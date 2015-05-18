@@ -2414,3 +2414,19 @@ if (BUSES["PSX_CONTROLLER"]~=null) then
 		MAME_DIR .. "src/emu/bus/psx/memcard.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/emu/bus/nasbus/nasbus.h,BUSES += NASBUS
+---------------------------------------------------
+
+if (BUSES["NASBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/bus/nasbus/nasbus.c",
+		MAME_DIR .. "src/emu/bus/nasbus/nasbus.h",
+		MAME_DIR .. "src/emu/bus/nasbus/cards.c",
+		MAME_DIR .. "src/emu/bus/nasbus/cards.h",
+		MAME_DIR .. "src/emu/bus/nasbus/floppy.c",
+		MAME_DIR .. "src/emu/bus/nasbus/floppy.h",
+	}
+end

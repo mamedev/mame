@@ -217,7 +217,7 @@ ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
 		{
 			m_RV.update_dev();
 		}
-		m_RV.set(1.0 / R, V, 0.0);
+		m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
 		m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
 	}
 }

@@ -106,8 +106,8 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
-			if (nl_math::abs(DD2) > 1e-50) // avoid div-by-zero
-				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(0.5*DD2));
+			if (nl_math::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
+				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -312,7 +312,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 		for (int j = i + 1; j < kN; j++)
 		{
 			const nl_double f1 = - m_A[j][i] * f;
-			if (f1 != 0.0)
+			if (f1 != NL_FCONST(0.0))
 			{
 				for (int k = i + 1; k < kN; k++)
 					m_A[j][k] += m_A[i][k] * f1;
@@ -365,7 +365,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 		cerr2 = (e2 > cerr2 ? e2 : cerr2);
 	}
 	// FIXME: Review
-	return cerr + cerr2*100000.0;
+	return cerr + cerr2*NL_FCONST(100000.0);
 }
 
 template <int m_N, int _storage_N>

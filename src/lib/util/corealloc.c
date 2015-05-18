@@ -17,6 +17,7 @@
 //**************************************************************************
 
 #define LOG_ALLOCS      (0)
+#define DEBUG_MISMATCHED_ALLOCS (0)
 
 // define this to initialize allocated memory to a fixed non-0 value
 #ifdef MAME_DEBUG
@@ -192,14 +193,18 @@ void free_file_line(void *memory, const char *file, int line, bool array)
 	// warn about mismatched arrays
 	if (!array && entry->m_array)
 	{
-		fprintf(stderr, "Error: attempt to free array %p with global_free in %s(%d)!\n", memory, file, line);
-		osd_break_into_debugger("Error: attempt to free array with global_free");
+		fprintf(stderr, "Warning: attempt to free array %p with global_free in %s(%d)!\n", memory, file, line);
+		if (DEBUG_MISMATCHED_ALLOCS) {
+			osd_break_into_debugger("Error: attempt to free array with global_free");
+		}
 	}
 	if (array && !entry->m_array)
 	{
 #ifndef __INTEL_COMPILER // todo: fix this properly, it appears some optimization the compiler applies breaks our logic here
-		fprintf(stderr, "Error: attempt to free single object %p with global_free_array in %s(%d)!\n", memory, file, line);
-		osd_break_into_debugger("Error: attempt to free single object with global_free_array");
+		fprintf(stderr, "Warning: attempt to free single object %p with global_free_array in %s(%d)!\n", memory, file, line);
+		if (DEBUG_MISMATCHED_ALLOCS) {
+			osd_break_into_debugger("Error: attempt to free single object with global_free_array");
+		}
 #endif
 	}
 

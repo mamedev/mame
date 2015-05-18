@@ -1115,7 +1115,7 @@ static void render_editor(DView_edit *editor)
 	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(width, 0.5);
+	maxwidth = MAX(width, 0.5f);
 
 	/* compute our bounds */
 	x1 = 0.5f - 0.5f * maxwidth;

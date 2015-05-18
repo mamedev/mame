@@ -225,7 +225,7 @@ float mu100_state::lightlevel(const UINT8 *src, const UINT8 *render)
 	int bit = slot & 7;
 	int adr = (slot >> 3);
 	if(render[adr] & (1 << bit))
-		return 1-(1-(255-l)/255.0)*contrast;
+		return 1-(1-(255-l)/255.0f)*contrast;
 	return 0.95f;
 }
 

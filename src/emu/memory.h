@@ -653,7 +653,9 @@ public:
 
 	// getters
 	memory_share *next() const { return m_next; }
-	void *ptr() const { return m_ptr; }
+	// NOTE: this being NULL in a C++ member function can lead to undefined behavior.
+	// However, it is relied on throughout MAME, so will remain for now.
+	void *ptr() const { if (this == NULL) return NULL; return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	endianness_t endianness() const { return m_endianness; }
 	UINT8 bitwidth() const { return m_bitwidth; }

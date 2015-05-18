@@ -938,7 +938,8 @@ ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
 
 ATTR_COLD void netlist_analog_output_t::initial(const nl_double val)
 {
-	net().as_analog().m_cur_Analog = val * 0.99;
+	// FIXME: Really necessary?
+	net().as_analog().m_cur_Analog = val * NL_FCONST(0.99);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1007,7 +1008,7 @@ ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, co
 		if (pequal < 0)
 			netlist().error("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
 		tmp = tmp.substr(pequal+1);
-		nl_double factor = 1.0;
+		nl_double factor = NL_FCONST(1.0);
 		switch (*(tmp.right(1).cstr()))
 		{
 			case 'm': factor = 1e-3; break;
@@ -1018,9 +1019,9 @@ ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, co
 			case 'a': factor = 1e-18; break;
 
 		}
-		if (factor != 1.0)
+		if (factor != NL_FCONST(1.0))
 			tmp = tmp.left(tmp.len() - 1);
-		return atof(tmp.cstr()) * factor;
+		return (nl_double) atof(tmp.cstr()) * factor;
 	}
 	else
 	{

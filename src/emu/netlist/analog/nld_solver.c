@@ -452,7 +452,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 	if (m_params.m_dynamic)
 	{
-		m_params.m_max_timestep *= 1000.0;
+		m_params.m_max_timestep *= NL_FCONST(1000.0);
 	}
 	else
 	{

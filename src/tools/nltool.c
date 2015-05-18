@@ -83,7 +83,8 @@ struct options_entry oplist[] =
 {
 	{ "time_to_run;t",   "1.0", OPTION_FLOAT,   "time to run the emulation (seconds)" },
 	{ "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
-	{ "f",               "-",   OPTION_STRING,  "file to process (default is stdin)" },
+	{ "file;f",          "-",   OPTION_STRING,  "file to process (default is stdin)" },
+	{ "cmd;c",			 "run", OPTION_STRING,  "run|convert|listdevices" },
 	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
 	{ NULL, NULL, 0, NULL }
@@ -101,9 +102,9 @@ NETLIST_END()
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-const char *filetobuf(pstring fname)
+pstring filetobuf(pstring fname)
 {
-	static pstring pbuf = "";
+	pstring pbuf = "";
 
 	if (fname == "-")
 	{
@@ -114,7 +115,7 @@ const char *filetobuf(pstring fname)
 			pbuf += lbuf;
 		}
 		printf("%d\n",*(pbuf.right(1).cstr()+1));
-		return pbuf.cstr();
+		return pbuf;
 	}
 	else
 	{
@@ -128,7 +129,9 @@ const char *filetobuf(pstring fname)
 		fread(buf, fsize, 1, f);
 		buf[fsize] = 0;
 		fclose(f);
-		return buf;
+		pbuf = buf;
+		free(buf);
+		return pbuf;
 	}
 }
 
@@ -237,6 +240,10 @@ static void run(core_options &opts)
 	printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
 }
 
+/*-------------------------------------------------
+    listdevices - list all known devices
+-------------------------------------------------*/
+
 static void listdevices()
 {
 	netlist_tool_t nt;
@@ -292,6 +299,263 @@ static void listdevices()
 }
 
 /*-------------------------------------------------
+    convert - convert a spice netlist
+-------------------------------------------------*/
+
+struct sp_net_t
+{
+public:
+	sp_net_t(const pstring &aname)
+	: m_name(aname), m_no_export(false) {}
+
+	const pstring &name() { return m_name;}
+	nl_util::pstring_list &terminals() { return m_terminals; }
+	void set_no_export() { m_no_export = true; }
+	bool is_no_export() { return m_no_export; }
+
+private:
+	pstring m_name;
+	bool m_no_export;
+	nl_util::pstring_list m_terminals;
+};
+
+struct sp_dev_t
+{
+public:
+	sp_dev_t(const pstring atype, const pstring aname, const pstring amodel)
+	: m_type(atype), m_name(aname), m_model(amodel), m_val(0), m_has_val(false)
+	{}
+
+	sp_dev_t(const pstring atype, const pstring aname, double aval)
+	: m_type(atype), m_name(aname), m_model(""), m_val(aval), m_has_val(true)
+	{}
+
+	const pstring &name() { return m_name;}
+	const pstring &type() { return m_type;}
+	const pstring &model() { return m_model;}
+	const double &value() { return m_val;}
+
+	bool has_model() { return m_model != ""; }
+	bool has_value() { return m_has_val; }
+
+private:
+	pstring m_type;
+	pstring m_name;
+	pstring m_model;
+	double m_val;
+	bool m_has_val;
+};
+
+static pnamedlist_t<sp_net_t *> nets;
+static pnamedlist_t<sp_dev_t *> devs;
+static plinearlist_t<pstring> alias;
+
+static void add_term(pstring netname, pstring termname)
+{
+	sp_net_t * net = nets.find(netname);
+	if (net == NULL)
+	{
+		net = new sp_net_t(netname);
+		nets.add(net, false);
+	}
+	net->terminals().add(termname);
+}
+
+static struct {
+	pstring sp_unit;
+	pstring nl_func;
+	double mult;
+} sp_units[] = {
+		{"T",   "",      1.0e12	},
+		{"G",   "", 	 1.0e9	},
+		{"MEG", "RES_M(%g)", 1.0e6	},
+		{"K",   "RES_K(%g)", 1.0e3	},
+		{"",    "%g",        1.0e0 	},
+		{"M",   "CAP_M(%g)", 1.0e-3	},
+		{"U",   "CAP_U(%g)", 1.0e-6	},
+		{"µ",   "CAP_U(%g)", 1.0e-6	},
+		{"N",   "CAP_N(%g)", 1.0e-9	},
+		{"P",   "CAP_P(%g)", 1.0e-12},
+		{"F", 	"%ge-15",    1.0e-15},
+
+		{"MIL", "%e",  25.4e-6},
+
+		{"-", 	"%g",  1.0	}
+};
+
+static const pstring get_nl_val(const double val)
+{
+	{
+		int i = 0;
+		while (sp_units[i].sp_unit != "-" )
+		{
+			if (sp_units[i].mult <= nl_math::abs(val))
+				break;
+			i++;
+		}
+		return pstring::sprintf(sp_units[i].nl_func.cstr(), val / sp_units[i].mult);
+	}
+}
+static double get_sp_unit(const pstring &unit)
+{
+	int i = 0;
+	while (sp_units[i].sp_unit != "-")
+	{
+		if (sp_units[i].sp_unit == unit)
+			return sp_units[i].mult;
+		i++;
+	}
+	fprintf(stderr, "Unit %s unknown\n", unit.cstr());
+	return 0.0;
+}
+
+static double get_sp_val(const pstring &sin)
+{
+	int p = sin.len() - 1;
+	while (p>=0 && (sin.substr(p,1) < "0" || sin.substr(p,1) > "9"))
+		p--;
+	pstring val = sin.substr(0,p + 1);
+	pstring unit = sin.substr(p + 1);
+
+	double ret = get_sp_unit(unit) * val.as_double();
+	//printf("<%s> %s %d ==> %f\n", sin.cstr(), unit.cstr(), p, ret);
+	return ret;
+}
+
+static void convert_dump_nl()
+{
+	for (int i=0; i<alias.count(); i++)
+	{
+		sp_net_t *net = nets.find(alias[i]);
+		// use the first terminal ...
+		printf("ALIAS(%s, %s)\n", alias[i].cstr(), net->terminals()[0].cstr());
+		// if the aliased net only has this one terminal connected ==> don't dump
+		if (net->terminals().count() == 1)
+			net->set_no_export();
+	}
+	for (int i=0; i<devs.count(); i++)
+	{
+		if (devs[i]->has_value())
+			printf("%s(%s, %s)\n", devs[i]->type().cstr(),
+					devs[i]->name().cstr(), get_nl_val(devs[i]->value()).cstr());
+		else if (devs[i]->has_model())
+			printf("%s(%s, \"%s\")\n", devs[i]->type().cstr(),
+					devs[i]->name().cstr(), devs[i]->model().cstr());
+		else
+			printf("%s(%s)\n", devs[i]->type().cstr(),
+					devs[i]->name().cstr());
+	}
+	// print nets
+	for (int i=0; i<nets.count(); i++)
+	{
+		sp_net_t * net = nets[i];
+		if (!net->is_no_export())
+		{
+			//printf("Net %s\n", net->name().cstr());
+			printf("NET_C(%s", net->terminals()[0].cstr() );
+			for (int j=1; j<net->terminals().count(); j++)
+			{
+				printf(", %s", net->terminals()[j].cstr() );
+			}
+			printf(")\n");
+		}
+	}
+	alias.clear();
+	devs.clear();
+	nets.clear();
+}
+static void convert(core_options &opts)
+{
+	pstring spnlf = filetobuf(opts.value("f"));
+	nl_util::pstring_list spnl = nl_util::split(spnlf.replace("\n+",""), "\n");
+
+	// Add gnd net
+
+	nets.add(new sp_net_t("0"), false);
+	nets[0]->terminals().add("GND");
+
+	for (int i=0; i < spnl.count(); i++)
+	{
+		pstring line = spnl[i].trim().ucase();
+		if (line != "")
+		{
+			nl_util::pstring_list tt = nl_util::split(line, " ", true);
+			switch (tt[0].cstr()[0])
+			{
+				case ';':
+					printf("// %s\n", line.substr(1).cstr());
+					break;
+				case '*':
+					printf("// %s\n", line.substr(1).cstr());
+					break;
+				case '.':
+					if (tt[0].equals(".SUBCKT"))
+					{
+						printf("NETLIST_START(%s)\n", tt[1].cstr());
+						for (int i=2; i<tt.count(); i++)
+							alias.add(tt[i]);
+					}
+					else if (tt[0].equals(".ENDS"))
+					{
+						convert_dump_nl();
+						printf("NETLIST_END()\n");
+					}
+					else
+						printf("// %s\n", line.cstr());
+					break;
+				case 'Q':
+				{
+					bool cerr = false;
+					/* check for fourth terminal ... should be numeric net
+					 * including "0" or start with "N" (ltspice)
+					 */
+					int nval =tt[4].as_long(&cerr);
+					if ((!cerr || tt[4].startsWith("N")) && tt.count() > 5)
+						devs.add(new sp_dev_t("QBJT", tt[0], tt[5]), false);
+					else
+						devs.add(new sp_dev_t("QBJT", tt[0], tt[4]), false);
+					add_term(tt[1], tt[0] + ".C");
+					add_term(tt[2], tt[0] + ".B");
+					add_term(tt[3], tt[0] + ".E");
+				}
+					break;
+				case 'R':
+					devs.add(new sp_dev_t("RES", tt[0], get_sp_val(tt[3])), false);
+					add_term(tt[1], tt[0] + ".1");
+					add_term(tt[2], tt[0] + ".2");
+					break;
+				case 'C':
+					devs.add(new sp_dev_t("CAP", tt[0], get_sp_val(tt[3])), false);
+					add_term(tt[1], tt[0] + ".1");
+					add_term(tt[2], tt[0] + ".2");
+					break;
+				case 'V':
+					// just simple Voltage sources ....
+					if (tt[2].equals("0"))
+					{
+						devs.add(new sp_dev_t("ANALOG_INPUT", tt[0], get_sp_val(tt[3])), false);
+						add_term(tt[1], tt[0] + ".Q");
+						//add_term(tt[2], tt[0] + ".2");
+					}
+					else
+						fprintf(stderr, "Voltage Source %s not connected to GND\n", tt[0].cstr());
+					break;
+				case 'D':
+					// FIXME: Rewrite resistor value
+					devs.add(new sp_dev_t("DIODE", tt[0], tt[3]), false);
+					add_term(tt[1], tt[0] + ".A");
+					add_term(tt[2], tt[0] + ".K");
+					break;
+				default:
+					printf("%s: %s\n", tt[0].cstr(), line.cstr());
+			}
+		}
+	}
+	convert_dump_nl();
+}
+
+
+/*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/
 
@@ -315,13 +579,18 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (opts.bool_value("ld"))
-	{
+	pstring cmd = opts.value("c");
+	if (cmd == "listdevices")
 		listdevices();
-	}
+	else if (cmd == "run")
+		run(opts);
+	else if (cmd == "convert")
+		convert(opts);
 	else
 	{
-		run(opts);
+		fprintf(stderr, "Unknown command %s\n", cmd.cstr());
+		usage(opts);
+		return 1;
 	}
 
 	return 0;

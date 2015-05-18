@@ -154,7 +154,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	INT32   frequency,delta,offset,pos;
 	INT32   cnt, voicecnt;
 	INT32   lastdt,prevdt,dltdt;
-	float   pbase=(float)m_baserate*2.0 / (float)m_sample_rate;
+	float   pbase=(float)m_baserate*2.0f / (float)m_sample_rate;
 
 	INT16   *lmix, *rmix;
 

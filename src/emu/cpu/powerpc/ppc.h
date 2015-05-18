@@ -14,7 +14,9 @@
 #ifndef __PPC_H__
 #define __PPC_H__
 
+#ifdef PPC_H_INCLUDED_FROM_PPC_C
 #include <setjmp.h>
+#endif
 #include "cpu/vtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -512,7 +514,9 @@ protected:
 	write32_delegate m_ext_dma_write_cb[4];
 
 	/* PowerPC function pointers for memory accesses/exceptions */
+#ifdef PPC_H_INCLUDED_FROM_PPC_C
 	jmp_buf m_exception_jmpbuf;
+#endif
 	UINT8 (*m_ppcread8)(address_space &space, offs_t address);
 	UINT16 (*m_ppcread16)(address_space &space, offs_t address);
 	UINT32 (*m_ppcread32)(address_space &space, offs_t address);

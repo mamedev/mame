@@ -272,6 +272,15 @@ project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
 	kind "StaticLib"
 
+	-- uncomment the options below to
+	-- compile using c++. Do the same 
+	-- in lsqlite3.
+	-- In addition comment out the "extern "C""
+	-- in lua.hpp and do the same in luaengine.c line 47
+	--options {
+	--	"ForceCPP",
+	--}
+
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -341,6 +350,10 @@ project "lua"
 project "lsqlite3"
 	uuid "1d84edab-94cf-48fb-83ee-b75bc697660e"
 	kind "StaticLib"
+
+	-- options {
+	--	"ForceCPP",
+	-- }
 
 	configuration { }
 		defines {
