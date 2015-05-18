@@ -556,7 +556,7 @@ void netlist_mame_sound_device_t::device_start()
 
 	// Configure outputs
 
-	plinearlist_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
+	plist_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
 	if (outdevs.count() == 0)
 		fatalerror("No output devices");
 
@@ -582,7 +582,7 @@ void netlist_mame_sound_device_t::device_start()
 	m_num_inputs = 0;
 	m_in = NULL;
 
-	plinearlist_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
+	plist_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
 	if (indevs.count() > 1)
 		fatalerror("A maximum of one input device is allowed!");
 	if (indevs.count() == 1)

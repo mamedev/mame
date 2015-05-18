@@ -75,18 +75,18 @@ class ATTR_ALIGNED(64) terms_t
 	int m_railstart;
 
 private:
-	plinearlist_t<netlist_terminal_t *> m_term;
-	plinearlist_t<int> m_net_other;
-	plinearlist_t<nl_double> m_go;
-	plinearlist_t<nl_double> m_gt;
-	plinearlist_t<nl_double> m_Idr;
-	plinearlist_t<nl_double *> m_other_curanalog;
+	plist_t<netlist_terminal_t *> m_term;
+	plist_t<int> m_net_other;
+	plist_t<nl_double> m_go;
+	plist_t<nl_double> m_gt;
+	plist_t<nl_double> m_Idr;
+	plist_t<nl_double *> m_other_curanalog;
 };
 
 class netlist_matrix_solver_t : public netlist_device_t
 {
 public:
-	typedef plinearlist_t<netlist_matrix_solver_t *> list_t;
+	typedef plist_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
 	enum eSolverType
@@ -134,8 +134,8 @@ protected:
 
 	ATTR_COLD virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
 
-	plinearlist_t<netlist_analog_net_t *> m_nets;
-	plinearlist_t<netlist_analog_output_t *> m_inps;
+	plist_t<netlist_analog_net_t *> m_nets;
+	plist_t<netlist_analog_output_t *> m_inps;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;

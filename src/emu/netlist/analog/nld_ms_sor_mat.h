@@ -40,7 +40,7 @@ public:
 
 	ATTR_COLD virtual void log_stats();
 
-	ATTR_HOT inline int vsolve_non_dynamic();
+	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
 	ATTR_HOT virtual nl_double vsolve();
 
@@ -126,7 +126,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic()
+ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	/* The matrix based code looks a lot nicer but actually is 30% slower than
 	 * the optimized code which works directly on the data structures.
@@ -293,7 +293,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 
 		this->LE_solve();
 		this->m_stat_calculations++;
-		return netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic();
+		return netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(newton_raphson);
 	}
 	else {
 		this->m_stat_calculations++;

@@ -8,6 +8,7 @@
 #define NLTIME_H_
 
 #include "nl_config.h"
+#include "pstate.h"
 
 //============================================================
 //  MACROS
@@ -71,6 +72,11 @@ protected:
 
 	INTERNALTYPE m_time;
 };
+
+template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist_time &nlt, const void *owner, const pstring &stname)
+{
+	save_state_ptr(stname, DT_INT64, owner, sizeof(netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr(), false);
+}
 
 ATTR_HOT inline const netlist_time operator-(const netlist_time &left, const netlist_time &right)
 {

@@ -66,27 +66,6 @@
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)
 
-
-#if 0
-#define NETDEV_ANALOG_CALLBACK(_name, _IN, _class, _member, _tag) \
-		{ \
-			NETLIB_NAME(analog_callback) *dev = downcast<NETLIB_NAME(analog_callback) *>(netlist.register_dev(NET_NEW(analog_callback), # _name)); \
-			netlist_analog_output_delegate d = netlist_analog_output_delegate(& _class :: _member, # _class "::" # _member, _tag, (_class *) 0); \
-			dev->register_callback(d); \
-		} \
-		NET_CONNECT(_name, IN, _IN)
-#endif
-
-#if 0
-#define NETDEV_SOUND_OUT(_name, _v, _m)                                             \
-		NET_REGISTER_DEV(sound_out, _name)                                          \
-		PARAM(_name.CHAN, _v)                                                       \
-		PARAM(_name.MULT, _m)
-
-#define NETDEV_SOUND_IN(_name)                                                      \
-		NET_REGISTER_DEV(sound_in, _name)
-#endif
-
 class netlist_mame_device_t;
 
 class netlist_mame_t : public netlist_base_t
@@ -518,7 +497,7 @@ class NETLIB_NAME(analog_callback) : public netlist_device_t
 {
 public:
 	NETLIB_NAME(analog_callback)()
-		: netlist_device_t(), m_cpu_device(NULL) { }
+		: netlist_device_t(), m_cpu_device(NULL), m_last(0) { }
 
 	ATTR_COLD void start()
 	{

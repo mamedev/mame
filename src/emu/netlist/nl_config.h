@@ -87,7 +87,7 @@
 //  Solver defines
 //============================================================
 
-#define USE_MATRIX_GS (1)
+#define USE_MATRIX_GS (0)
 #define USE_PIVOT_SEARCH (0)
 #define USE_GABS (1)
 // savings are eaten up by effort

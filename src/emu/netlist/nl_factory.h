@@ -68,7 +68,7 @@ public:
 class netlist_factory_t
 {
 public:
-	typedef plinearlist_t<net_device_t_base_factory *> list_t;
+	typedef plist_t<net_device_t_base_factory *> list_t;
 
 	ATTR_COLD netlist_factory_t();
 	ATTR_COLD ~netlist_factory_t();
