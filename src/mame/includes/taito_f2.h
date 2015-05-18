@@ -96,6 +96,7 @@ public:
 	int             m_nibble;
 	INT32           m_driveout_sound_latch;
 	INT32           m_oki_bank;
+	emu_timer       *m_int6_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
