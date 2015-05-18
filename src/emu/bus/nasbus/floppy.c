@@ -21,7 +21,8 @@ FLOPPY_FORMATS_MEMBER( nascom_fdc_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( nascom_floppies )
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+	SLOT_INTERFACE("55e", TEAC_FD_55E)
+	SLOT_INTERFACE("55f", TEAC_FD_55F)
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
@@ -32,10 +33,12 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_FRAGMENT( nascom_fdc )
 	MCFG_FD1793x_ADD("fd1793", XTAL_16MHz / 4 / 4)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "525qd", nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, NULL,    nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, NULL,    nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, NULL,    nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, NULL,  nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, NULL,  nascom_fdc_device::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
 
 machine_config_constructor nascom_fdc_device::device_mconfig_additions() const
@@ -71,6 +74,7 @@ nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *
 
 void nascom_fdc_device::device_start()
 {
+	save_item(NAME(m_select));
 }
 
 //-------------------------------------------------
