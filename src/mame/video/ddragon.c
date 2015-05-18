@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
+// copyright-holders:Philip Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
 /***************************************************************************
 
   Video Hardware for some Technos games:
