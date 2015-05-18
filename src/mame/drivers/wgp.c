@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Graves
 /***************************************************************************
 
 World Grand Prix    (c) Taito Corporation 1989
