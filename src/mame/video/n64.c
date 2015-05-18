@@ -2133,32 +2133,6 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 					userdata->m_lod_fraction = m_lod_fraction;
 					userdata->m_prim_lod_fraction = m_prim_lod_fraction;
 
-					userdata->m_color_inputs.combiner_rgbsub_a_r[0] = userdata->m_color_inputs.combiner_rgbsub_a_r[1] = &m_one.i.r;
-					userdata->m_color_inputs.combiner_rgbsub_a_g[0] = userdata->m_color_inputs.combiner_rgbsub_a_g[1] = &m_one.i.g;
-					userdata->m_color_inputs.combiner_rgbsub_a_b[0] = userdata->m_color_inputs.combiner_rgbsub_a_b[1] = &m_one.i.b;
-					userdata->m_color_inputs.combiner_rgbsub_b_r[0] = userdata->m_color_inputs.combiner_rgbsub_b_r[1] = &m_one.i.r;
-					userdata->m_color_inputs.combiner_rgbsub_b_g[0] = userdata->m_color_inputs.combiner_rgbsub_b_g[1] = &m_one.i.g;
-					userdata->m_color_inputs.combiner_rgbsub_b_b[0] = userdata->m_color_inputs.combiner_rgbsub_b_b[1] = &m_one.i.b;
-					userdata->m_color_inputs.combiner_rgbmul_r[0] = userdata->m_color_inputs.combiner_rgbmul_r[1] = &m_one.i.r;
-					userdata->m_color_inputs.combiner_rgbmul_g[0] = userdata->m_color_inputs.combiner_rgbmul_g[1] = &m_one.i.g;
-					userdata->m_color_inputs.combiner_rgbmul_b[0] = userdata->m_color_inputs.combiner_rgbmul_b[1] = &m_one.i.b;
-					userdata->m_color_inputs.combiner_rgbadd_r[0] = userdata->m_color_inputs.combiner_rgbadd_r[1] = &m_one.i.r;
-					userdata->m_color_inputs.combiner_rgbadd_g[0] = userdata->m_color_inputs.combiner_rgbadd_g[1] = &m_one.i.g;
-					userdata->m_color_inputs.combiner_rgbadd_b[0] = userdata->m_color_inputs.combiner_rgbadd_b[1] = &m_one.i.b;
-					userdata->m_color_inputs.combiner_alphasub_a[0] = userdata->m_color_inputs.combiner_alphasub_a[1] = &m_one.i.a;
-					userdata->m_color_inputs.combiner_alphasub_b[0] = userdata->m_color_inputs.combiner_alphasub_b[1] = &m_one.i.a;
-					userdata->m_color_inputs.combiner_alphamul[0] = userdata->m_color_inputs.combiner_alphamul[1] = &m_one.i.a;
-					userdata->m_color_inputs.combiner_alphaadd[0] = userdata->m_color_inputs.combiner_alphaadd[1] = &m_one.i.a;
-
-					userdata->m_color_inputs.blender1a_r[0] = userdata->m_color_inputs.blender1a_r[1] = &userdata->m_pixel_color.i.r;
-					userdata->m_color_inputs.blender1a_g[0] = userdata->m_color_inputs.blender1a_g[1] = &userdata->m_pixel_color.i.g;
-					userdata->m_color_inputs.blender1a_b[0] = userdata->m_color_inputs.blender1a_b[1] = &userdata->m_pixel_color.i.b;
-					userdata->m_color_inputs.blender1b_a[0] = userdata->m_color_inputs.blender1b_a[1] = &userdata->m_pixel_color.i.a;
-					userdata->m_color_inputs.blender2a_r[0] = userdata->m_color_inputs.blender2a_r[1] = &userdata->m_pixel_color.i.r;
-					userdata->m_color_inputs.blender2a_g[0] = userdata->m_color_inputs.blender2a_g[1] = &userdata->m_pixel_color.i.g;
-					userdata->m_color_inputs.blender2a_b[0] = userdata->m_color_inputs.blender2a_b[1] = &userdata->m_pixel_color.i.b;
-					userdata->m_color_inputs.blender2b_a[0] = userdata->m_color_inputs.blender2b_a[1] = &userdata->m_pixel_color.i.a;
-
 					// Setup blender data for this scanline
 					set_blender_input(0, 0, &userdata->m_color_inputs.blender1a_r[0],
 											&userdata->m_color_inputs.blender1a_g[0],
@@ -2299,32 +2273,6 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 					userdata->m_key_scale = m_key_scale;
 					userdata->m_lod_fraction = m_lod_fraction;
 					userdata->m_prim_lod_fraction = m_prim_lod_fraction;
-
-					userdata->m_color_inputs.combiner_rgbsub_a_r[0] = userdata->m_color_inputs.combiner_rgbsub_a_r[1] = &m_one.i.r;
-					userdata->m_color_inputs.combiner_rgbsub_a_g[0] = userdata->m_color_inputs.combiner_rgbsub_a_g[1] = &m_one.i.g;
-					userdata->m_color_inputs.combiner_rgbsub_a_b[0] = userdata->m_color_inputs.combiner_rgbsub_a_b[1] = &m_one.i.b;
-					userdata->m_color_inputs.combiner_rgbsub_b_r[0] = userdata->m_color_inputs.combiner_rgbsub_b_r[1] = &m_one.i.r;
-					userdata->m_color_inputs.combiner_rgbsub_b_g[0] = userdata->m_color_inputs.combiner_rgbsub_b_g[1] = &m_one.i.g;
-					userdata->m_color_inputs.combiner_rgbsub_b_b[0] = userdata->m_color_inputs.combiner_rgbsub_b_b[1] = &m_one.i.b;
-					userdata->m_color_inputs.combiner_rgbmul_r[0] = userdata->m_color_inputs.combiner_rgbmul_r[1] = &m_one.i.r;
-					userdata->m_color_inputs.combiner_rgbmul_g[0] = userdata->m_color_inputs.combiner_rgbmul_g[1] = &m_one.i.g;
-					userdata->m_color_inputs.combiner_rgbmul_b[0] = userdata->m_color_inputs.combiner_rgbmul_b[1] = &m_one.i.b;
-					userdata->m_color_inputs.combiner_rgbadd_r[0] = userdata->m_color_inputs.combiner_rgbadd_r[1] = &m_one.i.r;
-					userdata->m_color_inputs.combiner_rgbadd_g[0] = userdata->m_color_inputs.combiner_rgbadd_g[1] = &m_one.i.g;
-					userdata->m_color_inputs.combiner_rgbadd_b[0] = userdata->m_color_inputs.combiner_rgbadd_b[1] = &m_one.i.b;
-					userdata->m_color_inputs.combiner_alphasub_a[0] = userdata->m_color_inputs.combiner_alphasub_a[1] = &m_one.i.a;
-					userdata->m_color_inputs.combiner_alphasub_b[0] = userdata->m_color_inputs.combiner_alphasub_b[1] = &m_one.i.a;
-					userdata->m_color_inputs.combiner_alphamul[0] = userdata->m_color_inputs.combiner_alphamul[1] = &m_one.i.a;
-					userdata->m_color_inputs.combiner_alphaadd[0] = userdata->m_color_inputs.combiner_alphaadd[1] = &m_one.i.a;
-
-					userdata->m_color_inputs.blender1a_r[0] = userdata->m_color_inputs.blender1a_r[1] = &userdata->m_pixel_color.i.r;
-					userdata->m_color_inputs.blender1a_g[0] = userdata->m_color_inputs.blender1a_g[1] = &userdata->m_pixel_color.i.g;
-					userdata->m_color_inputs.blender1a_b[0] = userdata->m_color_inputs.blender1a_b[1] = &userdata->m_pixel_color.i.b;
-					userdata->m_color_inputs.blender1b_a[0] = userdata->m_color_inputs.blender1b_a[1] = &userdata->m_pixel_color.i.a;
-					userdata->m_color_inputs.blender2a_r[0] = userdata->m_color_inputs.blender2a_r[1] = &userdata->m_pixel_color.i.r;
-					userdata->m_color_inputs.blender2a_g[0] = userdata->m_color_inputs.blender2a_g[1] = &userdata->m_pixel_color.i.g;
-					userdata->m_color_inputs.blender2a_b[0] = userdata->m_color_inputs.blender2a_b[1] = &userdata->m_pixel_color.i.b;
-					userdata->m_color_inputs.blender2b_a[0] = userdata->m_color_inputs.blender2b_a[1] = &userdata->m_pixel_color.i.a;
 
 					// Setup blender data for this scanline
 					set_blender_input(0, 0, &userdata->m_color_inputs.blender1a_r[0],
