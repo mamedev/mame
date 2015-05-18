@@ -182,8 +182,8 @@ void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 	// escape pressed with non-empty text clears the text
 	if (m_search[0] != 0)
 	{
-		// since we have already been popped, we must recreate ourself from scratch
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, NULL)));
+		m_search[0] = 0;
+		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 }
 
@@ -201,7 +201,6 @@ void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 	if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
 	{
 		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-		m_rerandomize = true;
 		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 
@@ -221,10 +220,9 @@ void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 
 void ui_menu_select_game::populate()
 {
-	int matchcount;
-	int curitem;
+	int curitem, matchcount;
 
-	for (curitem = matchcount = 0; m_driverlist[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
+	for (curitem = matchcount = 0; m_driverlist[curitem] != NULL; curitem++)
 		if (!(m_driverlist[curitem]->flags & GAME_NO_STANDALONE))
 			matchcount++;
 
@@ -244,18 +242,30 @@ void ui_menu_select_game::populate()
 
 	// otherwise, rebuild the match list
 	assert(m_drivlist != NULL);
-	if (m_search[0] != 0 || m_matchlist[0] == -1 || m_rerandomize)
-		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
-	m_rerandomize = false;
-
-	// iterate over entries
-	for (curitem = 0; curitem < matchcount; curitem++)
+	if (m_search[0] != 0)
 	{
-		int curmatch = m_matchlist[curitem];
-		if (curmatch != -1)
+		m_drivlist->find_approximate_matches(m_search, VISIBLE_GAMES_IN_SEARCH, m_matchlist);
+
+		// iterate over entries
+		for (curitem = 0; curitem < VISIBLE_GAMES_IN_SEARCH; curitem++)
 		{
-			int cloneof = m_drivlist->non_bios_clone(curmatch);
-			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+			int curmatch = m_matchlist[curitem];
+
+			if (curmatch != -1)
+			{
+				int cloneof = m_drivlist->non_bios_clone(curmatch);
+				item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+			}
+		}
+	}
+
+	else
+	{
+		// iterate over entries
+		for (curitem = 0; m_driverlist[curitem] != NULL; curitem++)
+		{
+			int cloneof = driver_list::non_bios_clone(*m_driverlist[curitem]);
+			item_append(m_driverlist[curitem]->name, m_driverlist[curitem]->description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)m_driverlist[curitem]);
 		}
 	}
 

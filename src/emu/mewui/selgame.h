@@ -27,13 +27,14 @@ public:
 	// force game select menu
 	static void force_game_select(running_machine &machine, render_container *container);
 
+    virtual bool menu_has_search_active() { return (m_search[0] != 0); }
+
 private:
 	// internal state
-	enum { VISIBLE_GAMES_IN_LIST = 15 };
+	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 	UINT8                   m_error;
-	UINT8                   m_rerandomize;
 	char                    m_search[40];
-	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
+	int                     m_matchlist[VISIBLE_GAMES_IN_SEARCH];
 	std::vector<const game_driver *> m_driverlist;
 	auto_pointer<driver_enumerator> m_drivlist;
 

@@ -168,6 +168,9 @@ public:
 	// To be reimplemented in the menu subclass
 	virtual void handle() = 0;
 
+	// test if search is active
+	virtual bool menu_has_search_active() { return false; }
+
 private:
 	static ui_menu *menu_free;
 	static bitmap_rgb32 *hilight_bitmap;
