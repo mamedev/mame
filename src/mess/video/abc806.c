@@ -6,17 +6,6 @@
  *
  ****************************************************************************/
 
-/*
-
-    TODO:
-
-    - hook up RAD prom
-    - flashing
-    - double height
-    - underline
-
-*/
-
 #include "includes/abc80x.h"
 
 
@@ -227,7 +216,6 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 {
 	const pen_t *pen = m_palette->pens();
 
-//  UINT8 old_data = 0xff;
 	int fg_color = 7;
 	int bg_color = 0;
 	int underline = 0;
@@ -242,21 +230,21 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 	{
 		UINT8 data = m_char_ram[(ma + column) & 0x7ff];
 		UINT8 attr = m_attr_ram[(ma + column) & 0x7ff];
-		UINT16 rad_addr;
 		UINT8 rad_data;
 
 		if ((attr & 0x07) == ((attr >> 3) & 0x07))
 		{
 			// special case
-
 			switch (attr >> 6)
 			{
 			case 0:
 				// use previously selected attributes
 				break;
+
 			case 1:
 				// reserved for future use
 				break;
+
 			case 2:
 				// blank
 				fg_color = 0;
@@ -264,6 +252,7 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 				underline = 0;
 				flash = 0;
 				break;
+
 			case 3:
 				// double width
 				e5 = BIT(attr, 0);
@@ -299,10 +288,8 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 		}
 		else
 		{
-			rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 5) | (m_flshclk << 4) | ra;
+			UINT16 rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 4) | (m_flshclk << 5) | (ra & 0x0f);
 			rad_data = m_rad_prom->base()[rad_addr] & 0x0f;
-
-			rad_data = ra; // HACK because the RAD prom is not dumped yet
 		}
 
 		UINT16 chargen_addr = (th << 12) | (data << 4) | rad_data;
@@ -328,8 +315,6 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 		{
 			column++;
 		}
-
-//      old_data = data;
 	}
 }
 
