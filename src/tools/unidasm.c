@@ -113,6 +113,7 @@ CPU_DISASSEMBLE( jaguargpu );
 CPU_DISASSEMBLE( konami );
 CPU_DISASSEMBLE( lh5801 );
 CPU_DISASSEMBLE( lr35902 );
+CPU_DISASSEMBLE( m58846 );
 CPU_DISASSEMBLE( m37710_generic );
 CPU_DISASSEMBLE( m6800 );
 CPU_DISASSEMBLE( m68000 );
@@ -264,6 +265,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "konami",     _8bit,  0, CPU_DISASSEMBLE_NAME(konami) },
 	{ "lh5801",     _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
 	{ "lr35902",    _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },
+	{ "m58846",     _16le, -1, CPU_DISASSEMBLE_NAME(m58846) },
 	{ "m37710",     _8bit,  0, CPU_DISASSEMBLE_NAME(m37710_generic) },
 	{ "m6800",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6800) },
 	{ "m68000",     _16be,  0, CPU_DISASSEMBLE_NAME(m68000) },
