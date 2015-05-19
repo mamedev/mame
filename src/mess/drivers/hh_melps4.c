@@ -8,8 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-//#include "cpu/melps4/melps4.h"
-#include "cpu/ucom4/ucom4.h"
+#include "cpu/melps4/m58846.h"
 #include "sound/speaker.h"
 
 #include "hh_melps4_test.lh" // common test-layout - use external artwork
@@ -240,7 +239,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D552, XTAL_600kHz)
+	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_melps4_test)

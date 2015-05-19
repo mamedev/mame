@@ -127,6 +127,7 @@ CPUS["ARCOMPACT"] = true
 --CPUS["UCOM4"] = true
 CPUS["HMCS40"] = true
 --CPUS["E0C6200"] = true
+--CPUS["MELPS4"] = true
 
 --------------------------------------------------
 -- specify available sound cores
