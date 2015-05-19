@@ -106,7 +106,8 @@ public:
 	nascom_state(mconfig, type, tag),
 	m_nasbus(*this, "nasbus"),
 	m_socket1(*this, "socket1"),
-	m_socket2(*this, "socket2")
+	m_socket2(*this, "socket2"),
+	m_lsw1(*this, "lsw1")
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
@@ -118,10 +119,14 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
+protected:
+	virtual void machine_reset();
+
 private:
 	required_device<nasbus_device> m_nasbus;
 	required_device<generic_slot_device> m_socket1;
 	required_device<generic_slot_device> m_socket2;
+	required_ioport m_lsw1;
 };
 
 
@@ -333,6 +338,15 @@ DRIVER_INIT_MEMBER( nascom_state, nascom )
 	{
 		m_maincpu->space(AS_PROGRAM).install_ram(0x1000, 0x1000 + m_ram->size() - 1, m_ram->pointer());
 	}
+}
+
+void nascom2_state::machine_reset()
+{
+	// base machine reset
+	nascom_state::machine_reset();
+
+	// restart address (on the real system, a12 to a15 are forced to 1 for one memory cycle)
+	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
 }
 
 DRIVER_INIT_MEMBER( nascom2_state, nascom )
@@ -547,6 +561,27 @@ static INPUT_PORTS_START( nascom2 )
 	PORT_MODIFY("KEY.8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back CS")       PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(8)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter  Escape") PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)  PORT_CHAR(27)
+
+	// link switch on board
+	PORT_START("lsw1")
+	PORT_DIPNAME(0x0f, 0x00, "Restart address")
+	PORT_DIPLOCATION("LSW1:2,3,4,5")
+	PORT_DIPSETTING(0x00, "0000H")
+	PORT_DIPSETTING(0x01, "1000H")
+	PORT_DIPSETTING(0x02, "2000H")
+	PORT_DIPSETTING(0x03, "3000H")
+	PORT_DIPSETTING(0x04, "4000H")
+	PORT_DIPSETTING(0x05, "5000H")
+	PORT_DIPSETTING(0x06, "6000H")
+	PORT_DIPSETTING(0x07, "7000H")
+	PORT_DIPSETTING(0x08, "8000H")
+	PORT_DIPSETTING(0x09, "9000H")
+	PORT_DIPSETTING(0x0a, "A000H")
+	PORT_DIPSETTING(0x0b, "B000H")
+	PORT_DIPSETTING(0x0c, "C000H")
+	PORT_DIPSETTING(0x0d, "D000H")
+	PORT_DIPSETTING(0x0e, "E000H")
+	PORT_DIPSETTING(0x0f, "F000H")
 INPUT_PORTS_END
 
 

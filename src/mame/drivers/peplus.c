@@ -8276,7 +8276,7 @@ Designed and co-created by Best Bet Products
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* Wrong!! Should be CAPX2325 */
 ROM_END
 
-ROM_START( pex2297p ) /* Superboard : Jackpot Poker (X002284P+XP000053) */
+ROM_START( pex2297p ) /* Superboard : Jackpot Poker (X002297P+XP000053) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------

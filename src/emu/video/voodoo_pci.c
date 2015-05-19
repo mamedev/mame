@@ -2,6 +2,8 @@
 // copyright-holders:Ted Green
 #include "voodoo_pci.h"
 
+int voodoo_pci_device::m_type = 0;
+
 static MACHINE_CONFIG_FRAGMENT( voodoo_1_pci )
 	MCFG_DEVICE_ADD("voodoo", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(4)
@@ -52,6 +54,8 @@ const device_type VOODOO_PCI = &device_creator<voodoo_pci_device>;
 DEVICE_ADDRESS_MAP_START(voodoo_reg_map, 32, voodoo_pci_device)
 	AM_RANGE(0x0, 0x00ffffff) AM_DEVREADWRITE("voodoo", voodoo_device, voodoo_r, voodoo_w)
 ADDRESS_MAP_END
+
+
 DEVICE_ADDRESS_MAP_START(banshee_reg_map, 32, voodoo_pci_device)
 	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_r, banshee_w)
 ADDRESS_MAP_END
@@ -64,7 +68,7 @@ ADDRESS_MAP_END
 
 voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, VOODOO_PCI, "Voodoo PCI", tag, owner, clock, "voodoo_pci", __FILE__),
-		m_voodoo(*this, "voodoo"),  m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
+		m_voodoo(*this, "voodoo"), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
 {
 }
 
