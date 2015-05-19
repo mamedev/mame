@@ -9,8 +9,8 @@
 #include "voodoo.h"
 
 #define MCFG_VOODOO_PCI_ADD(_tag,  _type, _cpu_tag) \
+	voodoo_pci_device::set_type(_type); \
 	MCFG_PCI_DEVICE_ADD(_tag, VOODOO_PCI, 0, 0, 0, 0) \
-	downcast<voodoo_pci_device *>(device)->set_type(_type); \
 	downcast<voodoo_pci_device *>(device)->set_cpu_tag(_cpu_tag);
 
 #define MCFG_VOODOO_PCI_FBMEM(_value) \
@@ -29,7 +29,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void set_cpu_tag(const char *tag);
-	void set_type(const int type) {m_type = type;}
+	static void set_type(const int type) {m_type = type;}
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
 	void set_tmumem(const int tmumem0, const int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
 
@@ -39,7 +39,8 @@ protected:
 
 private:
 	required_device<voodoo_device> m_voodoo;
-	int m_type, m_fbmem, m_tmumem0, m_tmumem1;
+	static int m_type;
+	int m_fbmem, m_tmumem0, m_tmumem1;
 	const char *m_cpu_tag;
 
 	DECLARE_ADDRESS_MAP(voodoo_reg_map, 32);
