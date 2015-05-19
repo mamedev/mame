@@ -29,10 +29,16 @@ If you're on a *nix system, it could be as easy as typing
 make
 ```
 
-for a MAME build, or
+for a MAME build,
 
 ```
-make TARGET=mess
+make SUBTARGET=arcade
+```
+
+for an arcade-only build, or
+
+```
+make SUBTARGET=mess
 ```
 
 for a MESS build (provided you have all the [prerequisites](http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=35138)).
