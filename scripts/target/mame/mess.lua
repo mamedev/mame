@@ -1755,6 +1755,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "mitsubishi")
 files {        
+	MAME_DIR .. "src/mess/drivers/hh_melps4.c",
 	MAME_DIR .. "src/mess/drivers/multi8.c",    
 	MAME_DIR .. "src/mess/drivers/multi16.c",   
 }

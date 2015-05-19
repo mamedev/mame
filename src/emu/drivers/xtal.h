@@ -238,6 +238,7 @@ enum
 	XTAL_430kHz         = 430000,
 	XTAL_455kHz         = 455000,       /* OKI MSM5205 on Gladiator h/w */
 	XTAL_512kHz         = 512000,       /* Toshiba TC8830F */
+	XTAL_600kHz         = 600000,
 	XTAL_640kHz         = 640000,       /* NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
 	XTAL_1_056MHz       = 1056000       /* OKI M6295 on Trio The Punch h/w */
 };
