@@ -269,12 +269,6 @@ intv2     // Mattel Intellivision II- 1982?
 intvsrs   // Intellivision (Sears License) - 19??
 intvoice      // Mattel Intellivision + IntelliVoice expansion - 1982
 
-// Milton Bradley
-microvsn  // MicroVision - 1979
-
-// Entex
-advision  // Adventurevision
-
 // Capcom
 sfach    // CPS Changer (Street Fighter Alpha)
 sfzbch  // CPS Changer (Street Fighter ZERO Brazil)
@@ -1037,19 +1031,6 @@ avigo_de     // 1997 Avigo (German)
 avigo_fr     // 1997 Avigo (French)
 avigo_es     // 1997 Avigo (Spanish)
 avigo_it     // 1997 Avigo (Italian)
-
-// TI Speak & Spell
-snspell
-snspella
-snspellb
-snspelluk
-snspelluka
-snspelljp
-ladictee
-snmath
-snmathp
-snread
-lantutor
 
 // Texas Instruments Calculators
 tisr16    // 1974 SR-16
@@ -2152,7 +2133,9 @@ ngen        // 1983
 ngenb38     // 1991
 386i        // 199?
 
-// Dedicated handhelds/tabletops
+//********** Dedicated handhelds/tabletops ******************
+
+// hh_cop400
 ctstein     // Castle Toy
 einvaderc   // Entex
 funjacks    // Mattel
@@ -2160,6 +2143,7 @@ funrlgr     // Mattel
 plus1       // Milton Bradley
 lightfgt    // Milton Bradley
 
+// hh_hmcs40
 bambball    // Bambino
 bmboxing    // Bambino
 bfriskyt    // Bandai
@@ -2188,8 +2172,10 @@ kingman     // Tomy
 tmtron      // Tomy
 vinvader    // VTech
 
+// hh_pic16
 maniac      // Ideal
 
+// hh_tms1k
 mathmagi    // APF
 amaztron    // Coleco
 h2hbaseb    // Coleco
@@ -2219,9 +2205,24 @@ splitsec    // Parker Bros
 mmerlin     // Parker Bros
 tandy12     // Tandy Radio Shack
 
+// hh_tms1k derivatives
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
+// TI snspell
+snspell
+snspella
+snspellb
+snspelluk
+snspelluka
+snspelljp
+ladictee
+snmath
+snmathp
+snread
+lantutor
+
+// hh_ucom4
 ufombs      // Bambino
 ssfball     // Bambino
 bmsoccer    // Bambino
@@ -2240,6 +2241,12 @@ tmscramb    // Tomy
 tcaveman    // Tomy
 alnchase    // Tomy
 
+// other
+tama        // Bandai
+advision    // Entex
+microvsn    // Milton Bradley
+monty       // Ritam
+mmonty      // Ritam
 wildfire    // Parker Bros
 
 
@@ -2667,6 +2674,3 @@ leapstertv
 excali64
 bitgrpha
 bitgrphb
-monty
-mmonty
-tama
