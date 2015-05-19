@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Stefan Jokish
 #include "sound/discrete.h"
 
 class skyraid_state : public driver_device

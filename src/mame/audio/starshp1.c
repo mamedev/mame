@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Frank Palazzolo, Stefan Jokish
 /************************************************************************
  * starshp1 Sound System Analog emulation
  * Aug 2008, Derrick Renaud

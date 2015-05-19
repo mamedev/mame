@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Stefan Jokisch
 /***************************************************************************
 
     Atari Mini Golf (prototype) driver

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 /***************************************************************************
 
     Namco NA-1 System hardware

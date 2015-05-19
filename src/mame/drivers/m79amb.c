@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Al Kossow
 /*          Ramtek M79 Ambush
 
 

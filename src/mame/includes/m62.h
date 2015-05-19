@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf, David Haywood
 class m62_state : public driver_device
 {
 public:

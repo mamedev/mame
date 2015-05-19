@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:insideoutboy
 /*
 
 Flower (c)1986 Komax (USA license)

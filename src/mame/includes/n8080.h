@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/sn76477.h"

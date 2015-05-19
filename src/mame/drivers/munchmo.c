@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 /***************************************************************************
   Munch Mobile
   (C) 1983 SNK

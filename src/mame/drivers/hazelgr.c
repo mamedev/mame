@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Hazel Grove Fruit Machine HW
  unknown platform! z80 based..
 
