@@ -99,8 +99,8 @@ const device_type SONY_OA_D32V = &device_creator<sony_oa_d32v>;
 #if 0
 const device_type TEAC_FD_55A = &device_creator<teac_fd_55a>;
 const device_type TEAC_FD_55B = &device_creator<teac_fd_55b>;
-const device_type TEAC_FD_55E = &device_creator<teac_fd_55e>;
 #endif
+const device_type TEAC_FD_55E = &device_creator<teac_fd_55e>;
 const device_type TEAC_FD_55F = &device_creator<teac_fd_55f>;
 const device_type TEAC_FD_55G = &device_creator<teac_fd_55g>;
 
@@ -1772,6 +1772,41 @@ void sony_oa_d32v::handled_variants(UINT32 *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 	variants[var_count++] = floppy_image::SSDD;
+}
+
+//-------------------------------------------------
+//  TEAC FD-55E
+//
+//  track to track: 3 ms
+//  average: 94 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_55e::teac_fd_55e(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, TEAC_FD_55F, "TEAC FD-55E FDD", tag, owner, clock, "teac_fd_55e", __FILE__)
+{
+}
+
+teac_fd_55e::~teac_fd_55e()
+{
+}
+
+void teac_fd_55e::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 80;
+	sides = 1;
+	set_rpm(300);
+}
+
+void teac_fd_55e::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::SSQD;
 }
 
 //-------------------------------------------------

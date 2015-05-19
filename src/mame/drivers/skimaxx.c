@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Bennett, Luca Elia
+// copyright-holders:Philip Bennett, Luca Elia
 /*****************************************************************************************************
 
     Skimaxx

@@ -100,13 +100,13 @@
 #define HWRITEADDR8(in, val)    /*{if ((in) <= MEM8_LIMIT) */m_hidden_bits[(in) ^ BYTE_ADDR_XOR] = val;/*}*/
 
 //sign-extension macros
-#define SIGN22(x)   (((x) & 0x200000) ? ((x) | ~0x3fffff) : ((x) & 0x3fffff))
-#define SIGN17(x)   (((x) & 0x10000) ? ((x) | ~0x1ffff) : ((x) & 0x1ffff))
-#define SIGN16(x)   (((x) & 0x8000) ? ((x) | ~0xffff) : ((x) & 0xffff))
-#define SIGN13(x)   (((x) & 0x1000) ? ((x) | ~0x1fff) : ((x) & 0x1fff))
-#define SIGN11(x)   (((x) & 0x400) ? ((x) | ~0x7ff) : ((x) & 0x7ff))
-#define SIGN9(x)    (((x) & 0x100) ? ((x) | ~0x1ff) : ((x) & 0x1ff))
-#define SIGN8(x)    (((x) & 0x80) ? ((x) | ~0xff) : ((x) & 0xff))
+#define SIGN22(x)   (((x & 0x00200000) * 0x7ff) | (x & 0x1fffff))
+#define SIGN17(x)	(((x & 0x00010000) * 0xffff) | (x & 0xffff))
+#define SIGN16(x)   (((x & 0x00008000) * 0x1ffff) | (x & 0x7fff))
+#define SIGN13(x)   (((x & 0x00001000) * 0xfffff) | (x & 0xfff))
+#define SIGN11(x)   (((x & 0x00000400) * 0x3fffff) | (x & 0x3ff))
+#define SIGN9(x)    (((x & 0x00000100) * 0xffffff) | (x & 0xff))
+#define SIGN8(x)    (((x & 0x00000080) * 0x1ffffff) | (x & 0x7f))
 
 #define KURT_AKELEY_SIGN9(x)    ((((x) & 0x180) == 0x180) ? ((x) | ~0x1ff) : ((x) & 0x1ff))
 

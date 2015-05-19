@@ -31,13 +31,13 @@ const char *nascom_format::extensions() const
 
 const nascom_format::format nascom_format::formats[] =
 {
-	{   //  360k 5 1/4 inch double density single sided
-		floppy_image::FF_525, floppy_image::SSQD, floppy_image::MFM,
-		2000, 16, 80, 1, 256, {}, 1, {}, 32, 22, 54
-	},
 	{   //  720k 5 1/4 inch double density double sided
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
 		2000, 16, 80, 2, 256, {}, 1, {}, 32, 22, 54
+	},
+	{   //  360k 5 1/4 inch double density single sided
+		floppy_image::FF_525, floppy_image::SSQD, floppy_image::MFM,
+		2000, 16, 80, 1, 256, {}, 1, {}, 32, 22, 54
 	},
 	{}
 };

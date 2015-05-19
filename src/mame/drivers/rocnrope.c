@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Chris Hardy
 /***************************************************************************
 
     Roc'n Rope (c) 1983 Konami

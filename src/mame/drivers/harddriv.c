@@ -5148,7 +5148,7 @@ void harddriv_state::init_hdrivairp(void)
  *
  *************************************/
 
-GAME( 1999, harddriv,   0,        harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
+GAME( 1988, harddriv,   0,        harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
 GAME( 1988, harddrivb,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 7)", 0 )
 GAME( 1988, harddrivg,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 7)", 0 )
 GAME( 1988, harddrivj,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 7)", 0 )

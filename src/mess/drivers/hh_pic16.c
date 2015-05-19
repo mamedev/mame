@@ -10,6 +10,7 @@
 -----------------------------------------------------------
  @036     1655A   1979, Ideal Maniac
  *061     1655A   1980, Lakeside Le Boom (have dump)
+ *094     1655A   1980, GAF Melody Madness (have dump)
  *110     1650A   1979, Tiger Rocket Pinball
  *192     1650    19??, (a phone dialer, have dump)
  *255     1655    19??, (a talking clock, have dump)

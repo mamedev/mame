@@ -93,7 +93,6 @@ public:
 	int                 		selected;       // which item is selected
 	int                 		hover;          // which item is being hovered over
 	int                 		visitems;       // number of visible items
-	int                 		numitems;       // number of items in the menu
 	float              			customtop;      // amount of extra height to add at the top
 	float               		custombottom;   // amount of extra height to add at the bottom
 	ui_menu_pool 	      		*pool;          // list of memory pools
@@ -101,9 +100,6 @@ public:
 
 	// free all items in the menu, and all memory allocated from the memory pool
 	void reset(ui_menu_reset_options options);
-
-	// returns true if the menu has any non-default items in it
-	bool populated();
 
 	// append a new item to the end of the menu
 	void item_append(const char *text, const char *subtext, UINT32 flags, void *ref);

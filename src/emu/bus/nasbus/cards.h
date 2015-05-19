@@ -13,6 +13,7 @@
 
 #include "emu.h"
 
+#include "avc.h"
 #include "floppy.h"
 
 SLOT_INTERFACE_EXTERN( nasbus_slot_cards );

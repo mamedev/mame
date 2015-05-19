@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Frank Palazzolo, Stefan Jokish
 /***************************************************************************
 
 Atari Starship 1 driver

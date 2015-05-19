@@ -24,7 +24,6 @@
 ***************************************************************************/
 
 #define UI_MENU_POOL_SIZE       65536
-#define UI_MENU_ALLOC_ITEMS     256
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -169,13 +168,12 @@ void ui_menu::reset(ui_menu_reset_options options)
 	else if (options == UI_MENU_RESET_REMEMBER_REF)
 		resetref = item[selected].ref;
 
-	// reset all the pools and the numitems back to 0
+	// reset all the pools and the item.size() back to 0
 	for (ui_menu_pool *ppool = pool; ppool != NULL; ppool = ppool->next)
 		ppool->top = (UINT8 *)(ppool + 1);
-	numitems = 0;
+	item.clear();
 	visitems = 0;
 	selected = 0;
-	item.clear();
 	std::string backtext;
 	strprintf(backtext, "Return to %s", emulator_info::get_capstartgamenoun());
 
@@ -212,17 +210,6 @@ void ui_menu::set_special_main_menu(bool special)
 
 
 //-------------------------------------------------
-//  populated - returns true if the menu
-//  has any non-default items in it
-//-------------------------------------------------
-
-bool ui_menu::populated()
-{
-	return numitems > 1;
-}
-
-
-//-------------------------------------------------
 //  item_append - append a new item to the
 //  end of the menu
 //-------------------------------------------------
@@ -231,10 +218,10 @@ void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, v
 {
 	// only allow multiline as the first item
 	if ((flags & MENU_FLAG_MULTILINE) != 0)
-		assert(numitems == 1);
+		assert(item.size() == 1);
 
 	// only allow a single multi-line item
-	else if (numitems >= 2)
+	else if (item.size() >= 2)
 		assert((item[0].flags & MENU_FLAG_MULTILINE) == 0);
 
 	// allocate a new item and populate it
@@ -244,8 +231,8 @@ void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, v
 	pitem.flags = flags;
 	pitem.ref = ref;
 
-	// append to the second to last position
-	int index = numitems++;
+	// append to array
+	int index = item.size();
 	if (!item.empty())
 		item.insert(item.end() - 1, pitem);
 	else
@@ -254,8 +241,8 @@ void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, v
 	// update the selection if we need to
 	if (resetpos == index || (resetref != NULL && resetref == ref))
 		selected = index;
-	if (resetpos == numitems - 1)
-		selected = numitems - 1;
+	if (resetpos == item.size() - 1)
+		selected = item.size() - 1;
 }
 
 
@@ -273,7 +260,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 	validate_selection(1);
 
 	// draw the menu
-	if (numitems > 1 && (item[0].flags & MENU_FLAG_MULTILINE) != 0)
+	if (item.size() > 1 && (item[0].flags & MENU_FLAG_MULTILINE) != 0)
 		draw_text_box();
 	else
 		draw(flags & UI_MENU_PROCESS_CUSTOM_ONLY);
@@ -290,7 +277,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 	}
 
 	// update the selected item in the menu_event
-	if (menu_event.iptkey != IPT_INVALID && selected >= 0 && selected < numitems)
+	if (menu_event.iptkey != IPT_INVALID && selected >= 0 && selected < item.size())
 	{
 		menu_event.itemref = item[selected].ref;
 		return &menu_event;
@@ -349,7 +336,7 @@ const char *ui_menu::pool_strdup(const char *string)
 
 void *ui_menu::get_selection()
 {
-	return (selected >= 0 && selected < numitems) ? item[selected].ref : NULL;
+	return (selected >= 0 && selected < item.size()) ? item[selected].ref : NULL;
 }
 
 
@@ -360,10 +347,8 @@ void *ui_menu::get_selection()
 
 void ui_menu::set_selection(void *selected_itemref)
 {
-	int itemnum;
-
 	selected = -1;
-	for (itemnum = 0; itemnum < numitems; itemnum++)
+	for (int itemnum = 0; itemnum < item.size(); itemnum++)
 		if (item[itemnum].ref == selected_itemref)
 		{
 			selected = itemnum;
@@ -387,25 +372,16 @@ void ui_menu::draw(bool customonly)
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float gutter_width = lr_arrow_width * 1.3f;
-	float x1, y1, x2, y2;
 
-	float effective_width, effective_left;
-	float visible_width, visible_main_menu_height;
-	float visible_extra_menu_height = 0;
-	float visible_top, visible_left;
 	int selected_subitem_too_big = FALSE;
-	int visible_lines;
-	int top_line;
 	int itemnum, linenum;
 	bool mouse_hit, mouse_button;
-	render_target *mouse_target;
-	INT32 mouse_target_x, mouse_target_y;
 	float mouse_x = -1, mouse_y = -1;
 
 	// compute the width and height of the full menu
-	visible_width = 0;
-	visible_main_menu_height = 0;
-	for (itemnum = 0; itemnum < numitems; itemnum++)
+	float visible_width = 0;
+	float visible_main_menu_height = 0;
+	for (itemnum = 0; itemnum < item.size(); itemnum++)
 	{
 		const ui_menu_item &pitem = item[itemnum];
 		float total_width;
@@ -426,7 +402,7 @@ void ui_menu::draw(bool customonly)
 	}
 
 	// account for extra space at the top and bottom
-	visible_extra_menu_height = customtop + custombottom;
+	float visible_extra_menu_height = customtop + custombottom;
 
 	// add a little bit of slop for rounding
 	visible_width += 0.01f;
@@ -440,48 +416,51 @@ void ui_menu::draw(bool customonly)
 	if (visible_main_menu_height + visible_extra_menu_height + 2.0f * UI_BOX_TB_BORDER > 1.0f)
 		visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
 
-	visible_lines = floor(visible_main_menu_height / line_height);
+	int visible_lines = floor(visible_main_menu_height / line_height);
 	visible_main_menu_height = (float)visible_lines * line_height;
 
 	// compute top/left of inner menu area by centering
-	visible_left = (1.0f - visible_width) * 0.5f;
-	visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+	float visible_left = (1.0f - visible_width) * 0.5f;
+	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
 
 	// if the menu is at the bottom of the extra, adjust
 	visible_top += customtop;
 
 	// first add us a box
-	x1 = visible_left - UI_BOX_LR_BORDER;
-	y1 = visible_top - UI_BOX_TB_BORDER;
-	x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
-	y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
+	float x1 = visible_left - UI_BOX_LR_BORDER;
+	float y1 = visible_top - UI_BOX_TB_BORDER;
+	float x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
+	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
 	if (!customonly)
 		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// determine the first visible line based on the current selection
-	top_line = selected - visible_lines / 2;
+	int top_line = selected - visible_lines / 2;
 	if (top_line < 0)
 		top_line = 0;
-	if (top_line + visible_lines >= numitems)
-		top_line = numitems - visible_lines;
+	if (top_line + visible_lines >= item.size())
+		top_line = item.size() - visible_lines;
 
 	// determine effective positions taking into account the hilighting arrows
-	effective_width = visible_width - 2.0f * gutter_width;
-	effective_left = visible_left + gutter_width;
+	float effective_width = visible_width - 2.0f * gutter_width;
+	float effective_left = visible_left + gutter_width;
 
 	// locate mouse
 	mouse_hit = false;
 	mouse_button = false;
 	if (!customonly)
 	{
-		mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
+		INT32 mouse_target_x, mouse_target_y;
+		render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
 		if (mouse_target != NULL)
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
 				mouse_hit = true;
 	}
 
 	// loop over visible lines
-	hover = numitems + 1;
+	hover = item.size() + 1;
+	float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+	float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
 	if (!customonly)
 		for (linenum = 0; linenum < visible_lines; linenum++)
 		{
@@ -493,9 +472,7 @@ void ui_menu::draw(bool customonly)
 			rgb_t bgcolor = UI_TEXT_BG_COLOR;
 			rgb_t fgcolor2 = UI_SUBITEM_COLOR;
 			rgb_t fgcolor3 = UI_CLONE_COLOR;
-			float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 			float line_y0 = line_y;
-			float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
 			float line_y1 = line_y + line_height;
 
 			// set the hover if this is our item
@@ -527,29 +504,27 @@ void ui_menu::draw(bool customonly)
 			// if we're on the top line, display the up arrow
 			if (linenum == 0 && top_line != 0)
 			{
-				draw_arrow(
-									container,
-									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-									line_y + 0.25f * line_height,
-									0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-									line_y + 0.75f * line_height,
-									fgcolor,
-									ROT0);
+				draw_arrow(container,
+						   0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+						   line_y + 0.25f * line_height,
+						   0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+						   line_y + 0.75f * line_height,
+						   fgcolor,
+						   ROT0);
 				if (hover == itemnum)
 					hover = -2;
 			}
 
 			// if we're on the bottom line, display the down arrow
-			else if (linenum == visible_lines - 1 && itemnum != numitems - 1)
+			else if (linenum == visible_lines - 1 && itemnum != item.size() - 1)
 			{
-				draw_arrow(
-									container,
-									0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-									line_y + 0.25f * line_height,
-									0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-									line_y + 0.75f * line_height,
-									fgcolor,
-									ROT0 ^ ORIENTATION_FLIP_Y);
+				draw_arrow(container,
+						   0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+						   line_y + 0.25f * line_height,
+						   0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+						   line_y + 0.75f * line_height,
+						   fgcolor,
+						   ROT0 ^ ORIENTATION_FLIP_Y);
 				if (hover == itemnum)
 					hover = -1;
 			}
@@ -592,25 +567,23 @@ void ui_menu::draw(bool customonly)
 				// apply arrows
 				if (itemnum == selected && (pitem.flags & MENU_FLAG_LEFT_ARROW))
 				{
-					draw_arrow(
-										container,
-										effective_left + effective_width - subitem_width - gutter_width,
-										line_y + 0.1f * line_height,
-										effective_left + effective_width - subitem_width - gutter_width + lr_arrow_width,
-										line_y + 0.9f * line_height,
-										fgcolor,
-										ROT90 ^ ORIENTATION_FLIP_X);
+					draw_arrow(container,
+							   effective_left + effective_width - subitem_width - gutter_width,
+							   line_y + 0.1f * line_height,
+							   effective_left + effective_width - subitem_width - gutter_width + lr_arrow_width,
+							   line_y + 0.9f * line_height,
+							   fgcolor,
+							   ROT90 ^ ORIENTATION_FLIP_X);
 				}
 				if (itemnum == selected && (pitem.flags & MENU_FLAG_RIGHT_ARROW))
 				{
-					draw_arrow(
-										container,
-										effective_left + effective_width + gutter_width - lr_arrow_width,
-										line_y + 0.1f * line_height,
-										effective_left + effective_width + gutter_width,
-										line_y + 0.9f * line_height,
-										fgcolor,
-										ROT90);
+					draw_arrow(container,
+							   effective_left + effective_width + gutter_width - lr_arrow_width,
+							   line_y + 0.1f * line_height,
+							   effective_left + effective_width + gutter_width,
+							   line_y + 0.9f * line_height,
+							   fgcolor,
+							   ROT90);
 				}
 			}
 		}
@@ -637,18 +610,19 @@ void ui_menu::draw(bool customonly)
 
 		// add a box around that
 		machine().ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
-							target_y - UI_BOX_TB_BORDER,
-							target_x + target_width + UI_BOX_LR_BORDER,
-							target_y + target_height + UI_BOX_TB_BORDER, subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
+										 target_y - UI_BOX_TB_BORDER,
+										 target_x + target_width + UI_BOX_LR_BORDER,
+										 target_y + target_height + UI_BOX_TB_BORDER,
+										 subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
 		machine().ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render((selected >= 0 && selected < numitems) ? item[selected].ref : NULL, customtop, custombottom, x1, y1, x2, y2);
+	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : NULL, customtop, custombottom, x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != numitems);
+	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
 }
 
 void ui_menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -698,9 +672,10 @@ void ui_menu::draw_text_box()
 
 	// add a box around that
 	machine().ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER - gutter_width,
-						target_y - UI_BOX_TB_BORDER,
-						target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
-						target_y + target_height + UI_BOX_TB_BORDER, (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
+									 target_y - UI_BOX_TB_BORDER,
+									 target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
+									 target_y + target_height + UI_BOX_TB_BORDER,
+									 (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	machine().ui().draw_text_full(container, text, target_x, target_y, target_width,
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
@@ -716,7 +691,7 @@ void ui_menu::draw_text_box()
 				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 
 	// artificially set the hover to the last item so a double-click exits
-	hover = numitems - 1;
+	hover = item.size() - 1;
 }
 
 
@@ -737,7 +712,7 @@ void ui_menu::handle_events()
 		{
 			// if we are hovering over a valid item, select it with a single click
 			case UI_EVENT_MOUSE_DOWN:
-				if (hover >= 0 && hover < numitems)
+				if (hover >= 0 && hover < item.size())
 					selected = hover;
 				else if (hover == -2)
 				{
@@ -753,13 +728,13 @@ void ui_menu::handle_events()
 
 			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
 			case UI_EVENT_MOUSE_DOUBLE_CLICK:
-				if (hover >= 0 && hover < numitems)
+				if (hover >= 0 && hover < item.size())
 				{
 					selected = hover;
 					if (local_menu_event.event_type == UI_EVENT_MOUSE_DOUBLE_CLICK)
 					{
 						menu_event.iptkey = IPT_UI_SELECT;
-						if (selected == numitems - 1)
+						if (selected == item.size() - 1)
 						{
 							menu_event.iptkey = IPT_UI_CANCEL;
 							ui_menu::stack_pop(machine());
@@ -797,13 +772,13 @@ void ui_menu::handle_keys(UINT32 flags)
 	int code;
 
 	// bail if no items
-	if (numitems == 0)
+	if (item.empty())
 		return;
 
 	// if we hit select, return TRUE or pop the stack, depending on the item
 	if (exclusive_input_pressed(IPT_UI_SELECT, 0))
 	{
-		if (selected == numitems - 1)
+		if (selected == item.size() - 1)
 		{
 			menu_event.iptkey = IPT_UI_CANCEL;
 			ui_menu::stack_pop(machine());
@@ -835,14 +810,14 @@ void ui_menu::handle_keys(UINT32 flags)
 	// up backs up by one item
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
 	{
-		selected = (selected + numitems - 1) % numitems;
+		selected = (selected + item.size() - 1) % item.size();
 		validate_selection(-1);
 	}
 
 	// down advances by one item
 	if (exclusive_input_pressed(IPT_UI_DOWN, 6))
 	{
-		selected = (selected + 1) % numitems;
+		selected = (selected + 1) % item.size();
 		validate_selection(1);
 	}
 
@@ -870,7 +845,7 @@ void ui_menu::handle_keys(UINT32 flags)
 	// end goes to the last
 	if (exclusive_input_pressed(IPT_UI_END, 0))
 	{
-		selected = numitems - 1;
+		selected = item.size() - 1;
 		validate_selection(-1);
 	}
 
@@ -910,12 +885,12 @@ void ui_menu::validate_selection(int scandir)
 	// clamp to be in range
 	if (selected < 0)
 		selected = 0;
-	else if (selected >= numitems)
-		selected = numitems - 1;
+	else if (selected >= item.size())
+		selected = item.size() - 1;
 
 	// skip past unselectable items
 	while (!item[selected].is_selectable())
-		selected = (selected + numitems + scandir) % numitems;
+		selected = (selected + item.size() + scandir) % item.size();
 }
 
 
@@ -1001,7 +976,7 @@ bool ui_menu::stack_has_special_main_menu()
 
 void ui_menu::do_handle()
 {
-	if(!populated())
+	if(item.size() < 2)
 		populate();
 	handle();
 }

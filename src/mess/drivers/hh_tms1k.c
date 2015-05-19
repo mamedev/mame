@@ -27,6 +27,7 @@
  *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000
  @MP2105   TMS1370   1979, Gakken Poker
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
+ *MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   ?         1980, Bandai Flight Time (? note: VFD-capable)
  *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)

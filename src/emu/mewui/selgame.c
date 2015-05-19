@@ -62,6 +62,9 @@ void ui_menu_select_game::build_driver_list()
 	while (m_drivlist->next())
 		m_fulllist[listnum++] = &m_drivlist->driver();
 
+	// NULL-terminate
+	m_fulllist[listnum] = NULL;
+
 	// then restart with an empty list
 	m_drivlist->exclude_all();
 
@@ -278,11 +281,11 @@ void ui_menu_select_game::populate()
 	}
 
 	// if we're forced into this, allow general input configuration as well
-	if (ui_menu::stack_has_special_main_menu())
-	{
-		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-		item_append("Configure General Inputs", NULL, 0, (void *)1);
-	}
+//	if (ui_menu::stack_has_special_main_menu())
+//	{
+//		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+//		item_append("Configure General Inputs", NULL, 0, (void *)1);
+//	}
 
 	// configure the custom rendering
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;

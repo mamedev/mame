@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Tim Lindner
 /*****************************************************************************
 
   Texas Instruments TMS7000
