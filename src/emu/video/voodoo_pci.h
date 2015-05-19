@@ -27,11 +27,15 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual DECLARE_ADDRESS_MAP(config_map, 32);
 
 	void set_cpu_tag(const char *tag);
 	static void set_type(const int type) {m_type = type;}
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
 	void set_tmumem(const int tmumem0, const int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
+
+	DECLARE_READ32_MEMBER(  pcictrl_r);
+	DECLARE_WRITE32_MEMBER( pcictrl_w);
 
 protected:
 	virtual void device_start();
@@ -43,6 +47,7 @@ private:
 	int m_fbmem, m_tmumem0, m_tmumem1;
 	const char *m_cpu_tag;
 
+	UINT32 m_pcictrl_reg[0x10];
 	DECLARE_ADDRESS_MAP(voodoo_reg_map, 32);
 	DECLARE_ADDRESS_MAP(banshee_reg_map, 32);
 	DECLARE_ADDRESS_MAP(lfb_map, 32);

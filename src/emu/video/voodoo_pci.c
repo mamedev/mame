@@ -51,6 +51,11 @@ machine_config_constructor voodoo_pci_device::device_mconfig_additions() const
 
 const device_type VOODOO_PCI = &device_creator<voodoo_pci_device>;
 
+DEVICE_ADDRESS_MAP_START(config_map, 32, voodoo_pci_device)
+	AM_RANGE(0x40, 0x4f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
+	AM_INHERIT_FROM(pci_device::config_map)
+ADDRESS_MAP_END
+
 DEVICE_ADDRESS_MAP_START(voodoo_reg_map, 32, voodoo_pci_device)
 	AM_RANGE(0x0, 0x00ffffff) AM_DEVREADWRITE("voodoo", voodoo_device, voodoo_r, voodoo_w)
 ADDRESS_MAP_END
@@ -83,11 +88,12 @@ void voodoo_pci_device::device_start()
 	voodoo_device::static_set_fbmem(m_voodoo, m_fbmem);
 	voodoo_device::static_set_tmumem(m_voodoo, m_tmumem0, m_tmumem1);
 	switch (m_type) {
+		//void set_ids(UINT32 main_id, UINT8 revision, UINT32 pclass, UINT32 subsystem_id);
 		case TYPE_VOODOO_1:
-			set_ids(0x121a0001, 0x02, 0x000003, 0x000000);
+			set_ids(0x121a0001, 0x02, 0x000000, 0x000000);
 			break;
 		case TYPE_VOODOO_2:
-			set_ids(0x121a0002, 0x02, 0x000003, 0x000000);
+			set_ids(0x121a0002, 0x02, 0x040000, 0x000000);
 			break;
 		case TYPE_VOODOO_BANSHEE:
 			set_ids(0x121a0003, 0x02, 0x000003, 0x000000);
@@ -109,6 +115,7 @@ void voodoo_pci_device::device_start()
 
 void voodoo_pci_device::device_reset()
 {
+	memset(m_pcictrl_reg, 0, sizeof(m_pcictrl_reg));
 	pci_device::device_reset();
 }
 
@@ -147,4 +154,27 @@ void voodoo_pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_wind
 UINT32 voodoo_pci_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return voodoo_update(m_voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+}
+
+// PCI bus control
+READ32_MEMBER (voodoo_pci_device::pcictrl_r)
+{
+	UINT32 result = m_pcictrl_reg[offset];
+	if (1)
+		logerror("%06X:voodoo_pci_device pcictrl_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
+	return result;
+}
+WRITE32_MEMBER (voodoo_pci_device::pcictrl_w)
+{
+	COMBINE_DATA(&m_pcictrl_reg[offset]);
+	switch (offset) {
+		case 0x0/4:  // The address map starts at 0x40
+			// HW initEnable
+			voodoo_set_init_enable(m_voodoo, data);
+			logerror("%06X:voodoo_pci_device pcictrl_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			break;
+		default:
+			logerror("%06X:voodoo_pci_device pcictrl_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			break;
+	}
 }
