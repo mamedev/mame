@@ -2,7 +2,7 @@
 // copyright-holders:hap, Kevin Horton
 /***************************************************************************
 
-  NEC MELPS 4 MCU tabletops/handhelds or other simple devices,
+  Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices,
   most of them are VFD electronic games/toys.
 
 ***************************************************************************/
@@ -212,7 +212,7 @@ UINT8 hh_melps4_state::read_inputs(int columns)
 
   Coleco Frogger (manufactured in Japan)
   * PCB label Coleco Frogger Code No. 01-81543, KS-003282 Japan
-  * Mitsubishi M58846 MCU, labeled M58846-701P
+  * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
   NOTE!: MESS external artwork is recommended
