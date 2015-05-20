@@ -86,6 +86,7 @@ struct options_entry oplist[] =
 	{ "file;f",          "-",   OPTION_STRING,  "file to process (default is stdin)" },
 	{ "cmd;c",			 "run", OPTION_STRING,  "run|convert|listdevices" },
 	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
+	{ "verbose;v",       "0",   OPTION_BOOLEAN, "list all devices available for use" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
 	{ NULL, NULL, 0, NULL }
 };
@@ -140,7 +141,7 @@ class netlist_tool_t : public netlist_base_t
 public:
 
 	netlist_tool_t()
-	: netlist_base_t(), m_logs(""), m_setup(NULL)
+	: netlist_base_t(), m_logs(""), m_verbose(false), m_setup(NULL)
 	{
 	}
 
@@ -184,6 +185,9 @@ public:
 	}
 
 	pstring m_logs;
+
+	bool m_verbose;
+
 protected:
 
 	void verror(const loglevel_e level, const char *format, va_list ap) const
@@ -191,6 +195,12 @@ protected:
 		switch (level)
 		{
 			case NL_LOG:
+				if (m_verbose)
+				{
+					vprintf(format, ap);
+					printf("\n");
+				}
+				break;
 			case NL_WARNING:
 				vprintf(format, ap);
 				printf("\n");
@@ -227,6 +237,7 @@ static void run(core_options &opts)
 
 	nt.init();
 	nt.m_logs = opts.value("l");
+	nt.m_verbose = opts.bool_value("v");
 	nt.read_netlist(filetobuf(opts.value("f")));
 	double ttr = opts.float_value("t");
 
@@ -235,6 +246,7 @@ static void run(core_options &opts)
 	t = osd_ticks();
 
 	nt.process_queue(netlist_time::from_double(ttr));
+	nt.stop();
 
 	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
 	printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
@@ -359,6 +371,10 @@ protected:
 
 		sp_dev_t(const pstring atype, const pstring aname, double aval)
 		: m_type(atype), m_name(aname), m_model(""), m_val(aval), m_has_val(true)
+		{}
+
+		sp_dev_t(const pstring atype, const pstring aname)
+		: m_type(atype), m_name(aname), m_model(""), m_val(0.0), m_has_val(false)
 		{}
 
 		const pstring &name() { return m_name;}
@@ -548,8 +564,18 @@ protected:
 					add_term(tt[1], tt[0] + ".A");
 					add_term(tt[2], tt[0] + ".K");
 					break;
+				case 'X':
+					// FIXME: specific code for KICAD exports
+					//        last element is component type
+					devs.add(nl_alloc(sp_dev_t, "TTL_" + tt[tt.count()-1] + "_DIP", tt[0]), false);
+					for (int i=1; i < tt.count() - 1; i++)
+					{
+						pstring term = pstring::sprintf("%s.%d", tt[0].cstr(), i);
+						add_term(tt[i], term);
+					}
+					break;
 				default:
-					printf("%s: %s\n", tt[0].cstr(), line.cstr());
+					printf("// IGNORED %s: %s\n", tt[0].cstr(), line.cstr());
 			}
 		}
 	}

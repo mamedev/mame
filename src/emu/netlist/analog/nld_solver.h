@@ -41,6 +41,7 @@ struct netlist_solver_parameters_t
 	int m_gs_loops;
 	int m_nr_loops;
 	netlist_time m_nt_sync_delay;
+	bool m_log_stats;
 };
 
 
@@ -172,6 +173,7 @@ public:
 	ATTR_COLD virtual ~NETLIB_NAME(solver)();
 
 	ATTR_COLD void post_start();
+	ATTR_COLD void stop();
 
 	ATTR_HOT inline nl_double gmin() { return m_gmin.Value(); }
 
@@ -197,6 +199,8 @@ protected:
 	netlist_param_int_t m_gs_loops;
 	netlist_param_int_t m_gs_threshold;
 	netlist_param_int_t m_parallel;
+
+	netlist_param_logic_t  m_log_stats;
 
 	netlist_matrix_solver_t::list_t m_mat_solvers;
 private:

@@ -24,7 +24,7 @@ public:
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
-			const char *p = osd_getenv("NETLIST_STATS");
+			const char *p = osd_getenv("NL_STATS");
 			if (p != NULL)
 				m_log_stats = (bool) atoi(p);
 			else

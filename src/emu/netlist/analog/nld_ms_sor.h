@@ -28,11 +28,6 @@ public:
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
-			const char *p = osd_getenv("NETLIST_STATS");
-			if (p != NULL)
-				m_log_stats = (bool) atoi(p);
-			else
-				m_log_stats = false;
 		}
 
 	virtual ~netlist_matrix_solver_SOR_t() {}
@@ -47,8 +42,6 @@ private:
 	nl_double m_lp_fact;
 	int m_gs_fail;
 	int m_gs_total;
-	bool m_log_stats;
-
 };
 
 // ----------------------------------------------------------------------------------------
@@ -58,15 +51,15 @@ private:
 template <int m_N, int _storage_N>
 void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
 {
-	if (this->m_stat_calculations != 0 && m_log_stats)
+	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
 	{
-		printf("==============================================\n");
-		printf("Solver %s\n", this->name().cstr());
-		printf("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-		printf("       has %s elements\n", this->is_dynamic() ? "dynamic" : "no dynamic");
-		printf("       has %s elements\n", this->is_timestep() ? "timestep" : "no timestep");
-		printf("       %6.3f average newton raphson loops\n", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		printf("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average\n",
+		this->netlist().log("==============================================");
+		this->netlist().log("Solver %s", this->name().cstr());
+		this->netlist().log("       ==> %d nets", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
+		this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
+		this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
 				this->m_stat_calculations,
 				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
 				this->m_gs_fail,

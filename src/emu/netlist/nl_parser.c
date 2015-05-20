@@ -379,20 +379,19 @@ void netlist_parser::net_alias()
 
 void netlist_parser::net_c()
 {
-	pstring last = get_identifier();
+	pstring first = get_identifier();
 	require_token(m_tok_comma);
 
 	while (true)
 	{
 		pstring t1 = get_identifier();
-		m_setup.register_link(last , t1);
+		m_setup.register_link(first , t1);
 		NL_VERBOSE_OUT(("Parser: Connect: %s %s\n", last.cstr(), t1.cstr()));
 		token_t n = get_token();
 		if (n.is(m_tok_param_right))
 			break;
 		if (!n.is(m_tok_comma))
 			error("expected a comma, found <%s>", n.str().cstr());
-		last = t1;
 	}
 
 }
