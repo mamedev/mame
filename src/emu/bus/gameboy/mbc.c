@@ -665,6 +665,14 @@ WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 
 // MMM01
 // This mmm01 implementation is mostly guess work, no clue how correct it all is
+/* TODO: This implementation is wrong. Tauwasser
+ * 
+ * Register 0: Map Latch, AA Mask, RAM Enable
+ * Register 1: EA1..EA0, RA18..RA14
+ * Register 2: ??, AA18..AA15, AA14..AA13
+ * Register 3: AA Multiplex, RA Mask, ???, MBC1 Mode
+ * 
+ */
 
 READ8_MEMBER(gb_rom_mmm01_device::read_rom)
 {
