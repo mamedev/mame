@@ -60,6 +60,24 @@ protected:
 	UINT16 m_pc;
 	UINT16 m_prev_pc;
 	UINT16 m_op;
+	
+	// registers (unless specified, each is 4-bit)
+	UINT8 m_a;              // accumulator
+	UINT8 m_b;              // generic
+	UINT8 m_y, m_y2;        // RAM index Y, Y' (Z.XX.YYYY is DP aka Data Pointer)
+	UINT8 m_x, m_x2;        // RAM index X, X', 2-bit
+	UINT8 m_z, m_z2;        // RAM index Z, Z', 1-bit, optional
+	UINT8 m_cy, m_cy2;      // carry flag(s)
+	UINT8 m_e;              // 8-bit register, hold data for S output
+	
+	UINT8 m_cps;            // DP,CY or DP',CY' selected
+	bool m_skip;
+
+	// misc internal helpers
+	UINT8 ram_r();
+	void ram_w(UINT8 data);
+	void pop_pc();
+	void push_pc();
 
 	// opcode handlers
 	void op_tab();

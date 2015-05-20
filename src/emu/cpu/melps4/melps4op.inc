@@ -3,6 +3,27 @@
 
 // MELPS 4 opcode handlers
 
+// internal helpers
+
+inline UINT8 melps4_cpu_device::ram_r()
+{
+	UINT8 address = (m_z << 5 | m_x << 4 | m_y) & m_datamask;
+	return m_data->read_byte(address) & 0xf;
+}
+
+inline void melps4_cpu_device::ram_w(UINT8 data)
+{
+	UINT8 address = (m_z << 5 | m_x << 4 | m_y) & m_datamask;
+	m_data->write_byte(address, data & 0xf);
+}
+
+void melps4_cpu_device::pop_pc()
+{
+}
+
+void melps4_cpu_device::push_pc()
+{
+}
 
 
 // Register-to-register transfers
@@ -10,31 +31,31 @@
 void melps4_cpu_device::op_tab()
 {
 	// TAB: transfer B to A
-	op_illegal();
+	m_a = m_b;
 }
 
 void melps4_cpu_device::op_tba()
 {
 	// TBA: transfer A to B
-	op_illegal();
+	m_b = m_a;
 }
 
 void melps4_cpu_device::op_tay()
 {
 	// TAY: transfer Y to A
-	op_illegal();
+	m_a = m_y;
 }
 
 void melps4_cpu_device::op_tya()
 {
 	// TYA: transfer A to Y
-	op_illegal();
+	m_y = m_a;
 }
 
 void melps4_cpu_device::op_teab()
 {
 	// TEAB: transfer A and B to E
-	op_illegal();
+	m_e = m_b << 4 | m_a;
 }
 
 void melps4_cpu_device::op_tepa()
@@ -61,31 +82,56 @@ void melps4_cpu_device::op_tax()
 void melps4_cpu_device::op_lxy()
 {
 	// LXY x,y: load immediate into X,Y, skip any next LXY
+	m_x = m_op >> 4 & 3;
+	m_y = m_op & 0xf;
+	
 	op_illegal();
 }
 
 void melps4_cpu_device::op_lz()
 {
 	// LZ z: load immediate into Z
-	op_illegal();
+	m_z = m_op & 1;
 }
 
 void melps4_cpu_device::op_iny()
 {
 	// INY: increment Y, skip next on overflow
-	op_illegal();
+	m_y = (m_y + 1) & 0xf;
+	m_skip = (m_y == 0);
 }
 
 void melps4_cpu_device::op_dey()
 {
 	// DEY: decrement Y, skip next on overflow
-	op_illegal();
+	m_y = (m_y - 1) & 0xf;
+	m_skip = (m_y == 0xf);
 }
 
 void melps4_cpu_device::op_lcps()
 {
 	// LCPS i: choose active DP,CY or DP',CY'
-	op_illegal();
+	if ((m_op & 1) != m_cps)
+	{
+		m_cps = m_op & 1;
+		
+		// swap registers
+		UINT8 x, y, z, cy;
+		x = m_x;
+		y = m_y;
+		z = m_z;
+		cy = m_cy;
+		
+		m_x = m_x2;
+		m_y = m_y2;
+		m_z = m_z2;
+		m_cy = m_cy2;
+
+		m_x2 = x;
+		m_y2 = y;
+		m_z2 = z;
+		m_cy2 = cy;
+	}
 }
 
 void melps4_cpu_device::op_sadr()
@@ -100,24 +146,32 @@ void melps4_cpu_device::op_sadr()
 void melps4_cpu_device::op_tam()
 {
 	// TAM j: transfer RAM to A, xor X with j
-	op_illegal();
+	m_a = ram_r();
+	m_x ^= m_op & 3;
 }
 
 void melps4_cpu_device::op_xam()
 {
 	// XAM j: exchange RAM with A, xor X with j
-	op_illegal();
+	UINT8 a = m_a;
+	m_a = ram_r();
+	ram_w(a);
+	m_x ^= m_op & 3;
 }
 
 void melps4_cpu_device::op_xamd()
 {
 	// XAMD j: XAM J, DEY
-	op_illegal();
+	op_xam();
+	op_dey();
 }
 
 void melps4_cpu_device::op_xami()
 {
-	// XAMI j: XAM J, increment Y, skip next on Y=mask(default 0)
+	// XAMI j: XAM J, INY, skip next on Y=mask(default 0)
+	op_xam();
+	op_iny();
+
 	op_illegal();
 }
 
@@ -127,55 +181,63 @@ void melps4_cpu_device::op_xami()
 void melps4_cpu_device::op_la()
 {
 	// LA n: load immediate into A, skip any next LA
+	m_a = m_op & 0xf;
+	
 	op_illegal();
 }
 
 void melps4_cpu_device::op_am()
 {
 	// AM: add RAM to A
-	op_illegal();
+	m_a = (m_a + ram_r()) & 0xf;
 }
 
 void melps4_cpu_device::op_amc()
 {
 	// AMC: add RAM+CY to A and CY
-	op_illegal();
+	m_a += ram_r() + m_cy;
+	m_cy = m_a >> 4 & 1;
+	m_a &= 0xf;
 }
 
 void melps4_cpu_device::op_amcs()
 {
 	// AMCS: AMC, skip next on carry
-	op_illegal();
+	op_amc();
+	m_skip = (m_cy != 0);
 }
 
 void melps4_cpu_device::op_a()
 {
 	// A n: add immediate to A, skip next on no carry (except when n=6)
-	op_illegal();
+	UINT8 n = m_op & 0xf;
+	m_a += n;
+	m_skip = !(m_a & 0x10 || n == 6);
+	m_a &= 0xf;
 }
 
 void melps4_cpu_device::op_sc()
 {
 	// SC: set carry
-	op_illegal();
+	m_cy = 1;
 }
 
 void melps4_cpu_device::op_rc()
 {
 	// RC: reset carry
-	op_illegal();
+	m_cy = 0;
 }
 
 void melps4_cpu_device::op_szc()
 {
 	// SZC: skip next on no carry
-	op_illegal();
+	m_skip = !m_cy;
 }
 
 void melps4_cpu_device::op_cma()
 {
 	// CMA: complement A
-	op_illegal();
+	m_a ^= 0xf;
 }
 
 
@@ -184,19 +246,22 @@ void melps4_cpu_device::op_cma()
 void melps4_cpu_device::op_sb()
 {
 	// SB j: set RAM bit
-	op_illegal();
+	UINT8 mask = 1 << (m_op & 3);
+	ram_w(ram_r() | mask);
 }
 
 void melps4_cpu_device::op_rb()
 {
 	// RB j: reset RAM bit
-	op_illegal();
+	UINT8 mask = 1 << (m_op & 3);
+	ram_w(ram_r() & ~mask);
 }
 
 void melps4_cpu_device::op_szb()
 {
 	// SZB j: skip next if RAM bit is reset
-	op_illegal();
+	UINT8 mask = 1 << (m_op & 3);
+	m_skip = !(ram_r() & mask);
 }
 
 
@@ -205,13 +270,13 @@ void melps4_cpu_device::op_szb()
 void melps4_cpu_device::op_seam()
 {
 	// SEAM: skip next if A equals RAM
-	op_illegal();
+	m_skip = (m_a == ram_r());
 }
 
 void melps4_cpu_device::op_sey()
 {
 	// SEY y: skip next if Y equals immediate
-	op_illegal();
+	m_skip = (m_y == (m_op & 0xf));
 }
 
 
