@@ -19,6 +19,7 @@
 // internal artwork
 #include "einvaderc.lh" // test-layout(but still playable)
 #include "funjacks.lh"
+#include "funrlgl.lh"
 #include "lightfgt.lh" // clickable
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
@@ -229,6 +230,53 @@ UINT8 hh_cop400_state::read_inputs(int columns)
 
 /***************************************************************************
 
+  Castle Toy Einstein
+  * COP421 MCU labeled ~/927 COP421-NEZ/N
+  * 4 lamps, 1bit sound
+  
+***************************************************************************/
+
+class ctstein_state : public hh_cop400_state
+{
+public:
+	ctstein_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag)
+	{ }
+};
+
+// handlers
+
+//..
+
+
+// config
+
+static INPUT_PORTS_START( ctstein )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( ctstein, ctstein_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP421, 1000000) // approximation - RC osc. R=12K to +6V, C=100pf to GND
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+//	MCFG_DEFAULT_LAYOUT(layout_ctstein)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Entex Space Invader
   * COP444L MCU labeled /B138 COPL444-HRZ/N INV II (die labeled HRZ COP 444L/A)
   * 3 7seg LEDs, LED matrix and overlay mask, 1bit sound
@@ -309,7 +357,7 @@ WRITE8_MEMBER(einvaderc_state::write_l)
 // config
 
 static INPUT_PORTS_START( einvaderc )
-	PORT_START("IN.0")
+	PORT_START("IN.0") // port IN
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "Amateur" )
 	PORT_CONFSETTING(    0x00, "Professional" )
@@ -373,12 +421,12 @@ WRITE8_MEMBER(funjacks_state::write_d)
 {
 	// D: led grid + input mux
 	m_d = m_inp_mux = data ^ 0xf;
-	display_matrix(2, 4, m_l, m_d );
+	display_matrix(2, 4, m_l, m_d);
 }
 
 WRITE8_MEMBER(funjacks_state::write_l)
 {
-	// L01: led state
+	// L0,L1: led state
 	m_l = data & 3;
 	display_matrix(2, 4, m_l, m_d);
 }
@@ -392,14 +440,14 @@ WRITE8_MEMBER(funjacks_state::write_g)
 
 READ8_MEMBER(funjacks_state::read_l)
 {
-	// L45: multiplexed inputs
+	// L4,L5: multiplexed inputs
 	return read_inputs(3) & 0x30;
 }
 
 READ8_MEMBER(funjacks_state::read_g)
 {
 	// G1: speaker out state
-	// G23: inputs
+	// G2,G3: inputs
 	return m_inp_matrix[3]->read() | (m_g & 2);
 }
 
@@ -407,15 +455,15 @@ READ8_MEMBER(funjacks_state::read_g)
 // config
 
 static INPUT_PORTS_START( funjacks )
-	PORT_START("IN.0")
+	PORT_START("IN.0") // D0 port G
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_START("IN.1")
+	PORT_START("IN.1") // D1 port G
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
-	PORT_START("IN.2")
+	PORT_START("IN.2") // D2 port G
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // positioned at 1 o'clock on panel, increment clockwise
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
 
@@ -441,6 +489,104 @@ static MACHINE_CONFIG_START( funjacks, funjacks_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_funjacks)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Funtronics Red Light Green Light
+  * COP410L MCU bonded directly to PCB (die labeled COP410L/B NHZ)
+  * 14 LEDs, 1bit sound
+
+  known releases:
+  - USA: Funtronics Red Light Green Light
+  - USA(rerelease): Funtronics Hot Wheels Drag Race
+
+***************************************************************************/
+
+class funrlgl_state : public hh_cop400_state
+{
+public:
+	funrlgl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_READ8_MEMBER(read_g);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+};
+
+// handlers
+
+WRITE8_MEMBER(funrlgl_state::write_d)
+{
+	// D: led grid
+	m_d = data ^ 0xf;
+	display_matrix(4, 4, m_l, m_d);
+}
+
+WRITE8_MEMBER(funrlgl_state::write_l)
+{
+	// L0-L3: led state
+	// L4-L7: N/C
+	m_l = data & 0xf;
+	display_matrix(4, 4, m_l, m_d);
+}
+
+WRITE8_MEMBER(funrlgl_state::write_g)
+{
+	// G3: speaker out
+	m_speaker->level_w(data >> 3 & 1);
+}
+
+
+// config
+
+static INPUT_PORTS_START( funrlgl )
+	PORT_START("IN.0") // port G
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.1") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, funrlgl_state, reset_button, NULL)
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
+{
+	// middle button is directly tied to MCU reset pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP410, 2000000) // approximation - RC osc. R=51K, C=91pf
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
+	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
+	MCFG_COP400_WRITE_G_CB(WRITE8(funrlgl_state, write_g))
+	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_funrlgl)
 
 	/* no video! */
 
@@ -583,31 +729,31 @@ READ8_MEMBER(lightfgt_state::read_g)
 // config
 
 static INPUT_PORTS_START( lightfgt )
-	PORT_START("IN.0")
+	PORT_START("IN.0") // SO port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) // note: button 1 is on the left side from player perspective
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_COCKTAIL
 
-	PORT_START("IN.1")
+	PORT_START("IN.1") // D0 port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_COCKTAIL
 
-	PORT_START("IN.2")
+	PORT_START("IN.2") // D1 port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_COCKTAIL
 
-	PORT_START("IN.3")
+	PORT_START("IN.3") // D2 port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_COCKTAIL
 
-	PORT_START("IN.4")
+	PORT_START("IN.4") // D3 port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON10 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -646,6 +792,12 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+ROM_START( ctstein )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421-nez_n", 0x0000, 0x0400, CRC(16148e03) SHA1(b2b74891d36813d9a1eefd56a925054997c4b7f7) ) // 2nd half empty
+ROM_END
+
+
 ROM_START( einvaderc )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "copl444-hrz_n_inv_ii", 0x0000, 0x0800, CRC(76400f38) SHA1(0e92ab0517f7b7687293b189d30d57110df20fe0) )
@@ -655,6 +807,12 @@ ROM_END
 ROM_START( funjacks )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "cop410l_b_ngs", 0x0000, 0x0200, CRC(863368ea) SHA1(f116cc27ae721b3a3e178fa13765808bdc275663) )
+ROM_END
+
+
+ROM_START( funrlgl )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "cop410l_b_nhz", 0x0000, 0x0200, CRC(4065c3ce) SHA1(f0bc8125d922949e0d7ab1ba89c805a836d20e09) )
 ROM_END
 
 
@@ -672,9 +830,12 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Castle Toy", "Einstein (Castle Toy)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+
 CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 
 CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", GAME_SUPPORTS_SAVE )

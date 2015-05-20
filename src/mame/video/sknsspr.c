@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Super Kaneko Nova System Sprites
 
    "CG24173 6186" & "CG24143 4181" (always used as a pair?)

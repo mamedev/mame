@@ -478,7 +478,7 @@ void ui_manager::update_and_render(render_container *container)
 		{
 			float mouse_y=-1,mouse_x=-1;
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y)) {
-				container->add_quad(mouse_x,mouse_y,mouse_x + 0.05*container->manager().ui_aspect(container),mouse_y + 0.05,UI_TEXT_COLOR,m_mouse_arrow_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container->add_quad(mouse_x,mouse_y,mouse_x + 0.05f*container->manager().ui_aspect(container),mouse_y + 0.05f,UI_TEXT_COLOR,m_mouse_arrow_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 		}
 	}
@@ -851,7 +851,7 @@ void ui_manager::draw_text_box(render_container *container, const char *text, in
 		draw_text_full(container, text, target_x, target_y, target_width + 0.00001f,
 					justify, WRAP_WORD, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &target_width, &target_height);
 		if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
-			target_height = floor((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
+			target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
 
 		// if we match our last value, we're done
 		if (target_height == last_target_height)
@@ -2029,8 +2029,8 @@ static INT32 slider_mixervol(running_machine &machine, void *arg, std::string *s
 		info.stream->set_user_gain(info.inputnum, (float)newval * 0.001f);
 	}
 	if (str != NULL)
-		strprintf(*str,"%4.2f", info.stream->user_gain(info.inputnum));
-	return floor(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
+		strprintf(*str,"%4.2f", (double) info.stream->user_gain(info.inputnum));
+	return floorf(info.stream->user_gain(info.inputnum) * 1000.0f + 0.5f);
 }
 
 
@@ -2068,7 +2068,7 @@ static INT32 slider_overclock(running_machine &machine, void *arg, std::string *
 		cpu->set_clock_scale((float)newval * 0.001f);
 	if (str != NULL)
 		strprintf(*str,"%3.0f%%", floor(cpu->clock_scale() * 100.0f + 0.5f));
-	return floor(cpu->clock_scale() * 1000.0f + 0.5f);
+	return floorf(cpu->clock_scale() * 1000.0f + 0.5f);
 }
 
 
@@ -2092,7 +2092,7 @@ static INT32 slider_refresh(running_machine &machine, void *arg, std::string *st
 	if (str != NULL)
 		strprintf(*str,"%.3ffps", ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds));
 	refresh = ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds);
-	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
+	return floorf((refresh - defrefresh) * 1000.0f + 0.5f);
 }
 
 
@@ -2113,7 +2113,7 @@ static INT32 slider_brightness(running_machine &machine, void *arg, std::string 
 		screen->container().set_user_settings(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_brightness);
+		strprintf(*str,"%.3f", (double) settings.m_brightness);
 	return floor(settings.m_brightness * 1000.0f + 0.5f);
 }
 
@@ -2135,7 +2135,7 @@ static INT32 slider_contrast(running_machine &machine, void *arg, std::string *s
 		screen->container().set_user_settings(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_contrast);
+		strprintf(*str,"%.3f", (double) settings.m_contrast);
 	return floor(settings.m_contrast * 1000.0f + 0.5f);
 }
 
@@ -2156,7 +2156,7 @@ static INT32 slider_gamma(running_machine &machine, void *arg, std::string *str,
 		screen->container().set_user_settings(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_gamma);
+		strprintf(*str,"%.3f", (double) settings.m_gamma);
 	return floor(settings.m_gamma * 1000.0f + 0.5f);
 }
 
@@ -2178,7 +2178,7 @@ static INT32 slider_xscale(running_machine &machine, void *arg, std::string *str
 		screen->container().set_user_settings(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_xscale);
+		strprintf(*str,"%.3f", (double) settings.m_xscale);
 	return floor(settings.m_xscale * 1000.0f + 0.5f);
 }
 
@@ -2200,7 +2200,7 @@ static INT32 slider_yscale(running_machine &machine, void *arg, std::string *str
 		screen->container().set_user_settings(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_yscale);
+		strprintf(*str,"%.3f", (double) settings.m_yscale);
 	return floor(settings.m_yscale * 1000.0f + 0.5f);
 }
 
@@ -2222,7 +2222,7 @@ static INT32 slider_xoffset(running_machine &machine, void *arg, std::string *st
 		screen->container().set_user_settings(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_xoffset);
+		strprintf(*str,"%.3f", (double) settings.m_xoffset);
 	return floor(settings.m_xoffset * 1000.0f + 0.5f);
 }
 
@@ -2244,7 +2244,7 @@ static INT32 slider_yoffset(running_machine &machine, void *arg, std::string *st
 		screen->container().set_user_settings(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_yoffset);
+		strprintf(*str,"%.3f",  (double) settings.m_yoffset);
 	return floor(settings.m_yoffset * 1000.0f + 0.5f);
 }
 
@@ -2266,7 +2266,7 @@ static INT32 slider_overxscale(running_machine &machine, void *arg, std::string 
 		laserdisc->set_overlay_config(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_overscalex);
+		strprintf(*str,"%.3f", (double) settings.m_overscalex);
 	return floor(settings.m_overscalex * 1000.0f + 0.5f);
 }
 
@@ -2288,7 +2288,7 @@ static INT32 slider_overyscale(running_machine &machine, void *arg, std::string 
 		laserdisc->set_overlay_config(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_overscaley);
+		strprintf(*str,"%.3f", (double) settings.m_overscaley);
 	return floor(settings.m_overscaley * 1000.0f + 0.5f);
 }
 
@@ -2310,7 +2310,7 @@ static INT32 slider_overxoffset(running_machine &machine, void *arg, std::string
 		laserdisc->set_overlay_config(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_overposx);
+		strprintf(*str,"%.3f", (double) settings.m_overposx);
 	return floor(settings.m_overposx * 1000.0f + 0.5f);
 }
 
@@ -2332,7 +2332,7 @@ static INT32 slider_overyoffset(running_machine &machine, void *arg, std::string
 		laserdisc->set_overlay_config(settings);
 	}
 	if (str != NULL)
-		strprintf(*str,"%.3f", settings.m_overposy);
+		strprintf(*str,"%.3f", (double) settings.m_overposy);
 	return floor(settings.m_overposy * 1000.0f + 0.5f);
 }
 
@@ -2348,7 +2348,7 @@ static INT32 slider_flicker(running_machine &machine, void *arg, std::string *st
 	if (newval != SLIDER_NOCHANGE)
 		vector->set_flicker((float)newval * 0.1f);
 	if (str != NULL)
-		strprintf(*str,"%1.2f", vector->get_flicker());
+		strprintf(*str,"%1.2f", (double) vector->get_flicker());
 	return floor(vector->get_flicker() * 10.0f + 0.5f);
 }
 
@@ -2364,7 +2364,7 @@ static INT32 slider_beam(running_machine &machine, void *arg, std::string *str, 
 	if (newval != SLIDER_NOCHANGE)
 		vector->set_beam((float)newval * 0.01f);
 	if (str != NULL)
-		strprintf(*str,"%1.2f", vector->get_beam());
+		strprintf(*str,"%1.2f", (double) vector->get_beam());
 	return floor(vector->get_beam() * 100.0f + 0.5f);
 }
 

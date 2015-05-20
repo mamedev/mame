@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
 /********************************************************************
 
     Sega Model 2 3D rasterization functions

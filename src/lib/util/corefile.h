@@ -117,6 +117,9 @@ int core_fputs(core_file *f, const char *s);
 int core_vfprintf(core_file *f, const char *fmt, va_list va);
 int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...) ATTR_PRINTF(2,3);
 
+/* file truncation */
+file_error core_truncate(core_file *f, UINT64 offset);
+
 
 
 /* ----- filename utilities ----- */

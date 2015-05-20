@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 /***************************************************************************
 
     Ninja Gaiden / Tecmo Knights Video Hardware

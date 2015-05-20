@@ -104,7 +104,7 @@ public:
 	typedef pnamedlist_t<link_t> tagmap_nstring_t;
 	typedef pnamedlist_t<netlist_param_t *> tagmap_param_t;
 	typedef pnamedlist_t<netlist_core_terminal_t *> tagmap_terminal_t;
-	typedef plinearlist_t<link_t> tagmap_link_t;
+	typedef plist_t<link_t> tagmap_link_t;
 
 	netlist_setup_t(netlist_base_t &netlist);
 	~netlist_setup_t();
@@ -167,7 +167,7 @@ private:
 
 	netlist_factory_t *m_factory;
 
-	plinearlist_t<pstring> m_models;
+	plist_t<pstring> m_models;
 
 	int m_proxy_cnt;
 

@@ -1787,10 +1787,10 @@ void nv2a_renderer::render_color(INT32 scanline, const extent_t &extent, const n
 		int ca, cr, cg, cb;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
-		cb = ((extent.param[PARAM_COLOR_B].start + (float)x*extent.param[PARAM_COLOR_B].dpdx))*255.0;
-		cg = ((extent.param[PARAM_COLOR_G].start + (float)x*extent.param[PARAM_COLOR_G].dpdx))*255.0;
-		cr = ((extent.param[PARAM_COLOR_R].start + (float)x*extent.param[PARAM_COLOR_R].dpdx))*255.0;
-		ca = ((extent.param[PARAM_COLOR_A].start + (float)x*extent.param[PARAM_COLOR_A].dpdx))*255.0;
+		cb = ((extent.param[PARAM_COLOR_B].start + (float)x*extent.param[PARAM_COLOR_B].dpdx))*255.0f;
+		cg = ((extent.param[PARAM_COLOR_G].start + (float)x*extent.param[PARAM_COLOR_G].dpdx))*255.0f;
+		cr = ((extent.param[PARAM_COLOR_R].start + (float)x*extent.param[PARAM_COLOR_R].dpdx))*255.0f;
+		ca = ((extent.param[PARAM_COLOR_A].start + (float)x*extent.param[PARAM_COLOR_A].dpdx))*255.0f;
 		a8r8g8b8 = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
 		z = (extent.param[PARAM_Z].start + (float)x*extent.param[PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
@@ -3235,37 +3235,37 @@ void nv2a_renderer::combiner_map_input_function3(int code, float *data)
 
 	switch (code) {
 	case 0:
-		data[0] = MAX(0.0, data[0]);
-		data[1] = MAX(0.0, data[1]);
-		data[2] = MAX(0.0, data[2]);
+		data[0] = MAX(0.0f, data[0]);
+		data[1] = MAX(0.0f, data[1]);
+		data[2] = MAX(0.0f, data[2]);
 		break;
 	case 1:
-		t = MAX(data[0], 0.0);
-		data[0] = 1.0 - MIN(t, 1.0);
-		t = MAX(data[1], 0.0);
-		data[1] = 1.0 - MIN(t, 1.0);
-		t = MAX(data[2], 0.0);
-		data[2] = 1.0 - MIN(t, 1.0);
+		t = MAX(data[0], 0.0f);
+		data[0] = 1.0f - MIN(t, 1.0f);
+		t = MAX(data[1], 0.0f);
+		data[1] = 1.0f - MIN(t, 1.0f);
+		t = MAX(data[2], 0.0f);
+		data[2] = 1.0f - MIN(t, 1.0f);
 		break;
 	case 2:
-		data[0] = 2.0 * MAX(0.0, data[0]) - 1.0;
-		data[1] = 2.0 * MAX(0.0, data[1]) - 1.0;
-		data[2] = 2.0 * MAX(0.0, data[2]) - 1.0;
+		data[0] = 2.0 * MAX(0.0f, data[0]) - 1.0f;
+		data[1] = 2.0 * MAX(0.0f, data[1]) - 1.0f;
+		data[2] = 2.0 * MAX(0.0f, data[2]) - 1.0f;
 		break;
 	case 3:
-		data[0] = -2.0 * MAX(0.0, data[0]) + 1.0;
-		data[1] = -2.0 * MAX(0.0, data[1]) + 1.0;
-		data[2] = -2.0 * MAX(0.0, data[2]) + 1.0;
+		data[0] = -2.0f * MAX(0.0f, data[0]) + 1.0f;
+		data[1] = -2.0f * MAX(0.0f, data[1]) + 1.0f;
+		data[2] = -2.0f * MAX(0.0f, data[2]) + 1.0f;
 		break;
 	case 4:
-		data[0] = MAX(0.0, data[0]) - 0.5;
-		data[1] = MAX(0.0, data[1]) - 0.5;
-		data[2] = MAX(0.0, data[2]) - 0.5;
+		data[0] = MAX(0.0f, data[0]) - 0.5f;
+		data[1] = MAX(0.0f, data[1]) - 0.5f;
+		data[2] = MAX(0.0f, data[2]) - 0.5f;
 		break;
 	case 5:
-		data[0] = -MAX(0.0, data[0]) + 0.5;
-		data[1] = -MAX(0.0, data[1]) + 0.5;
-		data[2] = -MAX(0.0, data[2]) + 0.5;
+		data[0] = -MAX(0.0f, data[0]) + 0.5f;
+		data[1] = -MAX(0.0f, data[1]) + 0.5f;
+		data[2] = -MAX(0.0f, data[2]) + 0.5f;
 		break;
 	case 6:
 		return;
@@ -3447,9 +3447,9 @@ void nv2a_renderer::combiner_map_final_input()
 	combiner.variable_sumclamp[1] = MAX(0, combiner.register_spare0[1]) + MAX(0, combiner.register_secondarycolor[1]);
 	combiner.variable_sumclamp[2] = MAX(0, combiner.register_spare0[2]) + MAX(0, combiner.register_secondarycolor[2]);
 	if (combiner.final.color_sum_clamp != 0) {
-		combiner.variable_sumclamp[0] = MIN(combiner.variable_sumclamp[0], 1.0);
-		combiner.variable_sumclamp[1] = MIN(combiner.variable_sumclamp[1], 1.0);
-		combiner.variable_sumclamp[2] = MIN(combiner.variable_sumclamp[2], 1.0);
+		combiner.variable_sumclamp[0] = MIN(combiner.variable_sumclamp[0], 1.0f);
+		combiner.variable_sumclamp[1] = MIN(combiner.variable_sumclamp[1], 1.0f);
+		combiner.variable_sumclamp[2] = MIN(combiner.variable_sumclamp[2], 1.0f);
 	}
 	// A
 	pv = combiner_map_input_select3(combiner.final.mapin_rgbA_input);
@@ -3494,12 +3494,12 @@ void nv2a_renderer::combiner_map_final_input()
 void nv2a_renderer::combiner_final_output()
 {
 	// rgb
-	combiner.output[0] = combiner.variable_A[0] * combiner.variable_B[0] + (1.0 - combiner.variable_A[0])*combiner.variable_C[0] + combiner.variable_D[0];
-	combiner.output[1] = combiner.variable_A[1] * combiner.variable_B[1] + (1.0 - combiner.variable_A[1])*combiner.variable_C[1] + combiner.variable_D[1];
-	combiner.output[2] = combiner.variable_A[2] * combiner.variable_B[2] + (1.0 - combiner.variable_A[2])*combiner.variable_C[2] + combiner.variable_D[2];
-	combiner.output[0] = MIN(combiner.output[0], 1.0);
-	combiner.output[1] = MIN(combiner.output[1], 1.0);
-	combiner.output[2] = MIN(combiner.output[2], 1.0);
+	combiner.output[0] = combiner.variable_A[0] * combiner.variable_B[0] + (1.0f - combiner.variable_A[0])*combiner.variable_C[0] + combiner.variable_D[0];
+	combiner.output[1] = combiner.variable_A[1] * combiner.variable_B[1] + (1.0f - combiner.variable_A[1])*combiner.variable_C[1] + combiner.variable_D[1];
+	combiner.output[2] = combiner.variable_A[2] * combiner.variable_B[2] + (1.0f - combiner.variable_A[2])*combiner.variable_C[2] + combiner.variable_D[2];
+	combiner.output[0] = MIN(combiner.output[0], 1.0f);
+	combiner.output[1] = MIN(combiner.output[1], 1.0f);
+	combiner.output[2] = MIN(combiner.output[2], 1.0f);
 	// a
 	combiner.output[3] = combiner_map_input_function(combiner.final.mapin_aG_mapping, combiner.variable_G);
 }

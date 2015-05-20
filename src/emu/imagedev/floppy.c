@@ -250,7 +250,7 @@ void floppy_image_device::set_rpm(float _rpm)
 
 	rpm = _rpm;
 	rev_time = attotime::from_double(60/rpm);
-	floppy_ratio_1 = int(1000*rpm/300+0.5);
+	floppy_ratio_1 = int(1000.0f*rpm/300.0f+0.5f);
 }
 
 void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
@@ -269,6 +269,11 @@ void floppy_image_device::commit_image()
 	io.file = (device_image_interface *)this;
 	io.procs = &image_ioprocs;
 	io.filler = 0xff;
+
+	file_error err = core_truncate(image_core_file(), 0);
+	if (err != 0)
+		popmessage("Error, unable to truncate image: %d", err);
+
 	output_format->save(&io, image);
 }
 

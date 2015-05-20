@@ -62,8 +62,7 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 	 * may change the output
 	 */
 	int bits = (1<<count_bits(nign));
-	plinearlist_t<int> t;
-	t.set_count(bits);
+	parray_t<int> t(bits);
 
 	for (UINT32 j=1; j<bits; j++)
 	{
@@ -172,8 +171,7 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 		nl_assert_always(times.count() == m_NO, "timing count not matching");
 
 		UINT16 val = 0;
-		plinearlist_t<UINT8> tindex;
-		tindex.set_count(m_NO);
+		parray_t<UINT8> tindex(m_NO);
 
 		for (int j=0; j<m_NO; j++)
 		{
@@ -196,8 +194,7 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 	}
 
 	// determine ignore
-	plinearlist_t<UINT32> ign;
-	ign.set_count(m_size);
+	parray_t<UINT32> ign(m_size);
 
 	for (int j=0; j < m_size; j++)
 		ign[j] = -1;

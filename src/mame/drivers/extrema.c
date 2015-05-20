@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Extrema Russian Video Fruit Machines */
 /*
   Appear to be Z80 based, some rom scramble?

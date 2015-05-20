@@ -121,6 +121,7 @@ public:
 	attotime get_next_transition(const attotime &from_when);
 	void write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions);
 	void set_write_splice(const attotime &when);
+	int get_sides() { return sides; }
 	UINT32 get_form_factor() const;
 	UINT32 get_variant() const;
 

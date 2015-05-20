@@ -20,7 +20,7 @@ public:
 	netlist_matrix_solver_direct2_t(const netlist_solver_parameters_t &params)
 		: netlist_matrix_solver_direct_t<2, 2>(params, 2)
 		{}
-	ATTR_HOT inline int vsolve_non_dynamic();
+	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
 	ATTR_HOT virtual nl_double vsolve();
 private:
@@ -36,7 +36,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct2_t::vsolve()
 	return this->compute_next_timestep();
 }
 
-ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic()
+ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic(const bool newton_raphson)
 {
 	build_LE_A();
 	build_LE_RHS();

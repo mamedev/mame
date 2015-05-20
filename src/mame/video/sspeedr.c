@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Stefan Jokisch
 /***************************************************************************
 
 Taito Super Speed Race video emulation

@@ -39,7 +39,7 @@ public:
 
 	ATTR_COLD virtual void log_stats();
 
-	ATTR_HOT virtual int vsolve_non_dynamic();
+	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
 protected:
 	ATTR_HOT virtual nl_double vsolve();
 
@@ -83,7 +83,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve()
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic()
+ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const int iN = this->N();
 	bool resched = false;
@@ -181,8 +181,17 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 		resched_cnt++;
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
-	for (int k = 0; k < iN; k++)
-		this->m_nets[k]->m_cur_Analog = new_V[k];
+	if (newton_raphson)
+	{
+		//printf("here %s\n", this->name().cstr());
+		for (int k = 0; k < iN; k++)
+			this->m_nets[k]->m_cur_Analog += 1.0 * (new_V[k] - this->m_nets[k]->m_cur_Analog);
+	}
+	else
+	{
+		for (int k = 0; k < iN; k++)
+			this->m_nets[k]->m_cur_Analog = new_V[k];
+	}
 
 	this->m_gs_total += resched_cnt;
 	this->m_stat_calculations++;
@@ -191,7 +200,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 	{
 		// Fallback to direct solver ...
 		this->m_gs_fail++;
-		return netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic();
+		return netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 	else {
 		return resched_cnt;

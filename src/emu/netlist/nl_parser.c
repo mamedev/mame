@@ -194,7 +194,7 @@ ATTR_COLD void ptokenizer::error(const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 
-	pstring errmsg1 =pstring(format).vprintf(ap);
+	pstring errmsg1 = pstring(format).vprintf(ap);
 	va_end(ap);
 
 	verror(errmsg1, currentline_no(), currentline_str());

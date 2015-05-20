@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #ifndef __TC0080VCO_H__
 #define __TC0080VCO_H__
 

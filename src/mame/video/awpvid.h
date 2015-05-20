@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /*************************************************************************************
 
     AWP Hardware video simulation system

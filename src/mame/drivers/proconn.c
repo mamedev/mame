@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
  Project PROCONN (and PC92/PC98) Fruit Machine hardware
   skeleton driver!

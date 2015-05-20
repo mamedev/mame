@@ -737,7 +737,7 @@ void dkong_state::radarscp_step(int line_cnt)
 	// Solve the amplifier by iteration
 	for (int j=1; j<=11; j++)// 11% = 1/75 / (1/75+1/10)
 	{
-		double f = (double) j / 100.0f;
+		double f = (double) j / 100.0;
 		m_vg1 = (m_cv1 - m_cv2)*(1-f) + f * m_vg2;
 		m_vg2 = 5*CD4049(m_vg1/5);
 	}
@@ -745,8 +745,8 @@ void dkong_state::radarscp_step(int line_cnt)
 	// Solve the amplifier by iteration 50% = both resistors equal
 	for (int j=10; j<=20; j++)
 	{
-		double f = (double) j / 40.0f;
-		vg3i = (1.0f-f) * m_vg2 + f * m_vg3;
+		double f = (double) j / 40.0;
+		vg3i = (1.0-f) * m_vg2 + f * m_vg3;
 		m_vg3 = 5*CD4049(vg3i/5);
 	}
 

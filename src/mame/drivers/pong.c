@@ -108,8 +108,6 @@ public:
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(sound_cb)
 	{
-		//printf("snd %f\n", newval);
-		//dac_w(m_dac, 0, newval*64);
 		m_dac->write_unsigned8(64*data);
 	}
 

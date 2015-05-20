@@ -616,7 +616,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_pal_brightness_mode_w)
 }
 
 /* RE from Seibu Cup Soccer bootleg */
-const UINT8 raiden2cop_device::fade_table(int v)
+UINT8 raiden2cop_device::fade_table(int v)
 {
 	int low  = v & 0x001f;
 	int high = v & 0x03e0;
