@@ -314,18 +314,18 @@ WRITE8_MEMBER(gb_rom_mbc_device::write_ram)
 
 READ8_MEMBER(gb_rom_mbc1_device::read_rom)
 {
-	if (offset < 0x4000)
-	{
+	if (offset & 0x4000) /* RB1 */
+		return m_rom[rom_bank_map[(m_ram_bank << (5 + m_shift)) | m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+	else
+	{                    /* RB0 */
 		int bank = (m_mode == MODE_4M_256k) ? (m_ram_bank << (5 + m_shift)) : 0;
 		return m_rom[rom_bank_map[bank] * 0x4000 + (offset & 0x3fff)];
 	}
-	else
-		return m_rom[rom_bank_map[(m_ram_bank << (5 + m_shift)) | m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
 }
 
 WRITE8_MEMBER(gb_rom_mbc1_device::write_bank)
 {
-	// the mapper only uses inputs A13-A15
+	// the mapper only uses inputs A15..A13
 	switch (offset & 0xe000)
 	{
 		case 0x0000:    // RAM Enable Register
