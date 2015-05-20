@@ -1583,6 +1583,7 @@ fsa1st
 // NASCOM Microcomputers
 nascom1   // 1978 Nascom 1
 nascom2   // 1979 Nascom 2
+nascom2c  // 1980 Nascom 2 (CP/M)
 
 // Miles Gordon Technology
 samcoupe  // 1989 Sam Coupe
