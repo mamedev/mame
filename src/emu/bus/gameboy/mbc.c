@@ -399,7 +399,7 @@ WRITE8_MEMBER(gb_rom_mbc2_device::write_bank)
 READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 {
 	if (!m_ram.empty() && m_ram_enable)
-		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
+		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] | 0xF0;
 	else
 		return 0xff;
 }
@@ -407,7 +407,7 @@ READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 WRITE8_MEMBER(gb_rom_mbc2_device::write_ram)
 {
 	if (!m_ram.empty() && m_ram_enable)
-		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
+		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x01ff)] = data & 0x0F;
 }
 
 
