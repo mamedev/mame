@@ -9,9 +9,6 @@
   Minor update to "the voice" rom names, and add comment about
   the older revision of "the voice" - LN, 10/03/08
 
-  TODO:
-  - Reimplement the cartridge slot, and thus also the voice, as a slot device
-
 ***************************************************************************/
 
 #include "emu.h"
