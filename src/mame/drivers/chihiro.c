@@ -1053,7 +1053,7 @@ static const char *const usbregnames[] = {
 #endif
 
 static const struct {
-	char *game_name;
+	const char *game_name;
 	struct {
 		UINT32 address;
 		UINT8 write_byte;
