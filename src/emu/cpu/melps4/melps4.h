@@ -34,8 +34,9 @@ protected:
 	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 6); } // "
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 1; }
-	virtual UINT32 execute_input_lines() const { return 1; }
+	virtual UINT32 execute_input_lines() const { return 3; } // up to 3 (some internal)
 	virtual void execute_run();
+	virtual void execute_one();
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
@@ -43,7 +44,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -57,10 +57,14 @@ protected:
 	
 	int m_icount;
 	
-	UINT16 m_pc;
+	UINT16 m_pc;            // program counter (11 or 10-bit)
 	UINT16 m_prev_pc;
+	UINT16 m_stack[3];      // callstack, 3 levels
 	UINT16 m_op;
 	
+	UINT8 m_cps;            // DP,CY or DP',CY' selected
+	bool m_skip;            // skip next opcode
+
 	// registers (unless specified, each is 4-bit)
 	UINT8 m_a;              // accumulator
 	UINT8 m_b;              // generic
@@ -70,9 +74,6 @@ protected:
 	UINT8 m_cy, m_cy2;      // carry flag(s)
 	UINT8 m_e;              // 8-bit register, hold data for S output
 	
-	UINT8 m_cps;            // DP,CY or DP',CY' selected
-	bool m_skip;
-
 	// misc internal helpers
 	UINT8 ram_r();
 	void ram_w(UINT8 data);

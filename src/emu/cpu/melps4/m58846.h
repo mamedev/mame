@@ -18,6 +18,13 @@ public:
 	m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual void execute_one();
+
 	// device_disasm_interface overrides
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 };

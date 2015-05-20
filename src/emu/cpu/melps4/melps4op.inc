@@ -7,13 +7,13 @@
 
 inline UINT8 melps4_cpu_device::ram_r()
 {
-	UINT8 address = (m_z << 5 | m_x << 4 | m_y) & m_datamask;
+	UINT8 address = (m_z << 6 | m_x << 4 | m_y) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
 inline void melps4_cpu_device::ram_w(UINT8 data)
 {
-	UINT8 address = (m_z << 5 | m_x << 4 | m_y) & m_datamask;
+	UINT8 address = (m_z << 6 | m_x << 4 | m_y) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -170,7 +170,7 @@ void melps4_cpu_device::op_xami()
 {
 	// XAMI j: XAM J, INY, skip next on Y=mask(default 0)
 	op_xam();
-	op_iny();
+	op_dey();
 
 	op_illegal();
 }
