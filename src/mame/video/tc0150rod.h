@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #ifndef __TC0150ROD_H__
 #define __TC0150ROD_H__
 

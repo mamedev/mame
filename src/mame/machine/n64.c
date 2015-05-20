@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /* machine/n64.c - contains N64 hardware emulation shared between MAME and MESS */
 
 #include "emu.h"

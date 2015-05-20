@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 #ifndef _VIDEO_N64_H_
 #define _VIDEO_N64_H_
 

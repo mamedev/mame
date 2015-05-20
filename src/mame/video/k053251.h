@@ -1,6 +1,5 @@
-// license:???
-// copyright-holders:???
-#pragma once
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
 #ifndef __K053251_H__
 #define __K053251_H__
 
