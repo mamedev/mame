@@ -193,12 +193,17 @@ public:
 
 // ======================> gb_rom_sachen1_device
 
-class gb_rom_sachen1_device : public gb_rom_mbc1_device
+class gb_rom_sachen_mmc1_device : public gb_rom_mbc_device
 {
 public:
 
+	enum {
+		MODE_LOCKED,
+		MODE_UNLOCKED
+	};
+
 	// construction/destruction
-	gb_rom_sachen1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gb_rom_sachen_mmc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
@@ -209,7 +214,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
 
-	UINT8 m_base_bank, m_mask;
+	UINT8 m_base_bank, m_mask, m_mode, m_unlock_cnt;
 };
 
 // ======================> gb_rom_188in1_device
