@@ -188,6 +188,9 @@ private:
 	inline bool exclusive_input_pressed(int key, int repeat);
 	static void clear_free_list(running_machine &machine);
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
+
+#include "mewui/menu.h"
+
 };
 
 #endif  // __UI_MENU_H__

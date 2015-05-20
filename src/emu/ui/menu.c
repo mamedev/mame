@@ -16,6 +16,7 @@
 #include "ui/ui.h"
 #include "ui/mainmenu.h"
 #include "ui/cheatopt.h"
+#include "mewui/menu.c"
 
 
 

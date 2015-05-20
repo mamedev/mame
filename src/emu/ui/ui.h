@@ -21,7 +21,7 @@
 ***************************************************************************/
 
 /* preferred font height; use ui_get_line_height() to get actual height */
-#define UI_TARGET_FONT_ROWS     (25)
+#define UI_TARGET_FONT_ROWS     get_font_rows()
 #define UI_TARGET_FONT_HEIGHT   (1.0f / (float)UI_TARGET_FONT_ROWS)
 #define UI_MAX_FONT_HEIGHT      (1.0f / 15.0f)
 
@@ -35,25 +35,26 @@
 /* handy colors */
 #define ARGB_WHITE              rgb_t(0xff,0xff,0xff,0xff)
 #define ARGB_BLACK              rgb_t(0xff,0x00,0x00,0x00)
-#define UI_BORDER_COLOR         rgb_t(0xff,0xff,0xff,0xff)
-#define UI_BACKGROUND_COLOR     rgb_t(0xef,0x10,0x10,0x30)
-#define UI_GFXVIEWER_BG_COLOR   rgb_t(0xef,0x10,0x10,0x30)
 #define UI_GREEN_COLOR          rgb_t(0xef,0x10,0x60,0x10)
 #define UI_YELLOW_COLOR         rgb_t(0xef,0x60,0x60,0x10)
 #define UI_RED_COLOR            rgb_t(0xf0,0x60,0x10,0x10)
-#define UI_UNAVAILABLE_COLOR    rgb_t(0xff,0x40,0x40,0x40)
-#define UI_TEXT_COLOR           rgb_t(0xff,0xff,0xff,0xff)
-#define UI_TEXT_BG_COLOR        rgb_t(0xef,0x00,0x00,0x00)
-#define UI_SUBITEM_COLOR        rgb_t(0xff,0xff,0xff,0xff)
-#define UI_CLONE_COLOR          rgb_t(0xff,0x80,0x80,0x80)
-#define UI_SELECTED_COLOR       rgb_t(0xff,0xff,0xff,0x00)
-#define UI_SELECTED_BG_COLOR    rgb_t(0xef,0x80,0x80,0x00)
-#define UI_MOUSEOVER_COLOR      rgb_t(0xff,0xff,0xff,0x80)
-#define UI_MOUSEOVER_BG_COLOR   rgb_t(0x70,0x40,0x40,0x00)
-#define UI_MOUSEDOWN_COLOR      rgb_t(0xff,0xff,0xff,0x80)
-#define UI_MOUSEDOWN_BG_COLOR   rgb_t(0xb0,0x60,0x60,0x00)
-#define UI_DIPSW_COLOR          rgb_t(0xff,0xff,0xff,0x00)
-#define UI_SLIDER_COLOR         rgb_t(0xff,0xff,0xff,0xff)
+
+#define UI_BORDER_COLOR         decode_ui_color(0)
+#define UI_BACKGROUND_COLOR     decode_ui_color(1)
+#define UI_GFXVIEWER_BG_COLOR   decode_ui_color(2)
+#define UI_UNAVAILABLE_COLOR    decode_ui_color(3)
+#define UI_TEXT_COLOR           decode_ui_color(4)
+#define UI_TEXT_BG_COLOR        decode_ui_color(5)
+#define UI_SUBITEM_COLOR        decode_ui_color(6)
+#define UI_CLONE_COLOR          decode_ui_color(7)
+#define UI_SELECTED_COLOR       decode_ui_color(8)
+#define UI_SELECTED_BG_COLOR    decode_ui_color(9)
+#define UI_MOUSEOVER_COLOR      decode_ui_color(10)
+#define UI_MOUSEOVER_BG_COLOR   decode_ui_color(11)
+#define UI_MOUSEDOWN_COLOR      decode_ui_color(12)
+#define UI_MOUSEDOWN_BG_COLOR   decode_ui_color(13)
+#define UI_DIPSW_COLOR          decode_ui_color(14)
+#define UI_SLIDER_COLOR         decode_ui_color(15)
 
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((UINT32)~0)
@@ -135,7 +136,7 @@ public:
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
 	void draw_text(render_container *container, const char *buf, float x, float y);
-	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = NULL, float *totalheight = NULL);
+	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = NULL, float *totalheight = NULL, float text_size = 1.0f);
 	void draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
 	void draw_message_window(render_container *container, const char *text);
 
@@ -166,6 +167,15 @@ public:
 
 	// other
 	void process_natural_keyboard();
+
+	// MEWUI word wrap
+	void wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int *totallines, int *xstart, int *xend, float text_size = 1.0f);
+
+	// draw an outlined box with given line color and filled with a texture
+	void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = NULL, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	// return text string width with given text size
+	float get_string_width_ex(const char *s, float text_size);
 
 private:
 	// instance variables
@@ -203,5 +213,7 @@ private:
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
+rgb_t decode_ui_color(int id, running_machine *machine = NULL);
+int get_font_rows(running_machine *machine = NULL);
 
 #endif  /* __USRINTRF_H__ */

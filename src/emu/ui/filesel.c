@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "ui/ui.h"
 #include "zippath.h"
-#include "mewui/menu.h"
+#include "ui/menu.h"
 #include "ui/filesel.h"
 #include "ui/swlist.h"
 #include "imagedev/floppy.h"

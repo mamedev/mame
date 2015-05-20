@@ -56,7 +56,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "output.h"
 
 // diimage requires uimenu
-#include "mewui/menu.h"
+#include "ui/menu.h"
 
 // devices and callbacks
 #include "device.h"

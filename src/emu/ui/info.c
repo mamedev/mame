@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "mewui/menu.h"
+#include "ui/menu.h"
 #include "ui/info.h"
 #include "ui/ui.h"
 
