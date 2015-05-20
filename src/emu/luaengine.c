@@ -642,10 +642,10 @@ int lua_engine::lua_screen::l_draw_box(lua_State *L)
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
 	float x1, y1, x2, y2;
-	x1 = MIN(MAX(0, lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	y1 = MIN(MAX(0, lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
-	x2 = MIN(MAX(0, lua_tonumber(L, 4)), sc_width-1) / static_cast<float>(sc_width);
-	y2 = MIN(MAX(0, lua_tonumber(L, 5)), sc_height-1) / static_cast<float>(sc_height);
+	x1 = MIN(MAX(0, (float) lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	y1 = MIN(MAX(0, (float) lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	x2 = MIN(MAX(0, (float) lua_tonumber(L, 4)), sc_width-1) / static_cast<float>(sc_width);
+	y2 = MIN(MAX(0, (float) lua_tonumber(L, 5)), sc_height-1) / static_cast<float>(sc_height);
 	UINT32 bgcolor = lua_tounsigned(L, 6);
 	UINT32 fgcolor = lua_tounsigned(L, 7);
 
@@ -680,10 +680,10 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
 	float x1, y1, x2, y2;
-	x1 = MIN(MAX(0, lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	y1 = MIN(MAX(0, lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
-	x2 = MIN(MAX(0, lua_tonumber(L, 4)), sc_width-1) / static_cast<float>(sc_width);
-	y2 = MIN(MAX(0, lua_tonumber(L, 5)), sc_height-1) / static_cast<float>(sc_height);
+	x1 = MIN(MAX(0, (float) lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	y1 = MIN(MAX(0, (float) lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	x2 = MIN(MAX(0, (float) lua_tonumber(L, 4)), sc_width-1) / static_cast<float>(sc_width);
+	y2 = MIN(MAX(0, (float) lua_tonumber(L, 5)), sc_height-1) / static_cast<float>(sc_height);
 	UINT32 color = lua_tounsigned(L, 6);
 
 	// draw the line
@@ -712,8 +712,8 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	// retrieve all parameters
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
-	float x = MIN(MAX(0, lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	float y = MIN(MAX(0, lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	float x = MIN(MAX(0, (float) lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	float y = MIN(MAX(0, (float) lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
 	const char *msg = luaL_checkstring(L,4);
 	rgb_t textcolor = UI_TEXT_COLOR;
 	if (!lua_isnone(L, 5)) {

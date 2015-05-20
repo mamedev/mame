@@ -590,7 +590,7 @@ void scsp_device::init()
 		t=ARTimes[i];   //In ms
 		if(t!=0.0)
 		{
-			step=(1023*1000.0)/( 44100.0f*t);
+			step=(1023*1000.0)/( 44100.0*t);
 			scale=(double) (1<<EG_SHIFT);
 			m_ARTABLE[i]=(int) (step*scale);
 		}
@@ -1432,10 +1432,10 @@ READ16_MEMBER( scsp_device::midi_out_r )
 #define LFIX(v) ((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
 
 //Convert DB to multiply amplitude
-#define DB(v)   LFIX(pow(10.0,v/20.0))
+#define DB(v)   LFIX(powf(10.0f,v/20.0f))
 
 //Convert cents to step increment
-#define CENTS(v) LFIX(pow(2.0,v/1200.0))
+#define CENTS(v) LFIX(powf(2.0f,v/1200.0f))
 
 
 static const float LFOFreq[32]=

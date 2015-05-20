@@ -3365,7 +3365,7 @@ void i860_cpu_device::insn_frcp (UINT32 insn)
 	{
 		float v = get_fregval_s (fsrc2);
 		float res;
-		if (v == 0.0)
+		if (v == 0.0f)
 		{
 			/* Generate source-exception trap if fsrc2 is 0.  */
 			if (0 /* GET_FSR_FTE () */)
@@ -3448,7 +3448,7 @@ void i860_cpu_device::insn_frsqr (UINT32 insn)
 	{
 		float v = get_fregval_s (fsrc2);
 		float res;
-		if (v == 0.0 || v < 0.0)
+		if (v == 0.0f || v < 0.0f)
 		{
 			/* Generate source-exception trap if fsrc2 is 0 or negative.  */
 			if (0 /* GET_FSR_FTE () */)
@@ -3463,7 +3463,8 @@ void i860_cpu_device::insn_frsqr (UINT32 insn)
 		{
 			SET_FSR_SE (0);
 			*((UINT32 *)&v) &= 0xffff8000;
-			res = (float)1.0/sqrt (v);
+			// FIXME: shouldn't this be 1.0f / sqrtf(v) ?
+			res = (float) (1.0/sqrt (v));
 			*((UINT32 *)&res) &= 0xffff8000;
 			if (res_prec)
 				set_fregval_d (fdest, (double)res);

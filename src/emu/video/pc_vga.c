@@ -2672,7 +2672,7 @@ void s3_vga_device::s3_define_video_mode()
 	if((vga.miscellaneous_output & 0xc) == 0x0c)
 	{
 		// DCLK calculation
-		freq = ((double)(s3.clk_pll_m+2) / (double)((s3.clk_pll_n+2)*(pow(2.0,s3.clk_pll_r)))) * 14.318f; // clock between XIN and XOUT
+		freq = ((double)(s3.clk_pll_m+2) / (double)((s3.clk_pll_n+2)*(pow(2.0,s3.clk_pll_r)))) * 14.318; // clock between XIN and XOUT
 		xtal = freq * 1000000;
 	}
 

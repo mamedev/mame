@@ -2966,7 +2966,7 @@ inline void sh34_base_device::FSRRA(const UINT16 opcode)
 
 	if (FP_RFS(n) < 0)
 		return;
-	FP_RFS(n) = 1.0 / sqrtf(FP_RFS(n));
+	FP_RFS(n) = 1.0f / sqrtf(FP_RFS(n));
 }
 
 /*  FSSCA FPUL,FRn PR=0 1111nnn011111101 */
@@ -2974,9 +2974,9 @@ void sh34_base_device::FSSCA(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
-float angle;
+	float angle;
 
-	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0) * 2.0 * M_PI;
+	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float) M_PI;
 	FP_RFS(n) = sinf(angle);
 	FP_RFS(n+1) = cosf(angle);
 }

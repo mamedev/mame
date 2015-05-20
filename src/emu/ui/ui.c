@@ -2044,8 +2044,8 @@ static INT32 slider_overclock(running_machine &machine, void *arg, std::string *
 	if (newval != SLIDER_NOCHANGE)
 		cpu->set_clock_scale((float)newval * 0.001f);
 	if (str != NULL)
-		strprintf(*str,"%3.0f%%", floor(cpu->clock_scale() * 100.0f + 0.5f));
-	return floorf(cpu->clock_scale() * 1000.0f + 0.5f);
+		strprintf(*str,"%3.0f%%", floor(cpu->clock_scale() * 100.0 + 0.5));
+	return floor(cpu->clock_scale() * 1000.0 + 0.5);
 }
 
 
@@ -2069,7 +2069,7 @@ static INT32 slider_refresh(running_machine &machine, void *arg, std::string *st
 	if (str != NULL)
 		strprintf(*str,"%.3ffps", ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds));
 	refresh = ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds);
-	return floorf((refresh - defrefresh) * 1000.0f + 0.5f);
+	return floor((refresh - defrefresh) * 1000.0 + 0.5);
 }
 
 

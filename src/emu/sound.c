@@ -225,7 +225,8 @@ int sound_stream::input_source_outputnum(int inputnum) const
 
 void sound_stream::set_input(int index, sound_stream *input_stream, int output_index, float gain)
 {
-	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", this, m_device.tag(), index, input_stream, output_index, gain));
+	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", this, m_device.tag(),
+			index, input_stream, output_index, (double) gain));
 
 	// make sure it's a valid input
 	if (index >= m_input.size())
@@ -983,9 +984,9 @@ void sound_manager::config_load(int config_type, xml_data_node *parentnode)
 		mixer_input info;
 		if (indexed_mixer_input(xml_get_attribute_int(channelnode, "index", -1), info))
 		{
-			float defvol = xml_get_attribute_float(channelnode, "defvol", 1.0);
-			float newvol = xml_get_attribute_float(channelnode, "newvol", -1000.0);
-			if (newvol != -1000.0)
+			float defvol = xml_get_attribute_float(channelnode, "defvol", 1.0f);
+			float newvol = xml_get_attribute_float(channelnode, "newvol", -1000.0f);
+			if (newvol != -1000.0f)
 				info.stream->set_user_gain(info.inputnum, newvol / defvol);
 		}
 	}
