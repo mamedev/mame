@@ -11,6 +11,14 @@
 
 
 //**************************************************************************
+//  CONSTANTS/MACROS
+//**************************************************************************
+
+#define VERBOSE 1
+#define VERBOSE_STATUS 0
+
+
+//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -88,6 +96,22 @@ void nascom_fdc_device::device_reset()
 	m_nasbus->m_io->install_read_handler(0xe5, 0xe5, read8_delegate(FUNC(nascom_fdc_device::status_r), this));
 }
 
+//-------------------------------------------------
+//  device_reset_after_children - device-specific reset after children
+//-------------------------------------------------
+
+void nascom_fdc_device::device_reset_after_children()
+{
+	// sanity check
+	if (m_floppy0->get_device() && m_floppy1->get_device())
+		if (m_floppy0->get_device()->get_sides() != m_floppy1->get_device()->get_sides())
+			fatalerror("Floppy drive 0 and 1 need to be of the same type.\n");
+
+	if (m_floppy2->get_device() && m_floppy3->get_device())
+		if (m_floppy2->get_device()->get_sides() != m_floppy3->get_device()->get_sides())
+			fatalerror("Floppy drive 2 and 3 need to be of the same type.\n");
+}
+
 
 //**************************************************************************
 //  IMPLEMENTATION
@@ -95,12 +119,32 @@ void nascom_fdc_device::device_reset()
 
 READ8_MEMBER( nascom_fdc_device::select_r )
 {
-	return m_select | 0xa0;
+	m_select |= (0x80 | 0x20);
+
+	// double sided drive for drive 0/1?
+	if (m_floppy0->get_device() && (m_floppy0->get_device()->get_sides() == 2))
+		m_select &= ~0x20;
+
+	if (m_floppy1->get_device() && (m_floppy1->get_device()->get_sides() == 2))
+		m_select &= ~0x20;
+
+	// double sided drive for drive 2/3?
+	if (m_floppy2->get_device() && (m_floppy2->get_device()->get_sides() == 2))
+		m_select &= ~0x80;
+
+	if (m_floppy3->get_device() && (m_floppy3->get_device()->get_sides() == 2))
+		m_select &= ~0x80;
+
+	if (VERBOSE)
+		logerror("nascom_fdc_device::select_r: 0x%02x\n", m_select);
+
+	return m_select;
 }
 
 WRITE8_MEMBER( nascom_fdc_device::select_w )
 {
-	logerror("nascom_fdc_device::select_w: 0x%02x\n", data);
+	if (VERBOSE)
+		logerror("nascom_fdc_device::select_w: 0x%02x\n", data);
 
 	m_floppy = NULL;
 
@@ -128,6 +172,9 @@ READ8_MEMBER( nascom_fdc_device::status_r )
 
 	data |= m_fdc->intrq_r() << 0;
 	data |= m_fdc->drq_r()   << 7;
+
+	if (VERBOSE_STATUS)
+		logerror("nascom_fdc_device::status_r: 0x%02x\n", data);
 
 	return data;
 }

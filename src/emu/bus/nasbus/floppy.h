@@ -28,9 +28,9 @@ public:
 	// construction/destruction
 	nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_MEMBER( select_r );
-	DECLARE_WRITE8_MEMBER( select_w );
-	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_READ8_MEMBER(select_r);
+	DECLARE_WRITE8_MEMBER(select_w);
+	DECLARE_READ8_MEMBER(status_r);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -38,6 +38,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_reset_after_children();
 
 private:
 	required_device<fd1793_t> m_fdc;
