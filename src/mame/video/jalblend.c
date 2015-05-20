@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Lica Elia
+// copyright-holders:David Haywood, Luca Elia
 /***************************************************************************
 
     Jaleco color blend emulation
