@@ -269,6 +269,11 @@ void floppy_image_device::commit_image()
 	io.file = (device_image_interface *)this;
 	io.procs = &image_ioprocs;
 	io.filler = 0xff;
+
+	file_error err = core_truncate(image_core_file(), 0);
+	if (err != 0)
+		popmessage("Error, unable to truncate image: %d", err);
+
 	output_format->save(&io, image);
 }
 
