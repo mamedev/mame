@@ -19,18 +19,15 @@
 // category structure
 struct IniCategoryIndex
 {
-    char *name;
+    std::string name;
     long offset;
-    IniCategoryIndex *prev, *next;
 };
 
 // ini file structure
 struct IniFileIndex
 {
-    char *file_name;
-    int category_number;
-    IniFileIndex *prev, *next;
-    IniCategoryIndex *first_category, *last_category, *current_category;
+    std::string file_name;
+    std::vector<IniCategoryIndex> category;
 };
 
 /**************************************************************************
@@ -46,16 +43,16 @@ public:
 
     // getters
     running_machine &machine() const { return m_machine; }
-    IniFileIndex *getfile() { return current_file_idx; }
-    IniCategoryIndex *getcategory() { return current_file_idx->current_category; }
-    IniCategoryIndex *getfirstcategory() { return current_file_idx->first_category; }
-    IniFileIndex *getfirstfile() { return first_file_idx; }
-    IniFileIndex *getlastfile() { return last_file_idx; }
-    int category_total() const { return current_file_idx->category_number; }
-    int files_total() const { return file_total; }
-    bool has_files() const { return (file_total > 0); }
-    int getfileindex();
-    int getcategoryindex();
+//    IniFileIndex *getfile() { return current_file_idx; }
+//    IniCategoryIndex *getcategory() { return current_file_idx->current_category; }
+//    IniCategoryIndex *getfirstcategory() { return current_file_idx->first_category; }
+//    IniFileIndex *getfirstfile() { return first_file_idx; }
+//    IniFileIndex *getlastfile() { return last_file_idx; }
+//    int category_total() const { return current_file_idx->category_number; }
+//    int files_total() const { return file_total; }
+//    bool has_files() const { return (file_total > 0); }
+//    int getfileindex();
+//    int getcategoryindex();
 
     // setters
     void setcategory(int direction, int index = -1);
@@ -64,16 +61,13 @@ public:
     // load games from category
     void load_ini_category(std::vector<int> &temp_filter);
 
-    // free global index
-    void free_ini_index();
+    // files indices
+    static std::vector<IniFileIndex> ini_index;
 
 private:
 
-    // files indices
-    static IniFileIndex *first_file_idx, *last_file_idx, *current_file_idx;
-
     // init category index
-    int init_category(IniFileIndex &index, const char *file_name);
+    void init_category(std::vector<IniFileIndex> &index, std::string &filename);
 
     // init file index
     void directory_scan();
@@ -82,13 +76,10 @@ private:
     bool ParseOpen(const char *filename);
     void ParseClose();
 
-    void add_item(IniFileIndex &index, const char *name, long *file_offset);
-    IniFileIndex *allocate(const char *name);
-
     // internal state
     running_machine &m_machine;     // reference to our machine
-    static int      file_total;
-    emu_file        *fp;
+    static int      current_file, current_category;
+    std::string		fullpath;
 };
 
 /**************************************************************************

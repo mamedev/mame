@@ -105,8 +105,7 @@ private:
     void init_sysinfo();
     void init_storyinfo();
 
-    bool ParseOpen(const char *pszFilename);
-    void ParseClose();
+    bool ParseOpen(const char *filename);
 
     int index_mame_mess_info(tDatafileIndex **_index, sDataDrvIndex **_index_drv, int &drvcount);
     int index_datafile(tDatafileIndex **_index, int &swcount);
@@ -122,8 +121,8 @@ private:
 
     // internal state
     running_machine     &m_machine;             // reference to our machine
-    emu_file            *fp;
 
+	std::string			fullpath;
     static bool         m_history_file, m_mame_file, m_mess_file, m_command_file, m_sysinfo_file, m_story_file;
     static std::string  history_revision, mame_revision, mess_revision, sysinfo_revision, story_revision;
 };

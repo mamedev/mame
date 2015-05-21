@@ -93,7 +93,8 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 //  ctor
 //-------------------------------------------------
 
-ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
+ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container),
+	m_searchlist(VISIBLE_GAMES_IN_SEARCH)
 {
     // build drivers list
     build_full_list();
@@ -467,8 +468,7 @@ void ui_mewui_select_game::populate()
     mewui_globals::redraw_icon = true;
     mewui_globals::switch_image = true;
     int old_item_selected = -1;
-    const game_driver *tmp = NULL;
-    std::fill(m_displaylist.begin(), m_displaylist.end(), tmp);
+	m_displaylist.clear();
     UINT32 flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
     if (mewui_globals::actual_filter != FILTER_FAVORITE_GAME)

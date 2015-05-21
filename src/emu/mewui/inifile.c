@@ -17,12 +17,11 @@
 //  GLOBAL VARIABLES
 //-------------------------------------------------
 
-IniFileIndex *inifile_manager::first_file_idx = NULL;
-IniFileIndex *inifile_manager::last_file_idx = NULL;
-IniFileIndex *inifile_manager::current_file_idx = NULL;
-int inifile_manager::file_total = 0;
 static bool first_load = true;
 static bool first_f_load = true;
+
+std::vector<IniFileIndex> inifile_manager::ini_index;
+int inifile_manager::current_file = -1;
 
 std::vector<ui_software_info> favorite_manager::favorite_list;
 int favorite_manager::current_favorite = -1;
@@ -70,19 +69,12 @@ void inifile_manager::directory_scan()
             // try to open file and indexing
             if (ParseOpen(file_name.c_str()))
             {
-                IniFileIndex *tmp = allocate(file_name.c_str());
-                int category_count = init_category(*tmp, file_name.c_str());
-                ParseClose();
-
-                // if no category, deallocate memory
-                if (category_count == 0)
-                    global_free(tmp);
-
-                // else, sort category, copy file name and category number
-                else
-                {
-                    tmp->category_number = category_count;
-                    file_total++;
+                IniFileIndex tmp;
+                init_category(tmp, fullpath);
+				if (!tmp.category.empty())
+				{
+					tmp.file_name.assign(file_name);
+					ini_index.push_back(tmp);
                 }
             }
         }
@@ -93,59 +85,50 @@ void inifile_manager::directory_scan()
 //  initialize category
 //-------------------------------------------------
 
-int inifile_manager::init_category(IniFileIndex &index, const char *file_name)
+void inifile_manager::init_category(std::vector<IniFileIndex> &index, std::string &filename)
 {
-    char    readbuf[MAX_CHAR_INFO];
-    char    name[80];
-    int     count = 0;
-
-    while (fp->gets(readbuf, MAX_CHAR_INFO))
+    std::string readbuf;
+	std::ifstream myfile(filename.c_str() std::ifstream::binary);
+    while (std::getline(myfile, readbuf))
     {
-        // do we have [...] ?
-
         if (readbuf[0] == '[')
         {
-            int ch = 1;
+            size_t found = readbuf.find("]");
+            if (found == std::string::npos)
+				return;
 
-            while (readbuf[ch] != ']')
-            {
-                name[ch - 1] = readbuf[ch];
-                ch++;
-            }
-
-            name[ch - 1] = '\0';
-
-            // is it [FOLDER_SETTINGS] or [ROOT_FOLDER] ?
-
-            if (!strcmp(name, "FOLDER_SETTINGS"))
+			std::string name = readbuf.substr(1, found - 1);
+            if (name.compare("FOLDER_SETTINGS") == 0)
                 continue;
             else
             {
-                long offset = fp->tell();
-                if (!strcmp(name, "ROOT_FOLDER"))
+                long offset = myfile.tellg();
+                if (name.compare("ROOT_FOLDER") == 0)
                 {
-                    long offset = fp->tell();
-                    fp->gets(readbuf, MAX_CHAR_INFO);
+                    long offset = myfile.tellg();
+                    std::getline(myfile, readbuf, MAX_CHAR_INFO);
 
-                    if (isspace(readbuf[0])) continue;
+                    if (isspace(readbuf[0]))
+						continue;
 
-                    int len = strlen(file_name) - 4;
-                    strncpy(name, file_name, len);
-                    name[len] = '\0';
-                    add_item(index, name, &offset);
-                    fp->seek(offset, SEEK_SET);
+                    int len = filename.length() - 4;
+                    name = filename.substr(0, filename.length() - 4);
+                    IniCategoryIndex tmp;
+                    tmp.category.assign(name);
+                    tmp.offset = offset;
+					index.category.push_back(tmp);
+                    myfile.seekg(offset, SEEK_SET);
                 }
-
-                // must be [folder name]
                 else
-                    add_item(index, name, &offset);
-
-                count++;
+                {
+                    IniCategoryIndex tmp;
+                    tmp.category.assign(name);
+                    tmp.offset = offset;
+					index.category.push_back(tmp);
+				}
             }
         }
     }
-
-    return count;
 }
 
 //-------------------------------------------------
@@ -154,35 +137,34 @@ int inifile_manager::init_category(IniFileIndex &index, const char *file_name)
 
 void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 {
-    if (!has_files())
+    if (ini_index.empty())
         return;
 
     bool search_clones = false;
-    std::string file_name(current_file_idx->file_name);
-    long offset = current_file_idx->current_category->offset;
+    std::string file_name(index[current_file].file_name);
+    long offset = index[current_file].category.offset;
+    std::string     carriage("\r\n");
 
     if (!core_stricmp(file_name.c_str(), "category.ini") || !core_stricmp(file_name.c_str(), "alltime.ini"))
         search_clones = true;
 
     if (ParseOpen(file_name.c_str()))
     {
+		std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
         int num_game = driver_list::total();
-        char readbuf[MAX_CHAR_INFO];
+        std::string readbuf;
 
-        fp->seek(offset, SEEK_SET);
+        myfile.seekg(offset, SEEK_SET);
 
-        while (fp->gets(readbuf, MAX_CHAR_INFO))
+        while (std::getline(myfile, readbuf))
         {
             if (readbuf[0] == '[')
                 break;
 
-            char name[80];
-            int li = strlen(readbuf) - 1;
-            strncpy(name, readbuf, li);
-            name[li] = '\0';
-            int dfind = driver_list::find(name);
-
-            // if game found and file is category.ini, add clones to the list
+            std::string name;
+            size_t found = readbuf.find_last_not_of(carriage);
+			name.assign(readbuf.substr(0, found);
+            int dfind = driver_list::find(name.c_str());
             if (dfind != -1 && search_clones)
             {
                 temp_filter.push_back(dfind);
@@ -196,12 +178,9 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
                             temp_filter.push_back(x);
                 }
             }
-
             else if (dfind != -1)
                 temp_filter.push_back(dfind);
         }
-
-        ParseClose();
     }
 
     return;
@@ -214,121 +193,16 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 bool inifile_manager::ParseOpen(const char *filename)
 {
     // Open file up in binary mode
-    fp = global_alloc(emu_file(machine().options().extraini_path(), OPEN_FLAG_READ));
+    emu_file fp(machine().options().extraini_path(), OPEN_FLAG_READ);
 
-    if (fp->open(filename) != FILERR_NONE)
+    if (fp.open(filename) == FILERR_NONE)
     {
-        global_free(fp);
-        fp = NULL;
-        return FALSE;
+		fullpath.assign(fp.fullpath());
+		fp.close();
+		return true
     }
 
-    return TRUE;
-}
-
-//-------------------------------------------------
-//  closes the existing opened file (if any)
-//-------------------------------------------------
-
-void inifile_manager::ParseClose()
-{
-    // If the file is open, time for fclose.
-    if (fp)
-    {
-        fp->close();
-        global_free(fp);
-    }
-
-    fp = NULL;
-}
-
-//-------------------------------------------------
-//  free allocated indices
-//-------------------------------------------------
-
-void inifile_manager::free_ini_index()
-{
-    // free ini file index
-    if (first_file_idx)
-    {
-        IniFileIndex *pItem = first_file_idx;
-
-        while (pItem != NULL)
-        {
-            IniCategoryIndex *pItems = pItem->first_category;
-
-            while (pItems != NULL)
-            {
-                IniCategoryIndex *pDelItems = pItems;
-                pItems = pItems->next;
-                global_free_array(pDelItems->name);
-                global_free(pDelItems);
-            }
-
-            pItem->first_category = pItem->last_category = NULL;
-            IniFileIndex *pDelItem = pItem;
-            pItem = pItem->next;
-            global_free_array(pDelItem->file_name);
-            global_free(pDelItem);
-        }
-
-        first_file_idx = last_file_idx = NULL;
-    }
-}
-
-//-------------------------------------------------
-//  add a category structure to file index
-//-------------------------------------------------
-
-void inifile_manager::add_item(IniFileIndex &tmp, const char *name, long *file_offset)
-{
-    IniCategoryIndex *tmp_item = global_alloc(IniCategoryIndex);
-
-    tmp_item->name = global_alloc_array(char, strlen(name) + 1);
-    strcpy(tmp_item->name, name);
-    tmp_item->offset = *file_offset;
-
-    if (tmp.first_category == NULL)
-    {
-        tmp.first_category = tmp.last_category = tmp.current_category = tmp_item;
-        tmp_item->next = tmp_item->prev = NULL;
-    }
-
-    else
-    {
-        tmp.last_category->next = tmp_item;
-        tmp_item->prev = tmp.last_category;
-        tmp.last_category = tmp_item;
-        tmp_item->next = NULL;
-    }
-}
-
-//-------------------------------------------------
-//  add a file to the index
-//-------------------------------------------------
-
-IniFileIndex *inifile_manager::allocate(const char *name)
-{
-    IniFileIndex *tmp = global_alloc(IniFileIndex);
-    tmp->file_name = global_alloc_array(char, strlen(name) + 1);
-    strcpy(tmp->file_name, name);
-    tmp->first_category = tmp->last_category = tmp->current_category = NULL;
-
-    if (first_file_idx == NULL)
-    {
-        first_file_idx = last_file_idx = current_file_idx = tmp;
-        tmp->next = tmp->prev = NULL;
-    }
-
-    else
-    {
-        last_file_idx->next = tmp;
-        tmp->prev = last_file_idx;
-        last_file_idx = tmp;
-        tmp->next = NULL;
-    }
-
-    return tmp;
+    return false;
 }
 
 //-------------------------------------------------
@@ -623,7 +497,6 @@ void favorite_manager::parse_favorite()
 {
     if (parseOpen(favorite_filename))
     {
-
         std::ifstream myfile(fp->fullpath());
         std::string readbuf;
 

@@ -68,7 +68,6 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
     {
         if (machine.options().mamefile())
             init_mameinfo();
-        ParseClose();
     }
 
     m_command_file = ParseOpen("command.dat");
@@ -76,7 +75,6 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
     {
         if (machine.options().cmndfile())
             init_command();
-        ParseClose();
     }
 
     m_story_file = ParseOpen("story.dat");
@@ -84,7 +82,6 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
     {
         if (machine.options().mamefile())
             init_storyinfo();
-        ParseClose();
     }
 
     m_mess_file = ParseOpen("messinfo.dat");
@@ -92,7 +89,6 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
     {
         if (machine.options().mamefile())
             init_messinfo();
-        ParseClose();
     }
 
     m_sysinfo_file = ParseOpen("sysinfo.dat");
@@ -100,7 +96,6 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
     {
         if (machine.options().mamefile())
             init_sysinfo();
-        ParseClose();
     }
 
     m_history_file = ParseOpen("history.dat");
@@ -108,7 +103,6 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
     {
         if (machine.options().historyfile())
             init_history();
-        ParseClose();
     }
 }
 
@@ -235,12 +229,9 @@ void datfile_manager::load_software_info(const char *soft_list, std::string &buf
                         }
 
             if (!found)
-            {
-                ParseClose();
                 return;
-            }
 
-            std::ifstream myfile(fp->fullpath());
+            std::ifstream myfile(fullpath.c_str());
             myfile.seekg(s_offset, myfile.beg);
             while (myfile.good())
             {
@@ -256,7 +247,6 @@ void datfile_manager::load_software_info(const char *soft_list, std::string &buf
             }
             myfile.close();
         }
-        ParseClose();
     }
 }
 
@@ -311,7 +301,6 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
         // load driver info
         if (driver_idx)
             load_driver_text(drv, buffer, driver_idx, TAG_DRIVER);
-        ParseClose();
     }
 }
 
@@ -707,31 +696,15 @@ int datfile_manager::index_datafile(tDatafileIndex **_index, int &swcount)
 bool datfile_manager::ParseOpen(const char *filename)
 {
     // Open file up in binary mode
-    fp = global_alloc(emu_file(machine().options().history_path(), OPEN_FLAG_READ));
+    emu_file fp(machine().options().history_path(), OPEN_FLAG_READ));
 
-    if (fp->open(filename) != FILERR_NONE)
+    if (fp.open(filename) == FILERR_NONE)
     {
-        global_free(fp);
-        fp = NULL;
-        return FALSE;
+		fullpath.assign(fp.fullpath());
+		fp.close();
+		return true;
     }
-    return TRUE;
-}
-
-//-------------------------------------------------
-//  closes the existing opened file (if any)
-//-------------------------------------------------
-
-void datfile_manager::ParseClose()
-{
-    // If the file is open, time for fclose.
-    if (fp)
-    {
-        fp->close();
-        global_free(fp);
-    }
-
-    fp = NULL;
+    return false;
 }
 
 //-------------------------------------------------
@@ -869,18 +842,13 @@ bool datfile_manager::find_command(const game_driver *drv)
     {
         // create menu_index
         int status = index_menuidx(drv, cmnd_idx, &menu_idx);
-
-        ParseClose();
-
         if (!status)
         {
             free_menuidx(&menu_idx);
             return false;
         }
-
         return true;
     }
-
     return false;
 }
 
