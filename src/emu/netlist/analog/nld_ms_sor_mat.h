@@ -29,9 +29,9 @@ public:
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
-			const char *p = osd_getenv("NETLIST_STATS");
-			if (p != NULL)
-				m_log_stats = (bool) atoi(p);
+			pstring p = nl_util::environment("NETLIST_STATS");
+			if (p != "")
+				m_log_stats = (bool) p.as_long();
 			else
 				m_log_stats = false;
 		}

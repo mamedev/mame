@@ -45,6 +45,13 @@ public:
 		}
 		return temp;
 	}
+	static const pstring environment(const pstring &var, const pstring &default_val = "")
+	{
+		if (getenv(var.cstr()) == NULL)
+			return default_val;
+		else
+			return pstring(getenv(var.cstr()));
+	}
 };
 
 class nl_math
