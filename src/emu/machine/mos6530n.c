@@ -92,8 +92,8 @@ mos6530_t::mos6530_t(const machine_config &mconfig, const char *tag, device_t *o
 	m_out_pb5_cb(*this),
 	m_out_pb6_cb(*this),
 	m_out_pb7_cb(*this),
-	m_pa_in(0),
-	m_pb_in(0)
+	m_pa_in(0xff),
+	m_pb_in(0xff)
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
@@ -226,8 +226,12 @@ void mos6530_t::update_pb()
 
 	if (m_ie)
 	{
-		data &= ~IRQ_TIMER;
-		data |= m_irq ? 0x00 : IRQ_TIMER;
+		if (m_irq) {
+			data |= IRQ_TIMER;
+		} else {
+			data &= ~IRQ_TIMER;
+		}
+
 		m_irq_cb(m_irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 
