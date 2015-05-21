@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /**********************************************************************
 
     Sega Game Gear "SMS Controller Adaptor" emulation

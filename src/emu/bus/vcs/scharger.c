@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /***************************************************************************
 
  Atari 2600 cart Starpath Supercharger (Cart + Tape drive!)

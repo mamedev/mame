@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
  A2600 VCS ROM cart emulation

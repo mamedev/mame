@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __CHANF_ROM_H
 #define __CHANF_ROM_H
 

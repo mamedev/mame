@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __NES_HES_H
 #define __NES_HES_H
 
