@@ -22,6 +22,10 @@ public:
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
+		, m_stack_levels(3)
+		, m_bm_page(14)
+		, m_int_page(12)
+		, m_xami_mask(0)
 	{ }
 
 protected:
@@ -44,35 +48,52 @@ protected:
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
 
-	int m_prgwidth;
-	int m_datawidth;
-	int m_prgmask;
-	int m_datamask;
-	
 	int m_icount;
+
+	// fixed settings or mask options
+	int m_prgwidth;         // number of bits and bitmask for ROM/RAM size
+	int m_datawidth;        // "
+	int m_prgmask;          // "
+	int m_datamask;         // "
+
+	UINT8 m_stack_levels;   // 3 levels on MELPS 4, 12 levels on MELPS 41/42
+	UINT8 m_bm_page;        // short BM default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
+	UINT8 m_int_page;       // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
+	UINT8 m_xami_mask;      // mask option for XAMI opcode on '40,'41,'45 (0 for others)
 	
+	// internal state, misc regs
 	UINT16 m_pc;            // program counter (11 or 10-bit)
 	UINT16 m_prev_pc;
-	UINT16 m_stack[3];      // callstack, 3 levels
+	UINT16 m_stack[12];     // callstack
 	UINT16 m_op;
+	UINT16 m_prev_op;
 	
 	UINT8 m_cps;            // DP,CY or DP',CY' selected
 	bool m_skip;            // skip next opcode
+	UINT8 m_inte;           // interrupt enable flag
+	UINT8 m_intp;           // external interrupt polarity ('40 to '44)
 
-	// registers (unless specified, each is 4-bit)
+	// work registers (unless specified, each is 4-bit)
 	UINT8 m_a;              // accumulator
 	UINT8 m_b;              // generic
+	UINT8 m_e;              // 8-bit register, hold data for S output
 	UINT8 m_y, m_y2;        // RAM index Y, Y' (Z.XX.YYYY is DP aka Data Pointer)
 	UINT8 m_x, m_x2;        // RAM index X, X', 2-bit
 	UINT8 m_z, m_z2;        // RAM index Z, Z', 1-bit, optional
 	UINT8 m_cy, m_cy2;      // carry flag(s)
-	UINT8 m_e;              // 8-bit register, hold data for S output
+	
+	UINT8 m_h;              // A/D converter H or generic
+	UINT8 m_l;              // A/D converter L or generic
+	UINT8 m_c;              // A/D converter counter
+	UINT8 m_v;              // timer control V
+	UINT8 m_w;              // timer control W
 	
 	// misc internal helpers
 	UINT8 ram_r();

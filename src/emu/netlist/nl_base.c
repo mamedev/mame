@@ -234,6 +234,19 @@ ATTR_COLD void netlist_base_t::start()
 
 }
 
+ATTR_COLD void netlist_base_t::stop()
+{
+	/* find the main clock and solver ... */
+
+	NL_VERBOSE_OUT(("Stopping all devices ...\n"));
+
+	// Step all devices once !
+	for (int i = 0; i < m_devices.count(); i++)
+	{
+		m_devices[i]->stop_dev();
+	}
+}
+
 ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 {
 	for (int i = 0; i < m_nets.count(); i++)
@@ -405,6 +418,13 @@ ATTR_COLD void netlist_core_device_t::start_dev()
 	netlist().m_started_devices.add(this, false);
 #endif
 	start();
+}
+
+ATTR_COLD void netlist_core_device_t::stop_dev()
+{
+#if (NL_KEEP_STATISTICS)
+#endif
+	stop();
 }
 
 ATTR_HOT ATTR_ALIGN netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
@@ -866,8 +886,6 @@ ATTR_HOT void netlist_terminal_t::schedule_after(const netlist_time &after)
 
 ATTR_COLD void netlist_terminal_t::reset()
 {
-	//printf("reset %s\n", name().cstr());
-	//netlist_terminal_core_terminal_t::reset();
 	set_state(STATE_INP_ACTIVE);
 	set_ptr(m_Idr1, 0.0);
 	set_ptr(m_go1, netlist().gmin());

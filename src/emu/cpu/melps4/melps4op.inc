@@ -82,10 +82,11 @@ void melps4_cpu_device::op_tax()
 void melps4_cpu_device::op_lxy()
 {
 	// LXY x,y: load immediate into X,Y, skip any next LXY
-	m_x = m_op >> 4 & 3;
-	m_y = m_op & 0xf;
-	
-	op_illegal();
+	if ((m_op & ~0x3f) != (m_prev_op & ~0x3f))
+	{
+		m_x = m_op >> 4 & 3;
+		m_y = m_op & 0xf;
+	}
 }
 
 void melps4_cpu_device::op_lz()
@@ -170,9 +171,8 @@ void melps4_cpu_device::op_xami()
 {
 	// XAMI j: XAM J, INY, skip next on Y=mask(default 0)
 	op_xam();
-	op_dey();
-
-	op_illegal();
+	op_iny();
+	m_skip = (m_y == m_xami_mask);
 }
 
 
@@ -181,9 +181,8 @@ void melps4_cpu_device::op_xami()
 void melps4_cpu_device::op_la()
 {
 	// LA n: load immediate into A, skip any next LA
-	m_a = m_op & 0xf;
-	
-	op_illegal();
+	if ((m_op & ~0xf) != (m_prev_op & ~0xf))
+		m_a = m_op & 0xf;
 }
 
 void melps4_cpu_device::op_am()
@@ -259,7 +258,7 @@ void melps4_cpu_device::op_rb()
 
 void melps4_cpu_device::op_szb()
 {
-	// SZB j: skip next if RAM bit is reset
+	// SZB j: skip next if RAM bit is 0
 	UINT8 mask = 1 << (m_op & 3);
 	m_skip = !(ram_r() & mask);
 }
@@ -285,55 +284,68 @@ void melps4_cpu_device::op_sey()
 void melps4_cpu_device::op_tla()
 {
 	// TLA: transfer A to L
-	op_illegal();
+	m_l = m_a;
 }
 
 void melps4_cpu_device::op_tha()
 {
 	// THA: transfer A to H
-	op_illegal();
+	m_h = m_a;
 }
 
 void melps4_cpu_device::op_taj()
 {
-	// TAJ: transfer J to A
+	// TAJ: transfer J(hi/lo) to A designated by Y
 	op_illegal();
 }
 
 void melps4_cpu_device::op_xal()
 {
 	// XAL: exchange A with L
-	op_illegal();
+	UINT8 a = m_a;
+	m_a = m_l;
+	m_l = a;
 }
 
 void melps4_cpu_device::op_xah()
 {
 	// XAH: exchange A with H
-	op_illegal();
+	UINT8 a = m_a;
+	m_a = m_h;
+	m_h = a;
 }
 
 void melps4_cpu_device::op_lc7()
 {
 	// LC7: load 7 into C
-	op_illegal();
+	m_c = 7;
 }
 
 void melps4_cpu_device::op_dec()
 {
 	// DEC: decrement C, skip next on overflow
-	op_illegal();
+	m_c = (m_c - 1) & 7;
+	m_skip = (m_c == 7);
 }
 
 void melps4_cpu_device::op_shl()
 {
 	// SHL: set bit in L or H designated by C
-	op_illegal();
+	UINT8 mask = 1 << (m_c & 3);
+	if (m_c & 4)
+		m_h |= mask;
+	else
+		m_l |= mask;
 }
 
 void melps4_cpu_device::op_rhl()
 {
 	// RHL: reset bit in L or H designated by C
-	op_illegal();
+	UINT8 mask = 1 << (m_c & 3);
+	if (m_c & 4)
+		m_h &= ~mask;
+	else
+		m_l &= ~mask;
 }
 
 void melps4_cpu_device::op_cpa()
@@ -356,7 +368,7 @@ void melps4_cpu_device::op_cpae()
 
 void melps4_cpu_device::op_szj()
 {
-	// SZJ: ..
+	// SZJ: skip next if J bit designated by Y is 0
 	op_illegal();
 }
 
@@ -462,7 +474,8 @@ void melps4_cpu_device::op_rt()
 void melps4_cpu_device::op_rts()
 {
 	// RTS: RT, skip next
-	op_illegal();
+	op_rt();
+	m_skip = true;
 }
 
 void melps4_cpu_device::op_rti()
@@ -576,25 +589,25 @@ void melps4_cpu_device::op_su()
 void melps4_cpu_device::op_ei()
 {
 	// EI: enable interrupt flag
-	op_illegal();
+	m_inte = 1;
 }
 
 void melps4_cpu_device::op_di()
 {
 	// DI: disable interrupt flag
-	op_illegal();
+	m_inte = 0;
 }
 
 void melps4_cpu_device::op_inth()
 {
-	// INTH: set interrupt polarity high
-	op_illegal();
+	// INTH: set external interrupt polarity high (rising edge)
+	m_intp = 1;
 }
 
 void melps4_cpu_device::op_intl()
 {
-	// INTL: set interrupt polarity low
-	op_illegal();
+	// INTL: set external interrupt polarity low (falling edge)
+	m_intp = 0;
 }
 
 

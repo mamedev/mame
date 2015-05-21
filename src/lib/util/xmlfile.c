@@ -511,7 +511,7 @@ xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name,
 xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *name, float value)
 {
 	char buffer[100];
-	sprintf(buffer, "%f", value);
+	sprintf(buffer, "%f", (double) value);
 	return xml_set_attribute(node, name, buffer);
 }
 

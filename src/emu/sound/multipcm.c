@@ -158,7 +158,7 @@ void multipcm_device::EG_Calc(SLOT *slot)
 #define LFIX(v) ((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
 
 //Convert DB to multiply amplitude
-#define DB(v)   LFIX(pow(10.0,v/20.0))
+#define DB(v)   LFIX(powf(10.0f,v/20.0f))
 
 //Convert cents to step increment
 #define CENTS(v) LFIX(powf(2.0f,v/1200.0f))

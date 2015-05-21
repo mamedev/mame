@@ -315,7 +315,7 @@ int trident_vga_device::calculate_clock()
 	m = tri.vid_clock & 0x007f;
 	n = (tri.vid_clock & 0x0f80) >> 7;
 	k = (tri.vid_clock & 0x1000) >> 12;
-	freq = ((double)(m+8) / (double)((n+2)*(pow(2.0,k)))) * 14.31818f; // there is a 14.31818MHz clock on the board
+	freq = ((double)(m+8) / (double)((n+2)*(pow(2.0,k)))) * 14.31818; // there is a 14.31818MHz clock on the board
 
 	return freq * 1000000;
 }

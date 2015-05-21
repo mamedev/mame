@@ -353,6 +353,8 @@ void netlist_mame_device_t::device_stop()
 	LOG_DEV_CALLS(("device_stop\n"));
 	m_setup->print_stats();
 
+	m_netlist->stop();
+
 	global_free(m_setup);
 	m_setup = NULL;
 	global_free(m_netlist);

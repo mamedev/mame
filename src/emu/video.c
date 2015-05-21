@@ -636,7 +636,7 @@ inline bool video_manager::effective_throttle() const
 
 inline int video_manager::original_speed_setting() const
 {
-	return machine().options().speed() * 1000.0 + 0.5;
+	return machine().options().speed() * 1000.0f + 0.5f;
 }
 
 
@@ -901,7 +901,7 @@ void video_manager::update_frameskip()
 	if (effective_throttle() && effective_autoframeskip() && m_frameskip_counter == 0)
 	{
 		// calibrate the "adjusted speed" based on the target
-		double adjusted_speed_percent = m_speed_percent / m_throttle_rate;
+		double adjusted_speed_percent = m_speed_percent / (double) m_throttle_rate;
 
 		// if we're too fast, attempt to increase the frameskip
 		double speed = m_speed * 0.001;
@@ -953,7 +953,7 @@ void video_manager::update_refresh_speed()
 	// only do this if the refreshspeed option is used
 	if (machine().options().refresh_speed())
 	{
-		float minrefresh = machine().render().max_update_rate();
+		double minrefresh = machine().render().max_update_rate();
 		if (minrefresh != 0)
 		{
 			// find the screen with the shortest frame period (max refresh rate)
@@ -970,7 +970,7 @@ void video_manager::update_refresh_speed()
 			// compute a target speed as an integral percentage
 			// note that we lop 0.25Hz off of the minrefresh when doing the computation to allow for
 			// the fact that most refresh rates are not accurate to 10 digits...
-			UINT32 target_speed = floor((minrefresh - 0.25f) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
+			UINT32 target_speed = floor((minrefresh - 0.25) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
 			UINT32 original_speed = original_speed_setting();
 			target_speed = MIN(target_speed, original_speed);
 
