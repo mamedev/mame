@@ -176,6 +176,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/ccvf_dsk.h",
 		MAME_DIR .. "src/lib/formats/cgen_cas.c",
 		MAME_DIR .. "src/lib/formats/cgen_cas.h",
+		MAME_DIR .. "src/lib/formats/cgenie_dsk.c",
+		MAME_DIR .. "src/lib/formats/cgenie_dsk.h",
 		MAME_DIR .. "src/lib/formats/coco_cas.c",
 		MAME_DIR .. "src/lib/formats/coco_cas.h",
 		MAME_DIR .. "src/lib/formats/coco_dsk.c",

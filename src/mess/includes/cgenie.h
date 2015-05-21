@@ -9,12 +9,10 @@
 #ifndef CGENIE_H_
 #define CGENIE_H_
 
-#include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/cgenie/expansion.h"
 
 // CRTC 6845
 struct CRTC6845
@@ -50,12 +48,12 @@ public:
 		m_fontram(*this, "fontram"),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
-		m_cart(*this, "cartslot"),
 		m_ram(*this, RAM_TAG),
 		m_ay8910(*this, "ay8910"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_exp(*this, "exp")
 	{
 	}
 
@@ -67,8 +65,6 @@ public:
 	int m_font_offset[4];
 	int m_port_ff;
 	UINT8 m_irq_status;
-	UINT8 m_motor_drive;
-	UINT8 m_head;
 	UINT8 m_cass_level;
 	UINT8 m_cass_bit;
 	UINT8 m_psg_a_out;
@@ -91,17 +87,19 @@ public:
 	INTERRUPT_GEN_MEMBER(cgenie_timer_interrupt);
 	INTERRUPT_GEN_MEMBER(cgenie_frame_interrupt);
 	TIMER_CALLBACK_MEMBER(handle_cassette_input);
-	DECLARE_WRITE_LINE_MEMBER(cgenie_fdc_intrq_w);
+
+	DECLARE_WRITE_LINE_MEMBER(exp_intrq_w);
+
 	DECLARE_READ8_MEMBER(cgenie_sh_control_port_r);
 	DECLARE_WRITE8_MEMBER(cgenie_sh_control_port_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<ay8910_device> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<expansion_slot_device> m_exp;
 
 	void cgenie_offset_xy();
 	int cgenie_get_register(int indx);
@@ -125,19 +123,7 @@ public:
 	DECLARE_WRITE8_MEMBER( cgenie_port_ff_w );
 	DECLARE_READ8_MEMBER( cgenie_port_ff_r );
 
-	DECLARE_READ8_MEMBER( cgenie_status_r );
-	DECLARE_READ8_MEMBER( cgenie_track_r );
-	DECLARE_READ8_MEMBER( cgenie_sector_r );
-	DECLARE_READ8_MEMBER( cgenie_data_r );
-
-	DECLARE_WRITE8_MEMBER( cgenie_command_w );
-	DECLARE_WRITE8_MEMBER( cgenie_track_w );
-	DECLARE_WRITE8_MEMBER( cgenie_sector_w );
-	DECLARE_WRITE8_MEMBER( cgenie_data_w );
-
 	DECLARE_READ8_MEMBER( cgenie_irq_status_r );
-
-	DECLARE_WRITE8_MEMBER( cgenie_motor_w );
 
 	DECLARE_READ8_MEMBER( cgenie_keyboard_r );
 	DECLARE_WRITE8_MEMBER( cgenie_videoram_w );
@@ -148,8 +134,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER( cgenie_index_w );
 	DECLARE_WRITE8_MEMBER( cgenie_register_w );
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cgenie_cart);
 };
 
 #endif /* CGENIE_H_ */
