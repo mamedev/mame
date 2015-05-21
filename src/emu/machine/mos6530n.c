@@ -113,14 +113,14 @@ void mos6530_t::device_start()
 	m_out_pa_cb.resolve();
 	m_in_pb_cb.resolve();
 	m_out_pb_cb.resolve();
-	m_in_pa0_cb.resolve_safe(1);
-	m_in_pa1_cb.resolve_safe(1);
-	m_in_pa2_cb.resolve_safe(1);
-	m_in_pa3_cb.resolve_safe(1);
-	m_in_pa4_cb.resolve_safe(1);
-	m_in_pa5_cb.resolve_safe(1);
-	m_in_pa6_cb.resolve_safe(1);
-	m_in_pa7_cb.resolve_safe(1);
+	m_in_pa0_cb.resolve();
+	m_in_pa1_cb.resolve();
+	m_in_pa2_cb.resolve();
+	m_in_pa3_cb.resolve();
+	m_in_pa4_cb.resolve();
+	m_in_pa5_cb.resolve();
+	m_in_pa6_cb.resolve();
+	m_in_pa7_cb.resolve();
 	m_out_pa0_cb.resolve_safe();
 	m_out_pa1_cb.resolve_safe();
 	m_out_pa2_cb.resolve_safe();
@@ -129,14 +129,14 @@ void mos6530_t::device_start()
 	m_out_pa5_cb.resolve_safe();
 	m_out_pa6_cb.resolve_safe();
 	m_out_pa7_cb.resolve_safe();
-	m_in_pb0_cb.resolve_safe(1);
-	m_in_pb1_cb.resolve_safe(1);
-	m_in_pb2_cb.resolve_safe(1);
-	m_in_pb3_cb.resolve_safe(1);
-	m_in_pb4_cb.resolve_safe(1);
-	m_in_pb5_cb.resolve_safe(1);
-	m_in_pb6_cb.resolve_safe(1);
-	m_in_pb7_cb.resolve_safe(1);
+	m_in_pb0_cb.resolve();
+	m_in_pb1_cb.resolve();
+	m_in_pb2_cb.resolve();
+	m_in_pb3_cb.resolve();
+	m_in_pb4_cb.resolve();
+	m_in_pb5_cb.resolve();
+	m_in_pb6_cb.resolve();
+	m_in_pb7_cb.resolve();
 	m_out_pb0_cb.resolve_safe();
 	m_out_pb1_cb.resolve_safe();
 	m_out_pb2_cb.resolve_safe();
@@ -255,6 +255,8 @@ void mos6530_t::update_pb()
 
 void mos6530_t::pa_w(int bit, int state)
 {
+	if (LOG) logerror("%s %s MOS6530 '%s' Port A Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), tag(), bit, state);
+
 	m_pa_in &= ~(1 << bit);
 	m_pa_in |= (state << bit);
 }
@@ -266,6 +268,8 @@ void mos6530_t::pa_w(int bit, int state)
 
 void mos6530_t::pb_w(int bit, int state)
 {
+	if (LOG) logerror("%s %s MOS6530 '%s' Port B Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), tag(), bit, state);
+
 	m_pb_in &= ~(1 << bit);
 	m_pb_in |= (state << bit);
 }

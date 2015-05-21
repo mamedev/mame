@@ -54,6 +54,8 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	DECLARE_WRITE_LINE_MEMBER( ds0_w );
+	DECLARE_WRITE_LINE_MEMBER( ds1_w );
 	DECLARE_WRITE_LINE_MEMBER( drv_sel_w );
 	DECLARE_WRITE_LINE_MEMBER( mode_sel_w );
 	DECLARE_WRITE_LINE_MEMBER( rw_sel_w );
@@ -127,6 +129,8 @@ protected:
 	int m_stp0;
 	int m_stp1;
 	int m_ds;
+	int m_ds0;
+	int m_ds1;
 	int m_drv_sel;
 	int m_mode_sel;
 	int m_rw_sel;
