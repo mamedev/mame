@@ -43,7 +43,8 @@ public:
 
     // getters
     running_machine &machine() const { return m_machine; }
-//    IniFileIndex *getfile() { return current_file_idx; }
+	int getcurfile() { return current_file; }
+	int getcurcategory() { return current_category; }
 //    IniCategoryIndex *getcategory() { return current_file_idx->current_category; }
 //    IniCategoryIndex *getfirstcategory() { return current_file_idx->first_category; }
 //    IniFileIndex *getfirstfile() { return first_file_idx; }
@@ -67,7 +68,7 @@ public:
 private:
 
     // init category index
-    void init_category(std::vector<IniFileIndex> &index, std::string &filename);
+    void init_category(std::vector<IniCategoryIndex> &index, std::string &filename);
 
     // init file index
     void directory_scan();
@@ -130,7 +131,8 @@ private:
 
     // internal state
     running_machine &m_machine;     // reference to our machine
-    emu_file        *fp;
+	std::string 	fullpath;
+
 };
 
 #endif  /* __INIFILE_H__ */

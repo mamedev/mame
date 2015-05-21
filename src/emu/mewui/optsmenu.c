@@ -57,10 +57,10 @@ void ui_menu_game_options::handle()
     IniFileIndex *current = NULL;
     IniCategoryIndex *current_category = NULL;
 
-    if (machine().inifile().has_files())
+    if (!inifile_manager::ini_index.empty())
     {
-        current = machine().inifile().getfile();
-        current_category = machine().inifile().getcategory();
+        current = machine().inifile().getcurfile();
+        current_category = machine().inifile().getcurcategory();
     }
 
     // process the menu
@@ -126,13 +126,13 @@ void ui_menu_game_options::handle()
 
                 else if (menu_event->iptkey == IPT_UI_SELECT)
                 {
-                    int total = machine().inifile().files_total();
+                    int total = inifile_manager::ini_index.size();
                     std::string s_sel[total + 1];
                     machine().inifile().setcategory(0);
                     actual_category = 0;
                     int index = 0;
-                    for (IniFileIndex *tmp = machine().inifile().getfirstfile(); tmp != NULL; tmp = tmp->next)
-                        s_sel[index++].assign(tmp->file_name);
+                    for (size_t index = 0; index < total; ++index)
+                        s_sel[index].assign(inifile_manager::ini_index.file_name);
 
                     ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &actual_file, total, SELECTOR_INIFILE)));
                 }
@@ -257,24 +257,24 @@ void ui_menu_game_options::populate()
     item_append("Filter", mewui_globals::filter_text[mewui_globals::actual_filter], arrow_flags, (void *)FILTER_MENU);
 
     // add category subitem
-    if (mewui_globals::actual_filter == FILTER_CATEGORY && machine().inifile().has_files())
+    if (mewui_globals::actual_filter == FILTER_CATEGORY && !inifile_manager::ini_index.empty())
     {
-        IniFileIndex *current_file = machine().inifile().getfile();
+        int current_file = machine().inifile().getcurfile();
 
-        if (machine().inifile().files_total() == 1)
+        if (inifile_manager::ini_index.size() == 1)
             arrow_flags = 0;
         else
-            arrow_flags = get_arrow_flags(machine().inifile().getfirstfile(), machine().inifile().getlastfile(), current_file);
+            arrow_flags = get_arrow_flags(0, inifile_manager::ini_index.size() - 1, current_file);
 
         convert_command_glyph(fbuff);
-        item_append(fbuff.c_str(), current_file->file_name, arrow_flags, (void *)FILE_CATEGORY_FILTER);
+        item_append(fbuff.c_str(), inifile_manager::ini_index[current_file].file_name, arrow_flags, (void *)FILE_CATEGORY_FILTER);
 
-        IniCategoryIndex *current_category = machine().inifile().getcategory();
+        int current = machine().inifile().getcurcategory();
 
-        if (machine().inifile().category_total() == 1)
+        if (inifile_manager::ini_index[current].category.size() == 1)
             arrow_flags = 0;
         else
-            arrow_flags = get_arrow_flags(current_file->first_category, current_file->last_category, current_category);
+            arrow_flags = get_arrow_flags(0, inifile_manager::ini_index[current].category.size() - 1, current);
 
         fbuff.assign(" ^!Category");
         convert_command_glyph(fbuff);

@@ -329,7 +329,7 @@ void datfile_manager::load_data_text(const game_driver *drv, std::string &buffer
     }
 
     std::string readbuf;
-    std::ifstream myfile(fp->fullpath());
+    std::ifstream myfile(fullpath.c_str());
 
     if (!myfile.is_open())
         return;
@@ -369,7 +369,7 @@ void datfile_manager::load_driver_text(const game_driver *drv, std::string &buff
         return;
 
     std::string readbuf;
-    std::ifstream myfile(fp->fullpath());
+    std::ifstream myfile(fullpath.c_str());
 
     if (!myfile.is_open())
         return;
@@ -416,7 +416,7 @@ int datfile_manager::index_mame_mess_info(tDatafileIndex **_index, sDataDrvIndex
     idx = *_index = global_alloc_array(tDatafileIndex, (driver_list::total() + 1));
     idx_drv = *_index_drv = global_alloc_array(sDataDrvIndex, (driver_list::total() + 1));
 
-    std::ifstream myfile(fp->fullpath(), std::ifstream::binary);
+    std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
     if (myfile.is_open())
     {
         // loop through datafile
@@ -503,7 +503,7 @@ int datfile_manager::index_datafile(tDatafileIndex **_index, int &swcount)
     if (!idx)
         return 0;
 
-    std::ifstream myfile(fp->fullpath(), std::ifstream::binary);
+    std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
     if (myfile.is_open())
     {
         // loop through datafile
@@ -696,7 +696,7 @@ int datfile_manager::index_datafile(tDatafileIndex **_index, int &swcount)
 bool datfile_manager::ParseOpen(const char *filename)
 {
     // Open file up in binary mode
-    emu_file fp(machine().options().history_path(), OPEN_FLAG_READ));
+    emu_file fp(machine().options().history_path(), OPEN_FLAG_READ);
 
     if (fp.open(filename) == FILERR_NONE)
     {
@@ -745,7 +745,7 @@ int datfile_manager::index_menuidx(const game_driver *drv, tDatafileIndex *d_idx
         return 0;
 
     // seek to correct point in datafile
-    std::ifstream myfile(fp->fullpath(), std::ifstream::binary);
+    std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
     if (!myfile.is_open())
         return 0;
 
@@ -806,7 +806,7 @@ int datfile_manager::load_command_text(std::string &buffer, tMenuIndex *m_idx, c
     std::string readbuf;
 
     // open and seek to correct point in datafile
-    std::ifstream myfile(fp->fullpath());
+    std::ifstream myfile(fullpath.c_str());
 
     if (!myfile.is_open())
         return 1;
@@ -860,10 +860,7 @@ void datfile_manager::load_command_info(std::string &buffer, const int menu_sel)
 {
     // try to open command datafile
     if (ParseOpen("command.dat"))
-    {
         load_command_text(buffer, menu_idx, menu_sel);
-        ParseClose();
-    }
 }
 
 //-------------------------------------------------
@@ -881,49 +878,6 @@ void datfile_manager::command_sub_menu(const game_driver *drv, std::vector<std::
         for (; !m_idx->menuitem.empty(); m_idx++)
             menu_item.push_back(m_idx->menuitem);
     }
-}
-
-//-------------------------------------------------
-//  free datafile indices
-//-------------------------------------------------
-
-void datfile_manager::free_dat_index()
-{
-    // free command menu index
-    if (menu_idx)
-        free_menuidx(&menu_idx);
-
-    // free history index
-    if (hist_idx)
-        global_free_array(hist_idx);
-
-    // free mameinfo index
-    if (mame_idx)
-        global_free_array(mame_idx);
-
-    // free sysinfo index
-    if (sysi_idx)
-        global_free_array(sysi_idx);
-
-    // free messinfo index
-    if (mess_idx)
-        global_free_array(mess_idx);
-
-    // free command index
-    if (cmnd_idx)
-        global_free_array(cmnd_idx);
-
-    // free story index
-    if (story_idx)
-        global_free_array(story_idx);
-
-    // free drivers index
-    if (drv_idx)
-        global_free_array(drv_idx);
-
-    // free drivers index
-    if (drvmess_idx)
-        global_free_array(drvmess_idx);
 }
 
 int datfile_manager::find_or_allocate(std::string name)

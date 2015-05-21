@@ -69,12 +69,14 @@ void inifile_manager::directory_scan()
             // try to open file and indexing
             if (ParseOpen(file_name.c_str()))
             {
-                IniFileIndex tmp;
+                std::vector<IniCategoryIndex> tmp;
                 init_category(tmp, fullpath);
-				if (!tmp.category.empty())
+				if (!tmp.empty())
 				{
-					tmp.file_name.assign(file_name);
-					ini_index.push_back(tmp);
+					IniFileIndex tfile;
+					tfile.file_name.assign(file_name);
+					tfile.category.push_back(tmp);
+					ini_index.push_back(tfile);
                 }
             }
         }
@@ -85,7 +87,7 @@ void inifile_manager::directory_scan()
 //  initialize category
 //-------------------------------------------------
 
-void inifile_manager::init_category(std::vector<IniFileIndex> &index, std::string &filename)
+void inifile_manager::init_category(std::vector<IniCategoryIndex> &index, std::string &filename)
 {
     std::string readbuf;
 	std::ifstream myfile(filename.c_str() std::ifstream::binary);
@@ -106,7 +108,7 @@ void inifile_manager::init_category(std::vector<IniFileIndex> &index, std::strin
                 if (name.compare("ROOT_FOLDER") == 0)
                 {
                     long offset = myfile.tellg();
-                    std::getline(myfile, readbuf, MAX_CHAR_INFO);
+                    std::getline(myfile, readbuf);
 
                     if (isspace(readbuf[0]))
 						continue;
@@ -114,15 +116,15 @@ void inifile_manager::init_category(std::vector<IniFileIndex> &index, std::strin
                     int len = filename.length() - 4;
                     name = filename.substr(0, filename.length() - 4);
                     IniCategoryIndex tmp;
-                    tmp.category.assign(name);
+                    tmp.name.assign(name);
                     tmp.offset = offset;
 					index.category.push_back(tmp);
-                    myfile.seekg(offset, SEEK_SET);
+                    myfile.seekg(offset, myfile.beg);
                 }
                 else
                 {
                     IniCategoryIndex tmp;
-                    tmp.category.assign(name);
+                    tmp.name.assign(name);
                     tmp.offset = offset;
 					index.category.push_back(tmp);
 				}
@@ -141,8 +143,8 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
         return;
 
     bool search_clones = false;
-    std::string file_name(index[current_file].file_name);
-    long offset = index[current_file].category.offset;
+    std::string file_name(ini_index[current_file].file_name);
+    long offset = ini_index[current_file].category.offset;
     std::string     carriage("\r\n");
 
     if (!core_stricmp(file_name.c_str(), "category.ini") || !core_stricmp(file_name.c_str(), "alltime.ini"))
@@ -154,7 +156,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
         int num_game = driver_list::total();
         std::string readbuf;
 
-        myfile.seekg(offset, SEEK_SET);
+        myfile.seekg(offset, myfile.beg);
 
         while (std::getline(myfile, readbuf))
         {
@@ -163,7 +165,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 
             std::string name;
             size_t found = readbuf.find_last_not_of(carriage);
-			name.assign(readbuf.substr(0, found);
+			name.assign(readbuf.substr(0, found));
             int dfind = driver_list::find(name.c_str());
             if (dfind != -1 && search_clones)
             {
@@ -174,7 +176,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
                 if (clone_of == -1)
                 {
                     for (int x = 0; x < num_game; x++)
-                        if (!strcmp(driver_list::driver(x).parent, name))
+                        if (name.compare(driver_list::driver(x).parent))
                             temp_filter.push_back(x);
                 }
             }
@@ -497,7 +499,7 @@ void favorite_manager::parse_favorite()
 {
     if (parseOpen(favorite_filename))
     {
-        std::ifstream myfile(fp->fullpath());
+        std::ifstream myfile(fullpath.c_str());
         std::string readbuf;
 
         std::getline(myfile, readbuf);

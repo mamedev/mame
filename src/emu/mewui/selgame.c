@@ -728,7 +728,7 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 
     std::string filtered;
 
-    if (mewui_globals::actual_filter == FILTER_CATEGORY && machine().inifile().has_files())
+    if (mewui_globals::actual_filter == FILTER_CATEGORY && !inifile_manager::ini_index.empty())
     {
         IniFileIndex *category_file = machine().inifile().getfile();
         IniCategoryIndex *category = machine().inifile().getcategory();
