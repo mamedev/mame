@@ -236,7 +236,7 @@ void netlist_matrix_solver_t::solve_base(C *p)
 		{
 			update_dynamic();
 			// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
-			this_resched = p->vsolve_non_dynamic();
+			this_resched = p->vsolve_non_dynamic(true);
 			newton_loops++;
 		} while (this_resched > 1 && newton_loops < m_params.m_nr_loops);
 
@@ -250,7 +250,7 @@ void netlist_matrix_solver_t::solve_base(C *p)
 	}
 	else
 	{
-		p->vsolve_non_dynamic();
+		p->vsolve_non_dynamic(false);
 	}
 }
 
@@ -320,6 +320,8 @@ NETLIB_START(solver)
 	register_param("LTE", m_lte, 5e-5);                     // diff/timestep
 	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
 
+	register_param("LOG_STATS", m_log_stats, 1);   // nl_double timestep resolution
+
 	// internal staff
 
 	register_input("FB_step", m_fb_step);
@@ -339,11 +341,14 @@ NETLIB_UPDATE_PARAM(solver)
 	//m_inc = netlist_time::from_hz(m_freq.Value());
 }
 
-NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
+NETLIB_STOP(solver)
 {
 	for (int i = 0; i < m_mat_solvers.count(); i++)
 		m_mat_solvers[i]->log_stats();
+}
 
+NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
+{
 	netlist_matrix_solver_t * const *e = m_mat_solvers.first();
 	while (e != NULL)
 	{
@@ -452,12 +457,19 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 	if (m_params.m_dynamic)
 	{
-		m_params.m_max_timestep *= 1000.0;
+		m_params.m_max_timestep *= NL_FCONST(1000.0);
 	}
 	else
 	{
 		m_params.m_min_timestep = m_params.m_max_timestep;
 	}
+
+	// Override log statistics
+	const char *p = osd_getenv("NL_STATS");
+	if (p != NULL)
+		m_params.m_log_stats = (bool) atoi(p);
+	else
+		m_params.m_log_stats = (bool) m_log_stats.Value();
 
 	netlist().log("Scanning net groups ...");
 	// determine net groups

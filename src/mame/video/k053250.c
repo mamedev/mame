@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "k053250.h"
 
 const device_type K053250 = &device_creator<k053250_device>;

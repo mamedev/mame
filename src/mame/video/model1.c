@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "video/segaic24.h"
 #include "cpu/mb86233/mb86233.h"

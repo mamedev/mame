@@ -2016,7 +2016,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 
 void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty)
 {
-	float value = m_live->analog->crosshair_read();
+	double value = m_live->analog->crosshair_read();
 
 	// apply the scale and offset
 	if (m_crosshair_scale < 0)

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino, Owen Rubin,David Haywood
 /***************************************************************************
 
     Atari Tunnel Hunt hardware

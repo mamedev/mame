@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Darren Olafson
 /***************************************************************************
 
     New York! New York! hardware

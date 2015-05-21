@@ -106,20 +106,29 @@ public:
 	nascom_state(mconfig, type, tag),
 	m_nasbus(*this, "nasbus"),
 	m_socket1(*this, "socket1"),
-	m_socket2(*this, "socket2")
+	m_socket2(*this, "socket2"),
+	m_lsw1(*this, "lsw1")
 	{}
 
+	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
+	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
+
 	virtual DECLARE_DRIVER_INIT(nascom);
+	virtual DECLARE_DRIVER_INIT(nascomc);
 	UINT32 screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	int load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
+protected:
+	virtual void machine_reset();
+
 private:
 	required_device<nasbus_device> m_nasbus;
 	required_device<generic_slot_device> m_socket1;
 	required_device<generic_slot_device> m_socket2;
+	required_ioport m_lsw1;
 };
 
 
@@ -333,6 +342,15 @@ DRIVER_INIT_MEMBER( nascom_state, nascom )
 	}
 }
 
+void nascom2_state::machine_reset()
+{
+	// base machine reset
+	nascom_state::machine_reset();
+
+	// restart address (on the real system, a12 to a15 are forced to 1 for one memory cycle)
+	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
+}
+
 DRIVER_INIT_MEMBER( nascom2_state, nascom )
 {
 	nascom_state::init_nascom();
@@ -340,6 +358,36 @@ DRIVER_INIT_MEMBER( nascom2_state, nascom )
 	// setup nasbus
 	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
 	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
+}
+
+// since we don't know for which regions we should disable ram, we just let other devices
+// overwrite the region they need, and re-install our ram when they are disabled
+WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
+{
+	if (state)
+	{
+		// enable ram again
+		m_maincpu->space(AS_PROGRAM).install_ram(0x1000, 0x1000 + m_ram->size() - 1, m_ram->pointer());
+	}
+}
+
+DRIVER_INIT_MEMBER( nascom2_state, nascomc )
+{
+	// install memory
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
+
+	// setup nasbus
+	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
+	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
+}
+
+WRITE_LINE_MEMBER( nascom2_state::ram_disable_cpm_w )
+{
+	if (state)
+	{
+		// enable ram again
+		m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
+	}
 }
 
 
@@ -441,6 +489,12 @@ static ADDRESS_MAP_START( nascom2_io, AS_IO, 8, nascom2_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_device, read, write )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( nascom2c_mem, AS_PROGRAM, 8, nascom2_state )
+	AM_RANGE(0xf000, 0xf7ff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xfc00, 0xffff) AM_RAM // WRAM
+ADDRESS_MAP_END
+
 
 //**************************************************************************
 //  INPUT PORTS
@@ -534,6 +588,51 @@ static INPUT_PORTS_START( nascom2 )
 	PORT_MODIFY("KEY.8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back CS")       PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(8)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter  Escape") PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)  PORT_CHAR(27)
+
+	// link switch on board
+	PORT_START("lsw1")
+	PORT_DIPNAME(0x0f, 0x00, "Restart address")
+	PORT_DIPLOCATION("LSW1:2,3,4,5")
+	PORT_DIPSETTING(0x00, "0000H")
+	PORT_DIPSETTING(0x01, "1000H")
+	PORT_DIPSETTING(0x02, "2000H")
+	PORT_DIPSETTING(0x03, "3000H")
+	PORT_DIPSETTING(0x04, "4000H")
+	PORT_DIPSETTING(0x05, "5000H")
+	PORT_DIPSETTING(0x06, "6000H")
+	PORT_DIPSETTING(0x07, "7000H")
+	PORT_DIPSETTING(0x08, "8000H")
+	PORT_DIPSETTING(0x09, "9000H")
+	PORT_DIPSETTING(0x0a, "A000H")
+	PORT_DIPSETTING(0x0b, "B000H")
+	PORT_DIPSETTING(0x0c, "C000H")
+	PORT_DIPSETTING(0x0d, "D000H")
+	PORT_DIPSETTING(0x0e, "E000H")
+	PORT_DIPSETTING(0x0f, "F000H")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nascom2c )
+	PORT_INCLUDE(nascom2)
+
+	PORT_MODIFY("lsw1")
+	PORT_DIPNAME(0x0f, 0x0f, "Restart address")
+	PORT_DIPLOCATION("LSW1:2,3,4,5")
+	PORT_DIPSETTING(0x00, "0000H")
+	PORT_DIPSETTING(0x01, "1000H")
+	PORT_DIPSETTING(0x02, "2000H")
+	PORT_DIPSETTING(0x03, "3000H")
+	PORT_DIPSETTING(0x04, "4000H")
+	PORT_DIPSETTING(0x05, "5000H")
+	PORT_DIPSETTING(0x06, "6000H")
+	PORT_DIPSETTING(0x07, "7000H")
+	PORT_DIPSETTING(0x08, "8000H")
+	PORT_DIPSETTING(0x09, "9000H")
+	PORT_DIPSETTING(0x0a, "A000H")
+	PORT_DIPSETTING(0x0b, "B000H")
+	PORT_DIPSETTING(0x0c, "C000H")
+	PORT_DIPSETTING(0x0d, "D000H")
+	PORT_DIPSETTING(0x0e, "E000H")
+	PORT_DIPSETTING(0x0f, "F000H")
 INPUT_PORTS_END
 
 
@@ -574,8 +673,8 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 
 	// internal extra ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
+	MCFG_RAM_DEFAULT_SIZE("48K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
 
 	// devices
 	MCFG_SNAPSHOT_ADD("snapshot", nascom_state, nascom1, "nas", 0.5)
@@ -606,10 +705,23 @@ static MACHINE_CONFIG_DERIVED_CLASS( nascom2, nascom1, nascom2_state )
 
 	// nasbus expansion bus
 	MCFG_NASBUS_ADD(NASBUS_TAG)
+	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_w))
 	MCFG_NASBUS_SLOT_ADD("nasbus1", nasbus_slot_cards, NULL)
 	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, NULL)
 	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, NULL)
 	MCFG_NASBUS_SLOT_ADD("nasbus4", nasbus_slot_cards, NULL)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED_CLASS( nascom2c, nascom2, nascom2_state )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nascom2c_mem)
+
+	MCFG_DEVICE_REMOVE(RAM_TAG)
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("60K")
+
+	MCFG_DEVICE_MODIFY(NASBUS_TAG)
+	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_cpm_w))
 MACHINE_CONFIG_END
 
 
@@ -645,11 +757,21 @@ ROM_START( nascom2 )
 	ROM_LOAD("nasgra.chr",  0x0800, 0x0800, CRC(2bc09d32) SHA1(d384297e9b02cbcb283c020da51b3032ff62b1ae))
 ROM_END
 
+ROM_START( nascom2c )
+	ROM_REGION(0x0800, "maincpu", 0)
+	ROM_LOAD("cpmboot.rom", 0x0000, 0x0800, CRC(44b67ffc) SHA1(60c8335f24798f8de7ad48a4cd03e56a60d87b63))
+
+	ROM_REGION(0x1000, "gfx1", 0)
+	ROM_LOAD("nascom1.chr", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
+	ROM_LOAD("nasgra.chr",  0x0800, 0x0800, CRC(2bc09d32) SHA1(d384297e9b02cbcb283c020da51b3032ff62b1ae))
+ROM_END
+
 
 //**************************************************************************
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT    COMPANY                  FULLNAME    FLAGS */
-COMP( 1977, nascom1, 0,      0,      nascom1, nascom1, nascom_state,  nascom, "Nascom Microcomputers", "Nascom 1", GAME_NO_SOUND_HW )
-COMP( 1979, nascom2, 0,      0,      nascom2, nascom2, nascom2_state, nascom, "Nascom Microcomputers", "Nascom 2", GAME_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT     COMPANY                  FULLNAME           FLAGS */
+COMP( 1977, nascom1,  0,        0,      nascom1,  nascom1,  nascom_state,  nascom,  "Nascom Microcomputers", "Nascom 1",        GAME_NO_SOUND_HW )
+COMP( 1979, nascom2,  0,        0,      nascom2,  nascom2,  nascom2_state, nascom,  "Nascom Microcomputers", "Nascom 2",        GAME_NO_SOUND_HW )
+COMP( 1980, nascom2c, nascom2,  0,      nascom2c, nascom2c, nascom2_state, nascomc, "Nascom Microcomputers", "Nascom 2 (CP/M)", GAME_NO_SOUND_HW )

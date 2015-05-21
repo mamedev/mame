@@ -19,7 +19,7 @@ private:
 	nl_util() {};
 
 public:
-	typedef plinearlist_t<pstring, 10> pstring_list;
+	typedef plist_t<pstring> pstring_list;
 
 	static pstring_list split(const pstring &str, const pstring &onstr, bool ignore_empty = false)
 	{

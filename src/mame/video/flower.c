@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:insideoutboy
 /* Flower Video Hardware */
 
 #include "emu.h"

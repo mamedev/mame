@@ -11,6 +11,14 @@
 
 
 //**************************************************************************
+//  CONSTANTS/MACROS
+//**************************************************************************
+
+#define VERBOSE 1
+#define VERBOSE_STATUS 0
+
+
+//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -21,7 +29,8 @@ FLOPPY_FORMATS_MEMBER( nascom_fdc_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( nascom_floppies )
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+	SLOT_INTERFACE("55e", TEAC_FD_55E)
+	SLOT_INTERFACE("55f", TEAC_FD_55F)
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
@@ -32,10 +41,12 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_FRAGMENT( nascom_fdc )
 	MCFG_FD1793x_ADD("fd1793", XTAL_16MHz / 4 / 4)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "525qd", nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, NULL,    nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, NULL,    nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, NULL,    nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, NULL,  nascom_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, NULL,  nascom_fdc_device::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
 MACHINE_CONFIG_END
 
 machine_config_constructor nascom_fdc_device::device_mconfig_additions() const
@@ -71,6 +82,7 @@ nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *
 
 void nascom_fdc_device::device_start()
 {
+	save_item(NAME(m_select));
 }
 
 //-------------------------------------------------
@@ -84,6 +96,22 @@ void nascom_fdc_device::device_reset()
 	m_nasbus->m_io->install_read_handler(0xe5, 0xe5, read8_delegate(FUNC(nascom_fdc_device::status_r), this));
 }
 
+//-------------------------------------------------
+//  device_reset_after_children - device-specific reset after children
+//-------------------------------------------------
+
+void nascom_fdc_device::device_reset_after_children()
+{
+	// sanity check
+	if (m_floppy0->get_device() && m_floppy1->get_device())
+		if (m_floppy0->get_device()->get_sides() != m_floppy1->get_device()->get_sides())
+			fatalerror("Floppy drive 0 and 1 need to be of the same type.\n");
+
+	if (m_floppy2->get_device() && m_floppy3->get_device())
+		if (m_floppy2->get_device()->get_sides() != m_floppy3->get_device()->get_sides())
+			fatalerror("Floppy drive 2 and 3 need to be of the same type.\n");
+}
+
 
 //**************************************************************************
 //  IMPLEMENTATION
@@ -91,12 +119,32 @@ void nascom_fdc_device::device_reset()
 
 READ8_MEMBER( nascom_fdc_device::select_r )
 {
-	return m_select | 0xa0;
+	m_select |= (0x80 | 0x20);
+
+	// double sided drive for drive 0/1?
+	if (m_floppy0->get_device() && (m_floppy0->get_device()->get_sides() == 2))
+		m_select &= ~0x20;
+
+	if (m_floppy1->get_device() && (m_floppy1->get_device()->get_sides() == 2))
+		m_select &= ~0x20;
+
+	// double sided drive for drive 2/3?
+	if (m_floppy2->get_device() && (m_floppy2->get_device()->get_sides() == 2))
+		m_select &= ~0x80;
+
+	if (m_floppy3->get_device() && (m_floppy3->get_device()->get_sides() == 2))
+		m_select &= ~0x80;
+
+	if (VERBOSE)
+		logerror("nascom_fdc_device::select_r: 0x%02x\n", m_select);
+
+	return m_select;
 }
 
 WRITE8_MEMBER( nascom_fdc_device::select_w )
 {
-	logerror("nascom_fdc_device::select_w: 0x%02x\n", data);
+	if (VERBOSE)
+		logerror("nascom_fdc_device::select_w: 0x%02x\n", data);
 
 	m_floppy = NULL;
 
@@ -124,6 +172,9 @@ READ8_MEMBER( nascom_fdc_device::status_r )
 
 	data |= m_fdc->intrq_r() << 0;
 	data |= m_fdc->drq_r()   << 7;
+
+	if (VERBOSE_STATUS)
+		logerror("nascom_fdc_device::status_r: 0x%02x\n", data);
 
 	return data;
 }

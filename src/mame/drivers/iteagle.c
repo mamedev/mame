@@ -34,19 +34,23 @@
         * Creative/Ensoniq AudioPCI ES1373 audio
         * Atmel 90S2313 AVR-based microcontroller for protection
         * STM48T02 NVRAM
+        * AMD AM85C30 Enhanced Serial Communications Controller
         * Conexant CX88168 modem
+    Eagle 1 Notes:
+        * Cypress CY82C693 Peripheral Controller
+        * 3DFX Voodoo 1 video
 
     TODO:
         * Add support for Eagle 1 (Virtual Pool) PCBs
-		* Add support for later RED boards
+        * Add support for later RED boards
 
-	Notes:
-		Sound volume may be muted, it can be adjusted through the service menu or with volume up/down buttons (+/-)
+  Notes:
+    Sound volume may be muted, it can be adjusted through the service menu or with volume up/down buttons (+/-)
 
-		The PCB for Virtual Pool is considered "Eagle 1" while the boards
-		that were production runs for later games are considered Eagle 2.
-		IE: GT Fore! & BBH, both security chips are "E2-" as are various
-		preprogrammed PALs: E2-CARD1 & E2-RES3
+    The PCB for Virtual Pool is considered "Eagle 1" while the boards
+    that were production runs for later games are considered Eagle 2.
+    IE: GT Fore! & BBH, both security chips are "E2-" as are various
+    preprogrammed PALs: E2-CARD1 & E2-RES3
 
 ***************************************************************************/
 
@@ -162,7 +166,8 @@ static MACHINE_CONFIG_START( iteagle, iteagle_state )
 	MCFG_SOUND_ROUTE(0, PCI_ID_SOUND":lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, PCI_ID_SOUND":rspeaker", 1.0)
 	MCFG_ES1373_IRQ_ADD(              ":maincpu", MIPS3_IRQ3)
-	MCFG_VOODOO_ADD(                  PCI_ID_VIDEO, ":maincpu")
+	MCFG_VOODOO_PCI_ADD(              PCI_ID_VIDEO, TYPE_VOODOO_3, ":maincpu")
+	MCFG_VOODOO_PCI_FBMEM(16)
 	MCFG_ITEAGLE_EEPROM_ADD(          PCI_ID_EEPROM)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -236,6 +241,10 @@ static MACHINE_CONFIG_DERIVED( bbhcotw, iteagle )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( virtpool, iteagle )
+	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
+	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_1, ":maincpu")
+	MCFG_VOODOO_PCI_FBMEM(4)
+	MCFG_VOODOO_PCI_TMUMEM(4, 4)
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000202, 0x0c0b0d)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
@@ -334,8 +343,6 @@ INPUT_PORTS_END
 	ROMX_LOAD( "eagle102.u15", 0x000000, 0x100000, CRC(1fd39e73) SHA1(d1ac758f94defc5c55c62594b3999a406dd9ef1f), ROM_BIOS(10) ) \
 	ROM_SYSTEM_BIOS( 10, "101", "bootrom 1.01" ) \
 	ROMX_LOAD( "eagle101.u15", 0x000000, 0x100000, CRC(2600bc2b) SHA1(c4b89e69c51e4a3bb1874407c4d30b6caed4f396), ROM_BIOS(11) ) \
-	ROM_SYSTEM_BIOS( 11, "pool", "Virtual Pool bootrom" ) \
-	ROMX_LOAD( "eagle1_bootrom_v1p01", 0x000000, 0x080000, CRC(6c8c1593) SHA1(707d5633388f8dd4e9252f4d8d6f27c98c2cb35a), ROM_BIOS(12) ) \
 	ROM_REGION( 0x30000, "fpga", 0 ) \
 	ROM_LOAD( "17s20lpc_sb4.u26", 0x000000, 0x008000, CRC(62c4af8a) SHA1(6eca277b9c66a401990599e98fdca64a9e38cc9a) ) \
 	ROM_LOAD( "17s20lpc_sb5.u26", 0x008000, 0x008000, CRC(c88b9d42) SHA1(b912d0fc50ecdc6a198c626f6e1644e8405fac6e) ) \
@@ -353,7 +360,9 @@ ROM_START( iteagle )
 ROM_END
 
 ROM_START( virtpool ) /* On earlier Eagle 1 PCB, possibly a prototype version - later boards are known as Eagle 2 */
-	EAGLE_BIOS
+	ROM_REGION( 0x100000, ":pci:00.0", 0 ) /* MIPS code */
+	ROM_SYSTEM_BIOS( 0, "pool", "Virtual Pool bootrom" )
+	ROMX_LOAD( "eagle1_bootrom_v1p01", 0x000000, 0x080000, CRC(6c8c1593) SHA1(707d5633388f8dd4e9252f4d8d6f27c98c2cb35a), ROM_BIOS(1) )
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "itvp-1.u53", 0x0000, 0x0880, NO_DUMP )

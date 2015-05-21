@@ -31,7 +31,7 @@ public:
 	// Peek through to the instruction
 	const reg_id& instSource() const;
 	const reg_id& instDestination() const;
-	const size_t instAccumulatorBitsModified() const;
+	size_t instAccumulatorBitsModified() const;
 
 private:
 	auto_pointer<Instruction> m_instruction;

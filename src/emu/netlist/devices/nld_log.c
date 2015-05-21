@@ -24,7 +24,7 @@ NETLIB_RESET(log)
 
 NETLIB_UPDATE(log)
 {
-	fprintf(m_file, "%20.9e %e\n", netlist().time().as_double(), INPANALOG(m_I));
+	fprintf(m_file, "%20.9e %e\n", netlist().time().as_double(), (nl_double) INPANALOG(m_I));
 }
 
 NETLIB_NAME(log)::~NETLIB_NAME(log)()
@@ -44,7 +44,7 @@ NETLIB_RESET(logD)
 
 NETLIB_UPDATE(logD)
 {
-	fprintf(m_file, "%e %e\n", netlist().time().as_double(), INPANALOG(m_I) - INPANALOG(m_I2));
+	fprintf(m_file, "%e %e\n", netlist().time().as_double(), (nl_double) (INPANALOG(m_I) - INPANALOG(m_I2)));
 }
 
 // FIXME: Implement wav later, this must be clock triggered device where the input to be written

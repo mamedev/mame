@@ -131,11 +131,11 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 			if (LOG_FPGA && m_prev_reg!=offset)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
-		case 0x0c/4: // 1d = modem byte
-			result =  (result & 0xFFFF0000) | 0x2c2c;
-			if (LOG_FPGA)
-				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
-			break;
+//		case 0x0c/4: // 1d = modem byte
+//			result =  (result & 0xFFFF0000) | 0x2c2c;
+//			if (LOG_FPGA)
+//				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
+//			break;
 		case 0x14/4: // Interrupt & 0x4==0x00080000
 			result = 0x00000000;
 			if (LOG_FPGA)
@@ -146,6 +146,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 			if (LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
+		case 0x0c/4: // 1d = modem byte
 		case 0x1c/4: // 1d = modem byte
 			result = (result & 0xFFFF0000) | ((m_serial_reg1d[m_serial_idx]&0xff)<<8) | (m_serial_reg1c[m_serial_idx]&0xff);
 			if (ACCESSING_BITS_0_15) {
@@ -200,10 +201,11 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 			if (LOG_FPGA)
 					logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
+		case 0x0c/4:
 		case 0x1c/4:
 			if (ACCESSING_BITS_0_7) {
 				if (!m_serial_data) {
-					m_serial_idx = data&0xff;
+					m_serial_idx = data&0xf;
 				} else {
 					m_serial_reg1c[m_serial_idx] = data&0xff;
 					m_serial_idx = 0;
@@ -212,7 +214,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 			}
 			if (ACCESSING_BITS_8_15) {
 				if (!m_serial_data) {
-					m_serial_idx = (data&0xff00)>>8;
+					m_serial_idx = (data&0x0f00)>>8;
 				} else {
 					m_serial_reg1d[m_serial_idx] = (data&0xff00)>>8;
 				}

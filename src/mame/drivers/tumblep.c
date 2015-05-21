@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /***************************************************************************
 
   Tumblepop (World)     (c) 1991 Data East Corporation

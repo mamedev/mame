@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
 /*
 Konami 007121
 ------

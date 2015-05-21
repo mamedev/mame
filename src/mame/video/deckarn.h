@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,David Haywood
 
 
 class deco_karnovsprites_device : public device_t

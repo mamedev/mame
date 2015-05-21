@@ -15,6 +15,7 @@
 
 enum e_mnemonics
 {
+	mILL,
 	mLAB, mLBA, mLAY, mLASPX, mLASPY, mXAMR,
 	mLXA, mLYA, mLXI, mLYI, mIY, mDY, mAYY, mSYY, mXSP,
 	mLAM, mLBM, mXMA, mXMB, mLMAIY, mLMADY,
@@ -25,11 +26,12 @@ enum e_mnemonics
 	mBR, mCAL, mLPU, mTBR, mRTN,
 	mSEIE, mSEIF0, mSEIF1, mSETF, mSECF, mREIE, mREIF0, mREIF1, mRETF, mRECF, mTI0, mTI1, mTIF0, mTIF1, mTTF, mLTI, mLTA, mLAT, mRTNI,
 	mSED, mRED, mTD, mSEDD, mREDD, mLAR, mLBR, mLRA, mLRB, mP,
-	mNOP, mILL
+	mNOP
 };
 
 static const char *const s_mnemonics[] =
 {
+	"?",
 	"LAB", "LBA", "LAY", "LASPX", "LASPY", "XAMR",
 	"LXA", "LYA", "LXI", "LYI", "IY", "DY", "AYY", "SYY", "XSP",
 	"LAM", "LBM", "XMA", "XMB", "LMAIY", "LMADY",
@@ -40,12 +42,13 @@ static const char *const s_mnemonics[] =
 	"BR", "CAL", "LPU", "TBR", "RTN",
 	"SEIE", "SEIF0", "SEIF1", "SETF", "SECF", "REIE", "REIF0", "REIF1", "RETF", "RECF", "TI0", "TI1", "TIF0", "TIF1", "TTF", "LTI", "LTA", "LAT", "RTNI",
 	"SED", "RED", "TD", "SEDD", "REDD", "LAR", "LBR", "LRA", "LRB", "P",
-	"NOP", "?"
+	"NOP"
 };
 
 // number of bits per opcode parameter, 99 means (XY) parameter, negative means reversed bit-order
 static const INT8 s_bits[] =
 {
+	0,
 	0, 0, 0, 0, 0, 4,
 	0, 0, -4, -4, 0, 0, 0, 0, 99,
 	99, 99, 99, 99, 99, 99,
@@ -56,7 +59,7 @@ static const INT8 s_bits[] =
 	6, 6, 5, 3, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0,
 	0, 0, 0, 4, 4, 3, 3, 3, 3, 3,
-	0, 0
+	0
 };
 
 #define _OVER DASMFLAG_STEP_OVER
@@ -64,6 +67,7 @@ static const INT8 s_bits[] =
 
 static const UINT32 s_flags[] =
 {
+	0,
 	0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0,
@@ -74,7 +78,7 @@ static const UINT32 s_flags[] =
 	0, _OVER, 0, 0, _OUT,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _OUT,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0
+	0
 };
 
 // next program counter in sequence (relative)
@@ -87,47 +91,46 @@ static const INT16 s_next_pc[0x40] =
 };
 
 
-#define m mILL
 static const UINT8 hmcs40_mnemonic[0x400] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x000 */
-	mNOP,  mXSP,  mXSP,  mXSP,  mSEM,  mSEM,  mSEM,  mSEM,  mLAM,  mLAM,  mLAM,  mLAM,  m,     m,     m,     m,
+	mNOP,  mXSP,  mXSP,  mXSP,  mSEM,  mSEM,  mSEM,  mSEM,  mLAM,  mLAM,  mLAM,  mLAM,  0,     0,     0,     0,
 	mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,
-	mLBM,  mLBM,  mLBM,  mLBM,  mBLEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	mAMC,  m,     m,     m,     mAM,   m,     m,     m,     m,     m,     m,     m,     mLTA,  m,     m,     m,
+	mLBM,  mLBM,  mLBM,  mLBM,  mBLEM, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	mAMC,  0,     0,     0,     mAM,   0,     0,     0,     0,     0,     0,     0,     mLTA,  0,     0,     0,
 	/* 0x040 */
-	mLXA,  m,     m,     m,     m,     mDAS,  mDAA,  m,     m,     m,     m,     m,     mREC,  m,     m,     mSEC,
-	mLYA,  m,     m,     m,     mIY,   m,     m,     m,     mAYY,  m,     m,     m,     m,     m,     m,     m,
-	mLBA,  m,     m,     m,     mIB,   m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mLXA,  0,     0,     0,     0,     mDAS,  mDAA,  0,     0,     0,     0,     0,     mREC,  0,     0,     mSEC,
+	mLYA,  0,     0,     0,     mIY,   0,     0,     0,     mAYY,  0,     0,     0,     0,     0,     0,     0,
+	mLBA,  0,     0,     0,     mIB,   0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,
 	/* 0x080 */
 	mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,
-	mSED,  m,     m,     m,     mTD,   m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	mSEIF1,mSECF, mSEIF0,m,     mSEIE, mSETF, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mSED,  0,     0,     0,     mTD,   0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	mSEIF1,mSECF, mSEIF0,0,     mSEIE, mSETF, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x0c0 */
-	mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  m,     m,     m,     m,     m,     m,     m,     m,
+	mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  0,     0,     0,     0,     0,     0,     0,     0,
 	mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD,
-	mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  m,     m,     m,     m,     m,     m,     m,     m,
+	mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  0,     0,     0,     0,     0,     0,     0,     0,
 	mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR,
 
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x100 */
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	mLMAIY,mLMAIY,m,     m,     mLMADY,mLMADY,m,     m,     mLAY,  m,     m,     m,     m,     m,     m,     m,
-	mOR,   m,     m,     m,     mANEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	mLMAIY,mLMAIY,0,     0,     mLMADY,mLMADY,0,     0,     mLAY,  0,     0,     0,     0,     0,     0,     0,
+	mOR,   0,     0,     0,     mANEM, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x140 */
 	mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,
 	mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,
 	mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,
 	mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,
 	/* 0x180 */
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	mTIF1, mTI1,  mTIF0, mTI0,  m,     mTTF,  m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	mTIF1, mTI1,  mTIF0, mTI0,  0,     mTTF,  0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x1c0 */
 	mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,
 	mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,
@@ -136,49 +139,48 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x200 */
-	mTM,   mTM,   mTM,   mTM,   mREM,  mREM,  mREM,  mREM,  mXMA,  mXMA,  mXMA,  mXMA,  m,     m,     m,     m,
+	mTM,   mTM,   mTM,   mTM,   mREM,  mREM,  mREM,  mREM,  mXMA,  mXMA,  mXMA,  mXMA,  0,     0,     0,     0,
 	mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI,
-	mXMB,  mXMB,  mXMB,  mXMB,  mROTR, mROTL, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	mSMC,  m,     m,     m,     mALEM, m,     m,     m,     m,     m,     m,     m,     mLAT,  m,     m,     m,
+	mXMB,  mXMB,  mXMB,  mXMB,  mROTR, mROTL, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	mSMC,  0,     0,     0,     mALEM, 0,     0,     0,     0,     0,     0,     0,     mLAT,  0,     0,     0,
 	/* 0x240 */
-	mLASPX,m,     m,     m,     mNEGA, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     mTC,
-	mLASPY,m,     m,     m,     mDY,   m,     m,     m,     mSYY,  m,     m,     m,     m,     m,     m,     m,
-	mLAB,  m,     m,     m,     m,     m,     m,     mDB,   m,     m,     m,     m,     m,     m,     m,     m,
+	mLASPX,0,     0,     0,     mNEGA, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     mTC,
+	mLASPY,0,     0,     0,     mDY,   0,     0,     0,     mSYY,  0,     0,     0,     0,     0,     0,     0,
+	mLAB,  0,     0,     0,     0,     0,     0,     mDB,   0,     0,     0,     0,     0,     0,     0,     0,
 	mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI,
 	/* 0x280 */
 	mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI,
-	mRED,  m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	mREIF1,mRECF, mREIF0,m,     mREIE, mRETF, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mRED,  0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	mREIF1,mRECF, mREIF0,0,     mREIE, mRETF, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x2c0 */
-	mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  m,     m,     m,     m,     m,     m,     m,     m,
+	mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  0,     0,     0,     0,     0,     0,     0,     0,
 	mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD,
-	mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x300 */
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	mCOMB, m,     m,     m,     mBNEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	mCOMB, 0,     0,     0,     mBNEM, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x340 */
 	mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,
 	mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,
 	mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mP,    mP,    mP,    mP,    mP,    mP,    mP,    mP,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x380 */
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     mRTNI, m,     m,     mRTN,  m,     m,     m,     m,     m,     m,     m,     m,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     mRTNI, 0,     0,     mRTN,  0,     0,     0,     0,     0,     0,     0,     0,
+	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x3c0 */
 	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,
 	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,
 	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,
 	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL
 };
-#undef m
 
 
 

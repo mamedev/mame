@@ -41,6 +41,7 @@ struct netlist_solver_parameters_t
 	int m_gs_loops;
 	int m_nr_loops;
 	netlist_time m_nt_sync_delay;
+	bool m_log_stats;
 };
 
 
@@ -75,18 +76,18 @@ class ATTR_ALIGNED(64) terms_t
 	int m_railstart;
 
 private:
-	plinearlist_t<netlist_terminal_t *> m_term;
-	plinearlist_t<int> m_net_other;
-	plinearlist_t<nl_double> m_go;
-	plinearlist_t<nl_double> m_gt;
-	plinearlist_t<nl_double> m_Idr;
-	plinearlist_t<nl_double *> m_other_curanalog;
+	plist_t<netlist_terminal_t *> m_term;
+	plist_t<int> m_net_other;
+	plist_t<nl_double> m_go;
+	plist_t<nl_double> m_gt;
+	plist_t<nl_double> m_Idr;
+	plist_t<nl_double *> m_other_curanalog;
 };
 
 class netlist_matrix_solver_t : public netlist_device_t
 {
 public:
-	typedef plinearlist_t<netlist_matrix_solver_t *> list_t;
+	typedef plist_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
 	enum eSolverType
@@ -134,8 +135,8 @@ protected:
 
 	ATTR_COLD virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
 
-	plinearlist_t<netlist_analog_net_t *> m_nets;
-	plinearlist_t<netlist_analog_output_t *> m_inps;
+	plist_t<netlist_analog_net_t *> m_nets;
+	plist_t<netlist_analog_output_t *> m_inps;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;
@@ -172,6 +173,7 @@ public:
 	ATTR_COLD virtual ~NETLIB_NAME(solver)();
 
 	ATTR_COLD void post_start();
+	ATTR_COLD void stop();
 
 	ATTR_HOT inline nl_double gmin() { return m_gmin.Value(); }
 
@@ -197,6 +199,8 @@ protected:
 	netlist_param_int_t m_gs_loops;
 	netlist_param_int_t m_gs_threshold;
 	netlist_param_int_t m_parallel;
+
+	netlist_param_logic_t  m_log_stats;
 
 	netlist_matrix_solver_t::list_t m_mat_solvers;
 private:

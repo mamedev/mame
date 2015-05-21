@@ -234,6 +234,19 @@ ATTR_COLD void netlist_base_t::start()
 
 }
 
+ATTR_COLD void netlist_base_t::stop()
+{
+	/* find the main clock and solver ... */
+
+	NL_VERBOSE_OUT(("Stopping all devices ...\n"));
+
+	// Step all devices once !
+	for (int i = 0; i < m_devices.count(); i++)
+	{
+		m_devices[i]->stop_dev();
+	}
+}
+
 ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 {
 	for (int i = 0; i < m_nets.count(); i++)
@@ -405,6 +418,13 @@ ATTR_COLD void netlist_core_device_t::start_dev()
 	netlist().m_started_devices.add(this, false);
 #endif
 	start();
+}
+
+ATTR_COLD void netlist_core_device_t::stop_dev()
+{
+#if (NL_KEEP_STATISTICS)
+#endif
+	stop();
 }
 
 ATTR_HOT ATTR_ALIGN netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
@@ -866,8 +886,6 @@ ATTR_HOT void netlist_terminal_t::schedule_after(const netlist_time &after)
 
 ATTR_COLD void netlist_terminal_t::reset()
 {
-	//printf("reset %s\n", name().cstr());
-	//netlist_terminal_core_terminal_t::reset();
 	set_state(STATE_INP_ACTIVE);
 	set_ptr(m_Idr1, 0.0);
 	set_ptr(m_go1, netlist().gmin());
@@ -938,7 +956,8 @@ ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
 
 ATTR_COLD void netlist_analog_output_t::initial(const nl_double val)
 {
-	net().as_analog().m_cur_Analog = val * 0.99;
+	// FIXME: Really necessary?
+	net().as_analog().m_cur_Analog = val * NL_FCONST(0.99);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1007,7 +1026,7 @@ ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, co
 		if (pequal < 0)
 			netlist().error("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
 		tmp = tmp.substr(pequal+1);
-		nl_double factor = 1.0;
+		nl_double factor = NL_FCONST(1.0);
 		switch (*(tmp.right(1).cstr()))
 		{
 			case 'm': factor = 1e-3; break;
@@ -1018,9 +1037,9 @@ ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, co
 			case 'a': factor = 1e-18; break;
 
 		}
-		if (factor != 1.0)
+		if (factor != NL_FCONST(1.0))
 			tmp = tmp.left(tmp.len() - 1);
-		return atof(tmp.cstr()) * factor;
+		return (nl_double) atof(tmp.cstr()) * factor;
 	}
 	else
 	{

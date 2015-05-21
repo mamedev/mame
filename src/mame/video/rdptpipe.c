@@ -572,7 +572,7 @@ void n64_texture_pipe_t::copy(color_t* TEX, INT32 SSS, INT32 SST, UINT32 tilenum
 	TEX->c = fetch(sss1, sst1, tilenum, object, userdata);
 }
 
-void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	const INT32 nextsw = (w + dwinc) >> 16;
 	INT32 nexts = (s + dsinc) >> 16;
@@ -689,7 +689,7 @@ void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, INT32 s, INT32 t, IN
 	}
 }
 
-void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, INT32* t2, rdp_span_aux* userdata, const rdp_poly_state& object)
+void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, INT32* t2, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	const INT32 nextsw = (w + dwinc) >> 16;
 	INT32 nexts = (s + dsinc) >> 16;
@@ -846,7 +846,7 @@ void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, INT32 s, INT32 t, IN
 	}
 }
 
-void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 w, INT32 dsinc, INT32 dtinc, INT32 dwinc, INT32 prim_tile, INT32* t1, const rdp_poly_state& object)
+void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, const rdp_poly_state& object)
 {
 	const INT32 nextsw = (w + dwinc) >> 16;
 	INT32 nexts = (s + dsinc) >> 16;

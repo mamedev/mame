@@ -72,10 +72,10 @@ static void resample_argb_bitmap_average(UINT32 *dest, UINT32 drowpixels, UINT32
 	UINT32 x, y;
 
 	/* precompute premultiplied R/G/B/A factors */
-	r = color.r * color.a * 256.0;
-	g = color.g * color.a * 256.0;
-	b = color.b * color.a * 256.0;
-	a = color.a * 256.0;
+	r = color.r * color.a * 256.0f;
+	g = color.g * color.a * 256.0f;
+	b = color.b * color.a * 256.0f;
+	a = color.a * 256.0f;
 
 	/* loop over the target vertically */
 	for (y = 0; y < dheight; y++)
@@ -163,10 +163,10 @@ static void resample_argb_bitmap_bilinear(UINT32 *dest, UINT32 drowpixels, UINT3
 	UINT32 x, y;
 
 	/* precompute premultiplied R/G/B/A factors */
-	r = color.r * color.a * 256.0;
-	g = color.g * color.a * 256.0;
-	b = color.b * color.a * 256.0;
-	a = color.a * 256.0;
+	r = color.r * color.a * 256.0f;
+	g = color.g * color.a * 256.0f;
+	b = color.b * color.a * 256.0f;
+	a = color.a * 256.0f;
 
 	/* loop over the target vertically */
 	for (y = 0; y < dheight; y++)
@@ -500,7 +500,7 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
 	else
 	{
 		/* prescale unitx and unity by the half-width */
-		float invlength = width / sqrt(unitx * unitx + unity * unity);
+		float invlength = width / sqrtf(unitx * unitx + unity * unity);
 		unitx *= invlength;
 		unity *= invlength;
 	}

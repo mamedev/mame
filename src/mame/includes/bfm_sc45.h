@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Scorpion 4 + 5 driver related includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
 

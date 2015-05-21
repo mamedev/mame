@@ -23,6 +23,7 @@
 #define MCFG_ITEAGLE_EEPROM_INIT(_sw_version, _hw_version) \
 	downcast<iteagle_eeprom_device *>(device)->set_info(_sw_version, _hw_version);
 
+// Mimic Cypress CY82C693 Peripheral Controller
 #define MCFG_ITEAGLE_IDE_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_IDE, 0x1080C693, 0x00, 0x060100, 0x00)
 

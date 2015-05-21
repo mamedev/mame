@@ -6,7 +6,7 @@
   ==================================
   Driver by smf & R Belmont
   Board notes by The Guru
-  Thanks to Zinc Team, Amuse & Miguel Angel Horna
+  Thanks to Zinc Team, Peter Ferrie, Amuse & Miguel Angel Horna
 
 ***************************************************************************/
 

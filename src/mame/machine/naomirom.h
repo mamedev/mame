@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef _NAOMIROM_H_
 #define _NAOMIROM_H_
 

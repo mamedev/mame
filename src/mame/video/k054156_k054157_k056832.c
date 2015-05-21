@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* this should probably be k054156.c and k054156_device (the base management device) */
 
 /***************************************************************************/

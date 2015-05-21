@@ -1890,7 +1890,7 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 	if (container != NULL && container == &m_manager.ui_container())
 	{
 		// this hit test went against the UI container
-		if (target_fx >= 0.0 && target_fx < 1.0 && target_fy >= 0.0 && target_fy < 1.0)
+		if (target_fx >= 0.0f && target_fx < 1.0f && target_fy >= 0.0f && target_fy < 1.0f)
 		{
 			// this point was successfully mapped
 			mapped_x = (float)target_x / m_width;

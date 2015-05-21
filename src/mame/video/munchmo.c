@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 #include "emu.h"
 #include "includes/munchmo.h"
 

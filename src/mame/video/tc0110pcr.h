@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #ifndef _TC0110PCR_H_
 #define _TC0110PCR_H_
 

@@ -695,7 +695,7 @@ void ui_menu::draw_text_box()
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
 	target_height += 2.0f * line_height;
 	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
-		target_height = floor((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
+		target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
 
 	// maximum against "return to prior menu" text
 	prior_width = machine().ui().get_string_width(backtext) + 2.0f * gutter_width;

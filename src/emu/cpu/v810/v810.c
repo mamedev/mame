@@ -924,8 +924,8 @@ void v810_device::opADDF(UINT32 op)
 	float val2=u2f(GETREG(GET2));
 	SET_OV(0);
 	val2+=val1;
-	SET_Z((val2==0.0)?1:0);
-	SET_S((val2<0.0)?1:0);
+	SET_Z((val2==0.0f)?1:0);
+	SET_S((val2<0.0f)?1:0);
 	SETREG(GET2,f2u(val2));
 }
 
@@ -936,8 +936,8 @@ void v810_device::opSUBF(UINT32 op)
 	SET_OV(0);
 	SET_CY((val2<val1)?1:0);
 	val2-=val1;
-	SET_Z((val2==0.0)?1:0);
-	SET_S((val2<0.0)?1:0);
+	SET_Z((val2==0.0f)?1:0);
+	SET_S((val2<0.0f)?1:0);
 	SETREG(GET2,f2u(val2));
 }
 
@@ -948,8 +948,8 @@ void v810_device::opMULF(UINT32 op)
 	float val2=u2f(GETREG(GET2));
 	SET_OV(0);
 	val2*=val1;
-	SET_Z((val2==0.0)?1:0);
-	SET_S((val2<0.0)?1:0);
+	SET_Z((val2==0.0f)?1:0);
+	SET_S((val2<0.0f)?1:0);
 	SETREG(GET2,f2u(val2));
 }
 
@@ -963,8 +963,8 @@ void v810_device::opDIVF(UINT32 op)
 		val2/=val1;
 	else
 		printf("DIVF divide by zero?\n");
-	SET_Z((val2==0.0)?1:0);
-	SET_S((val2<0.0)?1:0);
+	SET_Z((val2==0.0f)?1:0);
+	SET_S((val2<0.0f)?1:0);
 	SETREG(GET2,f2u(val2));
 }
 
@@ -972,8 +972,8 @@ void v810_device::opTRNC(UINT32 op)
 {
 	float val1=u2f(GETREG(GET1));
 	SET_OV(0);
-	SET_Z((val1==0.0)?1:0);
-	SET_S((val1<0.0)?1:0);
+	SET_Z((val1==0.0f)?1:0);
+	SET_S((val1<0.0f)?1:0);
 	SETREG(GET2,(INT32)val1);
 }
 
@@ -984,16 +984,16 @@ void v810_device::opCMPF(UINT32 op)
 	SET_OV(0);
 	SET_CY((val2<val1)?1:0);
 	val2-=val1;
-	SET_Z((val2==0.0)?1:0);
-	SET_S((val2<0.0)?1:0);
+	SET_Z((val2==0.0f)?1:0);
+	SET_S((val2<0.0f)?1:0);
 }
 
 void v810_device::opCVTS(UINT32 op)
 {
 	float val1=u2f(GETREG(GET1));
 	SET_OV(0);
-	SET_Z((val1==0.0)?1:0);
-	SET_S((val1<0.0)?1:0);
+	SET_Z((val1==0.0f)?1:0);
+	SET_S((val1<0.0f)?1:0);
 	SETREG(GET2,(INT32)val1);
 }
 
@@ -1002,8 +1002,8 @@ void v810_device::opCVTW(UINT32 op)
 	//TODO: CY
 	float val1=(INT32)GETREG(GET1);
 	SET_OV(0);
-	SET_Z((val1==0.0)?1:0);
-	SET_S((val1<0.0)?1:0);
+	SET_Z((val1==0.0f)?1:0);
+	SET_S((val1<0.0f)?1:0);
 	SETREG(GET2,f2u(val1));
 }
 
@@ -1013,8 +1013,8 @@ void v810_device::opMPYHW(UINT32 op)
 	int val2=(GETREG(GET2) & 0xffff);
 	SET_OV(0);
 	val2*=val1;
-	SET_Z((val2==0.0)?1:0);
-	SET_S((val2<0.0)?1:0);
+	SET_Z((val2==0.0f)?1:0);
+	SET_S((val2<0.0f)?1:0);
 	SETREG(GET2,val2);
 }
 
@@ -1023,8 +1023,8 @@ void v810_device::opXB(UINT32 op)
 	int val=GETREG(GET2);
 	SET_OV(0);
 	val = (val & 0xffff0000) | ((val & 0xff) << 8) | ((val & 0xff00) >> 8);
-	SET_Z((val==0.0)?1:0);
-	SET_S((val<0.0)?1:0);
+	SET_Z((val==0.0f)?1:0);
+	SET_S((val<0.0f)?1:0);
 	SETREG(GET2,val);
 }
 
@@ -1034,8 +1034,8 @@ void v810_device::opXH(UINT32 op)
 	int val=GETREG(GET2);
 	SET_OV(0);
 	val = ((val & 0xffff0000)>>16) | ((val & 0xffff)<<16);
-	SET_Z((val==0.0)?1:0);
-	SET_S((val<0.0)?1:0);
+	SET_Z((val==0.0f)?1:0);
+	SET_S((val<0.0f)?1:0);
 	SETREG(GET2,val);
 }
 

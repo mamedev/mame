@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Al Kossow
 #include "sound/discrete.h"
 
 class m79amb_state : public driver_device

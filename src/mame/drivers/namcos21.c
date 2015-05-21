@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 /**
 2008/06/11, by Naibo(translated to English by Mameplus team):
 Driver's Eyes works,

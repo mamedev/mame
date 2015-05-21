@@ -877,6 +877,27 @@ int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...)
 }
 
 
+/*-------------------------------------------------
+    core_truncate - truncate a file
+-------------------------------------------------*/
+
+file_error core_truncate(core_file *f, UINT64 offset)
+{
+	file_error err;
+
+	/* truncate file */
+	err = osd_truncate(f->file, offset);
+	if (err != FILERR_NONE)
+		return err;
+
+	/* and adjust to new length and offset */
+	f->length = offset;
+	f->offset = MIN(f->offset, f->length);
+
+	return FILERR_NONE;
+}
+
+
 
 /***************************************************************************
     FILENAME UTILITIES

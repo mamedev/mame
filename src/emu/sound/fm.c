@@ -2548,7 +2548,7 @@ static void FM_ADPCMAWrite(YM2610 *F2610,int r,int v)
 				if( (v>>c)&1 )
 				{
 					/**** start adpcm ****/
-					adpcm[c].step      = (UINT32)((float)(1<<ADPCM_SHIFT)*((float)F2610->OPN.ST.freqbase)/3.0);
+					adpcm[c].step      = (UINT32)((float)(1<<ADPCM_SHIFT)*((float)F2610->OPN.ST.freqbase)/3.0f);
 					adpcm[c].now_addr  = adpcm[c].start<<1;
 					adpcm[c].now_step  = 0;
 					adpcm[c].adpcm_acc = 0;
@@ -3043,9 +3043,9 @@ void ym2608_reset_chip(void *chip)
 	for( i = 0; i < 6; i++ )
 	{
 		if (i<=3)   /* channels 0,1,2,3 */
-			F2608->adpcm[i].step      = (UINT32)((float)(1<<ADPCM_SHIFT)*((float)F2608->OPN.ST.freqbase)/3.0);
+			F2608->adpcm[i].step      = (UINT32)((float)(1<<ADPCM_SHIFT)*((float)F2608->OPN.ST.freqbase)/3.0f);
 		else        /* channels 4 and 5 work with slower clock */
-			F2608->adpcm[i].step      = (UINT32)((float)(1<<ADPCM_SHIFT)*((float)F2608->OPN.ST.freqbase)/6.0);
+			F2608->adpcm[i].step      = (UINT32)((float)(1<<ADPCM_SHIFT)*((float)F2608->OPN.ST.freqbase)/6.0f);
 
 		F2608->adpcm[i].start     = YM2608_ADPCM_ROM_addr[i*2];
 		F2608->adpcm[i].end       = YM2608_ADPCM_ROM_addr[i*2+1];
@@ -3721,7 +3721,7 @@ void ym2610_reset_chip(void *chip)
 	/**** ADPCM work initial ****/
 	for( i = 0; i < 6 ; i++ )
 	{
-		F2610->adpcm[i].step      = (UINT32)((float)(1<<ADPCM_SHIFT)*((float)F2610->OPN.ST.freqbase)/3.0);
+		F2610->adpcm[i].step      = (UINT32)((float)(1<<ADPCM_SHIFT)*((float)F2610->OPN.ST.freqbase)/3.0f);
 		F2610->adpcm[i].now_addr  = 0;
 		F2610->adpcm[i].now_step  = 0;
 		F2610->adpcm[i].start     = 0;

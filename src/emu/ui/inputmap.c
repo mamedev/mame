@@ -25,7 +25,7 @@
 
 /* DIP switch rendering parameters */
 #define DIP_SWITCH_HEIGHT       0.05f
-#define DIP_SWITCH_SPACING      0.01
+#define DIP_SWITCH_SPACING      0.01f
 #define SINGLE_TOGGLE_SWITCH_FIELD_WIDTH 0.025f
 #define SINGLE_TOGGLE_SWITCH_WIDTH 0.020f
 /* make the switch 80% of the width space and 1/2 of the switch height */

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:David Haywood, Luca Elia, ???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Luca Elia
 /*************************************************************************
 
     kan_pand.h

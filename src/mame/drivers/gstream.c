@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /********************************************************************
 
     G-Stream (c)2002 Oriental Soft Japan

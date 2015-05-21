@@ -909,7 +909,7 @@ osd_dim sdl_window_info::pick_best_mode()
 			if (m_win_config.refresh)
 				size_score *= 1.0f / (1.0f + fabsf(m_win_config.refresh - mode.refresh_rate) / 10.0f);
 
-			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, size_score);
+			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, (double) size_score);
 
 			// best so far?
 			if (size_score > best_score)

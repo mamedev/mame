@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 /*************************************************************************
 
 Atari Fire Truck + Super Bug + Monte Carlo driver

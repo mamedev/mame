@@ -191,10 +191,10 @@ typedef void (*net_update_delegate)(netlist_core_device_t *);
 
 #define NETLIB_UPDATE(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update(void)
 #define NETLIB_START(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: start(void)
-//#define NETLIB_CONSTRUCTOR(_chip) ATTR_COLD _chip :: _chip (netlist_setup_t &setup, const char *name)
-//          : net_device_t(setup, name)
 
 #define NETLIB_RESET(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: reset(void)
+
+#define NETLIB_STOP(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: stop(void)
 
 #define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: _name _params
@@ -421,7 +421,7 @@ class netlist_core_terminal_t : public netlist_owned_object_t, public plinkedlis
 	NETLIST_PREVENT_COPYING(netlist_core_terminal_t)
 public:
 
-	typedef plinearlist_t<netlist_core_terminal_t *> list_t;
+	typedef plist_t<netlist_core_terminal_t *> list_t;
 
 	/* needed here ... */
 
@@ -477,7 +477,7 @@ class ATTR_ALIGN netlist_terminal_t : public netlist_core_terminal_t
 	NETLIST_PREVENT_COPYING(netlist_terminal_t)
 public:
 
-	typedef plinearlist_t<netlist_terminal_t * RESTRICT> list_t;
+	typedef plist_t<netlist_terminal_t * RESTRICT> list_t;
 
 	ATTR_COLD netlist_terminal_t();
 
@@ -598,7 +598,7 @@ class netlist_net_t : public netlist_object_t
 	NETLIST_PREVENT_COPYING(netlist_net_t)
 public:
 
-	typedef plinearlist_t<netlist_net_t *> list_t;
+	typedef plist_t<netlist_net_t *> list_t;
 
 	ATTR_COLD netlist_net_t(const family_t afamily);
 	ATTR_COLD virtual ~netlist_net_t();
@@ -636,7 +636,7 @@ public:
 
 	ATTR_COLD void move_connections(netlist_net_t *new_net);
 
-	plinearlist_t<netlist_core_terminal_t *> m_core_terms; // save post-start m_list ...
+	plist_t<netlist_core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 	ATTR_HOT inline void set_Q_time(const netlist_sig_t &newQ, const netlist_time &at)
 	{
@@ -678,7 +678,7 @@ class netlist_logic_net_t : public netlist_net_t
 	NETLIST_PREVENT_COPYING(netlist_logic_net_t)
 public:
 
-	typedef plinearlist_t<netlist_logic_net_t *> list_t;
+	typedef plist_t<netlist_logic_net_t *> list_t;
 
 	ATTR_COLD netlist_logic_net_t();
 	ATTR_COLD virtual ~netlist_logic_net_t() { };
@@ -739,7 +739,7 @@ class netlist_analog_net_t : public netlist_net_t
 	NETLIST_PREVENT_COPYING(netlist_analog_net_t)
 public:
 
-	typedef plinearlist_t<netlist_analog_net_t *> list_t;
+	typedef plist_t<netlist_analog_net_t *> list_t;
 
 	ATTR_COLD netlist_analog_net_t();
 	ATTR_COLD virtual ~netlist_analog_net_t() { };
@@ -962,7 +962,7 @@ class netlist_core_device_t : public netlist_object_t, public netlist_logic_fami
 	NETLIST_PREVENT_COPYING(netlist_core_device_t)
 public:
 
-	typedef plinearlist_t<netlist_core_device_t *> list_t;
+	typedef plist_t<netlist_core_device_t *> list_t;
 
 	ATTR_COLD netlist_core_device_t(const family_t afamily);
 
@@ -987,6 +987,7 @@ public:
 		end_timing(stat_total_time);
 	}
 	ATTR_COLD void start_dev();
+	ATTR_COLD void stop_dev();
 
 	ATTR_HOT netlist_sig_t INPLOGIC_PASSIVE(netlist_logic_input_t &inp);
 
@@ -1034,6 +1035,7 @@ protected:
 
 	ATTR_HOT virtual void update() { }
 	ATTR_COLD virtual void start() { }
+	ATTR_COLD virtual void stop() { }                                                  \
 	ATTR_COLD virtual const netlist_logic_family_desc_t *default_logic_family()
 	{
 		return &netlist_family_TTL;
@@ -1067,7 +1069,7 @@ public:
 
 	ATTR_COLD void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 
-	plinearlist_t<pstring, 20> m_terminals;
+	plist_t<pstring> m_terminals;
 
 protected:
 
@@ -1121,6 +1123,7 @@ public:
 	virtual ~netlist_base_t();
 
 	ATTR_COLD void start();
+	ATTR_COLD void stop();
 
 	ATTR_HOT inline const netlist_queue_t &queue() const { return m_queue; }
 	ATTR_HOT inline netlist_queue_t &queue() { return m_queue; }
@@ -1149,9 +1152,9 @@ public:
 	ATTR_COLD void log(const char *format, ...) const ATTR_PRINTF(2,3);
 
 	template<class _C>
-	plinearlist_t<_C *> get_device_list()
+	plist_t<_C *> get_device_list()
 	{
-		plinearlist_t<_C *> tmp;
+		plist_t<_C *> tmp;
 		for (netlist_device_t * const *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 		{
 			_C *dev = dynamic_cast<_C *>(*entry);

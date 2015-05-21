@@ -25,14 +25,14 @@ public:
 
 	ATTR_HOT inline int N() const { return (m_N == 0 ? m_dim : m_N); }
 
-	ATTR_HOT inline int vsolve_non_dynamic();
+	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
 	ATTR_COLD virtual void add_term(int net_idx, netlist_terminal_t *term);
 
 	ATTR_HOT virtual nl_double vsolve();
 
-	ATTR_HOT int solve_non_dynamic();
+	ATTR_HOT int solve_non_dynamic(const bool newton_raphson);
 	ATTR_HOT void build_LE_A();
 	ATTR_HOT void build_LE_RHS();
 	ATTR_HOT void LE_solve();
@@ -106,8 +106,8 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
-			if (nl_math::abs(DD2) > 1e-50) // avoid div-by-zero
-				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(0.5*DD2));
+			if (nl_math::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
+				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -312,7 +312,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 		for (int j = i + 1; j < kN; j++)
 		{
 			const nl_double f1 = - m_A[j][i] * f;
-			if (f1 != 0.0)
+			if (f1 != NL_FCONST(0.0))
 			{
 				for (int k = i + 1; k < kN; k++)
 					m_A[j][k] += m_A[i][k] * f1;
@@ -365,7 +365,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 		cerr2 = (e2 > cerr2 ? e2 : cerr2);
 	}
 	// FIXME: Review
-	return cerr + cerr2*100000.0;
+	return cerr + cerr2*NL_FCONST(100000.0);
 }
 
 template <int m_N, int _storage_N>
@@ -394,7 +394,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 
 
 template <int m_N, int _storage_N>
-ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic()
+ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
 	nl_double new_v[_storage_N]; // = { 0.0 };
 
@@ -416,13 +416,13 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic()
+ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
 	this->build_LE_RHS();
 	this->LE_solve();
 
-	return this->solve_non_dynamic();
+	return this->solve_non_dynamic(newton_raphson);
 }
 
 template <int m_N, int _storage_N>

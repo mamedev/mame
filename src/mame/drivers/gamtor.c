@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Novomatic CoolFire I */
 /* Austrian gaming system - used late 2002 - early 2008? */
 

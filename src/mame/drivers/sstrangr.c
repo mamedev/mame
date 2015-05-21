@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari
 /*******************************************************/
 /*                                                     */
 /* Yachiyo "Space Stranger/Space Stranger 2"           */
