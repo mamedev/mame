@@ -782,19 +782,6 @@ int datfile_manager::index_menuidx(const game_driver *drv, tDatafileIndex *d_idx
 }
 
 //-------------------------------------------------
-//  free the menu index
-//-------------------------------------------------
-
-void datfile_manager::free_menuidx(tMenuIndex **_index)
-{
-    if (*_index)
-    {
-        auto_free(machine(), *_index);
-        *_index = NULL;
-    }
-}
-
-//-------------------------------------------------
 //  load command text into the buffer
 //-------------------------------------------------
 

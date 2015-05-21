@@ -72,11 +72,11 @@ void ui_menu_game_options::handle()
                 else if (menu_event->iptkey == IPT_UI_SELECT)
                 {
                     int total = mewui_globals::s_filter_text;
-                    std::string s_sel[total + 1];
+                    std::vector<std::string> s_sel(total);
                     for (int index = 0; index < total; index++)
                         s_sel[index].assign(mewui_globals::filter_text[index]);
 
-                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &mewui_globals::actual_filter, total)));
+                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &mewui_globals::actual_filter)));
                 }
                 break;
             }
@@ -129,13 +129,13 @@ void ui_menu_game_options::handle()
 
             case CATEGORY_FILTER:
             {
-                if (menu_event->iptkey == IPT_UI_LEFT && current_category->prev != NULL)
+                if (menu_event->iptkey == IPT_UI_LEFT)
                 {
 					inifile_manager::current_category--;
                     changed = true;
                 }
 
-                else if (menu_event->iptkey == IPT_UI_RIGHT && current_category->next != NULL)
+                else if (menu_event->iptkey == IPT_UI_RIGHT)
                 {
 					inifile_manager::current_category++;
                     changed = true;
@@ -144,7 +144,7 @@ void ui_menu_game_options::handle()
                 else if (menu_event->iptkey == IPT_UI_SELECT)
                 {
                     int total = inifile_manager::ini_index[inifile_manager::current_file].category.size();
-                    std::string s_sel[total + 1];
+                    std::vector<std::string> s_sel(total + 1);
                     for (int index = 0; index < total; ++index)
                         s_sel[index].assign(inifile_manager::ini_index[inifile_manager::current_file].category[index].name);
 
@@ -253,7 +253,7 @@ void ui_menu_game_options::populate()
             arrow_flags = get_arrow_flags(0, inifile_manager::ini_index.size() - 1, actual_file);
 
         convert_command_glyph(fbuff);
-        item_append(fbuff.c_str(), inifile_manager::ini_index[actual_file].name, arrow_flags, (void *)FILE_CATEGORY_FILTER);
+        item_append(fbuff.c_str(), inifile_manager::ini_index[actual_file].name.c_str(), arrow_flags, (void *)FILE_CATEGORY_FILTER);
 
         int actual_category = inifile_manager::current_category;
 
@@ -264,7 +264,7 @@ void ui_menu_game_options::populate()
 
         fbuff.assign(" ^!Category");
         convert_command_glyph(fbuff);
-        item_append(fbuff.c_str(), current_category->name, arrow_flags, (void *)CATEGORY_FILTER);
+        item_append(fbuff.c_str(), inifile_manager::ini_index[actual_file].category[actual_category].name.c_str(), arrow_flags, (void *)CATEGORY_FILTER);
     }
 
     // add manufacturer subitem

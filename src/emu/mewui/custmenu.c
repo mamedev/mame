@@ -95,14 +95,14 @@ void ui_menu_custom_filter::handle()
             else if (menu_event->iptkey == IPT_UI_SELECT)
             {
                 int total = mewui_globals::s_filter_text;
-                std::string s_sel[total + 1];
+                std::vector<std::string> s_sel(total);
                 for (int index = 0; index < total; index++)
                     if (index <= FILTER_UNAVAILABLE || index == FILTER_CATEGORY || index == FILTER_FAVORITE_GAME || index == FILTER_CUSTOM)
                         s_sel[index].assign("_skip_");
                     else
                         s_sel[index].assign(mewui_globals::filter_text[index]);
 
-                ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &custfltr::other[pos], total)));
+                ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &custfltr::other[pos])));
             }
         }
 

@@ -249,7 +249,6 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 
 // qsort compares
 bool compare_software(ui_software_info a, ui_software_info b);
-int compare(struct IniCategoryIndex *elem1, struct IniCategoryIndex *elem2);
 
 // advanced search function
 int fuzzy_substring(const char *needle, const char *haystack);

@@ -118,11 +118,11 @@ void ui_menu_display_options::handle()
                 else if (menu_event->iptkey == IPT_UI_SELECT)
                 {
                     int total = ARRAY_LENGTH(video_modes_label);
-                    std::string s_sel[total + 1];
+                    std::vector<std::string> s_sel(total + 1);
                     for (int index = 0; index < total; index++)
                         s_sel[index].assign(video_modes_label[index]);
 
-                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &cur_video, total)));
+                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &cur_video)));
                 }
                 break;
             }

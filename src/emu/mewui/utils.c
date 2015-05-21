@@ -230,15 +230,6 @@ bool compare_software(ui_software_info a, ui_software_info b)
 }
 
 //-------------------------------------------------
-//  compares two category name in the INIs file
-//-------------------------------------------------
-
-int compare(struct IniCategoryIndex *elem1, struct IniCategoryIndex *elem2)
-{
-    return (core_stricmp(elem1->name, elem2->name));
-}
-
-//-------------------------------------------------
 //  search a substring with even partial matching
 //-------------------------------------------------
 

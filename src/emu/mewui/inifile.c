@@ -20,7 +20,7 @@
 static bool first_f_load = true;
 
 std::vector<IniFileIndex> inifile_manager::ini_index;
-int inifile_manager::current_file = -1;
+UINT16 inifile_manager::current_file = -1;
 
 std::vector<ui_software_info> favorite_manager::favorite_list;
 int favorite_manager::current_favorite = -1;
@@ -140,7 +140,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 
     bool search_clones = false;
     std::string file_name(ini_index[current_file].name);
-    long offset = ini_index[current_file].category.offset;
+    long offset = ini_index[current_file].category[current_category].offset;
     std::string     carriage("\r\n");
 
     if (!core_stricmp(file_name.c_str(), "category.ini") || !core_stricmp(file_name.c_str(), "alltime.ini"))
@@ -457,7 +457,6 @@ void favorite_manager::parse_favorite()
             favorite_list.push_back(tmpmatches);
         }
         myfile.close();
-        parseClose();
     }
 }
 

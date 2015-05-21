@@ -90,9 +90,9 @@ public:
 private:
 
     // global index
-    static tDatafileIndex *hist_idx, *mame_idx, *mess_idx, *cmnd_idx, *sysi_idx, *story_idx;
-    static sDataDrvIndex *drv_idx, *drvmess_idx;
-    static tMenuIndex *menu_idx;
+    static std::vector<tDatafileIndex> hist_idx, mame_idx, mess_idx, cmnd_idx, sysi_idx, story_idx;
+    static std::vector<sDataDrvIndex> drv_idx, drvmess_idx;
+    static std::vector<tMenuIndex> menu_idx;
 
     static std::vector<SoftwareListIndex> sListIndex;
 
@@ -106,16 +106,15 @@ private:
 
     bool ParseOpen(const char *filename);
 
-    int index_mame_mess_info(tDatafileIndex **_index, sDataDrvIndex **_index_drv, int &drvcount);
-    int index_datafile(tDatafileIndex **_index, int &swcount);
-    int index_menuidx(const game_driver *drv, tDatafileIndex *d_idx, tMenuIndex **_index);
+    int index_mame_mess_info(std::vector<tDatafileIndex> &index, std::vector<sDataDrvIndex> &index_drv, int &drvcount);
+    int index_datafile(std::vector<tDatafileIndex> &index, int &swcount);
+    int index_menuidx(const game_driver *drv, std::vector<tDatafileIndex> &d_idx, std::vector<tMenuIndex> &index);
 
-    int load_command_text(std::string &buffer, tMenuIndex *m_idx, const int menu_sel);
-    void load_data_text(const game_driver *drv, std::string &buffer, tDatafileIndex *idx, const char *tag);
-    void load_driver_text(const game_driver *drv, std::string &buffer, sDataDrvIndex *idx, const char *tag);
+    int load_command_text(std::string &buffer, std::vector<tMenuIndex> &m_idx, const int menu_sel);
+    void load_data_text(const game_driver *drv, std::string &buffer, std::vector<tDatafileIndex> &idx, const char *tag);
+    void load_driver_text(const game_driver *drv, std::string &buffer, std::vector<sDataDrvIndex> &idx, const char *tag);
 
     bool find_command(const game_driver *drv);
-    void free_menuidx(tMenuIndex **_index);
     int find_or_allocate(std::string name);
 
     // internal state

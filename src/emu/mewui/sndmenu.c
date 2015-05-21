@@ -95,11 +95,11 @@ void ui_menu_sound_options::handle()
                 else if (menu_event->iptkey == IPT_UI_SELECT)
                 {
                     int total = ARRAY_LENGTH(sound_rate);
-                    std::string s_sel[total + 1];
+                    std::vector<std::string> s_sel(total);
                     for (int index = 0; index < total; index++)
                         strprintf(s_sel[index], "%d", sound_rate[index]);
 
-                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &cur_rates, total)));
+                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &cur_rates)));
                 }
                 break;
 
