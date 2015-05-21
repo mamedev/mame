@@ -259,30 +259,26 @@ void ui_menu_game_options::populate()
     // add category subitem
     if (mewui_globals::actual_filter == FILTER_CATEGORY && !inifile_manager::ini_index.empty())
     {
-        int current_file = machine().inifile().getcurfile();
+        actual_file = machine().inifile().getcurfile();
 
         if (inifile_manager::ini_index.size() == 1)
             arrow_flags = 0;
         else
-            arrow_flags = get_arrow_flags(0, inifile_manager::ini_index.size() - 1, current_file);
+            arrow_flags = get_arrow_flags(0, inifile_manager::ini_index.size() - 1, actual_file);
 
         convert_command_glyph(fbuff);
-        item_append(fbuff.c_str(), inifile_manager::ini_index[current_file].file_name, arrow_flags, (void *)FILE_CATEGORY_FILTER);
+        item_append(fbuff.c_str(), inifile_manager::ini_index[actual_file].file_name, arrow_flags, (void *)FILE_CATEGORY_FILTER);
 
-        int current = machine().inifile().getcurcategory();
+        actual_category = machine().inifile().getcurcategory();
 
-        if (inifile_manager::ini_index[current].category.size() == 1)
+        if (inifile_manager::ini_index[actual_file].category.size() == 1)
             arrow_flags = 0;
         else
-            arrow_flags = get_arrow_flags(0, inifile_manager::ini_index[current].category.size() - 1, current);
+            arrow_flags = get_arrow_flags(0, inifile_manager::ini_index[current].category.size() - 1, actual_category);
 
         fbuff.assign(" ^!Category");
         convert_command_glyph(fbuff);
         item_append(fbuff.c_str(), current_category->name, arrow_flags, (void *)CATEGORY_FILTER);
-
-        actual_file = machine().inifile().getfileindex();
-        actual_category = machine().inifile().getcategoryindex();
-
     }
 
     // add manufacturer subitem
