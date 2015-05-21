@@ -23524,6 +23524,18 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
+	<software name="4in1_01c">
+		<description>4 in 1 (4B-001)</description>
+		<year>20??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen1" />
+			<dataarea name="rom" size="524288">
+				<rom name="4b-001.gbc" size="524288" crc="42a2fdf8" sha1="79a4faddfd1aca397e56d7895e45b1bc12900dab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_8in1">
 		<description>8 in 1 (Tw)</description>
 		<year>19??</year>
