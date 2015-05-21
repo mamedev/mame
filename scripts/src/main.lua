@@ -120,7 +120,7 @@ function mainProject(_target, _subtarget)
 	
 	override_resources = false;
 	
-	maintargetosdoptions(_target)
+	maintargetosdoptions(_target,_subtarget)
 
 	includedirs {
 		MAME_DIR .. "src/osd",
