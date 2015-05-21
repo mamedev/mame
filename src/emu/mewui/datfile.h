@@ -80,7 +80,6 @@ public:
     void load_command_info(std::string &buffer, const int menu_sel);
     void load_software_info(const char *soft_list, std::string &buffer, const char *soft_name);
     void command_sub_menu(const game_driver *drv, std::vector<std::string> &menu_item);
-    void free_dat_index();
 
     std::string rev_history() const { return history_revision; }
     std::string rev_mameinfo() const { return mame_revision; }

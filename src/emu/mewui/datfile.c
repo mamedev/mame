@@ -112,14 +112,11 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
 
 void datfile_manager::init_sysinfo()
 {
-    // check if already indexed
-    if (!sysi_idx)
-    {
-        int swcount = 0;
-        int count = index_datafile(&sysi_idx, swcount);
-        osd_printf_verbose("Sysinfo.dat games found = %i\n", count);
-        osd_printf_verbose("Rev = %s\n", sysinfo_revision.c_str());
-    }
+	sysi_idx.clear();
+    int swcount = 0;
+	int count = index_datafile(&sysi_idx, swcount);
+    osd_printf_verbose("Sysinfo.dat games found = %i\n", count);
+    osd_printf_verbose("Rev = %s\n", sysinfo_revision.c_str());
 }
 
 //-------------------------------------------------

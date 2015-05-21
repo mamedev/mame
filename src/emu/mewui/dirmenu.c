@@ -146,8 +146,6 @@ void ui_menu_add_change_folder::handle()
                 if (change)
                 {
                     machine().options().set_value(s_folders_entry[path_ref].option, current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-                    machine().inifile().free_ini_index();
-                    machine().datfile().free_dat_index();
                 }
 
                 else

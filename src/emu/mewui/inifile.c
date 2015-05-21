@@ -17,7 +17,6 @@
 //  GLOBAL VARIABLES
 //-------------------------------------------------
 
-static bool first_load = true;
 static bool first_f_load = true;
 
 std::vector<IniFileIndex> inifile_manager::ini_index;
@@ -35,11 +34,8 @@ static const char *favorite_filename = "favorites.ini";
 inifile_manager::inifile_manager(running_machine &machine)
     : m_machine(machine)
 {
-    if (first_load)
-    {
-        directory_scan();
-        first_load = false;
-    }
+	ini_index.clear();
+	directory_scan();
 }
 
 //-------------------------------------------------
@@ -74,7 +70,7 @@ void inifile_manager::directory_scan()
 				if (!tmp.empty())
 				{
 					IniFileIndex tfile;
-					tfile.file_name.assign(file_name);
+					tfile.name.assign(file_name);
 					tfile.category.push_back(tmp);
 					ini_index.push_back(tfile);
                 }
@@ -90,7 +86,7 @@ void inifile_manager::directory_scan()
 void inifile_manager::init_category(std::vector<IniCategoryIndex> &index, std::string &filename)
 {
     std::string readbuf;
-	std::ifstream myfile(filename.c_str() std::ifstream::binary);
+	std::ifstream myfile(filename.c_str(), std::ifstream::binary);
     while (std::getline(myfile, readbuf))
     {
         if (readbuf[0] == '[')
@@ -118,7 +114,7 @@ void inifile_manager::init_category(std::vector<IniCategoryIndex> &index, std::s
                     IniCategoryIndex tmp;
                     tmp.name.assign(name);
                     tmp.offset = offset;
-					index.category.push_back(tmp);
+					index.push_back(tmp);
                     myfile.seekg(offset, myfile.beg);
                 }
                 else
@@ -126,7 +122,7 @@ void inifile_manager::init_category(std::vector<IniCategoryIndex> &index, std::s
                     IniCategoryIndex tmp;
                     tmp.name.assign(name);
                     tmp.offset = offset;
-					index.category.push_back(tmp);
+					index.push_back(tmp);
 				}
             }
         }
@@ -143,7 +139,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
         return;
 
     bool search_clones = false;
-    std::string file_name(ini_index[current_file].file_name);
+    std::string file_name(ini_index[current_file].name);
     long offset = ini_index[current_file].category.offset;
     std::string     carriage("\r\n");
 
@@ -201,84 +197,10 @@ bool inifile_manager::ParseOpen(const char *filename)
     {
 		fullpath.assign(fp.fullpath());
 		fp.close();
-		return true
+		return true;
     }
 
     return false;
-}
-
-//-------------------------------------------------
-//  set current file
-//-------------------------------------------------
-
-void inifile_manager::setfile(int direction, int index)
-{
-    if (index == -1)
-    {
-        if (direction == -1)
-            current_file_idx = current_file_idx->prev;
-        else if (direction == 1)
-            current_file_idx = current_file_idx->next;
-        else
-            current_file_idx = first_file_idx;
-    }
-
-    else
-    {
-        current_file_idx = first_file_idx;
-
-        for (int x = 0; x != index; x++, current_file_idx = current_file_idx->next);
-    }
-}
-
-//-------------------------------------------------
-//  set current category
-//-------------------------------------------------
-
-void inifile_manager::setcategory(int direction, int index)
-{
-    if (index == -1)
-    {
-        if (direction == -1)
-            current_file_idx->current_category = current_file_idx->current_category->prev;
-        else if (direction == 1)
-            current_file_idx->current_category = current_file_idx->current_category->next;
-        else
-            current_file_idx->current_category = current_file_idx->first_category;
-    }
-
-    else
-    {
-        current_file_idx->current_category = current_file_idx->first_category;
-
-        for (int x = 0; x != index; x++, current_file_idx->current_category = current_file_idx->current_category->next);
-    }
-}
-
-//-------------------------------------------------
-//  get index of current file
-//-------------------------------------------------
-
-int inifile_manager::getfileindex()
-{
-    int index = 0;
-
-    for (IniFileIndex *tmp = first_file_idx; tmp != current_file_idx; tmp = tmp->next, index++);
-
-    return index;
-}
-
-//-------------------------------------------------
-//  get index of current category
-//-------------------------------------------------
-
-int inifile_manager::getcategoryindex()
-{
-    int index = 0;
-
-    for (IniCategoryIndex *tmp = current_file_idx->first_category; tmp != current_file_idx->current_category; tmp = tmp->next, index++);
-
-    return index;
 }
 
 /**************************************************************************
@@ -549,10 +471,7 @@ void favorite_manager::save_favorite_games()
     if (favorite_list.empty())
     {
         if (parseOpen(favorite_filename))
-        {
-            fp->remove_on_close();
-            parseClose();
-        }
+            remove(fullpath.c_str());
         return;
     }
 
@@ -601,33 +520,21 @@ void favorite_manager::save_favorite_games()
 //  open up file for reading
 //-------------------------------------------------
 
+//-------------------------------------------------
+//  open up file for reading
+//-------------------------------------------------
+
 bool favorite_manager::parseOpen(const char *filename)
 {
     // Open file up in binary mode
-    fp = global_alloc(emu_file(MEWUI_DIR, OPEN_FLAG_READ));
+    emu_file fp(machine().options().extraini_path(), OPEN_FLAG_READ);
 
-    if (fp->open(filename) != FILERR_NONE)
+    if (fp.open(filename) == FILERR_NONE)
     {
-        global_free(fp);
-        fp = NULL;
-        return FALSE;
+		fullpath.assign(fp.fullpath());
+		fp.close();
+		return true;
     }
 
-    return TRUE;
-}
-
-//-------------------------------------------------
-//  closes the existing opened file (if any)
-//-------------------------------------------------
-
-void favorite_manager::parseClose()
-{
-    // If the file is open, time for fclose.
-    if (fp)
-    {
-        fp->close();
-        global_free(fp);
-    }
-
-    fp = NULL;
+    return false;
 }

@@ -54,14 +54,6 @@ ui_menu_game_options::~ui_menu_game_options()
 void ui_menu_game_options::handle()
 {
     bool changed = false;
-    IniFileIndex *current = NULL;
-    IniCategoryIndex *current_category = NULL;
-
-    if (!inifile_manager::ini_index.empty())
-    {
-        current = machine().inifile().getcurfile();
-        current_category = machine().inifile().getcurcategory();
-    }
 
     // process the menu
     const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
@@ -108,33 +100,29 @@ void ui_menu_game_options::handle()
 
             case FILE_CATEGORY_FILTER:
             {
-                if (menu_event->iptkey == IPT_UI_LEFT && current->prev != NULL )
+                if (menu_event->iptkey == IPT_UI_LEFT)
                 {
-                    machine().inifile().setfile(-1);
-                    machine().inifile().setcategory(0);
-                    actual_category = 0;
+                    inifile_manager::current_file--;
+                    inifile_manager::current_category = 0;
                     changed = true;
                 }
 
-                else if (menu_event->iptkey == IPT_UI_RIGHT && current->next != NULL)
+                else if (menu_event->iptkey == IPT_UI_RIGHT)
                 {
-                    machine().inifile().setfile(1);
-                    machine().inifile().setcategory(0);
-                    actual_category = 0;
+                    inifile_manager::current_file++;
+                    inifile_manager::current_category = 0;
                     changed = true;
                 }
 
                 else if (menu_event->iptkey == IPT_UI_SELECT)
                 {
                     int total = inifile_manager::ini_index.size();
-                    std::string s_sel[total + 1];
-                    machine().inifile().setcategory(0);
-                    actual_category = 0;
-                    int index = 0;
+                    std::vector<std::string> s_sel(total);
+                    inifile_manager::current_category = 0;
                     for (size_t index = 0; index < total; ++index)
-                        s_sel[index].assign(inifile_manager::ini_index.file_name);
+                        s_sel[index].assign(inifile_manager::ini_index[index].name);
 
-                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &actual_file, total, SELECTOR_INIFILE)));
+                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &inifile_manager::current_file, SELECTOR_INIFILE)));
                 }
                 break;
             }
@@ -143,26 +131,24 @@ void ui_menu_game_options::handle()
             {
                 if (menu_event->iptkey == IPT_UI_LEFT && current_category->prev != NULL)
                 {
-                    machine().inifile().setcategory(-1);
+					inifile_manager::current_category--;
                     changed = true;
                 }
 
                 else if (menu_event->iptkey == IPT_UI_RIGHT && current_category->next != NULL)
                 {
-                    machine().inifile().setcategory(1);
+					inifile_manager::current_category++;
                     changed = true;
                 }
 
                 else if (menu_event->iptkey == IPT_UI_SELECT)
                 {
-                    int total = machine().inifile().category_total();
+                    int total = inifile_manager::ini_index[inifile_manager::current_file].category.size();
                     std::string s_sel[total + 1];
-                    int index = 0;
+                    for (int index = 0; index < total; ++index)
+                        s_sel[index].assign(inifile_manager::ini_index[inifile_manager::current_file].category[index].name);
 
-                    for (IniCategoryIndex *tmp = machine().inifile().getfirstcategory(); tmp != NULL; tmp = tmp->next)
-                        s_sel[index++].assign(tmp->name);
-
-                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &actual_category, total, SELECTOR_CATEGORY)));
+                    ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &inifile_manager::current_category, SELECTOR_CATEGORY)));
                 }
                 break;
             }
@@ -259,7 +245,7 @@ void ui_menu_game_options::populate()
     // add category subitem
     if (mewui_globals::actual_filter == FILTER_CATEGORY && !inifile_manager::ini_index.empty())
     {
-        actual_file = machine().inifile().getcurfile();
+        int actual_file = inifile_manager::current_file;
 
         if (inifile_manager::ini_index.size() == 1)
             arrow_flags = 0;
@@ -267,14 +253,14 @@ void ui_menu_game_options::populate()
             arrow_flags = get_arrow_flags(0, inifile_manager::ini_index.size() - 1, actual_file);
 
         convert_command_glyph(fbuff);
-        item_append(fbuff.c_str(), inifile_manager::ini_index[actual_file].file_name, arrow_flags, (void *)FILE_CATEGORY_FILTER);
+        item_append(fbuff.c_str(), inifile_manager::ini_index[actual_file].name, arrow_flags, (void *)FILE_CATEGORY_FILTER);
 
-        actual_category = machine().inifile().getcurcategory();
+        int actual_category = inifile_manager::current_category;
 
         if (inifile_manager::ini_index[actual_file].category.size() == 1)
             arrow_flags = 0;
         else
-            arrow_flags = get_arrow_flags(0, inifile_manager::ini_index[current].category.size() - 1, actual_category);
+            arrow_flags = get_arrow_flags(0, inifile_manager::ini_index[actual_file].category.size() - 1, actual_category);
 
         fbuff.assign(" ^!Category");
         convert_command_glyph(fbuff);

@@ -26,7 +26,7 @@ struct IniCategoryIndex
 // ini file structure
 struct IniFileIndex
 {
-    std::string file_name;
+    std::string name;
     std::vector<IniCategoryIndex> category;
 };
 
@@ -43,8 +43,8 @@ public:
 
     // getters
     running_machine &machine() const { return m_machine; }
-	int getcurfile() { return current_file; }
-	int getcurcategory() { return current_category; }
+//	int getcurfile() { return current_file; }
+//	int getcurcategory() { return current_category; }
 //    IniCategoryIndex *getcategory() { return current_file_idx->current_category; }
 //    IniCategoryIndex *getfirstcategory() { return current_file_idx->first_category; }
 //    IniFileIndex *getfirstfile() { return first_file_idx; }
@@ -56,14 +56,15 @@ public:
 //    int getcategoryindex();
 
     // setters
-    void setcategory(int direction, int index = -1);
-    void setfile(int direction, int index = -1);
+//    void setcategory(int direction, int index = -1);
+//    void setfile(int direction, int index = -1) {
 
     // load games from category
     void load_ini_category(std::vector<int> &temp_filter);
 
     // files indices
     static std::vector<IniFileIndex> ini_index;
+    static int      current_file, current_category;
 
 private:
 
@@ -75,11 +76,10 @@ private:
 
     // file open/close
     bool ParseOpen(const char *filename);
-    void ParseClose();
 
     // internal state
     running_machine &m_machine;     // reference to our machine
-    static int      current_file, current_category;
+//    static int      current_file, current_category;
     std::string		fullpath;
 };
 
@@ -127,7 +127,6 @@ private:
 
     // file open/close
     bool parseOpen(const char *filename);
-    void parseClose();
 
     // internal state
     running_machine &m_machine;     // reference to our machine

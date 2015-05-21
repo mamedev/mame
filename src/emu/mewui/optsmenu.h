@@ -23,7 +23,6 @@ public:
     virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-    UINT16  actual_category, actual_file;
     bool    m_grouped;
     bool    m_audit;
 

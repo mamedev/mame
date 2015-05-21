@@ -730,9 +730,12 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 
     if (mewui_globals::actual_filter == FILTER_CATEGORY && !inifile_manager::ini_index.empty())
     {
-        IniFileIndex *category_file = machine().inifile().getfile();
-        IniCategoryIndex *category = machine().inifile().getcategory();
-        filtered.assign(mewui_globals::filter_text[mewui_globals::actual_filter]).append(" (").append(category_file->file_name).append(" - ").append(category->name).append(") -");
+        int c_file = inifile_manager::current_file;
+        int c_cat = inifile_manager::current_category;
+        std::string s_file = inifile_manager::ini_index[c_file].name;
+        std::string s_category = inifile_manager::ini_index[c_file].category[c_cat].name;
+        filtered.assign(mewui_globals::filter_text[mewui_globals::actual_filter]).append(" (").append(s_file)
+						.append(" - ").append(s_category).append(") -");
     }
 
     else if (mewui_globals::actual_filter == FILTER_MANUFACTURER)

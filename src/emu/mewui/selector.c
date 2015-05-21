@@ -16,20 +16,6 @@
 //  ctor / dtor
 //-------------------------------------------------
 
-ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::string *s_sel, UINT16 *s_actual, int total, int category, int _hover) : ui_menu(machine, container)
-{
-    p_category = category;
-    selector = s_actual;
-    first_pass = true;
-    hover = _hover;
-
-    str_items.resize(total);
-
-    for (int index = 0; index < total; index++)
-        str_items[index].assign(s_sel[index]);
-}
-
-
 ui_menu_selector::ui_menu_selector(running_machine &machine, render_container *container, std::vector<std::string> s_sel, UINT16 *s_actual, int category, int _hover) : ui_menu(machine, container)
 {
     p_category = category;
@@ -63,12 +49,13 @@ void ui_menu_selector::handle()
             switch (p_category)
             {
                 case SELECTOR_INIFILE:
-                    machine().inifile().setfile(0, *selector);
+                    inifile_manager::current_file = *selector;
+                    inifile_manager::current_category = 0;
                     ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
                     break;
 
                 case SELECTOR_CATEGORY:
-                    machine().inifile().setcategory(0, *selector);
+                    inifile_manager::current_category = *selector;
                     ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
                     break;
 
