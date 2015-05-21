@@ -23627,7 +23627,17 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-
+	<software name="4B-001_Color">
+		<description>Sachen 4B-001</description>
+		<year>20??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="524288">
+				<rom name="4B-001.gbc" size="524288" crc="42A2FDF8" sha1="79A4FADDFD1ACA397E56D7895E45B1BC12900DAB" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- GOWIN games -->
 <!--
