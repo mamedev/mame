@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Phil Bennett, Andrew Gardner
 #ifndef NAMCO62_H
 #define NAMCO62_H
 

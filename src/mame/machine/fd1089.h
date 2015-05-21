@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Andreas Naive, Charles MacDonald
 /***************************************************************************
 
     Hitachi FD1089A/FD1089B encryption emulation

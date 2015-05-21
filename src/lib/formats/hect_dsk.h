@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:JJ Stacino
 /*********************************************************************
 
     formats/hect_dsk.h

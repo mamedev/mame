@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:R. Belmont, Andrew Gardner
 #include "machine/eepromser.h"
 #include "video/k053936.h"

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sean Young
 #include <assert.h>
 
 #include "svi_cas.h"

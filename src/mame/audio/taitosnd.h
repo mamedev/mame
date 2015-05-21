@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Phil Bennett
 #ifndef __TAITOSND_H__
 #define __TAITOSND_H__
 

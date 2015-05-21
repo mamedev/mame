@@ -2141,9 +2141,7 @@ files {
 	MAME_DIR .. "src/mame/video/neogeo.c",
 	MAME_DIR .. "src/mame/drivers/neogeo_noslot.c",
 	MAME_DIR .. "src/mame/video/neogeo_spr.c",
-	MAME_DIR .. "src/mame/machine/neoboot.c",
 	MAME_DIR .. "src/mame/machine/neocrypt.c",
-	MAME_DIR .. "src/mame/machine/neoprot.c",
 	MAME_DIR .. "src/mame/machine/ng_memcard.c",
 }
 

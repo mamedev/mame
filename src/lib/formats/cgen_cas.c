@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /********************************************************************
 
 Support for EACA Colour Genie .cas cassette images

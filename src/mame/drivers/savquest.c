@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:R. Belmont, Peter Ferrie
 /***************************************************************************
 
@@ -428,9 +428,9 @@ WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
 
 static const UINT8 m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d}; /* 0x9d or 0x9e */
 static const UINT8 m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x53, 0x4e, 0x53, 0x49, 0x53, 0x48, 0x53, 0x4b, 0x53, 0x4a,
-					0x53, 0x43, 0x53, 0x45, 0x52, 0x46, 0x53, 0x43, 0x53, 0x41, 0xac, 0x40, 0x53, 0xbc, 0x53, 0x42,
-					0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
-				       };
+                                        0x53, 0x43, 0x53, 0x45, 0x52, 0x46, 0x53, 0x43, 0x53, 0x41, 0xac, 0x40, 0x53, 0xbc, 0x53, 0x42,
+                                        0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
+                                       };
 
 READ8_MEMBER(savquest_state::parallel_port_r)
 {
@@ -443,32 +443,32 @@ READ8_MEMBER(savquest_state::parallel_port_r)
 			/* passmode 3 is used to retrieve the product(s) information
 			   it comes in two parts: header and product
 			   the header has this format:
-				offset	range		purpose
-				00	01		header type
-				01	01-05		count of used product slots, must be 2
-				02	01-05		count of unused product slots
-							this is assumed to be 6-(count of used slots)
-							but it is not enforced here
-							however a total of 6 structures will be checked
-				03	01-02		unknown
-				04	01-46		country code
-				05-0f	00		reserved
-			   the used product slots have this format:
-			   (the unused product slots must be entirely zeroes)
-				00-01	0001-000a	product ID, one must be 6, the other 0a
-				02	0001-0003	unknown but must be 0001
-				04	01-05		HASP plug country ID
-				05	01-02		unknown but must be 01
-				06	05		unknown
-				07-0a	any		unknown, not used
-				0b	ff		unknown
-				0c	ff		unknown
-				0d-0f	00		reserved
+               offset  range      purpose
+               00      01         header type
+               01      01-05      count of used product slots, must be 2
+               02      01-05      count of unused product slots
+                                  this is assumed to be 6-(count of used slots)
+                                  but it is not enforced here
+                                  however a total of 6 structures will be checked
+               03      01-02      unknown
+               04      01-46      country code
+               05-0f   00         reserved
+               the used product slots have this format:
+               (the unused product slots must be entirely zeroes)
+               00-01   0001-000a  product ID, one must be 6, the other 0a
+               02      0001-0003  unknown but must be 0001
+               04      01-05      HASP plug country ID
+               05      01-02      unknown but must be 01
+               06      05         unknown
+               07-0a   any        unknown, not used
+               0b      ff         unknown
+               0c      ff         unknown
+               0d-0f   00         reserved
 
-			  the read is performed by accessing an array of 16-bit big-endian values
-			  and returning one bit at a time into bit 5 of the result
-			  the 16-bit value is then XORed with 0x534d and the register index
-			*/
+               the read is performed by accessing an array of 16-bit big-endian values
+               and returning one bit at a time into bit 5 of the result
+               the 16-bit value is then XORed with 0x534d and the register index
+            */
 
 			if (m_hasp_prodind <= (sizeof(m_hasp_prodinfo) * 8))
 			{
@@ -728,9 +728,10 @@ WRITE8_MEMBER(savquest_state::smram_w)
 }
 
 static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
+    ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8(smram_r,smram_w,0xffffffff) //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
+	AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_f0000") AM_WRITE(bios_f0000_ram_w)
 	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_e0000") AM_WRITE(bios_e0000_ram_w)
 	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_e4000") AM_WRITE(bios_e4000_ram_w)

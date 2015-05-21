@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Takahiro Nogi
 /******************************************************************************
 
     Machine Hardware for Nichibutsu Mahjong series.

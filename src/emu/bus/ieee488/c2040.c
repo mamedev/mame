@@ -188,9 +188,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c2040_fdc_mem, AS_PROGRAM, 8, c2040_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
-	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6530_TAG, mos6530_device, read, write)
+	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_DEVICE(M6530_TAG, mos6530_t, ram_map)
+	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVICE(M6522_TAG, via6522_device, map)
+	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVICE(M6530_TAG, mos6530_t, io_map)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -405,69 +405,6 @@ WRITE8_MEMBER( c2040_device::via_pb_w )
 
 
 //-------------------------------------------------
-//  mos6530 uk3
-//-------------------------------------------------
-
-READ8_MEMBER( c2040_device::miot_pb_r )
-{
-	/*
-
-	    bit     description
-
-	    PB0
-	    PB1
-	    PB2
-	    PB3     WPS
-	    PB4
-	    PB5
-	    PB6     SYNC
-	    PB7
-
-	*/
-
-	UINT8 data = 0;
-
-	// write protect sense
-	data |= m_fdc->wps_r() << 3;
-
-	// SYNC detected
-	data |= m_fdc->sync_r() << 6;
-
-	return data;
-}
-
-WRITE8_MEMBER( c2040_device::miot_pb_w )
-{
-	/*
-
-	    bit     description
-
-	    PB0     DRV SEL
-	    PB1     DS0
-	    PB2     DS1
-	    PB3
-	    PB4
-	    PB5
-	    PB6
-	    PB7     M6504 IRQ
-
-	*/
-
-	// drive select
-	m_fdc->drv_sel_w(BIT(data, 0));
-
-	// density select
-	m_fdc->ds_w((data >> 1) & 0x03);
-
-	// interrupt
-	if (m_miot_irq != BIT(data, 7))
-	{
-		m_fdccpu->set_input_line(M6502_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
-		m_miot_irq = BIT(data, 7);
-	}
-}
-
-//-------------------------------------------------
 //  SLOT_INTERFACE( c2040_floppies )
 //-------------------------------------------------
 
@@ -536,12 +473,16 @@ static MACHINE_CONFIG_FRAGMENT( c2040 )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, mode_sel_w))
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, rw_sel_w))
 
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530, XTAL_16MHz/16)
-	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
-	MCFG_MOS6530_IN_PB_CB(READ8(c2040_device, miot_pb_r))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(c2040_device, miot_pb_w))
+	MCFG_DEVICE_ADD(M6530_TAG, MOS6530n, XTAL_16MHz/16)
+	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
+	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, drv_sel_w))
+	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds0_w))
+	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds1_w))
+	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
+	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_t, wps_r))
 
 	MCFG_DEVICE_ADD(FDC_TAG, C2040_FDC, XTAL_16MHz)
+	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_t, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
@@ -590,12 +531,16 @@ static MACHINE_CONFIG_FRAGMENT( c3040 )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, mode_sel_w))
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, rw_sel_w))
 
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530, XTAL_16MHz/16)
-	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
-	MCFG_MOS6530_IN_PB_CB(READ8(c2040_device, miot_pb_r))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(c2040_device, miot_pb_w))
+	MCFG_DEVICE_ADD(M6530_TAG, MOS6530n, XTAL_16MHz/16)
+	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
+	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, drv_sel_w))
+	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds0_w))
+	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds1_w))
+	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_t, wps_r))
+	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(FDC_TAG, C2040_FDC, XTAL_16MHz)
+	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_t, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
@@ -644,12 +589,16 @@ static MACHINE_CONFIG_FRAGMENT( c4040 )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, mode_sel_w))
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, rw_sel_w))
 
-	MCFG_DEVICE_ADD(M6530_TAG, MOS6530, XTAL_16MHz/16)
-	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
-	MCFG_MOS6530_IN_PB_CB(READ8(c2040_device, miot_pb_r))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(c2040_device, miot_pb_w))
+	MCFG_DEVICE_ADD(M6530_TAG, MOS6530n, XTAL_16MHz/16)
+	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
+	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, drv_sel_w))
+	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds0_w))
+	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c2040_fdc_t, ds1_w))
+	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c2040_fdc_t, wps_r))
+	MCFG_MOS6530n_OUT_PB7_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(FDC_TAG, C2040_FDC, XTAL_16MHz)
+	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_t, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
@@ -741,8 +690,7 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 	m_address(*this, "ADDRESS"),
 	m_rfdo(1),
 	m_daco(1),
-	m_atna(1),
-	m_miot_irq(CLEAR_LINE)
+	m_atna(1)
 {
 }
 
@@ -762,8 +710,7 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 	m_address(*this, "ADDRESS"),
 	m_rfdo(1),
 	m_daco(1),
-	m_atna(1),
-	m_miot_irq(CLEAR_LINE)
+	m_atna(1)
 {
 }
 
@@ -797,7 +744,7 @@ void c2040_device::device_start()
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));
 	save_item(NAME(m_atna));
-	save_item(NAME(m_miot_irq));
+	save_item(NAME(m_ifc));
 }
 
 

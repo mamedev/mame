@@ -82,6 +82,8 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 	m_stp0(0),
 	m_stp1(0),
 	m_ds(0),
+	m_ds0(0),
+	m_ds1(0),
 	m_drv_sel(0),
 	m_mode_sel(0),
 	m_rw_sel(0),
@@ -116,6 +118,8 @@ void c2040_fdc_t::device_start()
 	save_item(NAME(m_stp0));
 	save_item(NAME(m_stp1));
 	save_item(NAME(m_ds));
+	save_item(NAME(m_ds0));
+	save_item(NAME(m_ds1));
 	save_item(NAME(m_drv_sel));
 	save_item(NAME(m_mode_sel));
 	save_item(NAME(m_rw_sel));
@@ -449,6 +453,18 @@ WRITE8_MEMBER( c2040_fdc_t::write )
 		if (LOG) logerror("%s %s PI %02x\n", machine().time().as_string(), machine().describe_context(), data);
 		live_run();
 	}
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::ds0_w )
+{
+	m_ds0 = state;
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::ds1_w )
+{
+	m_ds1 = state;
+
+	ds_w(m_ds1 << 1 | m_ds0);
 }
 
 WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )

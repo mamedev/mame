@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __GENERIC_ROM_H
 #define __GENERIC_ROM_H
 

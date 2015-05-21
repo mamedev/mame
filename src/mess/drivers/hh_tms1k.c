@@ -18,17 +18,18 @@
  @MP0923   TMS1000   1979, Entex Baseball 2
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
- @MP1204   TMS1100   1980, Entex Baseball 3
+ @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
+ *MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1221   TMS1100   1980, Entex Raise The Devil
  *MP1296   TMS1100?  1982, Entex Black Knight
  *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
- *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000
+ *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000 (? note: VFD-capable)
  @MP2105   TMS1370   1979, Gakken Poker
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
  *MP2726   TMS1040   1979, Tomy Break Up
- *MP2788   ?         1980, Bandai Flight Time (? note: VFD-capable)
+ *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
@@ -65,7 +66,8 @@
   MP7332   TMS1400   1981, Milton Bradley Dark Tower -> mbdtower.c
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400CR 1982, Parker Brothers Master Merlin
- *MP7573   ?         1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
+ *MP7551   TMS1670   1980, Entex Color Football 4 (6009)
+ *MP7573   TMS1670?  1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
 
   inconsistent:
 
@@ -3837,7 +3839,7 @@ ROM_END
 
 ROM_START( ebball3 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp1204", 0x0000, 0x0800, CRC(987a29ba) SHA1(9481ae244152187d85349d1a08e439e798182938) )
+	ROM_LOAD( "6007_mp1204", 0x0000, 0x0800, CRC(987a29ba) SHA1(9481ae244152187d85349d1a08e439e798182938) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_ebball3_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )

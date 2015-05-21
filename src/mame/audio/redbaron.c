@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Brad Oliver, Nicola Salmoria
 /*************************************************************************
 
     Atari Red Baron sound hardware

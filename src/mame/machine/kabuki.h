@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "emu.h"
 
 void mgakuen2_decode(running_machine &machine);
