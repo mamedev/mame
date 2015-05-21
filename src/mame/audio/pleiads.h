@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 #include "sound/tms36xx.h"
 
 struct pl_t_state

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ElSemi
 /* IGS 027 Encryptions */
 
 void pgm_kov_decrypt(running_machine &machine);

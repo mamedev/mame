@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Alex Jackson
 /*
 Mitsubishi M37702 MCUs with Namco custom labels.
 

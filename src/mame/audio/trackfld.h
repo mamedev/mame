@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Chris Hardy
 #include "sound/vlm5030.h"
 #include "cpu/m6800/m6800.h"
 

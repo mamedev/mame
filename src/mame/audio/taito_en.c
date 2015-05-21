@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Graves
 /***************************************************************************
 
     Taito Ensoniq ES5505-based sound hardware

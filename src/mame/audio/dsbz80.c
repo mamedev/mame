@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Olivier Galibert
 /***************************************************************************
 
   Sega Z80 Digital Sound Board

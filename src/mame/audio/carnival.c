@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Peter J.C.Clare
 /*****************************************************************************/
 /*                                                                           */
 /*                    (C) Copyright       Peter J.C.Clare                    */

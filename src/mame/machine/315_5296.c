@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:hap
 /**********************************************************************
 
     Sega 315-5296 I/O chip

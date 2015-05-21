@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "segabb.h"
 
 const device_type SEGA_LINDBERGH_BASEBOARD = &device_creator<sega_lindbergh_baseboard_device>;

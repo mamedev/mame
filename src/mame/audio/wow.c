@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Coates
 /**************************************************************************
 
     WOW/Votrax SC-01 Emulator

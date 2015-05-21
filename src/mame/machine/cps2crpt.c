@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Leaman, Andreas Naive, Nicola Salmoria
 /******************************************************************************
 
 CPS-2 Encryption

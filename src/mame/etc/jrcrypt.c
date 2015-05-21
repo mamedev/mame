@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Caldwell
 /***************************************************************************
 
   jrcrypt.c
