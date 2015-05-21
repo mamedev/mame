@@ -12,12 +12,8 @@
 #define __DATFILE_H__
 
 //-------------------------------------------------
-//  CONSTANTS AND STRUCTURES
+//  STRUCTURES
 //-------------------------------------------------
-#define MAX_TOKEN_LENGTH        65535
-#define DATAFILE_TAG '$'
-#define MAX_MENUIDX_ENTRIES 64
-
 struct tDatafileIndex
 {
     long offset;
@@ -68,13 +64,6 @@ public:
     bool sysinfo_file() const { return m_sysinfo_file; }
     bool story_file() const { return m_story_file; }
 
-    tDatafileIndex *historyindex() { return hist_idx; }
-    tDatafileIndex *mameindex() { return mame_idx; }
-    tDatafileIndex *messindex() { return mess_idx; }
-    tDatafileIndex *cmdindex() { return cmnd_idx; }
-    tDatafileIndex *sysindex() { return sysi_idx; }
-    tDatafileIndex *storyindex() { return story_idx; }
-
     // actions
     void load_data_info(const game_driver *drv, std::string &buffer, int hm_type);
     void load_command_info(std::string &buffer, const int menu_sel);
@@ -114,7 +103,6 @@ private:
     void load_data_text(const game_driver *drv, std::string &buffer, std::vector<tDatafileIndex> &idx, const char *tag);
     void load_driver_text(const game_driver *drv, std::string &buffer, std::vector<sDataDrvIndex> &idx, const char *tag);
 
-    bool find_command(const game_driver *drv);
     int find_or_allocate(std::string name);
 
     // internal state

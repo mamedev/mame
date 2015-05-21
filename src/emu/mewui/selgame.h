@@ -37,8 +37,9 @@ private:
 	std::vector<const game_driver *> m_unavailsortedlist;
 	std::vector<const game_driver *> m_unavailablelist;
 	std::vector<const game_driver *> m_displaylist;
-	std::vector<const game_driver *> m_searchlist;
 	std::vector<const game_driver *> m_tmp;
+
+	const game_driver **m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 
 	// internal methods
 	void build_custom();

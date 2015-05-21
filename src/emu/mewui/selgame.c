@@ -1411,10 +1411,9 @@ void ui_mewui_select_game::populate_search()
 {
     // allocate memory to track the penalty value
     std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
-	const game_driver *tmp = NULL;
-	std::fill(m_searchlist.begin(), m_searchlist.end(), tmp);
 
-    for (int index = 0; index < m_displaylist.size(); index++)
+	int index = 0
+    for (; index < m_displaylist.size(); ++index)
     {
         // pick the best match between driver name and description
         int curpenalty = driver_list::penalty_compare(m_search, m_displaylist[index]->description);
@@ -1440,9 +1439,11 @@ void ui_mewui_select_game::populate_search()
         }
     }
 
+	(index < VISIBLE_GAMES_IN_SEARCH) ? searchlist[index] = NULL : searchlist[VISIBLE_GAMES_IN_SEARCH] = NULL;
+
     UINT32 flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
-    for (int curitem = 0; curitem < m_searchlist.size() && m_searchlist[curitem]; curitem++)
+    for (int curitem = 0; m_searchlist[curitem]; curitem++)
     {
         bool cloneof = strcmp(m_searchlist[curitem]->parent, "0");
 

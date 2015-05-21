@@ -71,7 +71,7 @@ void inifile_manager::directory_scan()
 				{
 					IniFileIndex tfile;
 					tfile.name.assign(file_name);
-					tfile.category.push_back(tmp);
+					tfile.category = tmp;
 					ini_index.push_back(tfile);
                 }
             }

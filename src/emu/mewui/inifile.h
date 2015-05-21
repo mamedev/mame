@@ -43,21 +43,6 @@ public:
 
     // getters
     running_machine &machine() const { return m_machine; }
-//	int getcurfile() { return current_file; }
-//	int getcurcategory() { return current_category; }
-//    IniCategoryIndex *getcategory() { return current_file_idx->current_category; }
-//    IniCategoryIndex *getfirstcategory() { return current_file_idx->first_category; }
-//    IniFileIndex *getfirstfile() { return first_file_idx; }
-//    IniFileIndex *getlastfile() { return last_file_idx; }
-//    int category_total() const { return current_file_idx->category_number; }
-//    int files_total() const { return file_total; }
-//    bool has_files() const { return (file_total > 0); }
-//    int getfileindex();
-//    int getcategoryindex();
-
-    // setters
-//    void setcategory(int direction, int index = -1);
-//    void setfile(int direction, int index = -1) {
 
     // load games from category
     void load_ini_category(std::vector<int> &temp_filter);
@@ -79,7 +64,6 @@ private:
 
     // internal state
     running_machine &m_machine;     // reference to our machine
-//    static int      current_file, current_category;
     std::string		fullpath;
 };
 
@@ -131,7 +115,6 @@ private:
     // internal state
     running_machine &m_machine;     // reference to our machine
 	std::string 	fullpath;
-
 };
 
 #endif  /* __INIFILE_H__ */
