@@ -770,6 +770,7 @@ void ui_menu_rgb_ui::populate()
     // set filter arrow
     UINT32 arrow_flags = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
     std::string text;
+    std::string s_text(m_search);
 
     if (lock_ref != RGB_ALPHA)
     {
@@ -777,12 +778,8 @@ void ui_menu_rgb_ui::populate()
         strprintf(text, "%3d", color->a());
         item_append("Alpha", text.c_str(), arrow_flags, (void *)RGB_ALPHA);
     }
-
     else
-    {
-        text.assign(search).append("_");
-        item_append("Alpha", text.c_str(), 0, (void *)RGB_ALPHA);
-    }
+        item_append("Alpha", s_text.c_str(), 0, (void *)RGB_ALPHA);
 
     if (lock_ref != RGB_RED)
     {
@@ -790,12 +787,8 @@ void ui_menu_rgb_ui::populate()
         strprintf(text, "%3d", color->r());
         item_append("Red", text.c_str(), arrow_flags, (void *)RGB_RED);
     }
-
     else
-    {
-        text.assign(search).append("_");
-        item_append("Red", text.c_str(), 0, (void *)RGB_RED);
-    }
+        item_append("Red", s_text.c_str(), 0, (void *)RGB_RED);
 
     if (lock_ref != RGB_GREEN)
     {
@@ -803,12 +796,8 @@ void ui_menu_rgb_ui::populate()
         strprintf(text, "%3d", color->g());
         item_append("Green", text.c_str(), arrow_flags, (void *)RGB_GREEN);
     }
-
     else
-    {
-        text.assign(search).append("_");
-        item_append("Green", text.c_str(), 0, (void *)RGB_GREEN);
-    }
+        item_append("Green", s_text.c_str(), 0, (void *)RGB_GREEN);
 
     if (lock_ref != RGB_BLUE)
     {
@@ -816,12 +805,8 @@ void ui_menu_rgb_ui::populate()
         strprintf(text, "%3d", color->b());
         item_append("Blue", text.c_str(), arrow_flags, (void *)RGB_BLUE);
     }
-
     else
-    {
-        text.assign(search).append("_");
-        item_append("Blue", text.c_str(), 0, (void *)RGB_BLUE);
-    }
+        item_append("Blue", s_text.c_str(), 0, (void *)RGB_BLUE);
 
     item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
@@ -913,7 +898,7 @@ void ui_menu_rgb_ui::inkey_special(const ui_menu_event *menu_event)
 
         if (!key_active)
         {
-            int val = atoi(search);
+            int val = atoi(m_search);
             val = color->clamp(val);
 
             switch ((FPTR)menu_event->itemref)
@@ -935,7 +920,7 @@ void ui_menu_rgb_ui::inkey_special(const ui_menu_event *menu_event)
                     break;
             }
 
-            search[0] = 0;
+            m_search[0] = 0;
             lock_ref = 0;
             return;
         }
@@ -943,23 +928,22 @@ void ui_menu_rgb_ui::inkey_special(const ui_menu_event *menu_event)
 
     if (!key_active)
     {
-        search[0] = 0;
+        m_search[0] = 0;
         return;
     }
 
-    int buflen = strlen(search);
+    int buflen = strlen(m_search);
 
     // if it's a backspace and we can handle it, do so
     if (((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0))
-        *(char *)utf8_previous_char(&search[buflen]) = 0;
-
+        *(char *)utf8_previous_char(&m_search[buflen]) = 0;
 
     else if (buflen >= 3)
         return;
 
     // if it's any other key and we're not maxed out, update
     else if ((menu_event->unichar >= '0' && menu_event->unichar <= '9'))
-        buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
+        buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
 
-    search[buflen] = 0;
+    m_search[buflen] = 0;
 }

@@ -93,28 +93,28 @@ void ui_menu_selector::handle()
 
         else if (menu_event->iptkey == IPT_SPECIAL)
         {
-            int buflen = strlen(search);
+            int buflen = strlen(m_search);
 
             // if it's a backspace and we can handle it, do so
             if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
             {
-                *(char *)utf8_previous_char(&search[buflen]) = 0;
+                *(char *)utf8_previous_char(&m_search[buflen]) = 0;
                 reset(UI_MENU_RESET_SELECT_FIRST);
             }
 
             // if it's any other key and we're not maxed out, update
             else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
             {
-                buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
-                search[buflen] = 0;
+                buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
+                m_search[buflen] = 0;
                 reset(UI_MENU_RESET_SELECT_FIRST);
             }
         }
 
         // escape pressed with non-empty text clears the text
-        else if (menu_event->iptkey == IPT_UI_CANCEL && search[0] != 0)
+        else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
         {
-            search[0] = '\0';
+            m_search[0] = '\0';
             reset(UI_MENU_RESET_SELECT_FIRST);
         }
     }
@@ -126,9 +126,9 @@ void ui_menu_selector::handle()
 
 void ui_menu_selector::populate()
 {
-    if (search[0] != 0)
+    if (m_search[0] != 0)
     {
-        find_matches(search, VISIBLE_GAMES_IN_SEARCH);
+        find_matches(m_search);
 
         for (int curitem = 0; searchlist[curitem]; curitem++)
             item_append(searchlist[curitem]->c_str(), NULL, 0, (void *)searchlist[curitem]);
@@ -159,7 +159,7 @@ void ui_menu_selector::populate()
 void ui_menu_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
     float x1, x2, y1, y2, width, maxwidth;
-    std::string tempbuf = std::string("Selection List - Search: ").append(search).append("_");
+    std::string tempbuf = std::string("Selection List - Search: ").append(m_search).append("_");
 
     // get the size of the text
     machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
@@ -219,10 +219,10 @@ void ui_menu_selector::custom_render(void *selectedref, float top, float bottom,
 //  find approximate matches
 //-------------------------------------------------
 
-void ui_menu_selector::find_matches(const char *str, int count)
+void ui_menu_selector::find_matches(const char *str)
 {
     // allocate memory to track the penalty value
-    std::vector<int> penalty(count, 9999);
+    std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
     int index = 0;
 
     for (; index < str_items.size(); index++)
@@ -236,24 +236,23 @@ void ui_menu_selector::find_matches(const char *str, int count)
         curpenalty = MIN(curpenalty, tmp);
 
         // insert into the sorted table of matches
-        for (int matchnum = count - 1; matchnum >= 0; matchnum--)
+        for (int matchnum = VISIBLE_GAMES_IN_SEARCH - 1; matchnum >= 0; matchnum--)
         {
             // stop if we're worse than the current entry
             if (curpenalty >= penalty[matchnum])
                 break;
 
             // as long as this isn't the last entry, bump this one down
-            if (matchnum < count - 1)
+            if (matchnum < VISIBLE_GAMES_IN_SEARCH - 1)
             {
                 penalty[matchnum + 1] = penalty[matchnum];
                 searchlist[matchnum + 1] = searchlist[matchnum];
             }
 
-            //searchlist[matchnum].assign(str_items[index].c_str());
             searchlist[matchnum] = &str_items[index];
             penalty[matchnum] = curpenalty;
         }
     }
-    (index < count) ? searchlist[index] = NULL : searchlist[count] = NULL;
+    (index < VISIBLE_GAMES_IN_SEARCH) ? searchlist[index] = NULL : searchlist[VISIBLE_GAMES_IN_SEARCH] = NULL;
 }
 

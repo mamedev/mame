@@ -148,8 +148,8 @@ void ui_menu::draw_select_game()
     if (machine().options().use_background_image() && bgrnd_bitmap->valid())
         container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
-    hover = numitems + 1;
-    visible_items = (is_swlist) ? numitems - 2 : numitems - 4;
+    hover = item.size() + 1;
+    visible_items = (is_swlist) ? item.size() - 2 : item.size() - 4;
     extra_height = (is_swlist) ? 2.0f * line_height : 4.0f * line_height;
     visible_extra_menu_height = customtop + custombottom + extra_height;
 
@@ -246,14 +246,14 @@ void ui_menu::draw_select_game()
         // if we have some background hilighting to do, add a quad behind everything else
         if (bgcolor != UI_TEXT_BG_COLOR)
             machine().ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1,
-                                                                            bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture,
-                                                                            PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+                                             bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture,
+                                             PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
         // if we're on the top line, display the up arrow
         if (linenum == 0 && top_line != 0)
         {
             draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-                                0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
+                       0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
 
             if (hover == itemnum)
                 hover = -2;
@@ -263,7 +263,7 @@ void ui_menu::draw_select_game()
         else if (linenum == visible_lines - 1 && itemnum != visible_items - 1)
         {
             draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-                                0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
+                       0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 
             if (hover == itemnum)
                 hover = -1;
@@ -272,7 +272,7 @@ void ui_menu::draw_select_game()
         // if we're just a divider, draw a line
         else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
             container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height,
-                                                    UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+                                UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
         // draw the item centered
         else if (pitem.subtext == NULL)
@@ -285,20 +285,20 @@ void ui_menu::draw_select_game()
                 if (is_favorites)
                 {
                     ui_software_info *soft = (ui_software_info *)item[itemnum].ref;
-                    if (soft->startempty == 1)
+					if (soft->startempty == 1)
                         draw_icon(container, linenum, (void *)soft->driver, effective_left, line_y);
                 }
 
-                else
-                    draw_icon(container, linenum, item[itemnum].ref, effective_left, line_y);
+					else
+						draw_icon(container, linenum, item[itemnum].ref, effective_left, line_y);
 
                 space = machine().ui().get_line_height() * container->manager().ui_aspect() * 1.5f;
 
             }
 
             machine().ui().draw_text_full(container, itemtext, effective_left + space, line_y, effective_width - space,
-                                                                        JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor,
-                                                                        bgcolor, NULL, NULL);
+                                          JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor,
+                                          bgcolor, NULL, NULL);
         }
 
         else
@@ -309,20 +309,20 @@ void ui_menu::draw_select_game()
 
             // compute right space for subitem
             machine().ui().draw_text_full(container, subitem_text, effective_left, line_y, machine().ui().get_string_width(pitem.subtext),
-                                                                        JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, NULL);
+                                          JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, NULL);
             subitem_width += gutter_width;
 
             // draw the item left-justified
             machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width - subitem_width,
-                                                                        JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, NULL);
+                                          JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, NULL);
 
             // draw the subitem right-justified
             machine().ui().draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-                                                                        JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, NULL, NULL);
+                                          JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, NULL, NULL);
         }
     }
 
-    for (int count = visible_items; count < numitems; count++)
+    for (int count = visible_items; count < item.size(); count++)
     {
         const ui_menu_item &pitem = item[count];
         const char *itemtext = pitem.text;
@@ -353,14 +353,14 @@ void ui_menu::draw_select_game()
         // if we have some background hilighting to do, add a quad behind everything else
         if (bgcolor != UI_TEXT_BG_COLOR)
             machine().ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
-                                                                            hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+                                             hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
         if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
             container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
-                                                    UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+                                UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
         else
             machine().ui().draw_text_full(container, itemtext, effective_left, line, effective_width,
-                                                                        JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+                                          JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 
         line += line_height;
     }
@@ -372,15 +372,15 @@ void ui_menu::draw_select_game()
     float origy1 = draw_right_box_title(x1, y1, x2, y2);
 
     if (mewui_globals::rpanel_infos == RP_IMAGES)
-        arts_render((selected >= 0 && selected < numitems) ? item[selected].ref : NULL, x1, origy1, x2, y2, (is_swlist || is_favorites));
+        arts_render((selected >= 0 && selected < item.size()) ? item[selected].ref : NULL, x1, origy1, x2, y2, (is_swlist || is_favorites));
     else
-        infos_render((selected >= 0 && selected < numitems) ? item[selected].ref : NULL, x1, origy1, x2, y2, (is_swlist || is_favorites));
+        infos_render((selected >= 0 && selected < item.size()) ? item[selected].ref : NULL, x1, origy1, x2, y2, (is_swlist || is_favorites));
 
     x1 = primary_left - UI_BOX_LR_BORDER;
     x2 = primary_left + primary_width + UI_BOX_LR_BORDER;
 
     // if there is something special to add, do it by calling the virtual method
-    custom_render((selected >= 0 && selected < numitems) ? item[selected].ref : NULL, customtop, custombottom, x1, y1, x2, y2);
+    custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : NULL, customtop, custombottom, x1, y1, x2, y2);
 
     // return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
     visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != visible_items);
@@ -567,7 +567,7 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
             float y2 = origy2 - UI_BOX_TB_BORDER - line_height;
 
             // apply texture
-            container->add_quad( x1, y1, x2, y2, ARGB_WHITE, snapx_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+            container->add_quad(x1, y1, x2, y2, ARGB_WHITE, snapx_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
         }
     }
 }
@@ -607,13 +607,13 @@ void ui_menu::handle_main_keys(UINT32 flags)
     int ignoreleft = FALSE;
 
     // bail if no items
-    if (numitems == 0)
+    if (item.size() == 0)
         return;
 
     // if we hit select, return TRUE or pop the stack, depending on the item
     if (exclusive_input_pressed(IPT_UI_SELECT, 0))
     {
-        if (selected == numitems - 1)
+        if (selected == item.size() - 1)
         {
             menu_event.iptkey = IPT_UI_CANCEL;
             ui_menu::stack_pop(machine());
@@ -624,7 +624,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
     // hitting cancel also pops the stack
     if (exclusive_input_pressed(IPT_UI_CANCEL, 0))
     {
-        if (!have_search())
+        if (!menu_has_search_active())
             ui_menu::stack_pop(machine());
 //      else if (!ui_error)
 //          ui_menu::stack_pop(machine()); TODO
@@ -700,7 +700,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
             return;
         }
 
-        if (selected == numitems - 1 || selected == visible_items - 1 || ui_error)
+        if (selected == item.size() - 1 || selected == visible_items - 1 || ui_error)
             return;
 
         selected++;
@@ -816,7 +816,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 //  handle input events for main menu
 //-------------------------------------------------
 
-void ui_menu::handle_main_events()
+void ui_menu::handle_main_events(UINT32 flags)
 {
     int stop = false;
     ui_event local_menu_event;
@@ -835,92 +835,71 @@ void ui_menu::handle_main_events()
                     stop = true;
                 }
 
-                else if (hover >= 0 && hover < numitems)
-                    selected = hover;
-
-                // UP arrow
-                else if (hover == -2)
-                {
-                    selected -= visitems;
-
-                    if (selected < 0)
-                        selected = 0;
-
-                    top_line -= visitems - (top_line + visible_lines == visible_items);
-                }
-
-                // DOWN arrow
-                else if (hover == -1)
-                {
-                    selected += visible_lines - 2 + (selected == 0);
-
-                    if (selected >= visible_items)
-                        selected = visible_items - 1;
-
-                    top_line += visible_lines - 2;
-                }
-
-                // RIGHT arrow
-                else if (hover == -3)
-                    menu_event.iptkey = IPT_UI_RIGHT;
-
-                // LEFT arrow
-                else if (hover == -4)
-                    menu_event.iptkey = IPT_UI_LEFT;
-
-                // Infos view DOWN arrow
-                else if (hover == -5)
-                    topline_datsview += right_visible_lines - 1;
-
-                // Infos view UP arrow
-                else if (hover == -6)
-                    topline_datsview -= right_visible_lines - 1;
-
-                // Images / Infos
-                else if (r_hover >= RP_FIRST && r_hover <= RP_LAST)
-                {
-                    mewui_globals::rpanel_infos = r_hover;
-                    stop = true;
-                }
-
-                // Software filter
-                else if (l_sw_hover >= MEWUI_SW_FIRST && l_sw_hover <= MEWUI_SW_LAST)
-                {
-                    menu_event.iptkey = IPT_OTHER;
-                    stop = true;
-                }
-
-                // UME filter
-                else if (ume_hover >= MEWUI_MAME_FIRST && ume_hover <= MEWUI_MAME_LAST)
-                {
-                    mewui_globals::ume_system = ume_hover;
-                    menu_event.iptkey = IPT_OTHER;
-                    stop = true;
-                }
-
-                // Games filter
-                else if (l_hover >= FILTER_FIRST && l_hover <= FILTER_LAST)
-                {
-                    menu_event.iptkey = IPT_OTHER;
-                    stop = true;
-                }
-
+   				else if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+   				{
+					if (hover >= 0 && hover < item.size())
+						selected = hover;
+					else if (hover == -2)
+					{
+						selected -= visitems;
+						if (selected < 0)
+							selected = 0;
+						top_line -= visitems - (top_line + visible_lines == visible_items);
+					}
+					else if (hover == -1)
+					{
+						selected += visible_lines - 2 + (selected == 0);
+						if (selected >= visible_items)
+							selected = visible_items - 1;
+						top_line += visible_lines - 2;
+					}
+					else if (hover == -3)
+						menu_event.iptkey = IPT_UI_RIGHT;
+					else if (hover == -4)
+						menu_event.iptkey = IPT_UI_LEFT;
+					else if (hover == -5)
+						topline_datsview += right_visible_lines - 1;
+					else if (hover == -6)
+						topline_datsview -= right_visible_lines - 1;
+					else if (r_hover >= RP_FIRST && r_hover <= RP_LAST)
+					{
+						mewui_globals::rpanel_infos = r_hover;
+						stop = true;
+					}
+					else if (l_sw_hover >= MEWUI_SW_FIRST && l_sw_hover <= MEWUI_SW_LAST)
+					{
+						menu_event.iptkey = IPT_OTHER;
+						stop = true;
+					}
+					else if (ume_hover >= MEWUI_MAME_FIRST && ume_hover <= MEWUI_MAME_LAST)
+					{
+						mewui_globals::ume_system = ume_hover;
+						menu_event.iptkey = IPT_OTHER;
+						stop = true;
+					}
+					else if (l_hover >= FILTER_FIRST && l_hover <= FILTER_LAST)
+					{
+						menu_event.iptkey = IPT_OTHER;
+						stop = true;
+					}
+				}
                 break;
             }
 
             // if we are hovering over a valid item, fake a UI_SELECT with a double-click
             case UI_EVENT_MOUSE_DOUBLE_CLICK:
-                if (hover >= 0 && hover < numitems)
-                {
-                    selected = hover;
-                    menu_event.iptkey = IPT_UI_SELECT;
-
-                    if (selected == numitems - 1)
+				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+   				{
+					if (hover >= 0 && hover < item.size())
+					{
+						selected = hover;
+						menu_event.iptkey = IPT_UI_SELECT;
+					}
+                    else if (selected == item.size() - 1)
                     {
                         menu_event.iptkey = IPT_UI_CANCEL;
                         ui_menu::stack_pop(machine());
                     }
-
                     stop = true;
                 }
 
@@ -928,34 +907,27 @@ void ui_menu::handle_main_events()
 
             // caught scroll event
             case UI_EVENT_MOUSE_SCROLL:
-
-                // scroll up backs up by num_lines items
-                if (local_menu_event.zdelta > 0)
-                {
-                    if (selected >= visible_items || selected == 0 || ui_error)
-                        break;
-
-                    selected -= local_menu_event.num_lines;
-
-                    if (selected < top_line + (top_line != 0))
-                        top_line -= local_menu_event.num_lines;
-                }
-
-                // scroll down advances by num_lines items
-                else
-                {
-                    if (selected >= visible_items - 1 || ui_error)
-                        break;
-
-                    selected += local_menu_event.num_lines;
-
-                    if (selected > visible_items - 1)
-                        selected = visible_items - 1;
-
-                    if (selected >= top_line + visitems + (top_line != 0))
-                        top_line += local_menu_event.num_lines;
-                }
-
+				if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
+   				{
+					if (local_menu_event.zdelta > 0)
+					{
+						if (selected >= visible_items || selected == 0 || ui_error)
+							break;
+						selected -= local_menu_event.num_lines;
+						if (selected < top_line + (top_line != 0))
+							top_line -= local_menu_event.num_lines;
+					}
+					else
+					{
+						if (selected >= visible_items - 1 || ui_error)
+							break;
+						selected += local_menu_event.num_lines;
+						if (selected > visible_items - 1)
+							selected = visible_items - 1;
+						if (selected >= top_line + visitems + (top_line != 0))
+							top_line += local_menu_event.num_lines;
+					}
+				}
                 break;
 
             // translate CHAR events into specials
@@ -1036,7 +1008,7 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
             container->add_rect(x1, y1, x2, y1 + line_height, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
         machine().ui().draw_text_full(container, text[filter], x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
-                                        DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
+                                      DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
 
         y1 += line_height;
     }
@@ -1059,7 +1031,7 @@ void ui_menu::draw_ume_box(float x1, float y1, float x2, float y2)
         float width;
         // compute width of left hand side
         machine().ui().draw_text_full(container, mewui_globals::ume_text[x], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-                                        DRAW_NONE, UI_TEXT_COLOR, ARGB_BLACK, &width, NULL, text_size);
+                                      DRAW_NONE, UI_TEXT_COLOR, ARGB_BLACK, &width, NULL, text_size);
         width += 2 * UI_BOX_LR_BORDER;
         maxwidth = MAX(maxwidth, width);
     }
@@ -1093,7 +1065,7 @@ void ui_menu::draw_ume_box(float x1, float y1, float x2, float y2)
             container->add_rect(x1, y1, x2, y1 + line_height, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
         machine().ui().draw_text_full(container, mewui_globals::ume_text[filter], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-                                        DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
+                                      DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
 
         y1 += line_height;
     }
@@ -1146,7 +1118,7 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
                                 bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
         machine().ui().draw_text_full(container, buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
-                                        JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+                                      JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
         x1 = x1 + midl;
     }
 
@@ -1210,13 +1182,13 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
         for (int x = MEWUI_FIRST_LOAD; x < MEWUI_LAST_LOAD; x++)
         {
             machine().ui().draw_text_full(container, dats_info[x], origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-                                            WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
+                                          WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
             txt_lenght += 0.01f;
             title_size = MAX(txt_lenght, title_size);
         }
 
         machine().ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-                                        WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+                                      WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
         draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::curdats_view, MEWUI_FIRST_LOAD, MEWUI_LAST_LOAD, title_size);
 
@@ -1254,13 +1226,13 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
         if (buffer.empty())
         {
             machine().ui().draw_text_full(container, "No Infos Available", origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
-                                            WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+                                          WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
             return;
         }
 
         else if (mewui_globals::curdats_view != MEWUI_STORY_LOAD && mewui_globals::curdats_view != MEWUI_COMMAND_LOAD)
             machine().ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), &totallines,
-                                        xstart, xend, text_size);
+                                     xstart, xend, text_size);
         else
             machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * gutter_width), &totallines, xstart, xend, text_size);
 
@@ -1292,8 +1264,8 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
                 int last_underscore = tempbuf.find_last_of('_');
                 if (last_underscore == -1)
                     machine().ui().draw_text_full(container, tempbuf.c_str(), origx1, oy1, origx2 - origx1, JUSTIFY_CENTER,
-                                                    WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL,
-                                                    text_size);
+                                                  WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL,
+                                                  text_size);
                 else
                 {
                     float effective_width = origx2 - origx1 - gutter_width;
@@ -1304,13 +1276,13 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
                     float item_width;
 
                     machine().ui().draw_text_full(container, first_part.c_str(), effective_left, oy1, effective_width,
-                                                    JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-                                                    &item_width, NULL, text_size);
+                                                  JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+                                                  &item_width, NULL, text_size);
 
                     machine().ui().draw_text_full(container, last_part.c_str(), effective_left + item_width, oy1,
-                                                    origx2 - origx1 - 2.0f * gutter_width - item_width, JUSTIFY_RIGHT,
-                                                    WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-                                                    NULL, NULL, text_size);
+                                                  origx2 - origx1 - 2.0f * gutter_width - item_width, JUSTIFY_RIGHT,
+                                                  WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+                                                  NULL, NULL, text_size);
                     }
             }
 
@@ -1330,18 +1302,18 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
                                                     NULL, NULL, text_size);
 
                     machine().ui().draw_text_full(container, last_part.c_str(), effective_left, oy1, origx2 - origx1 - 2.0f * gutter_width,
-                                                    JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-                                                    NULL, NULL, text_size);
+                                                  JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+                                                  NULL, NULL, text_size);
                 }
 
                 else
                     machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
-                                                WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
+                                                  WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
             }
 
             else
                 machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
-                                                WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
+											  WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
 
             oy1 += (line_height * text_size);
         }
@@ -1361,7 +1333,7 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
         if (soft->usage.empty())
         {
             machine().ui().draw_text_full(container, "History", origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-                                            DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+                                          DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
             mewui_globals::cur_sw_dats_view = 0;
         }
 
@@ -1376,14 +1348,14 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
             for (int x = 0; x < 2; x++)
             {
                 machine().ui().draw_text_full(container, t_text[x].c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-                                                DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
+                                              DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
                 txt_lenght += 0.01f;
                 title_size = MAX(txt_lenght, title_size);
             }
 
             machine().ui().draw_text_full(container, t_text[mewui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-                                            JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-                                            NULL, NULL);
+                                          JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+                                          NULL, NULL);
 
             draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::cur_sw_dats_view, 0, 1, title_size);
         }
@@ -1412,13 +1384,13 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
         if (buffer.empty())
         {
             machine().ui().draw_text_full(container, "No Infos Available", origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
-                                            WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+                                          WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
             return;
         }
 
         else
             machine().ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), &totallines,
-                                        xstart, xend, text_size);
+                                     xstart, xend, text_size);
 
         int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
         if (totallines < r_visible_lines)
@@ -1444,8 +1416,8 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 
             else
                 machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
-                                                JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-                                                NULL, NULL, text_size);
+                                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+                                              NULL, NULL, text_size);
             oy1 += (line_height * text_size);
         }
 
@@ -1470,13 +1442,13 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
     for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
     {
         machine().ui().draw_text_full(container, arts_info[x].title, origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-                                                                    WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
+                                      WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
         txt_lenght += 0.01f;
         title_size = MAX(txt_lenght, title_size);
     }
 
     machine().ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-                                                                DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+                                  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
     draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
@@ -1615,7 +1587,7 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
     if (mouse_hit && ar_x0 <= mouse_x && ar_x1 > mouse_x && ar_y0 <= mouse_y && ar_y1 > mouse_y && current!= dmax)
     {
         machine().ui().draw_textured_box(container, ar_x0 + 0.01f, ar_y0, ar_x1 - 0.01f, ar_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
-                                                                        hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+                                         hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
         hover = -3;
         fgcolor_right = UI_MOUSEOVER_COLOR;
     }
@@ -1623,7 +1595,7 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
     else if (mouse_hit && al_x0 <= mouse_x && al_x1 > mouse_x && al_y0 <= mouse_y && al_y1 > mouse_y && current != dmin)
     {
         machine().ui().draw_textured_box(container, al_x0 + 0.01f, al_y0, al_x1 - 0.01f, al_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
-                                                                        hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+                                         hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
         hover = -4;
         fgcolor_left = UI_MOUSEOVER_COLOR;
     }
@@ -1708,11 +1680,11 @@ void ui_menu::info_arrow(int ub, float origx1, float origx2, float oy1, float li
     if (mouse_hit && origx1 <= mouse_x && origx2 > mouse_x && oy1 <= mouse_y && oy1 + (line_height * text_size) > mouse_y)
     {
         machine().ui().draw_textured_box(container, origx1 + 0.01f, oy1, origx2 - 0.01f, oy1 + (line_height * text_size), UI_MOUSEOVER_BG_COLOR,
-                                                                        rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+                                         rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
         hover = (!ub) ? -6 : -5;
         fgcolor = UI_MOUSEOVER_COLOR;
     }
 
     draw_arrow(container, 0.5f * (origx1 + origx2) - 0.5f * (ud_arrow_width * text_size), oy1 + 0.25f * (line_height * text_size),
-                        0.5f * (origx1 + origx2) + 0.5f * (ud_arrow_width * text_size), oy1 + 0.75f * (line_height * text_size), fgcolor, orientation);
+               0.5f * (origx1 + origx2) + 0.5f * (ud_arrow_width * text_size), oy1 + 0.75f * (line_height * text_size), fgcolor, orientation);
 }

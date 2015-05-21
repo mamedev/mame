@@ -118,10 +118,10 @@ public:
 private:
 
     rgb_t           *color;
-    char            search[4];
+    char            m_search[4];
     bool            key_active;
     int             lock_ref;
-    std::string title;
+    std::string 	title;
 
     enum
     {

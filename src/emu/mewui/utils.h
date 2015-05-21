@@ -249,15 +249,14 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 
 // qsort compares
 bool compare_software(ui_software_info a, ui_software_info b);
-bool compare_machine(const game_driver *a, const game_driver *b);
 int compare(struct IniCategoryIndex *elem1, struct IniCategoryIndex *elem2);
 
 // advanced search function
 int fuzzy_substring(const char *needle, const char *haystack);
 
 // drivers cache
-void save_cache_info(running_machine &machine, const game_driver **sortedlist);
-void load_cache_info(running_machine &machine, const game_driver **sortedlist);
+void save_cache_info(running_machine &machine);
+void load_cache_info(running_machine &machine);
 
 void fskip(char *s, int id = 0, bool crlf = false);
 

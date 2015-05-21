@@ -81,6 +81,8 @@
 #include "validity.h"
 #include "unzip.h"
 #include "debug/debugcon.h"
+#include "mewui/datfile.h"
+#include "mewui/inifile.h"
 #include "debug/debugvw.h"
 
 #include <time.h>
@@ -230,6 +232,9 @@ void running_machine::start()
 	// init the osd layer
 	m_manager.osd().init(*this);
 
+    // start the inifile manager
+    m_inifile.reset(global_alloc(inifile_manager(*this)));
+
 	// create the video manager
 	m_video.reset(global_alloc(video_manager(*this)));
 	m_ui.reset(global_alloc(ui_manager(*this)));
@@ -301,6 +306,12 @@ void running_machine::start()
 
 	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
+
+    // start datfile manager
+    m_datfile.reset(global_alloc(datfile_manager(*this)));
+
+    // start favorite manager
+    m_favorite.reset(global_alloc(favorite_manager(*this)));
 
 	manager().update_machine();
 }

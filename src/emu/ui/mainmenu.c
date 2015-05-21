@@ -178,7 +178,7 @@ void ui_menu_main::populate()
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	/* add favorite menu */
-	if (!machine().inifile().isgame_favorite())
+    if (!machine().favorite().isgame_favorite())
 		item_append("Add To Favorites", NULL, 0, (void *)ADD_FAVORITE);
 	else
 		item_append("Remove From Favorites", NULL, 0, (void *)REMOVE_FAVORITE);
@@ -315,12 +315,12 @@ void ui_menu_main::handle()
 			break;
 
 		case ADD_FAVORITE:
-			machine().inifile().add_favorite_game();
+            machine().favorite().add_favorite_game();
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
 			break;
 
 		case REMOVE_FAVORITE:
-			machine().inifile().remove_favorite_game();
+            machine().favorite().remove_favorite_game();
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
 			break;
 

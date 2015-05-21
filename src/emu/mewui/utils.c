@@ -178,66 +178,6 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 }
 
 //-------------------------------------------------
-//  compares two items in the list and sort
-//  them by parent-clone
-//-------------------------------------------------
-
-int compare_list(const void *a, const void *b)
-{
-    game_driver *x = *(game_driver * const *) a;
-    game_driver *y = *(game_driver * const *) b;
-
-    bool clonex = strcmp(x->parent, "0");
-    bool cloney = strcmp(y->parent, "0");
-
-    if (!clonex && !cloney)
-        return (core_stricmp(x->description, y->description));
-
-    int cx = -1, cy = -1;
-
-    if (clonex)
-    {
-        cx = driver_list::find(x->parent);
-        if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
-            clonex = false;
-    }
-
-    if (cloney)
-    {
-        cy = driver_list::find(y->parent);
-        if (cy != -1 && ((driver_list::driver(cy).flags & GAME_IS_BIOS_ROOT) != 0))
-            cloney = false;
-    }
-
-    if (!clonex && !cloney)
-        return (core_stricmp(x->description, y->description));
-
-    else if (clonex && cloney)
-    {
-        if (!strcmp(x->parent, y->parent))
-            return (core_stricmp(x->description, y->description));
-        else
-            return (core_stricmp(driver_list::driver(cx).description, driver_list::driver(cy).description));
-    }
-
-    else if (!clonex && cloney)
-    {
-        if (!core_stricmp(x->name, y->parent))
-            return -1;
-        else
-            return (core_stricmp(x->description, driver_list::driver(cy).description));
-    }
-
-    else
-    {
-        if (!core_stricmp(x->parent, y->name))
-            return 1;
-        else
-            return (core_stricmp(driver_list::driver(cx).description, y->description));
-    }
-}
-
-//-------------------------------------------------
 //  compares two items in the software list and
 //  sort them by parent-clone
 //-------------------------------------------------
@@ -357,7 +297,7 @@ int fuzzy_substring(const char *needle, const char *haystack)
 //  save drivers infos to file
 //-------------------------------------------------
 
-void save_cache_info(running_machine &machine, const game_driver **sortedlist)
+void save_cache_info(running_machine &machine)
 {
     // attempt to open the output file
     emu_file file(MEWUI_DIR, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -377,7 +317,6 @@ void save_cache_info(running_machine &machine, const game_driver **sortedlist)
             if (driver.flags & GAME_NO_STANDALONE)
                 continue;
 
-            sortedlist[curitem] = &driver;
             cache_info infos;
             machine_config config(driver, machine.options());
 
@@ -406,19 +345,6 @@ void save_cache_info(running_machine &machine, const game_driver **sortedlist)
 
             strcatprintf(buffer, "%d%d%d%d\n", infos.b_vector, infos.b_samples, infos.b_stereo, infos.b_chd);
         }
-
-        // NULL-terminate
-        sortedlist[curitem] = NULL;
-
-        // sort
-//      qsort(sortedlist, curitem, sizeof(game_driver *), compare_list);
-
-        for (curitem = 0; sortedlist[curitem]; curitem++)
-        {
-            int index = driver_list::find(sortedlist[curitem]->name);
-            strcatprintf(buffer, "%d\n", index);
-        }
-
         file.puts(buffer.c_str());
         file.close();
     }
@@ -428,7 +354,7 @@ void save_cache_info(running_machine &machine, const game_driver **sortedlist)
 //  load drivers infos from file
 //-------------------------------------------------
 
-void load_cache_info(running_machine &machine, const game_driver **sortedlist)
+void load_cache_info(running_machine &machine)
 {
     bool fexist = true;
 
@@ -439,7 +365,7 @@ void load_cache_info(running_machine &machine, const game_driver **sortedlist)
     // file not exist ? save and exit
     if (filerr != FILERR_NONE)
     {
-        save_cache_info(machine, sortedlist);
+        save_cache_info(machine);
         return;
     }
 
@@ -456,7 +382,7 @@ void load_cache_info(running_machine &machine, const game_driver **sortedlist)
         if (a_rev.compare(buffer) != 0)
         {
             efile.close();
-            save_cache_info(machine, sortedlist);
+            save_cache_info(machine);
             return;
         }
     }
@@ -475,17 +401,6 @@ void load_cache_info(running_machine &machine, const game_driver **sortedlist)
         mewui_globals::driver_cache[index].b_stereo = buffer[2] - '0';
         mewui_globals::driver_cache[index++].b_chd = buffer[3] - '0';
     }
-
-    int index2 = 0;
-    while (index2 < index)
-    {
-        efile.gets(buffer, MAX_CHAR_INFO);
-        int idx = atoi(buffer);
-        sortedlist[index2++] = &driver_list::driver(idx);
-    }
-
-    // NULL-terminate
-    sortedlist[index2] = NULL;
 
     efile.close();
 }

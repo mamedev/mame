@@ -2453,7 +2453,7 @@ void ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 /**********************************************
  * MEWUI
  *********************************************/
-void ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int *totallines, int *xstart, int *xend, float text_size)
+void ui_manager::wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int *totallines, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
 {
 	float lineheight = get_line_height() * text_size;
 	const char *ends = origs + strlen(origs);
@@ -2550,8 +2550,8 @@ void ui_manager::wrap_text(render_container *container, const char *origs, float
 		if (curwidth > maxwidth)
 			maxwidth = curwidth;
 
-		xstart[count] = linestart - origs;
-		xend[count] = s - origs;
+        xstart.push_back(linestart - origs);
+        xend.push_back(s - origs);
 
 		// loop from the line start and add the characters
 		while (linestart < s)

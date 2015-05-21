@@ -117,13 +117,13 @@ public:
     virtual void handle();
     virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
-    virtual bool have_search() {return (search[0] != 0); }
+	virtual bool menu_has_search_active() { return (m_search[0] != 0); }
 
 private:
-    int         path_ref;
+    int         	path_ref;
     std::string     current_path;
-    char        search[40];
-    bool        change;
+	char	        m_search[40];
+    bool    	    change;
 };
 
 #endif /* __MEWUI_DIRMENU_H__ */

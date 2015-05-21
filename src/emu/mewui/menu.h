@@ -23,8 +23,6 @@ public:
         return ((actual == min) ? MENU_FLAG_RIGHT_ARROW : (actual == max ? MENU_FLAG_LEFT_ARROW : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW)));
     }
 
-    virtual bool have_search() { return false; }
-
 protected:
     int topline_datsview;       // right box top line
     int top_line;               // main box top line
@@ -62,7 +60,7 @@ private:
     void handle_main_keys(UINT32 flags);
 
     // handle mouse
-    void handle_main_events();
+    void handle_main_events(UINT32 flags);
 
     // draw left box
     float draw_left_box(float x1, float y1, float x2, float y2, bool software = false);

@@ -17,7 +17,7 @@
 #include "osdepend.h"
 #include "uismall.fh"
 
-#include "mewui/render.inc"
+#include "mewui/cmdrender.h"
 
 //**************************************************************************
 //  INLINE FUNCTIONS

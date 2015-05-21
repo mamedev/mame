@@ -49,21 +49,20 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 		return (c_stricmp(x->description, y->description) < 0);
 
 	int cx = -1, cy = -1;
-
 	if (clonex)
 	{
 		cx = driver_list::find(x->parent);
-		if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+		if (cx == -1 || (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0)))
 			clonex = false;
 	}
 
 	if (cloney)
 	{
 		cy = driver_list::find(y->parent);
-		if (cy != -1 && ((driver_list::driver(cy).flags & GAME_IS_BIOS_ROOT) != 0))
+		if (cy == -1 || (cy != -1 && ((driver_list::driver(cy).flags & GAME_IS_BIOS_ROOT) != 0)))
 			cloney = false;
 	}
-
+//osd_printf_verbose("*** X = %s - Y = %s - cx = %d - cy = %d\n", x->name, y->name, cx, cy);
 	if (!clonex && !cloney)
 		return (c_stricmp(x->description, y->description) < 0);
 
@@ -74,7 +73,6 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 		else
 			return (c_stricmp(driver_list::driver(cx).description, driver_list::driver(cy).description) < 0);
 	}
-
 	else if (!clonex && cloney)
 	{
 		if (!c_stricmp(x->name, y->parent))
@@ -82,7 +80,6 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 		else
 			return (c_stricmp(x->description, driver_list::driver(cy).description) < 0);
 	}
-
 	else
 	{
 		if (!c_stricmp(x->parent, y->name))
@@ -98,6 +95,16 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 
 ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
+    // build drivers list
+    build_full_list();
+    build_available_list();
+
+    // load custom filter
+    load_custom_filters();
+
+    // load drivers cache
+    load_cache_info(machine);
+
     if (!machine.options().remember_last())
     {
         reselect_last::driver.clear();
@@ -122,39 +129,6 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 
 ui_mewui_select_game::~ui_mewui_select_game()
 {
-}
-
-//-------------------------------------------------
-//  Initialize all global arrays
-//-------------------------------------------------
-
-void ui_mewui_select_game::init(running_machine &machine)
-{
-    driverlist.resize(driver_list::total() + 1);
-    sortedlist.resize(driver_list::total() + 1);
-
-    // load drivers cache
-    load_cache_info(machine, sortedlist);
-
-    // build drivers list
-    build_driver_list(machine);
-    build_available_list(machine);
-
-    // load custom filter
-    load_custom_filters();
-}
-
-//-------------------------------------------------
-//  Free all global arrays
-//-------------------------------------------------
-
-void ui_mewui_select_game::exit(running_machine &machine)
-{
-    // free years data
-    c_year::ui.clear();
-
-    // free manufacturers data
-    c_mnfct::ui.clear();
 }
 
 //-------------------------------------------------
@@ -264,9 +238,9 @@ void ui_mewui_select_game::handle()
             mewui_globals::rpanel_infos = RP_INFOS;
 
         // escape pressed with non-empty text clears the text
-        else if (menu_event->iptkey == IPT_UI_CANCEL && search[0] != 0)
+        else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
         {
-            search[0] = '\0';
+            m_search[0] = '\0';
             reset(UI_MENU_RESET_SELECT_FIRST);
         }
 
@@ -426,7 +400,7 @@ void ui_mewui_select_game::handle()
     if (menu_event != NULL && menu_event->itemref == NULL)
     {
         if (menu_event->iptkey == IPT_SPECIAL && menu_event->unichar == 0x09)
-            selected = prev_selected;
+            selected = m_prev_selected;
 
         // handle UI_UP_FILTER
         else if (menu_event->iptkey == IPT_UI_UP_FILTER && mewui_globals::actual_filter > FILTER_FIRST)
@@ -455,7 +429,7 @@ void ui_mewui_select_game::handle()
     // handle filters selection from key shortcuts
     if (check_filter)
     {
-        search[0] = '\0';
+        m_search[0] = '\0';
 
         if (l_hover == FILTER_CATEGORY)
         {
@@ -493,17 +467,19 @@ void ui_mewui_select_game::populate()
     mewui_globals::redraw_icon = true;
     mewui_globals::switch_image = true;
     int old_item_selected = -1;
+    const game_driver *tmp = NULL;
+    std::fill(m_displaylist.begin(), m_displaylist.end(), tmp);
     UINT32 flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
     if (mewui_globals::actual_filter != FILTER_FAVORITE_GAME)
     {
         // if search is not empty, find approximate matches
-        if (search[0] != 0 && !no_active_search())
+        if (m_search[0] != 0 && !no_active_search())
             populate_search();
         else
         {
             // reset search string
-            search[0] = '\0';
+            m_search[0] = '\0';
 
             // if filter is set on category, build category list
             switch (mewui_globals::actual_filter)
@@ -515,11 +491,11 @@ void ui_mewui_select_game::populate()
                 }
 
                 case FILTER_MANUFACTURER:
-                    build_list(c_mnfct::ui[c_mnfct::actual].c_str());
+                    build_list(m_tmp, c_mnfct::ui[c_mnfct::actual].c_str());
                     break;
 
                 case FILTER_YEAR:
-                    build_list(c_year::ui[c_year::actual].c_str());
+                    build_list(m_tmp, c_year::ui[c_year::actual].c_str());
                     break;
 
                 case FILTER_VECTOR:
@@ -527,7 +503,7 @@ void ui_mewui_select_game::populate()
                 case FILTER_SAMPLES:
                 case FILTER_RASTER:
                 case FILTER_CHD:
-                    build_from_cache();
+                    build_from_cache(m_tmp);
                     break;
 
                 case FILTER_CUSTOM:
@@ -535,26 +511,26 @@ void ui_mewui_select_game::populate()
                     break;
 
                 default:
-                    build_list();
+                    build_list(m_tmp);
                     break;
             }
 
             // iterate over entries
-            for (int curitem = 0; displaylist[curitem]; curitem++)
+            for (int curitem = 0; curitem < m_displaylist.size(); curitem++)
             {
-                if (!reselect_last::driver.empty() && !(core_stricmp(displaylist[curitem]->name, reselect_last::driver.c_str())))
+                if (!reselect_last::driver.empty() && !(core_stricmp(m_displaylist[curitem]->name, reselect_last::driver.c_str())))
                     old_item_selected = curitem;
 
-                bool cloneof = strcmp(displaylist[curitem]->parent, "0");
+                bool cloneof = strcmp(m_displaylist[curitem]->parent, "0");
                 if (cloneof)
                 {
-                    int cx = driver_list::find(displaylist[curitem]->parent);
+                    int cx = driver_list::find(m_displaylist[curitem]->parent);
                     if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
                         cloneof = false;
                 }
 
-                item_append(displaylist[curitem]->description, NULL, (!cloneof) ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
-                            (void *)displaylist[curitem]);
+                item_append(m_displaylist[curitem]->description, NULL, (!cloneof) ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
+                            (void *)m_displaylist[curitem]);
             }
         }
     }
@@ -563,7 +539,7 @@ void ui_mewui_select_game::populate()
     else
     {
         // reset search string
-        search[0] = '\0';
+        m_search[0] = '\0';
 
         flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_MEWUI_FAVORITE | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
@@ -625,142 +601,112 @@ void ui_mewui_select_game::populate()
 //  build a list of all drivers
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_driver_list(running_machine &machine)
+void ui_mewui_select_game::build_full_list()
 {
-    // build full and sorted list
-    driver_enumerator drivlist(machine.options());
-    int curitem = 0;
+	// build list
+	for (int x = 0; x < driver_list::total(); ++x)
+	{
+        if (!strcmp("___empty", driver_list::driver(x).name))
+            continue;
+		m_fulllist.push_back(&driver_list::driver(x));
+        c_mnfct::set(driver_list::driver(x).manufacturer);
+        c_year::set(driver_list::driver(x).year);
+	}
 
-    for ( ; drivlist.next(); curitem++)
-    {
-        driverlist[curitem] = &drivlist.driver();
-        c_mnfct::set(drivlist.driver().manufacturer);
-        c_year::set(drivlist.driver().year);
-    }
+	m_sortedlist = m_fulllist;
 
-    // NULL-terminate
-    driverlist[curitem] = NULL;
-
-    // sort
-    std::sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
-    std::sort(c_year::ui.begin(), c_year::ui.end());
+	// sort manufacturers - years and driver
+    std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
+    std::stable_sort(c_year::ui.begin(), c_year::ui.end());
+	std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sort_game_list);
 }
 
 //-------------------------------------------------
 //  build a list of available drivers
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_driver_list(running_machine &machine)
+void ui_mewui_select_game::build_available_list()
 {
-    driver_enumerator availlist(machine.options());
-	while (availlist.next())
-		m_fulllist.push_back(&drivlist.driver());
+	int m_total = driver_list::total();
+	std::vector<UINT8> m_included(m_total, 0);
 
-	m_sortedlist = m_fulllist;
-
-    availlist.exclude_all();
-    file_enumerator path(machine.options().media_path());
+    // open a path to the ROMs and find them in the array
+    file_enumerator path(machine().options().media_path());
     const osd_directory_entry *dir;
 
+    // iterate while we get new objects
     while ((dir = path.next()) != NULL)
     {
         char drivername[50];
         char *dst = drivername;
         const char *src;
 
+        // build a name for it
         for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
             *dst++ = tolower((UINT8) * src);
 
         *dst = 0;
 
-        int drivnum = availlist.find(drivername);
+        int drivnum = driver_list::find(drivername);
 
         if (drivnum != -1)
-            ;
-    }
-
-    availlist.reset();
-
-    while (availlist.next_excluded())
-    {
-        if (!strcmp("___empty", availlist.driver().name))
-            continue;
-
-        const rom_entry *rom = availlist.driver().rom;
-        if (ROMENTRY_ISREGION(rom) && ROMENTRY_ISEND(++rom))
-            availlist.include();
-    }
-
-    if (machine.options().audit_mode())
-    {
-        availlist.reset();
-        while (availlist.next_excluded())
         {
-            driver_enumerator enumerator(machine.options(), availlist.driver().name);
-            enumerator.next();
-            media_auditor auditor(enumerator);
-            media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+			m_availablelist.push_back(&driver_list::driver(drivnum));
+            m_included[drivnum] = 1;
+		}
+    }
 
-            if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
-                availlist.include();
-        }
+    // now check and include NONE_NEEDED
+    for (int x = 0; x < m_total; ++x)
+		if (!m_included[x])
+		{
+			if (!strcmp("___empty", driver_list::driver(x).name))
+				continue;
 
+			const rom_entry *rom = driver_list::driver(x).rom;
+			if (ROMENTRY_ISREGION(rom) && ROMENTRY_ISEND(++rom))
+			{
+				m_availablelist.push_back(&driver_list::driver(x));
+				m_included[x] = 1;
+			}
+		}
+
+    // now audit excluded
+    if (machine().options().audit_mode())
+    {
+		for (int x = 0; x < m_total; ++x)
+			if (!m_included[x])
+			{
+				if (!strcmp("___empty", driver_list::driver(x).name))
+					continue;
+
+				driver_enumerator enumerator(machine().options(), driver_list::driver(x).name);
+				enumerator.next();
+				media_auditor auditor(enumerator);
+				media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+
+				// if everything looks good, include the driver
+				if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+				{
+					m_availablelist.push_back(&driver_list::driver(x));
+					m_included[x] = 1;
+				}
+			}
         zip_file_cache_clear();
     }
 
-    availlist.reset();
-    int listnum = 0;
-
-    while (availlist.next())
-        avllist[listnum++] = &availlist.driver();
-
-    // NULL-terminate
-    avllist[listnum] = NULL;
-
-    // now build sorted list
-    listnum = 0;
-    availlist.reset();
-
-    for (int k = 0; sortedlist[k]; k++)
-    {
-        int found = availlist.find(sortedlist[k]->name);
-        if (found != -1 && availlist.included(found))
-            avlsortedlist[listnum++] = sortedlist[k];
-    }
-
-    // NULL-terminate
-    avlsortedlist[listnum] = NULL;
+	// sort
+	m_availsortedlist = m_availablelist;
+	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sort_game_list);
 
     // now build the unavailable list
-    unavllist = global_alloc_array(const game_driver *, (driver_list::total() + 1 - availlist.count()));
-    unavlsortedlist = global_alloc_array(const game_driver *, (driver_list::total() + 1 - availlist.count()));
-    availlist.reset();
-    listnum = 0;
+	for (int x = 0; x < m_total; ++x)
+		if (!m_included[x] && strcmp("___empty", driver_list::driver(x).name))
+			m_unavailablelist.push_back(&driver_list::driver(x));
 
-    while (availlist.next_excluded())
-    {
-        if (!strcmp("___empty", availlist.driver().name))
-            continue;
-
-        unavllist[listnum++] = &availlist.driver();
-    }
-
-    // NULL-terminate
-    unavllist[listnum] = NULL;
-
-    // now build unavailable sorted list
-    listnum = 0;
-    availlist.reset();
-
-    for (int k = 0; sortedlist[k]; k++)
-    {
-        int found = availlist.find(sortedlist[k]->name);
-        if (found != -1 && availlist.excluded(found))
-            unavlsortedlist[listnum++] = sortedlist[k];
-    }
-
-    // NULL-terminate
-    unavlsortedlist[listnum] = NULL;
+	// sort
+	m_unavailsortedlist = m_unavailablelist;
+	std::stable_sort(m_unavailsortedlist.begin(), m_unavailsortedlist.end(), sort_game_list);
 }
 
 //-------------------------------------------------
@@ -799,7 +745,7 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
     if (no_active_search())
         tempbuf[1].clear();
     else
-        tempbuf[1].assign(filtered.c_str()).append(" Search: ").append(search).append("_");
+        tempbuf[1].assign(filtered.c_str()).append(" Search: ").append(m_search).append("_");
 
     // get the size of the text
     for (line = 0; line < 2; line++)
@@ -1149,20 +1095,20 @@ bool ui_mewui_select_game::no_active_search()
 
 void ui_mewui_select_game::inkey_special(const ui_menu_event *menu_event)
 {
-    int buflen = strlen(search);
+    int buflen = strlen(m_search);
 
     // if it's a backspace and we can handle it, do so
     if (((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0) && !no_active_search())
     {
-        *(char *)utf8_previous_char(&search[buflen]) = 0;
+        *(char *)utf8_previous_char(&m_search[buflen]) = 0;
         reset(UI_MENU_RESET_SELECT_FIRST);
     }
 
     // if it's any other key and we're not maxed out, update
     else if ((menu_event->unichar >= ' ' && menu_event->unichar < 0x7f) && !no_active_search())
     {
-        buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
-        search[buflen] = 0;
+        buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
+        m_search[buflen] = 0;
         reset(UI_MENU_RESET_SELECT_FIRST);
     }
 
@@ -1172,13 +1118,13 @@ void ui_mewui_select_game::inkey_special(const ui_menu_event *menu_event)
         // if the selection is in the main screen, save it and go to submenu
         if (selected <= visible_items)
         {
-            prev_selected = selected;
+            m_prev_selected = selected;
             selected = visible_items + 1;
         }
 
         // otherwise, retrieve the previous position
         else
-            selected = prev_selected;
+            selected = m_prev_selected;
     }
 }
 
@@ -1186,33 +1132,33 @@ void ui_mewui_select_game::inkey_special(const ui_menu_event *menu_event)
 //  build list
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_list(const char *filter_text, const game_driver **s_drivers, int filter, bool bioscheck)
+void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_drivers, const char *filter_text, int filter, bool bioscheck)
 {
-    int arrayindex = 0, cx = 0;
+    int cx = 0;
     bool cloneof = false;
 
-    if (s_drivers == NULL)
+    if (s_drivers.empty())
     {
         filter = mewui_globals::actual_filter;
 
         if (machine().options().ui_grouped())
         {
             if (filter == FILTER_AVAILABLE)
-                s_drivers = avlsortedlist;
+                s_drivers = m_availsortedlist;
             else if (filter == FILTER_UNAVAILABLE)
-                s_drivers = unavlsortedlist;
+                s_drivers = m_unavailsortedlist;
             else
-                s_drivers = sortedlist;
+                s_drivers = m_sortedlist;
         }
         else if (filter == FILTER_AVAILABLE)
-            s_drivers = avllist;
+            s_drivers = m_availablelist;
         else if (filter == FILTER_UNAVAILABLE)
-            s_drivers = unavllist;
+            s_drivers = m_unavailablelist;
         else
-            s_drivers = driverlist;
+            s_drivers = m_fulllist;
     }
 
-    for (int index = 0; s_drivers[index]; index++)
+    for (int index = 0; index < s_drivers.size(); index++)
     {
         if (!bioscheck && filter != FILTER_BIOS && (s_drivers[index]->flags & GAME_IS_BIOS_ROOT) != 0)
             continue;
@@ -1228,70 +1174,68 @@ void ui_mewui_select_game::build_list(const char *filter_text, const game_driver
             case FILTER_ALL:
             case FILTER_AVAILABLE:
             case FILTER_UNAVAILABLE:
-                displaylist[arrayindex++] = s_drivers[index];
+				m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_WORKING:
                 if (!(s_drivers[index]->flags & GAME_NOT_WORKING))
-                    displaylist[arrayindex++] = s_drivers[index];
-                break;
+					m_displaylist.push_back(s_drivers[index]);
+				break;
 
             case FILTER_NOT_MECHANICAL:
                 if (!(s_drivers[index]->flags & GAME_MECHANICAL))
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_BIOS:
                 if (s_drivers[index]->flags & GAME_IS_BIOS_ROOT)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_PARENT:
             case FILTER_CLONES:
                 cloneof = strcmp(s_drivers[index]->parent, "0");
-
                 if (cloneof)
                 {
                     cx = driver_list::find(s_drivers[index]->parent);
-
                     if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
                         cloneof = false;
                 }
 
                 if (filter == FILTER_CLONES && cloneof)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 else if (filter == FILTER_PARENT && !cloneof)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_NOT_WORKING:
                 if (s_drivers[index]->flags & GAME_NOT_WORKING)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_MECHANICAL:
                 if (s_drivers[index]->flags & GAME_MECHANICAL)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_SAVE:
                 if (s_drivers[index]->flags & GAME_SUPPORTS_SAVE)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_YEAR:
                 if (!core_stricmp(filter_text, s_drivers[index]->year))
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_VERTICAL:
                 if (s_drivers[index]->flags & ORIENTATION_SWAP_XY)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_HORIZONTAL:
                 if (!(s_drivers[index]->flags & ORIENTATION_SWAP_XY))
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_MANUFACTURER:
@@ -1299,12 +1243,11 @@ void ui_mewui_select_game::build_list(const char *filter_text, const game_driver
                 std::string name = c_mnfct::getname(s_drivers[index]->manufacturer);
 
                 if (!core_stricmp(filter_text, name.c_str()))
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
             }
         }
     }
-    displaylist[arrayindex] = NULL;
 }
 
 //-------------------------------------------------
@@ -1314,24 +1257,24 @@ void ui_mewui_select_game::build_list(const char *filter_text, const game_driver
 void ui_mewui_select_game::build_custom()
 {
     int arrayindex = 0;
-    const game_driver **s_drivers;
+    std::vector<const game_driver *> s_drivers;
     bool bioscheck = false;
 
     if (machine().options().ui_grouped())
     {
         if (custfltr::main_filter == FILTER_AVAILABLE)
-            s_drivers = avlsortedlist;
+            s_drivers = m_availsortedlist;
         else if (custfltr::main_filter == FILTER_UNAVAILABLE)
-            s_drivers = unavlsortedlist;
+            s_drivers = m_unavailsortedlist;
         else
-            s_drivers = sortedlist;
+            s_drivers = m_sortedlist;
     }
     else if (custfltr::main_filter == FILTER_AVAILABLE)
-        s_drivers = avllist;
+        s_drivers = m_availablelist;
     else if (custfltr::main_filter == FILTER_UNAVAILABLE)
-        s_drivers = unavllist;
+        s_drivers = m_unavailablelist;
     else
-        s_drivers = driverlist;
+        s_drivers = m_fulllist;
 
     for (int index = 0; s_drivers[index]; index++)
     {
@@ -1341,10 +1284,8 @@ void ui_mewui_select_game::build_custom()
         if (!(s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_ARCADES)
             continue;
 
-        displaylist[arrayindex++] = s_drivers[index];
+        m_displaylist.push_back(s_drivers[index]);
     }
-
-    displaylist[arrayindex] = NULL;
 
     for (int count = 1; count <= custfltr::numother; count++)
     {
@@ -1356,15 +1297,15 @@ void ui_mewui_select_game::build_custom()
     for (int count = 1; count <= custfltr::numother; count++)
     {
         int filter = custfltr::other[count];
-        s_drivers = &displaylist[0];
+        s_drivers = m_displaylist;
 
         switch (filter)
         {
             case FILTER_YEAR:
-                build_list(c_year::ui[custfltr::year[count]].c_str(), s_drivers, filter, bioscheck);
+                build_list(s_drivers, c_year::ui[custfltr::year[count]].c_str(), filter, bioscheck);
                 break;
             case FILTER_MANUFACTURER:
-                build_list(c_mnfct::ui[custfltr::mnfct[count]].c_str(), s_drivers, filter, bioscheck);
+                build_list(s_drivers, c_mnfct::ui[custfltr::mnfct[count]].c_str(), filter, bioscheck);
                 break;
             case FILTER_VECTOR:
             case FILTER_RASTER:
@@ -1374,7 +1315,7 @@ void ui_mewui_select_game::build_custom()
                 build_from_cache(s_drivers, filter, bioscheck);
                 break;
             default:
-                build_list(NULL, s_drivers, filter, bioscheck);
+                build_list(s_drivers, NULL, filter, bioscheck);
                 break;
         }
     }
@@ -1386,42 +1327,13 @@ void ui_mewui_select_game::build_custom()
 
 void ui_mewui_select_game::build_category()
 {
-    int arrayindex = 0;
     std::vector<int> temp_filter;
     machine().inifile().load_ini_category(temp_filter);
 
-    while (arrayindex < temp_filter.size())
+    for (int index = 0; index < temp_filter.size(); ++index)
     {
-        int actual = temp_filter[arrayindex];
-        displaylist[arrayindex++] = &driver_list::driver(actual);
-    }
-
-    displaylist[arrayindex] = NULL;
-}
-
-//-------------------------------------------------
-//  populate search list
-//-------------------------------------------------
-
-void ui_mewui_select_game::populate_search()
-{
-    UINT32 flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
-    find_matches(search, VISIBLE_GAMES_IN_SEARCH);
-
-    for (int curitem = 0; searchlist[curitem]; curitem++)
-    {
-        bool cloneof = strcmp(searchlist[curitem]->parent, "0");
-
-        if (cloneof)
-        {
-            int cx = driver_list::find(searchlist[curitem]->parent);
-
-            if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
-                cloneof = false;
-        }
-
-        item_append(searchlist[curitem]->description, NULL, (!cloneof) ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
-                    (void *)searchlist[curitem]);
+        int actual = temp_filter[index];
+        m_displaylist.push_back(&driver_list::driver(actual));
     }
 }
 
@@ -1429,14 +1341,13 @@ void ui_mewui_select_game::populate_search()
 //  build list from cache
 //-------------------------------------------------
 
-void ui_mewui_select_game::build_from_cache(const game_driver **s_drivers, int filter, bool bioscheck)
+void ui_mewui_select_game::build_from_cache(std::vector<const game_driver *> &s_drivers, int filter, bool bioscheck)
 {
-    int arrayindex = 0;
     int empty = driver_list::find("___empty");
 
-    if (s_drivers == NULL)
+    if (s_drivers.empty())
     {
-        s_drivers = (machine().options().ui_grouped()) ? sortedlist : driverlist;
+        s_drivers = (machine().options().ui_grouped()) ? m_sortedlist : m_fulllist;
         filter = mewui_globals::actual_filter;
     }
 
@@ -1463,79 +1374,84 @@ void ui_mewui_select_game::build_from_cache(const game_driver **s_drivers, int f
         {
             case FILTER_VECTOR:
                 if (mewui_globals::driver_cache[idx].b_vector)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_RASTER:
                 if (!mewui_globals::driver_cache[idx].b_vector)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_SAMPLES:
                 if (mewui_globals::driver_cache[idx].b_samples)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_STEREO:
                 if (mewui_globals::driver_cache[idx].b_stereo)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
 
             case FILTER_CHD:
                 if (mewui_globals::driver_cache[idx].b_chd)
-                    displaylist[arrayindex++] = s_drivers[index];
+					m_displaylist.push_back(s_drivers[index]);
                 break;
         }
     }
-
-    displaylist[arrayindex] = NULL;
 }
 
 //-------------------------------------------------
-//  find approximate matches
+//  populate search list
 //-------------------------------------------------
 
-void ui_mewui_select_game::find_matches(const char *str, int count)
+void ui_mewui_select_game::populate_search()
 {
     // allocate memory to track the penalty value
-    std::vector<int> penalty(count, 9999);
-    std::vector<int> penalty_old(count, 9999);
-    int index = 0;
+    std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
+	const game_driver *tmp = NULL;
+	std::fill(m_searchlist.begin(), m_searchlist.end(), tmp);
 
-    for (; displaylist[index]; index++)
+    for (int index = 0; index < m_displaylist.size(); index++)
     {
         // pick the best match between driver name and description
-        int curpenalty_old = driver_list::penalty_compare(str, displaylist[index]->description);
-        int tmp_old = driver_list::penalty_compare(str, displaylist[index]->name);
-        int curpenalty = fuzzy_substring(str, displaylist[index]->description);
-        int tmp = fuzzy_substring(str, displaylist[index]->name);
+        int curpenalty = driver_list::penalty_compare(m_search, m_displaylist[index]->description);
+        int tmp = driver_list::penalty_compare(m_search, m_displaylist[index]->name);
         curpenalty = MIN(curpenalty, tmp);
-        curpenalty_old = MIN(curpenalty_old, tmp_old);
 
         // insert into the sorted table of matches
-        for (int matchnum = count - 1; matchnum >= 0; matchnum--)
+        for (int matchnum = VISIBLE_GAMES_IN_SEARCH - 1; matchnum >= 0; matchnum--)
         {
             // stop if we're worse than the current entry
-            if (curpenalty > penalty[matchnum])
+            if (curpenalty >= penalty[matchnum])
                 break;
 
-            if (curpenalty == penalty[matchnum])
-                if (curpenalty_old >= penalty_old[matchnum])
-                    break;
-
             // as long as this isn't the last entry, bump this one down
-            if (matchnum < count - 1)
+            if (matchnum < VISIBLE_GAMES_IN_SEARCH - 1)
             {
                 penalty[matchnum + 1] = penalty[matchnum];
-                penalty_old[matchnum + 1] = penalty_old[matchnum];
-                searchlist[matchnum + 1] = searchlist[matchnum];
+                m_searchlist[matchnum + 1] = m_searchlist[matchnum];
             }
 
-            searchlist[matchnum] = displaylist[index];
+            m_searchlist[matchnum] = m_displaylist[index];
             penalty[matchnum] = curpenalty;
-            penalty_old[matchnum] = curpenalty_old;
         }
     }
 
-    (index < count) ? searchlist[index] = NULL : searchlist[count] = NULL;
+    UINT32 flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
+
+    for (int curitem = 0; curitem < m_searchlist.size() && m_searchlist[curitem]; curitem++)
+    {
+        bool cloneof = strcmp(m_searchlist[curitem]->parent, "0");
+
+        if (cloneof)
+        {
+            int cx = driver_list::find(m_searchlist[curitem]->parent);
+
+            if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+                cloneof = false;
+        }
+
+        item_append(m_searchlist[curitem]->description, NULL, (!cloneof) ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
+                    (void *)m_searchlist[curitem]);
+    }
 }

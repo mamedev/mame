@@ -113,28 +113,29 @@ void ui_menu_add_change_folder::handle()
             }
 
             // reset the char buffer also in this case
-            if (search[0] != 0) search[0] = '\0';
+            if (m_search[0] != 0)
+				m_search[0] = '\0';
 
             reset(UI_MENU_RESET_SELECT_FIRST);
         }
 
         else if (menu_event->iptkey == IPT_SPECIAL)
         {
-            int buflen = strlen(search);
+            int buflen = strlen(m_search);
             bool update_selected = FALSE;
 
             // if it's a backspace and we can handle it, do so
             if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
             {
-                *(char *)utf8_previous_char(&search[buflen]) = 0;
+                *(char *)utf8_previous_char(&m_search[buflen]) = 0;
                 update_selected = TRUE;
             }
 
             // if it's any other key and we're not maxed out, update
             else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
             {
-                buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
-                search[buflen] = 0;
+                buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
+                m_search[buflen] = 0;
                 update_selected = TRUE;
             }
 
@@ -167,14 +168,14 @@ void ui_menu_add_change_folder::handle()
                 int entry, bestmatch = 0;
 
                 // from current item to the end
-                for (entry = cur_selected; entry < numitems; entry++)
-                    if (item[entry].ref != NULL && search != NULL)
+                for (entry = cur_selected; entry < item.size(); entry++)
+                    if (item[entry].ref != NULL && m_search != NULL)
                     {
                         int match = 0;
 
-                        for (int i = 0; i < ARRAY_LENGTH(search); i++)
+                        for (int i = 0; i < ARRAY_LENGTH(m_search); i++)
                         {
-                            if (core_strnicmp(item[entry].text, search, i) == 0)
+                            if (core_strnicmp(item[entry].text, m_search, i) == 0)
                                 match = i;
                         }
 
@@ -188,13 +189,13 @@ void ui_menu_add_change_folder::handle()
                 // and from the first item to current one
                 for (entry = 0; entry < cur_selected; entry++)
                 {
-                    if (item[entry].ref != NULL && search != NULL)
+                    if (item[entry].ref != NULL && m_search != NULL)
                     {
                         int match = 0;
 
-                        for (int i = 0; i < ARRAY_LENGTH(search); i++)
+                        for (int i = 0; i < ARRAY_LENGTH(m_search); i++)
                         {
-                            if (core_strnicmp(item[entry].text, search, i) == 0)
+                            if (core_strnicmp(item[entry].text, m_search, i) == 0)
                                 match = i;
                         }
 
@@ -211,8 +212,8 @@ void ui_menu_add_change_folder::handle()
         else if (menu_event->iptkey == IPT_UI_CANCEL)
         {
             // reset the char buffer also in this case
-            if (search[0] != 0)
-                search[0] = '\0';
+            if (m_search[0] != 0)
+                m_search[0] = '\0';
         }
     }
 }
@@ -258,7 +259,7 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
     std::string tempbuf[2];
     const char *s_change = (change) ? "Change" : "Add";
 
-    tempbuf[0].assign(s_change).append(" ").append(s_folders_entry[path_ref].name).append(" Folder - Search: ").append(search).append("_");
+    tempbuf[0].assign(s_change).append(" ").append(s_folders_entry[path_ref].name).append(" Folder - Search: ").append(m_search).append("_");
 
     tempbuf[1].assign(current_path.c_str());
 
@@ -595,7 +596,7 @@ void ui_menu_remove_folder::handle()
         int index = (FPTR)menu_event->itemref - 1;
         std::string tmppath;
 
-        for (int i = 0; i < numitems - 2; i++)
+        for (int i = 0; i < item.size() - 2; i++)
             if (i != index)
                 tmppath.append(item[i].text).append(";");
 

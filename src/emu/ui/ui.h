@@ -62,25 +62,25 @@
 /* justification options for ui_draw_text_full */
 enum
 {
-	JUSTIFY_LEFT = 0,
-	JUSTIFY_CENTER,
-	JUSTIFY_RIGHT
+    JUSTIFY_LEFT = 0,
+    JUSTIFY_CENTER,
+    JUSTIFY_RIGHT
 };
 
 /* word wrapping options for ui_draw_text_full */
 enum
 {
-	WRAP_NEVER,
-	WRAP_TRUNCATE,
-	WRAP_WORD
+    WRAP_NEVER,
+    WRAP_TRUNCATE,
+    WRAP_WORD
 };
 
 /* drawing options for ui_draw_text_full */
 enum
 {
-	DRAW_NONE,
-	DRAW_NORMAL,
-	DRAW_OPAQUE
+    DRAW_NONE,
+    DRAW_NORMAL,
+    DRAW_OPAQUE
 };
 
 #define SLIDER_NOCHANGE     0x12345678
@@ -97,14 +97,14 @@ typedef INT32(*slider_update)(running_machine &machine, void *arg, std::string *
 
 struct slider_state
 {
-	slider_state *  next;               /* pointer to next slider */
-	slider_update   update;             /* callback */
-	void *          arg;                /* argument */
-	INT32           minval;             /* minimum value */
-	INT32           defval;             /* default value */
-	INT32           maxval;             /* maximum value */
-	INT32           incval;             /* increment value */
-	char            description[1];     /* textual description */
+    slider_state *  next;               /* pointer to next slider */
+    slider_update   update;             /* callback */
+    void *          arg;                /* argument */
+    INT32           minval;             /* minimum value */
+    INT32           defval;             /* default value */
+    INT32           maxval;             /* maximum value */
+    INT32           incval;             /* increment value */
+    char            description[1];     /* textual description */
 };
 
 
@@ -113,100 +113,100 @@ struct slider_state
 class ui_manager
 {
 public:
-	// construction/destruction
-	ui_manager(running_machine &machine);
+    // construction/destruction
+    ui_manager(running_machine &machine);
 
-	// getters
-	running_machine &machine() const { return m_machine; }
-	bool single_step() const { return m_single_step; }
+    // getters
+    running_machine &machine() const { return m_machine; }
+    bool single_step() const { return m_single_step; }
 
-	// setters
-	void set_single_step(bool single_step) { m_single_step = single_step; }
+    // setters
+    void set_single_step(bool single_step) { m_single_step = single_step; }
 
-	// methods
-	void initialize(running_machine &machine);
-	UINT32 set_handler(ui_callback callback, UINT32 param);
-	void display_startup_screens(bool first_time, bool show_disclaimer);
-	void set_startup_text(const char *text, bool force);
-	void update_and_render(render_container *container);
-	render_font *get_font();
-	float get_line_height();
-	float get_char_width(unicode_char ch);
-	float get_string_width(const char *s);
-	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
-	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
-	void draw_text(render_container *container, const char *buf, float x, float y);
-	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = NULL, float *totalheight = NULL, float text_size = 1.0f);
-	void draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
-	void draw_message_window(render_container *container, const char *text);
+    // methods
+    void initialize(running_machine &machine);
+    UINT32 set_handler(ui_callback callback, UINT32 param);
+    void display_startup_screens(bool first_time, bool show_disclaimer);
+    void set_startup_text(const char *text, bool force);
+    void update_and_render(render_container *container);
+    render_font *get_font();
+    float get_line_height();
+    float get_char_width(unicode_char ch);
+    float get_string_width(const char *s);
+    void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
+    void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
+    void draw_text(render_container *container, const char *buf, float x, float y);
+    void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = NULL, float *totalheight = NULL, float text_size = 1.0f);
+    void draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
+    void draw_message_window(render_container *container, const char *text);
 
-	void CLIB_DECL popup_time(int seconds, const char *text, ...) ATTR_PRINTF(3,4);
-	void show_fps_temp(double seconds);
-	void set_show_fps(bool show);
-	bool show_fps() const;
-	bool show_fps_counter();
-	void set_show_profiler(bool show);
-	bool show_profiler() const;
-	void show_menu();
-	void show_mouse(bool status);
-	bool is_menu_active();
-	bool can_paste();
-	void paste();
-	bool use_natural_keyboard() const;
-	void set_use_natural_keyboard(bool use_natural_keyboard);
-	void image_handler_ingame();
-	void increase_frameskip();
-	void decrease_frameskip();
-	void request_quit();
+    void CLIB_DECL popup_time(int seconds, const char *text, ...) ATTR_PRINTF(3,4);
+    void show_fps_temp(double seconds);
+    void set_show_fps(bool show);
+    bool show_fps() const;
+    bool show_fps_counter();
+    void set_show_profiler(bool show);
+    bool show_profiler() const;
+    void show_menu();
+    void show_mouse(bool status);
+    bool is_menu_active();
+    bool can_paste();
+    void paste();
+    bool use_natural_keyboard() const;
+    void set_use_natural_keyboard(bool use_natural_keyboard);
+    void image_handler_ingame();
+    void increase_frameskip();
+    void decrease_frameskip();
+    void request_quit();
 
-	// print the game info string into a buffer
-	std::string &game_info_astring(std::string &str);
+    // print the game info string into a buffer
+    std::string &game_info_astring(std::string &str);
 
-	// slider controls
-	const slider_state *get_slider_list(void);
+    // slider controls
+    const slider_state *get_slider_list(void);
 
-	// other
-	void process_natural_keyboard();
+    // other
+    void process_natural_keyboard();
 
-	// MEWUI word wrap
-	void wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int *totallines, int *xstart, int *xend, float text_size = 1.0f);
+    // MEWUI word wrap
+    void wrap_text(render_container *container, const char *origs, float x, float y, float origwrapwidth, int *totallines, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
 
-	// draw an outlined box with given line color and filled with a texture
-	void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = NULL, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+    // draw an outlined box with given line color and filled with a texture
+    void draw_textured_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = NULL, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
-	// return text string width with given text size
-	float get_string_width_ex(const char *s, float text_size);
+    // return text string width with given text size
+    float get_string_width_ex(const char *s, float text_size);
 
 private:
-	// instance variables
-	running_machine &       m_machine;
-	render_font *           m_font;
-	ui_callback             m_handler_callback;
-	UINT32                  m_handler_param;
-	bool                    m_single_step;
-	bool                    m_showfps;
-	osd_ticks_t             m_showfps_end;
-	bool                    m_show_profiler;
-	osd_ticks_t             m_popup_text_end;
-	bool                    m_use_natural_keyboard;
-	UINT8 *                 m_non_char_keys_down;
-	render_texture *        m_mouse_arrow_texture;
-	bool                    m_mouse_show;
+    // instance variables
+    running_machine &       m_machine;
+    render_font *           m_font;
+    ui_callback             m_handler_callback;
+    UINT32                  m_handler_param;
+    bool                    m_single_step;
+    bool                    m_showfps;
+    osd_ticks_t             m_showfps_end;
+    bool                    m_show_profiler;
+    osd_ticks_t             m_popup_text_end;
+    bool                    m_use_natural_keyboard;
+    UINT8 *                 m_non_char_keys_down;
+    render_texture *        m_mouse_arrow_texture;
+    bool                    m_mouse_show;
 
-	// text generators
-	std::string &disclaimer_string(std::string &buffer);
-	std::string &warnings_string(std::string &buffer);
+    // text generators
+    std::string &disclaimer_string(std::string &buffer);
+    std::string &warnings_string(std::string &buffer);
 
-	// UI handlers
-	static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);
-	static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
-	static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
-	static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state);
-	static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);
-	static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state);
+    // UI handlers
+    static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);
+    static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
+    static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
+    static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state);
+    static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);
+    static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state);
 
-	// private methods
-	void exit();
+    // private methods
+    void exit();
 };
 
 

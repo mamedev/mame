@@ -38,19 +38,21 @@ private:
 	std::vector<const game_driver *> m_unavailablelist;
 	std::vector<const game_driver *> m_displaylist;
 	std::vector<const game_driver *> m_searchlist;
+	std::vector<const game_driver *> m_tmp;
 
 	// internal methods
 	void build_custom();
 	void build_category();
-	void build_driver_list();
-	void build_list(const char *filter_text = NULL, const game_driver **s_drivers = NULL, int filter = 0, bool bioscheck = false);
-	void build_from_cache(const game_driver **s_drivers = NULL, int filter = 0, bool bioscheck = false);
+	void build_full_list();
+	void build_available_list();
+	void build_list(std::vector<const game_driver *> &vec, const char *filter_text = NULL, int filter = 0, bool bioscheck = false);
+	void build_from_cache(std::vector<const game_driver *> &vec, int filter = 0, bool bioscheck = false);
 
 	bool no_active_search();
 	void populate_search();
 
 	// handlers
-	void inkey_cancel(const ui_menu_event *menu_event);
+//	void inkey_cancel(const ui_menu_event *menu_event);
 	void inkey_select(const ui_menu_event *menu_event);
 	void inkey_select_favorite(const ui_menu_event *menu_event);
 	void inkey_special(const ui_menu_event *menu_event);

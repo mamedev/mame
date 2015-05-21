@@ -33,18 +33,18 @@ public:
     virtual void handle();
     virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
-    virtual bool have_search() { return (search[0] != 0); }
+	virtual bool menu_has_search_active() { return (m_search[0] != 0); }
 
 private:
     enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-    char        search[40];
+    char        m_search[40];
     UINT16      *selector;
     int         p_category, hover;
     bool        first_pass;
     std::vector<std::string> str_items;
     std::string *searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 
-    void find_matches(const char *str, int count);
+    void find_matches(const char *str);
 };
 
 #endif /* __MSELECTOR_H__ */

@@ -281,17 +281,17 @@ void ui_menu_select_software::populate()
         build_list();
 
         // iterate over entries
-        for (int curitem = 0; displaylist[curitem]; curitem++)
+        for (int curitem = 0; m_displaylist[curitem]; curitem++)
         {
             if (reselect_last::software.compare("[Start empty]") == 0 && !reselect_last::driver.empty())
                 old_software = 0;
 
-            else if (!reselect_last::software.empty() && displaylist[curitem]->shortname.compare(reselect_last::software) == 0
-                            && displaylist[curitem]->part.compare(reselect_last::part) == 0)
+            else if (!reselect_last::software.empty() && m_displaylist[curitem]->shortname.compare(reselect_last::software) == 0
+                            && m_displaylist[curitem]->part.compare(reselect_last::part) == 0)
                     old_software = has_empty_start ? curitem + 1 : curitem;
 
-            item_append(displaylist[curitem]->longname.c_str(), displaylist[curitem]->devicetype.c_str(),
-                        displaylist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui), (void *)displaylist[curitem]);
+            item_append(m_displaylist[curitem]->longname.c_str(), m_displaylist[curitem]->devicetype.c_str(),
+                        m_displaylist[curitem]->parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui), (void *)m_displaylist[curitem]);
         }
     }
 
@@ -402,7 +402,7 @@ void ui_menu_select_software::build_software_list()
         return;
     }
 
-    displaylist.resize(ui_swlist.size() + 1);
+    m_displaylist.resize(ui_swlist.size() + 1);
 
     // retrieve and set the long name of software for parents
     for (int y = 0; y < ui_swlist.size(); y++)
@@ -828,37 +828,37 @@ void ui_menu_select_software::build_list()
         {
             case MEWUI_SW_PARENTS:
                 if (ui_swlist[x].parentname.empty())
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
 
             case MEWUI_SW_CLONES:
                 if (!ui_swlist[x].parentname.empty())
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
 
             case MEWUI_SW_AVAILABLE:
                 if (ui_swlist[x].available)
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                  break;
 
             case MEWUI_SW_UNAVAILABLE:
                 if (!ui_swlist[x].available)
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                  break;
 
             case MEWUI_SW_SUPPORTED:
                 if (ui_swlist[x].supported != SOFTWARE_SUPPORTED_NO && ui_swlist[x].supported != SOFTWARE_SUPPORTED_PARTIAL)
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
 
             case MEWUI_SW_PARTIAL_SUPPORTED:
                 if (ui_swlist[x].supported == SOFTWARE_SUPPORTED_PARTIAL)
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
 
             case MEWUI_SW_UNSUPPORTED:
                 if (ui_swlist[x].supported == SOFTWARE_SUPPORTED_NO)
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
 
             case MEWUI_SW_REGION:
@@ -866,7 +866,7 @@ void ui_menu_select_software::build_list()
                 std::string name = m_region.getname(ui_swlist[x].longname.c_str());
 
                 if(!name.empty() && m_region.ui[m_region.actual].compare(name) == 0)
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
             }
 
@@ -875,21 +875,21 @@ void ui_menu_select_software::build_list()
                 std::string name = m_publisher.getname(ui_swlist[x].publisher.c_str());
 
                 if(!name.empty() && m_publisher.ui[m_publisher.actual].compare(name) == 0)
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
             }
 
             case MEWUI_SW_YEARS:
                 if(ui_swlist[x].year == m_year.ui[m_year.actual])
-                    displaylist[arrayindex++] = &ui_swlist[x];
+                    m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
 
             default:
-                displaylist[arrayindex++] = &ui_swlist[x];
+                m_displaylist[arrayindex++] = &ui_swlist[x];
                 break;
         }
     }
-    displaylist[arrayindex] = NULL;
+    m_displaylist[arrayindex] = NULL;
 }
 
 //-------------------------------------------------
@@ -903,13 +903,13 @@ void ui_menu_select_software::find_matches(const char *str, int count)
     std::vector<int> penalty_old(count, 9999);
     int index = 0;
 
-    for (; displaylist[index]; index++)
+    for (; m_displaylist[index]; index++)
     {
         // pick the best match between driver name and description
-        int curpenalty_old = driver_list::penalty_compare(str, displaylist[index]->longname.c_str());
-        int tmp_old = driver_list::penalty_compare(str, displaylist[index]->shortname.c_str());
-        int curpenalty = fuzzy_substring(str, displaylist[index]->longname.c_str());
-        int tmp = fuzzy_substring(str, displaylist[index]->shortname.c_str());
+        int curpenalty_old = driver_list::penalty_compare(str, m_displaylist[index]->longname.c_str());
+        int tmp_old = driver_list::penalty_compare(str, m_displaylist[index]->shortname.c_str());
+        int curpenalty = fuzzy_substring(str, m_displaylist[index]->longname.c_str());
+        int tmp = fuzzy_substring(str, m_displaylist[index]->shortname.c_str());
         curpenalty = MIN(curpenalty, tmp);
         curpenalty_old = MIN(curpenalty_old, tmp_old);
 
@@ -932,7 +932,7 @@ void ui_menu_select_software::find_matches(const char *str, int count)
                 searchlist[matchnum + 1] = searchlist[matchnum];
             }
 
-            searchlist[matchnum] = displaylist[index];
+            searchlist[matchnum] = m_displaylist[index];
             penalty[matchnum] = curpenalty;
             penalty_old[matchnum] = curpenalty_old;
         }

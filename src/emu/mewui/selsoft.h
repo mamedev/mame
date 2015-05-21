@@ -64,7 +64,7 @@ private:
     c_sw_year           m_year;
 
     ui_software_info *searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
-    std::vector<ui_software_info *> displaylist;
+    std::vector<ui_software_info *> m_displaylist;
     std::vector<ui_software_info> ui_swlist;
 
     void build_software_list();
