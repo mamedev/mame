@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R.Belmont,Kevin Horton
+// copyright-holders:R. Belmont,Kevin Horton
 /***************************************************************************
 
     MPU-401 MIDI device interface

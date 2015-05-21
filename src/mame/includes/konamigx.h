@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
 #include "sound/k056800.h"
 #include "sound/k054539.h"
