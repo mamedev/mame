@@ -437,6 +437,28 @@ bool floppy_image_device::call_create(int format_type, option_resolution *format
 {
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	output_format = 0;
+
+	// search for a suitable format based on the extension
+	for(floppy_image_format_t *i = fif_list; i; i = i->next)
+	{
+		// only consider formats that actually support saving
+		if(!i->supports_save())
+			continue;
+
+		if (i->extension_matches(basename()))
+		{
+			output_format = i;
+			break;
+		}
+	}
+
+	// did we find a suitable format?
+	if (output_format == 0)
+	{
+		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
+		return IMAGE_INIT_FAIL;
+	}
+
 	return IMAGE_INIT_PASS;
 }
 
