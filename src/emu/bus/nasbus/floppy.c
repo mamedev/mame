@@ -72,6 +72,7 @@ nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *
 	m_floppy2(*this, "fd1793:2"),
 	m_floppy3(*this, "fd1793:3"),
 	m_floppy(NULL),
+	m_motor(NULL),
 	m_select(0)
 {
 }
@@ -82,6 +83,9 @@ nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *
 
 void nascom_fdc_device::device_start()
 {
+	// timer to turn off the drive motor line
+	m_motor = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nascom_fdc_device::motor_off), this));
+
 	save_item(NAME(m_select));
 }
 
@@ -116,6 +120,21 @@ void nascom_fdc_device::device_reset_after_children()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+TIMER_CALLBACK_MEMBER( nascom_fdc_device::motor_off )
+{
+	if (m_floppy0->get_device())
+		m_floppy0->get_device()->mon_w(1);
+
+	if (m_floppy1->get_device())
+		m_floppy1->get_device()->mon_w(1);
+
+	if (m_floppy2->get_device())
+		m_floppy2->get_device()->mon_w(1);
+
+	if (m_floppy3->get_device())
+		m_floppy3->get_device()->mon_w(1);
+}
 
 READ8_MEMBER( nascom_fdc_device::select_r )
 {
@@ -159,6 +178,9 @@ WRITE8_MEMBER( nascom_fdc_device::select_w )
 	{
 		m_floppy->ss_w(BIT(data, 4));
 		m_floppy->mon_w(!BIT(data, 5));
+
+		// motor gets turned off again after 10 seconds
+		m_motor->adjust(attotime::from_seconds(10), 0);
 	}
 
 	m_fdc->dden_w(BIT(data, 6));
@@ -171,6 +193,13 @@ READ8_MEMBER( nascom_fdc_device::status_r )
 	UINT8 data = 0;
 
 	data |= m_fdc->intrq_r() << 0;
+
+	// if a floppy is selected, get its ready state, otherwise just set non-ready
+	if (m_floppy)
+		data |= m_floppy->ready_r() << 1;
+	else
+		data |= 1 << 1;
+
 	data |= m_fdc->drq_r()   << 7;
 
 	if (VERBOSE_STATUS)
