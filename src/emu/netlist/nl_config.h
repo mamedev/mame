@@ -29,10 +29,13 @@
  *
  * To get a performance increase we need the GCC extension.
  *
+ * Todo: This doesn't work with current (4.8+) mingw 32bit builds.
+ * 		 Therefore disabled for now for i386 builds.
+ *
  */
 
 #ifndef USE_PMFDELEGATES
-#if defined(__clang__)
+#if defined(__clang__) || (defined(__GNUC__) && defined(__i386__))
 	#define USE_PMFDELEGATES        	(0)
 	#define NO_USE_PMFCONVERSION		(1)
 #else
