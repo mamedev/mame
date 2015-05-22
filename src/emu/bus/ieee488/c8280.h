@@ -24,14 +24,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c8280_device
+// ======================> c8280_t
 
-class c8280_device :  public device_t,
-					  public device_ieee488_interface
+class c8280_t :  public device_t,
+				 public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8280_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
