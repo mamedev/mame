@@ -23,7 +23,7 @@
  *M58496: 72-pin QFP CMOS, 2Kx10 ROM, 128x4 internal + 256x4 external RAM, 1 timer, low-power
  *M58497: almost same as M58496
 
-  MELPS 740 subfamily has more differences, document them when needed.
+  MELPS 760 subfamily has more differences, document them when needed.
 
 
   References:
