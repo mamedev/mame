@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Lord Nightmare
+// copyright-holders:hap, Jonathan Gevaryahu
 /***************************************************************************
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
