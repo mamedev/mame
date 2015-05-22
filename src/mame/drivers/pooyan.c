@@ -1,10 +1,10 @@
 // license:???
-// copyright-holders:Allard Van Der Bas
+// copyright-holders:Allard van der Bas
 /***************************************************************************
 
     Pooyan
 
-    Original driver by Allard Van Der Bas
+    Original driver by Allard van der Bas
 
     This hardware is very similar to Time Pilot.
 

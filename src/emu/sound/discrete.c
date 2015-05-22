@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Keith Wilkins, D.Renaud, F.Palazzolo, Couriersud
+// copyright-holders:Keith Wilkins, Derrick Renaud, Frank Palazzolo, Couriersud
 /************************************************************************
  *
  *  MAME - Discrete sound system emulation library

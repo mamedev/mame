@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett, J.Wallace, David Haywood
+// copyright-holders:Philip Bennett, James Wallace, David Haywood
 /***************************************************************************
 
     JPM System 5

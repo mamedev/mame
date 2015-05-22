@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Stefan Jokish
+// copyright-holders:Stefan Jokisch
 /*************************************************************************
 
     Atari Triple Hunt hardware

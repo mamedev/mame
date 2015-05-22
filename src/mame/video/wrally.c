@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Andel Horna
+// copyright-holders:Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Angel Horna
 /***************************************************************************
 
   World Rally Video Hardware

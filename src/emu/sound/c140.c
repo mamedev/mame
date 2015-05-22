@@ -40,8 +40,8 @@ Unmapped registers:
 */
 /*
     2000.06.26  CAB     fixed compressed pcm playback
-    2002.07.20  R.Belmont   added support for multiple banking types
-    2006.01.08  R.Belmont   added support for NA-1/2 "219" derivative
+    2002.07.20  R. Belmont   added support for multiple banking types
+    2006.01.08  R. Belmont   added support for NA-1/2 "219" derivative
 */
 
 
