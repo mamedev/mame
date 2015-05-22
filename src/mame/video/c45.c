@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Alex Jackson
+// copyright-holders:Phil Stroffolino, Aaron Giles, Alex W. Jackson
 /**************************************************************************************************************/
 /*
     Land Line Buffer
