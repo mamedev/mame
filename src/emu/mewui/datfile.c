@@ -555,7 +555,7 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
             }
 
             // search for software info
-            else if (readbuf[0] == DATAFILE_TAG)
+            else if (readbuf[0] == DATAFILE_TAG[0])
             {
                 std::string readbuf_2;
                 std::getline(myfile, readbuf_2);
@@ -680,7 +680,9 @@ int datfile_manager::index_menuidx(const game_driver *drv, std::vector<tDatafile
     const game_driver *gdrv;
     int m_count = 0;
     std::string readbuf;
+	size_t x = 0;
 
+	for (
     gdrv = drv;
 
     do
@@ -743,11 +745,7 @@ int datfile_manager::load_command_text(std::string &buffer, std::vector<tMenuInd
 
     // open and seek to correct point in datafile
     std::ifstream myfile(fullpath.c_str());
-
-    if (!myfile.is_open())
-        return 1;
-
-    myfile.seekg((m_idx + menu_sel)->offset, myfile.beg);
+    myfile.seekg(m_idx[menu_sel].offset, myfile.beg);
 
     while (myfile.good())
     {
@@ -813,9 +811,8 @@ void datfile_manager::command_sub_menu(const game_driver *drv, std::vector<std::
 
 		if (!menu_idx.empty())
 		{
-			tMenuIndex *m_idx = menu_idx;
-			for (; !m_idx->menuitem.empty(); m_idx++)
-				menu_item.push_back(m_idx->menuitem);
+			for (size_t x = 0; x < menu_idx.size(); ++x)
+				menu_item.push_back(menu_idx[x].menuitem);
 		}
 	}
 }
