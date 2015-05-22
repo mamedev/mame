@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Stefan Jokish
 /************************************************************************
  * starshp1 Sound System Analog emulation

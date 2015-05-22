@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo
 #include "sound/discrete.h"
 #include "sound/samples.h"
