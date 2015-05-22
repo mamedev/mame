@@ -261,6 +261,8 @@ protected:
 	void update_pa();
 	virtual void update_pb();
 	virtual void update_irq();
+	virtual UINT8 get_irq_flags();
+	void edge_detect(int old, int state);
 	void pa_w(int bit, int state);
 	void pb_w(int bit, int state);
 
@@ -382,6 +384,7 @@ protected:
 
 	void update_pb();
 	void update_irq();
+	UINT8 get_irq_flags();
 };
 
 
@@ -393,6 +396,8 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
+
+	DECLARE_WRITE8_MEMBER( pa_data_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pa7_w );
 
