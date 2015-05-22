@@ -570,24 +570,38 @@ bool netlist_setup_t::connect_input_input(netlist_core_terminal_t &t1, netlist_c
 	bool ret = false;
 	if (t1.has_net())
 	{
-		for (int i=0; i<t1.net().m_core_terms.count(); i++)
+		if (t1.net().isRailNet())
+			ret = connect(t2, t1.net().railterminal());
+		if (!ret)
 		{
-			if (t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::TERMINAL)
-					|| t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT))
-				ret = connect(t2, *t1.net().m_core_terms[i]);
-			if (ret)
-				break;
+			for (int i=0; i<t1.net().m_core_terms.count(); i++)
+			{
+				if (t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::TERMINAL)
+						/*|| t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT)*/)
+				{
+					ret = connect(t2, *t1.net().m_core_terms[i]);
+				}
+				if (ret)
+					break;
+			}
 		}
 	}
 	if (!ret && t2.has_net())
 	{
-		for (int i=0; i<t2.net().m_core_terms.count(); i++)
+		if (t2.net().isRailNet())
+			ret = connect(t1, t2.net().railterminal());
+		if (!ret)
 		{
-			if (t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::TERMINAL)
-					|| t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT))
-				ret = connect(t1, *t2.net().m_core_terms[i]);
-			if (ret)
-				break;
+			for (int i=0; i<t2.net().m_core_terms.count(); i++)
+			{
+				if (t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::TERMINAL)
+						/*|| t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT)*/)
+				{
+					ret = connect(t1, *t2.net().m_core_terms[i]);
+				}
+				if (ret)
+					break;
+			}
 		}
 	}
 	return ret;
@@ -667,12 +681,10 @@ void netlist_setup_t::resolve_inputs()
 
 			if (connect(*t1, *t2))
 			{
-				printf("%s and %s connected\n", t1s.cstr(), t2s.cstr());
 				m_links.remove_at(li);
 			}
 			else
 			{
-				printf("%s and %s failed\n", t1s.cstr(), t2s.cstr());
 				li++;
 			}
 		}

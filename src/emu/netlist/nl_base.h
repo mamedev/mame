@@ -260,14 +260,15 @@ ATTR_COLD virtual const netlist_logic_family_desc_t *default_logic_family()     
 // forward definitions
 // -----------------------------------------------------------------------------
 
-class netlist_net_t;
+class netlist_logic_output_t;
 class netlist_analog_net_t;
 class netlist_logic_net_t;
-class netlist_logic_output_t;
+class netlist_net_t;
 class netlist_param_t;
 class netlist_setup_t;
 class netlist_base_t;
 class netlist_matrix_solver_t;
+
 class NETLIB_NAME(gnd);
 class NETLIB_NAME(solver);
 class NETLIB_NAME(mainclock);
@@ -749,7 +750,6 @@ public:
 	 */
 	ATTR_COLD inline netlist_sig_t &Q_state_ptr()
 	{
-		nl_assert(family() == LOGIC);
 		return m_cur_Q;
 	}
 
@@ -777,15 +777,11 @@ public:
 
 	ATTR_HOT inline nl_double Q_Analog() const
 	{
-		//nl_assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
-		nl_assert(family() == ANALOG);
 		return m_cur_Analog;
 	}
 
 	ATTR_COLD inline nl_double &Q_Analog_state_ptr()
 	{
-		//nl_assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
-		nl_assert(family() == ANALOG);
 		return m_cur_Analog;
 	}
 
@@ -1381,7 +1377,6 @@ ATTR_HOT inline void netlist_net_t::reschedule_in_queue(const netlist_time &dela
 
 ATTR_HOT inline netlist_sig_t netlist_logic_input_t::Q() const
 {
-	nl_assert(family() == LOGIC);
 	return net().as_logic().Q();
 }
 
