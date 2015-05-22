@@ -173,14 +173,12 @@ float GetVignetteFactor(float2 coord, float amount)
 {
 	float2 VignetteCoord = coord;
 
-	float VignetteBlur = amount * 2.0f;
+	float VignetteLength = length(VignetteCoord);
+	float VignetteBlur = (amount * 0.75f) + 0.25;
 
 	// 0.5 full screen fitting circle
-	float VignetteRadius = 1.0f - amount * 0.5f;
-	float Vignette = smoothstep(VignetteRadius, VignetteRadius - VignetteBlur, length(VignetteCoord));
-
-	// reduce strength to 50%
-	Vignette = lerp(1.0, 1.0 * Vignette, 0.5f);
+	float VignetteRadius = 1.0f - (amount * 0.25f);
+	float Vignette = smoothstep(VignetteRadius, VignetteRadius - VignetteBlur, VignetteLength);
 
 	return saturate(Vignette);
 }
@@ -283,17 +281,17 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	BaseCoordCentered *= CurvatureZoom; // zoom
 	BaseCoordCentered += CurvatureCurve; // distortion
 
-	// float2 BaseAreaRatioCoord = BaseCoord;
-	// BaseAreaRatioCoord *= UsedArea * ScreenRatio;
-
-	float2 BaseAreaRatioCoordCentered = BaseCoordCentered;
-	BaseAreaRatioCoordCentered *= UsedArea * ScreenRatio;
-
-	// float2 BaseAreaCoord = BaseCoord;
-	// BaseAreaCoord *= UsedArea;
+	float2 BaseAreaCoord = BaseCoord;
+	BaseAreaCoord *= UsedArea;
 
 	float2 BaseAreaCoordCentered = BaseCoordCentered;
 	BaseAreaCoordCentered *= UsedArea;
+
+	float2 BaseAreaRatioCoord = BaseAreaCoord;
+	BaseAreaRatioCoord *= ScreenRatio;
+
+	float2 BaseAreaRatioCoordCentered = BaseAreaCoordCentered;
+	BaseAreaRatioCoordCentered *= ScreenRatio;
 
 	// // Alpha Clipping (round corners applies smoother clipping when screen is curved)
 	// clip((BaseCoord < SourceTexelDims) ? -1 : 1);
@@ -303,7 +301,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	BaseColor.a = 1.0f;
 
 	// Vignetting Simulation (may affect bloom)
-	float2 VignetteCoord = BaseAreaRatioCoordCentered;
+	float2 VignetteCoord = BaseAreaCoordCentered;
 
 	float VignetteFactor = GetVignetteFactor(VignetteCoord, VignettingAmount);
 	BaseColor.rgb *= VignetteFactor;
