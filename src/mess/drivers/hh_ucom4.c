@@ -3,7 +3,7 @@
 /***************************************************************************
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices,
-  most of them are VFD electronic games/toys.
+  most of them (emulated ones) are VFD electronic games/toys.
 
   Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
 
@@ -32,6 +32,7 @@
  @031     uPD553C  1979, Bambino Superstar Football (ET-03)
  @049     uPD553C  1979, Mego Mini-Vid Break Free
  @055     uPD553C  1980, Bambino Space Laser Fight (ET-12)
+ *073     uPD553C  1980, Sony ST-J75 FM Stereo Tuner
  @080     uPD553C  1980, Epoch Electronic Football
  *102     uPD553C  1981, Bandai Block Out
  @153     uPD553C  1981, Epoch Galaxy II

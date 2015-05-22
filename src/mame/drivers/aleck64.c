@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 /* 'Aleck64' and similar boards */
 /* N64 based hardware */
 /*

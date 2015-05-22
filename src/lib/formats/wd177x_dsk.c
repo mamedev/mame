@@ -234,7 +234,7 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 	// Previously tested cell size
 	int min_cell_size = 0;
 	for(;;) {
-		// Build the list of all formats for the immediatly superior cell size
+		// Build the list of all formats for the immediately superior cell size
 		int cur_cell_size = 0;
 		candidates.clear();
 		for(int i=0; i != formats_count; i++) {
@@ -288,13 +288,10 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 			else if(cc.head_count >= heads && cn.head_count < heads)
 				goto dont_change;
 
-			// Since we're limited to two heads, at that point head
-			// count is identical for both formats.
-
 			// Handling enough tracks is better than not
 			if(cn.track_count >= tracks && cc.track_count < tracks)
 				goto change;
-			else if(cn.track_count >= tracks && cc.track_count < tracks)
+			else if(cc.track_count >= tracks && cn.track_count < tracks)
 				goto dont_change;
 
 			// Both are on the same side of the track count, so closest is best
@@ -302,6 +299,11 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 				goto change;
 			if(cc.track_count >= tracks && cn.track_count < cc.track_count)
 				goto change;
+
+			// Lower number of heads is better
+			if (cn.head_count < cc.head_count && cn.head_count <= heads)
+				goto change;
+
 			goto dont_change;
 
 		change:

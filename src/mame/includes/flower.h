@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:insideoutboy
 class flower_state : public driver_device
 {
 public:

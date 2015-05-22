@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Mike Coates
 /***************************************************************************
   Functions to emulate video hardware on these Taito games:

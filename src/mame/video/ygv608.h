@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Mark McDougall
 #ifndef __YGV608_H__
 #define __YGV608_H__

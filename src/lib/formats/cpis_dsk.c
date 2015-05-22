@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*********************************************************************
 
     formats/cpis_dsk.c
@@ -97,9 +97,6 @@ LEGACY_FLOPPY_OPTIONS_END
 
 
 
-
-// license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
 /*********************************************************************
 
     formats/cpis_dsk.c

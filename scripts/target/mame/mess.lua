@@ -127,6 +127,7 @@ CPUS["AMIS2000"] = true
 CPUS["UCOM4"] = true
 CPUS["HMCS40"] = true
 CPUS["E0C6200"] = true
+CPUS["MELPS4"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -578,6 +579,7 @@ BUSES["C64"] = true
 BUSES["CBM2"] = true
 BUSES["CBMIEC"] = true
 BUSES["CENTRONICS"] = true
+BUSES["CGENIE_EXPANSION"] = true
 BUSES["CHANNELF"] = true
 BUSES["COCO"] = true
 BUSES["COLECO"] = true
@@ -606,6 +608,7 @@ BUSES["MACPDS"] = true
 BUSES["MIDI"] = true
 BUSES["MEGADRIVE"] = true
 BUSES["MSX_SLOT"] = true
+BUSES["NASBUS"] = true
 BUSES["NEOGEO"] = true
 BUSES["NES"] = true
 BUSES["NES_CTRL"] = true
@@ -948,9 +951,7 @@ files {
 	MAME_DIR .. "src/mame/machine/315-5881_crypt.c",  
 	MAME_DIR .. "src/mame/video/powervr2.c",    
 	MAME_DIR .. "src/mame/drivers/neogeo.c",    
-	MAME_DIR .. "src/mame/machine/neoboot.c",   
 	MAME_DIR .. "src/mame/machine/neocrypt.c",  
-	MAME_DIR .. "src/mame/machine/neoprot.c",   
 	MAME_DIR .. "src/mame/machine/ng_memcard.c",
 	MAME_DIR .. "src/mame/video/neogeo.c",      
 	MAME_DIR .. "src/mame/video/neogeo_spr.c",  
@@ -1754,6 +1755,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "mitsubishi")
 files {        
+	MAME_DIR .. "src/mess/drivers/hh_melps4.c",
 	MAME_DIR .. "src/mess/drivers/multi8.c",    
 	MAME_DIR .. "src/mess/drivers/multi16.c",   
 }
@@ -1790,8 +1792,6 @@ files {
 createMESSProjects(_target, _subtarget, "nascom")
 files {            
 	MAME_DIR .. "src/mess/drivers/nascom1.c",
-	MAME_DIR .. "src/mess/machine/nascom1.c",
-	MAME_DIR .. "src/mess/video/nascom1.c", 
 }
 
 createMESSProjects(_target, _subtarget, "ne")

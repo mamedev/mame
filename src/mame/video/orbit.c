@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Stefan Jokish
 /***************************************************************************
 
 Atari Orbit video emulation

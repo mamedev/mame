@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Angelo Salese, Roberto Fresca, Peter Ferrie
 /***********************************************************************************
 
   Multi Game - EGD, 1997
@@ -146,7 +146,7 @@ READ16_MEMBER(gambl186_state::comms_r)
                     case 5:
                     {
                         m_comms_expect = 13;
-                        m_comms_blocks = 5;
+                        m_comms_blocks = 4;
                         break;
                     }
 
@@ -226,9 +226,14 @@ READ16_MEMBER(gambl186_state::comms_r)
                             {
                                 m_comms_expect = 3;
 
-                                if (m_comms_blocks < 5)
+                                if (m_comms_blocks < 4)
                                 {
                                     m_comms_data[m_comms_ind] += 5; //compensate for ack
+
+                                    if (m_comms_blocks == 2)
+                                    {
+                                        m_comms_expect = 2;
+                                    }
                                 }
 
                                 break;
@@ -506,5 +511,6 @@ ROM_START( gambl186a )
 ROM_END
 
 
-GAME( 1997, gambl186,  0,        gambl186,   gambl186, driver_device,   0,   ROT0,  "EGD", "Multi Game (V398)",  GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, gambl186a, gambl186, gambl186,   gambl186, driver_device,   0,   ROT0,  "EGD", "Multi Game (V399)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY    FULLNAME             FLAGS... */
+GAME( 1997, gambl186,  0,        gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (V398)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, gambl186a, gambl186, gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (V399)",  GAME_NOT_WORKING | GAME_NO_SOUND )

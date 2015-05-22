@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __NES_KARASTUDIO_H
 #define __NES_KARASTUDIO_H
 

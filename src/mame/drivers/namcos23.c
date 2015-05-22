@@ -1887,9 +1887,9 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 
 void namcos23_state::render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
 {
-	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[1]*INT64(yi) + re->model.m[2]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0;
-	pv.y =    (INT32((re->model.m[3]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[5]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0;
-	pv.p[0] = (INT32((re->model.m[6]*INT64(xi) + re->model.m[7]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0;
+	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[1]*INT64(yi) + re->model.m[2]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0f;
+	pv.y =    (INT32((re->model.m[3]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[5]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0f;
+	pv.p[0] = (INT32((re->model.m[6]*INT64(xi) + re->model.m[7]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0f;
 }
 
 void namcos23_state::render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
@@ -1975,7 +1975,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 
 			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
 			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
-			pv[i].p[2] = (((v1 >> 16) & 0xf00) | ((v3 >> 24 & 0xff))) + 0.5 + tbase;
+			pv[i].p[2] = (((v1 >> 16) & 0xf00) | ((v3 >> 24 & 0xff))) + 0.5f + tbase;
 
 			if(pv[i].p[0] > maxz)
 				maxz = pv[i].p[0];
@@ -1999,12 +1999,12 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 				INT32 nz = u32_to_s10(norm);
 				INT32 nrx, nry, nrz;
 				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
-				float lsi = float(nrx*m_light_vector[0] + nry*m_light_vector[1] + nrz*m_light_vector[2])/4194304.0;
+				float lsi = float(nrx*m_light_vector[0] + nry*m_light_vector[1] + nrz*m_light_vector[2])/4194304.0f;
 				if(lsi < 0)
 					lsi = 0;
 
 				// Mapping taken out of a hat
-				pv[i].p[3] = 0.25+1.5*lsi;
+				pv[i].p[3] = 0.25f+1.5f*lsi;
 				break;
 			}
 			}
@@ -2022,7 +2022,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 				p->pv[i].p[2] *= w;
 				p->pv[i].p[3] *= w;
 			}
-			p->zkey = 0.5*(minz+maxz);
+			p->zkey = 0.5f*(minz+maxz);
 			p->front = !(h & 0x00000001);
 			p->rd.machine = &machine();
 			p->rd.texture_lookup = render_texture_lookup_nocache_point;

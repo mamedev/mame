@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood, Paul Priest
 /*
 Psikyo PS6406B (PS3v1/PS5/PS5v2):

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 #include "emu.h"
 #include "includes/namcos2.h" /* for game-specific hacks */
 #include "includes/namcoic.h"

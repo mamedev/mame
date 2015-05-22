@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /**************************************************************************
  *
  * Intel PXA255 on-chip peripheral emulation

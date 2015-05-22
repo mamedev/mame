@@ -34,19 +34,23 @@
         * Creative/Ensoniq AudioPCI ES1373 audio
         * Atmel 90S2313 AVR-based microcontroller for protection
         * STM48T02 NVRAM
+        * AMD AM85C30 Enhanced Serial Communications Controller
         * Conexant CX88168 modem
+    Eagle 1 Notes:
+        * Cypress CY82C693 Peripheral Controller
+        * 3DFX Voodoo 1 video
 
     TODO:
         * Add support for Eagle 1 (Virtual Pool) PCBs
-		* Add support for later RED boards
+        * Add support for later RED boards
 
-	Notes:
-		Sound volume may be muted, it can be adjusted through the service menu or with volume up/down buttons (+/-)
+  Notes:
+    Sound volume may be muted, it can be adjusted through the service menu or with volume up/down buttons (+/-)
 
-		The PCB for Virtual Pool is considered "Eagle 1" while the boards
-		that were production runs for later games are considered Eagle 2.
-		IE: GT Fore! & BBH, both security chips are "E2-" as are various
-		preprogrammed PALs: E2-CARD1 & E2-RES3
+    The PCB for Virtual Pool is considered "Eagle 1" while the boards
+    that were production runs for later games are considered Eagle 2.
+    IE: GT Fore! & BBH, both security chips are "E2-" as are various
+    preprogrammed PALs: E2-CARD1 & E2-RES3
 
 ***************************************************************************/
 
@@ -138,6 +142,14 @@ void iteagle_state::machine_reset()
 {
 }
 
+#define PCI_ID_IDE 			":pci:06.0"
+// Primary IDE Control	":pci:06.1"
+// Seconday IDE Control	":pci:06.2"
+#define PCI_ID_SOUND  	":pci:07.0"
+#define PCI_ID_FPGA 		":pci:08.0"
+#define PCI_ID_VIDEO  	":pci:09.0"
+#define PCI_ID_EEPROM 	":pci:0a.0"
+
 static MACHINE_CONFIG_START( iteagle, iteagle_state )
 
 	/* basic machine hardware */
@@ -147,91 +159,95 @@ static MACHINE_CONFIG_START( iteagle, iteagle_state )
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
-	MCFG_ITEAGLE_FPGA_ADD(            ":pci:06.0")
-	MCFG_ITEAGLE_IDE_ADD(             ":pci:06.1")
+	MCFG_ITEAGLE_IDE_ADD(             PCI_ID_IDE)
 	MCFG_ITEAGLE_IDE_IRQ_ADD(         ":maincpu", MIPS3_IRQ2)
-	MCFG_ES1373_ADD(                  ":pci:07.0")
-	MCFG_SOUND_ROUTE(0, ":pci:07.0:lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, ":pci:07.0:rspeaker", 1.0)
+	MCFG_ITEAGLE_FPGA_ADD(            PCI_ID_FPGA, ":maincpu", MIPS3_IRQ1)
+	MCFG_ES1373_ADD(                  PCI_ID_SOUND)
+	MCFG_SOUND_ROUTE(0, PCI_ID_SOUND":lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, PCI_ID_SOUND":rspeaker", 1.0)
 	MCFG_ES1373_IRQ_ADD(              ":maincpu", MIPS3_IRQ3)
-	MCFG_VOODOO_ADD(                  ":pci:09.0", ":maincpu")
-	MCFG_ITEAGLE_EEPROM_ADD(          ":pci:0a.0")
+	MCFG_VOODOO_PCI_ADD(              PCI_ID_VIDEO, TYPE_VOODOO_3, ":maincpu")
+	MCFG_VOODOO_PCI_FBMEM(16)
+	MCFG_ITEAGLE_EEPROM_ADD(          PCI_ID_EEPROM)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59)
 	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_UPDATE_DEVICE(":pci:09.0", voodoo_pci_device, screen_update)
-
+	MCFG_SCREEN_UPDATE_DEVICE(PCI_ID_VIDEO, voodoo_pci_device, screen_update)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtfore01, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000401, 0x0b0b0b)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0401, 0x7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtfore02, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000402, 0x020201)
 	MCFG_DEVICE_MODIFY(":pci:0a.0")
 	MCFG_ITEAGLE_EEPROM_INIT(0x0402, 0x7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtfore03, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000403, 0x0a0b0a)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0403, 0x7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtfore04, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000404, 0x0a020b)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0404, 0x7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtfore05, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000405, 0x0b0a0c)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0405, 0x7);
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtfore06, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000406, 0x0c0b0d)
 	MCFG_DEVICE_MODIFY(":pci:0a.0")
-	MCFG_ITEAGLE_EEPROM_INIT(0x0406, 0x7);
+	MCFG_ITEAGLE_EEPROM_INIT(0x0406, 0x9);
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( carnking, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000603, 0x0c0b0d)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
-	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x7)
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
+	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x9)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbhsc, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
-	MCFG_ITEAGLE_FPGA_INIT(0x02000201, 0x0c0a0a)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
-	MCFG_ITEAGLE_EEPROM_INIT(0x0201, 0x7)
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
+	MCFG_ITEAGLE_FPGA_INIT(0x01000600, 0x0c0a0a)
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
+	MCFG_ITEAGLE_EEPROM_INIT(0x0600, 0x9)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbhcotw, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x02000603, 0x080704)
 	MCFG_DEVICE_MODIFY(":pci:0a.0")
-	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x7)
+	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x9)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( virtpool, iteagle )
-	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
+	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_1, ":maincpu")
+	MCFG_VOODOO_PCI_FBMEM(4)
+	MCFG_VOODOO_PCI_TMUMEM(4, 4)
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	MCFG_ITEAGLE_FPGA_INIT(0x01000202, 0x0c0b0d)
-	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0202, 0x7)
 MACHINE_CONFIG_END
 
@@ -252,11 +268,12 @@ static INPUT_PORTS_START( iteagle )
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left" )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Right" )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left/Trigger" )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Right/Pump" )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Fly By" )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Backspin" )
-	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -282,31 +299,20 @@ static INPUT_PORTS_START( iteagle )
 	PORT_DIPSETTING(0x4000, "High" )
 	PORT_DIPSETTING(0x0000, "Not Detected" )
 
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore )
-	PORT_INCLUDE(iteagle)
-
 	PORT_START("TRACKX1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 
 	PORT_START("TRACKY1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
 
-INPUT_PORTS_END
+	PORT_START("GUNX1")
+  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-static INPUT_PORTS_START( carnking )
-	PORT_INCLUDE(iteagle)
-
-	PORT_START("TRACKX1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
-
-	PORT_START("TRACKY1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
+	PORT_START("GUNY1")
+  PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -337,8 +343,6 @@ INPUT_PORTS_END
 	ROMX_LOAD( "eagle102.u15", 0x000000, 0x100000, CRC(1fd39e73) SHA1(d1ac758f94defc5c55c62594b3999a406dd9ef1f), ROM_BIOS(10) ) \
 	ROM_SYSTEM_BIOS( 10, "101", "bootrom 1.01" ) \
 	ROMX_LOAD( "eagle101.u15", 0x000000, 0x100000, CRC(2600bc2b) SHA1(c4b89e69c51e4a3bb1874407c4d30b6caed4f396), ROM_BIOS(11) ) \
-	ROM_SYSTEM_BIOS( 11, "pool", "Virtual Pool bootrom" ) \
-	ROMX_LOAD( "eagle1_bootrom_v1p01", 0x000000, 0x080000, CRC(6c8c1593) SHA1(707d5633388f8dd4e9252f4d8d6f27c98c2cb35a), ROM_BIOS(12) ) \
 	ROM_REGION( 0x30000, "fpga", 0 ) \
 	ROM_LOAD( "17s20lpc_sb4.u26", 0x000000, 0x008000, CRC(62c4af8a) SHA1(6eca277b9c66a401990599e98fdca64a9e38cc9a) ) \
 	ROM_LOAD( "17s20lpc_sb5.u26", 0x008000, 0x008000, CRC(c88b9d42) SHA1(b912d0fc50ecdc6a198c626f6e1644e8405fac6e) ) \
@@ -347,21 +351,23 @@ INPUT_PORTS_END
 	ROM_LOAD( "e2-card1.u22.jed", 0x000000, 0x000bd1, CRC(9d1e1ace) SHA1(287d6a30e9f32137ef4eba54f0effa092c97a6eb) ) \
 	ROM_LOAD( "e2-res3.u117.jed", 0x001000, 0x000bd1, CRC(4f1ff45a) SHA1(213cbdd6cd37ad9b5bfc9545084892a68d29f5ff) )
 
- 
+
 ROM_START( iteagle )
 	EAGLE_BIOS
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	//DISK_REGION( ":pci:06.1:ide:1:cdrom" ) // program CD-ROM
+	//DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	//DISK_REGION( PCI_ID_IDE":ide2:1:cdrom" ) // program CD-ROM
 ROM_END
 
 ROM_START( virtpool ) /* On earlier Eagle 1 PCB, possibly a prototype version - later boards are known as Eagle 2 */
-	EAGLE_BIOS
-	
+	ROM_REGION( 0x100000, ":pci:00.0", 0 ) /* MIPS code */
+	ROM_SYSTEM_BIOS( 0, "pool", "Virtual Pool bootrom" )
+	ROMX_LOAD( "eagle1_bootrom_v1p01", 0x000000, 0x080000, CRC(6c8c1593) SHA1(707d5633388f8dd4e9252f4d8d6f27c98c2cb35a), ROM_BIOS(1) )
+
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "itvp-1.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "virtualpool", 0, SHA1(be8f890c33701ca17fab8112ee6cd7b5e435d8cf) ) /* HD hand labeled 3-1-99 V.P. */
 ROM_END
 
@@ -371,7 +377,7 @@ ROM_START( carnking ) /* REQUIRES a "RED" board, will NOT work with earlier gree
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "ck1-us.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "carnival_king_v_1.00.11", 0, SHA1(c819af66d36df173ab17bf42f4045c7cca3203d8) ) /* Labeled Carnival King V 1.00.11 */
 ROM_END
 
@@ -381,7 +387,7 @@ ROM_START( gtfore01 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "e2-led0.u53", 0x0000, 0x0880, CRC(6ec86dc6) SHA1(01665ad6d92d2b8e917e33ca705fab9258766513) )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_v1.00.25", 0, SHA1(6dc445b982aee3bab93ade5c4f5d148471939ecc) ) /* Build 19:19:59, Sep 11 2000 */
 ROM_END
 
@@ -391,7 +397,7 @@ ROM_START( gtfore02 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2002_v2.01.06", 0, SHA1(d1363bc17337c91684148b76fa1e73ac9dd80d8f) ) /* Build 11:27:20, Nov  5 2001 */
 ROM_END
 
@@ -401,7 +407,7 @@ ROM_START( gtfore03 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g43-us-u.u53", 0x0000, 0x0880, CRC(51c6f726) SHA1(9930337315128f89f7202893fb123ee3f0d33649) )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2003_v3.00.10", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) ) /* Build 09:36:45, Nov  7 2002 */
 ROM_END
 
@@ -411,7 +417,7 @@ ROM_START( gtfore03a )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g43-us-u.u53", 0x0000, 0x0880, CRC(51c6f726) SHA1(9930337315128f89f7202893fb123ee3f0d33649) )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2003_v3.00.09", 0, SHA1(3c9cf82c3ad87b0d6b5a21089795abd8a08f8dd2) ) /* Build 09:36:45, Oct 17 2002 */
 ROM_END
 
@@ -421,7 +427,7 @@ ROM_START( gtfore04 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2004_v4.00.08", 0, SHA1(739a52d6ce13bb6ac7a543ee0e8086fb66be19b9) ) /* Build 14:15:44, Aug 27 2003 - Has been upgraded to Extra */
 ROM_END
 
@@ -431,7 +437,7 @@ ROM_START( gtfore04a )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2004_v4.00.00", 0, SHA1(fe7525de89d67e0e3d10c48572fd04382543c19f) ) /* Build 16:40:59, Feb 28 2003 */
 ROM_END
 
@@ -441,7 +447,7 @@ ROM_START( gtfore05 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2005_v5.01.06", 0, SHA1(fa465263218d8e39102ec81d116c11447ef07e19) ) /* Build 10:55:49, Oct 27 2005 - Has been upgraded to Extra */
 ROM_END
 
@@ -451,7 +457,7 @@ ROM_START( gtfore05a )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2005_v5.01.02", 0, SHA1(6e20d60fb7e9ab6bf0086267fa5b4329d8a9f468) ) /* Build 15:02:32, Feb 27 2004 - Has been upgraded to Extra */
 ROM_END
 
@@ -461,7 +467,7 @@ ROM_START( gtfore05b )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2005_v5.01.00", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) ) /* Build 12:30:35, Feb 16 2004 - Has been upgraded to Extra */
 ROM_END
 
@@ -471,7 +477,7 @@ ROM_START( gtfore05c )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2005_v5.00.00", 0, SHA1(4236f57e639cae2e5a3eaa97fb24f5ff80557e84) ) /* Build 23:15:38, Jan 31 2004 - Has been upgraded to Extra */
 ROM_END
 
@@ -481,7 +487,7 @@ ROM_START( gtfore06 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g4c-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_complete_v6.00.01", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Build 09:51:13, Jan 20 2006 */
 ROM_END
 
@@ -491,7 +497,7 @@ ROM_START( bbhsc )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "bb15-us.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "bbhsc_v1.50.07_cf", 0, SHA1(21dcf1f7e5ab901ac64e6afb099c35e273b3bf1f) ) /* Build 16:35:34, Feb 26 2002 - 4gb Compact Flash conversion */
 ROM_END
 
@@ -501,7 +507,7 @@ ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs */
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "cw-us-8.u53", 0x0000, 0x0880, CRC(c5234b58) SHA1(fb47b2233147a3f633f01edebef9994c358bd162) )
 
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "bbhcotw_v3.02.05_cf", 0, SHA1(b1fcaab3a5aa51821673a914333c8868d36f77ae) ) /* Build 21:00:39, Sep 10 2006 - 4gb Compact Flash conversion  */
 ROM_END
 
@@ -511,19 +517,19 @@ ROM_END
  *
  *************************************/
 
-GAME( 2000, iteagle,          0,  iteagle,  iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1998, virtpool,   iteagle,  virtpool, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", GAME_NOT_WORKING )
-GAME( 2002, carnking,   iteagle,  carnking, carnking, driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING )
-GAME( 2000, gtfore01,   iteagle,  gtfore01, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", 0 )
-GAME( 2001, gtfore02,   iteagle,  gtfore02, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", 0 )
-GAME( 2002, gtfore03,   iteagle,  gtfore03, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", 0 )
-GAME( 2002, gtfore03a,  gtfore03, gtfore03, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", 0 )
-GAME( 2003, gtfore04,   iteagle,  gtfore04, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", 0 )
-GAME( 2003, gtfore04a,  gtfore04, gtfore04, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", 0 )
-GAME( 2004, gtfore05,   iteagle,  gtfore05, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", 0 )
-GAME( 2004, gtfore05a,  gtfore05, gtfore05, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", 0 )
-GAME( 2004, gtfore05b,  gtfore05, gtfore05, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", 0 )
-GAME( 2004, gtfore05c,  gtfore05, gtfore05, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", 0 )
-GAME( 2005, gtfore06,   iteagle,  gtfore06, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", 0 )
-GAME( 2002, bbhsc,      iteagle,  bbhsc,    gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", GAME_NOT_WORKING )
-GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", GAME_NOT_WORKING )
+GAME( 2000, iteagle,          0,  iteagle,  iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1998, virtpool,   iteagle,  virtpool, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", GAME_NOT_WORKING )
+GAME( 2002, carnking,   iteagle,  carnking, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING )
+GAME( 2000, gtfore01,   iteagle,  gtfore01, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", 0 )
+GAME( 2001, gtfore02,   iteagle,  gtfore02, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", 0 )
+GAME( 2002, gtfore03,   iteagle,  gtfore03, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", 0 )
+GAME( 2002, gtfore03a,  gtfore03, gtfore03, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", 0 )
+GAME( 2003, gtfore04,   iteagle,  gtfore04, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", 0 )
+GAME( 2003, gtfore04a,  gtfore04, gtfore04, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", 0 )
+GAME( 2004, gtfore05,   iteagle,  gtfore05, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", 0 )
+GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", 0 )
+GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", 0 )
+GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", 0 )
+GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", 0 )
+GAME( 2002, bbhsc,      iteagle,  bbhsc,    iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", GAME_NOT_WORKING )
+GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  iteagle, driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", GAME_NOT_WORKING )

@@ -648,7 +648,7 @@ void discrete_device::display_profiling(void)
 		discrete_step_interface *step;
 		if ((*node)->interface(step))
 			if (step->run_time > tresh)
-				printf("%3d: %20s %8.2f %10.2f\n", (*node)->index(), (*node)->module_name(), (float) step->run_time / (float) total * 100.0, ((float) step->run_time) / (float) m_total_samples);
+				printf("%3d: %20s %8.2f %10.2f\n", (*node)->index(), (*node)->module_name(), (double) step->run_time / (double) total * 100.0, ((double) step->run_time) / (double) m_total_samples);
 	}
 
 	/* Task information */

@@ -30,7 +30,7 @@ Noted differences in versions of SharpShooter:
  Added a "Welcome to Sharpshooter" start-up screen showing rom versions for v1.9
  Initial High Score names are changed between v1.1 and v1.2
   Circus of Mystery:
-    The ballon challenge has been rewritten for v1.7
+    The balloon challenge has been rewritten for v1.7
     Jugglers throw balls painted with targets for v1.1 & v1.2  Version 1.7 uses regular targets
   Alien Encounter:
     First saucer challenge has been modified for v1.7
@@ -64,7 +64,7 @@ Sound: BSMT2000
 Other: Bt481AKPJ110 (44 Pin PQFP, Brooktree RAMDAC)
        AT001 (160 Pin PQFP, P&P Marketing, custom programmed XILINX XC4310)
        ATMEL 93C66 (EEPROM)
-       CN7 - 4 pin connector for stero speaker output
+       CN7 - 4 pin connector for stereo speaker output
 PLDs:
        XILINX-1 XC9536 Labeled as U175A (Rev 2/3: Not Used)
        XILINX-2 XC9536 Labeled as U109A (Rev 2/3: Lattice ispLSI 2032-80LJ - U109.P)

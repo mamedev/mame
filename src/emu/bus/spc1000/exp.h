@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __SCP1000_SLOT_H
 #define __SCP1000_SLOT_H
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Kevin Thacker
 #include <assert.h>
 
 #include "oric_tap.h"

@@ -81,7 +81,7 @@ NETLIB_START(9310_sub)
 
 NETLIB_RESET(9310_sub)
 {
-	m_CLK.set_state(netlist_input_t::STATE_INP_LH);
+	m_CLK.set_state(netlist_logic_t::STATE_INP_LH);
 	m_cnt = 0;
 	m_loadq = 1;
 	m_ent = 1;

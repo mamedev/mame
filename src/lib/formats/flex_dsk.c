@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * flex_dsk.c  -  FLEX compatible disk images
  *

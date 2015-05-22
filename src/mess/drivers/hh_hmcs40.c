@@ -28,6 +28,7 @@
  @88      HD38800A  1984, Tomy Tron (THN-02)
 
  @01      HD38800B  1982, Gakken Crazy Kong
+ *19      HD38800B  1982, Bandai Zaxxon
  @23      HD38800B  1982, Tomy Kingman (THF-01II)
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  *29      HD38800B  1984, Tomy Portable 6000 Bombman
@@ -46,9 +47,13 @@
  @45      HD38820A  1982, Coleco Donkey Kong
  @49      HD38820A  1983, Bandai Zackman
  @61      HD38820A  1983, Coleco Ms. Pac-Man
+ *63      HD38820A  1983, Bandai Pengo
+ *65      HD38820A  1983, Bandai Burger Time
  @69      HD38820A  1983, Gakken Dig Dug
  @70      HD38820A  1983, Parker Brothers Q*Bert
  @85      HD38820A  1984, Bandai Machine Man (PT-438)
+ *88      HD38820A  1984, Bandai Pair Match (1/2)
+ *89      HD38820A  1984, Bandai Pair Match (2/2)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 

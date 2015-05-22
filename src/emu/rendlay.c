@@ -327,7 +327,8 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 
 	// check for errors
 	if (bounds.x0 > bounds.x1 || bounds.y0 > bounds.y1)
-		throw emu_fatalerror("Illegal bounds value in XML: (%f-%f)-(%f-%f)", bounds.x0, bounds.x1, bounds.y0, bounds.y1);
+		throw emu_fatalerror("Illegal bounds value in XML: (%f-%f)-(%f-%f)",
+				(double) bounds.x0, (double) bounds.x1, (double) bounds.y0, (double) bounds.y1);
 }
 
 
@@ -351,9 +352,10 @@ void parse_color(running_machine &machine, xml_data_node *colornode, render_colo
 	color.a = xml_get_attribute_float_with_subst(machine, *colornode, "alpha", 1.0);
 
 	// check for errors
-	if (color.r < 0.0 || color.r > 1.0 || color.g < 0.0 || color.g > 1.0 ||
-		color.b < 0.0 || color.b > 1.0 || color.a < 0.0 || color.a > 1.0)
-		throw emu_fatalerror("Illegal ARGB color value in XML: %f,%f,%f,%f", color.r, color.g, color.b, color.a);
+	if (color.r < 0.0f || color.r > 1.0f || color.g < 0.0f || color.g > 1.0f ||
+		color.b < 0.0f || color.b > 1.0f || color.a < 0.0f || color.a > 1.0f)
+		throw emu_fatalerror("Illegal ARGB color value in XML: %f,%f,%f,%f",
+				(double) color.r, (double) color.g, (double) color.b, (double) color.a);
 }
 
 
@@ -807,10 +809,10 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 void layout_element::component::draw_rect(bitmap_argb32 &dest, const rectangle &bounds)
 {
 	// compute premultiplied colors
-	UINT32 r = m_color.r * m_color.a * 255.0;
-	UINT32 g = m_color.g * m_color.a * 255.0;
-	UINT32 b = m_color.b * m_color.a * 255.0;
-	UINT32 inva = (1.0f - m_color.a) * 255.0;
+	UINT32 r = m_color.r * m_color.a * 255.0f;
+	UINT32 g = m_color.g * m_color.a * 255.0f;
+	UINT32 b = m_color.b * m_color.a * 255.0f;
+	UINT32 inva = (1.0f - m_color.a) * 255.0f;
 
 	// iterate over X and Y
 	for (UINT32 y = bounds.min_y; y <= bounds.max_y; y++)
@@ -845,10 +847,10 @@ void layout_element::component::draw_rect(bitmap_argb32 &dest, const rectangle &
 void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &bounds)
 {
 	// compute premultiplied colors
-	UINT32 r = m_color.r * m_color.a * 255.0;
-	UINT32 g = m_color.g * m_color.a * 255.0;
-	UINT32 b = m_color.b * m_color.a * 255.0;
-	UINT32 inva = (1.0f - m_color.a) * 255.0;
+	UINT32 r = m_color.r * m_color.a * 255.0f;
+	UINT32 g = m_color.g * m_color.a * 255.0f;
+	UINT32 b = m_color.b * m_color.a * 255.0f;
+	UINT32 inva = (1.0f - m_color.a) * 255.0f;
 
 	// find the center
 	float xcenter = float(bounds.xcenter());
@@ -861,7 +863,7 @@ void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &
 	for (UINT32 y = bounds.min_y; y <= bounds.max_y; y++)
 	{
 		float ycoord = ycenter - ((float)y + 0.5f);
-		float xval = xradius * sqrt(1.0f - (ycoord * ycoord) * ooyradius2);
+		float xval = xradius * sqrtf(1.0f - (ycoord * ycoord) * ooyradius2);
 
 		// compute left/right coordinates
 		INT32 left = (INT32)(xcenter - xval + 0.5f);
@@ -897,10 +899,10 @@ void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &
 void layout_element::component::draw_text(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds)
 {
 	// compute premultiplied colors
-	UINT32 r = m_color.r * 255.0;
-	UINT32 g = m_color.g * 255.0;
-	UINT32 b = m_color.b * 255.0;
-	UINT32 a = m_color.a * 255.0;
+	UINT32 r = m_color.r * 255.0f;
+	UINT32 g = m_color.g * 255.0f;
+	UINT32 b = m_color.b * 255.0f;
+	UINT32 a = m_color.a * 255.0f;
 
 	// get the width of the string
 	render_font *font = machine.render().font_alloc("default");
@@ -1006,10 +1008,10 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 		int use_state = (state + m_stateoffset) % max_state_used;
 
 		// compute premultiplied colors
-		UINT32 r = m_color.r * 255.0;
-		UINT32 g = m_color.g * 255.0;
-		UINT32 b = m_color.b * 255.0;
-		UINT32 a = m_color.a * 255.0;
+		UINT32 r = m_color.r * 255.0f;
+		UINT32 g = m_color.g * 255.0f;
+		UINT32 b = m_color.b * 255.0f;
+		UINT32 a = m_color.a * 255.0f;
 
 		// get the width of the string
 		render_font *font = machine.render().font_alloc("default");
@@ -1159,10 +1161,10 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 	int use_state = (state + m_stateoffset) % max_state_used;
 
 	// compute premultiplied colors
-	UINT32 r = m_color.r * 255.0;
-	UINT32 g = m_color.g * 255.0;
-	UINT32 b = m_color.b * 255.0;
-	UINT32 a = m_color.a * 255.0;
+	UINT32 r = m_color.r * 255.0f;
+	UINT32 g = m_color.g * 255.0f;
+	UINT32 b = m_color.b * 255.0f;
+	UINT32 a = m_color.a * 255.0f;
 
 	// get the width of the string
 	render_font *font = machine.render().font_alloc("default");

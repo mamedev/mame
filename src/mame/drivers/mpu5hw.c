@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU5 hardware emulation */
 
 /* This file contains the hardware emulation, the mpu5.c contains the set listings */

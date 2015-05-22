@@ -2918,7 +2918,7 @@ default_case:
 		if (regnum < fvertexAx || regnum > fdWdY)
 			logerror("VOODOO.%d.REG:%s(%d) write = %08X\n", v->index, (regnum < 0x384/4) ? v->regnames[regnum] : "oob", chips, origdata);
 		else
-			logerror("VOODOO.%d.REG:%s(%d) write = %f\n", v->index, (regnum < 0x384/4) ? v->regnames[regnum] : "oob", chips, u2f(origdata));
+			logerror("VOODOO.%d.REG:%s(%d) write = %f\n", v->index, (regnum < 0x384/4) ? v->regnames[regnum] : "oob", chips, (double) u2f(origdata));
 	}
 
 	return cycles;
@@ -5436,12 +5436,12 @@ static INT32 setup_and_draw_triangle(voodoo_state *v)
 	float divisor, tdiv;
 
 	/* grab the X/Ys at least */
-	v->fbi.ax = (INT16)(v->fbi.svert[0].x * 16.0);
-	v->fbi.ay = (INT16)(v->fbi.svert[0].y * 16.0);
-	v->fbi.bx = (INT16)(v->fbi.svert[1].x * 16.0);
-	v->fbi.by = (INT16)(v->fbi.svert[1].y * 16.0);
-	v->fbi.cx = (INT16)(v->fbi.svert[2].x * 16.0);
-	v->fbi.cy = (INT16)(v->fbi.svert[2].y * 16.0);
+	v->fbi.ax = (INT16)(v->fbi.svert[0].x * 16.0f);
+	v->fbi.ay = (INT16)(v->fbi.svert[0].y * 16.0f);
+	v->fbi.bx = (INT16)(v->fbi.svert[1].x * 16.0f);
+	v->fbi.by = (INT16)(v->fbi.svert[1].y * 16.0f);
+	v->fbi.cx = (INT16)(v->fbi.svert[2].x * 16.0f);
+	v->fbi.cy = (INT16)(v->fbi.svert[2].y * 16.0f);
 
 	/* compute the divisor */
 	divisor = 1.0f / ((v->fbi.svert[0].x - v->fbi.svert[1].x) * (v->fbi.svert[0].y - v->fbi.svert[2].y) -
@@ -5486,7 +5486,7 @@ static INT32 setup_and_draw_triangle(voodoo_state *v)
 	/* set up alpha */
 	if (v->reg[sSetupMode].u & (1 << 1))
 	{
-		v->fbi.starta = (INT32)(v->fbi.svert[0].a * 4096.0);
+		v->fbi.starta = (INT32)(v->fbi.svert[0].a * 4096.0f);
 		v->fbi.dadx = (INT32)(((v->fbi.svert[0].a - v->fbi.svert[1].a) * dx1 - (v->fbi.svert[0].a - v->fbi.svert[2].a) * dx2) * tdiv);
 		v->fbi.dady = (INT32)(((v->fbi.svert[0].a - v->fbi.svert[2].a) * dy1 - (v->fbi.svert[0].a - v->fbi.svert[1].a) * dy2) * tdiv);
 	}
@@ -5494,7 +5494,7 @@ static INT32 setup_and_draw_triangle(voodoo_state *v)
 	/* set up Z */
 	if (v->reg[sSetupMode].u & (1 << 2))
 	{
-		v->fbi.startz = (INT32)(v->fbi.svert[0].z * 4096.0);
+		v->fbi.startz = (INT32)(v->fbi.svert[0].z * 4096.0f);
 		v->fbi.dzdx = (INT32)(((v->fbi.svert[0].z - v->fbi.svert[1].z) * dx1 - (v->fbi.svert[0].z - v->fbi.svert[2].z) * dx2) * tdiv);
 		v->fbi.dzdy = (INT32)(((v->fbi.svert[0].z - v->fbi.svert[2].z) * dy1 - (v->fbi.svert[0].z - v->fbi.svert[1].z) * dy2) * tdiv);
 	}

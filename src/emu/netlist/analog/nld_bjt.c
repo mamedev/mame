@@ -144,22 +144,11 @@ NETLIB_UPDATE_TERMINALS(QBJT_switch)
 	const int new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 	if (m_state_on ^ new_state)
 	{
-#if 0
-		nl_double gb = m_gB;
-		nl_double gc = m_gC;
-		nl_double v  = m_V * m;
-		if (!new_state )
-		{
-			// not conducting
-			gb = netlist().gmin();
-			v = 0;
-			gc = netlist().gmin();
-		}
-#else
+
 		const nl_double gb = new_state ? m_gB : netlist().gmin();
 		const nl_double gc = new_state ? m_gC : netlist().gmin();
 		const nl_double v  = new_state ? m_V * m : 0;
-#endif
+
 		m_RB.set(gb, v,   0.0);
 		m_RC.set(gc, 0.0, 0.0);
 		//m_RB.update_dev();

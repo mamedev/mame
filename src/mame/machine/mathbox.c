@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Eric Smith
 /*
  * mathbox.c: math box simulation (Battlezone/Red Baron/Tempest)
  *

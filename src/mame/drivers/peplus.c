@@ -8276,7 +8276,7 @@ Designed and co-created by Best Bet Products
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* Wrong!! Should be CAPX2325 */
 ROM_END
 
-ROM_START( pex2297p ) /* Superboard : Jackpot Poker (X002284P+XP000053) */
+ROM_START( pex2297p ) /* Superboard : Jackpot Poker (X002297P+XP000053) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -9339,14 +9339,10 @@ Double Double Bonus  P505A     97.80%
 	ROM_LOAD( "xm00008p.u66",   0x00000, 0x10000, CRC(37ff1a79) SHA1(5b15245e79d8f1b984d254f4307f1a2219ce3ed2) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2228.u77",  0x00000, 0x8000, NO_DUMP ) /* This set requires CG2228 for the correct banners on the MENU page */
-	ROM_LOAD( "mgo-cg2228.u78",  0x08000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mbo-cg2228.u79",  0x10000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mxo-cg2228.u80",  0x18000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
-	ROM_LOAD( "mgo-cg2174.u78",  0x08000, 0x8000, CRC(cc46adb0) SHA1(6065aa5dcb9091ad80e499c7ee6dc629e79c865a) ) /* Close but banners on MEMU WRONG!! */
-	ROM_LOAD( "mbo-cg2174.u79",  0x10000, 0x8000, CRC(7291a0c8) SHA1(1068f35e6ef5fd88c584922860231840a90fb623) )
-	ROM_LOAD( "mxo-cg2174.u80",  0x18000, 0x8000, CRC(14f9480c) SHA1(59323f9fc5995277aea86d088893b6eb95b4e89b) )
+	ROM_LOAD( "mro-cg2228.u77",  0x00000, 0x8000, CRC(b8abca87) SHA1(b008e0c0b272bc024fc1bfee1aeb80b8df589e4a) )
+	ROM_LOAD( "mgo-cg2228.u78",  0x08000, 0x8000, CRC(ad9b93ae) SHA1(3ffba64d4763bc0e107f6279b5cce4c0e7e4fa7a) )
+	ROM_LOAD( "mbo-cg2228.u79",  0x10000, 0x8000, CRC(4ad376ef) SHA1(116160d507f734ecdf5e80a3e746ab10fb9b4d78) )
+	ROM_LOAD( "mxo-cg2228.u80",  0x18000, 0x8000, CRC(8965ff2f) SHA1(9d5ba61504f9a7e3225ecaf72e81d65a9fbf3667) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
@@ -10045,7 +10041,7 @@ GAMEL(1995, pexm004p,  0,        peplus,  peplus_poker, peplus_state, peplussb, 
 GAMEL(1995, pexm005p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00005P+XMP00004) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm006p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00006P+XMP00006) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm007p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00007P+XMP00006) Multi-Poker",        0, layout_pe_poker )
-GAMEL(1995, pexm008p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00008P+XMP00006) Multi-Poker",        GAME_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs CG2228 graphics roms for correct MENU game banners */
+GAMEL(1995, pexm008p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00008P+XMP00006) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm009p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00009P+XMP00002) Multi-Poker",        GAME_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs unknown CG2??? graphics roms for correct MENU game banners */
 GAMEL(1995, pexm013p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00013P+XMP00025) Multi-Poker",        0, layout_pe_poker )
 

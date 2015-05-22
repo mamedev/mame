@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Various Tecmo Sprite implementations
 
  - the various sprite implementations here are slightly different but can clearly be refactored to use

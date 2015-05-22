@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:JJ Stacino
 /*******************************************************/
 /************ HECDISK2.C  in machine  ******************/

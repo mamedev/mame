@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* IGS Gambling games using IGS036 CPU
    pgm2.c also uses this CPU
 

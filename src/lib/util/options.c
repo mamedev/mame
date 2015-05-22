@@ -642,7 +642,7 @@ bool core_options::set_value(const char *name, int value, int priority, std::str
 bool core_options::set_value(const char *name, float value, int priority, std::string &error_string)
 {
 	std::string tempstr;
-	strprintf(tempstr, "%f", value);
+	strprintf(tempstr, "%f", (double) value);
 	return set_value(name, tempstr.c_str(), priority, error_string);
 }
 
@@ -780,7 +780,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 				strcatprintf(error_string, "Illegal float value for %s: \"%s\"; reverting to %s\n", curentry.name(), data.c_str(), curentry.value());
 				return false;
 			}
-			if (curentry.has_range() && (fval < atof(curentry.minimum()) || fval > atof(curentry.maximum())))
+			if (curentry.has_range() && ((double) fval < atof(curentry.minimum()) || (double) fval > atof(curentry.maximum())))
 			{
 				strcatprintf(error_string, "Out-of-range float value for %s: \"%s\" (must be between %s and %s); reverting to %s\n", curentry.name(), data.c_str(), curentry.minimum(), curentry.maximum(), curentry.value());
 				return false;

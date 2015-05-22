@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont,Ryan Holtz,etabeta
+// copyright-holders:R. Belmont,Ryan Holtz,Fabio Priuli
 #ifndef __GBA_SLOT_H
 #define __GBA_SLOT_H
 

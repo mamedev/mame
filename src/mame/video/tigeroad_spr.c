@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
 
     very simple sprite scheme, used by some Capcom games and hardware cloned from them

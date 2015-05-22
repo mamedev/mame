@@ -476,7 +476,7 @@ WRITE8_MEMBER(m3745x_device::adc_w)
 			// starting a conversion?  this takes 50 cycles.
 			if (!(m_adctrl & ADCTRL_COMPLETE))
 			{
-				double hz = (double)clock() / 50.0f;
+				double hz = (double)clock() / 50.0;
 				m_timers[TIMER_ADC]->adjust(attotime::from_hz(hz));
 			}
 			break;

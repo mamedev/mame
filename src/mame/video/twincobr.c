@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Quench
+// license:BSD-3-Clause
+// copyright-holders:Quench, Nicola Salmoria
 /***************************************************************************
   video.c
 

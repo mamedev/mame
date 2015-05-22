@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:fulivi
+// license:BSD-3-Clause
+// copyright-holders:F. Ulivi
 // Driver for Intel Intellec MDS series-II
 
 #ifndef _IMDS2_H_

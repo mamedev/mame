@@ -8,6 +8,7 @@
 #define NLTIME_H_
 
 #include "nl_config.h"
+#include "pstate.h"
 
 //============================================================
 //  MACROS
@@ -35,7 +36,7 @@ public:
 	ATTR_HOT friend inline const netlist_time operator-(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline const netlist_time operator+(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline const netlist_time operator*(const netlist_time &left, const UINT32 factor);
-	ATTR_HOT friend inline const UINT32 operator/(const netlist_time &left, const netlist_time &right);
+	ATTR_HOT friend inline UINT32 operator/(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline bool operator>(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline bool operator<(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline bool operator>=(const netlist_time &left, const netlist_time &right);
@@ -50,8 +51,8 @@ public:
 
 	ATTR_HOT inline const netlist_time &operator+=(const netlist_time &right) { m_time += right.m_time; return *this; }
 
-	ATTR_HOT inline const INTERNALTYPE as_raw() const { return m_time; }
-	ATTR_HOT inline const double as_double() const { return (double) m_time / (double) RESOLUTION; }
+	ATTR_HOT inline INTERNALTYPE as_raw() const { return m_time; }
+	ATTR_HOT inline double as_double() const { return (double) m_time / (double) RESOLUTION; }
 
 	// for save states ....
 	ATTR_HOT inline INTERNALTYPE *get_internaltype_ptr() { return &m_time; }
@@ -72,6 +73,11 @@ protected:
 	INTERNALTYPE m_time;
 };
 
+template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist_time &nlt, const void *owner, const pstring &stname)
+{
+	save_state_ptr(stname, DT_INT64, owner, sizeof(netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr(), false);
+}
+
 ATTR_HOT inline const netlist_time operator-(const netlist_time &left, const netlist_time &right)
 {
 	return netlist_time::from_raw(left.m_time - right.m_time);
@@ -82,7 +88,7 @@ ATTR_HOT inline const netlist_time operator*(const netlist_time &left, const UIN
 	return netlist_time::from_raw(left.m_time * factor);
 }
 
-ATTR_HOT inline const UINT32 operator/(const netlist_time &left, const netlist_time &right)
+ATTR_HOT inline UINT32 operator/(const netlist_time &left, const netlist_time &right)
 {
 	return left.m_time / right.m_time;
 }

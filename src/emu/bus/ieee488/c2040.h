@@ -17,8 +17,7 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6504.h"
 #include "machine/6522via.h"
-#include "machine/6532riot.h"
-#include "machine/mos6530.h"
+#include "machine/mos6530n.h"
 
 
 
@@ -29,7 +28,7 @@
 // ======================> c2040_device
 
 class c2040_device :  public device_t,
-						public device_ieee488_interface
+					  public device_ieee488_interface
 {
 public:
 	// construction/destruction
@@ -50,8 +49,6 @@ public:
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( mode_sel_w );
 	DECLARE_WRITE_LINE_MEMBER( rw_sel_w );
-	DECLARE_READ8_MEMBER( miot_pb_r );
-	DECLARE_WRITE8_MEMBER( miot_pb_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -76,9 +73,9 @@ protected:
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
-	required_device<riot6532_device> m_riot0;
-	required_device<riot6532_device> m_riot1;
-	required_device<mos6530_device> m_miot;
+	required_device<mos6532_t> m_riot0;
+	required_device<mos6532_t> m_riot1;
+	required_device<mos6530_t> m_miot;
 	required_device<via6522_device> m_via;
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;
@@ -91,9 +88,6 @@ protected:
 	int m_daco;                         // not data accepted output
 	int m_atna;                         // attention acknowledge
 	int m_ifc;
-
-	// signals
-	int m_miot_irq;                     // MIOT interrupt
 };
 
 

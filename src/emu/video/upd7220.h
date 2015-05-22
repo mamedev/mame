@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Miodrag Milanovic
+// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl
 /**********************************************************************
 
     NEC uPD7220 Graphics Display Controller emulation

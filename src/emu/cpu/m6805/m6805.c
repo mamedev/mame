@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*** m6805: Portable 6805 emulator ******************************************
 
     m6805.c (Also supports hd68705 and hd63705 variants)

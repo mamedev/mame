@@ -8,8 +8,8 @@
 #ifndef PSTATE_H_
 #define PSTATE_H_
 
-#include "nl_config.h"
-#include "nl_time.h"
+//#include "nl_config.h"
+//#include "nl_time.h"
 #include "plists.h"
 #include "pstring.h"
 
@@ -79,7 +79,7 @@ class pstate_manager_t;
 class pstate_callback_t
 {
 public:
-	typedef plinearlist_t<pstate_callback_t *> list_t;
+	typedef plist_t<pstate_callback_t *> list_t;
 
 	virtual ~pstate_callback_t() { };
 
@@ -91,7 +91,7 @@ protected:
 
 struct pstate_entry_t
 {
-	typedef plinearlist_t<pstate_entry_t *> list_t;
+	typedef plist_t<pstate_entry_t *> list_t;
 
 	pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
 			const int size, const int count, void *ptr, bool is_ptr)
@@ -156,12 +156,6 @@ private:
 };
 
 template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname);
-
-template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist_time &nlt, const void *owner, const pstring &stname)
-{
-	save_state_ptr(stname, DT_INT64, owner, sizeof(netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr(), false);
-}
-
 
 
 #endif /* PSTATE_H_ */

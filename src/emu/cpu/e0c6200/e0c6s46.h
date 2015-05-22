@@ -120,7 +120,7 @@ private:
 	devcb_read8 m_read_p0, m_read_p1, m_read_p2, m_read_p3;
 	devcb_write8 m_write_p0, m_write_p1, m_write_p2, m_write_p3;
 	void write_r(UINT8 port, UINT8 data);
-	void write_r4();
+	void write_r4_out();
 	void write_p(UINT8 port, UINT8 data);
 	UINT8 read_p(UINT8 port);
 	
@@ -133,21 +133,20 @@ private:
 	UINT8 m_dfk0;
 
 	// timers
+	int m_256_src_pulse;
+	emu_timer *m_core_256_handle;
+	TIMER_CALLBACK_MEMBER(core_256_cb);
+
 	int m_watchdog_count;
 	void clock_watchdog();
-	
 	UINT8 m_clktimer_count;
-	emu_timer *m_clktimer_handle;
-	TIMER_CALLBACK_MEMBER(clktimer_cb);
+	void clock_clktimer();
 
 	UINT8 m_stopwatch_on;
-	int m_swl_src_pulse;
 	int m_swl_cur_pulse;
 	int m_swl_slice;
 	int m_swl_count;
 	int m_swh_count;
-	emu_timer *m_stopwatch_handle;
-	TIMER_CALLBACK_MEMBER(stopwatch_cb);
 	void clock_stopwatch();
 	
 	UINT8 m_prgtimer_select;
@@ -161,8 +160,19 @@ private:
 	bool prgtimer_reset_prescaler();
 	void clock_prgtimer();
 
+	UINT8 m_bz_43_on;
+	UINT8 m_bz_freq;
+	UINT8 m_bz_envelope;
+	UINT8 m_bz_duty_ratio;
+	UINT8 m_bz_1shot_on;
+	bool m_bz_1shot_running;
+	UINT8 m_bz_1shot_count;
+	int m_bz_pulse;
 	emu_timer *m_buzzer_handle;
 	TIMER_CALLBACK_MEMBER(buzzer_cb);
+	void schedule_buzzer();
+	void reset_buzzer();
+	void clock_bz_1shot();
 };
 
 

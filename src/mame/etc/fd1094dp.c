@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Charles MacDonald, Nicola Salmoria
 /*****************************************************************************
 
 FD1094 key dumper

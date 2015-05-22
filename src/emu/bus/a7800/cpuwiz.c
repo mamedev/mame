@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
  A7800 CPUWIZ's homebrew boards (MegaCart+ and VersaBoard)

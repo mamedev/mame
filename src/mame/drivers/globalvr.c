@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Scott Stone
 /* Global VR - PC-Based Hardware
 
 Skeleton only at this time holding info regarding Install Disks

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Jason Eckhardt
 #include "i860.h"
 

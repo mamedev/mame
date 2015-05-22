@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Phill Harvey-Smith
 /*
     machine/mbc55x.c

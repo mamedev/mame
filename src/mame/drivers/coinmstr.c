@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli, Roberto Fresca
+// copyright-holders:Pierpaolo Prazzoli, Roberto Fresca, David Haywood
 /*==================================================================================
 
   Coinmaster trivia and poker games.

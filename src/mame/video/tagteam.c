@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Steve Ellenoff, Brad Oliver
 /***************************************************************************
 
     tagteam.c

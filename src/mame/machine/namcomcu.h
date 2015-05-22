@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Alex W. Jackson
 #pragma once
 
 #ifndef __NAMCOMCU_H__

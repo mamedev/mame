@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MayGay M2 hardware
   SWP (Skill With Prizes) Video based games */
 

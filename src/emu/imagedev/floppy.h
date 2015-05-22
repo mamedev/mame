@@ -121,6 +121,7 @@ public:
 	attotime get_next_transition(const attotime &from_when);
 	void write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions);
 	void set_write_splice(const attotime &when);
+	int get_sides() { return sides; }
 	UINT32 get_form_factor() const;
 	UINT32 get_variant() const;
 
@@ -242,6 +243,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(epson_sd_321, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d31v, "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d32w, "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d32v, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55e, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55f, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55g, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(alps_3255190x, "floppy_5_25")
@@ -293,6 +295,7 @@ extern const device_type EPSON_SD_321;
 extern const device_type SONY_OA_D31V;
 extern const device_type SONY_OA_D32W;
 extern const device_type SONY_OA_D32V;
+extern const device_type TEAC_FD_55E;
 extern const device_type TEAC_FD_55F;
 extern const device_type TEAC_FD_55G;
 extern const device_type ALPS_3255190x;
