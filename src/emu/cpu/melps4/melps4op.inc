@@ -169,10 +169,10 @@ void melps4_cpu_device::op_xamd()
 
 void melps4_cpu_device::op_xami()
 {
-	// XAMI j: XAM J, INY, skip next on Y=mask(default 0)
+	// XAMI j: XAM J, skip next on Y mask(default 0xf), increment Y
 	op_xam();
-	op_iny();
-	m_skip = (m_y == m_xami_mask);
+	m_skip = ((m_y & m_xami_mask) == m_xami_mask);
+	m_y = (m_y + 1) & 0xf;
 }
 
 
@@ -245,22 +245,19 @@ void melps4_cpu_device::op_cma()
 void melps4_cpu_device::op_sb()
 {
 	// SB j: set RAM bit
-	UINT8 mask = 1 << (m_op & 3);
-	ram_w(ram_r() | mask);
+	ram_w(ram_r() | m_bitmask);
 }
 
 void melps4_cpu_device::op_rb()
 {
 	// RB j: reset RAM bit
-	UINT8 mask = 1 << (m_op & 3);
-	ram_w(ram_r() & ~mask);
+	ram_w(ram_r() & ~m_bitmask);
 }
 
 void melps4_cpu_device::op_szb()
 {
 	// SZB j: skip next if RAM bit is 0
-	UINT8 mask = 1 << (m_op & 3);
-	m_skip = !(ram_r() & mask);
+	m_skip = !(ram_r() & m_bitmask);
 }
 
 
