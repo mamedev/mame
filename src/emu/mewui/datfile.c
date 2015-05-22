@@ -681,39 +681,27 @@ int datfile_manager::index_menuidx(const game_driver *drv, std::vector<tDatafile
     int m_count = 0;
     std::string readbuf;
 	size_t x = 0;
-
-	for (
     gdrv = drv;
 
-    do
+	// find driver in datafile index
+	for (x = 0; x < d_idx.size() && d_idx[x].driver != gdrv; ++x) ;
+
+    if (x == d_idx.size())
     {
-        // find driver in datafile index
-        for (; gd_idx->driver && gd_idx->driver != gdrv; gd_idx++) ;
-
-        if (gd_idx->driver == gdrv)
-            break;
-
-        int cl = driver_list::clone(*gdrv);
-
-        if (cl == -1)
-            break;
+		int cl = driver_list::clone(*gdrv);
+		if (cl == -1)
+			return m_count;
 
         gdrv = &driver_list::driver(cl);
+        for (x = 0; x < d_idx.size() && d_idx[x].driver != gdrv; ++x) ;
 
-    }   while (!gd_idx->driver && gdrv);
+        if (x == d_idx.size())
+			return m_count;
+	}
 
-    // driver not found in Data_file_index
-    if (gdrv == 0)
-        return 0;
-
-    // seek to correct point in datafile
+	// seek to correct point in datafile
     std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
-    if (!myfile.is_open())
-        return 0;
-
-    myfile.seekg(gd_idx->offset, myfile.beg);
-
-    // loop through between $cmd=
+    myfile.seekg(d_idx[x].offset, myfile.beg);
     while (std::getline(myfile, readbuf))
     {
         if (!core_strnicmp(TAG_INFO, readbuf.c_str(), strlen(TAG_INFO)))
@@ -775,12 +763,10 @@ bool datfile_manager::find_command(const game_driver *drv)
     if (ParseOpen("command.dat"))
     {
         // create menu_index
-        int status = index_menuidx(drv, cmnd_idx, &menu_idx);
+        int status = index_menuidx(drv, cmnd_idx, menu_idx);
         if (!status)
-        {
-            free_menuidx(&menu_idx);
             return false;
-        }
+
         return true;
     }
     return false;
@@ -807,7 +793,7 @@ void datfile_manager::command_sub_menu(const game_driver *drv, std::vector<std::
     if (ParseOpen("command.dat"))
     {
         // create menu_index
-        int status = index_menuidx(drv, cmnd_idx, &menu_idx);
+        int status = index_menuidx(drv, cmnd_idx, menu_idx);
 
 		if (!menu_idx.empty())
 		{

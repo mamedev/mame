@@ -335,16 +335,13 @@ function createProjects_mame_mewuitest(_target, _subtarget)
 	--	MAME_DIR .. "src/mame/drivers/cps1.c",
 	--	MAME_DIR .. "src/mame/video/cps1.c",
 
-	-- Neogeo
+		-- Neogeo
 		MAME_DIR .. "src/mame/drivers/neogeo.c",
 		MAME_DIR .. "src/mame/video/neogeo.c",
 		MAME_DIR .. "src/mame/drivers/neogeo_noslot.c",
 		MAME_DIR .. "src/mame/video/neogeo_spr.c",
-		MAME_DIR .. "src/mame/machine/neoboot.c",
 		MAME_DIR .. "src/mame/machine/neocrypt.c",
-		MAME_DIR .. "src/mame/machine/neoprot.c",
 		MAME_DIR .. "src/mame/machine/ng_memcard.c",
-
 	}
 end
 

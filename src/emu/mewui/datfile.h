@@ -104,6 +104,7 @@ private:
     void load_driver_text(const game_driver *drv, std::string &buffer, std::vector<sDataDrvIndex> &idx, const char *tag);
 
     int find_or_allocate(std::string name);
+	bool find_command(const game_driver *drv);
 
     // internal state
     running_machine     &m_machine;             // reference to our machine

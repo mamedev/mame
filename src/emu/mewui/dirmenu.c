@@ -11,7 +11,6 @@
 #include "mewui/dirmenu.h"
 #include "mewui/inifile.h"
 #include "mewui/datfile.h"
-#include "mewui/selgame.c"
 #include "mewui/utils.h"
 
 static const folders_entry s_folders_entry[] =
@@ -334,11 +333,6 @@ ui_menu_directory::ui_menu_directory(running_machine &machine, render_container 
 
 ui_menu_directory::~ui_menu_directory()
 {
-    if (roms_reset)
-    {
-        ui_mewui_select_game::exit(machine());
-        ui_mewui_select_game::init(machine());
-    }
     save_game_options(machine());
     mewui_globals::force_reset_main = true;
 }

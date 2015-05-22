@@ -21,6 +21,7 @@ static bool first_f_load = true;
 
 std::vector<IniFileIndex> inifile_manager::ini_index;
 UINT16 inifile_manager::current_file = -1;
+UINT16 inifile_manager::current_category = -1;
 
 std::vector<ui_software_info> favorite_manager::favorite_list;
 int favorite_manager::current_favorite = -1;
