@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Charles MacDonald
 /*
     HuC6280 sound chip emulator

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Wilbert Pol,???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /***************************************************************************
 
   Atari TIA video emulation

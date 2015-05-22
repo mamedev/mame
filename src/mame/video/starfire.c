@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Daniel Boris, Olivier Galibert, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Dan Boris, Olivier Galibert, Aaron Giles
 /***************************************************************************
 
     Star Fire/Fire One system - video hardware
