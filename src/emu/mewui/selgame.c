@@ -62,7 +62,7 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 		if (cy == -1 || (cy != -1 && ((driver_list::driver(cy).flags & GAME_IS_BIOS_ROOT) != 0)))
 			cloney = false;
 	}
-//osd_printf_verbose("*** X = %s - Y = %s - cx = %d - cy = %d\n", x->name, y->name, cx, cy);
+
 	if (!clonex && !cloney)
 		return (c_stricmp(x->description, y->description) < 0);
 
@@ -93,8 +93,7 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 //  ctor
 //-------------------------------------------------
 
-ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container),
-	m_searchlist(VISIBLE_GAMES_IN_SEARCH)
+ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
     // build drivers list
     build_full_list();
@@ -1412,7 +1411,7 @@ void ui_mewui_select_game::populate_search()
     // allocate memory to track the penalty value
     std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
 
-	int index = 0
+	int index = 0;
     for (; index < m_displaylist.size(); ++index)
     {
         // pick the best match between driver name and description
@@ -1439,7 +1438,7 @@ void ui_mewui_select_game::populate_search()
         }
     }
 
-	(index < VISIBLE_GAMES_IN_SEARCH) ? searchlist[index] = NULL : searchlist[VISIBLE_GAMES_IN_SEARCH] = NULL;
+	(index < VISIBLE_GAMES_IN_SEARCH) ? m_searchlist[index] = NULL : m_searchlist[VISIBLE_GAMES_IN_SEARCH] = NULL;
 
     UINT32 flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 

@@ -298,18 +298,19 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 
 void datfile_manager::load_data_text(const game_driver *drv, std::string &buffer, std::vector<tDatafileIndex> &idx, const char *tag)
 {
-    for (; s_idx->driver && s_idx->driver != drv; s_idx++) ;
-    if (s_idx->driver == NULL)
-    {
+	size_t x = 0;
+    for (x = 0; x < idx.size() && idx[x].driver != drv; ++x) ;
+
+	if (x == idx.size())
+	{
         int cloneof = driver_list::non_bios_clone(*drv);
         if (cloneof == -1)
             return;
         else
         {
-            s_idx = idx;
             const game_driver *c_drv = &driver_list::driver(cloneof);
-            for (; s_idx->driver && s_idx->driver != c_drv; s_idx++) ;
-            if (s_idx->driver == NULL)
+            for (x = 0; x < idx.size() && idx[x].driver != c_drv; ++x) ;
+            if (x == idx.size())
                 return;
         }
     }
@@ -317,10 +318,7 @@ void datfile_manager::load_data_text(const game_driver *drv, std::string &buffer
     std::string readbuf;
     std::ifstream myfile(fullpath.c_str());
 
-    if (!myfile.is_open())
-        return;
-
-    myfile.seekg(s_idx->offset, myfile.beg);
+    myfile.seekg(idx[x].offset, myfile.beg);
     while (myfile.good())
     {
         // read from datafile
@@ -348,19 +346,17 @@ void datfile_manager::load_driver_text(const game_driver *drv, std::string &buff
 {
     std::string s;
     core_filename_extract_base(s, drv->source_file);
-    for (; !idx.name.empty() && idx.name.compare(s.c_str()) != 0; idx++) ;
+    size_t index = 0;
+    for (index = 0; index < idx.size() && idx[index].name.compare(s.c_str()) != 0; ++index) ;
 
     // if driver not found, return
-    if (idx->name.empty())
+    if (index == idx.size())
         return;
 
     std::string readbuf;
     std::ifstream myfile(fullpath.c_str());
 
-    if (!myfile.is_open())
-        return;
-
-    myfile.seekg(idx->offset, myfile.beg);
+    myfile.seekg(idx[index].offset, myfile.beg);
     buffer.append("--- DRIVER INFO ---\n\0").append("Driver: ").append(s).append("\n\n");
     while (myfile.good())
     {
@@ -434,30 +430,27 @@ int datfile_manager::index_mame_mess_info(std::vector<tDatafileIndex> &index, st
                     int game_index = driver_list::find(name.c_str());
                     if (game_index != -1)
                     {
-                        idx->driver = &driver_list::driver(game_index);
-                        idx->offset = myfile.tellg();
-                        idx++;
+                        tDatafileIndex idx;
+                        idx.driver = &driver_list::driver(game_index);
+                        idx.offset = myfile.tellg();
+						index.push_back(idx);
                         count++;
                     }
                 }
 
                 else if (xid.compare(0, t_drv, TAG_DRIVER) == 0)
                 {
-                    idx_drv->name.assign(name);
-                    idx_drv->offset = myfile.tellg();
-                    idx_drv++;
-                    drvcount++;
+                    sDataDrvIndex idx_drv;
+                    idx_drv.name.assign(name);
+                    idx_drv.offset = myfile.tellg();
+					index_drv.push_back(idx_drv);
+					drvcount++;
                 }
             }
         }
         myfile.close();
     }
 
-    // mark end of index
-    idx->offset = 0L;
-    idx->driver = NULL;
-    idx_drv->offset = 0L;
-    idx_drv->name.clear();
     return count;
 }
 
@@ -525,9 +518,10 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 
                         if (game_index != -1)
                         {
-                            idx->driver = &driver_list::driver(game_index);
-                            idx->offset = myfile.tellg();
-                            idx++;
+							tDatafileIndex idx;
+                            idx.driver = &driver_list::driver(game_index);
+                            idx.offset = myfile.tellg();
+                            index.push_back(idx);
                             count++;
                         }
 
@@ -547,9 +541,10 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 
                         if (game_index != -1)
                         {
-                            idx->driver = &driver_list::driver(game_index);
-                            idx->offset = myfile.tellg();
-                            idx++;
+							tDatafileIndex idx;
+                            idx.driver = &driver_list::driver(game_index);
+                            idx.offset = myfile.tellg();
+                            index.push_back(idx);
                             count++;
                         }
 
@@ -655,10 +650,6 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
         }
         myfile.close();
     }
-
-    // mark end of index
-    idx->offset = 0L;
-    idx->driver = 0;
     return count;
 }
 
@@ -730,19 +721,15 @@ int datfile_manager::index_menuidx(const game_driver *drv, std::vector<tDatafile
         if (!core_strnicmp(TAG_COMMAND, readbuf.c_str(), strlen(TAG_COMMAND)))
         {
             std::getline(myfile, readbuf);
-            m_idx->menuitem = readbuf;
-            m_idx->offset = myfile.tellg();
-            m_idx++;
+            tMenuIndex m_idx;
+            m_idx.menuitem = readbuf;
+            m_idx.offset = myfile.tellg();
+            index.push_back(m_idx);
             m_count++;
         }
     }
 
     myfile.close();
-
-    // mark end of index
-    m_idx->offset = 0L;
-    m_idx->menuitem.clear();
-
     return m_count;
 }
 
