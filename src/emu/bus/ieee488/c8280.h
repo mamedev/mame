@@ -15,7 +15,7 @@
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/c8280_dsk.h"
-#include "machine/6532riot.h"
+#include "machine/mos6530n.h"
 #include "machine/wd_fdc.h"
 
 
@@ -27,7 +27,7 @@
 // ======================> c8280_device
 
 class c8280_device :  public device_t,
-						public device_ieee488_interface
+					  public device_ieee488_interface
 {
 public:
 	// construction/destruction
@@ -64,8 +64,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
-	required_device<riot6532_device> m_riot0;
-	required_device<riot6532_device> m_riot1;
+	required_device<mos6532_t> m_riot0;
+	required_device<mos6532_t> m_riot1;
 	required_device<fd1797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
