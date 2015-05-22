@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Peter J.C.Clare
+// license:BSD-3-Clause
+// copyright-holders:Mike Coates, Peter J.C.Clare
 /*****************************************************************************/
 /*                                                                           */
 /*                    (C) Copyright       Peter J.C.Clare                    */
