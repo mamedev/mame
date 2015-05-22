@@ -26,7 +26,7 @@ Test Paste:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/6532riot.h"
+#include "machine/mos6530n.h"
 #include "junior.lh"
 
 
@@ -39,7 +39,7 @@ public:
 	,
 		m_maincpu(*this, "maincpu") { }
 
-	required_device<riot6532_device> m_riot;
+	required_device<mos6532_t> m_riot;
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
 	DECLARE_READ8_MEMBER(junior_riot_b_r);
 	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
@@ -62,8 +62,8 @@ static ADDRESS_MAP_START(junior_mem, AS_PROGRAM, 8, junior_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1K RAM
-	AM_RANGE(0x1a00, 0x1a7f) AM_RAM // 6532 RAM
-	AM_RANGE(0x1a80, 0x1aff) AM_DEVREADWRITE("riot", riot6532_device, read, write)
+	AM_RANGE(0x1a00, 0x1a7f) AM_DEVICE("riot", mos6532_t, ram_map)
+	AM_RANGE(0x1a80, 0x1a9f) AM_DEVICE("riot", mos6532_t, io_map)
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM // Monitor
 ADDRESS_MAP_END
 
@@ -145,7 +145,7 @@ READ8_MEMBER( junior_state::junior_riot_a_r )
 
 READ8_MEMBER( junior_state::junior_riot_b_r )
 {
-	if ( m_riot->portb_out_get() & 0x20 )
+	if ( m_port_b & 0x20 )
 		return 0xFF;
 
 	return 0x7F;
@@ -227,12 +227,12 @@ static MACHINE_CONFIG_START( junior, junior_state )
 	MCFG_DEFAULT_LAYOUT( layout_junior )
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL_1MHz)
-	MCFG_RIOT6532_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(junior_state, junior_riot_b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(junior_state, junior_riot_b_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(junior_state, junior_riot_irq))
+	MCFG_DEVICE_ADD("riot", MOS6532n, XTAL_1MHz)
+	MCFG_MOS6530n_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(junior_state, junior_riot_b_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(junior_state, junior_riot_b_w))
+	MCFG_MOS6530n_IRQ_CB(WRITELINE(junior_state, junior_riot_irq))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
 MACHINE_CONFIG_END
