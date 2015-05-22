@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:K.Wilkins
+// copyright-holder:Keith Wilkins
 /***************************************************************************
 
   Toaplan Slap Fight hardware

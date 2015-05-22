@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Farfetch'd, Richter Belmont
+// copyright-holders:Farfetch'd, R. Belmont
 // AM1 Functions (for ReadAM)
 // **************************
 

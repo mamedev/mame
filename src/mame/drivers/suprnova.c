@@ -17,7 +17,7 @@ Mainboard + Cart combo
 
   Credits (in no particular order):
    Olivier Galibert for all the assistance and information he's provided
-   R.Belmont for working on the SH2 timers so sound worked
+   R. Belmont for working on the SH2 timers so sound worked
    Nicola Salmoria for hooking up the Roz and improving the dirty tile handling
    Paul Priest for a lot of things
    Stephh for spotting what was wrong with Puzz Loop's inputs

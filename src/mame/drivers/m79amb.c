@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Al Kossow
 /*          Ramtek M79 Ambush
 

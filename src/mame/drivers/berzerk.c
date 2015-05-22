@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Zsolt Vasvari, Aaron Giles, R. Belmont, Lord Nightmare
+// copyright-holders:Zsolt Vasvari, Aaron Giles, R. Belmont, Jonathan Gevaryahu
 /***************************************************************************
 
     Berzerk hardware

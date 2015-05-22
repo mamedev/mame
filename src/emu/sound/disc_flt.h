@@ -15,7 +15,7 @@
  *
  *  Coding started in November 2000
  *
- *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
+ *  Additions/bugfix February 2003 - Derrick Renaud, F.Palazzolo, K.Wilkins
  *  Discrete parallel tasks 2009 - Couriersud
  *  Discrete classes 2010        - Couriersud
  *

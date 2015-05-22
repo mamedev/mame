@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Charles Mac Donald, Wilbert Pol, Angelo Salese
+// copyright-holders:Charles MacDonald, Wilbert Pol, Angelo Salese
 /************************************************************
 
 PC Engine CD HW notes:

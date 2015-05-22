@@ -1,10 +1,10 @@
 // license:???
-// copyright-holders:Jaroslaw Burczynski
+// copyright-holders:Jarek Burczynski
 /****************************************************************************
 
     Metal Soldier Isaac II  (c) Taito 1985
 
-    driver by Jaroslaw Burczynski
+    driver by Jarek Burczynski
 
 ****************************************************************************/
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Keith Wilkins, D.Renaud, F.Palazzolo, Couriersud
+// copyright-holders:Keith Wilkins, Derrick Renaud, Frank Palazzolo, Couriersud
 #pragma once
 
 #ifndef __DISCRETE_H__
@@ -17,7 +17,7 @@
  *
  *  Coding started in November 2000
  *
- *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
+ *  Additions/bugfix February 2003 - Derrick Renaud, F.Palazzolo, K.Wilkins
  *  Discrete parallel tasks 2009 - Couriersud
  *
  ***********************************************************************

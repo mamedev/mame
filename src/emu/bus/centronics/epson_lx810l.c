@@ -3,8 +3,6 @@
 /*
  * Epson LX-810L dot matrix printer emulation
 
- * License: BSD-3-Clause
- *
  * IC list:
  *   uPD7810HG (cpu)
  *   E05A30 (gate array)

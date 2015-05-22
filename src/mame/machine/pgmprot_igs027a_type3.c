@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood, Xing Xing
 /***********************************************************************
  PGM IGS027A ARM protection emulation

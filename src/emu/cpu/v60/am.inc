@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Farfetch'd, Richter Belmont
+// copyright-holders:Farfetch'd, R. Belmont
 // NOTE for bit string / field addressing
 // ************************************
 // m_moddim must be passed as 10 for bit string instructions,

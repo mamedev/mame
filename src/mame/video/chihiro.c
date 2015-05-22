@@ -820,17 +820,18 @@ void vertex_program_simulator::compute_scalar_operation(float t_out[4], int inst
 		t_out[3] = par_in[p3_C + 3];
 		break;
 	case 2: // "RCP"
-		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0 / par_in[p3_C + 0];
+		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0f / par_in[p3_C + 0];
 		break;
 	case 3: // "RCC"
-		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0 / par_in[p3_C + 0]; // ?
+		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0f / par_in[p3_C + 0]; // ?
 		break;
 	case 4: // "RSQ"
-		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0 / sqrt(abs(par_in[p3_C + 0]));
+		// FIXME: should this be really abs which is "int abs(int x)"?
+		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0f / sqrtf(abs(par_in[p3_C + 0]));
 		break;
 	case 5: // "EXP"
 		t_out[0] = pow(2, floor(par_in[p3_C + 0]));
-		t_out[1] = par_in[p3_C + 0] - floor(par_in[p3_C + 0]);
+		t_out[1] = par_in[p3_C + 0] - floorf(par_in[p3_C + 0]);
 		t.f = pow(2, par_in[p3_C + 0]);
 		t.i = t.i & 0xffffff00;
 		t_out[2] = t.f;
@@ -1843,10 +1844,10 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 		xp = extent.startx + x;
 		// 1: fetch data
 		// 1.1: interpolated color from vertices
-		cb = ((extent.param[PARAM_COLOR_B].start + (float)x*extent.param[PARAM_COLOR_B].dpdx))*255.0;
-		cg = ((extent.param[PARAM_COLOR_G].start + (float)x*extent.param[PARAM_COLOR_G].dpdx))*255.0;
-		cr = ((extent.param[PARAM_COLOR_R].start + (float)x*extent.param[PARAM_COLOR_R].dpdx))*255.0;
-		ca = ((extent.param[PARAM_COLOR_A].start + (float)x*extent.param[PARAM_COLOR_A].dpdx))*255.0;
+		cb = ((extent.param[PARAM_COLOR_B].start + (float)x*extent.param[PARAM_COLOR_B].dpdx))*255.0f;
+		cg = ((extent.param[PARAM_COLOR_G].start + (float)x*extent.param[PARAM_COLOR_G].dpdx))*255.0f;
+		cr = ((extent.param[PARAM_COLOR_R].start + (float)x*extent.param[PARAM_COLOR_R].dpdx))*255.0f;
+		ca = ((extent.param[PARAM_COLOR_A].start + (float)x*extent.param[PARAM_COLOR_A].dpdx))*255.0f;
 		color[0] = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
 		color[1] = 0; // lighting not yet
 		// 1.2: color for each of the 4 possible textures
@@ -2366,8 +2367,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 					address = address + c * 4;
 					countlen = countlen - c;
 					convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 1);
-					if (xy[(n + 2) & 3].y > 293800000.0)
-						xy[(n + 2) & 3].y = xy[(n + 2) & 3].y + 1.0;
+					if (xy[(n + 2) & 3].y > 293800000.0f)
+						xy[(n + 2) & 3].y = xy[(n + 2) & 3].y + 1.0f;
 					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
 				}
 			}
@@ -3072,20 +3073,20 @@ void nv2a_renderer::debug_grab_vertex_program_slot(int slot, UINT32 *instruction
 
 void nv2a_renderer::combiner_argb8_float(UINT32 color, float reg[4])
 {
-	reg[0] = (float)(color & 0xff) / 255.0;
-	reg[1] = (float)((color >> 8) & 0xff) / 255.0;
-	reg[2] = (float)((color >> 16) & 0xff) / 255.0;
-	reg[3] = (float)((color >> 24) & 0xff) / 255.0;
+	reg[0] = (float)(color & 0xff) / 255.0f;
+	reg[1] = (float)((color >> 8) & 0xff) / 255.0f;
+	reg[2] = (float)((color >> 16) & 0xff) / 255.0f;
+	reg[3] = (float)((color >> 24) & 0xff) / 255.0f;
 }
 
 UINT32 nv2a_renderer::combiner_float_argb8(float reg[4])
 {
 	UINT32 r, g, b, a;
 
-	a = reg[3] * 255.0;
-	r = reg[2] * 255.0;
-	g = reg[1] * 255.0;
-	b = reg[0] * 255.0;
+	a = reg[3] * 255.0f;
+	r = reg[2] * 255.0f;
+	g = reg[1] * 255.0f;
+	b = reg[0] * 255.0f;
 	return (a << 24) | (r << 16) | (g << 8) | b;
 }
 
@@ -3206,18 +3207,18 @@ float nv2a_renderer::combiner_map_input_function(int code, float value)
 
 	switch (code) {
 	case 0:
-		return MAX(0.0, value);
+		return MAX(0.0f, value);
 	case 1:
-		t = MAX(value, 0.0);
-		return 1.0 - MIN(t, 1.0);
+		t = MAX(value, 0.0f);
+		return 1.0f - MIN(t, 1.0f);
 	case 2:
-		return 2.0 * MAX(0.0, value) - 1.0;
+		return 2.0f * MAX(0.0f, value) - 1.0f;
 	case 3:
-		return -2.0 * MAX(0.0, value) + 1.0;
+		return -2.0f * MAX(0.0f, value) + 1.0f;
 	case 4:
-		return MAX(0.0, value) - 0.5;
+		return MAX(0.0f, value) - 0.5f;
 	case 5:
-		return -MAX(0.0, value) + 0.5;
+		return -MAX(0.0f, value) + 0.5f;
 	case 6:
 		return value;
 	case 7:
@@ -3248,9 +3249,9 @@ void nv2a_renderer::combiner_map_input_function3(int code, float *data)
 		data[2] = 1.0f - MIN(t, 1.0f);
 		break;
 	case 2:
-		data[0] = 2.0 * MAX(0.0f, data[0]) - 1.0f;
-		data[1] = 2.0 * MAX(0.0f, data[1]) - 1.0f;
-		data[2] = 2.0 * MAX(0.0f, data[2]) - 1.0f;
+		data[0] = 2.0f * MAX(0.0f, data[0]) - 1.0f;
+		data[1] = 2.0f * MAX(0.0f, data[1]) - 1.0f;
+		data[2] = 2.0f * MAX(0.0f, data[2]) - 1.0f;
 		break;
 	case 3:
 		data[0] = -2.0f * MAX(0.0f, data[0]) + 1.0f;
@@ -3534,7 +3535,7 @@ void nv2a_renderer::combiner_function_CdotD(float result[4])
 
 void nv2a_renderer::combiner_function_ABmuxCD(float result[4])
 {
-	if (combiner.register_spare0[3] >= 0.5)
+	if (combiner.register_spare0[3] >= 0.5f)
 		combiner_function_AB(result);
 	else
 		combiner_function_CD(result);
@@ -3580,26 +3581,26 @@ void nv2a_renderer::combiner_compute_rgb_outputs(int stage_number)
 		m = 0;
 		combiner_function_AB(combiner.function_RGBop1);
 	}
-	combiner.function_RGBop1[0] = MAX(MIN((combiner.function_RGBop1[0] + biasrgb) * scalergb, 1.0), -1.0);
-	combiner.function_RGBop1[1] = MAX(MIN((combiner.function_RGBop1[1] + biasrgb) * scalergb, 1.0), -1.0);
-	combiner.function_RGBop1[2] = MAX(MIN((combiner.function_RGBop1[2] + biasrgb) * scalergb, 1.0), -1.0);
+	combiner.function_RGBop1[0] = MAX(MIN((combiner.function_RGBop1[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop1[1] = MAX(MIN((combiner.function_RGBop1[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop1[2] = MAX(MIN((combiner.function_RGBop1[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	if (combiner.stage[n].mapout_rgbCD_dotproduct) {
 		m = m | 1;
 		combiner_function_CdotD(combiner.function_RGBop2);
 	}
 	else
 		combiner_function_CD(combiner.function_RGBop2);
-	combiner.function_RGBop2[0] = MAX(MIN((combiner.function_RGBop2[0] + biasrgb) * scalergb, 1.0), -1.0);
-	combiner.function_RGBop2[1] = MAX(MIN((combiner.function_RGBop2[1] + biasrgb) * scalergb, 1.0), -1.0);
-	combiner.function_RGBop2[2] = MAX(MIN((combiner.function_RGBop2[2] + biasrgb) * scalergb, 1.0), -1.0);
+	combiner.function_RGBop2[0] = MAX(MIN((combiner.function_RGBop2[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop2[1] = MAX(MIN((combiner.function_RGBop2[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+	combiner.function_RGBop2[2] = MAX(MIN((combiner.function_RGBop2[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	if (m == 0) {
 		if (combiner.stage[n].mapout_rgb_muxsum)
 			combiner_function_ABmuxCD(combiner.function_RGBop3);
 		else
 			combiner_function_ABsumCD(combiner.function_RGBop3);
-		combiner.function_RGBop3[0] = MAX(MIN((combiner.function_RGBop3[0] + biasrgb) * scalergb, 1.0), -1.0);
-		combiner.function_RGBop3[1] = MAX(MIN((combiner.function_RGBop3[1] + biasrgb) * scalergb, 1.0), -1.0);
-		combiner.function_RGBop3[2] = MAX(MIN((combiner.function_RGBop3[2] + biasrgb) * scalergb, 1.0), -1.0);
+		combiner.function_RGBop3[0] = MAX(MIN((combiner.function_RGBop3[0] + biasrgb) * scalergb, 1.0f), -1.0f);
+		combiner.function_RGBop3[1] = MAX(MIN((combiner.function_RGBop3[1] + biasrgb) * scalergb, 1.0f), -1.0f);
+		combiner.function_RGBop3[2] = MAX(MIN((combiner.function_RGBop3[2] + biasrgb) * scalergb, 1.0f), -1.0f);
 	}
 }
 
@@ -3628,18 +3629,18 @@ void nv2a_renderer::combiner_compute_a_outputs(int stage_number)
 		break;
 	}
 	combiner.function_Aop1 = combiner.variable_A[3] * combiner.variable_B[3];
-	combiner.function_Aop1 = MAX(MIN((combiner.function_Aop1 + biasa) * scalea, 1.0), -1.0);
+	combiner.function_Aop1 = MAX(MIN((combiner.function_Aop1 + biasa) * scalea, 1.0f), -1.0f);
 	combiner.function_Aop2 = combiner.variable_C[3] * combiner.variable_D[3];
-	combiner.function_Aop2 = MAX(MIN((combiner.function_Aop2 + biasa) * scalea, 1.0), -1.0);
+	combiner.function_Aop2 = MAX(MIN((combiner.function_Aop2 + biasa) * scalea, 1.0f), -1.0f);
 	if (combiner.stage[n].mapout_a_muxsum) {
-		if (combiner.register_spare0[3] >= 0.5)
+		if (combiner.register_spare0[3] >= 0.5f)
 			combiner.function_Aop3 = combiner.variable_A[3] * combiner.variable_B[3];
 		else
 			combiner.function_Aop3 = combiner.variable_C[3] * combiner.variable_D[3];
 	}
 	else
 		combiner.function_Aop3 = combiner.variable_A[3] * combiner.variable_B[3] + combiner.variable_C[3] * combiner.variable_D[3];
-	combiner.function_Aop3 = MAX(MIN((combiner.function_Aop3 + biasa) * scalea, 1.0), -1.0);
+	combiner.function_Aop3 = MAX(MIN((combiner.function_Aop3 + biasa) * scalea, 1.0f), -1.0f);
 }
 
 bool nv2a_renderer::vblank_callback(screen_device &screen, bool state)
@@ -3864,7 +3865,10 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 		//logerror("NV_2A: read channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,ret);
 		return ret;
 	}
-	else;
+	else
+	{
+		/* nothing */
+	}
 	//logerror("NV_2A: read at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,ret);
 	return ret;
 }

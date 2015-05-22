@@ -25,15 +25,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c2040_device
+// ======================> c2040_t
 
-class c2040_device :  public device_t,
-					  public device_ieee488_interface
+class c2040_t :  public device_t,
+				 public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c2040_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c2040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -91,13 +91,13 @@ protected:
 };
 
 
-// ======================> c3040_device
+// ======================> c3040_t
 
-class c3040_device :  public c2040_device
+class c3040_t :  public c2040_t
 {
 public:
 	// construction/destruction
-	c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c3040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -107,13 +107,13 @@ public:
 };
 
 
-// ======================> c4040_device
+// ======================> c4040_t
 
-class c4040_device :  public c2040_device
+class c4040_t :  public c2040_t
 {
 public:
 	// construction/destruction
-	c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c4040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;

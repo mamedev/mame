@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Carlos A. Lozano Baides
+// license:BSD-3-Clause
+// copyright-holders:Carlos A. Lozano
 /**************************************************************************
 
 Blood Bros, West Story & Sky Smasher

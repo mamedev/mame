@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:FelipeSanches
+// copyright-holders:Felipe Sanches
 /*************************************************************************
 
     barata.c

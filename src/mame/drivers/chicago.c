@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabiou Priuli
+// copyright-holders:Fabio Priuli
 /***************************************************************************
 
  Chicago Coin discrete hardware games

@@ -526,7 +526,8 @@ protected:
 					/* check for fourth terminal ... should be numeric net
 					 * including "0" or start with "N" (ltspice)
 					 */
-					int nval =tt[4].as_long(&cerr);
+					// FIXME: we need a is_long method ..
+					ATTR_UNUSED int nval =tt[4].as_long(&cerr);
 					if ((!cerr || tt[4].startsWith("N")) && tt.count() > 5)
 						devs.add(nl_alloc(sp_dev_t, "QBJT", tt[0], tt[5]), false);
 					else

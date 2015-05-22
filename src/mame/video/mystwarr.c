@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Phil Stroffolino, Acho Tang, Nicola Salmoria
+// copyright-holders:R. Belmont, Phil Stroffolino, Acho A. Tang, Nicola Salmoria
 #define MW_VERBOSE 0
 
 /*

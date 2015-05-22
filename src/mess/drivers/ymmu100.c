@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, O. Galibert
+// copyright-holders:R. Belmont, Olivier Galibert
 /*************************************************************************************
 
     Yamaha MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone module
