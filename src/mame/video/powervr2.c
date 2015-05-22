@@ -2293,9 +2293,9 @@ void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 
 	if(0)
 		fprintf(stderr, "%f %f %f %f -> %f %f | %f %f -> %f %f\n",
-				y0,
-				dy, dxldy, dxrdy, dy*dxldy, dy*dxrdy,
-				xl, xr, xl + dy*dxldy, xr + dy*dxrdy);
+				(double) y0,
+				(double) dy, (double) dxldy, (double) dxrdy, (double) (dy*dxldy), (double) (dy*dxrdy),
+				(double) xl, (double) xr, (double) (xl + dy*dxldy), (double) (xr + dy*dxrdy));
 	xl += dy*dxldy;
 	xr += dy*dxrdy;
 	ul += dy*duldy;

@@ -17,7 +17,6 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6504.h"
 #include "machine/6522via.h"
-#include "machine/6532riot.h"
 #include "machine/mos6530n.h"
 
 
@@ -66,8 +65,8 @@ protected:
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
-	required_device<riot6532_device> m_riot0;
-	required_device<riot6532_device> m_riot1;
+	required_device<mos6532_t> m_riot0;
+	required_device<mos6532_t> m_riot1;
 	required_device<mos6530_t> m_miot;
 	required_device<via6522_device> m_via;
 	required_device<floppy_connector> m_floppy0;

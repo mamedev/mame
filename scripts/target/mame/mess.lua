@@ -579,6 +579,7 @@ BUSES["C64"] = true
 BUSES["CBM2"] = true
 BUSES["CBMIEC"] = true
 BUSES["CENTRONICS"] = true
+BUSES["CGENIE_EXPANSION"] = true
 BUSES["CHANNELF"] = true
 BUSES["COCO"] = true
 BUSES["COLECO"] = true

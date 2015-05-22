@@ -825,9 +825,9 @@ int midzeus_state::zeus_fifo_process(const UINT32 *data, int numwords)
 						data[2] & 0xffff,   data[2] >> 16,      data[0] & 0xffff,
 						data[3] & 0xffff,   data[3] >> 16,      data[1] >> 16,
 						data[4] & 0xffff,   data[4] >> 16,      data[1] & 0xffff,
-						(float)(INT32)data[5] * (1.0f / 65536.0f),
-						(float)(INT32)data[6] * (1.0f / 65536.0f),
-						(float)(INT32)data[7] * (1.0f / (65536.0f * 512.0f)));
+						(double)(INT32)data[5] * (1.0 / 65536.0),
+						(double)(INT32)data[6] * (1.0 / 65536.0),
+						(double)(INT32)data[7] * (1.0 / (65536.0 * 512.0)));
 				}
 
 				/* extract the matrix from the raw data */
@@ -860,9 +860,9 @@ int midzeus_state::zeus_fifo_process(const UINT32 *data, int numwords)
 						data[1] & 0xffff,   data[2] & 0xffff,   data[3] & 0xffff,
 						data[1] >> 16,      data[2] >> 16,      data[3] >> 16,
 						data[5] & 0xffff,   data[6] & 0xffff,   data[7] & 0xffff,
-						(float)(INT32)data[10] * (1.0f / 65536.0f),
-						(float)(INT32)data[11] * (1.0f / 65536.0f),
-						(float)(INT32)data[12] * (1.0f / (65536.0f * 512.0f)));
+						(double)(INT32)data[10] * (1.0 / 65536.0),
+						(double)(INT32)data[11] * (1.0 / 65536.0),
+						(double)(INT32)data[12] * (1.0 / (65536.0 * 512.0)));
 				}
 
 				/* extract the first matrix from the raw data */
@@ -1178,7 +1178,7 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 		if (logit)
 		{
 			logerror("\t\t(%f,%f,%f) (%02X,%02X) (%03X,%03X,%03X) dot=%08X\n",
-					vert[i].x * (1.0f / 65536.0f), vert[i].y * (1.0f / 65536.0f), vert[i].p[0] * (1.0f / 65536.0f),
+					(double) vert[i].x * (1.0 / 65536.0), (double) vert[i].y * (1.0 / 65536.0), (double) vert[i].p[0] * (1.0 / 65536.0),
 					(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f),
 					(databuffer[10 + i] >> 20) & 0x3ff, (databuffer[10 + i] >> 10) & 0x3ff, (databuffer[10 + i] >> 0) & 0x3ff,
 					dotnormal);
@@ -1202,7 +1202,7 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 		maxx = MAX(maxx, clipvert[i].x);
 		maxy = MAX(maxy, clipvert[i].y);
 		if (logit)
-			logerror("\t\t\tTranslated=(%f,%f)\n", clipvert[i].x, clipvert[i].y);
+			logerror("\t\t\tTranslated=(%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y);
 	}
 	for (i = 0; i < numverts; i++)
 	{

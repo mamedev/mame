@@ -173,7 +173,6 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 
 }
 
-
 ATTR_HOT void netlist_matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
@@ -465,9 +464,9 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	}
 
 	// Override log statistics
-	const char *p = osd_getenv("NL_STATS");
-	if (p != NULL)
-		m_params.m_log_stats = (bool) atoi(p);
+	pstring p = nl_util::environment("NL_STATS");
+	if (p != "")
+		m_params.m_log_stats = (bool) p.as_long();
 	else
 		m_params.m_log_stats = (bool) m_log_stats.Value();
 

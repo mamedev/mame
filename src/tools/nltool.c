@@ -85,8 +85,7 @@ struct options_entry oplist[] =
 	{ "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
 	{ "file;f",          "-",   OPTION_STRING,  "file to process (default is stdin)" },
 	{ "cmd;c",			 "run", OPTION_STRING,  "run|convert|listdevices" },
-	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
-	{ "verbose;v",       "0",   OPTION_BOOLEAN, "list all devices available for use" },
+	{ "verbose;v",       "0",   OPTION_BOOLEAN, "be verbose - this produces lots of output" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
 	{ NULL, NULL, 0, NULL }
 };

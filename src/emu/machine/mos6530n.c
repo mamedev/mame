@@ -109,9 +109,16 @@ mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, 
 	m_out_pb6_cb(*this),
 	m_out_pb7_cb(*this),
 	m_pa_in(0xff),
+	m_pa_out(0),
+	m_pa_ddr(0),
 	m_pb_in(0xff),
+	m_pb_out(0),
+	m_pb_ddr(0),
 	m_ie_timer(false),
-	m_ie_edge(false)
+	m_irq_timer(true),
+	m_ie_edge(false),
+	m_irq_edge(false),
+	m_positive(false)
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
@@ -222,15 +229,16 @@ void mos6532_t::device_start()
 
 void mos6530_base_t::device_reset()
 {
-	m_ie_timer = false;
-	m_irq_timer = true;
-	m_ie_edge = false;
-	m_irq_edge = true;
-
 	m_pa_out = 0;
 	m_pa_ddr = 0;
 	m_pb_out = 0;
 	m_pb_ddr = 0;
+
+	m_ie_timer = false;
+	m_irq_timer = true;
+	m_ie_edge = false;
+	m_irq_edge = false;
+	m_positive = false;
 
 	update_pa();
 	update_pb();
@@ -359,12 +367,56 @@ void mos6530_t::update_irq()
 
 
 //-------------------------------------------------
+//  get_irq_flags -
+//-------------------------------------------------
+
+UINT8 mos6530_base_t::get_irq_flags()
+{
+	UINT8 data = 0;
+
+	if (m_irq_timer) data |= IRQ_TIMER;
+	if (m_irq_edge) data |= IRQ_EDGE;
+
+	return data;
+}
+
+UINT8 mos6530_t::get_irq_flags()
+{
+	UINT8 data = 0;
+
+	if (m_irq_timer) data |= IRQ_TIMER;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  edge_detect -
+//-------------------------------------------------
+
+void mos6530_base_t::edge_detect(int old, int state)
+{
+	if (!m_irq_edge)
+	{
+		if (m_positive && !old && state) m_irq_edge = true;
+		if (!m_positive && old && !state) m_irq_edge = true;
+
+		if (m_irq_edge) {
+			if (LOG) logerror("%s %s '%s' edge-detect IRQ\n", machine().time().as_string(), name(), tag());
+
+			update_irq();
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  pa_w -
 //-------------------------------------------------
 
 void mos6530_base_t::pa_w(int bit, int state)
 {
-	if (LOG) logerror("%s %s MOS6530 '%s' Port A Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), tag(), bit, state);
+	if (LOG) logerror("%s %s %s '%s' Port A Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), bit, state);
 
 	m_pa_in &= ~(1 << bit);
 	m_pa_in |= (state << bit);
@@ -377,7 +429,7 @@ void mos6530_base_t::pa_w(int bit, int state)
 
 void mos6530_base_t::pb_w(int bit, int state)
 {
-	if (LOG) logerror("%s %s MOS6530 '%s' Port B Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), tag(), bit, state);
+	if (LOG) logerror("%s %s %s '%s' Port B Data Bit %u State %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), bit, state);
 
 	m_pb_in &= ~(1 << bit);
 	m_pb_in |= (state << bit);
@@ -413,7 +465,7 @@ READ8_MEMBER( mos6530_base_t::pa_data_r )
 	UINT8 ddr_in = m_pa_ddr ^ 0xff;
 	UINT8 data = (out & ddr_out) | (in & ddr_in);
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Port A Data In %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port A Data In %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	return data;
 }
@@ -427,9 +479,16 @@ WRITE8_MEMBER( mos6530_base_t::pa_data_w )
 {
 	m_pa_out = data;
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Port A Data Out %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port A Data Out %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	update_pa();
+}
+
+WRITE8_MEMBER( mos6532_t::pa_data_w )
+{
+	edge_detect(BIT(m_pa_out, 7), BIT(data, 7));
+
+	mos6530_base_t::pa_data_w(space, offset, data);
 }
 
 
@@ -441,7 +500,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_ddr_w )
 {
 	m_pa_ddr = data;
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Port A DDR %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port A DDR %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	update_pa();
 }
@@ -476,7 +535,7 @@ READ8_MEMBER( mos6530_base_t::pb_data_r )
 	UINT8 ddr_in = m_pb_ddr ^ 0xff;
 	UINT8 data = (out & ddr_out) | (in & ddr_in);
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Port B Data In %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port B Data In %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	return data;
 }
@@ -490,7 +549,7 @@ WRITE8_MEMBER( mos6530_base_t::pb_data_w )
 {
 	m_pb_out = data;
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Port B Data Out %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port B Data Out %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	update_pb();
 }
@@ -504,7 +563,7 @@ WRITE8_MEMBER( mos6530_base_t::pb_ddr_w )
 {
 	m_pb_ddr = data;
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Port B DDR %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+	if (LOG) logerror("%s %s %s '%s' Port B DDR %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	update_pb();
 }
@@ -523,8 +582,7 @@ READ8_MEMBER( mos6530_base_t::timer_r )
 
 	if (offset & 0x01)
 	{
-		if (m_irq_timer) data |= IRQ_TIMER;
-		if (m_irq_edge) data |= IRQ_EDGE;
+		data |= get_irq_flags();
 	}
 	else
 	{
@@ -577,7 +635,7 @@ WRITE8_MEMBER( mos6530_base_t::timer_w )
 
 	m_ie_timer = BIT(offset, 3) ? true : false;
 
-	if (LOG_TIMER) logerror("%s %s MOS6530 '%s' Timer value %02x shift %u IE %u\n", machine().time().as_string(), machine().describe_context(), tag(), data, m_shift, m_ie_timer ? 1 : 0);
+	if (LOG_TIMER) logerror("%s %s %s '%s' Timer value %02x shift %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data, m_shift, m_ie_timer ? 1 : 0);
 
 	if (m_irq_timer) {
 		m_irq_timer = false;
@@ -602,9 +660,9 @@ WRITE8_MEMBER( mos6530_base_t::timer_w )
 WRITE8_MEMBER( mos6530_base_t::edge_w )
 {
 	m_positive = BIT(data, 0) ? true : false;
-	m_ie_edge = BIT(data, 1) ? true : false;
+	m_ie_edge = BIT(data, 1) ? false : true;
 
-	if (LOG) logerror("%s %s MOS6530 '%s' %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), tag(), m_positive ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
+	if (LOG) logerror("%s %s %s '%s' %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name(), tag(), m_positive ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
 }
 
 
@@ -614,17 +672,7 @@ WRITE8_MEMBER( mos6530_base_t::edge_w )
 
 WRITE_LINE_MEMBER( mos6532_t::pa7_w )
 {
-	if (!m_irq_edge)
-	{
-		int old = BIT(m_pa_in, 7);
-
-		if (m_positive && !old && state) m_irq_edge = true;
-		if (!m_positive && old && !state) m_irq_edge = true;
-
-		if (m_irq_edge) {
-			update_irq();
-		}
-	}
+	edge_detect(BIT(m_pa_in, 7), state);
 
 	mos6530_base_t::pa7_w(state);
 }
@@ -715,7 +763,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 
 			cur_live.value--;
 
-			if (LOG_TIMER) logerror("%s MOS6530 '%s' timer %02x IRQ 1\n", cur_live.tm.as_string(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s %s '%s' timer %02x IRQ 1\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
 
 			if (!cur_live.value) {
 				cur_live.period = attotime::from_hz(clock());
@@ -733,7 +781,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 			cur_live.value--;
 			cur_live.irq = true;
 
-			if (LOG_TIMER) logerror("%s MOS6530 '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s %s '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
 
 			live_delay(RUNNING_SYNCPOINT);
 
@@ -742,7 +790,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 		}
 
 		case RUNNING_SYNCPOINT: {
-			if (LOG_TIMER) logerror("%s MOS6530 '%s' IRQ\n", machine().time().as_string(), tag());
+			if (LOG_TIMER) logerror("%s %s '%s' timer IRQ\n", machine().time().as_string(), name(), tag());
 
 			m_irq_timer = true;
 			update_irq();
@@ -758,7 +806,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 
 			cur_live.value--;
 
-			if (LOG_TIMER) logerror("%s MOS6530 '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s %s '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
 
 			if (!cur_live.value) {
 				live_abort();
