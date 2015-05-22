@@ -15,7 +15,7 @@
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/6532riot.h"
+#include "machine/mos6530n.h"
 #include "bus/scsi/scsi.h"
 
 
@@ -28,7 +28,7 @@
 // ======================> base_d9060_device
 
 class base_d9060_device :  public device_t,
-							public device_ieee488_interface
+						   public device_ieee488_interface
 {
 public:
 	enum
@@ -72,8 +72,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_hdccpu;
-	required_device<riot6532_device> m_riot0;
-	required_device<riot6532_device> m_riot1;
+	required_device<mos6532_t> m_riot0;
+	required_device<mos6532_t> m_riot1;
 	required_device<via6522_device> m_via;
 	required_device<SCSI_PORT_DEVICE> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;
