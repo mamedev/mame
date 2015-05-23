@@ -2432,3 +2432,19 @@ if (BUSES["NASBUS"]~=null) then
 		MAME_DIR .. "src/emu/bus/nasbus/floppy.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/emu/bus/cgenie/expansion.h,BUSES += CGENIE_EXPANSION
+---------------------------------------------------
+
+if (BUSES["CGENIE_EXPANSION"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/bus/cgenie/expansion.c",
+		MAME_DIR .. "src/emu/bus/cgenie/expansion.h",
+		MAME_DIR .. "src/emu/bus/cgenie/carts.c",
+		MAME_DIR .. "src/emu/bus/cgenie/carts.h",
+		MAME_DIR .. "src/emu/bus/cgenie/floppy.c",
+		MAME_DIR .. "src/emu/bus/cgenie/floppy.h",
+	}
+end

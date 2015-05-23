@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 /*******************************************************************************
 
     Input port macros used by many games in multiple KONAMI drivers

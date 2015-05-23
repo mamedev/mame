@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Couriersud, Jonathan Gevaryahu
 /* TMS51xx and TMS52xx ROM Tables */
 

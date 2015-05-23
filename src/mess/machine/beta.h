@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
     beta.h

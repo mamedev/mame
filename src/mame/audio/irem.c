@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Couriersud
 /***************************************************************************
 
     Irem M52/M62 sound hardware

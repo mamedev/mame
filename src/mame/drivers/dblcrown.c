@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders: Angelo Salese, Roberto Fresca.
+// copyright-holders: Angelo Salese, Roberto Fresca
 /***************************************************************************
 
     Double Crown (c) 1997 Cadence Technology / Dyna

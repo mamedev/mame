@@ -41,6 +41,8 @@ protected:
 	virtual void device_reset_after_children();
 
 private:
+	TIMER_CALLBACK_MEMBER(motor_off);
+
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -48,6 +50,7 @@ private:
 	required_device<floppy_connector> m_floppy3;
 
 	floppy_image_device *m_floppy;
+	emu_timer *m_motor;
 
 	UINT8 m_select;
 };

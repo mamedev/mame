@@ -12,6 +12,35 @@
 #include "emu.h"
 
 
+// pinout reference
+
+/*
+            ______   ______
+    D9   1 |*     \_/      | 42 D8
+    D10  2 |               | 41 D7
+    D11  3 |               | 40 D6
+  RESET  4 |               | 39 D5
+      T  5 |               | 38 D4
+     K0  6 |               | 37 D3
+     K1  7 |               | 36 D2
+     K2  8 |               | 35 D1
+     K3  9 |               | 34 D0
+     G0 10 |               | 33 Xin
+     G1 11 |     M58846    | 32 Xout
+     G2 12 |               | 31 S7
+     G3 13 |               | 30 S6
+      U 14 |               | 29 S5
+     F0 15 |               | 28 S4
+     F1 16 |               | 27 S3
+     F2 17 |               | 26 S2
+     F3 18 |               | 25 S1
+    INT 19 |               | 24 S0
+  CNVss 20 |               | 23 Vp
+    Vss 21 |_______________| 22 Vdd
+
+*/
+
+
 class melps4_cpu_device : public cpu_device
 {
 public:
@@ -25,7 +54,7 @@ public:
 		, m_stack_levels(3)
 		, m_bm_page(14)
 		, m_int_page(12)
-		, m_xami_mask(0)
+		, m_xami_mask(0xf)
 	{ }
 
 protected:
@@ -66,7 +95,7 @@ protected:
 	UINT8 m_stack_levels;   // 3 levels on MELPS 4, 12 levels on MELPS 41/42
 	UINT8 m_bm_page;        // short BM default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
 	UINT8 m_int_page;       // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
-	UINT8 m_xami_mask;      // mask option for XAMI opcode on '40,'41,'45 (0 for others)
+	UINT8 m_xami_mask;      // mask option for XAMI opcode on '40,'41,'45 (0xf for others)
 	
 	// internal state, misc regs
 	UINT16 m_pc;            // program counter (11 or 10-bit)
@@ -74,6 +103,7 @@ protected:
 	UINT16 m_stack[12];     // callstack
 	UINT16 m_op;
 	UINT16 m_prev_op;
+	UINT8 m_bitmask;        // opcode bit argument
 	
 	UINT8 m_cps;            // DP,CY or DP',CY' selected
 	bool m_skip;            // skip next opcode

@@ -85,8 +85,7 @@ struct options_entry oplist[] =
 	{ "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
 	{ "file;f",          "-",   OPTION_STRING,  "file to process (default is stdin)" },
 	{ "cmd;c",			 "run", OPTION_STRING,  "run|convert|listdevices" },
-	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
-	{ "verbose;v",       "0",   OPTION_BOOLEAN, "list all devices available for use" },
+	{ "verbose;v",       "0",   OPTION_BOOLEAN, "be verbose - this produces lots of output" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
 	{ NULL, NULL, 0, NULL }
 };
@@ -527,7 +526,8 @@ protected:
 					/* check for fourth terminal ... should be numeric net
 					 * including "0" or start with "N" (ltspice)
 					 */
-					int nval =tt[4].as_long(&cerr);
+					// FIXME: we need a is_long method ..
+					ATTR_UNUSED int nval =tt[4].as_long(&cerr);
 					if ((!cerr || tt[4].startsWith("N")) && tt.count() > 5)
 						devs.add(nl_alloc(sp_dev_t, "QBJT", tt[0], tt[5]), false);
 					else

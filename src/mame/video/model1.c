@@ -900,8 +900,8 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
 #endif
 			float dif=mult_vector(&vn, &view->light);
 			float spec=compute_specular(&vn,&view->light,dif,lightmode);
-			float ln=view->lightparams[lightmode].a + view->lightparams[lightmode].d*MAX(0.0,dif) + spec;
-			int lumval=255.0*MIN(1.0,ln);
+			float ln=view->lightparams[lightmode].a + view->lightparams[lightmode].d*MAX(0.0f,dif) + spec;
+			int lumval=255.0f*MIN(1.0f,ln);
 			int color=m_paletteram16[0x1000|(m_tgp_ram[tex_adr-0x40000] & 0x3ff)];
 			int r=(color>>0x0)&0x1f;
 			int g=(color>>0x5)&0x1f;
@@ -1059,7 +1059,7 @@ UINT16 *model1_state::push_direct(UINT16 *list)
 		cquad.p[3] = p1;
 		cquad.z    = z;
 		{
-			int lumval=((float) (lum>>24)) * 2.0;
+			int lumval=((float) (lum>>24)) * 2.0f;
 			int color=m_paletteram16[0x1000|(m_tgp_ram[tex_adr-0x40000] & 0x3ff)];
 			int r=(color>>0x0)&0x1f;
 			int g=(color>>0x5)&0x1f;
@@ -1265,9 +1265,9 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				for(i=0;i<len;++i)
 				{
 					int v=readi(list+6+i*2);
-					view->lightparams[i+adr].d=((float) (v&0xff))/255.0;
-					view->lightparams[i+adr].a=((float) ((v>>8)&0xff))/255.0;
-					view->lightparams[i+adr].s=((float) ((v>>16)&0xff))/255.0;
+					view->lightparams[i+adr].d=((float) (v&0xff))/255.0f;
+					view->lightparams[i+adr].a=((float) ((v>>8)&0xff))/255.0f;
+					view->lightparams[i+adr].s=((float) ((v>>16)&0xff))/255.0f;
 					view->lightparams[i+adr].p=(v>>24)&0xff;
 				}
 				list += 6+len*2;
@@ -1398,9 +1398,9 @@ void model1_state::tgp_scan()
 				for(i=0;i<len;++i)
 				{
 					int v=readi(list+6+i*2);
-					view->lightparams[i+adr].d=((float) (v&0xff))/255.0;
-					view->lightparams[i+adr].a=((float) ((v>>8)&0xff))/255.0;
-					view->lightparams[i+adr].s=((float) ((v>>16)&0xff))/255.0;
+					view->lightparams[i+adr].d=((float) (v&0xff))/255.0f;
+					view->lightparams[i+adr].a=((float) ((v>>8)&0xff))/255.0f;
+					view->lightparams[i+adr].s=((float) ((v>>16)&0xff))/255.0f;
 					view->lightparams[i+adr].p=(v>>24)&0xff;
 					//LOG_TGP(("         %02X\n",v));
 				}

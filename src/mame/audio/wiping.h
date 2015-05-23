@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Allard van der Bas
 /* 8 voices max */
 #define MAX_VOICES 8
 

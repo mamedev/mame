@@ -4,7 +4,7 @@
  * Sega System 32 Multi/Model 1/Model 2 custom PCM chip (315-5560) emulation.
  *
  * by Miguel Angel Horna (ElSemi) for Model 2 Emulator and MAME.
- * Information by R.Belmont and the YMF278B (OPL4) manual.
+ * Information by R. Belmont and the YMF278B (OPL4) manual.
  *
  * voice registers:
  * 0: Pan

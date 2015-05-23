@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 void buckrog_decode(running_machine &machine, const char *cputag);
 void pengo_decode(running_machine &machine, const char *cputag);
 void szaxxon_decode(running_machine &machine, const char *cputag);

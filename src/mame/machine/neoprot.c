@@ -1,3 +1,0 @@
-// license:???
-// copyright-holders:???
-/// empty

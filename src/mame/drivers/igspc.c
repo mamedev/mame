@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Scott Stone
+// copyright-holders:David Haywood
 /*
 
  IGS PC based hardware

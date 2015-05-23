@@ -1,4 +1,4 @@
-// license:GPL2.0+
+// license:GPL-2.0+
 // copyright-holders:Sam Lantinga
 /*
     SDL - Simple DirectMedia Layer

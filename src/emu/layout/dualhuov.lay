@@ -1,6 +1,4 @@
 <?xml version="1.0"?>
-<!-- license:BSD-3-Clause -->
-<!-- copyright-holders:Aaron Giles -->
 <mamelayout version="2">
 	<view name="Screen 0 Standard (4:3)">
 		<screen index="0">

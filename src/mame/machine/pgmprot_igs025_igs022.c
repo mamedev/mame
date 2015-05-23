@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ElSemi
 /***********************************************************************
  PGM 022 + 025 PGM protection emulation
 

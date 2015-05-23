@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:James Wallace, Phil Bennett
+// copyright-holders:James Wallace, Philip Bennett
 /***********************************************************************************************************
 Barcrest MPU4 Extension driver by J.Wallace, Phil Bennett and Anonymous.
 

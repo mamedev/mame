@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont,Ryan Holtz,etabeta
+// copyright-holders:R. Belmont,Ryan Holtz,Fabio Priuli
 /***********************************************************************************************************
 
 

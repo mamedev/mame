@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Phil Stroffolino, hap, R.Belmont
+// copyright-holders:Phil Stroffolino, hap, R. Belmont
 /**
  * video hardware for Namco System22
  *
@@ -742,7 +742,7 @@ float namcos22_state::dspfloat_to_nativefloat(UINT32 val)
 	int exponent = (val >> 16) & 0xff;
 	while (exponent < 0x2e)
 	{
-		result /= 2.0;
+		result /= 2.0f;
 		exponent++;
 	}
 	return result;
@@ -894,7 +894,7 @@ void namcos22_state::draw_direct_poly(const UINT16 *src)
 		{
 			while (exponent < 0x2e)
 			{
-				zf /= 2.0;
+				zf /= 2.0f;
 				exponent++;
 			}
 			if (m_is_ss22)
@@ -908,7 +908,7 @@ void namcos22_state::draw_direct_poly(const UINT16 *src)
 			exponent = 0x40 - exponent;
 			while (exponent < 0x2e)
 			{
-				zf /= 2.0;
+				zf /= 2.0f;
 				exponent++;
 			}
 			p->z = 1.0f / zf;

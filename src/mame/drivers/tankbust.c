@@ -1,10 +1,10 @@
 // license:???
-// copyright-holders:Jaroslaw Burczynski
+// copyright-holders:Jarek Burczynski
 /***************************************************************************
 
 Tank Busters memory map
 
-driver by Jaroslaw Burczynski
+driver by Jarek Burczynski
 
 
 Note:

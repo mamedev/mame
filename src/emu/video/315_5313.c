@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Sega 315-5313 - Megadrive VDP */
 
 #include "emu.h"

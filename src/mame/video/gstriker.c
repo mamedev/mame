@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Farfetch, David Haywood
+// copyright-holders:Farfetch'd, David Haywood
 #include "emu.h"
 #include "includes/gstriker.h"
 

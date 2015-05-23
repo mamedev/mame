@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Couriersud
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Guru
+// copyright-holders:Guru, Scott Stone
 /***************************************************************************
 
 Konami Pyson Hardware Overview

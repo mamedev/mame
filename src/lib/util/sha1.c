@@ -1,4 +1,4 @@
-// license:LGPL2.1
+// license:LGPL-2.1+
 // copyright-holders:Peter Gutmann, Andrew Kuchling, Niels Moeller
 /* sha1.h
  *

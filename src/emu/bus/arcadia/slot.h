@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __ARCADIA_SLOT_H
 #define __ARCADIA_SLOT_H
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R.Belmont, Miodrag Milanovic
+// copyright-holders:R. Belmont, Miodrag Milanovic
 /***************************************************************************
 
   ISA 8/16 bit Creative Labs Sound Blaster Sound Card

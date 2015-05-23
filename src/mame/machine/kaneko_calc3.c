@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:David Haywood, Luca Elia
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
  KANEKO CALC3 MCU simulation ( KANEKO CALC3 508 (74 PIN PQFP) )
 

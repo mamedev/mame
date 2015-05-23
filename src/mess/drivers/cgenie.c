@@ -38,28 +38,19 @@ NMI
 #include "sound/dac.h"
 #include "formats/cgen_cas.h"
 #include "machine/ram.h"
+#include "bus/cgenie/expansion.h"
 
-static ADDRESS_MAP_START (cgenie_mem, AS_PROGRAM, 8, cgenie_state )
+static ADDRESS_MAP_START( cgenie_mem, AS_PROGRAM, 8, cgenie_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in MACHINE_START
-//  AM_RANGE(0xc000, 0xdfff) AM_ROM // installed in cgenie_init_machine
-//  AM_RANGE(0xe000, 0xefff) AM_ROM // installed in cgenie_init_machine
 	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(cgenie_colorram_r, cgenie_colorram_w ) AM_SHARE("colorram")
 	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cgenie_fontram_r, cgenie_fontram_w) AM_SHARE("fontram")
 	AM_RANGE(0xf800, 0xf8ff) AM_READ(cgenie_keyboard_r )
-	AM_RANGE(0xf900, 0xffdf) AM_NOP
-	AM_RANGE(0xffe0, 0xffe3) AM_READWRITE(cgenie_irq_status_r, cgenie_motor_w )
-	AM_RANGE(0xffe4, 0xffeb) AM_NOP
-	AM_RANGE(0xffec, 0xffec) AM_READWRITE(cgenie_status_r, cgenie_command_w )
-	AM_RANGE(0xffe4, 0xffeb) AM_NOP
-	AM_RANGE(0xffec, 0xffec) AM_WRITE(cgenie_command_w )
-	AM_RANGE(0xffed, 0xffed) AM_READWRITE(cgenie_track_r, cgenie_track_w )
-	AM_RANGE(0xffee, 0xffee) AM_READWRITE(cgenie_sector_r, cgenie_sector_w )
-	AM_RANGE(0xffef, 0xffef) AM_READWRITE(cgenie_data_r, cgenie_data_w )
-	AM_RANGE(0xfff0, 0xffff) AM_NOP
+	AM_RANGE(0xffe0, 0xffe3) AM_READ(cgenie_irq_status_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (cgenie_io, AS_IO, 8, cgenie_state )
+static ADDRESS_MAP_START( cgenie_io, AS_IO, 8, cgenie_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(cgenie_sh_control_port_r, cgenie_sh_control_port_w )
 	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
@@ -70,19 +61,10 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cgenie )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x80, 0x80, "Floppy Disc Drives")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "CG-DOS ROM C000-DFFF")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Extension  E000-EFFF")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Video Display accuracy") PORT_CODE(KEYCODE_F5) PORT_TOGGLE
 	PORT_DIPSETTING(    0x10, "TV set" )
 	PORT_DIPSETTING(    0x00, "RGB monitor" )
-	PORT_BIT(0x0f, 0x0f, IPT_UNUSED)
+	PORT_BIT(0xef, 0xef, IPT_UNUSED)
 
 /**************************************************************************
    +-------------------------------+     +-------------------------------+
@@ -443,7 +425,7 @@ static const unsigned short cgenie_palette[] =
 	0,    41,   39,   38,   /* TV set graphics colors: a bit brighter */
 };
 
-/* Initialise the palette */
+/* Initialize the palette */
 PALETTE_INIT_MEMBER(cgenie_state,cgenie)
 {
 	UINT8 i, r, g, b;
@@ -470,41 +452,6 @@ PALETTE_INIT_MEMBER(cgenie_state,cgenienz)
 
 	for(i=0; i<108; i++)
 		palette.set_pen_indirect(i, cgenie_palette[i]);
-}
-
-// This is currently broken
-static LEGACY_FLOPPY_OPTIONS_START(cgenie )
-	LEGACY_FLOPPY_OPTION( cgd, "cgd", "Colour Genie disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface cgenie_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(cgenie),
-	NULL
-};
-
-
-// TODO: investigate this! I think it is some sort of expansion of the DOS cart...
-DEVICE_IMAGE_LOAD_MEMBER( cgenie_state, cgenie_cart )
-{
-	UINT32 size = m_cart->common_get_size("rom");
-
-	if (size > 0x1000)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
-	}
-
-	m_cart->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return IMAGE_INIT_PASS;
 }
 
 
@@ -549,22 +496,12 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 	MCFG_CASSETTE_INTERFACE("cgenie_cass")
 
-	MCFG_DEVICE_ADD("wd179x", FD1793, 0) // TODO confirm type
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(cgenie_state, cgenie_fdc_intrq_w))
-
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(cgenie_floppy_interface)
-
-	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cgenie_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(cgenie_state, cgenie_cart)
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "cgenie_cart")
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
-	/* internal ram */
+	MCFG_EXPANSION_SLOT_ADD("exp")
+	MCFG_EXPANSION_SLOT_INT_HANDLER(WRITELINE(cgenie_state, exp_intrq_w))
+
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
@@ -586,173 +523,31 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START (cgenie)
-	ROM_REGION(0x13000,"maincpu",0)
-	ROM_LOAD ("cgenie.rom",  0x00000, 0x4000, CRC(d359ead7) SHA1(d8c2fc389ad38c45fba0ed556a7d91abac5463f4))
-	ROM_LOAD ("cgdos.rom",   0x10000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
+ROM_START( cgenie )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("cgenie.rom",  0x0000, 0x4000, CRC(d359ead7) SHA1(d8c2fc389ad38c45fba0ed556a7d91abac5463f4))
 
-	ROM_REGION(0x0c00,"gfx1",0)
-	ROM_LOAD ("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
+	ROM_REGION(0x0c00, "gfx1", 0)
+	ROM_LOAD("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
 
 	/* Empty memory region for the character generator */
-	ROM_REGION(0x0800,"gfx2",ROMREGION_ERASEFF)
-
+	ROM_REGION(0x0800, "gfx2", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START (cgenienz)
-	ROM_REGION(0x13000,"maincpu",0)
+ROM_START( cgenienz )
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "old", "Old ROM")
-	ROMX_LOAD( "cg-basic-rom-v1-pal-en.rom",   0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1) )
+	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom",   0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "new", "New ROM")
-	ROMX_LOAD( "cgromv2.rom",   0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2) )
-	ROM_LOAD ("cgdos.rom",   0x10000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
+	ROMX_LOAD("cgromv2.rom",   0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2) )
 
-	ROM_REGION(0x0c00,"gfx1",0)
-	ROM_LOAD ("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
+	ROM_REGION(0x0c00, "gfx1", 0)
+	ROM_LOAD("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))
 
 	/* Empty memory region for the character generator */
-	ROM_REGION(0x0800,"gfx2",ROMREGION_ERASEFF)
-
+	ROM_REGION(0x0800, "gfx2", ROMREGION_ERASEFF)
 ROM_END
 
-// Code below is previous non-working implementation , just for reference
-#if 0
-
-#define CGENIE_DRIVE_INFO
-
-
-
-//
-//   abbreviations used:
-//   GPL    Granules Per Lump
-//   GAT    Granule Allocation Table
-//   GATL GAT Length
-//   GATM GAT Mask
-//   DDGA Disk Directory Granule Allocation
-struct PDRIVE
-{
-	UINT8 DDSL;      // Disk Directory Start Lump (lump number of GAT)
-	UINT8 GATL;      // # of bytes used in the Granule Allocation Table sector
-	UINT8 STEPRATE;  // step rate and somet SD/DD flag ...
-	UINT8 TRK;       // number of tracks
-	UINT8 SPT;       // sectors per track (both heads counted!)
-	UINT8 GATM;      // number of used bits per byte in the GAT sector (GAT mask)
-	UINT8 P7;        // ???? always zero
-	UINT8 FLAGS;     // ???? some flags (SS/DS bit 6)
-	UINT8 GPL;       // Sectors per granule (always 5 for the Colour Genie)
-	UINT8 DDGA;      // Disk Directory Granule allocation (number of driectory granules)
-};
-
-static const PDRIVE pd_list[12] = {
-	{0x14, 0x28, 0x07, 0x28, 0x0A, 0x02, 0x00, 0x00, 0x05, 0x02}, // CMD"<0=A" 40 tracks, SS, SD
-	{0x14, 0x28, 0x07, 0x28, 0x14, 0x04, 0x00, 0x40, 0x05, 0x04}, // CMD"<0=B" 40 tracks, DS, SD
-	{0x18, 0x30, 0x53, 0x28, 0x12, 0x03, 0x00, 0x03, 0x05, 0x03}, // CMD"<0=C" 40 tracks, SS, DD
-	{0x18, 0x30, 0x53, 0x28, 0x24, 0x06, 0x00, 0x43, 0x05, 0x06}, // CMD"<0=D" 40 tracks, DS, DD
-	{0x14, 0x28, 0x07, 0x28, 0x0A, 0x02, 0x00, 0x04, 0x05, 0x02}, // CMD"<0=E" 40 tracks, SS, SD
-	{0x14, 0x28, 0x07, 0x28, 0x14, 0x04, 0x00, 0x44, 0x05, 0x04}, // CMD"<0=F" 40 tracks, DS, SD
-	{0x18, 0x30, 0x53, 0x28, 0x12, 0x03, 0x00, 0x07, 0x05, 0x03}, // CMD"<0=G" 40 tracks, SS, DD
-	{0x18, 0x30, 0x53, 0x28, 0x24, 0x06, 0x00, 0x47, 0x05, 0x06}, // CMD"<0=H" 40 tracks, DS, DD
-	{0x28, 0x50, 0x07, 0x50, 0x0A, 0x02, 0x00, 0x00, 0x05, 0x02}, // CMD"<0=I" 80 tracks, SS, SD
-	{0x28, 0x50, 0x07, 0x50, 0x14, 0x04, 0x00, 0x40, 0x05, 0x04}, // CMD"<0=J" 80 tracks, DS, SD
-	{0x30, 0x60, 0x53, 0x50, 0x12, 0x03, 0x00, 0x03, 0x05, 0x03}, // CMD"<0=K" 80 tracks, SS, DD
-	{0x30, 0x60, 0x53, 0x50, 0x24, 0x06, 0x00, 0x43, 0x05, 0x06}, // CMD"<0=L" 80 tracks, DS, DD
-};
-
-// basic-dsk is a disk image format which has the tracks and sectors
-// stored in order, no information is stored which details the number
-// of tracks, number of sides, number of sectors etc, so we need to
-// set that up here
-//
-DEVICE_IMAGE_LOAD( cgenie_floppy )
-{
-	int i, j, dir_offset;
-	UINT8 buff[16];
-	UINT8 tracks = 0;
-	UINT8 heads = 0;
-	UINT8 spt = 0;
-	short dir_sector = 0;
-	short dir_length = 0;
-
-	// A Floppy Isnt manditory, so return if none
-	if (device_load_basicdsk_floppy(image) != IMAGE_INIT_PASS)
-		return IMAGE_INIT_FAIL;
-
-	// determine image geometry
-	image.fseek(0, SEEK_SET);
-
-	// determine geometry from disk contents
-	for( i = 0; i < 12; i++ )
-	{
-		image.fseek(pd_list[i].SPT * 256, SEEK_SET);
-		image.fread( buff, 16);
-		// find an entry with matching DDSL
-		if (buff[0] != 0x00 || buff[1] != 0xfe || buff[2] != pd_list[i].DDSL)
-			continue;
-		logerror("cgenie: checking format #%d\n", i);
-
-		dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
-		dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-
-		// scan directory for DIR/SYS or NCW1983/JHL files
-		// look into sector 2 and 3 first entry relative to DDSL
-		for( j = 16; j < 32; j += 8 )
-		{
-			dir_offset = dir_sector * 256 + j * 32;
-			if( image.fseek(dir_offset, SEEK_SET) < 0 )
-				break;
-			if( image.fread( buff, 16) != 16 )
-				break;
-			if( !strncmp((char*)buff + 5, "DIR     SYS", 11) ||
-				!strncmp((char*)buff + 5, "NCW1983 JHL", 11) )
-			{
-				tracks = pd_list[i].TRK;
-				heads = (pd_list[i].SPT > 18) ? 2 : 1;
-				spt = pd_list[i].SPT / heads;
-				dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
-				dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-				memcpy(memregion("maincpu")->base() + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
-				break;
-			}
-		}
-
-		logerror("cgenie: geometry %d tracks, %d heads, %d sec/track\n", tracks, heads, spt);
-		// set geometry so disk image can be read
-		basicdsk_set_geometry(image, tracks, heads, spt, 256, 0, 0, FALSE);
-
-		logerror("cgenie: directory sectors %d - %d (%d sectors)\n", dir_sector, dir_sector + dir_length - 1, dir_length);
-		// mark directory sectors with deleted data address mark
-		// assumption dir_sector is a sector offset
-		for (j = 0; j < dir_length; j++)
-		{
-			UINT8 track;
-			UINT8 side;
-			UINT8 sector_id;
-			UINT16 track_offset;
-			UINT16 sector_offset;
-
-			// calc sector offset
-			sector_offset = dir_sector + j;
-
-			// get track offset
-			track_offset = sector_offset / spt;
-
-			// calc track
-			track = track_offset / heads;
-
-			// calc side
-			side = track_offset % heads;
-
-			// calc sector id - first sector id is 0!
-			sector_id = sector_offset % spt;
-
-			// set deleted data address mark for sector specified
-			basicdsk_set_ddam(image, track, side, sector_id, 1);
-		}
-
-	}
-	return IMAGE_INIT_PASS;
-}
-#endif
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY    FULLNAME */
 COMP( 1982, cgenie,   0,        0,      cgenie,   cgenie, driver_device,    0,       "EACA Computers Ltd",  "Colour Genie EG2000" , 0)

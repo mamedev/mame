@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Reip, Barry Rodewald
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli, Barry Rodewald
 /*************************************************************************
 
     Malzak

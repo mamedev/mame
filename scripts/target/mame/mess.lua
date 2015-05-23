@@ -579,6 +579,7 @@ BUSES["C64"] = true
 BUSES["CBM2"] = true
 BUSES["CBMIEC"] = true
 BUSES["CENTRONICS"] = true
+BUSES["CGENIE_EXPANSION"] = true
 BUSES["CHANNELF"] = true
 BUSES["COCO"] = true
 BUSES["COLECO"] = true
@@ -950,9 +951,7 @@ files {
 	MAME_DIR .. "src/mame/machine/315-5881_crypt.c",  
 	MAME_DIR .. "src/mame/video/powervr2.c",    
 	MAME_DIR .. "src/mame/drivers/neogeo.c",    
-	MAME_DIR .. "src/mame/machine/neoboot.c",   
 	MAME_DIR .. "src/mame/machine/neocrypt.c",  
-	MAME_DIR .. "src/mame/machine/neoprot.c",   
 	MAME_DIR .. "src/mame/machine/ng_memcard.c",
 	MAME_DIR .. "src/mame/video/neogeo.c",      
 	MAME_DIR .. "src/mame/video/neogeo_spr.c",  

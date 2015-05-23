@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:By R. Belmont, Hans Ostermeyer
+// copyright-holders:R. Belmont, Hans Ostermeyer
 /*
     m68kmmu.h - PMMU implementation for 68851/68030/68040
             HMMU implementation for 68020 (II and LC variants)
