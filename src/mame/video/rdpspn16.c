@@ -76,7 +76,7 @@ void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, ext
 			render_triangle_custom(m_visarea, render_delegate(FUNC(n64_rdp::span_draw_fill), this), start, (end - start) + 1, spans + offset);
 			break;
 	}
-	wait();
+	//wait();
 }
 
 void n64_rdp::rgbaz_clip(INT32 sr, INT32 sg, INT32 sb, INT32 sa, INT32* sz, rdp_span_aux* userdata)

@@ -154,6 +154,20 @@ void mips3_device::mips3drc_set_options(UINT32 options)
 	m_drcoptions = options;
 }
 
+/*-------------------------------------------------
+    mips3drc_clears_fastram - clears fastram
+    region starting at index select_start
+-------------------------------------------------*/
+void mips3_device::clear_fastram(UINT32 select_start)
+{
+	for (int i=select_start; i<MIPS3_MAX_FASTRAM; i++) {
+		m_fastram[i].start = 0;
+		m_fastram[i].end = 0;
+		m_fastram[i].readonly = false;
+		m_fastram[i].base = NULL;
+	}
+	 m_fastram_select=select_start;
+}
 
 /*-------------------------------------------------
     mips3drc_add_fastram - add a new fastram

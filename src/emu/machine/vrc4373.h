@@ -6,6 +6,7 @@
 #define VRC4373_H
 
 #include "pci.h"
+#include "cpu/mips/mips3.h"
 
 #define MCFG_VRC4373_ADD(_tag,  _cpu_tag) \
 	MCFG_PCI_HOST_ADD(_tag, VRC4373, 0x005B1033, 0x00, 0x00000000) \
@@ -66,7 +67,6 @@ public:
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
 
-
 	void set_cpu_tag(const char *tag);
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32);
@@ -102,12 +102,14 @@ protected:
 	void dma_transfer(int which);
 
 private:
-	cpu_device *m_cpu;
+	mips3_device *m_cpu;
 	const char *cpu_tag;
 
 	address_space_config m_mem_config, m_io_config;
 
 	DECLARE_ADDRESS_MAP(cpu_map, 32);
+
+	void map_cpu_space();
 
 	UINT32 m_ram_size;
 	UINT32 m_ram_base;
@@ -116,7 +118,6 @@ private:
 	UINT32 m_simm_size;
 	UINT32 m_simm_base;
 	std::vector<UINT32> m_simm;
-
 
 	UINT32 m_cpu_regs[0x7c];
 
