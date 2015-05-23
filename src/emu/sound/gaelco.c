@@ -1,9 +1,9 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
 /***************************************************************************
                     Gaelco Sound Hardware
 
-                By Manuel Abadia <manu@teleline.es>
+                By Manuel Abadia <emumanu+mame@gmail.com>
 
 CG-1V/GAE1 (Gaelco custom GFX & Sound chip):
     The CG-1V/GAE1 can handle up to 7 stereo channels.

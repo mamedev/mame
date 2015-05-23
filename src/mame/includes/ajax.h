@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
 #include "sound/k007232.h"
 #include "video/k052109.h"

@@ -1,10 +1,10 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Manuel Abadia 
 /***************************************************************************
 
     Double Dribble (GX690) (c) Konami 1986
 
-    Driver by Manuel Abadia <manu@teleline.es>
+    Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
     2008-08
     Dip locations and suggested settings verified with US manual.
