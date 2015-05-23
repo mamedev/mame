@@ -297,7 +297,7 @@ public:
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
 
 	void add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
-
+	void clear_fastram(UINT32 select_start);
 	void mips3drc_set_options(UINT32 options);
 	void mips3drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles);
 
