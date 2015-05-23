@@ -123,14 +123,15 @@ mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, 
 	m_pa_in(0xff),
 	m_pa_out(0),
 	m_pa_ddr(0),
+	m_pa7(0),
+	m_pa7_dir(0),
 	m_pb_in(0xff),
 	m_pb_out(0),
 	m_pb_ddr(0),
 	m_ie_timer(false),
 	m_irq_timer(true),
 	m_ie_edge(false),
-	m_irq_edge(false),
-	m_positive(false)
+	m_irq_edge(false)
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
@@ -206,6 +207,8 @@ void mos6530_base_t::device_start()
 	save_item(NAME(m_pa_in));
 	save_item(NAME(m_pa_out));
 	save_item(NAME(m_pa_ddr));
+	save_item(NAME(m_pa7));
+	save_item(NAME(m_pa7_dir));
 	save_item(NAME(m_pb_in));
 	save_item(NAME(m_pb_out));
 	save_item(NAME(m_pb_ddr));
@@ -213,7 +216,6 @@ void mos6530_base_t::device_start()
 	save_item(NAME(m_irq_timer));
 	save_item(NAME(m_ie_edge));
 	save_item(NAME(m_irq_edge));
-	save_item(NAME(m_positive));
 	save_item(NAME(m_shift));
 	save_item(NAME(m_timer));
 }
@@ -250,11 +252,12 @@ void mos6530_base_t::device_reset()
 	m_irq_timer = false;
 	m_ie_edge = false;
 	m_irq_edge = false;
-	m_positive = false;
+	m_pa7_dir = 0;
 
 	update_pa();
 	update_pb();
 	update_irq();
+	edge_detect();
 
 	live_abort();
 }
@@ -407,19 +410,22 @@ UINT8 mos6530_t::get_irq_flags()
 //  edge_detect -
 //-------------------------------------------------
 
-void mos6530_base_t::edge_detect(int old, int state)
+void mos6530_base_t::edge_detect()
 {
-	if (!m_irq_edge)
+	UINT8 ddr_out = m_pa_ddr;
+	UINT8 ddr_in = m_pa_ddr ^ 0xff;
+	UINT8 data = (m_pa_out & ddr_out) | (m_pa_in & ddr_in);
+	int state = BIT(data, 7);
+
+	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0)
 	{
-		if (m_positive && !old && state) m_irq_edge = true;
-		if (!m_positive && old && !state) m_irq_edge = true;
+		if (LOG) logerror("%s %s '%s' edge-detect IRQ\n", machine().time().as_string(), name(), tag());
 
-		if (m_irq_edge) {
-			if (LOG) logerror("%s %s '%s' edge-detect IRQ\n", machine().time().as_string(), name(), tag());
-
-			update_irq();
-		}
+		m_irq_edge = true;
+		update_irq();
 	}
+
+	m_pa7 = state;
 }
 
 
@@ -433,6 +439,8 @@ void mos6530_base_t::pa_w(int bit, int state)
 
 	m_pa_in &= ~(1 << bit);
 	m_pa_in |= (state << bit);
+
+	edge_detect();
 }
 
 
@@ -495,13 +503,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_data_w )
 	if (LOG) logerror("%s %s %s '%s' Port A Data Out %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	update_pa();
-}
-
-WRITE8_MEMBER( mos6532_t::pa_data_w )
-{
-	edge_detect(BIT(m_pa_out, 7), BIT(data, 7));
-
-	mos6530_base_t::pa_data_w(space, offset, data);
+	edge_detect();
 }
 
 
@@ -516,6 +518,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_ddr_w )
 	if (LOG) logerror("%s %s %s '%s' Port A DDR %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	update_pa();
+	edge_detect();
 }
 
 
@@ -692,22 +695,10 @@ void mos6530_base_t::timer_w(offs_t offset, UINT8 data, bool ie)
 
 WRITE8_MEMBER( mos6530_base_t::edge_w )
 {
-	m_positive = BIT(data, 0) ? true : false;
+	m_pa7_dir = BIT(data, 0);
 	m_ie_edge = BIT(data, 1) ? false : true;
 
-	if (LOG) logerror("%s %s %s '%s' %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name(), tag(), m_positive ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
-}
-
-
-//-------------------------------------------------
-//  pa7_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mos6532_t::pa7_w )
-{
-	edge_detect(BIT(m_pa_in, 7), state);
-
-	mos6530_base_t::pa7_w(state);
+	if (LOG) logerror("%s %s %s '%s' %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name(), tag(), m_pa7_dir ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
 }
 
 

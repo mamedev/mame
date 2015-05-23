@@ -262,7 +262,7 @@ protected:
 	virtual void update_pb();
 	virtual void update_irq();
 	virtual UINT8 get_irq_flags();
-	void edge_detect(int old, int state);
+	void edge_detect();
 	void pa_w(int bit, int state);
 	void pb_w(int bit, int state);
 	void timer_w(offs_t offset, UINT8 data, bool ie);
@@ -329,6 +329,8 @@ protected:
 	UINT8 m_pa_in;
 	UINT8 m_pa_out;
 	UINT8 m_pa_ddr;
+	int m_pa7;
+	int m_pa7_dir;
 
 	UINT8 m_pb_in;
 	UINT8 m_pb_out;
@@ -336,10 +338,8 @@ protected:
 
 	bool m_ie_timer;
 	bool m_irq_timer;
-
 	bool m_ie_edge;
 	bool m_irq_edge;
-	bool m_positive;
 
 	int m_shift;
 	UINT8 m_timer;
@@ -400,10 +400,6 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
-
-	DECLARE_WRITE8_MEMBER( pa_data_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pa7_w );
 
 protected:
 	// device-level overrides
