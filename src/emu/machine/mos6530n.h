@@ -265,6 +265,8 @@ protected:
 	void edge_detect(int old, int state);
 	void pa_w(int bit, int state);
 	void pb_w(int bit, int state);
+	void timer_w(offs_t offset, UINT8 data, bool ie);
+	UINT8 timer_r(bool ie);
 
 	DECLARE_READ8_MEMBER( rom_r ) { return m_region->base()[offset]; }
 	DECLARE_READ8_MEMBER( ram_r ) { return m_ram[offset]; }
@@ -277,8 +279,11 @@ protected:
 	DECLARE_WRITE8_MEMBER( pa_ddr_w );
 	DECLARE_READ8_MEMBER( pb_ddr_r ) { return m_pb_ddr; }
 	DECLARE_WRITE8_MEMBER( pb_ddr_w );
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
+	DECLARE_READ8_MEMBER( timer_off_r );
+	DECLARE_READ8_MEMBER( timer_on_r );
+	DECLARE_READ8_MEMBER( irq_r );
+	DECLARE_WRITE8_MEMBER( timer_off_w );
+	DECLARE_WRITE8_MEMBER( timer_on_w );
 	DECLARE_WRITE8_MEMBER( edge_w );
 
 	optional_shared_ptr<UINT8> m_ram;
@@ -352,7 +357,6 @@ protected:
 		attotime period;
 		int state, next_state;
 		UINT8 value;
-		bool irq;
 	};
 
 	live_info cur_live, checkpoint_live;
