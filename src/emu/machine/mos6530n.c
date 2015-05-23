@@ -259,7 +259,14 @@ void mos6530_base_t::device_reset()
 	update_irq();
 	edge_detect();
 
-	live_abort();
+	m_shift = 1024;
+
+	if (cur_live.state != IDLE) {
+		live_abort();
+	}
+
+	live_start();
+	live_run();
 }
 
 
