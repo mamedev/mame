@@ -620,13 +620,13 @@ UINT8 cirrus_gd5428_device::cirrus_gc_reg_read(UINT8 index)
 	switch(index)
 	{
 	case 0x00:
-		if(gc_mode_ext & 0x02)
+		if(gc_mode_ext & 0x04)
 			res = vga.gc.set_reset & 0xff;
 		else
 			res = vga.gc.set_reset & 0x0f;
 		break;
 	case 0x01:
-		if(gc_mode_ext & 0x02)
+		if(gc_mode_ext & 0x04)
 			res = vga.gc.enable_set_reset & 0xff;
 		else
 			res = vga.gc.enable_set_reset & 0x0f;
@@ -738,17 +738,11 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 	if(LOG_REG) logerror("CL: GC write %02x to GR%02x\n",data,index);
 	switch(index)
 	{
-	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits
-		if(gc_mode_ext & 0x04)
-			vga.gc.set_reset = data & 0xff;
-		else
-			vga.gc.set_reset = data & 0x0f;
+	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits, however XFree86 does not appear to do this...
+		vga.gc.set_reset = data & 0xff;
 		break;
 	case 0x01:
-		if(gc_mode_ext & 0x04)
-			vga.gc.enable_set_reset = data & 0xff;
-		else
-			vga.gc.enable_set_reset = data & 0x0f;
+		vga.gc.enable_set_reset = data & 0xff;
 		break;
 	case 0x05:
 		vga.gc.shift256 = (data & 0x40) >> 6;
@@ -770,7 +764,7 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 		break;
 	case 0x0b:  // Graphics controller mode extensions
 		gc_mode_ext = data;
-		if(!(data & 0x02))
+		if(!(data & 0x04))
 		{
 			vga.gc.set_reset &= 0x0f;
 			vga.gc.enable_set_reset &= 0x0f;
