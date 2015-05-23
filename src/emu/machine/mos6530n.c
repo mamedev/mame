@@ -809,7 +809,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 			if (LOG_TIMER) logerror("%s %s '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
 
 			if (!cur_live.value) {
-				live_abort();
+				cur_live.state = IDLE;
 				return;
 			}
 
