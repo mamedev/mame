@@ -9,7 +9,6 @@
 #define NLSETUP_H_
 
 #include "nl_base.h"
-//#include "nl_factory.h"
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -22,8 +21,6 @@
 
 #define ALIAS(_alias, _name)                                                        \
 	setup.register_alias(# _alias, # _name);
-
-//#define NET_NEW(_type)  setup.factory().new_device_by_classname(NETLIB_NAME_STR(_type), setup)
 
 #define NET_REGISTER_DEV(_type, _name)                                              \
 		setup.register_dev(NETLIB_NAME_STR(_type), # _name);

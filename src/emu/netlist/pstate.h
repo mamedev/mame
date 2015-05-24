@@ -8,8 +8,6 @@
 #ifndef PSTATE_H_
 #define PSTATE_H_
 
-//#include "nl_config.h"
-//#include "nl_time.h"
 #include "plists.h"
 #include "pstring.h"
 

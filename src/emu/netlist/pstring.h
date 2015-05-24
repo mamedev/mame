@@ -7,16 +7,18 @@
 #ifndef _PSTRING_H_
 #define _PSTRING_H_
 
-#include "nl_config.h"
-#include <cstdio>
-#include <ctype.h>
+#include <algorithm>
+#include <cstdarg>
+
+#define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
+#define ATTR_UNUSED             __attribute__((__unused__))
 
 // ----------------------------------------------------------------------------------------
 // pblockbool: allocate small memory more efficiently at the expense of some overhead
 // ----------------------------------------------------------------------------------------
 
 struct pblockpool {
-	NETLIST_PREVENT_COPYING(pblockpool)
+
 public:
 	static const int MINDATASIZE = 8;
 
@@ -48,7 +50,7 @@ private:
 	};
 
 	memblock *m_first;
-	int m_blocksize;
+	std::size_t m_blocksize;
 	int m_align;
 };
 
@@ -128,26 +130,16 @@ public:
 	inline int cmp(const pstring &string) const { return pcmp(string.cstr()); }
 	inline int cmpi(const pstring &string) const { return pcmpi(cstr(), string.cstr()); }
 
-	inline int find(const char *search, int start = 0) const
-	{
-		int alen = len();
-		const char *result = strstr(cstr() + MIN(start, alen), search);
-		return (result != NULL) ? (result - cstr()) : -1;
-	}
+	int find(const char *search, int start = 0) const;
 
-	inline int find(const char search, int start = 0) const
-	{
-		int alen = len();
-		const char *result = strchr(cstr() + MIN(start, alen), search);
-		return (result != NULL) ? (result - cstr()) : -1;
-	}
+	int find(const char search, int start = 0) const;
 
 	// various
 
 	inline bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
-	inline bool startsWith(const char *arg) const { return (pcmp(cstr(), arg, strlen(arg)) == 0); }
+	bool startsWith(const char *arg) const;
 
-	pstring replace(const pstring &search, const pstring &replace);
+	pstring replace(const pstring &search, const pstring &replace) const;
 
 	// these return nstring ...
 	inline pstring cat(const pstring &s) const { return *this + s; }
@@ -171,7 +163,7 @@ public:
 
 	// conversions
 
-	nl_double as_double(bool *error = NULL) const;
+	double as_double(bool *error = NULL) const;
 
 	long as_long(bool *error = NULL) const;
 
@@ -214,22 +206,13 @@ private:
 		return pcmp(m_ptr->str(), right);
 	}
 
-	inline int pcmp(const char *left, const char *right, int count = -1) const
-	{
-		if (count < 0)
-			return strcmp(left, right);
-		else
-			return strncmp(left, right, count);
-	}
+	int pcmp(const char *left, const char *right, int count = -1) const;
 
 	int pcmpi(const char *lhs, const char *rhs, int count = -1) const;
 
 	void pcopy(const char *from, int size);
 
-	inline void pcopy(const char *from)
-	{
-		pcopy(from, strlen(from));
-	}
+	void pcopy(const char *from);
 
 	inline void pcopy(const pstring &from)
 	{

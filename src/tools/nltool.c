@@ -148,7 +148,7 @@ public:
 
 	void init()
 	{
-		m_setup = nl_alloc(netlist_setup_t, *this);
+		m_setup = palloc(netlist_setup_t, *this);
 		this->init_object(*this, "netlist");
 		m_setup->init();
 	}
@@ -313,16 +313,20 @@ static void listdevices()
     convert - convert a spice netlist
 -------------------------------------------------*/
 
+static const char *PSTR_RES = "RES";
+static const char *PSTR_CAP = "CAP";
+
 class convert_t
 {
 public:
-	void convert(pstring contents)
+
+	void convert(const pstring &contents)
 	{
 		nl_util::pstring_list spnl = nl_util::split(contents, "\n");
 
 		// Add gnd net
 
-		nets.add(nl_alloc(sp_net_t, "0"), false);
+		nets.add(palloc(sp_net_t, "0"), false);
 		nets[0]->terminals().add("GND");
 
 		pstring line = "";
@@ -364,15 +368,15 @@ protected:
 	struct sp_dev_t
 	{
 	public:
-		sp_dev_t(const pstring atype, const pstring aname, const pstring amodel)
+		sp_dev_t(const pstring &atype, const pstring &aname, const pstring &amodel)
 		: m_type(atype), m_name(aname), m_model(amodel), m_val(0), m_has_val(false)
 		{}
 
-		sp_dev_t(const pstring atype, const pstring aname, double aval)
+		sp_dev_t(const pstring &atype, const pstring &aname, double aval)
 		: m_type(atype), m_name(aname), m_model(""), m_val(aval), m_has_val(true)
 		{}
 
-		sp_dev_t(const pstring atype, const pstring aname)
+		sp_dev_t(const pstring &atype, const pstring &aname)
 		: m_type(atype), m_name(aname), m_model(""), m_val(0.0), m_has_val(false)
 		{}
 
@@ -404,7 +408,7 @@ protected:
 		sp_net_t * net = nets.find(netname);
 		if (net == NULL)
 		{
-			net = nl_alloc(sp_net_t, netname);
+			net = palloc(sp_net_t, netname);
 			nets.add(net, false);
 		}
 		net->terminals().add(termname);
@@ -497,6 +501,7 @@ protected:
 		if (line != "")
 		{
 			nl_util::pstring_list tt = nl_util::split(line, " ", true);
+			double val = 0.0;
 			switch (tt[0].cstr()[0])
 			{
 				case ';':
@@ -529,21 +534,23 @@ protected:
 					// FIXME: we need a is_long method ..
 					ATTR_UNUSED int nval =tt[4].as_long(&cerr);
 					if ((!cerr || tt[4].startsWith("N")) && tt.count() > 5)
-						devs.add(nl_alloc(sp_dev_t, "QBJT", tt[0], tt[5]), false);
+						devs.add(palloc(sp_dev_t, "QBJT", tt[0], tt[5]), false);
 					else
-						devs.add(nl_alloc(sp_dev_t, "QBJT", tt[0], tt[4]), false);
+						devs.add(palloc(sp_dev_t, "QBJT", tt[0], tt[4]), false);
 					add_term(tt[1], tt[0] + ".C");
 					add_term(tt[2], tt[0] + ".B");
 					add_term(tt[3], tt[0] + ".E");
 				}
 					break;
 				case 'R':
-					devs.add(nl_alloc(sp_dev_t, "RES", tt[0], get_sp_val(tt[3])), false);
+					val = get_sp_val(tt[3]);
+					devs.add(palloc(sp_dev_t, "RES", tt[0], val), false);
 					add_term(tt[1], tt[0] + ".1");
 					add_term(tt[2], tt[0] + ".2");
 					break;
 				case 'C':
-					devs.add(nl_alloc(sp_dev_t, "CAP", tt[0], get_sp_val(tt[3])), false);
+					val = get_sp_val(tt[3]);
+					devs.add(palloc(sp_dev_t, "CAP", tt[0], val), false);
 					add_term(tt[1], tt[0] + ".1");
 					add_term(tt[2], tt[0] + ".2");
 					break;
@@ -551,7 +558,8 @@ protected:
 					// just simple Voltage sources ....
 					if (tt[2].equals("0"))
 					{
-						devs.add(nl_alloc(sp_dev_t, "ANALOG_INPUT", tt[0], get_sp_val(tt[3])), false);
+						val = get_sp_val(tt[3]);
+						devs.add(palloc(sp_dev_t, "ANALOG_INPUT", tt[0], val), false);
 						add_term(tt[1], tt[0] + ".Q");
 						//add_term(tt[2], tt[0] + ".2");
 					}
@@ -560,20 +568,23 @@ protected:
 					break;
 				case 'D':
 					// FIXME: Rewrite resistor value
-					devs.add(nl_alloc(sp_dev_t, "DIODE", tt[0], tt[3]), false);
+					devs.add(palloc(sp_dev_t, "DIODE", tt[0], tt[3]), false);
 					add_term(tt[1], tt[0] + ".A");
 					add_term(tt[2], tt[0] + ".K");
 					break;
 				case 'X':
+				{
 					// FIXME: specific code for KICAD exports
 					//        last element is component type
-					devs.add(nl_alloc(sp_dev_t, "TTL_" + tt[tt.count()-1] + "_DIP", tt[0]), false);
+					pstring tname = "TTL_" + tt[tt.count()-1] + "_DIP";
+					devs.add(palloc(sp_dev_t, tname, tt[0]), false);
 					for (int i=1; i < tt.count() - 1; i++)
 					{
 						pstring term = pstring::sprintf("%s.%d", tt[0].cstr(), i);
 						add_term(tt[i], term);
 					}
 					break;
+				}
 				default:
 					printf("// IGNORED %s: %s\n", tt[0].cstr(), line.cstr());
 			}

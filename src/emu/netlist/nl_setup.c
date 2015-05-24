@@ -5,6 +5,9 @@
  *
  */
 
+#include <cstdio>
+
+#include "palloc.h"
 #include "nl_base.h"
 #include "nl_setup.h"
 #include "nl_parser.h"
@@ -36,7 +39,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 	, m_proxy_cnt(0)
 {
 	netlist.set_setup(this);
-	m_factory = nl_alloc(netlist_factory_t);
+	m_factory = palloc(netlist_factory_t);
 }
 
 void netlist_setup_t::init()
@@ -55,7 +58,7 @@ netlist_setup_t::~netlist_setup_t()
 	m_params_temp.clear();
 
 	netlist().set_setup(NULL);
-	nl_free(m_factory);
+	pfree(m_factory);
 
 	pstring::resetmem();
 }
@@ -221,7 +224,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
-							if (sscanf(val.cstr(), "%lf", &vald) != 1)
+							if (std::sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<netlist_param_double_t &>(param).initial(vald);
 						}
@@ -231,7 +234,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
-							if (sscanf(val.cstr(), "%lf", &vald) != 1)
+							if (std::sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<netlist_param_int_t &>(param).initial((int) vald);
 						}
@@ -436,7 +439,7 @@ void netlist_setup_t::connect_input_output(netlist_core_terminal_t &in, netlist_
 	if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
 	{
 		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(in);
-		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, incast);
+		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, incast);
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -475,7 +478,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_c
 	{
 		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(inp);
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, incast);
+		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, incast);
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -544,7 +547,7 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
 	else
 	{
 		NL_VERBOSE_OUT(("adding net ...\n"));
-		netlist_analog_net_t *anet =  nl_alloc(netlist_analog_net_t);
+		netlist_analog_net_t *anet =  palloc(netlist_analog_net_t);
 		t1.set_net(*anet);
 		//m_netlist.solver()->m_nets.add(anet);
 		// FIXME: Nets should have a unique name
@@ -721,7 +724,7 @@ void netlist_setup_t::resolve_inputs()
 		netlist().log("Deleting net %s ...", todelete[i]->name().cstr());
 		netlist().m_nets.remove(todelete[i]);
 		if (!todelete[i]->isRailNet())
-			delete todelete[i];
+			pfree(todelete[i]);
 	}
 
 	pstring errstr("");

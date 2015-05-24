@@ -80,7 +80,7 @@ netlist_factory_t::~netlist_factory_t()
 	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
 	{
 		net_device_t_base_factory *p = *e;
-		global_free(p);
+		pfree(p);
 	}
 	m_list.clear();
 }
@@ -90,7 +90,7 @@ netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &clas
 	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
 	{
 		net_device_t_base_factory *p = *e;
-		if (strcmp(p->classname(), classname) == 0)
+		if (p->classname() == classname)
 		{
 			netlist_device_t *ret = p->Create();
 			return ret;
@@ -111,7 +111,7 @@ net_device_t_base_factory * netlist_factory_t::factory_by_name(const pstring &na
 	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
 	{
 		net_device_t_base_factory *p = *e;
-		if (strcmp(p->name(), name) == 0)
+		if (p->name() == name)
 		{
 			return p;
 		}

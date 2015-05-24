@@ -12,8 +12,6 @@
 #ifndef NLD_MS_SOR_H_
 #define NLD_MS_SOR_H_
 
-#include <cmath>
-
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 

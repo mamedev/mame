@@ -45,7 +45,6 @@ public:
 
 	netlist_timed_queue()
 	{
-		//m_list = global_alloc_array(entry_t, SIZE);
 		clear();
 	}
 
@@ -64,7 +63,7 @@ public:
 		}
 		*i = e;
 		inc_stat(m_prof_sort);
-		nl_assert(m_end - m_list < _Size);
+		//nl_assert(m_end - m_list < _Size);
 	}
 
 	ATTR_HOT inline const entry_t *pop()

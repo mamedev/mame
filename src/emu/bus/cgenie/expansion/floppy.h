@@ -29,12 +29,17 @@ public:
 	// construction/destruction
 	cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	TIMER_CALLBACK_MEMBER( irq_off_callback );
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
+
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	DECLARE_READ8_MEMBER(irq_r);
 	DECLARE_WRITE8_MEMBER(select_w);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
 
 protected:
 	virtual const rom_entry *device_rom_region() const;
@@ -43,6 +48,8 @@ protected:
 	virtual void device_reset();
 
 private:
+	void update_irq();
+
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -50,7 +57,16 @@ private:
 	required_device<floppy_connector> m_floppy3;
 	required_device<generic_slot_device> m_socket;
 
+	enum
+	{
+		IRQ_WDC = 0x40,
+		IRQ_TIMER = 0x80
+	};
+
 	floppy_image_device *m_floppy;
+
+	emu_timer *m_timer_irq_off;
+	UINT8 m_irq_status;
 };
 
 // device type definition

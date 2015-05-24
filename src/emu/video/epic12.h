@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Luca Elia, MetalliC
 /* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
 
 #define MCFG_EPIC12_ADD(_tag) \
