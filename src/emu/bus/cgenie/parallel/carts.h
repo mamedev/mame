@@ -2,19 +2,20 @@
 // copyright-holders:Dirk Best
 /***************************************************************************
 
-    EACA Colour Genie Expansion Carts
+    EACA Colour Genie Parallel Carts
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __CGENIE_CARTS_H__
-#define __CGENIE_CARTS_H__
+#ifndef __CGENIE_PARALLEL_CARTS_H__
+#define __CGENIE_PARALLEL_CARTS_H__
 
 #include "emu.h"
 
-#include "floppy.h"
+#include "joystick.h"
+#include "printer.h"
 
-SLOT_INTERFACE_EXTERN( expansion_slot_carts );
+SLOT_INTERFACE_EXTERN( parallel_slot_carts );
 
-#endif // __CGENIE_CARTS_H__
+#endif // __CGENIE_PARALLEL_CARTS_H__

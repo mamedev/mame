@@ -5,9 +5,11 @@
     EACA Colour Genie Floppy Disc Controller
 
     TODO:
+    - Only native MESS .mfi files load
     - What's the exact FD1793 model?
     - How does it turn off the motor?
     - How does it switch between FM/MFM?
+    - What's the source of the timer and the exact timings?
 
 ***************************************************************************/
 
@@ -65,7 +67,9 @@ const rom_entry *cgenie_fdc_device::device_rom_region() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cgenie_fdc )
-	MCFG_FD1793x_ADD("fd1793", XTAL_16MHz / 4 / 4)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", cgenie_fdc_device, timer_callback, attotime::from_msec(25))
+
+	MCFG_FD1793x_ADD("fd1793", XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cgenie_fdc_device, intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
@@ -97,7 +101,7 @@ machine_config_constructor cgenie_fdc_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CGENIE_FDC, "Colour Genie Floppy Disc Controller", tag, owner, clock, "cgenie_fdc", __FILE__),
+	device_t(mconfig, CGENIE_FDC, "Floppy Disc Controller", tag, owner, clock, "cgenie_fdc", __FILE__),
 	device_expansion_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),
 	m_floppy0(*this, "fd1793:0"),
@@ -105,7 +109,9 @@ cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *
 	m_floppy2(*this, "fd1793:2"),
 	m_floppy3(*this, "fd1793:3"),
 	m_socket(*this, "socket"),
-	m_floppy(NULL)
+	m_floppy(NULL),
+	m_timer_irq_off(NULL),
+	m_irq_status(0)
 {
 }
 
@@ -115,6 +121,7 @@ cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *
 
 void cgenie_fdc_device::device_start()
 {
+	m_timer_irq_off = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cgenie_fdc_device::irq_off_callback), this));
 }
 
 //-------------------------------------------------
@@ -127,8 +134,9 @@ void cgenie_fdc_device::device_reset()
 	m_slot->m_program->install_rom(0xc000, 0xdfff, memregion("software")->base());
 
 	// memory mapped i/o
+	m_slot->m_program->install_read_handler(0xffe0, 0xffe3, 0, 0x10, read8_delegate(FUNC(cgenie_fdc_device::irq_r), this));
 	m_slot->m_program->install_write_handler(0xffe0, 0xffe3, 0, 0x10, write8_delegate(FUNC(cgenie_fdc_device::select_w), this));
-	m_slot->m_program->install_read_handler( 0xffec, 0xffef, 0, 0x10,  read8_delegate(FUNC(fd1793_t::read),  m_fdc.target()));
+	m_slot->m_program->install_read_handler(0xffec, 0xffef, 0, 0x10, read8_delegate(FUNC(fd1793_t::read), m_fdc.target()));
 	m_slot->m_program->install_write_handler(0xffec, 0xffef, 0, 0x10, write8_delegate(FUNC(fd1793_t::write), m_fdc.target()));
 
 	// map extra socket
@@ -142,6 +150,31 @@ void cgenie_fdc_device::device_reset()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+READ8_MEMBER( cgenie_fdc_device::irq_r )
+{
+	return m_irq_status;
+}
+
+void cgenie_fdc_device::update_irq()
+{
+	m_slot->int_w(m_irq_status ? 1 : 0);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( cgenie_fdc_device::timer_callback )
+{
+	m_irq_status |= IRQ_TIMER;
+	update_irq();
+
+	// timer to turn it off again
+	m_timer_irq_off->adjust(attotime::from_usec(250));
+}
+
+TIMER_CALLBACK_MEMBER( cgenie_fdc_device::irq_off_callback )
+{
+	m_irq_status &= ~IRQ_TIMER;
+	update_irq();
+}
 
 DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device, socket_load )
 {
@@ -164,8 +197,12 @@ WRITE_LINE_MEMBER( cgenie_fdc_device::intrq_w )
 	if (VERBOSE)
 		logerror("cgenie_fdc_device::intrq_w: %d\n", state);
 
-	// forward to host
-	m_slot->int_w(state);
+	if (state)
+		m_irq_status |= IRQ_WDC;
+	else
+		m_irq_status &= ~IRQ_WDC;
+
+	update_irq();
 }
 
 WRITE8_MEMBER( cgenie_fdc_device::select_w )
