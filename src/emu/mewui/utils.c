@@ -146,10 +146,6 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
     strcatprintf(buffer, "Support Save: %s\n", ((driver->flags & GAME_SUPPORTS_SAVE) ? "Yes" : "No"));
 
     int idx = driver_list::find(driver->name);
-    int empty = driver_list::find("___empty");
-    if (machine.options().ui_grouped())
-        if (idx > empty) idx--;
-
     strcatprintf(buffer, "Screen Type: %s\n", (mewui_globals::driver_cache[idx].b_vector ? "Vector" : "Raster"));
     strcatprintf(buffer, "Screen Orentation: %s\n", ((driver->flags & ORIENTATION_SWAP_XY) ? "Vertical" : "Horizontal"));
     strcatprintf(buffer, "Requires Samples: %s\n", (mewui_globals::driver_cache[idx].b_samples ? "Yes" : "No"));
@@ -298,18 +294,15 @@ void save_cache_info(running_machine &machine)
         // generate the updated INI
         std::string buffer = std::string("#\n# MEWUI INFO ").append(mewui_version).append("\n#\n\n");
 
-        driver_enumerator drv(machine.options());
-        int curitem = 0;
+		for (int x = 0; x < driver_list::total(); ++x)
+		{
+			const game_driver *driver = &driver_list::driver(x);
 
-        while (drv.next())
-        {
-            // no action if not a game
-            const game_driver &driver = drv.driver();
-            if (driver.flags & GAME_NO_STANDALONE)
-                continue;
+			if (!strcmp("___empty", driver->name))
+				continue;
 
             cache_info infos;
-            machine_config config(driver, machine.options());
+            machine_config config(*driver, machine.options());
 
             samples_device_iterator iter(config.root_device());
             infos.b_samples = (iter.first() != NULL) ? 1 : 0;
@@ -322,17 +315,17 @@ void save_cache_info(running_machine &machine)
             infos.b_stereo = (snditer.first() != NULL && siter.count() > 1) ? 1 : 0;
 
             infos.b_chd = 0;
-            for (const rom_entry *rom = driver.rom; !ROMENTRY_ISEND(rom); rom++)
+            for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
                 if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
                 {
                     infos.b_chd = 1;
                     break;
                 }
 
-            mewui_globals::driver_cache[curitem].b_vector = infos.b_vector;
-            mewui_globals::driver_cache[curitem].b_samples = infos.b_samples;
-            mewui_globals::driver_cache[curitem].b_stereo = infos.b_stereo;
-            mewui_globals::driver_cache[curitem++].b_chd = infos.b_chd;
+            mewui_globals::driver_cache[x].b_vector = infos.b_vector;
+            mewui_globals::driver_cache[x].b_samples = infos.b_samples;
+            mewui_globals::driver_cache[x].b_stereo = infos.b_stereo;
+            mewui_globals::driver_cache[x].b_chd = infos.b_chd;
 
             strcatprintf(buffer, "%d%d%d%d\n", infos.b_vector, infos.b_samples, infos.b_stereo, infos.b_chd);
         }
@@ -381,18 +374,17 @@ void load_cache_info(running_machine &machine)
     efile.gets(buffer, MAX_CHAR_INFO);
     efile.gets(buffer, MAX_CHAR_INFO);
 
-    driver_enumerator drv(machine.options());
-    int index = 0;
+	for (int x = 0; x < driver_list::total(); ++x)
+	{
+		if (!strcmp("___empty", driver_list::driver(x).name))
+			continue;
 
-    while (drv.next())
-    {
         efile.gets(buffer, MAX_CHAR_INFO);
-        mewui_globals::driver_cache[index].b_vector = buffer[0] - '0';
-        mewui_globals::driver_cache[index].b_samples = buffer[1] - '0';
-        mewui_globals::driver_cache[index].b_stereo = buffer[2] - '0';
-        mewui_globals::driver_cache[index++].b_chd = buffer[3] - '0';
+        mewui_globals::driver_cache[x].b_vector = buffer[0] - '0';
+        mewui_globals::driver_cache[x].b_samples = buffer[1] - '0';
+        mewui_globals::driver_cache[x].b_stereo = buffer[2] - '0';
+        mewui_globals::driver_cache[x].b_chd = buffer[3] - '0';
     }
-
     efile.close();
 }
 

@@ -136,11 +136,11 @@ void ui_menu_main::populate()
 		item_append("Cheat", NULL, 0, (void *)CHEAT);
 
 	/* add history menu */
-	if (machine().options().historyfile() && machine().datfile().history_file())
+	if (machine().options().enabled_dats())
 		item_append("History Info", NULL, 0, (void *)HISTORY);
 
 	// add software history menu
-	if ((machine().system().flags & GAME_TYPE_ARCADE) == 0 && machine().options().historyfile() && machine().datfile().history_file())
+	if ((machine().system().flags & GAME_TYPE_ARCADE) == 0 && machine().options().enabled_dats())
 	{
 		image_interface_iterator iter(machine().root_device());
 		for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
@@ -155,24 +155,24 @@ void ui_menu_main::populate()
 	}
 
 	/* add mameinfo / messinfo menu */
-	if (machine().options().mamefile())
+	if (machine().options().enabled_dats())
 	{
-		if ((machine().system().flags & GAME_TYPE_ARCADE) != 0 && machine().datfile().mame_file())
+		if ((machine().system().flags & GAME_TYPE_ARCADE) != 0)
 			item_append("MameInfo", NULL, 0, (void *)MAMEINFO);
-		else if ((machine().system().flags & GAME_TYPE_ARCADE) == 0 && machine().datfile().mess_file())
+		else if ((machine().system().flags & GAME_TYPE_ARCADE) == 0)
 			item_append("MessInfo", NULL, 0, (void *)MAMEINFO);
 	}
 
 	/* add sysinfo menu */
-	if ((machine().system().flags & GAME_TYPE_ARCADE) == 0 && machine().options().mamefile() && machine().datfile().sysinfo_file())
+	if ((machine().system().flags & GAME_TYPE_ARCADE) == 0 && machine().options().enabled_dats())
 		item_append("SysInfo", NULL, 0, (void *)SYSINFO);
 
 	/* add command list menu */
-	if ((machine().system().flags & GAME_TYPE_ARCADE) != 0 && machine().options().cmndfile() && machine().datfile().command_file())
+	if ((machine().system().flags & GAME_TYPE_ARCADE) != 0 && machine().options().enabled_dats())
 		item_append("Commands Info", NULL, 0, (void *)COMMAND);
 
 	/* add story menu */
-	if ((machine().system().flags & GAME_TYPE_ARCADE) != 0 && machine().options().mamefile() && machine().datfile().story_file())
+	if ((machine().system().flags & GAME_TYPE_ARCADE) != 0 && machine().options().enabled_dats())
 		item_append("Mamescores", NULL, 0, (void *)STORYINFO);
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);

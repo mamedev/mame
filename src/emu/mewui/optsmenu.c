@@ -144,7 +144,7 @@ void ui_menu_game_options::handle()
                 else if (menu_event->iptkey == IPT_UI_SELECT)
                 {
                     int total = inifile_manager::ini_index[inifile_manager::current_file].category.size();
-                    std::vector<std::string> s_sel(total + 1);
+                    std::vector<std::string> s_sel(total);
                     for (int index = 0; index < total; ++index)
                         s_sel[index].assign(inifile_manager::ini_index[inifile_manager::current_file].category[index].name);
 

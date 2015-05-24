@@ -39,7 +39,7 @@ const options_entry mewui_options::s_option_entries[] =
 
 	// misc options
 	{ NULL,                                 NULL,        OPTION_HEADER,     "MEWUI MISC OPTIONS" },
-
+	{ OPTION_DATS_ENABLED,                  "1",         OPTION_BOOLEAN,    "enable DATs support" },
 	{ OPTION_REMEMBER_LAST,                 "1",         OPTION_BOOLEAN,    "reselect in main menu last played game" },
 	{ OPTION_ENLARGE_SNAPS,                 "1",         OPTION_BOOLEAN,    "enlarge arts (snapshot, title, etc...) in right panel (keeping aspect ratio)" },
 	{ OPTION_FORCED4X3,                     "1",         OPTION_BOOLEAN,    "force the appearance of the snapshot in the list software to 4:3" },

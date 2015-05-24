@@ -130,7 +130,7 @@ void ui_menu_select_software::handle()
         }
 
         // handle UI_HISTORY
-        else if (menu_event->iptkey == IPT_UI_HISTORY && machine().options().historyfile() && machine().datfile().history_file())
+        else if (menu_event->iptkey == IPT_UI_HISTORY && machine().options().enabled_dats())
         {
             ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 
@@ -161,9 +161,9 @@ void ui_menu_select_software::handle()
             mewui_globals::rpanel_infos = RP_INFOS;
 
         // escape pressed with non-empty text clears the text
-        else if (menu_event->iptkey == IPT_UI_CANCEL && search[0] != 0)
+        else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
         {
-            search[0] = '\0';
+            m_search[0] = '\0';
             reset(UI_MENU_RESET_SELECT_FIRST);
         }
 
@@ -230,7 +230,7 @@ void ui_menu_select_software::handle()
     // handle filters selection from key shortcuts
     if (check_filter)
     {
-        search[0] = '\0';
+        m_search[0] = '\0';
 
         if (l_sw_hover == MEWUI_SW_REGION)
             ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_region.ui,
@@ -272,7 +272,7 @@ void ui_menu_select_software::populate()
     }
 
     // no active search
-    if (search[0] == 0)
+    if (m_search[0] == 0)
     {
         // if the device can be loaded empty, add an item
         if (has_empty_start)
@@ -297,7 +297,7 @@ void ui_menu_select_software::populate()
 
     else
     {
-        find_matches(search, VISIBLE_GAMES_IN_SEARCH);
+        find_matches(m_search, VISIBLE_GAMES_IN_SEARCH);
 
         for (int curitem = 0; searchlist[curitem]; curitem++)
             item_append(searchlist[curitem]->longname.c_str(), searchlist[curitem]->devicetype.c_str(),
@@ -472,7 +472,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
     bool isstar = false;
 
     // determine the text for the header
-    int vis_item = (search[0] != 0) ? visible_items : (has_empty_start ? visible_items - 1 : visible_items);
+    int vis_item = (m_search[0] != 0) ? visible_items : (has_empty_start ? visible_items - 1 : visible_items);
     strprintf(tempbuf[0], "MEWUI %s (%d / %d software)", mewui_version, vis_item, (int)ui_swlist.size() - 1);
     tempbuf[1].assign("Driver: \"").append(ui_driver->description).append("\" software list ");
 
@@ -483,7 +483,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
     else if (mewui_globals::actual_sw_filter == MEWUI_SW_YEARS)
         filtered.assign("Year: ").append(m_year.ui[m_year.actual]).append(" - ");
 
-    tempbuf[2].assign(filtered).append("Search: ").append(search).append("_");
+    tempbuf[2].assign(filtered).append("Search: ").append(m_search).append("_");
 
     // get the size of the text
     maxwidth = origx2 - origx1;
@@ -727,20 +727,20 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 
 void ui_menu_select_software::inkey_special(const ui_menu_event *menu_event)
 {
-    int buflen = strlen(search);
+    int buflen = strlen(m_search);
 
     // if it's a backspace and we can handle it, do so
     if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
     {
-        *(char *)utf8_previous_char(&search[buflen]) = 0;
+        *(char *)utf8_previous_char(&m_search[buflen]) = 0;
         reset(UI_MENU_RESET_SELECT_FIRST);
     }
 
     // if it's any other key and we're not maxed out, update
     else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
     {
-        buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
-        search[buflen] = 0;
+        buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
+        m_search[buflen] = 0;
         reset(UI_MENU_RESET_SELECT_FIRST);
     }
 }

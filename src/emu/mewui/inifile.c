@@ -20,11 +20,11 @@
 static bool first_f_load = true;
 
 std::vector<IniFileIndex> inifile_manager::ini_index;
-UINT16 inifile_manager::current_file = -1;
-UINT16 inifile_manager::current_category = -1;
+UINT16 inifile_manager::current_file = 0;
+UINT16 inifile_manager::current_category = 0;
 
 std::vector<ui_software_info> favorite_manager::favorite_list;
-int favorite_manager::current_favorite = -1;
+int favorite_manager::current_favorite = 0;
 
 static const char *favorite_filename = "favorites.ini";
 
@@ -97,38 +97,19 @@ void inifile_manager::init_category(std::vector<IniCategoryIndex> &index, std::s
 				return;
 
 			std::string name = readbuf.substr(1, found - 1);
-            if (name.compare("FOLDER_SETTINGS") == 0)
+            if (name.compare("FOLDER_SETTINGS") == 0 || name.compare("ROOT_FOLDER") == 0)
                 continue;
             else
             {
-                long offset = myfile.tellg();
-                if (name.compare("ROOT_FOLDER") == 0)
-                {
-                    long offset = myfile.tellg();
-                    std::getline(myfile, readbuf);
-
-                    if (isspace(readbuf[0]))
-						continue;
-
-                    int len = filename.length() - 4;
-                    name = filename.substr(0, filename.length() - 4);
-                    IniCategoryIndex tmp;
-                    tmp.name.assign(name);
-                    tmp.offset = offset;
-					index.push_back(tmp);
-                    myfile.seekg(offset, myfile.beg);
-                }
-                else
-                {
-                    IniCategoryIndex tmp;
-                    tmp.name.assign(name);
-                    tmp.offset = offset;
-					index.push_back(tmp);
-				}
-            }
-        }
-    }
+				IniCategoryIndex tmp;
+				tmp.name.assign(name);
+				tmp.offset = myfile.tellg();
+				index.push_back(tmp);
+			}
+		}
+	}
 }
+
 
 //-------------------------------------------------
 //  closes the existing opened file (if any)

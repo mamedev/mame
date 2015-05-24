@@ -52,11 +52,11 @@ public:
     virtual void handle();
     virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
-    virtual bool have_search() { return (search[0] != 0); }
+    virtual bool menu_has_search_active() { return (m_search[0] != 0); }
 
 private:
     enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-    char                search[40];
+    char                m_search[40];
     const game_driver   *ui_driver;
     bool                has_empty_start;
     c_sw_region         m_region;

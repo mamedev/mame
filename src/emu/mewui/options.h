@@ -33,9 +33,7 @@
 #define OPTION_ICONS_DIRECTORY      "icons_directory"
 
 // core misc options
-#define OPTION_HISTORY              "history"
-#define OPTION_MAMEINFO             "mameinfo"
-#define OPTION_COMMAND_DAT          "command_dat"
+#define OPTION_DATS_ENABLED         "dats_enabled"
 #define OPTION_REMEMBER_LAST        "remember_last"
 #define OPTION_ENLARGE_SNAPS        "enlarge_snaps"
 #define OPTION_FORCED4X3            "forced4x3"
@@ -90,9 +88,7 @@ public:
     const char *icons_directory() const { return value(OPTION_ICONS_DIRECTORY); }
 
     // Misc options
-    bool historyfile() const { return bool_value(OPTION_HISTORY); }
-    bool mamefile() const { return bool_value(OPTION_MAMEINFO); }
-    bool cmndfile() const { return bool_value(OPTION_COMMAND_DAT); }
+    bool enabled_dats() const { return bool_value(OPTION_DATS_ENABLED); }
     bool remember_last() const { return bool_value(OPTION_REMEMBER_LAST); }
     bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }
     bool forced_4x3_snapshot() const { return bool_value(OPTION_FORCED4X3); }

@@ -23,9 +23,7 @@ private:
     {
         REMEMBER_LAST_GAME = 1,
         ENLARGE_ARTS,
-        HISTORY_ENABLED,
-        MAMEINFO_ENABLED,
-        COMMAND_ENABLED,
+        DATS_ENABLED,
         CHEAT_ENABLED,
         MOUSE_ENABLED,
         CONFIRM_QUIT_ENABLED,

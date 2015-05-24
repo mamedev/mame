@@ -770,7 +770,7 @@ void ui_menu_rgb_ui::populate()
     // set filter arrow
     UINT32 arrow_flags = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
     std::string text;
-    std::string s_text(m_search);
+    std::string s_text = std::string(m_search).append("_");
 
     if (lock_ref != RGB_ALPHA)
     {

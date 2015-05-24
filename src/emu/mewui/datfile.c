@@ -20,7 +20,7 @@
 std::vector<tDatafileIndex> datfile_manager::hist_idx;
 std::vector<tDatafileIndex> datfile_manager::mame_idx;
 std::vector<tDatafileIndex> datfile_manager::mess_idx;
-std::vector<tDatafileIndex> datfile_manager::cmnd_idx;
+std::vector<tDatafileIndex> datfile_manager::cmd_idx;
 std::vector<tDatafileIndex> datfile_manager::sysi_idx;
 std::vector<tDatafileIndex> datfile_manager::story_idx;
 
@@ -30,13 +30,6 @@ std::vector<sDataDrvIndex> datfile_manager::drvmess_idx;
 std::vector<tMenuIndex> datfile_manager::menu_idx;
 
 std::vector<SoftwareListIndex> datfile_manager::sListIndex;
-
-bool datfile_manager::m_history_file = false;
-bool datfile_manager::m_mame_file = false;
-bool datfile_manager::m_mess_file = false;
-bool datfile_manager::m_command_file = false;
-bool datfile_manager::m_sysinfo_file = false;
-bool datfile_manager::m_story_file = false;
 
 std::string datfile_manager::history_revision;
 std::string datfile_manager::mame_revision;
@@ -64,47 +57,26 @@ static const char *DATAFILE_TAG = "$";
 //-------------------------------------------------
 datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
 {
-    m_mame_file = ParseOpen("mameinfo.dat");
-    if (m_mame_file)
-    {
-        if (machine.options().mamefile())
-            init_mameinfo();
-    }
+	if (machine.options().enabled_dats())
+	{
+		if (ParseOpen("mameinfo.dat"))
+			init_mameinfo();
 
-    m_command_file = ParseOpen("command.dat");
-    if (m_command_file)
-    {
-        if (machine.options().cmndfile())
-            init_command();
-    }
+		if (ParseOpen("command.dat"))
+			init_command();
 
-    m_story_file = ParseOpen("story.dat");
-    if (m_story_file)
-    {
-        if (machine.options().mamefile())
-            init_storyinfo();
-    }
+		if (ParseOpen("story.dat"))
+			init_storyinfo();
 
-    m_mess_file = ParseOpen("messinfo.dat");
-    if (m_mess_file)
-    {
-        if (machine.options().mamefile())
-            init_messinfo();
-    }
+		if (ParseOpen("messinfo.dat"))
+			init_messinfo();
 
-    m_sysinfo_file = ParseOpen("sysinfo.dat");
-    if (m_sysinfo_file)
-    {
-        if (machine.options().mamefile())
-            init_sysinfo();
-    }
+		if (ParseOpen("sysinfo.dat"))
+			init_sysinfo();
 
-    m_history_file = ParseOpen("history.dat");
-    if (m_history_file)
-    {
-        if (machine.options().historyfile())
-            init_history();
-    }
+		if (ParseOpen("history.dat"))
+			init_history();
+	}
 }
 
 //-------------------------------------------------
@@ -126,7 +98,6 @@ void datfile_manager::init_sysinfo()
 
 void datfile_manager::init_storyinfo()
 {
-    // check if already indexed
 	story_idx.clear();
     int swcount = 0;
     int count = index_datafile(story_idx, swcount);
@@ -139,7 +110,6 @@ void datfile_manager::init_storyinfo()
 
 void datfile_manager::init_history()
 {
-    // check if already indexed
     hist_idx.clear();
 	int swcount = 0;
 	int count = index_datafile(hist_idx, swcount);
@@ -154,7 +124,6 @@ void datfile_manager::init_history()
 
 void datfile_manager::init_mameinfo()
 {
-    // check if already indexed
     mame_idx.clear();
     drv_idx.clear();
 	int drvcount = 0;
@@ -170,7 +139,6 @@ void datfile_manager::init_mameinfo()
 
 void datfile_manager::init_messinfo()
 {
-    // check if already indexed
     mess_idx.clear();
     drvmess_idx.clear();
 	int drvcount = 0;
@@ -186,10 +154,9 @@ void datfile_manager::init_messinfo()
 
 void datfile_manager::init_command()
 {
-    // check if already indexed
-    cmnd_idx.clear();
+    cmd_idx.clear();
 	int swcount = 0;
-	int count = index_datafile(cmnd_idx, swcount);
+	int count = index_datafile(cmd_idx, swcount);
 	osd_printf_verbose("Command.dat games found = %i\n", count);
 }
 
@@ -248,7 +215,7 @@ void datfile_manager::load_data_info(const game_driver *drv, std::string &buffer
 {
     std::vector<tDatafileIndex> index_idx;
     std::vector<sDataDrvIndex> driver_idx;
-    const char *tag;
+    const char *tag = NULL;
     std::string filename;
 
     switch (hm_type)
@@ -491,7 +458,7 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 
             else if (story_revision.empty() && readbuf.compare(0, t_story, TAG_STORY_R) == 0)
             {
-                size_t found = readbuf.find(".", t_story + 1);
+                size_t found = readbuf.find_first_of(carriage, t_story + 1);
                 story_revision.assign(readbuf.substr(t_story + 1, found - t_story));
             }
 
@@ -675,28 +642,26 @@ bool datfile_manager::ParseOpen(const char *filename)
 //  create the menu index
 //-------------------------------------------------
 
-int datfile_manager::index_menuidx(const game_driver *drv, std::vector<tDatafileIndex> &d_idx, std::vector<tMenuIndex> &index)
+void datfile_manager::index_menuidx(const game_driver *drv, std::vector<tDatafileIndex> &d_idx, std::vector<tMenuIndex> &index)
 {
     const game_driver *gdrv;
-    int m_count = 0;
     std::string readbuf;
 	size_t x = 0;
-    gdrv = drv;
 
 	// find driver in datafile index
-	for (x = 0; x < d_idx.size() && d_idx[x].driver != gdrv; ++x) ;
+	for (x = 0; x < d_idx.size() && d_idx[x].driver != drv; ++x) ;
 
     if (x == d_idx.size())
     {
-		int cl = driver_list::clone(*gdrv);
+		int cl = driver_list::clone(*drv);
 		if (cl == -1)
-			return m_count;
+			return;
 
-        gdrv = &driver_list::driver(cl);
+        const game_driver *gdrv = &driver_list::driver(cl);
         for (x = 0; x < d_idx.size() && d_idx[x].driver != gdrv; ++x) ;
 
         if (x == d_idx.size())
-			return m_count;
+			return;
 	}
 
 	// seek to correct point in datafile
@@ -715,19 +680,16 @@ int datfile_manager::index_menuidx(const game_driver *drv, std::vector<tDatafile
             m_idx.menuitem = readbuf;
             m_idx.offset = myfile.tellg();
             index.push_back(m_idx);
-            m_count++;
         }
     }
-
     myfile.close();
-    return m_count;
 }
 
 //-------------------------------------------------
 //  load command text into the buffer
 //-------------------------------------------------
 
-int datfile_manager::load_command_text(std::string &buffer, std::vector<tMenuIndex> &m_idx, const int menu_sel)
+void datfile_manager::load_command_text(std::string &buffer, std::vector<tMenuIndex> &m_idx, const int menu_sel)
 {
     std::string readbuf;
 
@@ -747,29 +709,7 @@ int datfile_manager::load_command_text(std::string &buffer, std::vector<tMenuInd
         // add this string to the buffer
         buffer.append(readbuf).append("\n");;
     }
-
     myfile.close();
-
-    return 0;
-}
-
-//-------------------------------------------------
-//  initializes the index
-//-------------------------------------------------
-
-bool datfile_manager::find_command(const game_driver *drv)
-{
-    // try to open command datafile
-    if (ParseOpen("command.dat"))
-    {
-        // create menu_index
-        int status = index_menuidx(drv, cmnd_idx, menu_idx);
-        if (!status)
-            return false;
-
-        return true;
-    }
-    return false;
 }
 
 //-------------------------------------------------
@@ -789,17 +729,12 @@ void datfile_manager::load_command_info(std::string &buffer, const int menu_sel)
 
 void datfile_manager::command_sub_menu(const game_driver *drv, std::vector<std::string> &menu_item)
 {
-     // try to open command datafile
-    if (ParseOpen("command.dat"))
-    {
-        // create menu_index
-        int status = index_menuidx(drv, cmnd_idx, menu_idx);
-
-		if (!menu_idx.empty())
-		{
-			for (size_t x = 0; x < menu_idx.size(); ++x)
-				menu_item.push_back(menu_idx[x].menuitem);
-		}
+	if (ParseOpen("command.dat"))
+	{
+		menu_idx.clear();
+		index_menuidx(drv, cmd_idx, menu_idx);
+		for (size_t x = 0; x < menu_idx.size(); ++x)
+			menu_item.push_back(menu_idx[x].menuitem);
 	}
 }
 
@@ -816,6 +751,5 @@ int datfile_manager::find_or_allocate(std::string name)
         tmp.listname.assign(name);
         sListIndex.push_back(tmp);
     }
-
     return x;
 }

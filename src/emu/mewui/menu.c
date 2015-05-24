@@ -129,15 +129,8 @@ void ui_menu::draw_select_game()
     float line_height = machine().ui().get_line_height();
     float ud_arrow_width = line_height * machine().render().ui_aspect();
     float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-    float x1, y1, x2, y2;
-
-    float effective_width, effective_left;
-    float visible_top, visible_left;
     mouse_x = -1, mouse_y = -1;
-    float visible_extra_menu_height;
-    float extra_height;
     float right_panel_size = 0.3f;
-
     float visible_width = 1.0f - 4.0f * UI_BOX_LR_BORDER;
     float primary_left = (1.0f - visible_width) * 0.5f;
     float primary_width = visible_width;
@@ -150,8 +143,8 @@ void ui_menu::draw_select_game()
 
     hover = item.size() + 1;
     visible_items = (is_swlist) ? item.size() - 2 : item.size() - 4;
-    extra_height = (is_swlist) ? 2.0f * line_height : 4.0f * line_height;
-    visible_extra_menu_height = customtop + custombottom + extra_height;
+    float extra_height = (is_swlist) ? 2.0f * line_height : 4.0f * line_height;
+    float visible_extra_menu_height = customtop + custombottom + extra_height;
 
     // locate mouse
     mouse_hit = FALSE;
@@ -172,17 +165,17 @@ void ui_menu::draw_select_game()
         mewui_globals::visible_sw_lines = visible_lines;
 
     // compute top/left of inner menu area by centering
-    visible_left = primary_left;
-    visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+    float visible_left = primary_left;
+    float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
 
     // if the menu is at the bottom of the extra, adjust
     visible_top += customtop;
 
     // compute left box size
-    x1 = visible_left - UI_BOX_LR_BORDER;
-    y1 = visible_top - UI_BOX_TB_BORDER;
-    x2 = visible_left + 2 * UI_BOX_LR_BORDER;
-    y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER + extra_height;
+    float x1 = visible_left - UI_BOX_LR_BORDER;
+    float y1 = visible_top - UI_BOX_TB_BORDER;
+    float x2 = visible_left + 2 * UI_BOX_LR_BORDER;
+    float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER + extra_height;
 
     // add left box
     visible_left = draw_left_box(x1, y1, x2, y2, is_swlist);
@@ -204,8 +197,8 @@ void ui_menu::draw_select_game()
         top_line = visible_items - visible_lines;
 
     // determine effective positions taking into account the hilighting arrows
-    effective_width = visible_width - 2.0f * gutter_width;
-    effective_left = visible_left + gutter_width;
+    float effective_width = visible_width - 2.0f * gutter_width;
+    float effective_left = visible_left + gutter_width;
 
     int n_loop = (visible_items >= visible_lines) ? visible_lines : visible_items;
 
@@ -405,17 +398,14 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
     if (software)
     {
         soft = ((FPTR)selectedref > 2) ? (ui_software_info *)selectedref : NULL;
-
         if (soft && soft->startempty == 1)
         {
             driver = soft->driver;
             oldsoft = NULL;
         }
-
         else
             olddriver = NULL;
     }
-
     else
     {
         driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : NULL;
@@ -425,7 +415,6 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
     if (driver)
     {
         float line_height = machine().ui().get_line_height();
-
         if (mewui_globals::default_image)
             ((driver->flags & GAME_TYPE_ARCADE) == 0) ? mewui_globals::curimage_view = CABINETS_VIEW : mewui_globals::curimage_view = SNAPSHOT_VIEW;
 
@@ -509,7 +498,6 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
                     render_load_jpeg(*tmp_bitmap, snapfile, NULL, fullname.c_str());
                 }
             }
-
             else if (mewui_globals::curimage_view == TITLES_VIEW)
             {
                 // First attempt from name list
@@ -523,7 +511,6 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
                     render_load_jpeg(*tmp_bitmap, snapfile, pathname.c_str(), fullname.c_str());
                 }
             }
-
             else
             {
                 // First attempt from name list

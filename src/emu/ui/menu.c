@@ -246,7 +246,10 @@ void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, v
 	// append to array
 	int index = item.size();
 	if (!item.empty())
+	{
 		item.insert(item.end() - 1, pitem);
+		--index;
+	}
 	else
 		item.push_back(pitem);
 

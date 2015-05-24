@@ -22,9 +22,7 @@ ui_menu_misc_options::ui_menu_misc_options(running_machine &machine, render_cont
 {
     m_options[REMEMBER_LAST_GAME] = machine.options().remember_last();
     m_options[ENLARGE_ARTS] = machine.options().enlarge_snaps();
-    m_options[HISTORY_ENABLED] = machine.options().historyfile();
-    m_options[MAMEINFO_ENABLED] = machine.options().mamefile();
-    m_options[COMMAND_ENABLED] = machine.options().cmndfile();
+	m_options[DATS_ENABLED] = machine.options().enabled_dats();
     m_options[CHEAT_ENABLED] = machine.options().cheat();
     m_options[MOUSE_ENABLED] = machine.options().ui_mouse();
     m_options[CONFIRM_QUIT_ENABLED] = machine.options().confirm_quit();
@@ -38,9 +36,7 @@ ui_menu_misc_options::~ui_menu_misc_options()
     std::string error_string;
     machine().options().set_value(OPTION_REMEMBER_LAST, m_options[REMEMBER_LAST_GAME], OPTION_PRIORITY_CMDLINE, error_string);
     machine().options().set_value(OPTION_ENLARGE_SNAPS, m_options[ENLARGE_ARTS], OPTION_PRIORITY_CMDLINE, error_string);
-    machine().options().set_value(OPTION_HISTORY, m_options[HISTORY_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
-    machine().options().set_value(OPTION_MAMEINFO, m_options[MAMEINFO_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
-    machine().options().set_value(OPTION_COMMAND_DAT, m_options[COMMAND_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
+    machine().options().set_value(OPTION_DATS_ENABLED, m_options[DATS_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
     machine().options().set_value(OPTION_CHEAT, m_options[CHEAT_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
     machine().options().set_value(OPTION_UI_MOUSE, m_options[MOUSE_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
     machine().options().set_value(OPTION_CONFIRM_QUIT, m_options[CONFIRM_QUIT_ENABLED], OPTION_PRIORITY_CMDLINE, error_string);
@@ -89,14 +85,8 @@ void ui_menu_misc_options::populate()
     item_append("Enlarge images in the right panel", m_options[ENLARGE_ARTS] ? "On" : "Off",
                 m_options[ENLARGE_ARTS] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)ENLARGE_ARTS);
 
-    item_append("History Info", m_options[HISTORY_ENABLED] ? "On" : "Off",
-                m_options[HISTORY_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HISTORY_ENABLED);
-
-    item_append("MameInfo / MessInfo", m_options[MAMEINFO_ENABLED] ? "On" : "Off",
-                m_options[MAMEINFO_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)MAMEINFO_ENABLED);
-
-    item_append("Command Info", m_options[COMMAND_ENABLED] ? "On" : "Off",
-                m_options[COMMAND_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)COMMAND_ENABLED);
+    item_append("Loading DATs info", m_options[DATS_ENABLED] ? "On" : "Off",
+                m_options[DATS_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)DATS_ENABLED);
 
     item_append("Cheats", m_options[CHEAT_ENABLED] ? "On" : "Off",
                 m_options[CHEAT_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)CHEAT_ENABLED);
