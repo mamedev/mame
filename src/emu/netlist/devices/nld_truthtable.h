@@ -206,7 +206,7 @@ public:
 
 	}
 
-	ATTR_HOT ATTR_ALIGN void update()
+	ATTR_HOT void update()
 	{
 		process<true>();
 	}

@@ -18,6 +18,17 @@
 #include <cstddef>
 #include <new>
 
+#if defined(__GNUC__) && (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))
+#if !defined(__ppc__) && !defined (__PPC__) && !defined(__ppc64__) && !defined(__PPC64__)
+#define ATTR_ALIGN __attribute__ ((aligned(64)))
+#else
+#define ATTR_ALIGN
+#endif
+#else
+#define ATTR_ALIGN
+#endif
+
+
 void *palloc_raw(const size_t size);
 void pfree_raw(void *p);
 
@@ -83,6 +94,9 @@ inline void pfree_array_t(T *p)
 #define pfree_array(_ptr)     pfree_array_t(_ptr)
 
 #else
+
+#define ATTR_ALIGN
+
 #include "corealloc.h"
 #define palloc(T, ...)        global_alloc(T(__VA_ARGS__))
 #define pfree(_ptr)           global_free(_ptr)

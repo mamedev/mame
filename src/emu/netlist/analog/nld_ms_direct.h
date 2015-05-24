@@ -36,9 +36,9 @@ protected:
 	ATTR_HOT void build_LE_A();
 	ATTR_HOT void build_LE_RHS();
 	ATTR_HOT void LE_solve();
-	ATTR_HOT void LE_back_subst(nl_double (* RESTRICT x));
-	ATTR_HOT nl_double delta(const nl_double (* RESTRICT V));
-	ATTR_HOT void store(const nl_double (* RESTRICT V), const bool store_RHS);
+	ATTR_HOT void LE_back_subst(nl_double * RESTRICT x);
+	ATTR_HOT nl_double delta(const nl_double * RESTRICT V);
+	ATTR_HOT void store(const nl_double * RESTRICT V, const bool store_RHS);
 
 	/* bring the whole system to the current time
 	 * Don't schedule a new calculation time. The recalculation has to be
@@ -46,10 +46,10 @@ protected:
 	 */
 	ATTR_HOT nl_double compute_next_timestep();
 
-	nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
-	nl_double m_RHS[_storage_N];
-	nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
-	nl_double m_last_V[_storage_N];
+	ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	ATTR_ALIGN nl_double m_RHS[_storage_N];
+	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
+	ATTR_ALIGN nl_double m_last_V[_storage_N];
 
 	terms_t **m_terms;
 	terms_t *m_rails_temp;
@@ -316,7 +316,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 
 template <int m_N, int _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
-		nl_double (* RESTRICT x))
+		nl_double * RESTRICT x)
 {
 	const int kN = N();
 
@@ -345,7 +345,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 
 template <int m_N, int _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
-		const nl_double (* RESTRICT V))
+		const nl_double * RESTRICT V)
 {
 	nl_double cerr = 0;
 	nl_double cerr2 = 0;
@@ -362,7 +362,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 
 template <int m_N, int _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
-		const nl_double (* RESTRICT V), const bool store_RHS)
+		const nl_double * RESTRICT V, const bool store_RHS)
 {
 	for (int i = 0; i < this->N(); i++)
 	{

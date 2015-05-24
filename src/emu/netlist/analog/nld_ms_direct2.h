@@ -13,7 +13,7 @@
 
 
 
-class ATTR_ALIGNED(64) netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
+class netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
 {
 public:
 

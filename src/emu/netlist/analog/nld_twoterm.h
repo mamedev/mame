@@ -124,7 +124,7 @@ public:
 protected:
 	ATTR_COLD virtual void start();
 	ATTR_COLD virtual void reset();
-	ATTR_HOT ATTR_ALIGN void update();
+	ATTR_HOT void update();
 
 private:
 };
@@ -146,7 +146,7 @@ public:
 protected:
 	ATTR_COLD virtual void start();
 	ATTR_COLD virtual void reset();
-	ATTR_HOT ATTR_ALIGN void update();
+	ATTR_HOT void update();
 };
 
 NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, R_base,
@@ -196,7 +196,7 @@ protected:
 	ATTR_COLD virtual void start();
 	ATTR_COLD virtual void reset();
 	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
+	ATTR_HOT void update();
 
 	netlist_param_double_t m_C;
 
@@ -284,7 +284,7 @@ public:
 protected:
 	ATTR_COLD virtual void start();
 	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
+	ATTR_HOT void update();
 
 	netlist_param_model_t m_model;
 

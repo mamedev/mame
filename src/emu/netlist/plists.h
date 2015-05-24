@@ -262,7 +262,7 @@ private:
 	}
 
 	int m_count;
-	_ListClass * m_list /* ATTR_ALIGN */;
+	_ListClass * m_list;
 	int m_capacity;
 };
 

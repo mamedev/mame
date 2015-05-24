@@ -151,7 +151,7 @@ protected:
 	{
 	}
 
-	ATTR_HOT ATTR_ALIGN void update()
+	ATTR_HOT void update()
 	{
 		OUTANALOG(m_Q, 0.0);
 	}
@@ -184,7 +184,7 @@ protected:
 	{
 	}
 
-	ATTR_HOT ATTR_ALIGN void update()
+	ATTR_HOT void update()
 	{
 	}
 
@@ -217,7 +217,7 @@ protected:
 	{
 	}
 
-	ATTR_HOT ATTR_ALIGN void update()
+	ATTR_HOT void update()
 	{
 		OUTANALOG(m_Q, INPANALOG(m_I));
 	}
@@ -249,8 +249,8 @@ protected:
 
 	ATTR_COLD void start();
 	ATTR_COLD void reset();
-	ATTR_HOT ATTR_ALIGN void update();
-	ATTR_HOT ATTR_ALIGN void update_param();
+	ATTR_HOT void update();
+	ATTR_HOT void update_param();
 
 private:
 	UINT8 m_last_state;
@@ -317,7 +317,7 @@ protected:
 	{
 	}
 
-	ATTR_HOT ATTR_ALIGN void update()
+	ATTR_HOT void update()
 	{
 		if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
 			OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
@@ -376,7 +376,7 @@ protected:
 
 	ATTR_COLD virtual void reset();
 
-	ATTR_HOT ATTR_ALIGN void update();
+	ATTR_HOT void update();
 
 private:
 	netlist_analog_output_t m_Q;

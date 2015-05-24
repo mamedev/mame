@@ -11,7 +11,7 @@
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
-class ATTR_ALIGNED(64) netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
+class netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
 {
 public:
 
