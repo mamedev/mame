@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Yochizo, Takahiro Nogi
 #include "sound/msm5205.h"
 #include "video/seta001.h"
