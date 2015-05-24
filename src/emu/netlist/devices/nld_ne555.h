@@ -47,8 +47,7 @@ NETLIB_DEVICE(NE555,
 #define NE555_DIP(_name)                                                         \
 		NET_REGISTER_DEV(NE555_dip, _name)
 
-NETLIB_DEVICE_DERIVED(NE555_dip, NE555,
-);
+NETLIB_DEVICE_DERIVED_PURE(NE555_dip, NE555);
 
 
 #endif /* NLD_NE555_H_ */

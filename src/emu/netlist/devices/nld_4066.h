@@ -54,7 +54,6 @@ NETLIB_DEVICE(4066_dip,
 	NETLIB_NAME(vdd_vss) m_supply;
 );
 
-NETLIB_DEVICE_DERIVED(4016_dip, 4066_dip,
-);
+NETLIB_DEVICE_DERIVED_PURE(4016_dip, 4066_dip);
 
 #endif /* NLD_4066_H_ */

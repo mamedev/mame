@@ -10,8 +10,7 @@
 #include <algorithm>
 #include <cstdarg>
 
-#define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
-#define ATTR_UNUSED             __attribute__((__unused__))
+#include "pconfig.h"
 
 // ----------------------------------------------------------------------------------------
 // pblockbool: allocate small memory more efficiently at the expense of some overhead
@@ -155,9 +154,16 @@ public:
 
 	pstring ltrim(const pstring ws = " \t\n\r") const;
 	pstring rtrim(const pstring ws = " \t\n\r") const;
-
-
 	inline pstring trim(const pstring ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
+
+	pstring rpad(const pstring ws, const int cnt) const
+	{
+		// FIXME: slow!
+		pstring ret = *this;
+		while (ret.len() < cnt)
+			ret += ws;
+		return ret.substr(0, cnt);
+	}
 
 	pstring ucase() const;
 

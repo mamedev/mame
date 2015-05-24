@@ -59,7 +59,6 @@ NETLIB_DEVICE(4020,
 	netlist_logic_input_t m_RESET;
 );
 
-NETLIB_DEVICE_DERIVED(4020_dip, 4020,
-);
+NETLIB_DEVICE_DERIVED_PURE(4020_dip, 4020);
 
 #endif /* NLD_4020_H_ */

@@ -283,7 +283,7 @@ bool netlist_parser::parse(const char *buf, const pstring nlname)
 	}
 }
 
-void netlist_parser::parse_netlist(const pstring &nlname)
+void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
 {
 	while (true)
 	{

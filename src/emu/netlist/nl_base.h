@@ -217,11 +217,14 @@ typedef void (*net_update_delegate)(netlist_core_device_t *);
 		_priv                                                                   \
 	}
 
+#define NETLIB_DEVICE_DERIVED_PURE(_name, _pclass)                            \
+		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), NETLIB_NAME(_pclass), protected:, private:)
+
 #define NETLIB_DEVICE_DERIVED(_name, _pclass, _priv)                            \
-		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), NETLIB_NAME(_pclass), , _priv)
+		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), NETLIB_NAME(_pclass), protected:, _priv)
 
 #define NETLIB_DEVICE(_name, _priv)                                             \
-		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), netlist_device_t, , _priv)
+		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), netlist_device_t, protected:, _priv)
 
 #define NETLIB_SUBDEVICE(_name, _priv)                                          \
 	class NETLIB_NAME(_name) : public netlist_device_t                          \
@@ -361,7 +364,7 @@ public:
 		NET      = 4,
 		DEVICE   = 5,
 		NETLIST   = 6,
-		QUEUE   = 7,
+		QUEUE   = 7
 	};
 	enum family_t {
 		// Terminal families
@@ -380,7 +383,7 @@ public:
 		VCVS,       // Voltage controlled voltage source
 		VCCS,       // Voltage controlled current source
 		CCCS,       // Current controlled current source
-		GND,        // GND device
+		GND         // GND device
 	};
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily);
@@ -1055,7 +1058,7 @@ public:
 
 	ATTR_HOT virtual void dec_active() {  }
 
-	ATTR_HOT virtual void step_time(const nl_double st) { }
+	ATTR_HOT virtual void step_time(ATTR_UNUSED const nl_double st) { }
 	ATTR_HOT virtual void update_terminals() { }
 
 
@@ -1246,7 +1249,7 @@ protected:
 	{
 		NL_ERROR,
 		NL_WARNING,
-		NL_LOG,
+		NL_LOG
 	};
 
 	// any derived netlist must override this ...

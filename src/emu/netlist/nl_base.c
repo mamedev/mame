@@ -589,7 +589,7 @@ ATTR_COLD netlist_net_t::netlist_net_t(const family_t afamily)
 	, m_in_queue(2)
 	, m_cur_Analog(0.0)
 {
-};
+}
 
 ATTR_COLD netlist_net_t::~netlist_net_t()
 {
@@ -774,7 +774,7 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 ATTR_COLD netlist_logic_net_t::netlist_logic_net_t()
 	: netlist_net_t(LOGIC)
 {
-};
+}
 
 
 ATTR_COLD void netlist_logic_net_t::reset()
@@ -797,7 +797,7 @@ ATTR_COLD netlist_analog_net_t::netlist_analog_net_t()
 	, m_h_n_m_1(1e-6)
 	, m_solver(NULL)
 {
-};
+}
 
 ATTR_COLD void netlist_analog_net_t::reset()
 {

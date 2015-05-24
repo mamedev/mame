@@ -386,7 +386,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 
 
 template <int m_N, int _storage_N>
-ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(const bool newton_raphson)
+ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	nl_double new_v[_storage_N]; // = { 0.0 };
 
