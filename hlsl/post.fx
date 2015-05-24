@@ -218,16 +218,19 @@ float GetRoundCornerFactor(float2 coord, float amount)
 	float2 SourceTexelDims = 1.0f / SourceDims;
 	
 	// base on the default ratio of 4:3
+	float2 RoundCoordScale = (SourceDims / SourceArea / SourceRatio) * ScreenRatio;
 
 	float2 RoundCoord = coord;
 	// hint: alignment correction
 	RoundCoord -= SourceTexelDims * SourceArea;
 	RoundCoord *= SourceTexelDims * SourceArea + 1.0f;
 	// hint: roundness correction
+	RoundCoord *= RoundCoordScale;
 
 	float radius = amount * 50.0f;
 
 	// compute box (base on the default ratio of 4:3)
+	float box = RoundBox(RoundCoord.xy, (RoundCoordScale * 0.5f), radius);
 
 	// // apply blur
 	// float blurAmount = 1.0f / max(1.0f, amount * 25.0f);
