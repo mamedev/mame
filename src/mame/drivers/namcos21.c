@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 /**
 2008/06/11, by Naibo(translated to English by Mameplus team):

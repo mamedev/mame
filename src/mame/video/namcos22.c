@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, hap, R. Belmont
 /**
  * video hardware for Namco System22
