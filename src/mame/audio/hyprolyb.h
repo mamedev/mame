@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Chris Hardy
 #include "sound/msm5205.h"
 
