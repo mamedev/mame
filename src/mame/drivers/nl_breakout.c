@@ -1,12 +1,12 @@
 // license:GPL-2.0+
-// copyright-holders:DICE Team,couriersud
+// copyright-holders:DICE Team,Couriersud
 /*
  * Changelog:
  *
- *      - Added led and lamp components (couriersud)
- *      - Start2 works (couriersud)
- *      - Added discrete paddle potentiometers (couriersud)
- *      - Changes made to run in MAME (couriersud)
+ *      - Added led and lamp components (Couriersud)
+ *      - Start2 works (Couriersud)
+ *      - Added discrete paddle potentiometers (Couriersud)
+ *      - Changes made to run in MAME (Couriersud)
  *      - Original version imported from DICE
  *
  * TODO:

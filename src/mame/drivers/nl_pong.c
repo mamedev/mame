@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:DICE Team,couriersud
+// copyright-holders: Couriersud
 
 /***************************************************************************
 
