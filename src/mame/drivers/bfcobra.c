@@ -147,7 +147,7 @@ union ADDR_REG
 /*
     Blitter state
 */
-struct blitter_t
+struct bf_blitter_t
 {
 	ADDR_REG    program;
 
@@ -273,7 +273,7 @@ public:
 	UINT8 m_col8bit[256];
 	UINT8 m_col7bit[256];
 	UINT8 m_col6bit[256];
-	struct blitter_t m_blitter;
+	struct bf_blitter_t m_blitter;
 	struct ramdac_t m_ramdac;
 	struct fdc_t m_fdc;
 	DECLARE_READ8_MEMBER(ramdac_r);
@@ -480,7 +480,7 @@ void bfcobra_state::RunBlit(address_space &space)
 {
 #define BLITPRG_READ(x)     blitter.x = *(blitter_get_addr(blitter.program.addr++))
 
-	struct blitter_t &blitter = m_blitter;
+	struct bf_blitter_t &blitter = m_blitter;
 	int cycles_used = 0;
 
 

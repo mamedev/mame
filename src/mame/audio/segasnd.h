@@ -52,9 +52,9 @@ MACHINE_CONFIG_EXTERN( sega_speech_board );
 
 
 
-struct filter_state
+struct g80_filter_state
 {
-		filter_state():
+		g80_filter_state():
 		capval(0),
 		exponent(0) {}
 
@@ -104,9 +104,9 @@ struct timer8253
 
 	timer8253_channel   chan[3];            /* three channels' worth of information */
 	double              env[3];             /* envelope value for each channel */
-	filter_state        chan_filter[2];     /* filter states for the first two channels */
-	filter_state        gate1;              /* first RC filter state */
-	filter_state        gate2;              /* second RC filter state */
+	g80_filter_state        chan_filter[2];     /* filter states for the first two channels */
+	g80_filter_state        gate1;              /* first RC filter state */
+	g80_filter_state        gate2;              /* second RC filter state */
 	UINT8               config;             /* configuration for this timer */
 };
 
@@ -163,8 +163,8 @@ private:
 	UINT8               m_noise_subcount;
 	double              m_gate_rc1_exp[2];
 	double              m_gate_rc2_exp[2];
-	filter_state        m_final_filter;
-	filter_state        m_noise_filters[5];
+	g80_filter_state        m_final_filter;
+	g80_filter_state        m_noise_filters[5];
 
 	TIMER_CALLBACK_MEMBER( delayed_usb_data_w );
 	void timer_w(int which, UINT8 offset, UINT8 data);

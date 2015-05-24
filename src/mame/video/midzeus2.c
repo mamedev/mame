@@ -37,7 +37,7 @@
  *
  *************************************/
 
-struct poly_extra_data
+struct mz2_poly_extra_data
 {
 	const void *    palbase;
 	const void *    texbase;
@@ -258,7 +258,7 @@ VIDEO_START_MEMBER(midzeus2_state,midzeus2)
 	waveram[1] = auto_alloc_array(machine(), UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
 
 	/* initialize polygon engine */
-	poly = poly_alloc(machine(), 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine(), 10000, sizeof(mz2_poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus2_state::exit_handler2), this));
@@ -1027,7 +1027,7 @@ void midzeus2_state::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 void midzeus2_state::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit)
 {
 	poly_draw_scanline_func callback;
-	poly_extra_data *extra;
+	mz2_poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
 //  float uscale, vscale;
@@ -1198,7 +1198,7 @@ In memory:
 			clipvert[i].y += 0.0005f;
 	}
 
-	extra = (poly_extra_data *)poly_get_extra_data(poly);
+	extra = (mz2_poly_extra_data *)poly_get_extra_data(poly);
 	switch (texmode)
 	{
 		case 0x01d:     /* crusnexo: RHS of score bar */
@@ -1257,7 +1257,7 @@ In memory:
 
 static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const mz2_poly_extra_data *extra = (const mz2_poly_extra_data *)extradata;
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;

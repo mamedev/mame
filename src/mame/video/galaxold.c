@@ -1324,7 +1324,7 @@ void galaxold_state::dambustr_draw_upper_background(bitmap_ind16 &bitmap, const 
 
 void galaxold_state::galaxold_init_stars(int colors_offset)
 {
-	struct star *stars = m_stars;
+	struct star_gold *stars = m_stars;
 	int i;
 	int total_stars;
 	UINT32 generator;
@@ -1412,7 +1412,7 @@ void galaxold_state::noop_draw_stars(bitmap_ind16 &bitmap, const rectangle &clip
 
 void galaxold_state::galaxold_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	struct star *stars = m_stars;
+	struct star_gold *stars = m_stars;
 	int offs;
 
 
@@ -1440,7 +1440,7 @@ void galaxold_state::galaxold_draw_stars(bitmap_ind16 &bitmap, const rectangle &
 
 void galaxold_state::scrambold_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	struct star *stars = m_stars;
+	struct star_gold *stars = m_stars;
 	int offs;
 
 
@@ -1485,7 +1485,7 @@ void galaxold_state::scrambold_draw_stars(bitmap_ind16 &bitmap, const rectangle 
 
 void galaxold_state::rescue_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	struct star *stars = m_stars;
+	struct star_gold *stars = m_stars;
 	int offs;
 
 
@@ -1532,7 +1532,7 @@ void galaxold_state::rescue_draw_stars(bitmap_ind16 &bitmap, const rectangle &cl
 
 void galaxold_state::mariner_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	struct star *stars = m_stars;
+	struct star_gold *stars = m_stars;
 	int offs;
 	UINT8 *prom;
 

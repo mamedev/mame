@@ -17,7 +17,7 @@ struct oprandinfo {
 	operandtype decode[4];
 };
 
-struct opcodeinfo {
+struct tms7000_opcodeinfo {
 	int opcode;
 	char name[8];
 	int operand;
@@ -84,7 +84,7 @@ static const oprandinfo of[] = {
 /* 45 */ { {" *R%u",    "",         "",         ""},        {UI8, DONE, DONE, DONE} }
 };
 
-static const opcodeinfo opcodes[] = {
+static const tms7000_opcodeinfo opcodes[] = {
 	{0x69, "ADC", 0, 0 },
 	{0x19, "ADC", 1, 0 },
 	{0x39, "ADC", 2, 0 },
@@ -375,7 +375,7 @@ CPU_DISASSEMBLE( tms7000 )
 
 	opcode = oprom[pos++];
 
-	for( i=0; i<sizeof(opcodes) / sizeof(opcodeinfo); i++ )
+	for( i=0; i<sizeof(opcodes) / sizeof(tms7000_opcodeinfo); i++ )
 	{
 		if( opcode == opcodes[i].opcode )
 		{
