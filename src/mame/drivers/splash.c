@@ -7,7 +7,7 @@ Return of Ladyfrog (c) 1993 Microhard   (hack/bootleg of splash)
 Funny Strip (c)199? Microhard / MagicGames
 Rebus (c)1995 Microhard
 
-Driver by Manuel Abadia <manu@teleline.es>
+Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 Return of Lady Frog addition by David Haywood
 

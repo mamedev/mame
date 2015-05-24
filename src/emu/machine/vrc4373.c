@@ -32,6 +32,7 @@ vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, d
 	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32)
+
 {
 }
 
@@ -43,7 +44,7 @@ const address_space_config *vrc4373_device::memory_space_config(address_spacenum
 void vrc4373_device::device_start()
 {
 	pci_host_device::device_start();
-	m_cpu = machine().device<cpu_device>(cpu_tag);
+	m_cpu = machine().device<mips3_device>(cpu_tag);
 	m_cpu_space = &m_cpu->space(AS_PROGRAM);
 	memory_space = &space(AS_DATA);
 	io_space = &space(AS_IO);
@@ -61,39 +62,49 @@ void vrc4373_device::device_start()
 	m_ram_base = 0;
 	m_simm_size = 1<<21;
 	m_simm_base = 0;
-	regenerate_config_mapping();
 
+	// ROM size = 1 MB
+	m_cpu_space->install_rom   (0x1fc00000, 0x1fcfffff, m_region->base());
+	m_cpu_space->install_device(0x0f000000, 0x0f0000ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::cpu_map);
+	// PCI Configuration also mapped at 0x0f000100
+	m_cpu_space->install_device(0x0f000100, 0x0f0001ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::config_map);
+
+	// MIPS drc
+	m_cpu->add_fastram(0x1fc00000, 0x1fcfffff, TRUE, m_region->base());
 }
 
 void vrc4373_device::device_reset()
 {
 	pci_device::device_reset();
 	memset(m_cpu_regs, 0, sizeof(m_cpu_regs));
-	remap_cb();
+	regenerate_config_mapping();
 }
 
-void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void vrc4373_device::map_cpu_space()
 {
-	m_cpu_space->unmap_readwrite(0x00000000, 0xffffffff);
-
-	m_cpu_space->install_rom   (0x1fc00000, 0x1fcfffff, m_region->base());
-	m_cpu_space->install_device(0x0f000000, 0x0f0000ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::cpu_map);
-	// PCI Configuration also mapped at 0x0f000100
-	m_cpu_space->install_device(0x0f000100, 0x0f0001ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::config_map);
-
 	UINT32 winStart, winEnd, winSize;
 
+	// VRC4373 is at 0x0f000000 to 0x0f0001ff
+	// ROM region starts at 0x1f000000
+	m_cpu_space->unmap_readwrite(0x00000000, 0x0effffff);
+	m_cpu_space->unmap_readwrite(0x0f000200, 0x1effffff);
+
+	// Clear fastram regions in cpu after rom
+	m_cpu->clear_fastram(1);
+
 	if (m_cpu_regs[NREG_BMCR]&0x8) {
-		m_cpu_space->install_ram      (m_ram_base, m_ram_base+m_ram_size-1, &m_ram[0]);
+		m_cpu_space->install_ram(m_ram_base, m_ram_base+m_ram_size-1, &m_ram[0]);
+		m_cpu->add_fastram(m_ram_base, m_ram_size-1, FALSE, &m_ram[0]);
 		if (LOG_NILE)
-			logerror("%s: map_extra ram_size=%08X ram_base=%08X\n", tag(),m_ram_size,m_ram_base);
+			logerror("%s: map_cpu_space ram_size=%08X ram_base=%08X\n", tag(),m_ram_size,m_ram_base);
 	}
 	if (m_cpu_regs[NREG_SIMM1]&0x8) {
-		m_cpu_space->install_ram      (m_simm_base, m_simm_base+m_simm_size-1, &m_simm[0]);
+		m_cpu_space->install_ram(m_simm_base, m_simm_base+m_simm_size-1, &m_simm[0]);
+		//m_cpu->add_fastram(m_simm_base, m_simm_size-1, FALSE, &m_simm[0]);
 		if (LOG_NILE)
-			logerror("%s: map_extra simm_size=%08X simm_base=%08X\n", tag(),m_simm_size,m_simm_base);
+			logerror("%s: map_cpu_space simm_size=%08X simm_base=%08X\n", tag(),m_simm_size,m_simm_base);
 	}
+
 	// PCI Master Window 1
 	if (m_cpu_regs[NREG_PCIMW1]&0x1000) {
 		winStart = m_cpu_regs[NREG_PCIMW1]&0xff000000;
@@ -102,7 +113,7 @@ void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 		m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(vrc4373_device::master1_r), this));
 		m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(vrc4373_device::master1_w), this));
 		if (LOG_NILE)
-			logerror("%s: map_extra Master Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci1_laddr);
+			logerror("%s: map_cpu_space Master Window 1 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci1_laddr);
 	}
 	// PCI Master Window 2
 	if (m_cpu_regs[NREG_PCIMW2]&0x1000) {
@@ -112,7 +123,7 @@ void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 		m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(vrc4373_device::master2_r), this));
 		m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(vrc4373_device::master2_w), this));
 		if (LOG_NILE)
-			logerror("%s: map_extra Master Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci2_laddr);
+			logerror("%s: map_cpu_space Master Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci2_laddr);
 	}
 	// PCI IO Window
 	if (m_cpu_regs[NREG_PCIMIOW]&0x1000) {
@@ -122,8 +133,15 @@ void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 		m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(vrc4373_device::master_io_r), this));
 		m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(vrc4373_device::master_io_w), this));
 		if (LOG_NILE)
-			logerror("%s: map_extra IO Window start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci_io_laddr);
+			logerror("%s: map_cpu_space IO Window start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci_io_laddr);
 	}
+}
+
+void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+{
+	UINT32 winStart, winEnd, winSize;
+
 	// PCI Target Window 1
 	if (m_cpu_regs[NREG_PCITW1]&0x1000) {
 		winStart = m_cpu_regs[NREG_PCITW1]&0xffe00000;
@@ -306,21 +324,23 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 	switch (offset) {
 		case NREG_PCIMW1:
 				m_pci1_laddr = (data&0xff)<<24;
-				remap_cb();
+				map_cpu_space();
 			break;
 		case NREG_PCIMW2:
 				m_pci2_laddr = (data&0xff)<<24;
-				remap_cb();
+				map_cpu_space();
 			break;
 		case NREG_PCIMIOW:
 				m_pci_io_laddr = (data&0xff)<<24;
-				remap_cb();
+				map_cpu_space();
 			break;
 		case NREG_PCITW1:
-				m_target1_laddr = (data&0x7FF)<<21;
+				m_target1_laddr = 0x00000000 | ((data&0x7FF)<<21);
+				remap_cb();
 			break;
 		case NREG_PCITW2:
-				m_target2_laddr = (data&0x7FF)<<21;
+				m_target2_laddr = 0x00000000 | ((data&0x7FF)<<21);
+				remap_cb();
 			break;
 		case NREG_PCICAR:
 			// Bits in reserved area are used for device selection of type 0 config transactions
@@ -374,7 +394,7 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 				m_ram.resize(m_ram_size/4);
 				m_ram_base = (data & 0x0fc00000);
 			}
-			remap_cb();
+			map_cpu_space();
 			break;
 		case NREG_SIMM1:
 			if ((data>>3)&0x1) {
@@ -386,7 +406,7 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 				m_simm.resize(m_simm_size/4);
 				m_simm_base = (data & 0x0fe00000);
 			}
-			remap_cb();
+			map_cpu_space();
 			break;
 		default:
 			break;

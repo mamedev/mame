@@ -262,9 +262,11 @@ protected:
 	virtual void update_pb();
 	virtual void update_irq();
 	virtual UINT8 get_irq_flags();
-	void edge_detect(int old, int state);
+	void edge_detect();
 	void pa_w(int bit, int state);
 	void pb_w(int bit, int state);
+	void timer_w(offs_t offset, UINT8 data, bool ie);
+	UINT8 timer_r(bool ie);
 
 	DECLARE_READ8_MEMBER( rom_r ) { return m_region->base()[offset]; }
 	DECLARE_READ8_MEMBER( ram_r ) { return m_ram[offset]; }
@@ -277,8 +279,11 @@ protected:
 	DECLARE_WRITE8_MEMBER( pa_ddr_w );
 	DECLARE_READ8_MEMBER( pb_ddr_r ) { return m_pb_ddr; }
 	DECLARE_WRITE8_MEMBER( pb_ddr_w );
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
+	DECLARE_READ8_MEMBER( timer_off_r );
+	DECLARE_READ8_MEMBER( timer_on_r );
+	DECLARE_READ8_MEMBER( irq_r );
+	DECLARE_WRITE8_MEMBER( timer_off_w );
+	DECLARE_WRITE8_MEMBER( timer_on_w );
 	DECLARE_WRITE8_MEMBER( edge_w );
 
 	optional_shared_ptr<UINT8> m_ram;
@@ -324,6 +329,8 @@ protected:
 	UINT8 m_pa_in;
 	UINT8 m_pa_out;
 	UINT8 m_pa_ddr;
+	int m_pa7;
+	int m_pa7_dir;
 
 	UINT8 m_pb_in;
 	UINT8 m_pb_out;
@@ -331,10 +338,8 @@ protected:
 
 	bool m_ie_timer;
 	bool m_irq_timer;
-
 	bool m_ie_edge;
 	bool m_irq_edge;
-	bool m_positive;
 
 	int m_shift;
 	UINT8 m_timer;
@@ -352,7 +357,6 @@ protected:
 		attotime period;
 		int state, next_state;
 		UINT8 value;
-		bool irq;
 	};
 
 	live_info cur_live, checkpoint_live;
@@ -396,10 +400,6 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
-
-	DECLARE_WRITE8_MEMBER( pa_data_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pa7_w );
 
 protected:
 	// device-level overrides

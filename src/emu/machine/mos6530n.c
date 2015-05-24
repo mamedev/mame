@@ -29,35 +29,47 @@ const device_type MOS6532n = &device_creator<mos6532_t>;
 
 
 DEVICE_ADDRESS_MAP_START( rom_map, 8, mos6530_t )
+	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x000, 0x3ff) AM_READ(rom_r)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( ram_map, 8, mos6530_t )
+	ADDRESS_MAP_GLOBAL_MASK(0x3f)
 	AM_RANGE(0x00, 0x3f) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( io_map, 8, mos6530_t )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(pa_data_r, pa_data_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(pa_ddr_r, pa_ddr_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(pb_data_r, pb_data_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(pb_ddr_r, pb_ddr_w)
-	AM_RANGE(0x04, 0x0f) AM_READ(timer_r)
-	AM_RANGE(0x04, 0x0f) AM_WRITE(timer_w)
+	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x8) AM_READWRITE(pa_data_r, pa_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x8) AM_READWRITE(pa_ddr_r, pa_ddr_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x8) AM_READWRITE(pb_data_r, pb_data_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x8) AM_READWRITE(pb_ddr_r, pb_ddr_w)
+	AM_RANGE(0x04, 0x07) AM_WRITE(timer_off_w)
+	AM_RANGE(0x0c, 0x0f) AM_WRITE(timer_on_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x2) AM_READ(timer_off_r)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x2) AM_READ(timer_on_r)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0xa) AM_READ(irq_r)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( ram_map, 8, mos6532_t )
+	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( io_map, 8, mos6532_t )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(pa_data_r, pa_data_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(pa_ddr_r, pa_ddr_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(pb_data_r, pb_data_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(pb_ddr_r, pb_ddr_w)
-	AM_RANGE(0x04, 0x0f) AM_READ(timer_r)
-	AM_RANGE(0x04, 0x07) AM_WRITE(edge_w)
-	AM_RANGE(0x14, 0x1f) AM_WRITE(timer_w)
+	ADDRESS_MAP_GLOBAL_MASK(0x1f)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(pa_data_r, pa_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(pa_ddr_r, pa_ddr_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_READWRITE(pb_data_r, pb_data_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_READWRITE(pb_ddr_r, pb_ddr_w)
+	AM_RANGE(0x14, 0x17) AM_WRITE(timer_off_w)
+	AM_RANGE(0x1c, 0x1f) AM_WRITE(timer_on_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x12) AM_READ(timer_off_r)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x12) AM_READ(timer_on_r)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x1a) AM_READ(irq_r)
+	AM_RANGE(0x04, 0x07) AM_MIRROR(0x8) AM_WRITE(edge_w)
 ADDRESS_MAP_END
+
 
 
 //**************************************************************************
@@ -111,14 +123,15 @@ mos6530_base_t::mos6530_base_t(const machine_config &mconfig, device_type type, 
 	m_pa_in(0xff),
 	m_pa_out(0),
 	m_pa_ddr(0),
+	m_pa7(0),
+	m_pa7_dir(0),
 	m_pb_in(0xff),
 	m_pb_out(0),
 	m_pb_ddr(0),
 	m_ie_timer(false),
 	m_irq_timer(true),
 	m_ie_edge(false),
-	m_irq_edge(false),
-	m_positive(false)
+	m_irq_edge(false)
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
@@ -194,6 +207,8 @@ void mos6530_base_t::device_start()
 	save_item(NAME(m_pa_in));
 	save_item(NAME(m_pa_out));
 	save_item(NAME(m_pa_ddr));
+	save_item(NAME(m_pa7));
+	save_item(NAME(m_pa7_dir));
 	save_item(NAME(m_pb_in));
 	save_item(NAME(m_pb_out));
 	save_item(NAME(m_pb_ddr));
@@ -201,7 +216,6 @@ void mos6530_base_t::device_start()
 	save_item(NAME(m_irq_timer));
 	save_item(NAME(m_ie_edge));
 	save_item(NAME(m_irq_edge));
-	save_item(NAME(m_positive));
 	save_item(NAME(m_shift));
 	save_item(NAME(m_timer));
 }
@@ -235,15 +249,24 @@ void mos6530_base_t::device_reset()
 	m_pb_ddr = 0;
 
 	m_ie_timer = false;
-	m_irq_timer = true;
+	m_irq_timer = false;
 	m_ie_edge = false;
 	m_irq_edge = false;
-	m_positive = false;
+	m_pa7_dir = 0;
 
 	update_pa();
 	update_pb();
+	update_irq();
+	edge_detect();
 
-	live_abort();
+	m_shift = 1024;
+
+	if (cur_live.state != IDLE) {
+		live_abort();
+	}
+
+	live_start();
+	live_run();
 }
 
 
@@ -394,19 +417,22 @@ UINT8 mos6530_t::get_irq_flags()
 //  edge_detect -
 //-------------------------------------------------
 
-void mos6530_base_t::edge_detect(int old, int state)
+void mos6530_base_t::edge_detect()
 {
-	if (!m_irq_edge)
+	UINT8 ddr_out = m_pa_ddr;
+	UINT8 ddr_in = m_pa_ddr ^ 0xff;
+	UINT8 data = (m_pa_out & ddr_out) | (m_pa_in & ddr_in);
+	int state = BIT(data, 7);
+
+	if ((m_pa7 ^ state) && (m_pa7_dir ^ state) == 0)
 	{
-		if (m_positive && !old && state) m_irq_edge = true;
-		if (!m_positive && old && !state) m_irq_edge = true;
+		if (LOG) logerror("%s %s '%s' edge-detect IRQ\n", machine().time().as_string(), name(), tag());
 
-		if (m_irq_edge) {
-			if (LOG) logerror("%s %s '%s' edge-detect IRQ\n", machine().time().as_string(), name(), tag());
-
-			update_irq();
-		}
+		m_irq_edge = true;
+		update_irq();
 	}
+
+	m_pa7 = state;
 }
 
 
@@ -420,6 +446,8 @@ void mos6530_base_t::pa_w(int bit, int state)
 
 	m_pa_in &= ~(1 << bit);
 	m_pa_in |= (state << bit);
+
+	edge_detect();
 }
 
 
@@ -482,13 +510,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_data_w )
 	if (LOG) logerror("%s %s %s '%s' Port A Data Out %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	update_pa();
-}
-
-WRITE8_MEMBER( mos6532_t::pa_data_w )
-{
-	edge_detect(BIT(m_pa_out, 7), BIT(data, 7));
-
-	mos6530_base_t::pa_data_w(space, offset, data);
+	edge_detect();
 }
 
 
@@ -503,6 +525,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_ddr_w )
 	if (LOG) logerror("%s %s %s '%s' Port A DDR %02x\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data);
 
 	update_pa();
+	edge_detect();
 }
 
 
@@ -573,43 +596,56 @@ WRITE8_MEMBER( mos6530_base_t::pb_ddr_w )
 //  timer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_base_t::timer_r )
+READ8_MEMBER( mos6530_base_t::timer_off_r )
 {
-	UINT8 data = 0;
-
 	if (space.debugger_access())
 		return 0;
 
-	if (offset & 0x01)
-	{
-		data |= get_irq_flags();
-	}
-	else
-	{
-		live_sync();
+	return timer_r(false);
+}
 
-		data = cur_live.value;
+READ8_MEMBER( mos6530_base_t::timer_on_r )
+{
+	if (space.debugger_access())
+		return 0;
 
-		checkpoint();
-		live_run();
+	return timer_r(true);
+}
 
-		m_ie_timer = BIT(offset, 3) ? true : false;
-	}
+UINT8 mos6530_base_t::timer_r(bool ie)
+{
+	UINT8 data = 0;
 
-	bool irq_dirty = false;
+	live_sync();
 
-	if (m_irq_timer) {
-		m_irq_timer = false;
-		irq_dirty = true;
-	}
+	m_ie_timer = ie;
+	m_irq_timer = false;
+	update_irq();
 
-	if (m_irq_edge) {
-		m_irq_edge = false;
-		irq_dirty = true;
-	}
+	data = cur_live.value;
 
-	if (irq_dirty) {
-		update_irq();
+	if (LOG_TIMER) logerror("%s %s %s '%s' Timer read %02x IE %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data, m_ie_timer ? 1 : 0);
+
+	checkpoint();
+	live_run();
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  irq_r -
+//-------------------------------------------------
+
+READ8_MEMBER( mos6530_base_t::irq_r )
+{
+	UINT8 data = get_irq_flags();
+
+	if (!space.debugger_access()) {
+		if (m_irq_edge) {
+			m_irq_edge = false;
+			update_irq();
+		}
 	}
 
 	return data;
@@ -620,7 +656,17 @@ READ8_MEMBER( mos6530_base_t::timer_r )
 //  timer_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_base_t::timer_w )
+WRITE8_MEMBER( mos6530_base_t::timer_off_w )
+{
+	timer_w(offset, data, false);
+}
+
+WRITE8_MEMBER( mos6530_base_t::timer_on_w )
+{
+	timer_w(offset, data, true);
+}
+
+void mos6530_base_t::timer_w(offs_t offset, UINT8 data, bool ie)
 {
 	live_sync();
 
@@ -633,14 +679,11 @@ WRITE8_MEMBER( mos6530_base_t::timer_w )
 	case 3: m_shift = 1024; break;
 	}
 
-	m_ie_timer = BIT(offset, 3) ? true : false;
+	m_ie_timer = ie;
+	m_irq_timer = false;
+	update_irq();
 
 	if (LOG_TIMER) logerror("%s %s %s '%s' Timer value %02x shift %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data, m_shift, m_ie_timer ? 1 : 0);
-
-	if (m_irq_timer) {
-		m_irq_timer = false;
-		update_irq();
-	}
 
 	checkpoint();
 
@@ -659,22 +702,10 @@ WRITE8_MEMBER( mos6530_base_t::timer_w )
 
 WRITE8_MEMBER( mos6530_base_t::edge_w )
 {
-	m_positive = BIT(data, 0) ? true : false;
+	m_pa7_dir = BIT(data, 0);
 	m_ie_edge = BIT(data, 1) ? false : true;
 
-	if (LOG) logerror("%s %s %s '%s' %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name(), tag(), m_positive ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
-}
-
-
-//-------------------------------------------------
-//  pa7_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mos6532_t::pa7_w )
-{
-	edge_detect(BIT(m_pa_in, 7), state);
-
-	mos6530_base_t::pa7_w(state);
+	if (LOG) logerror("%s %s %s '%s' %s edge-detect, %s interrupt\n", machine().time().as_string(), machine().describe_context(), name(), tag(), m_pa7_dir ? "positive" : "negative", m_ie_edge ? "enable" : "disable");
 }
 
 
@@ -690,7 +721,6 @@ void mos6530_base_t::live_start()
 	cur_live.next_state = -1;
 
 	cur_live.value = m_timer;
-	cur_live.irq = false;
 
 	checkpoint_live = cur_live;
 
@@ -746,8 +776,6 @@ void mos6530_base_t::live_abort()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-
-	cur_live.irq = false;
 }
 
 void mos6530_base_t::live_run(const attotime &limit)
@@ -779,7 +807,6 @@ void mos6530_base_t::live_run(const attotime &limit)
 				return;
 
 			cur_live.value--;
-			cur_live.irq = true;
 
 			if (LOG_TIMER) logerror("%s %s '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
 
