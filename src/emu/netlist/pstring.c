@@ -10,6 +10,7 @@
 #include <cstring>
 //FIXME:: pstring should be locale free
 #include <cctype>
+#include "stdlib.h"
 
 #include "pstring.h"
 

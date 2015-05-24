@@ -5,7 +5,7 @@
  *
  */
 
-#include <malloc.h>
+#include <malloc/malloc.h>
 #include <xmmintrin.h>
 
 void *palloc_raw(const size_t size)
