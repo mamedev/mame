@@ -212,30 +212,30 @@ float RoundBox(float2 p, float2 b, float r)
 
 float GetRoundCornerFactor(float2 coord, float amount)
 {
-	float2 HalfSourceDims = SourceDims * 0.5f;
+	float2 SourceArea = 1.0f / SourceRect;	
+	float2 SourceRes = SourceDims * SourceRect;
+	float2 SourceRatio = float2(1.0f, SourceRes.y / SourceRes.x);
 	float2 SourceTexelDims = 1.0f / SourceDims;
+	
+	// base on the default ratio of 4:3
 
-	// hint: roundness correction (base on the default ratio of 4:3)
 	float2 RoundCoord = coord;
-	RoundCoord -= SourceTexelDims;
-	RoundCoord *= SourceTexelDims + 1.0f;
-	RoundCoord *= SourceDims / ScreenRatio;
+	// hint: alignment correction
+	RoundCoord -= SourceTexelDims * SourceArea;
+	RoundCoord *= SourceTexelDims * SourceArea + 1.0f;
+	// hint: roundness correction
 
 	float radius = amount * 50.0f;
 
-	// compute box
-	float box = RoundBox(RoundCoord.xy, HalfSourceDims / ScreenRatio, radius);
+	// compute box (base on the default ratio of 4:3)
 
-	float solidBorder = smoothstep(1.0f, 0.5f, box);
+	// // apply blur
+	// float blurAmount = 1.0f / max(1.0f, amount * 25.0f);
+	// float blueOffset = 1.0f - pow(blurAmount * 0.5f, 0.5f);
+	// box *= blurAmount;
+	// box += blueOffset;
 
-	// apply blur
-	float blur = 1.0f / max(2.0f, amount * 100.0f); // blur amount
-	box *= blur * 2.0f; // blur stength
-	box += 1.0f - pow(blur * 0.5f, 0.5f); // blur offset
-
-	float blurBorder = smoothstep(1.0f, 0.5f, box);
-
-	float border = solidBorder * (blurBorder + 0.5f);
+	float border = smoothstep(1.0f, 0.5f, box);
 
 	return saturate(border);
 }
@@ -245,47 +245,47 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
 	float2 SourceTexelDims = 1.0f / SourceDims;
 
-	float2 UsedArea = 1.0f / SourceRect;
-	float2 HalfRect = SourceRect * 0.5f;
+	float2 SourceArea = 1.0f / SourceRect;
+	float2 HalfSourceRect = SourceRect * 0.5f;
 
 	// Screen Curvature
 	float2 CurvatureUnitCoord = 
 		  Input.TexCoord 
-		* UsedArea * 2.0f -
+		* SourceArea * 2.0f -
 		  1.0f;
 	float2 CurvatureCurve =
 		  CurvatureUnitCoord
 		* pow(length(CurvatureUnitCoord), 2.0f)
-		/ pow(length(UsedArea), 2.0f)
+		/ pow(length(SourceArea), 2.0f)
 		* CurvatureAmount * 0.25f; // reduced curvature
 	float2 CurvatureZoom = 
 		  1.0f - 
-		  UsedArea * 2.0f
-		/ pow(length(UsedArea), 2.0f)
+		  SourceArea * 2.0f
+		/ pow(length(SourceArea), 2.0f)
 		* CurvatureAmount * 0.25f; // reduced curvature
 
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
-	ScreenCoord -= HalfRect;
+	ScreenCoord -= HalfSourceRect;
 	ScreenCoord *= CurvatureZoom; // zoom
-	ScreenCoord += HalfRect;
+	ScreenCoord += HalfSourceRect;
 	ScreenCoord += CurvatureCurve; // distortion
 
 	float2 BaseCoord = Input.TexCoord;
-	BaseCoord -= HalfRect;
+	BaseCoord -= HalfSourceRect;
 	BaseCoord *= CurvatureZoom; // zoom
-	BaseCoord += HalfRect;
+	BaseCoord += HalfSourceRect;
 	BaseCoord += CurvatureCurve; // distortion
 
 	float2 BaseCoordCentered = Input.TexCoord;
-	BaseCoordCentered -= HalfRect;
+	BaseCoordCentered -= HalfSourceRect;
 	BaseCoordCentered *= CurvatureZoom; // zoom
 	BaseCoordCentered += CurvatureCurve; // distortion
 
 	float2 BaseAreaCoord = BaseCoord;
-	BaseAreaCoord *= UsedArea;
+	BaseAreaCoord *= SourceArea;
 
 	float2 BaseAreaCoordCentered = BaseCoordCentered;
-	BaseAreaCoordCentered *= UsedArea;
+	BaseAreaCoordCentered *= SourceArea;
 
 	float2 BaseAreaRatioCoord = BaseAreaCoord;
 	BaseAreaRatioCoord *= ScreenRatio;
