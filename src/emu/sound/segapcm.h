@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hiromitsu Shioya
 /*********************************************************/
 /*    SEGA 8bit PCM                                      */
