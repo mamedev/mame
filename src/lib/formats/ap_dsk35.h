@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Nathan Woods, R. Belmont
 /*********************************************************************
 
     ap_dsk35.h
