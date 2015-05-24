@@ -254,6 +254,32 @@ ATTR_COLD virtual const netlist_logic_family_desc_t *default_logic_family()     
 	return &netlist_family_ ## _fam;                                            \
 }
 
+//============================================================
+//  Exceptions
+//============================================================
+
+class nl_fatalerror : public std::exception
+{
+public:
+	nl_fatalerror(const char *format, ...) ATTR_PRINTF(2,3);
+	nl_fatalerror(const char *format, va_list ap);
+	virtual ~nl_fatalerror() throw() {}
+
+	inline const pstring &text() { return m_text; }
+private:
+	pstring m_text;
+};
+
+//============================================================
+//  Asserts
+//============================================================
+
+#ifdef MAME_DEBUG
+#define nl_assert(x)               do { if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#else
+#define nl_assert(x)               do { if (0) if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#endif
+#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 
 
 // -----------------------------------------------------------------------------
@@ -618,8 +644,6 @@ protected:
 		set_state(STATE_INP_ACTIVE);
 	}
 };
-
-//#define INPVAL(_x) (_x).Q()
 
 // -----------------------------------------------------------------------------
 // net_net_t
@@ -1246,11 +1270,11 @@ private:
 	netlist_time                m_time;
 	netlist_queue_t             m_queue;
 
-	bool                        m_use_deactivate;
-
 	NETLIB_NAME(mainclock) *    m_mainclock;
 	NETLIB_NAME(solver) *       m_solver;
 	NETLIB_NAME(gnd) *          m_gnd;
+
+	bool                        m_use_deactivate;
 
 	NETLIB_NAME(netlistparams) *m_params;
 	netlist_setup_t *m_setup;
