@@ -95,6 +95,7 @@
 #include "sound/dac.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "formats/camplynx_cas.h"
 
 class camplynx_state : public driver_device
 {
@@ -573,6 +574,7 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
 
 	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(lynx48k_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 	//MCFG_CASSETTE_INTERFACE("camplynx_cass")
 MACHINE_CONFIG_END
@@ -611,6 +613,7 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITE8(camplynx_state, lynx128k_irq))
 
 	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_FORMATS(lynx128k_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 	//MCFG_CASSETTE_INTERFACE("camplynx_cass")
 MACHINE_CONFIG_END

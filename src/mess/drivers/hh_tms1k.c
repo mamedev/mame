@@ -944,8 +944,8 @@ public:
 void tc4_state::prepare_display()
 {
 	// R5,R7-R9 are 7segs
-	for (int y = 0; y < 10; y++)
-		if (y >= 5 && y <= 9 && y != 6)
+	for (int y = 5; y < 10; y++)
+		if (y != 6)
 			m_display_segmask[y] = 0x7f;
 
 	// update current state (note: R6 as extra column!)
@@ -1140,9 +1140,9 @@ static INPUT_PORTS_START( ebball )
 	PORT_START("IN.0") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Change Sides")
-	PORT_CONFNAME( 0x04, 0x04, "Pitcher" )
-	PORT_CONFSETTING(    0x04, "Auto" )
-	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_CONFNAME( 0x04, 0x04, "Players" )
+	PORT_CONFSETTING(    0x04, "1" ) // Auto
+	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R2
@@ -1272,9 +1272,9 @@ READ8_MEMBER(ebball2_state::read_k)
 static INPUT_PORTS_START( ebball2 )
 	PORT_START("IN.0") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, "Pitcher" )
-	PORT_CONFSETTING(    0x02, "Auto" )
-	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_CONFNAME( 0x02, 0x02, "Players" )
+	PORT_CONFSETTING(    0x02, "1" ) // Auto
+	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fast Ball")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 
@@ -1361,7 +1361,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
 	virtual void machine_reset();
@@ -1444,19 +1444,19 @@ static INPUT_PORTS_START( ebball3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Steal Defense")
 
 	PORT_START("IN.2") // R2
-	PORT_CONFNAME( 0x01, 0x01, "Pitcher" )
-	PORT_CONFSETTING(    0x01, "Auto" )
-	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_CONFNAME( 0x01, 0x01, "Players" )
+	PORT_CONFSETTING(    0x01, "1" ) // Auto
+	PORT_CONFSETTING(    0x00, "2" ) // Manual
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Bunt")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // fake
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, difficulty_switch, NULL)
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, skill_switch, NULL)
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x01, "Professional" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(ebball3_state::difficulty_switch)
+INPUT_CHANGED_MEMBER(ebball3_state::skill_switch)
 {
 	set_clock();
 }
@@ -1525,7 +1525,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
 	virtual void machine_reset();
@@ -1567,12 +1567,12 @@ static INPUT_PORTS_START( einvader )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
-	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, difficulty_switch, NULL)
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, skill_switch, NULL)
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(einvader_state::difficulty_switch)
+INPUT_CHANGED_MEMBER(einvader_state::skill_switch)
 {
 	set_clock();
 }
@@ -1619,7 +1619,7 @@ MACHINE_CONFIG_END
 
   Entex Color Football 4
   * TMS1670 6009 MP7551 (die also labeled MP7551)
-  * 4 7seg LEDs, 60 red and green LEDs behind bezel, 1bit sound
+  * * 9-digit cyan VFD display, 60 red and green LEDs behind bezel, 1bit sound
 
 ***************************************************************************/
 
@@ -1640,10 +1640,21 @@ public:
 
 void efootb4_state::prepare_display()
 {
+	// R10-R15 are 7segs
+	for (int y = 10; y < 16; y++)
+		m_display_segmask[y] = 0x7f;
+
+	display_matrix(7, 16, m_o, m_r);
 }
 
 WRITE16_MEMBER(efootb4_state::write_r)
 {
+	// R0-R4: input mux
+	m_inp_mux = data & 0x1f;
+
+	// R0-R9: led select
+	m_r = data;
+	prepare_display();
 }
 
 WRITE16_MEMBER(efootb4_state::write_o)
@@ -1652,25 +1663,58 @@ WRITE16_MEMBER(efootb4_state::write_o)
 	m_speaker->level_w(data >> 7 & 1);
 
 	// O0-O6: led state
-	m_o = data & 0x7f;
+	m_o = data;
 	prepare_display();
 }
 
 READ8_MEMBER(efootb4_state::read_k)
 {
-	return 0;
+	return read_inputs(5);
 }
 
 
 // config
 
 static INPUT_PORTS_START( efootb4 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Run")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Kick")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Run")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Kick")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // R4
+	PORT_CONFNAME( 0x01, 0x01, "Players" )
+	PORT_CONFSETTING(    0x01, "1" ) // Auto
+	PORT_CONFSETTING(    0x00, "2" ) // Manual
+	PORT_CONFNAME( 0x02, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "Amateur" )
+	PORT_CONFSETTING(    0x02, "Professional" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Status")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( efootb4, efootb4_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1670, 400000) // RC osc. R=42K, C=47pf -> ~000kHz
+	MCFG_CPU_ADD("maincpu", TMS1670, 475000) // approximation - RC osc. R=42K, C=47pf, but unknown RC curve
 	MCFG_TMS1XXX_READ_K_CB(READ8(efootb4_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(efootb4_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(efootb4_state, write_o))
@@ -1716,35 +1760,75 @@ public:
 
 void ebaskb2_state::prepare_display()
 {
+	// R0-R3 are 7segs
+	for (int y = 0; y < 4; y++)
+		m_display_segmask[y] = 0x7f;
+
+	display_matrix(7, 10, m_o, m_r);
 }
 
 WRITE16_MEMBER(ebaskb2_state::write_r)
 {
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R6-R9: input mux
+	m_inp_mux = data >> 6 & 0xf;
+
+	// R0-R9: led select
+	m_r = data;
+	prepare_display();
 }
 
 WRITE16_MEMBER(ebaskb2_state::write_o)
 {
 	// O0-O6: led state
 	// O7: N/C
-	m_o = data & 0x7f;
+	m_o = data;
 	prepare_display();
 }
 
 READ8_MEMBER(ebaskb2_state::read_k)
 {
-	return 0;
+	return read_inputs(4);
 }
 
 
 // config
 
 static INPUT_PORTS_START( ebaskb2 )
+	PORT_START("IN.0") // R6
+	PORT_CONFNAME( 0x01, 0x01, "Skill Level" )
+	PORT_CONFSETTING(    0x01, "Amateur" )
+	PORT_CONFSETTING(    0x00, "Professional" )
+	PORT_CONFNAME( 0x02, 0x02, "Players" )
+	PORT_CONFSETTING(    0x02, "1" ) // Auto
+	PORT_CONFSETTING(    0x00, "2" ) // Manual
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Shoot")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
+
+	PORT_START("IN.1") // R7
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Shoot")
+
+	PORT_START("IN.2") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
+
+	PORT_START("IN.3") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ebaskb2, ebaskb2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 400000) // RC osc. R=33K, C=82pf -> ~000kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 360000) // RC osc. R=33K, C=82pf -> ~360kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(ebaskb2_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebaskb2_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebaskb2_state, write_o))

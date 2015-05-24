@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:R. Belmont, Olivier Galibert
 /*********************************************************************
 
     formats/esq8_dsk.c
