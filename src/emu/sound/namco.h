@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nicola Salmoria,Aaron Giles
 #pragma once
 
 #ifndef __NAMCO_H__
