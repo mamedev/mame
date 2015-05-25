@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Keith Wilkins
+// copyright-holders:Keith Wilkins, Derrick Renaud, F.Palazzolo, Couriersud
 #pragma once
 
 #ifndef __DISC_CLS_H__

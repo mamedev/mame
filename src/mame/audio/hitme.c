@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+// FIXME: copyright most likely Derrick Renaud
 /*************************************************************************
 
     audio\hitme.c

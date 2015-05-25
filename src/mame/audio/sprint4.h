@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Stefan Jokisch
+// copyright-holders:Derrick Renaud
 /***************************************************************************
 
 Atari Sprint 4 + Ultra Tank Audio

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+// FIXME: coding style indicates Derrick Renaud
 /***************************************************************************
 
     Sigma Spiders hardware

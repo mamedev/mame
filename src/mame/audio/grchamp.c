@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Phil Stroffolino
+// copyright-holders:Hans Andersson
 /*************************************************************************
 
     audio\grchamp.c

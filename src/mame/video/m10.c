@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Lee Taylor
+// copyright-holders:Lee Taylor, Couriersud
 /***************************************************************************
 
   video.c
