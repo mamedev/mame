@@ -2,7 +2,7 @@
  *
  *  MAME - Discrete sound system emulation library
  *
- *  Written by Keith Wilkins (mame@dysfunction.demon.co.uk)
+ *  Written by K.Wilkins (mame@dysfunction.demon.co.uk)
  *
  *  (c) K.Wilkins 2000
  *  (c) Derrick Renaud 2003-2004

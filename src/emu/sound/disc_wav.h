@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Keith Wilkins
+// copyright-holders:K.Wilkins
 #pragma once
 
 #ifndef __DISC_WAV_H__
@@ -9,7 +9,7 @@
  *
  *  MAME - Discrete sound system emulation library
  *
- *  Written by Keith Wilkins (mame@esplexo.co.uk)
+ *  Written by K.Wilkins (mame@esplexo.co.uk)
  *
  *  (c) K.Wilkins 2000
  *
