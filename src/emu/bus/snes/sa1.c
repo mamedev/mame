@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, R. Belmont
 /***********************************************************************************************************
 
  SA-1 add-on chip emulation (for SNES/SFC)
