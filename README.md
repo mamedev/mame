@@ -20,6 +20,23 @@ MESS (Multi Emulator Super System) is the sister project of MAME. MESS documents
 The MESS and MAME projects live in the same source repository and share much of the same code, but are different build targets.
 
 
+License
+=======
+
+MAME is Open Source project now, we are still in process of contacting all developers from past to get their wish of license.
+So far situation is that
+
+|License|Percentage|
+|---|---|
+|[BSD-3-Clause](http://spdx.org/licenses/BSD-3-Clause)|86%|
+|[LGPL-2.1+](http://spdx.org/licenses/LGPL-2.1+)|3%|
+|[GPL-2.0+](http://spdx.org/licenses/GPL-2.0+)|5%|
+|not defined|6%|
+
+Please note that all files that do not have explicit license are still pending decision from authors and till they are marked with some should not be used by other prjects/forks.
+
+Since licenses are compatible but some are more permissive then others, as whole MAME will be delivered as GPL-2.0+ software. 
+
 How to compile?
 =============
 
@@ -64,3 +81,8 @@ Contributing
 MAME source code should be viewed and edited with your editor set to use four spaces per tab. Tabs are used for initial indentation of lines, with one tab used per indentation level. Spaces are used for other alignment within a line.
 
 Some parts of the code follow [GNU style](http://www.gnu.org/prep/standards/html_node/Formatting.html); some parts of the code follow [K&R style](https://en.wikipedia.org/wiki/Indent_style#K.26R_style) -- mostly depending on who wrote the original version. **Above all else, be consistent with what you modify, and keep whitespace changes to a minimum when modifying existing source.** For new code, the majority tends to prefer GNU style, so if you don't care much, use that.
+
+All contributors need to either add standard header for license info (on new files) or send us their wish under which of licenses they would like their code to be published under.
+[BSD-3-Clause](http://spdx.org/licenses/BSD-3-Clause)
+[LGPL-2.1+](http://spdx.org/licenses/LGPL-2.1+)
+[GPL-2.0+](http://spdx.org/licenses/GPL-2.0+)
