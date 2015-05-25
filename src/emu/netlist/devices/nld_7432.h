@@ -43,7 +43,12 @@
 		NET_REGISTER_DEV(7432_dip, _name)
 
 
+#if (USE_TRUTHTABLE)
+#include "nld_truthtable.h"
+NETLIB_TRUTHTABLE(7432, 2, 1, 0);
+#else
 NETLIB_SIGNAL(7432, 2, 1, 1);
+#endif
 
 NETLIB_DEVICE(7432_dip,
 

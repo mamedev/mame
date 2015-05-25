@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Stefan Jokisch
 /************************************************************************
  * skyraid Sound System Analog emulation
  * Sept 2009, Derrick Renaud

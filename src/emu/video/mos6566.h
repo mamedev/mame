@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
     MOS 6566/6567/6569 Video Interface Chip II (VIC-II) emulation

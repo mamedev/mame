@@ -1,4 +1,4 @@
-// license:GPL2.0+
+// license:BSD-3-Clause
 // copyright-holders:Sven Gothel
 const char glsl_plain_idx16_lut_fsh_src[] =
 "\n"

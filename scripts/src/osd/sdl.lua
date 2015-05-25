@@ -4,7 +4,7 @@
 dofile("modules.lua")
 
 
-function maintargetosdoptions(_target)
+function maintargetosdoptions(_target,_subtarget)
 	osdmodulestargetconf()
 
 	if _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS["MESA_INSTALL_ROOT"] then

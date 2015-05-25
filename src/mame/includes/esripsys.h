@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Phil Bennett
+// license:BSD-3-Clause
+// copyright-holders:Philip Bennett
 /*************************************************************************
 
     Entertainment Sciences RIP System hardware

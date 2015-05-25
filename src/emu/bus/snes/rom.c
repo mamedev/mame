@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:etabeta
+// license:GPL-2.0+
+// copyright-holders:Fabio Priuli, byuu
 /***********************************************************************************************************
 
  Super NES/Famicom (LoROM) cartridge emulation (for SNES/SFC)

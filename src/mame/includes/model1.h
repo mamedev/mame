@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
 #include "cpu/v60/v60.h"

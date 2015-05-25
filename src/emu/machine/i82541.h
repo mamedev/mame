@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 // Intel I82541 ethernet controller
 
 #ifndef I82541_H

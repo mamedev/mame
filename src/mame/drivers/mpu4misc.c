@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU4 sets from various other manufactuers which appear to be based off unique code / behaviors (no barcrest headers etc.) */
 
 #include "emu.h"

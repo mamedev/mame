@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari, Aaron Giles
 /****************************************************************************
  *                                                                          *
  *  Functions to emulate the TMS34061 video controller                      *

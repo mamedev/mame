@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Xing Xing
 /*
     Dou Di Zhu (by IGS?)
 

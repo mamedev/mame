@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 
     MSM6242 / Epson RTC 62421 / 62423 Real Time Clock

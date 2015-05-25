@@ -81,8 +81,6 @@
 #define NETLIST_DEVELOPMENT 0
 
 #include "netlist/nl_dice_compat.h"
-#include "netlist/devices/net_lib.h"
-#include "netlist/analog/nld_twoterm.h"
 
 #define SLOW_BUT_ACCURATE 0
 
@@ -114,6 +112,7 @@ CIRCUIT_LAYOUT( breakout )
     // FIXME: PARALLEL Doesn't work in breakout.
     PARAM(Solver.PARALLEL, 0)
 #endif
+    PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	// DIPSWITCH - Free game
 	SWITCH(S1_1)

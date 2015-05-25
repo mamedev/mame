@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Chris Hardy
 /**************************************************************************
 
 Based on drivers from Juno First emulator by Chris Hardy (chris@junofirst.freeserve.co.uk)

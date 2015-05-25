@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
 
     Cirrus Logic GD542x/3x video chipsets
@@ -66,6 +66,8 @@ protected:
 	UINT16 m_blt_width;
 	UINT32 m_blt_source_current;
 	UINT32 m_blt_dest_current;
+	UINT16 m_blt_trans_colour;
+	UINT16 m_blt_trans_colour_mask;
 
 	bool m_blt_system_transfer;  // blit from system memory 
 	UINT8 m_blt_system_count;
@@ -93,6 +95,7 @@ private:
 	void start_reverse_bitblt();
 	void start_system_bitblt();
 	void blit_dword();
+	void blit_byte();  // used for colour expanded system-to-vram bitblts
 	void copy_pixel(UINT8 src, UINT8 dst);
 };
 

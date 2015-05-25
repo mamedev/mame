@@ -1052,6 +1052,24 @@ if (CPUS["PSX"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Mitsubishi MELPS 4 series
+---@src/emu/cpu/melps4/melps4.h,CPUS += MELPS4
+--------------------------------------------------
+
+if (CPUS["MELPS4"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/cpu/melps4/melps4.c",
+		MAME_DIR .. "src/emu/cpu/melps4/melps4.h",
+		MAME_DIR .. "src/emu/cpu/melps4/m58846.c",
+		MAME_DIR .. "src/emu/cpu/melps4/m58846.h",
+	}
+end
+
+if (CPUS["MELPS4"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/melps4/melps4d.c")
+end
+
+--------------------------------------------------
 -- Mitsubishi M37702 and M37710 (based on 65C816)
 ---@src/emu/cpu/m37710/m37710.h,CPUS += M37710
 --------------------------------------------------

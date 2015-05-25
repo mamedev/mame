@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
 #ifndef _SNES_H_
 #define _SNES_H_
 

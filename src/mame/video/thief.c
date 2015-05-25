@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Victor Trucco, Mike Balfour, Phil Stroffolino
 /*  video hardware for Pacific Novelty games:
 **  Thief/Nato Defense

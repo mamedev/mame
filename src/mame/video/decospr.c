@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Haywood
 /* Data East Sprite Chip
    DECO 52
 

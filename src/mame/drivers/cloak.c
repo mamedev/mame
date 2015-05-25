@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Dan Boris, Mirko Buffoni
 /***************************************************************************
 
     Atari Cloak & Dagger hardware

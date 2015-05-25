@@ -36,7 +36,7 @@ public:
 	public:
 		token_id_t() : m_id(-2) {}
 		token_id_t(const int id) : m_id(id) {}
-		const int id() const { return m_id; }
+		int id() const { return m_id; }
 	private:
 		int m_id;
 	};
@@ -127,7 +127,7 @@ private:
 
 	pstring m_identifier_chars;
 	pstring m_number_chars;
-	plinearlist_t<pstring> m_tokens;
+	plist_t<pstring> m_tokens;
 	pstring m_whitespace;
 	char  m_string;
 
@@ -182,7 +182,7 @@ private:
 class netlist_source_t
 {
 public:
-	typedef plinearlist_t<netlist_source_t> list_t;
+	typedef plist_t<netlist_source_t> list_t;
 
 	enum source_e
 	{

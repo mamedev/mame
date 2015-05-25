@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /*
 
     Tape support for C16 / C64 / VIC20 TAP format

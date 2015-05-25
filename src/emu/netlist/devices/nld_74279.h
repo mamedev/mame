@@ -3,7 +3,7 @@
 /*
  * nld_74279.h
  *
- *  DM74279: Triple 3-Input NAND Gates
+ *  DM74279: Quad S-R Latch
  *
  *          +--------------+
  *       1R |1     ++    16| VCC
@@ -38,9 +38,15 @@
 
 #include "nld_truthtable.h"
 
+#if 0
 NETLIB_TRUTHTABLE(74279A, 2, 1, 1);
 NETLIB_TRUTHTABLE(74279B, 3, 1, 1);
-
+#else
+NETLIB_TRUTHTABLE(74279A, 3, 1, 0);
+NETLIB_TRUTHTABLE(74279B, 4, 1, 0);
+//NETLIB_TRUTHTABLE(74279A, 4, 2, 0);
+//NETLIB_TRUTHTABLE(74279B, 5, 2, 0);
+#endif
 #define TTL_74279_DIP(_name)                                                         \
 		NET_REGISTER_DEV(74279_dip, _name)
 

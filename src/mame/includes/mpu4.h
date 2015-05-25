@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"

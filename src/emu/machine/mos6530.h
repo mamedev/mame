@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     MOS Technology 6530 Memory, I/O, Timer Array emulation

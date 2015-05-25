@@ -998,10 +998,10 @@ const floppy_format_type FLOPPY_A216S_FORMAT = &floppy_image_format_creator<a2_1
    D5 9D <track> <sector> <checksum> AA FF FF <titlespecific sync> <0x400 nybbles which represent 768 bytes> <data checksum> D6
    Title-specific sync bytes are:
     Airheart: D4
-    Toy Shop: unknown
+    Toy Shop: A5
     Carmen USA: unknown (not all released versions used RWTS18)
     Wings of Fury: 96
-    Prince of Persia: unknown
+    Prince of Persia: A9
     And several others.
 */
 a2_rwts18_format::a2_rwts18_format() : floppy_image_format_t()

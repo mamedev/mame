@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /**********************************************************************
 
     Nintendo Super Famicom - Yonezawa / PartyRoom 21 Twin Tap Controller

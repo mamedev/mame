@@ -1,10 +1,10 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, Peter Ferrie
 /***************************************************************************
 
 Thunder Hoop II: Strikes Back (c) 1994 Gaelco
 
-Driver by Manuel Abadia <manu@teleline.es>
+Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 updated by Peter Ferrie <peter.ferrie@gmail.com>
 

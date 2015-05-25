@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Richard Davies
 /*************************************************************************
 
     Exed Exes

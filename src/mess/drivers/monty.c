@@ -19,8 +19,8 @@
     by adding chips and wires to the inside of the game.
     
     TODO:
-    - Everything - this is just a little better than a skeleton
-    - Get clock speeds from the dumper
+    - Input from the keyboard
+    - Proper SED1503F emulation (it's simulated in-driver for now)
 
 ****************************************************************************/
 
@@ -172,7 +172,7 @@ SED1520_UPDATE_CB(monty_screen_update)
 // TODO: Additional machine definition - Master Monty has a different memory layout
 static MACHINE_CONFIG_START( monty, monty_state )
 	// Basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
+	MCFG_CPU_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
 	MCFG_CPU_PROGRAM_MAP(monty_mem)
 	MCFG_CPU_IO_MAP(monty_io)
 

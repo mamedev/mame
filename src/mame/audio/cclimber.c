@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "sound/ay8910.h"
 #include "audio/cclimber.h"

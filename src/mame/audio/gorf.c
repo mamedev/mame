@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Mike Coates
 /**************************************************************************
 
     Gorf/Votrax SC-01 Emulator

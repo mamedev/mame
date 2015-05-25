@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood, Farfetch'd
 /*** DRIVER INFO & NOTES ******************************************************
  Speed Spin (c)1994 TCH

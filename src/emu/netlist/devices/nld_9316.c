@@ -81,7 +81,7 @@ NETLIB_START(9316_sub)
 
 NETLIB_RESET(9316_sub)
 {
-	m_CLK.set_state(netlist_input_t::STATE_INP_LH);
+	m_CLK.set_state(netlist_logic_t::STATE_INP_LH);
 	m_cnt = 0;
 	m_loadq = 1;
 	m_ent = 1;
@@ -123,7 +123,7 @@ NETLIB_UPDATE(9316)
 	sub.m_ent = INPLOGIC(m_ENT);
 	const netlist_sig_t clrq = INPLOGIC(m_CLRQ);
 
-	if ((!sub.m_loadq | (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
+	if (((sub.m_loadq ^ 1) | (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
 	{
 		sub.m_CLK.activate_lh();
 		OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));

@@ -85,6 +85,8 @@ c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_
 	m_stp0(0),
 	m_stp1(0),
 	m_ds(0),
+	m_ds0(0),
+	m_ds1(0),
 	m_drv_sel(0),
 	m_mode_sel(0),
 	m_rw_sel(1)
@@ -117,6 +119,8 @@ void c8050_fdc_t::device_start()
 	save_item(NAME(m_stp0));
 	save_item(NAME(m_stp1));
 	save_item(NAME(m_ds));
+	save_item(NAME(m_ds0));
+	save_item(NAME(m_ds1));
 	save_item(NAME(m_drv_sel));
 	save_item(NAME(m_mode_sel));
 	save_item(NAME(m_rw_sel));

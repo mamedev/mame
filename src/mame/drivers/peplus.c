@@ -288,6 +288,7 @@ public:
 	DECLARE_DRIVER_INIT(nonplus);
 	DECLARE_DRIVER_INIT(peplus);
 	DECLARE_DRIVER_INIT(peplussb);
+	DECLARE_DRIVER_INIT(pepluss64);
 	DECLARE_DRIVER_INIT(peplussbw);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
@@ -406,8 +407,7 @@ WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 
 WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[m_vid_address] = data;
+	m_videoram[m_vid_address] = data;
 	m_palette_ram[m_vid_address] = m_io_port[1];
 	m_palette_ram2[m_vid_address] = m_io_port[3];
 
@@ -950,7 +950,7 @@ PALETTE_INIT_MEMBER(peplus_state, peplus)
 ******************************/
 
 static GFXDECODE_START( peplus )
-			GFXDECODE_ENTRY( "gfx1", 0x00000, gfx_8x8x4_planar, 0, 16 )
+			GFXDECODE_ENTRY( "gfx1", 0x00000, gfx_8x8x4_planar, 0, 32 )
 GFXDECODE_END
 
 
@@ -1353,6 +1353,16 @@ DRIVER_INIT_MEMBER(peplus_state,peplussb)
 	m_doorcycle = TRUE;
 	m_wingboard = FALSE;
 	m_jumper_e16_e17 = FALSE;
+	peplus_load_superdata("user1");
+}
+
+/* Superboard with 64K CG rom set */
+DRIVER_INIT_MEMBER(peplus_state,pepluss64)
+{
+	door_wait = 500;
+	m_doorcycle = TRUE;
+	m_wingboard = FALSE;
+	m_jumper_e16_e17 = TRUE;
 	peplus_load_superdata("user1");
 }
 
@@ -8266,6 +8276,34 @@ Designed and co-created by Best Bet Products
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* Wrong!! Should be CAPX2325 */
 ROM_END
 
+ROM_START( pex2297p ) /* Superboard : Jackpot Poker (X002297P+XP000053) */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  P820AU    1    2    3    4    5   8  **  50 250    800
+  % Range: 95.7-97.7%  Optimum: 99.7%  Hit Frequency: 45.5%
+     Programs Available: X002297P
+
+** 4K goes to a slot machine bonus routine. The average Jackpot Poker pay = 35.15 per Coin In
+   Possible payouts are: 30, 26, 40, 80 & 400 per Coin In
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xp000053.u67",   0x00000, 0x10000, CRC(f4f1f986) SHA1(84cfc2c4a10ed24d3a971fe75041a4108ec1d7f2) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x002297p.u66",   0x00000, 0x10000, CRC(7ebe809e) SHA1(5aafdf499455b8c96f6d780894cc442ed21e0dc2) ) /* Jackpot Poker */
+
+	ROM_REGION( 0x040000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2292.u77",  0x00000, 0x10000, CRC(10da5df3) SHA1(0975acc2151957c0d9996d5cc77ded6deefbb41a) )
+	ROM_LOAD( "mgo-cg2292.u78",  0x10000, 0x10000, CRC(92fc6282) SHA1(8d765326dd604274dcf36e38440a1f9c404a020a) )
+	ROM_LOAD( "mbo-cg2292.u79",  0x20000, 0x10000, CRC(996ab79c) SHA1(54469ce8de6aa35d6be996fc87b677d75f7cfa68) )
+	ROM_LOAD( "mxo-cg2292.u80",  0x30000, 0x10000, CRC(d7efa5c9) SHA1(40aa7593b358c99f3f98c5d5ad11e186aff17b58) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2292.u43", 0x0000, 0x0200, CRC(2836f00b) SHA1(c6ff79977ed2eb24fdbfa378c72d44b9ec05a40f) )
+ROM_END
+
 ROM_START( pex2302p ) /* Superboard : Bonus Poker Deluxe (X002302P+XP000038) */
 /*
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
@@ -9301,14 +9339,10 @@ Double Double Bonus  P505A     97.80%
 	ROM_LOAD( "xm00008p.u66",   0x00000, 0x10000, CRC(37ff1a79) SHA1(5b15245e79d8f1b984d254f4307f1a2219ce3ed2) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2228.u77",  0x00000, 0x8000, NO_DUMP ) /* This set requires CG2228 for the correct banners on the MENU page */
-	ROM_LOAD( "mgo-cg2228.u78",  0x08000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mbo-cg2228.u79",  0x10000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mxo-cg2228.u80",  0x18000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mro-cg2174.u77",  0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) ) /*  07/26/95   @ IGT  L95-1616  */
-	ROM_LOAD( "mgo-cg2174.u78",  0x08000, 0x8000, CRC(cc46adb0) SHA1(6065aa5dcb9091ad80e499c7ee6dc629e79c865a) ) /* Close but banners on MEMU WRONG!! */
-	ROM_LOAD( "mbo-cg2174.u79",  0x10000, 0x8000, CRC(7291a0c8) SHA1(1068f35e6ef5fd88c584922860231840a90fb623) )
-	ROM_LOAD( "mxo-cg2174.u80",  0x18000, 0x8000, CRC(14f9480c) SHA1(59323f9fc5995277aea86d088893b6eb95b4e89b) )
+	ROM_LOAD( "mro-cg2228.u77",  0x00000, 0x8000, CRC(b8abca87) SHA1(b008e0c0b272bc024fc1bfee1aeb80b8df589e4a) )
+	ROM_LOAD( "mgo-cg2228.u78",  0x08000, 0x8000, CRC(ad9b93ae) SHA1(3ffba64d4763bc0e107f6279b5cce4c0e7e4fa7a) )
+	ROM_LOAD( "mbo-cg2228.u79",  0x10000, 0x8000, CRC(4ad376ef) SHA1(116160d507f734ecdf5e80a3e746ab10fb9b4d78) )
+	ROM_LOAD( "mxo-cg2228.u80",  0x18000, 0x8000, CRC(8965ff2f) SHA1(9d5ba61504f9a7e3225ecaf72e81d65a9fbf3667) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
@@ -9966,6 +10000,7 @@ GAMEL(1995, pex2275p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex2276p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002276P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2283p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002283P+XP000057) Dealt Deuces Wild Bonus Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
 GAMEL(1995, pex2284p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002284P+XP000057) Barbaric Decues Wild Bonus Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
+GAMEL(1995, pex2297p,  0,         peplus,  peplus_poker, peplus_state, pepluss64,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002297P+XP000053) Jackpot Poker",       0, layout_pe_poker )
 GAMEL(1995, pex2302p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002302P+XP000038) Bonus Poker Deluxe",  0, layout_pe_poker )
 GAMEL(1995, pex2303p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002303P+XP000112) White Hot Aces Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2306p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002306P+XP000112) Triple Double Bonus Poker", 0, layout_pe_poker )
@@ -10006,7 +10041,7 @@ GAMEL(1995, pexm004p,  0,        peplus,  peplus_poker, peplus_state, peplussb, 
 GAMEL(1995, pexm005p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00005P+XMP00004) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm006p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00006P+XMP00006) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm007p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00007P+XMP00006) Multi-Poker",        0, layout_pe_poker )
-GAMEL(1995, pexm008p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00008P+XMP00006) Multi-Poker",        GAME_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs CG2228 graphics roms for correct MENU game banners */
+GAMEL(1995, pexm008p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00008P+XMP00006) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm009p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00009P+XMP00002) Multi-Poker",        GAME_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs unknown CG2??? graphics roms for correct MENU game banners */
 GAMEL(1995, pexm013p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00013P+XMP00025) Multi-Poker",        0, layout_pe_poker )
 

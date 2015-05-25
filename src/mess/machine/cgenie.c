@@ -12,10 +12,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/cgenie.h"
-#include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
 #include "sound/dac.h"
-#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 #define AYWriteReg(chip,port,value) \
@@ -68,51 +66,6 @@ void cgenie_state::machine_reset()
 	/* wipe out font RAM */
 	memset(&ROM[0x0f400], 0xff, 0x0400);
 
-	if( ioport("DSW0")->read() & 0x80 )
-	{
-		logerror("cgenie floppy discs enabled\n");
-	}
-	else
-	{
-		logerror("cgenie floppy discs disabled\n");
-	}
-
-	/* copy DOS ROM, if enabled or wipe out that memory area */
-	if( ioport("DSW0")->read() & 0x40 )
-	{
-		if ( ioport("DSW0")->read() & 0x80 )
-		{
-			space.install_read_bank(0xc000, 0xdfff, "bank10");
-			space.nop_write(0xc000, 0xdfff);
-			membank("bank10")->set_base(&ROM[0x0c000]);
-			logerror("cgenie DOS enabled\n");
-			memcpy(&ROM[0x0c000],&ROM[0x10000], 0x2000);
-		}
-		else
-		{
-			space.nop_readwrite(0xc000, 0xdfff);
-			logerror("cgenie DOS disabled (no floppy image given)\n");
-		}
-	}
-	else
-	{
-		space.nop_readwrite(0xc000, 0xdfff);
-		logerror("cgenie DOS disabled\n");
-		memset(&memregion("maincpu")->base()[0x0c000], 0x00, 0x2000);
-	}
-
-	/* copy EXT ROM, if enabled or wipe out that memory area */
-	if (ioport("DSW0")->read() & 0x20 && m_cart->exists())
-	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
-		logerror("cgenie EXT enabled\n");
-	}
-	else
-	{
-		space.nop_readwrite(0xe000, 0xefff);
-		logerror("cgenie EXT disabled\n");
-	}
-
 	m_cass_level = 0;
 	m_cass_bit = 1;
 }
@@ -125,8 +78,6 @@ void cgenie_state::machine_start()
 
 	/* initialize static variables */
 	m_irq_status = 0;
-	m_motor_drive = 0;
-	m_head = 0;
 	m_tv_mode = -1;
 	m_port_ff = 0xff;
 
@@ -147,6 +98,10 @@ void cgenie_state::machine_start()
 	m_videoram = m_ram->pointer();
 	membank("bank1")->set_base(m_ram->pointer());
 	machine().scheduler().timer_pulse(attotime::from_hz(11025), timer_expired_delegate(FUNC(cgenie_state::handle_cassette_input),this));
+
+	// setup expansion bus
+	m_exp->set_program_space(&m_maincpu->space(AS_PROGRAM));
+	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 /*************************************
@@ -319,83 +274,11 @@ WRITE8_MEMBER( cgenie_state::cgenie_psg_port_b_w )
 	m_psg_b_out = data;
 }
 
-READ8_MEMBER( cgenie_state::cgenie_status_r )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	/* If the floppy isn't emulated, return 0 */
-	if( (ioport("DSW0")->read() & 0x80) == 0 )
-		return 0;
-	return fdc->status_r(space, offset);
-}
-
-READ8_MEMBER( cgenie_state::cgenie_track_r )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	/* If the floppy isn't emulated, return 0xff */
-	if( (ioport("DSW0")->read() & 0x80) == 0 )
-		return 0xff;
-	return fdc->track_r(space, offset);
-}
-
-READ8_MEMBER( cgenie_state::cgenie_sector_r )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	/* If the floppy isn't emulated, return 0xff */
-	if( (ioport("DSW0")->read() & 0x80) == 0 )
-		return 0xff;
-	return fdc->sector_r(space, offset);
-}
-
-READ8_MEMBER( cgenie_state::cgenie_data_r )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	/* If the floppy isn't emulated, return 0xff */
-	if( (ioport("DSW0")->read() & 0x80) == 0 )
-		return 0xff;
-	return fdc->data_r(space, offset);
-}
-
-WRITE8_MEMBER( cgenie_state::cgenie_command_w )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	/* If the floppy isn't emulated, return immediately */
-	if( (ioport("DSW0")->read() & 0x80) == 0 )
-		return;
-	fdc->command_w(space, offset, data);
-}
-
-WRITE8_MEMBER( cgenie_state::cgenie_track_w )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	/* If the floppy isn't emulated, ignore the write */
-	if( (ioport("DSW0")->read() & 0x80) == 0 )
-		return;
-	fdc->track_w(space, offset, data);
-}
-
-WRITE8_MEMBER( cgenie_state::cgenie_sector_w )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	/* If the floppy isn't emulated, ignore the write */
-	if( (ioport("DSW0")->read() & 0x80) == 0 )
-		return;
-	fdc->sector_w(space, offset, data);
-}
-
-WRITE8_MEMBER( cgenie_state::cgenie_data_w )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	/* If the floppy isn't emulated, ignore the write */
-	if( (ioport("DSW0")->read() & 0x80) == 0 )
-		return;
-	fdc->data_w(space, offset, data);
-}
-
 READ8_MEMBER( cgenie_state::cgenie_irq_status_r )
 {
 	int result = m_irq_status;
 
-	m_irq_status &= ~(IRQ_TIMER | IRQ_FDC);
+	m_irq_status &= ~(IRQ_TIMER);
 	return result;
 }
 
@@ -408,54 +291,17 @@ INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_timer_interrupt)
 	}
 }
 
-WRITE_LINE_MEMBER(cgenie_state::cgenie_fdc_intrq_w)
+WRITE_LINE_MEMBER( cgenie_state::exp_intrq_w )
 {
-	/* if disc hardware is not enabled, do not cause an int */
-	if (!( ioport("DSW0")->read() & 0x80 ))
-		return;
+	m_irq_status &= ~IRQ_FDC;
+	m_irq_status |= state << 6;
 
-	if (state)
-	{
-		if( (m_irq_status & IRQ_FDC) == 0 )
-		{
-			m_irq_status |= IRQ_FDC;
-			m_maincpu->set_input_line(0, HOLD_LINE);
-		}
-	}
+	if (m_irq_status)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	else
-	{
-		m_irq_status &= ~IRQ_FDC;
-	}
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( cgenie_state::cgenie_motor_w )
-{
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	UINT8 drive = 255;
-
-	logerror("cgenie motor_w $%02X\n", data);
-
-	if( data & 1 )
-		drive = 0;
-	if( data & 2 )
-		drive = 1;
-	if( data & 4 )
-		drive = 2;
-	if( data & 8 )
-		drive = 3;
-
-	if( drive > 3 )
-		return;
-
-	/* mask head select bit */
-		m_head = (data >> 4) & 1;
-
-	/* currently selected drive */
-	m_motor_drive = drive;
-
-	fdc->set_drive(drive);
-	fdc->set_side(m_head);
-}
 
 /*************************************
  *      Keyboard                     *

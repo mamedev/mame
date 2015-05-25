@@ -116,5 +116,6 @@ files {
 	MAME_DIR .. "src/emu/netlist/devices/nld_system.h",
 	MAME_DIR .. "src/emu/netlist/devices/nld_cmos.h",
 	MAME_DIR .. "src/emu/netlist/devices/nld_signal.h",
+	MAME_DIR .. "src/emu/netlist/devices/nld_truthtable.c",
 	MAME_DIR .. "src/emu/netlist/devices/nld_truthtable.h",
 }

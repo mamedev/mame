@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:ElSemi
 #ifndef __VR0VIDEO_H__
 #define __VR0VIDEO_H__
 

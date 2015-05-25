@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Kevin Thacker
 /* Intel 8271 Floppy Disc Controller */
 /* used in BBC Micro B,Acorn Atom */

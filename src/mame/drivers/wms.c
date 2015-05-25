@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Fresca
 /**************************************************************************************************
 
   WMS 360 / 550 (also 3601?) CPU 1.5 Plus board
@@ -560,7 +560,7 @@ DRIVER_INIT_MEMBER(wms_state,wms)
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME        PARENT    MACHINE  INPUT     STATS      INIT  ROT    COMPANY  FULLNAME                          FLAGS
+//    YEAR  NAME        PARENT    MACHINE  INPUT     STATE      INIT  ROT    COMPANY  FULLNAME                          FLAGS
 
 GAME( 200?, wms,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 1)",   GAME_IS_SKELETON )
 GAME( 200?, wmsa,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 2)",   GAME_IS_SKELETON )

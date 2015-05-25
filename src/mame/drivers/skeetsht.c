@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Philip Bennett, Angelo Salese
 /***************************************************************************
 
     Dynamo Skeet Shot

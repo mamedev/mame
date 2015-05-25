@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Jaroslaw Burczynski
+// copyright-holders:Jarek Burczynski
 /*
 *   Video Driver for Forty-Love
 */

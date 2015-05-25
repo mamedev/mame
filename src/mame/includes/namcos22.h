@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Phil Stroffolino, hap, R.Belmont
+// copyright-holders:Phil Stroffolino, hap, R. Belmont
 /***************************************************************************
 
     Namco System 22 / Super System 22 hardware

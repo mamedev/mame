@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 #pragma once
 
 #ifndef __TMS3615_H__

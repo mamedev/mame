@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

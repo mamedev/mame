@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "sound/msm5205.h"
 #include "sound/2203intf.h"
 

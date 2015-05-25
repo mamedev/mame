@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Lee Taylor
 /***************************************************************************
 
 Universal board numbers (found on the schematics)

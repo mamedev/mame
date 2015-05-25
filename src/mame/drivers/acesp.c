@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
  sp.ACE system by ACE
  based roughly on the Mach2000 hardware used by Castle

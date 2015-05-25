@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli, Scott Stone
 /***************************************************************************
 
  Atari / Kee Games Driver - Discrete Games made in the 1970's

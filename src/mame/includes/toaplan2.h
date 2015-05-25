@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Quench, Yochizo
+// license:BSD-3-Clause
+// copyright-holders:Quench, Yochizo, David Haywood
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */

@@ -482,7 +482,7 @@ void validity_checker::validate_inlines()
 	if (resultu32 != expectedu32)
 		osd_printf_error("Error testing divu_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", (UINT32)testu64a, testu32a, resultu32, expectedu32);
 
-	if (fabs(recip_approx(100.0) - 0.01) > 0.0001)
+	if (fabsf(recip_approx(100.0f) - 0.01f) > 0.0001f)
 		osd_printf_error("Error testing recip_approx\n");
 
 	testi32a = (testi32a & 0x0000ffff) | 0x400000;

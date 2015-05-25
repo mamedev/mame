@@ -23,21 +23,21 @@ NETLIB_RESET(4066)
 NETLIB_UPDATE(4066)
 {
 	nl_double sup = (m_supply->vdd() - m_supply->vss());
-	nl_double low = 0.45 * sup;
-	nl_double high = 0.55 * sup;
+	nl_double low = NL_FCONST(0.45) * sup;
+	nl_double high = NL_FCONST(0.55) * sup;
 	nl_double in = INPANALOG(m_control) - m_supply->vss();
-	nl_double rON = m_base_r * 5.0 / sup;
+	nl_double rON = m_base_r * NL_FCONST(5.0) / sup;
 	nl_double R = -1.0;
 
 	if (in < low)
 	{
-		R = 1.0 / netlist().gmin();
+		R = NL_FCONST(1.0) / netlist().gmin();
 	}
 	else if (in > high)
 	{
 		R = rON;
 	}
-	if (R > 0.0)
+	if (R > NL_FCONST(0.0))
 	{
 		// We only need to update the net first if this is a time stepping net
 		if (1) // m_R.m_P.net().as_analog().solver()->is_timestep())

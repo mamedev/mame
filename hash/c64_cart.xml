@@ -4149,7 +4149,7 @@
 	</software>
 
 	<software name="aspargp">
-		<description>Aspar GTP Master</description>
+		<description>Aspar GP Master</description>
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="cart" interface="c64_cart">

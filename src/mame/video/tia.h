@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Wilbert Pol,Stefan Jokisch
 #ifndef _VIDEO_TIA_H_
 #define _VIDEO_TIA_H_
 

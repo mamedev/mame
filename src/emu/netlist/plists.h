@@ -14,31 +14,101 @@
 #include "pstring.h"
 
 // ----------------------------------------------------------------------------------------
-// plinearlist_t: a simple list
+// parray_t: dynamic array
 // ----------------------------------------------------------------------------------------
 
-template <class _ListClass, int _NumElem = 0>
-class plinearlist_t
+template <class _ListClass>
+class parray_t
 {
 public:
 
-	ATTR_COLD plinearlist_t(int numElements = _NumElem)
+	ATTR_COLD parray_t(int numElements)
+	: m_list(0), m_capacity(0)
 	{
-		m_num_elements = numElements;
-		if (m_num_elements == 0)
+		set_capacity(numElements);
+	}
+
+	ATTR_COLD parray_t(const parray_t &rhs)
+	: m_list(0), m_capacity(0)
+	{
+		set_capacity(rhs.capacity());
+		for (int i=0; i<m_capacity; i++)
+			m_list[i] = rhs[i];
+	}
+
+	ATTR_COLD parray_t &operator=(const parray_t &rhs)
+	{
+		set_capacity(rhs.capacity());
+		for (int i=0; i<m_capacity; i++)
+			m_list[i] = rhs[i];
+		return *this;
+	}
+
+	ATTR_COLD ~parray_t()
+	{
+		if (m_list != NULL)
+			nl_free_array(m_list);
+		m_list = NULL;
+	}
+
+	ATTR_HOT inline operator _ListClass *  () { return m_list; }
+	ATTR_HOT inline operator const _ListClass * () const { return m_list; }
+
+	/* using the [] operator will not allow gcc to vectorize code because
+	 * basically a pointer is returned.
+	 * array works around this.
+	 */
+
+	ATTR_HOT inline _ListClass *array() { return m_list; }
+
+	ATTR_HOT inline _ListClass& operator[](const int index) { return m_list[index]; }
+	ATTR_HOT inline const _ListClass& operator[](const int index) const { return m_list[index]; }
+
+	ATTR_HOT inline int capacity() const { return m_capacity; }
+
+protected:
+	ATTR_COLD void set_capacity(const int new_capacity)
+	{
+		if (m_list != NULL)
+			nl_free_array(m_list);
+		if (new_capacity > 0)
+			m_list = nl_alloc_array(_ListClass, new_capacity);
+		else
+			m_list = NULL;
+		m_capacity = new_capacity;
+	}
+
+private:
+	_ListClass * m_list;
+	int m_capacity;
+};
+
+// ----------------------------------------------------------------------------------------
+// plinearlist_t: a simple list
+// ----------------------------------------------------------------------------------------
+
+template <class _ListClass>
+class plist_t
+{
+public:
+
+	ATTR_COLD plist_t(const int numElements = 0)
+	{
+		m_capacity = numElements;
+		if (m_capacity == 0)
 			m_list = NULL;
 		else
-			m_list = nl_alloc_array(_ListClass, m_num_elements);
+			m_list = nl_alloc_array(_ListClass, m_capacity);
 		m_count = 0;
 	}
 
-	ATTR_COLD plinearlist_t(const plinearlist_t &rhs)
+	ATTR_COLD plist_t(const plist_t &rhs)
 	{
-		m_num_elements = rhs.capacity();
-		if (m_num_elements == 0)
+		m_capacity = rhs.capacity();
+		if (m_capacity == 0)
 			m_list = NULL;
 		else
-			m_list = nl_alloc_array(_ListClass, m_num_elements);
+			m_list = nl_alloc_array(_ListClass, m_capacity);
 		m_count = 0;
 		for (int i=0; i<rhs.count(); i++)
 		{
@@ -46,7 +116,7 @@ public:
 		}
 	}
 
-	ATTR_COLD plinearlist_t &operator=(const plinearlist_t &rhs)
+	ATTR_COLD plist_t &operator=(const plist_t &rhs)
 	{
 		this->clear();
 		for (int i=0; i<rhs.count(); i++)
@@ -57,7 +127,7 @@ public:
 	}
 
 
-	ATTR_COLD ~plinearlist_t()
+	ATTR_COLD ~plist_t()
 	{
 		if (m_list != NULL)
 			nl_free_array(m_list);
@@ -79,11 +149,11 @@ public:
 
 	ATTR_HOT inline void add(const _ListClass &elem)
 	{
-		if (m_count >= m_num_elements){
-			int new_size = m_num_elements * 2;
+		if (m_count >= m_capacity){
+			int new_size = m_capacity * 2;
 			if (new_size < 32)
 				new_size = 32;
-			resize(new_size);
+			set_capacity(new_size);
 		}
 
 		m_list[m_count++] = elem;
@@ -151,7 +221,7 @@ public:
 	ATTR_HOT inline int count() const { return m_count; }
 	ATTR_HOT inline bool is_empty() const { return (m_count == 0); }
 	ATTR_HOT inline void clear() { m_count = 0; }
-	ATTR_HOT inline int capacity() const { return m_num_elements; }
+	ATTR_HOT inline int capacity() const { return m_capacity; }
 
 	ATTR_COLD void clear_and_free()
 	{
@@ -163,16 +233,16 @@ public:
 	}
 
 private:
-	ATTR_COLD void resize(const int new_size)
+	ATTR_COLD void set_capacity(const int new_capacity)
 	{
 		int cnt = count();
-		if (new_size > 0)
+		if (new_capacity > 0)
 		{
-			_ListClass *m_new = nl_alloc_array(_ListClass, new_size);
+			_ListClass *m_new = nl_alloc_array(_ListClass, new_capacity);
 			_ListClass *pd = m_new;
 
-			if (cnt > new_size)
-				cnt = new_size;
+			if (cnt > new_capacity)
+				cnt = new_capacity;
 			for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
 				*pd = *ps;
 			if (m_list != NULL)
@@ -187,55 +257,52 @@ private:
 			m_list = NULL;
 			m_count = 0;
 		}
-		m_num_elements = new_size;
+		m_capacity = new_capacity;
 	}
 
 	int m_count;
 	_ListClass * m_list /* ATTR_ALIGN */;
-	int m_num_elements;
+	int m_capacity;
 };
 
 // ----------------------------------------------------------------------------------------
-// pnamedlist_t: a simple list
+// pnamedlist_t: a simple list of elements which have a name() interface
 // ----------------------------------------------------------------------------------------
 
-#if (defined(__sun__) && defined(__svr4__)) || defined(__ANDROID__) || defined(__OpenBSD__)
-#undef _C
-#endif
-
-template <class _C>
-class pnamedlist_t : public plinearlist_t<_C>
+template <class _ListClass>
+class pnamedlist_t : public plist_t<_ListClass>
 {
 public:
-	_C find(const pstring name) const
+	_ListClass find(const pstring &name) const
 	{
 		for (int i=0; i < this->count(); i++)
 			if (get_name((*this)[i]) == name)
 				return (*this)[i];
-		return _C(NULL);
+		return _ListClass(NULL);
 	}
 
-	void remove_by_name(const pstring name)
+	void remove_by_name(const pstring &name)
 	{
-		plinearlist_t<_C>::remove(find(name));
+		plist_t<_ListClass>::remove(find(name));
 	}
 
-	bool add(_C dev, bool allow_duplicate)
+	bool add(_ListClass dev, bool allow_duplicate)
 	{
 		if (allow_duplicate)
-			plinearlist_t<_C>::add(dev);
+			plist_t<_ListClass>::add(dev);
 		else
 		{
-			if (!(this->find(get_name(dev)) == _C(NULL)))
+			if (!(this->find(get_name(dev)) == _ListClass(NULL)))
 				return false;
-			plinearlist_t<_C>::add(dev);
+			plist_t<_ListClass>::add(dev);
 		}
 		return true;
 	}
 
 private:
-	template <typename T> static const pstring get_name(T &elem) { return elem.name(); }
+	template <typename T> static const pstring get_name(const T *elem) { return elem->name(); }
 	template <typename T> static const pstring get_name(T *elem) { return elem->name(); }
+	template <typename T> static const pstring get_name(const T &elem) { return elem.name(); }
 
 };
 
@@ -244,12 +311,12 @@ private:
 // pstack_t: a simple stack
 // ----------------------------------------------------------------------------------------
 
-template <class _StackClass, int _NumElem = 128>
+template <class _StackClass>
 class pstack_t
 {
 public:
 
-	ATTR_COLD pstack_t(int numElements = _NumElem)
+	ATTR_COLD pstack_t(const int numElements = 128)
 	: m_list(numElements)
 	{
 	}
@@ -293,7 +360,7 @@ public:
 	ATTR_HOT inline int capacity() const { return m_list.capacity(); }
 
 private:
-	plinearlist_t<_StackClass, _NumElem> m_list;
+	plist_t<_StackClass> m_list;
 };
 
 template <class _ListClass>

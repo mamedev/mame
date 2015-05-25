@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:David Haywood, ElSemi, ???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ElSemi
 
 #include "machine/v3021.h"
 #include "cpu/z80/z80.h"

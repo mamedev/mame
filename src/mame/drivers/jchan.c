@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
     Jackie Chan The Kung-Fu Master

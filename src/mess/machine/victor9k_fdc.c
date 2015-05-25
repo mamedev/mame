@@ -577,7 +577,7 @@ void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_ti
 		if (!floppy->mon_r()) {
 			float tach = rpm[da] / 60 * SPINDLE_RATIO * MOTOR_POLES;
 
-			if (LOG_SCP) logerror("%s: motor speed %u rpm / tach %0.1f hz (DA %02x)\n", floppy->tag(), rpm[da], tach, da);
+			if (LOG_SCP) logerror("%s: motor speed %u rpm / tach %0.1f hz (DA %02x)\n", floppy->tag(), rpm[da], (double) tach, da);
 
 			t_tach->adjust(attotime::from_hz(tach*2), 0, attotime::from_hz(tach*2));
 			floppy->set_rpm(rpm[da]);

@@ -1,49 +1,10 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /***************************************************************************
 
     netlist.h
 
     Discrete netlist implementation.
-
-****************************************************************************
-
-    Couriersud reserves the right to license the code under a less restrictive
-    license going forward.
-
-    Copyright Nicola Salmoria and the MAME team
-    All rights reserved.
-
-    Redistribution and use of this code or any derivative works are permitted
-    provided that the following conditions are met:
-
-    * Redistributions may not be sold, nor may they be used in a commercial
-    product or activity.
-
-    * Redistributions that are modified from the original source must include the
-    complete source code, including the source code for all components used by a
-    binary built from the modified sources. However, as a special exception, the
-    source code distributed need not include anything that is normally distributed
-    (in either source or binary form) with the major components (compiler, kernel,
-    and so on) of the operating system on which the executable runs, unless that
-    component itself accompanies the executable.
-
-    * Redistributions must reproduce the above copyright notice, this list of
-    conditions and the following disclaimer in the documentation and/or other
-    materials provided with the distribution.
-
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-
 
 ****************************************************************************/
 
@@ -104,27 +65,6 @@
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)
-
-
-#if 0
-#define NETDEV_ANALOG_CALLBACK(_name, _IN, _class, _member, _tag) \
-		{ \
-			NETLIB_NAME(analog_callback) *dev = downcast<NETLIB_NAME(analog_callback) *>(netlist.register_dev(NET_NEW(analog_callback), # _name)); \
-			netlist_analog_output_delegate d = netlist_analog_output_delegate(& _class :: _member, # _class "::" # _member, _tag, (_class *) 0); \
-			dev->register_callback(d); \
-		} \
-		NET_CONNECT(_name, IN, _IN)
-#endif
-
-#if 0
-#define NETDEV_SOUND_OUT(_name, _v, _m)                                             \
-		NET_REGISTER_DEV(sound_out, _name)                                          \
-		PARAM(_name.CHAN, _v)                                                       \
-		PARAM(_name.MULT, _m)
-
-#define NETDEV_SOUND_IN(_name)                                                      \
-		NET_REGISTER_DEV(sound_in, _name)
-#endif
 
 class netlist_mame_device_t;
 
@@ -557,7 +497,7 @@ class NETLIB_NAME(analog_callback) : public netlist_device_t
 {
 public:
 	NETLIB_NAME(analog_callback)()
-		: netlist_device_t(), m_cpu_device(NULL) { }
+		: netlist_device_t(), m_cpu_device(NULL), m_last(0) { }
 
 	ATTR_COLD void start()
 	{
@@ -640,7 +580,7 @@ public:
 
 	ATTR_HOT void update()
 	{
-		double val = INPANALOG(m_in);
+		nl_double val = INPANALOG(m_in);
 		sound_update(netlist().time());
 		m_cur = (stream_sample_t) (val * m_mult.Value() + m_offset.Value());
 	}
@@ -724,7 +664,7 @@ public:
 		{
 			if (m_buffer[i] == NULL)
 				break; // stop, called outside of stream_update
-			double v = m_buffer[i][m_pos];
+			nl_double v = m_buffer[i][m_pos];
 			m_param[i]->setTo(v * m_param_mult[i].Value() + m_param_offset[i].Value());
 		}
 		m_pos++;

@@ -1,10 +1,10 @@
 // license:???
-// copyright-holders:Jaroslaw Burczynski
+// copyright-holders:Jarek Burczynski
 /****************************************************************************
 
     Forty-Love (c) Taito 1984
 
-    driver by Jaroslaw Burczynski
+    driver by Jarek Burczynski
 
 ****************************************************************************/
 

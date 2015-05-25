@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * Fujitsu FM-7 cassette format handling
  */

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef __BUFFER_H__
 #define __BUFFER_H__
 

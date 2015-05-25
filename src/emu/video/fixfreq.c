@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Couriersud
 /***************************************************************************
 
     fixfreq.h
@@ -261,12 +261,6 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 			col = rgb_t(colv, colv, colv);
 		}
 
-		while (0 && pixels >= m_htotal)
-		{
-			bm->plot_box(m_last_x, m_last_y + m_sig_field * has_fields, m_htotal - 1 - m_last_x, 1, col);
-			pixels -= m_htotal;
-			m_last_x = 0;
-		}
 		bm->plot_box(m_last_x, m_last_y + m_sig_field * has_fields, pixels - m_last_x, 1, col);
 		m_last_x = pixels;
 	}
@@ -286,7 +280,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 
 	if (sync & 1)
 	{
-		m_last_y = m_vbackporch - m_vsync; // 6; // FIXME: needed for pong - need to be able to adjust screen parameters
+		m_last_y = m_vbackporch - m_vsync;
 		// toggle bitmap
 		m_cur_bm ^= 1;
 		update_screen_parameters(time - m_last_vsync_time);

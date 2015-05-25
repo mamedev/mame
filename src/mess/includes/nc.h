@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:GPL-2.0+
 // copyright-holders:Wilbert Pol, Kevin Thacker
 /*****************************************************************************
  *

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /*******************************************************************************
 
     Input port macros used by many games in multiple KONAMI drivers

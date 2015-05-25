@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #pragma once
 #ifndef BFM_BD1_H
 #define BFM_BD1_H

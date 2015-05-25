@@ -224,7 +224,7 @@ READ8_MEMBER(ufo_state::crane_limits_r)
 	}
 
 	// d6: crane open sensor (reflective sticker on the stepper motor rotation disc)
-	if (m_player[p].motor[3].position >= 0.97)
+	if (m_player[p].motor[3].position >= 0.97f)
 		ret ^= 0x40;
 
 	// d7: prize sensor (mirror?)
@@ -358,7 +358,7 @@ READ8_MEMBER(ufo_state::ex_crane_open_r)
 	for (int p = 0; p < 2; p++)
 	{
 		// d0: crane open sensor
-		if (m_player[p].motor[3].position >= 0.97)
+		if (m_player[p].motor[3].position >= 0.97f)
 			ret ^= (1 << (p*4));
 
 		// d1: coincounter is plugged in (ufo800 gives error 14 otherwise)

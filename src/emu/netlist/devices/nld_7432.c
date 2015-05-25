@@ -7,6 +7,18 @@
 
 #include "nld_7432.h"
 
+#if (USE_TRUTHTABLE)
+nld_7432::truthtable_t nld_7432::m_ttbl;
+const char *nld_7432::m_desc[] = {
+		"A,B|Q ",
+		"1,X|1|22",
+		"0,1|1|22",
+		"0,0|0|15",
+		""
+};
+
+#endif
+
 NETLIB_START(7432_dip)
 {
 	register_sub("1", m_1);

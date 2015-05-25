@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*******************************************************************************
  Shadow Force (c)1993 Technos

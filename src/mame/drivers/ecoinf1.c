@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Electrocoin Older (original?) HW type
 
   this appears to be the earliest of the Electrocoin hardware

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __SEGA8_ROM_H
 #define __SEGA8_ROM_H
 

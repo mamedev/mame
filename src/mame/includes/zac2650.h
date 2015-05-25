@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Mike Coates
 #include "machine/s2636.h"
 

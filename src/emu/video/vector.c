@@ -164,7 +164,7 @@ void vector_device::device_start()
 void vector_device::set_flicker(float _flicker)
 {
 	m_flicker_correction = _flicker;
-	m_flicker = (int)(m_flicker_correction * 2.55);
+	m_flicker = (int)(m_flicker_correction * 2.55f);
 }
 
 float vector_device::get_flicker()

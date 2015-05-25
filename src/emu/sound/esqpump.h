@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Christian Brunschen
 #pragma once
 
 #ifndef _ESQPUMP_H_

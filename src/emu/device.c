@@ -122,6 +122,9 @@ device_t::~device_t()
 //  info for a given region
 //-------------------------------------------------
 
+// NOTE: this being NULL in a C++ member function can lead to undefined behavior.
+// However, it is relied on throughout MAME, so will remain for now.
+
 memory_region *device_t::memregion(const char *_tag) const
 {
 	// safety first

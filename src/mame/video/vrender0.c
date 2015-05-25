@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:ElSemi
 #include "emu.h"
 #include "vrender0.h"
 

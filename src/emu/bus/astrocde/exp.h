@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __ASTROCADE_EXP_H
 #define __ASTROCADE_EXP_H
 

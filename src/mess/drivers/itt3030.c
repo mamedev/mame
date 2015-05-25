@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:rfka01
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Olivier Galibert
 /***************************************************************************
 
     ITT 3030

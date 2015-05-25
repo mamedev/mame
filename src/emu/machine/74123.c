@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Couriersud
 /*****************************************************************************
 
     74123 monoflop emulator - see 74123.h for pin out and truth table

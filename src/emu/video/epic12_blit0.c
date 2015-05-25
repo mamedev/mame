@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #define REALLY_SIMPLE 0
 /* Non-Flipped, Non-Tinted, Transparent */
 #define FLIPX 0

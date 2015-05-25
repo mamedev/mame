@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 #ifndef GENPIN_H_
 #define GENPIN_H_
 

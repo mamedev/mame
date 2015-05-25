@@ -22,7 +22,7 @@
 */
 #include "nld_9312.h"
 
-#if (USE_TRUTHTABLE)
+#if (1 && USE_TRUTHTABLE)
 nld_9312::truthtable_t nld_9312::m_ttbl;
 
 /* FIXME: Data changes are propagating faster than changing selects A,B,C
@@ -57,25 +57,26 @@ const char *nld_9312::m_desc[] = {
 NETLIB_UPDATE(9312)
 {
 	const UINT8 G = INPLOGIC(m_G);
-	if ((m_last_G ^ G) == 1)
+	if (G)
 	{
 		static const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(19) };
-		OUTLOGIC(m_Y, !G, delay[!G]);
-		OUTLOGIC(m_YQ, G, delay[G]);
-		if (G)
+		OUTLOGIC(m_Y, 0, delay[0]);
+		OUTLOGIC(m_YQ, 1, delay[1]);
+
+		m_A.inactivate();
+		m_B.inactivate();
+		m_C.inactivate();
+		m_last_G = G;
+	}
+	else
+	{
+		if (m_last_G)
 		{
-			m_A.inactivate();
-			m_B.inactivate();
-			m_C.inactivate();
-		} else {
+			m_last_G = G;
 			m_A.activate();
 			m_B.activate();
 			m_C.activate();
 		}
-		m_last_G = G;
-	}
-	if (!G)
-	{
 		static const netlist_time delay[2] = { NLTIME_FROM_NS(33), NLTIME_FROM_NS(28) };
 		const UINT8 chan = INPLOGIC(m_A) | (INPLOGIC(m_B)<<1) | (INPLOGIC(m_C)<<2);
 		if (m_last_chan != chan)
@@ -125,7 +126,7 @@ NETLIB_START(9312_dip)
 {
 	register_sub("1", m_sub);
 
-#if (USE_TRUTHTABLE)
+#if (1 && USE_TRUTHTABLE)
 
 	register_subalias("13", m_sub.m_i[0]);
 	register_subalias("12", m_sub.m_i[1]);

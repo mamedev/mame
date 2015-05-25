@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:etabeta
+// license:GPL-2.0+
+// copyright-holders:Fabio Priuli, byuu
 /***********************************************************************************************************
 
  SPC-7110 add-on chip emulation (for SNES/SFC)

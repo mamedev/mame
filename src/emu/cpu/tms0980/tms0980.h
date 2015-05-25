@@ -226,6 +226,12 @@ public:
 	tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class tms1040_cpu_device : public tms1000_cpu_device
+{
+public:
+	tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 class tms1200_cpu_device : public tms1000_cpu_device
 {

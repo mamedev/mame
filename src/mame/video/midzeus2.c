@@ -352,8 +352,8 @@ UINT32 midzeus2_state::screen_update_midzeus2(screen_device &screen, bitmap_rgb3
 
 	poly_wait(poly, "VIDEO_UPDATE");
 
-if (machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
-if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
+if (machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", (double) zbase); }
+if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", (double) zbase); }
 
 	/* normal update case */
 	if (!machine().input().code_pressed(KEYCODE_W))
@@ -808,12 +808,12 @@ int midzeus2_state::zeus2_fifo_process(const UINT32 *data, int numwords)
 			{
 				log_fifo_command(data, numwords, "");
 				logerror("\n\t\tmatrix ( %8.2f %8.2f %8.2f ) ( %8.2f %8.2f %8.2f ) ( %8.2f %8.2f %8.2f )\n\t\tvector %8.2f %8.2f %8.5f\n",
-					zeus_matrix[0][0], zeus_matrix[0][1], zeus_matrix[0][2],
-					zeus_matrix[1][0], zeus_matrix[1][1], zeus_matrix[1][2],
-					zeus_matrix[2][0], zeus_matrix[2][1], zeus_matrix[2][2],
-					zeus_point[0],
-					zeus_point[1],
-					zeus_point[2]);
+						(double) zeus_matrix[0][0], (double) zeus_matrix[0][1], (double) zeus_matrix[0][2],
+						(double) zeus_matrix[1][0], (double) zeus_matrix[1][1], (double) zeus_matrix[1][2],
+						(double) zeus_matrix[2][0], (double) zeus_matrix[2][1], (double) zeus_matrix[2][2],
+						(double) zeus_point[0],
+						(double) zeus_point[1],
+						(double) zeus_point[2]);
 			}
 			break;
 
@@ -833,9 +833,9 @@ int midzeus2_state::zeus2_fifo_process(const UINT32 *data, int numwords)
 			{
 				log_fifo_command(data, numwords, "");
 				logerror("\n\t\tvector %8.2f %8.2f %8.5f\n",
-					zeus_point[0],
-					zeus_point[1],
-					zeus_point[2]);
+						(double) zeus_point[0],
+						(double) zeus_point[1],
+						(double) zeus_point[2]);
 			}
 			break;
 
@@ -847,9 +847,9 @@ int midzeus2_state::zeus2_fifo_process(const UINT32 *data, int numwords)
 			{
 				log_fifo_command(data, numwords, " -- unknown control + hack clear screen\n");
 				logerror("\t\tvector %8.2f %8.2f %8.5f\n",
-					tms3203x_device::fp_to_float(data[1]),
-					tms3203x_device::fp_to_float(data[2]),
-					tms3203x_device::fp_to_float(data[3]));
+						(double) tms3203x_device::fp_to_float(data[1]),
+						(double) tms3203x_device::fp_to_float(data[2]),
+						(double) tms3203x_device::fp_to_float(data[3]));
 
 				/* extract the translation point from the raw data */
 				zeus_point2[0] = tms3203x_device::fp_to_float(data[1]);
@@ -1162,7 +1162,7 @@ In memory:
 		if (logit)
 		{
 			logerror("\t\t(%f,%f,%f) (%02X,%02X)\n",
-					vert[i].x, vert[i].y, vert[i].p[0],
+					(double) vert[i].x, (double) vert[i].y, (double) vert[i].p[0],
 					(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f));
 		}
 	}
@@ -1188,7 +1188,7 @@ In memory:
 		maxx = MAX(maxx, clipvert[i].x);
 		maxy = MAX(maxy, clipvert[i].y);
 		if (logit)
-			logerror("\t\t\tTranslated=(%f,%f)\n", clipvert[i].x, clipvert[i].y);
+			logerror("\t\t\tTranslated=(%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y);
 	}
 	for (i = 0; i < numverts; i++)
 	{

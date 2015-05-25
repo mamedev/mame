@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Derrick Renaud, Couriersud
 #include "emu.h"
 #include "flt_vol.h"
 

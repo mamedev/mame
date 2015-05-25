@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Roberto Fresca,David Haywood
+// copyright-holders:Angelo Salese, Roberto Fresca, David Haywood
 /******************************************************************************
 
   MAGIC CARD - IMPERA

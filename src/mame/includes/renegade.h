@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 #include "sound/msm5205.h"
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Couriersud
 /*
  * Couriersud, July 2014:
  *

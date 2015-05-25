@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
 
   ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.1

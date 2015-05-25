@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Jonathan Gevaryahu
 #include "sound/2151intf.h"
 #include "cpu/z80/z80.h"
 

@@ -1,10 +1,10 @@
 // license:???
-// copyright-holders:Allard Van Der Bas
+// copyright-holders:Allard van der Bas
 /***************************************************************************
 
     Mikie memory map (preliminary)
 
-    driver by Allard Van Der Bas
+    driver by Allard van der Bas
 
 
     MAIN BOARD:

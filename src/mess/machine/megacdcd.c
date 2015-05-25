@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* CD controller code from megacd.c, used by Sega CD / Mega CD */
 

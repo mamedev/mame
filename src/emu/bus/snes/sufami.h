@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __SNS_SUFAMI_H
 #define __SNS_SUFAMI_H
 

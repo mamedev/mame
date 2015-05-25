@@ -99,8 +99,8 @@ const device_type SONY_OA_D32V = &device_creator<sony_oa_d32v>;
 #if 0
 const device_type TEAC_FD_55A = &device_creator<teac_fd_55a>;
 const device_type TEAC_FD_55B = &device_creator<teac_fd_55b>;
-const device_type TEAC_FD_55E = &device_creator<teac_fd_55e>;
 #endif
+const device_type TEAC_FD_55E = &device_creator<teac_fd_55e>;
 const device_type TEAC_FD_55F = &device_creator<teac_fd_55f>;
 const device_type TEAC_FD_55G = &device_creator<teac_fd_55g>;
 
@@ -250,7 +250,7 @@ void floppy_image_device::set_rpm(float _rpm)
 
 	rpm = _rpm;
 	rev_time = attotime::from_double(60/rpm);
-	floppy_ratio_1 = int(1000*rpm/300+0.5);
+	floppy_ratio_1 = int(1000.0f*rpm/300.0f+0.5f);
 }
 
 void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
@@ -269,6 +269,11 @@ void floppy_image_device::commit_image()
 	io.file = (device_image_interface *)this;
 	io.procs = &image_ioprocs;
 	io.filler = 0xff;
+
+	file_error err = core_truncate(image_core_file(), 0);
+	if (err != 0)
+		popmessage("Error, unable to truncate image: %d", err);
+
 	output_format->save(&io, image);
 }
 
@@ -432,6 +437,28 @@ bool floppy_image_device::call_create(int format_type, option_resolution *format
 {
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	output_format = 0;
+
+	// search for a suitable format based on the extension
+	for(floppy_image_format_t *i = fif_list; i; i = i->next)
+	{
+		// only consider formats that actually support saving
+		if(!i->supports_save())
+			continue;
+
+		if (i->extension_matches(basename()))
+		{
+			output_format = i;
+			break;
+		}
+	}
+
+	// did we find a suitable format?
+	if (output_format == 0)
+	{
+		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
+		return IMAGE_INIT_FAIL;
+	}
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -1772,6 +1799,41 @@ void sony_oa_d32v::handled_variants(UINT32 *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 	variants[var_count++] = floppy_image::SSDD;
+}
+
+//-------------------------------------------------
+//  TEAC FD-55E
+//
+//  track to track: 3 ms
+//  average: 94 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_55e::teac_fd_55e(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, TEAC_FD_55F, "TEAC FD-55E FDD", tag, owner, clock, "teac_fd_55e", __FILE__)
+{
+}
+
+teac_fd_55e::~teac_fd_55e()
+{
+}
+
+void teac_fd_55e::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 80;
+	sides = 1;
+	set_rpm(300);
+}
+
+void teac_fd_55e::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::SSQD;
 }
 
 //-------------------------------------------------

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Mariusz Wojcieszek, R. Belmont
 #ifndef _MC68681_H
 #define _MC68681_H
 

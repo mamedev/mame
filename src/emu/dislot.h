@@ -75,7 +75,7 @@ public:
 	device_slot_option *next() const { return m_next; }
 	const char *name() const { return m_name; }
 	const device_type &devtype() const { return m_devtype; }
-	const bool selectable() const { return m_selectable; }
+	bool selectable() const { return m_selectable; }
 	const char *default_bios() const { return m_default_bios; }
 	machine_config_constructor machine_config() const { return m_machine_config; }
 	const input_device_default *input_device_defaults() const { return m_input_device_defaults; }
@@ -112,7 +112,7 @@ public:
 	static void static_set_option_machine_config(device_t &device, const char *option, const machine_config_constructor machine_config) { static_option(device, option)->m_machine_config = machine_config; }
 	static void static_set_option_device_input_defaults(device_t &device, const char *option, const input_device_default *default_input) { static_option(device, option)->m_input_device_defaults = default_input; }
 	static void static_set_option_clock(device_t &device, const char *option, UINT32 default_clock) { static_option(device, option)->m_clock = default_clock; }
-	const bool fixed() const { return m_fixed; }
+	bool fixed() const { return m_fixed; }
 	const char *default_option() const { return m_default_option; }
 	device_slot_option *first_option() const { return m_options.first(); }
 	device_slot_option *option(const char *name) const { if (name) return m_options.find(name); return NULL; }

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Yves
 /*     vlc.c
 Multi-games from VLC Nevada 1995
 CGA monitor 15Khz 60hz

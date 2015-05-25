@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* This is the tilemap chip used by Grand Striker, Tecmo World Cup '94 and V Goal Soccer for the backgrounds
 
   the actual line scroll / zoom is not properly understood

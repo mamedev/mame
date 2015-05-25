@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:hap
 /***************************************************************************
 
   Namco Cosmoswat, a lightgun game that uses a projector and a bunch of

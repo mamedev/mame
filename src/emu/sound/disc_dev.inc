@@ -5,7 +5,7 @@
  *  Written by Keith Wilkins (mame@dysfunction.demon.co.uk)
  *
  *  (c) K.Wilkins 2000
- *  (c) D.Renaud 2003-2004
+ *  (c) Derrick Renaud 2003-2004
  *
  ************************************************************************
  *

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Paul Priest, David Haywood
+// license:BSD-3-Clause
+// copyright-holders:Paul Priest, David Haywood, Luca Elia
 /***************************************************************************
 
                           -= Fuuki 32 Bit Games (FG-3) =-

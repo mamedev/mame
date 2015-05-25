@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Kevin Thacker
 #pragma once
 
 #ifndef __BEEP_H__

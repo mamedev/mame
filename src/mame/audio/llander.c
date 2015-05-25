@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Keith Wilkins
 /***************************************************************************
 
     Lunar Lander Specific Sound Code
