@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,trap15,Angelo Salese,Luca Elia
+// copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshal,Angelo Salese,Luca Elia
 /********************************************************************
 
 Task Force Harrier       1989 UPL        68000 Z80           YM2203 2xOKIM6295
@@ -29,7 +29,7 @@ Bombjack Twin            1993 NMK        68000               2xOKIM6295
 Nouryoku Koujou Iinkai   1995 Tecmo      68000               2xOKIM6295
 
 driver by Mirko Buffoni, Richard Bush, Nicola Salmoria, Bryan McPhail,
-          David Haywood, R. Belmont, trap15 and Luca Elia.
+          David Haywood, R. Belmont, Alex Marshal and Luca Elia.
 
 Afega based their hardware on the NMK hardware, not surprising considering Twin
 Action is simply a hack of USSAF Mustang.

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,trap15
+// copyright-holders:David Haywood,Alex Marshal
 /***************************************************************************
 
  NMK004 emulation
