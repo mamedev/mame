@@ -18,16 +18,24 @@
 
 // Compiling without mame ?
 
+#include <algorithm>
+#include <cstdarg>
+
 #if !(PSTANDALONE)
 #include "osdcore.h"
+
+#undef ATTR_COLD
+#define ATTR_COLD
 
 #else
 #include <stdint.h>
 
 /* not supported in GCC prior to 4.4.x */
 /* ATTR_HOT and ATTR_COLD cause performance degration in 5.1 */
-#define ATTR_HOT
+//#define ATTR_HOT
 #define ATTR_COLD
+#define ATTR_HOT                __attribute__((hot))
+//#define ATTR_COLD               __attribute__((cold))
 
 #define RESTRICT
 #define EXPECTED(x)		(x)

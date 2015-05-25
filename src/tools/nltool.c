@@ -10,7 +10,13 @@
 
 #include <cstdio>
 
+#ifdef PSTANDALONE
 #if (PSTANDALONE)
+#define PSTANDALONE_PROVIDED
+#endif
+#endif
+
+#ifdef PSTANDALONE_PROVIDED
 
 #include <ctime>
 
@@ -27,9 +33,8 @@
 inline osd_ticks_t osd_ticks_per_second() { return CLOCKS_PER_SEC; }
 
 osd_ticks_t osd_ticks(void) { return clock(); }
-
-
 #else
+
 #include "netlist/poptions.h"
 #include "netlist/pstring.h"
 #include "netlist/plists.h"

@@ -155,7 +155,6 @@
 #ifndef NLBASE_H_
 #define NLBASE_H_
 
-#include "nl_config.h"
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "nl_util.h"

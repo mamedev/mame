@@ -7,9 +7,6 @@
 #ifndef _PSTRING_H_
 #define _PSTRING_H_
 
-#include <algorithm>
-#include <cstdarg>
-
 #include "pconfig.h"
 
 // ----------------------------------------------------------------------------------------

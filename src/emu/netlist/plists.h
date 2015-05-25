@@ -10,7 +10,6 @@
 #ifndef PLISTS_H_
 #define PLISTS_H_
 
-#include "nl_config.h"
 #include "palloc.h"
 #include "pstring.h"
 
