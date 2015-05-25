@@ -6,9 +6,6 @@
 
     Compute weights for resistors networks.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ******************************************************************************
 
     Function can evaluate from one to three networks at a time.

@@ -6,9 +6,6 @@
 
     VMX/Altivec optimised RGB utilities.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #ifndef __RGBVMX__

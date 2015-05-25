@@ -4,9 +4,6 @@
 
     AMD AM9517A/8237A Multimode DMA Controller emulation
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
                             _____   _____
                   _IOR   1 |*    \_/     | 40  A7

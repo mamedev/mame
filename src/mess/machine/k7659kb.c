@@ -4,9 +4,6 @@
 
     K7659 keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #include "k7659kb.h"
