@@ -97,9 +97,9 @@ public:
 	};
 
 	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t &params);
-	ATTR_COLD virtual ~netlist_matrix_solver_t();
+	/* ATTR_COLD */ virtual ~netlist_matrix_solver_t();
 
-	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
+	/* ATTR_COLD */ virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
 
 	template<class C>
 	void solve_base(C *p);
@@ -117,11 +117,11 @@ public:
 
 	/* netdevice functions */
 	ATTR_HOT  virtual void update();
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void reset();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void reset();
 
 	ATTR_COLD int get_net_idx(netlist_net_t *net);
-	ATTR_COLD virtual void log_stats() {};
+	/* ATTR_COLD */ virtual void log_stats() {};
 
 	inline eSolverType type() const { return m_type; }
 
@@ -133,7 +133,7 @@ protected:
 	// should return next time step
 	ATTR_HOT virtual nl_double vsolve() = 0;
 
-	ATTR_COLD virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
+	/* ATTR_COLD */ virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
 
 	plist_t<netlist_analog_net_t *> m_nets;
 	plist_t<netlist_analog_output_t *> m_inps;
@@ -170,7 +170,7 @@ public:
 	NETLIB_NAME(solver)()
 	: netlist_device_t()    { }
 
-	ATTR_COLD virtual ~NETLIB_NAME(solver)();
+	/* ATTR_COLD */ virtual ~NETLIB_NAME(solver)();
 
 	ATTR_COLD void post_start();
 	ATTR_COLD void stop();

@@ -44,7 +44,7 @@ public:
 		return *this;
 	}
 
-	ATTR_COLD ~parray_t()
+	~parray_t()
 	{
 		if (m_list != NULL)
 			pfree_array(m_list);
@@ -127,7 +127,7 @@ public:
 	}
 
 
-	ATTR_COLD ~plist_t()
+	~plist_t()
 	{
 		if (m_list != NULL)
 			pfree_array(m_list);
@@ -333,7 +333,7 @@ public:
 	}
 
 
-	ATTR_COLD ~pstack_t()
+	~pstack_t()
 	{
 	}
 

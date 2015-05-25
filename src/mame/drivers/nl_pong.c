@@ -9,6 +9,8 @@
 
 #include "netlist/devices/net_lib.h"
 
+#define FAST_CLOCK	(1)
+
 NETLIST_START(pong_fast)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
@@ -22,15 +24,15 @@ NETLIST_START(pong_fast)
 	TTL_INPUT(low, 0)
 
 #if 1
-#if 0
-	/* this is the clock circuit in schematics. */
-	MAINCLOCK(xclk, 7159000.0*2)
-	TTL_74107(ic_f6a, xclk, high, high, high)
-	ALIAS(clk, ic_f6a.Q)
-#else
+#if (FAST_CLOCK)
 	/* abstracting this, performance increases by 60%
 	 * No surprise, the clock is extremely expensive */
 	MAINCLOCK(clk, 7159000.0)
+#else
+	/* this is the clock circuit in schematics. */
+	MAINCLOCK(xclk, 14318000.0) //7159000.0*2
+	TTL_74107(ic_f6a, xclk, high, high, high)
+	ALIAS(clk, ic_f6a.Q)
 #endif
 #else
 	// benchmarking ...

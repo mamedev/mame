@@ -93,7 +93,7 @@ public:
 	{
 	}
 
-	ATTR_COLD virtual void start()
+	/* ATTR_COLD */ virtual void start()
 	{
 		pstring ttline = pstring(m_desc[0]);
 

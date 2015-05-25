@@ -138,7 +138,7 @@ public:
 	ATTR_COLD NETLIB_NAME(gnd)()
 			: netlist_device_t(GND) { }
 
-	ATTR_COLD virtual ~NETLIB_NAME(gnd)() {}
+	/* ATTR_COLD */ virtual ~NETLIB_NAME(gnd)() {}
 
 protected:
 
@@ -171,7 +171,7 @@ public:
 	ATTR_COLD NETLIB_NAME(dummy_input)()
 			: netlist_device_t(DUMMY) { }
 
-	ATTR_COLD virtual ~NETLIB_NAME(dummy_input)() {}
+	/* ATTR_COLD */ virtual ~NETLIB_NAME(dummy_input)() {}
 
 protected:
 
@@ -203,7 +203,7 @@ public:
 	ATTR_COLD NETLIB_NAME(frontier)()
 			: netlist_device_t(DUMMY) { }
 
-	ATTR_COLD virtual ~NETLIB_NAME(frontier)() {}
+	/* ATTR_COLD */ virtual ~NETLIB_NAME(frontier)() {}
 
 protected:
 
@@ -238,7 +238,7 @@ public:
 	ATTR_COLD NETLIB_NAME(res_sw)()
 			: netlist_device_t() { }
 
-	ATTR_COLD virtual ~NETLIB_NAME(res_sw)() {}
+	/* ATTR_COLD */ virtual ~NETLIB_NAME(res_sw)() {}
 
 	netlist_param_double_t m_RON;
 	netlist_param_double_t m_ROFF;
@@ -271,14 +271,14 @@ public:
 		m_proxy_term = &proxy_inout;
 	}
 
-	ATTR_COLD virtual ~nld_base_proxy() {}
+	/* ATTR_COLD */ virtual ~nld_base_proxy() {}
 
 	ATTR_COLD netlist_logic_t &term_proxied() const { return *m_term_proxied; }
 	ATTR_COLD netlist_core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 protected:
 
-	ATTR_COLD virtual const netlist_logic_family_desc_t &logic_family() const
+	/* ATTR_COLD */ virtual const netlist_logic_family_desc_t &logic_family() const
 	{
 		return *m_logic_family;
 	}
@@ -301,7 +301,7 @@ public:
 	{
 	}
 
-	ATTR_COLD virtual ~nld_a_to_d_proxy() {}
+	/* ATTR_COLD */ virtual ~nld_a_to_d_proxy() {}
 
 	netlist_analog_input_t m_I;
 	netlist_logic_output_t m_Q;
@@ -343,12 +343,12 @@ public:
 	{
 	}
 
-	ATTR_COLD virtual ~nld_base_d_to_a_proxy() {}
+	/* ATTR_COLD */ virtual ~nld_base_d_to_a_proxy() {}
 
-	ATTR_COLD virtual netlist_logic_input_t &in() { return m_I; }
+	/* ATTR_COLD */ virtual netlist_logic_input_t &in() { return m_I; }
 
 protected:
-	ATTR_COLD virtual void start()
+	/* ATTR_COLD */ virtual void start()
 	{
 		register_input("I", m_I);
 	}
@@ -369,12 +369,12 @@ public:
 	{
 	}
 
-	ATTR_COLD virtual ~nld_d_to_a_proxy() {}
+	/* ATTR_COLD */ virtual ~nld_d_to_a_proxy() {}
 
 protected:
-	ATTR_COLD virtual void start();
+	/* ATTR_COLD */ virtual void start();
 
-	ATTR_COLD virtual void reset();
+	/* ATTR_COLD */ virtual void reset();
 
 	ATTR_HOT void update();
 
