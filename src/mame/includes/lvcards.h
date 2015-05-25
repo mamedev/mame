@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari, Curt Coder
 class lvcards_state : public driver_device
 {
