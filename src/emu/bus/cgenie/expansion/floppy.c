@@ -110,7 +110,6 @@ cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *
 	m_floppy3(*this, "fd1793:3"),
 	m_socket(*this, "socket"),
 	m_floppy(NULL),
-	m_timer_irq_off(NULL),
 	m_irq_status(0)
 {
 }
@@ -121,7 +120,6 @@ cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *
 
 void cgenie_fdc_device::device_start()
 {
-	m_timer_irq_off = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cgenie_fdc_device::irq_off_callback), this));
 }
 
 //-------------------------------------------------
@@ -153,27 +151,18 @@ void cgenie_fdc_device::device_reset()
 
 READ8_MEMBER( cgenie_fdc_device::irq_r )
 {
-	return m_irq_status;
-}
+	UINT8 data = m_irq_status;
 
-void cgenie_fdc_device::update_irq()
-{
-	m_slot->int_w(m_irq_status ? 1 : 0);
+	m_irq_status &= ~IRQ_TIMER;
+	m_slot->int_w(m_irq_status ? ASSERT_LINE : CLEAR_LINE);
+
+	return data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( cgenie_fdc_device::timer_callback )
 {
 	m_irq_status |= IRQ_TIMER;
-	update_irq();
-
-	// timer to turn it off again
-	m_timer_irq_off->adjust(attotime::from_usec(250));
-}
-
-TIMER_CALLBACK_MEMBER( cgenie_fdc_device::irq_off_callback )
-{
-	m_irq_status &= ~IRQ_TIMER;
-	update_irq();
+	m_slot->int_w(ASSERT_LINE);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device, socket_load )
@@ -202,7 +191,7 @@ WRITE_LINE_MEMBER( cgenie_fdc_device::intrq_w )
 	else
 		m_irq_status &= ~IRQ_WDC;
 
-	update_irq();
+	m_slot->int_w(m_irq_status ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER( cgenie_fdc_device::select_w )

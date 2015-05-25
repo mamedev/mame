@@ -30,7 +30,6 @@ public:
 	cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
-	TIMER_CALLBACK_MEMBER( irq_off_callback );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
 
@@ -65,7 +64,6 @@ private:
 
 	floppy_image_device *m_floppy;
 
-	emu_timer *m_timer_irq_off;
 	UINT8 m_irq_status;
 };
 
