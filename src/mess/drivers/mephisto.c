@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Dirk V.
+// license:BSD-3-Clause
+// copyright-holders:Dirk V., Cowering
 /******************************************************************************
  Mephisto 4 + 5 Chess Computer
  2007 Dirk V.
