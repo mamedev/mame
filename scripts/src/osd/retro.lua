@@ -5,7 +5,7 @@ newoption {
 	trigger = "NO_USE_MIDI",
 	description = "Disable MIDI I/O",
 	allowed = {
-		{ "0",  "Enable MIDI"  },
+	--	{ "0",  "Enable MIDI"  },
 		{ "1",  "Disable MIDI" },
 	},
 }
@@ -21,6 +21,8 @@ project ("osd_" .. _OPTIONS["osd"])
 	options {
 		"ForceCPP",
 	}
+
+	_OPTIONS["NO_USE_MIDI"] = "1"
 
 	dofile("retro_cfg.lua")
 
@@ -51,7 +53,8 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/retro/retromain.c",
 	}
 
-	if _OPTIONS["NO_USE_MIDI"]=="1" then
+	-- We don't support MIDI at present
+	--if _OPTIONS["NO_USE_MIDI"]=="1" then
 		defines {
 			"NO_USE_MIDI",
 		}
@@ -59,11 +62,11 @@ project ("osd_" .. _OPTIONS["osd"])
 		files {
 			MAME_DIR .. "src/osd/modules/midi/none.c",
 		}
-	else
-		files {
-			MAME_DIR .. "src/osd/modules/midi/portmidi.c",
-		}
-	end
+	--else
+	--	files {
+	--		MAME_DIR .. "src/osd/modules/midi/portmidi.c",
+	--	}
+	--end
 
 	if _OPTIONS["NO_OPENGL"]=="1" then
 		files {
