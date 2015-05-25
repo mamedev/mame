@@ -29,7 +29,6 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 			"DT_FLOAT"
 	};
 
-	NL_VERBOSE_OUT(("SAVE: <%s> %s(%d) %p\n", fullname.cstr(), ts[dt].cstr(), size, ptr));
 	pstate_entry_t *p = palloc(pstate_entry_t, stname, dt, owner, size, count, ptr, is_ptr);
 	m_save.add(p);
 }

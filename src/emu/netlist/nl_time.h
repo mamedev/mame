@@ -7,7 +7,6 @@
 #ifndef NLTIME_H_
 #define NLTIME_H_
 
-#include "nl_config.h"
 #include "pstate.h"
 
 //============================================================

@@ -107,7 +107,6 @@ NETLIB_DEVICE(9316,
 	netlist_logic_input_t m_LOADQ;
 );
 
-NETLIB_DEVICE_DERIVED(9316_dip, 9316,
-);
+NETLIB_DEVICE_DERIVED_PURE(9316_dip, 9316);
 
 #endif /* NLD_9316_H_ */

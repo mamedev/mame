@@ -322,7 +322,7 @@ ATTR_COLD void netlist_base_t::reset()
 }
 
 
-ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time &delta)
+ATTR_HOT void netlist_base_t::process_queue(const netlist_time &delta)
 {
 	m_stop = m_time + delta;
 
@@ -451,7 +451,7 @@ ATTR_COLD void netlist_core_device_t::stop_dev()
 	stop();
 }
 
-ATTR_HOT ATTR_ALIGN netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
+ATTR_HOT netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
 {
 	if (inp.state() != netlist_logic_t::STATE_INP_PASSIVE)
 		return inp.Q();
@@ -589,7 +589,7 @@ ATTR_COLD netlist_net_t::netlist_net_t(const family_t afamily)
 	, m_in_queue(2)
 	, m_cur_Analog(0.0)
 {
-};
+}
 
 ATTR_COLD netlist_net_t::~netlist_net_t()
 {
@@ -676,7 +676,7 @@ ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
 	}
 }
 
-ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
+ATTR_HOT inline void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
@@ -774,7 +774,7 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 ATTR_COLD netlist_logic_net_t::netlist_logic_net_t()
 	: netlist_net_t(LOGIC)
 {
-};
+}
 
 
 ATTR_COLD void netlist_logic_net_t::reset()
@@ -797,7 +797,7 @@ ATTR_COLD netlist_analog_net_t::netlist_analog_net_t()
 	, m_h_n_m_1(1e-6)
 	, m_solver(NULL)
 {
-};
+}
 
 ATTR_COLD void netlist_analog_net_t::reset()
 {

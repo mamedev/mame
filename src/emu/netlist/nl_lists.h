@@ -52,7 +52,7 @@ public:
 	ATTR_HOT inline bool is_empty() const { return (m_end == &m_list[0]); }
 	ATTR_HOT inline bool is_not_empty() const { return (m_end > &m_list[0]); }
 
-	ATTR_HOT /*ATTR_ALIGN*/ void push(const entry_t &e)
+	ATTR_HOT void push(const entry_t &e)
 	{
 		entry_t * i = m_end++;
 		while ((i > &m_list[0]) && (e.exec_time() > (i - 1)->exec_time()) )

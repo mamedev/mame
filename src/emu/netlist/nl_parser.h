@@ -28,7 +28,7 @@ public:
 		STRING,
 		COMMENT,
 		UNKNOWN,
-		ENDOFFILE,
+		ENDOFFILE
 	};
 
 	struct token_id_t

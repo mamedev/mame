@@ -61,8 +61,6 @@ NETLIB_DEVICE(74175,
 	netlist_logic_input_t m_CLRQ;
 );
 
-NETLIB_DEVICE_DERIVED(74175_dip, 74175,
-
-);
+NETLIB_DEVICE_DERIVED_PURE(74175_dip, 74175);
 
 #endif /* NLD_74175_H_ */

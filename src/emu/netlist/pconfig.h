@@ -12,32 +12,35 @@
 	#define PSTANDALONE (0)
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))
-#if !defined(__ppc__) && !defined (__PPC__) && !defined(__ppc64__) && !defined(__PPC64__)
-#define ATTR_ALIGN __attribute__ ((aligned(64)))
-#else
-#define ATTR_ALIGN
-#endif
-#else
-#define ATTR_ALIGN
-#endif
-
 //============================================================
 //  Compiling standalone
 //============================================================
 
 // Compiling without mame ?
 
+#include <algorithm>
+#include <cstdarg>
+
 #if !(PSTANDALONE)
 #include "osdcore.h"
-#else
-#define ATTR_HOT
+
+#undef ATTR_COLD
 #define ATTR_COLD
+
+#else
+#include <stdint.h>
+
+/* not supported in GCC prior to 4.4.x */
+/* ATTR_HOT and ATTR_COLD cause performance degration in 5.1 */
+//#define ATTR_HOT
+#define ATTR_COLD
+#define ATTR_HOT                __attribute__((hot))
+//#define ATTR_COLD               __attribute__((cold))
 
 #define RESTRICT
 #define EXPECTED(x)		(x)
 #define UNEXPECTED(x)	(x)
-#define ATTR_PRINTF(n1,n2)
+#define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
 #define ATTR_UNUSED             __attribute__((__unused__))
 
 /* 8-bit values */
@@ -60,8 +63,8 @@ typedef signed int                          INT32;
 typedef signed __int64                      INT64;
 typedef unsigned __int64                    UINT64;
 #else
-__extension__ typedef unsigned long long    UINT64;
-__extension__ typedef signed long long      INT64;
+typedef uint64_t    UINT64;
+typedef int64_t      INT64;
 #endif
 #endif
 

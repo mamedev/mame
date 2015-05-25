@@ -13,7 +13,7 @@
 
 
 
-class ATTR_ALIGNED(64) netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
+class netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
 {
 public:
 
@@ -36,7 +36,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct2_t::vsolve()
 	return this->compute_next_timestep();
 }
 
-ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic(const bool newton_raphson)
+ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	build_LE_A();
 	build_LE_RHS();
