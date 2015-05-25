@@ -6,9 +6,6 @@
 
     Documentation and consistent naming for known existing crystals.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************
 
     PCB Crystal Reference

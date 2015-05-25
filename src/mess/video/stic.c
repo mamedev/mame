@@ -5,9 +5,6 @@
  General Instruments AY-3-8900-1 a.k.a. Standard Television Interface Chip
  (STIC) emulation for Mattel Intellivision
 
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
-
  *********************************************************************/
 
 #include "emu.h"

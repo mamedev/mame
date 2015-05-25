@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Nicola Salmoria
+// copyright-holders:David Haywood,Nicola Salmoria,Paul Priest
 /*---
 
 Pirates      (c)1994 NIX  (DEC 14 1994 17:32:29) displayed in cabinet test mode

@@ -30073,6 +30073,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="suppoker">
+		<description>Super Poker (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="Cha Oji Pu Ke"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_smouse"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="cha oji pu ke - super poker (ch).bin" size="4194304" crc="c37e6858" sha1="2aa4f27b2be3d98016fcff3709176682169da6c2" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Are these unprotected versions legit? or were they hacked to work with emus? -->
 
 	<software name="chinf3a" cloneof="chinf3">

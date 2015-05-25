@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Paul Forgey
+// copyright-holders:Paul Forgey, Hedley Rainnie, Aaron Giles
 /***************************************************************************
 
     Atari Quantum hardware

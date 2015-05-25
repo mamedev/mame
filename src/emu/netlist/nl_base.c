@@ -5,6 +5,10 @@
  *
  */
 
+#include <cstring>
+
+#include "palloc.h"
+
 #include "nl_base.h"
 #include "devices/nld_system.h"
 #include "analog/nld_solver.h"
@@ -12,6 +16,28 @@
 #include "nl_util.h"
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
+
+//============================================================
+//  Exceptions
+//============================================================
+
+// emu_fatalerror is a generic fatal exception that provides an error string
+nl_fatalerror::nl_fatalerror(const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	m_text = pstring(format).vprintf(ap);
+	va_end(ap);
+}
+
+nl_fatalerror::nl_fatalerror(const char *format, va_list ap)
+{
+	m_text = pstring(format).vprintf(ap);
+}
+
+// ----------------------------------------------------------------------------------------
+// netlist_logic_family_ttl_t
+// ----------------------------------------------------------------------------------------
 
 class netlist_logic_family_ttl_t : public netlist_logic_family_desc_t
 {
@@ -28,7 +54,7 @@ public:
 	}
 	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
 	{
-		return nl_alloc(nld_d_to_a_proxy , proxied);
+		return palloc(nld_d_to_a_proxy , proxied);
 	}
 };
 
@@ -48,7 +74,7 @@ public:
 	}
 	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
 	{
-		return nl_alloc(nld_d_to_a_proxy , proxied);
+		return palloc(nld_d_to_a_proxy , proxied);
 	}
 };
 
@@ -84,9 +110,10 @@ void netlist_queue_t::on_pre_save()
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		m_times[i] =  this->listptr()[i].exec_time().as_raw();
-		const char *p = this->listptr()[i].object()->name().cstr();
-		int n = MIN(63, strlen(p));
-		strncpy(&(m_name[i][0]), p, n);
+		pstring p = this->listptr()[i].object()->name();
+		int n = p.len();
+		n = std::min(63, n);
+		std::strncpy(&(m_name[i][0]), p, n);
 		m_name[i][n] = 0;
 	}
 }
@@ -117,7 +144,7 @@ ATTR_COLD netlist_object_t::netlist_object_t(const type_t atype, const family_t 
 
 ATTR_COLD netlist_object_t::~netlist_object_t()
 {
-	//delete m_name;
+
 }
 
 ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const pstring &aname)
@@ -161,10 +188,10 @@ netlist_base_t::netlist_base_t()
 		m_stop(netlist_time::zero),
 		m_time(netlist_time::zero),
 		m_queue(*this),
-		m_use_deactivate(0),
 		m_mainclock(NULL),
 		m_solver(NULL),
 		m_gnd(NULL),
+		m_use_deactivate(0),
 		m_setup(NULL)
 {
 }
@@ -175,7 +202,7 @@ netlist_base_t::~netlist_base_t()
 	{
 		if (!m_nets[i]->isRailNet())
 		{
-			global_free(m_nets[i]);
+			pfree(m_nets[i]);
 		}
 	}
 
@@ -295,7 +322,7 @@ ATTR_COLD void netlist_base_t::reset()
 }
 
 
-ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time &delta)
+ATTR_HOT void netlist_base_t::process_queue(const netlist_time &delta)
 {
 	m_stop = m_time + delta;
 
@@ -424,7 +451,7 @@ ATTR_COLD void netlist_core_device_t::stop_dev()
 	stop();
 }
 
-ATTR_HOT ATTR_ALIGN netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
+ATTR_HOT netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
 {
 	if (inp.state() != netlist_logic_t::STATE_INP_PASSIVE)
 		return inp.Q();
@@ -562,7 +589,7 @@ ATTR_COLD netlist_net_t::netlist_net_t(const family_t afamily)
 	, m_in_queue(2)
 	, m_cur_Analog(0.0)
 {
-};
+}
 
 ATTR_COLD netlist_net_t::~netlist_net_t()
 {
@@ -649,7 +676,7 @@ ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
 	}
 }
 
-ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
+ATTR_HOT inline void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
@@ -747,7 +774,7 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 ATTR_COLD netlist_logic_net_t::netlist_logic_net_t()
 	: netlist_net_t(LOGIC)
 {
-};
+}
 
 
 ATTR_COLD void netlist_logic_net_t::reset()
@@ -770,7 +797,7 @@ ATTR_COLD netlist_analog_net_t::netlist_analog_net_t()
 	, m_h_n_m_1(1e-6)
 	, m_solver(NULL)
 {
-};
+}
 
 ATTR_COLD void netlist_analog_net_t::reset()
 {

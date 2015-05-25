@@ -8,8 +8,6 @@
 #ifndef PSTATE_H_
 #define PSTATE_H_
 
-//#include "nl_config.h"
-//#include "nl_time.h"
 #include "plists.h"
 #include "pstring.h"
 
@@ -58,7 +56,7 @@ template<typename _ItemType> struct nl_datatype<_ItemType *>
 
 #define NETLIST_SAVE_TYPE(TYPE, TYPEDESC) \
 		template<> struct nl_datatype<TYPE>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = false;}; \
-		template<> struct nl_datatype<TYPE *>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = true;};
+		template<> struct nl_datatype<TYPE *>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = true;}
 
 NETLIST_SAVE_TYPE(char, DT_INT8);
 NETLIST_SAVE_TYPE(double, DT_DOUBLE);

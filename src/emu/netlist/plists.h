@@ -10,7 +10,7 @@
 #ifndef PLISTS_H_
 #define PLISTS_H_
 
-#include "nl_config.h"
+#include "palloc.h"
 #include "pstring.h"
 
 // ----------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ public:
 	ATTR_COLD ~parray_t()
 	{
 		if (m_list != NULL)
-			nl_free_array(m_list);
+			pfree_array(m_list);
 		m_list = NULL;
 	}
 
@@ -70,9 +70,9 @@ protected:
 	ATTR_COLD void set_capacity(const int new_capacity)
 	{
 		if (m_list != NULL)
-			nl_free_array(m_list);
+			pfree_array(m_list);
 		if (new_capacity > 0)
-			m_list = nl_alloc_array(_ListClass, new_capacity);
+			m_list = palloc_array(_ListClass, new_capacity);
 		else
 			m_list = NULL;
 		m_capacity = new_capacity;
@@ -98,7 +98,7 @@ public:
 		if (m_capacity == 0)
 			m_list = NULL;
 		else
-			m_list = nl_alloc_array(_ListClass, m_capacity);
+			m_list = palloc_array(_ListClass, m_capacity);
 		m_count = 0;
 	}
 
@@ -108,7 +108,7 @@ public:
 		if (m_capacity == 0)
 			m_list = NULL;
 		else
-			m_list = nl_alloc_array(_ListClass, m_capacity);
+			m_list = palloc_array(_ListClass, m_capacity);
 		m_count = 0;
 		for (int i=0; i<rhs.count(); i++)
 		{
@@ -130,7 +130,7 @@ public:
 	ATTR_COLD ~plist_t()
 	{
 		if (m_list != NULL)
-			nl_free_array(m_list);
+			pfree_array(m_list);
 		m_list = NULL;
 	}
 
@@ -178,7 +178,7 @@ public:
 
 	ATTR_HOT inline void remove_at(const int pos)
 	{
-		nl_assert((pos>=0) && (pos<m_count));
+		//nl_assert((pos>=0) && (pos<m_count));
 		m_count--;
 		for (int i = pos; i < m_count; i++)
 		{
@@ -188,8 +188,8 @@ public:
 
 	ATTR_HOT inline void swap(const int pos1, const int pos2)
 	{
-		nl_assert((pos1>=0) && (pos1<m_count));
-		nl_assert((pos2>=0) && (pos2<m_count));
+		//nl_assert((pos1>=0) && (pos1<m_count));
+		//nl_assert((pos2>=0) && (pos2<m_count));
 		_ListClass tmp = m_list[pos1];
 		m_list[pos1] = m_list[pos2];
 		m_list[pos2] =tmp;
@@ -227,7 +227,7 @@ public:
 	{
 		for (_ListClass *i = m_list; i < m_list + m_count; i++)
 		{
-			nl_free(*i);
+			pfree(*i);
 		}
 		clear();
 	}
@@ -238,7 +238,7 @@ private:
 		int cnt = count();
 		if (new_capacity > 0)
 		{
-			_ListClass *m_new = nl_alloc_array(_ListClass, new_capacity);
+			_ListClass *m_new = palloc_array(_ListClass, new_capacity);
 			_ListClass *pd = m_new;
 
 			if (cnt > new_capacity)
@@ -246,14 +246,14 @@ private:
 			for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
 				*pd = *ps;
 			if (m_list != NULL)
-				nl_free_array(m_list);
+				pfree_array(m_list);
 			m_list = m_new;
 			m_count = cnt;
 		}
 		else
 		{
 			if (m_list != NULL)
-				nl_free_array(m_list);
+				pfree_array(m_list);
 			m_list = NULL;
 			m_count = 0;
 		}
@@ -261,7 +261,7 @@ private:
 	}
 
 	int m_count;
-	_ListClass * m_list /* ATTR_ALIGN */;
+	_ListClass * m_list;
 	int m_capacity;
 };
 
@@ -402,7 +402,8 @@ public:
 				}
 				p = p->m_next;
 			}
-			nl_assert_always(false, "element not found");
+			//FXIME: throw a standard exception
+			//nl_assert_always(false, "element not found");
 		}
 	}
 
@@ -428,7 +429,7 @@ public:
 		_ListClass **p = &m_head;
 		while (*p != &elem)
 		{
-			nl_assert(*p != NULL);
+			//nl_assert(*p != NULL);
 			p = &((*p)->m_next);
 		}
 		(*p) = elem.m_next;

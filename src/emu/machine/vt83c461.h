@@ -6,9 +6,6 @@
 
     VIA VT83C461 (IDE Hard Drive controller).
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #pragma once

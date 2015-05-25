@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Phil Stroffolino, Owen Rubin,David Haywood
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino, David Haywood
 class tunhunt_state : public driver_device
 {
 public:

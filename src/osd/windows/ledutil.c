@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles,Paul Priest
 //============================================================
 //
 //  ledutil.c - Win32 example code that tracks changing

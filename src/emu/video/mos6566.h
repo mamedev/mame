@@ -4,9 +4,6 @@
 
     MOS 6566/6567/6569 Video Interface Chip II (VIC-II) emulation
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
                             _____   _____
                    DB6   1 |*    \_/     | 40  Vcc

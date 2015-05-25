@@ -45,7 +45,6 @@ public:
 
 	netlist_timed_queue()
 	{
-		//m_list = global_alloc_array(entry_t, SIZE);
 		clear();
 	}
 
@@ -53,7 +52,7 @@ public:
 	ATTR_HOT inline bool is_empty() const { return (m_end == &m_list[0]); }
 	ATTR_HOT inline bool is_not_empty() const { return (m_end > &m_list[0]); }
 
-	ATTR_HOT /*ATTR_ALIGN*/ void push(const entry_t &e)
+	ATTR_HOT void push(const entry_t &e)
 	{
 		entry_t * i = m_end++;
 		while ((i > &m_list[0]) && (e.exec_time() > (i - 1)->exec_time()) )
@@ -64,7 +63,7 @@ public:
 		}
 		*i = e;
 		inc_stat(m_prof_sort);
-		nl_assert(m_end - m_list < _Size);
+		//nl_assert(m_end - m_list < _Size);
 	}
 
 	ATTR_HOT inline const entry_t *pop()

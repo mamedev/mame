@@ -6,9 +6,6 @@
  *  Created on: Dec 27, 2010
  *      Author: Hans Ostermeyer
  *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
- *
  *  see also http://www.bitsavers.org/pdf/apollo/008778-03_DOMAIN_Series_3000_4000_Technical_Reference_Aug87.pdf
  *
  */

@@ -59,7 +59,7 @@ protected:
 	ATTR_COLD virtual void start();
 	ATTR_COLD virtual void reset();
 	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
+	ATTR_HOT void update();
 
 	ATTR_COLD void start_internal(const nl_double def_RI);
 
@@ -115,7 +115,7 @@ protected:
 	ATTR_COLD virtual void start();
 	ATTR_COLD virtual void reset();
 	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
+	ATTR_HOT void update();
 
 	nl_double m_gfac;
 };
@@ -159,7 +159,7 @@ protected:
 	ATTR_COLD virtual void start();
 	ATTR_COLD virtual void reset();
 	ATTR_COLD virtual void update_param();
-	//ATTR_HOT ATTR_ALIGN void update();
+	//ATTR_HOT void update();
 
 	netlist_terminal_t m_OP2;
 	netlist_terminal_t m_ON2;

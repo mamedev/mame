@@ -5,10 +5,14 @@
  *
  */
 
-#include "pstring.h"
+#include <new>
 #include <cstdio>
-#include <stdlib.h>
+#include <cstring>
+//FIXME:: pstring should be locale free
+#include <cctype>
+#include <cstdlib>
 
+#include "pstring.h"
 
 // The following will work on linux, however not on Windows ....
 
@@ -51,9 +55,9 @@ void pstring::pcat(const char *s)
 	int slen = strlen(s);
 	str_t *n = salloc(m_ptr->len() + slen);
 	if (m_ptr->len() > 0)
-		memcpy(n->str(), m_ptr->str(), m_ptr->len());
+		std::memcpy(n->str(), m_ptr->str(), m_ptr->len());
 	if (slen > 0)
-		memcpy(n->str() + m_ptr->len(), s, slen);
+		std::memcpy(n->str() + m_ptr->len(), s, slen);
 	*(n->str() + n->len()) = 0;
 	sfree(m_ptr);
 	m_ptr = n;
@@ -63,7 +67,7 @@ void pstring::pcopy(const char *from, int size)
 {
 	str_t *n = salloc(size);
 	if (size > 0)
-		memcpy(n->str(), from, size);
+		std::memcpy(n->str(), from, size);
 	*(n->str() + size) = 0;
 	sfree(m_ptr);
 	m_ptr = n;
@@ -118,7 +122,7 @@ int pstring::find_last_not_of(const pstring no) const
 	return -1;
 }
 
-pstring pstring::replace(const pstring &search, const pstring &replace)
+pstring pstring::replace(const pstring &search, const pstring &replace) const
 {
 	pstring ret = "";
 
@@ -158,6 +162,11 @@ pstring pstring::rtrim(const pstring ws) const
 		return "";
 }
 
+void pstring::pcopy(const char *from)
+{
+	pcopy(from, strlen(from));
+}
+
 //-------------------------------------------------
 //  pcmpi - compare a character array to an nstring
 //-------------------------------------------------
@@ -167,20 +176,20 @@ int pstring::pcmpi(const char *lhs, const char *rhs, int count) const
 	// loop while equal until we hit the end of strings
 	int index;
 	for (index = 0; index < count; index++)
-		if (lhs[index] == 0 || tolower(lhs[index]) != tolower(rhs[index]))
+		if (lhs[index] == 0 || std::tolower(lhs[index]) != std::tolower(rhs[index]))
 			break;
 
 	// determine the final result
 	if (index < count)
-		return tolower(lhs[index]) - tolower(rhs[index]);
+		return std::tolower(lhs[index]) - std::tolower(rhs[index]);
 	if (lhs[index] == 0)
 		return 0;
 	return 1;
 }
 
-nl_double pstring::as_double(bool *error) const
+double pstring::as_double(bool *error) const
 {
-	nl_double ret;
+	double ret;
 	char *e = NULL;
 
 	if (error != NULL)
@@ -194,7 +203,7 @@ nl_double pstring::as_double(bool *error) const
 
 long pstring::as_long(bool *error) const
 {
-	nl_double ret;
+	long ret;
 	char *e = NULL;
 
 	if (error != NULL)
@@ -213,7 +222,7 @@ pstring pstring::vprintf(va_list args) const
 {
 	// sprintf into the temporary buffer
 	char tempbuf[4096];
-	vsprintf(tempbuf, cstr(), args);
+	std::vsprintf(tempbuf, cstr(), args);
 
 	return pstring(tempbuf);
 }
@@ -235,6 +244,17 @@ pstring::str_t *pstring::salloc(int n)
 	return ret;
 }
 
+void pstring::resetmem()
+{
+	// Release the 0 string
+	m_pool.m_shutdown = true;
+	m_pool.resetmem();
+}
+
+// ----------------------------------------------------------------------------------------
+// pstring ...
+// ----------------------------------------------------------------------------------------
+
 pstring pstring::sprintf(const char *format, ...)
 {
 	va_list ap;
@@ -245,11 +265,31 @@ pstring pstring::sprintf(const char *format, ...)
 }
 
 
-void pstring::resetmem()
+int pstring::find(const char *search, int start) const
 {
-	// Release the 0 string
-	m_pool.m_shutdown = true;
-	m_pool.resetmem();
+	int alen = len();
+	const char *result = std::strstr(cstr() + std::min(start, alen), search);
+	return (result != NULL) ? (result - cstr()) : -1;
+}
+
+int pstring::find(const char search, int start) const
+{
+	int alen = len();
+	const char *result = std::strchr(cstr() + std::min(start, alen), search);
+	return (result != NULL) ? (result - cstr()) : -1;
+}
+
+bool pstring::startsWith(const char *arg) const
+{
+	return (pcmp(cstr(), arg, std::strlen(arg)) == 0);
+}
+
+int pstring::pcmp(const char *left, const char *right, int count) const
+{
+	if (count < 0)
+		return std::strcmp(left, right);
+	else
+		return std::strncmp(left, right, count);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -276,8 +316,8 @@ void *pblockpool::alloc(const std::size_t n)
 		return (char *) malloc(n);
 	else
 	{
-		int memsize = ((n + m_align - 1) / m_align) * m_align;
-		int min_alloc = MAX(m_blocksize, memsize+sizeof(memblock)-MINDATASIZE);
+		std::size_t memsize = ((n + m_align - 1) / m_align) * m_align;
+		std::size_t min_alloc = std::max(m_blocksize, memsize+sizeof(memblock)-MINDATASIZE);
 		char *ret = NULL;
 		//std::printf("m_first %p\n", m_first);
 		for (memblock *p = m_first; p != NULL && ret == NULL; p = p->next)
@@ -374,3 +414,4 @@ void pblockpool::resetmem()
 			std::printf("Freed %d out of total %d blocks\n", freedblocks, totalblocks);
 	}
 }
+

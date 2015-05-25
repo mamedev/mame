@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Takahiro Nogi
+// license:BSD-3-Clause
+// copyright-holders:Takahiro Nogi, Uki
 /******************************************************************************
 
     Game Driver for Video System Mahjong series.

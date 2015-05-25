@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:trap15,nimitz,austere
+// copyright-holders:Alex Marshal,nimitz,austere
 #pragma once
 
 #ifndef __ICS2115_H__

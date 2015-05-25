@@ -6,9 +6,6 @@
 
     ROM comparison utility program.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "unzip.h"

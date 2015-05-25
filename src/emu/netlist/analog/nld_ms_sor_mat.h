@@ -12,13 +12,11 @@
 #ifndef NLD_MS_SOR_MAT_H_
 #define NLD_MS_SOR_MAT_H_
 
-#include <cmath>
-
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
 template <int m_N, int _storage_N>
-class ATTR_ALIGNED(64) netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
+class netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
@@ -64,13 +62,13 @@ void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 {
 	if (this->m_stat_calculations != 0 && m_log_stats)
 	{
-		printf("==============================================\n");
-		printf("Solver %s\n", this->name().cstr());
-		printf("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-		printf("       has %s elements\n", this->is_dynamic() ? "dynamic" : "no dynamic");
-		printf("       has %s elements\n", this->is_timestep() ? "timestep" : "no timestep");
-		printf("       %6.3f average newton raphson loops\n", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		printf("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average\n",
+		this->netlist().log("==============================================\n");
+		this->netlist().log("Solver %s\n", this->name().cstr());
+		this->netlist().log("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		this->netlist().log("       has %s elements\n", this->is_dynamic() ? "dynamic" : "no dynamic");
+		this->netlist().log("       has %s elements\n", this->is_timestep() ? "timestep" : "no timestep");
+		this->netlist().log("       %6.3f average newton raphson loops\n", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average\n",
 				this->m_stat_calculations,
 				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
 				this->m_gs_fail,

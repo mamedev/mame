@@ -4,9 +4,6 @@
  *
  * vector.c
  *
- *
- * Copyright Nicola Salmoria and the MAME Team
- *
  *        anti-alias code by Andrew Caldwell
  *        (still more to add)
  *

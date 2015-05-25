@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 /**
  * @file namcos21.h

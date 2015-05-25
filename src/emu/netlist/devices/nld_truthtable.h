@@ -23,7 +23,7 @@
 		static const char *m_desc[];                                                \
 	}
 
-
+#if 0
 static inline UINT32 remove_first_bit(UINT32 v)
 {
 	for (int i=0; i<32; i++)
@@ -31,6 +31,7 @@ static inline UINT32 remove_first_bit(UINT32 v)
 			return v & ~(1<<i);
 	return v;
 }
+#endif
 
 struct truthtable_desc_t
 {
@@ -206,7 +207,7 @@ public:
 
 	}
 
-	ATTR_HOT ATTR_ALIGN void update()
+	ATTR_HOT void update()
 	{
 		process<true>();
 	}

@@ -4,9 +4,6 @@
 
     Rockwell A17XX ROM, RAM and I/O chip
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
     A ROM of 2048 x 8 bits is addressed whenever the RRSEL line
     (ROM/RAM select) is 0. A RAM of 128 x 4 bit is addressed when
     RRSEL is 1. The 16 I/O ports are addressed when the WI/O line

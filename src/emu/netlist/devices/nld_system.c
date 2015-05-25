@@ -198,7 +198,7 @@ ATTR_COLD void nld_d_to_a_proxy::reset()
 	m_is_timestep = m_RV.m_P.net().as_analog().solver()->is_timestep();
 }
 
-ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
+ATTR_HOT void nld_d_to_a_proxy::update()
 {
 	const int state = INPLOGIC(m_I);
 	if (state != m_last_state)

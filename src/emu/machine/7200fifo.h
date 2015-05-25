@@ -4,9 +4,6 @@
 
     IDT7200 series 9-bit Asynchronous FIFO Emulation
 
-    Copyright MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                     _W   1 |*    \_/     | 28  Vcc

@@ -45,7 +45,7 @@ struct netlist_solver_parameters_t
 };
 
 
-class ATTR_ALIGNED(64) terms_t
+class terms_t
 {
 	NETLIST_PREVENT_COPYING(terms_t)
 
@@ -164,7 +164,7 @@ private:
 
 
 
-class ATTR_ALIGNED(64) NETLIB_NAME(solver) : public netlist_device_t
+class NETLIB_NAME(solver) : public netlist_device_t
 {
 public:
 	NETLIB_NAME(solver)()

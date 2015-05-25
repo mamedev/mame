@@ -4,10 +4,6 @@
 
     Rockwell 10788 General Purpose Keyboard and Display circuit
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
-
     REGISTER DESCRIPTION
 
 

@@ -168,6 +168,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/c4040_dsk.h",
 		MAME_DIR .. "src/lib/formats/c8280_dsk.c",
 		MAME_DIR .. "src/lib/formats/c8280_dsk.h",
+		MAME_DIR .. "src/lib/formats/camplynx_cas.c",
+		MAME_DIR .. "src/lib/formats/camplynx_cas.h",
 		MAME_DIR .. "src/lib/formats/cbm_crt.c",
 		MAME_DIR .. "src/lib/formats/cbm_crt.h",
 		MAME_DIR .. "src/lib/formats/cbm_tap.c",

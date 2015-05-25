@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Jarek Burczynski
+// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh 
 /*
 **
 ** File: fm2612.c -- software implementation of Yamaha YM2612 FM sound generator

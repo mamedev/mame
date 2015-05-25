@@ -716,7 +716,7 @@ WRITE8_MEMBER( mos6530_base_t::edge_w )
 void mos6530_base_t::live_start()
 {
 	cur_live.period = attotime::from_hz(clock() / m_shift);
-	cur_live.tm = machine().time() + cur_live.period;
+	cur_live.tm = machine().time() + attotime::from_hz(clock());
 	cur_live.state = RUNNING;
 	cur_live.next_state = -1;
 

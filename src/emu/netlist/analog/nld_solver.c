@@ -79,8 +79,7 @@ ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t(const eSolverType typ
 
 ATTR_COLD netlist_matrix_solver_t::~netlist_matrix_solver_t()
 {
-	for (int i = 0; i < m_inps.count(); i++)
-		global_free(m_inps[i]);
+	m_inps.clear_and_free();
 }
 
 ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets)
@@ -144,7 +143,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 
 						if (net_proxy_output == NULL)
 						{
-							net_proxy_output = nl_alloc(netlist_analog_output_t);
+							net_proxy_output = palloc(netlist_analog_output_t);
 							net_proxy_output->init_object(*this, this->name() + "." + pstring::sprintf("m%d", m_inps.count()));
 							m_inps.add(net_proxy_output);
 							net_proxy_output->m_proxied_net = &p->net().as_analog();
@@ -352,7 +351,7 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 	while (e != NULL)
 	{
 		netlist_matrix_solver_t * const *en = m_mat_solvers.next(e);
-		global_free(*e);
+		pfree(*e);
 		e = en;
 	}
 
@@ -410,9 +409,9 @@ template <int m_N, int _storage_N>
 netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int gs_threshold, const bool use_specific)
 {
 	if (use_specific && m_N == 1)
-		return nl_alloc(netlist_matrix_solver_direct1_t, m_params);
+		return palloc(netlist_matrix_solver_direct1_t, m_params);
 	else if (use_specific && m_N == 2)
-		return nl_alloc(netlist_matrix_solver_direct2_t, m_params);
+		return palloc(netlist_matrix_solver_direct2_t, m_params);
 	else
 	{
 		if (size >= gs_threshold)
@@ -420,18 +419,18 @@ netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int
 			if (USE_MATRIX_GS)
 			{
 				typedef netlist_matrix_solver_SOR_mat_t<m_N,_storage_N> solver_mat;
-				return nl_alloc(solver_mat, m_params, size);
+				return palloc(solver_mat, m_params, size);
 			}
 			else
 			{
 				typedef netlist_matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
-				return nl_alloc(solver_GS, m_params, size);
+				return palloc(solver_GS, m_params, size);
 			}
 		}
 		else
 		{
 			typedef netlist_matrix_solver_direct_t<m_N,_storage_N> solver_D;
-			return nl_alloc(solver_D, m_params, size);
+			return palloc(solver_D, m_params, size);
 		}
 	}
 }

@@ -36,9 +36,9 @@ protected:
 	ATTR_HOT void build_LE_A();
 	ATTR_HOT void build_LE_RHS();
 	ATTR_HOT void LE_solve();
-	ATTR_HOT void LE_back_subst(nl_double (* RESTRICT x));
-	ATTR_HOT nl_double delta(const nl_double (* RESTRICT V));
-	ATTR_HOT void store(const nl_double (* RESTRICT V), const bool store_RHS);
+	ATTR_HOT void LE_back_subst(nl_double * RESTRICT x);
+	ATTR_HOT nl_double delta(const nl_double * RESTRICT V);
+	ATTR_HOT void store(const nl_double * RESTRICT V, const bool store_RHS);
 
 	/* bring the whole system to the current time
 	 * Don't schedule a new calculation time. The recalculation has to be
@@ -46,10 +46,10 @@ protected:
 	 */
 	ATTR_HOT nl_double compute_next_timestep();
 
-	nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
-	nl_double m_RHS[_storage_N];
-	nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
-	nl_double m_last_V[_storage_N];
+	ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	ATTR_ALIGN nl_double m_RHS[_storage_N];
+	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
+	ATTR_ALIGN nl_double m_last_V[_storage_N];
 
 	terms_t **m_terms;
 	terms_t *m_rails_temp;
@@ -67,20 +67,12 @@ private:
 template <int m_N, int _storage_N>
 netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t()
 {
-	for (int k=0; k<_storage_N; k++)
-	{
-		//delete[] m_A[k];
-	}
 	for (int k = 0; k < N(); k++)
 	{
-		nl_free(m_terms[k]);
+		pfree(m_terms[k]);
 	}
-	//delete[] m_last_RHS;
-	//delete[] m_RHS;
-	nl_free_array(m_terms);
-	nl_free_array(m_rails_temp);
-	//delete[] m_row_ops;
-
+	pfree_array(m_terms);
+	pfree_array(m_rails_temp);
 }
 
 template <int m_N, int _storage_N>
@@ -324,7 +316,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 
 template <int m_N, int _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
-		nl_double (* RESTRICT x))
+		nl_double * RESTRICT x)
 {
 	const int kN = N();
 
@@ -353,7 +345,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 
 template <int m_N, int _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
-		const nl_double (* RESTRICT V))
+		const nl_double * RESTRICT V)
 {
 	nl_double cerr = 0;
 	nl_double cerr2 = 0;
@@ -370,7 +362,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 
 template <int m_N, int _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
-		const nl_double (* RESTRICT V), const bool store_RHS)
+		const nl_double * RESTRICT V, const bool store_RHS)
 {
 	for (int i = 0; i < this->N(); i++)
 	{
@@ -394,7 +386,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 
 
 template <int m_N, int _storage_N>
-ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(const bool newton_raphson)
+ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	nl_double new_v[_storage_N]; // = { 0.0 };
 
@@ -431,12 +423,12 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 , m_dim(size)
 , m_lp_fact(0)
 {
-	m_terms = nl_alloc_array(terms_t *, N());
-	m_rails_temp = nl_alloc_array(terms_t, N());
+	m_terms = palloc_array(terms_t *, N());
+	m_rails_temp = palloc_array(terms_t, N());
 
 	for (int k = 0; k < N(); k++)
 	{
-		m_terms[k] = nl_alloc(terms_t);
+		m_terms[k] = palloc(terms_t);
 	}
 }
 
@@ -446,12 +438,12 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 , m_dim(size)
 , m_lp_fact(0)
 {
-	m_terms = nl_alloc_array(terms_t *, N());
-	m_rails_temp = nl_alloc_array(terms_t, N());
+	m_terms = palloc_array(terms_t *, N());
+	m_rails_temp = palloc_array(terms_t, N());
 
 	for (int k = 0; k < N(); k++)
 	{
-		m_terms[k] = nl_alloc(terms_t);
+		m_terms[k] = palloc(terms_t);
 	}
 }
 
