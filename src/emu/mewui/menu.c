@@ -882,7 +882,8 @@ void ui_menu::handle_main_events(UINT32 flags)
 						selected = hover;
 						menu_event.iptkey = IPT_UI_SELECT;
 					}
-                    else if (selected == item.size() - 1)
+
+                    if (selected == item.size() - 1)
                     {
                         menu_event.iptkey = IPT_UI_CANCEL;
                         ui_menu::stack_pop(machine());

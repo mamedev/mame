@@ -900,41 +900,31 @@ void ui_menu_select_software::find_matches(const char *str, int count)
 {
     // allocate memory to track the penalty value
     std::vector<int> penalty(count, 9999);
-    std::vector<int> penalty_old(count, 9999);
     int index = 0;
 
     for (; m_displaylist[index]; index++)
     {
         // pick the best match between driver name and description
-        int curpenalty_old = driver_list::penalty_compare(str, m_displaylist[index]->longname.c_str());
-        int tmp_old = driver_list::penalty_compare(str, m_displaylist[index]->shortname.c_str());
-        int curpenalty = fuzzy_substring(str, m_displaylist[index]->longname.c_str());
-        int tmp = fuzzy_substring(str, m_displaylist[index]->shortname.c_str());
+        int curpenalty = driver_list::penalty_compare(str, m_displaylist[index]->longname.c_str());
+        int tmp = driver_list::penalty_compare(str, m_displaylist[index]->shortname.c_str());
         curpenalty = MIN(curpenalty, tmp);
-        curpenalty_old = MIN(curpenalty_old, tmp_old);
 
         // insert into the sorted table of matches
         for (int matchnum = count - 1; matchnum >= 0; matchnum--)
         {
             // stop if we're worse than the current entry
-            if (curpenalty > penalty[matchnum])
+            if (curpenalty >= penalty[matchnum])
                 break;
-
-            if (curpenalty == penalty[matchnum])
-                if (curpenalty_old >= penalty_old[matchnum])
-                    break;
 
             // as long as this isn't the last entry, bump this one down
             if (matchnum < count - 1)
             {
                 penalty[matchnum + 1] = penalty[matchnum];
-                penalty_old[matchnum + 1] = penalty_old[matchnum];
                 searchlist[matchnum + 1] = searchlist[matchnum];
             }
 
             searchlist[matchnum] = m_displaylist[index];
             penalty[matchnum] = curpenalty;
-            penalty_old[matchnum] = curpenalty_old;
         }
     }
     (index < count) ? searchlist[index] = NULL : searchlist[count] = NULL;
