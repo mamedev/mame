@@ -1435,7 +1435,7 @@ DISCRETE_RESET(dst_ramp)
 {
 	m_v_out = DST_RAMP__CLAMP;
 	m_step    = DST_RAMP__GRAD / this->sample_rate();
-	m_dir     = ((DST_RAMP__END - DST_RAMP__START) == abs(DST_RAMP__END - DST_RAMP__START));
+	m_dir     = ((DST_RAMP__END - DST_RAMP__START) == fabs(DST_RAMP__END - DST_RAMP__START));
 	m_last_en = 0;
 }
 

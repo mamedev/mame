@@ -826,8 +826,10 @@ void vertex_program_simulator::compute_scalar_operation(float t_out[4], int inst
 		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0f / par_in[p3_C + 0]; // ?
 		break;
 	case 4: // "RSQ"
-		// FIXME: should this be really abs which is "int abs(int x)"?
-		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0f / sqrtf(abs(par_in[p3_C + 0]));
+		/*
+		 *  NOTE: this was abs which is "int abs(int x)" - and changed to fabsf due to clang 3.6 warning
+		 */
+		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0f / sqrtf(fabsf(par_in[p3_C + 0]));
 		break;
 	case 5: // "EXP"
 		t_out[0] = pow(2, floor(par_in[p3_C + 0]));
@@ -841,7 +843,10 @@ void vertex_program_simulator::compute_scalar_operation(float t_out[4], int inst
 		t_out[1] = frexp(par_in[p3_C + 0], &e)*2.0; // frexp gives mantissa as 0.5....1
 		t_out[0] = e - 1;
 #ifndef __OS2__
-		t.f = log2(abs(par_in[p3_C + 0]));
+		/*
+		 *  NOTE: this was abs which is "int abs(int x)" - and changed to fabsf due to clang 3.6 warning
+		 */
+		t.f = log2(fabsf(par_in[p3_C + 0]));
 #else
 		static double log_2 = 0.0;
 		if (log_2 == 0.0)

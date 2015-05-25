@@ -99,7 +99,9 @@ void tx0_device::tx0_write(offs_t address, int data)
 	else
 		/* toggle switch storage (TSS) */
 		/* TSS is read-only */
-		;
+	{
+		/* nothing */
+	}
 }
 
 
