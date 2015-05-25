@@ -1,0 +1,4 @@
+BSD-3-Clause: http://spdx.org/licenses/BSD-3-Clause
+GPL-2.0+: http://spdx.org/licenses/GPL-2.0+
+LGPL-2.1+: http://spdx.org/licenses/LGPL-2.1+
+MAME: see docs/license.txt
