@@ -1827,7 +1827,7 @@ void ioport_write_line_wrapper(_FunctionClass &device, ioport_field &field, void
 
 
 //**************************************************************************
-//  INLINE FUNCITONS
+//  INLINE FUNCTIONS
 //**************************************************************************
 
 inline ioport_manager &ioport_field::manager() const { return m_port.manager(); }
