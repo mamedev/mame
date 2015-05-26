@@ -23,9 +23,9 @@ The MESS and MAME projects live in the same source repository and share much of 
 License
 =======
 
-MAME is in the process of becoming an Free and Open Source project. We are still in process of contacting all developers from the past. We have received approval for the vast majority of contributions.
+MAME is in the process of becoming a Free and Open Source project. We are still in process of contacting all developers who have contributed in the past. We have received approval for the vast majority of contributions.
 
-Going forward, we will be using the 3-Clause BSD license for the core; and the LGPL version 2.1 or later, and the GPL version 2.0 or later, for certain drivers. As a whole, MAME will be delivered under the GPL version 2.0 or later.
+Going forward, we will be using the 3-Clause BSD license for the core, and the LGPL version 2.1 or later, and the GPL version 2.0 or later, for certain drivers. As a whole, MAME will be delivered under the GPL version 2.0 or later.
 As we are still contacting developers, MAME is still distributed under the [MAME license](docs/mamelicense.txt) as of this time. If you have not been contacted yet, and believe you have contributed code to MAME in the past, please [contact us](mailto:mamedev@mamedev.org).
 
 How to compile?
