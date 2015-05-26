@@ -1035,8 +1035,8 @@ void wd_fdc_t::cmd_w(UINT8 val)
 			intrq_cb(intrq);
 	}
 
-	// No more than one write in flight
-	if(cmd_buffer != -1)
+	// No more than one write in flight, but interrupts take priority
+	if(cmd_buffer != -1 && ((val & 0xf0) != 0xd0))
 		return;
 
 	cmd_buffer = val;

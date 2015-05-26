@@ -245,7 +245,7 @@ double ppreprocessor::expr(const nl_util::pstring_list &sexpr, int &start, int p
 		val = tok.as_double();
 		start++;
 	}
-	while (start < sexpr.count())
+	while (start < sexpr.size())
 	{
 		tok=sexpr[start];
 		if (tok == ")")
@@ -278,7 +278,7 @@ double ppreprocessor::expr(const nl_util::pstring_list &sexpr, int &start, int p
 
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 {
-	for (int i = 0; i<m_defines.count(); i++)
+	for (int i = 0; i<m_defines.size(); i++)
 	{
 		if (m_defines[i].m_name == name)
 			return &m_defines[i];
@@ -290,7 +290,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 {
 	nl_util::pstring_list elems = nl_util::splitexpr(line, m_expr_sep);
 	pstringbuffer ret = "";
-	for (int i=0; i<elems.count(); i++)
+	for (int i=0; i<elems.size(); i++)
 	{
 		define_t *def = get_define(elems[i]);
 		if (def != NULL)
@@ -310,7 +310,7 @@ pstring ppreprocessor::process(const pstring &contents)
 	int level = 0;
 
 	int i=0;
-	while (i<lines.count())
+	while (i<lines.size())
 	{
 		pstring line = lines[i];
 		pstring lt = line.replace("\t"," ").trim();
@@ -342,7 +342,7 @@ pstring ppreprocessor::process(const pstring &contents)
 			}
 			else if (lti[0].equals("#define"))
 			{
-				if (lti.count() != 3)
+				if (lti.size() != 3)
 					error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
 				m_defines.add(define_t(lti[1], lti[2]));
 			}
@@ -352,7 +352,7 @@ pstring ppreprocessor::process(const pstring &contents)
 		else
 		{
 			//if (ifflag == 0 && level > 0)
-			//	fprintf(stderr, "conditional: %s\n", line.cstr());
+			//  fprintf(stderr, "conditional: %s\n", line.cstr());
 			if (ifflag == 0)
 			{
 				ret.cat(line);

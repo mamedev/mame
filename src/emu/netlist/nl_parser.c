@@ -238,7 +238,7 @@ void netlist_parser::device(const pstring &dev_type)
 	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
 
 	cnt = 0;
-	while (cnt < def_params.count())
+	while (cnt < def_params.size())
 	{
 		pstring paramfq = devname + "." + def_params[cnt];
 
@@ -259,7 +259,7 @@ void netlist_parser::device(const pstring &dev_type)
 
 	token_t tok = get_token();
 	cnt = 0;
-	while (tok.is(m_tok_comma) && cnt < termlist.count())
+	while (tok.is(m_tok_comma) && cnt < termlist.size())
 	{
 		pstring output_name = get_identifier();
 
@@ -268,8 +268,8 @@ void netlist_parser::device(const pstring &dev_type)
 		cnt++;
 		tok = get_token();
 	}
-	if (cnt != termlist.count())
-		m_setup.netlist().error("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), termlist.count(), cnt);
+	if (cnt != termlist.size())
+		m_setup.netlist().error("netlist: input count mismatch for %s - expected %" SIZETFMT " found %d\n", devname.cstr(), termlist.size(), cnt);
 	require_token(tok, m_tok_param_right);
 }
 

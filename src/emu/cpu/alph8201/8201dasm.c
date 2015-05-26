@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Tatsuyuki Satoh
 /****************************************************************************
                          Alpha 8201/8301 Disassembler

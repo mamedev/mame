@@ -62,14 +62,14 @@ class terms_t
 
 	ATTR_COLD void add(netlist_terminal_t *term, int net_other);
 
-	ATTR_HOT inline int count() { return m_term.count(); }
+	ATTR_HOT inline int count() { return m_term.size(); }
 
-	ATTR_HOT inline netlist_terminal_t **terms() { return m_term; }
-	ATTR_HOT inline int *net_other() { return m_net_other; }
-	ATTR_HOT inline nl_double *gt() { return m_gt; }
-	ATTR_HOT inline nl_double *go() { return m_go; }
-	ATTR_HOT inline nl_double *Idr() { return m_Idr; }
-	ATTR_HOT inline nl_double **other_curanalog() { return m_other_curanalog; }
+	ATTR_HOT inline netlist_terminal_t **terms() { return m_term.data(); }
+	ATTR_HOT inline int *net_other() { return m_net_other.data(); }
+	ATTR_HOT inline nl_double *gt() { return m_gt.data(); }
+	ATTR_HOT inline nl_double *go() { return m_go.data(); }
+	ATTR_HOT inline nl_double *Idr() { return m_Idr.data(); }
+	ATTR_HOT inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
 
 	ATTR_COLD void set_pointers();
 
@@ -106,8 +106,8 @@ public:
 
 	ATTR_HOT nl_double solve();
 
-	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.count() > 0; }
-	ATTR_HOT inline bool is_timestep() { return m_step_devices.count() > 0; }
+	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.size() > 0; }
+	ATTR_HOT inline bool is_timestep() { return m_step_devices.size() > 0; }
 
 	ATTR_HOT void update_forced();
 	ATTR_HOT inline void update_after(const netlist_time after)

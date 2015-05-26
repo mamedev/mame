@@ -35,7 +35,7 @@
 
 #define EXTCLOCK(_name, _freq, _pattern)                                       \
 		NET_REGISTER_DEV(extclock, _name)                                      \
-		PARAM(_name.FREQ, _freq)											   \
+		PARAM(_name.FREQ, _freq)                                               \
 		PARAM(_name.PATTERN, _pattern)
 
 #define GNDA()                                                                 \
@@ -52,13 +52,11 @@
 #define RES_SWITCH(_name, _IN, _P1, _P2)                                       \
 		NET_REGISTER_DEV(res_sw, _name)                                        \
 		NET_C(_IN, _name.I)                                                    \
-		NET_C(_P1, _name.1)													   \
-		NET_C(_P2, _name.2)													   \
-
+		NET_C(_P1, _name.1)                                                    \
+		NET_C(_P2, _name.2)
 /* Default device to hold netlist parameters */
-#define PARAMETERS(_name)													   \
-		NET_REGISTER_DEV(netlistparams, _name)                                 \
-
+#define PARAMETERS(_name)                                                      \
+		NET_REGISTER_DEV(netlistparams, _name)
 // -----------------------------------------------------------------------------
 // mainclock
 // -----------------------------------------------------------------------------

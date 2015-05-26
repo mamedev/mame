@@ -556,6 +556,7 @@ MACHINES["STEPPERS"] = true
 MACHINES["CORVUSHD"] = true
 MACHINES["WOZFDC"] = true
 MACHINES["DIABLO_HD"] = true
+MACHINES["TMS1024"] = true
 
 --------------------------------------------------
 -- specify available bus cores

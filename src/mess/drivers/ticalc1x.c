@@ -1030,9 +1030,9 @@ ROM_START( tisr16 )
 	ROM_LOAD( "tms1001nl", 0x0000, 0x0400, CRC(b7ce3c1d) SHA1(95cdb0c6be31043f4fe06314ed41c0ca1337bc46) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_sr16_mpla.pla", 0, 867, CRC(5b35019c) SHA1(730d3b9041ed76d57fbedd73b009477fe432b386) )
+	ROM_LOAD( "tms1000_sr16_micro.pla", 0, 867, CRC(5b35019c) SHA1(730d3b9041ed76d57fbedd73b009477fe432b386) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_sr16_opla.pla", 0, 365, CRC(29b08739) SHA1(d55f01e40a2d493d45ea422f12e63b01bcde08fb) )
+	ROM_LOAD( "tms1000_sr16_output.pla", 0, 365, CRC(29b08739) SHA1(d55f01e40a2d493d45ea422f12e63b01bcde08fb) )
 ROM_END
 
 
@@ -1041,9 +1041,9 @@ ROM_START( tisr16ii )
 	ROM_LOAD( "tms1016nl", 0x0000, 0x0400, CRC(c07a7b27) SHA1(34ea4d3b59871e08db74f8c5bfb7ff00d1f0adc7) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_sr16ii_mpla.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
+	ROM_LOAD( "tms1000_sr16ii_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_sr16ii_opla.pla", 0, 365, CRC(c45dfbd0) SHA1(5d588c1abc317134b51eb08ac3953f1009d80056) )
+	ROM_LOAD( "tms1000_sr16ii_output.pla", 0, 365, CRC(c45dfbd0) SHA1(5d588c1abc317134b51eb08ac3953f1009d80056) )
 ROM_END
 
 
@@ -1052,13 +1052,13 @@ ROM_START( ti1270 )
 	ROM_LOAD( "za0355", 0x0000, 0x0400, CRC(48e09b4b) SHA1(17f27167164df223f9f06082ece4c3fc3900eda3) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_ti1270_ipla.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_ti1270_mpla.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_LOAD( "tms0970_ti1270_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_ti1270_opla.pla", 0, 352, CRC(f39bf0a4) SHA1(160341490043eb369720d5f487cf0f59f458a93e) )
+	ROM_LOAD( "tms0970_ti1270_output.pla", 0, 352, CRC(f39bf0a4) SHA1(160341490043eb369720d5f487cf0f59f458a93e) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_ti1270_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
+	ROM_LOAD( "tms0970_common2_segment.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
 ROM_END
 
 
@@ -1067,13 +1067,13 @@ ROM_START( ti1000 )
 	ROM_LOAD( "tmc1991nl", 0x0000, 0x0400, CRC(2da5381d) SHA1(b5dc14553db2068ed48e130e5ec9109930d8cda9) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_ti1000_ipla.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_ti1000_mpla.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_ti1000_opla.pla", 0, 352, CRC(1d82061a) SHA1(90e4a4b0fb3b4ae5965da90479b7fed737ad8831) )
+	ROM_LOAD( "tms0970_ti1000_output.pla", 0, 352, CRC(1d82061a) SHA1(90e4a4b0fb3b4ae5965da90479b7fed737ad8831) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_ti1000_spla.pla", 0, 157, CRC(234ca3a8) SHA1(76844dd87cb380a07c8fcbef143038087e98f138) )
+	ROM_LOAD( "tms0970_ti1000_segment.pla", 0, 157, CRC(234ca3a8) SHA1(76844dd87cb380a07c8fcbef143038087e98f138) )
 ROM_END
 
 
@@ -1082,13 +1082,13 @@ ROM_START( wizatron )
 	ROM_LOAD( "za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_wizatron_ipla.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_wizatron_mpla.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_wizatron_opla.pla", 0, 352, CRC(745a3900) SHA1(031b55a0cf783c8a88eec4289d4373eb8538f374) )
+	ROM_LOAD( "tms0970_wizatron_output.pla", 0, 352, CRC(745a3900) SHA1(031b55a0cf783c8a88eec4289d4373eb8538f374) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_wizatron_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
+	ROM_LOAD( "tms0970_common2_segment.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
 ROM_END
 
 
@@ -1097,13 +1097,13 @@ ROM_START( lilprof )
 	ROM_LOAD( "za0356", 0x0000, 0x0400, CRC(fef9dd39) SHA1(5c9614c9c5092d55dabeee2d6e0387d50d6ad4d5) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_lilprof_ipla.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_lilprof_mpla.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_LOAD( "tms0970_lilprof_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_lilprof_opla.pla", 0, 352, CRC(c74daf97) SHA1(c4948000196171b34d4fe9cdd2962a945da9883d) )
+	ROM_LOAD( "tms0970_lilprof_output.pla", 0, 352, CRC(c74daf97) SHA1(c4948000196171b34d4fe9cdd2962a945da9883d) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_lilprof_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
+	ROM_LOAD( "tms0970_common2_segment.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
 ROM_END
 
 ROM_START( lilprof78 )
@@ -1111,13 +1111,13 @@ ROM_START( lilprof78 )
 	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_lilprof78_ipla.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_lilprof78_mpla.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_lilprof78_opla.pla", 0, 352, CRC(03f509c4) SHA1(691554a55db0c5950df848077095f23a991b1909) )
+	ROM_LOAD( "tms0970_lilprof78_output.pla", 0, 352, CRC(03f509c4) SHA1(691554a55db0c5950df848077095f23a991b1909) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_lilprof78_spla.pla", 0, 157, CRC(234ca3a8) SHA1(76844dd87cb380a07c8fcbef143038087e98f138) )
+	ROM_LOAD( "tms0970_lilprof78_segment.pla", 0, 157, CRC(234ca3a8) SHA1(76844dd87cb380a07c8fcbef143038087e98f138) )
 ROM_END
 
 
@@ -1126,13 +1126,13 @@ ROM_START( ti30 )
 	ROM_LOAD16_WORD( "tmc0981nl", 0x0000, 0x1000, CRC(41298a14) SHA1(06f654c70add4044a612d3a38b0c2831c188fd0c) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0980_default_mpla.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_ti30_opla.pla", 0, 352, CRC(38788410) SHA1(cb3d1a61190b887cd2e6d9c60b4fdb9b901f7eed) )
+	ROM_LOAD( "tms0980_ti30_output.pla", 0, 352, CRC(38788410) SHA1(cb3d1a61190b887cd2e6d9c60b4fdb9b901f7eed) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_ti30_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
 
 
@@ -1141,13 +1141,13 @@ ROM_START( tibusan1 )
 	ROM_LOAD16_WORD( "tmc0982nl", 0x0000, 0x1000, CRC(6954560a) SHA1(6c153a0c9239a811e3514a43d809964c06f8f88e) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0980_default_mpla.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_tibusan1_opla.pla", 0, 352, CRC(38788410) SHA1(cb3d1a61190b887cd2e6d9c60b4fdb9b901f7eed) )
+	ROM_LOAD( "tms0980_tibusan1_output.pla", 0, 352, CRC(38788410) SHA1(cb3d1a61190b887cd2e6d9c60b4fdb9b901f7eed) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_tibusan1_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
 
 
@@ -1156,13 +1156,13 @@ ROM_START( tiprog )
 	ROM_LOAD16_WORD( "za0675nl", 0x0000, 0x1000, CRC(82355854) SHA1(03fab373bce04df8ea3fe25352525e8539213626) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0980_tiprog_mpla.pla", 0, 1982, CRC(57043284) SHA1(0fa06d5865830ecdb3d870271cb92ac917bed3ca) )
+	ROM_LOAD( "tms0980_tiprog_micro.pla", 0, 1982, CRC(57043284) SHA1(0fa06d5865830ecdb3d870271cb92ac917bed3ca) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_tiprog_opla.pla", 0, 352, BAD_DUMP CRC(2a63956f) SHA1(26a62ca2b5973d8564e580e12230292f6d2888d9) ) // corrected by hand
+	ROM_LOAD( "tms0980_tiprog_output.pla", 0, 352, BAD_DUMP CRC(2a63956f) SHA1(26a62ca2b5973d8564e580e12230292f6d2888d9) ) // corrected by hand
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0980_tiprog_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
 
 

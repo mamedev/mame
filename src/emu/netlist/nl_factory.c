@@ -38,9 +38,9 @@ netlist_factory_t::netlist_factory_t()
 
 netlist_factory_t::~netlist_factory_t()
 {
-	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
+	for (int i=0; i < m_list.size(); i++)
 	{
-		net_device_t_base_factory *p = *e;
+		net_device_t_base_factory *p = m_list[i];
 		pfree(p);
 	}
 	m_list.clear();
@@ -48,9 +48,9 @@ netlist_factory_t::~netlist_factory_t()
 
 netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname) const
 {
-	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
+	for (int i=0; i < m_list.size(); i++)
 	{
-		net_device_t_base_factory *p = *e;
+		net_device_t_base_factory *p = m_list[i];
 		if (p->classname() == classname)
 		{
 			netlist_device_t *ret = p->Create();
@@ -69,9 +69,9 @@ netlist_device_t *netlist_factory_t::new_device_by_name(const pstring &name, net
 
 net_device_t_base_factory * netlist_factory_t::factory_by_name(const pstring &name, netlist_setup_t &setup) const
 {
-	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
+	for (int i=0; i < m_list.size(); i++)
 	{
-		net_device_t_base_factory *p = *e;
+		net_device_t_base_factory *p = m_list[i];
 		if (p->name() == name)
 		{
 			return p;

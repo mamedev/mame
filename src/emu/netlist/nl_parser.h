@@ -129,6 +129,14 @@ private:
 class netlist_sources_t
 {
 public:
+
+	netlist_sources_t() { }
+
+	~netlist_sources_t()
+	{
+		m_list.clear();
+	}
+
 	void add(netlist_source_t src)
 	{
 		m_list.add(src);
@@ -136,7 +144,7 @@ public:
 
 	void parse(netlist_setup_t &setup, const pstring name)
 	{
-		for (int i=0; i < m_list.count(); i++)
+		for (int i=0; i < m_list.size(); i++)
 		{
 			if (m_list[i].parse(setup, name))
 				return;
