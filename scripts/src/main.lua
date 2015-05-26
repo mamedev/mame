@@ -223,11 +223,21 @@ function mainProject(_target, _subtarget)
 			"libco",
 		}
 
+		-- FIXME: set the targetos based on _OPTIONS["platform"]
+
 		-- "macosx" for libretro platforms "osx" and "ios"
 		if _OPTIONS["targetos"]=="macosx" then
 			linkoptions {
 				"-fPIC",
 				"-Wl,-u,_retro_run",
+			}
+		end
+
+		-- "linux" for pretty much any Linux/BSD/Android…
+		if _OPTIONS["targetos"]=="linux" then
+			linkoptions {
+				"-fPIC",
+				"-Wl,--version-script=src/osd/retro/link.T",
 			}
 		end
 
