@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:K.Wilkins, Derrick Renaud, Frank Palazzolo, Couriersud
 #pragma once
 

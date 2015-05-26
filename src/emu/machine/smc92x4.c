@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Raphael Nabet, Michael Zapf
 /*
     HDC9224 and HDC9234 Hard and Floppy Disk Controller
