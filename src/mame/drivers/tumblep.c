@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood,Bryan McPhail
 /***************************************************************************
 
   Tumblepop (World)     (c) 1991 Data East Corporation

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Jarek Parchanski,Mirko Buffoni
+// copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
 /*************************************************************************
 
     System1 / System 2

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Sylvain Glaize
+// copyright-holders:David Haywood, Sylvain Glaize, Paul Priest, Olivier Galibert
 
 #include "cpu/sh2/sh2.h"
 

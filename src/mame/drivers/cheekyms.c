@@ -1,11 +1,9 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Lee Taylor, Chris Moore
 /*************************************************************************
     Universal Cheeky Mouse Driver
     (c)Lee Taylor May/June 1998, All rights reserved.
 
-    For use only in official MAME releases.
-    Not to be distributed as part of any commercial work.
 **************************************************************************/
 
 #include "emu.h"
