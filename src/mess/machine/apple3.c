@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Nathan Woods
+// copyright-holders:Nathan Woods,R. Belmont
 /***************************************************************************
 
     machine/apple3.c
