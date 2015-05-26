@@ -175,7 +175,7 @@ void abc80_state::video_start()
 	m_vsync_on_timer->adjust(screen->time_until_pos(0, 0), 0, screen->frame_period());
 
 	m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
-	m_vsync_on_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
+	m_vsync_off_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
 
 	// allocate memory
 	m_video_ram.allocate(0x400);
