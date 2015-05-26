@@ -259,6 +259,7 @@ void mos6530_base_t::device_reset()
 	update_irq();
 	edge_detect();
 
+	m_timer = 0xff;
 	m_prescale = 1024;
 
 	if (cur_live.state != IDLE) {
