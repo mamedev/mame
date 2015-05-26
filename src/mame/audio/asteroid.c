@@ -12,7 +12,7 @@
 
 /************************************************************************/
 /* Asteroids Sound System Analog emulation by K.Wilkins Nov 2000        */
-/* Questions/Suggestions to mame@dysfunction.demon.co.uk                */
+/* Questions/Suggestions to mame@esplexo.co.uk                          */
 /************************************************************************/
 
 static const discrete_lfsr_desc asteroid_lfsr =

@@ -3,7 +3,7 @@
 /***************************************************************************
 
 Namco System II driver by K.Wilkins  (Jun1998, Oct1999)
-Email: kwns2@dysfunction.demon.co.uk
+Email: mame@esplexo.co.uk
 
 How to calibrate the guns:
   - hold 9, press f2
