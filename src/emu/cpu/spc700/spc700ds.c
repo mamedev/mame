@@ -17,7 +17,7 @@ All rights reserved.
 
 
 
-struct opcode_struct
+struct spc700_opcode_struct
 {
 	unsigned char name;
 	unsigned char args[2];
@@ -60,7 +60,7 @@ static const char *const g_opnames[] =
 	"TCLR1", "TSET1", "XCN  "
 };
 
-static const opcode_struct g_opcodes[256] =
+static const spc700_opcode_struct g_opcodes[256] =
 {
 /* 00 */ {NOP    , {IMP , IMP }},
 /* 01 */ {TCALL  , {N0  , IMP }},
@@ -339,7 +339,7 @@ INLINE unsigned int read_16_immediate(void)
 
 CPU_DISASSEMBLE( spc700 )
 {
-	const opcode_struct* opcode;
+	const spc700_opcode_struct* opcode;
 	UINT32 flags = 0;
 	char* ptr;
 	int var;

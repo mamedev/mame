@@ -38,7 +38,7 @@ enum z80netape_speed
 	TAPE_1200BPS = 1200 /* 1200 bps */
 };
 
-struct cass_data_t {
+struct z80ne_cass_data_t {
 	struct {
 		int length;     /* time cassette level is at input.level */
 		int level;      /* cassette level */
@@ -110,7 +110,7 @@ public:
 	int m_reset_delay_counter;
 	UINT8 m_lx385_ctrl;
 	emu_timer *m_cassette_timer;
-	cass_data_t m_cass_data;
+	z80ne_cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
 	DECLARE_READ8_MEMBER(lx383_r);
 	DECLARE_WRITE8_MEMBER(lx383_w);
