@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
 /* 8 voices max */
 #define MAX_VOICES 8

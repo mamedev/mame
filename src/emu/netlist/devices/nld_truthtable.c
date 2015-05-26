@@ -188,7 +188,7 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 			tindex[j] = k;
 		}
 
-		help(0, inout, 0 , val, tindex);
+		help(0, inout, 0 , val, tindex.data());
 		ttline = pstring(truthtable[0]);
 		truthtable++;
 	}

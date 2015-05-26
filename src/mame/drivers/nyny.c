@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Darren Olafson
+// license:BSD-3-Clause
+// copyright-holders:Darren Olafson, Zsolt Vasvari
 /***************************************************************************
 
     New York! New York! hardware

@@ -5,10 +5,10 @@
     EACA Colour Genie Floppy Disc Controller
 
     TODO:
-    - Only native MESS .mfi files load
+    - Only native MESS .mfi files load (some sectors are marked DDM)
+    - FM mode disks can be formatted but don't work correctly
     - What's the exact FD1793 model?
     - How does it turn off the motor?
-    - How does it switch between FM/MFM?
     - What's the source of the timer and the exact timings?
 
 ***************************************************************************/
@@ -24,15 +24,21 @@
 
 #define VERBOSE 0
 
-// set to 1 to test fm disk formats
-#define FM_MODE 0
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 const device_type CGENIE_FDC = &device_creator<cgenie_fdc_device>;
+
+DEVICE_ADDRESS_MAP_START( mmio, 8, cgenie_fdc_device )
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x10) AM_READWRITE(irq_r, select_w)
+	AM_RANGE(0xec, 0xef) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_t, read)
+	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_WRITE(command_w)
+	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVWRITE("fd1793", fd1793_t, track_w)
+	AM_RANGE(0xee, 0xee) AM_MIRROR(0x10) AM_DEVWRITE("fd1793", fd1793_t, sector_w)
+	AM_RANGE(0xef, 0xef) AM_MIRROR(0x10) AM_DEVWRITE("fd1793", fd1793_t, data_w)
+ADDRESS_MAP_END
 
 FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )
 	FLOPPY_CGENIE_FORMAT
@@ -132,10 +138,7 @@ void cgenie_fdc_device::device_reset()
 	m_slot->m_program->install_rom(0xc000, 0xdfff, memregion("software")->base());
 
 	// memory mapped i/o
-	m_slot->m_program->install_read_handler(0xffe0, 0xffe3, 0, 0x10, read8_delegate(FUNC(cgenie_fdc_device::irq_r), this));
-	m_slot->m_program->install_write_handler(0xffe0, 0xffe3, 0, 0x10, write8_delegate(FUNC(cgenie_fdc_device::select_w), this));
-	m_slot->m_program->install_read_handler(0xffec, 0xffef, 0, 0x10, read8_delegate(FUNC(fd1793_t::read), m_fdc.target()));
-	m_slot->m_program->install_write_handler(0xffec, 0xffef, 0, 0x10, write8_delegate(FUNC(fd1793_t::write), m_fdc.target()));
+	m_slot->m_program->install_device(0xff00, 0xffff, *this, &cgenie_fdc_device::mmio);
 
 	// map extra socket
 	if (m_socket->exists())
@@ -199,9 +202,6 @@ WRITE8_MEMBER( cgenie_fdc_device::select_w )
 	if (VERBOSE)
 		logerror("cgenie_fdc_device::motor_w: 0x%02x\n", data);
 
-	if (FM_MODE)
-		m_fdc->dden_w(1);
-
 	m_floppy = NULL;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
@@ -216,4 +216,14 @@ WRITE8_MEMBER( cgenie_fdc_device::select_w )
 		m_floppy->ss_w(BIT(data, 4));
 		m_floppy->mon_w(0);
 	}
+}
+
+WRITE8_MEMBER( cgenie_fdc_device::command_w )
+{
+	// density select is encoded into this pseudo-command
+	if ((data & 0xfe) == 0xfe)
+		m_fdc->dden_w(!BIT(data, 0));
+
+	// forward to the controller
+	m_fdc->cmd_w(data);
 }
