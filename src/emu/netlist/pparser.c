@@ -227,7 +227,7 @@ void ppreprocessor::error(const pstring &err)
 
 
 
-double ppreprocessor::expr(const nl_util::pstring_list &sexpr, int &start, int prio)
+double ppreprocessor::expr(const nl_util::pstring_list &sexpr, std::size_t &start, int prio)
 {
 	double val;
 	pstring tok=sexpr[start];
@@ -255,14 +255,14 @@ double ppreprocessor::expr(const nl_util::pstring_list &sexpr, int &start, int p
 		}
 		else if (tok == "+")
 		{
-			if (prio >= 20)
+			if (prio > 10)
 				return val;
 			start++;
 			val = val + expr(sexpr, start, 10);
 		}
 		else if (tok == "-")
 		{
-			if (prio >= 20)
+			if (prio > 10)
 				return val;
 			start++;
 			val = val - expr(sexpr, start, 10);
@@ -272,13 +272,25 @@ double ppreprocessor::expr(const nl_util::pstring_list &sexpr, int &start, int p
 			start++;
 			val = val * expr(sexpr, start, 20);
 		}
+		else if (tok == "/")
+		{
+			start++;
+			val = val / expr(sexpr, start, 20);
+		}
+		else if (tok == "==")
+		{
+			if (prio > 5)
+				return val;
+			start++;
+			val = (val == expr(sexpr, start, 5)) ? 1.0 : 0.0;
+		}
 	}
 	return val;
 }
 
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 {
-	for (int i = 0; i<m_defines.size(); i++)
+	for (std::size_t i = 0; i<m_defines.size(); i++)
 	{
 		if (m_defines[i].m_name == name)
 			return &m_defines[i];
@@ -290,7 +302,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 {
 	nl_util::pstring_list elems = nl_util::splitexpr(line, m_expr_sep);
 	pstringbuffer ret = "";
-	for (int i=0; i<elems.size(); i++)
+	for (std::size_t i=0; i<elems.size(); i++)
 	{
 		define_t *def = get_define(elems[i]);
 		if (def != NULL)
@@ -301,6 +313,16 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	return pstring(ret.cstr());
 }
 
+static pstring catremainder(const nl_util::pstring_list &elems, std::size_t start, pstring sep)
+{
+	pstringbuffer ret = "";
+	for (std::size_t i=start; i<elems.size(); i++)
+	{
+		ret.cat(elems[i]);
+		ret.cat(sep);
+	}
+	return pstring(ret.cstr());
+}
 
 pstring ppreprocessor::process(const pstring &contents)
 {
@@ -309,7 +331,7 @@ pstring ppreprocessor::process(const pstring &contents)
 	UINT32 ifflag = 0; // 31 if levels
 	int level = 0;
 
-	int i=0;
+	std::size_t i=0;
 	while (i<lines.size())
 	{
 		pstring line = lines[i];
@@ -321,10 +343,22 @@ pstring ppreprocessor::process(const pstring &contents)
 			if (lti[0].equals("#if"))
 			{
 				level++;
-				int start = 0;
+				std::size_t start = 0;
 				nl_util::pstring_list t = nl_util::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
 				int val = expr(t, start, 0);
 				if (val == 0)
+					ifflag |= (1 << level);
+			}
+			else if (lti[0].equals("#ifdef"))
+			{
+				level++;
+				if (get_define(lti[1]) == NULL)
+					ifflag |= (1 << level);
+			}
+			else if (lti[0].equals("#ifndef"))
+			{
+				level++;
+				if (get_define(lti[1]) != NULL)
 					ifflag |= (1 << level);
 			}
 			else if (lti[0].equals("#else"))
@@ -340,6 +374,14 @@ pstring ppreprocessor::process(const pstring &contents)
 			{
 				// ignore
 			}
+			else if (lti[0].equals("#pragma"))
+			{
+				if (lti.size() > 3 && lti[1].equals("NETLIST"))
+				{
+					if (lti[2].equals("warning"))
+						error("NETLIST: " + catremainder(lti, 3, " "));
+				}
+			}
 			else if (lti[0].equals("#define"))
 			{
 				if (lti.size() != 3)
@@ -347,7 +389,7 @@ pstring ppreprocessor::process(const pstring &contents)
 				m_defines.add(define_t(lti[1], lti[2]));
 			}
 			else
-				error(pstring::sprintf("unknown directive on line %d: %s\n", i, line.cstr()));
+				error(pstring::sprintf("unknown directive on line %" SIZETFMT ": %s\n", i, line.cstr()));
 		}
 		else
 		{

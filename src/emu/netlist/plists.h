@@ -194,7 +194,7 @@ public:
 	~plist_t()
 	{
 		if (m_list != NULL)
-			this->dealloc(m_list, m_capacity);
+			this->dealloc(m_list);
 		m_list = NULL;
 	}
 
@@ -299,14 +299,14 @@ private:
 			for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
 				*pd = *ps;
 			if (m_list != NULL)
-				this->dealloc(m_list, m_capacity);
+				this->dealloc(m_list);
 			m_list = m_new;
 			m_count = cnt;
 		}
 		else
 		{
 			if (m_list != NULL)
-				this->dealloc(m_list, m_capacity);
+				this->dealloc(m_list);
 			m_list = NULL;
 			m_count = 0;
 		}
@@ -318,7 +318,7 @@ private:
 		return palloc_array(_ListClass, n);
 	}
 
-	void dealloc(_ListClass *p, std::size_t n)
+	void dealloc(_ListClass *p)
 	{
 		pfree_array(p);
 	}

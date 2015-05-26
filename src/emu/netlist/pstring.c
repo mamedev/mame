@@ -76,7 +76,7 @@ void pstring::pcopy(const char *from, int size)
 pstring pstring::substr(unsigned int start, int count) const
 {
 	pstring ret;
-	int alen = len();
+	unsigned alen = len();
 	if (start >= alen)
 		return ret;
 	if (count <0 || start + count > alen)

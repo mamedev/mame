@@ -228,7 +228,7 @@ void netlist_parser::device(const pstring &dev_type)
 	nl_util::pstring_list termlist = f->term_param_list();
 	nl_util::pstring_list def_params = f->def_params();
 
-	int cnt;
+	std::size_t cnt;
 
 	devname = get_identifier();
 
@@ -269,7 +269,7 @@ void netlist_parser::device(const pstring &dev_type)
 		tok = get_token();
 	}
 	if (cnt != termlist.size())
-		m_setup.netlist().error("netlist: input count mismatch for %s - expected %" SIZETFMT " found %d\n", devname.cstr(), termlist.size(), cnt);
+		m_setup.netlist().error("netlist: input count mismatch for %s - expected %" SIZETFMT " found %" SIZETFMT "\n", devname.cstr(), termlist.size(), cnt);
 	require_token(tok, m_tok_param_right);
 }
 

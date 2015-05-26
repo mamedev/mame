@@ -47,15 +47,15 @@ struct truthtable_desc_t
 	ATTR_COLD void setup(const char **truthtable, UINT32 disabled_ignore);
 
 private:
-	ATTR_COLD void help(int cur, nl_util::pstring_list list,
+	ATTR_COLD void help(unsigned cur, nl_util::pstring_list list,
 			UINT64 state,UINT16 val, UINT8 *timing_index);
-	static int count_bits(UINT32 v);
+	static unsigned count_bits(UINT32 v);
 	static UINT32 set_bits(UINT32 v, UINT32 b);
 	UINT32 get_ignored_simple(UINT32 i);
 	UINT32 get_ignored_extended(UINT32 i);
 
-	int m_NO;
-	int m_NI;
+	unsigned m_NO;
+	unsigned m_NI;
 	//int m_has_state;
 	bool *m_initialized;
 	UINT32 *m_outs;
@@ -69,7 +69,7 @@ private:
 
 };
 
-template<int m_NI, int m_NO, int has_state>
+template<unsigned m_NI, unsigned m_NO, int has_state>
 class nld_truthtable_t : public netlist_device_t
 {
 public:
@@ -166,12 +166,12 @@ public:
 		netlist_time mt = netlist_time::zero;
 
 		UINT32 state = 0;
-		for (int i = 0; i < m_NI; i++)
+		for (unsigned i = 0; i < m_NI; i++)
 		{
 			if (!doOUT || (m_ign & (1<<i)) != 0)
 				m_i[i].activate();
 		}
-		for (int i = 0; i < m_NI; i++)
+		for (unsigned i = 0; i < m_NI; i++)
 		{
 			state |= (INPLOGIC(m_i[i]) << i);
 			if (!doOUT)

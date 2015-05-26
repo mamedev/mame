@@ -25,9 +25,6 @@
 #pragma GCC optimize "-fivopts"
 #endif
 
-#define SOLVER_VERBOSE_OUT(x) do {} while (0)
-//#define SOLVER_VERBOSE_OUT(x) printf x
-
 #include <algorithm>
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
@@ -88,12 +85,12 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 
 	m_nets.clear();
 
-	for (int k = 0; k < nets.size(); k++)
+	for (std::size_t k = 0; k < nets.size(); k++)
 	{
 		m_nets.add(nets[k]);
 	}
 
-	for (int k = 0; k < nets.size(); k++)
+	for (std::size_t k = 0; k < nets.size(); k++)
 	{
 		NL_VERBOSE_OUT(("setting up net\n"));
 
@@ -101,7 +98,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 
 		net->m_solver = this;
 
-		for (int i = 0; i < net->m_core_terms.size(); i++)
+		for (std::size_t i = 0; i < net->m_core_terms.size(); i++)
 		{
 			netlist_core_terminal_t *p = net->m_core_terms[i];
 			NL_VERBOSE_OUT(("%s %s %d\n", p->name().cstr(), net->name().cstr(), (int) net->isRailNet()));
@@ -134,7 +131,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 				case netlist_terminal_t::INPUT:
 					{
 						netlist_analog_output_t *net_proxy_output = NULL;
-						for (int i = 0; i < m_inps.size(); i++)
+						for (std::size_t i = 0; i < m_inps.size(); i++)
 							if (m_inps[i]->m_proxied_net == &p->net().as_analog())
 							{
 								net_proxy_output = m_inps[i];
@@ -167,7 +164,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 {
 	// avoid recursive calls. Inputs are updated outside this call
-	for (int i=0; i<m_inps.size(); i++)
+	for (std::size_t i=0; i<m_inps.size(); i++)
 		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->m_cur_Analog);
 
 }
@@ -175,7 +172,7 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 ATTR_HOT void netlist_matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
-	for (int i=0; i < m_dynamic_devices.size(); i++)
+	for (std::size_t i=0; i < m_dynamic_devices.size(); i++)
 		switch (m_dynamic_devices[i]->family())
 		{
 			case netlist_device_t::DIODE:
@@ -218,7 +215,7 @@ ATTR_COLD void netlist_matrix_solver_t::update_forced()
 ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 {
 	const nl_double dd = delta.as_double();
-	for (int k=0; k < m_step_devices.size(); k++)
+	for (std::size_t k=0; k < m_step_devices.size(); k++)
 		m_step_devices[k]->step_time(dd);
 }
 
@@ -281,7 +278,7 @@ ATTR_HOT nl_double netlist_matrix_solver_t::solve()
 
 ATTR_COLD int netlist_matrix_solver_t::get_net_idx(netlist_net_t *net)
 {
-	for (int k = 0; k < m_nets.size(); k++)
+	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
 			return k;
 	return -1;
@@ -329,7 +326,7 @@ NETLIB_START(solver)
 
 NETLIB_RESET(solver)
 {
-	for (int i = 0; i < m_mat_solvers.size(); i++)
+	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
 		m_mat_solvers[i]->reset();
 }
 
@@ -341,7 +338,7 @@ NETLIB_UPDATE_PARAM(solver)
 
 NETLIB_STOP(solver)
 {
-	for (int i = 0; i < m_mat_solvers.size(); i++)
+	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
 		m_mat_solvers[i]->log_stats();
 }
 
@@ -355,7 +352,7 @@ NETLIB_UPDATE(solver)
 	if (m_params.m_dynamic)
 		return;
 
-	const int t_cnt = m_mat_solvers.size();
+	const std::size_t t_cnt = m_mat_solvers.size();
 
 #if HAS_OPENMP && USE_OPENMP
 	if (m_parallel.Value())
@@ -381,7 +378,7 @@ NETLIB_UPDATE(solver)
 				ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
 			}
 #else
-	for (int i = 0; i < t_cnt; i++)
+	for (std::size_t i = 0; i < t_cnt; i++)
 	{
 		if (m_mat_solvers[i]->is_timestep())
 		{
@@ -464,7 +461,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 	netlist().log("Scanning net groups ...");
 	// determine net groups
-	for (int i=0; i<netlist().m_nets.size(); i++)
+	for (std::size_t i=0; i<netlist().m_nets.size(); i++)
 	{
 		SOLVER_VERBOSE_OUT(("processing %s\n", netlist().m_nets[i]->name().cstr()));
 		if (!netlist().m_nets[i]->isRailNet())
@@ -484,7 +481,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	for (int i = 0; i <= cur_group; i++)
 	{
 		netlist_matrix_solver_t *ms;
-		int net_count = groups[i].size();
+		std::size_t net_count = groups[i].size();
 
 		switch (net_count)
 		{
@@ -547,11 +544,11 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		netlist().log("       # %d ==> %" SIZETFMT " nets", i, groups[i].size()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
 		netlist().log("       has %s elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
 		netlist().log("       has %s elements", ms->is_timestep() ? "timestep" : "no timestep");
-		for (int j=0; j<groups[i].size(); j++)
+		for (std::size_t j=0; j<groups[i].size(); j++)
 		{
-			netlist().log("Net %d: %s", j, groups[i][j]->name().cstr());
+			netlist().log("Net %" SIZETFMT ": %s", j, groups[i][j]->name().cstr());
 			netlist_net_t *n = groups[i][j];
-			for (int k = 0; k < n->m_core_terms.size(); k++)
+			for (std::size_t k = 0; k < n->m_core_terms.size(); k++)
 			{
 				const netlist_core_terminal_t *p = n->m_core_terms[k];
 				netlist().log("   %s", p->name().cstr());
