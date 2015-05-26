@@ -162,12 +162,6 @@ UINT8 s3virge_vga_device::s3_crtc_reg_read(UINT8 index)
 				break;
 			case 0x36:  // Configuration register 1
 				res = s3.strapping & 0x000000ff;
-				if(vga.svga_intf.vram_size == 0x200000)
-					res |= 0x80;
-				else if(vga.svga_intf.vram_size == 0x400000)
-					res |= 0x00;
-				else
-					res |= 0x80;  // shouldn't get here...
 				break;
 			case 0x37:  // Configuration register 2
 				res = (s3.strapping & 0x0000ff00) >> 8;
@@ -714,12 +708,15 @@ READ8_MEMBER(s3virge_vga_device::mem_r)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
-		int data;
+		UINT8 data;
 		if(offset & 0x10000)
 			return 0;
-		data = 0;
+		data = 0xff;
 		if(vga.sequencer.data[4] & 0x8)
-			data = vga.memory[offset + (svga.bank_r*0x10000)];
+		{
+			if(offset + (svga.bank_r*0x10000) < vga.svga_intf.vram_size)
+				data = vga.memory[offset + (svga.bank_r*0x10000)];
+		}
 		else
 		{
 			int i;
@@ -727,12 +724,18 @@ READ8_MEMBER(s3virge_vga_device::mem_r)
 			for(i=0;i<4;i++)
 			{
 				if(vga.sequencer.map_mask & 1 << i)
-					data |= vga.memory[offset*4+i+(svga.bank_r*0x10000)];
+				{
+					if(offset*4+i+(svga.bank_r*0x10000) < vga.svga_intf.vram_size)
+						data |= vga.memory[offset*4+i+(svga.bank_r*0x10000)];
+				}
 			}
 		}
 		return data;
 	}
-	return vga_device::mem_r(space,offset,mem_mask);
+	if((offset + (svga.bank_r*0x10000)) < vga.svga_intf.vram_size)
+		return vga_device::mem_r(space,offset,mem_mask);
+	else
+		return 0xff;
 }
 
 WRITE8_MEMBER(s3virge_vga_device::mem_w)
@@ -749,18 +752,25 @@ WRITE8_MEMBER(s3virge_vga_device::mem_w)
 		if(offset & 0x10000)
 			return;
 		if(vga.sequencer.data[4] & 0x8)
-			vga.memory[(offset + (svga.bank_w*0x10000)) % vga.svga_intf.vram_size] = data;
+		{
+			if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
+				vga.memory[(offset + (svga.bank_w*0x10000))] = data;
+		}
 		else
 		{
 			int i;
 			for(i=0;i<4;i++)
 			{
 				if(vga.sequencer.map_mask & 1 << i)
-					vga.memory[(offset*4+i+(svga.bank_w*0x10000)) % vga.svga_intf.vram_size] = data;
+				{
+					if((offset*4+i+(svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
+						vga.memory[(offset*4+i+(svga.bank_w*0x10000))] = data;
+				}
 			}
 		}
 		return;
 	}
 
-	vga_device::mem_w(space,offset,data,mem_mask);
+	if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
+		vga_device::mem_w(space,offset,data,mem_mask);
 }

@@ -48,9 +48,6 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 
 WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 {
-	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
-		return;
-
 	// Check if TH of controller port 2 is set to input (1)
 	if (m_io_ctrl_reg & 0x08)
 	{
@@ -66,6 +63,16 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 		}
 		m_ctrl2_th_state = state;
 	}
+}
+
+
+WRITE_LINE_MEMBER(sms_state::gg_ext_th_input)
+{
+	if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+		return;
+
+	// The EXT port act as the controller port 2 on SMS compatibility mode.
+	sms_ctrl2_th_input(state);
 }
 
 
@@ -182,7 +189,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 		if (!m_is_gamegear)
 			m_port_ctrl2->port_w(ctrl2_port_data);
 		else
-			m_port_gg_ext->port_w(ctrl2_port_data); // not verified
+			m_port_gg_ext->port_w(ctrl2_port_data);
 	}
 	// check if TH is set to input (1).
 	if (data & 0x08)
@@ -190,7 +197,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 		if (!m_is_gamegear)
 			ctrl2_port_data &= ~0x40 | m_port_ctrl2->port_r();
 		else
-			ctrl2_port_data &= ~0x40 | m_port_gg_ext->port_r(); // not verified
+			ctrl2_port_data &= ~0x40 | m_port_gg_ext->port_r();
 
 		// check if TH input level is high (1) and was output/low (0)
 		if ((ctrl2_port_data & 0x40) && !(m_io_ctrl_reg & 0x88))
@@ -325,7 +332,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		// For Japanese Master System, set upper 4 bits with TH/TR
 		// direction bits of IO control register, according to Enri's
-		// docs (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm).
+		// docs ( http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm ).
 		// This makes the console incapable of using the Light Phaser.
 		// Assume the same for a Japanese Game Gear.
 		m_port_dd_reg &= ~0x10 | ((m_io_ctrl_reg & 0x01) << 4);
@@ -390,7 +397,9 @@ WRITE8_MEMBER(sms_state::sms_audio_control_w)
 READ8_MEMBER(sms_state::sms_audio_control_r)
 {
 	if (m_has_fm)
-		return m_audio_control & 0x01; // just one bit even for smsj.
+		// The register reference on SMSPower states that just the
+		// first bit written is returned on reads (even for smsj?).
+		return m_audio_control & 0x01;
 	else
 		return sms_input_port_dc_r(space, offset);
 }
@@ -825,7 +834,7 @@ void sms_state::setup_media_slots()
 	// Set offset for Light Phaser
 	if (!m_is_mark_iii)
 	{
-		m_lphaser_x_offs = 36;
+		m_lphaser_x_offs = -1; // same value returned for ROMs without custom offset.
 
 		if (m_mem_device_enabled & ENABLE_CART)
 			m_lphaser_x_offs = m_cartslot->m_cart->get_lphaser_xoffs();
@@ -833,6 +842,9 @@ void sms_state::setup_media_slots()
 			m_lphaser_x_offs = m_cardslot->m_cart->get_lphaser_xoffs();
 		else if (m_mem_device_enabled & ENABLE_EXPANSION)
 			m_lphaser_x_offs = m_expslot->m_device->get_lphaser_xoffs();
+
+		if (m_lphaser_x_offs == -1)
+			m_lphaser_x_offs = 36;
 	}
 }
 

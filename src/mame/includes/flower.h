@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:insideoutboy
+// license:BSD-3-Clause
+// copyright-holders:insideoutboy, David Haywood, Stephh
 class flower_state : public driver_device
 {
 public:

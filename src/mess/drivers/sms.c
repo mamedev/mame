@@ -18,6 +18,7 @@
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
    that has homebrew software support
  - Rapid button of Japanese Master System
+ - Verify if disabling of the SN76489 PSG chip is possible on sms1krfm console
  - Keyboard support for Sega Mark III (sg1000m3 driver)
  - Link between two Mark III's through keyboard, supported by F-16 Fighting Falcon
  - Mark III expansion slot, used by keyboard and FM module
@@ -52,7 +53,7 @@ General compatibility issues on real hardware (not emulation bugs):
 
 - Some ROMs have issues or don't work when running on a console of different
   region;
-- Many Japanese/Korean or homebrew ROMs don't have the signature required by
+- Many Japanese, Korean and homebrew ROMs don't have the signature required by
   BIOSes of consoles sold overseas;
 - Paddle games need to detect the system region as Japanese to work with the
   Paddle controller;
@@ -229,10 +230,10 @@ SMS Store Unit memory map for the second CPU:
 8000      - System Control Register (R/W)
             Reading:
             bit7      - ready (0 = ready, 1 = not ready)
-            bit6      - active timer bit switch (0 = selection 2, 1 = selection 1)
+            bit6      - active timer bit switch (0 = timer 2, 1 = timer 1)
             bit5      - unknown
-            bit4-bit3 - timer selection 2 bit switches (10s-25s)
-            bit2-bit0 - timer selection 1 bit switches (30s-135s)
+            bit4-bit3 - timer 2 length bit switches (10s-25s)
+            bit2-bit0 - timer 1 length bit switches (30s-135s)
             Writing:
             bit7-bit4 - led of selected game to set
             bit3      - unknown, 1 seems to be written all the time
@@ -322,7 +323,8 @@ ADDRESS_MAP_END
 // It seems the Korean versions do some more strict decoding on the I/O
 // addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
-// Enri's doc about the Japanese SMS also doesn't mention them.
+// Enri's doc ( http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm ) about
+// the Japanese SMS also doesn't mention them.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
 static ADDRESS_MAP_START( smsj_io, AS_IO, 8, sms_state )
 	AM_IMPORT_FROM(sg1000m3_io)
@@ -331,13 +333,13 @@ static ADDRESS_MAP_START( smsj_io, AS_IO, 8, sms_state )
 ADDRESS_MAP_END
 
 
-// The first Korean SMS version also seems to lack I/O port $3F.
-// Games detect the first version as Japanese region (opposite to the second
-// version). The region detection tests the behavior of the TH bits of port
-// $DD. Port $3F sets the mode used by those bits. If the first version would
-// use the same mode used by Japanese SMS, it would't support the Light Phaser,
-// as it does. If it would use the standard mode of other SMS versions, the
-// system would be detected as Export region.
+// The first Korean SMS version also seems to lack I/O port $3F. Games execute
+// a region detection procedure that, through that port, sets the mode used by
+// the TH bits of port $DD and tests their behavior. The region of the first SMS
+// version is detected as Japanese (opposite to the second version). However,
+// as it supports Light Phaser games, it doesn't have the same behavior of the
+// Japanese SMS. If it had the behavior of other SMS versions, the system
+// region would be detected as Export, so it probably lacks the port.
 static ADDRESS_MAP_START( sms1kr_io, AS_IO, 8, sms_state )
 	AM_IMPORT_FROM(sg1000m3_io)
 	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
@@ -748,19 +750,17 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( smsj, sms1_krfm )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smsj_io)
-
-	// Mark III does not have TH connected. Also, according with Enri's docs
-	// (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm), the Japanese SMS
-	// only allows read of TH direction, through port $dd, not its input state.
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sg1000m3, smsj )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sg1000m3_io)
+
+	// Mark III does not have TH connected.
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms2_kr, sms2_ntsc )
@@ -812,7 +812,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gamegear")
 
 	MCFG_GG_EXT_PORT_ADD("ext", gg_ext_port_devices, NULL)
-	MCFG_GG_EXT_PORT_TH_INPUT_HANDLER(WRITELINE(sms_state, sms_ctrl2_th_input)) // not verified
+	MCFG_GG_EXT_PORT_TH_INPUT_HANDLER(WRITELINE(sms_state, gg_ext_th_input))
 	//MCFG_GG_EXT_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color)) // only for GG-TV mod
 MACHINE_CONFIG_END
 
@@ -1012,5 +1012,5 @@ CONS( 1989, sms1krfm,   sms,        0,      sms1_krfm,   smsj,     sms_state,   
 CONS( 19??, sms1kr,     sms,        0,      sms1_kr,     smsj,     sms_state,      sms1kr,   "Samsung",  "Gam*Boy I (Korea)",                GAME_SUPPORTS_SAVE )
 CONS( 1991, smskr,      sms,        0,      sms2_kr,     sms,      sms_state,      smskr,    "Samsung",  "Gam*Boy II (Korea)",               GAME_SUPPORTS_SAVE )
 
-CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,       sms_state,      gamegear, "Sega",     "Game Gear (Europe/America)",       GAME_SUPPORTS_SAVE )
+CONS( 1991, gamegear,   0,          sms,    gamegear,    gg,       sms_state,      gamegear, "Sega",     "Game Gear (Europe/America)",       GAME_SUPPORTS_SAVE )
 CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,       sms_state,      gamegeaj, "Sega",     "Game Gear (Japan)",                GAME_SUPPORTS_SAVE )

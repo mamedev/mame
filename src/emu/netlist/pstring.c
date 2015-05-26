@@ -13,20 +13,20 @@
 #include <cstdlib>
 
 #include "pstring.h"
+#include "palloc.h"
 
 // The following will work on linux, however not on Windows ....
 
 //pblockpool *pstring::m_pool = new pblockpool;
 //pstring::str_t *pstring::m_zero = new(pstring::m_pool, 0) pstring::str_t(0);
 
-pblockpool pstring::m_pool;
-pstring::str_t pstring::m_zero;
+pstring::str_t pstring::m_zero = str_t(0);
 
 /*
  * Uncomment the following to override defaults
  */
 
-//#define IMMEDIATE_MODE  (1)
+#define IMMEDIATE_MODE  (1)
 //#define DEBUG_MODE      (0)
 
 #ifdef MAME_DEBUG
@@ -75,12 +75,12 @@ void pstring::pcopy(const char *from, int size)
 
 pstring pstring::substr(unsigned int start, int count) const
 {
-	int alen = len();
+	pstring ret;
+	unsigned alen = len();
 	if (start >= alen)
-		return pstring();
+		return ret;
 	if (count <0 || start + count > alen)
 		count = alen - start;
-	pstring ret;
 	ret.pcopy(cstr() + start, count);
 	return ret;
 }
@@ -90,7 +90,7 @@ pstring pstring::ucase() const
 	pstring ret = *this;
 	ret.pcopy(cstr(), len());
 	for (int i=0; i<ret.len(); i++)
-		ret.m_ptr->m_str[i] = toupper((unsigned) ret.m_ptr->m_str[i]);
+		ret.m_ptr->str()[i] = toupper((unsigned) ret.m_ptr->str()[i]);
 	return ret;
 }
 
@@ -100,7 +100,7 @@ int pstring::find_first_not_of(const pstring no) const
 	{
 		bool f = true;
 		for (int j=0; j < no.len(); j++)
-			if (m_ptr->m_str[i] == no.m_ptr->m_str[j])
+			if (m_ptr->str()[i] == no.m_ptr->str()[j])
 				f = false;
 		if (f)
 			return i;
@@ -114,7 +114,7 @@ int pstring::find_last_not_of(const pstring no) const
 	{
 		bool f = true;
 		for (int j=0; j < no.len(); j++)
-			if (m_ptr->m_str[i] == no.m_ptr->m_str[j])
+			if (m_ptr->str()[i] == no.m_ptr->str()[j])
 				f = false;
 		if (f)
 			return i;
@@ -235,20 +235,24 @@ void pstring::sfree(str_t *s)
 {
 	s->m_ref_count--;
 	if (s->m_ref_count == 0 && s != &m_zero)
-		m_pool.dealloc(s);
+	{
+		pfree_array(((char *)s));
+		//_mm_free(((char *)s));
+	}
 }
 
 pstring::str_t *pstring::salloc(int n)
 {
-	str_t *ret = new(m_pool, n+1) str_t(n);
-	return ret;
+	int size = sizeof(str_t) + n + 1;
+	str_t *p = (str_t *) palloc_array(char, size);
+	//  str_t *p = (str_t *) _mm_malloc(size, 8);
+	p->init(n);
+	return p;
 }
 
 void pstring::resetmem()
 {
 	// Release the 0 string
-	m_pool.m_shutdown = true;
-	m_pool.resetmem();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -293,125 +297,64 @@ int pstring::pcmp(const char *left, const char *right, int count) const
 }
 
 // ----------------------------------------------------------------------------------------
-// block allocation pool
+// pstringbuffer
 // ----------------------------------------------------------------------------------------
 
-
-pblockpool::pblockpool()
-	: m_shutdown(false)
-	, m_first(NULL)
-	, m_blocksize((DEBUG_MODE) ? 16384 : 16384)
-	, m_align(8)
+pstringbuffer::~pstringbuffer()
 {
+	if (m_ptr != NULL)
+		pfree_array(m_ptr);
 }
 
-pblockpool::~pblockpool()
+void pstringbuffer::resize(const std::size_t size)
 {
-}
-
-
-void *pblockpool::alloc(const std::size_t n)
-{
-	if (IMMEDIATE_MODE)
-		return (char *) malloc(n);
-	else
+	if (m_ptr == NULL)
 	{
-		std::size_t memsize = ((n + m_align - 1) / m_align) * m_align;
-		std::size_t min_alloc = std::max(m_blocksize, memsize+sizeof(memblock)-MINDATASIZE);
-		char *ret = NULL;
-		//std::printf("m_first %p\n", m_first);
-		for (memblock *p = m_first; p != NULL && ret == NULL; p = p->next)
-		{
-			if (p->remaining > memsize)
-			{
-				ret = p->cur;
-				p->cur += memsize;
-				p->allocated += 1;
-				p->remaining -= memsize;
-			}
-		}
-
-		if (ret == NULL)
-		{
-			// need to allocate a new block
-			memblock *p = (memblock *) malloc(min_alloc); //new char[min_alloc];
-			p->allocated = 0;
-			p->cur = &p->data[0];
-			p->size = p->remaining = min_alloc - (sizeof(memblock)-MINDATASIZE);
-			p->next = m_first;
-			//std::printf("allocated block size %d\n", sizeof(p->data));
-
-			ret = p->cur;
-			p->cur += memsize;
-			p->allocated += 1;
-			p->remaining -= memsize;
-
-			m_first = p;
-		}
-
-		return ret;
+		m_size = DEFAULT_SIZE;
+		while (m_size <= size)
+			m_size *= 2;
+		m_ptr = palloc_array(char, m_size);
+		m_len = 0;
+	}
+	else if (m_size < size)
+	{
+		while (m_size < size)
+			m_size *= 2;
+		char *new_buf = palloc_array(char, m_size);
+		std::strncpy(new_buf, m_ptr, m_len + 1);
+		pfree_array(m_ptr);
+		m_ptr = new_buf;
 	}
 }
 
-void pblockpool::dealloc(void *ptr)
+void pstringbuffer::pcopy(const char *from)
 {
-	if (IMMEDIATE_MODE)
-		free(ptr);
-	else
-	{
-		for (memblock *p = m_first; p != NULL; p = p->next)
-		{
-			if (ptr >= &p->data[0] && ptr < &p->data[p->size])
-			{
-				p->allocated -= 1;
-				if (p->allocated < 0)
-					std::fprintf(stderr, "nstring: memory corruption - crash likely\n");
-				if (p->allocated == 0)
-				{
-					//std::printf("Block entirely freed\n");
-					p->remaining = p->size;
-					p->cur = &p->data[0];
-				}
-				// shutting down ?
-				if (m_shutdown)
-					resetmem(); // try to free blocks
-				return;
-			}
-		}
-		std::fprintf(stderr, "nstring: string <%p> not found on free\n", ptr);
-	}
+	std::size_t nl = strlen(from) + 1;
+	resize(nl);
+	std::strncpy(m_ptr, from, nl);
 }
 
-void pblockpool::resetmem()
+void pstringbuffer::pcopy(const pstring &from)
 {
-	if (!IMMEDIATE_MODE)
-	{
-		memblock **p = &m_first;
-		int totalblocks = 0;
-		int freedblocks = 0;
-
-		while (*p != NULL)
-		{
-			totalblocks++;
-			memblock **next = &((*p)->next);
-			if ((*p)->allocated == 0)
-			{
-				//std::printf("freeing block %p\n", *p);
-				memblock *freeme = *p;
-				*p = *next;
-				free(freeme); //delete[] *p;
-				freedblocks++;
-			}
-			else
-			{
-				//if (DEBUG_MODE)
-				//    std::printf("Allocated: <%s>\n", ((str_t *)(&(*p)->data[0]))->str());
-
-				p = next;
-			}
-		}
-		if (DEBUG_MODE)
-			std::printf("Freed %d out of total %d blocks\n", freedblocks, totalblocks);
-	}
+	std::size_t nl = from.len() + 1;
+	resize(nl);
+	std::strncpy(m_ptr, from.cstr(), nl);
 }
 
+void pstringbuffer::pcat(const char *s)
+{
+	std::size_t slen = std::strlen(s);
+	std::size_t nl = m_len + slen + 1;
+	resize(nl);
+	std::strncpy(m_ptr + m_len, s, slen + 1);
+	m_len += slen;
+}
+
+void pstringbuffer::pcat(const pstring &s)
+{
+	std::size_t slen = s.len();
+	std::size_t nl = m_len + slen + 1;
+	resize(nl);
+	std::strncpy(m_ptr + m_len, s.cstr(), slen + 1);
+	m_len += slen;
+}

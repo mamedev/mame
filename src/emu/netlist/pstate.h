@@ -26,7 +26,7 @@
 	template<typename C, std::size_t N> ATTR_COLD void obj::save(C (&state)[N], const pstring &stname) \
 	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false); } \
 	template<typename C> ATTR_COLD void obj::save(C *state, const pstring &stname, const int count) \
-	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(C), count, state, false); 	}
+	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(C), count, state, false);   }
 
 enum pstate_data_type_e {
 	NOT_SUPPORTED,
@@ -98,6 +98,8 @@ struct pstate_entry_t
 	pstate_entry_t(const pstring &stname, const void *owner, pstate_callback_t *callback)
 	: m_name(stname), m_dt(DT_CUSTOM), m_owner(owner), m_callback(callback), m_size(0), m_count(0), m_ptr(NULL), m_is_ptr(false) { }
 
+	~pstate_entry_t() { }
+
 	pstring m_name;
 	const pstate_data_type_e m_dt;
 	const void *m_owner;
@@ -121,7 +123,8 @@ class pstate_manager_t
 {
 public:
 
-	ATTR_COLD ~pstate_manager_t();
+	pstate_manager_t();
+	~pstate_manager_t();
 
 	template<typename C> ATTR_COLD void save_item(C &state, const void *owner, const pstring &stname)
 	{

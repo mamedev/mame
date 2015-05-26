@@ -4,9 +4,6 @@
 
     Z80 CTC (Z8430) implementation
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
                             _____   _____
                     D4   1 |*    \_/     | 28  D3

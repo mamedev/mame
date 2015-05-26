@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
@@ -124,13 +124,13 @@ PALETTE_INIT_MEMBER(carpolo_state, carpolo)
 			pen = ((i - 0x38) & 0x01) ? ALPHA_COLOR_BASE   + ((i - 0x38) >> 1) : 0;
 
 		/* red component */
-		r = ((r_voltage[(color_prom[pen] >> 5) & 0x07] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
+		r = ((r_voltage[(color_prom[pen] >> 5) & 0x07] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.0f;
 
 		/* green component */
-		g = ((g_voltage[(color_prom[pen] >> 2) & 0x07] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
+		g = ((g_voltage[(color_prom[pen] >> 2) & 0x07] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.0f;
 
 		/* blue component */
-		b = ((b_voltage[(color_prom[pen] >> 0) & 0x03] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
+		b = ((b_voltage[(color_prom[pen] >> 0) & 0x03] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.0f;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

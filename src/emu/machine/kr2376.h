@@ -4,9 +4,6 @@
 
     SMC KR2376 Keyboard Encoder emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    Vcc   1 |*    \_/     | 40  Frequency Control A

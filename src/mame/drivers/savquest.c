@@ -34,9 +34,6 @@
 
     On boot it reports: S3 86C775/86C705 Video BIOS. Version 2.04.11 Copyright 1996 S3 Incorporated.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 - update by Peter Ferrie:
 - split BIOS region into 16kb blocks and implement missing PAM registers
 

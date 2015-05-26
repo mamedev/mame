@@ -10,66 +10,9 @@
 #include "pconfig.h"
 
 // ----------------------------------------------------------------------------------------
-// pblockbool: allocate small memory more efficiently at the expense of some overhead
-// ----------------------------------------------------------------------------------------
-
-struct pblockpool {
-
-public:
-	static const int MINDATASIZE = 8;
-
-	pblockpool();
-	~pblockpool();
-
-	void resetmem();
-
-	void *alloc(std::size_t n);
-	void dealloc(void *ptr);
-
-	template<class T>
-	void destroy(T* object)
-	{
-		object->~T();
-		dealloc(object);
-	}
-	bool m_shutdown;
-
-private:
-	struct memblock
-	{
-		memblock *next;
-		int size;
-		int allocated;
-		int remaining;
-		char *cur;
-		char data[MINDATASIZE];
-	};
-
-	memblock *m_first;
-	std::size_t m_blocksize;
-	int m_align;
-};
-
-/* objects must be destroyed using destroy above */
-
-inline void *operator new(std::size_t size, pblockpool &pool, int extra = 0) throw (std::bad_alloc)
-{
-	void *result = pool.alloc(size + extra);
-	//std::printf("allocating %ld + %d\n", size, extra);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-inline void operator delete(void *pMem, pblockpool &pool, ATTR_UNUSED int extra)
-{
-	pool.dealloc(pMem);
-}
-
-// ----------------------------------------------------------------------------------------
-// nstring: immutable strings ...
+// pstring: immutable strings ...
 //
-// nstrings are just a pointer to a "pascal-style" string representation.
+// pstrings are just a pointer to a "pascal-style" string representation.
 // It uses reference counts and only uses new memory when a string changes.
 // ----------------------------------------------------------------------------------------
 
@@ -98,6 +41,7 @@ public:
 	// concatenation operators
 	pstring& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
 	pstring& operator+=(const pstring &string) { pcat(string.cstr()); return *this; }
+	pstring& operator+=(const char *string) { pcat(string); return *this; }
 	friend pstring operator+(const pstring &lhs, const pstring &rhs) { return pstring(lhs) += rhs; }
 	friend pstring operator+(const pstring &lhs, const char *rhs) { return pstring(lhs) += rhs; }
 	friend pstring operator+(const pstring &lhs, const char rhs) { return pstring(lhs) += rhs; }
@@ -117,7 +61,6 @@ public:
 	bool operator>=(const char *string) const { return (pcmp(string) >= 0); }
 	bool operator>=(const pstring &string) const { return (pcmp(string.cstr()) >= 0); }
 
-	//
 	inline int len() const { return m_ptr->len(); }
 
 	inline bool equals(const pstring &string) const { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
@@ -182,20 +125,26 @@ protected:
 
 	struct str_t
 	{
-		str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
-		str_t(int alen) : m_ref_count(1), m_len(alen) { m_str[0] = 0; }
-
+		//str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
+		str_t(const int alen)
+		{
+			init(alen);
+		}
+		void init(const int alen)
+		{
+				m_ref_count = 1;
+				m_len = alen;
+				m_str[0] = 0;
+		}
 		char *str() { return &m_str[0]; }
 		int len() { return m_len; }
-	//private:
 		int m_ref_count;
+	private:
 		int m_len;
 		char m_str[1];
 	};
 
 	str_t *m_ptr;
-
-	static pblockpool m_pool;
 
 private:
 	inline void init()
@@ -232,6 +181,76 @@ private:
 	static str_t m_zero;
 };
 
+// ----------------------------------------------------------------------------------------
+// pstringbuffer: a string buffer implementation
+//
+// string buffer are optimized to handle concatenations. This implementation is designed
+// to specifically interact with pstrings nicely.
+// ----------------------------------------------------------------------------------------
+
+struct pstringbuffer
+{
+public:
+	static const int DEFAULT_SIZE = 2048;
+	// simple construction/destruction
+	pstringbuffer()
+	{
+		init();
+		resize(DEFAULT_SIZE);
+	}
+
+	~pstringbuffer();
+
+	// construction with copy
+	pstringbuffer(const char *string) {init(); if (string != NULL) pcopy(string); }
+	pstringbuffer(const pstring &string) {init(); pcopy(string); }
+
+	// assignment operators
+	pstringbuffer &operator=(const char *string) { pcopy(string); return *this; }
+	pstringbuffer &operator=(const pstring &string) { pcopy(string); return *this; }
+	pstringbuffer &operator=(const pstringbuffer &string) { pcopy(string.cstr()); return *this; }
+
+	// C string conversion operators and helpers
+	operator const char *() const { return m_ptr; }
+	inline const char *cstr() const { return m_ptr; }
+
+	operator pstring() const { return pstring(m_ptr); }
+
+	// concatenation operators
+	pstringbuffer& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
+	pstringbuffer& operator+=(const pstring &string) { pcat(string.cstr()); return *this; }
+
+	inline std::size_t len() const { return m_len; }
+
+	inline void cat(const pstring &s) { pcat(s); }
+	inline void cat(const char *s) { pcat(s); }
+
+	pstring substr(unsigned int start, int count = -1)
+	{
+		return pstring(m_ptr).substr(start, count);
+	}
+
+private:
+
+	inline void init()
+	{
+		m_ptr = NULL;
+		m_size = 0;
+		m_len = 0;
+	}
+
+	void resize(const std::size_t size);
+
+	void pcopy(const char *from);
+	void pcopy(const pstring &from);
+	void pcat(const char *s);
+	void pcat(const pstring &s);
+
+	char *m_ptr;
+	std::size_t m_size;
+	std::size_t m_len;
+
+};
 
 
 #endif /* _PSTRING_H_ */

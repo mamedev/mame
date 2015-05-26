@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:Nathan Woods,Frank Palazzolo
 #include "emu.h"
 #include "includes/intv.h"
 

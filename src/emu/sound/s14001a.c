@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu,R. Belmont,Zsolt Vasvari
 /*
 
@@ -9,26 +9,6 @@
  Other fixes by AtariAce
 
  Copyright (C) 2006-2013 Jonathan Gevaryahu aka Lord Nightmare
- This source file is dual-licensed under the following licenses:
- 1. The MAME license as of September 2013
- 2. The GNU LGPLv2.1:
-
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
-
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
-
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
- Please contact the author if you require other licensing.
-
 
  Version history:
  0.8 initial version - LN

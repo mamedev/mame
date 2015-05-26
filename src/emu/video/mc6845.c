@@ -4,9 +4,6 @@
 
     Motorola MC6845 and compatible CRT controller emulation
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
     The following variations exist that are different in
     functionality and not just in speed rating(1):
         * Motorola 6845, 6845-1

@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont
+// copyright-holders:Couriersud, Olivier Galibert, R. Belmont
 //============================================================
 //
 //  drawsdl.c - SDL software and OpenGL implementation
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
+//
+//  yuvmodes by Couriersud
 //
 //============================================================
 

@@ -29,14 +29,16 @@ public:
 	// construction/destruction
 	cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_ADDRESS_MAP(mmio, 8);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
-	TIMER_CALLBACK_MEMBER( irq_off_callback );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
 
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_READ8_MEMBER(irq_r);
 	DECLARE_WRITE8_MEMBER(select_w);
+	DECLARE_WRITE8_MEMBER(command_w);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -65,7 +67,6 @@ private:
 
 	floppy_image_device *m_floppy;
 
-	emu_timer *m_timer_irq_off;
 	UINT8 m_irq_status;
 };
 

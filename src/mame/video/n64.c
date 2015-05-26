@@ -3001,6 +3001,15 @@ void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
 	tex_tile->mask_s    = (w2 >>  4) & 0xf;
 	tex_tile->shift_s   = (w2 >>  0) & 0xf;
 
+	tex_tile->lshift_s  = (tex_tile->shift_s >= 11) ? (16 - tex_tile->shift_s) : 0;
+	tex_tile->rshift_s  = (tex_tile->shift_s < 11) ? tex_tile->shift_s : 0;
+	tex_tile->lshift_t  = (tex_tile->shift_t >= 11) ? (16 - tex_tile->shift_t) : 0;
+	tex_tile->rshift_t  = (tex_tile->shift_t < 11) ? tex_tile->shift_t : 0;
+	tex_tile->wrapped_mask_s = (tex_tile->mask_s > 10 ? 10 : tex_tile->mask_s);
+	tex_tile->wrapped_mask_t = (tex_tile->mask_t > 10 ? 10 : tex_tile->mask_t);
+	tex_tile->clamp_s = tex_tile->cs || !tex_tile->mask_s;
+	tex_tile->clamp_t = tex_tile->ct || !tex_tile->mask_t;
+
 	if (tex_tile->format == FORMAT_I && tex_tile->size > PIXEL_SIZE_8BIT)
 	{
 		tex_tile->format = FORMAT_RGBA; // Used by Supercross 2000 (in-game)

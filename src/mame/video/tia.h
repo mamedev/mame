@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Stefan Jokisch
 #ifndef _VIDEO_TIA_H_
 #define _VIDEO_TIA_H_

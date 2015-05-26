@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    mewui/sndmenu.h
+	mewui/sndmenu.h
 
-    Internal MEWUI user interface.
+	Internal MEWUI user interface.
 
 ***************************************************************************/
 
@@ -17,25 +17,25 @@
 class ui_menu_sound_options : public ui_menu
 {
 public:
-    ui_menu_sound_options(running_machine &machine, render_container *container);
-    virtual ~ui_menu_sound_options();
-    virtual void populate();
-    virtual void handle();
-    virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+	ui_menu_sound_options(running_machine &machine, render_container *container);
+	virtual ~ui_menu_sound_options();
+	virtual void populate();
+	virtual void handle();
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-    enum
-    {
-        ENABLE_SOUND = 1,
-        SAMPLE_RATE,
-        ENABLE_SAMPLES
-    };
+	enum
+	{
+		ENABLE_SOUND = 1,
+		SAMPLE_RATE,
+		ENABLE_SAMPLES
+	};
 
-    UINT16              cur_rates;
-    static const int    sound_rate[];
-    int                 m_sample_rate;
-    bool                m_samples;
-    bool                m_sound;
+	UINT16			  cur_rates;
+	static const int	sound_rate[];
+	int				 m_sample_rate;
+	bool				m_samples;
+	bool				m_sound;
 };
 
 #endif /* __SNDMENU_H__ */

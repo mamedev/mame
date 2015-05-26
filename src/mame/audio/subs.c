@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mike Balfour
+// copyright-holders:Derrick Renaud
 /*************************************************************************
 
     audio\subs.c

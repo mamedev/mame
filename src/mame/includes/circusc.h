@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria,Chris Hardy
+// copyright-holders:Nicola Salmoria,Chris Hardy, Couriersud
 /*************************************************************************
 
     Circus Charlie

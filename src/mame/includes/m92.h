@@ -9,7 +9,7 @@
 #include "video/bufsprite.h"
 #include "sound/okim6295.h"
 
-struct pf_layer_info
+struct M92_pf_layer_info
 {
 	tilemap_t *     tmap;
 	tilemap_t *     wide_tmap;
@@ -54,7 +54,7 @@ public:
 	UINT16 m_videocontrol;
 	UINT8 m_sprite_buffer_busy;
 	UINT8 m_game_kludge;
-	pf_layer_info m_pf_layer[3];
+	M92_pf_layer_info m_pf_layer[3];
 	UINT16 m_pf_master_control[4];
 	INT32 m_sprite_list;
 	UINT8 m_palette_bank;

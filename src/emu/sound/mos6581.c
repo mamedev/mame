@@ -4,9 +4,6 @@
 
     MOS 6581/8580 Sound Interface Device emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mos6581.h"

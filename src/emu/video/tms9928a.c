@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Sean Young, Nathan Woods, Aaron Giles
+// copyright-holders:Sean Young, Nathan Woods, Aaron Giles, Wilbert Pol, hap
 /*
 ** File: tms9928a.c -- software implementation of the Texas Instruments
 **                     TMS9918(A), TMS9928(A) and TMS9929(A), used by the Coleco, MSX and

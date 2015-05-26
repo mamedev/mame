@@ -9,132 +9,8 @@
 #define NL_PARSER_H_
 
 #include "nl_setup.h"
-
-class ptokenizer
-{
-	NETLIST_PREVENT_COPYING(ptokenizer)
-public:
-	virtual ~ptokenizer() {}
-
-	ptokenizer()
-	: m_line(1), m_line_ptr(NULL), m_px(NULL), m_string('"')
-	{}
-
-	enum token_type
-	{
-		IDENTIFIER,
-		NUMBER,
-		TOKEN,
-		STRING,
-		COMMENT,
-		UNKNOWN,
-		ENDOFFILE
-	};
-
-	struct token_id_t
-	{
-	public:
-		token_id_t() : m_id(-2) {}
-		token_id_t(const int id) : m_id(id) {}
-		int id() const { return m_id; }
-	private:
-		int m_id;
-	};
-
-	struct token_t
-	{
-		token_t(token_type type)
-		{
-			m_type = type;
-			m_id = token_id_t(-1);
-			m_token ="";
-		}
-		token_t(token_type type, const pstring str)
-		{
-			m_type = type;
-			m_id = token_id_t(-1);
-			m_token = str;
-		}
-		token_t(const token_id_t id, const pstring str)
-		{
-			m_type = TOKEN;
-			m_id = id;
-			m_token = str;
-		}
-
-		bool is(const token_id_t &tok_id) const { return m_id.id() == tok_id.id(); }
-		bool is_not(const token_id_t &tok_id) const { return !is(tok_id); }
-
-		bool is_type(const token_type type) const { return m_type == type; }
-
-		pstring str() const { return m_token; }
-
-	private:
-		token_type m_type;
-		token_id_t m_id;
-		pstring m_token;
-	};
-
-
-	int currentline_no() { return m_line; }
-	pstring currentline_str();
-
-	/* tokenizer stuff follows ... */
-
-	token_t get_token();
-	pstring get_string();
-	pstring get_identifier();
-
-	void require_token(const token_id_t &token_num);
-	void require_token(const token_t tok, const token_id_t &token_num);
-
-	token_id_t register_token(pstring token)
-	{
-		m_tokens.add(token);
-		return token_id_t(m_tokens.count() - 1);
-	}
-
-	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
-	void set_number_chars(pstring s) { m_number_chars = s; }
-	void set_whitespace(pstring s) { m_whitespace = s; }
-	void set_comment(pstring start, pstring end, pstring line)
-	{
-		m_tok_comment_start = register_token(start);
-		m_tok_comment_end = register_token(end);
-		m_tok_line_comment = register_token(line);
-		m_string = '"';
-	}
-
-	token_t get_token_internal();
-	void error(const char *format, ...) ATTR_PRINTF(2,3);
-
-protected:
-	void reset(const char *p) { m_px = p; m_line = 1; m_line_ptr = p; }
-	virtual void verror(pstring msg, int line_num, pstring line) = 0;
-
-private:
-	void skipeol();
-
-	unsigned char getc();
-	void ungetc();
-	bool eof() { return *m_px == 0; }
-
-	int m_line;
-	const char * m_line_ptr;
-	const char * m_px;
-
-	/* tokenizer stuff follows ... */
-
-	pstring m_identifier_chars;
-	pstring m_number_chars;
-	plist_t<pstring> m_tokens;
-	pstring m_whitespace;
-	char  m_string;
-
-	token_id_t m_tok_comment_start;
-	token_id_t m_tok_comment_end;
-	token_id_t m_tok_line_comment;
-};
+#include "nl_util.h"
+#include "pparser.h"
 
 class netlist_parser : public ptokenizer
 {
@@ -253,6 +129,14 @@ private:
 class netlist_sources_t
 {
 public:
+
+	netlist_sources_t() { }
+
+	~netlist_sources_t()
+	{
+		m_list.clear();
+	}
+
 	void add(netlist_source_t src)
 	{
 		m_list.add(src);
@@ -260,7 +144,7 @@ public:
 
 	void parse(netlist_setup_t &setup, const pstring name)
 	{
-		for (int i=0; i < m_list.count(); i++)
+		for (std::size_t i=0; i < m_list.size(); i++)
 		{
 			if (m_list[i].parse(setup, name))
 				return;

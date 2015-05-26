@@ -11,6 +11,7 @@
 #include "pstring.h"
 #include "plists.h"
 #include <cmath>
+#include <cstring>
 
 class nl_util
 {
@@ -45,6 +46,43 @@ public:
 		}
 		return temp;
 	}
+
+	static pstring_list splitexpr(const pstring &str, const pstring_list &onstrl)
+	{
+		pstring_list temp;
+		pstring col = "";
+
+		int i = 0;
+		while (i<str.len())
+		{
+			int p = -1;
+			for (std::size_t j=0; j < onstrl.size(); j++)
+			{
+				if (std::strncmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].len())==0)
+				{
+					p = j;
+					break;
+				}
+			}
+			if (p>=0)
+			{
+				if (col != "")
+					temp.add(col);
+				col = "";
+				temp.add(onstrl[p]);
+				i += onstrl[p].len();
+			}
+			else
+			{
+				col += str.cstr()[i];
+				i++;
+			}
+		}
+		if (col != "")
+			temp.add(col);
+		return temp;
+	}
+
 	static const pstring environment(const pstring &var, const pstring &default_val = "")
 	{
 		if (getenv(var.cstr()) == NULL)

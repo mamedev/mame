@@ -4,9 +4,6 @@
 
     HD44102 Dot Matrix Liquid Crystal Graphic Display Column Driver emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "emu.h"

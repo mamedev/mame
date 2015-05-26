@@ -4,9 +4,6 @@
 
     MOS 7360/8360 Text Edit Device (TED) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "emu.h"

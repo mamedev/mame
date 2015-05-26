@@ -14,6 +14,9 @@
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
 
+#define SOLVER_VERBOSE_OUT(x) do {} while (0)
+//#define SOLVER_VERBOSE_OUT(x) printf x
+
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------
@@ -62,14 +65,14 @@ class terms_t
 
 	ATTR_COLD void add(netlist_terminal_t *term, int net_other);
 
-	ATTR_HOT inline int count() { return m_term.count(); }
+	ATTR_HOT inline int count() { return m_term.size(); }
 
-	ATTR_HOT inline netlist_terminal_t **terms() { return m_term; }
-	ATTR_HOT inline int *net_other() { return m_net_other; }
-	ATTR_HOT inline nl_double *gt() { return m_gt; }
-	ATTR_HOT inline nl_double *go() { return m_go; }
-	ATTR_HOT inline nl_double *Idr() { return m_Idr; }
-	ATTR_HOT inline nl_double **other_curanalog() { return m_other_curanalog; }
+	ATTR_HOT inline netlist_terminal_t **terms() { return m_term.data(); }
+	ATTR_HOT inline int *net_other() { return m_net_other.data(); }
+	ATTR_HOT inline nl_double *gt() { return m_gt.data(); }
+	ATTR_HOT inline nl_double *go() { return m_go.data(); }
+	ATTR_HOT inline nl_double *Idr() { return m_Idr.data(); }
+	ATTR_HOT inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
 
 	ATTR_COLD void set_pointers();
 
@@ -97,17 +100,17 @@ public:
 	};
 
 	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t &params);
-	ATTR_COLD virtual ~netlist_matrix_solver_t();
+	/* ATTR_COLD */ virtual ~netlist_matrix_solver_t();
 
-	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
+	/* ATTR_COLD */ virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
 
 	template<class C>
 	void solve_base(C *p);
 
 	ATTR_HOT nl_double solve();
 
-	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.count() > 0; }
-	ATTR_HOT inline bool is_timestep() { return m_step_devices.count() > 0; }
+	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.size() > 0; }
+	ATTR_HOT inline bool is_timestep() { return m_step_devices.size() > 0; }
 
 	ATTR_HOT void update_forced();
 	ATTR_HOT inline void update_after(const netlist_time after)
@@ -117,11 +120,11 @@ public:
 
 	/* netdevice functions */
 	ATTR_HOT  virtual void update();
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void reset();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void reset();
 
 	ATTR_COLD int get_net_idx(netlist_net_t *net);
-	ATTR_COLD virtual void log_stats() {};
+	/* ATTR_COLD */ virtual void log_stats() {};
 
 	inline eSolverType type() const { return m_type; }
 
@@ -133,7 +136,7 @@ protected:
 	// should return next time step
 	ATTR_HOT virtual nl_double vsolve() = 0;
 
-	ATTR_COLD virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
+	/* ATTR_COLD */ virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
 
 	plist_t<netlist_analog_net_t *> m_nets;
 	plist_t<netlist_analog_output_t *> m_inps;
@@ -170,7 +173,7 @@ public:
 	NETLIB_NAME(solver)()
 	: netlist_device_t()    { }
 
-	ATTR_COLD virtual ~NETLIB_NAME(solver)();
+	/* ATTR_COLD */ virtual ~NETLIB_NAME(solver)();
 
 	ATTR_COLD void post_start();
 	ATTR_COLD void stop();

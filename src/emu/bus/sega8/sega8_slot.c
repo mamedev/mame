@@ -56,7 +56,7 @@ device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &m
 		m_rom_page_count(0),
 		has_battery(FALSE),
 		m_late_battery_enable(FALSE),
-		m_lphaser_xoffs(0),
+		m_lphaser_xoffs(-1),
 		m_sms_mode(0)
 {
 }
@@ -247,7 +247,7 @@ void sega8_cart_slot_device::set_lphaser_xoffset( UINT8 *rom, int size )
 		{ 0x54, 0x4d, 0x52, 0x20, 0x53, 0x45, 0x47, 0x41, 0x41, 0x4c, 0x15, 0x4a, 0x01, 0x80, 0x00, 0x4f }
 	};
 
-	int xoff = 36;
+	int xoff = -1;
 
 	if (size >= 0x8000)
 	{

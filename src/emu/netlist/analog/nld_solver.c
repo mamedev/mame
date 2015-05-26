@@ -25,9 +25,6 @@
 #pragma GCC optimize "-fivopts"
 #endif
 
-#define SOLVER_VERBOSE_OUT(x) do {} while (0)
-//#define SOLVER_VERBOSE_OUT(x) printf x
-
 #include <algorithm>
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
@@ -88,12 +85,12 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 
 	m_nets.clear();
 
-	for (int k = 0; k < nets.count(); k++)
+	for (std::size_t k = 0; k < nets.size(); k++)
 	{
 		m_nets.add(nets[k]);
 	}
 
-	for (int k = 0; k < nets.count(); k++)
+	for (std::size_t k = 0; k < nets.size(); k++)
 	{
 		NL_VERBOSE_OUT(("setting up net\n"));
 
@@ -101,7 +98,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 
 		net->m_solver = this;
 
-		for (int i = 0; i < net->m_core_terms.count(); i++)
+		for (std::size_t i = 0; i < net->m_core_terms.size(); i++)
 		{
 			netlist_core_terminal_t *p = net->m_core_terms[i];
 			NL_VERBOSE_OUT(("%s %s %d\n", p->name().cstr(), net->name().cstr(), (int) net->isRailNet()));
@@ -134,7 +131,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 				case netlist_terminal_t::INPUT:
 					{
 						netlist_analog_output_t *net_proxy_output = NULL;
-						for (int i = 0; i < m_inps.count(); i++)
+						for (std::size_t i = 0; i < m_inps.size(); i++)
 							if (m_inps[i]->m_proxied_net == &p->net().as_analog())
 							{
 								net_proxy_output = m_inps[i];
@@ -144,7 +141,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 						if (net_proxy_output == NULL)
 						{
 							net_proxy_output = palloc(netlist_analog_output_t);
-							net_proxy_output->init_object(*this, this->name() + "." + pstring::sprintf("m%d", m_inps.count()));
+							net_proxy_output->init_object(*this, this->name() + "." + pstring::sprintf("m%" SIZETFMT, m_inps.size()));
 							m_inps.add(net_proxy_output);
 							net_proxy_output->m_proxied_net = &p->net().as_analog();
 						}
@@ -159,7 +156,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 					break;
 			}
 		}
-		NL_VERBOSE_OUT(("added net with %d populated connections\n", net->m_core_terms.count()));
+		NL_VERBOSE_OUT(("added net with %d populated connections\n", net->m_core_terms.size()));
 	}
 }
 
@@ -167,22 +164,22 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 {
 	// avoid recursive calls. Inputs are updated outside this call
-	for (netlist_analog_output_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
-		(*p)->set_Q((*p)->m_proxied_net->m_cur_Analog);
+	for (std::size_t i=0; i<m_inps.size(); i++)
+		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->m_cur_Analog);
 
 }
 
 ATTR_HOT void netlist_matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
-	for (netlist_core_device_t * const *p = m_dynamic_devices.first(); p != NULL; p = m_dynamic_devices.next(p))
-		switch ((*p)->family())
+	for (std::size_t i=0; i < m_dynamic_devices.size(); i++)
+		switch (m_dynamic_devices[i]->family())
 		{
 			case netlist_device_t::DIODE:
-				static_cast<NETLIB_NAME(D) *>((*p))->update_terminals();
+				static_cast<NETLIB_NAME(D) *>(m_dynamic_devices[i])->update_terminals();
 				break;
 			default:
-				(*p)->update_terminals();
+				m_dynamic_devices[i]->update_terminals();
 				break;
 		}
 }
@@ -218,7 +215,7 @@ ATTR_COLD void netlist_matrix_solver_t::update_forced()
 ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 {
 	const nl_double dd = delta.as_double();
-	for (int k=0; k < m_step_devices.count(); k++)
+	for (std::size_t k=0; k < m_step_devices.size(); k++)
 		m_step_devices[k]->step_time(dd);
 }
 
@@ -281,7 +278,7 @@ ATTR_HOT nl_double netlist_matrix_solver_t::solve()
 
 ATTR_COLD int netlist_matrix_solver_t::get_net_idx(netlist_net_t *net)
 {
-	for (int k = 0; k < m_nets.count(); k++)
+	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
 			return k;
 	return -1;
@@ -329,7 +326,7 @@ NETLIB_START(solver)
 
 NETLIB_RESET(solver)
 {
-	for (int i = 0; i < m_mat_solvers.count(); i++)
+	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
 		m_mat_solvers[i]->reset();
 }
 
@@ -341,20 +338,13 @@ NETLIB_UPDATE_PARAM(solver)
 
 NETLIB_STOP(solver)
 {
-	for (int i = 0; i < m_mat_solvers.count(); i++)
+	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
 		m_mat_solvers[i]->log_stats();
 }
 
 NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 {
-	netlist_matrix_solver_t * const *e = m_mat_solvers.first();
-	while (e != NULL)
-	{
-		netlist_matrix_solver_t * const *en = m_mat_solvers.next(e);
-		pfree(*e);
-		e = en;
-	}
-
+	m_mat_solvers.clear_and_free();
 }
 
 NETLIB_UPDATE(solver)
@@ -362,7 +352,7 @@ NETLIB_UPDATE(solver)
 	if (m_params.m_dynamic)
 		return;
 
-	const int t_cnt = m_mat_solvers.count();
+	const std::size_t t_cnt = m_mat_solvers.size();
 
 #if HAS_OPENMP && USE_OPENMP
 	if (m_parallel.Value())
@@ -388,7 +378,7 @@ NETLIB_UPDATE(solver)
 				ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
 			}
 #else
-	for (int i = 0; i < t_cnt; i++)
+	for (std::size_t i = 0; i < t_cnt; i++)
 	{
 		if (m_mat_solvers[i]->is_timestep())
 		{
@@ -471,13 +461,13 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 	netlist().log("Scanning net groups ...");
 	// determine net groups
-	for (netlist_net_t * const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+	for (std::size_t i=0; i<netlist().m_nets.size(); i++)
 	{
-		SOLVER_VERBOSE_OUT(("processing %s\n", (*pn)->name().cstr()));
-		if (!(*pn)->isRailNet())
+		SOLVER_VERBOSE_OUT(("processing %s\n", netlist().m_nets[i]->name().cstr()));
+		if (!netlist().m_nets[i]->isRailNet())
 		{
 			SOLVER_VERBOSE_OUT(("   ==> not a rail net\n"));
-			netlist_analog_net_t *n = &(*pn)->as_analog();
+			netlist_analog_net_t *n = &netlist().m_nets[i]->as_analog();
 			if (!n->already_processed(groups, cur_group))
 			{
 				cur_group++;
@@ -487,11 +477,11 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	}
 
 	// setup the solvers
-	netlist().log("Found %d net groups in %d nets\n", cur_group + 1, netlist().m_nets.count());
+	netlist().log("Found %d net groups in %" SIZETFMT " nets\n", cur_group + 1, netlist().m_nets.size());
 	for (int i = 0; i <= cur_group; i++)
 	{
 		netlist_matrix_solver_t *ms;
-		int net_count = groups[i].count();
+		std::size_t net_count = groups[i].size();
 
 		switch (net_count)
 		{
@@ -544,21 +534,21 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				break;
 		}
 
-		register_sub(pstring::sprintf("Solver_%d",m_mat_solvers.count()), *ms);
+		register_sub(pstring::sprintf("Solver_%" SIZETFMT,m_mat_solvers.size()), *ms);
 
 		ms->vsetup(groups[i]);
 
 		m_mat_solvers.add(ms);
 
 		netlist().log("Solver %s", ms->name().cstr());
-		netlist().log("       # %d ==> %d nets", i, groups[i].count()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		netlist().log("       # %d ==> %" SIZETFMT " nets", i, groups[i].size()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
 		netlist().log("       has %s elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
 		netlist().log("       has %s elements", ms->is_timestep() ? "timestep" : "no timestep");
-		for (int j=0; j<groups[i].count(); j++)
+		for (std::size_t j=0; j<groups[i].size(); j++)
 		{
-			netlist().log("Net %d: %s", j, groups[i][j]->name().cstr());
+			netlist().log("Net %" SIZETFMT ": %s", j, groups[i][j]->name().cstr());
 			netlist_net_t *n = groups[i][j];
-			for (int k = 0; k < n->m_core_terms.count(); k++)
+			for (std::size_t k = 0; k < n->m_core_terms.size(); k++)
 			{
 				const netlist_core_terminal_t *p = n->m_core_terms[k];
 				netlist().log("   %s", p->name().cstr());

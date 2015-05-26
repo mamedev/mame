@@ -340,9 +340,7 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 #endif
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
 
-	INT32 clamp_s_diff[8];
-	INT32 clamp_t_diff[8];
-	m_tex_pipe.calculate_clamp_diffs(tilenum, userdata, object, clamp_s_diff, clamp_t_diff);
+	m_tex_pipe.calculate_clamp_diffs(tilenum, object);
 
 	const bool partialreject = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_inv_pixel_color.i.a && userdata->m_color_inputs.blender1b_a[0] == &userdata->m_pixel_color.i.a);
 	const INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color.i.a) ? 1 : 0;
@@ -437,8 +435,8 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 			rgbaz_correct_triangle(offx, offy, &sr, &sg, &sb, &sa, &sz, userdata, object);
 			rgbaz_clip(sr, sg, sb, sa, &sz, userdata);
 
-			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle0]))(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tilenum, 0, userdata, object, clamp_s_diff, clamp_t_diff);
-			//m_tex_pipe.Cycle(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tilenum, 0, userdata, object, clamp_s_diff, clamp_t_diff);
+			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle0]))(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tilenum, 0, userdata, object);
+			//m_tex_pipe.Cycle(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tilenum, 0, userdata, object);
 
 			userdata->m_noise_color.i.r = userdata->m_noise_color.i.g = userdata->m_noise_color.i.b = rand() << 3; // Not accurate
 
@@ -531,9 +529,7 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 #endif
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
 
-	INT32 clamp_s_diff[8];
-	INT32 clamp_t_diff[8];
-	m_tex_pipe.calculate_clamp_diffs(tile1, userdata, object, clamp_s_diff, clamp_t_diff);
+	m_tex_pipe.calculate_clamp_diffs(tile1, object);
 
 	bool partialreject = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_inv_pixel_color.i.a && userdata->m_color_inputs.blender1b_a[1] == &userdata->m_pixel_color.i.a);
 	INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color.i.a) ? 1 : 0;
@@ -644,9 +640,9 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			rgbaz_correct_triangle(offx, offy, &sr, &sg, &sb, &sa, &sz, userdata, object);
 			rgbaz_clip(sr, sg, sb, sa, &sz, userdata);
 
-			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle0]))(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tile1, 0, userdata, object, clamp_s_diff, clamp_t_diff);
-			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle1]))(&userdata->m_texel1_color, &userdata->m_texel0_color, sss, sst, tile2, 1, userdata, object, clamp_s_diff, clamp_t_diff);
-			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle1]))(&userdata->m_next_texel_color, &userdata->m_next_texel_color, sss, sst, tile2, 1, userdata, object, clamp_s_diff, clamp_t_diff);
+			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle0]))(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tile1, 0, userdata, object);
+			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle1]))(&userdata->m_texel1_color, &userdata->m_texel0_color, sss, sst, tile2, 1, userdata, object);
+			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle1]))(&userdata->m_next_texel_color, &userdata->m_next_texel_color, sss, sst, tile2, 1, userdata, object);
 
 			userdata->m_noise_color.i.r = userdata->m_noise_color.i.g = userdata->m_noise_color.i.b = rand() << 3; // Not accurate
 			userdata->m_combined_color.i.r = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_r[0],

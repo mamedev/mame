@@ -1,7 +1,7 @@
 // license:???
-// copyright-holders:trap15,nimitz,austere
+// copyright-holders:Alex Marshal,nimitz,austere
 //ICS2115 by Raiden II team (c) 2010
-//members: austere, nimitz, trap15
+//members: austere, nimitz, Alex Marshal
 //
 //Original driver by O. Galibert, ElSemi
 //

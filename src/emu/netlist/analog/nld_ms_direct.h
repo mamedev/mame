@@ -20,15 +20,15 @@ public:
 
 	virtual ~netlist_matrix_solver_direct_t();
 
-	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets);
-	ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
+	/* ATTR_COLD */ virtual void vsetup(netlist_analog_net_t::list_t &nets);
+	/* ATTR_COLD */ virtual void reset() { netlist_matrix_solver_t::reset(); }
 
 	ATTR_HOT inline int N() const { return (m_N == 0 ? m_dim : m_N); }
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
-	ATTR_COLD virtual void add_term(int net_idx, netlist_terminal_t *term);
+	/* ATTR_COLD */ virtual void add_term(int net_idx, netlist_terminal_t *term);
 
 	ATTR_HOT virtual nl_double vsolve();
 
@@ -142,8 +142,8 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, 
 template <int m_N, int _storage_N>
 ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
 {
-	if (m_dim < nets.count())
-		netlist().error("Dimension %d less than %d", m_dim, nets.count());
+	if (m_dim < nets.size())
+		netlist().error("Dimension %d less than %" SIZETFMT, m_dim, nets.size());
 
 	for (int k = 0; k < N(); k++)
 	{
@@ -212,7 +212,6 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 template <int m_N, int _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 {
-
 	for (int k = 0; k < N(); k++)
 	{
 		for (int i=0; i < N(); i++)
@@ -429,6 +428,8 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	for (int k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_t);
+		m_last_RHS[k] = 0.0;
+		m_last_V[k] = 0.0;
 	}
 }
 
@@ -444,6 +445,8 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	for (int k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_t);
+		m_last_RHS[k] = 0.0;
+		m_last_V[k] = 0.0;
 	}
 }
 

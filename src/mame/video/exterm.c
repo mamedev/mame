@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Alex Pasadyn,Zsolt Vasvari
+// copyright-holders:Alex Pasadyn,Zsolt Vasvari,Aaron Giles
 /***************************************************************************
 
     Gottlieb Exterminator hardware

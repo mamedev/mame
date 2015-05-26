@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Norbert Kehrer
+// copyright-holders:Derrick Renaud
 /************************************************************************
  * madalien Sound System Analog emulation
  * Aug 2008, Derrick Renaud

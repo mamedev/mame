@@ -6,9 +6,6 @@
 
     based on original version (c) 1997, Tatsuyuki Satoh
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "emu.h"

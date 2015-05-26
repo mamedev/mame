@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nicola Salmoria, Couriersud
 /***************************************************************************
 
 Gyruss memory map (preliminary)

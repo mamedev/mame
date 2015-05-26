@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:David Viens
 /**********************************************************************
 
     NEC uPD1771-017 as used in the Epoch Super Cassette Vision (SCV)

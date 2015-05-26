@@ -185,6 +185,9 @@ struct n64_tile_t
 	INT32 palette; // Palette number for 4b CI texels
 	INT32 ct, mt, cs, ms; // Clamp / mirror enable bits for S / T direction
 	INT32 mask_t, shift_t, mask_s, shift_s; // Mask values / LOD shifts
+	INT32 lshift_s, rshift_s, lshift_t, rshift_t;
+	INT32 wrapped_mask_s, wrapped_mask_t;
+	bool clamp_s, clamp_t;
 	UINT16 sl, tl, sh, th;      // 10.2 fixed-point, starting and ending texel row / column
 	INT32 num;
 };

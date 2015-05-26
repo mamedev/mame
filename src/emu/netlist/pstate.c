@@ -7,7 +7,11 @@
 
 #include "pstate.h"
 
-ATTR_COLD pstate_manager_t::~pstate_manager_t()
+pstate_manager_t::pstate_manager_t()
+{
+}
+
+pstate_manager_t::~pstate_manager_t()
 {
 	m_save.clear_and_free();
 }
@@ -37,12 +41,12 @@ ATTR_COLD void pstate_manager_t::remove_save_items(const void *owner)
 {
 	pstate_entry_t::list_t todelete;
 
-	for (int i=0; i < m_save.count(); i++)
+	for (std::size_t i=0; i < m_save.size(); i++)
 	{
 		if (m_save[i]->m_owner == owner)
 			todelete.add(m_save[i]);
 	}
-	for (int i=0; i < todelete.count(); i++)
+	for (std::size_t i=0; i < todelete.size(); i++)
 	{
 		m_save.remove(todelete[i]);
 	}
@@ -51,14 +55,14 @@ ATTR_COLD void pstate_manager_t::remove_save_items(const void *owner)
 
 ATTR_COLD void pstate_manager_t::pre_save()
 {
-	for (int i=0; i < m_save.count(); i++)
+	for (std::size_t i=0; i < m_save.size(); i++)
 		if (m_save[i]->m_dt == DT_CUSTOM)
 			m_save[i]->m_callback->on_pre_save();
 }
 
 ATTR_COLD void pstate_manager_t::post_load()
 {
-	for (int i=0; i < m_save.count(); i++)
+	for (std::size_t i=0; i < m_save.size(); i++)
 		if (m_save[i]->m_dt == DT_CUSTOM)
 			m_save[i]->m_callback->on_post_load();
 }

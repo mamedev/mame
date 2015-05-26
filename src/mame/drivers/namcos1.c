@@ -218,7 +218,7 @@ Notes:
 
 TODO:
 - There is still a big mystery about the first location of tri port ram, which is
-  shared among all four CPUs. See namcos1_mcu_patch_w() for the kludge: essentially,
+  shared among all four CPUs. See mcu_patch_w() for the kludge: essentially,
   this location has to be 0xA6 for the games to work. However, the MCU first sets it
   to 0xA6, then zeroes it - and there doesn't seem to be any code anywhere for any CPU
   that would set it back to 0xA6. Se, we ignore the zeroing write.
@@ -358,19 +358,19 @@ READ8_MEMBER(namcos1_state::dsw_r)
 	return 0xf0 | ret;
 }
 
-WRITE8_MEMBER(namcos1_state::namcos1_coin_w)
+WRITE8_MEMBER(namcos1_state::coin_w)
 {
 	coin_lockout_global_w(machine(), ~data & 1);
 	coin_counter_w(machine(), 0, data & 2);
 	coin_counter_w(machine(), 1, data & 4);
 }
 
-void namcos1_state::namcos1_update_DACs()
+void namcos1_state::update_DACs()
 {
 	m_dac->write_signed16(0x8000 + (m_dac0_value * m_dac0_gain) + (m_dac1_value * m_dac1_gain));
 }
 
-void namcos1_state::namcos1_init_DACs()
+void namcos1_state::init_DACs()
 {
 	m_dac0_value = 0;
 	m_dac1_value = 0;
@@ -378,7 +378,7 @@ void namcos1_state::namcos1_init_DACs()
 	m_dac1_gain = 0x80;
 }
 
-WRITE8_MEMBER(namcos1_state::namcos1_dac_gain_w)
+WRITE8_MEMBER(namcos1_state::dac_gain_w)
 {
 	int value;
 
@@ -390,19 +390,19 @@ WRITE8_MEMBER(namcos1_state::namcos1_dac_gain_w)
 	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
 	m_dac1_gain = 0x20 * (value+1);
 
-	namcos1_update_DACs();
+	update_DACs();
 }
 
-WRITE8_MEMBER(namcos1_state::namcos1_dac0_w)
+WRITE8_MEMBER(namcos1_state::dac0_w)
 {
 	m_dac0_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs();
+	update_DACs();
 }
 
-WRITE8_MEMBER(namcos1_state::namcos1_dac1_w)
+WRITE8_MEMBER(namcos1_state::dac1_w)
 {
 	m_dac1_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs();
+	update_DACs();
 }
 
 
@@ -416,11 +416,11 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, namcos1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( virtual_map, AS_PROGRAM, 8, namcos1_state )
-	AM_RANGE(0x2c0000, 0x2c1fff) AM_WRITE(namcos1_3dcs_w)
+	AM_RANGE(0x2c0000, 0x2c1fff) AM_WRITE(_3dcs_w)
 	AM_RANGE(0x2e0000, 0x2e7fff) AM_DEVREADWRITE("c116", namco_c116_device, read, write)
-	AM_RANGE(0x2f0000, 0x2f7fff) AM_RAM_WRITE(namcos1_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2f0000, 0x2f7fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2f8000, 0x2f9fff) AM_READWRITE(no_key_r, no_key_w)
-	AM_RANGE(0x2fc000, 0x2fcfff) AM_RAM_WRITE(namcos1_spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x2fc000, 0x2fcfff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x2fd000, 0x2fd01f) AM_RAM AM_SHARE("pfcontrol") AM_MIRROR(0xfe0)
 	AM_RANGE(0x2fe000, 0x2fe3ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0xc00) /* PSG ( Shared ) */
 	AM_RANGE(0x2ff000, 0x2ff7ff) AM_RAM AM_SHARE("triram") AM_MIRROR(0x800)
@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("triram")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Sound RAM 3 */
-	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos1_sound_bankswitch_w) /* ROM bank selector */
+	AM_RANGE(0xc000, 0xc001) AM_WRITE(sound_bankswitch_w) /* ROM bank selector */
 	AM_RANGE(0xd001, 0xd001) AM_DEVWRITE("c117", namco_c117_device, sound_watchdog_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(irq_ack_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -452,16 +452,16 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("mcubank") /* banked ROM */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("triram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("nvram") /* EEPROM */
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(namcos1_dac0_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(namcos1_dac1_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(namcos1_mcu_bankswitch_w) /* ROM bank selector */
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(dac0_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(dac1_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE(mcu_bankswitch_w) /* ROM bank selector */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(irq_ack_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos1_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE(namcos1_coin_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE(namcos1_dac_gain_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE(coin_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE(dac_gain_w)
 ADDRESS_MAP_END
 
 
@@ -1063,8 +1063,8 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update_namcos1)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos1_state, screen_eof_namcos1)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(namcos1_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos1)

@@ -38,24 +38,24 @@ struct truthtable_desc_t
 	truthtable_desc_t(int NO, int NI, int has_state, bool *initialized,
 			UINT32 *outs, UINT8 *timing, netlist_time *timing_nt)
 	: m_NO(NO), m_NI(NI), /*m_has_state(has_state),*/ m_initialized(initialized),
-	  m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
-	  m_num_bits(m_NI + has_state * (m_NI + m_NO)),
-	  m_size(1 << (m_num_bits))
+		m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
+		m_num_bits(m_NI + has_state * (m_NI + m_NO)),
+		m_size(1 << (m_num_bits))
 	{
 	}
 
 	ATTR_COLD void setup(const char **truthtable, UINT32 disabled_ignore);
 
 private:
-	ATTR_COLD void help(int cur, nl_util::pstring_list list,
+	ATTR_COLD void help(unsigned cur, nl_util::pstring_list list,
 			UINT64 state,UINT16 val, UINT8 *timing_index);
-	static int count_bits(UINT32 v);
+	static unsigned count_bits(UINT32 v);
 	static UINT32 set_bits(UINT32 v, UINT32 b);
 	UINT32 get_ignored_simple(UINT32 i);
 	UINT32 get_ignored_extended(UINT32 i);
 
-	int m_NO;
-	int m_NI;
+	unsigned m_NO;
+	unsigned m_NI;
 	//int m_has_state;
 	bool *m_initialized;
 	UINT32 *m_outs;
@@ -69,7 +69,7 @@ private:
 
 };
 
-template<int m_NI, int m_NO, int has_state>
+template<unsigned m_NI, unsigned m_NO, int has_state>
 class nld_truthtable_t : public netlist_device_t
 {
 public:
@@ -93,17 +93,17 @@ public:
 	{
 	}
 
-	ATTR_COLD virtual void start()
+	/* ATTR_COLD */ virtual void start()
 	{
 		pstring ttline = pstring(m_desc[0]);
 
 		nl_util::pstring_list io = nl_util::split(ttline,"|");
 		// checks
-		nl_assert_always(io.count() == 2, "too many '|'");
+		nl_assert_always(io.size() == 2, "too many '|'");
 		nl_util::pstring_list inout = nl_util::split(io[0], ",");
-		nl_assert_always(inout.count() == m_num_bits, "bitcount wrong");
+		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
 		nl_util::pstring_list out = nl_util::split(io[1], ",");
-		nl_assert_always(out.count() == m_NO, "output count wrong");
+		nl_assert_always(out.size() == m_NO, "output count wrong");
 
 		for (int i=0; i < m_NI; i++)
 		{
@@ -163,16 +163,15 @@ public:
 	template<bool doOUT>
 	ATTR_HOT inline void process()
 	{
-
 		netlist_time mt = netlist_time::zero;
 
 		UINT32 state = 0;
-		for (int i = 0; i < m_NI; i++)
+		for (unsigned i = 0; i < m_NI; i++)
 		{
 			if (!doOUT || (m_ign & (1<<i)) != 0)
 				m_i[i].activate();
 		}
-		for (int i = 0; i < m_NI; i++)
+		for (unsigned i = 0; i < m_NI; i++)
 		{
 			state |= (INPLOGIC(m_i[i]) << i);
 			if (!doOUT)

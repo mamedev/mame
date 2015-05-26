@@ -100,8 +100,10 @@ inline void pfree_array_t(T *p)
 #include "corealloc.h"
 #define palloc(T, ...)        global_alloc(T(__VA_ARGS__))
 #define pfree(_ptr)           global_free(_ptr)
+
 #define palloc_array(T, N)    global_alloc_array(T, N)
 #define pfree_array(_ptr)     global_free_array(_ptr)
+
 #endif
 
 #endif /* NLCONFIG_H_ */

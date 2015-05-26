@@ -175,7 +175,11 @@ public:
 	{
 	}
 
-	virtual ~netlist_tool_t() { };
+	~netlist_tool_t()
+	{
+		if (m_setup != NULL)
+			pfree(m_setup);
+	};
 
 	void init()
 	{
@@ -206,7 +210,7 @@ public:
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
 		nl_util::pstring_list ll = nl_util::split(m_logs, ":");
-		for (int i=0; i < ll.count(); i++)
+		for (int i=0; i < ll.size(); i++)
 		{
 			pstring name = "log_" + ll[i];
 			/*netlist_device_t *nc = */ m_setup->register_dev("nld_log", name);
@@ -299,7 +303,7 @@ static void listdevices()
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
 
-	for (int i=0; i < list.count(); i++)
+	for (int i=0; i < list.size(); i++)
 	{
 		pstring out = pstring::sprintf("%-20s %s(<id>", list[i]->classname().cstr(),
 				list[i]->name().cstr() );
@@ -311,7 +315,7 @@ static void listdevices()
 		d->start_dev();
 
 		// get the list of terminals ...
-		for (int j=0; j < d->m_terminals.count(); j++)
+		for (int j=0; j < d->m_terminals.size(); j++)
 		{
 			pstring inp = d->m_terminals[j];
 			if (inp.startsWith(d->name() + "."))
@@ -347,6 +351,13 @@ class convert_t
 {
 public:
 
+	convert_t() {};
+	~convert_t()
+	{
+		nets.clear_and_free();
+		devs.clear_and_free();
+	}
+
 	void convert(const pstring &contents)
 	{
 		nl_util::pstring_list spnl = nl_util::split(contents, "\n");
@@ -358,7 +369,7 @@ public:
 
 		pstring line = "";
 
-		for (int i=0; i < spnl.count(); i++)
+		for (int i=0; i < spnl.size(); i++)
 		{
 			// Basic preprocessing
 			pstring inl = spnl[i].trim().ucase();
@@ -482,16 +493,16 @@ protected:
 
 	void dump_nl()
 	{
-		for (int i=0; i<alias.count(); i++)
+		for (int i=0; i<alias.size(); i++)
 		{
 			sp_net_t *net = nets.find(alias[i]);
 			// use the first terminal ...
 			printf("ALIAS(%s, %s)\n", alias[i].cstr(), net->terminals()[0].cstr());
 			// if the aliased net only has this one terminal connected ==> don't dump
-			if (net->terminals().count() == 1)
+			if (net->terminals().size() == 1)
 				net->set_no_export();
 		}
-		for (int i=0; i<devs.count(); i++)
+		for (int i=0; i<devs.size(); i++)
 		{
 			if (devs[i]->has_value())
 				printf("%s(%s, %s)\n", devs[i]->type().cstr(),
@@ -504,14 +515,14 @@ protected:
 						devs[i]->name().cstr());
 		}
 		// print nets
-		for (int i=0; i<nets.count(); i++)
+		for (int i=0; i<nets.size(); i++)
 		{
 			sp_net_t * net = nets[i];
 			if (!net->is_no_export())
 			{
 				//printf("Net %s\n", net->name().cstr());
 				printf("NET_C(%s", net->terminals()[0].cstr() );
-				for (int j=1; j<net->terminals().count(); j++)
+				for (int j=1; j<net->terminals().size(); j++)
 				{
 					printf(", %s", net->terminals()[j].cstr() );
 				}
@@ -541,7 +552,7 @@ protected:
 					if (tt[0].equals(".SUBCKT"))
 					{
 						printf("NETLIST_START(%s)\n", tt[1].cstr());
-						for (int i=2; i<tt.count(); i++)
+						for (int i=2; i<tt.size(); i++)
 							alias.add(tt[i]);
 					}
 					else if (tt[0].equals(".ENDS"))
@@ -560,7 +571,7 @@ protected:
 					 */
 					// FIXME: we need a is_long method ..
 					ATTR_UNUSED int nval =tt[4].as_long(&cerr);
-					if ((!cerr || tt[4].startsWith("N")) && tt.count() > 5)
+					if ((!cerr || tt[4].startsWith("N")) && tt.size() > 5)
 						devs.add(palloc(sp_dev_t, "QBJT", tt[0], tt[5]), false);
 					else
 						devs.add(palloc(sp_dev_t, "QBJT", tt[0], tt[4]), false);
@@ -603,9 +614,9 @@ protected:
 				{
 					// FIXME: specific code for KICAD exports
 					//        last element is component type
-					pstring tname = "TTL_" + tt[tt.count()-1] + "_DIP";
+					pstring tname = "TTL_" + tt[tt.size()-1] + "_DIP";
 					devs.add(palloc(sp_dev_t, tname, tt[0]), false);
-					for (int i=1; i < tt.count() - 1; i++)
+					for (int i=1; i < tt.size() - 1; i++)
 					{
 						pstring term = pstring::sprintf("%s.%d", tt[0].cstr(), i);
 						add_term(tt[i], term);
@@ -650,8 +661,13 @@ convert_t::sp_unit convert_t::m_sp_units[] = {
     main - primary entry point
 -------------------------------------------------*/
 
+#include "corealloc.h"
+
 int main(int argc, char *argv[])
 {
+
+	track_memory(true);
+	{
 	tool_options_t opts;
 	int ret;
 
@@ -686,6 +702,7 @@ int main(int argc, char *argv[])
 		usage(opts);
 		return 1;
 	}
-
+	}
+	dump_unfreed_mem();
 	return 0;
 }

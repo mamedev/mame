@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Ville Laitinen
+// license:BSD-3-Clause
+// copyright-holders:Ville Laitinen, Aaron Giles
 /***************************************************************************
 
     Sun Electronics hardware:

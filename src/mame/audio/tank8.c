@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Stefan Jokisch
+// copyright-holders:Hans Andersson
 /*************************************************************************
 
     audio\tank8.c

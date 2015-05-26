@@ -23,7 +23,7 @@ All rights reserved.
 #define ADDRESS_65816(A) ((A)&0xffffff)
 
 
-struct opcode_struct
+struct g65816_opcode_struct
 {
 	unsigned char name;
 	unsigned char flag;
@@ -70,7 +70,7 @@ static const char *const g_opnames[] =
 	"TYA", "TYX", "WAI", "WDM", "XBA", "XCE"
 };
 
-static const opcode_struct g_opcodes[256] =
+static const g65816_opcode_struct g_opcodes[256] =
 {
 	{BRK, I, SIG }, {ORA, M, DXI }, {COP, I, SIG }, {ORA, M, S   },
 	{TSB, M, D   }, {ORA, M, D   }, {ASL, M, D   }, {ORA, M, DLI },
@@ -192,7 +192,7 @@ INLINE char* int_16_str(unsigned int val)
 unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag)
 {
 	unsigned int instruction;
-	const opcode_struct* opcode;
+	const g65816_opcode_struct* opcode;
 	char* ptr;
 	int var;
 	int length = 1;

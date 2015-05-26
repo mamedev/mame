@@ -1,5 +1,10 @@
-Unless otherwise explicitly stated, all code in MAME is released under the
-following license:
+The MAME project, as a whole, is currently released under the following
+license, known as the MAME License.
+
+Most code in MAME is under a more permissive license, or dual-licensed.
+This is noted in per-file headers which specify the alternate license.
+
+The text of the MAME License follows.
 
 Copyright Nicola Salmoria and the MAME team
 All rights reserved.

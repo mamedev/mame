@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Leland
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
 Skeleton driver for Dragon's Lair II: Time Warp

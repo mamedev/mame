@@ -36,7 +36,7 @@ public:
 
 	virtual ~netlist_matrix_solver_SOR_mat_t() {}
 
-	ATTR_COLD virtual void log_stats();
+	/* ATTR_COLD */ virtual void log_stats();
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
@@ -166,7 +166,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 				s = s + nl_math::abs(this->m_A[k][i]);
 			akk = s / akk - 1.0;
 			//if ( akk > lambdaN)
-			//	lambdaN = akk;
+			//  lambdaN = akk;
 			if (akk < lambda1)
 				lambda1 = akk;
 	#endif

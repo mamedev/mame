@@ -32,7 +32,6 @@ public:
 
 	virtual ~poption()
 	{
-
 	}
 
 	/* no_argument options will be called with "" argument */
@@ -109,6 +108,11 @@ public:
 		}
 	}
 
+	~poptions()
+	{
+		m_opts.clear();
+	}
+
 	void register_option(poption *opt)
 	{
 		m_opts.add(opt);
@@ -152,7 +156,7 @@ public:
 	{
 		pstring ret;
 
-		for (int i=0; i<m_opts.count(); i++ )
+		for (std::size_t i=0; i<m_opts.size(); i++ )
 		{
 			poption *opt = m_opts[i];
 			pstring line = "";
@@ -177,7 +181,7 @@ private:
 
 	poption *getopt_short(pstring arg)
 	{
-		for (int i=0; i < m_opts.count(); i++)
+		for (std::size_t i=0; i < m_opts.size(); i++)
 		{
 			if (m_opts[i]->m_short == arg)
 				return m_opts[i];
@@ -186,7 +190,7 @@ private:
 	}
 	poption *getopt_long(pstring arg)
 	{
-		for (int i=0; i < m_opts.count(); i++)
+		for (std::size_t i=0; i < m_opts.size(); i++)
 		{
 			if (m_opts[i]->m_long == arg)
 				return m_opts[i];

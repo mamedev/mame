@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Derrick Renaud, Couriersud
 /*************************************************************************
 
     VIC Dual Game board

@@ -4,9 +4,6 @@
 
     MSM6242 Real Time Clock
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #pragma once

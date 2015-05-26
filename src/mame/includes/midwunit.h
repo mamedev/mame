@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Ernesto Corvi
+// copyright-holders:Aaron Giles,Ernesto Corvi
 /*************************************************************************
 
     Driver for Midway Wolf-unit games.

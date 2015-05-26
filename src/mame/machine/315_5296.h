@@ -4,9 +4,6 @@
 
     Sega 315-5296 I/O chip
 
-    Copyright MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

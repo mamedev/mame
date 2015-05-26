@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, hap
 /**********************************************************************
 
     PLA (Programmable Logic Array) emulation

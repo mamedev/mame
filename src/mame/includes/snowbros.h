@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Mike Coates
 #include "emu.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h" // for the original pandora

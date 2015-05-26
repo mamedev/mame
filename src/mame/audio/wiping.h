@@ -1,10 +1,10 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
 /* 8 voices max */
 #define MAX_VOICES 8
 
 /* this structure defines the parameters for a channel */
-struct sound_channel
+struct wp_sound_channel
 {
 	int frequency;
 	int counter;
@@ -34,8 +34,8 @@ private:
 	// internal state
 
 	/* data about the sound system */
-	sound_channel m_channel_list[MAX_VOICES];
-	sound_channel *m_last_channel;
+	wp_sound_channel m_channel_list[MAX_VOICES];
+	wp_sound_channel *m_last_channel;
 
 	/* global sound parameters */
 	const UINT8 *m_sound_prom;

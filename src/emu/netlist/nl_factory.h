@@ -28,9 +28,9 @@ public:
 	: m_name(name), m_classname(classname), m_def_param(def_param)
 	{}
 
-	ATTR_COLD virtual ~net_device_t_base_factory() {}
+	/* ATTR_COLD */ virtual ~net_device_t_base_factory() {}
 
-	ATTR_COLD virtual netlist_device_t *Create() const = 0;
+	/* ATTR_COLD */ virtual netlist_device_t *Create() const = 0;
 
 	ATTR_COLD const pstring &name() const { return m_name; }
 	ATTR_COLD const pstring &classname() const { return m_classname; }
@@ -66,8 +66,8 @@ class netlist_factory_t
 public:
 	typedef plist_t<net_device_t_base_factory *> list_t;
 
-	ATTR_COLD netlist_factory_t();
-	ATTR_COLD ~netlist_factory_t();
+	netlist_factory_t();
+	~netlist_factory_t();
 
 	template<class _C>
 	ATTR_COLD void register_device(const pstring &name, const pstring &classname,

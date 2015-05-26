@@ -107,7 +107,7 @@ netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const 
 template <class T>
 static void remove_start_with(T &hm, pstring &sw)
 {
-	for (int i = hm.count() - 1; i >= 0; i--)
+	for (std::size_t i = hm.size() - 1; i >= 0; i--)
 	{
 		pstring x = hm[i]->name();
 		if (sw.equals(x.substr(0, sw.len())))
@@ -128,10 +128,10 @@ void netlist_setup_t::remove_dev(const pstring &name)
 	remove_start_with<tagmap_terminal_t>(m_terminals, temp);
 	remove_start_with<tagmap_param_t>(m_params, temp);
 
-	const link_t *p = m_links.first();
+	const link_t *p = m_links.data();
 	while (p != NULL)
 	{
-		const link_t *n = m_links.next(p);
+		const link_t *n = p+1;
 		if (temp.equals(p->e1.substr(0,temp.len())) || temp.equals(p->e2.substr(0,temp.len())))
 			m_links.remove(*p);
 		p = n;
@@ -248,7 +248,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 						{
 							pstring search = (".model " + val + " ").ucase();
 							bool found = false;
-							for (int i=0; i < m_models.count(); i++)
+							for (std::size_t i=0; i < m_models.size(); i++)
 							{
 								if (m_models[i].ucase().startsWith(search))
 								{
@@ -287,9 +287,9 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 void netlist_setup_t::register_link_arr(const pstring &terms)
 {
 	nl_util::pstring_list list = nl_util::split(terms,", ");
-	if (list.count() < 2)
+	if (list.size() < 2)
 		netlist().error("You must pass at least 2 terminals to NET_C");
-	for (int i = 1; i < list.count(); i++)
+	for (std::size_t i = 1; i < list.size(); i++)
 	{
 		register_link(list[0], list[i]);
 	}
@@ -418,7 +418,7 @@ nld_base_proxy *netlist_setup_t::get_d_a_proxy(netlist_core_terminal_t &out)
 #if 1
 		/* connect all existing terminals to new net */
 
-		for (int i = 0; i < out.net().m_core_terms.count(); i++)
+		for (std::size_t i = 0; i < out.net().m_core_terms.size(); i++)
 		{
 			netlist_core_terminal_t *p = out.net().m_core_terms[i];
 			p->clear_net(); // de-link from all nets ...
@@ -577,7 +577,7 @@ bool netlist_setup_t::connect_input_input(netlist_core_terminal_t &t1, netlist_c
 			ret = connect(t2, t1.net().railterminal());
 		if (!ret)
 		{
-			for (int i=0; i<t1.net().m_core_terms.count(); i++)
+			for (std::size_t i=0; i<t1.net().m_core_terms.size(); i++)
 			{
 				if (t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::TERMINAL)
 						/*|| t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT)*/)
@@ -595,7 +595,7 @@ bool netlist_setup_t::connect_input_input(netlist_core_terminal_t &t1, netlist_c
 			ret = connect(t1, t2.net().railterminal());
 		if (!ret)
 		{
-			for (int i=0; i<t2.net().m_core_terms.count(); i++)
+			for (std::size_t i=0; i<t2.net().m_core_terms.size(); i++)
 			{
 				if (t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::TERMINAL)
 						/*|| t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT)*/)
@@ -672,10 +672,10 @@ void netlist_setup_t::resolve_inputs()
 	 * after all other terminals were connected.
 	 */
 	int tries = 100;
-	while (m_links.count() > 0 && tries >  0) // FIXME: convert into constant
+	while (m_links.size() > 0 && tries >  0) // FIXME: convert into constant
 	{
-		int li = 0;
-		while (li < m_links.count())
+		unsigned li = 0;
+		while (li < m_links.size())
 		{
 			const pstring t1s = m_links[li].e1;
 			const pstring t2s = m_links[li].e2;
@@ -695,7 +695,7 @@ void netlist_setup_t::resolve_inputs()
 	}
 	if (tries == 0)
 	{
-		for (int i = 0; i < m_links.count(); i++ )
+		for (std::size_t i = 0; i < m_links.size(); i++ )
 			netlist().warning("Error connecting %s to %s\n", m_links[i].e1.cstr(), m_links[i].e2.cstr());
 
 		netlist().error("Error connecting -- bailing out\n");
@@ -707,19 +707,19 @@ void netlist_setup_t::resolve_inputs()
 
 	netlist_net_t::list_t todelete;
 
-	for (netlist_net_t *const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+	for (std::size_t i = 0; i<netlist().m_nets.size(); i++)
 	{
-		if ((*pn)->num_cons() == 0)
+		if (netlist().m_nets[i]->num_cons() == 0)
 		{
-			todelete.add(*pn);
+			todelete.add(netlist().m_nets[i]);
 		}
 		else
 		{
-			(*pn)->rebuild_list();
+			netlist().m_nets[i]->rebuild_list();
 		}
 	}
 
-	for (int i=0; i < todelete.count(); i++)
+	for (std::size_t i=0; i < todelete.size(); i++)
 	{
 		netlist().log("Deleting net %s ...", todelete[i]->name().cstr());
 		netlist().m_nets.remove(todelete[i]);
@@ -730,7 +730,7 @@ void netlist_setup_t::resolve_inputs()
 	pstring errstr("");
 
 	netlist().log("looking for terminals not connected ...");
-	for (int i = 0; i < m_terminals.count(); i++)
+	for (std::size_t i = 0; i < m_terminals.size(); i++)
 	{
 		if (!m_terminals[i]->has_net())
 			errstr += pstring::sprintf("Found terminal %s without a net\n",
@@ -745,7 +745,7 @@ void netlist_setup_t::resolve_inputs()
 
 	netlist().log("looking for two terms connected to rail nets ...\n");
 	// FIXME: doesn't find internal devices. This needs to be more clever
-	for (int i=0; i < netlist().m_devices.count(); i++)
+	for (std::size_t i=0; i < netlist().m_devices.size(); i++)
 	{
 		NETLIB_NAME(twoterm) *t = dynamic_cast<NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
 		if (t != NULL)
@@ -777,7 +777,7 @@ void netlist_setup_t::start_devices()
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
 		nl_util::pstring_list ll = nl_util::split(env, ":");
-		for (int i=0; i < ll.count(); i++)
+		for (std::size_t i=0; i < ll.size(); i++)
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));

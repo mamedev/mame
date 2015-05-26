@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
 /***************************************************************************
 
     SNK 68000 video routines
