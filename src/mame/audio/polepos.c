@@ -1,6 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Juergen Buchmueller, Alex Pasadyn, Aaron Giles, Nicola Salmoria
-// FIXME: Coding style indicates Derrick Renaud
+// license:???
+// copyright-holders:Derrick Renaud
 /***************************************************************************
     polepos.c
     Sound handler

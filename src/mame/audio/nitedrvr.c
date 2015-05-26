@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mike Balfour
-// FIXME: coding style indicates Derrick Renaud
+// copyright-holders:Derrick Renaud
 /*************************************************************************
 
     audio\nitedrvr.c
