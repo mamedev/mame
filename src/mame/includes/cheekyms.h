@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Chris Moore
+// license:BSD-3-Clause
+// copyright-holders:Lee Taylor, Chris Moore
 /*************************************************************************
 
     Cheeky Mouse

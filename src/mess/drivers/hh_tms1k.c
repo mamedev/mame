@@ -28,7 +28,7 @@
  *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000 (? note: VFD-capable)
  @MP2105   TMS1370   1979, Gakken Poker
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
- *MP2726   TMS1040   1979, Tomy Break Up
+ @MP2726   TMS1040   1979, Tomy Break Up
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
@@ -103,7 +103,6 @@
 #include "ebball.lh"
 #include "ebball2.lh"
 #include "ebball3.lh"
-#include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
 #include "gjackpot.lh"
 #include "gpoker.lh"
@@ -119,6 +118,8 @@
 #include "stopthie.lh"
 #include "tandy12.lh" // clickable
 #include "tc4.lh"
+
+#include "einvader.lh" // test-layout(but still playable)
 
 #include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
@@ -3990,6 +3991,112 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tomy(tronics) Break Up
+  * TMS1040 MP2726 TOMY WIPE (die labeled MP2726A)
+  * TMS1025N2LL I/O expander
+  * 2-digit 7seg display, 46 other leds, 1bit sound
+
+  known releases:
+  - USA: Break Up
+  - Japan: Block Attack
+  - UK: Break-In
+
+***************************************************************************/
+
+class tbreakup_state : public hh_tms1k_state
+{
+public:
+	tbreakup_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+
+	void set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+
+protected:
+	virtual void machine_reset();
+};
+
+// handlers
+
+void tbreakup_state::prepare_display()
+{
+}
+
+WRITE16_MEMBER(tbreakup_state::write_r)
+{
+	prepare_display();
+}
+
+WRITE16_MEMBER(tbreakup_state::write_o)
+{
+	prepare_display();
+}
+
+READ8_MEMBER(tbreakup_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( tbreakup )
+	PORT_START("IN.3") // fake
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, NULL)
+	PORT_CONFSETTING(    0x00, "Pro 1" )
+	PORT_CONFSETTING(    0x01, "Pro 2" )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tbreakup_state::skill_switch)
+{
+	set_clock();
+}
+
+
+void tbreakup_state::set_clock()
+{
+	// MCU clock is from an analog circuit with resistor of 73K, PRO2 adds 100K
+	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 400000 : 350000);
+}
+
+void tbreakup_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
+static MACHINE_CONFIG_START( tbreakup, tbreakup_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1040, 400000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(tbreakup_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tbreakup_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tbreakup_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+//	MCFG_DEFAULT_LAYOUT(layout_tbreakup)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -4342,6 +4449,17 @@ ROM_START( tandy12 )
 ROM_END
 
 
+ROM_START( tbreakup )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp2726a", 0x0000, 0x0400, CRC(1f7c28e2) SHA1(164cda4eb3f0b1d20955212a197c9aadf8d18a06) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_tbreakup_mpla.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_tbreakup_opla.pla", 0, 365, CRC(a1ea035e) SHA1(fcf0b57ed90b41441a8974223a697f530daac0ab) )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
@@ -4383,6 +4501,8 @@ CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Par
 CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", GAME_SUPPORTS_SAVE )
 
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE ) // some of the minigames: ***
+
+CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 // ***: As far as MESS is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

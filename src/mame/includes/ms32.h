@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood,Paul Priest
 class ms32_state : public driver_device
 {
 public:

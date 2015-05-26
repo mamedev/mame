@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller,Robbbert
+// copyright-holders:Juergen Buchmueller, Robbbert
 /***************************************************************************
     microbee.c
 

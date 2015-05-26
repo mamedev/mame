@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Takahiro Nogi
+// copyright-holders:Takahiro Nogi, Uki
 #include "machine/eepromser.h"
 
 class fromanc2_state : public driver_device

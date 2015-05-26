@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Eisuke Watanabe, Nicola Salmoria
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"

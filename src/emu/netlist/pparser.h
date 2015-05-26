@@ -167,10 +167,7 @@ protected:
 
 	pstring replace_macros(const pstring &line);
 
-	virtual void error(const pstring &err)
-	{
-		fprintf(stderr, "PREPRO ERROR: %s\n", err.cstr());
-	}
+	virtual void error(const pstring &err);
 
 private:
 

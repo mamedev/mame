@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek
+// copyright-holders:Mariusz Wojcieszek, hap
 /***************************************************************************
 
 Penguin Adventure bootleg (tagged 'Screen', 1988)

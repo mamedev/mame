@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi
+// copyright-holders:Eisuke Watanabe, Nicola Salmoria
 /******************************************************************************
 
   Ganbare Ginkun  (Japan)  (c)1995 TECMO

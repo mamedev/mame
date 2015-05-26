@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:John Butler, Ed Mueller, Aaron Giles
 /***************************************************************************
 

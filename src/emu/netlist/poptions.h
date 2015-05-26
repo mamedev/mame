@@ -109,6 +109,11 @@ public:
 		}
 	}
 
+	~poptions()
+	{
+		m_opts.clear();
+	}
+
 	void register_option(poption *opt)
 	{
 		m_opts.add(opt);

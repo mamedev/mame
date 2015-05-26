@@ -2561,16 +2561,6 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				break;
 			case 0x36:  // Configuration register 1
 				res = s3.strapping & 0x000000ff;  // PCI (not really), Fast Page Mode DRAM
-				if(vga.svga_intf.vram_size == 0x80000)
-					res |= 0xe0;
-				else if(vga.svga_intf.vram_size == 0x100000)
-					res |= 0xc0;
-				else if(vga.svga_intf.vram_size == 0x200000)
-					res |= 0x80;
-				else if(vga.svga_intf.vram_size == 0x400000)
-					res |= 0x00;
-				else
-					res |= 0xe0;  // shouldn't get here...
 				break;
 			case 0x37:  // Configuration register 2
 				res = (s3.strapping & 0x0000ff00) >> 8;  // enable chipset, 64k BIOS size, internal DCLK/MCLK
@@ -2989,8 +2979,6 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 			case 0x6a:
 				svga.bank_w = data & 0x3f;
 				svga.bank_r = svga.bank_w;
-				if(data & 0x60)
-					popmessage("TODO: s3 bank selects above 1M\n");
 				break;
 			case 0x6f:
 				if(s3.reg_lock2 == 0xa5)
@@ -4645,7 +4633,10 @@ READ8_MEMBER(s3_vga_device::mem_r)
 			return 0;
 		data = 0;
 		if(vga.sequencer.data[4] & 0x8)
-			data = vga.memory[(offset + (svga.bank_r*0x10000)) % vga.svga_intf.vram_size];
+		{
+			if((offset + (svga.bank_r*0x10000)) < vga.svga_intf.vram_size)
+				data = vga.memory[(offset + (svga.bank_r*0x10000))];
+		}
 		else
 		{
 			int i;
@@ -4653,12 +4644,18 @@ READ8_MEMBER(s3_vga_device::mem_r)
 			for(i=0;i<4;i++)
 			{
 				if(vga.sequencer.map_mask & 1 << i)
-					data |= vga.memory[(offset*4+i+(svga.bank_r*0x10000)) % vga.svga_intf.vram_size];
+				{
+					if((offset*4+i+(svga.bank_r*0x10000)) < vga.svga_intf.vram_size)
+						data |= vga.memory[(offset*4+i+(svga.bank_r*0x10000))];
+				}
 			}
 		}
 		return data;
 	}
-	return vga_device::mem_r(space,offset,mem_mask);
+	if((offset + (svga.bank_r*0x10000)) < vga.svga_intf.vram_size)
+		return vga_device::mem_r(space,offset,mem_mask);
+	else
+		return 0xff;
 }
 
 WRITE8_MEMBER(s3_vga_device::mem_w)
@@ -4906,20 +4903,27 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		if(offset & 0x10000)
 			return;
 		if(vga.sequencer.data[4] & 0x8)
-			vga.memory[(offset + (svga.bank_w*0x10000)) % vga.svga_intf.vram_size] = data;
+		{
+			if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
+				vga.memory[(offset + (svga.bank_w*0x10000))] = data;
+		}
 		else
 		{
 			int i;
 			for(i=0;i<4;i++)
 			{
 				if(vga.sequencer.map_mask & 1 << i)
-					vga.memory[(offset*4+i+(svga.bank_w*0x10000)) % vga.svga_intf.vram_size] = data;
+				{
+					if((offset*4+i+(svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
+						vga.memory[(offset*4+i+(svga.bank_w*0x10000))] = data;
+				}
 			}
 		}
 		return;
 	}
 
-	vga_device::mem_w(space,offset,data,mem_mask);
+	if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
+		vga_device::mem_w(space,offset,data,mem_mask);
 }
 
 /******************************************

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:David Haywood,Bryan McPhail
 /***************************************************************************
 
    Tumblepop (bootlegs) and similar hardware

@@ -412,6 +412,7 @@ private:
 
 extern const device_type TMS1000;
 extern const device_type TMS1070;
+extern const device_type TMS1040;
 extern const device_type TMS1200;
 extern const device_type TMS1100;
 extern const device_type TMS1170;

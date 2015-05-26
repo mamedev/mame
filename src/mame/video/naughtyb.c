@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brad Oliver,Sal,John Bugliarisi
+// copyright-holders:Brad Oliver,Sal,John Bugliarisi,Paul Priest
 /***************************************************************************
 
   video.c

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Phill Harvey-Smith
+// copyright-holders:Phill Harvey-Smith, Carl
 /*
     drivers/rmnimbus.c
 

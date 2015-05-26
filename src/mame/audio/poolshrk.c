@@ -1,6 +1,5 @@
 // license:???
-// copyright-holders:Stefan Jokisch
-// FIXME: Coding style indicates Derrick Renaud
+// copyright-holders:Derrick Renaud
 /*************************************************************************
 
     audio\poolshrk.c

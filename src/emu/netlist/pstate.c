@@ -7,7 +7,11 @@
 
 #include "pstate.h"
 
-ATTR_COLD pstate_manager_t::~pstate_manager_t()
+pstate_manager_t::pstate_manager_t()
+{
+}
+
+pstate_manager_t::~pstate_manager_t()
 {
 	m_save.clear_and_free();
 }

@@ -184,7 +184,7 @@ ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
 // ----------------------------------------------------------------------------------------
 
 netlist_base_t::netlist_base_t()
-	:   netlist_object_t(NETLIST, GENERIC),
+	:   netlist_object_t(NETLIST, GENERIC), pstate_manager_t(),
 		m_stop(netlist_time::zero),
 		m_time(netlist_time::zero),
 		m_queue(*this),
