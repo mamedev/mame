@@ -144,7 +144,7 @@ public:
 
 	void parse(netlist_setup_t &setup, const pstring name)
 	{
-		for (int i=0; i < m_list.size(); i++)
+		for (std::size_t i=0; i < m_list.size(); i++)
 		{
 			if (m_list[i].parse(setup, name))
 				return;

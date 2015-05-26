@@ -197,7 +197,7 @@ netlist_base_t::netlist_base_t()
 
 netlist_base_t::~netlist_base_t()
 {
-	for (int i=0; i < m_nets.size(); i++)
+	for (std::size_t i=0; i < m_nets.size(); i++)
 	{
 		if (!m_nets[i]->isRailNet())
 		{
@@ -248,7 +248,7 @@ ATTR_COLD void netlist_base_t::start()
 	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
 
 	NL_VERBOSE_OUT(("Initializing devices ...\n"));
-	for (int i = 0; i < m_devices.size(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		netlist_device_t *dev = m_devices[i];
 		if (dev != m_solver && dev != m_params)
@@ -264,7 +264,7 @@ ATTR_COLD void netlist_base_t::stop()
 	NL_VERBOSE_OUT(("Stopping all devices ...\n"));
 
 	// Step all devices once !
-	for (int i = 0; i < m_devices.size(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->stop_dev();
 	}
@@ -272,7 +272,7 @@ ATTR_COLD void netlist_base_t::stop()
 
 ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 {
-	for (int i = 0; i < m_nets.size(); i++)
+	for (std::size_t i = 0; i < m_nets.size(); i++)
 	{
 		if (m_nets[i]->name() == name)
 			return m_nets[i];
@@ -282,7 +282,7 @@ ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 
 ATTR_COLD void netlist_base_t::rebuild_lists()
 {
-	for (int i = 0; i < m_nets.size(); i++)
+	for (std::size_t i = 0; i < m_nets.size(); i++)
 		m_nets[i]->rebuild_list();
 }
 
@@ -297,24 +297,24 @@ ATTR_COLD void netlist_base_t::reset()
 		m_solver->do_reset();
 
 	// Reset all nets once !
-	for (int i = 0; i < m_nets.size(); i++)
+	for (std::size_t i = 0; i < m_nets.size(); i++)
 		m_nets[i]->do_reset();
 
 	// Reset all devices once !
-	for (int i = 0; i < m_devices.size(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->do_reset();
 	}
 
 	// Step all devices once !
-	for (int i = 0; i < m_devices.size(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->update_dev();
 	}
 
 	// FIXME: some const devices rely on this
 	/* make sure params are set now .. */
-	for (int i = 0; i < m_devices.size(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->update_param();
 	}
@@ -650,7 +650,7 @@ ATTR_COLD void netlist_net_t::rebuild_list()
 	/* rebuild m_list */
 
 	m_list_active.clear();
-	for (int i=0; i < m_core_terms.size(); i++)
+	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		if (m_core_terms[i]->state() != netlist_logic_t::STATE_INP_PASSIVE)
 			m_list_active.add(*m_core_terms[i]);
 }
@@ -708,13 +708,13 @@ ATTR_COLD void netlist_net_t::reset()
 	/* rebuild m_list */
 
 	m_list_active.clear();
-	for (int i=0; i < m_core_terms.size(); i++)
+	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		m_list_active.add(*m_core_terms[i]);
 
-	for (int i=0; i < m_core_terms.size(); i++)
+	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		m_core_terms[i]->do_reset();
 
-	for (int i=0; i < m_core_terms.size(); i++)
+	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		if (m_core_terms[i]->state() != netlist_logic_t::STATE_INP_PASSIVE)
 			m_active++;
 }
@@ -731,7 +731,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
 
 ATTR_COLD void netlist_net_t::move_connections(netlist_net_t *dest_net)
 {
-	for (int i = 0; i < m_core_terms.size(); i++)
+	for (std::size_t i = 0; i < m_core_terms.size(); i++)
 	{
 		netlist_core_terminal_t *p = m_core_terms[i];
 		dest_net->register_con(*p);
@@ -829,7 +829,7 @@ ATTR_COLD void netlist_analog_net_t::process_net(list_t *groups, int &cur_group)
 	/* add the net */
 	//SOLVER_VERBOSE_OUT(("add %d - %s\n", cur_group, name().cstr()));
 	groups[cur_group].add(this);
-	for (int i = 0; i < m_core_terms.size(); i++)
+	for (std::size_t i = 0; i < m_core_terms.size(); i++)
 	{
 		netlist_core_terminal_t *p = m_core_terms[i];
 		//SOLVER_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));

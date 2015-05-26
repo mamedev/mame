@@ -161,7 +161,7 @@ public:
 
 protected:
 
-	double expr(const nl_util::pstring_list &sexpr, int &start, int prio);
+	double expr(const nl_util::pstring_list &sexpr, std::size_t &start, int prio);
 
 	define_t *get_define(const pstring &name);
 
