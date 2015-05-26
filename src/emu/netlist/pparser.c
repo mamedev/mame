@@ -5,6 +5,8 @@
  *
  */
 
+#include <cstdio>
+
 #include "pparser.h"
 
 //#undef NL_VERBOSE_OUT
@@ -218,6 +220,12 @@ ppreprocessor::ppreprocessor()
 	m_expr_sep.add("\t");
 }
 
+void ppreprocessor::error(const pstring &err)
+{
+	fprintf(stderr, "PREPRO ERROR: %s\n", err.cstr());
+}
+
+
 
 double ppreprocessor::expr(const nl_util::pstring_list &sexpr, int &start, int prio)
 {
@@ -281,22 +289,22 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
 	nl_util::pstring_list elems = nl_util::splitexpr(line, m_expr_sep);
-	pstring ret = "";
+	pstringbuffer ret = "";
 	for (int i=0; i<elems.count(); i++)
 	{
 		define_t *def = get_define(elems[i]);
 		if (def != NULL)
-			ret = ret + def->m_replace;
+			ret.cat(def->m_replace);
 		else
-			ret = ret + elems[i];
+			ret.cat(elems[i]);
 	}
-	return ret;
+	return pstring(ret.cstr());
 }
 
 
 pstring ppreprocessor::process(const pstring &contents)
 {
-	pstring ret = "";
+	pstringbuffer ret = "";
 	nl_util::pstring_list lines = nl_util::split(contents,"\n", false);
 	UINT32 ifflag = 0; // 31 if levels
 	int level = 0;
@@ -346,9 +354,12 @@ pstring ppreprocessor::process(const pstring &contents)
 			//if (ifflag == 0 && level > 0)
 			//	fprintf(stderr, "conditional: %s\n", line.cstr());
 			if (ifflag == 0)
-				ret = ret + line + "\n";
+			{
+				ret.cat(line);
+				ret.cat("\n");
+			}
 		}
 		i++;
 	}
-	return ret;
+	return pstring(ret.cstr());
 }

@@ -429,6 +429,8 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	for (int k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_t);
+		m_last_RHS[k] = 0.0;
+		m_last_V[k] = 0.0;
 	}
 }
 
@@ -444,6 +446,8 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	for (int k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_t);
+		m_last_RHS[k] = 0.0;
+		m_last_V[k] = 0.0;
 	}
 }
 

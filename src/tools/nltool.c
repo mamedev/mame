@@ -175,7 +175,11 @@ public:
 	{
 	}
 
-	virtual ~netlist_tool_t() { };
+	~netlist_tool_t()
+	{
+		if (m_setup != NULL)
+			pfree(m_setup);
+	};
 
 	void init()
 	{
@@ -346,6 +350,13 @@ static void listdevices()
 class convert_t
 {
 public:
+
+	convert_t() {};
+	~convert_t()
+	{
+		nets.clear_and_free();
+		devs.clear_and_free();
+	}
 
 	void convert(const pstring &contents)
 	{
@@ -650,8 +661,13 @@ convert_t::sp_unit convert_t::m_sp_units[] = {
     main - primary entry point
 -------------------------------------------------*/
 
+#include "corealloc.h"
+
 int main(int argc, char *argv[])
 {
+
+	track_memory(true);
+	{
 	tool_options_t opts;
 	int ret;
 
@@ -686,6 +702,7 @@ int main(int argc, char *argv[])
 		usage(opts);
 		return 1;
 	}
-
+	}
+	dump_unfreed_mem();
 	return 0;
 }
