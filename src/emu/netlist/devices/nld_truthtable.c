@@ -162,13 +162,13 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 	{
 		nl_util::pstring_list io = nl_util::split(ttline,"|");
 		// checks
-		nl_assert_always(io.count() == 3, "io.count mismatch");
+		nl_assert_always(io.size() == 3, "io.count mismatch");
 		nl_util::pstring_list inout = nl_util::split(io[0], ",");
-		nl_assert_always(inout.count() == m_num_bits, "number of bits not matching");
+		nl_assert_always(inout.size() == m_num_bits, "number of bits not matching");
 		nl_util::pstring_list out = nl_util::split(io[1], ",");
-		nl_assert_always(out.count() == m_NO, "output count not matching");
+		nl_assert_always(out.size() == m_NO, "output count not matching");
 		nl_util::pstring_list times = nl_util::split(io[2], ",");
-		nl_assert_always(times.count() == m_NO, "timing count not matching");
+		nl_assert_always(times.size() == m_NO, "timing count not matching");
 
 		UINT16 val = 0;
 		parray_t<UINT8> tindex(m_NO);
@@ -233,5 +233,3 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 	*m_initialized = true;
 
 }
-
-

@@ -93,7 +93,7 @@ public:
 	token_id_t register_token(pstring token)
 	{
 		m_tokens.add(token);
-		return token_id_t(m_tokens.count() - 1);
+		return token_id_t(m_tokens.size() - 1);
 	}
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }

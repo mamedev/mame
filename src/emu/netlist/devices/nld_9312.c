@@ -108,7 +108,7 @@ NETLIB_START(9312)
 	register_input("D7",        m_D[7]);
 
 	register_output("Y",        m_Y);
-	register_output("YQ",     	m_YQ);
+	register_output("YQ",       m_YQ);
 
 	m_last_chan = 0;
 	m_last_G = 0;

@@ -26,7 +26,7 @@
 	template<typename C, std::size_t N> ATTR_COLD void obj::save(C (&state)[N], const pstring &stname) \
 	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false); } \
 	template<typename C> ATTR_COLD void obj::save(C *state, const pstring &stname, const int count) \
-	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(C), count, state, false); 	}
+	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(C), count, state, false);   }
 
 enum pstate_data_type_e {
 	NOT_SUPPORTED,

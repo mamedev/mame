@@ -245,7 +245,7 @@ pstring::str_t *pstring::salloc(int n)
 {
 	int size = sizeof(str_t) + n + 1;
 	str_t *p = (str_t *) palloc_array(char, size);
-	//	str_t *p = (str_t *) _mm_malloc(size, 8);
+	//  str_t *p = (str_t *) _mm_malloc(size, 8);
 	p->init(n);
 	return p;
 }
@@ -358,4 +358,3 @@ void pstringbuffer::pcat(const pstring &s)
 	std::strncpy(m_ptr + m_len, s.cstr(), slen + 1);
 	m_len += slen;
 }
-

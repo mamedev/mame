@@ -80,7 +80,7 @@ NETLIB_START(extclock)
 		m_off = netlist_time::from_double(m_offset.Value());
 
 		int pati[256];
-		m_size = pat.count();
+		m_size = pat.size();
 		int total = 0;
 		for (int i=0; i<m_size; i++)
 		{

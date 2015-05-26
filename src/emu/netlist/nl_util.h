@@ -56,7 +56,7 @@ public:
 		while (i<str.len())
 		{
 			int p = -1;
-			for (int j=0; j < onstrl.count(); j++)
+			for (int j=0; j < onstrl.size(); j++)
 			{
 				if (std::strncmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].len())==0)
 				{

@@ -23,22 +23,22 @@
  * To get a performance increase we need the GCC extension.
  *
  * Todo: This doesn't work with current (4.8+) mingw 32bit builds.
- * 		 Therefore disabled for now for i386 builds.
+ *       Therefore disabled for now for i386 builds.
  *
  */
 
 #ifndef USE_PMFDELEGATES
 #if defined(__clang__) || (defined(__GNUC__) && defined(__i386__))
-	#define USE_PMFDELEGATES        	(0)
-	#define NO_USE_PMFCONVERSION		(1)
+	#define USE_PMFDELEGATES            (0)
+	#define NO_USE_PMFCONVERSION        (1)
 #else
 	#if defined(__GNUC__)
 		#define USE_PMFDELEGATES        (1)
-		#define NO_USE_PMFCONVERSION	(0)
+		#define NO_USE_PMFCONVERSION    (0)
 		#pragma GCC diagnostic ignored "-Wpmf-conversions"
 	#else
 		#define USE_PMFDELEGATES        (0)
-		#define NO_USE_PMFCONVERSION	(1)
+		#define NO_USE_PMFCONVERSION    (1)
 	#endif
 #endif
 #endif

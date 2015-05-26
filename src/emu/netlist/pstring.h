@@ -132,9 +132,9 @@ protected:
 		}
 		void init(const int alen)
 		{
-			 m_ref_count = 1;
-			 m_len = alen;
-			 m_str[0] = 0;
+				m_ref_count = 1;
+				m_len = alen;
+				m_str[0] = 0;
 		}
 		char *str() { return &m_str[0]; }
 		int len() { return m_len; }

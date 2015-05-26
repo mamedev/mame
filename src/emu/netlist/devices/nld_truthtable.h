@@ -38,9 +38,9 @@ struct truthtable_desc_t
 	truthtable_desc_t(int NO, int NI, int has_state, bool *initialized,
 			UINT32 *outs, UINT8 *timing, netlist_time *timing_nt)
 	: m_NO(NO), m_NI(NI), /*m_has_state(has_state),*/ m_initialized(initialized),
-	  m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
-	  m_num_bits(m_NI + has_state * (m_NI + m_NO)),
-	  m_size(1 << (m_num_bits))
+		m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
+		m_num_bits(m_NI + has_state * (m_NI + m_NO)),
+		m_size(1 << (m_num_bits))
 	{
 	}
 
@@ -99,11 +99,11 @@ public:
 
 		nl_util::pstring_list io = nl_util::split(ttline,"|");
 		// checks
-		nl_assert_always(io.count() == 2, "too many '|'");
+		nl_assert_always(io.size() == 2, "too many '|'");
 		nl_util::pstring_list inout = nl_util::split(io[0], ",");
-		nl_assert_always(inout.count() == m_num_bits, "bitcount wrong");
+		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
 		nl_util::pstring_list out = nl_util::split(io[1], ",");
-		nl_assert_always(out.count() == m_NO, "output count wrong");
+		nl_assert_always(out.size() == m_NO, "output count wrong");
 
 		for (int i=0; i < m_NI; i++)
 		{
@@ -163,7 +163,6 @@ public:
 	template<bool doOUT>
 	ATTR_HOT inline void process()
 	{
-
 		netlist_time mt = netlist_time::zero;
 
 		UINT32 state = 0;
