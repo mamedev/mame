@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Lee Taylor, John Clegg
 class m58_state : public driver_device
 {
