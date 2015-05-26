@@ -25,6 +25,10 @@
  *
  *************************************/
 
+// FIXME
+#undef I64FMT
+#define I64FMT   "ll"
+
 
 DISCRETE_START( dso_csvlog )
 {
