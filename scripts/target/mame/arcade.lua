@@ -557,6 +557,7 @@ MACHINES["STEPPERS"] = true
 --MACHINES["WOZFDC"] = true
 --MACHINES["DIABLO_HD"] = true
 MACHINES["PCI9050"] = true
+--MACHINES["TMS1024"] = true
 
 --------------------------------------------------
 -- specify available bus cores

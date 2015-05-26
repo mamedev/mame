@@ -91,6 +91,7 @@
 ***************************************************************************/
 
 #include "includes/hh_tms1k.h"
+#include "machine/tms1024.h"
 #include "sound/beep.h"
 
 // internal artwork
