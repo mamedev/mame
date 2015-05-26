@@ -557,17 +557,17 @@ void hmcs40_cpu_device::execute_run()
 		if ((m_prev_op & 0x3e0) == 0x340)
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
 
+		// remember previous state
+		m_prev_op = m_op;
+		m_prev_pc = m_pc;
+
 		// check/handle interrupt, but not in the middle of a long jump
-		if (m_ie && (m_iri || m_irt) && (m_op & 0x3e0) != 0x340)
+		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340)
 		{
 			do_interrupt();
 			if (m_icount <= 0)
 				break;
 		}
-
-		// remember previous state
-		m_prev_op = m_op;
-		m_prev_pc = m_pc;
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
