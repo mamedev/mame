@@ -864,7 +864,6 @@ end
 			if (version >= 40800) then
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				buildoptions {
-					"-Wno-unused-variable",
 					"-Wno-array-bounds"
 				}
 			end
