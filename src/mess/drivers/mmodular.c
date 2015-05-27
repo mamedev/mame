@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Ralf Schaefer, Cowering
+// license:LGPL-2.1+
+// copyright-holders:Dirk Verwiebe, Ralf Schaefer, Cowering
 /******************************************************************************
  Mephisto Chess Computers using plugin modules
 
