@@ -86,6 +86,8 @@ public:
 	token_t get_token();
 	pstring get_string();
 	pstring get_identifier();
+	double get_number_double();
+	long get_number_long();
 
 	void require_token(const token_id_t &token_num);
 	void require_token(const token_t tok, const token_id_t &token_num);
@@ -97,7 +99,7 @@ public:
 	}
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
-	void set_number_chars(pstring s) { m_number_chars = s; }
+	void set_number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; }
 	void set_whitespace(pstring s) { m_whitespace = s; }
 	void set_comment(pstring start, pstring end, pstring line)
 	{
@@ -129,6 +131,7 @@ private:
 
 	pstring m_identifier_chars;
 	pstring m_number_chars;
+	pstring m_number_chars_start;
 	plist_t<pstring> m_tokens;
 	pstring m_whitespace;
 	char  m_string;

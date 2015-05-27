@@ -31,6 +31,7 @@ public:
 	void net_model();
 	void net_submodel();
 	void net_include();
+	void net_truthtable_start();
 
 protected:
 	virtual void verror(pstring msg, int line_num, pstring line);
@@ -49,6 +50,10 @@ private:
 	token_id_t m_tok_NETLIST_END;
 	token_id_t m_tok_SUBMODEL;
 	token_id_t m_tok_INCLUDE;
+	token_id_t m_tok_TRUTHTABLE_START;
+	token_id_t m_tok_TRUTHTABLE_END;
+	token_id_t m_tok_TT_HEAD;
+	token_id_t m_tok_TT_LINE;
 
 	netlist_setup_t &m_setup;
 

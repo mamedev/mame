@@ -97,7 +97,8 @@ class tool_options_t : public poptions
 public:
 	tool_options_t() :
 		poptions(),
-		opt_ttr ("t", "time_to_run", 1.0,   "time to run the emulation (seconds)", this),
+		opt_ttr ("t", "time_to_run", 1.0,     "time to run the emulation (seconds)", this),
+		opt_name("n", "name",        "",      "netlist in file to run; default is first one", this),
 		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
 		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
 		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
@@ -106,6 +107,7 @@ public:
 	{}
 
 	poption_double opt_ttr;
+	poption_str    opt_name;
 	poption_str    opt_logs;
 	poption_str    opt_file;
 	poption_str    opt_cmd;
@@ -183,14 +185,14 @@ public:
 		m_setup->init();
 	}
 
-	void read_netlist(const char *buffer)
+	void read_netlist(const char *buffer, pstring name)
 	{
 		// read the netlist ...
 
 		netlist_sources_t sources;
 
 		sources.add(netlist_source_t(buffer));
-		sources.parse(*m_setup,"");
+		sources.parse(*m_setup, name);
 		//m_setup->parse(buffer);
 		log_setup();
 
@@ -266,7 +268,7 @@ static void run(tool_options_t &opts)
 	nt.init();
 	nt.m_logs = opts.opt_logs();
 	nt.m_verbose = opts.opt_verb();
-	nt.read_netlist(filetobuf(opts.opt_file()));
+	nt.read_netlist(filetobuf(opts.opt_file()), opts.opt_name());
 	double ttr = opts.opt_ttr();
 
 	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );

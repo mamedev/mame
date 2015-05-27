@@ -7,6 +7,7 @@
 
 #include "nl_parser.h"
 #include "nl_factory.h"
+#include "devices/nld_truthtable.h"
 
 //#undef NL_VERBOSE_OUT
 //#define NL_VERBOSE_OUT(x) printf x
@@ -33,7 +34,7 @@ bool netlist_parser::parse(const char *buf, const pstring nlname)
 
 	reset(m_buf);
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
-	set_number_chars("01234567890eE-."); //FIXME: processing of numbers
+	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
 	char ws[5];
 	ws[0] = ' ';
 	ws[1] = 9;
@@ -54,6 +55,10 @@ bool netlist_parser::parse(const char *buf, const pstring nlname)
 	m_tok_SUBMODEL = register_token("SUBMODEL");
 	m_tok_NETLIST_START = register_token("NETLIST_START");
 	m_tok_NETLIST_END = register_token("NETLIST_END");
+	m_tok_TRUTHTABLE_START = register_token("TRUTHTABLE_START");
+	m_tok_TRUTHTABLE_END = register_token("TRUTHTABLE_END");
+	m_tok_TT_HEAD = register_token("TT_HEAD");
+	m_tok_TT_LINE = register_token("TT_LINE");
 
 	bool in_nl = false;
 
@@ -119,6 +124,8 @@ void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			net_submodel();
 		else if (token.is(m_tok_INCLUDE))
 			net_include();
+		else if (token.is(m_tok_TRUTHTABLE_START))
+			net_truthtable_start();
 		else if (token.is(m_tok_NETLIST_END))
 		{
 			netdev_netlist_end();
@@ -126,6 +133,49 @@ void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
 		}
 		else
 			device(token.str());
+	}
+}
+
+void netlist_parser::net_truthtable_start()
+{
+	pstring name = get_identifier();
+	require_token(m_tok_comma);
+	unsigned ni = get_number_long();
+	require_token(m_tok_comma);
+	unsigned no = get_number_long();
+	require_token(m_tok_comma);
+	unsigned hs = get_number_long();
+	require_token(m_tok_comma);
+	pstring def_param = get_string();
+	require_token(m_tok_param_right);
+
+	netlist_base_factory_truthtable_t *ttd = nl_tt_factory_create(ni, no, hs,
+			name, name, "+" + def_param);
+
+	while (true)
+	{
+		token_t token = get_token();
+
+		if (token.is(m_tok_TT_HEAD))
+		{
+			require_token(m_tok_param_left);
+			ttd->m_desc.add(get_string());
+			require_token(m_tok_param_right);
+		}
+		else if (token.is(m_tok_TT_LINE))
+		{
+			require_token(m_tok_param_left);
+			ttd->m_desc.add(get_string());
+			require_token(m_tok_param_right);
+		}
+		else
+		{
+			require_token(token, m_tok_TRUTHTABLE_END);
+			require_token(m_tok_param_left);
+			require_token(m_tok_param_right);
+			m_setup.factory().register_device(ttd);
+			return;
+		}
 	}
 }
 
@@ -198,7 +248,7 @@ void netlist_parser::net_c()
 	{
 		pstring t1 = get_identifier();
 		m_setup.register_link(first , t1);
-		NL_VERBOSE_OUT(("Parser: Connect: %s %s\n", last.cstr(), t1.cstr()));
+		NL_VERBOSE_OUT(("Parser: Connect: %s %s\n", first.cstr(), t1.cstr()));
 		token_t n = get_token();
 		if (n.is(m_tok_param_right))
 			break;
@@ -293,6 +343,23 @@ nl_double netlist_parser::eval_param(const token_t tok)
 	for (i=1; i<6;i++)
 		if (tok.str().equals(macs[i]))
 			f = i;
+#if 1
+	if (f>0)
+	{
+		require_token(m_tok_param_left);
+		ret = get_number_double();
+		require_token(m_tok_param_right);
+	}
+	else
+	{
+		val = tok.str();
+		ret = val.as_double(&e);
+		if (e)
+			error("Error with parameter ...\n");
+	}
+	return ret * facs[f];
+
+#else
 	if (f>0)
 	{
 		require_token(m_tok_param_left);
@@ -308,4 +375,5 @@ nl_double netlist_parser::eval_param(const token_t tok)
 	if (f>0)
 		require_token(m_tok_param_right);
 	return ret * facs[f];
+#endif
 }

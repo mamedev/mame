@@ -777,7 +777,7 @@ void netlist_setup_t::start_devices()
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
 		pstring_list_t ll(env, ":");
-		for (std::size_t i=0; i < ll.size(); i++)
+		for (unsigned i=0; i < ll.size(); i++)
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
