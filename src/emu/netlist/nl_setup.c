@@ -39,7 +39,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 	, m_proxy_cnt(0)
 {
 	netlist.set_setup(this);
-	m_factory = palloc(netlist_factory_t);
+	m_factory = palloc(netlist_factory_list_t);
 }
 
 void netlist_setup_t::init()

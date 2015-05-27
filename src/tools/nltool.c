@@ -288,7 +288,7 @@ static void listdevices()
 {
 	netlist_tool_t nt;
 	nt.init();
-	const netlist_factory_t::list_t &list = nt.setup().factory().list();
+	const netlist_factory_list_t::list_t &list = nt.setup().factory().list();
 
 	netlist_sources_t sources;
 
@@ -304,7 +304,7 @@ static void listdevices()
 				list[i]->name().cstr() );
 		pstring terms("");
 
-		net_device_t_base_factory *f = list[i];
+		netlist_base_factory_t *f = list[i];
 		netlist_device_t *d = f->Create();
 		d->init(nt, pstring::sprintf("dummy%d", i));
 		d->start_dev();

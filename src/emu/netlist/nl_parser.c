@@ -223,7 +223,7 @@ void netlist_parser::netdev_param()
 void netlist_parser::device(const pstring &dev_type)
 {
 	pstring devname;
-	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);
+	netlist_base_factory_t *f = m_setup.factory().factory_by_name(dev_type, m_setup);
 	netlist_device_t *dev;
 	pstring_list_t termlist = f->term_param_list();
 	pstring_list_t def_params = f->def_params();

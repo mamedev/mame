@@ -376,7 +376,7 @@ pstring ppreprocessor::process(const pstring &contents)
 			}
 			else if (lti[0].equals("#pragma"))
 			{
-				if (lti.size() > 3 && lti[1].equals("NETLIST"))
+				if (ifflag == 0 && lti.size() > 3 && lti[1].equals("NETLIST"))
 				{
 					if (lti[2].equals("warning"))
 						error("NETLIST: " + catremainder(lti, 3, " "));
@@ -384,9 +384,12 @@ pstring ppreprocessor::process(const pstring &contents)
 			}
 			else if (lti[0].equals("#define"))
 			{
-				if (lti.size() != 3)
-					error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
-				m_defines.add(define_t(lti[1], lti[2]));
+				if (ifflag == 0)
+				{
+					if (lti.size() != 3)
+						error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
+					m_defines.add(define_t(lti[1], lti[2]));
+				}
 			}
 			else
 				error(pstring::sprintf("unknown directive on line %" SIZETFMT ": %s\n", i, line.cstr()));

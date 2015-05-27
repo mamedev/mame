@@ -18,18 +18,18 @@
 // net_dev class factory
 // -----------------------------------------------------------------------------
 
-class net_device_t_base_factory
+class netlist_base_factory_t
 {
-	NETLIST_PREVENT_COPYING(net_device_t_base_factory)
+	NETLIST_PREVENT_COPYING(netlist_base_factory_t)
 public:
-	ATTR_COLD net_device_t_base_factory(const pstring &name, const pstring &classname,
+	ATTR_COLD netlist_base_factory_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	: m_name(name), m_classname(classname), m_def_param(def_param)
 	{}
 
-	/* ATTR_COLD */ virtual ~net_device_t_base_factory() {}
+	/* ATTR_COLD */ virtual ~netlist_base_factory_t() {}
 
-	/* ATTR_COLD */ virtual netlist_device_t *Create() const = 0;
+	/* ATTR_COLD */ virtual netlist_device_t *Create() = 0;
 
 	ATTR_COLD const pstring &name() const { return m_name; }
 	ATTR_COLD const pstring &classname() const { return m_classname; }
@@ -44,15 +44,15 @@ protected:
 };
 
 template <class C>
-class net_device_t_factory : public net_device_t_base_factory
+class net_list_factory_t : public netlist_base_factory_t
 {
-	NETLIST_PREVENT_COPYING(net_device_t_factory)
+	NETLIST_PREVENT_COPYING(net_list_factory_t)
 public:
-	ATTR_COLD net_device_t_factory(const pstring &name, const pstring &classname,
+	ATTR_COLD net_list_factory_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: net_device_t_base_factory(name, classname, def_param) { }
+	: netlist_base_factory_t(name, classname, def_param) { }
 
-	ATTR_COLD netlist_device_t *Create() const
+	ATTR_COLD netlist_device_t *Create()
 	{
 		netlist_device_t *r = palloc(C);
 		//r->init(setup, name);
@@ -60,29 +60,29 @@ public:
 	}
 };
 
-class netlist_factory_t
+class netlist_factory_list_t
 {
 public:
-	typedef plist_t<net_device_t_base_factory *> list_t;
+	typedef plist_t<netlist_base_factory_t *> list_t;
 
-	netlist_factory_t();
-	~netlist_factory_t();
+	netlist_factory_list_t();
+	~netlist_factory_list_t();
 
 	template<class _C>
 	ATTR_COLD void register_device(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	{
-		m_list.add(palloc(net_device_t_factory< _C >, name, classname, def_param));
+		m_list.add(palloc(net_list_factory_t< _C >, name, classname, def_param));
 	}
 
-	ATTR_COLD void register_device(net_device_t_base_factory *factory)
+	ATTR_COLD void register_device(netlist_base_factory_t *factory)
 	{
 		m_list.add(factory);
 	}
 
 	ATTR_COLD netlist_device_t *new_device_by_classname(const pstring &classname) const;
 	ATTR_COLD netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;
-	ATTR_COLD net_device_t_base_factory * factory_by_name(const pstring &name, netlist_setup_t &setup) const;
+	ATTR_COLD netlist_base_factory_t * factory_by_name(const pstring &name, netlist_setup_t &setup) const;
 
 	const list_t &list() { return m_list; }
 

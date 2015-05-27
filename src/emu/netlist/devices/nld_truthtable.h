@@ -258,28 +258,28 @@ private:
 	pstring_list_t m_desc;
 };
 
-class net_device_t_base_factory_tt : public net_device_t_base_factory
+class netlist_base_factory_truthtable_t : public netlist_base_factory_t
 {
-	NETLIST_PREVENT_COPYING(net_device_t_base_factory_tt)
+	NETLIST_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 public:
-	ATTR_COLD net_device_t_base_factory_tt(const pstring &name, const pstring &classname,
+	ATTR_COLD netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: net_device_t_base_factory(name, classname, def_param)
+	: netlist_base_factory_t(name, classname, def_param)
 	{}
 	pstring_list_t m_desc;
 };
 
 
 template<unsigned m_NI, unsigned m_NO, int has_state>
-class net_device_t_factory_tt : public net_device_t_base_factory_tt
+class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
 {
-	NETLIST_PREVENT_COPYING(net_device_t_factory_tt)
+	NETLIST_PREVENT_COPYING(netlist_factory_truthtable_t)
 public:
-	ATTR_COLD net_device_t_factory_tt(const pstring &name, const pstring &classname,
+	ATTR_COLD netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: net_device_t_base_factory(name, classname, def_param) { }
+	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	ATTR_COLD netlist_device_t *Create() const
+	ATTR_COLD netlist_device_t *Create()
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
 		netlist_device_t *r = palloc(tt_type, &m_ttbl, m_desc);
@@ -290,6 +290,25 @@ private:
 	typename nld_truthtable_t<m_NI, m_NO, has_state>::truthtable_t m_ttbl;
 };
 
+netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const unsigned no,
+		const unsigned has_state,
+		const pstring &name, const pstring &classname,
+		const pstring &def_param);
+
+#define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
+	{ \
+	netlist_base_factory_truthtable_t *ttd = nl_tt_factory_create(_in, _out, _has_state, \
+			# _name, # _name, "+" _def_params);
+
+#define TT_HEAD(_x) \
+	ttd->m_desc.add(_x);
+
+#define TT_LINE(_x) \
+	ttd->m_desc.add(_x);
+
+#define TRUTHTABLE_END() \
+	setup.factory().register_device(ttd); \
+	}
 
 
 #endif /* NLD_TRUTHTABLE_H_ */

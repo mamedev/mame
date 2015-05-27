@@ -235,3 +235,35 @@ ATTR_COLD void truthtable_desc_t::setup(const pstring_list_t &truthtable, UINT32
 	*m_initialized = true;
 
 }
+
+#define ENTRYX(_n,_m,_h)	case (_n * 1000 + _m * 10 + _h): \
+	{ typedef netlist_factory_truthtable_t<_n,_m,_h> xtype; \
+	  return palloc(xtype,name,classname,def_param); } break
+
+#define ENTRYY(_n,_m)	ENTRYX(_n,_m,0); ENTRYX(_n,_m,1)
+
+#define ENTRY(_n) ENTRYY(_n, 1); ENTRYY(_n, 2); ENTRYY(_n, 3); ENTRYY(_n, 4); ENTRYY(_n, 5); ENTRYY(_n, 6)
+
+netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const unsigned no,
+		const unsigned has_state,
+		const pstring &name, const pstring &classname,
+		const pstring &def_param)
+{
+	switch (ni * 1000 + no * 10 + has_state)
+	{
+		ENTRY(1);
+		ENTRY(2);
+		ENTRY(3);
+		ENTRY(4);
+		ENTRY(5);
+		ENTRY(6);
+		ENTRY(7);
+		ENTRY(8);
+		ENTRY(9);
+		ENTRY(10);
+		default:
+			pstring msg = pstring::sprintf("unable to create truthtable<%d,%d,%d>", ni, no, has_state);
+			nl_assert_always(false, msg.cstr());
+	}
+	return NULL;
+}
