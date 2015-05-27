@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Alex Marshal,nimitz,austere
+// copyright-holders:Alex Marshall,nimitz,austere
 //ICS2115 by Raiden II team (c) 2010
 //members: austere, nimitz, Alex Marshal
 //
