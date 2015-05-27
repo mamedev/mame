@@ -358,11 +358,7 @@ endif
 
 # specify a default optimization level if none explicitly stated
 ifndef OPTIMIZE
-ifndef SYMBOLS
 OPTIMIZE = 3
-else
-OPTIMIZE = 0
-endif
 endif
 
 # set the symbols level
