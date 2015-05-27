@@ -232,7 +232,6 @@ void running_machine::start()
 	// init the osd layer
 	m_manager.osd().init(*this);
 
-osd_printf_verbose("**** START ****\nTime = %I64d\n", osd_ticks());
 	// start the inifile manager
 	m_inifile.reset(global_alloc(inifile_manager(*this)));
 

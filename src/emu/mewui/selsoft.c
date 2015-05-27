@@ -205,11 +205,11 @@ void ui_menu_select_software::handle()
 		}
 
 		// handle UI_LEFT_PANEL
-		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL && mewui_globals::rpanel_infos == RP_INFOS)
+		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
 			mewui_globals::rpanel_infos = RP_IMAGES;
 
 		// handle UI_RIGHT_PANEL
-		else if (menu_event->iptkey == IPT_UI_RIGHT_PANEL && mewui_globals::rpanel_infos == RP_IMAGES)
+		else if (menu_event->iptkey == IPT_UI_RIGHT_PANEL)
 			mewui_globals::rpanel_infos = RP_INFOS;
 
 		// escape pressed with non-empty text clears the text

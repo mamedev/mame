@@ -96,7 +96,6 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
 
-osd_printf_verbose("**** END 1 ****\nTime = %I64d\nTicks x seconds = %I64d\n", osd_ticks(), osd_ticks_per_second());
 	// build drivers list
 	build_full_list();
 	build_available_list();
@@ -163,7 +162,6 @@ void ui_mewui_select_game::handle()
 
 	// process the menu
 	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
-osd_printf_verbose("**** END ****\nTime = %I64d\nTicks x seconds = %I64d\n", osd_ticks(), osd_ticks_per_second());
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		// reset the error on any future menu_event
@@ -545,28 +543,28 @@ void ui_mewui_select_game::populate()
 		flags_mewui = MENU_FLAG_MEWUI | MENU_FLAG_MEWUI_FAVORITE | MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
 		// iterate over entries
-		for (size_t x = 0; x < favorite_manager::favorite_list.size(); x++)
+		for (size_t x = 0; x < machine().favorite().favorite_list.size(); x++)
 		{
-			if (favorite_manager::favorite_list[x].startempty == 1)
+			if (machine().favorite().favorite_list[x].startempty == 1)
 			{
-				bool cloneof = strcmp(favorite_manager::favorite_list[x].driver->parent, "0");
+				bool cloneof = strcmp(machine().favorite().favorite_list[x].driver->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(favorite_manager::favorite_list[x].driver->parent);
+					int cx = driver_list::find(machine().favorite().favorite_list[x].driver->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
-				item_append(favorite_manager::favorite_list[x].longname.c_str(), NULL,
+				item_append(machine().favorite().favorite_list[x].longname.c_str(), NULL,
 							(cloneof) ? (MENU_FLAG_INVERT | flags_mewui) : flags_mewui,
-							(void *)&favorite_manager::favorite_list[x]);
+							(void *)&machine().favorite().favorite_list[x]);
 			}
 
 			else
-				item_append(favorite_manager::favorite_list[x].longname.c_str(),
-							favorite_manager::favorite_list[x].devicetype.c_str(),
-							favorite_manager::favorite_list[x].parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
-							(void *)&favorite_manager::favorite_list[x]);
+				item_append(machine().favorite().favorite_list[x].longname.c_str(),
+							machine().favorite().favorite_list[x].devicetype.c_str(),
+							machine().favorite().favorite_list[x].parentname.empty() ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
+							(void *)&machine().favorite().favorite_list[x]);
 		}
 	}
 
@@ -604,8 +602,7 @@ void ui_mewui_select_game::populate()
 
 void ui_mewui_select_game::build_full_list()
 {
-osd_printf_verbose("**** START 2 ****\nTime = %I64d\nTicks x seconds = %I64d\n", osd_ticks(), osd_ticks_per_second());
-machine().ui().set_startup_text("Build machine list...", true);
+//machine().ui().set_startup_text("Build machine list...", true);
 	// build list
 	for (int x = 0; x < driver_list::total(); ++x)
 	{
@@ -623,7 +620,6 @@ machine().ui().set_startup_text("Build machine list...", true);
 	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
 	std::stable_sort(c_year::ui.begin(), c_year::ui.end());
 	std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sort_game_list);
-osd_printf_verbose("**** END 2 ****\nTime = %I64d\nTicks x seconds = %I64d\n", osd_ticks(), osd_ticks_per_second());
 }
 
 //-------------------------------------------------
@@ -632,8 +628,7 @@ osd_printf_verbose("**** END 2 ****\nTime = %I64d\nTicks x seconds = %I64d\n", o
 
 void ui_mewui_select_game::build_available_list()
 {
-osd_printf_verbose("**** START Avail ****\nTime = %I64d\n", osd_ticks());
-machine().ui().set_startup_text("Initializing...\nBuild available list...", true);
+//machine().ui().set_startup_text("Initializing...\nBuild available list...", true);
 	int m_total = driver_list::total();
 	std::vector<UINT8> m_included(m_total, 0);
 
@@ -662,7 +657,7 @@ machine().ui().set_startup_text("Initializing...\nBuild available list...", true
 			m_included[drivnum] = 1;
 		}
 	}
-osd_printf_verbose("**** END Avail 1 ****\nTime = %I64d\n", osd_ticks());
+
 	// now check and include NONE_NEEDED
 	for (int x = 0; x < m_total; ++x)
 		if (!m_included[x])
@@ -678,7 +673,6 @@ osd_printf_verbose("**** END Avail 1 ****\nTime = %I64d\n", osd_ticks());
 			}
 		}
 
-osd_printf_verbose("**** END Avail 2 ****\nTime = %I64d\n", osd_ticks());
 	// now audit excluded
 	if (machine().options().audit_mode())
 	{
@@ -706,7 +700,7 @@ osd_printf_verbose("**** END Avail 2 ****\nTime = %I64d\n", osd_ticks());
 	// sort
 	m_availsortedlist = m_availablelist;
 	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sort_game_list);
-osd_printf_verbose("**** END Avail 3 ****\nTime = %I64d\n", osd_ticks());
+
 	// now build the unavailable list
 	for (int x = 0; x < m_total; ++x)
 		if (!m_included[x] && strcmp("___empty", driver_list::driver(x).name))
@@ -715,7 +709,6 @@ osd_printf_verbose("**** END Avail 3 ****\nTime = %I64d\n", osd_ticks());
 	// sort
 	m_unavailsortedlist = m_unavailablelist;
 	std::stable_sort(m_unavailsortedlist.begin(), m_unavailsortedlist.end(), sort_game_list);
-osd_printf_verbose("**** END 3 ****\nTime = %I64d\nTicks x seconds = %I64d\n", osd_ticks(), osd_ticks_per_second());
 }
 
 //-------------------------------------------------
@@ -737,12 +730,12 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 
 	std::string filtered;
 
-	if (mewui_globals::actual_filter == FILTER_CATEGORY && !inifile_manager::ini_index.empty())
+	if (mewui_globals::actual_filter == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
 	{
-		int c_file = inifile_manager::current_file;
-		int c_cat = inifile_manager::current_category;
-		std::string s_file = inifile_manager::ini_index[c_file].name;
-		std::string s_category = inifile_manager::ini_index[c_file].category[c_cat].name;
+		int c_file = machine().inifile().current_file;
+		int c_cat = machine().inifile().current_category;
+		std::string s_file = machine().inifile().ini_index[c_file].name;
+		std::string s_category = machine().inifile().ini_index[c_file].category[c_cat].name;
 		filtered.assign(mewui_globals::filter_text[mewui_globals::actual_filter]).append(" (").append(s_file)
 						.append(" - ").append(s_category).append(") -");
 	}

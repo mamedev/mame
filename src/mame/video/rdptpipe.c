@@ -47,7 +47,6 @@ void n64_texture_pipe_t::set_machine(running_machine &machine)
 		}
 		else
 		{
-			INT32 tempanded = i & 0x18000;
 			if ((i & 0x18000) == 0x8000)
 			{
 				m_lod_lookup[i] = 0x7fff;
@@ -256,7 +255,7 @@ void n64_texture_pipe_t::clamp_cycle_light(INT32* S, INT32* T, const bool maxs, 
 
 void n64_texture_pipe_t::cycle_nearest(color_t* TEX, color_t* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
-	const n64_tile_t* tiles = object.m_tiles;
+  //	const n64_tile_t* tiles = object.m_tiles;
 	const n64_tile_t& tile = object.m_tiles[tilenum];
 	const UINT32 tformat = tile.format;
 	const UINT32 tsize =  tile.size;

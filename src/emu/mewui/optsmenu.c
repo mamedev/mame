@@ -102,27 +102,27 @@ void ui_menu_game_options::handle()
 			{
 				if (menu_event->iptkey == IPT_UI_LEFT)
 				{
-					inifile_manager::current_file--;
-					inifile_manager::current_category = 0;
+					machine().inifile().current_file--;
+					machine().inifile().current_category = 0;
 					changed = true;
 				}
 
 				else if (menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					inifile_manager::current_file++;
-					inifile_manager::current_category = 0;
+					machine().inifile().current_file++;
+					machine().inifile().current_category = 0;
 					changed = true;
 				}
 
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					int total = inifile_manager::ini_index.size();
+					int total = machine().inifile().ini_index.size();
 					std::vector<std::string> s_sel(total);
-					inifile_manager::current_category = 0;
+					machine().inifile().current_category = 0;
 					for (size_t index = 0; index < total; ++index)
-						s_sel[index].assign(inifile_manager::ini_index[index].name);
+						s_sel[index].assign(machine().inifile().ini_index[index].name);
 
-					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &inifile_manager::current_file, SELECTOR_INIFILE)));
+					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &machine().inifile().current_file, SELECTOR_INIFILE)));
 				}
 				break;
 			}
@@ -131,24 +131,24 @@ void ui_menu_game_options::handle()
 			{
 				if (menu_event->iptkey == IPT_UI_LEFT)
 				{
-					inifile_manager::current_category--;
+					machine().inifile().current_category--;
 					changed = true;
 				}
 
 				else if (menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					inifile_manager::current_category++;
+					machine().inifile().current_category++;
 					changed = true;
 				}
 
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					int total = inifile_manager::ini_index[inifile_manager::current_file].category.size();
+					int total = machine().inifile().ini_index[machine().inifile().current_file].category.size();
 					std::vector<std::string> s_sel(total);
 					for (int index = 0; index < total; ++index)
-						s_sel[index].assign(inifile_manager::ini_index[inifile_manager::current_file].category[index].name);
+						s_sel[index].assign(machine().inifile().ini_index[machine().inifile().current_file].category[index].name);
 
-					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &inifile_manager::current_category, SELECTOR_CATEGORY)));
+					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &machine().inifile().current_category, SELECTOR_CATEGORY)));
 				}
 				break;
 			}
@@ -243,28 +243,28 @@ void ui_menu_game_options::populate()
 	item_append("Filter", mewui_globals::filter_text[mewui_globals::actual_filter], arrow_flags, (void *)FILTER_MENU);
 
 	// add category subitem
-	if (mewui_globals::actual_filter == FILTER_CATEGORY && !inifile_manager::ini_index.empty())
+	if (mewui_globals::actual_filter == FILTER_CATEGORY && !machine().inifile().ini_index.empty())
 	{
-		int actual_file = inifile_manager::current_file;
+		int actual_file = machine().inifile().current_file;
 
-		if (inifile_manager::ini_index.size() == 1)
+		if (machine().inifile().ini_index.size() == 1)
 			arrow_flags = 0;
 		else
-			arrow_flags = get_arrow_flags(0, inifile_manager::ini_index.size() - 1, actual_file);
+			arrow_flags = get_arrow_flags(0, machine().inifile().ini_index.size() - 1, actual_file);
 
 		convert_command_glyph(fbuff);
-		item_append(fbuff.c_str(), inifile_manager::ini_index[actual_file].name.c_str(), arrow_flags, (void *)FILE_CATEGORY_FILTER);
+		item_append(fbuff.c_str(), machine().inifile().ini_index[actual_file].name.c_str(), arrow_flags, (void *)FILE_CATEGORY_FILTER);
 
-		int actual_category = inifile_manager::current_category;
+		int actual_category = machine().inifile().current_category;
 
-		if (inifile_manager::ini_index[actual_file].category.size() == 1)
+		if (machine().inifile().ini_index[actual_file].category.size() == 1)
 			arrow_flags = 0;
 		else
-			arrow_flags = get_arrow_flags(0, inifile_manager::ini_index[actual_file].category.size() - 1, actual_category);
+			arrow_flags = get_arrow_flags(0, machine().inifile().ini_index[actual_file].category.size() - 1, actual_category);
 
 		fbuff.assign(" ^!Category");
 		convert_command_glyph(fbuff);
-		item_append(fbuff.c_str(), inifile_manager::ini_index[actual_file].category[actual_category].name.c_str(), arrow_flags, (void *)CATEGORY_FILTER);
+		item_append(fbuff.c_str(), machine().inifile().ini_index[actual_file].category[actual_category].name.c_str(), arrow_flags, (void *)CATEGORY_FILTER);
 	}
 
 	// add manufacturer subitem

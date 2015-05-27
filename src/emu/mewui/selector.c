@@ -49,13 +49,13 @@ void ui_menu_selector::handle()
 			switch (p_category)
 			{
 				case SELECTOR_INIFILE:
-					inifile_manager::current_file = *selector;
-					inifile_manager::current_category = 0;
+					machine().inifile().current_file = *selector;
+					machine().inifile().current_category = 0;
 					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
 					break;
 
 				case SELECTOR_CATEGORY:
-					inifile_manager::current_category = *selector;
+					machine().inifile().current_category = *selector;
 					ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
 					break;
 

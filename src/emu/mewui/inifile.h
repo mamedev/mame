@@ -48,8 +48,8 @@ public:
 	void load_ini_category(std::vector<int> &temp_filter);
 
 	// files indices
-	static std::vector<IniFileIndex> ini_index;
-	static UINT16 current_file, current_category;
+	std::vector<IniFileIndex> ini_index;
+	UINT16 current_file, current_category;
 
 private:
 
@@ -79,7 +79,7 @@ public:
 	favorite_manager(running_machine &machine);
 
 	// favorite indices
-	static std::vector<ui_software_info> favorite_list;
+	std::vector<ui_software_info> favorite_list;
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -104,7 +104,7 @@ public:
 private:
 
 	// current
-	static int current_favorite;
+	int current_favorite;
 
 	// parse file mewui_favorite
 	void parse_favorite();

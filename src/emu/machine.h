@@ -369,7 +369,7 @@ private:
 
     auto_pointer<datfile_manager>   m_datfile;      // internal data from datfile.c
     auto_pointer<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs
-    auto_pointer<favorite_manager> m_favorite;     // internal data from inifile.c for favorites
+    auto_pointer<favorite_manager> 	m_favorite;     // internal data from inifile.c for favorites
 };
 
 #endif  /* __MACHINE_H__ */
