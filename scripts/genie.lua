@@ -723,9 +723,23 @@ if _OPTIONS["OPTIMIZE"] then
 		buildoptions {
 			"-flto",
 		}
+--		buildoptions {
+--			"-ffat-lto-objects",
+--		}
+--		buildoptions {
+--			"-flto-partition=1to1",
+--		}
 		linkoptions {
 			"-flto",
 		}
+--		linkoptions {
+--			"-flto-partition=1to1",
+--		}
+--		linkoptions {
+--			"-ffat-lto-objects",
+--		}
+		
+		
 	end
 end
 
@@ -859,8 +873,9 @@ end
 			if (version >= 40800) then
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				buildoptions {
+					"-D__USE_MINGW_ANSI_STDIO=1",
 					"-Wno-unused-variable",
-					"-Wno-array-bounds"
+--					"-Wno-array-bounds"
 				}
 			end
 		end
