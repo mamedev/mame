@@ -14,6 +14,8 @@
 #define __EMUOPTS_H__
 
 #include "options.h"
+#include "mewui/options.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -194,7 +196,7 @@ enum
 struct game_driver;
 
 
-class emu_options : public core_options
+class emu_options : public mewui_options
 {
 	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
 
