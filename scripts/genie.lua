@@ -880,7 +880,7 @@ end
 				buildoptions {
 					"-D__USE_MINGW_ANSI_STDIO=1",
 					"-Wno-unused-variable",
---					"-Wno-array-bounds"
+					"-Wno-array-bounds"
 				}
 			end
 		end
