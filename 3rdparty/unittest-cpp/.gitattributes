@@ -1,0 +1,17 @@
+* text=auto
+
+*.h text
+*.cpp text
+
+# VS 20xx files
+*.sln text eol=crlf
+*.vcproj text eol=crlf
+*.vcxproj text eol=crlf
+*.vcxproj.filters text eol=crlf
+
+# VC6 files 
+*.dsw text eol=crlf
+*.dsp text eol=crlf
+
+# Other 'windows-specific' files
+*.bat text eol=crlf
