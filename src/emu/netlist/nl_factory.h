@@ -10,10 +10,9 @@
 #define NLFACTORY_H_
 
 #include "nl_config.h"
-#include "palloc.h"
-#include "plists.h"
+#include "plib/palloc.h"
+#include "plib/plists.h"
 #include "nl_base.h"
-#include "pstring.h"
 
 // -----------------------------------------------------------------------------
 // net_dev class factory
@@ -35,8 +34,8 @@ public:
 	ATTR_COLD const pstring &name() const { return m_name; }
 	ATTR_COLD const pstring &classname() const { return m_classname; }
 	ATTR_COLD const pstring &param_desc() const { return m_def_param; }
-	ATTR_COLD const nl_util::pstring_list term_param_list();
-	ATTR_COLD const nl_util::pstring_list def_params();
+	ATTR_COLD const pstring_list_t term_param_list();
+	ATTR_COLD const pstring_list_t def_params();
 
 protected:
 	pstring m_name;                             /* device name */
@@ -74,6 +73,11 @@ public:
 			const pstring &def_param)
 	{
 		m_list.add(palloc(net_device_t_factory< _C >, name, classname, def_param));
+	}
+
+	ATTR_COLD void register_device(net_device_t_base_factory *factory)
+	{
+		m_list.add(factory);
 	}
 
 	ATTR_COLD netlist_device_t *new_device_by_classname(const pstring &classname) const;

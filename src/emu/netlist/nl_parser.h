@@ -10,7 +10,7 @@
 
 #include "nl_setup.h"
 #include "nl_util.h"
-#include "pparser.h"
+#include "plib/pparser.h"
 
 class netlist_parser : public ptokenizer
 {

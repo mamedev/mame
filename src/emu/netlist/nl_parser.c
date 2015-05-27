@@ -225,8 +225,8 @@ void netlist_parser::device(const pstring &dev_type)
 	pstring devname;
 	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);
 	netlist_device_t *dev;
-	nl_util::pstring_list termlist = f->term_param_list();
-	nl_util::pstring_list def_params = f->def_params();
+	pstring_list_t termlist = f->term_param_list();
+	pstring_list_t def_params = f->def_params();
 
 	std::size_t cnt;
 

@@ -9,8 +9,8 @@
 #define PPARSER_H_
 
 #include "pconfig.h"
-#include "nl_config.h" // FIXME
-#include "nl_util.h"
+#include "../nl_config.h" // FIXME
+#include "../nl_util.h"
 
 class ptokenizer
 {
@@ -161,7 +161,7 @@ public:
 
 protected:
 
-	double expr(const nl_util::pstring_list &sexpr, std::size_t &start, int prio);
+	double expr(const pstring_list_t &sexpr, std::size_t &start, int prio);
 
 	define_t *get_define(const pstring &name);
 
@@ -172,7 +172,7 @@ protected:
 private:
 
 	plist_t<define_t> m_defines;
-	nl_util::pstring_list m_expr_sep;
+	pstring_list_t m_expr_sep;
 };
 
 #endif /* PPARSER_H_ */

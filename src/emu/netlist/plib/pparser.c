@@ -227,7 +227,7 @@ void ppreprocessor::error(const pstring &err)
 
 
 
-double ppreprocessor::expr(const nl_util::pstring_list &sexpr, std::size_t &start, int prio)
+double ppreprocessor::expr(const pstring_list_t &sexpr, std::size_t &start, int prio)
 {
 	double val;
 	pstring tok=sexpr[start];
@@ -300,7 +300,7 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
-	nl_util::pstring_list elems = nl_util::splitexpr(line, m_expr_sep);
+	pstring_list_t elems = pstring_list_t::splitexpr(line, m_expr_sep);
 	pstringbuffer ret = "";
 	for (std::size_t i=0; i<elems.size(); i++)
 	{
@@ -313,7 +313,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	return pstring(ret.cstr());
 }
 
-static pstring catremainder(const nl_util::pstring_list &elems, std::size_t start, pstring sep)
+static pstring catremainder(const pstring_list_t &elems, std::size_t start, pstring sep)
 {
 	pstringbuffer ret = "";
 	for (std::size_t i=start; i<elems.size(); i++)
@@ -327,7 +327,7 @@ static pstring catremainder(const nl_util::pstring_list &elems, std::size_t star
 pstring ppreprocessor::process(const pstring &contents)
 {
 	pstringbuffer ret = "";
-	nl_util::pstring_list lines = nl_util::split(contents,"\n", false);
+	pstring_list_t lines(contents,"\n", false);
 	UINT32 ifflag = 0; // 31 if levels
 	int level = 0;
 
@@ -339,12 +339,12 @@ pstring ppreprocessor::process(const pstring &contents)
 		lt = replace_macros(lt);
 		if (lt.startsWith("#"))
 		{
-			nl_util::pstring_list lti = nl_util::split(lt, " ", true);
+			pstring_list_t lti(lt, " ", true);
 			if (lti[0].equals("#if"))
 			{
 				level++;
 				std::size_t start = 0;
-				nl_util::pstring_list t = nl_util::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
+				pstring_list_t t = pstring_list_t::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
 				int val = expr(t, start, 0);
 				if (val == 0)
 					ifflag |= (1 << level);

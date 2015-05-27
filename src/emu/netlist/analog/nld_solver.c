@@ -51,7 +51,7 @@ ATTR_COLD void terms_t::add(netlist_terminal_t *term, int net_other)
 
 ATTR_COLD void terms_t::set_pointers()
 {
-	for (int i = 0; i < count(); i++)
+	for (unsigned i = 0; i < count(); i++)
 	{
 		m_term[i]->m_gt1 = &m_gt[i];
 		m_term[i]->m_go1 = &m_go[i];

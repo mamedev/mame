@@ -8,7 +8,7 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
-#include "pconfig.h"
+#include "plib/pconfig.h"
 
 //============================================================
 //  SETUP

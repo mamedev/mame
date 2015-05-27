@@ -7,7 +7,7 @@
 
 #include <cstdio>
 
-#include "palloc.h"
+#include "plib/palloc.h"
 #include "nl_base.h"
 #include "nl_setup.h"
 #include "nl_parser.h"
@@ -286,7 +286,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 
 void netlist_setup_t::register_link_arr(const pstring &terms)
 {
-	nl_util::pstring_list list = nl_util::split(terms,", ");
+	pstring_list_t list(terms,", ");
 	if (list.size() < 2)
 		netlist().error("You must pass at least 2 terminals to NET_C");
 	for (std::size_t i = 1; i < list.size(); i++)
@@ -776,7 +776,7 @@ void netlist_setup_t::start_devices()
 	if (env != "")
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
-		nl_util::pstring_list ll = nl_util::split(env, ":");
+		pstring_list_t ll(env, ":");
 		for (std::size_t i=0; i < ll.size(); i++)
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));

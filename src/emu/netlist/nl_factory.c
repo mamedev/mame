@@ -15,20 +15,20 @@
 // net_device_t_base_factory
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::term_param_list()
+ATTR_COLD const pstring_list_t net_device_t_base_factory::term_param_list()
 {
 	if (m_def_param.startsWith("+"))
-		return nl_util::split(m_def_param.substr(1), ",");
+		return pstring_list_t(m_def_param.substr(1), ",");
 	else
-		return nl_util::pstring_list();
+		return pstring_list_t();
 }
 
-ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::def_params()
+ATTR_COLD const pstring_list_t net_device_t_base_factory::def_params()
 {
 	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-		return nl_util::pstring_list();
+		return pstring_list_t();
 	else
-		return nl_util::split(m_def_param, ",");
+		return pstring_list_t(m_def_param, ",");
 }
 
 

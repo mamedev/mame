@@ -7,12 +7,11 @@
 
 #include <cstring>
 
-#include "palloc.h"
+#include "plib/palloc.h"
 
 #include "nl_base.h"
 #include "devices/nld_system.h"
 #include "analog/nld_solver.h"
-#include "pstring.h"
 #include "nl_util.h"
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);

@@ -6,7 +6,7 @@
  */
 
 #include "nld_truthtable.h"
-#include "../plists.h"
+#include "../plib/plists.h"
 
 unsigned truthtable_desc_t::count_bits(UINT32 v)
 {
@@ -97,7 +97,7 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 // desc
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void truthtable_desc_t::help(unsigned cur, nl_util::pstring_list list,
+ATTR_COLD void truthtable_desc_t::help(unsigned cur, pstring_list_t list,
 		UINT64 state,UINT16 val, UINT8 *timing_index)
 {
 	pstring elem = list[cur].trim();
@@ -142,15 +142,17 @@ ATTR_COLD void truthtable_desc_t::help(unsigned cur, nl_util::pstring_list list,
 	}
 }
 
-ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled_ignore)
+ATTR_COLD void truthtable_desc_t::setup(const pstring_list_t &truthtable, UINT32 disabled_ignore)
 {
+	unsigned line = 0;
+
 	if (*m_initialized)
 		return;
 
-	pstring ttline = pstring(truthtable[0]);
-	truthtable++;
-	ttline = pstring(truthtable[0]);
-	truthtable++;
+	pstring ttline = truthtable[line];
+	line++;
+	ttline = truthtable[line];
+	line++;
 
 	for (unsigned j=0; j < m_size; j++)
 		m_outs[j] = ~0L;
@@ -160,14 +162,14 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 
 	while (!ttline.equals(""))
 	{
-		nl_util::pstring_list io = nl_util::split(ttline,"|");
+		pstring_list_t io(ttline,"|");
 		// checks
 		nl_assert_always(io.size() == 3, "io.count mismatch");
-		nl_util::pstring_list inout = nl_util::split(io[0], ",");
+		pstring_list_t inout(io[0], ",");
 		nl_assert_always(inout.size() == m_num_bits, "number of bits not matching");
-		nl_util::pstring_list out = nl_util::split(io[1], ",");
+		pstring_list_t out(io[1], ",");
 		nl_assert_always(out.size() == m_NO, "output count not matching");
-		nl_util::pstring_list times = nl_util::split(io[2], ",");
+		pstring_list_t times(io[2], ",");
 		nl_assert_always(times.size() == m_NO, "timing count not matching");
 
 		UINT16 val = 0;
@@ -189,8 +191,8 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 		}
 
 		help(0, inout, 0 , val, tindex.data());
-		ttline = pstring(truthtable[0]);
-		truthtable++;
+		ttline = truthtable[line];
+		line++;
 	}
 
 	// determine ignore

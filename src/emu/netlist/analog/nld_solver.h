@@ -65,7 +65,7 @@ class terms_t
 
 	ATTR_COLD void add(netlist_terminal_t *term, int net_other);
 
-	ATTR_HOT inline int count() { return m_term.size(); }
+	ATTR_HOT inline unsigned count() { return m_term.size(); }
 
 	ATTR_HOT inline netlist_terminal_t **terms() { return m_term.data(); }
 	ATTR_HOT inline int *net_other() { return m_net_other.data(); }
@@ -76,7 +76,7 @@ class terms_t
 
 	ATTR_COLD void set_pointers();
 
-	int m_railstart;
+	unsigned m_railstart;
 
 private:
 	plist_t<netlist_terminal_t *> m_term;

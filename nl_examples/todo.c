@@ -3,6 +3,60 @@
  *
  */
 
+#include "netlist/devices/net_lib.h"
+
+struct ttd
+{
+	nl_util::pstring_list a;
+};
+
+ttd * nl_register_tt(pstring name, int in, int out);
+
+
+#define NETLIST_TT(_name, _in, _out) \
+	{ \
+		ttd *a = setup.register_tt(# _name, _in, _out); \
+
+#define TT_LINE(_x) \
+	a->a.add(_x);
+
+#define TT_END() }
+
+NETLIST_START(7400_TTL)
+	NET_REGISTER_DEV(7400, s1)
+	NET_REGISTER_DEV(7400, s2)
+	NET_REGISTER_DEV(7400, s3)
+	NET_REGISTER_DEV(7400, s4)
+
+	ALIAS(1, s1.A);
+	ALIAS(2, s1.B);
+	ALIAS(3, s1.Q);
+
+	ALIAS(4, s2.A);
+	ALIAS(5, s2.B);
+	ALIAS(6, s2.Q);
+
+	ALIAS(9, s3.A);
+	ALIAS(10, s3.B)
+	ALIAS(8, s3.Q);
+
+	ALIAS(12, s4.A);
+	ALIAS(13, s4.B);
+	ALIAS(11, s4.Q);
+
+NETLIST_END()
+
+NETLIST_START(lib)
+	NETLIST_TT(7400, 2, 1)
+		TT_LINE("A,B | Q ")
+		TT_LINE("0,X|1|22")
+		TT_LINE("X,0|1|22")
+		TT_LINE("1,1|0|15")
+	TT_END()
+NETLIST_END()
+
+
+
 #if 0
     RES(R1, 10)
     RES(R2, 10)
@@ -98,4 +152,4 @@
     LOG(logY, 4V)
 
 #endif
-d
+
