@@ -621,6 +621,7 @@ project "portaudio"
 			"-Wno-missing-braces",
 			"-Wno-unused-but-set-variable",
 			"-Wno-maybe-uninitialized",
+			"-Wno-unused-variable",
 			"-Wno-unused-value",
 			"-Wno-unused-function",
 			"-Wno-unknown-pragmas",
