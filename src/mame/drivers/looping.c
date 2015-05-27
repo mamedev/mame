@@ -887,7 +887,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
 	int length = memregion("maincpu")->bytes();
 	UINT8 *rom = memregion("maincpu")->base();
 	int i;
-	
+
 	m_cop_port_l = 0;
 
 	/* bitswap the TMS9995 ROMs */

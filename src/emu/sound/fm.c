@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh 
+// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
 #define YM2610B_WARNING
 
 /*

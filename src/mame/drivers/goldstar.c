@@ -181,7 +181,7 @@
   you can see what seems the attract working (still with wrong graphics).
 
   Seems to be sooo slow.... (interrupts?)
-  
+
 
 ***************************************************************************/
 

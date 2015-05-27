@@ -160,7 +160,7 @@ The following floppies came with the machines.
 <!--
 
  Games, Programs, Etc.
- These all had a disk release, according to http://www.generation-msx.nl/ but we have no confirmation about these dumps coming 
+ These all had a disk release, according to http://www.generation-msx.nl/ but we have no confirmation about these dumps coming
  from original disks: more investigations are definitely needed!!
 
 -->
@@ -1523,7 +1523,7 @@ The following floppies came with the machines.
 
 
 
-<!-- 
+<!--
 
     Coverdisks
 
@@ -1558,9 +1558,9 @@ The following floppies came with the machines.
 
 
 
-<!-- 
+<!--
 
-    Homebrew / Doujin 
+    Homebrew / Doujin
 
 -->
 
@@ -1856,7 +1856,7 @@ The following floppies came with the machines.
 
 
 
-<!-- 
+<!--
 
  Sets below are hacked games "converted" from their original format (carts or tapes) into disks
  However, we currently don't have the real dumps for these so we keep them in disk format for the moment
@@ -1878,7 +1878,7 @@ The following floppies came with the machines.
 	<software name="3dwater">
 		<description>3D Water Driver (Jpn)</description>
 		<year>19??</year>
-		<publisher>&lt;tape2disk hack&gt;</publisher>	<!-- or maybe cart2disk -->
+		<publisher>&lt;tape2disk hack&gt;</publisher>   <!-- or maybe cart2disk -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -4059,7 +4059,7 @@ The following floppies came with the machines.
 	</software>
 
 
-<!-- 
+<!--
 
  Sets below are hacked games "converted" from their original format (carts or tapes) into disks
  Such information has been retrieved from websites like http://www.generation-msx.nl/ and http://msx.jpn.org/tagoo/

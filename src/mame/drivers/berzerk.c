@@ -1325,7 +1325,7 @@ DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
 	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
 	io.install_read_handler (0x4a, 0x4a, read8_delegate(FUNC(berzerk_state::moonwarp_p2_r), this));
-	
+
 	save_item(NAME(m_p1_counter_74ls161));
 	save_item(NAME(m_p1_direction));
 	save_item(NAME(m_p2_counter_74ls161));

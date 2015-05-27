@@ -3,7 +3,7 @@
 /*
 
   Mitsubishi MELPS 4 MCU family cores
-  
+
   Known types and their features:
   (* means not emulated yet)
 
@@ -16,7 +16,7 @@
   M58846: 42-pin DIL, 2Kx9 ROM, 128x4 RAM, 2 timers(not same as M58845), extra I/O ports
  *M58847: 40-pin DIL, 2Kx9 ROM, 128x4 RAM, extra I/O ports(not same as M58846)
  *M58848: ? (couldn't find info, just that it exists)
-  
+
   MELPS 41/42 subfamily:
 
  *M58494: 72-pin QFP CMOS, 4Kx10 ROM, 32x4 internal + 4Kx4 external RAM, 2 timers
@@ -74,7 +74,7 @@ void melps4_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
-	
+
 	// zerofill
 	m_pc = 0;
 	m_prev_pc = 0;
@@ -87,7 +87,7 @@ void melps4_cpu_device::device_start()
 	m_skip = false;
 	m_inte = 0;
 	m_intp = 1;
-	
+
 	m_a = 0;
 	m_b = 0;
 	m_e = 0;
@@ -163,7 +163,7 @@ void melps4_cpu_device::device_reset()
 	m_inte = 0;
 	m_intp = 1;
 	op_lcps(); // CPS=0
-	
+
 	m_v = 0;
 	m_w = 0;
 }

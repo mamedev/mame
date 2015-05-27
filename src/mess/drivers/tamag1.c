@@ -52,7 +52,7 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 		27,26,25,24,36,23,22,21,
 		20,19,18,17,16,37,38,39
 	};
-	
+
 	int y = com, x = seg2x[seg];
 	if (cliprect.contains(x, y))
 		bitmap.pix16(y, x) = state;
@@ -66,7 +66,7 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 		output_set_lamp_value(y, state);
 	else if (x == 36 && y >= 12)
 		output_set_lamp_value(y-8, state);
-	
+
 	// output for svg2lay
 	char buf[0x10];
 	sprintf(buf, "%d.%d", y, x);

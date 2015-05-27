@@ -273,7 +273,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 	char fullpath[1024];
 	UINT64 filesize;
 
-//	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+//  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.curcmd = data;
 	switch(data) {
 	case kFileCmdGetDir:
@@ -332,7 +332,7 @@ WRITE32_MEMBER( nubus_image_device::file_data_w )
 		//data = ni_ntohl(data);
 		if((filectx.bytecount + count) > filectx.filelen) count = filectx.filelen - filectx.bytecount;
 		osd_write(filectx.fd, &data, filectx.bytecount, count, &actualcount);
-		filectx.bytecount += actualcount; 
+		filectx.bytecount += actualcount;
 
 		if(filectx.bytecount >= filectx.filelen) {
 			osd_close(filectx.fd);

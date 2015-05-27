@@ -195,7 +195,7 @@ yyyyyyyy fccccccc x???pppp xxxxxxxx
 		sx = sprram[offs + 3] - ((sprram[offs + 2] & 0x80) << 1);
 		sy = 256 - 8 - sprram[offs + 0] - 23;   // center player sprite: 256 - 8 - 0x71 + dy = 256/2-32/2 -> dy = -23
 
-//		int flipx = sprram[offs + 2] & 0x40;    // nope
+//      int flipx = sprram[offs + 2] & 0x40;    // nope
 		int flipx = 0;
 		int flipy = sprram[offs + 1] & 0x80;
 

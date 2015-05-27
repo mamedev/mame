@@ -120,13 +120,13 @@ public:
 	DECLARE_READ8_MEMBER(_620000_r);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
-	
+
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	
+
 	void postload();
 };
 
@@ -226,7 +226,7 @@ void popobear_state::video_start()
 	m_bg_tilemap[1]->set_transparent_pen(0);
 	m_bg_tilemap[2]->set_transparent_pen(0);
 	m_bg_tilemap[3]->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_vram_rearranged));
 	machine().save().register_postload(save_prepost_delegate(FUNC(popobear_state::postload), this));
 }

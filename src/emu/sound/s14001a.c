@@ -599,7 +599,7 @@ void s14001a_device::device_start()
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate());
-	
+
 	save_item(NAME(m_WordInput));
 	save_item(NAME(m_LatchedWord));
 	save_item(NAME(m_SyllableAddress));
@@ -619,7 +619,7 @@ void s14001a_device::device_start()
 	save_item(NAME(m_DACOutput));
 	save_item(NAME(m_audioout));
 	save_item(NAME(m_filtervals));
-	save_item(NAME(m_VSU1000_amp)); 
+	save_item(NAME(m_VSU1000_amp));
 }
 
 //-------------------------------------------------

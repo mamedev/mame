@@ -694,12 +694,12 @@ WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 // MMM01
 // This mmm01 implementation is mostly guess work, no clue how correct it all is
 /* TODO: This implementation is wrong. Tauwasser
- * 
+ *
  * Register 0: Map Latch, AA Mask, RAM Enable
  * Register 1: EA1..EA0, RA18..RA14
  * Register 2: ??, AA18..AA15, AA14..AA13
  * Register 3: AA Multiplex, RA Mask, ???, MBC1 Mode
- * 
+ *
  */
 
 READ8_MEMBER(gb_rom_mmm01_device::read_rom)
@@ -748,7 +748,6 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 
 READ8_MEMBER(gb_rom_sachen_mmc1_device::read_rom)
 {
-
 	UINT16 off_edit = offset;
 
 	/* Wait for 0x31 transitions of A15 (hi -> lo), i.e. ROM accesses; A15 = HI while in bootstrap */
@@ -757,11 +756,11 @@ READ8_MEMBER(gb_rom_sachen_mmc1_device::read_rom)
 		m_mode = MODE_UNLOCKED;
 	else
 		m_unlock_cnt++;
-	
+
 	/* Logo Switch */
 	if (m_mode == MODE_LOCKED)
 		off_edit |= 0x80;
-		
+
 	/* Header Un-Scramble */
 	if ((off_edit & 0xFF00) == 0x0100) {
 		off_edit &= 0xFFAC;
@@ -771,7 +770,7 @@ READ8_MEMBER(gb_rom_sachen_mmc1_device::read_rom)
 		off_edit |= ((offset >> 0) & 0x01) << 6;
 	}
 	//logerror("read from %04X (%04X)\n", offset, off_edit);
-	
+
 	if (offset & 0x4000) /* RB1 */
 		return m_rom[rom_bank_map[(m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask)] * 0x4000 + (offset & 0x3fff)];
 	else                 /* RB0 */
@@ -780,38 +779,37 @@ READ8_MEMBER(gb_rom_sachen_mmc1_device::read_rom)
 
 WRITE8_MEMBER(gb_rom_sachen_mmc1_device::write_bank)
 {
-
 	/* Only A15..A6, A4, A1..A0 are connected */
 	/* We only decode upper three bits */
 	switch ((offset & 0xFFD3) & 0xE000)
 	{
 		case 0x0000: /* Base ROM Bank Register */
-			
+
 			if ((m_latch_bank2 & 0x30) == 0x30)
 				m_base_bank = data;
 			//logerror("write to base bank %X - %X\n", data, (m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask));
 			break;
-		
+
 		case 0x2000: /* ROM Bank Register */
-		
+
 			m_latch_bank2 = data ? data : 0x01;
 			//logerror("write to latch %X - %X\n", data, (m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask));
 			break;
-		
+
 		case 0x4000: /* ROM Bank Mask Register */
-		
+
 			if ((m_latch_bank2 & 0x30) == 0x30)
 				m_mask = data;
 			//logerror("write to mask %X - %X\n", data, (m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask));
 			break;
-		
+
 		case 0x6000:
-			
+
 			/* nothing happens when writing to 0x6000-0x7fff, as verified by Tauwasser */
 			break;
-		
+
 		default:
-		
+
 			//logerror("write to unknown/unmapped area %04X <= %02X\n", offset, data);
 			/* did not extensively test other unlikely ranges */
 			break;
@@ -822,27 +820,26 @@ WRITE8_MEMBER(gb_rom_sachen_mmc1_device::write_bank)
 
 READ8_MEMBER(gb_rom_sachen_mmc2_device::read_rom)
 {
-
 	UINT16 off_edit = offset;
 
 	/* Wait for 0x30 transitions of A15 (lo -> hi), i.e. ROM accesses; A15 = HI while in bootstrap */
 	/* This is 0x30 transitions, because we increment counter _after_ checking it, but A15 lo -> hi*/
 	/* transition means first read (hi -> lo transition) must not count */
-	
+
 	if (m_unlock_cnt == 0x30 && m_mode == MODE_LOCKED_DMG) {
 		m_mode = MODE_LOCKED_CGB;
 		m_unlock_cnt = 0x00;
 	} else if (m_unlock_cnt == 0x30 && m_mode == MODE_LOCKED_CGB) {
 		m_mode = MODE_UNLOCKED;
 	}
-	
+
 	if (m_unlock_cnt != 0x30)
 		m_unlock_cnt++;
-	
+
 	/* Logo Switch */
 	if (m_mode == MODE_LOCKED_CGB)
 		off_edit |= 0x80;
-		
+
 	/* Header Un-Scramble */
 	if ((off_edit & 0xFF00) == 0x0100) {
 		off_edit &= 0xFFAC;
@@ -852,7 +849,7 @@ READ8_MEMBER(gb_rom_sachen_mmc2_device::read_rom)
 		off_edit |= ((offset >> 0) & 0x01) << 6;
 	}
 	//logerror("read from %04X (%04X) cnt: %02X\n", offset, off_edit, m_unlock_cnt);
-	
+
 	if (offset & 0x4000) /* RB1 */
 		return m_rom[rom_bank_map[(m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask)] * 0x4000 + (offset & 0x3fff)];
 	else                 /* RB0 */
@@ -861,7 +858,6 @@ READ8_MEMBER(gb_rom_sachen_mmc2_device::read_rom)
 
 READ8_MEMBER(gb_rom_sachen_mmc2_device::read_ram)
 {
-
 	if (m_mode == MODE_LOCKED_DMG) {
 		m_unlock_cnt = 0x00;
 		m_mode = MODE_LOCKED_CGB;
@@ -872,7 +868,6 @@ READ8_MEMBER(gb_rom_sachen_mmc2_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_sachen_mmc2_device::write_ram)
 {
-
 	if (m_mode == MODE_LOCKED_DMG) {
 		m_unlock_cnt = 0x00;
 		m_mode = MODE_LOCKED_CGB;

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, Peter Trauner 
+// copyright-holders:Mariusz Wojcieszek, Peter Trauner
 /**********************************************************************
 
     Signetics 2636 video chip

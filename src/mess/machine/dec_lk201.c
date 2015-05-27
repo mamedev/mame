@@ -232,14 +232,14 @@ const rom_entry *lk201_device::device_rom_region() const
 
    DEC omitted terms like 'Interrupt', 'Break' and 'Data / Talk' on some keyboards,
    so Fn numbers are definitely important for end users.
- 
+
    === CURRENT SPECIAL KEYS ===
-   [PC-AT] ......=> [DEC] 
-   LEFT CONTROL..=> Control 
-   LEFT ALT .....=> Compose 
-   
-   RIGHT ALT ....=> Help 
-   RIGHT CONTROL => Do 
+   [PC-AT] ......=> [DEC]
+   LEFT CONTROL..=> Control
+   LEFT ALT .....=> Compose
+
+   RIGHT ALT ....=> Help
+   RIGHT CONTROL => Do
    ==============================================================================================
    === (PC - AT ) keys above cursor block ===
    * KEYCODE_INSERT * KEYCODE_HOME * KEYCODE_PGUP
@@ -251,9 +251,9 @@ const rom_entry *lk201_device::device_rom_region() const
    ==============================================================================================
    === CURRENT NUM PAD ASSIGNMENTS ===
    [PF1] to [PF4] are mapped to NUM LOCK, SLASH etc. (=> 4 keys on top on num pad).
-   Num pad '+' gives         ',' on the DEC.  
+   Num pad '+' gives         ',' on the DEC.
            ',' translates to '.' (=> more or less the layout of model 'LK-201-AG')
-		   
+
    Switch between 'full' and 'partial keyboard emulation' with Scroll Lock.
 */
 
@@ -278,7 +278,7 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Compose") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) 
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
 
 	PORT_START("KBD2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
@@ -365,14 +365,14 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("L") PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("O") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LF (F13)") PORT_CODE(KEYCODE_F13) 
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LF (F13)") PORT_CODE(KEYCODE_F13)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BS (F12)") PORT_CODE(KEYCODE_F12)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KBD11")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)  
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)      
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // FIXME - duplicate "Return"
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("P") PORT_CODE(KEYCODE_P)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0)
@@ -396,7 +396,7 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("'") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Previous [^]") PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Do (F16) [Ausfuehren]") PORT_CODE(KEYCODE_RCONTROL) 
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Do (F16) [Ausfuehren]") PORT_CODE(KEYCODE_RCONTROL)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Insert Here") PORT_CODE(KEYCODE_HOME)
 
@@ -435,7 +435,7 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num ,") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) // PORT_NAME("Num -") = duplicate...see KBD13
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF4") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F20") 
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F20")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F19")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -636,7 +636,7 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				output_set_value("led_lock"   , (led_data & 0x8) == 0);
 			}
 #endif
-			
+
 			break;
 	}
 }
@@ -758,4 +758,3 @@ WRITE8_MEMBER( lk201_device::spi_w )
 
 //  printf("SPI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
-

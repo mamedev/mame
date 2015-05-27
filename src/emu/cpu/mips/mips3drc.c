@@ -166,7 +166,7 @@ void mips3_device::clear_fastram(UINT32 select_start)
 		m_fastram[i].readonly = false;
 		m_fastram[i].base = NULL;
 	}
-	 m_fastram_select=select_start;
+		m_fastram_select=select_start;
 }
 
 /*-------------------------------------------------

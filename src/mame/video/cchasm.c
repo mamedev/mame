@@ -131,6 +131,6 @@ void cchasm_state::video_start()
 
 	m_xcenter=visarea.xcenter() << 16;
 	m_ycenter=visarea.ycenter() << 16;
-	
+
 	m_refresh_end_timer = timer_alloc(TIMER_REFRESH_END);
 }

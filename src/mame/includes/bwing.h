@@ -85,6 +85,6 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 *ram, int pri );
-	
+
 	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
 };

@@ -501,7 +501,7 @@ VIDEO_START_MEMBER(nbmj8891_state,_1layer)
 		save_item(NAME(m_param_cnt));
 		save_item(NAME(m_param_old));
 	}
-	
+
 	common_save_state();
 }
 
@@ -521,7 +521,7 @@ void nbmj8891_state::video_start()
 	memset(m_videoram1, 0xff, (width * height * sizeof(UINT8)));
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
-	
+
 	common_save_state();
 	save_pointer(NAME(m_videoram1), width * height);
 }
@@ -546,7 +546,7 @@ void nbmj8891_state::common_save_state()
 	save_pointer(NAME(m_palette_ptr), 0x200);
 	save_pointer(NAME(m_clut), 0x800);
 	save_item(NAME(m_flipscreen_old));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj8891_state::postload), this));
 }
 

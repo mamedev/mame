@@ -141,7 +141,7 @@ void namcos1_state::video_start()
 
 	memset(m_playfield_control, 0, sizeof(m_playfield_control));
 	m_copy_sprites = 0;
-	
+
 	save_item(NAME(m_copy_sprites));
 }
 

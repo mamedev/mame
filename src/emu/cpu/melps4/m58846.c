@@ -50,7 +50,7 @@ offs_t m58846_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 void m58846_device::device_start()
 {
 	melps4_cpu_device::device_start();
-	
+
 	// set fixed state
 	m_bm_page = 2;
 	m_int_page = 1;
@@ -158,7 +158,7 @@ void m58846_device::execute_one()
 
 			}
 			break; // 0xff
-			
+
 			}
 			break; // 0xfc
 

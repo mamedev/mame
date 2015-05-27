@@ -300,7 +300,7 @@ void sigmab98_state::video_start()
 
 inline int integer_part(int x)
 {
-//	return x >> 16;
+//  return x >> 16;
 	return (x + 0x8000) >> 16;
 }
 
@@ -328,14 +328,14 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int ny      =   ((s[ 0x06 ] & 0xf8) >> 3) + 1;
 		int dsty    =   (s[ 0x06 ] & 0x03) * 256 + s[ 0x07 ];
 
-		int dstdx   =   (s[ 0x08 ] & 0xff) * 256 + s[ 0x09 ];	// 0x100 = no zoom, 0x200 = 50% zoom
-		int dstdy   =   (s[ 0x0a ] & 0xff) * 256 + s[ 0x0b ];	// ""
+		int dstdx   =   (s[ 0x08 ] & 0xff) * 256 + s[ 0x09 ];   // 0x100 = no zoom, 0x200 = 50% zoom
+		int dstdy   =   (s[ 0x0a ] & 0xff) * 256 + s[ 0x0b ];   // ""
 
 		int srcx    =   (s[ 0x0c ] & 0xff) * 256 + s[ 0x0d ];
 		int srcy    =   (s[ 0x0e ] & 0xff) * 256 + s[ 0x0f ];
 
 		// Sign extend the position
-		dstx = (dstx  & 0x01ff) - (dstx  & 0x0200);	// or 0x3ff/0x400?
+		dstx = (dstx  & 0x01ff) - (dstx  & 0x0200); // or 0x3ff/0x400?
 		dsty = (dsty  & 0x01ff) - (dsty  & 0x0200);
 
 		// Flipping
@@ -390,17 +390,17 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		dsty  <<=   16;
 
 		// Source delta (equal for x and y)
-		int z = int( sqrt(dstdx * dstdx + dstdy * dstdy) + 0.5 );	// dest delta vector is scaled by the source delta!?
+		int z = int( sqrt(dstdx * dstdx + dstdy * dstdy) + 0.5 );   // dest delta vector is scaled by the source delta!?
 		if (!z)
 			z = 0x100;
 		int srcdzz = z << 8;
 
 		// Destination x and y deltas
-		int dstdxx = (dstdx << 16) / z;	// dest x delta for source x increments
-		int dstdyx = (dstdy << 16) / z;	// dest y delta for source x increments
+		int dstdxx = (dstdx << 16) / z; // dest x delta for source x increments
+		int dstdyx = (dstdy << 16) / z; // dest y delta for source x increments
 
-		int dstdxy = -dstdyx;			// dest x delta for source y increments (orthogonal to the above vector)
-		int dstdyy = dstdxx;			// dest y delta for source y increments
+		int dstdxy = -dstdyx;           // dest x delta for source y increments (orthogonal to the above vector)
+		int dstdyy = dstdxx;            // dest y delta for source y increments
 
 		// Transform the source offset in a destination offset (negate, scale and rotate it)
 		srcx = (-srcx << 8) / z;

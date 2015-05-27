@@ -115,14 +115,14 @@ void melps4_cpu_device::op_lcps()
 	if ((m_op & 1) != m_cps)
 	{
 		m_cps = m_op & 1;
-		
+
 		// swap registers
 		UINT8 x, y, z, cy;
 		x = m_x;
 		y = m_y;
 		z = m_z;
 		cy = m_cy;
-		
+
 		m_x = m_x2;
 		m_y = m_y2;
 		m_z = m_z2;

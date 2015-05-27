@@ -8,7 +8,7 @@ Portions (2015) : Karl-Ludwig Deisenhofer
 **********************************************************************
 
 Implements WD2010 / WD1010 controller basics.
- 
+
  Provides IRQ / (B)DRQ signals needed for early MFM cards.
  Honors DRIVE_READY and WRITE FAULT (DRDY / WF).
 
@@ -17,16 +17,16 @@ Implements WD2010 / WD1010 controller basics.
 
  LIST OF UNIMPLEMENTED FEATURES :
         - MULTI SECTOR TRANSFERS (M = 1); MULTIPLE DRIVES
-        - AUTO_SCAN_ID / SEEK + INDEX TIMERS / ID NOT FOUND 
+        - AUTO_SCAN_ID / SEEK + INDEX TIMERS / ID NOT FOUND
         - IMPLIED SEEKS / IMPLIED WRITES / RETRIES
         - EDGE or LEVEL TRIGGERED SEEK_COMPLETE (SC)
         - SET_PARAMETER / COMPUTE_CORRECTION (DWC flag!)
- 
- Pseudo code (from datasheet) left in to illustrate 
- the intended instruction flow. Some loops were omitted! 
- 
+
+ Pseudo code (from datasheet) left in to illustrate
+ the intended instruction flow. Some loops were omitted!
+
  USAGE:  tie WF (write fault) to ground if not needed:
- MCFG_WD2010_IN_WF_CB(GND)    
+ MCFG_WD2010_IN_WF_CB(GND)
 
  Other signals should be set to VCC if not serviced:
  MCFG_WD2010_IN_DRDY_CB(VCC)  // DRIVE READY = VCC
@@ -34,17 +34,17 @@ Implements WD2010 / WD1010 controller basics.
  **********************************************************************/
 
 // WD 2010 CONFIGURATION (2048 cylinder limit)
-#define STEP_LIMIT 2048         
-#define CYLINDER_HIGH_MASK 0x07 
+#define STEP_LIMIT 2048
+#define CYLINDER_HIGH_MASK 0x07
 
 // DEC RD51 chip; different STEP / CYLINDER LIMIT (**):
 
-// WD 1010 CONFIGURATION (1024 cylinder limit) 
-// #define	STEP_LIMIT 1024       
-// #define CYLINDER_HIGH_MASK 0x03 
+// WD 1010 CONFIGURATION (1024 cylinder limit)
+// #define  STEP_LIMIT 1024
+// #define CYLINDER_HIGH_MASK 0x03
 
 // --------------------------------------------------------
-#define MAX_MFM_SECTORS 17      // STANDARD MFM SECTORS/TRACK 
+#define MAX_MFM_SECTORS 17      // STANDARD MFM SECTORS/TRACK
 // --------------------------------------------------------
 
 
@@ -229,7 +229,7 @@ READ8_MEMBER(wd2010_device::read)
 	switch (offset)
 	{
 	case TASK_FILE_ERROR:
-		if (m_status & STATUS_CIP) // "if other registers are read while CIP, the status register contents are returned." 
+		if (m_status & STATUS_CIP) // "if other registers are read while CIP, the status register contents are returned."
 			data = (m_in_drdy_cb() ? 0x40 : 0) | (m_in_wf_cb() ? 0x20 : 0) | (m_in_sc_cb() ? 0x10 : 0) | m_status;// see STATUS register
 		else
 			data = m_error;
@@ -245,7 +245,6 @@ READ8_MEMBER(wd2010_device::read)
 
 		if (offset == TASK_FILE_SDH_REGISTER)
 		{
-
 			logerror("(READ) %s WD2010 '%s' SDH: %u\n", machine().describe_context(), tag(), data);
 			logerror("(READ) %s WD2010 '%s' Head: %u\n", machine().describe_context(), tag(), HEAD);
 			logerror("(READ) %s WD2010 '%s' Drive: %u\n", machine().describe_context(), tag(), DRIVE);
@@ -302,7 +301,7 @@ WRITE8_MEMBER(wd2010_device::write)
 	case TASK_FILE_COMMAND:
 		m_out_intrq_cb(CLEAR_LINE); // "either reading the status register or writing a new command clears INTRQ"
 		m_status &= ~(STATUS_ERR | STATUS_BSY | STATUS_CIP);  // "Reset ERR bit in STATUS upon new cmd" (see datasheet)
-		m_error = 0;                             
+		m_error = 0;
 
 		if (data == COMMAND_COMPUTE_CORRECTION)
 		{
@@ -381,8 +380,8 @@ void wd2010_device::set_parameter(UINT8 data)
 //-------------------------------------------------
 void wd2010_device::restore(UINT8 data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;  
-	
+	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+
 	m_out_intrq_cb(CLEAR_LINE); // reset INTRQ, errors, set BUSY, CIP
 	m_error = 0;
 	m_status = STATUS_BSY | STATUS_CIP;
@@ -408,8 +407,8 @@ void wd2010_device::restore(UINT8 data)
 				m_out_bcr_cb(0); // pulse BCR
 				m_out_bcr_cb(1);
 
-				m_error = ERROR_AC; // ERROR : ABORTED COMMAND 
-				complete_cmd(newstatus | STATUS_ERR); 
+				m_error = ERROR_AC; // ERROR : ABORTED COMMAND
+				complete_cmd(newstatus | STATUS_ERR);
 				return;
 			}
 		}
@@ -419,7 +418,7 @@ void wd2010_device::restore(UINT8 data)
 		{
 			m_out_bcr_cb(0); // pulse BCR
 			m_out_bcr_cb(1);
-			newstatus &= ~(STATUS_BSY | STATUS_CIP); // prepare new status; (INTRQ later) reset BSY, CIP 
+			newstatus &= ~(STATUS_BSY | STATUS_CIP); // prepare new status; (INTRQ later) reset BSY, CIP
 			complete_cmd(newstatus);
 			return;
 		}
@@ -431,7 +430,7 @@ void wd2010_device::restore(UINT8 data)
 
 			m_out_bcr_cb(0); // pulse BCR
 			m_out_bcr_cb(1);
-			newstatus &= ~(STATUS_BSY | STATUS_CIP); // prepare new status; (INTRQ later) reset BSY, CIP 
+			newstatus &= ~(STATUS_BSY | STATUS_CIP); // prepare new status; (INTRQ later) reset BSY, CIP
 			complete_cmd(newstatus);
 			return;
 		}
@@ -452,12 +451,12 @@ void wd2010_device::restore(UINT8 data)
 
 // NOT IMPLEMENTED: IMPLIED SEEK ("wait until rising edge of SC signal")
 void wd2010_device::seek(UINT8 data)
-{ 
-	UINT8 newstatus = STATUS_RDY | STATUS_SC; 
+{
+	UINT8 newstatus = STATUS_RDY | STATUS_SC;
 
 	m_out_intrq_cb(CLEAR_LINE); // reset INTRQ, errors, set BUSY, CIP
 	m_error = 0;
-	m_status = STATUS_BSY | STATUS_CIP; 
+	m_status = STATUS_BSY | STATUS_CIP;
 
 	// TODO : store STEP RATE.
 
@@ -472,12 +471,12 @@ void wd2010_device::seek(UINT8 data)
 	if (m_present_cylinder > cylinder_registers)
 	{
 		step_pulses = m_present_cylinder - cylinder_registers;
-		direction = 0;  
+		direction = 0;
 	}
 	else
 	{
 		step_pulses = cylinder_registers - m_present_cylinder;
-		direction = 1; 
+		direction = 1;
 	}
 	logerror("SEEK - direction = %u, step_pulses = %u\n", direction, step_pulses);
 	m_out_dirin_cb(direction);
@@ -490,10 +489,10 @@ void wd2010_device::seek(UINT8 data)
 	}
 	else
 	{
-		while (step_pulses > 0)	// issue STEP PULSES
+		while (step_pulses > 0) // issue STEP PULSES
 		{
-			if (direction == 0)   
-			{  
+			if (direction == 0)
+			{
 				m_out_step_cb(1); // issue a step pulse
 				m_out_step_cb(0);
 
@@ -528,13 +527,13 @@ void wd2010_device::seek(UINT8 data)
 
 	logerror("SEEK (END) - m_present_cylinder = %u\n", m_present_cylinder);
 
-	cmd_timer->adjust(attotime::from_msec(35), newstatus); 	// 35 msecs makes "SEEK_TIMING" test happy.
+	cmd_timer->adjust(attotime::from_msec(35), newstatus);  // 35 msecs makes "SEEK_TIMING" test happy.
 }
 
 //-------------------------------------------------
 //  read_sector -
 //-------------------------------------------------
-// FIXME: multiple sector transfers, ID / CYL / HEAD / SIZE match 
+// FIXME: multiple sector transfers, ID / CYL / HEAD / SIZE match
 //        + ERROR HANDLING (...)
 void wd2010_device::read_sector(UINT8 data)
 {
@@ -548,11 +547,11 @@ void wd2010_device::read_sector(UINT8 data)
 	// Assume: drive NO # has not changed... (else: SCAN_ID; GET CYL#)
 	auto_scan_id(data); // has drive number changed?
 
-	// CYL REGISTERS and INTERNAL CYL. SAME ? 
+	// CYL REGISTERS and INTERNAL CYL. SAME ?
 	// TODO:  < NOT SAME? THEN _SEEK_ >
 
-	// DRIVE NOT READY?  OR  WF?  
-	if ( (!m_in_drdy_cb()) || m_in_wf_cb() ) 
+	// DRIVE NOT READY?  OR  WF?
+	if ( (!m_in_drdy_cb()) || m_in_wf_cb() )
 	{
 		m_error = ERROR_AC; // ABORTED_COMMAND
 		complete_cmd(newstatus | STATUS_ERR);
@@ -564,7 +563,7 @@ void wd2010_device::read_sector(UINT8 data)
 
 		m_out_bcr_cb(0); // strobe BCR
 		m_out_bcr_cb(1);
-	
+
 		if (!m_in_drdy_cb()) // DRIVE NOT READY?
 		{
 			m_error = ERROR_AC; // ABORTED_COMMAND
@@ -576,7 +575,7 @@ void wd2010_device::read_sector(UINT8 data)
 			// < SEARCH FOR ID FIELD >
 			// < CYL / HEAD / SEC.SIZE MATCH ? >
 
-			// < ID NOT FOUND > 
+			// < ID NOT FOUND >
 			if (SECTOR_NUMBER > MAX_MFM_SECTORS)
 			{
 				// prepare new status; (later IRQ +) reset BSY, CIP
@@ -587,8 +586,8 @@ void wd2010_device::read_sector(UINT8 data)
 
 			// LOOP OVER 10 INDEXES : SCAN_ID / GET CYL.# (not implemented: ID NOT FOUND)
 
-			// CYL / HEAD / SEC.SIZE MATCH ? => (ID FOUND)  
-			// 
+			// CYL / HEAD / SEC.SIZE MATCH ? => (ID FOUND)
+			//
 			// NO "BAD BLOCK DETECT" (** NOT IMPLEMENTED **)
 			// NO "CRC ERROR"  (** NOT IMPLEMENTED **)
 			// AND "DAM FOUND" (** NOT IMPLEMENTED **)
@@ -618,7 +617,7 @@ void wd2010_device::read_sector(UINT8 data)
 			// reset BUSY (* after * TRANSFER OF SECTOR in READ)
 			m_status &= ~(STATUS_BSY);
 
-			// FLAG "I" SET? 
+			// FLAG "I" SET?
 			if (!(data & 8))  // (I = 0    INTRQ occurs with BDRQ/DRQ indicating the Sector Buffer is full...)
 			{
 				m_out_intrq_cb(ASSERT_LINE);
@@ -627,7 +626,7 @@ void wd2010_device::read_sector(UINT8 data)
 			}
 			else
 			{
-				intrq_at_end = 0;  // (default): (I = 1  INTRQ occurs when the command is completed and the Host has read the Sector Buffer) 
+				intrq_at_end = 0;  // (default): (I = 1  INTRQ occurs when the command is completed and the Host has read the Sector Buffer)
 			}
 
 			// (WAIT FOR): BRDY LOW TO HIGH?   (see -> TIMER)
@@ -636,7 +635,7 @@ void wd2010_device::read_sector(UINT8 data)
 
 	} // DRIVE_READY ? (outer)
 
-	// NOTE : (intrq_at_end = 0) - INTRQ occurs when the command is completed 
+	// NOTE : (intrq_at_end = 0) - INTRQ occurs when the command is completed
 	newstatus |= (m_status & ~(STATUS_CIP | STATUS_DRQ)) | intrq_at_end; // de-assert CIP + DRQ (BSY already reset)
 
 	deassert_read_when_buffer_ready_high->adjust(attotime::from_usec(1), newstatus); // complete command ON  *RISING EDGE * OF BUFFER_READY
@@ -652,7 +651,7 @@ void wd2010_device::write_sector(UINT8 data)
 {
 	m_error = 0; // De-assert ERROR + DRQ
 	m_status &= ~(STATUS_DRQ);
-	
+
 	m_status = STATUS_BSY | STATUS_CIP; // Assert BUSY + CIP
 
 	m_status |= STATUS_DRQ; // Assert BDRQ + DRQ (= status bit 3)
@@ -673,13 +672,13 @@ void wd2010_device::complete_write_sector(UINT8 data)
 	m_out_bdrq_cb(0); // DE-Assert BDRQ (...and DRQ !)
 	m_status &= ~(STATUS_DRQ);
 
-	// (When drive changed) : SCAN_ID / GET CYL# 
+	// (When drive changed) : SCAN_ID / GET CYL#
 	auto_scan_id(data); // has drive number changed? (*** UNIMPLEMENTED ***)
 
 	// Assume YES : CYL.register + internal CYL.register SAME?  (if NO => SEEK!)
 	// Assume : SEEK_COMPLETE = YES
 
-	if (!m_in_drdy_cb() || m_in_wf_cb())  //  DRIVE IS READY / NO WF? 
+	if (!m_in_drdy_cb() || m_in_wf_cb())  //  DRIVE IS READY / NO WF?
 	{
 		m_error = ERROR_AC; // ABORTED_COMMAND
 		complete_cmd(newstatus | STATUS_ERR);
@@ -692,10 +691,10 @@ void wd2010_device::complete_write_sector(UINT8 data)
 		// < Correct ID found >
 
 		// (*** UNIMPLEMENTED ***) : 'ID NOT FOUND' - set bit 4 error register
-		// ........................:   => SCAN_ID => RE-SEEK (2-10 INDEX PULSES) / Set ERR bit 0 status register .. 
+		// ........................:   => SCAN_ID => RE-SEEK (2-10 INDEX PULSES) / Set ERR bit 0 status register ..
 
 		m_status &= ~(STATUS_SC); // "WRITE_GATE valid when SEEK_COMPLETE = 0" (see Rainbow 100 Addendum!)
-		
+
 		m_out_bcs_cb(1);
 		m_out_wg_cb(1); // (!)
 
@@ -728,7 +727,7 @@ void wd2010_device::complete_write_sector(UINT8 data)
 // ******************************************************
 // AUTO SCAN-ID (whenever DRIVE # changes):
 
- // * does nothing right now *
+	// * does nothing right now *
 // ******************************************************
 void wd2010_device::auto_scan_id(UINT8 data)
 {
@@ -774,7 +773,7 @@ void wd2010_device::update_sdh(UINT8 new_sector_size, UINT8 new_head, UINT16 new
 //  Reads the cylinder number from the track on which the heads are PRESENTLY located,
 //  and writes this into the Present Cylinder Position Register.
 
-//  FIXME: NO ID HANDLING (ID FOUND / NOT FOUND), NO BAD BLOCK; NO CRC 
+//  FIXME: NO ID HANDLING (ID FOUND / NOT FOUND), NO BAD BLOCK; NO CRC
 void wd2010_device::scan_id(UINT8 data)
 {
 	UINT8 newstatus = STATUS_RDY;
@@ -787,7 +786,7 @@ void wd2010_device::scan_id(UINT8 data)
 	// < TODO: Search for ANY ID FIELD. >
 
 	// Assume ID FOUND :
-	update_sdh( 32, 0, 0, 1 ); // (NEW:) SECTOR_SIZE,  HEAD,  CYLINDER,  SECTOR_NR 
+	update_sdh( 32, 0, 0, 1 ); // (NEW:) SECTOR_SIZE,  HEAD,  CYLINDER,  SECTOR_NR
 
 	// NO BAD BLOCK.
 	// NO CRC ERROR.
@@ -807,9 +806,9 @@ void wd2010_device::scan_id(UINT8 data)
 // < UNIMPLEMENTED: (IMPLIED) SEEKs, INDEX, CRC and GAPs >
 //--------------------------------------------------------
 // SECTOR_COUNT REG.= 'total # of sectors to be formatted'
-// (raw number; no multiplication)   = 16 decimal on RD51 
+// (raw number; no multiplication)   = 16 decimal on RD51
 
-// SECTOR NUMBER REG.= number of bytes - 3 (for GAP 1 + 3) 
+// SECTOR NUMBER REG.= number of bytes - 3 (for GAP 1 + 3)
 // = 40 decimal on DEC RD51 with WUTIL 3.2
 //--------------------------------------------------------
 void wd2010_device::format(UINT8 data)
@@ -836,10 +835,10 @@ void wd2010_device::format(UINT8 data)
 	// TODO: Seek to desired cylinder
 	// Assume : SEEK COMPLETE.
 
-	m_out_bcr_cb(0); // strobe BCR 
+	m_out_bcr_cb(0); // strobe BCR
 	m_out_bcr_cb(1);
 
-	m_out_bcs_cb(1); // activate BCS (!) 
+	m_out_bcs_cb(1); // activate BCS (!)
 
 	if (!m_in_drdy_cb() || m_in_wf_cb())
 	{
@@ -849,10 +848,10 @@ void wd2010_device::format(UINT8 data)
 	}
 
 	// WAIT FOR INDEX
-	
-	m_out_wg_cb(1); // Have Index, activate WRITE GATE 
 
-	// Check for WRITE FAULT (WF) 
+	m_out_wg_cb(1); // Have Index, activate WRITE GATE
+
+	// Check for WRITE FAULT (WF)
 	if (m_in_wf_cb())
 	{
 		m_error = ERROR_AC; // ABORTED_COMMAND
@@ -860,28 +859,28 @@ void wd2010_device::format(UINT8 data)
 		return;
 	}
 
-	//	UINT8 format_sector_count = m_task_file[TASK_FILE_SECTOR_COUNT];
-	//	do
-	//	{
-	//		< WRITE GAP 1 or GAP 3 >
+	//  UINT8 format_sector_count = m_task_file[TASK_FILE_SECTOR_COUNT];
+	//  do
+	//  {
+	//      < WRITE GAP 1 or GAP 3 >
 
-	//		< Wait for SEEK_COMPLETE=1 (extend GAP if SEEK_COMPLETE = 0) >
-	//		< Assume SEEK COMPLETE >
+	//      < Wait for SEEK_COMPLETE=1 (extend GAP if SEEK_COMPLETE = 0) >
+	//      < Assume SEEK COMPLETE >
 
-	//		format_sector_count--;
-	//		if (format_sector_count != 0)
+	//      format_sector_count--;
+	//      if (format_sector_count != 0)
 			{
 				// The Rainbow 100 driver does ignore multiple sector
 				// transfers so WRITE FORMAT does not actually write -
 
 				m_out_wg_cb(0);   // (transition from WG 1 -> 0)
 
-				// NOTE: decrementing TASK_FILE_SECTOR_COUNT does * NOT WORK * 
+				// NOTE: decrementing TASK_FILE_SECTOR_COUNT does * NOT WORK *
 			}
-	//		else
-	//		{		//  < Write 4Es until INDEX  (*** UNIMPLEMENTED ****) >
-	//		}
-	//	} while (format_sector_count > 0);
+	//      else
+	//      {       //  < Write 4Es until INDEX  (*** UNIMPLEMENTED ****) >
+	//      }
+	//  } while (format_sector_count > 0);
 
 	//  ** DELAY INTRQ UNTIL WRITE IS COMPLETE :
 	complete_write_when_buffer_ready_high->adjust(attotime::from_usec(1), newstatus | STATUS_DRQ); // 1 USECs
@@ -889,7 +888,7 @@ void wd2010_device::format(UINT8 data)
 
 
 // *************************************
-// INTERNAL 
+// INTERNAL
 // *************************************
 void wd2010_device::buffer_ready(bool state)
 {
@@ -906,7 +905,7 @@ void wd2010_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 		complete_immediate(param);
 		break;
 
-	case COMPLETE_WRITE_SECTOR:  // when BUFFER_READY -> HIGH 
+	case COMPLETE_WRITE_SECTOR:  // when BUFFER_READY -> HIGH
 		if (is_buffer_ready)
 		{
 			complete_write_when_buffer_ready_high->adjust(attotime::never);
@@ -914,25 +913,25 @@ void wd2010_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 		}
 		else
 		{
-			complete_write_when_buffer_ready_high->reset(); 
+			complete_write_when_buffer_ready_high->reset();
 			complete_write_when_buffer_ready_high->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
 		}
 		break;
 
-	case DE_ASSERT_WRITE: //  waiting for BUFFER_READY -> LOW  
-		if (!(is_buffer_ready)) 
+	case DE_ASSERT_WRITE: //  waiting for BUFFER_READY -> LOW
+		if (!(is_buffer_ready))
 		{
 			deassert_write_when_buffer_ready_low->adjust(attotime::never);
 			complete_immediate(param);
 		}
 		else
 		{
-			deassert_write_when_buffer_ready_low->reset();  
+			deassert_write_when_buffer_ready_low->reset();
 			deassert_write_when_buffer_ready_low->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
 		}
 		break;
 
-	case DE_ASSERT_READ: // when BUFFER_READY -> HIGH 
+	case DE_ASSERT_READ: // when BUFFER_READY -> HIGH
 		if (is_buffer_ready)
 		{
 			deassert_read_when_buffer_ready_high->adjust(attotime::never);
@@ -945,7 +944,7 @@ void wd2010_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 		}
 		else
 		{
-			deassert_read_when_buffer_ready_high->reset(); 
+			deassert_read_when_buffer_ready_high->reset();
 			deassert_read_when_buffer_ready_high->adjust(attotime::from_usec(1), param); // DELAY ANOTHER 1 USEC (!)
 		}
 		break;
@@ -962,7 +961,7 @@ void wd2010_device::complete_immediate(UINT8 status)
 	status &= ~(STATUS_RDY | STATUS_WF | STATUS_SC); // RDY  0x40  / WF 0x20 /  SC 0x10
 	status |= (m_in_drdy_cb() ? 0x40 : 0) | (m_in_wf_cb() ? 0x20 : 0) | (m_in_sc_cb() ? 0x10 : 0);
 
- 	if (status & STATUS_DRQ) // if DRQ was set, reset
+	if (status & STATUS_DRQ) // if DRQ was set, reset
 	{
 		status &= ~(STATUS_DRQ);
 		m_out_bdrq_cb(0);
@@ -980,7 +979,7 @@ void wd2010_device::complete_immediate(UINT8 status)
 	m_out_bcs_cb(0); // de-assert BCS (needed)
 	m_out_wg_cb(0);  // deactivate WG  (required by write / format)
 
-	m_out_bcr_cb(0); // strobe BCR 
+	m_out_bcr_cb(0); // strobe BCR
 	m_out_bcr_cb(1);
 }
 
@@ -988,4 +987,3 @@ void wd2010_device::complete_cmd(UINT8 status)
 {
 	cmd_timer->adjust(attotime::from_msec(1), status);
 }
-

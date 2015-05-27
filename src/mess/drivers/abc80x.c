@@ -139,11 +139,11 @@ Notes:
 
 /*
 
-	TODO:
+    TODO:
 
-	- cassette
-	- abc806 RTC
-	- abc806 disks except ufd631 won't boot
+    - cassette
+    - abc806 RTC
+    - abc806 disks except ufd631 won't boot
 
 */
 

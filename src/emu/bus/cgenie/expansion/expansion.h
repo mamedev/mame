@@ -6,31 +6,31 @@
 
     50-pin slot
 
-	 1  GND        26  /MREQ
-	 2  A8         27  /WR
-	 3  A7         28  /C4
-	 4  A6         29  (not used)
-	 5  A9         30  /C1
-	 6  A5         31  BD3
-	 7  A4         32  /C3
-	 8  A3         33  (not used)
-	 9  A10        34  /C2
-	10  A2         35  DB6
-	11  A11        36  /RD
-	12  A1         37  BD4
-	13  A0         38  (not used)
-	14  A12        39  BD7
-	15  A14        40  (not used)
-	16  A13        41  BD5
-	17  /RFSH      42  (not useD)
-	18  A15        43  BD0
-	19  /INT       44  (not used)
-	20  /BUSRQ     45  BD2
-	21  /NMI       46  /RESET
-	22  /WAIT      47  /M1
-	23  /HALT      48  /IORQ
-	24  /BUSAK     49  BD1
-	25  /ROMDIS    50  +5V
+     1  GND        26  /MREQ
+     2  A8         27  /WR
+     3  A7         28  /C4
+     4  A6         29  (not used)
+     5  A9         30  /C1
+     6  A5         31  BD3
+     7  A4         32  /C3
+     8  A3         33  (not used)
+     9  A10        34  /C2
+    10  A2         35  DB6
+    11  A11        36  /RD
+    12  A1         37  BD4
+    13  A0         38  (not used)
+    14  A12        39  BD7
+    15  A14        40  (not used)
+    16  A13        41  BD5
+    17  /RFSH      42  (not useD)
+    18  A15        43  BD0
+    19  /INT       44  (not used)
+    20  /BUSRQ     45  BD2
+    21  /NMI       46  /RESET
+    22  /WAIT      47  /M1
+    23  /HALT      48  /IORQ
+    24  /BUSAK     49  BD1
+    25  /ROMDIS    50  +5V
 
 ***************************************************************************/
 

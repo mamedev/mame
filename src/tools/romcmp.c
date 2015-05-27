@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles,Nicola Salmoria 
+// copyright-holders:Aaron Giles,Nicola Salmoria
 /***************************************************************************
 
     romcmp.c

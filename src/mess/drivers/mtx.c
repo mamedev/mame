@@ -18,7 +18,7 @@
     - CBM (all RAM) mode
     - "Silicon" disks
     - Multi Effect Video Wall
- 
+
  */
 
 #include "emu.h"

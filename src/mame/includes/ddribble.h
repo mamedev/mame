@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia 
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Double Dribble

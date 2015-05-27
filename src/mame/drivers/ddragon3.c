@@ -4,7 +4,7 @@
 
     Double Dragon 3                     Technos Japan Corp 1990
     The Combatribes                     Technos Japan Corp 1990
-	WWF WrestleFest                     Technos Japan Corp 1991
+    WWF WrestleFest                     Technos Japan Corp 1991
 
     Notes:
 

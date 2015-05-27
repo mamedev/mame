@@ -194,12 +194,12 @@ static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
 	/* External Device */
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM // banked access to ROM/NET board address space, mainly backup SRAM and ATA
 	AM_RANGE(0x01010000, 0x01010007) AM_READWRITE(sp_bank_r, sp_bank_w )
-//	AM_RANGE(0x01010080, 0x01010087) IRQ pending/reset, ATA control
+//  AM_RANGE(0x01010080, 0x01010087) IRQ pending/reset, ATA control
 	AM_RANGE(0x01010100, 0x01010127) AM_READ(sp_io_r)
 	AM_RANGE(0x01010128, 0x0101012f) AM_READWRITE(sp_eeprom_r, sp_eeprom_w )
 	AM_RANGE(0x01010150, 0x01010157) AM_READ(sp_rombdflg_r)
-//	AM_RANGE(0x01010180, 0x010101af) custom UART 1
-//	AM_RANGE(0x010101c0, 0x010101ef) custom UART 2
+//  AM_RANGE(0x01010180, 0x010101af) custom UART 1
+//  AM_RANGE(0x010101c0, 0x010101ef) custom UART 2
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -370,7 +370,7 @@ ROM_START( brickppl )
 	ROM_LOAD( "ic64",  0x08000000, 0x4000000, CRC(383e90d9) SHA1(eeca4b1bd0cd1fed7b85f045d71e0c7258d4350b) )
 	ROM_LOAD( "ic65",  0x0c000000, 0x4000000, CRC(4c29b5ac) SHA1(9e6a79ad2d2498eed5b2590c8764222e7d6c0229) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0558-com.ic15", 0, 0x800, BAD_DUMP CRC(7592d004) SHA1(632373d807f54953d68c95a9f874ed3e8011f085) )
@@ -392,7 +392,7 @@ ROM_START( dinoking )
 	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(c78e46c2) SHA1(b8224c68face23010414d13ebb4cc05a2a9dce8a) )
 
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))	// actually 8x 128Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
@@ -413,7 +413,7 @@ ROM_START( dinokior )
 	ROM_LOAD( "ic68s", 0x06000000, 0x01000000, CRC(ff5ed2b8) SHA1(d8d86b3ed976c8c8fc51d225ae661e5f237b6e1d) )
 	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(ab8ac4eb) SHA1(e6b3ce796ae4887011e2764261f3f437dc9939f9) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))	// actually 8x 128Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
@@ -429,7 +429,7 @@ ROM_START( lovebery )
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(1bd80ed0) SHA1(d50307573389ebe71e381a75deb83811fa397b94) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d3870287) SHA1(efd3630d54068f5a8caf242a48db410bedf48e7a) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
@@ -453,7 +453,7 @@ ROM_START( lovebero )
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(0a23cea3) SHA1(1780d935b0d641769859b2022df8e4262e7bafd8) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d3870287) SHA1(efd3630d54068f5a8caf242a48db410bedf48e7a) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
@@ -469,7 +469,7 @@ ROM_START( tetgiant )
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(31ba1938) SHA1(9b5a05193b3df13cd7617a38913e0b0fbd61da44) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(cb946213) SHA1(6195e33c44a1e8eb464dfc3558dc1c9b4d910ef3) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))	// 2x 512Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )
@@ -487,7 +487,7 @@ ROM_START( dinoki25 )
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0047", 0, SHA1(0f97291d9c5dbe3e66a5220da05aebdfaa78b35d) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
@@ -511,7 +511,7 @@ ROM_START( loveber3 )
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0042", 0, SHA1(9992d90dae8ce7636e4153e02b779c27931b3be6) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
@@ -528,7 +528,7 @@ ROM_START( tetgiano )
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0076", 0, SHA1(6987c888d2a3ada2d07f6396d47fdba507ca859d) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))	// 2x 512Mbit FlashROMs
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )

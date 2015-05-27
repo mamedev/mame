@@ -89,17 +89,17 @@ static Mono9602Desc a8_desc(K_OHM(27.0), U_FARAD(1.0), K_OHM(27.0), U_FARAD(1.0)
 CIRCUIT_LAYOUT( breakout )
 
 #if (SLOW_BUT_ACCURATE)
-    SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
-    PARAM(Solver.GS_THRESHOLD, 6)
+	SOLVER(Solver, 48000)
+	PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
+	PARAM(Solver.GS_THRESHOLD, 6)
 #else
-    SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-6)
-    PARAM(Solver.GS_THRESHOLD, 6)
-    // FIXME: PARALLEL Doesn't work in breakout.
-    PARAM(Solver.PARALLEL, 0)
+	SOLVER(Solver, 48000)
+	PARAM(Solver.ACCURACY, 1e-6)
+	PARAM(Solver.GS_THRESHOLD, 6)
+	// FIXME: PARALLEL Doesn't work in breakout.
+	PARAM(Solver.PARALLEL, 0)
 #endif
-    PARAM(NETLIST.USE_DEACTIVATE, 1)
+	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	// DIPSWITCH - Free game
 	SWITCH(S1_1)
@@ -129,7 +129,7 @@ CIRCUIT_LAYOUT( breakout )
 	// Clock circuit
 	//----------------------------------------------------------------
 #if 0  || (SLOW_BUT_ACCURATE)
-    MAINCLOCK(Y1, 14318000.0)
+	MAINCLOCK(Y1, 14318000.0)
 	CHIP("F1", 9316)
 	NET_C(Y1.Q, F1.2)
 
@@ -149,24 +149,24 @@ CIRCUIT_LAYOUT( breakout )
 #define DICECLOCK   "H1", 11
 #else
 	/*
-	 * 	9316	2	3	4	5	6	7	8	9	10	11	12	13	14	15	2	3	4	5	6
-	 *  A		0	1	0	1	0	1	0	1	0	1	0	1	0	1
-	 *  B		1	1	0	0	1	1	0	0	1	1	0	0	1	1
-	 * CKBH		1	1	0	0	1	1	0	0	1	1	0	0	1	1	1	1
+	 *  9316    2   3   4   5   6   7   8   9   10  11  12  13  14  15  2   3   4   5   6
+	 *  A       0   1   0   1   0   1   0   1   0   1   0   1   0   1
+	 *  B       1   1   0   0   1   1   0   0   1   1   0   0   1   1
+	 * CKBH     1   1   0   0   1   1   0   0   1   1   0   0   1   1   1   1
 	 *                  ^--- Pattern Start
-	 * CLOCK	1	0	1	1	1	0	1	1	1	0	1	1	1	0	1	0	1	1	1
+	 * CLOCK    1   0   1   1   1   0   1   1   1   0   1   1   1   0   1   0   1   1   1
 	 *                              ^--- Pattern Start
 	 *                  <--------> 3 Clocks Offset
 	 */
-    EXTCLOCK(Y1, 14318000.0, "4,4,4,4,4,8")
-    EXTCLOCK(Y2, 14318000.0, "2,6,2,6,2,2,2,6")
-    PARAM(Y2.OFFSET, 3.0 / 14318000.0 + 20.0e-9	)
+	EXTCLOCK(Y1, 14318000.0, "4,4,4,4,4,8")
+	EXTCLOCK(Y2, 14318000.0, "2,6,2,6,2,2,2,6")
+	PARAM(Y2.OFFSET, 3.0 / 14318000.0 + 20.0e-9 )
 #define CKBH    "Y1", Q
 #define DICECLOCK   "Y2", Q
 
-    NET_C(ttlhigh, H1.13)
-    NET_C(ttlhigh, H1.12)
-    NET_C(ttlhigh, E1.5)
+	NET_C(ttlhigh, H1.13)
+	NET_C(ttlhigh, H1.12)
+	NET_C(ttlhigh, E1.5)
 #endif
 
 	//----------------------------------------------------------------
@@ -175,38 +175,38 @@ CIRCUIT_LAYOUT( breakout )
 
 	TTL_INPUT(antenna, 0)
 
-    DIODE(CR3, "1N914")
-    DIODE(CR4, "1N914")
-    DIODE(CR5, "1N914")
-    DIODE(CR7, "1N914")
+	DIODE(CR3, "1N914")
+	DIODE(CR4, "1N914")
+	DIODE(CR5, "1N914")
+	DIODE(CR7, "1N914")
 
-    QBJT_EB(Q1, "2N3644")
-    QBJT_EB(Q2, "2N3643")
-    QBJT_EB(Q3, "2N3643")
-    CAP(C19, CAP_U(0.1))
-    CAP(C16, CAP_U(0.1))
+	QBJT_EB(Q1, "2N3644")
+	QBJT_EB(Q2, "2N3643")
+	QBJT_EB(Q3, "2N3643")
+	CAP(C19, CAP_U(0.1))
+	CAP(C16, CAP_U(0.1))
 
-    RES(R25, 100)
-    RES(R26, 330)
-    RES(R27, 100)
-    RES(R31, 220)
-    RES(R32, 100)
+	RES(R25, 100)
+	RES(R26, 330)
+	RES(R27, 100)
+	RES(R31, 220)
+	RES(R32, 100)
 
-    NET_C(GND, CR5.A, Q2.E, C16.2, R25.2, Q3.E)
-    NET_C(CR5.K, Q2.B, antenna)
-    NET_C(Q2.C, C16.1, R25.1, Q3.B, R27.2)
-    NET_C(R27.1, CR7.A, R31.2)  //CR7.K == IN
-    NET_C(R31.1, Q1.C)
-    NET_C(Q3.C, R26.2, CR3.A, CR4.A, E9.5) // E9.6 = Q Q3.C=QQ CR3.K = COIN*1 CR4.K = COIN*2
-    NET_C(R26.1, Q1.B, C19.2, R32.2)
-    NET_C(Q1.E, C19.1, R32.1, V5)
+	NET_C(GND, CR5.A, Q2.E, C16.2, R25.2, Q3.E)
+	NET_C(CR5.K, Q2.B, antenna)
+	NET_C(Q2.C, C16.1, R25.1, Q3.B, R27.2)
+	NET_C(R27.1, CR7.A, R31.2)  //CR7.K == IN
+	NET_C(R31.1, Q1.C)
+	NET_C(Q3.C, R26.2, CR3.A, CR4.A, E9.5) // E9.6 = Q Q3.C=QQ CR3.K = COIN*1 CR4.K = COIN*2
+	NET_C(R26.1, Q1.B, C19.2, R32.2)
+	NET_C(Q1.E, C19.1, R32.1, V5)
 
 	#define LAT_Q   "E9", 6
 	#define Q_n         "Q3", C
 	#define COIN1_n         "F8", 5
 	#define COIN2_n         "H9", 5
 
-    CONNECTION("CR7", K, "D8", 11)  //set
+	CONNECTION("CR7", K, "D8", 11)  //set
 	CONNECTION("CR3", K, COIN1_n)     //reset
 	CONNECTION("CR4", K, COIN2_n)     //reset
 
@@ -440,31 +440,31 @@ CIRCUIT_LAYOUT( breakout )
 	#define EGL     "C37" , 2
 	#define EGL_n   "C5", 2
 
-   #define RAM_PLAYER1 	"E7", 4
-   #define A1 		"H6", 14
-   #define B1 		"H6", 13
-   #define C1 		"H6", 12
-   #define D1 		"H6", 11
-   #define E1 		"J6", 14
-   #define F1 		"J6", 13
-   #define G1 		"J6", 12
-   #define H01 		"J6", 11
-   #define I1 		"K6", 14
-   #define J1 		"K6", 13
-   #define K1 		"K6", 12
-   #define L1 		"K6", 11
-   #define A2 		"N6", 14
-   #define B2 		"N6", 13
-   #define C2 		"N6", 12
-   #define D2 		"N6", 11
-   #define E2s 		"M6", 14
-   #define F2 		"M6", 13
-   #define G2 		"M6", 12
-   #define H02 		"M6", 11	//TODO: better name for these signals
-   #define I2 		"L6", 14
-   #define J2 		"L6", 13
-   #define K2 		"L6", 12
-   #define L2 		"L6", 11
+	#define RAM_PLAYER1     "E7", 4
+	#define A1      "H6", 14
+	#define B1      "H6", 13
+	#define C1      "H6", 12
+	#define D1      "H6", 11
+	#define E1      "J6", 14
+	#define F1      "J6", 13
+	#define G1      "J6", 12
+	#define H01         "J6", 11
+	#define I1      "K6", 14
+	#define J1      "K6", 13
+	#define K1      "K6", 12
+	#define L1      "K6", 11
+	#define A2      "N6", 14
+	#define B2      "N6", 13
+	#define C2      "N6", 12
+	#define D2      "N6", 11
+	#define E2s         "M6", 14
+	#define F2      "M6", 13
+	#define G2      "M6", 12
+	#define H02         "M6", 11    //TODO: better name for these signals
+	#define I2      "L6", 14
+	#define J2      "L6", 13
+	#define K2      "L6", 12
+	#define L2      "L6", 11
 
 	#define CX0         "C6", 11
 	#define CX1         "C6", 6
@@ -772,18 +772,18 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION(BALL_C, "C4", 10)
 	CONNECTION("A4", 11, "C4", 9)
 
-   CONNECTION(A2, "N5", 1)
-   CONNECTION(E2s, "N5", 2)
-   CONNECTION(I2, "N5", 3)
-   CONNECTION("C5", 6, "N5", 4)
-   CONNECTION(A1, "N5", 5)
-   CONNECTION(E1, "N5", 6)
-   CONNECTION(I1, "N5", 7)
-   CONNECTION(PLAYER_2_n, "N5", 9)
-   CONNECTION(H32_n, "N5", 10)
-   CONNECTION(V16, "N5", 11)
-   CONNECTION(V64, "N5", 12)
-   CONNECTION(V128, "N5", 13)
+	CONNECTION(A2, "N5", 1)
+	CONNECTION(E2s, "N5", 2)
+	CONNECTION(I2, "N5", 3)
+	CONNECTION("C5", 6, "N5", 4)
+	CONNECTION(A1, "N5", 5)
+	CONNECTION(E1, "N5", 6)
+	CONNECTION(I1, "N5", 7)
+	CONNECTION(PLAYER_2_n, "N5", 9)
+	CONNECTION(H32_n, "N5", 10)
+	CONNECTION(V16, "N5", 11)
+	CONNECTION(V64, "N5", 12)
+	CONNECTION(V128, "N5", 13)
 
 	CONNECTION(B2, "M5", 1)
 	CONNECTION(F2, "M5", 2)
@@ -1561,7 +1561,7 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION(PSYNC, "B9", 1)
 	CONNECTION(VSYNC_n, "B9", 2)
 
-   	// VIDEO SUMMING
+	// VIDEO SUMMING
 	RES(R41, RES_K(3.9))
 	RES(R42, RES_K(3.9))
 	RES(R43, RES_K(3.9))

@@ -1906,9 +1906,9 @@ void avr8_device::timer5_tick()
 	case WGM5_FAST_PWM_ICR:
 	case WGM5_FAST_PWM_OCR:
 #if LOG_TIMER_5
-	        printf("Unimplemented timer#5 waveform generation mode: AVR8_WGM5 = 0x%02X\n", AVR8_WGM5);
+			printf("Unimplemented timer#5 waveform generation mode: AVR8_WGM5 = 0x%02X\n", AVR8_WGM5);
 #endif
-	        break;
+			break;
 
 		case WGM5_CTC_OCR:
 		//TODO: verify this! Can be very wrong!!!

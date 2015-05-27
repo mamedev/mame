@@ -4,7 +4,7 @@
 
   National Semiconductor COP400 MCU handhelds or other simple devices,
   mostly LED electronic games/toys.
-  
+
   TODO:
   - non-working games are due to MCU emulation bugs?
   - better not start on visually dumped games before other games are working
@@ -233,7 +233,7 @@ UINT8 hh_cop400_state::read_inputs(int columns)
   Castle Toy Einstein
   * COP421 MCU labeled ~/927 COP421-NEZ/N
   * 4 lamps, 1bit sound
-  
+
 ***************************************************************************/
 
 class ctstein_state : public hh_cop400_state
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( ctstein, ctstein_state )
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-//	MCFG_DEFAULT_LAYOUT(layout_ctstein)
+//  MCFG_DEFAULT_LAYOUT(layout_ctstein)
 
 	/* no video! */
 
@@ -310,7 +310,7 @@ void einvaderc_state::prepare_display()
 	// D0-D2 are 7segs
 	for (int y = 0; y < 3; y++)
 		m_display_segmask[y] = 0x7f;
-	
+
 	// update display
 	UINT8 l = BITSWAP8(m_l,7,6,0,1,2,3,4,5);
 	UINT16 grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0ff;
@@ -633,7 +633,7 @@ static MACHINE_CONFIG_START( plus1, plus1_state )
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED) // guessed
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
-//	MCFG_DEFAULT_LAYOUT(layout_plus1)
+//  MCFG_DEFAULT_LAYOUT(layout_plus1)
 
 	/* no video! */
 
@@ -652,12 +652,12 @@ MACHINE_CONFIG_END
   Milton Bradley (Electronic) Lightfight
   * COP421L MCU labeled /B119 COP421L-HLA/N
   * LED matrix, 1bit sound
-  
+
   Xbox-shaped electronic game for 2 or more players, with long diagonal buttons
   next to each outer LED. The main object of the game is to pinpoint a light
   by pressing 2 buttons. To start, press a skill-level button(P2 button 7/8/9)
   after selecting a game mode(P1 button 6-10).
-  
+
   The game variations are:
   1: LightFight
   2: NightFight

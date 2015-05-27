@@ -72,8 +72,8 @@ class n64_blender_t
 		INT32 dither_alpha(INT32 alpha, INT32 dither);
 		INT32 dither_color(INT32 color, INT32 dither);
 
-		UINT8				m_color_dither[256 * 8];
-		UINT8				m_alpha_dither[256 * 8];
+		UINT8               m_color_dither[256 * 8];
+		UINT8               m_alpha_dither[256 * 8];
 };
 
 #endif // _VIDEO_RDPBLEND_H_

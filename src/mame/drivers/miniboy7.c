@@ -309,10 +309,10 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 //    output_set_lamp_value(3, (data >> 3) & 1);    // [-x---]
 //    output_set_lamp_value(4, (data >> 4) & 1);    // [x----]
 
-    coin_counter_w(machine(), 0, data & 0x40);    // counter
+	coin_counter_w(machine(), 0, data & 0x40);    // counter
 
 //  popmessage("Out Lamps: %02x", data);
-// 	logerror("Out Lamps: %02x\n", data);
+//  logerror("Out Lamps: %02x\n", data);
 
 }
 

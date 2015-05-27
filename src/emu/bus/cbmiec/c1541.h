@@ -37,8 +37,8 @@
 // ======================> c1541_base_t
 
 class c1541_base_t :  public device_t,
-					  public device_cbm_iec_interface,
-					  public device_c64_floppy_parallel_interface
+						public device_cbm_iec_interface,
+						public device_c64_floppy_parallel_interface
 {
 public:
 	// construction/destruction

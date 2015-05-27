@@ -4,7 +4,7 @@
 
 
  MegaDrive / Genesis J-Cart (+SEPROM) emulation
- 
+
 
  Emulation based on earlier researches by ElBarto
 

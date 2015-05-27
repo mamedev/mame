@@ -1882,7 +1882,7 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 {
 	int found = 0;
 	slname_map listnames;
-    slname_map shortnames;
+	slname_map shortnames;
 
 	// iterate over drivers
 	m_drivlist.reset();
@@ -1891,26 +1891,26 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 		// iterate over devices, regions and files within the region */
 		device_iterator deviter(m_drivlist.config().root_device());
 		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-        {
-            if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
-            {
-                for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
-                    for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
-                    {
-                        hash_collection romhashes(ROM_GETHASHDATA(rom));
-                        if (!romhashes.flag(hash_collection::FLAG_NO_DUMP) && hashes == romhashes)
-                        {
-                            bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
-                            
-                            // output information about the match
-                            if (found)
-                                osd_printf_info("                    ");
-                            osd_printf_info("= %s%-20s  %-10s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), m_drivlist.driver().name, m_drivlist.driver().description);
-                            found++;
-                        }
-                    }
-            }
-        }
+		{
+			if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
+			{
+				for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
+					for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+					{
+						hash_collection romhashes(ROM_GETHASHDATA(rom));
+						if (!romhashes.flag(hash_collection::FLAG_NO_DUMP) && hashes == romhashes)
+						{
+							bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
+
+							// output information about the match
+							if (found)
+								osd_printf_info("                    ");
+							osd_printf_info("= %s%-20s  %-10s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), m_drivlist.driver().name, m_drivlist.driver().description);
+							found++;
+						}
+					}
+			}
+		}
 
 		// next iterate over softlists
 		software_list_device_iterator iter(m_drivlist.config().root_device());
@@ -1927,7 +1927,7 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 								if (hashes == romhashes)
 								{
 									bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
-									
+
 									// output information about the match
 									if (found)
 										osd_printf_info("                    ");

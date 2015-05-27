@@ -2,13 +2,13 @@
 // copyright-holders:Barry Rodewald
 /*
 
-	Brunword MK4 - Word processor ROM / expansion
+    Brunword MK4 - Word processor ROM / expansion
 
-	Software is provided as an expansion device, which uses it own ROM mapping
+    Software is provided as an expansion device, which uses it own ROM mapping
 
-	The ROM select port will be handled by this device, calling back to the standard driver when necessary.
-	Not enabled for the CPC Plus, as ROM selection wraps after 63, making it impossible to see cartridge
-	banks in the upper ROM area (0x80-0xff)
+    The ROM select port will be handled by this device, calling back to the standard driver when necessary.
+    Not enabled for the CPC Plus, as ROM selection wraps after 63, making it impossible to see cartridge
+    banks in the upper ROM area (0x80-0xff)
 */
 
 #include "brunword4.h"
@@ -21,7 +21,7 @@ ROM_START( cpc_brunword4 )
 	ROM_LOAD( "brunw-c1.rom",   0x0000, 0x4000, CRC(3200299b) SHA1(d7d5fcacf3c6707a6629b0c65564ac44267d2b49) )
 	ROM_LOAD( "brunw-c2.rom",   0x4000, 0x4000, CRC(aa19aff1) SHA1(5aa4e87ae6ad2063540e3f5179298657bbd82bfb) )
 	ROM_LOAD( "brunw-c3.rom",   0x8000, 0x4000, CRC(eabe60fe) SHA1(41f605f1e1b5e2bc7dcbd702f2d202ab4d2f44ec) )
-	
+
 	ROM_REGION( 0x80000, "mk4_roms", 0 )
 	ROM_LOAD( "brunw-c0.rom",   0x0000, 0x4000, CRC(45493337) SHA1(a971e2e63adb004c605cf642edde828e8b3ab897) )
 	ROM_LOAD( "brunw-c1.rom",   0x4000, 0x4000, CRC(3200299b) SHA1(d7d5fcacf3c6707a6629b0c65564ac44267d2b49) )
@@ -108,4 +108,3 @@ void cpc_brunword4_device::set_mapping()
 		membank(":bank4")->set_base(ROM+((bank*0x4000) + 0x2000));
 	}
 }
-

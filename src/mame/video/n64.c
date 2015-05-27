@@ -442,11 +442,11 @@ void n64_rdp::set_suba_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input
 		case 3:     *input_r = &userdata->m_prim_color.i.r;     *input_g = &userdata->m_prim_color.i.g;     *input_b = &userdata->m_prim_color.i.b;     break;
 		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
 		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
-		case 6:     *input_r = &m_one.i.r;                   	*input_g = &m_one.i.g;                   	*input_b = &m_one.i.b;                   	break;
+		case 6:     *input_r = &m_one.i.r;                      *input_g = &m_one.i.g;                      *input_b = &m_one.i.b;                      break;
 		case 7:     *input_r = &userdata->m_noise_color.i.r;    *input_g = &userdata->m_noise_color.i.g;    *input_b = &userdata->m_noise_color.i.b;    break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
-					*input_r = &m_zero.i.r;	*input_g = &m_zero.i.g;	*input_b = &m_zero.i.b;	break;
+					*input_r = &m_zero.i.r; *input_g = &m_zero.i.g; *input_b = &m_zero.i.b; break;
 		}
 	}
 }
@@ -462,10 +462,10 @@ void n64_rdp::set_subb_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input
 		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
 		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
 		case 6:     fatalerror("SET_SUBB_RGB_INPUT: key_center\n");
-		case 7:     *input_r = (UINT8*)&m_k4;					*input_g = (UINT8*)&m_k4;					*input_b = (UINT8*)&m_k4;					break;
+		case 7:     *input_r = (UINT8*)&m_k4;                   *input_g = (UINT8*)&m_k4;                   *input_b = (UINT8*)&m_k4;                   break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
-					*input_r = &m_zero.i.r;	*input_g = &m_zero.i.g;	*input_b = &m_zero.i.b;	break;
+					*input_r = &m_zero.i.r; *input_g = &m_zero.i.g; *input_b = &m_zero.i.b; break;
 		}
 	}
 }
@@ -493,7 +493,7 @@ void n64_rdp::set_mul_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_
 		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31:
 		{
-					*input_r = &m_zero.i.r;	*input_g = &m_zero.i.g;	*input_b = &m_zero.i.b;	break;
+					*input_r = &m_zero.i.r; *input_g = &m_zero.i.g; *input_b = &m_zero.i.b; break;
 		}
 	}
 }
@@ -508,8 +508,8 @@ void n64_rdp::set_add_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_
 		case 3:     *input_r = &userdata->m_prim_color.i.r;     *input_g = &userdata->m_prim_color.i.g;     *input_b = &userdata->m_prim_color.i.b;     break;
 		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
 		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
-		case 6:     *input_r = &m_one.i.r;                   	*input_g = &m_one.i.g;                   	*input_b = &m_one.i.b;                   	break;
-		case 7:     *input_r = &m_zero.i.r;               		*input_g = &m_zero.i.g;               		*input_b = &m_zero.i.b;               		break;
+		case 6:     *input_r = &m_one.i.r;                      *input_g = &m_one.i.g;                      *input_b = &m_one.i.b;                      break;
+		case 7:     *input_r = &m_zero.i.r;                     *input_g = &m_zero.i.g;                     *input_b = &m_zero.i.b;                     break;
 	}
 }
 
@@ -2623,7 +2623,7 @@ void n64_rdp::cmd_set_other_modes(UINT32 w1, UINT32 w2)
 	m_other_modes.blend_m2b_0      = (w2 >> 18) & 0x3; // 00
 	m_other_modes.blend_m2b_1      = (w2 >> 16) & 0x3; // 01
 	m_other_modes.force_blend      = (w2 >> 14) & 1; // 0
-	m_other_modes.blend_shift		= m_other_modes.force_blend ? 5 : 2;
+	m_other_modes.blend_shift       = m_other_modes.force_blend ? 5 : 2;
 	m_other_modes.alpha_cvg_select = (w2 >> 13) & 1; // 1
 	m_other_modes.cvg_times_alpha  = (w2 >> 12) & 1; // 0
 	m_other_modes.z_mode           = (w2 >> 10) & 0x3; // 00

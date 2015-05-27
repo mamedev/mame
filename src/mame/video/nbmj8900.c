@@ -368,7 +368,7 @@ void nbmj8900_state::video_start()
 {
 	m_screen_width = m_screen->width();
 	m_screen_height = m_screen->height();
-	
+
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
@@ -382,7 +382,7 @@ void nbmj8900_state::video_start()
 //  m_palette->pen(0x07f) = 0xff;    /* palette_transparent_pen */
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
-	
+
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_blitter_destx));
 	save_item(NAME(m_blitter_desty));
