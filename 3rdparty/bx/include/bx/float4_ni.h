@@ -15,7 +15,7 @@ namespace bx
 		const float4_t xAyB   = float4_shuf_xAyB(_a, _b);
 		const float4_t zCwD   = float4_shuf_zCwD(_a, _b);
 		const float4_t result = float4_shuf_xyAB(xAyB, zCwD);
-		
+
 		return result;
 	}
 
@@ -24,7 +24,7 @@ namespace bx
 		const float4_t xAyB   = float4_shuf_xAyB(_a, _b);
 		const float4_t zCwD   = float4_shuf_zCwD(_a, _b);
 		const float4_t result = float4_shuf_zwCD(xAyB, zCwD);
-		
+
 		return result;
 	}
 
@@ -192,7 +192,7 @@ namespace bx
 		const float4_t one    = float4_splat(1.0f);
 		const float4_t sqrt   = float4_sqrt(_a);
 		const float4_t result = float4_div(one, sqrt);
-		
+
 		return result;
 	}
 
@@ -206,7 +206,7 @@ namespace bx
 		const float4_t three           = float4_splat(3.0f);
 		const float4_t three_sub_iter1 = float4_sub(three, iter1);
 		const float4_t result          = float4_mul(half_rsqrt, three_sub_iter1);
-		
+
 		return result;
 	}
 
@@ -375,7 +375,7 @@ namespace bx
 		const float4_t expfpart = float4_logexp_detail::float4_exppoly(fpart);
 
 		const float4_t result   = float4_mul(expipart, expfpart);
-		
+
 		return result;
 	}
 
@@ -401,12 +401,21 @@ namespace bx
 
 	BX_FLOAT4_INLINE float4_t float4_cross3_ni(float4_t _a, float4_t _b)
 	{
+		// a.yzx * b.zxy - a.zxy * b.yzx == (a * b.yzx - a.yzx * b).yzx
+#if 0
 		const float4_t a_yzxw = float4_swiz_yzxw(_a);
 		const float4_t a_zxyw = float4_swiz_zxyw(_a);
 		const float4_t b_zxyw = float4_swiz_zxyw(_b);
 		const float4_t b_yzxw = float4_swiz_yzxw(_b);
 		const float4_t tmp    = float4_mul(a_yzxw, b_zxyw);
 		const float4_t result = float4_nmsub(a_zxyw, b_yzxw, tmp);
+#else
+		const float4_t a_yzxw = float4_swiz_yzxw(_a);
+		const float4_t b_yzxw = float4_swiz_yzxw(_b);
+		const float4_t tmp0   = float4_mul(_a, b_yzxw);
+		const float4_t tmp1   = float4_nmsub(a_yzxw, _b, tmp0);
+		const float4_t result = float4_swiz_yzxw(tmp1);
+#endif
 
 		return result;
 	}
@@ -416,7 +425,7 @@ namespace bx
 		const float4_t dot3    = float4_dot3(_a, _a);
 		const float4_t invSqrt = float4_rsqrt(dot3);
 		const float4_t result  = float4_mul(_a, invSqrt);
-		
+
 		return result;
 	}
 
