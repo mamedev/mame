@@ -31,19 +31,19 @@ const char *bbc_format::extensions() const
 
 const bbc_format::format bbc_format::formats[] =
 {
-	{   // 100k single sided single density
+	{	// 100k single sided single density
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 10, 40, 1, 256, {}, 0, {}, 16, 11, 19
 	},
-	{   // 200k double sided single density
+	{	// 200k double sided single density
 		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
 		4000, 10, 40, 2, 256, {}, 0, {}, 16, 11, 19
 	},
-	{   // 200k single sided double density
+	{	// 200k single sided double density
 		floppy_image::FF_525, floppy_image::SSQD, floppy_image::FM,
 		4000, 10, 80, 1, 256, {}, 0, {}, 16, 11, 19
 	},
-	{   // 400k double sided double density
+	{	// 400k double sided double density
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::FM,
 		4000, 10, 80, 2, 256, {}, 0, {}, 16, 11, 19
 	},
