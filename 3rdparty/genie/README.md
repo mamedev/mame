@@ -11,10 +11,31 @@ Supported project generators:
  * Visual Studio 2008, 2010, 2012, 2013, 2015
  * GNU Makefile
 
+Who is using it?
+----------------
+
+https://github.com/bkaradzic/bgfx bgfx - Cross-platform, graphics API
+agnostic, "Bring Your Own Engine/Framework" style rendering library.
+
+https://github.com/Psybrus/Psybrus Psybrus Engine & Toolchain
+
+https://github.com/dariomanesku/cmftstudio cmftStudio - cubemap filtering tool
+
+https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
+
+http://sol.gfxile.net/soloud SoLoud is an easy to use, free, 
+portable c/c++ audio engine for games.
+
+https://github.com/andr3wmac/Torque6 Torque 6 is an MIT licensed 3D engine
+loosely based on Torque2D. Being neither Torque2D or Torque3D it is the 6th
+derivative of the original Torque Engine.
+
 Download (stable)
 -----------------
 
-	version 273 (commit aa7e321e7a29dd140e285c4ab9aacc06f54c4de7)
+[![Build Status](https://travis-ci.org/bkaradzic/genie.svg?branch=master)](https://travis-ci.org/bkaradzic/genie)
+
+	version 302 (commit 3b2edb279a29f269065c4664cf0f8ac6baa82388)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -63,7 +84,7 @@ intention to keep it compatible with it.
  - Removed vs2002, vs2003, vs2005, Solaris, and Haiku support.
  - Allow source files in the same project to have the same name. Added 
    `SingleOutputDir` flag to use single output directory (original behaviour).
- - Added WinRT support.
+ - Added WinRT support (Windows Phone 8.1, Windows Store, Universal Apps).
  - Added `removeflags`, `removelinks`.
  - Added vs2015 support.
  - Added `targetsubdir`.
@@ -78,6 +99,7 @@ intention to keep it compatible with it.
  - Split functionality of `excludes` in `removefiles` and `excludes`. With VS
    `excludes` will exclude files from build but files will be added to project
    file. `removefiles` removes files completely from project.
+ - Added support for generating PS4/Orbis projects.
 
 ## Why fork?
 
@@ -116,9 +138,12 @@ state of Premake, it's just acknowledging the problem, and dealing with it.
 -----------------------------------------------------------------
 
 	GENie
-	Copyright (c) 2014 Branimir Karadžić, Neil Richardson, Mike Popoloski,
-	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers.
+	Copyright (c) 2014-2015 Branimir Karadžić, Neil Richardson, Mike Popoloski,
+	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers,
+	Terry Hendrix II.
 	All rights reserved.
+
+	https://github.com/bkaradzic/genie
 	
 	Redistribution and use in source and binary forms, with or without modification,
 	are permitted provided that the following conditions are met:
