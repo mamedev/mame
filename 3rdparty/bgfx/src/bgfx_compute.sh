@@ -44,10 +44,11 @@ vec2 unpackHalf2x16(uint _x)
 
 #define SHARED groupshared
 
-#define r32ui  uint
-#define r32f   float
-#define rg16f  float2
-#define rgba8  float4
+#define r32ui   uint
+#define r32f    float
+#define rg16f   float2
+#define rgba16f float4
+#define rgba8   float4
 
 #define IMAGE2D_RO( _name, _format, _reg) Texture2D<_format>   _name : register(t[_reg])
 #define UIMAGE2D_RO(_name, _format, _reg) Texture2D<_format>   _name : register(t[_reg])
@@ -93,6 +94,13 @@ uint4 imageLoad(RWTexture2D<uint> _image, ivec2 _uv)
 }
 
 ivec2 imageSize(Texture2D _image)
+{
+	ivec2 result;
+	_image.GetDimensions(result.x, result.y);
+	return result;
+}
+
+ivec2 imageSize(Texture2D<uint> _image)
 {
 	ivec2 result;
 	_image.GetDimensions(result.x, result.y);
@@ -185,6 +193,34 @@ uint atomicCompSwap(uint _mem, uint _compare, uint _data)
 #define NUM_THREADS(_x, _y, _z) layout (local_size_x = _x, local_size_y = _y, local_size_z = _z) in;
 
 #endif // BGFX_SHADER_LANGUAGE_HLSL
+
+#define dispatchIndirect(_buffer \
+			, _offset \
+			, _numX \
+			, _numY \
+			, _numZ \
+			) \
+			_buffer[_offset*2+0] = uvec4(_numX, _numY, _numZ, 0u)
+
+#define drawIndirect(_buffer \
+			, _offset \
+			, _numVertices \
+			, _numInstances \
+			, _startVertex \
+			, _startInstance \
+			) \
+			_buffer[_offset*2+0] = uvec4(_numVertices, _numInstances, _startVertex, _startInstance)
+
+#define drawIndexedIndirect(_buffer \
+			, _offset \
+			, _numIndices \
+			, _numInstances \
+			, _startIndex \
+			, _startVertex \
+			, _startInstance \
+			) \
+			_buffer[_offset*2+0] = uvec4(_numIndices, _numInstances, _startIndex, _startInstance); \
+			_buffer[_offset*2+1] = uvec4(_startInstance, 0u, 0u, 0u)
 
 #endif // __cplusplus
 

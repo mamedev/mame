@@ -27,7 +27,7 @@
 // ======================> c1551_t
 
 class c1551_t :  public device_t,
-				 public device_plus4_expansion_card_interface
+					public device_plus4_expansion_card_interface
 {
 public:
 	// construction/destruction

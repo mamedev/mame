@@ -1722,7 +1722,7 @@ static MACHINE_CONFIG_START( efootb4, efootb4_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(efootb4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-//	MCFG_DEFAULT_LAYOUT(layout_efootb4)
+//  MCFG_DEFAULT_LAYOUT(layout_efootb4)
 	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
@@ -1836,7 +1836,7 @@ static MACHINE_CONFIG_START( ebaskb2, ebaskb2_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebaskb2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-//	MCFG_DEFAULT_LAYOUT(layout_ebaskb2)
+//  MCFG_DEFAULT_LAYOUT(layout_ebaskb2)
 	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
@@ -4081,7 +4081,7 @@ static MACHINE_CONFIG_START( tbreakup, tbreakup_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tbreakup_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-//	MCFG_DEFAULT_LAYOUT(layout_tbreakup)
+//  MCFG_DEFAULT_LAYOUT(layout_tbreakup)
 	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */

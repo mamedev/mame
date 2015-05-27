@@ -108,7 +108,7 @@
 			kind  = "table",
 			scope = "config",
 		},
-		
+
 		excludes =
 		{
 			kind  = "filelist",
@@ -160,6 +160,8 @@
 					NoNativeWChar = 1,
 					NoPCH = 1,
 					NoRTTI = 1,
+					FastCall = 1,
+					StdCall = 1,
 					SingleOutputDir = 1,
 					Optimize = 1,
 					OptimizeSize = 1,
@@ -444,7 +446,7 @@
 			kind  = "list",
 			scope = "config",
 		},
-		
+
 		prelinkcommands =
 		{
 			kind  = "list",

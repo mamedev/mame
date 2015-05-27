@@ -437,7 +437,7 @@ public:
 	DECLARE_READ16_MEMBER(hd68k_snd_status_r);
 	DECLARE_WRITE16_MEMBER(hd68k_snd_data_w);
 	DECLARE_WRITE16_MEMBER(hd68k_snd_reset_w);
-	
+
 	DECLARE_READ16_MEMBER(hdsnd68k_data_r);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_data_w);
 	DECLARE_READ16_MEMBER(hdsnd68k_switches_r);
@@ -453,7 +453,7 @@ public:
 	DECLARE_READ16_MEMBER(hdsnd68k_320com_r);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_320com_w);
 	DECLARE_READ16_MEMBER(hdsnddsp_get_bio);
-	
+
 	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
 	DECLARE_WRITE16_MEMBER(hdsnddsp_comport_w);
 	DECLARE_WRITE16_MEMBER(hdsnddsp_mute_w);
@@ -462,19 +462,19 @@ public:
 	DECLARE_READ16_MEMBER(hdsnddsp_rom_r);
 	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
 	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
-	
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_device> m_dac;
 	required_device<cpu_device> m_sounddsp;
 	required_shared_ptr<UINT16> m_sounddsp_ram;
 	required_region_ptr<UINT8>  m_sound_rom;
-	
+
 	UINT8                   m_soundflag;
 	UINT8                   m_mainflag;
 	UINT16                  m_sounddata;
@@ -488,7 +488,7 @@ private:
 
 	UINT16                  m_comram[0x400/2];
 	UINT64                  m_last_bio_cycles;
-	
+
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
 };

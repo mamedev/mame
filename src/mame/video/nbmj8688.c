@@ -556,7 +556,7 @@ void nbmj8688_state::common_video_start()
 
 	m_scrolly = 0;  // reset because crystalg/crystal2 don't write to this register
 	m_screen_refresh = 1;
-	
+
 	save_pointer(NAME(m_videoram), 512 * 256);
 	save_pointer(NAME(m_clut), 0x20);
 	save_item(NAME(m_scrolly));
@@ -573,7 +573,7 @@ void nbmj8688_state::common_video_start()
 	save_item(NAME(m_gfxflag3));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_flipscreen_old));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj8688_state::postload), this));
 }
 

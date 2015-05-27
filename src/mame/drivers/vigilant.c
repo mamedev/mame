@@ -897,7 +897,7 @@ ROM_START( vigilanbl ) /* Bootleg */
 	ROM_LOAD( "f05_c08.bin",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
 	ROM_LOAD( "h05_c09.bin",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) 
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "n07_c12.bin",  0x00000, 0x10000, CRC(10af8eb2) SHA1(664b178b248babc43a9af0fe140fe57bc7367762) )
 	ROM_LOAD( "k07_c10.bin",  0x10000, 0x10000, CRC(9576f304) SHA1(0ec2a7d3d82208e2a9a4ef9ab2824e6fe26ebbe5) )
 	ROM_LOAD( "o07_c13.bin",  0x20000, 0x10000, CRC(b1d9d4dc) SHA1(1aacf6b0ff8d102880d3dce3b55cd1488edb90cf) )
@@ -1055,14 +1055,14 @@ ROM_START( buccanrsa )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant,	0,		vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev E)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantg,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilano,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilanta,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev A)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantb,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantc,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev C)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantd,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilanbl,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "bootleg", "Vigilante (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilant,   0,      vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev E)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilano,   vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev A)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev C)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilanbl,  vigilant,   vigilant, vigilant, driver_device, 0, ROT0, "bootleg", "Vigilante (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
 GAME( 1988, kikcubic,  0,        kikcubic, kikcubic, driver_device, 0, ROT0, "Irem",                         "Meikyu Jima (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )   /* English title is Kickle Cubicle */
 GAME( 1988, kikcubicb, kikcubic, kikcubic, kikcubic, driver_device, 0, ROT0, "bootleg",                      "Kickle Cubele", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

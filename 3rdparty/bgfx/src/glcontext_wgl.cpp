@@ -109,14 +109,14 @@ namespace bgfx { namespace gl
 		wglGetProcAddress = (PFNWGLGETPROCADDRESSPROC)bx::dlsym(m_opengl32dll, "wglGetProcAddress");
 		BGFX_FATAL(NULL != wglGetProcAddress, Fatal::UnableToInitialize, "Failed get wglGetProcAddress.");
 
-		// If g_bgfxHwnd is NULL, the assumption is that GL context was created
+		// If g_platformHooks.nwh is NULL, the assumption is that GL context was created
 		// by user (for example, using SDL, GLFW, etc.)
-		BX_WARN(NULL != g_bgfxHwnd
-			, "bgfx::winSetHwnd with valid window is not called. This might "
+		BX_WARN(NULL != g_platformData.nwh
+			, "bgfx::setPlatform with valid window is not called. This might "
 			  "be intentional when GL context is created by the user."
 			);
 
-		if (NULL != g_bgfxHwnd)
+		if (NULL != g_platformData.nwh)
 		{
 			wglMakeCurrent = (PFNWGLMAKECURRENTPROC)bx::dlsym(m_opengl32dll, "wglMakeCurrent");
 			BGFX_FATAL(NULL != wglMakeCurrent, Fatal::UnableToInitialize, "Failed get wglMakeCurrent.");
@@ -127,7 +127,7 @@ namespace bgfx { namespace gl
 			wglDeleteContext = (PFNWGLDELETECONTEXTPROC)bx::dlsym(m_opengl32dll, "wglDeleteContext");
 			BGFX_FATAL(NULL != wglDeleteContext, Fatal::UnableToInitialize, "Failed get wglDeleteContext.");
 
-			m_hdc = GetDC(g_bgfxHwnd);
+			m_hdc = GetDC( (HWND)g_platformData.nwh);
 			BGFX_FATAL(NULL != m_hdc, Fatal::UnableToInitialize, "GetDC failed!");
 
 			// Dummy window to peek into WGL functionality.
@@ -188,7 +188,7 @@ namespace bgfx { namespace gl
 				{
 					result = wglChoosePixelFormatARB(m_hdc, attrs, NULL, 1, &m_pixelFormat, &numFormats);
 					if (0 == result
-						||  0 == numFormats)
+					||  0 == numFormats)
 					{
 						attrs[3] >>= 1;
 						attrs[1] = attrs[3] == 0 ? 0 : 1;
@@ -212,7 +212,7 @@ namespace bgfx { namespace gl
 					);
 
 				result = SetPixelFormat(m_hdc, m_pixelFormat, &m_pfd);
-				// When window is created by SDL and SDL_WINDOW_OPENGL is set SetPixelFormat
+				// When window is created by SDL and SDL_WINDOW_OPENGL is set, SetPixelFormat
 				// will fail. Just warn and continue. In case it failed for some other reason
 				// create context will fail and it will error out there.
 				BX_WARN(result, "SetPixelFormat failed (last err: 0x%08x)!", GetLastError() );
@@ -272,14 +272,14 @@ namespace bgfx { namespace gl
 
 	void GlContext::destroy()
 	{
-		if (NULL != g_bgfxHwnd)
+		if (NULL != g_platformData.nwh)
 		{
 			wglMakeCurrent(NULL, NULL);
 
 			wglDeleteContext(m_context);
 			m_context = NULL;
 
-			ReleaseDC(g_bgfxHwnd, m_hdc);
+			ReleaseDC( (HWND)g_platformData.nwh, m_hdc);
 			m_hdc = NULL;
 		}
 
@@ -324,7 +324,7 @@ namespace bgfx { namespace gl
 
 		if (NULL == _swapChain)
 		{
-			if (NULL != g_bgfxHwnd)
+			if (NULL != g_platformData.nwh)
 			{
 				SwapBuffers(m_hdc);
 			}

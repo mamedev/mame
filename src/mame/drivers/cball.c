@@ -24,7 +24,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram")	{ }
+		m_video_ram(*this, "video_ram") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -37,7 +37,7 @@ public:
 
 	/* video-related */
 	tilemap_t* m_bg_tilemap;
-	
+
 	emu_timer *m_int_timer;
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 

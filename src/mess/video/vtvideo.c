@@ -20,27 +20,27 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
 - REQUIRED TODOS / TESTS :
   * do line and character attributes (plus combinations) match real hardware?
   * how does the AVO fit in?
-  
+
 - SCROLLING REGIONS / SPLIT SCREEN SCROLLING UNTESTED (if you open > 1 file with the VAX editor EDT)
   See VT100 Technical Manual: 4.7.4 Address Shuffling to 4.7.9 Split Screen Smooth Scrolling.
   More on scrolling regions: Rainbow 100 B technical documentation (QV069-GZ) April 1985 page 22
-  
+
 - NEW - INTERLACED MODE (Rainbow only):
   Vertical resolution increases from 240 to 480, while the refresh rate halves (flickers on CRTs).
   To accomplish this, the display controller repeats even lines in odd scans.
   VTVIDEO activates line doubling in 24 line, interlaced mode only.
-  
+
   Although the DC12 has the ability to display 48 lines, most units are low on screen RAM and
-  won't even show 80 x 48. -> REASON: (83 x 48 = 3984 Byte) > (screen RAM) minus 'scratch area' 
+  won't even show 80 x 48. -> REASON: (83 x 48 = 3984 Byte) > (screen RAM) minus 'scratch area'
   On a VT-180, BIOS scratch requires up to 700 bytes used for SETUP, flags, SILO, keyboard.
-  
+
 - POSSIBLE IMPROVEMENTS:
- 
+
 * exact colors for different VR201 monitors (for white, green and amber)
 
 * ACCURATE VIDEO DELAYS:
-  Position of the first visible scanline (relative to the vertical reset) depends on 
-  content of fill bytes at the beginning of screen RAM. 
+  Position of the first visible scanline (relative to the vertical reset) depends on
+  content of fill bytes at the beginning of screen RAM.
 
   Six invisible, linked lines are initially provided (at location $EE000+ on a Rainbow).
   Real-world DC hardware parses the (circular) chain until interrupted by blanking.
@@ -184,10 +184,10 @@ void rainbow_video_device::device_reset()
 	m_basic_attribute = 0;
 
 	m_columns = 80;
-	
-	m_frequency = 60; 
 
-	m_interlaced = 1; 
+	m_frequency = 60;
+
+	m_interlaced = 1;
 	m_fill_lines = 2; // for 60Hz (not in use any longer -> detected)
 	recompute_parameters();
 }
@@ -209,8 +209,8 @@ void vt100_video_device::recompute_parameters()
 
 	int vert_pix_total = ((m_linedoubler == false) ? m_height : m_height_MAX) * 10;
 
-	if (m_columns == 132) 
-		horiz_pix_total = m_columns * 9; // display 1 less filler pixel in 132 char. mode 
+	if (m_columns == 132)
+		horiz_pix_total = m_columns * 9; // display 1 less filler pixel in 132 char. mode
 	else
 		horiz_pix_total = m_columns * 10; // normal 80 character mode.
 
@@ -238,7 +238,7 @@ READ8_MEMBER(vt100_video_device::lba7_r)
 // Also used by Rainbow-100 ************
 WRITE8_MEMBER(vt100_video_device::dc012_w)
 {
-	// Writes to [10C] and [0C] are treated differently 
+	// Writes to [10C] and [0C] are treated differently
 	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
 
 	// MHFU is disabled by writing 00 to port 010C.
@@ -248,7 +248,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 	{
 		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 		if (rom != NULL)
-		{ 
+		{
 			UINT32 PC = space.device().safe_pc();
 			if ((rom[ PC - 1] == 0xe6) &&
 				(rom[ PC    ] == 0x0c)
@@ -264,7 +264,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 				//printf("\n PC %05x - MHFU MAGIC -2 %02x\n", PC, magic2);
 				//if (VERBOSE)
 
-				//if(1	)
+				//if(1  )
 				if ((rom[PC - 2] == 0x0C) &&
 					(rom[PC - 1] == 0x01)
 					)
@@ -272,14 +272,14 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 					if (MHFU_FLAG == true)
 						printf("MHFU  *** DISABLED *** %05x \n", PC);
 
-					MHFU_FLAG = false; 
+					MHFU_FLAG = false;
 					MHFU_counter = 0;
 				}
 			}
-		
+
 		} // DATA == 0 ONLY ....
 
-	} 
+	}
 	else
 	{
 		//if (VERBOSE)
@@ -368,9 +368,9 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 // Writing to DC011 resets internal counters (& disturbs display) on real hardware.
 WRITE8_MEMBER(vt100_video_device::dc011_w)
 {
-	if (!BIT(data, 5)) 
+	if (!BIT(data, 5))
 	{
-		m_interlaced = 1;  
+		m_interlaced = 1;
 
 		if (!BIT(data, 4))
 			m_columns = 80;
@@ -384,16 +384,16 @@ WRITE8_MEMBER(vt100_video_device::dc011_w)
 		if (!BIT(data, 4))
 		{
 			m_frequency = 60;
-			m_fill_lines = 2;  
+			m_fill_lines = 2;
 		}
 		else
 		{
 			m_frequency = 50;
-			m_fill_lines = 5; 
+			m_fill_lines = 5;
 		}
 	}
 
-	recompute_parameters(); 
+	recompute_parameters();
 }
 
 WRITE8_MEMBER(vt100_video_device::brightness_w)
@@ -559,7 +559,7 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 
 	UINT16 y_preset;
 
-	UINT16 CHARPOS_y_preset = y << 3; // CHARPOS_y_preset = y * 10; 
+	UINT16 CHARPOS_y_preset = y << 3; // CHARPOS_y_preset = y * 10;
 	CHARPOS_y_preset += y;
 	CHARPOS_y_preset += y;
 
@@ -571,10 +571,10 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 	int back_intensity, back_default_intensity;
 
 	int invert = (display_type & 8) ? 1 : 0; // REVERSE
-	int bold  = (display_type & 16) ? 0 : 1; // BIT 4 
+	int bold  = (display_type & 16) ? 0 : 1; // BIT 4
 	int blink = (display_type & 32) ? 0 : 1; // BIT 5
-	int underline = (display_type & 64) ? 0 : 1; // BIT 6 
-	bool blank = (display_type & 128) ? true : false; // BIT 7 
+	int underline = (display_type & 64) ? 0 : 1; // BIT 6
+	bool blank = (display_type & 128) ? true : false; // BIT 7
 
 	display_type = display_type & 3;
 
@@ -755,7 +755,7 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 	// Skip fill (0xFF) lines and put result in ADDR.
 	for (int xp = 1; xp <= 6; xp += 1) // beware of circular references
 	{
-		// Fetch LINE ATTRIBUTE before it is gone 
+		// Fetch LINE ATTRIBUTE before it is gone
 		attr_addr = 0x1000 | ((addr + 1) & 0x0fff);
 
 		temp = m_read_ram(addr + 2) * 256 + m_read_ram(addr + 1);
@@ -903,8 +903,8 @@ int rainbow_video_device::MHFU(int ASK)
 		MHFU_FLAG = true;
 
 		return -100;
-   
-    case -200:          // -200 : RESET and DISABLE MHFU
+
+	case -200:          // -200 : RESET and DISABLE MHFU
 		MHFU_counter = 0;
 
 		if(1) //if (VERBOSE)
@@ -915,7 +915,7 @@ int rainbow_video_device::MHFU(int ASK)
 		MHFU_FLAG = false;
 
 		return -200;
-		
+
 	default:
 		assert(1);
 		return -255;

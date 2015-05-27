@@ -60,6 +60,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-tests",
+	description = "Enable building tests.",
+}
+
+newoption {
 	trigger = "osd",
 	description = "Choose OSD layer implementation",
 }
@@ -1153,3 +1158,7 @@ if _OPTIONS["with-tools"] then
 	dofile(path.join("src", "tools.lua"))
 end
 
+if _OPTIONS["with-tests"] then
+	group "tests"
+	dofile(path.join("src", "tests.lua"))
+end

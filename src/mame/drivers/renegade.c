@@ -205,7 +205,7 @@ void renegade_state::machine_start()
 DRIVER_INIT_MEMBER(renegade_state,renegade)
 {
 	m_mcu_sim = FALSE;
-	
+
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_from_mcu));
 	save_item(NAME(m_main_sent));
@@ -229,7 +229,7 @@ DRIVER_INIT_MEMBER(renegade_state,kuniokun)
 	m_mcu_encrypt_table_len = 0x2a;
 
 	m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
-	
+
 	save_item(NAME(m_mcu_buffer));
 	save_item(NAME(m_mcu_input_size));
 	save_item(NAME(m_mcu_output_byte));

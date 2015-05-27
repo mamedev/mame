@@ -627,13 +627,12 @@ c64_se  // Commodore 64 (Sweden)
 pet64    // Commodore PET 64
 edu64    // Commodore Educator 64
 //clipper  // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer - roms needed - not in driver
-//tesa6240  //  modified SX64 with label printer - roms needed - not in driver
 sx64
 sx64p
-
 vip64    // Commodore VIP64 (SX64, PAL, Swedish)
 dx64    // Commodore DX-64 - Prototype
-c64c      // Commodore 64C (NTSC)
+tesa6240
+c64c
 c64cp   // Commodore 64C (PAL)
 c64c_es
 c64c_se

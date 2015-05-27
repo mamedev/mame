@@ -28,7 +28,7 @@
 // ======================> d9060_base_t
 
 class d9060_base_t :  public device_t,
-					  public device_ieee488_interface
+						public device_ieee488_interface
 {
 public:
 	enum

@@ -1022,12 +1022,12 @@ int shaders::create_resources(bool reset)
 
 	phosphor_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
-	phosphor_effect->add_uniform("Passthrough", uniform::UT_FLOAT, uniform::CU_PHOSPHOR_IGNORE);	
-	
+	phosphor_effect->add_uniform("Passthrough", uniform::UT_FLOAT, uniform::CU_PHOSPHOR_IGNORE);
+
 	downsample_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	
+
 	bloom_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	
+
 	simple_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
 	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
@@ -1052,9 +1052,9 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
-	
+
 	vector_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	
+
 	default_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
 	initialized = true;
@@ -1458,7 +1458,7 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize,
 	UINT num_passes = 0;
 
 	phosphor_passthrough = false;
-	
+
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 
@@ -1516,7 +1516,7 @@ void shaders::post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &
 
 	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
 	bool orientation_swap_xy = (d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-	bool rotation_swap_xy = 
+	bool rotation_swap_xy =
 		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
 		(d3d->window().target()->orientation() & ROT270) == ROT270;
 
@@ -1525,8 +1525,8 @@ void shaders::post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
 	curr_effect->set_texture("DiffuseTexture", rt->render_texture[0]);
 	curr_effect->set_vector("Prescale", 2, prescale);
-	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);	
-	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);	
+	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
+	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 
 	d3d->set_wrap(D3DTADDRESS_MIRROR);
@@ -1655,8 +1655,8 @@ void shaders::bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_i
 
 void shaders::screen_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
 {
-  UINT num_passes = 0;
-	
+	UINT num_passes = 0;
+
 	curr_effect = simple_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("DiffuseTexture", rt->render_texture[1]);
@@ -1800,13 +1800,13 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		}
 
 		curr_effect->end();
-		
+
 		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
 		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 
 		curr_effect = default_effect;
 		curr_effect->update_uniforms();
-		
+
 		curr_effect->set_float("FixedAlpha", 1.0f);
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable)
@@ -1912,10 +1912,10 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		/* Phosphor, todo: merge with phosphor_pass() */
 		phosphor_passthrough = false;
-	
+
 		curr_effect = phosphor_effect;
 		curr_effect->update_uniforms();
-		
+
 		float target_dims[2] = { d3d->get_width(), d3d->get_height() };
 		curr_effect->set_vector("TargetDims", 2, target_dims);
 		curr_effect->set_texture("Diffuse", rt->render_texture[1]);
@@ -1955,7 +1955,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_effect = default_effect;
 		curr_effect->update_uniforms();
-		
+
 		curr_effect->set_float("PostPass", 0.0f);
 
 		curr_effect->begin(&num_passes, 0);

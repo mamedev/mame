@@ -3,7 +3,7 @@
 /*
 
   Mitsubishi MELPS 4 MCU family disassembler
-  
+
   Not counting the extra opcodes for peripherals (eg. timers, A/D),
   each MCU in the series has small differences in the opcode map.
 
@@ -117,10 +117,10 @@ CPU_DISASSEMBLE(m58846)
 		instr = m58846_opmap[op];
 
 	dst += sprintf(dst, "%-6s", em_name[instr]);
-	
+
 	// get immediate param
 	UINT8 bits = em_bits[instr];
-	
+
 	// special case for LXY x,y
 	if (instr == em_LXY)
 	{

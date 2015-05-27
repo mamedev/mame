@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshal,Angelo Salese,Luca Elia
+// copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
 /* notes...
 
  drawing sprites in a single pass with pdrawgfx breaks Thunder Dragon 2,

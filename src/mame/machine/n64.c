@@ -1723,17 +1723,17 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 					// Read status
 					switch ((machine().root_device().ioport("input")->read() >> (2 * channel)) & 3)
 					{
-						case 0:				//NONE (unconnected)
-						case 3:				//Invalid
+						case 0:             //NONE (unconnected)
+						case 3:             //Invalid
 							return 1;
 
-						case 1:				//JOYPAD
+						case 1:             //JOYPAD
 							rdata[0] = 0x05;
 							rdata[1] = 0x00;
 							rdata[2] = 0x01;
 							return 0;
 
-						case 2:				//MOUSE
+						case 2:             //MOUSE
 							rdata[0] = 0x02;
 							rdata[1] = 0x00;
 							rdata[2] = 0x01;
@@ -1778,15 +1778,15 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 0: // P1 Inputs
 				case 1: // P2 Inputs
 				case 2: // P3 Inputs
-				case 3:	// P4 Inputs
+				case 3: // P4 Inputs
 				{
 					switch ((machine().root_device().ioport("input")->read() >> (2 * channel)) & 3)
 					{
-						case 0:			//NONE
-						case 3:			//Invalid
+						case 0:         //NONE
+						case 3:         //Invalid
 							return 1;
 
-						case 1:			//JOYPAD
+						case 1:         //JOYPAD
 							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
 							x = machine().root_device().ioport(portnames[(channel*5) + 1])->read() - 128;
 							y = machine().root_device().ioport(portnames[(channel*5) + 2])->read() - 128;
@@ -1797,7 +1797,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 							rdata[3] = (UINT8)(y);
 							return 0;
 
-						case 2:			//MOUSE
+						case 2:         //MOUSE
 							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
 							x = (INT16)machine().root_device().ioport(portnames[(channel*5) + 1 + 2])->read();// - 128;
 							y = (INT16)machine().root_device().ioport(portnames[(channel*5) + 2 + 2])->read();// - 128;

@@ -6,16 +6,16 @@
 
     20-pin slot
 
-	 1  GND        11  IOB2
-	 2  +12V       12  IOB1
-	 3  IOA3       13  IOB0
-	 4  IOA4       14  IOB3
-	 5  IOA0       15  IOB4
-	 6  IOA5       16  IOB5
-	 7  IOA1       17  IOB7
-	 8  IOA2       18  IOB6
-	 9  IOA7       19  +5V
-	10  IOA6       20  -12V
+     1  GND        11  IOB2
+     2  +12V       12  IOB1
+     3  IOA3       13  IOB0
+     4  IOA4       14  IOB3
+     5  IOA0       15  IOB4
+     6  IOA5       16  IOB5
+     7  IOA1       17  IOB7
+     8  IOA2       18  IOB6
+     9  IOA7       19  +5V
+    10  IOA6       20  -12V
 
 ***************************************************************************/
 

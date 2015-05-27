@@ -46,14 +46,14 @@ public:
 	UINT8 *m_clut;
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
-	
+
 	// common
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_WRITE8_MEMBER(clut_w);
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(scrolly_w);
 
-	
+
 	DECLARE_WRITE8_MEMBER(mjsikaku_gfxflag2_w);
 	DECLARE_WRITE8_MEMBER(mjsikaku_gfxflag3_w);
 	DECLARE_WRITE8_MEMBER(mjsikaku_romsel_w);
@@ -83,7 +83,7 @@ public:
 	DECLARE_VIDEO_START(mbmj8688_hybrid_16bit);
 	DECLARE_VIDEO_START(mbmj8688_hybrid_12bit);
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vramflip();
 	void update_pixel(int x, int y);

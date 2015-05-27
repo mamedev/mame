@@ -377,7 +377,7 @@ INPUT_PORTS_END
 void dgpix_state::video_start()
 {
 	m_vram = auto_alloc_array(machine(), UINT32, 0x40000*2/4);
-	
+
 	save_pointer(NAME(m_vram), 0x40000*2/4);
 }
 

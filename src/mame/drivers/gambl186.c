@@ -42,7 +42,7 @@ In order to get the game to run, follow these steps:
 TODO:
 - fix the poker game (casino 10). EEPROM behaviour still buggy.
 - sound;
-- proper 3x D71055C emulation. 
+- proper 3x D71055C emulation.
 
 ***********************************************************************************/
 
@@ -64,14 +64,14 @@ public:
 		m_upd7759(*this, "7759") { }
 
 	required_device<cpu_device> m_maincpu;
- 	optional_device<upd7759_device> m_upd7759;
-    int m_comms_state;
+	optional_device<upd7759_device> m_upd7759;
+	int m_comms_state;
 	int m_comms_ind;
 	UINT8 m_comms_data[1002];
-    int m_comms_cmd;
-    int m_comms_expect;
-    int m_comms_blocks;
-    bool m_comms_ack;
+	int m_comms_cmd;
+	int m_comms_expect;
+	int m_comms_blocks;
+	bool m_comms_ack;
 
 	virtual void machine_start();
 	DECLARE_READ16_MEMBER(comms_r);
@@ -97,233 +97,233 @@ static const UINT8 password[] = {5, 2, 0, 3, 0, 0, 2, 4, 5, 6, 0x16};
 
 READ16_MEMBER(gambl186_state::comms_r)
 {
-    UINT16 retval = 0;
+	UINT16 retval = 0;
 
-    if ((offset == 0) && ACCESSING_BITS_0_7) //port 680 == data
-    {
-        if (m_comms_state == 0x16) //read mode, just in case
-        {
-            if (!m_comms_ind && (m_comms_cmd == 0xff))
-            {
-                m_comms_cmd = m_comms_data[1];
+	if ((offset == 0) && ACCESSING_BITS_0_7) //port 680 == data
+	{
+		if (m_comms_state == 0x16) //read mode, just in case
+		{
+			if (!m_comms_ind && (m_comms_cmd == 0xff))
+			{
+				m_comms_cmd = m_comms_data[1];
 
-                switch (m_comms_cmd)
-                {
-                    case 0:
-                    {
-                        m_comms_expect = 4;
-                        break;
-                    }
+				switch (m_comms_cmd)
+				{
+					case 0:
+					{
+						m_comms_expect = 4;
+						break;
+					}
 
-                    case 1:
-                    {
-                        m_comms_expect = 12;
-                        m_comms_blocks = 2;
-                        break;
-                    }
+					case 1:
+					{
+						m_comms_expect = 12;
+						m_comms_blocks = 2;
+						break;
+					}
 
-                    case 2:
-                    {
-                        m_comms_expect = 408;
-                        m_comms_blocks = 4;
-                        break;
-                    }
+					case 2:
+					{
+						m_comms_expect = 408;
+						m_comms_blocks = 4;
+						break;
+					}
 
-                    case 3:
-                    {
-                        m_comms_expect = 7;
-                        m_comms_blocks = 3;
-                        break;
-                    }
+					case 3:
+					{
+						m_comms_expect = 7;
+						m_comms_blocks = 3;
+						break;
+					}
 
-                    case 4:
-                    {
-                        m_comms_expect = 2;
-                        m_comms_blocks = 2;
-                        break;
-                    }
+					case 4:
+					{
+						m_comms_expect = 2;
+						m_comms_blocks = 2;
+						break;
+					}
 
-                    case 5:
-                    {
-                        m_comms_expect = 13;
-                        m_comms_blocks = 4;
-                        break;
-                    }
+					case 5:
+					{
+						m_comms_expect = 13;
+						m_comms_blocks = 4;
+						break;
+					}
 
-                    case 6:
-                    {
-                        m_comms_expect = 1003;
-                        break;
-                    }
+					case 6:
+					{
+						m_comms_expect = 1003;
+						break;
+					}
 
-                    default: //unknown
-                    {
-                        m_comms_expect = 1;
-                    }
-                }
-            }
+					default: //unknown
+					{
+						m_comms_expect = 1;
+					}
+				}
+			}
 
-            if (m_comms_ind < sizeof(m_comms_data))
-            {
-                if (m_comms_expect && !--m_comms_expect)
-                {
-                    m_comms_ack = true;
+			if (m_comms_ind < sizeof(m_comms_data))
+			{
+				if (m_comms_expect && !--m_comms_expect)
+				{
+					m_comms_ack = true;
 
-                    if (m_comms_ind)
-                    {
-                        int i, sum;
+					if (m_comms_ind)
+					{
+						int i, sum;
 
-                        for (i = 1, sum = 0; i < m_comms_ind; sum += m_comms_data[i++]);
-                        m_comms_data[m_comms_ind] = (unsigned char) sum;
+						for (i = 1, sum = 0; i < m_comms_ind; sum += m_comms_data[i++]);
+						m_comms_data[m_comms_ind] = (unsigned char) sum;
 
-                        switch (m_comms_cmd)
-                        {
-                            case 1:
-                            {
-                                if (m_comms_blocks == 2)
-                                {
-                                    m_comms_expect = 5;
-                                }
-                                else
-                                {
-                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
-                                }
+						switch (m_comms_cmd)
+						{
+							case 1:
+							{
+								if (m_comms_blocks == 2)
+								{
+									m_comms_expect = 5;
+								}
+								else
+								{
+									m_comms_data[m_comms_ind] += 5; //compensate for ack
+								}
 
-                                break;
-                            }
+								break;
+							}
 
-                            case 2:
-                            {
-                                if (m_comms_blocks == 4)
-                                {
-                                    m_comms_expect = 5;
-                                }
-                                else
-                                {
-                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
-                                    m_comms_expect = 3;
-                                }
+							case 2:
+							{
+								if (m_comms_blocks == 4)
+								{
+									m_comms_expect = 5;
+								}
+								else
+								{
+									m_comms_data[m_comms_ind] += 5; //compensate for ack
+									m_comms_expect = 3;
+								}
 
-                                break;
-                            }
+								break;
+							}
 
-                            case 3:
-                            {
-                                if (m_comms_blocks == 3)
-                                {
-                                    m_comms_expect = 3;
-                                }
-                                else
-                                {
-                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
-                                    m_comms_expect = 5;
-                                }
+							case 3:
+							{
+								if (m_comms_blocks == 3)
+								{
+									m_comms_expect = 3;
+								}
+								else
+								{
+									m_comms_data[m_comms_ind] += 5; //compensate for ack
+									m_comms_expect = 5;
+								}
 
-                                break;
-                            }
+								break;
+							}
 
-                            case 5:
-                            {
-                                m_comms_expect = 3;
+							case 5:
+							{
+								m_comms_expect = 3;
 
-                                if (m_comms_blocks < 4)
-                                {
-                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+								if (m_comms_blocks < 4)
+								{
+									m_comms_data[m_comms_ind] += 5; //compensate for ack
 
-                                    if (m_comms_blocks == 2)
-                                    {
-                                        m_comms_expect = 2;
-                                    }
-                                }
+									if (m_comms_blocks == 2)
+									{
+										m_comms_expect = 2;
+									}
+								}
 
-                                break;
-                            }
+								break;
+							}
 
-                            default:
-                            {
-                            }
-                        }
-                    }
-                    else if (m_comms_cmd == 4)
-                    {
-                        if (!memcmp(m_comms_data, password, sizeof(password)))
-                        {
-                            m_comms_data[1] = 0x55;
-                            m_comms_data[2] = 0x55;
-                        }
+							default:
+							{
+							}
+						}
+					}
+					else if (m_comms_cmd == 4)
+					{
+						if (!memcmp(m_comms_data, password, sizeof(password)))
+						{
+							m_comms_data[1] = 0x55;
+							m_comms_data[2] = 0x55;
+						}
 
-                        m_comms_expect = 2;
-                        m_comms_ack = false;
-                    }
+						m_comms_expect = 2;
+						m_comms_ack = false;
+					}
 
-                    if (!m_comms_blocks || !--m_comms_blocks)
-                    {
-                        m_comms_cmd = 0xff;
-                    }
-                }
+					if (!m_comms_blocks || !--m_comms_blocks)
+					{
+						m_comms_cmd = 0xff;
+					}
+				}
 
-                retval = m_comms_data[m_comms_ind++];
-            }
-        }
-    }
-    else if (offset == 1) //port 681 == status
-    {
-        if (m_comms_state == 0x16) //read mode
-        {
-            retval = 2; //read ready
-        }
-        else if (m_comms_state == 0x31) //write mode
-        {
-            retval = 4; //write ready
-        }
-    }
+				retval = m_comms_data[m_comms_ind++];
+			}
+		}
+	}
+	else if (offset == 1) //port 681 == status
+	{
+		if (m_comms_state == 0x16) //read mode
+		{
+			retval = 2; //read ready
+		}
+		else if (m_comms_state == 0x31) //write mode
+		{
+			retval = 4; //write ready
+		}
+	}
 
-    return retval;
+	return retval;
 }
 
 WRITE16_MEMBER(gambl186_state::comms_w)
 {
-    if (offset == 0)
-    {
-        if ((m_comms_state == 0x31) && (m_comms_ind < 1000))
-        {
-            if (!m_comms_ack || (data == 0x15)) //validation failure
-            {
-                if (m_comms_cmd == 6) //1000 bytes transfer
-                {
-                    data = ~data;
-                }
-                else if (m_comms_ack)
-                {
-                    m_comms_cmd = 0xfe;
-                    m_comms_expect = 2;
-                    data = 5;
-                }
+	if (offset == 0)
+	{
+		if ((m_comms_state == 0x31) && (m_comms_ind < 1000))
+		{
+			if (!m_comms_ack || (data == 0x15)) //validation failure
+			{
+				if (m_comms_cmd == 6) //1000 bytes transfer
+				{
+					data = ~data;
+				}
+				else if (m_comms_ack)
+				{
+					m_comms_cmd = 0xfe;
+					m_comms_expect = 2;
+					data = 5;
+				}
 
-                m_comms_data[++m_comms_ind] = (UINT8) data;
-            }
+				m_comms_data[++m_comms_ind] = (UINT8) data;
+			}
 
-            m_comms_ack = false;
-        }
-    }
-    else if (offset == 1)
-    {
-        if (m_comms_state != data) //detect transition
-        {
-            m_comms_ind = 0;
+			m_comms_ack = false;
+		}
+	}
+	else if (offset == 1)
+	{
+		if (m_comms_state != data) //detect transition
+		{
+			m_comms_ind = 0;
 
-            if (data == 0x4e) //reset
-            {
-                m_comms_data[0] = 5; //operation complete
-                m_comms_cmd = 0xff; //none
-                m_comms_expect = 0;
-                m_comms_blocks = 0;
-                m_comms_ack = false;
-            }
-        }
+			if (data == 0x4e) //reset
+			{
+				m_comms_data[0] = 5; //operation complete
+				m_comms_cmd = 0xff; //none
+				m_comms_expect = 0;
+				m_comms_blocks = 0;
+				m_comms_ack = false;
+			}
+		}
 
-        m_comms_state = data;
-    }
+		m_comms_state = data;
+	}
 }
 
 WRITE16_MEMBER( gambl186_state::data_bank_w)
@@ -338,9 +338,9 @@ WRITE16_MEMBER( gambl186_state::data_bank_w)
 
    port 400h writes the sample index/input
    port 504h writes the commands...
-   
+
    504h xxxx ---- ---- ----
- 
+
    Sound event:
    504h: 2000
    504h: e000
@@ -352,16 +352,16 @@ WRITE16_MEMBER( gambl186_state::data_bank_w)
 WRITE16_MEMBER(gambl186_state::upd_w)
 {
 //// FIXME
-//	m_upd7759->reset_w(0);
-//	m_upd7759->reset_w(1);
+//  m_upd7759->reset_w(0);
+//  m_upd7759->reset_w(1);
 
-//	if (mem_mask&0x00ff) m_upd7759->port_w(space, 0, data & 0xff);
-//	if (mem_mask&0xff00) m_upd7759->port_w(space, 0, (data >> 8) & 0xff);
+//  if (mem_mask&0x00ff) m_upd7759->port_w(space, 0, data & 0xff);
+//  if (mem_mask&0xff00) m_upd7759->port_w(space, 0, (data >> 8) & 0xff);
 	data = (data >> 8);
-    popmessage("sample index: %02x", data);
+	popmessage("sample index: %02x", data);
 
-//	m_upd7759->start_w(0);
-//	m_upd7759->start_w(1);
+//  m_upd7759->start_w(0);
+//  m_upd7759->start_w(1);
 }
 
 
@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
 	AM_RANGE(0x0580, 0x0581) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0582, 0x0583) AM_READ_PORT("JOY")
 	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW0") AM_WRITENOP // Watchdog: bit 8
-//	AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
+//  AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
 	AM_RANGE(0x0680, 0x0683) AM_READWRITE(comms_r, comms_w)
 	AM_RANGE(0x0700, 0x0701) AM_WRITE(data_bank_w)
 ADDRESS_MAP_END
@@ -493,7 +493,7 @@ ROM_START( gambl186 )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
-	ROM_REGION( 0x20000, "upd", 0 )	// upd7759 sound samples
+	ROM_REGION( 0x20000, "upd", 0 ) // upd7759 sound samples
 	ROM_LOAD( "347.u302", 0x00000, 0x20000, CRC(7ce8f490) SHA1(2f856e31d189e9d46ba6b322133d99133e0b52ac) )
 ROM_END
 
@@ -506,7 +506,7 @@ ROM_START( gambl186a )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
-	ROM_REGION( 0x20000, "upd", 0 )	// upd7759 sound samples
+	ROM_REGION( 0x20000, "upd", 0 ) // upd7759 sound samples
 	ROM_LOAD( "347.u302", 0x00000, 0x20000, CRC(7ce8f490) SHA1(2f856e31d189e9d46ba6b322133d99133e0b52ac) )
 ROM_END
 

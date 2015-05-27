@@ -22,6 +22,7 @@
 # TARGET = mame
 # SUBTARGET = tiny
 # TOOLS = 1
+# TESTS = 1
 # OSD = sdl
 
 # USE_BGFX = 1
@@ -375,6 +376,10 @@ ifdef TOOLS
 PARAMS += --with-tools
 endif
 
+ifdef TESTS
+PARAMS += --with-tests
+endif
+
 ifdef SYMBOLS
 PARAMS += --SYMBOLS='$(SYMBOLS)'
 endif
@@ -571,6 +576,7 @@ SCRIPTS = scripts/genie.lua \
 	$(wildcard scripts/src/osd/$(OSD)*.lua) \
 	scripts/src/sound.lua \
 	scripts/src/tools.lua \
+	scripts/src/tests.lua \
 	scripts/src/video.lua \
 	scripts/src/bus.lua \
 	scripts/src/netlist.lua \

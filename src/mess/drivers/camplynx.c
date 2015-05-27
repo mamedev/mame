@@ -393,7 +393,7 @@ WRITE8_MEMBER( camplynx_state::port84_w )
 		// Square wave output
 		m_cass->output(BIT(data, 5) ? -1.0 : +1.0);
 	}
-	else	// speaker output
+	else    // speaker output
 		m_dac->write_unsigned8(space, 0, data);
 }
 
@@ -432,7 +432,7 @@ WRITE8_MEMBER( camplynx_state::lynx128k_port84_w )
 		// Square wave output
 		m_cass->output(BIT(data, 5) ? -1.0 : +1.0);
 	}
-	else	// speaker output
+	else    // speaker output
 		m_dac->write_unsigned8(space, 0, data);
 }
 

@@ -28,7 +28,7 @@
 #include "nl_parser.h"
 #include "devices/net_lib.h"
 
-#define osd_ticks_t clock_t 
+#define osd_ticks_t clock_t
 
 inline osd_ticks_t osd_ticks_per_second() { return CLOCKS_PER_SEC; }
 
@@ -102,17 +102,17 @@ class tool_options_t : public poptions
 public:
 	tool_options_t() :
 		poptions(),
-		opt_ttr ("t", "time_to_run", 1.0, 	"time to run the emulation (seconds)", this),
+		opt_ttr ("t", "time_to_run", 1.0,   "time to run the emulation (seconds)", this),
 		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
 		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
-		opt_cmd ("c", "cmd",		 "run",   "run|convert|listdevices", this),
+		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
 		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
 		opt_help("h", "help",                 "display help", this)
 	{}
 
 	poption_double opt_ttr;
 	poption_str    opt_logs;
-	poption_str	   opt_file;
+	poption_str    opt_file;
 	poption_str    opt_cmd;
 	poption_bool   opt_verb;
 	poption_bool   opt_help;
@@ -639,21 +639,21 @@ private:
 };
 
 convert_t::sp_unit convert_t::m_sp_units[] = {
-		{"T",   "",      1.0e12	},
-		{"G",   "", 	 1.0e9	},
-		{"MEG", "RES_M(%g)", 1.0e6	},
-		{"K",   "RES_K(%g)", 1.0e3	},
-		{"",    "%g",        1.0e0 	},
-		{"M",   "CAP_M(%g)", 1.0e-3	},
-		{"U",   "CAP_U(%g)", 1.0e-6	},
-		{"µ",   "CAP_U(%g)", 1.0e-6	},
-		{"N",   "CAP_N(%g)", 1.0e-9	},
+		{"T",   "",      1.0e12 },
+		{"G",   "",      1.0e9  },
+		{"MEG", "RES_M(%g)", 1.0e6  },
+		{"K",   "RES_K(%g)", 1.0e3  },
+		{"",    "%g",        1.0e0  },
+		{"M",   "CAP_M(%g)", 1.0e-3 },
+		{"U",   "CAP_U(%g)", 1.0e-6 },
+		{"??",   "CAP_U(%g)", 1.0e-6    },
+		{"N",   "CAP_N(%g)", 1.0e-9 },
 		{"P",   "CAP_P(%g)", 1.0e-12},
-		{"F", 	"%ge-15",    1.0e-15},
+		{"F",   "%ge-15",    1.0e-15},
 
 		{"MIL", "%e",  25.4e-6},
 
-		{"-", 	"%g",  1.0	}
+		{"-",   "%g",  1.0  }
 };
 
 
@@ -665,7 +665,6 @@ convert_t::sp_unit convert_t::m_sp_units[] = {
 
 int main(int argc, char *argv[])
 {
-
 	track_memory(true);
 	{
 	tool_options_t opts;

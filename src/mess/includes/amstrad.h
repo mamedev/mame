@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Kevin Thacker, Barry Rodewald 
+// copyright-holders:Kevin Thacker, Barry Rodewald
 /*****************************************************************************
  *
  * includes/amstrad.h

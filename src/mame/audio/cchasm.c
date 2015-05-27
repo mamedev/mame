@@ -124,7 +124,7 @@ void cchasm_state::sound_start()
 	m_sound_flags = 0;
 	m_output[0] = 0;
 	m_output[1] = 0;
-	
+
 	save_item(NAME(m_sound_flags));
 	save_item(NAME(m_coin_flag));
 	save_item(NAME(m_channel_active));

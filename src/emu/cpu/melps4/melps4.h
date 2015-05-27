@@ -96,7 +96,7 @@ protected:
 	UINT8 m_bm_page;        // short BM default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
 	UINT8 m_int_page;       // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
 	UINT8 m_xami_mask;      // mask option for XAMI opcode on '40,'41,'45 (0xf for others)
-	
+
 	// internal state, misc regs
 	UINT16 m_pc;            // program counter (11 or 10-bit)
 	UINT16 m_prev_pc;
@@ -104,7 +104,7 @@ protected:
 	UINT16 m_op;
 	UINT16 m_prev_op;
 	UINT8 m_bitmask;        // opcode bit argument
-	
+
 	UINT8 m_cps;            // DP,CY or DP',CY' selected
 	bool m_skip;            // skip next opcode
 	UINT8 m_inte;           // interrupt enable flag
@@ -118,13 +118,13 @@ protected:
 	UINT8 m_x, m_x2;        // RAM index X, X', 2-bit
 	UINT8 m_z, m_z2;        // RAM index Z, Z', 1-bit, optional
 	UINT8 m_cy, m_cy2;      // carry flag(s)
-	
+
 	UINT8 m_h;              // A/D converter H or generic
 	UINT8 m_l;              // A/D converter L or generic
 	UINT8 m_c;              // A/D converter counter
 	UINT8 m_v;              // timer control V
 	UINT8 m_w;              // timer control W
-	
+
 	// misc internal helpers
 	UINT8 ram_r();
 	void ram_w(UINT8 data);

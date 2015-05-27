@@ -158,15 +158,15 @@ class n64_texture_pipe_t
 		UINT32              fetch_i8_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 		UINT32              fetch_i8_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 
-		texel_fetcher_t		m_texel_fetch[16*5];
+		texel_fetcher_t     m_texel_fetch[16*5];
 
 		n64_rdp*            m_rdp;
 
 		INT32               m_maskbits_table[16];
 		UINT32              m_expand_16to32_table[0x10000];
-		UINT16				m_lod_lookup[0x80000];
-		INT32 				m_clamp_s_diff[8];
-		INT32 				m_clamp_t_diff[8];
+		UINT16              m_lod_lookup[0x80000];
+		INT32               m_clamp_s_diff[8];
+		INT32               m_clamp_t_diff[8];
 };
 
 #endif // _VIDEO_RDPTEXPIPE_H_

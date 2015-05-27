@@ -62,7 +62,14 @@
 			cfgsuffix       = "ARM",
 			iscrosscompiler = true,
 			namestyle       = "windows"
-		}
+		},
+		Orbis = 
+		{ 
+			cfgsuffix       = "orbis",
+			iscrosscompiler = true,
+			nosharedlibs    = true,  -- @thendrix, Fix this to allow SPRXs
+			namestyle       = "Orbis",
+		},
 	}
 
 

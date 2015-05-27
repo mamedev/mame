@@ -83,7 +83,7 @@ static MACHINE_CONFIG_FRAGMENT( cgenie_fdc )
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", cgenie_floppies, NULL,   cgenie_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", cgenie_floppies, NULL,   cgenie_fdc_device::floppy_formats)
 
-//	MCFG_SOFTWARE_LIST_ADD("floppy_list", "cgenie_flop")
+//  MCFG_SOFTWARE_LIST_ADD("floppy_list", "cgenie_flop")
 
 	MCFG_GENERIC_SOCKET_ADD("socket", generic_plain_slot, "cgenie_socket")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

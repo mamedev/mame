@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	int m_flipscreen;
 	UINT8 *m_soundregs;  // if 0-ed
 	UINT8 m_main_irq_mask;
