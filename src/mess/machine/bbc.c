@@ -17,7 +17,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
 #include "machine/6522via.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "includes/bbc.h"
 #include "machine/mc146818.h"
@@ -1576,7 +1576,7 @@ void bbc_state::bbc_update_fdq_int(int state)
 		/* do not trigger int */
 		bbc_state = 0;
 	}
-
+//printf("bbc_state %d prev %d\n", bbc_state, m_previous_wd177x_int_state);
 	/* nmi is edge triggered, and triggers when the state goes from clear->set.
 	Here we are checking this transition before triggering the nmi */
 	if (bbc_state!=m_previous_wd177x_int_state)
@@ -1594,6 +1594,7 @@ void bbc_state::bbc_update_fdq_int(int state)
 
 WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_intrq_w)
 {
+//printf("bbc_wd177x_intrq_w %d \n", state);
 	m_wd177x_irq_state = state;
 	bbc_update_fdq_int(state);
 }
@@ -1606,20 +1607,28 @@ WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_drq_w)
 
 WRITE8_MEMBER(bbc_state::bbc_wd177x_status_w)
 {
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
+	floppy_image_device *floppy0 = machine().device<floppy_connector>("wd177x:0")->get_device();
+	floppy_image_device *floppy1 = machine().device<floppy_connector>("wd177x:1")->get_device();
+	floppy_image_device *floppy = NULL;
+
 	m_drive_control = data;
 
-	/* set drive */
-	if ((data>>0) & 0x01) fdc->set_drive(0);
-	if ((data>>1) & 0x01) fdc->set_drive(1);
+	// bit 0, 1: drive select
+	if (BIT(data, 0)) floppy = floppy0;
+	if (BIT(data, 1)) floppy = floppy1;
 
-	/* set side */
-	fdc->set_side((data>>2) & 0x01);
+	fdc->set_floppy(floppy);
 
-	/* set density */
+	// bit 2: side select
+	if (floppy)
+		floppy->ss_w(BIT(data, 2));
+
+	// bit 3: density
 	fdc->dden_w(BIT(data, 3));
 
-	m_1770_IntEnabled=(((data>>4) & 0x01)==0);
+	// bit 4: interrupt enable
+	m_1770_IntEnabled = !BIT(data, 4);
 }
 
 
@@ -1627,7 +1636,7 @@ WRITE8_MEMBER(bbc_state::bbc_wd177x_status_w)
 READ8_MEMBER(bbc_state::bbc_wd1770_read)
 {
 	int retval=0xff;
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
 	switch (offset)
 	{
 	case 4:
@@ -1645,22 +1654,22 @@ READ8_MEMBER(bbc_state::bbc_wd1770_read)
 	default:
 		break;
 	}
-	logerror("wd177x read: $%02X  $%02X\n", offset,retval);
+	//logerror("wd177x read: $%02X  $%02X\n", offset,retval);
 
 	return retval;
 }
 
 WRITE8_MEMBER(bbc_state::bbc_wd1770_write)
 {
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
-	logerror("wd177x write: $%02X  $%02X\n", offset,data);
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
+	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
 	case 0:
 		bbc_wd177x_status_w(space, 0, data);
 		break;
 	case 4:
-		fdc->command_w(space, 0, data);
+		fdc->cmd_w(space, 0, data);
 		break;
 	case 5:
 		fdc->track_w(space, 0, data);
@@ -1715,26 +1724,34 @@ AM_RANGE(0xfc00, 0xfdff) AM_READWRITE(bbc_opus_read     , bbc_opus_write    )
 
 WRITE8_MEMBER(bbc_state::bbc_opus_status_w)
 {
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
+	floppy_image_device *floppy0 = machine().device<floppy_connector>("wd177x:0")->get_device();
+	floppy_image_device *floppy1 = machine().device<floppy_connector>("wd177x:1")->get_device();
+	floppy_image_device *floppy = NULL;
+
 	m_drive_control = data;
 
-	/* set drive */
-	if ((data>>1) & 0x01) fdc->set_drive(0);
-	if ((data>>2) & 0x01) fdc->set_drive(1);
+	// bit 1, 2: drive select
+	if (BIT(data, 1)) floppy = floppy0;
+	if (BIT(data, 2)) floppy = floppy1;
 
-	/* set side */
-	fdc->set_side((data>>0) & 0x01);
+	fdc->set_floppy(floppy);
 
-	/* set density */
+	// bit 0: side select
+	if (floppy)
+		floppy->ss_w(BIT(data, 0));
+
+	// bit 5: density
 	fdc->dden_w(BIT(data, 5));
 
-	m_1770_IntEnabled=(data>>4) & 0x01;
+	// bit 4: interrupt enable
+	m_1770_IntEnabled = BIT(data, 4);
 }
 
 READ8_MEMBER(bbc_state::bbc_opus_read)
 {
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
-	logerror("wd177x read: $%02X\n", offset);
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
+	//logerror("wd177x read: $%02X\n", offset);
 
 	if (m_DFSType==6)
 	{
@@ -1762,8 +1779,8 @@ READ8_MEMBER(bbc_state::bbc_opus_read)
 
 WRITE8_MEMBER(bbc_state::bbc_opus_write)
 {
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
-	logerror("wd177x write: $%02X  $%02X\n", offset,data);
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
+	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
 
 	if (m_DFSType==6)
 	{
@@ -1772,7 +1789,7 @@ WRITE8_MEMBER(bbc_state::bbc_opus_write)
 			switch (offset)
 			{
 				case 0xf8:
-					fdc->command_w(space, 0, data);
+					fdc->cmd_w(space, 0, data);
 					break;
 				case 0xf9:
 					fdc->track_w(space, 0, data);
@@ -1810,7 +1827,7 @@ BBC MASTER DISC SUPPORT
 READ8_MEMBER(bbc_state::bbcm_wd1770_read)
 {
 	int retval=0xff;
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
 	switch (offset)
 	{
 	case 0:
@@ -1834,12 +1851,12 @@ READ8_MEMBER(bbc_state::bbcm_wd1770_read)
 
 WRITE8_MEMBER(bbc_state::bbcm_wd1770_write)
 {
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
 	//logerror("wd177x write: $%02X  $%02X\n", offset,data);
 	switch (offset)
 	{
 	case 0:
-		fdc->command_w(space, 0, data);
+		fdc->cmd_w(space, 0, data);
 		break;
 	case 1:
 		fdc->track_w(space, 0, data);
@@ -1863,22 +1880,26 @@ READ8_MEMBER(bbc_state::bbcm_wd1770l_read)
 
 WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 {
-	wd1770_device *fdc = machine().device<wd1770_device>("wd177x");
+	wd1770_t *fdc = machine().device<wd1770_t>("wd177x");
+	floppy_image_device *floppy0 = machine().device<floppy_connector>("wd177x:0")->get_device();
+	floppy_image_device *floppy1 = machine().device<floppy_connector>("wd177x:1")->get_device();
+	floppy_image_device *floppy = NULL;
+
 	m_drive_control = data;
 
-	/* set drive */
-	if ((data>>0) & 0x01) fdc->set_drive(0);
-	if ((data>>1) & 0x01) fdc->set_drive(1);
+	// bit 0, 1: drive select
+	if (BIT(data, 0)) floppy = floppy0;
+	if (BIT(data, 1)) floppy = floppy1;
 
-	/* set side */
-	fdc->set_side((data>>4) & 0x01);
+	// bit 4: side select
+	if (floppy)
+		floppy->ss_w(BIT(data, 4));
 
-	/* set density */
+	// bit 5: density
 	fdc->dden_w(BIT(data, 5));
 
 //  m_1770_IntEnabled=(((data>>4) & 0x01)==0);
 	m_1770_IntEnabled=1;
-
 }
 
 
