@@ -1130,7 +1130,11 @@ void wd_fdc_t::sector_w(UINT8 val)
 	//  return;
 
 	sector_buffer = val;
-	delay_cycles(t_sector, dden ? delay_register_commit*2 : delay_register_commit);
+
+	// set a timer to write the new value to the register, but only if we aren't in
+	// the middle of an already occurring update
+	if (!t_sector->enabled())
+		delay_cycles(t_sector, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
 UINT8 wd_fdc_t::sector_r()
