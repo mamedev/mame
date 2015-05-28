@@ -521,6 +521,13 @@
 				prefix = "lib"
 				ext = ".a"
 			end
+		elseif namestyle == "Orbis" then
+			if kind == "ConsoleApp" or kind == "WindowedApp" then
+				ext = ".elf"
+			elseif kind == "StaticLib" then
+				prefix = "lib"
+				ext = ".a"
+			end
 		end
 
 		prefix = cfg[field.."prefix"] or cfg.targetprefix or prefix

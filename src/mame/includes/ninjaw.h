@@ -19,7 +19,6 @@ public:
 	ninjaw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_tc0100scn_1(*this, "tc0100scn_1"),
@@ -39,7 +38,6 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<tc0140syt_device> m_tc0140syt;
 	required_device<tc0100scn_device> m_tc0100scn_1;

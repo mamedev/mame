@@ -7,18 +7,13 @@
 
 #if SHADERC_CONFIG_HLSL
 
+#define INITGUID
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
 
 #ifndef D3D_SVF_USED
 #	define D3D_SVF_USED 2
 #endif // D3D_SVF_USED
-
-#ifndef IID_ID3D11ShaderReflection
-// In case MinGW is missing IID...
-static const GUID GUID_ID3D11ShaderReflection = { 0x0a233719, 0x3960, 0x4578, { 0x9d, 0x7c, 0x20, 0x3b, 0x8b, 0x1d, 0x9c, 0xc1 } };
-#	define IID_ID3D11ShaderReflection GUID_ID3D11ShaderReflection
-#endif // IID_ID3D11ShaderReflection
 
 struct CTHeader
 {
@@ -525,7 +520,7 @@ bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _d3d, const std::stri
 			while (!reader.isEof() )
 			{
 				std::string line = reader.getLine();
-				for (UniformNameList::const_iterator it = unusedUniforms.begin(), itEnd = unusedUniforms.end(); it != itEnd; ++it)
+				for (UniformNameList::iterator it = unusedUniforms.begin(), itEnd = unusedUniforms.end(); it != itEnd; ++it)
 				{
 					size_t index = line.find("uniform ");
 					if (index == std::string::npos)

@@ -41,7 +41,7 @@ NETLIST_END()
 #define ENTRY1(_nic, _name, _defparam) factory.register_device<_nic>( # _name, xstr(_nic), _defparam );
 #define ENTRY(_nic, _name, _defparam) ENTRY1(NETLIB_NAME(_nic), _name, _defparam)
 
-void nl_initialize_factory(netlist_factory_t &factory)
+void nl_initialize_factory(netlist_factory_list_t &factory)
 {
 	ENTRY(R,                    RES,                    "R")
 	ENTRY(POT,                  POT,                    "R")

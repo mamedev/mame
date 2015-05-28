@@ -60,6 +60,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-tests",
+	description = "Enable building tests.",
+}
+
+newoption {
 	trigger = "osd",
 	description = "Choose OSD layer implementation",
 }
@@ -859,7 +864,6 @@ end
 			if (version >= 40800) then
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				buildoptions {
-					"-Wno-unused-variable",
 					"-Wno-array-bounds"
 				}
 			end
@@ -1138,3 +1142,7 @@ if _OPTIONS["with-tools"] then
 	dofile(path.join("src", "tools.lua"))
 end
 
+if _OPTIONS["with-tests"] then
+	group "tests"
+	dofile(path.join("src", "tests.lua"))
+end

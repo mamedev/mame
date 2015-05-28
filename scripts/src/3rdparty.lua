@@ -604,3 +604,192 @@ project "bgfx"
 		}
 	end
 end
+
+--------------------------------------------------
+-- PortAudio library objects
+--------------------------------------------------
+
+project "portaudio"
+	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
+	kind "StaticLib"
+
+	configuration { "gmake" }
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+			"-Wno-bad-function-cast",
+			"-Wno-undef",
+			"-Wno-missing-braces",
+			"-Wno-unused-but-set-variable",
+			"-Wno-maybe-uninitialized",
+			"-Wno-unused-variable",
+			"-Wno-unused-value",
+			"-Wno-unused-function",
+		}
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4204", -- warning C4204: nonstandard extension used : non-constant aggregate initializer
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
+		}
+		
+	configuration { }
+
+	includedirs {
+		MAME_DIR .. "3rdparty/portaudio/include",
+		MAME_DIR .. "3rdparty/portaudio/src/common",
+	}
+
+	files {
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_allocation.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_converters.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_cpuload.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_dither.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_debugprint.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_front.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_process.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_stream.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_trace.c",
+		MAME_DIR .. "3rdparty/portaudio/src/hostapi/skeleton/pa_hostapi_skeleton.c",
+	}
+
+	if _OPTIONS["targetos"]=="windows" then
+		defines {
+			"PA_USE_DS=1",
+			"PA_USE_WDMKS=1",
+			"PA_USE_WMME=1",
+			"PA_USE_WASAPI=1",
+		}	
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/win",
+		}
+		configuration { "mingw*" }		
+			includedirs {		
+				MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/mingw-include",
+			}
+		configuration { }			
+		files {	
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_waveformat.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_x86_plain_converters.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_wdmks_utils.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_coinitialize.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds_dynlink.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wdmks/pa_win_wdmks.c",
+			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wmme/pa_win_wmme.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/pa_win_wasapi.c",
+		}
+		
+	end
+	if _OPTIONS["targetos"]=="linux" then
+		defines {
+			"PA_USE_ALSA=1",
+			"PA_USE_OSS=1",
+			"HAVE_LINUX_SOUNDCARD_H",
+		}	
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix",
+		}
+		files {	
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/alsa/pa_linux_alsa.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/oss/pa_unix_oss.c",
+		}		
+	end
+	if _OPTIONS["targetos"]=="macosx" then
+		defines {
+			"PA_USE_COREAUDIO=1",
+		}	
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix",
+		}
+		files {	
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_blocking.c",
+			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
+		}		
+	end
+	
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
+		
+--------------------------------------------------
+-- UnitTest++ library objects
+--------------------------------------------------
+
+project "unittest-cpp"
+	uuid "717d39e5-b6ff-4507-a092-c27c05b60ab5"
+	kind "StaticLib"
+
+	files {		
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/AssertException.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/AssertException.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CheckMacros.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Checks.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Checks.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CompositeTestReporter.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CompositeTestReporter.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Config.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CurrentTest.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CurrentTest.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestReporter.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestReporter.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestResult.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestResult.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ExceptionMacros.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ExecuteTest.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/HelperMacros.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/MemoryOutStream.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/MemoryOutStream.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssert.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssert.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssertImpl.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Test.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Test.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestDetails.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestDetails.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestList.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestList.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestMacros.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporter.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporter.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporterStdout.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporterStdout.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestResults.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestResults.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestRunner.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestRunner.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestSuite.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeConstraint.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeConstraint.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeHelpers.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/UnitTest++.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/UnitTestPP.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/XmlTestReporter.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/XmlTestReporter.h",
+	}
+
+	if _OPTIONS["targetos"]~="windows" then
+		files {
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/SignalTranslator.cpp",
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/SignalTranslator.h",
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/TimeHelpers.cpp",
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/TimeHelpers.h",
+		}
+	end
+
+	if _OPTIONS["targetos"]=="windows" then
+		files {
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.cpp",
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.h",
+		}
+	end

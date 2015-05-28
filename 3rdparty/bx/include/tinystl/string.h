@@ -27,6 +27,7 @@
 #ifndef TINYSTL_STRING_H
 #define TINYSTL_STRING_H
 
+#include <string.h> // strlen
 #include "stddef.h"
 #include "hash.h"
 

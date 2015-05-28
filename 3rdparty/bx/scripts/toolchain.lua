@@ -46,6 +46,8 @@ function toolchain(_buildDir, _libDir)
 			{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
 			{ "winphone8",     "Windows Phone 8.0" },
 			{ "winphone81",    "Windows Phone 8.1" },
+			{ "winstore81",    "Windows Store 8.1" },
+			{ "winstore82",    "Universal Windows App" }
 		},
 	}
 
@@ -281,8 +283,21 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "winphone81" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "v120_wp81"
+			premake.vstudio.storeapp = "8.1"
 			platforms { "ARM" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-winphone81"))
+
+		elseif "winstore81" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v120"
+			premake.vstudio.storeapp = "8.1"
+			platforms { "ARM" }
+			location (path.join(_buildDir, "projects", _ACTION .. "-winstore81"))
+
+		elseif "winstore82" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v140"
+			premake.vstudio.storeapp = "8.2"
+			platforms { "ARM" }
+			location (path.join(_buildDir, "projects", _ACTION .. "-winstore82"))
 
 		elseif ("vs2012-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v110_xp")
@@ -334,7 +349,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		targetsuffix "Release"
 
-	configuration { "vs*", "x86" }
+	configuration { "vs*", "x32" }
 		flags {
 			"EnableSSE2",
 		}
@@ -397,7 +412,7 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/bin"))
 		objdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/obj"))
 
-	configuration { "winphone8*" }
+	configuration { "winphone8* or winstore8*" }
 		removeflags {
 			"StaticRuntime",
 			"NoExceptions",

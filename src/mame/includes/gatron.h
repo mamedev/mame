@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
 class gatron_state : public driver_device
 {

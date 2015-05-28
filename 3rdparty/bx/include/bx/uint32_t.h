@@ -85,6 +85,11 @@ namespace bx
 		return _a & _b;
 	}
 
+	inline uint32_t uint32_andc(uint32_t _a, uint32_t _b)
+	{
+		return _a & ~_b;
+	}
+
 	inline uint32_t uint32_xor(uint32_t _a, uint32_t _b)
 	{
 		return _a ^ _b;
@@ -95,14 +100,14 @@ namespace bx
 		return !_a != !_b;
 	}
 
-	inline uint32_t uint32_andc(uint32_t _a, uint32_t _b)
-	{
-		return _a & ~_b;
-	}
-
 	inline uint32_t uint32_or(uint32_t _a, uint32_t _b)
 	{
 		return _a | _b;
+	}
+
+	inline uint32_t uint32_orc(uint32_t _a, uint32_t _b)
+	{
+		return _a | ~_b;
 	}
 
 	inline uint32_t uint32_sll(uint32_t _a, int _sa)
@@ -267,6 +272,14 @@ namespace bx
 	{
 		const uint32_t tmp    = uint32_max(_a, _min);
 		const uint32_t result = uint32_min(tmp, _max);
+
+		return result;
+	}
+
+	inline uint32_t uint32_iclamp(uint32_t _a, uint32_t _min, uint32_t _max)
+	{
+		const uint32_t tmp    = uint32_imax(_a, _min);
+		const uint32_t result = uint32_imin(tmp, _max);
 
 		return result;
 	}

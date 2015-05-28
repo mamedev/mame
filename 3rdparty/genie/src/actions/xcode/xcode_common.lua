@@ -786,6 +786,19 @@
 			StaticLib = '/usr/local/lib',
 		}
 		_p(4,'INSTALL_PATH = %s;', installpaths[cfg.kind])
+		
+		local infoplist_file = nil
+		
+		for _, v in ipairs(cfg.files) do
+			-- for any file named *info.plist, use it as the INFOPLIST_FILE
+			if (string.find (string.lower (v), 'info.plist') ~= nil) then
+				infoplist_file = string.format('$(SRCROOT)/%s', v)
+			end
+		end
+		
+		if infoplist_file ~= nil then
+			_p(4,'INFOPLIST_FILE = "%s";', infoplist_file)
+		end
 
 		_p(4,'PRODUCT_NAME = "%s";', cfg.buildtarget.basename)
 		_p(3,'};')

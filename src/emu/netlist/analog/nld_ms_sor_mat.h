@@ -15,7 +15,7 @@
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
@@ -57,7 +57,7 @@ private:
 // netlist_matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 {
 	if (this->m_stat_calculations != 0 && m_log_stats)
@@ -77,7 +77,7 @@ void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 {
 	/*
@@ -85,13 +85,13 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 	 */
 
 	if (USE_LINEAR_PREDICTION)
-		for (int k = 0; k < this->N(); k++)
+		for (unsigned k = 0; k < this->N(); k++)
 		{
 			this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
 			this->m_nets[k]->m_cur_Analog = this->m_nets[k]->m_cur_Analog + this->m_Vdelta[k] * this->current_timestep() * m_lp_fact;
 		}
 	else
-		for (int k = 0; k < this->N(); k++)
+		for (unsigned k = 0; k < this->N(); k++)
 		{
 			this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
 		}
@@ -103,7 +103,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 		nl_double sq = 0;
 		nl_double sqo = 0;
 		const nl_double rez_cts = 1.0 / this->current_timestep();
-		for (int k = 0; k < this->N(); k++)
+		for (unsigned k = 0; k < this->N(); k++)
 		{
 			const netlist_analog_net_t *n = this->m_nets[k];
 			const nl_double nv = (n->m_cur_Analog - this->m_last_V[k]) * rez_cts ;
@@ -123,7 +123,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 	return this->compute_next_timestep();
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	/* The matrix based code looks a lot nicer but actually is 30% slower than

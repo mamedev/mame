@@ -123,6 +123,20 @@ function vs10_flags.noRTTI_runtimeTypeInfo_setToFalse()
 	test.string_contains(buffer,'<RuntimeTypeInfo>false</RuntimeTypeInfo>')
 end
 
+function vs10_flags.callingconvention_fastcall()
+	flags  {"FastCall"}
+
+	local buffer = get_buffer()
+	test.string_contains(buffer,'<CallingConvention>FastCall</CallingConvention>')
+end
+
+function vs10_flags.callingconvention_stdcall()
+	flags  {"StdCall"}
+
+	local buffer = get_buffer()
+	test.string_contains(buffer,'<CallingConvention>StdCall</CallingConvention>')
+end
+
 function vs10_flags.optimizeSize_optimization_setToMinSpace()
 	flags  {"OptimizeSize"}
 
@@ -169,20 +183,6 @@ function vs10_flags.releaseAndStaticRuntime_runtimeLibrary_setToMultiThreaded()
 	local buffer = get_buffer()
 	test.string_contains(buffer,'<RuntimeLibrary>MultiThreaded</RuntimeLibrary>')
 end
-
-function vs10_flags.noCharacterSetDefine_characterSet_setToMultiByte()
-	local buffer = get_buffer()
-	test.string_contains(buffer,'<CharacterSet>MultiByte</CharacterSet>')
-end
-
-function vs10_flags.unicode_characterSet_setToUnicode()
-	flags {"Unicode"}
-
-	local buffer = get_buffer()
-	test.string_contains(buffer,'<CharacterSet>Unicode</CharacterSet>')
-end
-
-
 
 function vs10_flags.debugAndMinimalRebuildAndSymbols_minimalRebuild_setToFalse()
 	flags {debug_string,"EnableMinimalRebuild"}

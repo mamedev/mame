@@ -448,7 +448,7 @@ links {
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "src/emu",
+	MAME_DIR .. "src/emu/netlist",
 }
 
 files {

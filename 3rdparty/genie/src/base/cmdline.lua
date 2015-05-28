@@ -71,6 +71,7 @@
 			{ "universal32", "Mac OS X Universal, 32-bit only" },
 			{ "universal64", "Mac OS X Universal, 64-bit only" },
 			{ "ps3",         "Playstation 3 (experimental)" },
+			{ "orbis",       "Playstation 4" },
 			{ "xbox360",     "Xbox 360 (experimental)" },
 			{ "ARM",         "ARM (Microsoft)" },
 		}
