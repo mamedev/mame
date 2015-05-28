@@ -1097,6 +1097,21 @@ configuration { "x64", "vs*" }
 			MAME_DIR .. "3rdparty/dxsdk/lib/x64",
 		}
 
+configuration { "winphone8* or winstore8*" }
+	removelinks {
+		"DelayImp",
+		"gdi32",
+		"psapi"
+	}
+	links {
+		"d3d11",
+		"dxgi"
+	}
+	linkoptions {
+		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
+	}
+
+
 configuration { }
 
 

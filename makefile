@@ -737,6 +737,9 @@ vs2013_xp: generate
 vs2013_clang: generate
 	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-clang vs2013
 
+vs2013_winrt: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=winstore81 vs2013
+
 vs2015: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2015
 
