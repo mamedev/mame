@@ -632,6 +632,7 @@ project "portaudio"
 	if string.find(_OPTIONS["gcc"], "clang") then
 		buildoptions_c {
 			"-Wno-unknown-warning-option",
+			"-Wno-absolute-value",
 		}
 	end
 
