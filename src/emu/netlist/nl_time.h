@@ -70,6 +70,7 @@ protected:
 
 	ATTR_HOT inline netlist_time(const INTERNALTYPE val) : m_time(val) {}
 
+private:
 	INTERNALTYPE m_time;
 };
 

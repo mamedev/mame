@@ -361,6 +361,8 @@ public:
 
 		// Add gnd net
 
+		// FIXME: Parameter
+		out("NETLIST_START(dummy)\n");
 		nets.add(palloc(sp_net_t, "0"), false);
 		nets[0]->terminals().add("GND");
 
@@ -380,6 +382,9 @@ public:
 		}
 		process_line(line);
 		dump_nl();
+		// FIXME: Parameter
+		out("NETLIST_END()\n");
+		printf("%s", m_buf.cstr());
 	}
 
 protected:
@@ -494,7 +499,7 @@ protected:
 		{
 			sp_net_t *net = nets.find(alias[i]);
 			// use the first terminal ...
-			printf("ALIAS(%s, %s)\n", alias[i].cstr(), net->terminals()[0].cstr());
+			out("ALIAS(%s, %s)\n", alias[i].cstr(), net->terminals()[0].cstr());
 			// if the aliased net only has this one terminal connected ==> don't dump
 			if (net->terminals().size() == 1)
 				net->set_no_export();
@@ -502,13 +507,13 @@ protected:
 		for (int i=0; i<devs.size(); i++)
 		{
 			if (devs[i]->has_value())
-				printf("%s(%s, %s)\n", devs[i]->type().cstr(),
+				out("%s(%s, %s)\n", devs[i]->type().cstr(),
 						devs[i]->name().cstr(), get_nl_val(devs[i]->value()).cstr());
 			else if (devs[i]->has_model())
-				printf("%s(%s, \"%s\")\n", devs[i]->type().cstr(),
+				out("%s(%s, \"%s\")\n", devs[i]->type().cstr(),
 						devs[i]->name().cstr(), devs[i]->model().cstr());
 			else
-				printf("%s(%s)\n", devs[i]->type().cstr(),
+				out("%s(%s)\n", devs[i]->type().cstr(),
 						devs[i]->name().cstr());
 		}
 		// print nets
@@ -518,12 +523,12 @@ protected:
 			if (!net->is_no_export())
 			{
 				//printf("Net %s\n", net->name().cstr());
-				printf("NET_C(%s", net->terminals()[0].cstr() );
+				out("NET_C(%s", net->terminals()[0].cstr() );
 				for (int j=1; j<net->terminals().size(); j++)
 				{
-					printf(", %s", net->terminals()[j].cstr() );
+					out(", %s", net->terminals()[j].cstr() );
 				}
-				printf(")\n");
+				out(")\n");
 			}
 		}
 		devs.clear_and_free();
@@ -540,25 +545,25 @@ protected:
 			switch (tt[0].cstr()[0])
 			{
 				case ';':
-					printf("// %s\n", line.substr(1).cstr());
+					out("// %s\n", line.substr(1).cstr());
 					break;
 				case '*':
-					printf("// %s\n", line.substr(1).cstr());
+					out("// %s\n", line.substr(1).cstr());
 					break;
 				case '.':
 					if (tt[0].equals(".SUBCKT"))
 					{
-						printf("NETLIST_START(%s)\n", tt[1].cstr());
+						out("NETLIST_START(%s)\n", tt[1].cstr());
 						for (int i=2; i<tt.size(); i++)
 							alias.add(tt[i]);
 					}
 					else if (tt[0].equals(".ENDS"))
 					{
 						dump_nl();
-						printf("NETLIST_END()\n");
+						out("NETLIST_END()\n");
 					}
 					else
-						printf("// %s\n", line.cstr());
+						out("// %s\n", line.cstr());
 					break;
 				case 'Q':
 				{
@@ -607,23 +612,35 @@ protected:
 					add_term(tt[1], tt[0] + ".A");
 					add_term(tt[2], tt[0] + ".K");
 					break;
+				case 'U':
 				case 'X':
 				{
 					// FIXME: specific code for KICAD exports
 					//        last element is component type
+					// FIXME: Parameter
+
+					pstring xname = tt[0].replace(".", "_");
 					pstring tname = "TTL_" + tt[tt.size()-1] + "_DIP";
-					devs.add(palloc(sp_dev_t, tname, tt[0]), false);
+					devs.add(palloc(sp_dev_t, tname, xname), false);
 					for (int i=1; i < tt.size() - 1; i++)
 					{
-						pstring term = pstring::sprintf("%s.%d", tt[0].cstr(), i);
+						pstring term = pstring::sprintf("%s.%d", xname.cstr(), i);
 						add_term(tt[i], term);
 					}
 					break;
 				}
 				default:
-					printf("// IGNORED %s: %s\n", tt[0].cstr(), line.cstr());
+					pstring::sprintf("// IGNORED %s: %s\n", tt[0].cstr(), line.cstr());
 			}
 		}
+	}
+
+	void out(const char *format, ...) ATTR_PRINTF(2,3)
+	{
+		va_list ap;
+		va_start(ap, format);
+		m_buf += pstring(format).vprintf(ap);
+		va_end(ap);
 	}
 
 
@@ -632,7 +649,10 @@ private:
 	pnamedlist_t<sp_dev_t *> devs;
 	plist_t<pstring> alias;
 
+	pstringbuffer m_buf;
+
 	static sp_unit m_sp_units[];
+
 };
 
 convert_t::sp_unit convert_t::m_sp_units[] = {
