@@ -619,7 +619,6 @@ project "portaudio"
 			"-Wno-bad-function-cast",
 			"-Wno-undef",
 			"-Wno-missing-braces",
-			"-Wno-unused-but-set-variable",
 			"-Wno-maybe-uninitialized",
 			"-Wno-unused-variable",
 			"-Wno-unused-value",
@@ -627,6 +626,15 @@ project "portaudio"
 			"-Wno-unknown-pragmas",
 			"-Wno-sometimes-uninitialized",
 		}
+
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if string.find(_OPTIONS["gcc"], "clang") then
+		if (version >= 30500) then
+			buildoptions {
+				"-Wno-unknown-warning-option",
+			}
+		end
+	end
 
 	configuration { "vs*" }
 		buildoptions {
