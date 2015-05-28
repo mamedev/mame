@@ -1318,7 +1318,12 @@ void ns_mgr_free(struct ns_mgr *s) {
 #define STR(x) STRX(x)
 #define __func__ __FILE__ ":" STR(__LINE__)
 #endif
+// find proper defines for this for VS and other compilers
+#if defined(__USE_MINGW_ANSI_STDIO)
+#define INT64_FMT   "lld"
+#else
 #define INT64_FMT   "I64d"
+#endif
 #define flockfile(x)      ((void) (x))
 #define funlockfile(x)    ((void) (x))
 typedef struct _stati64 file_stat_t;
@@ -2477,7 +2482,7 @@ int mg_url_decode(const char *src, size_t src_len, char *dst,
 static int is_valid_http_method(const char *s) {
   return !strcmp(s, "GET") || !strcmp(s, "POST") || !strcmp(s, "HEAD") ||
     !strcmp(s, "CONNECT") || !strcmp(s, "PUT") || !strcmp(s, "DELETE") ||
-    !strcmp(s, "OPTIONS") || !strcmp(s, "PROPFIND") || !strcmp(s, "MKCOL") || 
+    !strcmp(s, "OPTIONS") || !strcmp(s, "PROPFIND") || !strcmp(s, "MKCOL") ||
     !strcmp(s, "PATCH");
 }
 
