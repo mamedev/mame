@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Brett Wyer, Raphael Nabet
 //
 //  corvus_hd

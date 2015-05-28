@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Bryan McPhail, David Graves
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"

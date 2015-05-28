@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:David Haywood, Sylvain Glaize, Paul Priest, Olivier Galibert
 /*
    Super Kaneko Nova System

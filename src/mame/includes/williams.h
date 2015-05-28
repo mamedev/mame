@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Michael Soderstrom, Marc LaFontaine, Aaron Giles
 /*************************************************************************
 

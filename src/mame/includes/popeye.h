@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Marc Lafontaine, Couriersud
 class popeye_state : public driver_device
 {

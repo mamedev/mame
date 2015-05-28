@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:???
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 /**********************************************************
 Strike Bowling  (c)1982 Taito

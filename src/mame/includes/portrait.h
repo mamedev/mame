@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
 #include "sound/tms5220.h"
 

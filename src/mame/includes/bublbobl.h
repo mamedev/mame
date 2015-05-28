@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Chris Moore, Nicola Salmoria
 
 class bublbobl_state : public driver_device
