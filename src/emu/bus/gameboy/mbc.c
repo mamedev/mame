@@ -369,7 +369,7 @@ WRITE8_MEMBER(gb_rom_mbc1_device::write_bank)
 			break;
 		case 0x6000:    // MBC1 Mode Register
 		default:
-			m_mode = (data & 0x1) ? MODE_4M_256k : MODE_16M_8k;
+			m_mode = (data & 0x1) ? MODE_4M_256k : MODE_16M_64k;
 			break;
 	}
 }
