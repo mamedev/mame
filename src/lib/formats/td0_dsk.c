@@ -16,6 +16,7 @@
 
 #include <string.h>
 #include <assert.h>
+#include "pool.h"
 #include "flopimg.h"
 
 #define BUFSZ           512     // new input buffer
@@ -95,13 +96,28 @@ struct td0dsk_t
 struct floppy_image_legacy
 {
 	struct io_generic io;
+
+	const struct FloppyFormat *floppy_option;
+	struct FloppyCallbacks format;
+
+	/* loaded track stuff */
+	int loaded_track_head;
+	int loaded_track_index;
+	UINT32 loaded_track_size;
+	void *loaded_track_data;
+	UINT8 loaded_track_status;
+	UINT8 flags;
+
+	/* tagging system */
+	object_pool *tags;
+	void *tag_data;
 };
 
 
 static struct td0dsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	struct td0dsk_tag *tag;
-	tag = (td0dsk_tag *)floppy_tag(floppy);
+	tag = (td0dsk_tag *)floppy_tag((floppy_image_legacy *)floppy);
 	return tag;
 }
 

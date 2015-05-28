@@ -40,7 +40,7 @@
 static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
-static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
+static const int DMASOUND_RATE[] = { (int)(Y2/640/8), (int)(Y2/640/4), (int)(Y2/640/2), (int)(Y2/640) };
 
 
 //**************************************************************************
@@ -1926,7 +1926,6 @@ void st_state::state_save()
 	save_item(NAME(m_acia_ikbd_irq));
 	save_item(NAME(m_acia_midi_irq));
 }
-
 
 //-------------------------------------------------
 //  MACHINE_START( st )
