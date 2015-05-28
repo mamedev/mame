@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino
 class xain_state : public driver_device
 {

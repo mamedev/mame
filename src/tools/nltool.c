@@ -11,22 +11,23 @@
 #include <cstdio>
 
 #ifdef PSTANDALONE
-#if (PSTANDALONE)
+	#if (PSTANDALONE)
 #define PSTANDALONE_PROVIDED
+	#endif
 #endif
-#endif
 
-#ifdef PSTANDALONE_PROVIDED
-
-#include <ctime>
-
-#include "poptions.h"
-#include "pstring.h"
-#include "plists.h"
+#include "plib/poptions.h"
+#include "plib/pstring.h"
+#include "plib/plists.h"
 #include "nl_setup.h"
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "devices/net_lib.h"
+
+
+#ifdef PSTANDALONE_PROVIDED
+
+#include <ctime>
 
 #define osd_ticks_t clock_t
 
@@ -35,14 +36,8 @@ inline osd_ticks_t osd_ticks_per_second() { return CLOCKS_PER_SEC; }
 osd_ticks_t osd_ticks(void) { return clock(); }
 #else
 
-#include "netlist/poptions.h"
-#include "netlist/pstring.h"
-#include "netlist/plists.h"
-#include "netlist/nl_setup.h"
-#include "netlist/nl_factory.h"
-#include "netlist/nl_parser.h"
-#include "netlist/devices/net_lib.h"
 #endif
+
 /***************************************************************************
  * MAME COMPATIBILITY ...
  *
@@ -102,7 +97,8 @@ class tool_options_t : public poptions
 public:
 	tool_options_t() :
 		poptions(),
-		opt_ttr ("t", "time_to_run", 1.0,   "time to run the emulation (seconds)", this),
+		opt_ttr ("t", "time_to_run", 1.0,     "time to run the emulation (seconds)", this),
+		opt_name("n", "name",        "",      "netlist in file to run; default is first one", this),
 		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
 		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
 		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
@@ -111,6 +107,7 @@ public:
 	{}
 
 	poption_double opt_ttr;
+	poption_str    opt_name;
 	poption_str    opt_logs;
 	poption_str    opt_file;
 	poption_str    opt_cmd;
@@ -188,14 +185,14 @@ public:
 		m_setup->init();
 	}
 
-	void read_netlist(const char *buffer)
+	void read_netlist(const char *buffer, pstring name)
 	{
 		// read the netlist ...
 
 		netlist_sources_t sources;
 
 		sources.add(netlist_source_t(buffer));
-		sources.parse(*m_setup,"");
+		sources.parse(*m_setup, name);
 		//m_setup->parse(buffer);
 		log_setup();
 
@@ -209,7 +206,7 @@ public:
 	void log_setup()
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
-		nl_util::pstring_list ll = nl_util::split(m_logs, ":");
+		pstring_list_t ll(m_logs, ":");
 		for (int i=0; i < ll.size(); i++)
 		{
 			pstring name = "log_" + ll[i];
@@ -271,7 +268,7 @@ static void run(tool_options_t &opts)
 	nt.init();
 	nt.m_logs = opts.opt_logs();
 	nt.m_verbose = opts.opt_verb();
-	nt.read_netlist(filetobuf(opts.opt_file()));
+	nt.read_netlist(filetobuf(opts.opt_file()), opts.opt_name());
 	double ttr = opts.opt_ttr();
 
 	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
@@ -293,7 +290,7 @@ static void listdevices()
 {
 	netlist_tool_t nt;
 	nt.init();
-	const netlist_factory_t::list_t &list = nt.setup().factory().list();
+	const netlist_factory_list_t::list_t &list = nt.setup().factory().list();
 
 	netlist_sources_t sources;
 
@@ -309,7 +306,7 @@ static void listdevices()
 				list[i]->name().cstr() );
 		pstring terms("");
 
-		net_device_t_base_factory *f = list[i];
+		netlist_base_factory_t *f = list[i];
 		netlist_device_t *d = f->Create();
 		d->init(nt, pstring::sprintf("dummy%d", i));
 		d->start_dev();
@@ -360,7 +357,7 @@ public:
 
 	void convert(const pstring &contents)
 	{
-		nl_util::pstring_list spnl = nl_util::split(contents, "\n");
+		pstring_list_t spnl(contents, "\n");
 
 		// Add gnd net
 
@@ -369,7 +366,7 @@ public:
 
 		pstring line = "";
 
-		for (int i=0; i < spnl.size(); i++)
+		for (std::size_t i=0; i < spnl.size(); i++)
 		{
 			// Basic preprocessing
 			pstring inl = spnl[i].trim().ucase();
@@ -393,14 +390,14 @@ protected:
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
-		nl_util::pstring_list &terminals() { return m_terminals; }
+		pstring_list_t &terminals() { return m_terminals; }
 		void set_no_export() { m_no_export = true; }
 		bool is_no_export() { return m_no_export; }
 
 	private:
 		pstring m_name;
 		bool m_no_export;
-		nl_util::pstring_list m_terminals;
+		pstring_list_t m_terminals;
 	};
 
 	struct sp_dev_t
@@ -538,7 +535,7 @@ protected:
 	{
 		if (line != "")
 		{
-			nl_util::pstring_list tt = nl_util::split(line, " ", true);
+			pstring_list_t tt(line, " ", true);
 			double val = 0.0;
 			switch (tt[0].cstr()[0])
 			{
@@ -646,7 +643,7 @@ convert_t::sp_unit convert_t::m_sp_units[] = {
 		{"",    "%g",        1.0e0  },
 		{"M",   "CAP_M(%g)", 1.0e-3 },
 		{"U",   "CAP_U(%g)", 1.0e-6 },
-		{"??",   "CAP_U(%g)", 1.0e-6    },
+		{"µ",   "CAP_U(%g)", 1.0e-6	},
 		{"N",   "CAP_N(%g)", 1.0e-9 },
 		{"P",   "CAP_P(%g)", 1.0e-12},
 		{"F",   "%ge-15",    1.0e-15},

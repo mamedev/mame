@@ -9,8 +9,8 @@
 #define PPARSER_H_
 
 #include "pconfig.h"
-#include "nl_config.h" // FIXME
-#include "nl_util.h"
+#include "../nl_config.h" // FIXME
+#include "../nl_util.h"
 
 class ptokenizer
 {
@@ -86,6 +86,8 @@ public:
 	token_t get_token();
 	pstring get_string();
 	pstring get_identifier();
+	double get_number_double();
+	long get_number_long();
 
 	void require_token(const token_id_t &token_num);
 	void require_token(const token_t tok, const token_id_t &token_num);
@@ -97,7 +99,7 @@ public:
 	}
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
-	void set_number_chars(pstring s) { m_number_chars = s; }
+	void set_number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; }
 	void set_whitespace(pstring s) { m_whitespace = s; }
 	void set_comment(pstring start, pstring end, pstring line)
 	{
@@ -129,6 +131,7 @@ private:
 
 	pstring m_identifier_chars;
 	pstring m_number_chars;
+	pstring m_number_chars_start;
 	plist_t<pstring> m_tokens;
 	pstring m_whitespace;
 	char  m_string;
@@ -161,7 +164,7 @@ public:
 
 protected:
 
-	double expr(const nl_util::pstring_list &sexpr, std::size_t &start, int prio);
+	double expr(const pstring_list_t &sexpr, std::size_t &start, int prio);
 
 	define_t *get_define(const pstring &name);
 
@@ -172,7 +175,7 @@ protected:
 private:
 
 	plist_t<define_t> m_defines;
-	nl_util::pstring_list m_expr_sep;
+	pstring_list_t m_expr_sep;
 };
 
 #endif /* PPARSER_H_ */

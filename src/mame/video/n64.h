@@ -372,6 +372,8 @@ struct rdp_span_aux
 	INT32               m_dzpix_enc;
 	UINT8*              m_tmem;                /* pointer to texture cache for this polygon */
 	bool                m_start_span;
+	INT32               m_clamp_s_diff[8];
+	INT32               m_clamp_t_diff[8];
 };
 
 struct rectangle_t

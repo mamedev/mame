@@ -158,8 +158,7 @@
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "nl_util.h"
-#include "pstring.h"
-#include "pstate.h"
+#include "plib/pstate.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -1197,7 +1196,7 @@ public:
 	plist_t<_C *> get_device_list()
 	{
 		plist_t<_C *> tmp;
-		for (int i = 0; i < m_devices.size(); i++)
+		for (std::size_t i = 0; i < m_devices.size(); i++)
 		{
 			_C *dev = dynamic_cast<_C *>(m_devices[i]);
 			if (dev != NULL)
@@ -1209,7 +1208,7 @@ public:
 	template<class _C>
 	_C *get_first_device()
 	{
-		for (int i = 0; i < m_devices.size(); i++)
+		for (std::size_t i = 0; i < m_devices.size(); i++)
 		{
 			_C *dev = dynamic_cast<_C *>(m_devices[i]);
 			if (dev != NULL)
@@ -1222,7 +1221,7 @@ public:
 	_C *get_single_device(const char *classname)
 	{
 		_C *ret = NULL;
-		for (int i = 0; i < m_devices.size(); i++)
+		for (std::size_t i = 0; i < m_devices.size(); i++)
 		{
 			_C *dev = dynamic_cast<_C *>(m_devices[i]);
 			if (dev != NULL)

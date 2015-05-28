@@ -17,7 +17,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 /***************************************************************************
     CONSTANTS
@@ -74,6 +74,10 @@ public:
 		m_ay31015(*this, "ay_3_1015"),
 		m_lx388_kr2376(*this, "lx388_kr2376"),
 		m_maincpu(*this, "z80ne"),
+		m_floppy0(*this, "wd1771:0"),
+		m_floppy1(*this, "wd1771:1"),
+		m_floppy2(*this, "wd1771:2"),
+		m_floppy3(*this, "wd1771:3"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
 		m_wd1771(*this, "wd1771"),
@@ -98,6 +102,8 @@ public:
 		m_io_x7(*this, "X7"),
 		m_io_modifiers(*this, "MODIFIERS"),
 		m_io_config(*this, "CONFIG") { }
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats)
 
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<UINT8> m_videoram;
@@ -148,9 +154,13 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	optional_device<floppy_connector> m_floppy2;
+	optional_device<floppy_connector> m_floppy3;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
-	optional_device<fd1771_device> m_wd1771;
+	optional_device<fd1771_t> m_wd1771;
 	required_memory_region m_region_z80ne;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;

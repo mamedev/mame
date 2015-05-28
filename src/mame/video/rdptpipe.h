@@ -104,7 +104,7 @@ class n64_texture_pipe_t
 		texel_cycler_t      m_cycle[4];
 
 		void                copy(color_t* TEX, INT32 SSS, INT32 SST, UINT32 tilenum, const rdp_poly_state& object, rdp_span_aux* userdata);
-		void                calculate_clamp_diffs(UINT32 prim_tile, const rdp_poly_state& object);
+		void                calculate_clamp_diffs(UINT32 prim_tile, rdp_span_aux* userdata, const rdp_poly_state& object);
 		void                lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, rdp_span_aux* userdata, const rdp_poly_state& object);
 		void                lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, INT32* t2, rdp_span_aux* userdata, const rdp_poly_state& object);
 		void                lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 s, const INT32 t, INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, const rdp_poly_state& object);
@@ -120,8 +120,8 @@ class n64_texture_pipe_t
 		void                shift_cycle(INT32* S, INT32* T, bool* maxs, bool* maxt, const n64_tile_t& tile);
 		void                shift_copy(INT32* S, INT32* T, const n64_tile_t& tile);
 
-		void                clamp_cycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile);
-		void                clamp_cycle_light(INT32* S, INT32* T, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile);
+		void                clamp_cycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata);
+		void                clamp_cycle_light(INT32* S, INT32* T, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata);
 
 		UINT32              fetch_nop(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 
@@ -165,8 +165,6 @@ class n64_texture_pipe_t
 		INT32               m_maskbits_table[16];
 		UINT32              m_expand_16to32_table[0x10000];
 		UINT16              m_lod_lookup[0x80000];
-		INT32               m_clamp_s_diff[8];
-		INT32               m_clamp_t_diff[8];
 };
 
 #endif // _VIDEO_RDPTEXPIPE_H_

@@ -623,7 +623,17 @@ project "portaudio"
 			"-Wno-maybe-uninitialized",
 			"-Wno-unused-value",
 			"-Wno-unused-function",
+			"-Wno-unknown-pragmas",
+			"-Wno-sometimes-uninitialized",
 		}
+
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if (_OPTIONS["gcc"]~=nil) and string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions_c {
+			"-Wno-unknown-warning-option",
+			"-Wno-absolute-value",
+		}
+	end
 
 	configuration { "vs*" }
 		buildoptions {
@@ -656,21 +666,16 @@ project "portaudio"
 			"PA_USE_DS=1",
 			"PA_USE_WDMKS=1",
 			"PA_USE_WMME=1",
-			"PA_USE_WASAPI=1",
 		}	
 		includedirs {
 			MAME_DIR .. "3rdparty/portaudio/src/os/win",
 		}
-		configuration { "mingw*" }		
-			includedirs {		
-				MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/mingw-include",
-			}
+
 		configuration { }			
 		files {	
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_waveformat.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
-			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_x86_plain_converters.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_wdmks_utils.c",
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_coinitialize.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds.c",
@@ -678,7 +683,6 @@ project "portaudio"
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wdmks/pa_win_wdmks.c",
 			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
 			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wmme/pa_win_wmme.c",
-			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/pa_win_wasapi.c",
 		}
 		
 	end

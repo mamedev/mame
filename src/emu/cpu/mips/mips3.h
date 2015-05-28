@@ -416,6 +416,9 @@ private:
 		offs_t              end;                        /* end of the RAM block */
 		UINT8               readonly;                   /* TRUE if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
+		UINT8 *             offset_base8;               /* base in memory where the RAM lives, 8-bit pointer, with the start offset pre-applied */
+		UINT16 *            offset_base16;              /* base in memory where the RAM lives, 16-bit pointer, with the start offset pre-applied  */
+		UINT32 *            offset_base32;              /* base in memory where the RAM lives, 32-bit pointer, with the start offset pre-applied  */
 	}       m_fastram[MIPS3_MAX_FASTRAM];
 
 	UINT64 m_debugger_temp;

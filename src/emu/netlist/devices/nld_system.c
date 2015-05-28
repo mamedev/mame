@@ -76,7 +76,7 @@ NETLIB_START(extclock)
 	connect(m_feedback, m_Q);
 	{
 		netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
-		nl_util::pstring_list pat = nl_util::split(m_pattern.Value(),",");
+		pstring_list_t pat(m_pattern.Value(),",");
 		m_off = netlist_time::from_double(m_offset.Value());
 
 		int pati[256];

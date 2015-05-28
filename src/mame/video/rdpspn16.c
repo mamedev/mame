@@ -340,7 +340,7 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 #endif
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
 
-	m_tex_pipe.calculate_clamp_diffs(tilenum, object);
+	m_tex_pipe.calculate_clamp_diffs(tilenum, userdata, object);
 
 	const bool partialreject = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_inv_pixel_color.i.a && userdata->m_color_inputs.blender1b_a[0] == &userdata->m_pixel_color.i.a);
 	const INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color.i.a) ? 1 : 0;
@@ -529,7 +529,7 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 #endif
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
 
-	m_tex_pipe.calculate_clamp_diffs(tile1, object);
+	m_tex_pipe.calculate_clamp_diffs(tile1, userdata, object);
 
 	bool partialreject = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_inv_pixel_color.i.a && userdata->m_color_inputs.blender1b_a[1] == &userdata->m_pixel_color.i.a);
 	INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color.i.a) ? 1 : 0;

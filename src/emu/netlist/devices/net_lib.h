@@ -67,6 +67,6 @@
 NETLIST_EXTERNAL(diode_models);
 NETLIST_EXTERNAL(bjt_models);
 
-void nl_initialize_factory(netlist_factory_t &factory);
+void nl_initialize_factory(netlist_factory_list_t &factory);
 
 #endif

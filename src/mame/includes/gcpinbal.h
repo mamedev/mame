@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:David Graves, R. Belmont
 
 #include "sound/okim6295.h"

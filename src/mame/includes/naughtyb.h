@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Brad Oliver,Sal,John Bugliarisi,Paul Priest
+// license:???
+// copyright-holders:Brad Oliver,Sal and John Bugliarisi,Paul Priest
 #include "audio/pleiads.h"
 
 class naughtyb_state : public driver_device

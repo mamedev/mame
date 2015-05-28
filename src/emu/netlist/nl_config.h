@@ -8,7 +8,7 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
-#include "pconfig.h"
+#include "plib/pconfig.h"
 
 //============================================================
 //  SETUP
@@ -101,7 +101,7 @@
 #if (NL_VERBOSE)
 	#define NL_VERBOSE_OUT(x)       printf x
 #else
-	#define NL_VERBOSE_OUT(x)       do { } while (0)
+	#define NL_VERBOSE_OUT(x)       do { if(0) printf x ; } while (0)
 #endif
 
 //============================================================

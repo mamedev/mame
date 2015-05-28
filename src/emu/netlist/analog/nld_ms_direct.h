@@ -10,7 +10,7 @@
 
 #include "nld_solver.h"
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
 public:
@@ -23,7 +23,7 @@ public:
 	/* ATTR_COLD */ virtual void vsetup(netlist_analog_net_t::list_t &nets);
 	/* ATTR_COLD */ virtual void reset() { netlist_matrix_solver_t::reset(); }
 
-	ATTR_HOT inline int N() const { return (m_N == 0 ? m_dim : m_N); }
+	ATTR_HOT inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 
@@ -56,7 +56,7 @@ protected:
 
 private:
 
-	const int m_dim;
+	const unsigned m_dim;
 	nl_double m_lp_fact;
 };
 
@@ -64,10 +64,10 @@ private:
 // netlist_matrix_solver_direct
 // ----------------------------------------------------------------------------------------
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t()
 {
-	for (int k = 0; k < N(); k++)
+	for (unsigned k = 0; k < N(); k++)
 	{
 		pfree(m_terms[k]);
 	}
@@ -75,7 +75,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t
 	pfree_array(m_rails_temp);
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
@@ -86,7 +86,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 		 * FIXME: We should extend the logic to use either all nets or
 		 *        only output nets.
 		 */
-		for (int k = 0; k < N(); k++)
+		for (unsigned k = 0; k < N(); k++)
 		{
 			netlist_analog_net_t *n = m_nets[k];
 
@@ -114,7 +114,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 	return new_solver_timestep;
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, netlist_terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
@@ -139,13 +139,13 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, 
 }
 
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
 		netlist().error("Dimension %d less than %" SIZETFMT, m_dim, nets.size());
 
-	for (int k = 0; k < N(); k++)
+	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k]->clear();
 		m_rails_temp[k].clear();
@@ -153,10 +153,10 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 
 	netlist_matrix_solver_t::setup(nets);
 
-	for (int k = 0; k < N(); k++)
+	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k]->m_railstart = m_terms[k]->count();
-		for (int i = 0; i < m_rails_temp[k].count(); i++)
+		for (unsigned i = 0; i < m_rails_temp[k].count(); i++)
 			this->m_terms[k]->add(m_rails_temp[k].terms()[i], m_rails_temp[k].net_other()[i]);
 
 		m_rails_temp[k].clear(); // no longer needed
@@ -187,8 +187,8 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 
 	int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1);
 
-	for (int k = 0; k < N() / 2; k++)
-		for (int i = 0; i < N() - 1; i++)
+	for (unsigned k = 0; k < N() / 2; k++)
+		for (unsigned i = 0; i < N() - 1; i++)
 		{
 			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
 			{
@@ -197,10 +197,10 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 			}
 		}
 
-	for (int k = 0; k < N(); k++)
+	for (unsigned k = 0; k < N(); k++)
 	{
 		int *other = m_terms[k]->net_other();
-		for (int i = 0; i < m_terms[k]->count(); i++)
+		for (unsigned i = 0; i < m_terms[k]->count(); i++)
 			if (other[i] != -1)
 				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
 	}
@@ -209,35 +209,35 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 }
 
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 {
-	for (int k = 0; k < N(); k++)
+	for (unsigned k = 0; k < N(); k++)
 	{
-		for (int i=0; i < N(); i++)
+		for (unsigned i=0; i < N(); i++)
 			m_A[k][i] = 0.0;
 
 		nl_double akk  = 0.0;
-		const int terms_count = m_terms[k]->count();
-		const int railstart =  m_terms[k]->m_railstart;
+		const unsigned terms_count = m_terms[k]->count();
+		const unsigned railstart =  m_terms[k]->m_railstart;
 		const nl_double * RESTRICT gt = m_terms[k]->gt();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const int * RESTRICT net_other = m_terms[k]->net_other();
 
-		for (int i = 0; i < terms_count; i++)
+		for (unsigned i = 0; i < terms_count; i++)
 			akk = akk + gt[i];
 
 		m_A[k][k] += akk;
 
-		for (int i = 0; i < railstart; i++)
+		for (unsigned i = 0; i < railstart; i++)
 			m_A[k][net_other[i]] += -go[i];
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
 {
-	for (int k = 0; k < N(); k++)
+	for (unsigned k = 0; k < N(); k++)
 	{
 		nl_double rhsk_a = 0.0;
 		nl_double rhsk_b = 0.0;
@@ -258,7 +258,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 {
 #if 0
@@ -271,15 +271,15 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 	printf("\n");
 #endif
 
-	const int kN = N();
+	const unsigned kN = N();
 
-	for (int i = 0; i < kN; i++) {
+	for (unsigned i = 0; i < kN; i++) {
 		// FIXME: use a parameter to enable pivoting?
 		if (USE_PIVOT_SEARCH)
 		{
 			/* Find the row with the largest first value */
-			int maxrow = i;
-			for (int j = i + 1; j < kN; j++)
+			unsigned maxrow = i;
+			for (unsigned j = i + 1; j < kN; j++)
 			{
 				if (nl_math::abs(m_A[j][i]) > nl_math::abs(m_A[maxrow][i]))
 					maxrow = j;
@@ -288,7 +288,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			if (maxrow != i)
 			{
 				/* Swap the maxrow and ith row */
-				for (int k = i; k < kN; k++) {
+				for (unsigned k = i; k < kN; k++) {
 					std::swap(m_A[i][k], m_A[maxrow][k]);
 				}
 				std::swap(m_RHS[i], m_RHS[maxrow]);
@@ -300,12 +300,12 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 
 		/* Eliminate column i from row j */
 
-		for (int j = i + 1; j < kN; j++)
+		for (unsigned j = i + 1; j < kN; j++)
 		{
 			const nl_double f1 = - m_A[j][i] * f;
 			if (f1 != NL_FCONST(0.0))
 			{
-				for (int k = i + 1; k < kN; k++)
+				for (unsigned k = i + 1; k < kN; k++)
 					m_A[j][k] += m_A[i][k] * f1;
 				m_RHS[j] += m_RHS[i] * f1;
 			}
@@ -313,18 +313,18 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 		nl_double * RESTRICT x)
 {
-	const int kN = N();
+	const unsigned kN = N();
 
 	/* back substitution */
 	for (int j = kN - 1; j >= 0; j--)
 	{
 		nl_double tmp = 0;
 
-		for (int k = j + 1; k < kN; k++)
+		for (unsigned k = j + 1; k < kN; k++)
 			tmp += m_A[j][k] * x[k];
 
 		x[j] = (m_RHS[j] - tmp) / m_A[j][j];
@@ -342,13 +342,13 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 		const nl_double * RESTRICT V)
 {
 	nl_double cerr = 0;
 	nl_double cerr2 = 0;
-	for (int i = 0; i < this->N(); i++)
+	for (unsigned i = 0; i < this->N(); i++)
 	{
 		const nl_double e = nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog);
 		const nl_double e2 = nl_math::abs(m_RHS[i] - this->m_last_RHS[i]);
@@ -359,24 +359,24 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 	return cerr + cerr2*NL_FCONST(100000.0);
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
 		const nl_double * RESTRICT V, const bool store_RHS)
 {
-	for (int i = 0; i < this->N(); i++)
+	for (unsigned i = 0; i < this->N(); i++)
 	{
 		this->m_nets[i]->m_cur_Analog = V[i];
 	}
 	if (store_RHS)
 	{
-		for (int i = 0; i < this->N(); i++)
+		for (unsigned i = 0; i < this->N(); i++)
 		{
 			this->m_last_RHS[i] = m_RHS[i];
 		}
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 {
 	solve_base<netlist_matrix_solver_direct_t>(this);
@@ -384,7 +384,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 }
 
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	nl_double new_v[_storage_N]; // = { 0.0 };
@@ -406,7 +406,7 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
@@ -416,7 +416,7 @@ ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_
 	return this->solve_non_dynamic(newton_raphson);
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const netlist_solver_parameters_t &params, const int size)
 : netlist_matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
@@ -425,7 +425,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	m_terms = palloc_array(terms_t *, N());
 	m_rails_temp = palloc_array(terms_t, N());
 
-	for (int k = 0; k < N(); k++)
+	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_t);
 		m_last_RHS[k] = 0.0;
@@ -433,7 +433,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, const int size)
 : netlist_matrix_solver_t(type, params)
 , m_dim(size)
@@ -442,7 +442,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	m_terms = palloc_array(terms_t *, N());
 	m_rails_temp = palloc_array(terms_t, N());
 
-	for (int k = 0; k < N(); k++)
+	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k] = palloc(terms_t);
 		m_last_RHS[k] = 0.0;

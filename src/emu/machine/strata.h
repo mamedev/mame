@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Raphael Nabet, Michael Zapf
 /*
     strata.h: header file for strata.c
