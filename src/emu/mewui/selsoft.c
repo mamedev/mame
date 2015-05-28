@@ -380,6 +380,26 @@ void ui_menu_select_software::populate()
 
 void ui_menu_select_software::build_software_list()
 {
+	// add start empty item
+	ui_software_info first_swlist;
+	first_swlist.shortname.assign(ui_driver->name);
+	first_swlist.longname.assign(ui_driver->description);
+	first_swlist.parentname.clear();
+	first_swlist.year.clear();
+	first_swlist.publisher.clear();
+	first_swlist.supported = 0;
+	first_swlist.part.clear();
+	first_swlist.driver = ui_driver;
+	first_swlist.listname.clear();
+	first_swlist.interface.clear();
+	first_swlist.instance.clear();
+	first_swlist.startempty = 1;
+	first_swlist.parentlongname.clear();
+	first_swlist.usage.clear();
+	first_swlist.devicetype.clear();
+	first_swlist.available = true;
+	ui_swlist.push_back(first_swlist);
+
 	machine_config config(*ui_driver, machine().options());
 	software_list_device_iterator deviter(config.root_device());
 
@@ -482,27 +502,7 @@ void ui_menu_select_software::build_software_list()
 
 	// sort array
 	if (machine().options().ui_grouped())
-		std::stable_sort(ui_swlist.begin(), ui_swlist.end(), compare_software);
-
-	// add start empty item
-	ui_software_info first_swlist;
-	first_swlist.shortname.assign(ui_driver->name);
-	first_swlist.longname.assign(ui_driver->description);
-	first_swlist.parentname.clear();
-	first_swlist.year.clear();
-	first_swlist.publisher.clear();
-	first_swlist.supported = 0;
-	first_swlist.part.clear();
-	first_swlist.driver = ui_driver;
-	first_swlist.listname.clear();
-	first_swlist.interface.clear();
-	first_swlist.instance.clear();
-	first_swlist.startempty = 1;
-	first_swlist.parentlongname.clear();
-	first_swlist.usage.clear();
-	first_swlist.devicetype.clear();
-	first_swlist.available = true;
-	ui_swlist.insert(ui_swlist.begin(), first_swlist);
+		std::stable_sort(ui_swlist.begin() + 1, ui_swlist.end(), compare_software);
 
 	std::sort(m_region.ui.begin(), m_region.ui.end());
 	std::sort(m_year.ui.begin(), m_year.ui.end());
