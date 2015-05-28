@@ -630,11 +630,9 @@ project "portaudio"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if string.find(_OPTIONS["gcc"], "clang") then
-		if (version >= 30500) then
-			buildoptions {
-				"-Wno-unknown-warning-option",
-			}
-		end
+		buildoptions_c {
+			"-Wno-unknown-warning-option",
+		}
 	end
 
 	configuration { "vs*" }
