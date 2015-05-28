@@ -233,7 +233,7 @@ void wd_fdc_t::seek_start(int state)
 {
 	if (TRACE_COMMAND) logerror("%s: seek %d (track=%d)\n", tag(), data, track);
 	main_state = state;
-	status = (status & ~(S_CRC|S_RNF|S_SPIN)) | S_BUSY;
+	status &= ~(S_CRC|S_RNF|S_SPIN);
 	if(head_control) {
 		// TODO get value from HLT callback
 		if(command & 8)
@@ -420,7 +420,7 @@ void wd_fdc_t::read_sector_start()
 	}
 
 	main_state = READ_SECTOR;
-	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
+	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -521,7 +521,7 @@ void wd_fdc_t::read_track_start()
 	}
 
 	main_state = READ_TRACK;
-	status = (status & ~(S_LOST|S_RNF)) | S_BUSY;
+	status &= ~(S_LOST|S_RNF);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -599,7 +599,7 @@ void wd_fdc_t::read_id_start()
 	}
 
 	main_state = READ_ID;
-	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
+	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -675,7 +675,7 @@ void wd_fdc_t::write_track_start()
 	}
 
 	main_state = WRITE_TRACK;
-	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
+	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -785,7 +785,7 @@ void wd_fdc_t::write_sector_start()
 	}
 
 	main_state = WRITE_SECTOR;
-	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
+	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -1041,7 +1041,17 @@ void wd_fdc_t::cmd_w(UINT8 val)
 
 	cmd_buffer = val;
 
-	delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
+	if ((val & 0xf0) == 0xd0)
+	{
+		// force interrupt is executed instantly (?)
+		delay_cycles(t_cmd, 0);
+	}
+	else
+	{
+		// set busy, then set a timer to process the command
+		status |= S_BUSY;
+		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
+	}
 }
 
 UINT8 wd_fdc_t::status_r()
@@ -1649,6 +1659,10 @@ void wd_fdc_t::live_run(attotime limit)
 						cur_live.shift_reg == 0xf56b ? 0x9fc6 :
 						cur_live.shift_reg == 0xf56e ? 0xafa5 :
 						0xbf84;
+
+					if((cur_live.data_reg & 0xfe) == 0xf8)
+						status |= S_DDM;
+
 					cur_live.data_separator_phase = false;
 					cur_live.bit_counter = 0;
 					cur_live.state = READ_SECTOR_DATA;
