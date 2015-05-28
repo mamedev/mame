@@ -100,7 +100,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
   - bits -
   7654 3210
   ---- ---x   Coin counter.
-  ---- --x-   Hold 1 / Black (Nero) lamp.
+  ---- --x-   Hold 1 / Black (Nero) / Bet Max lamp.
   ---- -x--   Payout counter.
   ---- x---   Hold 2 / Low (Bassa) lamp.
   ---x ----   unknown (unused).
@@ -216,7 +216,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( chsuper )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_Q) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Black (Nero)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Black (Nero) / Bet Max")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Cancel All / Take (Ritira)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("Start / Double (Radoppio)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Red (Rosso) / Double (Radoppio)")
