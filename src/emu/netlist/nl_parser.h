@@ -34,6 +34,9 @@ public:
 	void net_truthtable_start();
 
 protected:
+	/* for debugging messages */
+	netlist_base_t &netlist() { return m_setup.netlist(); }
+
 	virtual void verror(pstring msg, int line_num, pstring line);
 private:
 

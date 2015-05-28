@@ -99,9 +99,9 @@
 #define NL_KEEP_STATISTICS          (0)
 
 #if (NL_VERBOSE)
-	#define NL_VERBOSE_OUT(x)       printf x
+	#define NL_VERBOSE_OUT(x)       netlist().log x
 #else
-	#define NL_VERBOSE_OUT(x)       do { if(0) printf x ; } while (0)
+	#define NL_VERBOSE_OUT(x)       do { if(0) netlist().log x ; } while (0)
 #endif
 
 //============================================================

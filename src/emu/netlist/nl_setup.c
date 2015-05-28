@@ -104,20 +104,6 @@ netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const 
 	return register_dev(dev, name);
 }
 
-template <class T>
-static void remove_start_with(T &hm, pstring &sw)
-{
-	for (std::size_t i = hm.size() - 1; i >= 0; i--)
-	{
-		pstring x = hm[i]->name();
-		if (sw.equals(x.substr(0, sw.len())))
-		{
-			NL_VERBOSE_OUT(("removing %s\n", hm[i]->name().cstr()));
-			hm.remove(hm[i]);
-		}
-	}
-}
-
 void netlist_setup_t::remove_dev(const pstring &name)
 {
 	netlist_device_t *dev = netlist().m_devices.find(name);
