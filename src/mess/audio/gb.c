@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Anthony Kruize
 /**************************************************************************************
 * Game Boy sound emulation (c) Anthony Kruize (trandor@labyrinth.net.au)
