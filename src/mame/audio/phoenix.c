@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:???
 // copyright-holders:Juergen Buchmueller, Derrick Renaud
 /****************************************************************************
  *

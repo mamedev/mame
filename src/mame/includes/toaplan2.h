@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Quench, Yochizo, David Haywood
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */

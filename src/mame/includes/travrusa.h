@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Lee Taylor,John Clegg,Tomasz Slanina
 class travrusa_state : public driver_device
 {
