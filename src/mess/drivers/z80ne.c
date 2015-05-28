@@ -95,7 +95,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
 #include "imagedev/flopdrv.h"
-#include "formats/z80ne_dsk.h"
+#include "formats/dmk_dsk.h"
 #include "machine/ram.h"
 
 /* Layout */
@@ -400,12 +400,13 @@ static const UINT32 lx388palette[] =
 	rgb_t(0xff, 0xc4, 0x18)      /* ALPHANUMERIC BRIGHT ORANGE */
 };
 
-static const floppy_interface z80netf_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(z80ne),
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( z80ne_state::floppy_formats )
+	FLOPPY_DMK_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( z80ne_floppies )
+	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( z80ne, z80ne_state )
 	/* basic machine hardware */
@@ -526,10 +527,11 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_DEVICE_ADD("wd1771", FD1771, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(z80netf_floppy_interface)
+	MCFG_FD1771x_ADD("wd1771", XTAL_2MHz / 2)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, NULL,   z80ne_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:3", z80ne_floppies, NULL,   z80ne_state::floppy_formats)
 
 	MCFG_DEFAULT_LAYOUT(layout_z80netf)
 
