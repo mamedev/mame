@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!--
+		Champion Super realistic control panel
+		with clickable button.lamps + coin in.
+
+		Written by Roberto Fresca.
+-->
+
+<!-- define button-lamps -->
+
+	<element name="hold1" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="BLACK/MAX">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold2" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="LOW">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold3" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold4" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HIGH">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold5" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="RED/D-UP">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.06" blue="0.0" />
+		</rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="start" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.12" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="D-UP">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+
+<!-- define basic elements -->
+
+	<element name="cpanel">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="cpanel2">
+		<rect>
+			<color red="0.045" green="0.045" blue="0.045" />
+		</rect>
+	</element>
+
+	<element name="coinin_plate">
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15" />
+		</rect>
+		<text string="COIN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.8" width="1" height="0.2" />
+		</text>
+	</element>
+
+	<element name="coinin_hole">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="hold_b" defstate="0">
+		<rect state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="bet_b" defstate="0">
+		<rect state="1">
+			<color red="0.8" green="0.4" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.05" blue="0.0" />
+		</rect>
+	</element>
+ 
+	<element name="start_b" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.8" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+
+
+<!-- define background -->
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel element="cpanel">
+			<bounds left="0" right="4" top="3" bottom="3.34" />
+		</bezel>
+
+		<bezel element="cpanel2">
+			<bounds left="0" right="4" top="3" bottom="3.17" />
+		</bezel>
+
+		<bezel element="coinin_plate" inputtag="IN2" inputmask="0x01">
+			<bounds x="0.10" y="3.05" width="0.15" height="0.24" />
+		</bezel>
+
+		<bezel element="coinin_hole" inputtag="IN2" inputmask="0x01">
+			<bounds x="0.16" y="3.08" width="0.03" height="0.14" />
+		</bezel>
+
+<!-- define lamps -->
+
+		<bezel name="lamp0" element="hold_b" inputtag="IN0" inputmask="0x02">
+			<bounds x="0.55" y="3.05" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp0" element="hold1" inputtag="IN0" inputmask="0x02">
+			<bounds x="0.57" y="3.07" width="0.31" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp1" element="hold_b" inputtag="IN1" inputmask="0x01">
+			<bounds x="1.00" y="3.05" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="hold2" inputtag="IN1" inputmask="0x01">
+			<bounds x="1.02" y="3.07" width="0.31" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp2" element="hold_b" inputtag="IN1" inputmask="0x02">
+			<bounds x="1.45" y="3.05" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="hold3" inputtag="IN1" inputmask="0x02">
+			<bounds x="1.47" y="3.07" width="0.31" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp3" element="hold_b" inputtag="IN0" inputmask="0x80">
+			<bounds x="1.90" y="3.05" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="hold4" inputtag="IN0" inputmask="0x80">
+			<bounds x="1.92" y="3.07" width="0.31" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp4" element="hold_b" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.35" y="3.05" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp4" element="hold5" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.37" y="3.07" width="0.31" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp5" element="bet_b" inputtag="IN0" inputmask="0x04">
+			<bounds x="3.10" y="3.05" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp5" element="bet" inputtag="IN0" inputmask="0x04">
+			<bounds x="3.12" y="3.07" width="0.31" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp6" element="start_b" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.55" y="3.05" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp6" element="start" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.57" y="3.07" width="0.31" height="0.20" />
+		</bezel>
+		
+	</view>
+</mamelayout>

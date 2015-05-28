@@ -46,6 +46,8 @@ newoption {
 		{ "vs2013-xp", 	   "Visual Studio 2013 targeting XP" },
 		{ "winphone8",     "Windows Phone 8.0" },
 		{ "winphone81",    "Windows Phone 8.1" },
+		{ "winstore81",    "Windows Store 8.1" },
+		{ "winstore82",    "Universal Windows App" }
 	},
 }
 
@@ -317,6 +319,20 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winphone81")
 		end
 
+		if "winstore81" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v120"
+			premake.vstudio.storeapp = "8.1"
+			platforms { "ARM" }
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore81")
+		end
+		
+		if "winstore82" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v140"
+			premake.vstudio.storeapp = "8.2"
+			platforms { "ARM" }
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore82")
+		end
+		
 		if "intel-14" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "Intel C++ Compiler XE 14.0"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
@@ -407,12 +423,19 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "x64", "vs*-clang", "Debug" }
 		targetdir (_buildDir .. _ACTION .. "-clang/bin/x64/Debug")
-
+	
 	configuration { "vs*-clang" }
 		buildoptions {
 			"-Qunused-arguments",
 		} 
 		
+	configuration { "winphone8* or winstore8*" }
+		removeflags {
+			"StaticRuntime",
+			"NoExceptions",
+			"EnableMinimalRebuild",
+		}
+
 	configuration { "mingw*" }
 		defines { "WIN32" }
 

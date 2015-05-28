@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Lee Taylor, Chris Moore
 /*************************************************************************
     Universal Cheeky Mouse Driver

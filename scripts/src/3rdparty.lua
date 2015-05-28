@@ -629,7 +629,7 @@ project "portaudio"
 		}
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
-	if string.find(_OPTIONS["gcc"], "clang") then
+	if (_OPTIONS["gcc"]~=nil) and string.find(_OPTIONS["gcc"], "clang") then
 		buildoptions_c {
 			"-Wno-unknown-warning-option",
 			"-Wno-absolute-value",

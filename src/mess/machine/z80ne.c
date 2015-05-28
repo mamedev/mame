@@ -652,37 +652,30 @@ WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 	    d1 1=select drive 1
 	    d0 1=select drive 0 */
 
-		UINT8 drive = 255;
+	floppy_image_device *floppy = NULL;
 
-		if (data & 1)
-			drive = 0;
-		else
-		if (data & 2)
-			drive = 1;
-		else
-		if (data & 4)
-			drive = 2;
-		else
-		if (data & 8)
-			drive = 3;
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
 
-		m_wd17xx_state.head = (data & 32) ? 1 : 0;
-		m_wd17xx_state.drive = data & 0x0F;
+	m_wd1771->set_floppy(floppy);
 
-		/* no drive selected, turn off all leds */
-		if (!m_wd17xx_state.drive)
-		{
-			output_set_value("drv0", 0);
-			output_set_value("drv1", 0);
-		}
+	if (floppy)
+	{
+		floppy->ss_w(BIT(data, 5));
+		floppy->mon_w(0);
+	}
 
-		if (drive < 4)
-		{
-			LOG(("lx390_motor_w, set drive %1d\n", drive));
-			m_wd1771->set_drive(drive);
-			LOG(("lx390_motor_w, set side %1d\n", m_wd17xx_state.head));
-			m_wd1771->set_side(m_wd17xx_state.head);
-		}
+	m_wd17xx_state.head = (data & 32) ? 1 : 0;
+	m_wd17xx_state.drive = data & 0x0F;
+
+	/* no drive selected, turn off all leds */
+	if (!m_wd17xx_state.drive)
+	{
+		output_set_value("drv0", 0);
+		output_set_value("drv1", 0);
+	}
 }
 
 READ8_MEMBER(z80ne_state::lx390_reset_bank)
@@ -748,7 +741,7 @@ WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 	{
 	case 0:
 		LOG(("lx390_fdc_w, WD17xx command: %02x\n", d));
-		m_wd1771->command_w(space, offset, d ^ 0xff);
+		m_wd1771->cmd_w(space, offset, d ^ 0xff);
 		if (m_wd17xx_state.drive & 1)
 			output_set_value("drv0", 2);
 		else if (m_wd17xx_state.drive & 2)

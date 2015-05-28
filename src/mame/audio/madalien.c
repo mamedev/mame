@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:???
 // copyright-holders:Derrick Renaud
 /************************************************************************
  * madalien Sound System Analog emulation

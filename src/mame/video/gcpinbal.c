@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:David Graves, R. Belmont
 #include "emu.h"
 #include "includes/gcpinbal.h"

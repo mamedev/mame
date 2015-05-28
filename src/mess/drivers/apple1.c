@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Paul Daniels, Colin Howell, R. Belmont
 /**********************************************************************
 

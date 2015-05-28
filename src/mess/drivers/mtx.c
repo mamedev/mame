@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:(Original Author?), Dirk Best, Curt Coder
+// license:???
+// copyright-holders:Lee Ward, Dirk Best, Curt Coder
 /*************************************************************************
 
     Memotech MTX 500, MTX 512 and RS 128

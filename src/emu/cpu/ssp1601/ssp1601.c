@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Pierpaolo Prazzoli,Grazvydas Ignotas
 /*
  * Samsung SSP1601 DSP emulator
