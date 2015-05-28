@@ -882,6 +882,12 @@ end
 					"-Wno-array-bounds"
 				}
 			end
+			if (version >= 50000) then
+				buildoptions {
+					"-D__USE_MINGW_ANSI_STDIO=1",							
+				}
+			end
+			
 		end
 	end
 --ifeq ($(findstring arm,$(UNAME)),arm)
