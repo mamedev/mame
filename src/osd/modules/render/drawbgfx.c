@@ -13,6 +13,13 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#if defined(SDLMAME_WIN32)
+#if (SDLMAME_SDL2)
+#include <SDL2/SDL_syswm.h>
+#else
+#include <SDL/SDL_syswm.h>
+#endif
+#endif
 #else
 #include "sdlinc.h"
 #endif
