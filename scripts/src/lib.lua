@@ -158,6 +158,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/atarist_dsk.h",
 		MAME_DIR .. "src/lib/formats/atom_tap.c",
 		MAME_DIR .. "src/lib/formats/atom_tap.h",
+		MAME_DIR .. "src/lib/formats/bbc_dsk.c",
+		MAME_DIR .. "src/lib/formats/bbc_dsk.h",
 		MAME_DIR .. "src/lib/formats/bw2_dsk.c",
 		MAME_DIR .. "src/lib/formats/bw2_dsk.h",
 		MAME_DIR .. "src/lib/formats/bw12_dsk.c",
