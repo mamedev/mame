@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Brad Oliver,Sal and John Bugliarisi,Paul Priest
 /***************************************************************************
 
 Naughty Boy driver by Sal and John Bugliarisi.

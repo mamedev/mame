@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Deniam games
@@ -7,10 +9,10 @@ Check archive.org for http://deniam.co.kr
 
 Title            System     Date
 ---------------- ---------- ----------
-GO!GO!           deniam-16b 1995/10/11
+GO!GO!           deniam-16b 1995/10/11 UNDUMPED "Go Go Quiz Song Stop"
 Logic Pro        deniam-16b 1996/10/20
 Karian Cross     deniam-16b 1997/04/17
-LOTTERY GAME     deniam-16c 1997/05/21 UNDUMPED
+LOTTERY GAME     deniam-16c 1997/05/21 UNDUMPED "Bogori (Lottery Game)"
 Logic Pro 2      deniam-16c 1997/06/20
 Propose          deniam-16c 1997/06/21 UNDUMPED
 

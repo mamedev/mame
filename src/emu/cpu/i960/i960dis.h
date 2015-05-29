@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, R. Belmont
 #ifndef __I960DIS_H__
 #define __I960DIS_H__
 

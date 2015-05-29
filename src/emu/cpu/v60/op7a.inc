@@ -1,4 +1,5 @@
-
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, R. Belmont
 /*
  * CMPC: What happens to _S flag if the strings are identical?
  *   I suppose that it will be cleared. And is it set or cleared

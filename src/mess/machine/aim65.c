@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner, Dan Boris, Dirk Best, Robbbert
 /******************************************************************************
 
  AIM65

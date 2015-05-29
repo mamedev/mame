@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
     vboy.c - Virtual Boy audio emulation
 
@@ -211,11 +213,11 @@ void vboysnd_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, AUDIO_FREQ);
 
 	for (i=0; i<2048; i++)
-		waveFreq2LenTbl[i] = AUDIO_FREQ / (5000000.0/(float)((2048-i) * 32));
+		waveFreq2LenTbl[i] = AUDIO_FREQ / (5000000.0f/(float)((2048-i) * 32));
 	for (i=0; i<32; i++)
-		waveTimer2LenTbl[i] = ((0.00384*(float)(i+1)) * (float)AUDIO_FREQ);
+		waveTimer2LenTbl[i] = ((0.00384f*(float)(i+1)) * (float)AUDIO_FREQ);
 	for (i=0; i<8; i++)
-		waveEnv2LenTbl[i] = ((0.01536*(float)(i+1)) * (float)AUDIO_FREQ);
+		waveEnv2LenTbl[i] = ((0.01536f*(float)(i+1)) * (float)AUDIO_FREQ);
 
 	for (i = 0; i < 5; i++)
 		memset(&snd_channel[i], 0, sizeof(s_snd_channel));
@@ -277,7 +279,7 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		snd_channel[channel].sample_len = waveFreq2LenTbl[((mgetb(m_aram+SxFQHb+i) & 0x7) << 8) | mgetb(m_aram+SxFQLb+i)];
 		waveAddr = (mgetb(m_aram + SxRAMb + i) & 0x3) << 7;
 
-		size = (float)snd_channel[channel].sample_len / 32.0;
+		size = (float)snd_channel[channel].sample_len / 32.0f;
 		for (j=0; j<32;)
 		{
 			INT8 byte = mgetb(m_aram + waveAddr + (j++ << 2)) & 0x3f;

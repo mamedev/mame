@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Roberto Fresca
 /* Notes: DJH 04 Jan 2008
 
   fixed gridiron079gre (shared access to spriteram was broken)

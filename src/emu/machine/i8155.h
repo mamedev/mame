@@ -5,9 +5,6 @@
     Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
     8156 is the same as 8155, except that chip enable is active high instead of low
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    PC3   1 |*    \_/     | 40  Vcc

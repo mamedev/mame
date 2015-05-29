@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  sdlfile.c - SDL file access functions
-//
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -368,6 +367,9 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 file_error osd_truncate(osd_file *file, UINT64 offset)
 {
 	UINT32 result;
+
+	if (!file || !file->handle)
+		return FILERR_FAILURE;
 
 	switch (file->type)
 	{

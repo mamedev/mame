@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /***************************************************************************
 
   Sega Model 1 sound board (68000 + 2x 315-5560 "MultiPCM")

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer,R. Belmont
 /*
  * omti8621.h - SMS OMTI 8621 disk controller
  *
@@ -5,9 +7,6 @@
  *      Author: Hans Ostermeyer
  *
  *  Converted to ISA device March 3, 2014 by R. Belmont
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  */
 

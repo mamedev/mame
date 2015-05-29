@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Luca Elia, MetalliC
 /* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
 
 #define MCFG_EPIC12_ADD(_tag) \
@@ -25,7 +27,7 @@ union colour_t
 	UINT32 u32;
 };
 
-typedef const void (*epic12_device_blitfunction)(bitmap_rgb32 *,
+typedef void (*epic12_device_blitfunction)(bitmap_rgb32 *,
 						const rectangle *,
 						UINT32 *, /* gfx */
 						int , /* src_x */
@@ -112,7 +114,7 @@ public:
 	void gfx_exec_unsafe(void);
 	static void *blit_request_callback_unsafe(void *param, int threadid);
 
-#define BLIT_FUNCTION static const void
+#define BLIT_FUNCTION static void
 #define BLIT_PARAMS bitmap_rgb32 *bitmap, const rectangle *clip, UINT32 *gfx, int src_x, int src_y, const int dst_x_start, const int dst_y_start, int dimx, int dimy, const int flipy, const UINT8 s_alpha, const UINT8 d_alpha, const clr_t *tint_clr
 
 	BLIT_FUNCTION draw_sprite_f0_ti0_plain(BLIT_PARAMS);

@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Dag Lem
 #ifndef WAVE6581_h
 #define WAVE6581_h
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Haywood
 #include "audio/seibu.h"
 
 class deadang_state : public driver_device

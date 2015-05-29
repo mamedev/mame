@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker, Barry Rodewald
 /******************************************************************************
 
     amstrad.c
@@ -805,6 +807,7 @@ SLOT_INTERFACE_START(cpc_exp_cards)
 	SLOT_INTERFACE("amdrum", CPC_AMDRUM)
 	SLOT_INTERFACE("playcity", CPC_PLAYCITY)
 	SLOT_INTERFACE("smartwatch", CPC_SMARTWATCH)
+	SLOT_INTERFACE("brunword4", CPC_BRUNWORD_MK4)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START(cpcplus_exp_cards)
@@ -896,6 +899,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(amstrad_state,rom_select))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -988,10 +992,11 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpcplus_exp_cards, NULL, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(amstrad_state,rom_select))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

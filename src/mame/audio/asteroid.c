@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Brad Oliver, Bernd Wiebelt, Allard van der Bas
 /*****************************************************************************
  *
  * Asteroids Analog Sound system interface
@@ -10,7 +12,7 @@
 
 /************************************************************************/
 /* Asteroids Sound System Analog emulation by K.Wilkins Nov 2000        */
-/* Questions/Suggestions to mame@dysfunction.demon.co.uk                */
+/* Questions/Suggestions to mame@esplexo.co.uk                          */
 /************************************************************************/
 
 static const discrete_lfsr_desc asteroid_lfsr =

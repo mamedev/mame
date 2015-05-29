@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn, Howie Cohen, Frank Palazzolo, Ernesto Corvi, Aaron Giles
 /*************************************************************************
 
     Sega Z80-3D system
@@ -215,7 +217,7 @@ inline UINT32 turbo_state::sprite_xscale(UINT8 dacinput, double vr1, double vr2,
 	/* compute the control voltage to the VCO */
 	/* VR1 and VR2 are variable resistors on Turbo, fixed on other boards */
 	double iref = 5.0 / (1.5e3 + vr2);
-	double iout = iref * ((float)dacinput / 256.0);
+	double iout = iref * ((double)dacinput / 256.0);
 	double vref = 5.0 * 1e3 / (3.8e3 + 1e3 + vr1);
 	double vco_cv = (2.2e3 * iout) + vref;
 

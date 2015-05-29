@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 #include "sound/okim6295.h"
 #include "cpu/pic16c5x/pic16c5x.h"

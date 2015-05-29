@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  sdlprefix.h - prefix file, included by ALL files
-//
-//  Copyright (c) 1996-2006, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -81,4 +80,3 @@ struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which m
 #endif
 
 #endif /* SDLMAME_UNIX */
-

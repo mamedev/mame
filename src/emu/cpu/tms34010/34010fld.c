@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn,Zsolt Vasvari
 /***************************************************************************
 
     TMS34010: Portable Texas Instruments TMS34010 emulator

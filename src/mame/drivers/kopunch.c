@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /********************************************************
 
   KO Punch (c) 1981 Sega

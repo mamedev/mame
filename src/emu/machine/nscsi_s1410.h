@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __NSCSI_S1410_H__
 #define __NSCSI_S1410_H__
 

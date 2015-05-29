@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia, Peter Ferrie
 class thoop2_state : public driver_device
 {
 public:

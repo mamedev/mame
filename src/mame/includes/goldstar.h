@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
 #include "emu.h"
 
 #include "machine/ticket.h"

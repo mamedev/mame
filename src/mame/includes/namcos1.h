@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
@@ -65,21 +67,35 @@ public:
 	UINT8 *m_tilemap_maskdata;
 	int m_copy_sprites;
 	UINT8 m_drawmode_table[16];
+
 	DECLARE_DIRECT_UPDATE_MEMBER(direct_handler_main);
 	DECLARE_DIRECT_UPDATE_MEMBER(direct_handler_sub);
+
 	DECLARE_WRITE_LINE_MEMBER(subres_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_WRITE8_MEMBER(namcos1_coin_w);
-	DECLARE_WRITE8_MEMBER(namcos1_dac_gain_w);
-	DECLARE_WRITE8_MEMBER(namcos1_dac0_w);
-	DECLARE_WRITE8_MEMBER(namcos1_dac1_w);
-	DECLARE_WRITE8_MEMBER(namcos1_sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(namcos1_mcu_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(namcos1_mcu_patch_w);
+	DECLARE_WRITE8_MEMBER(coin_w);
+	DECLARE_WRITE8_MEMBER(dac_gain_w);
+	DECLARE_WRITE8_MEMBER(dac0_w);
+	DECLARE_WRITE8_MEMBER(dac1_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(mcu_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(mcu_patch_w);
 	DECLARE_READ8_MEMBER(quester_paddle_r);
 	DECLARE_READ8_MEMBER(berabohm_buttons_r);
 	DECLARE_READ8_MEMBER(faceoff_inputs_r);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(spriteram_w);
+	DECLARE_WRITE8_MEMBER(_3dcs_w);
+	DECLARE_READ8_MEMBER(no_key_r);
+	DECLARE_WRITE8_MEMBER(no_key_w);
+	DECLARE_READ8_MEMBER(key_type1_r);
+	DECLARE_WRITE8_MEMBER(key_type1_w);
+	DECLARE_READ8_MEMBER(key_type2_r);
+	DECLARE_WRITE8_MEMBER(key_type2_w);
+	DECLARE_READ8_MEMBER(key_type3_r);
+	DECLARE_WRITE8_MEMBER(key_type3_w);
+
 	DECLARE_DRIVER_INIT(pacmania);
 	DECLARE_DRIVER_INIT(ws);
 	DECLARE_DRIVER_INIT(wldcourt);
@@ -103,31 +119,24 @@ public:
 	DECLARE_DRIVER_INIT(ws89);
 	DECLARE_DRIVER_INIT(dspirit);
 	DECLARE_DRIVER_INIT(pistoldm);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	void driver_init();
+
 	TILE_GET_INFO_MEMBER(bg_get_info0);
 	TILE_GET_INFO_MEMBER(bg_get_info1);
 	TILE_GET_INFO_MEMBER(bg_get_info2);
 	TILE_GET_INFO_MEMBER(bg_get_info3);
 	TILE_GET_INFO_MEMBER(fg_get_info4);
 	TILE_GET_INFO_MEMBER(fg_get_info5);
-	virtual void machine_reset();
-	virtual void video_start();
+
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_namcos1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_namcos1(screen_device &screen, bool state);
-	void namcos1_update_DACs();
-	void namcos1_init_DACs();
-	DECLARE_WRITE8_MEMBER( namcos1_videoram_w );
-	DECLARE_WRITE8_MEMBER( namcos1_spriteram_w );
-	WRITE8_MEMBER( namcos1_3dcs_w );
-	READ8_MEMBER( no_key_r );
-	WRITE8_MEMBER( no_key_w );
-	READ8_MEMBER( key_type1_r );
-	WRITE8_MEMBER( key_type1_w );
-	READ8_MEMBER( key_type2_r );
-	WRITE8_MEMBER( key_type2_w );
-	READ8_MEMBER( key_type3_r );
-	WRITE8_MEMBER( key_type3_w );
-	void namcos1_driver_init();
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof(screen_device &screen, bool state);
+	void update_DACs();
+	void init_DACs();
+
 private:
 	inline offs_t direct_handler(int whichcpu, direct_read_data &direct, offs_t address);
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);

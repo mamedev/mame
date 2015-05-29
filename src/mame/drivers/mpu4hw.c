@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /* MPU4 hardware emulation
   for sets see mpu4.c
 */
@@ -1413,7 +1415,7 @@ WRITE8_MEMBER(mpu4_state::ic3ss_w)
 	float num = (1720000/((m_t3l + 1)*(m_t3h + 1)));
 	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
 
-	int denom2 = denom1 +0.5;//need to round up, this gives same precision as chip
+	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
 	int freq=num*denom2;
 
 	if (freq)

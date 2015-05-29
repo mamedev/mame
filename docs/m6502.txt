@@ -34,11 +34,11 @@ tree.  The final class hierarchy is this:
                            |
         +------+--------+--+--+-------+-------+
         |      |        |     |       |       |
-      6510   deco16   6504   6509   n2a03   65c02 
+      6510   deco16   6504   6509   n2a03   65c02
         |                                     |
   +-----+-----+                            r65c02
   |     |     |                               |
-6510t  7501  8502                         +---+---+     
+6510t  7501  8502                         +---+---+
                                           |       |
                                        65ce02   65sc02
                                           |
@@ -170,7 +170,7 @@ An opcode description is a series of lines starting by an opcode entry
 by itself and followed by a series of indented lines with code
 executing the opcode.
 
-For instance the asl <absolute adress> opcode looks like this:
+For instance the asl <absolute address> opcode looks like this:
 
 asl_aba
     TMP = read_pc();

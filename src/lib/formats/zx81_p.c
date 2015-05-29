@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /*****************************************************************************
 
 Taken from nocash ZX81 docs by Martin Korth.

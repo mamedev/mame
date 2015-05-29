@@ -4,9 +4,6 @@
 
     RCA VIP ASCII Keyboard Interface VP-620 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

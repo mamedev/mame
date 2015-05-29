@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli, R. Belmont
 /***********************************************************************************************************
 
  SA-1 add-on chip emulation (for SNES/SFC)
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  Note:
  - SA-1 register description below is based on no$cash docs.
@@ -823,11 +822,11 @@ UINT8 sns_sa1_device::read_bwram(UINT32 offset)
 	int shift = 0;
 	UINT8 mask = 0xff;
 
-	if (!m_nvram)
+	if (m_nvram.empty())
 		return 0xff;    // this should probably never happen, or are there SA-1 games with no BWRAM?
 
 	if (offset < 0x100000)
-		return m_nvram[offset & (m_nvram.count() - 1)];
+		return m_nvram[offset & (m_nvram.size() - 1)];
 
 	// Bitmap BWRAM
 	offset -= 0x100000;
@@ -848,19 +847,19 @@ UINT8 sns_sa1_device::read_bwram(UINT32 offset)
 	}
 
 	// only return the correct bits
-	return (m_nvram[offset & (m_nvram.count() - 1)] >> shift) & mask;
+	return (m_nvram[offset & (m_nvram.size() - 1)] >> shift) & mask;
 }
 
 void sns_sa1_device::write_bwram(UINT32 offset, UINT8 data)
 {
 	UINT8 mask = 0xff;
 
-	if (!m_nvram)
+	if (m_nvram.empty())
 		return; // this should probably never happen, or are there SA-1 games with no BWRAM?
 
 	if (offset < 0x100000)
 	{
-		m_nvram[offset & (m_nvram.count() - 1)] = data;
+		m_nvram[offset & (m_nvram.size() - 1)] = data;
 		return;
 	}
 
@@ -883,7 +882,7 @@ void sns_sa1_device::write_bwram(UINT32 offset, UINT8 data)
 	}
 
 	// only change the correct bits, keeping the rest untouched
-	m_nvram[offset & (m_nvram.count() - 1)] = (m_nvram[offset & (m_nvram.count() - 1)] & ~mask) | data;
+	m_nvram[offset & (m_nvram.size() - 1)] = (m_nvram[offset & (m_nvram.size() - 1)] & ~mask) | data;
 }
 
 

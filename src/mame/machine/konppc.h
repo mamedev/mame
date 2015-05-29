@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 #ifndef _KONPPC_H
 #define _KONPPC_H
 

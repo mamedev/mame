@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 #ifndef __SPC1000_VDP_H__
 #define __SPC1000_VDP_H__
 

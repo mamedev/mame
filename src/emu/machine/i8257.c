@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder,Carl
 /***************************************************************************
 
     Intel 8257 DMA Controller emulation
-
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

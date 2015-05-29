@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, David Haywood
 /* Kaneko Sprites */
 
 /*
@@ -68,7 +70,7 @@ void kaneko16_sprite_device::static_set_gfxdecode_tag(device_t &device, const ch
 
 void kaneko16_sprite_device::device_start()
 {
-	m_first_sprite = auto_alloc_array(machine(), struct tempsprite, 0x400);
+	m_first_sprite = auto_alloc_array(machine(), struct kan_tempsprite, 0x400);
 	m_sprites_regs = auto_alloc_array_clear(machine(), UINT16, 0x20/2);
 	m_screen->register_screen_bitmap(m_sprites_bitmap);
 
@@ -173,7 +175,7 @@ Offset:         Format:                     Value:
 #define USE_LATCHED_CODE    2
 #define USE_LATCHED_COLOR   4
 
-void kaneko_kc002_sprite_device::get_sprite_attributes(struct tempsprite *s, UINT16 attr)
+void kaneko_kc002_sprite_device::get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr)
 {
 	s->color        =       (attr & 0x003f);
 	s->priority     =       (attr & 0x00c0) >> 6;
@@ -182,7 +184,7 @@ void kaneko_kc002_sprite_device::get_sprite_attributes(struct tempsprite *s, UIN
 	s->code         +=      (s->y & 1) << 16;   // bloodwar
 }
 
-void kaneko_vu002_sprite_device::get_sprite_attributes(struct tempsprite *s, UINT16 attr)
+void kaneko_vu002_sprite_device::get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr)
 {
 	s->flipy        =       (attr & 0x0001);
 	s->flipx        =       (attr & 0x0002);
@@ -191,7 +193,7 @@ void kaneko_vu002_sprite_device::get_sprite_attributes(struct tempsprite *s, UIN
 }
 
 
-int kaneko16_sprite_device::kaneko16_parse_sprite_type012(int i, struct tempsprite *s, UINT16* spriteram16, int spriteram16_bytes)
+int kaneko16_sprite_device::kaneko16_parse_sprite_type012(int i, struct kan_tempsprite *s, UINT16* spriteram16, int spriteram16_bytes)
 {
 	int attr, xoffs, offs;
 
@@ -356,7 +358,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	int max =   (m_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
-	struct tempsprite *s = m_first_sprite;
+	struct kan_tempsprite *s = m_first_sprite;
 
 	/* These values are latched from the last sprite. */
 	int x           =   0;

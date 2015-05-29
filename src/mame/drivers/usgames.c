@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Nicola Salmoria
 /*
 
 US Games - Trivia / Quiz / 'Amusement Only' Gambling Games
@@ -35,7 +37,7 @@ void usgames_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-WRITE8_MEMBER(usgames_state::usgames_rombank_w)
+WRITE8_MEMBER(usgames_state::rombank_w)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -67,11 +69,11 @@ static ADDRESS_MAP_START( usgames_map, AS_PROGRAM, 8, usgames_state )
 	AM_RANGE(0x2040, 0x2040) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2041, 0x2041) AM_READ_PORT("UNK1")
 	AM_RANGE(0x2041, 0x2041) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2060, 0x2060) AM_WRITE(usgames_rombank_w)
+	AM_RANGE(0x2060, 0x2060) AM_WRITE(rombank_w)
 	AM_RANGE(0x2070, 0x2070) AM_READ_PORT("UNK2")
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(usgames_charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(usgames_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -87,10 +89,10 @@ static ADDRESS_MAP_START( usg185_map, AS_PROGRAM, 8, usgames_state )
 	AM_RANGE(0x2440, 0x2440) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2441, 0x2441) AM_READ_PORT("UNK1")
 	AM_RANGE(0x2441, 0x2441) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2460, 0x2460) AM_WRITE(usgames_rombank_w)
+	AM_RANGE(0x2460, 0x2460) AM_WRITE(rombank_w)
 	AM_RANGE(0x2470, 0x2470) AM_READ_PORT("UNK2")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(usgames_charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(usgames_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -226,7 +228,7 @@ static MACHINE_CONFIG_START( usg32, usgames_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(7*8, 57*8-1, 0*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update_usgames)
+	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", usgames)
@@ -399,11 +401,11 @@ ROM_START( usg182 ) /* Version 18.2 */
 ROM_END
 
 
-GAME( 1987, usg32,    0,        usg32,  usg32, driver_device, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", 0 )
-GAME( 1988, superten, 0,        usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3", 0 )
-GAME( 1988, usg83x,   superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3X", 0 ) /* "Experimental" version?? */
-GAME( 1988, usg82,    superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)
-GAME( 1992, usgames,  0,        usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V25.4X", 0 )
-GAME( 1991, usg187c,  usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.7C", 0 )
-GAME( 1990, usg185,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.5", 0 )
-GAME( 1989, usg182,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.2", 0 )
+GAME( 1987, usg32,    0,        usg32,  usg32, driver_device, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, superten, 0,        usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3", GAME_SUPPORTS_SAVE )
+GAME( 1988, usg83x,   superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3X", GAME_SUPPORTS_SAVE ) /* "Experimental" version?? */
+GAME( 1988, usg82,    superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.2" , GAME_SUPPORTS_SAVE )
+GAME( 1992, usgames,  0,        usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V25.4X", GAME_SUPPORTS_SAVE )
+GAME( 1991, usg187c,  usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.7C", GAME_SUPPORTS_SAVE )
+GAME( 1990, usg185,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.5", GAME_SUPPORTS_SAVE )
+GAME( 1989, usg182,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.2", GAME_SUPPORTS_SAVE )

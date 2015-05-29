@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
 From: erbo@xs4all.nl (erik de boer)
 

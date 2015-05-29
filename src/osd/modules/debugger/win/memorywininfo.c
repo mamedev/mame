@@ -275,5 +275,5 @@ void memorywin_info::process_string(char const *string)
 
 void memorywin_info::update_caption()
 {
-	win_set_window_text_utf8(window(), astring("Memory: ", m_views[0]->source_name()));
+	win_set_window_text_utf8(window(), std::string("Memory: ").append(m_views[0]->source_name()).c_str());
 }

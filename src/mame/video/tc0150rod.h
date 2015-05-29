@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #ifndef __TC0150ROD_H__
 #define __TC0150ROD_H__
 
@@ -17,7 +19,7 @@ protected:
 
 private:
 	// internal state
-	dynamic_array<UINT16> m_ram;
+	std::vector<UINT16> m_ram;
 	UINT16 *m_roadgfx;
 };
 

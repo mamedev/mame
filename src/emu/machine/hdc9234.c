@@ -24,37 +24,37 @@
 #include "hdc9234.h"
 
 // Per-command debugging
-#define TRACE_SELECT 0
-#define TRACE_STEP 0
-#define TRACE_RESTORE 0
-#define TRACE_SUBSTATES 0
-#define TRACE_READ 0
-#define TRACE_WRITE 0
-#define TRACE_READREG 0
-#define TRACE_SETREG 0
-#define TRACE_SETPTR 0
-#define TRACE_FORMAT 0
-#define TRACE_READTRACK 0
+#define TRACE_SELECT 1
+#define TRACE_STEP 1
+#define TRACE_RESTORE 1
+#define TRACE_SUBSTATES 1
+#define TRACE_READ 1
+#define TRACE_WRITE 1
+#define TRACE_READREG 1
+#define TRACE_SETREG 1
+#define TRACE_SETPTR 1
+#define TRACE_FORMAT 1
+#define TRACE_READTRACK 1
 
 // Common states
-#define TRACE_READID 0
-#define TRACE_VERIFY 0
-#define TRACE_TRANSFER 0
+#define TRACE_READID 1
+#define TRACE_VERIFY 1
+#define TRACE_TRANSFER 1
 
 // Live states debugging
-#define TRACE_LIVE 0
-#define TRACE_SHIFT 0
-#define TRACE_SYNC 0
+#define TRACE_LIVE 1
+#define TRACE_SHIFT 1
+#define TRACE_SYNC 1
 
 // Misc debugging
 #define TRACE_DELAY 0
-#define TRACE_INT 0
-#define TRACE_LINES 0
-#define TRACE_INDEX 0
-#define TRACE_DMA 0
-#define TRACE_DONE 0
-#define TRACE_FAIL 0
-#define TRACE_AUXBUS 0
+#define TRACE_INT 1
+#define TRACE_LINES 1
+#define TRACE_INDEX 1
+#define TRACE_DMA 1
+#define TRACE_DONE 1
+#define TRACE_FAIL 1
+#define TRACE_AUXBUS 1
 
 #define TRACE_DETAIL 0
 
@@ -239,8 +239,8 @@ enum
 enum
 {
 	GEN_TIMER = 1,
-	COM_TIMER,
-	LIVE_TIMER
+	COM_TIMER /*,
+    LIVE_TIMER */
 };
 
 /*
@@ -570,9 +570,9 @@ void hdc9234_device::wait_time(emu_timer *tm, int microsec, int next_substate)
 	m_substate = next_substate;
 }
 
-void hdc9234_device::wait_time(emu_timer *tm, attotime delay, int param)
+void hdc9234_device::wait_time(emu_timer *tm, const attotime &delay, int param)
 {
-	if (TRACE_DELAY) logerror("%s: [%s] Delaying by %4.2f microsecs\n", tag(), ttsn().cstr(), delay.as_double()*1000000);
+	if (TRACE_DELAY) logerror("%s: [%s] Delaying by %4.2f microsecs\n", tag(), ttsn().c_str(), delay.as_double()*1000000);
 	tm->adjust(delay);
 	m_substate = param;
 }
@@ -627,7 +627,7 @@ void hdc9234_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			break;
 
 		case READ_ID1:
-			// If an error occured (no IDAM found), terminate the command
+			// If an error occurred (no IDAM found), terminate the command
 			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
 			{
 				if (TRACE_FAIL) logerror("%s: READ_ID failed to find any IDAM\n", tag());
@@ -735,7 +735,7 @@ void hdc9234_device::verify(int& cont, bool verify_all)
 
 			if (TRACE_VERIFY && TRACE_SUBSTATES) logerror("%s: substate VERIFY\n", tag());
 
-			// If an error occured (no IDAM found), terminate the command
+			// If an error occurred (no IDAM found), terminate the command
 			// (This test is only relevant when we did not have a seek phase before)
 			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
 			{
@@ -1027,6 +1027,7 @@ void hdc9234_device::drive_deselect()
 {
 	if (TRACE_SELECT) logerror("%s: DESELECT command\n", tag());
 	m_selected_drive_number = NODRIVE;
+	m_output1 = 0x00;
 	set_command_done(TC_SUCCESS);
 }
 
@@ -1066,7 +1067,7 @@ void hdc9234_device::restore_drive()
 			// Track 0 has not been reached yet
 			if ((m_register_r[DRIVE_STATUS] & HDC_DS_READY)==0)
 			{
-				if (TRACE_RESTORE) logerror("%s: restore command: drive not ready\n", tag());
+				if (TRACE_RESTORE) logerror("%s: restore command: Drive not ready\n", tag());
 				// Does not look like a success, but this takes into account
 				// that if a drive is not connected we do not want an error message
 				cont = SUCCESS;
@@ -1081,6 +1082,7 @@ void hdc9234_device::restore_drive()
 					// When we have buffered steps, the seek limit will be reached
 					// before TRK00 is asserted. In that case we have to wait for
 					// SEEK_COMPLETE. We also wait as soon as TRK00 is asserted.
+					if (TRACE_RESTORE) logerror("%s: restore using buffered steps\n", tag());
 					wait_line(SEEKCOMP_LINE, ASSERT_LINE, SEEK_COMPLETE, false);
 					cont = WAIT;
 				}
@@ -1757,7 +1759,7 @@ void hdc9234_device::write_sectors()
     state machine attempts to find marks on the track, starting from the current
     position. When found, it waits for the machine to catch up. When an event
     happens in the meantime, the state machine is rolled back, and the actions
-    are replayed until the position where the event occured.
+    are replayed until the position where the event occurred.
 
     Lots of code is taken from wd_fdc, with some minor restructuring and renaming.
     Same ideas, though. More comments.
@@ -1765,7 +1767,7 @@ void hdc9234_device::write_sectors()
 ===========================================================================
 */
 
-astring hdc9234_device::tts(const attotime &t)
+std::string hdc9234_device::tts(const attotime &t)
 {
 	char buf[256];
 	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
@@ -1773,7 +1775,7 @@ astring hdc9234_device::tts(const attotime &t)
 	return buf;
 }
 
-astring hdc9234_device::ttsn()
+std::string hdc9234_device::ttsn()
 {
 	return tts(machine().time());
 }
@@ -1784,7 +1786,7 @@ astring hdc9234_device::ttsn()
 */
 void hdc9234_device::live_start(int state)
 {
-	if (TRACE_LIVE) logerror("%s: [%s] Live start substate=%d\n", tag(), ttsn().cstr(), state);
+	if (TRACE_LIVE) logerror("%s: [%s] Live start substate=%d\n", tag(), ttsn().c_str(), state);
 	m_live_state.time = machine().time();
 	m_live_state.state = state;
 	m_live_state.next_state = -1;
@@ -1809,7 +1811,8 @@ void hdc9234_device::live_start(int state)
 
 void hdc9234_device::live_run()
 {
-	live_run_until(attotime::never);
+	if (using_floppy()) live_run_until(attotime::never);
+	else live_run_hd_until(attotime::never);
 }
 
 /*
@@ -1817,6 +1820,8 @@ void hdc9234_device::live_run()
     the requested data are read.
     limit: if unlimited (attotime::never), run up to the end of the track and wait there
     otherwise, used to replay the read/write operation up to the point where the event happened
+
+    THIS IS THE FLOPPY-ONLY LIVE_RUN
 */
 void hdc9234_device::live_run_until(attotime limit)
 {
@@ -1828,9 +1833,9 @@ void hdc9234_device::live_run_until(attotime limit)
 	if (TRACE_LIVE)
 	{
 		if (limit == attotime::never)
-			logerror("%s: [%s] live_run, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).cstr(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("%s: [%s] live_run, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 		else
-			logerror("%s: [%s] live_run until %s, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).cstr(), tts(limit).cstr(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("%s: [%s] live_run until %s, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 	}
 
 	if (limit == attotime::never)
@@ -1862,7 +1867,7 @@ void hdc9234_device::live_run_until(attotime limit)
 
 			if (TRACE_LIVE && m_last_live_state != SEARCH_IDAM)
 			{
-				logerror("%s: [%s] SEARCH_IDAM [limit %s]\n", tag(),tts(m_live_state.time).cstr(), tts(limit).cstr());
+				logerror("%s: [%s] SEARCH_IDAM [limit %s]\n", tag(),tts(m_live_state.time).c_str(), tts(limit).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -1871,11 +1876,11 @@ void hdc9234_device::live_run_until(attotime limit)
 
 			if (read_one_bit(limit))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s] SEARCH_IDAM limit reached\n", tag(), tts(m_live_state.time).cstr());
+				if (TRACE_LIVE) logerror("%s: [%s] SEARCH_IDAM limit reached\n", tag(), tts(m_live_state.time).c_str());
 				return;
 			}
-			// logerror("%s: SEARCH_IDAM\n", tts(m_live_state.time).cstr());
-			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(m_live_state.time).cstr(), m_live_state.shift_reg,
+			// logerror("%s: SEARCH_IDAM\n", tts(m_live_state.time).c_str());
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg,
 				get_data_from_encoding(m_live_state.shift_reg), m_live_state.bit_counter);
 
 			// [1] p. 9: The ID field sync mark must be found within 33,792 byte times
@@ -1890,7 +1895,7 @@ void hdc9234_device::live_run_until(attotime limit)
 				// MFM case
 				if (m_live_state.shift_reg == 0x4489)
 				{
-					if (TRACE_LIVE) logerror("%s: [%s] Found an A1 mark\n", tag(),tts(m_live_state.time).cstr());
+					if (TRACE_LIVE) logerror("%s: [%s] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
 					m_live_state.crc = 0x443b;
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
@@ -1921,14 +1926,14 @@ void hdc9234_device::live_run_until(attotime limit)
 
 			if (TRACE_LIVE && m_last_live_state != READ_TWO_MORE_A1_IDAM)
 			{
-				logerror("%s: [%s] READ_TWO_MORE_A1\n", tag(),tts(m_live_state.time).cstr());
+				logerror("%s: [%s] READ_TWO_MORE_A1\n", tag(),tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
 			// Beyond time limit?
 			if (read_one_bit(limit)) return;
 
-			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(m_live_state.time).cstr(), m_live_state.shift_reg,
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg,
 					get_data_from_encoding(m_live_state.shift_reg), m_live_state.bit_counter);
 
 			if (m_live_state.bit_count_total > 33792*16)
@@ -1950,12 +1955,12 @@ void hdc9234_device::live_run_until(attotime limit)
 					m_live_state.state = SEARCH_IDAM;
 				}
 				else
-					if (TRACE_LIVE) logerror("%s: [%s] Found an A1 mark\n", tag(),tts(m_live_state.time).cstr());
+					if (TRACE_LIVE) logerror("%s: [%s] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
 				// Continue
 				break;
 			}
 
-			if (TRACE_LIVE) logerror("%s: [%s] Found data value %02X\n", tag(),tts(m_live_state.time).cstr(), m_live_state.data_reg);
+			if (TRACE_LIVE) logerror("%s: [%s] Found data value %02X\n", tag(),tts(m_live_state.time).c_str(), m_live_state.data_reg);
 
 			// Check for ident field (fe, ff, fd, fc)
 			if ((m_live_state.data_reg & 0xfc) != 0xfc)
@@ -1976,7 +1981,7 @@ void hdc9234_device::live_run_until(attotime limit)
 		case READ_ID_FIELDS_INTO_REGS:
 			if (TRACE_LIVE && m_last_live_state != READ_ID_FIELDS_INTO_REGS)
 			{
-				logerror("%s: [%s] READ_ID_FIELDS_INTO_REGS\n", tag(),tts(m_live_state.time).cstr());
+				logerror("%s: [%s] READ_ID_FIELDS_INTO_REGS\n", tag(),tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -2017,7 +2022,7 @@ void hdc9234_device::live_run_until(attotime limit)
 		case SEARCH_DAM:
 			if (TRACE_LIVE && m_last_live_state != SEARCH_DAM)
 			{
-				logerror("%s: [%s] SEARCH_DAM\n", tag(),tts(m_live_state.time).cstr());
+				logerror("%s: [%s] SEARCH_DAM\n", tag(),tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -2026,7 +2031,7 @@ void hdc9234_device::live_run_until(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(m_live_state.time).cstr(), m_live_state.shift_reg,
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg,
 					get_data_from_encoding(m_live_state.shift_reg), m_live_state.bit_counter);
 
 			if (!fm_mode())
@@ -2040,7 +2045,7 @@ void hdc9234_device::live_run_until(attotime limit)
 
 				if (m_live_state.bit_counter >= 28*16 && m_live_state.shift_reg == 0x4489)
 				{
-					if (TRACE_LIVE) logerror("%s: [%s] Found an A1 mark\n", tag(),tts(m_live_state.time).cstr());
+					if (TRACE_LIVE) logerror("%s: [%s] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
 					m_live_state.crc = 0x443b;
 					m_live_state.data_separator_phase = false;
 					m_live_state.bit_counter = 0;
@@ -2074,14 +2079,14 @@ void hdc9234_device::live_run_until(attotime limit)
 		case READ_TWO_MORE_A1_DAM: {
 			if (TRACE_LIVE && m_last_live_state != READ_TWO_MORE_A1_DAM)
 			{
-				logerror("%s: [%s] READ_TWO_MORE_A1_DAM\n", tag(),tts(m_live_state.time).cstr());
+				logerror("%s: [%s] READ_TWO_MORE_A1_DAM\n", tag(),tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
 			if(read_one_bit(limit))
 				return;
 
-			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(m_live_state.time).cstr(), m_live_state.shift_reg,
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(m_live_state.time).c_str(), m_live_state.shift_reg,
 				get_data_from_encoding(m_live_state.shift_reg), m_live_state.bit_counter);
 
 			// Repeat until we have collected 16 bits
@@ -2098,12 +2103,12 @@ void hdc9234_device::live_run_until(attotime limit)
 					return;
 				}
 				else
-					if (TRACE_LIVE) logerror("%s: [%s] Found an A1 mark\n", tag(),tts(m_live_state.time).cstr());
+					if (TRACE_LIVE) logerror("%s: [%s] Found an A1 mark\n", tag(),tts(m_live_state.time).c_str());
 				// Continue
 				break;
 			}
 
-			if (TRACE_LIVE) logerror("%s: [%s] Found data value %02X\n", tag(),tts(m_live_state.time).cstr(), m_live_state.data_reg);
+			if (TRACE_LIVE) logerror("%s: [%s] Found data value %02X\n", tag(),tts(m_live_state.time).c_str(), m_live_state.data_reg);
 
 			if ((m_live_state.data_reg & 0xff) == 0xf8)
 			{
@@ -2133,7 +2138,7 @@ void hdc9234_device::live_run_until(attotime limit)
 		{
 			if (TRACE_LIVE && m_last_live_state != READ_SECTOR_DATA)
 			{
-				logerror("%s: [%s] READ_SECTOR_DATA\n", tag(),tts(m_live_state.time).cstr());
+				logerror("%s: [%s] READ_SECTOR_DATA\n", tag(),tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -2158,7 +2163,7 @@ void hdc9234_device::live_run_until(attotime limit)
 			// Repeat until we have collected 16 bits
 			if (m_live_state.bit_counter & 15) break;
 
-			if (TRACE_LIVE) logerror("%s: [%s] Found data value %02X, CRC=%04x\n", tag(),tts(m_live_state.time).cstr(), m_live_state.data_reg, m_live_state.crc);
+			if (TRACE_LIVE) logerror("%s: [%s] Found data value %02X, CRC=%04x\n", tag(),tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.crc);
 			int slot = (m_live_state.bit_counter >> 4)-1;
 
 			if (slot < calc_sector_size())
@@ -2179,7 +2184,7 @@ void hdc9234_device::live_run_until(attotime limit)
 					}
 					else
 					{
-						if (TRACE_LIVE) logerror("%s: [%s] Sector read completed\n", tag(),tts(m_live_state.time).cstr());
+						if (TRACE_LIVE) logerror("%s: [%s] Sector read completed\n", tag(),tts(m_live_state.time).c_str());
 						wait_for_realtime(IDLE);
 					}
 					return;
@@ -2191,7 +2196,7 @@ void hdc9234_device::live_run_until(attotime limit)
 		case READ_SECTOR_DATA1:
 			if (TRACE_LIVE && m_last_live_state != READ_SECTOR_DATA1)
 			{
-				logerror("%s: [%s] READ_SECTOR_DATA1\n", tag(),tts(m_live_state.time).cstr());
+				logerror("%s: [%s] READ_SECTOR_DATA1\n", tag(),tts(m_live_state.time).c_str());
 				m_last_live_state = m_live_state.state;
 			}
 
@@ -2237,7 +2242,7 @@ void hdc9234_device::live_run_until(attotime limit)
 			// 5. Write the CRC bytes
 
 			if (TRACE_LIVE)
-				logerror("%s: [%s] WRITE_DAM_AND_SECTOR\n", tag(), tts(m_live_state.time).cstr());
+				logerror("%s: [%s] WRITE_DAM_AND_SECTOR\n", tag(), tts(m_live_state.time).c_str());
 
 			skip_on_track(m_gap2_size, WRITE_DAM_SYNC);
 			break;
@@ -2554,14 +2559,14 @@ void hdc9234_device::live_run_until(attotime limit)
 			// The pause is implemented by doing dummy reads on the floppy
 			if (read_one_bit(limit))
 			{
-				if (TRACE_LIVE) logerror("%s: [%s] return; limit=%s\n", tag(), tts(m_live_state.time).cstr(), tts(limit).cstr());
+				if (TRACE_LIVE) logerror("%s: [%s] return; limit=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str());
 				return;
 			}
 
 			// Repeat until we have collected 16 bits
 			if ((m_live_state.bit_counter & 15)==0)
 			{
-				if (TRACE_READ && TRACE_DETAIL) logerror("%s: [%s] Read byte %02x, repeat = %d\n", tag(), tts(m_live_state.time).cstr(), m_live_state.data_reg, m_live_state.repeat);
+				if (TRACE_READ && TRACE_DETAIL) logerror("%s: [%s] Read byte %02x, repeat = %d\n", tag(), tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.repeat);
 				wait_for_realtime(READ_TRACK_NEXT_BYTE);
 				return;
 			}
@@ -2623,6 +2628,40 @@ void hdc9234_device::live_run_until(attotime limit)
 }
 
 /*
+    The main method of the live state machine. We stay in this method until
+    the requested data are read.
+    limit: if unlimited (attotime::never), run up to the end of the track and wait there
+    otherwise, used to replay the read/write operation up to the point where the event happened
+
+    THIS IS THE HARDDISK-ONLY LIVE_RUN
+*/
+void hdc9234_device::live_run_hd_until(attotime limit)
+{
+//  int slot = 0;
+	logerror("%s: live_run_hd\n", tag());
+
+	if (m_live_state.state == IDLE || m_live_state.next_state != -1)
+		return;
+
+	if (TRACE_LIVE)
+	{
+		if (limit == attotime::never)
+			logerror("%s: [%s] live_run_hd, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+		else
+			logerror("%s: [%s] live_run_hd until %s, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+	}
+	while (true)
+	{
+		switch (m_live_state.state)
+		{
+			case SEARCH_IDAM:
+				break;
+		}
+		return;
+	}
+}
+
+/*
     Synchronize the live position on the track with the real time.
     Results in a new checkpoint and a live position at machine time or behind.
     As a side effect, portions of the track may be re-read
@@ -2636,7 +2675,7 @@ void hdc9234_device::live_sync()
 		if(m_live_state.time > machine().time())
 		{
 			// If so, we must roll back to the last checkpoint
-			if (TRACE_SYNC) logerror("%s: [%s] Rolling back and replaying (%s)\n", tag(), ttsn().cstr(), tts(m_live_state.time).cstr());
+			if (TRACE_SYNC) logerror("%s: [%s] Rolling back and replaying (%s)\n", tag(), ttsn().c_str(), tts(m_live_state.time).c_str());
 			rollback();
 			// and replay until we reach the machine time
 			live_run_until(machine().time());
@@ -2647,7 +2686,7 @@ void hdc9234_device::live_sync()
 		{
 			// We are behind machine time, so we will never get back to that
 			// time, thus we can commit that position
-			if (TRACE_SYNC) logerror("%s: [%s] Committing (%s)\n", tag(), ttsn().cstr(), tts(m_live_state.time).cstr());
+			if (TRACE_SYNC) logerror("%s: [%s] Committing (%s)\n", tag(), ttsn().c_str(), tts(m_live_state.time).c_str());
 			// Write on floppy image
 			m_pll.commit(m_floppy, m_live_state.time);
 
@@ -2672,7 +2711,7 @@ void hdc9234_device::live_abort()
 {
 	if (!m_live_state.time.is_never() && m_live_state.time > machine().time())
 	{
-		if (TRACE_LIVE) logerror("%s: Abort; rolling back and replaying (%s)\n", ttsn().cstr(), tts(m_live_state.time).cstr());
+		if (TRACE_LIVE) logerror("%s: Abort; rolling back and replaying (%s)\n", ttsn().c_str(), tts(m_live_state.time).c_str());
 		rollback();
 		live_run_until(machine().time());
 	}
@@ -2735,7 +2774,7 @@ void hdc9234_device::wait_for_realtime(int state)
 {
 	m_live_state.next_state = state;
 	m_timer->adjust(m_live_state.time - machine().time());
-	if (TRACE_LIVE) logerror("%s: [%s] Waiting for real time [%s] to catch up\n", tag(), tts(m_live_state.time).cstr(), tts(machine().time()).cstr());
+	if (TRACE_LIVE) logerror("%s: [%s] Waiting for real time [%s] to catch up\n", tag(), tts(m_live_state.time).c_str(), tts(machine().time()).c_str());
 }
 
 /*
@@ -2858,7 +2897,7 @@ void hdc9234_device::encode_byte(UINT8 byte)
 	m_live_state.bit_counter = 16;
 	m_live_state.last_data_bit = raw & 1;
 	m_live_state.shift_reg = m_live_state.shift_reg_save = raw;
-	if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: [%s] Write %02x (%04x)\n", tag(), tts(m_live_state.time).cstr(), byte, raw);
+	if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: [%s] Write %02x (%04x)\n", tag(), tts(m_live_state.time).c_str(), byte, raw);
 	checkpoint();
 }
 
@@ -2872,7 +2911,7 @@ void hdc9234_device::encode_raw(UINT16 raw)
 	m_live_state.bit_counter = 16;
 	m_live_state.shift_reg = m_live_state.shift_reg_save = raw;
 	m_live_state.last_data_bit = raw & 1;
-	if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: [%s] Write %02x (%04x)\n", tag(), tts(m_live_state.time).cstr(), get_data_from_encoding(raw), raw);
+	if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: [%s] Write %02x (%04x)\n", tag(), tts(m_live_state.time).c_str(), get_data_from_encoding(raw), raw);
 	checkpoint();
 }
 
@@ -2960,7 +2999,7 @@ WRITE8_MEMBER( hdc9234_device::write )
 	{
 		if (m_executing)
 		{
-			logerror("%s: [%s] Error - previous command %02x not completed; new command %02x ignored\n", tag(), ttsn().cstr(), current_command(), data);
+			logerror("%s: [%s] Error - previous command %02x not completed; new command %02x ignored\n", tag(), ttsn().c_str(), current_command(), data);
 		}
 		else
 		{
@@ -3169,7 +3208,7 @@ void hdc9234_device::auxbus_in(UINT8 data)
 
 void hdc9234_device::index_callback(int level)
 {
-	if (TRACE_LINES) logerror("%s: [%s] Index callback level=%d\n", tag(), ttsn().cstr(), level);
+	if (TRACE_LINES) logerror("%s: [%s] Index callback level=%d\n", tag(), ttsn().c_str(), level);
 
 	// Synchronize our position on the track
 	live_sync();
@@ -3182,7 +3221,7 @@ void hdc9234_device::index_callback(int level)
 
 	if (m_event_line == INDEX_LINE && level == m_line_level && m_state_after_line != UNDEF)
 	{
-		if (TRACE_LINES) logerror("%s: [%s] Index pulse level=%d triggers event\n", tag(), ttsn().cstr(), level);
+		if (TRACE_LINES) logerror("%s: [%s] Index pulse level=%d triggers event\n", tag(), ttsn().c_str(), level);
 		m_substate = m_state_after_line;
 		m_state_after_line = UNDEF;
 		if (m_stopwrite)
@@ -3197,7 +3236,7 @@ void hdc9234_device::index_callback(int level)
 
 void hdc9234_device::ready_callback(int level)
 {
-	if (TRACE_LINES) logerror("%s: [%s] Ready callback level=%d\n", tag(), ttsn().cstr(), level);
+	if (TRACE_LINES) logerror("%s: [%s] Ready callback level=%d\n", tag(), ttsn().c_str(), level);
 
 	// Set the interrupt status flag
 	set_bits(m_register_r[INT_STATUS], ST_RDYCHNG, true);
@@ -3222,7 +3261,7 @@ void hdc9234_device::ready_callback(int level)
 
 void hdc9234_device::seek_complete_callback(int level)
 {
-	if (TRACE_LINES) logerror("%s: [%s] Seek complete callback level=%d\n", tag(), ttsn().cstr(), level);
+	if (TRACE_LINES) logerror("%s: [%s] Seek complete callback level=%d\n", tag(), ttsn().c_str(), level);
 
 	// Synchronize our position on the track
 	live_sync();
@@ -3269,7 +3308,7 @@ void hdc9234_device::auxbus_out()
 	m_output2 = (m_output2 & 0xb0) | desired_head();
 	if (m_reduced_write_current) m_output2 |= OUT2_REDWRT;
 
-	if (TRACE_AUXBUS) logerror("%s: Setting OUTPUT2 to %02x\n", tag(), m_output2);
+	if (TRACE_AUXBUS) logerror("%s: [%s] Setting OUTPUT1=%02x, OUTPUT2=%02x\n", tag(), ttsn().c_str(), m_output1, m_output2);
 
 	if (m_output1 != m_output1_old || m_output2 != m_output2_old)
 	{
@@ -3323,7 +3362,7 @@ WRITE_LINE_MEMBER( hdc9234_device::dmaack )
 {
 	if (state==ASSERT_LINE)
 	{
-		if (TRACE_DMA) logerror("%s: [%s] DMA acknowledged\n", tag(), ttsn().cstr());
+		if (TRACE_DMA) logerror("%s: [%s] DMA acknowledged\n", tag(), ttsn().c_str());
 		set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
 	}
 }
@@ -3335,6 +3374,14 @@ WRITE_LINE_MEMBER( hdc9234_device::dmaack )
 void hdc9234_device::connect_floppy_drive(floppy_image_device* floppy)
 {
 	m_floppy = floppy;
+}
+
+/*
+    Connect the current hard drive.
+*/
+void hdc9234_device::connect_hard_drive(mfm_harddisk_device* harddisk)
+{
+	m_harddisk = harddisk;
 }
 
 /*
@@ -3363,9 +3410,9 @@ void hdc9234_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case COM_TIMER:
 		process_command();
 		break;
-	case LIVE_TIMER:
-		live_run();
-		break;
+	/* case LIVE_TIMER:
+	    live_run();
+	    break; */
 	}
 }
 
@@ -3393,7 +3440,7 @@ void hdc9234_device::device_start()
 	// allocate timers
 	m_timer = timer_alloc(GEN_TIMER);
 	m_cmd_timer = timer_alloc(COM_TIMER);
-	m_live_timer = timer_alloc(LIVE_TIMER);
+	// m_live_timer = timer_alloc(LIVE_TIMER);
 
 	m_live_state.state = IDLE;
 }

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Hau
 #include "emu.h"
 #include "video/polylgcy.h"
 #include "includes/galastrm.h"
@@ -262,21 +264,21 @@ void galastrm_state::tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcb
 
 	if (rzx != 0 || rzy != 0)
 	{
-		while (sqrt(pow((float)pxx/4096.0, 2.0) + pow((float)pxy/4096.0, 2.0)) < (float)(lx / 2))
+		while (sqrtf(powf((float)pxx/4096.0f, 2.0f) + powf((float)pxy/4096.0f, 2.0f)) < (float)(lx / 2))
 		{
 			pxx += rzx;
 			pxy += rzy;
 			zx++;
 		}
-		while (sqrt(pow((float)pyy/4096.0, 2.0) + pow((float)pyx/4096.0, 2.0)) < (float)(ly / 2))
+		while (sqrtf(powf((float)pyy/4096.0f, 2.0f) + powf((float)pyx/4096.0f, 2.0f)) < (float)(ly / 2))
 		{
 			pyy += rzx;
 			pyx += -rzy;
 			zy++;
 		}
 	}
-	zsn = ((float)pyx/4096.0) / (float)(ly / 2);
-	zcs = ((float)pxx/4096.0) / (float)(lx / 2);
+	zsn = ((float)pyx/4096.0f) / (float)(ly / 2);
+	zcs = ((float)pxx/4096.0f) / (float)(lx / 2);
 
 
 	if ((rsx == -240 && rsy == 1072) || !m_tc0610_ctrl_reg[1][7])
@@ -338,13 +340,13 @@ void galastrm_state::tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcb
 	{
 		if (ryx != 0 || ryy != 0)
 		{
-			while (sqrt(pow((float)pxx/4096.0, 2.0) + pow((float)pxy/4096.0, 2.0)) < (float)(lx / 2))
+			while (sqrtf(powf((float)pxx/4096.0f, 2.0f) + powf((float)pxy/4096.0f, 2.0f)) < (float)(lx / 2))
 			{
 				pxx += ryx;
 				pxy += ryy;
 				yx++;
 			}
-			while (sqrt(pow((float)pyy/4096.0, 2.0) + pow((float)pyx/4096.0, 2.0)) < (float)(ly / 2))
+			while (sqrtf(powf((float)pyy/4096.0f, 2.0f) + powf((float)pyx/4096.0f, 2.0f)) < (float)(ly / 2))
 			{
 				pyy += ryx;
 				pyx += -ryy;
@@ -365,12 +367,12 @@ void galastrm_state::tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcb
 
 		if (rsx != 0 || rsy != 0)
 		{
-			while (sqrt(pow((float)pxx/65536.0, 2.0) + pow((float)pxy/65536.0, 2.0)) < (float)(lx / 2))
+			while (sqrtf(powf((float)pxx/65536.0f, 2.0) + powf((float)pxy/65536.0f, 2.0f)) < (float)(lx / 2))
 			{
 				pxx += rsx;
 				pxy += rsy;
 			}
-			while (sqrt(pow((float)pyy/65536.0, 2.0) + pow((float)pyx/65536.0, 2.0)) < (float)(ly / 2))
+			while (sqrtf(powf((float)pyy/65536.0f, 2.0f) + powf((float)pyx/65536.0f, 2.0f)) < (float)(ly / 2))
 			{
 				pyy += rsx;
 				pyx += -rsy;
@@ -411,10 +413,10 @@ void galastrm_state::tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcb
 	vert[0].p[0] = 0.0;
 	vert[0].p[1] = 0.0;
 	vert[1].p[0] = 0.0;
-	vert[1].p[1] = (float)(ly - 1) * 65536.0;
-	vert[2].p[0] = (float)(lx - 1) * 65536.0;
-	vert[2].p[1] = (float)(ly - 1) * 65536.0;
-	vert[3].p[0] = (float)(lx - 1) * 65536.0;
+	vert[1].p[1] = (float)(ly - 1) * 65536.0f;
+	vert[2].p[0] = (float)(lx - 1) * 65536.0f;
+	vert[2].p[1] = (float)(ly - 1) * 65536.0f;
+	vert[3].p[0] = (float)(lx - 1) * 65536.0f;
 	vert[3].p[1] = 0.0;
 
 	extra->texbase = &srcbitmap;

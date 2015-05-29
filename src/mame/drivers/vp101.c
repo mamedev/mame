@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     Play Mechanix / Right Hand Tech "VP100" and "VP101" platforms

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Olivier Galibert, hap
 /*
 
    YMF278B  FM + Wave table Synthesizer (OPL4)
@@ -37,26 +39,6 @@
 
    By R. Belmont and O. Galibert.
 
-   Copyright R. Belmont and O. Galibert.
-
-   This software is dual-licensed: it may be used in MAME and properly licensed
-   MAME derivatives under the terms of the MAME license.  For use outside of
-   MAME and properly licensed derivatives, it is available under the
-   terms of the GNU Lesser General Public License (LGPL), version 2.1.
-   You may read the LGPL at http://www.gnu.org/licenses/lgpl.html
-
-   Changelog:
-   Sep. 8, 2002 - fixed ymf278b_compute_rate when octave is negative (RB)
-   Dec. 11, 2002 - added ability to set non-standard clock rates (RB)
-                   fixed envelope target for release (fixes missing
-           instruments in hotdebut).
-                   Thanks to Team Japump! for MP3s from a real PCB.
-           fixed crash if MAME is run with no sound.
-   June 4, 2003 -  Changed to dual-license with LGPL for use in openMSX.
-                   openMSX contributed a bugfix where looped samples were
-            not being addressed properly, causing pitch fluctuation.
-
-   With further improvements over the years by MAME team.
 
    TODO:
    - accurate timing of envelopes

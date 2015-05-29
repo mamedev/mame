@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"

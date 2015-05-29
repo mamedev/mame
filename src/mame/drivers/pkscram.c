@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
 
 PCB# -   ANIMAL-01  Cosmo Electronics Corporation

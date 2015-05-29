@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi,Brad Oliver
 /******************************************************************************
 
     Nintendo 2C0x PPU emulation.

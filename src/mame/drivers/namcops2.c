@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
     namcops2.c
@@ -14,10 +16,6 @@
     * SPU2 - Sound Processing Unit.  Almost literally 2 PS1 SPUs stuck together,
       with 2 MB of wave RAM, a 48 kHz sample rate (vs. 44.1 on PS1), and 2
       stereo DMADACs.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 
 List of Namco System 246 games:
 * Battle Gear 3 (Taito, 2002)

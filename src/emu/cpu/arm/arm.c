@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /* arm.c
 
     ARM 2/3/6 Emulation (26 bit address bus)
@@ -550,14 +552,14 @@ void arm_cpu_device::device_start()
 }
 
 
-void arm_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void arm_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	static const char *s[4] = { "USER", "FIRQ", "IRQ ", "SVC " };
 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c %s",
+			strprintf(str, "%c%c%c%c%c%c %s",
 				(m_sArmRegister[15] & N_MASK) ? 'N' : '-',
 				(m_sArmRegister[15] & Z_MASK) ? 'Z' : '-',
 				(m_sArmRegister[15] & C_MASK) ? 'C' : '-',

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Phil Stroffolino
 /*
     ARM 2/3 disassembler
 

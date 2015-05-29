@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Aaron Giles, R. Belmont, hap, Philip Bennett
 /***************************************************************************
 
     Taito Ensoniq ES5505-based sound hardware

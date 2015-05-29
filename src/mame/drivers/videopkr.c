@@ -1,276 +1,273 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca, Grull Osgo
 /*************************************************************************
 
-    VIDEO POKER - IGT/INTERFLIP
-    -----------------------
+  VIDEO POKER - IGT/INTERFLIP
+  ---------------------------
 
-    Original driver by Grull Osgo.
-    Rewrite and additional work by Roberto Fresca.
-    Fortune I (IGT) added by Jim Stolis.
-
-
-    Games running on this hardware:
-
-    * Draw Poker,          1984, IGT - International Game Technology
-
-    * Video Poker,         1984, InterFlip.
-    * Black Jack,          1984, InterFlip.
-    * Video Dado,          1987, InterFlip.
-    * Video Cordoba,       1987, InterFlip.
-
-    * Baby Poker,          1989, Recreativos Franco.
-    * Baby Dado,           1989, Recreativos Franco.
-
-    * Video Poker (v1403), 198?, Recreativos Franco?.
+  Original driver by Grull Osgo.
+  Rewrite and additional work by Roberto Fresca.
+  Fortune I (IGT) added by Jim Stolis.
 
 
-***************************************************************************
+  Games running on this hardware:
 
+  * Draw Poker,          1984, IGT - International Game Technology
 
-    History:
-    ========
+  * Video Poker,         1984, InterFlip.
+  * Black Jack,          1984, InterFlip.
+  * Video Dado,          1987, InterFlip.
+  * Video Cordoba,       1987, InterFlip.
 
-    In 1975, Si Redd founded A1-Supply.  This was renamed to Sircoma in 1978,
-    and eventually IGT (International Game Technology) in 1981.
+  * Baby Poker,          1989, Recreativos Franco.
+  * Baby Dado,           1989, Recreativos Franco.
 
-    Along the way, in 1978, Fortune Coin Company was acquired and contained
-    the basis to their Fortune I game machines.
-
-    The Fortune I hardware consisted of the following games:
-      Regular Draw Poker
-      Progressive Draw Poker
-      Joker Wild Poker
-      Double Up Draw Poker
-      Credit Draw Poker
-      Lucky 7 Poker (Seven Card Stud Poker)
-      Twenty One
-      Live 21
-      Count Down 21
-      Two Hand 21
-      In Between
-      Regular Slot
-      Credit Slot
-
-    InterFlip (Spain), is a subsidiary of Recreativos Franco.
-    This company was created mainly with the purpose of manufacture
-    and distribute export-class games.
-
-    These machines were build in upright wood style cabinets, and compliment
-    with class "C" (for casinos) spanish gaming regulations.
+  * Video Poker (v1403), 198?, Recreativos Franco?.
 
 
 ***************************************************************************
 
+  History:
+  ========
 
-    Hardware Info
-    =============
+  In 1975, Si Redd founded A1-Supply.  This was renamed to Sircoma in 1978,
+  and eventually IGT (International Game Technology) in 1981.
 
-    This is a two board system: Main & Sound board.
+  Along the way, in 1978, Fortune Coin Company was acquired and contained
+  the basis to their Fortune I game machines.
 
+  The Fortune I hardware consisted of the following games:
+    Regular Draw Poker
+    Progressive Draw Poker
+    Joker Wild Poker
+    Double Up Draw Poker
+    Credit Draw Poker
+    Lucky 7 Poker (Seven Card Stud Poker)
+    Twenty One
+    Live 21
+    Count Down 21
+    Two Hand 21
+    In Between
+    Regular Slot
+    Credit Slot
 
-    * Main board:
+  InterFlip (Spain), is a subsidiary of Recreativos Franco.
+  This company was created mainly with the purpose of manufacture
+  and distribute export-class games.
 
-    1x Intel 8039 CPU               Clocked @ 6/8 MHz.
-    2x 2716 EPROM                   Program ROM.
-    2x 2716 EPROM                   Character/graphics ROM.
-    1x 5101 (256 x 4) SRAM          Data Memory (Battery Backed RAM).
-    2x 2114 (1024 x 4) SRAM         8-Bit Char. RAM.
-    1x 2114 (1024 x 4) SRAM         4-Bit Color RAM.
-    1x 74s287 (256 x 4) TTL PROM    Color PROM.
-
-    1x 6 MHz.(or 8 MHz.) Crystal    CPU clock.
-    1x 7.8643 MHz. Crystal          Video System.
-
-    1x 3.6 Ni-Cd Battery            Data Memory.
-
-    TTL type Raster video           Configurable HIGH-LOW resolution through hardware jumper.
-                                    Configurable 50Hz-60Hz V-Sync through hardware jumper.
-
-    I/O System                      Buffered, latched & optocoupled.
-
-
-    * Sound board:
-
-    1x Intel 8039 CPU               Clocked @ 8 MHz.
-    2x 2716 EPROM                   Program ROM.
-    1x 1408 DAC
-    1x 8.0000 MHz. Crystal
+  These machines were build in upright wood style cabinets, and compliment
+  with class "C" (for casinos) spanish gaming regulations.
 
 
-********************************************************************************
+***************************************************************************
+
+  Hardware Info
+  =============
+
+  This is a two board system: Main & Sound board.
+
+  * Main board:
+
+  1x Intel 8039 CPU               Clocked @ 6/8 MHz.
+  2x 2716 EPROM                   Program ROM.
+  2x 2716 EPROM                   Character/graphics ROM.
+  1x 5101 (256 x 4) SRAM          Data Memory (Battery Backed RAM).
+  2x 2114 (1024 x 4) SRAM         8-Bit Char. RAM.
+  1x 2114 (1024 x 4) SRAM         4-Bit Color RAM.
+  1x 74s287 (256 x 4) TTL PROM    Color PROM.
+
+  1x 6 MHz.(or 8 MHz.) Crystal    CPU clock.
+  1x 7.8643 MHz. Crystal          Video System.
+
+  1x 3.6 Ni-Cd Battery            Data Memory.
+
+  TTL type Raster video           Configurable HIGH-LOW resolution through hardware jumper.
+                                  Configurable 50Hz-60Hz V-Sync through hardware jumper.
+
+  I/O System                      Buffered, latched & optocoupled.
 
 
-    Main CPU Memory Map
-    ===================
+  * Sound board:
 
-    0x0000 - 0x0FFF         Program ROM.
-
-    Data & Video RAM are mapped through I/O hardware implementations due to
-    I8039 memory addressing restrictions.
-
-
-    Main CPU I/0 Map
-    ================
-
-    P1.0          ; Used at bit level, Aux_0 signal.
-    P1.1          ; Used at bit level, Aux_1 signal.
-    P1.2          ; Used at bit level, Aux_2 signal.
-    P1.3          ; Used at bit level, Aux_3 signal.
-    P1.4          ; Used at bit level, Aux_4 signal & Sound Latch bit 3
-    P1.5          ; Used at bit level, Aux_5 signal & Sound Latch bit 0
-    P1.6          ; Expands address bus for video and color RAM access (V.A8)
-    P1.7          ; Expands address bus for video and color RAM access (V.A9)
-
-    P2.0 - P2.3:  ; I8039 as address bus expansion (Program memory - High address nibble).
-
-    P2.4:         ; Reads 8 bits from data buffer input port (interface for switch encoder).
-                        Bit 0: Lamp_1.
-                        Bit 1: Lamp_2.
-                        Bit 2: Lamp_3.
-                        Bit 3: Lamp_4.
-                        Bit 4: Coin Acceptor.
-                        Bit 5: Hopper 1 & Sound Latch bit 1.
-                        Bit 6: Hopper 2 & Sound Latch bit 2.
-                        Bit 7: Diverter.
-
-                    Writes 8 bits to data latch out port (lamps, relays and coils).
-                        Bit 0: SW_encoder_0.
-                        Bit 1: SW_encoder_1.
-                        Bit 2: SW_encoder_2.
-                        Bit 3: SW_encoder_3.
-                        Bit 4: Coin Out.
-                        Bit 5: Undocumented jumper.
-                        Bit 6: N/U (pulled up).
-                        Bit 7: N/U (pulled up).
-
-    P2.5:         ; Enable access to data RAM.
-    P2.6:         ; Enable access to video RAM (write mode) - no read mode.
-    P2.7:         ; Enable access to color RAM (write Mode) - no read mode.
+  1x Intel 8039 CPU               Clocked @ 8 MHz.
+  2x 2716 EPROM                   Program ROM.
+  1x 1408 DAC
+  1x 8.0000 MHz. Crystal
 
 
 ********************************************************************************
 
+  Main CPU Memory Map
+  ===================
 
-    Game Info
-    =========
+  0x0000 - 0x0FFF         Program ROM.
 
-    Pay Tables:
-
-    These machines had its pay tables out of screen, in the upper front panel (backlighted).
-
-
-                        Video Poker (Spanish text only)
-    ----------------------------------------------------------------------------
-    Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
-    ----------------------------------------------------------------------------
-    Escalera Maxima         250        500         750        1000        4000
-    de color
-
-    Escalera de Color       100        200         300         400         500
-
-    Poker                    50        100         150         200         250
-
-    Full                     11         22          33          44          55
-
-    Color                     7         14          21          28          35
-
-    Escalera                  5         10          15          20          25
-
-    Trio                      3          6           9          12          15
-
-    Doble Pareja              2          4           6           8          10
-    ----------------------------------------------------------------------------
+  Data & Video RAM are mapped through I/O hardware implementations due to
+  I8039 memory addressing restrictions.
 
 
-                        Black Jack (Spanish text only)
-    ----------------------------------------------------------------------------
-    Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
-    ----------------------------------------------------------------------------
-    Empate                   1          2           3           4            5
+  Main CPU I/0 Map
+  ================
 
-    La Banca se pasa         2          4           6           8           10
+  P1.0          ; Used at bit level, Aux_0 signal.
+  P1.1          ; Used at bit level, Aux_1 signal.
+  P1.2          ; Used at bit level, Aux_2 signal.
+  P1.3          ; Used at bit level, Aux_3 signal.
+  P1.4          ; Used at bit level, Aux_4 signal & Sound Latch bit 3
+  P1.5          ; Used at bit level, Aux_5 signal & Sound Latch bit 0
+  P1.6          ; Expands address bus for video and color RAM access (V.A8)
+  P1.7          ; Expands address bus for video and color RAM access (V.A9)
 
-    Jugador tiene mas        2          4           6           8           10
-    que la banca
+  P2.0 - P2.3:  ; I8039 as address bus expansion (Program memory - High address nibble).
 
-    Jugador tiene menos      2          4           6           8           10
-    de 22 con 6 cartas
+  P2.4:         ; Reads 8 bits from data buffer input port (interface for switch encoder).
+                      Bit 0: Lamp_1.
+                      Bit 1: Lamp_2.
+                      Bit 2: Lamp_3.
+                      Bit 3: Lamp_4.
+                      Bit 4: Coin Acceptor.
+                      Bit 5: Hopper 1 & Sound Latch bit 1.
+                      Bit 6: Hopper 2 & Sound Latch bit 2.
+                      Bit 7: Diverter.
 
-    Jugador tiene blackjack  2          5           7          10           12
-    y la Banca no
-    ----------------------------------------------------------------------------
+                ; Writes 8 bits to data latch out port (lamps, relays and coils).
+                      Bit 0: SW_encoder_0.
+                      Bit 1: SW_encoder_1.
+                      Bit 2: SW_encoder_2.
+                      Bit 3: SW_encoder_3.
+                      Bit 4: Coin Out.
+                      Bit 5: Undocumented jumper.
+                      Bit 6: N/U (pulled up).
+                      Bit 7: N/U (pulled up).
 
-
-                                Video Cordoba
-    ----------------------------------------------------------------------------
-    Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
-    ----------------------------------------------------------------------------
-    TRIPLE BAR             250         250         250         250        2000
-    ............................................................................
-    3 x Doble Bar        - 100            |    Olive-Olive-Any Bar        - 18
-    3 x Single Bar       -  50            |    3 x Orange                 - 14
-    3 x Any Bar          -  20            |    Orange-Orange-Any Bar      - 14
-    3 x Bell             -  20            |    3 x Cherry                 - 10
-    Bell-Bell-Any Bar    -  20            |    2 x Cherry                 -  5
-    3 x Olive            -  10            |    1 x Cherry                 -  2
-    ............................................................................
-    All combinations are valid only from left to rigth
-    ----------------------------------------------------------------------------
-
-
-                     Video Dado
-    ---------------------------------------------
-    Twelve      (12)                    33 x 1
-    Eleven      (11)                    16 x 1
-    Crap        (2,3,12)                 8 x 1
-    Seven       (7)                      5 x 1
-    Field       (2,12)                   3 x 1
-    8 or More   (8,9,10,11,12)           2 x 1
-    6 or Less   (2,3,4,5,6)              2 x 1
-
-    Winnings less or equal to 25 can be re-played
-    ---------------------------------------------
+  P2.5:         ; Enable access to data RAM.
+  P2.6:         ; Enable access to video RAM (write mode) - no read mode.
+  P2.7:         ; Enable access to color RAM (write Mode) - no read mode.
 
 
-    All payments with less than 400 coins are done through hopper.
-    (you need to press "Coin Out" button once per coin due to the lack of hopper emulation)
+********************************************************************************
 
-    Payments over 400 coins are manual.
+  Game Info
+  =========
+
+  Pay Tables:
+
+  These machines had their pay tables out of screen, in a backlighted upper front panel.
+
+
+                      Video Poker (Spanish text only)
+  ----------------------------------------------------------------------------
+  Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
+  ----------------------------------------------------------------------------
+  Escalera Maxima         250        500         750        1000        4000
+  de color
+
+  Escalera de Color       100        200         300         400         500
+
+  Poker                    50        100         150         200         250
+
+  Full                     11         22          33          44          55
+
+  Color                     7         14          21          28          35
+
+  Escalera                  5         10          15          20          25
+
+  Trio                      3          6           9          12          15
+
+  Doble Pareja              2          4           6           8          10
+  ----------------------------------------------------------------------------
+
+
+                      Black Jack (Spanish text only)
+  ----------------------------------------------------------------------------
+  Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
+  ----------------------------------------------------------------------------
+  Empate                   1          2           3           4            5
+
+  La Banca se pasa         2          4           6           8           10
+
+  Jugador tiene mas        2          4           6           8           10
+  que la banca
+
+  Jugador tiene menos      2          4           6           8           10
+  de 22 con 6 cartas
+
+  Jugador tiene blackjack  2          5           7          10           12
+  y la Banca no
+  ----------------------------------------------------------------------------
+
+
+                              Video Cordoba
+  ----------------------------------------------------------------------------
+  Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
+  ----------------------------------------------------------------------------
+  TRIPLE BAR             250         250         250         250        2000
+  ............................................................................
+  3 x Doble Bar        - 100            |    Olive-Olive-Any Bar        - 18
+  3 x Single Bar       -  50            |    3 x Orange                 - 14
+  3 x Any Bar          -  20            |    Orange-Orange-Any Bar      - 14
+  3 x Bell             -  20            |    3 x Cherry                 - 10
+  Bell-Bell-Any Bar    -  20            |    2 x Cherry                 -  5
+  3 x Olive            -  10            |    1 x Cherry                 -  2
+  ............................................................................
+  All combinations are valid only from left to rigth
+  ----------------------------------------------------------------------------
+
+
+                   Video Dado
+  ---------------------------------------------
+  Twelve      (12)                    33 x 1
+  Eleven      (11)                    16 x 1
+  Crap        (2,3,12)                 8 x 1
+  Seven       (7)                      5 x 1
+  Field       (2,12)                   3 x 1
+  8 or More   (8,9,10,11,12)           2 x 1
+  6 or Less   (2,3,4,5,6)              2 x 1
+
+  Winnings less or equal to 25 can be re-played
+  ---------------------------------------------
+
+
+  All payments with less than 400 coins are done through hopper.
+  (you need to press "Coin Out" button once per coin due to the lack of hopper emulation)
+
+  Payments over 400 coins are manual.
 
 
 **************************************************************************
 
+  [2008-10-08]
 
-    [2008-10-08]
+  - Added Baby Poker Game.
+  - Added Baby Dado Game.
+  - Mapped "Hand Pay" button for Baby Games.
+  - Added decoder to Jackpot mechanical counter.
+  - Added sound support to Baby Poker Game.
+  - Added tower lamps to Baby Games layouts.
+  - Reworked layouts for Baby Games.
+  - Reworked the color routines.
+  - Added new color routines for Baby Games.
+  - Redumped the videocba color PROM.
+  - Added color switch. (It changes background color in some games).
+  - Added "hopper full" switch support (for diverter function).
+  - Added diverter function decoder.
+  - Added Button-lamps layout.
+  - Added full functional mechanical counters decoding.
+  - Added 7 Segment decoder and 7 Digit Counter functions.
+  - Added button-lamps layout & mechanical counters simulation on layout.
+     Mechanical counters to layout: Coin-In, Coin-Out and Coin to Drop.
+  - Added NVRAM support to mechanical counters.
 
-    - Added Baby Poker Game.
-    - Added Baby Dado Game.
-    - Mapped "Hand Pay" button for Baby Games.
-    - Added decoder to Jackpot mechanical counter.
-    - Added sound support to Baby Poker Game.
-    - Added tower lamps to Baby Games layouts.
-    - Reworked layouts for Baby Games.
-    - Reworked the color routines.
-    - Added new color routines for Baby Games.
-    - Redumped the videocba color PROM.
-    - Added color switch. (It changes background color in some games).
-    - Added "hopper full" switch support (for diverter function).
-    - Added diverter function decoder.
-    - Added Button-lamps layout.
-    - Added full functional mechanical counters decoding.
-    - Added 7 Segment decoder and 7 Digit Counter functions.
-    - Added button-lamps layout & mechanical counters simulation on layout.
-      Mechanical counters to layout: Coin-In, Coin-Out and Coin to Drop.
-    - Added NVRAM support to mechanical counters.
 
-    TO DO
-    =====
+  TO DO
+  =====
 
-    * Add Tech. Notes for Baby board, a reworked and improved version on Video Poker hardware.
-    * Fix some missing pulses on mechanical counters.
-    * Fix the bug on bookeeping mode (videodad & videocba).
-    * Figure out the undocumented jumper.
-    * Hopper simulation.
-    * Switch to resnet system.
+  * Add Tech. Notes for Baby board, a reworked and improved version on Video Poker hardware.
+  * Fix some missing pulses on mechanical counters.
+  * Fix the bug on bookeeping mode (videodad & videocba).
+  * Figure out the undocumented jumper.
+  * Hopper simulation.
+  * Switch to resnet system.
 
 
 **************************************************************************/
@@ -381,7 +378,6 @@ public:
 /*************************
 *     Video Hardware     *
 *************************/
-
 
 /* BCD to Seven Segment Decoder */
 static UINT8 dec_7seg(int data)

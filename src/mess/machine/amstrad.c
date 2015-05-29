@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker, Barry Rodewald
 /***************************************************************************
 
   machine.c
@@ -1656,6 +1658,14 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		}
 
 		/* b3b2 != 0 then change the state of upper or lower rom area and rethink memory */
+		if (m_exp)
+		{
+			if((dataToGateArray & 0x0c) != 0)
+				m_exp->romen_w(0);  // active low
+			else
+				m_exp->romen_w(1);
+		}
+
 		amstrad_setLowerRom();
 		amstrad_setUpperRom();
 
@@ -1939,6 +1949,29 @@ void amstrad_state::amstrad_plus_seqcheck(int data)
 	m_prev_data = data;
 }
 
+WRITE8_MEMBER(amstrad_state::rom_select)
+{
+	m_gate_array.upper_bank = data;
+	// expansion devices know the selected ROM by monitoring I/O writes to DFxx
+	// there are no signals related to which ROM is selected
+	cpc_expansion_slot_device* exp_port = m_exp;
+	while(exp_port != NULL)
+	{
+		device_cpc_expansion_card_interface* temp;
+		device_t* temp_dev;
+
+		temp = dynamic_cast<device_cpc_expansion_card_interface*>(exp_port->get_card_device());
+		temp_dev = dynamic_cast<device_t*>(exp_port->get_card_device());
+		if(temp != NULL)
+		{
+			temp->set_rom_bank(data);
+		}
+		exp_port = temp_dev->subdevice<cpc_expansion_slot_device>("exp");
+	}
+
+	amstrad_setUpperRom();
+}
+
 /* Offset handler for write */
 WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 {
@@ -2005,25 +2038,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	/* b13 = 0 : ROM select Write Selected*/
 	if ((offset & (1<<13)) == 0)
 	{
-		m_gate_array.upper_bank = data;
-		// expansion devices know the selected ROM by monitoring I/O writes to DFxx
-		// there are no signals related to which ROM is selected
-		cpc_expansion_slot_device* exp_port = m_exp;
-		while(exp_port != NULL)
-		{
-			device_cpc_expansion_card_interface* temp;
-			device_t* temp_dev;
-
-			temp = dynamic_cast<device_cpc_expansion_card_interface*>(exp_port->get_card_device());
-			temp_dev = dynamic_cast<device_t*>(exp_port->get_card_device());
-			if(temp != NULL)
-			{
-				temp->set_rom_bank(data);
-			}
-			exp_port = temp_dev->subdevice<cpc_expansion_slot_device>("exp");
-		}
-
-		amstrad_setUpperRom();
+		rom_select(space,0,data);
 	}
 
 	/* b12 = 0 : Printer port Write Selected*/
@@ -2372,6 +2387,10 @@ void amstrad_state::amstrad_rethinkMemory()
 			}
 		}
 	}
+
+	/* mappings for other expansion devices */
+	if (m_exp)
+		m_exp->set_mapping();
 }
 
 
@@ -3032,8 +3051,8 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 	m_system_type = SYSTEM_PLUS;
 	m_centronics->write_data7(0);
 
-	astring region_tag;
-	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	std::string region_tag;
+	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (!m_region_cart) // this should never happen, since we make carts mandatory!
 		m_region_cart = memregion("maincpu");
 }
@@ -3076,8 +3095,8 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
 
-	astring region_tag;
-	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	std::string region_tag;
+	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (!m_region_cart) // this should never happen, since we make carts mandatory!
 		m_region_cart = memregion("maincpu");
 }
@@ -3169,14 +3188,14 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 	snapshot.resize(snapshot_size);
 
 	/* read whole file */
-	image.fread(snapshot, snapshot_size);
+	image.fread(&snapshot[0], snapshot_size);
 
-	if (memcmp(snapshot, "MV - SNA", 8))
+	if (memcmp(&snapshot[0], "MV - SNA", 8))
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	amstrad_handle_snapshot(snapshot);
+	amstrad_handle_snapshot(&snapshot[0]);
 	return IMAGE_INIT_PASS;
 }
 
@@ -3238,7 +3257,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		UINT8 *crt = m_cart->get_rom_base();
 		dynamic_buffer temp_copy;
 		temp_copy.resize(size);
-		image.fread(temp_copy, size);
+		image.fread(&temp_copy[0], size);
 
 		// RIFF chunk bits
 		char chunkid[4];              // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)
@@ -3260,11 +3279,11 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		// read some chunks
 		while (bytes_to_read > 0)
 		{
-			memcpy(chunkid, temp_copy + offset, 4);
+			memcpy(chunkid, &temp_copy[offset], 4);
 			bytes_to_read -= 4;
 			offset += 4;
 
-			memcpy(chunklen, temp_copy + offset, 4);
+			memcpy(chunklen, &temp_copy[offset], 4);
 			bytes_to_read -= 4;
 			offset += 4;
 
@@ -3285,7 +3304,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 					if (chunksize > 0x4000)
 						chunksize = 0x4000;
 
-					memcpy(crt + 0x4000 * ramblock, temp_copy + offset, chunksize);
+					memcpy(crt + 0x4000 * ramblock, &temp_copy[offset], chunksize);
 					bytes_to_read -= chunksize;
 					offset += chunksize;
 					logerror("CPR: Loaded %i-byte chunk into RAM block %i\n", chunksize, ramblock);

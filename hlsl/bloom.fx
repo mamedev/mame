@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
 // Effect File Variables
 //-----------------------------------------------------------------------------
@@ -16,7 +18,7 @@ texture DiffuseK;
 
 sampler DiffuseSampler0 = sampler_state
 {
-	Texture   = <DiffuseA>;
+	Texture = <DiffuseA>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -27,7 +29,7 @@ sampler DiffuseSampler0 = sampler_state
 
 sampler DiffuseSampler1 = sampler_state
 {
-	Texture   = <DiffuseB>;
+	Texture = <DiffuseB>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -38,7 +40,7 @@ sampler DiffuseSampler1 = sampler_state
 
 sampler DiffuseSampler2 = sampler_state
 {
-	Texture   = <DiffuseC>;
+	Texture = <DiffuseC>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -49,7 +51,7 @@ sampler DiffuseSampler2 = sampler_state
 
 sampler DiffuseSampler3 = sampler_state
 {
-	Texture   = <DiffuseD>;
+	Texture = <DiffuseD>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -60,7 +62,7 @@ sampler DiffuseSampler3 = sampler_state
 
 sampler DiffuseSampler4 = sampler_state
 {
-	Texture   = <DiffuseE>;
+	Texture = <DiffuseE>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -71,7 +73,7 @@ sampler DiffuseSampler4 = sampler_state
 
 sampler DiffuseSampler5 = sampler_state
 {
-	Texture   = <DiffuseF>;
+	Texture = <DiffuseF>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -82,7 +84,7 @@ sampler DiffuseSampler5 = sampler_state
 
 sampler DiffuseSampler6 = sampler_state
 {
-	Texture   = <DiffuseG>;
+	Texture = <DiffuseG>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -93,7 +95,7 @@ sampler DiffuseSampler6 = sampler_state
 
 sampler DiffuseSampler7 = sampler_state
 {
-	Texture   = <DiffuseH>;
+	Texture = <DiffuseH>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -104,7 +106,7 @@ sampler DiffuseSampler7 = sampler_state
 
 sampler DiffuseSampler8 = sampler_state
 {
-	Texture   = <DiffuseI>;
+	Texture = <DiffuseI>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -115,7 +117,7 @@ sampler DiffuseSampler8 = sampler_state
 
 sampler DiffuseSampler9 = sampler_state
 {
-	Texture   = <DiffuseJ>;
+	Texture = <DiffuseJ>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -126,7 +128,7 @@ sampler DiffuseSampler9 = sampler_state
 
 sampler DiffuseSamplerA = sampler_state
 {
-	Texture   = <DiffuseK>;
+	Texture = <DiffuseK>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -156,7 +158,6 @@ struct VS_INPUT
 	float3 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 Unused : TEXCOORD1;
 };
 
 struct PS_INPUT
@@ -174,7 +175,10 @@ struct PS_INPUT
 // Bloom Vertex Shader
 //-----------------------------------------------------------------------------
 
-uniform float2 TargetSize;
+uniform float2 ScreenDims;
+
+uniform float2 Prescale = float2(8.0f, 8.0f);
+
 uniform float4 Level01Size;
 uniform float4 Level23Size;
 uniform float4 Level45Size;
@@ -182,22 +186,43 @@ uniform float4 Level67Size;
 uniform float4 Level89Size;
 uniform float2 LevelASize;
 
+uniform bool PrepareVector = false;
+
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-	
+
+	float2 ScreenDimsTexel = 1.0f / ScreenDims;
+
+	float2 HalfPrescale = Prescale * 0.5f;
+
 	Output.Position = float4(Input.Position.xyz, 1.0f);
-	Output.Position.xy /= TargetSize;
+	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= float2(0.5f, 0.5f);
-	Output.Position.xy *= float2(2.0f, 2.0f);
+	Output.Position.xy -= 0.5f;
+	Output.Position.xy *= 2.0f;
+
 	Output.Color = Input.Color;
-	Output.TexCoord01 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level01Size;
-	Output.TexCoord23 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level23Size;
-	Output.TexCoord45 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level45Size;
-	Output.TexCoord67 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level67Size;
-	Output.TexCoord89 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level89Size;
-	Output.TexCoordA = Input.Position.xy / TargetSize - 0.5f / LevelASize;
+
+	// Vector graphics is not prescaled it has the size of the screen
+	if (PrepareVector)
+	{
+		Output.TexCoord01 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level01Size;
+		Output.TexCoord23 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level23Size;
+		Output.TexCoord45 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level45Size;
+		Output.TexCoord67 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level67Size;
+		Output.TexCoord89 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level89Size;
+		Output.TexCoordA  = Input.Position.xy   / ScreenDims.xy   + 1.0f / LevelASize;
+	}
+	else
+	{
+		Output.TexCoord01 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level01Size;
+		Output.TexCoord23 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level23Size;
+		Output.TexCoord45 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level45Size;
+		Output.TexCoord67 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level67Size;
+		Output.TexCoord89 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level89Size;
+		Output.TexCoordA  = Input.Position.xy   / ScreenDims.xy   + HalfPrescale.xy   / LevelASize;
+	}
 
 	return Output;
 }
@@ -236,8 +261,18 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	texel9 = texel9 * Level89AWeight.y;
 	texelA = texelA * Level89AWeight.z;
 
-	float4 sum = float4(texel0 + texel1 + texel2 + texel3 + texel4 +
-	        texel5 + texel6 + texel7 + texel8 + texel9 + texelA, 1.0f);
+	float4 sum = float4(
+		texel0 + 
+		texel1 + 
+		texel2 + 
+		texel3 + 
+		texel4 +
+		texel5 + 
+		texel6 + 
+		texel7 + 
+		texel8 + 
+		texel9 + 
+		texelA, 1.0f);
 	return sum;
 }
 
@@ -264,6 +299,6 @@ technique TestTechnique
 		Sampler[10] = <DiffuseSamplerA>; // 2x2
 
 		VertexShader = compile vs_3_0 vs_main();
-		PixelShader  = compile ps_3_0 ps_main();
+		PixelShader = compile ps_3_0 ps_main();
 	}
 }

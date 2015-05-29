@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tim Lindner
 /*********************************************************************
 
     ds1315.h
@@ -35,7 +37,10 @@ public:
 	DECLARE_READ8_MEMBER(read_0);
 	DECLARE_READ8_MEMBER(read_1);
 	DECLARE_READ8_MEMBER(read_data);
-	DECLARE_WRITE8_MEMBER(write_data);
+	DECLARE_READ8_MEMBER(write_data);
+
+	bool chip_enable();
+	void chip_reset();
 
 protected:
 	// device-level overrides
@@ -45,12 +50,12 @@ protected:
 
 private:
 	// internal state
+	ds1315_mode_t m_mode;
 
 	void fill_raw_data();
 	void input_raw_data();
 
 	int m_count;
-	ds1315_mode_t m_mode;
 	UINT8 m_raw_data[8*8];
 };
 

@@ -203,9 +203,9 @@ public:
 	emu_options();
 
 	// parsing wrappers
-	bool parse_command_line(int argc, char *argv[], astring &error_string);
-	void parse_standard_inis(astring &error_string);
-	bool parse_slot_devices(int argc, char *argv[], astring &error_string, const char *name, const char *value);
+	bool parse_command_line(int argc, char *argv[], std::string &error_string);
+	void parse_standard_inis(std::string &error_string);
+	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value);
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
@@ -358,8 +358,8 @@ public:
 	// FIXME: Couriersud: This should be in image_device_exit
 	void remove_device_options();
 
-	const char *main_value(astring &buffer, const char *option) const;
-	const char *sub_value(astring &buffer, const char *name, const char *subname) const;
+	const char *main_value(std::string &buffer, const char *option) const;
+	const char *sub_value(std::string &buffer, const char *name, const char *subname) const;
 	bool add_slot_options(bool isfirst);
 
 private:
@@ -368,7 +368,7 @@ private:
 	void update_slot_options();
 
 	// INI parsing helper
-	bool parse_one_ini(const char *basename, int priority, astring *error_string = NULL);
+	bool parse_one_ini(const char *basename, int priority, std::string *error_string = NULL);
 
 	static const options_entry s_option_entries[];
 };

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 #include "sound/msm5205.h"
 
 class wc90b_state : public driver_device

@@ -4,9 +4,6 @@
 
     Commodore IEEE-488 cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "ieee488.h"

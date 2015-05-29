@@ -9,6 +9,7 @@
 #if BGFX_USE_EGL
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 
 namespace bgfx { namespace gl
 {
@@ -26,7 +27,7 @@ namespace bgfx { namespace gl
 
 		void create(uint32_t _width, uint32_t _height);
 		void destroy();
-		void resize(uint32_t _width, uint32_t _height, bool _vsync);
+		void resize(uint32_t _width, uint32_t _height, uint32_t _flags);
 
 		static bool isSwapChainSupported();
 		SwapChainGL* createSwapChain(void* _nwh);

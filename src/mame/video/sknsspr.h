@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 class sknsspr_device : public device_t,
 							public device_video_interface

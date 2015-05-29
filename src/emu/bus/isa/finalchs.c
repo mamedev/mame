@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jonathan Gevaryahu
 /***************************************************************************
 
     Final Chess Card by TASC

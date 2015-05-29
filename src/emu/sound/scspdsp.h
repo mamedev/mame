@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:ElSemi, R. Belmont
 #pragma once
 
 #ifndef __SCSPDSP_H__

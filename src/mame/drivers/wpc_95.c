@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, Micko
+// copyright-holders:Olivier Galibert, Miodrag Milanovic
 
 // Thanks to the PinMAME guys for all their research
 

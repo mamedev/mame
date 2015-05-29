@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 #include "sound/namco.h"
 
 class baraduke_state : public driver_device

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"

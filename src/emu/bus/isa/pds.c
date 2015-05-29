@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * isa_pds.c - Programmers Development System 8-bit ISA card
  *

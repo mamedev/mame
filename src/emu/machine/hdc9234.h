@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "imagedev/floppy.h"
 #include "fdc_pll.h"
+#include "ti99_hd.h"
 
 extern const device_type HDC9234;
 
@@ -109,6 +110,9 @@ public:
 	// is changed outside of the controller, and by this way we let it know.
 	void connect_floppy_drive(floppy_image_device *floppy);
 
+	// Used to reconfigure the drive connections. See connect_floppy_drive.
+	void connect_hard_drive(mfm_harddisk_device *harddisk);
+
 protected:
 	void device_start();
 	void device_reset();
@@ -133,6 +137,9 @@ private:
 
 	// Currently connected floppy
 	floppy_image_device* m_floppy;
+
+	// Currently connected harddisk
+	mfm_harddisk_device* m_harddisk;
 
 	// internal register OUTPUT1
 	UINT8 m_output1, m_output1_old;
@@ -161,7 +168,7 @@ private:
 	// Timers to delay execution/completion of commands */
 	emu_timer *m_timer;
 	emu_timer *m_cmd_timer;
-	emu_timer *m_live_timer;
+	// emu_timer *m_live_timer;
 
 	// Timer callback
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -173,14 +180,14 @@ private:
 
 	// Wait for some time to pass or for a line to change level
 	void wait_time(emu_timer *tm, int microsec, int next_substate);
-	void wait_time(emu_timer *tm, attotime delay, int param);
+	void wait_time(emu_timer *tm, const attotime &delay, int param);
 	void wait_line(int line, line_state level, int substate, bool stopwrite);
 
 	// Converts attotime to a string
-	astring tts(const attotime &t);
+	std::string tts(const attotime &t);
 
 	// Current time
-	astring ttsn();
+	std::string ttsn();
 
 	// Utility routine to set or reset bits
 	void set_bits(UINT8& byte, int mask, bool set);
@@ -220,6 +227,9 @@ private:
 
 	// Analyses the track until the given time
 	void live_run_until(attotime limit);
+
+	// Same for hard disks
+	void live_run_hd_until(attotime limit);
 
 	// Live run until next index pulse
 	void live_run();

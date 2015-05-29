@@ -1,10 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Mariusz Wojcieszek, Peter Trauner
 /**********************************************************************
 
     Signetics 2636 video chip
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 
     PVI REGISTER DESCRIPTION
     ------------------------
@@ -112,7 +110,8 @@ void s2636_device::device_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_work_ram.resize_and_clear(m_work_ram_size);
+	m_work_ram.resize(m_work_ram_size);
+	memset(&m_work_ram[0], 0, m_work_ram_size);
 	m_bitmap.resize(width, height);
 	m_collision_bitmap.resize(width, height);
 

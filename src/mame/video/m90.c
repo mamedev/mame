@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*****************************************************************************
 
     Irem M90 system.  There is 1 video chip - NANAO GA-25, it produces

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner, R. Belmont, Ville Linde
 #include "emu.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"

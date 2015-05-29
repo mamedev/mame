@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sven Gothel
 const char glsl_general_vsh_src[] =
 "\n"
 "void main()\n"

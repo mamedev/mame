@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
     ui/videoopt.c
 
     Internal menus for video options
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
@@ -174,7 +173,7 @@ ui_menu_video_options::ui_menu_video_options(running_machine &machine, render_co
 void ui_menu_video_options::populate()
 {
 	const char *subtext = "";
-	astring tempstring;
+	std::string tempstring;
 	int viewnum;
 	int enabled;
 
@@ -186,8 +185,9 @@ void ui_menu_video_options::populate()
 			break;
 
 		/* create a string for the item, replacing underscores with spaces */
-		tempstring.cpy(name).replace(0, "_", " ");
-		item_append(tempstring, NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
+		tempstring.assign(name);
+		strreplace(tempstring, "_", " ");
+		item_append(tempstring.c_str(), NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
 	/* add a separator */

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol,???
 /*
 
 TZX (currently spectrum only) and spectrum TAP cassette format support by Wilbert Pol
@@ -211,7 +213,7 @@ INLINE int millisec_to_samplecount( int millisec )
 
 INLINE int tcycles_to_samplecount( int tcycles )
 {
-	return (int) ((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * t_scale);
+	return (int) ((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * (double) t_scale);
 }
 
 static void tzx_output_wave( INT16 **buffer, int length )

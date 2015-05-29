@@ -71,7 +71,7 @@ public:
 		sample_t &operator=(const sample_t &rhs) { assert(false); return *this; }
 
 		UINT32          frequency;      // frequency of the sample
-		dynamic_array<INT16> data;      // 16-bit signed data
+		std::vector<INT16> data;      // 16-bit signed data
 	};
 	static bool read_sample(emu_file &file, sample_t &sample);
 
@@ -114,8 +114,8 @@ private:
 	void load_samples();
 
 	// internal state
-	dynamic_array<channel_t>    m_channel;
-	dynamic_array<sample_t>     m_sample;
+	std::vector<channel_t>    m_channel;
+	std::vector<sample_t>     m_sample;
 
 	// internal constants
 	static const UINT8 FRAC_BITS = 24;

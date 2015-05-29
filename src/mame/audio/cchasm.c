@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mathis Rosenhauer
 /***************************************************************************
 
     Cinematronics Cosmic Chasm hardware
@@ -12,7 +14,7 @@
 #include "sound/dac.h"
 
 
-WRITE8_MEMBER(cchasm_state::cchasm_reset_coin_flag_w)
+WRITE8_MEMBER(cchasm_state::reset_coin_flag_w)
 {
 	if (m_coin_flag)
 	{
@@ -21,7 +23,7 @@ WRITE8_MEMBER(cchasm_state::cchasm_reset_coin_flag_w)
 	}
 }
 
-INPUT_CHANGED_MEMBER(cchasm_state::cchasm_set_coin_flag )
+INPUT_CHANGED_MEMBER(cchasm_state::set_coin_flag )
 {
 	if (!newval && !m_coin_flag)
 	{
@@ -30,27 +32,27 @@ INPUT_CHANGED_MEMBER(cchasm_state::cchasm_set_coin_flag )
 	}
 }
 
-READ8_MEMBER(cchasm_state::cchasm_coin_sound_r)
+READ8_MEMBER(cchasm_state::coin_sound_r)
 {
 	UINT8 coin = (ioport("IN3")->read() >> 4) & 0x7;
 	return m_sound_flags | (m_coin_flag << 3) | coin;
 }
 
-READ8_MEMBER(cchasm_state::cchasm_soundlatch2_r)
+READ8_MEMBER(cchasm_state::soundlatch2_r)
 {
 	m_sound_flags &= ~0x80;
 	m_ctc->trg2(0);
 	return soundlatch2_byte_r(space, offset);
 }
 
-WRITE8_MEMBER(cchasm_state::cchasm_soundlatch4_w)
+WRITE8_MEMBER(cchasm_state::soundlatch4_w)
 {
 	m_sound_flags |= 0x40;
 	soundlatch4_byte_w(space, offset, data);
 	m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE16_MEMBER(cchasm_state::cchasm_io_w)
+WRITE16_MEMBER(cchasm_state::io_w)
 {
 	//static int led;
 
@@ -75,7 +77,7 @@ WRITE16_MEMBER(cchasm_state::cchasm_io_w)
 	}
 }
 
-READ16_MEMBER(cchasm_state::cchasm_io_r)
+READ16_MEMBER(cchasm_state::io_r)
 {
 	switch (offset & 0xf)
 	{
@@ -120,5 +122,11 @@ void cchasm_state::sound_start()
 {
 	m_coin_flag = 0;
 	m_sound_flags = 0;
-	m_output[0] = 0; m_output[1] = 0;
+	m_output[0] = 0;
+	m_output[1] = 0;
+
+	save_item(NAME(m_sound_flags));
+	save_item(NAME(m_coin_flag));
+	save_item(NAME(m_channel_active));
+	save_item(NAME(m_output));
 }

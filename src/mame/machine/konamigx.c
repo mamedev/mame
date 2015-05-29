@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
 /**************************************************************************
  *
  * machine/konamigx.c - contains various System GX hardware abstractions

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mark McDougall
 #include "sound/msm5205.h"
 
 class stfight_state : public driver_device

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
@@ -63,9 +63,7 @@ void device_a800_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(A800SLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A800SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 
 		// setup other helpers
@@ -408,7 +406,7 @@ int a800_cart_slot_device::identify_cart_type(UINT8 *header)
  get default card software
  -------------------------------------------------*/
 
-void a800_cart_slot_device::get_default_card_software(astring &result)
+void a800_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -420,8 +418,8 @@ void a800_cart_slot_device::get_default_card_software(astring &result)
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);
-			type = identify_cart_type(head);
+			core_fread(m_file, &head[0], 0x10);
+			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size
 		{
@@ -438,14 +436,14 @@ void a800_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "a800_8k");
 }
 
 
-void a5200_cart_slot_device::get_default_card_software(astring &result)
+void a5200_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -457,11 +455,11 @@ void a5200_cart_slot_device::get_default_card_software(astring &result)
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);
-			type = identify_cart_type(head);
+			core_fread(m_file, &head[0], 0x10);
+			type = identify_cart_type(&head[0]);
 
-			astring info;
-			if (hashfile_extrainfo(*this, info) && info == "A13MIRRORING")
+			std::string info;
+			if (hashfile_extrainfo(*this, info) && info.compare("A13MIRRORING")==0)
 				type = A5200_16K_2CHIPS;
 		}
 		if (type < A5200_4K)
@@ -471,14 +469,14 @@ void a5200_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "a5200");
 }
 
 
-void xegs_cart_slot_device::get_default_card_software(astring &result)
+void xegs_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -490,8 +488,8 @@ void xegs_cart_slot_device::get_default_card_software(astring &result)
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);
-			type = identify_cart_type(head);
+			core_fread(m_file, &head[0], 0x10);
+			type = identify_cart_type(&head[0]);
 		}
 		if (type != A800_XEGS)
 		{
@@ -506,7 +504,7 @@ void xegs_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "xegs");

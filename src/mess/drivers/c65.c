@@ -1,4 +1,4 @@
-// license: MAME
+// license:LGPL-2.1+
 // copyright-holders: Angelo Salese
 /***************************************************************************
 
@@ -621,6 +621,9 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 //  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "c65_flop")
 MACHINE_CONFIG_END
 
 

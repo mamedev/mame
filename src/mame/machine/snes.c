@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Harmony
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
 /***************************************************************************
 
   snes.c
@@ -1137,7 +1137,7 @@ void snes_state::machine_reset()
 	}
 
 	/* Set STAT78 to NTSC or PAL */
-	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59.0f)
+	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59.0)
 		m_ppu->m_stat78 = SNES_NTSC;
 	else /* if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) == 50.0f) */
 		m_ppu->m_stat78 = SNES_PAL;

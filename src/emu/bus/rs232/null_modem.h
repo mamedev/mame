@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf,Carl
 #ifndef NULL_MODEM_H_
 #define NULL_MODEM_H_
 

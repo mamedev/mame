@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 #include "machine/mb87078.h"
 #include "machine/taitoio.h"
 #include "video/hd63484.h"

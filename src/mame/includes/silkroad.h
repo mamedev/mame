@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, R. Belmont
 #include "sound/okim6295.h"
 
 class silkroad_state : public driver_device

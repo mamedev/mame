@@ -1,3 +1,32 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
+function string.starts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
+
+function addlibfromstring(str)
+	if (str==nil) then return  end
+	for w in str:gmatch("%S+") do 
+		if string.starts(w,"-l")==true then 
+			links {
+				string.sub(w,3)
+			}
+		end
+	end
+end
+
+function addoptionsfromstring(str)
+	if (str==nil) then return  end
+	for w in str:gmatch("%S+") do 
+		if string.starts(w,"-l")==false then 
+			linkoptions {
+				w
+			}
+		end
+	end
+end
+
 function osdmodulesbuild()
 
 	removeflags {
@@ -26,6 +55,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/midi/none.c",
 		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.c",
+		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
@@ -99,6 +129,45 @@ function osdmodulesbuild()
 		defines {
 			"USE_QTDEBUG=1",
 		}
+		
+		local MOC = ""
+		if (os.is("windows")) then
+			MOC = "moc"
+		else
+			if _OPTIONS["QT_HOME"]~=nil then
+				QMAKETST = backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake --version 2>/dev/null")
+				if (QMAKETST=='') then
+					print("Qt's Meta Object Compiler (moc) wasn't found!")
+					os.exit(1)
+				end	
+				MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
+			else 
+				MOCTST = backtick("which moc-qt4 2>/dev/null")			
+				if (MOCTST=='') then
+					MOCTST = backtick("which moc 2>/dev/null")
+				end
+				if (MOCTST=='') then
+					print("Qt's Meta Object Compiler (moc) wasn't found!")
+					os.exit(1)
+				end	
+				MOC = MOCTST
+			end
+		end
+		
+		
+		custombuildtask {
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h", 			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.c", { },			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h", 				GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.c", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.c", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",				GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",		GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.c", { }, 		{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h", 			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.c", { },{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			
+		}
+		
 		if _OPTIONS["targetos"]=="windows" then
 			configuration { "mingw*" }
 				buildoptions {
@@ -107,12 +176,18 @@ function osdmodulesbuild()
 			configuration { }
 		elseif _OPTIONS["targetos"]=="macosx" then
 			buildoptions {
-				"-F" .. string.gsub(os.outputof("qmake -query QT_INSTALL_LIBS"), '[\r\n]+', ''),
+				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 		else
-			buildoptions {
-				string.gsub(os.outputof("pkg-config --cflags QtGui"), '[\r\n]+', ' '),
-			}
+			if _OPTIONS["QT_HOME"]~=nil then
+				buildoptions {
+					"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
+				}
+			else
+				buildoptions {
+					backtick("pkg-config --cflags QtGui"),
+				}
+			end
 		end
 	else
 		defines {
@@ -145,12 +220,11 @@ function osdmodulestargetconf()
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		if _OPTIONS["targetos"]=="linux" then
-			linkoptions {
-				string.gsub(os.outputof("pkg-config --libs alsa"), '[\r\n]+', ' '),
-			}
+			local str = backtick("pkg-config --libs alsa")
+			addlibfromstring(str)
+			addoptionsfromstring(str)
 		elseif _OPTIONS["targetos"]=="macosx" then
 			links {
-				"CoreAudio.framework",
 				"CoreMIDI.framework",
 			}
 		end
@@ -168,17 +242,42 @@ function osdmodulestargetconf()
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			linkoptions {
-				"-F" .. string.gsub(os.outputof("qmake -query QT_INSTALL_LIBS"), '[\r\n]+', ''),
+				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 			links {
 				"QtCore.framework",
 				"QtGui.framework",
 			}
 		else
-			linkoptions {
-				string.gsub(os.outputof("pkg-config --libs QtGui"), '[\r\n]+', ' '),
-			}
+			if _OPTIONS["QT_HOME"]~=nil then
+				linkoptions {
+					"-L" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_LIBS"),
+				}
+				links {
+					"QtGui",
+					"QtCore",
+				}
+			else
+				local str = backtick("pkg-config --libs QtGui")
+				addlibfromstring(str)
+				addoptionsfromstring(str)
+			end
 		end
+	end
+
+	if _OPTIONS["targetos"]=="windows" then
+		links {
+			"gdi32",
+			"dsound",
+			"dxguid",
+		}
+	elseif _OPTIONS["targetos"]=="macosx" then
+		links {
+			"AudioUnit.framework",
+			"AudioToolbox.framework",
+			"CoreAudio.framework",
+			"CoreServices.framework",
+		}
 	end
 
 end
@@ -248,6 +347,12 @@ newoption {
 		{ "1",  "Use Qt debugger" },
 	},
 }
+
+newoption {
+	trigger = "QT_HOME",
+	description = "QT lib location",
+}
+
 
 if not _OPTIONS["USE_QTDEBUG"] then
 	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "emscripten" or _OPTIONS["targetos"] == "os2" then

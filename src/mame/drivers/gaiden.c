@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /***************************************************************************
 
 Ninja Gaiden memory map (preliminary)
@@ -1561,7 +1563,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	{
 		dynamic_buffer buffer(size);
 
-		memcpy(buffer, ROM, size);
+		memcpy(&buffer[0], ROM, size);
 		for( i = 0; i < size; i++ )
 		{
 			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
@@ -1578,7 +1580,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	{
 		dynamic_buffer buffer(size);
 
-		memcpy(buffer,ROM,size);
+		memcpy(&buffer[0],ROM,size);
 		for( i = 0; i < size; i++ )
 		{
 			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
@@ -1623,7 +1625,7 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 			7,6,4,
 			3,2,1,0)];
 		}
-		memcpy(src, buffer, len);
+		memcpy(src, &buffer[0], len);
 	}
 
 	{
@@ -1639,7 +1641,7 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 			7,5,4,
 			3,2,1,0)];
 		}
-		memcpy(src, buffer, len);
+		memcpy(src, &buffer[0], len);
 	}
 }
 

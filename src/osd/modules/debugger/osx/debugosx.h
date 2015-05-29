@@ -4,9 +4,6 @@
 //
 //  debugosx.h - MacOS X Cocoa debug window handling
 //
-//  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //============================================================
 
 #ifndef __SDL_DEBUGOSX__
@@ -23,14 +20,6 @@
 
 // workarounds for 10.6 warnings
 #ifdef MAC_OS_X_VERSION_MAX_ALLOWED
-
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 1050
-
-typedef int NSInteger;
-typedef unsigned NSUInteger;
-typedef float CGFloat;
-
-#endif // MAC_OS_X_VERSION_MAX_ALLOWED < 1050
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
 

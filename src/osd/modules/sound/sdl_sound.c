@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  sound.c - SDL implementation of MAME sound routines
-//
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -58,7 +57,7 @@ public:
 	}
 	virtual ~sound_sdl() { }
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	// sound_module
@@ -185,7 +184,7 @@ void sound_sdl::unlock_buffer(void)
 
 void sound_sdl::att_memcpy(void *dest, const INT16 *data, int bytes_to_copy)
 {
-	int level= (int) (pow(10.0, (float) attenuation / 20.0) * 128.0);
+	int level= (int) (pow(10.0, (double) attenuation / 20.0) * 128.0);
 	INT16 *d = (INT16 *) dest;
 	int count = bytes_to_copy/2;
 	while (count>0)
@@ -332,20 +331,14 @@ void sound_sdl::update_audio_stream(bool is_throttled, const INT16 *buffer, int 
 void sound_sdl::set_mastervolume(int _attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	if (_attenuation > 0)
-		_attenuation = 0;
-	if (_attenuation < -32)
-		_attenuation = -32;
+	attenuation = MAX(MIN(_attenuation, 0), -32);
 
-	attenuation = _attenuation;
-
-	if ((attenuation == -32) && (stream_in_initialized))
+	if (stream_in_initialized)
 	{
-		SDL_PauseAudio(1);
-	}
-	else if (stream_in_initialized)
-	{
-		SDL_PauseAudio(0);
+		if (attenuation == -32)
+			SDL_PauseAudio(1);
+		else
+			SDL_PauseAudio(0);
 	}
 }
 
@@ -409,7 +402,7 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 //  sound_sdl::init
 //============================================================
 
-int sound_sdl::init()
+int sound_sdl::init(const osd_options &options)
 {
 	int         n_channels = 2;
 	int         audio_latency;
@@ -455,17 +448,8 @@ int sound_sdl::init()
 
 		sdl_xfer_samples = obtained.samples;
 
-		audio_latency = m_audio_latency;
-
 		// pin audio latency
-		if (audio_latency > MAX_AUDIO_LATENCY)
-		{
-			audio_latency = MAX_AUDIO_LATENCY;
-		}
-		else if (audio_latency < 1)
-		{
-			audio_latency = 1;
-		}
+		audio_latency = MAX(MIN(m_audio_latency, MAX_AUDIO_LATENCY), 1);
 
 		// compute the buffer sizes
 		stream_buffer_size = (sample_rate() * 2 * sizeof(INT16) * (2 + audio_latency)) / 30;

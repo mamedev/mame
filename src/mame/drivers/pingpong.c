@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski
 /***************************************************************************
 
 Ping Pong (c) 1985 Konami

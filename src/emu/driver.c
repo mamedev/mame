@@ -75,7 +75,7 @@ void driver_device::static_set_game(device_t &device, const game_driver &game)
 	// and set the search path to include all parents
 	driver.m_searchpath = game.name;
 	for (int parent = driver_list::clone(game); parent != -1; parent = driver_list::clone(parent))
-		driver.m_searchpath.cat(";").cat(driver_list::driver(parent).name);
+		driver.m_searchpath.append(";").append(driver_list::driver(parent).name);
 }
 
 

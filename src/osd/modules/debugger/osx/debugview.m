@@ -4,14 +4,15 @@
 //
 //  debugview.m - MacOS X Cocoa debug window handling
 //
-//  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //============================================================
 
 #import "debugview.h"
 
 #include "debug/debugcpu.h"
+
+#include "modules/lib/osdobj_common.h"
+
+#include <string.h>
 
 
 static NSColor *DefaultForeground;
@@ -209,8 +210,16 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-+ (NSFont *)defaultFont {
-	return [NSFont userFixedPitchFontOfSize:0];
++ (NSFont *)defaultFontForMachine:(running_machine &)m {
+	osd_options const &options = downcast<osd_options const &>(m.options());
+	char const *const face = options.debugger_font();
+	float const size = options.debugger_font_size();
+
+	NSFont *const result = (('\0' != *face) && (0 != strcmp(OSDOPTVAL_AUTO, face)))
+						 ? [NSFont fontWithName:[NSString stringWithUTF8String:face] size:MAX(0, size)]
+						 : nil;
+
+	return (nil != result) ? result : [NSFont userFixedPitchFontOfSize:MAX(0, size)];
 }
 
 
@@ -238,7 +247,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	[text addLayoutManager:layoutManager];
 	[layoutManager release];
 
-	[self setFont:[[self class] defaultFont]];
+	[self setFont:[[self class] defaultFontForMachine:m]];
 
 	NSMenu *contextMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Context"];
 	[self addContextMenuItemsToMenu:contextMenu];

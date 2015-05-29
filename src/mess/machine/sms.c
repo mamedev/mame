@@ -1,6 +1,9 @@
+// license:???
+// copyright-holders:Wilbert Pol, Charles MacDonald,Mathis Rosenhauer,Brad Oliver,Michael Luong,Fabio Priuli,Enik Land
 #include "emu.h"
 #include "crsshair.h"
 #include "video/315_5124.h"
+#include "sound/sn76496.h"
 #include "sound/2413intf.h"
 #include "includes/sms.h"
 
@@ -45,9 +48,6 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 
 WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 {
-	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
-		return;
-
 	// Check if TH of controller port 2 is set to input (1)
 	if (m_io_ctrl_reg & 0x08)
 	{
@@ -63,6 +63,16 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 		}
 		m_ctrl2_th_state = state;
 	}
+}
+
+
+WRITE_LINE_MEMBER(sms_state::gg_ext_th_input)
+{
+	if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+		return;
+
+	// The EXT port act as the controller port 2 on SMS compatibility mode.
+	sms_ctrl2_th_input(state);
 }
 
 
@@ -124,34 +134,6 @@ void sms_state::sms_get_inputs()
 }
 
 
-WRITE8_MEMBER(sms_state::sms_fm_detect_w)
-{
-	if (m_has_fm)
-		m_fm_detect = (data & 0x01);
-}
-
-
-READ8_MEMBER(sms_state::sms_fm_detect_r)
-{
-	if (m_has_fm)
-	{
-		return m_fm_detect;
-	}
-	else
-	{
-		if (!m_is_mark_iii && (m_mem_ctrl_reg & IO_CHIP))
-		{
-			return 0xff;
-		}
-		else
-		{
-			sms_get_inputs();
-			return m_port_dc_reg;
-		}
-	}
-}
-
-
 WRITE8_MEMBER(sms_state::sms_io_control_w)
 {
 	bool latch_hcount = false;
@@ -207,7 +189,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 		if (!m_is_gamegear)
 			m_port_ctrl2->port_w(ctrl2_port_data);
 		else
-			m_port_gg_ext->port_w(ctrl2_port_data); // not verified
+			m_port_gg_ext->port_w(ctrl2_port_data);
 	}
 	// check if TH is set to input (1).
 	if (data & 0x08)
@@ -215,7 +197,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 		if (!m_is_gamegear)
 			ctrl2_port_data &= ~0x40 | m_port_ctrl2->port_r();
 		else
-			ctrl2_port_data &= ~0x40 | m_port_gg_ext->port_r(); // not verified
+			ctrl2_port_data &= ~0x40 | m_port_gg_ext->port_r();
 
 		// check if TH input level is high (1) and was output/low (0)
 		if ((ctrl2_port_data & 0x40) && !(m_io_ctrl_reg & 0x88))
@@ -350,7 +332,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		// For Japanese Master System, set upper 4 bits with TH/TR
 		// direction bits of IO control register, according to Enri's
-		// docs (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm).
+		// docs ( http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm ).
 		// This makes the console incapable of using the Light Phaser.
 		// Assume the same for a Japanese Game Gear.
 		m_port_dd_reg &= ~0x10 | ((m_io_ctrl_reg & 0x01) << 4);
@@ -400,20 +382,68 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 }
 
 
-WRITE8_MEMBER(sms_state::sms_ym2413_register_port_w)
+WRITE8_MEMBER(sms_state::sms_audio_control_w)
 {
 	if (m_has_fm)
-		m_ym->write(space, 0, (data & 0x3f));
+	{
+		if (m_is_smsj)
+			m_audio_control = data & 0x03;
+		else
+			m_audio_control = data & 0x01;
+	}
+}
+
+
+READ8_MEMBER(sms_state::sms_audio_control_r)
+{
+	if (m_has_fm)
+		// The register reference on SMSPower states that just the
+		// first bit written is returned on reads (even for smsj?).
+		return m_audio_control & 0x01;
+	else
+		return sms_input_port_dc_r(space, offset);
+}
+
+
+WRITE8_MEMBER(sms_state::sms_ym2413_register_port_w)
+{
+	if (m_has_fm && (m_audio_control & 0x01))
+		m_ym->write(space, 0, data & 0x3f);
 }
 
 
 WRITE8_MEMBER(sms_state::sms_ym2413_data_port_w)
 {
-	if (m_has_fm)
+	if (m_has_fm && (m_audio_control & 0x01))
 	{
 		//logerror("data_port_w %x %x\n", offset, data);
 		m_ym->write(space, 1, data);
 	}
+}
+
+
+WRITE8_MEMBER(sms_state::sms_psg_w)
+{
+	// On Japanese SMS, if FM is enabled, PSG must be explicitly enabled too.
+	if (m_is_smsj && (m_audio_control & 0x01) && !(m_audio_control & 0x02))
+		return;
+
+	m_psg_sms->write(space, offset, data, mem_mask);
+}
+
+
+WRITE8_MEMBER(sms_state::gg_psg_w)
+{
+	m_psg_gg->write(space, offset, data, mem_mask);
+}
+
+
+WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
+{
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+		return;
+
+	m_psg_gg->stereo_w(space, offset, data, mem_mask);
 }
 
 
@@ -804,7 +834,7 @@ void sms_state::setup_media_slots()
 	// Set offset for Light Phaser
 	if (!m_is_mark_iii)
 	{
-		m_lphaser_x_offs = 36;
+		m_lphaser_x_offs = -1; // same value returned for ROMs without custom offset.
 
 		if (m_mem_device_enabled & ENABLE_CART)
 			m_lphaser_x_offs = m_cartslot->m_cart->get_lphaser_xoffs();
@@ -812,6 +842,9 @@ void sms_state::setup_media_slots()
 			m_lphaser_x_offs = m_cardslot->m_cart->get_lphaser_xoffs();
 		else if (m_mem_device_enabled & ENABLE_EXPANSION)
 			m_lphaser_x_offs = m_expslot->m_device->get_lphaser_xoffs();
+
+		if (m_lphaser_x_offs == -1)
+			m_lphaser_x_offs = 36;
 	}
 }
 
@@ -871,7 +904,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		// a F0 pattern on power up; F0 = RET P.
 		// This initialization breaks some Game Gear games though (e.g.
 		// tempojr), suggesting that not all systems had the same initialization.
-		// This also breaks some homebrew software (e.g. Nine Pixels).
+		// This also breaks some homebrew softwares (e.g. Nine Pixels).
 		// For the moment we apply this to systems that have the Japanese SMS
 		// cartridge slot.
 		if (m_has_jpn_sms_cart_slot)
@@ -888,7 +921,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 	if (m_has_fm)
 	{
-		save_item(NAME(m_fm_detect));
+		save_item(NAME(m_audio_control));
 	}
 
 	if (!m_is_mark_iii)
@@ -935,7 +968,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 MACHINE_RESET_MEMBER(sms_state,sms)
 {
 	if (m_has_fm)
-		m_fm_detect = 0x01;
+		m_audio_control = 0x00;
 
 	if (!m_is_mark_iii)
 	{

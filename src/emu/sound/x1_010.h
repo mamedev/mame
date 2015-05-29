@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 #pragma once
 
 #ifndef __X1_010_H__

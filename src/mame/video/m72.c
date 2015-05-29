@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/m72.h"
 
@@ -178,7 +180,7 @@ VIDEO_START_MEMBER(m72_state,poundfor)
 	m_bg_tilemap->set_scrolldx(6,0);
 	m_fg_tilemap->set_scrolldy(-128,-128);
 	m_bg_tilemap->set_scrolldy(-128,-128);
-	
+
 	save_item(NAME(m_prev));
 	save_item(NAME(m_diff));
 }

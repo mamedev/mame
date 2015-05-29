@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /***********************************************************************************************
 
     Fujitsu Micro 7 (FM-7)

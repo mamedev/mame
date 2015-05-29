@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_fourterm.h
  *
@@ -54,10 +56,10 @@ public:
 	: netlist_device_t(afamily), m_gfac(1.0) {  }
 
 protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void reset();
-	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void reset();
+	/* ATTR_COLD */ virtual void update_param();
+	ATTR_HOT void update();
 
 	ATTR_COLD void start_internal(const nl_double def_RI);
 
@@ -110,10 +112,10 @@ public:
 	//: netlist_device_t(afamily), m_gfac(1.0) {  }
 
 protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void reset();
-	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void reset();
+	/* ATTR_COLD */ virtual void update_param();
+	ATTR_HOT void update();
 
 	nl_double m_gfac;
 };
@@ -154,10 +156,10 @@ public:
 	: NETLIB_NAME(VCCS)(VCVS) { }
 
 protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void reset();
-	ATTR_COLD virtual void update_param();
-	//ATTR_HOT ATTR_ALIGN void update();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void reset();
+	/* ATTR_COLD */ virtual void update_param();
+	//ATTR_HOT void update();
 
 	netlist_terminal_t m_OP2;
 	netlist_terminal_t m_ON2;

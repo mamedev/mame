@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:John Butler, Ed Mueller, Aaron Giles
 /***************************************************************************
 
     Taito Qix hardware

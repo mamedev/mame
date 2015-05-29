@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Hans Andersson
 /*************************************************************************
 
     audio\sprint2.c

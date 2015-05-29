@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Charles MacDonald
 #pragma once
 #ifndef __DECO146_H__
 #define __DECO146_H__

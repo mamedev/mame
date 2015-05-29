@@ -4,9 +4,6 @@
 
     Fairchild DM9368 7-Segment Decoder/Driver/Latch emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "dm9368.h"

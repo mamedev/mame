@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Triforce Skeleton
  -- split from Naomi.c
 

@@ -40,7 +40,7 @@ hard_disk_file *hard_disk_open(chd_file *chd)
 {
 	int cylinders, heads, sectors, sectorbytes;
 	hard_disk_file *file;
-	astring metadata;
+	std::string metadata;
 	chd_error err;
 
 	/* punt if no CHD */
@@ -53,7 +53,7 @@ hard_disk_file *hard_disk_open(chd_file *chd)
 		return NULL;
 
 	/* parse the metadata */
-	if (sscanf(metadata, HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sectorbytes) != 4)
+	if (sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sectorbytes) != 4)
 		return NULL;
 
 	/* allocate memory for the hard disk file */

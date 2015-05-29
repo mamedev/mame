@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Michael Zapf
 /*********************************************************************
 
     formats/ti99_dsk.c

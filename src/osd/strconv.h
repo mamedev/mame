@@ -4,9 +4,6 @@
 //
 //  strconv.h - String conversion
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //============================================================
 
 #ifndef __OSD_STRCONV__
@@ -41,10 +38,6 @@ char *utf8_from_wstring(const WCHAR *s);
 #define tstring_from_utf8   astring_from_utf8
 #define utf8_from_tstring   utf8_from_astring
 #endif // UNICODE
-
-#if defined(SDLMAME_WIN32)
-#define _tcsncpy wcsncpy
-#endif
 
 #endif //SDLMAME_WIN32
 

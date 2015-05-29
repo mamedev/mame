@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Bandai Karaoke Studio
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate the following PCBs Bandai Karaoke Studio [mapper 188]
@@ -133,7 +132,7 @@ bool nes_kstudio_slot_device::call_softlist_load(software_list_device &swlist, c
 	return TRUE;
 }
 
-void nes_kstudio_slot_device::get_default_card_software(astring &result)
+void nes_kstudio_slot_device::get_default_card_software(std::string &result)
 {
 	software_get_default_slot(result, "ks_exp");
 }

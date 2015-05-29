@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
  Bandai Sufami Turbo cartridge emulation (for SNES/SFC)
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  This is basically a standard LoROM cart with two slots for ST minicarts
  The content of each slot (with ROM and RAM) is mapped to a separate memory range

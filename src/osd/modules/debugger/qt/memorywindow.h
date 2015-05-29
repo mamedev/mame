@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #ifndef __DEBUG_QT_MEMORY_WINDOW_H__
 #define __DEBUG_QT_MEMORY_WINDOW_H__
 

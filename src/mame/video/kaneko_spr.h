@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, David Haywood
 
 /* Kaneko Sprites */
 
@@ -14,7 +16,7 @@ struct kaneko16_priority_t
 	int sprite[4];
 };
 
-struct tempsprite
+struct kan_tempsprite
 {
 	int code,color;
 	int x,y;
@@ -70,7 +72,7 @@ protected:
 
 	// pure virtual function for getting the attributes on sprites, the two different chip types have
 	// them in a different order
-	virtual void get_sprite_attributes(struct tempsprite *s, UINT16 attr) =0;
+	virtual void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr) =0;
 
 
 private:
@@ -79,7 +81,7 @@ private:
 	UINT16 m_sprite_flipy;
 	UINT16* m_sprites_regs;
 
-	struct tempsprite *m_first_sprite;
+	struct kan_tempsprite *m_first_sprite;
 	int m_keep_sprites;
 	bitmap_ind16 m_sprites_bitmap;
 
@@ -93,7 +95,7 @@ private:
 			UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 			bitmap_ind8 &priority_bitmap, int priority);
 
-	int kaneko16_parse_sprite_type012(int i, struct tempsprite *s, UINT16* spriteram16, int spriteram16_bytes);
+	int kaneko16_parse_sprite_type012(int i, struct kan_tempsprite *s, UINT16* spriteram16, int spriteram16_bytes);
 
 	void kaneko16_copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kaneko16_copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -112,7 +114,7 @@ class kaneko_vu002_sprite_device : public kaneko16_sprite_device
 {
 public:
 	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void get_sprite_attributes(struct tempsprite *s, UINT16 attr);
+	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr);
 	int get_sprite_type(void){ return 0; };
 };
 
@@ -122,7 +124,7 @@ class kaneko_kc002_sprite_device : public kaneko16_sprite_device
 {
 public:
 	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void get_sprite_attributes(struct tempsprite *s, UINT16 attr);
+	void get_sprite_attributes(struct kan_tempsprite *s, UINT16 attr);
 	int get_sprite_type(void){ return 1; };
 };
 

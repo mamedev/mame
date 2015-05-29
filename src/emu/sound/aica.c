@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:ElSemi, kingshriek, Deunan Knute, R. Belmont
 /*
     Sega/Yamaha AICA emulation
     By ElSemi, kingshriek, Deunan Knute, and R. Belmont
@@ -22,10 +24,10 @@
 #define LFIX(v) ((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
 
 //Convert DB to multiply amplitude
-#define DB(v)   LFIX(pow(10.0,v/20.0))
+#define DB(v)   LFIX(powf(10.0f,v/20.0f))
 
 //Convert cents to step increment
-#define CENTS(v) LFIX(pow(2.0,v/1200.0))
+#define CENTS(v) LFIX(powf(2.0f,v/1200.0f))
 
 /*
     AICA features 64 programmable slots
@@ -431,9 +433,9 @@ void aica_device::Init()
 
 	for(i=0;i<0x400;++i)
 	{
-		float envDB=((float)(3*(i-0x3ff)))/32.0;
+		float envDB=((float)(3*(i-0x3ff)))/32.0f;
 		float scale=(float)(1<<SHIFT);
-		m_EG_TABLE[i]=(INT32)(pow(10.0,envDB/20.0)*scale);
+		m_EG_TABLE[i]=(INT32)(powf(10.0f,envDB/20.0f)*scale);
 	}
 
 	for(i=0;i<0x20000;++i)
@@ -456,7 +458,7 @@ void aica_device::Init()
 		if(iTL&0x40) SegaDB-=24.0f;
 		if(iTL&0x80) SegaDB-=48.0f;
 
-		TL=pow(10.0,SegaDB/20.0);
+		TL=powf(10.0f,SegaDB/20.0f);
 
 		SegaDB=0;
 		if(iPAN&0x1) SegaDB-=3.0f;
@@ -465,7 +467,7 @@ void aica_device::Init()
 		if(iPAN&0x8) SegaDB-=24.0f;
 
 		if((iPAN&0xf)==0xf) PAN=0.0;
-		else PAN=pow(10.0,SegaDB/20.0);
+		else PAN=powf(10.0f,SegaDB/20.0f);
 
 		if(iPAN<0x10)
 		{
@@ -479,12 +481,12 @@ void aica_device::Init()
 		}
 
 		if(iSDL)
-			fSDL=pow(10.0,(SDLT[iSDL])/20.0);
+			fSDL=powf(10.0f,(SDLT[iSDL])/20.0f);
 		else
 			fSDL=0.0;
 
-		m_LPANTABLE[i]=FIX((4.0*LPAN*TL*fSDL));
-		m_RPANTABLE[i]=FIX((4.0*RPAN*TL*fSDL));
+		m_LPANTABLE[i]=FIX((4.0f*LPAN*TL*fSDL));
+		m_RPANTABLE[i]=FIX((4.0f*RPAN*TL*fSDL));
 	}
 
 	m_ARTABLE[0]=m_DRTABLE[0]=0;    //Infinite time
@@ -495,7 +497,7 @@ void aica_device::Init()
 		t=ARTimes[i];   //In ms
 		if(t!=0.0)
 		{
-			step=(1023*1000.0)/((float) 44100.0f*t);
+			step=(1023*1000.0)/(44100.0*t);
 			scale=(double) (1<<EG_SHIFT);
 			m_ARTABLE[i]=(int) (step*scale);
 		}
@@ -503,7 +505,7 @@ void aica_device::Init()
 			m_ARTABLE[i]=1024<<EG_SHIFT;
 
 		t=DRTimes[i];   //In ms
-		step=(1023*1000.0)/((float) 44100.0f*t);
+		step=(1023*1000.0)/(44100.0*t);
 		scale=(double) (1<<EG_SHIFT);
 		m_DRTABLE[i]=(int) (step*scale);
 	}
@@ -1594,12 +1596,12 @@ void aica_device::AICALFO_Init()
 		float limit=PSCALE[s];
 		for(i=-128;i<128;++i)
 		{
-			m_PSCALES[s][i+128]=CENTS(((limit*(float) i)/128.0));
+			m_PSCALES[s][i+128]=CENTS(((limit*(float) i)/128.0f));
 		}
 		limit=-ASCALE[s];
 		for(i=0;i<256;++i)
 		{
-			m_ASCALES[s][i]=DB(((limit*(float) i)/256.0));
+			m_ASCALES[s][i]=DB(((limit*(float) i)/256.0f));
 		}
 	}
 }
@@ -1631,7 +1633,7 @@ signed int aica_device::AICAALFO_Step(AICA_LFO_t *LFO)
 
 void aica_device::AICALFO_ComputeStep(AICA_LFO_t *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int ALFO)
 {
-	float step=(float) LFOFreq[LFOF]*256.0/(float)44100.0;
+	float step=(float) LFOFreq[LFOF]*256.0f/(float)44100.0f;
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
 	if(ALFO)
 	{

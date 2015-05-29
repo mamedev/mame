@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
 #include "machine/taitoio.h"
 #include "sound/okim6295.h"
 #include "video/tc0100scn.h"
@@ -94,6 +96,7 @@ public:
 	int             m_nibble;
 	INT32           m_driveout_sound_latch;
 	INT32           m_oki_bank;
+	emu_timer       *m_int6_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

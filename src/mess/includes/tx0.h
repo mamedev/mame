@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*****************************************************************************
  *
  * includes/tx0.h
@@ -58,7 +60,7 @@ enum irg_pos_t
 
 
 /* tape reader registers */
-struct tape_reader_t
+struct tx0_tape_reader_t
 {
 	device_image_interface *fd; /* file descriptor of tape image */
 
@@ -83,7 +85,7 @@ struct tape_puncher_t
 
 
 /* typewriter registers */
-struct typewriter_t
+struct tx0_typewriter_t
 {
 	device_image_interface *fd; /* file descriptor of output image */
 
@@ -136,9 +138,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	tape_reader_t m_tape_reader;
+	tx0_tape_reader_t m_tape_reader;
 	tape_puncher_t m_tape_puncher;
-	typewriter_t m_typewriter;
+	tx0_typewriter_t m_typewriter;
 	emu_timer *m_dis_timer;
 	magtape_t m_magtape;
 	int m_old_typewriter_keys[4];

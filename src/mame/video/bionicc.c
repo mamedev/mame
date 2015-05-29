@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steven Frew, Phil Stroffolino, Paul Leaman
 /***************************************************************************
 
     Bionic Commando Video Hardware

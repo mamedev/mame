@@ -1658,14 +1658,14 @@ void renderer::draw_quad(const render_primitive *prim)
 		return;
 
 	// fill in the vertexes clockwise
-	vertex[0].x = prim->bounds.x0 - 0.5f;
-	vertex[0].y = prim->bounds.y0 - 0.5f;
-	vertex[1].x = prim->bounds.x1 - 0.5f;
-	vertex[1].y = prim->bounds.y0 - 0.5f;
-	vertex[2].x = prim->bounds.x0 - 0.5f;
-	vertex[2].y = prim->bounds.y1 - 0.5f;
-	vertex[3].x = prim->bounds.x1 - 0.5f;
-	vertex[3].y = prim->bounds.y1 - 0.5f;
+	vertex[0].x = prim->bounds.x0;
+	vertex[0].y = prim->bounds.y0;
+	vertex[1].x = prim->bounds.x1;
+	vertex[1].y = prim->bounds.y0;
+	vertex[2].x = prim->bounds.x0;
+	vertex[2].y = prim->bounds.y1;
+	vertex[3].x = prim->bounds.x1;
+	vertex[3].y = prim->bounds.y1;
 	float width = prim->bounds.x1 - prim->bounds.x0;
 	float height = prim->bounds.y1 - prim->bounds.y0;
 
@@ -1713,9 +1713,11 @@ void renderer::draw_quad(const render_primitive *prim)
 	if (a > 255) a = 255;
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
-	// set the color, Z parameters to standard values
+	// adjust half pixel X/Y offset, set the color, Z parameters to standard values
 	for (int i = 0; i < 4; i++)
 	{
+		vertex[i].x -= 0.5f;
+		vertex[i].y -= 0.5f;
 		vertex[i].z = 0.0f;
 		vertex[i].rhw = 1.0f;
 		vertex[i].color = color;
@@ -2080,27 +2082,13 @@ error:
 
 
 //============================================================
-//  texture_info::compute_size
+//  texture_info::compute_size_subroutine
 //============================================================
 
-void texture_info::compute_size(int texwidth, int texheight)
+void texture_info::compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height)
 {
 	int finalheight = texheight;
 	int finalwidth = texwidth;
-
-	// if we're not wrapping, add a 1-2 pixel border on all sides
-	m_xborderpix = 0;
-	m_yborderpix = 0;
-	if (ENABLE_BORDER_PIX && !(m_flags & PRIMFLAG_TEXWRAP_MASK))
-	{
-		// note we need 2 pixels in X for YUY textures
-		m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
-		m_yborderpix = 1;
-	}
-
-	// compute final texture size
-	finalwidth += 2 * m_xborderpix;
-	finalheight += 2 * m_yborderpix;
 
 	// round width/height up to nearest power of 2 if we need to
 	if (!(m_texture_manager->get_texture_caps() & D3DPTEXTURECAPS_NONPOW2CONDITIONAL))
@@ -2145,14 +2133,46 @@ void texture_info::compute_size(int texwidth, int texheight)
 		finalheight *= 2;
 	}
 
-	// if we added pixels for the border, and that just barely pushed us over, take it back
-	if ((finalwidth > m_texture_manager->get_max_texture_width() && finalwidth - 2 * m_xborderpix <= m_texture_manager->get_max_texture_width()) ||
-		(finalheight > m_texture_manager->get_max_texture_height() && finalheight - 2 * m_yborderpix <= m_texture_manager->get_max_texture_height()))
+	*p_width = finalwidth;
+	*p_height = finalheight;
+}
+
+//============================================================
+//  texture_info::compute_size
+//============================================================
+
+void texture_info::compute_size(int texwidth, int texheight)
+{
+	int finalheight = texheight;
+	int finalwidth = texwidth;
+
+	m_xborderpix = 0;
+	m_yborderpix = 0;
+
+	// if we're not wrapping, add a 1-2 pixel border on all sides
+	if (ENABLE_BORDER_PIX && !(m_flags & PRIMFLAG_TEXWRAP_MASK))
 	{
-		finalwidth -= 2 * m_xborderpix;
-		finalheight -= 2 * m_yborderpix;
+		// note we need 2 pixels in X for YUY textures
+		m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
+		m_yborderpix = 1;
+	}
+
+	// compute final texture size
+	finalwidth += 2 * m_xborderpix;
+	finalheight += 2 * m_yborderpix;
+
+	compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
+
+	// if we added pixels for the border, and that just barely pushed us over, take it back
+	if (finalwidth > m_texture_manager->get_max_texture_width() || finalheight > m_texture_manager->get_max_texture_height())
+	{
+		finalheight = texheight;
+		finalwidth = texwidth;
+
 		m_xborderpix = 0;
 		m_yborderpix = 0;
+
+		compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 	}
 
 	// if we're above the max width/height, do what?

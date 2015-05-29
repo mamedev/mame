@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves
 /***************************************************************************
 
 Taito Dual Screen Games
@@ -147,9 +149,7 @@ Colscroll effects?
 #include "cpu/z80/z80.h"
 #include "rendlay.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/taitosnd.h"
 #include "sound/2610intf.h"
-#include "sound/flt_vol.h"
 #include "includes/warriorb.h"
 #include "includes/taitoipt.h"
 
@@ -164,7 +164,7 @@ WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
 	membank("z80bank")->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(warriorb_state::warriorb_sound_w)
+WRITE16_MEMBER(warriorb_state::sound_w)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, data & 0xff);
@@ -172,7 +172,7 @@ WRITE16_MEMBER(warriorb_state::warriorb_sound_w)
 		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
 }
 
-READ16_MEMBER(warriorb_state::warriorb_sound_r)
+READ16_MEMBER(warriorb_state::sound_r)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
@@ -181,7 +181,7 @@ READ16_MEMBER(warriorb_state::warriorb_sound_r)
 }
 
 
-WRITE8_MEMBER(warriorb_state::warriorb_pancontrol)
+WRITE8_MEMBER(warriorb_state::pancontrol)
 {
 	filter_volume_device *flt = NULL;
 	offset &= 3;
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( darius2d_map, AS_PROGRAM, 16, warriorb_state )
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
-	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
+	AM_RANGE(0x830000, 0x830003) AM_READWRITE(sound_r, sound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( warriorb_map, AS_PROGRAM, 16, warriorb_state )
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( warriorb_map, AS_PROGRAM, 16, warriorb_state )
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
-	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
+	AM_RANGE(0x830000, 0x830003) AM_READWRITE(sound_r, sound_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, warriorb_state )
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(warriorb_pancontrol) /* pan */
+	AM_RANGE(0xe400, 0xe403) AM_WRITE(pancontrol) /* pan */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
@@ -402,17 +402,6 @@ static GFXDECODE_START( warriorb )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* scr tiles (screen 2) */
 GFXDECODE_END
 
-
-/**************************************************************
-                           YM2610 (SOUND)
-**************************************************************/
-
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(warriorb_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /***********************************************************
                        MACHINE DRIVERS
 ***********************************************************/
@@ -459,7 +448,7 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_warriorb_left)
+	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
@@ -477,7 +466,7 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_warriorb_right)
+	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("palette2")
 
 	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
@@ -495,7 +484,7 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(warriorb_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
@@ -547,7 +536,7 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_warriorb_left)
+	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
@@ -565,7 +554,7 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_warriorb_right)
+	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("palette2")
 
 	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
@@ -584,7 +573,7 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(warriorb_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
@@ -787,7 +776,7 @@ ROM_END
 /* Working Games */
 
 //    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia, driver_device,   0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", 0 )
-GAME( 1989, darius2d,  darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 2)", 0 )
-GAME( 1989, darius2do, darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 1)", 0 )
-GAME( 1991, warriorb,  0,       warriorb, warriorb, driver_device, 0,   ROT0,   "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", 0 )
+GAME( 1989, sagaia,    darius2, darius2d, sagaia, driver_device,   0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, driver_device, 0,   ROT0,   "Taito Corporation", "Darius II (dual screen) (Japan, Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1991, warriorb,  0,       warriorb, warriorb, driver_device, 0,   ROT0,   "Taito Corporation", "Warrior Blade - Rastan Saga Episode III (Japan)", GAME_SUPPORTS_SAVE )

@@ -32,7 +32,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/6532riot.h"
+#include "machine/mos6530n.h"
 #include "machine/ram.h"
 #include "sound/speaker.h"
 
@@ -100,8 +100,8 @@ public:
 /* Memory Maps */
 
 static ADDRESS_MAP_START( beta_mem, AS_PROGRAM, 8, beta_state )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_RAM // 6532 RAM
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6532_TAG, riot6532_device, read, write)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_t, ram_map)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_t, io_map)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x7800) AM_ROM
 ADDRESS_MAP_END
 
@@ -301,7 +301,7 @@ DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 {
 	if (image.software_entry() == NULL)
-		image.fwrite(m_eprom_rom, 0x800);
+		image.fwrite(&m_eprom_rom[0], 0x800);
 }
 
 /* Machine Initialization */
@@ -313,11 +313,11 @@ void beta_state::machine_start()
 	m_eprom_rom.resize(0x800);
 
 	if (!m_eprom->exists())
-		memset(m_eprom_rom, 0xff, 0x800);
+		memset(&m_eprom_rom[0], 0xff, 0x800);
 	else
 	{
-		astring region_tag;
-		memcpy(m_eprom_rom, memregion(region_tag.cpy(m_eprom->tag()).cat(GENERIC_ROM_REGION_TAG))->base(), 0x800);
+		std::string region_tag;
+		memcpy(&m_eprom_rom[0], memregion(region_tag.assign(m_eprom->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base(), 0x800);
 	}
 
 	// state saving
@@ -347,12 +347,12 @@ static MACHINE_CONFIG_START( beta, beta_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(M6532_TAG, RIOT6532, XTAL_4MHz/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(beta_state, riot_pa_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(beta_state, riot_pa_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(beta_state, riot_pb_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(beta_state, riot_pb_w))
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
+	MCFG_DEVICE_ADD(M6532_TAG, MOS6532n, XTAL_4MHz/4)
+	MCFG_MOS6530n_IN_PA_CB(READ8(beta_state, riot_pa_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(beta_state, riot_pa_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(beta_state, riot_pb_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(beta_state, riot_pb_w))
+	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	/* EPROM socket */
 	MCFG_GENERIC_CARTSLOT_ADD(EPROM_TAG, generic_plain_slot, NULL)

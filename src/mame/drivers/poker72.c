@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
   Unknown game, dump was marked 'slot 72 - poker'
 
@@ -123,6 +125,19 @@ static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
 	AM_RANGE(0xfe22, 0xfe22) AM_WRITE(tile_bank_w)
 	AM_RANGE(0xfe40, 0xfe40) AM_DEVREADWRITE("ay", ay8910_device, data_r, data_w)
 	AM_RANGE(0xfe60, 0xfe60) AM_DEVWRITE("ay", ay8910_device, address_w)
+
+	AM_RANGE(0xff00, 0xffff) AM_RAM //??
+/*
+bp 13a
+
+fe06 w
+fe08 w
+fe0b = 9b (ppi?)
+fe24 w
+
+01f9 : call 6399 --> cls
+
+*/
 ADDRESS_MAP_END
 
 

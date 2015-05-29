@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*******************************************************************
 
 Namco System 86
@@ -1516,7 +1518,7 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 		UINT8 *mono = gfx + size;
 		int i;
 
-		memcpy( buffer, gfx, size );
+		memcpy( &buffer[0], gfx, size );
 
 		for ( i = 0; i < size; i += 2 )
 		{
@@ -1539,7 +1541,7 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 		UINT8 *mono = gfx + size;
 		int i;
 
-		memcpy( buffer, gfx, size );
+		memcpy( &buffer[0], gfx, size );
 
 		for ( i = 0; i < size; i += 2 )
 		{

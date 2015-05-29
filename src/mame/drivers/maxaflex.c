@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mariusz Wojcieszek, Aaron Giles
 /******************************************************************************
     Exidy Max-A-Flex driver
 

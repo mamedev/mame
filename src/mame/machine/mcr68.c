@@ -57,10 +57,10 @@ MACHINE_START_MEMBER(mcr68_state,mcr68)
 
 		m6840->timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr68_state::counter_fired_callback),this));
 
-		state_save_register_item(machine(), "m6840", NULL, i, m6840->control);
-		state_save_register_item(machine(), "m6840", NULL, i, m6840->latch);
-		state_save_register_item(machine(), "m6840", NULL, i, m6840->count);
-		state_save_register_item(machine(), "m6840", NULL, i, m6840->timer_active);
+		save_item(m6840->control, "m6840/control", i);
+		save_item(m6840->latch, "m6840/latch", i);
+		save_item(m6840->count, "m6840/count", i);
+		save_item(m6840->timer_active, "m6840/timer_active", i);
 	}
 
 	save_item(NAME(m_m6840_status));

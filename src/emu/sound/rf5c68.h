@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert,Aaron Giles
 /*********************************************************/
 /*    ricoh RF5C68(or clone) PCM controller              */
 /*********************************************************/

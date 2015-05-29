@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /***************************************************************************
 
     Intel 8279 Programmable Keyboard/Display Interface emulation
-
-    Copyright the MESS Team 2012.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
                             _____   _____

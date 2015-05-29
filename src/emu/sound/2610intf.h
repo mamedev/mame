@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 #pragma once
 
 #ifndef __2610INTF_H__

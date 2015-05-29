@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia,Paul Priest
 /***************************************************************************
 
                           -= Fuuki 16 Bit Games (FG-2) =-

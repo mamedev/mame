@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Zsolt Vasvari
 #include "emu.h"
 #include "sound/samples.h"
 #include "includes/gotya.h"

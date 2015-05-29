@@ -7,9 +7,6 @@
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
     Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
 
-    Copyright (c) 2008, The MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
     The z80dart/z80sio itself is based on an older intel serial chip, the i8274 MPSC
     (see http://doc.chipfind.ru/pdf/intel/8274.pdf), which also has almost identical
     behavior, except lacks the interrupt daisy chaining and has its own interrupt/dma

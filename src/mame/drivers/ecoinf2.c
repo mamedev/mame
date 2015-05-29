@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Electrocoin 'OXO' hardware type (Phoenix?)
 
  at least some of these are multiple part cabs, with both top and bottom units all linked together

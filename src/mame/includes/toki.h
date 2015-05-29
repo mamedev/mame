@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski
 #include "audio/seibu.h"
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"

@@ -1,11 +1,12 @@
+// license:BSD-3-Clause
+// copyright-holders: Couriersud, Olivier Galibert, R. Belmont
 //============================================================
 //
 //  draw13.c - SDL 2.0 drawing implementation
 //
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //  SDLMAME by Olivier Galibert and R. Belmont
+//
+//  SDL 2.0 renderer by Couriersud
 //
 //============================================================
 
@@ -111,10 +112,10 @@ public:
 	const render_texinfo &texinfo() const { return m_texinfo; }
 	render_texinfo &texinfo() { return m_texinfo; }
 
-	const HashT hash() const { return m_hash; }
-	const UINT32 flags() const { return m_flags; }
+	HashT hash() const { return m_hash; }
+	UINT32 flags() const { return m_flags; }
 	// FIXME:
-	const bool is_pixels_owned() const;
+	bool is_pixels_owned() const;
 
 private:
 	Uint32              m_sdl_access;
@@ -902,7 +903,7 @@ copy_info_t *texture_info::compute_size_type()
 }
 
 // FIXME:
-const bool texture_info::is_pixels_owned() const
+bool texture_info::is_pixels_owned() const
 { // do we own / allocated it ?
 	return ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 			&& (m_copyinfo->blitter->m_is_passthrough));
@@ -1080,8 +1081,8 @@ void quad_setup_data::compute(const render_primitive &prim, const int prescale)
 	fdudy = (texcoords->bl.u - texcoords->tl.u); // b a12
 	fdvdy = (texcoords->bl.v - texcoords->tl.v); // d a22
 
-	width = fabs(( fdudx * (float) (texwidth) + fdvdx * (float) (texheight)) ) * fscale;
-	height = fabs((fdudy * (float) (texwidth) + fdvdy * (float) (texheight)) ) * fscale;
+	width = fabsf(( fdudx * (float) (texwidth) + fdvdx * (float) (texheight)) ) * fscale;
+	height = fabsf((fdudy * (float) (texwidth) + fdvdy * (float) (texheight)) ) * fscale;
 
 	fdudx = signf(fdudx) / fscale;
 	fdvdy = signf(fdvdy) / fscale;

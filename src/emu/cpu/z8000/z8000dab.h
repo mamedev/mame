@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller,Ernesto Corvi
 /************************************************
  * Result table for Z8000 DAB instruction
  *

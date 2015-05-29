@@ -1,24 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner,Antoine Mine
 /*****************************************************************************
  *
  *   saturn.c
  *   portable saturn emulator interface
  *   (hp calculators)
  *
- *   Copyright Peter Trauner, all rights reserved.
- *
- *   Modified by Antoine Mine'
- *
- *   - This source code is released as freeware for non-commercial purposes.
- *   - You are free to use and redistribute this code in modified or
- *     unmodified form, provided you list me in the credits.
- *   - If you modify this source code, you must add a notice to each modified
- *     source file that it has been changed.  If you're a nice person, you
- *     will clearly mark each change too.  :)
- *   - If you wish to use this for commercial purposes, please contact me at
- *     peter.trauner@jk.uni-linz.ac.at
- *   - The author of this copywritten work reserves the right to change the
- *     terms of its usage and license at any time, including retroactively
- *   - This entire notice must remain in the source code.
  *
  *****************************************************************************/
 
@@ -56,7 +43,7 @@ const device_type SATURN = &device_creator<saturn_device>;
 
 
 saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, SATURN, "Saturn", tag, owner, clock, "saturn_cpu", __FILE__)
+	: cpu_device(mconfig, SATURN, "HP Saturn", tag, owner, clock, "saturn_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)
 	, m_in_func(*this)
@@ -181,7 +168,7 @@ void saturn_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void saturn_device::state_string_export(const device_state_entry &entry, astring &string)
+void saturn_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 #define Reg64Data(s) s[15],s[14],s[13],s[12],s[11],s[10],s[9],s[8],s[7],s[6],s[5],s[4],s[3],s[2],s[1],s[0]
 #define Reg64Format "%x %x%x%x%x%x%x%x %x%x%x %x%x%x%x%x"
@@ -189,47 +176,47 @@ void saturn_device::state_string_export(const device_state_entry &entry, astring
 	switch (entry.index())
 	{
 		case SATURN_A:
-			string.printf( Reg64Format, Reg64Data(m_reg[A]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[A]) );
 			break;
 
 		case SATURN_B:
-			string.printf( Reg64Format, Reg64Data(m_reg[B]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[B]) );
 			break;
 
 		case SATURN_C:
-			string.printf( Reg64Format, Reg64Data(m_reg[C]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[C]) );
 			break;
 
 		case SATURN_D:
-			string.printf( Reg64Format, Reg64Data(m_reg[D]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[D]) );
 			break;
 
 		case SATURN_R0:
-			string.printf( Reg64Format, Reg64Data(m_reg[R0]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R0]) );
 			break;
 
 		case SATURN_R1:
-			string.printf( Reg64Format, Reg64Data(m_reg[R1]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R1]) );
 			break;
 
 		case SATURN_R2:
-			string.printf( Reg64Format, Reg64Data(m_reg[R2]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R2]) );
 			break;
 
 		case SATURN_R3:
-			string.printf( Reg64Format, Reg64Data(m_reg[R3]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R3]) );
 			break;
 
 		case SATURN_R4:
-			string.printf( Reg64Format, Reg64Data(m_reg[R4]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R4]) );
 			break;
 
 		case SATURN_IRQ_STATE:
-			string.printf( "%c%c%c%i", m_in_irq?'S':'.', m_irq_enable?'e':'.', m_pending_irq?'p':'.', m_irq_state );
+			strprintf(str,  "%c%c%c%i", m_in_irq?'S':'.', m_irq_enable?'e':'.', m_pending_irq?'p':'.', m_irq_state );
 			break;
 
 		case STATE_GENFLAGS:
-			string.printf( "%c%c", m_decimal?'D':'.', m_carry ? 'C':'.' );
+			strprintf(str,  "%c%c", m_decimal?'D':'.', m_carry ? 'C':'.' );
 			break;
 	}
 }

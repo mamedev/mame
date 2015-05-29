@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /***************************************************************************
 
     Zilog Z80 DMA Direct Memory Access Controller emulation
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
                             _____   _____

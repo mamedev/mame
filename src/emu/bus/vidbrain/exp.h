@@ -4,9 +4,6 @@
 
     VideoBrain Expansion Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                     GND       1      2       BO2
@@ -153,7 +150,7 @@ protected:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	devcb_write_line   m_write_extres;
 

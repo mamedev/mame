@@ -1,11 +1,8 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:smf
 /**********************************************************************
 
     MOS Technology 6551 Asynchronous Communication Interface Adapter
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
                             _____   _____

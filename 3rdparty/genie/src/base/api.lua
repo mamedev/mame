@@ -66,6 +66,12 @@
 			scope = "solution",
 		},
 
+		custombuildtask =
+		{
+			kind  = "table",
+			scope = "config",
+		},
+
 		debugargs =
 		{
 			kind = "list",
@@ -95,6 +101,12 @@
 			kind  = "list",
 			scope = "config",
 			usagecopy = true,
+		},
+
+		dependency =
+		{
+			kind  = "table",
+			scope = "config",
 		},
 
 		excludes =
@@ -148,6 +160,8 @@
 					NoNativeWChar = 1,
 					NoPCH = 1,
 					NoRTTI = 1,
+					FastCall = 1,
+					StdCall = 1,
 					SingleOutputDir = 1,
 					Optimize = 1,
 					OptimizeSize = 1,
@@ -427,6 +441,12 @@
 			scope = "config",
 		},
 
+		postcompiletasks =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+
 		prelinkcommands =
 		{
 			kind  = "list",
@@ -653,6 +673,14 @@
 
 
 --
+-- Adds table value to array of tables
+--
+	function premake.settable(obj, fieldname, value, allowed)
+		obj[fieldname] = obj[fieldname] or {}
+		table.insert(obj[fieldname], value)
+		return obj[fieldname]
+	end
+--
 -- Adds values to an array-of-directories field of a solution/project/configuration.
 -- `ctype` specifies the container type (see premake.getobject) for the field. All
 -- values are converted to absolute paths before being stored.
@@ -789,6 +817,8 @@
 			return premake.setstring(scope, name, value)
 		elseif kind == "list" then
 			return premake.setarray(container, name, value, allowed)
+		elseif kind == "table" then
+			return premake.settable(container, name, value, allowed)
 		elseif kind == "dirlist" then
 			return premake.setdirarray(container, name, value)
 		elseif kind == "filelist" or kind == "absolutefilelist" then
@@ -878,7 +908,7 @@
 --    the group object
 --
 
-	local function creategroup(name, sln, parent, inpath)
+	local function creategroup(name, sln, curpath, parent, inpath)
 
 		local group = {}
 
@@ -893,7 +923,7 @@
 
 		group.solution = sln
 		group.name = name
-		group.uuid = os.uuid(group.name)
+		group.uuid = os.uuid(curpath)
 		group.parent = parent
 		return group
 	end
@@ -923,7 +953,7 @@
 
 			local group = sln.groups[curpath]
 			if group == nil then
-				group = creategroup(v, sln, lastgroup, curpath)
+				group = creategroup(v, sln, curpath, lastgroup, curpath)
 			end
 			lastgroup = group
 		end

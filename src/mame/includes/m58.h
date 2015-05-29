@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Lee Taylor, John Clegg
 class m58_state : public driver_device
 {
 public:

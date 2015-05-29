@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet, Couriersud, Michael Zapf
 /**********************************************************************************************
 
      TMS5200/5220 simulator
@@ -406,7 +408,7 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_digital_select));
 
 	save_item(NAME(m_io_ready));
-	
+
 	save_item(NAME(m_true_timing));
 
 	save_item(NAME(m_rs_ws));

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood,Paul Priest
 /* Jaleco MegaSystem 32 (Preliminary Driver)
 
  - hardware tests are needed to establish how the mixing really works (and interrupt source etc.)

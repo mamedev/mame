@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Uki
 /*****************************************************************************
 
 Ikki (c) 1985 Sun Electronics

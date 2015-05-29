@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*********************************************************************
 
     formats/dim_dsk.c
@@ -101,8 +103,6 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 }
 
 
-// license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
 /*********************************************************************
 
     formats/dim_dsk.c

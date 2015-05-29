@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*
 Taito TC0360PRI
 ---------
@@ -46,17 +48,6 @@ const device_type TC0360PRI = &device_creator<tc0360pri_device>;
 
 tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock, "tc0360pri", __FILE__)
-	// m_regs[16](0),
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0360pri_device::device_config_complete()
 {
 }
 
@@ -75,9 +66,7 @@ void tc0360pri_device::device_start()
 
 void tc0360pri_device::device_reset()
 {
-		int i;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_regs[i] = 0;
 }
 

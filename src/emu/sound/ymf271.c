@@ -1,15 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont, hap
 /*
     Yamaha YMF271-F "OPX" emulator v0.1
     By R. Belmont.
     Based in part on YMF278B emulator by R. Belmont and O. Galibert.
     12June04 update by Toshiaki Nijiura
     Copyright R. Belmont.
-
-    This software is dual-licensed: it may be used in MAME and properly licensed
-    MAME derivatives under the terms of the MAME license.  For use outside of
-    MAME and properly licensed derivatives, it is available under the
-    terms of the GNU Lesser General Public License (LGPL), version 2.1.
-    You may read the LGPL at http://www.gnu.org/licenses/lgpl.html
 
     TODO:
     - A/L bit (alternate loop)

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 #include "video/bufsprite.h"
 #include "sound/upd7759.h"
 #include "sound/k007232.h"

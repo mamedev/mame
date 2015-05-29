@@ -512,7 +512,7 @@ public:
 	int scrolly(int which = 0) const { return (which < m_scrollcols) ? m_colscroll[which] : 0; }
 	bitmap_ind16 &pixmap() { pixmap_update(); return m_pixmap; }
 	bitmap_ind8 &flagsmap() { pixmap_update(); return m_flagsmap; }
-	UINT8 *tile_flags() { pixmap_update(); return m_tileflags; }
+	UINT8 *tile_flags() { pixmap_update(); return &m_tileflags[0]; }
 	tilemap_memory_index memory_index(UINT32 col, UINT32 row) { return m_mapper(col, row, m_cols, m_rows); }
 
 	// setters
@@ -639,9 +639,9 @@ private:
 	UINT32                      m_height;               // height of the full tilemap in pixels
 
 	// logical <-> memory mappings
-	tilemap_mapper_delegate     m_mapper;               // callback to map a row/column to a memory index
-	dynamic_array<logical_index> m_memory_to_logical;   // map from memory index to logical index
-	dynamic_array<tilemap_memory_index> m_logical_to_memory; // map from logical index to memory index
+	tilemap_mapper_delegate      m_mapper;               // callback to map a row/column to a memory index
+	std::vector<logical_index>        m_memory_to_logical;   // map from memory index to logical index
+	std::vector<tilemap_memory_index> m_logical_to_memory; // map from logical index to memory index
 
 	// callback to interpret video RAM for the tilemap
 	tilemap_get_info_delegate   m_tile_get_info;        // callback to get information about a tile
@@ -659,8 +659,8 @@ private:
 	// scroll information
 	UINT32                      m_scrollrows;           // number of independently scrolled rows
 	UINT32                      m_scrollcols;           // number of independently scrolled columns
-	dynamic_array<INT32>        m_rowscroll;            // array of rowscroll values
-	dynamic_array<INT32>        m_colscroll;            // array of colscroll values
+	std::vector<INT32>               m_rowscroll;            // array of rowscroll values
+	std::vector<INT32>               m_colscroll;            // array of colscroll values
 	INT32                       m_dx;                   // global horizontal scroll offset
 	INT32                       m_dx_flipped;           // global horizontal scroll offset when flipped
 	INT32                       m_dy;                   // global vertical scroll offset
@@ -671,7 +671,7 @@ private:
 
 	// transparency mapping
 	bitmap_ind8                 m_flagsmap;             // per-pixel flags
-	dynamic_array<UINT8>        m_tileflags;            // per-tile flags
+	std::vector<UINT8>               m_tileflags;            // per-tile flags
 	UINT8                       m_pen_to_flags[MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS]; // mapping of pens to flags
 };
 

@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -13,9 +15,12 @@ struct l7a1045_voice
 	}
 
 	UINT32 start;
+	UINT32 end;
+	bool mode;
 	UINT32 pos;
 	UINT32 frac;
-	
+	UINT16 l_volume;
+	UINT16 r_volume;
 };
 
 // ======================> l7a1045_sound_device
@@ -27,7 +32,7 @@ public:
 	l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~l7a1045_sound_device() { }
 
-//	void set_base(INT8* base) { m_base = base; }
+//  void set_base(INT8* base) { m_base = base; }
 
 	DECLARE_WRITE16_MEMBER( l7a1045_sound_w );
 	DECLARE_READ16_MEMBER( l7a1045_sound_r );
@@ -55,15 +60,10 @@ private:
 
 	l7a1045_48bit_data m_audiodat[0x10][0x20];
 
-	DECLARE_WRITE16_MEMBER(l7a1045_sound_select_w);
-	DECLARE_WRITE16_MEMBER(l7a1045_sound_data_02_w);
-	DECLARE_WRITE16_MEMBER(l7a1045_sound_data_04_w);
-	DECLARE_WRITE16_MEMBER(l7a1045_sound_data_06_w);
-
-	DECLARE_READ16_MEMBER(l7a1045_sound_port_0004_r);
-	DECLARE_READ16_MEMBER(l7a1045_sound_port_0006_r);
-
-
+	DECLARE_WRITE16_MEMBER(sound_select_w);
+	DECLARE_WRITE16_MEMBER(sound_data_w);
+	DECLARE_READ16_MEMBER(sound_data_r);
+	DECLARE_WRITE16_MEMBER(sound_status_w);
 };
 
 extern const device_type L7A1045;

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia, Ernesto Corvi, Nicola Salmoria
 /***************************************************************************
 
   video.c
@@ -117,9 +119,9 @@ TILE_GET_INFO_MEMBER(gaplus_state::get_tile_info)
 ***************************************************************************/
 
 /* starfield speed constants (bigger = faster) */
-#define SPEED_1 0.5
-#define SPEED_2 1.0
-#define SPEED_3 2.0
+#define SPEED_1 0.5f
+#define SPEED_2 1.0f
+#define SPEED_3 2.0f
 
 void gaplus_state::starfield_init()
 {

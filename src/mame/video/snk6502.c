@@ -1,6 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Dan Boris
 /***************************************************************************
 
-  video.c
+  snk6502.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -74,26 +76,26 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::snk6502_videoram_w)
+WRITE8_MEMBER(snk6502_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::snk6502_videoram2_w)
+WRITE8_MEMBER(snk6502_state::videoram2_w)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::snk6502_colorram_w)
+WRITE8_MEMBER(snk6502_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::snk6502_charram_w)
+WRITE8_MEMBER(snk6502_state::charram_w)
 {
 	if (m_charram[offset] != data)
 	{
@@ -103,25 +105,21 @@ WRITE8_MEMBER(snk6502_state::snk6502_charram_w)
 }
 
 
-WRITE8_MEMBER(snk6502_state::snk6502_flipscreen_w)
+WRITE8_MEMBER(snk6502_state::flipscreen_w)
 {
-	int bank;
-
 	/* bits 0-2 select background color */
 
 	if (m_backcolor != (data & 7))
 	{
-		int i;
-
 		m_backcolor = data & 7;
 
-		for (i = 0;i < 32;i += 4)
+		for (int i = 0;i < 32;i += 4)
 			m_palette->set_pen_color(COLOR(1, i), m_palette_val[4 * m_backcolor + 0x20]);
 	}
 
 	/* bit 3 selects char bank */
 
-	bank = (~data & 0x08) >> 3;
+	int bank = (~data & 0x08) >> 3;
 
 	if (m_charbank != bank)
 	{
@@ -138,12 +136,12 @@ WRITE8_MEMBER(snk6502_state::snk6502_flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::snk6502_scrollx_w)
+WRITE8_MEMBER(snk6502_state::scrollx_w)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(snk6502_state::snk6502_scrolly_w)
+WRITE8_MEMBER(snk6502_state::scrolly_w)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
@@ -173,6 +171,12 @@ VIDEO_START_MEMBER(snk6502_state,snk6502)
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(0)->set_source(m_charram);
+	machine().save().register_postload(save_prepost_delegate(FUNC(snk6502_state::postload), this));
+}
+
+void snk6502_state::postload()
+{
+	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 VIDEO_START_MEMBER(snk6502_state,pballoon)
@@ -184,7 +188,7 @@ VIDEO_START_MEMBER(snk6502_state,pballoon)
 }
 
 
-UINT32 snk6502_state::screen_update_snk6502(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 snk6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -267,11 +271,9 @@ WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
 
 	if (m_backcolor != (data & 0x03))
 	{
-		int i;
-
 		m_backcolor = data & 0x03;
 
-		for (i = 0; i < 16; i += 4)
+		for (int i = 0; i < 16; i += 4)
 			m_palette->set_pen_color(COLOR(1, i), m_palette_val[m_backcolor + 0x10]);
 	}
 }
@@ -300,4 +302,5 @@ VIDEO_START_MEMBER(snk6502_state,satansat)
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(0)->set_source(m_charram);
+	machine().save().register_postload(save_prepost_delegate(FUNC(snk6502_state::postload), this));
 }

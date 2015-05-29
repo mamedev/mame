@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,David Haywood
 
 
 class deco_zoomspr_device : public device_t

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tomasz Slanina, David Haywood
 /* ST0016 - CPU (z80) + Sound + Video */
 
 #pragma once

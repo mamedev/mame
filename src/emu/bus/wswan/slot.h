@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef __WS_SLOT_H
 #define __WS_SLOT_H
 
@@ -36,9 +38,9 @@ public:
 	void rom_alloc(UINT32 size, const char *tag);
 	void nvram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_nvram_base() { return m_nvram; }
+	UINT8* get_nvram_base() { return &m_nvram[0]; }
 	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_nvram_size() { return m_nvram.count(); }
+	UINT32 get_nvram_size() { return m_nvram.size(); }
 
 	void save_nvram()   { device().save_item(NAME(m_nvram)); }
 	void set_has_rtc(bool val) { m_has_rtc = val; }
@@ -94,7 +96,7 @@ public:
 	virtual const char *file_extensions() const { return "ws,wsc,bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom20);

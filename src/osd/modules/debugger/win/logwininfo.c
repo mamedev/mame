@@ -12,7 +12,7 @@
 
 
 logwin_info::logwin_info(debugger_windows_interface &debugger) :
-	debugwin_info(debugger, false, astring("Errorlog: ", debugger.machine().system().description, " [", debugger.machine().system().name, "]"), NULL)
+	debugwin_info(debugger, false, std::string("Errorlog: ").append(debugger.machine().system().description).append(" [").append(debugger.machine().system().name).append("]").c_str(), NULL)
 {
 	if (!window())
 		return;

@@ -1,4 +1,4 @@
-// license:MAME,GPL-2.0+
+// license:GPL-2.0+
 // copyright-holders:DICE Team,couriersud
 /*
  * Changelog:
@@ -10,21 +10,7 @@
  *      - implement trimmers
  *
  * The MAME team has asked for and received written confirmation from the
- * author of DICE to use, modify and redistribute code under
- * a dual licensing scheme:
- *
- *  *  The licensing terms of MAME apply to this piece of code for the MAME
- *     project and derivative works, as defined by the MAME license. You
- *     may opt to make modifications, improvements or derivative works under
- *     that same conditions, and the MAME project may opt to keep
- *     modifications, improvements or derivatives under their terms exclusively.
- *
- *   - Alternatively you can choose to apply the terms of the "GPL" (see
- *     below) to this - and only this - piece of code or your derivative works.
- *     Note that in no case your choice can have any impact on any other
- *     source code of the MAME project, or binary, or executable, be it closely
- *     or losely related to this piece of code.
- *
+ * author of DICE to use, modify and redistribute code under:
  *  -  GPL (GNU General Public License)
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License
@@ -70,8 +56,6 @@
 //#define NETLIST_DEVELOPMENT 1
 
 #include "netlist/nl_dice_compat.h"
-#include "netlist/devices/net_lib.h"
-#include "netlist/analog/nld_twoterm.h"
 
 static Mono555Desc a3_555_desc(K_OHM(100.0), U_FARAD(0.1));
 

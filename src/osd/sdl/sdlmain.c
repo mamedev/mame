@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  sdlmain.c - main file for SDLMAME.
-//
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -209,10 +208,10 @@ void MorphToPM()
 sdl_options::sdl_options()
 : osd_options()
 {
-	astring ini_path(INI_PATH);
+	std::string ini_path(INI_PATH);
 	add_entries(sdl_options::s_option_entries);
-	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());
-	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());
+	strreplace(ini_path,"APP_NAME", emulator_info::get_appname_lower());
+	set_default_value(SDLOPTION_INIPATH, ini_path.c_str());
 }
 
 //============================================================
@@ -252,16 +251,16 @@ int main(int argc, char *argv[])
 
 	// FIXME: this should be done differently
 
-	#ifdef SDLMAME_UNIX
+#ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 0;
-	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 	FcInit();
-	#endif
-	#endif
+#endif
+#endif
 
-	#ifdef SDLMAME_OS2
+#ifdef SDLMAME_OS2
 	MorphToPM();
-	#endif
+#endif
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
 	if (SDL_Linked_Version()->patch < 10)
@@ -290,21 +289,14 @@ int main(int argc, char *argv[])
 		res = frontend.execute(argc, argv);
 	}
 
-#ifdef MALLOC_DEBUG
-	{
-		void check_unfreed_mem(void);
-		check_unfreed_mem();
-	}
-#endif
-
-	#ifdef SDLMAME_UNIX
-	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#ifdef SDLMAME_UNIX
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 	if (!sdl_entered_debugger)
 	{
 		FcFini();
 	}
-	#endif
-	#endif
+#endif
+#endif
 
 	exit(res);
 }
@@ -500,14 +492,14 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options().bench();
-	astring error_string;
+	std::string error_string;
 	if (bench > 0)
 	{
 		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
 		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
 		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
 		options().set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(!error_string);
+		assert(error_string.c_str()[0] == 0);
 	}
 
 	// Some driver options - must be before audio init!

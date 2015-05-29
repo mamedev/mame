@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #ifndef __DEBUG_QT_DEVICE_INFORMATION_WINDOW_H__
 #define __DEBUG_QT_DEVICE_INFORMATION_WINDOW_H__
 
@@ -34,7 +36,7 @@ private:
 class DeviceInformationWindowQtConfig : public WindowQtConfig
 {
 public:
-	astring m_device_tag;
+	std::string m_device_tag;
 
 	DeviceInformationWindowQtConfig() :
 		WindowQtConfig(WIN_TYPE_DEVICE_INFORMATION)

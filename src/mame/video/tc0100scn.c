@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*
 Taito TC0100SCN
 ---------
@@ -444,6 +446,8 @@ void tc0100scn_device::postload()
 {
 	set_layer_ptrs();
 	restore_scroll();
+
+	m_gfxdecode->gfx(m_txnum)->set_source((UINT8 *)m_char_ram);
 
 	m_tilemap[0][0]->mark_all_dirty();
 	m_tilemap[1][0]->mark_all_dirty();

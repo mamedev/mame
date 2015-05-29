@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
 /*************************************************************************
 
     Williams/Midway Y/Z-unit system

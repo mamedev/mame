@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Sega Compression (and possibly encryption) device
 
     315-5838 - Decathlete (ST-V)

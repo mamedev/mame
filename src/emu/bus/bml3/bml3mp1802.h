@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Jonathan Edwards
 /*********************************************************************
 
     bml3mp1802.h

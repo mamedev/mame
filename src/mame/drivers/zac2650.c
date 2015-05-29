@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Coates
 /*
  * Signetics 2650 CPU Games
  *

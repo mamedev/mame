@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Angel Horna
 /***************************************************************************
 
 World Rally (c) 1993 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco)
 
-Driver by Manuel Abadia, Mike Coates, Nicola Salmoria and Miguel Andel Horna
+Driver by Manuel Abadia, Mike Coates, Nicola Salmoria and Miguel Angel Horna
 
 Thanks to GAELCO SA for the DS5002FP code and information about the encryption
 

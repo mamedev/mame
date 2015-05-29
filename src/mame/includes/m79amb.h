@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Al Kossow
 #include "sound/discrete.h"
 
 class m79amb_state : public driver_device

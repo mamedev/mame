@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   a1bus.h - Apple I expansion slot and card emulation
-
-  license: BSD-3-Clause
-  copyright-holders: R. Belmont
 
 ***************************************************************************/
 

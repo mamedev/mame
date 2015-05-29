@@ -4,9 +4,6 @@
 
     Structured Basic cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "structured_basic.h"

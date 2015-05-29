@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Miodrag Milanovic
 #pragma once
 
 #ifndef __ISA_SOUND_BLASTER_H__

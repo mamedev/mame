@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer,R. Belmont
 /*
  * threecom3c505.h - 3COM 3C505 ethernet controller
  *
  *  Created on: August 27, 2010
  *      Author: Hans Ostermeyer
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  */
 
@@ -168,10 +167,10 @@ private:
 		UINT8 get(int i) { return m_data[i]; };
 		UINT16 get_word(int i) { return (m_data[i*2+1] << 8) + m_data[i*2]; };
 		int is_empty() {return  m_length == 0; };
-		int is_full() {return  m_length >= m_data.count(); };
+		int is_full() {return  m_length >= m_data.size(); };
 		UINT16 get_length() { return m_length; };
-		UINT16 get_size() { return m_data.count(); };
-		UINT8 *get_data() { return m_data; };
+		UINT16 get_size() { return m_data.size(); };
+		UINT8 *get_data() { return &m_data[0]; };
 		void copy(data_buffer *db) const;
 		void log(const char *title) const;
 

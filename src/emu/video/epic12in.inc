@@ -1,6 +1,6 @@
 /* blitter function */
 
-const void epic12_device::FUNCNAME(BLIT_PARAMS)
+void epic12_device::FUNCNAME(BLIT_PARAMS)
 {
 	UINT32* gfx2;
 	int y, yf;

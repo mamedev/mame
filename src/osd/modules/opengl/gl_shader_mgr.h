@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sven Gothel
 
 #ifndef GL_SHADER_MGR_H
 #define GL_SHADER_MGR_H

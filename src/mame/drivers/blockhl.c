@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*******************************************************************************
 
     Block Hole (GX973) (c) 1989 Konami

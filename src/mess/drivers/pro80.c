@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sandro Ronco, Robbbert
 /***************************************************************************
 
         Protec Pro-80

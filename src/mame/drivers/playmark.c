@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
 /***************************************************************************
 
 Big Twin
@@ -54,7 +56,7 @@ TODO:
   ROM is currently missing.
 - Lucky Boom has some minor colour issue with the background - see the title screen. The
   game selects the wrong colour for some tiles. The tiles should be colour 0x01 not 0x02.
-  Affects the backgrounds in game however it's barely noticable.
+  Affects the backgrounds in game however it's barely noticeable.
 
 ***************************************************************************/
 

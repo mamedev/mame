@@ -1,389 +1,374 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca
 /********************************************************************************
 
+  AMERICAN POKER 2
+  ----------------
 
-    AMERICAN POKER 2
-    ----------------
+  Company:  Novomatic.
+  Year:     1990.
 
-    Company:  Novomatic.
-    Year:     1990.
+  Driver by Roberto Fresca, with a lot of help of Grull Osgo.
+  Based on a preliminary work of Curt Coder.
 
-    Driver by Roberto Fresca, with a lot of help of Grull Osgo.
-    Based on a preliminary work of Curt Coder.
+  --- Supported Sets ---
 
-
-    --- Supported Sets ---
-
-    Set Name | Relation | Description
-    ---------+----------+------------------------------------
-    ampoker2 |  parent  |  American Poker II.
-    ampkr2b1 |  clone   |  American Poker II (bootleg, set 1).
-    ampkr2b2 |  clone   |  American Poker II (bootleg, set 2).
-    ampkr2b3 |  clone   |  American Poker II (bootleg, set 3).
-    ampkr2b4 |  clone   |  American Poker II (bootleg, set 4).
-    ampkr228 |  clone   |  American Poker II (iamp2 v28).
-    pkrdewin |  clone   |  Poker De Win.
-    ampkr95  |  clone   |  American Poker 95.
-    videomat |  clone   |  Videomat (polish bootleg).
-    rabbitpk |  clone   |  Rabbit Poker / Arizona Poker 1.1? (with PIC)
-    sigmapkr |  parent  |  Sigma Poker.
-    sigma2k  |  parent  |  Sigma Poker 2000.
-    piccolop |  parent  |  Piccolo Poker 100.
-
+  Set Name | Relation | Description
+  ---------+----------+------------------------------------
+  ampoker2 |  parent  |  American Poker II.
+  ampkr2b1 |  clone   |  American Poker II (bootleg, set 1).
+  ampkr2b2 |  clone   |  American Poker II (bootleg, set 2).
+  ampkr2b3 |  clone   |  American Poker II (bootleg, set 3).
+  ampkr2b4 |  clone   |  American Poker II (bootleg, set 4).
+  ampkr228 |  clone   |  American Poker II (iamp2 v28).
+  pkrdewin |  clone   |  Poker De Win.
+  ampkr95  |  clone   |  American Poker 95.
+  videomat |  clone   |  Videomat (polish bootleg).
+  rabbitpk |  clone   |  Rabbit Poker / Arizona Poker 1.1? (with PIC)
+  sigmapkr |  parent  |  Sigma Poker.
+  sigma2k  |  parent  |  Sigma Poker 2000.
+  piccolop |  parent  |  Piccolo Poker 100.
 
 *********************************************************************************
 
+  Game Notes...
+  -------------
 
-    Game Notes...
-    -------------
+  American Poker II uses a standard deck of 52 cards plus 1 Joker card.
+  The Joker card substitutes for any card. The player places a bet for
+  the 1st hand deal and can then choose to buy a 2nd draw.
 
-    American Poker II uses a standard deck of 52 cards plus 1 Joker card.
-    The Joker card substitutes for any card. The player places a bet for
-    the 1st hand deal and can then choose to buy a 2nd draw.
-
-    The win combination Jacks or Better is only paid if a 2nd draw is bought.
-
-
-    Operation...
-
-    To 'init' (boot) the machine:
-    1) Turn ON the Operator Key (9).
-    2) Keep pressed the DOOR key (W). You are entering the Operator Mode.
-    3) Turn OFF the Operator Key (9).
-    4) Reset the machine. (you must reset manually the machine due to watchdog issues).
-
-    The set ampkr2b3 has a special init code/key:
-
-    1) Turn ON the Supervisor Key (0).
-    2) Enter the following sequence: HOLD1, HOLD5, HOLD4, HOLD3, HOLD2 and HOLD3.
-    3) Wait till the Supervisor Mode appear, and turn OFF the Supervisor Key (0).
-    4) Reset the machine. (you must reset manually the machine due to watchdog issues).
-
-    ...The key is produced taking 6 bytes at offset 0x5d40 XORed with their respective pairs
-    at offset 0x5d50, resulting the sequence of HOLD keys to init the machine.
+  The win combination Jacks or Better is only paid if a 2nd draw is bought.
 
 
-    Operator Mode:
-    Press '9' once to turn ON the Operator Key. You can find the interim meters (Page 1).
-    Press HOLD3 to clear the meters. Press '9' again to turn OFF the Operator Key.
-    Reset the machine to enter the Game Mode.
+  Operation...
 
-    Supervisor Mode:
-    Press '0' once to turn ON the Supervisor Key. You can find the permanent meters (Page 1 to 5).
-    HOLD1, HOLD3 and HOLD5 are the valid keys to navigate through the mode. Press '0' again to turn
-    OFF the Operator Key.
-    Reset the machine to enter the Game Mode.
+  To 'init' (boot) the machine:
+  1) Turn ON the Operator Key (9).
+  2) Keep pressed the DOOR key (W). You are entering the Operator Mode.
+  3) Turn OFF the Operator Key (9).
+  4) Reset the machine. (you must reset manually the machine due to watchdog issues).
 
-    To access both modes, no credits should be placed in the machine.
+  The set ampkr2b3 has a special init code/key:
+
+  1) Turn ON the Supervisor Key (0).
+  2) Enter the following sequence: HOLD1, HOLD5, HOLD4, HOLD3, HOLD2 and HOLD3.
+  3) Wait till the Supervisor Mode appear, and turn OFF the Supervisor Key (0).
+  4) Reset the machine. (you must reset manually the machine due to watchdog issues).
+
+  ...The key is produced taking 6 bytes at offset 0x5d40 XORed with their respective pairs
+  at offset 0x5d50, resulting the sequence of HOLD keys to init the machine.
 
 
-    From Novomatic web site:
+  Operator Mode:
+  Press '9' once to turn ON the Operator Key. You can find the interim meters (Page 1).
+  Press HOLD3 to clear the meters. Press '9' again to turn OFF the Operator Key.
+  Reset the machine to enter the Game Mode.
 
-    "1990 - American Poker II kommt auf den Markt und wird als
-    'The Legend' in die Geschichte des Gl?cksspiels eingehen."
+  Supervisor Mode:
+  Press '0' once to turn ON the Supervisor Key. You can find the permanent meters (Page 1 to 5).
+  HOLD1, HOLD3 and HOLD5 are the valid keys to navigate through the mode. Press '0' again to turn
+  OFF the Operator Key.
+  Reset the machine to enter the Game Mode.
 
-    "1990 - American Poker II comes on the market and is known as
-    'The Legend' in the history of gaming."
+  To access both modes, no credits should be placed in the machine.
 
+
+  From Novomatic web site:
+
+  "1990 - American Poker II kommt auf den Markt und wird als
+  'The Legend' in die Geschichte des Gl?cksspiels eingehen."
+
+  "1990 - American Poker II comes on the market and is known as
+  'The Legend' in the history of gaming."
 
     ----
 
+  Sigma Poker:
+  This poker game was also sold as "upgrade kit" for American Poker II taiwanese boards.
+  The game has a lot of improvements. New graphics, sounds, bonus, and a totally new
+  'double-up' feature. Very addictive, in fact.
 
-    Sigma Poker:
-
-    This poker game was also sold as "upgrade kit" for American Poker II taiwanese boards.
-    The game has a lot of improvements. New graphics, sounds, bonus, and a totally new
-    'double-up' feature. Very addictive, in fact.
-
-    Sigma only released 2 games for this hardware: Sigma Poker and Sigma Poker 2000.
-    Both games need some modifications to the original board to be installed.
-    The rest of Sigma poker games (2001 onwards) were developed for B-52 mainboards.
-    (2x 6809; HD63484 video controller).
+  Sigma only released 2 games for this hardware: Sigma Poker and Sigma Poker 2000.
+  Both games need some modifications to the original board to be installed.
+  The rest of Sigma poker games (2001 onwards) were developed for B-52 mainboards.
+  (2x 6809; HD63484 video controller).
 
 
-    Sigma Poker 2000:
+  Sigma Poker 2000:
 
-    This game has better graphics and use 4 times more tiles than other games running
-    on this hardware. To manage this, the game use 2 extra bits from the color RAM.
+  This game has better graphics and use 4 times more tiles than other games running
+  on this hardware. To manage this, the game use 2 extra bits from the color RAM.
 
-    To init the game:
+  To init the game:
 
-    1) Turn ON the Supervisor Key (0).
-    2) Press HOLD5 3 times to enter into page 4 (setup) of the supervisor menu.
-    3) Press HOLD3 to navegate between options, and highlight "Clear All Informations"
-    4) Keep pressed HOLD1 for more than 3 seconds.
-    5) Turn OFF the Supervisor Key (0).
+  1) Turn ON the Supervisor Key (0).
+  2) Press HOLD5 3 times to enter into page 4 (setup) of the supervisor menu.
+  3) Press HOLD3 to navegate between options, and highlight "Clear All Informations"
+  4) Keep pressed HOLD1 for more than 3 seconds.
+  5) Turn OFF the Supervisor Key (0).
 
 
-    Piccolo Poker 100:
+  Piccolo Poker 100:
 
-    To 'init' (boot) the machine:
-    1) Turn ON the Operator Key (9).
-    2) Press the DOOR key (O). You are entering the Operator Mode.
-    3) Turn OFF the Operator Key (9).
-    4) Reset the machine. (sometimes you must reset manually the machine due to watchdog issues).
+  To 'init' (boot) the machine:
+  1) Turn ON the Operator Key (9).
+  2) Press the DOOR key (O). You are entering the Operator Mode.
+  3) Turn OFF the Operator Key (9).
+  4) Reset the machine. (sometimes you must reset manually the machine due to watchdog issues).
 
-    If you win some credits, you'll be on troubles due to unemulated hopper.
-    Just discharge the credits one by one pressing quickly the door switch (O)
-    If you want to play without the hopper issues, just leave the door open (O). In this mode,
-    the game is playable but doesn't contabilize in the meters.
+  If you win some credits, you'll be on troubles due to unemulated hopper.
+  Just discharge the credits one by one pressing quickly the door switch (O)
+  If you want to play without the hopper issues, just leave the door open (O). In this mode,
+  the game is playable but doesn't contabilize in the meters.
 
 
 *********************************************************************************
 
-
-    *** Technical Notes (in progress) ***
-
+  *** Technical Notes ***
 
 
-    DIP Switches
-    ------------
+  DIP Switches
+  ------------
 
-    DIP1       Remote Credits
-    OFF        x100
-    ON         x50
+  DIP1       Remote Credits
+  OFF        x100
+  ON         x50
 
-    DIP2       Auto Hold
-    OFF        Off
-    ON         On
+  DIP2       Auto Hold
+  OFF        Off
+  ON         On
 
-    DIP3 DIP4  Rate Tables (*)
-    OFF  OFF   RATE: 1 2 3 4 5 10 20 30 40 50
-    OFF  ON    RATE: 5 10 15 20 25 30 35 40 50 100
-    ON   OFF   RATE: 5 10 15 20 25 30 35 40 45 50
-    ON   ON    RATE: 10 20 30 40 50 60 70 80 90 100
+  DIP3 DIP4  Rate Tables (*)
+  OFF  OFF   RATE: 1 2 3 4 5 10 20 30 40 50
+  OFF  ON    RATE: 5 10 15 20 25 30 35 40 50 100
+  ON   OFF   RATE: 5 10 15 20 25 30 35 40 45 50
+  ON   ON    RATE: 10 20 30 40 50 60 70 80 90 100
 
-    DIP6       Take Winnings (On Double Up)
-    OFF        Take Part (10 Credits steps)
-    ON         Take All
+  DIP6       Take Winnings (On Double Up)
+  OFF        Take Part (10 Credits steps)
+  ON         Take All
 
-    DIP8       Jackpot
-    OFF        Off
-    ON         On
+  DIP8       Jackpot
+  OFF        Off
+  ON         On
 
-
-    (*) Working only in ampkr95.
-
+  (*) Working only in ampkr95.
 
 
-    Hardware Notes:
-    --------------
+  Hardware Notes:
+  --------------
+
+  - CPU:            1x Z80 @ 3 MHz.
+  - Video:          TTL Logic Raster - 6 MHz Dot Clock.
+  - Osc:            6.000 MHz Xtal.
+  - RAM:            1x 6116 (4Kx8) Static RAM.
+  - VRAM            2x 2016 (4Kx8) Static RAM.
+  - I/O:            8x 74LS251; 8x 74LS259 (Multiplex 8 Ports > 1 Bit).
+  - PRG ROMs:       1x 27C512 (64Kx8) EPROM or similar.
+  - GFX ROMs:       1x 27C128 (16Kx8) EPROM or similar.
+  - Color PROM:     1x 82S147AN.
+  - Sound:          1x AY-3-8910.
+  - Backup Battery: 1x NI-CD 3.6 Volt.
+  - DIP Switches:   1x 8 switches.
+  - Watchdog:       1x TL7705 (Texas Instruments). Refresh: 200 Ms.
 
 
-    - CPU:            1x Z80 @ 3 MHz.
-    - Video:          TTL Logic Raster - 6 MHz Dot Clock.
-    - Osc:            6.000 MHz Xtal.
-    - RAM:            1x 6116 (4Kx8) Static RAM.
-    - VRAM            2x 2016 (4Kx8) Static RAM.
-    - I/O:            8x 74LS251; 8x 74LS259 (Multiplex 8 Ports > 1 Bit).
-    - PRG ROMs:       1x 27C512 (64Kx8) EPROM or similar.
-    - GFX ROMs:       1x 27C128 (16Kx8) EPROM or similar.
-    - Color PROM:     1x 82S147AN.
-    - Sound:          1x AY-3-8910.
-    - Backup Battery: 1x NI-CD 3.6 Volt.
-    - DIP Switches:   1x 8 switches.
-    - Watchdog:       1x TL7705 (Texas Instruments). Refresh: 200 Ms.
+  Taiwanese PCB Layout:
+   ________________________________________________________________________________
+  |                                                                                |
+  |  ______   _________    _________    ______________    _________   __________   |
+  | | XTAL | | 74LS04  |  | 74LS138 |  |              |  | 74LS163 | |PALCE16V8H|  |
+  | | 6MHz | |_________|  |_________|  |  UM6116-2    |  |_________| |__________|  |
+  | |______|  _________    _________   |______________|   _________   ________  __ |
+  |          | 74LS74A |  | DM7407N |  _______________   | 74LS163 | | 74LS00 ||74||
+  |          |_________|  |_________| |               |  |_________| |________||LS||
+  | ____________________   _________  |    27C512     |   _________   ________ |08||
+  ||                    | | MC14020 | |_______________|  | 74LS163 | | 74LS157||__||
+  || NI-CD 3.6V BATTERY | |_________|                    |_________| |________|    |
+  ||____________________|  __________    _____________    _________   ________     |
+  |____                   | 74LS244  |  |   74LS245   |  | 74LS163 | | 74LS157|    |
+       |                  |__________|  |_____________|  |_________| |________|    |
+   ____|                                                                           |
+  |_28_                         ______________________    _________   ________     |
+  |____                        |       - Z80A -       |  | 74LS74  | | 74LS157|    |
+  |____                        |     TMPZ84C00AP-6    |  |_________| |________|    |
+  |____                        |______________________|   __________  __________   |
+  |____                     ___________    ____________  |PALCE16V8H||D4016CX-20|  |
+  |____                    | 74LS244N  |  |  74LS259N  | |__________||__________|  |
+  |____                    |___________|  |____________|  ________    __________   |
+  |____                     ___________     __________   | 74LS02 |  |D4016CX-20|  |
+  |____                    | TD62003AP |   | 74LS251P |  |________|  |__________|  |
+  |____                    |___________|   |__________|   ____________________     |
+  |____                     ___________     __________   |AY-3-8910 / YM2149F |    |
+  |____                    | 74LS259N  |   | 74LS251P |  |    or KC89C72      |    |
+  |____                    |___________|   |__________|  |____________________|    |
+  |____                     ___________     __________    __________   _________   |
+  |____                    | 74LS259N  |   | 74LS251P |  | 82S147AN | | 74LS245 |  |
+  |____                    |___________|   |__________|  |__________| |_________|  |
+  |____                     ___________     __________    _________                |
+  |____                    | 74LS259N  |   | 74LS251P |  | 74LS377 |               |
+  |____                    |___________|   |__________|  |_________|               |
+  |____                     ___________     __________    _________                |
+  |____        ________    | TD62003AP |   | 74LS251P |  | 74LS377 |               |
+  |____       |12345678|   |___________|   |__________|  |_________|               |
+  |____       |________|                    __________    _________   _________    |
+  |____          DSW1                      | 74LS194  |  | 74LS194 | | 74LS245 |   |
+  |____                                    |__________|  |_________| |_________|   |
+  |____                                                                            |
+  |____         ______        ________________         _____________   _________   |
+  |_01_        |TL7705|      |01 oooooooooo 10|       |   27C128    | | 74LS377 |  |
+       |       |______|      |________________|       |   D27128D   | |_________|  |
+   ____|                         CONNECTOR1           |_____________|              |
+  |                                                                                |
+  |________________________________________________________________________________|
 
 
-    Taiwanese PCB Layout:
-     ________________________________________________________________________________
-    |                                                                                |
-    |  ______   _________    _________    ______________    _________   __________   |
-    | | XTAL | | 74LS04  |  | 74LS138 |  |              |  | 74LS163 | |PALCE16V8H|  |
-    | | 6MHz | |_________|  |_________|  |  UM6116-2    |  |_________| |__________|  |
-    | |______|  _________    _________   |______________|   _________   ________  __ |
-    |          | 74LS74A |  | DM7407N |  _______________   | 74LS163 | | 74LS00 ||74||
-    |          |_________|  |_________| |               |  |_________| |________||LS||
-    | ____________________   _________  |    27C512     |   _________   ________ |08||
-    ||                    | | MC14020 | |_______________|  | 74LS163 | | 74LS157||__||
-    || NI-CD 3.6V BATTERY | |_________|                    |_________| |________|    |
-    ||____________________|  __________    _____________    _________   ________     |
-    |____                   | 74LS244  |  |   74LS245   |  | 74LS163 | | 74LS157|    |
-         |                  |__________|  |_____________|  |_________| |________|    |
-     ____|                                                                           |
-    |_28_                         ______________________    _________   ________     |
-    |____                        |       - Z80A -       |  | 74LS74  | | 74LS157|    |
-    |____                        |     TMPZ84C00AP-6    |  |_________| |________|    |
-    |____                        |______________________|   __________  __________   |
-    |____                     ___________    ____________  |PALCE16V8H||D4016CX-20|  |
-    |____                    | 74LS244N  |  |  74LS259N  | |__________||__________|  |
-    |____                    |___________|  |____________|  ________    __________   |
-    |____                     ___________     __________   | 74LS02 |  |D4016CX-20|  |
-    |____                    | TD62003AP |   | 74LS251P |  |________|  |__________|  |
-    |____                    |___________|   |__________|   ____________________     |
-    |____                     ___________     __________   |AY-3-8910 / YM2149F |    |
-    |____                    | 74LS259N  |   | 74LS251P |  |    or KC89C72      |    |
-    |____                    |___________|   |__________|  |____________________|    |
-    |____                     ___________     __________    __________   _________   |
-    |____                    | 74LS259N  |   | 74LS251P |  | 82S147AN | | 74LS245 |  |
-    |____                    |___________|   |__________|  |__________| |_________|  |
-    |____                     ___________     __________    _________                |
-    |____                    | 74LS259N  |   | 74LS251P |  | 74LS377 |               |
-    |____                    |___________|   |__________|  |_________|               |
-    |____                     ___________     __________    _________                |
-    |____        ________    | TD62003AP |   | 74LS251P |  | 74LS377 |               |
-    |____       |12345678|   |___________|   |__________|  |_________|               |
-    |____       |________|                    __________    _________   _________    |
-    |____          DSW1                      | 74LS194  |  | 74LS194 | | 74LS245 |   |
-    |____                                    |__________|  |_________| |_________|   |
-    |____                                                                            |
-    |____         ______        ________________         _____________   _________   |
-    |_01_        |TL7705|      |01 oooooooooo 10|       |   27C128    | | 74LS377 |  |
-         |       |______|      |________________|       |   D27128D   | |_________|  |
-     ____|                         CONNECTOR1           |_____________|              |
-    |                                                                                |
-    |________________________________________________________________________________|
+  The main clock (6 MHz.) is generated with a crystal and 74LS04 inverters. This frequency is
+  used as the pixel clock, then is divided by 2 in a flip-flop (7474) and again to the video
+  stage like DOT/2 (the video hardware uses a 3 MHz clock synchronous to the pixel clock).
+
+  Once again this 3 MHz clock signal is further divided by 2 through a flip-flop (7474) to get
+  the 1.5 MHz for the AY8910.
+
+  The 4020 is clocked at 1.5 MHz. The Q10 output (pin 14) is approximately 1464.84 Hz. Using
+  an oscilloscope, I measured a value of 60 uS = 1538 Hz. We used a NMI period of 1536 Hz due
+  to a better binary composition (1024+512).
+
+  Inputs/Ouputs are driven through 74LS251 and 74LS259 multiplexers. Each one handles 1 bit
+  from data bus, and there are many devices as addressed ports (8x 74LS251 and 8x 74LS259).
+
+  Input ports are mapped to offsets 0xC410 through 0xC417. Output ports are mapped to 0xC4000
+  to 0xC407 and are polled/updated during NMI.
+
+  These 1-bit controls are relative to buttons, keys, lights and counters. Other output ports
+  like watchdog or PSG (AY8910) are operated directly.
 
 
+  Resistor Network
+  ----------------
 
-    The main clock (6 MHz.) is generated with a crystal and 74LS04 inverters. This frequency is
-    used as the pixel clock, then is divided by 2 in a flip-flop (7474) and again to the video
-    stage like DOT/2 (the video hardware uses a 3 MHz clock synchronous to the pixel clock).
+  The following diagram is related to taiwanese and argentine PCBs.
 
-    Once again this 3 MHz clock signal is further divided by 2 through a flip-flop (7474) to get
-    the 1.5 MHz for the AY8910.
+   82S147AN
+  +---------+
+  |         |    470
+  | O1-Pin06|---/\/\/\----+---> BLUE
+  |         |    220      |
+  | O2-Pin07|---/\/\/\----+
+  |         |    1K
+  | O3-Pin08|---/\/\/\----+---> GREEN
+  |         |    470      |
+  | O4-Pin09|---/\/\/\----+
+  |         |    220      |
+  | O5-Pin11|---/\/\/\----+
+  |         |    1K
+  | O6-Pin12|---/\/\/\----+---> RED
+  |         |    470      |
+  | O7-Pin13|---/\/\/\----+
+  |         |    220      |
+  | O8-Pin14|---/\/\/\----+
+  |         |
+  +---------+
 
-    The 4020 is clocked at 1.5 MHz. The Q10 output (pin 14) is approximately 1464.84 Hz. Using
-    an oscilloscope, I measured a value of 60 uS = 1538 Hz. We used a NMI period of 1536 Hz due
-    to a better binary composition (1024+512).
-
-    Inputs/Ouputs are driven through 74LS251 and 74LS259 multiplexers. Each one handles 1 bit
-    from data bus, and there are many devices as addressed ports (8x 74LS251 and 8x 74LS259).
-
-    Input ports are mapped to offsets 0xC410 through 0xC417. Output ports are mapped to 0xC4000
-    to 0xC407 and are polled/updated during NMI.
-
-    These 1-bit controls are relative to buttons, keys, lights and counters. Other output ports
-    like watchdog or PSG (AY8910) are operated directly.
-
-
-
-    Resistor Network
-    ----------------
-
-    The following diagram is related to taiwanese and argentine PCBs.
-
-
-    82S147AN
-   +---------+
-   |         |    470
-   | O1-Pin06|---/\/\/\----+---> BLUE
-   |         |    220      |
-   | O2-Pin07|---/\/\/\----+
-   |         |    1K
-   | O3-Pin08|---/\/\/\----+---> GREEN
-   |         |    470      |
-   | O4-Pin09|---/\/\/\----+
-   |         |    220      |
-   | O5-Pin11|---/\/\/\----+
-   |         |    1K
-   | O6-Pin12|---/\/\/\----+---> RED
-   |         |    470      |
-   | O7-Pin13|---/\/\/\----+
-   |         |    220      |
-   | O8-Pin14|---/\/\/\----+
-   |         |
-   +---------+
-
-
-   All colors are directly routed to the edge connector.
-   There are not pull-up or pull-down resistors.
+  All colors are directly routed to the edge connector.
+  There are not pull-up or pull-down resistors.
 
 
 *********************************************************************************
 
-
-    --- DRIVER UPDATES ---
-
-
-    [2010-09-28]
-
-    Piccolo Poker 100 from Admiral - Novomatic.
-    - Added a workaround to get the game booting.
-    - Created inputs from the scratch.
-    - Promoted to 'working'.
-    - Added technical and game notes.
+  --- DRIVER UPDATES ---
 
 
-    [2009-08-17]
+  [2010-09-28]
 
-    - Added Rabbit Poker / Arizona Poker? set (with GAL22V10 and PIC16F84A).
-    - Added proper decryption algorithms.
-    - Updated technical notes.
-
-
-    [2008-10-07]
-    - Improved the button-lamps layout to all games. Now are more realistic.
+  Piccolo Poker 100 from Admiral - Novomatic.
+  - Added a workaround to get the game booting.
+  - Created inputs from the scratch.
+  - Promoted to 'working'.
+  - Added technical and game notes.
 
 
-    [2008-06-09]
-    - Added Videomat (polish bootleg).
+  [2009-08-17]
+
+  - Added Rabbit Poker / Arizona Poker? set (with GAL22V10 and PIC16F84A).
+  - Added proper decryption algorithms.
+  - Updated technical notes.
 
 
-    [2008-06-02]
-
-    - Reworked the input system for Sigma Poker 2000.
-    - Promoted Sigma Poker 2000 to 'WORKING' state.
-    - Updated technical notes.
+  [2008-10-07]
+  - Improved the button-lamps layout to all games. Now are more realistic.
 
 
-    [2008-05-23]
-
-    - Reworked the color routines switching to resnet system.
-    - Added a resistor network diagram.
-    - Switch to pre-defined crystal value.
-    - Changed the WATCHDOG_TIME_INIT to be based on miliseconds instead of hertz.
-    - Other minor cleanup/fixes.
-    - Updated technical notes.
+  [2008-06-09]
+  - Added Videomat (polish bootleg).
 
 
-    [2007-11-15]
+  [2008-06-02]
 
-    ******** REWRITE ********
-
-    - Crystal documented via #define.
-    - CPU and sound clocks derived from #defined crystal value.
-    - Reworked TILE_GET_INFO to handle the proper tiles/color codes.
-    - Added the correct GFX dump to sigma2k.
-    - Added proper TILE_GET_INFO, VIDEO_START, GFX_LAYOUT, GFXDECODE and MACHINE to sigma2k.
-    - Fixed interrupts (NMI).
-    - Corrected AY8910 frequency to 1.5 MHz to match the real thing.
-    - Arranged the AY8910 volume in all games avoiding clips.
-    - Corrected the screen visible area.
-    - Added NVRAM support.
-    - Reworked the memory map, mapping all the hardware I/O ports.
-    - Reworked the Inputs for all sets.
-    - Added implementation of Operator and Supervisor Keys.
-    - Fixed some timing troubles.
-    - Mapped the input buttons in the same way I mapped them in other poker games.
-    - Added partial DIP switch support with diplocations to all sets.
-
-    - Removed the hack in DRIVER_INIT.
-    - Hooked write handlers for output ports.
-    - Added watchdog routines.
-    - Dumped, hooked, wired and decoded the color PROM in all sets. Colors are perfect.
-    - Modified the refresh rate to 60 fps according to hardware measurements.
-    - Cleaned up and renamed all sets, defining parent-clone relationship.
-    - Wired the lamps for all sets. Created their respective layouts.
-    - Updated flags in game drivers.
-    - Splitted the driver to driver/video.
-    - Other minor fixes.
-
-    - New set dumped/added: American Poker 95.
-    - New set dumped/added: American Poker 2 (bootleg, set 1).
-    - New set dumped/added: Sigma Poker.
-    - New set dumped/added: Sigma Poker 2000.
-
-    - Rewritten the technical notes from the scratch (still in progress).
-    - Added a PCB layout to the technical notes.
+  - Reworked the input system for Sigma Poker 2000.
+  - Promoted Sigma Poker 2000 to 'WORKING' state.
+  - Updated technical notes.
 
 
+  [2008-05-23]
 
-    *** TO DO ***
+  - Reworked the color routines switching to resnet system.
+  - Added a resistor network diagram.
+  - Switch to pre-defined crystal value.
+  - Changed the WATCHDOG_TIME_INIT to be based on miliseconds instead of hertz.
+  - Other minor cleanup/fixes.
+  - Updated technical notes.
 
-    - Find why the watchdog sometimes stop to work.
-    - Analyze the write to port 0x21 after reset.
-    - Proper lamps for Piccolo Poker.
-    - Hopper emulation.
+
+  [2007-11-15]
+
+  ******** REWRITE ********
+
+  - Crystal documented via #define.
+  - CPU and sound clocks derived from #defined crystal value.
+  - Reworked TILE_GET_INFO to handle the proper tiles/color codes.
+  - Added the correct GFX dump to sigma2k.
+  - Added proper TILE_GET_INFO, VIDEO_START, GFX_LAYOUT, GFXDECODE and MACHINE to sigma2k.
+  - Fixed interrupts (NMI).
+  - Corrected AY8910 frequency to 1.5 MHz to match the real thing.
+  - Arranged the AY8910 volume in all games avoiding clips.
+  - Corrected the screen visible area.
+  - Added NVRAM support.
+  - Reworked the memory map, mapping all the hardware I/O ports.
+  - Reworked the Inputs for all sets.
+  - Added implementation of Operator and Supervisor Keys.
+  - Fixed some timing troubles.
+  - Mapped the input buttons in the same way I mapped them in other poker games.
+  - Added partial DIP switch support with diplocations to all sets.
+
+  - Removed the hack in DRIVER_INIT.
+  - Hooked write handlers for output ports.
+  - Added watchdog routines.
+  - Dumped, hooked, wired and decoded the color PROM in all sets. Colors are perfect.
+  - Modified the refresh rate to 60 fps according to hardware measurements.
+  - Cleaned up and renamed all sets, defining parent-clone relationship.
+  - Wired the lamps for all sets. Created their respective layouts.
+  - Updated flags in game drivers.
+  - Splitted the driver to driver/video.
+  - Other minor fixes.
+
+  - New set dumped/added: American Poker 95.
+  - New set dumped/added: American Poker 2 (bootleg, set 1).
+  - New set dumped/added: Sigma Poker.
+  - New set dumped/added: Sigma Poker 2000.
+
+  - Rewritten the technical notes from the scratch (still in progress).
+  - Added a PCB layout to the technical notes.
+
+
+
+  *** TODO ***
+
+  - Find why the watchdog sometimes stop to work.
+  - Analyze the write to port 0x21 after reset.
+  - Proper lamps for Piccolo Poker.
+  - Hopper emulation.
 
 
 *********************************************************************************/
@@ -1288,7 +1273,6 @@ ROM_START( ampkr228 )
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "gal16v8a_bad.u41", 0x0000, 0x0117, CRC(a26ba7e6) SHA1(fd22ccb1ff3bf6956f300668ecd8cfe699182b39) )
 	ROM_LOAD( "gal16v8b.u8",      0x0200, 0x0117, CRC(7edb3276) SHA1(1302aec1d9703e6ce9da77fc7a0613e7eff1ccb5) )
-
 ROM_END
 
 ROM_START( pkrdewin )
@@ -1443,7 +1427,7 @@ DRIVER_INIT_MEMBER(ampoker2_state,piccolop)
 
 	UINT8 *rom = memregion("maincpu")->base();
 
-	/* NOP'ing the mortal jump... */
+	// NOP'ing the mortal jump...
 	rom[0x154b] = 0x00;
 	rom[0x154c] = 0x00;
 	rom[0x154d] = 0x00;
@@ -1455,17 +1439,17 @@ DRIVER_INIT_MEMBER(ampoker2_state,piccolop)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY              FULLNAME                             FLAGS  LAYOUT      */
-GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, driver_device, 0,        ROT0, "Novomatic",         "American Poker II",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg?",          "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95, driver_device,  0,        ROT0, "bootleg",           "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, driver_device, 0,        ROT0, "bootleg",           "Videomat (Polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY              FULLNAME                             FLAGS                   LAYOUT
+GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, driver_device,  0,        ROT0, "Novomatic",         "American Poker II",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg?",          "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  driver_device,  0,        ROT0, "bootleg",           "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "Videomat (Polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, ampoker2_state, rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, driver_device, 0,        ROT0, "Sigma Inc.",        "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
-GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k, driver_device,  0,        ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, driver_device,  0,        ROT0, "Sigma Inc.",        "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  driver_device,  0,        ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )
 GAME(  1990, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                  GAME_SUPPORTS_SAVE )

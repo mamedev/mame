@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /* Come On Baby
   (c) 2000 ExPotato Co. Ltd (Excellent Potato)
 

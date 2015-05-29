@@ -4,9 +4,6 @@
 //
 //  debugview.h - MacOS X Cocoa debug window handling
 //
-//  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //============================================================
 
 #import "debugosx.h"
@@ -34,7 +31,7 @@
 	NSLayoutManager *layoutManager;
 }
 
-+ (NSFont *)defaultFont;
++ (NSFont *)defaultFontForMachine:(running_machine &)m;
 
 - (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m wholeLineScroll:(BOOL)w;
 

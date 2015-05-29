@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Wilbert Pol
 /***************************************************************************
 
   Atari VCS 2600 driver
@@ -9,7 +11,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/6532riot.h"
+#include "machine/mos6530n.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
@@ -79,7 +81,7 @@ static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVICE("riot", mos6532_t, io_map)
 	// AM_RANGE(0x1000, 0x1fff) is cart data and it is configured at reset time, depending on the mounted cart!
 ADDRESS_MAP_END
 
@@ -480,12 +482,12 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	/* devices */
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_NTSC / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_NTSC / 3)
+	MCFG_MOS6530n_IN_PA_CB(READ8(a2600_state, switch_A_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
+	MCFG_MOS6530n_IRQ_CB(WRITELINE(a2600_state, irq_callback))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
@@ -521,12 +523,12 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	/* devices */
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_PAL / 3)
+	MCFG_MOS6530n_IN_PA_CB(READ8(a2600_state, switch_A_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
+	MCFG_MOS6530n_IRQ_CB(WRITELINE(a2600_state, irq_callback))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)

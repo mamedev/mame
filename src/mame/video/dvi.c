@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #include "emu.h"
 
 // This just attempts to parse some of the header structures in the DVI data Dragon Gun uses...

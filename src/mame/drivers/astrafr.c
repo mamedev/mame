@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Astra Fruit Machines
  -- Unknown 68340 based HW platform (seems related to pluto5.c?)
  -- dumps are of an unknown quality
@@ -2090,7 +2092,7 @@ ROM_END
 
 void astra_addresslines( UINT16* src, size_t srcsize, int small )
 {
-	dynamic_array<UINT16> dst(srcsize/2);
+	std::vector<UINT16> dst(srcsize/2);
 
 	int blocksize;
 
@@ -2106,7 +2108,7 @@ void astra_addresslines( UINT16* src, size_t srcsize, int small )
 		}
 	}
 
-	memcpy(src,dst, srcsize);
+	memcpy(src,&dst[0], srcsize);
 }
 
 

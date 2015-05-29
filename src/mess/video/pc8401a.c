@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 #include "includes/pc8401a.h"
 #include "pc8500.lh"
 

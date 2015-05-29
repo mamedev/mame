@@ -4,9 +4,6 @@
 
     Motorola MCCS1850 Serial Real-Time Clock emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 /*

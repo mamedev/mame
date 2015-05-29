@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  osdsync.h - Core synchronization functions
-//
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
 
@@ -17,7 +16,7 @@
     SYNCHRONIZATION INTERFACES - Events
 ***************************************************************************/
 
-#define OSD_EVENT_WAIT_INFINITE -1
+#define OSD_EVENT_WAIT_INFINITE (~(osd_ticks_t)0)
 
 /* osd_event is an opaque type which represents a setable/resetable event */
 

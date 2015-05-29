@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Coates
 #include "emu.h"
 #include "sound/samples.h"
 #include "includes/circus.h"

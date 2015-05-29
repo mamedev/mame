@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli,Philip Bennett
 /*****************************************************************************
 
   Fujitsu MB87078 6-bit, 4-channel electronic volume controller emulator

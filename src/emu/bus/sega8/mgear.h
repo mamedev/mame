@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 #ifndef __SEGA8_MGEAR_H
 #define __SEGA8_MGEAR_H
 

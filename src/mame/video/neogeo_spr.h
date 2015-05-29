@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 
 #define VERBOSE     (0)
 
@@ -113,7 +115,7 @@ public:
 	virtual void optimize_sprite_data();
 	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask);
 	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
-	dynamic_array<UINT8> m_sprite_gfx;
+	std::vector<UINT8> m_sprite_gfx;
 	UINT8* m_spritegfx8;
 
 };

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sven Gothel
 /***
  *
  * GL Shader Tool - Convinient Basic Shader functionality
@@ -5,18 +7,7 @@
  * Copyright (c) 2007, Sven Gothel
  * Copyright (c) 2007, MAME Team
  *
- * Dual license: MAME and GPL version 2
- *
- * This module has a dual license, i.e. it is compatible to MAME,
- * but I like to reserve my rights to use this module under
- * the GPL as well.
- *
- * GPL license:
- *      Visit http://www.gnu.org/copyleft/gpl.html
- *
- * MAME license:
- *  Visit http://mamedev.org for licensing and usage restrictions.
- *
+ * GPL version 2
  *
  * OpenGL GLSL ARB extentions:
  *

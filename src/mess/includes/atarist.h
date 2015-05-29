@@ -332,7 +332,8 @@ public:
 
 	int m_monochrome;
 	required_device<palette_device> m_palette;
-	virtual DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+	// make GCC 5.1 happy.. FIXME
+	/*virtual*/ DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

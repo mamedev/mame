@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Lee Hammerton, Dirk Best
 /***************************************************************************
 
     Miles Gordon Technology SAM Coupe
-
-    license: MAME
-    copyright-holders: Lee Hammerton, Dirk Best
 
     Notes:
     ------

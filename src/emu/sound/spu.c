@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:pSXAuthor, R. Belmont
 /*
 
     Sony PlayStation SPU (CXD2922BQ/CXD2925Q) emulator
@@ -494,7 +496,8 @@ public:
 			marker_tail(NULL)
 	{
 		buffer_size=sector_size*num_sectors;
-		buffer.resize_and_clear(buffer_size);
+		buffer.resize(buffer_size);
+		memset(&buffer[0], 0, buffer_size);
 	}
 
 	~stream_buffer()
@@ -518,7 +521,7 @@ public:
 		}
 		marker_tail=xam;
 
-		unsigned char *ret=buffer+head;
+		unsigned char *ret=&buffer[head];
 		head=(head+sector_size)%buffer_size;
 		in+=sector_size;
 		return ret;
@@ -2330,9 +2333,9 @@ void spu_device::set_xa_format(const float _freq, const int channels)
 	// Adjust frequency to compensate for slightly slower/faster frame rate
 //  float freq=44100.0; //(_freq*get_adjusted_frame_rate())/ps1hw.rcnt->get_vertical_refresh();
 
-	xa_freq=(unsigned int)((_freq/44100.0)*4096.0f);
+	xa_freq=(unsigned int)((_freq/44100.0f)*4096.0f);
 	xa_channels=channels;
-	xa_spf=(unsigned int)(_freq/60.0)*channels;
+	xa_spf=(unsigned int)(_freq/60.0f)*channels;
 }
 
 //

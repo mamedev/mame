@@ -83,6 +83,13 @@ namespace bx
 			return result;
 		}
 
+		void reset()
+		{
+			m_current = 0;
+			m_write   = 0;
+			m_read    = 0;
+		}
+
 		const uint32_t m_size;
 		uint32_t m_current;
 		uint32_t m_write;
@@ -164,6 +171,13 @@ namespace bx
 			return result;
 		}
 
+		void reset()
+		{
+			m_current = 0;
+			m_write   = 0;
+			m_read    = 0;
+		}
+
 		const uint32_t m_size;
 		uint32_t m_current;
 		uint32_t m_write;
@@ -201,11 +215,11 @@ namespace bx
 
 		void read(char* _data, uint32_t _len)
 		{
-			const uint32_t end = (m_read + _len) % m_control.m_size;
+			const uint32_t eof = (m_read + _len) % m_control.m_size;
 			uint32_t wrap = 0;
 			const char* from = &m_buffer[m_read];
 
-			if (end < m_read)
+			if (eof < m_read)
 			{
 				wrap = m_control.m_size - m_read;
 				memcpy(_data, from, wrap);
@@ -215,7 +229,7 @@ namespace bx
 
 			memcpy(_data, from, _len-wrap);
 
-			m_read = end;
+			m_read = eof;
 		}
 
 		void skip(uint32_t _len)
@@ -271,11 +285,11 @@ namespace bx
 
 		void write(const char* _data, uint32_t _len)
 		{
-			const uint32_t end = (m_write + _len) % m_control.m_size;
+			const uint32_t eof = (m_write + _len) % m_control.m_size;
 			uint32_t wrap = 0;
 			char* to = &m_buffer[m_write];
 
-			if (end < m_write)
+			if (eof < m_write)
 			{
 				wrap = m_control.m_size - m_write;
 				memcpy(to, _data, wrap);
@@ -285,16 +299,16 @@ namespace bx
 
 			memcpy(to, _data, _len-wrap);
 
-			m_write = end;
+			m_write = eof;
 		}
 
 		void write(ReadRingBufferT<Control>& _read, uint32_t _len)
 		{
-			const uint32_t end = (_read.m_read + _len) % _read.m_control.m_size;
+			const uint32_t eof = (_read.m_read + _len) % _read.m_control.m_size;
 			uint32_t wrap = 0;
 			const char* from = &_read.m_buffer[_read.m_read];
 
-			if (end < _read.m_read)
+			if (eof < _read.m_read)
 			{
 				wrap = _read.m_control.m_size - _read.m_read;
 				write(from, wrap);
@@ -303,7 +317,7 @@ namespace bx
 
 			write(from, _len-wrap);
 
-			_read.m_read = end;
+			_read.m_read = eof;
 		}
 
 		void skip(uint32_t _len)

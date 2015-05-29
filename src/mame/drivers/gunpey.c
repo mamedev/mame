@@ -1,4 +1,4 @@
-// license:MAME
+// license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Tomasz Slanina, David Haywood, Luca Elia
 /********************************************************************************************
 

@@ -34,8 +34,8 @@
 
 NETLIB_DEVICE(7404,
 public:
-	netlist_ttl_input_t m_I;
-	netlist_ttl_output_t m_Q;
+	netlist_logic_input_t m_I;
+	netlist_logic_output_t m_Q;
 );
 
 #define TTL_7404_INVERT(_name, _A)                                                  \

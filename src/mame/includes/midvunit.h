@@ -148,6 +148,8 @@ public:
 	optional_device<midway_ioasic_device> m_midway_ioasic;
 	required_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	void postload();
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

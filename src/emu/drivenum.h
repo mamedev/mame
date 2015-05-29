@@ -106,7 +106,7 @@ public:
 	int filter(const char *string = NULL);
 	int filter(const game_driver &driver);
 	void include_all();
-	void exclude_all() { memset(m_included, 0, sizeof(m_included[0]) * s_driver_count); m_filtered_count = 0; }
+	void exclude_all() { memset(&m_included[0], 0, sizeof(m_included[0]) * s_driver_count); m_filtered_count = 0; }
 	void reset() { m_current = -1; }
 	bool next();
 	bool next_excluded();
@@ -146,8 +146,8 @@ private:
 	int                 m_current;
 	int                 m_filtered_count;
 	emu_options &       m_options;
-	dynamic_array<UINT8> m_included;
-	mutable dynamic_array<machine_config *> m_config;
+	std::vector<UINT8> m_included;
+	mutable std::vector<machine_config *> m_config;
 	mutable simple_list<config_entry> m_config_cache;
 };
 

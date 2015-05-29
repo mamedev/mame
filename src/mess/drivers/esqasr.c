@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     esqasr.c - Ensoniq ASR-10 and ASR-X

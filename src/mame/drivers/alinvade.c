@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Mariusz Wojcieszek
 /*
 
  tiny bartop b&w Space Invaders type game with colour overlay
@@ -37,11 +39,11 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sounden_w);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	UINT32 screen_update_alinvade(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT8 irqmask;
-	UINT8 irqff;
+	UINT8 m_irqmask;
+	UINT8 m_irqff;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
@@ -88,10 +90,10 @@ READ8_MEMBER(alinvade_state::irqmask_r)
 
 WRITE8_MEMBER(alinvade_state::irqmask_w)
 {
-	if((!(irqff & 1)) && (data & 1)) // f/f, active high? If the above actually returns 0xff this could be active low ...
-		irqmask^= 1;
+	if((!(m_irqff & 1)) && (data & 1)) // f/f, active high? If the above actually returns 0xff this could be active low ...
+		m_irqmask^= 1;
 
-	irqff = data;
+	m_irqff = data;
 }
 
 static ADDRESS_MAP_START( alinvade_map, AS_PROGRAM, 8, alinvade_state )
@@ -155,14 +157,16 @@ INPUT_PORTS_END
 
 void alinvade_state::machine_start()
 {
+	save_item(NAME(m_irqff));
+	save_item(NAME(m_irqmask));
 }
 
 void alinvade_state::machine_reset()
 {
-	irqmask = 1;
+	m_irqmask = 1;
 }
 
-UINT32 alinvade_state::screen_update_alinvade(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -190,7 +194,7 @@ UINT32 alinvade_state::screen_update_alinvade(screen_device &screen, bitmap_rgb3
 
 INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
 {
-	if(irqmask & 1)
+	if(m_irqmask & 1)
 		m_maincpu->set_input_line(0,HOLD_LINE);
 }
 
@@ -207,7 +211,7 @@ static MACHINE_CONFIG_START( alinvade, alinvade_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(128, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
-	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update_alinvade)
+	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -233,4 +237,4 @@ ROM_START( alinvade )
 ROM_END
 
 
-GAMEL( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND, layout_alinvade )
+GAMEL( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_alinvade )

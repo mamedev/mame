@@ -1,9 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Crime Fighters (Konami GX821) (c) 1989 Konami
 
     Preliminary driver by:
-        Manuel Abadia <manu@teleline.es>
+        Manuel Abadia <emumanu+mame@gmail.com>
 
 
     2008-08
@@ -237,7 +239,7 @@ WRITE8_MEMBER( crimfght_state::banking_callback )
 	{
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(palette_device::write), m_palette.target()));
-		membank("bank3")->set_base(m_paletteram);
+		membank("bank3")->set_base(&m_paletteram[0]);
 	}
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");                             /* RAM */

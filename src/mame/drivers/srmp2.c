@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Yochizo, Takahiro Nogi
 /***************************************************************************
 
 Super Real Mahjong P2

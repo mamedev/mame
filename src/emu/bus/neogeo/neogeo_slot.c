@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:S. Smith,David Haywood
 /***********************************************************************************************************
 
  ***********************************************************************************************************/
@@ -202,7 +204,7 @@ bool neogeo_cart_slot_device::call_softlist_load(software_list_device &swlist, c
  get default card software
  -------------------------------------------------*/
 
-void neogeo_cart_slot_device::get_default_card_software(astring &result)
+void neogeo_cart_slot_device::get_default_card_software(std::string &result)
 {
 	software_get_default_slot(result, "rom");
 }

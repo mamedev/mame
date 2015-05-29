@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*************************************************************************
 
     Atari Centipede hardware
@@ -53,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(coin_count_w);
 	DECLARE_WRITE8_MEMBER(bullsdrt_coin_count_w);
-	DECLARE_READ8_MEMBER(caterplr_rand_r);
+	DECLARE_READ8_MEMBER(caterplr_unknown_r);
 	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
 	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
 	DECLARE_READ8_MEMBER(multiped_eeprom_r);

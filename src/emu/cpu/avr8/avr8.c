@@ -1,5 +1,5 @@
-// license:MAME
-// copyright-holders: Ryan Holtz (Mooglyguy), Sandro Ronco, Felipe Sanches
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz, Sandro Ronco, Felipe Sanches
 /***************************************************************************
 
     Atmel 8-bit AVR simulator
@@ -749,7 +749,7 @@ void avr8_device::device_start()
 	m_io = &space(AS_IO);
 
 	// register our state for the debugger
-	astring tempstr;
+	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_shifted_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_r[AVR8_REGIDX_SREG]).callimport().callexport().formatstr("%8s").noshow();
 	state_add(AVR8_SREG,       "STATUS",    m_r[AVR8_REGIDX_SREG]).mask(0xff);
@@ -902,12 +902,12 @@ const address_space_config *avr8_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void avr8_device::state_string_export(const device_state_entry &entry, astring &string)
+void avr8_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				(m_r[AVR8_REGIDX_SREG] & 0x80) ? 'I' : '-',
 				(m_r[AVR8_REGIDX_SREG] & 0x40) ? 'T' : '-',
 				(m_r[AVR8_REGIDX_SREG] & 0x20) ? 'H' : '-',
@@ -1158,7 +1158,7 @@ void avr8_device::timer_tick(int cycles)
 //TODO  UINT8 int0[2] = { AVR8_INTIDX_OCF0A, AVR8_INTIDX_OCF0B };
 
 #define LOG_TIMER_0 0
-#define LOG_TIMER_5 1
+#define LOG_TIMER_5 0
 // Timer 0 Handling
 void avr8_device::timer0_tick()
 {
@@ -1905,8 +1905,10 @@ void avr8_device::timer5_tick()
 	case WGM5_CTC_ICR:
 	case WGM5_FAST_PWM_ICR:
 	case WGM5_FAST_PWM_OCR:
-		printf("Unimplemented timer#5 waveform generation mode: WGMM5=0x%02X\n", AVR8_WGM5);
-		break;
+#if LOG_TIMER_5
+			printf("Unimplemented timer#5 waveform generation mode: AVR8_WGM5 = 0x%02X\n", AVR8_WGM5);
+#endif
+			break;
 
 		case WGM5_CTC_OCR:
 		//TODO: verify this! Can be very wrong!!!

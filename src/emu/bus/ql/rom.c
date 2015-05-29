@@ -4,9 +4,6 @@
 
     Sinclair QL ROM cartridge port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "rom.h"
@@ -117,7 +114,7 @@ bool ql_rom_cartridge_slot_t::call_softlist_load(software_list_device &swlist, c
 //  get_default_card_software -
 //-------------------------------------------------
 
-void ql_rom_cartridge_slot_t::get_default_card_software(astring &result)
+void ql_rom_cartridge_slot_t::get_default_card_software(std::string &result)
 {
 	software_get_default_slot(result, "standard");
 }

@@ -1,5 +1,7 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /*
- * font_sdl.c
+ * font_none.c
  *
  */
 
@@ -14,7 +16,7 @@
 class osd_font_none : public osd_font
 {
 public:
-	virtual ~osd_font_none() {};
+	virtual ~osd_font_none() { }
 
 	virtual bool open(const char *font_path, const char *name, int &height);
 	virtual void close();
@@ -52,10 +54,11 @@ bool osd_font_none::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 
 class font_none : public osd_module, public font_module
 {
 public:
-	font_none()
-	: osd_module(OSD_FONT_PROVIDER, "none"), font_module()
+	font_none() : osd_module(OSD_FONT_PROVIDER, "none"), font_module()
 	{
 	}
+
+	virtual int init(const osd_options &options) { return 0; }
 
 	osd_font *font_alloc()
 	{

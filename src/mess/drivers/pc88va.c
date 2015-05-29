@@ -1,4 +1,4 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /********************************************************************************************
 
@@ -1727,9 +1727,9 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 
 WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
 {
-//	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+//  m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-    m_dmac->hack_w(state);
+	m_dmac->hack_w(state);
 
 //  printf("%02x HLDA\n",state);
 }
@@ -1833,7 +1833,6 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_AM9517A_IN_MEMR_CB(READ8(pc88va_state, dma_memr_cb))
 	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(pc88va_state, dma_memw_cb))
 
-	
 	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_irq))
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_drq))

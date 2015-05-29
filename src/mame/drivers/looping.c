@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /*
 To Do:
 - redump COP420 internal ROM
@@ -113,7 +115,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
-	UINT8 *     m_cop_io;
+	UINT8 m_cop_port_l;
 
 	/* tilemaps */
 	tilemap_t * m_bg_tilemap;
@@ -137,8 +139,9 @@ public:
 	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE8_MEMBER(adc_w);
 	DECLARE_WRITE8_MEMBER(plr2_w);
-	DECLARE_READ8_MEMBER(cop_io_r);
-	DECLARE_WRITE8_MEMBER(cop_io_w);
+	DECLARE_READ8_MEMBER(cop_unk_r);
+	DECLARE_READ_LINE_MEMBER(cop_serial_r);
+	DECLARE_WRITE8_MEMBER(cop_l_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE_LINE_MEMBER(looping_spcint);
 	DECLARE_WRITE8_MEMBER(looping_sound_sw);
@@ -479,16 +482,20 @@ WRITE8_MEMBER(looping_state::plr2_w)
  *
  *************************************/
 
-READ8_MEMBER(looping_state::cop_io_r)
+READ8_MEMBER(looping_state::cop_unk_r)
 {
-	// if (offset == 1) return machine().rand() & 0x01;
-	return 1; // m_cop_io[offset];
+	return 1;
 }
 
-WRITE8_MEMBER(looping_state::cop_io_w)
+READ_LINE_MEMBER(looping_state::cop_serial_r)
 {
-	m_cop_io[offset] = data;
-if (offset == 0) logerror("%02x  ",data);
+	return 1;
+}
+
+WRITE8_MEMBER(looping_state::cop_l_w)
+{
+	m_cop_port_l = data;
+	logerror("%02x  ",data);
 }
 
 READ8_MEMBER(looping_state::protection_r)
@@ -511,7 +518,7 @@ READ8_MEMBER(looping_state::protection_r)
 //        cop write randomly fc (unfortunatly) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
 
 	// missing something
-	if(m_cop_io[0] != 0xfc) return m_cop_io[0];
+	if(m_cop_port_l != 0xfc) return m_cop_port_l;
 	return 0xff;
 }
 
@@ -579,20 +586,6 @@ static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )
 ADDRESS_MAP_END
 
 
-/* standard COP420 map */
-static ADDRESS_MAP_START( looping_cop_map, AS_PROGRAM, 8, looping_state )
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( looping_cop_data_map, AS_DATA, 8, looping_state )
-	AM_RANGE(0x0000, 0x003f) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( looping_cop_io_map, AS_IO, 8, looping_state )
-	AM_RANGE(0x0100, 0x0107) AM_READWRITE(cop_io_r, cop_io_w)
-ADDRESS_MAP_END
-
-
 /*************************************
  *
  *  Graphics definitions
@@ -633,10 +626,12 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map)
 
 	MCFG_CPU_ADD("mcu", COP420, COP_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(looping_cop_map)
-	MCFG_CPU_DATA_MAP(looping_cop_data_map)
-	MCFG_CPU_IO_MAP(looping_cop_io_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
+	MCFG_COP400_WRITE_L_CB(WRITE8(looping_state, cop_l_w))
+	MCFG_COP400_READ_L_CB(READ8(looping_state, cop_unk_r))
+	MCFG_COP400_READ_G_CB(READ8(looping_state, cop_unk_r))
+	MCFG_COP400_READ_IN_CB(READ8(looping_state, cop_unk_r))
+	MCFG_COP400_READ_SI_CB(READLINE(looping_state, cop_serial_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -893,7 +888,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
 	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
-	m_cop_io = auto_alloc_array(machine(), UINT8, 0x08);
+	m_cop_port_l = 0;
 
 	/* bitswap the TMS9995 ROMs */
 	for (i = 0; i < length; i++)

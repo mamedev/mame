@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:pSXAuthor, R. Belmont
 #include "emu.h"
 #include "spu.h"
 

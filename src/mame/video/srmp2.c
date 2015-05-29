@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Yochizo, Takahiro Nogi
 /***************************************************************************
 
 Functions to emulate the video hardware of the machine.

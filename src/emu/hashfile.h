@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /*********************************************************************
 
     hashfile.h
@@ -12,6 +14,6 @@
 #include "emu.h"
 
 
-bool hashfile_extrainfo(device_image_interface &image, astring &result);
+bool hashfile_extrainfo(device_image_interface &image, std::string &result);
 
 #endif /* __HASHFILE_H__ */

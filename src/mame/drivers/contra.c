@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carlos A. Lozano, Phil Stroffolino
 /***************************************************************************
 
 Contra/Gryzor (c) 1987 Konami
@@ -124,9 +126,9 @@ static INPUT_PORTS_START( contra )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")    /* Not Used according to manual */
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "30000 70000" )
 	PORT_DIPSETTING(    0x10, "40000 80000" )
@@ -145,15 +147,30 @@ static INPUT_PORTS_START( contra )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")    /* Not Used according to manual */
-	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
 	PORT_DIPNAME( 0x08, 0x08, "Sound" ) PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Stereo ) )
 INPUT_PORTS_END
 
+
+
+static INPUT_PORTS_START( gryzor )
+	PORT_INCLUDE( contra )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")    /* Not Used according to manual, used in gryzor sets */
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")    /* Not Used according to manual, used in gryzor sets */
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+INPUT_PORTS_END
 
 
 static const gfx_layout gfxlayout =
@@ -274,6 +291,46 @@ ROM_START( contra1 )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )    /* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
+ROM_END
+
+ROM_START( contrae )
+	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 96k for banked ROMs */
+	ROM_LOAD( "633_e03.18a",   0x20000, 0x08000, CRC(7ebdb314) SHA1(b42c032cce7ae0c9b3eea6a41b7ffa5cb7fced5d) )
+	ROM_CONTINUE(              0x08000, 0x08000 )
+	ROM_LOAD( "633_e02.17a",   0x10000, 0x10000, CRC(9d5ebe66) SHA1(5218426e1494b4f6dec667f1ade7ada13aa04f2b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for SOUND code */
+	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
+
+	// this PCB used official Konami riser-boards in place of the mask roms
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "633_e04_a.7d",    0x00000, 0x10000, CRC(e027f330) SHA1(e3480c0ed9f5ed5df829e66eb72e01ea39d5fca3) )
+	ROM_LOAD16_BYTE( "633_e04_b.7d",    0x20000, 0x10000, CRC(a71230f5) SHA1(c2c92b42a04adbb4c7ba3d4632b9a9db0555840e) )
+	ROM_LOAD16_BYTE( "633_e04_c.7d",    0x40000, 0x10000, CRC(0b103d01) SHA1(95e7feb7103d71b43ba921b7a376a2faf642621b) )
+	ROM_LOAD16_BYTE( "633_e04_d.7d",    0x60000, 0x10000, CRC(ab3faa60) SHA1(905c1eaa5fb46904058977582c9bb3132ba165f7) )
+	ROM_LOAD16_BYTE( "633_e05_a.7f",    0x00001, 0x10000, CRC(81a70a77) SHA1(c7493474af0144c05d3d98b2f77a3dae2d8d7ca5) )
+	ROM_LOAD16_BYTE( "633_e05_b.7f",    0x20001, 0x10000, CRC(55556f29) SHA1(ebd52abd4adb9c4302050579fa126fde49fb468d) )
+	ROM_LOAD16_BYTE( "633_e05_c.7f",    0x40001, 0x10000, CRC(acba86bf) SHA1(c248c837b1f8093bcaf465b0c75b67f1f67a3f61) )
+	ROM_LOAD16_BYTE( "633_e05_d.7f",    0x60001, 0x10000, CRC(59cf234d) SHA1(4a6bb30789e581c0600c55d8e8fba778e30ba299) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "633_e06_a.16d",   0x00000, 0x10000, CRC(030079c5) SHA1(3f93e05e9df0a9dde570b771e04b719cf0ace967) )
+	ROM_LOAD16_BYTE( "633_e06_b.16d",   0x20000, 0x10000, CRC(e17d5807) SHA1(15ebbf62d026cc8ac75c9877304458cbc0c5d5e0) )
+	ROM_LOAD16_BYTE( "633_e06_c.16d",   0x40000, 0x10000, CRC(7d6a28cd) SHA1(9fbbe0460406bb8b3e2e572c4d5a2f8be4ba9c2e) )
+	ROM_LOAD16_BYTE( "633_e06_d.16d",   0x60000, 0x10000, CRC(83db378f) SHA1(b9a2235382836fe06868d3bbd45978653bf5c91d) )
+	ROM_LOAD16_BYTE( "633_e07_a.16f",   0x00001, 0x10000, CRC(8fcd40e5) SHA1(980273dc9108cc546b2146ec1e9db5dd440c4bd2) )
+	ROM_LOAD16_BYTE( "633_e07_b.16f",   0x20001, 0x10000, CRC(694e306e) SHA1(f077aefb2b1ed29b27ed02b094007fe6b50a06a1) )
+	ROM_LOAD16_BYTE( "633_e07_c.16f",   0x40001, 0x10000, CRC(fb33f3ff) SHA1(c6f6035a1478e8d2cdab01ddf2ec07a834b79593) )
+	ROM_LOAD16_BYTE( "633_e07_d.16f",   0x60001, 0x10000, CRC(cfab0988) SHA1(3961bcbc3093b787211ab2815914f90a89df78b1) )
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    /* 007121 #0 sprite lookup table */
+	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #0 char lookup table */
+	ROM_LOAD( "633e10.18g",   0x0200, 0x0100, CRC(e782c494) SHA1(9459e721a4361fc4fbace3a017211f0199dee24d) )    /* 007121 #1 sprite lookup table */ // earlier rev
+	ROM_LOAD( "633e11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
 	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
@@ -506,13 +563,13 @@ ROM_START( contrabj1 )
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 ROM_END
 
-
-GAME( 1987, contra,    0,      contra, contra, driver_device, 0, ROT90, "Konami", "Contra (US, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contra1,   contra, contra, contra, driver_device, 0, ROT90, "Konami", "Contra (US, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contraj,   contra, contra, contra, driver_device, 0, ROT90, "Konami", "Contra (Japan, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contraj1,  contra, contra, contra, driver_device, 0, ROT90, "Konami", "Contra (Japan, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, gryzor,    contra, contra, contra, driver_device, 0, ROT90, "Konami", "Gryzor (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, gryzor1,   contra, contra, contra, driver_device, 0, ROT90, "Konami", "Gryzor (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contrab,   contra, contra, contra, driver_device, 0, ROT90, "bootleg", "Contra (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contrabj,  contra, contra, contra, driver_device, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, contrabj1, contra, contra, contra, driver_device, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contra,    0,      contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (US / Asia, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contra1,   contra, contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (US / Asia, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contrae,   contra, contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (US / Asia, set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contraj,   contra, contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (Japan, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contraj1,  contra, contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (Japan, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, gryzor,    contra, contra, gryzor,  driver_device, 0, ROT90, "Konami", "Gryzor (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, gryzor1,   contra, contra, gryzor,  driver_device, 0, ROT90, "Konami", "Gryzor (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contrab,   contra, contra, contra,  driver_device, 0, ROT90, "bootleg", "Contra (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contrabj,  contra, contra, contra,  driver_device, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contrabj1, contra, contra, contra,  driver_device, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 2)", GAME_SUPPORTS_SAVE )

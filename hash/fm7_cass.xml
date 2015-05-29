@@ -352,7 +352,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="chima">
-		<description>Yokai Tantei Chima Chima</description>
+		<description>Youkai Tantei Chima Chima</description>
 		<year>1985</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<info name="release" value="198501xx"/>
@@ -783,7 +783,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ぐっちゃんバンク"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2407350">
-				<rom name="gbank.t77" size="2407350" crc="b5b66db4" sha1="7498c5b8f25eb5aa3a8dfd2972d75f7af22dce1a" offset="0" />
+				<rom name="gbankalt.t77" size="2407350" crc="b5b66db4" sha1="7498c5b8f25eb5aa3a8dfd2972d75f7af22dce1a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1062,7 +1062,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="karuizaw">
-		<description>Karuizawa Yukai Annai</description>
+		<description>Karuizawa Yuukai Annai</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="serial" value="E-G135"/>
@@ -1952,7 +1952,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 <!-- This should have contained 3 tapes, according to Oh!FM-7. Who's wrong? -->
-	<software name="wakumeph">
+	<software name="mephius">
 		<description>Star Arthur Densetsu I - Wakusei Mephius</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>

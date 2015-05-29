@@ -9,6 +9,8 @@
   serial  device  etc.
 -----------------------------------------------------------
  @036     1655A   1979, Ideal Maniac
+ *061     1655A   1980, Lakeside Le Boom (have dump)
+ *094     1655A   1980, GAF Melody Madness (have dump)
  *110     1650A   1979, Tiger Rocket Pinball
  *192     1650    19??, (a phone dialer, have dump)
  *255     1655    19??, (a talking clock, have dump)
@@ -51,8 +53,6 @@ public:
 	UINT8 m_b;                          // MCU port B data
 	UINT8 m_c;                          // MCU port C data
 
-	virtual void machine_start();
-
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
@@ -68,10 +68,13 @@ public:
 	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
-	// game-specific handlers
-	DECLARE_WRITE8_MEMBER(maniac_output_w);
+protected:
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
+
+// machine start/reset
 
 void hh_pic16_state::machine_start()
 {
@@ -96,6 +99,10 @@ void hh_pic16_state::machine_start()
 
 	save_item(NAME(m_b));
 	save_item(NAME(m_c));
+}
+
+void hh_pic16_state::machine_reset()
+{
 }
 
 
@@ -124,7 +131,7 @@ void hh_pic16_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -142,7 +149,7 @@ void hh_pic16_state::display_update()
 				int state = active_state[y] >> x & 1;
 				char buf1[0x10]; // lampyx
 				char buf2[0x10]; // y.x
-				
+
 				if (x == m_display_maxx)
 				{
 					// always-on if selected
@@ -195,7 +202,7 @@ void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 /***************************************************************************
 
-  Minidrivers (I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config)
 
 ***************************************************************************/
 
@@ -207,7 +214,19 @@ void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
+class maniac_state : public hh_pic16_state
+{
+public:
+	maniac_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(output_w);
+};
+
+// handlers
+
+WRITE8_MEMBER(maniac_state::output_w)
 {
 	// B,C: outputs
 	offset -= PIC16C5x_PORTB;
@@ -228,6 +247,8 @@ WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
 }
 
 
+// config
+
 static INPUT_PORTS_START( maniac )
 	PORT_START("IN.0") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // bottom-right
@@ -239,13 +260,13 @@ INPUT_PORTS_END
 
 static const INT16 maniac_speaker_levels[] = { 0, 32767, -32768, 0 };
 
-static MACHINE_CONFIG_START( maniac, hh_pic16_state )
+static MACHINE_CONFIG_START( maniac, maniac_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC16C55, 850000) // RC osc. R=13.4K, C=470pf, but unknown RC curve - measured 800-890kHz
 	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(hh_pic16_state, maniac_output_w))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(hh_pic16_state, maniac_output_w))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(maniac_state, output_w))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(maniac_state, output_w))
 	MCFG_PIC16C5x_SET_CONFIG(0) // ?
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))

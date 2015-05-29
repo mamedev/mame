@@ -1,4 +1,4 @@
-// license:MAME|LGPL-2.1+
+// license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /******************************************************************************
     MESS Driver for the Myarc Geneve 9640.

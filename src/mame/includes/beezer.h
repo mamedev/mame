@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mathis Rosenhauer
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
 
@@ -45,7 +47,7 @@ public:
 /*----------- defined in audio/beezer.c -----------*/
 
 /* 6840 variables */
-struct sh6840_timer_channel
+struct sh6840_timer_channel_beez
 {
 	UINT8   cr;
 	UINT8   state;
@@ -94,7 +96,7 @@ private:
 	/* IRQ variable */
 	//UINT8 m_ptm_irq_state;
 
-	struct sh6840_timer_channel m_sh6840_timer[3];
+	struct sh6840_timer_channel_beez m_sh6840_timer[3];
 	UINT8 m_sh6840_volume[4];
 	UINT8 m_sh6840_MSB_latch;
 	UINT8 m_sh6840_LSB_latch;

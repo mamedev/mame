@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "emu.h"
 #include "includes/tatsumi.h"
 
@@ -605,10 +607,10 @@ static void draw_sprites(running_machine &machine, _BitmapClass &bitmap, const r
 		{
 			double theta = rotate * ((2.0 * M_PI) / 512.0);
 
-			int incxx = (int)((float)65536.0 * cos(theta));
-			int incxy = (int)((float)65536.0 * -sin(theta));
-			int incyx = (int)((float)65536.0 * sin(theta));
-			int incyy = (int)((float)65536.0 * cos(theta));
+			int incxx = (int)(65536.0 * cos(theta));
+			int incxy = (int)(65536.0 * -sin(theta));
+			int incyx = (int)(65536.0 * sin(theta));
+			int incyy = (int)(65536.0 * cos(theta));
 
 			extent_x = extent_x >> 16;
 			extent_y = extent_y >> 16;

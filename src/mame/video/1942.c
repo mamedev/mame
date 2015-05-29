@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Leaman, Couriersud
 /***************************************************************************
 
   video.c

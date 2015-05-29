@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Haywood
 /***************************************************************************
 
     Dead Angle                          (c) 1988 Seibu Kaihatsu

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ElSemi
 /* IGS 027 Encryptions
 
   the IGS027 chips are typically used with encrypted ROMs.

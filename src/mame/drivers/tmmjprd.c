@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* tmmjprd.c
 
  - split from rabbit.c  (it uses the same GFX chip, but is otherwise a different PCB, and until the methods

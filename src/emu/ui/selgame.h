@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
     ui/selgame.h
 
     Game selector
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -35,7 +34,7 @@ private:
 	UINT8                   m_rerandomize;
 	char                    m_search[40];
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
-	dynamic_array<const game_driver *> m_driverlist;
+	std::vector<const game_driver *> m_driverlist;
 	auto_pointer<driver_enumerator> m_drivlist;
 
 	// internal methods

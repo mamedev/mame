@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Dan Boris
 #ifndef __ATARI_MARIA__
 #define __ATARI_MARIA__
 

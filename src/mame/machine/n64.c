@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /* machine/n64.c - contains N64 hardware emulation shared between MAME and MESS */
 
 #include "emu.h"
@@ -14,7 +16,6 @@ UINT32 *rsp_dmem;
 
 // device type definition
 const device_type N64PERIPH = &device_creator<n64_periphs>;
-
 
 
 
@@ -270,6 +271,13 @@ void n64_periphs::device_reset()
 		pif_ram[0x26] = 0x85;
 		pif_ram[0x27] = 0x3f;
 		cic_type=6;
+	}
+
+	// Mouse X2/Y2 for delta
+	for (int i = 0; i < 4; i++)
+	{
+		mouse_x2[i] = 0;
+		mouse_y2[i] = 0;
 	}
 }
 
@@ -654,21 +662,21 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 		case 0x20/4:        // DP_CMD_START
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetStartReg();
+			ret = state->m_rdp->get_start();
 			break;
 		}
 
 		case 0x24/4:        // DP_CMD_END
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetEndReg();
+			ret = state->m_rdp->get_end();
 			break;
 		}
 
 		case 0x28/4:        // DP_CMD_CURRENT
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetCurrentReg();
+			ret = state->m_rdp->get_current();
 			break;
 		}
 
@@ -680,13 +688,13 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 		case 0x2c/4:        // DP_CMD_STATUS
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetStatusReg();
+			ret = state->m_rdp->get_status();
 			break;
 		}
 
 		case 0x30/4:        // DP_CMD_CLOCK
 		{
-			if(!(machine().driver_data<n64_state>()->m_rdp->GetStatusReg() & DP_STATUS_FREEZE))
+			if(!(machine().driver_data<n64_state>()->m_rdp->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
 				ret = dp_clock;
@@ -900,24 +908,24 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			ret = state->m_rdp->GetStartReg();
+			ret = state->m_rdp->get_start();
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			ret = state->m_rdp->GetEndReg();
+			ret = state->m_rdp->get_end();
 			break;
 
 		case 0x08/4:        // DP_CURRENT_REG
-			ret = state->m_rdp->GetCurrentReg();
+			ret = state->m_rdp->get_current();
 			break;
 
 		case 0x0c/4:        // DP_STATUS_REG
-			ret = state->m_rdp->GetStatusReg();
+			ret = state->m_rdp->get_status();
 			break;
 
 		case 0x10/4:        // DP_CLOCK_REG
 		{
-			if(!(state->m_rdp->GetStatusReg() & DP_STATUS_FREEZE))
+			if(!(state->m_rdp->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
 				ret = dp_clock;
@@ -940,20 +948,20 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			state->m_rdp->SetStartReg(data);
-			state->m_rdp->SetCurrentReg(state->m_rdp->GetStartReg());
+			state->m_rdp->set_start(data);
+			state->m_rdp->set_current(state->m_rdp->get_start());
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			state->m_rdp->SetEndReg(data);
+			state->m_rdp->set_end(data);
 			g_profiler.start(PROFILER_USER1);
-			state->m_rdp->ProcessList();
+			state->m_rdp->process_command_list();
 			g_profiler.stop();
 			break;
 
 		case 0x0c/4:        // DP_STATUS_REG
 		{
-			UINT32 current_status = state->m_rdp->GetStatusReg();
+			UINT32 current_status = state->m_rdp->get_status();
 			if (data & 0x00000001)  current_status &= ~DP_STATUS_XBUS_DMA;
 			if (data & 0x00000002)  current_status |= DP_STATUS_XBUS_DMA;
 			if (data & 0x00000004)  current_status &= ~DP_STATUS_FREEZE;
@@ -961,7 +969,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			if (data & 0x00000010)  current_status &= ~DP_STATUS_FLUSH;
 			if (data & 0x00000020)  current_status |= DP_STATUS_FLUSH;
 			if (data & 0x00000200)  dp_clock = 0;
-			state->m_rdp->SetStatusReg(current_status);
+			state->m_rdp->set_status(current_status);
 			break;
 		}
 
@@ -1017,7 +1025,7 @@ void n64_periphs::vi_recalculate_resolution()
 	if (height > 480)
 		height = 480;
 
-	state->m_rdp->MiscState.FBHeight = height;
+	state->m_rdp->m_misc_state.m_fb_height = height;
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
@@ -1114,7 +1122,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 				vi_recalculate_resolution();
 			}
 			vi_width = data;
-			state->m_rdp->MiscState.FBWidth = data;
+			state->m_rdp->m_misc_state.m_fb_width = data;
 			break;
 
 		case 0x0c/4:        // VI_INTR_REG
@@ -1709,18 +1717,28 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			{
 				case 0:
 				case 1:
-				{
-					// Read status
-					rdata[0] = 0x05;
-					rdata[1] = 0x00;
-					rdata[2] = 0x01;
-					return 0;
-				}
 				case 2:
 				case 3:
 				{
-					// Read status (unconnected)
-					return 1;
+					// Read status
+					switch ((machine().root_device().ioport("input")->read() >> (2 * channel)) & 3)
+					{
+						case 0:             //NONE (unconnected)
+						case 3:             //Invalid
+							return 1;
+
+						case 1:             //JOYPAD
+							rdata[0] = 0x05;
+							rdata[1] = 0x00;
+							rdata[2] = 0x01;
+							return 0;
+
+						case 2:             //MOUSE
+							rdata[0] = 0x02;
+							rdata[1] = 0x00;
+							rdata[2] = 0x01;
+							return 0;
+					}
 				}
 				case 4:
 				{
@@ -1744,9 +1762,11 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 		case 0x01:      // Read button values
 		{
 			UINT16 buttons = 0;
-			INT8 x = 0, y = 0;
-			/* add here tags for P3 and P4 when implemented */
-			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y", "P2", "P2_ANALOG_X", "P2_ANALOG_Y" };
+			int x = 0, y = 0;
+			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y", "P1_MOUSE_X", "P1_MOUSE_Y",
+													"P2", "P2_ANALOG_X", "P2_ANALOG_Y", "P2_MOUSE_X", "P2_MOUSE_Y",
+													"P3", "P3_ANALOG_X", "P3_ANALOG_Y", "P3_MOUSE_X", "P3_MOUSE_Y",
+													"P4", "P4_ANALOG_X", "P4_ANALOG_Y", "P4_MOUSE_X", "P4_MOUSE_Y" };
 
 			if (slength != 1 || rlength != 4)
 			{
@@ -1757,22 +1777,81 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			{
 				case 0: // P1 Inputs
 				case 1: // P2 Inputs
+				case 2: // P3 Inputs
+				case 3: // P4 Inputs
 				{
-					buttons = machine().root_device().ioport(portnames[(channel*3) + 0])->read();
-					x = machine().root_device().ioport(portnames[(channel*3) + 1])->read() - 128;
-					y = machine().root_device().ioport(portnames[(channel*3) + 2])->read() - 128;
+					switch ((machine().root_device().ioport("input")->read() >> (2 * channel)) & 3)
+					{
+						case 0:         //NONE
+						case 3:         //Invalid
+							return 1;
 
-					rdata[0] = (buttons >> 8) & 0xff;
-					rdata[1] = (buttons >> 0) & 0xff;
-					rdata[2] = (UINT8)(x);
-					rdata[3] = (UINT8)(y);
-					return 0;
-				}
-				case 2:
-				case 3:
-				{
-					// P3/P4 Inputs (not connected)
-					return 1;
+						case 1:         //JOYPAD
+							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
+							x = machine().root_device().ioport(portnames[(channel*5) + 1])->read() - 128;
+							y = machine().root_device().ioport(portnames[(channel*5) + 2])->read() - 128;
+
+							rdata[0] = (buttons >> 8) & 0xff;
+							rdata[1] = (buttons >> 0) & 0xff;
+							rdata[2] = (UINT8)(x);
+							rdata[3] = (UINT8)(y);
+							return 0;
+
+						case 2:         //MOUSE
+							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
+							x = (INT16)machine().root_device().ioport(portnames[(channel*5) + 1 + 2])->read();// - 128;
+							y = (INT16)machine().root_device().ioport(portnames[(channel*5) + 2 + 2])->read();// - 128;
+
+							int mouse_dx = 0;
+							int mouse_dy = 0;
+
+							if (x != mouse_x2[channel])
+							{
+								mouse_dx = x - mouse_x2[channel];
+
+								if (mouse_dx > 0x40)
+									mouse_dx = (0x80) - (mouse_dx - ((mouse_dx / 0x80) * 0x80));
+								else if (mouse_dx < -0x40)
+									mouse_dx = -(0x80) - (mouse_dx - ((mouse_dx / 0x80) * 0x80));
+
+								mouse_x2[channel] = x;
+							}
+
+							if (y != mouse_y2[channel])
+							{
+								mouse_dy = y - mouse_y2[channel];
+
+								if (mouse_dy > 0x40)
+									mouse_dy = (0x80) - (mouse_dy - ((mouse_dy / 0x80) * 0x80));
+								else if (mouse_dy < -0x40)
+									mouse_dy = -(0x80) - (mouse_dy - ((mouse_dy / 0x80) * 0x80));
+
+								mouse_y2[channel] = y;
+							}
+
+							if (mouse_dx)
+							{
+								if(mouse_dx < 0)
+									mouse_dx++;
+								else
+									mouse_dx--;
+							}
+
+							if (mouse_dy)
+							{
+								if(mouse_dy < 0)
+									mouse_dy++;
+								else
+									mouse_dy--;
+							}
+
+							rdata[0] = (buttons >> 8) & 0xff;
+							rdata[1] = (buttons >> 0) & 0xff;
+							rdata[2] = (UINT8)(mouse_dx);
+							rdata[3] = (UINT8)(mouse_dy);
+							return 0;
+
+					}
 				}
 			}
 
@@ -2264,7 +2343,7 @@ void n64_periphs::dd_read_sector()
 	for(int i = 0; i < ddZoneSecSize[dd_zone]/4; i++)
 	{
 		dd_sector_data[i] = sector[(i*4 + 0)] << 24 | sector[(i*4 + 1)] << 16 |
-		                    sector[(i*4 + 2)] << 8  | sector[(i*4 + 3)];
+							sector[(i*4 + 2)] << 8  | sector[(i*4 + 3)];
 	}
 	return;
 }

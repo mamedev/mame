@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU4 games by Crystal */
 
 /* Crystal games tend to have scrambled ROM + a different sound chip */

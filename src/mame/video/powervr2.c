@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
   Dreamcast video emulation
 */
@@ -117,8 +119,8 @@ inline INT32 powervr2_device::clamp(INT32 in, INT32 min, INT32 max)
 // Perform a standard bilinear filter across four pixels
 inline UINT32 powervr2_device::bilinear_filter(UINT32 c0, UINT32 c1, UINT32 c2, UINT32 c3, float u, float v)
 {
-	UINT32 ui = (u * 256.0);
-	UINT32 vi = (v * 256.0);
+	UINT32 ui = (u * 256.0f);
+	UINT32 vi = (v * 256.0f);
 	return rgba_bilinear_filter(c0, c1, c3, c2, ui, vi);
 }
 
@@ -675,10 +677,10 @@ void powervr2_device::tex_get_info(texinfo *t)
 				break;
 			case 1: // floating color
 				/* TODO: might be converted even earlier I believe */
-				t->nontextured_fpal_a = (UINT8)(nontextured_fpal_a * 255.0);
-				t->nontextured_fpal_r = (UINT8)(nontextured_fpal_r * 255.0);
-				t->nontextured_fpal_g = (UINT8)(nontextured_fpal_g * 255.0);
-				t->nontextured_fpal_b = (UINT8)(nontextured_fpal_b * 255.0);
+				t->nontextured_fpal_a = (UINT8)(nontextured_fpal_a * 255.0f);
+				t->nontextured_fpal_r = (UINT8)(nontextured_fpal_r * 255.0f);
+				t->nontextured_fpal_g = (UINT8)(nontextured_fpal_g * 255.0f);
+				t->nontextured_fpal_b = (UINT8)(nontextured_fpal_b * 255.0f);
 				t->r = &powervr2_device::tex_r_nt_palfloat;
 				break;
 		}
@@ -2195,7 +2197,7 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 		xxr = 640;
 
 	// Target the pixel center
-	ddx = xxl + 0.5 - xl;
+	ddx = xxl + 0.5f - xl;
 	ul += ddx*dudx;
 	vl += ddx*dvdx;
 	wl += ddx*dwdx;
@@ -2228,9 +2230,9 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 			{
 				if(ti->filter_mode >= TEX_FILTER_BILINEAR)
 				{
-					UINT32 c1 = (this->*(ti->r))(ti, u+1.0, v);
-					UINT32 c2 = (this->*(ti->r))(ti, u+1.0, v+1.0);
-					UINT32 c3 = (this->*(ti->r))(ti, u, v+1.0);
+					UINT32 c1 = (this->*(ti->r))(ti, u+1.0f, v);
+					UINT32 c2 = (this->*(ti->r))(ti, u+1.0f, v+1.0f);
+					UINT32 c3 = (this->*(ti->r))(ti, u, v+1.0f);
 					c = bilinear_filter(c, c1, c2, c3, u, v);
 				}
 			}
@@ -2287,13 +2289,13 @@ void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	if((yy0 < 0 && y0 > 0) || (yy1 < 0 && y1 > 0)) //temp handling of int32 overflow, needed by hotd2/totd
 		return;
 
-	dy = yy0+0.5-y0;
+	dy = yy0+0.5f-y0;
 
 	if(0)
 		fprintf(stderr, "%f %f %f %f -> %f %f | %f %f -> %f %f\n",
-				y0,
-				dy, dxldy, dxrdy, dy*dxldy, dy*dxrdy,
-				xl, xr, xl + dy*dxldy, xr + dy*dxrdy);
+				(double) y0,
+				(double) dy, (double) dxldy, (double) dxrdy, (double) (dy*dxldy), (double) (dy*dxrdy),
+				(double) xl, (double) xr, (double) (xl + dy*dxldy), (double) (xr + dy*dxrdy));
 	xl += dy*dxldy;
 	xr += dy*dxrdy;
 	ul += dy*duldy;

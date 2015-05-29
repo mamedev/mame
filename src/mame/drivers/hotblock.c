@@ -1,8 +1,5 @@
-/* Hot Blocks */
-/*
-driver by David Haywood
-*/
-
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
 HotBlock board
 

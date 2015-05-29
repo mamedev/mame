@@ -15,6 +15,83 @@
 #################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
 ###########################################################################
 
+# REGENIE = 1
+# VERBOSE = 1
+# NOWERROR = 1
+
+# TARGET = mame
+# SUBTARGET = tiny
+# TOOLS = 1
+# TESTS = 1
+# OSD = sdl
+
+# USE_BGFX = 1
+# NO_OPENGL = 1
+# USE_DISPATCH_GL = 0
+# DIRECTINPUT = 7
+# USE_SDL = 1
+# SDL2_MULTIAPI = 1
+# NO_USE_MIDI = 1
+# DONT_USE_NETWORK = 1
+# USE_QTDEBUG = 1
+# NO_X11 = 1
+# NO_USE_XINPUT = 0
+# FORCE_DRC_C_BACKEND = 1
+
+# DEBUG = 1
+# PROFILER = 1
+# SANITIZE = 1
+
+# PTR64 = 1
+# BIGENDIAN = 1
+# NOASM = 1
+
+# OPTIMIZE = 3
+# SYMBOLS = 1
+# SYMLEVEL = 2
+# MAP = 1
+# PROFILE = 1
+# ARCHOPTS =
+# LDOPTS =
+
+# USE_SYSTEM_LIB_EXPAT = 1
+
+# MESA_INSTALL_ROOT = /opt/mesa
+# SDL_INSTALL_ROOT = /opt/sdl2
+# SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
+# SDL_LIBVER = sdl
+# MACOSX_USE_LIBSDL = 1
+# CYGWIN_BUILD = 1
+
+# TARGETOS = windows
+# CROSS_BUILD = 1
+# OVERRIDE_CC = cc
+# OVERRIDE_CXX = c++
+# OVERRIDE_LD = ld
+
+# DEPRECATED = 1
+# LTO = 1
+# SSE2 = 1
+# OPENMP = 1
+# CPP11 = 1
+# FASTDEBUG = 1
+
+# FILTER_DEPS = 1
+# SEPARATE_BIN = 1
+# PYTHON_EXECUTABLE = python3
+# SHADOW_CHECK = 1
+# STRIP_SYMBOLS = 0
+
+# QT_HOME = /usr/lib64/qt48/
+
+-include useroptions.mak
+
+###########################################################################
+##################   END USER-CONFIGURABLE OPTIONS   ######################
+###########################################################################
+
+MAKEPARAMS := -R
+
 #
 # Determine running OS
 #
@@ -30,23 +107,31 @@ OS := linux
 endif
 ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
 OS := solaris
+GENIEOS := solaris
+endif
+ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
+OS := solaris
+GENIEOS := solaris
 endif
 ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 OS := freebsd
+GENIEOS := bsd
 endif
 ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
 OS := freebsd
+GENIEOS := bsd
 endif
 ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
 OS := netbsd
+GENIEOS := bsd
 endif
 ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
 OS := openbsd
+GENIEOS := bsd
 endif
 ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
 OS := macosx
 GENIEOS := darwin
-DARWIN_VERSION := $(shell sw_vers -productVersion)
 endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
@@ -76,8 +161,11 @@ ifdef DEBUG
 CONFIG := debug
 endif
 
-ifndef VERBOSE
-  SILENT := @
+ifdef VERBOSE
+MAKEPARAMS += verbose=1
+else
+SILENT := @
+MAKEPARAMS += --no-print-directory
 endif
 
 #-------------------------------------------------
@@ -90,7 +178,6 @@ ifndef TARGETOS
 
 ifeq ($(OS),windows)
 TARGETOS := windows
-WINDRES := windres
 ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 ARCHITECTURE := _x64
 endif
@@ -102,7 +189,6 @@ ARCHITECTURE := _x86
 endif
 endif
 else
-WINDRES  := x86_64-w64-mingw32-windres
 UNAME    := $(shell uname -mps)
 TARGETOS := $(OS)
 
@@ -131,6 +217,19 @@ ARCHITECTURE := _x86
 endif
 endif
 
+ifeq ($(OS),windows)
+ifeq ($(ARCHITECTURE),_x64)
+WINDRES  := $(MINGW64)/bin/windres
+else
+WINDRES  := $(MINGW32)/bin/windres
+endif
+else
+ifeq ($(ARCHITECTURE),_x64)
+WINDRES  := x86_64-w64-mingw32-windres
+else
+WINDRES  := i686-w64-mingw32-windres
+endif
+endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
 ifndef NOASM
@@ -138,8 +237,23 @@ ifndef NOASM
 endif
 endif
 
+# Autodetect BIGENDIAN
+# MacOSX
+ifndef BIGENDIAN
+ifneq (,$(findstring Power,$(UNAME)))
+BIGENDIAN := 1
+endif
+# Linux
+ifneq (,$(findstring ppc,$(UNAME)))
+BIGENDIAN := 1
+endif
+endif # BIGENDIAN
 
-PYTHON := $(SILENT)python
+ifndef PYTHON_EXECUTABLE
+PYTHON := python
+else
+PYTHON := $(PYTHON_EXECUTABLE)
+endif
 CC := $(SILENT)gcc
 LD := $(SILENT)g++
 
@@ -161,11 +275,26 @@ ifeq ($(TARGETOS),linux)
 OSD := sdl
 endif
 
+ifeq ($(TARGETOS),freebsd)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),solaris)
+OSD := sdl
+endif
+
 ifeq ($(TARGETOS),macosx)
 OSD := sdl
 endif
 endif
 
+#-------------------------------------------------
+# which 3rdparty library to build;
+#  link against system (common) library otherwise
+#-------------------------------------------------
+ifndef USE_SYSTEM_LIB_EXPAT
+PARAMS += --with-bundled-expat
+endif
 
 #-------------------------------------------------
 # distribution may change things
@@ -222,7 +351,6 @@ endif
 ifdef PROFILE
 PROFILER =
 SYMBOLS = 1
-OPTIMIZE = 3
 ifndef SYMLEVEL
 SYMLEVEL = 1
 endif
@@ -230,11 +358,7 @@ endif
 
 # specify a default optimization level if none explicitly stated
 ifndef OPTIMIZE
-ifndef SYMBOLS
 OPTIMIZE = 3
-else
-OPTIMIZE = 0
-endif
 endif
 
 # set the symbols level
@@ -248,20 +372,24 @@ ifdef TOOLS
 PARAMS += --with-tools
 endif
 
+ifdef TESTS
+PARAMS += --with-tests
+endif
+
 ifdef SYMBOLS
-PARAMS += --SYMBOLS=$(SYMBOLS)
+PARAMS += --SYMBOLS='$(SYMBOLS)'
 endif
 
 ifdef SYMLEVEL
-PARAMS += --SYMLEVEL=$(SYMLEVEL)
+PARAMS += --SYMLEVEL='$(SYMLEVEL)'
 endif
 
 ifdef PROFILER
-PARAMS += --PROFILER=$(PROFILER)
+PARAMS += --PROFILER='$(PROFILER)'
 endif
 
 ifdef PROFILE
-PARAMS += --PROFILE=$(PROFILE)
+PARAMS += --PROFILE='$(PROFILE)'
 endif
 
 ifdef OPTIMIZE
@@ -284,28 +412,32 @@ ifdef NOASM
 PARAMS += --NOASM='$(NOASM)'
 endif
 
+ifdef BIGENDIAN
+PARAMS += --BIGENDIAN='$(BIGENDIAN)'
+endif
+
 ifdef FORCE_DRC_C_BACKEND
 PARAMS += --FORCE_DRC_C_BACKEND='$(FORCE_DRC_C_BACKEND)'
 endif
 
 ifdef NOWERROR
-PARAMS += --NOWERROR=$(NOWERROR)
+PARAMS += --NOWERROR='$(NOWERROR)'
 endif
 
 ifdef TARGET
-PARAMS += --target=$(TARGET)
+PARAMS += --target='$(TARGET)'
 endif
 
 ifdef SUBTARGET
-PARAMS += --subtarget=$(SUBTARGET)
+PARAMS += --subtarget='$(SUBTARGET)'
 endif
 
 ifdef OSD
-PARAMS += --osd=$(OSD)
+PARAMS += --osd='$(OSD)'
 endif
 
 ifdef TARGETOS
-PARAMS += --targetos=$(TARGETOS)
+PARAMS += --targetos='$(TARGETOS)'
 endif
 
 ifdef DONT_USE_NETWORK
@@ -330,6 +462,14 @@ endif
 
 ifdef DIRECTINPUT
 PARAMS += --DIRECTINPUT='$(DIRECTINPUT)'
+endif
+
+ifdef USE_SDL
+PARAMS += --USE_SDL='$(USE_SDL)'
+endif
+
+ifdef CYGWIN_BUILD
+PARAMS += --CYGWIN_BUILD='$(CYGWIN_BUILD)'
 endif
 
 ifdef MESA_INSTALL_ROOT
@@ -368,6 +508,54 @@ ifdef LDOPTS
 PARAMS += --LDOPTS='$(LDOPTS)'
 endif
 
+ifdef LTO
+PARAMS += --LTO='$(LTO)'
+endif
+
+ifdef DEPRECATED
+PARAMS += --DEPRECATED='$(DEPRECATED)'
+endif
+
+ifdef SSE2
+PARAMS += --SSE2='$(SSE2)'
+endif
+
+ifdef OPENMP
+PARAMS += --OPENMP='$(OPENMP)'
+endif
+
+ifdef CPP11
+PARAMS += --CPP11='$(CPP11)'
+endif
+
+ifdef FASTDEBUG
+PARAMS += --FASTDEBUG='$(FASTDEBUG)'
+endif
+
+ifdef FILTER_DEPS
+PARAMS += --FILTER_DEPS='$(FILTER_DEPS)'
+endif
+
+ifdef SEPARATE_BIN
+PARAMS += --SEPARATE_BIN='$(SEPARATE_BIN)'
+endif
+
+ifdef PYTHON_EXECUTABLE
+PARAMS += --PYTHON_EXECUTABLE='$(PYTHON_EXECUTABLE)'
+endif
+
+ifdef SHADOW_CHECK
+PARAMS += --SHADOW_CHECK='$(SHADOW_CHECK)'
+endif
+
+ifdef STRIP_SYMBOLS
+PARAMS += --STRIP_SYMBOLS='$(STRIP_SYMBOLS)'
+endif
+
+ifdef QT_HOME
+PARAMS += --QT_HOME='$(QT_HOME)'
+endif
+
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------
@@ -380,13 +568,16 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/main.lua \
 	scripts/src/3rdparty.lua \
 	scripts/src/cpu.lua \
+	scripts/src/osd/modules.lua \
 	$(wildcard scripts/src/osd/$(OSD)*.lua) \
 	scripts/src/sound.lua \
 	scripts/src/tools.lua \
+	scripts/src/tests.lua \
 	scripts/src/video.lua \
 	scripts/src/bus.lua \
 	scripts/src/netlist.lua \
 	scripts/toolchain.lua \
+	scripts/src/osd/modules.lua \
 	scripts/target/$(TARGET)/$(SUBTARGET).lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
@@ -435,12 +626,14 @@ SRC = src
 ifeq ($(OS),windows)
 GCC_VERSION      := $(shell gcc -dumpversion 2> NUL)
 CLANG_VERSION    := $(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed "s/[^0-9,.]//g")
-PYTHON_AVAILABLE := $(shell python --version > NUL 2>&1 && echo python)
+PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
 CHECK_CLANG      :=
 else
 GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
+ifneq ($(OS),solaris)
 CLANG_VERSION    := $(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
-PYTHON_AVAILABLE := $(shell python --version > /dev/null 2>&1 && echo python)
+endif
+PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 CHECK_CLANG      := $(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
 endif
 
@@ -479,11 +672,11 @@ $(PROJECTDIR)/gmake-mingw64-gcc/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake 
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: windows_x64
 windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw32-gcc
@@ -500,7 +693,7 @@ endif
 
 .PHONY: windows_x86
 windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw-clang
@@ -514,11 +707,11 @@ endif
 
 .PHONY: windows_x64_clang
 windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
-	
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
+
 .PHONY: windows_x86_clang
 windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 vs2010: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2010
@@ -541,6 +734,12 @@ vs2013_intel: generate
 vs2013_xp: generate
 	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-xp vs2013
 
+vs2013_clang: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-clang vs2013
+
+vs2013_winrt: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=winstore81 vs2013
+
 vs2015: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2015
 
@@ -554,7 +753,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
 
 android-mips: generate
 ifndef ANDROID_NDK_MIPS
@@ -566,7 +765,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
 
 android-x86: generate
 ifndef ANDROID_NDK_X86
@@ -578,7 +777,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
 
 asmjs: generate
 ifndef EMSCRIPTEN
@@ -587,7 +786,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=asmjs --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
 
 
 nacl: nacl_x86
@@ -599,7 +798,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)64
 
 nacl_x86: generate
 ifndef NACL_SDK_ROOT
@@ -608,7 +807,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)32
 
 nacl-arm: generate
 ifndef NACL_SDK_ROOT
@@ -617,7 +816,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl-arm --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl-arm config=$(CONFIG)
 
 pnacl: generate
 ifndef NACL_SDK_ROOT
@@ -626,7 +825,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
 
 #-------------------------------------------------
 # gmake-linux
@@ -637,14 +836,14 @@ $(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: linux_x64
 linux_x64: generate $(PROJECTDIR)/gmake-linux/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
 
 .PHONY: linux
 linux: linux_x86
 
 .PHONY: linux_x86
 linux_x86: generate $(PROJECTDIR)/gmake-linux/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-linux-clang
@@ -655,119 +854,117 @@ $(PROJECTDIR)/gmake-linux-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: linux_x64_clang
 linux_x64_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)64
 
 .PHONY: linux_x86_clang
 linux_x86_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-osx
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-osx/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --os_version=$(DARWIN_VERSION) --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: macosx_x64
 macosx_x64: generate $(PROJECTDIR)/gmake-osx/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)64
 
 .PHONY: macosx
 macosx: macosx_x86
 
 .PHONY: macosx_x86
 macosx_x86: generate $(PROJECTDIR)/gmake-osx/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-osx-clang
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --os_version=$(DARWIN_VERSION) --gcc_version=$(CLANG_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) gmake
 
 .PHONY: macosx_x64_clang
 macosx_x64_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)64
 
 .PHONY: macosx_x86_clang
 macosx_x86_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
+
+xcode4: generate
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=osx xcode4
+
+xcode4-ios: generate
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=ios xcode4
+
+#-------------------------------------------------
+# gmake-solaris
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: solaris_x64
+solaris_x64: generate $(PROJECTDIR)/gmake-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-solaris config=$(CONFIG)64
+
+.PHONY: solaris
+solaris: solaris_x86
+
+.PHONY: solaris_x86
+solaris_x86: generate $(PROJECTDIR)/gmake-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-solaris config=$(CONFIG)32
+
+
+#-------------------------------------------------
+# gmake-freebsd
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-freebsd/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=freebsd --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: freebsd_x64
+freebsd_x64: generate $(PROJECTDIR)/gmake-freebsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)64
+
+.PHONY: freebsd
+freebsd: freebsd_x86
+
+.PHONY: freebsd_x86
+freebsd_x86: generate $(PROJECTDIR)/gmake-freebsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)32
+
 
 #-------------------------------------------------
 # Clean/bootstrap
 #-------------------------------------------------
 
-$(GENIE):
-	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
+GENIE_SRC=$(wildcard 3rdparty/genie/src/host/*.c)
+
+$(GENIE): $(GENIE_SRC)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
+
+3rdparty/genie/src/hosts/%.c:
 
 clean:
 	@echo Cleaning...
 	-@rm -rf build
-	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 
-GEN_FOLDERS :=  \
-	$(GENDIR) \
-	$(GENDIR)/$(TARGET)/$(SUBTARGET) \
-	$(GENDIR)/emu/layout/ \
-	$(GENDIR)/$(TARGET)/layout/ \
-	$(GENDIR)/mess/drivers/ \
-	$(GENDIR)/emu/cpu/arcompact/ \
-	$(GENDIR)/emu/cpu/h8/ \
-	$(GENDIR)/emu/cpu/mcs96/ \
-	$(GENDIR)/emu/cpu/m6502/ \
-	$(GENDIR)/emu/cpu/m6809/ \
-	$(GENDIR)/emu/cpu/m68000/ \
-	$(GENDIR)/emu/cpu/tms57002/ \
-	$(GENDIR)/osd/modules/debugger/qt/ \
-	$(GENDIR)/resource/
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET)/
 
-LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/$(TARGET)/layout/*.lay)
-
-MOC_FILES=$(wildcard $(SRC)/osd/modules/debugger/qt/*.h)
-ifneq ($(USE_QTDEBUG),1)
-ifeq ($(TARGETOS),macosx)
-MOC_FILES=
-endif
-ifeq ($(TARGETOS),solaris)
-MOC_FILES=
-endif
-ifeq ($(TARGETOS),haiku)
-MOC_FILES=
-endif
-ifeq ($(TARGETOS),emscripten)
-MOC_FILES=
-endif
-ifeq ($(TARGETOS),os2)
-MOC_FILES=
-endif
-endif
-
-ifeq ($(OS),windows)
-MOC = moc
-else
-MOCTST = $(shell which moc-qt4 2>/dev/null)
-ifeq '$(MOCTST)' ''
-MOCTST = $(shell which moc 2>/dev/null)
-ifeq '$(MOCTST)' ''
-ifneq '$(MOC_FILES)' ''
-$(error Qt's Meta Object Compiler (moc) wasn't found!)
-endif
-else
-MOC = $(MOCTST)
-endif
-else
-MOC = $(MOCTST)
-endif
-endif
-
+LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
 
 ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
 include src/osd/$(OSD)/$(OSD).mak
 endif
 
-ifneq (,$(wildcard src/$(TARGET)/$(SUBTARGET).mak))
-include src/$(TARGET)/$(SUBTARGET).mak
+ifneq (,$(wildcard src/$(TARGET)/$(TARGET).mak))
+include src/$(TARGET)/$(TARGET).mak
 endif
 
 $(GEN_FOLDERS):
@@ -776,147 +973,100 @@ $(GEN_FOLDERS):
 generate: \
 		$(GENIE) \
 		$(GEN_FOLDERS) \
-		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(patsubst $(SRC)/%.h,$(GENDIR)/%.moc.c,$(MOC_FILES)) \
-		$(GENDIR)/emu/uismall.fh \
-		$(GENDIR)/resource/$(TARGET)vers.rc \
-		$(GENDIR)/resource/$(TARGET)-Info.plist \
-		$(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c \
-		$(GENDIR)/mess/drivers/ymmu100.inc \
-		$(GENDIR)/emu/cpu/arcompact/arcompact.inc \
-		$(GENDIR)/emu/cpu/h8/h8.inc $(GENDIR)/emu/cpu/h8/h8h.inc $(GENDIR)/emu/cpu/h8/h8s2000.inc $(GENDIR)/emu/cpu/h8/h8s2600.inc \
-		$(GENDIR)/emu/cpu/mcs96/mcs96.inc $(GENDIR)/emu/cpu/mcs96/i8x9x.inc $(GENDIR)/emu/cpu/mcs96/i8xc196.inc \
-		$(GENDIR)/emu/cpu/m6502/deco16.inc $(GENDIR)/emu/cpu/m6502/m4510.inc $(GENDIR)/emu/cpu/m6502/m6502.inc $(GENDIR)/emu/cpu/m6502/m65c02.inc $(GENDIR)/emu/cpu/m6502/m65ce02.inc $(GENDIR)/emu/cpu/m6502/m6509.inc $(GENDIR)/emu/cpu/m6502/m6510.inc $(GENDIR)/emu/cpu/m6502/n2a03.inc $(GENDIR)/emu/cpu/m6502/r65c02.inc $(GENDIR)/emu/cpu/m6502/m740.inc \
-		$(GENDIR)/emu/cpu/m6809/m6809.inc $(GENDIR)/emu/cpu/m6809/hd6309.inc $(GENDIR)/emu/cpu/m6809/konami.inc \
-		$(GENDIR)/emu/cpu/tms57002/tms57002.inc \
-		$(GENDIR)/m68kmake$(EXE) $(GENDIR)/emu/cpu/m68000/m68kops.c
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
 
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
-	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
+	$(SILENT)$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
-$(GENDIR)/%.fh: $(SRC)/%.png $(SRC)/build/png2bdc.py $(SRC)/build/file2str.py
-	@echo Converting $<...
-	$(PYTHON) $(SRC)/build/png2bdc.py $< $(GENDIR)/temp.bdc
-	$(PYTHON) $(SRC)/build/file2str.py $(GENDIR)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
+	
+#-------------------------------------------------
+# Regression tests
+#-------------------------------------------------
 
-$(GENDIR)/resource/$(TARGET)vers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
-	@echo Emitting $@...
-	$(PYTHON) $(SRC)/build/verinfo.py -r -b $(TARGET) $(SRC)/version.c > $@
+include $(SRC)/regtests/regtests.mak
 
-$(GENDIR)/resource/$(TARGET)-Info.plist: $(SRC)/build/verinfo.py $(SRC)/version.c
-	@echo Emitting $@...
-	$(PYTHON) $(SRC)/build/verinfo.py -p -b $(TARGET) $(SRC)/version.c > $@
+.PHONY: tests
 
-$(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c: $(SRC)/$(TARGET)/$(SUBTARGET).lst $(SRC)/build/makelist.py
-	@echo Building driver list $<...
-	$(PYTHON) $(SRC)/build/makelist.py $< >$@
+tests: $(REGTESTS)
 
-# rule to generate the C files
-$(GENDIR)/emu/cpu/arcompact/arcompact.inc: $(SRC)/emu/cpu/arcompact/arcompact_make.py
-	@echo Generating arcompact source .inc files...
-	$(PYTHON) $(SRC)/emu/cpu/arcompact/arcompact_make.py $@
+#-------------------------------------------------
+# Source cleanup
+#-------------------------------------------------
 
-$(GENDIR)/emu/cpu/h8/h8.inc: $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst
-	@echo Generating H8-300 source file...
-	$(PYTHON) $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst o $@
+.PHONY: cleansrc
 
-$(GENDIR)/emu/cpu/h8/h8h.inc: $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst
-	@echo Generating H8-300H source file...
-	$(PYTHON) $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst h $@
+cleansrc:
+	@echo Cleaning up tabs/spaces/end of lines....
+ifeq ($(OS),windows)
+	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.inc) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
+else
+	$(shell find src/ -name *.c -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.h -exec ./srcclean {}  >&2 ;)
+	$(shell find src/ -name *.mak -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.lst -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.lay -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.inc -exec ./srcclean {} >&2 ;)
+	$(shell find hash/ -name *.xml -exec ./srcclean {} >&2 ;)
+endif
 
-$(GENDIR)/emu/cpu/h8/h8s2000.inc: $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst
-	@echo Generating H8S/2000 source file...
-	$(PYTHON) $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst s20 $@
+#-------------------------------------------------
+# Doxygen documentation
+#-------------------------------------------------
 
-$(GENDIR)/emu/cpu/h8/h8s2600.inc: $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst
-	@echo Generating H8S/2600 source file...
-	$(PYTHON) $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst s26 $@
+.PHONY: doxygen
 
-$(GENDIR)/emu/cpu/mcs96/mcs96.inc:   $(SRC)/emu/cpu/mcs96/mcs96make.py $(SRC)/emu/cpu/mcs96/mcs96ops.lst
-	@echo Generating mcs96 source file...
-	$(PYTHON) $(SRC)/emu/cpu/mcs96/mcs96make.py mcs96 $(SRC)/emu/cpu/mcs96/mcs96ops.lst $@
+doxygen:
+	@echo Generate Doxygen documentation
+	doxygen mame.doxygen
 
-$(GENDIR)/emu/cpu/mcs96/i8x9x.inc:   $(SRC)/emu/cpu/mcs96/mcs96make.py $(SRC)/emu/cpu/mcs96/mcs96ops.lst
-	@echo Generating i8x9x source file...
-	$(PYTHON) $(SRC)/emu/cpu/mcs96/mcs96make.py i8x9x $(SRC)/emu/cpu/mcs96/mcs96ops.lst $@
+#-------------------------------------------------
+# CppCheck analysis
+#-------------------------------------------------
 
-$(GENDIR)/emu/cpu/mcs96/i8xc196.inc: $(SRC)/emu/cpu/mcs96/mcs96make.py $(SRC)/emu/cpu/mcs96/mcs96ops.lst
-	@echo Generating i8xc196 source file...
-	$(PYTHON) $(SRC)/emu/cpu/mcs96/mcs96make.py i8xc196 $(SRC)/emu/cpu/mcs96/mcs96ops.lst $@
+.PHONY: cppcheck
 
-$(GENDIR)/emu/cpu/m6502/deco16.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/odeco16.lst $(SRC)/emu/cpu/m6502/ddeco16.lst
-	@echo Generating deco16 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py deco16_device $(SRC)/emu/cpu/m6502/odeco16.lst $(SRC)/emu/cpu/m6502/ddeco16.lst $@
+CPPCHECK_PARAMS  = -Isrc/osd
+CPPCHECK_PARAMS += -Isrc/emu
+CPPCHECK_PARAMS += -Isrc/lib
+CPPCHECK_PARAMS += -Isrc/lib/util
+CPPCHECK_PARAMS += -Isrc/mame
+CPPCHECK_PARAMS += -Isrc/mess 
+CPPCHECK_PARAMS += -Isrc/osd/modules/render
+CPPCHECK_PARAMS += -Isrc/osd/windows
+CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
+CPPCHECK_PARAMS += -I3rdparty
+CPPCHECK_PARAMS += -I3rdparty/lua/src
+CPPCHECK_PARAMS += -I3rdparty/zlib 
+CPPCHECK_PARAMS += -I3rdparty/bgfx/include
+CPPCHECK_PARAMS += -I3rdparty/bx/include
+CPPCHECK_PARAMS += -Ibuild/generated/emu 
+CPPCHECK_PARAMS += -Ibuild/generated/emu/layout
+CPPCHECK_PARAMS += -Ibuild/generated/mess/layout
+CPPCHECK_PARAMS += -Ibuild/generated/mame/layout 
+CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
+CPPCHECK_PARAMS += -DPTR64=1
+CPPCHECK_PARAMS += -DMAME_DEBUG
+CPPCHECK_PARAMS += -DMAME_PROFILER
+CPPCHECK_PARAMS += -DCRLF=3
+CPPCHECK_PARAMS += -DLSB_FIRST
+CPPCHECK_PARAMS += -DFLAC__NO_DLL
+CPPCHECK_PARAMS += -DNATIVE_DRC=drcbe_x64
+CPPCHECK_PARAMS += -DLUA_COMPAT_APIINTCASTS
+CPPCHECK_PARAMS += -DWIN32
+CPPCHECK_PARAMS += -D__GNUC__
+CPPCHECK_PARAMS += -D__x86_64__
+ifndef VERBOSE
+CPPCHECK_PARAMS += --quiet
+endif
 
-$(GENDIR)/emu/cpu/m6502/m4510.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om4510.lst $(SRC)/emu/cpu/m6502/dm4510.lst
-	@echo Generating m4510 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m4510_device $(SRC)/emu/cpu/m6502/om4510.lst $(SRC)/emu/cpu/m6502/dm4510.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m6502.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om6502.lst $(SRC)/emu/cpu/m6502/dm6502.lst
-	@echo Generating m6502 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m6502_device $(SRC)/emu/cpu/m6502/om6502.lst $(SRC)/emu/cpu/m6502/dm6502.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m65c02.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om65c02.lst $(SRC)/emu/cpu/m6502/dm65c02.lst
-	@echo Generating m65c02 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m65c02_device $(SRC)/emu/cpu/m6502/om65c02.lst $(SRC)/emu/cpu/m6502/dm65c02.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m65ce02.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om65ce02.lst $(SRC)/emu/cpu/m6502/dm65ce02.lst
-	@echo Generating m65ce02 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m65ce02_device $(SRC)/emu/cpu/m6502/om65ce02.lst $(SRC)/emu/cpu/m6502/dm65ce02.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m6509.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om6509.lst $(SRC)/emu/cpu/m6502/dm6509.lst
-	@echo Generating m6509 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m6509_device $(SRC)/emu/cpu/m6502/om6509.lst $(SRC)/emu/cpu/m6502/dm6509.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m6510.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om6510.lst $(SRC)/emu/cpu/m6502/dm6510.lst
-	@echo Generating m6510 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m6510_device $(SRC)/emu/cpu/m6502/om6510.lst $(SRC)/emu/cpu/m6502/dm6510.lst $@
-
-$(GENDIR)/emu/cpu/m6502/n2a03.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/on2a03.lst $(SRC)/emu/cpu/m6502/dn2a03.lst
-	@echo Generating n2a03 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py n2a03_device $(SRC)/emu/cpu/m6502/on2a03.lst $(SRC)/emu/cpu/m6502/dn2a03.lst $@
-
-$(GENDIR)/emu/cpu/m6502/r65c02.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/dr65c02.lst
-	@echo Generating r65c02 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py r65c02_device - $(SRC)/emu/cpu/m6502/dr65c02.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m740.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om740.lst $(SRC)/emu/cpu/m6502/dm740.lst
-	@echo Generating m740 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m740_device $(SRC)/emu/cpu/m6502/om740.lst $(SRC)/emu/cpu/m6502/dm740.lst $@
-
-$(GENDIR)/emu/cpu/m6809/m6809.inc:  $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/m6809.ops $(SRC)/emu/cpu/m6809/base6x09.ops
-	@echo Generating m6809 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/m6809.ops > $@
-
-$(GENDIR)/emu/cpu/m6809/hd6309.inc: $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/hd6309.ops $(SRC)/emu/cpu/m6809/base6x09.ops
-	@echo Generating hd6309 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/hd6309.ops > $@
-
-$(GENDIR)/emu/cpu/m6809/konami.inc: $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/konami.ops $(SRC)/emu/cpu/m6809/base6x09.ops
-	@echo Generating konami source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/konami.ops > $@
-
-$(GENDIR)/emu/cpu/tms57002/tms57002.inc: $(SRC)/emu/cpu/tms57002/tmsmake.py $(SRC)/emu/cpu/tms57002/tmsinstr.lst
-	@echo Generating TMS57002 source file...
-	$(PYTHON) $(SRC)/emu/cpu/tms57002/tmsmake.py $(SRC)/emu/cpu/tms57002/tmsinstr.lst $@
-
-$(GENDIR)/m68kmake.o: src/emu/cpu/m68000/m68kmake.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) -x c++ -std=gnu++98 -o "$@" -c "$<"
-
-$(GENDIR)/m68kmake$(EXE) : $(GENDIR)/m68kmake.o
-	@echo Linking $@...
-	$(LD) -lstdc++ $^ -o $@
-
-$(GENDIR)/emu/cpu/m68000/m68kops.c: $(GENDIR)/m68kmake$(EXE) $(SRC)/emu/cpu/m68000/m68k_in.c
-	@echo Generating M68K source files...
-	$(SILENT) $(GENDIR)/m68kmake $(GENDIR)/emu/cpu/m68000 $(SRC)/emu/cpu/m68000/m68k_in.c
-
-$(GENDIR)/mess/drivers/ymmu100.inc: $(SRC)/mess/drivers/ymmu100.ppm $(SRC)/build/file2str.py
-	@echo Converting $<...
-	@$(PYTHON) $(SRC)/build/file2str.py $(SRC)/mess/drivers/ymmu100.ppm $@ ymmu100_bkg UINT8
-
-$(GENDIR)/%.moc.c: $(SRC)/%.h
-	$(SILENT) $(MOC) $(MOCINCPATH) $< -o $@
+cppcheck:
+	@echo Generate CppCheck analysis report
+	cppcheck --enable=all src/ $(CPPCHECK_PARAMS) -j9
 	

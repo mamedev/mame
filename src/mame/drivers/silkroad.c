@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, R. Belmont
 /* The Legend of Silk Road - Unico 1999 */
 
 /* Preliminary Driver by David Haywood */

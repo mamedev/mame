@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Takahiro Nogi
 /******************************************************************************
 
     nbmj9195 - Nichibutsu Mahjong games for years 1991-1995

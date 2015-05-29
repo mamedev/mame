@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:ElSemi, kingshriek, Deunan Knute, R. Belmont
 /*
 
     Sega/Yamaha AICA emulation

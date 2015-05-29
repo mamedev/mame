@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn,Zsolt Vasvari
 /*** TMS34010: Portable TMS34010 emulator ***********************************
 
     Copyright Alex Pasadyn/Zsolt Vasvari

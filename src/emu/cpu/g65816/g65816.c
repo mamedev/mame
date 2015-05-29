@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */
 /* ======================================================================== */
@@ -7,11 +9,6 @@ G65C816 CPU Emulator V1.00
 
 Copyright Karl Stenerud
 All rights reserved.
-
-Permission is granted to use this source code for non-commercial purposes.
-To use this code for commercial purposes, you must get permission from the
-author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
-
 
 */
 /* ======================================================================== */
@@ -955,12 +952,12 @@ void g65816_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void g65816_device::state_string_export(const device_state_entry &entry, astring &string)
+void g65816_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				m_flag_n & NFLAG_SET ? 'N':'.',
 				m_flag_v & VFLAG_SET ? 'V':'.',
 				m_flag_m & MFLAG_SET ? 'M':'.',

@@ -19,10 +19,10 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wpragmas");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4005) // warning C4005: '' : macro redefinition
 #define D3D11_NO_HELPERS
 #if BX_PLATFORM_WINRT
-#include <d3d11_2.h>
+#	include <d3d11_2.h>
 #else
-#include <d3d11.h>
-#endif
+#	include <d3d11.h>
+#endif // BX_PLATFORM_WINRT
 BX_PRAGMA_DIAGNOSTIC_POP()
 
 #include "renderer.h"
@@ -75,21 +75,8 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #		define	D3D11_REQ_MAXANISOTROPY	16
 #	endif // D3D11_REQ_MAXANISOTROPY
 
-#	ifndef D3D11_FEATURE_DATA_FORMAT_SUPPORT
-typedef struct D3D11_FEATURE_DATA_FORMAT_SUPPORT
-{
-	DXGI_FORMAT InFormat;
-	UINT OutFormatSupport;
-} D3D11_FEATURE_DATA_FORMAT_SUPPORT;
-#	endif // D3D11_FEATURE_DATA_FORMAT_SUPPORT
+typedef void ID3D11InfoQueue;
 
-#	ifndef D3D11_FEATURE_DATA_FORMAT_SUPPORT2
-typedef struct D3D11_FEATURE_DATA_FORMAT_SUPPORT2
-{
-	DXGI_FORMAT InFormat;
-	UINT OutFormatSupport2;
-} D3D11_FEATURE_DATA_FORMAT_SUPPORT2;
-#	endif // D3D11_FEATURE_DATA_FORMAT_SUPPORT2
 #endif // __MINGW32__
 
 namespace bgfx { namespace d3d11
@@ -100,11 +87,12 @@ namespace bgfx { namespace d3d11
 			: m_ptr(NULL)
 			, m_srv(NULL)
 			, m_uav(NULL)
+			, m_flags(BGFX_BUFFER_NONE)
 			, m_dynamic(false)
 		{
 		}
 
-		void create(uint32_t _size, void* _data, uint8_t _flags, uint16_t _stride = 0, bool _vertex = true);
+		void create(uint32_t _size, void* _data, uint16_t _flags, uint16_t _stride = 0, bool _vertex = false);
 		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false);
 
 		void destroy()
@@ -123,6 +111,7 @@ namespace bgfx { namespace d3d11
 		ID3D11ShaderResourceView*  m_srv;
 		ID3D11UnorderedAccessView* m_uav;
 		uint32_t m_size;
+		uint16_t m_flags;
 		bool m_dynamic;
 	};
 
@@ -135,7 +124,7 @@ namespace bgfx { namespace d3d11
 		{
 		}
 
-		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint8_t _flags);
+		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint16_t _flags);
 
 		VertexDeclHandle m_decl;
 	};
@@ -283,14 +272,18 @@ namespace bgfx { namespace d3d11
 	struct FrameBufferD3D11
 	{
 		FrameBufferD3D11()
-			: m_denseIdx(UINT16_MAX)
+			: m_dsv(NULL)
+			, m_denseIdx(UINT16_MAX)
 			, m_num(0)
+			, m_numTh(0)
 		{
 		}
 
 		void create(uint8_t _num, const TextureHandle* _handles);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
+		void preReset();
+		void postReset();
 		void resolve();
 		void clear(const Clear& _clear, const float _palette[][4]);
 
@@ -300,6 +293,35 @@ namespace bgfx { namespace d3d11
 		IDXGISwapChain* m_swapChain;
 		uint16_t m_denseIdx;
 		uint8_t m_num;
+		uint8_t m_numTh;
+		TextureHandle m_th[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+	};
+
+	struct TimerQueryD3D11
+	{
+		TimerQueryD3D11()
+			: m_control(BX_COUNTOF(m_frame) )
+		{
+		}
+
+		void postReset();
+		void preReset();
+		void begin();
+		void end();
+		bool get();
+
+		struct Frame
+		{
+			ID3D11Query* m_disjoint;
+			ID3D11Query* m_start;
+			ID3D11Query* m_end;
+		};
+
+		uint64_t m_elapsed;
+		uint64_t m_frequency;
+
+		Frame m_frame[4];
+		bx::RingBufferControl m_control;
 	};
 
 } /*  namespace d3d11 */ } // namespace bgfx

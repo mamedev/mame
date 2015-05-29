@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Brett Wyer, Raphael Nabet
 //
 //  corvus_hd
 //

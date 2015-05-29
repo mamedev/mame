@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, R. Belmont, Pierpaolo Prazzoli
 /*
   Dragonball Z                  (c) 1993 Banpresto
   Dragonball Z 2 - Super Battle (c) 1994 Banpresto

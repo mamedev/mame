@@ -59,7 +59,7 @@ public:
 
 	// getters
 	_Type *live() const { return m_spriteram; }
-	_Type *buffer() { return m_buffered; }
+	_Type *buffer() { return &m_buffered[0]; }
 	UINT32 bytes() const { return m_spriteram.bytes(); }
 
 	// operations
@@ -67,8 +67,8 @@ public:
 	{
 		assert(m_spriteram != NULL);
 		if (m_spriteram != NULL)
-			memcpy(m_buffered, m_spriteram + srcoffset, MIN(srclength, m_spriteram.bytes() / sizeof(_Type) - srcoffset) * sizeof(_Type));
-		return m_buffered;
+			memcpy(&m_buffered[0], m_spriteram + srcoffset, MIN(srclength, m_spriteram.bytes() / sizeof(_Type) - srcoffset) * sizeof(_Type));
+		return &m_buffered[0];
 	}
 
 	// read/write handlers
@@ -92,7 +92,7 @@ protected:
 private:
 	// internal state
 	required_shared_ptr<_Type>  m_spriteram;
-	dynamic_array<_Type>        m_buffered;
+	std::vector<_Type>        m_buffered;
 };
 
 

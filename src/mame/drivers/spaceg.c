@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski, Tomasz Slanina
 /**************************************************************************************
 
 Space Guerrilla PCB Layout

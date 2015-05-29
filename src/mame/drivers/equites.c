@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Acho A. Tang, Nicola Salmoria
 /*******************************************************************************
 
 Equites           (c) 1984 Alpha Denshi Co./Sega   8303
@@ -410,7 +412,7 @@ TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
 	m_cymvol *= 0.94f;
 	m_hihatvol *= 0.94f;
 
-	m_msm->set_output_gain(10, m_hihatvol + m_cymvol * (m_ay_port_b & 3) * 0.33);   /* NO from msm5232 */
+	m_msm->set_output_gain(10, m_hihatvol + m_cymvol * (m_ay_port_b & 3) * 0.33f);   /* NO from msm5232 */
 }
 
 WRITE8_MEMBER(equites_state::equites_c0f8_w)

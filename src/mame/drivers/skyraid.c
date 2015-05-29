@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Stefan Jokisch
 /***************************************************************************
 
 Atari Sky Raider driver

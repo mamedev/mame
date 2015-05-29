@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner,Antoine Mine
 #define IRQ_ADDRESS 0xf
 
 #define saturn_assert(x) \

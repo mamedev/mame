@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /**********************************************************************
 
     Nintendo Family Computer & Entertainment System controller ports
@@ -35,9 +37,6 @@
     ports call both read_bit0 and read_bit34. However, to cope with
     the original FC microphone, we will have the second controller
     port calling read_exp too.
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* BFM System 83 */
 
 #include "emu.h"

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*** DRIVER INFO **************************************************************
 
 Macross Plus                        (c)1996 Banpresto

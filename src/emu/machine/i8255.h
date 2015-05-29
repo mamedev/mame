@@ -4,9 +4,6 @@
 
     Intel 8255(A) Programmable Peripheral Interface emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    PA3   1 |*    \_/     | 40  PA4

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andreas Naive,Olivier Galibert
 /* Raiden 2 Sprite Decryption */
 
 #include "emu.h"

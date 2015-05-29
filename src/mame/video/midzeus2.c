@@ -37,7 +37,7 @@
  *
  *************************************/
 
-struct poly_extra_data
+struct mz2_poly_extra_data
 {
 	const void *    palbase;
 	const void *    texbase;
@@ -258,7 +258,7 @@ VIDEO_START_MEMBER(midzeus2_state,midzeus2)
 	waveram[1] = auto_alloc_array(machine(), UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
 
 	/* initialize polygon engine */
-	poly = poly_alloc(machine(), 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine(), 10000, sizeof(mz2_poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus2_state::exit_handler2), this));
@@ -352,8 +352,8 @@ UINT32 midzeus2_state::screen_update_midzeus2(screen_device &screen, bitmap_rgb3
 
 	poly_wait(poly, "VIDEO_UPDATE");
 
-if (machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
-if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
+if (machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", (double) zbase); }
+if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", (double) zbase); }
 
 	/* normal update case */
 	if (!machine().input().code_pressed(KEYCODE_W))
@@ -808,12 +808,12 @@ int midzeus2_state::zeus2_fifo_process(const UINT32 *data, int numwords)
 			{
 				log_fifo_command(data, numwords, "");
 				logerror("\n\t\tmatrix ( %8.2f %8.2f %8.2f ) ( %8.2f %8.2f %8.2f ) ( %8.2f %8.2f %8.2f )\n\t\tvector %8.2f %8.2f %8.5f\n",
-					zeus_matrix[0][0], zeus_matrix[0][1], zeus_matrix[0][2],
-					zeus_matrix[1][0], zeus_matrix[1][1], zeus_matrix[1][2],
-					zeus_matrix[2][0], zeus_matrix[2][1], zeus_matrix[2][2],
-					zeus_point[0],
-					zeus_point[1],
-					zeus_point[2]);
+						(double) zeus_matrix[0][0], (double) zeus_matrix[0][1], (double) zeus_matrix[0][2],
+						(double) zeus_matrix[1][0], (double) zeus_matrix[1][1], (double) zeus_matrix[1][2],
+						(double) zeus_matrix[2][0], (double) zeus_matrix[2][1], (double) zeus_matrix[2][2],
+						(double) zeus_point[0],
+						(double) zeus_point[1],
+						(double) zeus_point[2]);
 			}
 			break;
 
@@ -833,9 +833,9 @@ int midzeus2_state::zeus2_fifo_process(const UINT32 *data, int numwords)
 			{
 				log_fifo_command(data, numwords, "");
 				logerror("\n\t\tvector %8.2f %8.2f %8.5f\n",
-					zeus_point[0],
-					zeus_point[1],
-					zeus_point[2]);
+						(double) zeus_point[0],
+						(double) zeus_point[1],
+						(double) zeus_point[2]);
 			}
 			break;
 
@@ -847,9 +847,9 @@ int midzeus2_state::zeus2_fifo_process(const UINT32 *data, int numwords)
 			{
 				log_fifo_command(data, numwords, " -- unknown control + hack clear screen\n");
 				logerror("\t\tvector %8.2f %8.2f %8.5f\n",
-					tms3203x_device::fp_to_float(data[1]),
-					tms3203x_device::fp_to_float(data[2]),
-					tms3203x_device::fp_to_float(data[3]));
+						(double) tms3203x_device::fp_to_float(data[1]),
+						(double) tms3203x_device::fp_to_float(data[2]),
+						(double) tms3203x_device::fp_to_float(data[3]));
 
 				/* extract the translation point from the raw data */
 				zeus_point2[0] = tms3203x_device::fp_to_float(data[1]);
@@ -1027,7 +1027,7 @@ void midzeus2_state::zeus2_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 void midzeus2_state::zeus2_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit)
 {
 	poly_draw_scanline_func callback;
-	poly_extra_data *extra;
+	mz2_poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
 //  float uscale, vscale;
@@ -1162,7 +1162,7 @@ In memory:
 		if (logit)
 		{
 			logerror("\t\t(%f,%f,%f) (%02X,%02X)\n",
-					vert[i].x, vert[i].y, vert[i].p[0],
+					(double) vert[i].x, (double) vert[i].y, (double) vert[i].p[0],
 					(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f));
 		}
 	}
@@ -1188,7 +1188,7 @@ In memory:
 		maxx = MAX(maxx, clipvert[i].x);
 		maxy = MAX(maxy, clipvert[i].y);
 		if (logit)
-			logerror("\t\t\tTranslated=(%f,%f)\n", clipvert[i].x, clipvert[i].y);
+			logerror("\t\t\tTranslated=(%f,%f)\n", (double) clipvert[i].x, (double) clipvert[i].y);
 	}
 	for (i = 0; i < numverts; i++)
 	{
@@ -1198,7 +1198,7 @@ In memory:
 			clipvert[i].y += 0.0005f;
 	}
 
-	extra = (poly_extra_data *)poly_get_extra_data(poly);
+	extra = (mz2_poly_extra_data *)poly_get_extra_data(poly);
 	switch (texmode)
 	{
 		case 0x01d:     /* crusnexo: RHS of score bar */
@@ -1257,7 +1257,7 @@ In memory:
 
 static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const mz2_poly_extra_data *extra = (const mz2_poly_extra_data *)extradata;
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;

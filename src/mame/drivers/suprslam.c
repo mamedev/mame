@@ -1,7 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*** DRIVER INFORMATION & NOTES ***********************************************
 
 Super Slams - Driver by David Haywood
-   Sound Information from R.Belmont
+   Sound Information from R. Belmont
    DSWs corrected by Stephh
 
 TODO :

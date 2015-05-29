@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn,Zsolt Vasvari
 /***************************************************************************
 
     TMS34010: Portable Texas Instruments TMS34010 emulator
@@ -240,7 +242,7 @@ public:
 	// construction/destruction
 	tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
-	static void set_halt_on_reset(device_t &device, bool reset_deferred) { downcast<tms340x0_device &>(device).m_reset_deferred = reset_deferred; }
+	static void set_halt_on_reset(device_t &device, bool halt_on_reset) { downcast<tms340x0_device &>(device).m_halt_on_reset = halt_on_reset; }
 	static void set_pixel_clock(device_t &device, UINT32 pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }
 	static void set_pixels_per_clock(device_t &device, int pixperclock) { downcast<tms340x0_device &>(device).m_pixperclock = pixperclock; }
 	static void set_scanline_ind16_callback(device_t &device, scanline_ind16_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_ind16_cb = callback; }
@@ -280,7 +282,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
@@ -327,7 +329,8 @@ protected:
 	INT32            m_gfxcycles;
 	UINT8            m_pixelshift;
 	UINT8            m_is_34020;
-	bool             m_reset_deferred; /* /HCS pin, which determines HALT state after reset */
+	bool             m_reset_deferred;
+	bool             m_halt_on_reset; /* /HCS pin, which determines HALT state after reset */
 	UINT8            m_hblank_stable;
 	UINT8            m_external_host_access;
 	UINT8            m_executing;

@@ -1,11 +1,11 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 ---------------------------------------------------------------------------
 --
 --   ldplayer.lua
 --
 --   Small makefile to build a standalone laserdisc player
---
---   Copyright Nicola Salmoria and the MAME Team.
---   Visit http://mamedev.org for licensing and usage restrictions.
 --
 ---------------------------------------------------------------------------
 
@@ -62,6 +62,7 @@ function createProjects_ldplayer_ldplayer(_target, _subtarget)
 	}
 	
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",
@@ -71,11 +72,17 @@ function createProjects_ldplayer_ldplayer(_target, _subtarget)
 		GEN_DIR  .. "mame/layout",
 	}	
 
-	includeosd()
-
 	files{
 		MAME_DIR .. "src/emu/drivers/emudummy.c",
 	}
+
+	dependency {
+		{ MAME_DIR .. "src/emu/drivers/emudummy.c", GEN_DIR .. "ldplayer/layout/pr8210.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("ldplayer/layout", "pr8210"),
+	}		
 end
 
 function linkProjects_ldplayer_ldplayer(_target, _subtarget)

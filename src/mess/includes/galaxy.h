@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Krzysztof Strzecha, Miodrag Milanovic
 /*****************************************************************************
  *
  * includes/galaxy.h

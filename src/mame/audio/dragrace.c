@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Stefan Jokisch
 /*************************************************************************
 
     audio\dragrace.c

@@ -1,11 +1,11 @@
-// license:?
-// copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R.Belmont
+// license:LGPL-2.1+
+// copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 /**************************************************************************************************
 
     Sega Saturn & Sega ST-V (Sega Titan Video) HW (c) 1994 Sega
 
     Driver by David Haywood, Angelo Salese, Olivier Galibert & Mariusz Wojcieszek
-    SCSP driver provided by R.Belmont, based on ElSemi's SCSP sound chip emulator
+    SCSP driver provided by R. Belmont, based on ElSemi's SCSP sound chip emulator
     Many thanks to Guru, Fabien, Runik and Charles MacDonald for the help given.
 
 ===================================================================================================

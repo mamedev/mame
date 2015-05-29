@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
     Apple "Cuda" ADB/system controller MCU
     Emulation by R. Belmont
@@ -438,8 +440,7 @@ void cuda_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	astring tempstring;
-	UINT8 *rom = device().machine().root_device().memregion(device().subtag(tempstring, CUDA_CPU_TAG))->base();
+	UINT8 *rom = device().machine().root_device().memregion(device().subtag(CUDA_CPU_TAG).c_str())->base();
 
 	if (rom)
 	{

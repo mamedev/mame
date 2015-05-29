@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* this should probably be k054156.c and k054156_device (the base management device) */
 
 /***************************************************************************/
@@ -279,7 +281,8 @@ void k056832_device::create_tilemaps()
 
 
 
-	m_videoram.resize_and_clear(0x2000 * (K056832_PAGE_COUNT + 1) / 2);
+	m_videoram.resize(0x2000 * (K056832_PAGE_COUNT + 1) / 2);
+	memset(&m_videoram[0], 0, 2*m_videoram.size());
 
 	m_tilemap[0x0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_tilemap[0x1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);

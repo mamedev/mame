@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*********************************************************************
 
     a2hsscsi.c
@@ -136,8 +138,7 @@ void a2bus_hsscsi_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	astring tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, SCSI_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(SCSI_ROM_REGION).c_str())->base();
 
 	memset(m_ram, 0, 8192);
 

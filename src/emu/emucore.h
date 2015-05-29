@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
     emucore.h
 
     General core utilities and macros used throughout the emulator.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #pragma once
@@ -34,7 +32,6 @@
 
 // core system includes
 #include "osdcomm.h"
-#include "astring.h"
 #include "emualloc.h"
 #include "corestr.h"
 #include "bitmap.h"

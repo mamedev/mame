@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 /****************************************************************************
 
     Sega "Space Tactics" Driver
@@ -363,7 +365,7 @@ void stactics_state::video_start()
 	m_shot_arrive = 0;
 	m_beam_state = 0;
 	m_old_beam_state = 0;
-	
+
 	save_item(NAME(m_y_scroll_d));
 	save_item(NAME(m_y_scroll_e));
 	save_item(NAME(m_y_scroll_f));

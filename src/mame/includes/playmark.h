@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "cpu/pic16c5x/pic16c5x.h"

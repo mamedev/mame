@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "i82541.h"
 
 const device_type I82541 = &device_creator<i82541_device>;

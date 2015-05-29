@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni, James Wallace
 #pragma once
 
 #ifndef __OKIM6376_H__

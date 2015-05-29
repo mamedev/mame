@@ -67,7 +67,7 @@ class sound_stream
 
 		// internal state
 		sound_stream *      m_stream;               // owning stream
-		dynamic_array<stream_sample_t> m_buffer;    // output buffer
+		std::vector<stream_sample_t> m_buffer;    // output buffer
 		int                 m_dependents;           // number of dependents
 		INT16               m_gain;                 // gain to apply to the output
 	};
@@ -82,7 +82,7 @@ class sound_stream
 
 		// internal state
 		stream_output *     m_source;               // pointer to the sound_output for this source
-		dynamic_array<stream_sample_t> m_resample;  // buffer for resampling to the stream's sample rate
+		std::vector<stream_sample_t> m_resample;  // buffer for resampling to the stream's sample rate
 		attoseconds_t       m_latency_attoseconds;  // latency between this stream and the input stream
 		INT16               m_gain;                 // gain to apply to this input
 		INT16               m_user_gain;            // user-controlled gain to apply to this input
@@ -104,9 +104,9 @@ public:
 	int sample_rate() const { return (m_new_sample_rate != 0) ? m_new_sample_rate : m_sample_rate; }
 	attotime sample_time() const;
 	attotime sample_period() const { return attotime(0, m_attoseconds_per_sample); }
-	int input_count() const { return m_input.count(); }
-	int output_count() const { return m_output.count(); }
-	const char *input_name(int inputnum, astring &string) const;
+	int input_count() const { return m_input.size(); }
+	int output_count() const { return m_output.size(); }
+	const char *input_name(int inputnum, std::string &str) const;
 	device_t *input_source_device(int inputnum) const;
 	int input_source_outputnum(int inputnum) const;
 	float user_gain(int inputnum) const;
@@ -153,15 +153,15 @@ private:
 	emu_timer *         m_sync_timer;                 // update timer for synchronous streams
 
 	// input information
-	dynamic_array<stream_input> m_input;              // list of streams we directly depend upon
-	dynamic_array<stream_sample_t *> m_input_array;   // array of inputs for passing to the callback
+	std::vector<stream_input> m_input;              // list of streams we directly depend upon
+	std::vector<stream_sample_t *> m_input_array;   // array of inputs for passing to the callback
 
 	// resample buffer information
 	UINT32              m_resample_bufalloc;          // allocated size of each resample buffer
 
 	// output information
-	dynamic_array<stream_output> m_output;            // list of streams which directly depend upon us
-	dynamic_array<stream_sample_t *> m_output_array;  // array of outputs for passing to the callback
+	std::vector<stream_output> m_output;            // list of streams which directly depend upon us
+	std::vector<stream_sample_t *> m_output_array;  // array of outputs for passing to the callback
 
 	// output buffer information
 	UINT32              m_output_bufalloc;            // allocated size of each output buffer
@@ -232,9 +232,9 @@ private:
 	emu_timer *         m_update_timer;         // timer to drive periodic updates
 
 	UINT32              m_finalmix_leftover;
-	dynamic_array<INT16> m_finalmix;
-	dynamic_array<INT32> m_leftmix;
-	dynamic_array<INT32> m_rightmix;
+	std::vector<INT16>       m_finalmix;
+	std::vector<INT32>       m_leftmix;
+	std::vector<INT32>       m_rightmix;
 
 	UINT8               m_muted;
 	int                 m_attenuation;

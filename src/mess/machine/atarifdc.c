@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 /***************************************************************************
 
     Atari 400/800
@@ -41,7 +43,7 @@
  * It is used to determine the format of a XFD image by it's size only
  *****************************************************************************/
 
-struct dsk_format
+struct atari_dsk_format
 {
 	UINT8 density;
 	UINT8 tracks;
@@ -64,7 +66,7 @@ struct dsk_format
 struct xfd_format
 {
 	int size;
-	dsk_format dsk;
+	atari_dsk_format dsk;
 };
 
 /* here's a table of known xfd formats */
@@ -172,7 +174,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 	if( toupper(ext[0])=='D' && toupper(ext[1])=='S' && toupper(ext[2])=='K' )
 	{
 		m_drv[id].type = FORMAT_DSK;
-		m_drv[id].header_skip = sizeof(dsk_format);
+		m_drv[id].header_skip = sizeof(atari_dsk_format);
 	}
 	else
 	{
@@ -274,7 +276,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 	/* DSK format: it's all in the header */
 	case FORMAT_DSK:
 		{
-			dsk_format *dsk = (dsk_format *) m_drv[id].image;
+			atari_dsk_format *dsk = (atari_dsk_format *) m_drv[id].image;
 
 			m_drv[id].tracks = dsk->tracks;
 			m_drv[id].spt = dsk->spt;

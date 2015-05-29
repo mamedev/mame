@@ -1,4 +1,4 @@
-// license:?
+// license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
 /* Hyper NeoGeo 64
 
@@ -132,7 +132,7 @@ PCB Layout (Bottom)
 |             CONN10                                           |
 |                                                              |
 |                                                              |
-|   PSRAM4  ASIC9                   SRAM4     CPU1  Y1         |
+|   PSRAM4  ASIC9                   SRAM4     CPU2  Y1         |
 |   PSRAM3         SRAM1            SRAM3                      |
 |                  SRAM2                                       |
 |                                                              |
@@ -167,7 +167,7 @@ No.  PCB Label  IC Markings               IC Package
 16   SRAM2      TC55257DFL-85L            SOP28
 17   SRAM3      TC551001BFL-70L           SOP32
 18   SRAM4      TC551001BFL-70L           SOP32
-19   Y1         D320L7                    XTAL
+19   Y1         D320L7                    XTAL (32MHz)
 
 
 INTERFACE PCB
@@ -1396,11 +1396,11 @@ static void hng64_reorder( UINT8* gfxregion, size_t gfxregionsize)
 
 	for (i=0;i<gfxregionsize/2;i+=tilesize)
 	{
-		memcpy((buffer+i*2)+tilesize, gfxregion+i,                   tilesize);
-		memcpy((buffer+i*2),          gfxregion+i+(gfxregionsize/2), tilesize);
+		memcpy(&buffer[i*2+tilesize], gfxregion+i,                   tilesize);
+		memcpy(&buffer[i*2],          gfxregion+i+(gfxregionsize/2), tilesize);
 	}
 
-	memcpy(gfxregion, buffer, gfxregionsize);
+	memcpy(gfxregion, &buffer[0], gfxregionsize);
 }
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)

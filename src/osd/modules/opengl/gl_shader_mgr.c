@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sven Gothel
 #include <stdio.h>   /* snprintf */
 #include <stdlib.h>  /* malloc */
 

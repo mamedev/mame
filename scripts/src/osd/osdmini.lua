@@ -1,4 +1,7 @@
-function maintargetosdoptions(_target)
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
+function maintargetosdoptions(_target,_subtarget)
 end
 
 
@@ -44,6 +47,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/midi/none.c",
 		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.c",
+		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.c",		
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}

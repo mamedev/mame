@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Haywood
 /******************************************************************
 
     Double Dragon 3                     Technos Japan Corp 1990
     The Combatribes                     Technos Japan Corp 1990
-
+    WWF WrestleFest                     Technos Japan Corp 1991
 
     Notes:
 

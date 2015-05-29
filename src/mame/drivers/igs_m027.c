@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Xing Xing
 /* IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s)
  Driver by Xing Xing
 
@@ -296,10 +298,10 @@ void igs_m027_state::sdwx_gfx_decrypt()
 
 	for (i=0; i<rom_size; i+=0x200)
 	{
-		memcpy(src+i+0x000,result_data+i+0x000,0x80);
-		memcpy(src+i+0x080,result_data+i+0x100,0x80);
-		memcpy(src+i+0x100,result_data+i+0x080,0x80);
-		memcpy(src+i+0x180,result_data+i+0x180,0x80);
+		memcpy(src+i+0x000,&result_data[i+0x000],0x80);
+		memcpy(src+i+0x080,&result_data[i+0x100],0x80);
+		memcpy(src+i+0x100,&result_data[i+0x080],0x80);
+		memcpy(src+i+0x180,&result_data[i+0x180],0x80);
 	}
 }
 

@@ -133,7 +133,9 @@ ImguiFontHandle imguiCreateFont(const void* _data, float _fontSize=15.0f);
 void imguiSetFont(ImguiFontHandle _handle);
 ImguiFontHandle imguiGetCurrentFont();
 
-ImguiFontHandle imguiCreate(const void* _data = NULL, uint32_t _size = 0, float _fontSize = 15.0f);
+namespace bx { struct AllocatorI; }
+
+ImguiFontHandle imguiCreate(const void* _data = NULL, uint32_t _size = 0, float _fontSize = 15.0f, bx::AllocatorI* _allocator = NULL);
 void imguiDestroy();
 
 void imguiBeginFrame(int32_t _mx, int32_t _my, uint8_t _button, int32_t _scroll, uint16_t _width, uint16_t _height, char _inputChar = 0, uint8_t _view = 255);
@@ -201,5 +203,17 @@ bool imguiCube(bgfx::TextureHandle _cubemap, float _lod = 0.0f, ImguiCubemap::En
 
 float imguiGetTextLength(const char* _text, ImguiFontHandle _handle);
 bool imguiMouseOverArea();
+
+namespace ImGui
+{
+	// Helper function for passing bgfx::TextureHandle to ImGui::Image.
+	inline void Image(bgfx::TextureHandle _handle, const ImVec2& _size, const ImVec2& _uv0 = ImVec2(0, 0), const ImVec2& _uv1 = ImVec2(1, 1), const ImVec4& _tint_col = ImVec4(1, 1, 1, 1), const ImVec4& _border_col = ImVec4(0, 0, 0, 0))
+	{
+		union { bgfx::TextureHandle handle; ImTextureID ptr; } texture;
+		texture.handle = _handle;
+		Image(texture.ptr, _size, _uv0, _uv1, _tint_col, _border_col);
+	}
+
+} // namespace ImGui
 
 #endif // IMGUI_H_HEADER_GUARD

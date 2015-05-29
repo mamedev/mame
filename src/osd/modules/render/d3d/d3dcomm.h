@@ -149,6 +149,7 @@ public:
 private:
 	void prescale();
 	void compute_size(int texwidth, int texheight);
+	void compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height);
 
 	texture_manager *       m_texture_manager;          // texture manager pointer
 

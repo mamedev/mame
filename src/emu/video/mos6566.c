@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
     MOS 6566/6567/6569 Video Interface Chip (VIC-II) emulation
@@ -10,9 +12,6 @@
     It may not - not even in parts - used for commercial purposes without explicit written permission by the author.
     Permission to use it for non-commercial purposes is hereby granted als long as my copyright notice remains in the program.
     You are not allowed to use the source to create and distribute a modified version of Frodo.
-
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

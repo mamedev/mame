@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 #ifndef X68K_KBD_H_
 #define X68K_KBD_H_
 

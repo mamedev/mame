@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
 /***************************************************************************
 
     Toshiba TMPZ84C015, MPUZ80/TLCS-Z80 ASSP Family

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #include "machine/ataintf.h"
 #include "video/konami_helper.h"
 #include "video/k054156_k054157_k056832.h"

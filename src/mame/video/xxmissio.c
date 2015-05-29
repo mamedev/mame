@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Uki
 /*******************************************************************************
 
 XX Mission (c) 1986 UPL

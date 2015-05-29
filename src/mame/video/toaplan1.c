@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Darren Olafson, Quench
 /***************************************************************************
 
   Functions to emulate the video hardware of some Toaplan games,

@@ -1,3 +1,11 @@
+// license:LGPL-2.1+
+// copyright-holders:Ville Linde, Angelo Salese, hap
+/*************************************************************************
+
+  Taito JC System
+
+*************************************************************************/
+
 #include "video/poly.h"
 #include "machine/taitoio.h"
 

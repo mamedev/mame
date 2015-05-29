@@ -1,9 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Flak Attack / MX5000 (Konami GX669)
 
     Driver by:
-        Manuel Abadia <manu@teleline.es>
+        Manuel Abadia <emumanu+mame@gmail.com>
 
     TO DO:
         -What does 0x900X do? (Z80)

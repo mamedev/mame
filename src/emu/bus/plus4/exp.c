@@ -4,9 +4,6 @@
 
     Commodore Plus/4 Expansion Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "exp.h"
@@ -160,7 +157,7 @@ bool plus4_expansion_slot_device::call_softlist_load(software_list_device &swlis
 //  get_default_card_software -
 //-------------------------------------------------
 
-void plus4_expansion_slot_device::get_default_card_software(astring &result)
+void plus4_expansion_slot_device::get_default_card_software(std::string &result)
 {
 	software_get_default_slot(result, "standard");
 }

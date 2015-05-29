@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Aaron Giles
 /***************************************************************************
 
     polylgcy.c
@@ -605,7 +607,7 @@ UINT32 poly_render_triangle(legacy_poly_manager *poly, void *dest, const rectang
 		float a22 = v1->x*v2->y - v2->x*v1->y;
 		float det = a02 + a12 + a22;
 
-		if(fabsf(det) < 0.001) {
+		if(fabsf(det) < 0.001f) {
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			{
 				poly_param *params = &polygon->param[paramnum];

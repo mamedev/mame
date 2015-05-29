@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Roberto Fresca, Angelo Salese
 /*
 
  Lucky Girl (newer 1991 version on different hardware?)
@@ -1089,6 +1091,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************
 
-       YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY           FULLNAME                                 FLAGS                                  LAYOUT  */
-GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_NO_SOUND, layout_luckgrln )
-GAMEL( 1993, 7smash, 0,        _7smash,  _7smash, driver_device,  0,        ROT0, "Sovic",          "7 Smash", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND, layout_luckgrln )
+       YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY           FULLNAME                                 FLAGS                                                       LAYOUT  */
+GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", GAME_NO_SOUND,                                              layout_luckgrln )
+GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  driver_device,  0,        ROT0, "Sovic",          "7 Smash",                                GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND, layout_luckgrln )

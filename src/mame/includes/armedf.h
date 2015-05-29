@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
 #include "includes/nb1414m4.h"
 #include "video/bufsprite.h"
 

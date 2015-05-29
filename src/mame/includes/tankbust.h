@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 class tankbust_state : public driver_device
 {
 public:

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder,Jonathan Gevaryahu
 #pragma once
 
 #ifndef __TDV2324__

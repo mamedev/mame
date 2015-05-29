@@ -1,10 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker, Dirk Best, Phill Harvey-Smith
 /******************************************************************************
 
     Tatung Einstein
-
-    license: MAME
-    copyright-holders: Kevin Thacker, Dirk Best, Phill Harvey-Smith
-
 
     TMS9129 VDP Graphics
         16k ram

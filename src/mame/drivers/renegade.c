@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 /***************************************************************************
 
 Renegade
@@ -198,15 +200,25 @@ void renegade_state::machine_start()
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_playing));
-	save_item(NAME(m_mcu_buffer));
-	save_item(NAME(m_mcu_input_size));
-	save_item(NAME(m_mcu_output_byte));
-	save_item(NAME(m_mcu_key));
 }
 
 DRIVER_INIT_MEMBER(renegade_state,renegade)
 {
 	m_mcu_sim = FALSE;
+
+	save_item(NAME(m_from_main));
+	save_item(NAME(m_from_mcu));
+	save_item(NAME(m_main_sent));
+	save_item(NAME(m_mcu_sent));
+	save_item(NAME(m_ddr_a));
+	save_item(NAME(m_ddr_b));
+	save_item(NAME(m_ddr_c));
+	save_item(NAME(m_port_a_out));
+	save_item(NAME(m_port_b_out));
+	save_item(NAME(m_port_c_out));
+	save_item(NAME(m_port_a_in));
+	save_item(NAME(m_port_b_in));
+	save_item(NAME(m_port_c_in));
 }
 
 DRIVER_INIT_MEMBER(renegade_state,kuniokun)
@@ -217,6 +229,11 @@ DRIVER_INIT_MEMBER(renegade_state,kuniokun)
 	m_mcu_encrypt_table_len = 0x2a;
 
 	m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
+
+	save_item(NAME(m_mcu_buffer));
+	save_item(NAME(m_mcu_input_size));
+	save_item(NAME(m_mcu_output_byte));
+	save_item(NAME(m_mcu_key));
 }
 
 DRIVER_INIT_MEMBER(renegade_state,kuniokunb)
@@ -235,27 +252,27 @@ DRIVER_INIT_MEMBER(renegade_state,kuniokunb)
 
 ***************************************************************************/
 
-READ8_MEMBER(renegade_state::renegade_68705_port_a_r)
+READ8_MEMBER(renegade_state::_68705_port_a_r)
 {
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(renegade_state::renegade_68705_port_a_w)
+WRITE8_MEMBER(renegade_state::_68705_port_a_w)
 {
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(renegade_state::renegade_68705_ddr_a_w)
+WRITE8_MEMBER(renegade_state::_68705_ddr_a_w)
 {
 	m_ddr_a = data;
 }
 
-READ8_MEMBER(renegade_state::renegade_68705_port_b_r)
+READ8_MEMBER(renegade_state::_68705_port_b_r)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(renegade_state::renegade_68705_port_b_w)
+WRITE8_MEMBER(renegade_state::_68705_port_b_w)
 {
 	if ((m_ddr_b & 0x02) && (~data & 0x02) && (m_port_b_out & 0x02))
 	{
@@ -275,13 +292,13 @@ WRITE8_MEMBER(renegade_state::renegade_68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(renegade_state::renegade_68705_ddr_b_w)
+WRITE8_MEMBER(renegade_state::_68705_ddr_b_w)
 {
 	m_ddr_b = data;
 }
 
 
-READ8_MEMBER(renegade_state::renegade_68705_port_c_r)
+READ8_MEMBER(renegade_state::_68705_port_c_r)
 {
 	m_port_c_in = 0;
 	if (m_main_sent)
@@ -292,12 +309,12 @@ READ8_MEMBER(renegade_state::renegade_68705_port_c_r)
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_MEMBER(renegade_state::renegade_68705_port_c_w)
+WRITE8_MEMBER(renegade_state::_68705_port_c_w)
 {
 	m_port_c_out = data;
 }
 
-WRITE8_MEMBER(renegade_state::renegade_68705_ddr_c_w)
+WRITE8_MEMBER(renegade_state::_68705_ddr_c_w)
 {
 	m_ddr_c = data;
 }
@@ -565,7 +582,7 @@ WRITE8_MEMBER(renegade_state::bankswitch_w)
 	m_rombank->set_entry(data & 1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::renegade_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 {
 	int scanline = param;
 
@@ -575,7 +592,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::renegade_interrupt)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(renegade_state::renegade_coin_counter_w)
+WRITE8_MEMBER(renegade_state::coincounter_w)
 {
 	//coin_counter_w(offset, data);
 }
@@ -593,11 +610,11 @@ static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE(scroll_lsb_w)       /* Player#1 controls, P1,P2 start */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(scroll_msb_w)       /* Player#2 controls, coin triggers */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE(sound_w) /* DIP2  various IO ports */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(renegade_flipscreen_w)   /* DIP1 */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(flipscreen_w)   /* DIP1 */
 	AM_RANGE(0x3804, 0x3804) AM_READWRITE(mcu_r, mcu_w)
 	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r, bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
-	AM_RANGE(0x3807, 0x3807) AM_WRITE(renegade_coin_counter_w)
+	AM_RANGE(0x3807, 0x3807) AM_WRITE(coincounter_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -614,12 +631,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_mcu_map, AS_PROGRAM, 8, renegade_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(renegade_68705_port_a_r, renegade_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(renegade_68705_port_b_r, renegade_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(renegade_68705_port_c_r, renegade_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(renegade_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(renegade_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(renegade_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(_68705_port_a_r, _68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(_68705_port_b_r, _68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(_68705_port_c_r, _68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(_68705_ddr_c_w)
 //  AM_RANGE(0x0008, 0x0008) AM_READWRITE(m68705_tdr_r, m68705_tdr_w)
 //  AM_RANGE(0x0009, 0x0009) AM_READWRITE(m68705_tcr_r, m68705_tcr_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
@@ -830,7 +847,7 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(renegade_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", renegade_state, renegade_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", renegade_state, interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M6809, 12000000/8)
 	MCFG_CPU_PROGRAM_MAP(renegade_sound_map)    /* IRQs are caused by the main CPU */
@@ -845,7 +862,7 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)*2)  /* not accurate */
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(renegade_state, screen_update_renegade)
+	MCFG_SCREEN_UPDATE_DRIVER(renegade_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", renegade)
@@ -996,6 +1013,6 @@ ROM_END
 
 
 
-GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, renegade,  ROT0, "Technos Japan (Taito America license)", "Renegade (US)", 0 )
-GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, kuniokun,  ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", 0 )
-GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, kuniokunb, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, renegade,  ROT0, "Technos Japan (Taito America license)", "Renegade (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, kuniokun,  ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, kuniokunb, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", GAME_SUPPORTS_SAVE )

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino, David Haywood
 /*************************************************************************
 
     Atari Tunnel Hunt hardware
@@ -78,7 +80,7 @@ void tunhunt_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrollx(0, 64);
-	
+
 	save_item(NAME(m_control));
 }
 

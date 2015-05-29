@@ -661,268 +661,268 @@ void mips3_device::state_export(const device_state_entry &entry)
 }
 
 
-void mips3_device::state_string_export(const device_state_entry &entry, astring &string)
+void mips3_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case MIPS3_FPS0:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][0]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][0]);
 			break;
 
 		case MIPS3_FPD0:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][0]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][0]);
 			break;
 
 		case MIPS3_FPS1:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][1]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][1]);
 			break;
 
 		case MIPS3_FPD1:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][1]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][1]);
 			break;
 
 		case MIPS3_FPS2:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][2]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][2]);
 			break;
 
 		case MIPS3_FPD2:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][2]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][2]);
 			break;
 
 		case MIPS3_FPS3:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][3]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][3]);
 			break;
 
 		case MIPS3_FPD3:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][3]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][3]);
 			break;
 
 		case MIPS3_FPS4:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][4]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][4]);
 			break;
 
 		case MIPS3_FPD4:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][4]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][4]);
 			break;
 
 		case MIPS3_FPS5:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][5]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][5]);
 			break;
 
 		case MIPS3_FPD5:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][5]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][5]);
 			break;
 
 		case MIPS3_FPS6:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][6]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][6]);
 			break;
 
 		case MIPS3_FPD6:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][6]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][6]);
 			break;
 
 		case MIPS3_FPS7:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][7]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][7]);
 			break;
 
 		case MIPS3_FPD7:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][7]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][7]);
 			break;
 
 		case MIPS3_FPS8:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][8]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][8]);
 			break;
 
 		case MIPS3_FPD8:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][8]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][8]);
 			break;
 
 		case MIPS3_FPS9:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][9]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][9]);
 			break;
 
 		case MIPS3_FPD9:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][9]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][9]);
 			break;
 
 		case MIPS3_FPS10:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][10]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][10]);
 			break;
 
 		case MIPS3_FPD10:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][10]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][10]);
 			break;
 
 		case MIPS3_FPS11:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][11]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][11]);
 			break;
 
 		case MIPS3_FPD11:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][11]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][11]);
 			break;
 
 		case MIPS3_FPS12:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][12]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][12]);
 			break;
 
 		case MIPS3_FPD12:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][12]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][12]);
 			break;
 
 		case MIPS3_FPS13:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][13]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][13]);
 			break;
 
 		case MIPS3_FPD13:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][13]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][13]);
 			break;
 
 		case MIPS3_FPS14:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][14]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][14]);
 			break;
 
 		case MIPS3_FPD14:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][14]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][14]);
 			break;
 
 		case MIPS3_FPS15:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][15]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][15]);
 			break;
 
 		case MIPS3_FPD15:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][15]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][15]);
 			break;
 
 		case MIPS3_FPS16:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][16]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][16]);
 			break;
 
 		case MIPS3_FPD16:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][16]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][16]);
 			break;
 
 		case MIPS3_FPS17:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][17]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][17]);
 			break;
 
 		case MIPS3_FPD17:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][17]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][17]);
 			break;
 
 		case MIPS3_FPS18:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][18]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][18]);
 			break;
 
 		case MIPS3_FPD18:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][18]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][18]);
 			break;
 
 		case MIPS3_FPS19:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][19]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][19]);
 			break;
 
 		case MIPS3_FPD19:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][19]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][19]);
 			break;
 
 		case MIPS3_FPS20:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][20]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][20]);
 			break;
 
 		case MIPS3_FPD20:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][20]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][20]);
 			break;
 
 		case MIPS3_FPS21:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][21]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][21]);
 			break;
 
 		case MIPS3_FPD21:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][21]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][21]);
 			break;
 
 		case MIPS3_FPS22:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][22]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][22]);
 			break;
 
 		case MIPS3_FPD22:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][22]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][22]);
 			break;
 
 		case MIPS3_FPS23:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][23]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][23]);
 			break;
 
 		case MIPS3_FPD23:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][23]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][23]);
 			break;
 
 		case MIPS3_FPS24:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][24]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][24]);
 			break;
 
 		case MIPS3_FPD24:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][24]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][24]);
 			break;
 
 		case MIPS3_FPS25:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][25]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][25]);
 			break;
 
 		case MIPS3_FPD25:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][25]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][25]);
 			break;
 
 		case MIPS3_FPS26:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][26]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][26]);
 			break;
 
 		case MIPS3_FPD26:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][26]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][26]);
 			break;
 
 		case MIPS3_FPS27:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][27]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][27]);
 			break;
 
 		case MIPS3_FPD27:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][27]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][27]);
 			break;
 
 		case MIPS3_FPS28:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][28]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][28]);
 			break;
 
 		case MIPS3_FPD28:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][28]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][28]);
 			break;
 
 		case MIPS3_FPS29:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][29]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][29]);
 			break;
 
 		case MIPS3_FPD29:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][29]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][29]);
 			break;
 
 		case MIPS3_FPS30:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][30]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][30]);
 			break;
 
 		case MIPS3_FPD30:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][30]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][30]);
 			break;
 
 		case MIPS3_FPS31:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][31]);
+			strprintf(str, "!%16g", *(float *)&m_core->cpr[1][31]);
 			break;
 
 		case MIPS3_FPD31:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][31]);
+			strprintf(str, "!%16g", *(double *)&m_core->cpr[1][31]);
 			break;
 
 		case STATE_GENFLAGS:
-			string.printf(" ");
+			strprintf(str, " ");
 			break;
 	}
 }
@@ -998,7 +998,7 @@ offs_t mips3_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
     TLB HANDLING
 ***************************************************************************/
 
-bool mips3_device::RBYTE(offs_t address, UINT32 *result)
+inline bool mips3_device::RBYTE(offs_t address, UINT32 *result)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1010,8 +1010,7 @@ bool mips3_device::RBYTE(offs_t address, UINT32 *result)
 			{
 				continue;
 			}
-			UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			*result = fastbase[tlbaddress ^ m_byte_xor];
+			*result = m_fastram[ramnum].offset_base8[tlbaddress ^ m_byte_xor];
 			return true;
 		}
 		*result = (*m_memory.read_byte)(*m_program, tlbaddress);
@@ -1032,7 +1031,7 @@ bool mips3_device::RBYTE(offs_t address, UINT32 *result)
 	return true;
 }
 
-bool mips3_device::RHALF(offs_t address, UINT32 *result)
+inline bool mips3_device::RHALF(offs_t address, UINT32 *result)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1044,8 +1043,7 @@ bool mips3_device::RHALF(offs_t address, UINT32 *result)
 			{
 				continue;
 			}
-			UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			*result = ((UINT16*)fastbase)[(tlbaddress ^ m_word_xor) >> 1];
+			*result = m_fastram[ramnum].offset_base16[(tlbaddress ^ m_word_xor) >> 1];
 			return true;
 		}
 		*result = (*m_memory.read_word)(*m_program, tlbaddress);
@@ -1066,7 +1064,7 @@ bool mips3_device::RHALF(offs_t address, UINT32 *result)
 	return true;
 }
 
-bool mips3_device::RWORD(offs_t address, UINT32 *result)
+inline bool mips3_device::RWORD(offs_t address, UINT32 *result)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1078,8 +1076,7 @@ bool mips3_device::RWORD(offs_t address, UINT32 *result)
 			{
 				continue;
 			}
-			UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			*result = ((UINT32*)fastbase)[tlbaddress >> 2];
+			*result = m_fastram[ramnum].offset_base32[tlbaddress >> 2];
 			return true;
 		}
 		*result = (*m_memory.read_dword)(*m_program, tlbaddress);
@@ -1100,7 +1097,7 @@ bool mips3_device::RWORD(offs_t address, UINT32 *result)
 	return true;
 }
 
-bool mips3_device::RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
+inline bool mips3_device::RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1123,7 +1120,7 @@ bool mips3_device::RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
 	return true;
 }
 
-bool mips3_device::RDOUBLE(offs_t address, UINT64 *result)
+inline bool mips3_device::RDOUBLE(offs_t address, UINT64 *result)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1146,7 +1143,7 @@ bool mips3_device::RDOUBLE(offs_t address, UINT64 *result)
 	return true;
 }
 
-bool mips3_device::RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
+inline bool mips3_device::RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1169,7 +1166,7 @@ bool mips3_device::RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mas
 	return true;
 }
 
-void mips3_device::WBYTE(offs_t address, UINT8 data)
+inline void mips3_device::WBYTE(offs_t address, UINT8 data)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1181,8 +1178,7 @@ void mips3_device::WBYTE(offs_t address, UINT8 data)
 			{
 				continue;
 			}
-			UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			fastbase[tlbaddress ^ m_byte_xor] = data;
+			m_fastram[ramnum].offset_base8[tlbaddress ^ m_byte_xor] = data;
 			return;
 		}
 		(*m_memory.write_byte)(*m_program, tlbaddress, data);
@@ -1204,7 +1200,7 @@ void mips3_device::WBYTE(offs_t address, UINT8 data)
 	}
 }
 
-void mips3_device::WHALF(offs_t address, UINT16 data)
+inline void mips3_device::WHALF(offs_t address, UINT16 data)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1216,8 +1212,7 @@ void mips3_device::WHALF(offs_t address, UINT16 data)
 			{
 				continue;
 			}
-			void *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			((UINT16*)fastbase)[(tlbaddress ^ m_word_xor) >> 1] = data;
+			m_fastram[ramnum].offset_base16[(tlbaddress ^ m_word_xor) >> 1] = data;
 			return;
 		}
 		(*m_memory.write_word)(*m_program, tlbaddress, data);
@@ -1239,7 +1234,7 @@ void mips3_device::WHALF(offs_t address, UINT16 data)
 	}
 }
 
-void mips3_device::WWORD(offs_t address, UINT32 data)
+inline void mips3_device::WWORD(offs_t address, UINT32 data)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1251,8 +1246,7 @@ void mips3_device::WWORD(offs_t address, UINT32 data)
 			{
 				continue;
 			}
-			void *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			((UINT32*)fastbase)[tlbaddress >> 2] = data;
+			m_fastram[ramnum].offset_base32[tlbaddress >> 2] = data;
 			return;
 		}
 		(*m_memory.write_dword)(*m_program, tlbaddress, data);
@@ -1274,7 +1268,7 @@ void mips3_device::WWORD(offs_t address, UINT32 data)
 	}
 }
 
-void mips3_device::WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
+inline void mips3_device::WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1298,7 +1292,7 @@ void mips3_device::WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
 	}
 }
 
-void mips3_device::WDOUBLE(offs_t address, UINT64 data)
+inline void mips3_device::WDOUBLE(offs_t address, UINT64 data)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1322,7 +1316,7 @@ void mips3_device::WDOUBLE(offs_t address, UINT64 data)
 	}
 }
 
-void mips3_device::WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
+inline void mips3_device::WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -2780,7 +2774,9 @@ void mips3_device::execute_run()
 			m_core->pc += 4;
 
 		/* parse the instruction */
-		switch (op >> 26)
+		const int switch_val = (op >> 26) & 0x3f;
+
+		switch (switch_val)
 		{
 			case 0x00:  /* SPECIAL */
 				handle_special(op);

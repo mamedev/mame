@@ -288,9 +288,9 @@ UINT16 put_ob3(imgtool_stream *instream, imgtool_stream *outstream)
 	dynamic_buffer buffer(size);
 
 	stream_seek(instream, 6, SEEK_SET);
-	stream_read(instream, buffer, size);
+	stream_read(instream, &buffer[0], size);
 
-	stream_write(outstream, buffer, size);
+	stream_write(outstream, &buffer[0], size);
 
 	// end of pack
 	stream_fill(outstream, 0xff, 2);

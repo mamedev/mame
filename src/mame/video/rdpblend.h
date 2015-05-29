@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /******************************************************************************
 
 
@@ -16,28 +18,26 @@
 
 #include "emu.h"
 
-struct OtherModesT;
-struct MiscStateT;
+struct other_modes_t;
+struct misc_state_t;
 class n64_rdp;
 struct rdp_span_aux;
-class Color;
+class color_t;
 struct rdp_poly_state;
 
-class N64BlenderT
+class n64_blender_t
 {
 	public:
-		typedef bool (N64BlenderT::*Blender1)(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		typedef bool (N64BlenderT::*Blender2)(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		typedef void (N64BlenderT::*BlendEquation)(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
-		typedef bool (N64BlenderT::*AlphaCompare)(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object);
+		typedef bool (n64_blender_t::*blender1)(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
+		typedef bool (n64_blender_t::*blender2)(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
 
-		N64BlenderT();
+		n64_blender_t();
 
-		Blender1            blend1[8];
-		Blender2            blend2[8];
+		blender1            blend1[8];
+		blender2            blend2[8];
 
-		void                SetMachine(running_machine& machine) { m_machine = &machine; }
-		void                SetProcessor(n64_rdp* rdp) { m_rdp = rdp; }
+		void                set_machine(running_machine& machine) { m_machine = &machine; }
+		void                set_processor(n64_rdp* rdp) { m_rdp = rdp; }
 
 		running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
@@ -45,44 +45,35 @@ class N64BlenderT
 		running_machine*    m_machine;
 		n64_rdp*            m_rdp;
 
-		bool                Blend1CycleNoBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend1CycleNoBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend1CycleNoBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend1CycleNoBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend1CycleBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend1CycleBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend1CycleBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend1CycleBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
+		INT32 min(const INT32 x, const INT32 min);
+		bool alpha_reject(rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool test_for_reject(rdp_span_aux* userdata, const rdp_poly_state& object);
+		void blend_pipe(const int cycle, const int special, int* r_out, int* g_out, int* b_out, rdp_span_aux* userdata, const rdp_poly_state& object);
+		void blend_with_partial_reject(INT32* r, INT32* g, INT32* b, INT32 cycle, INT32 partialreject, INT32 select, rdp_span_aux* userdata, const rdp_poly_state& object);
 
-		bool                Blend2CycleNoBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend2CycleNoBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend2CycleNoBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend2CycleNoBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend2CycleBlendNoACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend2CycleBlendNoACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend2CycleBlendACVGNoDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                Blend2CycleBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, int acmode, rdp_span_aux *userdata, const rdp_poly_state& object);
+		bool cycle1_noblend_noacvg_nodither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle1_noblend_noacvg_dither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle1_noblend_acvg_nodither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle1_noblend_acvg_dither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle1_blend_noacvg_nodither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle1_blend_noacvg_dither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle1_blend_acvg_nodither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle1_blend_acvg_dither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
 
-		void                BlendEquationCycle0NoForceNoSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
-		void                BlendEquationCycle0NoForceSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
-		void                BlendEquationCycle0ForceNoSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
-		void                BlendEquationCycle0ForceSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
+		bool cycle2_noblend_noacvg_nodither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle2_noblend_noacvg_dither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle2_noblend_acvg_nodither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle2_noblend_acvg_dither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle2_blend_noacvg_nodither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle2_blend_noacvg_dither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle2_blend_acvg_nodither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
+		bool cycle2_blend_acvg_dither(INT32* fr, INT32* fg, INT32* fb, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
 
-		void                BlendEquationCycle1NoForceNoSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
-		void                BlendEquationCycle1NoForceSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
-		void                BlendEquationCycle1ForceNoSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
-		void                BlendEquationCycle1ForceSpecial(INT32* r, INT32* g, INT32* b, rdp_span_aux *userdata, const rdp_poly_state& object);
+		INT32 dither_alpha(INT32 alpha, INT32 dither);
+		INT32 dither_color(INT32 color, INT32 dither);
 
-		BlendEquation       cycle0[4];
-		BlendEquation       cycle1[4];
-		AlphaCompare        compare[4];
-
-		bool                AlphaCompareNone(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                AlphaCompareNoDither(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object);
-		bool                AlphaCompareDither(UINT8 alpha, const rdp_span_aux *userdata, const rdp_poly_state& object);
-
-		void                DitherRGB(INT32* r, INT32* g, INT32* b, int dith);
-		void                DitherA(UINT8* a, int dith);
+		UINT8               m_color_dither[256 * 8];
+		UINT8               m_alpha_dither[256 * 8];
 };
 
 #endif // _VIDEO_RDPBLEND_H_

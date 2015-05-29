@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
   Galaxian hardware family (old)
@@ -17,7 +19,7 @@
 
 /* star circuit */
 #define STAR_COUNT  252
-struct star
+struct star_gold
 {
 	int x, y, color;
 };
@@ -104,7 +106,7 @@ public:
 	UINT8 m_stars_blink_state;
 	emu_timer *m_stars_blink_timer;
 	emu_timer *m_stars_scroll_timer;
-	struct star m_stars[STAR_COUNT];
+	struct star_gold m_stars[STAR_COUNT];
 
 	DECLARE_READ8_MEMBER(drivfrcg_port0_r);
 	DECLARE_READ8_MEMBER(scrambler_protection_2_r);

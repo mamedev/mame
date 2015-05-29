@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * wpcsnd.c - Williams WPC pinball sound
  *   M6809E + YM2151 + HC55516 + DAC

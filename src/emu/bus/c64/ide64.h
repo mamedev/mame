@@ -4,9 +4,6 @@
 
     IDE64 v4.1 cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

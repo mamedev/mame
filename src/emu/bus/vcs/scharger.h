@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 #ifndef __VCS_SCHARGER_H
 #define __VCS_SCHARGER_H
 

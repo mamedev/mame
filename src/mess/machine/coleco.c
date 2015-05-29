@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Balfour, Ben Bruscella, Sean Young
 #include "emu.h"
 #include "machine/coleco.h"
 

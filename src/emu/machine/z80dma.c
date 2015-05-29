@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /**********************************************************************
 
     Z80 DMA interface and emulation

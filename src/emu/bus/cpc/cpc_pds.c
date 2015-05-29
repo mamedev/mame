@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * cpc_pds.c  --  CPC interface hardware for the Programmers Development System
  *

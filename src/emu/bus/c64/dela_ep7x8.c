@@ -4,9 +4,6 @@
 
     Dela 7x8K EPROM cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "dela_ep7x8.h"

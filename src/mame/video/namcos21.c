@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /***************************************************************************
 Namco System 21 Video Hardware
 
@@ -270,7 +272,7 @@ void namcos21_state::renderscanline_flat(const edge *e1, const edge *e2, int sy,
 	}
 }
 
-void namcos21_state::rendertri(const vertex *v0, const vertex *v1, const vertex *v2, unsigned color, int depthcueenable)
+void namcos21_state::rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, int depthcueenable)
 {
 	int dy,ystart,yend,crop;
 
@@ -279,11 +281,11 @@ void namcos21_state::rendertri(const vertex *v0, const vertex *v1, const vertex 
 	{
 		if( v0->y > v1->y )
 		{
-			SWAP(vertex,v0,v1);
+			SWAP(n21_vertex,v0,v1);
 		}
 		else if( v1->y > v2->y )
 		{
-			SWAP(vertex,v1,v2);
+			SWAP(n21_vertex,v1,v2);
 		}
 		else
 		{
@@ -385,7 +387,7 @@ void namcos21_state::rendertri(const vertex *v0, const vertex *v1, const vertex 
 
 void namcos21_state::draw_quad(int sx[4], int sy[4], int zcode[4], int color)
 {
-	vertex a,b,c,d;
+	n21_vertex a,b,c,d;
 	int depthcueenable = 1;
 	/*
 	    0x0000..0x1fff  sprite palettes (0x20 sets of 0x100 colors)

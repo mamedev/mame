@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
  * ncr5394/5396.h SCSI controller
  *

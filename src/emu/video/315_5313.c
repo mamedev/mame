@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Sega 315-5313 - Megadrive VDP */
 
 #include "emu.h"
@@ -174,10 +176,10 @@ void sega315_5313_device::device_start()
 	save_pointer(NAME(m_sprite_renderline), 1024);
 	save_pointer(NAME(m_highpri_renderline), 320);
 	save_pointer(NAME(m_video_renderline), 320/4);
-	save_pointer(NAME(m_palette_lookup), 0x40/2);
-	save_pointer(NAME(m_palette_lookup_sprite), 0x40/2);
-	save_pointer(NAME(m_palette_lookup_shadow), 0x40/2);
-	save_pointer(NAME(m_palette_lookup_highlight), 0x40/2);
+	save_pointer(NAME(m_palette_lookup), 0x40);
+	save_pointer(NAME(m_palette_lookup_sprite), 0x40);
+	save_pointer(NAME(m_palette_lookup_shadow), 0x40);
+	save_pointer(NAME(m_palette_lookup_highlight), 0x40);
 	save_pointer(NAME(m_render_line_raw), 320/2);
 	if (m_use_alt_timing)
 		save_pointer(NAME(m_render_line), 320/2);

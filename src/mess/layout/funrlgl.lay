@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+
+	<element name="ledr" defstate="0">
+		<disk state="0"><color red="0.2" green="0.05" blue="0.06" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk state="0"><color red="0.05" green="0.2" blue="0.06" /></disk>
+		<disk state="1"><color red="0.23" green="1.0" blue="0.2" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-1" right="12" top="-0.2" bottom="12" />
+		<bezel element="static_black">
+			<bounds left="-1" right="12" top="-0.2" bottom="12" />
+		</bezel>
+
+		<bezel name="lamp0"  element="ledr"><bounds x="0" y="0" width="1" height="1" /></bezel>
+		<bezel name="lamp10" element="ledr"><bounds x="0" y="2" width="1" height="1" /></bezel>
+		<bezel name="lamp20" element="ledr"><bounds x="0" y="4" width="1" height="1" /></bezel>
+		<bezel name="lamp30" element="ledr"><bounds x="0" y="6" width="1" height="1" /></bezel>
+		<bezel name="lamp2"  element="ledr"><bounds x="0" y="8" width="1" height="1" /></bezel>
+		<bezel name="lamp12" element="ledr"><bounds x="0" y="10" width="1" height="1" /></bezel>
+
+		<bezel name="lamp22" element="ledr"><bounds x="5" y="2" width="1" height="1" /></bezel>
+		<bezel name="lamp33" element="ledg"><bounds x="5" y="4" width="1" height="1" /></bezel>
+
+		<bezel name="lamp1"  element="ledr"><bounds x="10" y="0" width="1" height="1" /></bezel>
+		<bezel name="lamp11" element="ledr"><bounds x="10" y="2" width="1" height="1" /></bezel>
+		<bezel name="lamp21" element="ledr"><bounds x="10" y="4" width="1" height="1" /></bezel>
+		<bezel name="lamp31" element="ledr"><bounds x="10" y="6" width="1" height="1" /></bezel>
+		<bezel name="lamp3"  element="ledr"><bounds x="10" y="8" width="1" height="1" /></bezel>
+		<bezel name="lamp13" element="ledr"><bounds x="10" y="10" width="1" height="1" /></bezel>
+
+	</view>
+</mamelayout>

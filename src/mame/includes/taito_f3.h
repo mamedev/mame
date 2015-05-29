@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "sound/okim6295.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */

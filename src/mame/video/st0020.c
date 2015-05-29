@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia,David Haywood
 /* ST0020 - Seta Zooming Sprites + Blitter
 
   (gdfs also has a tilemap, I don't know if this chip supplies that)

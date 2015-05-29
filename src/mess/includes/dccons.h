@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese, R. Belmont
 #include "imagedev/chd_cd.h"
 #include "machine/gdrom.h"
 #include "machine/ataintf.h"

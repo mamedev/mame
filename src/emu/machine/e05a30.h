@@ -1,8 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Ramiro Polla
 /*
  * E05A30 Gate Array (used in the Epson ActionPrinter 2000)
  *
- * Copyright: 2014 Ramiro Polla
- * License: BSD-3-Clause
  */
 
 #ifndef __E05A30_H__

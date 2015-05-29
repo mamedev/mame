@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steve Ellenoff, Brad Oliver
 /***************************************************************************
 
 Tag Team Wrestling hardware description:

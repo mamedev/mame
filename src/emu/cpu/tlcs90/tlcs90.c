@@ -1,8 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /*************************************************************************************************************
 
     Toshiba TLCS-90 Series MCU's
 
     emulation by Luca Elia, based on the Z80 core by Juergen Buchmueller
+
+    ChangeLog:
+
+    20150517 Fixed TRUN bit masking (timers start/stop handling) [Rainer Keuchel]
 
 *************************************************************************************************************/
 
@@ -2019,9 +2025,10 @@ void tlcs90_device::device_reset()
     P0/D0-D7 P1/A0-A7 P2/A8-A15 P6 P7 = INPUT
     P35/~RD P36/~WR CLK = 1 (ALWAYS OUTPUTS)
     P4/A16-A19 P83 = 0
-    dedicated input ports and registers remain unchanged,
+    dedicated input ports and CPU registers remain unchanged,
     but PC IFF BX BY = 0, A undefined
 */
+	memset(m_internal_registers, 0, sizeof(m_internal_registers));
 }
 
 void tlcs90_device::execute_burn(INT32 cycles)
@@ -2412,7 +2419,8 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 	int mode, timer_fired;
 	int i = param;
 
-	if ( (m_internal_registers[ T90_TRUN - T90_IOBASE ] & (1 << i)) == 0 )
+	int mask = 0x20 | (1 << i);
+	if ( (m_internal_registers[ T90_TRUN - T90_IOBASE ] & mask) != mask )
 		return;
 
 	timer_fired = 0;
@@ -2505,21 +2513,23 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 		case T90_TRUN:
 		{
 			int i;
+			UINT8 mask;
 			// Timers 0-3
 			for (i = 0; i < 4; i++)
 			{
-				if ( (old ^ data) & (0x20 | (1 << i)) ) // if timer bit or prescaler bit changed
+				mask = 0x20 | (1 << i);
+				if ( (old ^ data) & mask ) // if timer bit or prescaler bit changed
 				{
-					if ( (data & (1 << i)) && (data & 0x20) )    t90_start_timer(i);
-					else                                         t90_stop_timer(i);
+					if ( (data & mask) == mask )    t90_start_timer(i);
+					else                            t90_stop_timer(i);
 				}
 			}
 
-
 			// Timer 4
-			if ( (old ^ data) & (0x20 | 0x10) )
+			mask = 0x20 | 0x10;
+			if ( (old ^ data) & mask )
 			{
-				if ( data == (0x20 | 0x10) )    t90_start_timer4();
+				if ( (data & mask) == mask )    t90_start_timer4();
 				else                            t90_stop_timer4();
 			}
 			break;
@@ -2724,11 +2734,6 @@ void tlcs90_device::device_start()
 
 	m_timer_period = attotime::from_hz(unscaled_clock()) * 8;
 
-	// Reset registers to their initial values
-
-//  IX = IY = 0xffff;
-//  F = ZF;
-
 	// Timers
 
 	for (i = 0; i < 4; i++)
@@ -2761,12 +2766,12 @@ void tlcs90_device::device_start()
 }
 
 
-void tlcs90_device::state_string_export(const device_state_entry &entry, astring &string)
+void tlcs90_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				F & 0x80 ? 'S':'.',
 				F & 0x40 ? 'Z':'.',
 				F & 0x20 ? 'I':'.',

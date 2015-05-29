@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 #pragma once
 
 #ifndef __G65816CM_H__

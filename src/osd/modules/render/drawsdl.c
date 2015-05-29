@@ -1,11 +1,12 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud, Olivier Galibert, R. Belmont
 //============================================================
 //
 //  drawsdl.c - SDL software and OpenGL implementation
 //
-//  Copyright (c) 1996-2011, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //  SDLMAME by Olivier Galibert and R. Belmont
+//
+//  yuvmodes by Couriersud
 //
 //============================================================
 

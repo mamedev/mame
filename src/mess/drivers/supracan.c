@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese, Harmony
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese,Ryan Holtz
 /***************************************************************************
 
 
@@ -431,7 +431,7 @@ void supracan_state::video_start()
 	m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
 
 	m_vram_addr_swapped.resize(0x20000); // hack for 1bpp layer at startup
-	m_gfxdecode->gfx(4)->set_source(m_vram_addr_swapped);
+	m_gfxdecode->gfx(4)->set_source(&m_vram_addr_swapped[0]);
 	m_gfxdecode->gfx(4)->set_xormask(0);
 
 	m_tilemap_sizes[0][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

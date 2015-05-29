@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "machine/rmnkbd.h"
 
 rmnimbus_keyboard_device::rmnimbus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :

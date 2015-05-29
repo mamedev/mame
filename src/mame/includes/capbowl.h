@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Zsolt Vasvari
 /*************************************************************************
 
     Coors Light Bowling/Bowl-O-Rama hardware

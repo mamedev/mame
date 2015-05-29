@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
     Emerson Arcadia 2001 (and clones) cart emulation
@@ -49,9 +49,7 @@ void device_arcadia_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(EA2001SLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(EA2001SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -232,7 +230,7 @@ bool arcadia_cart_slot_device::call_softlist_load(software_list_device &swlist, 
  get default card software
  -------------------------------------------------*/
 
-void arcadia_cart_slot_device::get_default_card_software(astring &result)
+void arcadia_cart_slot_device::get_default_card_software(std::string &result)
 {
 	software_get_default_slot(result, "std");
 }

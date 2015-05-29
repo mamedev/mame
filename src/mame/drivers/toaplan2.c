@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Quench, Yochizo, David Haywood
 /*****************************************************************************
 
         ToaPlan      game hardware from 1991 - 1994

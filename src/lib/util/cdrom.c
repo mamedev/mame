@@ -161,10 +161,10 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 	for (i = 0; i < file->cdtoc.numtrks; i++)
 	{
-		file_error filerr = core_fopen(file->track_info.track[i].fname, OPEN_FLAG_READ, &file->fhandle[i]);
+		file_error filerr = core_fopen(file->track_info.track[i].fname.c_str(), OPEN_FLAG_READ, &file->fhandle[i]);
 		if (filerr != FILERR_NONE)
 		{
-			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.cstr());
+			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.c_str());
 			cdrom_close(file);
 			return NULL;
 		}
@@ -811,7 +811,7 @@ const char *cdrom_get_subtype_string(UINT32 subtype)
 
 chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 {
-	astring metadata;
+	std::string metadata;
 	chd_error err;
 	int i;
 
@@ -833,7 +833,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 			/* parse the metadata */
 			type[0] = subtype[0] = 0;
 			pgtype[0] = pgsub[0] = 0;
-			if (sscanf(metadata, CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
+			if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
 				return CHDERR_INVALID_DATA;
 			if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
 				return CHDERR_INVALID_DATA;
@@ -847,7 +847,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 				/* parse the metadata */
 				type[0] = subtype[0] = 0;
 				pregap = postgap = 0;
-				if (sscanf(metadata, CDROM_TRACK_METADATA2_FORMAT, &tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
+				if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA2_FORMAT, &tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
 					return CHDERR_INVALID_DATA;
 				if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
 					return CHDERR_INVALID_DATA;
@@ -867,7 +867,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 					/* parse the metadata */
 					type[0] = subtype[0] = 0;
 					pregap = postgap = 0;
-					if (sscanf(metadata, GDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
+					if (sscanf(metadata.c_str(), GDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
 						return CHDERR_INVALID_DATA;
 					if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
 						return CHDERR_INVALID_DATA;
@@ -983,7 +983,7 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 	/* write the metadata */
 	for (i = 0; i < toc->numtrks; i++)
 	{
-		astring metadata;
+		std::string metadata;
 		if (!(toc->flags & CD_FLAG_GDROM))
 		{
 			char submode[32];
@@ -998,7 +998,7 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 				strcpy(submode, cdrom_get_type_string(toc->tracks[i].pgtype));
 			}
 
-			metadata.format(CDROM_TRACK_METADATA2_FORMAT, i + 1, cdrom_get_type_string(toc->tracks[i].trktype),
+			strprintf(metadata, CDROM_TRACK_METADATA2_FORMAT, i + 1, cdrom_get_type_string(toc->tracks[i].trktype),
 					cdrom_get_subtype_string(toc->tracks[i].subtype), toc->tracks[i].frames, toc->tracks[i].pregap,
 					submode, cdrom_get_subtype_string(toc->tracks[i].pgsub),
 					toc->tracks[i].postgap);
@@ -1006,7 +1006,7 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 		}
 		else
 		{
-			metadata.format(GDROM_TRACK_METADATA_FORMAT, i + 1, cdrom_get_type_string(toc->tracks[i].trktype),
+			strprintf(metadata, GDROM_TRACK_METADATA_FORMAT, i + 1, cdrom_get_type_string(toc->tracks[i].trktype),
 					cdrom_get_subtype_string(toc->tracks[i].subtype), toc->tracks[i].frames, toc->tracks[i].padframes,
 					toc->tracks[i].pregap, cdrom_get_type_string(toc->tracks[i].pgtype),
 					cdrom_get_subtype_string(toc->tracks[i].pgsub), toc->tracks[i].postgap);

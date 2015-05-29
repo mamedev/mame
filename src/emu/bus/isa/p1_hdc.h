@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:XXX
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     Poisk-1 HDC device (model B942)
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

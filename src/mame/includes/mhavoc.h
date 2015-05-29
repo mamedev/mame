@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Appolo
 /*************************************************************************
 
     Atari Major Havoc hardware

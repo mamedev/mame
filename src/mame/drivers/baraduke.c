@@ -1,9 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Baraduke    (c) 1985 Namco
 Metro-Cross (c) 1985 Namco
 
-Driver by Manuel Abadia <manu@teleline.es>
+Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 The sprite and tilemap generator ICs are the same as in Namco System 86, but
 System 86 has two tilemap generators instead of one.

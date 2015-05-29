@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 
 // MAME NeoGeo code for single fixed slot 'shortname' configs
 // none of this is required by MESS or the slot-based implementation

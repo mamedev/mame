@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carlos A. Lozano
 #include "audio/seibu.h"
 #include "sound/msm5205.h"
 

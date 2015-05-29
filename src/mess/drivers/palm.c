@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz, R. Belmont
 /****************************************************************************
 
     drivers/palm.c

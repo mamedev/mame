@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Stefan Jokisch
 /***************************************************************************
 
     Atari Cannonball (prototype) driver
@@ -18,18 +20,11 @@ public:
 
 	cball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-	{ }
-
-	/* memory pointers */
-	required_shared_ptr<UINT8> m_video_ram;
-
-	/* video-related */
-	tilemap_t* m_bg_tilemap;
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -37,16 +32,27 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(cball_vram_w);
-	DECLARE_READ8_MEMBER(cball_wram_r);
-	DECLARE_WRITE8_MEMBER(cball_wram_w);
+	/* memory pointers */
+	required_shared_ptr<UINT8> m_video_ram;
+
+	/* video-related */
+	tilemap_t* m_bg_tilemap;
+
+	emu_timer *m_int_timer;
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
+
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(wram_r);
+	DECLARE_WRITE8_MEMBER(wram_w);
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(cball);
-	UINT32 screen_update_cball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -61,7 +67,7 @@ TILE_GET_INFO_MEMBER(cball_state::get_tile_info)
 }
 
 
-WRITE8_MEMBER(cball_state::cball_vram_w)
+WRITE8_MEMBER(cball_state::vram_w)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -74,7 +80,7 @@ void cball_state::video_start()
 }
 
 
-UINT32 cball_state::screen_update_cball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 cball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw playfield */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -114,17 +120,18 @@ TIMER_CALLBACK_MEMBER(cball_state::interrupt_callback)
 	if (scanline >= 262)
 		scanline = 16;
 
-	timer_set(m_screen->time_until_pos(scanline), TIMER_INTERRUPT, scanline);
+	m_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
 void cball_state::machine_start()
 {
+	m_int_timer = timer_alloc(TIMER_INTERRUPT);
 }
 
 void cball_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(16), TIMER_INTERRUPT, 16);
+	m_int_timer->adjust(m_screen->time_until_pos(16), 16);
 }
 
 
@@ -139,13 +146,13 @@ PALETTE_INIT_MEMBER(cball_state, cball)
 }
 
 
-READ8_MEMBER(cball_state::cball_wram_r)
+READ8_MEMBER(cball_state::wram_r)
 {
 	return m_video_ram[0x380 + offset];
 }
 
 
-WRITE8_MEMBER(cball_state::cball_wram_w)
+WRITE8_MEMBER(cball_state::wram_w)
 {
 	m_video_ram[0x380 + offset] = data;
 }
@@ -155,7 +162,7 @@ WRITE8_MEMBER(cball_state::cball_wram_w)
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 
-	AM_RANGE(0x0000, 0x03ff) AM_READ(cball_wram_r) AM_MASK(0x7f)
+	AM_RANGE(0x0000, 0x03ff) AM_READ(wram_r) AM_MASK(0x7f)
 	AM_RANGE(0x0400, 0x07ff) AM_READONLY
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("1001")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("1003")
@@ -165,8 +172,8 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
 	AM_RANGE(0x2000, 0x2001) AM_NOP
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")
 
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(cball_wram_w) AM_MASK(0x7f)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(cball_vram_w) AM_SHARE("video_ram")
+	AM_RANGE(0x0000, 0x03ff) AM_WRITE(wram_w) AM_MASK(0x7f)
+	AM_RANGE(0x0400, 0x07ff) AM_WRITE(vram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x1800, 0x1800) AM_NOP /* watchdog? */
 	AM_RANGE(0x1810, 0x1811) AM_NOP
 	AM_RANGE(0x1820, 0x1821) AM_NOP
@@ -263,7 +270,7 @@ static MACHINE_CONFIG_START( cball, cball_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update_cball)
+	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cball)
@@ -296,4 +303,4 @@ ROM_START( cball )
 ROM_END
 
 
-GAME( 1976, cball, 0, cball, cball, driver_device, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1976, cball, 0, cball, cball, driver_device, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

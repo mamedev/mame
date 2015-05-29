@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"

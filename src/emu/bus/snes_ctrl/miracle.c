@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /**********************************************************************
 
     Super Nintendo Entertainment System - Miracle Piano Keyboard
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
     recv at PC = 008a4a
     xmit at PC = 008adb
@@ -173,7 +172,7 @@ void snes_miracle_device::write_strobe(UINT8 data)
 
 			if (m_strobe_clock < 500 && data == 0)
 			{
-				// short delay is recieve mode
+				// short delay is receive mode
 				m_midi_mode = MIRACLE_MIDI_RECEIVE;
 				strobe_timer->reset();
 				m_strobe_on = 0;

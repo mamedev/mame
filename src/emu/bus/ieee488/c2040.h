@@ -4,9 +4,6 @@
 
     Commodore 2040/3040/4040 Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once
@@ -20,8 +17,7 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6504.h"
 #include "machine/6522via.h"
-#include "machine/6532riot.h"
-#include "machine/mos6530.h"
+#include "machine/mos6530n.h"
 
 
 
@@ -29,15 +25,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c2040_device
+// ======================> c2040_t
 
-class c2040_device :  public device_t,
-						public device_ieee488_interface
+class c2040_t :  public device_t,
+					public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c2040_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c2040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -53,8 +49,6 @@ public:
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( mode_sel_w );
 	DECLARE_WRITE_LINE_MEMBER( rw_sel_w );
-	DECLARE_READ8_MEMBER( miot_pb_r );
-	DECLARE_WRITE8_MEMBER( miot_pb_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -79,9 +73,9 @@ protected:
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
-	required_device<riot6532_device> m_riot0;
-	required_device<riot6532_device> m_riot1;
-	required_device<mos6530_device> m_miot;
+	required_device<mos6532_t> m_riot0;
+	required_device<mos6532_t> m_riot1;
+	required_device<mos6530_t> m_miot;
 	required_device<via6522_device> m_via;
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;
@@ -94,29 +88,32 @@ protected:
 	int m_daco;                         // not data accepted output
 	int m_atna;                         // attention acknowledge
 	int m_ifc;
-
-	// signals
-	int m_miot_irq;                     // MIOT interrupt
 };
 
 
-// ======================> c3040_device
+// ======================> c3040_t
 
-class c3040_device :  public c2040_device
+class c3040_t :  public c2040_t
 {
 public:
 	// construction/destruction
-	c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c3040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 
-// ======================> c4040_device
+// ======================> c4040_t
 
-class c4040_device :  public c2040_device
+class c4040_t :  public c2040_t
 {
 public:
 	// construction/destruction
-	c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c4040_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;

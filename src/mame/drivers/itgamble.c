@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /******************************************************************
 
   Nazionale Elettronica + others (mostly Italian) Gambling games

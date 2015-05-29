@@ -48,28 +48,10 @@ typedef delegate<void ()> save_prepost_delegate;
 #define ALLOW_SAVE_TYPE(TYPE) \
 	template<> struct save_manager::type_checker<TYPE> { static const bool is_atom = true; static const bool is_pointer = false; }
 
-// use this as above, but also to declare that dynamic_array<TYPE> is safe as well
+// use this as above, but also to declare that std::vector<TYPE> is safe as well
 #define ALLOW_SAVE_TYPE_AND_ARRAY(TYPE) \
 	ALLOW_SAVE_TYPE(TYPE); \
-	template<> inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, dynamic_array<TYPE> &value, const char *name) { save_memory(device, module, tag, index, name, &value[0], sizeof(TYPE), value.count()); }
-
-
-// register items with explicit tags
-#define state_save_register_item(_mach, _mod, _tag, _index, _val) \
-	(_mach).save().save_item(NULL, _mod, _tag, _index, _val, #_val)
-
-#define state_save_register_item_pointer(_mach, _mod, _tag, _index, _val, _count) \
-	(_mach).save().save_pointer(NULL, _mod, _tag, _index, _val, #_val, _count)
-
-#define state_save_register_item_array(_mach, _mod, _tag, _index, _val) \
-	(_mach).save().save_item(NULL, _mod, _tag, _index, _val, #_val)
-
-#define state_save_register_item_2d_array(_mach, _mod, _tag, _index, _val) \
-	(_mach).save().save_item(NULL, _mod, _tag, _index, _val, #_val)
-
-#define state_save_register_item_bitmap(_mach, _mod, _tag, _index, _val) \
-	(_mach).save().save_item(NULL, _mod, _tag, _index, *(_val), #_val)
-
+	template<> inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, std::vector<TYPE> &value, const char *name) { save_memory(device, module, tag, index, name, &value[0], sizeof(TYPE), value.size()); }
 
 
 //**************************************************************************
@@ -91,10 +73,10 @@ public:
 	// state
 	state_entry *       m_next;                 // pointer to next entry
 	void *              m_data;                 // pointer to the memory to save/restore
-	astring             m_name;                 // full name
+	std::string         m_name;                 // full name
 	device_t *          m_device;               // associated device, NULL if none
-	astring             m_module;               // module name
-	astring             m_tag;                  // tag name
+	std::string         m_module;               // module name
+	std::string         m_tag;                  // tag name
 	int                 m_index;                // index
 	UINT8               m_typesize;             // size of the raw data type
 	UINT32              m_typecount;            // number of items
@@ -209,7 +191,7 @@ private:
 
 // template specializations to enumerate the fundamental atomic types you are allowed to save
 ALLOW_SAVE_TYPE_AND_ARRAY(char);
-ALLOW_SAVE_TYPE_AND_ARRAY(bool);
+ALLOW_SAVE_TYPE          (bool); // std::vector<bool> may be packed internally
 ALLOW_SAVE_TYPE_AND_ARRAY(INT8);
 ALLOW_SAVE_TYPE_AND_ARRAY(UINT8);
 ALLOW_SAVE_TYPE_AND_ARRAY(INT16);
@@ -267,10 +249,10 @@ inline void save_manager::save_item(device_t *device, const char *module, const 
 template<>
 inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, attotime &value, const char *name)
 {
-	astring tempstr(name, ".attoseconds");
-	save_memory(device, module, tag, index, tempstr, &value.attoseconds, sizeof(value.attoseconds));
-	tempstr.cpy(name).cat(".seconds");
-	save_memory(device, module, tag, index, tempstr, &value.seconds, sizeof(value.seconds));
+	std::string tempstr = std::string(name).append(".attoseconds");
+	save_memory(device, module, tag, index, tempstr.c_str(), &value.attoseconds, sizeof(value.attoseconds));
+	tempstr.assign(name).append(".seconds");
+	save_memory(device, module, tag, index, tempstr.c_str(), &value.seconds, sizeof(value.seconds));
 }
 
 

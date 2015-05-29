@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Olivier Galibert
 #pragma once
 
 #ifndef __DSBZ80_H__

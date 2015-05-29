@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #ifndef TD0_DSK_H_
 #define TD0_DSK_H_
 

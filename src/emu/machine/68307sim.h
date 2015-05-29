@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* 68307 SIM module */
 
 #include "cpu/m68000/m68000.h"

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 /******************************************************************************
 
     Data East Side Pocket hardware

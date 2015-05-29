@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef _DC_CTRL_H_
 #define _DC_CTRL_H_
 

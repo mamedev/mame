@@ -63,7 +63,7 @@ private:
 		UINT64              m_currval;          // current value
 		int                 m_index;            // index
 		UINT8               m_vallen;           // number of value chars
-		astring             m_symbol;           // symbol
+		std::string         m_symbol;           // symbol
 	};
 
 	// internal helpers

@@ -4,9 +4,6 @@
 
     Commodore 1570/1571/1571CR Single Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once
@@ -39,16 +36,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1571_device
+// ======================> c1571_t
 
-class c1571_device :  public device_t,
-						public device_cbm_iec_interface,
-						public device_c64_floppy_parallel_interface
+class c1571_t :  public device_t,
+					public device_cbm_iec_interface,
+					public device_c64_floppy_parallel_interface
 {
 public:
 	// construction/destruction
-	c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1571_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c1571_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -130,13 +127,13 @@ protected:
 };
 
 
-// ======================> c1570_device
+// ======================> c1570_t
 
-class c1570_device :  public c1571_device
+class c1570_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1570_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -144,13 +141,13 @@ public:
 };
 
 
-// ======================> c1571cr_device
+// ======================> c1571cr_t
 
-class c1571cr_device :  public c1571_device
+class c1571cr_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1571cr_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -161,13 +158,13 @@ public:
 };
 
 
-// ======================> mini_chief_device
+// ======================> mini_chief_t
 
-class mini_chief_device :  public c1571_device
+class mini_chief_t :  public c1571_t
 {
 public:
 	// construction/destruction
-	mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mini_chief_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;

@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     LMC1992 Digitally-Controlled Stereo Tone and Volume Circuit with
     Four-Channel Input-Selector emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

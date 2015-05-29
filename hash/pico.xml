@@ -13,29 +13,21 @@ with a lot of tweaks)
 
 Published by Sega/Sega Toys (HPC-6*** serial codes)
 
-* 超光戦士 シャンゼリオン  - Chou Hikari Senshi Shanzerion (Sega - 1996xxxx - HPC-6038)
 * さわってみよう! よいこのはじめてキーボード - Sawattemiyou! Yoiko no Hajimete Keyboard (Sega - 199712xx - HPC-6053)
-* プーさんとたのしいなかまたち - Pooh-san to Tanoshii na Kamatachi (Sega - ???? - HPC-6054)
 * はじめまシリーズ5 けろけろけろっぴのハリキリうんどうかい - Hajimema Series 5 - Kerokero Keroppi no Harikiri Undoukai (Sega - 1998xxxx - HPC-6059) [reprint HPC-6006]
 * はじめまシリーズ6 クイズにチャレンジ! ドラえもん - Hajimema Series 6 - Quiz ni Challenge! Doraemon (Sega - 1998xxxx - HPC-6060) [reprint HPC-6020]
-* はじめまシリーズ2 ハローキティのたのしいぶとうかい - Hajimema Series 2 - Hello Kitty no Tanoshii Butoukai (Sega - 1998xxxx - HPC-6061) [reprint HPC-6002]
 * はじめまシリーズ3 ゴジラ どきどき怪獣島! - Hajimema Series 3 - Godzilla Dokidoki Kaijuu Shima! (Sega - 1998xxxx - HPC-????) [reprint HPC-6027]
 * おえかきピコ <タブレットのみ> - Oekaki Pico ~Tablet no Mi~ (Sega - ???? - HPC-????)
 * いっしょにうたおう! ドラえもん わくわくカラオケ - Issho ni Utaou! Doraemon Wakuwaku Karaoke (Sega Toys - 1999xxxx - HPC-6073)
 * クッキングピコ セット - Cooking Pico Set (Sega Toys - 1999xxxx - HPC-6076)
 * スージーちゃんとマービー おてつだい だ～いすき! - Susie-chan to Mabi - Otetsudai Daisuki! (Sega Toys - 200010xx - HPC-6089)
 * パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
-* ECCジュニアの はじめてえいご Vol.4 - Patty Loves Animals 動物大好き、パティちゃん - ECC Junior no Hajimete Eigo Vol. 4 - Patty Loves Animals - Doubutsu Daisuki, Patty-chan (Sega Toys - 200207xx - HPC-6106)
-* ECCジュニアの はじめてえいご Vol.5 - Merry Christmas, Patty! メリークリスマス、パティちゃん - ECC Junior no Hajimete Eigo Vol. 5 - Merry Christmas, Patty! - Merry Christmas, Patty-chan (Sega Toys - 200207xx - HPC-6107)
-* ECCジュニアの はじめてえいご Vol.6 - Patty Goes to the Amusement Park パティちゃん遊園地に行く - ECC Junior no Hajimete Eigo Vol. 6 - Patty Goes to the Amusement Park - Patty-chan Yuuenchi ni Iku (Sega Toys - 200207xx - HPC-6108)
-* おせわしましょ! あかちゃんピコ - Osewashimasho! Akachan Pico (Sega Toys - 20020701 - HPC-6109)
 * トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
 * 学研 ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Sega Toys - ???? - HPC-????)
 * ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
 * McDonald's マクドナルドであそぼ!<10th> - McDonald's - McDonald de Asobo! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6125) [reprint HPC-6079]
 * ドラえもん のびたの まちなか ドキドキ たんけん!<10th> - Doraemon - Nobita no Machinaka Dokidoki Tanken! ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6126) [reprint HPC-6009]
 * トイストーリー2 ウッディ そうさく だいさくせん!!<10th> - Toy Story 2 - Woody Sousaku Daisakusen!! ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6127) [reprint HPC-6090]
-* それいけ! アンパンマン えいごとなかよし2 たのしいカーニバル<10th> - Soreike! Anpanman - Eigo to Nakayoshi 2 Tanoshii Carnival ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6128) [reprint HPC-6017]
 * ミッキーと大きな古時計<10th> - Mickey To Ooki na Furudokei ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6129) [reprint HPC-6023]
 * おりょうりだいすき! キッチンピコ - Oryouri Daisuki! Kitchen Pico (Sega Toys - 20030718 - HPC-6132)
 * それいけ!アンパンマン はじめてあそぶピコソフト アンパンマンのいろ･かず･かたち ぬりえもできちゃうぞ! - Soreike! Anpanman Hajimete Asobu Pico Soft - Anpanman Noiro-Kazu-Katachi Nuriemo Dekichauzo! (Sega Toys - ???? - HPC-????)
@@ -636,6 +628,21 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
+	<software name="csshanze">
+		<description>Choukou Senshi Shanzerion (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6038"/>
+		<info name="alt_title" value="超光戦士 シャンゼリオン"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-19094-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19094-t.ic1" size="524288" crc="763cbcf4" sha1="68a592ebe972a984eb6c631a363bd60c384ed5af" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="conveni">
 		<description>Conveni de Okaimono! (Jpn)</description>
 		<year>2001</year>
@@ -789,6 +796,22 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 	</software>
 
 	<software name="princess">
+		<description>Disney Princesses - Princesses ni Naritai! (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6136" />
+		<info name="release" value="20031209"/>
+		<info name="alt_title" value="ディズニープリンセス プリンセスになりたい!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1__alt__.ic1" size="2097152" crc="5d8d1eda" sha1="31d47cad551aa46d78565a17a78914dab3ab58ed" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princessa" cloneof="princess">
 		<description>Disney Princesses - Princesses ni Naritai! (Jpn)</description>
 		<year>2003</year>
 		<publisher>Sega Toys</publisher>
@@ -1219,6 +1242,57 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic2" value="HC00" />
 			<dataarea name="rom" size="4194304">
 				<rom name="9k0-0059.ic1" size="4194304" crc="a7faf67c" sha1="25527816ebea51395b1abf011e3784eb24662d78" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ecc4">
+		<description>ECC Junior no Hajimete Eigo Vol. 4 - Patty Loves Animals - Doubutsu Daisuki, Patty-chan (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6106" />
+		<info name="release" value="200207xx"/>
+		<info name="alt_title" value="ECCジュニアの はじめてえいご Vol.4 - Patty Loves Animals 動物大好き、パティちゃん"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="9B1-0005A" />
+			<feature name="ic1" value="9K0-0067" />
+			<feature name="ic2" value="74HC00A" />
+			<dataarea name="rom" size="4194304">
+				<rom name="9k0-0067.ic1" size="4194304" crc="d412c517" sha1="9cd14906040c3c5f5e4232bbd91daba5bfe2670a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ecc5">
+		<description>ECC Junior no Hajimete Eigo Vol. 5 - Merry Christmas, Patty! - Merry Christmas, Patty-chan (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6107" />
+		<info name="release" value="200207xx"/>
+		<info name="alt_title" value="ECCジュニアの はじめてえいご Vol.5 - Merry Christmas, Patty! メリークリスマス、パティちゃん"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="9B1-0005A" />
+			<feature name="ic1" value="9K0-0068-MX-32" />
+			<feature name="ic2" value="74HC00A" />
+			<dataarea name="rom" size="4194304">
+				<rom name="9k0-0068-mx-32.ic1" size="4194304" crc="7aed02a7" sha1="9a4f2b0a0c0c8ae0bbb5977c6743e18bc65c39e0" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ecc6">
+		<description>ECC Junior no Hajimete Eigo Vol. 6 - Patty Goes to the Amusement Park - Patty-chan Yuuenchi ni Iku (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6108" />
+		<info name="release" value="200207xx"/>
+		<info name="alt_title" value="ECCジュニアの はじめてえいご Vol.6 - Patty Goes to the Amusement Park パティちゃん遊園地に行く"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="9B1-0005A" />
+			<feature name="ic1" value="9K0-0069-MX-32" />
+			<feature name="ic2" value="74HC00A" />
+			<dataarea name="rom" size="4194304">
+				<rom name="9k0-0069-mx-32.ic1" size="4194304" crc="8f3335a8" sha1="7a9910d88c25197ae31f70b80f9a336dd133cba7" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1791,13 +1865,14 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
+<!-- The 1998 reprint HPC-6061 has been confirmed to contain the same ROM as the original ROM! -->
 	<software name="helloktb" cloneof="hellokcs">
 		<description>Hello Kitty no Tanoshii Butoukai (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="HPC-6002"/>
-		<info name="release" value="19930326"/>
-		<info name="alt_title" value="ハローキティのたのしいぶとうかい"/>
+		<info name="serial" value="HPC-6002, HPC-6061 (Reprint)"/>
+		<info name="release" value="19930326, 1998 (Reprint)"/>
+		<info name="alt_title" value="ハローキティのたのしいぶとうかい, はじめまシリーズ2 ハローキティのたのしいぶとうかい (Reprint)"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6434C" />
 			<feature name="ic1" value="MPR-15645-H" />
@@ -3143,6 +3218,26 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="osewashi">
+		<description>o-Sewa Shimasho! Aka-chan Pico (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6109"/>
+		<info name="release" value="20020701"/>
+		<info name="alt_title" value="おせわしましょ! あかちゃんピコ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="9B1-0017A" />
+			<feature name="u1" value="EPOXY BLOCK U1" />
+			<feature name="u2" value="MM74HC32M" />
+			<feature name="u3" value="MM74HC125M" />
+			<feature name="u4" value="EPOXY BLOCK U4" />
+			<feature name="u5" value="(adapter?)" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.u1" size="2097152" crc="1e843a86" sha1="3494b01637c5546c537839edac0471a1105797bb" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hairsaln">
 		<description>Oshare Pico Suteki ni Henshin! Naruchan no Oshare Hair Salon (Jpn)</description>
 		<year>2000</year>
@@ -3449,6 +3544,21 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="poohtano">
+		<description>Pooh-san to Tanoshii na Kamatachi (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6054"/>
+		<info name="alt_title" value="プーさんとたのしいなかまたち"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-20691-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-20691-t.ic1" size="524288" crc="4811d334" sha1="7321cdecb77d27e7fde6cd3937a24d24de6d35df" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="profpico" supported="no">
 		<description>Professor Pico und das Malkasten Puzzle (Ger)</description>
 		<year>1995</year>
@@ -3589,6 +3699,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18197A-U" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18197a-u.ic1" size="524288" crc="836f6478" sha1="6194c99ac07ac343dc98fee23a8d77aa7049d779" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanouk1a" cloneof="sanouk1">
+		<description>Sanou Kaihatsu Series 1 Zukei Ninshiki (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150210"/>
+		<info name="release" value="19950831"/>
+		<info name="alt_title" value="左脳開発シリーズ1 図形認識"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18197-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18197-h.ic1" size="524288" crc="6080779d" sha1="5be121b25ab4cda4c7859707107ec04b42f25469" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4065,12 +4191,13 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	<software name="anpanme2">
 		<description>Soreike! Anpanman - Eigo to Nakayoshi 2 - Tanoshii Carnival (Jpn)</description>
 		<year>1995</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="HPC-6017"/>
+		<publisher>Sega</publisher> <!-- Reprint was published by Sega Toys -->
+		<info name="serial" value="HPC-6017, HPC-6128 (10th Anniversary Reprint)"/>
+		<info name="release" value="1995xxxx, 20030714 (10th Anniversary Reprint)"/>
 		<info name="alt_title" value="それいけ! アンパンマン えいごとなかよし2 たのしいカーニバル"/>
 		<part name="cart" interface="pico_cart">
-			<feature name="pcb" value="171-6586A" />
-			<feature name="ic1" value="MPR-17522 J13" />
+			<feature name="pcb" value="171-6586A, 170-7090A (Reprint)" />
+			<feature name="ic1" value="MPR-17522 J13, Epoxy Block (Reprint)" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17522 j13.ic1" size="1048576" crc="1b28d597" sha1="b61bb5b7ef0572b50c806d4a7ea01f8db04f814d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>

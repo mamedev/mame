@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
 

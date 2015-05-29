@@ -1,10 +1,12 @@
+// license:BSD-3-Clause
+// copyright-holders:smf, R. Belmont
 /***************************************************************************
 
   Sony ZN1/ZN2 - Arcade PSX Hardware
   ==================================
   Driver by smf & R Belmont
   Board notes by The Guru
-  Thanks to Zinc Team, Amuse & Miguel Angel Horna
+  Thanks to Zinc Team, Peter Ferrie, Amuse & Miguel Angel Horna
 
 ***************************************************************************/
 

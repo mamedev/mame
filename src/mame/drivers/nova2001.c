@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Steph, Phil Stroffolino, Uki
 /******************************************************************************
 
 UPL "orthogonal palette" hardware
@@ -963,7 +965,7 @@ void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
 		temp[da] = src[sa];
 	}
 
-	memcpy(src, temp, length);
+	memcpy(src, &temp[0], length);
 }
 
 

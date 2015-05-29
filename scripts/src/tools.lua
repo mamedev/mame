@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 --------------------------------------------------
 -- romcmp
 --------------------------------------------------
@@ -10,8 +13,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -21,10 +29,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/romcmp.c",
@@ -42,8 +49,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -55,11 +67,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/chdman.c",
@@ -78,8 +89,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -89,10 +105,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/jedutil.c",
@@ -110,8 +125,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"dasm",
@@ -125,12 +145,11 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/unidasm.c",
@@ -149,8 +168,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -162,11 +186,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/ldresample.c",
@@ -184,8 +207,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -197,11 +225,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/ldverify.c",
@@ -219,8 +246,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -230,10 +262,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/regrep.c",
@@ -251,8 +282,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -262,10 +298,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/srcclean.c",
@@ -283,8 +318,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -294,10 +334,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/src2html.c",
@@ -315,8 +354,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -328,10 +372,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/split.c",
@@ -349,8 +392,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -360,10 +408,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/pngcmp.c",
@@ -381,8 +428,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -394,11 +446,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
-	MAME_DIR .. "src/emu",
+	MAME_DIR .. "src/emu/netlist",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/nltool.c",
@@ -418,8 +469,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"formats",
@@ -432,11 +488,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib",	
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/mess/tools/castool/main.c",
@@ -454,8 +509,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"formats",
@@ -469,11 +529,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib",	
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/mess/tools/floptool/main.c",
@@ -491,8 +550,13 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"formats",
@@ -506,13 +570,12 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib",	
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty/zlib",
 	MAME_DIR .. "src/mess/tools/imgtool",	
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/mess/tools/imgtool/main.c",
@@ -548,4 +611,3 @@ files {
 	MAME_DIR .. "src/mess/tools/imgtool/modules/bml3.c",
 	MAME_DIR .. "src/mess/tools/imgtool/modules/hp48.c",
 }
-

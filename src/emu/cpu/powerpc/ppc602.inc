@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 static void ppc_dsa(UINT32 op)
 {
 	UINT32 msr = ppc_get_msr();

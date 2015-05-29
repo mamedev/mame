@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Miguel Angel Horna
 /*
  * Sega System 32 Multi/Model 1/Model 2 custom PCM chip (315-5560) emulation.
  *
  * by Miguel Angel Horna (ElSemi) for Model 2 Emulator and MAME.
- * Information by R.Belmont and the YMF278B (OPL4) manual.
+ * Information by R. Belmont and the YMF278B (OPL4) manual.
  *
  * voice registers:
  * 0: Pan
@@ -35,7 +37,7 @@
 #include "multipcm.h"
 
 //????
-#define MULTIPCM_CLOCKDIV       (180.0)
+#define MULTIPCM_CLOCKDIV       (180.0f)
 
 ALLOW_SAVE_TYPE(STATE); // allow save_item on a non-fundamental type
 
@@ -156,10 +158,10 @@ void multipcm_device::EG_Calc(SLOT *slot)
 #define LFIX(v) ((unsigned int) ((float) (1<<LFO_SHIFT)*(v)))
 
 //Convert DB to multiply amplitude
-#define DB(v)   LFIX(pow(10.0,v/20.0))
+#define DB(v)   LFIX(powf(10.0f,v/20.0f))
 
 //Convert cents to step increment
-#define CENTS(v) LFIX(pow(2.0,v/1200.0))
+#define CENTS(v) LFIX(powf(2.0f,v/1200.0f))
 
 static int PLFO_TRI[256];
 static int ALFO_TRI[256];
@@ -200,12 +202,12 @@ static void LFO_Init(void)
 		float limit=PSCALE[s];
 		for(i=-128;i<128;++i)
 		{
-			PSCALES[s][i+128]=CENTS(((limit*(float) i)/128.0));
+			PSCALES[s][i+128]=CENTS(((limit*(float) i)/128.0f));
 		}
 		limit=-ASCALE[s];
 		for(i=0;i<256;++i)
 		{
-			ASCALES[s][i]=DB(((limit*(float) i)/256.0));
+			ASCALES[s][i]=DB(((limit*(float) i)/256.0f));
 		}
 	}
 }
@@ -230,7 +232,7 @@ INLINE signed int ALFO_Step(LFO_t *LFO)
 
 void multipcm_device::LFO_ComputeStep(LFO_t *LFO,UINT32 LFOF,UINT32 LFOS,int ALFO)
 {
-	float step=(float) LFOFreq[LFOF]*256.0/(float) m_Rate;
+	float step=(float) LFOFreq[LFOF]*256.0f/(float) m_Rate;
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
 	if(ALFO)
 	{
@@ -451,9 +453,9 @@ void multipcm_device::device_start()
 		unsigned char iTL=i&0x7f;
 		unsigned char iPAN=(i>>7)&0xf;
 
-		SegaDB=(float) iTL*(-24.0)/(float) 0x40;
+		SegaDB=(float) iTL*(-24.0f)/(float) 0x40;
 
-		TL=pow(10.0,SegaDB/20.0);
+		TL=powf(10.0f,SegaDB/20.0f);
 
 
 		if(iPAN==0x8)
@@ -470,9 +472,9 @@ void multipcm_device::device_start()
 
 			iPAN=0x10-iPAN;
 
-			SegaDB=(float) iPAN*(-12.0)/(float) 0x4;
+			SegaDB=(float) iPAN*(-12.0f)/(float) 0x4;
 
-			RPAN=pow(10.0,SegaDB/20.0);
+			RPAN=pow(10.0f,SegaDB/20.0f);
 
 			if((iPAN&0x7)==7)
 				RPAN=0.0;
@@ -481,14 +483,14 @@ void multipcm_device::device_start()
 		{
 			RPAN=1.0;
 
-			SegaDB=(float) iPAN*(-12.0)/(float) 0x4;
+			SegaDB=(float) iPAN*(-12.0f)/(float) 0x4;
 
-			LPAN=pow(10.0,SegaDB/20.0);
+			LPAN=pow(10.0f,SegaDB/20.0f);
 			if((iPAN&0x7)==7)
 				LPAN=0.0;
 		}
 
-		TL/=4.0;
+		TL/=4.0f;
 
 		LPANTABLE[i]=FIX((LPAN*TL));
 		RPANTABLE[i]=FIX((RPAN*TL));
@@ -497,7 +499,7 @@ void multipcm_device::device_start()
 	//Pitch steps
 	for(i=0;i<0x400;++i)
 	{
-		float fcent=m_Rate*(1024.0+(float) i)/1024.0;
+		float fcent=m_Rate*(1024.0f+(float) i)/1024.0f;
 		m_FNS_Table[i]=(unsigned int ) ((float) (1<<SHIFT) *fcent);
 	}
 
@@ -505,8 +507,8 @@ void multipcm_device::device_start()
 	for(i=0;i<0x40;++i)
 	{
 		//Times are based on 44100 clock, adjust to real chip clock
-		m_ARStep[i]=(float) (0x400<<EG_SHIFT)/(BaseTimes[i]*44100.0/(1000.0));
-		m_DRStep[i]=(float) (0x400<<EG_SHIFT)/(BaseTimes[i]*AR2DR*44100.0/(1000.0));
+		m_ARStep[i]=(float) (0x400<<EG_SHIFT)/(float)(BaseTimes[i]*44100.0/(1000.0));
+		m_DRStep[i]=(float) (0x400<<EG_SHIFT)/(float)(BaseTimes[i]*AR2DR*44100.0/(1000.0));
 	}
 	m_ARStep[0]=m_ARStep[1]=m_ARStep[2]=m_ARStep[3]=0;
 	m_ARStep[0x3f]=0x400<<EG_SHIFT;
@@ -514,15 +516,15 @@ void multipcm_device::device_start()
 
 	//TL Interpolation steps
 	//lower
-	TLSteps[0]=-(float) (0x80<<SHIFT)/(78.2*44100.0/1000.0);
+	TLSteps[0]=-(float) (0x80<<SHIFT)/(78.2f*44100.0f/1000.0f);
 	//raise
-	TLSteps[1]=(float) (0x80<<SHIFT)/(78.2*2*44100.0/1000.0);
+	TLSteps[1]=(float) (0x80<<SHIFT)/(78.2f*2*44100.0f/1000.0f);
 
 	//build the linear->exponential ramps
 	for(i=0;i<0x400;++i)
 	{
-		float db=-(96.0-(96.0*(float) i/(float) 0x400));
-		lin2expvol[i]=pow(10.0,db/20.0)*(float) (1<<SHIFT);
+		float db=-(96.0f-(96.0f*(float) i/(float) 0x400));
+		lin2expvol[i]=powf(10.0f,db/20.0f)*(float) (1<<SHIFT);
 	}
 
 

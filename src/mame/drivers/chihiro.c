@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Samuele Zannoli
 /*
 Chihiro is an Xbox-based arcade system from SEGA.
 
@@ -382,6 +384,11 @@ public:
 		driver_device(mconfig, type, tag),
 		nvidia_nv2a(NULL),
 		debug_irq_active(false),
+		debug_irq_number(0),
+		dimm_board_memory(NULL),
+		dimm_board_memory_size(0),
+		usbhack_index(-1),
+		usbhack_counter(0),
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ32_MEMBER(geforce_r);
@@ -467,6 +474,7 @@ public:
 	int debug_irq_number;
 	UINT8 *dimm_board_memory;
 	UINT32 dimm_board_memory_size;
+	int usbhack_index;
 	int usbhack_counter;
 	required_device<cpu_device> m_maincpu;
 };
@@ -1044,36 +1052,32 @@ static const char *const usbregnames[] = {
 };
 #endif
 
+static const struct {
+	const char *game_name;
+	struct {
+		UINT32 address;
+		UINT8 write_byte;
+	} modify[16];
+} hacks[2] = { { "chihiro", { { 0x6a79f, 0x01 }, { 0x6a7a0, 0x00 }, { 0x6b575, 0x00 }, { 0x6b576, 0x00 }, { 0x6b5af, 0x75 }, { 0x6b78a, 0x75 }, { 0x6b7ca, 0x00 }, { 0x6b7b8, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e, 0x74 }, { 0x79b80, 0x74 }, { 0x79b97, 0x74 }, { 0, 0 } } },
+				{ "outr2", { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } } };
+
 READ32_MEMBER(chihiro_state::usbctrl_r)
 {
-	if (offset == 0) { /* hack needed until usb (and jvs) is implemented */
-		if (usbhack_counter == 0) {
-			m_maincpu->space(0).write_byte(0x6a79f, 0x01);
-			m_maincpu->space(0).write_byte(0x6a7a0, 0x00);
-			m_maincpu->space(0).write_byte(0x6b575, 0x00);
-			m_maincpu->space(0).write_byte(0x6b576, 0x00);
-			m_maincpu->space(0).write_byte(0x6b5af, 0x75);
-			m_maincpu->space(0).write_byte(0x6b78a, 0x75);
-			m_maincpu->space(0).write_byte(0x6b7ca, 0x00);
-			m_maincpu->space(0).write_byte(0x6b7b8, 0x00);
-			m_maincpu->space(0).write_byte(0x8f5b2, 0x75);
-			m_maincpu->space(0).write_byte(0x79a9e, 0x74);
-			m_maincpu->space(0).write_byte(0x79b80, 0x74);
-			m_maincpu->space(0).write_byte(0x79b97, 0x74);
-		}
-		// after game loaded
-		if (usbhack_counter == 1) {
-			m_maincpu->space(0).write_byte(0x12e4cf, 0x01);
-			m_maincpu->space(0).write_byte(0x12e4d0, 0x00);
-			m_maincpu->space(0).write_byte(0x4793e, 0x01);
-			m_maincpu->space(0).write_byte(0x4793f, 0x00);
-			m_maincpu->space(0).write_byte(0x47aa3, 0x01);
-			m_maincpu->space(0).write_byte(0x47aa4, 0x00);
-			m_maincpu->space(0).write_byte(0x14f2b6, 0x84);
-			m_maincpu->space(0).write_byte(0x14f2d1, 0x75);
-			m_maincpu->space(0).write_byte(0x8732f, 0x7d);
-			m_maincpu->space(0).write_byte(0x87384, 0x7d);
-			m_maincpu->space(0).write_byte(0x87388, 0xeb);
+	int a, p;
+
+	if (offset == 0) { /* hacks needed until usb (and jvs) is implemented */
+		if (usbhack_counter == 0)
+			p = 0;
+		else if (usbhack_counter == 1) // after game loaded
+			p = usbhack_index;
+		else
+			p = -1;
+		if (p >= 0) {
+			for (a = 0; a < 16; a++) {
+				if (hacks[p].modify[a].address == 0)
+					break;
+				m_maincpu->space(0).write_byte(hacks[p].modify[a].address, hacks[p].modify[a].write_byte);
+			}
 		}
 		usbhack_counter++;
 	}
@@ -1177,9 +1181,9 @@ WRITE32_MEMBER(chihiro_state::audio_apu_w)
 	}
 	if (offset == 0x2037c / 4) { // value related to sample rate
 		INT16 v = (INT16)(data >> 16); // upper 16 bits as a signed 16 bit value
-		float vv = ((float)v) / 4096.0; // divide by 4096
+		float vv = ((float)v) / 4096.0f; // divide by 4096
 		float vvv = powf(2, vv); // two to the vv
-		int f = vvv*48000.0; // sample rate
+		int f = vvv*48000.0f; // sample rate
 		apust.voices_frequency[apust.voice_number] = f;
 		return;
 	}
@@ -1788,6 +1792,12 @@ void chihiro_state::machine_start()
 	apust.timer->enable(false);
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 		debug_console_register_command(machine(), "chihiro", CMDFLAG_NONE, 0, 1, 4, chihiro_debug_commands);
+	usbhack_index = -1;
+	for (int a = 1; a < 2; a++)
+		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
+			usbhack_index = a;
+			break;
+		}
 	usbhack_counter = 0;
 	// savestates
 	save_item(NAME(debug_irq_active));
@@ -1801,7 +1811,7 @@ void chihiro_state::machine_start()
 	save_item(NAME(smbusst.words));
 	save_item(NAME(pic16lc_buffer));
 	save_item(NAME(usbhack_counter));
-	nvidia_nv2a->start();
+	nvidia_nv2a->start(&m_maincpu->space());
 	nvidia_nv2a->savestate_items();
 }
 

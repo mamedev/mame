@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*
     (Some) Data East 32 bit 156 CPU ARM based games:
 
@@ -653,7 +655,7 @@ void deco156_state::descramble_sound( const char *tag )
 		buf1[addr] = rom[x];
 	}
 
-	memcpy(rom,buf1,length);
+	memcpy(rom,&buf1[0],length);
 }
 
 DRIVER_INIT_MEMBER(deco156_state,hvysmsh)

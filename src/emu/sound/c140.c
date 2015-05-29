@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
 C140.c
 
@@ -38,8 +40,8 @@ Unmapped registers:
 */
 /*
     2000.06.26  CAB     fixed compressed pcm playback
-    2002.07.20  R.Belmont   added support for multiple banking types
-    2006.01.08  R.Belmont   added support for NA-1/2 "219" derivative
+    2002.07.20  R. Belmont   added support for multiple banking types
+    2006.01.08  R. Belmont   added support for NA-1/2 "219" derivative
 */
 
 
@@ -152,7 +154,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	INT32   frequency,delta,offset,pos;
 	INT32   cnt, voicecnt;
 	INT32   lastdt,prevdt,dltdt;
-	float   pbase=(float)m_baserate*2.0 / (float)m_sample_rate;
+	float   pbase=(float)m_baserate*2.0f / (float)m_sample_rate;
 
 	INT16   *lmix, *rmix;
 

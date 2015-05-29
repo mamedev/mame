@@ -73,21 +73,20 @@
 NETLIB_DEVICE(7490,
 	ATTR_HOT void update_outputs();
 
-	netlist_ttl_input_t m_R1;
-	netlist_ttl_input_t m_R2;
-	netlist_ttl_input_t m_R91;
-	netlist_ttl_input_t m_R92;
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
+	netlist_logic_input_t m_R1;
+	netlist_logic_input_t m_R2;
+	netlist_logic_input_t m_R91;
+	netlist_logic_input_t m_R92;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
 
-	netlist_state_t<UINT8> m_cnt;
-	netlist_state_t<UINT8> m_last_A;
-	netlist_state_t<UINT8> m_last_B;
+	UINT8 m_cnt;
+	UINT8 m_last_A;
+	UINT8 m_last_B;
 
-	netlist_ttl_output_t m_Q[4];
+	netlist_logic_output_t m_Q[4];
 );
 
-NETLIB_DEVICE_DERIVED(7490_dip, 7490,
-);
+NETLIB_DEVICE_DERIVED_PURE(7490_dip, 7490);
 
 #endif /* NLD_7490_H_ */

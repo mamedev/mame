@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Martin Buchholz
 /***************************************************************************
 
   Poly-Play

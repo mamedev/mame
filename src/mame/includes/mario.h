@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni
 #ifndef MARIO_H_
 #define MARIO_H_
 

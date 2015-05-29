@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 #pragma once
 
 #ifndef __NUBUS_48GC_H__
@@ -45,7 +47,7 @@ public:
 		UINT32 m_registers[0x100];
 		int m_xres, m_yres;
 		bool m_is824;
-		astring m_assembled_tag;
+		std::string m_assembled_tag;
 };
 
 class nubus_48gc_device : public jmfb_device

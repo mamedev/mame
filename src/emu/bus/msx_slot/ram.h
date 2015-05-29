@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef __MSX_SLOT_RAM_H
 #define __MSX_SLOT_RAM_H
 
@@ -24,7 +26,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write);
 
 private:
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 };
 
 

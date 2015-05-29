@@ -80,7 +80,7 @@ public:
 		UINT32              m_input;            // target input index
 		UINT32              m_mixoutput;        // target mixer output
 		float               m_gain;             // gain
-		astring             m_target;           // target tag
+		std::string         m_target;           // target tag
 	};
 
 	// construction/destruction
@@ -146,7 +146,7 @@ protected:
 
 	// internal state
 	UINT8               m_outputs;              // number of outputs
-	dynamic_array<UINT8> m_outputmap;           // map of inputs to outputs
+	std::vector<UINT8>       m_outputmap;            // map of inputs to outputs
 	sound_stream *      m_mixer_stream;         // mixing stream
 };
 

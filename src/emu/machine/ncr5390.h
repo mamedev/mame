@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef NCR5390_H
 #define NCR5390_H
 
@@ -119,7 +121,7 @@ private:
 		ARB_TIMEOUT_ABORT,
 		ARB_DESKEW_WAIT,
 
-		// Send/recieve byte
+		// Send/receive byte
 		SEND_WAIT_SETTLE,
 		SEND_WAIT_REQ_0,
 		RECV_WAIT_REQ_1,

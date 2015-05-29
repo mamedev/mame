@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Zsolt Vasvari
 /*************************************************************************
 
     VIC Dual Game board
@@ -66,6 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(digger_io_w);
 	DECLARE_WRITE8_MEMBER(invho2_io_w);
 	DECLARE_WRITE8_MEMBER(invds_io_w);
+	DECLARE_WRITE8_MEMBER(carhntds_io_w);
 	DECLARE_WRITE8_MEMBER(sspacaho_io_w);
 	DECLARE_WRITE8_MEMBER(tranqgun_io_w);
 	DECLARE_WRITE8_MEMBER(spacetrk_io_w);

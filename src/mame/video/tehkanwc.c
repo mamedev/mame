@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Roberto Fresca
 /***************************************************************************
 
 Tehkan World Cup - (c) Tehkan 1985

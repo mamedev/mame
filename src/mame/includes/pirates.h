@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood,Nicola Salmoria,Paul Priest
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 

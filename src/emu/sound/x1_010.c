@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /***************************************************************************
 
                             -= Seta Hardware =-
@@ -214,7 +216,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				// Meta Fox does write the frequency register, but this is a hack to make it "work" with the current setup
 				// This is broken for Arbalester (it writes 8), but that'll be fixed later.
 				if( freq == 0 ) freq = 4;
-				smp_step = (UINT32)((float)m_base_clock/8192.0
+				smp_step = (UINT32)((float)m_base_clock/8192.0f
 							*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
 				if( smp_offs == 0 ) {
 					LOG_SOUND(( "Play sample %p - %p, channel %X volume %d:%d freq %X step %X offset %X\n",
@@ -237,11 +239,11 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				start    = (INT8 *)&(m_reg[reg->volume*128+0x1000]);
 				smp_offs = m_smp_offset[ch];
 				freq     = (reg->pitch_hi<<8)+reg->frequency;
-				smp_step = (UINT32)((float)m_base_clock/128.0/1024.0/4.0*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
+				smp_step = (UINT32)((float)m_base_clock/128.0f/1024.0f/4.0f*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
 
 				env      = (UINT8 *)&(m_reg[reg->end*128]);
 				env_offs = m_env_offset[ch];
-				env_step = (UINT32)((float)m_base_clock/128.0/1024.0/4.0*reg->start*(1<<ENV_BASE_BITS)/(float)m_rate);
+				env_step = (UINT32)((float)m_base_clock/128.0f/1024.0f/4.0f*reg->start*(1<<ENV_BASE_BITS)/(float)m_rate);
 				/* Print some more debug info */
 				if( smp_offs == 0 ) {
 					LOG_SOUND(( "Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",

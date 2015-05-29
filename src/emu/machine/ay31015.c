@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /****************************************************************************
 
     ay31015.c by Robbbert, May 2008. Bugs fixed by Judge.

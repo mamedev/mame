@@ -81,12 +81,12 @@ namespace tinystl {
 	{
 		const size_t nbuckets = (size_t)(other.m_buckets.last - other.m_buckets.first);
 		buffer_init<pointer, Alloc>(&m_buckets);
-		buffer_resize<pointer, Alloc>(&m_buckets, 9, 0);
+		buffer_resize<pointer, Alloc>(&m_buckets, nbuckets, 0);
 
-		for (pointer* it = *other.m_buckets.first; it; it = it->next) {
+		for (pointer it = *other.m_buckets.first; it; it = it->next) {
 			unordered_hash_node<Key, void>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_hash_node<Key, void>))) unordered_hash_node<Key, void>(*it);
 			newnode->next = newnode->prev = 0;
-			unordered_hash_node_insert(newnode, hash(*it), m_buckets.first, nbuckets - 1);
+			unordered_hash_node_insert(newnode, hash(it->first), m_buckets.first, nbuckets - 1);
 		}
 	}
 

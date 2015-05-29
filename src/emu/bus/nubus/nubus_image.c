@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   nubus_image.c - synthetic NuBus card to allow reading/writing "raw"
@@ -8,11 +10,21 @@
 
 #include "emu.h"
 #include "nubus_image.h"
+#include "osdcore.h"
 
 #define IMAGE_ROM_REGION    "image_rom"
 #define IMAGE_DISK0_TAG     "nb_disk"
 
 #define MESSIMG_DISK_SECTOR_SIZE (512)
+
+// on big-endian, these are NOPs.  (TODO: hey, where did WORDS_BIGENDIAN go since the GENie transition?!)
+#if defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
+static UINT32 ni_htonl(UINT32 x) { return x; }
+static UINT32 ni_ntohl(UINT32 x) { return x; }
+#else
+static UINT32 ni_htonl(UINT32 x) { return FLIPENDIAN_INT32(x); }
+static UINT32 ni_ntohl(UINT32 x) { return FLIPENDIAN_INT32(x); }
+#endif
 
 
 // messimg_disk_image_device
@@ -193,9 +205,16 @@ void nubus_image_device::device_start()
 
 	m_nubus->install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_image_device::image_r), this), write32_delegate(FUNC(nubus_image_device::image_w), this));
 	m_nubus->install_device(slotspace+4, slotspace+7, read32_delegate(FUNC(nubus_image_device::image_status_r), this), write32_delegate(FUNC(nubus_image_device::image_status_w), this));
+	m_nubus->install_device(slotspace+8, slotspace+11, read32_delegate(FUNC(nubus_image_device::file_cmd_r), this), write32_delegate(FUNC(nubus_image_device::file_cmd_w), this));
+	m_nubus->install_device(slotspace+12, slotspace+15, read32_delegate(FUNC(nubus_image_device::file_data_r), this), write32_delegate(FUNC(nubus_image_device::file_data_w), this));
+	m_nubus->install_device(slotspace+16, slotspace+19, read32_delegate(FUNC(nubus_image_device::file_len_r), this), write32_delegate(FUNC(nubus_image_device::file_len_w), this));
+	m_nubus->install_device(slotspace+20, slotspace+147, read32_delegate(FUNC(nubus_image_device::file_name_r), this), write32_delegate(FUNC(nubus_image_device::file_name_w), this));
 	m_nubus->install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32_delegate(FUNC(nubus_image_device::image_super_r), this), write32_delegate(FUNC(nubus_image_device::image_super_w), this));
 
 	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
+
+	filectx.curdir[0] = '.';
+	filectx.curdir[1] = '\0';
 }
 
 //-------------------------------------------------
@@ -246,4 +265,117 @@ READ32_MEMBER( nubus_image_device::image_super_r )
 	UINT32 *image = (UINT32*)m_image->m_data;
 	UINT32 data = image[offset];
 	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+}
+
+WRITE32_MEMBER( nubus_image_device::file_cmd_w )
+{
+	const osd_directory_entry *dp = NULL;
+	char fullpath[1024];
+	UINT64 filesize;
+
+//  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+	filectx.curcmd = data;
+	switch(data) {
+	case kFileCmdGetDir:
+		strcpy((char*)filectx.filename, (char*)filectx.curdir);
+		break;
+	case kFileCmdSetDir:
+		if(filectx.filename[0] == '/') {
+			strcpy((char*)filectx.curdir, (char*)filectx.filename);
+		} else {
+			strcat((char*)filectx.curdir, "/");
+			strcat((char*)filectx.curdir, (char*)filectx.filename);
+		}
+		break;
+	case kFileCmdGetFirstListing:
+		if(filectx.dirp) osd_closedir(filectx.dirp);
+		filectx.dirp = osd_opendir((const char *)filectx.curdir);
+	case kFileCmdGetNextListing:
+		dp = osd_readdir(filectx.dirp);
+		if(dp) {
+			strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
+		} else {
+			memset(filectx.filename, 0, sizeof(filectx.filename));
+		}
+		break;
+	case kFileCmdGetFile:
+		memset(fullpath, 0, sizeof(fullpath));
+		strcpy(fullpath, (const char *)filectx.curdir);
+		strcat(fullpath, "/");
+		strcat(fullpath, (const char*)filectx.filename);
+		if(osd_open((const char*)fullpath, OPEN_FLAG_READ, &filectx.fd, &filectx.filelen) != FILERR_NONE) printf("Error opening %s\n", fullpath);
+		filectx.bytecount = 0;
+		break;
+	case kFileCmdPutFile:
+		memset(fullpath, 0, sizeof(fullpath));
+		strcpy(fullpath, (const char *)filectx.curdir);
+		strcat(fullpath, "/");
+		strcat(fullpath, (const char*)filectx.filename);
+		if(osd_open((const char*)fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, &filectx.fd, &filesize) != FILERR_NONE) printf("Error opening %s\n", fullpath);
+		filectx.bytecount = 0;
+		break;
+	}
+}
+
+READ32_MEMBER( nubus_image_device::file_cmd_r )
+{
+	return 0;
+}
+
+WRITE32_MEMBER( nubus_image_device::file_data_w )
+{
+	UINT32 count = 4;
+	UINT32 actualcount = 0;
+
+	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+	if(filectx.fd != NULL) {
+		//data = ni_ntohl(data);
+		if((filectx.bytecount + count) > filectx.filelen) count = filectx.filelen - filectx.bytecount;
+		osd_write(filectx.fd, &data, filectx.bytecount, count, &actualcount);
+		filectx.bytecount += actualcount;
+
+		if(filectx.bytecount >= filectx.filelen) {
+			osd_close(filectx.fd);
+			filectx.fd = NULL;
+		}
+	}
+}
+
+READ32_MEMBER( nubus_image_device::file_data_r )
+{
+	if(filectx.fd != NULL) {
+		UINT32 ret;
+		UINT32 actual = 0;
+		osd_read(filectx.fd, &ret, filectx.bytecount, sizeof(ret), &actual);
+		filectx.bytecount += actual;
+		if(actual < sizeof(ret)) {
+			osd_close(filectx.fd);
+			filectx.fd = NULL;
+		}
+		return ni_htonl(ret);
+	}
+	return 0;
+}
+
+WRITE32_MEMBER( nubus_image_device::file_len_w )
+{
+	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+	filectx.filelen = ni_ntohl(data);
+}
+
+READ32_MEMBER( nubus_image_device::file_len_r )
+{
+	return filectx.filelen;
+}
+
+WRITE32_MEMBER( nubus_image_device::file_name_w )
+{
+	((UINT32*)(filectx.filename))[offset] = ni_ntohl(data);
+}
+
+READ32_MEMBER( nubus_image_device::file_name_r )
+{
+	UINT32 ret;
+	ret = ni_htonl(((UINT32*)(filectx.filename))[offset]);
+	return ret;
 }

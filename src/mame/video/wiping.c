@@ -1,6 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Allard van der Bas
 /***************************************************************************
 
-  video.c
+  wiping.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -77,13 +79,13 @@ PALETTE_INIT_MEMBER(wiping_state, wiping)
 
 
 
-WRITE8_MEMBER(wiping_state::wiping_flipscreen_w)
+WRITE8_MEMBER(wiping_state::flipscreen_w)
 {
 	m_flipscreen = (data & 1);
 }
 
 
-UINT32 wiping_state::screen_update_wiping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 wiping_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
 	int offs;

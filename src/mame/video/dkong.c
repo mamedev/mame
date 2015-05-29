@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /***************************************************************************
 
   video.c
@@ -199,11 +201,11 @@ static const res_net_info radarscp_grid_net_info =
 PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 	int i;
 
 	compute_res_net_all(rgb, color_prom, dkong_decode_info, dkong_net_info);
-	palette.set_pen_colors(0, rgb, 256);
+	palette.set_pen_colors(0, rgb);
 
 	/* Now treat tri-state black background generation */
 
@@ -428,10 +430,10 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 PALETTE_INIT_MEMBER(dkong_state,dkong3)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, dkong3_decode_info, dkong3_net_info);
-	palette.set_pen_colors(0, rgb, 256);
+	palette.set_pen_colors(0, rgb);
 	palette.palette()->normalize_range(0, 255);
 
 	color_prom += 1024;
@@ -735,7 +737,7 @@ void dkong_state::radarscp_step(int line_cnt)
 	// Solve the amplifier by iteration
 	for (int j=1; j<=11; j++)// 11% = 1/75 / (1/75+1/10)
 	{
-		double f = (double) j / 100.0f;
+		double f = (double) j / 100.0;
 		m_vg1 = (m_cv1 - m_cv2)*(1-f) + f * m_vg2;
 		m_vg2 = 5*CD4049(m_vg1/5);
 	}
@@ -743,8 +745,8 @@ void dkong_state::radarscp_step(int line_cnt)
 	// Solve the amplifier by iteration 50% = both resistors equal
 	for (int j=10; j<=20; j++)
 	{
-		double f = (double) j / 40.0f;
-		vg3i = (1.0f-f) * m_vg2 + f * m_vg3;
+		double f = (double) j / 40.0;
+		vg3i = (1.0-f) * m_vg2 + f * m_vg3;
 		m_vg3 = 5*CD4049(vg3i/5);
 	}
 

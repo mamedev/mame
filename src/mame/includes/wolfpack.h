@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Stefan Jokisch
 #include "sound/s14001a.h"
 
 class wolfpack_state : public driver_device

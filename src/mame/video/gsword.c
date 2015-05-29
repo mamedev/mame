@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steve Ellenoff,Jarek Parchanski
 /***************************************************************************
   Great Swordsman
 

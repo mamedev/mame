@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/nes_apu.h"

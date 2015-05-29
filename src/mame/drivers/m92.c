@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*****************************************************************************
 
     Irem M92 system games:
@@ -828,9 +830,6 @@ static INPUT_PORTS_START( gunforc2 )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(      0x0000, "15000 35000 75000 120000" )
-	PORT_DIPSETTING(      0x0010, "20000 40000 90000 150000" )
 INPUT_PORTS_END
 
 

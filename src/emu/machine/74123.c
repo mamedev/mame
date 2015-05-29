@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /*****************************************************************************
 
     74123 monoflop emulator - see 74123.h for pin out and truth table

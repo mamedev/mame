@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves, R. Belmont
 
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"

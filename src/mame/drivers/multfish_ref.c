@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 /* The following sets are known to exist based on official documentation, but have not been dumped. */
 /* no other official sets are known to exist apart from these and the ones in multfish.c */

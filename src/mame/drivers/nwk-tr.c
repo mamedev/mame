@@ -1,31 +1,33 @@
-	/*  Konami NWK-TR System
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
+/*  Konami NWK-TR System
 
-	Driver by Ville Linde
+    Driver by Ville Linde
 
 
 
-	Hardware overview:
+    Hardware overview:
 
-	GN676 CPU Board:
-	----------------
-	    IBM PowerPC 403GA at 32MHz (main CPU)
-	    Motorola MC68EC000 at 16MHz (sound CPU)
-	    Konami K056800 (MIRAC), sound system interface
-	    Ricoh RF5c400 sound chip
-	    National Semiconductor ADC12138
+    GN676 CPU Board:
+    ----------------
+        IBM PowerPC 403GA at 32MHz (main CPU)
+        Motorola MC68EC000 at 16MHz (sound CPU)
+        Konami K056800 (MIRAC), sound system interface
+        Ricoh RF5c400 sound chip
+        National Semiconductor ADC12138
 
-	GN676 GFX Board:
-	----------------
-	    Analog Devices ADSP-21062 SHARC DSP at 36MHz
-	    Konami K001604 (2D tilemaps + 2x ROZ)
-	    Konami 0000033906 (PCI bridge)
-	    3DFX 500-0003-03 (Voodoo) FBI with 2MB RAM
-	    2x 3DFX 500-0004-02 (Voodoo) TMU with 2MB RAM
+    GN676 GFX Board:
+    ----------------
+        Analog Devices ADSP-21062 SHARC DSP at 36MHz
+        Konami K001604 (2D tilemaps + 2x ROZ)
+        Konami 0000033906 (PCI bridge)
+        3DFX 500-0003-03 (Voodoo) FBI with 2MB RAM
+        2x 3DFX 500-0004-02 (Voodoo) TMU with 2MB RAM
 
-	GN676 LAN Board:
-	----------------
-	    Xilinx XC5210 FPGA
-	    Xilinx XC5204 FPGA
+    GN676 LAN Board:
+    ----------------
+        Xilinx XC5210 FPGA
+        Xilinx XC5204 FPGA
 
 
 Konami 'NWK-TR' Hardware
@@ -88,56 +90,56 @@ Konami 1997
 |M48T58Y-70PC1  CN4          DSW(8) CN6               64.000MHz|
 |--------------------------------------------------------------|
 Notes:
-	  DRM1M4SJ8 - Fujitsu 81C4256 256kx4 DRAM (SOJ24)
-	   SRAM256K - Cypress CY7C199 32kx8 SRAM (SOJ28)
-	  DRAM16X16 - Fujitsu 8118160A-60 16megx16 DRAM (SOJ42)
-	  M48T58Y-70PC1 - ST Timekeeper RAM
-	    RF5C400 - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.9344MHz
-	     056800 - Konami Custom (QFP80)
-	     058232 - Konami Custom Ceramic Package (SIL14)
-	   ADC12138 - National Semiconductor ADC12138 A/D Converter, 12-bit + Serial I/O With MUX (SOP28)
-	    MACH111 - AMD MACH111 CPLD (Stamped 'N676A1', PLCC44)
-	    68EC000 - Motorola MC68EC000, running at 16.0MHz (64/4)
-	   PPC403GA - IBM PowerPC 403GA CPU, clock input 32.0MHz (64/2) (QFP160)
-	   SM5877AM - Nippon Precision Circuits 3rd Order 2-Channel D/A Converter (SOIC24)
-	      4AK16 - Hitachi 4AK16 Silicon N-Channel Power MOS FET Array (SIL10)
-	   NE5532AN - Philips, Dual Low-Noise High-Speed Audio OP Amp (DIP8)
-	    SP485CS - Sipex SP485CS Low Power Half Duplex RS485 Transceiver (DIP8)
-	    AN7395S - Panasonic AM7395S Spatializer Audio Processor IC for 3D surround (SOIC20)
-	       PAL1 - AMD PALCE16V8 (stamped 'N676A4', DIP20)
-	       PAL2 - AMD PALCE16V8 (stamped 'N676A2', DIP20)
-	       PAL3 - AMD PALCE16V8 (stamped 'N676A3', DIP20)
-	       PAL4 - AMD PALCE16V8 (stamped 'N676A5', DIP20)
-	        JP1 -       25M O O-O 32M
-	        JP2 -       25M O O-O 32M
-	        JP3 -        RW O O O RO
-	        JP4 - PROG  32M O O-O 16M
-	        JP5 - DATA  32M O-O O 16M
-	        JP6 - BOOT   16 O-O O 32
-	        JP7 - SRC DOUT2 O O-O 0
-	        JP8 -   64M&32M O-O O 16M
-	        JP9 -       64M O O-O 32M&16M
-	       JP10 -   64M&32M O-O O 16M
-	       JP11 -       64M O O-O 32M&16M
-	       JP12 -   through O-O O SP
-	       JP13 -   through O-O O SP
-	       JP14 -       WDT O O
-	       JP15 -      MONO O-O O SURR
-	       JP16 -      HIGH O O O MID (N/C LOW)
-	CN1 to  CN3 - D-SUB Connectors
-	        CN4 - Multi-pin Connector for Network PCB
-	        CN5 - DIN96 connector (pads only, not used)
-	        CN6 - DIN96 joining connector to lower PCB
-	        CN7 - Multi-pin connector (pads only, not used)
-	CN9 to CN13 - Power Connectors
-	   CN14 to CN17 - RCA Stereo Audio OUT
-	       CN18 - RCA Mono Audio OUT
-	       CN19 - USB Connector
+      DRM1M4SJ8 - Fujitsu 81C4256 256kx4 DRAM (SOJ24)
+       SRAM256K - Cypress CY7C199 32kx8 SRAM (SOJ28)
+      DRAM16X16 - Fujitsu 8118160A-60 16megx16 DRAM (SOJ42)
+      M48T58Y-70PC1 - ST Timekeeper RAM
+        RF5C400 - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.9344MHz
+         056800 - Konami Custom (QFP80)
+         058232 - Konami Custom Ceramic Package (SIL14)
+       ADC12138 - National Semiconductor ADC12138 A/D Converter, 12-bit + Serial I/O With MUX (SOP28)
+        MACH111 - AMD MACH111 CPLD (Stamped 'N676A1', PLCC44)
+        68EC000 - Motorola MC68EC000, running at 16.0MHz (64/4)
+       PPC403GA - IBM PowerPC 403GA CPU, clock input 32.0MHz (64/2) (QFP160)
+       SM5877AM - Nippon Precision Circuits 3rd Order 2-Channel D/A Converter (SOIC24)
+          4AK16 - Hitachi 4AK16 Silicon N-Channel Power MOS FET Array (SIL10)
+       NE5532AN - Philips, Dual Low-Noise High-Speed Audio OP Amp (DIP8)
+        SP485CS - Sipex SP485CS Low Power Half Duplex RS485 Transceiver (DIP8)
+        AN7395S - Panasonic AM7395S Spatializer Audio Processor IC for 3D surround (SOIC20)
+           PAL1 - AMD PALCE16V8 (stamped 'N676A4', DIP20)
+           PAL2 - AMD PALCE16V8 (stamped 'N676A2', DIP20)
+           PAL3 - AMD PALCE16V8 (stamped 'N676A3', DIP20)
+           PAL4 - AMD PALCE16V8 (stamped 'N676A5', DIP20)
+            JP1 -       25M O O-O 32M
+            JP2 -       25M O O-O 32M
+            JP3 -        RW O O O RO
+            JP4 - PROG  32M O O-O 16M
+            JP5 - DATA  32M O-O O 16M
+            JP6 - BOOT   16 O-O O 32
+            JP7 - SRC DOUT2 O O-O 0
+            JP8 -   64M&32M O-O O 16M
+            JP9 -       64M O O-O 32M&16M
+           JP10 -   64M&32M O-O O 16M
+           JP11 -       64M O O-O 32M&16M
+           JP12 -   through O-O O SP
+           JP13 -   through O-O O SP
+           JP14 -       WDT O O
+           JP15 -      MONO O-O O SURR
+           JP16 -      HIGH O O O MID (N/C LOW)
+    CN1 to  CN3 - D-SUB Connectors
+            CN4 - Multi-pin Connector for Network PCB
+            CN5 - DIN96 connector (pads only, not used)
+            CN6 - DIN96 joining connector to lower PCB
+            CN7 - Multi-pin connector (pads only, not used)
+    CN9 to CN13 - Power Connectors
+       CN14 to CN17 - RCA Stereo Audio OUT
+           CN18 - RCA Mono Audio OUT
+           CN19 - USB Connector
 
 
 ROM Usage
 ---------
-	      |------------------------------- ROM Locations -------------------------------------|
+          |------------------------------- ROM Locations -------------------------------------|
 Game         27P     25P  22P   16P     14P     12P     9P      16T     14T     12T     9T  7S
 --------------------------------------------------------------------------------------------------
 Racing Jam   676NC01 -    -     676A09  676A10  -       -       676A04  676A05  -       -   676A08
@@ -161,18 +163,18 @@ sticker - GC713AC
 |         CN1            |
 |------------------------|
 Notes:
-	  CN1      - Connector joining to CPU board CN4
-	  CN2/3    - RCA jacks for network cable
-	  2G       - Small SOIC8 chip with number 0038323 at location 2G. An identical chip is present on
-	             *some* Hornet games on the GN715 CPU board at location 30C. It may be a PIC or EEPROM.
-	             On Hornet, the chip seems to refresh the data in the Timekeeper RAM when the battery
-	             dies and keeps the game working. It's purpose on the network board is unknown but it may
-	             'upgrade' the data in the NVRAM to the network version of the game for a twin cabinet set-up.
-	  HYC2485S - Hybrid ceramic module for RS485
-	  CY7C199  - 32k x8 SRAM
-	  XC5204   - Xilinx XC5204 FPGA
-	  XC5210   - Xilink XC5210 FPGA
-	  N676H1   - PALCE16V8Q-15 stamped 'N676H1'
+      CN1      - Connector joining to CPU board CN4
+      CN2/3    - RCA jacks for network cable
+      2G       - Small SOIC8 chip with number 0038323 at location 2G. An identical chip is present on
+                 *some* Hornet games on the GN715 CPU board at location 30C. It may be a PIC or EEPROM.
+                 On Hornet, the chip seems to refresh the data in the Timekeeper RAM when the battery
+                 dies and keeps the game working. It's purpose on the network board is unknown but it may
+                 'upgrade' the data in the NVRAM to the network version of the game for a twin cabinet set-up.
+      HYC2485S - Hybrid ceramic module for RS485
+      CY7C199  - 32k x8 SRAM
+      XC5204   - Xilinx XC5204 FPGA
+      XC5210   - Xilink XC5210 FPGA
+      N676H1   - PALCE16V8Q-15 stamped 'N676H1'
 
 
 Bottom Board (VIDEO PCB)
@@ -209,34 +211,34 @@ GN676 PWB(B)B
 |         256KSRAM 256KSRAM              JP2   CN1                   PAL2                   |
 |-------------------------------------------------------------------------------------------|
 Notes:
-	  4M_EDO - Silicon Magic SM81C256K16CJ-35 EDO DRAM 66MHz (SOJ40)
-	  1MSRAM - Cypress CY7C109-25VC 1Meg SRAM (SOJ32)
-	256KSRAM - Winbond W24257AJ-15 256k SRAM (SOJ28)
-	 TEXELFX - 3DFX 500-0004-02 BD0665.1 TMU (QFP208)
-	 PIXELFX - 3DFX 500-0003-03 F001701.1 FBI (QFP240)
-	  001604 - Konami Custom (QFP208)
-	   MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
-	 MACH111 - AMD MACH111 CPLD (Stamped '03161A', PLCC44)
-	PLCC44_SOCKET - empty PLCC44 socket
-	  AV9170 - Integrated Circuit Systems Inc. Clock Multiplier (SOIC8)
-	  AM7201 - AMD AM7201 FIFO (PLCC32)
-	    PAL1 - AMD PALCE16V8 (stamped 'N676B4', DIP20)
-	    PAL2 - AMD PALCE16V8 (stamped 'N676B5', DIP20)
-	    PAL3 - AMD PALCE16V8 (stamped 'N676B2', DIP20)
-	     JP1 - SLV O O-O MST,TWN (sets board to MASTER TWIN or SLAVE)
-	     JP2 - SLV O O-O MST (sets board to MASTER or SLAVE)
-	     CN1 - 96 Pin joining connector to upper PCB
-	     CN2 - 8-Pin 24kHz RGB OUT
-	     CN3 - 15-Pin DSUB VGA Video MAIN OUT
-	     CN4 - 6-Pin Power Connector
-	     CN5 - 4-Pin Power Connector
-	     CN6 - 2-Pin Connector (Not Used)
-	     CN7 - 6-Pin Connector
+      4M_EDO - Silicon Magic SM81C256K16CJ-35 EDO DRAM 66MHz (SOJ40)
+      1MSRAM - Cypress CY7C109-25VC 1Meg SRAM (SOJ32)
+    256KSRAM - Winbond W24257AJ-15 256k SRAM (SOJ28)
+     TEXELFX - 3DFX 500-0004-02 BD0665.1 TMU (QFP208)
+     PIXELFX - 3DFX 500-0003-03 F001701.1 FBI (QFP240)
+      001604 - Konami Custom (QFP208)
+       MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
+     MACH111 - AMD MACH111 CPLD (Stamped '03161A', PLCC44)
+    PLCC44_SOCKET - empty PLCC44 socket
+      AV9170 - Integrated Circuit Systems Inc. Clock Multiplier (SOIC8)
+      AM7201 - AMD AM7201 FIFO (PLCC32)
+        PAL1 - AMD PALCE16V8 (stamped 'N676B4', DIP20)
+        PAL2 - AMD PALCE16V8 (stamped 'N676B5', DIP20)
+        PAL3 - AMD PALCE16V8 (stamped 'N676B2', DIP20)
+         JP1 - SLV O O-O MST,TWN (sets board to MASTER TWIN or SLAVE)
+         JP2 - SLV O O-O MST (sets board to MASTER or SLAVE)
+         CN1 - 96 Pin joining connector to upper PCB
+         CN2 - 8-Pin 24kHz RGB OUT
+         CN3 - 15-Pin DSUB VGA Video MAIN OUT
+         CN4 - 6-Pin Power Connector
+         CN5 - 4-Pin Power Connector
+         CN6 - 2-Pin Connector (Not Used)
+         CN7 - 6-Pin Connector
 
 
 ROM Usage
 ---------
-	      |------ ROM Locations -------|
+          |------ ROM Locations -------|
 Game         8X      8Y      16X     16Y
 -------------------------------------------
 Racing Jam   676A13  -       676A14  -

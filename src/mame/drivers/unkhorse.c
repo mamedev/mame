@@ -46,7 +46,7 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_out);
-	
+
 	virtual void machine_start();
 	DECLARE_PALETTE_INIT(horse);
 

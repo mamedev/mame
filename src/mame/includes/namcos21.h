@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /**
  * @file namcos21.h
  */
@@ -25,7 +27,7 @@ struct dsp_state
 	int slaveActive;
 };
 
-struct vertex
+struct n21_vertex
 {
 	double x,y;
 	double z;
@@ -171,7 +173,7 @@ public:
 	void clear_poly_framebuffer();
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
 	void renderscanline_flat(const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable);
-	void rendertri(const vertex *v0, const vertex *v1, const vertex *v2, unsigned color, int depthcueenable);
+	void rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, int depthcueenable);
 	void draw_quad(int sx[4], int sy[4], int zcode[4], int color);
 	INT32 read_pointrom_data(unsigned offset);
 	void transmit_word_to_slave(UINT16 data);

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #define NO_MEM_TRACKING
 
 #include "deviceinformationwindow.h"
@@ -114,14 +116,14 @@ void DeviceInformationWindowQtConfig::applyToQWidget(QWidget* widget)
 {
 	WindowQtConfig::applyToQWidget(widget);
 	DeviceInformationWindow* window = dynamic_cast<DeviceInformationWindow*>(widget);
-	window->set_device(m_device_tag.cstr());
+	window->set_device(m_device_tag.c_str());
 }
 
 
 void DeviceInformationWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute(node, "device-tag", m_device_tag);
+	xml_set_attribute(node, "device-tag", m_device_tag.c_str());
 }
 
 

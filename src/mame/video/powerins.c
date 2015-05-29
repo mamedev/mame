@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /***************************************************************************
 
                           -= Power Instinct =-
@@ -168,7 +170,7 @@ void powerins_state::video_start()
 	m_tilemap_1->set_scroll_rows(1);
 	m_tilemap_1->set_scroll_cols(1);
 	m_tilemap_1->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_tile_bank));
 }
 

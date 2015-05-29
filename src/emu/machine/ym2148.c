@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /**************************************************************************
 
   Yamaha YM-2148 emulation

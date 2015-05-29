@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:BUT
 
 
 #define MCU_INITIAL_SEED    0x81

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 #include "machine/eepromser.h"
 
 class xorworld_state : public driver_device

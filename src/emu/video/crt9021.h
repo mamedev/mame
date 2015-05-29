@@ -4,9 +4,6 @@
 
     SMC CRT9021 Video Attributes Controller (VAC) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                     D0   1 |*    \_/     | 28  D1

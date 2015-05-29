@@ -4,9 +4,6 @@
 
     Intel 8212 8-Bit Input/Output Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                   _DS1   1 |*    \_/     | 24  Vcc

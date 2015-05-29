@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, Enik Land
 /*********************************************************************
 
     sega315_5124.c
@@ -112,23 +114,24 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 		int b = (i & 0x30) >> 4;
 		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
+	/* sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette */
 	/* TMS9918 palette */
-	palette.set_pen_color(64+ 0,   0,   0,   0);
-	palette.set_pen_color(64+ 1,   0,   0,   0);
-	palette.set_pen_color(64+ 2,  33, 200,  66);
-	palette.set_pen_color(64+ 3,  94, 220, 120);
-	palette.set_pen_color(64+ 4,  84,  85, 237);
-	palette.set_pen_color(64+ 5, 125, 118, 252);
-	palette.set_pen_color(64+ 6, 212,  82,  77);
-	palette.set_pen_color(64+ 7,  66, 235, 245);
-	palette.set_pen_color(64+ 8, 252,  85,  84);
-	palette.set_pen_color(64+ 9, 255, 121, 120);
-	palette.set_pen_color(64+10, 212, 193,  84);
-	palette.set_pen_color(64+11, 230, 206, 128);
-	palette.set_pen_color(64+12,  33, 176,  59);
-	palette.set_pen_color(64+13, 201,  91, 186);
-	palette.set_pen_color(64+14, 204, 204, 204);
-	palette.set_pen_color(64+15, 255, 255, 255);
+	palette.set_pen_color(64+ 0,   0,   0,   0); // palette.set_pen_color(64+ 0,   0,   0,   0);
+	palette.set_pen_color(64+ 1,   0,   0,   0); // palette.set_pen_color(64+ 1,   0,   0,   0);
+	palette.set_pen_color(64+ 2,   0, 170,   0); // palette.set_pen_color(64+ 2,  33, 200,  66);
+	palette.set_pen_color(64+ 3,   0, 255,   0); // palette.set_pen_color(64+ 3,  94, 220, 120);
+	palette.set_pen_color(64+ 4,   0,   0,  85); // palette.set_pen_color(64+ 4,  84,  85, 237);
+	palette.set_pen_color(64+ 5,   0,   0, 255); // palette.set_pen_color(64+ 5, 125, 118, 252);
+	palette.set_pen_color(64+ 6,  85,   0,   0); // palette.set_pen_color(64+ 6, 212,  82,  77);
+	palette.set_pen_color(64+ 7,   0, 255, 255); // palette.set_pen_color(64+ 7,  66, 235, 245);
+	palette.set_pen_color(64+ 8, 170,   0,   0); // palette.set_pen_color(64+ 8, 252,  85,  84);
+	palette.set_pen_color(64+ 9, 255,   0,   0); // palette.set_pen_color(64+ 9, 255, 121, 120);
+	palette.set_pen_color(64+10,  85,  85,   0); // palette.set_pen_color(64+10, 212, 193,  84);
+	palette.set_pen_color(64+11, 255, 255,   0); // palette.set_pen_color(64+11, 230, 206, 128);
+	palette.set_pen_color(64+12,   0,  85,   0); // palette.set_pen_color(64+12,  33, 176,  59);
+	palette.set_pen_color(64+13, 255,   0, 255); // palette.set_pen_color(64+13, 201,  91, 186);
+	palette.set_pen_color(64+14,  85,  85,  85); // palette.set_pen_color(64+14, 204, 204, 204);
+	palette.set_pen_color(64+15, 255, 255, 255); // palette.set_pen_color(64+15, 255, 255, 255);
 }
 
 
@@ -562,7 +565,7 @@ void sega315_5124_device::check_pending_flags()
 	/* A timer ensures that this function will run at least at end of each line.
 	   When this function runs through a CPU instruction executed when the timer
 	   was about to fire, the time added in the CPU timeslice may make hpos()
-	   return some position in the begining of next line. To ensure the instruction
+	   return some position in the beginning of next line. To ensure the instruction
 	   will get updated status, here a maximum hpos is set if the timer reports no
 	   remaining time, what could also occur due to the ahead time of the timeslice. */
 	if (m_pending_flags_timer->remaining() == attotime::zero)
@@ -712,7 +715,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 				//
 				// For VINT disabling through register 01:
 				// When running eagles5 on the smskr driver the irq_state is 1 because of some
-				// previos HINTs that occured. eagles5 sets register 01 to 0x02 and expects
+				// previos HINTs that occurred. eagles5 sets register 01 to 0x02 and expects
 				// the irq state to be cleared after that.
 				// The following bit of code takes care of that.
 				//
@@ -1573,8 +1576,6 @@ void sega315_5124_device::device_start()
 	m_pause_cb.resolve();
 
 	/* Allocate video RAM */
-	astring tempstring;
-
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
 
 	/* Make temp bitmap for rendering */

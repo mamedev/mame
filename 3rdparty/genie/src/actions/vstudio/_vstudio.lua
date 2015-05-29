@@ -17,6 +17,7 @@
 		vs2015 = "v140"
 	}
 	premake.vstudio.toolset = toolsets[_ACTION] or "unknown?"
+	premake.vstudio.splashpath = ''
 
 	local vstudio = premake.vstudio
 
@@ -35,7 +36,8 @@
 		x64     = "x64",
 		PS3     = "PS3",
 		Xbox360 = "Xbox 360",
-		ARM     = "ARM"
+		ARM     = "ARM",
+		Orbis	= "Orbis"
 	}
 
 
@@ -51,6 +53,12 @@
 		else
 			return "Win32"
 		end
+	end
+
+
+
+	function vstudio.iswinrt()
+		return vstudio.storeapp ~= nil and vstudio.storeapp ~= ''
 	end
 
 

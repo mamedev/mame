@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood,Nicola Salmoria,Paul Priest
 #include "emu.h"
 #include "includes/pirates.h"
 

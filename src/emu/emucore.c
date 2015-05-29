@@ -1,13 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
     emucore.c
 
     Simple core functions that are defined in emucore.h and which may
     need to be accessed by other MAME-related tools.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -25,7 +23,7 @@ emu_fatalerror::emu_fatalerror(const char *format, ...)
 	{
 		va_list ap;
 		va_start(ap, format);
-		vsprintf(text, format, ap);
+		vsnprintf(text, sizeof(text), format, ap);
 		va_end(ap);
 	}
 	osd_break_into_debugger(text);
@@ -40,7 +38,7 @@ emu_fatalerror::emu_fatalerror(const char *format, va_list ap)
 	}
 	else
 	{
-		vsprintf(text, format, ap);
+		vsnprintf(text, sizeof(text), format, ap);
 	}
 	osd_break_into_debugger(text);
 }
@@ -56,7 +54,7 @@ emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, ...)
 	{
 		va_list ap;
 		va_start(ap, format);
-		vsprintf(text, format, ap);
+		vsnprintf(text, sizeof(text), format, ap);
 		va_end(ap);
 	}
 }
@@ -70,7 +68,7 @@ emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, va_list ap)
 	}
 	else
 	{
-		vsprintf(text, format, ap);
+		vsnprintf(text, sizeof(text), format, ap);
 	}
 }
 

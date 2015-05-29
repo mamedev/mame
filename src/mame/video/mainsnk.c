@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Tomasz Slanina
 #include "emu.h"
 #include "includes/mainsnk.h"
 
@@ -76,7 +78,7 @@ void mainsnk_state::video_start()
 
 	m_bg_tilemap->set_scrolldx(16, 16);
 	m_bg_tilemap->set_scrolldy(8,  8);
-	
+
 	save_item(NAME(m_bg_tile_offset));
 }
 

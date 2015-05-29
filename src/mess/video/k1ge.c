@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /******************************************************************************
 
   K1GE/K2GE graphics emulation

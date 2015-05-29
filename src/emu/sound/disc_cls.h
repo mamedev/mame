@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:K.Wilkins, Derrick Renaud, F.Palazzolo, Couriersud
 #pragma once
 
 #ifndef __DISC_CLS_H__
@@ -7,13 +9,13 @@
  *
  *  MAME - Discrete sound system emulation library
  *
- *  Written by Keith Wilkins (mame@esplexo.co.uk)
+ *  Written by K.Wilkins (mame@esplexo.co.uk)
  *
  *  (c) K.Wilkins 2000
  *
  *  Coding started in November 2000
  *
- *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
+ *  Additions/bugfix February 2003 - Derrick Renaud, F.Palazzolo, K.Wilkins
  *  Discrete parallel tasks 2009 - Couriersud
  *  Discrete classes 2010        - Couriersud
  *

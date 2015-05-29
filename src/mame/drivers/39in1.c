@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Ryan Holtz, Andreas Naive
 /**************************************************************************
  *
  * 39in1.c - bootleg MAME-based "39-in-1" arcade PCB

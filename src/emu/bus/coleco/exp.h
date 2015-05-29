@@ -4,9 +4,6 @@
 
     ColecoVision cartridge port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                      D2       1      2       /C000
@@ -96,7 +93,7 @@ protected:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	device_colecovision_cartridge_interface *m_card;
 };

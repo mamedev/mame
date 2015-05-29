@@ -43,9 +43,9 @@ private:
 
 	virtual void process_string(char const *string);
 
-	static void build_generic_filter(device_image_interface *img, bool is_save, astring &filter);
-	static void add_filter_entry(astring &dest, char const *description, char const *extensions);
-	static void copy_extension_list(astring &dest, char const *extensions);
+	static void build_generic_filter(device_image_interface *img, bool is_save, std::string &filter);
+	static void add_filter_entry(std::string &dest, char const *description, char const *extensions);
+	static void copy_extension_list(std::string &dest, char const *extensions);
 
 	HMENU   m_devices_menu;
 };

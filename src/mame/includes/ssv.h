@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
 #include "machine/eepromser.h"
@@ -76,7 +78,7 @@ public:
 	DECLARE_READ16_MEMBER(dsp_r);
 	DECLARE_WRITE16_MEMBER(dsp_w);
 	DECLARE_READ16_MEMBER(fake_r);
-	DECLARE_READ16_MEMBER(drifto94_rand_r);
+	DECLARE_READ16_MEMBER(drifto94_unknown_r);
 	DECLARE_READ16_MEMBER(gdfs_gfxram_r);
 	DECLARE_WRITE16_MEMBER(gdfs_gfxram_w);
 	DECLARE_READ16_MEMBER(gdfs_blitram_r);

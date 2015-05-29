@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ElSemi
 /*
 
  IGS022 is an encrypted DMA device, most likely an MCU of some sort

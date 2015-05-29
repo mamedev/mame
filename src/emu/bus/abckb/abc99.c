@@ -4,9 +4,6 @@
 
     Luxor ABC-99 keyboard and mouse emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 /*
@@ -545,6 +542,8 @@ void abc99_device::device_reset()
 	// set EA lines
 	m_maincpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
+
+	m_slot->write_rx(1);
 }
 
 

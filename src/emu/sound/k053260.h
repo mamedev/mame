@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Alex W. Jackson
 /*********************************************************
 
     Konami 053260 KDSC

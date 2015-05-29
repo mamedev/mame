@@ -35,7 +35,10 @@ extern const device_type STEELTALP_BOARD_DEVICE;
 extern const device_type STRTDRIV_BOARD_DEVICE;
 extern const device_type HDRIVAIR_BOARD_DEVICE;
 extern const device_type HDRIVAIRP_BOARD_DEVICE;
+extern const device_type HARDDRIV_SOUND_BOARD_DEVICE;
 
+
+class harddriv_sound_board_device;
 
 class harddriv_state :  public device_t
 	/* public device_video_interface */
@@ -48,14 +51,13 @@ public:
 	required_device<tms34010_device> m_gsp;
 	optional_device<tms34010_device> m_msp;
 	required_device<adsp21xx_device> m_adsp;
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<cpu_device> m_sounddsp;
 	optional_device<cpu_device> m_jsacpu;
 	optional_device<dsp32c_device> m_dsp32;
 	optional_device<adsp2105_device> m_ds3sdsp;
 	optional_device<adsp2105_device> m_ds3xdsp;
 	optional_device<dac_device> m_ds3dac1;
 	optional_device<dac_device> m_ds3dac2;
+	optional_device<harddriv_sound_board_device> m_harddriv_sound;
 	optional_device<atari_jsa_base_device> m_jsa;
 
 	UINT8                   m_hd34010_host_access;
@@ -96,8 +98,6 @@ public:
 	UINT32                  m_gsp_speedup_count[4];
 	UINT32                  m_msp_speedup_count[4];
 	UINT32                  m_adsp_speedup_count[4];
-
-	optional_shared_ptr<UINT16> m_sounddsp_ram;
 
 	UINT8                   m_gsp_multisync;
 	optional_shared_ptr<UINT8> m_gsp_vram;
@@ -185,23 +185,6 @@ public:
 	UINT32                  m_dataval[MAX_MSP_SYNC];
 	int                     m_next_msp_sync;
 
-	/* audio state */
-	UINT8                   m_soundflag;
-	UINT8                   m_mainflag;
-	UINT16                  m_sounddata;
-	UINT16                  m_maindata;
-
-	UINT8                   m_dacmute;
-	UINT8                   m_cramen;
-	UINT8                   m_irq68k;
-
-	offs_t                  m_sound_rom_offs;
-
-	UINT8 *                 m_rombase;
-	UINT32                  m_romsize;
-	UINT16                  m_comram[0x400/2];
-	UINT64                  m_last_bio_cycles;
-
 	/* video state */
 	offs_t                  m_vram_mask;
 
@@ -215,32 +198,6 @@ public:
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(steeltal_dummy_r);
 	DECLARE_READ32_MEMBER(rddsp_unmap_r);
-	DECLARE_READ16_MEMBER(hd68k_snd_data_r);
-	DECLARE_READ16_MEMBER(hd68k_snd_status_r);
-	DECLARE_WRITE16_MEMBER(hd68k_snd_data_w);
-	DECLARE_WRITE16_MEMBER(hd68k_snd_reset_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_data_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_data_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_switches_r);
-	DECLARE_READ16_MEMBER(hdsnd68k_320port_r);
-	DECLARE_READ16_MEMBER(hdsnd68k_status_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_latches_w);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_speech_w);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_irqclr_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_320ram_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_320ram_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_320ports_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_320ports_w);
-	DECLARE_READ16_MEMBER(hdsnd68k_320com_r);
-	DECLARE_WRITE16_MEMBER(hdsnd68k_320com_w);
-	DECLARE_READ16_MEMBER(hdsnddsp_get_bio);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_comport_w);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_mute_w);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_gen68kirq_w);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_soundaddr_w);
-	DECLARE_READ16_MEMBER(hdsnddsp_rom_r);
-	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
-	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
 	void init_driver();
 	void init_multisync(int compact_inputs);
 	void init_adsp();
@@ -278,17 +235,9 @@ public:
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
-	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
-	optional_device<dac_device> m_dac;
 	required_device<mc68681_device> m_duart;
 	optional_device<asic65_device> m_asic65;
 	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
-
-	/*----------- defined in audio/harddriv.c -----------*/
-
-	void hdsnd_init();
-	void update_68k_interrupts();
-	TIMER_CALLBACK_MEMBER( delayed_68k_w );
 
 	/*----------- defined in machine/harddriv.c -----------*/
 
@@ -475,6 +424,73 @@ protected:
 	//virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
+};
+
+class harddriv_sound_board_device :  public device_t
+{
+public:
+	// construction/destruction
+	harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~harddriv_sound_board_device() {}
+
+	DECLARE_READ16_MEMBER(hd68k_snd_data_r);
+	DECLARE_READ16_MEMBER(hd68k_snd_status_r);
+	DECLARE_WRITE16_MEMBER(hd68k_snd_data_w);
+	DECLARE_WRITE16_MEMBER(hd68k_snd_reset_w);
+
+	DECLARE_READ16_MEMBER(hdsnd68k_data_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_data_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_switches_r);
+	DECLARE_READ16_MEMBER(hdsnd68k_320port_r);
+	DECLARE_READ16_MEMBER(hdsnd68k_status_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_latches_w);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_speech_w);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_irqclr_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_320ram_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_320ram_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_320ports_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_320ports_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_320com_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_320com_w);
+	DECLARE_READ16_MEMBER(hdsnddsp_get_bio);
+
+	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_comport_w);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_mute_w);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_gen68kirq_w);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_soundaddr_w);
+	DECLARE_READ16_MEMBER(hdsnddsp_rom_r);
+	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
+	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+private:
+	required_device<cpu_device> m_soundcpu;
+	required_device<dac_device> m_dac;
+	required_device<cpu_device> m_sounddsp;
+	required_shared_ptr<UINT16> m_sounddsp_ram;
+	required_region_ptr<UINT8>  m_sound_rom;
+
+	UINT8                   m_soundflag;
+	UINT8                   m_mainflag;
+	UINT16                  m_sounddata;
+	UINT16                  m_maindata;
+
+	UINT8                   m_dacmute;
+	UINT8                   m_cramen;
+	UINT8                   m_irq68k;
+
+	offs_t                  m_sound_rom_offs;
+
+	UINT16                  m_comram[0x400/2];
+	UINT64                  m_last_bio_cycles;
+
+	void update_68k_interrupts();
+	TIMER_CALLBACK_MEMBER( delayed_68k_w );
 };
 
 /* Hard Drivin' */

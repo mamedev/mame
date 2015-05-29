@@ -1,9 +1,7 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /**********************************************************
  *   DIABLO31 and DIABLO44 hard drive support
- *
- *   Copyright Juergen Buchmueller <pullmoll@t-online.de>
- *
- *   Licenses: MAME, GPLv2
  **********************************************************/
 #include "diablo_hd.h"
 

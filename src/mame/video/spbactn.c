@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Stephh
 
 #include "emu.h"
 #include "includes/spbactn.h"

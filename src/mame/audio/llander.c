@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:K.Wilkins
 /***************************************************************************
 
     Lunar Lander Specific Sound Code
@@ -10,7 +12,7 @@
 
 /************************************************************************/
 /* Lunar Lander Sound System Analog emulation by K.Wilkins Nov 2000     */
-/* Questions/Suggestions to mame@dysfunction.demon.co.uk                */
+/* Questions/Suggestions to mame@esplexo.co.uk                          */
 /************************************************************************/
 #define LLANDER_TONE3K_EN   NODE_01
 #define LLANDER_TONE6K_EN   NODE_02

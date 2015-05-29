@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski, Andrea Mazzoleni
 /***************************************************************************
 
 Return of the Invaders

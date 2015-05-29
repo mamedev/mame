@@ -1,9 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Dragon Buster (c) 1984 Namco
 Sky Kid       (c) 1985 Namco
 
-Driver by Manuel Abadia <manu@teleline.es>
+Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 Notes:
 -----

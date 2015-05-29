@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /**********************************************************************
 
     Rockwell 10937/10957 interface and emulation by J.Wallace

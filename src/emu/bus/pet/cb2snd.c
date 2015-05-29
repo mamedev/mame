@@ -6,9 +6,6 @@
 
     http://zimmers.net/cbmpics/cbm/PETx/petfaq.html
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "cb2snd.h"

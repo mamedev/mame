@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /***************************************************************************
 
                      -= 68020 + Imagetek I5000 Games =-
@@ -64,8 +66,7 @@ Notes:
 
       Only ROMs positions 60, 50, 40, 02, 03, 10, 11, 01, 00 are populated.
 
-      There is known to exist a version of Rabbit with program rom labels
-      printed as ASIA 3/6 which is currently not dumped.
+      There is known to exist an earlier Japanese prototype version of Rabbit which is currently not dumped.
 
 Tokimeki Mahjong Paradise - Dear My Love Board Notes
 ----------------------------------------------------
@@ -980,4 +981,4 @@ ROM_START( rabbit )
 ROM_END
 
 
-GAME( 1997, rabbit,        0, rabbit,  rabbit, rabbit_state,  rabbit,  ROT0, "Aorn / Electronic Arts", "Rabbit (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // somewhat playable
+GAME( 1997, rabbit,        0, rabbit,  rabbit, rabbit_state,  rabbit,  ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // somewhat playable

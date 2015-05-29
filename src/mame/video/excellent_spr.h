@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 class excellent_spr_device : public device_t,
 						public device_video_interface

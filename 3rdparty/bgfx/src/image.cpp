@@ -436,7 +436,7 @@ namespace bgfx
 		}
 	}
 
-	uint32_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
+	uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
 	{
 		using namespace bx;
 		uint32_t tmp0   = uint32_sll(1, _to);
@@ -449,7 +449,7 @@ namespace bgfx
 		uint32_t tmp7   = uint32_add(tmp5, tmp6);
 		uint32_t result = uint32_srl(tmp7, _from);
 
-		return result;
+		return uint8_t(result);
 	}
 
 	void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
@@ -986,7 +986,7 @@ namespace bgfx
 		{ 0, 8, 0, 8 },
 	};
 
-	uint32_t morton2d(uint16_t _x, uint16_t _y)
+	uint32_t morton2d(uint32_t _x, uint32_t _y)
 	{
 		using namespace bx;
 		const uint32_t tmpx   = uint32_part1by1(_x);
@@ -1099,9 +1099,9 @@ namespace bgfx
 				const uint8_t wa = weight[0];
 				const uint8_t wb = weight[1];
 
-				_dst[(yy*4 + xx)*4+0] = (ab * wa + bb * wb) >> 7;
-				_dst[(yy*4 + xx)*4+1] = (ag * wa + bg * wb) >> 7;
-				_dst[(yy*4 + xx)*4+2] = (ar * wa + br * wb) >> 7;
+				_dst[(yy*4 + xx)*4+0] = uint8_t( (ab * wa + bb * wb) >> 7);
+				_dst[(yy*4 + xx)*4+1] = uint8_t( (ag * wa + bg * wb) >> 7);
+				_dst[(yy*4 + xx)*4+2] = uint8_t( (ar * wa + br * wb) >> 7);
 				_dst[(yy*4 + xx)*4+3] = 255;
 
 				mod >>= 2;
@@ -1209,10 +1209,10 @@ namespace bgfx
 				const uint8_t wc = weight[2];
 				const uint8_t wd = weight[3];
 
-				_dst[(yy*4 + xx)*4+0] = (ab * wa + bb * wb) >> 7;
-				_dst[(yy*4 + xx)*4+1] = (ag * wa + bg * wb) >> 7;
-				_dst[(yy*4 + xx)*4+2] = (ar * wa + br * wb) >> 7;
-				_dst[(yy*4 + xx)*4+3] = (aa * wc + ba * wd) >> 7;
+				_dst[(yy*4 + xx)*4+0] = uint8_t( (ab * wa + bb * wb) >> 7);
+				_dst[(yy*4 + xx)*4+1] = uint8_t( (ag * wa + bg * wb) >> 7);
+				_dst[(yy*4 + xx)*4+2] = uint8_t( (ar * wa + br * wb) >> 7);
+				_dst[(yy*4 + xx)*4+3] = uint8_t( (aa * wc + ba * wd) >> 7);
 
 				mod >>= 2;
 				factorTable += 4;
@@ -1251,33 +1251,42 @@ namespace bgfx
 #define DDS_G32R32F        115
 #define DDS_A32B32G32R32F  116
 
-#define DDS_FORMAT_R32G32B32A32_FLOAT 2
-#define DDS_FORMAT_R32G32B32A32_UINT  3
-#define DDS_FORMAT_R16G16B16A16_FLOAT 10
-#define DDS_FORMAT_R16G16B16A16_UNORM 11
-#define DDS_FORMAT_R16G16B16A16_UINT  12
-#define DDS_FORMAT_R32G32_FLOAT       16
-#define DDS_FORMAT_R32G32_UINT        17
-#define DDS_FORMAT_R10G10B10A2_UNORM  24
-#define DDS_FORMAT_R16G16_FLOAT       34
-#define DDS_FORMAT_R16G16_UNORM       35
-#define DDS_FORMAT_R32_FLOAT          41
-#define DDS_FORMAT_R32_UINT           42
-#define DDS_FORMAT_R8G8_UNORM         49
-#define DDS_FORMAT_R16_FLOAT          54
-#define DDS_FORMAT_R16_UNORM          56
-#define DDS_FORMAT_R8_UNORM           61
-#define DDS_FORMAT_BC1_UNORM          71
-#define DDS_FORMAT_BC2_UNORM          74
-#define DDS_FORMAT_BC3_UNORM          77
-#define DDS_FORMAT_BC4_UNORM          80
-#define DDS_FORMAT_BC5_UNORM          83
-#define DDS_FORMAT_B5G6R5_UNORM       85
-#define DDS_FORMAT_B5G5R5A1_UNORM     86
-#define DDS_FORMAT_B8G8R8A8_UNORM     87
-#define DDS_FORMAT_BC6H_SF16          96
-#define DDS_FORMAT_BC7_UNORM          98
-#define DDS_FORMAT_B4G4R4A4_UNORM     115
+#define DDS_FORMAT_R32G32B32A32_FLOAT  2
+#define DDS_FORMAT_R32G32B32A32_UINT   3
+#define DDS_FORMAT_R16G16B16A16_FLOAT  10
+#define DDS_FORMAT_R16G16B16A16_UNORM  11
+#define DDS_FORMAT_R16G16B16A16_UINT   12
+#define DDS_FORMAT_R32G32_FLOAT        16
+#define DDS_FORMAT_R32G32_UINT         17
+#define DDS_FORMAT_R10G10B10A2_UNORM   24
+#define DDS_FORMAT_R11G11B10_FLOAT     26
+#define DDS_FORMAT_R8G8B8A8_UNORM      28
+#define DDS_FORMAT_R8G8B8A8_UNORM_SRGB 29
+#define DDS_FORMAT_R16G16_FLOAT        34
+#define DDS_FORMAT_R16G16_UNORM        35
+#define DDS_FORMAT_R32_FLOAT           41
+#define DDS_FORMAT_R32_UINT            42
+#define DDS_FORMAT_R8G8_UNORM          49
+#define DDS_FORMAT_R16_FLOAT           54
+#define DDS_FORMAT_R16_UNORM           56
+#define DDS_FORMAT_R8_UNORM            61
+#define DDS_FORMAT_R1_UNORM            66
+#define DDS_FORMAT_BC1_UNORM           71
+#define DDS_FORMAT_BC1_UNORM_SRGB      72
+#define DDS_FORMAT_BC2_UNORM           74
+#define DDS_FORMAT_BC2_UNORM_SRGB      75
+#define DDS_FORMAT_BC3_UNORM           77
+#define DDS_FORMAT_BC3_UNORM_SRGB      78
+#define DDS_FORMAT_BC4_UNORM           80
+#define DDS_FORMAT_BC5_UNORM           83
+#define DDS_FORMAT_B5G6R5_UNORM        85
+#define DDS_FORMAT_B5G5R5A1_UNORM      86
+#define DDS_FORMAT_B8G8R8A8_UNORM      87
+#define DDS_FORMAT_B8G8R8A8_UNORM_SRGB 91
+#define DDS_FORMAT_BC6H_SF16           96
+#define DDS_FORMAT_BC7_UNORM           98
+#define DDS_FORMAT_BC7_UNORM_SRGB      99
+#define DDS_FORMAT_B4G4R4A4_UNORM      115
 
 #define DDSD_CAPS                   0x00000001
 #define DDSD_HEIGHT                 0x00000002
@@ -1318,70 +1327,80 @@ namespace bgfx
 	{
 		uint32_t m_format;
 		TextureFormat::Enum m_textureFormat;
+		bool m_srgb;
 	};
 
 	static TranslateDdsFormat s_translateDdsFourccFormat[] =
 	{
-		{ DDS_DXT1,                  TextureFormat::BC1     },
-		{ DDS_DXT2,                  TextureFormat::BC2     },
-		{ DDS_DXT3,                  TextureFormat::BC2     },
-		{ DDS_DXT4,                  TextureFormat::BC3     },
-		{ DDS_DXT5,                  TextureFormat::BC3     },
-		{ DDS_ATI1,                  TextureFormat::BC4     },
-		{ DDS_BC4U,                  TextureFormat::BC4     },
-		{ DDS_ATI2,                  TextureFormat::BC5     },
-		{ DDS_BC5U,                  TextureFormat::BC5     },
-		{ DDS_A16B16G16R16,          TextureFormat::RGBA16  },
-		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F },
-		{ DDPF_RGB|DDPF_ALPHAPIXELS, TextureFormat::BGRA8   },
-		{ DDPF_INDEXED,              TextureFormat::R8      },
-		{ DDPF_LUMINANCE,            TextureFormat::R8      },
-		{ DDPF_ALPHA,                TextureFormat::R8      },
-		{ DDS_R16F,                  TextureFormat::R16F    },
-		{ DDS_R32F,                  TextureFormat::R32F    },
-		{ DDS_A8L8,                  TextureFormat::RG8     },
-		{ DDS_G16R16,                TextureFormat::RG16    },
-		{ DDS_G16R16F,               TextureFormat::RG16F   },
-		{ DDS_G32R32F,               TextureFormat::RG32F   },
-		{ DDS_A8R8G8B8,              TextureFormat::BGRA8   },
-		{ DDS_A16B16G16R16,          TextureFormat::RGBA16  },
-		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F },
-		{ DDS_A32B32G32R32F,         TextureFormat::RGBA32F },
-		{ DDS_R5G6B5,                TextureFormat::R5G6B5  },
-		{ DDS_A4R4G4B4,              TextureFormat::RGBA4   },
-		{ DDS_A1R5G5B5,              TextureFormat::RGB5A1  },
-		{ DDS_A2B10G10R10,           TextureFormat::RGB10A2 },
+		{ DDS_DXT1,                  TextureFormat::BC1,     false },
+		{ DDS_DXT2,                  TextureFormat::BC2,     false },
+		{ DDS_DXT3,                  TextureFormat::BC2,     false },
+		{ DDS_DXT4,                  TextureFormat::BC3,     false },
+		{ DDS_DXT5,                  TextureFormat::BC3,     false },
+		{ DDS_ATI1,                  TextureFormat::BC4,     false },
+		{ DDS_BC4U,                  TextureFormat::BC4,     false },
+		{ DDS_ATI2,                  TextureFormat::BC5,     false },
+		{ DDS_BC5U,                  TextureFormat::BC5,     false },
+		{ DDS_A16B16G16R16,          TextureFormat::RGBA16,  false },
+		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F, false },
+		{ DDPF_RGB|DDPF_ALPHAPIXELS, TextureFormat::BGRA8,   false },
+		{ DDPF_INDEXED,              TextureFormat::R8,      false },
+		{ DDPF_LUMINANCE,            TextureFormat::R8,      false },
+		{ DDPF_ALPHA,                TextureFormat::R8,      false },
+		{ DDS_R16F,                  TextureFormat::R16F,    false },
+		{ DDS_R32F,                  TextureFormat::R32F,    false },
+		{ DDS_A8L8,                  TextureFormat::RG8,     false },
+		{ DDS_G16R16,                TextureFormat::RG16,    false },
+		{ DDS_G16R16F,               TextureFormat::RG16F,   false },
+		{ DDS_G32R32F,               TextureFormat::RG32F,   false },
+		{ DDS_A8R8G8B8,              TextureFormat::BGRA8,   false },
+		{ DDS_A16B16G16R16,          TextureFormat::RGBA16,  false },
+		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F, false },
+		{ DDS_A32B32G32R32F,         TextureFormat::RGBA32F, false },
+		{ DDS_R5G6B5,                TextureFormat::R5G6B5,  false },
+		{ DDS_A4R4G4B4,              TextureFormat::RGBA4,   false },
+		{ DDS_A1R5G5B5,              TextureFormat::RGB5A1,  false },
+		{ DDS_A2B10G10R10,           TextureFormat::RGB10A2, false },
 	};
 
 	static TranslateDdsFormat s_translateDxgiFormat[] =
 	{
-		{ DDS_FORMAT_BC1_UNORM,          TextureFormat::BC1     },
-		{ DDS_FORMAT_BC2_UNORM,          TextureFormat::BC2     },
-		{ DDS_FORMAT_BC3_UNORM,          TextureFormat::BC3     },
-		{ DDS_FORMAT_BC4_UNORM,          TextureFormat::BC4     },
-		{ DDS_FORMAT_BC5_UNORM,          TextureFormat::BC5     },
-		{ DDS_FORMAT_BC6H_SF16,          TextureFormat::BC6H    },
-		{ DDS_FORMAT_BC7_UNORM,          TextureFormat::BC7     },
+		{ DDS_FORMAT_BC1_UNORM,           TextureFormat::BC1,        false },
+		{ DDS_FORMAT_BC1_UNORM_SRGB,      TextureFormat::BC1,        true  },
+		{ DDS_FORMAT_BC2_UNORM,           TextureFormat::BC2,        false },
+		{ DDS_FORMAT_BC2_UNORM_SRGB,      TextureFormat::BC2,        true  },
+		{ DDS_FORMAT_BC3_UNORM,           TextureFormat::BC3,        false },
+		{ DDS_FORMAT_BC3_UNORM_SRGB,      TextureFormat::BC3,        true  },
+		{ DDS_FORMAT_BC4_UNORM,           TextureFormat::BC4,        false },
+		{ DDS_FORMAT_BC5_UNORM,           TextureFormat::BC5,        false },
+		{ DDS_FORMAT_BC6H_SF16,           TextureFormat::BC6H,       false },
+		{ DDS_FORMAT_BC7_UNORM,           TextureFormat::BC7,        false },
+		{ DDS_FORMAT_BC7_UNORM_SRGB,      TextureFormat::BC7,        true  },
 
-		{ DDS_FORMAT_R8_UNORM,           TextureFormat::R8      },
-		{ DDS_FORMAT_R16_UNORM,          TextureFormat::R16     },
-		{ DDS_FORMAT_R16_FLOAT,          TextureFormat::R16F    },
-		{ DDS_FORMAT_R32_UINT,           TextureFormat::R32     },
-		{ DDS_FORMAT_R32_FLOAT,          TextureFormat::R32F    },
-		{ DDS_FORMAT_R8G8_UNORM,         TextureFormat::RG8     },
-		{ DDS_FORMAT_R16G16_UNORM,       TextureFormat::RG16    },
-		{ DDS_FORMAT_R16G16_FLOAT,       TextureFormat::RG16F   },
-		{ DDS_FORMAT_R32G32_UINT,        TextureFormat::RG32    },
-		{ DDS_FORMAT_R32G32_FLOAT,       TextureFormat::RG32F   },
-		{ DDS_FORMAT_B8G8R8A8_UNORM,     TextureFormat::BGRA8   },
-		{ DDS_FORMAT_R16G16B16A16_UNORM, TextureFormat::RGBA16  },
-		{ DDS_FORMAT_R16G16B16A16_FLOAT, TextureFormat::RGBA16F },
-		{ DDS_FORMAT_R32G32B32A32_UINT,  TextureFormat::RGBA32  },
-		{ DDS_FORMAT_R32G32B32A32_FLOAT, TextureFormat::RGBA32F },
-		{ DDS_FORMAT_B5G6R5_UNORM,       TextureFormat::R5G6B5  },
-		{ DDS_FORMAT_B4G4R4A4_UNORM,     TextureFormat::RGBA4   },
-		{ DDS_FORMAT_B5G5R5A1_UNORM,     TextureFormat::RGB5A1  },
-		{ DDS_FORMAT_R10G10B10A2_UNORM,  TextureFormat::RGB10A2 },
+		{ DDS_FORMAT_R1_UNORM,            TextureFormat::R1,         false },
+		{ DDS_FORMAT_R8_UNORM,            TextureFormat::R8,         false },
+		{ DDS_FORMAT_R16_UNORM,           TextureFormat::R16,        false },
+		{ DDS_FORMAT_R16_FLOAT,           TextureFormat::R16F,       false },
+		{ DDS_FORMAT_R32_UINT,            TextureFormat::R32,        false },
+		{ DDS_FORMAT_R32_FLOAT,           TextureFormat::R32F,       false },
+		{ DDS_FORMAT_R8G8_UNORM,          TextureFormat::RG8,        false },
+		{ DDS_FORMAT_R16G16_UNORM,        TextureFormat::RG16,       false },
+		{ DDS_FORMAT_R16G16_FLOAT,        TextureFormat::RG16F,      false },
+		{ DDS_FORMAT_R32G32_UINT,         TextureFormat::RG32,       false },
+		{ DDS_FORMAT_R32G32_FLOAT,        TextureFormat::RG32F,      false },
+		{ DDS_FORMAT_B8G8R8A8_UNORM,      TextureFormat::BGRA8,      false },
+		{ DDS_FORMAT_B8G8R8A8_UNORM_SRGB, TextureFormat::BGRA8,      true  },
+		{ DDS_FORMAT_R8G8B8A8_UNORM,      TextureFormat::RGBA8,      false },
+		{ DDS_FORMAT_R8G8B8A8_UNORM_SRGB, TextureFormat::RGBA8,      true  },
+		{ DDS_FORMAT_R16G16B16A16_UNORM,  TextureFormat::RGBA16,     false },
+		{ DDS_FORMAT_R16G16B16A16_FLOAT,  TextureFormat::RGBA16F,    false },
+		{ DDS_FORMAT_R32G32B32A32_UINT,   TextureFormat::RGBA32,     false },
+		{ DDS_FORMAT_R32G32B32A32_FLOAT,  TextureFormat::RGBA32F,    false },
+		{ DDS_FORMAT_B5G6R5_UNORM,        TextureFormat::R5G6B5,     false },
+		{ DDS_FORMAT_B4G4R4A4_UNORM,      TextureFormat::RGBA4,      false },
+		{ DDS_FORMAT_B5G5R5A1_UNORM,      TextureFormat::RGB5A1,     false },
+		{ DDS_FORMAT_R10G10B10A2_UNORM,   TextureFormat::RGB10A2,    false },
+		{ DDS_FORMAT_R11G11B10_FLOAT,     TextureFormat::R11G11B10F, false },
 	};
 
 	struct TranslateDdsPixelFormat
@@ -1496,6 +1515,7 @@ namespace bgfx
 
 		TextureFormat::Enum format = TextureFormat::Unknown;
 		bool hasAlpha = pixelFlags & DDPF_ALPHAPIXELS;
+		bool srgb = false;
 
 		if (dxgiFormat == 0)
 		{
@@ -1534,6 +1554,7 @@ namespace bgfx
 				if (s_translateDxgiFormat[ii].m_format == dxgiFormat)
 				{
 					format = s_translateDxgiFormat[ii].m_textureFormat;
+					srgb = s_translateDxgiFormat[ii].m_srgb;
 					break;
 				}
 			}
@@ -1542,14 +1563,15 @@ namespace bgfx
 		_imageContainer.m_data = NULL;
 		_imageContainer.m_size = 0;
 		_imageContainer.m_offset = (uint32_t)bx::seek(_reader);
-		_imageContainer.m_width = width;
+		_imageContainer.m_width  = width;
 		_imageContainer.m_height = height;
-		_imageContainer.m_depth = depth;
-		_imageContainer.m_format = format;
-		_imageContainer.m_numMips = (caps[0] & DDSCAPS_MIPMAP) ? mips : 1;
+		_imageContainer.m_depth  = depth;
+		_imageContainer.m_format   = uint8_t(format);
+		_imageContainer.m_numMips  = uint8_t( (caps[0] & DDSCAPS_MIPMAP) ? mips : 1);
 		_imageContainer.m_hasAlpha = hasAlpha;
-		_imageContainer.m_cubeMap = cubeMap;
+		_imageContainer.m_cubeMap  = cubeMap;
 		_imageContainer.m_ktx = false;
+		_imageContainer.m_srgb = srgb;
 
 		return TextureFormat::Unknown != format;
 	}
@@ -1719,13 +1741,13 @@ namespace bgfx
 		_imageContainer.m_data = NULL;
 		_imageContainer.m_size = 0;
 		_imageContainer.m_offset = (uint32_t)offset;
-		_imageContainer.m_width = width;
+		_imageContainer.m_width  = width;
 		_imageContainer.m_height = height;
-		_imageContainer.m_depth = depth;
-		_imageContainer.m_format = format;
-		_imageContainer.m_numMips = numMips;
+		_imageContainer.m_depth  = depth;
+		_imageContainer.m_format = uint8_t(format);
+		_imageContainer.m_numMips  = uint8_t(numMips);
 		_imageContainer.m_hasAlpha = hasAlpha;
-		_imageContainer.m_cubeMap = numFaces > 1;
+		_imageContainer.m_cubeMap  = numFaces > 1;
 		_imageContainer.m_ktx = true;
 
 		return TextureFormat::Unknown != format;
@@ -1865,14 +1887,15 @@ namespace bgfx
 		_imageContainer.m_data = NULL;
 		_imageContainer.m_size = 0;
 		_imageContainer.m_offset = (uint32_t)offset;
-		_imageContainer.m_width = width;
+		_imageContainer.m_width  = width;
 		_imageContainer.m_height = height;
-		_imageContainer.m_depth = depth;
-		_imageContainer.m_format = format;
-		_imageContainer.m_numMips = numMips;
+		_imageContainer.m_depth  = depth;
+		_imageContainer.m_format = uint8_t(format);
+		_imageContainer.m_numMips  = uint8_t(numMips);
 		_imageContainer.m_hasAlpha = hasAlpha;
-		_imageContainer.m_cubeMap = numFaces > 1;
+		_imageContainer.m_cubeMap  = numFaces > 1;
 		_imageContainer.m_ktx = false;
+		_imageContainer.m_srgb = colorSpace > 0;
 
 		return TextureFormat::Unknown != format;
 	}
@@ -1918,6 +1941,7 @@ namespace bgfx
 			_imageContainer.m_hasAlpha = false;
 			_imageContainer.m_cubeMap = tc.m_cubeMap;
 			_imageContainer.m_ktx = false;
+			_imageContainer.m_srgb = false;
 
 			return true;
 		}
@@ -2122,9 +2146,36 @@ namespace bgfx
 			imageCheckerboard(_width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffffff), _dst);
 			break;
 
+		case TextureFormat::RGBA8:
+			imageSwizzleBgra8(_width, _height, _pitch, _src, _dst);
+			break;
+
+		case TextureFormat::BGRA8:
+			memcpy(_dst, _src, _pitch*_height);
+			break;
+
 		default:
 			// Decompression not implemented... Make ugly red-yellow checkerboard texture.
 			imageCheckerboard(_width, _height, 16, UINT32_C(0xffff0000), UINT32_C(0xffffff00), _dst);
+			break;
+		}
+	}
+
+	void imageDecodeToRgba8(uint8_t* _dst, const uint8_t* _src, uint32_t _width, uint32_t _height, uint32_t _pitch, uint8_t _type)
+	{
+		switch (_type)
+		{
+		case TextureFormat::RGBA8:
+			memcpy(_dst, _src, _pitch*_height);
+			break;
+
+		case TextureFormat::BGRA8:
+			imageSwizzleBgra8(_width, _height, _pitch, _src, _dst);
+			break;
+
+		default:
+			imageDecodeToBgra8(_dst, _src, _width, _height, _pitch, _type);
+			imageSwizzleBgra8(_width, _height, _pitch, _dst, _dst);
 			break;
 		}
 	}
@@ -2175,13 +2226,13 @@ namespace bgfx
 				if (side == _side
 				&&  lod == _lod)
 				{
-					_mip.m_width = width;
-					_mip.m_height = height;
+					_mip.m_width     = width;
+					_mip.m_height    = height;
 					_mip.m_blockSize = blockSize;
 					_mip.m_size = size;
 					_mip.m_data = (const uint8_t*)_data + offset;
-					_mip.m_bpp = bpp;
-					_mip.m_format = type;
+					_mip.m_bpp  = bpp;
+					_mip.m_format   = uint8_t(type);
 					_mip.m_hasAlpha = hasAlpha;
 					return true;
 				}

@@ -62,7 +62,7 @@
 #		define BX_THREAD /* not supported right now */
 #	else
 #		if (__GNUC__ == 4) && (__GNUC_MINOR__ <= 2)
-#			define BX_THREAD /* not supported right now */	
+#			define BX_THREAD /* not supported right now */
 #		else
 #			define BX_THREAD __thread
 #		endif // __GNUC__ <= 4.2
@@ -179,7 +179,7 @@
 #	define BX_TYPE_IS_POD(t) (!__is_class(t) || __is_pod(t))
 #else
 #	define BX_TYPE_IS_POD(t) false
-#endif 
+#endif
 ///
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
 			private: _class()

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino, Stefan Jokisch
 /***************************************************************************
 
 Atari Ultra Tank video emulation

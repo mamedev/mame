@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "sound/okim6295.h"
 #include "cpu/m68000/m68000.h"
 

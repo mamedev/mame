@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /********************************************************************
 
 Driver file to handle emulation of the Nintendo Pokemon Mini handheld

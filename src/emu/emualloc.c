@@ -40,10 +40,11 @@ UINT64 resource_pool::s_id = 0;
 resource_pool::resource_pool(int hash_size)
 	: m_hash_size(hash_size),
 		m_listlock(osd_lock_alloc()),
-		m_hash(hash_size, 0),
+		m_hash(hash_size),
 		m_ordered_head(NULL),
 		m_ordered_tail(NULL)
 {
+	memset(&m_hash[0], 0, hash_size*sizeof(m_hash[0]));
 }
 
 

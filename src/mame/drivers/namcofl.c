@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, ElSemi
 /*
     Namco System FL
     Driver by R. Belmont and ElSemi

@@ -1,13 +1,17 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  window.c - SDL window handling
 //
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
+
+#ifdef SDLMAME_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 // standard SDL headers
 #include "sdlinc.h"
@@ -60,16 +64,16 @@
 // minimum window dimension
 #define MIN_WINDOW_DIM                  200
 
-//#ifndef SDLMAME_WIN32
-#define WMSZ_TOP        (0)
-#define WMSZ_BOTTOM     (1)
+#ifndef SDLMAME_WIN32
+#define WMSZ_TOP            (0)
+#define WMSZ_BOTTOM         (1)
 #define WMSZ_BOTTOMLEFT     (2)
 #define WMSZ_BOTTOMRIGHT    (3)
-#define WMSZ_LEFT       (4)
+#define WMSZ_LEFT           (4)
 #define WMSZ_TOPLEFT        (5)
 #define WMSZ_TOPRIGHT       (6)
-#define WMSZ_RIGHT      (7)
-//#endif
+#define WMSZ_RIGHT          (7)
+#endif
 
 //============================================================
 //  GLOBAL VARIABLES
@@ -887,7 +891,7 @@ osd_dim sdl_window_info::pick_best_mode()
 			SDL_GetDisplayMode(*((UINT64 *)m_monitor->oshandle()), i, &mode);
 
 			// compute initial score based on difference between target and current
-			size_score = 1.0f / (1.0f + fabsf((INT32)mode.w - target_width) + fabsf((INT32)mode.h - target_height));
+			size_score = 1.0f / (1.0f + abs((INT32)mode.w - target_width) + abs((INT32)mode.h - target_height));
 
 			// if the mode is too small, give a big penalty
 			if (mode.w < minimum_width || mode.h < minimum_height)
@@ -903,9 +907,9 @@ osd_dim sdl_window_info::pick_best_mode()
 
 			// refresh adds some points
 			if (m_win_config.refresh)
-				size_score *= 1.0f / (1.0f + fabsf(m_win_config.refresh - mode.refresh_rate) / 10.0f);
+				size_score *= 1.0f / (1.0f + abs(m_win_config.refresh - mode.refresh_rate) / 10.0f);
 
-			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, size_score);
+			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, (double) size_score);
 
 			// best so far?
 			if (size_score > best_score)
@@ -924,6 +928,7 @@ osd_dim sdl_window_info::pick_best_mode()
 	int minimum_width, minimum_height, target_width, target_height;
 	int i;
 	float size_score, best_score = 0.0f;
+	int best_width = 0, best_height = 0;
 	SDL_Rect **modes;
 
 	// determine the minimum width/height for the selected target
@@ -984,12 +989,13 @@ osd_dim sdl_window_info::pick_best_mode()
 			if (size_score > best_score)
 			{
 				best_score = size_score;
-				return osd_dim(modes[i]->w, modes[i]->h);
+				best_width = modes[i]->w;
+				best_height = modes[i]->h;
 			}
 
 		}
 	}
-	return osd_dim(0,0);
+	return osd_dim(best_width, best_height);
 }
 #endif
 
@@ -1263,6 +1269,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	SDL_WM_SetCaption(window->m_title, "SDLMAME");
 #endif
 
+	window->monitor()->refresh();
 	// initialize the drawing backend
 	if (window->renderer().create())
 		return (void *) &result[1];

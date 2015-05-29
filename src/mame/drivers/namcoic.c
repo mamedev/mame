@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 #include "emu.h"
 #include "includes/namcos2.h" /* for game-specific hacks */
 #include "includes/namcoic.h"

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef AMIGAFDC_H
 #define AMIGAFDC_H
 

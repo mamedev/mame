@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
@@ -44,7 +47,7 @@ end
 
 if _OPTIONS["NO_USE_MIDI"]~="1" and _OPTIONS["targetos"]=="linux" then
 	buildoptions {
-		string.gsub(os.outputof("pkg-config --cflags alsa"), '[\r\n]+', ' '),
+		backtick("pkg-config --cflags alsa"),
 	}
 end
 
@@ -79,32 +82,36 @@ if BASE_TARGETOS=="unix" then
 			}
 		else
 			defines {
-				"NO_SDL_GLEXT",
 				"MACOSX_USE_LIBSDL",
 			}
 			buildoptions {
-				string.gsub(os.outputof(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"), '[\r\n]+', ' '),
+				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"),
 			}
 		end
 	else
 		buildoptions {
-			string.gsub(os.outputof(sdlconfigcmd() .. " --cflags"), '[\r\n]+', ' '),
+			backtick(sdlconfigcmd() .. " --cflags"),
 		}
-		if _OPTIONS["targetos"]~="emscripten" then
+		if _OPTIONS["targetos"]~="asmjs" then
 			buildoptions {
-				string.gsub(os.outputof("pkg-config --cflags fontconfig"), '[\r\n]+', ' '),
+				backtick("pkg-config --cflags fontconfig"),
 			}
 		end
 	end
 end
 
 if _OPTIONS["targetos"]=="windows" then
-	defines {
-		"UNICODE",
-		"_UNICODE",
-		"main=utf8_main",
-	}
+	configuration { "mingw*-gcc or vs*" }
+		defines {
+			"UNICODE",
+			"_UNICODE",
+			"main=utf8_main",
+		}
 
+	configuration { "Debug" }
+		defines {
+			"MALLOC_DEBUG",
+		}
 	configuration { "vs*" }
 		includedirs {
 			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")
@@ -112,9 +119,15 @@ if _OPTIONS["targetos"]=="windows" then
 	configuration { }
 
 elseif _OPTIONS["targetos"]=="linux" then
-	buildoptions {
-		'$(shell pkg-config --cflags QtGui)',
-	}
+	if _OPTIONS["QT_HOME"]~=nil then
+		buildoptions {
+			"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
+		}
+	else
+		buildoptions {
+			backtick("pkg-config --cflags QtGui"),
+		}
+	end
 elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",
@@ -127,6 +140,6 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 	}
 elseif _OPTIONS["targetos"]=="os2" then
 	buildoptions {
-		string.gsub(os.outputof(sdlconfigcmd() .. " --cflags"), '[\r\n]+', ' '),
+		backtick(sdlconfigcmd() .. " --cflags"),
 	}
 end

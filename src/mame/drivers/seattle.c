@@ -579,8 +579,8 @@ void seattle_state::machine_start()
 	save_item(NAME(m_galileo.pci_ide_regs));
 	for (index = 0; index < ARRAY_LENGTH(m_galileo.timer); index++)
 	{
-		state_save_register_item(machine(), "galileo", NULL, index, m_galileo.timer[index].count);
-		state_save_register_item(machine(), "galileo", NULL, index, m_galileo.timer[index].active);
+		save_item(NAME(m_galileo.timer[index].count), index);
+		save_item(NAME(m_galileo.timer[index].active), index);
 	}
 	save_item(NAME(m_widget.ethernet_addr));
 	save_item(NAME(m_widget.irq_num));

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /**********************************************************************
 
     Nintendo Family Computer Hori Twin (and 4P?) adapters
@@ -14,9 +16,6 @@
     connected to the 4players adapter are really seen as P3 and P4 inputs.
     it seems the most reasonable setup (so that users with only 2
     external pads can use the adapter in 4P games), but one never knows...
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

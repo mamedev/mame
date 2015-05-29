@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Various Video System Co. games using the C7-01 GGA, VS8803, VS8904, VS8905

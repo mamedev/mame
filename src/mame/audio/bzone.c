@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /*
 
 Battlezone sound info, courtesy of Al Kossow:

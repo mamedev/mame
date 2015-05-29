@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /***************************************************************************
 
     rspcp2s.c
@@ -5,10 +7,6 @@
     Universal machine language-based Nintendo/SGI RSP COP2 emulator, with
     SSSE3 SIMD optimizations.
     Written by Harmony of the MESS team.
-
-    Copyright the MESS team.
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -295,7 +293,7 @@ rsp_cop2_simd::rsp_cop2_simd(rsp_device &rsp, running_machine &machine) : rsp_co
 	vec_flag_reverse = _mm_set_epi16(0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e);
 }
 
-void rsp_cop2_simd::state_string_export(const int index, astring &string)
+void rsp_cop2_simd::state_string_export(const int index, std::string &str)
 {
 	switch (index)
 	{

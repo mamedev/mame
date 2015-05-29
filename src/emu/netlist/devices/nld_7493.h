@@ -70,15 +70,15 @@
 		NET_REGISTER_DEV(7493_dip, _name)
 
 NETLIB_SUBDEVICE(7493ff,
-	netlist_ttl_input_t m_I;
-	netlist_ttl_output_t m_Q;
+	netlist_logic_input_t m_I;
+	netlist_logic_output_t m_Q;
 
-	netlist_state_t<UINT8> m_reset;
+	UINT8 m_reset;
 );
 
 NETLIB_DEVICE(7493,
-	netlist_ttl_input_t m_R1;
-	netlist_ttl_input_t m_R2;
+	netlist_logic_input_t m_R1;
+	netlist_logic_input_t m_R2;
 
 	NETLIB_NAME(7493ff) A;
 	NETLIB_NAME(7493ff) B;
@@ -86,8 +86,7 @@ NETLIB_DEVICE(7493,
 	NETLIB_NAME(7493ff) D;
 );
 
-NETLIB_DEVICE_DERIVED(7493_dip, 7493,
-);
+NETLIB_DEVICE_DERIVED_PURE(7493_dip, 7493);
 
 
 #endif /* NLD_7493_H_ */

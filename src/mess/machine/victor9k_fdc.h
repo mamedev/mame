@@ -4,9 +4,6 @@
 
     Victor 9000 floppy disk controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once
@@ -148,9 +145,6 @@ private:
 
 		// write
 		UINT16 shift_reg_write;
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
 		UINT8 wd;
 		int wrsync;
 		int gcr_data;
@@ -221,7 +215,7 @@ private:
 
 	floppy_image_device* get_floppy();
 	void live_start();
-	void pll_reset(const attotime &when, const attotime clock);
+	void pll_reset(const attotime &when);
 	void pll_start_writing(const attotime &tm);
 	void pll_commit(floppy_image_device *floppy, const attotime &tm);
 	void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);

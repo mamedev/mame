@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 //TODO: determine when to switch modes and add single bit mode
 
 #include "pc_joy_sw.h"

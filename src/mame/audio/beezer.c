@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mathis Rosenhauer
 /*************************************************************************
 
     Beezer 6522+6840 audio hardware
@@ -190,7 +192,7 @@ void beezer_sound_device::device_reset()
  *
  *************************************/
 // need to set int_flag properly here
-INLINE void sh6840_apply_clock(struct sh6840_timer_channel *t, int clocks)
+INLINE void sh6840_apply_clock(struct sh6840_timer_channel_beez *t, int clocks)
 {
 	/* dual 8-bit case */
 	if (t->cr & 0x04)
@@ -326,7 +328,7 @@ READ8_MEMBER( beezer_sound_device::noise_r )
 
 WRITE8_MEMBER( beezer_sound_device::sh6840_w )
 {
-	struct sh6840_timer_channel *sh6840_timer = m_sh6840_timer;
+	struct sh6840_timer_channel_beez *sh6840_timer = m_sh6840_timer;
 
 	/* force an update of the stream */
 	m_stream->update();
@@ -398,7 +400,7 @@ WRITE8_MEMBER( beezer_sound_device::sfxctrl_w )
 
 void beezer_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	struct sh6840_timer_channel *sh6840_timer = m_sh6840_timer;
+	struct sh6840_timer_channel_beez *sh6840_timer = m_sh6840_timer;
 
 	/* hack to skip the expensive lfsr noise generation unless at least one of the 2 channels which actually depend on it are set to use it as a source */
 	int noisy = ((sh6840_timer[0].cr & sh6840_timer[2].cr & 0x02) == 0);
@@ -407,7 +409,7 @@ void beezer_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	/* loop over samples */
 	while (samples--)
 	{
-		struct sh6840_timer_channel *t;
+		struct sh6840_timer_channel_beez *t;
 		int clocks_this_sample;
 		int clocks;
 		INT16 sample1, sample2, sample3, sample0;

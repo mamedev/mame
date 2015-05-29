@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Richard Davies
 /***************************************************************************
 
   video.c
@@ -79,7 +81,7 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, phoenix_decode_info, phoenix_net_info);
 	/* native order */
@@ -96,7 +98,7 @@ PALETTE_INIT_MEMBER(phoenix_state,survival)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, phoenix_decode_info, survival_net_info);
 	/* native order */
@@ -113,7 +115,7 @@ PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, phoenix_decode_info, pleiades_net_info);
 	/* native order */

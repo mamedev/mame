@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tatsuyuki Satoh
 #include "sound/msm5205.h"
 
 class appoooh_state : public driver_device

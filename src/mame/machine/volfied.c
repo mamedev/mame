@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Nicola Salmoria
 /*************************************************************************
 
   Volfied C-Chip Protection

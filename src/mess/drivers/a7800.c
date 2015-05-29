@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Dan Boris, Fabio Priuli, Mike Saarna, Robert Tuccitto
 /***************************************************************************
 
   a7800.c
@@ -98,7 +100,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
 #include "sound/tiasound.h"
-#include "machine/6532riot.h"
+#include "machine/mos6530n.h"
 #include "video/maria.h"
 #include "bus/a7800/a78_carts.h"
 
@@ -282,8 +284,8 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_DEVREADWRITE("maria", atari_maria_device, read, write)
 	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("zpmirror") // mirror of 0x2040-0x20ff, for zero page
 	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("spmirror") // mirror of 0x2140-0x21ff, for stack page
-	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x0480, 0x04ff) AM_RAM AM_SHARE("riot_ram") AM_MIRROR(0x100)
+	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x60) AM_DEVICE("riot", mos6532_t, io_map)
+	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_DEVICE("riot", mos6532_t, ram_map)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("6116_1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("6116_2") AM_MIRROR(0x0800)
 								// According to the official Software Guide, the RAM at 0x2000 is
@@ -1373,10 +1375,10 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD("riot", RIOT6532, A7800_NTSC_Y1/8)
-	MCFG_RIOT6532_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
-	MCFG_RIOT6532_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
+	MCFG_DEVICE_ADD("riot", MOS6532n, A7800_NTSC_Y1/8)
+	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
+	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
 
 	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, NULL)
 
@@ -1400,10 +1402,10 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 
 	/* devices */
 	MCFG_DEVICE_REMOVE("riot")
-	MCFG_DEVICE_ADD("riot", RIOT6532, CLK_PAL)
-	MCFG_RIOT6532_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
-	MCFG_RIOT6532_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
+	MCFG_DEVICE_ADD("riot", MOS6532n, CLK_PAL)
+	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
+	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")

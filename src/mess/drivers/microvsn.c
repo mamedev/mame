@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /***************************************************************************
 
     Milton Bradley MicroVision
@@ -200,7 +202,7 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 					break;
 
 				case RC_TYPE_100PF_23_2K:
-				case RC_TYPE_UNKNOWN:   // Default to most occuring setting
+				case RC_TYPE_UNKNOWN:   // Default to most occurring setting
 					static_set_clock( m_tms1100, 500000 );
 					break;
 

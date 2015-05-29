@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tim Schuerewegen
 /*********************************************************************
 
     Philips PCF8593 CMOS clock/calendar circuit

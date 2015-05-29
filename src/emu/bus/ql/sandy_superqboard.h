@@ -4,9 +4,6 @@
 
     Sandy SuperQBoard/SuperQMouse (with HD upgrade) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

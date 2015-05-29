@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     National Semiconductor INS8154
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     N-Channel 128-by-8 Bit RAM Input/Output (RAM I/O)
 

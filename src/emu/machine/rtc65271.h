@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet, R. Belmont
 /*
     rtc65271.h: include file for rtc65271.c
 */

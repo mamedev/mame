@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
     ui/cheatopt.c
 
     Internal menu for the cheat interface.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
@@ -109,13 +108,13 @@ ui_menu_cheat::ui_menu_cheat(running_machine &machine, render_container *contain
 void ui_menu_cheat::populate()
 {
 	/* iterate over cheats */
-	astring text;
-	astring subtext;
+	std::string text;
+	std::string subtext;
 	for (cheat_entry *curcheat = machine().cheat().first(); curcheat != NULL; curcheat = curcheat->next())
 	{
 		UINT32 flags;
 		curcheat->menu_text(text, subtext, flags);
-		item_append(text, subtext, flags, curcheat);
+		item_append(text.c_str(), subtext.c_str(), flags, curcheat);
 	}
 
 	/* add a separator */

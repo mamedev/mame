@@ -4,9 +4,6 @@
 
     Wang PC Low-Resolution Video Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

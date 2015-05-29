@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 /* LSI Logic LSI53C810A PCI to SCSI I/O Processor */
 
 #include "emu.h"

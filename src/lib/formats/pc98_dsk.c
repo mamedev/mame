@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /*********************************************************************
 
     formats/pc98_dsk.c

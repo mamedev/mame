@@ -1,15 +1,17 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres);
 INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index);
 INLINE void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres);
-INLINE void divot_filter16_buffer(INT32* r, INT32* g, INT32* b, Color* vibuffer);
-INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, Color* vibuff, UINT32 hres);
-INLINE void restore_two(Color* filtered, Color* neighbour);
+INLINE void divot_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuffer);
+INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuff, UINT32 hres);
+INLINE void restore_two(color_t* filtered, color_t* neighbour);
 INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb);
 INLINE UINT32 ge_two(UINT32 enb);
 
 INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres)
 {
-	Color penumax, penumin, max, min;
+	color_t penumax, penumin, max, min;
 	UINT16 pix = *vbuff;
 	const UINT8 centercvg = (*hbuff & 3) + ((pix & 1) << 2) + 1;
 	UINT32 numoffull = 1;
@@ -253,11 +255,11 @@ INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 f
 	}
 }
 
-INLINE void divot_filter16_buffer(int* r, int* g, int* b, Color* vibuffer)
+INLINE void divot_filter16_buffer(int* r, int* g, int* b, color_t* vibuffer)
 {
-	Color leftpix = vibuffer[-1];
-	Color rightpix = vibuffer[1];
-	Color filtered = *vibuffer;
+	color_t leftpix = vibuffer[-1];
+	color_t rightpix = vibuffer[1];
+	color_t filtered = *vibuffer;
 
 	*r = filtered.i.r;
 	*g = filtered.i.g;
@@ -427,12 +429,12 @@ INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 fbuff
 	}
 }
 
-INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, Color* vibuff, UINT32 hres)
+INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, color_t* vibuff, UINT32 hres)
 {
-	Color filtered;
-	Color leftuppix, leftdownpix, leftpix;
-	Color rightuppix, rightdownpix, rightpix;
-	Color uppix, downpix;
+	color_t filtered;
+	color_t leftuppix, leftdownpix, leftpix;
+	color_t rightuppix, rightdownpix, rightpix;
+	color_t uppix, downpix;
 	INT32 ihres = (INT32)hres; //can't apply unary minus to unsigned
 
 	leftuppix = vibuff[-ihres - 1];
@@ -471,7 +473,7 @@ INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, Color* vibuff,
 }
 
 // This is wrong, only the 5 upper bits are compared.
-INLINE void restore_two(Color* filtered, Color* neighbour)
+INLINE void restore_two(color_t* filtered, color_t* neighbour)
 {
 	if (neighbour->i.r > filtered->i.r)
 	{

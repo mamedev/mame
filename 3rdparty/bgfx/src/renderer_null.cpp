@@ -29,7 +29,7 @@ namespace bgfx { namespace noop
 			return BGFX_RENDERER_NULL_NAME;
 		}
 
-		void flip() BX_OVERRIDE
+		void flip(HMD& /*_hmd*/) BX_OVERRIDE
 		{
 		}
 
@@ -110,6 +110,10 @@ namespace bgfx { namespace noop
 		}
 
 		void updateTextureEnd() BX_OVERRIDE
+		{
+		}
+
+		void resizeTexture(TextureHandle /*_handle*/, uint16_t /*_width*/, uint16_t /*_height*/) BX_OVERRIDE
 		{
 		}
 

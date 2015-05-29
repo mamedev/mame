@@ -4,9 +4,6 @@
 
     Motorola MC2661/MC68661 Enhanced Programmable Communications Interface
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
                             _____   _____
                     D2   1 |*    \_/     | 28  D1

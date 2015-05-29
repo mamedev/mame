@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Ernesto Corvi
 class iqblock_state : public driver_device
 {
 public:

@@ -1,7 +1,11 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 --------------------------------------------------
 -- expat library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-expat"] then
 project "expat"
 	uuid "f4cd40b1-c37c-452d-9785-640f26f0bf54"
 	kind "StaticLib"
@@ -15,6 +19,16 @@ project "expat"
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
+else
+links {
+	"expat",
+}
+end
 
 --------------------------------------------------
 -- zlib library objects
@@ -52,6 +66,11 @@ project "zlib"
 		MAME_DIR .. "3rdparty/zlib/uncompr.c",
 		MAME_DIR .. "3rdparty/zlib/zutil.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- SoftFloat library objects
@@ -66,19 +85,28 @@ project "softfloat"
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/expat/lib/",
 	}
-	includeosd()
+	if _OPTIONS["with-bundled-expat"] then
+	    includedirs {
+			MAME_DIR .. "3rdparty/expat/lib/",
+		}
+	end
 	
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- libJPEG library objects
@@ -136,6 +164,11 @@ project "jpeg"
 		MAME_DIR .. "3rdparty/libjpeg/jmemmgr.c",
 		MAME_DIR .. "3rdparty/libjpeg/jmemansi.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- libflac library objects
@@ -152,15 +185,10 @@ project "flac"
 			"_LARGEFILE_SOURCE",
 			"_FILE_OFFSET_BITS=64",
 			"FLAC__HAS_OGG=0",
+			"HAVE_CONFIG_H=1",
 		}
-	configuration { "vs*" }
-		defines {
-			"VERSION=\"1.2.1\""
-		}
-	configuration { "gmake" }
-		defines {
-			"VERSION=\\\"1.2.1\\\""
-		}
+
+	configuration { "gmake"}
 		buildoptions_c {
 			"-Wno-unused-function",
 			"-O0",
@@ -190,6 +218,11 @@ project "flac"
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- lib7z library objects
@@ -225,6 +258,11 @@ project "7z"
 			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Dec.c",
 			MAME_DIR .. "3rdparty/lzma/C/7zStream.c",
 		}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- LUA library objects
@@ -233,6 +271,15 @@ project "7z"
 project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
 	kind "StaticLib"
+
+	-- uncomment the options below to
+	-- compile using c++. Do the same 
+	-- in lsqlite3.
+	-- In addition comment out the "extern "C""
+	-- in lua.hpp and do the same in luaengine.c line 47
+	--options {
+	--	"ForceCPP",
+	--}
 
 	configuration { }
 		defines {
@@ -290,6 +337,11 @@ project "lua"
 		MAME_DIR .. "3rdparty/lua/src/linit.c",
 		MAME_DIR .. "3rdparty/lua/src/lutf8lib.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- sqlite3 lua library objects
@@ -298,6 +350,10 @@ project "lua"
 project "lsqlite3"
 	uuid "1d84edab-94cf-48fb-83ee-b75bc697660e"
 	kind "StaticLib"
+
+	-- options {
+	--	"ForceCPP",
+	-- }
 
 	configuration { }
 		defines {
@@ -312,6 +368,11 @@ project "lsqlite3"
 	files {
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- mongoose library objects
@@ -336,6 +397,11 @@ project "mongoose"
 	files {
 		MAME_DIR .. "3rdparty/mongoose/mongoose.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- jsoncpp library objects
@@ -359,6 +425,11 @@ project "jsoncpp"
 		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
 		
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- SQLite3 library objects
@@ -379,22 +450,26 @@ project "sqllite3"
 	files {
 		MAME_DIR .. "3rdparty/sqlite3/sqlite3.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- portmidi library objects
 --------------------------------------------------
-
+if _OPTIONS["NO_USE_MIDI"]~="1" then
 project "portmidi"
 	uuid "587f2da6-3274-4a65-86a2-f13ea315bb98"
 	kind "StaticLib"
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "3rdparty/portmidi/pm_common",
 		MAME_DIR .. "3rdparty/portmidi/porttime",
 	}
-	
-	includeosd()
-
+		
 	configuration { "linux*" }
 		defines {
 			"PMALSA=1",
@@ -434,7 +509,12 @@ project "portmidi"
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
 		}
 	end
-	
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
+end	
 --------------------------------------------------
 -- BGFX library objects
 --------------------------------------------------
@@ -451,8 +531,6 @@ project "bgfx"
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 	}
 
-	includeosd()
-
 	configuration { "vs*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include",
@@ -467,7 +545,12 @@ project "bgfx"
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
-	
+		
+	configuration { "freebsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
 	configuration { "gmake" }
 		buildoptions {		
 			"-Wno-uninitialized",
@@ -515,4 +598,202 @@ project "bgfx"
 			
 		}
 	end
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 end
+
+--------------------------------------------------
+-- PortAudio library objects
+--------------------------------------------------
+
+project "portaudio"
+	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
+	kind "StaticLib"
+
+	configuration { "gmake" }
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+			"-Wno-bad-function-cast",
+			"-Wno-undef",
+			"-Wno-missing-braces",
+			"-Wno-unused-but-set-variable",
+			"-Wno-maybe-uninitialized",
+			"-Wno-unused-value",
+			"-Wno-unused-function",
+			"-Wno-unknown-pragmas",
+			"-Wno-sometimes-uninitialized",
+		}
+
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if (_OPTIONS["gcc"]~=nil) and string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions_c {
+			"-Wno-unknown-warning-option",
+			"-Wno-absolute-value",
+			"-Wno-unused-variable",
+		}
+	end
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4204", -- warning C4204: nonstandard extension used : non-constant aggregate initializer
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
+		}
+		
+	configuration { }
+
+	includedirs {
+		MAME_DIR .. "3rdparty/portaudio/include",
+		MAME_DIR .. "3rdparty/portaudio/src/common",
+	}
+
+	files {
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_allocation.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_converters.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_cpuload.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_dither.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_debugprint.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_front.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_process.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_stream.c",
+		MAME_DIR .. "3rdparty/portaudio/src/common/pa_trace.c",
+		MAME_DIR .. "3rdparty/portaudio/src/hostapi/skeleton/pa_hostapi_skeleton.c",
+	}
+
+	if _OPTIONS["targetos"]=="windows" then
+		defines {
+			"PA_USE_DS=1",
+			"PA_USE_WDMKS=1",
+			"PA_USE_WMME=1",
+		}	
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/win",
+		}
+
+		configuration { }			
+		files {	
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_waveformat.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_wdmks_utils.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_coinitialize.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/dsound/pa_win_ds_dynlink.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wdmks/pa_win_wdmks.c",
+			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wmme/pa_win_wmme.c",
+		}
+		
+	end
+	if _OPTIONS["targetos"]=="linux" then
+		defines {
+			"PA_USE_ALSA=1",
+			"PA_USE_OSS=1",
+			"HAVE_LINUX_SOUNDCARD_H",
+		}	
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix",
+		}
+		files {	
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/alsa/pa_linux_alsa.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/oss/pa_unix_oss.c",
+		}		
+	end
+	if _OPTIONS["targetos"]=="macosx" then
+		defines {
+			"PA_USE_COREAUDIO=1",
+		}	
+		includedirs {
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix",
+		}
+		files {	
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_hostapis.c",
+			MAME_DIR .. "3rdparty/portaudio/src/os/unix/pa_unix_util.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c",
+			MAME_DIR .. "3rdparty/portaudio/src/hostapi/coreaudio/pa_mac_core_blocking.c",
+			MAME_DIR .. "3rdparty/portaudio/src/common/pa_ringbuffer.c",
+		}		
+	end
+	
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
+		
+--------------------------------------------------
+-- UnitTest++ library objects
+--------------------------------------------------
+
+project "unittest-cpp"
+	uuid "717d39e5-b6ff-4507-a092-c27c05b60ab5"
+	kind "StaticLib"
+
+	files {		
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/AssertException.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/AssertException.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CheckMacros.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Checks.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Checks.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CompositeTestReporter.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CompositeTestReporter.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Config.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CurrentTest.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/CurrentTest.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestReporter.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestReporter.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestResult.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/DeferredTestResult.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ExceptionMacros.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ExecuteTest.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/HelperMacros.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/MemoryOutStream.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/MemoryOutStream.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssert.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssert.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/ReportAssertImpl.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Test.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Test.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestDetails.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestDetails.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestList.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestList.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestMacros.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporter.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporter.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporterStdout.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestReporterStdout.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestResults.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestResults.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestRunner.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestRunner.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TestSuite.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeConstraint.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeConstraint.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/TimeHelpers.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/UnitTest++.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/UnitTestPP.h",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/XmlTestReporter.cpp",
+		MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/XmlTestReporter.h",
+	}
+
+	if _OPTIONS["targetos"]~="windows" then
+		files {
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/SignalTranslator.cpp",
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/SignalTranslator.h",
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/TimeHelpers.cpp",
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Posix/TimeHelpers.h",
+		}
+	end
+
+	if _OPTIONS["targetos"]=="windows" then
+		files {
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.cpp",
+			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.h",
+		}
+	end

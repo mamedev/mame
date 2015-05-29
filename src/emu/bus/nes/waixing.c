@@ -1,11 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Waixing PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
-
 
  Here we emulate the various PCBs used by Waixing for its games
 

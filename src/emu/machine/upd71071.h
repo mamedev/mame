@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 #ifndef __UPD71071_H__
 #define __UPD71071_H__
 

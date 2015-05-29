@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_4066.c
  *
@@ -9,7 +11,8 @@
 NETLIB_START(4066)
 {
 	register_input("CTL", m_control);
-	register_sub(m_R, "R");
+	register_sub("R", m_R);
+	m_base_r = 270.0;
 }
 
 NETLIB_RESET(4066)
@@ -19,33 +22,49 @@ NETLIB_RESET(4066)
 
 NETLIB_UPDATE(4066)
 {
-	nl_double sup = (m_supply.get()->vdd() - m_supply.get()->vss());
-	nl_double low = 0.45 * sup;
-	nl_double high = 0.55 * sup;
-	nl_double in = INPANALOG(m_control) - m_supply.get()->vss();
-	nl_double rON = 270.0 * 5.0 / sup;
+	nl_double sup = (m_supply->vdd() - m_supply->vss());
+	nl_double low = NL_FCONST(0.45) * sup;
+	nl_double high = NL_FCONST(0.55) * sup;
+	nl_double in = INPANALOG(m_control) - m_supply->vss();
+	nl_double rON = m_base_r * NL_FCONST(5.0) / sup;
+	nl_double R = -1.0;
 
 	if (in < low)
 	{
-		m_R.set_R(1.0 / netlist().gmin());
-		m_R.update_dev();
+		R = NL_FCONST(1.0) / netlist().gmin();
 	}
 	else if (in > high)
 	{
-		m_R.set_R(rON);
-		m_R.update_dev();
+		R = rON;
+	}
+	if (R > NL_FCONST(0.0))
+	{
+		// We only need to update the net first if this is a time stepping net
+		if (1) // m_R.m_P.net().as_analog().solver()->is_timestep())
+		{
+			m_R.update_dev();
+			m_R.set_R(R);
+			m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+		}
+		else
+		{
+			m_R.set_R(R);
+			m_R.update_dev();
+		}
 	}
 }
 
 
 NETLIB_START(4066_dip)
 {
-	register_sub(m_supply, "supply");
+	register_sub("supply", m_supply);
 	m_A.m_supply = m_B.m_supply = m_C.m_supply = m_D.m_supply = &m_supply;
-	register_sub(m_A, "A");
-	register_sub(m_B, "B");
-	register_sub(m_C, "C");
-	register_sub(m_D, "D");
+	register_sub("A", m_A);
+	register_sub("B", m_B);
+	register_sub("C", m_C);
+	register_sub("D", m_D);
+
+	m_A.m_base_r = m_B.m_base_r = m_C.m_base_r = m_D.m_base_r = 270;
 
 	register_subalias("1", m_A.m_R.m_P);
 	register_subalias("2", m_A.m_R.m_N);
@@ -80,4 +99,22 @@ NETLIB_UPDATE(4066_dip)
 	m_B.update_dev();
 	m_C.update_dev();
 	m_D.update_dev();
+}
+
+NETLIB_START(4016_dip)
+{
+	NETLIB_NAME(4066_dip)::start();
+
+	m_A.m_base_r = m_B.m_base_r = m_C.m_base_r = m_D.m_base_r = 1000.0;
+}
+
+NETLIB_RESET(4016_dip)
+{
+	NETLIB_NAME(4066_dip)::reset();
+}
+
+NETLIB_UPDATE(4016_dip)
+{
+	/* only called during startup */
+	NETLIB_NAME(4066_dip)::update();
 }

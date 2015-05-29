@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Balfour, Aaron Giles
 /*************************************************************************
 
     Atari Cloud 9 (prototype) hardware

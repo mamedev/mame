@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   Hewlett-Packard HP16500a/b/c Logic Analyzer
@@ -68,7 +70,7 @@ public:
 	UINT32 screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	dynamic_array<UINT8> m_vram;
+	std::vector<UINT8> m_vram;
 
 	UINT8 m_mask, m_val;
 

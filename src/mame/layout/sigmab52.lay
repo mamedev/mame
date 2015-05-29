@@ -84,19 +84,19 @@
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<bezel name="lamp5" element="HOLD" inputtag="IN1" inputmask="0x80">
+		<bezel name="lamp5" element="HOLD" inputtag="IN0" inputmask="0x0400">
 			<bounds x="0.80" y="3.05" width="0.30" height="0.15" />
 		</bezel>
-		<bezel name="lamp6" element="HOLD" inputtag="IN2" inputmask="0x02">
+		<bezel name="lamp6" element="HOLD" inputtag="IN0" inputmask="0x0200">
 			<bounds x="1.15" y="3.05" width="0.30" height="0.15" />
 		</bezel>
-		<bezel name="lamp7" element="HOLD" inputtag="IN2" inputmask="0x10">
+		<bezel name="lamp7" element="HOLD" inputtag="IN0" inputmask="0x0100">
 			<bounds x="1.50" y="3.05" width="0.30" height="0.15" />
 		</bezel>
-		<bezel name="lamp8" element="HOLD" inputtag="IN2" inputmask="0x20">
+		<bezel name="lamp8" element="HOLD" inputtag="IN0" inputmask="0x0080">
 			<bounds x="1.85" y="3.05" width="0.30" height="0.15" />
 		</bezel>4
-		<bezel name="lamp9" element="HOLD" inputtag="IN2" inputmask="0x40">
+		<bezel name="lamp9" element="HOLD" inputtag="IN0" inputmask="0x0040">
 			<bounds x="2.20" y="3.05" width="0.30" height="0.15" />
 		</bezel>
 

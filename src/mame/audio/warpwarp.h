@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Allard van der Bas
 class geebee_sound_device : public device_t,
 									public device_sound_interface
 {

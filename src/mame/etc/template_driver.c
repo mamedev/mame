@@ -1,5 +1,5 @@
-// license: BSD-3-Clause
-// copyright-holders: Angelo Salese
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
 Template for skeleton drivers
@@ -168,7 +168,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Game driver(s)
+  Machine driver(s)
 
 ***************************************************************************/
 
@@ -177,4 +177,17 @@ ROM_START( xxx )
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 198?, xxx,  0,   xxx,  xxx, driver_device,  0,       ROT0, "<template_manufacturer>",      "<template_gamename>", GAME_IS_SKELETON )
+// See src/emu/gamedrv.h for details
+// For a game:
+// GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)
+
+// For a console:
+// CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
+
+// For a computer:
+// COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
+
+// For a generic system:
+// SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
+
+GAME( 198?, xxx,  0,   xxx,  xxx, driver_device,  0,       ROT0, "<template_manufacturer>",      "<template_machinename>", GAME_IS_SKELETON )

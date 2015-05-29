@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 /* ======================================================================== */
 /* ========================= LICENSING & COPYRIGHT ======================== */
 /* ======================================================================== */
@@ -8,16 +10,6 @@ static const char copyright_notice[] =
 "Version 4.95 (2012-02-19)\n"
 "A portable Motorola M68xxx/CPU32/ColdFire processor emulation engine.\n"
 "Copyright Karl Stenerud.  All rights reserved.\n"
-"\n"
-"This code may be freely used for non-commercial purpooses as long as this\n"
-"copyright notice remains unaltered in the source code and any binary files\n"
-"containing this code in compiled form.\n"
-"\n"
-"All other licensing terms must be negotiated with the author\n"
-"(Karl Stenerud).\n"
-"\n"
-"The latest version of this code can be obtained at:\n"
-"http://kstenerud.cjb.net or http://mamedev.org/\n"
 ;
 #endif
 
@@ -677,7 +669,7 @@ static void m68k_presave(m68000_base_device *m68k)
 static void m68k_postload(m68000_base_device *m68k)
 {
 	m68ki_set_sr_noint_nosp(m68k, m68k->save_sr);
-	fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
+	//fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
 	m68k->stopped = (m68k->save_stopped ? STOP_LEVEL_STOP : 0) | (m68k->save_halted  ? STOP_LEVEL_HALT : 0);
 	m68ki_jump(m68k, REG_PC(m68k));
 }
@@ -1173,47 +1165,47 @@ void m68000_base_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void m68000_base_device::state_string_export(const device_state_entry &entry, astring &string)
+void m68000_base_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	UINT16 sr;
 
 	switch (entry.index())
 	{
 		case M68K_FP0:
-			string.printf("%f", fx80_to_double(REG_FP(this)[0]));
+			strprintf(str,"%f", fx80_to_double(REG_FP(this)[0]));
 			break;
 
 		case M68K_FP1:
-			string.printf("%f", fx80_to_double(REG_FP(this)[1]));
+			strprintf(str,"%f", fx80_to_double(REG_FP(this)[1]));
 			break;
 
 		case M68K_FP2:
-			string.printf("%f", fx80_to_double(REG_FP(this)[2]));
+			strprintf(str,"%f", fx80_to_double(REG_FP(this)[2]));
 			break;
 
 		case M68K_FP3:
-			string.printf("%f", fx80_to_double(REG_FP(this)[3]));
+			strprintf(str,"%f", fx80_to_double(REG_FP(this)[3]));
 			break;
 
 		case M68K_FP4:
-			string.printf("%f", fx80_to_double(REG_FP(this)[4]));
+			strprintf(str,"%f", fx80_to_double(REG_FP(this)[4]));
 			break;
 
 		case M68K_FP5:
-			string.printf("%f", fx80_to_double(REG_FP(this)[5]));
+			strprintf(str,"%f", fx80_to_double(REG_FP(this)[5]));
 			break;
 
 		case M68K_FP6:
-			string.printf("%f", fx80_to_double(REG_FP(this)[6]));
+			strprintf(str,"%f", fx80_to_double(REG_FP(this)[6]));
 			break;
 
 		case M68K_FP7:
-			string.printf("%f", fx80_to_double(REG_FP(this)[7]));
+			strprintf(str,"%f", fx80_to_double(REG_FP(this)[7]));
 			break;
 
 		case STATE_GENFLAGS:
 			sr = m68ki_get_sr(this);
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				sr & 0x8000 ? 'T':'.',
 				sr & 0x4000 ? 't':'.',
 				sr & 0x2000 ? 'S':'.',
@@ -1737,11 +1729,15 @@ void m68000_base_device::define_state(void)
 		state_add(M68K_MSP,    "MSP",       iotemp).callimport().callexport();
 	state_add(M68K_ISP,        "ISP",       iotemp).callimport().callexport();
 
-	astring tempstr;
-	for (int regnum = 0; regnum < 8; regnum++)
-		state_add(M68K_D0 + regnum, tempstr.format("D%d", regnum), dar[regnum]);
-	for (int regnum = 0; regnum < 8; regnum++)
-		state_add(M68K_A0 + regnum, tempstr.format("A%d", regnum), dar[8 + regnum]);
+	std::string tempstr;
+	for (int regnum = 0; regnum < 8; regnum++) {
+		strprintf(tempstr,"D%d", regnum);
+		state_add(M68K_D0 + regnum, tempstr.c_str(), dar[regnum]);
+	}
+	for (int regnum = 0; regnum < 8; regnum++) {
+		strprintf(tempstr,"A%d", regnum);
+		state_add(M68K_A0 + regnum, tempstr.c_str(), dar[8 + regnum]);
+	}
 
 	state_add(M68K_PREF_ADDR,  "PREF_ADDR", pref_addr).mask(addrmask);
 	state_add(M68K_PREF_DATA,  "PREF_DATA", pref_data);
@@ -1761,8 +1757,10 @@ void m68000_base_device::define_state(void)
 
 	if (cpu_type & MASK_030_OR_LATER)
 	{
-		for (int regnum = 0; regnum < 8; regnum++)
-			state_add(M68K_FP0 + regnum, tempstr.format("FP%d", regnum), iotemp).callimport().callexport().formatstr("%10s");
+		for (int regnum = 0; regnum < 8; regnum++) {
+			strprintf(tempstr,"FP%d", regnum);
+			state_add(M68K_FP0 + regnum, tempstr.c_str(), iotemp).callimport().callexport().formatstr("%10s");
+		}
 		state_add(M68K_FPSR, "FPSR", fpsr);
 		state_add(M68K_FPCR, "FPCR", fpcr);
 	}

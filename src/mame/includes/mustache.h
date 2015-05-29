@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 #include "audio/seibu.h"    // for seibu_sound_decrypt on the MAIN cpu (not sound)
 
 class mustache_state : public driver_device

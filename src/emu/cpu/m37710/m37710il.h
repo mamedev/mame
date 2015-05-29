@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Karl Stenerud, hap
 #pragma once
 
 #ifndef __M37710IL_H__

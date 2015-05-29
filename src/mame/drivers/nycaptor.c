@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 /***************************************************************************
     N.Y. Captor - Taito '85
 

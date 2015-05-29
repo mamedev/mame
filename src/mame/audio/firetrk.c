@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /*************************************************************************
 
     audio\firetrk.c
@@ -70,7 +72,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_xtndply_w)
 
 /************************************************************************/
 /* firetrk Sound System Analog emulation by K.Wilkins Feb 2001          */
-/* Questions/Suggestions to mame@dysfunction.demon.co.uk                */
+/* Questions/Suggestions to mame@esplexo.co.uk                          */
 /* Modified and added superbug/montecar sounds.  Jan 2003 D.R.          */
 /* Complete re-write Feb 2004, D. Renaud                                */
 /************************************************************************/

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Frank Palazzolo, Jarek Burczynski, Aaron Giles, Jonathan Gevaryahu, Couriersud
 #pragma once
 
 #ifndef __TMS5110_H__

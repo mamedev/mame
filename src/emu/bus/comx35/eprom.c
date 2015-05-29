@@ -4,9 +4,6 @@
 
     COMX-35 F&M EPROM Card emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "eprom.h"

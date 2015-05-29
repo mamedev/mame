@@ -4,9 +4,6 @@
 
     Commodore 8280 Dual 8" Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once
@@ -14,11 +11,11 @@
 #ifndef __C8280__
 #define __C8280__
 
-
 #include "emu.h"
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/6532riot.h"
+#include "formats/c8280_dsk.h"
+#include "machine/mos6530n.h"
 #include "machine/wd_fdc.h"
 
 
@@ -27,14 +24,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c8280_device
+// ======================> c8280_t
 
-class c8280_device :  public device_t,
-						public device_ieee488_interface
+class c8280_t :  public device_t,
+					public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8280_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -51,6 +48,8 @@ public:
 	DECLARE_READ8_MEMBER( fk5_r );
 	DECLARE_WRITE8_MEMBER( fk5_w );
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -65,8 +64,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
-	required_device<riot6532_device> m_riot0;
-	required_device<riot6532_device> m_riot1;
+	required_device<mos6532_t> m_riot0;
+	required_device<mos6532_t> m_riot1;
 	required_device<fd1797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

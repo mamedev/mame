@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #pragma once
 
 #ifndef __ISA_CGA_H__
@@ -259,5 +261,26 @@ public:
 // device type definition
 extern const device_type ISA8_CGA_MC1502;
 
+
+class isa8_cga_m24_device :
+		public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// optional information overrides
+	//virtual const rom_entry *device_rom_region() const;
+	virtual DECLARE_READ8_MEMBER( io_read );
+	virtual DECLARE_WRITE8_MEMBER( io_write );
+	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	MC6845_UPDATE_ROW( m24_gfx_1bpp_m24_update_row );
+protected:
+	virtual void device_reset();
+private:
+	UINT8 m_mode2, m_index;
+};
+
+// device type definition
+extern const device_type ISA8_CGA_M24;
 
 #endif  /* __ISA_CGA_H__ */

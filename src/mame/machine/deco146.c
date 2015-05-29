@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Charles MacDonald
 /* Data East 146 protection chip / memory-mapper & I/O interface */
 
 /*

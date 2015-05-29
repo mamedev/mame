@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf,R. Belmont,pSXAuthor,Carl
 #ifndef _included_psxcdrom_
 #define _included_psxcdrom_
 

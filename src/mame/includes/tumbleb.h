@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood,Bryan McPhail
 
 #include "video/decospr.h"
 #include "sound/okim6295.h"

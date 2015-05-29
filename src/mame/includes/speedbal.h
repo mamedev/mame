@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Joseba Epalza
 class speedbal_state : public driver_device
 {
 public:

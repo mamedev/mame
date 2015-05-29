@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /* namcoic.h
 
 Custom Chips:                       Final Lap   Assault     LuckyWld    System21    NA1/2       NB1/2

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mathis Rosenhauer
 /***************************************************************************
 
     Cinematronics Cosmic Chasm hardware
@@ -30,7 +32,7 @@ void cchasm_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-void cchasm_state::cchasm_refresh ()
+void cchasm_state::refresh ()
 {
 	int pc = 0;
 	int done = 0;
@@ -103,18 +105,18 @@ void cchasm_state::cchasm_refresh ()
 		}
 	}
 	/* Refresh processor runs with 6 MHz */
-	timer_set(attotime::from_hz(6000000) * total_length, TIMER_REFRESH_END);
+	m_refresh_end_timer->adjust(attotime::from_hz(6000000) * total_length);
 }
 
 
-WRITE16_MEMBER(cchasm_state::cchasm_refresh_control_w)
+WRITE16_MEMBER(cchasm_state::refresh_control_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		switch (data >> 8)
 		{
 		case 0x37:
-			cchasm_refresh();
+			refresh();
 			break;
 		case 0xf7:
 			m_maincpu->set_input_line(2, CLEAR_LINE);
@@ -129,4 +131,6 @@ void cchasm_state::video_start()
 
 	m_xcenter=visarea.xcenter() << 16;
 	m_ycenter=visarea.ycenter() << 16;
+
+	m_refresh_end_timer = timer_alloc(TIMER_REFRESH_END);
 }

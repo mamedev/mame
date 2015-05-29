@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Alex W. Jackson
 /*
 Mitsubishi M37702 MCUs with Namco custom labels.
 

@@ -4,9 +4,6 @@
 
     Tandy Radio Shack TRS-80 Model II keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

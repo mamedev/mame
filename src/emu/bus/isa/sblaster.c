@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Miodrag Milanovic
 /***************************************************************************
 
   ISA 8/16 bit Creative Labs Sound Blaster Sound Card
@@ -832,12 +834,12 @@ void sb16_device::mixer_set()
 	ymf262_device *ymf = subdevice<ymf262_device>("ymf262");
 	float lmain = m_mixer.main_vol[0]/248.0;
 	float rmain = m_mixer.main_vol[1]/248.0;
-	m_dacl->set_output_gain(ALL_OUTPUTS, lmain*(m_mixer.dac_vol[0]/248.0));
-	m_dacr->set_output_gain(ALL_OUTPUTS, rmain*(m_mixer.dac_vol[1]/248.0));
-	ymf->set_output_gain(0, lmain*(m_mixer.fm_vol[0]/248.0));
-	ymf->set_output_gain(1, rmain*(m_mixer.fm_vol[1]/248.0));
-	ymf->set_output_gain(2, lmain*(m_mixer.fm_vol[0]/248.0));
-	ymf->set_output_gain(3, rmain*(m_mixer.fm_vol[1]/248.0));
+	m_dacl->set_output_gain(ALL_OUTPUTS, lmain*(m_mixer.dac_vol[0]/248.0f));
+	m_dacr->set_output_gain(ALL_OUTPUTS, rmain*(m_mixer.dac_vol[1]/248.0f));
+	ymf->set_output_gain(0, lmain*(m_mixer.fm_vol[0]/248.0f));
+	ymf->set_output_gain(1, rmain*(m_mixer.fm_vol[1]/248.0f));
+	ymf->set_output_gain(2, lmain*(m_mixer.fm_vol[0]/248.0f));
+	ymf->set_output_gain(3, rmain*(m_mixer.fm_vol[1]/248.0f));
 }
 
 void sb16_device::mixer_reset()

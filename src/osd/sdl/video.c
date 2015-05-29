@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  video.c - SDL video handling
-//
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -285,8 +284,6 @@ void sdl_monitor_info::refresh()
 
 float osd_monitor_info::aspect()
 {
-	// refresh the monitor information and compute the aspect
-	refresh();
 	// FIXME: returning 0 looks odd, video_config is bad
 	if (video_config.keepaspect)
 	{

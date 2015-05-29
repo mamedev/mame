@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood,hap
 /***************************************************************************
 
     Toshiba TMPZ84C011, MPUZ80/TLCS-Z80 ASSP Family

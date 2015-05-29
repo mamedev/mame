@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves
 #include "emu.h"
 #include "includes/slapshot.h"
 
@@ -5,19 +7,13 @@
 
 void slapshot_state::video_start()
 {
-	int i;
-
 	m_spriteram_delayed = auto_alloc_array(machine(), UINT16, m_spriteram.bytes() / 2);
 	m_spriteram_buffered = auto_alloc_array(machine(), UINT16, m_spriteram.bytes() / 2);
 	m_spritelist = auto_alloc_array(machine(), struct slapshot_tempsprite, 0x400);
 
-	for (i = 0; i < 8; i ++)
-		m_spritebank[i] = 0x400 * i;
-
 	m_sprites_disabled = 1;
 	m_sprites_active_area = 0;
 
-	save_item(NAME(m_spritebank));
 	save_item(NAME(m_sprites_disabled));
 	save_item(NAME(m_sprites_active_area));
 	save_item(NAME(m_sprites_master_scrollx));
@@ -450,7 +446,7 @@ One exception is the "puck" in early attract which is
 a bg layer given priority over some sprites.
 ********************************************************************/
 
-UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT8 layer[5];

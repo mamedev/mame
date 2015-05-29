@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /*
   copyright peter trauner
 
@@ -172,7 +174,7 @@ static void filterTableInit(running_machine &machine)
 	uk = 0;
 	for ( rk = 0; rk < 0x800; rk++ )
 	{
-		filterTable[uk] = (((exp(rk/0x800*log(400.0))/60.0)+0.05)
+		filterTable[uk] = (((expf(rk/0x800*logf(400.0f))/60.0f)+0.05f)
 			*filterRefFreq) / sample_rate;
 		if ( filterTable[uk] < yMin )
 			filterTable[uk] = yMin;

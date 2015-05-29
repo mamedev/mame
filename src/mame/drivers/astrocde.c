@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles
 /****************************************************************************
 
     Bally Astrocade style games
@@ -207,8 +209,8 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
 	m_samples->set_volume(9, (data & 0x80) ? 1.0 : 0.0);
 
 	/* dive panning controlled by low 3 bits */
-	m_samples->set_volume(2, (float)(~data & 0x07) / 7.0);
-	m_samples->set_volume(7, (float)(data & 0x07) / 7.0);
+	m_samples->set_volume(2, (float)(~data & 0x07) / 7.0f);
+	m_samples->set_volume(7, (float)(data & 0x07) / 7.0f);
 
 	if (rising_bits & 0x08)
 	{

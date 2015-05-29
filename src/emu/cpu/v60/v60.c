@@ -1,7 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, R. Belmont
 // V60.C
 // Undiscover the beast!
 // Main hacking and coding by Farfetch'd
-// Portability fixes by Richter Belmont
+// Portability fixes by R. Belmont
 //
 // Emulation for the NEC V60 (uPD70615) and V70 (uPD70632) CPUs
 //

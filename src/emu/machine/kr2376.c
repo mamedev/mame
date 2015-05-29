@@ -1,9 +1,8 @@
+// license:???
+// copyright-holders:Roberto Lavarone
 /**********************************************************************
 
     SMC KR2376 Keyboard Encoder emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

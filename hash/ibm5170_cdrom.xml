@@ -2,6 +2,27 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="ibm5170_cdrom" description="IBM PC/AT CD-ROM images">
 
+	<software name="acercpr" supported="no">
+		<!-- Floppy dumped via Kryoflux, three tracks show as modified -->
+		<description>Acer CPR</description>
+		<year>1995</year>
+		<publisher>Acer America Corporation</publisher>
+		<info name="version" value="1.2a" />    <!-- floppy version 1.2a, CD version 1.2 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_label" value="Hard Drive Recovery Start-Up Diskette" />
+			<dataarea name="flop" size="1474560">
+				<rom name="acer cpr.img" size="1474560" crc="6f88a82a" sha1="a0afd6dcddbf6ae67d5c28c068af2fa9843dcb5f" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="Hard Drive Recovery" />
+			<diskarea name="cdrom">
+				<disk name="acercpr" sha1="a0f073387e661318eae2d1fdd30dfb116d1295ae" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="pcdos2k">
 		<description>PC DOS 2000</description>
 		<year>1998</year>

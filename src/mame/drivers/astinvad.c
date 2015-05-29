@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Lee Taylor
 /***************************************************************************
 
 Misc early Z80 games with simple color bitmap graphics

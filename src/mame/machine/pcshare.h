@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -26,7 +28,7 @@ public:
 	required_device<pic8259_device> m_pic8259_1;
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<pit8254_device> m_pit8254;
-	required_device<mc146818_device> m_mc146818;
+	optional_device<mc146818_device> m_mc146818;
 	required_device<kbdc8042_device> m_kbdc;
 
 	DECLARE_READ8_MEMBER(at_dma8237_2_r);

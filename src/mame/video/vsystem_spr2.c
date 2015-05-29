@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, David Haywood
 // Video System Sprites (type 2)
 // todo:
 //  move various vsystem sprite functions here

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Eugene Sandulenko
 
 class tiamc1_state : public driver_device
 {

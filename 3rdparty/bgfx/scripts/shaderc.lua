@@ -14,6 +14,11 @@ project "shaderc"
 		path.join(GLSL_OPTIMIZER, "src"),
 	}
 
+	removeflags {
+		-- GCC 4.9 -O2 + -fno-strict-aliasing don't work together...
+		"OptimizeSpeed",
+	}
+
 	configuration { "vs*" }
 		includedirs {
 			path.join(GLSL_OPTIMIZER, "src/glsl/msvc"),
@@ -33,7 +38,11 @@ project "shaderc"
 
 	configuration { "mingw* or linux or osx" }
 		buildoptions {
-			"-fno-strict-aliasing" -- glsl-optimizer has bugs if strict aliasing is used.
+			"-fno-strict-aliasing", -- glsl-optimizer has bugs if strict aliasing is used.
+			"-Wno-unused-parameter",
+		}
+		removebuildoptions {
+			"-Wshadow", -- glsl-optimizer is full of -Wshadow warnings ignore it.
 		}
 
 	configuration { "osx" }
@@ -41,20 +50,20 @@ project "shaderc"
 			"Cocoa.framework",
 		}
 
-	configuration { "windows", "vs*" }
+	configuration { "vs*" }
 		includedirs {
 			path.join(GLSL_OPTIMIZER, "include/c99"),
 		}
 
-	configuration { "windows" }
+	configuration { "vs*" }
 		includedirs {
 			"$(DXSDK_DIR)/include",
 		}
 
+
+	configuration { "vs* or mingw*" }
 		links {
-			"d3dx9",
 			"d3dcompiler",
-			"dxguid",
 		}
 
 	configuration {}
@@ -102,7 +111,7 @@ project "shaderc"
 		path.join(GLSL_OPTIMIZER, "src/util/**.h"),
 	}
 
-	excludes {
+	removefiles {
 		path.join(GLSL_OPTIMIZER, "src/glsl/glcpp/glcpp.c"),
 		path.join(GLSL_OPTIMIZER, "src/glsl/glcpp/tests/**"),
 		path.join(GLSL_OPTIMIZER, "src/glsl/glcpp/**.l"),

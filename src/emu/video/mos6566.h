@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
     MOS 6566/6567/6569 Video Interface Chip II (VIC-II) emulation
-
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
                             _____   _____

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 /***************************************************************************
 
 Taito B System

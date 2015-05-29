@@ -225,6 +225,9 @@ typedef UINT32                              FPTR;
 
 #ifdef _MSC_VER
 #include <malloc.h>
+#if _MSC_VER == 1900 // < VS2015
+#define __LINE__Var 0
+#endif
 #if _MSC_VER < 1900 // < VS2015
 #define snprintf _snprintf
 #if _MSC_VER < 1800 // VS2013 or earlier
@@ -244,7 +247,7 @@ static __inline double log2(double x) { return log(x) * M_LOG2E; }
 
 #ifdef __GNUC__
 #ifndef alloca
-#define alloca  __builtin_alloca
+#define alloca(size)  __builtin_alloca(size)
 #endif
 #endif
 

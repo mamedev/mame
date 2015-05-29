@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:R. Belmont, Brad Martin
 /*****************************************************************************
  *
  * audio/snes_spc.h

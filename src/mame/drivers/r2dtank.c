@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 /*******************************************************************
 R2D Tank (c) 1980 Sigma Ent. Inc.
 

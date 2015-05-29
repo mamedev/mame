@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 /*********************************************************************
 
     ap2_dsk.c
@@ -607,9 +609,8 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 
 	int fpos = 0;
 	for(int track=0; track < 35; track++) {
-		UINT32 track_data[51090*2];
+		std::vector<UINT32> track_data;
 		UINT8 sector_data[256*16];
-		int offset = 0;
 		static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
 		static const unsigned char pascal2_block1[4] = { 0xff, 0xa2, 0x00, 0x8e };
 		static const unsigned char dos33_block1[4] = { 0xa2, 0x02, 0x8e, 0x52 };
@@ -668,7 +669,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 
 		fpos += 256*16;
 		for(int i=0; i<51; i++)
-			raw_w(track_data, offset, 10, 0x3fc);
+			raw_w(track_data, 10, 0x3fc);
 		for(int i=0; i<16; i++) {
 			int sector;
 
@@ -683,20 +684,20 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 
 			const UINT8 *sdata = sector_data + 256 * sector;
 			for(int j=0; j<20; j++)
-				raw_w(track_data, offset, 10, 0x3fc);
-			raw_w(track_data, offset,  8, 0xff);
-			raw_w(track_data, offset, 24, 0xd5aa96);
-			raw_w(track_data, offset, 16, gcr4_encode(0xfe));
-			raw_w(track_data, offset, 16, gcr4_encode(track));
-			raw_w(track_data, offset, 16, gcr4_encode(i));
-			raw_w(track_data, offset, 16, gcr4_encode(0xfe ^ track ^ i));
-			raw_w(track_data, offset, 24, 0xdeaaeb);
+				raw_w(track_data, 10, 0x3fc);
+			raw_w(track_data,  8, 0xff);
+			raw_w(track_data, 24, 0xd5aa96);
+			raw_w(track_data, 16, gcr4_encode(0xfe));
+			raw_w(track_data, 16, gcr4_encode(track));
+			raw_w(track_data, 16, gcr4_encode(i));
+			raw_w(track_data, 16, gcr4_encode(0xfe ^ track ^ i));
+			raw_w(track_data, 24, 0xdeaaeb);
 
 			for(int j=0; j<4; j++)
-				raw_w(track_data, offset, 10, 0x3fc);
+				raw_w(track_data, 10, 0x3fc);
 
-			raw_w(track_data, offset,  9, 0x01fe);
-			raw_w(track_data, offset, 24, 0xd5aaad);
+			raw_w(track_data,  9, 0x01fe);
+			raw_w(track_data, 24, 0xd5aaad);
 
 			UINT8 pval = 0x00;
 			for(int i=0; i<342; i++) {
@@ -714,16 +715,16 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 							((sdata[i+0xac] & 0x01) << 5) |
 							((sdata[i+0xac] & 0x02) << 3);
 				}
-				raw_w(track_data, offset, 8, translate6[nval ^ pval]);
+				raw_w(track_data, 8, translate6[nval ^ pval]);
 				pval = nval;
 			}
-			raw_w(track_data, offset, 8, translate6[pval]);
-			raw_w(track_data, offset, 24, 0xdeaaeb);
+			raw_w(track_data, 8, translate6[pval]);
+			raw_w(track_data, 24, 0xdeaaeb);
 		}
-		raw_w(track_data, offset, 4, 0xff);
-		assert(offset == 51090);
+		raw_w(track_data, 4, 0xff);
+		assert(track_data.size() == 51090);
 
-		generate_track_from_levels(track, 0, track_data, 51090, 0, image);
+		generate_track_from_levels(track, 0, track_data, 0, image);
 	}
 	return true;
 }
@@ -997,10 +998,10 @@ const floppy_format_type FLOPPY_A216S_FORMAT = &floppy_image_format_creator<a2_1
    D5 9D <track> <sector> <checksum> AA FF FF <titlespecific sync> <0x400 nybbles which represent 768 bytes> <data checksum> D6
    Title-specific sync bytes are:
     Airheart: D4
-    Toy Shop: unknown
+    Toy Shop: A5
     Carmen USA: unknown (not all released versions used RWTS18)
     Wings of Fury: 96
-    Prince of Persia: unknown
+    Prince of Persia: A9
     And several others.
 */
 a2_rwts18_format::a2_rwts18_format() : floppy_image_format_t()

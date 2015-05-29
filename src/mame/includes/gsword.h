@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steve Ellenoff,Jarek Parchanski
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 

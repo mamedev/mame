@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, Enik Land
 /*************************************************************************
 
     sega315_5124.h

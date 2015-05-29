@@ -46,7 +46,7 @@ public:
 
 	virtual ~debugger_windows() { }
 
-	virtual int init() { return 0; }
+	virtual int init(const osd_options &options) { return 0; }
 	virtual void exit();
 
 	virtual void init_debugger(running_machine &machine);
@@ -96,7 +96,7 @@ void debugger_windows::exit()
 void debugger_windows::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
-	m_metrics.reset(global_alloc(ui_metrics(downcast<windows_options &>(m_machine->options()))));
+	m_metrics.reset(global_alloc(ui_metrics(downcast<osd_options &>(m_machine->options()))));
 }
 
 

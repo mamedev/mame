@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andreas Naive,David Haywood
 #include "igs036crypt.h"
 
 /****************************************************************************

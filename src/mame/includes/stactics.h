@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 /****************************************************************************
 
     Sega "Space Tactics" Driver
@@ -32,11 +34,11 @@ public:
 	required_shared_ptr<UINT8> m_videoram_d;
 	required_shared_ptr<UINT8> m_videoram_e;
 	required_shared_ptr<UINT8> m_videoram_f;
-	
+
 	/* machine state */
 	int    m_vert_pos;
 	int    m_horiz_pos;
-	
+
 	/* video state */
 	UINT8  m_y_scroll_d;
 	UINT8  m_y_scroll_e;

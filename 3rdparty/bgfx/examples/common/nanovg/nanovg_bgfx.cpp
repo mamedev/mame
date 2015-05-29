@@ -32,6 +32,8 @@
 
 #include <bx/bx.h>
 
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4244); // warning C4244: '=' : conversion from '' to '', possible loss of data
+
 namespace
 {
 #include "vs_nanovg_fill.bin.h"
@@ -309,14 +311,13 @@ namespace
 		const bgfx::Memory* mem = NULL;
 		if (NULL != _rgba)
 		{
-			mem = bgfx::alloc(tex->height * pitch);
-			bgfx::imageSwizzleBgra8(tex->width, tex->height, pitch, _rgba, mem->data);
+			mem = bgfx::copy(_rgba, tex->height * pitch);
 		}
 
 		tex->id = bgfx::createTexture2D(tex->width
 						, tex->height
 						, 1
-						, NVG_TEXTURE_RGBA == _type ? bgfx::TextureFormat::BGRA8 : bgfx::TextureFormat::R8
+						, NVG_TEXTURE_RGBA == _type ? bgfx::TextureFormat::RGBA8 : bgfx::TextureFormat::R8
 						, BGFX_TEXTURE_NONE
 						, mem
 						);

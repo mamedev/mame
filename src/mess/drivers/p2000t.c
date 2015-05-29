@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Daniels
 /************************************************************************
 Philips P2000 1 Memory map
 

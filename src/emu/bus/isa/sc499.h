@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer, R. Belmont
 /*
  * sc499.h - Archive Cartridge tape controller SC-499
  *
  *  Created on: February 21, 2011
  *      Author: Hans Ostermeyer
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  */
 
@@ -46,7 +45,7 @@ public:
 
 	UINT8 *read_block(int block_num);
 	void write_block(int block_num, UINT8 *ptr);
-	UINT64 tapelen() { return m_ctape_data.bytes(); }
+	UINT64 tapelen() { return m_ctape_data.size(); }
 
 protected:
 	// device-level overrides

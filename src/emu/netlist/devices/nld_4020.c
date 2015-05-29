@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_4020.c
  *
@@ -7,8 +9,8 @@
 
 NETLIB_START(4020)
 {
-	register_sub(sub, "sub");
-	register_sub(m_supply, "supply");
+	register_sub("sub", sub);
+	register_sub("supply", m_supply);
 
 	register_input("RESET", m_RESET);
 	register_subalias("IP", sub.m_IP);
@@ -56,7 +58,7 @@ NETLIB_START(4020_sub)
 
 NETLIB_RESET(4020_sub)
 {
-	m_IP.set_state(netlist_input_t::STATE_INP_HL);
+	m_IP.set_state(netlist_logic_t::STATE_INP_HL);
 	m_cnt = 0;
 }
 

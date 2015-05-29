@@ -575,7 +575,7 @@ private:
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
 	auto_pointer<palette_client> m_palclient;       // client to the screen palette
-	dynamic_array<rgb_t>    m_bcglookup;            // copy of screen palette with bcg adjustment
+	std::vector<rgb_t>           m_bcglookup;            // copy of screen palette with bcg adjustment
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 };
 

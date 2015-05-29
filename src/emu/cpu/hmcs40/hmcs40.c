@@ -144,12 +144,12 @@ hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, d
 
 
 // disasm
-void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c",
+			strprintf(str, "%c%c",
 				m_c ? 'C':'c',
 				m_s ? 'S':'s'
 			);
@@ -502,7 +502,7 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 void hmcs40_cpu_device::reset_prescaler()
 {
 	// reset 6-bit timer prescaler
-	attotime base = attotime::from_hz(unscaled_clock() / 4 / 64);
+	attotime base = attotime::from_ticks(4 * 64, unscaled_clock());
 	m_timer->adjust(base);
 }
 
@@ -553,22 +553,25 @@ void hmcs40_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		m_icount--;
-
 		// LPU is handled 1 cycle later
 		if ((m_prev_op & 0x3e0) == 0x340)
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
-
-		// check/handle interrupt, but not in the middle of a long jump
-		if (m_ie && (m_iri || m_irt) && (m_op & 0x3e0) != 0x340)
-			do_interrupt();
 
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 
+		// check/handle interrupt, but not in the middle of a long jump
+		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340)
+		{
+			do_interrupt();
+			if (m_icount <= 0)
+				break;
+		}
+
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
+		m_icount--;
 		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
 		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR, REDD, SEDD)
 		increment_pc();

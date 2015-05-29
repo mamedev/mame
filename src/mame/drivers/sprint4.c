@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Stefan Jokisch
 /***************************************************************************
 
 Atari Sprint 4 driver

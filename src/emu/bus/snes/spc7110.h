@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Fabio Priuli, byuu
 #ifndef __SNS_SPC7110_H
 #define __SNS_SPC7110_H
 

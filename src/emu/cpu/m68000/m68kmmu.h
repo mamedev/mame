@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Hans Ostermeyer
 /*
     m68kmmu.h - PMMU implementation for 68851/68030/68040
             HMMU implementation for 68020 (II and LC variants)
 
     By R. Belmont and Hans Ostermeyer
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 */
 
 // MMU status register bit definitions

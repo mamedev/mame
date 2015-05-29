@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /****************************************************************************
 
 Some Dynax games using the first version of their blitter

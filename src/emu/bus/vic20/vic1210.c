@@ -5,9 +5,6 @@
     Commodore VIC-1210 3K RAM Expansion Cartridge emulation
     Commodore VIC-1211A Super Expander with 3K RAM Cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "vic1210.h"

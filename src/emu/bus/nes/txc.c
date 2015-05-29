@@ -1,11 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for TXC PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
-
 
  Here we emulate the following PCBs
 
@@ -219,11 +217,11 @@ READ8_MEMBER(nes_txc_mjblock_device::read_l)
 
  Bootleg Board 'Strike Wolf' by TXC
 
- Games: Strike Wolf (also Policeman?? according to Nestopia)
+ Games: Strike Wolf and Policeman
 
  iNES: mapper 36
 
- In MESS: Supported.
+ In MESS: Partially Supported (Policeman has glitches)
 
  -------------------------------------------------*/
 

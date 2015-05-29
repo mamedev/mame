@@ -1,4 +1,4 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:Robbbert
 /***************************************************************************
 
@@ -285,7 +285,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	else
 	{
 		quick_data.resize(quick_length);
-		read_ = image.fread( quick_data, quick_length);
+		read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");

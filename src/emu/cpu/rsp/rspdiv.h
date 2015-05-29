@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 static const UINT16 rsp_divtable[1024] =
 {
 	0xffff,

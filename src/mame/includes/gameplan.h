@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Chris Moore
 /***************************************************************************
 
 GAME PLAN driver

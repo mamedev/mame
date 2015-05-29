@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Patrick Lawrence, Aaron Giles
 /***************************************************************************
 
     Atari Crystal Castles hardware

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Nicola Salmoria, Tomasz Slanina
 #include "audio/t5182.h"
 
 class darkmist_state : public driver_device

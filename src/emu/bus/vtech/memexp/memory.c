@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     VTech Laser/VZ Laser Memory Expansions
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
 ***************************************************************************/
 
@@ -49,7 +48,7 @@ void laser110_16k_device::device_start()
 
 void laser110_16k_device::device_reset()
 {
-	m_slot->m_program->install_ram(0x8000, 0xbfff, m_ram);
+	m_slot->m_program->install_ram(0x8000, 0xbfff, &m_ram[0]);
 }
 
 
@@ -82,7 +81,7 @@ void laser210_16k_device::device_start()
 
 void laser210_16k_device::device_reset()
 {
-	m_slot->m_program->install_ram(0x9000, 0xcfff, m_ram);
+	m_slot->m_program->install_ram(0x9000, 0xcfff, &m_ram[0]);
 }
 
 
@@ -115,7 +114,7 @@ void laser310_16k_device::device_start()
 
 void laser310_16k_device::device_reset()
 {
-	m_slot->m_program->install_ram(0xb800, 0xf7ff, m_ram);
+	m_slot->m_program->install_ram(0xb800, 0xf7ff, &m_ram[0]);
 }
 
 
@@ -149,12 +148,12 @@ void laser_64k_device::device_start()
 void laser_64k_device::device_reset()
 {
 	// fixed first bank
-	m_slot->m_program->install_ram(0x8000, 0xbfff, m_ram);
+	m_slot->m_program->install_ram(0x8000, 0xbfff, &m_ram[0]);
 
 	// other banks
 	m_slot->m_program->install_readwrite_bank(0xc000, 0xffff, tag());
 
-	membank(tag())->configure_entries(0, 4, m_ram, 0x4000);
+	membank(tag())->configure_entries(0, 4, &m_ram[0], 0x4000);
 	membank(tag())->set_entry(1);
 
 	// bank switch

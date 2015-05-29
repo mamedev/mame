@@ -66,7 +66,7 @@ public:
 	// query information
 	int index() const { return m_index; }
 	void *dataptr() const { return m_dataptr.v; }
-	const char *symbol() const { return m_symbol; }
+	const char *symbol() const { return m_symbol.c_str(); }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
 	bool divider() const { return m_flags & DSF_DIVIDER; }
 	device_state_interface *parent_state() const {return m_device_state;}
@@ -87,7 +87,7 @@ protected:
 	// return the current value -- only for our friends who handle export
 	bool needs_export() const { return ((m_flags & DSF_EXPORT) != 0); }
 	UINT64 value() const;
-	astring &format(astring &dest, const char *string, bool maxout = false) const;
+	std::string &format(std::string &dest, const char *string, bool maxout = false) const;
 
 	// set the current value -- only for our friends who handle import
 	bool needs_import() const { return ((m_flags & DSF_IMPORT) != 0); }
@@ -105,8 +105,8 @@ protected:
 	UINT64                  m_datamask;             // mask that applies to the data
 	UINT8                   m_datasize;             // size of the data
 	UINT8                   m_flags;                // flags for this data
-	astring                 m_symbol;               // symbol for display; all lower-case version for expressions
-	astring                 m_format;               // supported formats
+	std::string             m_symbol;               // symbol for display; all lower-case version for expressions
+	std::string             m_format;               // supported formats
 	bool                    m_default_format;       // true if we are still using default format
 	UINT64                  m_sizemask;             // mask derived from the data size
 };
@@ -128,7 +128,7 @@ public:
 
 	// state getters
 	UINT64 state_int(int index);
-	astring &state_string(int index, astring &dest);
+	std::string &state_string(int index, std::string &dest);
 	int state_string_max_length(int index);
 	offs_t pc() { return state_int(STATE_GENPC); }
 	offs_t pcbase() { return state_int(STATE_GENPCBASE); }
@@ -162,8 +162,8 @@ protected:
 	// derived class overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_import(const device_state_entry &entry, astring &string);
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_import(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// internal operation overrides
 	virtual void interface_post_start();

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Data East MLC Hardware:
@@ -819,7 +821,7 @@ void deco_mlc_state::descramble_sound(  )
 		buf1[addr] = rom[x];
 	}
 
-	memcpy(rom,buf1,length);
+	memcpy(rom,&buf1[0],length);
 }
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)

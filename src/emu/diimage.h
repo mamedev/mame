@@ -80,17 +80,17 @@ public:
 			m_optspec(optspec)  { }
 
 	image_device_format *next() const { return m_next; }
-	const char *name() const { return m_name; }
-	const char *description() const { return m_description; }
-	const char *extensions() const { return m_extensions; }
-	const char *optspec() const { return m_optspec; }
+	const char *name() const { return m_name.c_str(); }
+	const char *description() const { return m_description.c_str(); }
+	const char *extensions() const { return m_extensions.c_str(); }
+	const char *optspec() const { return m_optspec.c_str(); }
 
 private:
 	image_device_format *m_next;
-	astring m_name;
-	astring m_description;
-	astring m_extensions;
-	astring m_optspec;
+	std::string m_name;
+	std::string m_description;
+	std::string m_extensions;
+	std::string m_optspec;
 };
 
 
@@ -170,11 +170,11 @@ public:
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
-	bool exists() { return m_image_name; }
-	const char *filename() { if (!m_image_name) return NULL; else return m_image_name; }
-	const char *basename() { if (!m_basename) return NULL; else return m_basename; }
-	const char *basename_noext()  { if (!m_basename_noext) return NULL; else return m_basename_noext; }
-	const char *filetype()  { if (!m_filetype) return NULL; else return m_filetype; }
+	bool exists() { return !m_image_name.empty(); }
+	const char *filename() { if (m_image_name.empty()) return NULL; else return m_image_name.c_str(); }
+	const char *basename() { if (m_basename.empty()) return NULL; else return m_basename.c_str(); }
+	const char *basename_noext()  { if (m_basename_noext.empty()) return NULL; else return m_basename_noext.c_str(); }
+	const char *filetype()  { if (m_filetype.empty()) return NULL; else return m_filetype.c_str(); }
 	core_file *image_core_file() { return m_file; }
 	UINT64 length() { check_for_file(); return core_fsize(m_file); }
 	bool is_readonly() { return m_readonly; }
@@ -193,14 +193,14 @@ public:
 	// configuration access
 	void set_init_phase() { m_init_phase = TRUE; }
 
-	const char* longname() { return m_longname; }
-	const char* manufacturer() { return m_manufacturer; }
-	const char* year() { return m_year; }
+	const char* longname() { return m_longname.c_str(); }
+	const char* manufacturer() { return m_manufacturer.c_str(); }
+	const char* year() { return m_year.c_str(); }
 	UINT32 supported() { return m_supported; }
 
 	const software_info *software_entry() { return m_software_info_ptr; }
 	const software_part *part_entry() { return m_software_part_ptr; }
-	const char *software_list_name() { return m_software_list_name; }
+	const char *software_list_name() { return m_software_list_name.c_str(); }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
@@ -221,8 +221,8 @@ public:
 
 
 
-	const char *instance_name() const { return m_instance_name; }
-	const char *brief_instance_name() const { return m_brief_instance_name; }
+	const char *instance_name() const { return m_instance_name.c_str(); }
+	const char *brief_instance_name() const { return m_brief_instance_name.c_str(); }
 	bool uses_file_extension(const char *file_extension) const;
 	image_device_format *formatlist() const { return m_formatlist.first(); }
 
@@ -234,7 +234,7 @@ public:
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const char *path);
 
-	static void software_name_split(const char *swlist_swname, astring &swlist_name, astring &swname, astring &swpart);
+	static void software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart);
 
 protected:
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load);
@@ -259,7 +259,7 @@ protected:
 
 	software_part *find_software_item(const char *path, bool restrict_to_interface);
 	bool load_software_part(const char *path, software_part *&swpart);
-	void software_get_default_slot(astring &result, const char *default_card_slot);
+	void software_get_default_slot(std::string &result, const char *default_card_slot);
 
 	// derived class overrides
 
@@ -269,29 +269,29 @@ protected:
 
 	/* error related info */
 	image_error_t m_err;
-	astring m_err_message;
+	std::string m_err_message;
 
 	/* variables that are only non-zero when an image is mounted */
 	core_file *m_file;
 	emu_file *m_mame_file;
-	astring m_image_name;
-	astring m_basename;
-	astring m_basename_noext;
-	astring m_filetype;
+	std::string m_image_name;
+	std::string m_basename;
+	std::string m_basename_noext;
+	std::string m_filetype;
 
 	/* working directory; persists across mounts */
-	astring m_working_directory;
+	std::string m_working_directory;
 
 	/* Software information */
-	astring m_full_software_name;
+	std::string m_full_software_name;
 	software_info *m_software_info_ptr;
 	software_part *m_software_part_ptr;
-	astring m_software_list_name;
+	std::string m_software_list_name;
 
 	/* info read from the hash file/software list */
-	astring m_longname;
-	astring m_manufacturer;
-	astring m_year;
+	std::string m_longname;
+	std::string m_manufacturer;
+	std::string m_year;
 	UINT32  m_supported;
 
 	/* flags */
@@ -306,8 +306,8 @@ protected:
 
 	hash_collection m_hash;
 
-	astring m_brief_instance_name;
-	astring m_instance_name;
+	std::string m_brief_instance_name;
+	std::string m_instance_name;
 
 	/* creation info */
 	simple_list<image_device_format> m_formatlist;

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 #ifndef __MM58274C_H__
 #define __MM58274C_H__
 

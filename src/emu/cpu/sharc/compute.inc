@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 /* compute operations */
 
 #include <math.h>
@@ -739,7 +741,7 @@ void adsp21062_device::compute_fclip(int rn, int rx, int ry)
 {
 	SHARC_REG r_alu;
 
-	if (FREG(rx) < fabs(FREG(ry)))
+	if (FREG(rx) < fabsf(FREG(ry)))
 	{
 		r_alu.f = FREG(rx);
 	}
@@ -747,11 +749,11 @@ void adsp21062_device::compute_fclip(int rn, int rx, int ry)
 	{
 		if (FREG(rx) >= 0.0f)
 		{
-			r_alu.f = fabs(FREG(ry));
+			r_alu.f = fabsf(FREG(ry));
 		}
 		else
 		{
-			r_alu.f = -fabs(FREG(ry));
+			r_alu.f = -fabsf(FREG(ry));
 		}
 	}
 

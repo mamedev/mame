@@ -2,9 +2,6 @@
 
 <!-- 2007-10-21: Initial version.  [Dirk Best] -->
 
-<!-- license: MAME, GPL-2.0+ -->
-<!-- copyright-holders: Dirk Best -->
-
 <mamelayout version="2">
 
 	<element name="digit" defstate="0">

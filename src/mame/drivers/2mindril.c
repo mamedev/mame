@@ -1,4 +1,4 @@
-// license:?
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Tomasz Slanina, David Haywood
 /*
  Two Minute Drill - Taito 1993

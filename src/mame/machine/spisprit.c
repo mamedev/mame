@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Nicola Salmoria
+
 #if 0
 key tables: table[n] is the column of bit n
 cpu #0 (PC=0033C2F5): unmapped program memory dword write to 00000530 = 0000xxxx & FFFFFFFF (256 times, see key_table[])

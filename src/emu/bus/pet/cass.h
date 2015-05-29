@@ -4,9 +4,6 @@
 
     Commodore PET/VIC-20/C64/Plus-4 Datassette Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                     GND       1      A       GND

@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese
 class nb1414m4_device : public device_t,
 									public device_video_interface
 {

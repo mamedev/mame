@@ -16,6 +16,7 @@
 #include "imagedev/flopdrv.h"
 #include "imagedev/printer.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/abc80kb.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
@@ -57,8 +58,8 @@
 #define Z80PIO_TAG          "cd67"
 #define SN76477_TAG         "g8"
 #define RS232_TAG           "ser"
-#define CASSETTE_TAG 		"cassette"
-#define KEYBOARD_TAG 		"keyboard"
+#define CASSETTE_TAG        "cassette"
+#define KEYBOARD_TAG        "keyboard"
 #define TIMER_CASSETTE_TAG  "cass"
 
 class abc80_state : public driver_device
@@ -91,7 +92,7 @@ public:
 	required_device<z80pio_device> m_pio;
 	required_device<sn76477_device> m_psg;
 	required_device<cassette_image_device> m_cassette;
-	required_device<abcbus_slot_device> m_bus;
+	required_device<abcbus_slot_t> m_bus;
 	required_device<abc80_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
@@ -115,6 +116,13 @@ public:
 		TIMER_ID_FAKE_KEYBOARD_CLEAR
 	};
 
+	enum
+	{
+		BOFA = 0xfe1c,
+		EOFA = 0xfe1e,
+		HEAD = 0xfe20
+	};
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	virtual void machine_start();
@@ -135,6 +143,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 	DECLARE_WRITE8_MEMBER( kbd_w );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
 
 	enum
 	{

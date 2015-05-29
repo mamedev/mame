@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "sound/upd7759.h"
 
 class prehisle_state : public driver_device

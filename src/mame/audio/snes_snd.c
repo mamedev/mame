@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:R. Belmont, Brad Martin
 /***************************************************************************
 
   snes_snd.c

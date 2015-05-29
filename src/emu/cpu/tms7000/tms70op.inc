@@ -1,8 +1,7 @@
-/*****************************************************************************
- *
- * tms70op.inc (Op code functions)
- *
- *****************************************************************************/
+// license:BSD-3-Clause
+// copyright-holders:hap, Tim Lindner
+
+// TMS7000 opcode handlers
 
 // addressing modes (not all opcodes have a write cycle)
 #define WB_NO -1

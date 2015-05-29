@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Victor Trucco, Mike Balfour, Phil Stroffolino
 #include "sound/samples.h"
 #include "video/tms9927.h"
 

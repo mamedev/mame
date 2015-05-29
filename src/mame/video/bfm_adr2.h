@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #ifndef INC_BFMADDER2
 #define INC_BFMADDER2
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 #include "emu.h"
 #include "machine/z80bin.h"
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 #include "midi.h"
 
 const device_type MIDI_PORT = &device_creator<midi_port_device>;

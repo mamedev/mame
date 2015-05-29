@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #pragma once
 
 #ifndef _K573DIO_H_

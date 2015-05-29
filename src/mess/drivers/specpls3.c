@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker
 /***************************************************************************
 
     NOTE: ****** Specbusy: press N, R, or E to boot *************

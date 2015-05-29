@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tim Schuerewegen
 /*
 
     M-Systems DiskOnChip G3 - Flash Disk with MLC NAND and M-Systems? x2 Technology

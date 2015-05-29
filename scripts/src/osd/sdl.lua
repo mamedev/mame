@@ -1,7 +1,10 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 dofile("modules.lua")
 
 
-function maintargetosdoptions(_target)
+function maintargetosdoptions(_target,_subtarget)
 	osdmodulestargetconf()
 
 	if _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS["MESA_INSTALL_ROOT"] then
@@ -37,13 +40,23 @@ function maintargetosdoptions(_target)
 				"SDL_ttf",
 			}
 		end
-		linkoptions {
-			string.gsub(os.outputof("pkg-config --libs fontconfig"), '[\r\n]+', ' '),
-		}
+		local str = backtick("pkg-config --libs fontconfig")
+		addlibfromstring(str)
+		addoptionsfromstring(str)
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
-		configuration { "mingw*" }
+		if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+			links {
+				"SDL2.dll",
+			}
+		else
+			links {
+				"SDL.dll",
+			}
+		end
+
+		configuration { "mingw*-gcc" }
 			linkoptions{
 				"-municode",
 			}
@@ -59,10 +72,6 @@ function maintargetosdoptions(_target)
 			libdirs {
 				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
 			}
-		configuration { "vs*" }	
-			links {
-				"SDL2",
-			}
 		configuration {}
 	elseif _OPTIONS["targetos"]=="haiku" then
 		links {
@@ -70,7 +79,7 @@ function maintargetosdoptions(_target)
 			"bsd",
 		}
 	end
-	
+
 	configuration { "mingw*" or "vs*" }
 		targetprefix "sdl"
 
@@ -102,7 +111,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_X11"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="emscripten" or _OPTIONS["targetos"]=="os2" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" or _OPTIONS["targetos"]=="os2" then
 		_OPTIONS["NO_X11"] = "1"
 	else
 		_OPTIONS["NO_X11"] = "0"
@@ -193,7 +202,7 @@ elseif _OPTIONS["targetos"]=="netbsd" then
 	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
 	SYNC_IMPLEMENTATION = "ntc"
-elseif _OPTIONS["targetos"]=="emscripten" then
+elseif _OPTIONS["targetos"]=="asmjs" then
 	SYNC_IMPLEMENTATION = "mini"
 elseif _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
@@ -208,6 +217,10 @@ elseif _OPTIONS["targetos"]=="os2" then
 	BASE_TARGETOS       = "os2"
 	SDLOS_TARGETOS      = "os2"
 	SYNC_IMPLEMENTATION = "os2"
+end
+
+if _OPTIONS["SDL_LIBVER"]=="sdl" then
+	USE_BGFX = 0
 end
 
 if BASE_TARGETOS=="unix" then
@@ -229,9 +242,9 @@ if BASE_TARGETOS=="unix" then
 				}
 			end
 		else
-			linkoptions {
-				string.gsub(os.outputof(sdlconfigcmd() .. " --libs | sed 's/-lSDLmain//'"), '[\r\n]+', ' '),
-			}
+			local str = backtick(sdlconfigcmd() .. " --libs | sed 's/-lSDLmain//'")
+			addlibfromstring(str)
+			addoptionsfromstring(str)
 		end
 	else
 		if _OPTIONS["NO_X11"]=="1" then
@@ -249,9 +262,9 @@ if BASE_TARGETOS=="unix" then
 				}
 			end
 		end
-		linkoptions {
-			string.gsub(os.outputof(sdlconfigcmd() .. " --libs"), '[\r\n]+', ' '),
-		}
+		local str = backtick(sdlconfigcmd() .. " --libs")
+		addlibfromstring(str)
+		addoptionsfromstring(str)
 		if _OPTIONS["targetos"]~="haiku" then
 			links {
 				"m",
@@ -270,20 +283,13 @@ if BASE_TARGETOS=="unix" then
 		end
 	end
 elseif BASE_TARGETOS=="os2" then
-	linkoptions {
-		string.gsub(os.outputof(sdlconfigcmd() .. " --libs"), '[\r\n]+', ' '),
-	}
+	local str = backtick(sdlconfigcmd() .. " --libs")
+	addlibfromstring(str)
+	addoptionsfromstring(str)
 	links {
 		"pthread"
 	}
 end
-
-configuration { "mingw*" }
-		linkoptions {
-			"-static"
-		}
-
-configuration { }
 
 
 project ("osd_" .. _OPTIONS["osd"])
@@ -363,11 +369,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	removeflags {
-		"SingleOutputDir",	
+		"SingleOutputDir",
 	}
 
 	dofile("sdl_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",
@@ -419,35 +425,95 @@ if _OPTIONS["with-tools"] then
 			"ForceCPP",
 		}
 
+		flags {
+			"Symbols", -- always include minimum symbols for executables 	
+		}
+
 		dofile("sdl_cfg.lua")
 
 		includedirs {
+			MAME_DIR .. "src/osd",
 			MAME_DIR .. "src/lib/util",
 		}
-		targetdir(MAME_DIR)
+
+		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+			targetdir(MAME_DIR)
+		end
 
 		links {
 			"utils",
 			"ocore_" .. _OPTIONS["osd"],
 		}
 
-		includeosd()
-
 		files {
 			MAME_DIR .. "src/osd/sdl/testkeys.c",
 		}
 
-		if _OPTIONS["targetos"]=="windows" then
+		if _OPTIONS["targetos"] == "windows" then
+			if _OPTIONS["SDL_LIBVER"] == "sdl2" then
+				links {
+					"SDL2.dll",
+				}
+			else
+				links {
+					"SDL.dll",
+				}
+			end
 			linkoptions{
 				"-municode",
 			}
 			files {
 				MAME_DIR .. "src/osd/sdl/main.c",
 			}
-		elseif _OPTIONS["targetos"]=="macosx" and _OPTIONS["SDL_LIBVER"]=="sdl" then
+		elseif _OPTIONS["targetos"] == "macosx" and _OPTIONS["SDL_LIBVER"] == "sdl" then
 			-- SDLMain_tmpl isn't necessary for SDL2
 			files {
 				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.m",
 			}
 		end
+end
+
+
+--------------------------------------------------
+-- aueffectutil
+--------------------------------------------------
+
+if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
+	project("aueffectutil")
+		uuid ("3db8316d-fad7-4f5b-b46a-99373c91550e")
+		kind "ConsoleApp"
+
+		options {
+			"ForceCPP",
+		}
+
+		flags {
+			"Symbols", -- always include minimum symbols for executables 	
+		}
+
+		dofile("sdl_cfg.lua")
+
+		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+			targetdir(MAME_DIR)
+		end
+
+		linkoptions {
+			"-sectcreate __TEXT __info_plist " .. MAME_DIR .. "src/osd/sdl/aueffectutil-Info.plist",
+		}
+
+		dependency {
+			{ "aueffectutil",  MAME_DIR .. "src/osd/sdl/aueffectutil-Info.plist", true  },
+		}
+
+		links {
+			"AudioUnit.framework",
+			"AudioToolbox.framework",
+			"CoreAudio.framework",
+			"CoreAudioKit.framework",
+			"CoreServices.framework",
+		}
+
+		files {
+			MAME_DIR .. "src/osd/sdl/aueffectutil.m",
+		}
 end

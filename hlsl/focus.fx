@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
 // Effect File Variables
 //-----------------------------------------------------------------------------
@@ -6,7 +8,7 @@ texture Diffuse;
 
 sampler DiffuseSampler = sampler_state
 {
-	Texture   = <Diffuse>;
+	Texture = <Diffuse>;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -59,7 +61,10 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
+
 uniform float2 Defocus = float2(0.0f, 0.0f);
+
+uniform float2 Prescale = float2(8.0f, 8.0f);
 
 float2 Coord0Offset = float2( 0.0f,  0.0f);
 float2 Coord1Offset = float2(-0.2f, -0.6f);
@@ -73,24 +78,31 @@ float2 Coord7Offset = float2(-0.6f, -0.4f);
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-	
+
+	float2 ScreenTexelDims = 1.0f / ScreenDims;
+
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
 	Output.Position.xy -= 0.5f;
-	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
-	Output.Color = Input.Color;
+	Output.Position.xy *= 2.0f;
+
+	// todo: there is an offset which can be noticed at lower prescale in high-resolution
+	float2 FocusPrescaleOffset = ScreenTexelDims / Prescale;
 	
-	float2 InvTexSize = 1.0f / ScreenDims;
 	float2 TexCoord = Input.TexCoord;
-	Output.TexCoord0 = TexCoord + Coord0Offset * InvTexSize * Defocus;
-	Output.TexCoord1 = TexCoord + Coord1Offset * InvTexSize * Defocus;
-	Output.TexCoord2 = TexCoord + Coord2Offset * InvTexSize * Defocus;
-	Output.TexCoord3 = TexCoord + Coord3Offset * InvTexSize * Defocus;
-	Output.TexCoord4 = TexCoord + Coord4Offset * InvTexSize * Defocus;
-	Output.TexCoord5 = TexCoord + Coord5Offset * InvTexSize * Defocus;
-	Output.TexCoord6 = TexCoord + Coord6Offset * InvTexSize * Defocus;
-	Output.TexCoord7 = TexCoord + Coord7Offset * InvTexSize * Defocus;
+	TexCoord += FocusPrescaleOffset;
+
+	Output.TexCoord0 = TexCoord + Coord0Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord1 = TexCoord + Coord1Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord2 = TexCoord + Coord2Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord3 = TexCoord + Coord3Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord4 = TexCoord + Coord4Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord5 = TexCoord + Coord5Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord6 = TexCoord + Coord6Offset * ScreenTexelDims * Defocus;
+	Output.TexCoord7 = TexCoord + Coord7Offset * ScreenTexelDims * Defocus;
+
+	Output.Color = Input.Color;
 
 	return Output;
 }
@@ -114,6 +126,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	blurred = lerp(d0.rgb, blurred, 1.0f);
 	return float4(blurred, d0.a);
+
+	// float4 texel = tex2D(DiffuseSampler, Input.TexCoord0);
+
+	// return float4(texel.rgb, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -129,6 +145,6 @@ technique TestTechnique
 		Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_2_0 vs_main();
-		PixelShader  = compile ps_2_0 ps_main();
+		PixelShader = compile ps_2_0 ps_main();
 	}
 }

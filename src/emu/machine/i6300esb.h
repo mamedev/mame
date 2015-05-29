@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 // Intel i6300ESB southbridge
 
 #ifndef I6300ESB_H

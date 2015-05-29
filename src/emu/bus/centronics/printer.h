@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #pragma once
 
 #ifndef __CENTRONICS_PRINTER_H__

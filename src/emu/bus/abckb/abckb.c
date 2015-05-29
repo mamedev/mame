@@ -4,9 +4,6 @@
 
     Luxor ABC 800/802/806/1600 keyboard port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "abckb.h"

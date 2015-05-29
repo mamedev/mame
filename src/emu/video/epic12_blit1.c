@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #define REALLY_SIMPLE 0
 /* Non-Flipped, Non-Tinted, Non-Transparent */
 #define FLIPX 0

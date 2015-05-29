@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
   Crude Buster (World version FX)       (c) 1990 Data East Corporation

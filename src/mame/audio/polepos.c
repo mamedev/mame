@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Derrick Renaud
 /***************************************************************************
     polepos.c
     Sound handler

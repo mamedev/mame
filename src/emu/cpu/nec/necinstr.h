@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 
 const nec_common_device::nec_ophandler nec_common_device::s_nec_instruction[256] =
 {

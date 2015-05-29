@@ -18,10 +18,6 @@
 //  CONSTANTS
 //============================================================
 
-// debugging options
-#define WINOPTION_DEBUGGER_FONT         "debugger_font"
-#define WINOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
-
 // performance options
 #define WINOPTION_PRIORITY              "priority"
 #define WINOPTION_PROFILE               "profile"
@@ -47,8 +43,12 @@
 #define WINOPTION_SHADOW_MASK_COUNT_Y       "shadow_mask_y_count"
 #define WINOPTION_SHADOW_MASK_USIZE         "shadow_mask_usize"
 #define WINOPTION_SHADOW_MASK_VSIZE         "shadow_mask_vsize"
-#define WINOPTION_PINCUSHION                "pincushion"
+#define WINOPTION_SHADOW_MASK_UOFFSET       "shadow_mask_uoffset"
+#define WINOPTION_SHADOW_MASK_VOFFSET       "shadow_mask_voffset"
+#define WINOPTION_REFLECTION                "reflection"
 #define WINOPTION_CURVATURE                 "curvature"
+#define WINOPTION_ROUND_CORNER              "round_corner"
+#define WINOPTION_VIGNETTING                "vignetting"
 #define WINOPTION_SCANLINE_AMOUNT           "scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE            "scanline_size"
 #define WINOPTION_SCANLINE_HEIGHT           "scanline_height"
@@ -119,10 +119,6 @@ public:
 	// construction/destruction
 	windows_options();
 
-	// debugging options
-	const char *debugger_font() const { return value(WINOPTION_DEBUGGER_FONT); }
-	float debugger_font_size() const { return float_value(WINOPTION_DEBUGGER_FONT_SIZE); }
-
 	// performance options
 	int priority() const { return int_value(WINOPTION_PRIORITY); }
 	int profile() const { return int_value(WINOPTION_PROFILE); }
@@ -148,14 +144,18 @@ public:
 	int screen_shadow_mask_count_y() const { return int_value(WINOPTION_SHADOW_MASK_COUNT_Y); }
 	float screen_shadow_mask_u_size() const { return float_value(WINOPTION_SHADOW_MASK_USIZE); }
 	float screen_shadow_mask_v_size() const { return float_value(WINOPTION_SHADOW_MASK_VSIZE); }
+	float screen_shadow_mask_u_offset() const { return float_value(WINOPTION_SHADOW_MASK_UOFFSET); }
+	float screen_shadow_mask_v_offset() const { return float_value(WINOPTION_SHADOW_MASK_VOFFSET); }
 	float screen_scanline_amount() const { return float_value(WINOPTION_SCANLINE_AMOUNT); }
 	float screen_scanline_scale() const { return float_value(WINOPTION_SCANLINE_SCALE); }
 	float screen_scanline_height() const { return float_value(WINOPTION_SCANLINE_HEIGHT); }
 	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
 	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
-	float screen_pincushion() const { return float_value(WINOPTION_PINCUSHION); }
+	float screen_reflection() const { return float_value(WINOPTION_REFLECTION); }
 	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
+	float screen_round_corner() const { return float_value(WINOPTION_ROUND_CORNER); }
+	float screen_vignetting() const { return float_value(WINOPTION_VIGNETTING); }
 	const char *screen_defocus() const { return value(WINOPTION_DEFOCUS); }
 	const char *screen_converge_x() const { return value(WINOPTION_CONVERGE_X); }
 	const char *screen_converge_y() const { return value(WINOPTION_CONVERGE_Y); }

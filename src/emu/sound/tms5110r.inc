@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo, Couriersud, Jonathan Gevaryahu
 /* TMS51xx and TMS52xx ROM Tables */
 
 /* The following table is assumed to be for TMS5100
@@ -66,13 +68,18 @@ struct tms5100_coeffs
 };
 
 /*
+TMS5100/TMC0281 Die revs A, B
+History
 The TMS5100NL was decapped and imaged by digshadow in April, 2013.
 The LPC table is verified to match the decap.
  It also matches the intended contents of US Patent 4,209,836 and several others.
 The chirp table is verified to match the decap, and also matches the patents.
-The TMS5100 (development name: TMC0280) and the Speak and spell's "CD2801" chip
-are believed to be the same silicon. The 5100 may be the 'A' die revision of
-the CD2801 based on die markings.
+The TMS5100 (development name: TMC0280) and the Speak & Spell's "CD2801" chip
+are believed to be the same silicon. The 5100 decapped by digshadow had the die
+markings: "0281 B  281A"
+In December 2014, Sean riddle decapped a TMC0281 die from 1978 from an early speak
+and spell. The TMC0281 die had the die markings "0281 A  281"; the chirp table matches
+what digshadow had decapped earlier.
 */
 static const struct tms5100_coeffs pat4209836_coeff =
 {

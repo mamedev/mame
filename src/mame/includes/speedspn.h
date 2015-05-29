@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Farfetch'd
 #include "sound/okim6295.h"
 
 class speedspn_state : public driver_device
@@ -27,7 +29,7 @@ public:
 	tilemap_t *m_tilemap;
 	bool m_display_disable;
 	UINT32 m_bank_vidram;
-	dynamic_array<UINT8> m_vidram;
+	std::vector<UINT8> m_vidram;
 	DECLARE_READ8_MEMBER(irq_ack_r);
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_WRITE8_MEMBER(sound_w);

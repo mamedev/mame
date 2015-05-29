@@ -1,4 +1,5 @@
-
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 
 #include "emu.h"
 #include "ram.h"

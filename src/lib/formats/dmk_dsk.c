@@ -92,7 +92,7 @@ bool dmk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	const int track_size = ( header[3] << 8 ) | header[2];
 	const int heads = (header[4] & 0x10) ? 1 : 2;
 	const bool is_sd = (header[4] & 0x40) ? true : false;
-	const int raw_track_size = 2 * 8 * ( track_size - 0x80 );
+	//const int raw_track_size = 2 * 8 * ( track_size - 0x80 );
 
 	if (is_sd)
 	{
@@ -121,15 +121,14 @@ bool dmk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	{
 		for (int head = 0; head < heads; head++)
 		{
-			dynamic_array<UINT8> track_data(track_size);
-			dynamic_array<UINT32> raw_track_data(raw_track_size);
+			std::vector<UINT8> track_data(track_size);
+			std::vector<UINT32> raw_track_data;
 			int iam_location = -1;
 			int idam_location[64];
 			int dam_location[64];
-			int tpos = 0;
 
 			// Read track
-			io_generic_read(io, track_data, header_size + ( heads * track + head ) * track_size, track_size);
+			io_generic_read(io, &track_data[0], header_size + ( heads * track + head ) * track_size, track_size);
 
 			for (int i = 0; i < 64; i++)
 			{
@@ -179,34 +178,34 @@ bool dmk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				if (offset == iam_location)
 				{
 					// Write IAM
-					raw_w(raw_track_data, tpos, 16, 0x5224);
-					raw_w(raw_track_data, tpos, 16, 0x5224);
-					raw_w(raw_track_data, tpos, 16, 0x5224);
+					raw_w(raw_track_data, 16, 0x5224);
+					raw_w(raw_track_data, 16, 0x5224);
+					raw_w(raw_track_data, 16, 0x5224);
 					offset += 3;
 				}
 
 				if (offset == idam_location[idam_index])
 				{
-					raw_w(raw_track_data, tpos, 16, 0x4489);
-					raw_w(raw_track_data, tpos, 16, 0x4489);
-					raw_w(raw_track_data, tpos, 16, 0x4489);
+					raw_w(raw_track_data, 16, 0x4489);
+					raw_w(raw_track_data, 16, 0x4489);
+					raw_w(raw_track_data, 16, 0x4489);
 					idam_index += 1;
 					offset += 3;
 				}
 
 				if (offset == dam_location[dam_index])
 				{
-					raw_w(raw_track_data, tpos, 16, 0x4489);
-					raw_w(raw_track_data, tpos, 16, 0x4489);
-					raw_w(raw_track_data, tpos, 16, 0x4489);
+					raw_w(raw_track_data, 16, 0x4489);
+					raw_w(raw_track_data, 16, 0x4489);
+					raw_w(raw_track_data, 16, 0x4489);
 					dam_index += 1;
 					offset += 3;
 				}
 
-				mfm_w(raw_track_data, tpos, 8, track_data[offset]);
+				mfm_w(raw_track_data, 8, track_data[offset]);
 			}
 
-			generate_track_from_levels(track, head, raw_track_data, raw_track_size, 0, image);
+			generate_track_from_levels(track, head, raw_track_data, 0, image);
 		}
 	}
 

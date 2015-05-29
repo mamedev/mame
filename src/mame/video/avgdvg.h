@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Eric Smith, Brad Oliver, Bernd Wiebelt, Aaron Giles, Andrew Caldwell
 #ifndef __AVGDVG__
 #define __AVGDVG__
 

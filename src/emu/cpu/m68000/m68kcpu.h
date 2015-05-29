@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 /* ======================================================================== */
 /* ========================= LICENSING & COPYRIGHT ======================== */
 /* ======================================================================== */
@@ -8,15 +10,6 @@
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
  *
- * This code may be freely used for non-commercial purposes as long as this
- * copyright notice remains unaltered in the source code and any binary files
- * containing this code in compiled form.
- *
- * All other licensing terms must be negotiated with the author
- * (Karl Stenerud).
- *
- * The latest version of this code can be obtained at:
- * http://kstenerud.cjb.net
  */
 
 
@@ -698,7 +691,7 @@ INLINE UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address)
 
 //              printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
 
-				// if no buserror occured, validate the tag
+				// if no buserror occurred, validate the tag
 				if (!m68k->mmu_tmp_buserror_occurred)
 				{
 					m68k->ic_address[idx] = tag;

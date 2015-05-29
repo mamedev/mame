@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca, Peter Ferrie
 /**********************************************************************************
 
   Fun World / Amatic / TAB / Impera.

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 #include "emu.h"
 #include "sidvoice.h"
 #include "sid.h"
@@ -342,7 +344,7 @@ INLINE void waveCalcFilter(sidOperator* pVoice)
 			else if (pVoice->sid->filter.Type == 0x40)
 			{
 				float tmp, tmp2;
-				pVoice->filtLow += ( pVoice->filtRef * pVoice->sid->filter.Dy * 0.1 );
+				pVoice->filtLow += ( pVoice->filtRef * pVoice->sid->filter.Dy * 0.1f );
 				tmp = (float)pVoice->filtIO - pVoice->filtLow;
 				tmp -= pVoice->filtRef * pVoice->sid->filter.ResDy;
 				pVoice->filtRef += ( tmp * (pVoice->sid->filter.Dy) );

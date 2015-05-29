@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     esq5505.c - Ensoniq ES5505 + ES5510 based synthesizers and samplers

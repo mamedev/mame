@@ -1,10 +1,13 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 dofile("modules.lua")
 
 
-function maintargetosdoptions(_target)
+function maintargetosdoptions(_target,_subtarget)
 	osdmodulestargetconf()
 
-	configuration { "mingw*" }
+	configuration { "mingw*-gcc" }
 		linkoptions {
 			"-municode",
 		}
@@ -21,17 +24,17 @@ function maintargetosdoptions(_target)
 		}
 	end
 
-	local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
 
-	if os.isfile(rcfile) then
-		files {
-			rcfile,
-		}
-	else
-		files {
-			MAME_DIR .. "src/osd/windows/mame.rc",
+	if _OPTIONS["USE_SDL"] == "1" then
+		links {
+			"SDL.dll",
 		}
 	end
+
+	links {
+		"comctl32",
+		"comdlg32",
+	}
 end
 
 
@@ -40,12 +43,48 @@ newoption {
 	description = "Minimum DirectInput version to support",
 	allowed = {
 		{ "7",  "Support DirectInput 7 or later"  },
-		{ "8",  "Support DirectInput 8 or later" },
+		{ "8",  "Support DirectInput 8 or later"  },
 	},
 }
 
 if not _OPTIONS["DIRECTINPUT"] then
 	_OPTIONS["DIRECTINPUT"] = "8"
+end
+
+newoption {
+	trigger = "USE_SDL",
+	description = "Enable SDL sound output",
+	allowed = {
+		{ "0",  "Disable SDL sound output"  },
+		{ "1",  "Enable SDL sound output"   },
+	},
+}
+
+if not _OPTIONS["USE_SDL"] then
+	_OPTIONS["USE_SDL"] = "0"
+end
+
+newoption {
+	trigger = "CYGWIN_BUILD",
+	description = "Build with Cygwin tools",
+	allowed = {
+		{ "0",  "Build with MinGW tools"   },
+		{ "1",  "Build with Cygwin tools"  },
+	},
+}
+
+if not _OPTIONS["CYGWIN_BUILD"] then
+	_OPTIONS["CYGWIN_BUILD"] = "0"
+end
+
+
+if _OPTIONS["CYGWIN_BUILD"] == "1" then
+	buildoptions {
+		"-mmo-cygwin",
+	}
+	linkoptions {
+		"-mno-cygwin",
+	}
 end
 
 
@@ -157,7 +196,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/lib/osdlib_win32.c",
 	}
 
-	if _OPTIONS["NOASM"]=="1" then
+	if _OPTIONS["NOASM"] == "1" then
 		files {
 			MAME_DIR .. "src/osd/modules/sync/work_mini.c",
 		}
@@ -181,14 +220,22 @@ if _OPTIONS["with-tools"] then
 			"ForceCPP",
 		}
 
-		targetdir(MAME_DIR)
+		flags {
+			"Symbols", -- always include minimum symbols for executables 	
+		}
+
+		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+			targetdir(MAME_DIR)
+		end
 
 		links {
 			"ocore_" .. _OPTIONS["osd"],
 		}
 
-		includeosd()
-
+		includedirs {
+			MAME_DIR .. "src/osd",
+		}
+		
 		files {
 			MAME_DIR .. "src/osd/windows/ledutil.c",
 		}

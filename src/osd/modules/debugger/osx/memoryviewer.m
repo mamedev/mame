@@ -4,9 +4,6 @@
 //
 //  memoryviewer.m - MacOS X Cocoa debug window handling
 //
-//  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //============================================================
 
 #import "memoryviewer.h"
@@ -25,35 +22,42 @@
 	NSScrollView	*memoryScroll;
 	NSView			*expressionContainer;
 	NSPopUpButton	*actionButton;
-	NSRect			contentBounds, expressionFrame;
+	NSRect			expressionFrame;
 
 	if (!(self = [super initWithMachine:m title:@"Memory" console:c]))
 		return nil;
-	contentBounds = [[window contentView] bounds];
+	NSRect const contentBounds = [[window contentView] bounds];
+	NSFont *const defaultFont = [[MAMEDebugView class] defaultFontForMachine:m];
 
 	// create the expression field
 	expressionField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[expressionField setAutoresizingMask:(NSViewWidthSizable | NSViewMaxXMargin | NSViewMinYMargin)];
-	[expressionField setFont:[[MAMEDebugView class] defaultFont]];
+	[expressionField setFont:defaultFont];
 	[expressionField setFocusRingType:NSFocusRingTypeNone];
 	[expressionField setTarget:self];
 	[expressionField setAction:@selector(doExpression:)];
 	[expressionField setDelegate:self];
-	expressionFrame = [expressionField frame];
-	expressionFrame.size.width = (contentBounds.size.width - expressionFrame.size.height) / 2;
-	[expressionField setFrameSize:expressionFrame.size];
+	[expressionField sizeToFit];
 
 	// create the subview popup
-	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSOffsetRect(expressionFrame,
-																	  expressionFrame.size.width,
-																	  0)];
+	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinXMargin | NSViewMinYMargin)];
 	[subviewButton setBezelStyle:NSShadowlessSquareBezelStyle];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];
-	[subviewButton setFont:[[MAMEDebugView class] defaultFont]];
+	[subviewButton setFont:defaultFont];
 	[subviewButton setTarget:self];
 	[subviewButton setAction:@selector(changeSubview:)];
 	[[subviewButton cell] setArrowPosition:NSPopUpArrowAtBottom];
+	[subviewButton sizeToFit];
+
+	// adjust sizes to make it fit nicely
+	expressionFrame = [expressionField frame];
+	expressionFrame.size.height = MAX(expressionFrame.size.height, [subviewButton frame].size.height);
+	expressionFrame.size.width = (contentBounds.size.width - expressionFrame.size.height) / 2;
+	[expressionField setFrame:expressionFrame];
+	expressionFrame.origin.x = expressionFrame.size.width;
+	expressionFrame.size.width = contentBounds.size.width - expressionFrame.size.height - expressionFrame.origin.x;
+	[subviewButton setFrame:expressionFrame];
 
 	// create a container for the expression field and subview popup
 	expressionFrame = NSMakeRect(expressionFrame.size.height,
@@ -93,6 +97,7 @@
 																	 expressionFrame.size.height,
 																	 expressionFrame.size.height)];
 	[actionButton setAutoresizingMask:(NSViewMaxXMargin | NSViewMinYMargin)];
+	[actionButton setFont:[NSFont systemFontOfSize:[defaultFont pointSize]]];
 	[memoryView insertActionItemsInMenu:[actionButton menu] atIndex:1];
 	[[window contentView] addSubview:actionButton];
 	[actionButton release];
@@ -144,7 +149,7 @@
 }
 
 
-- (BOOL)selectSubviewForDevice:(device_t *)device {	
+- (BOOL)selectSubviewForDevice:(device_t *)device {
 	BOOL const result = [memoryView selectSubviewForDevice:device];
 	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[memoryView selectedSubviewIndex]]];
 	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];

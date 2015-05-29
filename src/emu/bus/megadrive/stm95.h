@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli, MetalliC
 #ifndef __MD_STM95_H
 #define __MD_STM95_H
 

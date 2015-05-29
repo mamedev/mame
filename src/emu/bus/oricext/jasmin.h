@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __JASMIN_H__
 #define __JASMIN_H__
 

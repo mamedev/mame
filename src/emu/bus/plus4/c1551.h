@@ -4,9 +4,6 @@
 
     Commodore 1551 Single Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once
@@ -27,14 +24,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1551_device
+// ======================> c1551_t
 
-class c1551_device :  public device_t,
-						public device_plus4_expansion_card_interface
+class c1551_t :  public device_t,
+					public device_plus4_expansion_card_interface
 {
 public:
 	// construction/destruction
-	c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;

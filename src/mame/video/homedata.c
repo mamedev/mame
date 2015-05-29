@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino, Nicola Salmoria
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/homedata.h"

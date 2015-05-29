@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU4 'Mod2' Sets
 
  This is the original MPU4 board, with AY8913 chip

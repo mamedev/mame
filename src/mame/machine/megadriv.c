@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
 
 Megadrive / Genesis support
@@ -1029,11 +1031,15 @@ WRITE8_MEMBER(md_base_state::megadriv_tas_callback)
 void md_base_state::megadriv_init_common()
 {
 	/* Look to see if this system has the standard Sound Z80 */
-	if (machine().device("genesis_snd_z80"))
+	if (m_z80snd)
 	{
 		//printf("GENESIS Sound Z80 cpu found '%s'\n", machine().device("genesis_snd_z80")->tag());
 		m_genz80.z80_prgram = auto_alloc_array(machine(), UINT8, 0x2000);
 		membank("bank1")->set_base(m_genz80.z80_prgram);
+		save_item(NAME(m_genz80.z80_is_reset));
+		save_item(NAME(m_genz80.z80_has_bus));
+		save_item(NAME(m_genz80.z80_bank_addr));
+		save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
 	}
 
 	m_maincpu->set_tas_write_callback(write8_delegate(FUNC(md_base_state::megadriv_tas_callback),this));

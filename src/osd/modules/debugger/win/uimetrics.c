@@ -11,7 +11,7 @@
 #include "strconv.h"
 
 
-ui_metrics::ui_metrics(windows_options const &options) :
+ui_metrics::ui_metrics(osd_options const &options) :
 	m_debug_font(NULL),
 	m_debug_font_height(0),
 	m_debug_font_width(0),
@@ -23,11 +23,12 @@ ui_metrics::ui_metrics(windows_options const &options) :
 	HDC const temp_dc = GetDC(NULL);
 	if (temp_dc != NULL)
 	{
-		int const size = options.debugger_font_size();
+		float const size = options.debugger_font_size();
+		char const *const face = options.debugger_font();
 
 		// create a standard font
-		TCHAR *t_face = tstring_from_utf8(options.debugger_font());
-		m_debug_font = CreateFont(-MulDiv(size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
+		TCHAR *t_face = tstring_from_utf8((!*face || !strcmp(OSDOPTVAL_AUTO, face)) ? "Lucida Console" : face);
+		m_debug_font = CreateFont(-MulDiv((size <= 0) ? 9 : size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
 					ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, t_face);
 		osd_free(t_face);
 		t_face = NULL;

@@ -34,15 +34,15 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	astring lookup(astring tag) const;
+	std::string lookup(std::string tag) const;
 
 	// setters
-	void add(astring tag, astring value);
+	void add(std::string tag, std::string value);
 
 private:
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
-	tagmap_t<astring>       m_parameters;
+	tagmap_t<std::string>       m_parameters;
 };
 
 #endif  // __INPTPORT_H__ */

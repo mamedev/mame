@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Pandora's Palace(GX328) (c) 1984 Konami/Interlogic
 
-Driver by Manuel Abadia <manu@teleline.es>
+Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 Notes:
 - Press 1P and 2P together to enter test mode.

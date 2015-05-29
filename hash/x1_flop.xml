@@ -753,7 +753,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="gaiamons">
-		<description>Gaia no Monsho</description>
+		<description>Gaia no Monshou</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
 		<info name="release" value="198708xx"/>
@@ -1906,7 +1906,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 
 <!-- Start this on Turbo, with both disks mounted -->
 	<software name="ojibinbm">
-		<description>Oji Binbin Monogatari</description>
+		<description>Ouji Binbin Monogatari</description>
 		<year>1988</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<info name="release" value="198801xx"/>
@@ -1924,7 +1924,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="ojibinbma" cloneof="ojibinbm">
-		<description>Oji Binbin Monogatari (Alt)</description>
+		<description>Ouji Binbin Monogatari (Alt)</description>
 		<year>1988</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<info name="release" value="198801xx"/>
@@ -1942,7 +1942,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="ojibinbmb" cloneof="ojibinbm">
-		<description>Oji Binbin Monogatari (Alt 2)</description>
+		<description>Ouji Binbin Monogatari (Alt 2)</description>
 		<year>1988</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<info name="release" value="198801xx"/>

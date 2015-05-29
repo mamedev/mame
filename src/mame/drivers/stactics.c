@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 /****************************************************************************
 
     Sega "Space Tactics" Driver
@@ -282,7 +284,7 @@ void stactics_state::machine_start()
 	m_vert_pos = 0;
 	m_horiz_pos = 0;
 	*m_motor_on = 0;
-	
+
 	save_item(NAME(m_vert_pos));
 	save_item(NAME(m_horiz_pos));
 }

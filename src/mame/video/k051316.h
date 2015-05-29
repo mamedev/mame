@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
 #pragma once
 #ifndef __K051316_H__
 #define __K051316_H__
@@ -78,7 +80,7 @@ protected:
 
 private:
 	// internal state
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 	UINT8 m_ctrlram[16];
 	tilemap_t *m_tmap;
 

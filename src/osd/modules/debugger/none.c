@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 //============================================================
 //
 //  none.c - stubs for linking when NO_DEBUGGER is defined
@@ -20,7 +22,7 @@ public:
 
 	virtual ~debug_none() { }
 
-	virtual int init() { return 0;}
+	virtual int init(const osd_options &options) { return 0; }
 	virtual void exit() { }
 
 	virtual void init_debugger(running_machine &machine);

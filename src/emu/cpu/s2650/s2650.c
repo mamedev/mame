@@ -1,8 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /*************************************************************************
  *
  *      Portable Signetics 2650 cpu emulation
- *
- *      Written by Juergen Buchmueller for use with MAME
  *
  *  Version 1.2
  *  - changed to clock cycle counts from machine cycles
@@ -870,12 +870,12 @@ void s2650_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void s2650_device::state_string_export(const device_state_entry &entry, astring &string)
+void s2650_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_psu & 0x80 ? 'S':'.',
 				m_psu & 0x40 ? 'O':'.',
 				m_psu & 0x20 ? 'I':'.',

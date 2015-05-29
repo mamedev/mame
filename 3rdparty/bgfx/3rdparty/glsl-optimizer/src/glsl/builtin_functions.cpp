@@ -53,7 +53,6 @@
  *    name and parameters.
  */
 
-#define _USE_MATH_DEFINES
 #include <stdarg.h>
 #include <stdio.h>
 #include "main/core.h" /* for struct gl_shader */
@@ -173,7 +172,8 @@ es_lod_exists_in_stage(const _mesa_glsl_parse_state *state)
 	 * is enabled.
 	 */
 	return
-		state->stage == MESA_SHADER_FRAGMENT &&
+// BK - EXT_shader_texture_lod is available in vertex and fragment shaders.
+//		state->stage == MESA_SHADER_FRAGMENT &&
 		state->es_shader &&
 		state->is_version(110, 100) &&
 		state->EXT_shader_texture_lod_enable;

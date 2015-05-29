@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Zsolt Vasvari, Aaron Giles
 /****************************************************************************
  *                                                                          *
  *  Functions to emulate the TMS34061 video controller                      *

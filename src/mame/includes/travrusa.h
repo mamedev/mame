@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Lee Taylor,John Clegg,Tomasz Slanina
 class travrusa_state : public driver_device
 {
 public:

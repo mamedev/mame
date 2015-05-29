@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef PCI_SMBUS_H
 #define PCI_SMBUS_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski, Hiromitsu Shioya
 #pragma once
 
 #ifndef __MSM5232_H__

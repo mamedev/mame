@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 /*
 
     TODO:
@@ -75,8 +77,8 @@ public:
 	DECLARE_READ8_MEMBER(cop_g_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(cop_g_w);
-	DECLARE_READ8_MEMBER(cop_si_r);
-	DECLARE_WRITE8_MEMBER(cop_so_w);
+	DECLARE_READ_LINE_MEMBER(cop_si_r);
+	DECLARE_WRITE_LINE_MEMBER(cop_so_w);
 	DECLARE_WRITE8_MEMBER(control2_w);
 	DECLARE_READ8_MEMBER(dsw_b_r);
 	DECLARE_READ8_MEMBER(laserdsc_data_r);
@@ -294,7 +296,7 @@ WRITE8_MEMBER(thayers_state::cop_g_w)
 
 /* Keyboard */
 
-READ8_MEMBER(thayers_state::cop_si_r)
+READ_LINE_MEMBER(thayers_state::cop_si_r)
 {
 	/* keyboard data */
 
@@ -327,11 +329,11 @@ READ8_MEMBER(thayers_state::cop_si_r)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::cop_so_w)
+WRITE_LINE_MEMBER(thayers_state::cop_so_w)
 {
 	/* keyboard clock */
 
-	if (data)
+	if (state)
 	{
 		m_rx_bit++;
 
@@ -622,14 +624,6 @@ static ADDRESS_MAP_START( thayers_io_map, AS_IO, 8, thayers_state )
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(den2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thayers_cop_io_map, AS_IO, 8, thayers_state )
-	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(cop_l_r, cop_l_w)
-	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE(cop_g_r, cop_g_w)
-	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(cop_d_w)
-	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_WRITENOP
-	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_READ(cop_si_r) AM_WRITE(cop_so_w)
-ADDRESS_MAP_END
-
 /* Input Ports */
 
 CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_enter_r)
@@ -780,15 +774,21 @@ void thayers_state::machine_reset()
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( thayers, thayers_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(thayers_map)
 	MCFG_CPU_IO_MAP(thayers_io_map)
 
 	MCFG_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
-	MCFG_CPU_IO_MAP(thayers_cop_io_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
-
+	MCFG_COP400_READ_L_CB(READ8(thayers_state, cop_l_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(thayers_state, cop_l_w))
+	MCFG_COP400_READ_G_CB(READ8(thayers_state, cop_g_r))
+	MCFG_COP400_WRITE_G_CB(WRITE8(thayers_state, cop_g_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(thayers_state, cop_d_w))
+	MCFG_COP400_READ_SI_CB(READLINE(thayers_state, cop_si_r))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(thayers_state, cop_so_w))
 
 	MCFG_LASERDISC_PR7820_ADD("laserdisc")
 

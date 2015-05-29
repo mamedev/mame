@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steve Ellenoff, Brad Oliver
 class tagteam_state : public driver_device
 {
 public:

@@ -260,9 +260,9 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 	dynamic_buffer img;
 	img.resize(size);
 
-	io_generic_read(io, img, 0, size);
+	io_generic_read(io, &img[0], 0, size);
 
-	log_boot_sector(img);
+	log_boot_sector(&img[0]);
 
 	int track_offset = 0;
 
@@ -286,7 +286,7 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 
 			desc_s sectors[40];
 
-			build_sector_description(f, img, track_offset, sectors, sector_count);
+			build_sector_description(f, &img[0], track_offset, sectors, sector_count);
 			generate_track(desc, track, head, sectors, sector_count, total_size, image);
 
 			track_offset += track_size;
@@ -298,14 +298,28 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 	return true;
 }
 
-bool victor9k_format::supports_save() const
-{
-	return false;
-}
-
 int victor9k_format::get_rpm(int head, int track)
 {
 	return rpm[speed_zone[head][track]];
+}
+
+int victor9k_format::get_image_offset(const format &f, int _head, int _track)
+{
+	int offset = 0;
+	if (_head) {
+		for (int track = 0; track < f.track_count; track++) {
+			offset += compute_track_size(f, _head, track);
+		}
+	}
+	for (int track = 0; track < _track; track++) {
+		offset += compute_track_size(f, _head, track);
+	}
+	return offset;
+}
+
+int victor9k_format::compute_track_size(const format &f, int head, int track)
+{
+	return sectors_per_track[head][track] * f.sector_base_size;
 }
 
 const victor9k_format::format victor9k_format::formats[] = {
@@ -375,5 +389,50 @@ const int victor9k_format::rpm[9] =
 {
 	252, 267, 283, 300, 320, 342, 368, 401, 417
 };
+
+bool victor9k_format::save(io_generic *io, floppy_image *image)
+{
+	const format &f = formats[0];
+
+	for(int head=0; head < f.head_count; head++) {
+		for(int track=0; track < f.track_count; track++) {
+			int sector_count = sectors_per_track[head][track];
+			int track_size = compute_track_size(f, head, track);
+			UINT8 sectdata[40*512];
+			desc_s sectors[40];
+			int offset = get_image_offset(f, head, track);
+
+			build_sector_description(f, sectdata, 0, sectors, sector_count);
+			extract_sectors(image, f, sectors, track, head, sector_count);
+			io_generic_write(io, sectdata, offset, track_size);
+		}
+	}
+
+	return true;
+}
+
+void victor9k_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count)
+{
+	UINT8 bitstream[500000/8];
+	UINT8 sectdata[50000];
+	desc_xs sectors[256];
+	int track_size;
+
+	// Extract the sectors
+	generate_bitstream_from_track(track, head, cell_size[speed_zone[head][track]], bitstream, track_size, image);
+	extract_sectors_from_bitstream_victor_gcr5(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+
+	for(int i=0; i<sector_count; i++) {
+		desc_s &ds = sdesc[i];
+		desc_xs &xs = sectors[ds.sector_id];
+		if(!xs.data)
+			memset((void *)ds.data, 0, ds.size);
+		else if(xs.size < ds.size) {
+			memcpy((void *)ds.data, xs.data, xs.size);
+			memset((UINT8 *)ds.data + xs.size, 0, xs.size - ds.size);
+		} else
+			memcpy((void *)ds.data, xs.data, ds.size);
+	}
+}
 
 const floppy_format_type FLOPPY_VICTOR_9000_FORMAT = &floppy_image_format_creator<victor9k_format>;

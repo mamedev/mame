@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:Raphael Nabet, Robbbert
 /*
     Experimental tm990/189 ("University Module") driver.

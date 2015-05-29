@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 #ifndef __SAT_BRAM_H
 #define __SAT_BRAM_H
 
@@ -20,8 +22,8 @@ public:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file) { if (m_ext_bram != NULL) { file.read(m_ext_bram, m_ext_bram.bytes()); } }
-	virtual void nvram_write(emu_file &file) { if (m_ext_bram != NULL) { file.write(m_ext_bram, m_ext_bram.bytes()); } }
+	virtual void nvram_read(emu_file &file) { if (!m_ext_bram.empty()) file.read(&m_ext_bram[0], m_ext_bram.size()); }
+	virtual void nvram_write(emu_file &file) { if (!m_ext_bram.empty()) file.write(&m_ext_bram[0], m_ext_bram.size()); }
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ext_bram);

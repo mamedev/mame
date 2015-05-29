@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 #include "machine/nmk112.h"
 
 class quizpani_state : public driver_device

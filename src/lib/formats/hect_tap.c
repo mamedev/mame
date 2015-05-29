@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:JJ Stacino
 /********************************************************************
 
 Support for Micronique machine .K7 and *.FOR cassette images

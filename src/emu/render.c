@@ -729,7 +729,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 				recompute_lookups();
 			}
 			assert (palette == &m_palclient->palette());
-			return m_bcglookup;
+			return &m_bcglookup[0];
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
@@ -1571,13 +1571,13 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	else
 	{
 		// build the path and optionally prepend the directory
-		astring fname(filename, ".lay");
+		std::string fname = std::string(filename).append(".lay");
 		if (dirname != NULL)
-			fname.ins(0, PATH_SEPARATOR).ins(0, dirname);
+			fname.insert(0, PATH_SEPARATOR).insert(0, dirname);
 
 		// attempt to open the file; bail if we can't
 		emu_file layoutfile(manager().machine().options().art_path(), OPEN_FLAG_READ);
-		file_error filerr = layoutfile.open(fname);
+		file_error filerr = layoutfile.open(fname.c_str());
 		if (filerr != FILERR_NONE)
 			return false;
 
@@ -1890,7 +1890,7 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 	if (container != NULL && container == &m_manager.ui_container())
 	{
 		// this hit test went against the UI container
-		if (target_fx >= 0.0 && target_fx < 1.0 && target_fy >= 0.0 && target_fy < 1.0)
+		if (target_fx >= 0.0f && target_fx < 1.0f && target_fy >= 0.0f && target_fy < 1.0f)
 		{
 			// this point was successfully mapped
 			mapped_x = (float)target_x / m_width;

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*************************************************************************
 
     Block Hole
@@ -22,7 +24,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_ram;
-	dynamic_array<UINT8> m_paletteram;
+	std::vector<UINT8> m_paletteram;
 
 	/* video-related */
 	int        m_layer_colorbase[3];

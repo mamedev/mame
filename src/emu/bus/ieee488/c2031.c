@@ -4,9 +4,6 @@
 
     Commodore 2031 Single Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "c2031.h"

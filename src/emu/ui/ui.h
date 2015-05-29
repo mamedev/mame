@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
     ui.h
 
     Functions used to handle MAME's crude user interface.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -93,7 +92,7 @@ enum
 
 typedef UINT32 (*ui_callback)(running_machine &, render_container *, UINT32);
 
-typedef INT32 (*slider_update)(running_machine &machine, void *arg, astring *string, INT32 newval);
+typedef INT32(*slider_update)(running_machine &machine, void *arg, std::string *str, INT32 newval);
 
 struct slider_state
 {
@@ -160,7 +159,7 @@ public:
 	void request_quit();
 
 	// print the game info string into a buffer
-	astring &game_info_astring(astring &string);
+	std::string &game_info_astring(std::string &str);
 
 	// slider controls
 	const slider_state *get_slider_list(void);
@@ -185,8 +184,8 @@ private:
 	bool                    m_mouse_show;
 
 	// text generators
-	astring &disclaimer_string(astring &buffer);
-	astring &warnings_string(astring &buffer);
+	std::string &disclaimer_string(std::string &buffer);
+	std::string &warnings_string(std::string &buffer);
 
 	// UI handlers
 	static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);

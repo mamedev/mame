@@ -128,21 +128,21 @@ bool mfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 			if(ent->uncompressed_size == 0) {
 				// Unformatted track
-				image->set_track_size(cyl >> 2, head, 0, cyl & 3);
+				image->get_buffer(cyl >> 2, head, cyl & 3).clear();
 				ent++;
 				continue;
 			}
 
 			compressed.resize(ent->compressed_size);
 
-			io_generic_read(io, compressed, ent->offset, ent->compressed_size);
+			io_generic_read(io, &compressed[0], ent->offset, ent->compressed_size);
 
 			unsigned int cell_count = ent->uncompressed_size/4;
-			image->set_track_size(cyl >> 2, head, cell_count, cyl & 3);
-			UINT32 *trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);
+			std::vector<UINT32> &trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);;
+			trackbuf.resize(cell_count);
 
 			uLongf size = ent->uncompressed_size;
-			if(uncompress((Bytef *)trackbuf, &size, compressed, ent->compressed_size) != Z_OK)
+			if(uncompress((Bytef *)&trackbuf[0], &size, &compressed[0], ent->compressed_size) != Z_OK)
 				return false;
 
 			UINT32 cur_time = 0;
@@ -168,7 +168,7 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 	int max_track_size = 0;
 	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {
-			int tsize = image->get_track_size(track >> 2, head, track & 3);
+			int tsize = image->get_buffer(track >> 2, head, track & 3).size();
 			if(tsize > max_track_size)
 					max_track_size = tsize;
 		}
@@ -192,13 +192,14 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 
 	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {
-			int tsize = image->get_track_size(track >> 2, head, track & 3);
+			std::vector<UINT32> &buffer = image->get_buffer(track >> 2, head, track & 3);
+			int tsize = buffer.size();
 			if(!tsize) {
 				epos++;
 				continue;
 			}
 
-			memcpy(precomp, image->get_buffer(track >> 2, head, track & 3), tsize*4);
+			memcpy(precomp, &buffer[0], tsize*4);
 			for(int j=0; j<tsize-1; j++)
 				precomp[j] = (precomp[j] & floppy_image::MG_MASK) |
 					((precomp[j+1] & floppy_image::TIME_MASK) -

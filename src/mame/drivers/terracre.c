@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carlos A. Lozano
 /******************************************************************
 Terra Cresta (preliminary)
 Nichibutsu 1985

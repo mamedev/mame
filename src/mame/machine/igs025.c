@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ElSemi
 /*
 
  IGS025 is some kind of state machine / logic device which the game

@@ -4,9 +4,6 @@
 # 
 #   ledutil.sh - Example script for output notifiers
 # 
-#   Copyright Nicola Salmoria and the MAME Team.
-#   Visit http://mamedev.org for licensing and usage restrictions.
-#
 #   This is a very basic implementation which
 #
 #   a) Sets kbd leds if led0, led1, led2 is received

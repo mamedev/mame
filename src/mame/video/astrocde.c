@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles
 /***************************************************************************
 
     Bally Astrocade-based hardware
@@ -94,7 +96,7 @@ PALETTE_INIT_MEMBER(astrocde_state, astrocde)
 
 			/* transform to RGB */
 			r = (ry + y) * 255;
-			g = ((y - 0.299 * (ry + y) - 0.114 * (by + y)) / 0.587) * 255;
+			g = ((y - 0.299f * (ry + y) - 0.114f * (by + y)) / 0.587f) * 255;
 			b = (by + y) * 255;
 
 			/* clamp and store */

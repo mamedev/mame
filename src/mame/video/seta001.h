@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, David Haywood
 
 typedef device_delegate<int (UINT16 code, UINT8 color)> gfxbank_cb_delegate;
 

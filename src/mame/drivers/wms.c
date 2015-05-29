@@ -1,14 +1,89 @@
-/*
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca
+/**************************************************************************************************
 
-WMS Russian Fruit Machines (Mechanical?)
+  WMS 360 / 550 (also 3601?) CPU 1.5 Plus board
+  ---------------------------------------------
 
-x86 based
+  Both systems (360 and 550) were originally composed by two boards:
 
-*/
+  CPU board:    WMS CPU 1.5 (Plus) MPU/CPU board. Copyright 1999.
+  I/O board:    WMS PCBA Video I/O board.
+
+***************************************************************************************************
+
+  Hardware Specs...
+
+  WMS CPU 1.5 (Plus) MPU/CPU board:
+
+  1x AMD N80C188-20 (CMOS High-Integration 16-bit Microprocessor), @20Mhz (40/2) [XU12]
+  1X Analog Devices ADSP-2105 KP-55 (Single-Chip 16-bit Microcomputers: 20 MIPS, 5v, 1 Serial Port) [U28]
+  1x Cirrus Logic CL-GD5429-86QC-C (VGA Graphics Controller) [U32]
+  1x QuickLogic QL2003-XPF144C FPGA [U21]
+
+  4x (1-2-4/8 Mb selectable through jumper) program ROM sockets. [XU02, XU03, XU04, XU05]
+  4x (1-2-4/8 Mb selectable through jumper) sound ROM sockets. [XU17, XU18, XU30, XU31]
+  1x unknown serial EEPROM (DIP8) (currently missing) [XU27]
+
+  4x ISSI IS41C16257-60K (256K x 16, 4-MBit Dynamic RAM with fast page mode) [U14, U15, U22, U23]
+  2x Cypress Semiconductor CY62256LL-70SNC (32K x 8 Static RAM) (near program ROMs) [U6, U9]
+  3x Cypress Semiconductor CY7C128A-35VC (CMOS 2048 x 8 Static RAM) (between ADSP-2105 and sound ROMs) [U25, U29, U33]
+
+  1x EXAR ST 16C1550CJ (UART Interface IC W/16-byte FIFO) [U19A]
+  1x Intersil Corporation CS82C59A (CMOS Priority Interrupt Controller) [U20]
+  1x MAXIM MAX232CWE (Integrated RS-232 Interface IC) (near ADSP-2105) [U24]
+  1x MAXIM MAX691ACWE (Microprocessor Supervisory Circuit) [U7]
+  1x EPSON RTC72423 (4-bit Real-Time Clock) [U10]
+
+  1x Pletronics MP49 (1.8432 MHz) Crystal (between the edge connectors) [X1]
+  1x Pletronics MP49 (14.31818 MHz) Crystal (near the Cirrus Logic VGA device) [X2]
+  1x Pletronics 40.000 MHz. Crystal (near the AMD N80C188) [Y1]
+
+  1x 3-pin jumper (for program ROM size) [JP2]
+  1x 3-pin jumper (for sound ROM size) [JP3]
+  1x 2-pin jumper (near the 40 MHz crystal) [JP300]
+
+  1x VGA D-SUB connector [J1]
+  2x 96-Pins (male) edge connectors.
+  1x push button [SW1]
+  1x 7-segments LED [DS1]
+  1x 3.6V lithium battery [B1]
+
+
+***************************************************************************************************
+
+  Notes...
+
+  The WMS CPU 1.5 Plus board has an upgrade: The WMS 360 / 550 Bluebird CPU NXT board,
+  based on a Pentium processor.
+
+***************************************************************************************************
+
+  Settings...
+
+  JP2 Software:
+  1-2: 4M or less EPROMS.
+  2-3: 8M EPROMS.
+
+  JP3 Sound:
+  1-2: 4M or less EPROMS.
+  2-3: 8M EPROMS.
+
+
+***************************************************************************************************/
+
+
+#define MAIN_CLOCK        XTAL_40MHz          // Pletronics 40.000 MHz. Crystal. Used for CPU clock.
+#define VIDEO_CLOCK       XTAL_14_31818MHz    // Pletronics MP49 14.31818 MHz. Crystal. Used in common VGA ISA cards.
+
+#define UART_CLOCK        XTAL_1_8432MHz      // Seems UART clock, since allows integer division to common baud rates.
+												// (16 * 115200 baud, 192 * 9600 baud, 1536 * 1200 baud, etc...)
 
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
+#include "cpu/i86/i186.h"
+#include "cpu/adsp2100/adsp2100.h"
+
 
 class wms_state : public driver_device
 {
@@ -18,59 +93,131 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_DRIVER_INIT(wms);
+	DECLARE_READ8_MEMBER(test_r);
+		UINT32 screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-public:
-	DECLARE_DRIVER_INIT(wms);
+
+private:
 };
 
+UINT32 wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
-static ADDRESS_MAP_START( wms_map, AS_PROGRAM, 32, wms_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0 )
+/*********************************************
+*           Memory Map Information           *
+*********************************************/
 
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0 )
+static ADDRESS_MAP_START( wms_map, AS_PROGRAM, 8, wms_state )
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM
+	AM_RANGE(0x60000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x60000) // TODO: fix me
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wms_io, AS_IO, 32, wms_state )
+READ8_MEMBER(wms_state::test_r)
+{
+	return 1;
+}
+
+static ADDRESS_MAP_START( wms_io, AS_IO, 8, wms_state )
+	AM_RANGE(0x1207, 0x1207) AM_READ(test_r)
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, wms_state )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, wms_state )
+ADDRESS_MAP_END
+
+
+/*********************************************
+*                Input Ports                 *
+*********************************************/
 
 static INPUT_PORTS_START( wms )
 INPUT_PORTS_END
 
 
+/*********************************************
+*              Machine Drivers               *
+*********************************************/
+
+static const gfx_layout gfxlayout =
+{
+	8,8,
+	0x100000/(8),
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
+	8*8
+};
+
+static GFXDECODE_START( wms )
+	GFXDECODE_ENTRY( "maincpu", 0x00000, gfxlayout,   0, 1 )
+GFXDECODE_END
+
 
 static MACHINE_CONFIG_START( wms, wms_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000 ) // ??
+	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
 	MCFG_CPU_PROGRAM_MAP(wms_map)
 	MCFG_CPU_IO_MAP(wms_io)
+
+	MCFG_CPU_ADD("adsp", ADSP2105, MAIN_CLOCK / 2)  // ADSP-2105 could run either at 13.824 or 20 MHz...
+	MCFG_DEVICE_DISABLE()
+	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
+	MCFG_CPU_DATA_MAP(adsp_data_map)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(wms_state, screen_update_wms)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wms)
+	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
-ROM_START( wms )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+
+/*********************************************
+*                 ROMs Load                  *
+*********************************************/
+
+// --------------- SetUp/Clear Chips ---------------
+
+ROM_START( wms )    // RamClear Rev 3.03
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "10.bin",      0x0e0000, 0x020000, CRC(cf901f7d) SHA1(009a28fede06d2ff7f476ff643bf27cddd2adbab) )
 	ROM_REGION(0x100000, "rom", ROMREGION_ERASE00)
 ROM_END
 
-ROM_START( wmsa )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( wmsa )    // RamClear Rev 3.03
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "10cver4.010", 0x0e0000, 0x020000, CRC(fd310b97) SHA1(5745549258a1cefec4b3dddbe9d9a0d6281278e9) )
 	ROM_REGION(0x100000, "rom", ROMREGION_ERASE00)
 ROM_END
 
-
-ROM_START( wmsb )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( wmsb )    // RamClear Rev 3.03
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "50cver4.010", 0x0e0000, 0x020000, CRC(eeeeab29) SHA1(898c05c0674a9978caaad4a0fe3650a9d9a56715) )
 	ROM_REGION(0x100000, "rom", ROMREGION_ERASE00)
 ROM_END
 
 
-ROM_START( btippers )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+// ----------------- Regular Sets ------------------
+
+
+ROM_START( btippers )    // Big Tippers (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(96e362e3) SHA1(a0c35e9aa6bcbc5ffbf8750fa728294ef1e21b02) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -84,8 +231,9 @@ ROM_START( btippers )
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(c845e18a) SHA1(3e20fbf6ac127a780a7a1517347e3cf7e951e5eb) )
 ROM_END
 
-ROM_START( wmsboom )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+
+ROM_START( wmsboom )    // Boom (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(5008854d) SHA1(8d9d11775b6cbdef1c71683c4d92e64af26e8939) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -97,8 +245,9 @@ ROM_START( wmsboom )
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x080000, CRC(68187707) SHA1(9a85fe5737ae372999f2bfaf50263c00fc9b22f4) )
 ROM_END
 
-ROM_START( cashcrop )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+
+ROM_START( cashcrop )    // Cash Crop (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(e1918f25) SHA1(55c33c1f604a44caef65e712e69d21792161dfbc) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -112,8 +261,9 @@ ROM_START( cashcrop )
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(17cdabce) SHA1(d54e6d1697ccd424922c712f4a1f75e8d5f44288) )
 ROM_END
 
-ROM_START( filthyr )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+
+ROM_START( filthyr )    // Filthy Rich (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(4b57aa15) SHA1(076ef6c1782a0ec34c15bffd5e93644ba179c1f7) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -125,9 +275,24 @@ ROM_START( filthyr )
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x080000, CRC(fb0de283) SHA1(e1df32787a6fcf597041923d977eacbe5744b770) )
 ROM_END
 
-ROM_START( hottop )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
-	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, NO_DUMP ) // missing?
+
+ROM_START( hottop )    // Hot Toppings (English)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "hot_topping_9fbah.xu03", 0x0000, 0x100000, CRC(9da8d2d7) SHA1(722809ec9df83c866ec7cbcc83b619d65134b523) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "hot_topping_8aceh.xu02", 0x0000, 0x100000, CRC(15ebe9a4) SHA1(3852bf9bd0976abe46102b2c237a513f6447bea6) )
+	ROM_LOAD( "hot_topping_2935h.xu04", 0x0000, 0x100000, CRC(8cab6576) SHA1(be1dc406cbf4fd4035f4e123c4095a0a07350035) )
+	// sound
+	ROM_LOAD( "hot_topping_1a00h.xu30", 0x0000, 0x100000, CRC(18b938ff) SHA1(4c75bfc23cb3754aa1457ed4183664c8d579b46f) )
+	ROM_LOAD( "hot_topping_8f00h.xu31", 0x0000, 0x100000, CRC(944df9f0) SHA1(5cc1f40aefcc82098d12d00fef603d86cd0c145f) )
+	ROM_LOAD( "hot_topping_6100h.xu17", 0x0000, 0x100000, CRC(9345c066) SHA1(ae04f59e4791ec1cc8751fb1fe194e4f690e442b) )
+	ROM_LOAD( "hot_topping_1600h.xu18", 0x0000, 0x100000, CRC(2ad1b2e2) SHA1(47832422be66acace22fe411062010303b9ce899) )
+ROM_END
+
+ROM_START( hottopa )    // Hot Toppings (Russian?)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, NO_DUMP ) // missing
 
 	ROM_REGION(0x100000, "rom", 0)
 	ROM_LOAD( "xu-2.bin", 0x0000, 0x100000, CRC(15ebe9a4) SHA1(3852bf9bd0976abe46102b2c237a513f6447bea6) )
@@ -139,8 +304,9 @@ ROM_START( hottop )
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(bee1eae3) SHA1(e18b10e7c6dafd9df8b34ee19ce74a82b8adcec4) )
 ROM_END
 
-ROM_START( inwinner )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+
+ROM_START( inwinner )    // Instant Winner (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(f5c26579) SHA1(4ef22c0115417320ef17f0c3fc7550db24bdcb8c) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -153,9 +319,8 @@ ROM_START( inwinner )
 ROM_END
 
 
-
-ROM_START( jptparty )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( jptparty )    // Jackpot Party (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(750bfd36) SHA1(161c98455cb2ceb1d7d1a35941b5bb0784129b25) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -168,8 +333,8 @@ ROM_START( jptparty )
 ROM_END
 
 
-ROM_START( leprgld )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( leprgld )    // Leprechaun's Gold (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(0985d6b6) SHA1(291c124a9ae813942b14620789370b4a7b9cf85e) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -183,10 +348,24 @@ ROM_START( leprgld )
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(a3f82467) SHA1(0971f32bff0d4bda43cd98e975e49710d73f9286) )
 ROM_END
 
+ROM_START( leprglds )    // Leprechaun's Gold (Spanish)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "leprechaun's_gold.xu03", 0x0000, 0x100000, CRC(a750e5b9) SHA1(891bbfded9ece4d81aa8415cbb5a2728c118300e) )
+
+	ROM_REGION(0x100000, "rom", 0)
+	ROM_LOAD( "leprechaun's_gold.xu02", 0x0000, 0x100000, CRC(884d4871) SHA1(2c7a452dd466532df5fc14b209302a5ad42bb356) )
+	ROM_LOAD( "leprechaun's_gold.xu04", 0x0000, 0x100000, CRC(02642dd2) SHA1(4ac00b9053f9859865910888952e09d2fda5db06) )
+	ROM_LOAD( "leprechaun's_gold.xu05", 0x0000, 0x100000, CRC(eedd0dd2) SHA1(2b1dceb541a660357404f24069392f7892c87cfb) )
+	// sound
+	ROM_LOAD( "leprechaun's_gold.xu30", 0x0000, 0x100000, CRC(6a41056f) SHA1(54168a0115dc8d232100fbbd440063dc75fdbaaf) )
+	ROM_LOAD( "leprechaun's_gold.xu31", 0x0000, 0x100000, CRC(0485e432) SHA1(c57a47fd27a14a2ea01400515f61be58be5fa391) )
+	ROM_LOAD( "leprechaun's_gold.xu17", 0x0000, 0x100000, CRC(10bfcdcf) SHA1(34dc619f33c81014120d9b6a2f8b2373451af2e4) )
+	ROM_LOAD( "leprechaun's_gold.xu18", 0x0000, 0x100000, CRC(a3f82467) SHA1(0971f32bff0d4bda43cd98e975e49710d73f9286) )
+ROM_END
 
 
-ROM_START( lol )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( lol )    // Life of Luxury (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(28af87a0) SHA1(c94b98b6922b5f5551eff239226bfe007535fc21) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -197,8 +376,8 @@ ROM_START( lol )
 ROM_END
 
 
-ROM_START( lovewin )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( lovewin )    // Love To Win (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(b1b2c7da) SHA1(96430bfa062467bba1daaf2e6180068b3211a739) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -213,9 +392,8 @@ ROM_START( lovewin )
 ROM_END
 
 
-
-ROM_START( mtburn )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( mtburn )    // Money To Burn (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a329aff0) SHA1(2f631783bd15b8a695d92d0861e167130f914046) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -228,9 +406,8 @@ ROM_START( mtburn )
 ROM_END
 
 
-
-ROM_START( otchart )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( otchart )    // Off The Charts (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(b1baee77) SHA1(9f8e87bb10499fa73d961bce4fd75d31c880ea51) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -243,9 +420,8 @@ ROM_START( otchart )
 ROM_END
 
 
-
-ROM_START( perfect )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( perfect )    // Perfect Game (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(1e90dc52) SHA1(6ac1762ce979e1259e03025d89271034565d8f4a) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -260,8 +436,8 @@ ROM_START( perfect )
 ROM_END
 
 
-ROM_START( reelemin )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( reelemin )    // Reel 'Em In (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a3840965) SHA1(1e782bb5eaeabce0d1a07eb895d344028364cd4f) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -274,8 +450,8 @@ ROM_START( reelemin )
 ROM_END
 
 
-ROM_START( sonoth )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( sonoth )    // Something For Nothing (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a5afc1dd) SHA1(5743c630d382d1cc2f7720a2038b105f0dd49790) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -285,8 +461,8 @@ ROM_START( sonoth )
 ROM_END
 
 
-ROM_START( swingin )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( swingin )    // Swingin In The Green (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(f0ee2385) SHA1(8269cf0a765228fd8a2512cefde715e3a7219d7a) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -299,8 +475,8 @@ ROM_START( swingin )
 ROM_END
 
 
-ROM_START( wmstopb )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( wmstopb )    // Top Banana (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(dbbabd02) SHA1(6e85bb11222c593a326e282e6edfff3647379c78) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -312,8 +488,8 @@ ROM_START( wmstopb )
 ROM_END
 
 
-ROM_START( wdun )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( wdun )    // Who Dunnit (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(9c5f2a50) SHA1(8c591eb80276d460dd66bdf817778aed11d013ef) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -326,8 +502,8 @@ ROM_START( wdun )
 ROM_END
 
 
-ROM_START( winbid )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( winbid )    // Winning Bid (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(873eecfb) SHA1(35960c9a2a4efeac8b8cea94f1eac6ffb175b9a9) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -341,8 +517,8 @@ ROM_START( winbid )
 ROM_END
 
 
-ROM_START( wldstrek )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( wldstrek )    // Wild Streak (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(6200c5e3) SHA1(fcf542875a11972974a9c72e171d4ca0686b0c0e) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -355,8 +531,8 @@ ROM_START( wldstrek )
 ROM_END
 
 
-ROM_START( yukongld )
-	ROM_REGION32_LE(0x100000, "maincpu", 0)
+ROM_START( yukongld )    // Yukon Gold (Russian)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(7c12f7c7) SHA1(20eb1a5ff85e0fd36e669c7dc53b677f12446af3) )
 
 	ROM_REGION(0x100000, "rom", 0)
@@ -371,33 +547,45 @@ ROM_START( yukongld )
 ROM_END
 
 
+/*********************************************
+*                Driver Init                 *
+*********************************************/
 
 DRIVER_INIT_MEMBER(wms_state,wms)
 {
 }
 
-GAME( 200?, wms,        0,       wms, wms, wms_state, wms, ROT0, "WMS", "WMS SetUp/Clear Chips (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, wmsa,       wms,     wms, wms, wms_state, wms, ROT0, "WMS", "WMS SetUp/Clear Chips (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, wmsb,       wms,     wms, wms, wms_state, wms, ROT0, "WMS", "WMS SetUp/Clear Chips (set 3)", GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, btippers,   0,       wms, wms, wms_state, wms, ROT0, "WMS", "Big Tippers (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, wmsboom,    0,       wms, wms, wms_state, wms, ROT0, "WMS", "Boom (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, cashcrop,   0,       wms, wms, wms_state, wms, ROT0, "WMS", "Cash Crop (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, filthyr,    0,       wms, wms, wms_state, wms, ROT0, "WMS", "Filthy Rich (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, hottop,     0,       wms, wms, wms_state, wms, ROT0, "WMS", "Hot Toppings (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, inwinner,   0,       wms, wms, wms_state, wms, ROT0, "WMS", "Instant Winner (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, jptparty,   0,       wms, wms, wms_state, wms, ROT0, "WMS", "Jackpot Party (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, leprgld,    0,       wms, wms, wms_state, wms, ROT0, "WMS", "Leprechaun's Gold (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, lol,        0,       wms, wms, wms_state, wms, ROT0, "WMS", "Life of Luxury (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, lovewin,    0,       wms, wms, wms_state, wms, ROT0, "WMS", "Love To Win (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, mtburn,     0,       wms, wms, wms_state, wms, ROT0, "WMS", "Money To Burn (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, otchart,    0,       wms, wms, wms_state, wms, ROT0, "WMS", "Off The Charts (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, perfect,    0,       wms, wms, wms_state, wms, ROT0, "WMS", "Perfect Game (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, reelemin,   0,       wms, wms, wms_state, wms, ROT0, "WMS", "Reel 'Em In (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sonoth,     0,       wms, wms, wms_state, wms, ROT0, "WMS", "Something For Nothing (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, swingin,    0,       wms, wms, wms_state, wms, ROT0, "WMS", "Swingin In The Green (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, wmstopb,    0,       wms, wms, wms_state, wms, ROT0, "WMS", "Top Banana (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, wdun,       0,       wms, wms, wms_state, wms, ROT0, "WMS", "Who Dunnit (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, winbid,     0,       wms, wms, wms_state, wms, ROT0, "WMS", "Winning Bid (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, wldstrek,   0,       wms, wms, wms_state, wms, ROT0, "WMS", "Wild Streak (Russia)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, yukongld,   0,       wms, wms, wms_state, wms, ROT0, "WMS", "Yukon Gold (Russia)", GAME_IS_SKELETON_MECHANICAL )
+/*********************************************
+*                Game Drivers                *
+*********************************************/
+
+//    YEAR  NAME        PARENT    MACHINE  INPUT     STATE      INIT  ROT    COMPANY  FULLNAME                          FLAGS
+
+GAME( 200?, wms,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 1)",   GAME_IS_SKELETON )
+GAME( 200?, wmsa,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 2)",   GAME_IS_SKELETON )
+GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 3)",   GAME_IS_SKELETON )
+
+GAME( 200?, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           GAME_IS_SKELETON )
+GAME( 200?, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  GAME_IS_SKELETON )
+GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             GAME_IS_SKELETON )
+GAME( 200?, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           GAME_IS_SKELETON )
+GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          GAME_IS_SKELETON )
+GAME( 200?, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         GAME_IS_SKELETON )
+GAME( 200?, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        GAME_IS_SKELETON )
+GAME( 200?, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         GAME_IS_SKELETON )
+GAME( 200?, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     GAME_IS_SKELETON )
+GAME( 200?, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     GAME_IS_SKELETON )
+GAME( 200?, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        GAME_IS_SKELETON )
+GAME( 200?, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           GAME_IS_SKELETON )
+GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         GAME_IS_SKELETON )
+GAME( 200?, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        GAME_IS_SKELETON )
+GAME( 200?, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          GAME_IS_SKELETON )
+GAME( 200?, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           GAME_IS_SKELETON )
+GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Something For Nothing (Russian)", GAME_IS_SKELETON )
+GAME( 200?, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  GAME_IS_SKELETON )
+GAME( 200?, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            GAME_IS_SKELETON )
+GAME( 200?, wdun,       0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            GAME_IS_SKELETON )
+GAME( 200?, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           GAME_IS_SKELETON )
+GAME( 200?, wldstrek,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Wild Streak (Russian)",           GAME_IS_SKELETON )
+GAME( 200?, yukongld,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            GAME_IS_SKELETON )

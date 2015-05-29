@@ -4,9 +4,6 @@
 
     Epyx Fast Load cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "epyx_fast_load.h"

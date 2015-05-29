@@ -183,7 +183,7 @@ static void *open_chd(const char *filename, movie_info &info)
 	}
 
 	// get the metadata
-	astring metadata;
+	std::string metadata;
 	chderr = chd->read_metadata(AV_METADATA_TAG, 0, metadata);
 	if (chderr != CHDERR_NONE)
 	{
@@ -194,7 +194,7 @@ static void *open_chd(const char *filename, movie_info &info)
 
 	// extract the info
 	int fps, fpsfrac, width, height, interlaced, channels, rate;
-	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
+	if (sscanf(metadata.c_str(), AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 	{
 		fprintf(stderr, "Improperly formatted metadata\n");
 		delete chd;
@@ -762,16 +762,16 @@ int main(int argc, char *argv[])
 		bitmap_yuy16 bitmap(info.width, info.height);
 
 		// allocate sound buffers
-		dynamic_array<INT16> lsound(info.samplerate);
-		dynamic_array<INT16> rsound(info.samplerate);
+		std::vector<INT16> lsound(info.samplerate);
+		std::vector<INT16> rsound(info.samplerate);
 
 		// loop over frames
 		int frame = 0;
 		int samples = 0;
-		while (isavi ? read_avi(file, frame, bitmap, lsound, rsound, samples) : read_chd(file, frame, bitmap, lsound, rsound, samples))
+		while (isavi ? read_avi(file, frame, bitmap, &lsound[0], &rsound[0], samples) : read_chd(file, frame, bitmap, &lsound[0], &rsound[0], samples))
 		{
 			verify_video(video, frame, bitmap);
-			verify_audio(audio, lsound, rsound, samples);
+			verify_audio(audio, &lsound[0], &rsound[0], samples);
 			frame++;
 		}
 

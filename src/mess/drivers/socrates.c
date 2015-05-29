@@ -1,31 +1,10 @@
-// license:MAME|LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
 *
 *  V-tech Socrates Driver
 *  Copyright (C) 2009-2013 Jonathan Gevaryahu AKA Lord Nightmare
 *  with dumping help from Kevin 'kevtris' Horton
-*
-*
-*  This source file is dual-licensed under the following licenses:
-*  1. The MAME license as of September 2013
-*  2. The GNU LGPLv2.1:
-*
-*  This library is free software; you can redistribute it and/or
-*  modify it under the terms of the GNU Lesser General Public
-*  License as published by the Free Software Foundation; either
-*  version 2.1 of the License, or (at your option) any later version.
-*
-*  This library is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-*  Lesser General Public License for more details.
-*
-*  You should have received a copy of the GNU Lesser General Public
-*  License along with this library; if not, write to the Free Software
-*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-*
-*  Please contact the author if you require other licensing.
 *
 *
 TODO:
@@ -317,8 +296,8 @@ void socrates_state::socrates_check_kb_latch(  ) // if kb[1] is full and kb[0] i
 
 void socrates_state::machine_reset()
 {
-	astring region_tag;
-	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	std::string region_tag;
+	m_cart_reg = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
 	socrates_set_rom_bank();
@@ -500,7 +479,7 @@ WRITE8_MEMBER(socrates_state::speech_command) // write 0x4x
    does not have the rom read mode, which the socrates definitely uses! */
 /* Commands (tc8802):
 SEL 5 4 3 2 1 0
-    0 0 n n n n -  ADLD - ADress LoaD - writes one nybble to the address
+    0 0 n n n n -  ADLD - ADdress LoaD - writes one nybble to the address
                           of vsm rom selected (internal or external) starting
                           from the low 4 bits; each subsequent write writes to
                           the next higher 4 bits; resetting the chip resets
@@ -896,8 +875,8 @@ WRITE8_MEMBER( iqunlim_state::video_regs_w )
 
 void iqunlim_state::machine_start()
 {
-	astring region_tag;
-	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	std::string region_tag;
+	m_cart_reg = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	UINT8 *bios = m_bios_reg->base();
 	UINT8 *cart = m_cart_reg ? m_cart_reg->base() : m_bios_reg->base();
