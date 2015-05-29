@@ -104,20 +104,6 @@ netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const 
 	return register_dev(dev, name);
 }
 
-template <class T>
-static void remove_start_with(T &hm, pstring &sw)
-{
-	for (std::size_t i = hm.size() - 1; i >= 0; i--)
-	{
-		pstring x = hm[i]->name();
-		if (sw.equals(x.substr(0, sw.len())))
-		{
-			NL_VERBOSE_OUT(("removing %s\n", hm[i]->name().cstr()));
-			hm.remove(hm[i]);
-		}
-	}
-}
-
 void netlist_setup_t::remove_dev(const pstring &name)
 {
 	netlist_device_t *dev = netlist().m_devices.find(name);
@@ -801,15 +787,13 @@ void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{
-		for (netlist_core_device_t * const *entry = netlist().m_started_devices.first(); entry != NULL; entry = netlist().m_started_devices.next(entry))
+		for (std::size_t i = 0; i < netlist().m_started_devices.size(); i++)
 		{
-			//entry->object()->s
-			printf("Device %20s : %12d %12d %15ld\n", (*entry)->name().cstr(), (*entry)->stat_call_count, (*entry)->stat_update_count, (long int) (*entry)->stat_total_time / ((*entry)->stat_update_count + 1));
+			netlist_core_device_t *entry = netlist().m_started_devices[i];
+			printf("Device %20s : %12d %12d %15ld\n", entry->name().cstr(), entry->stat_call_count, entry->stat_update_count, (long int) entry->stat_total_time / (entry->stat_update_count + 1));
 		}
-		printf("Queue Start %15d\n", m_netlist.queue().m_prof_start);
-		printf("Queue End   %15d\n", m_netlist.queue().m_prof_end);
-		printf("Queue Sort  %15d\n", m_netlist.queue().m_prof_sort);
-		printf("Queue Move  %15d\n", m_netlist.queue().m_prof_sortmove);
+		printf("Queue Pushes %15d\n", m_netlist.queue().m_prof_call);
+		printf("Queue Moves  %15d\n", m_netlist.queue().m_prof_sortmove);
 	}
 #endif
 }

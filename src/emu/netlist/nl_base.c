@@ -1088,12 +1088,3 @@ NETLIB_UPDATE(mainclock)
 	net.set_time(netlist().time() + m_inc);
 }
 
-ATTR_HOT void netlist_base_t::push_to_queue(netlist_net_t &out, const netlist_time &attime)
-{
-	m_queue.push(netlist_queue_t::entry_t(attime, &out));
-}
-
-ATTR_HOT void netlist_base_t::remove_from_queue(netlist_net_t &out)
-{
-	m_queue.remove(&out);
-}

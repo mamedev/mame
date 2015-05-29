@@ -186,6 +186,20 @@ private:
 
 	const pstring resolve_alias(const pstring &name) const;
 	nld_base_proxy *get_d_a_proxy(netlist_core_terminal_t &out);
+
+	template <class T>
+	void remove_start_with(T &hm, pstring &sw)
+	{
+		for (std::size_t i = hm.size() - 1; i >= 0; i--)
+		{
+			pstring x = hm[i]->name();
+			if (sw.equals(x.substr(0, sw.len())))
+			{
+				NL_VERBOSE_OUT(("removing %s\n", hm[i]->name().cstr()));
+				hm.remove(hm[i]);
+			}
+		}
+	}
 };
 
 #endif /* NLSETUP_H_ */

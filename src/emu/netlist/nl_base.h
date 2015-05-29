@@ -1419,4 +1419,14 @@ ATTR_HOT inline void netlist_analog_output_t::set_Q(const nl_double newQ)
 	}
 }
 
+ATTR_HOT inline void netlist_base_t::push_to_queue(netlist_net_t &out, const netlist_time &attime)
+{
+	m_queue.push(netlist_queue_t::entry_t(attime, &out));
+}
+
+ATTR_HOT inline void netlist_base_t::remove_from_queue(netlist_net_t &out)
+{
+	m_queue.remove(&out);
+}
+
 #endif /* NLBASE_H_ */

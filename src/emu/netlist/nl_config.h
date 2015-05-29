@@ -99,9 +99,9 @@
 #define NL_KEEP_STATISTICS          (0)
 
 #if (NL_VERBOSE)
-	#define NL_VERBOSE_OUT(x)       printf x
+	#define NL_VERBOSE_OUT(x)       netlist().log x
 #else
-	#define NL_VERBOSE_OUT(x)       do { if(0) printf x ; } while (0)
+	#define NL_VERBOSE_OUT(x)       do { if(0) netlist().log x ; } while (0)
 #endif
 
 //============================================================
@@ -125,6 +125,7 @@
 //============================================================
 
 #if NL_KEEP_STATISTICS
+#include "eminline.h"
 #define add_to_stat(v,x)        do { v += (x); } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
 #define begin_timing(v)         do { v -= get_profile_ticks(); } while (0)
