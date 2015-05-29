@@ -538,7 +538,7 @@ WRITE_LINE_MEMBER(namcos1_state::subres_w)
 
 void namcos1_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 	membank("mcubank")->configure_entries(0, 24, memregion("voice")->base(), 0x8000);
 
 	save_item(NAME(m_dac0_value));
