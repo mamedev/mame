@@ -49,7 +49,7 @@ public:
 
 	// files indices
 	std::vector<IniFileIndex> ini_index;
-	UINT16 current_file, current_category;
+	static UINT16 current_file, current_category;
 
 private:
 

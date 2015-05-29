@@ -18,6 +18,8 @@
 //-------------------------------------------------
 
 static const char *favorite_filename = "favorites.ini";
+UINT16 inifile_manager::current_category = 0;
+UINT16 inifile_manager::current_file = 0;
 
 //-------------------------------------------------
 //  ctor
@@ -129,32 +131,29 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 
 		while (std::getline(myfile, readbuf))
 		{
-			if (readbuf[0] == '[')
-				break;
-
+			if (readbuf[0] == '[') break;
 			std::string name;
 			size_t found = readbuf.find_last_not_of(carriage);
-			name.assign(readbuf.substr(0, found));
+			name.assign(readbuf.substr(0, found + 1));
+			if (name.empty()) break;
 			int dfind = driver_list::find(name.c_str());
 			if (dfind != -1 && search_clones)
 			{
 				temp_filter.push_back(dfind);
-
 				int clone_of = driver_list::non_bios_clone(dfind);
 
 				if (clone_of == -1)
 				{
 					for (int x = 0; x < num_game; x++)
-						if (name.compare(driver_list::driver(x).parent))
+						if (name.compare(driver_list::driver(x).parent) == 0 && name.compare(driver_list::driver(x).name) != 0)
 							temp_filter.push_back(x);
 				}
 			}
 			else if (dfind != -1)
 				temp_filter.push_back(dfind);
 		}
+		myfile.close();
 	}
-
-	return;
 }
 
 //-------------------------------------------------
