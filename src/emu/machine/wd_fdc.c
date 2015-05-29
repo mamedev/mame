@@ -895,9 +895,12 @@ void wd_fdc_t::interrupt_start()
 		drop_drq();
 		motor_timeout = 0;
 	}
-
-	// after a force interrupt command, return status type 1
-	status_type_1 = true;
+	else
+	{
+		// when a force interrupt command is issued and there is no
+		// currently running command, return the status type 1 bits
+		status_type_1 = true;
+	}
 
 	if(!(command & 0x0f)) {
 		intrq_cond = 0;
