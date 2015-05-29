@@ -679,7 +679,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	const int masks[4] = { 1, 5, 3, 1 };
+	const UINT32 masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
 
 	m_in_queue = 2; /* mark as taken ... */
