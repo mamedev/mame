@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:Andreas Naive,David Haywood
 #ifndef _IGS036CRYPT_H_
 #define _IGS036CRYPT_H_
 
