@@ -142,13 +142,13 @@ void iteagle_state::machine_reset()
 {
 }
 
-#define PCI_ID_IDE 			":pci:06.0"
-// Primary IDE Control	":pci:06.1"
-// Seconday IDE Control	":pci:06.2"
-#define PCI_ID_SOUND  	":pci:07.0"
-#define PCI_ID_FPGA 		":pci:08.0"
-#define PCI_ID_VIDEO  	":pci:09.0"
-#define PCI_ID_EEPROM 	":pci:0a.0"
+#define PCI_ID_IDE          ":pci:06.0"
+// Primary IDE Control  ":pci:06.1"
+// Seconday IDE Control ":pci:06.2"
+#define PCI_ID_SOUND    ":pci:07.0"
+#define PCI_ID_FPGA         ":pci:08.0"
+#define PCI_ID_VIDEO    ":pci:09.0"
+#define PCI_ID_EEPROM   ":pci:0a.0"
 
 static MACHINE_CONFIG_START( iteagle, iteagle_state )
 

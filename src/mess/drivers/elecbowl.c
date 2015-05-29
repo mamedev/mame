@@ -213,9 +213,9 @@ ROM_START( elecbowl )
 	ROM_LOAD( "mp3403.u9", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_elecbowl_opla.pla", 0, 365, NO_DUMP )
+	ROM_LOAD( "tms1100_elecbowl_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
 

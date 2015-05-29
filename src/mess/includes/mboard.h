@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Ralf Schaefer
+// copyright-holders:Ralf Schaefer, Cowering
 /**********************************************************************
 
      Mephisto Chess Computers

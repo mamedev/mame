@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb, Nicola Salmoria
+// copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/dooyong.h"
 

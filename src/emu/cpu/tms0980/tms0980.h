@@ -46,6 +46,47 @@
 	tms0270_cpu_device::set_write_pdc_callback(*device, DEVCB_##_devcb);
 
 
+// pinout reference
+
+/*
+
+            ____   ____                         ____   ____
+     R8  1 |*   \_/    | 28 R7           R0  1 |*   \_/    | 28 Vss
+     R9  2 |           | 27 R6           R1  2 |           | 27 OSC2
+    R10  3 |           | 26 R5           R2  3 |           | 26 OSC1
+    Vdd  4 |           | 25 R4           R3  4 |           | 25 O0
+     K1  5 |           | 24 R3           R4  5 |           | 24 O1
+     K2  6 |  TMS1000  | 23 R2           R5  6 |           | 23 O2
+     K4  7 |  TMS1070  | 22 R1           R6  7 |  TMS1400  | 22 O3
+     K8  8 |  TMS1100  | 21 R0           R7  8 |           | 21 O4
+   INIT  9 |  TMS1170  | 20 Vss          R8  9 |           | 20 O5
+     O7 10 |           | 19 OSC2         R9 10 |           | 19 O6
+     O6 11 |           | 18 OSC1        R10 11 |           | 18 O7
+     O5 12 |           | 17 O0          Vdd 12 |           | 17 K8
+     O4 13 |           | 16 O1         INIT 13 |           | 16 K4
+     O3 14 |___________| 15 O2           K1 14 |___________| 15 K2
+
+
+            ____   ____
+     R2  1 |*   \_/    | 28 R3
+     R1  2 |           | 27 R4
+     R0  3 |           | 26 R5
+      ?  4 |           | 25 R6
+    Vdd  5 |           | 24 R7
+     K3  6 |           | 23 R8
+     K8  7 |  TMS0980  | 22 ?
+     K4  8 |           | 21 ?
+     K2  9 |           | 20 Vss
+     K1 10 |           | 19 ?
+     O7 11 |           | 18 O0
+     O6 12 |           | 17 O1
+     O5 13 |           | 16 O2
+     O4 14 |___________| 15 O3
+
+  note: TMS0980 official pin names for R0-R8 is D9-D1, O0-O7 is S(A-G,DP)
+
+*/
+
 
 class tms1xxx_cpu_device : public cpu_device
 {
@@ -412,6 +453,7 @@ private:
 
 extern const device_type TMS1000;
 extern const device_type TMS1070;
+extern const device_type TMS1040;
 extern const device_type TMS1200;
 extern const device_type TMS1100;
 extern const device_type TMS1170;

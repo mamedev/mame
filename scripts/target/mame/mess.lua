@@ -556,6 +556,7 @@ MACHINES["STEPPERS"] = true
 MACHINES["CORVUSHD"] = true
 MACHINES["WOZFDC"] = true
 MACHINES["DIABLO_HD"] = true
+MACHINES["TMS1024"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -580,6 +581,7 @@ BUSES["CBM2"] = true
 BUSES["CBMIEC"] = true
 BUSES["CENTRONICS"] = true
 BUSES["CGENIE_EXPANSION"] = true
+BUSES["CGENIE_PARALLEL"] = true
 BUSES["CHANNELF"] = true
 BUSES["COCO"] = true
 BUSES["COLECO"] = true
@@ -1405,8 +1407,6 @@ files {
 createMESSProjects(_target, _subtarget, "eaca")
 files {              
 	MAME_DIR .. "src/mess/drivers/cgenie.c",
-	MAME_DIR .. "src/mess/machine/cgenie.c",
-	MAME_DIR .. "src/mess/video/cgenie.c", 
 }
 
 createMESSProjects(_target, _subtarget, "einis")

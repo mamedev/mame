@@ -4,10 +4,6 @@
 
     Rockwell 10696 General Purpose Input/Output (I/O)
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
-
     REGISTER DESCRIPTION
 
     HEX    Address   Select     Names

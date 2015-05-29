@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Paul Leaman
+// copyright-holders:Paul Leaman, Couriersud
 /***************************************************************************
 
     1942

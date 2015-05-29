@@ -640,7 +640,7 @@ void help(const char* _error = NULL)
 		  "  -i <include path>             Include path (for multiple paths use semicolon).\n"
 		  "  -o <file path>                Output file path.\n"
 		  "      --bin2c <file path>       Generate C header file.\n"
-		  "      --depends <file path>     Generate makefile style depends file.\n"
+		  "      --depends                 Generate makefile style depends file.\n"
 		  "      --platform <platform>     Target platform.\n"
 		  "           android\n"
 		  "           asm.js\n"
@@ -1390,7 +1390,7 @@ int main(int _argc, const char* _argv[])
 							strins(const_cast<char*>(brace+1), "\nvec4 bgfx_VoidFrag;\n");
 						}
 
-						const bool hasFragCoord   = NULL != strstr(input, "gl_FragCoord") || hlsl > 3;
+						const bool hasFragCoord   = NULL != strstr(input, "gl_FragCoord") || hlsl > 3 || hlsl == 2;
 						const bool hasFragDepth   = NULL != strstr(input, "gl_FragDepth");
 						const bool hasFrontFacing = NULL != strstr(input, "gl_FrontFacing");
 						const bool hasPrimitiveId = NULL != strstr(input, "gl_PrimitiveID");

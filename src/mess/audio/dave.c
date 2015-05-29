@@ -4,9 +4,6 @@
 
     Intelligent Designs DAVE emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "dave.h"

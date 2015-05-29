@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 #include "sound/msm5205.h"
 
@@ -18,7 +18,7 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_rombank(*this, "rombank"),
-		m_adpcmrom(*this, "adpcm")	{ }
+		m_adpcmrom(*this, "adpcm")  { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

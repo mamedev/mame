@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-	Wang PC keyboard emulation
+    Wang PC keyboard emulation
 
 *********************************************************************/
 

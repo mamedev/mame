@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Keith Wilkins
+// license:BSD-3-Clause
+// copyright-holders:K.Wilkins
 /***************************************************************************
 
   namcos2.h

@@ -4,9 +4,6 @@
 
     Intel 8257 DMA Controller emulation
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "i8257.h"

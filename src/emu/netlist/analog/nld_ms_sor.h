@@ -12,13 +12,11 @@
 #ifndef NLD_MS_SOR_H_
 #define NLD_MS_SOR_H_
 
-#include <cmath>
-
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
-template <int m_N, int _storage_N>
-class ATTR_ALIGNED(64) netlist_matrix_solver_SOR_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
+template <unsigned m_N, unsigned _storage_N>
+class netlist_matrix_solver_SOR_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
@@ -32,7 +30,7 @@ public:
 
 	virtual ~netlist_matrix_solver_SOR_t() {}
 
-	ATTR_COLD virtual void log_stats();
+	/* ATTR_COLD */ virtual void log_stats();
 
 	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
 protected:
@@ -48,7 +46,7 @@ private:
 // netlist_matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
 {
 	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
@@ -68,14 +66,14 @@ void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve()
 {
 	this->solve_base(this);
 	return this->compute_next_timestep();
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const int iN = this->N();

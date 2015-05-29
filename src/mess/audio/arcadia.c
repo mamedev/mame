@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Peter Trauner
+// copyright-holders:David Viens, Peter Trauner
 /***************************************************************************
 
   PeT mess@utanet.at

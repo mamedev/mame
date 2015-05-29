@@ -7,12 +7,6 @@
 
   Copyright R. Belmont.
 
-  This software is dual-licensed: it may be used in MAME and properly licensed
-  MAME derivatives under the terms of the MAME license.  For use outside of
-  MAME and properly licensed derivatives, it is available under the
-  terms of the GNU Lesser General Public License (LGPL), version 2.1.
-  You may read the LGPL at http://www.gnu.org/licenses/lgpl.html
-
   History: the ES5503 was the next design after the famous C64 "SID" by Bob Yannes.
   It powered the legendary Mirage sampler (the first affordable pro sampler) as well
   as the ESQ-1 synth/sequencer.  The ES5505 (used in Taito's F3 System) and 5506

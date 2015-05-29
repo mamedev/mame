@@ -15,25 +15,19 @@
 #define CONFIGNAME              "mess"
 #define APPLONGNAME             "M.E.S.S."
 #define FULLLONGNAME            "Multi Emulator Super System"
-#define CAPGAMENOUN             "SYSTEM"
-#define CAPSTARTGAMENOUN        "System"
-#define GAMENOUN                "system"
-#define GAMESNOUN               "systems"
+#define CAPGAMENOUN             "MACHINE"
+#define CAPSTARTGAMENOUN        "Machine"
+#define GAMENOUN                "machine"
+#define GAMESNOUN               "machines"
 #define COPYRIGHT               "Copyright Nicola Salmoria\nand the MAME team\nhttp://mamedev.org"
 #define COPYRIGHT_INFO          "Copyright Nicola Salmoria and the MAME team"
-#define DISCLAIMER              "MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"\
-								"several computer and console systems. But hardware is useless without software\n" \
-								"so a file dump of the ROM, cartridges, discs, and cassettes which run on that\n" \
-								"hardware is required. Such files, like any other commercial software, are\n" \
-								"copyrighted material and it is therefore illegal to use them if you don't own\n" \
-								"the original media from which the files are derived. Needless to say, these\n" \
-								"files are not distributed together with MESS. Distribution of MESS together\n" \
-								"with these files is a violation of copyright law and should be promptly\n" \
-								"reported to the authors so that appropriate legal action can be taken.\n"
+#define DISCLAIMER              "This software reproduces, more or less faithfully, the behaviour of a wide range\n" \
+								"of machines. But hardware is useless without software, so images of the ROMs and\n" \
+								"other media which run on that hardware are also required.\n"
 #define USAGE                   "Usage:  %s [%s] [media] [software] [options]"
-#define XML_ROOT                "mess"
+#define XML_ROOT                "mame"
 #define XML_TOP                 "machine"
-#define STATE_MAGIC_NUM         "MESSSAVE"
+#define STATE_MAGIC_NUM         "MAMESAVE"
 
 const char * emulator_info::get_appname() { return APPNAME;}
 const char * emulator_info::get_appname_lower() { return APPNAME_LOWER;}

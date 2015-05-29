@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Nathan Woods, Raphael Nabet
 /*
     Code to interface the MESS image code with MAME's harddisk core.

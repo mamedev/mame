@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:???
 // copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina
 /***************************************************************************
 

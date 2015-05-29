@@ -4,9 +4,6 @@
 
     MOS 7360/8360 Text Edit Device (TED) emulation
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
                             _____   _____
                    DB6   1 |*    \_/     | 40  Vcc

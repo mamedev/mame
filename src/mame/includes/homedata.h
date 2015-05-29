@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
 #include "sound/dac.h"
 #include "sound/sn76496.h"

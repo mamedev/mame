@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert,Andreas Naive
 
 #include "emu.h"
 #include "naomim4.h"

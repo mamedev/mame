@@ -299,7 +299,7 @@ The following floppies came with the machines.
 <!--
 
  Games, Programs, Etc.
- These all had a disk release, according to http://www.generation-msx.nl/ but we have no confirmation about these dumps coming 
+ These all had a disk release, according to http://www.generation-msx.nl/ but we have no confirmation about these dumps coming
  from original disks: more investigations are definitely needed!!
 
 -->
@@ -375,8 +375,8 @@ The following floppies came with the machines.
 				<rom name="snatcher (1988)(konami)(jp)(disk 3 of 3)[scc+].dsk" size="737280" crc="35e70ac9" sha1="c653d9aab4fdda14ab92490972783f7b9d3ceb1a" offset="0" />
 			</dataarea>
 		</part>
-		<!-- This is the sound cartridge that came with the game Snatcher. This sound cartridge 
-             can also be used with the MSX Game Collections from Konami. -->
+		<!-- This is the sound cartridge that came with the game Snatcher. This sound cartridge
+		     can also be used with the MSX Game Collections from Konami. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="sound_snatcher" />
 			<dataarea name="ram" size="65536">
@@ -403,8 +403,8 @@ The following floppies came with the machines.
 				<rom name="snatcher (1988)(konami)(jp)(disk 3 of 3)[scc+].dsk" size="737280" crc="35e70ac9" sha1="c653d9aab4fdda14ab92490972783f7b9d3ceb1a" offset="0" />
 			</dataarea>
 		</part>
-		<!-- This is the sound cartridge that came with the game Snatcher. This sound cartridge 
-             can also be used with the MSX Game Collections from Konami. -->
+		<!-- This is the sound cartridge that came with the game Snatcher. This sound cartridge
+		     can also be used with the MSX Game Collections from Konami. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="sound_snatcher" />
 			<dataarea name="ram" size="65536">
@@ -431,8 +431,8 @@ The following floppies came with the machines.
 				<rom name="super deform snatcher (1990)(konami)(jp)(disk 3 of 3)[scc+].dsk" size="737280" crc="0547bb3a" sha1="e4b1b5f8b7ea4532551c103164860c8802151131" offset="0" />
 			</dataarea>
 		</part>
-		<!-- This is the sound cartridge that came with the game SD Snatcher. This sound cartridge 
-             can _not_ be used with the MSX Game Collections from Konami. -->
+		<!-- This is the sound cartridge that came with the game SD Snatcher. This sound cartridge
+		     can _not_ be used with the MSX Game Collections from Konami. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="sound_sdsnatch" />
 			<dataarea name="ram" size="65536">
@@ -459,8 +459,8 @@ The following floppies came with the machines.
 				<rom name="super deform snatcher (1990)(konami)(jp)(disk 3 of 3)[scc+].dsk" size="737280" crc="0547bb3a" sha1="e4b1b5f8b7ea4532551c103164860c8802151131" offset="0" />
 			</dataarea>
 		</part>
-		<!-- This is the sound cartridge that came with the game SD Snatcher. This sound cartridge 
-             can _not_ be used with the MSX Game Collections from Konami. -->
+		<!-- This is the sound cartridge that came with the game SD Snatcher. This sound cartridge
+		     can _not_ be used with the MSX Game Collections from Konami. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="sound_sdsnatch" />
 			<dataarea name="ram" size="65536">
@@ -13058,7 +13058,7 @@ The following floppies came with the machines.
 
 
 
-<!-- 
+<!--
 
 HOMEBREW
 
@@ -16047,7 +16047,7 @@ HOMEBREW
 	</software>
 
 
-<!-- 
+<!--
 
 DISKMAG
 
@@ -16701,7 +16701,7 @@ DISKMAG
 
 
 
-<!-- 
+<!--
 
  Sets below are hacked games "converted" from their original format (carts or tapes) into disks
  However, we currently don't have the real dumps for these so we keep them in disk format for the moment
@@ -16769,7 +16769,7 @@ DISKMAG
 
 
 
-<!-- 
+<!--
 
  Sets below are hacked games "converted" from their original format (carts or tapes) into disks
  Such information has been retrieved from websites like http://www.generation-msx.nl/ and http://msx.jpn.org/tagoo/
@@ -17350,7 +17350,7 @@ DISKMAG
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="fantzon2">
 		<description>Fantasy Zone II - The Tears of Opa-Opa (Jpn)</description>
 		<year>19??</year>

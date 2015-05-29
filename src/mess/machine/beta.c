@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, MetalliC
 /*********************************************************************
 
     beta.h
@@ -11,8 +11,7 @@
 *********************************************************************/
 /*
 BUGS:
-- random commands can be sent to FDC, so better keep .trd images write protected for now
-goto TR-DOS, CAT -> files will be shown, CAT again -> NO DISK mesage as result of trash commands
+- due to original firmware bug random commands can be sent to FDC instead of SEEK, current WD FDC emulation cant handle this correctly, use patch fix for now
 
 */
 #include "emu.h"
@@ -269,6 +268,11 @@ ROM_START( beta_disk )
 
 	//Default for now
 	ROM_LOAD( "trd503.rom",     0x00000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c))
+
+	// TR-DOS rom have a bug - semi-random commands sent to FDC instead of SEEK command sometimes
+	// however it works OK on real hardware but does not using our WD FDC emulation, both legacy and modern
+	// this patch fixes original bug
+	ROM_FILL( 0x3e47, 1, 0x3e)
 ROM_END
 
 

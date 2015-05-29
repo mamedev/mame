@@ -7,7 +7,7 @@
 
 #include "nld_82S16.h"
 
-static const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+//static const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 
 // FIXME: timing!
 // FIXME: optimize device (separate address decoder!)

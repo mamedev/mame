@@ -27,7 +27,7 @@
 // ======================> c8280_t
 
 class c8280_t :  public device_t,
-				 public device_ieee488_interface
+					public device_ieee488_interface
 {
 public:
 	// construction/destruction

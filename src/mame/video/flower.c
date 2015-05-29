@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:insideoutboy
+// copyright-holders:insideoutboy, David Haywood, Stephh
 /* Flower Video Hardware */
 
 #include "emu.h"

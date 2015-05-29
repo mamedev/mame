@@ -13,9 +13,6 @@
     Permission to use it for non-commercial purposes is hereby granted als long as my copyright notice remains in the program.
     You are not allowed to use the source to create and distribute a modified version of Frodo.
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 /*

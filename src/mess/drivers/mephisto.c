@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Dirk V.
+// license:LGPL-2.1+
+// copyright-holders:Dirk Verwiebe, Cowering
 /******************************************************************************
  Mephisto 4 + 5 Chess Computer
  2007 Dirk V.

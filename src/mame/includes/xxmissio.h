@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Uki
 class xxmissio_state : public driver_device
 {

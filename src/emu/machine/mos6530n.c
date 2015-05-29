@@ -216,7 +216,7 @@ void mos6530_base_t::device_start()
 	save_item(NAME(m_irq_timer));
 	save_item(NAME(m_ie_edge));
 	save_item(NAME(m_irq_edge));
-	save_item(NAME(m_shift));
+	save_item(NAME(m_prescale));
 	save_item(NAME(m_timer));
 }
 
@@ -259,7 +259,8 @@ void mos6530_base_t::device_reset()
 	update_irq();
 	edge_detect();
 
-	m_shift = 1024;
+	m_timer = 0xff;
+	m_prescale = 1024;
 
 	if (cur_live.state != IDLE) {
 		live_abort();
@@ -619,7 +620,9 @@ UINT8 mos6530_base_t::timer_r(bool ie)
 	live_sync();
 
 	m_ie_timer = ie;
-	m_irq_timer = false;
+	if (cur_live.tm_irq != machine().time()) {
+		m_irq_timer = false;
+	}
 	update_irq();
 
 	data = cur_live.value;
@@ -673,17 +676,19 @@ void mos6530_base_t::timer_w(offs_t offset, UINT8 data, bool ie)
 	m_timer = data;
 
 	switch (offset & 0x03) {
-	case 0: m_shift = 1; break;
-	case 1: m_shift = 8; break;
-	case 2: m_shift = 64; break;
-	case 3: m_shift = 1024; break;
+	case 0: m_prescale = 1; break;
+	case 1: m_prescale = 8; break;
+	case 2: m_prescale = 64; break;
+	case 3: m_prescale = 1024; break;
 	}
 
 	m_ie_timer = ie;
-	m_irq_timer = false;
+	if (cur_live.tm_irq != machine().time()) {
+		m_irq_timer = false;
+	}
 	update_irq();
 
-	if (LOG_TIMER) logerror("%s %s %s '%s' Timer value %02x shift %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data, m_shift, m_ie_timer ? 1 : 0);
+	if (LOG_TIMER) logerror("%s %s %s '%s' Timer value %02x prescale %u IE %u\n", machine().time().as_string(), machine().describe_context(), name(), tag(), data, m_prescale, m_ie_timer ? 1 : 0);
 
 	checkpoint();
 
@@ -715,14 +720,14 @@ WRITE8_MEMBER( mos6530_base_t::edge_w )
 
 void mos6530_base_t::live_start()
 {
-	cur_live.period = attotime::from_hz(clock() / m_shift);
-	cur_live.tm = machine().time() + cur_live.period;
+	cur_live.period = attotime::from_ticks(m_prescale, clock());
+	cur_live.tm = machine().time() + attotime::from_hz(clock());
 	cur_live.state = RUNNING;
 	cur_live.next_state = -1;
 
 	cur_live.value = m_timer;
 
-	checkpoint_live = cur_live;
+	checkpoint();
 
 	live_run();
 }
@@ -776,6 +781,7 @@ void mos6530_base_t::live_abort()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
+	cur_live.tm_irq = attotime::never;
 }
 
 void mos6530_base_t::live_run(const attotime &limit)
@@ -791,39 +797,29 @@ void mos6530_base_t::live_run(const attotime &limit)
 
 			cur_live.value--;
 
-			if (LOG_TIMER) logerror("%s %s '%s' timer %02x IRQ 1\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
+			if (cur_live.value == 0xff) {
+				live_delay(RUNNING_SYNCPOINT);
+				return;
+			} else {
+				if (LOG_TIMER) logerror("%s %s '%s' timer %02x\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
 
-			if (!cur_live.value) {
-				cur_live.period = attotime::from_hz(clock());
-				cur_live.state = RUNNING_INTERRUPT;
+				cur_live.tm += cur_live.period;
 			}
-
-			cur_live.tm += cur_live.period;
 			break;
 		}
 
-		case RUNNING_INTERRUPT: {
-			if (cur_live.tm > limit)
-				return;
-
-			cur_live.value--;
-
-			if (LOG_TIMER) logerror("%s %s '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
-
-			live_delay(RUNNING_SYNCPOINT);
-
-			cur_live.tm += cur_live.period;
-			return;
-		}
-
 		case RUNNING_SYNCPOINT: {
-			if (LOG_TIMER) logerror("%s %s '%s' timer IRQ\n", machine().time().as_string(), name(), tag());
+			if (LOG_TIMER) logerror("%s %s '%s' timer %02x interrupt\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
 
+			cur_live.tm_irq = cur_live.tm;
 			m_irq_timer = true;
 			update_irq();
 
-			cur_live.state = RUNNING_AFTER_INTERRUPT;
 			checkpoint();
+
+			cur_live.state = RUNNING_AFTER_INTERRUPT;
+			cur_live.period = attotime::from_hz(clock());
+			cur_live.tm += cur_live.period;
 			break;
 		}
 
@@ -833,7 +829,7 @@ void mos6530_base_t::live_run(const attotime &limit)
 
 			cur_live.value--;
 
-			if (LOG_TIMER) logerror("%s %s '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s %s '%s' timer %02x\n", cur_live.tm.as_string(), name(), tag(), cur_live.value);
 
 			if (!cur_live.value) {
 				cur_live.state = IDLE;

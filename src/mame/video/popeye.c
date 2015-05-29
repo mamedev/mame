@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Marc Lafontaine
+// copyright-holders:Marc Lafontaine, Couriersud
 /***************************************************************************
 
   video.c

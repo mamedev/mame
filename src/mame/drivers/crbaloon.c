@@ -4,8 +4,6 @@
 
     Taito Crazy Balloon hardware
 
-    Copyright Nicola Salmoria and the MAME Team.
-
     To-Do:
         * Video timing from schematics
         * Watchdog length from schematics

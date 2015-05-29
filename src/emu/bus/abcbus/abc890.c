@@ -53,7 +53,7 @@ machine_config_constructor abc890_t::device_mconfig_additions() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc_expansion_unit )
-	MCFG_ABCBUS_SLOT_ADD("io1", abc80_cards, "slow")
+	MCFG_ABCBUS_SLOT_ADD("io1", abc80_cards, "abc830")
 	MCFG_ABCBUS_SLOT_ADD("io2", abc80_cards, NULL)
 	MCFG_ABCBUS_SLOT_ADD("io3", abc80_cards, NULL)
 	MCFG_ABCBUS_SLOT_ADD("io4", abc80_cards, NULL)

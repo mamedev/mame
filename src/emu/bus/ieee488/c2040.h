@@ -28,7 +28,7 @@
 // ======================> c2040_t
 
 class c2040_t :  public device_t,
-				 public device_ieee488_interface
+					public device_ieee488_interface
 {
 public:
 	// construction/destruction

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brad Oliver, Nicola Salmoria
+// copyright-holders:Couriersud
 /*
 
 Battlezone sound info, courtesy of Al Kossow:

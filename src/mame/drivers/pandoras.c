@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia 
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Pandora's Palace(GX328) (c) 1984 Konami/Interlogic

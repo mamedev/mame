@@ -368,6 +368,9 @@ file_error osd_truncate(osd_file *file, UINT64 offset)
 {
 	UINT32 result;
 
+	if (!file || !file->handle)
+		return FILERR_FAILURE;
+
 	switch (file->type)
 	{
 		case SDLFILE_FILE:

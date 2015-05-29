@@ -83,6 +83,13 @@ namespace bx
 			return result;
 		}
 
+		void reset()
+		{
+			m_current = 0;
+			m_write   = 0;
+			m_read    = 0;
+		}
+
 		const uint32_t m_size;
 		uint32_t m_current;
 		uint32_t m_write;
@@ -162,6 +169,13 @@ namespace bx
 			const uint32_t result = uint32_sels(diff, le, diff);
 
 			return result;
+		}
+
+		void reset()
+		{
+			m_current = 0;
+			m_write   = 0;
+			m_read    = 0;
 		}
 
 		const uint32_t m_size;

@@ -1,12 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, MetalliC
 /***************************************************************************
 
 
  MegaDrive / Genesis Cart + STM95 EEPROM device
-
-
- Emulation by MetalliC, converted to slot by Fabio Priuli
 
 
  TO DO: split STM95 to a separate device...

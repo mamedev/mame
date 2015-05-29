@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Roberto Fresca
+// copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
 /***************************************************************************
 
   Golden Star
@@ -181,7 +181,7 @@
   you can see what seems the attract working (still with wrong graphics).
 
   Seems to be sooo slow.... (interrupts?)
-  
+
 
 ***************************************************************************/
 

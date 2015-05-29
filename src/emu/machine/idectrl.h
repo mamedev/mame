@@ -6,9 +6,6 @@
 
     Generic (PC-style) IDE controller implementation.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #pragma once

@@ -63,24 +63,24 @@ Xilinx  XC95108 stickered   ACCLAIM COIN-OP
 TI  TVP3409
     V53C16258HK40       x24
     V53C511816500K60    x4
-    
-U38 and U97 on main board	3DFX
-							500-0004-02
-							BF2733.1 TMU
-							9748 20001
-							TAIWAN 1001
 
-U4 on daughter board  		Zoran ZR36050PQC
-							-29.5
-							85 GF7B9726E
+U38 and U97 on main board   3DFX
+                            500-0004-02
+                            BF2733.1 TMU
+                            9748 20001
+                            TAIWAN 1001
 
-U11 on main board			Removed heatsink, Couldn't see anything...
+U4 on daughter board        Zoran ZR36050PQC
+                            -29.5
+                            85 GF7B9726E
 
-							
-U71 on main board			Galileo
-							GT-64010A-B-0
-							BB8018.1
-							TAIWAN
+U11 on main board           Removed heatsink, Couldn't see anything...
+
+
+U71 on main board           Galileo
+                            GT-64010A-B-0
+                            BB8018.1
+                            TAIWAN
 14.31818 Oscillator by the TI part
 50.0000 Oscillator by EPROMS
 33.0000 Oscillator by the V53C511816500K60

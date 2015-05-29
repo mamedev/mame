@@ -87,7 +87,6 @@ NETLIB_DEVICE(7490,
 	netlist_logic_output_t m_Q[4];
 );
 
-NETLIB_DEVICE_DERIVED(7490_dip, 7490,
-);
+NETLIB_DEVICE_DERIVED_PURE(7490_dip, 7490);
 
 #endif /* NLD_7490_H_ */

@@ -8,9 +8,11 @@
 #ifndef NL_UTIL_H_
 #define NL_UTIL_H_
 
-#include "pstring.h"
-#include "plists.h"
 #include <cmath>
+#include <cstring>
+
+#include "plib/pstring.h"
+#include "plib/plists.h"
 
 class nl_util
 {
@@ -19,32 +21,8 @@ private:
 	nl_util() {};
 
 public:
-	typedef plist_t<pstring> pstring_list;
 
-	static pstring_list split(const pstring &str, const pstring &onstr, bool ignore_empty = false)
-	{
-		pstring_list temp;
 
-		int p = 0;
-		int pn;
-
-		pn = str.find(onstr, p);
-		while (pn>=0)
-		{
-			pstring t = str.substr(p, pn - p);
-			if (!ignore_empty || t.len() != 0)
-				temp.add(t);
-			p = pn + onstr.len();
-			pn = str.find(onstr, p);
-		}
-		if (p<str.len())
-		{
-			pstring t = str.substr(p);
-			if (!ignore_empty || t.len() != 0)
-				temp.add(t);
-		}
-		return temp;
-	}
 	static const pstring environment(const pstring &var, const pstring &default_val = "")
 	{
 		if (getenv(var.cstr()) == NULL)

@@ -166,7 +166,7 @@ void mips3_device::clear_fastram(UINT32 select_start)
 		m_fastram[i].readonly = false;
 		m_fastram[i].base = NULL;
 	}
-	 m_fastram_select=select_start;
+		m_fastram_select=select_start;
 }
 
 /*-------------------------------------------------
@@ -182,6 +182,9 @@ void mips3_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *b
 		m_fastram[m_fastram_select].end = end;
 		m_fastram[m_fastram_select].readonly = readonly;
 		m_fastram[m_fastram_select].base = base;
+		m_fastram[m_fastram_select].offset_base8 = (UINT8*)base - start;
+		m_fastram[m_fastram_select].offset_base16 = (UINT16*)((UINT8*)base - start);
+		m_fastram[m_fastram_select].offset_base32 = (UINT32*)((UINT8*)base - start);
 		m_fastram_select++;
 	}
 }

@@ -6,6 +6,9 @@
  MegaDrive / Genesis J-Cart (+SEPROM) emulation
 
 
+ Emulation based on earlier researches by ElBarto
+
+
  i2c games mapping table:
 
  game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |

@@ -89,6 +89,12 @@
   endif
   include $(DEVKITPPC)/wii_rules']],
 		},
+		Orbis = {
+			cc         = "orbis-clang",
+			cxx        = "orbis-clang++",
+			ar         = "orbis-ar",
+			cppflags   = "-MMD -MP",
+		}
 	}
 
 	local platforms = premake.gcc.platforms
@@ -138,7 +144,9 @@
 		-- OS X has a bug, see http://lists.apple.com/archives/Darwin-dev/2006/Sep/msg00084.html
 		if not cfg.flags.Symbols then
 			if cfg.system == "macosx" then
-				table.insert(result, "-Wl,-x")
+-- Issue#80
+-- https://github.com/bkaradzic/genie/issues/80#issuecomment-100664007
+--				table.insert(result, "-Wl,-x")
 			else
 				table.insert(result, "-s")
 			end
@@ -163,7 +171,7 @@
 		local platform = platforms[cfg.platform]
 		table.insert(result, platform.flags)
 		table.insert(result, platform.ldflags)
-		
+
 		return result
 	end
 
@@ -185,8 +193,8 @@
 
 
 --
--- This is poorly named: returns a list of linker flags for external 
--- (i.e. system, or non-sibling) libraries. See bug #1729227 for 
+-- This is poorly named: returns a list of linker flags for external
+-- (i.e. system, or non-sibling) libraries. See bug #1729227 for
 -- background on why the path must be split.
 --
 

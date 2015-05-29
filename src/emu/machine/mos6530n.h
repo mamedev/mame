@@ -341,19 +341,18 @@ protected:
 	bool m_ie_edge;
 	bool m_irq_edge;
 
-	int m_shift;
+	int m_prescale;
 	UINT8 m_timer;
 
 	enum {
 		IDLE,
 		RUNNING,
-		RUNNING_INTERRUPT,
 		RUNNING_SYNCPOINT,
 		RUNNING_AFTER_INTERRUPT
 	};
 
 	struct live_info {
-		attotime tm;
+		attotime tm, tm_irq;
 		attotime period;
 		int state, next_state;
 		UINT8 value;

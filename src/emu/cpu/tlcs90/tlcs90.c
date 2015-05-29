@@ -6,9 +6,9 @@
 
     emulation by Luca Elia, based on the Z80 core by Juergen Buchmueller
 
-	ChangeLog:
+    ChangeLog:
 
-	20150517 Fixed TRUN bit masking (timers start/stop handling) [Rainer Keuchel]
+    20150517 Fixed TRUN bit masking (timers start/stop handling) [Rainer Keuchel]
 
 *************************************************************************************************************/
 

@@ -12,13 +12,11 @@
 #ifndef NLD_MS_SOR_MAT_H_
 #define NLD_MS_SOR_MAT_H_
 
-#include <cmath>
-
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
-template <int m_N, int _storage_N>
-class ATTR_ALIGNED(64) netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
+template <unsigned m_N, unsigned _storage_N>
+class netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
@@ -38,7 +36,7 @@ public:
 
 	virtual ~netlist_matrix_solver_SOR_mat_t() {}
 
-	ATTR_COLD virtual void log_stats();
+	/* ATTR_COLD */ virtual void log_stats();
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
@@ -59,18 +57,18 @@ private:
 // netlist_matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 {
 	if (this->m_stat_calculations != 0 && m_log_stats)
 	{
-		printf("==============================================\n");
-		printf("Solver %s\n", this->name().cstr());
-		printf("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-		printf("       has %s elements\n", this->is_dynamic() ? "dynamic" : "no dynamic");
-		printf("       has %s elements\n", this->is_timestep() ? "timestep" : "no timestep");
-		printf("       %6.3f average newton raphson loops\n", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		printf("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average\n",
+		this->netlist().log("==============================================\n");
+		this->netlist().log("Solver %s\n", this->name().cstr());
+		this->netlist().log("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		this->netlist().log("       has %s elements\n", this->is_dynamic() ? "dynamic" : "no dynamic");
+		this->netlist().log("       has %s elements\n", this->is_timestep() ? "timestep" : "no timestep");
+		this->netlist().log("       %6.3f average newton raphson loops\n", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average\n",
 				this->m_stat_calculations,
 				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
 				this->m_gs_fail,
@@ -79,7 +77,7 @@ void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 	}
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 {
 	/*
@@ -87,13 +85,13 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 	 */
 
 	if (USE_LINEAR_PREDICTION)
-		for (int k = 0; k < this->N(); k++)
+		for (unsigned k = 0; k < this->N(); k++)
 		{
 			this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
 			this->m_nets[k]->m_cur_Analog = this->m_nets[k]->m_cur_Analog + this->m_Vdelta[k] * this->current_timestep() * m_lp_fact;
 		}
 	else
-		for (int k = 0; k < this->N(); k++)
+		for (unsigned k = 0; k < this->N(); k++)
 		{
 			this->m_last_V[k] = this->m_nets[k]->m_cur_Analog;
 		}
@@ -105,7 +103,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 		nl_double sq = 0;
 		nl_double sqo = 0;
 		const nl_double rez_cts = 1.0 / this->current_timestep();
-		for (int k = 0; k < this->N(); k++)
+		for (unsigned k = 0; k < this->N(); k++)
 		{
 			const netlist_analog_net_t *n = this->m_nets[k];
 			const nl_double nv = (n->m_cur_Analog - this->m_last_V[k]) * rez_cts ;
@@ -125,7 +123,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 	return this->compute_next_timestep();
 }
 
-template <int m_N, int _storage_N>
+template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	/* The matrix based code looks a lot nicer but actually is 30% slower than
@@ -168,7 +166,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 				s = s + nl_math::abs(this->m_A[k][i]);
 			akk = s / akk - 1.0;
 			//if ( akk > lambdaN)
-			//	lambdaN = akk;
+			//  lambdaN = akk;
 			if (akk < lambda1)
 				lambda1 = akk;
 	#endif

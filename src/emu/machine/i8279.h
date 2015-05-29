@@ -4,9 +4,6 @@
 
     Intel 8279 Programmable Keyboard/Display Interface emulation
 
-    Copyright the MESS Team 2012.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
                             _____   _____
                    RL2   1 |*    \_/     | 40  Vcc

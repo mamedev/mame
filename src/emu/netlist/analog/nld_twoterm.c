@@ -171,8 +171,8 @@ NETLIB_UPDATE_PARAM(POT)
 	m_R1.update_dev();
 	m_R2.update_dev();
 
-	m_R1.set_R(MAX(m_R.Value() * v, netlist().gmin()));
-	m_R2.set_R(MAX(m_R.Value() * (1.0 - v), netlist().gmin()));
+	m_R1.set_R(std::max(m_R.Value() * v, netlist().gmin()));
+	m_R2.set_R(std::max(m_R.Value() * (1.0 - v), netlist().gmin()));
 
 }
 
@@ -218,7 +218,7 @@ NETLIB_UPDATE_PARAM(POT2)
 
 	m_R1.update_dev();
 
-	m_R1.set_R(MAX(m_R.Value() * v, netlist().gmin()));
+	m_R1.set_R(std::max(m_R.Value() * v, netlist().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------

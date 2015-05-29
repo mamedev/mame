@@ -395,9 +395,9 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
 
 ATTR_COLD void netlist_mame_device_t::save_state()
 {
-	for (pstate_entry_t * const *p = netlist().save_list().first(); p != NULL; p = netlist().save_list().next(p))
+	for (int i=0; i< netlist().save_list().size(); i++)
 	{
-		pstate_entry_t *s = *p;
+		pstate_entry_t *s = netlist().save_list()[i];
 		NL_VERBOSE_OUT(("saving state for %s\n", s->m_name.cstr()));
 		switch (s->m_dt)
 		{
@@ -464,7 +464,7 @@ void netlist_mame_cpu_device_t::device_start()
 
 	state_add(STATE_GENPC, "curpc", m_genPC).noshow();
 
-	for (int i=0; i < netlist().m_nets.count(); i++)
+	for (int i=0; i < netlist().m_nets.size(); i++)
 	{
 		netlist_net_t *n = netlist().m_nets[i];
 		if (n->isFamily(netlist_object_t::LOGIC))
@@ -559,10 +559,10 @@ void netlist_mame_sound_device_t::device_start()
 	// Configure outputs
 
 	plist_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
-	if (outdevs.count() == 0)
+	if (outdevs.size() == 0)
 		fatalerror("No output devices");
 
-	m_num_outputs = outdevs.count();
+	m_num_outputs = outdevs.size();
 
 	/* resort channels */
 	for (int i=0; i < MAX_OUT; i++) m_out[i] = NULL;
@@ -572,7 +572,7 @@ void netlist_mame_sound_device_t::device_start()
 
 		netlist().log("Output %d on channel %d", i, chan);
 
-		if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.count())
+		if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.size())
 			fatalerror("illegal channel number");
 		m_out[chan] = outdevs[i];
 		m_out[chan]->m_sample = netlist_time::from_hz(clock());
@@ -585,9 +585,9 @@ void netlist_mame_sound_device_t::device_start()
 	m_in = NULL;
 
 	plist_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
-	if (indevs.count() > 1)
+	if (indevs.size() > 1)
 		fatalerror("A maximum of one input device is allowed!");
-	if (indevs.count() == 1)
+	if (indevs.size() == 1)
 	{
 		m_in = indevs[0];
 		m_num_inputs = m_in->resolve();

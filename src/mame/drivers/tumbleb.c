@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood,Bryan McPhail
 /***************************************************************************
 
   the following run on hardware which is physically not the same as

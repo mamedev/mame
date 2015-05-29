@@ -277,7 +277,7 @@ void cirrus_gd5428_device::start_bitblt()
 			if(m_blt_mode & 0x80)  // colour expand
 			{
 				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
-				
+
 				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
 					m_blt_source_current++;
@@ -327,7 +327,7 @@ void cirrus_gd5428_device::start_reverse_bitblt()
 			if(m_blt_mode & 0x80)  // colour expand
 			{
 				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
-				
+
 				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't decrement if a pattern (it's only 8 bits)
 					m_blt_source_current--;
@@ -429,7 +429,7 @@ void cirrus_gd5428_device::blit_byte()
 void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
 {
 	UINT8 res = src;
-	
+
 	switch(m_blt_rop)
 	{
 	case 0x00:  // BLACK
@@ -458,7 +458,7 @@ void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
 		if((res & (~m_blt_trans_colour_mask & 0xff)) == ((m_blt_trans_colour & 0xff) & (~m_blt_trans_colour_mask & 0xff)))
 			return;
 	}
-	
+
 	vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = res;
 }
 
@@ -1269,7 +1269,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 	UINT8 cur_mode = pc_vga_choosevideomode();
 
 	if(m_blt_system_transfer)
-	{	
+	{
 		if(m_blt_mode & 0x80)  // colour expand
 		{
 			m_blt_system_buffer &= ~(0x000000ff);

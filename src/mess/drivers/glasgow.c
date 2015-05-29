@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Dirk V.
+// copyright-holders:Dirk Verwiebe, Robbbert, Ralf Schaefer, Cowering
 /***************************************************************************
 Mephisto Glasgow 3 S chess computer
 Dirk V.

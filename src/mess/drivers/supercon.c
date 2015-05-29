@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Ralf Schaefer
+// copyright-holders:Ralf Schaefer, Robbbert
 /******************************************************************************
  Novag SuperConstellation Chess Computer
  2010 R. Schaefer

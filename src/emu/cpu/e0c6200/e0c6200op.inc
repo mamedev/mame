@@ -151,14 +151,14 @@ UINT8 e0c6200_cpu_device::op_add(UINT8 x, UINT8 y, int decimal)
 	m_icount -= 2;
 	x += y;
 	set_cf(x);
-	
+
 	// decimal correction
 	if (m_f & decimal && x >= 10)
 	{
 		x -= 10;
 		m_f |= C_FLAG;
 	}
-	
+
 	set_zf(x);
 	return x & 0xf;
 }

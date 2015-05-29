@@ -25,8 +25,8 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 #define NL_DICE_COMPAT_H_
 
 #ifndef NL_CONVERT_CPP
-#include "netlist/devices/net_lib.h"
-#include "netlist/analog/nld_twoterm.h"
+#include "devices/net_lib.h"
+#include "analog/nld_twoterm.h"
 #endif
 
 /* --------------------------------------------------------------------
@@ -41,7 +41,7 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 
 #ifndef NL_CONVERT_CPP
 #ifdef NETLIST_DEVELOPMENT
-#define CHIP(_n, _t) setup.register_dev( nl_alloc(nld_ ## _t ## _dip), _n);
+#define CHIP(_n, _t) setup.register_dev( palloc(nld_ ## _t ## _dip), _n);
 #else
 #define CHIP(_n, _t) setup.register_dev(NETLIB_NAME_STR(_t ## _dip), _n);
 #endif

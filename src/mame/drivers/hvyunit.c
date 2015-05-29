@@ -135,16 +135,16 @@ public:
 	DECLARE_WRITE8_MEMBER(mermaid_p2_w);
 	DECLARE_READ8_MEMBER(mermaid_p3_r);
 	DECLARE_WRITE8_MEMBER(mermaid_p3_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 };
 

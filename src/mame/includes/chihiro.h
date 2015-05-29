@@ -71,24 +71,24 @@ struct vertex_nv {
 class vertex_program_simulator {
 public:
 	enum VectorialOperation {
-		VecNOP=0, 
-		VecMOV, 
-		VecMUL, 
-		VecADD, 
-		VecMAD, 
-		VecDP3, 
-		VecDPH, 
-		VecDP4, 
-		VecDST, 
-		VecMIN, 
-		VecMAX, 
-		VecSLT, 
-		VecSGE, 
+		VecNOP=0,
+		VecMOV,
+		VecMUL,
+		VecADD,
+		VecMAD,
+		VecDP3,
+		VecDPH,
+		VecDP4,
+		VecDST,
+		VecMIN,
+		VecMAX,
+		VecSLT,
+		VecSGE,
 		VecARL
 	};
 	enum ScalarOperation {
 		ScaNOP=0,
-		ScaIMV, 
+		ScaIMV,
 		ScaRCP,
 		ScaRCC,
 		ScaRSQ,

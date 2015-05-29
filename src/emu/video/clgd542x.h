@@ -69,12 +69,12 @@ protected:
 	UINT16 m_blt_trans_colour;
 	UINT16 m_blt_trans_colour_mask;
 
-	bool m_blt_system_transfer;  // blit from system memory 
+	bool m_blt_system_transfer;  // blit from system memory
 	UINT8 m_blt_system_count;
 	UINT32 m_blt_system_buffer;
 	UINT16 m_blt_pixel_count;
 	UINT16 m_blt_scan_count;
-	
+
 	UINT8 m_scratchpad1;
 	UINT8 m_scratchpad2;
 	UINT8 m_scratchpad3;

@@ -7,7 +7,7 @@
 		<description>Acer CPR</description>
 		<year>1995</year>
 		<publisher>Acer America Corporation</publisher>
-		<info name="version" value="1.2a" />	<!-- floppy version 1.2a, CD version 1.2 -->
+		<info name="version" value="1.2a" />    <!-- floppy version 1.2a, CD version 1.2 -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="disk_label" value="Hard Drive Recovery Start-Up Diskette" />

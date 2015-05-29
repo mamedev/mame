@@ -4,9 +4,6 @@
 
     MOS 6581/8580 Sound Interface Device emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                  CAP1A   1 |*    \_/     | 28  Vdd

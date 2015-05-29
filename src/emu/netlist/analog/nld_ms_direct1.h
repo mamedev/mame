@@ -11,7 +11,7 @@
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
-class ATTR_ALIGNED(64) netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
+class netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
 {
 public:
 
@@ -34,7 +34,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct1_t::vsolve()
 	return this->compute_next_timestep();
 }
 
-ATTR_HOT inline int netlist_matrix_solver_direct1_t::vsolve_non_dynamic(const bool newton_raphson)
+ATTR_HOT inline int netlist_matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	netlist_analog_net_t *net = m_nets[0];
 	this->build_LE_A();

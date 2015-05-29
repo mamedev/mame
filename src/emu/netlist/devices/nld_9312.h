@@ -52,7 +52,7 @@ NETLIB_TRUTHTABLE(9312, 12, 2, 0);
 
 NETLIB_DEVICE(9312,
 public:
-//		C, B, A, G,D0,D1,D2,D3,D4,D5,D6,D7| Y,YQ
+//      C, B, A, G,D0,D1,D2,D3,D4,D5,D6,D7| Y,YQ
 	netlist_logic_input_t m_A;
 	netlist_logic_input_t m_B;
 	netlist_logic_input_t m_C;

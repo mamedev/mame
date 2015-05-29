@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:???
 // copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina
 #include "sound/okim6295.h"
 #include "audio/seibu.h"
