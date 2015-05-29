@@ -23,6 +23,7 @@
 
 #if !(PSTANDALONE)
 #include "osdcore.h"
+#include "eminline.h"
 
 #undef ATTR_COLD
 #define ATTR_COLD

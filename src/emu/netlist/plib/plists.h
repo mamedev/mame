@@ -58,12 +58,12 @@ public:
 	 * array works around this.
 	 */
 
-	ATTR_HOT /* inline */ _ListClass *data() { return m_list; }
+	ATTR_HOT  _ListClass *data() { return m_list; }
 
-	ATTR_HOT /* inline */ _ListClass& operator[](std::size_t index) { return m_list[index]; }
-	ATTR_HOT /* inline */ const _ListClass& operator[](std::size_t index) const { return m_list[index]; }
+	ATTR_HOT  _ListClass& operator[](std::size_t index) { return m_list[index]; }
+	ATTR_HOT  const _ListClass& operator[](std::size_t index) const { return m_list[index]; }
 
-	ATTR_HOT /* inline */ std::size_t size() const { return m_capacity; }
+	ATTR_HOT  std::size_t size() const { return m_capacity; }
 
 protected:
 	ATTR_COLD void set_capacity(const std::size_t new_capacity)
@@ -96,7 +96,7 @@ public:
 	plist_t() : std::vector<_ListClass>() {}
 	plist_t(const int numElements) : std::vector<_ListClass>(numElements) {}
 
-	/* inline */ void add(const _ListClass &elem) { this->push_back(elem); }
+	 void add(const _ListClass &elem) { this->push_back(elem); }
 	void clear_and_free()
 	{
 		for (_ListClass *i = this->data(); i < this->data() + this->size(); i++)
@@ -105,7 +105,7 @@ public:
 		}
 		this->clear();
 	}
-	/* inline */ bool contains(const _ListClass &elem) const
+	 bool contains(const _ListClass &elem) const
 	{
 		for (const _ListClass *i = this->data(); i < this->data() + this->size(); i++)
 		{
@@ -115,7 +115,7 @@ public:
 		return false;
 	}
 
-	/* inline */ void remove(const _ListClass &elem)
+	 void remove(const _ListClass &elem)
 	{
 		for (int i = 0; i < this->size(); i++)
 		{
@@ -126,12 +126,12 @@ public:
 			}
 		}
 	}
-	/* inline */ void remove_at(const int pos)
+	 void remove_at(const int pos)
 	{
 		this->erase(this->begin() + pos);
 	}
 
-	/* inline */ int indexof(const _ListClass &elem) const
+	 int indexof(const _ListClass &elem) const
 	{
 		for (int i = 0; i < this->size(); i++)
 		{
@@ -141,7 +141,7 @@ public:
 		return -1;
 	}
 
-	ATTR_HOT /* inline */ void swap(const int pos1, const int pos2)
+	ATTR_HOT  void swap(const int pos1, const int pos2)
 	{
 		//nl_assert((pos1>=0) && (pos1<m_count));
 		//nl_assert((pos2>=0) && (pos2<m_count));
@@ -200,12 +200,12 @@ public:
 		m_list = NULL;
 	}
 
-	ATTR_HOT /* inline */ _ListClass *data() { return m_list; }
+	ATTR_HOT  _ListClass *data() { return m_list; }
 
-	ATTR_HOT /* inline */ _ListClass& operator[](std::size_t index) { return *(m_list + index); }
-	ATTR_HOT /* inline */ const _ListClass& operator[](std::size_t index) const { return *(m_list + index); }
+	ATTR_HOT  _ListClass& operator[](std::size_t index) { return *(m_list + index); }
+	ATTR_HOT  const _ListClass& operator[](std::size_t index) const { return *(m_list + index); }
 
-	ATTR_HOT /* inline */ void add(const _ListClass &elem)
+	ATTR_HOT  void add(const _ListClass &elem)
 	{
 		if (m_count >= m_capacity){
 			std::size_t new_size = m_capacity * 2;
@@ -217,7 +217,7 @@ public:
 		m_list[m_count++] = elem;
 	}
 
-	ATTR_HOT /* inline */ void remove(const _ListClass &elem)
+	ATTR_HOT  void remove(const _ListClass &elem)
 	{
 		for (std::size_t i = 0; i < m_count; i++)
 		{
@@ -234,7 +234,7 @@ public:
 		}
 	}
 
-	ATTR_HOT /* inline */ void remove_at(const std::size_t pos)
+	ATTR_HOT  void remove_at(const std::size_t pos)
 	{
 		//nl_assert((pos>=0) && (pos<m_count));
 		m_count--;
@@ -244,7 +244,7 @@ public:
 		}
 	}
 
-	ATTR_HOT /* inline */ void swap(const std::size_t pos1, const std::size_t pos2)
+	ATTR_HOT  void swap(const std::size_t pos1, const std::size_t pos2)
 	{
 		//nl_assert((pos1>=0) && (pos1<m_count));
 		//nl_assert((pos2>=0) && (pos2<m_count));
@@ -253,7 +253,7 @@ public:
 		m_list[pos2] =tmp;
 	}
 
-	ATTR_HOT /* inline */ bool contains(const _ListClass &elem) const
+	ATTR_HOT  bool contains(const _ListClass &elem) const
 	{
 		for (_ListClass *i = m_list; i < m_list + m_count; i++)
 		{
@@ -263,7 +263,7 @@ public:
 		return false;
 	}
 
-	ATTR_HOT /* inline */ int indexof(const _ListClass &elem) const
+	ATTR_HOT  int indexof(const _ListClass &elem) const
 	{
 		for (std::size_t i = 0; i < m_count; i++)
 		{
@@ -273,10 +273,10 @@ public:
 		return -1;
 	}
 
-	ATTR_HOT /* inline */ std::size_t size() const { return m_count; }
-	ATTR_HOT /* inline */ bool is_empty() const { return (m_count == 0); }
-	ATTR_HOT /* inline */ void clear() { m_count = 0; }
-	ATTR_HOT /* inline */ std::size_t capacity() const { return m_capacity; }
+	ATTR_HOT  std::size_t size() const { return m_count; }
+	ATTR_HOT  bool is_empty() const { return (m_count == 0); }
+	ATTR_HOT  void clear() { m_count = 0; }
+	ATTR_HOT  std::size_t capacity() const { return m_capacity; }
 
 	ATTR_COLD void clear_and_free()
 	{
@@ -366,9 +366,9 @@ public:
 	}
 
 private:
-	template <typename T> static const pstring get_name(const T *elem) { return elem->name(); }
-	template <typename T> static const pstring get_name(T *elem) { return elem->name(); }
-	template <typename T> static const pstring get_name(const T &elem) { return elem.name(); }
+	template <typename T> static const pstring &get_name(const T *elem) { return elem->name(); }
+	template <typename T> static const pstring &get_name(T *elem) { return elem->name(); }
+	template <typename T> static const pstring &get_name(const T &elem) { return elem.name(); }
 
 };
 
@@ -403,27 +403,27 @@ public:
 	{
 	}
 
-	ATTR_HOT /* inline */ void push(const _StackClass &elem)
+	ATTR_HOT  void push(const _StackClass &elem)
 	{
 		m_list.add(elem);
 	}
 
-	ATTR_HOT /* inline */ _StackClass peek() const
+	ATTR_HOT  _StackClass peek() const
 	{
 		return m_list[m_list.size() - 1];
 	}
 
-	ATTR_HOT /* inline */ _StackClass pop()
+	ATTR_HOT  _StackClass pop()
 	{
 		_StackClass ret = peek();
 		m_list.remove_at(m_list.size() - 1);
 		return ret;
 	}
 
-	ATTR_HOT /* inline */ int count() const { return m_list.size(); }
-	ATTR_HOT /* inline */ bool empty() const { return (m_list.size() == 0); }
-	ATTR_HOT /* inline */ void reset() { m_list.reset(); }
-	ATTR_HOT /* inline */ int capacity() const { return m_list.capacity(); }
+	ATTR_HOT  int count() const { return m_list.size(); }
+	ATTR_HOT  bool empty() const { return (m_list.size() == 0); }
+	ATTR_HOT  void reset() { m_list.reset(); }
+	ATTR_HOT  int capacity() const { return m_list.capacity(); }
 
 private:
 	plist_t<_StackClass> m_list;
@@ -448,7 +448,7 @@ public:
 
 	plinkedlist_t() : m_head(NULL) {}
 
-	ATTR_HOT /* inline */ void insert(const _ListClass &before, _ListClass &elem)
+	ATTR_HOT  void insert(const _ListClass &before, _ListClass &elem)
 	{
 		if (m_head == &before)
 		{
@@ -473,13 +473,13 @@ public:
 		}
 	}
 
-	ATTR_HOT /* inline */ void insert(_ListClass &elem)
+	ATTR_HOT  void insert(_ListClass &elem)
 	{
 		elem.m_next = m_head;
 		m_head = &elem;
 	}
 
-	ATTR_HOT /* inline */ void add(_ListClass &elem)
+	ATTR_HOT  void add(_ListClass &elem)
 	{
 		_ListClass **p = &m_head;
 		while (*p != NULL)
@@ -490,7 +490,7 @@ public:
 		elem.m_next = NULL;
 	}
 
-	ATTR_HOT /* inline */ void remove(const _ListClass &elem)
+	ATTR_HOT  void remove(const _ListClass &elem)
 	{
 		_ListClass **p = &m_head;
 		while (*p != &elem)
@@ -502,11 +502,11 @@ public:
 	}
 
 
-	ATTR_HOT static /* inline */ _ListClass *next(const _ListClass &elem) { return elem.m_next; }
-	ATTR_HOT static /* inline */ _ListClass *next(const _ListClass *elem) { return elem->m_next; }
-	ATTR_HOT /* inline */ _ListClass *first() const { return m_head; }
-	ATTR_HOT /* inline */ void clear() { m_head = NULL; }
-	ATTR_HOT /* inline */ bool is_empty() const { return (m_head == NULL); }
+	ATTR_HOT static  _ListClass *next(const _ListClass &elem) { return elem.m_next; }
+	ATTR_HOT static  _ListClass *next(const _ListClass *elem) { return elem->m_next; }
+	ATTR_HOT  _ListClass *first() const { return m_head; }
+	ATTR_HOT  void clear() { m_head = NULL; }
+	ATTR_HOT  bool is_empty() const { return (m_head == NULL); }
 
 private:
 	_ListClass *m_head;
