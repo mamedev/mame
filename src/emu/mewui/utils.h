@@ -18,15 +18,15 @@
 
 #define MENU_FLAG_MEWUI			 (1 << 6)
 #define MENU_FLAG_MEWUI_HISTORY	 (1 << 7)
-#define MENU_FLAG_MEWUI_SWLIST	  (1 << 8)
-#define MENU_FLAG_MEWUI_FAVORITE	(1 << 9)
-#define MAX_CHAR_INFO			   256
-#define CR						  0x0d	//  '\n' and '\r' meanings are swapped in some
-#define LF						  0x0a	//  compilers (e.g., Mac compilers)
-#define UI_MENU_PROCESS_ONLYCHAR	8
-#define MAX_FILTER				  10
-#define MAX_ICONS_RENDER			40
-#define MEWUI_DIR				   "mewui"
+#define MENU_FLAG_MEWUI_SWLIST	 (1 << 8)
+#define MENU_FLAG_MEWUI_FAVORITE (1 << 9)
+#define MAX_CHAR_INFO			 256
+#define CR						 0x0d	//  '\n' and '\r' meanings are swapped in some
+#define LF						 0x0a	//  compilers (e.g., Mac compilers)
+#define UI_MENU_PROCESS_ONLYCHAR 8
+#define MAX_FILTER				 10
+#define MAX_ICONS_RENDER		 40
+#define MEWUI_DIR				 "mewui"
 
 // GLOBAL ENUMERATORS
 enum
@@ -256,18 +256,6 @@ void load_custom_filters();
 void save_custom_filters();
 
 // TEMPLATES
-template <typename _T>
-void addtolist(_T &add, _T &first, _T &last, bool prev)
-{
-	add->next = add->prev = NULL;
-	if (!first)
-		first = last = add;
-	else
-	{
-		add->prev = last;
-		last = last->next = add;
-	}
-}
 
 // jpeg loader
 template <typename _T>
