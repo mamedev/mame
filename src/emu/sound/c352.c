@@ -485,8 +485,8 @@ void c352_device::device_start()
 		default:
 			divider=288;
 			break;
-		case C352_DIVIDER_348:
-			divider=348;
+		case C352_DIVIDER_332:
+			divider=332;
 			break;
 	}
 	
