@@ -538,7 +538,8 @@ WRITE_LINE_MEMBER(namcos1_state::subres_w)
 
 void namcos1_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	membank("mcubank")->configure_entries(0, 24, memregion("voice")->base(), 0x8000);
 
 	save_item(NAME(m_dac0_value));
 	save_item(NAME(m_dac1_value));
@@ -578,24 +579,24 @@ void namcos1_state::machine_reset()
 /* mcu banked rom area select */
 WRITE8_MEMBER(namcos1_state::mcu_bankswitch_w)
 {
-	int addr;
+	int bank;
 
 	/* bit 2-7 : chip select line of ROM chip */
 	switch (data & 0xfc)
 	{
-		case 0xf8: addr = 0x10000; data ^= 2; break;    /* bit 2 : ROM 0 (bit 1 is inverted in that case) */
-		case 0xf4: addr = 0x30000; break;               /* bit 3 : ROM 1 */
-		case 0xec: addr = 0x50000; break;               /* bit 4 : ROM 2 */
-		case 0xdc: addr = 0x70000; break;               /* bit 5 : ROM 3 */
-		case 0xbc: addr = 0x90000; break;               /* bit 6 : ROM 4 */
-		case 0x7c: addr = 0xb0000; break;               /* bit 7 : ROM 5 */
-		default:   addr = 0x10000; break;               /* illegal */
+		case 0xf8: bank = 0;  data ^= 2; break;    /* bit 2 : ROM 0, A16 is inverted */
+		case 0xf4: bank = 4;  break;               /* bit 3 : ROM 1 */
+		case 0xec: bank = 8;  break;               /* bit 4 : ROM 2 */
+		case 0xdc: bank = 12; break;               /* bit 5 : ROM 3 */
+		case 0xbc: bank = 16; break;               /* bit 6 : ROM 4 */
+		case 0x7c: bank = 20; break;               /* bit 7 : ROM 5 */
+		default:   bank = 0;  break;               /* illegal (selects multiple ROMs at once) */
 	}
 
 	/* bit 0-1 : address line A15-A16 */
-	addr += (data & 3) * 0x8000;
+	bank += (data & 3);
 
-	membank("mcubank")->set_base(memregion("mcu")->base() + addr);
+	membank("mcubank")->set_entry(bank);
 }
 
 
