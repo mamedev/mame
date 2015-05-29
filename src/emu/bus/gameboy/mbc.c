@@ -398,31 +398,29 @@ WRITE8_MEMBER(gb_rom_mbc1_device::write_ram)
 
 READ8_MEMBER(gb_rom_mbc2_device::read_rom)
 {
-	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
-	else
+	if (offset & 0x4000) /* RB1 */
 		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+	else                 /* RB0 */
+		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
 }
 
 WRITE8_MEMBER(gb_rom_mbc2_device::write_bank)
 {
-	if (offset < 0x2000)
-		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
-	else if (offset < 0x4000)
-	{
-		// 4bits only
-		data &= 0x0f;
-		// bank = 0 => bank = 1
-		if (data == 0)
-			data = 1;
+	// the mapper only has data lines D3..D0
+	data &= 0x0f;
 
-		// The least significant bit of the upper address byte must be 1
-		if (offset & 0x0100)
-			m_latch_bank2 = (m_latch_bank2 & 0x100) | data;
+	// the mapper only uses inputs A15..A14, A8 for register accesses
+	switch (offset & 0xc100)
+	{
+		case 0x0000:    // RAM Enable Register
+			m_ram_enable = (data == 0x0a) ? 1 : 0;
+			break;
+		case 0x0100:    // ROM Bank Register
+			m_latch_bank2 = (data == 0x00) ? 0x01 : data;
+			break;
 	}
 }
 
-// 1 bank only??
 READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 {
 	if (!m_ram.empty() && m_ram_enable)
