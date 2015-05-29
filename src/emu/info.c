@@ -39,7 +39,6 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t<!ATTLIST __XML_TOP__ cloneof CDATA #IMPLIED>\n"
 "\t\t<!ATTLIST __XML_TOP__ romof CDATA #IMPLIED>\n"
 "\t\t<!ATTLIST __XML_TOP__ sampleof CDATA #IMPLIED>\n"
-"\t\t<!ATTLIST __XML_TOP__ type CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT description (#PCDATA)>\n"
 "\t\t<!ELEMENT year (#PCDATA)>\n"
 "\t\t<!ELEMENT manufacturer (#PCDATA)>\n"
@@ -274,15 +273,6 @@ void info_xml_creator::output_one()
 
 	// display sample information and close the game tag
 	output_sampleof();
-	// machine type indicator
-	if (driver.flags & GAME_TYPE_ARCADE)
-		fprintf(m_output, " type=\"%s\"", GAME_TYPE_STRING_ARCADE);
-	else if (driver.flags & GAME_TYPE_CONSOLE)
-		fprintf(m_output, " type=\"%s\"", GAME_TYPE_STRING_CONSOLE);
-	else if (driver.flags & GAME_TYPE_COMPUTER)
-		fprintf(m_output, " type=\"%s\"", GAME_TYPE_STRING_COMPUTER);
-	else if (driver.flags & GAME_TYPE_OTHER)
-		fprintf(m_output, " type=\"%s\"", GAME_TYPE_STRING_OTHER);
 	fprintf(m_output, ">\n");
 
 	// output game description

@@ -49,11 +49,7 @@ const UINT32 GAME_CLICKABLE_ARTWORK         = 0x00800000;   // marking that artw
 const UINT32 GAME_IS_SKELETON               = GAME_NO_SOUND | GAME_NOT_WORKING; // mask for skelly games
 const UINT32 GAME_IS_SKELETON_MECHANICAL    = GAME_IS_SKELETON | GAME_MECHANICAL | GAME_REQUIRES_ARTWORK; // mask for skelly mechanical games
 
-// machine type string
-#define GAME_TYPE_STRING_ARCADE             "arcade"
-#define GAME_TYPE_STRING_CONSOLE            "console"
-#define GAME_TYPE_STRING_COMPUTER           "computer"
-#define GAME_TYPE_STRING_OTHER              "othersys"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
