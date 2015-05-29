@@ -449,14 +449,14 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x1000, 0x1003) AM_READ(dsw_r)
 	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("CONTROL0")
 	AM_RANGE(0x1401, 0x1401) AM_READ_PORT("CONTROL1")
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("mcubank") /* banked ROM */
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("mcubank") /* banked external ROM */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("triram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("nvram") /* EEPROM */
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(dac0_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(dac1_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(mcu_bankswitch_w) /* ROM bank selector */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(irq_ack_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("mcu", 0) /* internal ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos1_state )
@@ -1137,11 +1137,13 @@ ROM_START( shadowld )
 	ROM_LOAD_512( "yd3_p6.bin",      0x300000, CRC(93d6811c) SHA1(87de3367bb4abdb6b8e9dc986378af7d3a52e02d) )
 	ROM_LOAD_512( "yd3_p7.bin",      0x380000, CRC(f1c271a0) SHA1(a5d6b856367127a1ee900e7339f29763c06029c1) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "yd_voi-0.bin",       0x10000, 0x20000, CRC(448bc6a1) SHA1(89033eb023bb770bfedf925040bbe32f4bea4937) ) // yd1.v0 + yd1.v3
-	ROM_LOAD( "yd_voi-1.bin",       0x30000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
-	ROM_LOAD( "yd_voi-2.bin",       0x50000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "yd_voi-0.bin",       0x00000, 0x20000, CRC(448bc6a1) SHA1(89033eb023bb770bfedf925040bbe32f4bea4937) ) // yd1.v0 + yd1.v3
+	ROM_LOAD( "yd_voi-1.bin",       0x20000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
+	ROM_LOAD( "yd_voi-2.bin",       0x40000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "yd_chr-8.bin",       0x00000, 0x20000, CRC(0c8e69d0) SHA1(cedf12db2d9b14396cc8a15ccb025b96c92e190d) )
@@ -1181,11 +1183,13 @@ ROM_START( youkaidk2 )
 	ROM_LOAD_512( "yd1_p6.bin",      0x300000, CRC(785a2772) SHA1(80c0a628bc834ff03460188b7fc63b6464c09476) )
 	ROM_LOAD_512( "yd2_p7b.bin",     0x380000, CRC(a05bf3ae) SHA1(3477eee9a09b1998e72b31f19a92c89c5033b0f7) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "yd_voi-0.bin",       0x10000, 0x20000, CRC(448bc6a1) SHA1(89033eb023bb770bfedf925040bbe32f4bea4937) ) // yd1.v0 + yd1.v3
-	ROM_LOAD( "yd_voi-1.bin",       0x30000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
-	ROM_LOAD( "yd_voi-2.bin",       0x50000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "yd_voi-0.bin",       0x00000, 0x20000, CRC(448bc6a1) SHA1(89033eb023bb770bfedf925040bbe32f4bea4937) ) // yd1.v0 + yd1.v3
+	ROM_LOAD( "yd_voi-1.bin",       0x20000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
+	ROM_LOAD( "yd_voi-2.bin",       0x40000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "yd_chr-8.bin",       0x00000, 0x20000, CRC(0c8e69d0) SHA1(cedf12db2d9b14396cc8a15ccb025b96c92e190d) )
@@ -1224,11 +1228,13 @@ ROM_START( youkaidk1 )
 	ROM_LOAD_512( "yd1_p6.bin",      0x300000, CRC(785a2772) SHA1(80c0a628bc834ff03460188b7fc63b6464c09476) )
 	ROM_LOAD_512( "yd2_p7.bin",      0x380000, CRC(3d39098c) SHA1(acdb5ea53358676d1b71c2a456cabaa9e46aed3f) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "yd_voi-0.bin",       0x10000, 0x20000, CRC(448bc6a1) SHA1(89033eb023bb770bfedf925040bbe32f4bea4937) ) // yd1.v0 + yd1.v3
-	ROM_LOAD( "yd_voi-1.bin",       0x30000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
-	ROM_LOAD( "yd_voi-2.bin",       0x50000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "yd_voi-0.bin",       0x00000, 0x20000, CRC(448bc6a1) SHA1(89033eb023bb770bfedf925040bbe32f4bea4937) ) // yd1.v0 + yd1.v3
+	ROM_LOAD( "yd_voi-1.bin",       0x20000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
+	ROM_LOAD( "yd_voi-2.bin",       0x40000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "yd_chr-8.bin",       0x00000, 0x20000, CRC(0c8e69d0) SHA1(cedf12db2d9b14396cc8a15ccb025b96c92e190d) )
@@ -1267,13 +1273,15 @@ ROM_START( dspirit )
 	ROM_LOAD_512( "ds3_p6.bin",      0x300000, CRC(fcc01bd1) SHA1(dd95388d2ccc5ab51b86da2242776dc82ac86901) )
 	ROM_LOAD_512( "ds3_p7.bin",      0x380000, CRC(820bedb2) SHA1(d05254c982635f9d184959065aacb10a077fcd34) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "ds1_v0.bin",      0x10000, 0x10000, CRC(313b3508) SHA1(4770fb28b45abc4967534face0bf6794d30df71a) )
-	ROM_LOAD( "ds_voi-1.bin",       0x30000, 0x20000, CRC(54790d4e) SHA1(d327b1c65c487dd691389920789c59f0eb1ecee1) )
-	ROM_LOAD( "ds_voi-2.bin",       0x50000, 0x20000, CRC(05298534) SHA1(5ffd9018a5c1d5ce992dd3c7575b5e25945f14fa) )
-	ROM_LOAD( "ds_voi-3.bin",       0x70000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
-	ROM_LOAD( "ds_voi-4.bin",       0x90000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "ds1_v0.bin",      0x00000, 0x10000, CRC(313b3508) SHA1(4770fb28b45abc4967534face0bf6794d30df71a) )
+	ROM_LOAD( "ds_voi-1.bin",       0x20000, 0x20000, CRC(54790d4e) SHA1(d327b1c65c487dd691389920789c59f0eb1ecee1) )
+	ROM_LOAD( "ds_voi-2.bin",       0x40000, 0x20000, CRC(05298534) SHA1(5ffd9018a5c1d5ce992dd3c7575b5e25945f14fa) )
+	ROM_LOAD( "ds_voi-3.bin",       0x60000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
+	ROM_LOAD( "ds_voi-4.bin",       0x80000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "ds_chr-8.bin",       0x00000, 0x20000, CRC(946eb242) SHA1(6964fff430fe306c575ff07e4c054c70aa7d96ca) )
@@ -1312,13 +1320,15 @@ ROM_START( dspirit2 )
 	ROM_LOAD_512( "ds2-pr6d.s11",   0x300000, CRC(5382447d) SHA1(3034d3a57b493c86673ee0aa7172bae778edd76a) ) // aka 8722-1107.bin for Atari's part number
 	ROM_LOAD_512( "ds2-pr7d.t11",   0x380000, CRC(80ff492a) SHA1(716ff7444edc0dfcce0fda2d213feb183435471f) ) // aka 8722-1108.bin for Atari's part number
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "ds1_v0.bin",      0x10000, 0x10000, CRC(313b3508) SHA1(4770fb28b45abc4967534face0bf6794d30df71a) )
-	ROM_LOAD( "ds_voi-1.bin",       0x30000, 0x20000, CRC(54790d4e) SHA1(d327b1c65c487dd691389920789c59f0eb1ecee1) )
-	ROM_LOAD( "ds_voi-2.bin",       0x50000, 0x20000, CRC(05298534) SHA1(5ffd9018a5c1d5ce992dd3c7575b5e25945f14fa) )
-	ROM_LOAD( "ds_voi-3.bin",       0x70000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
-	ROM_LOAD( "ds_voi-4.bin",       0x90000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "ds1_v0.bin",      0x00000, 0x10000, CRC(313b3508) SHA1(4770fb28b45abc4967534face0bf6794d30df71a) )
+	ROM_LOAD( "ds_voi-1.bin",       0x20000, 0x20000, CRC(54790d4e) SHA1(d327b1c65c487dd691389920789c59f0eb1ecee1) )
+	ROM_LOAD( "ds_voi-2.bin",       0x40000, 0x20000, CRC(05298534) SHA1(5ffd9018a5c1d5ce992dd3c7575b5e25945f14fa) )
+	ROM_LOAD( "ds_voi-3.bin",       0x60000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
+	ROM_LOAD( "ds_voi-4.bin",       0x80000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "ds_chr-8.bin",       0x00000, 0x20000, CRC(946eb242) SHA1(6964fff430fe306c575ff07e4c054c70aa7d96ca) )
@@ -1357,13 +1367,15 @@ ROM_START( dspirit1 )
 	ROM_LOAD_512( "ds1_p6.bin",      0x300000, CRC(a82737b4) SHA1(13865eb05a5d7b5cf06316ad8e71da3abbad335a) )
 	ROM_LOAD_512( "ds1_p7.bin",      0x380000, CRC(f4c0d75e) SHA1(87ac334b5d66b9b66ee0d4fe222afb76ff190534) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "ds1_v0.bin",      0x10000, 0x10000, CRC(313b3508) SHA1(4770fb28b45abc4967534face0bf6794d30df71a) )
-	ROM_LOAD( "ds_voi-1.bin",       0x30000, 0x20000, CRC(54790d4e) SHA1(d327b1c65c487dd691389920789c59f0eb1ecee1) )
-	ROM_LOAD( "ds_voi-2.bin",       0x50000, 0x20000, CRC(05298534) SHA1(5ffd9018a5c1d5ce992dd3c7575b5e25945f14fa) )
-	ROM_LOAD( "ds_voi-3.bin",       0x70000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
-	ROM_LOAD( "ds_voi-4.bin",       0x90000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "ds1_v0.bin",      0x00000, 0x10000, CRC(313b3508) SHA1(4770fb28b45abc4967534face0bf6794d30df71a) )
+	ROM_LOAD( "ds_voi-1.bin",       0x20000, 0x20000, CRC(54790d4e) SHA1(d327b1c65c487dd691389920789c59f0eb1ecee1) )
+	ROM_LOAD( "ds_voi-2.bin",       0x40000, 0x20000, CRC(05298534) SHA1(5ffd9018a5c1d5ce992dd3c7575b5e25945f14fa) )
+	ROM_LOAD( "ds_voi-3.bin",       0x60000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
+	ROM_LOAD( "ds_voi-4.bin",       0x80000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "ds_chr-8.bin",       0x00000, 0x20000, CRC(946eb242) SHA1(6964fff430fe306c575ff07e4c054c70aa7d96ca) )
@@ -1401,13 +1413,15 @@ ROM_START( blazer )
 	ROM_LOAD_1024( "bz_prg-6.bin",    0x300000, CRC(81c48fc0) SHA1(3b93465e707d19d9eb4a1f2cef142a9ca06edf01) )
 	ROM_LOAD_512 ( "bz1_p7.bin",      0x380000, CRC(2d4cbb95) SHA1(86918ccf5c3b59061891253d3419267a38b187b1) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "bz1_v0.bin",      0x10000, 0x10000, CRC(3d09d32e) SHA1(d29c6140f871633b5fbb6849b003629ff22e13f6) )
-	ROM_LOAD( "bz_voi-1.bin",       0x30000, 0x20000, CRC(2043b141) SHA1(f8be0584026365e092be37fffa2e52a6a2c3ff0b) )
-	ROM_LOAD( "bz_voi-2.bin",       0x50000, 0x20000, CRC(64143442) SHA1(bee3b98c0289b7c443450c551d791f7ffcee0b60) )
-	ROM_LOAD( "bz_voi-3.bin",       0x70000, 0x20000, CRC(26cfc510) SHA1(749680eaf3072db5331cc76a21cd022c50f95647) )
-	ROM_LOAD( "bz_voi-4.bin",       0x90000, 0x20000, CRC(d206b1bd) SHA1(32702fa67339ab337a2a70946e3861420a07b11b) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "bz1_v0.bin",      0x00000, 0x10000, CRC(3d09d32e) SHA1(d29c6140f871633b5fbb6849b003629ff22e13f6) )
+	ROM_LOAD( "bz_voi-1.bin",       0x20000, 0x20000, CRC(2043b141) SHA1(f8be0584026365e092be37fffa2e52a6a2c3ff0b) )
+	ROM_LOAD( "bz_voi-2.bin",       0x40000, 0x20000, CRC(64143442) SHA1(bee3b98c0289b7c443450c551d791f7ffcee0b60) )
+	ROM_LOAD( "bz_voi-3.bin",       0x60000, 0x20000, CRC(26cfc510) SHA1(749680eaf3072db5331cc76a21cd022c50f95647) )
+	ROM_LOAD( "bz_voi-4.bin",       0x80000, 0x20000, CRC(d206b1bd) SHA1(32702fa67339ab337a2a70946e3861420a07b11b) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "bz_chr-8.bin",       0x00000, 0x20000, CRC(db28bfca) SHA1(510dd204da389db7eb5d9ce34dc0daf60bad1219) )
@@ -1445,9 +1459,11 @@ ROM_START( quester )
 	/* 300000-37ffff empty */
 	ROM_LOAD_512( "qs1_p7b.bin",     0x380000, CRC(f358a944) SHA1(317adf846c6dbf6d00b13020b5078e2263056f93) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "qs1_v0.bin",      0x10000, 0x10000, CRC(6a2f3038) SHA1(00870da9b7f65536ff052c32da2d553f8c6b994b) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "qs1_v0.bin",      0x00000, 0x10000, CRC(6a2f3038) SHA1(00870da9b7f65536ff052c32da2d553f8c6b994b) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "qs1_c8.bin",         0x00000, 0x10000, CRC(06730d54) SHA1(53d79c27e2f1b192b1de781b6b5024eb1e8126ad) )
@@ -1476,9 +1492,11 @@ ROM_START( questers )
 	ROM_LOAD_512( "qs2_p6.bin",      0x300000, CRC(19e0fc20) SHA1(bc824dd7f88ccfa2e97ae05897e6535cf6876fab) )
 	ROM_LOAD_512( "qs2_p7.bin",      0x380000, CRC(4f6ad716) SHA1(759b4eee1a24029efc2e813a648f6fbc22a17fab) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "qs1_v0.bin",      0x10000, 0x10000, CRC(6a2f3038) SHA1(00870da9b7f65536ff052c32da2d553f8c6b994b) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "qs1_v0.bin",      0x00000, 0x10000, CRC(6a2f3038) SHA1(00870da9b7f65536ff052c32da2d553f8c6b994b) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "qs1_c8.bin",         0x00000, 0x10000, CRC(06730d54) SHA1(53d79c27e2f1b192b1de781b6b5024eb1e8126ad) )
@@ -1508,9 +1526,11 @@ ROM_START( pacmania )
 	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
 	ROM_LOAD_512 ( "pn2_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "pn2_v0.bin",      0x10000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "pn2_v0.bin",      0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "pn2_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
@@ -1542,9 +1562,11 @@ ROM_START( pacmaniao )
 	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
 	ROM_LOAD_512 ( "pn2_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "pac-mania_111187.voice0",      0x10000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // identical to world version
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "pac-mania_111187.voice0",      0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // identical to world version
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // same as the Japanese version
@@ -1576,9 +1598,11 @@ ROM_START( pacmaniaj )
 	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
 	ROM_LOAD_512 ( "pn1_p7.bin",      0x380000, CRC(2aa99e2b) SHA1(1d5e8ce6eac03696d51b32c1d0f6c3e82f604422) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "pn1_v0.bin",      0x10000, 0x10000, CRC(e2689f79) SHA1(b88e3435f2932901cc0a3b379b31a764bb9b2e2b) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "pn1_v0.bin",      0x00000, 0x10000, CRC(e2689f79) SHA1(b88e3435f2932901cc0a3b379b31a764bb9b2e2b) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
@@ -1610,14 +1634,16 @@ ROM_START( galaga88 )
 	ROM_LOAD_512( "g8x_p6.bin",      0x300000, CRC(403d01c1) SHA1(86109087b10c4fbcc940df6a84f7546de56303d2) ) /* Unknown number for the "x" */
 	ROM_LOAD_512( "g8x_p7.bin",      0x380000, CRC(df75b7fc) SHA1(cb810e7ba05bd8e873559e529e25a99adbf6307d) ) /* Unknown number for the "x" */
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "g81_v0.bin",      0x10000, 0x10000, CRC(86921dd4) SHA1(7048fd5b6ed5f4ddf6788958c30604418a6613ff) )
-	ROM_LOAD_HS( "g81_v1.bin",      0x30000, 0x10000, CRC(9c300e16) SHA1(6f3c82dc83290426068acef0b8fabba452421e8f) )
-	ROM_LOAD_HS( "g81_v2.bin",      0x50000, 0x10000, CRC(5316b4b0) SHA1(353c06e0e7c8dd9d609f8b341663bbf0ca60f6b5) )
-	ROM_LOAD_HS( "g81_v3.bin",      0x70000, 0x10000, CRC(dc077af4) SHA1(560090a335dfd345a6ae0eef8f1fd4d8098881f3) )
-	ROM_LOAD_HS( "g81_v4.bin",      0x90000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) )
-	ROM_LOAD_HS( "g81_v5.bin",      0xb0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "g81_v0.bin",      0x00000, 0x10000, CRC(86921dd4) SHA1(7048fd5b6ed5f4ddf6788958c30604418a6613ff) )
+	ROM_LOAD_HS( "g81_v1.bin",      0x20000, 0x10000, CRC(9c300e16) SHA1(6f3c82dc83290426068acef0b8fabba452421e8f) )
+	ROM_LOAD_HS( "g81_v2.bin",      0x40000, 0x10000, CRC(5316b4b0) SHA1(353c06e0e7c8dd9d609f8b341663bbf0ca60f6b5) )
+	ROM_LOAD_HS( "g81_v3.bin",      0x60000, 0x10000, CRC(dc077af4) SHA1(560090a335dfd345a6ae0eef8f1fd4d8098881f3) )
+	ROM_LOAD_HS( "g81_v4.bin",      0x80000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) )
+	ROM_LOAD_HS( "g81_v5.bin",      0xa0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "g8_chr-8.bin",       0x00000, 0x20000, CRC(3862ed0a) SHA1(4cae42bbfa434c7dce63fdceaa569fcb28768420) )
@@ -1653,14 +1679,16 @@ ROM_START( galaga88j )
 	ROM_LOAD_512( "g81_p6.bin",      0x300000, CRC(e7203707) SHA1(1171196029ebf0734211e1cc2521db7aa8594f31) )
 	ROM_LOAD_512( "g81_p7.bin",      0x380000, CRC(7c10965d) SHA1(35f2e4ef66525c2b60975b799014d60cc15f83a5) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "g81_v0.bin",      0x10000, 0x10000, CRC(86921dd4) SHA1(7048fd5b6ed5f4ddf6788958c30604418a6613ff) )
-	ROM_LOAD_HS( "g81_v1.bin",      0x30000, 0x10000, CRC(9c300e16) SHA1(6f3c82dc83290426068acef0b8fabba452421e8f) )
-	ROM_LOAD_HS( "g81_v2.bin",      0x50000, 0x10000, CRC(5316b4b0) SHA1(353c06e0e7c8dd9d609f8b341663bbf0ca60f6b5) )
-	ROM_LOAD_HS( "g81_v3.bin",      0x70000, 0x10000, CRC(dc077af4) SHA1(560090a335dfd345a6ae0eef8f1fd4d8098881f3) )
-	ROM_LOAD_HS( "g81_v4.bin",      0x90000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) )
-	ROM_LOAD_HS( "g81_v5.bin",      0xb0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "g81_v0.bin",      0x00000, 0x10000, CRC(86921dd4) SHA1(7048fd5b6ed5f4ddf6788958c30604418a6613ff) )
+	ROM_LOAD_HS( "g81_v1.bin",      0x20000, 0x10000, CRC(9c300e16) SHA1(6f3c82dc83290426068acef0b8fabba452421e8f) )
+	ROM_LOAD_HS( "g81_v2.bin",      0x40000, 0x10000, CRC(5316b4b0) SHA1(353c06e0e7c8dd9d609f8b341663bbf0ca60f6b5) )
+	ROM_LOAD_HS( "g81_v3.bin",      0x60000, 0x10000, CRC(dc077af4) SHA1(560090a335dfd345a6ae0eef8f1fd4d8098881f3) )
+	ROM_LOAD_HS( "g81_v4.bin",      0x80000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) )
+	ROM_LOAD_HS( "g81_v5.bin",      0xa0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "g8_chr-8.bin",       0x00000, 0x20000, CRC(3862ed0a) SHA1(4cae42bbfa434c7dce63fdceaa569fcb28768420) )
@@ -1696,14 +1724,16 @@ ROM_START( galaga88a )
 	ROM_LOAD_512( "prg-6c.s10",      0x300000, CRC(c781b8b5) SHA1(93b75e7512aa48d55a4230a02e1012210a79d372) ) // 02-03-88    (romcmp g8x_p6.bin - 99.981689%)
 	ROM_LOAD_512( "prg-7c.t10",      0x380000, CRC(d2d7e4fa) SHA1(5de44d1ea4c3135f16dc5a4f8a2147d991bbe681) ) // 02-03-88    (romcmp g8x_p7.bin - 99.908447%)
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "g81_v0.bin",      0x10000, 0x10000, CRC(86921dd4) SHA1(7048fd5b6ed5f4ddf6788958c30604418a6613ff) ) // 12-11-87
-	ROM_LOAD_HS( "g81_v1.bin",      0x30000, 0x10000, CRC(9c300e16) SHA1(6f3c82dc83290426068acef0b8fabba452421e8f) ) // 12-11-87
-	ROM_LOAD_HS( "g81_v2.bin",      0x50000, 0x10000, CRC(5316b4b0) SHA1(353c06e0e7c8dd9d609f8b341663bbf0ca60f6b5) ) // 12-11-87
-	ROM_LOAD_HS( "g81_v3.bin",      0x70000, 0x10000, CRC(dc077af4) SHA1(560090a335dfd345a6ae0eef8f1fd4d8098881f3) ) // 12-11-87
-	ROM_LOAD_HS( "g81_v4.bin",      0x90000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) ) // 12-11-87
-	ROM_LOAD_HS( "g81_v5.bin",      0xb0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) ) // 12-11-87
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "g81_v0.bin",      0x00000, 0x10000, CRC(86921dd4) SHA1(7048fd5b6ed5f4ddf6788958c30604418a6613ff) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v1.bin",      0x20000, 0x10000, CRC(9c300e16) SHA1(6f3c82dc83290426068acef0b8fabba452421e8f) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v2.bin",      0x40000, 0x10000, CRC(5316b4b0) SHA1(353c06e0e7c8dd9d609f8b341663bbf0ca60f6b5) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v3.bin",      0x60000, 0x10000, CRC(dc077af4) SHA1(560090a335dfd345a6ae0eef8f1fd4d8098881f3) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v4.bin",      0x80000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) ) // 12-11-87
+	ROM_LOAD_HS( "g81_v5.bin",      0xa0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) ) // 12-11-87
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "g8_chr-8.bin",       0x00000, 0x20000, CRC(3862ed0a) SHA1(4cae42bbfa434c7dce63fdceaa569fcb28768420) ) // 12-11-87
@@ -1741,10 +1771,12 @@ ROM_START( ws )
 	/* 300000-37ffff empty */
 	ROM_LOAD_512( "ws1_prg7.bin",    0x380000, CRC(28712eba) SHA1(01ffb75af07eccd42426c4f4f933a3d562fdd165) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "ws1_voi0.bin",    0x10000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
-	ROM_LOAD( "ws_voi-1.bin",       0x30000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "ws1_voi0.bin",    0x00000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
+	ROM_LOAD( "ws_voi-1.bin",       0x20000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "ws_chr-8.bin",       0x00000, 0x20000, CRC(d1897b9b) SHA1(29906614b879e5623b49bc925e80006aee3997b9) )
@@ -1779,11 +1811,13 @@ ROM_START( berabohm )
 	ROM_LOAD_512 ( "bm1-p6.bin",      0x300000, CRC(a51b69a5) SHA1(d04a52feb95f8b65978af88bd4b338883228fd93) )
 	ROM_LOAD_1024( "bm1_p7c.bin",     0x380000, CRC(9694d7b2) SHA1(2953a7029457a8afb2767560f05c064aade28bca) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "bm1_v0.bin",      0x10000, 0x10000, CRC(4e40d0ca) SHA1(799c4becd2e5877719d7a5eb9b610f91a7a637af) )
-	ROM_LOAD(    "bm_voi-1.bin",    0x30000, 0x20000, CRC(be9ce0a8) SHA1(a211216125615cb14e515317f56976c4ebe13f5f) )
-	ROM_LOAD_HS( "bm1_v2.bin",      0x50000, 0x10000, CRC(41225d04) SHA1(a670c5ce63ff1d2ed94aa5ea17cb2c91eb768f14) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "bm1_v0.bin",      0x00000, 0x10000, CRC(4e40d0ca) SHA1(799c4becd2e5877719d7a5eb9b610f91a7a637af) )
+	ROM_LOAD(    "bm_voi-1.bin",    0x20000, 0x20000, CRC(be9ce0a8) SHA1(a211216125615cb14e515317f56976c4ebe13f5f) )
+	ROM_LOAD_HS( "bm1_v2.bin",      0x40000, 0x10000, CRC(41225d04) SHA1(a670c5ce63ff1d2ed94aa5ea17cb2c91eb768f14) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "bm_chr-8.bin",       0x00000, 0x20000, CRC(92860e95) SHA1(d8c8d5aed956c876809f287700f33bc70a1b58a3) )
@@ -1821,11 +1855,13 @@ ROM_START( berabohmb )
 	ROM_LOAD_512 ( "bm1-p6.bin",      0x300000, CRC(a51b69a5) SHA1(d04a52feb95f8b65978af88bd4b338883228fd93) )
 	ROM_LOAD_1024( "bm1_p7b.bin",     0x380000, CRC(e0c36ddd) SHA1(e949da36524add3ab70d5dd5dcc7c6f42e3799e7) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "bm1_v0.bin",      0x10000, 0x10000, CRC(4e40d0ca) SHA1(799c4becd2e5877719d7a5eb9b610f91a7a637af) )
-	ROM_LOAD(    "bm_voi-1.bin",    0x30000, 0x20000, CRC(be9ce0a8) SHA1(a211216125615cb14e515317f56976c4ebe13f5f) )
-	ROM_LOAD_HS( "bm1_v2.bin",      0x50000, 0x10000, CRC(41225d04) SHA1(a670c5ce63ff1d2ed94aa5ea17cb2c91eb768f14) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "bm1_v0.bin",      0x00000, 0x10000, CRC(4e40d0ca) SHA1(799c4becd2e5877719d7a5eb9b610f91a7a637af) )
+	ROM_LOAD(    "bm_voi-1.bin",    0x20000, 0x20000, CRC(be9ce0a8) SHA1(a211216125615cb14e515317f56976c4ebe13f5f) )
+	ROM_LOAD_HS( "bm1_v2.bin",      0x40000, 0x10000, CRC(41225d04) SHA1(a670c5ce63ff1d2ed94aa5ea17cb2c91eb768f14) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "bm_chr-8.bin",       0x00000, 0x20000, CRC(92860e95) SHA1(d8c8d5aed956c876809f287700f33bc70a1b58a3) )
@@ -1865,10 +1901,12 @@ ROM_START( mmaze )
 	ROM_LOAD_512 ( "mm1_p6.bin",      0x300000, CRC(eaf530d8) SHA1(4c62f86b58ff2c62b269f2cef7982a3d49490ffa) )
 	ROM_LOAD_512 ( "mm1_p7.bin",      0x380000, CRC(085e58cc) SHA1(3b83943e93eacae61a0e762d568cf7bc64128e37) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "mm_voi-0.bin",       0x10000, 0x20000, CRC(ee974cff) SHA1(f211c461a36dae9ce5ee614aaaabf92556181a85) )
-	ROM_LOAD( "mm_voi-1.bin",       0x30000, 0x20000, CRC(d09b5830) SHA1(954be797e30f7d126b4fc2b04f190bfd7dc23bff) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "mm_voi-0.bin",       0x00000, 0x20000, CRC(ee974cff) SHA1(f211c461a36dae9ce5ee614aaaabf92556181a85) )
+	ROM_LOAD( "mm_voi-1.bin",       0x20000, 0x20000, CRC(d09b5830) SHA1(954be797e30f7d126b4fc2b04f190bfd7dc23bff) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "mm_chr-8.bin",       0x00000, 0x20000, CRC(a3784dfe) SHA1(7bcd71e0c675cd16587b61c23b470abb8ba434d3) )
@@ -1903,9 +1941,11 @@ ROM_START( bakutotu )
 	ROM_LOAD_1024( "bk1_p6.bin",      0x300000, CRC(57a3ce42) SHA1(773d5f93e75ffe4b114cbcd1093c7cb43e1d6362) )
 	ROM_LOAD_1024( "bk1_prg7.bin",    0x380000, CRC(fac1c1bf) SHA1(59e2612d0f4b3aea5cf5f5652e7cbee89cde860f) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "bk1_v0.bin",      0x10000, 0x10000, CRC(008e290e) SHA1(87ac7291088f0d6a7179b1a5f3567a72dc92177c) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "bk1_v0.bin",      0x00000, 0x10000, CRC(008e290e) SHA1(87ac7291088f0d6a7179b1a5f3567a72dc92177c) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "bk_chr-8.bin",       0x00000, 0x20000, CRC(6c8d4029) SHA1(2eb6fd89ffaecfa53f9adcdebbe8f550199d067f) )
@@ -1945,10 +1985,12 @@ ROM_START( wldcourt )
 	ROM_LOAD_512( "wc1_prg6.bin",    0x300000, CRC(e9216b9e) SHA1(dc2e0b7ca1b0de01ae7e05a4098eb6f2d1042211) )
 	ROM_LOAD_512( "wc1_prg7.bin",    0x380000, CRC(8a7c6cac) SHA1(da3b1682c4aa756a8f8d06c15110ee8d23c215f1) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "wc1_voi0.bin",    0x10000, 0x10000, CRC(b57919f7) SHA1(5305c479513943a5d92988a63ad1671744e944b5) )
-	ROM_LOAD( "wc1_voi1.bin",       0x30000, 0x20000, CRC(97974b4b) SHA1(1e4d10ce28cabc01f1f233a0edc05e20874e0285) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "wc1_voi0.bin",    0x00000, 0x10000, CRC(b57919f7) SHA1(5305c479513943a5d92988a63ad1671744e944b5) )
+	ROM_LOAD( "wc1_voi1.bin",       0x20000, 0x20000, CRC(97974b4b) SHA1(1e4d10ce28cabc01f1f233a0edc05e20874e0285) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "wc1_chr8.bin",       0x00000, 0x20000, CRC(23e1c399) SHA1(2d22da5c68c0924767f18fb19576cb76a016ae8e) )
@@ -2104,12 +2146,14 @@ ROM_START( splatter )
 	ROM_LOAD_512( "sh3_prg6.bin",    0x300000, CRC(0579e90e) SHA1(7ca32e370adce00d4f5152cfa1b691a1685e8dd1) )
 	ROM_LOAD_512( "sh3_prg7.bin",    0x380000, CRC(653b4509) SHA1(59fc84654acc88a1f748e5b632cbef8a78f4288e) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "sh_voi-0.bin",       0x10000, 0x20000, CRC(2199cb66) SHA1(f1c4e3fb0e7c6eae50c698cded8c85a3cbd36672) )
-	ROM_LOAD( "sh_voi-1.bin",       0x30000, 0x20000, CRC(9b6472af) SHA1(b7cde805a4d25f9c332c2c13ffa474e683ec76d5) )
-	ROM_LOAD( "sh_voi-2.bin",       0x50000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
-	ROM_LOAD( "sh_voi-3.bin",       0x70000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "sh_voi-0.bin",       0x00000, 0x20000, CRC(2199cb66) SHA1(f1c4e3fb0e7c6eae50c698cded8c85a3cbd36672) )
+	ROM_LOAD( "sh_voi-1.bin",       0x20000, 0x20000, CRC(9b6472af) SHA1(b7cde805a4d25f9c332c2c13ffa474e683ec76d5) )
+	ROM_LOAD( "sh_voi-2.bin",       0x40000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
+	ROM_LOAD( "sh_voi-3.bin",       0x60000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "sh_chr-8.bin",       0x00000, 0x20000, CRC(321f483b) SHA1(84d75367d2e3ae210ecd17c163b336f609628a91) )
@@ -2148,12 +2192,14 @@ ROM_START( splatter2 )
 	ROM_LOAD_512( "sh2_prg6.bin",    0x300000, CRC(054d6275) SHA1(5f28985897e35dca33a8063e98938c0f6d8fe9d8) )
 	ROM_LOAD_512( "sh2_prg7.bin",    0x380000, CRC(942cb61e) SHA1(405804b85eed62150667116c500222f591a25dd3) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "sh_voi-0.bin",       0x10000, 0x20000, CRC(2199cb66) SHA1(f1c4e3fb0e7c6eae50c698cded8c85a3cbd36672) )
-	ROM_LOAD( "sh_voi-1.bin",       0x30000, 0x20000, CRC(9b6472af) SHA1(b7cde805a4d25f9c332c2c13ffa474e683ec76d5) )
-	ROM_LOAD( "sh_voi-2.bin",       0x50000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
-	ROM_LOAD( "sh_voi-3.bin",       0x70000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "sh_voi-0.bin",       0x00000, 0x20000, CRC(2199cb66) SHA1(f1c4e3fb0e7c6eae50c698cded8c85a3cbd36672) )
+	ROM_LOAD( "sh_voi-1.bin",       0x20000, 0x20000, CRC(9b6472af) SHA1(b7cde805a4d25f9c332c2c13ffa474e683ec76d5) )
+	ROM_LOAD( "sh_voi-2.bin",       0x40000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
+	ROM_LOAD( "sh_voi-3.bin",       0x60000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "sh_chr-8.bin",       0x00000, 0x20000, CRC(321f483b) SHA1(84d75367d2e3ae210ecd17c163b336f609628a91) )
@@ -2192,12 +2238,14 @@ ROM_START( splatterj )
 	ROM_LOAD_512( "sh1_prg6.bin",    0x300000, CRC(97a3e664) SHA1(397907cedea1cd9ae25427df5d41b942933c3ca9) )
 	ROM_LOAD_512( "sh1_prg7.bin",    0x380000, CRC(24c8cbd7) SHA1(72a2f008840b1b5cf026dd51e2797d87d92040fd) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "sh_voi-0.bin",       0x10000, 0x20000, CRC(2199cb66) SHA1(f1c4e3fb0e7c6eae50c698cded8c85a3cbd36672) )
-	ROM_LOAD( "sh_voi-1.bin",       0x30000, 0x20000, CRC(9b6472af) SHA1(b7cde805a4d25f9c332c2c13ffa474e683ec76d5) )
-	ROM_LOAD( "sh_voi-2.bin",       0x50000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
-	ROM_LOAD( "sh_voi-3.bin",       0x70000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "sh_voi-0.bin",       0x00000, 0x20000, CRC(2199cb66) SHA1(f1c4e3fb0e7c6eae50c698cded8c85a3cbd36672) )
+	ROM_LOAD( "sh_voi-1.bin",       0x20000, 0x20000, CRC(9b6472af) SHA1(b7cde805a4d25f9c332c2c13ffa474e683ec76d5) )
+	ROM_LOAD( "sh_voi-2.bin",       0x40000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
+	ROM_LOAD( "sh_voi-3.bin",       0x60000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "sh_chr-8.bin",       0x00000, 0x20000, CRC(321f483b) SHA1(84d75367d2e3ae210ecd17c163b336f609628a91) )
@@ -2236,10 +2284,12 @@ ROM_START( faceoff )
 	ROM_LOAD_512( "fo1_p6.bin",      0x300000, CRC(a48ee82b) SHA1(d6dbcb6d84a1290185388fb7278e0b2fbb46a0e5) )
 	ROM_LOAD_512( "fo1_p7.bin",      0x380000, CRC(6791d221) SHA1(e3a95bd4ff36df5fccd5168491beeb18b1a10d95) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "fo1_v0.bin",      0x10000, 0x10000, CRC(e6edf63e) SHA1(095f7fa93233e4b4f25e728868c212170be48550) )
-	ROM_LOAD_HS( "fo1_v1.bin",      0x30000, 0x10000, CRC(132a5d90) SHA1(d5ceae68d7aea7cdde43600453f9724f35834519) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "fo1_v0.bin",      0x00000, 0x10000, CRC(e6edf63e) SHA1(095f7fa93233e4b4f25e728868c212170be48550) )
+	ROM_LOAD_HS( "fo1_v1.bin",      0x20000, 0x10000, CRC(132a5d90) SHA1(d5ceae68d7aea7cdde43600453f9724f35834519) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "fo1_c8.bin",         0x00000, 0x10000, CRC(d397216c) SHA1(baa3747bf3e12246e2629eaf0abdb3df05e423bd) )
@@ -2273,9 +2323,11 @@ ROM_START( rompers )
 	ROM_LOAD_512( "rp1prg6b.bin",    0x300000, CRC(80821065) SHA1(76e0dd774e064d8ed9399116d50230e7d7f38216) )
 	ROM_LOAD_512( "rp1prg7b.bin",    0x380000, CRC(49d057e2) SHA1(c1e19218b1897827b3de7912a08f1677510a8b09) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "rp_voi-0.bin",       0x10000, 0x20000, CRC(11caef7e) SHA1(c6470cbbc6402872794e0a4e822a5d08ca2448ef) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "rp_voi-0.bin",       0x00000, 0x20000, CRC(11caef7e) SHA1(c6470cbbc6402872794e0a4e822a5d08ca2448ef) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "rp1_chr8.bin",       0x00000, 0x10000, CRC(69cfe46a) SHA1(01c5af1b7fc337ec06a5afabd87b9a6a7dcf3503) )
@@ -2311,9 +2363,11 @@ ROM_START( romperso )
 	ROM_LOAD_512( "rp1_prg6.bin",    0x300000, CRC(fc183345) SHA1(1660233d8971236d059ac9c40ee430b269abdc8f) )
 	ROM_LOAD_512( "rp1_prg7.bin",    0x380000, CRC(8d49f28a) SHA1(3b86757da6e3f81794a7c18907b14a555b99bb10) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "rp_voi-0.bin",       0x10000, 0x20000, CRC(11caef7e) SHA1(c6470cbbc6402872794e0a4e822a5d08ca2448ef) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "rp_voi-0.bin",       0x00000, 0x20000, CRC(11caef7e) SHA1(c6470cbbc6402872794e0a4e822a5d08ca2448ef) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "rp1_chr8.bin",       0x00000, 0x10000, CRC(69cfe46a) SHA1(01c5af1b7fc337ec06a5afabd87b9a6a7dcf3503) )
@@ -2350,11 +2404,13 @@ ROM_START( blastoff )
 	ROM_LOAD_1024( "bo1_prg6.bin",       0x300000, CRC(d60da63e) SHA1(525e7d87e240d08f83e5d69b47eb185283b396d4) )
 	ROM_LOAD_1024( "bo1prg7b.bin",       0x380000, CRC(b630383c) SHA1(eef9ae4e84f41bf5d137936d8eb033cb89374b86) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "bo_voi-0.bin",       0x10000, 0x20000, CRC(47065e18) SHA1(234e7a40be4def6846040a0fca3e9d7eff3754e3) )
-	ROM_LOAD( "bo_voi-1.bin",       0x30000, 0x20000, CRC(0308b18e) SHA1(7196abdf36d660089d739e3f3a362648768a6127) )
-	ROM_LOAD( "bo_voi-2.bin",       0x50000, 0x20000, CRC(88cab230) SHA1(659c4efeb8aa24f8b32509ee563407ed1e17d564) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "bo_voi-0.bin",       0x00000, 0x20000, CRC(47065e18) SHA1(234e7a40be4def6846040a0fca3e9d7eff3754e3) )
+	ROM_LOAD( "bo_voi-1.bin",       0x20000, 0x20000, CRC(0308b18e) SHA1(7196abdf36d660089d739e3f3a362648768a6127) )
+	ROM_LOAD( "bo_voi-2.bin",       0x40000, 0x20000, CRC(88cab230) SHA1(659c4efeb8aa24f8b32509ee563407ed1e17d564) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "bo_chr-8.bin",       0x00000, 0x20000, CRC(e8b5f2d4) SHA1(70dd2898dcfed5f43f6c50f852660f24a9d7ec9d) )
@@ -2392,10 +2448,12 @@ ROM_START( ws89 )
 	/* 300000-37ffff empty */
 	ROM_LOAD_512( "w91_prg7.bin",    0x380000, CRC(611ed964) SHA1(855a9173bdc707f9cc0fa599ed5e6ccc4897f4e5) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "ws1_voi0.bin",    0x10000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
-	ROM_LOAD( "ws_voi-1.bin",       0x30000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "ws1_voi0.bin",    0x00000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
+	ROM_LOAD( "ws_voi-1.bin",       0x20000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "ws_chr-8.bin",       0x00000, 0x20000, CRC(d1897b9b) SHA1(29906614b879e5623b49bc925e80006aee3997b9) )
@@ -2430,9 +2488,11 @@ ROM_START( dangseed )
 	ROM_LOAD_512 ( "dr1_prg6.bin",    0x300000, CRC(cc68262b) SHA1(34a6860a6e74e4060c118d06da7ecfb2530b8f97) )
 	ROM_LOAD_1024( "dr1_prg7.bin",    0x380000, CRC(d7d2f653) SHA1(a08ca7ac0c36c8f06f516bbfb9f541b77e53e864) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "dr_voi-0.bin",       0x10000, 0x20000, CRC(de4fdc0e) SHA1(b5e952aaf5a81a2b4ff1c7cae141d50360545770) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "dr_voi-0.bin",       0x00000, 0x20000, CRC(de4fdc0e) SHA1(b5e952aaf5a81a2b4ff1c7cae141d50360545770) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "dr_chr-8.bin",       0x00000, 0x20000, CRC(0fbaa10e) SHA1(18ea77544678d889aded927a96a11bc04ad42fa6) )
@@ -2468,10 +2528,12 @@ ROM_START( ws90 )
 	/* 300000-37ffff empty */
 	ROM_LOAD_512( "w901prg7.bin",    0x380000, CRC(37ae1b25) SHA1(e3f9d8abdfa68929495993d0842d64a8fd323d91) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "ws1_voi0.bin",    0x10000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
-	ROM_LOAD( "ws_voi-1.bin",       0x30000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "ws1_voi0.bin",    0x00000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
+	ROM_LOAD( "ws_voi-1.bin",       0x20000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "ws_chr-8.bin",       0x00000, 0x20000, CRC(d1897b9b) SHA1(29906614b879e5623b49bc925e80006aee3997b9) )
@@ -2506,11 +2568,13 @@ ROM_START( pistoldm )
 	/* 300000-37ffff empty */
 	ROM_LOAD_1024( "pd1prg7b.bin",       0x380000, CRC(7189b797) SHA1(3652ee6b4a459946f61db8629a44b9675b082119) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "pd_voi-0.bin",       0x10000, 0x20000, CRC(ad1b8128) SHA1(f2112aa129abd7a243c0c329319d9d2ebf7869f7) )
-	ROM_LOAD( "pd_voi-1.bin",       0x30000, 0x20000, CRC(2871c494) SHA1(9ac0dc559c22ac5083025c32f28e353b04348155) )
-	ROM_LOAD( "pd_voi-2.bin",       0x50000, 0x20000, CRC(e783f0c4) SHA1(6a43f22226d1637d507c8194244058e8d96f8692) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "pd_voi-0.bin",       0x00000, 0x20000, CRC(ad1b8128) SHA1(f2112aa129abd7a243c0c329319d9d2ebf7869f7) )
+	ROM_LOAD( "pd_voi-1.bin",       0x20000, 0x20000, CRC(2871c494) SHA1(9ac0dc559c22ac5083025c32f28e353b04348155) )
+	ROM_LOAD( "pd_voi-2.bin",       0x40000, 0x20000, CRC(e783f0c4) SHA1(6a43f22226d1637d507c8194244058e8d96f8692) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "pd_chr-8.bin",       0x00000, 0x20000, CRC(a5f516db) SHA1(262c3a99cfa3061b58331d8ed254b49a06bfdd9f) )
@@ -2547,9 +2611,11 @@ ROM_START( boxyboy )
 	/* 300000-37ffff empty */
 	ROM_LOAD_512 ( "sbx_prg7.bin",    0x380000, CRC(7787c72e) SHA1(84b064165788481fbfb4836291c9c4000abcf7ce) ) /* Unknown number for the "x" */
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "sb1_voi0.bin",    0x10000, 0x10000, CRC(63d9cedf) SHA1(117767c6b25325bf3005756d74196da56008498c) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "sb1_voi0.bin",    0x00000, 0x10000, CRC(63d9cedf) SHA1(117767c6b25325bf3005756d74196da56008498c) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "sb1_chr8.bin",       0x00000, 0x10000, CRC(5692b297) SHA1(ed20a0f4ce80674d01cd2a30571ffeff9f9066fd) )
@@ -2578,9 +2644,11 @@ ROM_START( soukobdx )
 	/* 300000-37ffff empty */
 	ROM_LOAD_512 ( "sb1_prg7.bin",    0x380000, CRC(c3bd418a) SHA1(f2c9cc3b5b115ee1b342517897bfa979dac11544) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "sb1_voi0.bin",    0x10000, 0x10000, CRC(63d9cedf) SHA1(117767c6b25325bf3005756d74196da56008498c) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD_HS( "sb1_voi0.bin",    0x00000, 0x10000, CRC(63d9cedf) SHA1(117767c6b25325bf3005756d74196da56008498c) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "sb1_chr8.bin",       0x00000, 0x10000, CRC(5692b297) SHA1(ed20a0f4ce80674d01cd2a30571ffeff9f9066fd) )
@@ -2609,8 +2677,10 @@ ROM_START( puzlclub )
 	/* 300000-37ffff empty */
 	ROM_LOAD_512( "pc1_p7.bin",      0x380000, CRC(f0638260) SHA1(9ea33e2352ebeea42aa077ed049bec1037397431) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", ROMREGION_ERASEFF )  /* MCU external ROM */
 	/* no voices */
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
@@ -2644,10 +2714,12 @@ ROM_START( tankfrce )
 	/* 300000-37ffff empty */
 	ROM_LOAD_1024( "tf1prg7.bin",        0x380000, CRC(2ec28a87) SHA1(91d2c1efbe156982beab24e437852d1c79dab412) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "tf1_voi0.bin",       0x10000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
-	ROM_LOAD( "tf1_voi1.bin",       0x30000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "tf1_voi0.bin",       0x00000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
+	ROM_LOAD( "tf1_voi1.bin",       0x20000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "tf1_chr8.bin",       0x00000, 0x20000, CRC(7d53b31e) SHA1(7e4b5fc92f7956477392f1e14c6edfc0cada2be0) )
@@ -2680,10 +2752,12 @@ ROM_START( tankfrce4 )
 	/* 300000-37ffff empty */
 	ROM_LOAD_1024( "tfu4prg7.bin",       0x380000, CRC(162adea0) SHA1(9758433ae97b463253af455c80eefee4243f6c9e) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "tf1_voi0.bin",       0x10000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
-	ROM_LOAD( "tf1_voi1.bin",       0x30000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "tf1_voi0.bin",       0x00000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
+	ROM_LOAD( "tf1_voi1.bin",       0x20000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "tf1_chr8.bin",       0x00000, 0x20000, CRC(7d53b31e) SHA1(7e4b5fc92f7956477392f1e14c6edfc0cada2be0) )
@@ -2716,10 +2790,12 @@ ROM_START( tankfrcej )
 	/* 300000-37ffff empty */
 	ROM_LOAD_1024( "tf1_prg7.bin",       0x380000, CRC(9dfa0dd5) SHA1(eeb6904225e7dedb0d134e5634aa5321237f68ac) )
 
-	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD( "tf1_voi0.bin",       0x10000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
-	ROM_LOAD( "tf1_voi1.bin",       0x30000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "tf1_voi0.bin",       0x00000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
+	ROM_LOAD( "tf1_voi1.bin",       0x20000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
 	ROM_LOAD( "tf1_chr8.bin",       0x00000, 0x20000, CRC(7d53b31e) SHA1(7e4b5fc92f7956477392f1e14c6edfc0cada2be0) )
