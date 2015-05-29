@@ -100,20 +100,21 @@ public:
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
 	void set_number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; }
+	void set_string_char(char c) { m_string = c; }
 	void set_whitespace(pstring s) { m_whitespace = s; }
 	void set_comment(pstring start, pstring end, pstring line)
 	{
 		m_tok_comment_start = register_token(start);
 		m_tok_comment_end = register_token(end);
 		m_tok_line_comment = register_token(line);
-		m_string = '"';
 	}
 
 	token_t get_token_internal();
 	void error(const char *format, ...) ATTR_PRINTF(2,3);
 
-protected:
 	void reset(const char *p) { m_px = p; m_line = 1; m_line_ptr = p; }
+
+protected:
 	virtual void verror(pstring msg, int line_num, pstring line) = 0;
 
 private:
