@@ -180,6 +180,7 @@ public:
 protected:
 	// Chip-specific configuration flags
 	bool disable_mfm;
+	bool enmf;
 	bool has_enmf;
 	bool inverted_bus;
 	bool side_control;
@@ -360,7 +361,7 @@ private:
 
 	emu_timer *t_gen, *t_cmd, *t_track, *t_sector;
 
-	bool dden, enmf, status_type_1, intrq, drq, hld, hlt, enp, force_ready;
+	bool dden, status_type_1, intrq, drq, hld, hlt, enp, force_ready;
 	int main_state, sub_state;
 	UINT8 command, track, sector, data, status, intrq_cond;
 	int last_dir;
@@ -596,11 +597,13 @@ protected:
 class wd2791_t : public wd_fdc_analog_t {
 public:
 	wd2791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
 };
 
 class wd2793_t : public wd_fdc_analog_t {
 public:
 	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
 };
 
 class wd2795_t : public wd_fdc_analog_t {
