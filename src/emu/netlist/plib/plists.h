@@ -339,7 +339,7 @@ template <class _ListClass>
 class pnamedlist_t : public plist_t<_ListClass>
 {
 public:
-	_ListClass find(const pstring &name) const
+	_ListClass find_by_name(const pstring &name) const
 	{
 		for (std::size_t i=0; i < this->size(); i++)
 			if (get_name((*this)[i]) == name)
@@ -349,7 +349,7 @@ public:
 
 	void remove_by_name(const pstring &name)
 	{
-		plist_t<_ListClass>::remove(find(name));
+		plist_t<_ListClass>::remove(find_by_name(name));
 	}
 
 	bool add(_ListClass dev, bool allow_duplicate)
@@ -358,7 +358,7 @@ public:
 			plist_t<_ListClass>::add(dev);
 		else
 		{
-			if (!(this->find(get_name(dev)) == _ListClass(NULL)))
+			if (!(this->find_by_name(get_name(dev)) == _ListClass(NULL)))
 				return false;
 			plist_t<_ListClass>::add(dev);
 		}

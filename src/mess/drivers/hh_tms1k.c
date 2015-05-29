@@ -118,6 +118,7 @@
 #include "starwbc.lh"
 #include "stopthie.lh"
 #include "tandy12.lh" // clickable
+//#include "tbreakup.lh"
 #include "tc4.lh"
 
 #include "einvader.lh" // test-layout(but still playable)
@@ -3992,7 +3993,8 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Tomy(tronics) Break Up
+  Tomy(tronics) Break Up (manufactured in Japan)
+  * PCB label TOMY B.O.
   * TMS1040 MP2726 TOMY WIPE (die labeled MP2726A)
   * TMS1025N2LL I/O expander
   * 2-digit 7seg display, 46 other leds, 1bit sound
@@ -4002,14 +4004,39 @@ MACHINE_CONFIG_END
   - Japan: Block Attack
   - UK: Break-In
 
+  lamp translation table: led zz from game PCB = MESS lampyx:
+
+    00 = -         10 = lamp25    20 = lamp44
+    01 = lamp27    11 = lamp35    21 = lamp53
+    02 = lamp37    12 = lamp45    22 = lamp42
+    03 = lamp47    13 = lamp55
+    04 = lamp57    14 = lamp54
+    05 = lamp26    15 = lamp33
+    06 = lamp36    16 = lamp43
+    07 = lamp46    17 = lamp23
+    08 = lamp56    18 = lamp34
+    09 = lamp24    19 = lamp32
+
+  the 7seg panel is lamp0x and lamp1x(aka digit0/1), and the
+  8(2*4) * 3 rectangular leds panel, where x=0,1,2,3:
+
+    lamp7x         lamp6x
+    lamp9x         lamp8x
+    lamp11x        lamp10x
+
 ***************************************************************************/
 
 class tbreakup_state : public hh_tms1k_state
 {
 public:
 	tbreakup_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_expander(*this, "expander")
 	{ }
+
+	required_device<tms1024_device> m_expander;
+	UINT8 m_exp_port[7];
+	DECLARE_WRITE8_MEMBER(expander_w);
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -4021,33 +4048,89 @@ public:
 
 protected:
 	virtual void machine_reset();
+	virtual void machine_start();
 };
 
 // handlers
 
 void tbreakup_state::prepare_display()
 {
+	// 7seg leds from R0,R1 and O0-O6
+	for (int y = 0; y < 2; y++)
+	{
+		m_display_segmask[y] = 0x7f;
+		m_display_state[y] = (m_r >> y & 1) ? (m_o & 0x7f) : 0;
+	}
+	
+	// 22 round leds from expander port 7 and O2-O7
+	for (int y = 0; y < 4; y++)
+		m_display_state[y+2] = (m_exp_port[6] >> y & 1) ? (m_o & 0xfc) : 0;
+
+	// 24 rectangular leds from expander ports 1-6 (not strobed)
+	for (int y = 0; y < 6; y++)
+		m_display_state[y+6] = m_exp_port[y];
+	
+	set_display_size(8, 12);
+	display_update();
+}
+
+WRITE8_MEMBER(tbreakup_state::expander_w)
+{
+	// TMS1025 port 1-7 data
+	m_exp_port[offset] = data;
+	prepare_display();
 }
 
 WRITE16_MEMBER(tbreakup_state::write_r)
 {
+	// R6: speaker out
+	m_speaker->level_w(data >> 6 & 1);
+
+	// R7,R8: input mux
+	m_inp_mux = data >> 7 & 3;
+	
+	// R3-R5: TMS1025 port S
+	// R2: TMS1025 STD pin
+	m_expander->write_s(space, 0, data >> 3 & 7);
+	m_expander->write_std(data >> 2 & 1);
+
+	// R0,R1: select digit
+	m_r = ~data;
 	prepare_display();
 }
 
 WRITE16_MEMBER(tbreakup_state::write_o)
 {
+	// O0-O3: TMS1025 port H
+	m_expander->write_h(space, 0, data & 0xf);
+	
+	// O0-O7: led state
+	m_o = data;
 	prepare_display();
 }
 
 READ8_MEMBER(tbreakup_state::read_k)
 {
-	return 0;
+	// K4: fixed input
+	// K8: multiplexed inputs
+	return (m_inp_matrix[2]->read() & 4) | (read_inputs(2) & 8);
 }
 
 
 // config
 
 static INPUT_PORTS_START( tbreakup )
+	PORT_START("IN.0") // R7 K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Ball")
+
+	PORT_START("IN.1") // R8 K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Hit")
+
+	PORT_START("IN.2") // K4
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_CONFSETTING(    0x00, "3" )
+	PORT_CONFSETTING(    0x04, "5" )
+
 	PORT_START("IN.3") // fake
 	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, NULL)
 	PORT_CONFSETTING(    0x00, "Pro 1" )
@@ -4072,6 +4155,15 @@ void tbreakup_state::machine_reset()
 	set_clock();
 }
 
+void tbreakup_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill/register for savestates
+	memset(m_exp_port, 0, sizeof(m_exp_port));
+	save_item(NAME(m_exp_port));
+}
+
 static MACHINE_CONFIG_START( tbreakup, tbreakup_state )
 
 	/* basic machine hardware */
@@ -4079,9 +4171,18 @@ static MACHINE_CONFIG_START( tbreakup, tbreakup_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(tbreakup_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tbreakup_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tbreakup_state, write_o))
+	
+	MCFG_DEVICE_ADD("expander", TMS1025, 0)
+	MCFG_TMS1024_WRITE_PORT_CB(1, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(2, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(3, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(4, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(5, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(6, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(7, WRITE8(tbreakup_state, expander_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-//  MCFG_DEFAULT_LAYOUT(layout_tbreakup)
+//	MCFG_DEFAULT_LAYOUT(layout_tbreakup)
 	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
