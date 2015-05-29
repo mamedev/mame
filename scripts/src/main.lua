@@ -207,6 +207,18 @@ function mainProject(_target, _subtarget)
 	debugargs ("-window")
 
 	if _OPTIONS["osd"]=="retro" then
+		newoption {
+			trigger = "platform",
+			description = "libretro OS/platform variable",
+		}
+
+		-- $ARCH means something to Apple/Clang, so we can't use it here.
+		-- Instead, use ARCH="" LIBRETRO_ARCH="$ARCH" on the make cmdline.
+		newoption {
+			trigger = "LIBRETRO_ARCH",
+			description = "libretro CPU/architecture variable",
+		}
+
 		kind "SharedLib"
 		targetsuffix "_libretro"
 		targetprefix ""
@@ -214,15 +226,23 @@ function mainProject(_target, _subtarget)
 			"libco",
 		}
 
-		-- These kind of presume OS X for now, more robust solution
-		-- once we get that working...
-		buildoptions {
-			"-fPIC",
-		}
-		linkoptions {
-			"-fPIC",
-			-- FIXME: We only need this on OS X
-			"-Wl,-u,_retro_run",
-		}
+		-- FIXME: set the targetos based on _OPTIONS["platform"]
+
+		-- "macosx" for libretro platforms "osx" and "ios"
+		if _OPTIONS["targetos"]=="macosx" then
+			linkoptions {
+				"-fPIC",
+				"-Wl,-u,_retro_run",
+			}
+		end
+
+		-- "linux" for pretty much any Linux/BSD/Android…
+		if _OPTIONS["targetos"]=="linux" then
+			linkoptions {
+				"-fPIC",
+				"-Wl,--version-script=src/osd/retro/link.T",
+			}
+		end
+
 	end
 end

@@ -561,3 +561,17 @@ file_error osd_get_full_path(char **dst, const char *path)
 
 	return err;
 }
+
+//============================================================
+//  osd_truncate
+//============================================================
+file_error osd_truncate(osd_file *file, UINT64 offset)
+{
+	int result;
+
+	result = ftruncate(file->handle, offset);
+	if (!result)
+		return error_to_file_error(errno);
+
+	return FILERR_NONE;
+}
