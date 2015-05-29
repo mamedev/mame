@@ -40,8 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
 
 	int m_tilexor;
-	UINT8 m_blacklamp = NULL;
-	UINT8 m_redlamp = NULL;
+	UINT8 m_blacklamp;
+	UINT8 m_redlamp;
 	UINT8 *m_vram;
 
 	required_device<z180_device> m_maincpu;
