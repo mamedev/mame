@@ -896,6 +896,9 @@ void wd_fdc_t::interrupt_start()
 		motor_timeout = 0;
 	}
 
+	// after a force interrupt command, return status type 1
+	status_type_1 = true;
+
 	if(!(command & 0x0f)) {
 		intrq_cond = 0;
 	} else {
