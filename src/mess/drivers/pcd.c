@@ -470,9 +470,10 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	// floppy disk controller
-	MCFG_WD2793x_ADD("fdc", XTAL_16MHz/8/2)
+	MCFG_WD2793x_ADD("fdc", XTAL_16MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
+	MCFG_WD_FDC_ENMF_CALLBACK(GND)
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcd_floppies, "525dsqd", pcd_state::floppy_formats)
@@ -539,12 +540,6 @@ ROM_START( pcd )
 	ROM_REGION(0x4000, "bios", 0)
 	ROM_LOAD16_BYTE("s26361-d359.d42", 0x0001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73))
 	ROM_LOAD16_BYTE("s26361-d359.d43", 0x0000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda))
-	ROM_FILL(0xb64, 1, 0xe2)  // post expects 0xd0 fdc command to be instant, give it a delay
-	ROM_FILL(0xb65, 1, 0xfe)
-	ROM_FILL(0xb35, 1, 0x90)  // fdc delay_register_commit is too long
-	ROM_FILL(0xb36, 1, 0x90)
-	ROM_FILL(0x3ffe, 1, 0xf4)  // fix csum
-	ROM_FILL(0x3fff, 1, 0x3d)
 
 	// gfx card (scn2674 with 8741), to be moved
 	ROM_REGION(0x400, "graphics", 0)

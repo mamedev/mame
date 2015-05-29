@@ -125,6 +125,9 @@
 #define MCFG_WD_FDC_ENP_CALLBACK(_write) \
 	devcb = &wd_fdc_t::set_enp_wr_callback(*device, DEVCB_##_write);
 
+#define MCFG_WD_FDC_ENMF_CALLBACK(_read) \
+	devcb = &wd_fdc_t::set_enmf_rd_callback(*device, DEVCB_##_read);
+
 class wd_fdc_t : public device_t {
 public:
 	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
@@ -133,6 +136,7 @@ public:
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).drq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_hld_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).hld_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_enp_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).enp_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_enmf_rd_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).enmf_cb.set_callback(object); }
 
 	void soft_reset();
 
@@ -176,6 +180,7 @@ public:
 protected:
 	// Chip-specific configuration flags
 	bool disable_mfm;
+	bool has_enmf;
 	bool inverted_bus;
 	bool side_control;
 	bool side_compare;
@@ -197,7 +202,7 @@ protected:
 	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 	virtual int settle_time() const;
 
-	virtual void pll_reset(bool fm, const attotime &when) = 0;
+	virtual void pll_reset(bool fm, bool enmf, const attotime &when) = 0;
 	virtual void pll_start_writing(const attotime &tm) = 0;
 	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm) = 0;
 	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm) = 0;
@@ -355,7 +360,7 @@ private:
 
 	emu_timer *t_gen, *t_cmd, *t_track, *t_sector;
 
-	bool dden, status_type_1, intrq, drq, hld, hlt, enp, force_ready;
+	bool dden, enmf, status_type_1, intrq, drq, hld, hlt, enp, force_ready;
 	int main_state, sub_state;
 	UINT8 command, track, sector, data, status, intrq_cond;
 	int last_dir;
@@ -367,6 +372,7 @@ private:
 	live_info cur_live, checkpoint_live;
 
 	devcb_write_line intrq_cb, drq_cb, hld_cb, enp_cb;
+	devcb_read_line enmf_cb;
 
 	UINT8 format_last_byte;
 	int format_last_byte_count;
@@ -437,7 +443,7 @@ public:
 	wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
-	virtual void pll_reset(bool fm, const attotime &when);
+	virtual void pll_reset(bool fm, bool enmf, const attotime &when);
 	virtual void pll_start_writing(const attotime &tm);
 	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm);
 	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
@@ -457,7 +463,7 @@ public:
 protected:
 	static const int wd_digital_step_times[4];
 
-	virtual void pll_reset(bool fm, const attotime &when);
+	virtual void pll_reset(bool fm, bool enmf, const attotime &when);
 	virtual void pll_start_writing(const attotime &tm);
 	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm);
 	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
