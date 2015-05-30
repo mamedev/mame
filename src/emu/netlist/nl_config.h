@@ -28,18 +28,16 @@
  */
 
 #ifndef USE_PMFDELEGATES
-#if defined(__clang__) || (defined(__GNUC__) && defined(__i386__))
+#if defined(__clang__) || defined(__APPLE__) || (defined(__GNUC__) && defined(__i386__))
 	#define USE_PMFDELEGATES            (0)
 	#define NO_USE_PMFCONVERSION        (1)
+#elif defined(__GNUC__)
+	#define USE_PMFDELEGATES        (0)
+	#define NO_USE_PMFCONVERSION    (0)
+	#pragma GCC diagnostic ignored "-Wpmf-conversions"
 #else
-	#if defined(__GNUC__)
-		#define USE_PMFDELEGATES        (1)
-		#define NO_USE_PMFCONVERSION    (0)
-		#pragma GCC diagnostic ignored "-Wpmf-conversions"
-	#else
-		#define USE_PMFDELEGATES        (0)
-		#define NO_USE_PMFCONVERSION    (1)
-	#endif
+	#define USE_PMFDELEGATES        (0)
+	#define NO_USE_PMFCONVERSION    (1)
 #endif
 #endif
 
