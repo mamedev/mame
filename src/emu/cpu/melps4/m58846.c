@@ -52,7 +52,7 @@ void m58846_device::device_start()
 	melps4_cpu_device::device_start();
 
 	// set fixed state
-	m_bm_page = 2;
+	m_sm_page = 2;
 	m_int_page = 1;
 }
 

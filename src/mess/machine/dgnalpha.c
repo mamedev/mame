@@ -161,6 +161,7 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 			result = m_fdc->status_r(space, 0);
 			break;
 	}
+
 	return result;
 }
 
@@ -196,10 +197,7 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 			m_fdc->track_w(space, 0, data);
 			break;
 		case 15:
-			m_fdc->command_w(space, 0, data);
-
-			/* disk head is encoded in the command byte */
-			m_fdc->set_side((data & 0x02) ? 1 : 0);
+			m_fdc->cmd_w(space, 0, data);
 			break;
 	}
 }
@@ -316,21 +314,24 @@ WRITE8_MEMBER( dragon_alpha_state::psg_porta_write )
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
 	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
-	switch (data & 0xF)
-	{
-		case(0x01) :
-			m_fdc->set_drive(0);
-			break;
-		case(0x02) :
-			m_fdc->set_drive(1);
-			break;
-		case(0x04) :
-			m_fdc->set_drive(2);
-			break;
-		case(0x08) :
-			m_fdc->set_drive(3);
-			break;
-	}
+
+	floppy_image_device *floppy = NULL;
+
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	// todo: turning the motor on with bit 4 isn't giving the drive enough
+	// time to spin up, how does it work in hardware?
+	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+	if (m_floppy2->get_device()) m_floppy2->get_device()->mon_w(0);
+	if (m_floppy3->get_device()) m_floppy3->get_device()->mon_w(0);
+
+	m_fdc->dden_w(BIT(data, 5));
 }
 
 /***************************************************************************

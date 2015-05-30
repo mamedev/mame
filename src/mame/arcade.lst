@@ -3012,13 +3012,15 @@ sidearms        // 12/1986 (c) 1986 (World)
 sidearmsu       // 12/1986 (c) 1986 + Romstar license (US)
 sidearmsur1     // 12/1986 (c) 1986 + Romstar license (US)
 sidearmsj       // 12/1986 (c) 1986 (Japan)
-turtship        // (c) 1988 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
-turtshipj       // (c) 1988 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
-turtshipk       // (c) 1988 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
-dyger           // (c) 1989 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
-dygera          // (c) 1989 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtship        // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtshipj       // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtshipk       // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtshipko       // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtshipkn	// (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+dyger           // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+dygera          // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 twinfalc        // (c) 1989 Philko (Poara Enterprises license) (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
-whizz           // (c) 1989 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+whizz           // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 avengers        //  2/1987 (c) 1987 (US)
 avengers2       //  2/1987 (c) 1987 (US)
 buraiken        //  2/1987 (c) 1987 (Japan)
@@ -6636,6 +6638,7 @@ overdriva       // GX789 (c) 1990
 overdrivb       // GX789 (c) 1990
 gradius3        // GX945 (c) 1989 (World)
 gradius3j       // GX945 (c) 1989 (Japan)
+gradius3js	// GX945 (c) 1989 (Japan, split)
 gradius3a       // GX945 (c) 1989 (Asia)
 
 // Konami 68020 games
@@ -9368,6 +9371,7 @@ missmw96        // (c) 1996 Comad
 smissw          //
 fantsia2        // (c) 1997 Comad
 fantsia2a       // (c) 1997 Comad
+fantsia2n	// (c) 1998 Comad
 wownfant        // (c) 2002 Comad
 pgalvip         // (c) 1996 ACE International (Afega stickers on ROMs)
 pgalvipa        //

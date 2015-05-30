@@ -52,9 +52,11 @@ public:
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_stack_levels(3)
-		, m_bm_page(14)
+		, m_sm_page(14)
 		, m_int_page(12)
 		, m_xami_mask(0xf)
+		, m_sp_mask(0x7<<4)
+		, m_ba_op(0x01)
 	{ }
 
 protected:
@@ -86,29 +88,35 @@ protected:
 
 	int m_icount;
 
-	// fixed settings or mask options
+	// fixed settings or mask options that differ between MCU type
 	int m_prgwidth;         // number of bits and bitmask for ROM/RAM size
 	int m_datawidth;        // "
 	int m_prgmask;          // "
 	int m_datamask;         // "
 
 	UINT8 m_stack_levels;   // 3 levels on MELPS 4, 12 levels on MELPS 41/42
-	UINT8 m_bm_page;        // short BM default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
+	UINT8 m_sm_page;        // subroutine default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
 	UINT8 m_int_page;       // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
 	UINT8 m_xami_mask;      // mask option for XAMI opcode on '40,'41,'45 (0xf for others)
+	UINT16 m_sp_mask;       // SP opcode location(middle 4 bits): 7 on '40 to '46, 3 on '47
+	UINT16 m_ba_op;         // BA opcode location: 1 on '40 to '46, N/A on '47
 
 	// internal state, misc regs
 	UINT16 m_pc;            // program counter (11 or 10-bit)
 	UINT16 m_prev_pc;
-	UINT16 m_stack[12];     // callstack
+	UINT16 m_stack[12];     // callstack (SK0-SKx, same size as PC)
 	UINT16 m_op;
 	UINT16 m_prev_op;
 	UINT8 m_bitmask;        // opcode bit argument
 
+	bool m_sm, m_sms;       // subroutine mode flag + stack
+	bool m_ba_flag;         // temp flag indicates BA opcode was executed
+	UINT8 m_sp_param;       // temp register holding SP opcode parameter
 	UINT8 m_cps;            // DP,CY or DP',CY' selected
 	bool m_skip;            // skip next opcode
 	UINT8 m_inte;           // interrupt enable flag
 	UINT8 m_intp;           // external interrupt polarity ('40 to '44)
+	bool m_prohibit_irq;    // interrupt is prohibited during certain opcodes
 
 	// work registers (unless specified, each is 4-bit)
 	UINT8 m_a;              // accumulator

@@ -747,6 +747,7 @@ void wd_fdc_t::write_track_continue()
 			if (TRACE_STATE) logerror("%s: DATA_LOAD_WAIT_DONE\n", tag());
 			if(drq) {
 				status |= S_LOST;
+				drop_drq();
 				command_end();
 				return;
 			}
@@ -904,11 +905,13 @@ void wd_fdc_t::interrupt_start()
 
 	if(!(command & 0x0f)) {
 		intrq_cond = 0;
+	} else if ((command & 0x0f) > 8) {	// assume I_IMM is set only if condition equal to 8 but not more than, Spectrum's BetaDisk require this
+		intrq_cond = 0;
 	} else {
 		intrq_cond = (intrq_cond & I_IMM) | (command & 0x0f);
 	}
 
-	if(intrq_cond & I_IMM) {
+	if(command & I_IMM) {
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
