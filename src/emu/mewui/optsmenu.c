@@ -41,7 +41,6 @@ ui_menu_game_options::~ui_menu_game_options()
 	std::string error_string;
 	machine().options().set_value(OPTION_GROUPED, m_grouped, OPTION_PRIORITY_CMDLINE, error_string);
 	machine().options().set_value(OPTION_AUDIT_MODE, m_audit, OPTION_PRIORITY_CMDLINE, error_string);
-
 	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
 	save_game_options(machine());
 	mewui_globals::switch_image = true;
@@ -68,7 +67,6 @@ void ui_menu_game_options::handle()
 					(menu_event->iptkey == IPT_UI_RIGHT) ? mewui_globals::actual_filter++ : mewui_globals::actual_filter--;
 					changed = true;
 				}
-
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					int total = mewui_globals::s_filter_text;
@@ -106,14 +104,12 @@ void ui_menu_game_options::handle()
 					machine().inifile().current_category = 0;
 					changed = true;
 				}
-
 				else if (menu_event->iptkey == IPT_UI_RIGHT)
 				{
 					machine().inifile().current_file++;
 					machine().inifile().current_category = 0;
 					changed = true;
 				}
-
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					int total = machine().inifile().ini_index.size();
@@ -134,13 +130,11 @@ void ui_menu_game_options::handle()
 					machine().inifile().current_category--;
 					changed = true;
 				}
-
 				else if (menu_event->iptkey == IPT_UI_RIGHT)
 				{
 					machine().inifile().current_category++;
 					changed = true;
 				}
-
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					int total = machine().inifile().ini_index[machine().inifile().current_file].category.size();
@@ -159,7 +153,6 @@ void ui_menu_game_options::handle()
 					(menu_event->iptkey == IPT_UI_RIGHT) ? c_mnfct::actual++ : c_mnfct::actual--;
 					changed = true;
 				}
-
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, c_mnfct::ui, &c_mnfct::actual)));
 
@@ -171,7 +164,6 @@ void ui_menu_game_options::handle()
 					(menu_event->iptkey == IPT_UI_RIGHT) ? c_year::actual++ : c_year::actual--;
 					changed = true;
 				}
-
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, c_year::ui, &c_year::actual)));
 
@@ -266,7 +258,6 @@ void ui_menu_game_options::populate()
 		convert_command_glyph(fbuff);
 		item_append(fbuff.c_str(), machine().inifile().ini_index[actual_file].category[actual_category].name.c_str(), arrow_flags, (void *)CATEGORY_FILTER);
 	}
-
 	// add manufacturer subitem
 	else if (mewui_globals::actual_filter == FILTER_MANUFACTURER && c_mnfct::ui.size() > 0)
 	{
@@ -279,7 +270,6 @@ void ui_menu_game_options::populate()
 		convert_command_glyph(fbuff);
 		item_append(fbuff.c_str(), c_mnfct::ui[c_mnfct::actual].c_str(), arrow_flags, (void *)MANUFACT_CAT_FILTER);
 	}
-
 	// add year subitem
 	else if (mewui_globals::actual_filter == FILTER_YEAR && c_year::ui.size() > 0)
 	{
@@ -292,7 +282,6 @@ void ui_menu_game_options::populate()
 		convert_command_glyph(fbuff);
 		item_append(fbuff.c_str(), c_year::ui[c_year::actual].c_str(), arrow_flags, (void *)YEAR_CAT_FILTER);
 	}
-
 	// add custom subitem
 	else if (mewui_globals::actual_filter == FILTER_CUSTOM)
 	{
@@ -335,21 +324,17 @@ void ui_menu_game_options::populate()
 
 void ui_menu_game_options::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth = origx2 - origx1;
-
-	// top text
-	std::string topbuf("Settings");
-
-	machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	float width;
+	machine().ui().draw_text_full(container, "Settings", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(maxwidth, width);
+	float maxwidth = MAX(origx2 - origx1, width);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -360,6 +345,6 @@ void ui_menu_game_options::custom_render(void *selectedref, float top, float bot
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	machine().ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, "Settings", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }

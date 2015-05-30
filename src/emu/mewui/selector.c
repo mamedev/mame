@@ -77,7 +77,6 @@ void ui_menu_selector::handle()
 			mewui_globals::switch_image = true;
 			ui_menu::stack_pop(machine());
 		}
-
 		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
 			int buflen = strlen(m_search);
@@ -145,20 +144,20 @@ void ui_menu_selector::populate()
 
 void ui_menu_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth;
+	float width;
 	std::string tempbuf = std::string("Selection List - Search: ").append(m_search).append("_");
 
 	// get the size of the text
 	machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	maxwidth = MAX(width, origx2 - origx1);
+	float maxwidth = MAX(width, origx2 - origx1);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);

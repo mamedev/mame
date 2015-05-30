@@ -33,17 +33,17 @@
 #define OPTION_ICONS_DIRECTORY	  	"icons_directory"
 
 // core misc options
-#define OPTION_DATS_ENABLED		"dats_enabled"
-#define OPTION_REMEMBER_LAST	"remember_last"
-#define OPTION_ENLARGE_SNAPS	"enlarge_snaps"
-#define OPTION_FORCED4X3		"forced4x3"
-#define OPTION_GROUPED			"grouped"
-#define OPTION_AUDIT_MODE		"audit_mode"
-#define OPTION_USE_BACKGROUND	"usebackground"
+#define OPTION_DATS_ENABLED			"dats_enabled"
+#define OPTION_REMEMBER_LAST		"remember_last"
+#define OPTION_ENLARGE_SNAPS		"enlarge_snaps"
+#define OPTION_FORCED4X3			"forced4x3"
+#define OPTION_GROUPED				"grouped"
+#define OPTION_AUDIT_MODE			"audit_mode"
+#define OPTION_USE_BACKGROUND		"usebackground"
 
 // core UI options
-#define OPTION_INFOS_SIZE		"infos_text_size"
-#define OPTION_FONT_ROWS		"font_rows"
+#define OPTION_INFOS_SIZE			"infos_text_size"
+#define OPTION_FONT_ROWS			"font_rows"
 
 #define OPTION_UI_BORDER_COLOR		 	"ui_border_color"
 #define OPTION_UI_BACKGROUND_COLOR	 	"ui_bg_color"

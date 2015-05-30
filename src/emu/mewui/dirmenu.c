@@ -95,7 +95,6 @@ void ui_menu_add_change_folder::handle()
 
 				current_path.substr(0, last_sep);
 			}
-
 			else
 			{
 				// if isn't a drive, appends the directory
@@ -106,7 +105,6 @@ void ui_menu_add_change_folder::handle()
 					else
 						current_path.append(PATH_SEPARATOR).append(pitem.text);
 				}
-
 				else
 					current_path.assign(pitem.text);
 			}
@@ -117,7 +115,6 @@ void ui_menu_add_change_folder::handle()
 
 			reset(UI_MENU_RESET_SELECT_FIRST);
 		}
-
 		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
 			int buflen = strlen(m_search);
@@ -129,7 +126,6 @@ void ui_menu_add_change_folder::handle()
 				*(char *)utf8_previous_char(&m_search[buflen]) = 0;
 				update_selected = TRUE;
 			}
-
 			// if it's any other key and we're not maxed out, update
 			else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
 			{
@@ -137,7 +133,6 @@ void ui_menu_add_change_folder::handle()
 				m_search[buflen] = 0;
 				update_selected = TRUE;
 			}
-
 			// Tab key, save current path
 			else if (menu_event->unichar == 0x09)
 			{
@@ -146,7 +141,6 @@ void ui_menu_add_change_folder::handle()
 				{
 					machine().options().set_value(s_folders_entry[path_ref].option, current_path.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 				}
-
 				else
 				{
 					std::string tmppath = std::string(machine().options().value(s_folders_entry[path_ref].option)).append(";").append(current_path.c_str());
@@ -169,7 +163,6 @@ void ui_menu_add_change_folder::handle()
 					if (item[entry].ref != NULL && m_search != NULL)
 					{
 						int match = 0;
-
 						for (int i = 0; i < ARRAY_LENGTH(m_search); i++)
 						{
 							if (core_strnicmp(item[entry].text, m_search, i) == 0)
@@ -189,7 +182,6 @@ void ui_menu_add_change_folder::handle()
 					if (item[entry].ref != NULL && m_search != NULL)
 					{
 						int match = 0;
-
 						for (int i = 0; i < ARRAY_LENGTH(m_search); i++)
 						{
 							if (core_strnicmp(item[entry].text, m_search, i) == 0)
@@ -205,7 +197,6 @@ void ui_menu_add_change_folder::handle()
 				}
 			}
 		}
-
 		else if (menu_event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
@@ -225,7 +216,6 @@ void ui_menu_add_change_folder::populate()
 	const char *volume_name;
 	file_enumerator path(current_path.c_str());
 	const osd_directory_entry *dirent;
-
 	int folders_count = 0;
 
 	// add the drives
@@ -252,12 +242,10 @@ void ui_menu_add_change_folder::populate()
 
 void ui_menu_add_change_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth = origx2 - origx1;
+	float width, maxwidth = origx2 - origx1;
 	std::string tempbuf[2];
 	const char *s_change = (change) ? "Change" : "Add";
-
 	tempbuf[0].assign(s_change).append(" ").append(s_folders_entry[path_ref].name).append(" Folder - Search: ").append(m_search).append("_");
-
 	tempbuf[1].assign(current_path.c_str());
 
 	// get the size of the text
@@ -270,10 +258,10 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 	}
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -346,9 +334,8 @@ void ui_menu_directory::handle()
 	// process the menu
 	const ui_menu_event *menu_event = process(0);
 
-	if (menu_event != NULL && menu_event->itemref != NULL)
-		if (menu_event->iptkey == IPT_UI_SELECT)
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_display_actual(machine(), container, int((long long)(menu_event->itemref)))));
+	if (menu_event != NULL && menu_event->itemref != NULL && menu_event->iptkey == IPT_UI_SELECT)
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_display_actual(machine(), container, int((long long)(menu_event->itemref)))));
 }
 
 //-------------------------------------------------
@@ -393,20 +380,19 @@ void ui_menu_directory::populate()
 
 void ui_menu_directory::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth;
-	std::string tempbuf("Folder Setup");
+	float width;
 
 	// get the size of the text
-	machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, "Folder Setup", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	maxwidth = MAX(width, origx2 - origx1);
+	float maxwidth = MAX(width, origx2 - origx1);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -417,7 +403,7 @@ void ui_menu_directory::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	machine().ui().draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, "Folder Setup", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }
 
@@ -498,7 +484,7 @@ void ui_menu_display_actual::populate()
 
 void ui_menu_display_actual::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth;
+	float width, maxwidth;
 	maxwidth = origx2 - origx1;
 
 	for (int line = 0; line < folders.size(); line++)
@@ -516,10 +502,10 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 	maxwidth = MAX(width, maxwidth);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = y1 + (machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER);
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = y1 + (machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER);
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -627,20 +613,20 @@ void ui_menu_remove_folder::populate()
 
 void ui_menu_remove_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth;
+	float width;
 	std::string tempbuf = std::string("Remove ").append(s_folders_entry[path_ref].name).append(" Folder");
 
 	// get the size of the text
 	machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	maxwidth = MAX(width, origx2 - origx1);
+	float maxwidth = MAX(width, origx2 - origx1);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
