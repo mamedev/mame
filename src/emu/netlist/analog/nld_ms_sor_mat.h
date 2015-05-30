@@ -20,9 +20,9 @@ class netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N
 {
 public:
 
-	netlist_matrix_solver_SOR_mat_t(const netlist_solver_parameters_t &params, int size)
+	netlist_matrix_solver_SOR_mat_t(const netlist_solver_parameters_t *params, int size)
 		: netlist_matrix_solver_direct_t<m_N, _storage_N>(netlist_matrix_solver_t::GAUSS_SEIDEL, params, size)
-		, m_omega(params.m_sor)
+		, m_omega(params->m_sor)
 		, m_lp_fact(0)
 		, m_gs_fail(0)
 		, m_gs_total(0)

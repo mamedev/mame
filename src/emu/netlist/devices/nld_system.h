@@ -261,12 +261,12 @@ private:
 class nld_base_proxy : public netlist_device_t
 {
 public:
-	ATTR_COLD nld_base_proxy(netlist_logic_t &inout_proxied, netlist_core_terminal_t &proxy_inout)
+	ATTR_COLD nld_base_proxy(netlist_logic_t *inout_proxied, netlist_core_terminal_t *proxy_inout)
 			: netlist_device_t()
 	{
-		m_logic_family = inout_proxied.logic_family();
-		m_term_proxied = &inout_proxied;
-		m_proxy_term = &proxy_inout;
+		m_logic_family = inout_proxied->logic_family();
+		m_term_proxied = inout_proxied;
+		m_proxy_term = proxy_inout;
 	}
 
 	/* ATTR_COLD */ virtual ~nld_base_proxy() {}
@@ -294,8 +294,8 @@ private:
 class nld_a_to_d_proxy : public nld_base_proxy
 {
 public:
-	ATTR_COLD nld_a_to_d_proxy(netlist_logic_input_t &in_proxied)
-			: nld_base_proxy(in_proxied, m_I)
+	ATTR_COLD nld_a_to_d_proxy(netlist_logic_input_t *in_proxied)
+			: nld_base_proxy(in_proxied, &m_I)
 	{
 	}
 
@@ -336,7 +336,7 @@ private:
 class nld_base_d_to_a_proxy : public nld_base_proxy
 {
 public:
-	ATTR_COLD nld_base_d_to_a_proxy(netlist_logic_output_t &out_proxied, netlist_core_terminal_t &proxy_out)
+	ATTR_COLD nld_base_d_to_a_proxy(netlist_logic_output_t *out_proxied, netlist_core_terminal_t *proxy_out)
 			: nld_base_proxy(out_proxied, proxy_out)
 	{
 	}
@@ -359,8 +359,8 @@ private:
 class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 {
 public:
-	ATTR_COLD nld_d_to_a_proxy(netlist_logic_output_t &out_proxied)
-	: nld_base_d_to_a_proxy(out_proxied, m_RV.m_P)
+	ATTR_COLD nld_d_to_a_proxy(netlist_logic_output_t *out_proxied)
+	: nld_base_d_to_a_proxy(out_proxied, &m_RV.m_P)
 	, m_RV(TWOTERM)
 	, m_last_state(-1)
 	, m_is_timestep(false)

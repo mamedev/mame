@@ -170,12 +170,10 @@
 
 class netlist_core_device_t;
 
-#if USE_PMFDELEGATES
-#if NO_USE_PMFCONVERSION
+#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 typedef void (netlist_core_device_t::*net_update_delegate)();
-#else
+#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
 typedef void (*net_update_delegate)(netlist_core_device_t *);
-#endif
 #endif
 
 //============================================================
@@ -312,7 +310,7 @@ class netlist_logic_family_desc_t
 {
 public:
 	virtual ~netlist_logic_family_desc_t() {}
-	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const = 0;
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const = 0;
 
 	nl_double m_low_thresh_V;
 	nl_double m_high_thresh_V;
@@ -482,7 +480,7 @@ public:
 	}
 
 	
-	ATTR_HOT inline void update_dev(const UINT32 mask);
+	ATTR_HOT /* inline */ void update_dev(const UINT32 mask);
 
 protected:
 	/* ATTR_COLD */ virtual void save_register()
@@ -1016,12 +1014,11 @@ public:
 	{
 		begin_timing(stat_total_time);
 		inc_stat(stat_update_count);
-#if USE_PMFDELEGATES
-#if NO_USE_PMFCONVERSION
+
+#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 		(this->*static_update)();
-#else
+#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
 		static_update(this);
-#endif
 #else
 		update();
 #endif
@@ -1059,17 +1056,11 @@ public:
 	ATTR_HOT virtual void step_time(ATTR_UNUSED const nl_double st) { }
 	ATTR_HOT virtual void update_terminals() { }
 
-
-
 #if (NL_KEEP_STATISTICS)
 	/* stats */
 	osd_ticks_t stat_total_time;
 	INT32 stat_update_count;
 	INT32 stat_call_count;
-#endif
-
-#if USE_PMFDELEGATES
-	net_update_delegate static_update;
 #endif
 
 protected:
@@ -1083,6 +1074,9 @@ protected:
 	}
 
 private:
+#if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
+	net_update_delegate static_update;
+#endif
 };
 
 

@@ -99,7 +99,7 @@ public:
 		GAUSS_SEIDEL
 	};
 
-	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t &params);
+	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t *params);
 	/* ATTR_COLD */ virtual ~netlist_matrix_solver_t();
 
 	/* ATTR_COLD */ virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;

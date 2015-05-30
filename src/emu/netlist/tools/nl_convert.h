@@ -11,6 +11,7 @@
 #define NL_CONVERT_H_
 
 #include <cstddef>
+#include <cstdarg>
 
 #include "plib/pstring.h"
 #include "plib/plists.h"
@@ -462,7 +463,7 @@ public:
 
 		void verror(pstring msg, int line_num, pstring line)
 		{
-			m_convert.out("abc");
+			m_convert.out("%s (line %d): %s\n", msg.cstr(), line_num, line.cstr());
 		}
 
 

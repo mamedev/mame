@@ -5,12 +5,12 @@
  *
  */
 
-#include <new>
 #include <cstdio>
 #include <cstring>
 //FIXME:: pstring should be locale free
 #include <cctype>
 #include <cstdlib>
+#include <algorithm>
 
 #include "pstring.h"
 #include "palloc.h"

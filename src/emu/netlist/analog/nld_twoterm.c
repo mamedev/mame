@@ -5,6 +5,8 @@
  *
  */
 
+#include <algorithm>
+
 #include "nld_twoterm.h"
 #include "nld_solver.h"
 
