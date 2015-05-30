@@ -297,7 +297,7 @@ public:
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
 
 	void add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
-
+	void clear_fastram(UINT32 select_start);
 	void mips3drc_set_options(UINT32 options);
 	void mips3drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles);
 
@@ -416,6 +416,9 @@ private:
 		offs_t              end;                        /* end of the RAM block */
 		UINT8               readonly;                   /* TRUE if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
+		UINT8 *             offset_base8;               /* base in memory where the RAM lives, 8-bit pointer, with the start offset pre-applied */
+		UINT16 *            offset_base16;              /* base in memory where the RAM lives, 16-bit pointer, with the start offset pre-applied  */
+		UINT32 *            offset_base32;              /* base in memory where the RAM lives, 32-bit pointer, with the start offset pre-applied  */
 	}       m_fastram[MIPS3_MAX_FASTRAM];
 
 	UINT64 m_debugger_temp;

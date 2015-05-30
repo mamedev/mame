@@ -115,7 +115,7 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 	/* sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette */
-	/* TMS9918 palette */ 
+	/* TMS9918 palette */
 	palette.set_pen_color(64+ 0,   0,   0,   0); // palette.set_pen_color(64+ 0,   0,   0,   0);
 	palette.set_pen_color(64+ 1,   0,   0,   0); // palette.set_pen_color(64+ 1,   0,   0,   0);
 	palette.set_pen_color(64+ 2,   0, 170,   0); // palette.set_pen_color(64+ 2,  33, 200,  66);

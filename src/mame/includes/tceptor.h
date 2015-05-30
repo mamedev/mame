@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:BUT
 #include "sound/dac.h"
 #include "sound/namco.h"

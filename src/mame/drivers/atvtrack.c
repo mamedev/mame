@@ -221,8 +221,9 @@ READ64_MEMBER(atvtrack_state::area2_r)
 				dat = (dat << 8) | 0xc0;
 		}
 		return dat;
-	} else
-		;
+	} else {
+		/* nothing */
+	}
 	return 0;
 }
 
@@ -280,8 +281,9 @@ WRITE64_MEMBER(atvtrack_state::area3_w)
 			data=data >> 8;
 		}
 		m_nandaddressstep = 0;
-	} else
-		;
+	} else {
+		/* nothing */
+	}
 }
 
 READ64_MEMBER(atvtrack_state::area4_r)
@@ -316,8 +318,9 @@ WRITE64_MEMBER(atvtrack_state::area4_w)
 			data = data >> 8;
 		}
 		m_nandaddressstep++;
-	} else
-		;
+	} else {
+		/* nothing */
+	}
 }
 
 READ64_MEMBER(atvtrack_state::ioport_r)

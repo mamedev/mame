@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:Takahiro Nogi, David Haywood
 /******************************************************************************
 
     Gomoku Narabe Renju

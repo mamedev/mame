@@ -25,15 +25,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c8050_device
+// ======================> c8050_t
 
-class c8050_device :  public device_t,
-						public device_ieee488_interface
+class c8050_t :  public device_t,
+					public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c8050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8050_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c8050_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -82,13 +82,13 @@ protected:
 };
 
 
-// ======================> c8250_device
+// ======================> c8250_t
 
-class c8250_device :  public c8050_device
+class c8250_t :  public c8050_t
 {
 public:
 	// construction/destruction
-	c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8250_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -97,13 +97,13 @@ public:
 };
 
 
-// ======================> c8250lp_device
+// ======================> c8250lp_t
 
-class c8250lp_device :  public c8050_device
+class c8250lp_t :  public c8050_t
 {
 public:
 	// construction/destruction
-	c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8250lp_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -113,13 +113,13 @@ public:
 };
 
 
-// ======================> sfd1001_device
+// ======================> sfd1001_t
 
-class sfd1001_device :  public c8050_device
+class sfd1001_t :  public c8050_t
 {
 public:
 	// construction/destruction
-	sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sfd1001_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;

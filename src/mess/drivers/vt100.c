@@ -630,7 +630,7 @@ ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt13
 	ROM_LOAD( "23-096e2-00.e52", 0x0800, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-097e2-00.e45", 0x1000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-098e2-00.e40", 0x1800, 0x0800, NO_DUMP)
-	
+
 	// NEWER vt132 (and STP?) romset
 	ROM_LOAD( "23-180e2-00.e56", 0x0000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-181e2-00.e52", 0x0800, 0x0800, NO_DUMP)

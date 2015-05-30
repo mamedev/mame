@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert, R. Belmont
 /*********************************************************************
 
     ap2_dsk.c

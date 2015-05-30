@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff,R. Belmont,Ryan Holtz
 /* ARM7 core helper Macros / Functions */
 

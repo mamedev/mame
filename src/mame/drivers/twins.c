@@ -286,7 +286,7 @@ ADDRESS_MAP_END
 void twins_state::video_start()
 {
 	m_paloff = 0;
-	
+
 	save_item(NAME(m_paloff));
 	save_item(NAME(m_spritesinit));
 	save_item(NAME(m_spriteswidth));

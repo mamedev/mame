@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari, Curt Coder
 /***************************************************************************
 Lovely Cards/Poker/Pontoon driver, updated by El Condor from work by Uki and

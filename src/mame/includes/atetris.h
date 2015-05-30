@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Zsolt Vasvari, Aaron Giles
 /*************************************************************************
 
     Atari Tetris hardware

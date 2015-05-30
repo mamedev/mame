@@ -1,12 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, Peter Trauner 
+// copyright-holders:Mariusz Wojcieszek, Peter Trauner
 /**********************************************************************
 
     Signetics 2636 video chip
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 
     PVI REGISTER DESCRIPTION
     ------------------------

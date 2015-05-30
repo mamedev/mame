@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wibert Pol
+// copyright-holders:Wilbert Pol
 /********************************************************************
 
 Support for TRS80 .cas cassette images

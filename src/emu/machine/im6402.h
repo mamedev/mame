@@ -4,9 +4,6 @@
 
     Intersil IM6402 Universal Asynchronous Receiver/Transmitter emulation
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
                             _____   _____
                    Vcc   1 |*    \_/     | 40  NOTE

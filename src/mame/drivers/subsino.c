@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood, Angelo Salese, Roberto Fresca.
+// copyright-holders:Luca Elia, David Haywood, Angelo Salese, Roberto Fresca
 /***************************************************************************
 
               -= Subsino's Gambling Games =-

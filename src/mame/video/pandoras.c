@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Manuel Abadia 
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 #include "emu.h"
 #include "includes/pandoras.h"
 #include "video/resnet.h"

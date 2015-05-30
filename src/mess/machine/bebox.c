@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, R.Belmont
+// copyright-holders:Nathan Woods, R. Belmont
 /***************************************************************************
 
     machine/bebox.c

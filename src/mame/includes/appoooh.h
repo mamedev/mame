@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Tatsuyuki Satoh
 #include "sound/msm5205.h"
 

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:Andrew Gardiner, R. Belmont, Ville Linde
+// copyright-holders:Andrew Gardner, R. Belmont, Ville Linde
 /*
     Sega Model 3
     PowerPC 603e + tilemaps + Real3D 1000 + 68000 + 2x SCSP
-    Preliminary driver by Andrew Gardiner, R. Belmont and Ville Linde
+    Preliminary driver by Andrew Gardner, R. Belmont and Ville Linde
 
     Hardware info from Team Supermodel: Bart Trzynadlowski, Ville Linde, and Stefano Teso
 

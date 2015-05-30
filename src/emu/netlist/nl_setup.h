@@ -9,7 +9,6 @@
 #define NLSETUP_H_
 
 #include "nl_base.h"
-//#include "nl_factory.h"
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -23,10 +22,12 @@
 #define ALIAS(_alias, _name)                                                        \
 	setup.register_alias(# _alias, # _name);
 
-//#define NET_NEW(_type)  setup.factory().new_device_by_classname(NETLIB_NAME_STR(_type), setup)
-
 #define NET_REGISTER_DEV(_type, _name)                                              \
 		setup.register_dev(NETLIB_NAME_STR(_type), # _name);
+
+/* to be used to reference new library truthtable devices */
+#define NET_REGISTER_DEV_X(_type, _name)                                            \
+		setup.register_dev(# _type, # _name);
 
 #define NET_REMOVE_DEV(_name)                                                       \
 		setup.remove_dev(# _name);
@@ -69,7 +70,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)                      
 // ----------------------------------------------------------------------------------------
 
 // Forward definition so we keep nl_factory.h out of the public
-class netlist_factory_t;
+class netlist_factory_list_t;
 
 class netlist_setup_t
 {
@@ -146,8 +147,8 @@ public:
 	void namespace_push(const pstring &aname);
 	void namespace_pop();
 
-	netlist_factory_t &factory() { return *m_factory; }
-	const netlist_factory_t &factory() const { return *m_factory; }
+	netlist_factory_list_t &factory() { return *m_factory; }
+	const netlist_factory_list_t &factory() const { return *m_factory; }
 
 	/* not ideal, but needed for save_state */
 	tagmap_terminal_t  m_terminals;
@@ -165,7 +166,7 @@ private:
 	tagmap_link_t   m_links;
 	tagmap_nstring_t m_params_temp;
 
-	netlist_factory_t *m_factory;
+	netlist_factory_list_t *m_factory;
 
 	plist_t<pstring> m_models;
 
@@ -185,6 +186,20 @@ private:
 
 	const pstring resolve_alias(const pstring &name) const;
 	nld_base_proxy *get_d_a_proxy(netlist_core_terminal_t &out);
+
+	template <class T>
+	void remove_start_with(T &hm, pstring &sw)
+	{
+		for (std::size_t i = hm.size() - 1; i >= 0; i--)
+		{
+			pstring x = hm[i]->name();
+			if (sw.equals(x.substr(0, sw.len())))
+			{
+				NL_VERBOSE_OUT(("removing %s\n", hm[i]->name().cstr()));
+				hm.remove(hm[i]);
+			}
+		}
+	}
 };
 
 #endif /* NLSETUP_H_ */

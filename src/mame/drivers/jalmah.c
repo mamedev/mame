@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, Uki
 /*******************************************************************************************
 
 MJ-8956 HW games (c) 1989 Jaleco / NMK / UPL

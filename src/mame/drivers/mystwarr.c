@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Phil Stroffolino, Acho Tang, Nicola Salmoria
+// copyright-holders:R. Belmont, Phil Stroffolino, Acho A. Tang, Nicola Salmoria
 /**************************************************************************
  * Mystic Warrior (c) 1993 Konami
  * Metamorphic Force (c) 1993 Konami
@@ -8,7 +8,7 @@
  * Gaiapolis (c) 1993 Konami
  * Ultimate Battler Dadandarn!! (c) 1993 Konami
  *
- * Driver by R. Belmont, Phil Stroffolino, Acho Tang, and Nicola Salmoria.
+ * Driver by R. Belmont, Phil Stroffolino, Acho A. Tang, and Nicola Salmoria.
  * Assists from Olivier Galibert, Brian Troha, The Guru, and Yasuhiro Ogawa.
  *
  * These games are the "pre-GX" boards, combining features of the previous

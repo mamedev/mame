@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Kevin Thacker, Barry Rodewald 
+// copyright-holders:Kevin Thacker, Barry Rodewald
 /***************************************************************************
 
   machine.c
@@ -1665,7 +1665,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 			else
 				m_exp->romen_w(1);
 		}
-		
+
 		amstrad_setLowerRom();
 		amstrad_setUpperRom();
 
@@ -2387,7 +2387,7 @@ void amstrad_state::amstrad_rethinkMemory()
 			}
 		}
 	}
-	
+
 	/* mappings for other expansion devices */
 	if (m_exp)
 		m_exp->set_mapping();

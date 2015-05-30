@@ -63,7 +63,7 @@ protected:
 	UINT16 m_prev_pc;
 	UINT16 m_npc;           // new bank/page prepared by pset
 	UINT16 m_jpc;           // actual bank/page destination for jumps
-	
+
 	// all work registers are 4-bit
 	UINT8 m_a;              // accumulator
 	UINT8 m_b;              // generic
@@ -92,7 +92,7 @@ protected:
 	inline void inc_x();
 	inline void inc_y();
 	void do_branch(int condition = 1);
-	
+
 	// opcode handlers
 	UINT8 op_inc(UINT8 x);
 	UINT8 op_dec(UINT8 x);

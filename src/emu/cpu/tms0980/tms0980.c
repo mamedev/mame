@@ -7,7 +7,6 @@
   TODO:
   - emulate TMS1600 L-pins
   - fix debugger disasm view
-  - add pinout diagrams for reference
 
 
 The TMS0980 and TMS1000-family MCU cores are very similar. The TMS0980 has a
@@ -140,6 +139,7 @@ unknown cycle: CME, SSE, SSS
 // - the ALU is between the opla and mpla
 const device_type TMS1000 = &device_creator<tms1000_cpu_device>; // 28-pin DIP, 11 R pins
 const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // high voltage version
+const device_type TMS1040 = &device_creator<tms1040_cpu_device>; // same as TMS1070 with just a different pinout?
 const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 // TMS1270 has 10 O pins, how does that work?
 
@@ -174,7 +174,7 @@ const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 
 // - main instructions PLA at the top half, to the right of the midline
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
 // - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
-const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins
+const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
 const device_type TMS1990 = &device_creator<tms1990_cpu_device>; // 28-pin DIP, ? R pins..
 // TMS0950 is same?
 
@@ -228,6 +228,10 @@ tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_typ
 
 tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1000_cpu_device(mconfig, TMS1070, "TMS1070", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1070", __FILE__)
+{ }
+
+tms1040_cpu_device::tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1000_cpu_device(mconfig, TMS1040, "TMS1040", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1040", __FILE__)
 { }
 
 tms1200_cpu_device::tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

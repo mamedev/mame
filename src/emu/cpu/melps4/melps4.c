@@ -3,7 +3,7 @@
 /*
 
   Mitsubishi MELPS 4 MCU family cores
-  
+
   Known types and their features:
   (* means not emulated yet)
 
@@ -15,12 +15,15 @@
  *M58845: 42-pin DIL, 2Kx9 ROM, 128x4 RAM, A/D converter, 2 timers
   M58846: 42-pin DIL, 2Kx9 ROM, 128x4 RAM, 2 timers(not same as M58845), extra I/O ports
  *M58847: 40-pin DIL, 2Kx9 ROM, 128x4 RAM, extra I/O ports(not same as M58846)
-  
+ *M58848: ? (couldn't find info, just that it exists)
+
   MELPS 41/42 subfamily:
 
  *M58494: 72-pin QFP CMOS, 4Kx10 ROM, 32x4 internal + 4Kx4 external RAM, 2 timers
  *M58496: 72-pin QFP CMOS, 2Kx10 ROM, 128x4 internal + 256x4 external RAM, 1 timer, low-power
  *M58497: almost same as M58496
+
+  MELPS 760 subfamily has more differences, document them when needed.
 
 
   References:
@@ -71,19 +74,20 @@ void melps4_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
-	
+
 	// zerofill
 	m_pc = 0;
 	m_prev_pc = 0;
 	memset(m_stack, 0, sizeof(m_stack));
 	m_op = 0;
 	m_prev_op = 0;
+	m_bitmask = 0;
 
 	m_cps = 0;
 	m_skip = false;
 	m_inte = 0;
 	m_intp = 1;
-	
+
 	m_a = 0;
 	m_b = 0;
 	m_e = 0;
@@ -104,6 +108,7 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_stack));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
+	save_item(NAME(m_bitmask));
 
 	save_item(NAME(m_cps));
 	save_item(NAME(m_skip));
@@ -158,7 +163,7 @@ void melps4_cpu_device::device_reset()
 	m_inte = 0;
 	m_intp = 1;
 	op_lcps(); // CPS=0
-	
+
 	m_v = 0;
 	m_w = 0;
 }
@@ -192,6 +197,7 @@ void melps4_cpu_device::execute_run()
 		debugger_instruction_hook(this, m_pc);
 		m_icount--;
 		m_op = m_program->read_word(m_pc << 1) & 0x1ff;
+		m_bitmask = 1 << (m_op & 3);
 		m_pc = (m_pc & ~0x7f) | ((m_pc + 1) & 0x7f); // stays in the same page
 
 		// handle opcode if it's not skipped

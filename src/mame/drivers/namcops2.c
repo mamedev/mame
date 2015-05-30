@@ -17,10 +17,6 @@
       with 2 MB of wave RAM, a 48 kHz sample rate (vs. 44.1 on PS1), and 2
       stereo DMADACs.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
-
 List of Namco System 246 games:
 * Battle Gear 3 (Taito, 2002)
 * Battle Gear 3 Tuned (Taito, 2003)

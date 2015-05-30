@@ -73,7 +73,6 @@ public:
 	netlist_logic_input_t m_BIQ;
 );
 #endif
-NETLIB_DEVICE_DERIVED(7448_dip, 7448,
-);
+NETLIB_DEVICE_DERIVED_PURE(7448_dip, 7448);
 
 #endif /* NLD_7448_H_ */

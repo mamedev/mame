@@ -79,7 +79,7 @@ void dynduke_state::video_start()
 
 	m_fg_layer->set_transparent_pen(15);
 	m_tx_layer->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_back_bankbase));
 	save_item(NAME(m_fore_bankbase));
 	save_item(NAME(m_back_enable));

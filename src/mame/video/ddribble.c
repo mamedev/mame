@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Manuel Abadia 
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
   video.c

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"

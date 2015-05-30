@@ -1,0 +1,22 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+script:
+  make -C build/gmake.linux clean all
+
+branches:
+  only:
+    - master
+
+notifications:
+  email: false
+
+os:
+  - linux
+  - osx
+
+osx_image:
+  xcode61

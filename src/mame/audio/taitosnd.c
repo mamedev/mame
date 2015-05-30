@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Bennett
+// copyright-holders:Philip Bennett
 /**********************************************************************************************
 
     Taito TC0140SYT

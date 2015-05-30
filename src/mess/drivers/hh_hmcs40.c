@@ -2070,7 +2070,7 @@ void eturtles_state::prepare_display()
 WRITE8_MEMBER(eturtles_state::plate_w)
 {
 	m_r[offset] = data;
-	
+
 	// R0x-R6x: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
@@ -2080,7 +2080,7 @@ WRITE8_MEMBER(eturtles_state::plate_w)
 WRITE16_MEMBER(eturtles_state::grid_w)
 {
 	m_d = data;
-	
+
 	// D1-D6: input mux
 	UINT8 inp_mux = data >> 1 & 0x3f;
 	if (inp_mux != m_inp_mux)
@@ -2172,7 +2172,7 @@ INPUT_CHANGED_MEMBER(eturtles_state::input_changed)
 void eturtles_state::machine_start()
 {
 	hh_hmcs40_state::machine_start();
-	
+
 	// register for savestates
 	save_item(NAME(m_cop_irq));
 }

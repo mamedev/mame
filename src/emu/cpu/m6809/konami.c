@@ -6,8 +6,6 @@
 
     Portable Konami cpu emulator
 
-    Copyright Nicola Salmoria and the MAME Team
-
     Based on M6809 cpu core copyright John Butler
 
     References:

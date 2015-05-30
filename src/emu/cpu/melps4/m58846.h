@@ -11,6 +11,8 @@
 
 #include "melps4.h"
 
+// note: for pinout and more info, see melps4.h
+
 
 class m58846_device : public melps4_cpu_device
 {

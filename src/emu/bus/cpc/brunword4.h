@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 /*
 
-	Brunword MK4 - Word processor ROM / expansion
+    Brunword MK4 - Word processor ROM / expansion
 
 */
 
@@ -21,7 +21,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	virtual void set_mapping();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -29,11 +29,10 @@ protected:
 
 private:
 	cpc_expansion_slot_device *m_slot;
-	
+
 	bool m_rombank_active;
 	UINT8 m_bank_sel;
 };
 
 // device type definition
 extern const device_type CPC_BRUNWORD_MK4;
-

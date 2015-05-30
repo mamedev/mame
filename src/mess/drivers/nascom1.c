@@ -72,7 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_01_r);
 	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
-	virtual DECLARE_DRIVER_INIT(nascom);
+	DECLARE_DRIVER_INIT(nascom);
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 	DECLARE_READ8_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
@@ -112,9 +112,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
-
-	virtual DECLARE_DRIVER_INIT(nascom);
-	virtual DECLARE_DRIVER_INIT(nascomc);
+	DECLARE_DRIVER_INIT(nascom2);
+	DECLARE_DRIVER_INIT(nascom2c);
 	UINT32 screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	int load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
@@ -351,9 +350,9 @@ void nascom2_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
 }
 
-DRIVER_INIT_MEMBER( nascom2_state, nascom )
+DRIVER_INIT_MEMBER( nascom2_state, nascom2 )
 {
-	nascom_state::init_nascom();
+	DRIVER_INIT_CALL(nascom);
 
 	// setup nasbus
 	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
@@ -371,7 +370,7 @@ WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( nascom2_state, nascomc )
+DRIVER_INIT_MEMBER( nascom2_state, nascom2c )
 {
 	// install memory
 	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0000 + m_ram->size() - 1, m_ram->pointer());
@@ -773,5 +772,5 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT     COMPANY                  FULLNAME           FLAGS */
 COMP( 1977, nascom1,  0,        0,      nascom1,  nascom1,  nascom_state,  nascom,  "Nascom Microcomputers", "Nascom 1",        GAME_NO_SOUND_HW )
-COMP( 1979, nascom2,  0,        0,      nascom2,  nascom2,  nascom2_state, nascom,  "Nascom Microcomputers", "Nascom 2",        GAME_NO_SOUND_HW )
-COMP( 1980, nascom2c, nascom2,  0,      nascom2c, nascom2c, nascom2_state, nascomc, "Nascom Microcomputers", "Nascom 2 (CP/M)", GAME_NO_SOUND_HW )
+COMP( 1979, nascom2,  0,        0,      nascom2,  nascom2,  nascom2_state, nascom2,  "Nascom Microcomputers", "Nascom 2",        GAME_NO_SOUND_HW )
+COMP( 1980, nascom2c, nascom2,  0,      nascom2c, nascom2c, nascom2_state, nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", GAME_NO_SOUND_HW )

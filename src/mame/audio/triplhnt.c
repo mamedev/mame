@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Stefan Jokish
+// copyright-holders:Derrick Renaud
 /*************************************************************************
 
     audio\triplhnt.c

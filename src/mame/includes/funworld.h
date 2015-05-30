@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Roberto Fresca
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca, Peter Ferrie
 class funworld_state : public driver_device
 {
 public:

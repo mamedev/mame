@@ -277,7 +277,7 @@ void cirrus_gd5428_device::start_bitblt()
 			if(m_blt_mode & 0x80)  // colour expand
 			{
 				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
-				
+
 				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
 					m_blt_source_current++;
@@ -327,7 +327,7 @@ void cirrus_gd5428_device::start_reverse_bitblt()
 			if(m_blt_mode & 0x80)  // colour expand
 			{
 				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
-				
+
 				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't decrement if a pattern (it's only 8 bits)
 					m_blt_source_current--;
@@ -429,7 +429,7 @@ void cirrus_gd5428_device::blit_byte()
 void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
 {
 	UINT8 res = src;
-	
+
 	switch(m_blt_rop)
 	{
 	case 0x00:  // BLACK
@@ -458,7 +458,7 @@ void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
 		if((res & (~m_blt_trans_colour_mask & 0xff)) == ((m_blt_trans_colour & 0xff) & (~m_blt_trans_colour_mask & 0xff)))
 			return;
 	}
-	
+
 	vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = res;
 }
 
@@ -620,13 +620,13 @@ UINT8 cirrus_gd5428_device::cirrus_gc_reg_read(UINT8 index)
 	switch(index)
 	{
 	case 0x00:
-		if(gc_mode_ext & 0x02)
+		if(gc_mode_ext & 0x04)
 			res = vga.gc.set_reset & 0xff;
 		else
 			res = vga.gc.set_reset & 0x0f;
 		break;
 	case 0x01:
-		if(gc_mode_ext & 0x02)
+		if(gc_mode_ext & 0x04)
 			res = vga.gc.enable_set_reset & 0xff;
 		else
 			res = vga.gc.enable_set_reset & 0x0f;
@@ -738,17 +738,11 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 	if(LOG_REG) logerror("CL: GC write %02x to GR%02x\n",data,index);
 	switch(index)
 	{
-	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits
-		if(gc_mode_ext & 0x04)
-			vga.gc.set_reset = data & 0xff;
-		else
-			vga.gc.set_reset = data & 0x0f;
+	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits, however XFree86 does not appear to do this...
+		vga.gc.set_reset = data & 0xff;
 		break;
 	case 0x01:
-		if(gc_mode_ext & 0x04)
-			vga.gc.enable_set_reset = data & 0xff;
-		else
-			vga.gc.enable_set_reset = data & 0x0f;
+		vga.gc.enable_set_reset = data & 0xff;
 		break;
 	case 0x05:
 		vga.gc.shift256 = (data & 0x40) >> 6;
@@ -770,7 +764,7 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 		break;
 	case 0x0b:  // Graphics controller mode extensions
 		gc_mode_ext = data;
-		if(!(data & 0x02))
+		if(!(data & 0x04))
 		{
 			vga.gc.set_reset &= 0x0f;
 			vga.gc.enable_set_reset &= 0x0f;
@@ -1275,7 +1269,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 	UINT8 cur_mode = pc_vga_choosevideomode();
 
 	if(m_blt_system_transfer)
-	{	
+	{
 		if(m_blt_mode & 0x80)  // colour expand
 		{
 			m_blt_system_buffer &= ~(0x000000ff);

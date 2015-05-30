@@ -1,11 +1,11 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Crime Fighters (Konami GX821) (c) 1989 Konami
 
     Preliminary driver by:
-        Manuel Abadia <manu@teleline.es>
+        Manuel Abadia <emumanu+mame@gmail.com>
 
 
     2008-08

@@ -92,9 +92,6 @@ READ8_MEMBER(sns_rom21_device::read_h)
  Byuu's code is released under GNU General Public License
  version 2 as published by the Free Software Foundation.
 
- The implementation below is released under the MAME license
- for use in MAME, MESS and derivatives by permission of Byuu
-
  ***************************************************************************/
 
 static const UINT8 srtc_months[12] =

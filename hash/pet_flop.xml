@@ -14,6 +14,18 @@
 		</part>
 	</software>
 
+	<software name="1001demo">
+		<description>Commodore SFD-1001 Floppy Disk Drive Test/Demo Disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="sfd1001-td-disk.d82" size="1066496" crc="83b12b13" sha1="316fa89b4553ff1d411dc14ffcdd477c1fb284da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2040demov1" cloneof="2040demo">
 		<description>Commodore 2040 Floppy Disk Drive Test/Demo Disk (DOS v1)</description>
 		<year>197?</year>

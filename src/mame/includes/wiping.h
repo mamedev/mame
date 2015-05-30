@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
 class wiping_state : public driver_device
 {
@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	int m_flipscreen;
 	UINT8 *m_soundregs;  // if 0-ed
 	UINT8 m_main_irq_mask;

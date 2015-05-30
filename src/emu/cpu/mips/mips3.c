@@ -1010,8 +1010,7 @@ inline bool mips3_device::RBYTE(offs_t address, UINT32 *result)
 			{
 				continue;
 			}
-			UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			*result = fastbase[tlbaddress ^ m_byte_xor];
+			*result = m_fastram[ramnum].offset_base8[tlbaddress ^ m_byte_xor];
 			return true;
 		}
 		*result = (*m_memory.read_byte)(*m_program, tlbaddress);
@@ -1044,8 +1043,7 @@ inline bool mips3_device::RHALF(offs_t address, UINT32 *result)
 			{
 				continue;
 			}
-			UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			*result = ((UINT16*)fastbase)[(tlbaddress ^ m_word_xor) >> 1];
+			*result = m_fastram[ramnum].offset_base16[(tlbaddress ^ m_word_xor) >> 1];
 			return true;
 		}
 		*result = (*m_memory.read_word)(*m_program, tlbaddress);
@@ -1078,8 +1076,7 @@ inline bool mips3_device::RWORD(offs_t address, UINT32 *result)
 			{
 				continue;
 			}
-			UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			*result = ((UINT32*)fastbase)[tlbaddress >> 2];
+			*result = m_fastram[ramnum].offset_base32[tlbaddress >> 2];
 			return true;
 		}
 		*result = (*m_memory.read_dword)(*m_program, tlbaddress);
@@ -1181,8 +1178,7 @@ inline void mips3_device::WBYTE(offs_t address, UINT8 data)
 			{
 				continue;
 			}
-			UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			fastbase[tlbaddress ^ m_byte_xor] = data;
+			m_fastram[ramnum].offset_base8[tlbaddress ^ m_byte_xor] = data;
 			return;
 		}
 		(*m_memory.write_byte)(*m_program, tlbaddress, data);
@@ -1216,8 +1212,7 @@ inline void mips3_device::WHALF(offs_t address, UINT16 data)
 			{
 				continue;
 			}
-			void *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			((UINT16*)fastbase)[(tlbaddress ^ m_word_xor) >> 1] = data;
+			m_fastram[ramnum].offset_base16[(tlbaddress ^ m_word_xor) >> 1] = data;
 			return;
 		}
 		(*m_memory.write_word)(*m_program, tlbaddress, data);
@@ -1251,8 +1246,7 @@ inline void mips3_device::WWORD(offs_t address, UINT32 data)
 			{
 				continue;
 			}
-			void *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-			((UINT32*)fastbase)[tlbaddress >> 2] = data;
+			m_fastram[ramnum].offset_base32[tlbaddress >> 2] = data;
 			return;
 		}
 		(*m_memory.write_dword)(*m_program, tlbaddress, data);

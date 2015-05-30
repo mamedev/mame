@@ -4,8 +4,6 @@
 
     Harris HC-55516 (and related) emulator
 
-    Copyright Nicola Salmoria and the MAME Team
-
 *****************************************************************************/
 
 #include "emu.h"

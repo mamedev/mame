@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Mike Balfour
+// copyright-holders:Hans Andersson
 /*************************************************************************
 
     audio\sprint2.c

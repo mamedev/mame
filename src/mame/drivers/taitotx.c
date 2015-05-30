@@ -56,7 +56,7 @@
     Zoids Card Colosseum
 
     Taito Type X+ games
-    
+
     Battle Gear 4
     Battle Gear 4 Tuned
     Half Life 2 Survivor
@@ -64,7 +64,7 @@
     War Of The Grail
 
     Taito Type X2 games
-    
+
     Battle Fantasia
     BlazBlue: Calamity Trigger
     BlazBlue: Chrono Phantasma

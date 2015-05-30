@@ -6,9 +6,6 @@
  *  Created on: Jan 20, 2011
  *      Author: Hans Ostermeyer
  *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
- *
  * Contains:
  * - apollo_config.c - APOLLO DS3500 configuration
  * - apollo_csr.c - APOLLO DS3500 CPU Control and Status registers

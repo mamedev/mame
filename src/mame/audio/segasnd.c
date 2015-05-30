@@ -6,9 +6,6 @@
 
     Sound boards for early Sega G-80 based games.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -40,21 +37,21 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void configure_filter(filter_state *state, double r, double c)
+INLINE void configure_filter(g80_filter_state *state, double r, double c)
 {
 	state->capval = 0;
 	state->exponent = 1.0 - exp(-1.0 / (r * c * SAMPLE_RATE));
 }
 
 
-INLINE double step_rc_filter(filter_state *state, double input)
+INLINE double step_rc_filter(g80_filter_state *state, double input)
 {
 	state->capval += (input - state->capval) * state->exponent;
 	return state->capval;
 }
 
 
-INLINE double step_cr_filter(filter_state *state, double input)
+INLINE double step_cr_filter(g80_filter_state *state, double input)
 {
 	double result = (input - state->capval);
 	state->capval += (input - state->capval) * state->exponent;
@@ -276,7 +273,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *ta
 
 void usb_sound_device::device_start()
 {
-	filter_state temp;
+	g80_filter_state temp;
 	int tchan, tgroup;
 
 	/* find the CPU we are associated with */

@@ -1,10 +1,10 @@
-// license:???
-// copyright-holders:Allard Van Der Bas
+// license:BSD-3-Clause
+// copyright-holders:Allard van der Bas
 /***************************************************************************
 
 Shaolin's Road
 
-driver by Allard Van Der Bas
+driver by Allard van der Bas
 
 ***************************************************************************/
 

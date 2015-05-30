@@ -351,7 +351,7 @@ int running_machine::run(bool firstrun)
 		start();
 
 		// load the configuration settings and NVRAM
-		bool settingsloaded = config_load_settings(*this);
+		config_load_settings(*this);
 
 		// disallow save state registrations starting here.
 		// Don't do it earlier, config load can create network
@@ -365,7 +365,7 @@ int running_machine::run(bool firstrun)
 		ui().initialize(*this);
 
 		// display the startup screens
-		ui().display_startup_screens(firstrun, !settingsloaded);
+		ui().display_startup_screens(firstrun, false);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();

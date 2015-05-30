@@ -19,8 +19,6 @@
 //#define IMGUI_API __declspec( dllimport )
 
 //---- Don't implement default handlers for Windows (so as not to link with OpenClipboard() and others Win32 functions)
-#define IMGUI_DISABLE_WIN32_DEFAULT_CLIPBOARD_FUNCS
-#define IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCS
 #define IMGUI_DISABLE_STB_RECT_PACK_IMPLEMENTATION
 #define IMGUI_DISABLE_STB_TRUETYPE_IMPLEMENTATION
 
@@ -30,7 +28,17 @@
 //---- Include imgui_user.h at the end of imgui.h
 //#define IMGUI_INCLUDE_IMGUI_USER_H
 
-//---- Define implicit cast operators to convert back<>forth from your math types and ImVec2/ImVec4.
+//---- Don't implement default handlers for Windows (so as not to link with OpenClipboard() and others Win32 functions)
+#define IMGUI_DISABLE_WIN32_DEFAULT_CLIPBOARD_FUNCS
+#define IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCS
+
+//---- Don't implement help and test window functionality (ShowUserGuide()/ShowStyleEditor()/ShowTestWindow() methods will be empty)
+//#define IMGUI_DISABLE_TEST_WINDOWS
+
+//---- Implement STB libraries in a namespace to avoid conflicts
+//#define IMGUI_STB_NAMESPACE     ImStb
+
+//---- Define constructor and implicit cast operators to convert back<>forth from your math types and ImVec2/ImVec4.
 /*
 #define IM_VEC2_CLASS_EXTRA                                                 \
         ImVec2(const MyVec2& f) { x = f.x; y = f.y; }                       \

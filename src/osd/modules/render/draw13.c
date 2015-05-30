@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont
+// copyright-holders: Couriersud, Olivier Galibert, R. Belmont
 //============================================================
 //
 //  draw13.c - SDL 2.0 drawing implementation
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
+//
+//  SDL 2.0 renderer by Couriersud
 //
 //============================================================
 

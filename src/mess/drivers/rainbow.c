@@ -16,10 +16,10 @@ Issues with this driver:
 
 (1) Keyboard emulation incomplete (fatal; inhibits the system from booting with ERROR 50).
 
-Serial ports do not work, so serial communication failure (ERROR 60) and ERROR 40 (serial 
+Serial ports do not work, so serial communication failure (ERROR 60) and ERROR 40 (serial
 printer interface) result. Unfortunately the BIOS tests all three serial interfaces in line.
 
-(2) while DOS 3 and UCSD systems (fort_sys, pas_sys) + diag disks boot, CPM 2.x and DOS 2.x die 
+(2) while DOS 3 and UCSD systems (fort_sys, pas_sys) + diag disks boot, CPM 2.x and DOS 2.x die
 in secondary boot loader with a RESTORE (seek track 0) when track 2 sector 1 should be loaded.
 
 Writing files to floppy is next to impossible on both CPM 1.x and DOS 3 (these two OS boot
@@ -28,20 +28,20 @@ with keyboard workarounds enabled). File deletion works, so few bytes pass.
 (3) heavy system interaction stalls the driver. Start one of the torture tests on the diag.disk
 and see what happens (system interaction, Z80, about any test except the video / CRT tests).
 
-(4) arbitration chip (E11; in 100-A schematics or E13 in -B) should be dumped. 
-It is a 6308 OTP ROM (2048 bit, 256 x 8) used as a lookup table (LUT) with the address pins (A) 
-used as inputs and the data pins (D) as output. 
+(4) arbitration chip (E11; in 100-A schematics or E13 in -B) should be dumped.
+It is a 6308 OTP ROM (2048 bit, 256 x 8) used as a lookup table (LUT) with the address pins (A)
+used as inputs and the data pins (D) as output.
 
 Plays a role in DMA access to lower memory (limited to 64 K; Extended communication option only).
-Arbiter is also involved in refresh and shared memory contention (affects Z80/8088 CPU cycles). 
+Arbiter is also involved in refresh and shared memory contention (affects Z80/8088 CPU cycles).
 
 => INPUTS on E13 (PC-100 B):
 
 SH5 RF SH REQ H   -> Pin 19 (A7) shared memory request / refresh ?
      1K -> +5 V   -> Pin 18 (A6) < UNUSED >
-SH 2 BDL ACK (L)  -> Pin 17 (A5) BUNDLE OPTION: IRQ acknowledged 
+SH 2 BDL ACK (L)  -> Pin 17 (A5) BUNDLE OPTION: IRQ acknowledged
 SH 2 NONSHRCYC H  -> Pin 5 (A4) unshared memory cycle is in progress
-SH 2 PRECHARGE H  -> Pin 4 (A3) 
+SH 2 PRECHARGE H  -> Pin 4 (A3)
 SH 2 SHMUX 88 ENB -> Pin 3 (A2) shared memory
 SH2 DO REFRESH H  -> Pin 2 (A1) indicates that extended memory must be refreshed -> on J6 as (L)
 SH10 BDL REQ (L)  -> Pin 1 (A0) BUNDLE OPTION wishes to use shared memory
@@ -52,7 +52,7 @@ UPGRADES WORTH EMULATING:
 
 * Color graphics option (uses NEC upd7220 GDC).         REFERENCE: Programmer's Reference: AA-AE36A-TV.
 Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 ? 64 K video RAM. Pallette limited to 4 colors on 100-A.
-Graphics output is independent from monochrome output. 
+Graphics output is independent from monochrome output.
 
 * Extended communication option (occupies BUNDLE_OPTION 1 + 2)  REFERENCE: AA-V172A-TV + Addendum AV-Y890A-TV.
 Two ports, a high-speed RS-422 half-duplex interface (port A) + lower-speed RS-423 full/half-duplex interface
@@ -62,7 +62,7 @@ Uses SHRAM, SHMA, BDL SH WR L, NONSHARED CYCLE. Implementation requires DMA and 
 Can't be added if RD51 hard disk controller present (J4 + J5). For programming info see NEWCOM1.DOC (-> RBETECDOC.ZIP).
 
 
-* ( NO DUMP YET )  PC character set. Enhances Code Blue emulation. Simple CHARACTER ROM replacement? 
+* ( NO DUMP YET )  PC character set. Enhances Code Blue emulation. Simple CHARACTER ROM replacement?
 
 * ( NO DUMP YET )  TCS / Technical Character Set ('$95 from DEC, for Rainbow 100, 100B, 100+ ; separate docs available')
   Source: price list of a DEC reseller. Possibly identical to http://vt100.net/charsets/technical.html
@@ -175,12 +175,12 @@ DIAGNOSTIC-LEDs |J3   | |J2     | |J1    |
 |-------------PCB# 5416206 / 5016205-01C1-------------|
 
 CONNECTORS ("J"):
-	...J5... ...J4... both: RD51 controller (hard disk)
-	...J5... ...J4... both: EXTENDED COMM. controller
+    ...J5... ...J4... both: RD51 controller (hard disk)
+    ...J5... ...J4... both: EXTENDED COMM. controller
 
-	...J6... is the MEMORY OPTION connector (52 pin)
-	...J7... is the GRAPHICS OPTION connector (40 pin)
-	...J9... RX50 FLOPPY CONTROLLER (40 pin; REQUIRED)
+    ...J6... is the MEMORY OPTION connector (52 pin)
+    ...J7... is the GRAPHICS OPTION connector (40 pin)
+    ...J9... RX50 FLOPPY CONTROLLER (40 pin; REQUIRED)
 
 JUMPERS (labeled "W"):
   W5 + W6 are out when 16K x 8 EPROMS are used
@@ -212,7 +212,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 // (2) KEYBOARD_WORKAROUND : also requires FORCE...LOGO (and preliminary headers)
 //#define KEYBOARD_WORKAROUND
-//#define KBD_DELAY 8	 // (debounce delay)
+//#define KBD_DELAY 8    // (debounce delay)
 // ---------------------------------------------------------------------------
 
 
@@ -236,8 +236,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "formats/pc_dsk.h" // PC Formats (TESTING)
 #include "imagedev/flopdrv.h"
 
-#include "imagedev/harddriv.h" 
-#include "machine/wd2010.h"    
+#include "imagedev/harddriv.h"
+#include "machine/wd2010.h"
 
 #include "machine/i8251.h"
 #include "machine/clock.h"
@@ -261,7 +261,7 @@ public:
 		driver_device(mconfig, type, tag),
 
 #ifdef KEYBOARD_WORKAROUND
-#include "./m_kbd1.c"  
+#include "./m_kbd1.c"
 #endif
 
 
@@ -270,9 +270,9 @@ public:
 		m_inp3(*this, "W15"),
 		m_inp4(*this, "W18"),
 		m_inp5(*this, "HARD DISK PRESENT"), // DO NOT CHANGE ORDER (also: COMMUNICATION EXTENSION)
-		m_inp6(*this, "FLOPPY CONTROLLER"), // DO NOT CHANGE ORDER 
-		m_inp7(*this, "GRAPHICS OPTION"),   // DO NOT CHANGE ORDER 
-		m_inp8(*this, "MEMORY PRESENT"),    // DO NOT CHANGE ORDER 
+		m_inp6(*this, "FLOPPY CONTROLLER"), // DO NOT CHANGE ORDER
+		m_inp7(*this, "GRAPHICS OPTION"),   // DO NOT CHANGE ORDER
+		m_inp8(*this, "MEMORY PRESENT"),    // DO NOT CHANGE ORDER
 		m_inp9(*this, "MONITOR TYPE"),
 		m_inp10(*this, "J17"),
 		m_inp11(*this, "CLIKCLOK"),
@@ -283,7 +283,7 @@ public:
 		m_z80(*this, "subcpu"),
 		m_fdc(*this, FD1793_TAG),
 
-		m_hdc(*this, "hdc"),                 
+		m_hdc(*this, "hdc"),
 
 		m_kbd8251(*this, "kbdser"),
 		m_lk201(*this, LK201_TAG),
@@ -312,9 +312,9 @@ public:
 	DECLARE_WRITE8_MEMBER(share_z80_w);
 
 	// 'RD51' MFM CONTROLLER (WD1010) *************************************
-	DECLARE_READ8_MEMBER(hd_status_60_r); // TRI STATE DATA PORT (R/W) 
+	DECLARE_READ8_MEMBER(hd_status_60_r); // TRI STATE DATA PORT (R/W)
 	DECLARE_WRITE8_MEMBER(hd_status_60_w);
- 
+
 	DECLARE_READ8_MEMBER(hd_status_68_r); // EXTRA REGISTER 0x68 (R/W 8088)
 	DECLARE_WRITE8_MEMBER(hd_status_68_w);
 
@@ -364,9 +364,9 @@ public:
 
 	DECLARE_READ8_MEMBER(rtc_w);
 
-	
+
 #ifdef KEYBOARD_WORKAROUND
-#include "./port9x_Ax.c" 
+#include "./port9x_Ax.c"
 #endif
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -381,22 +381,22 @@ protected:
 private:
 	enum
 	{   // LOWEST PRIORITY
-		// Mnemonic - - - - - -  TYPE  ADDRESS - Source  
+		// Mnemonic - - - - - -  TYPE  ADDRESS - Source
 		//                      [1][0]  [1][0] <= Depends on DTR(L) output of keyboard PUSART (on Rainbow-100 B)
 		IRQ_8088_MAILBOX = 0, // 27/A7  9C/29C  - [built-in] Interrupt from Z80A
 		IRQ_8088_KBD,         // 26/A6  98/298  - [built-in] KEYBOARD Interrupt - 8251A
 		IRQ_BDL_INTR_L,       // 25/A5  94/294  - [ext. BUNDLE OPTION] Hard disk or Extended communication IRQ (no DMA)
-	 // IRQ_COMM_PTR_INTR_L,  // 24/A4  90/290  - [built-in 7201] Communication/Printer interrupt
-	 // IRQ_DMAC_INTR_L,      // 23/A3  8C/28C  - [ext. COMM.BOARD only] - external DMA Controller (8237) interrupt
-	 // IRQ_GRF_INTR_L,       // 22/A2  88/288  - [ext. COLOR GRAPHICS]
-	 // IRQ_BDL_INTR_1L,      // 21/A1  84/284  - [ext. COMM.BOARD only] 
+		// IRQ_COMM_PTR_INTR_L,  // 24/A4  90/290  - [built-in 7201] Communication/Printer interrupt
+		// IRQ_DMAC_INTR_L,      // 23/A3  8C/28C  - [ext. COMM.BOARD only] - external DMA Controller (8237) interrupt
+		// IRQ_GRF_INTR_L,       // 22/A2  88/288  - [ext. COLOR GRAPHICS]
+		// IRQ_BDL_INTR_1L,      // 21/A1  84/284  - [ext. COMM.BOARD only]
 		IRQ_8088_VBL,         // 20/A0  80/280  - [built-in DC012] - VERT INTR L (= schematics)
-		IRQ_8088_NMI          // 02/02  08/08   - [external MEMORY EXTENSION] - PARITY ERROR L 
+		IRQ_8088_NMI          // 02/02  08/08   - [external MEMORY EXTENSION] - PARITY ERROR L
 	};  // HIGHEST PRIORITY
 
-	
+
 #ifdef KEYBOARD_WORKAROUND
-#include "./m_kbd2.c" 
+#include "./m_kbd2.c"
 #endif
 
 	required_ioport m_inp1;
@@ -416,7 +416,7 @@ private:
 	required_device<cpu_device> m_z80;
 
 	required_device<fd1793_t> m_fdc;
-	optional_device<wd2010_device> m_hdc; 
+	optional_device<wd2010_device> m_hdc;
 
 	required_device<i8251_device> m_kbd8251;
 	required_device<lk201_device> m_lk201;
@@ -468,10 +468,10 @@ private:
 	int m_irq_high;
 	UINT32 m_irq_mask;
 
-	int m_bdl_irq; 
+	int m_bdl_irq;
 	int m_hdc_buf_offset;
 
-	bool m_hdc_index_latch; 
+	bool m_hdc_index_latch;
 	bool m_hdc_step_latch;
 	int m_hdc_direction;
 	bool m_hdc_track0;
@@ -491,7 +491,7 @@ FLOPPY_IMD_FORMAT,
 FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-// initially only : SLOT_INTERFACE("525qd", FLOPPY_525_SSQD)  
+// initially only : SLOT_INTERFACE("525qd", FLOPPY_525_SSQD)
 static SLOT_INTERFACE_START(rainbow_floppies)
 SLOT_INTERFACE("525qd0", FLOPPY_525_SSQD)
 SLOT_INTERFACE("525qd1", FLOPPY_525_SSQD)
@@ -584,7 +584,7 @@ AM_RANGE(0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
 // 0x02 Communication status / control register (8088)
 AM_RANGE(0x02, 0x02) AM_READWRITE(comm_control_r, comm_control_w)
 
-AM_RANGE(0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w) 
+AM_RANGE(0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w)
 
 // TODO: unmapped [06] : Communication bit rates (see page 21 of PC 100 SPEC)
 
@@ -592,7 +592,7 @@ AM_RANGE(0x08, 0x08) AM_READ(system_parameter_r)
 
 AM_RANGE(0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
 
-AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w) 
+AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
 
 // TODO: unmapped [0e] : PRINTER BIT RATE REGISTER (WO)
 
@@ -609,7 +609,7 @@ AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w
 // 0x20 -> 0x2f ***** EXTENDED COMM. OPTION / Option Select 1.
 // See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
 // ===========================================================
-// 0x30 -> 0x3f ***** Option Select 3 
+// 0x30 -> 0x3f ***** Option Select 3
 // ===========================================================
 // 0x40  COMMUNICATIONS DATA REGISTER (MPSC)
 // 0x41  PRINTER DATA REGISTER (MPSC)
@@ -647,7 +647,7 @@ AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // ===========================================================
 // THE RD51 CONTROLLER:
 // - WD1010AL - 00 (WDC '83)
-// + 2 K x 8 SRAM (SY2128-4 or Japan 8328) 21-17872-01 
+// + 2 K x 8 SRAM (SY2128-4 or Japan 8328) 21-17872-01
 // + 74(L)Sxxx glue logic (drive/head select, buffers etc.)
 // + 10 Mhz Quartz (/2)
 // SERVICE JUMPERS (not to be removed for normal operation):
@@ -665,26 +665,26 @@ AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // DEC RD53(67 Mbyte); 1024 cyl.8 heads -- 1325 [!]
 // [!] More than 4 heads. Prepare with WUTIL and / or DSKPREP.
 
-// SIZE RESTRICTIONS 
+// SIZE RESTRICTIONS
 // * HARDWARE:
-//      WD1010 controller has a built-in limit of 8 heads / 1024 cylinders. 
+//      WD1010 controller has a built-in limit of 8 heads / 1024 cylinders.
 // * BOOT LOADERS:
 //   - the DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB.
 //   - the custom boot loader that comes with 'WUTIL 3.2' allows 117 MB and 8 surfaces.
 // * SOFTWARE:
-//   - MS-DOS 2 allows a maximum partition size of 16 MB (sizes > 15 MB are incompatible to DOS 3) 
+//   - MS-DOS 2 allows a maximum partition size of 16 MB (sizes > 15 MB are incompatible to DOS 3)
 //     [ no more than 4 partitions of 8 MB size on one hard disk possible ]
 //   - MS-DOS 3 - and Concurrent CPM - have a global 32 MB (1024 cylinder) limit
 //   - a CP/M-86-80 partition can have up to 8 MB (all CP/M partitions together must not exceed 10 MB)
 // ===========================================================
-// 0x70 -> 0x7f ***** Option Select 4 
+// 0x70 -> 0x7f ***** Option Select 4
 // ===========================================================
 // 0x10c
 AM_RANGE(0x10c, 0x10c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
 
 
 #ifdef KEYBOARD_WORKAROUND
-#include "./am_range_9x_Ax.c" 
+#include "./am_range_9x_Ax.c"
 #endif
 
 ADDRESS_MAP_END
@@ -778,7 +778,7 @@ PORT_DIPNAME(0x08, 0x08, "W15 (FACTORY TEST C, LEAVE OFF)") PORT_TOGGLE
 PORT_DIPSETTING(0x08, DEF_STR(Off))
 PORT_DIPSETTING(0x00, DEF_STR(On))
 
-PORT_START("W18") // DSR = 1 when switch is OFF - see i8251.c 
+PORT_START("W18") // DSR = 1 when switch is OFF - see i8251.c
 PORT_DIPNAME(0x01, 0x00, "W18 (FACTORY TEST D, LEAVE OFF) (8251A: DSR)") PORT_TOGGLE
 PORT_DIPSETTING(0x00, DEF_STR(Off))
 PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -808,22 +808,22 @@ void rainbow_state::machine_reset()
 	// BIOS can't handle soft resets (would trigger ERROR 16).
 	// As a fallback, execute a hard reboot!
 	if (COLD_BOOT == 2)
-	{		// FIXME: ask for confirmation (via UI ?)
+	{       // FIXME: ask for confirmation (via UI ?)
 			device().machine().schedule_hard_reset();
 	}
 
 	/* *****************************************************************************************************************
 	    Suitable Solutions ClikClok (one of the more compatible battery backed real time clocks)
 
-		DESCRIPTION: plugs into NVRAM chip socket on a 100-A and into one of the (EP)ROM sockets on the 100-B 
-		............ (there is a socket on the ClikClok for the NVRAM / EPROM chip).  
+	    DESCRIPTION: plugs into NVRAM chip socket on a 100-A and into one of the (EP)ROM sockets on the 100-B
+	    ............ (there is a socket on the ClikClok for the NVRAM / EPROM chip).
 
-		DS1315 phantom clock. No address space needed (-> IRQs must be disabled to block ROM accesses during reads).
+	    DS1315 phantom clock. No address space needed (-> IRQs must be disabled to block ROM accesses during reads).
 
-		DRIVERS: 'rbclik.zip' DOS and CP/M binaries plus source from DEC employee; Reads & displays times. Y2K READY. 
-		+ 'newclk.arc' (Suitable Solutions; sets time and date; uses FE000 and up). 2 digit year here.
+	    DRIVERS: 'rbclik.zip' DOS and CP/M binaries plus source from DEC employee; Reads & displays times. Y2K READY.
+	    + 'newclk.arc' (Suitable Solutions; sets time and date; uses FE000 and up). 2 digit year here.
 
-		TODO: obtain hardware / check address decoders. Access logic here is derived from Vincent Esser's source.
+	    TODO: obtain hardware / check address decoders. Access logic here is derived from Vincent Esser's source.
 	*****************************************************************************************************************/
 
 	// * Reset RTC to a defined state *
@@ -833,7 +833,7 @@ void rainbow_state::machine_reset()
 
 	// A magic pattern enables reads or writes (-> RTC_WRITE_DATA_0 / RTC_WRITE_DATA_1)
 	// 64 bits read from two alternating addresses (see DS1315.C)
-	#define RTC_PATTERN_0 0xFC100 // MIRROR: FE100 
+	#define RTC_PATTERN_0 0xFC100 // MIRROR: FE100
 	#define RTC_PATTERN_1 0xFC101 // MIRROR: FE101
 	program.install_read_handler(RTC_PATTERN_0, RTC_PATTERN_1, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_enable), this));
 	program.install_read_handler(RTC_PATTERN_0 + 0x2000, RTC_PATTERN_1 + 0x2000, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_enable2), this));
@@ -844,11 +844,11 @@ void rainbow_state::machine_reset()
 	program.install_read_handler(RTC_READ_DATA + 0x2000, RTC_READ_DATA + 0x2000, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_r2), this));
 
 	// * Secretly transmit data to RTC (set time / date) *  Works only if magic pattern enabled RTC. Look ma, no writes!
-	#define RTC_WRITE_DATA_0 0xFE000 
+	#define RTC_WRITE_DATA_0 0xFE000
 	#define RTC_WRITE_DATA_1 0xFE001
 	program.install_read_handler(RTC_WRITE_DATA_0, RTC_WRITE_DATA_1, 0, 0, read8_delegate(FUNC(rainbow_state::rtc_w), this));
 
-	m_rtc->chip_reset(); 
+	m_rtc->chip_reset();
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
 
 
@@ -856,14 +856,14 @@ void rainbow_state::machine_reset()
 	{
 		COLD_BOOT = 2;
 		m_crtc->MHFU(-100); // reset MHFU counter
-	}  
+	}
 
 	//  *********** HARD DISK CONTROLLER...
 	if (m_inp5->read() == 0x01) // ...PRESENT?
-	{  
+	{
 		// Install 8088 read / write handler
 		address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
-		io.unmap_readwrite(0x60, 0x60); 
+		io.unmap_readwrite(0x60, 0x60);
 		io.install_read_handler(0x60, 0x60, read8_delegate(FUNC(rainbow_state::hd_status_60_r), this));
 		io.install_write_handler(0x60, 0x60, write8_delegate(FUNC(rainbow_state::hd_status_60_w), this));
 
@@ -933,12 +933,12 @@ void rainbow_state::machine_reset()
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
-	// Suppress display when accessing floppy (switch to 'smooth scroll' when working with DOS, please)!
-	if (MOTOR_DISABLE_counter) // IF motor running...
-	{
-		if (m_p_vol_ram[0x84] == 0x00) // IF jump scroll
-			return 0;
-	}
+    // Suppress display when accessing floppy (switch to 'smooth scroll' when working with DOS, please)!
+    if (MOTOR_DISABLE_counter) // IF motor running...
+    {
+        if (m_p_vol_ram[0x84] == 0x00) // IF jump scroll
+            return 0;
+    }
 */
 	m_crtc->palette_select(m_inp9->read());
 
@@ -952,7 +952,7 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 // Interrupt handling and arbitration.  See 3.1.3.8 OF PC-100 spec.
 void rainbow_state::update_8088_irqs()
 {
-	static const int vectors[] = { 0x27, 0x26, 0x25, 0x20 }; 
+	static const int vectors[] = { 0x27, 0x26, 0x25, 0x20 };
 
 	if (m_irq_mask != 0)
 	{
@@ -983,7 +983,7 @@ void rainbow_state::lower_8088_irq(int ref)
 	update_8088_irqs();
 }
 
-// Only Z80 * private SRAM * is wait state free 
+// Only Z80 * private SRAM * is wait state free
 // (= fast enough to allow proper I/O to the floppy)
 
 // Shared memory is contended by refresh, concurrent
@@ -1045,22 +1045,22 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 
 // ------------------------ClikClok (for model B; DS1315)  ---------------------------------
 #define RTC_RESET_MACRO  m_rtc->chip_reset(); \
-	                     UINT8 *rom = memregion("maincpu")->base();
+							UINT8 *rom = memregion("maincpu")->base();
 
 #define RTC_ENABLE_MACRO \
-  if (m_inp11->read() == 0x01) \
-  {										     \
-	if (offset & 1)						     \
+	if (m_inp11->read() == 0x01) \
+	{                                            \
+	if (offset & 1)                          \
 		m_rtc->read_1(space, 0);             \
 	else                                     \
-	   m_rtc->read_0(space, 0);              \
-  }                                          \
-  UINT8 *rom = memregion("maincpu")->base(); 
+		m_rtc->read_0(space, 0);              \
+	}                                          \
+	UINT8 *rom = memregion("maincpu")->base();
 
 #define RTC_READ_MACRO \
-  if (m_rtc->chip_enable() && (m_inp11->read() == 0x01))  \
-      return (m_rtc->read_data(space, 0) & 0x01);         \
-  UINT8 *rom = memregion("maincpu")->base();
+	if (m_rtc->chip_enable() && (m_inp11->read() == 0x01))  \
+		return (m_rtc->read_data(space, 0) & 0x01);         \
+	UINT8 *rom = memregion("maincpu")->base();
 
 // *********** RTC RESET **************
 READ8_MEMBER(rainbow_state::rtc_reset)
@@ -1078,7 +1078,7 @@ READ8_MEMBER(rainbow_state::rtc_reset2)
 // *********** RTC ENABLE **************
 READ8_MEMBER(rainbow_state::rtc_enable)
 {
-    RTC_ENABLE_MACRO
+	RTC_ENABLE_MACRO
 	return rom[RTC_PATTERN_0 + offset];
 }
 
@@ -1151,13 +1151,13 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 
 	if (m_inp5->read() != 0x01) // ...PRESENT?
 		return NULL;
-		
+
 	if (drv != 0)
 		return NULL;
 
 	harddisk_image_device *img = NULL;
-	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("harddisk1").c_str()));		
-	
+	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("harddisk1").c_str()));
+
 	if (!img)
 		return NULL;
 
@@ -1188,7 +1188,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	}
 }
 
-// LBA sector from CHS 
+// LBA sector from CHS
 static UINT32 get_and_print_lbasector(hard_disk_info *info, UINT16 cylinder, UINT8 head, UINT8 sector_number)
 {
 	if (info == NULL)
@@ -1242,7 +1242,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 					// Pointer to info + C + H + S
 					UINT32 lbasector = get_and_print_lbasector(info, cylinder, SDH & 0x07, sector_number);
 
-					if ((cylinder <= info->cylinders) &&						  // filter invalid ranges
+					if ((cylinder <= info->cylinders) &&                          // filter invalid ranges
 						(SECTOR_SIZES[(SDH >> 5) & 0x03] == info->sectorbytes)    // may not vary in image!
 						)
 					{
@@ -1261,8 +1261,8 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 			if (read_status != 0)
 			{
 				logerror("...** READ FAILED WITH STATUS %u ** (CYLINDER %u - HEAD %u - SECTOR # %u - SECTOR_SIZE %u ) ***\n",
-					                          read_status, cylinder, SDH & 0x07, sector_number, SECTOR_SIZES[(SDH >> 5) & 0x03]
-					   ) ;
+												read_status, cylinder, SDH & 0x07, sector_number, SECTOR_SIZES[(SDH >> 5) & 0x03]
+						) ;
 			}
 
 		} //   (on BCS 1 -> 0)
@@ -1308,14 +1308,14 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 
 		// CHD WRITE FAILURES  or  UNMOUNTED HARDDSIK TRIGGER A PERMANENT ERROR.
 		if (success < 50)
-			m_hdc_write_fault = true; // reset only by HDC RESET! 
+			m_hdc_write_fault = true; // reset only by HDC RESET!
 	}
 
 	wg_last = state;  // remember state
 }
 
 
-// Initiated by 'hdc_write_sector' (below) 
+// Initiated by 'hdc_write_sector' (below)
 // - in turn invoked by a WG: 1 -> 0 transit.
 // STATUS CODES:
 //   0 = DEFAULT ERROR (no HARD DISK FILE ?)
@@ -1324,7 +1324,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 //  50 = SANITY CHECK FAILED (cylinder limit / <> 512 sectors?)
 
 //  88 = (LOW LEVEL) WRITE/FORMAT (sector_count != 1 IGNORED)
-//  99 = SUCCESS : SECTOR WRITTEN 
+//  99 = SUCCESS : SECTOR WRITTEN
 
 // * RELIES * ON THE FACT THAT THERE WILL BE NO MULTI SECTOR TRANSFERS (!)
 int rainbow_state::do_write_sector()
@@ -1352,7 +1352,7 @@ int rainbow_state::do_write_sector()
 			int sector_number = m_hdc->read(space(AS_PROGRAM), 0x03);
 			int sector_count = m_hdc->read(space(AS_PROGRAM), 0x02); // (1 = single sector)
 
-			if (!((cylinder <= info->cylinders) &&					   // filter invalid cylinders
+			if (!((cylinder <= info->cylinders) &&                     // filter invalid cylinders
 				(SECTOR_SIZES[(SDH >> 5) & 0x03] == info->sectorbytes) // 512, may not vary
 				))
 			{
@@ -1364,7 +1364,7 @@ int rainbow_state::do_write_sector()
 			// Pointer to info + C + H + S
 			UINT32 lbasector = get_and_print_lbasector(info, cylinder, SDH & 0x07, sector_number);
 
-			if (sector_count != 1) // ignore all SECTOR_COUNTS != 1 
+			if (sector_count != 1) // ignore all SECTOR_COUNTS != 1
 			{
 				logerror(" - ** IGNORED (SECTOR_COUNT !=1) **\n");
 				return 88; // BAIL OUT
@@ -1397,7 +1397,7 @@ READ8_MEMBER(rainbow_state::hd_status_60_r)
 	if (m_hdc_buf_offset >= 1024) // 1 K enforced by controller
 	{
 		m_hdc_buf_offset = 0;
-		m_hdc->buffer_ready(true);  
+		m_hdc->buffer_ready(true);
 	}
 	return data;
 }
@@ -1412,13 +1412,13 @@ WRITE8_MEMBER(rainbow_state::hd_status_60_w)
 	if (m_hdc_buf_offset >= 1024) // 1 K enforced by controller
 	{
 		m_hdc_buf_offset = 0;
-		m_hdc->buffer_ready(true); 
+		m_hdc->buffer_ready(true);
 	}
 }
 
 
 // Secondary Command / Status Registers(68H) is...
-//   (A) a write - only register for commands  
+//   (A) a write - only register for commands
 //   (B) a read - only register for status signals
 // Holds the status of the following signals:
 // - 3 hard-wired controller module identification bits.
@@ -1426,8 +1426,8 @@ WRITE8_MEMBER(rainbow_state::hd_status_60_w)
 // - disk drive(latched status signals)
 READ8_MEMBER(rainbow_state::hd_status_68_r)
 {
-	// (*) Bits 5-7 : HARD WIRED IDENTIFICATION BITS, bits 5+7 = 1 and bit 6 = 0  (= 101 für RD51 module)
-	int data = 0xe0; // 111 gives DRIVE NOT READY (when W is pressed on boot screen) 
+	// (*) Bits 5-7 : HARD WIRED IDENTIFICATION BITS, bits 5+7 = 1 and bit 6 = 0  (= 101 f?r RD51 module)
+	int data = 0xe0; // 111 gives DRIVE NOT READY (when W is pressed on boot screen)
 	if ((m_inp5->read() == 0x01) && (rainbow_hdc_file(0) != NULL))
 		data = 0xa0; // A0 : OK, DRIVE IS READY (!)
 
@@ -1439,27 +1439,27 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 	// Bit 4 : SEEK COMPLETE: This status bit indicates that the disk drive positioned the R/W heads over the desired track on the disk surface.
 
 	// (ALT.TEXT): "Seek Complete - When this signal from the disk drive goes low(0), it indicates that the R /W heads settled on the correct track.
-	// Writing is inhibited until this signal goes low(0).  Seek complete is high(1) during normal seek	operation.
+	// Writing is inhibited until this signal goes low(0).  Seek complete is high(1) during normal seek operation.
 	if (stat & 16) // SEEK COMPLETE (bit 4)?
 		data |= 16;
 
 	// Bit 3 : DIRECTION : This bit indicates the direction the read/write heads in the disk
-	//					   drive will move when the WD1010 chip issues step pulse(s). When high(1), the R / W heads will move toward the spindle.
-	//				       When low (0), the heads will move away from the spindle, towards track O.
+	//                     drive will move when the WD1010 chip issues step pulse(s). When high(1), the R / W heads will move toward the spindle.
+	//                     When low (0), the heads will move away from the spindle, towards track O.
 	if (m_hdc_direction)
 		data |= 8;
 
 	// Bit 2 :  LATCHED STEP PULSE: This status bit from the step pulse latch indicates if the WD1010
-	//	            chip issued a step pulse since the last time the 8088 processor cleared the step pulse latch.
+	//              chip issued a step pulse since the last time the 8088 processor cleared the step pulse latch.
 	if (m_hdc_step_latch)
 		data |= 4;
 
 	// Bit 1 :  LATCHED INDEX : This status bit from the index latch indicates if the disk drive
-	//		            encountered an index mark since the last time the 8088 processor cleared the index latch.
+	//                  encountered an index mark since the last time the 8088 processor cleared the index latch.
 	if (m_hdc_index_latch)
 		data |= 2;
 
-	// Bit 0 :  CTRL BUSY : indicates that the WD 1010 chip is accessing the sector buffer. When this bit is set, 
+	// Bit 0 :  CTRL BUSY : indicates that the WD 1010 chip is accessing the sector buffer. When this bit is set,
 	//          the 8088 cannot access the WD 1010 registers.
 	if (stat & 128) // BUSY (bit 7)?
 		data |= 1;
@@ -1468,7 +1468,7 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 }
 
 
-// 68 (WRITE): Secondary Command Registers (68H) - - ERKLÄRUNG: "write-only register for commands" 
+// 68 (WRITE): Secondary Command Registers (68H) - - ERKL?RUNG: "write-only register for commands"
 // - see TABLE 4.8 (4-24)
 WRITE8_MEMBER(rainbow_state::hd_status_68_w)
 {
@@ -1550,15 +1550,15 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 
 	if (m_hdc_write_gate) // WRITE GATE (cached here)
 		data |= 16;
-	
+
 	if (m_hdc_write_fault)
 		data |= 32;
 
 	if (m_hdc_drive_ready)
-		data |= 64; 
+		data |= 64;
 
 	// Fake TRACK 0 signal  (normally FROM DRIVE)
-	m_hdc_track0 = false; // Set a default 
+	m_hdc_track0 = false; // Set a default
 
 	int stat1 = m_hdc->read(space, 0x04); // CYL LO
 	int stat2 = m_hdc->read(space, 0x05); // CYL HI
@@ -1598,7 +1598,7 @@ READ_LINE_MEMBER(rainbow_state::hdc_write_fault)
 	return m_hdc_write_fault;
 }
 
-// Buffer counter reset when BCR goes from 0 -> 1 
+// Buffer counter reset when BCR goes from 0 -> 1
 WRITE_LINE_MEMBER(rainbow_state::hdc_bcr)
 {
 	static int bcr_state;
@@ -1613,7 +1613,7 @@ void rainbow_state::hdc_buffer_counter_reset()
 	m_hdc_buf_offset = 0;
 }
 
-// DATA REQUEST - When high (..) initiates data transfers 
+// DATA REQUEST - When high (..) initiates data transfers
 // to or from the sector buffer. On a READ, this signal
 // goes high AFTER the sector buffer is filled.
 
@@ -1644,7 +1644,7 @@ void rainbow_state::update_bundle_irq()
 		lower_8088_irq(IRQ_BDL_INTR_L);
 
 		if (m_inp5->read() == 0x01)
-			hdc_buffer_counter_reset(); 
+			hdc_buffer_counter_reset();
 	}
 	else
 	{
@@ -1686,14 +1686,14 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 
 	B : no separation between the 2 available 'bundle cards' (HD controller / COMM.OPTION) ?
 
-	M : old RAM extension (128 / 192 K ?) detected with OPTION_PRESENT bit, newer models 'by presence'. 
+	M : old RAM extension (128 / 192 K ?) detected with OPTION_PRESENT bit, newer models 'by presence'.
 	    BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
 	*/
 	return  (((m_inp5->read() == 1) ? 0 : 1) |
 		((m_inp6->read() == 1) ? 0 : 2) |
 		((m_inp7->read() == 1) ? 0 : 4) |
 		((m_inp8->read() > BOARD_RAM) ? 0 : 8)
-		//				16 | 32 | 64 | 128 // to be verified.
+		//              16 | 32 | 64 | 128 // to be verified.
 		);
 }
 
@@ -1709,7 +1709,7 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 	*/
 	int data = 0;
 	if (COLD_BOOT == 2)
-		data = 0; 	// During boot phase 2, never enable MHFU (prevents errors).
+		data = 0;   // During boot phase 2, never enable MHFU (prevents errors).
 	else
 	{
 		data = m_crtc->MHFU(1);
@@ -1831,8 +1831,8 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 
 	int track = 0;
 	int fdc_step = 0;
-	int	fdc_ready = 0;
-	int	tk00 = 0;
+	int fdc_ready = 0;
+	int tk00 = 0;
 	int fdc_write_gate = 0;
 	int last_dir = 0;
 
@@ -1860,7 +1860,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 			last_dir = 1;      // correct?
 		else
 			last_dir = 0;
-		
+
 		if (fdc_ready == 1)
 		printf(" RDY:1 "); // TEST-DEBUG
 		else
@@ -1875,7 +1875,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 		printf(" TK00=0 "); // TEST-DEBUG
 		else
 		printf(" TK00=1 "); // TEST-DEBUG
-		
+
 	}
 
 	int data = (
@@ -1909,12 +1909,12 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 	{
 		// D7: DRQ: reflects status of DATA REQUEST signal from FDC.
 		// '1' indicates that FDC has read data OR requires new write data.
-		data |= m_fdc->drq_r() ? 0x80 : 0x00;  
+		data |= m_fdc->drq_r() ? 0x80 : 0x00;
 
 		// D6: IRQ: indicates INTERRUPT REQUEST signal from FDC. Indicates that a
 		//          status bit has changed. Set to 1 at the completion of any
 		//          command (.. see page 207 or 5-25).
-		data |= m_fdc->intrq_r() ? 0x40 : 0x00; 
+		data |= m_fdc->intrq_r() ? 0x40 : 0x00;
 
 		// D5: SIDE 0H: status of side select signal at J2 + J3 of RX50 controller.
 		//              For 1 sided drives, this bit will always read low (0).
@@ -1935,7 +1935,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 	if (track > 43)
 		data = data & (255 - 4);
 	else
-		data = data | 4; 
+		data = data | 4;
 
 	// D1: DS1 H: reflect status of bits 0 and 1 form disk.control reg.
 	// D0: DS0 H: "
@@ -1977,9 +1977,9 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	if (m_floppy != NULL)
 	{
 		m_fdc->set_floppy(m_floppy);  // Sets new  _image device_
-		if (!m_floppy->exists()) 
+		if (!m_floppy->exists())
 		{
-			m_floppy = NULL; 
+			m_floppy = NULL;
 			printf("(m_unit = %i) SELECTED IMAGE *** DOES NOT EXIST *** (selected drive = %i)\n", m_unit, selected_drive);
 			selected_drive = INVALID_DRIVE;
 			//m_unit = INVALID_DRIVE;
@@ -2002,7 +2002,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		m_unit = selected_drive;
 
 		if (MOTOR_DISABLE_counter == 0) // "one shot"
-			MOTOR_DISABLE_counter = 20; 
+			MOTOR_DISABLE_counter = 20;
 
 		// FORCE_READY = 0 : assert DRIVE READY on FDC (diagnostic override; USED BY BIOS!)
 		bool force_ready = ((data & 4) == 0) ? true : false;
@@ -2025,7 +2025,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 		if (m_unit < 2)
 		{
-			data = data & (255 - 8); // MOTOR 0 (for A or B)  
+			data = data & (255 - 8); // MOTOR 0 (for A or B)
 		}
 		else
 		{
@@ -2033,7 +2033,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 			enable_start = 2;
 			disable_start = 4;
 		}
-		
+
 		// RX-50 has head A and head B (1 for each of the 2 disk slots in a RX-50).
 		// Assume the other one is switched off -
 		for (int f_num = 0; f_num < MAX_FLOPPIES; f_num++)
@@ -2045,7 +2045,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 			if ((f_num >= enable_start) && (f_num < disable_start))
 				tmp_floppy->mon_w(CLEAR_LINE); // enable
 		}
-		
+
 	}
 
 	m_z80_diskcontrol = data;
@@ -2075,7 +2075,7 @@ WRITE_LINE_MEMBER(rainbow_state::clear_video_interrupt)
 	m_crtc->notify_vblank(false);
 }
 
-// Reflects bits from 'diagnostic_w', except test jumpers 
+// Reflects bits from 'diagnostic_w', except test jumpers
 READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + table 4-15
 {
 	return ((m_diagnostic & (0xf1)) |   // MASK 0xf1 = 11110001
@@ -2131,13 +2131,13 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	allows the floppy data separator and the serial video output to be tested
 	through the use of the printer port. The following table shows how signals are routed.
 
-	DIAGNOSTIC LOOPBACK = 0		DIAGNOSTIC LOOPBACK = 1		SIGNAL INPUT
-	SIGNAL SOURCE				SIGNAL SOURCE				TO
-	FROM						FROM
-	PRT RDATA(J2)				VIDEO OUT					PRT RXD(7201)
-	PRT RXTXC					500 KHZ						PRT RXTXC(7201)
-	MASTER CLK					250 KHZ						VIDEO CLK(DCO11)
-	FLOPPY RAW DATA				PRT TXD(7201)				FLOPPY DATA SEPARATOR
+	DIAGNOSTIC LOOPBACK = 0     DIAGNOSTIC LOOPBACK = 1     SIGNAL INPUT
+	SIGNAL SOURCE               SIGNAL SOURCE               TO
+	FROM                        FROM
+	PRT RDATA(J2)               VIDEO OUT                   PRT RXD(7201)
+	PRT RXTXC                   500 KHZ                     PRT RXTXC(7201)
+	MASTER CLK                  250 KHZ                     VIDEO CLK(DCO11)
+	FLOPPY RAW DATA             PRT TXD(7201)               FLOPPY DATA SEPARATOR
 
 	During Diagnostic Loopback, the - TEST input of the 8088 is connected to the
 	interrupt output of the MPSC.Thus, using the 8088's WAIT instruction in a
@@ -2234,7 +2234,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
 	if (m_crtc->MHFU(1)) // MHFU * flag * enabled ?
 	{
 		int data = m_crtc->MHFU(-1); // increment MHFU, return new value
-		
+
 		// MHFU gets active if the 8088 has not acknowledged a video processor interrupt within approx. 108 milliseconds.
 		// Timer reset by 2 sources : the VERT INT L from the DC012, or the MHFU ENB L from the enable flip - flop.
 
@@ -2243,7 +2243,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
 			for (int i = 0; i < 9; i++)
 				printf("\nWATCHDOG TRIPPED *** NOW RESET MACHINE ***\n");
 
-			m_crtc->MHFU(-100);  // -100 : Enable MHFU flag 
+			m_crtc->MHFU(-100);  // -100 : Enable MHFU flag
 
 			if (m_inp12->read() == 0x01) // DIP for watchdog set?
 			{
@@ -2322,7 +2322,7 @@ MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
 
 
 /// ********************************* HARD DISK CONTROLLER *****************************************
-MCFG_DEVICE_ADD("hdc", WD2010, 5000000) // 10 Mhz quartz on controller (divided by 2 for WCLK) 
+MCFG_DEVICE_ADD("hdc", WD2010, 5000000) // 10 Mhz quartz on controller (divided by 2 for WCLK)
 MCFG_WD2010_OUT_INTRQ_CB(WRITELINE(rainbow_state, bundle_irq)) // FIRST IRQ SOURCE (OR'ed with DRQ)
 MCFG_WD2010_OUT_BDRQ_CB(WRITELINE(rainbow_state, hdc_bdrq))  // BUFFER DATA REQUEST
 
@@ -2341,7 +2341,7 @@ MCFG_WD2010_IN_SC_CB(VCC)                                        // SEEK COMPLET
 
 // CURRENTLY NOT EVALUATED WITHIN 'WD2010':
 MCFG_WD2010_IN_TK000_CB(VCC)
-MCFG_WD2010_IN_INDEX_CB(VCC) 
+MCFG_WD2010_IN_INDEX_CB(VCC)
 
 MCFG_HARDDISK_ADD("harddisk1")
 /// ******************************** / HARD DISK CONTROLLER ****************************************
@@ -2360,7 +2360,7 @@ MCFG_LK201_TX_HANDLER(DEVWRITELINE("kbdser", i8251_device, write_rxd))
 MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 16) // 8251 is set to /16 on the clock input
 MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(rainbow_state, write_keyboard_clock))
 
-MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, motor_tick, attotime::from_hz(60)) 
+MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, motor_tick, attotime::from_hz(60))
 
 MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
@@ -2369,7 +2369,7 @@ MACHINE_CONFIG_END
 // - first generation hardware (introduced May '82) with ROM 04.03.11
 // - inability to boot from hard disc (mind the inadequate PSU)
 
-// AVAILABLE RAM: 64 K on board (instead of 128 K on model 'B'). 
+// AVAILABLE RAM: 64 K on board (instead of 128 K on model 'B').
 
 // Two compatible memory expansions were sold by DEC:
 // (PCIXX-AA) : 64 K (usable on either Rainbow 100-A or 100-B)
@@ -2390,10 +2390,10 @@ ROM_LOAD("12-19606-02a.bin", 0xFA000, 0x2000, NO_DUMP) // ROM (FA000-FBFFF) (E89
 ROM_LOAD("12-19606-02b.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90) 8 K
 
 // SOCKETED LANGUAGE ROM (E91) with 1 single localization per ROM -
-ROM_LOAD("70-20274-15", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - USA 
+ROM_LOAD("70-20274-15", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - USA
 // ROM_LOAD("bg-r873a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - Canadian (French)
 // ROM_LOAD("bg-r876a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - British (UK)
-// ROM_LOAD("bg-r878a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - German / Austrian 
+// ROM_LOAD("bg-r878a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - German / Austrian
 // ROM_LOAD("bg-r874a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - Italian
 // ROM_LOAD("bg-r377a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - Spanish
 // (...)
@@ -2420,8 +2420,8 @@ ROM_RELOAD(0xfc000, 0x4000)
 ROM_REGION(0x1000, "chargen", 0)
 ROM_LOAD("chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 
-//	ROM_REGION(0x800, BUFFER, 0)  // HDC RAM buffer 2 K -- NEW HDC
-//	// ROM_FILL(0x000, 0x800, 0x00)
+//  ROM_REGION(0x800, BUFFER, 0)  // HDC RAM buffer 2 K -- NEW HDC
+//  // ROM_FILL(0x000, 0x800, 0x00)
 ROM_END
 
 // 'Rainbow 190 B' (announced March 1985) is identical to 100-B, with alternate ROM v5.05.

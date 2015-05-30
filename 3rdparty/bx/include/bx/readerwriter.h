@@ -96,6 +96,26 @@ namespace bx
 		return _writer->write(_data, _size);
 	}
 
+	/// Write repeat the same value.
+	inline int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size)
+	{
+		const uint32_t tmp0      = uint32_sels(64   - _size,   64, _size);
+		const uint32_t tmp1      = uint32_sels(256  - _size,  256, tmp0);
+		const uint32_t blockSize = uint32_sels(1024 - _size, 1024, tmp1);
+		uint8_t* temp = (uint8_t*)alloca(blockSize);
+		memset(temp, _byte, blockSize);
+
+		int32_t size = 0;
+		while (0 < _size)
+		{
+			int32_t bytes = write(_writer, temp, uint32_min(blockSize, _size) );
+			size  += bytes;
+			_size -= bytes;
+		}
+
+		return size;
+	}
+
 	/// Write value.
 	template<typename Ty>
 	inline int32_t write(WriterI* _writer, const Ty& _value)

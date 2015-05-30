@@ -110,7 +110,7 @@ private:
 	UINT8 m_irqmask[6];
 	UINT8 m_osc;
 	UINT8 m_svd;
-	
+
 	UINT8 m_lcd_control;
 	UINT8 m_lcd_contrast;
 	e0c6s46_pixel_update_func m_pixel_update_handler;
@@ -123,7 +123,7 @@ private:
 	void write_r4_out();
 	void write_p(UINT8 port, UINT8 data);
 	UINT8 read_p(UINT8 port);
-	
+
 	UINT8 m_port_r[5];
 	UINT8 m_r_dir;
 	UINT8 m_port_p[4];
@@ -148,7 +148,7 @@ private:
 	int m_swl_count;
 	int m_swh_count;
 	void clock_stopwatch();
-	
+
 	UINT8 m_prgtimer_select;
 	UINT8 m_prgtimer_on;
 	int m_prgtimer_src_pulse;

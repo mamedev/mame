@@ -6,9 +6,6 @@
  *  Created on: May 12, 2010
  *      Author: Hans Ostermeyer
  *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
- *
  */
 
 #pragma once

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Carlos A. Lozano Baides
+// copyright-holders:Carlos A. Lozano
 class bloodbro_state : public driver_device
 {
 public:

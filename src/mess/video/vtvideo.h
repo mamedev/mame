@@ -7,9 +7,6 @@ DEC VT Terminal video emulation
 
 01/05/2009 Initial implementation [Miodrag Milanovic]
 
-Copyright MESS Team.
-Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #ifndef __VT_VIDEO__

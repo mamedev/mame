@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Zsolt Vasvari
+// copyright-holders:Derrick Renaud
 /***************************************************************************
 
     Sigma Spiders hardware

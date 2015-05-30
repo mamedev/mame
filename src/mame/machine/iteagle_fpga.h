@@ -55,14 +55,18 @@ private:
 	cpu_device *m_cpu;
 	int m_irq_num;
 
-	UINT32 m_fpga_regs[0x20];
-	UINT32 m_rtc_regs[0x200];
+	UINT32 m_fpga_regs[0x20/4];
+	UINT32 m_rtc_regs[0x800/4];
+	UINT32 m_ram[0x20000/4];
 	UINT32 m_prev_reg;
 
+	std::string m_serial_str;
 	UINT8 m_serial_idx;
 	bool  m_serial_data;
-	UINT8 m_serial_reg1c[0x10];
-	UINT8 m_serial_reg1d[0x10];
+	UINT8 m_serial_com1[0x10];
+	UINT8 m_serial_com2[0x10];
+	UINT8 m_serial_com3[0x10];
+	UINT8 m_serial_com4[0x10];
 
 	UINT32 m_version;
 	UINT32 m_seq_init;
@@ -72,11 +76,15 @@ private:
 
 	DECLARE_ADDRESS_MAP(rtc_map, 32);
 	DECLARE_ADDRESS_MAP(fpga_map, 32);
+	DECLARE_ADDRESS_MAP(ram_map, 32);
 
 	DECLARE_READ32_MEMBER( fpga_r );
 	DECLARE_WRITE32_MEMBER( fpga_w );
 	DECLARE_READ32_MEMBER( rtc_r );
 	DECLARE_WRITE32_MEMBER( rtc_w );
+
+	DECLARE_READ32_MEMBER( ram_r );
+	DECLARE_WRITE32_MEMBER( ram_w );
 };
 
 class iteagle_eeprom_device : public pci_device {
@@ -84,6 +92,8 @@ public:
 	iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
@@ -93,6 +103,7 @@ protected:
 	virtual void device_reset();
 
 private:
+	address_space *m_memory_space;
 	UINT16 m_sw_version;
 	UINT8 m_hw_version;
 
@@ -122,7 +133,8 @@ private:
 	cpu_device *m_cpu;
 	int m_irq_num;
 
-	UINT32 m_ctrl_regs[0x30];
+	UINT32 m_ctrl_regs[0xd0/4];
+	UINT8 m_rtc_regs[0x100];
 
 	DECLARE_ADDRESS_MAP(ctrl_map, 32);
 	DECLARE_ADDRESS_MAP(ide_map, 32);

@@ -34,9 +34,6 @@
 
     On boot it reports: S3 86C775/86C705 Video BIOS. Version 2.04.11 Copyright 1996 S3 Incorporated.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 - update by Peter Ferrie:
 - split BIOS region into 16kb blocks and implement missing PAM registers
 
@@ -428,47 +425,47 @@ WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
 
 static const UINT8 m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d}; /* 0x9d or 0x9e */
 static const UINT8 m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x53, 0x4e, 0x53, 0x49, 0x53, 0x48, 0x53, 0x4b, 0x53, 0x4a,
-                                        0x53, 0x43, 0x53, 0x45, 0x52, 0x46, 0x53, 0x43, 0x53, 0x41, 0xac, 0x40, 0x53, 0xbc, 0x53, 0x42,
-                                        0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
-                                       };
+										0x53, 0x43, 0x53, 0x45, 0x52, 0x46, 0x53, 0x43, 0x53, 0x41, 0xac, 0x40, 0x53, 0xbc, 0x53, 0x42,
+										0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
+										};
 
 READ8_MEMBER(savquest_state::parallel_port_r)
 {
 	if (offset == 1)
 	{
 		if ((m_haspstate == HASPSTATE_READ)
-		 && (m_hasp_passmode == 3)
-		   )
+			&& (m_hasp_passmode == 3)
+			)
 		{
 			/* passmode 3 is used to retrieve the product(s) information
 			   it comes in two parts: header and product
 			   the header has this format:
-               offset  range      purpose
-               00      01         header type
-               01      01-05      count of used product slots, must be 2
-               02      01-05      count of unused product slots
-                                  this is assumed to be 6-(count of used slots)
-                                  but it is not enforced here
-                                  however a total of 6 structures will be checked
-               03      01-02      unknown
-               04      01-46      country code
-               05-0f   00         reserved
-               the used product slots have this format:
-               (the unused product slots must be entirely zeroes)
-               00-01   0001-000a  product ID, one must be 6, the other 0a
-               02      0001-0003  unknown but must be 0001
-               04      01-05      HASP plug country ID
-               05      01-02      unknown but must be 01
-               06      05         unknown
-               07-0a   any        unknown, not used
-               0b      ff         unknown
-               0c      ff         unknown
-               0d-0f   00         reserved
+			   offset  range      purpose
+			   00      01         header type
+			   01      01-05      count of used product slots, must be 2
+			   02      01-05      count of unused product slots
+			                      this is assumed to be 6-(count of used slots)
+			                      but it is not enforced here
+			                      however a total of 6 structures will be checked
+			   03      01-02      unknown
+			   04      01-46      country code
+			   05-0f   00         reserved
+			   the used product slots have this format:
+			   (the unused product slots must be entirely zeroes)
+			   00-01   0001-000a  product ID, one must be 6, the other 0a
+			   02      0001-0003  unknown but must be 0001
+			   04      01-05      HASP plug country ID
+			   05      01-02      unknown but must be 01
+			   06      05         unknown
+			   07-0a   any        unknown, not used
+			   0b      ff         unknown
+			   0c      ff         unknown
+			   0d-0f   00         reserved
 
-               the read is performed by accessing an array of 16-bit big-endian values
-               and returning one bit at a time into bit 5 of the result
-               the 16-bit value is then XORed with 0x534d and the register index
-            */
+			   the read is performed by accessing an array of 16-bit big-endian values
+			   and returning one bit at a time into bit 5 of the result
+			   the 16-bit value is then XORed with 0x534d and the register index
+			*/
 
 			if (m_hasp_prodind <= (sizeof(m_hasp_prodinfo) * 8))
 			{
@@ -570,24 +567,24 @@ WRITE8_MEMBER(savquest_state::parallel_port_w)
 				*/
 
 				if ((data8 == 0x94)
-				 || (data8 == 0x9e)
-				 || (data8 == 0xa4)
-				 || (data8 == 0xb2)
-				 || (data8 == 0xbe)
-				 || (data8 == 0xd0)
-				   )
+					|| (data8 == 0x9e)
+					|| (data8 == 0xa4)
+					|| (data8 == 0xb2)
+					|| (data8 == 0xbe)
+					|| (data8 == 0xd0)
+					)
 				{
 					return;
 				}
 
 				if ((data8 == 0x8a)
-				 || (data8 == 0x8e)
-				 || (data8 == 0xca)
-				 || (data8 == 0xd2)
-				 || (data8 == 0xe2)
-				 || (data8 == 0xf0)
-				 || (data8 == 0xfc)
-				   )
+					|| (data8 == 0x8e)
+					|| (data8 == 0xca)
+					|| (data8 == 0xd2)
+					|| (data8 == 0xe2)
+					|| (data8 == 0xf0)
+					|| (data8 == 0xfc)
+					)
 				{
 					/* someone with access to the actual dongle could dump the true values
 					   I've never seen it so I just determined the relevant bits instead
@@ -651,8 +648,8 @@ WRITE8_MEMBER(savquest_state::parallel_port_w)
 			if (data8 & 1)
 			{
 				if ((m_hasp_passmode == 1)
-				 && (data8 == 0x9d)
-				   )
+					&& (data8 == 0x9d)
+					)
 				{
 					m_hasp_passmode = 2;
 				}
@@ -666,8 +663,8 @@ WRITE8_MEMBER(savquest_state::parallel_port_w)
 				if (++m_hasp_passind == sizeof(m_hasp_tmppass))
 				{
 					if ((m_hasp_tmppass[0] == 0x9c)
-				 	 && (m_hasp_tmppass[1] == 0x9e)
-				   	   )
+						&& (m_hasp_tmppass[1] == 0x9e)
+						)
 					{
 						int i;
 
@@ -693,7 +690,7 @@ WRITE8_MEMBER(savquest_state::parallel_port_w)
 			}
 		}
 		else if ((m_haspstate == HASPSTATE_PASSBEG)
-		      && (data8 & 1)
+				&& (data8 & 1)
 			)
 		{
 			m_hasp_tmppass[m_hasp_passind] = data8;
@@ -728,10 +725,10 @@ WRITE8_MEMBER(savquest_state::smram_w)
 }
 
 static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
-    ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8(smram_r,smram_w,0xffffffff) //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("video_bios", 0)
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_f0000") AM_WRITE(bios_f0000_ram_w)
 	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_e0000") AM_WRITE(bios_e0000_ram_w)
 	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_e4000") AM_WRITE(bios_e4000_ram_w)
@@ -807,7 +804,7 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_DEVICE_REMOVE("rtc") 
+	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
@@ -844,6 +841,9 @@ ROM_START( savquest )
 
 	ROM_REGION( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
 	ROM_LOAD( "vgabios.bin",   0x000000, 0x010000, CRC(a81423d6) SHA1(a099af621ce7fbaa55a2d9947d9f07e04f1b5fca) )
+
+	ROM_REGION( 0x080, "rtc", 0 )    /* default NVRAM */
+	ROM_LOAD( "savquest_ds12885.bin", 0x0000, 0x080, BAD_DUMP CRC(e9270019) SHA1(4d900ca317d93c915c80a9053528b741746f08a1) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )

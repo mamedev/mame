@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Jaroslaw Burczynski
+// copyright-holders:Jarek Burczynski
 #include "machine/buggychl.h"
 #include "sound/msm5232.h"
 /* Disabled because the mcu dump is currently unavailable. -AS */

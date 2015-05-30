@@ -891,7 +891,7 @@ osd_dim sdl_window_info::pick_best_mode()
 			SDL_GetDisplayMode(*((UINT64 *)m_monitor->oshandle()), i, &mode);
 
 			// compute initial score based on difference between target and current
-			size_score = 1.0f / (1.0f + fabsf((INT32)mode.w - target_width) + fabsf((INT32)mode.h - target_height));
+			size_score = 1.0f / (1.0f + abs((INT32)mode.w - target_width) + abs((INT32)mode.h - target_height));
 
 			// if the mode is too small, give a big penalty
 			if (mode.w < minimum_width || mode.h < minimum_height)
@@ -907,7 +907,7 @@ osd_dim sdl_window_info::pick_best_mode()
 
 			// refresh adds some points
 			if (m_win_config.refresh)
-				size_score *= 1.0f / (1.0f + fabsf(m_win_config.refresh - mode.refresh_rate) / 10.0f);
+				size_score *= 1.0f / (1.0f + abs(m_win_config.refresh - mode.refresh_rate) / 10.0f);
 
 			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, (double) size_score);
 

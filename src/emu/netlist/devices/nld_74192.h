@@ -56,7 +56,6 @@ NETLIB_DEVICE(74192,
 	netlist_logic_output_t m_CARRYQ;
 );
 
-NETLIB_DEVICE_DERIVED(74192_dip, 74192,
-);
+NETLIB_DEVICE_DERIVED_PURE(74192_dip, 74192);
 
 #endif /* NLD_74192_H_ */

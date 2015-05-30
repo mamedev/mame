@@ -82,30 +82,30 @@ static char* decode_param(UINT16 opcode, int param, char* buffer)
 	int bits = ep_bits[param] & 0xf;
 	int shift = ep_bits[param] >> 4 & 0xf;
 	UINT16 opmask = opcode >> shift & ((1 << bits) - 1);
-	
+
 	// redirect r/q to A/B/MX/MY
 	if (ep_bits[param] & 0x100)
 		param = ep_redirect_r[opmask];
-	
+
 	// literal param
 	if (ep_bits[param] == 0)
 	{
 		strcpy(buffer, ep_name[param]);
 		return buffer;
 	}
-	
+
 	// print value like how it's documented in the manual
 	char val[10];
 	if (bits > 4 || opmask > 9)
 		sprintf(val, "%02XH", opmask);
 	else
 		sprintf(val, "%d", opmask);
-	
+
 	if (param == ep_MN)
 		sprintf(buffer, "M%s", val);
 	else
 		strcpy(buffer, val);
-	
+
 	return buffer;
 }
 
@@ -113,7 +113,7 @@ static char* decode_param(UINT16 opcode, int param, char* buffer)
 CPU_DISASSEMBLE(e0c6200)
 {
 	UINT16 op = (oprom[1] | oprom[0] << 8) & 0xfff;
-	
+
 	int m = -1;
 	int p1 = -1;
 	int p2 = -1;
@@ -180,7 +180,6 @@ CPU_DISASSEMBLE(e0c6200)
 		default:
 			switch (op)
 			{
-
 		// RLC r
 		case 0xaf0: case 0xaf5: case 0xafa: case 0xaff:
 		m = em_RLC; p1 = ep_R0;
@@ -475,7 +474,6 @@ CPU_DISASSEMBLE(e0c6200)
 		default:
 			switch (op & 0xff0)
 			{
-
 		// ADC XH,i
 		case 0xa00:
 			m = em_ADC; p1 = ep_XH; p2 = ep_I;
@@ -694,7 +692,7 @@ CPU_DISASSEMBLE(e0c6200)
 	// fetch mnemonic
 	char *dst = buffer;
 	dst += sprintf(dst, "%-6s", em_name[m]);
-	
+
 	// fetch param(s)
 	char pbuffer[10];
 	if (p1 != -1)
@@ -705,6 +703,6 @@ CPU_DISASSEMBLE(e0c6200)
 			dst += sprintf(dst, ",%s", decode_param(op, p2, pbuffer));
 		}
 	}
-	
+
 	return 1 | em_flags[m] | DASMFLAG_SUPPORTED;
 }

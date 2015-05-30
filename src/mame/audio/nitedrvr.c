@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Mike Balfour
+// copyright-holders:Derrick Renaud
 /*************************************************************************
 
     audio\nitedrvr.c

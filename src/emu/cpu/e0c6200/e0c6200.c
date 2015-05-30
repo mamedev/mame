@@ -78,7 +78,7 @@ void e0c6200_cpu_device::device_start()
 	m_prev_pc = 0;
 	m_npc = 0;
 	m_jpc = 0;
-	
+
 	m_a = 0;
 	m_b = 0;
 	m_xp = m_xh = m_xl = 0;
@@ -158,7 +158,7 @@ void e0c6200_cpu_device::do_interrupt()
 	m_halt = m_sleep = false;
 	push_pc();
 	m_f &= ~I_FLAG;
-	
+
 	// page 1 of the current bank
 	m_pc = (m_pc & 0x1000) | 0x100 | m_irq_vector;
 
@@ -180,27 +180,27 @@ void e0c6200_cpu_device::execute_run()
 					break;
 			}
 		}
-		
+
 		// core cpu not running (peripherals still work)
 		if (m_halt || m_sleep)
 		{
 			m_icount = 0;
 			break;
 		}
-		
+
 		// remember previous state, prepare pset-longjump
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 		m_jpc = ((m_prev_op & 0xfe0) == 0xe40) ? m_npc : (m_prev_pc & 0x1f00);
-		
+
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_word(m_pc << 1) & 0xfff;
 		m_pc = (m_pc & 0x1000) | ((m_pc + 1) & 0x0fff);
-		
+
 		// minimal opcode time is 5 clock cycles, opcodes take 5, 7, or 12 clock cycles
 		m_icount -= 5;
-		
+
 		// handle opcode
 		execute_one();
 	}
@@ -226,7 +226,7 @@ void e0c6200_cpu_device::execute_one()
 	// i   = 4-bit immediate param
 	// e   = 8-bit immediate param
 	// s   = 8-bit immediate branch destination
-	
+
 	switch (m_op & 0xf00)
 	{
 		// JP s: jump unconditional
@@ -296,7 +296,6 @@ void e0c6200_cpu_device::execute_one()
 		default:
 			switch (m_op)
 			{
-
 		// LD r,q: load register with register
 		case 0xec0: /* m_a = m_a; */ break;
 		case 0xec1: m_a = m_b; break;
@@ -698,7 +697,6 @@ void e0c6200_cpu_device::execute_one()
 		default:
 			switch (m_op & 0xff0)
 			{
-
 		// LD r,i: load register with 4-bit immediate data
 		case 0xe00: m_a = m_op & 0xf; break;
 		case 0xe10: m_b = m_op & 0xf; break;
@@ -726,7 +724,7 @@ void e0c6200_cpu_device::execute_one()
 			break;
 
 		// LD Mn,A: load memory with A
-		case 0xf80: 
+		case 0xf80:
 			write_mn(m_a);
 			break;
 

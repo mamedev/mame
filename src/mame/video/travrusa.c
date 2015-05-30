@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:???
 // copyright-holders:Lee Taylor,John Clegg,Tomasz Slanina
 /***************************************************************************
 

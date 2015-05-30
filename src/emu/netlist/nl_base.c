@@ -5,13 +5,38 @@
  *
  */
 
+#include <cstring>
+
+#include "plib/palloc.h"
+
 #include "nl_base.h"
 #include "devices/nld_system.h"
 #include "analog/nld_solver.h"
-#include "pstring.h"
 #include "nl_util.h"
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
+
+//============================================================
+//  Exceptions
+//============================================================
+
+// emu_fatalerror is a generic fatal exception that provides an error string
+nl_fatalerror::nl_fatalerror(const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	m_text = pstring(format).vprintf(ap);
+	va_end(ap);
+}
+
+nl_fatalerror::nl_fatalerror(const char *format, va_list ap)
+{
+	m_text = pstring(format).vprintf(ap);
+}
+
+// ----------------------------------------------------------------------------------------
+// netlist_logic_family_ttl_t
+// ----------------------------------------------------------------------------------------
 
 class netlist_logic_family_ttl_t : public netlist_logic_family_desc_t
 {
@@ -28,7 +53,7 @@ public:
 	}
 	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
 	{
-		return nl_alloc(nld_d_to_a_proxy , proxied);
+		return palloc(nld_d_to_a_proxy , proxied);
 	}
 };
 
@@ -48,7 +73,7 @@ public:
 	}
 	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
 	{
-		return nl_alloc(nld_d_to_a_proxy , proxied);
+		return palloc(nld_d_to_a_proxy , proxied);
 	}
 };
 
@@ -84,9 +109,10 @@ void netlist_queue_t::on_pre_save()
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		m_times[i] =  this->listptr()[i].exec_time().as_raw();
-		const char *p = this->listptr()[i].object()->name().cstr();
-		int n = MIN(63, strlen(p));
-		strncpy(&(m_name[i][0]), p, n);
+		pstring p = this->listptr()[i].object()->name();
+		int n = p.len();
+		n = std::min(63, n);
+		std::strncpy(&(m_name[i][0]), p, n);
 		m_name[i][n] = 0;
 	}
 }
@@ -117,7 +143,6 @@ ATTR_COLD netlist_object_t::netlist_object_t(const type_t atype, const family_t 
 
 ATTR_COLD netlist_object_t::~netlist_object_t()
 {
-	//delete m_name;
 }
 
 ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const pstring &aname)
@@ -157,25 +182,25 @@ ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
 // ----------------------------------------------------------------------------------------
 
 netlist_base_t::netlist_base_t()
-	:   netlist_object_t(NETLIST, GENERIC),
+	:   netlist_object_t(NETLIST, GENERIC), pstate_manager_t(),
 		m_stop(netlist_time::zero),
 		m_time(netlist_time::zero),
 		m_queue(*this),
-		m_use_deactivate(0),
 		m_mainclock(NULL),
 		m_solver(NULL),
 		m_gnd(NULL),
+		m_use_deactivate(0),
 		m_setup(NULL)
 {
 }
 
 netlist_base_t::~netlist_base_t()
 {
-	for (int i=0; i < m_nets.count(); i++)
+	for (std::size_t i=0; i < m_nets.size(); i++)
 	{
 		if (!m_nets[i]->isRailNet())
 		{
-			global_free(m_nets[i]);
+			pfree(m_nets[i]);
 		}
 	}
 
@@ -222,9 +247,9 @@ ATTR_COLD void netlist_base_t::start()
 	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
 
 	NL_VERBOSE_OUT(("Initializing devices ...\n"));
-	for (netlist_device_t * const * entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
-		netlist_device_t *dev = *entry;
+		netlist_device_t *dev = m_devices[i];
 		if (dev != m_solver && dev != m_params)
 			dev->start_dev();
 	}
@@ -238,7 +263,7 @@ ATTR_COLD void netlist_base_t::stop()
 	NL_VERBOSE_OUT(("Stopping all devices ...\n"));
 
 	// Step all devices once !
-	for (int i = 0; i < m_devices.count(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->stop_dev();
 	}
@@ -246,7 +271,7 @@ ATTR_COLD void netlist_base_t::stop()
 
 ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 {
-	for (int i = 0; i < m_nets.count(); i++)
+	for (std::size_t i = 0; i < m_nets.size(); i++)
 	{
 		if (m_nets[i]->name() == name)
 			return m_nets[i];
@@ -256,7 +281,7 @@ ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 
 ATTR_COLD void netlist_base_t::rebuild_lists()
 {
-	for (int i = 0; i < m_nets.count(); i++)
+	for (std::size_t i = 0; i < m_nets.size(); i++)
 		m_nets[i]->rebuild_list();
 }
 
@@ -271,31 +296,31 @@ ATTR_COLD void netlist_base_t::reset()
 		m_solver->do_reset();
 
 	// Reset all nets once !
-	for (int i = 0; i < m_nets.count(); i++)
+	for (std::size_t i = 0; i < m_nets.size(); i++)
 		m_nets[i]->do_reset();
 
 	// Reset all devices once !
-	for (int i = 0; i < m_devices.count(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->do_reset();
 	}
 
 	// Step all devices once !
-	for (int i = 0; i < m_devices.count(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->update_dev();
 	}
 
 	// FIXME: some const devices rely on this
 	/* make sure params are set now .. */
-	for (int i = 0; i < m_devices.count(); i++)
+	for (std::size_t i = 0; i < m_devices.size(); i++)
 	{
 		m_devices[i]->update_param();
 	}
 }
 
 
-ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time &delta)
+ATTR_HOT void netlist_base_t::process_queue(const netlist_time &delta)
 {
 	m_stop = m_time + delta;
 
@@ -424,7 +449,7 @@ ATTR_COLD void netlist_core_device_t::stop_dev()
 	stop();
 }
 
-ATTR_HOT ATTR_ALIGN netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
+ATTR_HOT netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
 {
 	if (inp.state() != netlist_logic_t::STATE_INP_PASSIVE)
 		return inp.Q();
@@ -562,7 +587,7 @@ ATTR_COLD netlist_net_t::netlist_net_t(const family_t afamily)
 	, m_in_queue(2)
 	, m_cur_Analog(0.0)
 {
-};
+}
 
 ATTR_COLD netlist_net_t::~netlist_net_t()
 {
@@ -601,7 +626,7 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 			}
 		}
 		//else if (netlist().use_deactivate())
-		//	m_cur_Q = m_new_Q;
+		//  m_cur_Q = m_new_Q;
 	}
 }
 
@@ -624,7 +649,7 @@ ATTR_COLD void netlist_net_t::rebuild_list()
 	/* rebuild m_list */
 
 	m_list_active.clear();
-	for (int i=0; i < m_core_terms.count(); i++)
+	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		if (m_core_terms[i]->state() != netlist_logic_t::STATE_INP_PASSIVE)
 			m_list_active.add(*m_core_terms[i]);
 }
@@ -649,12 +674,12 @@ ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
 	}
 }
 
-ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
+ATTR_HOT inline void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	const int masks[4] = { 1, 5, 3, 1 };
+	const UINT32 masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
 
 	m_in_queue = 2; /* mark as taken ... */
@@ -682,13 +707,13 @@ ATTR_COLD void netlist_net_t::reset()
 	/* rebuild m_list */
 
 	m_list_active.clear();
-	for (int i=0; i < m_core_terms.count(); i++)
+	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		m_list_active.add(*m_core_terms[i]);
 
-	for (int i=0; i < m_core_terms.count(); i++)
+	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		m_core_terms[i]->do_reset();
 
-	for (int i=0; i < m_core_terms.count(); i++)
+	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		if (m_core_terms[i]->state() != netlist_logic_t::STATE_INP_PASSIVE)
 			m_active++;
 }
@@ -705,7 +730,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
 
 ATTR_COLD void netlist_net_t::move_connections(netlist_net_t *dest_net)
 {
-	for (int i = 0; i < m_core_terms.count(); i++)
+	for (std::size_t i = 0; i < m_core_terms.size(); i++)
 	{
 		netlist_core_terminal_t *p = m_core_terms[i];
 		dest_net->register_con(*p);
@@ -747,7 +772,7 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 ATTR_COLD netlist_logic_net_t::netlist_logic_net_t()
 	: netlist_net_t(LOGIC)
 {
-};
+}
 
 
 ATTR_COLD void netlist_logic_net_t::reset()
@@ -770,7 +795,7 @@ ATTR_COLD netlist_analog_net_t::netlist_analog_net_t()
 	, m_h_n_m_1(1e-6)
 	, m_solver(NULL)
 {
-};
+}
 
 ATTR_COLD void netlist_analog_net_t::reset()
 {
@@ -803,7 +828,7 @@ ATTR_COLD void netlist_analog_net_t::process_net(list_t *groups, int &cur_group)
 	/* add the net */
 	//SOLVER_VERBOSE_OUT(("add %d - %s\n", cur_group, name().cstr()));
 	groups[cur_group].add(this);
-	for (int i = 0; i < m_core_terms.count(); i++)
+	for (std::size_t i = 0; i < m_core_terms.size(); i++)
 	{
 		netlist_core_terminal_t *p = m_core_terms[i];
 		//SOLVER_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));
@@ -1063,12 +1088,3 @@ NETLIB_UPDATE(mainclock)
 	net.set_time(netlist().time() + m_inc);
 }
 
-ATTR_HOT void netlist_base_t::push_to_queue(netlist_net_t &out, const netlist_time &attime)
-{
-	m_queue.push(netlist_queue_t::entry_t(attime, &out));
-}
-
-ATTR_HOT void netlist_base_t::remove_from_queue(netlist_net_t &out)
-{
-	m_queue.remove(&out);
-}

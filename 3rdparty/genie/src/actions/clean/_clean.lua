@@ -83,6 +83,7 @@
 					premake.clean.file(prj, premake.gettarget(cfg, "build", "posix", "posix", "linux").fullpath)
 					premake.clean.file(prj, premake.gettarget(cfg, "build", "posix", "posix", "macosx").fullpath)
 					premake.clean.file(prj, premake.gettarget(cfg, "build", "posix", "PS3", "windows").fullpath)
+					premake.clean.file(prj, premake.gettarget(cfg, "build", "posix", "PS3", "windows", "Orbis").fullpath)
 					if cfg.kind == "WindowedApp" then
 						premake.clean.directory(prj, premake.gettarget(cfg, "build", "posix", "posix", "linux").fullpath .. ".app")
 					end

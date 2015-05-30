@@ -55,8 +55,8 @@ public:
 
 PALETTE_INIT_MEMBER(sealy_state,sealy)
 {
-//	for (int i = 0; i < 32768; i++)
-//		palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+//  for (int i = 0; i < 32768; i++)
+//      palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 UINT32 sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

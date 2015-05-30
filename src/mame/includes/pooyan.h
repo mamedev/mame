@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Allard Van Der Bas
+// license:BSD-3-Clause
+// copyright-holders:Allard van der Bas
 class pooyan_state : public driver_device
 {
 public:

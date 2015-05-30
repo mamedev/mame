@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Scott Stone
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
 
  IGS PC based hardware

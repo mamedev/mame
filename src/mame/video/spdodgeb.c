@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Hampson, Nicola Salmoria
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

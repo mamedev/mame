@@ -101,7 +101,7 @@
 
 //sign-extension macros
 #define SIGN22(x)   (((x & 0x00200000) * 0x7ff) | (x & 0x1fffff))
-#define SIGN17(x)	(((x & 0x00010000) * 0xffff) | (x & 0xffff))
+#define SIGN17(x)   (((x & 0x00010000) * 0xffff) | (x & 0xffff))
 #define SIGN16(x)   (((x & 0x00008000) * 0x1ffff) | (x & 0x7fff))
 #define SIGN13(x)   (((x & 0x00001000) * 0xfffff) | (x & 0xfff))
 #define SIGN11(x)   (((x & 0x00000400) * 0x3fffff) | (x & 0x3ff))
@@ -185,6 +185,9 @@ struct n64_tile_t
 	INT32 palette; // Palette number for 4b CI texels
 	INT32 ct, mt, cs, ms; // Clamp / mirror enable bits for S / T direction
 	INT32 mask_t, shift_t, mask_s, shift_s; // Mask values / LOD shifts
+	INT32 lshift_s, rshift_s, lshift_t, rshift_t;
+	INT32 wrapped_mask_s, wrapped_mask_t;
+	bool clamp_s, clamp_t;
 	UINT16 sl, tl, sh, th;      // 10.2 fixed-point, starting and ending texel row / column
 	INT32 num;
 };
@@ -219,7 +222,7 @@ struct misc_state_t
 	INT32 m_fb_format;          // Framebuffer pixel format index (0 - I, 1 - IA, 2 - CI, 3 - RGBA)
 	INT32 m_fb_size;            // Framebuffer pixel size index (0 - 4bpp, 1 - 8bpp, 2 - 16bpp, 3 - 32bpp)
 	INT32 m_fb_width;           // Framebuffer width, in pixels
-	INT32 m_fb_height;			// Framebuffer height, in pixels
+	INT32 m_fb_height;          // Framebuffer height, in pixels
 	UINT32 m_fb_address;        // Framebuffer source address offset (in bytes) from start of RDRAM
 
 	UINT32 m_zb_address;        // Z-buffer source address offset (in bytes) from start of RDRAM
@@ -364,11 +367,13 @@ struct rdp_span_aux
 	INT32               m_shift_b;
 	INT32               m_precomp_s;
 	INT32               m_precomp_t;
-	INT32				m_blend_enable;
+	INT32               m_blend_enable;
 	bool                m_pre_wrap;
 	INT32               m_dzpix_enc;
-	UINT8*				m_tmem;                /* pointer to texture cache for this polygon */
+	UINT8*              m_tmem;                /* pointer to texture cache for this polygon */
 	bool                m_start_span;
+	INT32               m_clamp_s_diff[8];
+	INT32               m_clamp_t_diff[8];
 };
 
 struct rectangle_t
@@ -395,11 +400,11 @@ struct cv_mask_derivative_t
 
 struct rdp_poly_state
 {
-	n64_rdp*           	m_rdp;                  /* pointer back to the RDP state */
+	n64_rdp*            m_rdp;                  /* pointer back to the RDP state */
 
 	misc_state_t        m_misc_state;           /* miscellaneous rasterizer bits */
-	other_modes_t		m_other_modes;          /* miscellaneous rasterizer bits (2) */
-	span_base_t			m_span_base;            /* span initial values for triangle rasterization */
+	other_modes_t       m_other_modes;          /* miscellaneous rasterizer bits (2) */
+	span_base_t         m_span_base;            /* span initial values for triangle rasterization */
 	rectangle_t         m_scissor;              /* screen-space scissor bounds */
 	UINT32              m_fill_color;           /* poly fill color */
 	n64_tile_t          m_tiles[8];             /* texture tile state */
@@ -485,10 +490,10 @@ public:
 	void        set_blender_input(INT32 cycle, INT32 which, UINT8** input_r, UINT8** input_g, UINT8** input_b, UINT8** input_a, INT32 a, INT32 b, rdp_span_aux* userdata);
 
 	// Span rasterization
-	void		span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
-	void		span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
-	void		span_draw_copy(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
-	void		span_draw_fill(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
+	void        span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
+	void        span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
+	void        span_draw_copy(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
+	void        span_draw_fill(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
 
 	// Render-related (move into eventual drawing-related classes?)
 	void            tc_div(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
@@ -572,7 +577,7 @@ public:
 
 	UINT32          m_fill_color;
 
-	other_modes_t	m_other_modes;
+	other_modes_t   m_other_modes;
 
 	n64_blender_t   m_blender;
 
@@ -585,7 +590,7 @@ public:
 	UINT16 m_dzpix_normalize[0x10000];
 
 	rectangle_t     m_scissor;
-	span_base_t		m_span_base;
+	span_base_t     m_span_base;
 
 	rectangle       m_visarea;
 
@@ -599,16 +604,16 @@ public:
 
 	bool            rdp_range_check(UINT32 addr);
 
-	n64_tile_t     	m_tiles[8];
+	n64_tile_t      m_tiles[8];
 
 private:
-	void	write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp_span_aux* userdata, const rdp_poly_state &object);
-	void	read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
-	void	copy_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, INT32 m_current_pix_cvg, const rdp_poly_state &object);
-	void	fill_pixel(UINT32 curpixel, const rdp_poly_state &object);
+	void    write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    copy_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, INT32 m_current_pix_cvg, const rdp_poly_state &object);
+	void    fill_pixel(UINT32 curpixel, const rdp_poly_state &object);
 
-	void	precalc_cvmask_derivatives(void);
-	void	z_build_com_table(void);
+	void    precalc_cvmask_derivatives(void);
+	void    z_build_com_table(void);
 
 	void    video_update16(n64_periphs* n64, bitmap_rgb32 &bitmap);
 	void    video_update32(n64_periphs* n64, bitmap_rgb32 &bitmap);
@@ -621,15 +626,15 @@ private:
 
 	cv_mask_derivative_t cvarray[(1 << 8)];
 
-	UINT16	m_z_com_table[0x40000]; //precalced table of compressed z values, 18b: 512 KB array!
-	UINT32	m_z_complete_dec_table[0x4000]; //the same for decompressed z values, 14b
-	UINT8	m_compressed_cvmasks[0x10000]; //16bit cvmask -> to byte
+	UINT16  m_z_com_table[0x40000]; //precalced table of compressed z values, 18b: 512 KB array!
+	UINT32  m_z_complete_dec_table[0x4000]; //the same for decompressed z values, 14b
+	UINT8   m_compressed_cvmasks[0x10000]; //16bit cvmask -> to byte
 
 	UINT32  m_cmd_data[0x1000];
 	UINT32  m_temp_rect_data[0x1000];
 
-	INT32	m_cmd_ptr;
-	INT32	m_cmd_cur;
+	INT32   m_cmd_ptr;
+	INT32   m_cmd_cur;
 
 	UINT32  m_start;
 	UINT32  m_end;

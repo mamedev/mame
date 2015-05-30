@@ -2132,7 +2132,7 @@ void texture_info::compute_size_subroutine(int texwidth, int texheight, int* p_w
 	{
 		finalheight *= 2;
 	}
-	
+
 	*p_width = finalwidth;
 	*p_height = finalheight;
 }
@@ -2148,7 +2148,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 
 	m_xborderpix = 0;
 	m_yborderpix = 0;
-	
+
 	// if we're not wrapping, add a 1-2 pixel border on all sides
 	if (ENABLE_BORDER_PIX && !(m_flags & PRIMFLAG_TEXWRAP_MASK))
 	{
@@ -2160,7 +2160,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 	// compute final texture size
 	finalwidth += 2 * m_xborderpix;
 	finalheight += 2 * m_yborderpix;
-	
+
 	compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 
 	// if we added pixels for the border, and that just barely pushed us over, take it back
@@ -2171,7 +2171,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 
 		m_xborderpix = 0;
 		m_yborderpix = 0;
-		
+
 		compute_size_subroutine(finalwidth, finalheight, &finalwidth, &finalheight);
 	}
 

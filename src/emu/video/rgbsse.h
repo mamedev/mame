@@ -8,9 +8,6 @@
 
     WARNING: This code assumes SSE2 or greater capability.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #ifndef __RGBSSE__

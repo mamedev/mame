@@ -175,7 +175,7 @@ void snk6502_sound_device::device_start()
 		save_item(NAME(m_tone_channels[i].sample_cur), i);
 		save_item(NAME(m_tone_channels[i].form), i);
 	}
-	
+
 	save_item(NAME(m_tone_clock));
 	save_item(NAME(m_Sound0StopOnRollover));
 	save_item(NAME(m_LastPort1));

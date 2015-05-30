@@ -4,9 +4,6 @@
 
     uPD7227 Intelligent Dot-Matrix LCD Controller/Driver emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

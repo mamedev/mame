@@ -442,10 +442,12 @@ void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		break;
 
 	case TIMER_ID_VSYNC_ON:
+		if (LOG) logerror("%s vsync 1\n", machine().time().as_string());
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 
 	case TIMER_ID_VSYNC_OFF:
+		if (LOG) logerror("%s vsync 0\n", machine().time().as_string());
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		break;
 
@@ -560,7 +562,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(abc80_state, kbd_w))
 
-	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 1)
+	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 2)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

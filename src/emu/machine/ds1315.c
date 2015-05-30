@@ -5,21 +5,21 @@
     ds1315.c
 
     Dallas Semiconductor's Phantom Time Chip DS1315.
-	NOTE: writes are decoded, but the host's time will always be returned when asked.
+    NOTE: writes are decoded, but the host's time will always be returned when asked.
 
-	April 2015: chip enable / chip reset / phantom writes by Karl-Ludwig Deisenhofer
+    April 2015: chip enable / chip reset / phantom writes by Karl-Ludwig Deisenhofer
 
-	November 2001: implementation by Tim Lindner
+    November 2001: implementation by Tim Lindner
 
-	HOW DOES IT WORK?
+    HOW DOES IT WORK?
 
-	READS: pattern recognition (64 bits in correct order). When RTC finally enables 
-	64 bits of data can be read. Chance of accidential pattern recognition is minimal.
+    READS: pattern recognition (64 bits in correct order). When RTC finally enables
+    64 bits of data can be read. Chance of accidential pattern recognition is minimal.
 
-	WRITES: two different locations (bits 0 and 1) are used to transfer data to the
-	DS1315.   64 bit with time/date info are transmitted directly after recognition 
-	of the magic 64 bit pattern (see read above). 
-	**************************************************************************************/
+    WRITES: two different locations (bits 0 and 1) are used to transfer data to the
+    DS1315.   64 bit with time/date info are transmitted directly after recognition
+    of the magic 64 bit pattern (see read above).
+    **************************************************************************************/
 
 #include "ds1315.h"
 #include "coreutil.h"
@@ -170,7 +170,7 @@ void ds1315_device::fill_raw_data()
 
 	/* get the current date/time from the core */
 	machine().current_datetime(systime);
-	
+
 	raw[0] = 0; /* tenths and hundreths of seconds are always zero */
 	raw[1] = dec_2_bcd(systime.local_time.second);
 	raw[2] = dec_2_bcd(systime.local_time.minute);
@@ -223,8 +223,8 @@ READ8_MEMBER(ds1315_device::write_data)
 /*-------------------------------------------------
   ds1315_input_raw_data
 
-  Routine is called when new date and time has 
-  been written to the clock chip. Currently we 
+  Routine is called when new date and time has
+  been written to the clock chip. Currently we
   ignore setting the date and time in the clock
   chip.
 -------------------------------------------------*/
@@ -242,7 +242,7 @@ void ds1315_device::input_raw_data()
 			flag = 1;
 
 		if (m_raw_data[i] & 1)
-		     raw[j] |= flag;
+				raw[j] |= flag;
 		flag <<= 1;
 	}
 	raw[0] = bcd_2_dec(raw[0]); // hundreds of seconds
@@ -255,9 +255,9 @@ void ds1315_device::input_raw_data()
 	raw[6] = bcd_2_dec(raw[6]); // month
 	raw[7] = bcd_2_dec(raw[7]); // year (two digits)
 
-	printf("\nDS1315 RTC INPUT (WILL BE IGNORED) mm/dd/yy  hh:mm:ss - %02d/%02d/%02d %02d/%02d/%02d", 
-		     raw[6], raw[5], raw[7], raw[3], raw[2], raw[1]
-		  );
+	printf("\nDS1315 RTC INPUT (WILL BE IGNORED) mm/dd/yy  hh:mm:ss - %02d/%02d/%02d %02d/%02d/%02d",
+				raw[6], raw[5], raw[7], raw[3], raw[2], raw[1]
+			);
 }
 
 /*-------------------------------------------------
@@ -265,7 +265,7 @@ void ds1315_device::input_raw_data()
    -------------------------------------------------*/
 bool ds1315_device::chip_enable()
 {
-	return (m_mode == DS_CALENDAR_IO); 
+	return (m_mode == DS_CALENDAR_IO);
 }
 
 // Set a defined state (important for pattern detection)

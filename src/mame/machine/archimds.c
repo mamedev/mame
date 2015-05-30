@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese, R. Belmont, Juergen Bunchmueller
+// copyright-holders:Angelo Salese, R. Belmont, Juergen Buchmueller
 /******************************************************************************
  *
  *  Acorn Archimedes custom chips (IOC, MEMC, VIDC)
