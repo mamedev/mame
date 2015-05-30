@@ -44,9 +44,10 @@ void melps4_cpu_device::state_string_export(const device_state_entry &entry, std
 	{
 		// obviously not from a single flags register, letters are made up
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c",
 				m_intp ? 'P':'p',
 				m_inte ? 'I':'i',
+				m_sm   ? 'S':'s',
 				m_cps  ? 'D':'d',
 				m_cy   ? 'C':'c'
 			);
@@ -83,10 +84,14 @@ void melps4_cpu_device::device_start()
 	m_prev_op = 0;
 	m_bitmask = 0;
 
+	m_sm = m_sms = false;
+	m_ba_flag = false;
+	m_sp_param = 0;
 	m_cps = 0;
 	m_skip = false;
 	m_inte = 0;
 	m_intp = 1;
+	m_prohibit_irq = false;
 
 	m_a = 0;
 	m_b = 0;
@@ -110,10 +115,15 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_bitmask));
 
+	save_item(NAME(m_sm));
+	save_item(NAME(m_sms));
+	save_item(NAME(m_ba_flag));
+	save_item(NAME(m_sp_param));
 	save_item(NAME(m_cps));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_inte));
 	save_item(NAME(m_intp));
+	save_item(NAME(m_prohibit_irq));
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
@@ -131,7 +141,7 @@ void melps4_cpu_device::device_start()
 
 	// register state for debugger
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_cy).formatstr("%4s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_cy).formatstr("%5s").noshow();
 
 	state_add(MELPS4_PC, "PC", m_pc).formatstr("%04X");
 	state_add(MELPS4_A, "A", m_a).formatstr("%2d"); // show in decimal
@@ -158,6 +168,11 @@ void melps4_cpu_device::device_start()
 
 void melps4_cpu_device::device_reset()
 {
+	m_sm = m_sms = false;
+	m_ba_flag = false;
+	m_prohibit_irq = false;
+	
+	m_skip = false;
 	m_op = m_prev_op = 0;
 	m_pc = m_prev_pc = 0;
 	m_inte = 0;
@@ -192,6 +207,10 @@ void melps4_cpu_device::execute_run()
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
+		
+		// irq is not accepted during skip or LXY, LA, EI, DI, RT/RTS/RTI or any branch
+		//..
+		m_prohibit_irq = false;
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
@@ -201,6 +220,13 @@ void melps4_cpu_device::execute_run()
 		m_pc = (m_pc & ~0x7f) | ((m_pc + 1) & 0x7f); // stays in the same page
 
 		// handle opcode if it's not skipped
-		execute_one();
+		if (m_skip)
+		{
+			// if it's a long jump, skip next one as well
+			if (m_op != m_ba_op && (m_op & ~0xf) != m_sp_mask)
+				m_skip = false;
+		}
+		else
+			execute_one();
 	}
 }
