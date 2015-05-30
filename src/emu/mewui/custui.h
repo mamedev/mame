@@ -11,6 +11,13 @@
 #ifndef __MEWUI_CUSTUI_H__
 #define __MEWUI_CUSTUI_H__
 
+#ifdef MEWUI_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <tchar.h>
+#include "strconv.h"
+#endif
+
 struct s_color_table
 {
 	rgb_t	   color;
@@ -58,6 +65,15 @@ private:
 	};
 };
 
+#ifdef MEWUI_WINDOWS
+// Fonts struct
+struct c_uifonts
+{
+	std::vector<std::string> ui;
+	UINT16 actual;
+};
+#endif
+
 /***************************************************************************
 	FONT UI CLASS
 ***************************************************************************/
@@ -80,7 +96,12 @@ private:
 		MUI_ITALIC
 	};
 
+#ifdef MEWUI_WINDOWS
+	c_uifonts m_class;
+	void list();
 	bool m_bold, m_italic;
+#endif
+
 	float info_min_size, info_max_size, info_size;
 	int font_min_size, font_max_size, font_size;
 };

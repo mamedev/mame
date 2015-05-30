@@ -5,12 +5,6 @@
 	Internal MEWUI user interface.
 
 ***************************************************************************/
-#ifdef MEWUI_WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <tchar.h>
-#include "strconv.h"
-#endif
 
 #include "emu.h"
 #include "drivenum.h"
@@ -26,12 +20,6 @@ std::vector<std::string> c_year::ui;
 // Manufacturers index
 UINT16 c_mnfct::actual = 0;
 std::vector<std::string> c_mnfct::ui;
-
-#ifdef MEWUI_WINDOWS
-// Fonts index
-UINT16 c_uifonts::actual = 0;
-std::vector<std::string> c_uifonts::ui;
-#endif
 
 // Globals
 UINT16 mewui_globals::actual_filter = 0;
@@ -340,43 +328,6 @@ void fskip(char *s, int id)
 	for (; s[id] && s[id] != CR && s[id] != LF; id++) ;
 	s[id] = '\0';
 }
-
-#ifdef MEWUI_WINDOWS
-//-------------------------------------------------
-//  fonts enumerator CALLBACK
-//-------------------------------------------------
-
-int CALLBACK EnumFontFamiliesExProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, LPARAM lParam)
-{
-	std::string utf((char *)lpelfe->lfFaceName);
-	if (utf[0] != '@')
-		c_uifonts::ui.push_back(utf);
-
-	return 1;
-}
-
-//-------------------------------------------------
-//  create fonts list
-//-------------------------------------------------
-
-void c_uifonts::list()
-{
-	// create LOGFONT structure
-	LOGFONT lf;
-	lf.lfCharSet = ANSI_CHARSET;
-	lf.lfFaceName[0] = '\0';
-
-	HDC hDC = GetDC( NULL );
-	EnumFontFamiliesEx( hDC, &lf, (FONTENUMPROC)EnumFontFamiliesExProc, 0, 0 );
-	ReleaseDC( NULL, hDC );
-
-	// sort
-	std::sort(ui.begin(), ui.end());
-
-	// add default string to the top of array
-	ui.insert(ui.begin(), std::string("default"));
-}
-#endif
 
 //-------------------------------------------------
 //  save custom filters info to file

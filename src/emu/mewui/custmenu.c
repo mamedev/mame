@@ -155,8 +155,6 @@ void ui_menu_custom_filter::handle()
 //-------------------------------------------------
 void ui_menu_custom_filter::populate()
 {
-	std::string fbuff;
-
 	// add main filter
 	UINT32 arrow_flags = get_arrow_flags((int)FILTER_ALL, (int)FILTER_UNAVAILABLE, custfltr::main_filter);
 	item_append("Main filter", mewui_globals::filter_text[custfltr::main_filter], arrow_flags, (void *)MAIN_FILTER);
@@ -178,7 +176,7 @@ void ui_menu_custom_filter::populate()
 			else
 				arrow_flags = get_arrow_flags(0, c_mnfct::ui.size() - 1, custfltr::mnfct[x]);
 
-			fbuff.assign("^!Manufacturer");
+			std::string fbuff("^!Manufacturer");
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), c_mnfct::ui[custfltr::mnfct[x]].c_str(), arrow_flags, (void *)(FPTR)(MNFCT_FILTER + x));
 		}
@@ -191,7 +189,7 @@ void ui_menu_custom_filter::populate()
 			else
 				arrow_flags = get_arrow_flags(0, c_year::ui.size() - 1, custfltr::year[x]);
 
-			fbuff.assign("^!Year");
+			std::string fbuff("^!Year");
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), c_year::ui[custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
 		}
@@ -215,20 +213,19 @@ void ui_menu_custom_filter::populate()
 //-------------------------------------------------
 void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth;
-	std::string tempbuf("Select custom filters:");
+	float width;
 
 	// get the size of the text
-	machine().ui().draw_text_full(container, tempbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
+	machine().ui().draw_text_full(container, "Select custom filters:", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 			DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
-	maxwidth = MAX(width, origx2 - origx1);
+	float maxwidth = MAX(width, origx2 - origx1);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -239,6 +236,6 @@ void ui_menu_custom_filter::custom_render(void *selectedref, float top, float bo
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	machine().ui().draw_text_full(container, tempbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
+	machine().ui().draw_text_full(container, "Select custom filters:", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 			DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }

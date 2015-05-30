@@ -221,19 +221,6 @@ public:
 	static UINT16  year[MAX_FILTER];
 };
 
-#ifdef MEWUI_WINDOWS
-// Fonts class
-class c_uifonts
-{
-public:
-	c_uifonts();
-
-	static void list();
-	static std::vector<std::string> ui;
-	static UINT16 actual;
-};
-#endif
-
 // GLOBAL FUNCTIONS
 
 // save options to file

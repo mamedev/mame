@@ -74,21 +74,18 @@ void ui_menu_custom_ui::populate()
 
 void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth = origx2 - origx1;
+	float width;
 
-	// top text
-	std::string topbuf("Custom UI Settings");
-
-	machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, "Custom UI Settings", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(maxwidth, width);
+	float maxwidth = MAX(origx2 - origx1, width);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -99,7 +96,7 @@ void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	machine().ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, "Custom UI Settings", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }
 
@@ -116,19 +113,17 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 #ifdef MEWUI_WINDOWS
 
 	std::string name(machine.options().ui_font());
-	c_uifonts::list();
+	list();
 
 	m_bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 	m_italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
-	c_uifonts::actual = 0;
+	m_class.actual = 0;
 
-	for (int index = 0; index < c_uifonts::ui.size(); index++)
+	for (int index = 0; index < m_class.ui.size(); index++)
 	{
-		std::string tmptxt(c_uifonts::ui[index]);
-
-		if (tmptxt.compare(name.c_str()) == 0)
+		if (m_class.ui[index] == name)
 		{
-			c_uifonts::actual = index;
+			m_class.actual = index;
 			break;
 		}
 	}
@@ -145,7 +140,6 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 			info_max_size = atof(f_entry->maximum());
 			info_min_size = atof(f_entry->minimum());
 		}
-
 		else if (name && strlen(name) && !strcmp(OPTION_FONT_ROWS, f_entry->name()))
 		{
 			font_max_size = atof(f_entry->maximum());
@@ -154,6 +148,44 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 	}
 
 }
+
+#ifdef MEWUI_WINDOWS
+//-------------------------------------------------
+//  fonts enumerator CALLBACK
+//-------------------------------------------------
+
+int CALLBACK EnumFontFamiliesExProc(const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, LPARAM lParam)
+{
+	c_uifonts *lpc = (c_uifonts*)lParam;
+	std::string utf((char *)lpelfe->lfFaceName);
+	if (utf[0] != '@')
+		lpc->ui.push_back(utf);
+
+	return 1;
+}
+
+//-------------------------------------------------
+//  create fonts list
+//-------------------------------------------------
+
+void ui_menu_font_ui::list()
+{
+	// create LOGFONT structure
+	LOGFONT lf;
+	lf.lfCharSet = ANSI_CHARSET;
+	lf.lfFaceName[0] = '\0';
+
+	HDC hDC = GetDC( NULL );
+	EnumFontFamiliesEx( hDC, &lf, (FONTENUMPROC)EnumFontFamiliesExProc, (LPARAM)&m_class, 0 );
+	ReleaseDC( NULL, hDC );
+
+	// sort
+	std::sort(m_class.ui.begin(), m_class.ui.end());
+
+	// add default string to the top of array
+	m_class.ui.insert(m_class.ui.begin(), std::string("default"));
+}
+#endif
 
 //-------------------------------------------------
 //  dtor
@@ -164,9 +196,8 @@ ui_menu_font_ui::~ui_menu_font_ui()
 	std::string error_string;
 
 #if MEWUI_WINDOWS
-
-	std::string name(c_uifonts::ui[c_uifonts::actual]);
-	if (name.compare("default") != 0)
+	std::string name(m_class.ui[m_class.actual]);
+	if (m_class.ui[m_class.actual] != "default")
 	{
 		if (m_italic)
 			name.insert(0, "[I]");
@@ -174,10 +205,6 @@ ui_menu_font_ui::~ui_menu_font_ui()
 			name.insert(0, "[B]");
 	}
 	machine().options().set_value(OPTION_UI_FONT, name.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-
-	// free fonts data
-	c_uifonts::ui.clear();
-
 #endif
 
 	machine().options().set_value(OPTION_INFOS_SIZE, info_size, OPTION_PRIORITY_CMDLINE, error_string);
@@ -219,12 +246,11 @@ void ui_menu_font_ui::handle()
 			case MUI_FNT:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					(menu_event->iptkey == IPT_UI_RIGHT) ? c_uifonts::actual++ : c_uifonts::actual--;
+					(menu_event->iptkey == IPT_UI_RIGHT) ? m_class.actual++ : m_class.actual--;
 					changed = true;
 				}
-
 				else if (menu_event->iptkey == IPT_UI_SELECT)
-					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, c_uifonts::ui, &c_uifonts::actual)));
+					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_class.ui, &m_class.actual)));
 					changed = true;
 
 				break;
@@ -255,10 +281,9 @@ void ui_menu_font_ui::populate()
 	std::string tmptxt;
 
 #ifdef MEWUI_WINDOWS
-
-	// add options items
-	arrow_flags = get_arrow_flags(0, c_uifonts::ui.size() - 1, c_uifonts::actual);
-	std::string name(c_uifonts::ui[c_uifonts::actual]);
+	// add fonts option
+	arrow_flags = get_arrow_flags(0, m_class.ui.size() - 1, m_class.actual);
+	std::string name(m_class.ui[m_class.actual]);
 	item_append("UI Font", name.c_str(), arrow_flags, (void *)MUI_FNT);
 
 	if (name.compare("default") != 0)
@@ -266,7 +291,6 @@ void ui_menu_font_ui::populate()
 		item_append("Bold", m_bold ? "On" : "Off", m_bold ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)MUI_BOLD);
 		item_append("Italic", m_italic ? "On" : "Off", m_italic ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)MUI_ITALIC);
 	}
-
 #endif
 
 	arrow_flags = get_arrow_flags(font_min_size, font_max_size, font_size);
@@ -293,21 +317,21 @@ void ui_menu_font_ui::populate()
 
 void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float x1, x2, y1, y2, width, maxwidth = origx2 - origx1;
+	float width;
 
 	// top text
 	std::string topbuf("UI Fonts Settings");
 
 	machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+								  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(maxwidth, width);
+	float maxwidth = MAX(origx2 - origx1, width);
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -319,17 +343,16 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 
 	// draw the text within it
 	machine().ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+								  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	if ((FPTR)selectedref == INFOS_SIZE)
 	{
 		topbuf.assign("Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
-		maxwidth = origx2 - origx1;
 		machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
-										DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL, info_size);
+									  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL, info_size);
 		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(maxwidth, width);
+		maxwidth = MAX(origx2 - origx1, width);
 
 		// compute our bounds
 		x1 = 0.5f - 0.5f * maxwidth;
@@ -347,7 +370,7 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 
 		// draw the text within it
 		machine().ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
-										DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, info_size);
+									  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, info_size);
 	}
 }
 
