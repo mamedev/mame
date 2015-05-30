@@ -106,7 +106,7 @@ netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const 
 
 void netlist_setup_t::remove_dev(const pstring &name)
 {
-	netlist_device_t *dev = netlist().m_devices.find(name);
+	netlist_device_t *dev = netlist().m_devices.find_by_name(name);
 	pstring temp = name + ".";
 	if (dev == NULL)
 		netlist().error("Device %s does not exist\n", name.cstr());
@@ -201,7 +201,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 			{
 				netlist_param_t &param = dynamic_cast<netlist_param_t &>(obj);
 				//printf("name: %s\n", name.cstr());
-				const pstring val = m_params_temp.find(name).e2;
+				const pstring val = m_params_temp.find_by_name(name).e2;
 				if (val != "")
 				{
 					switch (param.param_type())
@@ -313,7 +313,7 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	/* FIXME: Detect endless loop */
 	do {
 		ret = temp;
-		temp = m_alias.find(ret).e2;
+		temp = m_alias.find_by_name(ret).e2;
 	} while (temp != "");
 
 	NL_VERBOSE_OUT(("%s==>%s\n", name.cstr(), ret.cstr()));
@@ -325,13 +325,13 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 	const pstring &tname = resolve_alias(terminal_in);
 	netlist_core_terminal_t *ret;
 
-	ret = m_terminals.find(tname);
+	ret = m_terminals.find_by_name(tname);
 	/* look for default */
 	if (ret == NULL)
 	{
 		/* look for ".Q" std output */
 		pstring s = tname + ".Q";
-		ret = m_terminals.find(s);
+		ret = m_terminals.find_by_name(s);
 	}
 	if (ret == NULL && required)
 		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
@@ -345,13 +345,13 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 	const pstring &tname = resolve_alias(terminal_in);
 	netlist_core_terminal_t *ret;
 
-	ret = m_terminals.find(tname);
+	ret = m_terminals.find_by_name(tname);
 	/* look for default */
 	if (ret == NULL && atype == netlist_object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		pstring s = tname + ".Q";
-		ret = m_terminals.find(s);
+		ret = m_terminals.find_by_name(s);
 	}
 	if (ret == NULL && required)
 		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
@@ -374,7 +374,7 @@ netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool requi
 	const pstring &outname = resolve_alias(param_in_fqn);
 	netlist_param_t *ret;
 
-	ret = m_params.find(outname);
+	ret = m_params.find_by_name(outname);
 	if (ret == NULL && required)
 		netlist().error("parameter %s(%s) not found!\n", param_in_fqn.cstr(), outname.cstr());
 	if (ret != NULL)

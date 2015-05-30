@@ -482,7 +482,7 @@ public:
 	}
 
 	/* inline only intended to be called from nl_base.c */
-	ATTR_HOT /* inline */ void update_dev(const UINT32 mask);
+	ATTR_HOT inline void update_dev(const UINT32 mask);
 
 protected:
 	/* ATTR_COLD */ virtual void save_register()

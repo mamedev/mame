@@ -20,7 +20,7 @@
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/i8271.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/upd7002.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
@@ -79,6 +79,8 @@ public:
 		m_acia_irq(CLEAR_LINE),
 		m_palette(*this, "palette")
 	{ }
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);

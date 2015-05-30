@@ -46,6 +46,17 @@ c352_device::c352_device(const machine_config &mconfig, const char *tag, device_
 }
 
 //-------------------------------------------------
+//  static_set_dividder - configuration helper to
+//  set the divider setting
+//-------------------------------------------------
+
+void c352_device::static_set_divider(device_t &device, int setting)
+{
+	c352_device &c352 = downcast<c352_device &>(device);
+	c352.m_divider = setting;
+}
+
+//-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
@@ -457,7 +468,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 
 void c352_device::device_start()
 {
-	int i;
+	int i, divider;
 	double x_max = 32752.0;
 	double y_max = 127.0;
 	double u = 10.0;
@@ -465,7 +476,21 @@ void c352_device::device_start()
 	// find our direct access
 	m_direct = &space().direct();
 
-	m_sample_rate_base = clock() / 288;
+	switch(m_divider)
+	{
+		case C352_DIVIDER_228:
+			divider=228;
+			break;
+		case C352_DIVIDER_288:
+		default:
+			divider=288;
+			break;
+		case C352_DIVIDER_332:
+			divider=332;
+			break;
+	}
+	
+	m_sample_rate_base = clock() / divider;
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
 
