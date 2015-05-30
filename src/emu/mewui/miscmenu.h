@@ -5,6 +5,10 @@
 	Internal MEWUI user interface.
 
 ***************************************************************************/
+#pragma once
+
+#ifndef __MEWUI_MISCMENU_H__
+#define __MEWUI_MISCMENU_H__
 
 //-------------------------------------------------
 //  class miscellaneous options menu
@@ -35,3 +39,5 @@ private:
 
 	bool m_options[LAST_MOPTION];
 };
+
+#endif /* __MEWUI_MISCMENU_H__ */

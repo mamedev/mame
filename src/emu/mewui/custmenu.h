@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef __CUSTMENU_H__
-#define __CUSTMENU_H__
+#ifndef __MEWUI_CUSTMENU_H__
+#define __MEWUI_CUSTMENU_H__
 
 #include "mewui/utils.h"
 
@@ -40,4 +40,4 @@ private:
 	bool single_menu;
 };
 
-#endif  /* __CUSTMENU_H__ */
+#endif  /* __MEWUI_CUSTMENU_H__ */

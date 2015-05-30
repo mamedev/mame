@@ -7,8 +7,8 @@
 ***************************************************************************/
 #pragma once
 
-#ifndef __CTRLMENU_H__
-#define __CTRLMENU_H__
+#ifndef __MEWUI_CTRLMENU_H__
+#define __MEWUI_CTRLMENU_H__
 
 //-------------------------------------------------
 //  class controller mapping menu
@@ -41,4 +41,4 @@ private:
 	int m_options[LAST_DEVICE_ASSIGN];
 };
 
-#endif /* __CTRLMENU_H__ */
+#endif /* __MEWUI_CTRLMENU_H__ */

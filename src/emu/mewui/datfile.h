@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __DATFILE_H__
-#define __DATFILE_H__
+#ifndef __MEWUI_DATFILE_H__
+#define __MEWUI_DATFILE_H__
 
 //-------------------------------------------------
 //  STRUCTURES
@@ -106,4 +106,4 @@ private:
 };
 
 
-#endif  /* __DATFILE_H__ */
+#endif  /* __MEWUI_DATFILE_H__ */

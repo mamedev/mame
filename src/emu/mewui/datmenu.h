@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef __DATMENU_H__
-#define __DATMENU_H__
+#ifndef __MEWUI_DATMENU_H__
+#define __MEWUI_DATMENU_H__
 
 #include "mewui/utils.h"
 //-------------------------------------------------
@@ -87,4 +87,4 @@ private:
 	const game_driver *ui_driver;
 };
 
-#endif  /* __DATMENU_H__ */
+#endif  /* __MEWUI_DATMENU_H__ */

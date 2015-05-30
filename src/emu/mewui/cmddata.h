@@ -8,6 +8,11 @@
 	Please do not send any reports from this build to the MAME team.
 
 *********************************************************************/
+#pragma once
+
+#ifndef __MEWUI_CMDDATA_H__
+#define __MEWUI_CMDDATA_H__
+
 #define BUTTON_COLOR_RED		rgb_t(255,64,64)
 #define BUTTON_COLOR_YELLOW	 rgb_t(255,238,0)
 #define BUTTON_COLOR_GREEN	  rgb_t(0,255,64)
@@ -408,3 +413,5 @@ rgb_t get_rgb_color(rgb_t color)
 
 	return color;
 }
+
+#endif /* __MEWUI_CMDDATA_H__ */

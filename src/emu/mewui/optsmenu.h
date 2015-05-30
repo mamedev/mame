@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __OPTSMENU_H__
-#define __OPTSMENU_H__
+#ifndef __MEWUI_OPTSMENU_H__
+#define __MEWUI_OPTSMENU_H__
 
 #include "mewui/utils.h"
 
@@ -47,4 +47,4 @@ private:
 	};
 };
 
-#endif /* __OPTSMENU_H__ */
+#endif /* __MEWUI_OPTSMENU_H__ */

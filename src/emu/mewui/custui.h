@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __CUSTUI_H__
-#define __CUSTUI_H__
+#ifndef __MEWUI_CUSTUI_H__
+#define __MEWUI_CUSTUI_H__
 
 struct s_color_table
 {
@@ -134,4 +134,4 @@ private:
 	void inkey_special(const ui_menu_event *menu_event);
 };
 
-#endif /* __CUSTUI_H__ */
+#endif /* __MEWUI_CUSTUI_H__ */

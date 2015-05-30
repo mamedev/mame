@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __MSELECTOR_H__
-#define __MSELECTOR_H__
+#ifndef __MEWUI_SELECTOR_H__
+#define __MEWUI_SELECTOR_H__
 
 enum
 {
@@ -46,4 +46,4 @@ private:
 	void find_matches(const char *str);
 };
 
-#endif /* __MSELECTOR_H__ */
+#endif /* __MEWUI_SELECTOR_H__ */

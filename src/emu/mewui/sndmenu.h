@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __SNDMENU_H__
-#define __SNDMENU_H__
+#ifndef __MEWUI_SNDMENU_H__
+#define __MEWUI_SNDMENU_H__
 
 //-------------------------------------------------
 //  class sound options menu
@@ -38,4 +38,4 @@ private:
 	bool				m_sound;
 };
 
-#endif /* __SNDMENU_H__ */
+#endif /* __MEWUI_SNDMENU_H__ */

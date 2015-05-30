@@ -10,6 +10,10 @@
 	Revised for MEWUI by dankan1890.
 
 ***************************************************************************/
+#pragma once
+
+#ifndef __MEWUI_ICORENDER_H__
+#define __MEWUI_ICORENDER_H__
 
 // These next two structs represent how the icon information is stored
 // in an ICO file.
@@ -233,3 +237,5 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	file.close();
 	global_free_array(buffer);
 }
+
+#endif /* __MEWUI_ICORENDER_H__ */

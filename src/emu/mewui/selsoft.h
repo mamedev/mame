@@ -7,8 +7,8 @@
 ***************************************************************************/
 #pragma once
 
-#ifndef __SELSOFT_H__
-#define __SELSOFT_H__
+#ifndef __MEWUI_SELSOFT_H__
+#define __MEWUI_SELSOFT_H__
 
 #include "mewui/utils.h"
 
@@ -76,4 +76,4 @@ private:
 	void inkey_special(const ui_menu_event *menu_event);
 };
 
-#endif /* __SELSOFT_H__ */
+#endif /* __MEWUI_SELSOFT_H__ */
