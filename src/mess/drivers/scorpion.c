@@ -322,8 +322,6 @@ ROM_START(scorpio)
 	ROMX_LOAD("scorp2.rom",   0x018000, 0x4000, CRC(fd0d3ce1) SHA1(07783ee295274d8ff15d935bfd787c8ac1d54900), ROM_BIOS(7))
 	ROMX_LOAD("scorp3.rom",   0x01c000, 0x4000, CRC(1fe1d003) SHA1(33703e97cc93b7edfcc0334b64233cf81b7930db), ROM_BIOS(7))
 
-	ROM_FILL( 0x1fe47, 1, 0x3e)	// patch TR-DOS bug
-
 	ROM_REGION(0x01000, "keyboard", 0)
 	ROM_LOAD( "scrpkey.rom", 0x0000, 0x1000, CRC(e938a510) SHA1(2753993c97ff0fc6cff26ed792929abc1288dc6f))
 
