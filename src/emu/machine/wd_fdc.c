@@ -1232,6 +1232,10 @@ void wd_fdc_t::spinup()
 
 void wd_fdc_t::ready_callback(floppy_image_device *floppy, int state)
 {
+	// why is this even possible?
+	if (!floppy)
+		return;
+
 	live_sync();
 	if(!ready_hooked)
 		return;
@@ -1260,12 +1264,23 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 
 	switch(sub_state) {
 	case IDLE:
-		if(motor_control) {
+		if(motor_control || head_control) {
 			motor_timeout ++;
-			if(motor_timeout >= 5) {
+			if(motor_control && motor_timeout >= 5) {
 				status &= ~S_MON;
 				if(floppy)
 					floppy->mon_w(1);
+			}
+
+			if (head_control && motor_timeout >= 3)
+			{
+				hld = false;
+
+				// signal drive to unload head
+				if (!hld_cb.isnull())
+					hld_cb(hld);
+
+				status &= ~S_HLD; // todo: should get this value from the drive
 			}
 		}
 		break;

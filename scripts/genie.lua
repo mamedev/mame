@@ -725,24 +725,19 @@ if _OPTIONS["OPTIMIZE"] then
 		}
 	end
 	if _OPTIONS["LTO"]=="1" then
+-- -flto=4 -> 4 threads
 		buildoptions {
-			"-flto",
+			"-flto=4",
 		}
---		buildoptions {
---			"-ffat-lto-objects",
---		}
---		buildoptions {
---			"-flto-partition=1to1",
---		}
+		buildoptions {
+			"-fno-fat-lto-objects",
+		}
 		linkoptions {
-			"-flto",
+			"-flto=4",
 		}
---		linkoptions {
---			"-flto-partition=1to1",
---		}
---		linkoptions {
---			"-ffat-lto-objects",
---		}
+		linkoptions {
+			"-fno-fat-lto-objects",
+		}
 		
 		
 	end
