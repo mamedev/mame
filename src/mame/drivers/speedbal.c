@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Joseba Epalza
+// copyright-holders:Joseba Epalza,Andreas Naive
 /***************************************************************************
 
  Speed Ball / Music Ball

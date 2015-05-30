@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:insideoutboy, David Haywood, Stephh
 /* Flower Video Hardware */
 

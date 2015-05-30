@@ -1247,7 +1247,7 @@ Notes:
 #define JVSCLOCK    (XTAL_14_7456MHz)
 #define H8CLOCK     (16737350)      /* from 2061 */
 #define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
-#define C352CLOCK   (16737350*1.5)  /* measured at 25.992MHz from 2061 pin 9 (but that sounds too highpitched) */
+#define C352CLOCK   (25992000)  /* measured at 25.992MHz from 2061 pin 9 (System 12 uses a divider of 332) */
 #define VSYNC1      (59.8824)
 #define VSYNC2      (59.915)
 #define HSYNC       (16666150)
@@ -3320,7 +3320,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", C352CLOCK)
+	MCFG_C352_ADD("c352", C352CLOCK, C352_DIVIDER_332)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3389,7 +3389,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", C352CLOCK)
+	MCFG_C352_ADD("c352", C352CLOCK, C352_DIVIDER_332)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -3469,7 +3469,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", C352CLOCK)
+	MCFG_C352_ADD("c352", C352CLOCK, C352_DIVIDER_332)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)

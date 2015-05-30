@@ -10,6 +10,8 @@
 #ifndef PLISTS_H_
 #define PLISTS_H_
 
+#include <cstring>
+
 #include "palloc.h"
 #include "pstring.h"
 
@@ -236,7 +238,7 @@ public:
 	{
 		//nl_assert((pos>=0) && (pos<m_count));
 		m_count--;
-		for (int i = pos; i < m_count; i++)
+		for (std::size_t i = pos; i < m_count; i++)
 		{
 			m_list[i] = m_list[i+1];
 		}
@@ -337,9 +339,9 @@ template <class _ListClass>
 class pnamedlist_t : public plist_t<_ListClass>
 {
 public:
-	_ListClass find(const pstring &name) const
+	_ListClass find_by_name(const pstring &name) const
 	{
-		for (int i=0; i < this->size(); i++)
+		for (std::size_t i=0; i < this->size(); i++)
 			if (get_name((*this)[i]) == name)
 				return (*this)[i];
 		return _ListClass(NULL);
@@ -347,7 +349,7 @@ public:
 
 	void remove_by_name(const pstring &name)
 	{
-		plist_t<_ListClass>::remove(find(name));
+		plist_t<_ListClass>::remove(find_by_name(name));
 	}
 
 	bool add(_ListClass dev, bool allow_duplicate)
@@ -356,7 +358,7 @@ public:
 			plist_t<_ListClass>::add(dev);
 		else
 		{
-			if (!(this->find(get_name(dev)) == _ListClass(NULL)))
+			if (!(this->find_by_name(get_name(dev)) == _ListClass(NULL)))
 				return false;
 			plist_t<_ListClass>::add(dev);
 		}
@@ -508,6 +510,76 @@ public:
 
 private:
 	_ListClass *m_head;
+};
+
+// ----------------------------------------------------------------------------------------
+// string list
+// ----------------------------------------------------------------------------------------
+
+class pstring_list_t : public plist_t<pstring>
+{
+public:
+	pstring_list_t() : plist_t<pstring>() { }
+
+	pstring_list_t(const pstring &str, const pstring &onstr, bool ignore_empty = false)
+	: plist_t<pstring>()
+	{
+
+		int p = 0;
+		int pn;
+
+		pn = str.find(onstr, p);
+		while (pn>=0)
+		{
+			pstring t = str.substr(p, pn - p);
+			if (!ignore_empty || t.len() != 0)
+				this->add(t);
+			p = pn + onstr.len();
+			pn = str.find(onstr, p);
+		}
+		if (p<str.len())
+		{
+			pstring t = str.substr(p);
+			if (!ignore_empty || t.len() != 0)
+				this->add(t);
+		}
+	}
+
+	static pstring_list_t splitexpr(const pstring &str, const pstring_list_t &onstrl)
+	{
+		pstring_list_t temp;
+		pstring col = "";
+
+		int i = 0;
+		while (i<str.len())
+		{
+			int p = -1;
+			for (std::size_t j=0; j < onstrl.size(); j++)
+			{
+				if (std::strncmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].len())==0)
+				{
+					p = j;
+					break;
+				}
+			}
+			if (p>=0)
+			{
+				if (col != "")
+					temp.add(col);
+				col = "";
+				temp.add(onstrl[p]);
+				i += onstrl[p].len();
+			}
+			else
+			{
+				col += str.cstr()[i];
+				i++;
+			}
+		}
+		if (col != "")
+			temp.add(col);
+		return temp;
+	}
 };
 
 #endif /* PLISTS_H_ */

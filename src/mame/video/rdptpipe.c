@@ -163,7 +163,7 @@ void n64_texture_pipe_t::shift_copy(INT32* S, INT32* T, const n64_tile_t& tile)
 	*T = (INT32)(INT16)sst;
 }
 
-void n64_texture_pipe_t::clamp_cycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile)
+void n64_texture_pipe_t::clamp_cycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata)
 {
 	if (tile.clamp_s)
 	{
@@ -174,7 +174,7 @@ void n64_texture_pipe_t::clamp_cycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TF
 		}
 		else if (maxs)
 		{
-			*S = m_clamp_s_diff[tilenum];
+			*S = userdata->m_clamp_s_diff[tilenum];
 			*SFRAC = 0;
 		}
 		else
@@ -196,7 +196,7 @@ void n64_texture_pipe_t::clamp_cycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TF
 		}
 		else if (maxt)
 		{
-			*T = m_clamp_t_diff[tilenum];
+			*T = userdata->m_clamp_t_diff[tilenum];
 			*TFRAC = 0;
 		}
 		else
@@ -210,7 +210,7 @@ void n64_texture_pipe_t::clamp_cycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TF
 	}
 }
 
-void n64_texture_pipe_t::clamp_cycle_light(INT32* S, INT32* T, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile)
+void n64_texture_pipe_t::clamp_cycle_light(INT32* S, INT32* T, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata)
 {
 	if (tile.clamp_s)
 	{
@@ -220,7 +220,7 @@ void n64_texture_pipe_t::clamp_cycle_light(INT32* S, INT32* T, const bool maxs, 
 		}
 		else if (maxs)
 		{
-			*S = m_clamp_s_diff[tilenum];
+			*S = userdata->m_clamp_s_diff[tilenum];
 		}
 		else
 		{
@@ -240,7 +240,7 @@ void n64_texture_pipe_t::clamp_cycle_light(INT32* S, INT32* T, const bool maxs, 
 		}
 		else if (maxt)
 		{
-			*T = m_clamp_t_diff[tilenum];
+			*T = userdata->m_clamp_t_diff[tilenum];
 		}
 		else
 		{
@@ -267,7 +267,7 @@ void n64_texture_pipe_t::cycle_nearest(color_t* TEX, color_t* prev, INT32 SSS, I
 	INT32 sss1 = SSS, sst1 = SST;
 	bool maxs, maxt;
 	shift_cycle(&sss1, &sst1, &maxs, &maxt, tile);
-	clamp_cycle_light(&sss1, &sst1, maxs, maxt, tilenum, tile);
+	clamp_cycle_light(&sss1, &sst1, maxs, maxt, tilenum, tile, userdata);
 	mask(&sss1, &sst1, tile);
 
 	UINT32 tbase = tile.tmem + ((tile.line * sst1) & 0x1ff);
@@ -313,7 +313,7 @@ void n64_texture_pipe_t::cycle_nearest_lerp(color_t* TEX, color_t* prev, INT32 S
 	INT32 sss1 = SSS, sst1 = SST;
 	bool maxs, maxt;
 	shift_cycle(&sss1, &sst1, &maxs, &maxt, tile);
-	clamp_cycle_light(&sss1, &sst1, maxs, maxt, tilenum, tile);
+	clamp_cycle_light(&sss1, &sst1, maxs, maxt, tilenum, tile, userdata);
 	mask(&sss1, &sst1, tile);
 
 	UINT32 tbase = tile.tmem + ((tile.line * sst1) & 0x1ff);
@@ -336,7 +336,7 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, IN
 	INT32 sfrac = sss1 & 0x1f;
 	INT32 tfrac = sst1 & 0x1f;
 
-	clamp_cycle(&sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum, tile);
+	clamp_cycle(&sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum, tile, userdata);
 
 	INT32 sss2 = sss1 + 1;
 	INT32 sst2 = sst1 + 1;
@@ -401,7 +401,7 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 	INT32 sfrac = sss1 & 0x1f;
 	INT32 tfrac = sst1 & 0x1f;
 
-	clamp_cycle(&sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum, tile);
+	clamp_cycle(&sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum, tile, userdata);
 
 	INT32 sss2 = sss1 + 1;
 	INT32 sst2 = sst1 + 1;
@@ -742,7 +742,7 @@ void n64_texture_pipe_t::lod_2cycle_limited(INT32* sss, INT32* sst, const INT32 
 	}
 }
 
-void n64_texture_pipe_t::calculate_clamp_diffs(UINT32 prim_tile, const rdp_poly_state& object)
+void n64_texture_pipe_t::calculate_clamp_diffs(UINT32 prim_tile, rdp_span_aux* userdata, const rdp_poly_state& object)
 {
 	const n64_tile_t* tiles = object.m_tiles;
 	if (object.m_other_modes.cycle_type == CYCLE_TYPE_2)
@@ -751,24 +751,24 @@ void n64_texture_pipe_t::calculate_clamp_diffs(UINT32 prim_tile, const rdp_poly_
 		{
 			for (INT32 start = 0; start <= 7; start++)
 			{
-				m_clamp_s_diff[start] = (tiles[start].sh >> 2) - (tiles[start].sl >> 2);
-				m_clamp_t_diff[start] = (tiles[start].th >> 2) - (tiles[start].tl >> 2);
+				userdata->m_clamp_s_diff[start] = (tiles[start].sh >> 2) - (tiles[start].sl >> 2);
+				userdata->m_clamp_t_diff[start] = (tiles[start].th >> 2) - (tiles[start].tl >> 2);
 			}
 		}
 		else
 		{
 			const INT32 start = prim_tile;
 			const INT32 end = (prim_tile + 1) & 7;
-			m_clamp_s_diff[start] = (tiles[start].sh >> 2) - (tiles[start].sl >> 2);
-			m_clamp_t_diff[start] = (tiles[start].th >> 2) - (tiles[start].tl >> 2);
-			m_clamp_s_diff[end] = (tiles[end].sh >> 2) - (tiles[end].sl >> 2);
-			m_clamp_t_diff[end] = (tiles[end].th >> 2) - (tiles[end].tl >> 2);
+			userdata->m_clamp_s_diff[start] = (tiles[start].sh >> 2) - (tiles[start].sl >> 2);
+			userdata->m_clamp_t_diff[start] = (tiles[start].th >> 2) - (tiles[start].tl >> 2);
+			userdata->m_clamp_s_diff[end] = (tiles[end].sh >> 2) - (tiles[end].sl >> 2);
+			userdata->m_clamp_t_diff[end] = (tiles[end].th >> 2) - (tiles[end].tl >> 2);
 		}
 	}
 	else//1-cycle or copy
 	{
-		m_clamp_s_diff[prim_tile] = (tiles[prim_tile].sh >> 2) - (tiles[prim_tile].sl >> 2);
-		m_clamp_t_diff[prim_tile] = (tiles[prim_tile].th >> 2) - (tiles[prim_tile].tl >> 2);
+		userdata->m_clamp_s_diff[prim_tile] = (tiles[prim_tile].sh >> 2) - (tiles[prim_tile].sl >> 2);
+		userdata->m_clamp_t_diff[prim_tile] = (tiles[prim_tile].th >> 2) - (tiles[prim_tile].tl >> 2);
 	}
 }
 

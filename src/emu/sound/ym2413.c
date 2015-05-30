@@ -280,7 +280,7 @@ struct YM2413
 /* table is 3dB/octave, DV converts this into 6dB/octave */
 /* 0.1875 is bit 0 weight of the envelope counter (volume) expressed in the 'decibel' scale */
 #define DV (0.1875/1.0)
-static const UINT32 ksl_tab[8*16]=
+static const double ksl_tab[8*16]=
 {
 	/* OCT 0 */
 		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
@@ -447,7 +447,7 @@ O( 0),O( 0),O( 0),O( 0),O( 0),O( 0),O( 0),O( 0),
 
 /* multiple table */
 #define ML 2
-static const UINT8 mul_tab[16]= {
+static const double mul_tab[16]= {
 /* 1/2, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,10,12,12,15,15 */
 	0.50*ML, 1.00*ML, 2.00*ML, 3.00*ML, 4.00*ML, 5.00*ML, 6.00*ML, 7.00*ML,
 	8.00*ML, 9.00*ML,10.00*ML,10.00*ML,12.00*ML,12.00*ML,15.00*ML,15.00*ML
@@ -1367,7 +1367,7 @@ static void OPLL_initalize(YM2413 *chip, device_t *device)
 		logerror("ym2413.c: ksl_tab[oct=%2i] =",i);
 		for (j=0; j<16; j++)
 		{
-			logerror("%08x ", ksl_tab[i*16+j] );
+			logerror("%08x ", (UINT32)ksl_tab[i*16+j] );
 		}
 		logerror("\n");
 	}
@@ -1470,7 +1470,7 @@ INLINE void set_mul(YM2413 *chip,int slot,int v)
 	OPLL_CH   *CH   = &chip->P_CH[slot/2];
 	OPLL_SLOT *SLOT = &CH->SLOT[slot&1];
 
-	SLOT->mul     = mul_tab[v&0x0f];
+	SLOT->mul     = (UINT8)mul_tab[v&0x0f];
 	SLOT->KSR     = (v&0x10) ? 0 : 2;
 	SLOT->eg_type = (v&0x20);
 	SLOT->vib     = (v&0x40);
@@ -1839,7 +1839,7 @@ static void OPLLWriteReg(YM2413 *chip, int r, int v)
 			/* BLK 2,1,0 bits -> bits 3,2,1 of kcode, FNUM MSB -> kcode LSB */
 			CH->kcode    = (block_fnum&0x0f00)>>8;
 
-			CH->ksl_base = ksl_tab[block_fnum>>5];
+			CH->ksl_base = (UINT32) ksl_tab[block_fnum>>5];
 
 			block_fnum   = block_fnum * 2;
 			block        = (block_fnum&0x1c00) >> 10;

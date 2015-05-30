@@ -158,8 +158,7 @@
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "nl_util.h"
-#include "pstring.h"
-#include "pstate.h"
+#include "plib/pstate.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -483,7 +482,7 @@ public:
 	}
 
 	/* inline only intended to be called from nl_base.c */
-	ATTR_HOT /* inline */ void update_dev(const UINT32 mask);
+	ATTR_HOT inline void update_dev(const UINT32 mask);
 
 protected:
 	/* ATTR_COLD */ virtual void save_register()
@@ -1197,7 +1196,7 @@ public:
 	plist_t<_C *> get_device_list()
 	{
 		plist_t<_C *> tmp;
-		for (int i = 0; i < m_devices.size(); i++)
+		for (std::size_t i = 0; i < m_devices.size(); i++)
 		{
 			_C *dev = dynamic_cast<_C *>(m_devices[i]);
 			if (dev != NULL)
@@ -1209,7 +1208,7 @@ public:
 	template<class _C>
 	_C *get_first_device()
 	{
-		for (int i = 0; i < m_devices.size(); i++)
+		for (std::size_t i = 0; i < m_devices.size(); i++)
 		{
 			_C *dev = dynamic_cast<_C *>(m_devices[i]);
 			if (dev != NULL)
@@ -1222,7 +1221,7 @@ public:
 	_C *get_single_device(const char *classname)
 	{
 		_C *ret = NULL;
-		for (int i = 0; i < m_devices.size(); i++)
+		for (std::size_t i = 0; i < m_devices.size(); i++)
 		{
 			_C *dev = dynamic_cast<_C *>(m_devices[i]);
 			if (dev != NULL)
@@ -1418,6 +1417,16 @@ ATTR_HOT inline void netlist_analog_output_t::set_Q(const nl_double newQ)
 		net().as_analog().m_cur_Analog = newQ;
 		net().push_to_queue(NLTIME_FROM_NS(1));
 	}
+}
+
+ATTR_HOT inline void netlist_base_t::push_to_queue(netlist_net_t &out, const netlist_time &attime)
+{
+	m_queue.push(netlist_queue_t::entry_t(attime, &out));
+}
+
+ATTR_HOT inline void netlist_base_t::remove_from_queue(netlist_net_t &out)
+{
+	m_queue.remove(&out);
 }
 
 #endif /* NLBASE_H_ */

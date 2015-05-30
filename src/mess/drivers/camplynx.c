@@ -363,7 +363,7 @@ READ8_MEMBER( camplynx_state::port80_r )
 	if BIT(m_port80, 1)
 	{
 		data &= 0xfe;
-		data |= (m_cass->input() > +0.02) ? 1 : 0;
+		data |= (m_cass->input() > +0.02) ? 0 : 1;
 	}
 	return data;
 }

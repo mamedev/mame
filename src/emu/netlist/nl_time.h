@@ -8,7 +8,7 @@
 #define NLTIME_H_
 
 #include "nl_config.h"
-#include "pstate.h"
+#include "plib/pstate.h"
 
 //============================================================
 //  MACROS
@@ -70,6 +70,7 @@ protected:
 
 	ATTR_HOT inline netlist_time(const INTERNALTYPE val) : m_time(val) {}
 
+private:
 	INTERNALTYPE m_time;
 };
 

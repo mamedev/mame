@@ -39,7 +39,9 @@ extern int drawnone_init(running_machine &machine, osd_draw_callbacks *callbacks
 extern int drawgdi_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawdd_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks);
+#if defined(USE_BGFX)
 extern int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
+#endif
 #if (USE_OPENGL)
 extern int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
 #endif
@@ -227,8 +229,10 @@ bool windows_osd_interface::window_init()
 	}
 	if (video_config.mode == VIDEO_MODE_GDI)
 		drawgdi_init(machine(), &draw);
+#if defined(USE_BGFX)
 	if (video_config.mode == VIDEO_MODE_BGFX)
 		drawbgfx_init(machine(), &draw);
+#endif
 	if (video_config.mode == VIDEO_MODE_NONE)
 		drawnone_init(machine(), &draw);
 #if (USE_OPENGL)

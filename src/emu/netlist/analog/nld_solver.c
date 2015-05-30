@@ -51,7 +51,7 @@ ATTR_COLD void terms_t::add(netlist_terminal_t *term, int net_other)
 
 ATTR_COLD void terms_t::set_pointers()
 {
-	for (int i = 0; i < count(); i++)
+	for (unsigned i = 0; i < count(); i++)
 	{
 		m_term[i]->m_gt1 = &m_gt[i];
 		m_term[i]->m_go1 = &m_go[i];
@@ -156,7 +156,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 					break;
 			}
 		}
-		NL_VERBOSE_OUT(("added net with %d populated connections\n", net->m_core_terms.size()));
+		NL_VERBOSE_OUT(("added net with %" SIZETFMT " populated connections\n", net->m_core_terms.size()));
 	}
 }
 

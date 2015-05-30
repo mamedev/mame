@@ -5,8 +5,8 @@
     EACA Colour Genie Floppy Disc Controller
 
     TODO:
-    - Only native MESS .mfi files load (some sectors are marked DDM)
-    - FM mode disks can be formatted but don't work correctly
+    - Plain sector files are not working (some sectors are marked DDM),
+      maybe support the .cgd format?
     - What's the exact FD1793 model?
     - How does it turn off the motor?
     - What's the source of the timer and the exact timings?
@@ -33,11 +33,10 @@ const device_type CGENIE_FDC = &device_creator<cgenie_fdc_device>;
 
 DEVICE_ADDRESS_MAP_START( mmio, 8, cgenie_fdc_device )
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x10) AM_READWRITE(irq_r, select_w)
-	AM_RANGE(0xec, 0xef) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_t, read)
-	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_WRITE(command_w)
-	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVWRITE("fd1793", fd1793_t, track_w)
-	AM_RANGE(0xee, 0xee) AM_MIRROR(0x10) AM_DEVWRITE("fd1793", fd1793_t, sector_w)
-	AM_RANGE(0xef, 0xef) AM_MIRROR(0x10) AM_DEVWRITE("fd1793", fd1793_t, data_w)
+	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_t, status_r) AM_WRITE(command_w)
+	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, track_r, track_w)
+	AM_RANGE(0xee, 0xee) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, sector_r, sector_w)
+	AM_RANGE(0xef, 0xef) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, data_r, data_w)
 ADDRESS_MAP_END
 
 FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )

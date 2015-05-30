@@ -7,12 +7,11 @@
 
 #include <cstring>
 
-#include "palloc.h"
+#include "plib/palloc.h"
 
 #include "nl_base.h"
 #include "devices/nld_system.h"
 #include "analog/nld_solver.h"
-#include "pstring.h"
 #include "nl_util.h"
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
@@ -680,7 +679,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	const int masks[4] = { 1, 5, 3, 1 };
+	const UINT32 masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
 
 	m_in_queue = 2; /* mark as taken ... */
@@ -1089,12 +1088,3 @@ NETLIB_UPDATE(mainclock)
 	net.set_time(netlist().time() + m_inc);
 }
 
-ATTR_HOT void netlist_base_t::push_to_queue(netlist_net_t &out, const netlist_time &attime)
-{
-	m_queue.push(netlist_queue_t::entry_t(attime, &out));
-}
-
-ATTR_HOT void netlist_base_t::remove_from_queue(netlist_net_t &out)
-{
-	m_queue.remove(&out);
-}

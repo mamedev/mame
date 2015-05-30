@@ -96,6 +96,34 @@ pstring ptokenizer::get_identifier()
 	return tok.str();
 }
 
+double ptokenizer::get_number_double()
+{
+	token_t tok = get_token();
+	if (!tok.is_type(NUMBER))
+	{
+		error("Error: expected a number, got <%s>\n", tok.str().cstr());
+	}
+	bool err = false;
+	double ret = tok.str().as_double(&err);
+	if (err)
+		error("Error: expected a number, got <%s>\n", tok.str().cstr());
+	return ret;
+}
+
+long ptokenizer::get_number_long()
+{
+	token_t tok = get_token();
+	if (!tok.is_type(NUMBER))
+	{
+		error("Error: expected a long int, got <%s>\n", tok.str().cstr());
+	}
+	bool err = false;
+	long ret = tok.str().as_long(&err);
+	if (err)
+		error("Error: expected a long int, got <%s>\n", tok.str().cstr());
+	return ret;
+}
+
 ptokenizer::token_t ptokenizer::get_token()
 {
 	while (true)
@@ -135,7 +163,26 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			return token_t(ENDOFFILE);
 		}
 	}
-	if (m_identifier_chars.find(c)>=0)
+	if (m_number_chars_start.find(c)>=0)
+	{
+		/* read number while we receive number or identifier chars
+		 * treat it as an identifier when there are identifier chars in it
+		 *
+		 */
+		token_type ret = NUMBER;
+		pstring tokstr = "";
+		while (true) {
+			if (m_identifier_chars.find(c)>=0 && m_number_chars.find(c)<0)
+				ret = IDENTIFIER;
+			else if (m_number_chars.find(c)<0)
+				break;
+			tokstr += c;
+			c = getc();
+		}
+		ungetc();
+		return token_t(ret, tokstr);
+	}
+	else if (m_identifier_chars.find(c)>=0)
 	{
 		/* read identifier till non identifier char */
 		pstring tokstr = "";
@@ -218,6 +265,8 @@ ppreprocessor::ppreprocessor()
 	m_expr_sep.add("==");
 	m_expr_sep.add(" ");
 	m_expr_sep.add("\t");
+
+	m_defines.add(define_t("__PLIB_PREPROCESSOR__", "1"));
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -227,7 +276,7 @@ void ppreprocessor::error(const pstring &err)
 
 
 
-double ppreprocessor::expr(const nl_util::pstring_list &sexpr, std::size_t &start, int prio)
+double ppreprocessor::expr(const pstring_list_t &sexpr, std::size_t &start, int prio)
 {
 	double val;
 	pstring tok=sexpr[start];
@@ -300,7 +349,7 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
-	nl_util::pstring_list elems = nl_util::splitexpr(line, m_expr_sep);
+	pstring_list_t elems = pstring_list_t::splitexpr(line, m_expr_sep);
 	pstringbuffer ret = "";
 	for (std::size_t i=0; i<elems.size(); i++)
 	{
@@ -313,7 +362,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	return pstring(ret.cstr());
 }
 
-static pstring catremainder(const nl_util::pstring_list &elems, std::size_t start, pstring sep)
+static pstring catremainder(const pstring_list_t &elems, std::size_t start, pstring sep)
 {
 	pstringbuffer ret = "";
 	for (std::size_t i=start; i<elems.size(); i++)
@@ -327,7 +376,7 @@ static pstring catremainder(const nl_util::pstring_list &elems, std::size_t star
 pstring ppreprocessor::process(const pstring &contents)
 {
 	pstringbuffer ret = "";
-	nl_util::pstring_list lines = nl_util::split(contents,"\n", false);
+	pstring_list_t lines(contents,"\n", false);
 	UINT32 ifflag = 0; // 31 if levels
 	int level = 0;
 
@@ -336,15 +385,16 @@ pstring ppreprocessor::process(const pstring &contents)
 	{
 		pstring line = lines[i];
 		pstring lt = line.replace("\t"," ").trim();
-		lt = replace_macros(lt);
+		// FIXME ... revise and extend macro handling
 		if (lt.startsWith("#"))
 		{
-			nl_util::pstring_list lti = nl_util::split(lt, " ", true);
+			pstring_list_t lti(lt, " ", true);
 			if (lti[0].equals("#if"))
 			{
 				level++;
 				std::size_t start = 0;
-				nl_util::pstring_list t = nl_util::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
+				lt = replace_macros(lt);
+				pstring_list_t t = pstring_list_t::splitexpr(lt.substr(3).replace(" ",""), m_expr_sep);
 				int val = expr(t, start, 0);
 				if (val == 0)
 					ifflag |= (1 << level);
@@ -376,7 +426,7 @@ pstring ppreprocessor::process(const pstring &contents)
 			}
 			else if (lti[0].equals("#pragma"))
 			{
-				if (lti.size() > 3 && lti[1].equals("NETLIST"))
+				if (ifflag == 0 && lti.size() > 3 && lti[1].equals("NETLIST"))
 				{
 					if (lti[2].equals("warning"))
 						error("NETLIST: " + catremainder(lti, 3, " "));
@@ -384,9 +434,12 @@ pstring ppreprocessor::process(const pstring &contents)
 			}
 			else if (lti[0].equals("#define"))
 			{
-				if (lti.size() != 3)
-					error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
-				m_defines.add(define_t(lti[1], lti[2]));
+				if (ifflag == 0)
+				{
+					if (lti.size() != 3)
+						error(pstring::sprintf("PREPRO: only simple defines allowed: %s", line.cstr()));
+					m_defines.add(define_t(lti[1], lti[2]));
+				}
 			}
 			else
 				error(pstring::sprintf("unknown directive on line %" SIZETFMT ": %s\n", i, line.cstr()));
@@ -395,9 +448,10 @@ pstring ppreprocessor::process(const pstring &contents)
 		{
 			//if (ifflag == 0 && level > 0)
 			//  fprintf(stderr, "conditional: %s\n", line.cstr());
+			lt = replace_macros(lt);
 			if (ifflag == 0)
 			{
-				ret.cat(line);
+				ret.cat(lt);
 				ret.cat("\n");
 			}
 		}

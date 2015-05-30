@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:???
 // copyright-holders:Gordon Jefferyes, Nigel Barnes
 /******************************************************************************
     BBC Model B
@@ -1576,7 +1576,7 @@ void bbc_state::bbc_update_fdq_int(int state)
 		/* do not trigger int */
 		bbc_state = 0;
 	}
-
+//printf("bbc_state %d prev %d\n", bbc_state, m_previous_wd177x_int_state);
 	/* nmi is edge triggered, and triggers when the state goes from clear->set.
 	Here we are checking this transition before triggering the nmi */
 	if (bbc_state!=m_previous_wd177x_int_state)
@@ -1594,6 +1594,7 @@ void bbc_state::bbc_update_fdq_int(int state)
 
 WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_intrq_w)
 {
+//printf("bbc_wd177x_intrq_w %d \n", state);
 	m_wd177x_irq_state = state;
 	bbc_update_fdq_int(state);
 }
@@ -1889,8 +1890,6 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 	// bit 0, 1: drive select
 	if (BIT(data, 0)) floppy = floppy0;
 	if (BIT(data, 1)) floppy = floppy1;
-
-	fdc->set_floppy(floppy);
 
 	// bit 4: side select
 	if (floppy)

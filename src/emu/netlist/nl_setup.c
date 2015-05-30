@@ -7,7 +7,7 @@
 
 #include <cstdio>
 
-#include "palloc.h"
+#include "plib/palloc.h"
 #include "nl_base.h"
 #include "nl_setup.h"
 #include "nl_parser.h"
@@ -39,7 +39,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 	, m_proxy_cnt(0)
 {
 	netlist.set_setup(this);
-	m_factory = palloc(netlist_factory_t);
+	m_factory = palloc(netlist_factory_list_t);
 }
 
 void netlist_setup_t::init()
@@ -104,23 +104,9 @@ netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const 
 	return register_dev(dev, name);
 }
 
-template <class T>
-static void remove_start_with(T &hm, pstring &sw)
-{
-	for (std::size_t i = hm.size() - 1; i >= 0; i--)
-	{
-		pstring x = hm[i]->name();
-		if (sw.equals(x.substr(0, sw.len())))
-		{
-			NL_VERBOSE_OUT(("removing %s\n", hm[i]->name().cstr()));
-			hm.remove(hm[i]);
-		}
-	}
-}
-
 void netlist_setup_t::remove_dev(const pstring &name)
 {
-	netlist_device_t *dev = netlist().m_devices.find(name);
+	netlist_device_t *dev = netlist().m_devices.find_by_name(name);
 	pstring temp = name + ".";
 	if (dev == NULL)
 		netlist().error("Device %s does not exist\n", name.cstr());
@@ -215,7 +201,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 			{
 				netlist_param_t &param = dynamic_cast<netlist_param_t &>(obj);
 				//printf("name: %s\n", name.cstr());
-				const pstring val = m_params_temp.find(name).e2;
+				const pstring val = m_params_temp.find_by_name(name).e2;
 				if (val != "")
 				{
 					switch (param.param_type())
@@ -286,7 +272,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 
 void netlist_setup_t::register_link_arr(const pstring &terms)
 {
-	nl_util::pstring_list list = nl_util::split(terms,", ");
+	pstring_list_t list(terms,", ");
 	if (list.size() < 2)
 		netlist().error("You must pass at least 2 terminals to NET_C");
 	for (std::size_t i = 1; i < list.size(); i++)
@@ -327,7 +313,7 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	/* FIXME: Detect endless loop */
 	do {
 		ret = temp;
-		temp = m_alias.find(ret).e2;
+		temp = m_alias.find_by_name(ret).e2;
 	} while (temp != "");
 
 	NL_VERBOSE_OUT(("%s==>%s\n", name.cstr(), ret.cstr()));
@@ -339,13 +325,13 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 	const pstring &tname = resolve_alias(terminal_in);
 	netlist_core_terminal_t *ret;
 
-	ret = m_terminals.find(tname);
+	ret = m_terminals.find_by_name(tname);
 	/* look for default */
 	if (ret == NULL)
 	{
 		/* look for ".Q" std output */
 		pstring s = tname + ".Q";
-		ret = m_terminals.find(s);
+		ret = m_terminals.find_by_name(s);
 	}
 	if (ret == NULL && required)
 		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
@@ -359,13 +345,13 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 	const pstring &tname = resolve_alias(terminal_in);
 	netlist_core_terminal_t *ret;
 
-	ret = m_terminals.find(tname);
+	ret = m_terminals.find_by_name(tname);
 	/* look for default */
 	if (ret == NULL && atype == netlist_object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		pstring s = tname + ".Q";
-		ret = m_terminals.find(s);
+		ret = m_terminals.find_by_name(s);
 	}
 	if (ret == NULL && required)
 		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
@@ -388,7 +374,7 @@ netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool requi
 	const pstring &outname = resolve_alias(param_in_fqn);
 	netlist_param_t *ret;
 
-	ret = m_params.find(outname);
+	ret = m_params.find_by_name(outname);
 	if (ret == NULL && required)
 		netlist().error("parameter %s(%s) not found!\n", param_in_fqn.cstr(), outname.cstr());
 	if (ret != NULL)
@@ -776,8 +762,8 @@ void netlist_setup_t::start_devices()
 	if (env != "")
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
-		nl_util::pstring_list ll = nl_util::split(env, ":");
-		for (std::size_t i=0; i < ll.size(); i++)
+		pstring_list_t ll(env, ":");
+		for (unsigned i=0; i < ll.size(); i++)
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
@@ -801,15 +787,13 @@ void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{
-		for (netlist_core_device_t * const *entry = netlist().m_started_devices.first(); entry != NULL; entry = netlist().m_started_devices.next(entry))
+		for (std::size_t i = 0; i < netlist().m_started_devices.size(); i++)
 		{
-			//entry->object()->s
-			printf("Device %20s : %12d %12d %15ld\n", (*entry)->name().cstr(), (*entry)->stat_call_count, (*entry)->stat_update_count, (long int) (*entry)->stat_total_time / ((*entry)->stat_update_count + 1));
+			netlist_core_device_t *entry = netlist().m_started_devices[i];
+			printf("Device %20s : %12d %12d %15ld\n", entry->name().cstr(), entry->stat_call_count, entry->stat_update_count, (long int) entry->stat_total_time / (entry->stat_update_count + 1));
 		}
-		printf("Queue Start %15d\n", m_netlist.queue().m_prof_start);
-		printf("Queue End   %15d\n", m_netlist.queue().m_prof_end);
-		printf("Queue Sort  %15d\n", m_netlist.queue().m_prof_sort);
-		printf("Queue Move  %15d\n", m_netlist.queue().m_prof_sortmove);
+		printf("Queue Pushes %15d\n", m_netlist.queue().m_prof_call);
+		printf("Queue Moves  %15d\n", m_netlist.queue().m_prof_sortmove);
 	}
 #endif
 }

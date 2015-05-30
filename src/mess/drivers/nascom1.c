@@ -72,7 +72,8 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_01_r);
 	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
-	virtual DECLARE_DRIVER_INIT(nascom);
+	// FIXME
+	/*virtual*/ DECLARE_DRIVER_INIT(nascom);
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 	DECLARE_READ8_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
@@ -112,9 +113,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
-
-	virtual DECLARE_DRIVER_INIT(nascom);
-	virtual DECLARE_DRIVER_INIT(nascomc);
+	// FIXME
+	/*virtual*/ DECLARE_DRIVER_INIT(nascom);
+	/*virtual*/ DECLARE_DRIVER_INIT(nascomc);
 	UINT32 screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	int load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);

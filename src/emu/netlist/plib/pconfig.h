@@ -77,6 +77,23 @@ typedef int64_t      INT64;
 #define S64(val) val
 #endif
 
+/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
+#if (defined(__MINGW32__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))) || defined(_MSC_VER)
+#define I64FMT   "I64"
+#else
+#define I64FMT   "ll"
+#endif
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef PTR64
+#define SIZETFMT   "I64u"
+#else
+#define SIZETFMT   "u"
+#endif
+#else
+#define SIZETFMT   "zu"
+#endif
+
 #endif
 
 #endif /* PCONFIG_H_ */
