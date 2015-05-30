@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
 
     Scorpion 4 Hardware Platform (c)1996 Bell Fruit Manufacturing
@@ -610,13 +612,6 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 }
 
 
-WRITE_LINE_MEMBER(sc4_state::bfm_sc4_irqhandler)
-{
-	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
-}
-
-
-
 WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_irq_handler)
 {
 	// triggers after reel tests on luckb, at the start on dnd...
@@ -709,7 +704,6 @@ MACHINE_CONFIG_FRAGMENT( sc4_common )
 //  MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(sc4_state, bfm_sc4_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

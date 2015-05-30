@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 // TMS320C82 Master Processor core execution
 
 #include "emu.h"
@@ -1426,7 +1428,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
-						UINT64 res = d2u((double)(s1 + s2));
+						UINT64 res = d2u((double) s1 + s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1434,7 +1436,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					{
 						double s1 = u2d(m_fpair[src1 >> 1]);
 						float s2 = u2f(m_reg[rs]);
-						UINT64 res = d2u((double)(s1 + s2));
+						UINT64 res = d2u(s1 + (double) s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1484,7 +1486,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
-						UINT64 res = d2u((double)(s1 - s2));
+						UINT64 res = d2u((double) s1 - s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1492,7 +1494,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					{
 						double s1 = u2d(m_fpair[src1 >> 1]);
 						float s2 = u2f(m_reg[rs]);
-						UINT64 res = d2u((double)(s1 - s2));
+						UINT64 res = d2u(s1 - (double) s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1542,7 +1544,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
-						UINT64 res = d2u((double)(s1 * s2));
+						UINT64 res = d2u((double)s1 * s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1550,7 +1552,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					{
 						double s1 = u2d(m_fpair[src1 >> 1]);
 						float s2 = u2f(m_reg[rs]);
-						UINT64 res = d2u((double)(s1 * s2));
+						UINT64 res = d2u(s1 * (double) s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1558,7 +1560,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 					{
 						double s1 = u2d(m_fpair[src1 >> 1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
-						UINT64 res = d2u((double)(s1 * s2));
+						UINT64 res = d2u(s1 * s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}

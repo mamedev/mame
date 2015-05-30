@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU4 games by 'Union' */
 
 #include "emu.h"
@@ -7,7 +9,7 @@ MACHINE_CONFIG_EXTERN( mod4oki );
 MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 
 
 ROM_START( m4cwalk )

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /*
  * Couriersud, July 2014:
  *
@@ -433,7 +435,7 @@ INLINE void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, con
 {
 	double min = 10.0,  max = 0.0;
 
-	dynamic_array<double> temp(8*32*32*32, 0);
+	std::vector<double> temp(8*32*32*32, 0);
 
 	for (int e=0; e < 8; e++)
 	{

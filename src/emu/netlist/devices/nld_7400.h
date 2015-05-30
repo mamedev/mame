@@ -39,11 +39,11 @@
 		NET_CONNECT(_name, A, _A)                                                   \
 		NET_CONNECT(_name, B, _B)
 
-#if 1
-NETLIB_SIGNAL(7400, 2, 0, 0);
-#else
+#if (USE_TRUTHTABLE)
 #include "nld_truthtable.h"
 NETLIB_TRUTHTABLE(7400, 2, 1, 0);
+#else
+NETLIB_SIGNAL(7400, 2, 0, 0);
 #endif
 
 

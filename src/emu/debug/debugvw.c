@@ -501,14 +501,14 @@ bool debug_view_expression::recompute()
 	// if dirty, re-evaluate
 	if (m_dirty)
 	{
-		astring oldstring(m_parsed.original_string());
+		std::string oldstring(m_parsed.original_string());
 		try
 		{
-			m_parsed.parse(m_string);
+			m_parsed.parse(m_string.c_str());
 		}
 		catch (expression_error &)
 		{
-			m_parsed.parse(oldstring);
+			m_parsed.parse(oldstring.c_str());
 		}
 	}
 

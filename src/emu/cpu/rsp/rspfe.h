@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /***************************************************************************
 
     rspfe.h
 
     Front-end for RSP recompiler
-
-    Copyright the MESS team
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Dan Boris, Fabio Priuli, Mike Saarna, Robert Tuccitto
 /***************************************************************************
 
   Atari MARIA video emulation

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Philip Bennett
 /***************************************************************************
 
     qs1000.c
@@ -246,7 +248,7 @@ void qs1000_device::device_start()
 
 	save_item(NAME(m_serial_data_in));
 	save_item(NAME(m_wave_regs));
-	
+
 	for (int i = 0; i < QS1000_CHANNELS; i++)
 	{
 		save_item(NAME(m_channels[i].m_acc), i);

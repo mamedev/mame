@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_opamps.c
  *
@@ -31,7 +33,7 @@ NETLIST_START(opamp_lm3900)
 	NET_C(R1.2, R2.2, G1.ON)
 	VCVS(G1)
 	PARAM(G1.G, 10000000)
-    //PARAM(G1.RI, 1)
+	//PARAM(G1.RI, 1)
 	PARAM(G1.RO, RES_K(8))
 
 NETLIST_END()

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Marc Lafontaine
 /***************************************************************************
 
 Time Pilot 84  (c) 1984 Konami

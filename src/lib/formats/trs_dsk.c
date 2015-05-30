@@ -1,4 +1,7 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 #include <string.h>
+#include <assert.h>
 #include "trs_dsk.h"
 #include "basicdsk.h"
 #include "coco_dsk.h"

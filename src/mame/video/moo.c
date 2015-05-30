@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Acho A. Tang
 /***************************************************************************
 
  Wild West C.O.W.boys of Moo Mesa

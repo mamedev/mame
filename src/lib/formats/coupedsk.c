@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*************************************************************************
 
     formats/coupedsk.c
@@ -6,7 +8,8 @@
 
 **************************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/coupedsk.h"
 #include "flopimg.h"
 

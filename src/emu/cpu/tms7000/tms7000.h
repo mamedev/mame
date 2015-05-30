@@ -1,21 +1,10 @@
-/*****************************************************************************
- *
- *   tms7000.h (c header file)
- *   Portable TMS7000 emulator (Texas Instruments 7000)
- *
- *   Copyright tim lindner, all rights reserved.
- *
- *   - This source code is released as freeware for non-commercial purposes.
- *   - You are free to use and redistribute this code in modified or
- *     unmodified form, provided you list me in the credits.
- *   - If you modify this source code, you must add a notice to each modified
- *     source file that it has been changed.  If you're a nice person, you
- *     will clearly mark each change too.  :)
- *   - If you wish to use this for commercial purposes, please contact me at
- *     tlindner@macmess.org
- *   - This entire notice must remain in the source code.
- *
- *****************************************************************************/
+// license:BSD-3-Clause
+// copyright-holders:hap, Tim Lindner
+/*
+
+  Texas Instruments TMS7000
+
+*/
 
 #pragma once
 
@@ -91,7 +80,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, astring &string);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }

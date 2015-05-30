@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 #include "sound/msm5205.h"
 
 #define MCU_BUFFER_MAX 6
@@ -12,28 +14,31 @@ public:
 		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_rombank(*this, "rombank"),
-		m_adpcmrom(*this, "adpcm"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_rombank(*this, "rombank"),
+		m_adpcmrom(*this, "adpcm")  { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_memory_bank m_rombank;
-	required_region_ptr<UINT8> m_adpcmrom;
+
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_bg_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
+
+	required_memory_bank m_rombank;
+
+	required_region_ptr<UINT8> m_adpcmrom;
 
 	UINT32 m_adpcm_pos;
 	UINT32 m_adpcm_end;
 	bool m_adpcm_playing;
 
-	int m_mcu_sim;
+	bool m_mcu_sim;
 	int m_from_main;
 	int m_from_mcu;
 	int m_main_sent;
@@ -63,20 +68,20 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_w);
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(renegade_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(coincounter_w);
 	void mcu_process_command();
-	DECLARE_READ8_MEMBER(renegade_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(renegade_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(renegade_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(renegade_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(renegade_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(renegade_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(renegade_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(renegade_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(renegade_68705_ddr_c_w);
+	DECLARE_READ8_MEMBER(_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(_68705_ddr_b_w);
+	DECLARE_READ8_MEMBER(_68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(_68705_port_c_w);
+	DECLARE_WRITE8_MEMBER(_68705_ddr_c_w);
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(renegade_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(scroll_lsb_w);
 	DECLARE_WRITE8_MEMBER(scroll_msb_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
@@ -85,15 +90,18 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_stop_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
+	TILE_GET_INFO_MEMBER(get_bg_tilemap_info);
+	TILE_GET_INFO_MEMBER(get_fg_tilemap_info);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
 	DECLARE_DRIVER_INIT(kuniokun);
 	DECLARE_DRIVER_INIT(kuniokunb);
 	DECLARE_DRIVER_INIT(renegade);
-	TILE_GET_INFO_MEMBER(get_bg_tilemap_info);
-	TILE_GET_INFO_MEMBER(get_fg_tilemap_info);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_renegade(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(renegade_interrupt);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

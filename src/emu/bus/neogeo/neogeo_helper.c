@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:S. Smith,David Haywood
 
 #include "emu.h"
 #include "neogeo_helper.h"
@@ -23,7 +25,7 @@ static UINT32 get_region_mask(UINT8* rgn, UINT32 rgn_size)
 	return mask;
 }
 
-UINT32 neogeohelper_optimize_sprite_data(dynamic_array<UINT8> &spritegfx, UINT8* region_sprites, UINT32 region_sprites_size)
+UINT32 neogeohelper_optimize_sprite_data(std::vector<UINT8> &spritegfx, UINT8* region_sprites, UINT32 region_sprites_size)
 {
 	/* convert the sprite graphics data into a format that
 	   allows faster blitting */
@@ -36,7 +38,7 @@ UINT32 neogeohelper_optimize_sprite_data(dynamic_array<UINT8> &spritegfx, UINT8*
 	UINT32 spritegfx_address_mask = mask;
 
 	src = region_sprites;
-	dest = spritegfx;
+	dest = &spritegfx[0];
 
 	for (unsigned i = 0; i < region_sprites_size; i += 0x80, src += 0x80)
 	{

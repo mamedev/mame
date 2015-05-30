@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #include "dsp16.h"
 
 #define DSP_LINE(__DSP_DOCLINE__) printf("0x%04x - %d (%s)\n", m_pc, __LINE__, __DSP_DOCLINE__);

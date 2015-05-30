@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /* ASG 971222 -- rewrote this interface */
 #ifndef __NEC_H_
 #define __NEC_H_
@@ -40,7 +42,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL); }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, astring &string);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
 
@@ -414,10 +416,18 @@ public:
 	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class v33a_device : public nec_common_device
+{
+public:
+	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 extern const device_type V20;
 extern const device_type V30;
 extern const device_type V33;
+extern const device_type V33A;
+
 
 
 #endif

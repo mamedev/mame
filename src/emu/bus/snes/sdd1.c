@@ -1,12 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz, Andreas Naive, Fabio Priuli
 /***********************************************************************************************************
 
  S-DD1 add-on chip emulation (for SNES/SFC)
 
  Based on Andreas Naive Public Domain code.
  Code ported by MooglyGuy and updated to slots by Fabio Priuli.
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  ***********************************************************************************************************/
 

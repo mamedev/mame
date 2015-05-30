@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "konami.h"
 
@@ -907,7 +909,7 @@ void msx_cart_keyboard_master::initialize_cartridge()
 	{
 		fatalerror("keyboard_master: Invalid ROM size\n");
 	}
-	m_vlm5030->set_rom(m_rom_vlm5030);
+	m_vlm5030->set_rom(&m_rom_vlm5030[0]);
 }
 
 

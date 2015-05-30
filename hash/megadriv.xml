@@ -5,7 +5,6 @@
 
     ADVANCED DAISENRYAKU            JAPAN       we have Rev A, Rev 0 needed (does it exist?)
     CAPTAIN PLANET              ASIA
-    DAVIS CUP TENNIS                JAPAN
     DYNAMITE HEADDY SAMPLE          JAPAN
     ECCO JR                 USA/PAL     graphic corruption on later revision
     F-22 (JUNE 1992)                USA/PAL     needs proper dump
@@ -1179,6 +1178,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWB 4/8M REV B"/>
 			<feature name="u1" value="Buck Rodgers BUC05"/>
 			<feature name="u2" value="UM6264AK-10L"/>
@@ -1187,6 +1187,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="batt" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="buck rodgers buc05.u1" size="1048576" crc="44e3bfff" sha1="89c39f00745f2a8798fe985ad8ce28411b977f9e" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -2855,6 +2857,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lh5370hd.u1" size="2097152" crc="012591f9" sha1="ad1202a2e4166f8266d5633b8c5beb59c6cbd005" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -2889,6 +2893,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWA P10002 REV M"/>
 			<feature name="u1" value="FIFA97B1"/>
 			<feature name="u2" value="GM76C88ALK-15"/>
@@ -2897,6 +2902,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="(batt)" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="fifa 97 b1.u1" size="2097152" crc="2bedb061" sha1="9337ad0318061e70e235a5bfba4504c738d7870c" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 <!-- LABEL(S)
@@ -3149,6 +3156,21 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+<!-- Only Euro is confirmed -->
+	<software name="garfield">
+		<description>Garfield - Caught in the Act (Euro, USA)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A"/>
+			<feature name="ic1" value="MPR-18452-U"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="mpr-18452-u.ic1" size="2097152" crc="f0ff078e" sha1="9fff7dea16c4d0e6c9d6dbaade20c7048bb485ec" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="sbtank">
 		<description>Garry Kitchen's Super Battletank - War in the Gulf (USA)</description>
 		<year>1992</year>
@@ -3279,6 +3301,27 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 				<rom size="393216" offset="0x020000" loadflag="continue"/>
 			</dataarea>
 		</part>
+	</software>
+
+
+	<software name="gods">
+		<description>Gods (Euro)</description>
+		<year>1993</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="ACSGPC291 REV.B"/>
+			<feature name="ic1" value="ACGOSG"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="acgosg.ic1" size="1048576" crc="6c415016" sha1="404bc6e67cd4942615ccb7bd894d780278ec6da7" offset="0x000000"/>
+			</dataarea>
+		</part>
+<!-- LABEL(S)
+
+    ACCOLADE, INC.
+    9341 LHR
+    ACGOSG
+    (c) 1993 ACCOLADE
+-->
 	</software>
 
 
@@ -4167,6 +4210,21 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic1" value="MPR-15656-SM"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-15656-sm.ic1" size="2097152" crc="7b31deef" sha1="e7a1f49d362b5c7e13d9c7942d4a83fe003cfbd2" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Only Euro is confirmed -->
+	<software name="jparkre">
+		<description>Jurassic Park - Rampage Edition (Euro, USA)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A"/>
+			<feature name="ic1" value="MPR-17069-MX"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="mpr-17069-mx.ic1" size="2097152" crc="98b4aa1b" sha1="535c78d91f76302a882d69ff40b3d0f030a5b6ae" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5355,6 +5413,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lh5370hc.bin" size="2097152" crc="779c1244" sha1="115c2e8cfa6bc45767ba47efc00aede424a6de66" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5487,6 +5547,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
 			<feature name="ic1" value="MPR-16052-U"/>
 			<feature name="ic2" value="D4364CX"/>
@@ -5495,6 +5556,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="batt1" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-16052-u.ic1" size="2097152" crc="0d486ed5" sha1="ad0150d0c0cabe1ab05e3d6ac4eb7aa4b38a467c" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -5597,6 +5660,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWA P10002 REV M"/>
 			<feature name="u1?" value="NHL96 NHL9602"/>
 			<feature name="u2?" value="LH5168D"/>
@@ -5605,6 +5669,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="batt?" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nhl 96 (euro, usa).bin" size="2097152" crc="8135702c" sha1="7204633fbb9966ac637e7966d02ba15c5acdee6b" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -5957,6 +6023,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWB 4/8M REV B"/>
 			<feature name="u1" value="PGA I U1 PGA09"/>   <!-- location not really marked on PCB, using u1 for consistency -->
 			<feature name="u2" value="LH5160D-10L"/>
@@ -5965,6 +6032,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="batt" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="pga i u1 pga09.u1" size="524288" crc="c1f0b4e1" sha1="1b173a1b674a6d5bdcd539c4fe8fe984586c3a8a" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -5976,6 +6045,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWB SC40x1B REV A1"/>
 			<feature name="u1" value="PGA I U1 PGA07"/>
 			<feature name="u2" value="CXK5864BP-12LL"/>
@@ -5984,6 +6054,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="(batt)" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="pga i u1 pga07.u1" size="524288" crc="0489ff8e" sha1="73935bfbdf63d3400284a16e464286b7630964aa" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6826,6 +6898,20 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="slm-gs-1.ic1" size="2097152" crc="04132699" sha1="cc5e310a8835641001fbfa116dcf03d95957c9c5" offset="0x000000"/>
 				<rom name="slm-gs-2.ic2" size="2097152" crc="3a20db0a" sha1="f48873b2662c1ccf5635d5331d92f58175982e6f" offset="0x200000"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="seaquest">
+		<description>SeaQuest DSV (Euro)</description>
+		<year>1994</year>
+		<publisher>THQ</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A"/>
+			<feature name="ic1" value="MPR-17981-F"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="mpr-17981-f.ic1" size="2097152" crc="bac87612" sha1="4be212f8756c5298397f49146e86e729f3ab520d" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7988,7 +8074,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-	<software name="stblad">
+	<software name="stblade">
 		<description>Super Thunder Blade (World)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -8005,7 +8091,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-	<software name="stbladj1" cloneof="stblad">
+	<software name="stbladej1" cloneof="stblade">
 		<description>Super Thunder Blade (Jpn, Alt PCB)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
@@ -9561,7 +9647,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="skitchin">
-		<description>Skitchin (Euro, USA)</description>
+		<description>Skitchin' (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -9726,7 +9812,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="aaahhrmu" cloneof="aaahhrm">
-		<description>AAAHH!!! Real Monsters (USA)</description>
+		<description>Aaahh!!! Real Monsters (USA)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -9737,7 +9823,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="aaahhrmup" cloneof="aaahhrm">
-		<description>AAAHH!!! Real Monsters (USA, Prototype 19950707)</description>
+		<description>Aaahh!!! Real Monsters (USA, Prototype 19950707)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -10314,7 +10400,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="ootwp" cloneof="anotherw">
-		<description>Out of this World (Prototype)</description>
+		<description>Out of This World (Prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -10819,6 +10905,18 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="ballz 3d - fighting at its ballziest (euro, usa).bin" size="2097152" crc="b362b705" sha1="4825cb9245a701cc59900c57a7a5fa70edc160f0" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baoxiao">
+		<description>Bao Xiao San Guo (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="爆笑三国"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="bao.bin" size="1048576" crc="496eb1d1" sha1="eb2363c83a0b76b7825320dcf332779b534a1d89" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12957,6 +13055,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="xfirep" cloneof="xfire">
+		<description>Cross Fire (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Kyugo Boueki</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="crossfire-gen-beta.bin" size="524288" crc="ff9e9f45" sha1="f33995fbb6d5378de0ce246c237e28fd7de1a3d9" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superair" cloneof="xfire">
 		<description>Super Airwolf (Jpn)</description>
 		<year>1991</year>
@@ -13363,6 +13472,20 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="david robinson basketball (jpn).bin" size="524288" crc="56164b00" sha1="eeac902df31240c246afe2b97a5b25104dd9f0e5" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daviscupj" cloneof="daviscup">
+		<description>Davis Cup World Tour (Jpn)</description>
+		<year>1993</year>
+		<publisher>Tengen</publisher>
+		<info name="serial" value="T-48163"/>
+		<info name="release" value="19940225"/>
+		<info name="alt_title" value="デビスカップ ~ Davis Cup Tennis (Box)"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="daviscuptennis.5848.bin" size="1048576" crc="802cd123" sha1="2de936513aefed35591eb1667a54b4298ccd12b9" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15435,17 +15558,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="garfield">
-		<description>Garfield - Caught in the Act (Euro, USA)</description>
-		<year>1995</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="garfield - caught in the act (euro, usa).bin" size="2097152" crc="f0ff078e" sha1="9fff7dea16c4d0e6c9d6dbaade20c7048bb485ec" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gargoyle">
 		<description>Gargoyles (USA)</description>
 		<year>1995</year>
@@ -15650,17 +15762,6 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="go-net (japan).bin" size="524288" crc="db30f773" sha1="22502a21b9508b385de32bd7e2c9d304ddcef38b" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gods">
-		<description>Gods (Euro)</description>
-		<year>1993</year>
-		<publisher>Accolade</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="gods (euro).bin" size="1048576" crc="6c415016" sha1="404bc6e67cd4942615ccb7bd894d780278ec6da7" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16163,7 +16264,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="hyokkohj" supported="partial">
-		<description>Hyokkori Hyoutan Jima - Daitouryou o Mezase! (Jpn)</description>
+		<description>Hyokkori Hyoutan-jima - Daitouryou o Mezase! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4075"/>
@@ -16839,17 +16940,6 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park (usa) (beta).bin" size="2097152" crc="cf890eed" sha1="ac2097b5f2a30787d7ca1ed8ab4eac7f4be77f0f" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jparkre">
-		<description>Jurassic Park - Rampage Edition (Euro, USA)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="jurassic park - rampage edition (euro, usa).bin" size="2097152" crc="98b4aa1b" sha1="535c78d91f76302a882d69ff40b3d0f030a5b6ae" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18434,8 +18524,11 @@ but dumps still have to be confirmed.
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="might and magic - gates to another world (euro, usa).bin" size="786432" crc="f509145f" sha1="52e7ade244d48bc282db003d87c408e96dcb3d85" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -22488,7 +22581,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="robotermp1" cloneof="roboterm">
-		<description>Robocop Versus The Terminator (Prototype, Alt)</description>
+		<description>Robocop versus The Terminator (Prototype, Alt)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22882,17 +22975,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="scrabble (euro) (prototype).bin" size="1048576" crc="360b2610" sha1="b2a06070eda30eb2ef745dcb2676dc25d39a07ed" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="seaquest">
-		<description>SeaQuest DSV (Euro)</description>
-		<year>1994</year>
-		<publisher>THQ</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="seaquest dsv (euro).bin" size="2097152" crc="0bb511bd" sha1="e0324a23bc26b40f7e564ae864afb8ede1776f6e" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24633,8 +24715,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="starflight (euro, usa) (v1.1).bin" size="1048576" crc="1217dbea" sha1="41722d8c0b4865ca8044fb53a818b13eded758fc" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -24644,8 +24729,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="starflight (euro, usa).bin" size="1048576" crc="d550c928" sha1="24252ca934be3f005436cdb85671413a9e6b0489" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -25521,7 +25609,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="stbladj" cloneof="stblad">
+	<software name="stbladej" cloneof="stblade">
 		<description>Super Thunder Blade (Jpn, Launch Cart)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
@@ -29969,6 +30057,31 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_radica"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="radicasf.bin" size="4194304" crc="868afb44" sha1="f4339e36272c18b1d49aa4095127ed18e0961df6" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomclown">
+		<description>Tom Clown (USA)</description>
+		<year>1993</year>
+		<publisher>Realtec</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_realtec"/>
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="tom clown (unl).bin" size="524288" crc="0c543cad" sha1="a17b48e45235a7441a6e2236bfe9721fddad1abc" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suppoker">
+		<description>Super Poker (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="Cha Oji Pu Ke"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_smouse"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="cha oji pu ke - super poker (ch).bin" size="4194304" crc="c37e6858" sha1="2aa4f27b2be3d98016fcff3709176682169da6c2" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>

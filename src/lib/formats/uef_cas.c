@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
 
 UEF format support (for electron driver)
@@ -12,6 +14,7 @@ Not nice, but it works...
 
 #include <string.h>
 #include <math.h>
+#include <assert.h>
 
 #include <zlib.h>
 #include "uef_cas.h"

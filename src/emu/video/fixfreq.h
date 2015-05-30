@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /***************************************************************************
 
     fixfreq.h
@@ -40,6 +42,9 @@
 #define MCFG_FIXFREQ_SYNC_THRESHOLD(_threshold) \
 	fixedfreq_device::set_threshold(*device, _threshold);
 
+#define MCFG_FIXFREQ_GAIN(_gain) \
+	fixedfreq_device::set_gain(*device, _gain);
+
 // pre-defined configurations
 
 //ModeLine "720x480@30i" 13.5 720 736 799 858 480 486 492 525 interlace -hsync -vsync
@@ -73,6 +78,7 @@ public:
 	static void set_minitor_clock(device_t &device, UINT32 clock) { downcast<fixedfreq_device &>(device).m_monitor_clock = clock; }
 	static void set_fieldcount(device_t &device, int count) { downcast<fixedfreq_device &>(device).m_fieldcount = count; }
 	static void set_threshold(device_t &device, double threshold) { downcast<fixedfreq_device &>(device).m_sync_threshold = threshold; }
+	static void set_gain(device_t &device, double gain) { downcast<fixedfreq_device &>(device).m_gain = gain; }
 	static void set_horz_params(device_t &device, int visible, int frontporch, int sync, int backporch)
 	{
 		fixedfreq_device &dev = downcast<fixedfreq_device &>(device);
@@ -135,6 +141,7 @@ private:
 	int m_vbackporch;
 	int m_fieldcount;
 	double m_sync_threshold;
+	double m_gain;
 
 	/* sync separator */
 	double m_vint;

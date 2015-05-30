@@ -529,7 +529,7 @@ void tms3203x_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void tms3203x_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms3203x_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
@@ -541,12 +541,12 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, astri
 		case TMS3203X_R5F:
 		case TMS3203X_R6F:
 		case TMS3203X_R7F:
-			string.printf("%12g", m_r[TMR_R0 + (entry.index() - TMS3203X_R0F)].as_double());
+			strprintf(str, "%12g", m_r[TMR_R0 + (entry.index() - TMS3203X_R0F)].as_double());
 			break;
 
 		case STATE_GENFLAGS:
 			UINT32 temp = m_r[TMR_ST].i32[0];
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				(temp & 0x80) ? 'O':'.',
 				(temp & 0x40) ? 'U':'.',
 				(temp & 0x20) ? 'V':'.',

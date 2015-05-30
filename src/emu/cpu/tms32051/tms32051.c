@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 /*
    Texas Instruments TMS320C51 DSP Emulator
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Dan Boris, Aaron Giles
 /***************************************************************************
 
     Atari Return of the Jedi hardware

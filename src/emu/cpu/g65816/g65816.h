@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 #pragma once
 
 #ifndef __G65816_H__
@@ -14,11 +16,6 @@ G65C816 CPU Emulator V0.92
 
 Copyright Karl Stenerud
 All rights reserved.
-
-Permission is granted to use this source code for non-commercial purposes.
-To use this code for commercial purposes, you must get permission from the
-author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
-
 
 */
 /* ======================================================================== */
@@ -85,7 +82,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }

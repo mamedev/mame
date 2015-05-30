@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jonathan Gevaryahu, Kevin Horton
 /******************************************************************************
 *
 *  Bare bones Realvoice PC driver

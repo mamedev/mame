@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef PCI_AC97_H
 #define PCI_AC97_H
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tim Schuerewegen
 /**************************************************************************
 
     sord_cas.c
@@ -7,6 +9,7 @@
 **************************************************************************/
 
 #include <string.h>
+#include <assert.h>
 #include "sord_cas.h"
 
 #define SORDM5_WAVESAMPLES_HEADER  1

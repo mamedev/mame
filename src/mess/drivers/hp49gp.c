@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tim Schuerewegen
 /*******************************************************************************
 
     Hewlett Packard 49G+ Graphing Calculator

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, R. Belmont
 const v60_device::am_func v60_device::s_OpCodeTable[256] =
 {
 	/* 0x00 */ &v60_device::opHALT,

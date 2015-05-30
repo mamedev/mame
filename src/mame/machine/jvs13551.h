@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __JVS13551_H__
 #define __JVS13551_H__
 

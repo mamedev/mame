@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef __RS232_PRINTER_H__
 #define __RS232_PRINTER_H__
 

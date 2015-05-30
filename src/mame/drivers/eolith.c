@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina,Pierpaolo Prazzoli
 /********************************************************************
  Eolith 32 bits hardware: Gradation 2D system
 
@@ -1494,7 +1496,7 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 
 	// Configure the sound ROM banking
 	membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
-	
+
 	save_item(NAME(m_sound_data));
 }
 

@@ -151,9 +151,9 @@
 		<bezel name="text2" element="P4"><bounds left="100" right="180" top="90" bottom="102" /></bezel>
 		<bezel name="text1" element="P5"><bounds left="100" right="180" top="150" bottom="162" /></bezel>
 		<bezel name="text0" element="P6"><bounds left="100" right="180" top="210" bottom="222" /></bezel>
-	
+
 		<screen index="0">
 			<bounds x="320" y="0" width="320" height="240" />
 		</screen>
-    </view>
+	</view>
 </mamelayout>

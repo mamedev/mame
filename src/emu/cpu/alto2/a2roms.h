@@ -1,10 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
  *   Xerox AltoII RAM PROM loading and decoding
- *
- *   Copyright Juergen Buchmueller <pullmoll@t-online.de>
- *
- *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
 #ifndef _CPU_A2ROMS_H_
@@ -32,7 +30,7 @@ typedef struct {
 }   prom_load_t;
 
 #define ZERO            0
-#define KEEP            ~0
+#define KEEP            ~0U
 
 #define AMAP_DEFAULT        {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
 #define AMAP_CONST_PROM     {3,2,1,4,5,6,7,0,}

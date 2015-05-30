@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Luca Elia
 /***************************************************************************
 
 Some Dynax/Nakanihon games using the third version of their blitter
@@ -110,8 +112,6 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/okim6295.h"
-#include "sound/2413intf.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "includes/dynax.h"
@@ -153,8 +153,70 @@ class ddenlovr_state : public dynax_state
 {
 public:
 	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dynax_state(mconfig, type, tag)
-		{ }
+		: dynax_state(mconfig, type, tag),
+		m_dsw_sel16(*this, "dsw_sel16"),
+		m_protection1(*this, "protection1"),
+		m_protection2(*this, "protection2") { }
+
+
+	optional_shared_ptr<UINT16> m_dsw_sel16;
+	optional_shared_ptr<UINT16> m_protection1;
+	optional_shared_ptr<UINT16> m_protection2;
+
+
+	UINT8 *  m_ddenlovr_pixmap[8];
+
+	/* blitter (TODO: merge with the dynax.h, where possible) */
+	int m_extra_layers;
+	int m_ddenlovr_dest_layer;
+	int m_ddenlovr_blit_flip;
+	int m_ddenlovr_blit_x;
+	int m_ddenlovr_blit_y;
+	int m_ddenlovr_blit_address;
+	int m_ddenlovr_blit_pen;
+	int m_ddenlovr_blit_pen_mode;
+	int m_ddenlovr_blitter_irq_flag;
+	int m_ddenlovr_blitter_irq_enable;
+	int m_ddenlovr_rect_width;
+	int m_ddenlovr_rect_height;
+	int m_ddenlovr_clip_width;
+	int m_ddenlovr_clip_height;
+	int m_ddenlovr_line_length;
+	int m_ddenlovr_clip_ctrl;
+	int m_ddenlovr_clip_x;
+	int m_ddenlovr_clip_y;
+	int m_ddenlovr_scroll[8*2];
+	int m_ddenlovr_priority;
+	int m_ddenlovr_priority2;
+	int m_ddenlovr_bgcolor;
+	int m_ddenlovr_bgcolor2;
+	int m_ddenlovr_layer_enable;
+	int m_ddenlovr_layer_enable2;
+	int m_ddenlovr_palette_base[8];
+	int m_ddenlovr_palette_mask[8];
+	int m_ddenlovr_transparency_pen[8];
+	int m_ddenlovr_transparency_mask[8];
+	int m_ddenlovr_blit_latch;
+	int m_ddenlovr_blit_pen_mask;   // not implemented
+	int m_ddenlovr_blit_rom_bits;           // usually 8, 16 in hanakanz
+	const int *m_ddenlovr_blit_commands;
+	int m_ddenlovr_blit_regs[2];
+
+	/* ddenlovr misc (TODO: merge with dynax.h, where possible) */
+	UINT8 m_palram[0x200];
+	int m_okibank;
+	UINT8 m_rongrong_blitter_busy_select;
+	UINT8 m_prot_val;
+	UINT16 m_prot_16;
+	UINT16 m_quiz365_protection[2];
+
+	UINT16 m_mmpanic_leds;  /* A led for each of the 9 buttons */
+	UINT8 m_funkyfig_lockout;
+	UINT8 m_romdata[2];
+	int m_palette_index;
+	UINT8 m_hginga_rombank;
+	UINT8 m_mjflove_irq_cause;
+	UINT8 m_daimyojn_palette_sel;
 
 	DECLARE_MACHINE_START(ddenlovr);
 	DECLARE_MACHINE_RESET(ddenlovr);
@@ -350,6 +412,20 @@ public:
 	DECLARE_VIDEO_START(htengoku);
 	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
 	DECLARE_READ8_MEMBER(htengoku_dsw_r);
+	DECLARE_WRITE8_MEMBER( quizchq_oki_bank_w );
+	DECLARE_WRITE16_MEMBER( ddenlovr_oki_bank_w );
+	DECLARE_WRITE16_MEMBER( quiz365_oki_bank1_w );
+	DECLARE_WRITE16_MEMBER( quiz365_oki_bank2_w );
+	DECLARE_WRITE8_MEMBER( ddenlovr_select_w );
+	DECLARE_READ8_MEMBER( quiz365_input_r );
+	DECLARE_WRITE16_MEMBER( nettoqc_oki_bank_w );
+	DECLARE_WRITE8_MEMBER( hanakanz_oki_bank_w );
+	DECLARE_WRITE8_MEMBER( mjchuuka_oki_bank_w );
+	DECLARE_READ8_MEMBER( hginga_dsw_r );
+	DECLARE_WRITE8_MEMBER( mjflove_okibank_w );
+	DECLARE_WRITE8_MEMBER( jongtei_okibank_w );
+	DECLARE_READ8_MEMBER( seljan2_dsw_r );
+	DECLARE_WRITE8_MEMBER( daimyojn_okibank_w );
 
 	void ddenlovr_flipscreen_w( UINT8 data );
 	void ddenlovr_blit_flip_w( UINT8 data );
@@ -368,20 +444,6 @@ public:
 	void mmpanic_update_leds();
 	void mjchuuka_get_romdata();
 	UINT8 hgokou_player_r( int player );
-	DECLARE_WRITE8_MEMBER( quizchq_oki_bank_w );
-	DECLARE_WRITE16_MEMBER( ddenlovr_oki_bank_w );
-	DECLARE_WRITE16_MEMBER( quiz365_oki_bank1_w );
-	DECLARE_WRITE16_MEMBER( quiz365_oki_bank2_w );
-	DECLARE_WRITE8_MEMBER( ddenlovr_select_w );
-	DECLARE_READ8_MEMBER( quiz365_input_r );
-	DECLARE_WRITE16_MEMBER( nettoqc_oki_bank_w );
-	DECLARE_WRITE8_MEMBER( hanakanz_oki_bank_w );
-	DECLARE_WRITE8_MEMBER( mjchuuka_oki_bank_w );
-	DECLARE_READ8_MEMBER( hginga_dsw_r );
-	DECLARE_WRITE8_MEMBER( mjflove_okibank_w );
-	DECLARE_WRITE8_MEMBER( jongtei_okibank_w );
-	DECLARE_READ8_MEMBER( seljan2_dsw_r );
-	DECLARE_WRITE8_MEMBER( daimyojn_okibank_w );
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
@@ -1916,7 +1978,7 @@ static ADDRESS_MAP_START( quiz365_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300286, 0x300287) AM_READ(ddenlovr_gfxrom_r)                             // Video Chip
 
 	AM_RANGE(0x3002c0, 0x3002c1) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)// Sound
-	AM_RANGE(0x300300, 0x300303) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0x300300, 0x300303) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x300340, 0x30035f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
 	AM_RANGE(0x300380, 0x300383) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x300384, 0x300385) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
@@ -1968,7 +2030,7 @@ static ADDRESS_MAP_START( ddenlovj_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300070, 0x300071) AM_READ(unk16_r)                                       // ? must be 78 on startup (not necessary in ddlover)
 	AM_RANGE(0x300080, 0x300083) AM_WRITE(ddenlovr_blitter_w)
 	AM_RANGE(0x300086, 0x300087) AM_READ(ddenlovr_gfxrom_r)                             // Video Chip
-	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
 	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
@@ -2035,7 +2097,7 @@ static ADDRESS_MAP_START( ddenlovrk_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)                         // Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)                         //
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
 	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
@@ -2073,7 +2135,7 @@ static ADDRESS_MAP_START( ddenlovr_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)                         // Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)                         //
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
 	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
@@ -2147,7 +2209,7 @@ static ADDRESS_MAP_START( nettoqc_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300070, 0x300071) AM_READ(unk16_r)                                           // ? must be 78 on startup (not necessary in ddlover)
 	AM_RANGE(0x300080, 0x300083) AM_WRITE(ddenlovr_blitter_w)
 	AM_RANGE(0x300086, 0x300087) AM_READ(ddenlovr_gfxrom_r)                                 // Video Chip
-	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
 	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
@@ -2210,7 +2272,7 @@ static ADDRESS_MAP_START( ultrchmp_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)                         // Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)                         //
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
 	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
@@ -2266,7 +2328,7 @@ static ADDRESS_MAP_START( quizchq_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x22, 0x23) AM_READ(rongrong_input2_r)
 
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ym2413", ym2413_device, write)
 
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
@@ -2303,7 +2365,7 @@ static ADDRESS_MAP_START( rongrong_portmap, AS_IO, 8, ddenlovr_state )
 
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ym2413", ym2413_device, write)
 
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
@@ -2457,7 +2519,7 @@ static ADDRESS_MAP_START( mmpanic_sound_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x02, 0x02) AM_READNOP     // read just before port 00
 	AM_RANGE(0x04, 0x04) AM_NOP                 // read only once at the start
 	AM_RANGE(0x06, 0x06) AM_WRITENOP    // almost always 1, sometimes 0
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
@@ -2740,7 +2802,7 @@ static ADDRESS_MAP_START( hanakanz_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x93, 0x93) AM_WRITE(hanakanz_coincounter_w)
 	AM_RANGE(0x94, 0x94) AM_WRITE(hanakanz_keyb_w)
 	AM_RANGE(0x96, 0x96) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
@@ -2756,7 +2818,7 @@ static ADDRESS_MAP_START( hkagerou_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE(hanakanz_blitter_data_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(hanakanz_palette_w)
 	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb1, 0xb2) AM_READ(hanakanz_keyb_r)
 	AM_RANGE(0xb3, 0xb3) AM_WRITE(hanakanz_coincounter_w)
@@ -2778,7 +2840,7 @@ static ADDRESS_MAP_START( kotbinyo_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE(hanakanz_blitter_data_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(hanakanz_palette_w)
 	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0xb1, 0xb2) AM_READ(hanakanz_keyb_r)
 	AM_RANGE(0xb1, 0xb1) AM_READ_PORT("KEYB0")
@@ -2802,7 +2864,7 @@ static ADDRESS_MAP_START( kotbinsp_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE(hanakanz_blitter_data_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(hanakanz_palette_w)
 	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x91, 0x91) AM_READ(hanakanz_keyb_r)
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("KEYB0")
@@ -2841,7 +2903,7 @@ static ADDRESS_MAP_START( mjreach1_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x94, 0x94) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x95, 0x96) AM_READ(hanakanz_keyb_r)
 	AM_RANGE(0x97, 0x97) AM_WRITE(hanakanz_coincounter_w)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
@@ -2969,7 +3031,7 @@ static ADDRESS_MAP_START( mjchuuka_portmap, AS_IO, 8, ddenlovr_state )     // 16
 	AM_RANGE(0x63, 0x63) AM_MIRROR(0xff00) AM_READ_PORT("DSW4")
 	AM_RANGE(0x64, 0x64) AM_MIRROR(0xff00) AM_READ_PORT("DSW5")     // DSW 1-4 high bits
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
@@ -3078,7 +3140,7 @@ static ADDRESS_MAP_START( mjmyster_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x22, 0x22) AM_READ(mjmyster_coins_r)
 	AM_RANGE(0x23, 0x23) AM_READ(mjmyster_keyb_r)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x44, 0x44) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x46, 0x46) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x48, 0x48) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -3243,7 +3305,7 @@ static ADDRESS_MAP_START( hginga_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
 	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(mjmyster_rambank_w)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x24, 0x24) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x26, 0x26) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x28, 0x28) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -3366,7 +3428,7 @@ static ADDRESS_MAP_START( hgokou_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x61, 0x61) AM_WRITE(hgokou_input_w)
 	AM_RANGE(0x62, 0x62) AM_READ(hgokou_input_r)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x86, 0x86) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x88, 0x88) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -3409,7 +3471,7 @@ static ADDRESS_MAP_START( hgokbang_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(mjmyster_rambank_w)        // ? ack on RTC int
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x24, 0x24) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x26, 0x26) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x28, 0x28) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -3500,7 +3562,7 @@ static ADDRESS_MAP_START( hparadis_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x1c, 0x1c) AM_READ(hparadis_dsw_r)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hparadis_select_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
 	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w)
@@ -3546,7 +3608,7 @@ static ADDRESS_MAP_START( mjmywrld_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x22, 0x22) AM_READ(mjmywrld_coins_r)
 	AM_RANGE(0x23, 0x23) AM_READ(mjmyster_keyb_r)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x44, 0x44) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x46, 0x46) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x48, 0x48) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -3646,7 +3708,7 @@ static ADDRESS_MAP_START( akamaru_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)                         // Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)                         //
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
 	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
@@ -3737,7 +3799,7 @@ static ADDRESS_MAP_START( mjflove_portmap, AS_IO, 8, ddenlovr_state )  // 16 bit
 	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0181, 0x0181) AM_WRITENOP                        // ? int. enable
 	AM_RANGE(0x0184, 0x0184) AM_WRITE(mjflove_coincounter_w)
-	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x0280, 0x028f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE(0x0300, 0x0301) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x0380, 0x0380) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -3778,7 +3840,7 @@ static ADDRESS_MAP_START( jongtei_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x60, 0x60) AM_WRITE(hanakanz_blitter_data_w)
 	AM_RANGE(0x61, 0x61) AM_WRITE(hanakanz_palette_w)
 	AM_RANGE(0x63, 0x64) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
@@ -3841,7 +3903,7 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_rambank_w)
 static ADDRESS_MAP_START( sryudens_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(sryudens_rambank_w)    // ? ack on RTC int
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(mjflove_rombank_w)
@@ -3928,7 +3990,7 @@ static ADDRESS_MAP_START( janshinp_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x70, 0x70) AM_WRITE(quizchq_oki_bank_w)
 	AM_RANGE(0x80, 0x80) AM_RAM
 	AM_RANGE(0x90, 0x90) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x92, 0x93) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x92, 0x93) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x94, 0x95) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
@@ -4000,7 +4062,7 @@ static ADDRESS_MAP_START( seljan2_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x38, 0x38) AM_READNOP         // ? ack or watchdog
 	AM_RANGE(0x40, 0x41) AM_WRITE(mjflove_blitter_w)
 	AM_RANGE(0x43, 0x43) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0x54, 0x54) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x58, 0x58) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x5c, 0x5c) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)   // dsw
@@ -4154,7 +4216,7 @@ static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, ddenlovr_state )
 	AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    // AY8910
 	AM_RANGE( 0x42, 0x42 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     //
 	AM_RANGE( 0x44, 0x44 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   //
-	AM_RANGE( 0x46, 0x47 ) AM_DEVWRITE("ymsnd", ym2413_device, write)        //
+	AM_RANGE( 0x46, 0x47 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
 	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE( 0xa0, 0xa3 ) AM_WRITE(ddenlovr_palette_base_w)    // ddenlovr mixer chip
 	AM_RANGE( 0xa4, 0xa7 ) AM_WRITE(ddenlovr_palette_mask_w)
@@ -4226,7 +4288,7 @@ static MACHINE_CONFIG_START( htengoku, ddenlovr_state )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, htengoku_dsw_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
@@ -4341,7 +4403,7 @@ static ADDRESS_MAP_START( daimyojn_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x42, 0x44) AM_READ(hanakanz_gfxrom_r)
 	AM_RANGE(0x8a, 0x8b) AM_READ(daimyojn_year_hack_r)  // ?
 	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xaa, 0xaa) AM_READ(daimyojn_keyb1_r)
@@ -9301,8 +9363,6 @@ MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_mjflove_irq_cause));
 	save_item(NAME(m_daimyojn_palette_sel));
 	save_item(NAME(m_palram));
-
-	save_item(NAME(m_irq_count));
 }
 
 MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
@@ -9323,7 +9383,6 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_hginga_rombank = 0;
 	m_mjflove_irq_cause = 0;
 	m_daimyojn_palette_sel = 0;
-	m_irq_count = 0;
 
 	m_quiz365_protection[0] = 0;
 	m_quiz365_protection[1] = 0;
@@ -9435,7 +9494,7 @@ static MACHINE_CONFIG_START( ddenlovr, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 16)  // or /8 ?
@@ -9553,7 +9612,7 @@ static MACHINE_CONFIG_START( quizchq, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz/8) // 3.579545Mhz, verified
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz/8) // 3.579545Mhz, verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
@@ -9637,7 +9696,7 @@ static MACHINE_CONFIG_START( mmpanic, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
@@ -9714,7 +9773,7 @@ static MACHINE_CONFIG_START( hanakanz, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -9760,7 +9819,7 @@ static MACHINE_CONFIG_START( kotbinyo, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_37516MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_37516MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_28_37516MHz / 28, OKIM6295_PIN7_HIGH)
@@ -10129,7 +10188,7 @@ static MACHINE_CONFIG_START( jongtei, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
@@ -10172,7 +10231,7 @@ static MACHINE_CONFIG_START( sryudens, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
@@ -10219,7 +10278,7 @@ static MACHINE_CONFIG_START( janshinp, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
@@ -10286,7 +10345,7 @@ static MACHINE_CONFIG_START( seljan2, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
@@ -10336,7 +10395,7 @@ static MACHINE_CONFIG_START( daimyojn, ddenlovr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, OKIM6295_PIN7_HIGH)
@@ -12535,48 +12594,48 @@ ROM_START( htengoku )
 	ROM_LOAD( "6510.11b", 0x80000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END
 
-GAME( 1992, htengoku, 0,        htengoku, htengoku, driver_device, 0,        ROT180, "Dynax",                    "Hanafuda Hana Tengoku (Japan)",                                 GAME_SUPPORTS_SAVE )
-GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (set 1)",                                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // scrolling, priority?
-GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (set 2)",                                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, quizchq,   0,        quizchq,   quizchq,  driver_device, 0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  driver_device, 0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1993, animaljr,  0,        mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA)",                                  GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1994, hginga,    0,        hginga,    hginga,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1994, mjmyornt,  0,        mjmyornt,  mjmyornt, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Universe",                                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1994, quiz365,   0,        quiz365,   quiz365,  driver_device, 0,        ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  driver_device, 0,        ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state,   rongrong, ROT0, "Nakanihon (Activision license)",           "Puzzle Game Rong Rong (Europe)",                                  GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
-GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, ddenlovr_state,   rongrong, ROT0, "Nakanihon (Activision license)",           "Puzzle Game Rong Rong (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
-GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, ddenlovr_state,   rongrong, ROT0, "Nakanihon (Activision license)",           "Puzzle Game Rong Rong (Germany)",                                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
-GAME( 1994, hparadis,  0,        hparadis,  hparadis, driver_device, 0,        ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, hgokou,    0,        hgokou,    hgokou,   driver_device, 0,        ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  driver_device, 0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
-GAME( 1995, ultrchmp,  nettoqc,  ultrchmp,  ultrchmp, driver_device, 0,        ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
-GAME( 1995, ultrchmph, nettoqc,  ultrchmp,  ultrchmp, driver_device, 0,        ROT0, "Nakanihon",                                   "Cheng Ba Shi Jie - Chao Shi Kong Guan Jun (Taiwan)",              GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
-GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, driver_device, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, driver_device, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, driver_device, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, akamaru,   0,        akamaru,   akamaru,  driver_device, 0,        ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, janshinp,  0,        janshinp,  janshinp, driver_device, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus (Japan)",                                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, driver_device, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, sryudens,  0,        sryudens,  sryudens, driver_device, 0,        ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, seljan2,   0,        seljan2,   seljan2,  driver_device, 0,        ROT0, "Dynax / Face",                                "Return Of Sel Jan II (Japan, NM557)",                             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, mjflove,   0,        mjflove,   mjflove,  driver_device, 0,        ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, driver_device, 0,        ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong Chuukanejyo (China)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, driver_device, 0,        ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1999, jongtei,   0,        jongtei,   jongtei,  driver_device, 0,        ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, ver. NM532-01)",                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, driver_device, 0,        ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state,   momotaro, ROT0, "Techno-Top",                               "Mahjong Momotarou (Japan)",                                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1992, htengoku,  0,        htengoku,  htengoku, driver_device, 0,        ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                   0)
+GAME( 1992, mmpanic,   0,        mmpanic,   mmpanic,  driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Monkey Mole Panic (USA)",                                         GAME_NO_COCKTAIL  )
+GAME( 1993, funkyfig,  0,        funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (set 1)",                                 GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS ) // scrolling, priority?
+GAME( 1993, funkyfiga, funkyfig, funkyfig,  funkyfig, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "The First Funky Fighter (set 2)",                                 GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, quizchq,   0,        quizchq,   quizchq,  driver_device, 0,        ROT0, "Nakanihon",                                   "Quiz Channel Question (Ver 1.00) (Japan)",                        GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1993, quizchql,  quizchq,  quizchq,   quizchq,  driver_device, 0,        ROT0, "Nakanihon (Laxan license)",                   "Quiz Channel Question (Ver 1.23) (Taiwan?)",                      GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1993, animaljr,  0,        mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Exciting Animal Land Jr. (USA)",                                  GAME_NO_COCKTAIL  | GAME_IMPERFECT_SOUND )
+GAME( 1993, animaljrs, animaljr, mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Animalandia Jr. (Spanish)",                                       GAME_NO_COCKTAIL  | GAME_IMPERFECT_SOUND )
+GAME( 1993, animaljrj, animaljr, mmpanic,   animaljr, driver_device, 0,        ROT0, "Nakanihon / East Technology (Taito license)", "Waiwai Animal Land Jr. (Japan)",                                  GAME_NO_COCKTAIL  )
+GAME( 1994, hginga,    0,        hginga,    hginga,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Ginga",                                             GAME_NO_COCKTAIL  )
+GAME( 1994, mjmyster,  0,        mjmyster,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 1)",                            GAME_NO_COCKTAIL  )
+GAME( 1994, mjmywrld,  mjmyster, mjmywrld,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious World (set 2)",                            GAME_NO_COCKTAIL  )
+GAME( 1994, mjmyornt,  0,        mjmyornt,  mjmyornt, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Orient",                                   GAME_NO_COCKTAIL  )
+GAME( 1994, mjmyuniv,  0,        mjmyuniv,  mjmyster, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Mysterious Universe",                                 GAME_NO_COCKTAIL  )
+GAME( 1994, quiz365,   0,        quiz365,   quiz365,  driver_device, 0,        ROT0, "Nakanihon",                                   "Quiz 365 (Japan)",                                                GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1994, quiz365t,  quiz365,  quiz365,   quiz365,  driver_device, 0,        ROT0, "Nakanihon / Taito",                           "Quiz 365 (Hong Kong & Taiwan)",                                   GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1994, rongrong,  0,        rongrong,  rongrong, ddenlovr_state,   rongrong, ROT0, "Nakanihon (Activision license)",           "Puzzle Game Rong Rong (Europe)",                                  GAME_NO_COCKTAIL  | GAME_IMPERFECT_COLORS )
+GAME( 1994, rongrongj, rongrong, rongrong,  rongrong, ddenlovr_state,   rongrong, ROT0, "Nakanihon (Activision license)",           "Puzzle Game Rong Rong (Japan)",                                   GAME_NO_COCKTAIL  | GAME_IMPERFECT_COLORS )
+GAME( 1994, rongrongg, rongrong, rongrong,  rongrong, ddenlovr_state,   rongrong, ROT0, "Nakanihon (Activision license)",           "Puzzle Game Rong Rong (Germany)",                                 GAME_NO_COCKTAIL  | GAME_IMPERFECT_COLORS )
+GAME( 1994, hparadis,  0,        hparadis,  hparadis, driver_device, 0,        ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                     GAME_NO_COCKTAIL  )
+GAME( 1995, hgokou,    0,        hgokou,    hgokou,   driver_device, 0,        ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan)",                                     GAME_NO_COCKTAIL  )
+GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                           GAME_NO_COCKTAIL  )
+GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",                     GAME_NO_COCKTAIL  )
+GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  driver_device, 0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    GAME_NO_COCKTAIL  | GAME_IMPERFECT_COLORS )
+GAME( 1995, ultrchmp,  nettoqc,  ultrchmp,  ultrchmp, driver_device, 0,        ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                         GAME_NO_COCKTAIL  | GAME_IMPERFECT_COLORS )
+GAME( 1995, ultrchmph, nettoqc,  ultrchmp,  ultrchmp, driver_device, 0,        ROT0, "Nakanihon",                                   "Cheng Ba Shi Jie - Chao Shi Kong Guan Jun (Taiwan)",              GAME_NO_COCKTAIL  | GAME_IMPERFECT_COLORS )
+GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              GAME_NO_COCKTAIL  )
+GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          GAME_NO_COCKTAIL  )
+GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", GAME_NO_COCKTAIL  )
+GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                GAME_NO_COCKTAIL  )
+GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, driver_device, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           GAME_NO_COCKTAIL  )
+GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, driver_device, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             GAME_NO_COCKTAIL  )
+GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, driver_device, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     GAME_NO_COCKTAIL  )
+GAME( 1996, akamaru,   0,        akamaru,   akamaru,  driver_device, 0,        ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        GAME_NO_COCKTAIL  )
+GAME( 1996, janshinp,  0,        janshinp,  janshinp, driver_device, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus (Japan)",                                    GAME_NO_COCKTAIL  )
+GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, driver_device, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken (Japan)",                                   GAME_NO_COCKTAIL  )
+GAME( 1996, sryudens,  0,        sryudens,  sryudens, driver_device, 0,        ROT0, "Dynax / Face",                                "Mahjong Seiryu Densetsu (Japan, NM502)",                          GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, seljan2,   0,        seljan2,   seljan2,  driver_device, 0,        ROT0, "Dynax / Face",                                "Return Of Sel Jan II (Japan, NM557)",                             GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, mjflove,   0,        mjflove,   mjflove,  driver_device, 0,        ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                   GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, hkagerou,  0,        hkagerou,  hkagerou, driver_device, 0,        ROT0, "Nakanihon / Dynax",                           "Hana Kagerou [BET] (Japan)",                                      GAME_NO_COCKTAIL  )
+GAME( 1998, mjchuuka,  0,        mjchuuka,  mjchuuka, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong Chuukanejyo (China)",                                     GAME_NO_COCKTAIL  )
+GAME( 1998, mjreach1,  0,        mjreach1,  mjreach1, driver_device, 0,        ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                   GAME_NO_COCKTAIL  )
+GAME( 1999, jongtei,   0,        jongtei,   jongtei,  driver_device, 0,        ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, ver. NM532-01)",                         GAME_NO_COCKTAIL  )
+GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, driver_device, 0,        ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                           GAME_NO_COCKTAIL  )
+GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, ddenlovr_state,   momotaro, ROT0, "Techno-Top",                               "Mahjong Momotarou (Japan)",                                       GAME_NO_COCKTAIL  | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

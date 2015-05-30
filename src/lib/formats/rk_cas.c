@@ -1,8 +1,12 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*
 
     Tape support for RK format
 
 */
+#include <assert.h>
+
 #include "rk_cas.h"
 
 

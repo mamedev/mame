@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* BGT Fruit Machines
   BGT (British Gaming Technology) were a small Spanish company
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Acho A. Tang, Nicola Salmoria
 #include "emu.h"
 #include "includes/equites.h"
 

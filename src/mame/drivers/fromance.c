@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Takahiro Nogi. Bryan McPhail, Nicola Salmoria, Aaron Giles
 /******************************************************************************
 
     Game Driver for Video System Mahjong series.

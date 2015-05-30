@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Dag Lem
 #pragma once
 
 #ifndef __SIDW8580_H__

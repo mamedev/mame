@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Nemesis (Hacked?)       GX400
@@ -1425,12 +1427,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(nemesis_state::sound_irq)
-{
-/* Interrupts _are_ generated, I wonder where they go.. */
-// m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
 WRITE8_MEMBER(nemesis_state::volume_callback)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
@@ -1821,7 +1817,7 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(nemesis_state, sound_irq))
+//  MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -1868,7 +1864,7 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(nemesis_state, sound_irq))
+//  MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

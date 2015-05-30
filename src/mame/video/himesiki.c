@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Uki
 /******************************************************************************
 
 Himeshikibu (C) 1989 Hi-Soft

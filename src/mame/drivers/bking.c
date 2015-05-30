@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ed Mueller, Mike Balfour, Zsolt Vasvari
 /***************************************************************************
 
 

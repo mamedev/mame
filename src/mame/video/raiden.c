@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Oliver Bergmann, Bryan McPhail, Randy Mongenel
 /*******************************************************************************
 
     Seibu Raiden hardware
@@ -228,6 +230,12 @@ void raiden_state::video_start()
 
 	m_fg_layer->set_transparent_pen(15);
 	m_tx_layer->set_transparent_pen(15);
+
+	save_item(NAME(m_bg_layer_enabled));
+	save_item(NAME(m_fg_layer_enabled));
+	save_item(NAME(m_tx_layer_enabled));
+	save_item(NAME(m_sp_layer_enabled));
+	save_item(NAME(m_flipscreen));
 }
 
 VIDEO_START_MEMBER(raiden_state,raidenb)
@@ -238,4 +246,11 @@ VIDEO_START_MEMBER(raiden_state,raidenb)
 
 	m_fg_layer->set_transparent_pen(15);
 	m_tx_layer->set_transparent_pen(15);
+
+	save_item(NAME(m_bg_layer_enabled));
+	save_item(NAME(m_fg_layer_enabled));
+	save_item(NAME(m_tx_layer_enabled));
+	save_item(NAME(m_sp_layer_enabled));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_raidenb_scroll_ram));
 }

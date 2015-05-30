@@ -13,6 +13,103 @@
 
 
 
+static int cIndexAscending(const void* a, const void* b)
+{
+	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
+	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
+	return left->index() - right->index();
+}
+
+static int cIndexDescending(const void* a, const void* b)
+{
+	return cIndexAscending(b, a);
+}
+
+static int cEnabledAscending(const void* a, const void* b)
+{
+	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
+	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
+	return (left->enabled() ? 1 : 0) - (right->enabled() ? 1 : 0);
+}
+
+static int cEnabledDescending(const void* a, const void* b)
+{
+	return cEnabledAscending(b, a);
+}
+
+static int cCpuAscending(const void* a, const void* b)
+{
+	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
+	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
+	return strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
+}
+
+static int cCpuDescending(const void* a, const void* b)
+{
+	return cCpuAscending(b, a);
+}
+
+static int cSpaceAscending(const void* a, const void* b)
+{
+	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
+	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
+	return strcmp(left->space().name(), right->space().name());
+}
+
+static int cSpaceDescending(const void* a, const void* b)
+{
+	return cSpaceAscending(b, a);
+}
+
+static int cAddressAscending(const void* a, const void* b)
+{
+	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
+	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
+	return (left->address() > right->address()) ? 1 : (left->address() < right->address()) ? -1 : 0;
+}
+
+static int cAddressDescending(const void* a, const void* b)
+{
+	return cAddressAscending(b, a);
+}
+
+static int cTypeAscending(const void* a, const void* b)
+{
+	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
+	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
+	return left->type() - right->type();
+}
+
+static int cTypeDescending(const void* a, const void* b)
+{
+	return cTypeAscending(b, a);
+}
+
+static int cConditionAscending(const void* a, const void* b)
+{
+	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
+	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
+	return strcmp(left->condition(), right->condition());
+}
+
+static int cConditionDescending(const void* a, const void* b)
+{
+	return cConditionAscending(b, a);
+}
+
+static int cActionAscending(const void* a, const void* b)
+{
+	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
+	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
+	return strcmp(left->action(), right->action());
+}
+
+static int cActionDescending(const void* a, const void* b)
+{
+	return cActionAscending(b, a);
+}
+
+
 //**************************************************************************
 //  DEBUG VIEW WATCH POINTS
 //**************************************************************************
@@ -25,16 +122,12 @@ static const int tableBreaks[] = { 5, 9, 31, 42, 60, 67, 86, 100 };
 
 debug_view_watchpoints::debug_view_watchpoints(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: debug_view(machine, DVT_WATCH_POINTS, osdupdate, osdprivate),
-		m_sortType(SORT_INDEX_ASCENDING)
+		m_sortType(&cIndexAscending)
 {
 	// fail if no available sources
 	enumerate_sources();
 	if (m_source_list.count() == 0)
 		throw std::bad_alloc();
-
-	// configure the view
-	m_total.y = 10;
-	m_supports_cursor = false;
 }
 
 
@@ -61,33 +154,13 @@ void debug_view_watchpoints::enumerate_sources()
 	disasm_interface_iterator iter(machine().root_device());
 	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
 	{
-		astring name;
-		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*global_alloc(debug_view_source(name.cstr(), &dasm->device())));
+		std::string name;
+		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
+		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
 	// reset the source to a known good entry
 	set_source(*m_source_list.first());
-}
-
-
-//-------------------------------------------------
-//  view_notify - handle notification of updates
-//  to cursor changes
-//-------------------------------------------------
-
-void debug_view_watchpoints::view_notify(debug_view_notification type)
-{
-}
-
-
-//-------------------------------------------------
-//  view_char - handle a character typed within
-//  the current view
-//-------------------------------------------------
-
-void debug_view_watchpoints::view_char(int chval)
-{
 }
 
 
@@ -98,414 +171,191 @@ void debug_view_watchpoints::view_char(int chval)
 
 void debug_view_watchpoints::view_click(const int button, const debug_view_xy& pos)
 {
-	bool clickedTopRow = (m_topleft.y == pos.y);
+	bool const clickedTopRow = (m_topleft.y == pos.y);
 
 	if (clickedTopRow)
 	{
-		if (pos.x < tableBreaks[0] && m_sortType == SORT_INDEX_ASCENDING)
-			m_sortType = SORT_INDEX_DESCENDING;
-		else if (pos.x < tableBreaks[0])
-			m_sortType = SORT_INDEX_ASCENDING;
-		else if (pos.x < tableBreaks[1] && m_sortType == SORT_ENABLED_ASCENDING)
-			m_sortType = SORT_ENABLED_DESCENDING;
+		if (pos.x < tableBreaks[0])
+			m_sortType = (m_sortType == &cIndexAscending) ? &cIndexDescending : &cIndexAscending;
 		else if (pos.x < tableBreaks[1])
-			m_sortType = SORT_ENABLED_ASCENDING;
-		else if (pos.x < tableBreaks[2] && m_sortType == SORT_CPU_ASCENDING)
-			m_sortType = SORT_CPU_DESCENDING;
+			m_sortType = (m_sortType == &cEnabledAscending) ? &cEnabledDescending : &cEnabledAscending;
 		else if (pos.x < tableBreaks[2])
-			m_sortType = SORT_CPU_ASCENDING;
-		else if (pos.x < tableBreaks[3] && m_sortType == SORT_SPACE_ASCENDING)
-			m_sortType = SORT_SPACE_DESCENDING;
+			m_sortType = (m_sortType == &cCpuAscending) ? &cCpuDescending : &cCpuAscending;
 		else if (pos.x < tableBreaks[3])
-			m_sortType = SORT_SPACE_ASCENDING;
-		else if (pos.x < tableBreaks[4] && m_sortType == SORT_ADDRESS_ASCENDING)
-			m_sortType = SORT_ADDRESS_DESCENDING;
+			m_sortType = (m_sortType == &cSpaceAscending) ? &cSpaceDescending : &cSpaceAscending;
 		else if (pos.x < tableBreaks[4])
-			m_sortType = SORT_ADDRESS_ASCENDING;
-		else if (pos.x < tableBreaks[5] && m_sortType == SORT_TYPE_ASCENDING)
-			m_sortType = SORT_TYPE_DESCENDING;
+			m_sortType = (m_sortType == &cAddressAscending) ? &cAddressDescending : &cAddressAscending;
 		else if (pos.x < tableBreaks[5])
-			m_sortType = SORT_TYPE_ASCENDING;
-		else if (pos.x < tableBreaks[6] && m_sortType == SORT_CONDITION_ASCENDING)
-			m_sortType = SORT_CONDITION_DESCENDING;
+			m_sortType = (m_sortType == &cTypeAscending) ? &cTypeDescending : &cTypeAscending;
 		else if (pos.x < tableBreaks[6])
-			m_sortType = SORT_CONDITION_ASCENDING;
-		else if (pos.x < tableBreaks[7] && m_sortType == SORT_ACTION_ASCENDING)
-			m_sortType = SORT_ACTION_DESCENDING;
+			m_sortType = (m_sortType == &cConditionAscending) ? &cConditionDescending : &cConditionAscending;
 		else if (pos.x < tableBreaks[7])
-			m_sortType = SORT_ACTION_ASCENDING;
+			m_sortType = (m_sortType == &cActionAscending) ? &cActionDescending : &cActionAscending;
 	}
 	else
 	{
 		// Gather a sorted list of all the watchpoints for all the CPUs
-		device_debug::watchpoint** wpList = NULL;
-		const int numWPs = watchpoints(SORT_NONE, wpList);
+		gather_watchpoints();
 
-		const int wpIndex = pos.y-1;
-		if (wpIndex > numWPs || wpIndex < 0)
+		int const wpIndex = pos.y - 1;
+		if ((wpIndex >= m_buffer.size()) || (wpIndex < 0))
 			return;
 
 		// Enable / disable
-		if (wpList[wpIndex]->enabled())
-			wpList[wpIndex]->setEnabled(false);
-		else
-			wpList[wpIndex]->setEnabled(true);
-
-		delete[] wpList;
+		m_buffer[wpIndex]->setEnabled(!m_buffer[wpIndex]->enabled());
 	}
 
-	view_update();
+	begin_update();
+	m_update_pending = true;
+	end_update();
 }
 
 
-void debug_view_watchpoints::pad_astring_to_length(astring& str, int len)
+void debug_view_watchpoints::pad_astring_to_length(std::string& str, int len)
 {
-	int diff = len - str.len();
+	int diff = len - str.length();
 	if (diff > 0)
 	{
-		astring buffer;
-		buffer.expand(diff);
+		std::string buffer;
 		for (int i = 0; i < diff; i++)
-			buffer.catprintf(" ");
-		str.catprintf("%s", buffer.cstr());
+			buffer.append(" ");
+		strcatprintf(str, "%s", buffer.c_str());
 	}
 }
 
 
-// Sorting functors for the qsort function
-static int cIndexAscending(const void* a, const void* b)
+void debug_view_watchpoints::gather_watchpoints()
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->index() > right->index();
-}
-
-static int cIndexDescending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->index() < right->index();
-}
-
-static int cEnabledAscending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->enabled() < right->enabled();
-}
-
-static int cEnabledDescending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->enabled() > right->enabled();
-}
-
-static int cCpuAscending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	const int result = strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
-	return result >= 0;
-}
-
-static int cCpuDescending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	const int result = strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
-	return result < 0;
-}
-
-static int cSpaceAscending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	const int result = strcmp(left->space().name(), right->space().name());
-	return result >= 0;
-}
-
-static int cSpaceDescending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	const int result = strcmp(left->space().name(), right->space().name());
-	return result < 0;
-}
-
-static int cAddressAscending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->address() > right->address();
-}
-
-static int cAddressDescending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->address() < right->address();
-}
-
-static int cTypeAscending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->type() > right->type();
-}
-
-static int cTypeDescending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->type() < right->type();
-}
-
-static int cConditionAscending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	const int result = strcmp(left->condition(), right->condition());
-	return result >= 0;
-}
-
-static int cConditionDescending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	const int result = strcmp(left->condition(), right->condition());
-	return result < 0;
-}
-
-static int cActionAscending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	const int result = strcmp(left->action(), right->action());
-	return result >= 0;
-}
-
-static int cActionDescending(const void* a, const void* b)
-{
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	const int result = strcmp(left->action(), right->action());
-	return result < 0;
-}
-
-
-int debug_view_watchpoints::watchpoints(SortMode sort, device_debug::watchpoint**& wpList)
-{
-	// Alloc
-	int numWPs = 0;
-	wpList = NULL;
-	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
-	{
-		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
-		{
-			/* loop over the watchpoints */
-			const device_debug& debugInterface = *source->device()->debug();
-			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != NULL; wp = wp->next())
-				numWPs++;
-		}
-	}
-	wpList = new device_debug::watchpoint*[numWPs];
-
-	int wpAddIndex = 0;
+	m_buffer.resize(0);
 	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
 	{
 		// Collect
+		device_debug &debugInterface = *source->device()->debug();
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
-			device_debug& debugInterface = *source->device()->debug();
 			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != NULL; wp = wp->next())
-			{
-				wpList[wpAddIndex] = wp;
-				wpAddIndex++;
-			}
+				m_buffer.push_back(wp);
 		}
 	}
 
 	// And now for the sort
-	switch (m_sortType)
-	{
-		case SORT_NONE:
-			break;
-		case SORT_INDEX_ASCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cIndexAscending);
-			break;
-		case SORT_INDEX_DESCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cIndexDescending);
-			break;
-		case SORT_ENABLED_ASCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cEnabledAscending);
-			break;
-		case SORT_ENABLED_DESCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cEnabledDescending);
-			break;
-		case SORT_CPU_ASCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cCpuAscending);
-			break;
-		case SORT_CPU_DESCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cCpuDescending);
-			break;
-		case SORT_SPACE_ASCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cSpaceAscending);
-			break;
-		case SORT_SPACE_DESCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cSpaceDescending);
-			break;
-		case SORT_ADDRESS_ASCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cAddressAscending);
-			break;
-		case SORT_ADDRESS_DESCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cAddressDescending);
-			break;
-		case SORT_TYPE_ASCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cTypeAscending);
-			break;
-		case SORT_TYPE_DESCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cTypeDescending);
-			break;
-		case SORT_CONDITION_ASCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cConditionAscending);
-			break;
-		case SORT_CONDITION_DESCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cConditionDescending);
-			break;
-		case SORT_ACTION_ASCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cActionAscending);
-			break;
-		case SORT_ACTION_DESCENDING:
-			qsort(wpList, numWPs, sizeof(device_debug::watchpoint*), cActionDescending);
-			break;
-	}
-
-	return numWPs;
+	if (!m_buffer.empty())
+		qsort(&m_buffer[0], m_buffer.size(), sizeof(device_debug::watchpoint *), m_sortType);
 }
 
 
 //-------------------------------------------------
 //  view_update - update the contents of the
-//  disassembly view
+//  watchpoints view
 //-------------------------------------------------
 
 void debug_view_watchpoints::view_update()
 {
 	// Gather a list of all the watchpoints for all the CPUs
-	device_debug::watchpoint** wpList = NULL;
-	const int numWPs = watchpoints(SORT_NONE, wpList);
+	gather_watchpoints();
 
 	// Set the view region so the scroll bars update
-	m_total.y = numWPs+1;
+	m_total.x = tableBreaks[ARRAY_LENGTH(tableBreaks) - 1];
+	m_total.y = m_buffer.size() + 1;
+	if (m_total.y < 10)
+		m_total.y = 10;
 
 	// Draw
-	debug_view_char *dest = m_viewdata;
-	for (int row = 0; row < m_visible.y; row++)
+	debug_view_char *dest = &m_viewdata[0];
+	std::string         linebuf;
+
+	// Header
+	if (m_visible.y > 0)
 	{
-		UINT32 effrow = m_topleft.y + row;
+		linebuf.clear();
+		linebuf.append("ID");
+		if (m_sortType == &cIndexAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cIndexDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[0]);
+		linebuf.append("En");
+		if (m_sortType == &cEnabledAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cEnabledDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[1]);
+		linebuf.append("CPU");
+		if (m_sortType == &cCpuAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cCpuDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[2]);
+		linebuf.append("Space");
+		if (m_sortType == &cSpaceAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cSpaceDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[3]);
+		linebuf.append("Addresses");
+		if (m_sortType == &cAddressAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cAddressDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[4]);
+		linebuf.append("Type");
+		if (m_sortType == &cTypeAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cTypeDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[5]);
+		linebuf.append("Condition");
+		if (m_sortType == &cConditionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cConditionDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[6]);
+		linebuf.append("Action");
+		if (m_sortType == &cActionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cActionDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[7]);
 
-		// Header
-		if (row == 0)
+		for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 		{
-			astring header;
-			header.printf("ID");
-			if (m_sortType == SORT_INDEX_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_INDEX_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[0]);
-			header.catprintf("En");
-			if (m_sortType == SORT_ENABLED_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ENABLED_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[1]);
-			header.catprintf("CPU");
-			if (m_sortType == SORT_CPU_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_CPU_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[2]);
-			header.catprintf("Space");
-			if (m_sortType == SORT_SPACE_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_SPACE_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[3]);
-			header.catprintf("Addresses");
-			if (m_sortType == SORT_ADDRESS_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ADDRESS_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[4]);
-			header.catprintf("Type");
-			if (m_sortType == SORT_TYPE_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_TYPE_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[5]);
-			header.catprintf("Condition");
-			if (m_sortType == SORT_CONDITION_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_CONDITION_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[6]);
-			header.catprintf("Action");
-			if (m_sortType == SORT_ACTION_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ACTION_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[7]);
-
-			for (int i = 0; i < m_visible.x; i++)
-			{
-				dest->byte = (i < header.len()) ? header[i] : ' ';
-				dest->attrib = DCA_ANCILLARY;
-				dest++;
-			}
-			continue;
-		}
-
-		// watchpoints
-		int wpi = effrow-1;
-		if (wpi < numWPs && wpi >= 0)
-		{
-			static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
-			device_debug::watchpoint* wp = wpList[wpi];
-
-			astring buffer;
-			buffer.printf("%x", wp->index());
-			pad_astring_to_length(buffer, tableBreaks[0]);
-			buffer.catprintf("%c", wp->enabled() ? 'X' : 'O');
-			pad_astring_to_length(buffer, tableBreaks[1]);
-			buffer.catprintf("%s", wp->debugInterface()->device().tag());
-			pad_astring_to_length(buffer, tableBreaks[2]);
-			buffer.catprintf("%s", wp->space().name());
-			pad_astring_to_length(buffer, tableBreaks[3]);
-			buffer.catprintf("%s-%s",
-								core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()),
-								core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()));
-			pad_astring_to_length(buffer, tableBreaks[4]);
-			buffer.catprintf("%s", types[wp->type() & 3]);
-			pad_astring_to_length(buffer, tableBreaks[5]);
-			if (astring(wp->condition()) != astring("1"))
-			{
-				buffer.catprintf("%s", wp->condition());
-				pad_astring_to_length(buffer, tableBreaks[6]);
-			}
-			if (astring(wp->action()) != astring(""))
-			{
-				buffer.catprintf("%s", wp->action());
-				pad_astring_to_length(buffer, tableBreaks[7]);
-			}
-
-			for (int i = 0; i < m_visible.x; i++)
-			{
-				dest->byte = (i < buffer.len()) ? buffer[i] : ' ';
-				dest->attrib = DCA_NORMAL;
-
-				// Color disabled watchpoints red
-				if (i == 5 && dest->byte == 'O')
-					dest->attrib = DCA_CHANGED;
-
-				dest++;
-			}
-			continue;
-		}
-
-		// Fill the remaining vertical space
-		for (int i = 0; i < m_visible.x; i++)
-		{
-			dest->byte = ' ';
-			dest->attrib = DCA_NORMAL;
-			dest++;
+			dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
+			dest->attrib = DCA_ANCILLARY;
 		}
 	}
 
-	delete[] wpList;
+	for (int row = 1; row < m_visible.y; row++)
+	{
+		// watchpoints
+		int const wpi = row + m_topleft.y - 1;
+		if ((wpi < m_buffer.size()) && wpi >= 0)
+		{
+			static char const *const types[] = { "unkn ", "read ", "write", "r/w  " };
+			device_debug::watchpoint *const wp = m_buffer[wpi];
+
+			linebuf.clear();
+			strcatprintf(linebuf, "%2X", wp->index());
+			pad_astring_to_length(linebuf, tableBreaks[0]);
+			linebuf.push_back(wp->enabled() ? 'X' : 'O');
+			pad_astring_to_length(linebuf, tableBreaks[1]);
+			linebuf.append(wp->debugInterface()->device().tag());
+			pad_astring_to_length(linebuf, tableBreaks[2]);
+			linebuf.append(wp->space().name());
+			pad_astring_to_length(linebuf, tableBreaks[3]);
+			linebuf.append(core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()));
+			linebuf.push_back('-');
+			linebuf.append(core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()));
+			pad_astring_to_length(linebuf, tableBreaks[4]);
+			linebuf.append(types[wp->type() & 3]);
+			pad_astring_to_length(linebuf, tableBreaks[5]);
+			if (strcmp(wp->condition(), "1"))
+				linebuf.append(wp->condition());
+			pad_astring_to_length(linebuf, tableBreaks[6]);
+			linebuf.append(wp->action());
+			pad_astring_to_length(linebuf, tableBreaks[7]);
+
+			for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
+			{
+				dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
+				dest->attrib = DCA_NORMAL;
+
+				// Color disabled watchpoints red
+				if ((i >= tableBreaks[0]) && (i < tableBreaks[1]) && !wp->enabled())
+					dest->attrib |= DCA_CHANGED;
+			}
+		}
+		else
+		{
+			// Fill the remaining vertical space
+			for (int i = 0; i < m_visible.x; i++, dest++)
+			{
+				dest->byte = ' ';
+				dest->attrib = DCA_NORMAL;
+			}
+		}
+	}
 }

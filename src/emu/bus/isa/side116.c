@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Acculogic sIDE-1/16
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     IDE Disk Controller for IBM PC, XT and compatibles
 

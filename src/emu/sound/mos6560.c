@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /***************************************************************************
 
     MOS 6560 / 6561 Video Interface Chip

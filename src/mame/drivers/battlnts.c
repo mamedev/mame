@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Konami Battlantis Hardware
@@ -6,7 +8,7 @@
      GX765 - Rack 'em Up/The Hustler (c) 1987 Konami
      GX777 - Battlantis (c) 1987 Konami
 
-    Preliminary driver by: Manuel Abadia <manu@teleline.es>
+    Preliminary driver by: Manuel Abadia <emumanu+mame@gmail.com>
 
 ***************************************************************************/
 

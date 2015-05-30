@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"

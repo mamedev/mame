@@ -1,10 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
  *   Xerox AltoII cursor task (CURT)
- *
- *   Copyright Juergen Buchmueller <pullmoll@t-online.de>
- *
- *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
 #ifdef  ALTO2_DEFINE_CONSTANTS

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 /***************************************************************************
 
     dsp56dsm.c
@@ -21,7 +23,7 @@ CPU_DISASSEMBLE( dsp56k )
 
 	// Decode and disassemble.
 	DSP56K::Opcode op(w0, w1);
-	sprintf(buffer, "%s", op.disassemble().cstr());
+	sprintf(buffer, "%s", op.disassemble().c_str());
 
 	const unsigned size = op.size();
 	return (size | DASMFLAG_SUPPORTED);

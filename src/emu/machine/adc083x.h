@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 /***************************************************************************
 
     National Semiconductor ADC0831 / ADC0832 / ADC0834 / ADC0838

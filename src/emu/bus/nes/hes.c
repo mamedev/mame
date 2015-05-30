@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for HES PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate the HES PCBs (both the one with hardwired mirroring and the one with mapper-controlled

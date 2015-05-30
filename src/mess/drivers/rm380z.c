@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol,Gabriele D'Antona
 /*
 
 Research Machines 380Z (aka "RML 380Z" or "RM 380Z")

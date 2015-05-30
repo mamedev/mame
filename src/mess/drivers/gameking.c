@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /* TimeTop - GameKing */
 
 // these are meant to have a 3-in-1 internal ROM, not dumped
@@ -118,8 +120,8 @@ DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
 
 void gameking_state::machine_start()
 {
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	if (!m_cart_rom)
 	{

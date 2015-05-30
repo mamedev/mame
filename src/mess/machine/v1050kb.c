@@ -4,9 +4,6 @@
 
     Visual 1050 keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #include "v1050kb.h"
@@ -73,7 +70,7 @@ static const discrete_555_desc v1050_ne555 =
 
 static DISCRETE_SOUND_START( v1050kb )
 	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_555_ASTABLE(NODE_02, NODE_01, RES_K(68) /* can't read on schematic */ , RES_K(3), CAP_N(10), &v1050_ne555)
+	DISCRETE_555_ASTABLE(NODE_02, NODE_01, (int) RES_K(68) /* can't read on schematic */ , (int) RES_K(3), (int) CAP_N(10), &v1050_ne555)
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
 

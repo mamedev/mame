@@ -4,9 +4,6 @@
 
     Classical Games/Protovision 4 Player Interface emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

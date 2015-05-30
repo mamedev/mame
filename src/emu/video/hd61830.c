@@ -4,9 +4,6 @@
 
     Hitachi HD61830 LCD Timing Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "hd61830.h"

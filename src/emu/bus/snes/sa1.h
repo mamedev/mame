@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli, R. Belmont
 #ifndef __SNS_SA1_H
 #define __SNS_SA1_H
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 #include "sound/okim6295.h"
 #include "cpu/pic16c5x/pic16c5x.h"
@@ -57,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(drgnmst_pcm_banksel_w);
 	DECLARE_WRITE8_MEMBER(drgnmst_oki_w);
 	DECLARE_WRITE8_MEMBER(drgnmst_snd_control_w);
-	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
+	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
 	DECLARE_WRITE16_MEMBER(drgnmst_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_md_videoram_w);

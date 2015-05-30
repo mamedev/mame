@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
   Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
@@ -530,7 +532,7 @@ void dec0_automat_state::machine_start()
 {
 	save_item(NAME(m_automat_adpcm_byte));
 	save_item(NAME(m_automat_msm5205_vclk_toggle));
-	save_item(NAME(m_automat_scroll_regs));	
+	save_item(NAME(m_automat_scroll_regs));
 }
 
 

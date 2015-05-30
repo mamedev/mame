@@ -69,7 +69,8 @@ wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, const char *
 	intrq_cb(*this),
 	drq_cb(*this),
 	hld_cb(*this),
-	enp_cb(*this)
+	enp_cb(*this),
+	enmf_cb(*this)
 {
 	force_ready = false;
 }
@@ -85,12 +86,17 @@ void wd_fdc_t::device_start()
 	drq_cb.resolve();
 	hld_cb.resolve();
 	enp_cb.resolve();
+	enmf_cb.resolve();
+
+	if (!has_enmf && !enmf_cb.isnull())
+		logerror("%s: Warning, this chip doesn't have an ENMF line.\n", tag());
 
 	t_gen = timer_alloc(TM_GEN);
 	t_cmd = timer_alloc(TM_CMD);
 	t_track = timer_alloc(TM_TRACK);
 	t_sector = timer_alloc(TM_SECTOR);
 	dden = disable_mfm;
+	enmf = false;
 	floppy = 0;
 	status = 0x00;
 
@@ -128,6 +134,11 @@ void wd_fdc_t::soft_reset()
 	counter = 0;
 	status_type_1 = true;
 	last_dir = 1;
+
+	// gnd == enmf enabled, otherwise disabled (default)
+	if (!enmf_cb.isnull() && has_enmf)
+		enmf = enmf_cb() ? false : true;
+
 	intrq = false;
 	if (!intrq_cb.isnull())
 	{
@@ -188,7 +199,7 @@ void wd_fdc_t::dden_w(bool _dden)
 	}
 }
 
-astring wd_fdc_t::tts(const attotime &t)
+std::string wd_fdc_t::tts(const attotime &t)
 {
 	char buf[256];
 	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
@@ -196,7 +207,7 @@ astring wd_fdc_t::tts(const attotime &t)
 	return buf;
 }
 
-astring wd_fdc_t::ttsn()
+std::string wd_fdc_t::ttsn()
 {
 	return tts(machine().time());
 }
@@ -233,7 +244,7 @@ void wd_fdc_t::seek_start(int state)
 {
 	if (TRACE_COMMAND) logerror("%s: seek %d (track=%d)\n", tag(), data, track);
 	main_state = state;
-	status = (status & ~(S_CRC|S_RNF|S_SPIN)) | S_BUSY;
+	status &= ~(S_CRC|S_RNF|S_SPIN);
 	if(head_control) {
 		// TODO get value from HLT callback
 		if(command & 8)
@@ -273,7 +284,8 @@ void wd_fdc_t::seek_continue()
 			}
 
 			if(main_state == SEEK && track == data) {
-				sub_state = SEEK_DONE;
+				sub_state = SEEK_WAIT_STABILIZATION_TIME;
+				delay_cycles(t_gen, 30000);
 			}
 
 			if(sub_state == SPINUP_DONE) {
@@ -382,7 +394,7 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		default:
-			logerror("%s: seek unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			logerror("%s: seek unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -419,7 +431,7 @@ void wd_fdc_t::read_sector_start()
 	}
 
 	main_state = READ_SECTOR;
-	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
+	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -504,7 +516,7 @@ void wd_fdc_t::read_sector_continue()
 			break;
 
 		default:
-			logerror("%s: read sector unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			logerror("%s: read sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -520,7 +532,7 @@ void wd_fdc_t::read_track_start()
 	}
 
 	main_state = READ_TRACK;
-	status = (status & ~(S_LOST|S_RNF)) | S_BUSY;
+	status &= ~(S_LOST|S_RNF);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -583,7 +595,7 @@ void wd_fdc_t::read_track_continue()
 			return;
 
 		default:
-			logerror("%s: read track unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			logerror("%s: read track unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -598,7 +610,7 @@ void wd_fdc_t::read_id_start()
 	}
 
 	main_state = READ_ID;
-	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
+	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -658,7 +670,7 @@ void wd_fdc_t::read_id_continue()
 			return;
 
 		default:
-			logerror("%s: read id unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			logerror("%s: read id unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -674,7 +686,7 @@ void wd_fdc_t::write_track_start()
 	}
 
 	main_state = WRITE_TRACK;
-	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
+	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -735,6 +747,7 @@ void wd_fdc_t::write_track_continue()
 			if (TRACE_STATE) logerror("%s: DATA_LOAD_WAIT_DONE\n", tag());
 			if(drq) {
 				status |= S_LOST;
+				drop_drq();
 				command_end();
 				return;
 			}
@@ -762,12 +775,12 @@ void wd_fdc_t::write_track_continue()
 					sprintf(buf, "%02x", format_last_byte);
 				format_description_string += buf;
 			}
-			if (TRACE_DESC) logerror("%s: track description %s\n", tag(), format_description_string.cstr());
+			if (TRACE_DESC) logerror("%s: track description %s\n", tag(), format_description_string.c_str());
 			command_end();
 			return;
 
 		default:
-			logerror("%s: write track unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			logerror("%s: write track unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -784,7 +797,7 @@ void wd_fdc_t::write_sector_start()
 	}
 
 	main_state = WRITE_SECTOR;
-	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
+	status &= ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM);
 	drop_drq();
 	if(side_control && floppy)
 		floppy->ss_w((command & 0x02) ? 1 : 0);
@@ -866,7 +879,7 @@ void wd_fdc_t::write_sector_continue()
 			break;
 
 		default:
-			logerror("%s: write sector unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			logerror("%s: write sector unknown sub-state %d\n", ttsn().c_str(), sub_state);
 			return;
 		}
 	}
@@ -883,21 +896,29 @@ void wd_fdc_t::interrupt_start()
 		drop_drq();
 		motor_timeout = 0;
 	}
+	else
+	{
+		// when a force interrupt command is issued and there is no
+		// currently running command, return the status type 1 bits
+		status_type_1 = true;
+	}
 
 	if(!(command & 0x0f)) {
 		intrq_cond = 0;
+	} else if ((command & 0x0f) > 8) {	// assume I_IMM is set only if condition equal to 8 but not more than, Spectrum's BetaDisk require this
+		intrq_cond = 0;
 	} else {
-		intrq_cond = (intrq_cond & I_IMM) | (command & 0x07);
+		intrq_cond = (intrq_cond & I_IMM) | (command & 0x0f);
 	}
 
-	if(intrq_cond & I_IMM) {
+	if(command & I_IMM) {
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
 	}
 
 	if(command & 0x03) {
-		logerror("%s: unhandled interrupt generation (%02x)\n", ttsn().cstr(), command);
+		logerror("%s: unhandled interrupt generation (%02x)\n", ttsn().c_str(), command);
 	}
 }
 
@@ -931,7 +952,7 @@ void wd_fdc_t::general_continue()
 		write_sector_continue();
 		break;
 	default:
-		logerror("%s: general_continue on unknown main-state %d\n", ttsn().cstr(), main_state);
+		logerror("%s: general_continue on unknown main-state %d\n", ttsn().c_str(), main_state);
 		break;
 	}
 }
@@ -962,7 +983,7 @@ void wd_fdc_t::do_generic()
 
 	default:
 		if(cur_live.tm.is_never())
-			logerror("%s: do_generic on unknown sub-state %d\n", ttsn().cstr(), sub_state);
+			logerror("%s: do_generic on unknown sub-state %d\n", ttsn().c_str(), sub_state);
 		break;
 	}
 }
@@ -1034,13 +1055,23 @@ void wd_fdc_t::cmd_w(UINT8 val)
 			intrq_cb(intrq);
 	}
 
-	// No more than one write in flight
-	if(cmd_buffer != -1)
+	// No more than one write in flight, but interrupts take priority
+	if(cmd_buffer != -1 && ((val & 0xf0) != 0xd0))
 		return;
 
 	cmd_buffer = val;
 
-	delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
+	if ((val & 0xf0) == 0xd0)
+	{
+		// force interrupt is executed instantly (?)
+		delay_cycles(t_cmd, 0);
+	}
+	else
+	{
+		// set busy, then set a timer to process the command
+		status |= S_BUSY;
+		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
+	}
 }
 
 UINT8 wd_fdc_t::status_r()
@@ -1051,7 +1082,7 @@ UINT8 wd_fdc_t::status_r()
 			intrq_cb(intrq);
 	}
 
-	if((main_state == IDLE && !drq) || status_type_1) {
+	if(status_type_1) {
 		if(floppy && floppy->idx_r())
 			status |= S_IP;
 		else
@@ -1129,7 +1160,11 @@ void wd_fdc_t::sector_w(UINT8 val)
 	//  return;
 
 	sector_buffer = val;
-	delay_cycles(t_sector, dden ? delay_register_commit*2 : delay_register_commit);
+
+	// set a timer to write the new value to the register, but only if we aren't in
+	// the middle of an already occurring update
+	if (!t_sector->enabled())
+		delay_cycles(t_sector, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
 UINT8 wd_fdc_t::sector_r()
@@ -1200,6 +1235,10 @@ void wd_fdc_t::spinup()
 
 void wd_fdc_t::ready_callback(floppy_image_device *floppy, int state)
 {
+	// why is this even possible?
+	if (!floppy)
+		return;
+
 	live_sync();
 	if(!ready_hooked)
 		return;
@@ -1228,12 +1267,23 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 
 	switch(sub_state) {
 	case IDLE:
-		if(motor_control) {
+		if(motor_control || head_control) {
 			motor_timeout ++;
-			if(motor_timeout >= 5) {
+			if(motor_control && motor_timeout >= 5) {
 				status &= ~S_MON;
 				if(floppy)
 					floppy->mon_w(1);
+			}
+
+			if (head_control && motor_timeout >= 3)
+			{
+				hld = false;
+
+				// signal drive to unload head
+				if (!hld_cb.isnull())
+					hld_cb(hld);
+
+				status &= ~S_HLD; // todo: should get this value from the drive
 			}
 		}
 		break;
@@ -1284,7 +1334,7 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 		break;
 
 	default:
-		logerror("%s: Index pulse on unknown sub-state %d\n", ttsn().cstr(), sub_state);
+		logerror("%s: Index pulse on unknown sub-state %d\n", ttsn().c_str(), sub_state);
 		break;
 	}
 
@@ -1329,7 +1379,11 @@ void wd_fdc_t::live_start(int state)
 	cur_live.previous_type = live_info::PT_NONE;
 	cur_live.data_bit_context = false;
 	cur_live.byte_counter = 0;
-	pll_reset(dden, cur_live.tm);
+
+	if (!enmf_cb.isnull() && has_enmf)
+		enmf = enmf_cb() ? false : true;
+
+	pll_reset(dden, enmf, cur_live.tm);
 	checkpoint_live = cur_live;
 	pll_save_checkpoint();
 
@@ -1359,12 +1413,12 @@ void wd_fdc_t::live_sync()
 {
 	if(!cur_live.tm.is_never()) {
 		if(cur_live.tm > machine().time()) {
-			if (TRACE_SYNC) logerror("%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			if (TRACE_SYNC) logerror("%s: Rolling back and replaying (%s)\n", ttsn().c_str(), tts(cur_live.tm).c_str());
 			rollback();
 			live_run(machine().time());
 			pll_commit(floppy, cur_live.tm);
 		} else {
-			if (TRACE_SYNC) logerror("%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			if (TRACE_SYNC) logerror("%s: Committing (%s)\n", ttsn().c_str(), tts(cur_live.tm).c_str());
 			pll_commit(floppy, cur_live.tm);
 			if(cur_live.next_state != -1) {
 				cur_live.state = cur_live.next_state;
@@ -1484,7 +1538,7 @@ void wd_fdc_t::live_run(attotime limit)
 		}
 	}
 
-	//  fprintf(stderr, "%s: live_run(%s)\n", ttsn().cstr(), tts(limit).cstr());
+	//  fprintf(stderr, "%s: live_run(%s)\n", ttsn().c_str(), tts(limit).c_str());
 
 	for(;;) {
 		switch(cur_live.state) {
@@ -1492,7 +1546,7 @@ void wd_fdc_t::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1525,7 +1579,7 @@ void wd_fdc_t::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1567,7 +1621,7 @@ void wd_fdc_t::live_run(attotime limit)
 			if(cur_live.bit_counter & 15)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
-			//          fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
+			//          fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
 				live_delay(IDLE);
@@ -1608,7 +1662,7 @@ void wd_fdc_t::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1644,6 +1698,10 @@ void wd_fdc_t::live_run(attotime limit)
 						cur_live.shift_reg == 0xf56b ? 0x9fc6 :
 						cur_live.shift_reg == 0xf56e ? 0xafa5 :
 						0xbf84;
+
+					if((cur_live.data_reg & 0xfe) == 0xf8)
+						status |= S_DDM;
+
 					cur_live.data_separator_phase = false;
 					cur_live.bit_counter = 0;
 					cur_live.state = READ_SECTOR_DATA;
@@ -1655,7 +1713,7 @@ void wd_fdc_t::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1953,7 +2011,7 @@ void wd_fdc_t::live_run(attotime limit)
 				break;
 
 			default:
-				logerror("%s: Unknown sub state %d in WRITE_BYTE_DONE\n", tts(cur_live.tm).cstr(), sub_state);
+				logerror("%s: Unknown sub state %d in WRITE_BYTE_DONE\n", tts(cur_live.tm).c_str(), sub_state);
 				live_abort();
 				return;
 			}
@@ -2016,7 +2074,7 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		default:
-			logerror("%s: Unknown live state %d\n", tts(cur_live.tm).cstr(), cur_live.state);
+			logerror("%s: Unknown live state %d\n", tts(cur_live.tm).c_str(), cur_live.state);
 			return;
 		}
 	}
@@ -2067,10 +2125,15 @@ wd_fdc_analog_t::wd_fdc_analog_t(const machine_config &mconfig, device_type type
 	clock_ratio = 1;
 }
 
-void wd_fdc_analog_t::pll_reset(bool fm, const attotime &when)
+void wd_fdc_analog_t::pll_reset(bool fm, bool enmf, const attotime &when)
 {
+	int clocks = 2;
+
+	if (fm)   clocks *= 2;
+	if (enmf) clocks *= 2;
+
 	cur_pll.reset(when);
-	cur_pll.set_clock(clocks_to_attotime(fm ? 4 : 2));
+	cur_pll.set_clock(clocks_to_attotime(clocks));
 }
 
 void wd_fdc_analog_t::pll_start_writing(const attotime &tm)
@@ -2116,10 +2179,15 @@ wd_fdc_digital_t::wd_fdc_digital_t(const machine_config &mconfig, device_type ty
 
 const int wd_fdc_digital_t::wd_digital_step_times[4] = { 12000, 24000, 40000, 60000 };
 
-void wd_fdc_digital_t::pll_reset(bool fm, const attotime &when)
+void wd_fdc_digital_t::pll_reset(bool fm, bool enmf, const attotime &when)
 {
+	int clocks = 1;
+
+	if (fm)   clocks *= 2;
+	if (enmf) clocks *= 2;
+
 	cur_pll.reset(when);
-	cur_pll.set_clock(clocks_to_attotime(fm ? 2 : 1)); // HACK
+	cur_pll.set_clock(clocks_to_attotime(clocks));
 }
 
 void wd_fdc_digital_t::pll_start_writing(const attotime &tm)
@@ -2185,12 +2253,12 @@ int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_dev
 
 	/* if (TRACE_TRANSITION)
 	    if(!when.is_never())
-	        logerror("transition_time=%s\n", tts(when).cstr());
+	        logerror("transition_time=%s\n", tts(when).c_str());
 	*/
 	for(;;) {
 		// if (TRACE_TRANSITION) logerror("slot=%2d, counter=%03x\n", slot, counter);
 		attotime etime = ctime+delays[slot];
-		// if (TRACE_TRANSITION) logerror("etime=%s\n", tts(etime).cstr());
+		// if (TRACE_TRANSITION) logerror("etime=%s\n", tts(etime).c_str());
 		if(etime > limit)
 			return -1;
 		if(transition_time == 0xffff && !when.is_never() && etime >= when)
@@ -2369,6 +2437,7 @@ fd1791_t::fd1791_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = true;
 	side_control = false;
 	side_compare = true;
@@ -2383,6 +2452,7 @@ fd1792_t::fd1792_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = true;
+	has_enmf = false;
 	inverted_bus = true;
 	side_control = false;
 	side_compare = true;
@@ -2397,6 +2467,7 @@ fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = false;
 	side_compare = true;
@@ -2411,6 +2482,7 @@ fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = true;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = false;
 	side_compare = true;
@@ -2425,6 +2497,7 @@ fd1795_t::fd1795_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = true;
 	side_control = true;
 	side_compare = false;
@@ -2447,6 +2520,7 @@ fd1797_t::fd1797_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = true;
 	side_compare = false;
@@ -2469,6 +2543,7 @@ mb8866_t::mb8866_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = true;
 	side_control = false;
 	side_compare = true;
@@ -2483,6 +2558,7 @@ mb8876_t::mb8876_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = true;
 	side_control = false;
 	side_compare = true;
@@ -2497,6 +2573,7 @@ mb8877_t::mb8877_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = false;
 	side_compare = true;
@@ -2511,6 +2588,7 @@ fd1761_t::fd1761_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = true;
 	side_control = false;
 	side_compare = true;
@@ -2525,6 +2603,7 @@ fd1763_t::fd1763_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = false;
 	side_compare = true;
@@ -2539,6 +2618,7 @@ fd1765_t::fd1765_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = true;
 	side_control = true;
 	side_compare = false;
@@ -2561,6 +2641,7 @@ fd1767_t::fd1767_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = true;
 	side_compare = false;
@@ -2583,6 +2664,7 @@ wd2791_t::wd2791_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = true;
 	inverted_bus = true;
 	side_control = false;
 	side_compare = true;
@@ -2597,6 +2679,7 @@ wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = true;
 	inverted_bus = false;
 	side_control = false;
 	side_compare = true;
@@ -2611,6 +2694,7 @@ wd2795_t::wd2795_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = true;
 	side_control = true;
 	side_compare = false;
@@ -2633,6 +2717,7 @@ wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = true;
 	side_compare = false;
@@ -2655,6 +2740,7 @@ wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 32;
 	delay_command_commit = 36; // official 48 is too high for oric jasmin boot
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = false;
 	side_compare = false;
@@ -2671,6 +2757,7 @@ wd1772_t::wd1772_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 32;
 	delay_command_commit = 48;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = false;
 	side_compare = false;
@@ -2690,6 +2777,7 @@ wd1773_t::wd1773_t(const machine_config &mconfig, const char *tag, device_t *own
 	delay_register_commit = 32;
 	delay_command_commit = 48;
 	disable_mfm = false;
+	has_enmf = false;
 	inverted_bus = false;
 	side_control = false;
 	side_compare = true;

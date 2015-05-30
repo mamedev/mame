@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
     ui/tapectrl.h
 
     Tape control
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -25,7 +24,7 @@ public:
 	virtual void handle();
 
 private:
-	static void get_time_string(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos);
+	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);
 };
 
 #endif /* __UI_TAPECTRL_H__ */

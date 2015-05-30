@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 #pragma once
 
 #ifndef __WAVWRITE_H__

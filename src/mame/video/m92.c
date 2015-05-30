@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*****************************************************************************
 
     Irem M92 video hardware, Bryan McPhail, mish@tendril.co.uk
@@ -145,7 +147,7 @@ WRITE16_MEMBER(m92_state::m92_paletteram_w)
 
 TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 {
-	pf_layer_info *layer = (pf_layer_info *)tilemap.user_data();
+	M92_pf_layer_info *layer = (M92_pf_layer_info *)tilemap.user_data();
 	int tile, attrib;
 	tile_index = 2 * tile_index + layer->vram_base;
 
@@ -201,7 +203,7 @@ WRITE16_MEMBER(m92_state::m92_pf3_control_w)
 WRITE16_MEMBER(m92_state::m92_master_control_w)
 {
 	UINT16 old = m_pf_master_control[offset];
-	pf_layer_info *layer;
+	M92_pf_layer_info *layer;
 
 	COMBINE_DATA(&m_pf_master_control[offset]);
 
@@ -250,7 +252,7 @@ VIDEO_START_MEMBER(m92_state,m92)
 	memset(&m_pf_layer, 0, sizeof(m_pf_layer));
 	for (laynum = 0; laynum < 3; laynum++)
 	{
-		pf_layer_info *layer = &m_pf_layer[laynum];
+		M92_pf_layer_info *layer = &m_pf_layer[laynum];
 
 		/* allocate two tilemaps per layer, one normal, one wide */
 		layer->tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m92_state::get_pf_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,64);
@@ -278,8 +280,8 @@ VIDEO_START_MEMBER(m92_state,m92)
 		layer->tmap->set_transmask(2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 		layer->wide_tmap->set_transmask(2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 
-		state_save_register_item(machine(), "layer", NULL, laynum, layer->vram_base);
-		state_save_register_item_array(machine(), "layer", NULL, laynum, layer->control);
+		save_item(NAME(layer->vram_base), laynum);
+		save_item(NAME(layer->control), laynum);
 	}
 
 	m_paletteram.resize(m_palette->entries());
@@ -305,7 +307,7 @@ VIDEO_START_MEMBER(m92_state,ppan)
 
 	for (laynum = 0; laynum < 3; laynum++)
 	{
-		pf_layer_info *layer = &m_pf_layer[laynum];
+		M92_pf_layer_info *layer = &m_pf_layer[laynum];
 
 		/* set scroll offsets */
 		layer->tmap->set_scrolldx(2 * laynum + 11, -2 * laynum + 11);
@@ -483,7 +485,7 @@ void m92_state::m92_update_scroll_positions()
 
 	for (laynum = 0; laynum < 3; laynum++)
 	{
-		pf_layer_info *layer = &m_pf_layer[laynum];
+		M92_pf_layer_info *layer = &m_pf_layer[laynum];
 
 		if (m_pf_master_control[laynum] & 0x40)
 		{

@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
  UPD7725 / UPD96050 add-on chip emulation (for SNES/SFC)
  used in carts with DSP-1, DSP-1A, DSP-1B, DSP-2, DSP-3, DSP-4, ST-010 & ST-011 add-on chips
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  ***********************************************************************************************************/
 
@@ -105,12 +104,12 @@ void sns_rom_setadsp_device::device_start()
 // DSP dump contains prg at offset 0 and data at offset 0x2000
 READ32_MEMBER( sns_rom20_necdsp_device::necdsp_prg_r )
 {
-	return get_prg(m_bios, offset);
+	return get_prg(&m_bios[0], offset);
 }
 
 READ16_MEMBER( sns_rom20_necdsp_device::necdsp_data_r )
 {
-	return get_data(m_bios, offset + 0x2000/2);
+	return get_data(&m_bios[0], offset + 0x2000/2);
 }
 
 
@@ -171,12 +170,12 @@ WRITE8_MEMBER( sns_rom20_necdsp_device::chip_write )
 // DSP dump contains prg at offset 0 and data at offset 0x2000
 READ32_MEMBER( sns_rom21_necdsp_device::necdsp_prg_r )
 {
-	return get_prg(m_bios, offset);
+	return get_prg(&m_bios[0], offset);
 }
 
 READ16_MEMBER( sns_rom21_necdsp_device::necdsp_data_r )
 {
-	return get_data(m_bios, offset + 0x2000/2);
+	return get_data(&m_bios[0], offset + 0x2000/2);
 }
 
 
@@ -290,12 +289,12 @@ WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 // DSP dump contains prg at offset 0 and data at offset 0x10000
 READ32_MEMBER( sns_rom_setadsp_device::setadsp_prg_r )
 {
-	return get_prg(m_bios, offset);
+	return get_prg(&m_bios[0], offset);
 }
 
 READ16_MEMBER( sns_rom_setadsp_device::setadsp_data_r )
 {
-	return get_data(m_bios, offset + 0x10000/2);
+	return get_data(&m_bios[0], offset + 0x10000/2);
 }
 
 
@@ -359,8 +358,8 @@ void sns_rom20_necdsp_device::speedup_addon_bios_access()
 {
 	m_upd7725->space(AS_PROGRAM).install_read_bank(0x0000, 0x07ff, "dsp_prg");
 	m_upd7725->space(AS_DATA).install_read_bank(0x0000, 0x03ff, "dsp_data");
-	membank("dsp_prg")->set_base(m_dsp_prg);
-	membank("dsp_data")->set_base(m_dsp_data);
+	membank("dsp_prg")->set_base(&m_dsp_prg[0]);
+	membank("dsp_data")->set_base(&m_dsp_data[0]);
 	// copy data in the correct format
 	for (int x = 0; x < 0x800; x++)
 		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;
@@ -372,8 +371,8 @@ void sns_rom21_necdsp_device::speedup_addon_bios_access()
 {
 	m_upd7725->space(AS_PROGRAM).install_read_bank(0x0000, 0x07ff, "dsp_prg");
 	m_upd7725->space(AS_DATA).install_read_bank(0x0000, 0x03ff, "dsp_data");
-	membank("dsp_prg")->set_base(m_dsp_prg);
-	membank("dsp_data")->set_base(m_dsp_data);
+	membank("dsp_prg")->set_base(&m_dsp_prg[0]);
+	membank("dsp_data")->set_base(&m_dsp_data[0]);
 	// copy data in the correct format
 	for (int x = 0; x < 0x800; x++)
 		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;
@@ -385,8 +384,8 @@ void sns_rom_setadsp_device::speedup_addon_bios_access()
 {
 	m_upd96050->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "dsp_prg");
 	m_upd96050->space(AS_DATA).install_read_bank(0x0000, 0x07ff, "dsp_data");
-	membank("dsp_prg")->set_base(m_dsp_prg);
-	membank("dsp_data")->set_base(m_dsp_data);
+	membank("dsp_prg")->set_base(&m_dsp_prg[0]);
+	membank("dsp_data")->set_base(&m_dsp_data[0]);
 	// copy data in the correct format
 	for (int x = 0; x < 0x3fff; x++)
 		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Lee Taylor,John Clegg,Tomasz Slanina
 /***************************************************************************
 
   video.c

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Hiromitsu Shioya, Olivier Galibert
 /*********************************************************/
 /*    SEGA 8bit PCM                                      */
 /*********************************************************/
@@ -10,9 +12,9 @@
 #define   BANK_256    (11)
 #define   BANK_512    (12)
 #define   BANK_12M    (13)
-#define   BANK_MASK7    (0x70<<16)
-#define   BANK_MASKF    (0xf0<<16)
-#define   BANK_MASKF8   (0xf8<<16)
+#define   BANK_MASK7  (0x70<<16)
+#define   BANK_MASKF  (0xf0<<16)
+#define   BANK_MASKF8 (0xf8<<16)
 
 
 //**************************************************************************

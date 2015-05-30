@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
 /***************************************************************************
 
         DEC VT240
@@ -15,6 +17,7 @@
     0x0071: RAM fill to 0x00
     0x1c8f: UPD7220
 
+    // vt240: x2212 nvram at E56
 ****************************************************************************/
 
 #include "emu.h"
@@ -267,6 +270,44 @@ ROM_START( mc7105 )
 	ROM_LOAD16_BYTE( "032.bin", 0x10001, 0x8000, CRC(e81d93c4) SHA1(982412a7a6e65d6f6b4f66bd093e54ee16f31384))
 ROM_END
 
+/* ROM definition */
+ROM_START( vt240 )
+	ROM_REGION( 0x10000, "charcpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "23-008e6-00.e100", 0x0000, 0x8000, CRC(ebc8a2fe) SHA1(70838175f8302fdc0dee79b2403fa95e6d989206))
+
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS( "vt240" )
+	// according to the schematics an even older set exists, variation 'E1' with roms:
+	// e100/8085: 23-003e6
+	// e20: 23-001e6
+	// e22: 23-002e6
+	// e19: 23-048e5
+	// e21: 23-049e5
+	// but according to the Field Change Order below, the initial release is V2.1, so the above must be a prototype.
+	// DOL for v2.1 to v2.2 change: http://web.archive.org/web/20060905145200/http://cmcnabb.cc.vt.edu/dec94mds/vt240dol.txt
+	ROM_SYSTEM_BIOS( 0, "vt240v21", "VT240 V2.1" ) // initial factory release, FCO says this was 8 Feburary 1985
+	ROMX_LOAD( "23-006e6-00.e20", 0x00000, 0x8000, CRC(79C11D82) SHA1(5A6FE5B75B6504A161F2C9B148C0FE9F19770837), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-004e6-00.e22", 0x00001, 0x8000, CRC(EBA10FEF) SHA1(C0EE4D8E4EEB70066F03F3D17A7E2F2BD0B5F8AD), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-007e6-00.e19", 0x10000, 0x8000, CRC(D18A2AB8) SHA1(37F448A332FC50298007ED39C8BF1AB1EB6D4CAE), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-005e6-00.e21", 0x10001, 0x8000, CRC(558D0285) SHA1(E96A49BF9D55D8AB879D9B39AA380368C5C9ADE0), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "vt240", "VT240 V2.2" ) // Revised version, December 1985
+	ROMX_LOAD( "23-058e6.e20", 0x00000, 0x8000, CRC(D2A56B90) SHA1(39CBB26134D7D8BA308DF3A93228918A5945B45F), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "23-056e6.e22", 0x00001, 0x8000, CRC(C46E13C3) SHA1(0F2801FA7483D1F97708143CD81AE0816BF9A435), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "23-059e6.e19", 0x10000, 0x8000, CRC(F8393346) SHA1(1E28DAF1B7F2BDABC47CE2F6FA99EF038B275A29), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "23-057e6.e21", 0x10001, 0x8000, CRC(7CE9DCE9) SHA1(5A105E5BDCA13910B3B79CC23567CE2DC36B844D), ROM_SKIP(1) | ROM_BIOS(2))
+	// E39, E85, E131 are empty.
+
+	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
+	ROM_LOAD( "23-351a1.e149", 0x0000, 0x0020, NO_DUMP) // 82s123; DRAM RAS/CAS Timing PROM
+	ROM_LOAD( "23-352a1.e187", 0x0020, 0x0020, NO_DUMP) // 82s123; "CT0" Timing PROM
+	ROM_LOAD( "23-369a1.e53", 0x0040, 0x0020, NO_DUMP) // 82s123; ROM and RAM mapping PROM
+	ROM_LOAD( "23-370a1.e188", 0x0060, 0x0020, NO_DUMP) // 82s123; "CT1" Timing PROM
+	ROM_LOAD( "23-994a9.e74", 0x0100, 0x0200, NO_DUMP) // 82s131; T11 Interrupt Encoder PROM
+
+	ROM_REGION( 0x1000, "pals", 0 )
+	ROM_LOAD( "23-087j5.e182.e183.jed", 0x0000, 0x1000, NO_DUMP ) // PAL16L8ACN; "Logic Unit" Character Pattern Related
+ROM_END
+
 /* Driver */
 DRIVER_INIT_MEMBER(vt240_state,vt240)
 {
@@ -283,7 +324,8 @@ DRIVER_INIT_MEMBER(vt240_state,vt240)
 	ROM[0x15e] = 0x00;
 }
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                      FULLNAME       FLAGS */
-//COMP( 1983, vt240,  0,      0,       vt220,     vt220, driver_device,   0,  "Digital Equipment Corporation", "VT240", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
+COMP( 1983, vt240,  0,      0,       mc7105,    vt240, vt240_state,   vt240,  "Digital Equipment Corporation", "VT240", GAME_NOT_WORKING | GAME_NO_SOUND)
 //COMP( 1983, vt241,  0,      0,       vt220,     vt220, driver_device,   0,  "Digital Equipment Corporation", "VT241", GAME_NOT_WORKING | GAME_NO_SOUND)
+// NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
 COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, vt240_state,   vt240,  "Elektronika",                  "MC7105", GAME_NOT_WORKING | GAME_NO_SOUND)

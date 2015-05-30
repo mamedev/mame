@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Bandai PT-554 PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate the following Bandai PT-554 PCB (a CNROM PCB + LPC / PARCOR speech synthesis chip)

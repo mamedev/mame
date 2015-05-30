@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde, Barry Rodewald, Carl, Phil Bennett
+// copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
 /*
     Intel 386 emulator
 
@@ -2876,7 +2876,7 @@ void i386_device::i386_decode_opcode()
 		(this->*m_opcode_table1_16[m_opcode])();
 }
 
-/* Two-byte opcode prefix */
+/* Two-byte opcode 0f xx */
 void i386_device::i386_decode_two_byte()
 {
 	m_opcode = FETCH();
@@ -2890,7 +2890,29 @@ void i386_device::i386_decode_two_byte()
 		(this->*m_opcode_table2_16[m_opcode])();
 }
 
-/* Three-byte opcode prefix 66 0f */
+/* Three-byte opcode 0f 38 xx */
+void i386_device::i386_decode_three_byte38()
+{
+	m_opcode = FETCH();
+
+	if (m_operand_size)
+		(this->*m_opcode_table338_32[m_opcode])();
+	else
+		(this->*m_opcode_table338_16[m_opcode])();
+}
+
+/* Three-byte opcode 0f 3a xx */
+void i386_device::i386_decode_three_byte3a()
+{
+	m_opcode = FETCH();
+
+	if (m_operand_size)
+		(this->*m_opcode_table33a_32[m_opcode])();
+	else
+		(this->*m_opcode_table33a_16[m_opcode])();
+}
+
+/* Three-byte opcode prefix 66 0f xx */
 void i386_device::i386_decode_three_byte66()
 {
 	m_opcode = FETCH();
@@ -2900,7 +2922,7 @@ void i386_device::i386_decode_three_byte66()
 		(this->*m_opcode_table366_16[m_opcode])();
 }
 
-/* Three-byte opcode prefix f2 0f */
+/* Three-byte opcode prefix f2 0f xx */
 void i386_device::i386_decode_three_bytef2()
 {
 	m_opcode = FETCH();
@@ -2919,6 +2941,57 @@ void i386_device::i386_decode_three_bytef3()
 	else
 		(this->*m_opcode_table3f3_16[m_opcode])();
 }
+
+/* Four-byte opcode prefix 66 0f 38 xx */
+void i386_device::i386_decode_four_byte3866()
+{
+	m_opcode = FETCH();
+	if (m_operand_size)
+		(this->*m_opcode_table46638_32[m_opcode])();
+	else
+		(this->*m_opcode_table46638_16[m_opcode])();
+}
+
+/* Four-byte opcode prefix 66 0f 3a xx */
+void i386_device::i386_decode_four_byte3a66()
+{
+	m_opcode = FETCH();
+	if (m_operand_size)
+		(this->*m_opcode_table4663a_32[m_opcode])();
+	else
+		(this->*m_opcode_table4663a_16[m_opcode])();
+}
+
+/* Four-byte opcode prefix f2 0f 38 xx */
+void i386_device::i386_decode_four_byte38f2()
+{
+	m_opcode = FETCH();
+	if (m_operand_size)
+		(this->*m_opcode_table4f238_32[m_opcode])();
+	else
+		(this->*m_opcode_table4f238_16[m_opcode])();
+}
+
+/* Four-byte opcode prefix f2 0f 3a xx */
+void i386_device::i386_decode_four_byte3af2()
+{
+	m_opcode = FETCH();
+	if (m_operand_size)
+		(this->*m_opcode_table4f23a_32[m_opcode])();
+	else
+		(this->*m_opcode_table4f23a_16[m_opcode])();
+}
+
+/* Four-byte opcode prefix f3 0f 38 xx */
+void i386_device::i386_decode_four_byte38f3()
+{
+	m_opcode = FETCH();
+	if (m_operand_size)
+		(this->*m_opcode_table4f338_32[m_opcode])();
+	else
+		(this->*m_opcode_table4f338_16[m_opcode])();
+}
+
 
 /*************************************************************************/
 
@@ -3395,60 +3468,60 @@ void i386_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void i386_device::state_string_export(const device_state_entry &entry, astring &string)
+void i386_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%08X", get_flags());
+			strprintf(str, "%08X", get_flags());
 			break;
 		case X87_ST0:
-			string.printf("%f", fx80_to_double(ST(0)));
+			strprintf(str, "%f", fx80_to_double(ST(0)));
 			break;
 		case X87_ST1:
-			string.printf("%f", fx80_to_double(ST(1)));
+			strprintf(str, "%f", fx80_to_double(ST(1)));
 			break;
 		case X87_ST2:
-			string.printf("%f", fx80_to_double(ST(2)));
+			strprintf(str, "%f", fx80_to_double(ST(2)));
 			break;
 		case X87_ST3:
-			string.printf("%f", fx80_to_double(ST(3)));
+			strprintf(str, "%f", fx80_to_double(ST(3)));
 			break;
 		case X87_ST4:
-			string.printf("%f", fx80_to_double(ST(4)));
+			strprintf(str, "%f", fx80_to_double(ST(4)));
 			break;
 		case X87_ST5:
-			string.printf("%f", fx80_to_double(ST(5)));
+			strprintf(str, "%f", fx80_to_double(ST(5)));
 			break;
 		case X87_ST6:
-			string.printf("%f", fx80_to_double(ST(6)));
+			strprintf(str, "%f", fx80_to_double(ST(6)));
 			break;
 		case X87_ST7:
-			string.printf("%f", fx80_to_double(ST(7)));
+			strprintf(str, "%f", fx80_to_double(ST(7)));
 			break;
 		case SSE_XMM0:
-			string.printf("%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
 			break;
 		case SSE_XMM1:
-			string.printf("%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
 			break;
 		case SSE_XMM2:
-			string.printf("%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
 			break;
 		case SSE_XMM3:
-			string.printf("%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
 			break;
 		case SSE_XMM4:
-			string.printf("%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
 			break;
 		case SSE_XMM5:
-			string.printf("%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
 			break;
 		case SSE_XMM6:
-			string.printf("%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
 			break;
 		case SSE_XMM7:
-			string.printf("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
 }
@@ -3500,6 +3573,41 @@ void i386_device::build_opcode_table(UINT32 features)
 			{
 				m_opcode_table3f3_32[op->opcode] = op->handler32;
 				m_opcode_table3f3_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_3BYTE38)
+			{
+				m_opcode_table338_32[op->opcode] = op->handler32;
+				m_opcode_table338_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_3BYTE3A)
+			{
+				m_opcode_table33a_32[op->opcode] = op->handler32;
+				m_opcode_table33a_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_4BYTE3866)
+			{
+				m_opcode_table46638_32[op->opcode] = op->handler32;
+				m_opcode_table46638_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_4BYTE3A66)
+			{
+				m_opcode_table4663a_32[op->opcode] = op->handler32;
+				m_opcode_table4663a_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_4BYTE38F2)
+			{
+				m_opcode_table4f238_32[op->opcode] = op->handler32;
+				m_opcode_table4f238_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_4BYTE3AF2)
+			{
+				m_opcode_table4f23a_32[op->opcode] = op->handler32;
+				m_opcode_table4f23a_16[op->opcode] = op->handler16;
+			}
+			else if (op->flags & OP_4BYTE38F3)
+			{
+				m_opcode_table4f338_32[op->opcode] = op->handler32;
+				m_opcode_table4f338_16[op->opcode] = op->handler16;
 			}
 			else
 			{

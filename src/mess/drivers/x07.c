@@ -263,9 +263,20 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 			for(int x = 0, y = p3; x <= sqrt((double)(p3 * p3) / 2) ; x++)
 			{
-				UINT32 d1 = (x * x + y * y) - p3 * p3;
-				UINT32 d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
-				if(abs((double)d1) > abs((double)d2))
+				/*
+				 * The old code produced results most likely not intended:
+				 * UINT32 d1 = (x * x + y * y) - p3 * p3;
+				 * UINT32 d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
+				 * if(abs((double)d1) > abs((double)d2))
+				 *
+				 * (double)(-1) = 4294967294.000000
+				 * abs((double)(-1)) = -2147483648;
+				 *
+				 * Therefore changed.
+				 */
+				INT32 d1 = (x * x + y * y) - p3 * p3;
+				INT32 d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
+				if (abs(d1) > abs(d2))
 					y--;
 				draw_point(x + p1, y + p2, 0x01);
 				draw_point(x + p1, -y + p2, 0x01);

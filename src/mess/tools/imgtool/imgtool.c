@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 
     imgtool.c
@@ -341,9 +343,9 @@ static imgtoolerr_t evaluate_module(const char *fname,
 				goto done;
 
 			if (ent.corrupt)
-				current_result = (current_result * 99 + 1.00) / 100;
+				current_result = (current_result * 99 + 1.00f) / 100;
 			else
-				current_result = (current_result + 1.00) / 2;
+				current_result = (current_result + 1.00f) / 2;
 		}
 		while(!ent.eof);
 
@@ -427,7 +429,7 @@ imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, 
 				goto done;
 
 			insert_module = module;
-			for (i = 0; (val > 0.0) && (i < count); i++)
+			for (i = 0; (val > 0.0f) && (i < count); i++)
 			{
 				if (val > values[i])
 				{

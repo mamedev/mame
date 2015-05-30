@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Couriersud
 /***************************************************************************
 
     Gaelco 3D serial hardware

@@ -1,34 +1,35 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
     ui/mainmenu.c
 
     Internal MAME menus for the user interface.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #include "emu.h"
+#include "audit.h"
+#include "crsshair.h"
 #include "osdnet.h"
 #include "emuopts.h"
-#include "ui/ui.h"
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"
+#include "ui/ui.h"
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
 #include "ui/barcode.h"
+#include "ui/cheatopt.h"
 #include "ui/info.h"
 #include "ui/inputmap.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
 #include "ui/selgame.h"
+#include "ui/sliders.h"
 #include "ui/slotopt.h"
 #include "ui/tapectrl.h"
-#include "audit.h"
-#include "crsshair.h"
-#include <ctype.h>
+#include "ui/videoopt.h"
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
 #include "machine/bcreader.h"
@@ -48,13 +49,13 @@ ui_menu_main::ui_menu_main(running_machine &machine, render_container *container
 
 void ui_menu_main::populate()
 {
-	astring menu_text;
+	std::string menu_text;
 
 	/* add input menu items */
 	item_append("Input (general)", NULL, 0, (void *)INPUT_GROUPS);
 
-	menu_text.printf("Input (this %s)",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)INPUT_SPECIFIC);
+	strprintf(menu_text, "Input (this %s)", emulator_info::get_capstartgamenoun());
+	item_append(menu_text.c_str(), NULL, 0, (void *)INPUT_SPECIFIC);
 
 	/* add optional input-related menus */
 	if (machine().ioport().has_analog())
@@ -63,16 +64,16 @@ void ui_menu_main::populate()
 		item_append("Dip Switches", NULL, 0, (void *)SETTINGS_DIP_SWITCHES);
 	if (machine().ioport().has_configs())
 	{
-		menu_text.printf("%s Configuration",emulator_info::get_capstartgamenoun());
-		item_append(menu_text.cstr(), NULL, 0, (void *)SETTINGS_DRIVER_CONFIG);
+		strprintf(menu_text, "%s Configuration", emulator_info::get_capstartgamenoun());
+		item_append(menu_text.c_str(), NULL, 0, (void *)SETTINGS_DRIVER_CONFIG);
 	}
 
 	/* add bookkeeping menu */
 	item_append("Bookkeeping Info", NULL, 0, (void *)BOOKKEEPING);
 
 	/* add game info menu */
-	menu_text.printf("%s Information",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)GAME_INFO);
+	strprintf(menu_text, "%s Information", emulator_info::get_capstartgamenoun());
+	item_append(menu_text.c_str(), NULL, 0, (void *)GAME_INFO);
 
 	image_interface_iterator imgiter(machine().root_device());
 	if (imgiter.first() != NULL)
@@ -132,8 +133,8 @@ void ui_menu_main::populate()
 		item_append("Cheat", NULL, 0, (void *)CHEAT);
 
 	/* add reset and exit menus */
-	menu_text.printf("Select New %s",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)SELECT_GAME);
+	strprintf(menu_text, "Select New %s", emulator_info::get_capstartgamenoun());
+	item_append(menu_text.c_str(), NULL, 0, (void *)SELECT_GAME);
 }
 
 ui_menu_main::~ui_menu_main()

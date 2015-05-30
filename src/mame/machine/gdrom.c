@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf, Angelo Salese
 /***************************************************************************
 
  gdrom.c - Implementation of the Sega GD-ROM device

@@ -6,9 +6,6 @@
 
     http://www.baltissen.org/newhtm/c64_cpm.htm
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

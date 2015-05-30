@@ -13,6 +13,80 @@
 
 
 
+// Sorting functors for the qsort function
+static int cIndexAscending(const void* a, const void* b)
+{
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return left->index() - right->index();
+}
+
+static int cIndexDescending(const void* a, const void* b)
+{
+	return cIndexAscending(b, a);
+}
+
+static int cEnabledAscending(const void* a, const void* b)
+{
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return (left->enabled() ? 1 : 0) - (right->enabled() ? 1 : 0);
+}
+
+static int cEnabledDescending(const void* a, const void* b)
+{
+	return cEnabledAscending(b, a);
+}
+
+static int cCpuAscending(const void* a, const void* b)
+{
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
+}
+
+static int cCpuDescending(const void* a, const void* b)
+{
+	return cCpuAscending(b, a);
+}
+
+static int cAddressAscending(const void* a, const void* b)
+{
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return (left->address() > right->address()) ? 1 : (left->address() < right->address()) ? -1 : 0;
+}
+
+static int cAddressDescending(const void* a, const void* b)
+{
+	return cAddressAscending(b, a);
+}
+
+static int cConditionAscending(const void* a, const void* b)
+{
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return strcmp(left->condition(), right->condition());
+}
+
+static int cConditionDescending(const void* a, const void* b)
+{
+	return cConditionAscending(b, a);
+}
+
+static int cActionAscending(const void* a, const void* b)
+{
+	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
+	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
+	return strcmp(left->action(), right->action());
+}
+
+static int cActionDescending(const void* a, const void* b)
+{
+	return cActionAscending(b, a);
+}
+
+
 //**************************************************************************
 //  DEBUG VIEW BREAK POINTS
 //**************************************************************************
@@ -26,16 +100,12 @@ static const int tableBreaks[] = { 5, 9, 31, 45, 63, 80 };
 
 debug_view_breakpoints::debug_view_breakpoints(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: debug_view(machine, DVT_BREAK_POINTS, osdupdate, osdprivate),
-		m_sortType(SORT_INDEX_ASCENDING)
+		m_sortType(cIndexAscending)
 {
 	// fail if no available sources
 	enumerate_sources();
 	if (m_source_list.count() == 0)
 		throw std::bad_alloc();
-
-	// configure the view
-	m_total.y = 10;
-	m_supports_cursor = false;
 }
 
 
@@ -62,33 +132,13 @@ void debug_view_breakpoints::enumerate_sources()
 	disasm_interface_iterator iter(machine().root_device());
 	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
 	{
-		astring name;
-		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*global_alloc(debug_view_source(name.cstr(), &dasm->device())));
+		std::string name;
+		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
+		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
 	// reset the source to a known good entry
 	set_source(*m_source_list.first());
-}
-
-
-//-------------------------------------------------
-//  view_notify - handle notification of updates
-//  to cursor changes
-//-------------------------------------------------
-
-void debug_view_breakpoints::view_notify(debug_view_notification type)
-{
-}
-
-
-//-------------------------------------------------
-//  view_char - handle a character typed within
-//  the current view
-//-------------------------------------------------
-
-void debug_view_breakpoints::view_char(int chval)
-{
 }
 
 
@@ -103,338 +153,167 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 
 	if (clickedTopRow)
 	{
-		if (pos.x < tableBreaks[0] && m_sortType == SORT_INDEX_ASCENDING)
-			m_sortType = SORT_INDEX_DESCENDING;
-		else if (pos.x < tableBreaks[0])
-			m_sortType = SORT_INDEX_ASCENDING;
-		else if (pos.x < tableBreaks[1] && m_sortType == SORT_ENABLED_ASCENDING)
-			m_sortType = SORT_ENABLED_DESCENDING;
+		if (pos.x < tableBreaks[0])
+			m_sortType = (m_sortType == &cIndexAscending) ? &cIndexDescending : &cIndexAscending;
 		else if (pos.x < tableBreaks[1])
-			m_sortType = SORT_ENABLED_ASCENDING;
-		else if (pos.x < tableBreaks[2] && m_sortType == SORT_CPU_ASCENDING)
-			m_sortType = SORT_CPU_DESCENDING;
+			m_sortType = (m_sortType == &cEnabledAscending) ? &cEnabledDescending : &cEnabledAscending;
 		else if (pos.x < tableBreaks[2])
-			m_sortType = SORT_CPU_ASCENDING;
-		else if (pos.x < tableBreaks[3] && m_sortType == SORT_ADDRESS_ASCENDING)
-			m_sortType = SORT_ADDRESS_DESCENDING;
+			m_sortType = (m_sortType == &cCpuAscending) ? &cCpuDescending : &cCpuAscending;
 		else if (pos.x < tableBreaks[3])
-			m_sortType = SORT_ADDRESS_ASCENDING;
-		else if (pos.x < tableBreaks[4] && m_sortType == SORT_CONDITION_ASCENDING)
-			m_sortType = SORT_CONDITION_DESCENDING;
+			m_sortType = (m_sortType == &cAddressAscending) ? &cAddressDescending : &cAddressAscending;
 		else if (pos.x < tableBreaks[4])
-			m_sortType = SORT_CONDITION_ASCENDING;
-		else if (pos.x < tableBreaks[5] && m_sortType == SORT_ACTION_ASCENDING)
-			m_sortType = SORT_ACTION_DESCENDING;
+			m_sortType = (m_sortType == &cConditionAscending) ? &cConditionDescending : &cConditionAscending;
 		else if (pos.x < tableBreaks[5])
-			m_sortType = SORT_ACTION_ASCENDING;
+			m_sortType = (m_sortType == &cActionAscending) ? &cActionDescending : &cActionAscending;
 	}
 	else
 	{
 		// Gather a sorted list of all the breakpoints for all the CPUs
-		device_debug::breakpoint** bpList = NULL;
-		const int numBPs = breakpoints(SORT_NONE, bpList);
+		gather_breakpoints();
 
-		const int bpIndex = pos.y-1;
-		if (bpIndex > numBPs || bpIndex < 0)
+		int bpIndex = pos.y - 1;
+		if ((bpIndex >= m_buffer.size()) || (bpIndex < 0))
 			return;
 
 		// Enable / disable
-		if (bpList[bpIndex]->enabled())
-			bpList[bpIndex]->setEnabled(false);
-		else
-			bpList[bpIndex]->setEnabled(true);
+		m_buffer[bpIndex]->setEnabled(!m_buffer[bpIndex]->enabled());
 
-		delete[] bpList;
+		machine().debug_view().update_all(DVT_DISASSEMBLY);
 	}
 
-	view_update();
+	begin_update();
+	m_update_pending = true;
+	end_update();
 }
 
 
-void debug_view_breakpoints::pad_astring_to_length(astring& str, int len)
+void debug_view_breakpoints::pad_astring_to_length(std::string& str, int len)
 {
-	int diff = len - str.len();
+	int diff = len - str.length();
 	if (diff > 0)
 	{
-		astring buffer;
-		buffer.expand(diff);
+		std::string buffer;
 		for (int i = 0; i < diff; i++)
-			buffer.catprintf(" ");
-		str.catprintf("%s", buffer.cstr());
+			strcatprintf(buffer, " ");
+		strcatprintf(str, "%s", buffer.c_str());
 	}
 }
 
 
-// Sorting functors for the qsort function
-static int cIndexAscending(const void* a, const void* b)
+void debug_view_breakpoints::gather_breakpoints()
 {
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	return left->index() > right->index();
-}
-
-static int cIndexDescending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	return left->index() < right->index();
-}
-
-static int cEnabledAscending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	return left->enabled() < right->enabled();
-}
-
-static int cEnabledDescending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	return left->enabled() > right->enabled();
-}
-
-static int cCpuAscending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	const int result = strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
-	return result >= 0;
-}
-
-static int cCpuDescending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	const int result = strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
-	return result < 0;
-}
-
-static int cAddressAscending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	return left->address() > right->address();
-}
-
-static int cAddressDescending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	return left->address() < right->address();
-}
-
-static int cConditionAscending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	const int result = strcmp(left->condition(), right->condition());
-	return result >= 0;
-}
-
-static int cConditionDescending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	const int result = strcmp(left->condition(), right->condition());
-	return result < 0;
-}
-
-static int cActionAscending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	const int result = strcmp(left->action(), right->action());
-	return result >= 0;
-}
-
-static int cActionDescending(const void* a, const void* b)
-{
-	const device_debug::breakpoint* left = *(device_debug::breakpoint**)a;
-	const device_debug::breakpoint* right = *(device_debug::breakpoint**)b;
-	const int result = strcmp(left->action(), right->action());
-	return result < 0;
-}
-
-
-int debug_view_breakpoints::breakpoints(SortMode sort, device_debug::breakpoint**& bpList)
-{
-	// Alloc
-	int numBPs = 0;
-	bpList = NULL;
-	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
-	{
-		const device_debug& debugInterface = *source->device()->debug();
-		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != NULL; bp = bp->next())
-			numBPs++;
-	}
-	bpList = new device_debug::breakpoint*[numBPs];
-
-	int bpAddIndex = 0;
+	m_buffer.resize(0);
 	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
 	{
 		// Collect
-		device_debug& debugInterface = *source->device()->debug();
+		device_debug &debugInterface = *source->device()->debug();
 		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != NULL; bp = bp->next())
-		{
-			bpList[bpAddIndex] = bp;
-			bpAddIndex++;
-		}
+			m_buffer.push_back(bp);
 	}
 
 	// And now for the sort
-	switch (m_sortType)
-	{
-		case SORT_NONE:
-			break;
-		case SORT_INDEX_ASCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cIndexAscending);
-			break;
-		case SORT_INDEX_DESCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cIndexDescending);
-			break;
-		case SORT_ENABLED_ASCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cEnabledAscending);
-			break;
-		case SORT_ENABLED_DESCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cEnabledDescending);
-			break;
-		case SORT_CPU_ASCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cCpuAscending);
-			break;
-		case SORT_CPU_DESCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cCpuDescending);
-			break;
-		case SORT_ADDRESS_ASCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cAddressAscending);
-			break;
-		case SORT_ADDRESS_DESCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cAddressDescending);
-			break;
-		case SORT_CONDITION_ASCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cConditionAscending);
-			break;
-		case SORT_CONDITION_DESCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cConditionDescending);
-			break;
-		case SORT_ACTION_ASCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cActionAscending);
-			break;
-		case SORT_ACTION_DESCENDING:
-			qsort(bpList, numBPs, sizeof(device_debug::breakpoint*), cActionDescending);
-			break;
-	}
-
-	return numBPs;
+	if (!m_buffer.empty())
+		qsort(&m_buffer[0], m_buffer.size(), sizeof(device_debug::breakpoint *), m_sortType);
 }
 
 
 //-------------------------------------------------
 //  view_update - update the contents of the
-//  disassembly view
+//  breakpoints view
 //-------------------------------------------------
 
 void debug_view_breakpoints::view_update()
 {
 	// Gather a list of all the breakpoints for all the CPUs
-	device_debug::breakpoint** bpList = NULL;
-	const int numBPs = breakpoints(SORT_NONE, bpList);
+	gather_breakpoints();
 
 	// Set the view region so the scroll bars update
-	m_total.y = numBPs+1;
+	m_total.x = tableBreaks[ARRAY_LENGTH(tableBreaks) - 1];
+	m_total.y = m_buffer.size() + 1;
+	if (m_total.y < 10)
+		m_total.y = 10;
 
 	// Draw
-	debug_view_char *dest = m_viewdata;
-	for (int row = 0; row < m_visible.y; row++)
+	debug_view_char *dest = &m_viewdata[0];
+	std::string         linebuf;
+
+	// Header
+	if (m_visible.y > 0)
 	{
-		UINT32 effrow = m_topleft.y + row;
+		linebuf.clear();
+		linebuf.append("ID");
+		if (m_sortType == &cIndexAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cIndexDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[0]);
+		linebuf.append("En");
+		if (m_sortType == &cEnabledAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cEnabledDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[1]);
+		linebuf.append("CPU");
+		if (m_sortType == &cCpuAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cCpuDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[2]);
+		linebuf.append("Address");
+		if (m_sortType == &cAddressAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cAddressDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[3]);
+		linebuf.append("Condition");
+		if (m_sortType == &cConditionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cConditionDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[4]);
+		linebuf.append("Action");
+		if (m_sortType == &cActionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cActionDescending) linebuf.push_back('/');
+		pad_astring_to_length(linebuf, tableBreaks[5]);
 
-		// Header
-		if (row == 0)
+		for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 		{
-			astring header;
-			header.printf("ID");
-			if (m_sortType == SORT_INDEX_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_INDEX_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[0]);
-			header.catprintf("En");
-			if (m_sortType == SORT_ENABLED_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ENABLED_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[1]);
-			header.catprintf("CPU");
-			if (m_sortType == SORT_CPU_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_CPU_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[2]);
-			header.catprintf("Address");
-			if (m_sortType == SORT_ADDRESS_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ADDRESS_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[3]);
-			header.catprintf("Condition");
-			if (m_sortType == SORT_CONDITION_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_CONDITION_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[4]);
-			header.catprintf("Action");
-			if (m_sortType == SORT_ACTION_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ACTION_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[5]);
-
-			for (int i = 0; i < m_visible.x; i++)
-			{
-				dest->byte = (i < header.len()) ? header[i] : ' ';
-				dest->attrib = DCA_ANCILLARY;
-				dest++;
-			}
-			continue;
-		}
-
-		// Breakpoints
-		int bpi = effrow-1;
-		if (bpi < numBPs && bpi >= 0)
-		{
-			device_debug::breakpoint* bp = bpList[bpi];
-
-			astring buffer;
-			buffer.printf("%x", bp->index());
-			pad_astring_to_length(buffer, tableBreaks[0]);
-			buffer.catprintf("%c", bp->enabled() ? 'X' : 'O');
-			pad_astring_to_length(buffer, tableBreaks[1]);
-			buffer.catprintf("%s", bp->debugInterface()->device().tag());
-			pad_astring_to_length(buffer, tableBreaks[2]);
-			buffer.catprintf("%s", core_i64_hex_format(bp->address(), bp->debugInterface()->logaddrchars()));
-			pad_astring_to_length(buffer, tableBreaks[3]);
-			if (astring(bp->condition()) != astring("1"))
-			{
-				buffer.catprintf("%s", bp->condition());
-				pad_astring_to_length(buffer, tableBreaks[4]);
-			}
-			if (astring(bp->action()) != astring(""))
-			{
-				buffer.catprintf("%s", bp->action());
-				pad_astring_to_length(buffer, tableBreaks[5]);
-			}
-
-			for (int i = 0; i < m_visible.x; i++)
-			{
-				dest->byte = (i < buffer.len()) ? buffer[i] : ' ';
-				dest->attrib = DCA_NORMAL;
-
-				// Color disabled breakpoints red
-				if (i == 5 && dest->byte == 'O')
-					dest->attrib = DCA_CHANGED;
-
-				dest++;
-			}
-			continue;
-		}
-
-		// Fill the remaining vertical space
-		for (int i = 0; i < m_visible.x; i++)
-		{
-			dest->byte = ' ';
-			dest->attrib = DCA_NORMAL;
-			dest++;
+			dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
+			dest->attrib = DCA_ANCILLARY;
 		}
 	}
 
-	delete[] bpList;
+	for (int row = 1; row < m_visible.y; row++)
+	{
+		// Breakpoints
+		int bpi = row + m_topleft.y - 1;
+		if ((bpi < m_buffer.size()) && (bpi >= 0))
+		{
+			device_debug::breakpoint *const bp = m_buffer[bpi];
+
+			linebuf.clear();
+			strcatprintf(linebuf, "%2X", bp->index());
+			pad_astring_to_length(linebuf, tableBreaks[0]);
+			linebuf.push_back(bp->enabled() ? 'X' : 'O');
+			pad_astring_to_length(linebuf, tableBreaks[1]);
+			linebuf.append(bp->debugInterface()->device().tag());
+			pad_astring_to_length(linebuf, tableBreaks[2]);
+			linebuf.append(core_i64_hex_format(bp->address(), bp->debugInterface()->logaddrchars()));
+			pad_astring_to_length(linebuf, tableBreaks[3]);
+			if (strcmp(bp->condition(), "1"))
+				linebuf.append(bp->condition());
+			pad_astring_to_length(linebuf, tableBreaks[4]);
+			linebuf.append(bp->action());
+			pad_astring_to_length(linebuf, tableBreaks[5]);
+
+			for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
+			{
+				dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
+				dest->attrib = DCA_NORMAL;
+
+				// Color disabled breakpoints red
+				if ((i >= tableBreaks[0]) && (i < tableBreaks[1]) && !bp->enabled())
+					dest->attrib |= DCA_CHANGED;
+			}
+		}
+		else
+		{
+			// Fill the remaining vertical space
+			for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
+			{
+				dest->byte = ' ';
+				dest->attrib = DCA_NORMAL;
+			}
+		}
+	}
 }

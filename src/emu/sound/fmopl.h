@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 #pragma once
 
 #ifndef __FMOPL_H__

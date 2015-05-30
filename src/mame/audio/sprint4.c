@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Derrick Renaud
 /*************************************************************************
 
     audio\sprint4.c

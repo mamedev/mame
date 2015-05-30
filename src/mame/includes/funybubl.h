@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #include "sound/okim6295.h"
 
 class funybubl_state : public driver_device

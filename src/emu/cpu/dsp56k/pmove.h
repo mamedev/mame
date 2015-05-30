@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #ifndef __DSP56K_PARALLEL_MOVE_H__
 #define __DSP56K_PARALLEL_MOVE_H__
 
@@ -19,17 +21,17 @@ public:
 	virtual ~ParallelMove() {}
 
 	virtual bool decode(const UINT16 word0, const UINT16 word1) = 0;
-	virtual void disassemble(astring& retString) const = 0;
+	virtual void disassemble(std::string& retString) const = 0;
 	virtual void evaluate() = 0;
 
 	static ParallelMove* decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1);
 
-	const bool valid() const { return m_valid; }
+	bool valid() const { return m_valid; }
 
 	// Peek through the opcode to see the instruction
 	const reg_id& opSource() const;
 	const reg_id& opDestination() const;
-	const size_t opAccumulatorBitsModified() const;
+	size_t opAccumulatorBitsModified() const;
 
 protected:
 	bool m_valid;
@@ -57,7 +59,7 @@ public:
 		reg_id SD;
 		decode_HHH_table(BITSn(word0,0x0e00), SD);
 
-		astring ea;
+		std::string ea;
 		assemble_ea_from_m_table(BITSn(word0,0x4000), regIDAsNum(r), ea);
 
 		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea,
@@ -69,15 +71,15 @@ public:
 
 		return true;
 	}
-	void disassemble(astring& retString) const
+	void disassemble(std::string& retString) const
 	{
 		retString = m_source + "," + m_destination;
 	}
 	void evaluate() {}
 
 private:
-	astring m_source;
-	astring m_destination;
+	std::string m_source;
+	std::string m_destination;
 };
 
 
@@ -91,7 +93,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		astring ea;
+		std::string ea;
 		if (opDestination() == iB)
 			ea = "(A1)";
 		else if (opDestination() == iA)
@@ -111,15 +113,15 @@ public:
 
 		return true;
 	}
-	void disassemble(astring& retString) const
+	void disassemble(std::string& retString) const
 	{
 		retString = m_source + "," + m_destination;
 	}
 	void evaluate() {}
 
 private:
-	astring m_source;
-	astring m_destination;
+	std::string m_source;
+	std::string m_destination;
 };
 
 
@@ -136,8 +138,8 @@ public:
 		reg_id r;
 		reg_id D1;
 		reg_id D2;
-		astring ea1 = "";
-		astring ea2 = "";
+		std::string ea1 = "";
+		std::string ea2 = "";
 
 		decode_rr_table(BITSn(word0,0x0060), r);
 		decode_KKK_table(BITSn(word0,0x0700), D1, D2);
@@ -158,22 +160,22 @@ public:
 		if (r == iR3) return false;
 
 		char temp[32];
-		sprintf(temp,  "X:%s,%s", ea1.cstr(), regIdAsString(D1).cstr());
+		sprintf(temp,  "X:%s,%s", ea1.c_str(), regIdAsString(D1).c_str());
 		parallelMove = temp;
-		sprintf(temp, "X:%s,%s", ea2.cstr(), regIdAsString(D2).cstr());
+		sprintf(temp, "X:%s,%s", ea2.c_str(), regIdAsString(D2).c_str());
 		parallelMove2 = temp;
 
 		return true;
 	}
-	void disassemble(astring& retString) const
+	void disassemble(std::string& retString) const
 	{
 		retString = parallelMove + " " + parallelMove2;
 	}
 	void evaluate() {}
 
 private:
-	astring parallelMove;
-	astring parallelMove2;
+	std::string parallelMove;
+	std::string parallelMove2;
 };
 
 
@@ -212,7 +214,7 @@ public:
 
 		return true;
 	}
-	void disassemble(astring& retString) const
+	void disassemble(std::string& retString) const
 	{
 		// (?,?) is a parallel nop
 		if (m_source == iWEIRD && m_destination == iWEIRD)
@@ -253,21 +255,21 @@ public:
 		decode_RR_table(BITSn(word0,0x00c0), r);
 		decode_DD_table(BITSn(word0,0x0030), S);
 
-		sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", regIdAsString(Dnot).cstr(), regIDAsNum(r), regIDAsNum(r));
-		sprintf(parallel_move_str2, "%s,%s", regIdAsString(S).cstr(), regIdAsString(Dnot).cstr());
+		sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", regIdAsString(Dnot).c_str(), regIDAsNum(r), regIDAsNum(r));
+		sprintf(parallel_move_str2, "%s,%s", regIdAsString(S).c_str(), regIdAsString(Dnot).c_str());
 		pms = parallel_move_str;
 		pms2 = parallel_move_str2;
 		return true;
 	}
-	void disassemble(astring& retString) const
+	void disassemble(std::string& retString) const
 	{
 		retString = pms + " " + pms2;
 	}
 	void evaluate() {}
 
 private:
-	astring pms;    // TODO
-	astring pms2;
+	std::string pms;    // TODO
+	std::string pms2;
 };
 
 
@@ -288,14 +290,14 @@ public:
 
 		return true;
 	}
-	void disassemble(astring& retString) const
+	void disassemble(std::string& retString) const
 	{
 		retString = m_ea;
 	}
 	void evaluate() {}
 
 private:
-	astring m_ea;
+	std::string m_ea;
 };
 
 
@@ -313,7 +315,7 @@ public:
 	{
 		INT8 b;
 		reg_id SD;
-		astring args;
+		std::string args;
 
 		b = (char)(word0 & 0x00ff);
 		decode_HHH_table(BITSn(word1,0x0e00), SD);
@@ -321,15 +323,15 @@ public:
 
 		return true;
 	}
-	void disassemble(astring& retString) const
+	void disassemble(std::string& retString) const
 	{
 		retString = m_source + "," + m_destination;
 	}
 	void evaluate() {}
 
 private:
-	astring m_source;
-	astring m_destination;
+	std::string m_source;
+	std::string m_destination;
 };
 
 }

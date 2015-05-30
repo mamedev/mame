@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Paul Priest
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"
 #include "cpu/sh2/sh2.h"
@@ -84,5 +86,4 @@ public:
 	void psikyosh_drawgfxzoom( bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 			UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 			int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

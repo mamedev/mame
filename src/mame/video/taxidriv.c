@@ -1,15 +1,17 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/taxidriv.h"
 
 
-WRITE8_MEMBER(taxidriv_state::taxidriv_spritectrl_w)
+WRITE8_MEMBER(taxidriv_state::spritectrl_w)
 {
 	m_spritectrl[offset] = data;
 }
 
 
 
-UINT32 taxidriv_state::screen_update_taxidriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 taxidriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int sx,sy;

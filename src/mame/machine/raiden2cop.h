@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 /***************************************************************************
 
  Seibu Cop (Co-Processor) emulation
@@ -77,7 +79,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
 
-	const UINT8 fade_table(int v);
+	UINT8 fade_table(int v);
 
 	template<class _Object> static devcb_base &set_m_videoramout_cb(device_t &device, _Object object) { return downcast<raiden2cop_device &>(device).m_videoramout_cb.set_callback(object); }
 

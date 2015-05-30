@@ -4,9 +4,6 @@
 
     Zaxxon/Super Zaxxon cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "zaxxon.h"

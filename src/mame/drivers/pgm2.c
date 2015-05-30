@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ???
 /* PGM 2 hardware.
 
     Motherboard is bare bones stuff, and does not contain any ROMs.
@@ -25,7 +27,7 @@
      IGS037(GFX PROCESSOR)
      YMZ774-S(SOUND)
      R5F21256SN(extra MCU for protection and ICcard communication)
-      - Appears to be refered to by the games as MPU
+      - Appears to be referred to by the games as MPU
 
     Cartridges
      IGS036 (MAIN CPU) (differs per game, internal code)

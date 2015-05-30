@@ -203,10 +203,10 @@ void kinst_state::machine_start()
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
-	/* configure fast RAM regions for DRC */
-	m_maincpu->mips3drc_add_fastram(0x08000000, 0x087fffff, FALSE, m_rambase2);
-	m_maincpu->mips3drc_add_fastram(0x00000000, 0x0007ffff, FALSE, m_rambase);
-	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	/* configure fast RAM regions */
+	m_maincpu->add_fastram(0x08000000, 0x087fffff, FALSE, m_rambase2);
+	m_maincpu->add_fastram(0x00000000, 0x0007ffff, FALSE, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 }
 
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Balfour
 class runaway_state : public driver_device
 {
 public:

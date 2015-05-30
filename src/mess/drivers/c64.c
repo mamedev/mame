@@ -11,7 +11,6 @@
         - NMI (WRONG $DD0D)
         - some CIA tests
     - PDC Clipper (C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer)
-    - Tesa 6240 (modified SX64 with label printer)
 
 */
 
@@ -1699,6 +1698,25 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( tesa6240 )
+//-------------------------------------------------
+
+ROM_START( tesa6240 )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "tesa-basic.ud4", 0x0000, 0x2000, CRC(f319d661) SHA1(0033afa7d2fbff314d80427324633c5444fbf1cd) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "tesa-kernal.ud3", 0x0000, 0x2000, CRC(af638f9c) SHA1(a2c9c83f598623c9940949979ac643f12397e907) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "tesa-char.ud1", 0x0000, 0x1000, CRC(10765a90) SHA1(1b824df5a295d0479e830e272758640b9fe99344) )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.ue4", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
+ROM_END
+
+
+//-------------------------------------------------
 //  ROM( c64c )
 //-------------------------------------------------
 
@@ -1785,20 +1803,21 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                        FULLNAME                                     FLAGS
-COMP( 1982, c64,    0,      0,      ntsc,       c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (NTSC)",                       GAME_SUPPORTS_SAVE )
-COMP( 1982, c64_jp, c64,    0,      ntsc,       c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (Japan)",                      GAME_SUPPORTS_SAVE )
-COMP( 1982, c64p,   c64,    0,      pal,        c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (PAL)",                        GAME_SUPPORTS_SAVE )
-COMP( 1982, c64_se, c64,    0,      pal,        c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",   GAME_SUPPORTS_SAVE )
-COMP( 1983, pet64,  c64,    0,      pet64,      c64,    driver_device,      0,      "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                  GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
-COMP( 1983, edu64,  c64,    0,      pet64,      c64,    driver_device,      0,      "Commodore Business Machines", "Educator 64 (NTSC)",                        GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
-COMP( 1984, sx64,   c64,    0,      ntsc_sx,    c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",               GAME_SUPPORTS_SAVE )
-COMP( 1984, sx64p,  c64,    0,      pal_sx,     c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",                GAME_SUPPORTS_SAVE )
-COMP( 1984, vip64,  c64,    0,      pal_sx,     c64sw,  driver_device,      0,      "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                   GAME_SUPPORTS_SAVE )
-COMP( 1984, dx64,   c64,    0,      ntsc_dx,    c64,    driver_device,      0,      "Commodore Business Machines", "DX-64 (NTSC)",                              GAME_SUPPORTS_SAVE )
-COMP( 1986, c64c,   c64,    0,      ntsc_c,     c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (NTSC)",                      GAME_SUPPORTS_SAVE )
-COMP( 1986, c64cp,  c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (PAL)",                       GAME_SUPPORTS_SAVE )
-COMP( 1988, c64c_es,c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Spain)",                     GAME_SUPPORTS_SAVE )
-COMP( 1986, c64c_se,c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",            GAME_SUPPORTS_SAVE )
-COMP( 1986, c64g,   c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64G (PAL)",                       GAME_SUPPORTS_SAVE )
-CONS( 1990, c64gs,  c64,    0,      pal_gs,     c64gs,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 Games System (PAL)",           GAME_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                        FULLNAME                                     FLAGS
+COMP( 1982, c64,     0,      0,      ntsc,       c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (NTSC)",                       GAME_SUPPORTS_SAVE )
+COMP( 1982, c64_jp,  c64,    0,      ntsc,       c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (Japan)",                      GAME_SUPPORTS_SAVE )
+COMP( 1982, c64p,    c64,    0,      pal,        c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (PAL)",                        GAME_SUPPORTS_SAVE )
+COMP( 1982, c64_se,  c64,    0,      pal,        c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",   GAME_SUPPORTS_SAVE )
+COMP( 1983, pet64,   c64,    0,      pet64,      c64,    driver_device,      0,      "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                  GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+COMP( 1983, edu64,   c64,    0,      pet64,      c64,    driver_device,      0,      "Commodore Business Machines", "Educator 64 (NTSC)",                        GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+COMP( 1984, sx64,    c64,    0,      ntsc_sx,    c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",               GAME_SUPPORTS_SAVE )
+COMP( 1984, sx64p,   c64,    0,      pal_sx,     c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",                GAME_SUPPORTS_SAVE )
+COMP( 1984, vip64,   c64,    0,      pal_sx,     c64sw,  driver_device,      0,      "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                   GAME_SUPPORTS_SAVE )
+COMP( 1984, dx64,    c64,    0,      ntsc_dx,    c64,    driver_device,      0,      "Commodore Business Machines", "DX-64 (NTSC)",                              GAME_SUPPORTS_SAVE )
+COMP( 1984, tesa6240,c64,    0,      pal_sx,     c64,    driver_device,      0,      "Tesa Etikett",                "Etikettendrucker 6240",                     GAME_SUPPORTS_SAVE )
+COMP( 1986, c64c,    c64,    0,      ntsc_c,     c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (NTSC)",                      GAME_SUPPORTS_SAVE )
+COMP( 1986, c64cp,   c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (PAL)",                       GAME_SUPPORTS_SAVE )
+COMP( 1988, c64c_es, c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Spain)",                     GAME_SUPPORTS_SAVE )
+COMP( 1986, c64c_se, c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",            GAME_SUPPORTS_SAVE )
+COMP( 1986, c64g,    c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64G (PAL)",                       GAME_SUPPORTS_SAVE )
+CONS( 1990, c64gs,   c64,    0,      pal_gs,     c64gs,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 Games System (PAL)",           GAME_SUPPORTS_SAVE )

@@ -321,23 +321,23 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	logerror("  a1_pitch = %d\n", a1_pitch);
 	logerror("  a1_psize = %d\n", 1 << ((A1FIXED >> 3) & 7));
 	logerror("  a1_width = %d\n", a1_width);
-	logerror("  a1_xadd  = %f (phrase=%d)\n", (float)a1_xadd / 65536.0, a1_phrase_mode);
-	logerror("  a1_yadd  = %f\n", (float)a1_yadd / 65536.0);
-	logerror("  a1_xstep = %f\n", (float)a1_xstep / 65536.0);
-	logerror("  a1_ystep = %f\n", (float)a1_ystep / 65536.0);
-	logerror("  a1_x     = %f\n", (float)a1_x / 65536.0);
-	logerror("  a1_y     = %f\n", (float)a1_y / 65536.0);
+	logerror("  a1_xadd  = %f (phrase=%d)\n", (double)a1_xadd / 65536.0, a1_phrase_mode);
+	logerror("  a1_yadd  = %f\n", (double)a1_yadd / 65536.0);
+	logerror("  a1_xstep = %f\n", (double)a1_xstep / 65536.0);
+	logerror("  a1_ystep = %f\n", (double)a1_ystep / 65536.0);
+	logerror("  a1_x     = %f\n", (double)a1_x / 65536.0);
+	logerror("  a1_y     = %f\n", (double)a1_y / 65536.0);
 
 	logerror("  a2_base  = %08X\n", a2_base);
 	logerror("  a2_pitch = %d\n", a2_pitch);
 	logerror("  a2_psize = %d\n", 1 << ((A2FIXED >> 3) & 7));
 	logerror("  a2_width = %d\n", a2_width);
-	logerror("  a2_xadd  = %f (phrase=%d)\n", (float)a2_xadd / 65536.0, a2_phrase_mode);
-	logerror("  a2_yadd  = %f\n", (float)a2_yadd / 65536.0);
-	logerror("  a2_xstep = %f\n", (float)a2_xstep / 65536.0);
-	logerror("  a2_ystep = %f\n", (float)a2_ystep / 65536.0);
-	logerror("  a2_x     = %f\n", (float)a2_x / 65536.0);
-	logerror("  a2_y     = %f\n", (float)a2_y / 65536.0);
+	logerror("  a2_xadd  = %f (phrase=%d)\n", (double)a2_xadd / 65536.0, a2_phrase_mode);
+	logerror("  a2_yadd  = %f\n", (double)a2_yadd / 65536.0);
+	logerror("  a2_xstep = %f\n", (double)a2_xstep / 65536.0);
+	logerror("  a2_ystep = %f\n", (double)a2_ystep / 65536.0);
+	logerror("  a2_x     = %f\n", (double)a2_x / 65536.0);
+	logerror("  a2_y     = %f\n", (double)a2_y / 65536.0);
 
 	logerror("  count    = %d x %d\n", inner_count, outer_count);
 	logerror("  command  = %08X\n", COMMAND);

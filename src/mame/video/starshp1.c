@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Frank Palazzolo, Stefan Jokisch
 /***************************************************************************
 
 Atari Starship 1 video emulation

@@ -223,4 +223,32 @@ typedef UINT32                              FPTR;
 	#define __has_feature(x) 0
 #endif
 
+#ifdef _MSC_VER
+#include <malloc.h>
+#if _MSC_VER == 1900 // < VS2015
+#define __LINE__Var 0
+#endif
+#if _MSC_VER < 1900 // < VS2015
+#define snprintf _snprintf
+#if _MSC_VER < 1800 // VS2013 or earlier
+#define alloca _alloca
+#define round(x) floor((x) + 0.5)
+#define strtoll _strtoi64
+#define _USE_MATH_DEFINES
+#include <math.h>
+static __inline double fmin(double x, double y){ return (x < y) ? x : y; }
+static __inline double fmax(double x, double y){ return (x > y) ? x : y; }
+static __inline double log2(double x) { return log(x) * M_LOG2E; }
+#endif // VS2013
+#else // VS2015
+#define _CRT_STDIO_LEGACY_WIDE_SPECIFIERS
+#endif
+#endif
+
+#ifdef __GNUC__
+#ifndef alloca
+#define alloca(size)  __builtin_alloca(size)
+#endif
+#endif
+
 #endif  /* __OSDCOMM_H__ */

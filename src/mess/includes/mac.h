@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
 /*****************************************************************************
  *
  * includes/mac.h
@@ -29,7 +31,7 @@
 #define MAC_539X_2_TAG "539x_2"
 #define MACKBD_TAG "mackbd"
 
-// uncomment to run i8021 keyboard in orignal Mac/512(e)/Plus
+// uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
 
 // model helpers
@@ -291,9 +293,9 @@ public:
 	INT32 m_adb_linestate;
 	bool  m_adb_srqflag;
 #define kADBKeyBufSize 32
-        UINT8 m_adb_keybuf[kADBKeyBufSize];
-        UINT8 m_adb_keybuf_start;
-        UINT8 m_adb_keybuf_end;
+		UINT8 m_adb_keybuf[kADBKeyBufSize];
+		UINT8 m_adb_keybuf_start;
+		UINT8 m_adb_keybuf_end;
 
 	// Portable/PB100 Power Manager IC comms (chapter 4, "Guide to the Macintosh Family Hardware", second edition)
 	UINT8 m_pm_data_send, m_pm_data_recv, m_pm_ack, m_pm_req, m_pm_cmd[32], m_pm_out[32], m_pm_dptr, m_pm_sptr, m_pm_slen, m_pm_state;

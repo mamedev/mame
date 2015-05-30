@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  *
  *   Sharp X1 TAP image format
@@ -18,6 +20,8 @@
  *   0x00: Sampling rate (4 bytes)
  *
  */
+
+#include <assert.h>
 
 #include "x1_tap.h"
 

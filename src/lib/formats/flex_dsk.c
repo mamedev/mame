@@ -1,13 +1,15 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * flex_dsk.c  -  FLEX compatible disk images
  *
  *  Created on: 24/06/2014
  */
 
-#include "emu.h"
+	#include "emu.h" // logerror
 #include "flex_dsk.h"
 
-flex_format::flex_format() : wd177x_format(formats)
+flex_format::flex_format()
 {
 }
 
@@ -24,6 +26,11 @@ const char *flex_format::description() const
 const char *flex_format::extensions() const
 {
 	return "dsk";
+}
+
+bool flex_format::supports_save() const
+{
+	return true;
 }
 
 int flex_format::identify(io_generic *io, UINT32 form_factor)

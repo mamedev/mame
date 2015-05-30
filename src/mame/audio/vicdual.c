@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Derrick Renaud, Couriersud
 /*************************************************************************
 
     VIC Dual Game board

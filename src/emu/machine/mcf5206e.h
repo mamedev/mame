@@ -1,6 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /***************************************************************************
 
-    Konami 033906
+    MCF5206E Peripherals
 
 ***************************************************************************/
 
@@ -183,7 +185,7 @@ private:
 	UINT16 m_DMCR;
 	UINT16 m_PAR;
 
-	emu_timer *timer1;
+	emu_timer *m_timer1;
 	UINT16 m_TMR1;
 	UINT16 m_TRR1;
 	UINT8 m_TER1;

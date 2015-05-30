@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:S. Smith,David Haywood
 #ifndef __NEOGEO_PCM2_CART_H
 #define __NEOGEO_PCM2_CART_H
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Takahiro Nogi
 #include "includes/nb1413m3.h"
 
 class hyhoo_state : public driver_device
@@ -32,14 +34,14 @@ public:
 	int m_highcolorflag;
 	int m_flipscreen;
 	bitmap_rgb32 m_tmpbitmap;
-	
+
 	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
 	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-	
+
 	virtual void video_start();
-	
+
 	UINT32 screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hyhoo_gfxdraw();
 

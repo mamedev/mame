@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Philip Bennett
 /*************************************************************************
 
     Turrett Tower video hardware

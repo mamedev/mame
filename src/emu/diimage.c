@@ -151,30 +151,31 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 {
 	m_image_name = filename;
 	zippath_parent(m_working_directory, filename);
-	m_basename.cpy(m_image_name);
+	m_basename.assign(m_image_name);
 
-	int loc1 = m_image_name.rchr(0,'\\');
-	int loc2 = m_image_name.rchr(0,'/');
-	int loc3 = m_image_name.rchr(0,':');
+	int loc1 = m_image_name.find_last_of('\\');
+	int loc2 = m_image_name.find_last_of('/');
+	int loc3 = m_image_name.find_last_of(':');
 	int loc = MAX(loc1,MAX(loc2,loc3));
 	if (loc!=-1) {
 		if (loc == loc3)
 		{
 			// temp workaround for softlists now that m_image_name contains the part name too (e.g. list:gamename:cart)
-			astring tmpstr = astring(m_basename.substr(0,loc));
-			int tmploc = tmpstr.rchr(0,':');
+			m_basename = m_basename.substr(0, loc);
+			std::string tmpstr = std::string(m_basename);
+			int tmploc = tmpstr.find_last_of(':');
 			m_basename = m_basename.substr(tmploc + 1,loc-tmploc);
 		}
 		else
-			m_basename = m_basename.substr(loc + 1,m_basename.len()-loc);
+			m_basename = m_basename.substr(loc + 1, m_basename.length() - loc);
 	}
-	m_basename_noext = m_basename.cpy(m_basename);
+	m_basename_noext = m_basename.assign(m_basename);
 	m_filetype = "";
-	loc = m_basename_noext.rchr(0,'.');
+	loc = m_basename_noext.find_last_of('.');
 	if (loc!=-1) {
 		m_basename_noext = m_basename_noext.substr(0,loc);
-		m_filetype = m_basename.cpy(m_basename);
-		m_filetype = m_filetype.substr(loc + 1,m_filetype.len()-loc);
+		m_filetype = m_basename.assign(m_basename);
+		m_filetype = m_filetype.substr(loc + 1, m_filetype.length() - loc);
 	}
 
 	return IMAGE_ERROR_SUCCESS;
@@ -210,9 +211,9 @@ const image_device_format *device_image_interface::device_get_named_creatable_fo
 void device_image_interface::clear_error()
 {
 	m_err = IMAGE_ERROR_SUCCESS;
-	if (m_err_message)
+	if (!m_err_message.empty())
 	{
-		m_err_message.reset();
+		m_err_message.clear();
 	}
 }
 
@@ -236,7 +237,7 @@ static const char *const messages[] =
 
 const char *device_image_interface::error()
 {
-	return (m_err_message) ? m_err_message.cstr() : messages[m_err];
+	return (!m_err_message.empty()) ? m_err_message.c_str() : messages[m_err];
 }
 
 
@@ -295,7 +296,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 	bool success = FALSE;
 	bool done = FALSE;
 
-	directory = osd_opendir(m_working_directory.cstr());
+	directory = osd_opendir(m_working_directory.c_str());
 	if (directory != NULL)
 	{
 		while(!done && (entry = osd_readdir(directory)) != NULL)
@@ -312,7 +313,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 	/* did we successfully identify the directory? */
 	if (success)
-		zippath_combine(m_working_directory, m_working_directory, subdir);
+		zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
 
 	return success;
 }
@@ -351,10 +352,10 @@ void device_image_interface::setup_working_directory()
 const char * device_image_interface::working_directory()
 {
 	/* check to see if we've never initialized the working directory */
-	if (!m_working_directory)
+	if (m_working_directory.empty())
 		setup_working_directory();
 
-	return m_working_directory;
+	return m_working_directory.c_str();
 }
 
 
@@ -431,16 +432,17 @@ void device_image_interface::run_hash(void (*partialhash)(hash_collection &, con
 	hashes.reset();
 	size = (UINT32) length();
 
-	buf.resize_and_clear(size);
+	buf.resize(size);
+	memset(&buf[0], 0, size);
 
 	/* read the file */
 	fseek(0, SEEK_SET);
-	fread(buf, size);
+	fread(&buf[0], size);
 
 	if (partialhash)
-		partialhash(hashes, buf, size, types);
+		partialhash(hashes, &buf[0], size, types);
 	else
-		hashes.compute(buf, size, types);
+		hashes.compute(&buf[0], size, types);
 
 	/* cleanup */
 	fseek(0, SEEK_SET);
@@ -499,14 +501,14 @@ UINT32 device_image_interface::crc()
 -------------------------------------------------*/
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
-	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
-	image_battery_load_by_name(device().machine().options(), fname, buffer, length, fill);
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
+	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, fill);
 }
 
 void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
 {
-	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
-	image_battery_load_by_name(device().machine().options(), fname, buffer, length, def_buffer);
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
+	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, def_buffer);
 }
 
 /*-------------------------------------------------
@@ -517,9 +519,9 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 -------------------------------------------------*/
 void device_image_interface::battery_save(const void *buffer, int length)
 {
-	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
+	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
-	image_battery_save_by_name(device().machine().options(), fname, buffer, length);
+	image_battery_save_by_name(device().machine().options(), fname.c_str(), buffer, length);
 }
 
 //-------------------------------------------------
@@ -535,8 +537,8 @@ bool device_image_interface::uses_file_extension(const char *file_extension) con
 		file_extension++;
 
 	/* find the extensions */
-	astring extensions(file_extensions());
-	char *ext = strtok((char*)extensions.cstr(),",");
+	std::string extensions(file_extensions());
+	char *ext = strtok((char*)extensions.c_str(),",");
 	while (ext != NULL)
 	{
 		if (!core_stricmp(ext, file_extension))
@@ -572,7 +574,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 {
 	file_error filerr = FILERR_NOT_FOUND;
 	image_error_t err = IMAGE_ERROR_FILENOTFOUND;
-	astring revised_path;
+	std::string revised_path;
 
 	/* attempt to read the file */
 	filerr = zippath_fopen(path, open_flags, m_file, revised_path);
@@ -614,7 +616,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 
 	/* if successful, set the file name */
 	if (filerr == FILERR_NONE)
-		set_image_filename(revised_path);
+		set_image_filename(revised_path.c_str());
 
 	return err;
 }
@@ -626,7 +628,7 @@ int device_image_interface::reopen_for_write(const char *path)
 
 	file_error filerr = FILERR_NOT_FOUND;
 	image_error_t err = IMAGE_ERROR_FILENOTFOUND;
-	astring revised_path;
+	std::string revised_path;
 
 	/* attempt to open the file for writing*/
 	filerr = zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
@@ -668,7 +670,7 @@ int device_image_interface::reopen_for_write(const char *path)
 
 	/* if successful, set the file name */
 	if (filerr == FILERR_NONE)
-		set_image_filename(revised_path);
+		set_image_filename(revised_path.c_str());
 
 	return err;
 }
@@ -702,7 +704,7 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 
 static void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
 {
-	astring tempstr;
+	std::string tempstr;
 	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string(tempstr));
 	osd_printf_error("       FOUND: %s\n", acthashes.macro_string(tempstr));
 }
@@ -726,7 +728,7 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 	}
 
 	/* If there is no good dump known, write it */
-	astring tempstr;
+	std::string tempstr;
 	hash_collection &acthashes = file->hashes(hashes.hash_types(tempstr));
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
@@ -754,9 +756,9 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 
 bool device_image_interface::load_software(software_list_device &swlist, const char *swname, const rom_entry *start)
 {
-	astring locationtag, breakstr("%");
+	std::string locationtag, breakstr("%");
 	const rom_entry *region;
-	astring regiontag;
+	std::string regiontag;
 	bool retVal = FALSE;
 	int warningcount = 0;
 	for (region = start; region != NULL; region = rom_next_region(region))
@@ -783,57 +785,57 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				if (supported == SOFTWARE_SUPPORTED_NO)
 					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
 
-				// attempt reading up the chain through the parents and create a locationtag astring in the format
+				// attempt reading up the chain through the parents and create a locationtag std::string in the format
 				// " swlist % clonename % parentname "
 				// below, we have the code to split the elements and to create paths to load from
 
 				while (swinfo != NULL)
 				{
-					locationtag.cat(swinfo->shortname()).cat(breakstr);
+					locationtag.append(swinfo->shortname()).append(breakstr);
 					const char *parentname = swinfo->parentname();
 					swinfo = (parentname != NULL) ? swlist.find(parentname) : NULL;
 				}
 				// strip the final '%'
-				locationtag.del(locationtag.len() - 1, 1);
+				locationtag.erase(locationtag.length() - 1, 1);
 
 
 				// check if locationtag actually contains two locations separated by '%'
 				// (i.e. check if we are dealing with a clone in softwarelist)
-				astring tag2, tag3, tag4(locationtag), tag5;
-				int separator = tag4.chr(0, '%');
+				std::string tag2, tag3, tag4(locationtag), tag5;
+				int separator = tag4.find_first_of('%');
 				if (separator != -1)
 				{
 					// we are loading a clone through softlists, split the setname from the parentname
-					tag5.cpysubstr(tag4, separator + 1, tag4.len() - separator + 1);
-					tag4.del(separator, tag4.len() - separator);
+					tag5.assign(tag4.substr(separator + 1, tag4.length() - separator + 1));
+					tag4.erase(separator, tag4.length() - separator);
 				}
 
 				// prepare locations where we have to load from: list/parentname & list/clonename
-				astring tag1(swlist.list_name());
-				tag1.cat(PATH_SEPARATOR);
-				tag2.cpy(tag1.cat(tag4));
-				tag1.cpy(swlist.list_name());
-				tag1.cat(PATH_SEPARATOR);
-				tag3.cpy(tag1.cat(tag5));
+				std::string tag1(swlist.list_name());
+				tag1.append(PATH_SEPARATOR);
+				tag2.assign(tag1.append(tag4));
+				tag1.assign(swlist.list_name());
+				tag1.append(PATH_SEPARATOR);
+				tag3.assign(tag1.append(tag5));
 
-				if (tag5.chr(0, '%') != -1)
+				if (tag5.find_first_of('%') != -1)
 					fatalerror("We do not support clones of clones!\n");
 
 				// try to load from the available location(s):
 				// - if we are not using lists, we have regiontag only;
 				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
 				// try to load from list/setname
-				if ((m_mame_file == NULL) && (tag2.cstr() != NULL))
-					filerr = common_process_file(device().machine().options(), tag2.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == NULL) && (tag2.c_str() != NULL))
+					filerr = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, &m_mame_file);
 				// try to load from list/parentname
-				if ((m_mame_file == NULL) && (tag3.cstr() != NULL))
-					filerr = common_process_file(device().machine().options(), tag3.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == NULL) && (tag3.c_str() != NULL))
+					filerr = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, &m_mame_file);
 				// try to load from setname
-				if ((m_mame_file == NULL) && (tag4.cstr() != NULL))
-					filerr = common_process_file(device().machine().options(), tag4.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == NULL) && (tag4.c_str() != NULL))
+					filerr = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, &m_mame_file);
 				// try to load from parentname
-				if ((m_mame_file == NULL) && (tag5.cstr() != NULL))
-					filerr = common_process_file(device().machine().options(), tag5.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == NULL) && (tag5.c_str() != NULL))
+					filerr = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, &m_mame_file);
 
 				warningcount += verify_length_and_hash(m_mame_file,ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
 
@@ -867,8 +869,8 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 	m_from_swlist = FALSE;
 
 	// if the path contains no period, we are using softlists, so we won't create an image
-	astring pathstr(path);
-	bool filename_has_period = (pathstr.rchr(0, '.') != -1) ? TRUE : FALSE;
+	std::string pathstr(path);
+	bool filename_has_period = (pathstr.find_last_of('.') != -1) ? TRUE : FALSE;
 
 	/* first unload the image */
 	unload();
@@ -894,13 +896,13 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 			if (softload)
 			{
 				m_software_info_ptr = &m_software_part_ptr->info();
-				m_software_list_name.cpy(m_software_info_ptr->list().list_name());
-				m_full_software_name.cpy(m_software_part_ptr->info().shortname());
+				m_software_list_name.assign(m_software_info_ptr->list().list_name());
+				m_full_software_name.assign(m_software_part_ptr->info().shortname());
 
 				// if we had launched from softlist with a specified part, e.g. "shortname:part"
 				// we would have recorded the wrong name, so record it again based on software_info
-				if (m_software_info_ptr && m_full_software_name)
-					m_err = set_image_filename(m_full_software_name);
+				if (m_software_info_ptr && !m_full_software_name.empty())
+					m_err = set_image_filename(m_full_software_name.c_str());
 
 				// check if image should be read-only
 				const char *read_only = get_feature("read_only");
@@ -1093,21 +1095,21 @@ void device_image_interface::clear()
 		}
 	}
 
-	m_image_name.reset();
+	m_image_name.clear();
 	m_readonly = false;
 	m_created = false;
 
-	m_longname.reset();
-	m_manufacturer.reset();
-	m_year.reset();
-	m_basename.reset();
-	m_basename_noext.reset();
-	m_filetype.reset();
+	m_longname.clear();
+	m_manufacturer.clear();
+	m_year.clear();
+	m_basename.clear();
+	m_basename_noext.clear();
+	m_filetype.clear();
 
-	m_full_software_name.reset();
+	m_full_software_name.clear();
 	m_software_info_ptr = NULL;
 	m_software_part_ptr = NULL;
-	m_software_list_name.reset();
+	m_software_list_name.clear();
 }
 
 /*-------------------------------------------------
@@ -1144,8 +1146,8 @@ void device_image_interface::update_names(const device_type device_type, const c
 	const char *brief_name = (device_type!=NULL) ? brief : device_brieftypename(image_type());
 	if (count > 1)
 	{
-		m_instance_name.printf("%s%d", inst_name , index + 1);
-		m_brief_instance_name.printf("%s%d", brief_name, index + 1);
+		strprintf(m_instance_name,"%s%d", inst_name, index + 1);
+		strprintf(m_brief_instance_name, "%s%d", brief_name, index + 1);
 	}
 	else
 	{
@@ -1170,18 +1172,18 @@ void device_image_interface::update_names(const device_type device_type, const c
 //  case.
 //-------------------------------------------------
 
-void device_image_interface::software_name_split(const char *swlist_swname, astring &swlist_name, astring &swname, astring &swpart)
+void device_image_interface::software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart)
 {
 	// reset all output parameters
-	swlist_name.reset();
-	swname.reset();
-	swpart.reset();
+	swlist_name.clear();
+	swname.clear();
+	swpart.clear();
 
 	// if no colon, this is the swname by itself
 	const char *split1 = strchr(swlist_swname, ':');
 	if (split1 == NULL)
 	{
-		swname.cpy(swlist_swname);
+		swname.assign(swlist_swname);
 		return;
 	}
 
@@ -1189,22 +1191,22 @@ void device_image_interface::software_name_split(const char *swlist_swname, astr
 	const char *split2 = strchr(split1 + 1, ':');
 	if (split2 == NULL)
 	{
-		swname.cpy(swlist_swname, split1 - swlist_swname);
-		swpart.cpy(split1 + 1);
+		swname.assign(swlist_swname, split1 - swlist_swname);
+		swpart.assign(split1 + 1);
 		return;
 	}
 
 	// if two colons present, split into 3 parts
-	swlist_name.cpy(swlist_swname, split1 - swlist_swname);
-	swname.cpy(split1 + 1, split2 - (split1 + 1));
-	swpart.cpy(split2 + 1);
+	swlist_name.assign(swlist_swname, split1 - swlist_swname);
+	swname.assign(split1 + 1, split2 - (split1 + 1));
+	swpart.assign(split2 + 1);
 }
 
 
 software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface)
 {
 	// split full software name into software list name and short software name
-	astring swlist_name, swinfo_name, swpart_name;
+	std::string swlist_name, swinfo_name, swpart_name;
 	software_name_split(path, swlist_name, swinfo_name, swpart_name);
 
 	// determine interface
@@ -1216,12 +1218,12 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	software_list_device_iterator deviter(device().mconfig().root_device());
 	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
 	{
-		if (swlist_name == swlistdev->list_name() || !(swlist_name.len() > 0))
+		if (swlist_name.compare(swlistdev->list_name())==0 || !(swlist_name.length() > 0))
 		{
-			software_info *info = swlistdev->find(swinfo_name);
+			software_info *info = swlistdev->find(swinfo_name.c_str());
 			if (info != NULL)
 			{
-				software_part *part = info->find_part(swpart_name, interface);
+				software_part *part = info->find_part(swpart_name.c_str(), interface);
 				if (part != NULL)
 					return part;
 			}
@@ -1233,7 +1235,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 			// gameboy:sml) which is not handled properly by software_name_split
 			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
-			software_info *info = swlistdev->find(swpart_name);
+			software_info *info = swlistdev->find(swpart_name.c_str());
 			if (info != NULL)
 			{
 				software_part *part = info->find_part(NULL, interface);
@@ -1275,8 +1277,8 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 	bool result = call_softlist_load(swpart->info().list(), swpart->info().shortname(), swpart->romdata());
 
 	// Tell the world which part we actually loaded
-	astring full_sw_name;
-	full_sw_name.printf("%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
+	std::string full_sw_name;
+	strprintf(full_sw_name,"%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
 
 	// check compatibility
 	if (!swpart->is_compatible(swpart->info().list()))
@@ -1317,19 +1319,19 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 //  software_get_default_slot
 //-------------------------------------------------
 
-void device_image_interface::software_get_default_slot(astring &result, const char *default_card_slot)
+void device_image_interface::software_get_default_slot(std::string &result, const char *default_card_slot)
 {
 	const char *path = device().mconfig().options().value(instance_name());
-	result.reset();
+	result.clear();
 	if (strlen(path) > 0)
 	{
-		result.cpy(default_card_slot);
+		result.assign(default_card_slot);
 		software_part *swpart = find_software_item(path, true);
 		if (swpart != NULL)
 		{
 			const char *slot = swpart->feature("slot");
 			if (slot != NULL)
-				result.cpy(slot);
+				result.assign(slot);
 		}
 	}
 }

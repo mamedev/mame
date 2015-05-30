@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Harmony
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
 /***************************************************************************
 
   snes.c
@@ -87,7 +87,7 @@ void snes_state::hirq_tick()
 {
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
-	m_ppu->latch_counters();
+	m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
 	SNES_CPU_REG(TIMEUP) = 0x80;    /* Indicate that irq occurred */
 	m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 
@@ -142,7 +142,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		{
 			SNES_CPU_REG(TIMEUP) = 0x80;    /* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
-			m_ppu->latch_counters();
+			m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
 			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE );
 		}
 	}
@@ -536,11 +536,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 			SNES_CPU_REG(NMITIMEN) = data;
 			return;
 		case WRIO:      /* Programmable I/O port - latches H/V counters on a 0->1 transition */
-			if (!(SNES_CPU_REG(WRIO) & 0x80) && (data & 0x80))
-			{
-				// external latch
-				m_ppu->latch_counters();
-			}
+			wrio_write(data);
 			SNES_CPU_REG(WRIO) = data;
 			return;
 		case HTIMEL:    /* H-Count timer settings (low)  */
@@ -610,6 +606,15 @@ void snes_state::write_joy_latch(UINT8 data)
 	m_read_idx[3] = 0;
 }
 
+
+void snes_state::wrio_write(UINT8 data)
+{
+	if (!(SNES_CPU_REG(WRIO) & 0x80) && (data & 0x80))
+	{
+		// external latch
+		m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
+	}
+}
 
 WRITE_LINE_MEMBER(snes_state::snes_extern_irq_w)
 {
@@ -1132,7 +1137,7 @@ void snes_state::machine_reset()
 	}
 
 	/* Set STAT78 to NTSC or PAL */
-	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59.0f)
+	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) >= 59.0)
 		m_ppu->m_stat78 = SNES_NTSC;
 	else /* if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds) == 50.0f) */
 		m_ppu->m_stat78 = SNES_PAL;

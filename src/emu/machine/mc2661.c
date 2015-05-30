@@ -4,9 +4,6 @@
 
     Motorola MC2661/MC68661 Enhanced Programmable Communications Interface
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "mc2661.h"
@@ -278,7 +275,11 @@ WRITE8_MEMBER( mc2661_device::write )
 			m_write_txrdy(CLEAR_LINE);
 		}
 		if(COMMAND_MODE == 0x02)  // loopback - the Wicat will set this after enabling the transmitter
+		{
 			m_rhr = data;
+			m_sr |= STATUS_RXRDY; // pcd expects this
+			m_write_rxrdy(ASSERT_LINE);
+		}
 		break;
 
 	case REGISTER_SYNC:

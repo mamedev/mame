@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Blades of Steel (GX797) (c) 1987 Konami
 
-    Driver by Manuel Abadia <manu@teleline.es>
+    Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
     Interrupts:
 

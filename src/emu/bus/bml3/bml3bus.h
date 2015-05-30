@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Jonathan Edwards
 /***************************************************************************
 
   bml3bus.h - Hitachi MB-6890 slot bus and card emulation

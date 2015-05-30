@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mariusz Wojcieszek
 #ifndef _MICROTOUCH_H
 #define _MICROTOUCH_H
 

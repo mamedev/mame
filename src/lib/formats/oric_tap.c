@@ -1,3 +1,7 @@
+// license:BSD-3-Clause
+// copyright-holders:Kevin Thacker
+#include <assert.h>
+
 #include "oric_tap.h"
 
 #define ORIC_WAV_DEBUG 0

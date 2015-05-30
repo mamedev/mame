@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jason Eckhardt, Andrew Gardner, Philip Bennett
 /*
 Virtual Combat hardware games.
 

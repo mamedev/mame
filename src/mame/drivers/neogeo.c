@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 /***************************************************************************
 
     Neo-Geo hardware
@@ -238,7 +240,9 @@
     . NEO-AEG CHA42G-3
     . NEO-AEG CHA42G-4
     . NEO-AEG CHA256
+     . NEO-AEG CHA256 B
     . NEO-AEG CHA256[B]
+     . NEO-AEG CHA256BY
     . NEO-AEG CHA256RY
     . NEO-AEG CHA512Y
     . NEO-AEG CHAFIO (1999.8.10) - used with NEO-CMC 90G06C7042 or NEO-CMC 90G06C7050
@@ -261,6 +265,7 @@
     . NEO-AEG PROG4096 B
     . NEO-AEG PROGGS
     . NEO-AEG PROGTOP2
+     . NEO-AEG PROGTOP2Y
     . NEO-AEG PROGEOP (1999.4.2)
     . NEO-AEG PROGLBA (1999.7.6)
     . NEO-AEG PROGRK
@@ -306,6 +311,15 @@
     MVS PROG:
     GIGA PROG Board 1.0
     GIGA PROG Board 1.5
+
+
+    Unofficial pcb's from NEOBITZ:
+
+    MVS CHA:
+    CHARBITZ1 2013.12.01
+
+    MVS PROG:
+    PROGBITZ1 2013.12.01
 
 
     Neo-Geo game PCB infos by Johnboy

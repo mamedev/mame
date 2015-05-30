@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 #ifndef __GENERIC_SLOT_H
 #define __GENERIC_SLOT_H
 
@@ -31,8 +31,8 @@ public:
 	UINT8* get_rom_base()  { return m_rom; }
 	UINT32 get_rom_size() { return m_rom_size; }
 
-	UINT8* get_ram_base() { return m_ram; }
-	UINT32 get_ram_size() { return m_ram.count(); }
+	UINT8* get_ram_base() { return &m_ram[0]; }
+	UINT32 get_ram_size() { return m_ram.size(); }
 
 	void save_ram()   { device().save_item(NAME(m_ram)); }
 
@@ -124,7 +124,7 @@ public:
 	virtual const char *file_extensions() const { return m_extensions; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);

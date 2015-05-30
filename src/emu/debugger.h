@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles
 /****************************************************************************
 
     debugger.h
 
     General debugging interfaces
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************/
 
 #pragma once

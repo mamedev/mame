@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, Dirk Best
 /***************************************************************************
 
     Video Technology Laser 110
@@ -9,9 +11,6 @@
       Dick Smith Electronics VZ-200
     Video Technology Laser 310
       Dick Smith Electronics VZ-300
-
-    license: MAME
-    copyright-holders: Juergen Buchmueller, Dirk Best
 
 Thanks go to:
 

@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner, Dan Boris, Dirk Best, Robbbert
 /*****************************************************************************
  *
  * includes/aim65.h
@@ -13,7 +15,7 @@
 #include "cpu/m6502/m6502.h"
 #include "video/dl1416.h"
 #include "machine/6522via.h"
-#include "machine/6532riot.h"
+#include "machine/mos6530n.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"

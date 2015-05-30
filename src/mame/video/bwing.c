@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Acho A. Tang, Alex W. Jackson
 /*****************************************************************************
 
 B-Wings  (c) 1984 Data East Corporation
@@ -17,7 +19,7 @@ revised by Alex W. Jackson
 // Exports
 
 
-WRITE8_MEMBER(bwing_state::bwing_videoram_w)
+WRITE8_MEMBER(bwing_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_charmap->mark_tile_dirty(offset);
@@ -46,7 +48,7 @@ WRITE8_MEMBER(bwing_state::gfxram_w)
 }
 
 
-WRITE8_MEMBER(bwing_state::bwing_scrollreg_w)
+WRITE8_MEMBER(bwing_state::scrollreg_w)
 {
 	m_sreg[offset] = data;
 
@@ -62,7 +64,7 @@ WRITE8_MEMBER(bwing_state::bwing_scrollreg_w)
 }
 
 
-WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
+WRITE8_MEMBER(bwing_state::paletteram_w)
 {
 	static const float rgb[4][3] = {
 		{0.85f, 0.95f, 1.00f},
@@ -113,7 +115,7 @@ TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(bwing_state::bwing_scan_cols)
+TILEMAP_MAPPER_MEMBER(bwing_state::scan_cols)
 {
 	return (row & 0xf) | ((col & 0xf) << 4) | ((row & 0x30) << 4) | ((col & 0x30) << 6);
 }
@@ -124,8 +126,8 @@ void bwing_state::video_start()
 	int i;
 
 	m_charmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_charinfo),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	m_fgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_fgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::bwing_scan_cols),this), 16, 16, 64, 64);
-	m_bgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_bgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::bwing_scan_cols),this), 16, 16, 64, 64);
+	m_fgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_fgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::scan_cols),this), 16, 16, 64, 64);
+	m_bgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_bgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::scan_cols),this), 16, 16, 64, 64);
 
 	m_charmap->set_transparent_pen(0);
 	m_fgmap->set_transparent_pen(0);
@@ -178,7 +180,7 @@ void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 
 }
 
 
-UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 bwing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	unsigned flip, x, y, shiftx;
 

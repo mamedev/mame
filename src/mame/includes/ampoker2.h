@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca
 class ampoker2_state : public driver_device
 {
 public:

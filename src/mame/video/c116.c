@@ -106,13 +106,13 @@ READ8_MEMBER(namco_c116_device::read)
 	switch (offset & 0x1800)
 	{
 		case 0x0000:
-			RAM = m_ram_r;
+			RAM = &m_ram_r[0];
 			break;
 		case 0x0800:
-			RAM = m_ram_g;
+			RAM = &m_ram_g[0];
 			break;
 		case 0x1000:
-			RAM = m_ram_b;
+			RAM = &m_ram_b[0];
 			break;
 		default: // case 0x1800 (internal registers)
 		{
@@ -135,13 +135,13 @@ WRITE8_MEMBER(namco_c116_device::write)
 	switch (offset & 0x1800)
 	{
 		case 0x0000:
-			RAM = m_ram_r;
+			RAM = &m_ram_r[0];
 			break;
 		case 0x0800:
-			RAM = m_ram_g;
+			RAM = &m_ram_g[0];
 			break;
 		case 0x1000:
-			RAM = m_ram_b;
+			RAM = &m_ram_b[0];
 			break;
 		default: // case 0x1800 (internal registers)
 		{

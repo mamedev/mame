@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Viens
 /**********************************************************************
 
     NEC uPD1771-017 as used in the Epoch Super Cassette Vision (SCV)
@@ -91,7 +93,7 @@
     uPD1776C: mentioned in the bristow book, implements VSRSSS speech concatenation
               (see US Patent 4577343 which is a patent on this VSRSSS implementation)
     uPD1771C-006: used in NEC APC for sound as the "MPU"
-            -011: used on Firefox F-4 handheld
+            -011: used on Firefox F-4/Astro Thunder handheld
             -015: unknown, known to exist from part scalper sites only.
             -017: used on Epoch Super Cassete Vision for sound; This audio driver HLEs that part only.
 
@@ -108,30 +110,36 @@
      6Mhz XIN     9        20        D2
      6Mhz XOUT   10        19        D1
      AUDOUT      11        18        D0
-     NC          12        17        GND
+     NC(recheck!)12        17        GND
      AUDOUT(inv) 13        16        VCC
      GND         14        15        ? tied to pin 16 (VCC) through a resistor (pullup?)
 
      Pinout based on guesses and information in "Electronic Speech Synthesis" by Geoff Bristow
      (ISBN 0-07-007912-9, pages 148-152), and the data on page 233 of the Nec APC technical manual at
      http://bitsavers.trailing-edge.com/pdf/nec/APC/819-000100-1003_APC_System_Reference_Guide_Apr83.pdf
+     I/O pin purpose based on testing by kevtris.
      [x] is unsure:
-     PB3          1        28        PB2
-     PB4(/ALE)    2        27        PB1
-     PB5(/RD)     3        26        PB0
-     PB6(/WR)     4        25        D7(PA7)
-     PB7(/CS)     5        24        D6(PA6)
-     /RESET       6        23        D5(PA5)
-     [TEST?]      7        22        D4(PA4)
-     VCC          8        21        D3(PA3)
-     XI(CLK)      9        20        D2(PA2)
-     XO          10        19        D1(PA1)
-     D/A OUT +   11        18        D0(PA0)
-     [D/A VREF]  12        17        CH2
-     D/A OUT -   13        16        /EXTINT
-     GND         14        15        CH1 tied to pin 16 (VCC) through a resistor, on APC to VCC thru a 12k resistor and thru a 10uf cap to gnd
+     PB3        <>  1        28 <>     PB2
+     PB4(/ALE)  <>  2        27 <>     PB1
+     PB5(/RD)   <>  3        26 <>     PB0
+     PB6(/WR)   <>  4        25 <>     D7(PA7)
+     PB7(/CS)   <>  5        24 <>     D6(PA6)
+     /RESET     ->  6        23 <>     D5(PA5)
+     [/TSTOUT?] <-  7        22 <>     D4(PA4)
+     VCC        --  8        21 <>     D3(PA3)
+     XI(CLK)    ->  9        20 <>     D2(PA2)
+     XO         <- 10        19 <>     D1(PA1)
+     D/A OUT +  <- 11        18 <>     D0(PA0)
+     D/A POWER  -- 12        17 <-     CH2
+     D/A OUT -  <- 13        16 <>     /EXTINT and [/TSTOUT2?] (test out is related to pin 15 state)
+     GND        -- 14        15 <-     CH1 tied to pin 16 (VCC) through a resistor, on APC to VCC thru a 12k resistor and thru a 10uf cap to gnd
 
-    CH1 and CH2 are some sort of mode selects?
+    CH1 and CH2 are mode selects, purpose based on testing by kevtris:
+    CH1 CH2
+    H   L   - 'master' mode, pb4-pb7 are i/o? /EXTINT is an input
+    L   L   - 'slave' mode where pb4-pb7 are /ale /rd /wr /cs? /EXTINT may be an output in this mode?
+    X   H   - test mode: the 512 byte 16-bit wide ROM is output sequentially on pins pa7-pa0 and pb7-pb0 for the high and low bytes of each word respectively
+    D/A POWER is the FET source for the D/A OUT+ and D/A OUT- push-pull dac drains; it should be tied to VCC or thereabouts
 
     In the SCV (info from plgDavid):
     pin  5 is tied to the !SCPU pin on the Epoch TV chip pin 29 (0x3600 writes)
@@ -168,22 +176,26 @@
 #define LOG 0
 
 /*
-  Each of the 8 waveforms have been sampled at 192kHz using period 0xFF,
-  filtered, and each of the 32 levels have been calculated with averages on around 10 samples
-  (removing the transition samples) then quantized to int8_t's.
-  We are not clear on the exact DAC details yet, especially with regards to volume changes.
-
-  External AC coupling is assumed in the use of this DAC, so we will center the 8bit data using a signed container
+  Each of the 8 waveforms have been extracted from the uPD1771c-017 internal
+  ROM, from offset 0x1fd (start of first waveform) to offset 0x2fc (end of
+  last waveform).
+  (note: given test mode dumping offset non-clarity it may be 0x200-0x2ff)
+  The waveforms are stored in an 8-bit sign-magnitude format, so if in ROM the
+  upper bit is 0x80, invert the lower 7 bits to get the 2's complement result
+  seen here.
+  Note that only the last 4 waveforms appear to have been intended for use as
+  waveforms; the first four look as if they're playing back a piece of code as
+  wave data.
 */
 const char WAVEFORMS[8][32]={
-{ -5,   -5,  -5,-117,-116, -53, -10, 127, 120, 108,  97, -121,-121,-121,  -4,  -4,  -4,  -4,  -4,  -4,  -4,  -4,  -4,  -4,-119,-119,-118,  -2,  -2,  -2,  -2,  -2},
-{  6,  -21,  -1, -41,  -1,  25, -35, -35,  -1, -16,  34,   29, -37, -30, -33, -20,  38, -15,  50, -20, -20, -15,   7, -20,  77, -15, -37,  69,  93, -21, -38, -37},
-{ -11,  -4, -11,  51,  -9, -11, -11,  84,  87,-112,  44,  102, -86,-112,  35, 103, -12,  51, -10, -12, -12,  -9, -12,  13, -11, -44,  25, 103, -12,  -5, -90,-101},
-{  40,  98,  31,  98,  -1,  13,  58,   3, -18,  45,  -5,  -13,  -5, -13,  -5, -13,  -5, -13,  -5, -13, -10, -15,-121,   5, -17,  45,-128,   8, -16, -12, -16,  -9},
-{ -53,-101,-121,-128,-113, -77, -34,   5,  26,  63,  97,  117, 119, 119, 115,  99,  54,  13, -13, -11,  -2,   3,  31,  52,  62,  74,  60,  51,  38,  22,   8, -14},
-{ -86,-128, -60,   3,  65, 101, 119,  44,  37,  41,  51,   53,  55,  58,  58,  29, -12,  74,  82,  77,  59, 113,  52,  21,  24,  34,  39,  45,  48,  48,  48, -13},
-{ -15, -18, -46, -67, -95,-111,-117,-124,-128,-123,-116, -105, -89, -72, -50, -21,   2,  16,  46,  76,  95, 111, 118, 119, 119, 119, 117, 110,  97,  75,  47,  18},
-{ -84,-121,-128,-105, -51,   7,  38,  66,  93,  97,  93,   88,  89,  96, 102, 111, 116, 118, 118, 119, 118, 118, 117, 117, 118, 118, 117, 117, 117, 115,  85, -14}
+{   0,   0,-123,-123, -61, -23, 125, 107,  94,  83,-128,-128,-128,   0,   0,   0,   1,   1,   1,   1,   0,   0,   0,-128,-128,-128,   0,   0,   0,   0,   0,   0},
+{  37,  16,  32, -21,  32,  52,   4,   4,  33,  18,  60,  56,   0,   8,   5,  16,  65,  19,  69,  16,  -2,  19,  37,  16,  97,  19,   0,  87, 127,  -3,   1,   2},
+{   0,   8,   1,  52,   4,   0,   0,  77,  81,-109,  47,  97, -83,-109,  38,  97,   0,  52,   4,   0,   1,   4,   1,  22,   2, -46,  33,  97,   0,   8, -85, -99},
+{  47,  97,  40,  97,  -3,  25,  64,  17,   0,  52,  12,   5,  12,   5,  12,   5,  12,   5,  12,   5,   8,   4,-114,  19,   0,  52,-122,  21,   2,   5,   0,   8},
+{ -52, -96,-118,-128,-111, -74, -37,  -5,  31,  62,  89, 112, 127, 125, 115,  93,  57,  23,   0, -16,  -8,  15,  37,  54,  65,  70,  62,  54,  43,  31,  19,   0},
+{ -81,-128, -61,  13,  65,  93, 127,  47,  41,  44,  52,  55,  56,  58,  58,  34,   0,  68,  76,  72,  61, 108,  55,  29,  32,  39,  43,  49,  50,  51,  51,   0},
+{ -21, -45, -67, -88,-105,-114,-122,-128,-123,-116,-103, -87, -70, -53, -28,  -9,  22,  46,  67,  86, 102, 114, 123, 125, 127, 117, 104,  91,  72,  51,  28,   0},
+{ -78,-118,-128,-102, -54,  -3,  40,  65,  84,  88,  84,  80,  82,  88,  94, 103, 110, 119, 122, 125, 122, 122, 121, 123, 125, 126, 127, 127, 125, 118,  82,   0}
 };
 
 

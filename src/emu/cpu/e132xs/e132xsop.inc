@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 #define LOCAL_DECODE_INIT \
 	struct regs_decode decode_state; \
 	struct regs_decode *decode = &decode_state; \

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Coates
 /*************************************************************/
 /*                                                           */
 /* Zaccaria/Zelco S2650 based games video                    */

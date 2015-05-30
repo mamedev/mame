@@ -1,5 +1,7 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
-    Ensoniq Vacuum Flourescent Displays (VFDs)
+    Ensoniq Vacuum Fluorescent Displays (VFDs)
     Emulation by R. Belmont
 */
 

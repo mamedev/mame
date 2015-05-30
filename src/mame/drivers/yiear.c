@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Enrique Sanchez
 /***************************************************************************
 
     Yie Ar Kung-Fu memory map (preliminary)

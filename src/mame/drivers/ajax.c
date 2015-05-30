@@ -1,9 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     "AJAX/Typhoon"  (Konami GX770)
 
     Driver by:
-        Manuel Abadia <manu@teleline.es>
+        Manuel Abadia <emumanu+mame@gmail.com>
 
     TO DO:
     - Find the CPU core bug, that makes the 052001 to read from 0x0000

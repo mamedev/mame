@@ -287,7 +287,7 @@ void integer_symbol_entry::set_value(UINT64 newvalue)
 	if (m_setter != NULL)
 		(*m_setter)(m_table, m_ref, newvalue);
 	else
-		throw emu_fatalerror("Symbol '%s' is read-only", m_name.cstr());
+		throw emu_fatalerror("Symbol '%s' is read-only", m_name.c_str());
 }
 
 
@@ -347,7 +347,7 @@ bool function_symbol_entry::is_lval() const
 
 UINT64 function_symbol_entry::value() const
 {
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name.cstr());
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name.c_str());
 }
 
 
@@ -357,7 +357,7 @@ UINT64 function_symbol_entry::value() const
 
 void function_symbol_entry::set_value(UINT64 newvalue)
 {
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name.cstr());
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name.c_str());
 }
 
 
@@ -368,9 +368,9 @@ void function_symbol_entry::set_value(UINT64 newvalue)
 UINT64 function_symbol_entry::execute(int numparams, const UINT64 *paramlist)
 {
 	if (numparams < m_minparams)
-		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name.cstr(), m_minparams);
+		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name.c_str(), m_minparams);
 	if (numparams > m_maxparams)
-		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name.cstr(), m_maxparams);
+		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name.c_str(), m_maxparams);
 	return (*m_execute)(m_table, m_ref, numparams, paramlist);
 }
 
@@ -579,7 +579,7 @@ parsed_expression::parsed_expression(symbol_table *symtable, const char *express
 void parsed_expression::parse(const char *expression)
 {
 	// copy the string and reset our parsing state
-	m_original_string.cpy(expression);
+	m_original_string.assign(expression);
 	m_tokenlist.reset();
 	m_stringlist.reset();
 
@@ -598,8 +598,8 @@ void parsed_expression::parse(const char *expression)
 void parsed_expression::copy(const parsed_expression &src)
 {
 	m_symtable = src.m_symtable;
-	m_original_string.cpy(src.m_original_string);
-	if (m_original_string)
+	m_original_string.assign(src.m_original_string);
+	if (!m_original_string.empty())
 		parse_string_into_tokens();
 }
 
@@ -703,7 +703,7 @@ void parsed_expression::print_tokens(FILE *out)
 void parsed_expression::parse_string_into_tokens()
 {
 	// loop until done
-	const char *stringstart = m_original_string;
+	const char *stringstart = m_original_string.c_str();
 	const char *string = stringstart;
 	while (string[0] != 0)
 	{
@@ -861,14 +861,14 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 {
 	// accumulate a lower-case version of the symbol
 	const char *stringstart = string;
-	astring buffer;
+	std::string buffer;
 	while (1)
 	{
 		static const char valid[] = "abcdefghijklmnopqrstuvwxyz0123456789_$#.:";
 		char val = tolower((UINT8)string[0]);
 		if (val == 0 || strchr(valid, val) == NULL)
 			break;
-		buffer.cat(&val, 1);
+		buffer.append(&val, 1);
 		string++;
 	}
 
@@ -876,69 +876,69 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	if (string[0] == '@')
 	{
 		string += 1;
-		return parse_memory_operator(token, buffer);
+		return parse_memory_operator(token, buffer.c_str());
 	}
 
 	// empty string is automatically invalid
-	if (!buffer)
+	if (buffer.empty())
 		throw expression_error(expression_error::INVALID_TOKEN, token.offset());
 
 	// check for wordy variants on standard operators
-	if (buffer == "bnot")
+	if (buffer.compare("bnot")==0)
 		{ token.configure_operator(TVL_NOT, 2); return; }
-	if (buffer == "plus")
+	if (buffer.compare("plus") == 0)
 		{ token.configure_operator(TVL_ADD, 4); return; }
-	if (buffer == "minus")
+	if (buffer.compare("minus") == 0)
 		{ token.configure_operator(TVL_SUBTRACT, 4); return; }
-	if (buffer == "times" || buffer == "mul")
+	if (buffer.compare("times") == 0 || buffer.compare("mul") == 0)
 		{ token.configure_operator(TVL_MULTIPLY, 3); return; }
-	if (buffer == "div")
+	if (buffer.compare("div") == 0)
 		{ token.configure_operator(TVL_DIVIDE, 3); return; }
-	if (buffer == "mod")
+	if (buffer.compare("mod") == 0)
 		{ token.configure_operator(TVL_MODULO, 3); return; }
-	if (buffer == "lt")
+	if (buffer.compare("lt") == 0)
 		{ token.configure_operator(TVL_LESS, 6); return; }
-	if (buffer == "le")
+	if (buffer.compare("le") == 0)
 		{ token.configure_operator(TVL_LESSOREQUAL, 6); return; }
-	if (buffer == "gt")
+	if (buffer.compare("gt") == 0)
 		{ token.configure_operator(TVL_GREATER, 6); return; }
-	if (buffer == "ge")
+	if (buffer.compare("ge") == 0)
 		{ token.configure_operator(TVL_GREATEROREQUAL, 6); return; }
-	if (buffer == "eq")
+	if (buffer.compare("eq") == 0)
 		{ token.configure_operator(TVL_EQUAL, 7); return; }
-	if (buffer == "ne")
+	if (buffer.compare("ne") == 0)
 		{ token.configure_operator(TVL_NOTEQUAL, 7); return; }
-	if (buffer == "not")
+	if (buffer.compare("not") == 0)
 		{ token.configure_operator(TVL_COMPLEMENT, 2); return; }
-	if (buffer == "and")
+	if (buffer.compare("and") == 0)
 		{ token.configure_operator(TVL_LAND, 8); return; }
-	if (buffer == "band")
+	if (buffer.compare("band") == 0)
 		{ token.configure_operator(TVL_BAND, 8); return; }
-	if (buffer == "or")
+	if (buffer.compare("or") == 0)
 		{ token.configure_operator(TVL_LOR, 12); return; }
-	if (buffer == "bor")
+	if (buffer.compare("bor") == 0)
 		{ token.configure_operator(TVL_BOR, 10); return; }
-	if (buffer == "bxor")
+	if (buffer.compare("bxor") == 0)
 		{ token.configure_operator(TVL_BXOR, 9); return; }
-	if (buffer == "lshift")
+	if (buffer.compare("lshift") == 0)
 		{ token.configure_operator(TVL_LSHIFT, 5); return; }
-	if (buffer == "rshift")
+	if (buffer.compare("rshift") == 0)
 		{ token.configure_operator(TVL_RSHIFT, 5); return; }
 
 	// if we have an 0x prefix, we must be a hex value
 	if (buffer[0] == '0' && buffer[1] == 'x')
-		return parse_number(token, buffer.cstr() + 2, 16, expression_error::INVALID_NUMBER);
+		return parse_number(token, buffer.c_str() + 2, 16, expression_error::INVALID_NUMBER);
 
 	// if we have a # prefix, we must be a decimal value
 	if (buffer[0] == '#')
-		return parse_number(token, buffer.cstr() + 1, 10, expression_error::INVALID_NUMBER);
+		return parse_number(token, buffer.c_str() + 1, 10, expression_error::INVALID_NUMBER);
 
 	// if we have a $ prefix, we are a hex value
 	if (buffer[0] == '$')
-		return parse_number(token, buffer.cstr() + 1, 16, expression_error::INVALID_NUMBER);
+		return parse_number(token, buffer.c_str() + 1, 16, expression_error::INVALID_NUMBER);
 
 	// check for a symbol match
-	symbol_entry *symbol = m_symtable->find_deep(buffer);
+	symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
 	if (symbol != NULL)
 	{
 		token.configure_symbol(*symbol);
@@ -953,7 +953,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	}
 
 	// attempt to parse as a number in the default base
-	parse_number(token, buffer, DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
+	parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
 }
 
 
@@ -1033,7 +1033,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 {
 	// accumulate a copy of the quoted string
 	string++;
-	astring buffer;
+	std::string buffer;
 	while (string[0] != 0)
 	{
 		// allow "" to mean a nested double-quote
@@ -1043,7 +1043,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 				break;
 			string++;
 		}
-		buffer.cat(string++, 1);
+		buffer.append(string++, 1);
 	}
 
 	// if we didn't find the ending quote, report an error
@@ -1052,7 +1052,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 	string++;
 
 	// make the token
-	token.configure_string(m_stringlist.append(*global_alloc(expression_string(buffer))));
+	token.configure_string(m_stringlist.append(*global_alloc(expression_string(buffer.c_str()))));
 }
 
 

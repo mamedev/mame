@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, Curt Coder
 #pragma once
 
 #ifndef __MPF1__
@@ -59,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_irq );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
 	DECLARE_DIRECT_UPDATE_MEMBER(mpf1_direct_update_handler);
 
 	int m_break;

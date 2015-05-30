@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*************************************************************************
 
     Bishi Bashi Champ Mini Game Senshuken
@@ -55,6 +57,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	K056832_CB_MEMBER(tile_callback);
 };

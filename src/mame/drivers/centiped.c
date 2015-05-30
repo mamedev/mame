@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
     Atari Centipede hardware
@@ -619,7 +621,7 @@ WRITE8_MEMBER(centiped_state::led_w)
 }
 
 
-READ8_MEMBER(centiped_state::caterplr_rand_r)
+READ8_MEMBER(centiped_state::caterplr_unknown_r)
 {
 	return machine().rand() % 0xff;
 }
@@ -712,7 +714,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( caterplr_map, AS_PROGRAM, 8, centiped_state )
 	AM_IMPORT_FROM(centiped_base_map)
-	AM_RANGE(0x1780, 0x1780) AM_READ(caterplr_rand_r)
+	AM_RANGE(0x1780, 0x1780) AM_READ(caterplr_unknown_r)
 	AM_RANGE(0x1000, 0x100f) AM_READWRITE(caterplr_AY8910_r, caterplr_AY8910_w)
 ADDRESS_MAP_END
 
@@ -1743,7 +1745,7 @@ static MACHINE_CONFIG_DERIVED( centipdb, centiped )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("pokey", AY8910, 12096000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(centiped_state, caterplr_rand_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(centiped_state, caterplr_unknown_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -1759,7 +1761,7 @@ static MACHINE_CONFIG_DERIVED( magworm, centiped_base )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("pokey", AY8910, 12096000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(centiped_state, caterplr_rand_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(centiped_state, caterplr_unknown_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 MACHINE_CONFIG_END

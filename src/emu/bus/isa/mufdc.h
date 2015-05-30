@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Multi Unique FDC
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     8-bit floppy controller, supports 4 drives with 360k, 720k,
     1.2MB or 1.44MB. It was sold under a few different names:

@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /**********************************************************************
 
     Sega Master System "Graphic Board" emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 I/O 3f write | this method
         0x20 | 0x7f
@@ -77,7 +76,7 @@ ioport_constructor sms_graphic_device::device_input_ports() const
 //-------------------------------------------------
 
 sms_graphic_device::sms_graphic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SMS_GRAPHIC, "Graphic Board", tag, owner, clock, "sms_graphic", __FILE__)
+	: device_t(mconfig, SMS_GRAPHIC, "Sega SMS Graphic Board", tag, owner, clock, "sms_graphic", __FILE__)
 	, device_sms_control_port_interface(mconfig, *this)
 	, m_buttons(*this, "BUTTONS")
 	, m_x(*this, "X")

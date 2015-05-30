@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* mpu4 sets which have been split, and appear to do something useful
 
   I'm trying to keep this file to official Barcrest / BwB rebuilds on mod4 hw
@@ -25,7 +27,7 @@ INPUT_PORTS_EXTERN( grtecp );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 
 DRIVER_INIT_MEMBER(mpu4_state,m4debug)
 {

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /*********************************************************************
 
     ui/filemngr.c
@@ -6,14 +8,8 @@
 
     TODO
         - Restrict directory listing by file extension
-        - Support file manager invocation from the main menu for
-          required images
 
 *********************************************************************/
-
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
 
 #include "emu.h"
 #include "ui/ui.h"
@@ -36,9 +32,11 @@ ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_cont
 	// This warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
 	if (warnings)
-		m_warnings.cpy(warnings);
+		m_warnings.assign(warnings);
 	else
-		m_warnings.reset();
+		m_warnings.clear();
+
+	m_curr_selected = FALSE;
 }
 
 
@@ -66,36 +64,36 @@ void ui_menu_file_manager::custom_render(void *selectedref, float top, float bot
 }
 
 
-void ui_menu_file_manager::fill_image_line(device_image_interface *img, astring &instance, astring &filename)
+void ui_menu_file_manager::fill_image_line(device_image_interface *img, std::string &instance, std::string &filename)
 {
 	// get the image type/id
-	instance.printf("%s (%s)", img->instance_name(), img->brief_instance_name());
-	
+	strprintf(instance,"%s (%s)", img->instance_name(), img->brief_instance_name());
+
 	// get the base name
 	if (img->basename() != NULL)
 	{
-		filename.cpy(img->basename());
-		
+		filename.assign(img->basename());
+
 		// if the image has been loaded through softlist, also show the loaded part
 		if (img->part_entry() != NULL)
 		{
 			const software_part *tmp = img->part_entry();
 			if (tmp->name() != NULL)
 			{
-				filename.cat(" (");
-				filename.cat(tmp->name());
+				filename.append(" (");
+				filename.append(tmp->name());
 				// also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.), and in case display it
 				if (img->get_feature("part_id") != NULL)
 				{
-					filename.cat(": ");
-					filename.cat(img->get_feature("part_id"));
+					filename.append(": ");
+					filename.append(img->get_feature("part_id"));
 				}
-				filename.cat(")");
+				filename.append(")");
 			}
 		}
 	}
 	else
-		filename.cpy("---");
+		filename.assign("---");
 }
 
 //-------------------------------------------------
@@ -104,16 +102,16 @@ void ui_menu_file_manager::fill_image_line(device_image_interface *img, astring 
 
 void ui_menu_file_manager::populate()
 {
-	astring buffer, tmp_inst, tmp_name;
+	std::string buffer, tmp_inst, tmp_name;
 	bool first_entry = true;
-	astring prev_owner;
+	std::string prev_owner;
 
-	if (m_warnings)
+	if (!m_warnings.empty())
 	{
-		item_append(m_warnings, NULL, MENU_FLAG_DISABLE, NULL);
+		item_append(m_warnings.c_str(), NULL, MENU_FLAG_DISABLE, NULL);
 		item_append("", NULL, MENU_FLAG_DISABLE, NULL);
 	}
-		
+
 	// cycle through all devices for this system
 	device_iterator iter(machine().root_device());
 	tagmap_t<UINT8> devtags;
@@ -126,7 +124,7 @@ void ui_menu_file_manager::populate()
 		// check whether it owns an image interface
 		image_interface_iterator subiter(*dev);
 		if (subiter.count() > 0)
-		{			
+		{
 			// if so, cycle through all its image interfaces
 			image_interface_iterator subiter(*dev);
 			for (device_image_interface *scan = subiter.first(); scan != NULL; scan = subiter.next())
@@ -142,13 +140,13 @@ void ui_menu_file_manager::populate()
 								first_entry = false;
 							else
 								item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-							buffer.printf("[root%s]", dev->tag());
-							item_append(buffer, NULL, 0, NULL);
+							strprintf(buffer, "[root%s]", dev->tag());
+							item_append(buffer.c_str(), NULL, 0, NULL);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
 						fill_image_line(scan, tmp_inst, tmp_name);
-						item_append(tmp_inst, tmp_name, 0, (void *) scan);
+						item_append(tmp_inst.c_str(), tmp_name.c_str(), 0, (void *)scan);
 					}
 			}
 		}
@@ -171,14 +169,18 @@ void ui_menu_file_manager::handle()
 	if (event != NULL && event->itemref != NULL && event->iptkey == IPT_UI_SELECT)
 	{
 		if ((FPTR)event->itemref == 1)
-			machine().schedule_hard_reset();
+		{
+			if (m_curr_selected)
+				machine().schedule_hard_reset();
+		}
 		else
 		{
 			selected_device = (device_image_interface *) event->itemref;
 			if (selected_device != NULL)
 			{
+				m_curr_selected = TRUE;
 				ui_menu::stack_push(selected_device->get_selection_menu(machine(), container));
-				
+
 				// reset the existing menu
 				reset(UI_MENU_RESET_REMEMBER_POSITION);
 			}
@@ -188,19 +190,19 @@ void ui_menu_file_manager::handle()
 
 // force file manager menu
 void ui_menu_file_manager::force_file_manager(running_machine &machine, render_container *container, const char *warnings)
-{	
+{
 	// reset the menu stack
 	ui_menu::stack_reset(machine);
-	
+
 	// add the quit entry followed by the game select entry
 	ui_menu *quit = auto_alloc_clear(machine, ui_menu_quit_game(machine, container));
 	quit->set_special_main_menu(true);
 	ui_menu::stack_push(quit);
 	ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_file_manager(machine, container, warnings)));
-	
+
 	// force the menus on
 	machine.ui().show_menu();
-	
+
 	// make sure MAME is paused
 	machine.pause();
 }

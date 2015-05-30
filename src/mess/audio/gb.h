@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Anthony Kruize
 #ifndef __GBSOUND_H__
 #define __GBSOUND_H__
 

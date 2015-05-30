@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*******************************************************************************
 
     actfancr - Bryan McPhail, mish@tendril.co.uk
@@ -6,18 +8,6 @@
 
 #include "emu.h"
 #include "includes/actfancr.h"
-
-/******************************************************************************/
-
-void actfancr_state::register_savestate()
-{
-	save_item(NAME(m_flipscreen));
-}
-
-void actfancr_state::video_start()
-{
-	register_savestate();
-}
 
 /******************************************************************************/
 

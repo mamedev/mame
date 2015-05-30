@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
     formats/td0_dsk.c
@@ -13,7 +15,8 @@
  */
 
 #include <string.h>
-#include "emu.h"
+#include <assert.h>
+#include "pool.h"
 #include "flopimg.h"
 
 #define BUFSZ           512     // new input buffer
@@ -93,13 +96,28 @@ struct td0dsk_t
 struct floppy_image_legacy
 {
 	struct io_generic io;
+
+	const struct FloppyFormat *floppy_option;
+	struct FloppyCallbacks format;
+
+	/* loaded track stuff */
+	int loaded_track_head;
+	int loaded_track_index;
+	UINT32 loaded_track_size;
+	void *loaded_track_data;
+	UINT8 loaded_track_status;
+	UINT8 flags;
+
+	/* tagging system */
+	object_pool *tags;
+	void *tag_data;
 };
 
 
 static struct td0dsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	struct td0dsk_tag *tag;
-	tag = (td0dsk_tag *)floppy_tag(floppy);
+	tag = (td0dsk_tag *)floppy_tag((floppy_image_legacy *)floppy);
 	return tag;
 }
 
@@ -833,10 +851,10 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		disk_decode.floppy_file = io;
 		disk_decode.init_Decode();
 		disk_decode.floppy_file_offset = 12;
-		disk_decode.Decode(imagebuf, max_size);
+		disk_decode.Decode(&imagebuf[0], max_size);
 	}
 	else
-		io_generic_read(io, imagebuf, 12, io_generic_size(io));
+		io_generic_read(io, &imagebuf[0], 12, io_generic_size(io));
 
 	if(header[7] & 0x80)
 		offset = 10 + imagebuf[2] + (imagebuf[3] << 8);

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef _NAOMIG1_H_
 #define _NAOMIG1_H_
 

@@ -1,15 +1,32 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 #pragma once
 
 #ifndef __C352_H__
 #define __C352_H__
 
 //**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+enum
+{
+	C352_DIVIDER_228 = 0,
+	C352_DIVIDER_288 = 1,
+	C352_DIVIDER_332 = 2
+};
+
+//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_C352_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, C352, _clock)
+#define MCFG_C352_ADD(_tag, _clock, _setting) \
+	MCFG_DEVICE_ADD(_tag, C352, _clock) \
+	MCFG_C352_DIVIDER(_setting)
 
+#define MCFG_C352_DIVIDER(_setting) \
+	c352_device::static_set_divider(*device, _setting);
+	
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -24,6 +41,9 @@ public:
 	// construction/destruction
 	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// inline configuration helpers
+	static void static_set_divider(device_t &device, int setting);
+	
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
@@ -87,7 +107,8 @@ private:
 
 	c352_ch_t m_c352_ch[32];
 	int m_sample_rate_base;
-
+	int m_divider;
+	
 	long m_channel_l[2048*2];
 	long m_channel_r[2048*2];
 	long m_channel_l2[2048*2];

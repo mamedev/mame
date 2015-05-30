@@ -1,12 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer,R. Belmont
 /*
  * 3c505.c - 3COM 3C505 ethernet controller (for Apollo DN3x00)
  *
  *  Created on: August 27, 2010
  *      Author: Hans Ostermeyer
  *      ISA conversion by R. Belmont
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  *  see also:
  *  - http://lxr.free-electrons.com/source/drivers/net/3c505.h
@@ -435,14 +434,14 @@ void threecom3c505_device::data_buffer::reset()
 
 void threecom3c505_device::data_buffer::copy(data_buffer *db) const
 {
-	db->m_data.resize(m_data.count());
+	db->m_data.resize(m_data.size());
 	db->m_length = m_length;
-	memcpy(db->m_data, m_data, m_data.count());
+	memcpy(&db->m_data[0], &m_data[0], m_data.size());
 }
 
 int threecom3c505_device::data_buffer::append(UINT8 data)
 {
-	if (m_length >= m_data.count())
+	if (m_length >= m_data.size())
 	{
 		return 0;
 	}
@@ -532,7 +531,7 @@ int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[], const int le
 	}
 	else
 	{
-		memcpy(m_db[m_put_index]->m_data, data, length);
+		memcpy(&m_db[m_put_index]->m_data[0], data, length);
 		m_db[m_put_index]->m_length = length;
 		m_put_index = next_index;
 		m_count++;

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Nicola Salmoria
 class buggychl_mcu_device : public device_t
 {
 public:

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
     Apple Macintosh original/512/Plus keyboard
     Emulation by R. Belmont

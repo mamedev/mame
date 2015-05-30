@@ -6,6 +6,9 @@
 //
 //============================================================
 
+#ifndef __WINDOWS_WINMAIN_H__
+#define __WINDOWS_WINMAIN_H__
+
 #include "clifront.h"
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
@@ -15,23 +18,15 @@
 //  CONSTANTS
 //============================================================
 
-// debugging options
-#define WINOPTION_DEBUGGER_FONT         "debugger_font"
-#define WINOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
-
 // performance options
 #define WINOPTION_PRIORITY              "priority"
 #define WINOPTION_PROFILE               "profile"
 
 // video options
-#define WINOPTION_PRESCALE              "prescale"
 #define WINOPTION_MENU                  "menu"
 
 // DirectDraw-specific options
 #define WINOPTION_HWSTRETCH             "hwstretch"
-
-// Direct3D-specific options
-#define WINOPTION_FILTER                "filter"
 
 // core post-processing options
 #define WINOPTION_HLSL_ENABLE               "hlsl_enable"
@@ -48,8 +43,12 @@
 #define WINOPTION_SHADOW_MASK_COUNT_Y       "shadow_mask_y_count"
 #define WINOPTION_SHADOW_MASK_USIZE         "shadow_mask_usize"
 #define WINOPTION_SHADOW_MASK_VSIZE         "shadow_mask_vsize"
-#define WINOPTION_PINCUSHION                "pincushion"
+#define WINOPTION_SHADOW_MASK_UOFFSET       "shadow_mask_uoffset"
+#define WINOPTION_SHADOW_MASK_VOFFSET       "shadow_mask_voffset"
+#define WINOPTION_REFLECTION                "reflection"
 #define WINOPTION_CURVATURE                 "curvature"
+#define WINOPTION_ROUND_CORNER              "round_corner"
+#define WINOPTION_VIGNETTING                "vignetting"
 #define WINOPTION_SCANLINE_AMOUNT           "scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE            "scanline_size"
 #define WINOPTION_SCANLINE_HEIGHT           "scanline_height"
@@ -120,23 +119,15 @@ public:
 	// construction/destruction
 	windows_options();
 
-	// debugging options
-	const char *debugger_font() const { return value(WINOPTION_DEBUGGER_FONT); }
-	float debugger_font_size() const { return float_value(WINOPTION_DEBUGGER_FONT_SIZE); }
-
 	// performance options
 	int priority() const { return int_value(WINOPTION_PRIORITY); }
 	int profile() const { return int_value(WINOPTION_PROFILE); }
 
 	// video options
-	int prescale() const { return int_value(WINOPTION_PRESCALE); }
 	bool menu() const { return bool_value(WINOPTION_MENU); }
 
 	// DirectDraw-specific options
 	bool hwstretch() const { return bool_value(WINOPTION_HWSTRETCH); }
-
-	// Direct3D-specific options
-	bool filter() const { return bool_value(WINOPTION_FILTER); }
 
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
@@ -153,14 +144,18 @@ public:
 	int screen_shadow_mask_count_y() const { return int_value(WINOPTION_SHADOW_MASK_COUNT_Y); }
 	float screen_shadow_mask_u_size() const { return float_value(WINOPTION_SHADOW_MASK_USIZE); }
 	float screen_shadow_mask_v_size() const { return float_value(WINOPTION_SHADOW_MASK_VSIZE); }
+	float screen_shadow_mask_u_offset() const { return float_value(WINOPTION_SHADOW_MASK_UOFFSET); }
+	float screen_shadow_mask_v_offset() const { return float_value(WINOPTION_SHADOW_MASK_VOFFSET); }
 	float screen_scanline_amount() const { return float_value(WINOPTION_SCANLINE_AMOUNT); }
 	float screen_scanline_scale() const { return float_value(WINOPTION_SCANLINE_SCALE); }
 	float screen_scanline_height() const { return float_value(WINOPTION_SCANLINE_HEIGHT); }
 	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
 	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
-	float screen_pincushion() const { return float_value(WINOPTION_PINCUSHION); }
+	float screen_reflection() const { return float_value(WINOPTION_REFLECTION); }
 	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
+	float screen_round_corner() const { return float_value(WINOPTION_ROUND_CORNER); }
+	float screen_vignetting() const { return float_value(WINOPTION_VIGNETTING); }
 	const char *screen_defocus() const { return value(WINOPTION_DEFOCUS); }
 	const char *screen_converge_x() const { return value(WINOPTION_CONVERGE_X); }
 	const char *screen_converge_y() const { return value(WINOPTION_CONVERGE_Y); }
@@ -252,14 +247,7 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
-	// font overridables
-	virtual osd_font *font_open(const char *name, int &height);
-	virtual void font_close(osd_font *font);
-	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
-
 	virtual void video_register();
-	virtual void sound_register();
-	virtual void debugger_register();
 
 	virtual bool video_init();
 	virtual bool window_init();
@@ -267,20 +255,19 @@ public:
 	virtual void input_pause();
 	virtual void input_resume();
 	virtual bool output_init();
-	#ifdef USE_NETWORK
-	virtual bool network_init();
-	#endif
 
 	virtual void video_exit();
 	virtual void window_exit();
 	virtual void input_exit();
 	virtual void output_exit();
-	#ifdef USE_NETWORK
-	virtual void network_exit();
-	#endif
+
+	void extract_video_config();
+
+	windows_options &options() { return m_options; }
 
 private:
 	void osd_exit();
+	windows_options &m_options;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };
@@ -305,3 +292,5 @@ extern int osd_num_processors;
 // use this to ping the watchdog
 void winmain_watchdog_ping(void);
 void winmain_dump_stack();
+
+#endif

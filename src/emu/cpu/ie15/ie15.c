@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 #include "emu.h"
 #include "debugger.h"
 #include "ie15.h"
@@ -62,9 +64,9 @@ void ie15_device::device_start()
 	state_add(STATE_GENFLAGS,"GENFLAGS", m_flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
 	state_add(IE15_A,        "A",        m_A);
 
-	astring tempstring;
+	std::string tempstring;
 	for (int ireg = 0; ireg < 32; ireg++)
-		state_add(IE15_R0 + ireg, tempstring.format("R%d", ireg), m_REGS[ireg]);
+		state_add(IE15_R0 + ireg, strformat(tempstring, "R%d", ireg).c_str(), m_REGS[ireg]);
 }
 
 //-------------------------------------------------
@@ -131,12 +133,12 @@ void ie15_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void ie15_device::state_string_export(const device_state_entry &entry, astring &string)
+void ie15_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c",
+			strprintf(str, "%c%c%c",
 				m_CF ? 'C':'.',
 				m_ZF ? 'Z':'.',
 				m_RF ? 'R':'.');

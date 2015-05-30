@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_SN74LS629.c
  *
@@ -76,9 +78,9 @@ NETLIB_UPDATE(SN74LS629clk)
 
 NETLIB_START(SN74LS629)
 {
-	register_sub(m_clock, "OSC");
-	register_sub(m_R_FC,  "R_FC");
-	register_sub(m_R_RNG,  "R_RNG");
+	register_sub("OSC", m_clock);
+	register_sub("R_FC", m_R_FC);
+	register_sub("R_RNG", m_R_RNG);
 
 	register_input("ENQ", m_ENQ);
 	register_input("RNG",    m_RNG);
@@ -139,11 +141,11 @@ NETLIB_UPDATE(SN74LS629)
 		freq += k9 * v_rng * v_freq_3;
 		freq += k10 * v_rng * v_freq_4;
 
-		freq *= 0.1e-6 / m_CAP.Value();
+		freq *= NL_FCONST(0.1e-6) / m_CAP.Value();
 
 		// FIXME: we need a possibility to remove entries from queue ...
 		//        or an exact model ...
-		m_clock.m_inc = netlist_time::from_double(0.5 / freq);
+		m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
 		//m_clock.update();
 
 		NL_VERBOSE_OUT(("%s %f %f %f\n", name().cstr(), v_freq, v_rng, freq));
@@ -173,8 +175,8 @@ NETLIB_UPDATE_PARAM(SN74LS629)
 
 NETLIB_START(SN74LS629_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
 
 	register_subalias("1",  m_2.m_FC);
 	register_subalias("2",  m_1.m_FC);

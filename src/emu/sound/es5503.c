@@ -1,15 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
 
   ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.1
   By R. Belmont.
 
   Copyright R. Belmont.
-
-  This software is dual-licensed: it may be used in MAME and properly licensed
-  MAME derivatives under the terms of the MAME license.  For use outside of
-  MAME and properly licensed derivatives, it is available under the
-  terms of the GNU Lesser General Public License (LGPL), version 2.1.
-  You may read the LGPL at http://www.gnu.org/licenses/lgpl.html
 
   History: the ES5503 was the next design after the famous C64 "SID" by Bob Yannes.
   It powered the legendary Mirage sampler (the first affordable pro sampler) as well

@@ -1,13 +1,10 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:smf
 /***************************************************************************
 
     atahle.h
 
     ATA Device HLE
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -125,6 +122,7 @@ protected:
 		IDE_COMMAND_WRITE_DMA = 0xca,
 		IDE_COMMAND_IDLE_IMMEDIATE = 0xe1,
 		IDE_COMMAND_IDLE = 0xe3,
+		IDE_COMMAND_CACHE_FLUSH = 0xe7,
 		IDE_COMMAND_IDENTIFY_DEVICE = 0xec,
 		IDE_COMMAND_SET_FEATURES = 0xef,
 		IDE_COMMAND_SECURITY_UNLOCK = 0xf2,

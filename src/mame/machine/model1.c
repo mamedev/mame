@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
 ** Model 1 coprocessor TGP simulation
 */
@@ -40,7 +42,7 @@ void model1_state::fifoout_push_f(float data)
 {
 	m_puuu = 1;
 
-	logerror("TGP: Push %f\n", data);
+	logerror("TGP: Push %f\n", (double) data);
 	fifoout_push(f2u(data));
 }
 
@@ -277,7 +279,7 @@ TGP_FUNCTION( model1_state::normalize )
 	float a = fifoin_pop_f();
 	float b = fifoin_pop_f();
 	float c = fifoin_pop_f();
-	float n = (a*a+b*b+c*c) / sqrt(a*a+b*b+c*c);
+	float n = (a*a+b*b+c*c) / sqrtf(a*a+b*b+c*c);
 	logerror("TGP normalize %f, %f, %f (%x)\n", a, b, c, m_pushpc);
 	fifoout_push_f(a/n);
 	fifoout_push_f(b/n);
@@ -566,7 +568,7 @@ TGP_FUNCTION( model1_state::distance3 )
 	a -= d;
 	b -= e;
 	c -= f;
-	fifoout_push_f((a*a+b*b+c*c)/sqrt(a*a+b*b+c*c));
+	fifoout_push_f((a*a+b*b+c*c)/sqrtf(a*a+b*b+c*c));
 	next_fn();
 }
 
@@ -665,7 +667,7 @@ TGP_FUNCTION( model1_state::xyz2rqf )
 	(void)b;
 	(void)c;
 	logerror("TGP xyz2rqf %f, %f, %f (%x)\n", a, b, c, m_pushpc);
-	fifoout_push_f((a*a+b*b+c*c)/sqrt(a*a+b*b+c*c));
+	fifoout_push_f((a*a+b*b+c*c)/sqrtf(a*a+b*b+c*c));
 	norm = sqrt(a*a+c*c);
 	if(!c) {
 		if(a>=0)
@@ -1107,7 +1109,7 @@ TGP_FUNCTION( model1_state::col_testpt )
 	logerror("TGP col_testpt %f, %f (%x)\n", a, b, m_pushpc);
 	x = a - m_tgp_vr_circx;
 	y = b - m_tgp_vr_circy;
-	fifoout_push_f(((x*x+y*y)/sqrt(x*x+y*y)) - m_tgp_vr_circrad);
+	fifoout_push_f(((x*x+y*y)/sqrtf(x*x+y*y)) - m_tgp_vr_circrad);
 	next_fn();
 }
 
@@ -1148,10 +1150,10 @@ TGP_FUNCTION( model1_state::catmull_rom )
 	m2 = m*m;
 	m3 = m*m*m;
 
-	w1 = 0.5*(-m3+2*m2-m);
-	w2 = 0.5*(3*m3-5*m2+2);
-	w3 = 0.5*(-3*m3+4*m2+m);
-	w4 = 0.5*(m3-m2);
+	w1 = 0.5f*(-m3+2*m2-m);
+	w2 = 0.5f*(3*m3-5*m2+2);
+	w3 = 0.5f*(-3*m3+4*m2+m);
+	w4 = 0.5f*(m3-m2);
 
 	fifoout_push_f(a*w1+d*w2+g*w3+j*w4);
 	fifoout_push_f(b*w1+e*w2+h*w3+k*w4);
@@ -1168,7 +1170,7 @@ TGP_FUNCTION( model1_state::distance )
 	logerror("TGP distance (%f, %f), (%f, %f) (%x)\n", a, b, c, d, m_pushpc);
 	c -= a;
 	d -= b;
-	fifoout_push_f((c*c+d*d)/sqrt(c*c+d*d));
+	fifoout_push_f((c*c+d*d)/sqrtf(c*c+d*d));
 	next_fn();
 }
 
@@ -1213,7 +1215,7 @@ TGP_FUNCTION( model1_state::cpa )
 	dv_y = (f-e) - (h-g);
 	dv_z = (j-i) - (l-k);
 	dv2 = dv_x*dv_x + dv_y*dv_y + dv_z*dv_z;
-	if(dv2 < 0.001)
+	if(dv2 < 0.001f)
 		dt = 0;
 	else {
 		dw_x = a-c;
@@ -1223,8 +1225,8 @@ TGP_FUNCTION( model1_state::cpa )
 	}
 	if(dt < 0)
 		dt = 0;
-	else if(dt > 1.0)
-		dt = 1.0;
+	else if(dt > 1.0f)
+		dt = 1.0f;
 
 	dv_x = (a-c)*(1-dt) + (b-d)*dt;
 	dv_y = (e-g)*(1-dt) + (f-h)*dt;

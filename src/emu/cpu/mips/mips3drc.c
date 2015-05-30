@@ -154,21 +154,37 @@ void mips3_device::mips3drc_set_options(UINT32 options)
 	m_drcoptions = options;
 }
 
+/*-------------------------------------------------
+    mips3drc_clears_fastram - clears fastram
+    region starting at index select_start
+-------------------------------------------------*/
+void mips3_device::clear_fastram(UINT32 select_start)
+{
+	for (int i=select_start; i<MIPS3_MAX_FASTRAM; i++) {
+		m_fastram[i].start = 0;
+		m_fastram[i].end = 0;
+		m_fastram[i].readonly = false;
+		m_fastram[i].base = NULL;
+	}
+		m_fastram_select=select_start;
+}
 
 /*-------------------------------------------------
     mips3drc_add_fastram - add a new fastram
     region
 -------------------------------------------------*/
 
-void mips3_device::mips3drc_add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+void mips3_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
 {
-	if (!machine().options().drc()) return;
 	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
 	{
 		m_fastram[m_fastram_select].start = start;
 		m_fastram[m_fastram_select].end = end;
 		m_fastram[m_fastram_select].readonly = readonly;
 		m_fastram[m_fastram_select].base = base;
+		m_fastram[m_fastram_select].offset_base8 = (UINT8*)base - start;
+		m_fastram[m_fastram_select].offset_base16 = (UINT16*)((UINT8*)base - start);
+		m_fastram[m_fastram_select].offset_base32 = (UINT32*)((UINT8*)base - start);
 		m_fastram_select++;
 	}
 }
@@ -1013,7 +1029,7 @@ void mips3_device::generate_update_mode(drcuml_block *block)
     an exception if out
 -------------------------------------------------*/
 
-void mips3_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, parameter param, int allow_exception)
+void mips3_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception)
 {
 	/* check software interrupts if pending */
 	if (compiler->checksoftints)
@@ -2054,15 +2070,15 @@ int mips3_device::generate_special(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x1a:  /* DIV - MIPS I */
-			UML_DIVS(block, I0, I1, R32(RSREG), R32(RTREG));                // divs    i0,i1,<rsreg>,<rtreg>
-			UML_DSEXT(block, LO64, I0, SIZE_DWORD);                                 // dsext   lo,i0,dword
-			UML_DSEXT(block, HI64, I1, SIZE_DWORD);                                 // dsext   hi,i1,dword
+			UML_DIVS(block, I0, I1, R32(RSREG), R32(RTREG));                    // divs    i0,i1,<rsreg>,<rtreg>
+			UML_DSEXT(block, LO64, I0, SIZE_DWORD);                             // dsext   lo,i0,dword
+			UML_DSEXT(block, HI64, I1, SIZE_DWORD);                             // dsext   hi,i1,dword
 			return TRUE;
 
 		case 0x1b:  /* DIVU - MIPS I */
-			UML_DIVU(block, I0, I1, R32(RSREG), R32(RTREG));                // divu    i0,i1,<rsreg>,<rtreg>
-			UML_DSEXT(block, LO64, I0, SIZE_DWORD);                                 // dsext   lo,i0,dword
-			UML_DSEXT(block, HI64, I1, SIZE_DWORD);                                 // dsext   hi,i1,dword
+			UML_DIVU(block, I0, I1, R32(RSREG), R32(RTREG));                    // divu    i0,i1,<rsreg>,<rtreg>
+			UML_DSEXT(block, LO64, I0, SIZE_DWORD);                             // dsext   lo,i0,dword
+			UML_DSEXT(block, HI64, I1, SIZE_DWORD);                             // dsext   hi,i1,dword
 			return TRUE;
 
 		case 0x1e:  /* DDIV - MIPS III */

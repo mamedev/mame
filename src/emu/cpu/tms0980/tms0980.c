@@ -4,6 +4,11 @@
 
   TMS0980/TMS1000-family MCU cores
 
+  TODO:
+  - emulate TMS1600 L-pins
+  - fix debugger disasm view
+
+
 The TMS0980 and TMS1000-family MCU cores are very similar. The TMS0980 has a
 slightly bigger addressable area and uses 9bit instructions where the TMS1000
 family uses 8bit instruction. The instruction set themselves are very similar
@@ -133,21 +138,28 @@ unknown cycle: CME, SSE, SSS
 // - 20-term output PLA(opla) at the top-left
 // - the ALU is between the opla and mpla
 const device_type TMS1000 = &device_creator<tms1000_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // almost same as tms1000, just supports higher voltage
+const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // high voltage version
+const device_type TMS1040 = &device_creator<tms1040_cpu_device>; // same as TMS1070 with just a different pinout?
 const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 // TMS1270 has 10 O pins, how does that work?
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
 const device_type TMS1100 = &device_creator<tms1100_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1170 = &device_creator<tms1170_cpu_device>; // almost same as tms1100, just supports higher voltage
+const device_type TMS1170 = &device_creator<tms1170_cpu_device>; // high voltage version
 const device_type TMS1300 = &device_creator<tms1300_cpu_device>; // 40-pin DIP, 16 R pins
-const device_type TMS1370 = &device_creator<tms1370_cpu_device>; // almost same as tms1300, just supports higher voltage
+const device_type TMS1370 = &device_creator<tms1370_cpu_device>; // high voltage version
 
 // TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pages), and adds a 3-level callstack
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
 // - the opla size is increased from 20 to 32 terms
-const device_type TMS1400 = &device_creator<tms1400_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1470 = &device_creator<tms1470_cpu_device>; // almost same as tms1400, just supports higher voltage
+const device_type TMS1400 = &device_creator<tms1400_cpu_device>; // 28-pin DIP, 11 R pins (TMS1400CR is same, but with TMS1100 pinout)
+const device_type TMS1470 = &device_creator<tms1470_cpu_device>; // high voltage version, 1 R pin removed for Vdd
+
+// TMS1600 adds more I/O to the TMS1400, input pins are doubled with added L1,2,4,8
+// - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
+// - the opla size is increased from 20 to 32 terms
+const device_type TMS1600 = &device_creator<tms1600_cpu_device>; // 40-pin DIP, 16 R pins
+const device_type TMS1670 = &device_creator<tms1670_cpu_device>; // high voltage version
 
 // TMS0980
 // - 64x9bit RAM array at the bottom-left (set up as 144x4)
@@ -162,7 +174,8 @@ const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 
 // - main instructions PLA at the top half, to the right of the midline
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
 // - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
-const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins
+const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
+const device_type TMS1990 = &device_creator<tms1990_cpu_device>; // 28-pin DIP, ? R pins..
 // TMS0950 is same?
 
 // TMS0270 on the other hand, is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
@@ -217,6 +230,10 @@ tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char
 	: tms1000_cpu_device(mconfig, TMS1070, "TMS1070", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1070", __FILE__)
 { }
 
+tms1040_cpu_device::tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1000_cpu_device(mconfig, TMS1040, "TMS1040", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1040", __FILE__)
+{ }
+
 tms1200_cpu_device::tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1000_cpu_device(mconfig, TMS1200, "TMS1200", tag, owner, clock, 8, 13, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1200", __FILE__)
 { }
@@ -256,12 +273,29 @@ tms1470_cpu_device::tms1470_cpu_device(const machine_config &mconfig, const char
 { }
 
 
+tms1600_cpu_device::tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1400_cpu_device(mconfig, TMS1600, "TMS1600", tag, owner, clock, 8, 16, 6, 8, 3, 12, ADDRESS_MAP_NAME(program_12bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1600", __FILE__)
+{ }
+
+tms1600_cpu_device::tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	: tms1400_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{ }
+
+tms1670_cpu_device::tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1600_cpu_device(mconfig, TMS1670, "TMS1670", tag, owner, clock, 8, 16, 6, 8, 3, 12, ADDRESS_MAP_NAME(program_12bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1670", __FILE__)
+{ }
+
+
 tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1000_cpu_device(mconfig, TMS0970, "TMS0970", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms0970", __FILE__)
 { }
 
 tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{ }
+
+tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms0970_cpu_device(mconfig, TMS1990, "TMS1990", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1990", __FILE__)
 { }
 
 
@@ -387,12 +421,12 @@ offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 	return CPU_DISASSEMBLE_NAME(tms0980)(this, buffer, pc, oprom, opram, options);
 }
 
-void tms1xxx_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms1xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			string.printf("%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
+			strprintf(str, "%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
 			break;
 	}
 }
@@ -588,8 +622,10 @@ void tms1000_cpu_device::device_reset()
 	tms1xxx_cpu_device::device_reset();
 
 	// pre-decode instructionset
-	m_fixed_decode.resize_and_clear(0x100);
-	m_micro_decode.resize_and_clear(0x100);
+	m_fixed_decode.resize(0x100);
+	memset(&m_fixed_decode[0], 0, 0x100*sizeof(UINT32));
+	m_micro_decode.resize(0x100);
+	memset(&m_micro_decode[0], 0, 0x100*sizeof(UINT32));
 
 	for (int op = 0; op < 0x100; op++)
 	{
@@ -638,7 +674,6 @@ void tms1400_cpu_device::device_reset()
 	tms1100_cpu_device::device_reset();
 
 	// small differences in 00-3f area
-	m_fixed_decode[0x09] = F_COMX;
 	m_fixed_decode[0x0b] = F_TPC;
 }
 
@@ -649,8 +684,10 @@ void tms0970_cpu_device::device_reset()
 	tms1xxx_cpu_device::device_reset();
 
 	// pre-decode instructionset
-	m_fixed_decode.resize_and_clear(0x100);
-	m_micro_decode.resize_and_clear(0x100);
+	m_fixed_decode.resize(0x100);
+	memset(&m_fixed_decode[0], 0, 0x100*sizeof(UINT32));
+	m_micro_decode.resize(0x100);
+	memset(&m_micro_decode[0], 0, 0x100*sizeof(UINT32));
 
 	for (int op = 0; op < 0x100; op++)
 	{
@@ -713,8 +750,10 @@ void tms0980_cpu_device::device_reset()
 	tms1xxx_cpu_device::device_reset();
 
 	// pre-decode instructionset
-	m_fixed_decode.resize_and_clear(0x200);
-	m_micro_decode.resize_and_clear(0x200);
+	m_fixed_decode.resize(0x200);
+	memset(&m_fixed_decode[0], 0, 0x200*sizeof(UINT32));
+	m_micro_decode.resize(0x200);
+	memset(&m_micro_decode[0], 0, 0x200*sizeof(UINT32));
 
 	for (int op = 0; op < 0x200; op++)
 	{
@@ -737,7 +776,8 @@ void tms0980_cpu_device::device_reset()
 
 	// like on TMS0970, one of the terms directly select a microinstruction index (via R4-R8),
 	// but it can't be pre-determined when it's active
-	m_micro_direct.resize_and_clear(0x40);
+	m_micro_direct.resize(0x40);
+	memset(&m_micro_decode[0], 0, 0x40*sizeof(UINT32));
 
 	for (int op = 0; op < 0x40; op++)
 		m_micro_direct[op] = decode_micro(op);
@@ -822,7 +862,7 @@ void tms0270_cpu_device::read_opcode()
 void tms1xxx_cpu_device::write_o_output(UINT8 index)
 {
 	// a hardcoded table is supported if the output pla is unknown
-	m_o = (c_output_pla == NULL) ? m_opla->read(index) : c_output_pla[index];
+	m_o = (m_output_pla_table == NULL) ? m_opla->read(index) : m_output_pla_table[index];
 	m_write_o(0, m_o & m_o_mask, 0xffff);
 }
 
@@ -1038,7 +1078,7 @@ void tms1400_cpu_device::op_call()
 
 		m_ps = m_ps << 4 | m_pa;
 		m_pa = m_pb;
-		
+
 		m_cs = m_cs << 2 | m_ca;
 		m_ca = m_cb;
 	}
@@ -1058,10 +1098,10 @@ void tms1400_cpu_device::op_retn()
 
 		m_pc = m_sr & m_pc_mask;
 		m_sr >>= m_pc_bits;
-		
+
 		m_pa = m_pb = m_ps & 0xf;
 		m_ps >>= 4;
-		
+
 		m_ca = m_cb = m_cs & 3;
 		m_cs >>= 2;
 	}

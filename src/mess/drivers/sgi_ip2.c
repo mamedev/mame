@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /****************************************************************************
 
     drivers/sgi_ip2.c

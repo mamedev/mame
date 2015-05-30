@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Bryan McPhail
 #include "emu.h"
 #include "includes/pktgaldx.h"
 

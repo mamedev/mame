@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
    Super Burger Time Video emulation - Bryan McPhail, mish@tendril.co.uk

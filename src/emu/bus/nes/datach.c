@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Bandai Datach PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate the Bandai Datach Joint ROM System [mapper 157].
@@ -144,7 +143,7 @@ bool nes_datach_slot_device::call_softlist_load(software_list_device &swlist, co
 	return TRUE;
 }
 
-void nes_datach_slot_device::get_default_card_software(astring &result)
+void nes_datach_slot_device::get_default_card_software(std::string &result)
 {
 	// any way to detect the game with X24C01?
 	software_get_default_slot(result, "datach_rom");

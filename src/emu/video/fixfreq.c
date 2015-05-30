@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /***************************************************************************
 
     fixfreq.h
@@ -45,7 +47,8 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type ty
 		m_vsync(492),
 		m_vbackporch(525),
 		m_fieldcount(2),
-		m_sync_threshold(0.3)
+		m_sync_threshold(0.3),
+		m_gain(1.0 / 3.7)
 {
 }
 
@@ -63,7 +66,8 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *ta
 		m_vsync(492),
 		m_vbackporch(525),
 		m_fieldcount(2),
-		m_sync_threshold(0.3)
+		m_sync_threshold(0.3),
+		m_gain(1.0 / 3.7)
 {
 }
 
@@ -247,21 +251,16 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 		rgb_t col;
 
 		if (m_vid < m_sync_threshold)
+			// Mark sync areas
 			col = rgb_t(255, 0, 0);
 		else
 		{
-			int colv = (int) ((m_vid - m_sync_threshold) / 3.7 * 255.0);
+			int colv = (int) ((m_vid - m_sync_threshold) * m_gain * 255.0);
 			if (colv > 255)
 				colv = 255;
 			col = rgb_t(colv, colv, colv);
 		}
 
-		while (0 && pixels >= m_htotal)
-		{
-			bm->plot_box(m_last_x, m_last_y + m_sig_field * has_fields, m_htotal - 1 - m_last_x, 1, col);
-			pixels -= m_htotal;
-			m_last_x = 0;
-		}
 		bm->plot_box(m_last_x, m_last_y + m_sig_field * has_fields, pixels - m_last_x, 1, col);
 		m_last_x = pixels;
 	}
@@ -272,6 +271,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 	if (sync & 2)
 	{
 		VERBOSE_OUT(("HSYNC up %d\n", pixels));
+		//if (m_last_y == 27) printf("HSYNC up %d %d\n", m_last_y, pixels);
 	}
 	if (sync & 4)
 	{
@@ -280,14 +280,15 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 
 	if (sync & 1)
 	{
-		m_last_y = m_vbackporch - m_vsync; // 6; // FIXME: needed for pong - need to be able to adjust screen parameters
+		m_last_y = m_vbackporch - m_vsync;
 		// toggle bitmap
 		m_cur_bm ^= 1;
 		update_screen_parameters(time - m_last_vsync_time);
 		m_last_vsync_time = time;
 	}
 
-	if ((sync & 2) && !m_sig_vsync)
+	// FIXME: pixels > 50 filters some spurious hysnc on line 27 in breakout
+	if ((sync & 2) && !m_sig_vsync && (pixels > 100))
 	{
 		m_last_y += m_fieldcount;
 		m_last_x = 0;

@@ -1,10 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /*********************************************************************
 
     konami.c
 
     Portable Konami cpu emulator
-
-    Copyright Nicola Salmoria and the MAME Team
 
     Based on M6809 cpu core copyright John Butler
 

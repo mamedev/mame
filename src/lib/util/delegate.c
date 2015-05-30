@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "osdcomm.h"
 #include "delegate.h"
 

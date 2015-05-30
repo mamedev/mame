@@ -4,9 +4,6 @@
 
     Intel 80130 iRMX Operating System Processor emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "i80130.h"

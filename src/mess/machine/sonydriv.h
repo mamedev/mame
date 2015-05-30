@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
 /*********************************************************************
 
     sonydriv.h

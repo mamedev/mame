@@ -4,9 +4,6 @@
 
     Commodore 64 Standard 8K/16K cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

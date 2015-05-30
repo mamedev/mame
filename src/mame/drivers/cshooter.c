@@ -1,4 +1,4 @@
-// license:?
+// license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina, Angelo Salese, hap
 /* Cross Shooter (c) 1987 Seibu
 

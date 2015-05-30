@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Philip Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
 /*************************************************************************
 
     Double Dragon & Double Dragon II (but also China Gate)

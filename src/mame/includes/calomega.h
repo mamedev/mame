@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 
@@ -51,7 +53,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	UINT32 screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(calomega);
-	
+
 protected:
 	virtual void video_start();
 
@@ -64,7 +66,7 @@ private:
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	
+
 	optional_ioport m_in0;
 	optional_ioport m_in0_0;
 	optional_ioport m_in0_1;
@@ -72,7 +74,7 @@ private:
 	optional_ioport m_in0_3;
 	optional_ioport m_frq;
 	optional_ioport m_sw2;
-		
+
 	UINT8 m_tx_line;
 	int m_s903_mux_data;
 	int m_s905_mux_data;

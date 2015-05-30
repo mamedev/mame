@@ -1,9 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /*************************************************************************************
 
     AWP Hardware video simulation system
     originally written for AGEMAME by J.Wallace, enhanced by D.Haywood
-
-    M.A.M.E Core Copyright Nicola Salmoria and the MAME Team.
 
     This is a primitive handler for generating reels with multiple symbols visible
     hanging off steppers.c .

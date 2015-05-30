@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Quench
 /***************************************************************************
         Twincobr/Flying Shark/Wardner  game hardware from 1986-1987
         -----------------------------------------------------------
@@ -16,7 +18,6 @@ public:
 		m_spriteram8(*this, "spriteram8"),
 		m_spriteram16(*this, "spriteram16"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_spritegen(*this, "scu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -119,9 +120,7 @@ public:
 	void toaplan0_control_w(int offset, int data);
 	void toaplan0_coin_dsp_w(address_space &space, int offset, int data);
 	void twincobr_driver_savestate();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
 	required_device<toaplan_scu_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;

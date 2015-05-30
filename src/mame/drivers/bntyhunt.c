@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /* Bounty Hunter
 
  PC hardware.. no dumps of the bios roms are currently available

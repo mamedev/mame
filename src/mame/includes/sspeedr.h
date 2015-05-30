@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Stefan Jokisch
 class sspeedr_state : public driver_device
 {
 public:

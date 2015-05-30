@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:JJ Stacino
 /*********************************************************************
 
     formats/hect_dsk.c
@@ -5,6 +7,8 @@
     Hector disk images
 
 *********************************************************************/
+
+#include <assert.h>
 
 #include "formats/hect_dsk.h"
 #include "formats/basicdsk.h"

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __UPD765_F_H__
 #define __UPD765_F_H__
 
@@ -329,8 +331,8 @@ protected:
 
 	emu_timer *poll_timer;
 
-	static astring tts(attotime t);
-	astring ttsn();
+	static std::string tts(attotime t);
+	std::string ttsn();
 
 	enum {
 		C_CONFIGURE,

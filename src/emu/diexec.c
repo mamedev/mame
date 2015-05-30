@@ -547,8 +547,7 @@ void device_execute_interface::interface_post_reset()
 	if (m_vblank_interrupt_screen != NULL)
 	{
 		// get the screen that will trigger the VBLANK
-		astring tempstring;
-		screen_device *screen = downcast<screen_device *>(device().machine().device(device().siblingtag(tempstring,m_vblank_interrupt_screen)));
+		screen_device *screen = downcast<screen_device *>(device().machine().device(device().siblingtag(m_vblank_interrupt_screen).c_str()));
 
 		assert(screen != NULL);
 		screen->register_vblank_callback(vblank_state_delegate(FUNC(device_execute_interface::on_vblank), this));

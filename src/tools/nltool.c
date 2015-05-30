@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /***************************************************************************
 
     nltool.c
@@ -6,22 +8,36 @@
 
 ****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <sstream>
-#include "astring.h"
-#include "corefile.h"
-#include "corestr.h"
-#include "sha1.h"
-#include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
-#include "netlist/nl_parser.h"
-#include "netlist/nl_factory.h"
-#include "netlist/nl_util.h"
-#include "netlist/devices/net_lib.h"
-#include "options.h"
+#include <cstdio>
+
+#ifdef PSTANDALONE
+	#if (PSTANDALONE)
+#define PSTANDALONE_PROVIDED
+	#endif
+#endif
+
+#include "plib/poptions.h"
+#include "plib/pstring.h"
+#include "plib/plists.h"
+#include "nl_setup.h"
+#include "nl_factory.h"
+#include "nl_parser.h"
+#include "devices/net_lib.h"
+#include "tools/nl_convert.h"
+
+
+#ifdef PSTANDALONE_PROVIDED
+
+#include <ctime>
+
+#define osd_ticks_t clock_t
+
+inline osd_ticks_t osd_ticks_per_second() { return CLOCKS_PER_SEC; }
+
+osd_ticks_t osd_ticks(void) { return clock(); }
+#else
+
+#endif
 
 /***************************************************************************
  * MAME COMPATIBILITY ...
@@ -77,21 +93,39 @@ void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_t
 }
 #endif
 
-struct options_entry oplist[] =
+class tool_options_t : public poptions
 {
-	{ "time_to_run;t",   "1.0", OPTION_FLOAT,   "time to run the emulation (seconds)" },
-	{ "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
-	{ "f",               "-",   OPTION_STRING,  "file to process (default is stdin)" },
-	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
-	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
-	{ NULL }
+public:
+	tool_options_t() :
+		poptions(),
+		opt_ttr ("t", "time_to_run", 1.0,     "time to run the emulation (seconds)", this),
+		opt_name("n", "name",        "",      "netlist in file to run; default is first one", this),
+		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
+		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
+		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
+		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
+		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
+		opt_help("h", "help",                 "display help", this)
+	{}
+
+	poption_double opt_ttr;
+	poption_str    opt_name;
+	poption_str    opt_logs;
+	poption_str    opt_file;
+	poption_str_limit opt_type;
+	poption_str    opt_cmd;
+	poption_bool   opt_verb;
+	poption_bool   opt_help;
 };
 
-NETLIST_START(dummy)
-    /* Standard stuff */
+//Alternative
+//static poption *optlist[] = { &opt_ttr, &opt_logs, &opt_file, &opt_cmd, &opt_verb, &opt_help, NULL };
 
-    CLOCK(clk, 1000) // 1000 Hz
-    SOLVER(Solver, 48000)
+NETLIST_START(dummy)
+	/* Standard stuff */
+
+	CLOCK(clk, 1000) // 1000 Hz
+	SOLVER(Solver, 48000)
 
 NETLIST_END()
 
@@ -99,9 +133,9 @@ NETLIST_END()
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-const char *filetobuf(pstring fname)
+pstring filetobuf(pstring fname)
 {
-	static pstring pbuf = "";
+	pstring pbuf = "";
 
 	if (fname == "-")
 	{
@@ -112,7 +146,7 @@ const char *filetobuf(pstring fname)
 			pbuf += lbuf;
 		}
 		printf("%d\n",*(pbuf.right(1).cstr()+1));
-		return pbuf.cstr();
+		return pbuf;
 	}
 	else
 	{
@@ -126,7 +160,9 @@ const char *filetobuf(pstring fname)
 		fread(buf, fsize, 1, f);
 		buf[fsize] = 0;
 		fclose(f);
-		return buf;
+		pbuf = buf;
+		free(buf);
+		return pbuf;
 	}
 }
 
@@ -135,27 +171,31 @@ class netlist_tool_t : public netlist_base_t
 public:
 
 	netlist_tool_t()
-	: netlist_base_t(), m_logs(""), m_setup(NULL)
+	: netlist_base_t(), m_logs(""), m_verbose(false), m_setup(NULL)
 	{
 	}
 
-	virtual ~netlist_tool_t() { };
+	~netlist_tool_t()
+	{
+		if (m_setup != NULL)
+			pfree(m_setup);
+	};
 
 	void init()
 	{
-		m_setup = new netlist_setup_t(*this);
+		m_setup = palloc(netlist_setup_t, *this);
 		this->init_object(*this, "netlist");
 		m_setup->init();
 	}
 
-	void read_netlist(const char *buffer)
+	void read_netlist(const char *buffer, pstring name)
 	{
 		// read the netlist ...
 
 		netlist_sources_t sources;
 
 		sources.add(netlist_source_t(buffer));
-		sources.parse(*m_setup,"");
+		sources.parse(*m_setup, name);
 		//m_setup->parse(buffer);
 		log_setup();
 
@@ -169,16 +209,19 @@ public:
 	void log_setup()
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
-		nl_util::pstring_list ll = nl_util::split(m_logs, ":");
-		for (int i=0; i < ll.count(); i++)
+		pstring_list_t ll(m_logs, ":");
+		for (int i=0; i < ll.size(); i++)
 		{
-            pstring name = "log_" + ll[i];
-			netlist_device_t *nc = m_setup->register_dev("nld_log", name);
+			pstring name = "log_" + ll[i];
+			/*netlist_device_t *nc = */ m_setup->register_dev("nld_log", name);
 			m_setup->register_link(name + ".I", ll[i]);
 		}
 	}
 
 	pstring m_logs;
+
+	bool m_verbose;
+
 protected:
 
 	void verror(const loglevel_e level, const char *format, va_list ap) const
@@ -186,6 +229,12 @@ protected:
 		switch (level)
 		{
 			case NL_LOG:
+				if (m_verbose)
+				{
+					vprintf(format, ap);
+					printf("\n");
+				}
+				break;
 			case NL_WARNING:
 				vprintf(format, ap);
 				printf("\n");
@@ -202,9 +251,8 @@ private:
 };
 
 
-void usage(core_options &opts)
+void usage(tool_options_t &opts)
 {
-	astring buffer;
 	fprintf(stderr,
 		"Usage:\n"
 		"  nltool -help\n"
@@ -212,56 +260,62 @@ void usage(core_options &opts)
 		"\n"
 		"Where:\n"
 	);
-	fprintf(stderr, "%s\n", opts.output_help(buffer));
+	fprintf(stderr, "%s\n", opts.help().cstr());
 }
 
-static void run(core_options &opts)
+static void run(tool_options_t &opts)
 {
 	netlist_tool_t nt;
 	osd_ticks_t t = osd_ticks();
 
 	nt.init();
-	nt.m_logs = opts.value("l");
-	nt.read_netlist(filetobuf(opts.value("f")));
-	double ttr = opts.float_value("t");
+	nt.m_logs = opts.opt_logs();
+	nt.m_verbose = opts.opt_verb();
+	nt.read_netlist(filetobuf(opts.opt_file()), opts.opt_name());
+	double ttr = opts.opt_ttr();
 
 	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
 	printf("runnning ...\n");
 	t = osd_ticks();
 
 	nt.process_queue(netlist_time::from_double(ttr));
+	nt.stop();
 
 	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
 	printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
 }
 
+/*-------------------------------------------------
+    listdevices - list all known devices
+-------------------------------------------------*/
+
 static void listdevices()
 {
 	netlist_tool_t nt;
 	nt.init();
-	const netlist_factory_t::list_t &list = nt.setup().factory().list();
+	const netlist_factory_list_t::list_t &list = nt.setup().factory().list();
 
-    netlist_sources_t sources;
+	netlist_sources_t sources;
 
-    sources.add(netlist_source_t("dummy", &netlist_dummy));
-    sources.parse(nt.setup(),"dummy");
+	sources.add(netlist_source_t("dummy", &netlist_dummy));
+	sources.parse(nt.setup(),"dummy");
 
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
 
-	for (int i=0; i < list.count(); i++)
+	for (int i=0; i < list.size(); i++)
 	{
 		pstring out = pstring::sprintf("%-20s %s(<id>", list[i]->classname().cstr(),
 				list[i]->name().cstr() );
 		pstring terms("");
 
-		net_device_t_base_factory *f = list[i];
+		netlist_base_factory_t *f = list[i];
 		netlist_device_t *d = f->Create();
 		d->init(nt, pstring::sprintf("dummy%d", i));
 		d->start_dev();
 
 		// get the list of terminals ...
-		for (int j=0; j < d->m_terminals.count(); j++)
+		for (int j=0; j < d->m_terminals.size(); j++)
 		{
 			pstring inp = d->m_terminals[j];
 			if (inp.startsWith(d->name() + "."))
@@ -289,38 +343,60 @@ static void listdevices()
 	}
 }
 
+
+
 /*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/
 
+#include "corealloc.h"
+
 int main(int argc, char *argv[])
 {
-	//int result;
-	core_options opts(oplist);
-	astring aerror("");
+	track_memory(true);
+	{
+	tool_options_t opts;
+	int ret;
 
 	fprintf(stderr, "%s", "WARNING: This is Work In Progress! - It may fail anytime\n");
-	if (!opts.parse_command_line(argc, argv, OPTION_PRIORITY_DEFAULT, aerror))
+	if ((ret = opts.parse(argc, argv)) != argc)
 	{
-		fprintf(stderr, "%s\n", aerror.cstr());
+		fprintf(stderr, "Error parsing %s\n", argv[ret]);
 		usage(opts);
 		return 1;
 	}
 
-	if (opts.bool_value("h"))
+	if (opts.opt_help())
 	{
 		usage(opts);
 		return 1;
 	}
 
-	if (opts.bool_value("ld"))
-	{
+	pstring cmd = opts.opt_cmd();
+	if (cmd == "listdevices")
 		listdevices();
+	else if (cmd == "run")
+		run(opts);
+	else if (cmd == "convert")
+	{
+		pstring contents = filetobuf(opts.opt_file());
+		nl_convert_base_t *converter = NULL;
+		if (opts.opt_type().equals("spice"))
+			converter = palloc(nl_convert_spice_t);
+		else
+			converter = palloc(nl_convert_eagle_t);
+		converter->convert(contents);
+		/* present result */
+		printf("%s\n", converter->result().cstr());
+		pfree(converter);
 	}
 	else
 	{
-		run(opts);
+		fprintf(stderr, "Unknown command %s\n", cmd.cstr());
+		usage(opts);
+		return 1;
 	}
-
+	}
+	dump_unfreed_mem();
 	return 0;
 }

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
 #ifndef _SNES_H_
 #define _SNES_H_
 
@@ -397,7 +399,8 @@ public:
 	void hdma_init(address_space &space);
 	void hdma_update(address_space &space, int dma);
 	void hirq_tick();
-	void write_joy_latch(UINT8 data);
+	virtual void write_joy_latch(UINT8 data);
+	virtual void wrio_write(UINT8 data);
 	inline UINT8 snes_rom_access(UINT32 offset);
 
 	void snes_init_ram();

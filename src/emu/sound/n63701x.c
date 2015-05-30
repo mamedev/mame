@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 An Hitachi HD637A01X0 MCU programmed to act as a sample player.

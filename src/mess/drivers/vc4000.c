@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
 /******************************************************************************
  Peter Trauner May 2001
@@ -404,7 +404,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
-	read_ = image.fread( quick_data, quick_length);
+	read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");

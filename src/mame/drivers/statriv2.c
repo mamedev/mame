@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese, David Haywood, MooglyGuy, Stephh, Pierpaolo Prazzoli, Roberto Fresca
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, David Haywood, Ryan Holtz, Stephh, Pierpaolo Prazzoli, Roberto Fresca
 /*****************************************************************
 * Status Triv Two driver by David Haywood, MooglyGuy, and Stephh *
 * Super Triv II driver by MooglyGuy                              *
@@ -977,6 +977,9 @@ ROM_START( cstripxi )
 	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketted */
 	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
+
+	DISK_REGION( "laserdisc")
+	DISK_IMAGE_READONLY("cstripxi", 0, NO_DUMP )
 ROM_END
 
 

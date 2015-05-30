@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /* MPU4 hardware emulation
   for sets see mpu4.c
 */
@@ -1388,24 +1390,6 @@ and t1 is the initial value in clock 1.
 */
 
 //O3 -> G1  O1 -> c2 o2 -> c1
-WRITE8_MEMBER(mpu4_state::ic3ss_o1_callback)
-{
-	device_t * device = machine().device("ptm_ic3ss");
-	downcast<ptm6840_device *>(device)->set_c2(data);
-}
-
-
-WRITE8_MEMBER(mpu4_state::ic3ss_o2_callback)//Generates 'beep' tone
-{
-	device_t * device = machine().device("ptm_ic3ss");
-	downcast<ptm6840_device *>(device)->set_c1(data);//?
-}
-
-
-WRITE8_MEMBER(mpu4_state::ic3ss_o3_callback)
-{
-	//downcast<ptm6840_device *>(device)->set_g1(data); /* this output is the clock for timer1 */
-}
 
 /* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
 calculate the oscillation frequency in advance. We're running the timer for interrupt
@@ -1431,7 +1415,7 @@ WRITE8_MEMBER(mpu4_state::ic3ss_w)
 	float num = (1720000/((m_t3l + 1)*(m_t3h + 1)));
 	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
 
-	int denom2 = denom1 +0.5;//need to round up, this gives same precision as chip
+	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
 	int freq=num*denom2;
 
 	if (freq)
@@ -2661,9 +2645,9 @@ MACHINE_CONFIG_FRAGMENT( mpu4_common2 )
 	MCFG_DEVICE_ADD("ptm_ic3ss", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(MPU4_MASTER_CLOCK / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(mpu4_state, ic3ss_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITE8(mpu4_state, ic3ss_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(mpu4_state, ic3ss_o3_callback))
+	MCFG_PTM6840_OUT0_CB(DEVWRITELINE("ptm_ic3ss", ptm6840_device, set_c2))
+	MCFG_PTM6840_OUT1_CB(DEVWRITELINE("ptm_ic3ss", ptm6840_device, set_c1))
+	//MCFG_PTM6840_OUT2_CB(DEVWRITELINE("ptm_ic3ss", ptm6840_device, set_g1))
 	//MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4_state, cpu1_ptm_irq))
 
 	MCFG_DEVICE_ADD("pia_ic4ss", PIA6821, 0)

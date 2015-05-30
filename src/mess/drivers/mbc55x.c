@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phill Harvey-Smith
 /*
     drivers/mbc55x.c
 

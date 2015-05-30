@@ -1,19 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo
 /*****************************************************************************
  *
  *   cp1610.c
  *   Portable CP1610 emulator (General Instrument CP1610)
  *
  *   Copyright Frank Palazzolo, all rights reserved.
- *
- *   - This source code is released as freeware for non-commercial purposes.
- *   - You are free to use and redistribute this code in modified or
- *     unmodified form, provided you list me in the credits.
- *   - If you modify this source code, you must add a notice to each modified
- *     source file that it has been changed.  If you're a nice person, you
- *     will clearly mark each change too.  :)
- *   - If you wish to use this for commercial purposes, please contact me at
- *     palazzol@comcast.net
- *   - This entire notice must remain in the source code.
  *
  *  This work is based on Juergen Buchmueller's F8 emulation,
  *  and the 'General Instruments CP1610' data sheets.
@@ -3427,12 +3419,12 @@ cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *
 }
 
 
-void cp1610_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c",
+			strprintf(str, "%c%c%c%c",
 				m_flags & 0x80 ? 'S':'.',
 				m_flags & 0x40 ? 'Z':'.',
 				m_flags & 0x20 ? 'V':'.',

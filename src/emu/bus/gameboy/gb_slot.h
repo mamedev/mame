@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli, Wilbert Pol
 #ifndef __GB_SLOT_H
 #define __GB_SLOT_H
 
@@ -12,7 +14,6 @@ enum
 	GB_MBC_NONE = 0,     /*  32KB ROM - No memory bank controller         */
 	GB_MBC_MBC1,         /*  ~2MB ROM,   8KB RAM -or- 512KB ROM, 32KB RAM */
 	GB_MBC_MBC2,         /* 256KB ROM,  32KB RAM                          */
-	GB_MBC_MMM01,        /*    ?? ROM,    ?? RAM                          */
 	GB_MBC_MBC3,         /*   2MB ROM,  32KB RAM, RTC                     */
 	GB_MBC_MBC4,         /*    ?? ROM,    ?? RAM                          */
 	GB_MBC_MBC5,         /*   8MB ROM, 128KB RAM (32KB w/ Rumble)         */
@@ -21,8 +22,12 @@ enum
 	GB_MBC_HUC3,         /*    ?? ROM,    ?? RAM - Hudson Soft Controller */
 	GB_MBC_MBC6,         /*    ?? ROM,  32KB SRAM                         */
 	GB_MBC_MBC7,         /*    ?? ROM,    ?? RAM                          */
+	GB_MBC_M161,         /*    ?? ROM,    ?? RAM                          */
+	GB_MBC_MMM01,        /*    ?? ROM,    ?? RAM                          */
 	GB_MBC_WISDOM,       /*    ?? ROM,    ?? RAM - Wisdom tree controller */
-	GB_MBC_MBC1_COL,     /*   1MB ROM,    ?? RAM - MBC1 variant for multigame carts    */
+	GB_MBC_MBC1_COL,     /*   1MB ROM,  32KB RAM - workaround for MBC1 on PCB that maps rom address lines differently */
+	GB_MBC_SACHEN1,      /*    ?? ROM,    ?? RAM - Sachen MMC-1 variant */
+	GB_MBC_SACHEN2,      /*    ?? ROM,    ?? RAM - Sachen MMC-2 variant */
 	GB_MBC_YONGYONG,     /*    ?? ROM,    ?? RAM - Appears in Sonic 3D Blast 5 pirate */
 	GB_MBC_LASAMA,       /*    ?? ROM,    ?? RAM - Appears in La Sa Ma */
 	GB_MBC_ATVRACIN,
@@ -59,13 +64,14 @@ public:
 	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_ram_base() { return m_ram; }
+	UINT8* get_ram_base() { return &m_ram[0]; }
 	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram.count(); }
+	UINT32 get_ram_size() { return m_ram.size(); }
 
 	void rom_map_setup(UINT32 size);
 	void ram_map_setup(UINT8 banks);
 
+	virtual void set_additional_wirings(UINT8 mask, int shift) { }  // MBC-1 will then overwrite this!
 	void set_has_timer(bool val) { has_timer = val; }
 	void set_has_rumble(bool val) { has_rumble = val; }
 	void set_has_battery(bool val) { has_battery = val; }
@@ -135,7 +141,7 @@ public:
 	virtual const char *file_extensions() const { return "bin,gb,gbc"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -176,7 +182,7 @@ public:
 	virtual const char *file_extensions() const { return "bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 };
 
 

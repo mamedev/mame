@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robert Justice
 /***************************************************************************
     swtpc09 machine file
     Robert Justice ,2009-2014
@@ -525,7 +527,7 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 /* DAT ram write handler (Dynamic Address Translator)    */
 /* This creates the address map when a page is mapped in */
 /* memory map is created based on system_type flag       */
-/* this is accomodate the different cards installed      */
+/* this is accommodate the different cards installed     */
 
 WRITE8_MEMBER(swtpc09_state::dat_w)
 {

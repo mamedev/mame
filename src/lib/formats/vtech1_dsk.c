@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
     formats/vtech1_dsk.c
@@ -5,6 +7,8 @@
     VTech1 disk images
 
 *********************************************************************/
+
+#include <assert.h>
 
 #include "formats/vtech1_dsk.h"
 

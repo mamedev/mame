@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:XXX
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     Electronika MC 1502 FDC device
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

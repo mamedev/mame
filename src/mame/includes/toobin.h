@@ -22,7 +22,6 @@ public:
 			m_interrupt_scan(*this, "interrupt_scan") { }
 
 	required_device<atari_jsa_i_device> m_jsa;
-
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
@@ -31,20 +30,24 @@ public:
 
 	double          m_brightness;
 	bitmap_ind16 m_pfbitmap;
+
 	virtual void update_interrupts();
+
 	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
-	DECLARE_DRIVER_INIT(toobin);
+	DECLARE_WRITE16_MEMBER(paletteram_w);
+	DECLARE_WRITE16_MEMBER(intensity_w);
+	DECLARE_WRITE16_MEMBER(xscroll_w);
+	DECLARE_WRITE16_MEMBER(yscroll_w);
+	DECLARE_WRITE16_MEMBER(slip_w);
+
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+
 	DECLARE_MACHINE_START(toobin);
 	DECLARE_MACHINE_RESET(toobin);
 	DECLARE_VIDEO_START(toobin);
-	UINT32 screen_update_toobin(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER( toobin_paletteram_w );
-	DECLARE_WRITE16_MEMBER( toobin_intensity_w );
-	DECLARE_WRITE16_MEMBER( toobin_xscroll_w );
-	DECLARE_WRITE16_MEMBER( toobin_yscroll_w );
-	DECLARE_WRITE16_MEMBER( toobin_slip_w );
+
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;
 };

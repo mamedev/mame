@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Luca Elia, Sebastien Volpe
 /* Kaneko Toybox */
 
 

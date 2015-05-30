@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
     mame.c
 
     Controls execution of the core MAME system.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
 
     Since there has been confusion in the past over the order of
@@ -94,7 +92,7 @@ machine_manager* machine_manager::m_manager = NULL;
 
 osd_interface &machine_manager::osd() const
 {
-    return m_osd;
+	return m_osd;
 }
 
 
@@ -199,7 +197,7 @@ int machine_manager::execute()
 		if (m_options.read_config())
 		{
 			m_options.revert(OPTION_PRIORITY_INI);
-			astring errors;
+			std::string errors;
 			m_options.parse_standard_inis(errors);
 		}
 
@@ -225,8 +223,8 @@ int machine_manager::execute()
 		// check the state of the machine
 		if (m_new_driver_pending)
 		{
-			astring old_system_name(m_options.system_name());
-			bool new_system = (old_system_name != m_new_driver_pending->name);
+			std::string old_system_name(m_options.system_name());
+			bool new_system = (old_system_name.compare(m_new_driver_pending->name)!=0);
 			// first: if we scheduled a new system, remove device options of the old system
 			// notice that, if we relaunch the same system, there is no effect on the emulation
 			if (new_system)
@@ -236,7 +234,7 @@ int machine_manager::execute()
 			// third: if we scheduled a new system, take also care of ramsize options
 			if (new_system)
 			{
-				astring error_string;
+				std::string error_string;
 				m_options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
 			}
 			firstrun = true;
@@ -276,16 +274,26 @@ void CLIB_DECL popmessage(const char *format, ...)
 	// otherwise, generate the buffer and call the UI to display the message
 	else
 	{
-		astring temp;
+		std::string temp;
 		va_list arg;
 
 		// dump to the buffer
 		va_start(arg, format);
-		temp.vprintf(format, arg);
+		strvprintf(temp,format, arg);
 		va_end(arg);
 
 		// pop it in the UI
-		machine_manager::instance()->machine()->ui().popup_time(temp.len() / 40 + 2, "%s", temp.cstr());
+		machine_manager::instance()->machine()->ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
+
+		/*
+		// also write to error.log
+		logerror("popmessage: %s\n", temp.c_str());
+
+#ifdef MAME_DEBUG
+		// and to command-line in a DEBUG build
+		osd_printf_info("popmessage: %s\n", temp.c_str());
+#endif
+		*/
 	}
 }
 

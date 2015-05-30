@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Philip Bennett
 /***************************************************************************
 
     Magic the Gathering: Armageddon
@@ -61,8 +63,24 @@ Xilinx  XC95108 stickered   ACCLAIM COIN-OP
 TI  TVP3409
     V53C16258HK40       x24
     V53C511816500K60    x4
-2 big chips with heat sinks on them, one by each 3dFX part
-2 big chips with heat sinks on them, by the EPROMS
+
+U38 and U97 on main board   3DFX
+                            500-0004-02
+                            BF2733.1 TMU
+                            9748 20001
+                            TAIWAN 1001
+
+U4 on daughter board        Zoran ZR36050PQC
+                            -29.5
+                            85 GF7B9726E
+
+U11 on main board           Removed heatsink, Couldn't see anything...
+
+
+U71 on main board           Galileo
+                            GT-64010A-B-0
+                            BB8018.1
+                            TAIWAN
 14.31818 Oscillator by the TI part
 50.0000 Oscillator by EPROMS
 33.0000 Oscillator by the V53C511816500K60
@@ -192,7 +210,7 @@ public:
 	DECLARE_WRITE32_MEMBER( f0_w );
 
 	DECLARE_READ32_MEMBER( unk_r );
-	DECLARE_READ32_MEMBER( rand_r );
+	DECLARE_READ32_MEMBER( unk2_r );
 
 	DECLARE_READ32_MEMBER( serial_r );
 	DECLARE_WRITE32_MEMBER( serial_w );
@@ -523,7 +541,7 @@ READ32_MEMBER( magictg_state::unk_r )
 	return 0x6000;
 }
 
-READ32_MEMBER( magictg_state::rand_r )
+READ32_MEMBER( magictg_state::unk2_r )
 {
 	return 0xffffffff;
 }
@@ -833,7 +851,7 @@ static ADDRESS_MAP_START( magictg_map, AS_PROGRAM, 32, magictg_state )
 	AM_RANGE(0x1b001024, 0x1b001027) AM_READ(adsp_status_r)
 	AM_RANGE(0x1b001108, 0x1b00110b) AM_READ(unk_r)
 	AM_RANGE(0x1e000000, 0x1e002fff) AM_RAM // NVRAM?
-	AM_RANGE(0x1e800000, 0x1e800007) AM_READWRITE(rand_r, serial_w)
+	AM_RANGE(0x1e800000, 0x1e800007) AM_READWRITE(unk2_r, serial_w)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("mips", 0)
 ADDRESS_MAP_END
 

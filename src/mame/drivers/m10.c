@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Lee Taylor, Couriersud
 /***************************************************************************
 
     Irem M10/M11/M15 hardware

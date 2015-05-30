@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "corefile.h"
 #include "unicode.h"
 #include <zlib.h>
@@ -748,10 +750,10 @@ file_error core_fload(const char *filename, dynamic_buffer &data)
 	data.resize(size);
 
 	/* read the data */
-	if (core_fread(file, data, size) != size)
+	if (core_fread(file, &data[0], size) != size)
 	{
 		core_fclose(file);
-		data.reset();
+		data.clear();
 		return FILERR_FAILURE;
 	}
 
@@ -875,6 +877,27 @@ int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...)
 }
 
 
+/*-------------------------------------------------
+    core_truncate - truncate a file
+-------------------------------------------------*/
+
+file_error core_truncate(core_file *f, UINT64 offset)
+{
+	file_error err;
+
+	/* truncate file */
+	err = osd_truncate(f->file, offset);
+	if (err != FILERR_NONE)
+		return err;
+
+	/* and adjust to new length and offset */
+	f->length = offset;
+	f->offset = MIN(f->offset, f->length);
+
+	return FILERR_NONE;
+}
+
+
 
 /***************************************************************************
     FILENAME UTILITIES
@@ -886,7 +909,7 @@ int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...)
     assumptions about path separators
 -------------------------------------------------*/
 
-astring &core_filename_extract_base(astring &result, const char *name, bool strip_extension)
+std::string &core_filename_extract_base(std::string &result, const char *name, bool strip_extension)
 {
 	/* find the start of the name */
 	const char *start = name + strlen(name);
@@ -894,11 +917,11 @@ astring &core_filename_extract_base(astring &result, const char *name, bool stri
 		start--;
 
 	/* copy the rest into an astring */
-	result.cpy(start);
+	result.assign(start);
 
 	/* chop the extension if present */
 	if (strip_extension)
-		result.substr(0, result.rchr(0, '.'));
+		result = result.substr(0, result.find_last_of('.'));
 	return result;
 }
 

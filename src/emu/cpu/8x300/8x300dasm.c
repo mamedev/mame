@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * 8x300dasm.c
  *  Implementation of the Scientific Micro Systems SMS300 / Signetics 8X300 Microcontroller

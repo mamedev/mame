@@ -96,11 +96,8 @@ static void __cdecl signal_handler(int sig_num) {
 }
 
 static void vnotify(const char *fmt, va_list ap, int must_exit) {
-  char msg[200];
-
-  vsnprintf(msg, sizeof(msg), fmt, ap);
-  fprintf(stderr, "%s\n", msg);
-
+  vfprintf(stderr, fmt, ap);
+  fputc('\n', stderr);
   if (must_exit) {
     exit(EXIT_FAILURE);
   }

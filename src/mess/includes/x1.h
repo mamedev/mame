@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese, Barry Rodewald
 /*****************************************************************************
  *
  * includes/x1.h
@@ -93,68 +95,115 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<z80ctc_device> m_ctc;
 
-	UINT8 *m_tvram;
-	UINT8 *m_avram;
-	UINT8 *m_kvram;
-	UINT8 *m_ipl_rom;
-	UINT8 *m_work_ram;
-	UINT8 *m_emm_ram;
-	UINT8 *m_pcg_ram;
-	UINT8 *m_cg_rom;
-	UINT8 *m_kanji_rom;
-	int m_xstart,m_ystart;
-	UINT8 m_hres_320;
-	UINT8 m_io_switch;
-	UINT8 m_io_sys;
-	UINT8 m_vsync;
-	UINT8 m_vdisp;
-	UINT8 m_io_bank_mode;
-	UINT8 *m_gfx_bitmap_ram;
-	UINT8 m_pcg_reset;
-	UINT8 m_sub_obf;
-	UINT8 m_ctc_irq_flag;
-	scrn_reg_t m_scrn_reg;
-	turbo_reg_t m_turbo_reg;
-	x1_rtc_t m_rtc;
-	emu_timer *m_rtc_timer;
-	UINT8 m_pcg_write_addr;
-	UINT8 m_sub_cmd;
-	UINT8 m_sub_cmd_length;
-	UINT8 m_sub_val[8];
-	int m_sub_val_ptr;
-	int m_key_i;
-	UINT8 m_irq_vector;
-	UINT8 m_cmt_current_cmd;
-	UINT8 m_cmt_test;
-	UINT8 m_rom_index[3];
-	UINT32 m_kanji_offset;
-	UINT8 m_bios_offset;
-	UINT8 m_x_b;
-	UINT8 m_x_g;
-	UINT8 m_x_r;
-	UINT16 m_kanji_addr_latch;
-	UINT32 m_kanji_addr;
-	UINT8 m_kanji_eksel;
-	UINT8 m_pcg_reset_occurred;
-	UINT32 m_old_key1;
-	UINT32 m_old_key2;
-	UINT32 m_old_key3;
-	UINT32 m_old_key4;
-	UINT32 m_old_fkey;
-	UINT8 m_key_irq_flag;
-	UINT8 m_key_irq_vector;
-	UINT32 m_emm_addr;
-	UINT8 *m_pal_4096;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT8 m_is_turbo;
-	UINT8 m_ex_bank;
-	UINT8 m_ram_bank;
+	UINT8 *m_tvram;         /**< Pointer for Text Video RAM */
+	UINT8 *m_avram;         /**< Pointer for Attribute Video RAM */
+	UINT8 *m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */
+	UINT8 *m_ipl_rom;       /**< Pointer for IPL ROM */
+	UINT8 *m_work_ram;      /**< Pointer for base work RAM */
+	UINT8 *m_emm_ram;       /**< Pointer for EMM RAM */
+	UINT8 *m_pcg_ram;       /**< Pointer for PCG GFX RAM */
+	UINT8 *m_cg_rom;        /**< Pointer for GFX ROM */
+	UINT8 *m_kanji_rom;     /**< Pointer for Kanji ROMs */
+	int m_xstart,           /**< Start X offset for screen drawing. */
+		m_ystart;           /**< Start Y offset for screen drawing. */
+	UINT8 m_hres_320;       /**< Pixel clock divider setting: (1) 48 (0) 24 */
+	UINT8 m_io_switch;      /**< Enable access for special bitmap RMW phase in isolated i/o. */
+	UINT8 m_io_sys;         /**< Read-back for PPI port C */
+	UINT8 m_vsync;          /**< Screen V-Sync bit, active low */
+	UINT8 m_vdisp;          /**< Screen V-Disp bit, active high */
+	UINT8 m_io_bank_mode;       /**< Helper for special bitmap RMW phase. */
+	UINT8 *m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
+	UINT8 m_pcg_reset;      /**< @todo Unused variable. */
+	UINT8 m_sub_obf;        /**< MCU side: OBF flag active low, indicates that there are parameters in comm buffer. */
+	UINT8 m_ctc_irq_flag;       /**< @todo Unused variable. */
+	scrn_reg_t m_scrn_reg;      /**< Base Video Registers. */
+	turbo_reg_t m_turbo_reg;    /**< Turbo Z Video Registers. */
+	x1_rtc_t m_rtc;         /**< Struct for RTC related variables */
+	emu_timer *m_rtc_timer;     /**< Pointer for RTC timer. */
+	UINT8 m_pcg_write_addr;     /**< @todo Unused variable. */
+	UINT8 m_sub_cmd;        /**< MCU side: current command issued from Main to Sub. */
+	UINT8 m_sub_cmd_length;     /**< MCU side: number of parameters, in bytes. */
+	UINT8 m_sub_val[8];     /**< MCU side: parameters buffer. */
+	int m_sub_val_ptr;      /**< MCU side: index for parameter read-back */
+	int m_key_i;            /**< MCU side: index for keyboard read-back during OBF phase. */
+	UINT8 m_irq_vector;     /**< @todo Unused variable. */
+	UINT8 m_cmt_current_cmd;    /**< MCU side: CMT command issued. */
+	UINT8 m_cmt_test;       /**< MCU side: Tape BREAK status bit. */
+	UINT8 m_rom_index[3];       /**< Current ROM address. */
+	UINT32 m_kanji_offset;      /**< @todo Unused variable. */
+	UINT8 m_bios_offset;        /**< @todo Unused variable. */
+	UINT8 m_x_b;            /**< Palette Register for Blue Gun */
+	UINT8 m_x_g;            /**< Palette Register for Green Gun */
+	UINT8 m_x_r;            /**< Palette Register for Red Gun */
+	UINT16 m_kanji_addr_latch;  /**< Internal Kanji ROM address. */
+	UINT32 m_kanji_addr;        /**< Latched Kanji ROM address. */
+	UINT8 m_kanji_eksel;        /**< Kanji ROM register bit for latch phase. */
+	UINT8 m_pcg_reset_occurred; /**< @todo Unused variable. */
+	UINT32 m_old_key1;      /**< Keyboard read buffer for i/o port "key1" */
+	UINT32 m_old_key2;      /**< Keyboard read buffer for i/o port "key2" */
+	UINT32 m_old_key3;      /**< Keyboard read buffer for i/o port "key3" */
+	UINT32 m_old_key4;      /**< Keyboard read buffer for i/o port "tenkey" */
+	UINT32 m_old_fkey;      /**< Keyboard read buffer for i/o port "f_keys" */
+	UINT8 m_key_irq_flag;       /**< Keyboard IRQ pending. */
+	UINT8 m_key_irq_vector;     /**< Keyboard IRQ vector. */
+	UINT32 m_emm_addr;      /**< EMM RAM current address */
+	UINT8 *m_pal_4096;      /**< X1 Turbo Z: pointer for 4096 palette entries */
+	UINT8 m_crtc_vreg[0x100],   /**< CRTC register buffer. */
+			m_crtc_index;       /**< CRTC register index. */
+	UINT8 m_is_turbo;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */
+	UINT8 m_ex_bank;        /**< X1 Turbo Z: RAM bank register */
+	UINT8 m_ram_bank;       /**< Regular RAM bank for 0x0000-0x7fff memory window: (0) ROM/IPL (1) RAM */
+	/**
+	@brief Refresh current bitmap palette.
+	*/
 	void set_current_palette();
+	/**
+	@brief Retrieves the current PCG address.
+
+	@param width Number of currently setted up CRTC characters
+	@param y_char_size Number of scanlines per character.
+	@return Destination PCG address.
+	*/
 	UINT16 get_pcg_addr(UINT16 width, UINT8 y_char_size);
+	/**
+	@brief X1 Turbo: Retrieves the current CHR ROM address in Hi-Speed Mode.
+
+	@return Destination CHR address.
+	*/
 	UINT16 check_chr_addr();
+	/**
+	@brief X1 Turbo: Retrieves the current PCG ROM address in Hi-Speed Mode.
+
+	@return Destination CHR address.
+	*/
 	UINT16 check_pcg_addr();
+	/**
+	@brief MCU side: retrieve keycode to game key conversion.
+
+	@param port Address to convert.
+	@return The converted game key buffer
+	*/
 	UINT8 get_game_key(UINT8 port);
+	/**
+	@brief MCU side: retrieve keyboard special key register.
+
+	@return
+	x--- ---- TEN: Numpad, Function key, special input key
+	-x-- ---- KIN: Valid key
+	--x- ---- REP: Key repeat
+	---x ---- GRAPH key ON
+	---- x--- CAPS lock ON
+	---- -x-- KANA lock ON
+	---- --x- SHIFT ON
+	---- ---x CTRL ON
+	*/
 	UINT8 check_keyboard_shift();
+	/**
+	@brief convert MAME input to raw scancode for keyboard.
+
+	@return the converted scancode
+	@todo Unoptimized.
+	*/
 	UINT16 check_keyboard_press();
 
 	DECLARE_READ8_MEMBER(x1_mem_r);

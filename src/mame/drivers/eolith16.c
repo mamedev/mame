@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
 
  Eolith 16 bits hardware
@@ -25,16 +27,16 @@ public:
 
 	UINT16 *m_vram;
 	int m_vbuffer;
-	
+
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(eolith16_custom_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ16_MEMBER(vram_r);
-	
+
 	DECLARE_DRIVER_INIT(eolith16);
 	DECLARE_VIDEO_START(eolith16);
 	DECLARE_PALETTE_INIT(eolith16);
-	
+
 	UINT32 screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

@@ -26,7 +26,7 @@ class machine_config;
 
 
 // core validity checker class
-class validity_checker
+class validity_checker : public osd_output
 {
 	// internal map types
 	typedef tagmap_t<const game_driver *> game_driver_map;
@@ -52,6 +52,11 @@ public:
 	// generic registry of already-checked stuff
 	bool already_checked(const char *string) { return (m_already_checked.add(string, 1, false) == TMERR_DUPLICATE); }
 
+	// osd_output interface
+
+protected:
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args);
+
 private:
 	// internal helpers
 	const char *ioport_string_from_index(UINT32 index);
@@ -74,10 +79,8 @@ private:
 	void validate_devices();
 
 	// output helpers
-	void build_output_prefix(astring &string);
-	void error_output(const char *format, va_list argptr);
-	void warning_output(const char *format, va_list argptr);
-	void output_via_delegate(output_delegate &delegate, const char *format, ...) ATTR_PRINTF(3,4);
+	void build_output_prefix(std::string &str);
+	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
 
 	// internal driver list
 	driver_enumerator       m_drivlist;
@@ -85,8 +88,8 @@ private:
 	// error tracking
 	int                     m_errors;
 	int                     m_warnings;
-	astring                 m_error_text;
-	astring                 m_warning_text;
+	std::string             m_error_text;
+	std::string             m_warning_text;
 
 	// maps for finding duplicates
 	game_driver_map         m_names_map;
@@ -102,9 +105,6 @@ private:
 	int_map                 m_region_map;
 	tagmap_t<UINT8>         m_already_checked;
 
-	// callbacks
-	output_delegate         m_saved_error_output;
-	output_delegate         m_saved_warning_output;
 };
 
 #endif

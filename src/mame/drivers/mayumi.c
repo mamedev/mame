@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Uki
 /*****************************************************************************
 
     Kikiippatsu Mayumi-chan (c) 1988 Victory L.L.C.

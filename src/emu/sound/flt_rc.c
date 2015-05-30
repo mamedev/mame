@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Derrick Renaud, Couriersud
 #include "emu.h"
 #include "flt_rc.h"
 
@@ -37,6 +39,14 @@ void filter_rc_device::device_start()
 {
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
 	recalc();
+
+	save_item(NAME(m_k));
+	save_item(NAME(m_memory));
+	save_item(NAME(m_type));
+	save_item(NAME(m_R1));
+	save_item(NAME(m_R2));
+	save_item(NAME(m_R3));
+	save_item(NAME(m_C));
 }
 
 

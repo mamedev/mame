@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /***************************************************************************
 
     BBN BitGraph -- monochrome, raster graphics (768x1024), serial terminal.

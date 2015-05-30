@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Fabio Priuli, byuu
 /***********************************************************************************************************
 
  Super NES/Famicom (LoROM) cartridge emulation (for SNES/SFC)
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  ***********************************************************************************************************/
 
@@ -200,12 +199,6 @@ READ8_MEMBER(sns_rom_device::read_h)
  Byuu's code is released under GNU General Public License
  version 2 as published by the Free Software Foundation.
 
- The implementation below is released under the MAME license
- for use in MAME, MESS and derivatives by permission of Byuu
-
- Copyright (for the implementation below) MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
-
  ***********************************************************************************************************/
 
 
@@ -312,7 +305,7 @@ WRITE8_MEMBER( sns_rom_pokemon_device::chip_write )
 // Tekken 2: It accesses the protection in a very strange way, always reading/writing the same data $f0 times,
 // because each access must be repeated a couple of times to be registered (typically around 7-30 times)
 // They probably used a microcontroller here.
-// The protection itself is accessed in banks $80-$bf. Accessing (read/write, doesn't matter) adress lines
+// The protection itself is accessed in banks $80-$bf. Accessing (read/write, doesn't matter) address lines
 // A8,A9,A10 in these banks in a certain sequence makes the mc return a 4bit value. [d4s]
 // Details on a possible algorythm behind the sequence of accesses were provided by nocash. Thanks!
 void sns_rom_tekken2_device::update_prot(UINT32 offset)

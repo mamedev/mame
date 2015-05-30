@@ -1,8 +1,12 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
 
     Tape support for Orao  TAP format
 
 */
+#include <assert.h>
+
 #include "orao_cas.h"
 
 

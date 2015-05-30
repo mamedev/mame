@@ -1,110 +1,84 @@
-// license:MAME
-// copyright-holders:Angelo Salese
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, Roberto Fresca
 /**************************************************************************************************************
 
-Videotronics Poker (c) 198? Videotronics
+  Videotronics Poker (c) 198? Videotronics
+  Preliminary driver by Angelo Salese & Roberto Fresca.
 
-preliminary driver by Angelo Salese
+  Notes:
+  - Looks like the 2nd generation of Noraut Poker / Draw Poker Hi-Lo HW.
 
-Notes:
-- Looks like the 2nd generation of Noraut Poker / Draw Poker Hi-Lo HW.
-
-TODO:
-- Understand how the 6840PTM hooks up, needed to let it work properly;
-- I/Os;
-- sound;
+  TODO:
+  - Understand how the 6840PTM hooks up, needed to let it work properly;
+  - I/Os;
+  - sound;
 
 ===============================================================================================================
 
-Bought as "old poker game by videotronics early 80's"
+  Bought as "old poker game by videotronics early 80's"
 
-Scratched on the CPU board  SN1069
-Scratched on the CPU board  SN1069
+  Scratched on the CPU board  SN1069
+  Scratched on the CPU board  SN1069
 
-CPU board
-.0  2716    stickered   DRAWPKR2    located top left
-                8-F
-                REV A
+  CPU board
 
-.1  2716    stickered   DRAWPKR2    located next to .0
-                0-7
-                REV A
+  .0  2716    stickered   DRAWPKR2  8-F  REV A    located top left
+  .1  2716    stickered   DRAWPKR2  0-7  REV A    located next to .0
 
-ROM board
-Top of board left to right
-.R0 2716    stickered   RA
-                0-7
+  ROM board
 
-.R1 2716    stickered   RA
-                8-F
+  Top of board left to right
 
-.R2 2716    stickered   BA
-                0-7
+  .R0 2716    stickered   RA  0-7
+  .R1 2716    stickered   RA  8-F
+  .R2 2716    stickered   BA  0-7
+  .R3 2716    stickered   BA  8-F
+  .R4 2716    stickered   GA  0-7
+  .R5 2716    stickered   GA  8-F
 
-.R3 2716    stickered   BA
-                8-F
+  Below top row left to right
 
-.R4 2716    stickered   GA
-                0-7
+  .R6  2716    stickered   RB  0-7
+  .R7  2716    stickered   RB  8-F
+  .R8  2716    stickered   BB  0-7
+  .R9  2716    stickered   BB  8-F
+  .R10 2716    stickered   GB  0-7
+  .R11 2716    stickered   GB  8-F
 
-.R5 2716    stickered   GA
-                8-F
+  ROM data showed cards
 
-
-Below top row left to right
-.R6 2716    stickered   RB
-                0-7
-
-.R7 2716    stickered   RB
-                8-F
-
-.R8 2716    stickered   BB
-                0-7
-
-.R9 2716    stickered   BB
-                8-F
-
-.R10    2716    stickered   GB
-                0-7
-
-.R11    2716    stickered   GB
-                8-F
-
-ROM data showed cards
-
-6809 cpu
-4.000Mhz crystal
-MC6840P
-mm74c920J/mmc6551j-9    x2
+  6809 CPU
+  4.000 Mhz crystal
+  MC6840P
+  mm74c920J/mmc6551j-9    x2
 
 
 **************************************************************************************************************
 
-- Added 5-Aces Poker (Roberto Fresca)
+ - Added 5-Aces Poker (Roberto Fresca)
 
-.1 is closest to the connector
-.7 is closest to the cpu
+  .1 is closest to the connector
+  .7 is closest to the cpu
 
-Etched in copper on top by .1 eprom 6000
+  Etched in copper on top by .1 eprom 6000
 
-.1  2732    handwritten sticker GJOK1
-.2  2732    handwritten sticker GJOK2
-.3  2732    handwritten sticker BJOK1
-.4  2732    handwritten sticker BJOK2
-.5  2732    handwritten sticker RJOK1
-.6  2732    handwritten sticker RJOK2
-.7  2764    handwritten sticker 688C
+  .1  2732    handwritten sticker GJOK1
+  .2  2732    handwritten sticker GJOK2
+  .3  2732    handwritten sticker BJOK1
+  .4  2732    handwritten sticker BJOK2
+  .5  2732    handwritten sticker RJOK1
+  .6  2732    handwritten sticker RJOK2
+  .7  2764    handwritten sticker 688C
 
+  4 MHz crystal
+  6809
+  MC6840P
+  nmc6514-9   x2
+  nm23114     x2
 
-4 Mhz crystal
-6809
-MC6840P
-nmc6514-9   x2
-nm23114     x2
-
-16 pin chip marked  74166F 7745
-            SA2889-0697
-    stamped     ETC
+  16 pin chip marked  74166F 7745
+                      SA2889-0697
+             stamped     ETC
 
 **************************************************************************************************************/
 
@@ -727,5 +701,6 @@ ROM_START( 5acespkr )
 ROM_END
 
 
-GAME( 198?, vpoker,   0,     vpoker,  vpoker, driver_device,   0,  ROT0, "Videotronics", "Videotronics Poker", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 198?, 5acespkr, 0,     vpoker,  5acespkr, driver_device, 0,  ROT0, "<unknown>",    "5-Aces Poker",       GAME_NOT_WORKING | GAME_NO_SOUND )
+/*    YEAR  NAME      PARENT  MACHINE  INPUT     STATE          INIT  ROT    COMPANY         FULLNAME             FLAGS... */
+GAME( 198?, vpoker,   0,      vpoker,  vpoker,   driver_device, 0,    ROT0, "Videotronics", "Videotronics Poker", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, driver_device, 0,    ROT0, "<unknown>",    "5-Aces Poker",       GAME_NOT_WORKING | GAME_NO_SOUND )

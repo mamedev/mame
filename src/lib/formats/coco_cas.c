@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /**************************************************************************
 
     coco_cas.c
@@ -31,7 +33,7 @@
 
 **************************************************************************/
 
-#include "emu.h"
+#include "emu.h" // PAIR
 #include "coco_cas.h"
 
 #define COCO_WAVESAMPLES_HEADER     (1.0)

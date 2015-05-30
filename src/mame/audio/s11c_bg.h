@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * s11c_bg.h - Williams System 11C background sound (M68B09E + YM2151 + HC55516 + DAC)
  *

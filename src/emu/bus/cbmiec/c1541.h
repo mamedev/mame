@@ -4,9 +4,6 @@
 
     Commodore 1540/1541/1541C/1541-II Single Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once
@@ -37,15 +34,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> base_c1541_device
+// ======================> c1541_base_t
 
-class base_c1541_device :  public device_t,
-							public device_cbm_iec_interface,
-							public device_c64_floppy_parallel_interface
+class c1541_base_t :  public device_t,
+						public device_cbm_iec_interface,
+						public device_c64_floppy_parallel_interface
 {
 public:
 	// construction/destruction
-	base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	c1541_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -102,39 +99,39 @@ protected:
 };
 
 
-// ======================> c1540_device
+// ======================> c1540_t
 
-class c1540_device :  public base_c1541_device
+class c1540_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1540_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 };
 
 
-// ======================> c1541_device
+// ======================> c1541_t
 
-class c1541_device :  public base_c1541_device
+class c1541_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 };
 
 
-// ======================> c1541c_device
+// ======================> c1541c_t
 
-class c1541c_device :  public base_c1541_device
+class c1541c_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541c_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -145,39 +142,52 @@ public:
 };
 
 
-// ======================> c1541ii_device
+// ======================> c1541ii_t
 
-class c1541ii_device :  public base_c1541_device
+class c1541ii_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541ii_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 };
 
 
-// ======================> sx1541_device
+// ======================> sx1541_t
 
-class sx1541_device :  public base_c1541_device
+class sx1541_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sx1541_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 };
 
 
-// ======================> fsd2_device
+// ======================> fsd1_t
 
-class fsd2_device :  public base_c1541_device
+class fsd1_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fsd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
+// ======================> fsd2_t
+
+class fsd2_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	fsd2_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -187,40 +197,26 @@ public:
 };
 
 
-// ======================> csd1_device
+// ======================> csd1_t
 
-class csd1_device :  public base_c1541_device
+class csd1_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	csd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 };
 
 
-// ======================> c1541_dolphin_dos_device
+// ======================> c1541_dolphin_dos_t
 
-class c1541_dolphin_dos_device :  public base_c1541_device
+class c1541_dolphin_dos_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-};
-
-
-// ======================> c1541_professional_dos_v1_device
-
-class c1541_professional_dos_v1_device :  public base_c1541_device
-{
-public:
-	// construction/destruction
-	c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541_dolphin_dos_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -228,13 +224,27 @@ public:
 };
 
 
-// ======================> c1541_prologic_dos_classic_device
+// ======================> c1541_professional_dos_v1_t
 
-class c1541_prologic_dos_classic_device :  public base_c1541_device
+class c1541_professional_dos_v1_t :  public c1541_base_t
 {
 public:
 	// construction/destruction
-	c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c1541_professional_dos_v1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+
+// ======================> c1541_prologic_dos_classic_t
+
+class c1541_prologic_dos_classic_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	c1541_prologic_dos_classic_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -258,17 +268,32 @@ protected:
 };
 
 
+// ======================> indus_gt_t
+
+class indus_gt_t :  public c1541_base_t
+{
+public:
+	// construction/destruction
+	indus_gt_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
 // device type definition
 extern const device_type C1540;
 extern const device_type C1541;
 extern const device_type C1541C;
 extern const device_type C1541II;
 extern const device_type SX1541;
+extern const device_type FSD1;
 extern const device_type FSD2;
 extern const device_type CSD1;
 extern const device_type C1541_DOLPHIN_DOS;
 extern const device_type C1541_PROFESSIONAL_DOS_V1;
 extern const device_type C1541_PROLOGIC_DOS_CLASSIC;
+extern const device_type INDUS_GT;
 
 
 

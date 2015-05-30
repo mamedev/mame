@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, R. Belmont
 /*********************************************************************
 
     ap_dsk35.c
@@ -99,7 +101,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "emu.h"
+#include "emu.h" // logerror
 #include "ap_dsk35.h"
 
 struct apple35_tag

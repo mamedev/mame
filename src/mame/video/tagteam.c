@@ -1,6 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Steve Ellenoff, Brad Oliver
 /***************************************************************************
 
-    video.c
+    tagteam.c
 
     Functions to emulate the video hardware of the machine.
 
@@ -35,26 +37,26 @@ static const res_net_decode_info tagteam_decode_info =
 PALETTE_INIT_MEMBER(tagteam_state, tagteam)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, tagteam_decode_info, tagteam_net_info);
-	palette.set_pen_colors(0x00, rgb, 0x20);
+	palette.set_pen_colors(0x00, rgb);
 }
 
 
-WRITE8_MEMBER(tagteam_state::tagteam_videoram_w)
+WRITE8_MEMBER(tagteam_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tagteam_state::tagteam_colorram_w)
+WRITE8_MEMBER(tagteam_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(tagteam_state::tagteam_mirrorvideoram_r)
+READ8_MEMBER(tagteam_state::mirrorvideoram_r)
 {
 	int x,y;
 
@@ -66,7 +68,7 @@ READ8_MEMBER(tagteam_state::tagteam_mirrorvideoram_r)
 	return m_videoram[offset];
 }
 
-READ8_MEMBER(tagteam_state::tagteam_mirrorcolorram_r)
+READ8_MEMBER(tagteam_state::mirrorcolorram_r)
 {
 	int x,y;
 
@@ -78,7 +80,7 @@ READ8_MEMBER(tagteam_state::tagteam_mirrorcolorram_r)
 	return m_colorram[offset];
 }
 
-WRITE8_MEMBER(tagteam_state::tagteam_mirrorvideoram_w)
+WRITE8_MEMBER(tagteam_state::mirrorvideoram_w)
 {
 	int x,y;
 
@@ -87,10 +89,10 @@ WRITE8_MEMBER(tagteam_state::tagteam_mirrorvideoram_w)
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	tagteam_videoram_w(space,offset,data);
+	videoram_w(space,offset,data);
 }
 
-WRITE8_MEMBER(tagteam_state::tagteam_mirrorcolorram_w)
+WRITE8_MEMBER(tagteam_state::mirrorcolorram_w)
 {
 	int x,y;
 
@@ -99,10 +101,10 @@ WRITE8_MEMBER(tagteam_state::tagteam_mirrorcolorram_w)
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	tagteam_colorram_w(space,offset,data);
+	colorram_w(space,offset,data);
 }
 
-WRITE8_MEMBER(tagteam_state::tagteam_control_w)
+WRITE8_MEMBER(tagteam_state::control_w)
 {
 	// d0-3: color for blank screen, applies to h/v borders too
 	// (not implemented yet, and tagteam doesn't have a global screen on/off bit)
@@ -111,7 +113,7 @@ WRITE8_MEMBER(tagteam_state::tagteam_control_w)
 	m_palettebank = (data & 0x80) >> 7;
 }
 
-WRITE8_MEMBER(tagteam_state::tagteam_flipscreen_w)
+WRITE8_MEMBER(tagteam_state::flipscreen_w)
 {
 	// d0: flip screen
 	if (flip_screen() != (data &0x01))
@@ -137,6 +139,8 @@ void tagteam_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X,
 			8, 8, 32, 32);
+
+	save_item(NAME(m_palettebank));
 }
 
 void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -183,7 +187,7 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 tagteam_state::screen_update_tagteam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tagteam_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

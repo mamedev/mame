@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /*
 DJ Boy (c)1989 Kaneko
 

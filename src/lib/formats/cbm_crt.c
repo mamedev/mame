@@ -39,6 +39,8 @@
 
 *********************************************************************/
 
+#include "emu.h" // fatalerror
+#include "corefile.h"
 #include "cbm_crt.h"
 
 
@@ -120,7 +122,7 @@ static const char * CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 //  cbm_crt_get_card - get slot interface card
 //-------------------------------------------------
 
-void cbm_crt_get_card(astring &result, core_file *file)
+void cbm_crt_get_card(std::string &result, core_file *file)
 {
 	// read the header
 	cbm_crt_header header;
@@ -130,11 +132,11 @@ void cbm_crt_get_card(astring &result, core_file *file)
 	{
 		UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
 
-		result.cpy(CRT_C64_SLOT_NAMES[hardware]);
+		result.assign(CRT_C64_SLOT_NAMES[hardware]);
 		return;
 	}
 
-	result.reset();
+	result.clear();
 }
 
 
@@ -202,8 +204,8 @@ bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, 
 
 bool cbm_crt_read_data(core_file* file, UINT8 *roml, UINT8 *romh)
 {
-	offs_t roml_offset = 0;
-	offs_t romh_offset = 0;
+	UINT32 roml_offset = 0;
+	UINT32 romh_offset = 0;
 
 	core_fseek(file, CRT_HEADER_LENGTH, SEEK_SET);
 

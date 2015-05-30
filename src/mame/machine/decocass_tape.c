@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, David Haywood
 /***********************************************************************
 
     DECO Cassette System machine
@@ -313,7 +315,9 @@ UINT8 decocass_tape_device::get_status_bits()
 
 		/* everywhere else, the clock holds to 0 */
 		else
-			;
+		{
+				/* nothing */
+		}
 
 		/* lead-in and lead-out bytes are 0xAA */
 		if (m_bytenum == BYTE_HEADER || m_bytenum == BYTE_TRAILER)

@@ -1,18 +1,19 @@
-// license:?
+// license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 /********************************************************************************************************
 
     Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
-    TODO: figure out the rest of the protection
-    TODO: Zero Team presumably needs additive blending on the character screen
 
     TODO:
-    - Zero Team currently crashes due of an unknown check with collision detection.
-    Additionally:
-    8E377: C7 06 00 05 80 A9         mov     word ptr [500h],0A980h
-    8E37D: C7 06 00 05 00 B9         mov     word ptr [500h],0B900h
-    8E383: F7 06 88 05 FF FF         test    word ptr [588h],0FFFFh ;checks unknown collision detection port with 0xffff?
-    8E389: 75 0A                     bne     8E395h
+    * zeroteam - sort-DMA doesn't seem to work too well, sprite-sprite priorities are broken as per now
+
+    * xsedae - it does an "8-liner"-style scroll during attract, doesn't work too well.
+
+    * sprite chip is the same as seibuspi.c and feversoc.c, needs device-ification and merging.
+
+    * sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping
+      regions (150 - ff in zeroteam, 150 - 0 and 150 - 80 in raiden2). Latter probably do double buffering
+      on odd/even frames, by updating only top or bottom part of screen.
 
 ===========================================================================================================
 
@@ -24,7 +25,6 @@ raiden 2 board test note 17/04/08 (based on test by dox)
   value of 0x80 puts 0x00000-0x1ffff at 0x20000 - 0x3ffff
   value of 0x00 puts 0x20000-0x3ffff at 0x20000 - 0x3ffff
 
-===
 
 ===========================================================================================================
 
@@ -129,29 +129,6 @@ Protection Notes:
  customs.
 
  The games in legionna.c use (almost?) the same protection chips.
-
-Current Problem(s) - in order of priority
-
- High Priority
-
- Protection
- - zeroteam has bogus collision detection;
- - raiden2 has a weird movement after that the ship completes animation from the aircraft. Probably 42c2 should be floating point rounded ...
- - (and probably more)
-
- Unemulated 0-0x3ffff ROM banking for raidendx, but it's unknown if/where it's used (hopefully NOT on getting perfect on Alpha course).
-
- zeroteam - sort-DMA doesn't seem to work too well, sprite-sprite priorities are broken as per now
-
- xsedae - do an "8-liner"-style scroll during attract, doesn't work too well.
-
- sprite chip is the same as seibuspi.c and feversoc.c, needs device-ification and merging.
-
- sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping
- regions (150 - ff in zeroteam, 150 - 0 and 150 - 80 in raiden2). Latter probably do double buffering
- on odd/even frames, by updating only top or bottom part of screen.
-
- Low Priority
 
 ********************************************************************************************************/
 
@@ -1367,15 +1344,8 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-#if 1
-	MCFG_SCREEN_REFRESH_RATE(55.47) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 34*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-#else // this should be correct but currently causes sprite flickering, visible from the very start of the intro
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
-#endif
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
@@ -2086,6 +2056,44 @@ ROM_START( raiden2nl )
 	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x288, NO_DUMP)
 ROM_END
 
+ROM_START( raiden2f ) // original board with serial # 12476 that matches raiden2nl set except the region and Audio CPU
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE("1_u0211.bin",   0x000000, 0x80000, CRC(53be3dd0) SHA1(304d118423e4085eea3b883bd625d90d21bb2054) )   // == raiden2nl
+	ROM_RELOAD(0x100000, 0x80000)
+	ROM_LOAD16_BYTE("seibu2_u0212.bin",  0x000001, 0x80000, CRC(8dcd8a8d) SHA1(be0681d5867d8b4f5fb78946a896d89827a71e8e) )
+	ROM_RELOAD(0x100001, 0x80000)
+
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered MASK ROM */
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
+	ROM_LOAD( "seibu5_u1110.bin",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )   // == raiden2
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "7_u0724.bin", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "raiden_2_seibu_bg-1.u0714", 0x000000, 0x200000, CRC(e61ad38e) SHA1(63b06cd38db946ad3fc5c1482dc863ef80b58fec) ) /* Soldered MASK ROM */
+	ROM_LOAD( "raiden_2_seibu_bg-2.u075",  0x200000, 0x200000, CRC(a694a4bb) SHA1(39c2614d0effc899fe58f735604283097769df77) ) /* Soldered MASK ROM */
+
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Soldered MASK ROM */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Soldered MASK ROM */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-3.u0837", 0x400000, 0x200000, CRC(897a0322) SHA1(abb2737a2446da5b364fc2d96524b43d808f4126) ) /* Soldered MASK ROM */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-4.u0836", 0x400002, 0x200000, CRC(b676e188) SHA1(19cc838f1ccf9c4203cd0e5365e5d99ff3a4ff0f) ) /* Soldered MASK ROM */
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "6_u1017.bin", 0x00000, 0x40000, CRC(fb0fca23) SHA1(4b2217b121a66c5ab6015537609cf908ffedaf86) ) /* PCB silkscreened VOICE1 */
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "raiden_2_pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Soldered MASK ROM */
+
+	ROM_REGION( 0x10000, "pals", 0 )    /* PALS */
+	ROM_LOAD( "jj4b02__ami18cv8-15.u0342.jed", 0x0000, 0x288, NO_DUMP)
+	ROM_LOAD( "jj4b01__mmipal16l8bcn.u0341.jed", 0x0000, 0x288, NO_DUMP)
+ROM_END
 
 ROM_START( raiden2u )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v30 main cpu */
@@ -3052,6 +3060,7 @@ GAME( 1993, raiden2sw,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  R
 GAME( 1993, raiden2j,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Japan)", GAME_SUPPORTS_SAVE ) //  rev 1
 GAME( 1993, raiden2i,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Italy)", GAME_SUPPORTS_SAVE ) // rev 2
 GAME( 1993, raiden2nl,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (Holland)", GAME_SUPPORTS_SAVE )
+GAME( 1993, raiden2f,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (France)", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, raiden2e,   raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easy version, Korea?)", GAME_SUPPORTS_SAVE ) // rev 3 (Region 0x04) - Korea?, if regions are the same as RDX, no license or region message tho
 GAME( 1993, raiden2ea,  raiden2,  raiden2,  raiden2,  raiden2_state, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden II (easy version, Japan?)", GAME_SUPPORTS_SAVE ) // rev 4 (Region 0x00) - Should be Japan, but the easy sets have no 'FOR USE IN JAPAN ONLY' display even when region is 00

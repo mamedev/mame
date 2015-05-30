@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Gordon Jefferyes
 /*****************************************************************************
  *
  * machine/upd7002.h

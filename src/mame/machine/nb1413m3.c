@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Takahiro Nogi
 /******************************************************************************
 
     Machine Hardware for Nichibutsu Mahjong series.
@@ -50,7 +52,7 @@ nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag,
 void nb1413m3_device::device_start()
 {
 	m_timer_cb = timer_alloc(TIMER_CB);
-	synchronize(TIMER_CB);
+	m_timer_cb->adjust(attotime::zero);
 
 	save_item(NAME(m_nb1413m3_type));
 	save_item(NAME(m_sndrombank1));
@@ -561,8 +563,6 @@ READ8_MEMBER( nb1413m3_device::dipsw3_h_r )
 
 WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 {
-	static int counter = 0;
-
 	m_outcoin_enable = (data & 0x04) >> 2;
 
 	switch (m_nb1413m3_type)
@@ -586,10 +586,10 @@ WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 		case NB1413M3_MMAIKO:
 			if (m_outcoin_enable)
 			{
-				if (counter++ == 2)
+				if (m_counter++ == 2)
 				{
 					m_outcoin_flag ^= 1;
-					counter = 0;
+					m_counter = 0;
 				}
 			}
 			break;

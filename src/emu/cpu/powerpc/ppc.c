@@ -1,8 +1,13 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /* IBM/Motorola PowerPC 4xx/6xx Emulator */
 
 #include <setjmp.h>
 #include "emu.h"
 #include "debugger.h"
+
+/* avoid including setjmp.h and defining jump buffer if not included from here */
+#define PPC_H_INCLUDED_FROM_PPC_C
 #include "ppc.h"
 
 // PLL Configuration based on the table in MPC603EUM page 7-31

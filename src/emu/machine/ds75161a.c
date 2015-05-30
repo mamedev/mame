@@ -4,9 +4,6 @@
 
     National Semiconductor DS75161A IEEE-488 GPIB Transceiver emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "ds75161a.h"

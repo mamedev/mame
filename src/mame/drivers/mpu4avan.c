@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU4 'Avantine' games
   These seem to be 3rd party games for various regions
 
@@ -12,7 +14,7 @@
 MACHINE_CONFIG_EXTERN( mod4oki );
 INPUT_PORTS_EXTERN( mpu4 );
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 
 
 

@@ -32,15 +32,15 @@
 		<bezel name="digit13" element="digit"><bounds x="99" y="4" width="10" height="15" /></bezel>
 
 		<bezel name="lamp14" element="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp30" element="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp46" element="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp62" element="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp78" element="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp94" element="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp110" element="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp126" element="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp142" element="triangle_mark"><bounds x="92" y="0" width="4" height="3" /></bezel>
-		<bezel name="lamp222" element="triangle_mark"><bounds x="103" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp114" element="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp214" element="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp314" element="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp414" element="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp514" element="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp614" element="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp714" element="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp814" element="triangle_mark"><bounds x="92" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp1314" element="triangle_mark"><bounds x="103" y="0" width="4" height="3" /></bezel>
 
 	</view>
 </mamelayout>

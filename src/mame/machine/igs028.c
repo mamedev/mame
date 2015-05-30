@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ElSemi
 /* IGS 028 */
 
 // this seems to be very similar to the igs022 - encrypted DMA + some other ops with shared RAM

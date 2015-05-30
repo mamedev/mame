@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
     formats/imd_dsk.c
@@ -7,7 +9,7 @@
 *********************************************************************/
 
 #include <string.h>
-#include "emu.h"
+#include <assert.h>
 #include "flopimg.h"
 
 struct imddsk_tag
@@ -133,6 +135,91 @@ static floperr_t imd_read_sector(floppy_image_legacy *floppy, int head, int trac
 static floperr_t imd_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	return internal_imd_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
+}
+
+static floperr_t imd_expand_file(floppy_image_legacy *floppy , UINT64 offset , size_t amount)
+{
+		if (amount == 0) {
+				return FLOPPY_ERROR_SUCCESS;
+		}
+
+		UINT64 file_size = floppy_image_size(floppy);
+
+		if (offset > file_size) {
+				return FLOPPY_ERROR_INTERNAL;
+		}
+
+	UINT64 size_after_off = file_size - offset;
+
+	if (size_after_off == 0) {
+		return FLOPPY_ERROR_SUCCESS;
+	}
+
+	UINT8 *buffer = global_alloc_array(UINT8 , size_after_off);
+
+	// Read the part of file after offset
+	floppy_image_read(floppy , buffer , offset , size_after_off);
+
+	// Add zeroes
+	floppy_image_write_filler(floppy , 0 , offset , amount);
+
+	// Write back the part of file after offset
+	floppy_image_write(floppy, buffer, offset + amount, size_after_off);
+
+	global_free_array(buffer);
+
+	// Update track offsets
+	struct imddsk_tag *tag = get_tag(floppy);
+	for (int track = 0; track < tag->tracks; track++) {
+		for (int head = 0; head < tag->heads; head++) {
+			UINT64 *track_off = &(tag->track_offsets[ (track << 1) + head ]);
+			if (*track_off >= offset) {
+				*track_off += amount;
+			}
+		}
+	}
+
+	return FLOPPY_ERROR_SUCCESS;
+}
+
+static floperr_t imd_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, const void *buffer, size_t buflen, int ddam)
+{
+	UINT64 offset;
+	floperr_t err;
+	UINT8 header[1];
+
+	// take sector offset
+	err = get_offset(floppy, head, track, sector_index, TRUE, &offset);
+	if (err)
+		return err;
+
+	floppy_image_read(floppy, header, offset, 1);
+
+	switch (header[ 0 ]) {
+	case 0:
+		return FLOPPY_ERROR_SEEKERROR;
+
+	default:
+		// Expand image file (from 1 byte to a whole sector)
+		err = imd_expand_file(floppy , offset , buflen - 1);
+		if (err) {
+			return err;
+		}
+		// Fall through!
+
+	case 1:
+	case 3:
+	case 5:
+	case 7:
+		// Turn every kind of sector into type 1 (normal data)
+		header[ 0 ] = 1;
+		floppy_image_write(floppy, header, offset, 1);
+		// Write sector
+		floppy_image_write(floppy, buffer, offset + 1, buflen);
+		break;
+	}
+
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 static floperr_t imd_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
@@ -266,6 +353,7 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 	callbacks = floppy_callbacks(floppy);
 	callbacks->read_sector = imd_read_sector;
 	callbacks->read_indexed_sector = imd_read_indexed_sector;
+	callbacks->write_indexed_sector = imd_write_indexed_sector;
 	callbacks->get_sector_length = imd_get_sector_length;
 	callbacks->get_heads_per_disk = imd_get_heads_per_disk;
 	callbacks->get_tracks_per_disk = imd_get_tracks_per_disk;
@@ -279,13 +367,13 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/imd_dsk.h
+    formats/imd_dsk.c
 
     IMD disk images
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // emu_fatalerror
 #include "imd_dsk.h"
 
 imd_format::imd_format()
@@ -336,7 +424,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
 	dynamic_buffer img(size);
-	io_generic_read(io, img, 0, size);
+	io_generic_read(io, &img[0], 0, size);
 
 	UINT64 pos;
 	for(pos=0; pos < size && img[pos] != 0x1a; pos++);
@@ -363,12 +451,12 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		int rpm = form_factor == floppy_image::FF_8 || (form_factor == floppy_image::FF_525 && rate >= 300000) ? 360 : 300;
 		int cell_count = (fm ? 1 : 2)*rate*60/rpm;
 
-		const UINT8 *snum = img+pos;
+		const UINT8 *snum = &img[pos];
 		pos += sector_count;
-		const UINT8 *tnum = head & 0x80 ? img+pos : NULL;
+		const UINT8 *tnum = head & 0x80 ? &img[pos] : NULL;
 		if(tnum)
 			pos += sector_count;
-		const UINT8 *hnum = head & 0x40 ? img+pos : NULL;
+		const UINT8 *hnum = head & 0x40 ? &img[pos] : NULL;
 		if(hnum)
 			pos += sector_count;
 
@@ -398,7 +486,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					memset(sects[i].data, img[pos++], actual_size);
 
 				} else {
-					sects[i].data = img + pos;
+					sects[i].data = &img[pos];
 					pos += actual_size;
 				}
 			}
@@ -410,7 +498,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, gap_3);
 
 		for(int i=0; i<sector_count; i++)
-			if(sects[i].data && (sects[i].data < img || sects[i].data >= img+size))
+			if(sects[i].data && (sects[i].data < &img[0] || sects[i].data >= &img[size]))
 				global_free_array(sects[i].data);
 	}
 

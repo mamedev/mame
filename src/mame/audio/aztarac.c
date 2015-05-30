@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mathis Rosenhauer
 /***************************************************************************
 
     Centuri Aztarac hardware
@@ -9,12 +11,12 @@
 #include "includes/aztarac.h"
 
 
-READ16_MEMBER(aztarac_state::aztarac_sound_r)
+READ16_MEMBER(aztarac_state::sound_r)
 {
 	return m_sound_status & 0x01;
 }
 
-WRITE16_MEMBER(aztarac_state::aztarac_sound_w)
+WRITE16_MEMBER(aztarac_state::sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -26,24 +28,24 @@ WRITE16_MEMBER(aztarac_state::aztarac_sound_w)
 	}
 }
 
-READ8_MEMBER(aztarac_state::aztarac_snd_command_r)
+READ8_MEMBER(aztarac_state::snd_command_r)
 {
 	m_sound_status |= 0x01;
 	m_sound_status &= ~0x20;
 	return soundlatch_byte_r(space,offset);
 }
 
-READ8_MEMBER(aztarac_state::aztarac_snd_status_r)
+READ8_MEMBER(aztarac_state::snd_status_r)
 {
 	return m_sound_status & ~0x01;
 }
 
-WRITE8_MEMBER(aztarac_state::aztarac_snd_status_w)
+WRITE8_MEMBER(aztarac_state::snd_status_w)
 {
 	m_sound_status &= ~0x10;
 }
 
-INTERRUPT_GEN_MEMBER(aztarac_state::aztarac_snd_timed_irq)
+INTERRUPT_GEN_MEMBER(aztarac_state::snd_timed_irq)
 {
 	m_sound_status ^= 0x10;
 

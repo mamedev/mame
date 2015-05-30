@@ -1,7 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, David Haywood
 /*** DRIVER INFO **************************************************************
 
 Grand Striker, V Goal Soccer, World Cup '94
-driver by Farfetch and David Haywood
+driver by Farfetch'd and David Haywood
 
 Grand Striker (c)199?  Human
 V Goal Soccer (c)199?  Tecmo (2 sets)

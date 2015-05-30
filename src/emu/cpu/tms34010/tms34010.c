@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn,Zsolt Vasvari
 /***************************************************************************
 
     TMS34010: Portable Texas Instruments TMS34010 emulator
@@ -35,7 +37,7 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3)
-	, m_reset_deferred(FALSE)
+	, m_halt_on_reset(FALSE)
 	, m_pixclock(0)
 	, m_pixperclock(0)
 	, m_output_int_cb(*this)
@@ -590,14 +592,14 @@ void tms340x0_device::device_start()
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 
-		astring tempstr;
+		std::string tempstr;
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_A0 + regnum, tempstr.format("A%d", regnum), m_regs[regnum].reg);
+			state_add(TMS34010_A0 + regnum, strformat(tempstr, "A%d", regnum).c_str(), m_regs[regnum].reg);
 		}
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_B0 + regnum, tempstr.format("B%d", regnum), m_regs[30 - regnum].reg);
+			state_add(TMS34010_B0 + regnum, strformat(tempstr, "B%d", regnum).c_str(), m_regs[30 - regnum].reg);
 		}
 	}
 
@@ -648,6 +650,8 @@ void tms340x0_device::device_reset()
 
 	/* HALT the CPU if requested, and remember to re-read the starting PC */
 	/* the first time we are run */
+	m_reset_deferred = m_halt_on_reset;
+
 	if (m_reset_deferred)
 	{
 		io_register_w(*m_program, REG_HSTCTLH, 0x8000, 0xffff);
@@ -714,11 +718,10 @@ void tms340x0_device::execute_run()
 		m_icount = 0;
 		return;
 	}
-
 	/* if the CPU's reset was deferred, do it now */
 	if (m_reset_deferred)
 	{
-		m_reset_deferred = 0;
+		m_reset_deferred = FALSE;
 		m_pc = RLONG(0xffffffe0);
 	}
 
@@ -1596,12 +1599,12 @@ READ16_MEMBER( tms340x0_device::host_r )
 }
 
 
-void tms340x0_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms340x0_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_st & 0x80000000 ? 'N':'.',
 				m_st & 0x40000000 ? 'C':'.',
 				m_st & 0x20000000 ? 'Z':'.',

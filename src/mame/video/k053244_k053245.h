@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #pragma once
 #ifndef __K053244_K053245_H__
 #define __K053244_K053245_H__

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /***************************************************************************
 
                     -= Seta, Sammy, Visco (SSV) System =-
@@ -141,7 +143,7 @@ Note: press Z to show some info on each sprite (debug builds only)
 #endif
 
 
-void ssv_state::ssv_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
+void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					int shadow )
 {
@@ -194,6 +196,10 @@ void ssv_state::ssv_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx
 void ssv_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
+
+	save_item(NAME(m_enable_video));
+	save_item(NAME(m_shadow_pen_mask));
+	save_item(NAME(m_shadow_pen_shift));
 }
 
 VIDEO_START_MEMBER(ssv_state,eaglshot)
@@ -204,6 +210,8 @@ VIDEO_START_MEMBER(ssv_state,eaglshot)
 
 	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_eaglshot_gfxram);
 	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_eaglshot_gfxram);
+
+	save_pointer(NAME(m_eaglshot_gfxram), 16 * 0x40000 / 2);
 }
 
 TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
@@ -368,7 +376,7 @@ VIDEO_START_MEMBER(ssv_state,gdfs)
 
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::ssv_vblank_r)
+READ16_MEMBER(ssv_state::vblank_r)
 {
 	if (m_screen->vblank())
 		return 0x2000 | 0x1000;
@@ -376,7 +384,7 @@ READ16_MEMBER(ssv_state::ssv_vblank_r)
 		return 0x0000;
 }
 
-WRITE16_MEMBER(ssv_state::ssv_scroll_w)
+WRITE16_MEMBER(ssv_state::scroll_w)
 {
 	COMBINE_DATA(m_scroll + offset);
 
@@ -688,7 +696,7 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx
 			{
 				for (ty = ystart; ty != yend; ty += yinc)
 				{
-					ssv_drawgfx( bitmap, clip, m_gfxdecode->gfx(gfx),
+					drawgfx( bitmap, clip, m_gfxdecode->gfx(gfx),
 											code++,
 											color,
 											flipx, flipy,
@@ -913,7 +921,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				{
 					for (y = ystart; y != yend; y += yinc)
 					{
-						ssv_drawgfx( bitmap, cliprect, m_gfxdecode->gfx(gfx),
+						drawgfx( bitmap, cliprect, m_gfxdecode->gfx(gfx),
 												code++,
 												color,
 												flipx, flipy,
@@ -948,12 +956,12 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 UINT32 ssv_state::screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return screen_update_ssv(screen, bitmap, cliprect);
+	return screen_update(screen, bitmap, cliprect);
 }
 
 UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update_ssv(screen, bitmap, cliprect);
+	screen_update(screen, bitmap, cliprect);
 
 	// draw zooming sprites
 	m_gdfs_st0020->st0020_draw_all(bitmap, cliprect);
@@ -965,12 +973,12 @@ UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-void ssv_state::ssv_enable_video(int enable)
+void ssv_state::enable_video(int enable)
 {
 	m_enable_video = enable;
 }
 
-UINT32 ssv_state::screen_update_ssv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 ssv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 

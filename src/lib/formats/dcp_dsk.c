@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /*********************************************************************
 
     formats/dcp_dsk.h
@@ -20,7 +20,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "dcp_dsk.h"
 
 dcp_format::dcp_format()

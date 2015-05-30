@@ -1,10 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Ramiro Polla, Felipe Sanches
 /*
  * Epson LX-810L dot matrix printer emulation
- *
- * Copyright: 2014 Ramiro Polla
- *                 Felipe Sanches
- * License: BSD-3-Clause
- *
+
  * IC list:
  *   uPD7810HG (cpu)
  *   E05A30 (gate array)

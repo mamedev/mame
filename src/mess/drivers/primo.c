@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Krzysztof Strzecha
 /*******************************************************************************
 
 Primo driver by Krzysztof Strzecha

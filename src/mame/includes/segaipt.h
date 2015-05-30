@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*******************************************************************************
 
     Input port macros used by many games in multiple Sega drivers

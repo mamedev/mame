@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* There were also MPU0 and MPU1 units
 
  Information from 'MAGIK'

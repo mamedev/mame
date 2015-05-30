@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_fourterm.c
  *
@@ -13,8 +15,8 @@
 
 NETLIB_START(VCCS)
 {
-	start_internal(1.0 / netlist().gmin());
-	m_gfac = 1.0;
+	start_internal(NL_FCONST(1.0) / netlist().gmin());
+	m_gfac = NL_FCONST(1.0);
 }
 
 void NETLIB_NAME(VCCS)::start_internal(const nl_double def_RI)
@@ -46,16 +48,16 @@ void NETLIB_NAME(VCCS)::start_internal(const nl_double def_RI)
 NETLIB_RESET(VCCS)
 {
 	const nl_double m_mult = m_G.Value() * m_gfac; // 1.0 ==> 1V ==> 1A
-	const nl_double GI = 1.0 / m_RI.Value();
+	const nl_double GI = NL_FCONST(1.0) / m_RI.Value();
 
 	m_IP.set(GI);
 	m_IN.set(GI);
 
-	m_OP.set(m_mult, 0.0);
-	m_OP1.set(-m_mult, 0.0);
+	m_OP.set(m_mult, NL_FCONST(0.0));
+	m_OP1.set(-m_mult, NL_FCONST(0.0));
 
-	m_ON.set(-m_mult, 0.0);
-	m_ON1.set(m_mult, 0.0);
+	m_ON.set(-m_mult, NL_FCONST(0.0));
+	m_ON1.set(m_mult, NL_FCONST(0.0));
 }
 
 NETLIB_UPDATE_PARAM(VCCS)
@@ -83,7 +85,7 @@ NETLIB_UPDATE(VCCS)
 NETLIB_START(CCCS)
 {
 	start_internal(1.0);
-	m_gfac = 1.0 / m_RI.Value();
+	m_gfac = NL_FCONST(1.0) / m_RI.Value();
 }
 
 NETLIB_RESET(CCCS)
@@ -123,11 +125,11 @@ NETLIB_START(VCVS)
 
 NETLIB_RESET(VCVS)
 {
-	m_gfac = 1.0 / m_RO.Value();
+	m_gfac = NL_FCONST(1.0) / m_RO.Value();
 	NETLIB_NAME(VCCS)::reset();
 
-	m_OP2.set(1.0 / m_RO.Value());
-	m_ON2.set(1.0 / m_RO.Value());
+	m_OP2.set(NL_FCONST(1.0) / m_RO.Value());
+	m_ON2.set(NL_FCONST(1.0) / m_RO.Value());
 }
 
 NETLIB_UPDATE_PARAM(VCVS)

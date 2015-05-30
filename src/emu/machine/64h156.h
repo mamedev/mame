@@ -6,9 +6,6 @@
 
     Used in 1541B/1541C/1541-II/1551/1571
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                   TEST   1 |*    \_/     | 40  _BYTE

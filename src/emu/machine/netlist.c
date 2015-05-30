@@ -1,46 +1,10 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /***************************************************************************
 
     netlist.c
 
     Discrete netlist implementation.
-
-****************************************************************************
-
-    Couriersud reserves the right to license the code under a less restrictive
-    license going forward.
-
-    Copyright Nicola Salmoria and the MAME team
-    All rights reserved.
-
-    Redistribution and use of this code or any derivative works are permitted
-    provided that the following conditions are met:
-
-    * Redistributions may not be sold, nor may they be used in a commercial
-    product or activity.
-
-    * Redistributions that are modified from the original source must include the
-    complete source code, including the source code for all components used by a
-    binary built from the modified sources. However, as a special exception, the
-    source code distributed need not include anything that is normally distributed
-    (in either source or binary form) with the major components (compiler, kernel,
-    and so on) of the operating system on which the executable runs, unless that
-    component itself accompanies the executable.
-
-    * Redistributions must reproduce the above copyright notice, this list of
-    conditions and the following disclaimer in the documentation and/or other
-    materials provided with the distribution.
-
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
 
 ****************************************************************************/
 
@@ -370,7 +334,8 @@ void netlist_mame_device_t::device_clock_changed()
 	//printf("device_clock_changed\n");
 	m_div = netlist_time::from_hz(clock()).as_raw();
 	//m_rem = 0;
-	NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clockfreq, m_div));
+	//NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clock(), m_div));
+	NL_VERBOSE_OUT(("Setting clock %d and divisor %d\n", clock(), m_div));
 	//printf("Setting clock %d and divisor %d\n", clock(), m_div);
 }
 
@@ -387,6 +352,8 @@ void netlist_mame_device_t::device_stop()
 {
 	LOG_DEV_CALLS(("device_stop\n"));
 	m_setup->print_stats();
+
+	m_netlist->stop();
 
 	global_free(m_setup);
 	m_setup = NULL;
@@ -428,9 +395,9 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
 
 ATTR_COLD void netlist_mame_device_t::save_state()
 {
-	for (pstate_entry_t * const *p = netlist().save_list().first(); p != NULL; p = netlist().save_list().next(p))
+	for (int i=0; i< netlist().save_list().size(); i++)
 	{
-		pstate_entry_t *s = *p;
+		pstate_entry_t *s = netlist().save_list()[i];
 		NL_VERBOSE_OUT(("saving state for %s\n", s->m_name.cstr()));
 		switch (s->m_dt)
 		{
@@ -440,12 +407,12 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 					if (td != NULL) save_pointer(td, s->m_name, s->m_count);
 				}
 				break;
-            case DT_FLOAT:
-                {
-                    float *td = s->resolved<float>();
-                    if (td != NULL) save_pointer(td, s->m_name, s->m_count);
-                }
-                break;
+			case DT_FLOAT:
+				{
+					float *td = s->resolved<float>();
+					if (td != NULL) save_pointer(td, s->m_name, s->m_count);
+				}
+				break;
 			case DT_INT64:
 				save_pointer((INT64 *) s->m_ptr, s->m_name, s->m_count);
 				break;
@@ -497,7 +464,7 @@ void netlist_mame_cpu_device_t::device_start()
 
 	state_add(STATE_GENPC, "curpc", m_genPC).noshow();
 
-	for (int i=0; i < netlist().m_nets.count(); i++)
+	for (int i=0; i < netlist().m_nets.size(); i++)
 	{
 		netlist_net_t *n = netlist().m_nets[i];
 		if (n->isFamily(netlist_object_t::LOGIC))
@@ -535,18 +502,16 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 	//char tmp[16];
 	unsigned startpc = pc;
 	int relpc = pc - m_genPC;
-	//UINT16 opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
-	//UINT8 inst = opcode >> 13;
-
 	if (relpc >= 0 && relpc < netlist().queue().count())
 	{
-		//            sprintf(buffer, "%04x %02d %s", pc, relpc, netlist().queue()[netlist().queue().count() - relpc - 1].object().name().cstr());
 		int dpc = netlist().queue().count() - relpc - 1;
-		sprintf(buffer, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
+		// FIXME: 50 below fixes crash in mame-debugger. It's based on try on error.
+		snprintf(buffer, 50, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
 				netlist().queue()[dpc].exec_time().as_double());
 	}
 	else
 		sprintf(buffer, "%s", "");
+
 	pc+=1;
 	return (pc - startpc);
 }
@@ -593,11 +558,11 @@ void netlist_mame_sound_device_t::device_start()
 
 	// Configure outputs
 
-	plinearlist_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
-	if (outdevs.count() == 0)
+	plist_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
+	if (outdevs.size() == 0)
 		fatalerror("No output devices");
 
-	m_num_outputs = outdevs.count();
+	m_num_outputs = outdevs.size();
 
 	/* resort channels */
 	for (int i=0; i < MAX_OUT; i++) m_out[i] = NULL;
@@ -607,7 +572,7 @@ void netlist_mame_sound_device_t::device_start()
 
 		netlist().log("Output %d on channel %d", i, chan);
 
-		if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.count())
+		if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.size())
 			fatalerror("illegal channel number");
 		m_out[chan] = outdevs[i];
 		m_out[chan]->m_sample = netlist_time::from_hz(clock());
@@ -619,10 +584,10 @@ void netlist_mame_sound_device_t::device_start()
 	m_num_inputs = 0;
 	m_in = NULL;
 
-	plinearlist_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
-	if (indevs.count() > 1)
+	plist_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
+	if (indevs.size() > 1)
 		fatalerror("A maximum of one input device is allowed!");
-	if (indevs.count() == 1)
+	if (indevs.size() == 1)
 	{
 		m_in = indevs[0];
 		m_num_inputs = m_in->resolve();

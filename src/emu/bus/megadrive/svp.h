@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Fabio Priuli,Pierpaolo Prazzoli,Grazvydas Ignotas
 #ifndef __MD_SVP_H
 #define __MD_SVP_H
 

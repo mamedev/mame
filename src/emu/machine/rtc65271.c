@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet, R. Belmont
 /*
     rtc65271 emulation
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 #pragma once
 
 #ifndef __NUBUS_LVIEW_H__
@@ -45,7 +47,7 @@ public:
 		UINT32 m_palette[256];
 		emu_timer *m_timer;
 		int m_protstate;
-		astring m_assembled_tag;
+		std::string m_assembled_tag;
 };
 
 

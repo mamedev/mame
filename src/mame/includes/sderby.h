@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Roberto Fresca
 class sderby_state : public driver_device
 {
 public:

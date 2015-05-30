@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*********************************************************************
 
     formats/dim_dsk.c
@@ -7,8 +9,8 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
-#include "emu.h"
 #include "dim_dsk.h"
 #include "basicdsk.h"
 
@@ -101,17 +103,14 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 }
 
 
-// license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/dim_dsk.h
+    formats/dim_dsk.c
 
     DIM disk images
 
 *********************************************************************/
 
-#include "emu.h"
 #include "dim_dsk.h"
 
 dim_format::dim_format()

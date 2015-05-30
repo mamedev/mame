@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 /* SHARC DMA operations */
 
 #define DMA_PMODE_NO_PACKING        0

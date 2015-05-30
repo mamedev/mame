@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 #include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 

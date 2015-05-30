@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 /*
 
 Power Balls  (c) 1994 Playmark

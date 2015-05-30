@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 #pragma once
 
 #ifndef __TMS6100_H__

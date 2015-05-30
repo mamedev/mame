@@ -122,7 +122,6 @@ public:
 	inline void consume_rle(int count);
 	void perform_blit(address_space &space);
 	void itech8_update_interrupts(int periodic, int tms34061, int blitter);
-	DECLARE_WRITE_LINE_MEMBER(generate_sound_irq);
 
 	/*----------- defined in machine/slikshot.c -----------*/
 

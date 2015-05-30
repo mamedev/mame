@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  sdlfile.c - SDL file access functions
-//
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -176,7 +175,6 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	// does path start with an environment variable?
 	if (tmpstr[0] == '$')
 	{
-		char *envval;
 		envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
@@ -189,7 +187,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 
 		envstr[i] = '\0';
 
-		envval = osd_getenv(&envstr[1]);
+		const char *envval = osd_getenv(&envstr[1]);
 		if (envval != NULL)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
@@ -370,6 +368,9 @@ file_error osd_truncate(osd_file *file, UINT64 offset)
 {
 	UINT32 result;
 
+	if (!file || !file->handle)
+		return FILERR_FAILURE;
+
 	switch (file->type)
 	{
 		case SDLFILE_FILE:
@@ -472,7 +473,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
 static int osd_is_path_separator(char c)
 {
-	return (c == '/') || (c == '\\');
+	return (c == PATHSEPCH) || (c == INVPATHSEPCH);
 }
 
 //============================================================
@@ -506,31 +507,31 @@ int osd_is_absolute_path(const char *path)
 
 osd_directory_entry *osd_stat(const char *path)
 {
-    int err;
-    osd_directory_entry *result = NULL;
-    #if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN)
-    struct stat st;
-    #else
-    struct stat64 st;
-    #endif
+	int err;
+	osd_directory_entry *result = NULL;
+	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN) || defined(SDLMAME_OS2)
+	struct stat st;
+	#else
+	struct stat64 st;
+	#endif
 
-    #if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN)
-    err = stat(path, &st);
-    #else
-    err = stat64(path, &st);
-    #endif
+	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN) || defined(SDLMAME_OS2)
+	err = stat(path, &st);
+	#else
+	err = stat64(path, &st);
+	#endif
 
-    if( err == -1) return NULL;
+	if( err == -1) return NULL;
 
-    // create an osd_directory_entry; be sure to make sure that the caller can
-    // free all resources by just freeing the resulting osd_directory_entry
-    result = (osd_directory_entry *) osd_malloc_array(sizeof(*result) + strlen(path) + 1);
-    strcpy(((char *) result) + sizeof(*result), path);
-    result->name = ((char *) result) + sizeof(*result);
-    result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
-    result->size = (UINT64)st.st_size;
+	// create an osd_directory_entry; be sure to make sure that the caller can
+	// free all resources by just freeing the resulting osd_directory_entry
+	result = (osd_directory_entry *) osd_malloc_array(sizeof(*result) + strlen(path) + 1);
+	strcpy(((char *) result) + sizeof(*result), path);
+	result->name = ((char *) result) + sizeof(*result);
+	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
+	result->size = (UINT64)st.st_size;
 
-    return result;
+	return result;
 }
 
 //============================================================
@@ -539,32 +540,32 @@ osd_directory_entry *osd_stat(const char *path)
 
 file_error osd_get_full_path(char **dst, const char *path)
 {
-    file_error err;
-    char path_buffer[512];
+	file_error err;
+	char path_buffer[512];
 
-    err = FILERR_NONE;
+	err = FILERR_NONE;
 
-    if (getcwd(path_buffer, 511) == NULL)
-    {
-        printf("osd_get_full_path: failed!\n");
-        err = FILERR_FAILURE;
-    }
-    else
-    {
-        *dst = (char *)osd_malloc_array(strlen(path_buffer)+strlen(path)+3);
+	if (getcwd(path_buffer, 511) == NULL)
+	{
+		printf("osd_get_full_path: failed!\n");
+		err = FILERR_FAILURE;
+	}
+	else
+	{
+		*dst = (char *)osd_malloc_array(strlen(path_buffer)+strlen(path)+3);
 
-        // if it's already a full path, just pass it through
-        if (path[0] == '/')
-        {
-            strcpy(*dst, path);
-        }
-        else
-        {
-            sprintf(*dst, "%s%s%s", path_buffer, PATH_SEPARATOR, path);
-        }
-    }
+		// if it's already a full path, just pass it through
+		if (path[0] == '/')
+		{
+			strcpy(*dst, path);
+		}
+		else
+		{
+			sprintf(*dst, "%s%s%s", path_buffer, PATH_SEPARATOR, path);
+		}
+	}
 
-    return err;
+	return err;
 }
 
 //============================================================
@@ -573,8 +574,8 @@ file_error osd_get_full_path(char **dst, const char *path)
 
 const char *osd_get_volume_name(int idx)
 {
-    if (idx!=0) return NULL;
-    return "/";
+	if (idx!=0) return NULL;
+	return "/";
 }
 
 #endif

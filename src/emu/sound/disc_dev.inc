@@ -1,11 +1,13 @@
+// license:BSD-3-Clause
+// copyright-holders:K.Wilkins
 /************************************************************************
  *
  *  MAME - Discrete sound system emulation library
  *
- *  Written by Keith Wilkins (mame@dysfunction.demon.co.uk)
+ *  Written by K.Wilkins (mame@esplexo.co.uk)
  *
  *  (c) K.Wilkins 2000
- *  (c) D.Renaud 2003-2004
+ *  (c) Derrick Renaud 2003-2004
  *
  ************************************************************************
  *

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*********************************************************************
 
     formats/msx_dsk.c
@@ -5,6 +7,8 @@
     MSX disk images
 
 *********************************************************************/
+
+#include <assert.h>
 
 #include "formats/msx_dsk.h"
 #include "formats/basicdsk.h"

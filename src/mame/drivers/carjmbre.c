@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:insideoutboy, Nicola Salmoria
 /***************************************************************************
 
     Car Jamboree

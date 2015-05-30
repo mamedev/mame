@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "machine/i8255.h"
 #include "includes/galaxold.h"
 #include "sound/tms5110.h"

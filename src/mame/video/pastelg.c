@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Takahiro Nogi
 /******************************************************************************
 
     Video Hardware for Nichibutsu Mahjong series.
@@ -283,7 +285,7 @@ void pastelg_state::video_start()
 	int height = m_screen->height();
 
 	m_videoram = auto_alloc_array_clear(machine(), UINT8, width * height);
-	
+
 	save_item(NAME(m_blitter_desty));
 	save_item(NAME(m_blitter_sizex));
 	save_item(NAME(m_blitter_sizey));

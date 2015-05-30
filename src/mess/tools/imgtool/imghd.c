@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Nathan Woods, Raphael Nabet
 /*
     Code to interface the MESS image code with MAME's harddisk core.
 
@@ -52,7 +54,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	chd_error rc;
 	UINT64 logicalbytes;
 	int hunknum, totalhunks;
-	astring metadata;
+	std::string metadata;
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
 
 	/* sanity check args */
@@ -92,7 +94,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* write the metadata */
-	metadata.format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
+	strprintf(metadata,HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
 	err = (imgtoolerr_t)chd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 	if (rc != CHDERR_NONE)
 	{
@@ -101,13 +103,14 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* alloc and zero buffer */
-	cache.resize_and_clear(hunksize);
+	cache.resize(hunksize);
+	memset(&cache[0], 0, hunksize);
 
 	/* zero out every hunk */
 	totalhunks = (logicalbytes + hunksize - 1) / hunksize;
 	for (hunknum = 0; hunknum < totalhunks; hunknum++)
 	{
-		rc = chd.write_units(hunknum, cache);
+		rc = chd.write_units(hunknum, &cache[0]);
 		if (rc)
 		{
 			err = IMGTOOLERR_WRITEERROR;

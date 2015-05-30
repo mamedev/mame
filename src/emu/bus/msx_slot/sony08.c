@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
 
   Emulation of the firmware mapper as found in Sony HB-F1XDJ and HB-F1XV machines.

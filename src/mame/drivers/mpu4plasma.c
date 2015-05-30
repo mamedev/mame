@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU4 'Plasma' addition */
 
 /* the Plasma was an oversized DMD, but was rarely used, Big Chief might be the only game with it, at least it's the only dump we have? */
@@ -189,7 +191,7 @@ ROM_START( m4elite )
 	M4ELITE_PLASMA
 ROM_END
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 
 GAMEL(199?, m4bigchf    ,0          ,mpu4plasma     ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 1)",                        GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )
 GAMEL(199?, m4bigchfa   ,m4bigchf   ,mpu4plasma     ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 2)",                        GAME_FLAGS|GAME_NO_SOUND,layout_mpu4plasma )

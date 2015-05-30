@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 
   video/advision.c
@@ -21,7 +23,8 @@
 void advision_state::video_start()
 {
 	m_video_hpos = 0;
-	m_display.resize_and_clear(8 * 8 * 256);
+	m_display.resize(8 * 8 * 256);
+	memset(&m_display[0], 0, 8*8*256);
 	save_item(NAME(m_display));
 	save_item(NAME(m_video_hpos));
 }

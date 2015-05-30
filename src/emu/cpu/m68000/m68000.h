@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 #pragma once
 
 #ifndef __M68000_H__
@@ -356,8 +358,8 @@ public:
 	UINT16 mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
 
 	UINT32 ic_address[M68K_IC_SIZE];   /* instruction cache address data */
-	UINT16 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
-
+	UINT32 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
+	bool   ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */
 
 
 
@@ -398,7 +400,7 @@ public:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_memory_interface overrides
 	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address);

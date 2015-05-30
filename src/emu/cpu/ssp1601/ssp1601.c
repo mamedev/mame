@@ -1,10 +1,9 @@
+// license:???
+// copyright-holders:Pierpaolo Prazzoli,Grazvydas Ignotas
 /*
  * Samsung SSP1601 DSP emulator
  *
  * Copyright 2008, Grazvydas Ignotas
- *
- * This code is released under the MAME license.
- *
  *
  * notes:
  * not everything is implemented, but it is accurate enough to
@@ -548,12 +547,12 @@ void ssp1601_device::device_start()
 }
 
 
-void ssp1601_device::state_string_export(const device_state_entry &entry, astring &string)
+void ssp1601_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf( "%c%c%c%c", (rST&SSP_FLAG_N)?'N':'.', (rST&SSP_FLAG_V)?'V':'.',
+			strprintf(str, "%c%c%c%c", (rST&SSP_FLAG_N) ? 'N' : '.', (rST&SSP_FLAG_V) ? 'V' : '.',
 				(rST&SSP_FLAG_Z)?'Z':'.', (rST&SSP_FLAG_L)?'L':'.'
 			);
 			break;

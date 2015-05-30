@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Christian Brunschen
 /***************************************************************************
  *
  *   es5510.c - Ensoniq ES5510 (ESP) emulation
@@ -178,7 +180,7 @@ typedef es5510_device::alu_op_t alu_op_t;
 typedef es5510_device::op_select_t op_select_t;
 typedef es5510_device::op_src_dst_t op_src_dst_t;
 
-static inline const char * const REGNAME(UINT8 r) {
+static inline const char * REGNAME(UINT8 r) {
 	static char rn[8];
 	if (r < 234) { sprintf(rn, "GPR_%02x", r); return rn; }
 	switch(r) {

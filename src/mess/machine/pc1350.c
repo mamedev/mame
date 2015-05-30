@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 #include "emu.h"
 #include "cpu/sc61860/sc61860.h"
 

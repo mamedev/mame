@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***************************************************************************
 
  Allied Leisure discrete hardware games
@@ -19,7 +21,6 @@
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
-#include "astring.h"
 
 // copied by Pong, not accurate for this driver!
 // start
@@ -121,4 +122,4 @@ ROM_START( sburners )
 ROM_END
 
 
-GAME( 1975, sburners,  0, sburners, 0, driver_device,  0, ROT0, "Alleid Leisure", "Street Burners [TTL]", GAME_IS_SKELETON )
+GAME( 1975, sburners,  0, sburners, 0, driver_device,  0, ROT0, "Allied Leisure", "Street Burners [TTL]", GAME_IS_SKELETON )

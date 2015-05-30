@@ -1,7 +1,9 @@
+// license:???
+// copyright-holders:Jarek Burczynski, Tomasz Slanina
 /***************************************************************************
 Big Event Golf (c) Taito 1986
 
-driver by Jaroslaw Burczynski
+driver by Jarek Burczynski
           Tomasz Slanina
 
 

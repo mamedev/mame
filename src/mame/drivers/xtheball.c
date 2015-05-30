@@ -30,21 +30,31 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tlc34076_device> m_tlc34076;
+
 	required_shared_ptr<UINT16> m_vram_bg;
 	required_shared_ptr<UINT16> m_vram_fg;
+
 	required_ioport m_analog_x;
 	required_ioport m_analog_y;
+
 	UINT8 m_bitvals[32];
+
 	DECLARE_WRITE16_MEMBER(bit_controls_w);
 	DECLARE_READ16_MEMBER(analogx_r);
 	DECLARE_READ16_MEMBER(analogy_watchdog_r);
+
+	virtual void machine_start();
+
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 };
 
 
-
+void xtheball_state::machine_start()
+{
+	save_item(NAME(m_bitvals));
+}
 
 /*************************************
  *
@@ -108,7 +118,7 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(xtheball_state::to_shiftreg)
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(shiftreg, &m_vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_to_shiftreg(%08X)\n", space.machine().describe_context(), address);
+		logerror("%s:to_shiftreg(%08X)\n", space.machine().describe_context(), address);
 }
 
 
@@ -119,7 +129,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(xtheball_state::from_shiftreg)
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(&m_vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_from_shiftreg(%08X)\n", space.machine().describe_context(), address);
+		logerror("%s:from_shiftreg(%08X)\n", space.machine().describe_context(), address);
 }
 
 
@@ -381,4 +391,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, xtheball, 0, xtheball, xtheball, driver_device, 0,  ROT0, "Rare", "X the Ball", 0 )
+GAME( 1991, xtheball, 0, xtheball, xtheball, driver_device, 0,  ROT0, "Rare", "X the Ball", GAME_SUPPORTS_SAVE )

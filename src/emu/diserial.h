@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl, Miodrag Milanovic
 #pragma once
 
 #ifndef __EMU_H__
@@ -68,7 +70,7 @@ public:
 						/*                               end is ready to accept it */
 		DSR = 0x0004, /* Data Set ready.      (INPUT)  Other end of connection has data */
 		DTR = 0x0008, /* Data terminal Ready. (OUTPUT) TX contains new data. */
-		RX  = 0x0010, /* Recieve data.        (INPUT)  */
+		RX  = 0x0010, /* Receive data.        (INPUT)  */
 		TX  = 0x0020  /* TX = Transmit data.  (OUTPUT) */
 	};
 
@@ -130,7 +132,7 @@ protected:
 	const char *parity_tostring(parity_t stop_bits);
 	const char *stop_bits_tostring(stop_bits_t stop_bits);
 
-	void register_save_state(save_manager &save, const char *module, const char *tag);
+	void register_save_state(save_manager &save, device_t *device);
 
 private:
 	enum { TRA_TIMER_ID = 10000, RCV_TIMER_ID };

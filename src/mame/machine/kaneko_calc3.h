@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, David Haywood
 /* CALC 3 */
 
 #define VERBOSE_OUTPUT 0

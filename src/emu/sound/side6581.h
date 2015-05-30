@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 //
 // /home/ms/source/sidplay/libsidplay/emu/RCS/enve_dl.h,v
 //

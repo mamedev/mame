@@ -4,9 +4,6 @@
 
     RCA VIP Expansion Keypad Interface Board VP585 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "vp585.h"

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /**********************************************************************
 
     Bellfruit BD1 VFD module interface and emulation by J.Wallace

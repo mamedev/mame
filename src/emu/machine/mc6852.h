@@ -4,9 +4,6 @@
 
     Motorola MC6852 Synchronous Serial Data Adapter emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    Vss   1 |*    \_/     | 24  _CTS

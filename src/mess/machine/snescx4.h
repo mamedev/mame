@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Fabio Priuli, byuu
 /***************************************************************************
 
     snescx4.h

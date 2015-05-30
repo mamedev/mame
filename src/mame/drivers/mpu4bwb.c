@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU4 BwB games
  - these are Bwb originals, not rebuilds..
    typically they have large 0x3f fills in rom..
@@ -29,7 +31,7 @@ MACHINE_CONFIG_EXTERN( bwboki );
 MACHINE_CONFIG_EXTERN( mod2 );
 INPUT_PORTS_EXTERN( mpu4 );
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 
 
 #define M4BIGMT_EXTRA_ROMS \

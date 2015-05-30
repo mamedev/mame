@@ -14,7 +14,8 @@
 #define __DEBUGCPU_H__
 
 #include "express.h"
-#include "simple_set.h"
+
+#include <set>
 
 
 //**************************************************************************
@@ -67,7 +68,7 @@ public:
 		bool enabled() const { return m_enabled; }
 		offs_t address() const { return m_address; }
 		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action; }
+		const char *action() const { return m_action.c_str(); }
 
 		// setters
 		void setEnabled(bool value) { m_enabled = value; }
@@ -82,7 +83,7 @@ public:
 		UINT8                m_enabled;                  // enabled?
 		offs_t               m_address;                  // execution address
 		parsed_expression    m_condition;                // condition
-		astring              m_action;                   // action
+		std::string          m_action;                   // action
 	};
 
 	// watchpoint class
@@ -112,7 +113,7 @@ public:
 		offs_t address() const { return m_address; }
 		offs_t length() const { return m_length; }
 		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action; }
+		const char *action() const { return m_action.c_str(); }
 
 		// setters
 		void setEnabled(bool value) { m_enabled = value; }
@@ -130,7 +131,7 @@ public:
 		offs_t               m_address;                  // start address
 		offs_t               m_length;                   // length of watch area
 		parsed_expression    m_condition;                // condition
-		astring              m_action;                   // action
+		std::string          m_action;                   // action
 	};
 
 	// registerpoint class
@@ -147,7 +148,7 @@ public:
 		int index() const { return m_index; }
 		bool enabled() const { return m_enabled; }
 		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action; }
+		const char *action() const { return m_action.c_str(); }
 
 	private:
 		// internals
@@ -157,7 +158,7 @@ public:
 		int                 m_index;                    // user reported index
 		UINT8               m_enabled;                  // enabled?
 		parsed_expression   m_condition;                // condition
-		astring             m_action;                   // action
+		std::string         m_action;                   // action
 	};
 
 public:
@@ -235,7 +236,7 @@ public:
 	void registerpoint_enable_all(bool enable = true );
 
 	// hotspots
-	bool hotspot_tracking_enabled() const { return (m_hotspots != NULL); }
+	bool hotspot_tracking_enabled() const { return !m_hotspots.empty(); }
 	void hotspot_track(int numspots, int threshhold);
 
 	// comments
@@ -277,7 +278,7 @@ private:
 	// internal helpers
 	void compute_debug_flags();
 	void prepare_for_step_overout(offs_t pc);
-	UINT32 dasm_wrapped(astring &buffer, offs_t pc);
+	UINT32 dasm_wrapped(std::string &buffer, offs_t pc);
 
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
@@ -350,7 +351,7 @@ private:
 
 		device_debug &      m_debug;                    // reference to our owner
 		FILE &              m_file;                     // tracing file for this CPU
-		astring             m_action;                   // action to perform during a trace
+		std::string         m_action;                   // action to perform during a trace
 		offs_t              m_history[TRACE_LOOPS];     // history of recent PCs
 		int                 m_loops;                    // number of instructions in a loop
 		int                 m_nextdex;                  // next index
@@ -369,7 +370,7 @@ private:
 		address_space *     m_space;                    // space where the access occurred
 		UINT32              m_count;                    // number of hits
 	};
-	dynamic_array<hotspot_entry> m_hotspots;            // hotspot list
+	std::vector<hotspot_entry> m_hotspots;            // hotspot list
 	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
 
 	// pc tracking
@@ -378,7 +379,7 @@ private:
 	public:
 		dasm_pc_tag(const offs_t& address, const UINT32& crc);
 
-		// required to be included in a simple_set
+		// required to be included in a set
 		bool operator < (const dasm_pc_tag& rhs) const
 		{
 			if (m_address == rhs.m_address)
@@ -389,7 +390,7 @@ private:
 		offs_t m_address;       // Stores [nothing] for a given address & crc32
 		UINT32 m_crc;
 	};
-	simple_set<dasm_pc_tag> m_track_pc_set;
+	std::set<dasm_pc_tag> m_track_pc_set;
 	bool m_track_pc;
 
 	// comments
@@ -398,11 +399,11 @@ private:
 	public:
 		dasm_comment(offs_t address, UINT32 crc, const char *text, rgb_t color);
 
-		astring  m_text;        // Stores comment text & color for a given address & crc32
+		std::string  m_text;        // Stores comment text & color for a given address & crc32
 		rgb_t    m_color;
 	};
-	simple_set<dasm_comment> m_comment_set;             // collection of comments
-	UINT32                   m_comment_change;          // change counter for comments
+	std::set<dasm_comment> m_comment_set;               // collection of comments
+	UINT32                 m_comment_change;            // change counter for comments
 
 	// memory tracking
 	class dasm_memory_access
@@ -413,7 +414,7 @@ private:
 							const UINT64& data,
 							const offs_t& pc);
 
-		// required to be included in a simple_set
+		// required to be included in a set
 		bool operator < (const dasm_memory_access& rhs) const
 		{
 			if ((m_address == rhs.m_address) && (m_address_space == rhs.m_address_space))
@@ -428,9 +429,9 @@ private:
 		address_spacenum m_address_space;
 		offs_t           m_address;
 		UINT64           m_data;
-		offs_t           m_pc;
+		mutable offs_t   m_pc;
 	};
-	simple_set<dasm_memory_access> m_track_mem_set;
+	std::set<dasm_memory_access> m_track_mem_set;
 	bool m_track_mem;
 
 	// internal flag values

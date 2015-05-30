@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phill Harvey-Smith
 #pragma once
 
 #ifndef __XTIDE_H__

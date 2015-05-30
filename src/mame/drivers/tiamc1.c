@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Eugene Sandulenko
 /*****************************************************************************
 
   TIA-MC1 driver

@@ -369,12 +369,12 @@ void lc8670_cpu_device::state_import(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void lc8670_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void lc8670_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%s%s%s%s",
+			strprintf(str, "%s%s%s%s",
 				GET_CY ? "CY" : "..",
 				GET_AC ? "AC" : "..",
 				GET_OV ? "OV" : "..",

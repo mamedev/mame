@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /****************************************************************************
 
     Data East 104 based protection/IO chips

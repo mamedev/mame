@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /**********************************************************************
 
     Rockwell A17XX ROM, RAM and I/O chip
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
     A ROM of 2048 x 8 bits is addressed whenever the RRSEL line
     (ROM/RAM select) is 0. A RAM of 128 x 4 bit is addressed when

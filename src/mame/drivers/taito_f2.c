@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
 /***************************************************************************
 
 Taito F2 System
@@ -584,7 +586,7 @@ void taitof2_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 INTERRUPT_GEN_MEMBER(taitof2_state::taitof2_interrupt)
 {
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), TIMER_TAITOF2_INTERRUPT6);
+	m_int6_timer->adjust(m_maincpu->cycles_to_attotime(500));
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
@@ -2834,6 +2836,7 @@ WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
 
 MACHINE_START_MEMBER(taitof2_state,common)
 {
+	m_int6_timer = timer_alloc(TIMER_TAITOF2_INTERRUPT6);
 }
 
 MACHINE_START_MEMBER(taitof2_state,f2)

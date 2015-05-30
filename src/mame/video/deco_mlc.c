@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*
     The MLC graphics hardware is quite complicated - the usual method of having 'object ram' that
     controls sprites is expanded into object ram that controls sprite blocks that may be stored

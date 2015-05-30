@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 
     imgterrs.c
@@ -6,7 +8,7 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include "imgtool.h"
 #include "imgterrs.h"
 #include "osdcomm.h"
 

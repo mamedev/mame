@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli, Quench
 /* Super Slam - Video Hardware */
 
 #include "emu.h"

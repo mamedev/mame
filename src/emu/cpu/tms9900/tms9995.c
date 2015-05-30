@@ -372,7 +372,7 @@ void tms9995_device::state_export(const device_state_entry &entry)
 /*
     state_string_export - export state as a string for the debugger
 */
-void tms9995_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms9995_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	static const char *statestr = "LAECOPX-----IIII";
 	char flags[17];
@@ -386,7 +386,7 @@ void tms9995_device::state_string_export(const device_state_entry &entry, astrin
 			val = (val >> 1) & 0x7fff;
 		}
 	}
-	string.cpy(flags);
+	str.assign(flags);
 }
 
 /*
@@ -1467,7 +1467,7 @@ void tms9995_device::int_prefetch_and_decode()
 				if (m_idle_state)
 				{
 					m_idle_state = false;
-					if (TRACE_INT) logerror("tms9995: Interrupt occured, terminate IDLE state\n");
+					if (TRACE_INT) logerror("tms9995: Interrupt occurred, terminate IDLE state\n");
 				}
 				PC = PC + 2;        // PC must be advanced (see flow chart), but no prefetch
 				if (TRACE_INT) logerror("tms9995: Interrupts pending; no prefetch; advance PC to %04x\n", PC);

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /***************************************************************************
 
   Texas Instruments TMS3556 Video Display Processor

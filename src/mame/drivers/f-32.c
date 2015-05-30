@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
 
  F-E1-32 driver
@@ -6,10 +8,24 @@
  Supported Games      PCB-ID
  ----------------------------------
  Mosaic               F-E1-32-009
+ Royal Poker 2        F-E1-32N-COM9e
 
  driver by Pierpaolo Prazzoli
 
 *********************************************************************/
+
+/*
+royalpk2 : to get 'secret. OK.'
+
+0002D92C: MOV L18, L29
+0002D92E: CMPI L18, $1
+0002D930: BNE $2d94c
+
+go 2d92c
+do l29 = 1
+f5
+
+*/
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
@@ -26,7 +42,7 @@ public:
 		m_videoram(*this, "videoram"){ }
 
 	/* devices */
-	required_device<e132xn_device>  m_maincpu;
+	required_device<hyperstone_device>  m_maincpu;
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_videoram;
@@ -134,6 +150,9 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
+
+
+
 static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 
 	/* basic machine hardware */
@@ -143,6 +162,8 @@ static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -166,6 +187,85 @@ static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
+
+
+
+static INPUT_PORTS_START( royalpk2 )
+	PORT_START("P1")
+
+	PORT_START("SYSTEM_P2")
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0xff7fffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMIN" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+
+	PORT_START( "EEPROMCLK" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+
+	PORT_START( "EEPROMCS" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+INPUT_PORTS_END
+
+
+
+static ADDRESS_MAP_START( royalpk2_map, AS_PROGRAM, 32, mosaicf2_state )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x80000000, 0x807fffff) AM_ROM AM_REGION("user2",0)
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( royalpk2_io, AS_IO, 32, mosaicf2_state )
+	AM_RANGE(0x4900, 0x4903) AM_READ_PORT("SYSTEM_P2")
+
+	AM_RANGE(0x4a00, 0x4a03) AM_READ_PORT("EEPROMIN")
+
+	AM_RANGE(0x6800, 0x6803) AM_WRITE_PORT("EEPROMCLK")
+	AM_RANGE(0x6900, 0x6903) AM_WRITE_PORT("EEPROMCS")
+	AM_RANGE(0x6a00, 0x6a03) AM_WRITE_PORT("EEPROMOUT")
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_START( royalpk2, mosaicf2_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_50MHz)
+	MCFG_CPU_PROGRAM_MAP(royalpk2_map)
+	MCFG_CPU_IO_MAP(royalpk2_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
+	MCFG_SCREEN_UPDATE_DRIVER(mosaicf2_state, screen_update_mosaicf2)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+//  MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* 3.579545 MHz */
+//  MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/8, OKIM6295_PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	// there is a 16c550 for communication
+MACHINE_CONFIG_END
+
 
 /*
 
@@ -221,6 +321,9 @@ DRAML & DRAMU are GM71C18163CJ6
 
 ROM1 & SND are stardard 27C040 and/or 27C020 eproms
 L00-L03 & U00-U03 are 29F1610ML Flash roms
+
+
+todo: royalpk2 layout (it's very different)
 */
 
 ROM_START( mosaicf2 )
@@ -242,4 +345,21 @@ ROM_START( mosaicf2 )
 	ROM_LOAD( "snd.bin",             0x000000, 0x040000, CRC(4584589c) SHA1(5f9824724f840767c3dc1dc04b203ddf3d78b84c) )
 ROM_END
 
+ROM_START( royalpk2 )
+	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	/* 0 - 0x80000 empty */
+	ROM_LOAD( "prog1",            0x80000, 0x080000, CRC(e1546304) SHA1(b628b347ba7fbbae948e98e72aa5ea190c5d0f2b) )
+
+	ROM_REGION32_BE( 0x800000, "user2", 0 )  /* gfx data */
+	ROM_LOAD32_WORD_SWAP( "1.u00", 0x000000, 0x200000, CRC(b397a805) SHA1(3fafa8533c793f41d0567b76667d3f3478eb9c1d) )
+	ROM_LOAD32_WORD_SWAP( "2.l00", 0x000002, 0x200000, CRC(83a67d20) SHA1(9bf4c3da0cd1aab2488f260f694493d8ee25883e) )
+	ROM_LOAD32_WORD_SWAP( "3.u01", 0x400000, 0x200000, CRC(f7b9d508) SHA1(5d98687c6cf158df8134d88d3726778d3762b411) )
+	ROM_LOAD32_WORD_SWAP( "4.l01", 0x400002, 0x200000, CRC(dcff4960) SHA1(f742c7a3b62262c4b0210db9df03f51b3f600bf2) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "snd2",             0x000000, 0x080000, CRC(f25e3315) SHA1(ce5350ecba6769b17bb01d82b55f26ded4d51773) )
+ROM_END
+
+
 GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, driver_device, 0,        ROT0, "F2 System", "Mosaic (F2 System)", GAME_SUPPORTS_SAVE )
+GAME( 1999, royalpk2, 0, royalpk2, royalpk2, driver_device, 0,        ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", GAME_NOT_WORKING )

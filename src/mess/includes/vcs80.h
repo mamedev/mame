@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, Robbbert
 #pragma once
 
 #ifndef __VCS80__

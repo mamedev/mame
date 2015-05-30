@@ -4,9 +4,6 @@
 
     NEC uPD1990AC Serial I/O Calendar & Clock emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*
@@ -312,7 +309,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 				m_shift_reg[i] = m_time_counter[i];
 
 			// data out pulse: uPD4990A: 1Hz, uPD1990A: 512Hz in testmode, 0.5Hz in normal mode
-			float div;
+			double div;
 			if (m_variant == TYPE_4990A)
 				div = 32768.0;
 			else if (m_testmode)
@@ -334,7 +331,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 		case MODE_TP_4096HZ:
 		{
 			// set timer pulse
-			const float div[4] = { 512.0, 128.0, 16.0, 8.0 };
+			const double div[4] = { 512.0, 128.0, 16.0, 8.0 };
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz((clock() / div[m_c - MODE_TP_64HZ]) * 2.0));
 
 			break;
@@ -347,7 +344,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 		{
 			// set timer pulse
 			attotime one_second = attotime::from_hz(clock() / 32768.0);
-			const float mul[4] = { 1.0, 10.0, 30.0, 60.0 };
+			const double mul[4] = { 1.0, 10.0, 30.0, 60.0 };
 			m_timer_tp->adjust(attotime::zero, 0, one_second * mul[m_c - MODE_TP_1S_INT] / 2.0);
 
 			break;

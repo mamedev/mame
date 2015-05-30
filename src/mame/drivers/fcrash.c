@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Final Crash & other CPS1 bootlegs */
 
 /*

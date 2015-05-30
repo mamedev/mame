@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #include "t10mmc.h"
 
 static int to_msf(int frame)

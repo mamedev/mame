@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /***************************************************************
  * Enter HALT state; write 1 to fake port on first execution
  ***************************************************************/

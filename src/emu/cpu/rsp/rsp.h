@@ -1,13 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Ryan Holtz
 /***************************************************************************
 
     rsp.h
 
     Interface file for the universal machine language-based
     Reality Signal Processor (RSP) emulator.
-
-    Copyright the MESS team
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -185,7 +183,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, astring &string);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }

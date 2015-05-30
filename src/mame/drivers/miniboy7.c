@@ -1,30 +1,21 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca
 /******************************************************************************
 
-  MINI BOY 7
+  MINI-BOY 7
 
   Driver by Roberto Fresca.
 
-
   Games running on this hardware:
 
-  * Mini Boy 7 (set 1).    1983, Bonanza Enterprises, Ltd.
-  * Mini Boy 7 (set 2).    1983, Bonanza Enterprises, Ltd.
+  * Mini-Boy 7 - 1983, Bonanza Enterprises, Ltd.
 
 
 *******************************************************************************
 
-
-  Preliminary Notes:
-
-  This driver was made reverse-engineering the program ROMs.
-  The Mini Boy 7 dump found lacks of PCB pics, technical notes or hardware list.
-  Only one text file inside telling that ROMs mb7511, mb7311 and mb7111 are rotten,
-  typical for M5L2764K parts. The color PROM was not dumped.
-
-
   Game Notes:
 
-  Mini Boy 7. Seven games in one, plus Ad message support.
+  Mini-Boy 7. Seven games in one, plus Ad message support.
   http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4275
 
   - Draw Poker.
@@ -35,9 +26,10 @@
   - Double-Up.
   - Craps.
 
+  During attract mode display, pressing the service menu will allow you to
+  add a custom ad to scroll during attract mode display. Up to 120 characters
 
 *******************************************************************************
-
 
   Hardware Notes:
   --------------
@@ -65,9 +57,10 @@
   - 1x 2x28 pins edge connector.
   - 1x 2x20 pins female connector.
 
+  - 2x pots to handle the B-G background color/intensity.
+
 
 *******************************************************************************
-
 
   --------------------
   ***  Memory Map  ***
@@ -77,13 +70,15 @@
   $0100 - $01FF   RAM     ; 6502 Stack Pointer.
   $0200 - $07FF   RAM     ; R/W. (settings)
 
-  $0800 - $0FFF   Video RAM
-  $1000 - $17FF   Color RAM
+  $0800 - $0FFF   Video RAM A
+  $1000 - $17FF   Color RAM A
+  $1800 - $1FFF   Video RAM B
+  $2000 - $27FF   Color RAM B
 
   $2800 - $2801   MC6845  ; MC6845 use $2800 for register addressing and $2801 for register values.
 
   $3000 - $3001   ?????   ; R/W. AY8910?
-  $3080 - $3083   ?????   ; R/W. PIA?
+  $3080 - $3083   MC6821  ; R/W. PIA
   $3800 - $3800   ?????   ; R.
 
   $4000 - $FFFF   ROM     ; ROM space.
@@ -130,14 +125,10 @@
 
   TODO:
 
-  - Inputs.
-  - DIP Switches.
-  - NVRAM support.
-  - Support for bottom scroll (big user message).
-  - Figure out the colors.
-  - Figure out the sound.
-  - Final cleanup and split the driver.
+  - Find the way to clean the lamps writes.
+    (there are alternate writes that mess the lamps)
 
+  - Implement fake pots for B-G background color
 
 *******************************************************************************/
 
@@ -150,6 +141,7 @@
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "miniboy7.lh"
 
 
 class miniboy7_state : public driver_device
@@ -157,22 +149,46 @@ class miniboy7_state : public driver_device
 public:
 	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
+		m_videoram_a(*this, "videoram_a"),
+		m_colorram_a(*this, "colorram_a"),
+		m_videoram_b(*this, "videoram_b"),
+		m_colorram_b(*this, "colorram_b"),
+		m_gfx1(*this, "gfx1"),
+		m_gfx2(*this, "gfx2"),
+		m_proms(*this, "proms"),
+		m_input2(*this, "INPUT2"),
+		m_dsw2(*this, "DSW2"),
 		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(miniboy7_videoram_w);
-	DECLARE_WRITE8_MEMBER(miniboy7_colorram_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(miniboy7);
-	UINT32 screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<UINT8> m_videoram_a;
+	required_shared_ptr<UINT8> m_colorram_a;
+	required_shared_ptr<UINT8> m_videoram_b;
+	required_shared_ptr<UINT8> m_colorram_b;
+	required_region_ptr<UINT8> m_gfx1;
+	required_region_ptr<UINT8> m_gfx2;
+	required_region_ptr<UINT8> m_proms;
+	required_ioport m_input2;
+	required_ioport m_dsw2;
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	DECLARE_WRITE8_MEMBER(ay_pa_w);
+	DECLARE_WRITE8_MEMBER(ay_pb_w);
+	DECLARE_READ8_MEMBER(pia_pb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+
+	void machine_reset();
+
+	int get_color_offset(UINT8 tile, UINT8 attr, int ra, int px);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	DECLARE_PALETTE_INIT(miniboy7);
+
+private:
+	UINT8 m_ay_pb;
+	int m_gpri;
 };
 
 
@@ -180,54 +196,57 @@ public:
 *          Video Hardware          *
 ***********************************/
 
-WRITE8_MEMBER(miniboy7_state::miniboy7_videoram_w)
-{
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(miniboy7_state::miniboy7_colorram_w)
-{
-	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(miniboy7_state::get_bg_tile_info)
+int miniboy7_state::get_color_offset(UINT8 tile, UINT8 attr, int ra, int px)
 {
 /*  - bits -
     7654 3210
-    --xx xx--   tiles color?.
-    ---- --x-   tiles bank.
-    xx-- ---x   seems unused. */
+    xxxx ----   tiles color.
+    ---- -xxx   tiles bank.
+    ---- x---   seems unused. */
 
-	int attr = m_colorram[tile_index];
-	int code = m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
-	int color = (attr & 0x3c) >> 2;  /* bits 2-3-4-5 for color? */
+	int color = (attr >> 4) & 0x0f;
 
-	if (bank == 1)  /* temporary hack to point to the 3rd gfx bank */
-		bank = 2;
+	if (attr & 0x04)
+	{
+		int bank = (attr & 0x03) << 8;
+		UINT8 bitplane0 = m_gfx2[0x0000 + ((tile + bank) << 3) + ra];
+		UINT8 bitplane1 = m_gfx2[0x2000 + ((tile + bank) << 3) + ra];
+		UINT8 bitplane2 = m_gfx2[0x4000 + ((tile + bank) << 3) + ra];
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+		return (color << 3) + ((BIT(bitplane0 << px, 7) << 0) | (BIT(bitplane1 << px, 7) << 1) | (BIT(bitplane2 << px, 7) << 2));
+	}
+	else
+	{
+		int bank = (attr & 0x01) << 8;
+		UINT8 bitplane0 = m_gfx1[((tile + bank) << 3) + ra];
+		return (color << 3) + BIT(bitplane0 << px, 7);
+	}
 }
 
-void miniboy7_state::video_start()
+MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(miniboy7_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 37, 37);
-}
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-UINT32 miniboy7_state::screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
+	for (UINT8 cx = 0; cx < x_count; cx+=1)
+	{
+		for (int px = 0; px < 8; px++)
+		{
+			int offset_a = (m_gpri ? 0x80 : 0) + get_color_offset(m_videoram_a[ma + cx], m_colorram_a[ma + cx], ra, px);
+			int offset_b = (m_gpri ? 0 : 0x80) + get_color_offset(m_videoram_b[ma + cx], m_colorram_b[ma + cx], ra, px);
+			UINT8 color_a = m_proms[offset_a] & 0x0f;
+			UINT8 color_b = m_proms[offset_b] & 0x0f;
+
+			if (color_a && (m_gpri || !color_b))          // videoram A has priority
+				bitmap.pix32(y, (cx << 3) + px) = palette[offset_a];
+			else if (color_b && (!m_gpri || !color_a))    // videoram B has priority
+				bitmap.pix32(y, (cx << 3) + px) = palette[offset_b];
+		}
+	}
 }
 
 PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
-/*  FIXME... Can't get the correct palette.
-    sometimes RGB bits are inverted, disregarding the 4th bit.
-
+/*
     prom bits
     7654 3210
     ---- ---x   red component?.
@@ -239,7 +258,7 @@ PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 	int i;
 
 	/* 0000IBGR */
-	if (color_prom == 0) return;
+	if (m_proms == 0) return;
 
 	for (i = 0;i < palette.entries();i++)
 	{
@@ -250,23 +269,70 @@ PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 		intenmax = 0xff;
 
 		/* intensity component */
-		inten = (color_prom[i] >> 3) & 0x01;
+		inten = (m_proms[i] >> 3) & 0x01;
 
 		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit0 = (m_proms[i] >> 0) & 0x01;
 		r = (bit0 * intenmin) + (inten * (bit0 * (intenmax - intenmin)));
 
 		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit1 = (m_proms[i] >> 1) & 0x01;
 		g = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
 
 		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
+		bit2 = (m_proms[i] >> 2) & 0x01;
 		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
 
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
+}
+
+void miniboy7_state::machine_reset()
+{
+	m_ay_pb = 0;
+	m_gpri = 0;
+}
+
+WRITE8_MEMBER(miniboy7_state::ay_pa_w)
+{
+	// ---x xxxx    lamps
+	// --x- ----    coins lockout
+	// -x-- ----    coins meter
+	// x--- ----    unused
+
+	data = data ^ 0xff;
+
+//    output_set_lamp_value(0, (data) & 1);         // [----x]
+//    output_set_lamp_value(1, (data >> 1) & 1);    // [---x-]
+//    output_set_lamp_value(2, (data >> 2) & 1);    // [--x--]
+//    output_set_lamp_value(3, (data >> 3) & 1);    // [-x---]
+//    output_set_lamp_value(4, (data >> 4) & 1);    // [x----]
+
+	coin_counter_w(machine(), 0, data & 0x40);    // counter
+
+//  popmessage("Out Lamps: %02x", data);
+//  logerror("Out Lamps: %02x\n", data);
+
+}
+
+WRITE8_MEMBER(miniboy7_state::ay_pb_w)
+{
+	// ---- xxxx    unused
+	// -xxx ----    HCD
+	// x--- ----    DSW2 select
+
+	m_ay_pb = data;
+}
+
+READ8_MEMBER(miniboy7_state::pia_pb_r)
+{
+	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
+}
+
+WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
+{
+	m_gpri = state;
 }
 
 
@@ -276,10 +342,10 @@ PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 
 static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8, miniboy7_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM? */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x25ff) AM_RAM /* looks like videoram */
-	AM_RANGE(0x2600, 0x27ff) AM_RAM
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("videoram_a")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("colorram_a")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("videoram_b")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("colorram_b")
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x3000, 0x3001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)  // FIXME
@@ -344,6 +410,45 @@ ADDRESS_MAP_END
 ***********************************/
 
 static INPUT_PORTS_START( miniboy7 )
+	PORT_START("INPUT1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
+
+	PORT_START("INPUT2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("RAM Reset")
+	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x06, 0x06, "Turns per Coin" )    PORT_DIPLOCATION("DSW2:2,3")
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+
+	PORT_DIPNAME( 0x18, 0x18, "Bonus Turns" )       PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPSETTING(    0x18, "50000 100000" )
+	PORT_DIPSETTING(    0x10, "100000 200000" )
+	PORT_DIPSETTING(    0x08, "100000 300000" )
+	PORT_DIPSETTING(    0x00, "200000 300000" )
+
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, "Bartop" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x20, 0x20, "DSW2-6" )            PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DSW2-7" )            PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW2-8" )            PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -354,7 +459,7 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8, 8,
-	256,
+	RGN_FRAC(1,1),
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -379,8 +484,7 @@ static const gfx_layout tilelayout =
 ****************************************/
 
 static GFXDECODE_START( miniboy7 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800,    charlayout, 0, 128 ) /* text layer 1 */
-	GFXDECODE_ENTRY( "gfx1", 0x0000,    charlayout, 0, 128 ) /* text layer 2 */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 ) /* text layer */
 
 	/* 0x000 cards
 	   0x100 joker
@@ -399,10 +503,15 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
 	MCFG_CPU_PROGRAM_MAP(miniboy7_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", miniboy7_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("INPUT1"))
+	MCFG_PIA_READPB_HANDLER(READ8(miniboy7_state, pia_pb_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(miniboy7_state, pia_ca2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -410,8 +519,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_DRIVER(miniboy7_state, screen_update_miniboy7)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", miniboy7)
 
@@ -421,11 +529,15 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/12) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(miniboy7_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("pia0", pia6821_device, ca1_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(miniboy7_state, ay_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(miniboy7_state, ay_pb_w))
 
 MACHINE_CONFIG_END
 
@@ -482,33 +594,7 @@ ROM_START( miniboy7 )
 	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
 
-/*
-   Incomplete set with some bad dumps.
-   Seems to be a different version/revision.
-*/
-ROM_START( miniboy7a )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mb7111.8a",  0x4000, 0x2000,  BAD_DUMP CRC(1b7ac5f0) SHA1(a52052771fcce688afccf9f0c3e3c2b5e7cec4e4) )    /* marked as BAD for the dumper but seems OK */
-	ROM_LOAD( "mb7211.7a",  0x6000, 0x2000, CRC(ac9b66a6) SHA1(66a33e475de4fb3ffdd9a68a24932574e7d78116) )
-	ROM_LOAD( "mb7311.6a",  0x8000, 0x2000,  BAD_DUMP CRC(99f2a063) SHA1(94108cdc574c7e9400fe8a249b78ba190d10502b) )    /* marked as BAD for the dumper */
-	ROM_LOAD( "mb7411.5a",  0xa000, 0x2000, CRC(99f8268f) SHA1(a4ca98dfb5df86fe45f33e291bf0c40d1f43ae7c) )
-	ROM_LOAD( "mb7511.4a",  0xc000, 0x2000,  BAD_DUMP CRC(2820ae91) SHA1(70f9b3823733ae39d153948a4006a5972204f482) )    /* marked as BAD for the dumper */
-	ROM_LOAD( "mb7611.3a",  0xe000, 0x2000, CRC(ca9b9b20) SHA1(c6cd793a15948601faa051a4643b14fd3d8bda0b) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "mb70.11d",   0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )    /* text layer */
-
-	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "mb71.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )
-	ROM_LOAD( "mb72.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
-	ROM_LOAD( "mb73.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
-
-	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* both bipolar PROMs are identical */
-	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
-	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
-ROM_END
-
-ROM_START( miniboy7b ) /* "Might" be the same set as miniboy7a, all roms read consistently for multiply reads */
+ROM_START( miniboy7a ) /* The term CREDIT has been changed to POINT is this version, other changes?? */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mb7_1-11.a8",  0x4000, 0x2000, CRC(e1c0f8f2) SHA1(0790dc37374cf12313ae13adaea2c6e7338e0dbc) )
 	ROM_LOAD( "mb7_2-11.a7",  0x6000, 0x2000, CRC(596040a3) SHA1(bb68b9fd12fba09c3d7c9dec70cf4770d31f911b) )
@@ -521,9 +607,9 @@ ROM_START( miniboy7b ) /* "Might" be the same set as miniboy7a, all roms read co
 	ROM_LOAD( "mb7_0.11d",   0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )    /* text layer */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "mb7_1.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )
-	ROM_LOAD( "mb7_2.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
-	ROM_LOAD( "mb7_3.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
+	ROM_LOAD( "mb7_1.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )  /* bitplane 1 */
+	ROM_LOAD( "mb7_2.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )  /* bitplane 2 */
+	ROM_LOAD( "mb7_3.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )  /* bitplane 3 */
 
 	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* both bipolar PROMs are identical */
 	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
@@ -535,7 +621,6 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                     FULLNAME             FLAGS  */
-GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1983, miniboy7b, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 3)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                     FULLNAME             FLAGS             LAYOUT
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", GAME_NO_COCKTAIL, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", GAME_NO_COCKTAIL, layout_miniboy7 )

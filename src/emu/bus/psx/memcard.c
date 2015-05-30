@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl,psxAuthor,R. Belmont
 /*
     psxcard.c - Sony PlayStation memory card device
 

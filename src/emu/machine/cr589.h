@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 /***************************************************************************
 
     cr589.h
 
     Matsushita CR589
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

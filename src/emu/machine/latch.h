@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef __LATCH_H__
 #define __LATCH_H__
 

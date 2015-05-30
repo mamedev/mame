@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, David Haywood
 // Video System Sprites
 // todo:
 //  update drivers which call multiple priority passes to use the pdrawgfx version (aerofgt, gstriker)

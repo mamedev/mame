@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-	/**********************************************************************
+/**********************************************************************
 
-	Wang PC keyboard emulation
-
-	Copyright MESS Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Wang PC keyboard emulation
 
 *********************************************************************/
 

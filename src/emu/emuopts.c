@@ -61,6 +61,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_RECORD ";rec",                              NULL,        OPTION_STRING,     "record an input file" },
 	{ OPTION_MNGWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write a MNG movie of the current session" },
 	{ OPTION_AVIWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write an AVI movie of the current session" },
+#ifdef MAME_DEBUG
+	{ OPTION_DUMMYWRITE,                                 "0",         OPTION_BOOLEAN,    "indicates if a snapshot should be created if each frame" },
+#endif
 	{ OPTION_WAVWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write a WAV file of the current session" },
 	{ OPTION_SNAPNAME,                                   "%g/%i",     OPTION_STRING,     "override of the default snapshot/movie naming; %g == gamename, %i == index" },
 	{ OPTION_SNAPSIZE,                                   "auto",      OPTION_STRING,     "specify snapshot/movie resolution (<width>x<height>) or 'auto' to use minimal size " },
@@ -150,10 +153,10 @@ const options_entry emu_options::s_option_entries[] =
 
 	// debugging options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },
-    { OPTION_VERBOSE ";v",                               "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
-    { OPTION_LOG,                                        "0",         OPTION_BOOLEAN,    "generate an error.log file" },
-    { OPTION_OSLOG,                                      "0",         OPTION_BOOLEAN,    "output error.log data to the system debugger" },
-    { OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
+	{ OPTION_VERBOSE ";v",                               "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
+	{ OPTION_LOG,                                        "0",         OPTION_BOOLEAN,    "generate an error.log file" },
+	{ OPTION_OSLOG,                                      "0",         OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ OPTION_UPDATEINPAUSE,                              "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 	{ OPTION_DEBUGSCRIPT,                                NULL,        OPTION_STRING,     "script for debugger" },
 
@@ -268,16 +271,18 @@ void emu_options::update_slot_options()
 		const char *name = slot->device().tag() + 1;
 		if (exists(name) && slot->first_option() != NULL)
 		{
-			astring defvalue;
+			std::string defvalue;
 			slot->get_default_card_software(defvalue);
-			if (defvalue.len() > 0)
+			if (defvalue.length() > 0)
 			{
-				set_default_value(name, defvalue);
-				const device_slot_option *option = slot->option(defvalue);
+				set_default_value(name, defvalue.c_str());
+				const device_slot_option *option = slot->option(defvalue.c_str());
 				set_flag(name, ~OPTION_FLAG_INTERNAL, (option != NULL && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
 			}
 		}
 	}
+	while (add_slot_options(false));
+	add_device_options(false);
 }
 
 
@@ -305,14 +310,14 @@ void emu_options::add_device_options(bool isfirstpass)
 		first = false;
 
 		// retrieve info about the device instance
-		astring option_name;
-		option_name.printf("%s;%s", image->instance_name(), image->brief_instance_name());
+		std::string option_name;
+		strprintf(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
 		if (strcmp(image->device_typename(image->image_type()), image->instance_name()) == 0)
-			option_name.catprintf(";%s1;%s1", image->instance_name(), image->brief_instance_name());
+			strcatprintf(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
 
 		// add the option
 		if (!exists(image->instance_name()))
-			add_entry(option_name, NULL, OPTION_STRING | OPTION_FLAG_DEVICE, NULL, true);
+			add_entry(option_name.c_str(), NULL, OPTION_STRING | OPTION_FLAG_DEVICE, NULL, true);
 	}
 }
 
@@ -342,7 +347,7 @@ void emu_options::remove_device_options()
 //  and update slot and image devices
 //-------------------------------------------------
 
-bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_string, const char *name, const char *value)
+bool emu_options::parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value)
 {
 	// an initial parse to capture the initial set of values
 	bool result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
@@ -365,8 +370,6 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_stri
 	do {
 		num = options_count();
 		update_slot_options();
-		while (add_slot_options(false));
-		add_device_options(false);
 		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options_count());
 
@@ -379,7 +382,7 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_stri
 //  and update the devices
 //-------------------------------------------------
 
-bool emu_options::parse_command_line(int argc, char *argv[], astring &error_string)
+bool emu_options::parse_command_line(int argc, char *argv[], std::string &error_string)
 {
 	// parse as normal
 	core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
@@ -392,10 +395,10 @@ bool emu_options::parse_command_line(int argc, char *argv[], astring &error_stri
 //  of INI files
 //-------------------------------------------------
 
-void emu_options::parse_standard_inis(astring &error_string)
+void emu_options::parse_standard_inis(std::string &error_string)
 {
 	// start with an empty string
-	error_string.reset();
+	error_string.clear();
 
 	// parse the INI file defined by the platform (e.g., "mame.ini")
 	// we do this twice so that the first file can change the INI path
@@ -439,12 +442,12 @@ void emu_options::parse_standard_inis(astring &error_string)
 	}
 
 	// next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini
-	astring sourcename;
-	core_filename_extract_base(sourcename, cursystem->source_file, true).ins(0, "source" PATH_SEPARATOR);
-	if (!parse_one_ini(sourcename, OPTION_PRIORITY_SOURCE_INI, &error_string))
+	std::string sourcename;
+	core_filename_extract_base(sourcename, cursystem->source_file, true).insert(0, "source" PATH_SEPARATOR);
+	if (!parse_one_ini(sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string))
 	{
 		core_filename_extract_base(sourcename, cursystem->source_file, true);
-		parse_one_ini(sourcename, OPTION_PRIORITY_SOURCE_INI, &error_string);
+		parse_one_ini(sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string);
 	}
 
 	// then parse the grandparent, parent, and system-specific INIs
@@ -468,8 +471,8 @@ void emu_options::parse_standard_inis(astring &error_string)
 
 const game_driver *emu_options::system() const
 {
-	astring tempstr;
-	int index = driver_list::find(core_filename_extract_base(tempstr, system_name(), true));
+	std::string tempstr;
+	int index = driver_list::find(core_filename_extract_base(tempstr, system_name(), true).c_str());
 	return (index != -1) ? &driver_list::driver(index) : NULL;
 }
 
@@ -481,15 +484,15 @@ const game_driver *emu_options::system() const
 void emu_options::set_system_name(const char *name)
 {
 	// remember the original system name
-	astring old_system_name(system_name());
+	std::string old_system_name(system_name());
 
 	// if the system name changed, fix up the device options
-	if (old_system_name != name)
+	if (old_system_name.compare(name)!=0)
 	{
 		// first set the new name
-		astring error;
+		std::string error;
 		set_value(OPTION_SYSTEMNAME, name, OPTION_PRIORITY_CMDLINE, error);
-		assert(!error);
+		assert(error.empty());
 
 		// remove any existing device options and then add them afresh
 		remove_device_options();
@@ -502,8 +505,6 @@ void emu_options::set_system_name(const char *name)
 		do {
 			num = options_count();
 			update_slot_options();
-			while (add_slot_options(false));
-			add_device_options(false);
 		} while(num != options_count());
 	}
 }
@@ -512,7 +513,7 @@ void emu_options::set_system_name(const char *name)
 //  parse_one_ini - parse a single INI file
 //-------------------------------------------------
 
-bool emu_options::parse_one_ini(const char *basename, int priority, astring *error_string)
+bool emu_options::parse_one_ini(const char *basename, int priority, std::string *error_string)
 {
 	// don't parse if it has been disabled
 	if (!read_config())
@@ -526,39 +527,39 @@ bool emu_options::parse_one_ini(const char *basename, int priority, astring *err
 
 	// parse the file
 	osd_printf_verbose("Parsing %s.ini\n", basename);
-	astring error;
+	std::string error;
 	bool result = parse_ini_file(file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
-	if (error && error_string != NULL)
-		error_string->catprintf("While parsing %s:\n%s\n", file.fullpath(), error.cstr());
+	if (!error.empty() && error_string != NULL)
+		strcatprintf(*error_string, "While parsing %s:\n%s\n", file.fullpath(), error.c_str());
 
 	return result;
 }
 
 
-const char *emu_options::main_value(astring &buffer, const char *name) const
+const char *emu_options::main_value(std::string &buffer, const char *name) const
 {
 	buffer = value(name);
-	int pos = buffer.chr(0, ',');
+	int pos = buffer.find_first_of(',');
 	if (pos != -1)
 		buffer = buffer.substr(0, pos);
-	return buffer.cstr();
+	return buffer.c_str();
 }
 
-const char *emu_options::sub_value(astring &buffer, const char *name, const char *subname) const
+const char *emu_options::sub_value(std::string &buffer, const char *name, const char *subname) const
 {
-	astring tmp(",", subname, "=");
+	std::string tmp = std::string(",").append(subname).append("=");
 	buffer = value(name);
-	int pos = buffer.find(0, tmp);
+	int pos = buffer.find(tmp.c_str());
 	if (pos != -1)
 	{
-		int endpos = buffer.chr(pos + 1, ',');
+		int endpos = buffer.find_first_of(',', pos + 1);
 		if (endpos == -1)
-			endpos = buffer.len();
-		buffer = buffer.substr(pos + tmp.len(), endpos - pos - tmp.len());
+			endpos = buffer.length();
+		buffer = buffer.substr(pos + tmp.length(), endpos - pos - tmp.length());
 	}
 	else
-		buffer.reset();
-	return buffer.cstr();
+		buffer.clear();
+	return buffer.c_str();
 }

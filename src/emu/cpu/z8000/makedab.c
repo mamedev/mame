@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller,Ernesto Corvi
 #include <stdio.h>
 
 #define CF  0x100

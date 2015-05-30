@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, ElSemi
 /*
     Namco System FL
     Driver by R. Belmont and ElSemi
@@ -608,7 +610,7 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_C352_ADD("c352", 48384000/2)
+	MCFG_C352_ADD("c352", 48384000/2, C352_DIVIDER_288)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)

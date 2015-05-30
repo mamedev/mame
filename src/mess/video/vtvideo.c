@@ -1,12 +1,11 @@
+// license:GPL-2.0+
+// copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /**********************************************************************
 DEC VT Terminal video emulation
 [ DC012 and DC011 emulation ]
 
-Copyright MESS Team.
-Visit http://mamedev.org for licensing and usage restrictions.
-
 01/05/2009 Initial implementation [Miodrag Milanovic]
-Portions (2013, 2014) by Karl-Ludwig Deisenhofer.
+Enhancements (2013 - 2015) by Karl-Ludwig Deisenhofer.
 
 DEC VIDEO : STATE AS OF JULY 2014
 ---------------------------------
@@ -37,7 +36,7 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
 
 - POSSIBLE IMPROVEMENTS:
 
-* exact colors for different VR201 monitors ('paper white', green and amber)
+* exact colors for different VR201 monitors (for white, green and amber)
 
 * ACCURATE VIDEO DELAYS:
   Position of the first visible scanline (relative to the vertical reset) depends on
@@ -65,7 +64,7 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
 PARAMETERS
 ***************************************************************************/
 
-#define VERBOSE         0
+#define VERBOSE         1
 
 #define LOG(x)      do { if (VERBOSE) logerror x; } while (0)
 
@@ -239,30 +238,57 @@ READ8_MEMBER(vt100_video_device::lba7_r)
 // Also used by Rainbow-100 ************
 WRITE8_MEMBER(vt100_video_device::dc012_w)
 {
-	// TODO: writes to 10C/0C should be treated differently (emulation disables the watchdog too often).
+	// Writes to [10C] and [0C] are treated differently
 	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
-	if (data == 0) // MHFU is disabled by writing 00 to port 010C.
-	{
-				MHFU_FLAG = false;
-				MHFU_counter = 0;
 
-		if (VERBOSE)
+	// MHFU is disabled by writing 00 to port 010C.
+
+	// Code recognition is abysmal - sorry for that.
+	if (data == 0)
+	{
+		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+		if (rom != NULL)
 		{
-			if (MHFU_FLAG == true)
-				printf("MHFU  *** DISABLED *** %ul \n", offset);
-	}
+			UINT32 PC = space.device().safe_pc();
+			if ((rom[ PC - 1] == 0xe6) &&
+				(rom[ PC    ] == 0x0c)
+				)
+			{
+				// OUT 0C,al  < DO NOTHING >
+			}
+			else
+			{
+				//UINT8 magic1= rom[PC - 1];
+				//printf("\n PC %05x - MHFU MAGIC -1 %02x\n", PC,  magic1);
+				//UINT8 magic2 = rom[PC - 2];
+				//printf("\n PC %05x - MHFU MAGIC -2 %02x\n", PC, magic2);
+				//if (VERBOSE)
+
+				//if(1  )
+				if ((rom[PC - 2] == 0x0C) &&
+					(rom[PC - 1] == 0x01)
+					)
+				{
+					if (MHFU_FLAG == true)
+						printf("MHFU  *** DISABLED *** %05x \n", PC);
+
+					MHFU_FLAG = false;
+					MHFU_counter = 0;
+				}
+			}
+
+		} // DATA == 0 ONLY ....
+
 	}
 	else
 	{
-		// RESET
-				MHFU_FLAG = true;
-		MHFU_counter = 0;
+		//if (VERBOSE)
+		if (MHFU_FLAG == false)
+			printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
 
-		if (VERBOSE)
-		{
-			if (MHFU_FLAG == false)
-				printf("MHFU  ___ENABLED___ %ul \n", offset);
-	}
+		// RESET
+		MHFU_FLAG = true;
+		MHFU_counter = 0;
 	}
 
 	if (!(data & 0x08))
@@ -284,57 +310,57 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 	{
 		switch (data & 0x0f)
 		{
-			case 0x08:
-				// toggle blink flip flop
-				m_blink_flip_flop = !(m_blink_flip_flop) ? 1 : 0;
-				break;
-			case 0x09:
-				// clear vertical frequency interrupt;
-				m_write_clear_video_interrupt(0);
-				break;
-			case 0x0a:
-				// set reverse field on
-				m_reverse_field = 1;
-				break;
-			case 0x0b:
-				// set reverse field off
-				m_reverse_field = 0;
-				break;
+		case 0x08:
+			// toggle blink flip flop
+			m_blink_flip_flop = !(m_blink_flip_flop) ? 1 : 0;
+			break;
+		case 0x09:
+			// clear vertical frequency interrupt;
+			m_write_clear_video_interrupt(0);
+			break;
+		case 0x0a:
+			// set reverse field on
+			m_reverse_field = 1;
+			break;
+		case 0x0b:
+			// set reverse field off
+			m_reverse_field = 0;
+			break;
 
 			//  Writing a 11XX bit combination clears the blink-flip flop (valid for 0x0C - 0x0F):
-			case 0x0c:
-				// set basic attribute to underline / blink flip-flop off
-				m_blink_flip_flop = 0;
-				m_basic_attribute = 0; // (VT-100 without AVO): reverse video is interpreted as underline (basic_attribute 0)
-				break;
+		case 0x0c:
+			// set basic attribute to underline / blink flip-flop off
+			m_blink_flip_flop = 0;
+			m_basic_attribute = 0; // (VT-100 without AVO): reverse video is interpreted as underline (basic_attribute 0)
+			break;
 
-			case 0x0d:
-				// (DEC Rainbow 100 DEFAULT) : reverse video with 24 lines / blink flip-flop off
-				m_blink_flip_flop = 0;
-				m_basic_attribute = 1; // (VT-100 without AVO): reverse video is interpreted as reverse (basic_attribute 1)
+		case 0x0d:
+			// (DEC Rainbow 100 DEFAULT) : reverse video with 24 lines / blink flip-flop off
+			m_blink_flip_flop = 0;
+			m_basic_attribute = 1; // (VT-100 without AVO): reverse video is interpreted as reverse (basic_attribute 1)
 
-				if (m_height_MAX == 25) break; //  Abort on VT-100 for now.
+			if (m_height_MAX == 25) break; //  Abort on VT-100 for now.
 
-					m_height = 24;  // (DEC Rainbow 100) : 24 line display
-					recompute_parameters();
-				break;
+			m_height = 24;  // (DEC Rainbow 100) : 24 line display
+			recompute_parameters();
+			break;
 
-			case 0x0e:
+		case 0x0e:
 			m_blink_flip_flop = 0;  // 'unsupported' DC012 command. Turns blink flip-flop off (11XX).
-				break;
+			break;
 
-			case 0x0f:
-				// (DEC Rainbow 100): reverse video with 48 lines / blink flip-flop off
-				m_blink_flip_flop = 0;
-				m_basic_attribute = 1;
+		case 0x0f:
+			// (DEC Rainbow 100): reverse video with 48 lines / blink flip-flop off
+			m_blink_flip_flop = 0;
+			m_basic_attribute = 1;
 
-				// 0x0f = 'reserved' on VT 100
-				//  Abort on VT-100 for now.
-				if (m_height_MAX == 25) break;
+			// 0x0f = 'reserved' on VT 100
+			//  Abort on VT-100 for now.
+			if (m_height_MAX == 25) break;
 
-					m_height = 48;   // (DEC Rainbow 100) : 48 line display
-					recompute_parameters();
-				break;
+			m_height = 48;   // (DEC Rainbow 100) : 48 line display
+			recompute_parameters();
+			break;
 		}
 	}
 }
@@ -350,7 +376,7 @@ WRITE8_MEMBER(vt100_video_device::dc011_w)
 			m_columns = 80;
 		else
 			m_columns = 132;
-		}
+	}
 	else
 	{
 		m_interlaced = 0;
@@ -388,12 +414,12 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, i
 		switch (display_type)
 		{
 		case 0: // bottom half, double height
-						j = (i >> 1) + 5; break;
+			j = (i >> 1) + 5; break;
 		case 1: // top half, double height
-						j = (i >> 1); break;
+			j = (i >> 1); break;
 		case 2: // double width
 		case 3: // normal
-						j = i;  break;
+			j = i;  break;
 		default: j = 0; break;
 		}
 		// modify line since that is how it is stored in rom
@@ -415,27 +441,27 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, i
 			bit = BIT((line << b), 7);
 			if (double_width)
 			{
-				bitmap.pix16(y * 10 + i, x * 20 + b * 2)     =  (bit | prevbit) ^ invert;
-				bitmap.pix16(y * 10 + i, x * 20 + b * 2 + 1) =  bit ^ invert;
+				bitmap.pix16(y * 10 + i, x * 20 + b * 2) = (bit | prevbit) ^ invert;
+				bitmap.pix16(y * 10 + i, x * 20 + b * 2 + 1) = bit ^ invert;
 			}
 			else
 			{
-				bitmap.pix16(y * 10 + i, x * 10 + b) =  (bit | prevbit) ^ invert;
+				bitmap.pix16(y * 10 + i, x * 10 + b) = (bit | prevbit) ^ invert;
 			}
 		}
 		prevbit = bit;
 		// char interleave is filled with last bit
 		if (double_width)
 		{
-			bitmap.pix16(y * 10 + i, x * 20 + 16) =  (bit | prevbit) ^ invert;
-			bitmap.pix16(y * 10 + i, x * 20 + 17) =  bit ^ invert;
-			bitmap.pix16(y * 10 + i, x * 20 + 18) =  bit ^ invert;
-			bitmap.pix16(y * 10 + i, x * 20 + 19) =  bit ^ invert;
+			bitmap.pix16(y * 10 + i, x * 20 + 16) = (bit | prevbit) ^ invert;
+			bitmap.pix16(y * 10 + i, x * 20 + 17) = bit ^ invert;
+			bitmap.pix16(y * 10 + i, x * 20 + 18) = bit ^ invert;
+			bitmap.pix16(y * 10 + i, x * 20 + 19) = bit ^ invert;
 		}
 		else
 		{
-			bitmap.pix16(y * 10 + i, x * 10 + 8) =  (bit | prevbit) ^ invert;
-			bitmap.pix16(y * 10 + i, x * 10 + 9) =  bit ^ invert;
+			bitmap.pix16(y * 10 + i, x * 10 + 8) = (bit | prevbit) ^ invert;
+			bitmap.pix16(y * 10 + i, x * 10 + 9) = bit ^ invert;
 		}
 	}
 }
@@ -474,7 +500,7 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			// if A12 is 1 then it is 0x2000 block, if 0 then 0x4000 (AVO)
 			if (addr & 0x1000) addr &= 0xfff; else addr |= 0x2000;
 			scroll_region = (temp >> 15) & 1;
-			display_type  = (temp >> 13) & 3;
+			display_type = (temp >> 13) & 3;
 			if (line >= m_fill_lines)
 			{
 				ypos++;
@@ -580,8 +606,8 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 	// BG: DEFAULT for entire character (underline overrides this for 1 line) -
 	back_default_intensity = back_intensity;
 
-	bool double_width  = (display_type != 3) ? true  : false; // all except normal: double width
-	bool double_height = (display_type &  1) ? false : true;  // 0,2 = double height
+	bool double_width = (display_type != 3) ? true : false; // all except normal: double width
+	bool double_height = (display_type & 1) ? false : true;  // 0,2 = double height
 
 	int smooth_offset = 0;
 	if (scroll_region != 0)
@@ -610,24 +636,24 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 			else
 			{
 				y_preset = (m_linedoubler ? 480 : 240) - extra_scan_line;
-				i = 0; // (should be always empty)
+				i = 0; // blank line. Might not work with TCS or other charsets (FIXME)
 			}
 		}
 
 		switch (display_type)
 		{
 		case 0:  // bottom half of 'double height, double width' char.
-						j = (i >> 1) + 5;
-						break;
+			j = (i >> 1) + 5;
+			break;
 
 		case 2:  // top half of 'double height, double width' char.
-						j = (i >> 1);
-						break;
+			j = (i >> 1);
+			break;
 
 		default: // 1: double width
-						// 3: normal
-						j = i;
-						break;
+			// 3: normal
+			j = i;
+			break;
 		}
 
 		// modify line since that is how it is stored in rom
@@ -641,13 +667,13 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		{
 			if (i == 8)
 			{
-					if (invert == 0)
-						line = 0xff; // CASE 5 A)
-					else
+				if (invert == 0)
+					line = 0xff; // CASE 5 A)
+				else
 				{
 					line = 0x00; // CASE 5 B)
-						back_intensity = 0; // OVERRIDE: BLACK BACKGROUND
-					}
+					back_intensity = 0; // OVERRIDE: BLACK BACKGROUND
+				}
 			}
 		}
 
@@ -659,12 +685,12 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 			}
 			else
 			{
-					bit = BIT((line << b), 7);
+				bit = BIT((line << b), 7);
 
-					if (bit > 0)
-						bit = fg_intensity;
-					else
-						bit = back_intensity;
+				if (bit > 0)
+					bit = fg_intensity;
+				else
+					bit = back_intensity;
 			}
 
 			// Double, 'double_height + double_width', then normal.
@@ -749,9 +775,9 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 		code = m_read_ram(addr + xpos);
 
 		if (code == 0x00)        // TODO: investigate side effect on regular zero character!
-				display_type |= 0x80; // DEFAULT: filler chars (till end of line) and empty lines (00) will be blanked
+			display_type |= 0x80; // DEFAULT: filler chars (till end of line) and empty lines (00) will be blanked
 		else
-				display_type &= 0x7f; // else activate display.
+			display_type &= 0x7f; // else activate display.
 
 		if (code == 0xff) // end of line, fill empty till end of line
 		{
@@ -759,7 +785,7 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			for (x = xpos; x < ((display_type != 3) ? (m_columns / 2) : m_columns); x++)
 			{
 					display_char(bitmap, code, x, ypos, scroll_region, display_type | 0x80);
-				}
+			}
 
 			//  LINE ATTRIBUTE - valid for all chars on next line  ** DO NOT SHUFFLE **
 			attr_addr = 0x1000 | ((addr + xpos + 1) & 0x0fff);
@@ -770,7 +796,7 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 
 			temp = m_read_ram(attr_addr);
 			scroll_region = (temp)& 1;
-			display_type  = (temp >> 1) & 3;
+			display_type = (temp >> 1) & 3;
 
 			ypos++;            // Y + 1 in non-interlaced mode
 			if (m_linedoubler)
@@ -821,24 +847,24 @@ void rainbow_video_device::palette_select(int choice)
 {
 	switch (choice)
 	{
-			default:
-			case 0x01:
+	default:
+	case 0x01:
 		m_palette->set_pen_color(1, 0xff - 100, 0xff - 100, 0xff - 100);  // WHITE (dim)
 		m_palette->set_pen_color(2, 0xff - 50, 0xff - 50, 0xff - 50);     // WHITE NORMAL
-						m_palette->set_pen_color(3, 0xff, 0xff, 0xff);              // WHITE (brighter)
-						break;
+		m_palette->set_pen_color(3, 0xff, 0xff, 0xff);              // WHITE (brighter)
+		break;
 
-			case 0x02:
+	case 0x02:
 		m_palette->set_pen_color(1, 35, 200 - 55, 75);        // GREEN (dim)
 		m_palette->set_pen_color(2, 35 + 55, 200, 75 + 55);        // GREEN (NORMAL)
 		m_palette->set_pen_color(3, 35 + 110, 200 + 55, 75 + 110);         // GREEN (brighter)
-						break;
+		break;
 
-			case 0x03:
-						m_palette->set_pen_color(1, 213 - 47, 146 - 47, 82 - 47); // AMBER (dim)
+	case 0x03:
+		m_palette->set_pen_color(1, 213 - 47, 146 - 47, 82 - 47); // AMBER (dim)
 		m_palette->set_pen_color(2, 213, 146, 82); // AMBER (NORMAL)
 		m_palette->set_pen_color(3, 255, 193, 129); // AMBER (brighter)
-						break;
+		break;
 	}
 }
 
@@ -856,31 +882,43 @@ int rainbow_video_device::MHFU(int ASK)
 {
 	switch (ASK)
 	{
-			case 1:         // "true": RETURN BOOLEAN (MHFU disabled or enabled?)
-				return MHFU_FLAG;
+	case 1:         // "true": RETURN BOOLEAN (MHFU disabled or enabled?)
+		return MHFU_FLAG;
 
-			case -1:        // -1: increment, return counter value (=> Rainbow.c)
-					if (MHFU_FLAG == true)
-					MHFU_counter++;
-				return MHFU_counter;
+	case -1:        // -1: increment IF ENABLED, return counter value (=> Rainbow.c)
+		if (MHFU_FLAG == true)
+			MHFU_counter++;
+		return MHFU_counter;
 
-			case -100:          // -100 : RESET and ENABLE MHFU counter
-		if (VERBOSE)
+	case -100:          // -100 : RESET and ENABLE MHFU counter
+		MHFU_counter = 0;
+		if(1) //if (VERBOSE)
 			printf("-100 MHFU  * reset and ENABLE * \n");
-				MHFU_counter = 0;
 
-		if (VERBOSE)
+		if(1) // if (VERBOSE)
 		{
 			if (MHFU_FLAG == false)
 				printf("-100 MHFU  ___ENABLED___\n");
 		}
-				MHFU_FLAG = true;
+		MHFU_FLAG = true;
 
-				return -100;
+		return -100;
 
-			default:
-				assert(1);
-				return -255;
+	case -200:          // -200 : RESET and DISABLE MHFU
+		MHFU_counter = 0;
+
+		if(1) //if (VERBOSE)
+		{
+			if (MHFU_FLAG == true)
+				printf("MHFU  *** DISABLED *** \n");
+		}
+		MHFU_FLAG = false;
+
+		return -200;
+
+	default:
+		assert(1);
+		return -255;
 	} // switch
 }
 

@@ -1,9 +1,12 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
 
 Atari 2600 SuperCharger support
 
 */
 
+#include <assert.h>
 
 #include "formats/a26_cas.h"
 

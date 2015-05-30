@@ -1,41 +1,18 @@
-// license:MAME|LGPL-2.1+
-// copyright-holders:Jonathan Gevaryahu
-// Modernised by Robbbert. Portions of the code copyright Robbbert.
+// license:BSD-3-Clause
+// copyright-holders:Jonathan Gevaryahu, Robbbert
 /******************************************************************************
 *
 *  Self Contained zexall 'Z80 instruction exerciser' test driver
-*  Copyright (C) 2009 Jonathan Gevaryahu AKA Lord Nightmare
 *  Zexall originally written by Frank Cringle for ZX Spectrum
 *  Modularized Spectrum-independent Zexall binary supplied by Blargg
 *  Serial interface binary/preloader at 0x0000-0x00FF written by Kevin 'kevtris' Horton
-*
-*
-*  This source file is dual-licensed under the following licenses:
-*  1. The MAME license as of September 2013
-*  2. The GNU LGPLv2.1:
-*
-*  This library is free software; you can redistribute it and/or
-*  modify it under the terms of the GNU Lesser General Public
-*  License as published by the Free Software Foundation; either
-*  version 2.1 of the License, or (at your option) any later version.
-*
-*  This library is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-*  Lesser General Public License for more details.
-*
-*  You should have received a copy of the GNU Lesser General Public
-*  License along with this library; if not, write to the Free Software
-*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-*
-*  Please contact the author if you require other licensing.
 *
 *
 * mem map:
 Ram 0000-FFFF (preloaded with binary)
 Special calls take place for three ram values (this interface was designed by kevtris):
 FFFD - 'ack' - shared ram with output device; z80 reads from here and considers the byte at FFFF read if this value incremented
-FFFE - 'req' - shared ram with output device; z80 writes an incrementing value to FFFE to indicate that there is a byte waiting at FFFF and hence requesting the output device on the other end do something about it, until FFFD is incremented by the output device to acknowledge reciept
+FFFE - 'req' - shared ram with output device; z80 writes an incrementing value to FFFE to indicate that there is a byte waiting at FFFF and hence requesting the output device on the other end do something about it, until FFFD is incremented by the output device to acknowledge receipt
 FFFF - 'data' - shared ram with output device; z80 writes the data to be sent to output device here
 One i/o port is used:
 0001 - bit 0 controls whether interrupt timer is enabled (1) or not (0), this is a holdover from a project of kevtris' and can be ignored.

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andreas Naive, Olivier Galibert, David Haywood
 /*
   re: Tecmo World Cup '98 (ST-V) (from ANY)
 
@@ -19,7 +21,7 @@ extern const device_type SEGA315_5881_CRYPT = &device_creator<sega_315_5881_cryp
 
 
 sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA315_5881_CRYPT, "Sega 315-5881 Encryption", tag, owner, clock, "SEGA315_5881", __FILE__)
+	: device_t(mconfig, SEGA315_5881_CRYPT, "Sega 315-5881 Encryption", tag, owner, clock, "sega315_5881", __FILE__)
 {
 }
 
@@ -45,6 +47,14 @@ void sega_315_5881_crypt_device::device_start()
 	save_item(NAME(line_buffer_pos));
 	save_item(NAME(line_buffer_size));
 
+	std::string skey = parameter("key").c_str();
+	if(!skey.empty())
+		key = strtoll(skey.c_str(), 0, 16);
+	else
+	{
+		logerror("%s: Warning: key not provided\n", tag());
+		key = 0;
+	}
 }
 
 void sega_315_5881_crypt_device::device_reset()
@@ -70,8 +80,15 @@ UINT16 sega_315_5881_crypt_device::do_decrypt(UINT8 *&base)
 	if(!enc_ready)
 		enc_start();
 	if(dec_header & FLAG_COMPRESSED) {
-		if(line_buffer_pos == line_buffer_size)
+		if (line_buffer_pos == line_buffer_size) // if there's no data left to read..
+		{
+			if (done_compression == 1)
+				enc_start();
+
+
+
 			line_fill();
+		}
 		base = line_buffer + line_buffer_pos;
 		line_buffer_pos += 2;
 	} else {
@@ -94,17 +111,14 @@ void sega_315_5881_crypt_device::set_addr_high(UINT16 data)
 {
 	prot_cur_address = (prot_cur_address & 0x0000ffff) | (data << 16);
 	enc_ready = false;
+
+	buffer_bit = 7;
+	buffer_bit2 = 15;
 }
 
 void sega_315_5881_crypt_device::set_subkey(UINT16 data)
 {
 	subkey = data;
-	enc_ready = false;
-}
-
-void sega_315_5881_crypt_device::set_key(UINT32 data)
-{
-	key = data;
 	enc_ready = false;
 }
 
@@ -120,8 +134,10 @@ Notes below refer to M2 & M3.
 
 The encryption is done by a stream cipher operating in counter mode, which use a 16-bits internal block cipher.
 
-There are 2 "control bits" at the start of the decrypted stream which control the mode of operation: bit #1 set to 1 means
-that the stream needs to be decompressed after being decrypted. More on this later.
+Every stream can be composed by several substreams; there are 18 header bits at the start of every substream, with
+a 1+9+8 format; the highest bit control the mode of operation: set to 1 means that the substream needs to be decompressed
+after being decrypted. The other two blocks (A||B) encode the length of the substream, as (A+1)*(B+1). When a
+substream end, the header of the next one, if existing, follows inmediatly.
 
 The next 16-bits are part of the header (they don't belong to the plaintext), but his meaning is unclear. It has been
 conjectured that it could stablish when to "reset" the process and start processing a new stream (based on some tests
@@ -134,22 +150,16 @@ internal block-cipher. So, at a given step, the internal block cipher will outpu
 given plaintext word, and the remaining 2 to the next plaintext word.
 
 The underlying block cipher consists of two 4-round Feistel Networks (FN): the first one takes the counter (16 bits),
-the game-key (>=27 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
-for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key and the result
-from the first FN and will output the decrypted word (16 bits).
+the game-key (>=30 bits; probably 64) and the sequence-key (16 bits) and output a middle result (16 bits) which will act
+as another key for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key
+and the result from the first FN and will output the decrypted word (16 bits).
 
 Each round of the Feistel Networks use four substitution sboxes, each having 6 inputs and 2 outputs. The input is the
 XOR of at most one bit from the previous round and at most one bit from the different keys.
 
 The underlying block cipher has the same structure than the one used by the CPS-2 (Capcom Play System 2) and,
 indeed, some of the used sboxes are exactly the same and appear in the same FN/round in both systems (this is not evident,
-as you need to apply a bitswapping and some XORs to the input & output of the sboxes to get the same values due). However,
-the key scheduling used by this implementation is much weaker than the CPS-2's one. Many s-boxes inputs aren't XORed with any
-key bit.
-
-Due to the small key-length, no sophisticated attacks are needed to recover the keys; a brute-force attack knowing just
-some (encrypted word-decrypted word) pairs suffice. However, due to the weak key scheduling, it should be noted that some
-related keys can produce the same output bytes for some (short) input sequences.
+as you need to apply a bitswapping and some XORs to the input & output of the sboxes to get the same values due).
 
 Note that this implementation considers that the counter initialization for ram decryption is 0 simply because the ram is
 mapped to multiples of 128K.
@@ -162,6 +172,37 @@ chosen so as to make the key for CAPSNK equal to 0.
 It can be observed that a couple of sboxes have incomplete tables (a 255 value indicate an unknown value). The recovered keys
 as of january/2015 show small randomness and big correlations, making possible that some unseen bits could make the
 decryption need those incomplete parts.
+
+SEGA apparently used his security part label (317-xxxx-yyy) as part of the key; the mapping of the current keys to the chip label
+is given by the following function:
+
+void key2label(uint32_t key)
+{
+    int bcd0 = ((BIT(key,17)<<3)|(BIT(key,7)<<2)|(BIT(key,14)<<1)|BIT(key,19))^9;
+    int bcd1 = ((BIT(key,20)<<3)|(BIT(key,1)<<2)|(BIT(key,4)<<1)|BIT(key,13))^5;
+    int bcd2 = (BIT(key,9)<<1)|BIT(key,22);
+    int bcd3 = ((BIT(key,9)<<2)|BIT(key,9))^5;
+
+    char chiplabel[13];
+    sprintf(chiplabel, "317-%d%d%d%d-%s", bcd3, bcd2, bcd1, bcd0, (BIT(key,5)?"JPN":"COM"));
+
+    printf("%s", chiplabel);
+}
+
+Given the use of the BCD-encoded security module labels, it's expected that at least other 6 additional bits be present in the
+real keys but undetected in the current implementation (due to them being set to fixed values on all the known 315-5881 chip labels).
+That would rise the bit count at least to 35.
+
+Other key bits not directly related to the 315-5881 label still show low entropies, making possible that
+they be derived from other non-random sources.
+
+In the second Feistel Network, every key bit seem to be used at most once (the various uses of current bit #9 are fictitious, as
+that bit really represent various bits in the real key; see comments on the use of the labels above). Given that, it seems probable
+that the real key is 64 bits long, exactly as in the related CPS-2 scheme, and the designers tried to cover all 96 input bits with
+the bits provening from the game key, the sequence key and the result from the first feistel network (64+16+16=96). In the first
+Feistel Network, as only 80 bits are available, some bits would be used twice (as can be partially seen in the current implementation).
+The fact that only 30 bits out of the expected 64 have been observed till now would be due to the generation of the key by composing
+low-entropy sources.
 
 ****************************************************************************************/
 
@@ -224,10 +265,10 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn1_sboxes[4]
 
 		{
 			{
-				2,2,2,3,1,1,0,1,0,1,2,2,3,3,0,2,0,3,2,3,3,0,2,1,0,3,1,0,0,2,3,2,
-				3,2,0,3,2,0,1,0,3,3,1,1,2,2,2,0,2,1,3,1,1,1,1,2,2,2,3,0,1,3,0,0,
+				2,2,2,3,1,1,0,1,3,3,1,1,2,2,2,0,0,3,2,3,3,0,2,1,2,2,3,0,1,3,0,0,
+				3,2,0,3,2,0,1,0,0,1,2,2,3,3,0,2,2,1,3,1,1,1,1,2,0,3,1,0,0,2,3,2,
 			},
-			{1,2,5,6,7,-1},
+			{1,2,5,6,7,6},
 			{2,7}
 		},
 
@@ -331,10 +372,10 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn2_sboxes[4]
 
 		{
 			{
-				0,2,3,2,1,1,0,0,2,1,0,3,3,0,0,0,3,2,0,2,1,1,2,1,0,0,3,1,2,2,3,1,
-				3,1,3,0,0,0,1,3,1,0,0,3,2,2,3,1,1,3,0,0,2,1,3,3,1,3,1,2,3,1,2,1,
+				0,1,3,0,1,1,2,3,2,0,0,3,2,1,3,1,3,3,0,0,1,0,0,3,0,3,3,2,3,2,0,1,
+				3,2,3,2,2,1,3,1,1,1,0,3,3,2,2,1,1,2,0,2,0,1,1,0,1,0,1,1,2,0,3,0,
 			},
-			{0,3,5,6,-1,-1},
+			{0,3,5,6,5,0},
 			{1,2}
 		},
 
@@ -377,10 +418,10 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn2_sboxes[4]
 
 		{
 			{
-				1,2,3,2,0,3,2,3,0,1,1,0,0,2,2,3,2,0,0,3,0,2,3,3,2,2,1,0,2,1,0,3,
-				1,0,2,0,1,1,0,1,0,0,1,0,3,0,3,3,2,2,0,2,1,1,1,0,3,0,1,3,2,3,2,1,
+				1,0,3,0,0,1,2,1,0,0,1,0,0,0,2,3,2,2,0,2,0,1,3,0,2,0,1,3,2,3,0,1,
+				1,2,2,2,1,3,0,3,0,1,1,0,3,2,3,3,2,0,0,3,1,2,1,3,3,2,1,0,2,1,2,3,
 			},
-			{2,3,4,6,7,-1},
+			{2,3,4,6,7,2},
 			{2,3}
 		},
 
@@ -396,10 +437,10 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn2_sboxes[4]
 	{   // 3rd round
 		{
 			{
-				0,3,0,1,0,2,3,3,1,0,1,3,2,2,1,1,3,3,3,0,2,0,2,0,0,0,2,3,1,1,0,0,
-				3,3,0,3,3,0,0,2,1,1,1,0,2,2,2,0,3,0,3,1,2,2,0,3,0,0,3,2,0,3,2,1,
+				0,3,0,1,3,0,0,2,1,0,1,3,2,2,2,0,3,3,3,0,2,2,0,3,0,0,2,3,0,3,2,1,
+				3,3,0,3,0,2,3,3,1,1,1,0,2,2,1,1,3,0,3,1,2,0,2,0,0,0,3,2,1,1,0,0,
 			},
-			{1,4,5,6,7,-1},
+			{1,4,5,6,7,5},
 			{0,5}
 		},
 
@@ -414,11 +455,11 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn2_sboxes[4]
 
 		{
 			{
-				2,2,3,2,0,3,2,3,1,1,2,0,2,3,1,3,0,0,0,3,2,0,1,0,1,3,2,3,3,3,1,0,
+				2,2,0,3,0,3,1,0,1,1,2,3,2,3,1,0,0,0,3,2,2,0,2,3,1,3,2,0,3,3,1,3,
 				// unused?
 				255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
 			},
-			{1,2,4,7,-1,-1},
+			{1,2,4,7,2,-1},
 			{2,4}
 		},
 
@@ -470,20 +511,19 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn2_sboxes[4]
 	},
 };
 
-const int sega_315_5881_crypt_device::fn1_game_key_scheduling[38][2] = {
+const int sega_315_5881_crypt_device::fn1_game_key_scheduling[FN1GK][2] = {
 	{1,29},  {1,71},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},  {5,11},
-	{6,51},  {7,92},  {8,89},  {9,9},   {9,10},  {9,39},  {9,41},  {9,58},
-	{9,59},  {9,86},  {10,90}, {11,6},  {12,64}, {13,49}, {14,44}, {15,40},
-    {16,69}, {17,15}, {18,23}, {18,43}, {19,82}, {20,81}, {21,32}, {22,5},
-	{23,66}, {24,13}, {24,45}, {25,12}, {25,35}, {26,61},
+	{6,51},  {7,92},  {8,89},  {9,9},   {9,39},  {9,58},  {10,90}, {11,6},
+	{12,64}, {13,49}, {14,44}, {15,40}, {16,69}, {17,15}, {18,23}, {18,43},
+	{19,82}, {20,81}, {21,32}, {22,5},  {23,66}, {24,13}, {24,45}, {25,12},
+	{25,35}, {26,61}, {27,10}, {27,59}, {28,25}, {29,86}
 };
 
-const int sega_315_5881_crypt_device::fn2_game_key_scheduling[34][2] = {
+const int sega_315_5881_crypt_device::fn2_game_key_scheduling[FN2GK][2] = {
 	{0,0},   {1,3},   {2,11},  {3,20},  {4,22},  {5,23},  {6,29},  {7,38},
-	{8,39},  {9,47},  {9,55},  {9,86},  {9,87},  {9,90},  {10,50}, {10,53},
-	{11,57}, {12,59}, {13,61}, {13,64}, {14,63}, {15,67}, {16,72}, {17,83},
-    {18,88}, {19,94}, {20,35}, {21,17}, {22,6},  {22,11}, {23,85}, {24,16},
-	{25,25}, {26,92}
+	{8,39},  {9,55},  {9,86},  {9,87},  {10,50}, {11,57}, {12,59}, {13,61},
+	{14,63}, {15,67}, {16,72}, {17,83}, {18,88}, {19,94}, {20,35}, {21,17},
+	{22,6},  {23,85}, {24,16}, {25,25}, {26,92}, {27,47}, {28,28}, {29,90}
 };
 
 const int sega_315_5881_crypt_device::fn1_sequence_key_scheduling[20][2] = {
@@ -529,108 +569,106 @@ of the function. Even so, it would still be pretty slow, so caching techniques c
 UINT16 sega_315_5881_crypt_device::block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter, UINT16 data)
 {
 	int j;
-	int aux,aux2;
-	int A,B;
+	int aux, aux2;
+	int A, B;
 	int middle_result;
 	UINT32 fn1_subkeys[4];
 	UINT32 fn2_subkeys[4];
 
 	/* Game-key scheduling; this could be done just once per game at initialization time */
-	memset(fn1_subkeys,0,sizeof(UINT32)*4);
-	memset(fn2_subkeys,0,sizeof(UINT32)*4);
+	memset(fn1_subkeys, 0, sizeof(UINT32) * 4);
+	memset(fn2_subkeys, 0, sizeof(UINT32) * 4);
 
-	for (j=0; j<38; ++j) {
-		if (BIT(game_key, fn1_game_key_scheduling[j][0])!=0) {
-			aux = fn1_game_key_scheduling[j][1]%24;
-			aux2 = fn1_game_key_scheduling[j][1]/24;
-			fn1_subkeys[aux2] ^= (1<<aux);
+	for (j = 0; j < FN1GK; ++j) {
+		if (BIT(game_key, fn1_game_key_scheduling[j][0]) != 0) {
+			aux = fn1_game_key_scheduling[j][1] % 24;
+			aux2 = fn1_game_key_scheduling[j][1] / 24;
+			fn1_subkeys[aux2] ^= (1 << aux);
 		}
 	}
 
-	for (j=0; j<34; ++j) {
-		if (BIT(game_key, fn2_game_key_scheduling[j][0])!=0) {
-			aux = fn2_game_key_scheduling[j][1]%24;
-			aux2 = fn2_game_key_scheduling[j][1]/24;
-			fn2_subkeys[aux2] ^= (1<<aux);
+	for (j = 0; j < FN2GK; ++j) {
+		if (BIT(game_key, fn2_game_key_scheduling[j][0]) != 0) {
+			aux = fn2_game_key_scheduling[j][1] % 24;
+			aux2 = fn2_game_key_scheduling[j][1] / 24;
+			fn2_subkeys[aux2] ^= (1 << aux);
 		}
 	}
 	/********************************************************/
 
 	/* Sequence-key scheduling; this could be done just once per decryption run */
-	for (j=0; j<20; ++j) {
-		if (BIT(sequence_key,fn1_sequence_key_scheduling[j][0])!=0) {
-			aux = fn1_sequence_key_scheduling[j][1]%24;
-			aux2 = fn1_sequence_key_scheduling[j][1]/24;
-			fn1_subkeys[aux2] ^= (1<<aux);
+	for (j = 0; j < 20; ++j) {
+		if (BIT(sequence_key, fn1_sequence_key_scheduling[j][0]) != 0) {
+			aux = fn1_sequence_key_scheduling[j][1] % 24;
+			aux2 = fn1_sequence_key_scheduling[j][1] / 24;
+			fn1_subkeys[aux2] ^= (1 << aux);
 		}
 	}
 
-	for (j=0; j<16; ++j) {
-		if (BIT(sequence_key,j)!=0) {
-			aux = fn2_sequence_key_scheduling[j]%24;
-			aux2 = fn2_sequence_key_scheduling[j]/24;
-			fn2_subkeys[aux2] ^= (1<<aux);
+	for (j = 0; j < 16; ++j) {
+		if (BIT(sequence_key, j) != 0) {
+			aux = fn2_sequence_key_scheduling[j] % 24;
+			aux2 = fn2_sequence_key_scheduling[j] / 24;
+			fn2_subkeys[aux2] ^= (1 << aux);
 		}
 	}
 
-	// subkeys bits 10 & 41
-	fn2_subkeys[0] ^= (BIT(sequence_key,2)<<10);
-	fn2_subkeys[1] ^= (BIT(sequence_key,4)<<17);
 	/**************************************************************/
 
 	// First Feistel Network
 
-	aux = BITSWAP16(counter,5,12,14,13,9,3,6,4,    8,1,15,11,0,7,10,2);
+	aux = BITSWAP16(counter, 5, 12, 14, 13, 9, 3, 6, 4, 8, 1, 15, 11, 0, 7, 10, 2);
 
 	// 1st round
 	B = aux >> 8;
-	A = (aux & 0xff) ^ feistel_function(B,fn1_sboxes[0],fn1_subkeys[0]);
+	A = (aux & 0xff) ^ feistel_function(B, fn1_sboxes[0], fn1_subkeys[0]);
 
 	// 2nd round
-	B = B ^ feistel_function(A,fn1_sboxes[1],fn1_subkeys[1]);
+	B ^= feistel_function(A, fn1_sboxes[1], fn1_subkeys[1]);
 
 	// 3rd round
-	A = A ^ feistel_function(B,fn1_sboxes[2],fn1_subkeys[2]);
+	A ^= feistel_function(B, fn1_sboxes[2], fn1_subkeys[2]);
 
 	// 4th round
-	B = B ^ feistel_function(A,fn1_sboxes[3],fn1_subkeys[3]);
+	B ^= feistel_function(A, fn1_sboxes[3], fn1_subkeys[3]);
 
-	middle_result = (B<<8)|A;
+	middle_result = (B << 8) | A;
 
 
 	/* Middle-result-key sheduling */
-	for (j=0; j<16; ++j) {
-		if (BIT(middle_result,j)!=0) {
-			aux = fn2_middle_result_scheduling[j]%24;
-			aux2 = fn2_middle_result_scheduling[j]/24;
-			fn2_subkeys[aux2] ^= (1<<aux);
+	for (j = 0; j < 16; ++j) {
+		if (BIT(middle_result, j) != 0) {
+			aux = fn2_middle_result_scheduling[j] % 24;
+			aux2 = fn2_middle_result_scheduling[j] / 24;
+			fn2_subkeys[aux2] ^= (1 << aux);
 		}
 	}
 	/*********************/
 
 	// Second Feistel Network
 
-	aux = BITSWAP16(data,14,3,8,12,13,7,15,4,    6,2,9,5,11,0,1,10);
+	aux = BITSWAP16(data, 14, 3, 8, 12, 13, 7, 15, 4, 6, 2, 9, 5, 11, 0, 1, 10);
 
 	// 1st round
 	B = aux >> 8;
-	A = (aux & 0xff) ^ feistel_function(B,fn2_sboxes[0],fn2_subkeys[0]);
+	A = (aux & 0xff) ^ feistel_function(B, fn2_sboxes[0], fn2_subkeys[0]);
 
 	// 2nd round
-	B = B ^ feistel_function(A,fn2_sboxes[1],fn2_subkeys[1]);
+	B ^= feistel_function(A, fn2_sboxes[1], fn2_subkeys[1]);
 
 	// 3rd round
-	A = A ^ feistel_function(B,fn2_sboxes[2],fn2_subkeys[2]);
+	A ^= feistel_function(B, fn2_sboxes[2], fn2_subkeys[2]);
 
 	// 4th round
-	B = B ^ feistel_function(A,fn2_sboxes[3],fn2_subkeys[3]);
+	B ^= feistel_function(A, fn2_sboxes[3], fn2_subkeys[3]);
 
-	aux = (B<<8)|A;
+	aux = (B << 8) | A;
 
-	aux = BITSWAP16(aux,15,7,6,14,13,12,5,4,    3,2,11,10,9,1,0,8);
+	aux = BITSWAP16(aux, 15, 7, 6, 14, 13, 12, 5, 4, 3, 2, 11, 10, 9, 1, 0, 8);
 
 	return aux;
 }
+
 
 UINT16 sega_315_5881_crypt_device::get_decrypted_16()
 {
@@ -643,20 +681,51 @@ UINT16 sega_315_5881_crypt_device::get_decrypted_16()
 	dec_hist = dec;
 
 	prot_cur_address ++;
+
+//  printf("get_decrypted_16 %04x\n", res);
+
 	return res;
 }
 
+
 void sega_315_5881_crypt_device::enc_start()
 {
+	block_pos = 0;
+	done_compression = 0;
 	buffer_pos = BUFFER_SIZE;
-	dec_header = get_decrypted_16() << 16;
+
+	if (buffer_bit2 != 15) // if we have remaining bits in the decompression buffer we shouldn't read the next word yet but should instead use the bits we have?? (twcup98) (might just be because we should be pulling bytes not words?)
+	{
+//      printf("buffer_bit2 is %d\n", buffer_bit2);
+		dec_header = (buffer2a & 0x0003) << 16;
+	}
+	else
+	{
+		dec_hist = 0; // seems to be needed by astrass at least otherwise any call after the first one will be influenced by the one before it.
+		dec_header = get_decrypted_16() << 16;
+	}
+
 	dec_header |= get_decrypted_16();
 
+	// the lower header bits are 2 values that multiply together to get the current stream length
+	// in astrass the first block is 0xffff (for a 0x10000 block) followed by 0x3f3f (for a 0x1000 block)
+	// etc. after each block a new header must be read, it looks like compressed and uncompressed blocks
+	// can be mixed like this, I don't know if the length is src length of decompressed length.
+	// deathcox and others confirm format as 0x20000 bit as compressed bit, 0x1ff00 bits as block size 1, 0x000ff bits as block size 2
+	// for compressed streams the 'line size' is block size 1.
+
+	block_numlines = ((dec_header & 0x000000ff) >> 0) + 1;
+	int blocky = ((dec_header & 0x0001ff00) >> 8) + 1;
+	block_size = block_numlines * blocky;
+
 	if(dec_header & FLAG_COMPRESSED) {
-		line_buffer_size = dec_header & FLAG_LINE_SIZE_512 ? 512 : 256;
+		line_buffer_size = blocky;
 		line_buffer_pos = line_buffer_size;
 		buffer_bit = 7;
+		buffer_bit2 = 15;
 	}
+
+	printf("header %08x\n", dec_header);
 	enc_ready = true;
 }
 
@@ -667,6 +736,18 @@ void sega_315_5881_crypt_device::enc_fill()
 		UINT16 val = get_decrypted_16();
 		buffer[i] = val;
 		buffer[i+1] = val >> 8;
+		block_pos+=2;
+
+		if (!(dec_header & FLAG_COMPRESSED))
+		{
+			if (block_pos == block_size)
+			{
+				// if we reach the size specified we need to read a new header
+				// todo: for compressed blocks this depends on OUTPUT size, not input size, so things get messy
+
+				enc_start();
+			}
+		}
 	}
 	buffer_pos = 0;
 }
@@ -745,9 +826,27 @@ const UINT8 sega_315_5881_crypt_device::trees[9][2][32] = {
 
 int sega_315_5881_crypt_device::get_compressed_bit()
 {
-	if(buffer_pos == BUFFER_SIZE)
-		enc_fill();
-	int res = (buffer[buffer_pos^1] >> buffer_bit) & 1;
+//  if(buffer_pos == BUFFER_SIZE)
+//      enc_fill();
+
+	if (buffer_bit2 == 15)
+	{
+		buffer_bit2 = 0;
+		buffer2a = get_decrypted_16();
+		buffer2[0] = buffer2a;
+		buffer2[1] = buffer2a >> 8;
+	//  block_pos+=2;
+		buffer_pos = 0;
+
+	}
+	else
+	{
+		buffer_bit2++;
+	}
+
+//  if (buffer_bit ==7) printf("using byte %02x\n", buffer2[(buffer_pos&1) ^ 1]);
+
+	int res = (buffer2[(buffer_pos&1)^1] >> buffer_bit) & 1;
 	buffer_bit--;
 	if(buffer_bit == -1) {
 		buffer_bit = 7;
@@ -755,7 +854,6 @@ int sega_315_5881_crypt_device::get_compressed_bit()
 	}
 	return res;
 }
-
 void sega_315_5881_crypt_device::line_fill()
 {
 	assert(line_buffer_pos == line_buffer_size);
@@ -764,8 +862,6 @@ void sega_315_5881_crypt_device::line_fill()
 	line_buffer = lc;
 	line_buffer_prev = lp;
 	line_buffer_pos = 0;
-
-	UINT32 line_buffer_mask = line_buffer_size-1;
 
 	for(int i=0; i != line_buffer_size;) {
 		// vlc 0: start of line
@@ -789,7 +885,7 @@ void sega_315_5881_crypt_device::line_fill()
 				static int offsets[4] = {0, 1, 0, -1};
 				int offset = offsets[(tmp & 0x18) >> 3];
 				for(int j=0; j != count; j++) {
-					lc[i^1] = lp[((i+offset) & line_buffer_mask)^1];
+					lc[i^1] = lp[((i+offset) % line_buffer_size)^1];
 					i++;
 				}
 
@@ -809,5 +905,14 @@ void sega_315_5881_crypt_device::line_fill()
 
 			}
 		}
+	}
+
+	block_pos++;
+	if (block_numlines == block_pos)
+	{
+		done_compression = 1;
+	}
+	else
+	{
 	}
 }

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /*********************************************************************
 
     formats/fdi_dsk.h
@@ -14,6 +16,7 @@
 
 */
 
+#include <assert.h>
 #include "imageutl.h"
 #include "flopimg.h"
 

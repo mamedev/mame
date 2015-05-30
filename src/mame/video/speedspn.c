@@ -1,10 +1,12 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Farfetch'd
 /* Speed Spin video, see driver file for notes */
 
 #include "emu.h"
 #include "includes/speedspn.h"
 
 
-TILE_GET_INFO_MEMBER(speedspn_state::get_speedspn_tile_info)
+TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)
 {
 	int code = m_vidram[tile_index*2+1] | (m_vidram[tile_index*2] << 8);
 	int attr = m_attram[tile_index^0x400];
@@ -14,11 +16,18 @@ TILE_GET_INFO_MEMBER(speedspn_state::get_speedspn_tile_info)
 
 void speedspn_state::video_start()
 {
-	m_vidram = auto_alloc_array(machine(), UINT8, 0x1000 * 2);
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(speedspn_state::get_speedspn_tile_info),this),TILEMAP_SCAN_COLS, 8, 8,64,32);
+	m_display_disable = false;
+	m_bank_vidram = 0;
+	m_vidram.resize(0x1000 * 2);
+	memset(&m_vidram[0], 0, 0x1000*2);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(speedspn_state::get_tile_info),this),TILEMAP_SCAN_COLS, 8, 8,64,32);
+
+	save_item(NAME(m_display_disable));
+	save_item(NAME(m_bank_vidram));
+	save_item(NAME(m_vidram));
 }
 
-WRITE8_MEMBER(speedspn_state::speedspn_vidram_w)
+WRITE8_MEMBER(speedspn_state::vidram_w)
 {
 	m_vidram[offset + m_bank_vidram] = data;
 
@@ -26,26 +35,26 @@ WRITE8_MEMBER(speedspn_state::speedspn_vidram_w)
 		m_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(speedspn_state::speedspn_attram_w)
+WRITE8_MEMBER(speedspn_state::attram_w)
 {
 	m_attram[offset] = data;
 
 	m_tilemap->mark_tile_dirty(offset^0x400);
 }
 
-READ8_MEMBER(speedspn_state::speedspn_vidram_r)
+READ8_MEMBER(speedspn_state::vidram_r)
 {
 	return m_vidram[offset + m_bank_vidram];
 }
 
-WRITE8_MEMBER(speedspn_state::speedspn_banked_vidram_change)
+WRITE8_MEMBER(speedspn_state::vidram_bank_w)
 {
 //  logerror("VidRam Bank: %04x\n", data);
 	m_bank_vidram = data & 1;
 	m_bank_vidram *= 0x1000;
 }
 
-WRITE8_MEMBER(speedspn_state::speedspn_global_display_w)
+WRITE8_MEMBER(speedspn_state::display_disable_w)
 {
 //  logerror("Global display: %u\n", data);
 	m_display_disable = data & 1;
@@ -55,7 +64,7 @@ WRITE8_MEMBER(speedspn_state::speedspn_global_display_w)
 void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	UINT8 *source = m_vidram+ 0x1000;
+	UINT8 *source = &m_vidram[0x1000];
 	UINT8 *finish = source + 0x1000;
 
 	while( source<finish )
@@ -85,7 +94,7 @@ void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 speedspn_state::screen_update_speedspn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 speedspn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_display_disable)
 	{

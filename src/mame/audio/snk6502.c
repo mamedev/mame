@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Dan Boris
 /* from Andrew Scott (ascott@utkux.utcc.utk.edu) */
 
 /*
@@ -146,15 +148,6 @@ snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const 
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void snk6502_sound_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -171,12 +164,29 @@ void snk6502_sound_device::device_start()
 	set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
 	m_tone_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
+
+	for (int i = 0; i < CHANNELS; i++)
+	{
+		save_item(NAME(m_tone_channels[i].mute), i);
+		save_item(NAME(m_tone_channels[i].offset), i);
+		save_item(NAME(m_tone_channels[i].base), i);
+		save_item(NAME(m_tone_channels[i].mask), i);
+		save_item(NAME(m_tone_channels[i].sample_step), i);
+		save_item(NAME(m_tone_channels[i].sample_cur), i);
+		save_item(NAME(m_tone_channels[i].form), i);
+	}
+
+	save_item(NAME(m_tone_clock));
+	save_item(NAME(m_Sound0StopOnRollover));
+	save_item(NAME(m_LastPort1));
+	save_item(NAME(m_hd38880_cmd));
+	save_item(NAME(m_hd38880_addr));
+	save_item(NAME(m_hd38880_data_bytes));
+	save_item(NAME(m_hd38880_speed));
 }
 
 inline void snk6502_sound_device::validate_tone_channel(int channel)
 {
-	//TONE *tone_channels = m_tone_channels;
-
 	if (!m_tone_channels[channel].mute)
 	{
 		UINT8 romdata = m_ROM[m_tone_channels[channel].base + m_tone_channels[channel].offset];
@@ -702,7 +712,7 @@ WRITE8_MEMBER( snk6502_sound_device::fantasy_sound_w )
 		m_tone_channels[2].base = 0x1000 + ((data & 0x70) << 4);
 		m_tone_channels[2].mask = 0xff;
 		snk6502_state *drvstate = space.machine().driver_data<snk6502_state>();
-		drvstate->snk6502_flipscreen_w(space, 0, data);
+		drvstate->flipscreen_w(space, 0, data);
 		break;
 	}
 }

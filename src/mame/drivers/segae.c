@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Sega System E */
 
 /*
@@ -286,15 +288,6 @@ GND  8A 8B GND
  E572 : table with L. slot infos (5 bytes wide)
  E577 : table with R. slot infos (5 bytes wide)
 
-Known issues:
-
-sometimes hangonjr has corrupt gfx when you start a game, I don't know why (timing?)
-
-todo:
-
-tidy up, add save states, clean up so we can use it with hazemd again
-add emulation of vdp bugs, use mame's new screen timing system instead
-covert megatech / megaplay drivers to use new code etc. etc.
 
 */
 
@@ -956,8 +949,8 @@ UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 
 
 		for ( int x = cliprect.min_x; x <= cliprect.max_x; x++ )
 		{
-			dest_ptr[x] = ( y1_ptr[x] ) ? vdp1_ptr[x] : vdp2_ptr[x];
-//dest_ptr[x] = y1_ptr[x] ? 0xFF0000 : 0x00FF00;
+			dest_ptr[x] = ( y1_ptr[x] ) ? vdp2_ptr[x] : vdp1_ptr[x];
+			//dest_ptr[x] = y1_ptr[x] ? 0x00FF00 : 0xFF0000;
 		}
 	}
 

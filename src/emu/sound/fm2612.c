@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
 /*
 **
 ** File: fm2612.c -- software implementation of Yamaha YM2612 FM sound generator
@@ -534,7 +536,7 @@ static FILE *sample[1];
 
 
 /* struct describing a single operator (SLOT) */
-struct FM_SLOT
+struct fm2612_FM_SLOT
 {
 	INT32   *DT;        /* detune          :dt_tab[DT] */
 	UINT8   KSR;        /* key scale rate  :3-KSR */
@@ -575,9 +577,9 @@ struct FM_SLOT
 
 };
 
-struct FM_CH
+struct fm2612_FM_CH
 {
-	FM_SLOT SLOT[4];    /* four SLOTs (operators) */
+	fm2612_FM_SLOT SLOT[4];    /* four SLOTs (operators) */
 
 	UINT8   ALGO;       /* algorithm */
 	UINT8   FB;         /* feedback shift */
@@ -600,7 +602,7 @@ struct FM_CH
 };
 
 
-struct FM_ST
+struct fm2612_FM_ST
 {
 	device_t *device;
 	void *      param;              /* this chip parameter  */
@@ -637,7 +639,7 @@ struct FM_ST
 /***********************************************************/
 
 /* OPN 3slot struct */
-struct FM_3SLOT
+struct fm2612_FM_3SLOT
 {
 	UINT32  fc[3];          /* fnum3,blk3: calculated */
 	UINT8   fn_h;           /* freq3 latch */
@@ -647,12 +649,12 @@ struct FM_3SLOT
 };
 
 /* OPN/A/B common state */
-struct FM_OPN
+struct fm2612_FM_OPN
 {
 	UINT8   type;           /* chip type */
-	FM_ST   ST;             /* general state */
-	FM_3SLOT SL3;           /* 3 slot mode state */
-	FM_CH   *P_CH;          /* pointer of CH */
+	fm2612_FM_ST   ST;             /* general state */
+	fm2612_FM_3SLOT SL3;           /* 3 slot mode state */
+	fm2612_FM_CH   *P_CH;          /* pointer of CH */
 	unsigned int pan[6*2];  /* fm channels output masks (0xffffffff = enable) */
 
 	UINT32  eg_cnt;         /* global envelope generator counter */
@@ -684,8 +686,8 @@ struct FM_OPN
 struct YM2612
 {
 	UINT8       REGS[512];          /* registers            */
-	FM_OPN      OPN;                /* OPN state            */
-	FM_CH       CH[6];              /* channel state        */
+	fm2612_FM_OPN      OPN;                /* OPN state            */
+	fm2612_FM_CH       CH[6];              /* channel state        */
 	UINT8       addr_A1;            /* address line A1      */
 
 	/* dac output (YM2612) */
@@ -711,7 +713,7 @@ struct YM2612
 
 
 /* status set and IRQ handling */
-INLINE void FM_STATUS_SET(FM_ST *ST,int flag)
+INLINE void FM_STATUS_SET(fm2612_FM_ST *ST,int flag)
 {
 	/* set status flag */
 	ST->status |= flag;
@@ -724,7 +726,7 @@ INLINE void FM_STATUS_SET(FM_ST *ST,int flag)
 }
 
 /* status reset and IRQ handling */
-INLINE void FM_STATUS_RESET(FM_ST *ST,int flag)
+INLINE void FM_STATUS_RESET(fm2612_FM_ST *ST,int flag)
 {
 	/* reset status flag */
 	ST->status &=~flag;
@@ -737,7 +739,7 @@ INLINE void FM_STATUS_RESET(FM_ST *ST,int flag)
 }
 
 /* IRQ mask set */
-INLINE void FM_IRQMASK_SET(FM_ST *ST,int flag)
+INLINE void FM_IRQMASK_SET(fm2612_FM_ST *ST,int flag)
 {
 	ST->irqmask = flag;
 	/* IRQ handling check */
@@ -745,9 +747,9 @@ INLINE void FM_IRQMASK_SET(FM_ST *ST,int flag)
 	FM_STATUS_RESET(ST,0);
 }
 
-INLINE void FM_KEYON(FM_OPN *OPN, FM_CH *CH , int s )
+INLINE void FM_KEYON(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH , int s )
 {
-	FM_SLOT *SLOT = &CH->SLOT[s];
+	fm2612_FM_SLOT *SLOT = &CH->SLOT[s];
 
 	if( !SLOT->key && !OPN->SL3.key_csm)
 	{
@@ -780,9 +782,9 @@ INLINE void FM_KEYON(FM_OPN *OPN, FM_CH *CH , int s )
 	SLOT->key = 1;
 }
 
-INLINE void FM_KEYOFF(FM_OPN *OPN, FM_CH *CH , int s )
+INLINE void FM_KEYOFF(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH , int s )
 {
-	FM_SLOT *SLOT = &CH->SLOT[s];
+	fm2612_FM_SLOT *SLOT = &CH->SLOT[s];
 
 	if (SLOT->key && !OPN->SL3.key_csm)
 	{
@@ -813,9 +815,9 @@ INLINE void FM_KEYOFF(FM_OPN *OPN, FM_CH *CH , int s )
 	SLOT->key = 0;
 }
 
-INLINE void FM_KEYON_CSM(FM_OPN *OPN, FM_CH *CH , int s )
+INLINE void FM_KEYON_CSM(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH , int s )
 {
-	FM_SLOT *SLOT = &CH->SLOT[s];
+	fm2612_FM_SLOT *SLOT = &CH->SLOT[s];
 
 	if( !SLOT->key && !OPN->SL3.key_csm)
 	{
@@ -846,9 +848,9 @@ INLINE void FM_KEYON_CSM(FM_OPN *OPN, FM_CH *CH , int s )
 	}
 }
 
-INLINE void FM_KEYOFF_CSM(FM_CH *CH , int s )
+INLINE void FM_KEYOFF_CSM(fm2612_FM_CH *CH , int s )
 {
-	FM_SLOT *SLOT = &CH->SLOT[s];
+	fm2612_FM_SLOT *SLOT = &CH->SLOT[s];
 	if (!SLOT->key)
 	{
 		if (SLOT->state>EG_REL)
@@ -877,7 +879,7 @@ INLINE void FM_KEYOFF_CSM(FM_CH *CH , int s )
 }
 
 /* OPN Mode Register Write */
-INLINE void set_timers( FM_OPN *OPN, FM_ST *ST, void *n, int v )
+INLINE void set_timers(fm2612_FM_OPN *OPN, fm2612_FM_ST *ST, void *n, int v)
 {
 	/* b7 = CSM MODE */
 	/* b6 = 3 slot mode */
@@ -951,7 +953,7 @@ INLINE void set_timers( FM_OPN *OPN, FM_ST *ST, void *n, int v )
 
 
 /* Timer A Overflow */
-INLINE void TimerAOver(FM_ST *ST)
+INLINE void TimerAOver(fm2612_FM_ST *ST)
 {
 	/* set status (if enabled) */
 	if(ST->mode & 0x04) FM_STATUS_SET(ST,0x01);
@@ -960,7 +962,7 @@ INLINE void TimerAOver(FM_ST *ST)
 	if (ST->timer_handler) (ST->timer_handler)(ST->param,0,ST->TAC * ST->timer_prescaler,ST->clock);
 }
 /* Timer B Overflow */
-INLINE void TimerBOver(FM_ST *ST)
+INLINE void TimerBOver(fm2612_FM_ST *ST)
 {
 	/* set status (if enabled) */
 	if(ST->mode & 0x08) FM_STATUS_SET(ST,0x02);
@@ -1002,7 +1004,7 @@ INLINE void TimerBOver(FM_ST *ST)
 
 #if FM_BUSY_FLAG_SUPPORT
 #define FM_BUSY_CLEAR(ST) ((ST)->busy_expiry_time = UNDEFINED_TIME)
-INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
+INLINE UINT8 FM_STATUS_FLAG(fm2612_FM_ST *ST)
 {
 	if( COMPARE_TIMES(ST->busy_expiry_time, UNDEFINED_TIME) != 0 )
 	{
@@ -1014,7 +1016,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 	return ST->status;
 }
 #if 0
-INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
+INLINE void FM_BUSY_SET(fm2612_FM_ST *ST,int busyclock )
 {
 	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(attotime::from_hz(ST->clock), busyclock * ST->timer_prescaler);
 	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(&ST->device->machine()), expiry_period);
@@ -1028,7 +1030,7 @@ INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
 
 
 /* set algorithm connection */
-static void setup_connection( FM_OPN *OPN, FM_CH *CH, int ch )
+static void setup_connection(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH, int ch)
 {
 	INT32 *carrier = &OPN->out_fm[ch];
 
@@ -1116,7 +1118,7 @@ static void setup_connection( FM_OPN *OPN, FM_CH *CH, int ch )
 }
 
 /* set detune & multiple */
-INLINE void set_det_mul(FM_ST *ST,FM_CH *CH,FM_SLOT *SLOT,int v)
+INLINE void set_det_mul(fm2612_FM_ST *ST,fm2612_FM_CH *CH,fm2612_FM_SLOT *SLOT,int v)
 {
 	SLOT->mul = (v&0x0f)? (v&0x0f)*2 : 1;
 	SLOT->DT  = ST->dt_tab[(v>>4)&7];
@@ -1124,7 +1126,7 @@ INLINE void set_det_mul(FM_ST *ST,FM_CH *CH,FM_SLOT *SLOT,int v)
 }
 
 /* set total level */
-INLINE void set_tl(FM_CH *CH,FM_SLOT *SLOT , int v)
+INLINE void set_tl(fm2612_FM_CH *CH,fm2612_FM_SLOT *SLOT , int v)
 {
 	SLOT->tl = (v&0x7f)<<(ENV_BITS-7); /* 7bit TL */
 
@@ -1136,7 +1138,7 @@ INLINE void set_tl(FM_CH *CH,FM_SLOT *SLOT , int v)
 }
 
 /* set attack rate & key scale  */
-INLINE void set_ar_ksr(UINT8 type, FM_CH *CH,FM_SLOT *SLOT,int v)
+INLINE void set_ar_ksr(UINT8 type, fm2612_FM_CH *CH,fm2612_FM_SLOT *SLOT,int v)
 {
 	UINT8 old_KSR = SLOT->KSR;
 
@@ -1165,7 +1167,7 @@ INLINE void set_ar_ksr(UINT8 type, FM_CH *CH,FM_SLOT *SLOT,int v)
 }
 
 /* set decay rate */
-INLINE void set_dr(UINT8 type, FM_SLOT *SLOT,int v)
+INLINE void set_dr(UINT8 type, fm2612_FM_SLOT *SLOT,int v)
 {
 	SLOT->d1r = (v&0x1f) ? 32 + ((v&0x1f)<<1) : 0;
 
@@ -1174,7 +1176,7 @@ INLINE void set_dr(UINT8 type, FM_SLOT *SLOT,int v)
 }
 
 /* set sustain rate */
-INLINE void set_sr(UINT8 type, FM_SLOT *SLOT,int v)
+INLINE void set_sr(UINT8 type, fm2612_FM_SLOT *SLOT,int v)
 {
 	SLOT->d2r = (v&0x1f) ? 32 + ((v&0x1f)<<1) : 0;
 
@@ -1183,7 +1185,7 @@ INLINE void set_sr(UINT8 type, FM_SLOT *SLOT,int v)
 }
 
 /* set release rate */
-INLINE void set_sl_rr(UINT8 type, FM_SLOT *SLOT,int v)
+INLINE void set_sl_rr(UINT8 type, fm2612_FM_SLOT *SLOT,int v)
 {
 	SLOT->sl = sl_table[ v>>4 ];
 
@@ -1198,7 +1200,7 @@ INLINE void set_sl_rr(UINT8 type, FM_SLOT *SLOT,int v)
 }
 
 /* advance LFO to next sample */
-INLINE void advance_lfo(FM_OPN *OPN)
+INLINE void advance_lfo(fm2612_FM_OPN *OPN)
 {
 	if (OPN->lfo_timer_overflow)   /* LFO enabled ? */
 	{
@@ -1227,7 +1229,7 @@ INLINE void advance_lfo(FM_OPN *OPN)
 }
 
 /* changed from INLINE to static here to work around gcc 4.2.1 codegen bug */
-static void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
+static void advance_eg_channel(fm2612_FM_OPN *OPN, fm2612_FM_SLOT *SLOT)
 {
 	unsigned int out;
 	unsigned int i = 4; /* four operators per channel */
@@ -1380,7 +1382,7 @@ static void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
 /* SSG-EG update process */
 /* The behavior is based upon Nemesis tests on real hardware */
 /* This is actually executed before each samples */
-static void update_ssg_eg_channel(FM_SLOT *SLOT)
+static void update_ssg_eg_channel(fm2612_FM_SLOT *SLOT)
 {
 	unsigned int i = 4; /* four operators per channel */
 
@@ -1439,7 +1441,7 @@ static void update_ssg_eg_channel(FM_SLOT *SLOT)
 }
 
 
-INLINE void update_phase_lfo_slot(FM_OPN *OPN, FM_SLOT *SLOT, INT32 pms, UINT32 block_fnum)
+INLINE void update_phase_lfo_slot(fm2612_FM_OPN *OPN, fm2612_FM_SLOT *SLOT, INT32 pms, UINT32 block_fnum)
 {
 	UINT32 fnum_lfo   = ((block_fnum & 0x7f0) >> 4) * 32 * 8;
 	INT32  lfo_fn_table_index_offset = lfo_pm_table[ fnum_lfo + pms + OPN->LFO_PM ];
@@ -1469,7 +1471,7 @@ INLINE void update_phase_lfo_slot(FM_OPN *OPN, FM_SLOT *SLOT, INT32 pms, UINT32 
 	}
 }
 
-INLINE void update_phase_lfo_channel(FM_OPN *OPN, FM_CH *CH)
+INLINE void update_phase_lfo_channel(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
 {
 	UINT32 block_fnum = CH->block_fnum;
 
@@ -1516,7 +1518,7 @@ INLINE void update_phase_lfo_channel(FM_OPN *OPN, FM_CH *CH)
 }
 
 /* update phase increment and envelope generator */
-INLINE void refresh_fc_eg_slot(FM_OPN *OPN, FM_SLOT *SLOT , int fc , int kc )
+INLINE void refresh_fc_eg_slot(fm2612_FM_OPN *OPN, fm2612_FM_SLOT *SLOT , int fc , int kc )
 {
 	int ksr = kc >> SLOT->KSR;
 
@@ -1556,7 +1558,7 @@ INLINE void refresh_fc_eg_slot(FM_OPN *OPN, FM_SLOT *SLOT , int fc , int kc )
 
 /* update phase increment counters */
 /* Changed from INLINE to static to work around gcc 4.2.1 codegen bug */
-static void refresh_fc_eg_chan(FM_OPN *OPN, FM_CH *CH )
+static void refresh_fc_eg_chan(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH )
 {
 	if( CH->SLOT[SLOT1].Incr==-1)
 	{
@@ -1593,7 +1595,7 @@ INLINE signed int op_calc1(UINT32 phase, unsigned int env, signed int pm)
 	return tl_tab[p];
 }
 
-INLINE void chan_calc(YM2612 *F2612, FM_OPN *OPN, FM_CH *CH)
+INLINE void chan_calc(YM2612 *F2612, fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
 {
 	UINT32 AM = OPN->LFO_AM >> CH->ams;
 	unsigned int eg_out = volume_calc(&CH->SLOT[SLOT1]);
@@ -1676,7 +1678,7 @@ static void FMCloseTable( void )
 
 
 /* CSM Key Controll */
-INLINE void CSMKeyControll(FM_OPN *OPN, FM_CH *CH)
+INLINE void CSMKeyControll(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
 {
 	/* all key ON (verified by Nemesis on real hardware) */
 	FM_KEYON_CSM(OPN,CH,SLOT1);
@@ -1688,7 +1690,7 @@ INLINE void CSMKeyControll(FM_OPN *OPN, FM_CH *CH)
 
 #ifdef __SAVE_H__
 /* FM channel save , internal state only */
-static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
+static void FMsave_state_channel(device_t *device,fm2612_FM_CH *CH,int num_ch)
 {
 	int slot , ch;
 
@@ -1700,7 +1702,7 @@ static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 		/* slots */
 		for(slot=0;slot<4;slot++)
 		{
-			FM_SLOT *SLOT = &CH->SLOT[slot];
+			fm2612_FM_SLOT *SLOT = &CH->SLOT[slot];
 			device->save_item(NAME(SLOT->phase), ch * 4 + slot);
 			device->save_item(NAME(SLOT->state), ch * 4 + slot);
 			device->save_item(NAME(SLOT->volume), ch * 4 + slot);
@@ -1708,7 +1710,7 @@ static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 	}
 }
 
-static void FMsave_state_st(device_t *device,FM_ST *ST)
+static void FMsave_state_st(device_t *device,fm2612_FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
 	device->save_item(NAME(ST->busy_expiry_time) );
@@ -1729,10 +1731,10 @@ static void FMsave_state_st(device_t *device,FM_ST *ST)
 
 #if BUILD_OPN
 /* write a OPN mode register 0x20-0x2f */
-static void OPNWriteMode(FM_OPN *OPN, int r, int v)
+static void OPNWriteMode(fm2612_FM_OPN *OPN, int r, int v)
 {
 	UINT8 c;
-	FM_CH *CH;
+	fm2612_FM_CH *CH;
 
 	switch(r)
 	{
@@ -1780,10 +1782,10 @@ static void OPNWriteMode(FM_OPN *OPN, int r, int v)
 }
 
 /* write a OPN register (0x30-0xff) */
-static void OPNWriteReg(FM_OPN *OPN, int r, int v)
+static void OPNWriteReg(fm2612_FM_OPN *OPN, int r, int v)
 {
-	FM_CH *CH;
-	FM_SLOT *SLOT;
+	fm2612_FM_CH *CH;
+	fm2612_FM_SLOT *SLOT;
 
 	UINT8 c = OPN_CHAN(r);
 
@@ -1985,7 +1987,7 @@ static void OPNWriteReg(FM_OPN *OPN, int r, int v)
 }
 
 /* initialize time tables */
-static void init_timetables(FM_OPN *OPN, double freqbase)
+static void init_timetables(fm2612_FM_OPN *OPN, double freqbase)
 {
 	int i,d;
 	double rate;
@@ -2020,7 +2022,7 @@ static void init_timetables(FM_OPN *OPN, double freqbase)
 }
 
 /* prescaler set (and make time tables) */
-static void OPNSetPres(FM_OPN *OPN, int pres, int timer_prescaler, int SSGpres)
+static void OPNSetPres(fm2612_FM_OPN *OPN, int pres, int timer_prescaler, int SSGpres)
 {
 	/* frequency base */
 	OPN->ST.freqbase = (OPN->ST.rate) ? ((double)OPN->ST.clock / OPN->ST.rate) / pres : 0;
@@ -2042,7 +2044,7 @@ static void OPNSetPres(FM_OPN *OPN, int pres, int timer_prescaler, int SSGpres)
 	init_timetables(OPN, OPN->ST.freqbase);
 }
 
-static void reset_channels( FM_ST *ST , FM_CH *CH , int num )
+static void reset_channels(fm2612_FM_ST *ST , fm2612_FM_CH *CH , int num)
 {
 	int c,s;
 
@@ -2175,11 +2177,11 @@ static void init_tables(void)
 void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
 	YM2612 *F2612 = (YM2612 *)chip;
-	FM_OPN *OPN   = &F2612->OPN;
+	fm2612_FM_OPN *OPN   = &F2612->OPN;
 	INT32 *out_fm = OPN->out_fm;
 	int i;
 	FMSAMPLE  *bufL,*bufR;
-	FM_CH   *cch[6];
+	fm2612_FM_CH   *cch[6];
 	int lt,rt;
 
 	/* set bufer */
@@ -2405,7 +2407,7 @@ void ym2612_reset_chip(void *chip)
 {
 	int i;
 	YM2612 *F2612 = (YM2612 *)chip;
-	FM_OPN *OPN   = &F2612->OPN;
+	fm2612_FM_OPN *OPN   = &F2612->OPN;
 
 	OPNSetPres( OPN, 6*24, 6*24, 0);
 	/* status clear */

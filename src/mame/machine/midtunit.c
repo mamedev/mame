@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
 /*************************************************************************
 
     Driver for Midway T-unit games.
@@ -71,22 +73,6 @@ READ16_MEMBER(midtunit_state::midtunit_cmos_r)
 {
 	return m_nvram[offset];
 }
-
-
-
-/*************************************
- *
- *  Generic input ports
- *
- *************************************/
-
-IOPORT_ARRAY_MEMBER(midtunit_state::tunit_ports) { "IN0", "IN1", "IN2", "DSW" };
-
-READ16_MEMBER(midtunit_state::midtunit_input_r)
-{
-	return m_ports[offset]->read();
-}
-
 
 
 /*************************************

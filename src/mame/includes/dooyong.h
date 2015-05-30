@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "video/bufsprite.h"
 
 class dooyong_state : public driver_device

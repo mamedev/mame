@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*
     Intel Flash ROM emulation
 */
@@ -82,6 +84,9 @@
 #define MCFG_INTEL_28F320J3D_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INTEL_28F320J3D, 0)
 
+#define MCFG_INTEL_28F320J5_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_28F320J5, 0)
+
 #define MCFG_SST_39VF400A_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SST_39VF400A, 0)
 
@@ -128,6 +133,7 @@ public:
 		FLASH_INTEL_TE28F160,
 		FLASH_SHARP_UNK128MBIT,
 		FLASH_INTEL_28F320J3D,
+		FLASH_INTEL_28F320J5,
 		FLASH_SST_39VF400A
 	};
 
@@ -363,6 +369,12 @@ public:
 	intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class intel_28f320j5_device : public intelfsh16_device
+{
+public:
+	intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class sst_39vf400a_device : public intelfsh16_device
 {
 public:
@@ -397,6 +409,7 @@ extern const device_type INTEL_E28F008SA;
 extern const device_type INTEL_TE28F160;
 extern const device_type SHARP_UNK128MBIT;
 extern const device_type INTEL_28F320J3D;
+extern const device_type INTEL_28F320J5;
 extern const device_type SST_39VF400A;
 
 #endif

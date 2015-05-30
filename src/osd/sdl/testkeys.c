@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  testkey.c - A small utility to analyze SDL keycodes
-//
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //  testkeys by couriersud
@@ -146,7 +145,7 @@ int main(int argc, char *argv[])
 				printf("ITEM_ID_XY %s 0x%x 0x%x %s\n",
 					lookup_key_name(sdl_lookup, event.key.keysym.scancode),
 					(int) event.key.keysym.scancode,
-					0, //(int) event.key.keysym.unicode,
+					(int) event.key.keysym.sym,
 					"");
 				lasttext[0] = 0;
 #else
@@ -165,7 +164,7 @@ int main(int argc, char *argv[])
 			printf("ITEM_ID_XY %s 0x%x 0x%x %s\n",
 					lookup_key_name(sdl_lookup, event.key.keysym.scancode),
 					(int) event.key.keysym.scancode,
-					0, //(int) event.key.keysym.unicode,
+					(int) event.key.keysym.sym,
 					lasttext);
 #else
 			memset(buf, 0, 19);

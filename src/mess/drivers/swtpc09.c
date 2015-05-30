@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robert Justice
 /**************************************************************************
 
     SWTPC S/09 Mess driver

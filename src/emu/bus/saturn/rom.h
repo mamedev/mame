@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 #ifndef __SAT_ROM_H
 #define __SAT_ROM_H
 

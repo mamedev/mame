@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*
     smartmed.c: SmartMedia Flash ROM emulation
 
@@ -44,7 +46,7 @@ INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
 #endif
 
 /* SmartMedia image header */
-struct disk_image_header
+struct SM_disk_image_header
 {
 	UINT8 version;
 	UINT32BE page_data_size;
@@ -64,7 +66,7 @@ struct disk_image_format_2_header
 
 enum
 {
-	header_len = sizeof(disk_image_header)
+	header_len = sizeof(SM_disk_image_header)
 };
 
 
@@ -130,7 +132,7 @@ void nand_device::device_start()
 */
 bool smartmedia_image_device::smartmedia_format_1()
 {
-	disk_image_header custom_header;
+	SM_disk_image_header custom_header;
 	int bytes_read;
 
 	bytes_read = fread(&custom_header, sizeof(custom_header));
@@ -303,7 +305,7 @@ void smartmedia_image_device::call_unload()
 	{
 		if (m_image_format == 1)
 		{
-			disk_image_header custom_header;
+			SM_disk_image_header custom_header;
 			int bytes_read;
 			fseek( 0, SEEK_SET);
 			bytes_read = fread( &custom_header, sizeof( custom_header));

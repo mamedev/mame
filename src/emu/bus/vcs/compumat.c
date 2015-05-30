@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***************************************************************************
 
  Atari 2600 cart Spectravideo Compumate (Cart + keyboard!)

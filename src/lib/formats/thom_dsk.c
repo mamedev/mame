@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Antoine Mine
 /*********************************************************************
 
     formats/thom_dsk.c
@@ -9,6 +11,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 #include "thom_dsk.h"
 #include "basicdsk.h"
 

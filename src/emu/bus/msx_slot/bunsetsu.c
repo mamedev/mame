@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
   Emulation for the bunsetsu internal firmware mapper found in a number of MSX machines
 */

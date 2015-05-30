@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 #include "emu.h"
 #include "debugger.h"
@@ -2142,7 +2144,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m0(OPS_32) // Jcc.
 			size = 8;
 		}
 
-	//	c = limm;
+	//  c = limm;
 
 	}
 	else
@@ -2151,7 +2153,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m0(OPS_32) // Jcc.
 		// Jcc [c]         0010 0RRR 1110 0000 0RRR CCCC CC0Q QQQQ
 		// no conditional links to ILINK1, ILINK2?
 
-	//	c = m_regs[creg];
+	//  c = m_regs[creg];
 	}
 
 	if (!check_condition(condition))

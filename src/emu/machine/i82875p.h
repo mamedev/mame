@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 // Intel i82875p northbridge
 
 #ifndef I82875P_H
@@ -86,7 +88,7 @@ private:
 	const char *cpu_tag;
 	int ram_size;
 	cpu_device *cpu;
-	dynamic_array<UINT32> ram;
+	std::vector<UINT32> ram;
 
 	UINT8 agpm, fpllcont, pam[8], smram, esmramc;
 	UINT8 apsize, amtt, lptt;

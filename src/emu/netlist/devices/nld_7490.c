@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_7490.c
  *
@@ -28,6 +30,8 @@ NETLIB_START(7490)
 NETLIB_RESET(7490)
 {
 	m_cnt = 0;
+	m_last_A = 0;
+	m_last_B = 0;
 }
 
 static const netlist_time delay[4] =

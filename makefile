@@ -15,6 +15,131 @@
 #################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
 ###########################################################################
 
+# REGENIE = 1
+# VERBOSE = 1
+# NOWERROR = 1
+
+# TARGET = mame
+# SUBTARGET = tiny
+# TOOLS = 1
+# TESTS = 1
+# OSD = sdl
+
+# USE_BGFX = 1
+# NO_OPENGL = 1
+# USE_DISPATCH_GL = 0
+# DIRECTINPUT = 7
+# USE_SDL = 1
+# SDL2_MULTIAPI = 1
+# NO_USE_MIDI = 1
+# DONT_USE_NETWORK = 1
+# USE_QTDEBUG = 1
+# NO_X11 = 1
+# NO_USE_XINPUT = 0
+# FORCE_DRC_C_BACKEND = 1
+
+# DEBUG = 1
+# PROFILER = 1
+# SANITIZE = 1
+
+# PTR64 = 1
+# BIGENDIAN = 1
+# NOASM = 1
+
+# OPTIMIZE = 3
+# SYMBOLS = 1
+# SYMLEVEL = 2
+# MAP = 1
+# PROFILE = 1
+# ARCHOPTS =
+# LDOPTS =
+
+# USE_SYSTEM_LIB_EXPAT = 1
+
+# MESA_INSTALL_ROOT = /opt/mesa
+# SDL_INSTALL_ROOT = /opt/sdl2
+# SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
+# SDL_LIBVER = sdl
+# MACOSX_USE_LIBSDL = 1
+# CYGWIN_BUILD = 1
+
+# TARGETOS = windows
+# CROSS_BUILD = 1
+# OVERRIDE_CC = cc
+# OVERRIDE_CXX = c++
+# OVERRIDE_LD = ld
+
+# DEPRECATED = 1
+# LTO = 1
+# SSE2 = 1
+# OPENMP = 1
+# CPP11 = 1
+# FASTDEBUG = 1
+
+# FILTER_DEPS = 1
+# SEPARATE_BIN = 1
+# PYTHON_EXECUTABLE = python3
+# SHADOW_CHECK = 1
+# STRIP_SYMBOLS = 0
+
+# QT_HOME = /usr/lib64/qt48/
+
+-include useroptions.mak
+
+###########################################################################
+##################   END USER-CONFIGURABLE OPTIONS   ######################
+###########################################################################
+
+MAKEPARAMS := -R
+
+#
+# Determine running OS
+#
+
+ifeq ($(OS),Windows_NT)
+OS := windows
+GENIEOS := windows
+else
+UNAME := $(shell uname -mps)
+GENIEOS := linux
+ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
+OS := linux
+endif
+ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
+OS := solaris
+GENIEOS := solaris
+endif
+ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
+OS := solaris
+GENIEOS := solaris
+endif
+ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
+OS := freebsd
+GENIEOS := bsd
+endif
+ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
+OS := freebsd
+GENIEOS := bsd
+endif
+ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
+OS := netbsd
+GENIEOS := bsd
+endif
+ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
+OS := openbsd
+GENIEOS := bsd
+endif
+ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
+OS := macosx
+GENIEOS := darwin
+endif
+ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
+OS := haiku
+endif
+ifndef OS
+$(error Unable to detect OS from uname -a: $(UNAME))
+endif
+endif
 
 #-------------------------------------------------
 # specify core target: mame, mess, etc.
@@ -24,35 +149,24 @@
 #-------------------------------------------------
 
 ifndef TARGET
-TARGET = mame
+TARGET := mame
 endif
 
 ifndef SUBTARGET
-SUBTARGET = $(TARGET)
+SUBTARGET := $(TARGET)
 endif
 
+CONFIG = release
+ifdef DEBUG
+CONFIG := debug
+endif
 
-
-#-------------------------------------------------
-# specify OSD layer: windows, sdl, etc.
-# build rules will be included from
-# src/osd/$(OSD)/$(OSD).mak
-#-------------------------------------------------
-
-ifndef OSD
-ifeq ($(OS),Windows_NT)
-OSD = windows
-TARGETOS = win32
+ifdef VERBOSE
+MAKEPARAMS += verbose=1
 else
-OSD = sdl
+SILENT := @
+MAKEPARAMS += --no-print-directory
 endif
-endif
-
-ifndef CROSS_BUILD_OSD
-CROSS_BUILD_OSD = $(OSD)
-endif
-
-
 
 #-------------------------------------------------
 # specify OS target, which further differentiates
@@ -62,225 +176,159 @@ endif
 
 ifndef TARGETOS
 
-ifeq ($(OS),Windows_NT)
-TARGETOS = win32
+ifeq ($(OS),windows)
+TARGETOS := windows
+ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+ARCHITECTURE := _x64
+endif
+ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+ARCHITECTURE := _x64
+ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
 else
-
-ifneq ($(CROSS_BUILD),1)
-
-ifneq ($(OS2_SHELL),)
-TARGETOS = os2
+ARCHITECTURE := _x86
+endif
+endif
 else
+UNAME    := $(shell uname -mps)
+TARGETOS := $(OS)
 
-UNAME = $(shell uname -mps)
+ARCHITECTURE := _x86
 
-ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
-TARGETOS = linux
-endif
-ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
-TARGETOS = solaris
-endif
-ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
-TARGETOS = freebsd
-endif
-ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
-TARGETOS = freebsd
-endif
-ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
-TARGETOS = netbsd
-endif
-ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
-TARGETOS = openbsd
-endif
-ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
-TARGETOS = macosx
-endif
-ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
-TARGETOS = haiku
-endif
-
-ifndef TARGETOS
-$(error Unable to detect TARGETOS from uname -a: $(UNAME))
-endif
-
-# Autodetect PTR64
-ifndef PTR64
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
-PTR64 = 1
+ARCHITECTURE := _x64
 endif
 ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
-PTR64 = 1
+ARCHITECTURE := _x64
 endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
-PTR64 = 1
+ARCHITECTURE := _x64
 endif
 endif
 
-# Autodetect BIGENDIAN 
+else
+CROSS_BUILD := 1
+endif # TARGET_OS
+
+ifdef PTR64
+ifeq ($(PTR64),1)
+ARCHITECTURE := _x64
+else
+ARCHITECTURE := _x86
+endif
+endif
+
+ifeq ($(OS),windows)
+ifeq ($(ARCHITECTURE),_x64)
+WINDRES  := $(MINGW64)/bin/windres
+else
+WINDRES  := $(MINGW32)/bin/windres
+endif
+else
+ifeq ($(ARCHITECTURE),_x64)
+WINDRES  := x86_64-w64-mingw32-windres
+else
+WINDRES  := i686-w64-mingw32-windres
+endif
+endif
+
+ifeq ($(findstring arm,$(UNAME)),arm)
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
+# Autodetect BIGENDIAN
 # MacOSX
 ifndef BIGENDIAN
 ifneq (,$(findstring Power,$(UNAME)))
-BIGENDIAN=1
+BIGENDIAN := 1
 endif
 # Linux
 ifneq (,$(findstring ppc,$(UNAME)))
-BIGENDIAN=1
+BIGENDIAN := 1
 endif
 endif # BIGENDIAN
 
-endif # OS/2
-endif # CROSS_BUILD
-endif # Windows_NT
+ifndef PYTHON_EXECUTABLE
+PYTHON := python
+else
+PYTHON := $(PYTHON_EXECUTABLE)
+endif
+CC := $(SILENT)gcc
+LD := $(SILENT)g++
 
-endif # TARGET_OS
+#-------------------------------------------------
+# specify OSD layer: windows, sdl, etc.
+# build rules will be included from
+# src/osd/$(OSD)/$(OSD).mak
+#-------------------------------------------------
 
+ifndef OSD
 
-ifeq ($(TARGETOS),win32)
+OSD := osdmini
 
-# Autodetect PTR64
-ifndef PTR64
-WIN_TEST_GCC := $(shell gcc --version)
-ifeq ($(findstring x86_64,$(WIN_TEST_GCC)),x86_64)
-	PTR64=1
+ifeq ($(TARGETOS),windows)
+OSD := windows
+endif
+
+ifeq ($(TARGETOS),linux)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),freebsd)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),solaris)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),macosx)
+OSD := sdl
 endif
 endif
 
+#-------------------------------------------------
+# which 3rdparty library to build;
+#  link against system (common) library otherwise
+#-------------------------------------------------
+ifndef USE_SYSTEM_LIB_EXPAT
+PARAMS += --with-bundled-expat
 endif
 
-
-
 #-------------------------------------------------
-# configure name of final executable
+# distribution may change things
 #-------------------------------------------------
 
-# uncomment and specify prefix to be added to the name
-# PREFIX =
+ifeq ($(DISTRO),)
+DISTRO := generic
+else
+ifeq ($(DISTRO),debian-stable)
+else
+$(error DISTRO $(DISTRO) unknown)
+endif
+endif
 
-# uncomment and specify suffix to be added to the name
-# SUFFIX =
+PARAMS+= --distro=$(DISTRO)
 
-
-
-#-------------------------------------------------
-# specify architecture-specific optimizations
-#-------------------------------------------------
-
-# uncomment and specify architecture-specific optimizations here
-# some examples:
-#   ARCHOPTS = -march=pentiumpro  # optimize for I686
-#   ARCHOPTS = -march=core2       # optimize for Core 2
-#   ARCHOPTS = -march=native      # optimize for local machine (auto detect)
-#   ARCHOPTS = -mcpu=G4           # optimize for G4
-# note that we leave this commented by default so that you can
-# configure this in your environment and never have to think about it
-# ARCHOPTS =
-
-
-
-#-------------------------------------------------
-# specify program options; see each option below
-# for details
-#-------------------------------------------------
-
-# uncomment next line to build a debug version
-# DEBUG = 1
-
-# uncomment next line to disable some debug-related hotspots/slowdowns (e.g. for profiling)
-# FASTDEBUG = 1
-
-# uncomment next line to include the internal profiler
-# PROFILER = 1
-
-# uncomment the force the universal DRC to always use the C backend
-# you may need to do this if your target architecture does not have
-# a native backend
-# FORCE_DRC_C_BACKEND = 1
-
-# uncomment next line to build using unix-style libsdl on Mac OS X
-# (vs. the native framework port).  Normal users should not enable this.
-# MACOSX_USE_LIBSDL = 1
-
-# uncomment and specify path to cppcheck executable to perform
-# static code analysis during compilation
-# CPPCHECK =
-
-
-
-#-------------------------------------------------
-# specify build options; see each option below 
-# for details
-#-------------------------------------------------
-
-# uncomment next line if you are building for a 64-bit target
-# PTR64 = 1
-
-# uncomment next line if you are building for a big-endian target
-# BIGENDIAN = 1
-
-# uncomment next line to build expat as part of MAME build
-BUILD_EXPAT = 1
-
-# uncomment next line to build zlib as part of MAME build
-BUILD_ZLIB = 1
-
-# uncomment next line to build libflac as part of MAME build
-BUILD_FLAC = 1
-
-# uncomment next line to build jpeglib as part of MAME build
-BUILD_JPEGLIB = 1
-
-# uncomment next line to build libsqlite3 as part of MAME/MESS build
-BUILD_SQLITE3 = 1
-
-# uncomment next line to build PortMidi as part of MAME/MESS build
-BUILD_MIDILIB = 1
-
-# uncomment next line to include the symbols
-# SYMBOLS = 1
-
-# specify symbols level or leave commented to use the default
-# (default is SYMLEVEL = 2 normally; use 1 if you only need backtrace)
-# SYMLEVEL = 2
-
-# uncomment next line to dump the symbols to a .sym file
-# DUMPSYM = 1
-
-# uncomment next line to include profiling information from the compiler
-# PROFILE = 1
-
-# uncomment next line to generate a link map for exception handling in windows
-# MAP = 1
-
-# uncomment next line to generate verbose build information
-# VERBOSE = 1
-
-# uncomment next line to generate deprecation warnings during compilation
-# DEPRECATED = 1
-
-# specify the sanitizer to use or leave empty to use none
-# SANITIZE =
-
-# uncomment next line to enable LTO (link-time optimizations)
-# LTO = 1
-
-# uncomment next line to disable networking
-# DONT_USE_NETWORK = 1
-
-# uncomment to enable SSE2 optimized code and SSE2 code generation (implicitly enabled by 64-bit compilers)
-# SSE2 = 1
-
-# uncomment to enable OpenMP optimized code
-# OPENMP = 1
-
-# specify optimization level or leave commented to use the default
-# (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
-# OPTIMIZE = 3
-
-
-###########################################################################
-##################   END USER-CONFIGURABLE OPTIONS   ######################
-###########################################################################
-
+ifdef OVERRIDE_CC
+PARAMS += --CC='$(OVERRIDE_CC)'
+ifndef CROSS_BUILD
+CC := $(OVERRIDE_CC)
+endif
+endif
+ifdef OVERRIDE_CXX
+PARAMS += --CXX='$(OVERRIDE_CXX)'
+ifndef CROSS_BUILD
+CXX := $(OVERRIDE_CXX)
+endif
+endif
+ifdef OVERRIDE_LD
+PARAMS += --LD='$(OVERRIDE_LD)'
+ifndef CROSS_BUILD
+LD := $(OVERRIDE_LD)
+endif
+endif
 
 #-------------------------------------------------
 # sanity check the configuration
@@ -310,11 +358,7 @@ endif
 
 # specify a default optimization level if none explicitly stated
 ifndef OPTIMIZE
-ifndef SYMBOLS
 OPTIMIZE = 3
-else
-OPTIMIZE = 0
-endif
 endif
 
 # set the symbols level
@@ -324,98 +368,254 @@ SYMLEVEL = 2
 endif
 endif
 
+ifdef TOOLS
+PARAMS += --with-tools
+endif
+
+ifdef TESTS
+PARAMS += --with-tests
+endif
+
+ifdef SYMBOLS
+PARAMS += --SYMBOLS='$(SYMBOLS)'
+endif
+
+ifdef SYMLEVEL
+PARAMS += --SYMLEVEL='$(SYMLEVEL)'
+endif
+
+ifdef PROFILER
+PARAMS += --PROFILER='$(PROFILER)'
+endif
+
+ifdef PROFILE
+PARAMS += --PROFILE='$(PROFILE)'
+endif
+
+ifdef OPTIMIZE
+PARAMS += --OPTIMIZE=$(OPTIMIZE)
+endif
+
+ifdef ARCHOPTS
+PARAMS += --ARCHOPTS='$(ARCHOPTS)'
+endif
+
+ifdef MAP
+PARAMS += --MAP='$(MAP)'
+endif
+
+ifdef USE_BGFX
+PARAMS += --USE_BGFX='$(USE_BGFX)'
+endif
+
+ifdef NOASM
+PARAMS += --NOASM='$(NOASM)'
+endif
+
+ifdef BIGENDIAN
+PARAMS += --BIGENDIAN='$(BIGENDIAN)'
+endif
+
+ifdef FORCE_DRC_C_BACKEND
+PARAMS += --FORCE_DRC_C_BACKEND='$(FORCE_DRC_C_BACKEND)'
+endif
+
+ifdef NOWERROR
+PARAMS += --NOWERROR='$(NOWERROR)'
+endif
+
+ifdef TARGET
+PARAMS += --target='$(TARGET)'
+endif
+
+ifdef SUBTARGET
+PARAMS += --subtarget='$(SUBTARGET)'
+endif
+
+ifdef OSD
+PARAMS += --osd='$(OSD)'
+endif
+
+ifdef TARGETOS
+PARAMS += --targetos='$(TARGETOS)'
+endif
+
+ifdef DONT_USE_NETWORK
+PARAMS += --DONT_USE_NETWORK='$(DONT_USE_NETWORK)'
+endif
+
+ifdef NO_OPENGL
+PARAMS += --NO_OPENGL='$(NO_OPENGL)'
+endif
+
+ifdef USE_DISPATCH_GL
+PARAMS += --USE_DISPATCH_GL='$(USE_DISPATCH_GL)'
+endif
+
+ifdef NO_USE_MIDI
+PARAMS += --NO_USE_MIDI='$(NO_USE_MIDI)'
+endif
+
+ifdef USE_QTDEBUG
+PARAMS += --USE_QTDEBUG='$(USE_QTDEBUG)'
+endif
+
+ifdef DIRECTINPUT
+PARAMS += --DIRECTINPUT='$(DIRECTINPUT)'
+endif
+
+ifdef USE_SDL
+PARAMS += --USE_SDL='$(USE_SDL)'
+endif
+
+ifdef CYGWIN_BUILD
+PARAMS += --CYGWIN_BUILD='$(CYGWIN_BUILD)'
+endif
+
+ifdef MESA_INSTALL_ROOT
+PARAMS += --MESA_INSTALL_ROOT='$(MESA_INSTALL_ROOT)'
+endif
+
+ifdef NO_X11
+PARAMS += --NO_X11='$(NO_X11)'
+endif
+
+ifdef NO_USE_XINPUT
+PARAMS += --NO_USE_XINPUT='$(NO_USE_XINPUT)'
+endif
+
+ifdef SDL_LIBVER
+PARAMS += --SDL_LIBVER='$(SDL_LIBVER)'
+endif
+
+ifdef SDL2_MULTIAPI
+PARAMS += --SDL2_MULTIAPI='$(SDL2_MULTIAPI)'
+endif
+
+ifdef SDL_INSTALL_ROOT
+PARAMS += --SDL_INSTALL_ROOT='$(SDL_INSTALL_ROOT)'
+endif
+
+ifdef SDL_FRAMEWORK_PATH
+PARAMS += --SDL_FRAMEWORK_PATH='$(SDL_FRAMEWORK_PATH)'
+endif
+
+ifdef MACOSX_USE_LIBSDL
+PARAMS += --MACOSX_USE_LIBSDL='$(MACOSX_USE_LIBSDL)'
+endif
+
+ifdef LDOPTS
+PARAMS += --LDOPTS='$(LDOPTS)'
+endif
+
+ifdef LTO
+PARAMS += --LTO='$(LTO)'
+endif
+
+ifdef DEPRECATED
+PARAMS += --DEPRECATED='$(DEPRECATED)'
+endif
+
+ifdef SSE2
+PARAMS += --SSE2='$(SSE2)'
+endif
+
+ifdef OPENMP
+PARAMS += --OPENMP='$(OPENMP)'
+endif
+
+ifdef CPP11
+PARAMS += --CPP11='$(CPP11)'
+endif
+
+ifdef FASTDEBUG
+PARAMS += --FASTDEBUG='$(FASTDEBUG)'
+endif
+
+ifdef FILTER_DEPS
+PARAMS += --FILTER_DEPS='$(FILTER_DEPS)'
+endif
+
+ifdef SEPARATE_BIN
+PARAMS += --SEPARATE_BIN='$(SEPARATE_BIN)'
+endif
+
+ifdef PYTHON_EXECUTABLE
+PARAMS += --PYTHON_EXECUTABLE='$(PYTHON_EXECUTABLE)'
+endif
+
+ifdef SHADOW_CHECK
+PARAMS += --SHADOW_CHECK='$(SHADOW_CHECK)'
+endif
+
+ifdef STRIP_SYMBOLS
+PARAMS += --STRIP_SYMBOLS='$(STRIP_SYMBOLS)'
+endif
+
+ifdef QT_HOME
+PARAMS += --QT_HOME='$(QT_HOME)'
+endif
 
 #-------------------------------------------------
-# platform-specific definitions
+# All scripts
+#-------------------------------------------------
+
+
+SCRIPTS = scripts/genie.lua \
+	scripts/src/lib.lua \
+	scripts/src/emu.lua \
+	scripts/src/machine.lua \
+	scripts/src/main.lua \
+	scripts/src/3rdparty.lua \
+	scripts/src/cpu.lua \
+	scripts/src/osd/modules.lua \
+	$(wildcard scripts/src/osd/$(OSD)*.lua) \
+	scripts/src/sound.lua \
+	scripts/src/tools.lua \
+	scripts/src/tests.lua \
+	scripts/src/video.lua \
+	scripts/src/bus.lua \
+	scripts/src/netlist.lua \
+	scripts/toolchain.lua \
+	scripts/src/osd/modules.lua \
+	scripts/target/$(TARGET)/$(SUBTARGET).lua \
+	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
+	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
+ifdef REGENIE
+SCRIPTS+= regenie
+endif
+
+#-------------------------------------------------
+# Dependent stuff
 #-------------------------------------------------
 
 # extension for executables
-EXE = 
+EXE :=
 
-ifeq ($(TARGETOS),win32)
-EXE = .exe
+ifeq ($(OS),windows)
+EXE := .exe
 endif
-ifeq ($(TARGETOS),os2)
-EXE = .exe
-endif
-
-# extension for build tools
-BUILD_EXE = 
-
-ifeq ($(OS),Windows_NT)
-BUILD_EXE = .exe
-endif
-ifneq ($(OS2_SHELL),)
-BUILD_EXE = .exe
+ifeq ($(OS),os2)
+EXE := .exe
 endif
 
-# compiler, linker and utilities
-ifneq ($(TARGETOS),emscripten)
-AR = @ar
-CC = @gcc
-LD = @g++
+SHELLTYPE := msdos
+ifeq (,$(ComSpec)$(COMSPEC))
+  SHELLTYPE := posix
 endif
-MD = -mkdir$(BUILD_EXE)
-RM = @rm -f
-OBJDUMP = @objdump
-PYTHON = @python
-
-
-#-------------------------------------------------
-# form the name of the executable
-#-------------------------------------------------
-
-# reset all internal prefixes/suffixes
-PREFIXSDL =
-SUFFIX64 =
-SUFFIXDEBUG =
-SUFFIXPROFILE =
-
-# Windows SDL builds get an SDL prefix
-ifeq ($(OSD),sdl)
-ifeq ($(TARGETOS),win32)
-PREFIXSDL = sdl
-endif
+ifeq (/bin,$(findstring /bin,$(SHELL)))
+  SHELLTYPE := posix
 endif
 
-ifeq ($(OSD),osdmini)
-PREFIXSDL = mini
-endif
-
-# 64-bit builds get a '64' suffix
-ifeq ($(PTR64),1)
-SUFFIX64 = 64
-endif
-
-# debug builds just get the 'd' suffix and nothing more
-ifdef DEBUG
-SUFFIXDEBUG = d
-endif
-
-# gprof builds get an addition 'p' suffix
-ifdef PROFILE
-SUFFIXPROFILE = p
-endif
-
-# the name is just 'target' if no subtarget; otherwise it is
-# the concatenation of the two (e.g., mametiny)
-ifeq ($(TARGET),$(SUBTARGET))
-NAME = $(TARGET)
+ifeq (posix,$(SHELLTYPE))
+  MKDIR = $(SILENT) mkdir -p "$(1)"
+  COPY  = $(SILENT) cp -fR "$(1)" "$(2)"
 else
-NAME = $(TARGET)$(SUBTARGET)
+  MKDIR = $(SILENT) mkdir "$(subst /,\\,$(1))" 2> nul || exit 0
+  COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))"
 endif
 
-# fullname is prefix+name+suffix+suffix64+suffixdebug
-FULLNAME ?= $(PREFIX)$(PREFIXSDL)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
-
-# add an EXE suffix to get the final emulator name
-EMULATOR = $(FULLNAME)$(EXE)
-
-
-
-#-------------------------------------------------
-# source and object locations
-#-------------------------------------------------
+GENDIR = build/generated
 
 # all sources are under the src/ directory
 SRC = src
@@ -423,613 +623,450 @@ SRC = src
 # all 3rd party sources are under the 3rdparty/ directory
 3RDPARTY = 3rdparty
 
-# build the targets in different object dirs, so they can co-exist
-OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
-
-ifeq ($(CROSS_BUILD),1)
-ifndef NATIVE_OBJ
-NATIVE_OBJ = OBJ
-endif # NATIVE_OBJ
-endif # CROSS_BUILD
-
-
-#-------------------------------------------------
-# compile-time definitions
-#-------------------------------------------------
-
-# CR/LF setup: use both on win32/os2, CR only on everything else
-DEFS = -DCRLF=2
-
-ifeq ($(TARGETOS),win32)
-DEFS = -DCRLF=3
-endif
-ifeq ($(TARGETOS),os2)
-DEFS = -DCRLF=3
-endif
-
-# map the INLINE to something digestible by GCC
-DEFS += -DINLINE="static inline"
-
-# define LSB_FIRST if we are a little-endian target
-ifndef BIGENDIAN
-DEFS += -DLSB_FIRST
-endif
-
-# define PTR64 if we are a 64-bit target
-ifeq ($(PTR64),1)
-DEFS += -DPTR64
-endif
-
-# define MAME_DEBUG if we are a debugging build
-ifdef DEBUG
-DEFS += -DMAME_DEBUG
+ifeq ($(OS),windows)
+GCC_VERSION      := $(shell gcc -dumpversion 2> NUL)
+CLANG_VERSION    := $(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed "s/[^0-9,.]//g")
+PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
+CHECK_CLANG      :=
 else
-DEFS += -DNDEBUG 
+GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
+ifneq ($(OS),solaris)
+CLANG_VERSION    := $(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
+endif
+PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
+CHECK_CLANG      := $(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
 endif
 
-# define MAME_PROFILER if we are a profiling build
-ifdef PROFILER
-DEFS += -DMAME_PROFILER
-endif
-
-# dine USE_NETWORK if networking is enabled (not OS/2 and hasn't been disabled)
-ifneq ($(TARGETOS),os2)
-ifndef DONT_USE_NETWORK
-DEFS += -DUSE_NETWORK
-endif
-endif
-
-# need to ensure FLAC functions are statically linked
-ifeq ($(BUILD_FLAC),1)
-DEFS += -DFLAC__NO_DLL
-endif
-
-# define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
-ifneq ($(BUILD_JPEGLIB),1)
-DEFS += -DUSE_SYSTEM_JPEGLIB
-endif
-
-ifdef FASTDEBUG
-DEFS += -DMAME_DEBUG_FAST
-endif
-
-# To support casting in Lua 5.3
-DEFS += -DLUA_COMPAT_APIINTCASTS
-
-#-------------------------------------------------
-# compile flags
-# CCOMFLAGS are common flags
-# CONLYFLAGS are flags only used when compiling for C
-# CPPONLYFLAGS are flags only used when compiling for C++
-# COBJFLAGS are flags only used when compiling for Objective-C(++)
-#-------------------------------------------------
-
-# start with empties for everything
-CCOMFLAGS =
-CONLYFLAGS =
-COBJFLAGS =
-CPPONLYFLAGS =
-
-# CFLAGS is defined based on C or C++ targets
-# (remember, expansion only happens when used, so doing it here is ok)
-CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS) $(INCPATH)
-
-# we compile C-only to C89 standard with GNU extensions
-# we compile C++ code to C++98 standard with GNU extensions
-CONLYFLAGS += -std=gnu89
-CPPONLYFLAGS += -x c++ -std=gnu++98
-COBJFLAGS += -x objective-c++
-
-# this speeds it up a bit by piping between the preprocessor/compiler/assembler
-CCOMFLAGS += -pipe
-
-# add -g if we need symbols, and ensure we have frame pointers
-ifdef SYMBOLS
-CCOMFLAGS += -g$(SYMLEVEL) -fno-omit-frame-pointer -fno-optimize-sibling-calls
-endif
-
-# we need to disable some additional implicit optimizations for profiling
-ifdef PROFILE
-CCOMFLAGS += -mno-omit-leaf-frame-pointer
-endif
-
-# add -v if we need verbose build information
-ifdef VERBOSE
-CCOMFLAGS += -v
-endif
-
-# only show deprecation warnings when enabled
-ifndef DEPRECATED
-CCOMFLAGS += \
-	-Wno-deprecated-declarations
-endif
-
-# add profiling information for the compiler
-ifdef PROFILE
-CCOMFLAGS += -pg
-endif
-
-# add the optimization flag
-CCOMFLAGS += -O$(OPTIMIZE)
-
-# add the error warning flag
-ifndef NOWERROR
-CCOMFLAGS += -Werror
-endif
-
-# if we are optimizing, include optimization options
-ifneq ($(OPTIMIZE),0)
-CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
-ifdef LTO
-CCOMFLAGS += -flto
-endif
-endif
-
-ifdef SSE2
-CCOMFLAGS += -msse2
-endif
-
-ifdef OPENMP
-CCOMFLAGS += -fopenmp
-else
-CCOMFLAGS += -Wno-unknown-pragmas
-endif
-
-# add a basic set of warnings
-CCOMFLAGS += \
-	-Wall \
-	-Wcast-align \
-	-Wundef \
-	-Wformat-security \
-	-Wwrite-strings \
-	-Wno-sign-compare \
-	-Wno-conversion
-
-# warnings only applicable to C compiles
-CONLYFLAGS += \
-	-Wpointer-arith \
-	-Wbad-function-cast \
-	-Wstrict-prototypes
-
-# warnings only applicable to OBJ-C compiles
-COBJFLAGS += \
-	-Wpointer-arith 
-
-# warnings only applicable to C++ compiles
-CPPONLYFLAGS += \
-	-Woverloaded-virtual
-	
-include $(SRC)/build/cc_detection.mak
-
-ifdef SANITIZE
-CCOMFLAGS += -fsanitize=$(SANITIZE)
-ifneq (,$(findstring thread,$(SANITIZE)))
-CCOMFLAGS += -fPIE
-endif
-ifneq (,$(findstring memory,$(SANITIZE)))
-ifneq (,$(findstring clang,$(CC)))
-CCOMFLAGS += -fsanitize-memory-track-origins -fPIE
-endif
-endif
-ifneq (,$(findstring undefined,$(SANITIZE)))
-ifneq (,$(findstring clang,$(CC)))
-# TODO: check if linker is clang++
-# produces a lot of messages - disable it for now
-CCOMFLAGS += -fno-sanitize=alignment
-# these are false positives because of the way our delegates work
-CCOMFLAGS += -fno-sanitize=function
-# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=shift
-# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c, src/emu/cpu/m6809/hd6309.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=object-size
-# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c, src/emu/cpu/m6809/konami.c, src/emu/cpu/m6809/hd6309.c, src/emu/video/psx.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=vptr
-# clang takes forever to compile src/emu/video/psx.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=null
-# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=signed-integer-overflow
-endif
-endif
-endif
-
-#-------------------------------------------------
-# include paths
-#-------------------------------------------------
-
-# add core include paths
-INCPATH += \
-	-I$(SRC)/$(TARGET) \
-	-I$(OBJ)/$(TARGET)/layout \
-	-I$(SRC)/emu \
-	-I$(OBJ)/emu \
-	-I$(OBJ)/emu/layout \
-	-I$(SRC)/lib/util \
-	-I$(SRC)/lib \
-	-I$(3RDPARTY) \
-	-I$(3RDPARTY)/lua/src \
-	-I$(SRC)/osd \
-	-I$(SRC)/osd/$(OSD) \
-
-
-
-#-------------------------------------------------
-# archiving flags
-#-------------------------------------------------
-# Default to something reasonable for all platforms
-ARFLAGS = -cr
-# Deal with macosx brain damage if COMMAND_MODE is in
-# the luser's environment:
 ifeq ($(TARGETOS),macosx)
-ifeq ($(COMMAND_MODE),"legacy")
-ARFLAGS = -crs
-endif
-endif
-ifeq ($(TARGETOS),emscripten)
-ARFLAGS = cr
-endif
-
-
-#-------------------------------------------------
-# linking flags
-#-------------------------------------------------
-
-# LDFLAGS are used generally; LDFLAGSEMULATOR are additional
-# flags only used when linking the core emulator
-LDFLAGS =
-ifneq ($(TARGETOS),macosx)
-ifneq ($(TARGETOS),os2)
-ifneq ($(TARGETOS),solaris)
-LDFLAGS = -Wl,--warn-common
-endif
-endif
-endif
-LDFLAGSEMULATOR =
-
-# add profiling information for the linker
-ifdef PROFILE
-LDFLAGS += -pg
-endif
-
-# strip symbols and other metadata in non-symbols and non profiling builds
-ifndef SYMBOLS
-ifneq ($(TARGETOS),macosx)
-LDFLAGS += -s
-endif
-endif
-
-ifneq ($(OPTIMIZE),0)
-ifdef LTO
-LDFLAGS += -flto
-endif
-endif
-
-# output a map file (emulator only)
-ifdef MAP
-LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
-endif
-
-ifdef SANITIZE
-LDFLAGS += -fsanitize=$(SANITIZE)
-ifneq (,$(findstring thread,$(SANITIZE)))
-LDFLAGS += -pie
-endif
-ifneq (,$(findstring memory,$(SANITIZE)))
-LDFLAGS += -pie
-endif
-endif
-
-
-#-------------------------------------------------
-# define the standard object directory; other
-# projects can add their object directories to
-# this variable
-#-------------------------------------------------
-
-OBJDIRS = $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
-
-
-#-------------------------------------------------
-# define standard libraries for CPU and sounds
-#-------------------------------------------------
-
-LIBEMU = $(OBJ)/libemu.a
-LIBOPTIONAL = $(OBJ)/$(TARGET)/$(SUBTARGET)/liboptional.a
-LIBBUS = $(OBJ)/$(TARGET)/$(SUBTARGET)/libbus.a
-LIBDASM = $(OBJ)/$(TARGET)/$(SUBTARGET)/libdasm.a
-LIBUTIL = $(OBJ)/libutil.a
-LIBOCORE = $(OBJ)/libocore.a
-LIBOSD = $(OBJ)/libosd.a
-
-VERSIONOBJ = $(OBJ)/version.o
-EMUINFOOBJ = $(OBJ)/$(TARGET)/$(TARGET).o
-DRIVLISTSRC = $(OBJ)/$(TARGET)/$(SUBTARGET)/drivlist.c
-DRIVLISTOBJ = $(OBJ)/$(TARGET)/$(SUBTARGET)/drivlist.o
-
-
-
-#-------------------------------------------------
-# either build or link against the included
-# libraries
-#-------------------------------------------------
-
-# start with an empty set of libs
-LIBS = 
-
-# add expat XML library
-ifeq ($(BUILD_EXPAT),1)
-INCPATH += -I$(3RDPARTY)/expat/lib
-EXPAT = $(OBJ)/libexpat.a
+ifneq (,$(findstring 3.,$(CLANG_VERSION)))
+ifeq ($(ARCHITECTURE),_x64)
+ARCHITECTURE := _x64_clang
 else
-LIBS += -lexpat
-EXPAT =
+ARCHITECTURE := _x86_clang
+endif
+endif
 endif
 
-# add ZLIB compression library
-ifeq ($(BUILD_ZLIB),1)
-INCPATH += -I$(3RDPARTY)/zlib
-ZLIB = $(OBJ)/libz.a
+ifneq ($(PYTHON_AVAILABLE),python)
+$(error Python is not available in path)
+endif
+
+GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
+
+ifeq ($(TARGET),$(SUBTARGET))
+SUBDIR := $(OSD)/$(TARGET)
 else
-LIBS += -lz
-ZLIB =
+SUBDIR := $(OSD)/$(TARGET)$(SUBTARGET)
 endif
+PROJECTDIR := build/projects/$(SUBDIR)
 
-# add flac library
-ifeq ($(BUILD_FLAC),1)
-INCPATH += -I$(SRC)/lib/util
-FLAC_LIB = $(OBJ)/libflac.a
-# $(OBJ)/libflac++.a
-else
-LIBS += -lFLAC
-FLAC_LIB =
-endif
-
-# add jpeglib image library
-ifeq ($(BUILD_JPEGLIB),1)
-INCPATH += -I$(3RDPARTY)/libjpeg
-JPEG_LIB = $(OBJ)/libjpeg.a
-else
-LIBS += -ljpeg
-JPEG_LIB =
-endif
-
-# add SoftFloat floating point emulation library
-SOFTFLOAT = $(OBJ)/libsoftfloat.a
-
-# add formats emulation library
-FORMATS_LIB = $(OBJ)/libformats.a
-
-# add LUA library
-LUA_LIB = $(OBJ)/liblua.a
-
-# add web library
-WEB_LIB = $(OBJ)/libweb.a
-
-# add SQLite3 library
-ifeq ($(BUILD_SQLITE3),1)
-SQLITE3_LIB = $(OBJ)/libsqlite3.a
-else
-LIBS += -lsqlite3
-SQLITE3_LIB =
-endif
-
-# add PortMidi MIDI library
-ifeq ($(BUILD_MIDILIB),1)
-INCPATH += -I$(SRC)/lib/portmidi
-MIDI_LIB = $(OBJ)/libportmidi.a
-else
-LIBS += -lportmidi
-MIDI_LIB =
-endif
-
-ifneq (,$(findstring clang,$(CC)))
-LIBS += -lstdc++ -lpthread
-endif
+.PHONY: all clean regenie generate
+all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
+regenie:
 
 #-------------------------------------------------
-# 'default' target needs to go here, before the
-# include files which define additional targets
+# gmake-mingw64-gcc
 #-------------------------------------------------
 
-default: maketree buildtools emulator
+$(PROJECTDIR)/gmake-mingw64-gcc/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef MINGW64
+	$(error MINGW64 is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake
 
-all: default tools
-
-7Z_LIB = $(OBJ)/lib7z.a
-
-#-------------------------------------------------
-# defines needed by multiple make files
-#-------------------------------------------------
-
-BUILDSRC = $(SRC)/build
-BUILDOBJ = $(OBJ)/build
-BUILDOUT = $(BUILDOBJ)
-
-ifdef NATIVE_OBJ
-BUILDOUT = $(NATIVE_OBJ)/build
-endif # NATIVE_OBJ
-
+.PHONY: windows_x64
+windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
-# include the various .mak files
+# gmake-mingw32-gcc
 #-------------------------------------------------
 
-# include OSD-specific rules first
-include $(SRC)/osd/$(OSD)/$(OSD).mak
+.PHONY: windows
+windows: windows_x86
 
-# then the various core pieces
-include $(SRC)/build/build.mak
-include $(SRC)/$(TARGET)/$(SUBTARGET).mak
--include $(SRC)/$(TARGET)/osd/$(OSD)/$(OSD).mak
-include $(SRC)/emu/emu.mak
-include $(SRC)/lib/lib.mak
--include $(SRC)/osd/$(CROSS_BUILD_OSD)/build.mak
-include $(SRC)/tools/tools.mak
+$(PROJECTDIR)/gmake-mingw32-gcc/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef MINGW32
+	$(error MINGW32 is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw32-gcc --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: windows_x86
+windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
+
+#-------------------------------------------------
+# gmake-mingw-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-mingw-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef CLANG
+	$(error CLANG is not set)
+endif
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
+
+.PHONY: windows_x64_clang
+windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
+
+.PHONY: windows_x86_clang
+windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
+
+vs2010: generate
+	$(SILENT) $(GENIE) $(PARAMS) vs2010
+
+vs2012: generate
+	$(SILENT) $(GENIE) $(PARAMS) vs2012
+
+vs2012_intel: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2012
+
+vs2012_xp: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2012-xp vs2012
+
+vs2013: generate
+	$(SILENT) $(GENIE) $(PARAMS) vs2013
+
+vs2013_intel: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2013
+
+vs2013_xp: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-xp vs2013
+
+vs2013_clang: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-clang vs2013
+
+vs2013_winrt: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=winstore81 vs2013
+
+vs2015: generate
+	$(SILENT) $(GENIE) $(PARAMS) vs2015
+
+android-arm: generate
+ifndef ANDROID_NDK_ARM
+	$(error ANDROID_NDK_ARM is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.8 gmake
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
+
+android-mips: generate
+ifndef ANDROID_NDK_MIPS
+	$(error ANDROID_NDK_MIPS is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.8 gmake
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
+
+android-x86: generate
+ifndef ANDROID_NDK_X86
+	$(error ANDROID_NDK_X86 is not set)
+endif
+ifndef ANDROID_NDK_ROOT
+	$(error ANDROID_NDK_ROOT is not set)
+endif
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.8 gmake
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
+
+asmjs: generate
+ifndef EMSCRIPTEN
+	$(error EMSCRIPTEN is not set)
+endif
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=asmjs --gcc_version=4.8 gmake
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
+
+
+nacl: nacl_x86
+
+nacl_x64: generate
+ifndef NACL_SDK_ROOT
+	$(error NACL_SDK_ROOT is not set)
+endif
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)64
+
+nacl_x86: generate
+ifndef NACL_SDK_ROOT
+	$(error NACL_SDK_ROOT is not set)
+endif
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)32
+
+nacl-arm: generate
+ifndef NACL_SDK_ROOT
+	$(error NACL_SDK_ROOT is not set)
+endif
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl-arm --gcc_version=4.8 gmake
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl-arm config=$(CONFIG)
+
+pnacl: generate
+ifndef NACL_SDK_ROOT
+	$(error NACL_SDK_ROOT is not set)
+endif
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=4.8 gmake
+endif
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
+
+#-------------------------------------------------
+# gmake-linux
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: linux_x64
+linux_x64: generate $(PROJECTDIR)/gmake-linux/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
+
+.PHONY: linux
+linux: linux_x86
+
+.PHONY: linux_x86
+linux_x86: generate $(PROJECTDIR)/gmake-linux/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-linux-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-linux-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
+
+.PHONY: linux_x64_clang
+linux_x64_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)64
+
+.PHONY: linux_x86_clang
+linux_x86_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-osx
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-osx/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: macosx_x64
+macosx_x64: generate $(PROJECTDIR)/gmake-osx/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)64
+
+.PHONY: macosx
+macosx: macosx_x86
+
+.PHONY: macosx_x86
+macosx_x86: generate $(PROJECTDIR)/gmake-osx/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-osx-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) gmake
+
+.PHONY: macosx_x64_clang
+macosx_x64_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)64
+
+.PHONY: macosx_x86_clang
+macosx_x86_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
+
+xcode4: generate
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=osx xcode4
+
+xcode4-ios: generate
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=ios xcode4
+
+#-------------------------------------------------
+# gmake-solaris
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: solaris_x64
+solaris_x64: generate $(PROJECTDIR)/gmake-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-solaris config=$(CONFIG)64
+
+.PHONY: solaris
+solaris: solaris_x86
+
+.PHONY: solaris_x86
+solaris_x86: generate $(PROJECTDIR)/gmake-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-solaris config=$(CONFIG)32
+
+
+#-------------------------------------------------
+# gmake-freebsd
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-freebsd/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=freebsd --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: freebsd_x64
+freebsd_x64: generate $(PROJECTDIR)/gmake-freebsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)64
+
+.PHONY: freebsd
+freebsd: freebsd_x86
+
+.PHONY: freebsd_x86
+freebsd_x86: generate $(PROJECTDIR)/gmake-freebsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)32
+
+
+#-------------------------------------------------
+# Clean/bootstrap
+#-------------------------------------------------
+
+GENIE_SRC=$(wildcard 3rdparty/genie/src/host/*.c)
+
+$(GENIE): $(GENIE_SRC)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
+
+3rdparty/genie/src/hosts/%.c:
+
+clean:
+	@echo Cleaning...
+	-@rm -rf build
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
+
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET)/
+
+LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
+
+ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
+include src/osd/$(OSD)/$(OSD).mak
+endif
+
+ifneq (,$(wildcard src/$(TARGET)/$(TARGET).mak))
+include src/$(TARGET)/$(TARGET).mak
+endif
+
+$(GEN_FOLDERS):
+	-$(call MKDIR,$@)
+
+generate: \
+		$(GENIE) \
+		$(GEN_FOLDERS) \
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
+
+$(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
+	@echo Converting $<...
+	$(SILENT)$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
+
+	
+#-------------------------------------------------
+# Regression tests
+#-------------------------------------------------
+
 include $(SRC)/regtests/regtests.mak
 
-# combine the various definitions to one
-CDEFS = $(DEFS)
-
-# TODO: -x c++ should not be hard-coded
-CPPCHECKFLAGS = $(CDEFS) $(INCPATH) -x c++ --enable=style
-
-#-------------------------------------------------
-# sanity check OSD additions
-#-------------------------------------------------
-
-ifeq (,$(findstring -DOSD_,$(CDEFS)))
-$(error $(OSD).mak should have defined -DOSD_)
-endif
-
-#-------------------------------------------------
-# primary targets
-#-------------------------------------------------
-
-emulator: maketree $(BUILD) $(EMULATOR)
-
-buildtools: maketree $(BUILD)
-
-tools: maketree $(TOOLS)
-
-maketree: $(sort $(OBJDIRS))
-
-clean: $(OSDCLEAN)
-	@echo Deleting object tree $(OBJ)...
-	$(RM) -r $(OBJ)
-	@echo Deleting $(EMULATOR)...
-	$(RM) $(EMULATOR)
-	@echo Deleting $(TOOLS)...
-	$(RM) $(TOOLS)
-	@echo Deleting dependencies...
-	$(RM) depend_emu.mak
-	$(RM) depend_mame.mak
-	$(RM) depend_mess.mak
-	$(RM) depend_ume.mak
-ifdef MAP
-	@echo Deleting $(FULLNAME).map...
-	$(RM) $(FULLNAME).map
-endif
-ifdef SYMBOLS
-	@echo Deleting $(FULLNAME).sym...
-	$(RM) $(FULLNAME).sym
-endif
-
-checkautodetect:
-	@echo TARGETOS=$(TARGETOS)
-	@echo PTR64=$(PTR64)
-	@echo BIGENDIAN=$(BIGENDIAN)
-	@echo UNAME="$(UNAME)"
+.PHONY: tests
 
 tests: $(REGTESTS)
 
-mak: maketree $(MAKEMAK_TARGET)
-	@echo Rebuilding $(SUBTARGET).mak...
-	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst -I. -I$(SRC)/emu -I$(SRC)/mame -I$(SRC)/mame/layout -I$(SRC)/mess -I$(SRC)/mess/layout $(SRC) > $(SUBTARGET).mak
-	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst > $(SUBTARGET).lst
-
 #-------------------------------------------------
-# directory targets
+# Source cleanup
 #-------------------------------------------------
 
-$(sort $(OBJDIRS)):
-	$(MD) -p $@
+.PHONY: cleansrc
 
-
-
-#-------------------------------------------------
-# executable targets and dependencies
-#-------------------------------------------------
-
-ifndef EXECUTABLE_DEFINED
-
-$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
-	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
-	@echo Linking $@...
-ifeq ($(TARGETOS),emscripten)
-	# Emscripten's linker seems to be stricter about the ordering of .a files
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) -Wl,--start-group $^ -Wl,--end-group $(LIBS) -o $@
+cleansrc:
+	@echo Cleaning up tabs/spaces/end of lines....
+ifeq ($(OS),windows)
+	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.inc) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
 else
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $@
+	$(shell find src/ -name *.c -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.h -exec ./srcclean {}  >&2 ;)
+	$(shell find src/ -name *.mak -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.lst -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.lay -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.inc -exec ./srcclean {} >&2 ;)
+	$(shell find hash/ -name *.xml -exec ./srcclean {} >&2 ;)
 endif
-ifeq ($(TARGETOS),win32)
-ifdef SYMBOLS
-ifndef MSVC_BUILD
-	$(OBJDUMP) --section=.text --line-numbers --syms --demangle $@ >$(FULLNAME).sym
-endif
-endif
-endif
-
-endif
-
-
 
 #-------------------------------------------------
-# generic rules
+# Doxygen documentation
 #-------------------------------------------------
 
-$(OBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
-ifdef CPPCHECK
-	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
-endif
+.PHONY: doxygen
 
-$(OBJ)/%.o: $(OBJ)/%.c | $(OSPREBUILD)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
-ifdef CPPCHECK
-	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
-endif
-
-$(OBJ)/%.pp: $(SRC)/%.c | $(OSPREBUILD)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
-ifdef CPPCHECK
-	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
-endif
-
-$(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
-ifdef CPPCHECK
-	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
-endif
-
-$(OBJ)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
-	@echo Converting $<...
-	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
-
-$(OBJ)/%.fh: $(SRC)/%.png $(SRC)/build/png2bdc.py $(SRC)/build/file2str.py
-	@echo Converting $<...
-	$(PYTHON) $(SRC)/build/png2bdc.py $< $(OBJ)/temp.bdc
-	$(PYTHON) $(SRC)/build/file2str.py $(OBJ)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
-
-$(DRIVLISTOBJ): $(DRIVLISTSRC)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
-ifdef CPPCHECK
-	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
-endif
-
-$(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(MAKELIST_TARGET)
-	@echo Building driver list $<...
-	@$(MAKELIST) $< >$@
-
-$(OBJ)/%.a:
-	@echo Archiving $@...
-	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $^
-
-ifeq ($(TARGETOS),macosx)
-$(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
-	@echo Objective-C compiling $<...
-	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) $(INCPATH) -c $< -o $@
-endif
-
-
+doxygen:
+	@echo Generate Doxygen documentation
+	doxygen mame.doxygen
 
 #-------------------------------------------------
-# optional dependencies file
+# CppCheck analysis
 #-------------------------------------------------
 
--include depend_emu.mak
--include depend_$(TARGET).mak
+.PHONY: cppcheck
+
+CPPCHECK_PARAMS  = -Isrc/osd
+CPPCHECK_PARAMS += -Isrc/emu
+CPPCHECK_PARAMS += -Isrc/lib
+CPPCHECK_PARAMS += -Isrc/lib/util
+CPPCHECK_PARAMS += -Isrc/mame
+CPPCHECK_PARAMS += -Isrc/mess 
+CPPCHECK_PARAMS += -Isrc/osd/modules/render
+CPPCHECK_PARAMS += -Isrc/osd/windows
+CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
+CPPCHECK_PARAMS += -I3rdparty
+CPPCHECK_PARAMS += -I3rdparty/lua/src
+CPPCHECK_PARAMS += -I3rdparty/zlib 
+CPPCHECK_PARAMS += -I3rdparty/bgfx/include
+CPPCHECK_PARAMS += -I3rdparty/bx/include
+CPPCHECK_PARAMS += -Ibuild/generated/emu 
+CPPCHECK_PARAMS += -Ibuild/generated/emu/layout
+CPPCHECK_PARAMS += -Ibuild/generated/mess/layout
+CPPCHECK_PARAMS += -Ibuild/generated/mame/layout 
+CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
+CPPCHECK_PARAMS += -DPTR64=1
+CPPCHECK_PARAMS += -DMAME_DEBUG
+CPPCHECK_PARAMS += -DMAME_PROFILER
+CPPCHECK_PARAMS += -DCRLF=3
+CPPCHECK_PARAMS += -DLSB_FIRST
+CPPCHECK_PARAMS += -DFLAC__NO_DLL
+CPPCHECK_PARAMS += -DNATIVE_DRC=drcbe_x64
+CPPCHECK_PARAMS += -DLUA_COMPAT_APIINTCASTS
+CPPCHECK_PARAMS += -DWIN32
+CPPCHECK_PARAMS += -D__GNUC__
+CPPCHECK_PARAMS += -D__x86_64__
+ifndef VERBOSE
+CPPCHECK_PARAMS += --quiet
+endif
+
+cppcheck:
+	@echo Generate CppCheck analysis report
+	cppcheck --enable=all src/ $(CPPCHECK_PARAMS) -j9
+	

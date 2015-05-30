@@ -1,8 +1,10 @@
+// license:???
+// copyright-holders:Patrick Lawrence, Aaron Giles
 /***************************************************************************
 
     Atari Crystal Castles hardware
 
-    driver by Pat Lawrence
+    driver by Patrick Lawrence
 
     Games supported:
         * Crystal Castles (1983) [8 sets]

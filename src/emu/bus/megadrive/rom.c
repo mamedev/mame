@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
@@ -6,6 +8,9 @@
 
  Here we emulate bankswitch / protection / NVRAM found on generic carts with no additional hardware
 
+
+ Emulation of the pirate carts is heavily indebted to the reverse engineering efforts made
+ by David Haywood (for HazeMD) and by EkeEke (for genplus-gx)
 
  ***********************************************************************************************************/
 

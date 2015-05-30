@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabrice Frances, Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
     Gottlieb hardware

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 #ifndef _sdlinc_h_
 #define _sdlinc_h_
 

@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     E05A03 Gate Array (used in the Epson LX-800)
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
 ***************************************************************************/
 

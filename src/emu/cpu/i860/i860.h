@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jason Eckhardt
 /***************************************************************************
 
     i860.h
@@ -5,11 +7,6 @@
     Interface file for the Intel i860 emulator.
 
     Copyright (C) 1995-present Jason Eckhardt (jle@rice.edu)
-    Released for general non-commercial use under the MAME license
-    with the additional requirement that you are free to use and
-    redistribute this code in modified or unmodified form, provided
-    you list me in the credits.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

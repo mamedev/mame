@@ -1,6 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * Fujitsu FM-7 series cassette handling
  */
+
+#include <assert.h>
 
 #include "fm7_cas.h"
 

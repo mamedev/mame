@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "i286.h"
 #include "debugger.h"
 #include "i86inline.h"
@@ -275,18 +277,18 @@ void i80286_cpu_device::device_start()
 	m_out_shutdown_func.resolve_safe();
 }
 
-void i80286_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void i80286_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			string.printf("%08X", pc() );
+			strprintf(str, "%08X", pc());
 			break;
 
 		case STATE_GENFLAGS:
 			{
 				UINT16 flags = CompressFlags();
-				string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 					flags & 0x8000 ? '0':'.',
 					flags & 0x4000 ? 'N':'.',
 					flags & 0x2000 ? 'I':'.',

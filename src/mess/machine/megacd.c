@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 #include "emu.h"
 #include "machine/megacd.h"
 #include "machine/nvram.h"
@@ -1691,7 +1693,7 @@ void sega_segacd_device::device_start()
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_backupram.resize(0x2000);
-	subdevice<nvram_device>("backupram")->set_base(m_backupram, 0x2000);
+	subdevice<nvram_device>("backupram")->set_base(&m_backupram[0], 0x2000);
 
 	segacd_4meg_prgbank = 0;
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*******************************************************************************************
 
 MicroART ATM (clone of Spectrum)
@@ -141,7 +143,6 @@ MACHINE_RESET_MEMBER(atm_state,atm)
 	if (m_beta->started())
 	{
 		m_beta->enable();
-		m_beta->clear_status();
 	}
 	space.set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), this));
 

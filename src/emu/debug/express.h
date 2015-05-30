@@ -120,7 +120,7 @@ protected:
 public:
 	// getters
 	symbol_entry *next() const { return m_next; }
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 
 	// type checking
 	bool is_function() const { return (m_type == SMT_FUNCTION); }
@@ -135,7 +135,7 @@ protected:
 	symbol_entry *  m_next;                     // link to next entry
 	symbol_table &  m_table;                    // pointer back to the owning table
 	symbol_type     m_type;                     // type of symbol
-	astring         m_name;                     // name of the symbol
+	std::string     m_name;                     // name of the symbol
 	void *          m_ref;                      // internal reference
 };
 
@@ -221,7 +221,7 @@ public:
 
 	// getters
 	bool is_empty() const { return (m_tokenlist.count() == 0); }
-	const char *original_string() const { return m_original_string; }
+	const char *original_string() const { return m_original_string.c_str(); }
 	symbol_table *symbols() const { return m_symtable; }
 
 	// setters
@@ -335,13 +335,13 @@ private:
 				m_string(string, (length == 0) ? strlen(string) : length) { }
 
 		// operators
-		operator const char *() { return m_string; }
-		operator const char *() const { return m_string; }
+		operator const char *() { return m_string.c_str(); }
+		operator const char *() const { return m_string.c_str(); }
 
 	private:
 		// internal state
 		expression_string * m_next;                     // next string in list
-		astring             m_string;                   // copy of the string
+		std::string         m_string;                   // copy of the string
 	};
 
 	// internal helpers
@@ -373,7 +373,7 @@ private:
 
 	// internal state
 	symbol_table *      m_symtable;                     // symbol table
-	astring             m_original_string;              // original string (prior to parsing)
+	std::string         m_original_string;              // original string (prior to parsing)
 	simple_list<parse_token> m_tokenlist;               // token list
 	simple_list<expression_string> m_stringlist;        // string list
 	int                 m_token_stack_ptr;              // stack pointer (used during execution)

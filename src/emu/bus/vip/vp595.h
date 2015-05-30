@@ -4,9 +4,6 @@
 
     RCA VIP Simple Sound Board VP595 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

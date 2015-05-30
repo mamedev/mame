@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Uki
 /******************************************************************************
 
 Strength & Skill (c) 1984 Sun Electronics

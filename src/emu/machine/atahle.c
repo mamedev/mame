@@ -1,4 +1,4 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:smf
 #include "atahle.h"
 
@@ -197,6 +197,10 @@ void ata_hle_device::process_command()
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
 		break;
 
+	case IDE_COMMAND_CACHE_FLUSH:
+		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
+		break;
+
 	default:
 		LOGPRINT(("IDE unknown command (%02X)\n", m_command));
 		m_status |= IDE_STATUS_ERR;
@@ -227,6 +231,10 @@ void ata_hle_device::finished_command()
 			m_error = IDE_ERROR_ABRT;
 		}
 		set_irq(ASSERT_LINE);
+		break;
+
+	case IDE_COMMAND_CACHE_FLUSH:
+		m_status |= IDE_STATUS_DRDY;
 		break;
 
 	default:

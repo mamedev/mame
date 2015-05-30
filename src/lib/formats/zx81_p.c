@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /*****************************************************************************
 
 Taken from nocash ZX81 docs by Martin Korth.
@@ -28,6 +30,8 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 50% of "0" and "1" bits each.
 
 *****************************************************************************/
+
+#include <assert.h>
 
 #include "zx81_p.h"
 

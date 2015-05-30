@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* apparently Deco CPU-6 used by ProGolf
  just seems to be a bitswap on the opcodes like 222, but not the same one
  not a complex scheme like CPU-7?

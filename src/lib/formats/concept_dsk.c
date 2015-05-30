@@ -10,7 +10,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "flopimg.h"
 #include "formats/concept_dsk.h"
 

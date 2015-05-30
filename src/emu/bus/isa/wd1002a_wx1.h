@@ -4,9 +4,6 @@
 
     Western Digital WD1002A-WX1 Winchester Disk Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

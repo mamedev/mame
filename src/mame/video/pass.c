@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* video/pass.c - see drivers/pass.c for more info */
 
 #include "emu.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 /* NeoGeo sprites (and fixed text layer) */
 
 #include "emu.h"
@@ -711,7 +713,7 @@ neosprite_optimized_device::neosprite_optimized_device(const machine_config &mco
 void neosprite_optimized_device::optimize_sprite_data()
 {
 	m_sprite_gfx_address_mask = neogeohelper_optimize_sprite_data(m_sprite_gfx, m_region_sprites, m_region_sprites_size);
-	m_spritegfx8 = m_sprite_gfx;
+	m_spritegfx8 = &m_sprite_gfx[0];
 }
 
 void neosprite_optimized_device::set_optimized_sprite_data(UINT8* sprdata, UINT32 mask)

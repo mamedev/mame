@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/mm_dsk.h"
 
 mm1_format::mm1_format() : upd765_format(formats)

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #ifndef __PC080SN_H__
 #define __PC080SN_H__
 

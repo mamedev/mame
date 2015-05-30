@@ -4,9 +4,6 @@
 
     Shugart SA1403D Winchester Disk Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "sa1403d.h"

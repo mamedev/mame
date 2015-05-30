@@ -1,4 +1,4 @@
-// license:?
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, R. Belmont, Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
 /*******************************************************************************************
 
@@ -8,7 +8,7 @@
     Actually an Acorn Archimedes-based Arcade system
 
     original driver by Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
-    rewrite to use AA functions by R.Belmont & Angelo Salese
+    rewrite to use AA functions by R. Belmont & Angelo Salese
     special thanks to Tom Walker (author of the Acorn Archimedes Arculator emulator)
 
     TODO (specific issues only):

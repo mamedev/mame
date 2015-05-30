@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_white"><rect><color red="1.0" green="1.0" blue="1.0" /></rect></element>
+
+	<element name="mask" defstate="0">
+		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect state="0"><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="card1" defstate="0">
+		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<text state="0" string="CURSED"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="1" string="VICTORY"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="2" string="WIZARD"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="3" string="DRAGON"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="4" string="GOLD KEY"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="5" string="SCOUT"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="6" string="WARRIOR"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="7" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="card2" defstate="0">
+		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<text state="0" string="LOST"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="1" string="WARRIORS"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="2" string="BAZAAR CLOSED"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="3" string="SWORD"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="4" string="SILVER KEY"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="5" string="HEALER"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="6" string="FOOD"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="7" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="card3" defstate="0">
+		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<text state="0" string="PLAGUE"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="1" string="BRIGANDS"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="2" string="KEY MISSING"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="3" string="PEGASUS"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="4" string="BRASS KEY"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="5" string="GOLD"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="6" string="BEAST"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="7" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="text_m1"><text string="(motor pos: 0." align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_m2"><text string=")" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="counter" defstate="0">
+		<simplecounter maxstate="99" digits="2" align="1">
+			<color red="0.95" green="0.95" blue="0.95" />
+		</simplecounter>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.20" blue="0.22" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.2" green="0.04" blue="0.05" /></disk>
+		<disk state="1"><color red="1.0" green="0.20" blue="0.22" /></disk>
+	</element>
+
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="40" top="0" bottom="118" />
+		<bezel element="static_black">
+			<bounds left="0" right="40" top="0" bottom="118" />
+		</bezel>
+
+		<bezel name="digit1" element="digit"><bounds x="10" y="3" width="10" height="15" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="20" y="3" width="10" height="15" /></bezel>
+
+	<!-- card lamps -->
+
+		<bezel element="static_white"><bounds x="1" y="28" width="38" height="25" /></bezel>
+		<bezel name="card_pos" element="card1"><bounds x="1" y="38" width="38" height="5" /></bezel>
+		<bezel name="lamp3" element="mask">
+			<bounds x="1" y="28" width="38" height="25" />
+			<color alpha="0.8" />
+		</bezel>
+
+		<bezel element="static_white"><bounds x="1" y="56" width="38" height="25" /></bezel>
+		<bezel name="card_pos" element="card2"><bounds x="1" y="66" width="38" height="5" /></bezel>
+		<bezel name="lamp2" element="mask">
+			<bounds x="1" y="56" width="38" height="25" />
+			<color alpha="0.8" />
+		</bezel>
+
+		<bezel element="static_white"><bounds x="1" y="84" width="38" height="25" /></bezel>
+		<bezel name="card_pos" element="card3"><bounds x="1" y="94" width="38" height="5" /></bezel>
+		<bezel name="lamp1" element="mask">
+			<bounds x="1" y="84" width="38" height="25" />
+			<color alpha="0.8" />
+		</bezel>
+
+	<!-- motor status info -->
+
+		<bezel element="text_m1"><bounds x="7" y="112" width="22" height="4" /></bezel>
+		<bezel name="motor_pos" element="counter"><bounds x="27.6" y="112" width="10" height="4" /></bezel>
+		<bezel element="text_m2"><bounds x="31.4" y="112" width="5" height="4" /></bezel>
+		<bezel name="motor_on" element="mask">
+			<bounds x="1" y="111" width="38" height="6" />
+			<color alpha="0.75" />
+		</bezel>
+
+
+	</view>
+</mamelayout>

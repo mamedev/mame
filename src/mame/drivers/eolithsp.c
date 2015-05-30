@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Eolith Speedup Handling */
 
 /*
@@ -84,7 +86,7 @@ void eolith_state::init_speedup()
 		}
 		n_game++;
 	}
-	
+
 	save_item(NAME(m_speedup_vblank));
 	save_item(NAME(m_speedup_scanline));
 }

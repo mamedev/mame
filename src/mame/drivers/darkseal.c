@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Dark Seal (Rev 3)    (c) 1990 Data East Corporation (World version)
@@ -23,7 +25,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(darkseal_state::darkseal_control_w)
+WRITE16_MEMBER(darkseal_state::control_w)
 {
 	switch (offset<<1) {
 	case 6: /* DMA flag */
@@ -38,7 +40,7 @@ WRITE16_MEMBER(darkseal_state::darkseal_control_w)
 	}
 }
 
-READ16_MEMBER(darkseal_state::darkseal_control_r)
+READ16_MEMBER(darkseal_state::control_r)
 {
 	switch (offset<<1)
 	{
@@ -61,9 +63,9 @@ static ADDRESS_MAP_START( darkseal_map, AS_PROGRAM, 16, darkseal_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(darkseal_palette_24bit_rg_w) AM_SHARE("paletteram")
-	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(darkseal_palette_24bit_b_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(darkseal_control_r, darkseal_control_w)
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(palette_24bit_rg_w) AM_SHARE("paletteram")
+	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(palette_24bit_b_w) AM_SHARE("paletteram2")
+	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(control_r, control_w)
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
@@ -236,7 +238,7 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darkseal_state, screen_update_darkseal)
+	MCFG_SCREEN_UPDATE_DRIVER(darkseal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkseal)
@@ -467,8 +469,8 @@ DRIVER_INIT_MEMBER(darkseal_state,darkseal)
 
 /******************************************************************************/
 
-GAME( 1990, darkseal,  0,        darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 3)", 0 )
-GAME( 1990, darkseal1, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 1)", 0 )
-GAME( 1990, darksealj, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan revision 4)", 0 )
-GAME( 1990, gatedoom,  darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 4)", 0 )
-GAME( 1990, gatedoom1, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 1)", 0 )
+GAME( 1990, darkseal,  0,        darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, darkseal1, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, darksealj, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan revision 4)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gatedoom,  darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 4)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gatedoom1, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 1)", GAME_SUPPORTS_SAVE )

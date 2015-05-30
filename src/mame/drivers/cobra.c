@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 /*  Konami Cobra System
 
     Driver by Ville Linde
@@ -1678,7 +1680,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		// Register 0x7E380000
 		// M2S FIFO read
 
-		UINT64 value;
+		UINT64 value = 0;
 		m_m2sfifo->pop(&space.device(), &value);
 
 		r |= (value & 0xff) << 24;

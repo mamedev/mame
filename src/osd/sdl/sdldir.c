@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  sdldir.c - SDL core directory access functions
-//
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -152,7 +151,6 @@ osd_directory *osd_opendir(const char *dirname)
 
 	if (tmpstr[0] == '$')
 	{
-		char *envval;
 		envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
@@ -165,7 +163,7 @@ osd_directory *osd_opendir(const char *dirname)
 
 		envstr[i] = '\0';
 
-		envval = osd_getenv(&envstr[1]);
+		const char *envval = osd_getenv(&envstr[1]);
 		if (envval != NULL)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /***************************************************************************
 
     Video emulation for Omori Battle Cross

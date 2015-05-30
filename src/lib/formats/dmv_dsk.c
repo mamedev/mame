@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/dmv_dsk.h"
 
 dmv_format::dmv_format() : upd765_format(formats)

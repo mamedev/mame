@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Pierpaolo Prazzoli, David Haywood, Angelo Salese
 /**************************************************************************************
 
     Counter Steer                   (c) 1985 Data East Corporation

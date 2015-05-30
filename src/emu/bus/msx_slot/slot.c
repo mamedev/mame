@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /***********************************************************************************************************
 
    MSX (logical) internal slot interfacing

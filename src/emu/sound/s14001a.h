@@ -1,12 +1,9 @@
-// license:MAME|LGPL-2.1+
+// license:LGPL-2.1+
 // copyright-holders:Jonathan Gevaryahu,R. Belmont,Zsolt Vasvari
 #pragma once
 /*
     Copyright (C) 2006-2013 Jonathan Gevaryahu AKA Lord Nightmare
 
-    This source file is dual-licensed under the following licenses:
-    1. The MAME license as of September 2013
-    2. The GNU LGPLv2.1
 */
 #ifndef __S14001A_H__
 #define __S14001A_H__
@@ -27,7 +24,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides

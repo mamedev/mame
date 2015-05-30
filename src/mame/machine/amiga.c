@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Aaron Giles, Mariusz Wojcieszek
 /***************************************************************************
 
     Amiga Computer / Arcadia Game System

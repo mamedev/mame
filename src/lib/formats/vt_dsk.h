@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 /*********************************************************************
 
     formats/vt_dsk.h

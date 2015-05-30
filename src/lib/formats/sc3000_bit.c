@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /*********************************************************************
 
     formats/sc3000_bit.c
@@ -5,6 +7,8 @@
     Cassette code for Sega SC-3000 *.bit files
 
 *********************************************************************/
+
+#include <assert.h>
 
 #include "sc3000_bit.h"
 

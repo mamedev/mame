@@ -9,4 +9,13 @@ map_imp
 	map_offset[0] = (A<<8) | ((X & 0xf) << 16);
 	map_offset[1] = (Y<<8) | ((Z & 0xf) << 16);
 	map_enable = ((X & 0xf0) >> 4) | (Z & 0xf0);
+	logerror("MAP execute\n");
+	logerror("0x0000 - 0x1fff = %08x\n",map_enable & 1 ? map_offset[0]+0x0000 : 0x0000);
+	logerror("0x2000 - 0x3fff = %08x\n",map_enable & 2 ? map_offset[0]+0x2000 : 0x2000);
+	logerror("0x4000 - 0x5fff = %08x\n",map_enable & 4 ? map_offset[0]+0x4000 : 0x4000);
+	logerror("0x6000 - 0x7fff = %08x\n",map_enable & 8 ? map_offset[0]+0x6000 : 0x6000);
+	logerror("0x8000 - 0x9fff = %08x\n",map_enable & 16 ? map_offset[1]+0x8000 : 0x8000);
+	logerror("0xa000 - 0xbfff = %08x\n",map_enable & 32 ? map_offset[1]+0xa000 : 0xa000);
+	logerror("0xc000 - 0xdfff = %08x\n",map_enable & 64 ? map_offset[1]+0xc000 : 0xc000);
+	logerror("0xe000 - 0xffff = %08x\n",map_enable & 128 ? map_offset[1]+0xe000 : 0xe000);
 	prefetch();

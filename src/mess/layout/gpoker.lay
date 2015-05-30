@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
+
+	<element name="text_dealer"><text string="DEALER"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_1"><text string="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.2" green="1.0" blue="0.9" /></led7seg>
+	</element>
+	<element name="seg_h" defstate="0">
+		<text state="0" string="\"><color red="0.0235" green="0.1255" blue="0.1098" /></text>
+		<text state="1" string="\"><color red="0.2" green="1.0" blue="0.9" /></text>
+	</element>
+
+	<element name="sym_heart" defstate="0">
+		<text state="0" string="H"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="H"><color red="0.2" green="1.0" blue="0.9" /></text>
+	</element>
+	<element name="sym_diamond" defstate="0">
+		<text state="0" string="D"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="D"><color red="0.2" green="1.0" blue="0.9" /></text>
+	</element>
+	<element name="sym_club" defstate="0">
+		<text state="0" string="C"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="C"><color red="0.2" green="1.0" blue="0.9" /></text>
+	</element>
+	<element name="sym_spade" defstate="0">
+		<text state="0" string="S"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="S"><color red="0.2" green="1.0" blue="0.9" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="114" top="0" bottom="33" />
+		<bezel element="static_black">
+			<bounds left="0" right="114" top="0" bottom="33" />
+		</bezel>
+
+	<!-- VFD digits -->
+
+		<bezel name="digit9" element="digit"><bounds x="2" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="12" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="22" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="32" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="42" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit10" element="digit"><bounds x="52" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="62" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="72" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="82" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="92" y="12" width="10" height="15" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="102" y="12" width="10" height="15" /></bezel>
+
+		<bezel name="9.7" element="seg_h"><bounds x="3" y="20" width="8" height="5" /></bezel>
+		<bezel name="8.7" element="seg_h"><bounds x="13" y="20" width="8" height="5" /></bezel>
+		<bezel name="7.7" element="seg_h"><bounds x="23" y="20" width="8" height="5" /></bezel>
+		<bezel name="6.7" element="seg_h"><bounds x="33" y="20" width="8" height="5" /></bezel>
+		<bezel name="5.7" element="seg_h"><bounds x="43" y="20" width="8" height="5" /></bezel>
+		<bezel name="10.7" element="seg_h"><bounds x="53" y="20" width="8" height="5" /></bezel>
+		<bezel name="4.7" element="seg_h"><bounds x="63" y="20" width="8" height="5" /></bezel>
+		<bezel name="3.7" element="seg_h"><bounds x="73" y="20" width="8" height="5" /></bezel>
+		<bezel name="2.7" element="seg_h"><bounds x="83" y="20" width="8" height="5" /></bezel>
+		<bezel name="1.7" element="seg_h"><bounds x="93" y="20" width="8" height="5" /></bezel>
+		<bezel name="0.7" element="seg_h"><bounds x="103" y="20" width="8" height="5" /></bezel>
+
+	<!-- VFD card symbols -->
+
+		<bezel name="9.10" element="sym_heart"><bounds x="4" y="8" width="3" height="3" /></bezel>
+		<bezel name="9.8" element="sym_club"><bounds x="7.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="9.11" element="sym_spade"><bounds x="3" y="28" width="3" height="3" /></bezel>
+		<bezel name="9.9" element="sym_diamond"><bounds x="6.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="8.10" element="sym_heart"><bounds x="14" y="8" width="3" height="3" /></bezel>
+		<bezel name="8.8" element="sym_club"><bounds x="17.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="8.11" element="sym_spade"><bounds x="13" y="28" width="3" height="3" /></bezel>
+		<bezel name="8.9" element="sym_diamond"><bounds x="16.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="7.10" element="sym_heart"><bounds x="24" y="8" width="3" height="3" /></bezel>
+		<bezel name="7.8" element="sym_club"><bounds x="27.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="7.11" element="sym_spade"><bounds x="23" y="28" width="3" height="3" /></bezel>
+		<bezel name="7.9" element="sym_diamond"><bounds x="26.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="6.10" element="sym_heart"><bounds x="34" y="8" width="3" height="3" /></bezel>
+		<bezel name="6.8" element="sym_club"><bounds x="37.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="6.11" element="sym_spade"><bounds x="33" y="28" width="3" height="3" /></bezel>
+		<bezel name="6.9" element="sym_diamond"><bounds x="36.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="5.10" element="sym_heart"><bounds x="44" y="8" width="3" height="3" /></bezel>
+		<bezel name="5.8" element="sym_club"><bounds x="47.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="5.11" element="sym_spade"><bounds x="43" y="28" width="3" height="3" /></bezel>
+		<bezel name="5.9" element="sym_diamond"><bounds x="46.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="10.10" element="sym_heart"><bounds x="54" y="8" width="3" height="3" /></bezel>
+		<bezel name="10.8" element="sym_club"><bounds x="57.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="10.11" element="sym_spade"><bounds x="53" y="28" width="3" height="3" /></bezel>
+		<bezel name="10.9" element="sym_diamond"><bounds x="56.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="4.10" element="sym_heart"><bounds x="64" y="8" width="3" height="3" /></bezel>
+		<bezel name="4.8" element="sym_club"><bounds x="67.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="4.11" element="sym_spade"><bounds x="63" y="28" width="3" height="3" /></bezel>
+		<bezel name="4.9" element="sym_diamond"><bounds x="66.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="3.10" element="sym_heart"><bounds x="74" y="8" width="3" height="3" /></bezel>
+		<bezel name="3.8" element="sym_club"><bounds x="77.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="3.11" element="sym_spade"><bounds x="73" y="28" width="3" height="3" /></bezel>
+		<bezel name="3.9" element="sym_diamond"><bounds x="76.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="2.10" element="sym_heart"><bounds x="84" y="8" width="3" height="3" /></bezel>
+		<bezel name="2.8" element="sym_club"><bounds x="87.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="2.11" element="sym_spade"><bounds x="83" y="28" width="3" height="3" /></bezel>
+		<bezel name="2.9" element="sym_diamond"><bounds x="86.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="1.10" element="sym_heart"><bounds x="94" y="8" width="3" height="3" /></bezel>
+		<bezel name="1.8" element="sym_club"><bounds x="97.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="1.11" element="sym_spade"><bounds x="93" y="28" width="3" height="3" /></bezel>
+		<bezel name="1.9" element="sym_diamond"><bounds x="96.5" y="28" width="3" height="3" /></bezel>
+
+		<bezel name="0.10" element="sym_heart"><bounds x="104" y="8" width="3" height="3" /></bezel>
+		<bezel name="0.8" element="sym_club"><bounds x="107.5" y="8" width="3" height="3" /></bezel>
+		<bezel name="0.11" element="sym_spade"><bounds x="103" y="28" width="3" height="3" /></bezel>
+		<bezel name="0.9" element="sym_diamond"><bounds x="106.5" y="28" width="3" height="3" /></bezel>
+
+
+	<!-- bezel -->
+
+		<bezel element="static_white"><bounds x="0" y="6" width="54" height="0.5" /></bezel>
+		<bezel element="static_white"><bounds x="0" y="32.5" width="54" height="0.5" /></bezel>
+		<bezel element="static_white"><bounds x="0" y="6.25" width="0.5" height="26.5" /></bezel>
+		<bezel element="static_white"><bounds x="53.5" y="6.25" width="0.5" height="26.5" /></bezel>
+
+		<bezel element="static_white"><bounds x="60" y="6" width="54" height="0.5" /></bezel>
+		<bezel element="static_white"><bounds x="60" y="32.5" width="54" height="0.5" /></bezel>
+		<bezel element="static_white"><bounds x="60" y="6.25" width="0.5" height="26.5" /></bezel>
+		<bezel element="static_white"><bounds x="113.5" y="6.25" width="0.5" height="26.5" /></bezel>
+
+		<bezel element="text_dealer"><bounds x="2" y="1" width="50" height="4" /></bezel>
+
+		<bezel element="text_5"><bounds x="62" y="1" width="10" height="4" /></bezel>
+		<bezel element="text_4"><bounds x="72" y="1" width="10" height="4" /></bezel>
+		<bezel element="text_3"><bounds x="82" y="1" width="10" height="4" /></bezel>
+		<bezel element="text_2"><bounds x="92" y="1" width="10" height="4" /></bezel>
+		<bezel element="text_1"><bounds x="102" y="1" width="10" height="4" /></bezel>
+
+
+	</view>
+</mamelayout>

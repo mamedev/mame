@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker
 /***************************************************************************
 
   timex.c
@@ -27,6 +29,23 @@ VIDEO_START_MEMBER(spectrum_state,ts2068)
 {
 	VIDEO_START_CALL_MEMBER( spectrum );
 	m_frame_invert_count = 30;
+}
+
+void spectrum_state::screen_eof_timex(screen_device &screen, bool state)
+{
+	// rising edge
+	if (state)
+	{
+		spectrum_UpdateBorderBitmap();
+
+		m_frame_number++;
+
+		if (m_frame_number >= m_frame_invert_count)
+		{
+			m_frame_number = 0;
+			m_flash_invert = !m_flash_invert;
+		}
+	}
 }
 
 

@@ -1,8 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef _NAOMIBD_H_
 #define _NAOMIBD_H_
 
 #include "machine/naomig1.h"
-#include "machine/naomicrypt.h"
 
 #define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _actel_tag, _irq_cb)    \
 	MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                        \

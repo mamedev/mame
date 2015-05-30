@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Paul Priest
 /* One Shot One Kill & Maddonna
    Driver by David Haywood and Paul Priest
    Dip Switches and Inputs by stephh
@@ -327,11 +329,6 @@ static GFXDECODE_START( oneshot )
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(oneshot_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void oneshot_state::machine_start()
 {
 	save_item(NAME(m_gun_x_p1));
@@ -381,7 +378,7 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3500000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(oneshot_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -448,6 +445,15 @@ ROM_START( maddonna )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
 ROM_END
+
+// The tiles containing the copyright string (tiles 0x3979 onwards) differ in this set.
+// Both versions have tiles containing the 'Tuning - Germany' copyright messages, but
+// the parent set has additional tiles containing the '(c)Copyright 1995' which is shown
+// on the title screen.
+//
+// The lack of these tiles in this set causes all subsequent tiles to be shifted.  It is
+// likely that the correct program roms for this set either don't show '(c)Copyright 1995'
+// or display it using the regular font instead.
 
 ROM_START( maddonnb )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */

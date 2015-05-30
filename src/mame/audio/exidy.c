@@ -947,6 +947,8 @@ void victory_sound_device::device_config_complete()
 void victory_sound_device::device_start()
 {
 	save_item(NAME(m_victory_sound_response_ack_clk));
+	save_item(NAME(m_pia1_ca1));
+	save_item(NAME(m_pia1_cb1));
 
 	common_sh_start();
 

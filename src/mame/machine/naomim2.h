@@ -1,12 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef _NAOMIM2_H_
 #define _NAOMIM2_H_
 
 #include "naomibd.h"
 #include "315-5881_crypt.h"
 
-#define MCFG_NAOMI_M2_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _actel_tag, _irq_cb) \
-	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M2_BOARD, _eeprom_tag, _actel_tag, _irq_cb) \
-	naomi_m2_board::static_set_tags(*device, _key_tag);
+
+#define MCFG_NAOMI_M2_BOARD_ADD(_tag, _eeprom_tag, _actel_tag, _irq_cb) \
+	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M2_BOARD, _eeprom_tag, _actel_tag, _irq_cb)
 
 class naomi_m2_board : public naomi_board
 {
@@ -16,7 +18,6 @@ public:
 	static const int RAM_SIZE = 65536;
 	UINT8* ram;
 
-	static void static_set_tags(device_t &device, const char *_key_tag);
 	UINT16 read_callback(UINT32 addr);
 
 protected:
@@ -30,11 +31,6 @@ protected:
 	virtual void board_write(offs_t offset, UINT16 data);
 
 private:
-
-
-	const char *key_tag;
-
-
 	required_device<sega_315_5881_crypt_device> m_cryptdevice;
 };
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia,David Haywood
 /* ST0020 - Seta Zooming Sprites + Blitter
 
   (gdfs also has a tilemap, I don't know if this chip supplies that)
@@ -85,6 +87,7 @@ void st0020_device::device_start()
 	save_pointer(NAME(m_st0020_gfxram), 4 * 0x100000/2);
 	save_pointer(NAME(m_st0020_spriteram), 0x80000/2);
 	save_pointer(NAME(m_st0020_blitram), 0x100/2);
+	save_item(NAME(m_st0020_gfxram_bank));
 }
 
 void st0020_device::device_reset()

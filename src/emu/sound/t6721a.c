@@ -4,9 +4,6 @@
 
     Toshiba T6721A C2MOS Voice Synthesizing LSI emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "t6721a.h"

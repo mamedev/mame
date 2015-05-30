@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Ron Fries,Dan Boris
 #pragma once
 
 #ifndef __TIAINTF_H__

@@ -54,7 +54,7 @@ public:
 	// getters
 	const char *expression() { return m_expression.string(); }
 	UINT8 bytes_per_chunk() { flush_updates(); return m_bytes_per_chunk; }
-	UINT8 chunks_per_row() { flush_updates(); return m_chunks_per_row; }
+	UINT32 chunks_per_row() { flush_updates(); return m_chunks_per_row; }
 	bool reverse() const { return m_reverse_view; }
 	bool ascii() const { return m_ascii_view; }
 	bool physical() const { return m_no_translation; }
@@ -108,7 +108,7 @@ private:
 	offs_t              m_maxaddr;              // (derived) maximum address to display
 	UINT32              m_bytes_per_row;        // (derived) number of bytes displayed per line
 	UINT32              m_byte_offset;          // (derived) offset of starting visible byte
-	astring             m_addrformat;           // (derived) format string to use to print addresses
+	std::string         m_addrformat;           // (derived) format string to use to print addresses
 
 	struct section
 	{

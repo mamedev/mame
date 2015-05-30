@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /*
 
     Tape support for C16 / C64 / VIC20 TAP format
@@ -91,6 +93,8 @@ only stores informations on half of the wave...
 Unfortunately, I have no such a .tap file to test, so my implementation
 below could be not working.  FP ]
 */
+
+#include <assert.h>
 
 #include "cbm_tap.h"
 

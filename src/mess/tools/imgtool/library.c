@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /****************************************************************************
 
     library.c
@@ -9,6 +11,7 @@
 
 #include <string.h>
 
+#include "imgtool.h"
 #include "library.h"
 #include "pool.h"
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
     Bondwell 12/14
@@ -484,6 +486,10 @@ void bw12_state::machine_start()
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_motor0));
 	save_item(NAME(m_motor1));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_fault));
+	save_item(NAME(m_centronics_perror));
+	machine().save().register_postload(save_prepost_delegate(FUNC(bw12_state::bankswitch), this));
 }
 
 void bw12_state::machine_reset()

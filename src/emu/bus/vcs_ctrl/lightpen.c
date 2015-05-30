@@ -4,9 +4,6 @@
 
     Atari Video Computer System lightpen emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "lightpen.h"
@@ -60,7 +57,7 @@ ioport_constructor vcs_lightpen_device::device_input_ports() const
 //-------------------------------------------------
 
 vcs_lightpen_device::vcs_lightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VCS_LIGHTPEN, "Light Pen", tag, owner, clock, "vcs_lightpen", __FILE__),
+	device_t(mconfig, VCS_LIGHTPEN, "Atari / CBM Light Pen", tag, owner, clock, "vcs_lightpen", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
 	m_lightx(*this, "LIGHTX"),

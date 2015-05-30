@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker, Robbbert
 /******************************************************************************
 
   Exidy Sorcerer machine functions
@@ -402,6 +404,9 @@ MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 		space.unmap_readwrite(0x8000, endmem);
 		break;
 	}
+
+	if (m_cart->exists())
+		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void sorcerer_state::machine_reset()

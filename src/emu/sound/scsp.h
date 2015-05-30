@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:ElSemi, R. Belmont
 /*
     SCSP (YMF292-F) header
 */

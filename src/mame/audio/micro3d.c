@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Philip Bennett
 /***************************************************************************
 
     Microprose sound hardware
@@ -145,7 +147,7 @@ void micro3d_sound_device::noise_sh_w(UINT8 data)
 			if (m_vca == 255)
 				m_gain = 0;
 			else
-				m_gain = exp(-(float)(m_vca) / 25.0) * 10.0;
+				m_gain = expf(-(float)(m_vca) / 25.0f) * 10.0f;
 
 			q = 0.75/255 * (255 - m_vcq) + 0.1;
 			fc = 4500.0/255 * (255 - m_vcf) + 100;
@@ -239,8 +241,8 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	if (m_gain == 0)
 		return;
 
-	pan_l = (float)(255 - m_pan) / 255.0;
-	pan_r = (float)(m_pan) / 255.0;
+	pan_l = (float)(255 - m_pan) / 255.0f;
+	pan_r = (float)(m_pan) / 255.0f;
 
 	while (samples--)
 	{
@@ -258,7 +260,7 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			m_noise_subcount = 2000000 / MM5837_CLOCK;
 		}
 		m_noise_subcount -= step;
-		input = (float)m_noise_value - 0.5;
+		input = (float)m_noise_value - 0.5f;
 		white = input;
 
 		/* Pink noise filtering */
@@ -294,7 +296,7 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			hist1_ptr++;
 			hist2_ptr++;
 		}
-		output *= 3.5;
+		output *= 3.5f;
 
 		/* Clip */
 		if (output > 32767)

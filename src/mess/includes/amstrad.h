@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker, Barry Rodewald
 /*****************************************************************************
  *
  * includes/amstrad.h
@@ -23,6 +25,8 @@
 #include "bus/cpc/symbfac2.h"
 #include "bus/cpc/amdrum.h"
 #include "bus/cpc/playcity.h"
+#include "bus/cpc/smartwatch.h"
+#include "bus/cpc/brunword4.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
@@ -235,6 +239,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
 	DECLARE_WRITE_LINE_MEMBER( cpc_romen );
+	DECLARE_WRITE8_MEMBER(rom_select);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

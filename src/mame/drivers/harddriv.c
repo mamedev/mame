@@ -347,14 +347,13 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_gsp(*this, "gsp"),
 			m_msp(*this, "msp"),
 			m_adsp(*this, "adsp"),
-			m_soundcpu(*this, "soundcpu"),
-			m_sounddsp(*this, "sounddsp"),
 			m_jsacpu(*this, "jsacpu"),
 			m_dsp32(*this, "dsp32"),
 			m_ds3sdsp(*this, "ds3sdsp"),
 			m_ds3xdsp(*this, "ds3xdsp"),
 			m_ds3dac1(*this, "ds3dac1"),
 			m_ds3dac2(*this, "ds3dac2"),
+			m_harddriv_sound(*this, "harddriv_sound"),
 			m_jsa(*this, "jsa"),
 			m_hd34010_host_access(0),
 			m_dsk_pio_access(0),
@@ -379,7 +378,6 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_ds3_speedup_addr(0),
 			m_ds3_speedup_pc(0),
 			m_ds3_transfer_pc(0),
-			m_sounddsp_ram(*this, "sounddsp_ram"),
 			m_gsp_multisync(0),
 			m_gsp_vram(*this, "gsp_vram", 16),
 			m_gsp_control_lo(*this, "gsp_control_lo"),
@@ -445,23 +443,11 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_st68k_sloop_bank(0),
 			m_st68k_last_alt_sloop_offset(0),
 			m_next_msp_sync(0),
-			m_soundflag(0),
-			m_mainflag(0),
-			m_sounddata(0),
-			m_maindata(0),
-			m_dacmute(0),
-			m_cramen(0),
-			m_irq68k(0),
-			m_sound_rom_offs(0),
-			m_rombase(0),
-			m_romsize(0),
-			m_last_bio_cycles(0),
 			m_vram_mask(0),
 			m_shiftreg_enable(0),
 			m_gsp_shiftreg_source(0),
 			m_gfx_finescroll(0),
 			m_gfx_palettebank(0),
-			m_dac(*this, "dac"),
 			m_duart(*this, "duartn68681"),
 			m_asic65(*this, "asic65"),
 			m_sound_int_state(0),
@@ -499,11 +485,6 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 	{
 		m_dataptr[i] = 0;
 		m_dataval[i] = 0;
-	}
-
-	for (i = 0; i < 0x400 / 2; i++)
-	{
-		m_comram[i] = 0;
 	}
 
 	for (i = 0; i < 65536 * 4; i++)
@@ -743,50 +724,6 @@ static ADDRESS_MAP_START( dsk2_dsp32_map, AS_PROGRAM, 32, harddriv_state )
 	AM_RANGE(0x400000, 0x5fffff) AM_ROM AM_REGION("user4", 0)
 	AM_RANGE(0xfff800, 0xffffff) AM_RAM
 ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Driver sound board memory maps
- *
- *************************************/
-
-static ADDRESS_MAP_START( driversnd_68k_map, AS_PROGRAM, 16, harddriv_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE(hdsnd68k_data_r, hdsnd68k_data_w)
-	AM_RANGE(0xff1000, 0xff1fff) AM_READWRITE(hdsnd68k_switches_r, hdsnd68k_latches_w)
-	AM_RANGE(0xff2000, 0xff2fff) AM_READWRITE(hdsnd68k_320port_r, hdsnd68k_speech_w)
-	AM_RANGE(0xff3000, 0xff3fff) AM_READWRITE(hdsnd68k_status_r, hdsnd68k_irqclr_w)
-	AM_RANGE(0xff4000, 0xff5fff) AM_READWRITE(hdsnd68k_320ram_r, hdsnd68k_320ram_w)
-	AM_RANGE(0xff6000, 0xff7fff) AM_READWRITE(hdsnd68k_320ports_r, hdsnd68k_320ports_w)
-	AM_RANGE(0xff8000, 0xffbfff) AM_READWRITE(hdsnd68k_320com_r, hdsnd68k_320com_w)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( driversnd_dsp_program_map, AS_PROGRAM, 16, harddriv_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0xfff) AM_RAM AM_SHARE("sounddsp_ram")
-ADDRESS_MAP_END
-
-
-/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
-
-static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_state )
-	AM_RANGE(0, 0) AM_READWRITE(hdsnddsp_rom_r, hdsnddsp_dac_w)
-	AM_RANGE(1, 1) AM_READ(hdsnddsp_comram_r)
-	AM_RANGE(2, 2) AM_READ(hdsnddsp_compare_r)
-	AM_RANGE(1, 2) AM_WRITENOP
-	AM_RANGE(3, 3) AM_WRITE(hdsnddsp_comport_w)
-	AM_RANGE(4, 4) AM_WRITE(hdsnddsp_mute_w)
-	AM_RANGE(5, 5) AM_WRITE(hdsnddsp_gen68kirq_w)
-	AM_RANGE(6, 7) AM_WRITE(hdsnddsp_soundaddr_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(hdsnddsp_get_bio)
-ADDRESS_MAP_END
-
-
 
 
 /*************************************
@@ -1665,32 +1602,6 @@ MACHINE_CONFIG_END
 
 /*************************************
  *
- *  Sound board pieces
- *
- *************************************/
-
-static MACHINE_CONFIG_FRAGMENT( driversnd )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)
-	MCFG_CPU_PROGRAM_MAP(driversnd_68k_map)
-
-	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL_20MHz)
-	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
-	/* Data Map is internal to the CPU */
-	MCFG_CPU_IO_MAP(driversnd_dsp_io_map)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
  *  Machine drivers
  *
  *************************************/
@@ -1699,7 +1610,7 @@ static MACHINE_CONFIG_FRAGMENT( harddriv )
 	MCFG_FRAGMENT_ADD( driver_msp )
 	/* basic machine hardware */        /* original driver board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_FRAGMENT_ADD( driversnd )      /* driver sound board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( harddrivc )
@@ -1707,7 +1618,7 @@ static MACHINE_CONFIG_FRAGMENT( harddrivc )
 
 	/* basic machine hardware */        /* multisync board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_FRAGMENT_ADD( driversnd )      /* driver sound board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( racedriv )
@@ -1716,7 +1627,7 @@ static MACHINE_CONFIG_FRAGMENT( racedriv )
 	/* basic machine hardware */        /* original driver board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-	MCFG_FRAGMENT_ADD( driversnd )      /* driver sound board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( racedrivc )
@@ -1726,7 +1637,7 @@ static MACHINE_CONFIG_FRAGMENT( racedrivc )
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-	MCFG_FRAGMENT_ADD( driversnd )      /* driver sound board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 
@@ -1737,7 +1648,7 @@ static MACHINE_CONFIG_FRAGMENT( racedrivc_panorama_side )
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 //  MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-//  MCFG_FRAGMENT_ADD( driversnd )      /* driver sound board */
+//  MCFG_DEVICE_ADD("sound_board", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
@@ -2134,7 +2045,7 @@ ROM_START( harddriv )
 	ROM_LOAD16_BYTE( "136052-1111.200x", 0x0c0000, 0x010000, CRC(e1f455a3) SHA1(68462a33bbfcc526d8f27ec082e55937a26ead8b) )
 	ROM_LOAD16_BYTE( "136052-1119.210x", 0x0c0001, 0x010000, CRC(a7fc3aaa) SHA1(ce8d4a8f83e25008cafa2a2242ed26b90b8517da) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2144,7 +2055,7 @@ ROM_START( harddriv )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2170,7 +2081,7 @@ ROM_START( harddrivg )
 	ROM_LOAD16_BYTE( "136052-4211.200x", 0x0c0000, 0x010000, CRC(20d1b3d5) SHA1(b7c4a2cf6ba729530c24980704989b3a3efb343b) )
 	ROM_LOAD16_BYTE( "136052-4219.210x", 0x0c0001, 0x010000, CRC(105e7052) SHA1(a8d13c35418e58410cfd74c243b74963f1553068) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2180,7 +2091,7 @@ ROM_START( harddrivg )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2207,7 +2118,7 @@ ROM_START( harddrivj )
 	ROM_LOAD16_BYTE( "136052-6811.200x", 0x0c0000, 0x010000, CRC(7bc5c8da) SHA1(ac228d6391bc9ac4238f953f9ad6eb93b3ff9958) )
 	ROM_LOAD16_BYTE( "136052-6819.210x", 0x0c0001, 0x010000, CRC(368b7e17) SHA1(e8742edec6961173df4450073a427cf3b9f3ff57) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2217,7 +2128,7 @@ ROM_START( harddrivj )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2242,7 +2153,7 @@ ROM_START( harddrivb )
 	ROM_LOAD16_BYTE( "136052-5911.200x", 0x0c0000, 0x010000, CRC(564ac427) SHA1(f71d5a8d06681fc96e753e7cd18e16b32ba6907f) )
 	ROM_LOAD16_BYTE( "136052-5919.210x", 0x0c0001, 0x010000, CRC(752d9a6d) SHA1(28edb54c7217f5ccdcb2b5614d4e8c2290d96b2a) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2252,7 +2163,7 @@ ROM_START( harddrivb )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2277,7 +2188,7 @@ ROM_START( harddrivb6 )
 	ROM_LOAD16_BYTE( "136052-5911.200x", 0x0c0000, 0x010000, CRC(564ac427) SHA1(f71d5a8d06681fc96e753e7cd18e16b32ba6907f) )
 	ROM_LOAD16_BYTE( "136052-5919.210x", 0x0c0001, 0x010000, CRC(752d9a6d) SHA1(28edb54c7217f5ccdcb2b5614d4e8c2290d96b2a) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2287,7 +2198,7 @@ ROM_START( harddrivb6 )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2314,7 +2225,7 @@ ROM_START( harddrivj6 )
 	ROM_LOAD16_BYTE( "136052-6811.200x", 0x0c0000, 0x010000, CRC(7bc5c8da) SHA1(ac228d6391bc9ac4238f953f9ad6eb93b3ff9958) )
 	ROM_LOAD16_BYTE( "136052-6819.210x", 0x0c0001, 0x010000, CRC(368b7e17) SHA1(e8742edec6961173df4450073a427cf3b9f3ff57) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2324,7 +2235,7 @@ ROM_START( harddrivj6 )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2349,7 +2260,7 @@ ROM_START( harddrivb5 )
 	ROM_LOAD16_BYTE( "136052-5911.200x", 0x0c0000, 0x010000, CRC(564ac427) SHA1(f71d5a8d06681fc96e753e7cd18e16b32ba6907f) )
 	ROM_LOAD16_BYTE( "136052-5919.210x", 0x0c0001, 0x010000, CRC(752d9a6d) SHA1(28edb54c7217f5ccdcb2b5614d4e8c2290d96b2a) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2359,7 +2270,7 @@ ROM_START( harddrivb5 )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2384,7 +2295,7 @@ ROM_START( harddrivg4 )
 	ROM_LOAD16_BYTE( "136052-4211.200x", 0x0c0000, 0x010000, CRC(20d1b3d5) SHA1(b7c4a2cf6ba729530c24980704989b3a3efb343b) )
 	ROM_LOAD16_BYTE( "136052-4219.210x", 0x0c0001, 0x010000, CRC(105e7052) SHA1(a8d13c35418e58410cfd74c243b74963f1553068) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2394,7 +2305,7 @@ ROM_START( harddrivg4 )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2419,7 +2330,7 @@ ROM_START( harddriv3 )
 	ROM_LOAD16_BYTE( "136052-1111.200x", 0x0c0000, 0x010000, CRC(e1f455a3) SHA1(68462a33bbfcc526d8f27ec082e55937a26ead8b) )
 	ROM_LOAD16_BYTE( "136052-1119.210x", 0x0c0001, 0x010000, CRC(a7fc3aaa) SHA1(ce8d4a8f83e25008cafa2a2242ed26b90b8517da) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2429,7 +2340,7 @@ ROM_START( harddriv3 )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2454,7 +2365,7 @@ ROM_START( harddriv2 )
 	ROM_LOAD16_BYTE( "136052-1111.200x", 0x0c0000, 0x010000, CRC(e1f455a3) SHA1(68462a33bbfcc526d8f27ec082e55937a26ead8b) )
 	ROM_LOAD16_BYTE( "136052-1119.210x", 0x0c0001, 0x010000, CRC(a7fc3aaa) SHA1(ce8d4a8f83e25008cafa2a2242ed26b90b8517da) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2464,7 +2375,7 @@ ROM_START( harddriv2 )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2489,7 +2400,7 @@ ROM_START( harddriv1 )
 	ROM_LOAD16_BYTE( "136052-1111.200x", 0x0c0000, 0x010000, CRC(e1f455a3) SHA1(68462a33bbfcc526d8f27ec082e55937a26ead8b) )
 	ROM_LOAD16_BYTE( "136052-1119.210x", 0x0c0001, 0x010000, CRC(a7fc3aaa) SHA1(ce8d4a8f83e25008cafa2a2242ed26b90b8517da) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-1121.45n", 0x000001, 0x008000, CRC(04316e6f) SHA1(9836b8d16cebd6013834432c9e5a5aca0050c889) )
 	ROM_LOAD16_BYTE( "136052-1122.70n", 0x000000, 0x008000, CRC(0c446eec) SHA1(53576c2800484d098cf250ab9a865314167c9d96) )
 
@@ -2499,7 +2410,7 @@ ROM_START( harddriv1 )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-1125.45a", 0x020000, 0x010000, CRC(ebf391af) SHA1(3c4097db8d625b994b39d46fe652585a74378ca0) )
@@ -2524,7 +2435,7 @@ ROM_START( harddrivc )
 	ROM_LOAD16_BYTE( "136068-1114.200x", 0x0c0000, 0x010000, CRC(293c153b) SHA1(6300a50766b19ad203b5c7da28d51bf22054b39e) )
 	ROM_LOAD16_BYTE( "136068-1113.210x", 0x0c0001, 0x010000, CRC(5630390d) SHA1(cd1932cee70cddd1fb2110d1aeebb573a13f1339) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-3122.70n", 0x000000, 0x008000, CRC(3f20a396) SHA1(f34819796087c543083f6baac6c778e0cdb7340a) )
 	ROM_LOAD16_BYTE( "136052-3121.45n", 0x000001, 0x008000, CRC(6346bca3) SHA1(707dc86305142722a4757ba431cf6c7e9cf116b3) )
 
@@ -2534,7 +2445,7 @@ ROM_START( harddrivc )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -2559,7 +2470,7 @@ ROM_START( harddrivcg )
 	ROM_LOAD16_BYTE( "136068-1114.200x", 0x0c0000, 0x010000, CRC(293c153b) SHA1(6300a50766b19ad203b5c7da28d51bf22054b39e) )
 	ROM_LOAD16_BYTE( "136068-1113.210x", 0x0c0001, 0x010000, CRC(5630390d) SHA1(cd1932cee70cddd1fb2110d1aeebb573a13f1339) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-3122.70n", 0x000000, 0x008000, CRC(3f20a396) SHA1(f34819796087c543083f6baac6c778e0cdb7340a) )
 	ROM_LOAD16_BYTE( "136052-3121.45n", 0x000001, 0x008000, CRC(6346bca3) SHA1(707dc86305142722a4757ba431cf6c7e9cf116b3) )
 
@@ -2569,7 +2480,7 @@ ROM_START( harddrivcg )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -2594,7 +2505,7 @@ ROM_START( harddrivcb )
 	ROM_LOAD16_BYTE( "136068-2914.200x", 0x0c0000, 0x010000, CRC(dd2998a5) SHA1(36c71549d114309b9072ced83ed149cad1d23646) )
 	ROM_LOAD16_BYTE( "136068-2913.210x", 0x0c0001, 0x010000, CRC(a211754d) SHA1(b93d4867f664caa76f2170ef0934194de29a5516) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-3122.70n", 0x000000, 0x008000, CRC(3f20a396) SHA1(f34819796087c543083f6baac6c778e0cdb7340a) )
 	ROM_LOAD16_BYTE( "136052-3121.45n", 0x000001, 0x008000, CRC(6346bca3) SHA1(707dc86305142722a4757ba431cf6c7e9cf116b3) )
 
@@ -2604,7 +2515,7 @@ ROM_START( harddrivcb )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -2629,7 +2540,7 @@ ROM_START( harddrivc1 )
 	ROM_LOAD16_BYTE( "136068-1114.200x", 0x0c0000, 0x010000, CRC(293c153b) SHA1(6300a50766b19ad203b5c7da28d51bf22054b39e) )
 	ROM_LOAD16_BYTE( "136068-1113.210x", 0x0c0001, 0x010000, CRC(5630390d) SHA1(cd1932cee70cddd1fb2110d1aeebb573a13f1339) )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136052-3122.70n", 0x000000, 0x008000, CRC(3f20a396) SHA1(f34819796087c543083f6baac6c778e0cdb7340a) )
 	ROM_LOAD16_BYTE( "136052-3121.45n", 0x000001, 0x008000, CRC(6346bca3) SHA1(707dc86305142722a4757ba431cf6c7e9cf116b3) )
 
@@ -2639,7 +2550,7 @@ ROM_START( harddrivc1 )
 	ROM_LOAD16_BYTE( "136052-1102.10j", 0x020000, 0x010000, CRC(998d3da2) SHA1(6ed560c2132e33858c91b1f4ab0247399665b5fd) )
 	ROM_LOAD16_BYTE( "136052-1104.10l", 0x020001, 0x010000, CRC(bc59a2b7) SHA1(7dfde5bbaa0cf349b1ef5d6b076baded7330376a) )
 
-	ROM_REGION( 0x40000, "mainpcb:serialroms", 0 )      /* 4*128k for audio serial ROMs */
+	ROM_REGION( 0x40000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 4*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3126,7 +3037,7 @@ ROM_START( racedriv )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3140,7 +3051,7 @@ ROM_START( racedriv )
 	ROM_LOAD16_BYTE( "136077-4030.30e", 0x000000, 0x010000, CRC(4207c784) SHA1(5ec410bd75c281ac57d9856d08ce65431f3af994) )
 	ROM_LOAD16_BYTE( "136077-4031.10e", 0x000001, 0x010000, CRC(796486b3) SHA1(937e27c012c5fb457bee1b43fc8e075b3e9405b4) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3177,7 +3088,7 @@ ROM_START( racedrivb )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3191,7 +3102,7 @@ ROM_START( racedrivb )
 	ROM_LOAD16_BYTE( "136077-4030.30e", 0x000000, 0x010000, CRC(4207c784) SHA1(5ec410bd75c281ac57d9856d08ce65431f3af994) )
 	ROM_LOAD16_BYTE( "136077-4031.10e", 0x000001, 0x010000, CRC(796486b3) SHA1(937e27c012c5fb457bee1b43fc8e075b3e9405b4) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3228,7 +3139,7 @@ ROM_START( racedrivg )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3242,7 +3153,7 @@ ROM_START( racedrivg )
 	ROM_LOAD16_BYTE( "136077-4030.30e", 0x000000, 0x010000, CRC(4207c784) SHA1(5ec410bd75c281ac57d9856d08ce65431f3af994) )
 	ROM_LOAD16_BYTE( "136077-4031.10e", 0x000001, 0x010000, CRC(796486b3) SHA1(937e27c012c5fb457bee1b43fc8e075b3e9405b4) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3279,7 +3190,7 @@ ROM_START( racedriv4 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3293,7 +3204,7 @@ ROM_START( racedriv4 )
 	ROM_LOAD16_BYTE( "136077-4030.30e", 0x000000, 0x010000, CRC(4207c784) SHA1(5ec410bd75c281ac57d9856d08ce65431f3af994) )
 	ROM_LOAD16_BYTE( "136077-4031.10e", 0x000001, 0x010000, CRC(796486b3) SHA1(937e27c012c5fb457bee1b43fc8e075b3e9405b4) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3330,7 +3241,7 @@ ROM_START( racedrivb4 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3344,7 +3255,7 @@ ROM_START( racedrivb4 )
 	ROM_LOAD16_BYTE( "136077-4030.30e", 0x000000, 0x010000, CRC(4207c784) SHA1(5ec410bd75c281ac57d9856d08ce65431f3af994) )
 	ROM_LOAD16_BYTE( "136077-4031.10e", 0x000001, 0x010000, CRC(796486b3) SHA1(937e27c012c5fb457bee1b43fc8e075b3e9405b4) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3381,7 +3292,7 @@ ROM_START( racedrivg4 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3395,7 +3306,7 @@ ROM_START( racedrivg4 )
 	ROM_LOAD16_BYTE( "136077-4030.30e", 0x000000, 0x010000, CRC(4207c784) SHA1(5ec410bd75c281ac57d9856d08ce65431f3af994) )
 	ROM_LOAD16_BYTE( "136077-4031.10e", 0x000001, 0x010000, CRC(796486b3) SHA1(937e27c012c5fb457bee1b43fc8e075b3e9405b4) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3432,7 +3343,7 @@ ROM_START( racedriv3 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3446,7 +3357,7 @@ ROM_START( racedriv3 )
 	ROM_LOAD16_BYTE( "136077-1030.30e", 0x000000, 0x010000, CRC(ff575b3d) SHA1(7f2202db7ec9dac06499c9535b4852defb192eb3) )
 	ROM_LOAD16_BYTE( "136077-1031.10e", 0x000001, 0x010000, CRC(2ae2ac35) SHA1(e2a050a6e24dc6fef86b3556b69b2c3e2993febc) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3483,7 +3394,7 @@ ROM_START( racedriv2 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3497,7 +3408,7 @@ ROM_START( racedriv2 )
 	ROM_LOAD16_BYTE( "136077-1030.30e", 0x000000, 0x010000, CRC(ff575b3d) SHA1(7f2202db7ec9dac06499c9535b4852defb192eb3) )
 	ROM_LOAD16_BYTE( "136077-1031.10e", 0x000001, 0x010000, CRC(2ae2ac35) SHA1(e2a050a6e24dc6fef86b3556b69b2c3e2993febc) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3534,7 +3445,7 @@ ROM_START( racedriv1 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3548,7 +3459,7 @@ ROM_START( racedriv1 )
 	ROM_LOAD16_BYTE( "136077-1030.30e", 0x000000, 0x010000, CRC(ff575b3d) SHA1(7f2202db7ec9dac06499c9535b4852defb192eb3) )
 	ROM_LOAD16_BYTE( "136077-1031.10e", 0x000001, 0x010000, CRC(2ae2ac35) SHA1(e2a050a6e24dc6fef86b3556b69b2c3e2993febc) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3585,7 +3496,7 @@ ROM_START( racedrivg1 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3599,7 +3510,7 @@ ROM_START( racedrivg1 )
 	ROM_LOAD16_BYTE( "136077-1030.30e", 0x000000, 0x010000, CRC(ff575b3d) SHA1(7f2202db7ec9dac06499c9535b4852defb192eb3) )
 	ROM_LOAD16_BYTE( "136077-1031.10e", 0x000001, 0x010000, CRC(2ae2ac35) SHA1(e2a050a6e24dc6fef86b3556b69b2c3e2993febc) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3636,7 +3547,7 @@ ROM_START( racedrivb1 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3650,7 +3561,7 @@ ROM_START( racedrivb1 )
 	ROM_LOAD16_BYTE( "136077-1030.30e", 0x000000, 0x010000, CRC(ff575b3d) SHA1(7f2202db7ec9dac06499c9535b4852defb192eb3) )
 	ROM_LOAD16_BYTE( "136077-1031.10e", 0x000001, 0x010000, CRC(2ae2ac35) SHA1(e2a050a6e24dc6fef86b3556b69b2c3e2993febc) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3687,7 +3598,7 @@ ROM_START( racedrivc )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3701,7 +3612,7 @@ ROM_START( racedrivc )
 	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
 	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3738,7 +3649,7 @@ ROM_START( racedrivcb )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3752,7 +3663,7 @@ ROM_START( racedrivcb )
 	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
 	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3789,7 +3700,7 @@ ROM_START( racedrivcg )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3803,7 +3714,7 @@ ROM_START( racedrivcg )
 	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
 	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3840,7 +3751,7 @@ ROM_START( racedrivc4 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3854,7 +3765,7 @@ ROM_START( racedrivc4 )
 	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
 	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3891,7 +3802,7 @@ ROM_START( racedrivcb4 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3905,7 +3816,7 @@ ROM_START( racedrivcb4 )
 	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
 	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3942,7 +3853,7 @@ ROM_START( racedrivcg4 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -3956,7 +3867,7 @@ ROM_START( racedrivcg4 )
 	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
 	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -3993,7 +3904,7 @@ ROM_START( racedrivc2 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -4007,7 +3918,7 @@ ROM_START( racedrivc2 )
 	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
 	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -4044,7 +3955,7 @@ ROM_START( racedrivc1 )
 	ROM_REGION( 0x2000, "mainpcb:asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "136077-1032.70n", 0x000000, 0x008000, CRC(fbc903a6) SHA1(047240a5192918ced52d90b0555ba2e19a26329e) )
 	ROM_LOAD16_BYTE( "136077-1033.45n", 0x000001, 0x008000, CRC(e032ca7c) SHA1(a80c980c8e58cf8cada72140e42a3cd1ea987b3d) )
 
@@ -4058,7 +3969,7 @@ ROM_START( racedrivc1 )
 	ROM_LOAD16_BYTE( "136078-1030.30e", 0x000000, 0x010000, CRC(d355a1c2) SHA1(6b0fb52dbecbe574959739f49c3c0fccdd5cebdb) )
 	ROM_LOAD16_BYTE( "136078-1031.10e", 0x000001, 0x010000, CRC(18fd5f44) SHA1(1c3bd780b72cfa61bcbd82683da18b4ee8d03a6d) )
 
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 10*128k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 10*128k for audio serial ROMs */
 	ROM_LOAD( "136052-1123.65a", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "136052-1124.55a", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "136052-3125.45a", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -4181,7 +4092,7 @@ ROM_START( racedrivpan )
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	/* ADSP board */
-	ROM_REGION( 0x20000, "mainpcb:soundcpu", 0 )        /* 2*64k for audio 68000 code */
+	ROM_REGION( 0x20000, "mainpcb:harddriv_sound:soundcpu", 0 )        /* 2*64k for audio 68000 code */
 	ROM_LOAD16_BYTE( "rdps1032.bin", 0x000000, 0x010000, CRC(33005f2a) SHA1(e4037a76f122b271a9675d9187ab847a11738640) )
 	ROM_LOAD16_BYTE( "rdps1033.bin", 0x000001, 0x010000, CRC(4fc800ac) SHA1(dd8cfdb727d6a65274f4f871a589a36796ae1e57) )
 
@@ -4191,7 +4102,7 @@ ROM_START( racedrivpan )
 	ROM_LOAD16_BYTE( "rdpd1025.bin", 0x000001, 0x020000, CRC(57b8a266) SHA1(257246d42841aa30220caeb91945e29978ee8fc0) )
 
 	/* Audio ROMs - show up as bad in self-test but so do racedriv's */
-	ROM_REGION( 0x50000, "mainpcb:serialroms", 0 )      /* 5*64k for audio serial ROMs */
+	ROM_REGION( 0x50000, "mainpcb:harddriv_sound:serialroms", 0 )      /* 5*64k for audio serial ROMs */
 	ROM_LOAD( "rdps1123.bin", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
 	ROM_LOAD( "rdps1124.bin", 0x010000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
 	ROM_LOAD( "rdps3125.bin", 0x020000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
@@ -4930,12 +4841,10 @@ void harddriv_state::init_dspcom()
 /* COMMON INIT: initialize the original "driver" sound board */
 void harddriv_state::init_driver_sound()
 {
-	hdsnd_init();
-
 	/* install sound handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x840000, 0x840001, read16_delegate(FUNC(harddriv_state::hd68k_snd_data_r), this), write16_delegate(FUNC(harddriv_state::hd68k_snd_data_w), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x844000, 0x844001, read16_delegate(FUNC(harddriv_state::hd68k_snd_status_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x84c000, 0x84c001, write16_delegate(FUNC(harddriv_state::hd68k_snd_reset_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x840000, 0x840001, read16_delegate(FUNC(harddriv_sound_board_device::hd68k_snd_data_r), (harddriv_sound_board_device*)m_harddriv_sound), write16_delegate(FUNC(harddriv_sound_board_device::hd68k_snd_data_w), (harddriv_sound_board_device*)m_harddriv_sound));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x844000, 0x844001, read16_delegate(FUNC(harddriv_sound_board_device::hd68k_snd_status_r), (harddriv_sound_board_device*)m_harddriv_sound));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x84c000, 0x84c001, write16_delegate(FUNC(harddriv_sound_board_device::hd68k_snd_reset_w), (harddriv_sound_board_device*)m_harddriv_sound));
 }
 
 
@@ -5239,7 +5148,7 @@ void harddriv_state::init_hdrivairp(void)
  *
  *************************************/
 
-GAME( 1999, harddriv,   0,        harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
+GAME( 1988, harddriv,   0,        harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, rev 7)", 0 )
 GAME( 1988, harddrivb,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, British, rev 7)", 0 )
 GAME( 1988, harddrivg,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, German, rev 7)", 0 )
 GAME( 1988, harddrivj,  harddriv, harddriv_machine, harddriv, driver_device, 0, ROT0, "Atari Games", "Hard Drivin' (cockpit, Japan, rev 7)", 0 )
@@ -5289,7 +5198,7 @@ GAME( 1990, racedrivcg4, racedriv, racedrivc_machine, racedrivc, driver_device, 
 GAME( 1990, racedrivc2,  racedriv, racedrivc1_machine, racedrivc, driver_device, 0,ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
 GAME( 1990, racedrivc1,  racedriv, racedrivc1_machine, racedrivc, driver_device, 0,ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
 
-GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, driver_device, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", GAME_NOT_WORKING, layout_racedrivpan ) // picking roadster crashes the side monitors?
+GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, driver_device, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
 
 GAME( 1991, steeltal,  0,        steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
 GAME( 1991, steeltalg, steeltal, steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )

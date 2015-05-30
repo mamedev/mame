@@ -40,7 +40,7 @@
 static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
-static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
+static const int DMASOUND_RATE[] = { (int)(Y2/640/8), (int)(Y2/640/4), (int)(Y2/640/2), (int)(Y2/640) };
 
 
 //**************************************************************************
@@ -1625,7 +1625,7 @@ static INPUT_PORTS_START( ste )
 	PORT_CONFNAME( 0x01, 0x00, "Input Port 0 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
-	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, st_state, write_monochrome)
+	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ste_state, write_monochrome)
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1435)" )
 
@@ -1926,7 +1926,6 @@ void st_state::state_save()
 	save_item(NAME(m_acia_ikbd_irq));
 	save_item(NAME(m_acia_midi_irq));
 }
-
 
 //-------------------------------------------------
 //  MACHINE_START( st )
@@ -3183,41 +3182,41 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME                FLAGS
-COMP( 1985, st,         0,          0,      st,         st, driver_device,          0,      "Atari",    "ST (USA)",             GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, st_uk,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (UK)",              GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, st_de,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Germany)",         GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, st_es,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Spain)",           GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, st_fr,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (France)",          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, st_nl,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Netherlands)",     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, st_se,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Sweden)",          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1985, st_sg,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Switzerland)",     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast,     st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (USA)",        GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast_uk,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (UK)",         GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast_de,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Germany)",    GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast_fr,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (France)",     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast_se,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Sweden)",     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, megast_sg,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Switzerland)",GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1989, ste,        0,          0,      ste,        ste, driver_device,     0,      "Atari",    "STE (USA)",            GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1989, ste_uk,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (UK)",             GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1989, ste_de,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Germany)",        GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1989, ste_es,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Spain)",          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1989, ste_fr,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (France)",         GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1989, ste_it,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Italy)",          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1989, ste_se,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Sweden)",         GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1989, ste_sg,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Switzerland)",    GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1985, st,         0,          0,      st,         st, driver_device,          0,      "Atari",    "ST (USA)",             GAME_NOT_WORKING )
+COMP( 1985, st_uk,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (UK)",              GAME_NOT_WORKING )
+COMP( 1985, st_de,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Germany)",         GAME_NOT_WORKING )
+COMP( 1985, st_es,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Spain)",           GAME_NOT_WORKING )
+COMP( 1985, st_fr,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (France)",          GAME_NOT_WORKING )
+COMP( 1985, st_nl,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Netherlands)",     GAME_NOT_WORKING )
+COMP( 1985, st_se,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Sweden)",          GAME_NOT_WORKING )
+COMP( 1985, st_sg,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Switzerland)",     GAME_NOT_WORKING )
+COMP( 1987, megast,     st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (USA)",        GAME_NOT_WORKING )
+COMP( 1987, megast_uk,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (UK)",         GAME_NOT_WORKING )
+COMP( 1987, megast_de,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Germany)",    GAME_NOT_WORKING )
+COMP( 1987, megast_fr,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (France)",     GAME_NOT_WORKING )
+COMP( 1987, megast_se,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Sweden)",     GAME_NOT_WORKING )
+COMP( 1987, megast_sg,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Switzerland)",GAME_NOT_WORKING )
+COMP( 1989, ste,        0,          0,      ste,        ste, driver_device,     0,      "Atari",    "STE (USA)",            GAME_NOT_WORKING )
+COMP( 1989, ste_uk,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (UK)",             GAME_NOT_WORKING )
+COMP( 1989, ste_de,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Germany)",        GAME_NOT_WORKING )
+COMP( 1989, ste_es,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Spain)",          GAME_NOT_WORKING )
+COMP( 1989, ste_fr,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (France)",         GAME_NOT_WORKING )
+COMP( 1989, ste_it,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Italy)",          GAME_NOT_WORKING )
+COMP( 1989, ste_se,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Sweden)",         GAME_NOT_WORKING )
+COMP( 1989, ste_sg,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Switzerland)",    GAME_NOT_WORKING )
 //COMP( 1990, stbook,       ste,        0,      stbook,     stbook, driver_device,     0,      "Atari",    "STBook",               GAME_NOT_WORKING )
 COMP( 1990, tt030,      0,          0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (USA)",          GAME_NOT_WORKING )
 COMP( 1990, tt030_uk,   tt030,      0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (UK)",           GAME_NOT_WORKING )
 COMP( 1990, tt030_de,   tt030,      0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (Germany)",      GAME_NOT_WORKING )
 COMP( 1990, tt030_fr,   tt030,      0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (France)",       GAME_NOT_WORKING )
 COMP( 1990, tt030_pl,   tt030,      0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (Poland)",       GAME_NOT_WORKING )
-COMP( 1991, megaste,    ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (USA)",       GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1991, megaste_uk, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (UK)",        GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1991, megaste_de, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Germany)",   GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1991, megaste_es, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Spain)",     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1991, megaste_fr, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (France)",    GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1991, megaste_it, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Italy)",     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1991, megaste_se, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Sweden)",    GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1991, megaste,    ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (USA)",       GAME_NOT_WORKING )
+COMP( 1991, megaste_uk, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (UK)",        GAME_NOT_WORKING )
+COMP( 1991, megaste_de, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Germany)",   GAME_NOT_WORKING )
+COMP( 1991, megaste_es, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Spain)",     GAME_NOT_WORKING )
+COMP( 1991, megaste_fr, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (France)",    GAME_NOT_WORKING )
+COMP( 1991, megaste_it, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Italy)",     GAME_NOT_WORKING )
+COMP( 1991, megaste_se, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Sweden)",    GAME_NOT_WORKING )
 COMP( 1992, falcon30,   0,          0,      falcon,     falcon, driver_device,      0,      "Atari",    "Falcon030",            GAME_NOT_WORKING )
 COMP( 1992, falcon40,   falcon30,   0,      falcon40,   falcon, driver_device,      0,      "Atari",    "Falcon040 (prototype)",GAME_NOT_WORKING )
 //COMP( 1989, stacy,    st,  0,      stacy,    stacy, driver_device,    0,     "Atari", "Stacy", GAME_NOT_WORKING )

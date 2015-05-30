@@ -1,9 +1,13 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*
 
     Tape support for Glaksija GTP format
 
     Miodrag Milanovic
 */
+#include <assert.h>
+
 #include "gtp_cas.h"
 
 

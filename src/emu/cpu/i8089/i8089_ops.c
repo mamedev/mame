@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best,Carl
 /***************************************************************************
 
     Intel 8089 I/O Processor
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Opcode implementations
 

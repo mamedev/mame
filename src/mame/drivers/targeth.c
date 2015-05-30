@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Target Hits (c) 1994 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco)
 
-Driver by Manuel Abadia <manu@teleline.es>
+Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 The DS5002FP has 32KB undumped gameplay code making the game unplayable :_(
 

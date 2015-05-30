@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Guru
 /* Hide & Seek
 
 the AG-2 AX51201 should be the follow-up to the AG-1 AX51101 in gunpey.c

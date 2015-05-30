@@ -1929,7 +1929,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FRSQRT, 4, 0):    // FSRSQRT dst,src1
-				FSPARAM0 = 1.0f / sqrt(FSPARAM1);
+				FSPARAM0 = 1.0f / sqrtf(FSPARAM1);
 				break;
 
 

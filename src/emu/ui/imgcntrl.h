@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 
     ui/imgcntrl.h
 
     MESS's clunky built-in file manager
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -27,8 +26,8 @@ public:
 
 protected:
 	enum {
-		START_FILE, START_OTHER_PART, START_SOFTLIST, 
-		SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, 
+		START_FILE, START_OTHER_PART, START_SOFTLIST,
+		SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART,
 		SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, CHECK_CREATE, DO_CREATE, SELECT_SOFTLIST,
 		LAST_ID
 	};
@@ -37,11 +36,11 @@ protected:
 	int state;
 	device_image_interface *image;
 	int submenu_result;
-	astring current_directory;
-	astring current_file;
+	std::string current_directory;
+	std::string current_file;
 
 	// methods
-	virtual void hook_load(astring filename, bool softlist);
+	virtual void hook_load(std::string filename, bool softlist);
 
 	bool create_ok;
 
@@ -52,7 +51,7 @@ private:
 	const software_info *swi;
 	const software_part *swp;
 	class software_list_device *sld;
-	astring software_info_name;
+	std::string software_info_name;
 
 	// methods
 	void test_create(bool &can_create, bool &need_confirm);

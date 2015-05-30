@@ -4,9 +4,6 @@
 
     CMD SuperCPU v2 + SuperRAM emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "supercpu.h"

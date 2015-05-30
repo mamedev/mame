@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /*********************************************************************
 
     formats/atom_tap.c
@@ -37,6 +39,8 @@
     The checksum is a simple sum (modulo 256) of all bytes from the start of the filename to the end of the data.
 
 */
+
+#include <assert.h>
 
 #include "atom_tap.h"
 #include "uef_cas.h"

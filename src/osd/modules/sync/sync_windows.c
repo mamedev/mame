@@ -14,7 +14,7 @@
 
 // MAME headers
 #include "osdcore.h"
-#include "osinline.h"
+#include "eminline.h"
 #include "osdsync.h"
 
 
@@ -244,7 +244,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 		timeout_param = INFINITE;
 	else
 		timeout_param = timeout * 1000 / osd_ticks_per_second();
-	
+
 	int ret = WaitForSingleObject((HANDLE) event, timeout_param);
 	return (ret == WAIT_OBJECT_0);
 }

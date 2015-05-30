@@ -1,4 +1,4 @@
-// license:?
+// license:GPL-2.0+
 // copyright-holders:Daniel Coulom,Sandro Ronco
 /*********************************************************************
 
@@ -8,9 +8,6 @@
 
     This code is based on Daniel Coulom's implementation in DCVG5k
     and DCAlice released by Daniel Coulom under GPL license
-
-    The implementation below is released under the MAME license for use
-    in MAME, MESS and derivatives by permission of the author.
 
 *********************************************************************/
 

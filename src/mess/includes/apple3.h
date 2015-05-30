@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods,R. Belmont
 /*****************************************************************************
  *
  * includes/apple3.h
@@ -164,6 +166,8 @@ private:
 	int m_analog_sel;
 	bool m_ramp_active;
 	int m_pdl_charge;
+	int m_va, m_vb, m_vc;
+	int m_smoothscr;
 };
 
 #endif /* APPLE3_H_ */

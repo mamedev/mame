@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Atari Video Computer System Driving Wheel emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
@@ -48,7 +47,7 @@ ioport_constructor vcs_wheel_device::device_input_ports() const
 //-------------------------------------------------
 
 vcs_wheel_device::vcs_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VCS_WHEEL, "Driving Wheel", tag, owner, clock, "vcs_wheel", __FILE__),
+	device_t(mconfig, VCS_WHEEL, "Atari / CBM Driving Wheel", tag, owner, clock, "vcs_wheel", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
 	m_wheel(*this, "WHEEL")

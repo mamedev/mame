@@ -1,7 +1,9 @@
+// license:???
+// copyright-holders:Jarek Burczynski, Tomasz Slanina
 /**********************************************************
 Strike Bowling  (c)1982 Taito
 
-driver by Jaroslaw Burczynski
+driver by Jarek Burczynski
           Tomasz Slanina
 
 Todo:

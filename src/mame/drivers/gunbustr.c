@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Bryan McPhail, David Graves
 /****************************************************************************
 
     Gunbuster (c) 1992 Taito

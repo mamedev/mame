@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
 
 #include "includes/vc4000.h"
 

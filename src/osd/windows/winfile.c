@@ -48,15 +48,10 @@ extern const char *winfile_ptty_identifier;
 
 file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
 {
-	DWORD disposition, access, sharemode;
 	file_error filerr = FILERR_NONE;
-	const TCHAR *src;
-	DWORD upper;
-	TCHAR *t_path;
-	TCHAR *dst;
 
 	// convert path to TCHAR
-	t_path = tstring_from_utf8(path);
+	TCHAR *t_path = tstring_from_utf8(path);
 	if (t_path == NULL)
 	{
 		filerr = FILERR_OUT_OF_MEMORY;
@@ -89,17 +84,15 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	(*file)->type = WINFILE_FILE;
 
 	// convert the path into something Windows compatible
-	dst = (*file)->filename;
-#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
-	for (src = t_path; *src != 0; src++)
-		*dst++ = (*src == '/') ? '\\' : *src;
-#else
-	for (src = t_path; *src != 0; src++)
-		*dst++ = *src;//(*src == '/') ? '\\' : *src;
-#endif
-	*dst++ = 0;
+	{
+		TCHAR *dst = (*file)->filename;
+		for (TCHAR const *src = t_path; *src != 0; src++)
+			*dst++ = *src;//(*src == '/') ? '\\' : *src;
+		*dst++ = 0;
+	}
 
 	// select the file open modes
+	DWORD disposition, access, sharemode;
 	if (openflags & OPEN_FLAG_WRITE)
 	{
 		disposition = (!is_path_to_physical_drive(path) && (openflags & OPEN_FLAG_CREATE)) ? CREATE_ALWAYS : OPEN_EXISTING;
@@ -149,6 +142,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	// get the file size
+	DWORD upper;
 	*filesize = GetFileSize((*file)->handle, &upper);
 	*filesize |= (UINT64)upper << 32;
 
@@ -379,23 +373,6 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 		*cylinders *= 2;
 	}
 	return TRUE;
-}
-
-
-//============================================================
-//  osd_uchar_from_osdchar
-//============================================================
-
-int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
-{
-	WCHAR wch;
-
-	count = MIN(count, IsDBCSLeadByte(*osdchar) ? 2 : 1);
-	if (MultiByteToWideChar(CP_ACP, 0, osdchar, (DWORD)count, &wch, 1) != 0)
-		*uchar = wch;
-	else
-		*uchar = 0;
-	return (int) count;
 }
 
 

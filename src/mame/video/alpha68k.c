@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail
 /***************************************************************************
 
    Alpha 68k video emulation - Bryan McPhail, mish@tendril.co.uk

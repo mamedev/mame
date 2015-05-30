@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
    Dark Seal Video emulation - Bryan McPhail, mish@tendril.co.uk
@@ -36,13 +38,13 @@ void darkseal_state::update_24bitcol(int offset)
 	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
-WRITE16_MEMBER(darkseal_state::darkseal_palette_24bit_rg_w)
+WRITE16_MEMBER(darkseal_state::palette_24bit_rg_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	update_24bitcol(offset);
 }
 
-WRITE16_MEMBER(darkseal_state::darkseal_palette_24bit_b_w)
+WRITE16_MEMBER(darkseal_state::palette_24bit_b_w)
 {
 	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
 	update_24bitcol(offset);
@@ -56,9 +58,11 @@ void darkseal_state::video_start()
 
 /******************************************************************************/
 
-UINT32 darkseal_state::screen_update_darkseal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 darkseal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	address_space &space = machine().driver_data()->generic_space();
+	UINT16 flip = m_deco_tilegen2->pf_control_r(space, 0, 0xffff);
+	flip_screen_set(!BIT(flip, 7));
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 

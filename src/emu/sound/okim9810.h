@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 /***************************************************************************
 
     okim9810.h
@@ -133,7 +135,6 @@ protected:
 
 		static const UINT8 s_volume_table[16];
 	};
-
 
 	// internal state
 	const address_space_config  m_space_config;

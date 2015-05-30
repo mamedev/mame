@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Allard van der Bas
 /***************************************************************************
 
     Wiping sound driver (quick hack of the Namco sound driver)
@@ -28,19 +30,10 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 	m_mixer_buffer(NULL),
 	m_mixer_buffer_2(NULL)
 {
-	memset(m_channel_list, 0, sizeof(sound_channel)*MAX_VOICES);
+	memset(m_channel_list, 0, sizeof(wp_sound_channel)*MAX_VOICES);
 	memset(m_soundregs, 0, sizeof(UINT8)*0x4000);
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wiping_sound_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -48,7 +41,7 @@ void wiping_sound_device::device_config_complete()
 
 void wiping_sound_device::device_start()
 {
-	sound_channel *voice;
+	wp_sound_channel *voice;
 
 	/* get stream channels */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, samplerate);
@@ -77,6 +70,17 @@ void wiping_sound_device::device_start()
 		voice->volume = 0;
 		voice->wave = &m_sound_prom[0];
 		voice->counter = 0;
+	}
+
+	save_item(NAME(m_soundregs));
+
+	for (int i = 0; i < MAX_VOICES; i++)
+	{
+		save_item(NAME(m_channel_list[i].frequency), i);
+		save_item(NAME(m_channel_list[i].counter), i);
+		save_item(NAME(m_channel_list[i].volume), i);
+		save_item(NAME(m_channel_list[i].oneshot), i);
+		save_item(NAME(m_channel_list[i].oneshotplaying), i);
 	}
 }
 
@@ -107,7 +111,7 @@ void wiping_sound_device::make_mixer_table(int voices, int gain)
 
 WRITE8_MEMBER( wiping_sound_device::sound_w )
 {
-	sound_channel *voice;
+	wp_sound_channel *voice;
 	int base;
 
 	/* update the streams */
@@ -158,7 +162,7 @@ WRITE8_MEMBER( wiping_sound_device::sound_w )
 void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
-	sound_channel *voice;
+	wp_sound_channel *voice;
 	short *mix;
 	int i;
 

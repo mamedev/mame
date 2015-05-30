@@ -4,9 +4,6 @@
 
     Sinclair ZX8302 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                  ERASE   1 |*    \_/     | 40  Vdd

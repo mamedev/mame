@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria,Chris Hardy, Couriersud
 /***************************************************************************
 
         Circus Charlie   GX380 (c) 1984 Konami

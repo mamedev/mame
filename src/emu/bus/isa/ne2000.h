@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef __NE2000_H__
 #define __NE2000_H__
 

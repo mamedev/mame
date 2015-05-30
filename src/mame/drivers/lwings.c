@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Leaman
 /***************************************************************************
 
   Legendary Wings
@@ -740,6 +742,7 @@ void lwings_state::machine_start()
 	save_item(NAME(m_palette_pen));
 	save_item(NAME(m_soundstate));
 	save_item(NAME(m_adpcm));
+	save_item(NAME(m_nmi_mask));
 }
 
 void lwings_state::machine_reset()

@@ -1,4 +1,4 @@
-// license:MAME|GPL-2.0+
+// license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 /*
   Replicator 1 desktop 3d printer
@@ -667,12 +667,84 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 MACHINE_CONFIG_END
 
 ROM_START( replica1 )
-	ROM_REGION( 0x20000, "maincpu", 0 )  /* Main program store */
-	ROM_LOAD( "mighty_one_v7.5.0.bin", 0x0000, 0x1EF9A, CRC(0d36d9e7) SHA1(a53899775b4c4eea87b6903758ebb75f06710a69) ) /*Sailfish firmware image - Metamaquian build v7.5 */
-	ROM_LOAD( "atmegaboot_168_atmega1280.bin", 0x1F000, 0x0F16, CRC(c041f8db) SHA1(d995ebf360a264cccacec65f6dc0c2257a3a9224) ) /*Arduino MEGA bootloader*/
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS("v750")
 
-	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )  /* on-die 4kbyte eeprom */
-	//ROM_LOAD( "eeprom.raw", 0x0000, 0x1000, CRC(c71c0011) SHA1(1ceaf73df40e531df3bfb26b4fb7cd95fb7bff1d) ) /* blank EEPROM data */
+	/* Version 5.1 release:
+	   - Initial firmware release
+	*/
+	ROM_SYSTEM_BIOS( 0, "v51", "V 5.1" )
+	ROMX_LOAD("mighty-mb40-v5.1.bin", 0x0000, 0x10b90, CRC(20d65cd1) SHA1(da18c3eb5a29a6bc1eecd92eaae6063fe29d0305), ROM_BIOS(1))
+
+	/* Version 5.2 release:
+	   - Nozzle Tolerance added to EEPROM
+	   - Updated onboard menus
+	   - X,Y calibration tool added
+	*/
+	ROM_SYSTEM_BIOS( 1, "v52", "V 5.2" )
+	ROMX_LOAD("mighty-mb40-v5.2.bin", 0x0000, 0x126c4, CRC(555e47cf) SHA1(9d24a3dbeddce16669bb4d29c3366220ddf15d2a), ROM_BIOS(2))
+
+	/* Version 5.5 release:
+	   - Acceleration added to motor motion
+	   - Digipot updates
+	*/
+	ROM_SYSTEM_BIOS( 2, "v55", "V 5.5" )
+	ROMX_LOAD("mighty-mb40-v5.5.bin", 0x0000, 0x1a420, CRC(9327d7e4) SHA1(d734ba2bda12f50ec3ac0035ab11591909d9edde), ROM_BIOS(3))
+
+	/* Version 6.2.0 release:
+	   - Bug fix release to firmware 6.0
+	   - Addresses wavy print issue above 1cm
+	   - Left extruder prints with makerware.
+	*/
+	ROM_SYSTEM_BIOS( 3, "v620", "V 6.2.0" )
+	ROMX_LOAD("mighty_one_v6.2.0.bin", 0x0000, 0x1cf54, CRC(00df6f48) SHA1(db05afc2e1ebc104fb04753634a911187e396556), ROM_BIOS(4))
+
+	/* Version 7.0.0 release:
+	   - Major upgrade to Stepper Motor Smoothness (via Sailfish team)
+	   - X3G format introduced
+	   - Heaters default to leaving 'preheat' on more of the time
+	*/
+	ROM_SYSTEM_BIOS( 4, "v700", "V 7.0.0" )
+	ROMX_LOAD("mighty_one_v7.0.0.bin", 0x0000, 0x1cb52, CRC(aa2a5fcf) SHA1(934e642b0b2d007689249680bad03c9255ae016a), ROM_BIOS(5))
+
+	/* Version 7.2.0 release:
+	   - Removes support for S3G files
+	   - X3G is the recognized format
+	   - Minor bug fixes
+	*/
+	ROM_SYSTEM_BIOS( 5, "v720", "V 7.2.0" )
+	ROMX_LOAD("mighty_one_v7.2.0.bin", 0x0000, 0x1cb80, CRC(5e546706) SHA1(ed4aaf7522d5a5beea7eb69bf2c85d7a89f8f188), ROM_BIOS(6))
+
+	/* Version 7.3.0 release:
+	   - Pause at Z Height
+	   - Elapsed time displays during prints
+	   - Minor bug fixes
+	*/
+	ROM_SYSTEM_BIOS( 6, "v730", "V 7.3.0" )
+	ROMX_LOAD("mighty_one_v7.3.0.bin", 0x0000, 0x1d738, CRC(71811ff5) SHA1(6728ea600ab3ff4b589adca90b0d700d9b70bd18), ROM_BIOS(7))
+
+	/* Version 7.4.0 (bugfix) release:
+	   - Fixes issues with Z Pause and elapsed print time
+	*/
+	ROM_SYSTEM_BIOS( 7, "v740", "V 7.4.0" )
+	ROMX_LOAD("mighty_one_v7.4.0.bin", 0x0000, 0x1b9e2, CRC(97b05a27) SHA1(76ca2c9c1db2e006e501c3177a8a1aa693dda0f9), ROM_BIOS(8))
+
+	/* Version 7.5.0 (bugfix) release:
+	   - Fixes issue with Heat Hold
+	*/
+	ROM_SYSTEM_BIOS( 8, "v750", "V 7.5.0" )
+	ROMX_LOAD("mighty_one_v7.5.0.bin", 0x0000, 0x1b9c4, CRC(169d6709) SHA1(62b5aacd1bc46969042aea7a50531ec467a4ff1f), ROM_BIOS(9))
+
+	/* Sailfish firmware image - Metam??quina experimental build v7.5.0 */
+	ROM_SYSTEM_BIOS( 9, "v750mm", "V 7.5.0 - Metam??quina" )
+	ROMX_LOAD("mighty_one_v7.5.0.mm.bin", 0x0000, 0x1ef9a, CRC(0d36d9e7) SHA1(a53899775b4c4eea87b6903758ebb75f06710a69), ROM_BIOS(10))
+
+
+	/*Arduino MEGA bootloader */
+	ROM_LOAD( "atmegaboot_168_atmega1280.bin", 0x1f000, 0x0f16, CRC(c041f8db) SHA1(d995ebf360a264cccacec65f6dc0c2257a3a9224) )
+
+	/* on-die 4kbyte eeprom */
+	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */

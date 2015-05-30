@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca, Angelo Salese
 /**********************************************************************************
 
   AMA-8000-1 / AMA-8000-2 Multi Game System.

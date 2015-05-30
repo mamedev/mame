@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Leaman
 #include "emu.h"
 #include "includes/blktiger.h"
 

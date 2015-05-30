@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     CR-511-B CD-ROM drive
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     CD-ROM drive with a custom MKE/Panasonic interface as used in the
     Commodore CDTV and early SoundBlaster cards.

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 #include "emu.h"
 #include "cpu/pdp1/pdp1.h"
 

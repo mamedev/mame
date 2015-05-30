@@ -6,9 +6,6 @@
 
     Sound boards for early Sega G-80 based games.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -40,21 +37,21 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void configure_filter(filter_state *state, double r, double c)
+INLINE void configure_filter(g80_filter_state *state, double r, double c)
 {
 	state->capval = 0;
 	state->exponent = 1.0 - exp(-1.0 / (r * c * SAMPLE_RATE));
 }
 
 
-INLINE double step_rc_filter(filter_state *state, double input)
+INLINE double step_rc_filter(g80_filter_state *state, double input)
 {
 	state->capval += (input - state->capval) * state->exponent;
 	return state->capval;
 }
 
 
-INLINE double step_cr_filter(filter_state *state, double input)
+INLINE double step_cr_filter(g80_filter_state *state, double input)
 {
 	double result = (input - state->capval);
 	state->capval += (input - state->capval) * state->exponent;
@@ -276,7 +273,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *ta
 
 void usb_sound_device::device_start()
 {
-	filter_state temp;
+	g80_filter_state temp;
 	int tchan, tgroup;
 
 	/* find the CPU we are associated with */
@@ -316,11 +313,11 @@ void usb_sound_device::device_start()
 	configure_filter(&m_final_filter, 100e3, 4.7e-6);
 
 	/* register for save states */
-	state_save_register_item(machine(), "usb", NULL, 0, m_in_latch);
-	state_save_register_item(machine(), "usb", NULL, 0, m_out_latch);
-	state_save_register_item(machine(), "usb", NULL, 0, m_last_p2_value);
-	state_save_register_item(machine(), "usb", NULL, 0, m_work_ram_bank);
-	state_save_register_item(machine(), "usb", NULL, 0, m_t1_clock);
+	save_item(NAME(m_in_latch));
+	save_item(NAME(m_out_latch));
+	save_item(NAME(m_last_p2_value));
+	save_item(NAME(m_work_ram_bank));
+	save_item(NAME(m_t1_clock));
 
 	for (tgroup = 0; tgroup < 3; tgroup++)
 	{
@@ -328,36 +325,36 @@ void usb_sound_device::device_start()
 		for (tchan = 0; tchan < 3; tchan++)
 		{
 			timer8253_channel *channel = &group->chan[tchan];
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->holding);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->latchmode);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->latchtoggle);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->clockmode);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->bcdmode);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->output);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->lastgate);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->gate);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->subcount);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->count);
-			state_save_register_item(machine(), "usb", NULL, tgroup * 3 + tchan, channel->remain);
+			save_item(NAME(channel->holding), tgroup * 3 + tchan);
+			save_item(NAME(channel->latchmode), tgroup * 3 + tchan);
+			save_item(NAME(channel->latchtoggle), tgroup * 3 + tchan);
+			save_item(NAME(channel->clockmode), tgroup * 3 + tchan);
+			save_item(NAME(channel->bcdmode), tgroup * 3 + tchan);
+			save_item(NAME(channel->output), tgroup * 3 + tchan);
+			save_item(NAME(channel->lastgate), tgroup * 3 + tchan);
+			save_item(NAME(channel->gate), tgroup * 3 + tchan);
+			save_item(NAME(channel->subcount), tgroup * 3 + tchan);
+			save_item(NAME(channel->count), tgroup * 3 + tchan);
+			save_item(NAME(channel->remain), tgroup * 3 + tchan);
 		}
-		state_save_register_item_array(machine(), "usb", NULL, tgroup, group->env);
-		state_save_register_item(machine(), "usb", NULL, tgroup, group->chan_filter[0].capval);
-		state_save_register_item(machine(), "usb", NULL, tgroup, group->chan_filter[1].capval);
-		state_save_register_item(machine(), "usb", NULL, tgroup, group->gate1.capval);
-		state_save_register_item(machine(), "usb", NULL, tgroup, group->gate2.capval);
-		state_save_register_item(machine(), "usb", NULL, tgroup, group->config);
+		save_item(NAME(group->env), tgroup);
+		save_item(NAME(group->chan_filter[0].capval), tgroup);
+		save_item(NAME(group->chan_filter[1].capval), tgroup);
+		save_item(NAME(group->gate1.capval), tgroup);
+		save_item(NAME(group->gate2.capval), tgroup);
+		save_item(NAME(group->config), tgroup);
 	}
 
-	state_save_register_item_array(machine(), "usb", NULL, 0, m_timer_mode);
-	state_save_register_item(machine(), "usb", NULL, 0, m_noise_shift);
-	state_save_register_item(machine(), "usb", NULL, 0, m_noise_state);
-	state_save_register_item(machine(), "usb", NULL, 0, m_noise_subcount);
-	state_save_register_item(machine(), "usb", NULL, 0, m_final_filter.capval);
-	state_save_register_item(machine(), "usb", NULL, 0, m_noise_filters[0].capval);
-	state_save_register_item(machine(), "usb", NULL, 0, m_noise_filters[1].capval);
-	state_save_register_item(machine(), "usb", NULL, 0, m_noise_filters[2].capval);
-	state_save_register_item(machine(), "usb", NULL, 0, m_noise_filters[3].capval);
-	state_save_register_item(machine(), "usb", NULL, 0, m_noise_filters[4].capval);
+	save_item(NAME(m_timer_mode));
+	save_item(NAME(m_noise_shift));
+	save_item(NAME(m_noise_state));
+	save_item(NAME(m_noise_subcount));
+	save_item(NAME(m_final_filter.capval));
+	save_item(NAME(m_noise_filters[0].capval));
+	save_item(NAME(m_noise_filters[1].capval));
+	save_item(NAME(m_noise_filters[2].capval));
+	save_item(NAME(m_noise_filters[3].capval));
+	save_item(NAME(m_noise_filters[4].capval));
 }
 
 //-------------------------------------------------

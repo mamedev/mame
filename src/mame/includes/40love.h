@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 #include "machine/buggychl.h"
 #include "sound/msm5232.h"
 

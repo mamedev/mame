@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "machine/nscsi_s1410.h"
 
 const device_type NSCSI_S1410 = &device_creator<nscsi_s1410_device>;
@@ -59,9 +61,9 @@ void nscsi_s1410_device::scsi_command()
 
 		int track_length = blocks*bytes_per_sector;
 		dynamic_buffer data(track_length);
-		memset(data, 0xc6, track_length);
+		memset(&data[0], 0xc6, track_length);
 
-		if(!hard_disk_write(harddisk, lba, data)) {
+		if(!hard_disk_write(harddisk, lba, &data[0])) {
 			logerror("%s: HD WRITE ERROR !\n", tag());
 			scsi_status_complete(SS_FORMAT_ERROR);
 		} else {

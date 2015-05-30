@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
     rgbsse.h
@@ -5,9 +7,6 @@
     SSE optimized RGB utilities.
 
     WARNING: This code assumes SSE2 or greater capability.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

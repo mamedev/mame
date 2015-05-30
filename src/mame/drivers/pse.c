@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Fabio Priuli,Dave Widel, gregf
 /***************************************************************************
 
  Project Support Engineering Games

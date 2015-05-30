@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald,Carl
 /*****************************************************************************
  *
  * includes/x68k.h
@@ -106,10 +108,10 @@ public:
 	required_ioport m_md6b;
 	required_ioport m_md6b_extra;
 
-	dynamic_array<UINT16> m_nvram;
-	dynamic_array<UINT16> m_tvram;
-	dynamic_array<UINT16> m_gvram;
-	dynamic_array<UINT16> m_spritereg;
+	std::vector<UINT16> m_nvram;
+	std::vector<UINT16> m_tvram;
+	std::vector<UINT16> m_gvram;
+	std::vector<UINT16> m_spritereg;
 
 	bitmap_ind16 *m_pcgbitmap;
 	bitmap_ind16 *m_gfxbitmap;

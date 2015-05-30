@@ -1,7 +1,12 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
  MegaDrive / Genesis J-Cart (+SEPROM) emulation
+
+
+ Emulation based on earlier researches by ElBarto
 
 
  i2c games mapping table:

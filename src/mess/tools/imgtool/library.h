@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /****************************************************************************
 
     library.h
@@ -16,7 +18,6 @@
 #define LIBRARY_H
 
 #include <time.h>
-#include <assert.h>
 
 #include "corestr.h"
 #include "opresolv.h"

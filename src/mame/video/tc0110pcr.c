@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*
 Taito TC0110PCR
 ---------
@@ -39,16 +41,6 @@ void tc0110pcr_device::static_set_palette_tag(device_t &device, const char *tag)
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0110pcr_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -58,6 +50,7 @@ void tc0110pcr_device::device_start()
 
 	save_pointer(NAME(m_ram), TC0110PCR_RAM_SIZE);
 	save_item(NAME(m_type));
+	save_item(NAME(m_addr));
 	machine().save().register_postload(save_prepost_delegate(FUNC(tc0110pcr_device::restore_colors), this));
 
 }

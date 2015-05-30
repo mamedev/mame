@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 /***************************************************************************
 
     Neo-Geo hardware
@@ -124,7 +126,8 @@ void neogeo_state::video_start()
 {
 	create_rgb_lookups();
 
-	m_paletteram.resize_and_clear(0x1000 * 2);
+	m_paletteram.resize(0x1000 * 2);
+	memset(&m_paletteram[0], 0, 0x1000 * 2 * sizeof(m_paletteram[0]));
 
 	m_screen_shadow = 0;
 	m_palette_bank = 0;

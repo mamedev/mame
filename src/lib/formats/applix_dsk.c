@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Robbbert
 /*********************************************************************
 
     formats/applix_dsk.c
@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/applix_dsk.h"
 
 applix_format::applix_format() : wd177x_format(formats)

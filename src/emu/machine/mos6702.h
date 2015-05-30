@@ -4,9 +4,6 @@
 
     MOS Technology 6702 Mystery Device emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                   R/_W   1 |*    \_/     | 20  Vcc

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Sylvain Glaize, Paul Priest, Olivier Galibert
 
 #include "cpu/sh2/sh2.h"
 

@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 
 #include "machine/st0016.h"
 
@@ -12,7 +14,7 @@ public:
 	{ }
 
 	int mux_port;
-//  UINT32 m_st0016_rom_bank;
+	// UINT32 m_st0016_rom_bank;
 
 	optional_device<st0016_cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(mux_r);
@@ -27,6 +29,7 @@ public:
 	DECLARE_DRIVER_INIT(mayjinsn);
 	DECLARE_DRIVER_INIT(mayjisn2);
 	DECLARE_DRIVER_INIT(renju);
+	virtual void machine_start();
 	DECLARE_VIDEO_START(st0016);
 	void st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

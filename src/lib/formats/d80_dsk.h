@@ -29,7 +29,8 @@ protected:
 	virtual UINT32 get_cell_size(const format &f, int track);
 	virtual int get_sectors_per_track(const format &f, int track);
 	virtual int get_disk_id_offset(const format &f);
-	floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2);
+	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2);
+	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size);
 
 	static const format file_formats[];
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /* Taito TC0180VCU */
 
 #include "emu.h"

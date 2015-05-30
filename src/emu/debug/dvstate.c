@@ -75,11 +75,11 @@ void debug_view_state::enumerate_sources()
 
 	// iterate over devices that have state interfaces
 	state_interface_iterator iter(machine().root_device());
-	astring name;
+	std::string name;
 	for (device_state_interface *state = iter.first(); state != NULL; state = iter.next())
 	{
-		name.printf("%s '%s'", state->device().name(), state->device().tag());
-		m_source_list.append(*global_alloc(debug_view_state_source(name, state->device())));
+		strprintf(name,"%s '%s'", state->device().name(), state->device().tag());
+		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
 	}
 
 	// reset the source to a known good entry
@@ -160,7 +160,7 @@ void debug_view_state::recompute()
 	for (state_item *item = m_state_list; item != NULL; item = item->m_next)
 	{
 		count++;
-		maxtaglen = MAX(maxtaglen, item->m_symbol.len());
+		maxtaglen = MAX(maxtaglen, item->m_symbol.length());
 		maxvallen = MAX(maxvallen, item->m_vallen);
 	}
 
@@ -212,7 +212,7 @@ void debug_view_state::view_update()
 
 	// loop over visible rows
 	screen_device *screen = machine().first_screen();
-	debug_view_char *dest = m_viewdata;
+	debug_view_char *dest = &m_viewdata[0];
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
 		UINT32 col = 0;
@@ -223,7 +223,7 @@ void debug_view_state::view_update()
 			UINT32 effcol = m_topleft.x;
 			UINT8 attrib = DCA_NORMAL;
 			UINT32 len = 0;
-			astring valstr;
+			std::string valstr;
 
 			// get the effective string
 			if (curitem->m_index >= REG_FRAME && curitem->m_index <= REG_DIVIDER)
@@ -233,16 +233,16 @@ void debug_view_state::view_update()
 				{
 					case REG_DIVIDER:
 						curitem->m_vallen = 0;
-						curitem->m_symbol.reset();
+						curitem->m_symbol.clear();
 						for (int i = 0; i < m_total.x; i++)
-							curitem->m_symbol.cat("-");
+							curitem->m_symbol.append("-");
 						break;
 
 					case REG_CYCLES:
 						if (source.m_execintf != NULL)
 						{
 							curitem->m_currval = source.m_execintf->cycles_remaining();
-							valstr.printf("%-8d", (UINT32)curitem->m_currval);
+							strprintf(valstr, "%-8d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -250,7 +250,7 @@ void debug_view_state::view_update()
 						if (screen != NULL)
 						{
 							curitem->m_currval = screen->hpos();
-							valstr.printf("%4d", (UINT32)curitem->m_currval);
+							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -258,7 +258,7 @@ void debug_view_state::view_update()
 						if (screen != NULL)
 						{
 							curitem->m_currval = screen->vpos();
-							valstr.printf("%4d", (UINT32)curitem->m_currval);
+							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
 						}
 						break;
 
@@ -266,7 +266,7 @@ void debug_view_state::view_update()
 						if (screen != NULL)
 						{
 							curitem->m_currval = screen->frame_number();
-							valstr.printf("%6d", (UINT32)curitem->m_currval);
+							strprintf(valstr, "%6d", (UINT32)curitem->m_currval);
 						}
 						break;
 				}
@@ -285,19 +285,19 @@ void debug_view_state::view_update()
 
 			// build up a string
 			char temp[256];
-			if (curitem->m_symbol.len() < m_divider - 1)
+			if (curitem->m_symbol.length() < m_divider - 1)
 			{
-				memset(&temp[len], ' ', m_divider - 1 - curitem->m_symbol.len());
-				len += m_divider - 1 - curitem->m_symbol.len();
+				memset(&temp[len], ' ', m_divider - 1 - curitem->m_symbol.length());
+				len += m_divider - 1 - curitem->m_symbol.length();
 			}
 
-			memcpy(&temp[len], curitem->m_symbol.cstr(), curitem->m_symbol.len());
-			len += curitem->m_symbol.len();
+			memcpy(&temp[len], curitem->m_symbol.c_str(), curitem->m_symbol.length());
+			len += curitem->m_symbol.length();
 
 			temp[len++] = ' ';
 			temp[len++] = ' ';
 
-			memcpy(&temp[len], valstr.cstr(), curitem->m_vallen);
+			memcpy(&temp[len], valstr.c_str(), curitem->m_vallen);
 			len += curitem->m_vallen;
 
 			temp[len++] = ' ';

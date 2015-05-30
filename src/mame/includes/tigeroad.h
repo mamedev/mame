@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 #include "video/bufsprite.h"
 #include "sound/msm5205.h"
 #include "cpu/m68000/m68000.h"

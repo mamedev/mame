@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mark McDougall
 /*****************************          (by Mark McDougall)
  *** STREET FIGHT hardware ***  This has been adapted from the excellent
  *****************************  Psychic 5 description (by Roberto Ventura)
@@ -54,7 +56,7 @@ RST 10,the main IRQ, is to be triggered each time the screen is refreshed.
 RST 08 must be triggered in order to make the game work properly. I haven't
 ascertained the exact frequency of this interrupt yet, though the game
 appears to run at the correct speed with RST08 at 30Hz. Curiously a trace
-on the interrupt pin shows two interrupts occuring at 60Hz, obviously the
+on the interrupt pin shows two interrupts occurring at 60Hz, obviously the
 VBlank interrupt followed by a second interrupt some 3.3ms later. At some
 stage I'll get around to probing the data lines to find the interrupt
 vector addresses.

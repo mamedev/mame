@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /*********************************************************************
 
     formats/fdd_dsk.h
@@ -31,7 +31,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "fdd_dsk.h"
 
 fdd_format::fdd_format()

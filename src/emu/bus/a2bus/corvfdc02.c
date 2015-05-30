@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*********************************************************************
 
     corvfdc02.c
@@ -34,6 +36,7 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START( corv_floppies )
 	SLOT_INTERFACE( "525dsqd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
+
 
 MACHINE_CONFIG_FRAGMENT( fdc02 )
 	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
@@ -108,8 +111,7 @@ void a2bus_corvfdc02_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	astring tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, FDC02_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(FDC02_ROM_REGION).c_str())->base();
 
 	m_timer = timer_alloc(0);
 
@@ -257,7 +259,7 @@ WRITE_LINE_MEMBER(a2bus_corvfdc02_device::intrq_w)
 {
 	if (state)
 	{
-		m_fdc_local_status &= ~2;   // indicate IRQ occured
+		m_fdc_local_status &= ~2;   // indicate IRQ occurred
 		if (m_fdc_local_command & 0x20)
 		{
 			raise_slot_irq();

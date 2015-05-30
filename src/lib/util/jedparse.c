@@ -36,7 +36,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct parse_info
+struct jed_parse_info
 {
 	UINT16      checksum;               /* checksum value */
 	UINT32      explicit_numfuses;      /* explicitly specified number of fuses */
@@ -117,7 +117,7 @@ static UINT32 suck_number(const UINT8 **psrc)
     process_field - process a single JEDEC field
 -------------------------------------------------*/
 
-static void process_field(jed_data *data, const UINT8 *cursrc, const UINT8 *srcend, parse_info *pinfo)
+static void process_field(jed_data *data, const UINT8 *cursrc, const UINT8 *srcend, jed_parse_info *pinfo)
 {
 	/* switch off of the field type */
 	switch (*cursrc)
@@ -192,7 +192,7 @@ int jed_parse(const void *data, size_t length, jed_data *result)
 	const UINT8 *cursrc = (const UINT8 *)data;
 	const UINT8 *srcend = cursrc + length;
 	const UINT8 *scan;
-	parse_info pinfo;
+	jed_parse_info pinfo;
 	UINT16 checksum;
 	int i;
 

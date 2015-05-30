@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __JVSHOST_H__
 #define __JVSHOST_H__
 

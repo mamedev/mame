@@ -1,4 +1,4 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:Robbbert
 /******************************************************************************************
 
@@ -158,11 +158,11 @@ WRITE8_MEMBER( spectra_state::portb_w )
 {
 	m_portb = data;
 	float vco = 5.0;
-	if (BIT(data, 0)) vco -= 0.3125;
-	if (BIT(data, 1)) vco -= 0.625;
-	if (BIT(data, 2)) vco -= 1.25;
-	if (BIT(data, 3)) vco -= 2.5;
-	m_snsnd->vco_voltage_w(5.3125 - vco);
+	if (BIT(data, 0)) vco -= 0.3125f;
+	if (BIT(data, 1)) vco -= 0.625f;
+	if (BIT(data, 2)) vco -= 1.25f;
+	if (BIT(data, 3)) vco -= 2.5f;
+	m_snsnd->vco_voltage_w(5.3125f - vco);
 	m_snsnd->enable_w(!BIT(data, 4)); // strobe: toggles enable
 	m_snsnd->envelope_1_w(!BIT(data, 5)); //decay: toggles envelope
 	m_snsnd->vco_w(BIT(data, 6)); // "phaser" sound: VCO toggled

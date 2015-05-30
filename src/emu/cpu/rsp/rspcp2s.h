@@ -1,13 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /***************************************************************************
 
     rspcp2s.h
 
     Interface file for Reality Signal Processor (RSP) vector extensions
     using SSSE3 SIMD acceleration.
-
-    Copyright the MESS team
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -32,7 +30,7 @@ class rsp_cop2_simd : public rsp_cop2_drc
 	virtual int generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc);
 	virtual int generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc);
 
-	virtual void state_string_export(const int index, astring &string);
+	virtual void state_string_export(const int index, std::string &str);
 
 public:
 	virtual void lbv();

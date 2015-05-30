@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, R. Belmont
 /* The Legend of Silk Road - Unico 1999 */
 
 /* Preliminary Driver by David Haywood */
@@ -388,5 +390,5 @@ ROM_START( silkroada )
 ROM_END
 
 
-GAME( 1999, silkroad,         0, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad", 0 )
-GAME( 1999, silkroada, silkroad, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", 0 ) // same content but fewer GFX roms of a larger size
+GAME( 1999, silkroad,         0, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad", GAME_SUPPORTS_SAVE )
+GAME( 1999, silkroada, silkroad, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", GAME_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size

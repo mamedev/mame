@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves
 /*************************************************************************
 
     Top Speed / Full Throttle

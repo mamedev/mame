@@ -1,4 +1,4 @@
-// license:?
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Pierpaolo Prazzoli, Roberto Fresca
 /************************************************************************
 
@@ -27,11 +27,11 @@
 
   - Reworked inputs to match the standard poker inputs names/layout.
   - Hooked the payout switch.
-  - Hooked a watchdog circuitery, that seems intended to reset
+  - Hooked a watchdog circuitry, that seems intended to reset
      the game and/or an external device.
   - Added machine start & reset.
   - All clocks pre defined.
-  - Added ay8910 interfase as a preliminary attempt to analyze the unknown
+  - Added ay8910 interface as a preliminary attempt to analyze the unknown
      port writes when these ports are set as input.
   - Figured out the following DIP switches:
      Auto Bet (No, Yes).
@@ -40,7 +40,7 @@
      Minimal Winner Hand (Jacks or Better, Two Pair).
      Deal Speed (Slow, Fast).
      Aces Type (Normal Aces, Number 1).
-     Cards Deck Type (english cards, french cards).
+     Cards Deck Type (English cards, French cards).
      Max Bet (5, 10, 15, 20).
   - Added NVRAM support.
   - Reorganized and cleaned-up the driver.
@@ -72,18 +72,24 @@ class supdrapo_state : public driver_device
 public:
 	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_col_line(*this, "col_line"),
-		m_videoram(*this, "videoram"),
-		m_char_bank(*this, "char_bank"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_col_line(*this, "col_line"),
+		m_videoram(*this, "videoram"),
+		m_char_bank(*this, "char_bank") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT8> m_col_line;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_char_bank;
+
 	UINT8 m_wdog;
-	DECLARE_READ8_MEMBER(sdpoker_rng_r);
+
+	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(wdog8000_w);
 	DECLARE_WRITE8_MEMBER(debug8004_w);
 	DECLARE_WRITE8_MEMBER(debug7c00_w);
@@ -91,14 +97,13 @@ public:
 	DECLARE_WRITE8_MEMBER(payout_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(supdrapo);
-	UINT32 screen_update_supdrapo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -111,7 +116,7 @@ void supdrapo_state::video_start()
 }
 
 
-UINT32 supdrapo_state::screen_update_supdrapo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 	int count;
@@ -171,7 +176,7 @@ PALETTE_INIT_MEMBER(supdrapo_state, supdrapo)
                             R/W Handlers
 **********************************************************************/
 
-READ8_MEMBER(supdrapo_state::sdpoker_rng_r)
+READ8_MEMBER(supdrapo_state::rng_r)
 {
 	return machine().rand();
 }
@@ -251,6 +256,7 @@ WRITE8_MEMBER(supdrapo_state::payout_w)
 
 void supdrapo_state::machine_start()
 {
+	save_item(NAME(m_wdog));
 }
 
 
@@ -282,7 +288,7 @@ static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8, supdrapo_state )
 	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("SW1")
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("SW2")
 	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
+	AM_RANGE(0x9400, 0x9400) AM_READ(rng_r)
 	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
@@ -453,7 +459,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update_supdrapo)
+	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supdrapo)
@@ -488,21 +494,21 @@ A3-1J
 */
 ROM_START( supdrapo )
 	ROM_REGION( 0x010000, "maincpu", 0 )
-	ROM_LOAD( "a2-1c",        0x0000, 0x1000, CRC(b65af689) SHA1(b45cd15ca8f9c931d83a90f3cdbebf218070b195) )
-	ROM_LOAD( "a2-1d",        0x1000, 0x1000, CRC(9ccc4347) SHA1(ea8f4d17aaacc7091ca0a66247b55eb12155c9d7) )
-	ROM_LOAD( "a1-1e",        0x2000, 0x1000, CRC(44f2b75d) SHA1(615d0acd3f8a109334f415732b6b4fe7b810d91c) ) //a2-1e
-	ROM_LOAD( "a1-1h",        0x3000, 0x1000, CRC(9c1a10ff) SHA1(243dd64f0b29f9bed4cfa8ecb801ddd973d9e3c3) )
-	ROM_LOAD( "a3-1j",        0x4000, 0x1000, CRC(71c2bf1c) SHA1(cb98bbf88b8a410075a074ec8619c6e703c6c582) )
+	ROM_LOAD( "a2-1c",  0x0000, 0x1000, CRC(b65af689) SHA1(b45cd15ca8f9c931d83a90f3cdbebf218070b195) )
+	ROM_LOAD( "a2-1d",  0x1000, 0x1000, CRC(9ccc4347) SHA1(ea8f4d17aaacc7091ca0a66247b55eb12155c9d7) )
+	ROM_LOAD( "a1-1e",  0x2000, 0x1000, CRC(44f2b75d) SHA1(615d0acd3f8a109334f415732b6b4fe7b810d91c) ) //a2-1e
+	ROM_LOAD( "a1-1h",  0x3000, 0x1000, CRC(9c1a10ff) SHA1(243dd64f0b29f9bed4cfa8ecb801ddd973d9e3c3) )
+	ROM_LOAD( "a3-1j",  0x4000, 0x1000, CRC(71c2bf1c) SHA1(cb98bbf88b8a410075a074ec8619c6e703c6c582) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "a1-4p",        0x0000, 0x1000, CRC(5ac096cc) SHA1(60173a83d0e60fd4d0eb40b7b4e80a74ac5fb23d) )
-	ROM_LOAD( "a1-4n",        0x1000, 0x1000, CRC(6985fac9) SHA1(c6357fe0f042b67f8559ec9da03106d1ff08dc66) )
-	ROM_LOAD( "a1-4l",        0x2000, 0x1000, CRC(534f7b94) SHA1(44b83053827b27b9e45f6fc50d3878984ef5c5cc) )
-	ROM_LOAD( "a1-4k",        0x3000, 0x1000, CRC(3d881f5b) SHA1(53d8800a098e4393224de0b82f8e516f73fd6b62) )
+	ROM_LOAD( "a1-4p",  0x0000, 0x1000, CRC(5ac096cc) SHA1(60173a83d0e60fd4d0eb40b7b4e80a74ac5fb23d) )
+	ROM_LOAD( "a1-4n",  0x1000, 0x1000, CRC(6985fac9) SHA1(c6357fe0f042b67f8559ec9da03106d1ff08dc66) )
+	ROM_LOAD( "a1-4l",  0x2000, 0x1000, CRC(534f7b94) SHA1(44b83053827b27b9e45f6fc50d3878984ef5c5cc) )
+	ROM_LOAD( "a1-4k",  0x3000, 0x1000, CRC(3d881f5b) SHA1(53d8800a098e4393224de0b82f8e516f73fd6b62) )
 
 	ROM_REGION( 0x00200, "proms", 0 )
-	ROM_LOAD( "a1-9n",        0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
-	ROM_LOAD( "a1-9p",        0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
+	ROM_LOAD( "a1-9n",  0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
+	ROM_LOAD( "a1-9p",  0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
 ROM_END
 
 /*
@@ -519,21 +525,21 @@ ROM_END
 */
 ROM_START( supdrapoa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "0.c1",   0x0000, 0x1000, CRC(63e2775a) SHA1(742e8db5378631fd93a22d2131f9523ee74c03a5) )
-	ROM_LOAD( "1.d1",   0x1000, 0x1000, CRC(aa1578de) SHA1(8f1a33864b2c8e09a25c7603522ebfc7e0757d56) )
-	ROM_LOAD( "2.e1",   0x2000, 0x1000, CRC(ffe0415c) SHA1(0233d192814ced0b32abd4b7d2e93431a339732f) )
-	ROM_LOAD( "3.h1",   0x3000, 0x1000, CRC(1bae52fa) SHA1(f89d48d67e52d0fca51eb23fee2d5cb94afcf7f4) )
-	ROM_LOAD( "4.j1",   0x4000, 0x1000, CRC(7af26f63) SHA1(aeeca69ef1c21acae4283183e4b073ec0d303f4a) )
+	ROM_LOAD( "0.c1",  0x0000, 0x1000, CRC(63e2775a) SHA1(742e8db5378631fd93a22d2131f9523ee74c03a5) )
+	ROM_LOAD( "1.d1",  0x1000, 0x1000, CRC(aa1578de) SHA1(8f1a33864b2c8e09a25c7603522ebfc7e0757d56) )
+	ROM_LOAD( "2.e1",  0x2000, 0x1000, CRC(ffe0415c) SHA1(0233d192814ced0b32abd4b7d2e93431a339732f) )
+	ROM_LOAD( "3.h1",  0x3000, 0x1000, CRC(1bae52fa) SHA1(f89d48d67e52d0fca51eb23fee2d5cb94afcf7f4) )
+	ROM_LOAD( "4.j1",  0x4000, 0x1000, CRC(7af26f63) SHA1(aeeca69ef1c21acae4283183e4b073ec0d303f4a) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "8.p4",   0x0000, 0x1000, CRC(ef0700c5) SHA1(53f49d99f310fdf675e3b7339bdca1115e4a1935) )
-	ROM_LOAD( "7.n4",   0x1000, 0x1000, CRC(3f77031b) SHA1(2d282d39ea568aa44af8b56228b6e096c2713a15) )
-	ROM_LOAD( "6.l4",   0x2000, 0x1000, CRC(d70cd50e) SHA1(c3e3dcf79f8a25df5b878ef8734a6d0dc22004ba) )
-	ROM_LOAD( "5.k4",   0x3000, 0x1000, CRC(34564917) SHA1(90b49fe8a5371159388839d42913352cf58c60e6) )
+	ROM_LOAD( "8.p4",  0x0000, 0x1000, CRC(ef0700c5) SHA1(53f49d99f310fdf675e3b7339bdca1115e4a1935) )
+	ROM_LOAD( "7.n4",  0x1000, 0x1000, CRC(3f77031b) SHA1(2d282d39ea568aa44af8b56228b6e096c2713a15) )
+	ROM_LOAD( "6.l4",  0x2000, 0x1000, CRC(d70cd50e) SHA1(c3e3dcf79f8a25df5b878ef8734a6d0dc22004ba) )
+	ROM_LOAD( "5.k4",  0x3000, 0x1000, CRC(34564917) SHA1(90b49fe8a5371159388839d42913352cf58c60e6) )
 
 	ROM_REGION( 0x00200, "proms", 0 )   /* using the color PROMs from the parent set - no reason to think they differ */
-	ROM_LOAD( "a1-9n",        0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
-	ROM_LOAD( "a1-9p",        0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
+	ROM_LOAD( "a1-9n",  0x0000, 0x0100, CRC(e62529e3) SHA1(176f2069b0c06c1d088909e81658652af06c8eec) )
+	ROM_LOAD( "a1-9p",  0x0100, 0x0100, CRC(a0547746) SHA1(747c8aef5afa26124fe0763e7f96c4ff6be31863) )
 ROM_END
 
 /*
@@ -594,12 +600,11 @@ ROM_START( supdrapob )
 ROM_END
 
 
-
 /*********************************************************************
                            Games Drivers
 **********************************************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT  ROT     COMPANY                               FULLNAME                   FLAGS... */
-GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)", 0 )
-GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation / Jeutel", "Super Draw Poker (set 2)", 0 )
-GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "bootleg", "Super Draw Poker (bootleg)", 0 )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY                                           FULLNAME                     FLAGS... */
+GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   GAME_SUPPORTS_SAVE )
+GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   GAME_SUPPORTS_SAVE )
+GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", GAME_SUPPORTS_SAVE )

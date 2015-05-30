@@ -24,7 +24,7 @@ struct micro_t
 	UINT16      i;
 	UINT16      pc;
 	UINT8       r,g,b;
-	UINT8       x,xp,y,yp;
+	UINT8       xp,yp;
 	UINT8       cmd,cmdlo;
 	emu_timer * timer;
 	UINT8       timer_active;
@@ -36,14 +36,19 @@ class victory_state : public driver_device
 public:
 	victory_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_videoram(*this, "videoram"),
-			m_charram(*this, "charram") ,
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_charram(*this, "charram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_charram;
+
 	UINT16 m_paletteram[0x40];
 	UINT8 *m_bgbitmap;
 	UINT8 *m_fgbitmap;
@@ -61,15 +66,20 @@ public:
 	UINT8 m_scrolly;
 	UINT8 m_video_control;
 	struct micro_t m_micro;
+
 	DECLARE_WRITE8_MEMBER(lamp_control_w);
-	DECLARE_WRITE8_MEMBER(victory_paletteram_w);
-	DECLARE_READ8_MEMBER(victory_video_control_r);
-	DECLARE_WRITE8_MEMBER(victory_video_control_w);
+	DECLARE_WRITE8_MEMBER(paletteram_w);
+	DECLARE_READ8_MEMBER(video_control_r);
+	DECLARE_WRITE8_MEMBER(video_control_w);
+
 	virtual void video_start();
-	UINT32 screen_update_victory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(victory_vblank_interrupt);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	TIMER_CALLBACK_MEMBER(bgcoll_irq_callback);
-	void victory_update_irq();
+
+	void update_irq();
 	void set_palette();
 	int command2();
 	int command3();
@@ -79,7 +89,4 @@ public:
 	int command7();
 	void update_background();
 	void update_foreground();
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 };

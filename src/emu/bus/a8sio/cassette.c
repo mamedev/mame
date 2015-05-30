@@ -115,4 +115,3 @@ void a8sio_cassette_device::device_timer(emu_timer &timer, device_timer_id id, i
 			break;
 	}
 }
-

@@ -12,10 +12,6 @@ Undumped:
 Undumped GBC protos:
   - Jet Force Gemini
 
-
-Undumped Pirates:
-  -  Sachen EB-004 Street Hero
-
 Unreleased (music source code exists, possibly no prototypes exist)
 - Crimson
 - Hard Truck
@@ -5584,7 +5580,7 @@ List of unconfirmed retail cartridge roms
 	<software name="bombmsel">
 		<!-- Notes: GBC only -->
 		<description>Bomberman Selection (Kor)</description>
-		<year>1996?</year>
+		<year>2003</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="CGB-B2CK-KOR"/>
 		<part name="cart" interface="gameboy_cart">
@@ -23528,6 +23524,18 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
+	<software name="4in1_01c">
+		<description>4 in 1 (4B-001)</description>
+		<year>20??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="524288">
+				<rom name="4b-001.gbc" size="524288" crc="42a2fdf8" sha1="79a4faddfd1aca397e56d7895e45b1bc12900dab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_8in1">
 		<description>8 in 1 (Tw)</description>
 		<year>19??</year>
@@ -23540,6 +23548,86 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
+
+
+	<!-- also data from ThunderBlast Man -->
+	<software name="jboy2a" cloneof="jboy2">
+		<description>Jurassic Boy II</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="jurassicboyii.bin" size="524288" crc="497be52b" sha1="4d7f15ed30dcc6ddeea1863ee8d786e3933ca92f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocmanx" supported="no">
+		<description>Rocman-X (Tw)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="524288">
+				<rom name="rocmanx.bin" size="524288" crc="7e1351cf" sha1="7e62472c13b5a6a933aa93dc5b239f11a664f337" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shero" supported="no">
+		<description>Street Hero (Tw)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="1B-004" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="393216">
+				<rom name="1b-004.bin" size="393216" crc="b580cb1f" sha1="f80ffcaf0757f16ce0e6940a2ec786ebd7549458" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thundbmna" cloneof="thundbmn" supported="no">
+		<description>Thunder Blast Man (Euro)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="SA-114" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="262144">
+				<rom name="thunderblastman_sa-114.bin" size="262144" crc="1a719ead" sha1="676b5f0a304fb83bc04921bc617b7485af529b38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+	<software name="mc31t" supported="no">
+		<description>31 in 1 Mighty Mix (Tw)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="31b-001_row.bin" size="2097152" crc="0eb8ddfb" sha1="8fa0d40dc4c239108304e8799413a69a5668404c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc31" supported="no">
+		<description>31-in-1 Mighty Mix (Aus)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="31b-001_tw.bin" size="2097152" crc="21524051" sha1="c0c2a65b1485a2768962cb97ba2f9b668528453a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 
 <!-- GOWIN games -->
 <!--
@@ -23649,6 +23737,21 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
   * CBA147 Shi Mian Maifu - Fengyun Pian 十面埋伏-风云篇
 
 -->
+
+	<software name="emochndx" supported="partial">
+		<description>Emo Cheng DX (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom"  size="4194304">
+				<rom name="e mo cheng dx (sintax) (unl).bin" size="4194304" crc="5c388c6d" sha1="7919fe7b54a5bc53ebacc13dd338be9e841dadf7" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="shuihusslc" cloneof="shuihuss">
 		<description>Shui Hu Shen Shou (Chi, Li Cheng)</description>
@@ -24104,7 +24207,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
 			<dataarea name="rom"  size="2097152">
-				<rom name="digimon crystal ii (unlicensed, english) [raw dump].gbc" size="2097152" crc="685e76df" sha1="4e981044ac3a40d7a9cd63b79d5982b4b4e670a5" offset="0" />
+				<rom name="digimon crystal ii (unlicensed, english) [raw dump].bin" size="2097152" crc="685e76df" sha1="4e981044ac3a40d7a9cd63b79d5982b4b4e670a5" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24120,7 +24223,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
 			<dataarea name="rom"  size="2097152">
-				<rom name="lao fuzi chuanqi (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="aeca45be" sha1="b7193fcb8b9b8958a2522be0d1a3874cffc1e1db" offset="0" />
+				<rom name="lao fuzi chuanqi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="aeca45be" sha1="b7193fcb8b9b8958a2522be0d1a3874cffc1e1db" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24136,7 +24239,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
 			<dataarea name="rom"  size="2097152">
-				<rom name="yuenan zhanyi x - shenru dihou (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="602951a6" sha1="6703e9f68b989c976e93bd2eb63f884ceaff63f1" offset="0" />
+				<rom name="yuenan zhanyi x - shenru dihou (unlicensed, chinese) [raw dump].bin" size="2097152" crc="602951a6" sha1="6703e9f68b989c976e93bd2eb63f884ceaff63f1" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24152,7 +24255,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
 			<dataarea name="rom"  size="2097152">
-				<rom name="qi long zhu z 3 (dragon ball - advance adventure) (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="ccfdd63a" sha1="4f3b63cd11522b6fb291661f4d918601d95138e0" offset="0" />
+				<rom name="qi long zhu z 3 (dragon ball - advance adventure) (unlicensed, chinese) [raw dump].bin" size="2097152" crc="ccfdd63a" sha1="4f3b63cd11522b6fb291661f4d918601d95138e0" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24353,7 +24456,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- this is a sprite hack (based on Golden Sun by Camelot) of another syntax game "Castlevania DX", currently undumped -->
+<!-- this is a sprite hack (based on Golden Sun by Camelot) of another sintax game "Castlevania DX", currently undumped -->
 <!-- ingame title uses 黃金の太陽, so I romanized it in the Jpn way rather than in the Chinese way... -->
 	<software name="hjtaiyou">
 		<description>Pian Wai Zhang Huang Jin no Taiyou - Feng Yin De Yuan Gu Lian Jin Shu (Chi)</description>
@@ -24370,7 +24473,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- this is a sprite hack (based on Dragon Quest by Enix) of another syntax game "Castlevania DX", currently undumped -->
+<!-- this is a sprite hack (based on Dragon Quest by Enix) of another sintax game "Castlevania DX", currently undumped -->
 	<software name="dquest8">
 		<description>Yong Zhe Dou E Long VIII (Chi)</description>
 		<year>200?</year>
@@ -24607,7 +24710,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 	<software name="taikong" cloneof="firmbaby">
 	<!-- 4MB rom with crc 5b49af92 is taizou's cracked version running on base MBC5 -->
-		<description>Tai Kong Bao Bei (Chi, Syntax)</description>
+		<description>Tai Kong Bao Bei (Chi, Sintax)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
 		<info name="alt_title" value="太空寶貝"/>

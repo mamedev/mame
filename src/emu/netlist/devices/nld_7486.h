@@ -41,9 +41,13 @@
 
 NETLIB_DEVICE(7486,
 public:
-		netlist_ttl_input_t m_A;
-		netlist_ttl_input_t m_B;
-		netlist_ttl_output_t m_Q;
+		netlist_logic_input_t m_A;
+		netlist_logic_input_t m_B;
+		netlist_logic_output_t m_Q;
+
+		ATTR_HOT void inc_active();
+		ATTR_HOT void dec_active();
+		int m_active;
 );
 
 #define TTL_7486_DIP(_name)                                                         \

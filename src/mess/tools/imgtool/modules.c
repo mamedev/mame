@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 
     modules.c
@@ -6,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "imgtool.h"
 #include "modules.h"
 
 #ifndef MODULES_RECURSIVE

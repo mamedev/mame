@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Hiromitsu Shioya, Olivier Galibert
 /*********************************************************/
 /*    SEGA 16ch 8bit PCM                                 */
 /*********************************************************/
@@ -45,7 +47,6 @@ void segapcm_device::device_start()
 		mask = BANK_MASK7 >> 16;
 
 	for(rom_mask = 1; rom_mask < m_rom.length(); rom_mask *= 2);
-
 	rom_mask--;
 
 	m_bankmask = mask & (rom_mask >> m_bankshift);
@@ -122,8 +123,8 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				v = rom[(addr >> 8) & m_rom.mask()] - 0x80;
 
 				/* apply panning and advance */
-				outputs[0][i] += v * regs[2];
-				outputs[1][i] += v * regs[3];
+				outputs[0][i] += v * (regs[2] & 0x7f);
+				outputs[1][i] += v * (regs[3] & 0x7f);
 				addr = (addr + regs[7]) & 0xffffff;
 			}
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Bellfruit SWP (Skill With Prizes) Video hardware
     aka Cobra 3
 
@@ -122,7 +124,6 @@ public:
 	{
 		return 0;
 	}
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
 
@@ -131,12 +132,6 @@ protected:
 
 	virtual void machine_start();
 };
-
-
-WRITE_LINE_MEMBER(bfm_swp_state::irqhandler)
-{
-}
-
 
 READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)
 {
@@ -218,7 +213,6 @@ static MACHINE_CONFIG_START( bfm_swp, bfm_swp_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 10000000 )
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(bfm_swp_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

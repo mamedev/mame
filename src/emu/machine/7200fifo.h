@@ -4,9 +4,6 @@
 
     IDT7200 series 9-bit Asynchronous FIFO Emulation
 
-    Copyright MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                     _W   1 |*    \_/     | 28  Vcc
@@ -113,7 +110,7 @@ private:
 	void fifo_write(UINT16 data);
 	UINT16 fifo_read();
 
-	dynamic_array<UINT16> m_buffer;
+	std::vector<UINT16> m_buffer;
 	int m_ram_size;
 
 	int m_read_ptr;

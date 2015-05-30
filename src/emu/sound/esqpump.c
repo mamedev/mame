@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Christian Brunschen
 /***************************************************************************
 
   esqpump.c - Ensoniq 5505/5506 to 5510 interface.

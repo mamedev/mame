@@ -3192,6 +3192,18 @@
 		</part>
 	</software>
 
+	<software name="hongkd">
+		<description>Hong Kil Dong (Kor)</description>
+		<year>1991</year>
+		<publisher>Clover</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="korean" />
+			<dataarea name="rom" size="49152">
+				<rom name="hong_kil_dong.bin" size="49152" crc="8040b2fa" sha1="f44299070c8f4d3c0a4b2f671d105c811ae7db99" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hook">
 		<description>Hook (Euro, Prototype)</description>
 		<year>19??</year>
@@ -3365,6 +3377,17 @@
 			<feature name="slot" value="janggun" />
 			<dataarea name="rom" size="524288">
 				<rom name="janggun ui adeul (kr).bin" size="524288" crc="192949d5" sha1="a290e41e0218dd54c7774229a7bf77c0e6b037f9" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jangpun2">
+		<description>Jang Pung II (Kor)</description>
+		<year>1993</year>
+		<publisher>Sieco</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="jang pung ii (kr).bin" size="524288" crc="929222c4" sha1="10a5095513efebae3d045b217caa7a520e66f26f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5428,6 +5451,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="sky jaguar (kr).bin" size="32768" crc="5b8e65e4" sha1="6ce290d59f14e9be5711d932095909abc0d681d1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyjag1" cloneof="skyjag">
+		<description>Sky Jaguar (Kor, Clover)</description>
+		<year>199?</year>
+		<publisher>Clover</publisher>
+		<info name="alt_title" value="스카이쟈가"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sky jaguar [clover] (kr).bin" size="32768" crc="e3f260ca" sha1="7eb9e296b674c4cda935e7c5b58eb3dad3aa322f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

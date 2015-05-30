@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
     formats/nes_dsk.c
@@ -8,6 +10,7 @@
 
 
 #include <string.h>
+#include <assert.h>
 
 #include "formats/nes_dsk.h"
 #include "formats/basicdsk.h"

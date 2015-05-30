@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer, R. Belmont
 /*
  * apollo.c - APOLLO DN3500/DN3000 driver
  *
  *  Created on: May 12, 2010
  *      Author: Hans Ostermeyer
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  *  Adapted February 19, 2012 for general MAME/MESS standards by R. Belmont
  *

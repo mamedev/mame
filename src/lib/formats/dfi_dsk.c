@@ -11,18 +11,18 @@
  * Correctly note exact index timing.
  */
 
-#include "emu.h"
+#include "emu.h" // fatalerror
 #include "dfi_dsk.h"
 #include <zlib.h>
 #define NUMBER_OF_MULTIREADS 3
 // threshholds for brickwall windowing
-//define MIN_CLOCKS 65
+//define DFI_MIN_CLOCKS 65
 // number_please apple2 wants 40 min
-#define MIN_CLOCKS 60
+#define DFI_MIN_CLOCKS 60
 //define MAX_CLOCKS 260
-#define MAX_CLOCKS 270
-#define MIN_THRESH (MIN_CLOCKS*(clock_rate/25000000))
-#define MAX_THRESH (MAX_CLOCKS*(clock_rate/25000000))
+#define DFI_MAX_CLOCKS 270
+#define MIN_THRESH (DFI_MIN_CLOCKS*(clock_rate/25000000))
+#define MAX_THRESH (DFI_MAX_CLOCKS*(clock_rate/25000000))
 // constants to help guess clockrate and rpm
 // constant is 25mhz / 6 revolutions per second (360rpm) = 4166667 +- 2.5%
 #define REV25_MIN 4062500
@@ -90,7 +90,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		data.resize(tsize);
 
 		pos += 10; // skip the header, we already read it
-		io_generic_read(io, data, pos, tsize);
+		io_generic_read(io, &data[0], pos, tsize);
 		pos += tsize; // for next time we read, increment to the beginning of next header
 
 		int index_time = 0; // what point the last index happened
@@ -149,7 +149,8 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if(!index_time)
 			index_time = total_time;
 
-		image->set_track_size(track, head, tsize);
+		std::vector<UINT32> &buf = image->get_buffer(track, head);
+		buf.resize(tsize);
 
 		int cur_time = 0;
 		int prev_time = 0;
@@ -162,7 +163,6 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		index_count = 0;
 		//index_polarity = 0;
 		UINT32 mg = floppy_image::MG_A;
-		UINT32 *buf = image->get_buffer(track, head);
 		int tpos = 0;
 		buf[tpos++] = mg;
 		for(int i=0; i<tsize; i++) {
@@ -218,7 +218,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		fprintf(stderr,"\n");
 #endif
 		index_count = 0;
-		image->set_track_size(track, head, tpos);
+		buf.resize(tpos);
 	}
 
 	return true;

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Nicola Salmoria
 /**********************************************************
 
     Jongkyo
@@ -469,6 +471,7 @@ void jongkyo_state::machine_start()
 	save_item(NAME(m_videoram2));
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_mux_data));
+	save_item(NAME(m_flip_screen));
 }
 
 void jongkyo_state::machine_reset()

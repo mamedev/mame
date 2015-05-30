@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves, Brian Troha
 /*************************************************************************
 
     Asuka & Asuka  (+ Taito/Visco games on similar hardware)

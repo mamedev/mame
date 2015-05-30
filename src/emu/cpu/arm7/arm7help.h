@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Steve Ellenoff,R. Belmont,Ryan Holtz
 /* ARM7 core helper Macros / Functions */
 
 /* Macros that need to be defined according to the cpu implementation specific need */

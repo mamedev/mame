@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /********************************************************************
 
 Support for Jupiter Ace .tap cassette images
@@ -7,6 +9,9 @@ For more information see:
 - http://www.jupiter-ace.co.uk/doc_AceTapeFormat.html
 
 ********************************************************************/
+
+#include <assert.h>
+
 #include "ace_tap.h"
 
 

@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese, R. Belmont, Juergen Bunchmueller
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese, R. Belmont, Juergen Buchmueller
 /******************************************************************************
  *
  *  Acorn Archimedes 310

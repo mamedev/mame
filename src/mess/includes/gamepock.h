@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef _GAMEPOCK_H_
 #define _GAMEPOCK_H_
 #include "sound/speaker.h"

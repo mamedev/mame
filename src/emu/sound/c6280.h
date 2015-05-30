@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Charles MacDonald
 #pragma once
 
 #ifndef __C6280_H__

@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
     rgbgen.h
 
     General RGB utilities.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

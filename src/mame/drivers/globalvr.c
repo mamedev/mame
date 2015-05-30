@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Scott Stone
 /* Global VR - PC-Based Hardware
 
 Skeleton only at this time holding info regarding Install Disks

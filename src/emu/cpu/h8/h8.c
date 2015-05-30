@@ -1,39 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /***************************************************************************
 
     h8.h
 
     H8-300 base cpu emulation
 
-****************************************************************************
-
-    Copyright Olivier Galibert
-    All rights reserved.
-
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are
-    met:
-
-        * Redistributions of source code must retain the above copyright
-          notice, this list of conditions and the following disclaimer.
-        * Redistributions in binary form must reproduce the above copyright
-          notice, this list of conditions and the following disclaimer in
-          the documentation and/or other materials provided with the
-          distribution.
-        * Neither the name 'MAME' nor the names of its contributors may be
-          used to endorse or promote products derived from this software
-          without specific prior written permission.
-
-    THIS SOFTWARE IS PROVIDED BY OLIVIER GALIBERT ''AS IS'' AND ANY EXPRESS OR
-    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-    DISCLAIMED. IN NO EVENT SHALL OLIVIER GALIBERT BE LIABLE FOR ANY DIRECT,
-    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -107,15 +79,22 @@ void h8_device::device_start()
 	}
 
 	save_item(NAME(PPC));
-	save_item(NAME(PC));
 	save_item(NAME(NPC));
+	save_item(NAME(PC));
+	save_item(NAME(PIR));
 	save_item(NAME(IR));
 	save_item(NAME(R));
 	save_item(NAME(EXR));
 	save_item(NAME(CCR));
 	save_item(NAME(TMP1));
+	save_item(NAME(TMP2));
 	save_item(NAME(inst_state));
 	save_item(NAME(inst_substate));
+	save_item(NAME(irq_vector));
+	save_item(NAME(taken_irq_vector));
+	save_item(NAME(irq_level));
+	save_item(NAME(taken_irq_level));
+	save_item(NAME(irq_nmi));
 
 	m_icountptr = &icount;
 
@@ -236,12 +215,12 @@ void h8_device::state_export(const device_state_entry &entry)
 {
 }
 
-void h8_device::state_string_export(const device_state_entry &entry, astring &string)
+void h8_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 		if(has_exr)
-			string.printf("%c%c %c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c %c%c%c%c%c%c%c%c",
 							(EXR & EXR_T) ? 'T' : '-',
 							'0' + (EXR & EXR_I),
 							(CCR & F_I)  ? 'I' : '-',
@@ -253,7 +232,7 @@ void h8_device::state_string_export(const device_state_entry &entry, astring &st
 							(CCR & F_V)  ? 'V' : '-',
 							(CCR & F_C)  ? 'C' : '-');
 		else
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 							(CCR & F_I)  ? 'I' : '-',
 							(CCR & F_UI) ? 'u' : '-',
 							(CCR & F_H)  ? 'H' : '-',
@@ -272,7 +251,7 @@ void h8_device::state_string_export(const device_state_entry &entry, astring &st
 	case H8_R6:
 	case H8_R7: {
 		int r = entry.index() - H8_R0;
-		string.printf("%04x %04x", R[r+8], R[r]);
+		strprintf(str, "%04x %04x", R[r + 8], R[r]);
 		break;
 	}
 	}

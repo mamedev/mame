@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, Enik Land
 /*************************************************************************
 
     sega315_5124.h
@@ -91,6 +93,7 @@ public:
 
 protected:
 	void set_display_settings();
+	void set_frame_timing();
 	virtual void update_palette();
 	virtual void cram_write(UINT8 data);
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );

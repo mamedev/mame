@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Roberto Zandona'
 /*************************************************************************************************
 
   Cherry Bonus 2001  (c)2000/2001 Dyna

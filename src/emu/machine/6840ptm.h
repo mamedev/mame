@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /***************************************************************************
 
     Motorola 6840 (PTM)

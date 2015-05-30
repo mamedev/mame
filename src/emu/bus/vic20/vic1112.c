@@ -4,9 +4,6 @@
 
     Commodore VIC-1112 IEEE-488 Interface Cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "vic1112.h"

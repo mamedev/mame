@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /* Super80.c written by Robbbert, 2005-2009. See driver source for documentation. */
 
 #include "includes/super80.h"
@@ -139,7 +141,7 @@ READ8_MEMBER( super80_state::port3e_r )
 WRITE8_MEMBER( super80_state::port3f_w )
 {
 	// m_fdc->58(BIT(data, 0));   5/8 pin not emulated in wd_fdc
-	m_fdc->set_unscaled_clock(BIT(data, 1) ? 2e6 : 1e6); // ENMF pin not emulated in wd_fdc
+	m_fdc->enmf_w(BIT(data,1));
 
 	floppy_image_device *floppy = NULL;
 	if (BIT(data, 2)) floppy = m_floppy0->get_device();

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /*************************************************************************
 
     Flak Attack / MX5000

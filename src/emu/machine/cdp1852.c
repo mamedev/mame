@@ -4,9 +4,6 @@
 
     RCA CDP1852 Byte-Wide Input/Output Port emulation
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "cdp1852.h"

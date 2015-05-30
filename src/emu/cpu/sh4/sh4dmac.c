@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /* SHA3/4 DMA Controller */
 
 #include "emu.h"

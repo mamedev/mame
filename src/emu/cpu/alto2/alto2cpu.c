@@ -1,10 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
  *   Xerox AltoII CPU core
- *
- *   Copyright Juergen Buchmueller <pullmoll@t-online.de>
- *
- *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
 #include "alto2cpu.h"
@@ -1004,15 +1002,15 @@ void alto2_cpu_device::device_start()
 //  for the debugger
 //-------------------------------------------------
 
-void alto2_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void alto2_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 	case A2_TASK:
-		string.printf("%s", task_name(m_task));
+		strprintf(str, "%s", task_name(m_task));
 		break;
 	case STATE_GENFLAGS:
-		string.printf("%s%s%s%s",
+		strprintf(str, "%s%s%s%s",
 						m_aluc0 ? "C":"-",
 						m_laluc0 ? "c":"-",
 						m_shifter == 0 ? "0":"-",

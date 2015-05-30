@@ -1,13 +1,10 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:smf
 /***************************************************************************
 
     vt83c461.h
 
     VIA VT83C461 (IDE Hard Drive controller).
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

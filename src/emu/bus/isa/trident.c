@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * trident.c
  *
@@ -9,21 +11,6 @@
 #include "emu.h"
 #include "trident.h"
 #include "debugger.h"
-
-enum
-{
-	SCREEN_OFF = 0,
-	TEXT_MODE,
-	VGA_MODE,
-	EGA_MODE,
-	CGA_MODE,
-	MONO_MODE,
-	RGB8_MODE,
-	RGB15_MODE,
-	RGB16_MODE,
-	RGB24_MODE,
-	RGB32_MODE
-};
 
 const device_type TRIDENT_VGA = &device_creator<trident_vga_device>;
 
@@ -169,7 +156,8 @@ void trident_vga_device::device_start()
 	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
 	vga.svga_intf.vram_size = 0x200000;
 
-	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
+	vga.memory.resize(vga.svga_intf.vram_size);
+	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
@@ -327,7 +315,7 @@ int trident_vga_device::calculate_clock()
 	m = tri.vid_clock & 0x007f;
 	n = (tri.vid_clock & 0x0f80) >> 7;
 	k = (tri.vid_clock & 0x1000) >> 12;
-	freq = ((double)(m+8) / (double)((n+2)*(pow(2.0,k)))) * 14.31818f; // there is a 14.31818MHz clock on the board
+	freq = ((double)(m+8) / (double)((n+2)*(pow(2.0,k)))) * 14.31818; // there is a 14.31818MHz clock on the board
 
 	return freq * 1000000;
 }

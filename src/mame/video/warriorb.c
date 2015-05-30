@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves
 #include "emu.h"
 #include "includes/warriorb.h"
 
@@ -7,7 +9,6 @@
 
 void warriorb_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs )
 {
-	UINT16 *spriteram = m_spriteram;
 	int offs, data, data2, tilenum, color, flipx, flipy;
 	int x, y, priority, pri_mask;
 
@@ -18,14 +19,14 @@ void warriorb_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	/* pdrawgfx() needs us to draw sprites front to back */
 	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
-		data = spriteram[offs + 1];
+		data = m_spriteram[offs + 1];
 		tilenum = data & 0x7fff;
 
-		data = spriteram[offs + 0];
+		data = m_spriteram[offs + 0];
 		y = (-(data & 0x1ff) - 24) & 0x1ff; /* (inverted y adjusted for vis area) */
 		flipy = (data & 0x200) >> 9;
 
-		data2 = spriteram[offs + 2];
+		data2 = m_spriteram[offs + 2];
 		/* 8,4 also seen in msbyte */
 		priority = (data2 & 0x0100) >> 8; // 1 = low
 
@@ -36,7 +37,7 @@ void warriorb_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 		color = (data2 & 0x7f);
 
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		x = (data & 0x3ff);
 		flipx = (data & 0x400) >> 10;
 
@@ -103,5 +104,5 @@ UINT32 warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-UINT32 warriorb_state::screen_update_warriorb_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, m_tc0100scn_1); }
-UINT32 warriorb_state::screen_update_warriorb_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, m_tc0100scn_2); }
+UINT32 warriorb_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, m_tc0100scn_1); }
+UINT32 warriorb_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, m_tc0100scn_2); }

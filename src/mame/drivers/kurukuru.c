@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca, hap
 /******************************************************************************
 
   KURU KURU PYON PYON

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Nicola Salmoria
 /*******************************************************************************
 
     Input port macros used by many games in mutiple IREM drivers

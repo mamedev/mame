@@ -4,9 +4,6 @@
 
     Xebec S1410 5.25" Winchester Disk Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*
@@ -260,11 +257,11 @@ void s1410_device::ExecCommand()
 		if ((m_disk) && (m_blocks))
 		{
 			dynamic_buffer data(m_sector_bytes);
-			memset(data, 0xc6, m_sector_bytes);
+			memset(&data[0], 0xc6, m_sector_bytes);
 
 			while (m_blocks > 0)
 			{
-				if (!hard_disk_write(m_disk, m_lba, data))
+				if (!hard_disk_write(m_disk, m_lba, &data[0]))
 				{
 					logerror("S1410: HD write error!\n");
 				}

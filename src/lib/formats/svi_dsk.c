@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
     formats/svi_dsk.c
@@ -7,6 +9,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
 #include "svi_dsk.h"
 #include "basicdsk.h"

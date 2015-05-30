@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
 /***************************************************************************
 
         DEC VT100 driver by Miodrag Milanovic
@@ -482,8 +484,8 @@ MACHINE_CONFIG_END
         WP keyboard, has 23-094E2 alt charset rom, 23-093E2 AVO rom.
  *     VT100-WY/WZ - has AVO board preinstalled, WP romset?, English
         WP keyboard, has 23-094E2 alt charset rom, 23-093E2 AVO rom.
-       The WP romset supports english, french, dutch and german languages but
-        will only display text properly in the non-english languages if the
+       The WP romset supports English, French, Dutch and German languages but
+        will only display text properly in the non-English languages if the
         23-094E2 alt charset rom AND the foreign language 23-093E2
         AVO rom are populated.
  *    VT100-NA/NB - ? romset with DECFORM keycaps
@@ -557,20 +559,25 @@ MACHINE_CONFIG_END
        23-095e2,096e2,139e2,140e2 set and probably others as well)
  * The vt100/101/102/103/etc 23-018e2-00 character set rom at location e4 is a 24 pin 2316 mask rom with enables as such: pin 18: CS2; pin 20: /CS1; pin 21: /CS3
  * The optional 23-094e2-00 alternate character set rom at location e9 is a 24 pin 2316 mask rom with enables as such: pin 18: /CS2; pin 20: /CS1; pin 21: /CS3
-       Supposedly the 23-094e2 rom is meant for vt100-WC or -WF systems, (which are french canadian and french respectively), implying that it has european language specific accented characters on it. It is probably used in all the -W* systems.
+       Supposedly the 23-094e2 rom is meant for vt100-WC or -WF systems, (which are French Canadian and French respectively), implying that it has European language specific accented characters on it. It is probably used in all the -W* systems.
        Pin 21 can be jumpered to +5v for this socket at location e9 by removing jumper w4 and inserting jumper w5, allowing a normal 2716 eprom to be used.
  * The optional AVO character set roms (see below) have: pin 18: /CS2*; pin 20: /CS1; pin 21: CS3 hence they match a normal 2716
    *(this is marked on the image as if it was CS2 but the input is tied to gnd meaning it must be /CS2)
 
- * The AVO itself can hold up to four character set roms on it (see http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
+ * The AVO itself can hold up to four roms on it (see http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
    and http://vt100.net/dec/ek-vt1ac-ug-002.pdf )
-   at least eight of these AVO roms were made, and are used as such:
+   and these roms can depending on jumpers be mapped at 0x8000, OR overlay the main code roms at 0x0000-0x1fff!
+   They may even allow banking between the main code roms and the overlay roms, I haven't traced the schematic.
+   At least sixteen of these AVO roms were made, and are used as such:
+   (based on EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf)
  * No roms - normal vt100 system with AVO installed
  * 23-069E2 (location e21) - meant for vt100-wa and -wb 'LA120' 'word processing' systems (the mapping of the rom for this system is different than for the ones below)
- * 23-099E2 (location e21) and 23-100E2 (location e17) - meant for vt132
+ * 23-099E2 (location e21) and 23-100E2 (location e17) - meant for vt132 but only with the OLD vt132 main romset of 095,096,097,098E2
  * 23-093E2 (location e21) - meant for vt100 wc through wz 'foreign language' word processing systems
  * 23-184E2 and 23-185E2 - meant for vt100 with STP printer option board installed, version 1, comes with vt1xx-ac kit
  * 23-186E2 and 23-187E2 - meant for vt100 with STP printer option board installed, version 2, comes with vt1xx-ac kit
+ * 23-224E2, 23-225E2, 23-226E2, 23-227E2 - meant for vt132 but only with the NEW vt132 main romset of 180,181,182,183E2
+ * 23-236E2, 23-237E2, 23-238E2, 23-239E2 - meant for vt132 but only with the NEW vt132 main romset of 180,181,182,183E2, unknown difference to above (PROM VS MASK ROM? same contents?)
  */
 
 /* ROM definition */
@@ -596,7 +603,7 @@ ROM_END
 ROM_START( vt100wp ) // This is from the schematics at http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
 // This is the standard vt100 cpu board, with the ?word processing? romset, included in the VT1xx-CE kit?
 // the vt103 can also use this rom set (-04 and -05 revs have it by default, -05 rev also has the optional alt charset rom by default)
-// NOTE: this is actually the same as the VT132 romset; vt132 has different AVO roms as well.
+// NOTE: this is actually the same as the newer VT132 romset; vt132 has different AVO roms as well.
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-180e2-00.e56", 0x0000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-181e2-00.e52", 0x0800, 0x0800, NO_DUMP)
@@ -618,16 +625,34 @@ ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt13
 // but is pretty much confirmed by page 433 in http://bitsavers.trailing-edge.com/www.computer.museum.uq.edu.au/pdf/EK-VT100-TM-003%20VT100%20Series%20Video%20Terminal%20Technical%20Manual.pdf
 // VT100 board with block serial roms, AVO with special roms, STP, custom firmware with block serial mode
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	// OLDER vt132 romset
+	ROM_LOAD( "23-095e2-00.e56", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-096e2-00.e52", 0x0800, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-097e2-00.e45", 0x1000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-098e2-00.e40", 0x1800, 0x0800, NO_DUMP)
+
+	// NEWER vt132 (and STP?) romset
 	ROM_LOAD( "23-180e2-00.e56", 0x0000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-181e2-00.e52", 0x0800, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-182e2-00.e45", 0x1000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-183e2-00.e40", 0x1800, 0x0800, NO_DUMP)
 
+	// AVO roms for OLDER romset only
 	ROM_REGION(0x1000, "avo", 0)
-	ROM_LOAD( "23-236e2-00.bin", 0x0000, 0x0800, NO_DUMP)
-	ROM_LOAD( "23-237e2-00.bin", 0x0800, 0x0800, NO_DUMP)
-	ROM_LOAD( "23-238e2-00.bin", 0x1000, 0x0800, NO_DUMP)
-	ROM_LOAD( "23-239e2-00.bin", 0x1800, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-099e2-00.e21", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-100e2-00.e17", 0x0800, 0x0800, NO_DUMP)
+	// other 2 sockets are empty
+
+	// AVO roms for NEWER romset only
+	ROM_LOAD( "23-224e2-00.e21", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-225e2-00.e17", 0x0800, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-226e2-00.e15", 0x1000, 0x0800, NO_DUMP) // loc is a guess
+	ROM_LOAD( "23-227e2-00.e13", 0x1800, 0x0800, NO_DUMP) // loc is a guess
+	// alt rev of newer avo roms, tech manual implies above are PROMS below are MASK ROMS? same data?
+	ROM_LOAD( "23-236e2-00.e21", 0x0000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-237e2-00.e17", 0x0800, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-238e2-00.e15", 0x1000, 0x0800, NO_DUMP) // loc is a guess
+	ROM_LOAD( "23-239e2-00.e13", 0x1800, 0x0800, NO_DUMP) // loc is a guess
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
@@ -636,7 +661,7 @@ ROM_END
 
 ROM_START( vt100stp ) // This is from the VT180 technical manual at http://www.bitsavers.org/pdf/dec/terminal/vt180/EK-VT18X-TM-001_VT180_Technical_Man_Feb83.pdf
 // This is the standard vt100 cpu board, but with the rom set included with the VT1xx-AC kit
-// which is only used when the STP 'printer port expansion' card is installed into the terminal board.
+// which is only used when the part 54-14260-00 STP 'printer port expansion' card is installed into the terminal board.
 // Or as http://bitsavers.trailing-edge.com/www.computer.museum.uq.edu.au/pdf/EK-VT100-TM-003%20VT100%20Series%20Video%20Terminal%20Technical%20Manual.pdf
 // on page 433: VT100 WC or WK uses these as well.
 // This romset adds the Set-up C page to the setup menu (press keypad 5 twice once you hit set-up)
@@ -720,8 +745,8 @@ ROM_END
 
 ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schematics are not scanned
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with a
-// special "GPO" ReGIS cpu+ram card installed which provides a framebuffer, text rotation, custom ram fonts, and many other features.
-// Comes with a custom STP card as well.
+// special "GPO" ReGIS cpu+ram card 54-14277 installed which provides a framebuffer, text rotation, custom ram fonts, and many other features.
+// Comes with a custom 'dumb' STP card 54-14275 as well.
 // VT125 upgrade kit (upgrade from vt100 or vt105) was called VT1xx-CB or CL
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-061e2-00.e56", 0x0000, 0x0800, CRC(3dae97ff) SHA1(e3437850c33565751b86af6c2fe270a491246d15)) // version 2 1980 'later rom'
@@ -736,7 +761,7 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 	// "GPO" aka vt125 "mono board" roms and proms
 	ROM_REGION(0x10000, "monocpu", ROMREGION_ERASEFF) // roms for the 8085 subcpu
 	ROM_LOAD( "23-043e4-00.e22", 0x0000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
-	ROM_LOAD( "23-043e4-00.e23", 0x2000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
+	ROM_LOAD( "23-044e4-00.e23", 0x2000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
 	ROM_LOAD( "23-045e4-00.e24", 0x4000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
 	// E25 socket is empty
 
@@ -753,12 +778,13 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 	ROM_LOAD( "23-070b1.e71", 0x0300, 0x0100, NO_DUMP) // 82s135, vector prom
 	ROM_LOAD( "23-582a2.e93", 0x0400, 0x0100, NO_DUMP) // 82s129, ras/erase prom
 ROM_END
+#endif
 
 ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
 // does not have integrated STP or AVO populated
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-???e4-00.e71", 0x0000, 0x2000, NO_DUMP) // rom is unique to vt101
+	ROM_LOAD( "23-028e4-00.e71", 0x0000, 0x2000, CRC(fccce02c) SHA1(f3e3e93a857443685b816cab4fb52e34c0bc72b1)) // rom is unique to vt101; "CN55004N 8232 // DEC TP03 // 23-028E4-00" 24-pin mask rom (mc68764 pinout)
 	//e69 socket is empty/unpopulated on vt101?
 	//e67 socket is empty/unpopulated on vt101?
 
@@ -766,15 +792,20 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
-#endif
+
 
 ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
 // has integrated STP and AVO both populated
 // ROMS have the set up page C in them
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb)) // shared with vt131
-	ROM_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b)) // shared with vt131
+	ROM_DEFAULT_BIOS( "vt102" )
+	ROM_SYSTEM_BIOS( 0, "vt102o", "VT102 older roms" )
+	ROMX_LOAD( "23-042e4-00.e71", 0x0000, 0x2000, CRC(e8aa006c) SHA1(8ac2a84a8d2a9fa0c6cd583ae35e4c21f863b45b), ROM_BIOS(1)) // shared with vt131
+	ROMX_LOAD( "23-041e4-00.e69", 0x8000, 0x2000, CRC(b11d331e) SHA1(8b0f885c7e032d1d709e3913d279d6950bbd4b6a), ROM_BIOS(1)) // shared with vt131
+	ROM_SYSTEM_BIOS( 1, "vt102", "VT102 newer roms" )
+	ROMX_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb), ROM_BIOS(2)) // shared with vt131
+	ROMX_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31c5374b), ROM_BIOS(2)) // shared with vt131
 	//e67 socket is empty but populated on vt102
 
 	ROM_REGION(0x1000, "chargen", 0)
@@ -820,7 +851,7 @@ ROM_END
 COMP( 1978, vt100,    0,      0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100",GAME_NOT_WORKING)
 //COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100-Wx", GAME_NOT_WORKING)
 //COMP( 1978, vt100stp, vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", GAME_NOT_WORKING)
-//COMP( 1981, vt101,    0,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT101", GAME_NOT_WORKING)
+COMP( 1981, vt101,    vt102,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT101", GAME_NOT_WORKING)
 COMP( 1981, vt102,    0,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT102", GAME_NOT_WORKING)
 //COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT103", GAME_NOT_WORKING)
 COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT105", GAME_NOT_WORKING)

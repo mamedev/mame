@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   macadb.c - handles various aspects of ADB on the Mac.
@@ -427,7 +429,7 @@ void mac_state::adb_talk()
 							{
 								if(m_adb_keybuf_start == m_adb_keybuf_end)
 								{
-	//								printf("%s: buffer empty\n", __func__);
+	//                              printf("%s: buffer empty\n", __func__);
 									m_adb_buffer[0] = 0xff;
 									m_adb_buffer[1] = 0xff;
 								}

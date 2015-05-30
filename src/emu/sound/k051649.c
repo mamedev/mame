@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Konami 051649 - SCC1 sound as used in Haunted Castle, City Bomber
@@ -119,7 +121,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			const signed char *w = voice[j].waveram;
 			int v=voice[j].volume * voice[j].key;
 			int c=voice[j].counter;
-			int step = ((INT64)m_mclock * (1 << FREQ_BITS)) / (float)((voice[j].frequency + 1) * 16 * (m_rate / 32)) + 0.5;
+			int step = ((INT64)m_mclock * (1 << FREQ_BITS)) / (float)((voice[j].frequency + 1) * 16 * (m_rate / 32)) + 0.5f;
 
 			mix = m_mixer_buffer;
 

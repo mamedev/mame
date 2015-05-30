@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 /**********************************************************************
 
     8 bit latch interface and emulation

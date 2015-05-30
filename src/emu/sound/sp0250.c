@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
    GI SP0250 digital LPC sound synthesizer
 

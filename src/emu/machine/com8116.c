@@ -4,9 +4,6 @@
 
     COM8116 Dual Baud Rate Generator (Programmable Divider) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "com8116.h"

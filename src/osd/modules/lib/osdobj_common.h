@@ -14,6 +14,12 @@
 #define __OSDOBJ_COMMON__
 
 #include "osdepend.h"
+#include "modules/osdmodule.h"
+#include "modules/font/font_module.h"
+#include "modules/sound/sound_module.h"
+#include "modules/debugger/debug_module.h"
+#include "modules/netdev/netdev_module.h"
+#include "modules/midi/midi_module.h"
 #include "cliopts.h"
 
 //============================================================
@@ -24,6 +30,8 @@
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 #define OSDOPTION_DEBUGGER              "debugger"
+#define OSDOPTION_DEBUGGER_FONT         "debugger_font"
+#define OSDOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
 #define OSDOPTION_WATCHDOG              "watchdog"
 
 #define OSDOPTION_MULTITHREADING        "multithreading"
@@ -49,84 +57,100 @@
 #define OSDOPTION_SOUND                 "sound"
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
 
+#define OSDOPTION_FILTER                "filter"
+#define OSDOPTION_PRESCALE              "prescale"
+
+#define OSDOPTION_SHADER_MAME           "glsl_shader_mame"
+#define OSDOPTION_SHADER_SCREEN         "glsl_shader_screen"
+#define OSDOPTION_GLSL_FILTER           "gl_glsl_filter"
+#define OSDOPTION_GL_GLSL               "gl_glsl"
+#define OSDOPTION_GL_PBO                "gl_pbo"
+#define OSDOPTION_GL_VBO                "gl_vbo"
+#define OSDOPTION_GL_NOTEXTURERECT      "gl_notexturerect"
+#define OSDOPTION_GL_FORCEPOW2TEXTURE   "gl_forcepow2texture"
+
+#define OSDOPTION_AUDIO_OUTPUT          "audio_output"
+#define OSDOPTION_AUDIO_EFFECT          "audio_effect"
+
 #define OSDOPTVAL_AUTO                  "auto"
+#define OSDOPTVAL_NONE                  "none"
+
+
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-/* FIXME: core_options inherits from osd_options. This will force any
- * future osd implementation to use the options below. Actually, these
- * options are *private* to the osd_core. This object should actually be an
- * accessor object. Later ...
- */
-
-/* FIXME: core_options inherits from osd_options. This will force any
- * future osd implementation to use the options below. Actually, these
- * options are *private* to the osd_core. This object should actually be an
- * accessor object. Later ...
- */
-
 class osd_options : public cli_options
 {
 public:
-    // construction/destruction
-    osd_options();
+	// construction/destruction
+	osd_options();
 
-    // debugging options
-    const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
-    int watchdog() const { return int_value(OSDOPTION_WATCHDOG); }
+	// debugging options
+	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
+	const char *debugger_font() const { return value(OSDOPTION_DEBUGGER_FONT); }
+	float debugger_font_size() const { return float_value(OSDOPTION_DEBUGGER_FONT_SIZE); }
+	int watchdog() const { return int_value(OSDOPTION_WATCHDOG); }
 
-    // performance options
-    bool multithreading() const { return bool_value(OSDOPTION_MULTITHREADING); }
-    const char *numprocessors() const { return value(OSDOPTION_NUMPROCESSORS); }
-    int bench() const { return int_value(OSDOPTION_BENCH); }
+	// performance options
+	bool multithreading() const { return bool_value(OSDOPTION_MULTITHREADING); }
+	const char *numprocessors() const { return value(OSDOPTION_NUMPROCESSORS); }
+	int bench() const { return int_value(OSDOPTION_BENCH); }
 
-    // video options
-    const char *video() const { return value(OSDOPTION_VIDEO); }
-    int numscreens() const { return int_value(OSDOPTION_NUMSCREENS); }
-    bool window() const { return bool_value(OSDOPTION_WINDOW); }
-    bool maximize() const { return bool_value(OSDOPTION_MAXIMIZE); }
-    bool keep_aspect() const { return bool_value(OSDOPTION_KEEPASPECT); }
-    bool uneven_stretch() const { return bool_value(OSDOPTION_UNEVENSTRETCH); }
-    bool wait_vsync() const { return bool_value(OSDOPTION_WAITVSYNC); }
-    bool sync_refresh() const { return bool_value(OSDOPTION_SYNCREFRESH); }
+	// video options
+	const char *video() const { return value(OSDOPTION_VIDEO); }
+	int numscreens() const { return int_value(OSDOPTION_NUMSCREENS); }
+	bool window() const { return bool_value(OSDOPTION_WINDOW); }
+	bool maximize() const { return bool_value(OSDOPTION_MAXIMIZE); }
+	bool keep_aspect() const { return bool_value(OSDOPTION_KEEPASPECT); }
+	bool uneven_stretch() const { return bool_value(OSDOPTION_UNEVENSTRETCH); }
+	bool wait_vsync() const { return bool_value(OSDOPTION_WAITVSYNC); }
+	bool sync_refresh() const { return bool_value(OSDOPTION_SYNCREFRESH); }
 
-    // per-window options
-    const char *screen() const { return value(OSDOPTION_SCREEN); }
-    const char *aspect() const { return value(OSDOPTION_ASPECT); }
-    const char *resolution() const { return value(OSDOPTION_RESOLUTION); }
-    const char *view() const { return value(OSDOPTION_VIEW); }
-    const char *screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SCREEN, index)); }
-    const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_ASPECT, index)); }
-    const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_RESOLUTION, index)); }
-    const char *view(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_VIEW, index)); }
+	// per-window options
+	const char *screen() const { return value(OSDOPTION_SCREEN); }
+	const char *aspect() const { return value(OSDOPTION_ASPECT); }
+	const char *resolution() const { return value(OSDOPTION_RESOLUTION); }
+	const char *view() const { return value(OSDOPTION_VIEW); }
+	const char *screen(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SCREEN, index);  return value(temp.c_str()); }
+	const char *aspect(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_ASPECT, index); return value(temp.c_str()); }
+	const char *resolution(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_RESOLUTION, index); return value(temp.c_str()); }
+	const char *view(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_VIEW, index); return value(temp.c_str()); }
 
-    // full screen options
-    bool switch_res() const { return bool_value(OSDOPTION_SWITCHRES); }
+	// full screen options
+	bool switch_res() const { return bool_value(OSDOPTION_SWITCHRES); }
 
-    // sound options
-    const char *sound() const { return value(OSDOPTION_SOUND); }
-    int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
+	// sound options
+	const char *sound() const { return value(OSDOPTION_SOUND); }
+	int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
+
+	// video options
+	bool filter() const { return bool_value(OSDOPTION_FILTER); }
+	int prescale() const { return int_value(OSDOPTION_PRESCALE); }
+
+	// OpenGL specific options
+	bool gl_force_pow2_texture() const { return bool_value(OSDOPTION_GL_FORCEPOW2TEXTURE); }
+	bool gl_no_texture_rect() const { return bool_value(OSDOPTION_GL_NOTEXTURERECT); }
+	bool gl_vbo() const { return bool_value(OSDOPTION_GL_VBO); }
+	bool gl_pbo() const { return bool_value(OSDOPTION_GL_PBO); }
+	bool gl_glsl() const { return bool_value(OSDOPTION_GL_GLSL); }
+	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
+	const char *shader_mame(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SHADER_MAME, index);  return value(temp.c_str()); }
+	const char *shader_screen(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SHADER_SCREEN, index);  return value(temp.c_str()); }
+
+	// CoreAudio specific options
+	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
+	const char *audio_effect(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_AUDIO_EFFECT, index); return value(temp.c_str()); }
 
 private:
-    static const options_entry s_option_entries[];
+	static const options_entry s_option_entries[];
 };
-
-class osd_sound_interface;
-class osd_debugger_interface;
-
-// a osd_sound_type is simply a pointer to its alloc function
-typedef osd_sound_interface *(*osd_sound_type)(const osd_interface &osd, running_machine &machine);
-
-// a osd_sound_type is simply a pointer to its alloc function
-typedef osd_debugger_interface *(*osd_debugger_type)(const osd_interface &osd);
-
 
 // ======================> osd_interface
 
 // description of the currently-running machine
-class osd_common_t : public osd_interface
+class osd_common_t : public osd_interface, osd_output
 {
 public:
 	// construction/destruction
@@ -160,117 +184,94 @@ public:
 	// video overridables
 	virtual void *get_slider_list();
 
-    // command option overrides
-    virtual bool execute_command(const char *command);
+	// command option overrides
+	virtual bool execute_command(const char *command);
+
+	osd_font *font_alloc() { return m_font_module->font_alloc(); }
+
+	osd_midi_device *create_midi_device() { return m_midi->create_midi_device(); }
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION
 
-    // getters
-    running_machine &machine() { assert(m_machine != NULL); return *m_machine; }
+	// getters
+	running_machine &machine() { assert(m_machine != NULL); return *m_machine; }
 
 
-    virtual void debugger_update();
-    virtual void debugger_exit();
-    virtual void debugger_register();
+	virtual void debugger_update();
 
-    virtual void init_subsystems();
+	virtual void init_subsystems();
 
-    virtual bool video_init();
-    virtual void video_register();
-    virtual bool window_init();
+	virtual bool video_init();
+	virtual void video_register();
+	virtual bool window_init();
 
-    virtual bool sound_init();
-    virtual void sound_register();
+	virtual void input_resume();
+	virtual bool output_init();
 
-    virtual void input_resume();
-    virtual bool output_init();
-    virtual bool network_init();
-    virtual bool midi_init();
+	virtual void exit_subsystems();
+	virtual void video_exit();
+	virtual void window_exit();
+	virtual void input_exit();
+	virtual void output_exit();
 
-    virtual void exit_subsystems();
-    virtual void video_exit();
-    virtual void window_exit();
-    virtual void sound_exit();
-    virtual void input_exit();
-    virtual void output_exit();
-    virtual void network_exit();
-    virtual void midi_exit();
+	virtual void osd_exit();
 
-    virtual void osd_exit();
+	virtual void video_options_add(const char *name, void *type);
 
-    virtual void video_options_add(const char *name, void *type);
-    virtual void sound_options_add(const char *name, osd_sound_type type);
-    virtual void debugger_options_add(const char *name, osd_debugger_type type);
+	osd_options &options() { return m_options; }
 
-    osd_options &options() { return m_options; }
+	// osd_output interface ...
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args);
 
 protected:
-    virtual bool input_init();
-    virtual void input_pause();
+	virtual bool input_init();
+	virtual void input_pause();
 
 private:
 	// internal state
 	running_machine *   m_machine;
 	osd_options& m_options;
 
-	void update_option(const char * key, dynamic_array<const char *> &values);
+	osd_module_manager m_mod_man;
+	font_module *m_font_module;
+
+	void update_option(const char * key, std::vector<const char *> &values);
+	// FIXME: should be elsewhere
+	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
+	{
+		std::string opt_val = opts.value(opt_name.c_str());
+		if (opt_val.compare("auto")==0)
+			opt_val = "";
+		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))
+		{
+			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val.c_str(), opt_name.c_str());
+			opt_val = "";
+		}
+		return m_mod_man.select_module(opt_name.c_str(), opt_val.c_str());
+	}
+
+	template<class C>
+	C select_module_options(const core_options &opts, const std::string &opt_name)
+	{
+		return dynamic_cast<C>(select_module_options(opts, opt_name));
+	}
 
 protected:
-	osd_sound_interface* m_sound;
-	osd_debugger_interface* m_debugger;
+	sound_module* m_sound;
+	debug_module* m_debugger;
+	midi_module* m_midi;
 private:
 	//tagmap_t<osd_video_type>  m_video_options;
-	dynamic_array<const char *> m_video_names;
-	tagmap_t<osd_sound_type>  m_sound_options;
-	dynamic_array<const char *> m_sound_names;
-	tagmap_t<osd_debugger_type>  m_debugger_options;
-	dynamic_array<const char *> m_debugger_names;
+	std::vector<const char *> m_video_names;
 };
 
-
-class osd_sound_interface
-{
-public:
-	// construction/destruction
-	osd_sound_interface(const osd_interface &osd, running_machine &machine);
-	virtual ~osd_sound_interface();
-
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) = 0;
-	virtual void set_mastervolume(int attenuation) = 0;
-protected:
-	const osd_interface& m_osd;
-	running_machine& m_machine;
-};
-
-// this template function creates a stub which constructs a sound subsystem
-template<class _DeviceClass>
-osd_sound_interface *osd_sound_creator(const osd_interface &osd, running_machine &machine)
-{
-	return global_alloc(_DeviceClass(osd, machine));
-}
-
-class osd_debugger_interface
-{
-public:
-	// construction/destruction
-	osd_debugger_interface(const osd_interface &osd);
-	virtual ~osd_debugger_interface();
-
-	virtual void init_debugger(running_machine &machine) = 0;
-	virtual void wait_for_debugger(device_t &device, bool firststop) = 0;
-	virtual void debugger_update() = 0;
-	virtual void debugger_exit() = 0;
-
-protected:
-	const osd_interface& m_osd;
-};
 
 // this template function creates a stub which constructs a debugger
 template<class _DeviceClass>
-osd_debugger_interface *osd_debugger_creator(const osd_interface &osd)
+debug_module *osd_debugger_creator()
 {
-	return global_alloc(_DeviceClass(osd));
+	return global_alloc(_DeviceClass());
 }
 
 #endif  /* __OSDOBJ_COMMON_H__ */

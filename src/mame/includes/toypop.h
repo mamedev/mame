@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Edgardo E. Contini Salvan
 #include "machine/namcoio.h"
 #include "sound/namco.h"
 

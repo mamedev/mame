@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "xmlfile.h"
 #include <ctype.h>
 #include <expat.h>
@@ -509,7 +511,7 @@ xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name,
 xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *name, float value)
 {
 	char buffer[100];
-	sprintf(buffer, "%f", value);
+	sprintf(buffer, "%f", (double) value);
 	return xml_set_attribute(node, name, buffer);
 }
 
@@ -696,7 +698,7 @@ static void expat_data(void *data, const XML_Char *s, int len)
 	if ((*curnode)->value != NULL)
 	{
 		memcpy(newdata, (*curnode)->value, oldlen);
-		free((*curnode)->value);
+		free((void *)(*curnode)->value);
 	}
 	(*curnode)->value = newdata;
 

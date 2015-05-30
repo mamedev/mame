@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca
 /************************************************************************
 
   Italian Gambling games based on Mitsubishi (Renesas) M16C MCU family.

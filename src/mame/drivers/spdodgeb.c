@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Paul Hampson, Nicola Salmoria
 /***************************************************************************
 
 Super Dodge Ball / Nekketsu Koukou Dodgeball Bu
@@ -378,11 +380,6 @@ static GFXDECODE_START( spdodgeb )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(spdodgeb_state::irqhandler)
-{
-	m_audiocpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void spdodgeb_state::machine_reset()
 {
 	m_toggle = 0;
@@ -421,7 +418,7 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(spdodgeb_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

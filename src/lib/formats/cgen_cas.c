@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /********************************************************************
 
 Support for EACA Colour Genie .cas cassette images
@@ -6,6 +8,8 @@ Current state: Not working. Only the sync signal and 0x66 byte get
                recognized.
 
 ********************************************************************/
+
+#include <assert.h>
 
 #include "formats/cgen_cas.h"
 

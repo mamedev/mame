@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /*****************************************************************************************
 
     NES Cart PCBs Emulation
@@ -312,6 +314,8 @@ static const nes_pcb pcb_list[] =
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
+	{ "coolboy",          UNSUPPORTED_BOARD },
+	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "dance2k",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
@@ -586,20 +590,20 @@ void nes_cart_slot_device::call_load_pcb()
 		// and we use the info from xml here to prepare a default NVRAM
 		dynamic_buffer default_nvram(tot_size);
 		if (battery_size)
-			memcpy(default_nvram, get_software_region("bwram"), battery_size);
+			memcpy(&default_nvram[0], get_software_region("bwram"), battery_size);
 		if (mapper_sram_size)
-			memset(default_nvram + battery_size, 0, mapper_sram_size);
+			memset(&default_nvram[battery_size], 0, mapper_sram_size);
 
 		// load battery (using default if no battery exists)
-		battery_load(temp_nvram, tot_size, default_nvram);
+		battery_load(&temp_nvram[0], tot_size, &default_nvram[0]);
 
 		// copy battery into PCB arrays
 		if (battery_size)
 		{
 			m_cart->battery_alloc(battery_size);
-			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
+			memcpy(m_cart->get_battery_base(), &temp_nvram[0], battery_size);
 		}
 		if (mapper_sram_size)
-			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, mapper_sram_size);
+			memcpy(m_cart->get_mapper_sram_base(), &temp_nvram[battery_size], mapper_sram_size);
 	}
 }

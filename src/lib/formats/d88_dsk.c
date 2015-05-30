@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*
  *   D77 and D88 disk images
  *
@@ -27,7 +29,8 @@
  *
  */
 
-#include "emu.h"
+	#include <assert.h>
+
 #include "flopimg.h"
 #include "imageutl.h"
 
@@ -390,7 +393,6 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 
 *********************************************************************/
 
-#include "emu.h"
 #include "d88_dsk.h"
 
 d88_format::d88_format()

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Paul Hampson, Nicola Salmoria
 /*************************************************************************
 
     Super Dodge Ball hardware
@@ -64,7 +66,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcu63705_update_inputs();
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu63705_busy_r);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	void spd_adpcm_int(msm5205_device *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_2);

@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     VTech Laser/VZ Memory Expansions
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
 ***************************************************************************/
 
@@ -33,7 +32,7 @@ protected:
 	virtual void device_reset();
 
 private:
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 };
 
 // ======================> laser210_16k_device
@@ -49,7 +48,7 @@ protected:
 	virtual void device_reset();
 
 private:
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 };
 
 // ======================> laser310_16k_device
@@ -65,7 +64,7 @@ protected:
 	virtual void device_reset();
 
 private:
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 };
 
 // ======================> laser_64k_device
@@ -83,7 +82,7 @@ protected:
 	virtual void device_reset();
 
 private:
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 };
 
 // device type definition

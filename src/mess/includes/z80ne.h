@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Lavarone
 /*****************************************************************************
  *
  * includes/z80ne.h
@@ -15,7 +17,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 /***************************************************************************
     CONSTANTS
@@ -36,7 +38,7 @@ enum z80netape_speed
 	TAPE_1200BPS = 1200 /* 1200 bps */
 };
 
-struct cass_data_t {
+struct z80ne_cass_data_t {
 	struct {
 		int length;     /* time cassette level is at input.level */
 		int level;      /* cassette level */
@@ -72,6 +74,10 @@ public:
 		m_ay31015(*this, "ay_3_1015"),
 		m_lx388_kr2376(*this, "lx388_kr2376"),
 		m_maincpu(*this, "z80ne"),
+		m_floppy0(*this, "wd1771:0"),
+		m_floppy1(*this, "wd1771:1"),
+		m_floppy2(*this, "wd1771:2"),
+		m_floppy3(*this, "wd1771:3"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
 		m_wd1771(*this, "wd1771"),
@@ -97,6 +103,8 @@ public:
 		m_io_modifiers(*this, "MODIFIERS"),
 		m_io_config(*this, "CONFIG") { }
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats)
+
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<UINT8> m_videoram;
 	required_device<ay31015_device> m_ay31015;
@@ -108,7 +116,7 @@ public:
 	int m_reset_delay_counter;
 	UINT8 m_lx385_ctrl;
 	emu_timer *m_cassette_timer;
-	cass_data_t m_cass_data;
+	z80ne_cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
 	DECLARE_READ8_MEMBER(lx383_r);
 	DECLARE_WRITE8_MEMBER(lx383_w);
@@ -146,9 +154,13 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	optional_device<floppy_connector> m_floppy2;
+	optional_device<floppy_connector> m_floppy3;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
-	optional_device<fd1771_device> m_wd1771;
+	optional_device<fd1771_t> m_wd1771;
 	required_memory_region m_region_z80ne;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;

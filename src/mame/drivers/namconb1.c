@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /*
 Namco System NB-1
 
@@ -1124,7 +1126,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_C352_ADD("c352", MASTER_CLOCK/2)
+	MCFG_C352_ADD("c352", MASTER_CLOCK/2, C352_DIVIDER_288)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -1161,7 +1163,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_C352_ADD("c352", MASTER_CLOCK/2)
+	MCFG_C352_ADD("c352", MASTER_CLOCK/2, C352_DIVIDER_288)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)

@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 #include "sound/msm5232.h"
 
 class nycaptor_state : public driver_device
@@ -25,8 +27,8 @@ public:
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
-	dynamic_array<UINT8> m_paletteram;
-	dynamic_array<UINT8> m_paletteram_ext;
+	std::vector<UINT8> m_paletteram;
+	std::vector<UINT8> m_paletteram_ext;
 	UINT8 m_gfxctrl;
 	UINT8 m_char_bank;
 	UINT8 m_palette_bank;

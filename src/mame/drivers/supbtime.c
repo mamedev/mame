@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
   Super Burger Time     (c) 1990 Data East Corporation (DE-0343)

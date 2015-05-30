@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Sega CD / Mega CD */
 
 #include "cpu/m68000/m68000.h"
@@ -56,7 +58,7 @@ public:
 	required_shared_ptr<UINT16> m_font_bits;
 
 	// can't use a memshare because it's 8-bit RAM in a 16-bit address space
-	dynamic_array<UINT8> m_backupram;
+	std::vector<UINT8> m_backupram;
 
 	UINT8 m_font_color;
 

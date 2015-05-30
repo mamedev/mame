@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski
 #ifndef __TAITO8741__
 #define __TAITO8741__
 

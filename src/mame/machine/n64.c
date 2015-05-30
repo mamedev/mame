@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /* machine/n64.c - contains N64 hardware emulation shared between MAME and MESS */
 
 #include "emu.h"
@@ -18,11 +20,13 @@ const device_type N64PERIPH = &device_creator<n64_periphs>;
 
 
 
-
 n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, N64PERIPH, "N64 Periphal Chips", tag, owner, clock, "n64_periphs", __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_nvram_image(NULL)
+	, dd_present(false)
+	, disk_present(false)
+	, cart_present(false)
 {
 }
 
@@ -171,7 +175,6 @@ void n64_periphs::device_reset()
 	pi_bsd_dom2_rls = 0;
 	pi_dma_dir = 0;
 
-	dd_int = 0;
 	memset(dd_buffer, 0, sizeof(dd_buffer));
 	memset(dd_sector_data, 0, sizeof(dd_sector_data));
 	memset(dd_ram_seq_data, 0, sizeof(dd_ram_seq_data));
@@ -183,6 +186,10 @@ void n64_periphs::device_reset()
 	dd_seq_status_reg = 0;
 	dd_seq_ctrl_reg = 0;
 	dd_int = 0;
+	dd_bm_reset_held = false;
+	dd_write = false;
+	dd_zone = 0;
+	dd_track_offset = 0;
 
 	memset(ri_regs, 0, sizeof(ri_regs));
 
@@ -217,7 +224,6 @@ void n64_periphs::device_reset()
 	pif_ram[0x25] = 0x00;
 	pif_ram[0x26] = 0x3f;
 	pif_ram[0x27] = 0x3f;
-	dd_present = false;
 	cic_type=2;
 	mem_map->write_dword(0x00000318, 0x800000);
 
@@ -227,7 +233,6 @@ void n64_periphs::device_reset()
 		pif_ram[0x25] = 0x08;
 		pif_ram[0x26] = 0xdd;
 		pif_ram[0x27] = 0x3f;
-		dd_present = true;
 		cic_type=0xd;
 	}
 	else if (boot_checksum == U64(0x000000cffb830843) || boot_checksum == U64(0x000000d0027fdf31))
@@ -266,6 +271,13 @@ void n64_periphs::device_reset()
 		pif_ram[0x26] = 0x85;
 		pif_ram[0x27] = 0x3f;
 		cic_type=6;
+	}
+
+	// Mouse X2/Y2 for delta
+	for (int i = 0; i < 4; i++)
+	{
+		mouse_x2[i] = 0;
+		mouse_y2[i] = 0;
 	}
 }
 
@@ -650,21 +662,21 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 		case 0x20/4:        // DP_CMD_START
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetStartReg();
+			ret = state->m_rdp->get_start();
 			break;
 		}
 
 		case 0x24/4:        // DP_CMD_END
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetEndReg();
+			ret = state->m_rdp->get_end();
 			break;
 		}
 
 		case 0x28/4:        // DP_CMD_CURRENT
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetCurrentReg();
+			ret = state->m_rdp->get_current();
 			break;
 		}
 
@@ -676,13 +688,13 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 		case 0x2c/4:        // DP_CMD_STATUS
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetStatusReg();
+			ret = state->m_rdp->get_status();
 			break;
 		}
 
 		case 0x30/4:        // DP_CMD_CLOCK
 		{
-			if(!(machine().driver_data<n64_state>()->m_rdp->GetStatusReg() & DP_STATUS_FREEZE))
+			if(!(machine().driver_data<n64_state>()->m_rdp->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
 				ret = dp_clock;
@@ -896,24 +908,24 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			ret = state->m_rdp->GetStartReg();
+			ret = state->m_rdp->get_start();
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			ret = state->m_rdp->GetEndReg();
+			ret = state->m_rdp->get_end();
 			break;
 
 		case 0x08/4:        // DP_CURRENT_REG
-			ret = state->m_rdp->GetCurrentReg();
+			ret = state->m_rdp->get_current();
 			break;
 
 		case 0x0c/4:        // DP_STATUS_REG
-			ret = state->m_rdp->GetStatusReg();
+			ret = state->m_rdp->get_status();
 			break;
 
 		case 0x10/4:        // DP_CLOCK_REG
 		{
-			if(!(state->m_rdp->GetStatusReg() & DP_STATUS_FREEZE))
+			if(!(state->m_rdp->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
 				ret = dp_clock;
@@ -936,20 +948,20 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			state->m_rdp->SetStartReg(data);
-			state->m_rdp->SetCurrentReg(state->m_rdp->GetStartReg());
+			state->m_rdp->set_start(data);
+			state->m_rdp->set_current(state->m_rdp->get_start());
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			state->m_rdp->SetEndReg(data);
+			state->m_rdp->set_end(data);
 			g_profiler.start(PROFILER_USER1);
-			state->m_rdp->ProcessList();
+			state->m_rdp->process_command_list();
 			g_profiler.stop();
 			break;
 
 		case 0x0c/4:        // DP_STATUS_REG
 		{
-			UINT32 current_status = state->m_rdp->GetStatusReg();
+			UINT32 current_status = state->m_rdp->get_status();
 			if (data & 0x00000001)  current_status &= ~DP_STATUS_XBUS_DMA;
 			if (data & 0x00000002)  current_status |= DP_STATUS_XBUS_DMA;
 			if (data & 0x00000004)  current_status &= ~DP_STATUS_FREEZE;
@@ -957,7 +969,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			if (data & 0x00000010)  current_status &= ~DP_STATUS_FLUSH;
 			if (data & 0x00000020)  current_status |= DP_STATUS_FLUSH;
 			if (data & 0x00000200)  dp_clock = 0;
-			state->m_rdp->SetStatusReg(current_status);
+			state->m_rdp->set_status(current_status);
 			break;
 		}
 
@@ -1013,7 +1025,7 @@ void n64_periphs::vi_recalculate_resolution()
 	if (height > 480)
 		height = 480;
 
-	state->m_rdp->MiscState.FBHeight = height;
+	state->m_rdp->m_misc_state.m_fb_height = height;
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
@@ -1110,7 +1122,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 				vi_recalculate_resolution();
 			}
 			vi_width = data;
-			state->m_rdp->MiscState.FBWidth = data;
+			state->m_rdp->m_misc_state.m_fb_width = data;
 			break;
 
 		case 0x0c/4:        // VI_INTR_REG
@@ -1374,13 +1386,26 @@ TIMER_CALLBACK_MEMBER(n64_periphs::pi_dma_callback)
 
 void n64_periphs::pi_dma_tick()
 {
+	bool update_bm = false;
 	UINT16 *cart16;
 	UINT16 *dram16 = (UINT16*)rdram;
 
 	UINT32 cart_addr = (pi_cart_addr & 0x0fffffff) >> 1;
 	UINT32 dram_addr = (pi_dram_addr & 0x007fffff) >> 1;
 
-	if((cart_addr & 0x04000000) == 0x04000000)
+	if(pi_cart_addr == 0x05000000 && dd_present)
+	{
+		update_bm = true;
+		cart16 = (UINT16*)dd_buffer;
+		cart_addr = (pi_cart_addr & 0x000003ff) >> 1;
+	}
+	else if(pi_cart_addr == 0x05000400 && dd_present)
+	{
+		update_bm = true;
+		cart16 = (UINT16*)dd_sector_data;
+		cart_addr = (pi_cart_addr & 0x000000ff) >> 1;
+	}
+	else if((cart_addr & 0x04000000) == 0x04000000)
 	{
 		cart16 = (UINT16*)n64_sram;
 		cart_addr = (pi_cart_addr & 0x0001ffff) >> 1;
@@ -1399,6 +1424,7 @@ void n64_periphs::pi_dma_tick()
 	if(pi_dma_dir == 1)
 	{
 		UINT32 dma_length = pi_wr_len + 1;
+		//logerror("PI Write, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_wr_len);
 		if (dma_length & 7)
 		{
 			dma_length = (dma_length + 7) & ~7;
@@ -1418,6 +1444,7 @@ void n64_periphs::pi_dma_tick()
 	else
 	{
 		UINT32 dma_length = pi_rd_len + 1;
+		//logerror("PI Read, %X, %X, %X\n", pi_cart_addr, pi_dram_addr, pi_rd_len);
 		if (dma_length & 7)
 		{
 			dma_length = (dma_length + 7) & ~7;
@@ -1436,7 +1463,10 @@ void n64_periphs::pi_dma_tick()
 	}
 
 	pi_status &= ~1; // Clear DMA_BUSY
-	pi_status |= 8; // Set INTERRUPT
+	//pi_status |= 8; // Set INTERRUPT ?? Does this bit exist ??
+
+	if(update_bm)
+		dd_update_bm();
 
 	signal_rcp_interrupt(PI_INTERRUPT);
 
@@ -1513,11 +1543,26 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 		case 0x04/4:        // PI_CART_ADDR_REG
 		{
 			pi_cart_addr = data;
+			if(pi_cart_addr == 0x05000400 && dd_present)
+			{
+				dd_status_reg &= ~DD_ASIC_STATUS_DREQ;
+				dd_status_reg &= ~DD_ASIC_STATUS_BM_INT;
+				//logerror("Clearing DREQ, INT\n");
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+			}
+			if(pi_cart_addr == 0x05000000 && dd_present)
+			{
+				dd_status_reg &= ~DD_ASIC_STATUS_C2_XFER;
+				dd_status_reg &= ~DD_ASIC_STATUS_BM_INT;
+				//logerror("Clearing C2, INT\n");
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+			}
 			break;
 		}
 
 		case 0x08/4:        // PI_RD_LEN_REG
 		{
+			//logerror("Start PI Read\n");
 			pi_rd_len = data;
 			pi_dma_dir = 0;
 			pi_status |= 1;
@@ -1530,6 +1575,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 
 		case 0x0c/4:        // PI_WR_LEN_REG
 		{
+			//logerror("Start PI Write\n");
 			pi_wr_len = data;
 			pi_dma_dir = 1;
 			pi_status |= 1;
@@ -1545,7 +1591,9 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 		{
 			if (data & 0x2)
 			{
-				pi_status &= ~8; // Clear INTERRUPT
+				//pi_status &= ~8; // Clear INTERRUPT ?? Does this bit exist ??
+				pi_status = 0; // Reset all bits
+				pi_dma_timer->adjust(attotime::never); // Cancel Pending Transfer
 				clear_rcp_interrupt(PI_INTERRUPT);
 			}
 			break;
@@ -1669,18 +1717,28 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			{
 				case 0:
 				case 1:
-				{
-					// Read status
-					rdata[0] = 0x05;
-					rdata[1] = 0x00;
-					rdata[2] = 0x01;
-					return 0;
-				}
 				case 2:
 				case 3:
 				{
-					// Read status (unconnected)
-					return 1;
+					// Read status
+					switch ((machine().root_device().ioport("input")->read() >> (2 * channel)) & 3)
+					{
+						case 0:             //NONE (unconnected)
+						case 3:             //Invalid
+							return 1;
+
+						case 1:             //JOYPAD
+							rdata[0] = 0x05;
+							rdata[1] = 0x00;
+							rdata[2] = 0x01;
+							return 0;
+
+						case 2:             //MOUSE
+							rdata[0] = 0x02;
+							rdata[1] = 0x00;
+							rdata[2] = 0x01;
+							return 0;
+					}
 				}
 				case 4:
 				{
@@ -1704,9 +1762,11 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 		case 0x01:      // Read button values
 		{
 			UINT16 buttons = 0;
-			INT8 x = 0, y = 0;
-			/* add here tags for P3 and P4 when implemented */
-			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y", "P2", "P2_ANALOG_X", "P2_ANALOG_Y" };
+			int x = 0, y = 0;
+			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y", "P1_MOUSE_X", "P1_MOUSE_Y",
+													"P2", "P2_ANALOG_X", "P2_ANALOG_Y", "P2_MOUSE_X", "P2_MOUSE_Y",
+													"P3", "P3_ANALOG_X", "P3_ANALOG_Y", "P3_MOUSE_X", "P3_MOUSE_Y",
+													"P4", "P4_ANALOG_X", "P4_ANALOG_Y", "P4_MOUSE_X", "P4_MOUSE_Y" };
 
 			if (slength != 1 || rlength != 4)
 			{
@@ -1717,22 +1777,81 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			{
 				case 0: // P1 Inputs
 				case 1: // P2 Inputs
+				case 2: // P3 Inputs
+				case 3: // P4 Inputs
 				{
-					buttons = machine().root_device().ioport(portnames[(channel*3) + 0])->read();
-					x = machine().root_device().ioport(portnames[(channel*3) + 1])->read() - 128;
-					y = machine().root_device().ioport(portnames[(channel*3) + 2])->read() - 128;
+					switch ((machine().root_device().ioport("input")->read() >> (2 * channel)) & 3)
+					{
+						case 0:         //NONE
+						case 3:         //Invalid
+							return 1;
 
-					rdata[0] = (buttons >> 8) & 0xff;
-					rdata[1] = (buttons >> 0) & 0xff;
-					rdata[2] = (UINT8)(x);
-					rdata[3] = (UINT8)(y);
-					return 0;
-				}
-				case 2:
-				case 3:
-				{
-					// P3/P4 Inputs (not connected)
-					return 1;
+						case 1:         //JOYPAD
+							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
+							x = machine().root_device().ioport(portnames[(channel*5) + 1])->read() - 128;
+							y = machine().root_device().ioport(portnames[(channel*5) + 2])->read() - 128;
+
+							rdata[0] = (buttons >> 8) & 0xff;
+							rdata[1] = (buttons >> 0) & 0xff;
+							rdata[2] = (UINT8)(x);
+							rdata[3] = (UINT8)(y);
+							return 0;
+
+						case 2:         //MOUSE
+							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
+							x = (INT16)machine().root_device().ioport(portnames[(channel*5) + 1 + 2])->read();// - 128;
+							y = (INT16)machine().root_device().ioport(portnames[(channel*5) + 2 + 2])->read();// - 128;
+
+							int mouse_dx = 0;
+							int mouse_dy = 0;
+
+							if (x != mouse_x2[channel])
+							{
+								mouse_dx = x - mouse_x2[channel];
+
+								if (mouse_dx > 0x40)
+									mouse_dx = (0x80) - (mouse_dx - ((mouse_dx / 0x80) * 0x80));
+								else if (mouse_dx < -0x40)
+									mouse_dx = -(0x80) - (mouse_dx - ((mouse_dx / 0x80) * 0x80));
+
+								mouse_x2[channel] = x;
+							}
+
+							if (y != mouse_y2[channel])
+							{
+								mouse_dy = y - mouse_y2[channel];
+
+								if (mouse_dy > 0x40)
+									mouse_dy = (0x80) - (mouse_dy - ((mouse_dy / 0x80) * 0x80));
+								else if (mouse_dy < -0x40)
+									mouse_dy = -(0x80) - (mouse_dy - ((mouse_dy / 0x80) * 0x80));
+
+								mouse_y2[channel] = y;
+							}
+
+							if (mouse_dx)
+							{
+								if(mouse_dx < 0)
+									mouse_dx++;
+								else
+									mouse_dx--;
+							}
+
+							if (mouse_dy)
+							{
+								if(mouse_dy < 0)
+									mouse_dy++;
+								else
+									mouse_dy--;
+							}
+
+							rdata[0] = (buttons >> 8) & 0xff;
+							rdata[1] = (buttons >> 0) & 0xff;
+							rdata[2] = (UINT8)(mouse_dx);
+							rdata[3] = (UINT8)(mouse_dy);
+							return 0;
+
+					}
 				}
 			}
 
@@ -2049,7 +2168,193 @@ WRITE32_MEMBER( n64_periphs::si_reg_w )
 	}
 }
 
-#define DD_STATUS_INTR      (1 << 25)
+void n64_periphs::dd_set_zone_and_track_offset()
+{
+	UINT16 head = (dd_track_reg & 0x1000) >> 9; // Head * 8
+	UINT16 track = dd_track_reg & 0xFFF;
+	UINT16 tr_off = 0;
+
+	if(track >= 0x425)
+	{
+		dd_zone = 7 + head;
+		tr_off = track - 0x425;
+	}
+	else if (track >= 0x390)
+	{
+		dd_zone = 6 + head;
+		tr_off = track - 0x390;
+	}
+	else if (track >= 0x2FB)
+	{
+		dd_zone = 5 + head;
+		tr_off = track - 0x2FB;
+	}
+	else if (track >= 0x266)
+	{
+		dd_zone = 4 + head;
+		tr_off = track - 0x266;
+	}
+	else if (track >= 0x1D1)
+	{
+		dd_zone = 3 + head;
+		tr_off = track - 0x1D1;
+	}
+	else if (track >= 0x13C)
+	{
+		dd_zone = 2 + head;
+		tr_off = track - 0x13C;
+	}
+	else if (track >= 0x9E)
+	{
+		dd_zone = 1 + head;
+		tr_off = track - 0x9E;
+	}
+	else
+	{
+		dd_zone = 0 + head;
+		tr_off = track;
+	}
+
+	dd_track_offset = ddStartOffset[dd_zone] + tr_off*ddZoneSecSize[dd_zone]*SECTORS_PER_BLOCK*BLOCKS_PER_TRACK;
+	//logerror("Zone %d, Head %d, Offset %x\n", dd_zone, head/8, dd_track_offset);
+}
+
+void n64_periphs::dd_update_bm()
+{
+	if(!(dd_buf_status_reg & DD_BMST_RUNNING))
+		return;
+	if(dd_write) // dd write, BM Mode 0
+	{
+		if(dd_current_reg == 0)
+		{
+			dd_current_reg += 1;
+			dd_status_reg |= DD_ASIC_STATUS_DREQ;
+		}
+		else if(dd_current_reg < SECTORS_PER_BLOCK)
+		{
+			dd_write_sector();
+			dd_current_reg += 1;
+			dd_status_reg |= DD_ASIC_STATUS_DREQ;
+		}
+		else if(dd_current_reg < SECTORS_PER_BLOCK + 1)
+		{
+			if(dd_buf_status_reg & DD_BMST_BLOCKS)
+			{
+				dd_write_sector();
+				dd_current_reg += 1;
+				//logerror("DD Write, Start Next Block\n");
+				dd_start_block = 1 - dd_start_block;
+				dd_current_reg = 1;
+				dd_buf_status_reg &= ~DD_BMST_BLOCKS;
+				dd_status_reg |= DD_ASIC_STATUS_DREQ;
+			}
+			else
+			{
+				dd_write_sector();
+				dd_current_reg += 1;
+				dd_buf_status_reg &= ~DD_BMST_RUNNING;
+			}
+		}
+		else
+		{
+			logerror("DD Write, Sector Overrun\n");
+		}
+		//logerror("DD Write, Sending Interrupt\n");
+		dd_status_reg |= DD_ASIC_STATUS_BM_INT;
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+		return;
+	}
+	else // dd read, BM Mode 1
+	{
+		if(((dd_track_reg & 0xFFF) == 6) && (dd_start_block == 0))
+		{
+			dd_status_reg &= ~DD_ASIC_STATUS_DREQ;
+		}
+		else if(dd_current_reg < SECTORS_PER_BLOCK)
+		{
+			dd_read_sector();
+			dd_current_reg += 1;
+			dd_status_reg |= DD_ASIC_STATUS_DREQ;
+		}
+		else if(dd_current_reg < SECTORS_PER_BLOCK + 4)
+		{
+			dd_read_C2();
+			dd_current_reg += 1;
+			if(dd_current_reg == SECTORS_PER_BLOCK + 4)
+				dd_status_reg |= DD_ASIC_STATUS_C2_XFER;
+		}
+		else if(dd_current_reg == SECTORS_PER_BLOCK + 4) // Gap Sector
+		{
+			if(dd_buf_status_reg & DD_BMST_BLOCKS)
+			{
+				//logerror("DD Read, Start Next Block\n");
+				dd_start_block = 1 - dd_start_block;
+				dd_current_reg = 0;
+				dd_buf_status_reg &= ~DD_BMST_BLOCKS;
+			}
+			else
+			{
+				dd_buf_status_reg &= ~DD_BMST_RUNNING;
+			}
+		}
+		else
+		{
+			logerror("DD Read, Sector Overrun\n");
+		}
+		//logerror("DD Read, Sending Interrupt\n");
+		dd_status_reg |= DD_ASIC_STATUS_BM_INT;
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+		return;
+	}
+}
+
+void n64_periphs::dd_write_sector()
+{
+	UINT8* sector;
+
+	sector = (UINT8*)machine().root_device().memregion("disk")->base();
+	sector += dd_track_offset;
+	sector += dd_start_block * SECTORS_PER_BLOCK * ddZoneSecSize[dd_zone];
+	sector += (dd_current_reg - 1) * ddZoneSecSize[dd_zone];
+
+	//logerror("Write Block %d, Sector %d\n", dd_start_block, dd_current_reg - 1);
+
+	for(int i = 0; i < ddZoneSecSize[dd_zone]/4; i++)
+	{
+		sector[i*4 + 0] = (dd_sector_data[i] >> 24) & 0xFF;
+		sector[i*4 + 1] = (dd_sector_data[i] >> 16) & 0xFF;
+		sector[i*4 + 2] = (dd_sector_data[i] >> 8) & 0xFF;
+		sector[i*4 + 3] = (dd_sector_data[i] >> 0) & 0xFF;
+	}
+	return;
+}
+
+void n64_periphs::dd_read_sector()
+{
+	UINT8* sector;
+
+	sector = (UINT8*)machine().root_device().memregion("disk")->base();
+	sector += dd_track_offset;
+	sector += dd_start_block * SECTORS_PER_BLOCK * ddZoneSecSize[dd_zone];
+	sector += (dd_current_reg) * ddZoneSecSize[dd_zone];
+
+	//logerror("Read Block %d, Sector %d\n", dd_start_block, dd_current_reg);
+
+	for(int i = 0; i < ddZoneSecSize[dd_zone]/4; i++)
+	{
+		dd_sector_data[i] = sector[(i*4 + 0)] << 24 | sector[(i*4 + 1)] << 16 |
+							sector[(i*4 + 2)] << 8  | sector[(i*4 + 3)];
+	}
+	return;
+}
+
+void n64_periphs::dd_read_C2()
+{
+	for(int i = 0; i < ddZoneSecSize[dd_zone]/4; i++)
+		dd_buffer[(dd_current_reg - SECTORS_PER_BLOCK)*0x40 + i] = 0;
+	//logerror("Read C2, Sector %d", dd_current_reg);
+	return;
+}
 
 READ32_MEMBER( n64_periphs::dd_reg_r )
 {
@@ -2058,14 +2363,14 @@ READ32_MEMBER( n64_periphs::dd_reg_r )
 		return dd_buffer[offset];
 	}
 
-	if(offset < 0x480/4)
-	{
-		return dd_sector_data[(offset - 0x400/4) / 4];
-	}
-
 	if(offset < 0x500/4)
 	{
-		return dd_ram_seq_data[(offset - 0x480/4) / 4];
+		return dd_sector_data[(offset - 0x400/4)];
+	}
+
+	if((offset < 0x5C0/4) && (0x580/4 <= offset))
+	{
+		return dd_ram_seq_data[(offset - 0x580/4)];
 	}
 
 	offset -= 0x500/4;
@@ -2081,7 +2386,19 @@ READ32_MEMBER( n64_periphs::dd_reg_r )
 			break;
 
 		case 0x08/4: // DD Status
+			if(disk_present)
+				dd_status_reg |= DD_ASIC_STATUS_DISK;
+			else
+				dd_status_reg &= ~DD_ASIC_STATUS_DISK;
 			ret = dd_status_reg;
+			// For Read, Gap Sector
+			if((dd_status_reg & DD_ASIC_STATUS_BM_INT) && (SECTORS_PER_BLOCK < dd_current_reg))
+			{
+				dd_status_reg &= ~DD_ASIC_STATUS_BM_INT;
+				//logerror("DD Read Gap, Clearing INT\n");
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				dd_update_bm();
+			}
 			break;
 
 		case 0x0c/4: // Current Track
@@ -2103,6 +2420,9 @@ READ32_MEMBER( n64_periphs::dd_reg_r )
 		case 0x1c/4: // Sequence Control
 			ret = dd_seq_ctrl_reg;
 			break;
+		case 0x40/4: // ASIC ID
+			ret = 0x00030000; // Japan Retail Drive
+			break;
 	}
 
 	//logerror("dd_reg_r: %08x (%08x)\n", offset << 2, ret);
@@ -2119,15 +2439,15 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 		return;
 	}
 
-	if(offset < 0x480/4)
+	if(offset < 0x500/4)
 	{
-		COMBINE_DATA(&dd_sector_data[(offset - 0x400/4) / 4]);
+		COMBINE_DATA(&dd_sector_data[(offset - 0x400/4)]);
 		return;
 	}
 
-	if(offset < 0x500/4)
+	if((offset < 0x5C0/4) && (0x580/4 <= offset))
 	{
-		COMBINE_DATA(&dd_ram_seq_data[(offset - 0x480/4) / 4]);
+		COMBINE_DATA(&dd_ram_seq_data[(offset - 0x580/4)]);
 		return;
 	}
 
@@ -2143,10 +2463,18 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 			switch((data >> 16) & 0xff)
 			{
 				case 0x01: // Seek Read
-					logerror("dd command: Seek Read\n");
+					dd_track_reg = dd_data_reg >> 16;
+					logerror("dd command: Seek Read %d\n", dd_track_reg);
+					dd_set_zone_and_track_offset();
+					dd_track_reg |= DD_TRACK_INDEX_LOCK;
+					dd_write = false;
 					break;
 				case 0x02: // Seek Write
-					logerror("dd command: Seek Write\n");
+					dd_track_reg = dd_data_reg >> 16;
+					logerror("dd command: Seek Write %d\n", dd_track_reg);
+					dd_set_zone_and_track_offset();
+					dd_track_reg |= DD_TRACK_INDEX_LOCK;
+					dd_write = true;
 					break;
 				case 0x03: // Re-Zero / Recalibrate
 					logerror("dd command: Re-Zero\n");
@@ -2157,29 +2485,29 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 				case 0x05: // Start Motor
 					logerror("dd command: Start Motor\n");
 					break;
-				case 0x06: // Standby
-					logerror("dd command: Standby\n");
+				case 0x06: // Set Standby Time
+					logerror("dd command: Set Standby Time\n");
 					break;
-				case 0x07: // Set Sleep Mode
-					logerror("dd command: Set Sleep Mode\n");
+				case 0x07: // Set Sleep Time
+					logerror("dd command: Set Sleep Time\n");
 					break;
-				case 0x08: // Unknown
-					logerror("dd command: Unknown\n");
+				case 0x08: // Clear Disk Change Flag
+					logerror("dd command: Clear Disk Change Flag\n");
 					break;
-				case 0x09: // Initialize Drive(?)
-					logerror("dd command: Initialize Drive\n");
+				case 0x09: // Clear Reset Flag
+					logerror("dd command: Clear Reset Flag\n");
 					break;
 				case 0x0B: // Select Disk Type
 					logerror("dd command: Select Disk Type\n");
 					break;
 				case 0x0C: // ASIC Command Inquiry
-					logerror("dd command: ASIC Commadn Inquiry\n");
+					logerror("dd command: ASIC Command Inquiry\n");
 					break;
 				case 0x0D: // Standby Mode (?)
 					logerror("dd command: Standby Mode(?)\n");
 					break;
-				case 0x0E: // Detect Disk Index
-					logerror("dd command: Detect Disk Index\n");
+				case 0x0E: // (Track Seek) Index Lock Retry
+					logerror("dd command: Index Lock Retry\n");
 					break;
 				case 0x0F: // Set RTC Year / Month
 					logerror("dd command: Set RTC Year / Month\n");
@@ -2198,9 +2526,6 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 					machine().base_datetime(systime);
 
 					dd_data_reg = (convert_to_bcd(systime.local_time.year % 100) << 24) | (convert_to_bcd(systime.local_time.month + 1) << 16);
-
-					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-					dd_status_reg |= DD_STATUS_INTR;
 					break;
 				}
 
@@ -2212,9 +2537,6 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 					machine().base_datetime(systime);
 
 					dd_data_reg = (convert_to_bcd(systime.local_time.mday) << 24) | (convert_to_bcd(systime.local_time.hour) << 16);
-
-					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-					dd_status_reg |= DD_STATUS_INTR;
 					break;
 				}
 
@@ -2226,28 +2548,90 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 					machine().base_datetime(systime);
 
 					dd_data_reg = (convert_to_bcd(systime.local_time.minute) << 24) | (convert_to_bcd(systime.local_time.second) << 16);
-
-					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-					dd_status_reg |= DD_STATUS_INTR;
 					break;
 				}
-
-				case 0x1B: // Disk Inquiry
-					logerror("dd command: Disk Inquiry\n");
+				case 0x15: // Set LED On/Off Time
+				{
+					logerror("dd command: Set LED On/Off Time\n");
 					break;
+				}
+				case 0x1B: // Disk Inquiry
+				{
+					logerror("dd command: Disk Inquiry\n");
+					dd_data_reg = 0x00000000;
+					break;
+				}
 			}
-			// Do something here
+			//logerror("Sending MECHA Int\n");
+			dd_status_reg |= DD_ASIC_STATUS_MECHA_INT;
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 			break;
 
-		case 0x10/4: // Interrupt Clear
-			logerror("dd interrupt clear\n");
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-			dd_status_reg &= ~DD_STATUS_INTR;
+		case 0x10/4: // BM Status
+			logerror("dd BM Status write\n");
+			dd_start_sector = (data >> 16) & 0xFF;
+			if(dd_start_sector == 0x00)
+			{
+				dd_start_block = 0;
+				dd_current_reg = 0;
+			}
+			else if (dd_start_sector == 0x5A)
+			{
+				dd_start_block = 1;
+				dd_current_reg = 0;
+			}
+			else
+			{
+				logerror("dd: start sector not aligned\n");
+			}
+			if(data & DD_BM_XFERBLOCKS)
+				dd_buf_status_reg |= DD_BMST_BLOCKS;
+			if(data & DD_BM_MECHA_INT_RESET)
+				dd_status_reg &= ~DD_ASIC_STATUS_MECHA_INT;
+			if(data & DD_BM_RESET)
+				dd_bm_reset_held = true;
+			if(!(data & DD_BM_RESET) && dd_bm_reset_held)
+			{
+				dd_bm_reset_held = false;
+				dd_status_reg &= ~DD_ASIC_STATUS_BM_INT;
+				dd_status_reg &= ~DD_ASIC_STATUS_BM_ERROR;
+				dd_status_reg &= ~DD_ASIC_STATUS_DREQ;
+				dd_status_reg &= ~DD_ASIC_STATUS_C2_XFER;
+				dd_buf_status_reg = 0;
+				dd_current_reg = 0;
+				dd_start_block = 0;
+				logerror("dd: BM RESET\n");
+			}
+			if(!(dd_status_reg & DD_ASIC_STATUS_BM_INT) && !(dd_status_reg & DD_ASIC_STATUS_MECHA_INT))
+			{
+				//logerror("DD Status, Clearing INT\n");
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+			}
+			if(data & DD_BM_START)
+			{
+				if(dd_write && (data & DD_BM_MODE))
+					popmessage("Attempt to write disk with BM Mode 1\n");
+				if(!dd_write && !(data & DD_BM_MODE))
+					popmessage("Attempt to read disk with BM Mode 0\n");
+				dd_buf_status_reg |= DD_BMST_RUNNING;
+				logerror("dd: Start BM\n");
+				dd_update_bm();
+			}
+
 			break;
 
 		case 0x1c/4: // Sequence Control
 			dd_seq_ctrl_reg = data;
 			break;
+		case 0x28/4: // Host Sector Byte
+			dd_sector_size = (data >> 16) & 0xFF;
+			if((dd_sector_size + 1) != ddZoneSecSize[dd_zone])
+				popmessage("Sector size %d set different than expected %d\n", dd_sector_size + 1, ddZoneSecSize[dd_zone]);
+			break;
+		case 0x30/4: // Sector Byte
+			dd_sectors_per_block = (data >> 24) & 0xFF;
+			if(dd_sectors_per_block != SECTORS_PER_BLOCK + 4)
+				popmessage("Sectors per block %d set different than expected %d\n", dd_sectors_per_block, SECTORS_PER_BLOCK + 4);
 	}
 }
 
@@ -2315,8 +2699,8 @@ void n64_state::machine_start()
 
 	dynamic_cast<mips3_device *>(machine().device("maincpu"))->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS);
 
-	/* configure fast RAM regions for DRC */
-	dynamic_cast<mips3_device *>(machine().device("maincpu"))->mips3drc_add_fastram(0x00000000, 0x007fffff, FALSE, rdram);
+	/* configure fast RAM regions */
+	dynamic_cast<mips3_device *>(machine().device("maincpu"))->add_fastram(0x00000000, 0x007fffff, FALSE, rdram);
 
 	rsp_device *rsp = machine().device<rsp_device>("rsp");
 	rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);

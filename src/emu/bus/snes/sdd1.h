@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 #ifndef __SNS_SDD1_H
 #define __SNS_SDD1_H
 

@@ -6,9 +6,6 @@
 
     National Semiconductor COP400 Emulator.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 /***************************************************************************
@@ -731,7 +728,7 @@ INSTRUCTION( xds )
 	A = t;
 
 	Bd = ((B & 0x0f) - 1) & 0x0f;
-	B = (B & 0x30) | Bd;
+	B = (B & 0x70) | Bd;
 
 	B = B ^ r;
 
@@ -766,7 +763,7 @@ INSTRUCTION( xis )
 	A = t;
 
 	Bd = ((B & 0x0f) + 1) & 0x0f;
-	B = (B & 0x30) | Bd;
+	B = (B & 0x70) | Bd;
 
 	B = B ^ r;
 
@@ -913,16 +910,18 @@ INSTRUCTION( cba )
 
 INSTRUCTION( lbi )
 {
+	m_skip_lbi++;
+	if (m_skip_lbi > 1) return;
+	m_skip_lbi++;
+
 	if (opcode & 0x80)
 	{
-		B = opcode & 0x3f;
+		B = opcode & 0x7f;
 	}
 	else
 	{
-		B = (opcode & 0x70) | (((opcode & 0x0f) + 1) & 0x0f);
+		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
 	}
-
-	m_skip_lbi = 1;
 }
 
 /*

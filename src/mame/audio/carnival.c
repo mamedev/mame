@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Coates, Peter J.C.Clare
 /*****************************************************************************/
 /*                                                                           */
 /*                    (C) Copyright       Peter J.C.Clare                    */

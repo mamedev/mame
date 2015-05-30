@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer, R. Belmont
 /*
  * sc499.c - ARCHIVE SC-499 cartridge tape controller (for Apollo DN3x00)
  *  Created on: April 17, 2011
  *      Author: Hans Ostermeyer
  *      ISA conversion by R. Belmont
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  *  see also:
  *  - http://www.bitsavers.org/pdf/apollo/002398-04_Domain_Engineering_Handbook_Rev4_Jan87.pdf
@@ -1187,7 +1186,7 @@ void sc499_device::read_block()
 	}
 	else
 	{
-		memcpy(m_ctape_block_buffer, tape, SC499_CTAPE_BLOCK_SIZE);
+		memcpy(&m_ctape_block_buffer[0], tape, SC499_CTAPE_BLOCK_SIZE);
 
 		//  if (verbose > 1 || m_tape_pos % 100 == 0)
 		{
@@ -1238,7 +1237,7 @@ void sc499_device::write_block()
 		check_tape();
 	}
 
-	m_image->write_block(m_tape_pos, m_ctape_block_buffer);
+	m_image->write_block(m_tape_pos, &m_ctape_block_buffer[0]);
 	m_ctape_block_count = m_tape_pos;
 	m_ctape_block_index = 0;
 	m_tape_pos++;
@@ -1255,8 +1254,8 @@ int sc499_device::block_is_filemark()
 {
 	static const UINT8 fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
 
-	int is_filemark = memcmp(m_ctape_block_buffer, fm_pattern, 4) == 0 &&
-			memcmp(m_ctape_block_buffer, m_ctape_block_buffer+4, SC499_CTAPE_BLOCK_SIZE-4) == 0;
+	int is_filemark = memcmp(&m_ctape_block_buffer[0], fm_pattern, 4) == 0 &&
+			memcmp(&m_ctape_block_buffer[0], &m_ctape_block_buffer[4], SC499_CTAPE_BLOCK_SIZE-4) == 0;
 
 	LOG3(("block_is_filemark for block %d = %d", m_tape_pos-1, is_filemark));
 	return is_filemark;
@@ -1271,7 +1270,7 @@ void sc499_device::block_set_filemark()
 	static const UINT8 fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
 	for (int i = 0; i < SC499_CTAPE_BLOCK_SIZE; i += 4)
 	{
-		memcpy(m_ctape_block_buffer + i, fm_pattern, 4);
+		memcpy(&m_ctape_block_buffer[i], fm_pattern, 4);
 	}
 }
 
@@ -1294,16 +1293,16 @@ void sc499_ctape_image_device::device_config_complete()
 UINT8 *sc499_ctape_image_device::read_block(int block_num)
 {
 	// access beyond end of tape cart
-	if (m_ctape_data.bytes() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE)
+	if (m_ctape_data.size() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE)
 		return NULL;
 	else
-		return m_ctape_data + (block_num * SC499_CTAPE_BLOCK_SIZE);
+		return &m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE];
 }
 
 void sc499_ctape_image_device::write_block(int block_num, UINT8 *ptr)
 {
-	if (!(m_ctape_data.bytes() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE))
-		memcpy(m_ctape_data + (block_num * SC499_CTAPE_BLOCK_SIZE), ptr, SC499_CTAPE_BLOCK_SIZE);
+	if (!(m_ctape_data.size() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE))
+		memcpy(&m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE], ptr, SC499_CTAPE_BLOCK_SIZE);
 }
 
 bool sc499_ctape_image_device::call_load()
@@ -1317,7 +1316,7 @@ bool sc499_ctape_image_device::call_load()
 	size = io_generic_size(&io);
 	m_ctape_data.resize(size);
 
-	io_generic_read(&io, m_ctape_data, 0, size);
+	io_generic_read(&io, &m_ctape_data[0], 0, size);
 
 	return IMAGE_INIT_PASS;
 }

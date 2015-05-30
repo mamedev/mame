@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Balfour
 /***************************************************************************
 
     redalert.c, Irem M27 hardware

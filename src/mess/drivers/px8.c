@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Curt Coder,Dirk Best
 /***************************************************************************
 
     Epson PX-8

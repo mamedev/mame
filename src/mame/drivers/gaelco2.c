@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Gaelco CG-1V/GAE1 based games
 
-    Driver by Manuel Abadia <manu@teleline.es>
+    Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
     Known games that run on this hardware:
     ======================================

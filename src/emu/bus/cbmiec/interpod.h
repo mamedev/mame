@@ -4,9 +4,6 @@
 
     Oxford Computer Systems Interpod IEC to IEEE interface emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once
@@ -19,7 +16,7 @@
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/6532riot.h"
+#include "machine/mos6530n.h"
 #include "machine/6850acia.h"
 
 
@@ -65,7 +62,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
-	required_device<riot6532_device> m_riot;
+	required_device<mos6532_t> m_riot;
 	required_device<acia6850_device> m_acia;
 	required_device<ieee488_device> m_ieee;
 };

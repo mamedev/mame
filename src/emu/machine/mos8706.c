@@ -4,9 +4,6 @@
 
     MOS 8706 Speech Glue Logic ASIC emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mos8706.h"

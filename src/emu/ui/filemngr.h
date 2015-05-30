@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 
     ui/filemngr.h
 
     MESS's clunky built-in file manager
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -16,8 +15,8 @@
 
 class ui_menu_file_manager : public ui_menu {
 public:
-	astring current_directory;
-	astring current_file;
+	std::string current_directory;
+	std::string current_file;
 	device_image_interface *selected_device;
 
 	static void force_file_manager(running_machine &machine, render_container *container, const char *warnings);
@@ -28,10 +27,11 @@ public:
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
-	void fill_image_line(device_image_interface *img, astring &instance, astring &filename);
+	void fill_image_line(device_image_interface *img, std::string &instance, std::string &filename);
 
 private:
-	astring m_warnings;
+	std::string m_warnings;
+	bool m_curr_selected;
 };
 
 #endif  /* __UI_FILEMNGR_H__ */

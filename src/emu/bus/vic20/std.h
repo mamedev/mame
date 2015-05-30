@@ -4,9 +4,6 @@
 
     Commodore VIC-20 Standard 8K/16K ROM Cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #ifndef __TC0480SCP_H__
 #define __TC0480SCP_H__
 
@@ -69,7 +71,7 @@ private:
 	// internal state
 	UINT16           m_ctrl[0x18];
 
-	dynamic_array<UINT16> m_ram;
+	std::vector<UINT16>   m_ram;
 	UINT16 *         m_bg_ram[4];
 	UINT16 *         m_tx_ram;
 	UINT16 *         m_char_ram;

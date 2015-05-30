@@ -2660,7 +2660,6 @@ def _main(argv):
 
     # Parse command line arguments
     from optparse import OptionParser
-    import re
     version = '%prog ' + __version__
     parser = OptionParser(version=version)
     parser.set_usage("%prog [options] [imagefile]")

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Roberto Fresca, Peter Ferrie
 /**********************************************************************************
 
   Fun World / TAB / Impera
@@ -5883,7 +5885,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	{
 		dynamic_buffer buffer(size);
-		memcpy(buffer, rom, size);
+		memcpy(&buffer[0], rom, size);
 
 
 		/* address lines swap: fedcba9876543210 -> fedcba9820134567 */
@@ -5902,7 +5904,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	{
 		dynamic_buffer buffer(sizeg);
-		memcpy(buffer, gfxrom, sizeg);
+		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
 
@@ -5927,7 +5929,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	{
 		dynamic_buffer buffer(sizep);
-		memcpy(buffer, prom, sizep);
+		memcpy(&buffer[0], prom, sizep);
 
 
 		/* address lines swap: fedcba9876543210 -> fedcba9487652013 */
@@ -6068,7 +6070,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 	{
 		dynamic_buffer buffer(size);
-		memcpy(buffer, rom, size);
+		memcpy(&buffer[0], rom, size);
 
 
 		/* address lines swap: fedcba9876543210 -> fedcba9867543210 */
@@ -6087,7 +6089,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 	{
 		dynamic_buffer buffer(sizeg);
-		memcpy(buffer, gfxrom, sizeg);
+		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
 
@@ -6172,7 +6174,7 @@ static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT
 
 	{
 		dynamic_buffer buffer(size);
-		memcpy(buffer, rom, size);
+		memcpy(&buffer[0], rom, size);
 
 
 		/* address lines swap: fedcba9876543210 -> fedcba9867543210 */
@@ -6191,7 +6193,7 @@ static void decrypt_rcdino4(UINT8 *rom, int size, UINT8 *gfxrom, int sizeg, UINT
 
 	{
 		dynamic_buffer buffer(sizeg);
-		memcpy(buffer, gfxrom, sizeg);
+		memcpy(&buffer[0], gfxrom, sizeg);
 
 		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
 

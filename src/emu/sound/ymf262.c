@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 /*
 **
 ** File: ymf262.c - software implementation of YMF262
@@ -464,8 +466,8 @@ O( 0),O( 0),O( 0),O( 0),O( 0),O( 0),O( 0),O( 0),
 #define ML 2
 static const UINT8 mul_tab[16]= {
 /* 1/2, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,10,12,12,15,15 */
-	0.50*ML, 1.00*ML, 2.00*ML, 3.00*ML, 4.00*ML, 5.00*ML, 6.00*ML, 7.00*ML,
-	8.00*ML, 9.00*ML,10.00*ML,10.00*ML,12.00*ML,12.00*ML,15.00*ML,15.00*ML
+	ML/2, 1*ML, 2*ML, 3*ML, 4*ML, 5*ML, 6*ML, 7*ML,
+	8*ML, 9*ML,10*ML,10*ML,12*ML,12*ML,15*ML,15*ML
 };
 #undef ML
 

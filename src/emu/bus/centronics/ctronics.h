@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 /***************************************************************************
 
     Centronics printer interface
-
-    license: MAME, GPL-2.0+
-    copyright-holders: smf
 
 ***************************************************************************/
 

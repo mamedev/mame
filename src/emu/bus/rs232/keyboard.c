@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #include "keyboard.h"
 
 serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -44,7 +46,7 @@ ioport_constructor serial_keyboard_device::device_input_ports() const
 void serial_keyboard_device::device_start()
 {
 	generic_keyboard_device::device_start();
-	device_serial_interface::register_save_state(machine().save(), name(), tag());
+	device_serial_interface::register_save_state(machine().save(), this);
 	save_item(NAME(m_curr_key));
 	save_item(NAME(m_key_valid));
 }

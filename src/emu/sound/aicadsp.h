@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:ElSemi, kingshriek, Deunan Knute, R. Belmont
 #pragma once
 
 #ifndef __AICADSP_H__

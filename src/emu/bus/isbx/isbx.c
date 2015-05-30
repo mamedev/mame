@@ -4,9 +4,6 @@
 
     Intel Multibus I/O Expansion Bus IEEE-P959 (iSBX) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "isbx.h"

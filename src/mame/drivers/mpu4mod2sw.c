@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* MPU4 'Mod2' Sets
 
  This is the original MPU4 board, with AY8913 chip
@@ -24,7 +26,7 @@ INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 
 
 
-#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
+#define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 
 DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod2 )
 {

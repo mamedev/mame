@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Wilbert Pol,Stefan Jokisch
 /***************************************************************************
 
   Atari TIA video emulation
@@ -430,7 +432,7 @@ void tia_video_device::device_start()
 	helper[0] = auto_bitmap_ind16_alloc(machine(), cx, TIA_MAX_SCREEN_HEIGHT);
 	helper[1] = auto_bitmap_ind16_alloc(machine(), cx, TIA_MAX_SCREEN_HEIGHT);
 	helper[2] = auto_bitmap_ind16_alloc(machine(), cx, TIA_MAX_SCREEN_HEIGHT);
-	
+
 	register_save_state();
 }
 

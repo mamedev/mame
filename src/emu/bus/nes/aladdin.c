@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Camerica/Codemasters Aladdin Deck Enhancer pass-through cart
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate the following PCBs
@@ -141,7 +140,7 @@ bool nes_aladdin_slot_device::call_softlist_load(software_list_device &swlist, c
 	return TRUE;
 }
 
-void nes_aladdin_slot_device::get_default_card_software(astring &result)
+void nes_aladdin_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -150,7 +149,7 @@ void nes_aladdin_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		UINT8 mapper;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
 		mapper = (rom[6] & 0xf0) >> 4;
 		mapper |= rom[7] & 0xf0;
@@ -162,7 +161,7 @@ void nes_aladdin_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "algn");

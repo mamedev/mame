@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, David Widel
 /***************************************************************************
 
   NEC MC-8123 encryption emulation

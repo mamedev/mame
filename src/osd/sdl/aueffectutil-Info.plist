@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>AUEffectUtil</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>aueffect</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>AUEffect</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array/>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>AUEffectDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>aupreset</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>AudioUnit Preset</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array/>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>AUEffectDocument</string>
+		</dict>
+	</array>
+	<key>CFBundleIdentifier</key>
+	<string>org.mamedev.aueffectutil</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>AUEffectUtil</string>
+</dict>
+</plist>

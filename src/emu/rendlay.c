@@ -327,7 +327,8 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 
 	// check for errors
 	if (bounds.x0 > bounds.x1 || bounds.y0 > bounds.y1)
-		throw emu_fatalerror("Illegal bounds value in XML: (%f-%f)-(%f-%f)", bounds.x0, bounds.x1, bounds.y0, bounds.y1);
+		throw emu_fatalerror("Illegal bounds value in XML: (%f-%f)-(%f-%f)",
+				(double) bounds.x0, (double) bounds.x1, (double) bounds.y0, (double) bounds.y1);
 }
 
 
@@ -351,9 +352,10 @@ void parse_color(running_machine &machine, xml_data_node *colornode, render_colo
 	color.a = xml_get_attribute_float_with_subst(machine, *colornode, "alpha", 1.0);
 
 	// check for errors
-	if (color.r < 0.0 || color.r > 1.0 || color.g < 0.0 || color.g > 1.0 ||
-		color.b < 0.0 || color.b > 1.0 || color.a < 0.0 || color.a > 1.0)
-		throw emu_fatalerror("Illegal ARGB color value in XML: %f,%f,%f,%f", color.r, color.g, color.b, color.a);
+	if (color.r < 0.0f || color.r > 1.0f || color.g < 0.0f || color.g > 1.0f ||
+		color.b < 0.0f || color.b > 1.0f || color.a < 0.0f || color.a > 1.0f)
+		throw emu_fatalerror("Illegal ARGB color value in XML: %f,%f,%f,%f",
+				(double) color.r, (double) color.g, (double) color.b, (double) color.a);
 }
 
 
@@ -626,19 +628,19 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	{
 		m_type = CTYPE_REEL;
 
-		astring symbollist = xml_get_attribute_string_with_subst(machine, compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
+		std::string symbollist = xml_get_attribute_string_with_subst(machine, compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
 		int location = -1;
 		m_numstops = 0;
-		location=symbollist.find(0,",");
+		location=symbollist.find(",");
 		while (location!=-1)
 		{
 			m_stopnames[m_numstops] = symbollist;
-			m_stopnames[m_numstops].substr(0, location);
-			symbollist.substr(location+1, symbollist.len()-(location-1));
+			m_stopnames[m_numstops] = m_stopnames[m_numstops].substr(0, location);
+			symbollist = symbollist.substr(location+1, symbollist.length()-(location-1));
 			m_numstops++;
-			location=symbollist.find(0,",");
+			location=symbollist.find(",");
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
@@ -648,12 +650,12 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 		for (int i=0;i<m_numstops;i++)
 		{
-			location=m_stopnames[i].find(0,":");
+			location=m_stopnames[i].find(":");
 			if (location!=-1)
 			{
 				m_imagefile[i] = m_stopnames[i];
-				m_stopnames[i].substr(0, location);
-				m_imagefile[i].substr(location+1, m_imagefile[i].len()-(location-1));
+				m_stopnames[i] = m_stopnames[i].substr(0, location);
+				m_imagefile[i] = m_imagefile[i].substr(location+1, m_imagefile[i].length()-(location-1));
 
 				//m_alphafile[i] =
 				m_file[i].reset(global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ)));
@@ -807,10 +809,10 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 void layout_element::component::draw_rect(bitmap_argb32 &dest, const rectangle &bounds)
 {
 	// compute premultiplied colors
-	UINT32 r = m_color.r * m_color.a * 255.0;
-	UINT32 g = m_color.g * m_color.a * 255.0;
-	UINT32 b = m_color.b * m_color.a * 255.0;
-	UINT32 inva = (1.0f - m_color.a) * 255.0;
+	UINT32 r = m_color.r * m_color.a * 255.0f;
+	UINT32 g = m_color.g * m_color.a * 255.0f;
+	UINT32 b = m_color.b * m_color.a * 255.0f;
+	UINT32 inva = (1.0f - m_color.a) * 255.0f;
 
 	// iterate over X and Y
 	for (UINT32 y = bounds.min_y; y <= bounds.max_y; y++)
@@ -845,10 +847,10 @@ void layout_element::component::draw_rect(bitmap_argb32 &dest, const rectangle &
 void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &bounds)
 {
 	// compute premultiplied colors
-	UINT32 r = m_color.r * m_color.a * 255.0;
-	UINT32 g = m_color.g * m_color.a * 255.0;
-	UINT32 b = m_color.b * m_color.a * 255.0;
-	UINT32 inva = (1.0f - m_color.a) * 255.0;
+	UINT32 r = m_color.r * m_color.a * 255.0f;
+	UINT32 g = m_color.g * m_color.a * 255.0f;
+	UINT32 b = m_color.b * m_color.a * 255.0f;
+	UINT32 inva = (1.0f - m_color.a) * 255.0f;
 
 	// find the center
 	float xcenter = float(bounds.xcenter());
@@ -861,7 +863,7 @@ void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &
 	for (UINT32 y = bounds.min_y; y <= bounds.max_y; y++)
 	{
 		float ycoord = ycenter - ((float)y + 0.5f);
-		float xval = xradius * sqrt(1.0f - (ycoord * ycoord) * ooyradius2);
+		float xval = xradius * sqrtf(1.0f - (ycoord * ycoord) * ooyradius2);
 
 		// compute left/right coordinates
 		INT32 left = (INT32)(xcenter - xval + 0.5f);
@@ -897,10 +899,10 @@ void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &
 void layout_element::component::draw_text(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds)
 {
 	// compute premultiplied colors
-	UINT32 r = m_color.r * 255.0;
-	UINT32 g = m_color.g * 255.0;
-	UINT32 b = m_color.b * 255.0;
-	UINT32 a = m_color.a * 255.0;
+	UINT32 r = m_color.r * 255.0f;
+	UINT32 g = m_color.g * 255.0f;
+	UINT32 b = m_color.b * 255.0f;
+	UINT32 a = m_color.a * 255.0f;
 
 	// get the width of the string
 	render_font *font = machine.render().font_alloc("default");
@@ -910,7 +912,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 
 	while (1)
 	{
-		width = font->string_width(bounds.height(), aspect, m_string);
+		width = font->string_width(bounds.height(), aspect, m_string.c_str());
 		if (width < bounds.width())
 			break;
 		aspect *= 0.9f;
@@ -941,7 +943,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 	bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 	// loop over characters
-	for (const char *s = m_string; *s != 0; s++)
+	for (const char *s = m_string.c_str(); *s != 0; s++)
 	{
 		// get the font bitmap
 		rectangle chbounds;
@@ -987,7 +989,7 @@ void layout_element::component::draw_simplecounter(running_machine &machine, bit
 {
 	char temp[256];
 	sprintf(temp, "%0*d", m_digits, state);
-	m_string = astring(temp);
+	m_string = std::string(temp);
 	draw_text(machine, dest, bounds);
 }
 
@@ -1006,10 +1008,10 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 		int use_state = (state + m_stateoffset) % max_state_used;
 
 		// compute premultiplied colors
-		UINT32 r = m_color.r * 255.0;
-		UINT32 g = m_color.g * 255.0;
-		UINT32 b = m_color.b * 255.0;
-		UINT32 a = m_color.a * 255.0;
+		UINT32 r = m_color.r * 255.0f;
+		UINT32 g = m_color.g * 255.0f;
+		UINT32 b = m_color.b * 255.0f;
+		UINT32 a = m_color.a * 255.0f;
 
 		// get the width of the string
 		render_font *font = machine.render().font_alloc("default");
@@ -1048,7 +1050,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 			{
 				while (1)
 				{
-					width = font->string_width(ourheight/num_shown, aspect, m_stopnames[fruit]);
+					width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
 					if (width < bounds.width())
 						break;
 					aspect *= 0.9f;
@@ -1100,7 +1102,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 					// loop over characters
-					for (const char *s = m_stopnames[fruit]; *s != 0; s++)
+					for (const char *s = m_stopnames[fruit].c_str(); *s != 0; s++)
 					{
 						// get the font bitmap
 						rectangle chbounds;
@@ -1159,10 +1161,10 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 	int use_state = (state + m_stateoffset) % max_state_used;
 
 	// compute premultiplied colors
-	UINT32 r = m_color.r * 255.0;
-	UINT32 g = m_color.g * 255.0;
-	UINT32 b = m_color.b * 255.0;
-	UINT32 a = m_color.a * 255.0;
+	UINT32 r = m_color.r * 255.0f;
+	UINT32 g = m_color.g * 255.0f;
+	UINT32 b = m_color.b * 255.0f;
+	UINT32 a = m_color.a * 255.0f;
 
 	// get the width of the string
 	render_font *font = machine.render().font_alloc("default");
@@ -1198,7 +1200,7 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 		{
 			while (1)
 			{
-				width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
+				width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
 				if (width < bounds.width())
 					break;
 				aspect *= 0.9f;
@@ -1250,7 +1252,7 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 				bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 				// loop over characters
-				for (const char *s = m_stopnames[fruit]; *s != 0; s++)
+				for (const char *s = m_stopnames[fruit].c_str(); *s != 0; s++)
 				{
 					// get the font bitmap
 					rectangle chbounds;
@@ -1310,11 +1312,11 @@ void layout_element::component::load_bitmap()
 {
 	// load the basic bitmap
 	assert(m_file[0] != NULL);
-	m_hasalpha[0] = render_load_png(m_bitmap[0], *m_file[0], m_dirname, m_imagefile[0]);
+	m_hasalpha[0] = render_load_png(m_bitmap[0], *m_file[0], m_dirname.c_str(), m_imagefile[0].c_str());
 
 	// load the alpha bitmap if specified
-	if (m_bitmap[0].valid() && m_alphafile[0])
-		render_load_png(m_bitmap[0], *m_file[0], m_dirname, m_alphafile[0], true);
+	if (m_bitmap[0].valid() && !m_alphafile[0].empty())
+		render_load_png(m_bitmap[0], *m_file[0], m_dirname.c_str(), m_alphafile[0].c_str(), true);
 
 	// if we can't load the bitmap, allocate a dummy one and report an error
 	if (!m_bitmap[0].valid())
@@ -1327,10 +1329,10 @@ void layout_element::component::load_bitmap()
 				m_bitmap[0].pix32((step + line) % 100, line % 100) = rgb_t(0xff,0xff,0xff,0xff);
 
 		// log an error
-		if (!m_alphafile[0])
-			osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile[0].cstr());
+		if (m_alphafile[0].empty())
+			osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile[0].c_str());
 		else
-			osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile[0].cstr(), m_alphafile[0].cstr());
+			osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile[0].c_str(), m_alphafile[0].c_str());
 	}
 }
 
@@ -1339,7 +1341,7 @@ void layout_element::component::load_reel_bitmap(int number)
 {
 	// load the basic bitmap
 	assert(m_file != NULL);
-	/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_imagefile[number]);
+	/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname.c_str(), m_imagefile[number].c_str());
 
 	// load the alpha bitmap if specified
 	//if (m_bitmap[number].valid() && m_alphafile[number])
@@ -2346,7 +2348,7 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	}
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
 	if (m_output_name[0] != 0 && m_element != NULL)
-		output_set_value(m_output_name, m_element->default_state());
+		output_set_value(m_output_name.c_str(), m_element->default_state());
 	parse_bounds(machine, xml_get_sibling(itemnode.child, "bounds"), m_rawbounds);
 	parse_color(machine, xml_get_sibling(itemnode.child, "color"), m_color);
 	parse_orientation(machine, xml_get_sibling(itemnode.child, "orientation"), m_orientation);
@@ -2396,12 +2398,12 @@ int layout_view::item::state() const
 
 	// if configured to an output, fetch the output value
 	if (m_output_name[0] != 0)
-		state = output_get_value(m_output_name);
+		state = output_get_value(m_output_name.c_str());
 
 	// if configured to an input, fetch the input value
 	else if (m_input_tag[0] != 0)
 	{
-		ioport_port *port = m_element->machine().root_device().ioport(m_input_tag);
+		ioport_port *port = m_element->machine().root_device().ioport(m_input_tag.c_str());
 		if (port != NULL)
 		{
 			ioport_field *field = port->field(m_input_mask);

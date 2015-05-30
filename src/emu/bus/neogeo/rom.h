@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:S. Smith,David Haywood
 #ifndef __NEOGEO_ROM_H
 #define __NEOGEO_ROM_H
 

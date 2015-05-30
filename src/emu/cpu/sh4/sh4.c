@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*****************************************************************************
  *
  *   sh4.c
@@ -29,6 +31,24 @@
 #include "sh4comn.h"
 #include "sh3comn.h"
 #include "sh4tmu.h"
+
+#if SH4_USE_FASTRAM_OPTIMIZATION
+void sh34_base_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+{
+	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
+	{
+		m_fastram[m_fastram_select].start = start;
+		m_fastram[m_fastram_select].end = end;
+		m_fastram[m_fastram_select].readonly = readonly;
+		m_fastram[m_fastram_select].base = base;
+		m_fastram_select++;
+	}
+}
+#else
+void sh34_base_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+{
+}
+#endif
 
 
 CPU_DISASSEMBLE( sh4 );
@@ -79,7 +99,17 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 	, c_md7(0)
 	, c_md8(0)
 	, c_clock(0)
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	, m_bigendian(endianness == ENDIANNESS_BIG)
+	, m_byte_xor(m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0))
+	, m_word_xor(m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0))
+	, m_dword_xor(m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0))
+	, m_fastram_select(0)
+#endif
 {
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	memset(m_fastram, 0, sizeof(m_fastram));
+#endif
 }
 
 
@@ -233,7 +263,22 @@ inline UINT8 sh34_base_device::RB(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_byte(A);
 
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		return fastbase[_A ^ m_byte_xor];
+	}
+	return m_program->read_byte(_A);
+#else
 	return m_program->read_byte(A & AM);
+#endif
+
 }
 
 inline UINT16 sh34_base_device::RW(offs_t A)
@@ -241,7 +286,22 @@ inline UINT16 sh34_base_device::RW(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_word(A);
 
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		return ((UINT16*)fastbase)[(_A ^ m_word_xor) >> 1];
+	}
+	return m_program->read_word(_A);
+#else
 	return m_program->read_word(A & AM);
+#endif
+
 }
 
 inline UINT32 sh34_base_device::RL(offs_t A)
@@ -249,7 +309,22 @@ inline UINT32 sh34_base_device::RL(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_dword(A);
 
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		return ((UINT32*)fastbase)[(_A^m_dword_xor) >> 2];
+	}
+	return m_program->read_dword(_A);
+#else
 	return m_program->read_dword(A & AM);
+#endif
+
 }
 
 inline void sh34_base_device::WB(offs_t A, UINT8 V)
@@ -259,8 +334,23 @@ inline void sh34_base_device::WB(offs_t A, UINT8 V)
 		m_program->write_byte(A,V);
 		return;
 	}
-
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		fastbase[_A ^ m_byte_xor] = V;
+		return;
+	}
+	m_program->write_byte(_A,V);
+#else
 	m_program->write_byte(A & AM,V);
+#endif
+
 }
 
 inline void sh34_base_device::WW(offs_t A, UINT16 V)
@@ -270,8 +360,23 @@ inline void sh34_base_device::WW(offs_t A, UINT16 V)
 		m_program->write_word(A,V);
 		return;
 	}
-
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		void *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		((UINT16*)fastbase)[(_A ^ m_word_xor) >> 1] = V;
+		return;
+	}
+	m_program->write_word(_A,V);
+#else
 	m_program->write_word(A & AM,V);
+#endif
+
 }
 
 inline void sh34_base_device::WL(offs_t A, UINT32 V)
@@ -281,8 +386,22 @@ inline void sh34_base_device::WL(offs_t A, UINT32 V)
 		m_program->write_dword(A,V);
 		return;
 	}
-
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		void *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		((UINT32*)fastbase)[(_A ^ m_dword_xor) >> 2] = V;
+		return;
+	}
+	m_program->write_dword(_A,V);
+#else
 	m_program->write_dword(A & AM,V);
+#endif
 }
 
 /*  code                 cycles  t-bit
@@ -2847,7 +2966,7 @@ inline void sh34_base_device::FSRRA(const UINT16 opcode)
 
 	if (FP_RFS(n) < 0)
 		return;
-	FP_RFS(n) = 1.0 / sqrtf(FP_RFS(n));
+	FP_RFS(n) = 1.0f / sqrtf(FP_RFS(n));
 }
 
 /*  FSSCA FPUL,FRn PR=0 1111nnn011111101 */
@@ -2855,9 +2974,9 @@ void sh34_base_device::FSSCA(const UINT16 opcode)
 {
 	UINT32 n = Rn;
 
-float angle;
+	float angle;
 
-	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0) * 2.0 * M_PI;
+	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float) M_PI;
 	FP_RFS(n) = sinf(angle);
 	FP_RFS(n+1) = cosf(angle);
 }
@@ -4328,7 +4447,7 @@ void sh34_base_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void sh34_base_device::state_string_export(const device_state_entry &entry, astring &string)
+void sh34_base_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 #ifdef LSB_FIRST
 	UINT8 fpu_xor = m_fpu_pr;
@@ -4339,7 +4458,7 @@ void sh34_base_device::state_string_export(const device_state_entry &entry, astr
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%s%s%s%s%c%c%d%c%c",
+			strprintf(str, "%s%s%s%s%c%c%d%c%c",
 					m_sr & MD ? "MD ":"   ",
 					m_sr & sRB ? "RB ":"   ",
 					m_sr & BL ? "BL ":"   ",
@@ -4352,131 +4471,131 @@ void sh34_base_device::state_string_export(const device_state_entry &entry, astr
 			break;
 
 		case SH4_FR0:
-			string.printf("%08X %f", m_fr[0 ^ fpu_xor], (double)FP_RFS(0 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[0 ^ fpu_xor], (double)FP_RFS(0 ^ fpu_xor));
 			break;
 
 		case SH4_FR1:
-			string.printf("%08X %f", m_fr[1 ^ fpu_xor], (double)FP_RFS(1 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[1 ^ fpu_xor], (double)FP_RFS(1 ^ fpu_xor));
 			break;
 
 		case SH4_FR2:
-			string.printf("%08X %f", m_fr[2 ^ fpu_xor], (double)FP_RFS(2 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[2 ^ fpu_xor], (double)FP_RFS(2 ^ fpu_xor));
 			break;
 
 		case SH4_FR3:
-			string.printf("%08X %f", m_fr[3 ^ fpu_xor], (double)FP_RFS(3 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[3 ^ fpu_xor], (double)FP_RFS(3 ^ fpu_xor));
 			break;
 
 		case SH4_FR4:
-			string.printf("%08X %f", m_fr[4 ^ fpu_xor], (double)FP_RFS(4 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[4 ^ fpu_xor], (double)FP_RFS(4 ^ fpu_xor));
 			break;
 
 		case SH4_FR5:
-			string.printf("%08X %f", m_fr[5 ^ fpu_xor], (double)FP_RFS(5 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[5 ^ fpu_xor], (double)FP_RFS(5 ^ fpu_xor));
 			break;
 
 		case SH4_FR6:
-			string.printf("%08X %f", m_fr[6 ^ fpu_xor], (double)FP_RFS(6 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[6 ^ fpu_xor], (double)FP_RFS(6 ^ fpu_xor));
 			break;
 
 		case SH4_FR7:
-			string.printf("%08X %f", m_fr[7 ^ fpu_xor], (double)FP_RFS(7 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[7 ^ fpu_xor], (double)FP_RFS(7 ^ fpu_xor));
 			break;
 
 		case SH4_FR8:
-			string.printf("%08X %f", m_fr[8 ^ fpu_xor], (double)FP_RFS(8 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[8 ^ fpu_xor], (double)FP_RFS(8 ^ fpu_xor));
 			break;
 
 		case SH4_FR9:
-			string.printf("%08X %f", m_fr[9 ^ fpu_xor], (double)FP_RFS(9 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[9 ^ fpu_xor], (double)FP_RFS(9 ^ fpu_xor));
 			break;
 
 		case SH4_FR10:
-			string.printf("%08X %f", m_fr[10 ^ fpu_xor], (double)FP_RFS(10 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[10 ^ fpu_xor], (double)FP_RFS(10 ^ fpu_xor));
 			break;
 
 		case SH4_FR11:
-			string.printf("%08X %f", m_fr[11 ^ fpu_xor], (double)FP_RFS(11 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[11 ^ fpu_xor], (double)FP_RFS(11 ^ fpu_xor));
 			break;
 
 		case SH4_FR12:
-			string.printf("%08X %f", m_fr[12 ^ fpu_xor], (double)FP_RFS(12 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[12 ^ fpu_xor], (double)FP_RFS(12 ^ fpu_xor));
 			break;
 
 		case SH4_FR13:
-			string.printf("%08X %f", m_fr[13 ^ fpu_xor], (double)FP_RFS(13 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[13 ^ fpu_xor], (double)FP_RFS(13 ^ fpu_xor));
 			break;
 
 		case SH4_FR14:
-			string.printf("%08X %f", m_fr[14 ^ fpu_xor], (double)FP_RFS(14 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[14 ^ fpu_xor], (double)FP_RFS(14 ^ fpu_xor));
 			break;
 
 		case SH4_FR15:
-			string.printf("%08X %f", m_fr[15 ^ fpu_xor], (double)FP_RFS(15 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_fr[15 ^ fpu_xor], (double)FP_RFS(15 ^ fpu_xor));
 			break;
 
 		case SH4_XF0:
-			string.printf("%08X %f", m_xf[0 ^ fpu_xor], (double)FP_XFS(0 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[0 ^ fpu_xor], (double)FP_XFS(0 ^ fpu_xor));
 			break;
 
 		case SH4_XF1:
-			string.printf("%08X %f", m_xf[1 ^ fpu_xor], (double)FP_XFS(1 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[1 ^ fpu_xor], (double)FP_XFS(1 ^ fpu_xor));
 			break;
 
 		case SH4_XF2:
-			string.printf("%08X %f", m_xf[2 ^ fpu_xor], (double)FP_XFS(2 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[2 ^ fpu_xor], (double)FP_XFS(2 ^ fpu_xor));
 			break;
 
 		case SH4_XF3:
-			string.printf("%08X %f", m_xf[3 ^ fpu_xor], (double)FP_XFS(3 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[3 ^ fpu_xor], (double)FP_XFS(3 ^ fpu_xor));
 			break;
 
 		case SH4_XF4:
-			string.printf("%08X %f", m_xf[4 ^ fpu_xor], (double)FP_XFS(4 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[4 ^ fpu_xor], (double)FP_XFS(4 ^ fpu_xor));
 			break;
 
 		case SH4_XF5:
-			string.printf("%08X %f", m_xf[5 ^ fpu_xor], (double)FP_XFS(5 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[5 ^ fpu_xor], (double)FP_XFS(5 ^ fpu_xor));
 			break;
 
 		case SH4_XF6:
-			string.printf("%08X %f", m_xf[6 ^ fpu_xor], (double)FP_XFS(6 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[6 ^ fpu_xor], (double)FP_XFS(6 ^ fpu_xor));
 			break;
 
 		case SH4_XF7:
-			string.printf("%08X %f", m_xf[7 ^ fpu_xor], (double)FP_XFS(7 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[7 ^ fpu_xor], (double)FP_XFS(7 ^ fpu_xor));
 			break;
 
 		case SH4_XF8:
-			string.printf("%08X %f", m_xf[8 ^ fpu_xor], (double)FP_XFS(8 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[8 ^ fpu_xor], (double)FP_XFS(8 ^ fpu_xor));
 			break;
 
 		case SH4_XF9:
-			string.printf("%08X %f", m_xf[9 ^ fpu_xor], (double)FP_XFS(9 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[9 ^ fpu_xor], (double)FP_XFS(9 ^ fpu_xor));
 			break;
 
 		case SH4_XF10:
-			string.printf("%08X %f", m_xf[10 ^ fpu_xor], (double)FP_XFS(10 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[10 ^ fpu_xor], (double)FP_XFS(10 ^ fpu_xor));
 			break;
 
 		case SH4_XF11:
-			string.printf("%08X %f", m_xf[11 ^ fpu_xor], (double)FP_XFS(11 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[11 ^ fpu_xor], (double)FP_XFS(11 ^ fpu_xor));
 			break;
 
 		case SH4_XF12:
-			string.printf("%08X %f", m_xf[12 ^ fpu_xor], (double)FP_XFS(12 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[12 ^ fpu_xor], (double)FP_XFS(12 ^ fpu_xor));
 			break;
 
 		case SH4_XF13:
-			string.printf("%08X %f", m_xf[13 ^ fpu_xor], (double)FP_XFS(13 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[13 ^ fpu_xor], (double)FP_XFS(13 ^ fpu_xor));
 			break;
 
 		case SH4_XF14:
-			string.printf("%08X %f", m_xf[14 ^ fpu_xor], (double)FP_XFS(14 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[14 ^ fpu_xor], (double)FP_XFS(14 ^ fpu_xor));
 			break;
 
 		case SH4_XF15:
-			string.printf("%08X %f", m_xf[15 ^ fpu_xor], (double)FP_XFS(15 ^ fpu_xor));
+			strprintf(str, "%08X %f", m_xf[15 ^ fpu_xor], (double)FP_XFS(15 ^ fpu_xor));
 			break;
 
 	}

@@ -1,7 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Tim Schuerewegen
 /**************************************************************************
  *
  * gp32.c - Game Park GP32
- * Skeleton by R. Belmont
+ * Driver by Tim Schuerewegen
  *
  * CPU: Samsung S3C2400X01 SoC
  * S3C2400X01 consists of:

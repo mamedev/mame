@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /*****************************************************************************
  *
  * includes/poisk1.h

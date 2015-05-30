@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Krzysztof Strzecha
 /*********************************************************************
 
     lviv_lvt.h

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Quench, Yochizo, David Haywood
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
@@ -153,8 +155,6 @@ public:
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	void toaplan2_vblank_irq(int irq_line);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(bbakraid_irqhandler);
 
 	UINT8 m_pwrkick_hopper;
 	DECLARE_CUSTOM_INPUT_MEMBER(pwrkick_hopper_status_r);

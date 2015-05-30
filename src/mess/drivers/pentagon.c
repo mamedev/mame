@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, MetalliC
 #include "emu.h"
 #include "includes/spectrum.h"
 #include "imagedev/snapquik.h"
@@ -120,6 +122,9 @@ WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
 	if (m_port_7ffd_data & 0x20)
 		return;
 
+	if ((m_port_7ffd_data ^ data) & 0x08)
+		spectrum_UpdateScreenBitmap();
+
 	/* store new state */
 	m_port_7ffd_data = data;
 
@@ -183,7 +188,6 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	{
 		if (strcmp(machine().system().name, "pent1024")==0)
 			m_beta->enable();
-		m_beta->clear_status();
 	}
 	space.set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tatsuyuki Satoh
 #pragma once
 
 #ifndef __VLM5030_H__

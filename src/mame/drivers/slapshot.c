@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves
 /***************************************************************************
 
 Slapshot (c) Taito 1994
@@ -157,9 +159,9 @@ void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-INTERRUPT_GEN_MEMBER(slapshot_state::slapshot_interrupt)
+INTERRUPT_GEN_MEMBER(slapshot_state::interrupt)
 {
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), TIMER_SLAPSHOT_INTERRUPT6);
+	m_int6_timer->adjust(m_maincpu->cycles_to_attotime(200000 - 500));
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
@@ -168,7 +170,7 @@ INTERRUPT_GEN_MEMBER(slapshot_state::slapshot_interrupt)
                 GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(slapshot_state::slapshot_service_input_r)
+READ16_MEMBER(slapshot_state::service_input_r)
 {
 	switch (offset)
 	{
@@ -223,7 +225,7 @@ WRITE8_MEMBER(slapshot_state::sound_bankswitch_w)
 	membank("z80bank")->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(slapshot_state::slapshot_msb_sound_w)
+WRITE16_MEMBER(slapshot_state::msb_sound_w)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, (data >> 8) & 0xff);
@@ -236,7 +238,7 @@ WRITE16_MEMBER(slapshot_state::slapshot_msb_sound_w)
 #endif
 }
 
-READ16_MEMBER(slapshot_state::slapshot_msb_sound_r)
+READ16_MEMBER(slapshot_state::msb_sound_r)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff) << 8);
@@ -260,8 +262,8 @@ static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
-	AM_RANGE(0xc00020, 0xc0002f) AM_READ(slapshot_service_input_r)  /* service mirror */
-	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(slapshot_msb_sound_r, slapshot_msb_sound_w)
+	AM_RANGE(0xc00020, 0xc0002f) AM_READ(service_input_r)  /* service mirror */
+	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(msb_sound_r, msb_sound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16, slapshot_state )
@@ -275,8 +277,8 @@ static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
-	AM_RANGE(0xc00020, 0xc0002f) AM_READ(slapshot_service_input_r)   /* service mirror */
-	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(slapshot_msb_sound_r, slapshot_msb_sound_w)
+	AM_RANGE(0xc00020, 0xc0002f) AM_READ(service_input_r)   /* service mirror */
+	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(msb_sound_r, msb_sound_w)
 	AM_RANGE(0xe00000, 0xe00007) AM_READWRITE(opwolf3_adc_r, opwolf3_adc_req_w)
 ADDRESS_MAP_END
 
@@ -444,18 +446,6 @@ static GFXDECODE_START( slapshot )
 GFXDECODE_END
 
 
-
-/**************************************************************
-                 YM2610B (SOUND)
-**************************************************************/
-
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(slapshot_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 /***********************************************************
                  MACHINE DRIVERS
 ***********************************************************/
@@ -463,6 +453,8 @@ WRITE_LINE_MEMBER(slapshot_state::irqhandler)
 void slapshot_state::machine_start()
 {
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	
+	m_int6_timer = timer_alloc(TIMER_SLAPSHOT_INTERRUPT6);
 }
 
 
@@ -471,7 +463,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
 	MCFG_CPU_PROGRAM_MAP(slapshot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  slapshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
@@ -490,7 +482,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update_slapshot)
+	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -514,7 +506,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(slapshot_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -532,7 +524,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
 	MCFG_CPU_PROGRAM_MAP(opwolf3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  slapshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
@@ -551,7 +543,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update_slapshot)
+	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -575,7 +567,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(slapshot_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -704,6 +696,6 @@ DRIVER_INIT_MEMBER(slapshot_state,slapshot)
 	}
 }
 
-GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)", 0 )
-GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3, slapshot_state,  slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", 0 )
-GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3, slapshot_state,  slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)", 0 )
+GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3, slapshot_state,  slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3, slapshot_state,  slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)", GAME_SUPPORTS_SAVE )

@@ -117,7 +117,7 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 		m_indirect_colors[index] = rgb;
 
 		// update the palette for any colortable entries that reference it
-		for (UINT32 pen = 0; pen < m_indirect_pens.count(); pen++)
+		for (UINT32 pen = 0; pen < m_indirect_pens.size(); pen++)
 			if (m_indirect_pens[pen] == index)
 				m_palette->entry_set_color(pen, rgb);
 	}
@@ -150,11 +150,11 @@ UINT32 palette_device::transpen_mask(gfx_element &gfx, int color, int transcolor
 	UINT32 entry = gfx.colorbase() + (color % gfx.colors()) * gfx.granularity();
 
 	// make sure we are in range
-	assert(entry < m_indirect_pens.count());
+	assert(entry < m_indirect_pens.size());
 	assert(gfx.depth() <= 32);
 
 	// either gfx->color_depth entries or as many as we can get up until the end
-	int count = MIN(gfx.depth(), m_indirect_pens.count() - entry);
+	int count = MIN(gfx.depth(), m_indirect_pens.size() - entry);
 
 	// set a bit anywhere the transcolor matches
 	UINT32 mask = 0;
@@ -408,8 +408,8 @@ void palette_device::device_start()
 	if (share != NULL)
 	{
 		// find the extended (split) memory, if present
-		astring tag_ext(tag(), "_ext");
-		const memory_share *share_ext = memshare(tag_ext.cstr());
+		std::string tag_ext = std::string(tag()).append("_ext");
+		const memory_share *share_ext = memshare(tag_ext.c_str());
 
 		// make sure we have specified a format
 		assert_always(m_raw_to_rgb.bytes_per_entry() > 0, "Palette has memory share but no format specified");

@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Intelligent Designs NICK emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
@@ -293,8 +292,8 @@ WRITE8_MEMBER( nick_device::lph_w )
 
 void nick_device::initialize_palette()
 {
-	const int resistances_rg[] = { RES_R(470), RES_R(220), RES_R(100) };
-	const int resistances_b[] = { RES_R(220), RES_R(82) };
+	const int resistances_rg[] = { (int) RES_R(470), (int) RES_R(220), (int) RES_R(100) };
+	const int resistances_b[] = { (int) RES_R(220), (int) RES_R(82) };
 
 	double color_weights_rg[3], color_weights_b[2];
 

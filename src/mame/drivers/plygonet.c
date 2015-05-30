@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Andrew Gardner
 /*
     Polygonet Commanders (Konami, 1993)
     Poly-Net Warriors (Konami, 1993)

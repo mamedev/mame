@@ -4,9 +4,6 @@
 
     Zilog Z8536 Counter/Timer and Parallel I/O emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

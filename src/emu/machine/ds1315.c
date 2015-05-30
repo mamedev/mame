@@ -1,12 +1,25 @@
-/*********************************************************************
+// license:BSD-3-Clause
+// copyright-holders:Tim Lindner
+/*****************************************************************************************
 
     ds1315.c
 
     Dallas Semiconductor's Phantom Time Chip DS1315.
+    NOTE: writes are decoded, but the host's time will always be returned when asked.
 
-    by tim lindner, November 2001.
+    April 2015: chip enable / chip reset / phantom writes by Karl-Ludwig Deisenhofer
 
-*********************************************************************/
+    November 2001: implementation by Tim Lindner
+
+    HOW DOES IT WORK?
+
+    READS: pattern recognition (64 bits in correct order). When RTC finally enables
+    64 bits of data can be read. Chance of accidential pattern recognition is minimal.
+
+    WRITES: two different locations (bits 0 and 1) are used to transfer data to the
+    DS1315.   64 bit with time/date info are transmitted directly after recognition
+    of the magic 64 bit pattern (see read above).
+    **************************************************************************************/
 
 #include "ds1315.h"
 #include "coreutil.h"
@@ -47,10 +60,9 @@ void ds1315_device::device_start()
 
 void ds1315_device::device_reset()
 {
-	memset(m_raw_data, 0, sizeof(m_raw_data));
-	m_count = 0;
-	m_mode = DS_SEEK_MATCHING;
+	chip_reset();
 }
+
 
 
 /***************************************************************************
@@ -75,7 +87,7 @@ static const UINT8 ds1315_pattern[] =
 ***************************************************************************/
 
 /*-------------------------------------------------
- read_0
+ read_0 (actual data)
  -------------------------------------------------*/
 
 READ8_MEMBER( ds1315_device::read_0 )
@@ -100,7 +112,7 @@ READ8_MEMBER( ds1315_device::read_0 )
 
 
 /*-------------------------------------------------
-    read_1
+    read_1 (actual data)
 -------------------------------------------------*/
 
 READ8_MEMBER( ds1315_device::read_1 )
@@ -144,35 +156,12 @@ READ8_MEMBER( ds1315_device::read_data )
 
 
 /*-------------------------------------------------
-    write_data
--------------------------------------------------*/
-
-WRITE8_MEMBER( ds1315_device::write_data )
-{
-	if (m_mode == DS_CALENDAR_IO)
-	{
-		m_raw_data[m_count++] = data & 0x01;
-
-		if (m_count == 64)
-		{
-			m_mode = DS_SEEK_MATCHING;
-			m_count = 0;
-			input_raw_data();
-		}
-		return;
-	}
-
-	m_count = 0;
-}
-
-
-/*-------------------------------------------------
     fill_raw_data
 -------------------------------------------------*/
 
 void ds1315_device::fill_raw_data()
 {
-	/* This routine will (hopefully) call a standard 'C' library routine to get the current
+	/* This routine calls a standard 'C' library routine to get the current
 	   date and time and then fill in the raw data struct.
 	*/
 
@@ -203,16 +192,86 @@ void ds1315_device::fill_raw_data()
 }
 
 
+
+
 /*-------------------------------------------------
-    ds1315_input_raw_data
+write_data
+-------------------------------------------------*/
+
+READ8_MEMBER(ds1315_device::write_data)
+{
+	static int write_count;
+	if (write_count >= 64)
+		write_count = 0;
+
+	if (m_mode == DS_CALENDAR_IO)
+	{
+		m_raw_data[write_count++] = offset & 0x01;
+
+		if (write_count == 64)
+		{
+			write_count = 0;
+
+			m_mode = DS_SEEK_MATCHING;
+			m_count = 0;
+			input_raw_data();
+		}
+	}
+	return 0; // ignore
+}
+
+/*-------------------------------------------------
+  ds1315_input_raw_data
+
+  Routine is called when new date and time has
+  been written to the clock chip. Currently we
+  ignore setting the date and time in the clock
+  chip.
 -------------------------------------------------*/
 
 void ds1315_device::input_raw_data()
 {
-	/* This routine is called when new date and time has been written to the
-	   clock chip. Currently we ignore setting the date and time in the clock
-	   chip.
+	int raw[8], i, j=0;
+	raw[0] = raw[1] = raw[2] = raw[3] = raw[4] = raw[5] = raw[6] = raw[7] = 0;
+	UINT8 flag = 1;
 
-	   We always return the host's time when asked.
-	*/
+	for (i = 0; i < 64; i++)
+	{
+		j = i / 8;
+		if ((i % 8) == 0)
+			flag = 1;
+
+		if (m_raw_data[i] & 1)
+				raw[j] |= flag;
+		flag <<= 1;
+	}
+	raw[0] = bcd_2_dec(raw[0]); // hundreds of seconds
+	raw[1] = bcd_2_dec(raw[1]); // seconds (often set to zero)
+	raw[2] = bcd_2_dec(raw[2]); // minute
+	raw[3] = bcd_2_dec(raw[3]); // hour
+
+	raw[4] = bcd_2_dec(raw[4]); // weekday (10 for Friday ?!)
+	raw[5] = bcd_2_dec(raw[5]); // mday
+	raw[6] = bcd_2_dec(raw[6]); // month
+	raw[7] = bcd_2_dec(raw[7]); // year (two digits)
+
+	printf("\nDS1315 RTC INPUT (WILL BE IGNORED) mm/dd/yy  hh:mm:ss - %02d/%02d/%02d %02d/%02d/%02d",
+				raw[6], raw[5], raw[7], raw[3], raw[2], raw[1]
+			);
+}
+
+/*-------------------------------------------------
+   query and reset chip status
+   -------------------------------------------------*/
+bool ds1315_device::chip_enable()
+{
+	return (m_mode == DS_CALENDAR_IO);
+}
+
+// Set a defined state (important for pattern detection)
+void ds1315_device::chip_reset()
+{
+	memset(m_raw_data, 0, sizeof(m_raw_data));
+	m_count = 0;
+	m_mode = DS_SEEK_MATCHING;
 }

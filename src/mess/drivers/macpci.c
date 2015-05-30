@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:R.Belmont
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   macpci.c: second-generation Old World PowerMacs based on PCI instead of NuBus

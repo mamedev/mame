@@ -59,6 +59,7 @@ struct options
 CPU_DISASSEMBLE( adsp21xx );
 CPU_DISASSEMBLE( alpha8201 );
 CPU_DISASSEMBLE( am29000 );
+CPU_DISASSEMBLE( amis2000 );
 CPU_DISASSEMBLE( apexc );
 CPU_DISASSEMBLE( arm );
 CPU_DISASSEMBLE( arm_be );
@@ -83,6 +84,7 @@ CPU_DISASSEMBLE( ds5002fp );
 CPU_DISASSEMBLE( dsp16a );
 CPU_DISASSEMBLE( dsp32c );
 CPU_DISASSEMBLE( dsp56k );
+CPU_DISASSEMBLE( e0c6200 );
 CPU_DISASSEMBLE( esrip );
 CPU_DISASSEMBLE( f8 );
 CPU_DISASSEMBLE( g65816_generic );
@@ -93,6 +95,7 @@ CPU_DISASSEMBLE( hd61700 );
 CPU_DISASSEMBLE( hd6301 );
 CPU_DISASSEMBLE( hd6309 );
 CPU_DISASSEMBLE( hd63701 );
+CPU_DISASSEMBLE( hmcs40 );
 CPU_DISASSEMBLE( hyperstone_generic );
 CPU_DISASSEMBLE( i4004 );
 CPU_DISASSEMBLE( i8008 );
@@ -110,6 +113,7 @@ CPU_DISASSEMBLE( jaguargpu );
 CPU_DISASSEMBLE( konami );
 CPU_DISASSEMBLE( lh5801 );
 CPU_DISASSEMBLE( lr35902 );
+CPU_DISASSEMBLE( m58846 );
 CPU_DISASSEMBLE( m37710_generic );
 CPU_DISASSEMBLE( m6800 );
 CPU_DISASSEMBLE( m68000 );
@@ -178,6 +182,7 @@ CPU_DISASSEMBLE( tms9980 );
 CPU_DISASSEMBLE( tms9995 );
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );
+CPU_DISASSEMBLE( ucom4 );
 CPU_DISASSEMBLE( unsp );
 CPU_DISASSEMBLE( upd7725 );
 CPU_DISASSEMBLE( upd7801 );
@@ -203,6 +208,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "adsp21xx",   _24le, -2, CPU_DISASSEMBLE_NAME(adsp21xx) },
 	{ "alpha8201",  _8bit,  0, CPU_DISASSEMBLE_NAME(alpha8201) },
 	{ "am29000",    _32be,  0, CPU_DISASSEMBLE_NAME(am29000) },
+	{ "amis2000",   _8bit,  0, CPU_DISASSEMBLE_NAME(amis2000) },
 	{ "apexc",      _32be,  0, CPU_DISASSEMBLE_NAME(apexc) },
 	{ "arm",        _32le,  0, CPU_DISASSEMBLE_NAME(arm) },
 	{ "arm_be",     _32be,  0, CPU_DISASSEMBLE_NAME(arm_be) },
@@ -227,19 +233,21 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp16a",     _16le, -1, CPU_DISASSEMBLE_NAME(dsp16a) },
 	{ "dsp32c",     _32le,  0, CPU_DISASSEMBLE_NAME(dsp32c) },
 	{ "dsp56k",     _16le, -1, CPU_DISASSEMBLE_NAME(dsp56k) },
+	{ "e0c6200",    _16be, -1, CPU_DISASSEMBLE_NAME(e0c6200) },
 	{ "esrip",      _64be,  0, CPU_DISASSEMBLE_NAME(esrip) },
 	{ "f8",         _8bit,  0, CPU_DISASSEMBLE_NAME(f8) },
 	{ "g65816",     _8bit,  0, CPU_DISASSEMBLE_NAME(g65816_generic) },
 	{ "h6280",      _8bit,  0, CPU_DISASSEMBLE_NAME(h6280) },
-	//  { "h8",         _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
-	//  { "h8_24",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
-	//  { "h8_32",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
+//  { "h8",         _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
+//  { "h8_24",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
+//  { "h8_32",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
 	{ "hc11",       _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
 	{ "hcd62121",   _16be,  0, CPU_DISASSEMBLE_NAME(hcd62121) },
 	{ "hd61700",    _8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
 	{ "hd6301",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd6301) },
 	{ "hd6309",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd6309) },
 	{ "hd63701",    _8bit,  0, CPU_DISASSEMBLE_NAME(hd63701) },
+	{ "hmcs40",     _16le, -1, CPU_DISASSEMBLE_NAME(hmcs40) },
 	{ "hyperstone", _16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
 	{ "i4004",      _8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
 	{ "i8008",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
@@ -257,6 +265,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "konami",     _8bit,  0, CPU_DISASSEMBLE_NAME(konami) },
 	{ "lh5801",     _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
 	{ "lr35902",    _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },
+	{ "m58846",     _16le, -1, CPU_DISASSEMBLE_NAME(m58846) },
 	{ "m37710",     _8bit,  0, CPU_DISASSEMBLE_NAME(m37710_generic) },
 	{ "m6800",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6800) },
 	{ "m68000",     _16be,  0, CPU_DISASSEMBLE_NAME(m68000) },
@@ -324,6 +333,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms9995",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms9995) },
 	{ "tx0_64kw",   _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
 	{ "tx0_8kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
+	{ "ucom4",      _8bit,  0, CPU_DISASSEMBLE_NAME(ucom4) },
 	{ "unsp",       _16be,  0, CPU_DISASSEMBLE_NAME(unsp) },
 	{ "upd7725",    _32be,  0, CPU_DISASSEMBLE_NAME(unsp) },
 	{ "upd7801",    _8bit,  0, CPU_DISASSEMBLE_NAME(upd7801) },

@@ -1,17 +1,19 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /***************************************************************************
 
 Wyvern F-0 (1985, Taito)
 
 driver by Luca Elia
 
-Typical Taito mid-80s hardware but with dual video outputs.
+Typical Taito mid-80s hardware but with dual video output.
 
 Sound board:    Z80, 2 x YM2149, OKI M5232
 CPU board:      Z80, ROM and RAM, 68705P5 MCU (protected)
 OBJ board:      ROMs and RAM
 Video board:    ROMs and RAM, 4 x Fujitsu MB112S146 (also used on arkanoid, lkage)
 
-The rest is just common logic, there's no custom chips.
+The rest is just common logic, there are no custom chips.
 
 The cabinet uses a half-silvered mirror to mix the images from two screens for a pseudo-3D effect:
 
@@ -21,6 +23,8 @@ Backgrounds and enemies on the ground are displayed in the lower screen, while
 player ship and enemies in the air are displayed in the upper screen.
 And the cabinet also has two speakers. The sound of enemies on the ground is heard
 from the bottom speaker and the sound of enemies in the air is heard from the top speaker.
+
+Actual game video: http://www.nicozon.net/watch/sm10823430
 
 ***************************************************************************/
 
@@ -125,20 +129,18 @@ WRITE8_MEMBER(wyvernf0_state::fgram_w)
 TILE_GET_INFO_MEMBER(wyvernf0_state::get_bg_tile_info)
 {
 	int offs = tile_index * 2;
-	int code = m_bgram[offs] + ((m_bgram[offs+1] & 0xff) << 8);
-	int color = 0 + ((code & 0x7000) >> 12);
+	int code = m_bgram[offs] + (m_bgram[offs+1] << 8);
+	int color = 0 + ((code & 0x3000) >> 12);
 
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
 TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 {
 	int offs = tile_index * 2;
-	int code = m_fgram[offs] + ((m_fgram[offs+1] & 0xff) << 8);
-	int color = 8 + ((code & 0x7000) >> 12);
+	int code = m_fgram[offs] + (m_fgram[offs+1] << 8);
+	int color = 8 + ((code & 0x3000) >> 12);
 
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
-	// flip bits overlap color bits, but this way the rotated taito copyright matches the screenshot here:
-	// http://twitter.yfrog.com/odzpridj
 }
 
 VIDEO_START_MEMBER(wyvernf0_state,wyvernf0)
@@ -180,7 +182,7 @@ YY       XX
 71 11 04 a8 <- target
 71 01 0f 50 <- player
 
-yyyyyyyy fccccccc xf??pppp xxxxxxxx
+yyyyyyyy fccccccc x???pppp xxxxxxxx
 
 */
 	UINT8 *sprram = &m_spriteram[ is_foreground ? m_spriteram.bytes()/2 : 0 ];
@@ -193,7 +195,8 @@ yyyyyyyy fccccccc xf??pppp xxxxxxxx
 		sx = sprram[offs + 3] - ((sprram[offs + 2] & 0x80) << 1);
 		sy = 256 - 8 - sprram[offs + 0] - 23;   // center player sprite: 256 - 8 - 0x71 + dy = 256/2-32/2 -> dy = -23
 
-		int flipx = sprram[offs + 2] & 0x40;    // maybe
+//      int flipx = sprram[offs + 2] & 0x40;    // nope
+		int flipx = 0;
 		int flipy = sprram[offs + 1] & 0x80;
 
 		if (flip_screen_x())

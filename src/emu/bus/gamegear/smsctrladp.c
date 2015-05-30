@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Game Gear "Gear to Gear Port SMS Controller Adaptor" emulation
+    Sega Game Gear "SMS Controller Adaptor" emulation
     Also known as "Master Link" cable.
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
@@ -29,7 +28,7 @@ const device_type SMS_CTRL_ADAPTOR = &device_creator<sms_ctrl_adaptor_device>;
 
 sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, SMS_CTRL_ADAPTOR, "SMS Controller Adaptor", tag, owner, clock, "sms_ctrl_adaptor", __FILE__),
-	device_gg_gear2gear_port_interface(mconfig, *this),
+	device_gg_ext_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl")
 {
 }

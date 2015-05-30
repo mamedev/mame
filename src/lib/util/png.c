@@ -10,6 +10,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include <zlib.h>
 #include "png.h"

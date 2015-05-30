@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
 D-Day
@@ -8,7 +10,7 @@ driver by Zsolt Vasvari
 Convention: "sl" stands for "searchlight"
 
 Note: This game doesn't seem to support cocktail mode, which is not too
-      suprising for a gun game.
+      surprising for a gun game.
 
 0000-3fff ROM
 5000-53ff Text layer videoram

@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker
 /*****************************************************************************
  *
  * includes/spectrum.h
@@ -179,6 +181,7 @@ public:
 	UINT32 screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
+	void screen_eof_timex(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
 
@@ -189,6 +192,8 @@ public:
 
 	unsigned int m_previous_border_x, m_previous_border_y;
 	bitmap_ind16 m_border_bitmap;
+	unsigned int m_previous_screen_x, m_previous_screen_y;
+	bitmap_ind16 m_screen_bitmap;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void spectrum_128_update_memory();
@@ -233,11 +238,13 @@ protected:
 	optional_ioport m_io_plus4;
 
 	void spectrum_UpdateBorderBitmap();
-	inline unsigned char get_display_color (unsigned char color, int invert);
+	void spectrum_UpdateScreenBitmap();
+	inline unsigned char get_display_color(unsigned char color, int invert);
 	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines);
 	void ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor);
 	void ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

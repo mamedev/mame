@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Stefan Jokisch
 /***************************************************************************
 
     Atari Drag Race video emulation

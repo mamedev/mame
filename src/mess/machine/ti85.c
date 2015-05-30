@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Krzysztof Strzecha,Jon Sturm
 /***************************************************************************
   TI-85 driver by Krzysztof Strzecha
   TI-83 Plus, TI-84 Plus, and Siliver Edition support by Jon Sturm
@@ -154,7 +156,7 @@ void ti85_state::update_ti83p_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_membank1->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well allmost
+	m_membank1->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well almost
 
 	if (m_ti83p_port4 & 1)
 	{
@@ -898,15 +900,15 @@ void ti85_state::ti83pse_count( UINT8 timer, UINT8 data)
 		switch (timer)
 		{
 		case CRYSTAL_TIMER1:
-			m_crystal_timer1->adjust(attotime::zero, 0, attotime::from_hz( 32768.0/m_ctimer[timer].divsor));
+			m_crystal_timer1->adjust(attotime::zero, 0, attotime::from_hz( 32768.0f/m_ctimer[timer].divsor));
 			m_crystal_timer1->enable(true);
 			break;
 		case CRYSTAL_TIMER2:
-			m_crystal_timer2->adjust(attotime::zero, 0, attotime::from_hz( 32768.0/m_ctimer[timer].divsor));
+			m_crystal_timer2->adjust(attotime::zero, 0, attotime::from_hz( 32768.0f/m_ctimer[timer].divsor));
 			m_crystal_timer2->enable(true);
 			break;
 		case CRYSTAL_TIMER3:
-			m_crystal_timer3->adjust(attotime::zero, 0, attotime::from_hz( 32768.0/m_ctimer[timer].divsor));
+			m_crystal_timer3->adjust(attotime::zero, 0, attotime::from_hz( 32768.0f/m_ctimer[timer].divsor));
 			m_crystal_timer3->enable(true);
 			break;
 
@@ -1179,12 +1181,12 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 
 	ti8x_snapshot_data.resize(snapshot_size);
 
-	image.fread( ti8x_snapshot_data, snapshot_size);
+	image.fread( &ti8x_snapshot_data[0], snapshot_size);
 
 	if (!strncmp(machine().system().name, "ti85", 4))
-		ti85_setup_snapshot(ti8x_snapshot_data);
+		ti85_setup_snapshot(&ti8x_snapshot_data[0]);
 	else if (!strncmp(machine().system().name, "ti86", 4))
-		ti86_setup_snapshot(ti8x_snapshot_data);
+		ti86_setup_snapshot(&ti8x_snapshot_data[0]);
 
 	return IMAGE_INIT_PASS;
 }

@@ -47,6 +47,11 @@
 		NET_REGISTER_DEV(POT, _name)                                                \
 		NETDEV_PARAMI(_name, R, _R)
 
+/* Does not have pin 3 connected */
+#define POT2(_name, _R)                                                       \
+		NET_REGISTER_DEV(POT2, _name)                                                \
+		NETDEV_PARAMI(_name, R, _R)
+
 
 #define CAP(_name, _C)                                                         \
 		NET_REGISTER_DEV(C, _name)                                                  \
@@ -93,7 +98,7 @@ public:
 	netlist_terminal_t m_P;
 	netlist_terminal_t m_N;
 
-	virtual NETLIB_UPDATE_TERMINALS()
+	virtual NETLIB_UPDATE_TERMINALSI()
 	{
 	}
 
@@ -117,9 +122,9 @@ public:
 	}
 
 protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void reset();
-	ATTR_HOT ATTR_ALIGN void update();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void reset();
+	ATTR_HOT void update();
 
 private:
 };
@@ -135,13 +140,13 @@ public:
 
 	inline void set_R(const nl_double R)
 	{
-		set(1.0 / R, 0.0, 0.0);
+		set(NL_FCONST(1.0) / R, 0.0, 0.0);
 	}
 
 protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void reset();
-	ATTR_HOT ATTR_ALIGN void update();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void reset();
+	ATTR_HOT void update();
 };
 
 NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, R_base,
@@ -159,6 +164,15 @@ NETLIB_DEVICE_WITH_PARAMS(POT,
 	netlist_param_double_t m_R;
 	netlist_param_double_t m_Dial;
 	netlist_param_logic_t m_DialIsLog;
+);
+
+NETLIB_DEVICE_WITH_PARAMS(POT2,
+	NETLIB_NAME(R_base) m_R1;
+
+	netlist_param_double_t m_R;
+	netlist_param_double_t m_Dial;
+	netlist_param_logic_t m_DialIsLog;
+	netlist_param_logic_t m_Reverse;
 );
 
 
@@ -179,10 +193,10 @@ public:
 	}
 
 protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void reset();
-	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void reset();
+	/* ATTR_COLD */ virtual void update_param();
+	ATTR_HOT void update();
 
 	netlist_param_double_t m_C;
 
@@ -202,7 +216,7 @@ public:
 	{
 		//FIXME: Optimize cutoff case
 
-		if (nVd < -5.0 * m_Vt)
+		if (nVd < NL_FCONST(-5.0) * m_Vt)
 		{
 			m_Vd = nVd;
 			m_G = m_gmin;
@@ -212,21 +226,18 @@ public:
 		{
 			m_Vd = nVd;
 
-			const nl_double eVDVt = exp(m_Vd * m_VtInv);
-			m_Id = m_Is * (eVDVt - 1.0);
+			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
+			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
 		else
 		{
-#if defined(_MSC_VER) && _MSC_VER < 1800
-			m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
-#else
 			nl_double a = (nVd - m_Vd) * m_VtInv;
-			if (a<1e-12 - 1.0) a = 1e-12 - 1.0;
-			m_Vd = m_Vd + log1p(a) * m_Vt;
-#endif
-			const nl_double eVDVt = exp(m_Vd * m_VtInv);
-			m_Id = m_Is * (eVDVt - 1.0);
+			if (a < NL_FCONST(1e-12) - NL_FCONST(1.0)) a = NL_FCONST(1e-12) - NL_FCONST(1.0);
+			m_Vd = m_Vd + nl_math::e_log1p(a) * m_Vt;
+
+			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
+			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
@@ -263,50 +274,17 @@ private:
 // nld_D
 // ----------------------------------------------------------------------------------------
 
-
-// this one has an accuracy of better than 5%. That's enough for our purpose
-// add c3 and it'll be better than 1%
-
-#if 0
-inline nl_double fastexp_h(const nl_double x)
-{
-	static const nl_double ln2r = 1.442695040888963387;
-	static const nl_double ln2  = 0.693147180559945286;
-	//static const nl_double c3   = 0.166666666666666667;
-
-	const nl_double y = x * ln2r;
-	const unsigned int t = y;
-	const nl_double z = (x - ln2 * (double) t);
-	const nl_double zz = z * z;
-	//const nl_double zzz = zz * z;
-
-	return (double)(1 << t)*(1.0 + z + 0.5 * zz); // + c3*zzz;
-}
-
-inline nl_double fastexp(const nl_double x)
-{
-	if (x<0)
-		return 1.0 / fastexp_h(-x);
-	else
-		return fastexp_h(x);
-}
-#endif
-
 class NETLIB_NAME(D) : public NETLIB_NAME(twoterm)
 {
 public:
 	ATTR_COLD NETLIB_NAME(D)() : NETLIB_NAME(twoterm)(DIODE) { }
 
-	NETLIB_UPDATE_TERMINALS()
-	{
-		m_D.update_diode(deltaV());
-		set(m_D.G(), 0.0, m_D.Ieq());
-	}
+	NETLIB_UPDATE_TERMINALSI();
 
 protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
+	/* ATTR_COLD */ virtual void start();
+	/* ATTR_COLD */ virtual void update_param();
+	ATTR_HOT void update();
 
 	netlist_param_model_t m_model;
 

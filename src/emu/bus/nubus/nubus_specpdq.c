@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   SuperMac Spectrum PDQ video card
@@ -84,20 +86,20 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const 
 		device_t(mconfig, NUBUS_SPECPDQ, "SuperMac Spectrum PDQ video card", tag, owner, clock, "nb_spdq", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this),
-		m_assembled_tag(tag, ":", SPECPDQ_SCREEN_NAME),
 		m_palette(*this, "palette")
 {
-	m_screen_tag = m_assembled_tag;
+	m_assembled_tag = std::string(tag).append(":").append(SPECPDQ_SCREEN_NAME);
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this),
-		m_assembled_tag(tag, ":", SPECPDQ_SCREEN_NAME),
 		m_palette(*this, "palette")
 {
-	m_screen_tag = m_assembled_tag;
+	m_assembled_tag = std::string(tag).append(":").append(SPECPDQ_SCREEN_NAME);
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 //-------------------------------------------------
@@ -135,7 +137,7 @@ void nubus_specpdq_device::device_reset()
 	m_clutoffs = 0;
 	m_vbl_disable = 1;
 	m_mode = 0;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(&m_vram[0], 0, VRAM_SIZE);
 	memset(m_palette_val, 0, sizeof(m_palette_val));
 
 	m_palette_val[0] = rgb_t(255, 255, 255);
@@ -166,7 +168,7 @@ UINT32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	UINT8 pixels, *vram;
 
 	// first time?  kick off the VBL timer
-	vram = m_vram + 0x9000;
+	vram = &m_vram[0x9000];
 
 	switch (m_mode)
 	{
@@ -424,7 +426,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			if (data == 2)
 			{
 				int x, y;
-				UINT8 *vram = m_vram + m_vram_addr + m_patofsx; // m_vram_addr is missing the low 2 bits, we add them back here
+				UINT8 *vram = &m_vram[m_vram_addr + m_patofsx]; // m_vram_addr is missing the low 2 bits, we add them back here
 
 //              printf("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
 
@@ -439,8 +441,8 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			else if ((data == 0x101) || (data == 0x100))
 			{
 				int x, y;
-				UINT8 *vram = m_vram + m_vram_addr;
-				UINT8 *vramsrc = m_vram + m_vram_src;
+				UINT8 *vram = &m_vram[m_vram_addr];
+				UINT8 *vramsrc = &m_vram[m_vram_src];
 
 //              printf("Copy rectangle, width %d height %d  src %x dst %x\n", m_width, m_height, m_vram_addr, m_vram_src);
 

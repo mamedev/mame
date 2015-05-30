@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Atari Video Computer System keypad emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
@@ -55,7 +54,7 @@ ioport_constructor vcs_keypad_device::device_input_ports() const
 //-------------------------------------------------
 
 vcs_keypad_device::vcs_keypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VCS_KEYPAD, "Keypad", tag, owner, clock, "vcs_keypad", __FILE__),
+	device_t(mconfig, VCS_KEYPAD, "Atari / CBM Keypad", tag, owner, clock, "vcs_keypad", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_keypad(*this, "KEYPAD")
 {

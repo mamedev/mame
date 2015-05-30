@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods,Frank Palazzolo
 #include "emu.h"
 #include "video/stic.h"
 #include "includes/intv.h"

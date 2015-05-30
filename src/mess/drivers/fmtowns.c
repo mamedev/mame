@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
 
     Fujitsu FM-Towns
@@ -2033,9 +2035,9 @@ WRITE8_MEMBER(towns_state::towns_volume_w)
 	case 2:
 		m_towns_volume[m_towns_volume_select] = data;
 		if(m_towns_volume_select == 4)
-			m_cdda->set_channel_volume(0,100.0 * (data / 64.0f));
+			m_cdda->set_channel_volume(0,100.0f * (data / 64.0f));
 		if(m_towns_volume_select == 5)
-			m_cdda->set_channel_volume(1,100.0 * (data / 64.0f));
+			m_cdda->set_channel_volume(1,100.0f * (data / 64.0f));
 		break;
 	case 3:  // select channel
 		if(data < 8)

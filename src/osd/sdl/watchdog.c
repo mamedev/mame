@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  watchdog.c - watchdog handling
-//
-//  Copyright (c) 1996-2011, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -11,11 +10,7 @@
 
 #include "osdcomm.h"
 #include "osdcore.h"
-#ifdef SDLMAME_NOASM
 #include "eminline.h"
-#else
-#include "osinline.h"
-#endif
 
 #include "watchdog.h"
 #include "modules/lib/osdlib.h"

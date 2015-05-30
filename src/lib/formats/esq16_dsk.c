@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Olivier Galibert
 /*********************************************************************
 
     formats/esq16_dsk.c
@@ -8,7 +10,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "flopimg.h"
 #include "formats/esq16_dsk.h"
 

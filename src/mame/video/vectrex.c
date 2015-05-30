@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mathis Rosenhauer
 #include <math.h>
 #include "emu.h"
 #include "includes/vectrex.h"

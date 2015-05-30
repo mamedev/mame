@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /**********************************************************************
 
     NEC HuC6270 Video Display Controller

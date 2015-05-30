@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * wpc.c  --  Williams WPC ASIC, used on Williams WPC pinball machines
  *

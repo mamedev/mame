@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:hap, Charles MacDonald
 /**********************************************************************
 
     Sega 315-5296 I/O chip
-
-    Copyright MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

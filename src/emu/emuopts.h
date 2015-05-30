@@ -73,6 +73,9 @@ enum
 #define OPTION_RECORD               "record"
 #define OPTION_MNGWRITE             "mngwrite"
 #define OPTION_AVIWRITE             "aviwrite"
+#ifdef MAME_DEBUG
+#define OPTION_DUMMYWRITE           "dummywrite"
+#endif
 #define OPTION_WAVWRITE             "wavwrite"
 #define OPTION_SNAPNAME             "snapname"
 #define OPTION_SNAPSIZE             "snapsize"
@@ -200,9 +203,9 @@ public:
 	emu_options();
 
 	// parsing wrappers
-	bool parse_command_line(int argc, char *argv[], astring &error_string);
-	void parse_standard_inis(astring &error_string);
-	bool parse_slot_devices(int argc, char *argv[], astring &error_string, const char *name, const char *value);
+	bool parse_command_line(int argc, char *argv[], std::string &error_string);
+	void parse_standard_inis(std::string &error_string);
+	bool parse_slot_devices(int argc, char *argv[], std::string &error_string, const char *name, const char *value);
 
 	// core options
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
@@ -241,6 +244,9 @@ public:
 	const char *record() const { return value(OPTION_RECORD); }
 	const char *mng_write() const { return value(OPTION_MNGWRITE); }
 	const char *avi_write() const { return value(OPTION_AVIWRITE); }
+#ifdef MAME_DEBUG
+	bool dummy_write() const { return bool_value(OPTION_DUMMYWRITE); }
+#endif
 	const char *wav_write() const { return value(OPTION_WAVWRITE); }
 	const char *snap_name() const { return value(OPTION_SNAPNAME); }
 	const char *snap_size() const { return value(OPTION_SNAPSIZE); }
@@ -318,11 +324,11 @@ public:
 	bool joystick_contradictory() const { return bool_value(OPTION_JOYSTICK_CONTRADICTORY); }
 	int coin_impulse() const { return int_value(OPTION_COIN_IMPULSE); }
 
-    // core debugging options
-    bool log() const { return bool_value(OPTION_LOG); }
-    bool debug() const { return bool_value(OPTION_DEBUG); }
-    bool verbose() const { return bool_value(OPTION_VERBOSE); }
-    bool oslog() const { return bool_value(OPTION_OSLOG); }
+	// core debugging options
+	bool log() const { return bool_value(OPTION_LOG); }
+	bool debug() const { return bool_value(OPTION_DEBUG); }
+	bool verbose() const { return bool_value(OPTION_VERBOSE); }
+	bool oslog() const { return bool_value(OPTION_OSLOG); }
 	const char *debug_script() const { return value(OPTION_DEBUGSCRIPT); }
 	bool update_in_pause() const { return bool_value(OPTION_UPDATEINPAUSE); }
 
@@ -352,8 +358,8 @@ public:
 	// FIXME: Couriersud: This should be in image_device_exit
 	void remove_device_options();
 
-	const char *main_value(astring &buffer, const char *option) const;
-	const char *sub_value(astring &buffer, const char *name, const char *subname) const;
+	const char *main_value(std::string &buffer, const char *option) const;
+	const char *sub_value(std::string &buffer, const char *name, const char *subname) const;
 	bool add_slot_options(bool isfirst);
 
 private:
@@ -362,7 +368,7 @@ private:
 	void update_slot_options();
 
 	// INI parsing helper
-	bool parse_one_ini(const char *basename, int priority, astring *error_string = NULL);
+	bool parse_one_ini(const char *basename, int priority, std::string *error_string = NULL);
 
 	static const options_entry s_option_entries[];
 };

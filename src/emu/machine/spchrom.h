@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet, Couriersud, Michael Zapf
 /*
  * Voice Synthesis Memory
  *

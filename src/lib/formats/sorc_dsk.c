@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /*********************************************************************
 
     formats/sorc_dsk.c
@@ -7,6 +9,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
 #include "sorc_dsk.h"
 #include "basicdsk.h"

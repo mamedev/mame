@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Luca Elia
 /* bootlegs of Kaneko Pandora chip, with modifications */
 
 #include "emu.h"

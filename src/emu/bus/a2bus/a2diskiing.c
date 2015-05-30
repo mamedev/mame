@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*********************************************************************
 
     a2diskii.c
@@ -84,8 +86,7 @@ void a2bus_diskiing_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	astring tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, DISKII_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION).c_str())->base();
 }
 
 void a2bus_diskiing_device::device_reset()

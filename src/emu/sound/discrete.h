@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:K.Wilkins, Derrick Renaud, Frank Palazzolo, Couriersud
 #pragma once
 
 #ifndef __DISCRETE_H__
@@ -9,13 +11,13 @@
  *
  *  MAME - Discrete sound system emulation library
  *
- *  Written by Keith Wilkins (mame@esplexo.co.uk)
+ *  Written by K.Wilkins (mame@esplexo.co.uk)
  *
  *  (c) K.Wilkins 2000
  *
  *  Coding started in November 2000
  *
- *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
+ *  Additions/bugfix February 2003 - Derrick Renaud, F.Palazzolo, K.Wilkins
  *  Discrete parallel tasks 2009 - Couriersud
  *
  ***********************************************************************
@@ -3751,21 +3753,21 @@ enum
  * add and delete may be slow - the focus is on access!
  */
 
-	// TODO: replace with dynamic_array from utils
-template<class _ElementType> struct dynamic_array_t
+	// TODO: replace with vector from utils
+template<class _ElementType> struct vector_t
 {
 public:
-	dynamic_array_t(int initial) {
+	vector_t(int initial) {
 		m_count = 0;
 		m_allocated = initial;
 		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 	}
-	dynamic_array_t()  {
+	vector_t()  {
 		m_count = 0;
 		m_allocated = 16;
 		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 	}
-	~dynamic_array_t() {
+	~vector_t() {
 		global_free_array(m_arr);
 	}
 	_ElementType& operator [] (unsigned int index) const // get array item
@@ -3773,7 +3775,7 @@ public:
 		return m_arr[index];
 	}
 
-	dynamic_array_t(const dynamic_array_t &a)  // copy constructor
+	vector_t(const vector_t &a)  // copy constructor
 	{
 		m_allocated = a.count();
 		if (m_allocated < 16)
@@ -3783,7 +3785,7 @@ public:
 		for (int i=0; i < m_count; i++)
 			m_arr[i] = a[i];
 	}
-	dynamic_array_t& operator = (const dynamic_array_t &a) // assignment operator
+	vector_t& operator = (const vector_t &a) // assignment operator
 	{
 		if (this == &a) return *this;
 		m_allocated = a.count();
@@ -4127,7 +4129,8 @@ enum {
 
 #define IS_VALUE_A_NODE(val)    (((val) > NODE_START) && ((val) <= NODE_END))
 
-
+// Optional node such as used in CR_FILTER
+#define OPT_NODE(val)   (int) val
 /*************************************
  *
  *  Enumerated values for Node types
@@ -4184,9 +4187,9 @@ class discrete_task;
 class discrete_base_node;
 class discrete_dss_input_stream_node;
 class discrete_device;
-typedef dynamic_array_t<discrete_base_node *> node_list_t;
-typedef dynamic_array_t<discrete_dss_input_stream_node *> istream_node_list_t;
-typedef dynamic_array_t<discrete_task *> task_list_t;
+typedef vector_t<discrete_base_node *> node_list_t;
+typedef vector_t<discrete_dss_input_stream_node *> istream_node_list_t;
+typedef vector_t<discrete_task *> task_list_t;
 
 
 /*************************************
@@ -4215,7 +4218,7 @@ struct discrete_block
 	const char *    name;                           /* Node Name */
 	const char *    mod_name;                       /* Module / class name */
 };
-typedef dynamic_array_t<const discrete_block *> sound_block_list_t;
+typedef vector_t<const discrete_block *> sound_block_list_t;
 
 /*************************************
  *
@@ -4232,7 +4235,7 @@ public:
 	osd_ticks_t         run_time;
 	discrete_base_node *    self;
 };
-typedef dynamic_array_t<discrete_step_interface *> node_step_list_t;
+typedef vector_t<discrete_step_interface *> node_step_list_t;
 
 class discrete_input_interface
 {
@@ -4270,7 +4273,7 @@ public:
 //**************************************************************************
 
 class discrete_sound_output_interface;
-typedef dynamic_array_t<discrete_sound_output_interface *> node_output_list_t;
+typedef vector_t<discrete_sound_output_interface *> node_output_list_t;
 
 
 // ======================> discrete_device
@@ -4655,8 +4658,8 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 #define DISCRETE_FILTER2(NODE,ENAB,INP0,FREQ,DAMP,TYPE)                 DSC_SND_ENTRY( NODE, dst_filter2     , DSS_NODE        , 5, DSE( ENAB,INP0,NODE_NC,NODE_NC,NODE_NC ), DSE( ENAB,INP0,FREQ,DAMP,TYPE ), NULL, "DISCRETE_FILTER2" ),
 /* Component specific */
 #define DISCRETE_SALLEN_KEY_FILTER(NODE,ENAB,INP0,TYPE,INFO)            DSC_SND_ENTRY( NODE, dst_sallen_key  , DSS_NODE        , 3, DSE( ENAB,INP0,NODE_NC ), DSE( ENAB,INP0,TYPE ), INFO, "DISCRETE_SALLEN_KEY_FILTER" ),
-#define DISCRETE_CRFILTER(NODE,INP0,RVAL,CVAL)                          DSC_SND_ENTRY( NODE, dst_crfilter    , DSS_NODE        , 3, DSE( INP0,RVAL,CVAL ), DSE( INP0,RVAL,CVAL ), NULL, "DISCRETE_CRFILTER" ),
-#define DISCRETE_CRFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                DSC_SND_ENTRY( NODE, dst_crfilter    , DSS_NODE        , 4, DSE( INP0,RVAL,CVAL,VREF ), DSE( INP0,RVAL,CVAL,VREF ), NULL, "DISCRETE_CRFILTER_VREF" ),
+#define DISCRETE_CRFILTER(NODE,INP0,RVAL,CVAL)                          DSC_SND_ENTRY( NODE, dst_crfilter    , DSS_NODE        , 3, DSE( INP0,OPT_NODE(RVAL),OPT_NODE(CVAL) ), DSE( INP0,RVAL,CVAL ), NULL, "DISCRETE_CRFILTER" ),
+#define DISCRETE_CRFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                DSC_SND_ENTRY( NODE, dst_crfilter    , DSS_NODE        , 4, DSE( INP0,OPT_NODE(RVAL),OPT_NODE(CVAL),VREF ), DSE( INP0,RVAL,CVAL,VREF ), NULL, "DISCRETE_CRFILTER_VREF" ),
 #define DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)           DSC_SND_ENTRY( NODE, dst_op_amp_filt , DSS_NODE        , 4, DSE( ENAB,INP0,INP1,NODE_NC ), DSE( ENAB,INP0,INP1,TYPE ), INFO, "DISCRETE_OP_AMP_FILTER" ),
 #define DISCRETE_RC_CIRCUIT_1(NODE,INP0,INP1,RVAL,CVAL)                 DSC_SND_ENTRY( NODE, dst_rc_circuit_1, DSS_NODE        , 4, DSE( INP0,INP1,NODE_NC,NODE_NC ), DSE( INP0,INP1,RVAL,CVAL ), NULL, "DISCRETE_RC_CIRCUIT_1" ),
 #define DISCRETE_RCDISC(NODE,ENAB,INP0,RVAL,CVAL)                       DSC_SND_ENTRY( NODE, dst_rcdisc      , DSS_NODE        , 4, DSE( ENAB,INP0,NODE_NC,NODE_NC ), DSE( ENAB,INP0,RVAL,CVAL ), NULL, "DISCRETE_RCDISC" ),
@@ -4665,8 +4668,8 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 #define DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE) DSC_SND_ENTRY( NODE, dst_rcdisc4     , DSS_NODE        , 8, DSE( ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC ), DSE( ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE ), NULL, "DISCRETE_RCDISC4" ),
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      DSC_SND_ENTRY( NODE, dst_rcdisc5     , DSS_NODE        , 4, DSE( ENAB,INP0,NODE_NC,NODE_NC ), DSE( ENAB,INP0,RVAL,CVAL ), NULL, "DISCRETE_RCDISC5" ),
 #define DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)   DSC_SND_ENTRY( NODE, dst_rcdisc_mod, DSS_NODE        , 8, DSE( INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC ), DSE( INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP ), NULL, "DISCRETE_RCDISC_MODULATED" ),
-#define DISCRETE_RCFILTER(NODE,INP0,RVAL,CVAL)                          DSC_SND_ENTRY( NODE, dst_rcfilter    , DSS_NODE        , 3, DSE( INP0,RVAL,CVAL ), DSE( INP0,RVAL,CVAL ), NULL, "DISCRETE_RCFILTER" ),
-#define DISCRETE_RCFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                DSC_SND_ENTRY( NODE, dst_rcfilter    , DSS_NODE        , 4, DSE( INP0,RVAL,CVAL,VREF ), DSE( INP0,RVAL,CVAL,VREF ), NULL, "DISCRETE_RCFILTER_VREF" ),
+#define DISCRETE_RCFILTER(NODE,INP0,RVAL,CVAL)                          DSC_SND_ENTRY( NODE, dst_rcfilter    , DSS_NODE        , 3, DSE( INP0,OPT_NODE(RVAL),OPT_NODE(CVAL) ), DSE( INP0,RVAL,CVAL ), NULL, "DISCRETE_RCFILTER" ),
+#define DISCRETE_RCFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                DSC_SND_ENTRY( NODE, dst_rcfilter    , DSS_NODE        , 4, DSE( INP0,OPT_NODE(RVAL),OPT_NODE(CVAL),VREF ), DSE( INP0,RVAL,CVAL,VREF ), NULL, "DISCRETE_RCFILTER_VREF" ),
 #define DISCRETE_RCFILTER_SW(NODE,ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4) DSC_SND_ENTRY( NODE, dst_rcfilter_sw, DSS_NODE    , 8, DSE( ENAB,INP0,SW,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC ), DSE( ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 ), NULL, "DISCRETE_RCFILTER_SW" ),
 #define DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)  DSC_SND_ENTRY( NODE, dst_rcintegrate , DSS_NODE        , 7, DSE( INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC ), DSE( INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE ), NULL, "DISCRETE_RCINTEGRATE" ),
 /* For testing - seem to be buggered.  Use versions not ending in N. */

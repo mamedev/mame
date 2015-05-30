@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Manuel Abadia
 /***************************************************************************
 
     Chequered Flag / Checkered Flag (GX717) (c) Konami 1988

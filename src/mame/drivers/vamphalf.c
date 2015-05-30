@@ -1,4 +1,4 @@
-// license:?
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, David Haywood, Pierpaolo Prazzoli, Tomasz Slanina
 /********************************************************************
 
@@ -50,7 +50,7 @@
  Undumped Semicom games on similar hardware:
    Red Wyvern - A semi-sequel or update?
  Same time era, but unknown hardware:
-   Gaia The last Choice of the Earth (c) 1998 (might be Byron Future Assault type hardware)
+   Gaia The last Choice of the Earth (c) 1998 (might be Baryon Future Assault type hardware)
    Choice III: Joker's Dream (c) 2001
 
 TODO:
@@ -75,24 +75,19 @@ class vamphalf_state : public driver_device
 public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_tiles(*this,"tiles"),
-			m_wram(*this,"wram"),
-			m_tiles32(*this,"tiles32"),
-			m_wram32(*this,"wram32"),
 			m_maincpu(*this, "maincpu"),
 			m_qs1000(*this, "qs1000"),
 			m_oki(*this, "oki"),
 			m_oki2(*this, "oki_2"),
 			m_eeprom(*this, "eeprom"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")  {
+			m_palette(*this, "palette"),
+			m_tiles(*this,"tiles"),
+			m_wram(*this,"wram"),
+			m_tiles32(*this,"tiles32"),
+			m_wram32(*this,"wram32") {
 			m_has_extra_gfx = 0;
 		}
-
-	optional_shared_ptr<UINT16> m_tiles;
-	optional_shared_ptr<UINT16> m_wram;
-	optional_shared_ptr<UINT32> m_tiles32;
-	optional_shared_ptr<UINT32> m_wram32;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<qs1000_device> m_qs1000;
@@ -102,15 +97,22 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	optional_shared_ptr<UINT16> m_tiles;
+	optional_shared_ptr<UINT16> m_wram;
+	optional_shared_ptr<UINT32> m_tiles32;
+	optional_shared_ptr<UINT32> m_wram32;
+
+	// driver init configuration
 	int m_flip_bit;
-	int m_flipscreen;
 	int m_palshift;
+	int m_has_extra_gfx;
+	UINT16 m_semicom_prot_data[2];
+
+	int m_flipscreen;
 	int m_semicom_prot_idx;
 	int m_semicom_prot_which;
-	UINT16 m_semicom_prot_data[2];
 	UINT16 m_finalgdr_backupram_bank;
 	UINT8 *m_finalgdr_backupram;
-	int m_has_extra_gfx;
 	UINT8 m_qs1000_data;
 
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
@@ -162,13 +164,10 @@ public:
 	DECLARE_WRITE16_MEMBER(boonggab_oki_bank_w);
 	DECLARE_WRITE32_MEMBER(wyvernwg_snd_w);
 	DECLARE_WRITE16_MEMBER(misncrft_snd_w);
-
-	DECLARE_READ32_MEMBER(yorizori_1c_r);
-	DECLARE_WRITE32_MEMBER(yorizori_1c_w);
-	DECLARE_READ32_MEMBER(yorizori_10_r);
-
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+
+	virtual void video_start();
 	DECLARE_DRIVER_INIT(vamphalf);
 	DECLARE_DRIVER_INIT(vamphafk);
 	DECLARE_DRIVER_INIT(coolmini);
@@ -187,7 +186,8 @@ public:
 	DECLARE_DRIVER_INIT(misncrft);
 	DECLARE_DRIVER_INIT(boonggab);
 	DECLARE_DRIVER_INIT(wyvernwg);
-	DECLARE_DRIVER_INIT(yorizori);
+	DECLARE_DRIVER_INIT(yorijori);
+
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap);
@@ -377,20 +377,7 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 	}
 }
 
-READ32_MEMBER(vamphalf_state::yorizori_10_r)
-{
-	printf("yorizori_10_r %08x\n", space.device().safe_pc());
-	return 0xffffffff;
-}
-READ32_MEMBER(vamphalf_state::yorizori_1c_r)
-{
-//  printf("yorizori_1c_r %08x\n", space.device().safe_pc());
-	return 0x00;// 0xaa;
-}
-WRITE32_MEMBER(vamphalf_state::yorizori_1c_w)
-{
-//  printf("yorizori_1c_w %08x %08x\n", space.device().safe_pc(), data);
-}
+
 
 WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
 {
@@ -434,7 +421,7 @@ static ADDRESS_MAP_START( common_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yorizori_32bit_map, AS_PROGRAM, 32, vamphalf_state )
+static ADDRESS_MAP_START( yorijori_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -583,10 +570,7 @@ static ADDRESS_MAP_START( boonggab_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x744, 0x747) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( yorizori_io, AS_IO, 32, vamphalf_state )
-	AM_RANGE(0x010, 0x013) AM_READ(yorizori_10_r)
-	AM_RANGE(0x01c, 0x01f) AM_READWRITE(yorizori_1c_r,yorizori_1c_w)
+static ADDRESS_MAP_START( yorijori_io, AS_IO, 32, vamphalf_state )
 ADDRESS_MAP_END
 
 /*
@@ -609,6 +593,12 @@ or
 Offset+3
 -------x xxxxxxxx X offs
 */
+
+void vamphalf_state::video_start()
+{
+	save_item(NAME(m_flipscreen));
+}
+
 void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
@@ -1160,10 +1150,10 @@ static MACHINE_CONFIG_DERIVED( boonggab, common )
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( yorizori, common )
+static MACHINE_CONFIG_DERIVED( yorijori, common )
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(yorizori_32bit_map)
-	MCFG_CPU_IO_MAP(yorizori_io)
+	MCFG_CPU_PROGRAM_MAP(yorijori_32bit_map)
+	MCFG_CPU_IO_MAP(yorijori_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_FRAGMENT_ADD(sound_qs1000)
@@ -2001,7 +1991,7 @@ ROM_END
 
 /*
 
-Yori Zori Kuk Kuk
+Yori Jori Kuk Kuk
 
 
 PCB Layout
@@ -2073,7 +2063,7 @@ ROMs:
 
 */
 
-ROM_START( yorizori )
+ROM_START( yorijori )
 	ROM_REGION32_BE( 0x200000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "prg1", 0x000000, 0x200000, CRC(0e04eb40) SHA1(0cec9dc91aaf9cf7c459c7baac200cf0fcfddc18) )
 
@@ -2084,10 +2074,10 @@ ROM_START( yorizori )
 	ROM_RELOAD(      0x60000, 0x20000 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(9299ce36) SHA1(cd8a9e2619da93e2015704230e8189a6ae52de69) )
+	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(16584ff2) SHA1(69dce8c33b246b4327b330233116c1b72a8b7e84) )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(b5d1892f) SHA1(20afcd00a506ec0fd1c4fffb2d9c853c8dc61e2e) )
+	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fe0485ef) SHA1(bd1a26aa386803df8e8e137ea5d5a2cdd6ad1197) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 )
 	ROM_LOAD( "snd2", 0x000000, 0x200000, CRC(8d9a8795) SHA1(482acb3beafc9baa43284c54ac36086c57098465) )
@@ -2702,6 +2692,8 @@ DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
+
+	save_item(NAME(m_qs1000_data));
 }
 
 DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
@@ -2760,11 +2752,15 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
+
+	save_item(NAME(m_qs1000_data));
+	save_item(NAME(m_semicom_prot_idx));
+	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,yorizori)
+DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 {
-	// seesm close to Final Godori in terms of port mappings, possibly a SemiCom game?
+	// seems close to Final Godori in terms of port mappings, possibly a SemiCom game?
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -2773,14 +2769,16 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorizori)
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 1;
 
-	UINT8 *romx = (UINT8 *)memregion("user1")->base();
+//  UINT8 *romx = (UINT8 *)memregion("user1")->base();
 	// prevent code dying after a trap 33 by patching it out, why?
-	romx[BYTE4_XOR_BE(0x8ff0)] = 3;
-	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
+//  romx[BYTE4_XOR_BE(0x8ff0)] = 3;
+//  romx[BYTE4_XOR_BE(0x8ff1)] = 0;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
+
+	save_item(NAME(m_qs1000_data));
 }
 
 DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
@@ -2796,6 +2794,11 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 	m_semicom_prot_idx = 8;
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 3;
+
+	save_item(NAME(m_finalgdr_backupram_bank));
+	save_pointer(NAME(m_finalgdr_backupram), 0x80*0x100);
+	save_item(NAME(m_semicom_prot_idx));
+	save_item(NAME(m_semicom_prot_which));
 }
 
 DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
@@ -2812,6 +2815,9 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 	m_semicom_prot_idx = 8;
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 3;
+
+	save_item(NAME(m_semicom_prot_idx));
+	save_item(NAME(m_semicom_prot_which));
 }
 
 DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
@@ -2873,26 +2879,26 @@ DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 	m_flip_bit = 1;
 }
 
-GAME( 1999, coolmini,  0,        coolmini, common,   vamphalf_state, coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", 0 )
-GAME( 1999, jmpbreak,  0,        jmpbreak, common,   vamphalf_state, jmpbreak, ROT0,   "F2 System",         "Jumping Break" , 0 )
-GAME( 1999, suplup,    0,        suplup,   common,   vamphalf_state, suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0 )
-GAME( 1999, luplup,    suplup,   suplup,   common,   vamphalf_state, luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
-GAME( 1999, luplup29,  suplup,   suplup,   common,   vamphalf_state, luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
-GAME( 1999, puzlbang,  suplup,   suplup,   common,   vamphalf_state, puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.9 / 990108)", 0 )
-GAME( 1999, puzlbanga, suplup,   suplup,   common,   vamphalf_state, puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.8 / 990106)", 0 )
-GAME( 1999, vamphalf,  0,        vamphalf, common,   vamphalf_state, vamphalf, ROT0,   "Danbi / F2 System", "Vamf x1/2 (Europe)", 0 )
-GAME( 1999, vamphalfk, vamphalf, vamphalf, common,   vamphalf_state, vamphafk, ROT0,   "Danbi / F2 System", "Vamp x1/2 (Korea)", 0 )
-GAME( 2000, dquizgo2,  0,        coolmini, common,   vamphalf_state, dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
-GAME( 2000, misncrft,  0,        misncrft, common,   vamphalf_state, misncrft, ROT90,  "Sun",               "Mission Craft (version 2.7)", GAME_IMPERFECT_SOUND )
-GAME( 2000, misncrfta, misncrft, misncrft, common,   vamphalf_state, misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_IMPERFECT_SOUND )
-GAME( 2000, mrdig,     0,        mrdig,    common,   vamphalf_state, mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
-GAME( 2001, dtfamily,  0,        coolmini, common,   vamphalf_state, dtfamily, ROT0,   "SemiCom",           "Diet Family", 0 )
-GAME( 2001, finalgdr,  0,        finalgdr, finalgdr, vamphalf_state, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
-GAME( 2001, mrkicker,  0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 )
-GAME( 2001, toyland,   0,        coolmini, common,   vamphalf_state, toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", 0 )
-GAME( 2001, wivernwg,  0,        wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom",           "Wivern Wings", GAME_IMPERFECT_SOUND )
-GAME( 2001, wyvernwg,  wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 2001, wyvernwga, wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", GAME_IMPERFECT_SOUND )
-GAME( 2001, aoh,       0,        aoh,      aoh,      vamphalf_state, aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
-GAME( 2001, boonggab,  0,        boonggab, boonggab, vamphalf_state, boonggab, ROT270, "Taff System",       "Boong-Ga Boong-Ga (Spank'em!)", 0 )
-GAME( 199?, yorizori,  0,        yorizori, common,   vamphalf_state, yorizori, ROT0,   "<unknown>",         "Yori Zori Kuk Kuk", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1999, coolmini,  0,        coolmini, common,   vamphalf_state, coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", GAME_SUPPORTS_SAVE )
+GAME( 1999, jmpbreak,  0,        jmpbreak, common,   vamphalf_state, jmpbreak, ROT0,   "F2 System",         "Jumping Break" , GAME_SUPPORTS_SAVE )
+GAME( 1999, suplup,    0,        suplup,   common,   vamphalf_state, suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , GAME_SUPPORTS_SAVE )
+GAME( 1999, luplup,    suplup,   suplup,   common,   vamphalf_state, luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", GAME_SUPPORTS_SAVE )
+GAME( 1999, luplup29,  suplup,   suplup,   common,   vamphalf_state, luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", GAME_SUPPORTS_SAVE )
+GAME( 1999, puzlbang,  suplup,   suplup,   common,   vamphalf_state, puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.9 / 990108)", GAME_SUPPORTS_SAVE )
+GAME( 1999, puzlbanga, suplup,   suplup,   common,   vamphalf_state, puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.8 / 990106)", GAME_SUPPORTS_SAVE )
+GAME( 1999, vamphalf,  0,        vamphalf, common,   vamphalf_state, vamphalf, ROT0,   "Danbi / F2 System", "Vamf x1/2 (Europe)", GAME_SUPPORTS_SAVE )
+GAME( 1999, vamphalfk, vamphalf, vamphalf, common,   vamphalf_state, vamphafk, ROT0,   "Danbi / F2 System", "Vamp x1/2 (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 2000, dquizgo2,  0,        coolmini, common,   vamphalf_state, dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , GAME_SUPPORTS_SAVE )
+GAME( 2000, misncrft,  0,        misncrft, common,   vamphalf_state, misncrft, ROT90,  "Sun",               "Mission Craft (version 2.7)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2000, misncrfta, misncrft, misncrft, common,   vamphalf_state, misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2000, mrdig,     0,        mrdig,    common,   vamphalf_state, mrdig,    ROT0,   "Sun",               "Mr. Dig", GAME_SUPPORTS_SAVE )
+GAME( 2001, dtfamily,  0,        coolmini, common,   vamphalf_state, dtfamily, ROT0,   "SemiCom",           "Diet Family", GAME_SUPPORTS_SAVE )
+GAME( 2001, finalgdr,  0,        finalgdr, finalgdr, vamphalf_state, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", GAME_SUPPORTS_SAVE )
+GAME( 2001, mrkicker,  0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_SUPPORTS_SAVE )
+GAME( 2001, toyland,   0,        coolmini, common,   vamphalf_state, toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", GAME_SUPPORTS_SAVE )
+GAME( 2001, wivernwg,  0,        wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom",           "Wivern Wings", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, wyvernwg,  wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, wyvernwga, wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, aoh,       0,        aoh,      aoh,      vamphalf_state, aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", GAME_SUPPORTS_SAVE )
+GAME( 2001, boonggab,  0,        boonggab, boonggab, vamphalf_state, boonggab, ROT270, "Taff System",       "Boong-Ga Boong-Ga (Spank'em!)", GAME_SUPPORTS_SAVE )
+GAME( 199?, yorijori,  0,        yorijori, common,   vamphalf_state, yorijori, ROT0,   "Golden Bell Entertainment",         "Yori Jori Kuk Kuk", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

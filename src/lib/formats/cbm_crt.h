@@ -13,7 +13,6 @@
 #ifndef __CBM_CRT__
 #define __CBM_CRT__
 
-#include "emu.h"
 #include "formats/imageutl.h"
 
 
@@ -136,7 +135,7 @@ struct cbm_crt_chip
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
-void cbm_crt_get_card(astring &result, core_file *file);
+void cbm_crt_get_card(std::string &result, core_file *file);
 bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, int *exrom, int *game);
 bool cbm_crt_read_data(core_file* file, UINT8 *roml, UINT8 *romh);
 

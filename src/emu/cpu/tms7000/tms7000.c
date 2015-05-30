@@ -1,35 +1,21 @@
+// license:BSD-3-Clause
+// copyright-holders:hap, Tim Lindner
 /*****************************************************************************
- *
- *   tms7000.c
- *   Portable TMS7000 emulator (Texas Instruments 7000)
- *
- *   Copyright tim lindner, all rights reserved.
- *
- *   - This source code is released as freeware for non-commercial purposes.
- *   - You are free to use and redistribute this code in modified or
- *     unmodified form, provided you list me in the credits.
- *   - If you modify this source code, you must add a notice to each modified
- *     source file that it has been changed.  If you're a nice person, you
- *     will clearly mark each change too.  :)
- *   - If you wish to use this for commercial purposes, please contact me at
- *     tlindner@macmess.org
- *   - This entire notice must remain in the source code.
- *
- *****************************************************************************
- *  Misc. improvements were done over the years by team MESS/MAME
- *
- *  TODO:
- *  - dump CROM and emulate cpu at microinstruction level
- *  - memory modes with IOCNT0, currently always running in faked full expansion mode
- *  - timer event counter mode (timer control register, bit 6)
- *  - TMS70x1/2 serial port and timer 3
- *  - TMS70C46 DOCK-BUS comms with external pins
- *  - TMS70C46 external memory mode is via "E" bus instead of configuring IOCNT0
- *  - TMS70C46 clock divider
- *  - TMS70C46 INT3 on keypress
- *  - when they're needed, add TMS70Cx2, TMS7742, TMS77C82, SE70xxx
- *
- *****************************************************************************/
+
+  Texas Instruments TMS7000
+
+  TODO:
+  - dump CROM and emulate cpu at microinstruction level
+  - memory modes with IOCNT0, currently always running in faked full expansion mode
+  - timer event counter mode (timer control register, bit 6)
+  - TMS70x1/2 serial port and timer 3
+  - TMS70C46 DOCK-BUS comms with external pins
+  - TMS70C46 external memory mode is via "E" bus instead of configuring IOCNT0
+  - TMS70C46 clock divider
+  - TMS70C46 INT3 on keypress
+  - when they're needed, add TMS70Cx2, TMS7742, TMS77C82, SE70xxx
+
+*****************************************************************************/
 
 #include "tms7000.h"
 
@@ -271,12 +257,12 @@ void tms7000_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 }
 
-void tms7000_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms7000_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				m_sr & 0x80 ? 'C':'c',
 				m_sr & 0x40 ? 'N':'n',
 				m_sr & 0x20 ? 'Z':'z',

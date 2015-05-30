@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Karl-Ludwig Deisenhofer
 /**********************************************************************
 
     formats/rx50_dsk.c
@@ -27,7 +29,8 @@
          FORMAT A: /F:160 on DOS; turn MEDIACHK ON
 ************************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "flopimg.h"
 #include "formats/rx50_dsk.h"
 

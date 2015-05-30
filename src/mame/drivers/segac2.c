@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Aaron Giles
 /***********************************************************************************************
 
     Sega System C (System 14)/C2 Driver

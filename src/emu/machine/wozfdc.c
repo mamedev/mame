@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*********************************************************************
 
     wozfdc.c
@@ -63,8 +65,7 @@ appleiii_fdc::appleiii_fdc(const machine_config &mconfig, const char *tag, devic
 
 void wozfdc_device::device_start()
 {
-	astring tempstring;
-	m_rom_p6 = machine().root_device().memregion(this->subtag(tempstring, DISKII_P6_REGION))->base();
+	m_rom_p6 = machine().root_device().memregion(this->subtag(DISKII_P6_REGION).c_str())->base();
 
 	timer = timer_alloc(0);
 	delay_timer = timer_alloc(1);
@@ -431,7 +432,6 @@ void wozfdc_device::lss_predict(attotime limit)
 	bool write_line_active = cur_lss.write_line_active;
 
 	attotime next_flux = floppy ? floppy->get_next_transition(cur_lss.tm - attotime::from_usec(1)) : attotime::never;
-	attotime next_flux_down = next_flux != attotime::never ? next_flux + attotime::from_usec(1) : attotime::never;
 
 	if(limit == attotime::never)
 		limit = machine().time() + attotime::from_usec(50);
@@ -439,7 +439,7 @@ void wozfdc_device::lss_predict(attotime limit)
 	UINT64 cycles = cur_lss.cycles;
 	UINT64 cycles_limit = time_to_cycles(limit);
 	UINT64 cycles_next_flux = next_flux != attotime::never ? time_to_cycles(next_flux) : UINT64(-1);
-	UINT64 cycles_next_flux_down = next_flux_down != attotime::never ? time_to_cycles(next_flux_down) : UINT64(-1);
+	UINT64 cycles_next_flux_down = cycles_next_flux != UINT64(-1) ? cycles_next_flux+1 : UINT64(-1);
 
 	UINT8 address = cur_lss.address;
 	UINT8 data_reg = cur_lss.data_reg;
@@ -499,9 +499,8 @@ void wozfdc_device::lss_predict(attotime limit)
 		else if(cycles == cycles_next_flux_down) {
 			address |= 0x10;
 			next_flux = floppy ? floppy->get_next_transition(cycles_to_time(cycles)) : attotime::never;
-			next_flux_down = next_flux != attotime::never ? next_flux + attotime::from_usec(1) : attotime::never;
 			cycles_next_flux = next_flux != attotime::never ? time_to_cycles(next_flux) : UINT64(-1);
-			cycles_next_flux_down = next_flux_down != attotime::never ? time_to_cycles(next_flux_down) : UINT64(-1);
+			cycles_next_flux_down = cycles_next_flux != UINT64(-1) ? cycles_next_flux+1 : UINT64(-1);
 		}
 	}
 

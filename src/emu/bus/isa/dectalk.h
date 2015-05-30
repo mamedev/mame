@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef ISA_DECTALK_H_
 #define ISA_DECTALK_H_
 

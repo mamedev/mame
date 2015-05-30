@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     EC-1841 92-key keyboard emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 

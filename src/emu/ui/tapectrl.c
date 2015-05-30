@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
     ui/tapectrl.c
 
     Tape control
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -56,18 +55,18 @@ ui_menu_tape_control::~ui_menu_tape_control()
 void ui_menu_tape_control::populate()
 {
 	if (current_device())
-	{		
+	{
 		// name of tape
-		item_append(current_display_name(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
+		item_append(current_display_name().c_str(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
 
 		if (current_device()->exists())
 		{
-			astring timepos;
+			std::string timepos;
 			cassette_state state;
 			double t0 = current_device()->get_position();
 			double t1 = current_device()->get_length();
 			UINT32 tapeflags = 0;
-			
+
 			// state
 			if (t1 > 0)
 			{
@@ -76,32 +75,32 @@ void ui_menu_tape_control::populate()
 				if (t0 < t1)
 					tapeflags |= MENU_FLAG_RIGHT_ARROW;
 			}
-			
+
 			get_time_string(timepos, current_device(), NULL, NULL);
 			state = current_device()->get_state();
 			item_append(
 						(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
 						?   "stopped"
 						:   ((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY
-							 ? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "playing" : "(playing)")
-							 : ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "recording" : "(recording)")
-							 ),
-						timepos,
+								? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "playing" : "(playing)")
+								: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "recording" : "(recording)")
+								),
+								timepos.c_str(),
 						tapeflags,
 						TAPECMD_SLIDER);
-			
+
 			// pause or stop
 			item_append("Pause/Stop", NULL, 0, TAPECMD_STOP);
-			
+
 			// play
 			item_append("Play", NULL, 0, TAPECMD_PLAY);
-			
+
 			// record
 			item_append("Record", NULL, 0, TAPECMD_RECORD);
-			
+
 			// rewind
 			item_append("Rewind", NULL, 0, TAPECMD_REWIND);
-			
+
 			// fast forward
 			item_append("Fast Forward", NULL, 0, TAPECMD_FAST_FORWARD);
 		}
@@ -163,7 +162,7 @@ void ui_menu_tape_control::handle()
 //  representation of the time
 //-------------------------------------------------
 
-void ui_menu_tape_control::get_time_string(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos)
+void ui_menu_tape_control::get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos)
 {
 	double t0, t1;
 
@@ -171,9 +170,9 @@ void ui_menu_tape_control::get_time_string(astring &dest, cassette_image_device 
 	t1 = cassette->get_length();
 
 	if (t1)
-		dest.printf("%04d/%04d", (int) t0, (int) t1);
+		strprintf(dest, "%04d/%04d", (int)t0, (int)t1);
 	else
-		dest.printf("%04d/%04d", 0, (int) t1);
+		strprintf(dest, "%04d/%04d", 0, (int)t1);
 
 	if (curpos != NULL)
 		*curpos = t0;

@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
     emucore.h
 
     General core utilities and macros used throughout the emulator.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #pragma once
@@ -15,16 +13,15 @@
 #define __EMUCORE_H__
 
 // standard C includes
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include <sstream>
-
 // some cleanups for Solaris for things defined in stdlib.h
-#ifdef SDLMAME_SOLARIS
+#if defined(__sun__) && defined(__svr4__)
 #undef si_status
 #undef WWORD
 #endif
@@ -35,7 +32,6 @@
 
 // core system includes
 #include "osdcomm.h"
-#include "astring.h"
 #include "emualloc.h"
 #include "corestr.h"
 #include "bitmap.h"
@@ -220,7 +216,10 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #undef assert
 #undef assert_always
 
-#ifdef MAME_DEBUG
+#if defined(MAME_DEBUG_FAST)
+#define assert(x)               do { } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#elif defined(MAME_DEBUG)
 #define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
@@ -371,7 +370,7 @@ ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, c
 //**************************************************************************
 
 // population count
-#ifndef SDLMAME_NETBSD
+#if !defined(__NetBSD__)
 inline int popcount(UINT32 val)
 {
 	int count;

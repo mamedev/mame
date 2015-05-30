@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "pci-smbus.h"
 
 const device_type SMBUS = &device_creator<smbus_device>;

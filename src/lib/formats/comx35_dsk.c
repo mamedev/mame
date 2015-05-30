@@ -36,7 +36,8 @@
 
 */
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/comx35_dsk.h"
 
 comx35_format::comx35_format() : wd177x_format(formats)

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Sega Hikaru / 'Samurai' */
 
 /*
@@ -373,7 +375,7 @@ Notes:
     subroutines, after all.)
 
   - the serial device at 0080000(A|C) is not an EEPROM; it's likely some
-    weird device that is used to query the heirarchy of the attached
+    weird device that is used to query the hierarchy of the attached
     input/output devices. Probably the naomi has something similar, I
     haven't looked into it yet.
 
@@ -570,9 +572,8 @@ ROM_START( airtrix )
 	/* ic65 unpopulated */
 	/* ic66 unpopulated */
 
-	// 315-5881 security IC key
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "airtrix-key.bin", 0, 4, CRC(bebdc179) SHA1(327ea299934ef78f3c88329fc624dc3771877453) )
+	// 834-14149   2000     317-0294-COM   Hikaru
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "291b02c7" )
 ROM_END
 
 
@@ -609,9 +610,8 @@ ROM_START( pharrier )
 	ROM_LOAD32_WORD( "mpr-23560.ic65", 0xe000000, 0x1000000, CRC(24bb7072) SHA1(dad5135c89d292e4a1f96bd0ad28be6a17154be0) )
 	ROM_LOAD32_WORD( "mpr-23564.ic66", 0xe000002, 0x1000000, CRC(255724b6) SHA1(1b382fad165831de3f2e39352c031146759dfc69) )
 
-	// 315-5881 security IC key
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "pharrier-key.bin", 0, 4, CRC(1697d591) SHA1(8ad4c93f63e2e379795e820d3edbdd990f8ca7e1) )
+	// 834-14144   2001     317-0297-COM   Hikaru
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2912c68a" )
 ROM_END
 
 ROM_START( podrace )
@@ -663,8 +663,8 @@ ROM_START( podrace )
 	ROM_LOAD32_WORD("mpr-23116.ic67s" , 0xf000000, 0x0800000, CRC(9f567fce) SHA1(c35bcf968f139557e50ceafa9c6bad4deb87154f))
 	ROM_LOAD32_WORD("mpr-23117.ic68s" , 0xf000002, 0x0800000, CRC(9d4d3529) SHA1(66008445629681ebf2f26b3f181d8524a8576d2f))
 
-	// current 315-5881 decryption simulation code can't produce valid output data with any of keys
-	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
+	// 834-14002   2001     317-0277-COM   Hikaru
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2903dad5" )
 ROM_END
 
 ROM_START( braveff )
@@ -708,8 +708,7 @@ ROM_START( braveff )
 	ROM_LOAD32_WORD( "mpr-22022.ic59s", 0xb000000, 0x800000, CRC(abd3d888) SHA1(9654c3a38feab46b4983a602831fb29cccdd0526) )
 	ROM_LOAD32_WORD( "mpr-22023.ic60s", 0xb000002, 0x800000, CRC(07f00869) SHA1(92282d09d72d3e65a91128e06bb0d4426bb90be5) )
 
-	// 315-5881 not populated
-	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" ) // 315-5881 not populated
 ROM_END
 
 ROM_START( sgnascar )
@@ -738,6 +737,10 @@ ROM_START( sgnascar )
 	ROM_LOAD32_WORD( "mpr-23483.ic32", 0xc000002, 0x1000000, CRC(c37adebe) SHA1(e84f6d2cc364c743f7f3b73d8c8d0271952bb093) )
 	ROM_LOAD32_WORD( "mpr-23480.ic33", 0xe000000, 0x1000000, CRC(f517b8b3) SHA1(c04740adb612473c4c9f8186e7e93d2f73d1bb1a) )
 	ROM_LOAD32_WORD( "mpr-23484.ic34", 0xe000002, 0x1000000, CRC(2ebe1aa1) SHA1(16b39f7422da1a334dde27169c2949e1d95bddb3) )
+
+	// 317-0283-COM Actel A54SX32
+	// ID 0x4252
+	ROM_PARAMETER( ":rom_board:key", "56dedf33" )
 ROM_END
 
 GAME( 2000, hikaru,   0,        hikaru,   hikaru, driver_device,   0, ROT0, "Sega",            "Hikaru Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )

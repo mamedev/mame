@@ -269,10 +269,12 @@ class Instruction:
                 if v in flags_fixed:
                     #print "@@@@", f
                     vals.append("%s=%d" % (v, flags_fixed[v]))
-            out = []
-            out.append("case %d: // %s %s" % (no, self._name, " ".join(vals)))
+            out = ["case %d: // %s %s" % (no, self._name, " ".join(vals))]
             for line in self.PreprocessRunString():
-                out.append(self.ExpandCintrp(line, flags_fixed))
+                exp = self.ExpandCintrp(line, flags_fixed)
+                # ensure we're not outputing a = a;
+                if not CheckSelfAssign(exp):
+                    out.append(exp)
             out.append("  break;")
             out.append("")
             EmitWithPrefix(f, out, prefix)
@@ -412,12 +414,20 @@ def EmitCintrp(f, ins_list):
     print >>f, "#endif"
 
 
+def CheckSelfAssign(line):
+    ls = line.split('=')
+    if len(ls) != 2:
+        return False
+    lhs = ls[0].strip()
+    rhs = ls[1].strip().rstrip(';')
+    return lhs == rhs
 
 ins_list = LoadLst(sys.argv[1])
 try:
     f = open(sys.argv[2], "w")
-except Exception, err:
-    logging.error("cannot write file %s [%s]", fname, err)
+except Exception:
+    err = sys.exc_info()[1]
+    sys.stderr.write("cannot write file %s [%s]\n" % (sys.argv[2], err))
     sys.exit(1)
 
 EmitDasm(f, ins_list)

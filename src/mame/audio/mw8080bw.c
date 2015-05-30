@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari,Derrick Renaud
 /***************************************************************************
 
     Midway 8080-based black and white hardware
@@ -1646,7 +1648,7 @@ MACHINE_CONFIG_FRAGMENT( m4_audio )
 	MCFG_SAMPLES_NAMES(m4_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(m4_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)

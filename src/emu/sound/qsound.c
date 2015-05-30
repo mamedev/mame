@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Leaman, Miguel Angel Horna
 /***************************************************************************
 
   Capcom System QSound(tm)

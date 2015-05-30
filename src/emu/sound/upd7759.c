@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller, Mike Balfour, Howie Cohen, Olivier Galibert, Aaron Giles
 /************************************************************
 
     NEC uPD7759/55/56/P56/57/58 ADPCM Speech Processor

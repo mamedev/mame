@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /* TAS 5 REEL system? by Olympic Video Gaming */
 
 #include "emu.h"

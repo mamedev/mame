@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, M. Burke
 #pragma once
 
 #ifndef __LK201_H__

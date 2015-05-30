@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+
+	<element name="text_sun"><text string="SUN"><color red="0.66" green="0.66" blue="0.7" /></text></element>
+	<element name="text_mercury"><text string="MERCURY"><color red="0.66" green="0.66" blue="0.7" /></text></element>
+	<element name="text_venus"><text string="VENUS"><color red="0.66" green="0.66" blue="0.7" /></text></element>
+	<element name="text_mars"><text string="MARS"><color red="0.66" green="0.66" blue="0.7" /></text></element>
+
+	<element name="led_g" defstate="0">
+		<disk state="1"><color red="0.25" green="1.0" blue="0.25" /></disk>
+		<disk state="0"><color red="0.05" green="0.2" blue="0.05" /></disk>
+	</element>
+	<element name="led_y" defstate="0">
+		<disk state="1"><color red="1.0" green="1.0" blue="0.25" /></disk>
+		<disk state="0"><color red="0.2" green="0.2" blue="0.05" /></disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.2" green="1.0" blue="0.85" /></led7seg>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="90" top="0" bottom="32" />
+		<bezel element="static_black">
+			<bounds left="0" right="90" top="0" bottom="32" />
+		</bezel>
+
+		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="10" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="20" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="30" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="40" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="50" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="60" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="70" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="80" y="0" width="10" height="15" /></bezel>
+
+		<bezel element="text_sun"><bounds x="10" y="22" width="10" height="3" /></bezel>
+		<bezel element="text_mercury"><bounds x="30" y="22" width="10" height="3" /></bezel>
+		<bezel element="text_venus"><bounds x="50" y="22" width="10" height="3" /></bezel>
+		<bezel element="text_mars"><bounds x="70" y="22" width="10" height="3" /></bezel>
+
+		<bezel name="lamp90" element="led_g"><bounds x="10" y="27" width="4" height="4" /></bezel>
+		<bezel name="lamp91" element="led_y"><bounds x="15" y="27" width="4" height="4" /></bezel>
+
+		<bezel name="lamp92" element="led_g"><bounds x="30" y="27" width="4" height="4" /></bezel>
+		<bezel name="lamp93" element="led_y"><bounds x="35" y="27" width="4" height="4" /></bezel>
+
+		<bezel name="lamp94" element="led_g"><bounds x="50" y="27" width="4" height="4" /></bezel>
+		<bezel name="lamp95" element="led_y"><bounds x="55" y="27" width="4" height="4" /></bezel>
+
+		<bezel name="lamp96" element="led_g"><bounds x="70" y="27" width="4" height="4" /></bezel>
+		<bezel name="lamp97" element="led_y"><bounds x="75" y="27" width="4" height="4" /></bezel>
+
+
+	</view>
+</mamelayout>

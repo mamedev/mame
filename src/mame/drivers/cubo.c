@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Stephh, Dirk Best
 /*
 
    Cubo CD32 (additional hardware and games by CD Express, Milan, Italy)
@@ -5,12 +7,11 @@
    The CuboCD32 is a stock retail CD32 unit with additional hardware to adapt it
    for JAMMA use.
 
-   copyright-holders: Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Stephh, Dirk Best
-
    Known Games:
    Title                | rev. | year
    ----------------------------------------------
    Candy Puzzle         |  1.0 | 1995
+   Double Strixx        |      | 1995
    Harem Challenge      |      | 1995
    Laser Quiz           |      | 1995
    Laser Quiz 2 "Italy" |  1.0 | 1995
@@ -18,6 +19,7 @@
    Laser Strixx 2       |      | 1995
    Magic Premium        |  1.1 | 1996
    Laser Quiz France    |  1.0 | 1995
+   Laser Quiz Greece?   |      | 1995 *may exist
    Odeon Twister        |      | 199x
    Odeon Twister 2      |202.19| 1999
 

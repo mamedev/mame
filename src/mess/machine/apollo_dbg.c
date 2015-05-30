@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer
 /*
  * debug/apollo.c - APOLLO DN3500/DN3000 debug functions
  *
  *  Created on: Nov. 21, 2010
  *      Author: Hans Ostermeyer
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  */
 

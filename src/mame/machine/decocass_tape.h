@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, David Haywood
 #ifndef __DECOCASS_TAPE_H__
 #define __DECOCASS_TAPE_H__
 

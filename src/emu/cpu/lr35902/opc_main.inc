@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #define INC_8BIT(x) \
 { \
 	register UINT8 r,f; \

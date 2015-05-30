@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Allard van der Bas
 /***************************************************************************
 
 Vastar memory map (preliminary)
 
-driver by Allard Van Der Bas
+driver by Allard van der Bas
 
 CPU #1:
 

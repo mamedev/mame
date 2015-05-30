@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Chris Hardy
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "audio/hyprolyb.h"

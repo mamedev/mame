@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /*************************************************************************
 
     drivers/advision.c
@@ -42,14 +44,6 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, advision_state )
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vsync_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, advision_state )
-	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READ(sound_cmd_r)
-	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(sound_g_w)
-	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(sound_d_w)
-	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_NOP
-	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_NOP
-ADDRESS_MAP_END
-
 /* Input Ports */
 
 static INPUT_PORTS_START( advision )
@@ -74,7 +68,9 @@ static MACHINE_CONFIG_START( advision, advision_state )
 
 	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, COP400_MICROBUS_DISABLED)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_COP400_READ_L_CB(READ8(advision_state, sound_cmd_r))
+	MCFG_COP400_WRITE_G_CB(WRITE8(advision_state, sound_g_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(advision_state, sound_d_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -105,13 +101,13 @@ MACHINE_CONFIG_END
 
 ROM_START( advision )
 	ROM_REGION( 0x1000, I8048_TAG, ROMREGION_ERASE00 )
-	ROM_LOAD( "avbios.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) )
+	ROM_LOAD( "b225__ins8048-11kdp_n.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) ) // "<natsemi logo> /B225 \\ INS8048-11KDP/N"
 
 	ROM_REGION( 0x200, COP411_TAG, 0 )
-	ROM_LOAD( "avsound.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) )
+	ROM_LOAD( "b8223__cop411l-kcn_n.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) ) // "<natsemi logo> /B8223 \\ COP411L-KCN/N"
 ROM_END
 
 /* Game Driver */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT        COMPANY                 FULLNAME            FLAGS */
-CONS( 1982, advision,   0,      0,      advision, advision, driver_device,  0,          "Entex Industries Inc", "Adventure Vision", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT               COMPANY  FULLNAME            FLAGS */
+CONS( 1982, advision,   0,      0,      advision, advision, driver_device,  0, "Entex", "Adventure Vision", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

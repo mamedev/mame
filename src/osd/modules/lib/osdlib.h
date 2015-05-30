@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
 //  osdlib.h
-//
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -45,19 +44,6 @@ int osd_get_num_processors(void);
         None.
 -----------------------------------------------------------------------------*/
 void osd_process_kill(void);
-
-/*-----------------------------------------------------------------------------
-    osd_getenv: return pointer to environment variable
-
-    Parameters:
-
-        name  - name of environment variable
-
-    Return value:
-
-        pointer to value
------------------------------------------------------------------------------*/
-char *osd_getenv(const char *name);
 
 /*-----------------------------------------------------------------------------
     osd_setenv: set environment variable

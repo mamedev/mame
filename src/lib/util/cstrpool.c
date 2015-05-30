@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     cstrpool.c
@@ -5,6 +7,8 @@
     Constant string pool helper class.
 
 ***************************************************************************/
+
+#include <assert.h>
 
 #include "cstrpool.h"
 

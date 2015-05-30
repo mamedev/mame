@@ -1,13 +1,10 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:smf
 /***************************************************************************
 
     atapihle.h
 
     ATAPI High Level Emulation
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

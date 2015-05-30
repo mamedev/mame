@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz, R. Belmont
 static const char *lookup_trap(UINT16 opcode)
 {
 	static const struct

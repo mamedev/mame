@@ -4,9 +4,6 @@
 
     Luxor ABC-55/77 keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 /*
@@ -123,7 +120,7 @@ static const discrete_555_desc abc77_ne556_a =
 
 static DISCRETE_SOUND_START( abc77 )
 	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_555_ASTABLE(NODE_02, NODE_01, RES_K(2.7), RES_K(15), CAP_N(22), &abc77_ne556_a)
+	DISCRETE_555_ASTABLE(NODE_02, NODE_01, (int) RES_K(2.7), (int) RES_K(15), (int) CAP_N(22), &abc77_ne556_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
 
@@ -424,58 +421,58 @@ inline void abc77_device::key_down(int state)
 //  abc77_device - constructor
 //-------------------------------------------------
 
-abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__),
-		abc_keyboard_interface(mconfig, *this),
-		m_maincpu(*this, I8035_TAG),
-		m_discrete(*this, DISCRETE_TAG),
-		m_x0(*this, "X0"),
-		m_x1(*this, "X1"),
-		m_x2(*this, "X2"),
-		m_x3(*this, "X3"),
-		m_x4(*this, "X4"),
-		m_x5(*this, "X5"),
-		m_x6(*this, "X6"),
-		m_x7(*this, "X7"),
-		m_x8(*this, "X8"),
-		m_x9(*this, "X9"),
-		m_x10(*this, "X10"),
-		m_x11(*this, "X11"),
-		m_dsw(*this, "DSW"),
-		m_txd(1),
-		m_keydown(1),
-		m_clock(0),
-		m_stb(1)
+abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__),
+	abc_keyboard_interface(mconfig, *this),
+	m_maincpu(*this, I8035_TAG),
+	m_discrete(*this, DISCRETE_TAG),
+	m_x0(*this, "X0"),
+	m_x1(*this, "X1"),
+	m_x2(*this, "X2"),
+	m_x3(*this, "X3"),
+	m_x4(*this, "X4"),
+	m_x5(*this, "X5"),
+	m_x6(*this, "X6"),
+	m_x7(*this, "X7"),
+	m_x8(*this, "X8"),
+	m_x9(*this, "X9"),
+	m_x10(*this, "X10"),
+	m_x11(*this, "X11"),
+	m_dsw(*this, "DSW"),
+	m_txd(1),
+	m_keydown(1),
+	m_clock(0),
+	m_stb(1)
 {
 }
 
-abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		abc_keyboard_interface(mconfig, *this),
-		m_maincpu(*this, I8035_TAG),
-		m_discrete(*this, DISCRETE_TAG),
-		m_x0(*this, "X0"),
-		m_x1(*this, "X1"),
-		m_x2(*this, "X2"),
-		m_x3(*this, "X3"),
-		m_x4(*this, "X4"),
-		m_x5(*this, "X5"),
-		m_x6(*this, "X6"),
-		m_x7(*this, "X7"),
-		m_x8(*this, "X8"),
-		m_x9(*this, "X9"),
-		m_x10(*this, "X10"),
-		m_x11(*this, "X11"),
-		m_dsw(*this, "DSW"),
-		m_txd(1),
-		m_keydown(1),
-		m_clock(0),
-		m_stb(1)
+abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	abc_keyboard_interface(mconfig, *this),
+	m_maincpu(*this, I8035_TAG),
+	m_discrete(*this, DISCRETE_TAG),
+	m_x0(*this, "X0"),
+	m_x1(*this, "X1"),
+	m_x2(*this, "X2"),
+	m_x3(*this, "X3"),
+	m_x4(*this, "X4"),
+	m_x5(*this, "X5"),
+	m_x6(*this, "X6"),
+	m_x7(*this, "X7"),
+	m_x8(*this, "X8"),
+	m_x9(*this, "X9"),
+	m_x10(*this, "X10"),
+	m_x11(*this, "X11"),
+	m_dsw(*this, "DSW"),
+	m_txd(1),
+	m_keydown(1),
+	m_clock(0),
+	m_stb(1)
 {
 }
 
-abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock, "abc55", __FILE__) { }
+abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock, "abc55", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -506,6 +503,8 @@ void abc77_device::device_reset()
 	m_reset_timer->adjust(attotime::from_msec(t));
 
 	m_maincpu->set_input_line(MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
+
+	m_slot->write_rx(1);
 }
 
 

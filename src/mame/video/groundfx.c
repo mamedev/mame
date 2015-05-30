@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Bryan McPhail, David Graves
 #include "emu.h"
 #include "includes/groundfx.h"
 

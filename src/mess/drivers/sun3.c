@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, R. Belmont
 /***************************************************************************
 
   sun3.c: preliminary driver for Sun 3 and Sun 3x models.

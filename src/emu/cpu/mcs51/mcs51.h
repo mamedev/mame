@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Steve Ellenoff, Manuel Abadia, Couriersud
 /*****************************************************************************
  *
  *   mcs51.h
@@ -10,18 +12,6 @@
  *   8058 Product Line (8058)
  *
  *   Copyright Steve Ellenoff, all rights reserved.
- *
- *   - This source code is released as freeware for non-commercial purposes.
- *   - You are free to use and redistribute this code in modified or
- *     unmodified form, provided you list me in the credits.
- *   - If you modify this source code, you must add a notice to each modified
- *     source file that it has been changed.  If you're a nice person, you
- *     will clearly mark each change too.  :)
- *   - If you wish to use this for commercial purposes, please contact me at
- *     sellenoff@hotmail.com
- *   - The author of this copywritten work reserves the right to change the
- *     terms of its usage and license at any time, including retroactively
- *   - This entire notice must remain in the source code.
  *
  *  This work is based on:
  *  #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
@@ -72,6 +62,16 @@ enum
 	MCS51_PORT_TX   = 0x20004,  /* P3.1 */
 };
 
+/* At least CMOS devices may be forced to read from ports configured as output.
+ * All you need is a low impedance output connect to the port.
+ */
+
+#define MCFG_MCS51_PORT1_CONFIG(_forced_inputs) \
+	mcs51_cpu_device::set_port_forced_input(*device, 1, _forced_inputs);
+#define MCFG_MCS51_PORT2_CONFIG(_forced_inputs) \
+	mcs51_cpu_device::set_port_forced_input(*device, 2, _forced_inputs);
+#define MCFG_MCS51_PORT3_CONFIG(_forced_inputs) \
+	mcs51_cpu_device::set_port_forced_input(*device, 3, _forced_inputs);
 
 class mcs51_cpu_device : public cpu_device
 {
@@ -81,6 +81,9 @@ public:
 
 	void i8051_set_serial_tx_callback(write8_delegate tx_func);
 	void i8051_set_serial_rx_callback(read8_delegate rx_func);
+
+	// configuration helpers
+	static void set_port_forced_input(device_t &device, UINT8 port, UINT8 forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
 
 protected:
 	// device-level overrides
@@ -106,7 +109,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, astring &string);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
@@ -136,6 +139,8 @@ protected:
 	int     m_cur_irq_prio;       /* Holds value of the current IRQ Priority Level; -1 if no irq */
 	UINT8   m_irq_active;         /* mask which irq levels are serviced */
 	UINT8   m_irq_prio[8];        /* interrupt priority */
+
+	UINT8   m_forced_inputs[4];   /* allow read even if configured as output */
 
 	int     m_icount;
 

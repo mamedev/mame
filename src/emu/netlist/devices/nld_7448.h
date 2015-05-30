@@ -39,36 +39,40 @@
 #define TTL_7448_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7448_dip, _name)
 
+/*
+ * FIXME: Using truthtable is a lot slower than the explicit device
+ */
+#if (0 && USE_TRUTHTABLE)
+#include "nld_truthtable.h"
+
+NETLIB_TRUTHTABLE(7448, 7, 7, 0);
+#else
+
 NETLIB_SUBDEVICE(7448_sub,
 	ATTR_HOT void update_outputs(UINT8 v);
 	static const UINT8 tab7448[16][7];
 
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_C;
-	netlist_ttl_input_t m_D;
-	netlist_ttl_input_t m_RBIQ;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
+	netlist_logic_input_t m_C;
+	netlist_logic_input_t m_D;
+	netlist_logic_input_t m_RBIQ;
 
-	netlist_state_t<UINT8> m_state;
+	UINT8 m_state;
+	int m_active;
 
-	netlist_ttl_output_t m_a;
-	netlist_ttl_output_t m_b;
-	netlist_ttl_output_t m_c;
-	netlist_ttl_output_t m_d;
-	netlist_ttl_output_t m_e;
-	netlist_ttl_output_t m_f;
-	netlist_ttl_output_t m_g;
+	netlist_logic_output_t m_Q[7];  /* a .. g */
+
 );
 
 NETLIB_DEVICE(7448,
 public:
 	NETLIB_NAME(7448_sub) sub;
 
-	netlist_ttl_input_t m_LTQ;
-	netlist_ttl_input_t m_BIQ;
+	netlist_logic_input_t m_LTQ;
+	netlist_logic_input_t m_BIQ;
 );
-
-NETLIB_DEVICE_DERIVED(7448_dip, 7448,
-);
+#endif
+NETLIB_DEVICE_DERIVED_PURE(7448_dip, 7448);
 
 #endif /* NLD_7448_H_ */

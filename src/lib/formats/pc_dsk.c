@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /*********************************************************************
 
     formats/pc_dsk.c
@@ -7,6 +9,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
 #include "formats/pc_dsk.h"
 #include "formats/basicdsk.h"

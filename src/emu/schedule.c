@@ -239,7 +239,7 @@ void emu_timer::register_save()
 {
 	// determine our instance number and name
 	int index = 0;
-	astring name;
+	std::string name;
 
 	// for non-device timers, it is an index based on the callback function name
 	if (m_device == NULL)
@@ -253,18 +253,18 @@ void emu_timer::register_save()
 	// for device timers, it is an index based on the device and timer ID
 	else
 	{
-		name.printf("%s/%d", m_device->tag(), m_id);
+		strprintf(name,"%s/%d", m_device->tag(), m_id);
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != NULL; curtimer = curtimer->next())
 			if (!curtimer->m_temporary && curtimer->m_device != NULL && curtimer->m_device == m_device && curtimer->m_id == m_id)
 				index++;
 	}
 
 	// save the bits
-	machine().save().save_item("timer", name, index, NAME(m_param));
-	machine().save().save_item("timer", name, index, NAME(m_enabled));
-	machine().save().save_item("timer", name, index, NAME(m_period));
-	machine().save().save_item("timer", name, index, NAME(m_start));
-	machine().save().save_item("timer", name, index, NAME(m_expire));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_param));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_enabled));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_period));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_start));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_expire));
 }
 
 
@@ -451,16 +451,14 @@ void device_scheduler::timeslice()
 				attoseconds_t delta = target.attoseconds - exec->m_localtime.attoseconds;
 				if (delta < 0 && target.seconds > exec->m_localtime.seconds)
 					delta += ATTOSECONDS_PER_SECOND;
-#ifndef MAME_DEBUG_FAST
 				assert(delta == (target - exec->m_localtime).as_attoseconds());
-#endif
 
 				// if we have enough for at least 1 cycle, do the math
 				if (delta >= exec->m_attoseconds_per_cycle)
 				{
 					// compute how many cycles we want to execute
 					int ran = exec->m_cycles_running = divu_64x32((UINT64)delta >> exec->m_divshift, exec->m_divisor);
-					LOG(("  cpu '%s': %"I64FMT"d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
+					LOG(("  cpu '%s': %" I64FMT"d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
 
 					// if we're not suspended, actually execute
 					if (exec->m_suspend == 0)
@@ -755,15 +753,15 @@ void device_scheduler::rebuild_execute_list()
 			min_quantum = attotime::from_hz(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
-		if (machine().config().m_perfect_cpu_quantum)
+		if (!machine().config().m_perfect_cpu_quantum.empty())
 		{
-			device_t *device = machine().device(machine().config().m_perfect_cpu_quantum);
+			device_t *device = machine().device(machine().config().m_perfect_cpu_quantum.c_str());
 			if (device == NULL)
-				fatalerror("Device '%s' specified for perfect interleave is not present!\n", machine().config().m_perfect_cpu_quantum.cstr());
+				fatalerror("Device '%s' specified for perfect interleave is not present!\n", machine().config().m_perfect_cpu_quantum.c_str());
 
 			device_execute_interface *exec;
 			if (!device->interface(exec))
-				fatalerror("Device '%s' specified for perfect interleave is not an executing device!\n", machine().config().m_perfect_cpu_quantum.cstr());
+				fatalerror("Device '%s' specified for perfect interleave is not an executing device!\n", machine().config().m_perfect_cpu_quantum.c_str());
 
 			min_quantum = min(attotime(0, exec->minimum_quantum()), min_quantum);
 		}

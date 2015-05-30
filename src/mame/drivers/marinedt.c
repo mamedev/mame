@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:insideoutboy
 /*
 ---------------------------
 Marine Date by TAITO (1981)

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont, hap
 #pragma once
 
 #ifndef __YMF271_H__

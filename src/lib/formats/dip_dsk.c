@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Fabio Priuli
 /*********************************************************************
 
     formats/dip_dsk.h
@@ -14,7 +14,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "dip_dsk.h"
 
 dip_format::dip_format()

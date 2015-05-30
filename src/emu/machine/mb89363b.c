@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /*
   (this acts as a trampoline to 2x i8255 chips)
 

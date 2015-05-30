@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:JJ Stacino
 /********************************************************************
 
 Support for Micronique machine .K7 and *.FOR cassette images
@@ -12,6 +14,8 @@ You can find some *.K7 file on serveral server in France
 
 Updated 3/1/10 : use real value for timing.
 ********************************************************************/
+#include <assert.h>
+
 #include "hect_tap.h"
 
 

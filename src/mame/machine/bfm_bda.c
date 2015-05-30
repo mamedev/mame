@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /**********************************************************************
 
     Bellfruit 7x5 Dot matrix VFD module interface and emulation by J.Wallace

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tim Schuerewegen
 /*******************************************************************************
 
     Mattel Juice Box
@@ -18,7 +20,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-struct smc_t
+struct jb_smc_t
 {
 	int add_latch;
 	int cmd_latch;
@@ -41,7 +43,7 @@ public:
 	required_device<s3c44b0_device> m_s3c44b0;
 	required_device<smartmedia_image_device> m_smartmedia;
 	UINT32 port[9];
-	smc_t smc;
+	jb_smc_t smc;
 
 	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
 	int port_g_read_count;

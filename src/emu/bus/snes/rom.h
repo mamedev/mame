@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli
 #ifndef __SNS_ROM_H
 #define __SNS_ROM_H
 

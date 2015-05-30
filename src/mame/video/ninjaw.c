@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves
 #include "emu.h"
 #include "includes/ninjaw.h"
 
@@ -7,7 +9,6 @@
 
 void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
 {
-	UINT16 *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int code;
@@ -18,16 +19,16 @@ void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	for (offs = (m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
-		data = spriteram[offs + 2];
+		data = m_spriteram[offs + 2];
 		tilenum = data & 0x7fff;
 
 		if (!tilenum)
 			continue;
 
-		data = spriteram[offs + 0];
+		data = m_spriteram[offs + 0];
 		x = (data - 32) & 0x3ff;    /* aligns sprites on rock outcrops and sewer hole */
 
-		data = spriteram[offs + 1];
+		data = m_spriteram[offs + 1];
 		y = (data - 0) & 0x1ff;
 
 		/*
@@ -43,7 +44,7 @@ void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		    Bit&0x8000 is set on some sprites in later levels of Darius
 		    but is again unknown, and there is no obvious visual problem.
 		*/
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		flipx    = (data & 0x1);
 		flipy    = (data & 0x2) >> 1;
 		priority = (data & 0x4) >> 2; // 1 = low
@@ -116,6 +117,6 @@ UINT32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-UINT32 ninjaw_state::screen_update_ninjaw_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 0, m_tc0100scn_1); }
-UINT32 ninjaw_state::screen_update_ninjaw_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 1, m_tc0100scn_2); }
-UINT32 ninjaw_state::screen_update_ninjaw_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 2, m_tc0100scn_3); }
+UINT32 ninjaw_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 0, m_tc0100scn_1); }
+UINT32 ninjaw_state::screen_update_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 1, m_tc0100scn_2); }
+UINT32 ninjaw_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 36 * 8 * 2, m_tc0100scn_3); }

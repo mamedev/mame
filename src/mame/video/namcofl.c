@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, ElSemi
 /* video/namcofl.c */
 
 #include "emu.h"

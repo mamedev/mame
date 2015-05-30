@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Antoine Mine
 /**********************************************************************
 
   Copyright (C) Antoine Mine' 2006
@@ -7,6 +9,7 @@
 **********************************************************************/
 
 #include <math.h>
+#include <assert.h>
 
 #include "pool.h"
 #include "cassimg.h"

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Alex W. Jackson
 /****************************************************************************
 
     NEC V25/V35 special function registers and internal ram access

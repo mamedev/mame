@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Toshiba Pasopia 1600

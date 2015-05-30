@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */
 /* ======================================================================== */
@@ -7,11 +9,6 @@ G65C816 CPU Emulator V0.90
 
 Copyright Karl Stenerud
 All rights reserved.
-
-Permission is granted to use this source code for non-commercial purposes.
-To use this code for commercial purposes, you must get permission from the
-author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
-
 
 */
 
@@ -26,7 +23,7 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 #define ADDRESS_65816(A) ((A)&0xffffff)
 
 
-struct opcode_struct
+struct g65816_opcode_struct
 {
 	unsigned char name;
 	unsigned char flag;
@@ -73,7 +70,7 @@ static const char *const g_opnames[] =
 	"TYA", "TYX", "WAI", "WDM", "XBA", "XCE"
 };
 
-static const opcode_struct g_opcodes[256] =
+static const g65816_opcode_struct g_opcodes[256] =
 {
 	{BRK, I, SIG }, {ORA, M, DXI }, {COP, I, SIG }, {ORA, M, S   },
 	{TSB, M, D   }, {ORA, M, D   }, {ASL, M, D   }, {ORA, M, DLI },
@@ -195,7 +192,7 @@ INLINE char* int_16_str(unsigned int val)
 unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag)
 {
 	unsigned int instruction;
-	const opcode_struct* opcode;
+	const g65816_opcode_struct* opcode;
 	char* ptr;
 	int var;
 	int length = 1;

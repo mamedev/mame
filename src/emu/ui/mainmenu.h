@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
     ui/mainmenu.h
 
     Internal MAME menus for the user interface.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -14,7 +13,6 @@
 #ifndef __UI_MAINMENU_H__
 #define __UI_MAINMENU_H__
 
-#include "crsshair.h"
 #include "drivenum.h"
 
 class ui_menu_main : public ui_menu {

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*****************************************************************************
  *
  * MSX Floopy drive interface add-on cartridges

@@ -46,6 +46,47 @@
 	tms0270_cpu_device::set_write_pdc_callback(*device, DEVCB_##_devcb);
 
 
+// pinout reference
+
+/*
+
+            ____   ____                         ____   ____
+     R8  1 |*   \_/    | 28 R7           R0  1 |*   \_/    | 28 Vss
+     R9  2 |           | 27 R6           R1  2 |           | 27 OSC2
+    R10  3 |           | 26 R5           R2  3 |           | 26 OSC1
+    Vdd  4 |           | 25 R4           R3  4 |           | 25 O0
+     K1  5 |           | 24 R3           R4  5 |           | 24 O1
+     K2  6 |  TMS1000  | 23 R2           R5  6 |           | 23 O2
+     K4  7 |  TMS1070  | 22 R1           R6  7 |  TMS1400  | 22 O3
+     K8  8 |  TMS1100  | 21 R0           R7  8 |           | 21 O4
+   INIT  9 |  TMS1170  | 20 Vss          R8  9 |           | 20 O5
+     O7 10 |           | 19 OSC2         R9 10 |           | 19 O6
+     O6 11 |           | 18 OSC1        R10 11 |           | 18 O7
+     O5 12 |           | 17 O0          Vdd 12 |           | 17 K8
+     O4 13 |           | 16 O1         INIT 13 |           | 16 K4
+     O3 14 |___________| 15 O2           K1 14 |___________| 15 K2
+
+
+            ____   ____
+     R2  1 |*   \_/    | 28 R3
+     R1  2 |           | 27 R4
+     R0  3 |           | 26 R5
+      ?  4 |           | 25 R6
+    Vdd  5 |           | 24 R7
+     K3  6 |           | 23 R8
+     K8  7 |  TMS0980  | 22 ?
+     K4  8 |           | 21 ?
+     K2  9 |           | 20 Vss
+     K1 10 |           | 19 ?
+     O7 11 |           | 18 O0
+     O6 12 |           | 17 O1
+     O5 13 |           | 16 O2
+     O4 14 |___________| 15 O3
+
+  note: TMS0980 official pin names for R0-R8 is D9-D1, O0-O7 is S(A-G,DP)
+
+*/
+
 
 class tms1xxx_cpu_device : public cpu_device
 {
@@ -64,7 +105,7 @@ public:
 		, m_pc_bits(pc_bits)
 		, m_byte_bits(byte_bits)
 		, m_x_bits(x_bits)
-		, c_output_pla(NULL)
+		, m_output_pla_table(NULL)
 		, m_read_k(*this)
 		, m_write_o(*this)
 		, m_write_r(*this)
@@ -76,7 +117,7 @@ public:
 	template<class _Object> static devcb_base &set_write_o_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_write_o.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_write_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_power_off.set_callback(object); }
-	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1xxx_cpu_device &>(device).c_output_pla = output_pla; }
+	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1xxx_cpu_device &>(device).m_output_pla_table = output_pla; }
 
 protected:
 	// device-level overrides
@@ -90,13 +131,13 @@ protected:
 	virtual void execute_run();
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config :((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
 
-	void state_string_export(const device_state_entry &entry, astring &string);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	void next_pc();
 
@@ -185,7 +226,7 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
-	const UINT16 *c_output_pla;
+	const UINT16 *m_output_pla_table;
 	devcb_read8 m_read_k;
 	devcb_write16 m_write_o;
 	devcb_write16 m_write_r;
@@ -198,9 +239,9 @@ protected:
 	UINT32 m_x_mask;
 
 	// lookup tables
-	dynamic_array<UINT32> m_fixed_decode;
-	dynamic_array<UINT32> m_micro_decode;
-	dynamic_array<UINT32> m_micro_direct;
+	std::vector<UINT32> m_fixed_decode;
+	std::vector<UINT32> m_micro_decode;
+	std::vector<UINT32> m_micro_direct;
 };
 
 
@@ -224,6 +265,12 @@ class tms1070_cpu_device : public tms1000_cpu_device
 {
 public:
 	tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class tms1040_cpu_device : public tms1000_cpu_device
+{
+public:
+	tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -295,6 +342,20 @@ public:
 };
 
 
+class tms1600_cpu_device : public tms1400_cpu_device
+{
+public:
+	tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+};
+
+class tms1670_cpu_device : public tms1600_cpu_device
+{
+public:
+	tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 class tms0970_cpu_device : public tms1000_cpu_device
 {
 public:
@@ -310,6 +371,12 @@ protected:
 
 	virtual void op_setr();
 	virtual void op_tdo();
+};
+
+class tms1990_cpu_device : public tms0970_cpu_device
+{
+public:
+	tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -386,6 +453,7 @@ private:
 
 extern const device_type TMS1000;
 extern const device_type TMS1070;
+extern const device_type TMS1040;
 extern const device_type TMS1200;
 extern const device_type TMS1100;
 extern const device_type TMS1170;
@@ -393,7 +461,10 @@ extern const device_type TMS1300;
 extern const device_type TMS1370;
 extern const device_type TMS1400;
 extern const device_type TMS1470;
+extern const device_type TMS1600;
+extern const device_type TMS1670;
 extern const device_type TMS0970;
+extern const device_type TMS1990;
 extern const device_type TMS0980;
 extern const device_type TMS0270;
 

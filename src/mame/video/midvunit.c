@@ -76,10 +76,15 @@ void midvunit_state::video_start()
 	save_item(NAME(m_dma_data));
 	save_item(NAME(m_dma_data_index));
 	save_item(NAME(m_page_control));
-	save_item(NAME(m_video_changed));
+
+	m_video_changed = TRUE;
+	machine().save().register_postload(save_prepost_delegate(FUNC(midvunit_state::postload), this));
 }
 
-
+void midvunit_state::postload()
+{
+	m_video_changed = TRUE;
+}
 
 /*************************************
  *

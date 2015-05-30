@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Gordon Jefferyes
 /******************************************************************************
     uPD7002 Analogue to Digital Converter
 

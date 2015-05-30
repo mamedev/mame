@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*********************************************************************
 
     video/apple2.h  - Video handling for 8-bit Apple IIs

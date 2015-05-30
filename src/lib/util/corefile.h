@@ -14,7 +14,8 @@
 #define __COREFILE_H__
 
 #include <stdarg.h>
-#include "astring.h"
+#include "corestr.h"
+#include <string>
 #include "coretmpl.h"
 
 
@@ -116,12 +117,15 @@ int core_fputs(core_file *f, const char *s);
 int core_vfprintf(core_file *f, const char *fmt, va_list va);
 int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...) ATTR_PRINTF(2,3);
 
+/* file truncation */
+file_error core_truncate(core_file *f, UINT64 offset);
+
 
 
 /* ----- filename utilities ----- */
 
 /* extract the base part of a filename (remove extensions and paths) */
-astring &core_filename_extract_base(astring &result, const char *name, bool strip_extension = false);
+std::string &core_filename_extract_base(std::string &result, const char *name, bool strip_extension = false);
 
 /* true if the given filename ends with a particular extension */
 int core_filename_ends_with(const char *filename, const char *extension);

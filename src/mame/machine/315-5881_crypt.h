@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 #pragma once
 
@@ -23,7 +25,6 @@ public:
 	void set_addr_low(UINT16 data);
 	void set_addr_high(UINT16 data);
 	void set_subkey(UINT16 data);
-	void set_key(UINT32 data);
 
 	sega_m2_read_delegate m_read;
 
@@ -40,8 +41,9 @@ protected:
 private:
 
 	enum {
-		BUFFER_SIZE = 32768, LINE_SIZE = 512,
-		FLAG_COMPRESSED = 0x10000, FLAG_LINE_SIZE_512 = 0x20000
+//        BUFFER_SIZE = 32768, LINE_SIZE = 512,
+		BUFFER_SIZE = 2, LINE_SIZE = 512,  // this should be a stream, without any 'BUFFER_SIZE' ? I guess the SH4 DMA implementation isn't on a timer tho?
+		FLAG_COMPRESSED = 0x20000
 	};
 
 	UINT32 key;
@@ -53,7 +55,14 @@ private:
 
 	bool enc_ready;
 
-	int buffer_pos, line_buffer_pos, line_buffer_size, buffer_bit;
+	int buffer_pos, line_buffer_pos, line_buffer_size, buffer_bit, buffer_bit2;
+	UINT8 buffer2[2];
+	UINT16 buffer2a;
+
+	int block_size;
+	int block_pos;
+	int block_numlines;
+	int done_compression;
 
 	struct sbox {
 		UINT8 table[64];
@@ -64,8 +73,10 @@ private:
 	static const sbox fn1_sboxes[4][4];
 	static const sbox fn2_sboxes[4][4];
 
-	static const int fn1_game_key_scheduling[38][2];
-	static const int fn2_game_key_scheduling[34][2];
+	static const int FN1GK = 38;
+	static const int FN2GK = 32;
+	static const int fn1_game_key_scheduling[FN1GK][2];
+	static const int fn2_game_key_scheduling[FN2GK][2];
 	static const int fn1_sequence_key_scheduling[20][2];
 	static const int fn2_sequence_key_scheduling[16];
 	static const int fn2_middle_result_scheduling[16];

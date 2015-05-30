@@ -20,7 +20,6 @@
 #define __OSDCORE_H__
 
 #include "osdcomm.h"
-#include "delegate.h"
 #include <stdarg.h>
 
 /***************************************************************************
@@ -29,7 +28,11 @@
 
 /* Make sure we have a path separator (default to /) */
 #ifndef PATH_SEPARATOR
+#if defined(_WIN32) || defined (__OS2__)
+#define PATH_SEPARATOR          "\\"
+#else
 #define PATH_SEPARATOR          "/"
+#endif
 #endif
 
 /* flags controlling file access */
@@ -193,6 +196,20 @@ file_error osd_truncate(osd_file *file, UINT64 offset);
         the file, or FILERR_NONE if no error occurred
 -----------------------------------------------------------------------------*/
 file_error osd_rmfile(const char *filename);
+
+
+/*-----------------------------------------------------------------------------
+    osd_getenv: return pointer to environment variable
+
+    Parameters:
+
+        name  - name of environment variable
+
+    Return value:
+
+        pointer to value
+-----------------------------------------------------------------------------*/
+const char *osd_getenv(const char *name);
 
 
 /*-----------------------------------------------------------------------------
@@ -873,21 +890,22 @@ file_error osd_get_full_path(char **dst, const char *path);
 /***************************************************************************
     MIDI I/O INTERFACES
 ***************************************************************************/
-struct osd_midi_device;
 
-bool osd_midi_init();
-void osd_midi_exit();
-void osd_list_midi_devices(void);
-// free result with osd_close_midi_channel()
-osd_midi_device *osd_open_midi_input(const char *devname);
-// free result with osd_close_midi_channel()
-osd_midi_device *osd_open_midi_output(const char *devname);
-void osd_close_midi_channel(osd_midi_device *dev);
-bool osd_poll_midi_channel(osd_midi_device *dev);
-int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut);
-void osd_write_midi_channel(osd_midi_device *dev, UINT8 data);
+class osd_midi_device
+{
+public:
+	virtual ~osd_midi_device() { }
+	// free result with osd_close_midi_channel()
+	virtual bool open_input(const char *devname) = 0;
+	// free result with osd_close_midi_channel()
+	virtual bool open_output(const char *devname) = 0;
+	virtual void close() = 0;
+	virtual bool poll() = 0;
+	virtual int read(UINT8 *pOut) = 0;
+	virtual void write(UINT8 data) = 0;
+};
 
-
+//FIXME: really needed here?
 void osd_list_network_adapters(void);
 
 /***************************************************************************
@@ -911,7 +929,7 @@ const char *osd_get_volume_name(int idx);
 /* ----- output management ----- */
 
 // output channels
-enum output_channel
+enum osd_output_channel
 {
 	OSD_OUTPUT_CHANNEL_ERROR,
 	OSD_OUTPUT_CHANNEL_WARNING,
@@ -922,11 +940,26 @@ enum output_channel
 	OSD_OUTPUT_CHANNEL_COUNT
 };
 
-// output channel callback
-typedef delegate<void (const char *, va_list)> output_delegate;
+class osd_output
+{
+public:
+	osd_output() : m_chain(NULL) { }
+	virtual ~osd_output() { }
 
-/* set the output handler for a channel, returns the current one */
-output_delegate osd_set_output_channel(output_channel channel, output_delegate callback);
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) = 0;
+
+	static void push(osd_output *delegate);
+	static void pop(osd_output *delegate);
+protected:
+
+	void chain_output(osd_output_channel channel, const char *msg, va_list args)
+	{
+		if (m_chain != NULL)
+			m_chain->output_callback(channel, msg, args);
+	}
+private:
+	osd_output *m_chain;
+};
 
 /* calls to be used by the code */
 void CLIB_DECL osd_printf_error(const char *format, ...) ATTR_PRINTF(1,2);

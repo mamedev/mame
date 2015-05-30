@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
     formats/atari_dsk.c
@@ -5,6 +7,8 @@
     Atari disk images
 
 *********************************************************************/
+
+#include <assert.h>
 
 #include "formats/atari_dsk.h"
 

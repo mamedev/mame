@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 /*********************************************************************
 
     formats/vt_dsk.c
@@ -8,6 +10,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "formats/vt_dsk.h"
 #include "formats/basicdsk.h"
 

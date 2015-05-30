@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Takahiro Nogi
 /***************************************************************************
 
 Dottori Kun (Head On's mini game)

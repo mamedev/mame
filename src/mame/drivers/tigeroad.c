@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
 /***************************************************************************
 
 Tiger Road     (C) 1987 Capcom (licensed to Romstar)

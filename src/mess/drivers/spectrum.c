@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Kevin Thacker
 /***************************************************************************
 
     NOTE: ****** Specbusy: press N, R, or E to boot *************
@@ -645,10 +647,15 @@ static GFXDECODE_START( spectrum )
 	GFXDECODE_ENTRY( "maincpu", 0x3d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
+void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
 
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	device.execute().set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
+	timer_set(attotime::from_ticks(32, m_maincpu->clock()), 0, 0);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(spectrum_state, spectrum_cart)

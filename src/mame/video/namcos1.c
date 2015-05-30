@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 /*******************************************************************
 
 Namco System 1 Video Hardware
@@ -139,6 +141,8 @@ void namcos1_state::video_start()
 
 	memset(m_playfield_control, 0, sizeof(m_playfield_control));
 	m_copy_sprites = 0;
+
+	save_item(NAME(m_copy_sprites));
 }
 
 
@@ -149,7 +153,7 @@ void namcos1_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER( namcos1_state::namcos1_videoram_w )
+WRITE8_MEMBER( namcos1_state::videoram_w )
 {
 	m_videoram[offset] = data;
 	if (offset < 0x7000)
@@ -168,7 +172,7 @@ WRITE8_MEMBER( namcos1_state::namcos1_videoram_w )
 }
 
 
-WRITE8_MEMBER( namcos1_state::namcos1_spriteram_w )
+WRITE8_MEMBER( namcos1_state::spriteram_w )
 {
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
@@ -278,7 +282,7 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 
 
-UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j, scrollx, scrolly, priority;
 	rectangle new_clip = cliprect;
@@ -342,7 +346,7 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 }
 
 
-void namcos1_state::screen_eof_namcos1(screen_device &screen, bool state)
+void namcos1_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)

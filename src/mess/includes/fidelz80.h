@@ -1,4 +1,4 @@
-// license:?
+// license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
 /***************************************************************************
 
@@ -53,9 +53,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bridgec_speech_w );
 	DECLARE_WRITE8_MEMBER(kp_matrix_w);
 	DECLARE_READ8_MEMBER(unknown_r);
+	DECLARE_READ8_MEMBER(unknown2_r);
 	DECLARE_READ8_MEMBER(exp_i8243_p2_r);
 	DECLARE_WRITE8_MEMBER(exp_i8243_p2_w);
-	DECLARE_READ8_MEMBER(rand_r);
 	DECLARE_WRITE8_MEMBER(mcu_data_w);
 	DECLARE_WRITE8_MEMBER(mcu_command_w);
 	DECLARE_READ8_MEMBER(mcu_data_r);

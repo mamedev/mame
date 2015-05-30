@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Quench, David Haywood
 /* GP9001 Video Controller */
 
 struct gp9001layeroffsets
