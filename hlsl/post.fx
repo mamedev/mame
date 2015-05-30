@@ -368,7 +368,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		// todo: there is an offset which can be noticed at lower prescale in high-resolution
 		float2 ScanlinePrescaleOffset = 0.0f;
 
-		float InnerSine = BaseCoordCentered.y * ScanlineScale * SourceDims.y;
+		float InnerSine = BaseCoord.y * ScanlineScale * SourceDims.y;
 		float ScanJitter = ScanlineOffset * SourceDims.y;
 		float ScanBrightMod = sin(InnerSine * PI + ScanJitter + ScanlinePrescaleOffset);
 		float3 ScanColor = lerp(1.0f, (pow(ScanBrightMod * ScanBrightMod, ScanlineHeight) * ScanlineBrightScale + 1.0f + ScanlineBrightOffset) * 0.5f, ScanlineAlpha);
