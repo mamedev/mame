@@ -2,8 +2,9 @@
 -- copyright-holders:MAMEdev Team
 
 project "utils"
+	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid "22489ad0-4cb2-4d91-ad81-24b0d80ca30a"
-	kind "StaticLib"
+	kind (LIBTYPE)
 
 	options {
 		"ForceCPP",
@@ -94,8 +95,9 @@ project "utils"
 
 
 project "formats"
+	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid "f69636b1-fcce-45ce-b09a-113e371a2d7a"
-	kind "StaticLib"
+	kind (LIBTYPE)
 
 	options {
 		"ForceCPP",

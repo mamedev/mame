@@ -393,6 +393,10 @@ ifdef OPTIMIZE
 PARAMS += --OPTIMIZE=$(OPTIMIZE)
 endif
 
+ifdef SHLIB
+PARAMS += --SHLIB=$(SHLIB)
+endif
+
 ifdef ARCHOPTS
 PARAMS += --ARCHOPTS='$(ARCHOPTS)'
 endif

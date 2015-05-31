@@ -201,7 +201,7 @@ void gime_base_device::device_start(void)
 //  get_composite_color
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE gime_base_device::pixel_t gime_base_device::get_composite_color(int color)
+inline gime_base_device::pixel_t gime_base_device::get_composite_color(int color)
 {
 	/* CMP colors
 	 *
@@ -313,7 +313,7 @@ ATTR_FORCE_INLINE gime_base_device::pixel_t gime_base_device::get_composite_colo
 //  get_rgb_color
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE gime_base_device::pixel_t gime_base_device::get_rgb_color(int color)
+inline gime_base_device::pixel_t gime_base_device::get_rgb_color(int color)
 {
 	return  (((color >> 4) & 2) | ((color >> 2) & 1)) * 0x550000
 		|   (((color >> 3) & 2) | ((color >> 1) & 1)) * 0x005500
@@ -543,7 +543,7 @@ void gime_base_device::reset_timer(void)
 //  update_memory
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void gime_base_device::update_memory(void)
+inline void gime_base_device::update_memory(void)
 {
 	for (int bank = 0; bank <= 8; bank++)
 	{
@@ -701,7 +701,7 @@ UINT8 gime_base_device::read(offs_t offset)
 //  read_gime_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
+inline UINT8 gime_base_device::read_gime_register(offs_t offset)
 {
 	offset &= 0x0F;
 
@@ -746,7 +746,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 //  read_mmu_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT8 gime_base_device::read_mmu_register(offs_t offset)
+inline UINT8 gime_base_device::read_mmu_register(offs_t offset)
 {
 	return (m_mmu[offset & 0x0F] & 0x3F) | (read_floating_bus() & 0xC0);
 }
@@ -757,7 +757,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_mmu_register(offs_t offset)
 //  read_palette_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT8 gime_base_device::read_palette_register(offs_t offset)
+inline UINT8 gime_base_device::read_palette_register(offs_t offset)
 {
 	// Bits 7/6 are floating, and behave oddly.  On a real CoCo 3
 	//
@@ -775,7 +775,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_palette_register(offs_t offset)
 //  read_floating_bus
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT8 gime_base_device::read_floating_bus(void)
+inline UINT8 gime_base_device::read_floating_bus(void)
 {
 	return m_read_floating_bus(0);
 }
@@ -815,7 +815,7 @@ void gime_base_device::write(offs_t offset, UINT8 data)
 //  write_gime_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT8 data)
+inline void gime_base_device::write_gime_register(offs_t offset, UINT8 data)
 {
 	// this is needed for writes to FF95
 	bool timer_was_off = (m_gime_registers[0x04] == 0x00) && (m_gime_registers[0x05] == 0x00);
@@ -1018,7 +1018,7 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 //  write_mmu_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void gime_base_device::write_mmu_register(offs_t offset, UINT8 data)
+inline void gime_base_device::write_mmu_register(offs_t offset, UINT8 data)
 {
 	offset &= 0x0F;
 
@@ -1038,7 +1038,7 @@ ATTR_FORCE_INLINE void gime_base_device::write_mmu_register(offs_t offset, UINT8
 //  write_palette_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void gime_base_device::write_palette_register(offs_t offset, UINT8 data)
+inline void gime_base_device::write_palette_register(offs_t offset, UINT8 data)
 {
 	offset &= 0x0F;
 
@@ -1071,7 +1071,7 @@ ATTR_FORCE_INLINE void gime_base_device::write_palette_register(offs_t offset, U
 //  write_sam_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void gime_base_device::write_sam_register(offs_t offset)
+inline void gime_base_device::write_sam_register(offs_t offset)
 {
 	/* change the SAM state */
 	UINT16 xorval = alter_sam_state(offset);
@@ -1145,7 +1145,7 @@ void gime_base_device::recalculate_firq(void)
 //  John Kowalski confirms this behavior
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE offs_t gime_base_device::get_video_base(void)
+inline offs_t gime_base_device::get_video_base(void)
 {
 	offs_t result;
 	UINT8 ff9d_mask, ff9e_mask;
@@ -1282,7 +1282,7 @@ void gime_base_device::record_border_scanline(UINT16 physical_scanline)
 //  get_lines_per_row
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT16 gime_base_device::get_lines_per_row(void)
+inline UINT16 gime_base_device::get_lines_per_row(void)
 {
 	UINT16 lines_per_row;
 	if (m_legacy_video)
@@ -1361,7 +1361,7 @@ ATTR_FORCE_INLINE UINT16 gime_base_device::get_lines_per_row(void)
 //-------------------------------------------------
 
 template<UINT8 xres, gime_base_device::get_data_func get_data, bool record_mode>
-ATTR_FORCE_INLINE UINT32 gime_base_device::record_scanline_res(int scanline)
+inline UINT32 gime_base_device::record_scanline_res(int scanline)
 {
 	int column;
 	UINT32 base_offset = m_legacy_video ? 0 : (m_gime_registers[0x0F] & 0x7F) * 2;
@@ -1639,7 +1639,7 @@ UINT32 gime_base_device::emit_dummy_samples(const scanline_record *scanline, int
 //  emit_mc6847_samples
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT32 gime_base_device::emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
+inline UINT32 gime_base_device::emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
 {
 	return super::emit_mc6847_samples<2>(
 		scanline->m_mode[sample_start],
@@ -1659,7 +1659,7 @@ ATTR_FORCE_INLINE UINT32 gime_base_device::emit_mc6847_samples(const scanline_re
 //-------------------------------------------------
 
 template<int xscale, int bits_per_pixel>
-ATTR_FORCE_INLINE UINT32 gime_base_device::emit_gime_graphics_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
+inline UINT32 gime_base_device::emit_gime_graphics_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
 {
 	const UINT8 *data = &scanline->m_data[sample_start];
 	mc6847_friend_device::emit_graphics<bits_per_pixel, xscale>(data, sample_count, pixels, 0, palette);
@@ -1673,7 +1673,7 @@ ATTR_FORCE_INLINE UINT32 gime_base_device::emit_gime_graphics_samples(const scan
 //-------------------------------------------------
 
 template<int xscale>
-ATTR_FORCE_INLINE UINT32 gime_base_device::emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
+inline UINT32 gime_base_device::emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
 {
 	UINT8 attribute = scanline->m_mode[sample_start];
 	const UINT8 *data = &scanline->m_data[sample_start];
@@ -1733,7 +1733,7 @@ ATTR_FORCE_INLINE UINT32 gime_base_device::emit_gime_text_samples(const scanline
 //-------------------------------------------------
 
 template<int sample_count, gime_base_device::emit_samples_proc emit_samples>
-ATTR_FORCE_INLINE void gime_base_device::render_scanline(const scanline_record *scanline, pixel_t *pixels, int min_x, int max_x, palette_resolver *resolver)
+inline void gime_base_device::render_scanline(const scanline_record *scanline, pixel_t *pixels, int min_x, int max_x, palette_resolver *resolver)
 {
 	int left_border, right_border;
 	int x, x2, pixel_position;
@@ -1934,7 +1934,7 @@ bool gime_base_device::update_rgb(bitmap_rgb32 &bitmap, const rectangle &cliprec
 //  palette_resolver::palette_resolver
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE gime_base_device::palette_resolver::palette_resolver(gime_base_device *gime, const pixel_t *palette)
+inline gime_base_device::palette_resolver::palette_resolver(gime_base_device *gime, const pixel_t *palette)
 {
 	m_gime = gime;
 	m_palette = palette;
@@ -1948,7 +1948,7 @@ ATTR_FORCE_INLINE gime_base_device::palette_resolver::palette_resolver(gime_base
 //  palette_resolver::get_palette
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE const gime_base_device::pixel_t *gime_base_device::palette_resolver::get_palette(UINT16 palette_rotation)
+inline const gime_base_device::pixel_t *gime_base_device::palette_resolver::get_palette(UINT16 palette_rotation)
 {
 	if (UNEXPECTED(m_current_resolved_palette != palette_rotation))
 	{
@@ -1965,7 +1965,7 @@ ATTR_FORCE_INLINE const gime_base_device::pixel_t *gime_base_device::palette_res
 //  palette_resolver::lookup
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE gime_base_device::pixel_t gime_base_device::palette_resolver::lookup(UINT8 color)
+inline gime_base_device::pixel_t gime_base_device::palette_resolver::lookup(UINT8 color)
 {
 	assert(color <= 63);
 	return m_palette[color];

@@ -311,6 +311,21 @@ newoption {
 }
 
 
+newoption {
+	trigger = "SHLIB",
+	description = "Generate shared libs.",
+	allowed = {
+		{ "0",   "Static libs" 	},
+		{ "1",   "Shared libs"  },
+	}
+}
+
+if _OPTIONS["SHLIB"]=="1" then
+	LIBTYPE = "SharedLib"
+else
+	LIBTYPE = "StaticLib"
+end
+
 PYTHON = "python"
 
 if _OPTIONS["PYTHON_EXECUTABLE"]~=nil then
@@ -741,6 +756,12 @@ if _OPTIONS["OPTIMIZE"] then
 		
 		
 	end
+end
+
+if _OPTIONS["SHLIB"] then
+	buildoptions {
+		"-fPIC"
+	}
 end
 
 if _OPTIONS["SSE2"]=="1" then
