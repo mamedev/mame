@@ -637,7 +637,7 @@ project "portaudio"
 				"-Wno-sometimes-uninitialized",
 			}
 		else
-			if (version >= 40400) then
+			if (version >= 40600) then
 				buildoptions_c {
 					"-Wno-unused-but-set-variable",
 					"-Wno-maybe-uninitialized",
