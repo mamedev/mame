@@ -4,9 +4,6 @@
 #
 #   Core makefile for building MAME and derivatives
 #
-#   Copyright (c) Nicola Salmoria and the MAME Team.
-#   Visit http://mamedev.org for licensing and usage restrictions.
-#
 ###########################################################################
 
 
