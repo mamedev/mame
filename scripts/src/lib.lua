@@ -313,6 +313,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/pc98fdi_dsk.h",
 		MAME_DIR .. "src/lib/formats/phc25_cas.c",
 		MAME_DIR .. "src/lib/formats/phc25_cas.h",
+		MAME_DIR .. "src/lib/formats/pk8020_dsk.c",
+		MAME_DIR .. "src/lib/formats/pk8020_dsk.h",
 		MAME_DIR .. "src/lib/formats/pmd_cas.c",
 		MAME_DIR .. "src/lib/formats/pmd_cas.h",
 		MAME_DIR .. "src/lib/formats/primoptp.c",
