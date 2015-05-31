@@ -18,7 +18,7 @@
 	class NETLIB_NAME(_name) : public net_signal_t<_num_input, _check, _invert>     \
 	{                                                                               \
 	public:                                                                         \
-		ATTR_COLD NETLIB_NAME(_name) ()                                             \
+		NETLIB_NAME(_name) ()                                             \
 		: net_signal_t<_num_input, _check, _invert>() { }                           \
 	}
 
@@ -35,7 +35,7 @@ public:
 	{
 	}
 
-	ATTR_COLD void start()
+	void start()
 	{
 		const char *sIN[8] = { "A", "B", "C", "D", "E", "F", "G", "H" };
 
@@ -47,7 +47,7 @@ public:
 		save(NLNAME(m_active));
 	}
 
-	ATTR_COLD void reset()
+	void reset()
 	{
 		m_Q[0].initial(0);
 		m_active = 1;

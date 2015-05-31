@@ -122,8 +122,8 @@ public:
 	}
 
 protected:
-	/* ATTR_COLD */ virtual void start();
-	/* ATTR_COLD */ virtual void reset();
+	virtual void start();
+	virtual void reset();
 	ATTR_HOT void update();
 
 private:
@@ -144,8 +144,8 @@ public:
 	}
 
 protected:
-	/* ATTR_COLD */ virtual void start();
-	/* ATTR_COLD */ virtual void reset();
+	virtual void start();
+	virtual void reset();
 	ATTR_HOT void update();
 };
 
@@ -193,9 +193,9 @@ public:
 	}
 
 protected:
-	/* ATTR_COLD */ virtual void start();
-	/* ATTR_COLD */ virtual void reset();
-	/* ATTR_COLD */ virtual void update_param();
+	virtual void start();
+	virtual void reset();
+	virtual void update_param();
 	ATTR_HOT void update();
 
 	netlist_param_double_t m_C;
@@ -282,8 +282,8 @@ public:
 	NETLIB_UPDATE_TERMINALSI();
 
 protected:
-	/* ATTR_COLD */ virtual void start();
-	/* ATTR_COLD */ virtual void update_param();
+	virtual void start();
+	virtual void update_param();
 	ATTR_HOT void update();
 
 	netlist_param_model_t m_model;
