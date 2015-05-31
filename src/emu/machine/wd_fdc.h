@@ -59,6 +59,9 @@
 #define MCFG_FD1793x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1793x, _clock)
 
+#define MCFG_KR1818VG93x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, KR1818VG93x, _clock)
+
 #define MCFG_FD1794x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1794x, _clock)
 
@@ -188,6 +191,7 @@ protected:
 	bool head_control;
 	bool motor_control;
 	bool ready_hooked;
+	bool nonsticky_immint;
 	int clock_ratio;
 	const int *step_times;
 	int delay_register_commit;
@@ -532,6 +536,11 @@ public:
 	fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class kr1818vg93_t : public wd_fdc_analog_t {
+public:
+	kr1818vg93_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class fd1794_t : public wd_fdc_analog_t {
 public:
 	fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -647,6 +656,7 @@ extern const device_type FD1781x;
 extern const device_type FD1791x;
 extern const device_type FD1792x;
 extern const device_type FD1793x;
+extern const device_type KR1818VG93x;
 extern const device_type FD1795x;
 extern const device_type FD1797x;
 
