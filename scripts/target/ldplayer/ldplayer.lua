@@ -54,7 +54,7 @@ BUSES["MIDI"] = true
 function createProjects_ldplayer_ldplayer(_target, _subtarget)
 	project ("drvldplayer")
 	targetsubdir(_target .."_" .. _subtarget)
-	kind "StaticLib"
+	kind (LIBTYPE)
 	uuid (os.uuid("drvldplayer"))
 	
 	options {

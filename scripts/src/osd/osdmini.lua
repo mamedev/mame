@@ -7,7 +7,7 @@ end
 
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
-	kind "StaticLib"
+	kind (LIBTYPE)
 
 	removeflags {
 		"SingleOutputDir",
@@ -54,7 +54,7 @@ project ("osd_" .. _OPTIONS["osd"])
 	
 project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
-	kind "StaticLib"
+	kind (LIBTYPE)
 
 	options {
 		"ForceCPP",
