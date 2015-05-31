@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Angelo Salese, Roberto Fresca, Rob Ragon
+// copyright-holders:Angelo Salese, Roberto Fresca
 /*************************************************************************************************
 
   Forte Card
