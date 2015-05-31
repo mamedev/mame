@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/selsoft.h
+    mewui/selsoft.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 #pragma once
@@ -56,12 +56,12 @@ public:
 
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	char				m_search[40];
+	char                m_search[40];
 	const game_driver   *ui_driver;
-	bool				has_empty_start;
-	c_sw_region		 m_region;
-	c_sw_publisher	  m_publisher;
-	c_sw_year		   m_year;
+	bool                has_empty_start;
+	c_sw_region      m_region;
+	c_sw_publisher    m_publisher;
+	c_sw_year          m_year;
 
 	ui_software_info *searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *> m_displaylist;

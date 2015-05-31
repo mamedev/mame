@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/inifile.h
+    mewui/inifile.h
 
-	MEWUI inifile system.
+    MEWUI inifile system.
 
 ***************************************************************************/
 
@@ -14,7 +14,7 @@
 #include "mewui/utils.h"
 
 /**************************************************************************
-	CONSTANTS AND STRUCTURES
+    CONSTANTS AND STRUCTURES
 **************************************************************************/
 // category structure
 struct IniCategoryIndex
@@ -31,7 +31,7 @@ struct IniFileIndex
 };
 
 /**************************************************************************
-	INIFILE MANAGER
+    INIFILE MANAGER
 **************************************************************************/
 
 class inifile_manager
@@ -63,12 +63,12 @@ private:
 	bool ParseOpen(const char *filename);
 
 	// internal state
-	running_machine &m_machine;	 // reference to our machine
-	std::string		fullpath;
+	running_machine &m_machine;  // reference to our machine
+	std::string     fullpath;
 };
 
 /**************************************************************************
-	FAVORITE MANAGER
+    FAVORITE MANAGER
 **************************************************************************/
 
 class favorite_manager
@@ -113,8 +113,8 @@ private:
 	bool parseOpen(const char *filename);
 
 	// internal state
-	running_machine &m_machine;	 // reference to our machine
-	std::string 	fullpath;
+	running_machine &m_machine;  // reference to our machine
+	std::string     fullpath;
 };
 
 #endif  /* __MEWUI_INIFILE_H__ */

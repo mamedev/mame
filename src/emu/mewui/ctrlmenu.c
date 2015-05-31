@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/ctrlmenu.c
+    mewui/ctrlmenu.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 

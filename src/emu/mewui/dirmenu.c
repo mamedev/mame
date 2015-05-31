@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/dirmenu.c
+    mewui/dirmenu.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 
@@ -15,37 +15,37 @@
 
 static const folders_entry s_folders_entry[] =
 {
-	{ "ROMs",				   OPTION_MEDIAPATH },
-	{ "Samples",				OPTION_SAMPLEPATH },
-	{ "DATs",				   OPTION_HISTORYPATH },
-	{ "INIs",				   OPTION_INIPATH },
-	{ "Extra INIs",			 OPTION_EXTRAINIPATH },
-	{ "Icons",				  OPTION_ICONS_DIRECTORY },
-	{ "Cheats",				 OPTION_CHEATPATH },
-	{ "Snapshots",			  OPTION_SNAPSHOT_DIRECTORY },
-	{ "Cabinets",			   OPTION_CABINETS_DIRECTORY },
-	{ "Flyers",				 OPTION_FLYERS_DIRECTORY },
-	{ "Titles",				 OPTION_TITLES_DIRECTORY },
-	{ "PCBs",				   OPTION_PCBS_DIRECTORY },
-	{ "Marquees",			   OPTION_MARQUEES_DIRECTORY },
-	{ "Controls Panels",		OPTION_CPANELS_DIRECTORY },
-	{ "Crosshairs",			 OPTION_CROSSHAIRPATH },
-	{ "Artworks",			   OPTION_ARTPATH },
-	{ "Bosses",				 OPTION_BOSSES_DIRECTORY },
-	{ "Artworks Preview",	   OPTION_ARTPREV_DIRECTORY },
-	{ "Select",				 OPTION_SELECT_DIRECTORY },
-	{ "GameOver",			   OPTION_GAMEOVER_DIRECTORY },
-	{ "HowTo",				  OPTION_HOWTO_DIRECTORY },
-	{ "Logos",				  OPTION_LOGOS_DIRECTORY },
-	{ "Scores",				 OPTION_SCORES_DIRECTORY },
-	{ "Versus",				 OPTION_VERSUS_DIRECTORY },
+	{ "ROMs",                  OPTION_MEDIAPATH },
+	{ "Samples",                OPTION_SAMPLEPATH },
+	{ "DATs",                  OPTION_HISTORYPATH },
+	{ "INIs",                  OPTION_INIPATH },
+	{ "Extra INIs",          OPTION_EXTRAINIPATH },
+	{ "Icons",                OPTION_ICONS_DIRECTORY },
+	{ "Cheats",              OPTION_CHEATPATH },
+	{ "Snapshots",            OPTION_SNAPSHOT_DIRECTORY },
+	{ "Cabinets",              OPTION_CABINETS_DIRECTORY },
+	{ "Flyers",              OPTION_FLYERS_DIRECTORY },
+	{ "Titles",              OPTION_TITLES_DIRECTORY },
+	{ "PCBs",                  OPTION_PCBS_DIRECTORY },
+	{ "Marquees",              OPTION_MARQUEES_DIRECTORY },
+	{ "Controls Panels",        OPTION_CPANELS_DIRECTORY },
+	{ "Crosshairs",          OPTION_CROSSHAIRPATH },
+	{ "Artworks",              OPTION_ARTPATH },
+	{ "Bosses",              OPTION_BOSSES_DIRECTORY },
+	{ "Artworks Preview",      OPTION_ARTPREV_DIRECTORY },
+	{ "Select",              OPTION_SELECT_DIRECTORY },
+	{ "GameOver",              OPTION_GAMEOVER_DIRECTORY },
+	{ "HowTo",                OPTION_HOWTO_DIRECTORY },
+	{ "Logos",                OPTION_LOGOS_DIRECTORY },
+	{ "Scores",              OPTION_SCORES_DIRECTORY },
+	{ "Versus",              OPTION_VERSUS_DIRECTORY },
 	{ NULL }
 };
 
 static bool roms_reset = false;
 
 /**************************************************
-	MENU ADD FOLDER
+    MENU ADD FOLDER
 **************************************************/
 //-------------------------------------------------
 //  ctor / dtor
@@ -308,7 +308,7 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 }
 
 /**************************************************
-	MENU DIRECTORY
+    MENU DIRECTORY
 **************************************************/
 //-------------------------------------------------
 //  ctor / dtor
@@ -408,7 +408,7 @@ void ui_menu_directory::custom_render(void *selectedref, float top, float bottom
 }
 
 /**************************************************
-	MENU DISPLAY PATH
+    MENU DISPLAY PATH
 **************************************************/
 //-------------------------------------------------
 //  ctor / dtor
@@ -544,7 +544,7 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 }
 
 /**************************************************
-	MENU REMOVE FOLDER
+    MENU REMOVE FOLDER
 **************************************************/
 //-------------------------------------------------
 //  ctor / dtor

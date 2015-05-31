@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/optsmenu.c
+    mewui/optsmenu.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 

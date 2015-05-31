@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/sndmenu.h
+    mewui/sndmenu.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 
@@ -31,11 +31,11 @@ private:
 		ENABLE_SAMPLES
 	};
 
-	UINT16			  cur_rates;
-	static const int	sound_rate[];
-	int				 m_sample_rate;
-	bool				m_samples;
-	bool				m_sound;
+	UINT16            cur_rates;
+	static const int    sound_rate[];
+	int              m_sample_rate;
+	bool                m_samples;
+	bool                m_sound;
 };
 
 #endif /* __MEWUI_SNDMENU_H__ */

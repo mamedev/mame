@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/ctrlmenu.h
+    mewui/ctrlmenu.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 #pragma once

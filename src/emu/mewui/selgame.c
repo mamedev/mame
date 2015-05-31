@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/selgame.c
+    mewui/selgame.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 
@@ -95,7 +95,6 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 
 ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
-
 	// build drivers list
 	build_full_list();
 	build_available_list();

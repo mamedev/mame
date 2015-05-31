@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/datfile.c
+    mewui/datfile.c
 
-	MEWUI data file.
+    MEWUI data file.
 
 ***************************************************************************/
 
@@ -33,7 +33,7 @@ static const char *TAG_END = "$end";
 static const char *TAG_DRIVER = "$drv";
 static const char *TAG_STORY = "$story";
 static const char *TAG_MAMEINFO_R = "# MAMEINFO.DAT";
-static const char *TAG_MESSINFO_R = "#	 MESSINFO.DAT";
+static const char *TAG_MESSINFO_R = "#   MESSINFO.DAT";
 static const char *TAG_SYSINFO_R = "# This file was generated on";
 static const char *TAG_STORY_R = "# version";
 static const char *DATAFILE_TAG = "$";
@@ -328,14 +328,14 @@ void datfile_manager::load_driver_text(const game_driver *drv, std::string &buff
 //-------------------------------------------------
 int datfile_manager::index_mame_mess_info(std::vector<tDatafileIndex> &index, std::vector<sDataDrvIndex> &index_drv, int &drvcount)
 {
-	int			 count = 0;
-	std::string	 readbuf, name;
-	int			 t_mame = strlen(TAG_MAMEINFO_R);
-	int			 t_mess = strlen(TAG_MESSINFO_R);
-	int			 t_drv = strlen(TAG_DRIVER);
-	int			 t_tag = strlen(TAG_MAME);
-	int			 t_info = strlen(TAG_INFO);
-	std::string	 carriage("\r\n");
+	int          count = 0;
+	std::string  readbuf, name;
+	int          t_mame = strlen(TAG_MAMEINFO_R);
+	int          t_mess = strlen(TAG_MESSINFO_R);
+	int          t_drv = strlen(TAG_DRIVER);
+	int          t_tag = strlen(TAG_MAME);
+	int          t_info = strlen(TAG_INFO);
+	std::string  carriage("\r\n");
 
 	std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
 	if (myfile.is_open())
@@ -402,14 +402,14 @@ int datfile_manager::index_mame_mess_info(std::vector<tDatafileIndex> &index, st
 //-------------------------------------------------
 int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swcount)
 {
-	int			 count = 0;
-	std::string	 readbuf, name;
-	int			 t_hist = strlen(TAG_HISTORY_R);
-	int			 t_story = strlen(TAG_STORY_R);
-	int			 t_sysinfo = strlen(TAG_SYSINFO_R);
-	int			 t_info = strlen(TAG_INFO);
-	int			 t_bio = strlen(TAG_BIO);
-	std::string	 carriage("\r\n");
+	int          count = 0;
+	std::string  readbuf, name;
+	int          t_hist = strlen(TAG_HISTORY_R);
+	int          t_story = strlen(TAG_STORY_R);
+	int          t_sysinfo = strlen(TAG_SYSINFO_R);
+	int          t_info = strlen(TAG_INFO);
+	int          t_bio = strlen(TAG_BIO);
+	std::string  carriage("\r\n");
 
 	std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
 	if (myfile.is_open())

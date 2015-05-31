@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/sndmenu.c
+    mewui/sndmenu.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/selector.c
+    mewui/selector.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 
@@ -241,4 +241,3 @@ void ui_menu_selector::find_matches(const char *str)
 	}
 	(index < VISIBLE_GAMES_IN_SEARCH) ? searchlist[index] = NULL : searchlist[VISIBLE_GAMES_IN_SEARCH] = NULL;
 }
-

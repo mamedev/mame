@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/inifile.c
+    mewui/inifile.c
 
-	MEWUI inifile system.
+    MEWUI inifile system.
 
 ***************************************************************************/
 
@@ -116,7 +116,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 	bool search_clones = false;
 	std::string file_name(ini_index[current_file].name);
 	long offset = ini_index[current_file].category[current_category].offset;
-	std::string	 carriage("\r\n");
+	std::string  carriage("\r\n");
 
 	if (!core_stricmp(file_name.c_str(), "category.ini") || !core_stricmp(file_name.c_str(), "alltime.ini"))
 		search_clones = true;
@@ -176,7 +176,7 @@ bool inifile_manager::ParseOpen(const char *filename)
 }
 
 /**************************************************************************
-	FAVORITE MANAGER
+    FAVORITE MANAGER
 **************************************************************************/
 
 //-------------------------------------------------

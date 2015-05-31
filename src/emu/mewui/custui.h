@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/custui.h
+    mewui/custui.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 
@@ -20,7 +20,7 @@
 
 struct s_color_table
 {
-	rgb_t	   color;
+	rgb_t      color;
 	const char  *option;
 };
 
@@ -46,7 +46,7 @@ enum
 };
 
 /***************************************************************************
-	CUSTOM UI CLASS
+    CUSTOM UI CLASS
 ***************************************************************************/
 class ui_menu_custom_ui : public ui_menu
 {
@@ -75,7 +75,7 @@ struct c_uifonts
 #endif
 
 /***************************************************************************
-	FONT UI CLASS
+    FONT UI CLASS
 ***************************************************************************/
 class ui_menu_font_ui : public ui_menu
 {
@@ -107,7 +107,7 @@ private:
 };
 
 /***************************************************************************
-	COLORS UI CLASS
+    COLORS UI CLASS
 ***************************************************************************/
 class ui_menu_colors_ui : public ui_menu
 {
@@ -125,7 +125,7 @@ private:
 };
 
 /***************************************************************************
-	RGB UI CLASS
+    RGB UI CLASS
 ***************************************************************************/
 class ui_menu_rgb_ui : public ui_menu
 {
@@ -138,11 +138,11 @@ public:
 
 private:
 
-	rgb_t		   *color;
-	char			m_search[4];
-	bool			key_active;
-	int			 lock_ref;
-	std::string 	title;
+	rgb_t          *color;
+	char            m_search[4];
+	bool            key_active;
+	int          lock_ref;
+	std::string     title;
 
 	enum
 	{

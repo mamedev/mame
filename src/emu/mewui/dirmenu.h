@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/dirmenu.h
+    mewui/dirmenu.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 
@@ -76,7 +76,7 @@ public:
 private:
 	std::string tempbuf, searchpath;
 	std::vector<std::string> folders;
-	int	 ref_path;
+	int  ref_path;
 
 	enum
 	{
@@ -100,8 +100,8 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-	std::string	 searchpath;
-	int		 path_ref;
+	std::string  searchpath;
+	int      path_ref;
 };
 
 //-------------------------------------------------
@@ -120,10 +120,10 @@ public:
 	virtual bool menu_has_search_active() { return (m_search[0] != 0); }
 
 private:
-	int		 	path_ref;
-	std::string	 current_path;
-	char			m_search[40];
-	bool			change;
+	int         path_ref;
+	std::string  current_path;
+	char            m_search[40];
+	bool            change;
 };
 
 #endif /* __MEWUI_DIRMENU_H__ */

@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/custui.c
+    mewui/custui.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 
@@ -13,7 +13,7 @@
 #include "mewui/custui.h"
 
 /***************************************************************************
-	CUSTOM UI CLASS
+    CUSTOM UI CLASS
 ***************************************************************************/
 //-------------------------------------------------
 //  ctor
@@ -102,7 +102,7 @@ void ui_menu_custom_ui::custom_render(void *selectedref, float top, float bottom
 
 
 /***************************************************************************
-	FONT UI CLASS
+    FONT UI CLASS
 ***************************************************************************/
 //-------------------------------------------------
 //  ctor
@@ -323,7 +323,7 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 	std::string topbuf("UI Fonts Settings");
 
 	machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-								  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -343,14 +343,14 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 
 	// draw the text within it
 	machine().ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-								  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	if ((FPTR)selectedref == INFOS_SIZE)
 	{
 		topbuf.assign("Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
 		machine().ui().draw_text_full(container, topbuf.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_NEVER,
-									  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL, info_size);
+										DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL, info_size);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(origx2 - origx1, width);
 
@@ -370,13 +370,13 @@ void ui_menu_font_ui::custom_render(void *selectedref, float top, float bottom, 
 
 		// draw the text within it
 		machine().ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
-									  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, info_size);
+										DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, info_size);
 	}
 }
 
 
 /***************************************************************************
-	COLORS UI CLASS
+    COLORS UI CLASS
 ***************************************************************************/
 //-------------------------------------------------
 //  ctor
@@ -654,7 +654,7 @@ void ui_menu_colors_ui::restore_colors()
 }
 
 /***************************************************************************
-	RGB UI CLASS
+    RGB UI CLASS
 ***************************************************************************/
 //-------------------------------------------------
 //  ctor

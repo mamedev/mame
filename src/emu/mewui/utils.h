@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/utils.h
+    mewui/utils.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 
@@ -16,17 +16,17 @@
 #include "libjpeg/jpeglib.h"
 #include <algorithm>
 
-#define MENU_FLAG_MEWUI			 (1 << 6)
-#define MENU_FLAG_MEWUI_HISTORY	 (1 << 7)
-#define MENU_FLAG_MEWUI_SWLIST	 (1 << 8)
+#define MENU_FLAG_MEWUI          (1 << 6)
+#define MENU_FLAG_MEWUI_HISTORY  (1 << 7)
+#define MENU_FLAG_MEWUI_SWLIST   (1 << 8)
 #define MENU_FLAG_MEWUI_FAVORITE (1 << 9)
-#define MAX_CHAR_INFO			 256
-#define CR						 0x0d	//  '\n' and '\r' meanings are swapped in some
-#define LF						 0x0a	//  compilers (e.g., Mac compilers)
+#define MAX_CHAR_INFO            256
+#define CR                       0x0d   //  '\n' and '\r' meanings are swapped in some
+#define LF                       0x0a   //  compilers (e.g., Mac compilers)
 #define UI_MENU_PROCESS_ONLYCHAR 8
-#define MAX_FILTER				 10
-#define MAX_ICONS_RENDER		 40
-#define MEWUI_DIR				 "mewui"
+#define MAX_FILTER               10
+#define MAX_ICONS_RENDER         40
+#define MEWUI_DIR                "mewui"
 
 // GLOBAL ENUMERATORS
 enum
@@ -198,13 +198,13 @@ class mewui_globals
 public:
 	mewui_globals();
 
-	static UINT16	   actual_filter, actual_sw_filter;
+	static UINT16       actual_filter, actual_sw_filter;
 	static const char   *filter_text[], *sw_filter_text[], *ume_text[];
-	static size_t	   s_filter_text, sw_filter_len, s_ume_text;
-	static UINT8		curimage_view, curdats_view, ume_system, cur_sw_dats_view, rpanel_infos;
-	static bool		 switch_image, redraw_icon, default_image;
-	static bool		 force_reselect_software, force_reset_main;
-	static int		  visible_main_lines, visible_sw_lines;
+	static size_t       s_filter_text, sw_filter_len, s_ume_text;
+	static UINT8        curimage_view, curdats_view, ume_system, cur_sw_dats_view, rpanel_infos;
+	static bool         switch_image, redraw_icon, default_image;
+	static bool         force_reselect_software, force_reset_main;
+	static int          visible_main_lines, visible_sw_lines;
 	static std::vector<cache_info> driver_cache;
 };
 

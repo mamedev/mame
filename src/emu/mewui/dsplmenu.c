@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/dsplmenu.c
+    mewui/dsplmenu.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 
@@ -25,7 +25,7 @@ const char *ui_menu_display_options::video_modes_label[] = { "Auto", "Direct3D",
 #endif
 
 /**************************************************
-	MENU DISPLAY OPTIONS
+    MENU DISPLAY OPTIONS
 **************************************************/
 //-------------------------------------------------
 //  ctor

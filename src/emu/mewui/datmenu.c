@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	mewui/datmenu.c
+    mewui/datmenu.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 *********************************************************************/
 
@@ -14,7 +14,7 @@
 #include "mewui/datmenu.h"
 
 /**************************************************
-	MENU COMMAND
+    MENU COMMAND
 **************************************************/
 //-------------------------------------------------
 //  ctor / dtor
@@ -241,7 +241,7 @@ void ui_menu_command_content::custom_render(void *selectedref, float top, float 
 }
 
 /**************************************************
-	MENU SOFTWARE HISTORY
+    MENU SOFTWARE HISTORY
 **************************************************/
 //-------------------------------------------------
 //  ctor / dtor
@@ -390,7 +390,7 @@ void ui_menu_history_sw::custom_render(void *selectedref, float top, float botto
 }
 
 /**************************************************
-	MENU DATS
+    MENU DATS
 **************************************************/
 //-------------------------------------------------
 //  ctor / dtor

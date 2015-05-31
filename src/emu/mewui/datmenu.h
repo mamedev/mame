@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/datmenu.h
+    mewui/datmenu.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 
 ***************************************************************************/
@@ -64,8 +64,8 @@ public:
 
 private:
 	const game_driver   *ui_driver;
-	FPTR				param;
-	std::string		 title;
+	FPTR                param;
+	std::string      title;
 };
 
 //-------------------------------------------------

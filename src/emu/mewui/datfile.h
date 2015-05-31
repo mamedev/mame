@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/datfile.h
+    mewui/datfile.h
 
-	MEWUI data file.
+    MEWUI data file.
 
 ***************************************************************************/
 
@@ -99,9 +99,9 @@ private:
 	int find_or_allocate(std::string name);
 
 	// internal state
-	running_machine	 &m_machine;			 // reference to our machine
+	running_machine  &m_machine;             // reference to our machine
 
-	std::string			fullpath;
+	std::string         fullpath;
 	static std::string  history_revision, mame_revision, mess_revision, sysinfo_revision, story_revision;
 };
 

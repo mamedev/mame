@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/dsplmenu.h
+    mewui/dsplmenu.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 

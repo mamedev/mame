@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/miscmenu.c
+    mewui/miscmenu.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 
@@ -12,7 +12,7 @@
 #include "mewui/utils.h"
 
 /**************************************************
-	MENU MISCELLANEOUS OPTIONS
+    MENU MISCELLANEOUS OPTIONS
 **************************************************/
 //-------------------------------------------------
 //  ctor / dtor

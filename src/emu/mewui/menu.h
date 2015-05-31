@@ -1,9 +1,9 @@
 /*****************************************
-		MEWUI SECTION
+        MEWUI SECTION
 *****************************************/
 public:
-	int	 visible_items;
-	bool	ui_error;
+	int  visible_items;
+	bool    ui_error;
 
 	// draw UME box
 	void draw_ume_box(float x1, float y1, float x2, float y2);
@@ -24,8 +24,8 @@ public:
 	}
 
 protected:
-	int topline_datsview;	   // right box top line
-	int top_line;			   // main box top line
+	int topline_datsview;      // right box top line
+	int top_line;              // main box top line
 	int l_sw_hover;
 	int l_hover;
 
@@ -47,8 +47,8 @@ private:
 	int r_hover;
 	int ume_hover;
 
-	int visible_lines;		  // main box visible lines
-	int right_visible_lines;	// right box lines
+	int visible_lines;        // main box visible lines
+	int right_visible_lines;    // right box lines
 	int totallines;
 
 	// draw game list

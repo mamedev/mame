@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/miscmenu.h
+    mewui/miscmenu.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 #pragma once

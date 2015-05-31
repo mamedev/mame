@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/selgame.h
+    mewui/selgame.h
 
-	Main MEWUI menu
+    Main MEWUI menu
 
 ***************************************************************************/
 
@@ -53,7 +53,7 @@ private:
 	void populate_search();
 
 	// handlers
-//	void inkey_cancel(const ui_menu_event *menu_event);
+//  void inkey_cancel(const ui_menu_event *menu_event);
 	void inkey_select(const ui_menu_event *menu_event);
 	void inkey_select_favorite(const ui_menu_event *menu_event);
 	void inkey_special(const ui_menu_event *menu_event);

@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/optsmenu.h
+    mewui/optsmenu.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 
@@ -23,8 +23,8 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-	bool	m_grouped;
-	bool	m_audit;
+	bool    m_grouped;
+	bool    m_audit;
 
 	enum
 	{

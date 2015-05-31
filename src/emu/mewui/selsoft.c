@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/selsoft.c
+    mewui/selsoft.c
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 ***************************************************************************/
 
@@ -891,12 +891,12 @@ void ui_menu_select_software::build_list()
 			case MEWUI_SW_AVAILABLE:
 				if (ui_swlist[x].available)
 					m_displaylist[arrayindex++] = &ui_swlist[x];
-				 break;
+					break;
 
 			case MEWUI_SW_UNAVAILABLE:
 				if (!ui_swlist[x].available)
 					m_displaylist[arrayindex++] = &ui_swlist[x];
-				 break;
+					break;
 
 			case MEWUI_SW_SUPPORTED:
 				if (ui_swlist[x].supported != SOFTWARE_SUPPORTED_NO && ui_swlist[x].supported != SOFTWARE_SUPPORTED_PARTIAL)

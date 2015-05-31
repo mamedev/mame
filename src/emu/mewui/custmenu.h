@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	mewui/custmenu.h
+    mewui/custmenu.h
 
-	Internal MEWUI user interface.
+    Internal MEWUI user interface.
 
 
 ***************************************************************************/
