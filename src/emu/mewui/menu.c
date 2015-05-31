@@ -158,7 +158,11 @@ void ui_menu::draw_select_game()
 	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
 	visible_lines = floor(visible_main_menu_height / line_height);
 	visible_main_menu_height = (float)(visible_lines * line_height);
-	visible_lines = (is_swlist) ? mewui_globals::visible_sw_lines : mewui_globals::visible_main_lines;
+
+	if (!is_swlist)
+		mewui_globals::visible_main_lines = visible_lines;
+	else
+		mewui_globals::visible_sw_lines = visible_lines;
 
 	// compute top/left of inner menu area by centering
 	float visible_left = primary_left;
