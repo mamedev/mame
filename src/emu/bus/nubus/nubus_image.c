@@ -215,6 +215,8 @@ void nubus_image_device::device_start()
 
 	filectx.curdir[0] = '.';
 	filectx.curdir[1] = '\0';
+	filectx.dirp = NULL;
+	filectx.fd = NULL;
 }
 
 //-------------------------------------------------
