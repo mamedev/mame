@@ -173,7 +173,7 @@ class netlist_core_device_t;
 #if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 typedef void (netlist_core_device_t::*net_update_delegate)();
 #elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-typedef /*__thiscall */ void (*net_update_delegate)(netlist_core_device_t *);
+typedef MEMBER_ABI void (*net_update_delegate)(netlist_core_device_t *);
 #endif
 
 //============================================================

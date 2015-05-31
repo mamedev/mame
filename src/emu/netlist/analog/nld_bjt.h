@@ -38,9 +38,8 @@ public:
 		BJT_PNP
 	};
 
-	ATTR_COLD NETLIB_NAME(Q)(const family_t afamily)
-	: netlist_device_t(afamily)
-	, m_qtype(BJT_NPN) { }
+	NETLIB_NAME(Q)(const family_t afamily);
+	virtual ~NETLIB_NAME(Q)();
 
 	inline q_type qtype() const { return m_qtype; }
 	inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
@@ -59,8 +58,10 @@ class NETLIB_NAME(QBJT) : public NETLIB_NAME(Q)
 {
 public:
 
-	ATTR_COLD NETLIB_NAME(QBJT)(const family_t afamily)
+	NETLIB_NAME(QBJT)(const family_t afamily)
 	: NETLIB_NAME(Q)(afamily) { }
+
+	virtual ~NETLIB_NAME(QBJT)() { }
 
 protected:
 
