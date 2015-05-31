@@ -529,43 +529,44 @@ void melps4_cpu_device::op_rti()
 void melps4_cpu_device::op_cld()
 {
 	// CLD: clear port D
-	op_illegal();
+	write_d_pin(MELPS4_PORTD_CLR, 0);
 }
 
 void melps4_cpu_device::op_cls()
 {
 	// CLS: clear port S
-	op_illegal();
+	write_gen_port(MELPS4_PORTS, 0);
 }
 
 void melps4_cpu_device::op_clds()
 {
 	// CLDS: CLD, CLS
-	op_illegal();
+	op_cld();
+	op_cls();
 }
 
 void melps4_cpu_device::op_sd()
 {
 	// SD: set port D bit designated by Y
-	op_illegal();
+	write_d_pin(m_y, 1);
 }
 
 void melps4_cpu_device::op_rd()
 {
 	// RD: reset port D bit designated by Y
-	op_illegal();
+	write_d_pin(m_y, 0);
 }
 
 void melps4_cpu_device::op_szd()
 {
 	// SZD: skip next if port D bit designated by Y is 0
-	op_illegal();
+	m_skip = !read_d_pin(m_y);
 }
 
 void melps4_cpu_device::op_osab()
 {
 	// OSAB: output A and B to port S
-	op_illegal();
+	write_gen_port(MELPS4_PORTS, m_b << 4 | m_a);
 }
 
 void melps4_cpu_device::op_ospa()
@@ -577,49 +578,50 @@ void melps4_cpu_device::op_ospa()
 void melps4_cpu_device::op_ose()
 {
 	// OSE: output E to port S
-	op_illegal();
+	write_gen_port(MELPS4_PORTS, m_e);
 }
 
 void melps4_cpu_device::op_ias()
 {
 	// IAS i: transfer port S(hi/lo) to A
-	op_illegal();
+	int shift = (m_op & 1) ? 0 : 4;
+	m_a = read_gen_port(MELPS4_PORTS) >> shift & 0xf;
 }
 
 void melps4_cpu_device::op_ofa()
 {
 	// OFA: output A to port F
-	op_illegal();
+	write_gen_port(MELPS4_PORTF, m_a);
 }
 
 void melps4_cpu_device::op_iaf()
 {
 	// IAF: input port F to A
-	op_illegal();
+	m_a = read_gen_port(MELPS4_PORTF);
 }
 
 void melps4_cpu_device::op_oga()
 {
 	// OGA: output A to port G
-	op_illegal();
+	write_gen_port(MELPS4_PORTG, m_a);
 }
 
 void melps4_cpu_device::op_iak()
 {
 	// IAK: input port K to A
-	op_illegal();
+	m_a = m_read_k(0, 0xffff) & 0xf;
 }
 
 void melps4_cpu_device::op_szk()
 {
 	// SZK j: skip next if port K bit is reset
-	op_illegal();
+	m_skip = !(m_read_k(0, 0xffff) & m_bitmask);
 }
 
 void melps4_cpu_device::op_su()
 {
 	// SU/RU: set/reset port U
-	op_illegal();
+	write_gen_port(MELPS4_PORTU, m_op & 1);
 }
 
 
@@ -628,15 +630,15 @@ void melps4_cpu_device::op_su()
 void melps4_cpu_device::op_ei()
 {
 	// EI: enable interrupt flag
-	m_inte = 1;
 	m_prohibit_irq = true;
+	m_inte = 1;
 }
 
 void melps4_cpu_device::op_di()
 {
 	// DI: disable interrupt flag
-	m_inte = 0;
 	m_prohibit_irq = true;
+	m_inte = 0;
 }
 
 void melps4_cpu_device::op_inth()
