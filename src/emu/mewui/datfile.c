@@ -16,20 +16,6 @@
 //  GLOBAL VARIABLES
 //-------------------------------------------------
 
-// Indices
-std::vector<tDatafileIndex> datfile_manager::hist_idx;
-std::vector<tDatafileIndex> datfile_manager::mame_idx;
-std::vector<tDatafileIndex> datfile_manager::mess_idx;
-std::vector<tDatafileIndex> datfile_manager::cmd_idx;
-std::vector<tDatafileIndex> datfile_manager::sysi_idx;
-std::vector<tDatafileIndex> datfile_manager::story_idx;
-
-std::vector<sDataDrvIndex> datfile_manager::drv_idx;
-std::vector<sDataDrvIndex> datfile_manager::drvmess_idx;
-
-std::vector<tMenuIndex> datfile_manager::menu_idx;
-
-std::vector<SoftwareListIndex> datfile_manager::sListIndex;
 
 std::string datfile_manager::history_revision;
 std::string datfile_manager::mame_revision;
@@ -85,7 +71,6 @@ datfile_manager::datfile_manager(running_machine &machine) : m_machine(machine)
 
 void datfile_manager::init_sysinfo()
 {
-	sysi_idx.clear();
 	int swcount = 0;
 	int count = index_datafile(sysi_idx, swcount);
 	osd_printf_verbose("Sysinfo.dat games found = %i\n", count);
@@ -98,7 +83,6 @@ void datfile_manager::init_sysinfo()
 
 void datfile_manager::init_storyinfo()
 {
-	story_idx.clear();
 	int swcount = 0;
 	int count = index_datafile(story_idx, swcount);
 	osd_printf_verbose("Story.dat games found = %i\n", count);
@@ -110,7 +94,6 @@ void datfile_manager::init_storyinfo()
 
 void datfile_manager::init_history()
 {
-	hist_idx.clear();
 	int swcount = 0;
 	int count = index_datafile(hist_idx, swcount);
 	osd_printf_verbose("History.dat games found = %i\n", count);
@@ -124,8 +107,6 @@ void datfile_manager::init_history()
 
 void datfile_manager::init_mameinfo()
 {
-	mame_idx.clear();
-	drv_idx.clear();
 	int drvcount = 0;
 	int count = index_mame_mess_info(mame_idx, drv_idx, drvcount);
 	osd_printf_verbose("Mameinfo.dat games found = %i\n", count);
@@ -139,8 +120,6 @@ void datfile_manager::init_mameinfo()
 
 void datfile_manager::init_messinfo()
 {
-	mess_idx.clear();
-	drvmess_idx.clear();
 	int drvcount = 0;
 	int count = index_mame_mess_info(mess_idx, drvmess_idx, drvcount);
 	osd_printf_verbose("Messinfo.dat games found = %i\n", count);
@@ -154,7 +133,6 @@ void datfile_manager::init_messinfo()
 
 void datfile_manager::init_command()
 {
-	cmd_idx.clear();
 	int swcount = 0;
 	int count = index_datafile(cmd_idx, swcount);
 	osd_printf_verbose("Command.dat games found = %i\n", count);
@@ -372,13 +350,11 @@ int datfile_manager::index_mame_mess_info(std::vector<tDatafileIndex> &index, st
 				size_t found = readbuf.find(" ", t_mame + 1);
 				mame_revision.assign(readbuf.substr(t_mame + 1, found - t_mame));
 			}
-
 			else if (mess_revision.empty() && readbuf.compare(0, t_mess, TAG_MESSINFO_R) == 0)
 			{
 				size_t found = readbuf.find(" ", t_mess + 1);
 				mess_revision.assign(readbuf.substr(t_mess + 1, found - t_mess));
 			}
-
 			// TAG_INFO
 			else if (readbuf.compare(0, t_info, TAG_INFO) == 0)
 			{
@@ -404,7 +380,6 @@ int datfile_manager::index_mame_mess_info(std::vector<tDatafileIndex> &index, st
 						count++;
 					}
 				}
-
 				else if (xid.compare(0, t_drv, TAG_DRIVER) == 0)
 				{
 					sDataDrvIndex idx_drv;
@@ -449,19 +424,16 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 				size_t found = readbuf.find(" ", t_hist + 1);
 				history_revision.assign(readbuf.substr(t_hist + 1, found - t_hist));
 			}
-
 			else if (sysinfo_revision.empty() && readbuf.compare(0, t_sysinfo, TAG_SYSINFO_R) == 0)
 			{
 				size_t found = readbuf.find(".", t_sysinfo + 1);
 				sysinfo_revision.assign(readbuf.substr(t_sysinfo + 1, found - t_sysinfo));
 			}
-
 			else if (story_revision.empty() && readbuf.compare(0, t_story, TAG_STORY_R) == 0)
 			{
 				size_t found = readbuf.find_first_of(carriage, t_story + 1);
 				story_revision.assign(readbuf.substr(t_story + 1, found - t_story));
 			}
-
 			// TAG_INFO identifies the driver
 			else if (readbuf.compare(0, t_info, TAG_INFO) == 0)
 			{
@@ -495,7 +467,6 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 						// update current point
 						curpoint = found + 1;
 					}
-
 					// if comma not found, copy data while until reach the end of string
 					else if (curpoint < ends)
 					{
@@ -520,7 +491,6 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 					}
 				}
 			}
-
 			// search for software info
 			else if (readbuf[0] == DATAFILE_TAG[0])
 			{
@@ -550,7 +520,6 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 							strtrimspace(name);
 							curpoint = found + 1;
 						}
-
 						else
 						{
 							name.assign(s_list);
@@ -587,7 +556,6 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 								cpoint = found + 1;
 								swcount++;
 							}
-
 							else
 							{
 								// if reach the end, bail out

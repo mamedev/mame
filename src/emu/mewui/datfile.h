@@ -72,11 +72,11 @@ public:
 private:
 
 	// global index
-	static std::vector<tDatafileIndex> hist_idx, mame_idx, mess_idx, cmd_idx, sysi_idx, story_idx;
-	static std::vector<sDataDrvIndex> drv_idx, drvmess_idx;
-	static std::vector<tMenuIndex> menu_idx;
+	std::vector<tDatafileIndex> hist_idx, mame_idx, mess_idx, cmd_idx, sysi_idx, story_idx;
+	std::vector<sDataDrvIndex> drv_idx, drvmess_idx;
+	std::vector<tMenuIndex> menu_idx;
 
-	static std::vector<SoftwareListIndex> sListIndex;
+	std::vector<SoftwareListIndex> sListIndex;
 
 	// internal helpers
 	void init_history();

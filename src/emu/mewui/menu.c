@@ -40,21 +40,21 @@ struct ui_arts_info
 
 static const ui_arts_info arts_info[] =
 {
-	{ "Snapshots",		  OPTION_SNAPSHOT_DIRECTORY,  "snap" },
-	{ "Cabinets",		   OPTION_CABINETS_DIRECTORY,  "cabinets;cabdevs" },
+	{ "Snapshots",		 OPTION_SNAPSHOT_DIRECTORY,  "snap" },
+	{ "Cabinets",		 OPTION_CABINETS_DIRECTORY,  "cabinets;cabdevs" },
 	{ "Control Panels",	 OPTION_CPANELS_DIRECTORY,   "cpanel" },
-	{ "PCBs",			   OPTION_PCBS_DIRECTORY,	  "pcb" },
-	{ "Flyers",			 OPTION_FLYERS_DIRECTORY,	"flyers" },
-	{ "Titles",			 OPTION_TITLES_DIRECTORY,	"titles" },
-	{ "Artwork Preview",	OPTION_ARTPREV_DIRECTORY,   "artwork preview" },
-	{ "Bosses",			 OPTION_BOSSES_DIRECTORY,	"bosses" },
-	{ "Logos",			  OPTION_LOGOS_DIRECTORY,	 "logo" },
-	{ "Versus",			 OPTION_VERSUS_DIRECTORY,	"versus" },
-	{ "Game Over",		  OPTION_GAMEOVER_DIRECTORY,  "gameover" },
-	{ "HowTo",			  OPTION_HOWTO_DIRECTORY,	 "howto" },
-	{ "Scores",			 OPTION_SCORES_DIRECTORY,	"scores" },
-	{ "Select",			 OPTION_SELECT_DIRECTORY,	"select" },
-	{ "Marquees",		   OPTION_MARQUEES_DIRECTORY,  "marquees" },
+	{ "PCBs",			 OPTION_PCBS_DIRECTORY,	     "pcb" },
+	{ "Flyers",			 OPTION_FLYERS_DIRECTORY,	 "flyers" },
+	{ "Titles",			 OPTION_TITLES_DIRECTORY,	 "titles" },
+	{ "Artwork Preview", OPTION_ARTPREV_DIRECTORY,   "artwork preview" },
+	{ "Bosses",			 OPTION_BOSSES_DIRECTORY,	 "bosses" },
+	{ "Logos",			 OPTION_LOGOS_DIRECTORY,	 "logo" },
+	{ "Versus",			 OPTION_VERSUS_DIRECTORY,	 "versus" },
+	{ "Game Over",		 OPTION_GAMEOVER_DIRECTORY,  "gameover" },
+	{ "HowTo",			 OPTION_HOWTO_DIRECTORY,	 "howto" },
+	{ "Scores",			 OPTION_SCORES_DIRECTORY,	 "scores" },
+	{ "Select",			 OPTION_SELECT_DIRECTORY,	 "select" },
+	{ "Marquees",		 OPTION_MARQUEES_DIRECTORY,  "marquees" },
 	{ NULL }
 };
 
@@ -158,11 +158,7 @@ void ui_menu::draw_select_game()
 	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
 	visible_lines = floor(visible_main_menu_height / line_height);
 	visible_main_menu_height = (float)(visible_lines * line_height);
-
-	if (!is_swlist)
-		mewui_globals::visible_main_lines = visible_lines;
-	else
-		mewui_globals::visible_sw_lines = visible_lines;
+	visible_lines = (is_swlist) ? mewui_globals::visible_sw_lines : mewui_globals::visible_main_lines;
 
 	// compute top/left of inner menu area by centering
 	float visible_left = primary_left;
@@ -227,7 +223,6 @@ void ui_menu::draw_select_game()
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
 			fgcolor3 = rgb_t(0xff, 0xcc, 0xcc, 0x00);
 		}
-
 		// else if the mouse is over this item, draw with a different background
 		else if (itemnum == hover)
 		{
@@ -251,7 +246,6 @@ void ui_menu::draw_select_game()
 			if (hover == itemnum)
 				hover = -2;
 		}
-
 		// if we're on the bottom line, display the down arrow
 		else if (linenum == visible_lines - 1 && itemnum != visible_items - 1)
 		{
@@ -261,12 +255,10 @@ void ui_menu::draw_select_game()
 			if (hover == itemnum)
 				hover = -1;
 		}
-
 		// if we're just a divider, draw a line
 		else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 			container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height,
 								UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
 		// draw the item centered
 		else if (pitem.subtext == NULL)
 		{
@@ -281,19 +273,15 @@ void ui_menu::draw_select_game()
 					if (soft->startempty == 1)
 						draw_icon(container, linenum, (void *)soft->driver, effective_left, line_y);
 				}
-
-					else
-						draw_icon(container, linenum, item[itemnum].ref, effective_left, line_y);
+				else
+					draw_icon(container, linenum, item[itemnum].ref, effective_left, line_y);
 
 				space = machine().ui().get_line_height() * container->manager().ui_aspect() * 1.5f;
-
 			}
-
 			machine().ui().draw_text_full(container, itemtext, effective_left + space, line_y, effective_width - space,
 										  JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor,
 										  bgcolor, NULL, NULL);
 		}
-
 		else
 		{
 			int item_invert = pitem.flags & MENU_FLAG_INVERT;
@@ -335,7 +323,6 @@ void ui_menu::draw_select_game()
 			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
 		}
-
 		// else if the mouse is over this item, draw with a different background
 		else if (count == hover)
 		{
@@ -354,7 +341,6 @@ void ui_menu::draw_select_game()
 		else
 			machine().ui().draw_text_full(container, itemtext, effective_left, line, effective_width,
 										  JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
-
 		line += line_height;
 	}
 
@@ -391,7 +377,6 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
 {
 	static ui_software_info *oldsoft = NULL;
 	static const game_driver *olddriver = NULL;
-
 	const game_driver *driver = NULL;
 	ui_software_info *soft = NULL;
 
@@ -466,7 +451,6 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
 			container->add_quad( x1, y1, x2, y2, ARGB_WHITE, snapx_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 	}
-
 	else if (soft)
 	{
 		float line_height = machine().ui().get_line_height();
@@ -821,7 +805,6 @@ void ui_menu::handle_main_events(UINT32 flags)
 					menu_event.iptkey = IPT_OTHER;
 					stop = true;
 				}
-
    				else if ((flags & UI_MENU_PROCESS_ONLYCHAR) == 0)
    				{
 					if (hover >= 0 && hover < item.size())
@@ -1143,7 +1126,6 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 		else
 			olddriver = NULL;
 	}
-
 	else
 	{
 		driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : NULL;
@@ -1217,7 +1199,6 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 										  WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 			return;
 		}
-
 		else if (mewui_globals::curdats_view != MEWUI_STORY_LOAD && mewui_globals::curdats_view != MEWUI_COMMAND_LOAD)
 			machine().ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), &totallines,
 									 xstart, xend, text_size);
@@ -1241,11 +1222,9 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 			// up arrow
 			if (r == 0 && topline_datsview != 0)
 				info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-
 			// bottom arrow
 			else if (r == r_visible_lines - 1 && itemline != totallines - 1)
 				info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-
 			// special case for mamescore
 			else if (mewui_globals::curdats_view == MEWUI_STORY_LOAD)
 			{
@@ -1293,12 +1272,10 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 												  JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
 												  NULL, NULL, text_size);
 				}
-
 				else
 					machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
 												  WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
 			}
-
 			else
 				machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
 											  WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
@@ -1309,7 +1286,6 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 		// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 		right_visible_lines = r_visible_lines - (topline_datsview != 0) - (topline_datsview + r_visible_lines != totallines);
 	}
-
 	else if (soft)
 	{
 		float line_height = machine().ui().get_line_height();
@@ -1324,7 +1300,6 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 										  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 			mewui_globals::cur_sw_dats_view = 0;
 		}
-
 		else
 		{
 			float title_size = 0.0f;
@@ -1375,7 +1350,6 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 										  WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 			return;
 		}
-
 		else
 			machine().ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), &totallines,
 									 xstart, xend, text_size);
@@ -1397,11 +1371,9 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 			// up arrow
 			if (r == 0 && topline_datsview != 0)
 				info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-
 			// bottom arrow
 			else if (r == r_visible_lines - 1 && itemline != totallines - 1)
 				info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-
 			else
 				machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
 											  JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
@@ -1451,7 +1423,6 @@ void ui_menu::draw_star(render_container *container, float x0, float y0)
 {
 	float y1 = y0 + machine().ui().get_line_height();
 	float x1 = x0 + machine().ui().get_line_height() * container->manager().ui_aspect();
-
 	container->add_quad(x0, y0, x1, y1, ARGB_WHITE, star_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
@@ -1504,7 +1475,6 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 			dest_xPixel = tmp_bitmap->width() * ratio;
 			dest_yPixel *= ratio;
 		}
-
 		// resize the bitmap if necessary
 		else if (ratioW < 1 || ratioH < 1 || (machine().options().enlarge_snaps() && !no_available))
 		{
@@ -1524,7 +1494,6 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 			render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
 			render_resample_argb_bitmap_hq(*dest_bitmap, *tmp_bitmap, color, true);
 		}
-
 		else
 			dest_bitmap = tmp_bitmap;
 
@@ -1542,7 +1511,6 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 		// apply bitmap
 		snapx_texture->set_bitmap(*snapx_bitmap, snapx_bitmap->cliprect(), TEXFORMAT_ARGB32);
 	}
-
 	else
 		snapx_bitmap->reset();
 }
@@ -1579,7 +1547,6 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
 		hover = -3;
 		fgcolor_right = UI_MOUSEOVER_COLOR;
 	}
-
 	else if (mouse_hit && al_x0 <= mouse_x && al_x1 > mouse_x && al_y0 <= mouse_y && al_y1 > mouse_y && current != dmin)
 	{
 		machine().ui().draw_textured_box(container, al_x0 + 0.01f, al_y0, al_x1 - 0.01f, al_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
@@ -1591,10 +1558,8 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
 	// apply arrow
 	if (current == dmin)
 		container->add_quad(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90));
-
 	else if (current == dmax)
 		container->add_quad(al_x0, al_y0, al_x1, al_y1, fgcolor_left, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90 ^ ORIENTATION_FLIP_X));
-
 	else
 	{
 		container->add_quad(ar_x0, ar_y0, ar_x1, ar_y1, fgcolor_right, arrow_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90));
