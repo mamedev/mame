@@ -632,7 +632,6 @@ project "portaudio"
 			buildoptions_c {
 				"-Wno-unknown-warning-option",
 				"-Wno-absolute-value",
-				"-Wno-unused-variable",
 				"-Wno-unused-but-set-variable",
 				"-Wno-maybe-uninitialized",
 				"-Wno-sometimes-uninitialized",
