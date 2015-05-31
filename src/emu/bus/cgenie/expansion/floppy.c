@@ -5,8 +5,6 @@
     EACA Colour Genie Floppy Disc Controller
 
     TODO:
-    - Plain sector files are not working (some sectors are marked DDM),
-      maybe support the .cgd format?
     - What's the exact FD1793 model?
     - How does it turn off the motor?
     - What's the source of the timer and the exact timings?
