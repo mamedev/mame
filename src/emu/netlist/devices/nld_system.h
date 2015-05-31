@@ -133,23 +133,23 @@ NETLIB_DEVICE_WITH_PARAMS(analog_input,
 class NETLIB_NAME(gnd) : public netlist_device_t
 {
 public:
-	ATTR_COLD NETLIB_NAME(gnd)()
+	NETLIB_NAME(gnd)()
 			: netlist_device_t(GND) { }
 
-	/* ATTR_COLD */ virtual ~NETLIB_NAME(gnd)() {}
+	virtual ~NETLIB_NAME(gnd)() {}
 
 protected:
 
-	ATTR_COLD void start()
+	void start()
 	{
 		register_output("Q", m_Q);
 	}
 
-	ATTR_COLD void reset()
+	void reset()
 	{
 	}
 
-	ATTR_HOT void update()
+	void update()
 	{
 		OUTANALOG(m_Q, 0.0);
 	}
@@ -166,23 +166,23 @@ private:
 class NETLIB_NAME(dummy_input) : public netlist_device_t
 {
 public:
-	ATTR_COLD NETLIB_NAME(dummy_input)()
+	NETLIB_NAME(dummy_input)()
 			: netlist_device_t(DUMMY) { }
 
-	/* ATTR_COLD */ virtual ~NETLIB_NAME(dummy_input)() {}
+	virtual ~NETLIB_NAME(dummy_input)() {}
 
 protected:
 
-	ATTR_COLD void start()
+	void start()
 	{
 		register_input("I", m_I);
 	}
 
-	ATTR_COLD void reset()
+	void reset()
 	{
 	}
 
-	ATTR_HOT void update()
+	void update()
 	{
 	}
 
@@ -198,24 +198,24 @@ private:
 class NETLIB_NAME(frontier) : public netlist_device_t
 {
 public:
-	ATTR_COLD NETLIB_NAME(frontier)()
+	NETLIB_NAME(frontier)()
 			: netlist_device_t(DUMMY) { }
 
-	/* ATTR_COLD */ virtual ~NETLIB_NAME(frontier)() {}
+	virtual ~NETLIB_NAME(frontier)() {}
 
 protected:
 
-	ATTR_COLD void start()
+	void start()
 	{
 		register_input("I", m_I);
 		register_output("Q", m_Q);
 	}
 
-	ATTR_COLD void reset()
+	void reset()
 	{
 	}
 
-	ATTR_HOT void update()
+	void update()
 	{
 		OUTANALOG(m_Q, INPANALOG(m_I));
 	}
@@ -233,10 +233,10 @@ private:
 class NETLIB_NAME(res_sw) : public netlist_device_t
 {
 public:
-	ATTR_COLD NETLIB_NAME(res_sw)()
+	NETLIB_NAME(res_sw)()
 			: netlist_device_t() { }
 
-	/* ATTR_COLD */ virtual ~NETLIB_NAME(res_sw)() {}
+	virtual ~NETLIB_NAME(res_sw)() {}
 
 	netlist_param_double_t m_RON;
 	netlist_param_double_t m_ROFF;
@@ -245,8 +245,8 @@ public:
 
 protected:
 
-	ATTR_COLD void start();
-	ATTR_COLD void reset();
+	void start();
+	void reset();
 	ATTR_HOT void update();
 	ATTR_HOT void update_param();
 
@@ -261,22 +261,22 @@ private:
 class nld_base_proxy : public netlist_device_t
 {
 public:
-	ATTR_COLD nld_base_proxy(netlist_logic_t &inout_proxied, netlist_core_terminal_t &proxy_inout)
+	nld_base_proxy(netlist_logic_t *inout_proxied, netlist_core_terminal_t *proxy_inout)
 			: netlist_device_t()
 	{
-		m_logic_family = inout_proxied.logic_family();
-		m_term_proxied = &inout_proxied;
-		m_proxy_term = &proxy_inout;
+		m_logic_family = inout_proxied->logic_family();
+		m_term_proxied = inout_proxied;
+		m_proxy_term = proxy_inout;
 	}
 
-	/* ATTR_COLD */ virtual ~nld_base_proxy() {}
+	virtual ~nld_base_proxy() {}
 
-	ATTR_COLD netlist_logic_t &term_proxied() const { return *m_term_proxied; }
-	ATTR_COLD netlist_core_terminal_t &proxy_term() const { return *m_proxy_term; }
+	netlist_logic_t &term_proxied() const { return *m_term_proxied; }
+	netlist_core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 protected:
 
-	/* ATTR_COLD */ virtual const netlist_logic_family_desc_t &logic_family() const
+	virtual const netlist_logic_family_desc_t &logic_family() const
 	{
 		return *m_logic_family;
 	}
@@ -294,24 +294,24 @@ private:
 class nld_a_to_d_proxy : public nld_base_proxy
 {
 public:
-	ATTR_COLD nld_a_to_d_proxy(netlist_logic_input_t &in_proxied)
-			: nld_base_proxy(in_proxied, m_I)
+	nld_a_to_d_proxy(netlist_logic_input_t *in_proxied)
+			: nld_base_proxy(in_proxied, &m_I)
 	{
 	}
 
-	/* ATTR_COLD */ virtual ~nld_a_to_d_proxy() {}
+	virtual ~nld_a_to_d_proxy() {}
 
 	netlist_analog_input_t m_I;
 	netlist_logic_output_t m_Q;
 
 protected:
-	ATTR_COLD void start()
+	void start()
 	{
 		register_input("I", m_I);
 		register_output("Q", m_Q);
 	}
 
-	ATTR_COLD void reset()
+	void reset()
 	{
 	}
 
@@ -336,17 +336,17 @@ private:
 class nld_base_d_to_a_proxy : public nld_base_proxy
 {
 public:
-	ATTR_COLD nld_base_d_to_a_proxy(netlist_logic_output_t &out_proxied, netlist_core_terminal_t &proxy_out)
-			: nld_base_proxy(out_proxied, proxy_out)
+	virtual ~nld_base_d_to_a_proxy() {}
+
+	virtual netlist_logic_input_t &in() { return m_I; }
+
+protected:
+	nld_base_d_to_a_proxy(netlist_logic_output_t *out_proxied, netlist_core_terminal_t &proxy_out)
+			: nld_base_proxy(out_proxied, &proxy_out)
 	{
 	}
 
-	/* ATTR_COLD */ virtual ~nld_base_d_to_a_proxy() {}
-
-	/* ATTR_COLD */ virtual netlist_logic_input_t &in() { return m_I; }
-
-protected:
-	/* ATTR_COLD */ virtual void start()
+	virtual void start()
 	{
 		register_input("I", m_I);
 	}
@@ -359,7 +359,7 @@ private:
 class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 {
 public:
-	ATTR_COLD nld_d_to_a_proxy(netlist_logic_output_t &out_proxied)
+	nld_d_to_a_proxy(netlist_logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(out_proxied, m_RV.m_P)
 	, m_RV(TWOTERM)
 	, m_last_state(-1)
@@ -367,12 +367,12 @@ public:
 	{
 	}
 
-	/* ATTR_COLD */ virtual ~nld_d_to_a_proxy() {}
+	virtual ~nld_d_to_a_proxy() {}
 
 protected:
-	/* ATTR_COLD */ virtual void start();
+	virtual void start();
 
-	/* ATTR_COLD */ virtual void reset();
+	virtual void reset();
 
 	ATTR_HOT void update();
 

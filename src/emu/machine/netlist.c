@@ -294,7 +294,7 @@ void netlist_mame_device_t::device_start()
 	//printf("clock is %d\n", clock());
 
 	m_netlist = global_alloc_clear(netlist_mame_t(*this));
-	m_setup = global_alloc_clear(netlist_setup_t(*m_netlist));
+	m_setup = global_alloc_clear(netlist_setup_t(m_netlist));
 	netlist().init_object(*m_netlist, "netlist");
 	m_setup->init();
 

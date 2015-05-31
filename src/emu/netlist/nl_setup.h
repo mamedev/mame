@@ -107,13 +107,13 @@ public:
 	typedef pnamedlist_t<netlist_core_terminal_t *> tagmap_terminal_t;
 	typedef plist_t<link_t> tagmap_link_t;
 
-	netlist_setup_t(netlist_base_t &netlist);
+	netlist_setup_t(netlist_base_t *netlist);
 	~netlist_setup_t();
 
 	void init();
 
-	netlist_base_t &netlist() { return m_netlist; }
-	const netlist_base_t &netlist() const { return m_netlist; }
+	netlist_base_t &netlist() { return *m_netlist; }
+	const netlist_base_t &netlist() const { return *m_netlist; }
 
 	pstring build_fqn(const pstring &obj_name) const;
 
@@ -159,7 +159,7 @@ protected:
 
 private:
 
-	netlist_base_t &m_netlist;
+	netlist_base_t *m_netlist;
 
 	tagmap_nstring_t m_alias;
 	tagmap_param_t  m_params;

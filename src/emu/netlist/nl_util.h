@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <cstdlib>
 
 #include "plib/pstring.h"
 #include "plib/plists.h"

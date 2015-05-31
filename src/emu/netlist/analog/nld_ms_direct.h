@@ -15,8 +15,8 @@ class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
 public:
 
-	netlist_matrix_solver_direct_t(const netlist_solver_parameters_t &params, const int size);
-	netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, const int size);
+	netlist_matrix_solver_direct_t(const netlist_solver_parameters_t *params, const int size);
+	netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t *params, const int size);
 
 	virtual ~netlist_matrix_solver_direct_t();
 
@@ -417,7 +417,7 @@ ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_
 }
 
 template <unsigned m_N, unsigned _storage_N>
-netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const netlist_solver_parameters_t &params, const int size)
+netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const netlist_solver_parameters_t *params, const int size)
 : netlist_matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
 , m_lp_fact(0)
@@ -434,7 +434,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, const int size)
+netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t *params, const int size)
 : netlist_matrix_solver_t(type, params)
 , m_dim(size)
 , m_lp_fact(0)
