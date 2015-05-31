@@ -633,6 +633,9 @@ project "portaudio"
 				"-Wno-unknown-warning-option",
 				"-Wno-absolute-value",
 				"-Wno-unused-variable",
+				"-Wno-unused-but-set-variable",
+				"-Wno-maybe-uninitialized",
+				"-Wno-sometimes-uninitialized",
 			}
 		else
 			if (version >= 40400) then
