@@ -612,7 +612,6 @@ bool datfile_manager::ParseOpen(const char *filename)
 
 void datfile_manager::index_menuidx(const game_driver *drv, std::vector<tDatafileIndex> &d_idx, std::vector<tMenuIndex> &index)
 {
-	const game_driver *gdrv;
 	std::string readbuf;
 	size_t x = 0;
 

@@ -1172,7 +1172,6 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 			olddriver = driver;
 			oldview = mewui_globals::curdats_view;
 			topline_datsview = 0;
-			int f_return = 0;
 			totallines = 0;
 			std::vector<std::string> m_item;
 

@@ -1259,7 +1259,6 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 
 void ui_mewui_select_game::build_custom()
 {
-	int arrayindex = 0;
 	std::vector<const game_driver *> s_drivers;
 	bool bioscheck = false;
 
