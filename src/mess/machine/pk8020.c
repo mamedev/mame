@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "includes/pk8020.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 
 
