@@ -12,6 +12,58 @@
 #include "emu.h"
 
 
+// I/O ports setup
+
+// K input or A/D input port, up to 16 pins
+#define MCFG_MELPS4_READ_K_CB(_devcb) \
+	melps4_cpu_device::set_read_k_callback(*device, DEVCB_##_devcb);
+
+// D discrete I/O port, up to 16 pins - offset 0-15 for bit, 16 for all pins clear
+#define MCFG_MELPS4_READ_D_CB(_devcb) \
+	melps4_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
+#define MCFG_MELPS4_WRITE_D_CB(_devcb) \
+	melps4_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
+
+// 8-bit S generic I/O port
+#define MCFG_MELPS4_READ_S_CB(_devcb) \
+	melps4_cpu_device::set_read_s_callback(*device, DEVCB_##_devcb);
+#define MCFG_MELPS4_WRITE_S_CB(_devcb) \
+	melps4_cpu_device::set_write_s_callback(*device, DEVCB_##_devcb);
+
+// 4-bit F generic I/O port
+#define MCFG_MELPS4_READ_F_CB(_devcb) \
+	melps4_cpu_device::set_read_f_callback(*device, DEVCB_##_devcb);
+#define MCFG_MELPS4_WRITE_F_CB(_devcb) \
+	melps4_cpu_device::set_write_f_callback(*device, DEVCB_##_devcb);
+
+// 4-bit G generic output port
+#define MCFG_MELPS4_WRITE_G_CB(_devcb) \
+	melps4_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
+
+// 1-bit U generic output port
+#define MCFG_MELPS4_WRITE_U_CB(_devcb) \
+	melps4_cpu_device::set_write_u_callback(*device, DEVCB_##_devcb);
+
+// T timer I/O pin
+#define MCFG_MELPS4_READ_T_CB(_devcb) \
+	melps4_cpu_device::set_read_t_callback(*device, DEVCB_##_devcb);
+#define MCFG_MELPS4_WRITE_T_CB(_devcb) \
+	melps4_cpu_device::set_write_t_callback(*device, DEVCB_##_devcb);
+
+
+#define MELPS4_PORTD_CLR 16
+
+// only generic ports here (S is 8-bit)
+enum
+{
+	MELPS4_PORTS = 0,
+	MELPS4_PORTF = 2,
+	MELPS4_PORTG,
+	MELPS4_PORTU
+};
+
+
+
 // pinout reference
 
 /*
@@ -45,19 +97,45 @@ class melps4_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	melps4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	melps4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, UINT8 sm_page, UINT8 int_page, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
-		, m_stack_levels(3)
-		, m_sm_page(14)
-		, m_int_page(12)
+		, m_d_pins(d_pins)
+		, m_sm_page(sm_page)
+		, m_int_page(int_page)
 		, m_xami_mask(0xf)
 		, m_sp_mask(0x7<<4)
 		, m_ba_op(0x01)
+		, m_stack_levels(3)
+		, m_read_k(*this)
+		, m_read_d(*this)
+		, m_read_s(*this)
+		, m_read_f(*this)
+		, m_read_t(*this)
+		, m_write_d(*this)
+		, m_write_s(*this)
+		, m_write_f(*this)
+		, m_write_g(*this)
+		, m_write_u(*this)
+		, m_write_t(*this)
 	{ }
+
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_k.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_d.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_s_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_s.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_f_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_f.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_t_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_t.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_d.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_s_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_s.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_f.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_g_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_g.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_u_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_u.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_t_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_t.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -89,17 +167,19 @@ protected:
 	int m_icount;
 
 	// fixed settings or mask options that differ between MCU type
-	int m_prgwidth;         // number of bits and bitmask for ROM/RAM size
+	int m_prgwidth;         // number of bits and bitmask for ROM/RAM size: see melps4.c for info
 	int m_datawidth;        // "
 	int m_prgmask;          // "
 	int m_datamask;         // "
+	int m_d_pins;           // number of D port pins and bitmask: 11 on '40,'41,'42,'44, 8 on '43, 12 on '45,'46, 16 on '47
+	int m_d_mask;           // "
 
-	UINT8 m_stack_levels;   // 3 levels on MELPS 4, 12 levels on MELPS 41/42
 	UINT8 m_sm_page;        // subroutine default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
 	UINT8 m_int_page;       // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
 	UINT8 m_xami_mask;      // mask option for XAMI opcode on '40,'41,'45 (0xf for others)
 	UINT16 m_sp_mask;       // SP opcode location(middle 4 bits): 7 on '40 to '46, 3 on '47
 	UINT16 m_ba_op;         // BA opcode location: 1 on '40 to '46, N/A on '47
+	UINT8 m_stack_levels;   // 3 levels on MELPS 4, 12 levels on MELPS 41/42
 
 	// internal state, misc regs
 	UINT16 m_pc;            // program counter (11 or 10-bit)
@@ -108,6 +188,10 @@ protected:
 	UINT16 m_op;
 	UINT16 m_prev_op;
 	UINT8 m_bitmask;        // opcode bit argument
+	
+	UINT16 m_port_d;        // last written port data
+	UINT8 m_port_s;         // "
+	UINT8 m_port_f;         // "
 
 	bool m_sm, m_sms;       // subroutine mode flag + stack
 	bool m_ba_flag;         // temp flag indicates BA opcode was executed
@@ -132,6 +216,25 @@ protected:
 	UINT8 m_c;              // A/D converter counter
 	UINT8 m_v;              // timer control V
 	UINT8 m_w;              // timer control W
+
+	// i/o handlers
+	devcb_read16 m_read_k;
+	devcb_read16 m_read_d;
+	devcb_read8 m_read_s;
+	devcb_read8 m_read_f;
+	devcb_read_line m_read_t;
+
+	devcb_write16 m_write_d;
+	devcb_write8 m_write_s;
+	devcb_write8 m_write_f;
+	devcb_write8 m_write_g;
+	devcb_write8 m_write_u;
+	devcb_write_line m_write_t;
+
+	UINT8 read_gen_port(int port);
+	void write_gen_port(int port, UINT8 data);
+	int read_d_pin(int bit);
+	void write_d_pin(int bit, int state);
 
 	// misc internal helpers
 	UINT8 ram_r();

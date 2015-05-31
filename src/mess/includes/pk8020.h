@@ -13,7 +13,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/i8251.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -33,12 +33,18 @@ public:
 		m_lan(*this, "lan"),
 		m_ram(*this, RAM_TAG),
 		m_wd1793(*this, "wd1793"),
+		m_floppy0(*this, "wd1793:0"),
+		m_floppy1(*this, "wd1793:1"),
+		m_floppy2(*this, "wd1793:2"),
+		m_floppy3(*this, "wd1793:3"),
 		m_pit8253(*this, "pit8253"),
 		m_pic8259(*this, "pic8259"),
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
 		m_palette(*this, "palette")  { }
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	UINT8 m_color;
 	UINT8 m_video_page;
@@ -84,7 +90,11 @@ protected:
 	required_device<i8251_device> m_rs232;
 	required_device<i8251_device> m_lan;
 	required_device<ram_device> m_ram;
-	required_device<fd1793_device> m_wd1793;
+	required_device<fd1793_t> m_wd1793;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic8259;
 	required_device<speaker_sound_device> m_speaker;

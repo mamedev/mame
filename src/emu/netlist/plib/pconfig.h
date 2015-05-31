@@ -134,7 +134,7 @@ typedef int64_t      INT64;
  * It derives a pointer to a member function.
  */
 
-#if (PHAS_PMF_INTERNAL)
+#if 1 || (PHAS_PMF_INTERNAL)
 class pmfp
 {
 public:
