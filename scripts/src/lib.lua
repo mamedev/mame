@@ -391,6 +391,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/wd177x_dsk.h",
 		MAME_DIR .. "src/lib/formats/x07_cas.c",
 		MAME_DIR .. "src/lib/formats/x07_cas.h",
+		MAME_DIR .. "src/lib/formats/x1_dsk.c",
+		MAME_DIR .. "src/lib/formats/x1_dsk.h",
 		MAME_DIR .. "src/lib/formats/x1_tap.c",
 		MAME_DIR .. "src/lib/formats/x1_tap.h",
 		MAME_DIR .. "src/lib/formats/xdf_dsk.c",
