@@ -2487,7 +2487,7 @@ fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *own
 	nonsticky_immint = false;
 }
 
-kr1818vg93_t::kr1818vg93_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1793x, "FD1793", tag, owner, clock, "fd1793", __FILE__)
+kr1818vg93_t::kr1818vg93_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, KR1818VG93x, "KR1818VG93", tag, owner, clock, "kr1818vg93", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
