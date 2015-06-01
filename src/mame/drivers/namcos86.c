@@ -183,13 +183,11 @@ TODO:
 
 WRITE8_MEMBER(namcos86_state::bankswitch1_w)
 {
-	UINT8 *base = memregion("cpu1")->base() + 0x10000;
-
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
 	if (memregion("user1")->base()) return;
 
-	membank("bank1")->set_base(base + ((data & 0x03) * 0x2000));
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
@@ -198,14 +196,12 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
 
 	if (base == 0) return;
 
-	membank("bank1")->set_base(base + ((data & 0x1f) * 0x2000));
+	membank("bank1")->set_entry(data & 0x1f);
 }
 
 WRITE8_MEMBER(namcos86_state::bankswitch2_w)
 {
-	UINT8 *base = memregion("cpu2")->base() + 0x10000;
-
-	membank("bank2")->set_base(base + ((data & 0x03) * 0x2000));
+	membank("bank2")->set_entry(data & 0x03);
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
@@ -222,7 +218,6 @@ READ8_MEMBER(namcos86_state::dsw0_r)
 	rlo |= ( ioport("DSWB")->read() & 0x04 ) >> 1;
 	rlo |= ( ioport("DSWB")->read() & 0x10 ) >> 2;
 	rlo |= ( ioport("DSWB")->read() & 0x40 ) >> 3;
-
 	return rhi | rlo;
 }
 
@@ -276,14 +271,14 @@ WRITE8_MEMBER(namcos86_state::watchdog2_w)
 }
 
 
-WRITE8_MEMBER(namcos86_state::namcos86_coin_w)
+WRITE8_MEMBER(namcos86_state::coin_w)
 {
 	coin_lockout_global_w(machine(), data & 1);
 	coin_counter_w(machine(), 0,~data & 2);
 	coin_counter_w(machine(), 1,~data & 4);
 }
 
-WRITE8_MEMBER(namcos86_state::namcos86_led_w)
+WRITE8_MEMBER(namcos86_state::led_w)
 {
 	set_led_status(machine(), 0,data & 0x08);
 	set_led_status(machine(), 1,data & 0x10);
@@ -320,23 +315,26 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 	}
 }
 
-
-void namcos86_state::machine_reset()
+void namcos86_state::machine_start()
 {
-	UINT8 *base = memregion("cpu1")->base() + 0x10000;
+	if (!memregion("user1")->base())
+		membank("bank1")->configure_entries(0, 4, memregion("cpu1")->base() + 0x10000, 0x2000);
+	else
+		membank("bank1")->configure_entries(0, 32, memregion("user1")->base(), 0x2000);
 
-	membank("bank1")->set_base(base);
+	membank("bank2")->configure_entries(0, 4, memregion("cpu2")->base() + 0x10000, 0x2000);
+	
+	save_item(NAME(m_wdog));
 }
 
 
-
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_WRITE(videoram2_w) AM_SHARE("videoram2")
 
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(spriteram_w) AM_SHARE("spriteram")
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -346,25 +344,25 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog1_w)
 	AM_RANGE(0x8400, 0x8400) AM_WRITE(int_ack1_w) /* IRQ acknowledge */
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(rthunder_tilebank_select_w)
+	AM_RANGE(0x8800, 0x8fff) AM_WRITE(tilebank_select_w)
 
-	AM_RANGE(0x9000, 0x9002) AM_WRITE(rthunder_scroll0_w)   /* scroll + priority */
+	AM_RANGE(0x9000, 0x9002) AM_WRITE(scroll0_w)   /* scroll + priority */
 	AM_RANGE(0x9003, 0x9003) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0x9004, 0x9006) AM_WRITE(rthunder_scroll1_w)   /* scroll + priority */
+	AM_RANGE(0x9004, 0x9006) AM_WRITE(scroll1_w)   /* scroll + priority */
 
-	AM_RANGE(0x9400, 0x9402) AM_WRITE(rthunder_scroll2_w)   /* scroll + priority */
+	AM_RANGE(0x9400, 0x9402) AM_WRITE(scroll2_w)   /* scroll + priority */
 //  { 0x9403, 0x9403 } sub CPU rom bank select would be here
-	AM_RANGE(0x9404, 0x9406) AM_WRITE(rthunder_scroll3_w)   /* scroll + priority */
+	AM_RANGE(0x9404, 0x9406) AM_WRITE(scroll3_w)   /* scroll + priority */
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(rthunder_backcolor_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(backcolor_w)
 ADDRESS_MAP_END
 
 
 #define CPU2_MEMORY(NAME,ADDR_SPRITE,ADDR_VIDEO1,ADDR_VIDEO2,ADDR_ROM,ADDR_BANK,ADDR_WDOG,ADDR_INT) \
 static ADDRESS_MAP_START( NAME##_cpu2_map, AS_PROGRAM, 8, namcos86_state )                          \
-	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_SHARE("spriteram")  \
-	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w)    \
-	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w)    \
+	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_RAM AM_WRITE(spriteram_w) AM_SHARE("spriteram")  \
+	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_RAM AM_WRITE(videoram1_w) AM_SHARE("videoram1")   \
+	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_RAM AM_WRITE(videoram2_w) AM_SHARE("videoram2")   \
 	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_ROMBANK("bank2")                              \
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                                             \
 /*  { ADDR_BANK+0x00, ADDR_BANK+0x02 } layer 2 scroll registers would be here */                \
@@ -422,8 +420,8 @@ READ8_MEMBER(namcos86_state::readFF)
 static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos86_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("IN2")
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)  /* leds won't work otherwise */
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(namcos86_coin_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(namcos86_led_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(coin_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(led_w)
 ADDRESS_MAP_END
 
 
@@ -1001,8 +999,8 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update_namcos86)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos86_state, screen_eof_namcos86)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(namcos86_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos86)
