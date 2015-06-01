@@ -35,8 +35,8 @@ WRITE8_MEMBER( isa8_gblaster_device::saa1099_1_16_w )
 {
 	switch(offset)
 	{
-		case 0 : m_saa1099_1->control_w( space, offset, data ); break;
-		case 1 : m_saa1099_1->data_w( space, offset, data ); break;
+		case 0 : m_saa1099_1->data_w( space, offset, data ); break;
+		case 1 : m_saa1099_1->control_w( space, offset, data ); break;
 	}
 }
 
@@ -44,8 +44,29 @@ WRITE8_MEMBER( isa8_gblaster_device::saa1099_2_16_w )
 {
 	switch(offset)
 	{
-		case 0 : m_saa1099_2->control_w( space, offset, data ); break;
-		case 1 : m_saa1099_2->data_w( space, offset, data ); break;
+		case 0 : m_saa1099_2->data_w( space, offset, data ); break;
+		case 1 : m_saa1099_2->control_w( space, offset, data ); break;
+	}
+}
+
+READ8_MEMBER( isa8_gblaster_device::detect_r )
+{
+	switch(offset)
+	{
+		case 0:
+		case 1: return 0x7f; break;  // this register reportedly returns 0x3f on a Tandy 1000 TL, and 0x7f on a generic 486 PC.
+		case 6:
+		case 7: return detect_reg; break;
+		default: return 0xff;
+	}
+}
+
+WRITE8_MEMBER( isa8_gblaster_device::detect_w )
+{
+	switch(offset)
+	{
+		case 2:
+		case 3: detect_reg = (data & 0xff); break;
 	}
 }
 
@@ -77,7 +98,8 @@ isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const 
 		device_t(mconfig, ISA8_GAME_BLASTER, "Game Blaster Sound Card", tag, owner, clock, "isa_gblaster", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_saa1099_1(*this, "saa1099.1"),
-		m_saa1099_2(*this, "saa1099.2")
+		m_saa1099_2(*this, "saa1099.2"),
+		detect_reg(0xFF)
 {
 }
 
@@ -90,6 +112,7 @@ void isa8_gblaster_device::device_start()
 	set_isa_device();
 	m_isa->install_device(0x0220, 0x0221, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_1_16_w), this ) );
 	m_isa->install_device(0x0222, 0x0223, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_2_16_w), this ) );
+	m_isa->install_device(0x0224, 0x022F, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::detect_r), this ), write8_delegate( FUNC(isa8_gblaster_device::detect_w), this ) );
 }
 
 //-------------------------------------------------
