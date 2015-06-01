@@ -90,7 +90,7 @@ public:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 
-	floppy_image_device *m_floppy = NULL;
+	floppy_image_device *m_floppy;
 
 	UINT8 *m_main_ram;
 	UINT8 *m_ipl_rom;
