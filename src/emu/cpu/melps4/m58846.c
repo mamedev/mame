@@ -111,6 +111,7 @@ void m58846_device::execute_one()
 		case 0x0b: op_ose(); break;
 		case 0x0c: op_tya(); break;
 		case 0x0f: op_cma(); break;
+		// 0x18 RAR undocumented?
 
 		case 0x10: op_cls(); break;
 		case 0x11: op_clds(); break;

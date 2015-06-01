@@ -23,11 +23,13 @@
  *M58496: 72-pin QFP CMOS, 2Kx10 ROM, 128x4 internal + 256x4 external RAM, 1 timer, low-power
  *M58497: almost same as M58496
 
-  MELPS 760 subfamily has more differences, document them when needed.
+  MELPS 760 family has more differences, document them when needed.
+  MELPS 720 family as well
 
 
   References:
-  - 1982 Mitsubishi LSI Data Book
+  - 1980 and 1982 Mitsubishi LSI Data Books
+  - M34550Mx-XXXFP datasheet (this one is MELPS 720 family)
 
 */
 
@@ -82,7 +84,6 @@ void melps4_cpu_device::device_start()
 	m_read_d.resolve_safe(0);
 	m_read_s.resolve_safe(0);
 	m_read_f.resolve_safe(0);
-	m_read_t.resolve_safe(0);
 
 	m_write_d.resolve_safe();
 	m_write_s.resolve_safe();

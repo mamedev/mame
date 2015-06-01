@@ -24,10 +24,10 @@
 #include "sound/sn76496.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
-
-#include "machine/wd17xx.h"
-#include "formats/basicdsk.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
+
+#define MASTER_CLOCK XTAL_4_028MHz
 
 #define mc6845_h_char_total     (m_crtc_vreg[0]+1)
 #define mc6845_h_display        (m_crtc_vreg[1])
@@ -54,15 +54,19 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "crtc"),
 	m_fdc(*this, "fdc"),
+	m_floppy0(*this, "fdc:0"),
+	m_floppy1(*this, "fdc:1"),
 	m_sn(*this, "sn1"),
 	m_beeper(*this, "beeper"),
 	m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+	m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_device<mb8876_device> m_fdc;
+	required_device<mb8876_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	optional_device<sn76489a_device> m_sn;
 	required_device<beep_device> m_beeper;
 
@@ -99,8 +103,6 @@ public:
 	DECLARE_WRITE8_MEMBER(smc777_pcg_w);
 	DECLARE_READ8_MEMBER(smc777_fbuf_r);
 	DECLARE_WRITE8_MEMBER(smc777_fbuf_w);
-	DECLARE_READ8_MEMBER(smc777_fdc1_r);
-	DECLARE_WRITE8_MEMBER(smc777_fdc1_w);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_WRITE8_MEMBER(border_col_w);
@@ -124,9 +126,14 @@ public:
 	UINT32 screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(smc777_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_drq_w);
-	void check_floppy_inserted();
+
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
+	DECLARE_READ8_MEMBER(fdc_request_r);
+	DECLARE_WRITE8_MEMBER(floppy_select_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -379,79 +386,53 @@ WRITE8_MEMBER(smc777_state::smc777_fbuf_w)
 	m_gvram[vram_index] = data;
 }
 
-
-void smc777_state::check_floppy_inserted()
+READ8_MEMBER( smc777_state::fdc_r )
 {
-	int f_num;
-	floppy_image_legacy *floppy;
-
-	/* check if a floppy is there, automatically disconnect the ready line if so (HW doesn't control the ready line) */
-	/* FIXME: floppy drive 1 doesn't work? */
-	for(f_num=0;f_num<2;f_num++)
-	{
-		floppy = floppy_get_device(machine(), f_num)->flopimg_get_image();
-		floppy_get_device(machine(), f_num)->floppy_mon_w((floppy != NULL) ? 0 : 1);
-		floppy_get_device(machine(), f_num)->floppy_drive_set_ready_state((floppy != NULL) ? 1 : 0,0);
-	}
+	return m_fdc->read(space, offset) ^ 0xff;
 }
 
-READ8_MEMBER(smc777_state::smc777_fdc1_r)
+WRITE8_MEMBER( smc777_state::fdc_w )
 {
-	check_floppy_inserted();
-
-	switch(offset)
-	{
-		case 0x00:
-			return m_fdc->status_r(space, offset) ^ 0xff;
-		case 0x01:
-			return m_fdc->track_r(space, offset) ^ 0xff;
-		case 0x02:
-			return m_fdc->sector_r(space, offset) ^ 0xff;
-		case 0x03:
-			return m_fdc->data_r(space, offset) ^ 0xff;
-		case 0x04: //irq / drq status
-			//popmessage("%02x %02x\n",m_fdc_irq_flag,m_fdc_drq_flag);
-
-			return (m_fdc_irq_flag ? 0x80 : 0x00) | (m_fdc_drq_flag ? 0x00 : 0x40);
-	}
-
-	return 0x00;
+	m_fdc->write(space, offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER(smc777_state::smc777_fdc1_w)
+READ8_MEMBER( smc777_state::fdc_request_r )
 {
-	check_floppy_inserted();
+	UINT8 data = 0;
 
-	switch(offset)
-	{
-		case 0x00:
-			m_fdc->command_w(space, offset,data ^ 0xff);
-			break;
-		case 0x01:
-			m_fdc->track_w(space, offset,data ^ 0xff);
-			break;
-		case 0x02:
-			m_fdc->sector_w(space, offset,data ^ 0xff);
-			break;
-		case 0x03:
-			m_fdc->data_w(space, offset,data ^ 0xff);
-			break;
-		case 0x04:
-			// ---- xxxx select floppy drive (yes, 15 of them, A to P)
-			m_fdc->set_drive(data & 0x01);
-			//  m_fdc->set_side((data & 0x10)>>4);
-			if(data & 0xf0)
-				printf("floppy access %02x\n",data);
-			break;
-	}
+	data |= !m_fdc_drq_flag << 6;
+	data |= m_fdc_irq_flag << 7;
+
+	return data;
 }
 
-WRITE_LINE_MEMBER(smc777_state::smc777_fdc_intrq_w)
+WRITE8_MEMBER( smc777_state::floppy_select_w )
+{
+	floppy_image_device *floppy = NULL;
+
+	// ---- xxxx select floppy drive (yes, 15 of them, A to P)
+	switch (data & 0x01)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	// no idea where the motor on signal is
+	if (floppy)
+		floppy->mon_w(0);
+
+	if(data & 0xf0)
+		printf("floppy access %02x\n", data);
+}
+
+WRITE_LINE_MEMBER( smc777_state::fdc_intrq_w )
 {
 	m_fdc_irq_flag = state;
 }
 
-WRITE_LINE_MEMBER(smc777_state::smc777_fdc_drq_w)
+WRITE_LINE_MEMBER( smc777_state::fdc_drq_w )
 {
 	m_fdc_drq_flag = state;
 }
@@ -652,7 +633,8 @@ READ8_MEMBER(smc777_state::smc777_io_r)
 	else if(low_offs == 0x26)                     { logerror("RS-232c RX %04x\n",space.device().safe_pc()); return 0xff; }
 	else if(low_offs >= 0x28 && low_offs <= 0x2c) { logerror("FDC 2 read %02x\n",low_offs & 7); return 0xff; }
 	else if(low_offs >= 0x2d && low_offs <= 0x2f) { logerror("RS-232c no. 2 read %02x\n",low_offs & 3); return 0xff; }
-	else if(low_offs >= 0x30 && low_offs <= 0x34) { return smc777_fdc1_r(space,low_offs & 7); }
+	else if(low_offs >= 0x30 && low_offs <= 0x33) { return fdc_r(space, low_offs & 3); }
+	else if(low_offs >= 0x34 && low_offs <= 0x34) { return fdc_request_r(space, 0); }
 	else if(low_offs >= 0x35 && low_offs <= 0x37) { logerror("RS-232c no. 3 read %02x\n",low_offs & 3); return 0xff; }
 	else if(low_offs >= 0x38 && low_offs <= 0x3b) { logerror("Cache disk unit read %02x\n",low_offs & 7); return 0xff; }
 	else if(low_offs >= 0x3c && low_offs <= 0x3d) { logerror("RGB superimposer read %02x\n",low_offs & 1); return 0xff; }
@@ -693,7 +675,8 @@ WRITE8_MEMBER(smc777_state::smc777_io_w)
 	else if(low_offs == 0x26)                     { logerror("RS-232c TX %02x\n",data); }
 	else if(low_offs >= 0x28 && low_offs <= 0x2c) { logerror("FDC 2 write %02x %02x\n",low_offs & 7,data); }
 	else if(low_offs >= 0x2d && low_offs <= 0x2f) { logerror("RS-232c no. 2 write %02x %02x\n",low_offs & 3,data); }
-	else if(low_offs >= 0x30 && low_offs <= 0x34) { smc777_fdc1_w(space,low_offs & 7,data); }
+	else if(low_offs >= 0x30 && low_offs <= 0x33) { fdc_w(space, low_offs & 3, data); }
+	else if(low_offs >= 0x34 && low_offs <= 0x34) { floppy_select_w(space, 0, data); }
 	else if(low_offs >= 0x35 && low_offs <= 0x37) { logerror("RS-232c no. 3 write %02x %02x\n",low_offs & 3,data); }
 	else if(low_offs >= 0x38 && low_offs <= 0x3b) { logerror("Cache disk unit write %02x %02x\n",low_offs & 7,data); }
 	else if(low_offs >= 0x3c && low_offs <= 0x3d) { logerror("RGB superimposer write %02x %02x\n",low_offs & 1,data); }
@@ -1021,21 +1004,6 @@ PALETTE_INIT_MEMBER(smc777_state, smc777)
 	}
 }
 
-static LEGACY_FLOPPY_OPTIONS_START( smc777 )
-	LEGACY_FLOPPY_OPTION( img, "img", "SMC70 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([70])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface smc777_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(smc777),
-	"floppy_5_25"
-};
 
 INTERRUPT_GEN_MEMBER(smc777_state::smc777_vblank_irq)
 {
@@ -1044,7 +1012,10 @@ INTERRUPT_GEN_MEMBER(smc777_state::smc777_vblank_irq)
 }
 
 
-#define MASTER_CLOCK XTAL_4_028MHz
+static SLOT_INTERFACE_START( smc777_floppies )
+	SLOT_INTERFACE("ssdd", FLOPPY_35_SSDD)
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( smc777, smc777_state )
 	/* basic machine hardware */
@@ -1071,15 +1042,16 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	/* devices */
-	MCFG_DEVICE_ADD("fdc", MB8876, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(smc777_state, smc777_fdc_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(smc777_state, smc777_fdc_drq_w))
+	// floppy controller
+	MCFG_MB8876x_ADD("fdc", XTAL_1MHz)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(smc777_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(smc777_state, fdc_drq_w))
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(smc777_floppy_interface)
+	// does it really support 16 of them?
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","smc777")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "smc777")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

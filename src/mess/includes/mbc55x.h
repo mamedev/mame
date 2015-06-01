@@ -15,7 +15,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/i8251.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
@@ -98,11 +98,17 @@ public:
 		m_ppi(*this, PPI8255_TAG),
 		m_pic(*this, PIC8259_TAG),
 		m_fdc(*this, FDC_TAG),
+		m_floppy0(*this, FDC_TAG ":0"),
+		m_floppy1(*this, FDC_TAG ":1"),
+		m_floppy2(*this, FDC_TAG ":2"),
+		m_floppy3(*this, FDC_TAG ":3"),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette")
 	{
 	}
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -110,7 +116,11 @@ public:
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
-	required_device<fd1793_device> m_fdc;
+	required_device<fd1793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
@@ -139,8 +149,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vid_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_t2);
-	DECLARE_WRITE_LINE_MEMBER(mbc55x_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(mbc55x_fdc_drq_w);
+
 	UINT32      m_debug_machine;
 	UINT32      m_debug_video;
 	UINT8       m_video_mem[VIDEO_MEM_SIZE];

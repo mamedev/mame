@@ -15,7 +15,6 @@
 ************************************************************************************************/
 
 #include "includes/x1.h"
-#include "formats/x1_dsk.h"
 
 #include "includes/pce.h"
 //#include "cpu/h6280/h6280.h"

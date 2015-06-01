@@ -44,20 +44,18 @@
 #define MCFG_MELPS4_WRITE_U_CB(_devcb) \
 	melps4_cpu_device::set_write_u_callback(*device, DEVCB_##_devcb);
 
-// T timer I/O pin
-#define MCFG_MELPS4_READ_T_CB(_devcb) \
-	melps4_cpu_device::set_read_t_callback(*device, DEVCB_##_devcb);
+// T timer I/O pin (use execute_set_input for reads)
 #define MCFG_MELPS4_WRITE_T_CB(_devcb) \
 	melps4_cpu_device::set_write_t_callback(*device, DEVCB_##_devcb);
 
 
 #define MELPS4_PORTD_CLR 16
 
-// only generic ports here (S is 8-bit)
+// only generic ports here
 enum
 {
 	MELPS4_PORTS = 0,
-	MELPS4_PORTF = 2,
+	MELPS4_PORTF,
 	MELPS4_PORTG,
 	MELPS4_PORTU
 };
@@ -114,7 +112,6 @@ public:
 		, m_read_d(*this)
 		, m_read_s(*this)
 		, m_read_f(*this)
-		, m_read_t(*this)
 		, m_write_d(*this)
 		, m_write_s(*this)
 		, m_write_f(*this)
@@ -128,7 +125,6 @@ public:
 	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_d.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_s_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_s.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_f_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_f.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_t_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_t.set_callback(object); }
 
 	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_d.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_s_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_s.set_callback(object); }
@@ -222,7 +218,6 @@ protected:
 	devcb_read16 m_read_d;
 	devcb_read8 m_read_s;
 	devcb_read8 m_read_f;
-	devcb_read_line m_read_t;
 
 	devcb_write16 m_write_d;
 	devcb_write8 m_write_s;
