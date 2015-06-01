@@ -419,13 +419,13 @@ void melps4_cpu_device::op_tab2()
 void melps4_cpu_device::op_tva()
 {
 	// TVA: transfer A to timer control V
-	op_illegal();
+	m_v = m_a;
 }
 
 void melps4_cpu_device::op_twa()
 {
 	// TWA: transfer A to timer control W
-	op_illegal();
+	m_w = m_a;
 }
 
 void melps4_cpu_device::op_snz1()
@@ -547,19 +547,19 @@ void melps4_cpu_device::op_clds()
 
 void melps4_cpu_device::op_sd()
 {
-	// SD: set port D bit designated by Y
+	// SD: set port D pin designated by Y
 	write_d_pin(m_y, 1);
 }
 
 void melps4_cpu_device::op_rd()
 {
-	// RD: reset port D bit designated by Y
+	// RD: reset port D pin designated by Y
 	write_d_pin(m_y, 0);
 }
 
 void melps4_cpu_device::op_szd()
 {
-	// SZD: skip next if port D bit designated by Y is 0
+	// SZD: skip next if port D pin designated by Y is 0
 	m_skip = !read_d_pin(m_y);
 }
 
