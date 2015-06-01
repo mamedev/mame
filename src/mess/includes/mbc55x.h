@@ -149,8 +149,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vid_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_t2);
-	DECLARE_WRITE_LINE_MEMBER(mbc55x_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(mbc55x_fdc_drq_w);
+
 	UINT32      m_debug_machine;
 	UINT32      m_debug_video;
 	UINT8       m_video_mem[VIDEO_MEM_SIZE];

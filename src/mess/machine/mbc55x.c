@@ -89,8 +89,6 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 2));
 	}
-
-	printf("port c %02x\n", data);
 }
 
 /* Serial port USART, unimplemented as yet */
@@ -156,13 +154,6 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
 	m_fdc->write(space, offset>>1, data);
 }
 
-WRITE_LINE_MEMBER( mbc55x_state::mbc55x_fdc_intrq_w )
-{
-}
-
-WRITE_LINE_MEMBER( mbc55x_state::mbc55x_fdc_drq_w )
-{
-}
 
 /*
     Keyboard emulation
