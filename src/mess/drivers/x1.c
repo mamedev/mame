@@ -206,7 +206,7 @@
 ************************************************************************************************/
 
 #include "includes/x1.h"
-#include "formats/x1_dsk.h"
+#include "formats/2d_dsk.h"
 
 #define MAIN_CLOCK XTAL_16MHz
 #define VDP_CLOCK  XTAL_42_9545MHz
@@ -2431,7 +2431,7 @@ PALETTE_INIT_MEMBER(x1_state,x1)
 }
 
 FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
-	FLOPPY_X1_FORMAT
+	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( x1_floppies )

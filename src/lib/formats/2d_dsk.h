@@ -2,7 +2,7 @@
 // copyright-holders:Dirk Best
 /***************************************************************************
 
-    Sharp X1
+    Sharp 2D
 
     Disk image format
 
@@ -10,15 +10,15 @@
 
 #pragma once
 
-#ifndef __X1_DSK_H__
-#define __X1_DSK_H__
+#ifndef __2D_DSK_H__
+#define __2D_DSK_H__
 
 #include "wd177x_dsk.h"
 
-class x1_format : public wd177x_format
+class _2d_format : public wd177x_format
 {
 public:
-	x1_format();
+	_2d_format();
 
 	virtual const char *name() const;
 	virtual const char *description() const;
@@ -28,6 +28,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_X1_FORMAT;
+extern const floppy_format_type FLOPPY_2D_FORMAT;
 
-#endif // __X1_DSK_H__
+#endif // __2D_DSK_H__

@@ -114,6 +114,8 @@ project "formats"
 	}
 
 	files {
+		MAME_DIR .. "src/lib/formats/2d_dsk.c",
+		MAME_DIR .. "src/lib/formats/2d_dsk.h",
 		MAME_DIR .. "src/lib/formats/cassimg.c",
 		MAME_DIR .. "src/lib/formats/cassimg.h",
 		MAME_DIR .. "src/lib/formats/flopimg.c",
@@ -395,8 +397,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/wd177x_dsk.h",
 		MAME_DIR .. "src/lib/formats/x07_cas.c",
 		MAME_DIR .. "src/lib/formats/x07_cas.h",
-		MAME_DIR .. "src/lib/formats/x1_dsk.c",
-		MAME_DIR .. "src/lib/formats/x1_dsk.h",
 		MAME_DIR .. "src/lib/formats/x1_tap.c",
 		MAME_DIR .. "src/lib/formats/x1_tap.h",
 		MAME_DIR .. "src/lib/formats/xdf_dsk.c",
