@@ -424,16 +424,13 @@ ui_menu_colors_ui::ui_menu_colors_ui(running_machine &machine, render_container 
 
 ui_menu_colors_ui::~ui_menu_colors_ui()
 {
-	if (mewui_globals::force_reset_main)
-	{
-		std::string error_string;
-		char dec_color[65];
+	std::string error_string;
+	char dec_color[65];
 
-		for (int index = 1; index < MUI_RESTORE; index++)
-		{
-			sprintf(dec_color, "%x", (UINT32)color_table[index].color);
-			machine().options().set_value(color_table[index].option, dec_color, OPTION_PRIORITY_CMDLINE, error_string);
-		}
+	for (int index = 1; index < MUI_RESTORE; index++)
+	{
+		sprintf(dec_color, "%x", (UINT32)color_table[index].color);
+		machine().options().set_value(color_table[index].option, dec_color, OPTION_PRIORITY_CMDLINE, error_string);
 	}
 }
 
