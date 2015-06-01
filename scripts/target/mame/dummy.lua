@@ -15,7 +15,7 @@ dofile("mess.lua")
 function createProjects_mame_dummy(_target, _subtarget)
 	project ("mame_dummy")
 	targetsubdir(_target .."_" .. _subtarget)
-	kind "StaticLib"
+	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame_dummy"))
 	
 	options {

@@ -75,6 +75,21 @@ void melps4_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
+	m_d_mask = (1 << m_d_pins) - 1;
+	
+	// resolve callbacks
+	m_read_k.resolve_safe(0);
+	m_read_d.resolve_safe(0);
+	m_read_s.resolve_safe(0);
+	m_read_f.resolve_safe(0);
+	m_read_t.resolve_safe(0);
+
+	m_write_d.resolve_safe();
+	m_write_s.resolve_safe();
+	m_write_f.resolve_safe();
+	m_write_g.resolve_safe();
+	m_write_u.resolve_safe();
+	m_write_t.resolve_safe();
 
 	// zerofill
 	m_pc = 0;
@@ -83,6 +98,10 @@ void melps4_cpu_device::device_start()
 	m_op = 0;
 	m_prev_op = 0;
 	m_bitmask = 0;
+	
+	m_port_d = 0;
+	m_port_s = 0;
+	m_port_f = 0;
 
 	m_sm = m_sms = false;
 	m_ba_flag = false;
@@ -114,6 +133,10 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_bitmask));
+
+	save_item(NAME(m_port_d));
+	save_item(NAME(m_port_s));
+	save_item(NAME(m_port_f));
 
 	save_item(NAME(m_sm));
 	save_item(NAME(m_sms));
@@ -181,6 +204,88 @@ void melps4_cpu_device::device_reset()
 
 	m_v = 0;
 	m_w = 0;
+	
+	// clear ports
+	write_d_pin(MELPS4_PORTD_CLR, 0);
+	write_gen_port(MELPS4_PORTS, 0);
+	write_gen_port(MELPS4_PORTF, 0);
+	write_gen_port(MELPS4_PORTG, 0);
+	write_gen_port(MELPS4_PORTU, 0);
+	m_write_t(0);
+}
+
+
+
+//-------------------------------------------------
+//  i/o handling
+//-------------------------------------------------
+
+UINT8 melps4_cpu_device::read_gen_port(int port)
+{
+	// input generic port
+	switch (port)
+	{
+		case MELPS4_PORTS:
+			return m_port_s | m_read_s(port, 0xff);
+		case MELPS4_PORTF:
+			return m_port_f | (m_read_f(port, 0xff) & 0xf);
+		
+		default:
+			break;
+	}
+
+	return 0;
+}
+
+void melps4_cpu_device::write_gen_port(int port, UINT8 data)
+{
+	// output generic port
+	switch (port)
+	{
+		case MELPS4_PORTS:
+			m_port_s = data;
+			m_write_s(port, data, 0xff);
+			break;
+		case MELPS4_PORTF:
+			m_port_f = data & 0xf;
+			m_write_f(port, data & 0xf, 0xff);
+			break;
+		case MELPS4_PORTG:
+			m_write_g(port, data & 0xf, 0xff);
+			break;
+		case MELPS4_PORTU:
+			m_write_u(port, data & 1, 0xff);
+			break;
+		
+		default:
+			break;
+	}
+}
+
+int melps4_cpu_device::read_d_pin(int bit)
+{
+	// read port D, return state of selected pin
+	bit &= 0xf;
+	UINT16 d = (m_port_d | m_read_d(bit, 0xffff)) & m_d_mask;
+	return d >> bit & 1;
+}
+
+void melps4_cpu_device::write_d_pin(int bit, int state)
+{
+	// clear all port D pins
+	if (bit == MELPS4_PORTD_CLR)
+	{
+		m_port_d = 0;
+		m_write_d(bit, 0, 0xffff);
+	}
+	
+	// set/reset one port D pin
+	else
+	{
+		bit &= 0xf;
+		m_port_d = ((m_port_d & (~(1 << bit))) | (state << bit)) & m_d_mask;
+		m_write_d(bit, m_port_d, 0xffff);
+	}
 }
 
 

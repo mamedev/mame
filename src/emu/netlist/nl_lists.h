@@ -128,9 +128,9 @@ public:
 
 	// save state support & mame disasm
 
-	ATTR_COLD  const entry_t *listptr() const { return &m_list[0]; }
-	ATTR_HOT  int count() const { return m_end - m_list; }
-	ATTR_HOT  const entry_t & operator[](const int & index) const { return m_list[index]; }
+	ATTR_COLD  const entry_t *listptr() const { return &m_list[1]; }
+	ATTR_HOT  int count() const { return m_end - &m_list[1]; }
+	ATTR_HOT  const entry_t & operator[](const int & index) const { return m_list[1+index]; }
 
 #if (NL_KEEP_STATISTICS)
 	// profiling

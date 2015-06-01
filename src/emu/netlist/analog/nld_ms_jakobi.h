@@ -31,7 +31,7 @@ public:
 
 	virtual ~netlist_matrix_solver_SOR_t() {}
 
-	/* ATTR_COLD */ virtual void log_stats();
+	virtual void log_stats();
 
 	ATTR_HOT inline int vsolve_non_dynamic();
 protected:

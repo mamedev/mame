@@ -173,7 +173,7 @@ class netlist_core_device_t;
 #if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 typedef void (netlist_core_device_t::*net_update_delegate)();
 #elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-typedef void (*net_update_delegate)(netlist_core_device_t *);
+typedef MEMBER_ABI void (*net_update_delegate)(netlist_core_device_t *);
 #endif
 
 //============================================================
@@ -248,7 +248,7 @@ typedef void (*net_update_delegate)(netlist_core_device_t *);
 		, _priv)
 
 #define NETLIB_LOGIC_FAMILY(_fam)                                               \
-/* ATTR_COLD */ virtual const netlist_logic_family_desc_t *default_logic_family()     \
+virtual const netlist_logic_family_desc_t *default_logic_family()     \
 {                                                                               \
 	return &netlist_family_ ## _fam;                                            \
 }
@@ -409,9 +409,9 @@ public:
 
 protected:
 
-	/* ATTR_COLD */ virtual void reset() = 0;
+	virtual void reset() = 0;
 	// must call parent save_register !
-	/* ATTR_COLD */ virtual void save_register() { };
+	virtual void save_register() { };
 
 private:
 	pstring m_name;
@@ -483,7 +483,7 @@ public:
 	ATTR_HOT /* inline */ void update_dev(const UINT32 mask);
 
 protected:
-	/* ATTR_COLD */ virtual void save_register()
+	virtual void save_register()
 	{
 		save(NLNAME(m_state));
 		netlist_owned_object_t::save_register();
@@ -537,9 +537,9 @@ public:
 	netlist_terminal_t *m_otherterm;
 
 protected:
-	/* ATTR_COLD */ virtual void save_register();
+	virtual void save_register();
 
-	/* ATTR_COLD */ virtual void reset();
+	virtual void reset();
 private:
 	ATTR_HOT  void set_ptr(nl_double *ptr, const nl_double val)
 	{
@@ -613,7 +613,7 @@ public:
 	ATTR_HOT  void activate_lh();
 
 protected:
-	/* ATTR_COLD */ virtual void reset()
+	virtual void reset()
 	{
 		//netlist_core_terminal_t::reset();
 		set_state(STATE_INP_ACTIVE);
@@ -637,7 +637,7 @@ public:
 	ATTR_HOT  nl_double Q_Analog() const;
 
 protected:
-	/* ATTR_COLD */ virtual void reset()
+	virtual void reset()
 	{
 		//netlist_core_terminal_t::reset();
 		set_state(STATE_INP_ACTIVE);
@@ -656,7 +656,7 @@ public:
 	typedef plist_t<netlist_net_t *> list_t;
 
 	ATTR_COLD netlist_net_t(const family_t afamily);
-	/* ATTR_COLD */ virtual ~netlist_net_t();
+	virtual ~netlist_net_t();
 
 	ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
 
@@ -705,8 +705,8 @@ public:
 
 protected:  //FIXME: needed by current solver code
 
-	/* ATTR_COLD */ virtual void save_register();
-	/* ATTR_COLD */ virtual void reset();
+	virtual void save_register();
+	virtual void reset();
 
 	netlist_sig_t m_new_Q;
 	netlist_sig_t m_cur_Q;
@@ -736,7 +736,7 @@ public:
 	typedef plist_t<netlist_logic_net_t *> list_t;
 
 	ATTR_COLD netlist_logic_net_t();
-	/* ATTR_COLD */ virtual ~netlist_logic_net_t() { };
+	virtual ~netlist_logic_net_t() { };
 
 	ATTR_HOT  netlist_sig_t Q() const
 	{
@@ -778,8 +778,8 @@ public:
 
 protected:  //FIXME: needed by current solver code
 
-	/* ATTR_COLD */ virtual void save_register();
-	/* ATTR_COLD */ virtual void reset();
+	virtual void save_register();
+	virtual void reset();
 
 
 private:
@@ -796,7 +796,7 @@ public:
 	typedef plist_t<netlist_analog_net_t *> list_t;
 
 	ATTR_COLD netlist_analog_net_t();
-	/* ATTR_COLD */ virtual ~netlist_analog_net_t() { };
+	virtual ~netlist_analog_net_t() { };
 
 	ATTR_HOT  nl_double Q_Analog() const
 	{
@@ -815,8 +815,8 @@ public:
 
 protected:
 
-	/* ATTR_COLD */ virtual void save_register();
-	/* ATTR_COLD */ virtual void reset();
+	virtual void save_register();
+	virtual void reset();
 
 
 private:
@@ -841,7 +841,7 @@ public:
 	ATTR_COLD netlist_logic_output_t();
 
 	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
-	/* ATTR_COLD */ virtual void reset()
+	virtual void reset()
 	{
 		set_state(STATE_OUT);
 	}
@@ -865,7 +865,7 @@ public:
 	ATTR_COLD netlist_analog_output_t();
 
 	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
-	/* ATTR_COLD */ virtual void reset()
+	virtual void reset()
 	{
 		set_state(STATE_OUT);
 	}
@@ -903,7 +903,7 @@ public:
 
 protected:
 
-	/* ATTR_COLD */ virtual void reset() { }
+	virtual void reset() { }
 
 private:
 	const param_type_t m_param_type;
@@ -920,7 +920,7 @@ public:
 	ATTR_HOT  nl_double Value() const        { return m_param;   }
 
 protected:
-	/* ATTR_COLD */ virtual void save_register()
+	virtual void save_register()
 	{
 		save(NLNAME(m_param));
 		netlist_param_t::save_register();
@@ -942,7 +942,7 @@ public:
 	ATTR_HOT  int Value() const     { return m_param;     }
 
 protected:
-	/* ATTR_COLD */ virtual void save_register()
+	virtual void save_register()
 	{
 		save(NLNAME(m_param));
 		netlist_param_t::save_register();
@@ -1005,9 +1005,9 @@ public:
 
 	ATTR_COLD netlist_core_device_t(const family_t afamily);
 
-	/* ATTR_COLD */ virtual ~netlist_core_device_t();
+	virtual ~netlist_core_device_t();
 
-	/* ATTR_COLD */ virtual void init(netlist_base_t &anetlist, const pstring &name);
+	virtual void init(netlist_base_t &anetlist, const pstring &name);
 	ATTR_HOT virtual void update_param() {}
 
 	ATTR_HOT  void update_dev()
@@ -1066,9 +1066,9 @@ public:
 protected:
 
 	ATTR_HOT virtual void update() { }
-	/* ATTR_COLD */ virtual void start() { }
-	/* ATTR_COLD */ virtual void stop() { }                                                  \
-	/* ATTR_COLD */ virtual const netlist_logic_family_desc_t *default_logic_family()
+	virtual void start() { }
+	virtual void stop() { }                                                  \
+	virtual const netlist_logic_family_desc_t *default_logic_family()
 	{
 		return &netlist_family_TTL;
 	}
@@ -1088,9 +1088,9 @@ public:
 	ATTR_COLD netlist_device_t();
 	ATTR_COLD netlist_device_t(const family_t afamily);
 
-	/* ATTR_COLD */ virtual ~netlist_device_t();
+	virtual ~netlist_device_t();
 
-	/* ATTR_COLD */ virtual void init(netlist_base_t &anetlist, const pstring &name);
+	virtual void init(netlist_base_t &anetlist, const pstring &name);
 
 	ATTR_COLD netlist_setup_t &setup();
 
@@ -1245,12 +1245,12 @@ protected:
 	};
 
 	// any derived netlist must override this ...
-	/* ATTR_COLD */ virtual void verror(const loglevel_e level,
+	virtual void verror(const loglevel_e level,
 			const char *format, va_list ap) const = 0;
 
 	/* from netlist_object */
-	/* ATTR_COLD */ virtual void reset();
-	/* ATTR_COLD */ virtual void save_register();
+	virtual void reset();
+	virtual void save_register();
 
 #if (NL_KEEP_STATISTICS)
 	// performance

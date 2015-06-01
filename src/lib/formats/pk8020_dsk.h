@@ -2,7 +2,7 @@
 // copyright-holders:Dirk Best
 /***************************************************************************
 
-    EACA Colour Genie
+    PK-8020
 
     Disk image format
 
@@ -10,28 +10,24 @@
 
 #pragma once
 
-#ifndef __CGENIE_DSK_H__
-#define __CGENIE_DSK_H__
+#ifndef __PK8020_DSK_H__
+#define __PK8020_DSK_H__
 
 #include "wd177x_dsk.h"
 
-class cgenie_format : public wd177x_format
+class pk8020_format : public wd177x_format
 {
 public:
-	cgenie_format();
+	pk8020_format();
 
 	virtual const char *name() const;
 	virtual const char *description() const;
 	virtual const char *extensions() const;
 
-protected:
-	virtual int get_track_dam_fm(const format &f, int head, int track);
-	virtual int get_track_dam_mfm(const format &f, int head, int track);
-
 private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_CGENIE_FORMAT;
+extern const floppy_format_type FLOPPY_PK8020_FORMAT;
 
-#endif // __CGENIE_DSK_H__
+#endif // __PK8020_DSK_H__

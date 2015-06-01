@@ -4794,7 +4794,8 @@ pdrift          // 1988.?? Power Drift (World)
 pdrifta         // 1988.?? Power Drift (World)
 pdrifte         // 1988.?? Power Drift (World)
 pdriftl
-gloc            // 1990.04 G-LOC Air Battle (US)
+gloc            // 1990.?? G-LOC Air Battle (World)
+glocu           // 1990.04 G-LOC Air Battle (US)
 				// 1990.05 G-LOC Air Battle (Japan)
 glocr360        // 1990.?? G-LOC (R360, World?)
 strkfgtr        // 1991.06 Strike Fighter (World)
@@ -10908,6 +10909,7 @@ mosaicf2        // (c) 1999 F2 System
 royalpk2        //
 finalgdr        // (c) 2001 Semicom
 mrkicker        // (c) 2001 Semicom
+mrkickera       // (c) 2001 Semicom
 wivernwg        // (c) 2001 Semicom
 wyvernwg        // (c) 2001 Semicom / Game Vision
 wyvernwga       // (c) 2001 Semicom / Game Vision

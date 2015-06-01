@@ -2,8 +2,9 @@
 -- copyright-holders:MAMEdev Team
 
 project "utils"
+	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid "22489ad0-4cb2-4d91-ad81-24b0d80ca30a"
-	kind "StaticLib"
+	kind (LIBTYPE)
 
 	options {
 		"ForceCPP",
@@ -94,8 +95,9 @@ project "utils"
 
 
 project "formats"
+	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid "f69636b1-fcce-45ce-b09a-113e371a2d7a"
-	kind "StaticLib"
+	kind (LIBTYPE)
 
 	options {
 		"ForceCPP",
@@ -311,6 +313,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/pc98fdi_dsk.h",
 		MAME_DIR .. "src/lib/formats/phc25_cas.c",
 		MAME_DIR .. "src/lib/formats/phc25_cas.h",
+		MAME_DIR .. "src/lib/formats/pk8020_dsk.c",
+		MAME_DIR .. "src/lib/formats/pk8020_dsk.h",
 		MAME_DIR .. "src/lib/formats/pmd_cas.c",
 		MAME_DIR .. "src/lib/formats/pmd_cas.h",
 		MAME_DIR .. "src/lib/formats/primoptp.c",
@@ -391,6 +395,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/wd177x_dsk.h",
 		MAME_DIR .. "src/lib/formats/x07_cas.c",
 		MAME_DIR .. "src/lib/formats/x07_cas.h",
+		MAME_DIR .. "src/lib/formats/x1_dsk.c",
+		MAME_DIR .. "src/lib/formats/x1_dsk.h",
 		MAME_DIR .. "src/lib/formats/x1_tap.c",
 		MAME_DIR .. "src/lib/formats/x1_tap.h",
 		MAME_DIR .. "src/lib/formats/xdf_dsk.c",

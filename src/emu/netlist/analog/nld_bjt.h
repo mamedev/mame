@@ -38,16 +38,15 @@ public:
 		BJT_PNP
 	};
 
-	ATTR_COLD NETLIB_NAME(Q)(const family_t afamily)
-	: netlist_device_t(afamily)
-	, m_qtype(BJT_NPN) { }
+	NETLIB_NAME(Q)(const family_t afamily);
+	virtual ~NETLIB_NAME(Q)();
 
 	inline q_type qtype() const { return m_qtype; }
 	inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
 	inline void set_qtype(q_type atype) { m_qtype = atype; }
 protected:
-	/* ATTR_COLD */ virtual void start();
-	/* ATTR_COLD */ virtual void reset();
+	virtual void start();
+	virtual void reset();
 	ATTR_HOT void update();
 
 	netlist_param_model_t m_model;
@@ -59,8 +58,10 @@ class NETLIB_NAME(QBJT) : public NETLIB_NAME(Q)
 {
 public:
 
-	ATTR_COLD NETLIB_NAME(QBJT)(const family_t afamily)
+	NETLIB_NAME(QBJT)(const family_t afamily)
 	: NETLIB_NAME(Q)(afamily) { }
+
+	virtual ~NETLIB_NAME(QBJT)() { }
 
 protected:
 
@@ -110,9 +111,9 @@ public:
 
 protected:
 
-	/* ATTR_COLD */ virtual void start();
+	virtual void start();
 	ATTR_HOT virtual void update_param();
-	/* ATTR_COLD */ virtual void reset();
+	virtual void reset();
 	NETLIB_UPDATE_TERMINALSI();
 
 	nl_double m_gB; // base conductance / switch on
@@ -142,8 +143,8 @@ public:
 
 protected:
 
-	/* ATTR_COLD */ virtual void start();
-	/* ATTR_COLD */ virtual void reset();
+	virtual void start();
+	virtual void reset();
 	ATTR_HOT void update_param();
 	ATTR_HOT void virtual update();
 	NETLIB_UPDATE_TERMINALSI();

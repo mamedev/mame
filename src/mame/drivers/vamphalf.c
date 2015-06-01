@@ -162,6 +162,7 @@ public:
 	DECLARE_WRITE32_MEMBER(finalgdr_oki_bank_w);
 	DECLARE_WRITE32_MEMBER(aoh_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(boonggab_oki_bank_w);
+	DECLARE_WRITE16_MEMBER(mrkickera_oki_bank_w);
 	DECLARE_WRITE32_MEMBER(wyvernwg_snd_w);
 	DECLARE_WRITE16_MEMBER(misncrft_snd_w);
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
@@ -187,6 +188,7 @@ public:
 	DECLARE_DRIVER_INIT(boonggab);
 	DECLARE_DRIVER_INIT(wyvernwg);
 	DECLARE_DRIVER_INIT(yorijori);
+	DECLARE_DRIVER_INIT(mrkickera);
 
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -339,6 +341,12 @@ WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)
 		m_oki->set_bank_base(0x40000 * (data & 0x7));
 }
 
+
+WRITE16_MEMBER(vamphalf_state::mrkickera_oki_bank_w)
+{
+	m_oki->set_bank_base(0x40000 * (data & 0x3));
+}
+
 WRITE16_MEMBER(vamphalf_state::boonggab_prize_w)
 {
 	if(offset)
@@ -450,6 +458,7 @@ static ADDRESS_MAP_START( misncrft_io, AS_IO, 16, vamphalf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolmini_io, AS_IO, 16, vamphalf_state )
+//	AM_RANGE(0x002, 0x003) AM_WRITE(mrkickera_oki_bank_w) // not coolmini?, installed on init
 	AM_RANGE(0x200, 0x203) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
@@ -512,6 +521,8 @@ static ADDRESS_MAP_START( mrkicker_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x7800, 0x7803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x7c00, 0x7c03) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
+
+
 
 static ADDRESS_MAP_START( jmpbreak_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x0c0, 0x0c3) AM_NOP // ?
@@ -1105,6 +1116,8 @@ static MACHINE_CONFIG_DERIVED( mrkicker, common )
 
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
+
+
 
 static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_CPU_ADD("maincpu", E132XN, XTAL_20MHz*4) /* 4x internal multiplier */
@@ -2237,6 +2250,36 @@ ROM_START( mrkicker )
 	ROM_LOAD( "eeprom-mrkicker.bin", 0x0000, 0x0080, CRC(87afb8f7) SHA1(444203b793c1d7929fc5916f18b510198719cd38) )
 ROM_END
 
+ROM_START( mrkickera )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	/* rom0 empty */
+	ROM_LOAD( "3.rom2", 0x080000, 0x080000, CRC(3f7fa08b) SHA1(dbffd44d8387e6ed1a4b5ec85ccf64d69a108d88) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )  /* gfx data */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(c677aac3) SHA1(356073a29260e8e6c29dd12b2113b30140c6108c) )
+	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(b6337d4a) SHA1(2f46e2933af7fd0f71083900d5e6e4f602ab4c66) )
+	/* roml01 empty */
+	/* romh01 empty */
+
+	ROM_REGION( 0x080000, "user2", 0 ) /* Oki Samples */
+	ROM_LOAD( "at27c040.u7", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* Mask ROM */
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) */
+	ROM_LOAD( "eeprom-mrkicker.bin", 0x0000, 0x0080, CRC(87afb8f7) SHA1(444203b793c1d7929fc5916f18b510198719cd38) )
+ROM_END
+
 /*
 Age Of Heroes - Silkroad 2
 Unico, 2001
@@ -2704,6 +2747,15 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 	m_flip_bit = 1;
 }
 
+DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
+{
+//	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d2e80, 0x000d2e83, read16_delegate(FUNC(vamphalf_state::mrkickera_speedup_r), this));
+	m_maincpu->space(AS_IO).install_write_handler(0x002, 0x003, write16_delegate(FUNC(vamphalf_state::mrkickera_oki_bank_w), this));
+
+	m_palshift = 0;
+	m_flip_bit = 1;
+}
+
 DRIVER_INIT_MEMBER(vamphalf_state,suplup)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0011605c, 0x0011605f, read16_delegate(FUNC(vamphalf_state::suplup_speedup_r), this));
@@ -2895,6 +2947,7 @@ GAME( 2000, mrdig,     0,        mrdig,    common,   vamphalf_state, mrdig,    R
 GAME( 2001, dtfamily,  0,        coolmini, common,   vamphalf_state, dtfamily, ROT0,   "SemiCom",           "Diet Family", GAME_SUPPORTS_SAVE )
 GAME( 2001, finalgdr,  0,        finalgdr, finalgdr, vamphalf_state, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", GAME_SUPPORTS_SAVE )
 GAME( 2001, mrkicker,  0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_SUPPORTS_SAVE )
+GAME( 2001, mrkickera, mrkicker, coolmini, common,   vamphalf_state, mrkickera,ROT0,   "SemiCom",           "Mr. Kicker (F-E1-16-010 PCB)", GAME_SUPPORTS_SAVE )
 GAME( 2001, toyland,   0,        coolmini, common,   vamphalf_state, toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", GAME_SUPPORTS_SAVE )
 GAME( 2001, wivernwg,  0,        wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom",           "Wivern Wings", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2001, wyvernwg,  wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

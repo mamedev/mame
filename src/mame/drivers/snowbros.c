@@ -1654,11 +1654,11 @@ MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 static MACHINE_CONFIG_START( snowbros, snowbros_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* 8 Mhz - confirmed */
 	MCFG_CPU_PROGRAM_MAP(snowbros_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/2) /* 6 MHz - confirmed */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -1683,7 +1683,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4) /* 3 MHz - confirmed */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1731,12 +1731,11 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 MACHINE_CONFIG_END
 
 
-
 static MACHINE_CONFIG_DERIVED( semicom_mcu, semicom )
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("protection", I8052, 16000000)  // AT89C52
+	MCFG_CPU_ADD("protection", I8052, XTAL_16MHz)  // AT89C52
 	MCFG_CPU_PROGRAM_MAP(protection_map)
 	MCFG_CPU_IO_MAP(protection_iomap)
 MACHINE_CONFIG_END
@@ -1746,34 +1745,15 @@ static MACHINE_CONFIG_DERIVED( semiprot, semicom )
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
 MACHINE_CONFIG_END
 
-/*
-
-Honey Doll - Barko Corp 1995
-
-Rom Board include a Cypress cy7C382-0JC chip
-
-Main Board :
-
-CPU : 1 X MC68000P12
-      1 X Z80B
-
-1 X Oki M6295
-2 X Cypress CY7C384A-XJC
-
-2 x quartz - 12Mhz and 16Mhz
-
-
-See included pics
-*/
 
 static MACHINE_CONFIG_START( honeydol, snowbros_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P12 @ 12MHz */
 	MCFG_CPU_PROGRAM_MAP(honeydol_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
 	MCFG_CPU_PROGRAM_MAP(honeydol_sound_map)
 	MCFG_CPU_IO_MAP(honeydol_sound_io_map)
 
@@ -1795,23 +1775,23 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 
 	/* sound hardware */
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4) /* 3Mhz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) /* freq? */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( twinadv, snowbros_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) // or 12
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12MHz like Honey Dolls ? */
 	MCFG_CPU_PROGRAM_MAP(twinadv_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(twinadv_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", snowbros_state,  irq0_line_hold)
@@ -1833,7 +1813,7 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* sound hardware */
-	MCFG_OKIM6295_ADD("oki", 12000000/12, OKIM6295_PIN7_HIGH) /* freq? */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1859,15 +1839,15 @@ Intel P8752 (mcu)
 static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(12000000)
+	MCFG_CPU_CLOCK(XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(finalttr_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(3578545)
+	MCFG_CPU_CLOCK(XTAL_3_579545MHz)
 
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, finalttr )
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, XTAL_3_579545MHz) /* possible but less likely 4MHz (12MHz/3) */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
 	MCFG_SOUND_ROUTE(1, "mono", 0.08)
@@ -1883,10 +1863,10 @@ static MACHINE_CONFIG_DERIVED( _4in1, semicom )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( snowbro3, snowbros_state )
+static MACHINE_CONFIG_START( snowbro3, snowbros_state ) /* PCB has 16MHz & 12MHz OSCs */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
 	MCFG_CPU_PROGRAM_MAP(snowbros3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros3_irq, "screen", 0, 1)
 
@@ -1906,7 +1886,7 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2063,6 +2043,24 @@ ROM_START( toto )
 ROM_END
 
 /* Barko */
+
+/*
+
+Honey Doll - Barko Corp 1995
+
+Rom Board include a Cypress cy7C382-0JC chip
+
+Main Board :
+
+CPU : 1 X MC68000P12
+      1 X Z80B
+
+1 X Oki M6295
+2 X Cypress CY7C384A-XJC
+
+2 x quartz - 12Mhz and 16Mhz
+
+*/
 
 ROM_START( honeydol )
 	ROM_REGION( 0x40000, "maincpu", 0 )

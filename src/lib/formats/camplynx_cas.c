@@ -101,19 +101,19 @@ static int camplynx_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 			if (i < camplynx_image_size)
 			{
 				sample_count += camplynx_output_byte(buffer, sample_count, bytes[i]);
-				pgmname.append<int>(1, bytes[i]);
+				pgmname.append(1, (char)bytes[i]);
 			}
 			else
 				return sample_count;
 			byte_count++;
 		}
 
-		pgmname.append<int>(1, 0x22);
+		pgmname.append(1, (char)0x22);
 		sample_count += camplynx_output_byte(buffer, sample_count, bytes[byte_count++]); // should be 0x22
 
 		// if a machine-language program, say to use MLOAD
 		if (bytes[byte_count] == 0x4D)
-			pgmname[0] = 0x4D;
+			pgmname[0] = (char)0x4D;
 
 		// Tell user how to load the tape
 		popmessage("%s",pgmname.c_str());

@@ -20,15 +20,15 @@ public:
 
 	virtual ~netlist_matrix_solver_direct_t();
 
-	/* ATTR_COLD */ virtual void vsetup(netlist_analog_net_t::list_t &nets);
-	/* ATTR_COLD */ virtual void reset() { netlist_matrix_solver_t::reset(); }
+	virtual void vsetup(netlist_analog_net_t::list_t &nets);
+	virtual void reset() { netlist_matrix_solver_t::reset(); }
 
 	ATTR_HOT inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
-	/* ATTR_COLD */ virtual void add_term(int net_idx, netlist_terminal_t *term);
+	virtual void add_term(int net_idx, netlist_terminal_t *term);
 
 	ATTR_HOT virtual nl_double vsolve();
 
