@@ -76,7 +76,7 @@ BUSES["CENTRONICS"] = true
 --------------------------------------------------
 -- This is the list of files that are necessary
 -- for building all of the drivers referenced
--- in tiny.lst
+-- in nl.lst
 --------------------------------------------------
 
 function createProjects_mame_nl(_target, _subtarget)
