@@ -1749,7 +1749,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( honeydol, snowbros_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12MHz like SemiCom or 8MHz (16MHz/2) like snowbros??? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* MC68000P12 @ 12MHz */
 	MCFG_CPU_PROGRAM_MAP(honeydol_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
@@ -1787,7 +1787,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( twinadv, snowbros_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12MHz like SemiCom or 8MHz (16MHz/2) like snowbros??? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12MHz like Honey Dolls ? */
 	MCFG_CPU_PROGRAM_MAP(twinadv_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
