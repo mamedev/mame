@@ -14,36 +14,37 @@
 #include "options.h"
 
 // core directory options
-#define OPTION_HISTORYPATH          "historypath"
-#define OPTION_EXTRAINIPATH         "extrainipath"
-#define OPTION_CABINETS_DIRECTORY   "cabinets_directory"
-#define OPTION_CPANELS_DIRECTORY    "cpanels_directory"
-#define OPTION_PCBS_DIRECTORY       "pcbs_directory"
-#define OPTION_FLYERS_DIRECTORY     "flyers_directory"
-#define OPTION_TITLES_DIRECTORY     "titles_directory"
-#define OPTION_MARQUEES_DIRECTORY   "marquees_directory"
-#define OPTION_ARTPREV_DIRECTORY    "artwork_preview_directory"
-#define OPTION_BOSSES_DIRECTORY     "bosses_directory"
-#define OPTION_LOGOS_DIRECTORY      "logos_directory"
-#define OPTION_SCORES_DIRECTORY     "scores_directory"
-#define OPTION_VERSUS_DIRECTORY     "versus_directory"
-#define OPTION_GAMEOVER_DIRECTORY   "gameover_directory"
-#define OPTION_HOWTO_DIRECTORY      "howto_directory"
-#define OPTION_SELECT_DIRECTORY     "select_directory"
-#define OPTION_ICONS_DIRECTORY      "icons_directory"
+#define OPTION_HISTORYPATH              "historypath"
+#define OPTION_EXTRAINIPATH             "extrainipath"
+#define OPTION_CABINETS_DIRECTORY       "cabinets_directory"
+#define OPTION_CPANELS_DIRECTORY        "cpanels_directory"
+#define OPTION_PCBS_DIRECTORY           "pcbs_directory"
+#define OPTION_FLYERS_DIRECTORY         "flyers_directory"
+#define OPTION_TITLES_DIRECTORY         "titles_directory"
+#define OPTION_MARQUEES_DIRECTORY       "marquees_directory"
+#define OPTION_ARTPREV_DIRECTORY        "artwork_preview_directory"
+#define OPTION_BOSSES_DIRECTORY         "bosses_directory"
+#define OPTION_LOGOS_DIRECTORY          "logos_directory"
+#define OPTION_SCORES_DIRECTORY         "scores_directory"
+#define OPTION_VERSUS_DIRECTORY         "versus_directory"
+#define OPTION_GAMEOVER_DIRECTORY       "gameover_directory"
+#define OPTION_HOWTO_DIRECTORY          "howto_directory"
+#define OPTION_SELECT_DIRECTORY         "select_directory"
+#define OPTION_ICONS_DIRECTORY          "icons_directory"
 
 // core misc options
-#define OPTION_DATS_ENABLED         "dats_enabled"
-#define OPTION_REMEMBER_LAST        "remember_last"
-#define OPTION_ENLARGE_SNAPS        "enlarge_snaps"
-#define OPTION_FORCED4X3            "forced4x3"
-#define OPTION_GROUPED              "grouped"
-#define OPTION_AUDIT_MODE           "audit_mode"
-#define OPTION_USE_BACKGROUND       "usebackground"
+#define OPTION_DATS_ENABLED             "dats_enabled"
+#define OPTION_REMEMBER_LAST            "remember_last"
+#define OPTION_ENLARGE_SNAPS            "enlarge_snaps"
+#define OPTION_FORCED4X3                "forced4x3"
+#define OPTION_GROUPED                  "grouped"
+#define OPTION_AUDIT_MODE               "audit_mode"
+#define OPTION_USE_BACKGROUND           "use_background"
+#define OPTION_START_FILTER             "start_filter"
 
 // core UI options
-#define OPTION_INFOS_SIZE           "infos_text_size"
-#define OPTION_FONT_ROWS            "font_rows"
+#define OPTION_INFOS_SIZE               "infos_text_size"
+#define OPTION_FONT_ROWS                "font_rows"
 
 #define OPTION_UI_BORDER_COLOR          "ui_border_color"
 #define OPTION_UI_BACKGROUND_COLOR      "ui_bg_color"
@@ -95,6 +96,7 @@ public:
 	bool ui_grouped() const { return bool_value(OPTION_GROUPED); }
 	bool audit_mode() const { return bool_value(OPTION_AUDIT_MODE); }
 	bool use_background_image() const { return bool_value(OPTION_USE_BACKGROUND); }
+	int start_filter() const { return int_value(OPTION_START_FILTER); }
 
 	// UI options
 	float infos_size() const { return float_value(OPTION_INFOS_SIZE); }

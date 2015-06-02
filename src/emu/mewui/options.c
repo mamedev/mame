@@ -45,7 +45,8 @@ const options_entry mewui_options::s_option_entries[] =
 	{ OPTION_FORCED4X3,                           "1",  OPTION_BOOLEAN, "force the appearance of the snapshot in the list software to 4:3" },
 	{ OPTION_GROUPED,                             "1",  OPTION_BOOLEAN, "set display mode in selection game menu" },
 	{ OPTION_AUDIT_MODE,                          "0",  OPTION_BOOLEAN, "set audit mode at mewui start" },
-	{ OPTION_USE_BACKGROUND,                      "0",  OPTION_BOOLEAN, "use background images in main view" },
+	{ OPTION_USE_BACKGROUND,                      "0",  OPTION_BOOLEAN, "enable background image in main view" },
+	{ OPTION_START_FILTER,                        "0",  OPTION_INTEGER, "startup filter (0 = ALL, 1 = ARCADES, 2 = SYSTEMS)" },
 
 	// UI options
 	{ NULL,                                      NULL,   OPTION_HEADER, "MEWUI UI OPTIONS" },

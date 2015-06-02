@@ -121,6 +121,7 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 	mewui_globals::switch_image = false;
 	mewui_globals::default_image = true;
 	l_sw_hover = -1;
+	mewui_globals::ume_system = machine.options().start_filter();
 }
 
 //-------------------------------------------------
@@ -129,6 +130,8 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 
 ui_mewui_select_game::~ui_mewui_select_game()
 {
+	std::string error_string;
+	machine().options().set_value(OPTION_START_FILTER, mewui_globals::ume_system, OPTION_PRIORITY_CMDLINE, error_string);
 }
 
 //-------------------------------------------------
