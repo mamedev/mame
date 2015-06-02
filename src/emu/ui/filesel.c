@@ -566,7 +566,8 @@ void ui_menu_file_selector::populate()
 	if (m_has_softlist)
 	{
 		// add the "[software list]" entry
-		append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, NULL, NULL);
+		entry = append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, NULL, NULL);
+		selected_entry = entry;
 	}
 
 	// add the drives
