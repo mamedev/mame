@@ -42,8 +42,6 @@ static const folders_entry s_folders_entry[] =
 	{ NULL }
 };
 
-static bool roms_reset = false;
-
 /**************************************************
     MENU ADD FOLDER
 **************************************************/
@@ -145,7 +143,6 @@ void ui_menu_add_change_folder::handle()
 				{
 					std::string tmppath = std::string(machine().options().value(s_folders_entry[path_ref].option)).append(";").append(current_path.c_str());
 					machine().options().set_value(s_folders_entry[path_ref].option, tmppath.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
-					roms_reset = true;
 				}
 
 				ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
@@ -316,7 +313,6 @@ void ui_menu_add_change_folder::custom_render(void *selectedref, float top, floa
 
 ui_menu_directory::ui_menu_directory(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-	roms_reset = false;
 }
 
 ui_menu_directory::~ui_menu_directory()
@@ -585,7 +581,6 @@ void ui_menu_remove_folder::handle()
 
 		ui_menu::menu_stack->parent->reset(UI_MENU_RESET_REMEMBER_REF);
 		ui_menu::stack_pop(machine());
-		roms_reset = true;
 	}
 }
 

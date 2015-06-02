@@ -132,6 +132,7 @@ ui_mewui_select_game::~ui_mewui_select_game()
 {
 	std::string error_string;
 	machine().options().set_value(OPTION_START_FILTER, mewui_globals::ume_system, OPTION_PRIORITY_CMDLINE, error_string);
+	save_game_options(machine());
 }
 
 //-------------------------------------------------
