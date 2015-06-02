@@ -76,7 +76,7 @@ protected:
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 2 - 1) / 2; } // internal /2 divider
 	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); } // internal /2 divider
 	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 13; }
+	virtual UINT32 execute_max_cycles() const { return 13+7; } // max opcode cycles + interrupt duration
 	virtual UINT32 execute_input_lines() const { return 4; }
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
@@ -193,11 +193,11 @@ private:
 	int timer_tick_simple(int tmr);
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
 	void illegal(UINT8 prefix, UINT8 op);
-	UINT32 do_add(UINT32 a, UINT32 b, UINT32 c);
-	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c);
+	UINT32 do_add(UINT32 a, UINT32 b, UINT32 c = 0);
+	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c = 0);
 	void test_nz16(UINT16 v);
 	void do_jsr(UINT32 to, UINT32 ret);
-	void do_branch(bool state);
+	void do_branch(int condition = 1);
 };
 
 
