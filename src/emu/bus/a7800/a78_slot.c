@@ -488,7 +488,7 @@ void a78_partialhash(hash_collection &dest, const unsigned char *data,
 
 void a78_cart_slot_device::call_unload()
 {
-	if (m_cart && m_cart->get_nvram_size())
+	if (m_cart && m_cart->get_nvram_base() && m_cart->get_nvram_size())
 		battery_save(m_cart->get_nvram_base(), 0x800);
 }
 
