@@ -173,8 +173,8 @@ MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
 	/* basic machine hardware */
 	MCFG_TAITO_ZOOM_ADD("taito_zoom")
 	MCFG_CPU_ADD("mn10200", MN1020012A, XTAL_25MHz/2)
-	MCFG_MN10200_READ_PORT_CB(0, DEVREAD8("taito_zoom", taito_zoom_device, tms_ctrl_r))
-	MCFG_MN10200_WRITE_PORT_CB(0, DEVWRITE8("taito_zoom", taito_zoom_device, tms_ctrl_w))
+	MCFG_MN10200_READ_PORT_CB(1, DEVREAD8("taito_zoom", taito_zoom_device, tms_ctrl_r))
+	MCFG_MN10200_WRITE_PORT_CB(1, DEVWRITE8("taito_zoom", taito_zoom_device, tms_ctrl_w))
 	MCFG_CPU_PROGRAM_MAP(taitozoom_mn_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
