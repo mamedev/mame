@@ -383,6 +383,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/upd765_dsk.h",
 		MAME_DIR .. "src/lib/formats/vdk_dsk.c",
 		MAME_DIR .. "src/lib/formats/vdk_dsk.h",
+		MAME_DIR .. "src/lib/formats/vector06_dsk.c",
+		MAME_DIR .. "src/lib/formats/vector06_dsk.h",
 		MAME_DIR .. "src/lib/formats/victor9k_dsk.c",
 		MAME_DIR .. "src/lib/formats/victor9k_dsk.h",
 		MAME_DIR .. "src/lib/formats/vg5k_cas.c",
