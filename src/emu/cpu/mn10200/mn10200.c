@@ -35,28 +35,88 @@ enum mn10200_flag
 	FLAG_D15 = 0x8000  // ?
 };
 
-const device_type MN1020012A = &device_creator<mn10200_device>;
 
-static ADDRESS_MAP_START( mn1020012_internal_map, AS_PROGRAM, 16, mn10200_device )
+const device_type MN1020012A = &device_creator<mn1020012a_device>;
+
+// internal memory maps
+static ADDRESS_MAP_START( mn1020012a_internal_map, AS_PROGRAM, 16, mn10200_device )
 	AM_RANGE(0x00fc00, 0x00ffff) AM_READWRITE8(io_control_r, io_control_w, 0xffff)
 ADDRESS_MAP_END
 
-mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, "mn1020012a", __FILE__),
-	m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(mn1020012_internal_map)),
-	m_io_config("data", ENDIANNESS_LITTLE, 8, 8, 0)
+
+// device definitions
+mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mn10200_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map), "mn1020012a", __FILE__)
+{ }
+
+
+// disasm
+void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			strprintf(str, "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
+				(m_psw >> 12) & 3,
+				m_psw & FLAG_IE ? "on " : "off",
+				(m_psw >> 8) & 7,
+				m_psw & FLAG_VX ? 'V' : '-',
+				m_psw & FLAG_CX ? 'C' : '-',
+				m_psw & FLAG_NX ? 'N' : '-',
+				m_psw & FLAG_ZX ? 'Z' : '-',
+				m_psw & FLAG_VF ? 'v' : '-',
+				m_psw & FLAG_CF ? 'c' : '-',
+				m_psw & FLAG_NF ? 'n' : '-',
+				m_psw & FLAG_ZF ? 'z' : '-');
+			break;
+	}
 }
+
+offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( mn10200 );
+	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
+}
+
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+enum
+{
+	MN10200_PC = 0,
+	MN10200_PSW,
+	MN10200_MDR,
+	MN10200_D0,
+	MN10200_D1,
+	MN10200_D2,
+	MN10200_D3,
+	MN10200_A0,
+	MN10200_A1,
+	MN10200_A2,
+	MN10200_A3,
+	MN10200_NMICR,
+	MN10200_IAGR
+};
+
 void mn10200_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_io = &space(AS_IO);
+
+	// resolve callbacks
+	m_read_port0.resolve_safe(0xff);
+	m_read_port1.resolve_safe(0xff);
+	m_read_port2.resolve_safe(0xff);
+	m_read_port3.resolve_safe(0xff);
+	m_read_port4.resolve_safe(0xff);
+
+	m_write_port0.resolve_safe();
+	m_write_port1.resolve_safe();
+	m_write_port2.resolve_safe();
+	m_write_port3.resolve_safe();
+	m_write_port4.resolve_safe();
 
 	// init and register for savestates
 	save_item(NAME(m_pc));
@@ -176,34 +236,6 @@ void mn10200_device::device_start()
 }
 
 
-void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str)
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			strprintf(str, "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
-				(m_psw >> 12) & 3,
-				m_psw & FLAG_IE ? "on " : "off",
-				(m_psw >> 8) & 7,
-				m_psw & FLAG_VX ? 'V' : '-',
-				m_psw & FLAG_CX ? 'C' : '-',
-				m_psw & FLAG_NX ? 'N' : '-',
-				m_psw & FLAG_ZX ? 'Z' : '-',
-				m_psw & FLAG_VF ? 'v' : '-',
-				m_psw & FLAG_CF ? 'c' : '-',
-				m_psw & FLAG_NF ? 'n' : '-',
-				m_psw & FLAG_ZF ? 'z' : '-');
-			break;
-	}
-}
-
-
-offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
-{
-	extern CPU_DISASSEMBLE( mn10200 );
-	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
-}
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -234,7 +266,10 @@ void mn10200_device::device_reset()
 }
 
 
-// interrupts
+
+//-------------------------------------------------
+//  interrupts
+//-------------------------------------------------
 
 void mn10200_device::take_irq(int level, int group)
 {
@@ -332,7 +367,10 @@ void mn10200_device::execute_set_input(int irqnum, int state)
 }
 
 
-// 8-bit timers
+
+//-------------------------------------------------
+//  timers
+//-------------------------------------------------
 
 int mn10200_device::timer_tick_simple(int tmr)
 {
@@ -405,7 +443,10 @@ TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 }
 
 
-// opcode handlers
+
+//-------------------------------------------------
+//  opcode helpers
+//-------------------------------------------------
 
 void mn10200_device::illegal(UINT8 prefix, UINT8 op)
 {
@@ -489,6 +530,10 @@ void mn10200_device::do_branch(int condition)
 }
 
 
+
+//-------------------------------------------------
+//  execute loop
+//-------------------------------------------------
 
 void mn10200_device::execute_run()
 {
@@ -1645,7 +1690,10 @@ void mn10200_device::execute_run()
 }
 
 
-// internal i/o
+
+//-------------------------------------------------
+//  internal i/o
+//-------------------------------------------------
 
 WRITE8_MEMBER(mn10200_device::io_control_w)
 {
@@ -2008,19 +2056,19 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		// outputs
 		case 0x3c0:
 			m_port[0].out = data;
-			m_io->write_byte(MN10200_PORT0, m_port[0].out | (m_port[0].dir ^ 0xff));
+			m_write_port0(MN10200_PORT0, m_port[0].out | (m_port[0].dir ^ 0xff), 0xff);
 			break;
 		case 0x264:
 			m_port[1].out = data;
-			m_io->write_byte(MN10200_PORT1, m_port[1].out | (m_port[1].dir ^ 0xff));
+			m_write_port1(MN10200_PORT1, m_port[1].out | (m_port[1].dir ^ 0xff), 0xff);
 			break;
 		case 0x3c2:
 			m_port[2].out = data & 0x0f;
-			m_io->write_byte(MN10200_PORT2, m_port[2].out | (m_port[2].dir ^ 0x0f));
+			m_write_port2(MN10200_PORT2, m_port[2].out | (m_port[2].dir ^ 0x0f), 0xff);
 			break;
 		case 0x3c3:
 			m_port[3].out = data & 0x1f;
-			m_io->write_byte(MN10200_PORT3, m_port[3].out | (m_port[3].dir ^ 0x1f));
+			m_write_port3(MN10200_PORT3, m_port[3].out | (m_port[3].dir ^ 0x1f), 0xff);
 			break;
 
 		// directions (0=input, 1=output)
@@ -2048,7 +2096,6 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 			break;
 	}
 }
-
 
 
 READ8_MEMBER(mn10200_device::io_control_r)
@@ -2152,13 +2199,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 
 		// inputs
 		case 0x3d0:
-			return m_io->read_byte(MN10200_PORT0) | m_port[0].dir;
+			return m_read_port0(MN10200_PORT0, 0xff) | m_port[0].dir;
 		case 0x3d1:
-			return m_io->read_byte(MN10200_PORT1) | m_port[1].dir;
+			return m_read_port1(MN10200_PORT1, 0xff) | m_port[1].dir;
 		case 0x3d2:
-			return (m_io->read_byte(MN10200_PORT2) & 0x0f) | m_port[2].dir;
+			return (m_read_port2(MN10200_PORT2, 0xff) & 0x0f) | m_port[2].dir;
 		case 0x3d3:
-			return (m_io->read_byte(MN10200_PORT3) & 0x1f) | m_port[3].dir;
+			return (m_read_port3(MN10200_PORT3, 0xff) & 0x1f) | m_port[3].dir;
 
 		// directions (0=input, 1=output)
 		case 0x3e0:
