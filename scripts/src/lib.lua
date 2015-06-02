@@ -257,6 +257,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/hect_dsk.h",
 		MAME_DIR .. "src/lib/formats/hect_tap.c",
 		MAME_DIR .. "src/lib/formats/hect_tap.h",
+		MAME_DIR .. "src/lib/formats/hector_minidisc.c",
+		MAME_DIR .. "src/lib/formats/hector_minidisc.h",
 		MAME_DIR .. "src/lib/formats/iq151_dsk.c",
 		MAME_DIR .. "src/lib/formats/iq151_dsk.h",
 		MAME_DIR .. "src/lib/formats/imd_dsk.c",
