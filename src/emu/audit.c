@@ -462,10 +462,16 @@ audit_record *media_auditor::audit_one_disk(const rom_entry *rom, const char *lo
 {
 	// allocate and append a new record
 	audit_record &record = m_record_list.append(*global_alloc(audit_record(*rom, audit_record::MEDIA_DISK)));
+	chd_error err;
 
 	// open the disk
 	chd_file source;
-	chd_error err = chd_error(open_disk_image(m_enumerator.options(), &m_enumerator.driver(), rom, source, locationtag));
+	if (&m_enumerator.driver() != NULL)
+		err = chd_error(open_disk_image(m_enumerator.options(), &m_enumerator.driver(), rom, source, locationtag));
+	else
+		// FIXME: this shouldn't be needed, but when trying to load a CDROM from the internal UI for some reason
+		// the enumerator is created with NULL driver() and we have to catch it by passing through the current options
+		err = chd_error(open_disk_image(m_enumerator.options(), &m_enumerator.driver(m_enumerator.find(m_enumerator.options().system_name())), rom, source, locationtag));
 
 	// if we succeeded, get the hashes
 	if (err == CHDERR_NONE)
