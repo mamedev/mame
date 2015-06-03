@@ -32,9 +32,8 @@
  - dquizgo2: bugged video test
 
  Notes:
-
- Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB that
-   Semicom also used for Toy Land Adventure & SemiComDate Quiz Go Go Episode 2 game.
+ 
+ Mr Kicker: The F-E1-16-010 PCB version still needs proper speed ups
 
  Mr Kicker: Doesn't boot without a valid default eeprom, but no longer seems to fail
             after you get a high score (since eeprom rewrite).
@@ -2177,7 +2176,6 @@ ROM_END
 Mr. Kicker (c) SemiCom
 
 SEMICOM-003b
-
 +---------------------------------------------+
 |                     +------+                |
 |            YM3012   |  U7  |                |
@@ -2218,12 +2216,56 @@ SW1 is the reset button
 SW2 is the setup button
 VR1 is the volume adjust pot
 
+
+F-E1-16-010
++-----------------------------------------------+
+|     VR1          YM3012  VROM1                |
+|                  YM2151  M6295   ROML03 ROMU03|
+|               CRAM2              ROML02 ROMU02|
+|               CRAM1              ROML01 ROMU01|
+|               MEM1L              ROML00 ROMU00|
+|J              MEM1U                           |
+|A              MEM2  +----------++----------+  |
+|M                    |          ||          |  |
+|M              MEM3  |Quicklogic||Quicklogic| 2|
+|A                    | QL2003-  || QL2003-  | 8|
+|               MEM6  | XPL84C   || XPL84C   | M|
+|                     |          ||          | H|
+|               MEM7  +----------++----------+ z|
+|                      GAL                      |
+|    93C46                       ROM1*          |
+|P1 P2   50MHz E1-16T   DRAM1    ROM2           |
++-----------------------------------------------+
+
+Notes:
+CPU - Hyperstone E1-16T @ 50.000MHz
+
+DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+CRAMx - W24M257AK-15 32K x8 SRAM (SOJ28)
+MEMx  - UM61256FK-15 32K x8 SRAM (SOJ28)
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151 rebaged as BS902/KA51
+
+ P1 - Reset push button
+ P2 - Setup push button
+VR1 - Volume adjust pot
+
+ROMs:
+    ROML00 & ROMH00 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML01 & ROMH01 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML02 & ROMH02 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    ROML03 & ROMH03 - Unpopulated space for MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1           - MX 27C2000 2MBit DIP32 EPROM
+  * ROM1            - Unpopulated space for DIP32 EPROM (up to 4MBit)
+    ROM2            - 27C040 4MBit DIP32 EPROM
+
 */
 
 ROM_START( mrkicker )
 	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* rom0 empty */
-	ROM_LOAD( "2-semicom.rom1", 0x080000, 0x080000, CRC(d3da29ca) SHA1(b843c650096a1c6d50f99e354ec0c93eb4406c5b) )
+	ROM_LOAD( "2-semicom.rom1", 0x080000, 0x080000, CRC(d3da29ca) SHA1(b843c650096a1c6d50f99e354ec0c93eb4406c5b) ) /* SEMICOM-003b PCB */
 
 	ROM_REGION( 0x800000, "gfx1", 0 )  /* gfx data */
 	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(c677aac3) SHA1(356073a29260e8e6c29dd12b2113b30140c6108c) )
@@ -2252,17 +2294,21 @@ ROM_END
 
 ROM_START( mrkickera )
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	/* rom0 empty */
-	ROM_LOAD( "3.rom2", 0x080000, 0x080000, CRC(3f7fa08b) SHA1(dbffd44d8387e6ed1a4b5ec85ccf64d69a108d88) )
+	/* rom1 empty */
+	ROM_LOAD( "3-semicom.rom2", 0x080000, 0x080000, CRC(3f7fa08b) SHA1(dbffd44d8387e6ed1a4b5ec85ccf64d69a108d88) ) /* F-E1-16-010 PCB */
 
 	ROM_REGION( 0x800000, "gfx1", 0 )  /* gfx data */
 	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(c677aac3) SHA1(356073a29260e8e6c29dd12b2113b30140c6108c) )
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(b6337d4a) SHA1(2f46e2933af7fd0f71083900d5e6e4f602ab4c66) )
 	/* roml01 empty */
 	/* romh01 empty */
+	/* roml02 empty */
+	/* romh02 empty */
+	/* roml03 empty */
+	/* romh03 empty */
 
 	ROM_REGION( 0x080000, "user2", 0 ) /* Oki Samples */
-	ROM_LOAD( "at27c040.u7", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* Mask ROM */
+	ROM_LOAD( "11-semicom.vrom1", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* same data as above */
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
@@ -2946,7 +2992,7 @@ GAME( 2000, misncrfta, misncrft, misncrft, common,   vamphalf_state, misncrft, R
 GAME( 2000, mrdig,     0,        mrdig,    common,   vamphalf_state, mrdig,    ROT0,   "Sun",               "Mr. Dig", GAME_SUPPORTS_SAVE )
 GAME( 2001, dtfamily,  0,        coolmini, common,   vamphalf_state, dtfamily, ROT0,   "SemiCom",           "Diet Family", GAME_SUPPORTS_SAVE )
 GAME( 2001, finalgdr,  0,        finalgdr, finalgdr, vamphalf_state, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", GAME_SUPPORTS_SAVE )
-GAME( 2001, mrkicker,  0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_SUPPORTS_SAVE )
+GAME( 2001, mrkicker,  0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker (SEMICOM-003b PCB)", GAME_SUPPORTS_SAVE )
 GAME( 2001, mrkickera, mrkicker, coolmini, common,   vamphalf_state, mrkickera,ROT0,   "SemiCom",           "Mr. Kicker (F-E1-16-010 PCB)", GAME_SUPPORTS_SAVE )
 GAME( 2001, toyland,   0,        coolmini, common,   vamphalf_state, toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", GAME_SUPPORTS_SAVE )
 GAME( 2001, wivernwg,  0,        wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom",           "Wivern Wings", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
