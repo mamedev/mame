@@ -3,7 +3,10 @@
 
 <!-- NOTE: highlight should be a bit star-shaped, not doable in MAME internal layout -->
 
-	<element name="highlight_explosion"><disk><color red="0.875" green="1.0" blue="0.125" /></disk></element>
+	<element name="highlight_explosion">
+	<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
+	<disk><color red="0.875" green="1.0" blue="0.125" /></disk>
+	</element>
 	<element name="static_green"><rect><color red="0.125" green="0.875" blue="0" /></rect></element>
 
 
