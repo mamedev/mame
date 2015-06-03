@@ -14,8 +14,8 @@ MAY-2015 System11
 
 - added turtshipko and turtshipkn.
 - amended comments for T-5 instances, A14 is tied high on the PCBs hence the need to load the higher half of the ROM only
-- order of age is guessed - turtshipko has grey bullets and is the only revision to have these, probably fixed based on feedback before it was licensed to Sharp Image and Pacific Games - differences between US/JP/Korea versions previously in MAME are minimal.
-- turtshipkn I assume is newer, the level order has changed and the disclaimer is in pure Korean however the orange bullets are retained.  Given the 88/9 release date from the startup screen it would seem unlikely that this came out first, then got grey bullets and back to orange in time for it to still be a 1988 game in other countries.
+- order of age is guessed - turtshipko has grey bullets and a different level order, 3x horizontal and then 3x vertical (as far as tested).  Bullets probably fixed based on feedback before it was licensed to Sharp Image and Pacific Games - differences between US/JP/Korea versions previously in MAME are minimal.
+- turtshipkn I assume is newer, the disclaimer is in pure Korean and the orange bullets are retained.  Given the 88/9 release date from the startup screen it would seem unlikely that this came out first, then got grey bullets and back to orange in time for it to still be a 1988 game in other countries.
 
 JUL-2003 AAT
 
