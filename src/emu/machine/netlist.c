@@ -13,6 +13,7 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/nl_factory.h"
+#include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
 #include "debugger.h"
 
@@ -632,4 +633,15 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 		m_out[i]->sound_update(cur);
 		m_out[i]->buffer_reset(cur);
 	}
+}
+
+// ----------------------------------------------------------------------------------------
+// memregion source support
+// ----------------------------------------------------------------------------------------
+
+bool netlist_source_memregion_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	const char *mem = (const char *)downcast<netlist_mame_t &>(setup->netlist()).machine().root_device().memregion(m_name.cstr())->base();
+	netlist_parser p(*setup);
+	return p.parse(mem, name);
 }

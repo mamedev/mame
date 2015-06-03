@@ -52,6 +52,7 @@ bool netlist_parser::parse(const char *buf, const pstring nlname)
 	m_tok_PARAM = register_token("PARAM");
 	m_tok_NET_MODEL = register_token("NET_MODEL");
 	m_tok_INCLUDE = register_token("INCLUDE");
+	m_tok_LOCAL_SOURCE = register_token("LOCAL_SOURCE");
 	m_tok_SUBMODEL = register_token("SUBMODEL");
 	m_tok_NETLIST_START = register_token("NETLIST_START");
 	m_tok_NETLIST_END = register_token("NETLIST_END");
@@ -124,6 +125,8 @@ void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			net_submodel();
 		else if (token.is(m_tok_INCLUDE))
 			net_include();
+		else if (token.is(m_tok_LOCAL_SOURCE))
+			net_local_source();
 		else if (token.is(m_tok_TRUTHTABLE_START))
 			net_truthtable_start();
 		else if (token.is(m_tok_NETLIST_END))
@@ -210,8 +213,7 @@ void netlist_parser::net_submodel()
 	require_token(m_tok_param_right);
 
 	m_setup.namespace_push(name);
-	netlist_parser subparser(m_setup);
-	subparser.parse(m_buf, model);
+	m_setup.include(name);
 	m_setup.namespace_pop();
 }
 
@@ -221,8 +223,15 @@ void netlist_parser::net_include()
 	pstring name = get_identifier();
 	require_token(m_tok_param_right);
 
-	netlist_parser subparser(m_setup);
-	subparser.parse(m_buf, name);
+	m_setup.include(name);
+}
+
+void netlist_parser::net_local_source()
+{
+	// This directive is only for hardcoded netlists. Ignore it here.
+	pstring name = get_identifier();
+	require_token(m_tok_param_right);
+
 }
 
 void netlist_parser::net_alias()
