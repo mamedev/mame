@@ -105,7 +105,7 @@ private:
 		bool m_has_val;
 	};
 
-	struct sp_unit {
+	struct _sp_unit {
 		pstring sp_unit;
 		pstring nl_func;
 		double mult;
@@ -136,7 +136,7 @@ private:
 	plist_t<pstring> m_ext_alias;
 	pnamedlist_t<sp_pin_alias_t *> m_pins;
 
-	static sp_unit m_sp_units[];
+	static _sp_unit m_sp_units[];
 
 };
 
