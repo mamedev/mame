@@ -11171,11 +11171,12 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="towercab">
+<!--	<software name="towercab">
 		<description>The Tower? of Cabin - Cabin Panic (Jpn)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
 	</software>
+-->
 
 	<software name="towercaba" cloneof="towercab">
 		<description>The Tower? of Cabin - Cabin Panic (Jpn, Alt)</description>
