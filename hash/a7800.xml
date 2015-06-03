@@ -2371,8 +2371,6 @@ almost nothing like the prototype.
 
 	<!-- XM board enhanced -->
     <!-- from http://atariage.com/forums/topic/204250-donkey-kong-xm-pre-order-and-demo/ -->
-    <!-- what is this? was listed alongside the 1.2 files, doesn't run -->
-    <!-- <rom name="dkxm_final_demo.bin" size="147456" crc="fd503bd4" sha1="454d754a0c4603323e476d9418f343a6a1a0d017" offset="0" /> -->
 
     <software name="dkongxm" supported="no">
       <description>Donkey Kong (PAL, Demo, XM enhanced, V1.2)</description>
@@ -2402,6 +2400,21 @@ almost nothing like the prototype.
       </part>
     </software>
 
+    <!-- this one is meant to detect PAL / NTSC and runs on an A7800 CC2 development board -->
+    <software name="dkongxmcc" cloneof="dkongxm" supported="no">
+      <description>Donkey Kong (PAL/NTSC, Demo, XM enhanced, V1.2, for CC2 board)</description>
+      <year>2012</year>
+      <publisher>&lt;homebrew&gt;</publisher>
+      <info name="programmer" value="TEP392" />
+      <part name="cart" interface="a7800_cart">
+        <feature name="slot" value="a78_sg9" />
+        <dataarea name="rom" size="147456">
+          <rom name="dkxm_final_demo.bin" size="0x20000" crc="fd503bd4" sha1="454d754a0c4603323e476d9418f343a6a1a0d017" offset="0x4000" />
+          <rom size="0x4000" offset="0x0000" loadflag="continue" />
+        </dataarea>
+      </part>
+    </software>
+ 
     <!-- todo, work out why the above fail to produce pokey sounds, once they work remove these -->
     <software name="dkongxmf" cloneof="dkongxm">
       <description>Donkey Kong (PAL, Demo, XM enhanced, V1.2, for emulators)</description>
