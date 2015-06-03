@@ -22,7 +22,7 @@ ATTR_COLD netlist_generic_diode::netlist_generic_diode()
 
 ATTR_COLD void netlist_generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
 {
-	static const int csqrt2 = nl_math::sqrt(2.0);
+	static const double csqrt2 = nl_math::sqrt(2.0);
 	m_Is = Is;
 	m_n = n;
 	m_gmin = gmin;

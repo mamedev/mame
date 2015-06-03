@@ -1016,9 +1016,9 @@ public:
 		inc_stat(stat_update_count);
 
 #if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-		(this->*static_update)();
+		(this->*m_static_update)();
 #elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-		static_update(this);
+		m_static_update(this);
 #else
 		update();
 #endif
@@ -1075,7 +1075,7 @@ protected:
 
 private:
 #if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
-	net_update_delegate static_update;
+	net_update_delegate m_static_update;
 #endif
 };
 

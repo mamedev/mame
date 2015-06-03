@@ -42,7 +42,7 @@ NETLIB_RESET(74192)
 }
 
 // FIXME: Timing
-static const netlist_time delay[4] =
+/* static */ const netlist_time delay[4] =
 {
 		NLTIME_FROM_NS(40),
 		NLTIME_FROM_NS(40),

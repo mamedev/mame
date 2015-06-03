@@ -61,17 +61,22 @@ public:
 #if 0
 	inline static double fastexp_h(const double x)
 	{
-		static const double ln2r = 1.442695040888963387;
-		static const double ln2  = 0.693147180559945286;
-		static const double c3   = 0.166666666666666667;
+		/* static */ const double ln2r = 1.442695040888963387;
+		/* static */ const double ln2  = 0.693147180559945286;
+		/* static */ const double c3   = 0.166666666666666667;
+		/* static */ const double c4   = 1.0 / 24.0;
+		/* static */ const double c5   = 1.0 / 120.0;
 
 		const double y = x * ln2r;
-		const unsigned int t = y;
+		const UINT32 t = y;
 		const double z = (x - ln2 * (double) t);
-		const double zz = z * z;
-		const double zzz = zz * z;
+		const double e = (1.0 + z * (1.0 + z * (0.5 + z * (c3  + z * (c4 + c5*z)))));
 
-		return (double)(1 << t)*(1.0 + z + 0.5 * zz + c3 * zzz);
+		if (t < 63)
+			//return (double)((UINT64) 1 <<  t)*(1.0 + z + 0.5 * zz + c3 * zzz+c4*zzzz+c5*zzzzz);
+			return (double)((UINT64) 1 <<  t) * e;
+		else
+			return pow(2.0, t)*e;
 	}
 
 	ATTR_HOT inline static double exp(const double x)

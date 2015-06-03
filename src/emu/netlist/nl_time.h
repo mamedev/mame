@@ -23,13 +23,13 @@
 // net_list_time
 // ----------------------------------------------------------------------------------------
 
+#define RESOLUTION NETLIST_INTERNAL_RES
+
 struct netlist_time
 {
 public:
 
 	typedef UINT64 INTERNALTYPE;
-
-	static const INTERNALTYPE RESOLUTION = NETLIST_INTERNAL_RES;
 
 	ATTR_HOT /* inline */ netlist_time() : m_time(0) {}
 
@@ -73,6 +73,8 @@ protected:
 private:
 	INTERNALTYPE m_time;
 };
+
+#undef RESOLUTION
 
 template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist_time &nlt, const void *owner, const pstring &stname)
 {
