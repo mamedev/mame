@@ -7,8 +7,6 @@
 #ifndef __990_DK__
 #define __990_DK__
 
-#include "imagedev/flopdrv.h"
-
 extern const device_type FD800;
 
 #define MAX_FLOPPIES 4
@@ -61,14 +59,14 @@ private:
 
 	struct
 	{
-		legacy_floppy_image_device *img;
+	//  legacy_floppy_image_device *img;
 		int phys_cylinder;
 		int log_cylinder[2];
 		int seclen;
 	} m_drv[MAX_FLOPPIES];
 };
 
-LEGACY_FLOPPY_OPTIONS_EXTERN(fd800);
+// LEGACY_FLOPPY_OPTIONS_EXTERN(fd800);
 
 #define MCFG_FD800_INT_HANDLER( _intcallb ) \
 	devcb = &fd800_legacy_device::static_set_int_callback( *device, DEVCB_##_intcallb );
