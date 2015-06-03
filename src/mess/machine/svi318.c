@@ -12,7 +12,6 @@
 #include "includes/svi318.h"
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
-#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/svi_cas.h"
 #include "sound/ay8910.h"
