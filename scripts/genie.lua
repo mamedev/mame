@@ -665,7 +665,7 @@ end
 		}
 	end
 -- add -g if we need symbols, and ensure we have frame pointers
-if _OPTIONS["SYMBOLS"]~=nil then
+if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	buildoptions {
 		"-g" .. _OPTIONS["SYMLEVEL"],
 		"-fno-omit-frame-pointer",
@@ -710,7 +710,7 @@ if _OPTIONS["PROFILE"] then
 	}
 end
 
-if _OPTIONS["SYMBOLS"]~=nil then
+if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	flags {
 		"Symbols",
 	}
