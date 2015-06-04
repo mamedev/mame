@@ -1310,7 +1310,7 @@ DRIVER_INIT_MEMBER(paradise_state,torus)
 
 GAME( 1994,  paradise, 0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (Escape)", GAME_SUPPORTS_SAVE )
+GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung (Escape license)", "Paradise (Escape)", GAME_SUPPORTS_SAVE )
 GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // year not shown, but should be >=1994
 GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // year not shown, but should be >=1994
 GAME( 1995,  tgtball,  0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
