@@ -670,7 +670,7 @@ phoenixb        // (c) 1980 Amstar + Centuri license
 phoenixt        // (c) 1980 Taito
 phoenixj        // (c) 1980 Taito
 phoenix3        // bootleg
-phoenixdal  // bootleg D&L (No copyright/title)
+phoenixdal      // bootleg D&L (No copyright/title)
 phoenixc        // bootleg
 phoenixc2       // bootleg
 phoenixc3       // bootleg
@@ -730,7 +730,7 @@ nrallyx         // (c) 1981 Namco
 nrallyxb        // (c) 1981 Namco
 jungler         // GX327 (c) 1981 Konami
 junglers        // GX327 (c) 1981 Stern
-jackler     // 1 9 8 2 (Jungler Bootleg)
+jackler         // 1 9 8 2 (Jungler Bootleg)
 savanna         // Olympia (c) 1982 (Jungler bootleg)
 tactcian        // GX335 (c) 1982 Sega
 tactcian2       // GX335 (c) 1981 Sega
@@ -1788,13 +1788,13 @@ horizon         // (c) 1985
 youjyudn        // (c) 1986 (Japan)
 
 vigilant        // (c) 1988 (World Rev E)
-vigilanta   // (c) 1988 (World Rev A)
+vigilanta       // (c) 1988 (World Rev A)
 vigilantb       // (c) 1988 (US Rev B)
-vigilantc   // (c) 1988 (World Rev C)
+vigilantc       // (c) 1988 (World Rev C)
 vigilantd       // (c) 1988 (Japan Rev D)
-vigilantg   // (c) 1988 (US Rev G)
-vigilano    // (c) 1988 (US)
-vigilanbl   // bootleg
+vigilantg       // (c) 1988 (US Rev G)
+vigilano        // (c) 1988 (US)
+vigilanbl       // bootleg
 kikcubic        // (c) 1988 (Japan)
 kikcubicb       // bootleg
 buccanrs        // (c) 1989 Duintronic
@@ -3015,8 +3015,8 @@ sidearmsj       // 12/1986 (c) 1986 (Japan)
 turtship        // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 turtshipj       // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 turtshipk       // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
-turtshipko       // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
-turtshipkn	// (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtshipko      // (c) 1988 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
+turtshipkn      // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 dyger           // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 dygera          // (c) 1989 Philko (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 twinfalc        // (c) 1989 Philko (Poara Enterprises license) (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
@@ -6639,7 +6639,7 @@ overdriva       // GX789 (c) 1990
 overdrivb       // GX789 (c) 1990
 gradius3        // GX945 (c) 1989 (World)
 gradius3j       // GX945 (c) 1989 (Japan)
-gradius3js	// GX945 (c) 1989 (Japan, split)
+gradius3js      // GX945 (c) 1989 (Japan, split)
 gradius3a       // GX945 (c) 1989 (Asia)
 
 // Konami 68020 games
@@ -9372,7 +9372,7 @@ missmw96        // (c) 1996 Comad
 smissw          //
 fantsia2        // (c) 1997 Comad
 fantsia2a       // (c) 1997 Comad
-fantsia2n	// (c) 1998 Comad
+fantsia2n       // (c) 1998 Comad
 wownfant        // (c) 2002 Comad
 pgalvip         // (c) 1996 ACE International (Afega stickers on ROMs)
 pgalvipa        //
@@ -9483,8 +9483,8 @@ suprridr        // (c) 1983 Venture Line + Taito license
 
 // Yun Sung games
 paradise        // (c) 1994 Yun Sung
-paradisea	// (c) 1994 Yun Sung
-paradisee	// (c) 1994 Yun Sung (Escape license)
+paradisea       // (c) 1994 Yun Sung
+paradisee       // (c) 1994 Yun Sung (Escape license)
 paradlx         // (c) >1994 Yun Sung
 para2dx         // (c) >1994 Yun Sung
 penky           // (c) 1995 Yun Sung
