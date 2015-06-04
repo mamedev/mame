@@ -265,6 +265,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/imd_dsk.h",
 		MAME_DIR .. "src/lib/formats/ipf_dsk.c",
 		MAME_DIR .. "src/lib/formats/ipf_dsk.h",
+		MAME_DIR .. "src/lib/formats/jvc_dsk.c",
+		MAME_DIR .. "src/lib/formats/jvc_dsk.h",
 		MAME_DIR .. "src/lib/formats/kaypro_dsk.c",
 		MAME_DIR .. "src/lib/formats/kaypro_dsk.h",
 		MAME_DIR .. "src/lib/formats/kc_cas.c",
