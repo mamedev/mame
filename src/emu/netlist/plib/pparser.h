@@ -51,13 +51,13 @@ public:
 			m_id = token_id_t(-1);
 			m_token ="";
 		}
-		token_t(token_type type, const pstring str)
+		token_t(token_type type, const pstring &str)
 		{
 			m_type = type;
 			m_id = token_id_t(-1);
 			m_token = str;
 		}
-		token_t(const token_id_t id, const pstring str)
+		token_t(const token_id_t id, const pstring &str)
 		{
 			m_type = TOKEN;
 			m_id = id;

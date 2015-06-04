@@ -72,8 +72,23 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portb_w )
 
 WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
 {
-	m_fdc->set_drive((data & 0x03));
-	m_fdc->set_side(BIT(data, 2));
+	floppy_image_device *floppy = NULL;
+
+	switch (data & 0x03)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	case 2: floppy = m_floppy2->get_device(); break;
+	case 3: floppy = m_floppy3->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 2));
+	}
 }
 
 /* Serial port USART, unimplemented as yet */
@@ -139,13 +154,6 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
 	m_fdc->write(space, offset>>1, data);
 }
 
-WRITE_LINE_MEMBER( mbc55x_state::mbc55x_fdc_intrq_w )
-{
-}
-
-WRITE_LINE_MEMBER( mbc55x_state::mbc55x_fdc_drq_w )
-{
-}
 
 /*
     Keyboard emulation

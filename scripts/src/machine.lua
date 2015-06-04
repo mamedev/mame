@@ -2662,3 +2662,14 @@ if (MACHINES["PCI9050"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/emu/machine/netlist.h,MACHINES += NETLIST
+---------------------------------------------------
+
+if (MACHINES["NETLIST"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/netlist.c",
+		MAME_DIR .. "src/emu/machine/netlist.h",
+	}
+end

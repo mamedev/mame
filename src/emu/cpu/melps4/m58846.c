@@ -30,7 +30,7 @@ ADDRESS_MAP_END
 
 // device definitions
 m58846_device::m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: melps4_cpu_device(mconfig, M58846, "M58846", tag, owner, clock, 11, ADDRESS_MAP_NAME(program_2kx9), 7, ADDRESS_MAP_NAME(data_128x4), "m58846", __FILE__)
+	: melps4_cpu_device(mconfig, M58846, "M58846", tag, owner, clock, 11, ADDRESS_MAP_NAME(program_2kx9), 7, ADDRESS_MAP_NAME(data_128x4), 12 /* number of D pins */, 2 /* subroutine page */, 1 /* interrupt page */, "m58846", __FILE__)
 { }
 
 
@@ -50,10 +50,6 @@ offs_t m58846_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 void m58846_device::device_start()
 {
 	melps4_cpu_device::device_start();
-
-	// set fixed state
-	m_bm_page = 2;
-	m_int_page = 1;
 }
 
 
@@ -115,6 +111,7 @@ void m58846_device::execute_one()
 		case 0x0b: op_ose(); break;
 		case 0x0c: op_tya(); break;
 		case 0x0f: op_cma(); break;
+		// 0x18 RAR undocumented?
 
 		case 0x10: op_cls(); break;
 		case 0x11: op_clds(); break;

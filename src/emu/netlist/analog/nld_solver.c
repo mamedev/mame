@@ -64,11 +64,11 @@ ATTR_COLD void terms_t::set_pointers()
 // netlist_matrix_solver
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t &params)
+ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t *params)
 : m_stat_calculations(0),
 	m_stat_newton_raphson(0),
 	m_stat_vsolver_calls(0),
-	m_params(params),
+	m_params(*params),
 	m_cur_ts(0),
 	m_type(type)
 {
@@ -399,9 +399,9 @@ template <int m_N, int _storage_N>
 netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int gs_threshold, const bool use_specific)
 {
 	if (use_specific && m_N == 1)
-		return palloc(netlist_matrix_solver_direct1_t, m_params);
+		return palloc(netlist_matrix_solver_direct1_t, &m_params);
 	else if (use_specific && m_N == 2)
-		return palloc(netlist_matrix_solver_direct2_t, m_params);
+		return palloc(netlist_matrix_solver_direct2_t, &m_params);
 	else
 	{
 		if (size >= gs_threshold)
@@ -409,18 +409,18 @@ netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int
 			if (USE_MATRIX_GS)
 			{
 				typedef netlist_matrix_solver_SOR_mat_t<m_N,_storage_N> solver_mat;
-				return palloc(solver_mat, m_params, size);
+				return palloc(solver_mat, &m_params, size);
 			}
 			else
 			{
 				typedef netlist_matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
-				return palloc(solver_GS, m_params, size);
+				return palloc(solver_GS, &m_params, size);
 			}
 		}
 		else
 		{
 			typedef netlist_matrix_solver_direct_t<m_N,_storage_N> solver_D;
-			return palloc(solver_D, m_params, size);
+			return palloc(solver_D, &m_params, size);
 		}
 	}
 }

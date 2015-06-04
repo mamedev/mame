@@ -15,7 +15,8 @@
 #include "emu.h"
 #include "bml3bus.h"
 #include "imagedev/flopdrv.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -36,13 +37,18 @@ public:
 	DECLARE_READ8_MEMBER(bml3_mp1802_r);
 	DECLARE_WRITE8_MEMBER(bml3_mp1802_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_wd17xx_intrq_w);
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	required_device<mb8866_device> m_wd17xx;
-
 private:
+	required_device<mb8866_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+
 	UINT8 *m_rom;
 };
 

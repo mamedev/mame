@@ -215,6 +215,8 @@ void nubus_image_device::device_start()
 
 	filectx.curdir[0] = '.';
 	filectx.curdir[1] = '\0';
+	filectx.dirp = NULL;
+	filectx.fd = NULL;
 }
 
 //-------------------------------------------------
@@ -280,7 +282,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		strcpy((char*)filectx.filename, (char*)filectx.curdir);
 		break;
 	case kFileCmdSetDir:
-		if(filectx.filename[0] == '/') {
+		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
 			strcpy((char*)filectx.curdir, (char*)filectx.filename);
 		} else {
 			strcat((char*)filectx.curdir, "/");
@@ -291,10 +293,15 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		if(filectx.dirp) osd_closedir(filectx.dirp);
 		filectx.dirp = osd_opendir((const char *)filectx.curdir);
 	case kFileCmdGetNextListing:
-		dp = osd_readdir(filectx.dirp);
-		if(dp) {
-			strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
-		} else {
+		if (filectx.dirp) {
+			dp = osd_readdir(filectx.dirp);
+			if(dp) {
+				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
+			} else {
+				memset(filectx.filename, 0, sizeof(filectx.filename));
+			}
+		}
+		else {
 			memset(filectx.filename, 0, sizeof(filectx.filename));
 		}
 		break;

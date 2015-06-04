@@ -7,6 +7,8 @@
 #ifndef _PSTRING_H_
 #define _PSTRING_H_
 
+#include <cstdarg>
+
 #include "pconfig.h"
 
 // ----------------------------------------------------------------------------------------
@@ -36,7 +38,7 @@ public:
 
 	// C string conversion operators and helpers
 	operator const char *() const { return m_ptr->str(); }
-	inline const char *cstr() const { return m_ptr->str(); }
+	const char *cstr() const { return m_ptr->str(); }
 
 	// concatenation operators
 	pstring& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
@@ -61,13 +63,13 @@ public:
 	bool operator>=(const char *string) const { return (pcmp(string) >= 0); }
 	bool operator>=(const pstring &string) const { return (pcmp(string.cstr()) >= 0); }
 
-	inline int len() const { return m_ptr->len(); }
+	int len() const { return m_ptr->len(); }
 
-	inline bool equals(const pstring &string) const { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
-	inline bool iequals(const pstring &string) const { return (pcmpi(string.cstr(), m_ptr->str()) == 0); }
+	bool equals(const pstring &string) const { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
+	bool iequals(const pstring &string) const { return (pcmpi(string.cstr(), m_ptr->str()) == 0); }
 
-	inline int cmp(const pstring &string) const { return pcmp(string.cstr()); }
-	inline int cmpi(const pstring &string) const { return pcmpi(cstr(), string.cstr()); }
+	int cmp(const pstring &string) const { return pcmp(string.cstr()); }
+	int cmpi(const pstring &string) const { return pcmpi(cstr(), string.cstr()); }
 
 	int find(const char *search, int start = 0) const;
 
@@ -75,28 +77,28 @@ public:
 
 	// various
 
-	inline bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
+	bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
 	bool startsWith(const char *arg) const;
 
 	pstring replace(const pstring &search, const pstring &replace) const;
 
 	// these return nstring ...
-	inline pstring cat(const pstring &s) const { return *this + s; }
-	inline pstring cat(const char *s) const { return *this + s; }
+	const pstring cat(const pstring &s) const { return *this + s; }
+	const pstring cat(const char *s) const { return *this + s; }
 
-	pstring substr(unsigned int start, int count = -1) const ;
+	const pstring substr(unsigned int start, int count = -1) const ;
 
-	inline pstring left(unsigned int count) const { return substr(0, count); }
-	inline pstring right(unsigned int count) const  { return substr(len() - count, count); }
+	const pstring left(unsigned int count) const { return substr(0, count); }
+	const pstring right(unsigned int count) const  { return substr(len() - count, count); }
 
-	int find_first_not_of(const pstring no) const;
-	int find_last_not_of(const pstring no) const;
+	int find_first_not_of(const pstring &no) const;
+	int find_last_not_of(const pstring &no) const;
 
-	pstring ltrim(const pstring ws = " \t\n\r") const;
-	pstring rtrim(const pstring ws = " \t\n\r") const;
-	inline pstring trim(const pstring ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
+	const pstring ltrim(const pstring &ws = " \t\n\r") const;
+	const pstring rtrim(const pstring &ws = " \t\n\r") const;
+	const pstring trim(const pstring &ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
 
-	pstring rpad(const pstring ws, const int cnt) const
+	const pstring rpad(const pstring &ws, const int cnt) const
 	{
 		// FIXME: slow!
 		pstring ret = *this;
@@ -105,7 +107,7 @@ public:
 		return ret.substr(0, cnt);
 	}
 
-	pstring ucase() const;
+	const pstring ucase() const;
 
 	// conversions
 
@@ -115,10 +117,10 @@ public:
 
 	// printf using string as format ...
 
-	pstring vprintf(va_list args) const;
+	const pstring vprintf(va_list args) const;
 
 	// static
-	static pstring sprintf(const char *format, ...) ATTR_PRINTF(1,2);
+	static const pstring sprintf(const char *format, ...) ATTR_PRINTF(1,2);
 	static void resetmem();
 
 protected:
@@ -147,13 +149,13 @@ protected:
 	str_t *m_ptr;
 
 private:
-	inline void init()
+	void init()
 	{
 		m_ptr = &m_zero;
 		m_ptr->m_ref_count++;
 	}
 
-	inline int pcmp(const char *right) const
+	int pcmp(const char *right) const
 	{
 		return pcmp(m_ptr->str(), right);
 	}
@@ -166,7 +168,7 @@ private:
 
 	void pcopy(const char *from);
 
-	inline void pcopy(const pstring &from)
+	void pcopy(const pstring &from)
 	{
 		sfree(m_ptr);
 		m_ptr = from.m_ptr;
@@ -212,7 +214,7 @@ public:
 
 	// C string conversion operators and helpers
 	operator const char *() const { return m_ptr; }
-	inline const char *cstr() const { return m_ptr; }
+	const char *cstr() const { return m_ptr; }
 
 	operator pstring() const { return pstring(m_ptr); }
 
@@ -220,10 +222,10 @@ public:
 	pstringbuffer& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
 	pstringbuffer& operator+=(const pstring &string) { pcat(string.cstr()); return *this; }
 
-	inline std::size_t len() const { return m_len; }
+	std::size_t len() const { return m_len; }
 
-	inline void cat(const pstring &s) { pcat(s); }
-	inline void cat(const char *s) { pcat(s); }
+	void cat(const pstring &s) { pcat(s); }
+	void cat(const char *s) { pcat(s); }
 
 	pstring substr(unsigned int start, int count = -1)
 	{
@@ -232,7 +234,7 @@ public:
 
 private:
 
-	inline void init()
+	void init()
 	{
 		m_ptr = NULL;
 		m_size = 0;

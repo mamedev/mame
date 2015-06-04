@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         Hawthorne Technology TinyGiant HT68k

@@ -97,7 +97,7 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 // desc
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void truthtable_desc_t::help(unsigned cur, pstring_list_t list,
+void truthtable_desc_t::help(unsigned cur, pstring_list_t list,
 		UINT64 state,UINT16 val, UINT8 *timing_index)
 {
 	pstring elem = list[cur].trim();
@@ -142,7 +142,7 @@ ATTR_COLD void truthtable_desc_t::help(unsigned cur, pstring_list_t list,
 	}
 }
 
-ATTR_COLD void truthtable_desc_t::setup(const pstring_list_t &truthtable, UINT32 disabled_ignore)
+void truthtable_desc_t::setup(const pstring_list_t &truthtable, UINT32 disabled_ignore)
 {
 	unsigned line = 0;
 

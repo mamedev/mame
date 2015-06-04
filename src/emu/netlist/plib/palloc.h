@@ -40,28 +40,28 @@ inline T *palloc_t()
 }
 
 template<typename T, typename P1>
-inline T *palloc_t(P1 &p1)
+inline T *palloc_t(P1 p1)
 {
 	void *p = palloc_raw(sizeof(T));
 	return new (p) T(p1);
 }
 
 template<typename T, typename P1, typename P2>
-inline T *palloc_t(P1 &p1, P2 &p2)
+inline T *palloc_t(P1 p1, P2 p2)
 {
 	void *p = palloc_raw(sizeof(T));
 	return new (p) T(p1, p2);
 }
 
 template<typename T, typename P1, typename P2, typename P3>
-inline T *palloc_t(P1 &p1, P2 &p2, P3 &p3)
+inline T *palloc_t(P1 p1, P2 p2, P3 p3)
 {
 	void *p = palloc_raw(sizeof(T));
 	return new (p) T(p1, p2, p3);
 }
 
 template<typename T, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
-inline T *palloc_t(P1 &p1, P2 &p2, P3 &p3, P4 &p4, P5 &p5, P6 &p6, P7 &p7)
+inline T *palloc_t(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7)
 {
 	void *p = palloc_raw(sizeof(T));
 	return new (p) T(p1, p2, p3, p4, p5, p6, p7);
@@ -87,9 +87,13 @@ inline void pfree_array_t(T *p)
 	delete[] p;
 }
 
+#if 1
 #define palloc(T, ...)        palloc_t<T>(__VA_ARGS__)
 #define pfree(_ptr)           pfree_t(_ptr)
-
+#else
+#define palloc(T, ...)        new T(__VA_ARGS__)
+#define pfree(_ptr)           delete(_ptr)
+#endif
 #define palloc_array(T, N)    palloc_array_t<T>(N)
 #define pfree_array(_ptr)     pfree_array_t(_ptr)
 

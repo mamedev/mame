@@ -6480,7 +6480,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="miahamm">
+	<software name="miahamm" cloneof="mikeowen">
 		<description>Mia Hamm Soccer 64 (USA)</description>
 		<year>2000</year>
 		<publisher>South Peak</publisher>
@@ -9969,7 +9969,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="tazexpru">
+	<software name="tazexpru" cloneof="tazexpr">
 		<description>Taz Express (USA, Prototype)</description>
 		<year>2000?</year>
 		<publisher>Infogrames</publisher>
@@ -9991,7 +9991,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="tetris64" cloneof="ntetris">
+	<software name="tetris64">
 		<description>Tetris 64 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Seta Corporation</publisher>

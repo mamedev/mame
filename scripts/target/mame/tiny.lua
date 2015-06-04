@@ -78,7 +78,7 @@ BUSES["CENTRONICS"] = true
 function createProjects_mame_tiny(_target, _subtarget)
 	project ("mame_tiny")
 	targetsubdir(_target .."_" .. _subtarget)
-	kind "StaticLib"
+	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-tiny"))
 	
 	options {

@@ -668,7 +668,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 		}
 
 		fpos += 256*16;
-		for(int i=0; i<51; i++)
+		for(int i=0; i<49; i++)
 			raw_w(track_data, 10, 0x3fc);
 		for(int i=0; i<16; i++) {
 			int sector;
@@ -698,6 +698,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 
 			raw_w(track_data,  9, 0x01fe);
 			raw_w(track_data, 24, 0xd5aaad);
+			raw_w(track_data,  1, 0);
 
 			UINT8 pval = 0x00;
 			for(int i=0; i<342; i++) {
@@ -721,7 +722,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			raw_w(track_data, 8, translate6[pval]);
 			raw_w(track_data, 24, 0xdeaaeb);
 		}
-		raw_w(track_data, 4, 0xff);
+		raw_w(track_data, 8, 0xff);
 		assert(track_data.size() == 51090);
 
 		generate_track_from_levels(track, 0, track_data, 0, image);

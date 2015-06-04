@@ -42,6 +42,15 @@ private:
 // nld_Q
 // ----------------------------------------------------------------------------------------
 
+NETLIB_NAME(Q)::NETLIB_NAME(Q)(const family_t afamily)
+: netlist_device_t(afamily)
+, m_qtype(BJT_NPN) { }
+
+NETLIB_NAME(Q)::~NETLIB_NAME(Q)()
+{
+}
+
+
 NETLIB_START(Q)
 {
 	register_param("model", m_model, "");

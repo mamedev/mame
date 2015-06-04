@@ -552,7 +552,7 @@ int base_md_cart_slot_device::load_nonlist()
 
 void base_md_cart_slot_device::call_unload()
 {
-	if (m_cart && m_cart->get_nvram_size())
+	if (m_cart && m_cart->get_nvram_base() && m_cart->get_nvram_size())
 		battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());
 }
 

@@ -87,6 +87,7 @@ function mainProject(_target, _subtarget)
 	links {
 		"osd_" .. _OPTIONS["osd"],
 		"bus",
+		"netlist",
 		"optional",
 		"emu",
 		"dasm",

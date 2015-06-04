@@ -443,6 +443,7 @@ links {
 	"flac",
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
+	"netlist",
 }
 
 includedirs {
@@ -454,8 +455,6 @@ includedirs {
 files {
 	MAME_DIR .. "src/tools/nltool.c",
 }
-
-dofile("netlist.lua")
 
 --------------------------------------------------
 -- castool

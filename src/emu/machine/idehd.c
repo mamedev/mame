@@ -394,7 +394,7 @@ void ata_mass_storage_device::fill_buffer()
 		{
 			set_dasp(ASSERT_LINE);
 
-			start_busy(TIME_BETWEEN_SECTORS, PARAM_COMMAND);
+			start_busy(TIME_PER_SECTOR, PARAM_COMMAND);
 		}
 		break;
 	}

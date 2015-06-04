@@ -6,6 +6,7 @@
  */
 
 #include <cstring>
+#include <algorithm>
 
 #include "plib/palloc.h"
 
@@ -51,7 +52,7 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const
 	{
 		return palloc(nld_d_to_a_proxy , proxied);
 	}
@@ -71,7 +72,7 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const
 	{
 		return palloc(nld_d_to_a_proxy , proxied);
 	}
@@ -419,15 +420,15 @@ ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstri
 	set_logic_family(this->default_logic_family());
 	init_object(anetlist, name);
 
-#if USE_PMFDELEGATES
+#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 	void (netlist_core_device_t::* pFunc)() = &netlist_core_device_t::update;
-#if NO_USE_PMFCONVERSION
-	static_update = pFunc;
-#else
-	static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
+	m_static_update = pFunc;
+#elif (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
+	void (netlist_core_device_t::* pFunc)() = &netlist_core_device_t::update;
+	m_static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
+#elif (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL)
+	m_static_update = pmfp::get_mfp<net_update_delegate>(&netlist_core_device_t::update, this);
 #endif
-#endif
-
 }
 
 ATTR_COLD netlist_core_device_t::~netlist_core_device_t()
@@ -665,7 +666,7 @@ ATTR_COLD void netlist_net_t::save_register()
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
+ATTR_HOT /* inline */ void netlist_core_terminal_t::update_dev(const UINT32 mask)
 {
 	inc_stat(netdev().stat_call_count);
 	if ((state() & mask) != 0)
@@ -674,7 +675,7 @@ ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
 	}
 }
 
-ATTR_HOT inline void netlist_net_t::update_devs()
+ATTR_HOT /* inline */ void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
@@ -684,7 +685,19 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
+#if 0
+	netlist_core_terminal_t * t[256];
+	netlist_core_terminal_t *p = m_list_active.first();
+	int cnt = 0;
+	while (p != NULL)
+	{
+		if ((p->state() & mask) != 0)
+			t[cnt++] = p;
+		p = m_list_active.next(p);
+	}
 
+	for (int i=0; i<cnt; i++)
+		t[i]->netdev().update_dev();
 	netlist_core_terminal_t *p = m_list_active.first();
 
 	while (p != NULL)
@@ -692,6 +705,16 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 		p->update_dev(mask);
 		p = m_list_active.next(p);
 	}
+
+#else
+	netlist_core_terminal_t *p = m_list_active.first();
+
+	while (p != NULL)
+	{
+		p->update_dev(mask);
+		p = p->m_next;
+	}
+#endif
 }
 
 ATTR_COLD void netlist_net_t::reset()
@@ -1056,7 +1079,7 @@ ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, co
 // mainclock
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_logic_net_t &net)
+ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(netlist_logic_net_t &net)
 {
 	net.toggle_new_Q();
 	net.update_devs();

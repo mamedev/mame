@@ -24,6 +24,9 @@ static NETLIST_START(base)
 	NET_REGISTER_DEV(gnd, GND)
 	NET_REGISTER_DEV(netlistparams, NETLIST)
 
+	LOCAL_SOURCE(diode_models)
+	LOCAL_SOURCE(bjt_models)
+
 	INCLUDE(diode_models);
 	INCLUDE(bjt_models);
 
@@ -34,11 +37,11 @@ NETLIST_END()
 // netlist_setup_t
 // ----------------------------------------------------------------------------------------
 
-netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
+netlist_setup_t::netlist_setup_t(netlist_base_t *netlist)
 	: m_netlist(netlist)
 	, m_proxy_cnt(0)
 {
-	netlist.set_setup(this);
+	netlist->set_setup(this);
 	m_factory = palloc(netlist_factory_list_t);
 }
 
@@ -394,7 +397,7 @@ nld_base_proxy *netlist_setup_t::get_d_a_proxy(netlist_core_terminal_t &out)
 	if (proxy == NULL)
 	{
 		// create a new one ...
-		nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(out_cast);
+		nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(&out_cast);
 		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -425,7 +428,7 @@ void netlist_setup_t::connect_input_output(netlist_core_terminal_t &in, netlist_
 	if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
 	{
 		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(in);
-		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, incast);
+		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, &incast);
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -464,7 +467,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_c
 	{
 		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(inp);
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, incast);
+		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, &incast);
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -745,13 +748,13 @@ void netlist_setup_t::resolve_inputs()
 
 	netlist().log("initialize solver ...\n");
 
-	if (m_netlist.solver() == NULL)
+	if (netlist().solver() == NULL)
 	{
 		if (has_twoterms)
 			netlist().error("No solver found for this net although analog elements are present\n");
 	}
 	else
-		m_netlist.solver()->post_start();
+		netlist().solver()->post_start();
 
 }
 
@@ -777,12 +780,6 @@ void netlist_setup_t::start_devices()
 	netlist().start();
 }
 
-void netlist_setup_t::parse(const char *buf)
-{
-	netlist_parser parser(*this);
-	parser.parse(buf);
-}
-
 void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
@@ -796,4 +793,35 @@ void netlist_setup_t::print_stats() const
 		printf("Queue Moves  %15d\n", m_netlist.queue().m_prof_sortmove);
 	}
 #endif
+}
+
+// ----------------------------------------------------------------------------------------
+// Sources
+// ----------------------------------------------------------------------------------------
+
+void netlist_sources_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	for (std::size_t i=0; i < m_list.size(); i++)
+	{
+		if (m_list[i]->parse(setup, name))
+			return;
+	}
+	setup->netlist().error("unable to find %s in source collection", name.cstr());
+}
+
+// ----------------------------------------------------------------------------------------
+// base sources
+// ----------------------------------------------------------------------------------------
+
+
+bool netlist_source_string_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	netlist_parser p(*setup);
+	return p.parse(m_str, name);
+}
+
+bool netlist_source_mem_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	netlist_parser p(*setup);
+	return p.parse(m_str, name);
 }

@@ -554,6 +554,7 @@ project "bgfx"
 	configuration { "gmake" }
 		buildoptions {		
 			"-Wno-uninitialized",
+			"-Wno-unused-function",
 		}
 			
 	configuration { }
@@ -619,23 +620,32 @@ project "portaudio"
 			"-Wno-bad-function-cast",
 			"-Wno-undef",
 			"-Wno-missing-braces",
-			"-Wno-unused-but-set-variable",
-			"-Wno-maybe-uninitialized",
+			"-Wno-unused-variable",
 			"-Wno-unused-value",
 			"-Wno-unused-function",
 			"-Wno-unknown-pragmas",
-			"-Wno-sometimes-uninitialized",
 		}
 
-	local version = str_to_version(_OPTIONS["gcc_version"])
-	if (_OPTIONS["gcc"]~=nil) and string.find(_OPTIONS["gcc"], "clang") then
-		buildoptions_c {
-			"-Wno-unknown-warning-option",
-			"-Wno-absolute-value",
-			"-Wno-unused-variable",
-		}
+	local version = str_to_version(_OPTIONS["gcc_version"])	
+	if (_OPTIONS["gcc"]~=nil) then
+		if string.find(_OPTIONS["gcc"], "clang") then
+			buildoptions_c {
+				"-Wno-unknown-warning-option",
+				"-Wno-absolute-value",
+				"-Wno-unused-but-set-variable",
+				"-Wno-maybe-uninitialized",
+				"-Wno-sometimes-uninitialized",
+			}
+		else
+			if (version >= 40600) then
+				buildoptions_c {
+					"-Wno-unused-but-set-variable",
+					"-Wno-maybe-uninitialized",
+					"-Wno-sometimes-uninitialized",
+				}
+			end
+		end
 	end
-
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4204", -- warning C4204: nonstandard extension used : non-constant aggregate initializer
