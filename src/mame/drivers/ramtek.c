@@ -25,8 +25,8 @@
  Game Name                                       Clone Of
  ---------------------------------------------------------------------------------
  Batter Up (1974/??)                             Baseball (1974/10)
- Crossfire (1974/01) (registered trademark?)     Knock Out (Ramtek, 1974/09)?
  Countdown (1974/02)                             Wipe Out (Ramtek, 1974/01)
+ Crossfire (1974/01) (registered trademark?)     Knock Out (Ramtek, 1974/09)?
  Elimination (1973/12?) (registered trademark?)  unused name for Countdown (1974/02)
  Flip-Out (1974/05?)                             Clean Sweep (Ramtek, 1974/06)
  Hockey (1973/??)                                Hockey (Ramtek, 1973/11)
