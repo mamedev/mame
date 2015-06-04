@@ -813,13 +813,12 @@ used left a "1994.8-1989" in the rom
 Paradise (set 2): No board ID, although some tracks which are wire hacks on
  YS-1600 PCB are corrected on this version. All roms are labeled as "A-19"
  Except for the program rom all other data matches Paradise (set 1).
+ NOTE: on this version of the PCB the above listed 4MHz OSC is replaced with
+       a 3.579545MHz OSC
  
 The Escape version might be the newest revision due to improved slot machine
  animation on 'girl select' compared to other sets. Except for the program
  rom all other data matches Paradise (set 1).
-
- NOTE: on this version of the PCB the above listed 4MHz OSC is repleace with
-       a 3.579545MHz OSC
 ***************************************************************************/
 
 ROM_START( paradise )
