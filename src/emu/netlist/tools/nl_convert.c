@@ -152,7 +152,7 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 	return ret;
 }
 
-nl_convert_base_t::sp_unit nl_convert_base_t::m_sp_units[] = {
+nl_convert_base_t::_sp_unit nl_convert_base_t::m_sp_units[] = {
 		{"T",   "",      1.0e12 },
 		{"G",   "",      1.0e9  },
 		{"MEG", "RES_M(%g)", 1.0e6  },

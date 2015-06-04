@@ -422,12 +422,12 @@ ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstri
 
 #if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 	void (netlist_core_device_t::* pFunc)() = &netlist_core_device_t::update;
-	static_update = pFunc;
+	m_static_update = pFunc;
 #elif (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
 	void (netlist_core_device_t::* pFunc)() = &netlist_core_device_t::update;
-	static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
+	m_static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
 #elif (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL)
-	static_update = pmfp::get_mfp<net_update_delegate>(&netlist_core_device_t::update, this);
+	m_static_update = pmfp::get_mfp<net_update_delegate>(&netlist_core_device_t::update, this);
 #endif
 }
 
@@ -685,7 +685,19 @@ ATTR_HOT /* inline */ void netlist_net_t::update_devs()
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
+#if 0
+	netlist_core_terminal_t * t[256];
+	netlist_core_terminal_t *p = m_list_active.first();
+	int cnt = 0;
+	while (p != NULL)
+	{
+		if ((p->state() & mask) != 0)
+			t[cnt++] = p;
+		p = m_list_active.next(p);
+	}
 
+	for (int i=0; i<cnt; i++)
+		t[i]->netdev().update_dev();
 	netlist_core_terminal_t *p = m_list_active.first();
 
 	while (p != NULL)
@@ -693,6 +705,16 @@ ATTR_HOT /* inline */ void netlist_net_t::update_devs()
 		p->update_dev(mask);
 		p = m_list_active.next(p);
 	}
+
+#else
+	netlist_core_terminal_t *p = m_list_active.first();
+
+	while (p != NULL)
+	{
+		p->update_dev(mask);
+		p = p->m_next;
+	}
+#endif
 }
 
 ATTR_COLD void netlist_net_t::reset()

@@ -179,10 +179,6 @@ void abc80_state::video_start()
 
 	// allocate memory
 	m_video_ram.allocate(0x400);
-
-	// register for state saving
-	save_item(NAME(m_blink));
-	save_item(NAME(m_latch));
 }
 
 

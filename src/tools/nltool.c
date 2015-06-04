@@ -192,11 +192,8 @@ public:
 	{
 		// read the netlist ...
 
-		netlist_sources_t sources;
-
-		sources.add(netlist_source_t(buffer));
-		sources.parse(*m_setup, name);
-		//m_setup->parse(buffer);
+		m_setup->register_source(palloc(netlist_source_mem_t, buffer));
+		m_setup->include(name);
 		log_setup();
 
 		// start devices
@@ -295,10 +292,8 @@ static void listdevices()
 	nt.init();
 	const netlist_factory_list_t::list_t &list = nt.setup().factory().list();
 
-	netlist_sources_t sources;
-
-	sources.add(netlist_source_t("dummy", &netlist_dummy));
-	sources.parse(nt.setup(),"dummy");
+	nt.setup().register_source(palloc(netlist_source_proc_t, "dummy", &netlist_dummy));
+	nt.setup().include("dummy");
 
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();

@@ -366,9 +366,9 @@ public:
 	}
 
 private:
-	template <typename T> static const pstring &get_name(const T *elem) { return elem->name(); }
-	template <typename T> static const pstring &get_name(T *elem) { return elem->name(); }
-	template <typename T> static const pstring &get_name(const T &elem) { return elem.name(); }
+	template <typename T> const pstring &get_name(const T *elem) const { return elem->name(); }
+	template <typename T> const pstring &get_name(T *elem) const { return elem->name(); }
+	template <typename T> const pstring &get_name(const T &elem) const { return elem.name(); }
 
 };
 

@@ -57,13 +57,59 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)                      
 {
 #define NETLIST_END()  }
 
+#define LOCAL_SOURCE(_name)															\
+		setup.register_source(palloc(netlist_source_proc_t, # _name, &NETLIST_NAME(_name)));
+
 #define INCLUDE(_name)                                                              \
-		NETLIST_NAME(_name)(setup);
+		setup.include(# _name);
 
 #define SUBMODEL(_name, _model)                                                     \
 		setup.namespace_push(# _name);                                              \
 		NETLIST_NAME(_model)(setup);                                                \
 		setup.namespace_pop();
+
+class netlist_setup_t;
+
+// ----------------------------------------------------------------------------------------
+// A Generic netlist sources implementation
+// ----------------------------------------------------------------------------------------
+
+class netlist_source_t
+{
+public:
+	typedef plist_t<netlist_source_t *> list_t;
+
+	netlist_source_t()
+	{}
+
+	virtual ~netlist_source_t() { }
+
+	virtual bool parse(netlist_setup_t *setup, const pstring name) = 0;
+private:
+};
+
+
+class netlist_sources_t
+{
+public:
+
+	netlist_sources_t() { }
+
+	~netlist_sources_t()
+	{
+		m_list.clear_and_free();
+	}
+
+	void add(netlist_source_t *src)
+	{
+		m_list.add(src);
+	}
+
+	void parse(netlist_setup_t *setup, const pstring name);
+
+private:
+	netlist_source_t::list_t m_list;
+};
 
 // ----------------------------------------------------------------------------------------
 // netlist_setup_t
@@ -137,8 +183,6 @@ public:
 
 	netlist_param_t *find_param(const pstring &param_in, bool required = true);
 
-	void parse(const char *buf);
-
 	void start_devices();
 	void resolve_inputs();
 
@@ -146,6 +190,14 @@ public:
 
 	void namespace_push(const pstring &aname);
 	void namespace_pop();
+
+	/* parse a source */
+
+	void include(pstring netlist_name) { m_sources.parse(this, netlist_name); }
+
+	/* register a source */
+
+	void register_source(netlist_source_t *src) { m_sources.add(src); }
 
 	netlist_factory_list_t &factory() { return *m_factory; }
 	const netlist_factory_list_t &factory() const { return *m_factory; }
@@ -173,6 +225,7 @@ private:
 	int m_proxy_cnt;
 
 	pstack_t<pstring> m_stack;
+	netlist_sources_t m_sources;
 
 
 	void connect_terminals(netlist_core_terminal_t &in, netlist_core_terminal_t &out);
@@ -201,5 +254,64 @@ private:
 		}
 	}
 };
+
+// ----------------------------------------------------------------------------------------
+// base sources
+// ----------------------------------------------------------------------------------------
+
+
+class netlist_source_string_t : public netlist_source_t
+{
+public:
+
+	netlist_source_string_t(pstring source)
+	: netlist_source_t(), m_str(source)
+	{
+	}
+
+	bool parse(netlist_setup_t *setup, const pstring name);
+
+private:
+	pstring m_str;
+};
+
+
+class netlist_source_mem_t : public netlist_source_t
+{
+public:
+	netlist_source_mem_t(const char *mem)
+	: netlist_source_t(), m_str(mem)
+	{
+	}
+
+	bool parse(netlist_setup_t *setup, const pstring name);
+private:
+	pstring m_str;
+};
+
+class netlist_source_proc_t : public netlist_source_t
+{
+public:
+	netlist_source_proc_t(pstring name, void (*setup_func)(netlist_setup_t &))
+	: m_setup_func(setup_func),
+	  m_setup_func_name(name)
+	{
+	}
+
+	bool parse(netlist_setup_t *setup, const pstring name)
+	{
+		if (name == m_setup_func_name)
+		{
+			m_setup_func(*setup);
+			return true;
+		}
+		else
+			return false;
+	}
+private:
+	void (*m_setup_func)(netlist_setup_t &);
+	pstring m_setup_func_name;
+};
+
 
 #endif /* NLSETUP_H_ */

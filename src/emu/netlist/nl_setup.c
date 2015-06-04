@@ -24,6 +24,9 @@ static NETLIST_START(base)
 	NET_REGISTER_DEV(gnd, GND)
 	NET_REGISTER_DEV(netlistparams, NETLIST)
 
+	LOCAL_SOURCE(diode_models)
+	LOCAL_SOURCE(bjt_models)
+
 	INCLUDE(diode_models);
 	INCLUDE(bjt_models);
 
@@ -777,12 +780,6 @@ void netlist_setup_t::start_devices()
 	netlist().start();
 }
 
-void netlist_setup_t::parse(const char *buf)
-{
-	netlist_parser parser(*this);
-	parser.parse(buf);
-}
-
 void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
@@ -796,4 +793,35 @@ void netlist_setup_t::print_stats() const
 		printf("Queue Moves  %15d\n", m_netlist.queue().m_prof_sortmove);
 	}
 #endif
+}
+
+// ----------------------------------------------------------------------------------------
+// Sources
+// ----------------------------------------------------------------------------------------
+
+void netlist_sources_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	for (std::size_t i=0; i < m_list.size(); i++)
+	{
+		if (m_list[i]->parse(setup, name))
+			return;
+	}
+	setup->netlist().error("unable to find %s in source collection", name.cstr());
+}
+
+// ----------------------------------------------------------------------------------------
+// base sources
+// ----------------------------------------------------------------------------------------
+
+
+bool netlist_source_string_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	netlist_parser p(*setup);
+	return p.parse(m_str, name);
+}
+
+bool netlist_source_mem_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	netlist_parser p(*setup);
+	return p.parse(m_str, name);
 }

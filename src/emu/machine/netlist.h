@@ -60,8 +60,21 @@
 // Extensions to interface netlist with MAME code ....
 // ----------------------------------------------------------------------------------------
 
-#define NETLIST_MEMREGION(_name)                                                    \
-		setup.parse((char *)downcast<netlist_mame_t &>(setup.netlist()).machine().root_device().memregion(_name)->base());
+class netlist_source_memregion_t : public netlist_source_t
+{
+public:
+	netlist_source_memregion_t(pstring name)
+	: netlist_source_t(), m_name(name)
+	{
+	}
+
+	bool parse(netlist_setup_t *setup, const pstring name);
+private:
+	pstring m_name;
+};
+
+#define MEMREGION_SOURCE(_name)	\
+		setup.register_source(palloc(netlist_source_memregion_t, _name));
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)

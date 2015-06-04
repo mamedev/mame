@@ -230,7 +230,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_READ16_MEMBER(input_r);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
@@ -269,7 +269,7 @@ WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
 	m_speaker->level_w(state);
 }
 
-READ8_MEMBER(cfrogger_state::input_r)
+READ16_MEMBER(cfrogger_state::input_r)
 {
 	// K0,K1: multiplexed inputs
 	// K2: N/C
@@ -309,6 +309,7 @@ static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_MELPS4_READ_K_CB(READ16(cfrogger_state, input_r))
 	MCFG_MELPS4_WRITE_S_CB(WRITE8(cfrogger_state, plate_w))
 	MCFG_MELPS4_WRITE_F_CB(WRITE8(cfrogger_state, plate_w))
 	MCFG_MELPS4_WRITE_G_CB(WRITE8(cfrogger_state, plate_w))

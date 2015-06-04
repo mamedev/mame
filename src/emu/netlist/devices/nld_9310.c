@@ -156,7 +156,7 @@ inline NETLIB_FUNC_VOID(9310_sub, update_outputs_all, (const UINT8 cnt, const ne
 
 inline NETLIB_FUNC_VOID(9310_sub, update_outputs, (const UINT8 cnt))
 {
-	static const netlist_time out_delay = NLTIME_FROM_NS(20);
+	/* static */ const netlist_time out_delay = NLTIME_FROM_NS(20);
 #if 0
 //    for (int i=0; i<4; i++)
 //        OUTLOGIC(m_Q[i], (cnt >> i) & 1, delay[i]);

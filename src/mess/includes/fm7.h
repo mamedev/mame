@@ -326,7 +326,7 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
-	floppy_image_device *m_floppy = NULL;
+	floppy_image_device *m_floppy;
 
 	void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat);
 	void fm7_alu_function_compare(UINT32 offset);

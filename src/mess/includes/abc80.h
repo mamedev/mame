@@ -84,6 +84,7 @@ public:
 		m_line_prom(*this, "line"),
 		m_attr_prom(*this, "attr"),
 		m_video_ram(*this, "video_ram"),
+		m_motor(false),
 		m_tape_in(1),
 		m_tape_in_latch(1)
 	{ }
@@ -164,6 +165,7 @@ public:
 	int m_blink;
 
 	// cassette state
+	bool m_motor;
 	int m_tape_in;
 	int m_tape_in_latch;
 
