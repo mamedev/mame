@@ -127,13 +127,15 @@ const device_type MACH8 = &device_creator<mach8_device>;
 
 vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_palette(*this, "^palette")
+		m_palette(*this, "^palette"),
+		m_screen(*this,"^screen")
 {
 }
 
 vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VGA, "VGA", tag, owner, clock, "vga", __FILE__),
-		m_palette(*this, "^palette")
+		m_palette(*this, "^palette"),
+		m_screen(*this,"^screen")
 {
 }
 
@@ -218,6 +220,7 @@ void svga_device::zero()
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
 	vga.crtc.start_addr = vga.crtc.start_addr_latch;
+	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
 	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
 }
 
@@ -1765,7 +1768,7 @@ void vga_device::attribute_reg_write(UINT8 index, UINT8 data)
 			case 0x10: vga.attribute.data[0x10] = data; break;
 			case 0x11: vga.attribute.data[0x11] = data; break;
 			case 0x12: vga.attribute.data[0x12] = data; break;
-			case 0x13: vga.attribute.pel_shift = vga.attribute.data[0x13] = data; break;
+			case 0x13: vga.attribute.pel_shift_latch = vga.attribute.data[0x13] = data; break;
 			case 0x14: vga.attribute.data[0x14] = data; break;
 		}
 	}
