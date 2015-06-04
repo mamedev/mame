@@ -230,6 +230,9 @@ function mainProject(_target, _subtarget)
 
 		-- "macosx" for libretro platforms "osx" and "ios"
 		if _OPTIONS["targetos"]=="macosx" then
+			buildoptions {
+				"-fPIC",
+			}
 			linkoptions {
 				"-fPIC",
 				"-Wl,-u,_retro_run",
@@ -238,9 +241,12 @@ function mainProject(_target, _subtarget)
 
 		-- "linux" for pretty much any Linux/BSD/Android…
 		if _OPTIONS["targetos"]=="linux" then
+			buildoptions {
+				"-fPIC",
+			}
 			linkoptions {
 				"-fPIC",
-				"-Wl,--version-script=src/osd/retro/link.T",
+				"-Wl,--version-script=" .. MAME_DIR .. "src/osd/retro/link.T",
 			}
 		end
 
