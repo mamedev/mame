@@ -241,7 +241,7 @@ function mainProject(_target, _subtarget)
 		if _OPTIONS["targetos"]=="linux" then
 			linkoptions {
 				"-fPIC",
-				"-Wl,--version-script=src/osd/retro/link.T",
+				"-Wl,--version-script=" .. MAME_DIR .. "src/osd/retro/link.T",
 			}
 		end
 
