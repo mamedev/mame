@@ -476,6 +476,9 @@ void abc80_state::machine_start()
 	save_item(NAME(m_key_data));
 	save_item(NAME(m_key_strobe));
 	save_item(NAME(m_pio_astb));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_motor));
 	save_item(NAME(m_tape_in));
 	save_item(NAME(m_tape_in_latch));
 }
