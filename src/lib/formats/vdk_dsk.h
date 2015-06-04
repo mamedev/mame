@@ -15,9 +15,9 @@
 #ifndef __VDK_DSK_H__
 #define __VDK_DSK_H__
 
-#include "wd177x_dsk.h"
+#include "flopimg.h"
 
-class vdk_format : public wd177x_format
+class vdk_format : public floppy_image_format_t
 {
 public:
 	vdk_format();
@@ -29,9 +29,12 @@ public:
 	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
 	virtual bool save(io_generic *io, floppy_image *image);
+	virtual bool supports_save() const;
 
 private:
-	format m_format;
+	static const int SECTOR_SIZE = 256;
+	static const int SECTOR_COUNT = 18;
+	static const int FIRST_SECTOR_ID = 1;
 };
 
 extern const floppy_format_type FLOPPY_VDK_FORMAT;
