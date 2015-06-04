@@ -16,43 +16,45 @@
  Suspected "same games" are grouped together.  These are usually the exact same game but different cabinet/name.
 
 
- Technical Manual #s  Game Name(s)                                         Atari Part #'s                     Data      PROM/ROM Chip Numbers
- -------------------+----------------------------------------------------+----------------------------------+---------+---------------------------------------
- TM-025               Anti-Aircraft (1975)                                 A000951                            YES       003127
- TM-058               Breakout/Breakout Cocktail (1976)                    A004533                            NO
- TM-048               Crash 'N Score/Stock Car (1975)                      A004256                            YES       003186(x2), 003187(x2), 004248, 004247
+ Technical Manual #s  Game Name(s)                                              Atari Part #'s                     Data      PROM/ROM Chip Numbers
+ -------------------+---------------------------------------------------------+----------------------------------+---------+---------------------------------------
+ TM-025               Anti-Aircraft (1975)                                      A000951                            YES       003127
+ TM-058               Breakout/Breakout Cocktail (1976)                         A004533                            NO
+ TM-048               Crash 'N Score/Stock Car (1975)                           A004256                            YES       003186(x2), 003187(x2), 004248, 004247
  TM-030               Crossfire (1975)
- TM-003,005,011,020   Gran Trak 10/Trak 10/Formula K/Race Circuit (1974)   A000872,A000872 K3RT               YES       74186 Racetrack Prom (K5)
- TM-004,021           Gran Trak 20/Trak 20/Twin Racer (1974)               A001791(RT20),A001793(A20-K4DRTA)  YES       74186 Racetrack prom (K5)
- TM-006,035           Goal 4/World Cup/Coupe De Monde (1975)               A000823                            NO
- TM-016               Gotcha/Gotcha Color? (1973)                          A000816                            NO
- TM-028               Highway/Hi-Way (1975)                                A003211                            NO
- TM-055               Indy 4 (1976)                                        A003000,A006268,A006270            YES       003186, 003187, 005502-01, 05503-01
- TM-026               Indy 800 (1975)                                      A003000,A003170,A003182            YES       003186-003189 (4)
- A003184,A003191,A003198,A003199
- TM-027               Jet Fighter/Jet Fighter Cocktail (1975)              A004254,A004255                    YES       004250-004252, 004253-01 to 03 (3)
- TM-077               LeMans (1976)                                        A005844,A005845                    YES       005837-01, 005838-01, 005839-01
- TM-040               Outlaw (1976)                                        A003213                            YES       003323 - ROM (8205 @ J4)
- TM-007               Pin Pong (1974)                                      A001660                            NO
- TM-013               Pong/Super Pong (1972)                               A001433,A000423                    NO
- TM-015               Pong Cocktail (1974)                                                                    NO
- TM-014               Pong Doubles/Coupe Davis (1974)                      A000785                            NO
- TM-018               Pursuit (1975)                                       K8P-B 90128                        NO
- TM-012,022,034       Quadrapong/Elimination (1974)                        A000845                            NO
- TM-009               Qwak!/Quack (1974)                                   A000937,A000953                    YES       72074/37-2530N (K9)
- TM-001,032           Rebound/Volleyball (1974)                            A000517,A000846                    NO
- TM-047               Shark Jaws (1975)                                    A003806                            YES       004182, 004183
- TM-008               Space Race (1974)                                    A000803                            NO
- TM-023               Spike  (1974)                                        SPIKE-(A or B)                     NO
- TM-046               Steeplechase/Astroturf (1975)                        A003750                            YES       003774 ROM Bugle (C8), 003773-01 "A" Horse (C4), 003773-02 "B" Horse (D4)
- TM-057               Stunt Cycle (1976)                                   A004128                            YES       004275 ROM Motorcycle/Bus (1F), 004811 ROM Score Translator (D7)
- TM-010,036,049       Tank/Tank Cocktail/Tank II (1974/1975)               A003111 (K5T-F 90124)              YES       90-2006
+ TM-003,005,011,020   Gran Trak 10/Trak 10/Formula K/Race Circuit (1974)        A000872,A000872 K3RT               YES       74186 Racetrack Prom (K5)
+ TM-004,021           Gran Trak 20/Trak 20/Twin Racer (1974)                    A001791(RT20),A001793(A20-K4DRTA)  YES       74186 Racetrack prom (K5)
+ TM-006,035           Goal 4/World Cup/Coupe De Monde (1975)                    A000823                            NO
+ TM-016               Gotcha/Gotcha Color? (1973)                               A000816                            NO
+ TM-028               Highway/Hi-Way (1975)                                     A003211                            NO
+ TM-055               Indy 4 (1976)                                             A003000,A006268,A006270            YES       003186, 003187, 005502-01, 05503-01
+ TM-026               Indy 800 (1975)                                           A003000,A003170,A003182            YES       003186-003189 (4)
+                                                                                A003184,A003191,A003198,A003199
+ TM-027               Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (1975)   A004254,A004255                    YES       004250-004252, 004253-01 to 03 (3)
+ TM-077               LeMans (1976)                                             A005844,A005845                    YES       005837-01, 005838-01, 005839-01
+ TM-040               Outlaw (1976)                                             A003213                            YES       003323 - ROM (8205 @ J4)
+ TM-007               Pin Pong (1974)                                           A001660                            NO
+ TM-013               Pong/Super Pong (1972)                                    A001433,A000423                    NO
+ TM-015               Pong Cocktail/Coup Franc (1974)                                                              NO
+ TM-014               Pong Doubles/Coupe Davis (1974)                           A000785                            NO
+ TM-018               Pursuit (1975)                                            K8P-B 90128                        NO
+ TM-012,022,034       Quadrapong/Elimination (1974)                             A000845                            NO
+ TM-009               Qwak!/Quack (1974)                                        A000937,A000953                    YES       72074/37-2530N (K9)
+ TM-001,032           Rebound/Volleyball (1974)                                 A000517,A000846                    NO
+ TM-047               Shark Jaws (1975)                                         A003806                            YES       004182, 004183
+ TM-008               Space Race (1974)                                         A000803                            NO
+ TM-023               Spike  (1974)                                             SPIKE-(A or B)                     NO
+ TM-046               Steeplechase/Astroturf (1975)                             A003750                            YES       003774 ROM Bugle (C8), 003773-01 "A" Horse (C4), 003773-02 "B" Horse (D4)
+ TM-057               Stunt Cycle (1976)                                        A004128                            YES       004275 ROM Motorcycle/Bus (1F), 004811 ROM Score Translator (D7)
+ TM-010,036,049       Tank/Tank Cocktail/Tank II (1974/1975)                    A003111 (K5T-F 90124)              YES       90-2006
  TM-002               Touch Me (1974)                                                                         NO
 
  - Not Known to be released or produced, but at least announced.
 
- TM-024               Qwakers (Not Produced/Released)
- TM-017               World Cup Football (Not Produced/Released)
+ TM-0??               Arcade Driver/Driver First Person (Not Produced/Released) (197?)
+ TM-0??               Dodgeball/Dodgem (Not Produced/Released) (1975)
+ TM-024               Qwakers (Not Produced/Released) (1974?)
+ TM-017               World Cup Football (Not Produced/Released) (1974)
 
 
 ***************************************************************************/
