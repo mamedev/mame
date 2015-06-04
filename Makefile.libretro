@@ -1,16 +1,3 @@
-###
-### THIS FILE IS OBSOLETE
-###
-### This is part of the libretro port using the old MAME build system.  It
-### can be safely removed, but is maintained here because some bits of the
-### old port (like OpenGL) are not yet done for the current GENie-based
-### build system.
-###
-### This file in particular MAY be re-written as a wrapper around the MAME
-### GENie makefile if we cannot effectively use GENie to do what we need,
-### but at this point that hasn't happened yet.
-###
-
 ###########################################################################
 #
 #   Makefile.libretro
@@ -21,88 +8,78 @@
 #   Licensing should be regarded as the same as that of the MAME project,
 #   visit http://mamedev.org for more information.
 #
+#
+#   Okay, basically this file exists to do the following:
+#
+#   1. Determine $ARCH and $platform from the cmdline, the environment, or
+#      by figuring them out (as other libretro cores do).
+#   2. Disable -Werror.  MAME upstream builds with -Werror, which is great
+#      for developers but absolutely frustrating for users.  From our POV,
+#      we're effectively users, and users who try to follow the bleeding
+#      edge no less.  That means we get cut, and too often it's by some
+#      random warning upstream hasn't squashed.
+#   3. Set PYTHON_EXECUTABLE on non-Apple platforms.  Upstream assumes
+#      python (no prefix) is python2, which basically NEVER happens now on
+#      modern Linux systems, and isn't even common on Windows anymore.  It
+#      should be python2 pretty much everywhere but Apple, and the exception
+#      there is mostly because Apple hates GPLv3.
+#   4. Enable VERBOSE.  Yes, MAME builds generate a metric crap-ton of
+#      output, but when builds fail it's nice to know why.
+#   5. Rename $ARCH and unset it.  Apple has a convention on the Mac of
+#      letting you use $ARCH to specify what CPU architectures to build
+#      for.  This is at odds to how libretro uses it, and solving that on
+#      the libretro end is going to have to wait for a major overhaul of
+#      how cores are built.  We're not ready to do that yet.
+#
 ###########################################################################
+
+# libretro's preferred settings
+NOWERROR ?= 1
+OSD ?= retro
+PYTHON_EXECUTABLE ?= @python2
+REGENIE ?= 1
+VERBOSE ?= 1
+
+
 
 # Try to determine libretro $(platform) if it's either not provided to us,
 # or if the user explicitly passes platform="" (i.e., for native buildtools
 # in a cross-compile)
 UNAME = $(shell uname -a)
 ifeq ($(platform),)
-	override platform = unix
+	platform = unix
 	ifeq ($(UNAME),)
-		override platform = win
+		platform = win
 	else ifneq ($(findstring MINGW,$(UNAME)),)
-		override platform = win
+		platform = win
 	else ifneq ($(findstring Darwin,$(UNAME)),)
-		override platform = osx
+		platform = osx
 	else ifneq ($(findstring win,$(UNAME)),)
-		override platform = win
+		platform = win
 	endif
 endif
 
-
-# libretro always wants dependencies compiled static when possible
-BUILD_EXPAT = 1
-BUILD_FLAC = 1
-BUILD_JPEGLIB = 1
-ifneq ($(platform), android)
-	BUILD_ZLIB = 1
-else
-	BUILD_ZLIB = 0
-endif
-
-# This affects whether or not the retro OSD is built for OpenGL
-VRENDER ?= soft
-
-# If we define this, MAME's makefile will not define final linking rules
-EXECUTABLE_DEFINED = 1
-
-# Dunno if MAME ever used this, but the retro OSD does for now
-TARGET ?= mame
-ifeq ($(TARGET), mess)
-	CORE_DEFINE := -DWANT_MESS
-else ifeq ($(TARGET), mame)
-	CORE_DEFINE := -DWANT_MAME
-else
-	CORE_DEFINE := -DWANT_UME
-endif
-
-# Ensure $(EMULATOR) has no suffixes
-override EMULATOR = $(TARGET)
-
-# libretro's preferred settings
-NOWERROR = 1
-OSD = retro
-OPTIMIZE = 3
-DEFS += -DNDEBUG
-
-# We don't do midi in libretro yet (and portmidi doesn't support eg, iOS)
-NO_USE_MIDI = 2
-override MIDI_LIB =
-
-# Upstream makefile fails to add this to INCPATH, bug?
-INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
-
+# FIXME: TARGETOS isn't used here.  Either we need to use it here or fix
+#        the GENie lua scripts to use it where needed.  The latter is the
+#        cleaner solution, but it's not done universally yet.
 ifeq ($(platform), unix)
 	TARGETOS=linux
 else ifeq ($(platform), android)
 	TARGETOS=linux
 	PTR64 = 0
-	FORCE_DRC_C_BACKEND = 1
-	CROSS_BUILD = 1
+	# FIXME: Need to figure out how to do this for GENie
+#	FORCE_DRC_C_BACKEND = 1
+#	CROSS_BUILD = 1
 else ifeq ($(platform), osx)
 	TARGETOS = macosx
-	PYTHON ?= @python
+	PYTHON_EXECUTABLE ?= @python
 else ifeq ($(platform), ios)
-	# To build for iOS, do this:
-	# make -f Makefile.libretro clean
-	# make -f Makefile.libretro platform="" buildtools
-	# make -f Makefile.libretro platform=ios
 	TARGETOS = macosx
 	PTR64 = 0
-	CROSS_BUILD = 1
-	PYTHON ?= @python
-	FORCE_DRC_C_BACKEND = 1
+	PYTHON_EXECUTABLE ?= @python
+	# FIXME: Need to figure out how to do this for GENie
+#	CROSS_BUILD = 1
+#	FORCE_DRC_C_BACKEND = 1
 else ifeq ($(platform), qnx)
 	TARGETOS=linux
 else ifneq (,$(findstring armv,$(platform)))
@@ -110,10 +87,12 @@ else ifneq (,$(findstring armv,$(platform)))
 else ifeq ($(platform), wincross)
 	TARGETOS = win32
 else
-# it's win32
+	# there shouldn't BE an else, but we assume it's win32
 	TARGETOS = win32
 endif
 
+# FIXME: Right now this will break anywhere we'd normally set CROSS_BUILD.
+#
 # Mame needs PTR64 defined on 64 bit processors, we guess at it if you aren't
 # cross-compiling.  If you ARE, you need to set it yourself.
 ifneq ($(CROSS_BUILD),1)
@@ -139,147 +118,143 @@ endif
 endif # PTR64
 endif # CROSS_BUILD
 
-# Upstream uses @python, but they require 2.x for now.  They do that because
-# some OSes (basically Apple) don't install 2.7 as python2.  @python2 is the
-# "right" choice anywhere else, unless the user says otherwise. If that's not
-# okay for a given $(platform), PYTHON ?= something in the block above.
-PYTHON ?= @python2
-override PYTHON := $(PYTHON)
-
-retro-default: maketree retro-buildtools emulator
-
-ifeq ($(CROSS_BUILD),1)
-# Recursive make call without specifying platform so that host compilers are
-# used for buildtools. Must use Makefile.libretro here because of REALCC.
-
-HOST_CC ?= cc
-HOST_CXX ?= c++
-
-retro-buildtools:
-
-	$(MAKE) -f Makefile.libretro platform="" CC=$(HOST_CXX) REALCC=$(HOST_CC) retro-buildtools
-else
-retro-buildtools: buildtools
+BUILDFLAGS = REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR)
+PLATFLAGS = PTR64=$(PTR64) ARCH="" platform="$(PLATFORM)"
+TARGETFLAGS = OSD=$(OSD)
+ifneq ($(ARCH),)
+	PLATFLAGS += ARCH="" LIBRETRO_ARCH="$(ARCH)"
+endif
+ifneq ($(TARGET),)
+	TARGETFLAGS += TARGET=$(TARGET)
+endif
+ifneq ($(SUBTARGET),)
+	TARGETFLAGS += SUBTARGET=$(SUBTARGET)
 endif
 
-# ============================================================================
-# Any settings/overrides that affect the logic of the upstream mame makefile
-# must be set above here.
+all: build
 
-include makefile
+build:
+	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS)
 
-# Anything below here is processed after mame's makefile logic is processed.
-# Remember that $(VAR) is expanded at runtime, unless used in a simple-type
-# := assignment.  Variables can be appended
-# ============================================================================
+clean:
+	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS) clean
 
-CPPONLYFLAGS += -fpermissive
-DEFS += $(CORE_DEFINE)
+.PHONY: all build clean
 
-## Unix
-ifeq ($(platform), unix)
-	TARGETLIB := $(TARGET)_libretro.so
-	fpic := -fPIC
-	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
-	CCOMFLAGS += $(fpic) -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
-	PLATCFLAGS +=  -DALIGN_INTS -DALIGN_SHORTS -fstrict-aliasing -fno-merge-constants  $(fpic)
-	ifeq ($(VRENDER),opengl)
-		PLATCFLAGS += -DHAVE_GL
-		LIBS += -lGL
-	endif
-	LDFLAGS +=  $(fpic) $(SHARED)
-	REALCC = cc
-	BASELIBS +=  -lpthread
-	REALCC := gcc
-	CC := g++
-	AR := @ar
-	LD := g++
-	CCOMFLAGS += $(PLATCFLAGS)
-	LIBS += -lstdc++ -lpthread -ldl
-	ifneq (,$(findstring ppc,$(UNAME)))
-		BIGENDIAN=1
-	else
-		PLATCFLAGS += -DLSB_FIRST
-	endif
+###########################################################################
 #
-## Android
-else ifeq ($(platform), android)
-	# May need to move armplatform := 1 to above "include makefile"
-	armplatform := 1
-	TARGETLIB := $(TARGET)_libretro_android.so
-	fpic := -fPIC
-	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
-	REALCC := @arm-linux-androideabi-gcc
-	CC := @arm-linux-androideabi-g++
-	AR := @arm-linux-androideabi-ar
-	LD := @arm-linux-androideabi-g++
-	CCOMFLAGS += $(fpic) -mstructure-size-boundary=32 -mthumb-interwork -falign-functions=16 -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16 -Wno-psabi
-	CCOMFLAGS_INCOMPATIBLE :=
-	PLATCFLAGS += -march=armv7-a -mfloat-abi=softfp -DANDROID -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DSDLMAME_ARM -DRETRO_SETJMP_HACK $(fpic)
-	ifeq ($(VRENDER),opengl)
-		PLATCFLAGS += -DHAVE_GL
-		LIBS += -lGLESv2
-		GLES = 1
-	endif
-	LDFLAGS += -Wl,--fix-cortex-a8 -Wl,--no-undefined -llog $(fpic) $(SHARED)
-	CCOMFLAGS += $(PLATCFLAGS)
-	LIBS += -lstdc++
-## OS X
-else ifeq ($(platform), osx)
-	TARGETLIB := $(TARGET)_libretro.dylib
-	fpic := -fPIC -mmacosx-version-min=10.7
-	LIBCXX := libstdc++
-	LDFLAGSEMULATOR +=  -stdlib=$(LIBCXX)
-	PLATCFLAGS += $(fpic)
-	SHARED := -dynamiclib
-	# Uses gcc or clang, whichever is default
-	CXX_AS := c++
-	REALCC := cc
-	CC := $(CXX_AS) -stdlib=$(LIBCXX)
-	LD := $(CXX_AS) -stdlib=$(LIBCXX)
-	LDFLAGS +=  $(fpic) $(SHARED)
-	AR := @ar
-	ifeq ($(COMMAND_MODE),"legacy")
-		ARFLAGS = -crs
-	endif
-	ifneq (,$(findstring Power,$(UNAME)))
-		BIGENDIAN=1
-	else
-		PLATCFLAGS += -DLSB_FIRST
-	endif
-	PLATCFLAGS += -DSDLMAME_NO64BITIO -DOSX
-	CCOMFLAGS += $(PLATCFLAGS)
-## iOS
-else ifeq ($(platform), ios)
-	armplatform := 1
-	TARGETLIB := $(TARGET)_libretro_ios.dylib
-	fpic := -fPIC
-	SHARED := -dynamiclib
-	LIBCXX := libstdc++
+#   OLD STUFF
+#
+#   What follows are bits of the old Makefile.libretro to help in porting
+#   stuff that doesn't work to GENie.  When you get something that doesn't
+#   work sorted, please trim the relevant bits below...
+#
+###########################################################################
 
-	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
-	CXX_AS := c++
-	REALCC = cc -arch armv7 -isysroot $(IOSSDK)
-	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
-	LD = $(CC) -stdlib=$(LIBCXX)
-	LDFLAGS +=  $(fpic) $(SHARED)
-	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
-	PLATCFLAGS += -mfloat-abi=softfp -marm -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
-	CCOMFLAGS += $(PLATCFLAGS)
-## QNX
-else ifeq ($(platform), qnx)
-	armplatform := 1
-	TARGETLIB := $(TARGET)_libretro_qnx.so
-	fpic := -fPIC
-	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
-
-	CC := qcc -Vgcc_ntoarmv7le
-	REALCC := qcc -Vgcc_ntoarmv7le
-	AR := qcc -Vgcc_ntoarmv7le
-	CFLAGS += -D__BLACKBERRY_QNX__
-	LIBS += -lstdc++ -lpthread
-
-## PS3
+### Unix
+#ifeq ($(platform), unix)
+#	TARGETLIB := $(TARGET)_libretro.so
+#	fpic := -fPIC
+#	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
+#	CCOMFLAGS += $(fpic) -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
+#	PLATCFLAGS +=  -DALIGN_INTS -DALIGN_SHORTS -fstrict-aliasing -fno-merge-constants  $(fpic)
+#	ifeq ($(VRENDER),opengl)
+#		PLATCFLAGS += -DHAVE_GL
+#		LIBS += -lGL
+#	endif
+#	LDFLAGS +=  $(fpic) $(SHARED)
+#	REALCC = cc
+#	BASELIBS +=  -lpthread
+#	REALCC := gcc
+#	CC := g++
+#	AR := @ar
+#	LD := g++
+#	CCOMFLAGS += $(PLATCFLAGS)
+#	LIBS += -lstdc++ -lpthread -ldl
+#	ifneq (,$(findstring ppc,$(UNAME)))
+#		BIGENDIAN=1
+#	else
+#		PLATCFLAGS += -DLSB_FIRST
+#	endif
+##
+### Android
+#else ifeq ($(platform), android)
+#	# May need to move armplatform := 1 to above "include makefile"
+#	armplatform := 1
+#	TARGETLIB := $(TARGET)_libretro_android.so
+#	fpic := -fPIC
+#	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
+#	REALCC := @arm-linux-androideabi-gcc
+#	CC := @arm-linux-androideabi-g++
+#	AR := @arm-linux-androideabi-ar
+#	LD := @arm-linux-androideabi-g++
+#	CCOMFLAGS += $(fpic) -mstructure-size-boundary=32 -mthumb-interwork -falign-functions=16 -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16 -Wno-psabi
+#	CCOMFLAGS_INCOMPATIBLE :=
+#	PLATCFLAGS += -march=armv7-a -mfloat-abi=softfp -DANDROID -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DSDLMAME_ARM -DRETRO_SETJMP_HACK $(fpic)
+#	ifeq ($(VRENDER),opengl)
+#		PLATCFLAGS += -DHAVE_GL
+#		LIBS += -lGLESv2
+#		GLES = 1
+#	endif
+#	LDFLAGS += -Wl,--fix-cortex-a8 -Wl,--no-undefined -llog $(fpic) $(SHARED)
+#	CCOMFLAGS += $(PLATCFLAGS)
+#	LIBS += -lstdc++
+### OS X
+#else ifeq ($(platform), osx)
+#	TARGETLIB := $(TARGET)_libretro.dylib
+#	fpic := -fPIC -mmacosx-version-min=10.7
+#	LIBCXX := libstdc++
+#	LDFLAGSEMULATOR +=  -stdlib=$(LIBCXX)
+#	PLATCFLAGS += $(fpic)
+#	SHARED := -dynamiclib
+#	# Uses gcc or clang, whichever is default
+#	CXX_AS := c++
+#	REALCC := cc
+#	CC := $(CXX_AS) -stdlib=$(LIBCXX)
+#	LD := $(CXX_AS) -stdlib=$(LIBCXX)
+#	LDFLAGS +=  $(fpic) $(SHARED)
+#	AR := @ar
+#	ifeq ($(COMMAND_MODE),"legacy")
+#		ARFLAGS = -crs
+#	endif
+#	ifneq (,$(findstring Power,$(UNAME)))
+#		BIGENDIAN=1
+#	else
+#		PLATCFLAGS += -DLSB_FIRST
+#	endif
+#	PLATCFLAGS += -DSDLMAME_NO64BITIO -DOSX
+#	CCOMFLAGS += $(PLATCFLAGS)
+### iOS
+#else ifeq ($(platform), ios)
+#	armplatform := 1
+#	TARGETLIB := $(TARGET)_libretro_ios.dylib
+#	fpic := -fPIC
+#	SHARED := -dynamiclib
+#	LIBCXX := libstdc++
+#
+#	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
+#	CXX_AS := c++
+#	REALCC = cc -arch armv7 -isysroot $(IOSSDK)
+#	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
+#	LD = $(CC) -stdlib=$(LIBCXX)
+#	LDFLAGS +=  $(fpic) $(SHARED)
+#	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
+#	PLATCFLAGS += -mfloat-abi=softfp -marm -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
+#	CCOMFLAGS += $(PLATCFLAGS)
+### QNX
+#else ifeq ($(platform), qnx)
+#	armplatform := 1
+#	TARGETLIB := $(TARGET)_libretro_qnx.so
+#	fpic := -fPIC
+#	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
+#
+#	CC := qcc -Vgcc_ntoarmv7le
+#	REALCC := qcc -Vgcc_ntoarmv7le
+#	AR := qcc -Vgcc_ntoarmv7le
+#	CFLAGS += -D__BLACKBERRY_QNX__
+#	LIBS += -lstdc++ -lpthread
+#
+### PS3
 # mame isn't likely to run very well on PS3, but if you want to make it work,
 # these blocks are a start (don't forget to set REALCC as well)
 #else ifeq ($(platform), ps3)
@@ -388,74 +363,74 @@ else ifeq ($(platform), qnx)
 #	PLATCFLAGS += -DARM
 #	LIBS += -lstdc++ -lpthread -ldl
 #
-## Windows cross compiler
-else ifeq ($(platform), wincross)
-	TARGETLIB := $(TARGET)_libretro.dll
-	# You're going to have to pass REALCC=<whatever> on the cmdline for wincross
-	REALCC := gcc
-	CC := g++
-	LD := $(CC)
-	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
-	CCOMFLAGS += -D__WIN32__
-	LDFLAGS += $(SHARED)
-	ifeq ($(VRENDER),opengl)
-		CCOMFLAGS += -DHAVE_GL
-		LIBS += -lopengl32
-	endif
-	EXE = .exe
-	ifneq (,$(findstring mingw64-w64,$(PATH)))
-		PTR64=1
-	endif
-
-else
-	## Windows
-	TARGETLIB := $(TARGET)_libretro.dll
-	REALCC = gcc
-	CC = g++
-	LD = $(CC)
-	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
-	CCOMFLAGS += -D__WIN32__
-	LDFLAGS += $(SHARED)
-	ifeq ($(VRENDER),opengl)
-		CCOMFLAGS += -DHAVE_GL
-		LIBS += -lopengl32
-	endif
-	EXE = .exe
-	LIBS += -lws2_32
-	# FIXME: Check if TARGETOS does this in makefile for you
-	#        Also I'm not sure the PTR64 stuff is being done right
-	DEFS += -DX64_WINDOWS_ABI
-	ifneq ($(findstring MINGW,$(shell uname -a)),)
-		PTR64=1
-	endif
-endif
-
-ifeq ($(platform), osx)
-CONLYFLAGS += -ansi
-else
-CONLYFLAGS += -std=gnu89
-endif
-
-libretro-target: clean-osd $(EMULATOR)
-
-# This replaces the $(EMULATOR) rule in makefile, so if that changes you may
-# need to modify this recipe accordingly.
-$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(OSDOBJS) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
-	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
-	@echo Linking $(TARGETLIB)
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $(TARGETLIB)
-
-# Upstream cleans $(OBJ) which may not get everything
-clean: clean-libretro
-clean-libretro:
-	@echo Deleting object tree obj...
-	$(RM) -r obj/*
-	@echo Deleting old build products...
-	$(RM) *.dll *.so *.dylib
-
-# retro OSD varies between mame, mess, ume so clean it between each
-clean-osd:
-	@echo Deleting object tree obj/osd...
-	$(RM) -r obj/osd/*
-
-.PHONY: clean-osd
+### Windows cross compiler
+#else ifeq ($(platform), wincross)
+#	TARGETLIB := $(TARGET)_libretro.dll
+#	# You're going to have to pass REALCC=<whatever> on the cmdline for wincross
+#	REALCC := gcc
+#	CC := g++
+#	LD := $(CC)
+#	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
+#	CCOMFLAGS += -D__WIN32__
+#	LDFLAGS += $(SHARED)
+#	ifeq ($(VRENDER),opengl)
+#		CCOMFLAGS += -DHAVE_GL
+#		LIBS += -lopengl32
+#	endif
+#	EXE = .exe
+#	ifneq (,$(findstring mingw64-w64,$(PATH)))
+#		PTR64=1
+#	endif
+#
+#else
+#	## Windows
+#	TARGETLIB := $(TARGET)_libretro.dll
+#	REALCC = gcc
+#	CC = g++
+#	LD = $(CC)
+#	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
+#	CCOMFLAGS += -D__WIN32__
+#	LDFLAGS += $(SHARED)
+#	ifeq ($(VRENDER),opengl)
+#		CCOMFLAGS += -DHAVE_GL
+#		LIBS += -lopengl32
+#	endif
+#	EXE = .exe
+#	LIBS += -lws2_32
+#	# FIXME: Check if TARGETOS does this in makefile for you
+#	#        Also I'm not sure the PTR64 stuff is being done right
+#	DEFS += -DX64_WINDOWS_ABI
+#	ifneq ($(findstring MINGW,$(shell uname -a)),)
+#		PTR64=1
+#	endif
+#endif
+#
+#ifeq ($(platform), osx)
+#CONLYFLAGS += -ansi
+#else
+#CONLYFLAGS += -std=gnu89
+#endif
+#
+#libretro-target: clean-osd $(EMULATOR)
+#
+## This replaces the $(EMULATOR) rule in makefile, so if that changes you may
+## need to modify this recipe accordingly.
+#$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(OSDOBJS) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
+#	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
+#	@echo Linking $(TARGETLIB)
+#	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $(TARGETLIB)
+#
+## Upstream cleans $(OBJ) which may not get everything
+#clean: clean-libretro
+#clean-libretro:
+#	@echo Deleting object tree obj...
+#	$(RM) -r obj/*
+#	@echo Deleting old build products...
+#	$(RM) *.dll *.so *.dylib
+#
+## retro OSD varies between mame, mess, ume so clean it between each
+#clean-osd:
+#	@echo Deleting object tree obj/osd...
+#	$(RM) -r obj/osd/*
+#
+#.PHONY: clean-osd
