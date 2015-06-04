@@ -9721,25 +9721,34 @@ ROM_START( theend )
 	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
 ROM_END
 
-ROM_START( theends )
+/*
+All labels are in the form of:
+
+THE END (c)
+RA3 13
+1980 STERN
+
+The above example is for IC13
+*/
+ROM_START( theends ) /* The Stern Electronics license */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic13",         0x0000, 0x0800, CRC(90e5ab14) SHA1(b926801ab1cc1e2787a76ced6c7cffd6fce753d4) )
-	ROM_LOAD( "ic14",         0x0800, 0x0800, CRC(950f0a07) SHA1(bde9f3c6cf060dc6f5b7652287b94e04bed7bcf7) )
-	ROM_LOAD( "ic15",         0x1000, 0x0800, CRC(6786bcf5) SHA1(7556d3dc51d6a112b6357b8a36df05fd1a4d1cc9) )
-	ROM_LOAD( "ic16",         0x1800, 0x0800, CRC(380a0017) SHA1(3354eb328a32537f722fe8a0949ddcab6cf21eb8) )
-	ROM_LOAD( "ic17",         0x2000, 0x0800, CRC(af067b7f) SHA1(855c6ddf29fbfea004c7143fe29064abf53801ad) )
-	ROM_LOAD( "ic18",         0x2800, 0x0800, CRC(a0411b93) SHA1(d644968758a1b73d13e09b24d24bfec82276e8f4) )
+	ROM_LOAD( "the_end_ra3_13.ic13",         0x0000, 0x0800, CRC(90e5ab14) SHA1(b926801ab1cc1e2787a76ced6c7cffd6fce753d4) )
+	ROM_LOAD( "the_end_ra3_14.ic14",         0x0800, 0x0800, CRC(950f0a07) SHA1(bde9f3c6cf060dc6f5b7652287b94e04bed7bcf7) )
+	ROM_LOAD( "the_end_ra3_15.ic15",         0x1000, 0x0800, CRC(6786bcf5) SHA1(7556d3dc51d6a112b6357b8a36df05fd1a4d1cc9) )
+	ROM_LOAD( "the_end_ra3_16.ic16",         0x1800, 0x0800, CRC(380a0017) SHA1(3354eb328a32537f722fe8a0949ddcab6cf21eb8) )
+	ROM_LOAD( "the_end_ra3_17.ic17",         0x2000, 0x0800, CRC(af067b7f) SHA1(855c6ddf29fbfea004c7143fe29064abf53801ad) )
+	ROM_LOAD( "the_end_ra3_18.ic18",         0x2800, 0x0800, CRC(a0411b93) SHA1(d644968758a1b73d13e09b24d24bfec82276e8f4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ic56",         0x0000, 0x0800, CRC(3b2c2f70) SHA1(bcccdacacfc9a3b5f1412dfba6bb0046d283bccc) )
-	ROM_LOAD( "ic55",         0x0800, 0x0800, CRC(e0429e50) SHA1(27678fc3172cbca3ae1eae96e9d8a62561d5ce40) )
+	ROM_LOAD( "the_end_ra3_56.ic56",         0x0000, 0x0800, CRC(3b2c2f70) SHA1(bcccdacacfc9a3b5f1412dfba6bb0046d283bccc) )
+	ROM_LOAD( "the_end_ra3_55.ic55",         0x0800, 0x0800, CRC(e0429e50) SHA1(27678fc3172cbca3ae1eae96e9d8a62561d5ce40) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "ic30",         0x0000, 0x0800, CRC(527fd384) SHA1(92a384899d5acd2c689f637da16a0e2d11a9d9c6) )
-	ROM_LOAD( "ic31",         0x0800, 0x0800, CRC(af6d09b6) SHA1(f3ad51dc88aa58fd39195ead978b039e0b0b585c) )
+	ROM_LOAD( "the_end_ra3_30.ic30",         0x0000, 0x0800, CRC(527fd384) SHA1(92a384899d5acd2c689f637da16a0e2d11a9d9c6) )
+	ROM_LOAD( "the_end_ra3_31.ic31",         0x0800, 0x0800, CRC(af6d09b6) SHA1(f3ad51dc88aa58fd39195ead978b039e0b0b585c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
+	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* no label for this chip */
 ROM_END
 
 ROM_START( theendb )
