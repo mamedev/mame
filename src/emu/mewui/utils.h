@@ -170,11 +170,8 @@ struct reselect_last
 };
 
 // Manufacturers
-class c_mnfct
+struct c_mnfct
 {
-public:
-	c_mnfct();
-
 	static void set(const char *str);
 	static std::string getname(const char *str);
 	static std::vector<std::string> ui;
@@ -182,22 +179,16 @@ public:
 };
 
 // Years
-class c_year
+struct c_year
 {
-public:
-	c_year();
-
 	static void set(const char *str);
 	static std::vector<std::string> ui;
 	static UINT16 actual;
 };
 
 // GLOBAL CLASS
-class mewui_globals
+struct mewui_globals
 {
-public:
-	mewui_globals();
-
 	static UINT16       actual_filter, actual_sw_filter;
 	static const char   *filter_text[], *sw_filter_text[], *ume_text[];
 	static size_t       s_filter_text, sw_filter_len, s_ume_text;
@@ -209,11 +200,8 @@ public:
 };
 
 // Custom filter class
-class custfltr
+struct custfltr
 {
-public:
-	custfltr();
-
 	static UINT16  main_filter;
 	static UINT16  numother;
 	static UINT16  other[MAX_FILTER];
@@ -241,8 +229,6 @@ void fskip(char *s, int id = 0);
 // custom filter load and save
 void load_custom_filters();
 void save_custom_filters();
-
-// TEMPLATES
 
 // jpeg loader
 template <typename _T>

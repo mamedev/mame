@@ -32,10 +32,9 @@ private:
 	};
 
 	UINT16            cur_rates;
-	static const int    sound_rate[];
-	int              m_sample_rate;
-	bool                m_samples;
-	bool                m_sound;
+	static const int  sound_rate[];
+	int               m_sample_rate;
+	bool              m_samples, m_sound;
 };
 
 #endif /* __MEWUI_SNDMENU_H__ */

@@ -19,29 +19,29 @@
 // in an ICO file.
 typedef struct
 {
-	UINT8   bWidth;            // Width of the image
-	UINT8   bHeight;              // Height of the image (times 2)
-	UINT8   bColorCount;          // Number of colors in image (0 if >=8bpp)
-	UINT8   bReserved;          // Reserved
-	UINT16  wPlanes;              // Color Planes
-	UINT16  wBitCount;          // Bits per pixel
-	UINT32  dwBytesInRes;        // how many bytes in this resource?
-	UINT32  dwImageOffset;      // where in the file is this image
+	UINT8   bWidth;                // Width of the image
+	UINT8   bHeight;               // Height of the image (times 2)
+	UINT8   bColorCount;           // Number of colors in image (0 if >=8bpp)
+	UINT8   bReserved;             // Reserved
+	UINT16  wPlanes;               // Color Planes
+	UINT16  wBitCount;             // Bits per pixel
+	UINT32  dwBytesInRes;          // how many bytes in this resource?
+	UINT32  dwImageOffset;         // where in the file is this image
 } ICONDIRENTRY, *LPICONDIRENTRY;
 
 typedef struct
 {
-	UINT16  idReserved;          // Reserved
-	UINT16  idType;              // resource type (1 for icons)
-	UINT16  idCount;                // how many images?
-	//ICONDIRENTRY  idEntries[1];   // the entries for each image
+	UINT16  idReserved;            // Reserved
+	UINT16  idType;                // resource type (1 for icons)
+	UINT16  idCount;               // how many images?
+	//ICONDIRENTRY  idEntries[1];  // the entries for each image
 } ICONDIR, *LPICONDIR;
 
 // size - 40 bytes
 typedef struct {
 	UINT32  biSize;
 	UINT32  biWidth;
-	UINT32  biHeight;              // Icon Height (added height of XOR-Bitmap and AND-Bitmap)
+	UINT32  biHeight;   // Icon Height (added height of XOR-Bitmap and AND-Bitmap)
 	UINT16  biPlanes;
 	UINT16  biBitCount;
 	UINT32  biCompression;
@@ -54,10 +54,10 @@ typedef struct {
 
 // 46 bytes
 typedef struct{
-	s_BITMAPINFOHEADER  icHeader;          // DIB header
-	UINT32            icColors[1];      // Color table (short 4 bytes) //RGBQUAD
-	UINT8              icXOR[1];           // DIB bits for XOR mask
-	UINT8              icAND[1];           // DIB bits for AND mask
+	s_BITMAPINFOHEADER  icHeader;       // DIB header
+	UINT32              icColors[1];    // Color table (short 4 bytes) //RGBQUAD
+	UINT8               icXOR[1];       // DIB bits for XOR mask
+	UINT8               icAND[1];       // DIB bits for AND mask
 } ICONIMAGE, *LPICONIMAGE;
 
 //-------------------------------------------------

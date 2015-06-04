@@ -41,9 +41,9 @@ private:
 		LAST_DISPLAY
 	};
 
-	UINT16 cur_video;
+	UINT16            cur_video;
 	static const char *video_modes[], *video_modes_label[];
-	bool m_options[LAST_DISPLAY];
+	bool              m_options[LAST_DISPLAY];
 };
 
 #endif /* __MEWUI_DSPLMENU_H__ */

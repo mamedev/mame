@@ -48,7 +48,7 @@ private:
 	int ume_hover;
 
 	int visible_lines;        // main box visible lines
-	int right_visible_lines;    // right box lines
+	int right_visible_lines;  // right box lines
 	int totallines;
 
 	// draw game list
