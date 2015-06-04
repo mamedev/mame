@@ -383,6 +383,7 @@ enum ioport_type
 		IPT_UI_RIGHT_PANEL,
 		IPT_UI_UP_PANEL,
 		IPT_UI_DOWN_PANEL,
+		IPT_UI_EXPORT,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,

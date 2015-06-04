@@ -763,6 +763,7 @@ void construct_core_types_UI(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_RIGHT_PANEL,      NULL,                     input_seq() )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_UP_PANEL,         NULL,                     input_seq() )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_DOWN_PANEL,       NULL,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_EXPORT,           NULL,                     input_seq(KEYCODE_LALT, KEYCODE_E) )
 }
 
 void construct_core_types_OSD(simple_list<input_type_entry> &typelist)

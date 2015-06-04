@@ -24,6 +24,7 @@
 #include "sound/samples.h"
 #include "unzip.h"
 #include "mewui/custmenu.h"
+#include "info.h"
 
 //-------------------------------------------------
 //  sort
@@ -388,6 +389,35 @@ void ui_mewui_select_game::handle()
 					machine().favorite().remove_favorite_game(*swinfo);
 					reset(UI_MENU_RESET_SELECT_FIRST);
 				}
+			}
+		}
+
+		// handle UI_SYSINFO
+		else if (menu_event->iptkey == IPT_UI_EXPORT)
+		{
+			// attempt to open the output file
+			emu_file file(MEWUI_DIR, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+
+			if (file.open("export.xml") == FILERR_NONE)
+			{
+				FILE *pfile;
+				std::string fullpath(file.fullpath());
+				file.close();
+				pfile = fopen(fullpath.c_str() , "w");
+
+				driver_enumerator drivlist(machine().options());
+				drivlist.exclude_all();
+				// iterate over entries
+				for (int curitem = 0; curitem < m_displaylist.size(); curitem++)
+				{
+					int f = driver_list::find(m_displaylist[curitem]->name);
+					drivlist.include(f);
+				}
+
+				// create the XML and save to file
+				info_xml_creator creator(drivlist);
+				creator.output(pfile);
+				fclose(pfile);
 			}
 		}
 
