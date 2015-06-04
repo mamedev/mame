@@ -101,7 +101,7 @@ static const UINT8 fpmode_source[4] =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)     direct->read_decrypted_dword(pc)
+#define ROPCODE(pc)     direct->read_dword(pc)
 
 
 const device_type VR4300BE = &device_creator<vr4300be_device>;

@@ -116,7 +116,7 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type ty
 UINT8 i8086_cpu_device::fetch_op()
 {
 	UINT8 data;
-	data = m_direct->read_decrypted_byte(pc(), m_fetch_xor);
+	data = m_direct->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -124,7 +124,7 @@ UINT8 i8086_cpu_device::fetch_op()
 UINT8 i8086_cpu_device::fetch()
 {
 	UINT8 data;
-	data = m_direct->read_raw_byte(pc(), m_fetch_xor);
+	data = m_direct->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }

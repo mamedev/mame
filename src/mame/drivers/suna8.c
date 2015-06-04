@@ -73,14 +73,15 @@ DRIVER_INIT_MEMBER(suna8_state,hardhead)
 			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
+	membank("bank0d")->set_base(memregion("maincpu")->base());
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1d")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Non encrypted bootleg */
 DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x48000);
+	membank("bank0d")->set_base(memregion("maincpu")->base() + 0x48000);
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
@@ -137,14 +138,13 @@ DRIVER_INIT_MEMBER(suna8_state, brickzn_common)
 	m_decrypt = brickzn_decrypt();
 
 	// Non-banked opcodes
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
+	membank("bank0d")->set_base(m_decrypt);
 
 	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
 	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	// Opcode banks: 00-1f normal opcode decryption:
-	membank("bank1")->configure_decrypted_entries(0, 16, m_decrypt + 0x10000, 0x4000);
-	membank("bank1")->configure_decrypted_entries(16, 16, m_decrypt + 0x10000, 0x4000);
+	membank("bank1d")->configure_entries(0, 16, m_decrypt + 0x10000, 0x4000);
+	membank("bank1d")->configure_entries(16, 16, m_decrypt + 0x10000, 0x4000);
 }
 
 DRIVER_INIT_MEMBER(suna8_state,brickzn)
@@ -209,8 +209,8 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn11)
 	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
 	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	// Opcode banks: 00-1f normal opcode decryption:
-	membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
-	membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1d")->configure_entries(0, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1d")->configure_entries(16, 16, decrypt + 0x10000, 0x4000);
 }
 
 
@@ -220,14 +220,13 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn11)
 
 DRIVER_INIT_MEMBER(suna8_state,hardhea2)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
+	membank("bank0d")->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -307,14 +306,13 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 DRIVER_INIT_MEMBER(suna8_state,starfigh)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
+	membank("bank0d")->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -393,14 +391,13 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 
 DRIVER_INIT_MEMBER(suna8_state,sparkman)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
+	membank("bank0d")->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -539,6 +536,7 @@ WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
 
 	if (data & ~0xef)   logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",space.device().safe_pc(),data);
 	membank("bank1")->set_entry(bank);
+	membank("bank1d")->set_entry(bank);
 }
 
 
@@ -571,6 +569,10 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")  // Sprites
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, suna8_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hardhead_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -596,6 +598,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 	if (data & ~0xf7)   logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",space.device().safe_pc(),data);
 
 	membank("bank1")->set_entry(bank);
+	membank("bank1d")->set_entry(bank);
 
 	flip_screen_set(data & 0x20);
 	coin_lockout_w ( machine(), 0,  data & 0x40);
@@ -695,6 +698,7 @@ WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
 	if (data & ~0x0f)   logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",space.device().safe_pc(),data);
 
 	membank("bank1")->set_entry(bank + (membank("bank1")->entry() & 0x10));
+	membank("bank1d")->set_entry(membank("bank1")->entry());
 
 	m_rombank = data;
 }
@@ -812,13 +816,11 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 
 		if (m_prot_opcode_toggle == 0)
 		{
-			address_space &space = m_maincpu->space(AS_PROGRAM);
-			space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
+			membank("bank0d")->set_base(m_decrypt);
 		}
 		else
 		{
-			address_space &space = m_maincpu->space(AS_PROGRAM);
-			space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base());
+			membank("bank0d")->set_base(memregion("maincpu")->base());
 		}
 	}
 }
@@ -839,6 +841,7 @@ WRITE8_MEMBER(suna8_state::brickzn_prot2_w)
 
 	// Select alternate data decryption, see code at 787e:
 	membank("bank1")->set_entry((membank("bank1")->entry() & 0x0f) + ((m_prot2 == (data | 0xdc)) ? 0x10 : 0));
+	membank("bank1d")->set_entry(membank("bank1")->entry());
 
 	m_prot2_prev = m_prot2;
 	m_prot2 = data;
@@ -941,6 +944,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_rombank_w)
 	if (data & ~0x0f)   logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",space.device().safe_pc(),data);
 
 	membank("bank1")->set_entry(bank);
+	membank("bank1d")->set_entry(bank);
 
 	m_rombank = data;
 }
@@ -1080,6 +1084,7 @@ WRITE8_MEMBER(suna8_state::starfigh_leds_w)
 	int bank = m_rombank_latch & 0x0f;
 
 	membank("bank1")->set_entry(bank);
+	membank("bank1d")->set_entry(bank);
 
 	m_rombank = m_rombank_latch;
 	logerror("CPU #0 - PC %04X: rom bank = %02X\n",space.device().safe_pc(), m_rombank);
@@ -1193,6 +1198,7 @@ WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 	int bank = m_rombank_latch & 0x0f;
 
 	membank("bank1")->set_entry(bank);
+	membank("bank1d")->set_entry(bank);
 
 	m_rombank = m_rombank_latch;
 	logerror("CPU #0 - PC %04X: rom bank = %02X\n",space.device().safe_pc(), m_rombank);
@@ -1868,6 +1874,7 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hardhead_map)
 	MCFG_CPU_IO_MAP(hardhead_io_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)      /* No NMI */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
@@ -1922,6 +1929,7 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(rranger_map)
 	MCFG_CPU_IO_MAP(rranger_io_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
@@ -1974,6 +1982,7 @@ MACHINE_RESET_MEMBER(suna8_state,brickzn)
 	m_paletteram_enab = 1;  // for brickzn11
 	m_remap_sound = 0;
 	membank("bank1")->set_entry(0);
+	membank("bank1d")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( brickzn11, suna8_state )
@@ -1981,6 +1990,7 @@ static MACHINE_CONFIG_START( brickzn11, suna8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA PROTECTION BLOCK */
 	MCFG_CPU_PROGRAM_MAP(brickzn11_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  // nmi breaks ramtest but is needed!
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)   /* Z0840006PSC - 6MHz (measured) */
@@ -2065,6 +2075,7 @@ static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA T568009 */
 	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
@@ -2084,6 +2095,7 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(starfigh_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	/* The sound section is identical to that of hardhead */
@@ -2135,6 +2147,7 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(sparkman_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)               /* ? */

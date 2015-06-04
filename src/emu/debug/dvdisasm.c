@@ -27,7 +27,8 @@ debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &d
 	: debug_view_source(name, &device),
 		m_device(device),
 		m_disasmintf(dynamic_cast<device_disasm_interface *>(&device)),
-		m_space(device.memory().space(AS_PROGRAM))
+		m_space(device.memory().space(AS_PROGRAM)),
+		m_decrypted_space(device.memory().has_space(AS_DECRYPTED_OPCODES) ? device.memory().space(AS_DECRYPTED_OPCODES) : device.memory().space(AS_PROGRAM))
 {
 }
 
@@ -251,8 +252,8 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 		while (curpcbyte < fillpcbyte)
 		{
 			fillpcbyte--;
-			opbuf[1000 + fillpcbyte - targetpcbyte] = debug_read_opcode(source.m_space, fillpcbyte, 1, FALSE);
-			argbuf[1000 + fillpcbyte - targetpcbyte] = debug_read_opcode(source.m_space, fillpcbyte, 1, TRUE);
+			opbuf[1000 + fillpcbyte - targetpcbyte] = debug_read_opcode(source.m_decrypted_space, fillpcbyte, 1);
+			argbuf[1000 + fillpcbyte - targetpcbyte] = debug_read_opcode(source.m_space, fillpcbyte, 1);
 		}
 
 		// loop until we get past the target instruction
@@ -310,12 +311,12 @@ void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes
 	// output the first value
 	int offset = 0;
 	if (maxchars >= char_num * minbytes)
-		offset = sprintf(string, "%s", core_i64_format(debug_read_opcode(source.m_space, pcbyte, minbytes, FALSE), minbytes * char_num, source.is_octal()));
+		offset = sprintf(string, "%s", core_i64_format(debug_read_opcode(source.m_decrypted_space, pcbyte, minbytes), minbytes * char_num, source.is_octal()));
 
 	// output subsequent values
 	int byte;
 	for (byte = minbytes; byte < numbytes && offset + 1 + char_num * minbytes < maxchars; byte += minbytes)
-		offset += sprintf(&string[offset], " %s", core_i64_format(debug_read_opcode(source.m_space, pcbyte + byte, minbytes, encrypted), minbytes * char_num, source.is_octal()));
+		offset += sprintf(&string[offset], " %s", core_i64_format(debug_read_opcode(encrypted ? source.m_space : source.m_decrypted_space, pcbyte + byte, minbytes), minbytes * char_num, source.is_octal()));
 
 	// if we ran out of room, indicate more
 	string[maxchars - 1] = 0;
@@ -394,8 +395,8 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			// fetch the bytes up to the maximum
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = debug_read_opcode(source.m_space, pcbyte + numbytes, 1, FALSE);
-				argbuf[numbytes] = debug_read_opcode(source.m_space, pcbyte + numbytes, 1, TRUE);
+				opbuf[numbytes] = debug_read_opcode(source.m_decrypted_space, pcbyte + numbytes, 1);
+				argbuf[numbytes] = debug_read_opcode(source.m_space, pcbyte + numbytes, 1);
 			}
 
 			// disassemble the result
@@ -429,8 +430,8 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	}
 
 	// update opcode base information
-	m_last_direct_decrypted = source.m_space.direct().decrypted();
-	m_last_direct_raw = source.m_space.direct().raw();
+	m_last_direct_decrypted = source.m_decrypted_space.direct().ptr();
+	m_last_direct_raw = source.m_space.direct().ptr();
 	m_last_change_count = source.m_device.debug()->comment_change_count();
 
 	// no longer need to recompute
@@ -478,7 +479,7 @@ void debug_view_disasm::view_update()
 	}
 
 	// if the opcode base has changed, rework things
-	if (source.m_space.direct().decrypted() != m_last_direct_decrypted || source.m_space.direct().raw() != m_last_direct_raw)
+	if (source.m_decrypted_space.direct().ptr() != m_last_direct_decrypted || source.m_space.direct().ptr() != m_last_direct_raw)
 		m_recompute = true;
 
 	// if the comments have changed, redo it

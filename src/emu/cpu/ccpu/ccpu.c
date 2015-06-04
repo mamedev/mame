@@ -22,7 +22,7 @@ const device_type CCPU = &device_creator<ccpu_cpu_device>;
     MACROS
 ***************************************************************************/
 
-#define READOP(a)         (m_direct->read_decrypted_byte(a))
+#define READOP(a)         (m_direct->read_byte(a))
 
 #define RDMEM(a)          (m_data->read_word((a) * 2) & 0xfff)
 #define WRMEM(a,v)        (m_data->write_word((a) * 2, (v)))

@@ -10,7 +10,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_scrollram(*this, "scrollram") { }
+		m_scrollram(*this, "scrollram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -19,6 +20,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_scrollram;
+	required_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	tilemap_t *m_bg_tilemap;
 	int m_control;

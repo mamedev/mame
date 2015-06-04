@@ -442,7 +442,7 @@ INLINE int pc_is_valid(address_space &space, UINT32 pc, UINT32 flags)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (space.direct().read_decrypted_ptr(pc) == NULL)
+	if (space.direct().read_ptr(pc) == NULL)
 		return 0;
 	return 1;
 }

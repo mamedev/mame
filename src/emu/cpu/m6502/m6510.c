@@ -119,9 +119,9 @@ UINT8 m6510_device::mi_6510_normal::read(UINT16 adr)
 	return res;
 }
 
-UINT8 m6510_device::mi_6510_normal::read_direct(UINT16 adr)
+UINT8 m6510_device::mi_6510_normal::read_sync(UINT16 adr)
 {
-	UINT8 res = direct->read_raw_byte(adr);
+	UINT8 res = sdirect->read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -129,9 +129,9 @@ UINT8 m6510_device::mi_6510_normal::read_direct(UINT16 adr)
 	return res;
 }
 
-UINT8 m6510_device::mi_6510_normal::read_decrypted(UINT16 adr)
+UINT8 m6510_device::mi_6510_normal::read_arg(UINT16 adr)
 {
-	UINT8 res = direct->read_decrypted_byte(adr);
+	UINT8 res = direct->read_byte(adr);
 	if(adr == 0x0000)
 		res = base->dir_r();
 	else if(adr == 0x0001)
@@ -152,14 +152,24 @@ m6510_device::mi_6510_nd::mi_6510_nd(m6510_device *_base) : mi_6510_normal(_base
 {
 }
 
-UINT8 m6510_device::mi_6510_nd::read_direct(UINT16 adr)
+UINT8 m6510_device::mi_6510_nd::read_sync(UINT16 adr)
 {
-	return read(adr);
+	UINT8 res = sprogram->read_byte(adr);
+	if(adr == 0x0000)
+		res = base->dir_r();
+	else if(adr == 0x0001)
+		res = base->port_r();
+	return res;
 }
 
-UINT8 m6510_device::mi_6510_nd::read_decrypted(UINT16 adr)
+UINT8 m6510_device::mi_6510_nd::read_arg(UINT16 adr)
 {
-	return read(adr);
+	UINT8 res = program->read_byte(adr);
+	if(adr == 0x0000)
+		res = base->dir_r();
+	else if(adr == 0x0001)
+		res = base->port_r();
+	return res;
 }
 
 #include "cpu/m6502/m6510.inc"

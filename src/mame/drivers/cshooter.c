@@ -4,7 +4,7 @@
 
  TS 01.05.2006:
 
- - added sprites, bgmap reading and few ixes here and there
+ - added sprites, bgmap reading and few fixes here and there
    airraid and cshootere are a bit "playable" ;) without gfx
 
 
@@ -103,7 +103,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram2_8(*this, "paletteram2") { }
+		m_generic_paletteram2_8(*this, "paletteram2"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;
@@ -114,6 +115,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
 	required_shared_ptr<UINT8> m_generic_paletteram2_8;
+	required_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	tilemap_t *m_txtilemap;
 	int m_coin_stat;
@@ -253,7 +255,7 @@ WRITE8_MEMBER(cshooter_state::cshooter_c700_w)
 
 WRITE8_MEMBER(cshooter_state::bank_w)
 {
-	membank("bank1")->set_base(&memregion("user1")->base()[0x4000*((data>>4)&3)]);
+	membank("bank1")->set_entry((data>>4)&3);
 }
 
 
@@ -311,6 +313,10 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cshooter_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
 #if 0
@@ -440,9 +446,11 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cshooter_state, cshooter_scanline, "screen", 0, 1)
 
 	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)      /* verified on pcb */
+	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -595,29 +603,24 @@ DRIVER_INIT_MEMBER(cshooter_state,cshooter)
 
 DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int A;
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
-
-	for (A = 0x0000;A < 0x8000;A++)
+	for (int A = 0x0000;A < 0x8000;A++)
 	{
 		/* decode the opcodes */
-		decrypt[A] = rom[A];
+		m_decrypted_opcodes[A] = rom[A];
 
 		if (BIT(A,5) && !BIT(A,3))
-			decrypt[A] ^= 0x40;
+			m_decrypted_opcodes[A] ^= 0x40;
 
 		if (BIT(A,10) && !BIT(A,9) && BIT(A,3))
-			decrypt[A] ^= 0x20;
+			m_decrypted_opcodes[A] ^= 0x20;
 
 		if ((BIT(A,10) ^ BIT(A,9)) && BIT(A,1))
-			decrypt[A] ^= 0x02;
+			m_decrypted_opcodes[A] ^= 0x02;
 
 		if (BIT(A,9) || !BIT(A,5) || BIT(A,3))
-			decrypt[A] = BITSWAP8(decrypt[A],7,6,1,4,3,2,5,0);
+			m_decrypted_opcodes[A] = BITSWAP8(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
 
 		/* decode the data */
 		if (BIT(A,5))
@@ -627,8 +630,7 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	membank("bank1")->set_base(&memregion("user1")->base()[0]);
-	m_seibu_sound->decrypt("audiocpu",0x2000);
+	membank("bank1")->configure_entries(0, 4, memregion("user1")->base(), 0x4000);
 }
 
 

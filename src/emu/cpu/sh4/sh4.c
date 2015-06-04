@@ -3948,7 +3948,7 @@ void sh34_base_device::execute_run()
 	{
 		if (m_delay)
 		{
-			const UINT16 opcode = m_direct->read_decrypted_word((UINT32)(m_delay & AM), WORD2_XOR_LE(0));
+			const UINT16 opcode = m_direct->read_word((UINT32)(m_delay & AM), WORD2_XOR_LE(0));
 
 			debugger_instruction_hook(this, (m_pc-2) & AM);
 
@@ -3964,7 +3964,7 @@ void sh34_base_device::execute_run()
 		}
 		else
 		{
-			const UINT16 opcode = m_direct->read_decrypted_word((UINT32)(m_pc & AM), WORD2_XOR_LE(0));
+			const UINT16 opcode = m_direct->read_word((UINT32)(m_pc & AM), WORD2_XOR_LE(0));
 
 			debugger_instruction_hook(this, m_pc & AM);
 
@@ -3995,7 +3995,7 @@ void sh3be_device::execute_run()
 	{
 		if (m_delay)
 		{
-			const UINT16 opcode = m_direct->read_decrypted_word((UINT32)(m_delay & AM), WORD_XOR_LE(6));
+			const UINT16 opcode = m_direct->read_word((UINT32)(m_delay & AM), WORD_XOR_LE(6));
 
 			debugger_instruction_hook(this, m_delay & AM);
 
@@ -4014,7 +4014,7 @@ void sh3be_device::execute_run()
 		}
 		else
 		{
-			const UINT16 opcode = m_direct->read_decrypted_word((UINT32)(m_pc & AM), WORD_XOR_LE(6));
+			const UINT16 opcode = m_direct->read_word((UINT32)(m_pc & AM), WORD_XOR_LE(6));
 
 			debugger_instruction_hook(this, m_pc & AM);
 
@@ -4045,7 +4045,7 @@ void sh4be_device::execute_run()
 	{
 		if (m_delay)
 		{
-			const UINT16 opcode = m_direct->read_decrypted_word((UINT32)(m_delay & AM), WORD_XOR_LE(6));
+			const UINT16 opcode = m_direct->read_word((UINT32)(m_delay & AM), WORD_XOR_LE(6));
 
 			debugger_instruction_hook(this, m_delay & AM);
 
@@ -4064,7 +4064,7 @@ void sh4be_device::execute_run()
 		}
 		else
 		{
-			const UINT16 opcode = m_direct->read_decrypted_word((UINT32)(m_pc & AM), WORD_XOR_LE(6));
+			const UINT16 opcode = m_direct->read_word((UINT32)(m_pc & AM), WORD_XOR_LE(6));
 
 			debugger_instruction_hook(this, m_pc & AM);
 

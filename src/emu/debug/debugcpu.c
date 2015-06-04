@@ -860,7 +860,7 @@ void debug_write_memory(address_space &space, offs_t address, UINT64 data, int s
     the given offset from opcode space
 -------------------------------------------------*/
 
-UINT64 debug_read_opcode(address_space &space, offs_t address, int size, int arg)
+UINT64 debug_read_opcode(address_space &space, offs_t address, int size)
 {
 	UINT64 result = ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size)), result2;
 	debugcpu_private *global = space.machine().debugcpu_data;
@@ -881,8 +881,8 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size, int arg
 	if (size > space.data_width() / 8)
 	{
 		int halfsize = size / 2;
-		UINT64 r0 = debug_read_opcode(space, address + 0, halfsize, arg);
-		UINT64 r1 = debug_read_opcode(space, address + halfsize, halfsize, arg);
+		UINT64 r0 = debug_read_opcode(space, address + 0, halfsize);
+		UINT64 r1 = debug_read_opcode(space, address + halfsize, halfsize);
 
 		if (space.endianness() == ENDIANNESS_LITTLE)
 			return r0 | (r1 << (8 * halfsize));
@@ -957,14 +957,14 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size, int arg
 	switch (size)
 	{
 		case 1:
-			result = (arg) ? space.direct().read_raw_byte(address, addrxor) : space.direct().read_decrypted_byte(address, addrxor);
+			result = space.direct().read_byte(address, addrxor);
 			break;
 
 		case 2:
-			result = (arg) ? space.direct().read_raw_word(address & ~1, addrxor) : space.direct().read_decrypted_word(address & ~1, addrxor);
+			result = space.direct().read_word(address & ~1, addrxor);
 			if ((address & 1) != 0)
 			{
-				result2 = (arg) ? space.direct().read_raw_word((address & ~1) + 2, addrxor) : space.direct().read_decrypted_word((address & ~1) + 2, addrxor);
+				result2 = space.direct().read_word((address & ~1) + 2, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)
 					result = (result >> (8 * (address & 1))) | (result2 << (16 - 8 * (address & 1)));
 				else
@@ -974,10 +974,10 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size, int arg
 			break;
 
 		case 4:
-			result = (arg) ? space.direct().read_raw_dword(address & ~3, addrxor) : space.direct().read_decrypted_dword(address & ~3, addrxor);
+			result = space.direct().read_dword(address & ~3, addrxor);
 			if ((address & 3) != 0)
 			{
-				result2 = (arg) ? space.direct().read_raw_dword((address & ~3) + 4, addrxor) : space.direct().read_decrypted_dword((address & ~3) + 4, addrxor);
+				result2 = space.direct().read_dword((address & ~3) + 4, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)
 					result = (result >> (8 * (address & 3))) | (result2 << (32 - 8 * (address & 3)));
 				else
@@ -987,10 +987,10 @@ UINT64 debug_read_opcode(address_space &space, offs_t address, int size, int arg
 			break;
 
 		case 8:
-			result = (arg) ? space.direct().read_raw_qword(address & ~7, addrxor) : space.direct().read_decrypted_qword(address & ~7, addrxor);
+			result = space.direct().read_qword(address & ~7, addrxor);
 			if ((address & 7) != 0)
 			{
-				result2 = (arg) ? space.direct().read_raw_qword((address & ~7) + 8, addrxor) : space.direct().read_decrypted_qword((address & ~7) + 8, addrxor);
+				result2 = space.direct().read_qword((address & ~7) + 8, addrxor);
 				if (space.endianness() == ENDIANNESS_LITTLE)
 					result = (result >> (8 * (address & 7))) | (result2 << (64 - 8 * (address & 7)));
 				else
@@ -1219,10 +1219,7 @@ static UINT64 expression_read_program_direct(address_space &space, int opcode, o
 		offs_t lowmask = space.data_width() / 8 - 1;
 
 		/* get the base of memory, aligned to the address minus the lowbits */
-		if (opcode & 1)
-			base = (UINT8 *)space.direct().read_decrypted_ptr(address & ~lowmask);
-		else
-			base = (UINT8 *)space.get_read_ptr(address & ~lowmask);
+		base = (UINT8 *)space.get_read_ptr(address & ~lowmask);
 
 		/* if we have a valid base, return the appropriate byte */
 		if (base != NULL)
@@ -1394,10 +1391,7 @@ static void expression_write_program_direct(address_space &space, int opcode, of
 		offs_t lowmask = space.data_width() / 8 - 1;
 
 		/* get the base of memory, aligned to the address minus the lowbits */
-		if (opcode & 1)
-			base = (UINT8 *)space.direct().read_decrypted_ptr(address & ~lowmask);
-		else
-			base = (UINT8 *)space.get_read_ptr(address & ~lowmask);
+		base = (UINT8 *)space.get_read_ptr(address & ~lowmask);
 
 		/* if we have a valid base, write the appropriate byte */
 		if (base != NULL)
@@ -2733,6 +2727,7 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 	assert(m_memory != NULL);
 
 	// determine the adjusted PC
+	address_space &decrypted_space = m_memory->has_space(AS_DECRYPTED_OPCODES) ? m_memory->space(AS_DECRYPTED_OPCODES) : m_memory->space(AS_PROGRAM);
 	address_space &space = m_memory->space(AS_PROGRAM);
 	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
 
@@ -2741,8 +2736,8 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 	int maxbytes = max_opcode_bytes();
 	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 	{
-		opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, false);
-		argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, true);
+		opbuf[numbytes] = debug_read_opcode(decrypted_space, pcbyte + numbytes, 1);
+		argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1);
 	}
 
 	// disassemble to our buffer
@@ -3128,6 +3123,7 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 	assert(m_memory != NULL && m_disasm != NULL);
 
 	// determine the adjusted PC
+	address_space &decrypted_space = m_memory->has_space(AS_DECRYPTED_OPCODES) ? m_memory->space(AS_DECRYPTED_OPCODES) : m_memory->space(AS_PROGRAM);
 	address_space &space = m_memory->space(AS_PROGRAM);
 	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
 
@@ -3136,8 +3132,8 @@ UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 	int maxbytes = max_opcode_bytes();
 	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 	{
-		opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, false);
-		argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, true);
+		opbuf[numbytes] = debug_read_opcode(decrypted_space, pcbyte + numbytes, 1);
+		argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1);
 	}
 
 	// disassemble to our buffer

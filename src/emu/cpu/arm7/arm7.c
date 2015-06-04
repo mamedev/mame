@@ -641,7 +641,7 @@ void arm7_cpu_device::execute_run()
 				}
 			}
 
-			insn = m_direct->read_decrypted_word(raddr);
+			insn = m_direct->read_word(raddr);
 			(this->*thumb_handler[(insn & 0xffc0) >> 6])(pc, insn);
 
 		}
@@ -672,7 +672,7 @@ void arm7_cpu_device::execute_run()
 			}
 #endif
 
-			insn = m_direct->read_decrypted_dword(raddr);
+			insn = m_direct->read_dword(raddr);
 
 			/* process condition codes for this instruction */
 			switch (insn >> INSN_COND_SHIFT)

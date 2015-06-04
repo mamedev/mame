@@ -69,7 +69,7 @@ offs_t mb86233_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 #define GETBRAM()           m_BRAM
 #define GETREPCNT()         m_repcnt
 
-#define ROPCODE(a)          m_direct->read_decrypted_dword(a<<2)
+#define ROPCODE(a)          m_direct->read_dword(a<<2)
 #define RDMEM(a)            m_program->read_dword((a<<2))
 #define WRMEM(a,v)          m_program->write_dword((a<<2), v)
 

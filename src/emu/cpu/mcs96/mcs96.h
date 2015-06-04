@@ -119,7 +119,7 @@ protected:
 	inline void next(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH; }
 	inline void next_noirq(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH_NOIRQ; }
 	void check_irq();
-	inline UINT8 read_pc() { return direct->read_decrypted_byte(PC++); }
+	inline UINT8 read_pc() { return direct->read_byte(PC++); }
 
 	void reg_w8(UINT8 adr, UINT8 data);
 	void reg_w16(UINT8 adr, UINT16 data);

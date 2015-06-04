@@ -360,12 +360,12 @@ brk_ce_imp
 	write(SP, irq_taken || nmi_state ? P & ~F_B : P);
 	dec_SP_ce();
 	if(nmi_state) {
-		PC = read_direct(0xfffa);
-		PC = set_h(PC, read_direct(0xfffb));
+		PC = read_arg(0xfffa);
+		PC = set_h(PC, read_arg(0xfffb));
 		nmi_state = false;
 	} else {
-		PC = read_direct(0xfffe);
-		PC = set_h(PC, read_direct(0xffff));
+		PC = read_arg(0xfffe);
+		PC = set_h(PC, read_arg(0xffff));
 	}
 	irq_taken = false;
 	P = (P | F_I) & ~F_D; // Do *not* move after the prefetch

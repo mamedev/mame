@@ -831,7 +831,7 @@ UINT16 hp_hybrid_cpu_device::RM(UINT16 addr)
 						return 0;
 				}
 		} else {
-				return m_direct->read_decrypted_word((offs_t)addr << 1);
+				return m_direct->read_word((offs_t)addr << 1);
 		}
 }
 

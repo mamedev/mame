@@ -69,14 +69,14 @@ UINT8 scmp_device::ROP()
 {
 	UINT16 pc = m_PC.w.l;
 	m_PC.w.l = ADD12(m_PC.w.l,1);
-	return m_direct->read_decrypted_byte( pc);
+	return m_direct->read_byte( pc);
 }
 
 UINT8 scmp_device::ARG()
 {
 	UINT16 pc = m_PC.w.l;
 	m_PC.w.l = ADD12(m_PC.w.l,1);
-	return m_direct->read_raw_byte(pc);
+	return m_direct->read_byte(pc);
 }
 
 UINT8 scmp_device::RM(UINT32 a)

@@ -166,8 +166,12 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, senjyo_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8, senjyo_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_device, write)
@@ -233,7 +237,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( starforb_sound_map, AS_PROGRAM, 8, senjyo_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_device, write)
@@ -606,8 +610,12 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( senjyox, senjyo )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( starforb, senjyo )
+static MACHINE_CONFIG_DERIVED( starforb, senjyox )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -625,13 +633,13 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( senjyo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "08m_05t.bin", 0x0000, 0x2000, CRC(b1f3544d) SHA1(59997164dfb740fce1862d89754be7517303161a) )
 	ROM_LOAD( "08k_04t.bin", 0x2000, 0x2000, CRC(e34468a8) SHA1(1931788e4ebe0dab9525f795b639be6544a6b31a) )
 	ROM_LOAD( "08j_03t.bin", 0x4000, 0x2000, CRC(c33aedee) SHA1(5adf83268ef7b91194dea41204bdb931a14f2158) )
 	ROM_LOAD( "08f_02t.bin", 0x6000, 0x2000, CRC(0ef4db9e) SHA1(0dcb216495f4328c44cc0af87ffb0bd255b7dc1a) )
 
-	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "02h_01t.bin", 0x0000, 0x2000, CRC(c1c24455) SHA1(24a2ab9e4df793f68f51bbe6a1313f38d951a8af) )
 
 	ROM_REGION( 0x03000, "gfx1", 0 )
@@ -666,11 +674,11 @@ ROM_START( senjyo )
 ROM_END
 
 ROM_START( starforc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "3.3p",    0x0000, 0x4000, CRC(8ba27691) SHA1(2b8b1e634ef5bed5c61a078e64a6dda77f84cdf5) )
 	ROM_LOAD( "2.3mn",   0x4000, 0x4000, CRC(0fc4d2d6) SHA1(0743e3928d5cc0e3f1bcdaf4b0cc83aeb7a2f7a8) )
 
-	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for sound board */
 	ROM_LOAD( "1.3hj",   0x0000, 0x2000, CRC(2735bb22) SHA1(1bd0558e05b41aebab3911991969512df904fea5) )
 
 	ROM_REGION( 0x03000, "gfx1", 0 )
@@ -703,13 +711,13 @@ ROM_START( starforc )
 ROM_END
 
 ROM_START( starforcb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "a2.8m",   0x0000, 0x2000, CRC(e81e8b7d) SHA1(829a082a335a0cf5bf8cc97bee96e62271f03ff4) )
 	ROM_LOAD( "a3.8k",   0x2000, 0x2000, CRC(7e98f0ab) SHA1(76eb387fbf5d04b7951a115d29076d1fd21346c4) )
 	ROM_LOAD( "a4.8j",   0x4000, 0x2000, CRC(285bc599) SHA1(c2f294a5e3ca39084e8f8503d6e9e00885ad0609) )
 	ROM_LOAD( "a5.8f",   0x6000, 0x2000, CRC(74d328b1) SHA1(3098438d47f650507de8b1d0aecfca81663cbe9c) )
 
-	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "a0.2e",   0x0000, 0x2000, CRC(5ab0e2fa) SHA1(78f0290d1e006a39bb8ee5a29cf229ed2c1f2b09) )
 
 	ROM_REGION( 0x03000, "gfx1", 0 )
@@ -745,13 +753,13 @@ ROM_START( starforcb )
 ROM_END
 
 ROM_START( starforca )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(7691bbd4) SHA1(efcab11ea0ed58b6a47c9d7a994c921dfaa1b47e) )
 	ROM_LOAD( "4.bin",   0x2000, 0x2000, CRC(32f3c34e) SHA1(9ecaa46fe296c2f2e9c8faf3d40085c0f10acbe1) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(5e99cfa0) SHA1(d16d5247f4afb7abb5b8331ad7ae9d4d1f6d6554) )
 	ROM_LOAD( "2.bin",   0x6000, 0x2000, CRC(311c6e59) SHA1(ff3ba96ffade7602d3b150dae4bdc1c02a148576) )
 
-	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "0.bin", 0x0000, 0x2000, CRC(a277c268) SHA1(99ed8439119fa4b850ad8aadb7ff3e54d4cd40be) )
 
 	ROM_REGION( 0x03000, "gfx1", 0 )
@@ -787,13 +795,13 @@ ROM_START( starforca )
 ROM_END
 
 ROM_START( starforce )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "starfore.005", 0x0000, 0x2000, CRC(825f7ebe) SHA1(d63fd516e075bcc28d42189216b95bbf491a4cd1) )
 	ROM_LOAD( "starfore.004", 0x2000, 0x2000, CRC(fbcecb65) SHA1(0406ae134915539a171603ecdd1b549f98dd048c) )
 	ROM_LOAD( "starfore.003", 0x4000, 0x2000, CRC(9f8013b9) SHA1(5398c97d84b4458ff926e07d6189d60565fbd8f1) )
 	ROM_LOAD( "starfore.002", 0x6000, 0x2000, CRC(f8111eba) SHA1(cf3295ffae4e36e87aea4332613f2cafb51522ce) )
 
-	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "starfore.000", 0x0000, 0x2000, CRC(a277c268) SHA1(99ed8439119fa4b850ad8aadb7ff3e54d4cd40be) )
 
 	ROM_REGION( 0x03000, "gfx1", 0 )
@@ -826,11 +834,11 @@ ROM_START( starforce )
 ROM_END
 
 ROM_START( megaforc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "mf3.bin",  0x0000, 0x4000, CRC(d3ea82ec) SHA1(e15fda65ba24517cc04abc55b5d079a33327553c) )
 	ROM_LOAD( "mf2.bin",  0x4000, 0x4000, CRC(aa320718) SHA1(cbbf8e4d06a1ecf77d776058d965afdaa7f5b47f) )
 
-	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "1.3hj",    0x0000, 0x2000, CRC(2735bb22) SHA1(1bd0558e05b41aebab3911991969512df904fea5) )
 
 	ROM_REGION( 0x03000, "gfx1", 0 )
@@ -863,11 +871,11 @@ ROM_START( megaforc )
 ROM_END
 
 ROM_START( baluba )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "0",            0x0000, 0x4000, CRC(0e2ebe32) SHA1(d5cac260b19dc4e8d2064a7e3de5d52ab0eb95d0) )
 	ROM_LOAD( "1",            0x4000, 0x4000, CRC(cde97076) SHA1(ef47851b2ed0d820e1564545795b707d00d5c6ce) )
 
-	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "2",            0x0000, 0x2000, CRC(441fbc64) SHA1(3853f80043e28e06a3ee399e3cd261b3ee94e0b9) )
 
 	ROM_REGION( 0x03000, "gfx1", 0 )
@@ -907,8 +915,29 @@ DRIVER_INIT_MEMBER(senjyo_state,starforc)
 }
 DRIVER_INIT_MEMBER(senjyo_state,starfore)
 {
-	/* encrypted CPU */
-	suprloco_decode(machine(), "maincpu");
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...0 */
+		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...1 */
+		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...1...0 */
+		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...0...1...1 */
+		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...1...0...0 */
+		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...1...0...1 */
+		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...1...1...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...1...1 */
+		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...0...0 */
+		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...0...1 */
+		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...1...0 */
+		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...1...1 */
+		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...1...0...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...0...1 */
+		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...1...0 */
+		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 }    /* ...1...1...1...1 */
+	};
+
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 
 	m_is_senjyo = 0;
 	m_scrollhack = 0;
@@ -916,8 +945,29 @@ DRIVER_INIT_MEMBER(senjyo_state,starfore)
 
 DRIVER_INIT_MEMBER(senjyo_state,starfora)
 {
-	/* encrypted CPU */
-	yamato_decode(machine(), "maincpu");
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...0 */
+		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x20,0xa0,0x28,0xa8 },   /* ...0...0...1...1 */
+		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x08,0x28 },   /* ...0...1...0...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...0...1 */
+		{ 0x20,0xa0,0x28,0xa8 }, { 0x20,0xa0,0x28,0xa8 },   /* ...0...1...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...1...1 */
+		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...0...0...0 */
+		{ 0x20,0xa0,0x28,0xa8 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...1 */
+		{ 0xa0,0x20,0x80,0x00 }, { 0x20,0xa0,0x28,0xa8 },   /* ...1...0...1...0 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0x20,0xa0,0x28,0xa8 },   /* ...1...0...1...1 */
+		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...1...0...0 */
+		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...1...0...1 */
+		{ 0xa0,0x20,0x80,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...1...1...1...0 */
+		{ 0x20,0xa0,0x28,0xa8 }, { 0x00,0x08,0x20,0x28 }    /* ...1...1...1...1 */
+	};
+
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 
 	m_is_senjyo = 0;
 	m_scrollhack = 1;
@@ -932,8 +982,8 @@ DRIVER_INIT_MEMBER(senjyo_state,senjyo)
 
 GAME( 1983, senjyo,   0,        senjyo,  senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", GAME_SUPPORTS_SAVE )
 GAME( 1984, starforc, 0,        senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", GAME_SUPPORTS_SAVE )
-GAME( 1984, starforce,starforc, senjyo,  starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, starforce,starforc, senjyox, starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, starforcb,starforc, starforb,starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1984, starforca,starforc, senjyo,  starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, starforca,starforc, senjyox, starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1985, megaforc, starforc, senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", GAME_SUPPORTS_SAVE )
 GAME( 1986, baluba,   0,        senjyo,  baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", GAME_SUPPORTS_SAVE )

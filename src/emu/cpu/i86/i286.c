@@ -965,7 +965,7 @@ UINT8 i80286_cpu_device::fetch_op()
 	if(m_ip > m_limit[CS])
 		throw TRAP(FAULT_GP, 0);
 
-	data = m_direct->read_decrypted_byte( pc() & m_amask, m_fetch_xor );
+	data = m_direct->read_byte( pc() & m_amask, m_fetch_xor );
 	m_ip++;
 	return data;
 }
@@ -976,7 +976,7 @@ UINT8 i80286_cpu_device::fetch()
 	if(m_ip > m_limit[CS])
 		throw TRAP(FAULT_GP, 0);
 
-	data = m_direct->read_raw_byte( pc() & m_amask, m_fetch_xor );
+	data = m_direct->read_byte( pc() & m_amask, m_fetch_xor );
 	m_ip++;
 	return data;
 }

@@ -20,8 +20,9 @@ public:
 		m_swimmer_palettebank(*this, "palettebank"),
 		m_swimmer_background_color(*this, "bgcolor"),
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
-		m_toprollr_bg_coloram(*this, "bg_coloram") { }
-
+		m_toprollr_bg_coloram(*this, "bg_coloram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -39,6 +40,7 @@ public:
 	optional_shared_ptr<UINT8> m_swimmer_background_color;
 	optional_shared_ptr<UINT8> m_toprollr_bg_videoram;
 	optional_shared_ptr<UINT8> m_toprollr_bg_coloram;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	UINT8 m_yamato_p0;
 	UINT8 m_yamato_p1;

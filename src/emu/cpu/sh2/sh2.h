@@ -138,7 +138,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -151,7 +151,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 private:
-	address_space_config m_program_config;
+	address_space_config m_program_config, m_decrypted_program_config;
 
 	// Data that needs to be stored close to the generated DRC code
 	struct internal_sh2_state
@@ -195,7 +195,7 @@ private:
 	UINT32 m_pcflushes[16];           // pcflush entries
 
 	INT8    m_irq_line_state[17];
-	address_space *m_program;
+	address_space *m_program, *m_decrypted_program;
 protected:
 	direct_read_data *m_direct;
 private:

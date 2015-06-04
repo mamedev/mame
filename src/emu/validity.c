@@ -109,8 +109,6 @@ void validity_checker::validate_tag(const char *tag)
 	// too short/too long = bad
 	if (strlen(begin) < MIN_TAG_LENGTH)
 		osd_printf_error("Tag '%s' is too short (must be at least %d characters)\n", tag, MIN_TAG_LENGTH);
-	if (strlen(begin) > MAX_TAG_LENGTH)
-		osd_printf_error("Tag '%s' is too long (must be less than %d characters)\n", tag, MAX_TAG_LENGTH);
 }
 
 

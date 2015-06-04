@@ -64,6 +64,10 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, darkmist_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( darkmist )
 	PORT_START("P1")
@@ -232,6 +236,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
@@ -401,11 +406,9 @@ void darkmist_state::decrypt_snd()
 
 DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i, len;
 	UINT8 *ROM = memregion("maincpu")->base();
 	dynamic_buffer buffer(0x10000);
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
 	decrypt_gfx();
 
@@ -432,10 +435,10 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 		}
 
 		ROM[i] = d;
-		decrypt[i] = p;
+		m_decrypted_opcodes[i] = p;
 	}
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
+	membank("bank1")->set_base(&ROM[0x010000]);
 
 	/* adr line swaps */
 	ROM = memregion("user1")->base();

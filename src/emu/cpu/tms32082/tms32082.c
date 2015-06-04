@@ -426,7 +426,7 @@ void tms32082_mp_device::execute_set_input(int inputnum, int state)
 
 UINT32 tms32082_mp_device::fetch()
 {
-	UINT32 w = m_direct->read_decrypted_dword(m_fetchpc);
+	UINT32 w = m_direct->read_dword(m_fetchpc);
 	m_fetchpc += 4;
 	return w;
 }

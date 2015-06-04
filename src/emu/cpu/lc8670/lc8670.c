@@ -1071,7 +1071,7 @@ WRITE8_MEMBER(lc8670_cpu_device::regs_w)
 
 inline UINT8 lc8670_cpu_device::fetch()
 {
-	UINT8 data = m_direct->read_decrypted_byte(m_pc);
+	UINT8 data = m_direct->read_byte(m_pc);
 
 	set_pc(m_pc + 1);
 

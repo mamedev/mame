@@ -84,8 +84,7 @@ WRITE8_MEMBER(pbaction_state::nmi_mask_w)
 }
 
 static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(pbaction_colorram2_w) AM_SHARE("colorram2")
@@ -100,6 +99,11 @@ static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe606, 0xe606) AM_READNOP /* ??? */ AM_WRITE(pbaction_scroll_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(pbaction_sh_command_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, pbaction_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
@@ -312,6 +316,11 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pbactionx, pbaction )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
 
 
 /***************************************************************************
@@ -377,7 +386,7 @@ ROM_START( pbaction2 )
 ROM_END
 
 ROM_START( pbaction3 )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "14.bin",     0x0000, 0x4000, CRC(f17a62eb) SHA1(8dabfc0ad127c154c0293a65df32d52d57dd9755) )
 	ROM_LOAD( "12.bin",     0x4000, 0x4000, CRC(ec3c64c6) SHA1(6130b80606d717f95e219316c2d3fa0a1980ea1d) )
 	ROM_LOAD( "13.bin",     0x8000, 0x4000, CRC(c93c851e) SHA1(b41077708fce4ccbcecdeae32af8821ca5322e87) )
@@ -403,7 +412,7 @@ ROM_START( pbaction3 )
 ROM_END
 
 ROM_START( pbaction4 )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "pinball_09.bin",     0x0000, 0x4000, CRC(c8e81ece) SHA1(04eafbd79263225f6c6fb5f04951b54179144f17) )
 	ROM_IGNORE(0x4000)
 	ROM_LOAD( "pinball_10.bin",     0x4000, 0x8000, CRC(04b56c7c) SHA1(d09c22fd0235e1c6a9b1978ba69338bb1ae5667d) )
@@ -433,7 +442,7 @@ ROM_START( pbaction4 )
 ROM_END
 
 ROM_START( pbaction5 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "p16.bin",     0x0000, 0x4000, CRC(ad20b360) SHA1(91e3cdceb1c170580d926b2ed8359c3100f71b11) )
 	ROM_LOAD( "c15.bin",     0x4000, 0x4000, CRC(057acfe3) SHA1(49c184d7caea0c0e9f0d0e163f2ef42bb9aebf16) )
 	ROM_LOAD( "p14.bin",     0x8000, 0x2000, CRC(e7412d68) SHA1(e75731d9bea80e0dc09798dd46e3b947fdb54aaa) )
@@ -479,7 +488,7 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 	}
 
 	/* then do the standard Sega decryption */
-	pbaction_decode(machine(), "maincpu");
+	DRIVER_INIT_CALL(pbactio4);
 
 	/* install a protection (?) workaround */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),this) );
@@ -487,14 +496,36 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 
 DRIVER_INIT_MEMBER(pbaction_state,pbactio4)
 {
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...0...0 */
+		{ 0x28,0x08,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...1 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...1...0 */
+		{ 0x28,0x08,0xa8,0x88 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...0...1...1 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...1...0...0 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...0...1 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...1...0 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...1...1 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...0 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...0...1 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...1...0 */
+		{ 0x28,0x08,0xa8,0x88 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...1...1 */
+		{ 0xa0,0x80,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...0...0 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0xa8,0x28,0xa0,0x20 },   /* ...1...1...0...1 */
+		{ 0xa0,0x80,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...1...0 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0xa8,0x28,0xa0,0x20 }    /* ...1...1...1...1 */
+	};
+
 	/* this one only has the Sega decryption */
-	pbaction_decode(machine(), "maincpu");
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 }
 
 
 
-GAME( 1985, pbaction,  0,        pbaction, pbaction, driver_device, 0,        ROT90, "Tehkan", "Pinball Action (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction, pbaction, driver_device, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction3, pbaction, pbaction, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbaction, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbaction, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", GAME_SUPPORTS_SAVE )

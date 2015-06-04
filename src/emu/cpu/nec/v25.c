@@ -122,7 +122,7 @@ void v25_common_device::do_prefetch(int previous_ICount)
 UINT8 v25_common_device::fetch()
 {
 	prefetch();
-	return m_direct->read_raw_byte((Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	return m_direct->read_byte((Sreg(PS)<<4)+m_ip++, m_fetch_xor);
 }
 
 UINT16 v25_common_device::fetchword()
@@ -146,7 +146,7 @@ UINT8 v25_common_device::fetchop()
 	UINT8 ret;
 
 	prefetch();
-	ret = m_direct->read_decrypted_byte(( Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	ret = m_direct->read_byte(( Sreg(PS)<<4)+m_ip++, m_fetch_xor);
 
 	if (m_MF == 0)
 		if (m_v25v35_decryptiontable)

@@ -1510,7 +1510,6 @@ memory_manager::memory_manager(running_machine &machine)
 		m_banknext(STATIC_BANK1)
 {
 	memset(m_bank_ptr, 0, sizeof(m_bank_ptr));
-	memset(m_bankd_ptr, 0, sizeof(m_bankd_ptr));
 }
 
 
@@ -2099,41 +2098,6 @@ void address_space::locate_memory()
 }
 
 
-//-------------------------------------------------
-//  set_decrypted_region - registers an address
-//  range as having a decrypted data pointer
-//-------------------------------------------------
-
-void address_space::set_decrypted_region(offs_t addrstart, offs_t addrend, void *base)
-{
-	offs_t bytestart = address_to_byte(addrstart);
-	offs_t byteend = address_to_byte_end(addrend);
-	bool found = false;
-
-	// loop over banks looking for a match
-	for (memory_bank *bank = manager().m_banklist.first(); bank != NULL; bank = bank->next())
-	{
-		// consider this bank if it is used for reading and matches the address space
-		if (bank->references_space(*this, ROW_READ))
-		{
-			// verify that the provided range fully covers this bank
-			if (bank->is_covered_by(bytestart, byteend))
-			{
-				// set the decrypted pointer for the corresponding memory bank
-				bank->set_base_decrypted(reinterpret_cast<UINT8 *>(base) + bank->bytestart() - bytestart);
-				found = true;
-			}
-
-			// fatal error if the decrypted region straddles the bank
-			else if (bank->straddles(bytestart, byteend))
-				throw emu_fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for device '%s'", bytestart, byteend, m_device.tag());
-		}
-	}
-
-	// fatal error as well if we didn't find any relevant memory banks
-	if (!found)
-		throw emu_fatalerror("memory_set_decrypted_region unable to find matching region %08X-%08X for device '%s'", bytestart, byteend, m_device.tag());
-}
 
 
 //-------------------------------------------------
@@ -3666,8 +3630,7 @@ handler_entry &address_table_write::handler(UINT32 index) const
 
 direct_read_data::direct_read_data(address_space &space)
 	: m_space(space),
-		m_raw(NULL),
-		m_decrypted(NULL),
+		m_ptr(NULL),
 		m_bytemask(space.bytemask()),
 		m_bytestart(1),
 		m_byteend(0),
@@ -3718,17 +3681,12 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 		return false;
 	}
 
-	// if no decrypted opcodes, point to the same base
-	UINT8 *base = *m_space.manager().bank_pointer_addr(m_entry, false);
-	UINT8 *based = *m_space.manager().bank_pointer_addr(m_entry, true);
-	if (based == NULL)
-		based = base;
+	UINT8 *base = *m_space.manager().bank_pointer_addr(m_entry);
 
 	// compute the adjusted base
 	const handler_entry_read &handler = m_space.read().handler_read(m_entry);
 	m_bytemask = handler.bytemask();
-	m_raw = base - (handler.bytestart() & m_bytemask);
-	m_decrypted = based - (handler.bytestart() & m_bytemask);
+	m_ptr = base - (handler.bytestart() & m_bytemask);
 	m_bytestart = maskedbits | range->m_bytestart;
 	m_byteend = maskedbits | range->m_byteend;
 	return true;
@@ -3811,15 +3769,12 @@ direct_update_delegate direct_read_data::set_direct_update(direct_update_delegat
 //  within a custom callback
 //-------------------------------------------------
 
-void direct_read_data::explicit_configure(offs_t bytestart, offs_t byteend, offs_t bytemask, void *raw, void *decrypted)
+void direct_read_data::explicit_configure(offs_t bytestart, offs_t byteend, offs_t bytemask, void *ptr)
 {
 	m_bytestart = bytestart;
 	m_byteend = byteend;
 	m_bytemask = bytemask;
-	m_raw = reinterpret_cast<UINT8 *>(raw);
-	m_decrypted = reinterpret_cast<UINT8 *>((decrypted == NULL) ? raw : decrypted);
-	m_raw -= bytestart & bytemask;
-	m_decrypted -= bytestart & bytemask;
+	m_ptr = reinterpret_cast<UINT8 *>(ptr) - (bytestart & bytemask);
 }
 
 
@@ -3901,8 +3856,7 @@ memory_block::~memory_block()
 memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag)
 	: m_next(NULL),
 		m_machine(space.machine()),
-		m_baseptr(space.manager().bank_pointer_addr(index, false)),
-		m_basedptr(space.manager().bank_pointer_addr(index, true)),
+		m_baseptr(space.manager().bank_pointer_addr(index)),
 		m_index(index),
 		m_anonymous(tag == NULL),
 		m_bytestart(bytestart),
@@ -3994,23 +3948,6 @@ void memory_bank::set_base(void *base)
 
 
 //-------------------------------------------------
-//  set_base_decrypted - set the decrypted base
-//  explicitly
-//-------------------------------------------------
-
-void memory_bank::set_base_decrypted(void *base)
-{
-	// NULL is not an option
-	if (base == NULL)
-		throw emu_fatalerror("memory_bank::set_base_decrypted called NULL base");
-
-	// set the base and invalidate any referencing spaces
-	*m_basedptr = reinterpret_cast<UINT8 *>(base);
-	invalidate_references();
-}
-
-
-//-------------------------------------------------
 //  set_entry - set the base to a pre-configured
 //  entry
 //-------------------------------------------------
@@ -4022,13 +3959,11 @@ void memory_bank::set_entry(int entrynum)
 		throw emu_fatalerror("memory_bank::set_entry called for anonymous bank");
 	if (entrynum < 0 || entrynum >= int(m_entry.size()))
 		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);
-	if (m_entry[entrynum].m_raw == NULL)
+	if (m_entry[entrynum].m_ptr == NULL)
 		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.c_str(), entrynum);
 
-	// set both raw and decrypted values
 	m_curentry = entrynum;
-	*m_baseptr = m_entry[entrynum].m_raw;
-	*m_basedptr = m_entry[entrynum].m_decrypted;
+	*m_baseptr = m_entry[entrynum].m_ptr;
 
 	// invalidate referencing spaces
 	invalidate_references();
@@ -4064,11 +3999,11 @@ void memory_bank::configure_entry(int entrynum, void *base)
 		expand_entries(entrynum);
 
 	// set the entry
-	m_entry[entrynum].m_raw = reinterpret_cast<UINT8 *>(base);
+	m_entry[entrynum].m_ptr = reinterpret_cast<UINT8 *>(base);
 
 	// if the bank base is not configured, and we're the first entry, set us up
 	if (*m_baseptr == NULL && entrynum == 0)
-		*m_baseptr = m_entry[entrynum].m_raw;
+		*m_baseptr = m_entry[entrynum].m_ptr;
 }
 
 
@@ -4081,43 +4016,6 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 	// fill in the requested bank entries (backwards to improve allocation)
 	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
 		configure_entry(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
-}
-
-
-//-------------------------------------------------
-//  configure_decrypted_entry - configure a
-//  decrypted entry
-//-------------------------------------------------
-
-void memory_bank::configure_decrypted_entry(int entrynum, void *base)
-{
-	// must be positive
-	if (entrynum < 0)
-		throw emu_fatalerror("memory_bank::configure_decrypted_entry called with out-of-range entry %d", entrynum);
-
-	// if we haven't allocated this many entries yet, expand our array
-	if (entrynum >= int(m_entry.size()))
-		expand_entries(entrynum);
-
-	// set the entry
-	m_entry[entrynum].m_decrypted = reinterpret_cast<UINT8 *>(base);
-
-	// if the bank base is not configured, and we're the first entry, set us up
-	if (*m_basedptr == NULL && entrynum == 0)
-		*m_basedptr = m_entry[entrynum].m_decrypted;
-}
-
-
-//-------------------------------------------------
-//  configure_decrypted_entries - configure
-//  multiple decrypted entries
-//-------------------------------------------------
-
-void memory_bank::configure_decrypted_entries(int startentry, int numentries, void *base, offs_t stride)
-{
-	// fill in the requested bank entries (backwards to improve allocation)
-	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
-		configure_decrypted_entry(entrynum, reinterpret_cast<UINT8 *>(base) + (entrynum - startentry) * stride);
 }
 
 

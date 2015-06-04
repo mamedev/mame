@@ -167,7 +167,7 @@ void pic16c5x_device::update_internalram_ptr()
 
 
 
-#define PIC16C5x_RDOP(A)         (m_direct->read_decrypted_word((A)<<1))
+#define PIC16C5x_RDOP(A)         (m_direct->read_word((A)<<1))
 #define PIC16C5x_RAM_RDMEM(A)    ((UINT8)m_data->read_byte(A))
 #define PIC16C5x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
 

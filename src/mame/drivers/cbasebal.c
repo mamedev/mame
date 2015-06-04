@@ -98,6 +98,11 @@ static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cbasebal_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8, cbasebal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cbasebal_bankswitch_w)
@@ -257,6 +262,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */
 	MCFG_CPU_PROGRAM_MAP(cbasebal_map)
 	MCFG_CPU_IO_MAP(cbasebal_portmap)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -330,7 +336,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
 {
-	pang_decode(machine());
+	UINT8 *src = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+	UINT8 *dst = auto_alloc_array(machine(), UINT8, size);
+	pang_decode(src, dst, size);
+	membank("bank1")->configure_entries(0, 16, src + 0x10000, 0x4000);
+	membank("bank0d")->set_base(dst);
+	membank("bank1d")->configure_entries(0, 16, dst + 0x10000, 0x4000);
 }
 
 

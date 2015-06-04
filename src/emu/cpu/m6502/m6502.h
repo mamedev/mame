@@ -42,14 +42,14 @@ public:
 protected:
 	class memory_interface {
 	public:
-		address_space *program;
-		direct_read_data *direct;
+		address_space *program, *sprogram;
+		direct_read_data *direct, *sdirect;
 
 		virtual ~memory_interface() {}
 		virtual UINT8 read(UINT16 adr) = 0;
 		virtual UINT8 read_9(UINT16 adr);
-		virtual UINT8 read_direct(UINT16 adr) = 0;
-		virtual UINT8 read_decrypted(UINT16 adr) = 0;
+		virtual UINT8 read_sync(UINT16 adr) = 0;
+		virtual UINT8 read_arg(UINT16 adr) = 0;
 		virtual void write(UINT16 adr, UINT8 val) = 0;
 		virtual void write_9(UINT16 adr, UINT8 val);
 	};
@@ -58,16 +58,16 @@ protected:
 	public:
 		virtual ~mi_default_normal() {}
 		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_direct(UINT16 adr);
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_arg(UINT16 adr);
 		virtual void write(UINT16 adr, UINT8 val);
 	};
 
 	class mi_default_nd : public mi_default_normal {
 	public:
 		virtual ~mi_default_nd() {}
-		virtual UINT8 read_direct(UINT16 adr);
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_arg(UINT16 adr);
 	};
 
 	struct disasm_entry {
@@ -151,7 +151,7 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
-	address_space_config program_config;
+	address_space_config program_config, sprogram_config;
 
 	UINT16  PPC;                    /* previous program counter */
 	UINT16  NPC;                    /* next start-of-instruction program counter */
@@ -179,9 +179,9 @@ protected:
 	UINT8 read_9(UINT16 adr) { return mintf->read_9(adr); }
 	void write(UINT16 adr, UINT8 val) { mintf->write(adr, val); }
 	void write_9(UINT16 adr, UINT8 val) { mintf->write_9(adr, val); }
-	UINT8 read_direct(UINT16 adr) { return mintf->read_direct(adr); }
-	UINT8 read_pc() { return mintf->read_direct(PC++); }
-	UINT8 read_pc_noinc() { return mintf->read_direct(PC); }
+	UINT8 read_arg(UINT16 adr) { return mintf->read_arg(adr); }
+	UINT8 read_pc() { return mintf->read_arg(PC++); }
+	UINT8 read_pc_noinc() { return mintf->read_arg(PC); }
 	void prefetch();
 	void prefetch_noirq();
 	void set_nz(UINT8 v);

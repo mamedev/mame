@@ -244,6 +244,7 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", deadang_state, sub_scanline, "screen", 0, 1)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
+	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60)) // the game stops working with higher interleave rates..
 
@@ -413,14 +414,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(deadang_state,deadang)
 {
-	m_seibu_sound->decrypt("audiocpu", 0x2000);
 	m_adpcm1->decrypt("adpcm1");
 	m_adpcm2->decrypt("adpcm2");
 }
 
 DRIVER_INIT_MEMBER(deadang_state,ghunter)
 {
-	m_seibu_sound->decrypt("audiocpu", 0x2000);
 	m_adpcm1->decrypt("adpcm1");
 	m_adpcm2->decrypt("adpcm2");
 

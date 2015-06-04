@@ -144,7 +144,7 @@ DIRECT_UPDATE_MEMBER( dsp56k_device::dsp56k_direct_handler )
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
-#define ROPCODE(pc)   cpustate->direct->read_decrypted_word(pc)
+#define ROPCODE(pc)   cpustate->direct->read_word(pc)
 
 
 /***************************************************************************

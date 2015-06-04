@@ -22,7 +22,8 @@ public:
 		m_palette(*this, "palette"),
 		m_port_dsw0(*this, "DSW0"),
 		m_p1_control(*this, "CONTP1"),
-		m_p2_control(*this, "CONTP2")   { }
+		m_p2_control(*this, "CONTP2"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -57,6 +58,7 @@ public:
 	optional_ioport m_port_dsw0;
 	optional_ioport m_p1_control;
 	optional_ioport m_p2_control;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	DECLARE_READ8_MEMBER(sraider_sound_low_r);
 	DECLARE_READ8_MEMBER(sraider_sound_high_r);

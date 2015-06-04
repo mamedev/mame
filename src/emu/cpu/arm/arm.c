@@ -345,7 +345,7 @@ void arm_cpu_device::execute_run()
 
 		/* load instruction */
 		pc = R15;
-		insn = m_direct->read_decrypted_dword( pc & ADDRESS_MASK );
+		insn = m_direct->read_dword( pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{

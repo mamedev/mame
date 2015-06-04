@@ -84,13 +84,13 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 			switch (m_romboard)
 			{
 				case ROM_BOARD_171_SHADOW:  mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
-				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate()); break;
+				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate()); break;
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
-												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
+												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
 											else
-												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base",0x100000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
+												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base", "decrypted_rom1base",0x100000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
 											break;
-				case ROM_BOARD_837_7525:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_837_7525_bank_w), this));
+				case ROM_BOARD_837_7525:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_837_7525_bank_w), this));
 				break;
 
 				default:                    assert(false);
@@ -101,12 +101,12 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 			switch (m_romboard)
 			{
 				case ROM_BOARD_171_SHADOW:
-				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", 0x00000, write16_delegate()); break;
+				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate()); break;
 				case ROM_BOARD_837_7525:
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
-												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", 0x00000, write16_delegate());
+												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
 											else
-												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom0base", 0x00000, write16_delegate());
+												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
 											break;
 				default:                    assert(false);
 			}

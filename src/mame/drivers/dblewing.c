@@ -89,7 +89,8 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_deco_tilegen1(*this, "tilegen1")
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 	optional_device<deco104_device> m_deco104;
 	/* memory pointers */
@@ -106,6 +107,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
+	required_shared_ptr<UINT16> m_decrypted_opcodes;
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_READ16_MEMBER(dblewing_prot_r);
 	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
@@ -177,6 +179,10 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x320000, 0x3207ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, dblewing_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
 READ8_MEMBER(dblewing_state::irq_latch_r)
@@ -362,6 +368,7 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(dblewing_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32_22MHz/9)
@@ -450,7 +457,7 @@ ROM_END
 DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
-	deco102_decrypt_cpu(machine(), "maincpu", 0x399d, 0x25, 0x3d);
+	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
 }
 
 

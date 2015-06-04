@@ -549,7 +549,7 @@ void debug_write_qword(address_space &space, offs_t address, UINT64 data, int ap
 void debug_write_memory(address_space &space, offs_t address, UINT64 data, int size, int apply_translation);
 
 /* read 1,2,4 or 8 bytes at the given offset from opcode space */
-UINT64 debug_read_opcode(address_space &space, offs_t offset, int size, int arg);
+UINT64 debug_read_opcode(address_space &space, offs_t offset, int size);
 
 
 #endif

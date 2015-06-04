@@ -296,7 +296,7 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 READ16_MEMBER( bsmt2000_device::tms_rom_r )
 {
 	// underlying logic assumes this is a sign-extended value
-	return (INT8)m_direct->read_raw_byte((m_rom_bank << 16) + m_rom_address);
+	return (INT8)m_direct->read_byte((m_rom_bank << 16) + m_rom_address);
 }
 
 

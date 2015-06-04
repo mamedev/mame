@@ -12,7 +12,7 @@
 #include "debugger.h"
 #include "8x300.h"
 
-#define FETCHOP(a)         (m_direct->read_decrypted_word(a))
+#define FETCHOP(a)         (m_direct->read_word(a))
 #define CYCLES(x)          do { m_icount -= (x); } while (0)
 #define READPORT(a)        (m_io->read_byte(a))
 #define WRITEPORT(a,v)     (m_io->write_byte((a), (v)))

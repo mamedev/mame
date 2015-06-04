@@ -293,20 +293,20 @@ void i8085a_cpu_device::break_halt_for_interrupt()
 UINT8 i8085a_cpu_device::ROP()
 {
 	set_status(0xa2); // instruction fetch
-	return m_direct->read_decrypted_byte(m_PC.w.l++);
+	return m_direct->read_byte(m_PC.w.l++);
 }
 
 UINT8 i8085a_cpu_device::ARG()
 {
-	return m_direct->read_raw_byte(m_PC.w.l++);
+	return m_direct->read_byte(m_PC.w.l++);
 }
 
 UINT16 i8085a_cpu_device::ARG16()
 {
 	UINT16 w;
-	w  = m_direct->read_raw_byte(m_PC.d);
+	w  = m_direct->read_byte(m_PC.d);
 	m_PC.w.l++;
-	w += m_direct->read_raw_byte(m_PC.d) << 8;
+	w += m_direct->read_byte(m_PC.d) << 8;
 	m_PC.w.l++;
 	return w;
 }

@@ -60,6 +60,10 @@ static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, dietgo_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 
 /* Physical memory map (21 bits) */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dietgo_state )
@@ -205,6 +209,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(dietgo_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
@@ -365,7 +370,7 @@ ROM_END
 DRIVER_INIT_MEMBER(dietgo_state,dietgo)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
-	deco102_decrypt_cpu(machine(), "maincpu", 0xe9ba, 0x01, 0x19);
+	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0xe9ba, 0x01, 0x19);
 }
 
 GAME( 1992, dietgo,   0,      dietgo, dietgo, dietgo_state,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26)", GAME_SUPPORTS_SAVE )

@@ -250,23 +250,23 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				{
 					// 8 bit
 					case 0:
-						sample = m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>16))<<8;
+						sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
 					// 12 bit
 					case 1:
 						if (slot->stepptr & 0x10000)
-							sample = m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
-								(m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
+							sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
+								(m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
-							sample = m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
-								(m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
+							sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
+								(m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
 					// 16 bit
 					case 2:
-						sample = m_direct->read_raw_byte(slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
-							m_direct->read_raw_byte(slot->startaddr + ((slot->stepptr>>16)*2)+1);
+						sample = m_direct->read_byte(slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
+							m_direct->read_byte(slot->startaddr + ((slot->stepptr>>16)*2)+1);
 						break;
 
 					// ?? bit, effect is unknown, datasheet says it's prohibited
@@ -480,7 +480,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 				else
 					offset = m_wavetblhdr*0x80000 + (slot->wave - 384) * 12;
 				for (i = 0; i < 12; i++)
-					p[i] = m_direct->read_raw_byte(offset+i);
+					p[i] = m_direct->read_byte(offset+i);
 
 				slot->bits = (p[0]&0xc0)>>6;
 				slot->startaddr = (p[2] | (p[1]<<8) | ((p[0]&0x3f)<<16));
@@ -752,7 +752,7 @@ READ8_MEMBER( ymf278b_device::read )
 					ret = (m_pcmregs[m_port_C] & 0x1f) | 0x20; // device ID in upper bits
 					break;
 				case 6:
-					ret = m_direct->read_raw_byte(m_memadr);
+					ret = m_direct->read_byte(m_memadr);
 					m_memadr = (m_memadr + 1) & 0x3fffff;
 					break;
 
