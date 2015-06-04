@@ -815,7 +815,9 @@ Paradise (set 2): No board ID, although some tracks which are wire hacks on
  Except for the program rom all other data matches Paradise (set 1).
  
 The Escape version might be the newest revision due to improved slot machine
- animation on 'girl select' compared to other sets.
+ animation on 'girl select' compared to other sets. Except for the program
+ rom all other data matches Paradise (set 1).
+
  NOTE: on this version of the PCB the above listed 4MHz OSC is repleace with
        a 3.579545MHz OSC
 ***************************************************************************/
