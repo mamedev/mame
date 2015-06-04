@@ -6,6 +6,7 @@
  */
 
 #include <cstdio>
+#include <cstdarg>
 
 #include "pparser.h"
 

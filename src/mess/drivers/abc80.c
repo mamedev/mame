@@ -333,15 +333,15 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 	// cassette motor
 	if (BIT(data, 5))
 	{
-		if (!m_cassette_timer->enabled()) if (LOG) logerror("%s %s started cassette motor\n", machine().time().as_string(), machine().describe_context());
+		if (!m_motor) if (LOG) logerror("%s %s started cassette motor\n", machine().time().as_string(), machine().describe_context());
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_cassette_timer->enable(true);
+		m_motor = true;
 	}
 	else
 	{
-		if (m_cassette_timer->enabled()) if (LOG) logerror("%s %s stopped cassette motor\n", machine().time().as_string(), machine().describe_context());
+		if (m_motor) if (LOG) logerror("%s %s stopped cassette motor\n", machine().time().as_string(), machine().describe_context());
 		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_cassette_timer->enable(false);
+		m_motor = false;
 	}
 
 	// cassette data
@@ -420,6 +420,8 @@ void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 	case TIMER_ID_CASSETTE:
 		{
+			if (!m_motor) return;
+
 			int tape_in = m_cassette->input() > 0;
 
 			if (m_tape_in != tape_in)
@@ -469,12 +471,14 @@ void abc80_state::machine_start()
 	// start timers
 	m_cassette_timer = timer_alloc(TIMER_ID_CASSETTE);
 	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
-	m_cassette_timer->enable(false);
 
 	// register for state saving
 	save_item(NAME(m_key_data));
 	save_item(NAME(m_key_strobe));
 	save_item(NAME(m_pio_astb));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_motor));
 	save_item(NAME(m_tape_in));
 	save_item(NAME(m_tape_in_latch));
 }

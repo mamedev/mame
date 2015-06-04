@@ -2,8 +2,9 @@
 -- copyright-holders:MAMEdev Team
 
 project "utils"
+	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid "22489ad0-4cb2-4d91-ad81-24b0d80ca30a"
-	kind "StaticLib"
+	kind (LIBTYPE)
 
 	options {
 		"ForceCPP",
@@ -94,8 +95,9 @@ project "utils"
 
 
 project "formats"
+	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid "f69636b1-fcce-45ce-b09a-113e371a2d7a"
-	kind "StaticLib"
+	kind (LIBTYPE)
 
 	options {
 		"ForceCPP",
@@ -112,6 +114,8 @@ project "formats"
 	}
 
 	files {
+		MAME_DIR .. "src/lib/formats/2d_dsk.c",
+		MAME_DIR .. "src/lib/formats/2d_dsk.h",
 		MAME_DIR .. "src/lib/formats/cassimg.c",
 		MAME_DIR .. "src/lib/formats/cassimg.h",
 		MAME_DIR .. "src/lib/formats/flopimg.c",
@@ -253,6 +257,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/hect_dsk.h",
 		MAME_DIR .. "src/lib/formats/hect_tap.c",
 		MAME_DIR .. "src/lib/formats/hect_tap.h",
+		MAME_DIR .. "src/lib/formats/hector_minidisc.c",
+		MAME_DIR .. "src/lib/formats/hector_minidisc.h",
 		MAME_DIR .. "src/lib/formats/iq151_dsk.c",
 		MAME_DIR .. "src/lib/formats/iq151_dsk.h",
 		MAME_DIR .. "src/lib/formats/imd_dsk.c",
@@ -311,6 +317,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/pc98fdi_dsk.h",
 		MAME_DIR .. "src/lib/formats/phc25_cas.c",
 		MAME_DIR .. "src/lib/formats/phc25_cas.h",
+		MAME_DIR .. "src/lib/formats/pk8020_dsk.c",
+		MAME_DIR .. "src/lib/formats/pk8020_dsk.h",
 		MAME_DIR .. "src/lib/formats/pmd_cas.c",
 		MAME_DIR .. "src/lib/formats/pmd_cas.h",
 		MAME_DIR .. "src/lib/formats/primoptp.c",
@@ -361,8 +369,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/trd_dsk.h",
 		MAME_DIR .. "src/lib/formats/trs_cas.c",
 		MAME_DIR .. "src/lib/formats/trs_cas.h",
-		MAME_DIR .. "src/lib/formats/trs_dsk.c",
-		MAME_DIR .. "src/lib/formats/trs_dsk.h",
+		MAME_DIR .. "src/lib/formats/trs80_dsk.c",
+		MAME_DIR .. "src/lib/formats/trs80_dsk.h",
 		MAME_DIR .. "src/lib/formats/tvc_cas.c",
 		MAME_DIR .. "src/lib/formats/tvc_cas.h",
 		MAME_DIR .. "src/lib/formats/tvc_dsk.c",
@@ -373,6 +381,10 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/uef_cas.h",
 		MAME_DIR .. "src/lib/formats/upd765_dsk.c",
 		MAME_DIR .. "src/lib/formats/upd765_dsk.h",
+		MAME_DIR .. "src/lib/formats/vdk_dsk.c",
+		MAME_DIR .. "src/lib/formats/vdk_dsk.h",
+		MAME_DIR .. "src/lib/formats/vector06_dsk.c",
+		MAME_DIR .. "src/lib/formats/vector06_dsk.h",
 		MAME_DIR .. "src/lib/formats/victor9k_dsk.c",
 		MAME_DIR .. "src/lib/formats/victor9k_dsk.h",
 		MAME_DIR .. "src/lib/formats/vg5k_cas.c",

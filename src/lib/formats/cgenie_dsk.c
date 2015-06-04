@@ -29,6 +29,16 @@ const char *cgenie_format::extensions() const
 	return "dsk";
 }
 
+int cgenie_format::get_track_dam_fm(const format &f, int head, int track)
+{
+	return (track == f.track_count/2) ? FM_DDAM : FM_DAM;
+}
+
+int cgenie_format::get_track_dam_mfm(const format &f, int head, int track)
+{
+	return (track == f.track_count/2) ? MFM_DDAM : MFM_DAM;
+}
+
 const cgenie_format::format cgenie_format::formats[] =
 {
 	{   //  102k 5 1/4 inch single density single sided (Type A)

@@ -17,7 +17,7 @@ class netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2
 {
 public:
 
-	netlist_matrix_solver_direct2_t(const netlist_solver_parameters_t &params)
+	netlist_matrix_solver_direct2_t(const netlist_solver_parameters_t *params)
 		: netlist_matrix_solver_direct_t<2, 2>(params, 2)
 		{}
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);

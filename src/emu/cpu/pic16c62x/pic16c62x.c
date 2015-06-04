@@ -57,6 +57,15 @@
 #include "pic16c62x.h"
 
 
+const device_type PIC16C620  = &device_creator<pic16c620_device>;
+const device_type PIC16C620A = &device_creator<pic16c620a_device>;
+const device_type PIC16C621  = &device_creator<pic16c621_device>;
+const device_type PIC16C621A = &device_creator<pic16c621a_device>;
+const device_type PIC16C622  = &device_creator<pic16c622_device>;
+const device_type PIC16C622A = &device_creator<pic16c622a_device>;
+
+
+
 /****************************************************************************
  *  Internal Memory Map
  ****************************************************************************/

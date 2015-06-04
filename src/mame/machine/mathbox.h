@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Eric Smith
 /*
  * mathbox.h: math box simulation (Battlezone/Red Baron/Tempest)

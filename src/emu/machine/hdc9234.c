@@ -24,37 +24,37 @@
 #include "hdc9234.h"
 
 // Per-command debugging
-#define TRACE_SELECT 1
-#define TRACE_STEP 1
-#define TRACE_RESTORE 1
-#define TRACE_SUBSTATES 1
-#define TRACE_READ 1
-#define TRACE_WRITE 1
-#define TRACE_READREG 1
-#define TRACE_SETREG 1
-#define TRACE_SETPTR 1
-#define TRACE_FORMAT 1
-#define TRACE_READTRACK 1
+#define TRACE_SELECT 0
+#define TRACE_STEP 0
+#define TRACE_RESTORE 0
+#define TRACE_SUBSTATES 0
+#define TRACE_READ 0
+#define TRACE_WRITE 0
+#define TRACE_READREG 0
+#define TRACE_SETREG 0
+#define TRACE_SETPTR 0
+#define TRACE_FORMAT 0
+#define TRACE_READTRACK 0
 
 // Common states
-#define TRACE_READID 1
-#define TRACE_VERIFY 1
-#define TRACE_TRANSFER 1
+#define TRACE_READID 0
+#define TRACE_VERIFY 0
+#define TRACE_TRANSFER 0
 
 // Live states debugging
-#define TRACE_LIVE 1
-#define TRACE_SHIFT 1
-#define TRACE_SYNC 1
+#define TRACE_LIVE 0
+#define TRACE_SHIFT 0
+#define TRACE_SYNC 0
 
 // Misc debugging
 #define TRACE_DELAY 0
-#define TRACE_INT 1
-#define TRACE_LINES 1
-#define TRACE_INDEX 1
-#define TRACE_DMA 1
-#define TRACE_DONE 1
-#define TRACE_FAIL 1
-#define TRACE_AUXBUS 1
+#define TRACE_INT 0
+#define TRACE_LINES 0
+#define TRACE_INDEX 0
+#define TRACE_DMA 0
+#define TRACE_DONE 0
+#define TRACE_FAIL 0
+#define TRACE_AUXBUS 0
 
 #define TRACE_DETAIL 0
 

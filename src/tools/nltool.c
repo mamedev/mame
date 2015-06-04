@@ -183,7 +183,7 @@ public:
 
 	void init()
 	{
-		m_setup = palloc(netlist_setup_t, *this);
+		m_setup = palloc(netlist_setup_t, this);
 		this->init_object(*this, "netlist");
 		m_setup->init();
 	}
@@ -192,11 +192,8 @@ public:
 	{
 		// read the netlist ...
 
-		netlist_sources_t sources;
-
-		sources.add(netlist_source_t(buffer));
-		sources.parse(*m_setup, name);
-		//m_setup->parse(buffer);
+		m_setup->register_source(palloc(netlist_source_mem_t, buffer));
+		m_setup->include(name);
 		log_setup();
 
 		// start devices
@@ -295,10 +292,8 @@ static void listdevices()
 	nt.init();
 	const netlist_factory_list_t::list_t &list = nt.setup().factory().list();
 
-	netlist_sources_t sources;
-
-	sources.add(netlist_source_t("dummy", &netlist_dummy));
-	sources.parse(nt.setup(),"dummy");
+	nt.setup().register_source(palloc(netlist_source_proc_t, "dummy", &netlist_dummy));
+	nt.setup().include("dummy");
 
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
@@ -349,16 +344,29 @@ static void listdevices()
     main - primary entry point
 -------------------------------------------------*/
 
+#if (!PSTANDALONE)
 #include "corealloc.h"
+#endif
+
+static const char *pmf_verbose[] =
+{
+	"NL_PMF_TYPE_VIRTUAL",
+	"NL_PMF_TYPE_GNUC_PMF",
+	"NL_PMF_TYPE_GNUC_PMF_CONV",
+	"NL_PMF_TYPE_INTERNAL"
+};
 
 int main(int argc, char *argv[])
 {
+#if (!PSTANDALONE)
 	track_memory(true);
 	{
+#endif
 	tool_options_t opts;
 	int ret;
 
 	fprintf(stderr, "%s", "WARNING: This is Work In Progress! - It may fail anytime\n");
+	fprintf(stderr, "Update dispatching using method %s\n", pmf_verbose[NL_PMF_TYPE]);
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
 		fprintf(stderr, "Error parsing %s\n", argv[ret]);
@@ -396,7 +404,9 @@ int main(int argc, char *argv[])
 		usage(opts);
 		return 1;
 	}
+#if (!PSTANDALONE)
 	}
 	dump_unfreed_mem();
+#endif
 	return 0;
 }

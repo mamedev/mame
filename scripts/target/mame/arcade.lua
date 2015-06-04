@@ -470,6 +470,7 @@ MACHINES["MSM6242"] = true
 --MACHINES["NCR5380N"] = true
 --MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
+MACHINES["NETLIST"] = true
 --MACHINES["NCR53C7XX"] = true
 MACHINES["NMC9306"] = true
 --MACHINES["NSC810"] = true
@@ -760,7 +761,7 @@ end
 function createMAMEProjects(_target, _subtarget, _name)
 	project (_name)
 	targetsubdir(_target .."_" .. _subtarget)
-	kind "StaticLib"
+	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
 	
 	options {

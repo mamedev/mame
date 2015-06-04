@@ -29,6 +29,8 @@ NETLIST_END()
 
 NETLIST_START(pong_fast)
 
+	LOCAL_SOURCE(lib)
+
 	INCLUDE(lib)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers

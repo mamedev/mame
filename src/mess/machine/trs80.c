@@ -490,8 +490,6 @@ WRITE8_MEMBER( trs80_state::trs80m4_ec_w )
 	m_port_ec = data & 0x7e;
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_f4_w )
-{
 /* Selection of drive and parameters - d6..d5 not emulated.
  A write also causes the selected drive motor to turn on for about 3 seconds.
  When the motor turns off, the drive is deselected.
@@ -503,36 +501,24 @@ WRITE8_MEMBER( trs80_state::trs80m4_f4_w )
     d2 1=select drive 2
     d1 1=select drive 1
     d0 1=select drive 0 */
+WRITE8_MEMBER( trs80_state::trs80m4_f4_w )
+{
+	floppy_image_device *floppy = NULL;
 
-	UINT8 drive = 255;
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
 
-	if (data & 1)
-		drive = 0;
-	else
-	if (data & 2)
-		drive = 1;
-	else
-	if (data & 4)
-		drive = 2;
-	else
-	if (data & 8)
-		drive = 3;
+	m_fdc->set_floppy(floppy);
 
-	m_head = (data & 16) ? 1 : 0;
-
-	if (drive < 4)
+	if (floppy)
 	{
-		m_fdc->set_drive(drive);
-		m_fdc->set_side(m_head);
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 4));
 	}
 
 	m_fdc->dden_w(!BIT(data, 7));
-
-	/* CLEAR_LINE means to turn motors on */
-	floppy_get_device(machine(), 0)->floppy_mon_w((data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_get_device(machine(), 1)->floppy_mon_w((data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_get_device(machine(), 2)->floppy_mon_w((data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_get_device(machine(), 3)->floppy_mon_w((data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER( trs80_state::sys80_f8_w )
@@ -578,10 +564,10 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
 		mem.install_readwrite_handler (0x37e0, 0x37e3, read8_delegate(FUNC(trs80_state::trs80_irq_status_r), this), write8_delegate(FUNC(trs80_state::trs80_motor_w), this));
 		mem.install_readwrite_handler (0x37e8, 0x37eb, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));
 		mem.install_read_handler (0x37ec, 0x37ec, read8_delegate(FUNC(trs80_state::trs80_wd179x_r), this));
-		mem.install_write_handler (0x37ec, 0x37ec, write8_delegate(FUNC(fd1793_device::command_w),(fd1793_device*)m_fdc));
-		mem.install_readwrite_handler (0x37ed, 0x37ed, read8_delegate(FUNC(fd1793_device::track_r),(fd1793_device*)m_fdc), write8_delegate(FUNC(fd1793_device::track_w),(fd1793_device*)m_fdc));
-		mem.install_readwrite_handler (0x37ee, 0x37ee, read8_delegate(FUNC(fd1793_device::sector_r),(fd1793_device*)m_fdc), write8_delegate(FUNC(fd1793_device::sector_w),(fd1793_device*)m_fdc));
-		mem.install_readwrite_handler (0x37ef, 0x37ef, read8_delegate(FUNC(fd1793_device::data_r),(fd1793_device*)m_fdc),write8_delegate( FUNC(fd1793_device::data_w),(fd1793_device*)m_fdc));
+		mem.install_write_handler (0x37ec, 0x37ec, write8_delegate(FUNC(fd1793_t::cmd_w),(fd1793_t*)m_fdc));
+		mem.install_readwrite_handler (0x37ed, 0x37ed, read8_delegate(FUNC(fd1793_t::track_r),(fd1793_t*)m_fdc), write8_delegate(FUNC(fd1793_t::track_w),(fd1793_t*)m_fdc));
+		mem.install_readwrite_handler (0x37ee, 0x37ee, read8_delegate(FUNC(fd1793_t::sector_r),(fd1793_t*)m_fdc), write8_delegate(FUNC(fd1793_t::sector_w),(fd1793_t*)m_fdc));
+		mem.install_readwrite_handler (0x37ef, 0x37ef, read8_delegate(FUNC(fd1793_t::data_r),(fd1793_t*)m_fdc),write8_delegate( FUNC(fd1793_t::data_w),(fd1793_t*)m_fdc));
 		mem.install_read_handler (0x3800, 0x38ff, 0, 0x0300, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));
 		mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));
 	}
@@ -745,59 +731,23 @@ READ8_MEMBER( trs80_state::trs80_irq_status_r )
 
 WRITE8_MEMBER( trs80_state::trs80_motor_w )
 {
-	UINT8 drive = 255;
+	floppy_image_device *floppy = NULL;
 
-	switch (data)
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
 	{
-	case 1:
-		drive = 0;
-		m_head = 0;
-		break;
-	case 2:
-		drive = 1;
-		m_head = 0;
-		break;
-	case 4:
-		drive = 2;
-		m_head = 0;
-		break;
-	case 8:
-		drive = 3;
-		m_head = 0;
-		break;
-	/* These 3 combinations aren't official. Some manufacturers of double-sided disks
-	    used drive select 4 to indicate the other side. */
-	case 9:
-		drive = 0;
-		m_head = 1;
-		break;
-	case 10:
-		drive = 1;
-		m_head = 1;
-		break;
-	case 12:
-		drive = 2;
-		m_head = 1;
-		break;
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 4));
 	}
 
-	if (drive > 3)
-	{   /* Turn motors off */
-		floppy_get_device(machine(), 0)->floppy_mon_w(ASSERT_LINE);
-		floppy_get_device(machine(), 1)->floppy_mon_w(ASSERT_LINE);
-		floppy_get_device(machine(), 2)->floppy_mon_w(ASSERT_LINE);
-		floppy_get_device(machine(), 3)->floppy_mon_w(ASSERT_LINE);
-		return;
-	}
-
-	m_fdc->set_drive(drive);
-	m_fdc->set_side(m_head);
-
-	/* Turn motors on */
-	floppy_get_device(machine(), 0)->floppy_mon_w(CLEAR_LINE);
-	floppy_get_device(machine(), 1)->floppy_mon_w(CLEAR_LINE);
-	floppy_get_device(machine(), 2)->floppy_mon_w(CLEAR_LINE);
-	floppy_get_device(machine(), 3)->floppy_mon_w(CLEAR_LINE);
+	// switch to fm
+	m_fdc->dden_w(1);
 }
 
 /*************************************

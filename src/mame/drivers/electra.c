@@ -5,12 +5,15 @@
  Electra discrete hardware games
 
  Game Name
- Avenger (1975)                EG-1020
+ Avenger (1975)                               EG-1020
+ Combo 3 (Tennis, Soccer, Hockey) (1975)
  Eliminator IV (1976)
- Flying Fortress (1976)        EG-1060  (Taito same name?)
- Pace Car Pro (1975)           EG-1000
- UFO Chase (1975)              EG-1010
- Wings (1976)
+ Flying Fortress (1976)                       EG-1060  (Taito same name?)
+ Knockout (1975)
+ Pace Car Pro (1975)                          EG-1000
+ Pace Race (1974?)
+ UFO Chase (1975)                             EG-1010
+ Wings / Wings Cocktail (1976)
 
 ***************************************************************************/
 
