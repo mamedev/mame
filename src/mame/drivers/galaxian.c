@@ -9741,7 +9741,7 @@ ROM_START( theends ) /* The Stern Electronics license */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "the_end_ra3_56.ic56",         0x0000, 0x0800, CRC(3b2c2f70) SHA1(bcccdacacfc9a3b5f1412dfba6bb0046d283bccc) )
-	ROM_LOAD( "the_end_ra3_55.ic55",         0x0800, 0x0800, CRC(e0429e50) SHA1(27678fc3172cbca3ae1eae96e9d8a62561d5ce40) )
+	ROM_LOAD( "the_end_ra2_55.ic55",         0x0800, 0x0800, CRC(e0429e50) SHA1(27678fc3172cbca3ae1eae96e9d8a62561d5ce40) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "the_end_ra3_30.ic30",         0x0000, 0x0800, CRC(527fd384) SHA1(92a384899d5acd2c689f637da16a0e2d11a9d9c6) )
