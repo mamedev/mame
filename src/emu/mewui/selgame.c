@@ -25,6 +25,7 @@
 #include "unzip.h"
 #include "mewui/custmenu.h"
 #include "info.h"
+#include <fstream>
 
 //-------------------------------------------------
 //  sort
@@ -392,34 +393,9 @@ void ui_mewui_select_game::handle()
 			}
 		}
 
-		// handle UI_SYSINFO
+		// handle UI_EXPORT
 		else if (menu_event->iptkey == IPT_UI_EXPORT)
-		{
-			// attempt to open the output file
-			emu_file file(MEWUI_DIR, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
-			if (file.open("export.xml") == FILERR_NONE)
-			{
-				FILE *pfile;
-				std::string fullpath(file.fullpath());
-				file.close();
-				pfile = fopen(fullpath.c_str() , "w");
-
-				driver_enumerator drivlist(machine().options());
-				drivlist.exclude_all();
-				// iterate over entries
-				for (int curitem = 0; curitem < m_displaylist.size(); curitem++)
-				{
-					int f = driver_list::find(m_displaylist[curitem]->name);
-					drivlist.include(f);
-				}
-
-				// create the XML and save to file
-				info_xml_creator creator(drivlist);
-				creator.output(pfile);
-				fclose(pfile);
-			}
-		}
+			inkey_export();
 
 		// typed characters append to the buffer
 		else if (menu_event->iptkey == IPT_SPECIAL)
@@ -1482,5 +1458,46 @@ void ui_mewui_select_game::populate_search()
 
 		item_append(m_searchlist[curitem]->description, NULL, (!cloneof) ? flags_mewui : (MENU_FLAG_INVERT | flags_mewui),
 					(void *)m_searchlist[curitem]);
+	}
+}
+
+
+void ui_mewui_select_game::inkey_export()
+{
+	// attempt to open the output file
+	emu_file file(MEWUI_DIR, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+
+	if (file.open("exported.xml") == FILERR_NONE)
+	{
+		FILE *pfile;
+		std::string fullpath(file.fullpath());
+		file.close();
+		pfile = fopen(fullpath.c_str() , "w");
+		driver_enumerator drivlist(machine().options());
+		drivlist.exclude_all();
+
+		if (m_search[0] != 0)
+		{
+			for (int curitem = 0; m_searchlist[curitem]; curitem++)
+			{
+				int f = driver_list::find(m_searchlist[curitem]->name);
+				drivlist.include(f);
+			}
+		}
+		else
+		{
+			// iterate over entries
+			for (int curitem = 0; curitem < m_displaylist.size(); curitem++)
+			{
+				int f = driver_list::find(m_displaylist[curitem]->name);
+				drivlist.include(f);
+			}
+		}
+
+		// create the XML and save to file
+		info_xml_creator creator(drivlist);
+		creator.output(pfile);
+		fclose(pfile);
+		popmessage("Exported.xml created under mewui folder.");
 	}
 }

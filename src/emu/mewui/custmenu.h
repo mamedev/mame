@@ -37,7 +37,7 @@ private:
 		OTHER_FILTER = YEAR_FILTER + MAX_FILTER + 1
 	};
 
-	bool single_menu;
+	bool single_menu, added;
 };
 
 #endif  /* __MEWUI_CUSTMENU_H__ */

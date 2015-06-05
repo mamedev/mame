@@ -57,7 +57,7 @@ private:
 	void inkey_select(const ui_menu_event *menu_event);
 	void inkey_select_favorite(const ui_menu_event *menu_event);
 	void inkey_special(const ui_menu_event *menu_event);
-
+	void inkey_export();
 };
 
 

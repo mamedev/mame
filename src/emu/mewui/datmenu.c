@@ -435,10 +435,7 @@ void ui_menu_dats::populate()
 			{
 				// determine which drivers to output
 				driver_enumerator drivlist(machine().options(), *ui_driver);
-
-				// iterate through matches
 				std::string tempstr, headstr;
-
 				while (drivlist.next())
 				{
 					item_append(" ", NULL, MENU_FLAG_MEWUI_HISTORY, NULL);
@@ -446,9 +443,7 @@ void ui_menu_dats::populate()
 					strprintf(headstr, "%-30s %-20s %-s", "Name", "Size", "Status");
 					item_append(headstr.c_str(), NULL, MENU_FLAG_MEWUI_HISTORY, NULL);
 
-					// iterate through roms
 					device_iterator deviter(drivlist.config().root_device());
-
 					for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 						for (const rom_entry *region = rom_first_region(*device); region; region = rom_next_region(region))
 							for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
