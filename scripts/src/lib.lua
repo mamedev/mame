@@ -182,6 +182,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/cbm_tap.h",
 		MAME_DIR .. "src/lib/formats/ccvf_dsk.c",
 		MAME_DIR .. "src/lib/formats/ccvf_dsk.h",
+		MAME_DIR .. "src/lib/formats/cd90_640_dsk.c",
+		MAME_DIR .. "src/lib/formats/cd90_640_dsk.h",
 		MAME_DIR .. "src/lib/formats/cgen_cas.c",
 		MAME_DIR .. "src/lib/formats/cgen_cas.h",
 		MAME_DIR .. "src/lib/formats/cgenie_dsk.c",
