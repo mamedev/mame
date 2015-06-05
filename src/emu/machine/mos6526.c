@@ -809,12 +809,18 @@ READ8_MEMBER( mos6526_device::read )
 	switch (offset & 0x0f)
 	{
 	case PRA:
-		data = (m_read_pa(0) & ~m_ddra) | (m_pra & m_ddra);
+		if (m_ddra != 0xff)
+			data = (m_read_pa(0) & ~m_ddra) | (m_pra & m_ddra);
+		else
+			data = m_read_pa(0) & m_pra;
 		m_pa_in = data;
 		break;
 
 	case PRB:
-		data = (m_read_pb(0) & ~m_ddrb) | (m_prb & m_ddrb);
+		if (m_ddrb != 0xff)
+			data = (m_read_pb(0) & ~m_ddrb) | (m_prb & m_ddrb);
+		else
+			data = m_read_pb(0) & m_prb;
 		m_pb_in = data;
 
 		if (CRA_PBON)
