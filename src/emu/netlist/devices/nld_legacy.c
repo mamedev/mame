@@ -59,15 +59,16 @@ NETLIB_UPDATE_PARAM(nicDelay)
 
 NETLIB_UPDATE(nicDelay)
 {
-	if (INPLOGIC(m_I) && !m_last)
+	netlist_sig_t nval = INPLOGIC(m_I);
+	if (nval && !m_last)
 	{
 		// L_to_H
 		OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(m_L_to_H.Value()));
 	}
-	else if (!INPLOGIC(m_I) && m_last)
+	else if (!nval && m_last)
 	{
 		// H_to_L
 		OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(m_H_to_L.Value()));
 	}
-	m_last = INPLOGIC(m_I);
+	m_last = nval;
 }

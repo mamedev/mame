@@ -11,12 +11,13 @@
 #define NLLISTS_H_
 
 #include "nl_config.h"
+#include "plib/plists.h"
 
 // ----------------------------------------------------------------------------------------
 // timed queue
 // ----------------------------------------------------------------------------------------
 
-template <class _Element, class _Time, int _Size>
+template <class _Element, class _Time>
 class netlist_timed_queue
 {
 	NETLIST_PREVENT_COPYING(netlist_timed_queue)
@@ -42,7 +43,8 @@ public:
 		_Element m_object;
 	};
 
-	netlist_timed_queue()
+	netlist_timed_queue(unsigned list_size)
+	: m_list(list_size)
 	{
 #if HAS_OPENMP && USE_OPENMP
 		m_lock = 0;
@@ -50,7 +52,7 @@ public:
 		clear();
 	}
 
-	ATTR_HOT  int capacity() const { return _Size; }
+	ATTR_HOT  std::size_t capacity() const { return m_list.size(); }
 	ATTR_HOT  bool is_empty() const { return (m_end == &m_list[1]); }
 	ATTR_HOT  bool is_not_empty() const { return (m_end > &m_list[1]); }
 
@@ -144,7 +146,8 @@ private:
 	volatile INT32 m_lock;
 #endif
 	entry_t * m_end;
-	entry_t m_list[_Size];
+	//entry_t m_list[_Size];
+	parray_t<entry_t> m_list;
 
 };
 

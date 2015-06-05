@@ -42,11 +42,12 @@ NETLIB_START(74123)
 	connect(m_RN.m_R.m_P, m_RP.m_R.m_N);
 	connect(m_CV, m_RN.m_R.m_P);
 
+	m_KP = 1.0 / (1.0 + exp(m_K.Value()));
+
 	save(NLNAME(m_last_trig));
 	save(NLNAME(m_state));
 	save(NLNAME(m_KP));
 
-	m_KP = 1.0 / (1.0 + exp(m_K.Value()));
 }
 
 NETLIB_UPDATE(74123)

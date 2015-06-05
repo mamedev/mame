@@ -168,14 +168,6 @@
 
 #define netlist_sig_t UINT8
 
-class netlist_core_device_t;
-
-#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-typedef void (netlist_core_device_t::*net_update_delegate)();
-#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-typedef MEMBER_ABI void (*net_update_delegate)(netlist_core_device_t *);
-#endif
-
 //============================================================
 //  MACROS / netlist devices
 //============================================================
@@ -273,7 +265,7 @@ private:
 //  Asserts
 //============================================================
 
-#ifdef MAME_DEBUG
+#if defined(MAME_DEBUG)
 #define nl_assert(x)               do { if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 #else
 #define nl_assert(x)               do { if (0) if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
@@ -289,10 +281,10 @@ class netlist_logic_output_t;
 class netlist_analog_net_t;
 class netlist_logic_net_t;
 class netlist_net_t;
-class netlist_param_t;
 class netlist_setup_t;
 class netlist_base_t;
 class netlist_matrix_solver_t;
+class netlist_core_device_t;
 
 class NETLIB_NAME(gnd);
 class NETLIB_NAME(solver);
@@ -1031,6 +1023,7 @@ public:
 
 	ATTR_HOT  netlist_sig_t INPLOGIC(const netlist_logic_input_t &inp) const
 	{
+		//printf("%s %d\n", inp.name().cstr(), inp.state());
 		nl_assert(inp.state() != netlist_logic_t::STATE_INP_PASSIVE);
 		return inp.Q();
 	}
@@ -1074,6 +1067,13 @@ protected:
 	}
 
 private:
+
+	#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
+	typedef void (netlist_core_device_t::*net_update_delegate)();
+	#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
+	typedef MEMBER_ABI void (*net_update_delegate)(netlist_core_device_t *);
+	#endif
+
 #if (NL_PMF_TYPE > NL_PMF_TYPE_VIRTUAL)
 	net_update_delegate m_static_update;
 #endif
@@ -1123,7 +1123,7 @@ private:
 // netlist_queue_t
 // -----------------------------------------------------------------------------
 
-class netlist_queue_t : public netlist_timed_queue<netlist_net_t *, netlist_time, 512>,
+class netlist_queue_t : public netlist_timed_queue<netlist_net_t *, netlist_time>,
 						public netlist_object_t,
 						public pstate_callback_t
 {
@@ -1140,8 +1140,8 @@ protected:
 
 private:
 	int m_qsize;
-	netlist_time::INTERNALTYPE m_times[512];
-	char m_name[512][64];
+	parray_t<netlist_time::INTERNALTYPE> m_times;
+	parray_t<char[64]> m_names;
 };
 
 // -----------------------------------------------------------------------------
@@ -1263,13 +1263,14 @@ private:
 	netlist_time                m_stop;     // target time for current queue processing
 
 	netlist_time                m_time;
+	bool                        m_use_deactivate;
 	netlist_queue_t             m_queue;
+
 
 	NETLIB_NAME(mainclock) *    m_mainclock;
 	NETLIB_NAME(solver) *       m_solver;
 	NETLIB_NAME(gnd) *          m_gnd;
 
-	bool                        m_use_deactivate;
 
 	NETLIB_NAME(netlistparams) *m_params;
 	netlist_setup_t *m_setup;
@@ -1334,6 +1335,7 @@ ATTR_HOT inline void netlist_logic_input_t::inactivate()
 {
 	if (EXPECTED(!is_state(STATE_INP_PASSIVE)))
 	{
+		//printf("inactivate %s\n", name().cstr());
 		set_state(STATE_INP_PASSIVE);
 		net().as_logic().dec_active(*this);
 	}

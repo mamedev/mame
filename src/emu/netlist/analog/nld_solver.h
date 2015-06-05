@@ -61,6 +61,9 @@ class terms_t
 		m_term.clear();
 		m_net_other.clear();
 		m_gt.clear();
+		m_go.clear();
+		m_Idr.clear();
+		m_other_curanalog.clear();
 	}
 
 	ATTR_COLD void add(netlist_terminal_t *term, int net_other);

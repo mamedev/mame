@@ -102,14 +102,14 @@ public:
 	{
 	}
 
-	ATTR_HOT inline void set(const nl_double G, const nl_double V, const nl_double I)
+	ATTR_HOT /* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
 		m_P.set( G,  G, (  V) * G - I);
 		m_N.set( G,  G, ( -V) * G + I);
 	}
 
-	ATTR_HOT inline nl_double deltaV() const
+	ATTR_HOT /* inline */ nl_double deltaV() const
 	{
 		return m_P.net().as_analog().Q_Analog() - m_N.net().as_analog().Q_Analog();
 	}

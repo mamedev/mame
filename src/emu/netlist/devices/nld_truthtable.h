@@ -157,16 +157,17 @@ public:
 		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero; k++)
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
 #endif
-		// FIXME: save state
 		save(NLNAME(m_last_state));
 		save(NLNAME(m_ign));
 		save(NLNAME(m_active));
-
 	}
 
 	void reset()
 	{
 		m_active = 0;
+		m_ign = 0;
+		for (unsigned i = 0; i < m_NI; i++)
+			m_i[i].activate();
 		for (unsigned i=0; i<m_NO;i++)
 			if (this->m_Q[i].net().num_cons()>0)
 				m_active++;
@@ -181,7 +182,7 @@ public:
 		UINT32 state = 0;
 		for (unsigned i = 0; i < m_NI; i++)
 		{
-			if (!doOUT || (m_ign & (1<<i)) != 0)
+			if (!doOUT || (m_ign & (1<<i)))
 				m_i[i].activate();
 		}
 		for (unsigned i = 0; i < m_NI; i++)
@@ -242,6 +243,7 @@ public:
 			{
 				for (unsigned i = 0; i< m_NI; i++)
 					m_i[i].inactivate();
+				m_ign = (1<<m_NI)-1;
 			}
 	}
 
