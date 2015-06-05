@@ -215,6 +215,7 @@ void hmcs40_cpu_device::device_start()
 	m_prev_op = 0;
 	m_i = 0;
 	m_eint_line = 0;
+	m_halt = 0;
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_page = 0;
@@ -242,6 +243,8 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_i));
 	save_item(NAME(m_eint_line));
+	save_item(NAME(m_halt));
+	save_item(NAME(m_timer_halted_remain));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_page));
@@ -477,9 +480,25 @@ void hmcs40_cpu_device::do_interrupt()
 
 void hmcs40_cpu_device::execute_set_input(int line, int state)
 {
+	state = (state) ? 1 : 0;
+
+	// halt/unhalt mcu
+	if (line == HMCS40_INPUT_LINE_HLT && state != m_halt)
+	{
+		if (state)
+		{
+			m_timer_halted_remain = m_timer->remaining();
+			m_timer->reset();
+		}
+		else
+			m_timer->adjust(m_timer_halted_remain);
+		
+		m_halt = state;
+		return;
+	}
+	
 	if (line != 0 && line != 1)
 		return;
-	state = (state) ? 1 : 0;
 
 	// external interrupt request on rising edge
 	if (state && !m_int[line])
@@ -551,6 +570,13 @@ inline void hmcs40_cpu_device::increment_pc()
 
 void hmcs40_cpu_device::execute_run()
 {
+	// in HLT state, the internal clock is not running
+	if (m_halt)
+	{
+		m_icount = 0;
+		return;
+	}
+	
 	while (m_icount > 0)
 	{
 		// LPU is handled 1 cycle later

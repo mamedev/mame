@@ -190,6 +190,8 @@ void nld_d_to_a_proxy::start()
 
 	connect(m_RV.m_N, m_Q);
 	m_Q.initial(0.0);
+
+	save(NLNAME(m_last_state));
 }
 
 void nld_d_to_a_proxy::reset()

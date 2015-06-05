@@ -12,6 +12,8 @@
 #ifndef NLD_MS_SOR_H_
 #define NLD_MS_SOR_H_
 
+#include <algorithm>
+
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
@@ -32,6 +34,7 @@ public:
 
 	virtual void log_stats();
 
+	virtual void vsetup(netlist_analog_net_t::list_t &nets);
 	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
 protected:
 	ATTR_HOT virtual nl_double vsolve();
@@ -64,6 +67,15 @@ void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
 				100.0 * (double) this->m_gs_fail / (double) this->m_stat_calculations,
 				(double) this->m_gs_total / (double) this->m_stat_calculations);
 	}
+}
+
+template <unsigned m_N, unsigned _storage_N>
+void netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
+{
+	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
+	this->save(NLNAME(m_lp_fact));
+	this->save(NLNAME(m_gs_fail));
+	this->save(NLNAME(m_gs_total));
 }
 
 template <unsigned m_N, unsigned _storage_N>

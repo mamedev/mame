@@ -8,6 +8,8 @@
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
 
+#include <algorithm>
+
 #include "nld_solver.h"
 
 template <unsigned m_N, unsigned _storage_N>
@@ -206,6 +208,21 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 	}
 
 #endif
+
+	//ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	save(NLNAME(m_RHS));
+	save(NLNAME(m_last_RHS));
+	save(NLNAME(m_last_V));
+
+	for (unsigned k = 0; k < N(); k++)
+	{
+		pstring num = pstring::sprintf("%d", k);
+
+		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
+		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
+		save(m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+	}
+
 }
 
 

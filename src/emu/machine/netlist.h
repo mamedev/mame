@@ -60,11 +60,11 @@
 // Extensions to interface netlist with MAME code ....
 // ----------------------------------------------------------------------------------------
 
-class netlist_source_memregion_t : public netlist_source_t
+class netlist_source_memregion_t : public netlist_setup_t::source_t
 {
 public:
 	netlist_source_memregion_t(pstring name)
-	: netlist_source_t(), m_name(name)
+	: netlist_setup_t::source_t(), m_name(name)
 	{
 	}
 

@@ -62,6 +62,7 @@ netlist_setup_t::~netlist_setup_t()
 
 	netlist().set_setup(NULL);
 	pfree(m_factory);
+	m_sources.clear_and_free();
 
 	pstring::resetmem();
 }
@@ -799,20 +800,19 @@ void netlist_setup_t::print_stats() const
 // Sources
 // ----------------------------------------------------------------------------------------
 
-void netlist_sources_t::parse(netlist_setup_t *setup, const pstring name)
+void netlist_setup_t::include(const pstring &netlist_name)
 {
-	for (std::size_t i=0; i < m_list.size(); i++)
+	for (std::size_t i=0; i < m_sources.size(); i++)
 	{
-		if (m_list[i]->parse(setup, name))
+		if (m_sources[i]->parse(this, netlist_name))
 			return;
 	}
-	setup->netlist().error("unable to find %s in source collection", name.cstr());
+	netlist().error("unable to find %s in source collection", netlist_name.cstr());
 }
 
 // ----------------------------------------------------------------------------------------
 // base sources
 // ----------------------------------------------------------------------------------------
-
 
 bool netlist_source_string_t::parse(netlist_setup_t *setup, const pstring name)
 {

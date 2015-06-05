@@ -28,6 +28,7 @@
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
 #include "machine/thomflop.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 
 #include "bus/generic/slot.h"
@@ -115,6 +116,8 @@ public:
 		m_screen(*this, "screen")
 	{
 	}
+
+	DECLARE_FLOPPY_FORMATS(cd90_640_formats);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );

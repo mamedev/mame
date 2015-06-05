@@ -7,14 +7,6 @@
 
 #include "nl_convert.h"
 
-#if 0
-#include <cstddef>
-#include <cstdarg>
-
-#include "plib/pstring.h"
-#include "plib/plists.h"
-#endif
-
 /*-------------------------------------------------
     convert - convert a spice netlist
 -------------------------------------------------*/
@@ -30,7 +22,7 @@ void nl_convert_base_t::out(const char *format, ...)
 
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
-	m_pins.add(palloc(sp_pin_alias_t, devname + "." + name, devname + "." + alias), false);
+	m_pins.add(palloc(pin_alias_t, devname + "." + name, devname + "." + alias), false);
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
@@ -40,28 +32,28 @@ void nl_convert_base_t::add_ext_alias(const pstring &alias)
 
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, const pstring &amodel)
 {
-	devs.add(palloc(sp_dev_t, atype, aname, amodel), false);
+	m_devs.add(palloc(dev_t, atype, aname, amodel), false);
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, double aval)
 {
-	devs.add(palloc(sp_dev_t, atype, aname, aval), false);
+	m_devs.add(palloc(dev_t, atype, aname, aval), false);
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 {
-	devs.add(palloc(sp_dev_t, atype, aname), false);
+	m_devs.add(palloc(dev_t, atype, aname), false);
 }
 
 void nl_convert_base_t::add_term(pstring netname, pstring termname)
 {
-	sp_net_t * net = m_nets.find_by_name(netname);
+	net_t * net = m_nets.find_by_name(netname);
 	if (net == NULL)
 	{
-		net = palloc(sp_net_t, netname);
+		net = palloc(net_t, netname);
 		m_nets.add(net, false);
 	}
 
 	/* if there is a pin alias, translate ... */
-	sp_pin_alias_t *alias = m_pins.find_by_name(termname);
+	pin_alias_t *alias = m_pins.find_by_name(termname);
 
 	if (alias != NULL)
 		net->terminals().add(alias->alias());
@@ -71,43 +63,43 @@ void nl_convert_base_t::add_term(pstring netname, pstring termname)
 
 void nl_convert_base_t::dump_nl()
 {
-	for (int i=0; i<m_ext_alias.size(); i++)
+	for (std::size_t i=0; i<m_ext_alias.size(); i++)
 	{
-		sp_net_t *net = m_nets.find_by_name(m_ext_alias[i]);
+		net_t *net = m_nets.find_by_name(m_ext_alias[i]);
 		// use the first terminal ...
 		out("ALIAS(%s, %s)\n", m_ext_alias[i].cstr(), net->terminals()[0].cstr());
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	for (int i=0; i<devs.size(); i++)
+	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
-		if (devs[i]->has_value())
-			out("%s(%s, %s)\n", devs[i]->type().cstr(),
-					devs[i]->name().cstr(), get_nl_val(devs[i]->value()).cstr());
-		else if (devs[i]->has_model())
-			out("%s(%s, \"%s\")\n", devs[i]->type().cstr(),
-					devs[i]->name().cstr(), devs[i]->model().cstr());
+		if (m_devs[i]->has_value())
+			out("%s(%s, %s)\n", m_devs[i]->type().cstr(),
+					m_devs[i]->name().cstr(), get_nl_val(m_devs[i]->value()).cstr());
+		else if (m_devs[i]->has_model())
+			out("%s(%s, \"%s\")\n", m_devs[i]->type().cstr(),
+					m_devs[i]->name().cstr(), m_devs[i]->model().cstr());
 		else
-			out("%s(%s)\n", devs[i]->type().cstr(),
-					devs[i]->name().cstr());
+			out("%s(%s)\n", m_devs[i]->type().cstr(),
+					m_devs[i]->name().cstr());
 	}
 	// print nets
-	for (int i=0; i<m_nets.size(); i++)
+	for (std::size_t i=0; i<m_nets.size(); i++)
 	{
-		sp_net_t * net = m_nets[i];
+		net_t * net = m_nets[i];
 		if (!net->is_no_export())
 		{
 			//printf("Net %s\n", net->name().cstr());
 			out("NET_C(%s", net->terminals()[0].cstr() );
-			for (int j=1; j<net->terminals().size(); j++)
+			for (std::size_t j=1; j<net->terminals().size(); j++)
 			{
 				out(", %s", net->terminals()[j].cstr() );
 			}
 			out(")\n");
 		}
 	}
-	devs.clear_and_free();
+	m_devs.clear_and_free();
 	m_nets.clear_and_free();
 	m_pins.clear_and_free();
 	m_ext_alias.clear();
@@ -117,22 +109,22 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 {
 	{
 		int i = 0;
-		while (m_sp_units[i].sp_unit != "-" )
+		while (m_units[i].m_unit != "-" )
 		{
-			if (m_sp_units[i].mult <= nl_math::abs(val))
+			if (m_units[i].m_mult <= nl_math::abs(val))
 				break;
 			i++;
 		}
-		return pstring::sprintf(m_sp_units[i].nl_func.cstr(), val / m_sp_units[i].mult);
+		return pstring::sprintf(m_units[i].m_func.cstr(), val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
 {
 	int i = 0;
-	while (m_sp_units[i].sp_unit != "-")
+	while (m_units[i].m_unit != "-")
 	{
-		if (m_sp_units[i].sp_unit == unit)
-			return m_sp_units[i].mult;
+		if (m_units[i].m_unit == unit)
+			return m_units[i].m_mult;
 		i++;
 	}
 	fprintf(stderr, "Unit %s unknown\n", unit.cstr());
@@ -152,7 +144,7 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 	return ret;
 }
 
-nl_convert_base_t::_sp_unit nl_convert_base_t::m_sp_units[] = {
+nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"T",   "",      1.0e12 },
 		{"G",   "",      1.0e9  },
 		{"MEG", "RES_M(%g)", 1.0e6  },
@@ -221,7 +213,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				if (tt[0].equals(".SUBCKT"))
 				{
 					out("NETLIST_START(%s)\n", tt[1].cstr());
-					for (int i=2; i<tt.size(); i++)
+					for (std::size_t i=2; i<tt.size(); i++)
 						add_ext_alias(tt[i]);
 				}
 				else if (tt[0].equals(".ENDS"))
@@ -289,9 +281,9 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				pstring xname = tt[0].replace(".", "_");
 				pstring tname = "TTL_" + tt[tt.size()-1] + "_DIP";
 				add_device(tname, xname);
-				for (int i=1; i < tt.size() - 1; i++)
+				for (std::size_t i=1; i < tt.size() - 1; i++)
 				{
-					pstring term = pstring::sprintf("%s.%d", xname.cstr(), i);
+					pstring term = pstring::sprintf("%s.%" SIZETFMT, xname.cstr(), i);
 					add_term(tt[i], term);
 				}
 				break;

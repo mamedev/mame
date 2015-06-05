@@ -173,15 +173,7 @@ ATTR_HOT void netlist_matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
 	for (std::size_t i=0; i < m_dynamic_devices.size(); i++)
-		switch (m_dynamic_devices[i]->family())
-		{
-			case netlist_device_t::DIODE:
-				static_cast<NETLIB_NAME(D) *>(m_dynamic_devices[i])->update_terminals();
-				break;
-			default:
-				m_dynamic_devices[i]->update_terminals();
-				break;
-		}
+		m_dynamic_devices[i]->update_terminals();
 }
 
 ATTR_COLD void netlist_matrix_solver_t::start()
@@ -189,6 +181,10 @@ ATTR_COLD void netlist_matrix_solver_t::start()
 	register_output("Q_sync", m_Q_sync);
 	register_input("FB_sync", m_fb_sync);
 	connect(m_fb_sync, m_Q_sync);
+
+	save(NLNAME(m_last_step));
+	save(NLNAME(m_cur_ts));
+
 }
 
 ATTR_COLD void netlist_matrix_solver_t::reset()

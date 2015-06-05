@@ -135,13 +135,11 @@ NETLIB_START(7448_sub)
 	register_output("g", m_Q[6]);
 
 	save(NLNAME(m_state));
-	save(NLNAME(m_active));
 }
 
 NETLIB_RESET(7448_sub)
 {
 	m_state = 0;
-	m_active = 1;
 }
 
 NETLIB_UPDATE(7448_sub)

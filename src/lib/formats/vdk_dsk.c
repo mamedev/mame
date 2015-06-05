@@ -13,19 +13,8 @@
 #include "emu.h"
 #include "vdk_dsk.h"
 
-vdk_format::vdk_format() : wd177x_format(NULL)
+vdk_format::vdk_format()
 {
-	m_format.form_factor = floppy_image::FF_525;
-	m_format.encoding = floppy_image::MFM;
-	m_format.cell_size = 2000;
-	m_format.sector_count = 18;
-//	m_format.track_count = 40/80
-//	m_format.head_count = 1/2
-	m_format.sector_base_size = 256;
-	m_format.sector_base_id = 1;
-	m_format.gap_1 = 32;
-	m_format.gap_2 = 24;
-	m_format.gap_3 = 22;
 }
 
 const char *vdk_format::name() const
@@ -57,66 +46,55 @@ int vdk_format::identify(io_generic *io, UINT32 form_factor)
 bool vdk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT8 header[0x100];
-	io_generic_read(io, header, 0, 100);
+	io_generic_read(io, header, 0, 0x100);
+
 	int header_size = header[3] * 0x100 + header[2];
+	int track_count = header[8];
+	int head_count = header[9];
 
-	m_format.track_count = header[8];
-	m_format.head_count = header[9];
+	int file_offset = header_size;
 
-	switch (m_format.head_count)
+	for (int track = 0; track < track_count; track++)
 	{
-	case 1: m_format.variant = floppy_image::SSDD; break;
-	case 2: m_format.variant = floppy_image::DSDD; break;
-	default: return false;
-	}
+		for (int head = 0; head < head_count ; head++)
+		{
+			desc_pc_sector sectors[SECTOR_COUNT];
+			UINT8 sector_data[SECTOR_COUNT * SECTOR_SIZE];
+			int sector_offset = 0;
 
-	floppy_image_format_t::desc_e *desc;
-	int current_size;
-	int end_gap_index;
+			for (int i = 0; i < SECTOR_COUNT; i++)
+			{
+				sectors[i].track = track;
+				sectors[i].head = head;
+				sectors[i].sector = FIRST_SECTOR_ID + i;
+				sectors[i].actual_size = SECTOR_SIZE;
+				sectors[i].size = SECTOR_SIZE >> 8;
+				sectors[i].deleted = false;
+				sectors[i].bad_crc = false;
+				sectors[i].data = &sector_data[sector_offset];
 
-	desc = get_desc_mfm(m_format, current_size, end_gap_index);
+				io_generic_read(io, sectors[i].data, file_offset, SECTOR_SIZE);
 
-	int total_size = 200000000 / m_format.cell_size;
-	int remaining_size = total_size - current_size;
-	if (remaining_size < 0)
-		throw emu_fatalerror("vdk_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
+				sector_offset += SECTOR_SIZE;
+				file_offset += SECTOR_SIZE;
+			}
 
-	// fixup the end gap
-	desc[end_gap_index].p2 = remaining_size / 16;
-	desc[end_gap_index + 1].p2 = remaining_size & 15;
-	desc[end_gap_index + 1].p1 >>= 16 - (remaining_size & 15);
-
-	int track_size = compute_track_size(m_format);
-
-	UINT8 sectdata[40*512];
-	desc_s sectors[40];
-	build_sector_description(m_format, sectdata, sectors);
-
-	for(int track=0; track < m_format.track_count; track++)
-		for(int head=0; head < m_format.head_count; head++) {
-			io_generic_read(io, sectdata, header_size + get_image_offset(m_format, head, track), track_size);
-			generate_track(desc, track, head, sectors, m_format.sector_count, total_size, image);
+			build_wd_track_mfm(track, head, image, 100000, SECTOR_COUNT, sectors, 22, 32, 24);
 		}
-
-	image->set_variant(m_format.variant);
+	}
 
 	return true;
 }
 
 bool vdk_format::save(io_generic *io, floppy_image *image)
 {
-	int tracks, heads;
-	image->get_actual_geometry(tracks, heads);
+	UINT8 bitstream[500000/8];
+	UINT8 sector_data[50000];
+	desc_xs sectors[256];
+	UINT64 file_offset = 0;
 
-	m_format.track_count = tracks;
-	m_format.head_count = heads;
-
-	switch (m_format.head_count)
-	{
-	case 1: m_format.variant = floppy_image::SSDD; break;
-	case 2: m_format.variant = floppy_image::DSDD; break;
-	default: return false;
-	}
+	int track_count, head_count;
+	image->get_actual_geometry(track_count, head_count);
 
 	// write header
 	UINT8 header[12];
@@ -129,29 +107,36 @@ bool vdk_format::save(io_generic *io, floppy_image *image)
 	header[5] = 0x10;
 	header[6] = 'M';
 	header[7] = 0x01;
-	header[8] = tracks;
-	header[9] = heads;
+	header[8] = track_count;
+	header[9] = head_count;
 	header[10] = 0;
 	header[11] = 0;
 
-	io_generic_write(io, header, 0, sizeof(header));
+	io_generic_write(io, header, file_offset, sizeof(header));
+	file_offset += sizeof(header);
 
 	// write disk data
-	int track_size = compute_track_size(m_format);
-
-	UINT8 sectdata[40*512];
-	desc_s sectors[40];
-	build_sector_description(m_format, sectdata, sectors);
-
-	for (int track = 0; track < m_format.track_count; track++)
+	for (int track = 0; track < track_count; track++)
 	{
-		for (int head = 0; head < m_format.head_count; head++)
+		for (int head = 0; head < head_count; head++)
 		{
-			extract_sectors(image, m_format, sectors, track, head);
-			io_generic_write(io, sectdata, sizeof(header) + get_image_offset(m_format, head, track), track_size);
+			int track_size;
+			generate_bitstream_from_track(track, head, 2000, bitstream, track_size, image);
+			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+
+			for (int i = 0; i < SECTOR_COUNT; i++)
+			{
+				io_generic_write(io, sectors[FIRST_SECTOR_ID + i].data, file_offset, SECTOR_SIZE);
+				file_offset += SECTOR_SIZE;
+			}
 		}
 	}
 
+	return true;
+}
+
+bool vdk_format::supports_save() const
+{
 	return true;
 }
 

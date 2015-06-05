@@ -2,25 +2,35 @@
 // copyright-holders:Dirk Best
 /***************************************************************************
 
-    VDK
+    JVC
 
     Disk image format
 
-    Used by Paul Burgin's PC-Dragon emulator
+    Named after its creator, Jeff Vavasour
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __VDK_DSK_H__
-#define __VDK_DSK_H__
+#ifndef __JVC_DSK_H__
+#define __JVC_DSK_H__
 
 #include "flopimg.h"
 
-class vdk_format : public floppy_image_format_t
+class jvc_format : public floppy_image_format_t
 {
 public:
-	vdk_format();
+	jvc_format();
+
+	struct jvc_header
+	{
+		UINT8 sectors_per_track;
+		UINT8 side_count;
+		UINT8 sector_size;
+		UINT8 first_sector_id;
+		UINT8 sector_attribute_flag;
+		int header_size;
+	};
 
 	virtual const char *name() const;
 	virtual const char *description() const;
@@ -32,11 +42,9 @@ public:
 	virtual bool supports_save() const;
 
 private:
-	static const int SECTOR_SIZE = 256;
-	static const int SECTOR_COUNT = 18;
-	static const int FIRST_SECTOR_ID = 1;
+	bool parse_header(io_generic *io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id);
 };
 
-extern const floppy_format_type FLOPPY_VDK_FORMAT;
+extern const floppy_format_type FLOPPY_JVC_FORMAT;
 
-#endif // __VDK_DSK_H__
+#endif // __JVC_DSK_H__

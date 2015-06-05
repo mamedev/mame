@@ -71,7 +71,7 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 	if (state)
 	{
 		spectrum_UpdateBorderBitmap();
-		spectrum_UpdateScreenBitmap();
+		spectrum_UpdateScreenBitmap(true);
 
 		m_frame_number++;
 
@@ -198,13 +198,16 @@ PALETTE_INIT_MEMBER(spectrum_state,spectrum)
 	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }
 
-void spectrum_state::spectrum_UpdateScreenBitmap()
+void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 {
 	unsigned int x = machine().first_screen()->hpos();
 	unsigned int y = machine().first_screen()->vpos();
 	int width = m_screen_bitmap.width();
 	int height = m_screen_bitmap.height();
 
+
+	if ((m_previous_screen_x == x) && (m_previous_screen_y == y) && !eof)
+		return;
 
 	if (m_screen_bitmap.valid())
 	{
