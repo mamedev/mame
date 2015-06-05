@@ -11754,7 +11754,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="gsharka" cloneof="gshark" supported="no">
+	<software name="gsharka" cloneof="arp64" supported="no">
 		<description>GameShark Pro (USA, v2.0)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11765,7 +11765,7 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="gshark" supported="no">
+	<software name="gshark" cloneof="arp64" supported="no">
 		<description>GameShark Pro (USA, v3.3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
