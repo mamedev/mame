@@ -49,6 +49,7 @@
 # MAP = 1
 # PROFILE = 1
 # ARCHOPTS =
+# OPT_FLAGS =
 # LDOPTS =
 
 # USE_SYSTEM_LIB_EXPAT = 1
@@ -399,6 +400,10 @@ endif
 
 ifdef ARCHOPTS
 PARAMS += --ARCHOPTS='$(ARCHOPTS)'
+endif
+
+ifdef OPT_FLAGS
+PARAMS += --OPT_FLAGS='$(OPT_FLAGS)'
 endif
 
 ifdef MAP
