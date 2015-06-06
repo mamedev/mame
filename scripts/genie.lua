@@ -169,6 +169,11 @@ newoption {
 }
 
 newoption {
+	trigger = "OPT_FLAGS",
+	description = "OPT_FLAGS.",
+}
+
+newoption {
 	trigger = "LDOPTS",
 	description = "Additional linker options",
 }
@@ -737,6 +742,11 @@ if _OPTIONS["OPTIMIZE"] then
 	if _OPTIONS["ARCHOPTS"] then
 		buildoptions {
 			_OPTIONS["ARCHOPTS"]
+		}
+	end
+	if _OPTIONS["OPT_FLAGS"] then
+		buildoptions {
+			_OPTIONS["OPT_FLAGS"]
 		}
 	end
 	if _OPTIONS["LTO"]=="1" then
