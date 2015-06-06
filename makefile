@@ -27,6 +27,7 @@
 # USE_DISPATCH_GL = 0
 # DIRECTINPUT = 7
 # USE_SDL = 1
+# SDL_INI_PATH = .;$HOME/.mame/;ini;
 # SDL2_MULTIAPI = 1
 # NO_USE_MIDI = 1
 # DONT_USE_NETWORK = 1
@@ -472,6 +473,10 @@ endif
 
 ifdef USE_SDL
 PARAMS += --USE_SDL='$(USE_SDL)'
+endif
+
+ifdef SDL_INI_PATH
+PARAMS += --SDL_INI_PATH='$(SDL_INI_PATH)'
 endif
 
 ifdef CYGWIN_BUILD
