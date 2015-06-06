@@ -59,6 +59,30 @@ private:
 	pstring m_val;
 };
 
+class poption_str_limit : public poption
+{
+public:
+	poption_str_limit(pstring ashort, pstring along, pstring defval, pstring limit, pstring help, poptions *parent = NULL)
+	: poption(ashort, along, help, true, parent), m_val(defval), m_limit(limit, ":")
+	{}
+
+	virtual int parse(pstring argument)
+	{
+		if (m_limit.contains(argument))
+		{
+			m_val = argument;
+			return 0;
+		}
+		else
+			return 1;
+	}
+
+	pstring operator ()() { return m_val; }
+private:
+	pstring m_val;
+	pstring_list_t m_limit;
+};
+
 class poption_bool : public poption
 {
 public:

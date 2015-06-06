@@ -5,7 +5,7 @@
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/2203intf.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
 
 /*
@@ -136,6 +136,9 @@ public:
 		m_centronics(*this, "centronics"),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
+		m_floppy(NULL),
 		m_kanji(*this, "kanji1"),
 		m_key1(*this, "key1"),
 		m_key2(*this, "key2"),
@@ -319,7 +322,11 @@ public:
 	optional_device<ay8910_device> m_psg;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
-	required_device<mb8877_device> m_fdc;
+	required_device<mb8877_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+
+	floppy_image_device *m_floppy;
 
 	void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat);
 	void fm7_alu_function_compare(UINT32 offset);

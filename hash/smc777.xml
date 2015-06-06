@@ -140,7 +140,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>Sony Corp.</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="121414">
 				<rom name="cpm22.imd" size="121414" crc="02db74fe" sha1="3f27609dd2d17e983bc337a5530e95883140e5b7" offset="0x0000" />
 			</dataarea>
@@ -153,7 +153,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="develop.1dd" size="305328" crc="13e5971a" sha1="c15d61e00ea2495ef5406a0a6f637ab2746e91cc" offset="0x0000" />
 			</dataarea>
@@ -166,7 +166,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="261808">
 				<rom name="system 12j.1dd" size="261808" crc="c66e1a07" sha1="44e5ffb697c20f3652d6673885c9824f49a307bb" offset="0x0000" />
 			</dataarea>
@@ -178,7 +178,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="system 11.1dd" size="305328" crc="fcf54a39" sha1="d5aa09c73cef0cf639ef3adbe6e64a109f883ad6" offset="0x0000" />
 			</dataarea>
@@ -190,7 +190,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="system 10.1dd" size="305328" crc="89a0c347" sha1="2d3fdacef43d6b89861b90997715a80d784dd2d9" offset="0x0000" />
 			</dataarea>
@@ -202,7 +202,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>Sony</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="211808">
 				<rom name="choplifter.1dd" size="211808" crc="bf2ea51c" sha1="4610f7456ca6bd1740b9c98fb3d2bd67aadffb5c" offset="0x0000" />
 			</dataarea>
@@ -215,7 +215,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ストリッツb.h." />
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="strizbh.1dd" size="305328" crc="efa24635" sha1="c2308afeb555197c6d583e6cd46e6c5c5c9b4ea9" offset="0x0000" />
 			</dataarea>
@@ -228,7 +228,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305056">
 				<rom name="floppy magazine.1dd" size="305056" crc="44f18e58" sha1="dc4d8bda72d408e53edd4be4f1d9497d9179d35e" offset="0x0000" />
 			</dataarea>
@@ -243,7 +243,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>1987</year>
 		<publisher>Y. Sato</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="corewars.1dd" size="305328" crc="4bbc1e35" sha1="22d1ba809d69d7e1679842f1d348cc9d6da850c5" offset="0x0000" />
 			</dataarea>
@@ -256,7 +256,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>1987</year>
 		<publisher>M &amp; M / Alines Soft</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="dragon.1dd" size="305328" crc="dc23c4bc" sha1="45c0d8510f660108d20c82ef116e8dfa8b66b9c2" offset="0x0000" />
 			</dataarea>
@@ -270,7 +270,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 	    <year>1987</year>
 	    <publisher>M &amp; M</publisher>
 
-	    <part name="flop1" interface="floppy_5_25">
+	    <part name="flop1" interface="floppy_3_5">
 	        <dataarea name="flop" size="305328">
 	            <rom name="dragon (freeware).1dd" size="305328" crc="168925c7" sha1="cf5b4b3f3ae0b77787613c7168eb8cb25dabbe52" offset="0x0000" />
 	        </dataarea>
@@ -282,7 +282,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>1987</year>
 		<publisher>Kawaguchiya</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="develop.1dd" size="305328" crc="b7605b47" sha1="927d173f5d08c7a0ad178af1c191cba7d5435a05" offset="0x0000" />
 			</dataarea>
@@ -295,7 +295,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="s-os sword monitor 2.0.1dd" size="305328" crc="27bc0b34" sha1="18840fab993716e7929b6e0600c446d8fba93059" offset="0x0000" />
 			</dataarea>
@@ -308,7 +308,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="348848">
 				<rom name="s-os sword monitor 2.2.1dd" size="348848" crc="6e3215ce" sha1="1fffac3db3005e3de750c63ce1285f6b8a40310a" offset="0x0000" />
 			</dataarea>
@@ -322,7 +322,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="261808">
 				<rom name="compilation 1.1dd" size="261808" crc="cc7827f5" sha1="8c24ec40cab047cff716d57ce44066709d238f5a" offset="0x0000" />
 			</dataarea>
@@ -334,7 +334,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="261808">
 				<rom name="compilation 2.1dd" size="261808" crc="6be3d020" sha1="9398acca8f44c868abc3a837f91c56833962c17f" offset="0x0000" />
 			</dataarea>

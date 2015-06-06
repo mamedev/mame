@@ -23,8 +23,6 @@ const device_type MPCC68561 = &device_creator<mpcc68561_t>;
 
 #define LOG_MPCC    (1)
 
-#if 0   // future
-
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -481,7 +479,3 @@ WRITE8_MEMBER( mpcc68561_t::reg_w )
 			break;
 	}
 }
-
-#else
-
-#endif

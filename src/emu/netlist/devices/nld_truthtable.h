@@ -45,10 +45,10 @@ struct truthtable_desc_t
 	{
 	}
 
-	ATTR_COLD void setup(const pstring_list_t &desc, UINT32 disabled_ignore);
+	void setup(const pstring_list_t &desc, UINT32 disabled_ignore);
 
 private:
-	ATTR_COLD void help(unsigned cur, pstring_list_t list,
+	void help(unsigned cur, pstring_list_t list,
 			UINT64 state,UINT16 val, UINT8 *timing_index);
 	static unsigned count_bits(UINT32 v);
 	static UINT32 set_bits(UINT32 v, UINT32 b);
@@ -106,7 +106,7 @@ public:
 		m_desc = desc;
 	}
 
-	/* ATTR_COLD */ virtual void start()
+	virtual void start()
 	{
 		pstring header = m_desc[0];
 
@@ -157,16 +157,17 @@ public:
 		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero; k++)
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
 #endif
-		// FIXME: save state
 		save(NLNAME(m_last_state));
 		save(NLNAME(m_ign));
 		save(NLNAME(m_active));
-
 	}
 
-	ATTR_COLD void reset()
+	void reset()
 	{
 		m_active = 0;
+		m_ign = 0;
+		for (unsigned i = 0; i < m_NI; i++)
+			m_i[i].activate();
 		for (unsigned i=0; i<m_NO;i++)
 			if (this->m_Q[i].net().num_cons()>0)
 				m_active++;
@@ -174,14 +175,14 @@ public:
 	}
 
 	template<bool doOUT>
-	ATTR_HOT inline void process()
+	inline void process()
 	{
 		netlist_time mt = netlist_time::zero;
 
 		UINT32 state = 0;
 		for (unsigned i = 0; i < m_NI; i++)
 		{
-			if (!doOUT || (m_ign & (1<<i)) != 0)
+			if (!doOUT || (m_ign & (1<<i)))
 				m_i[i].activate();
 		}
 		for (unsigned i = 0; i < m_NI; i++)
@@ -242,6 +243,7 @@ public:
 			{
 				for (unsigned i = 0; i< m_NI; i++)
 					m_i[i].inactivate();
+				m_ign = (1<<m_NI)-1;
 			}
 	}
 
@@ -262,7 +264,7 @@ class netlist_base_factory_truthtable_t : public netlist_base_factory_t
 {
 	NETLIST_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 public:
-	ATTR_COLD netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
+	netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	: netlist_base_factory_t(name, classname, def_param)
 	{}
@@ -275,11 +277,11 @@ class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
 {
 	NETLIST_PREVENT_COPYING(netlist_factory_truthtable_t)
 public:
-	ATTR_COLD netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
+	netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	ATTR_COLD netlist_device_t *Create()
+	netlist_device_t *Create()
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
 		netlist_device_t *r = palloc(tt_type, &m_ttbl, m_desc);

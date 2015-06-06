@@ -332,8 +332,7 @@ public:
 
 	int m_monochrome;
 	required_device<palette_device> m_palette;
-	// make GCC 5.1 happy.. FIXME
-	/*virtual*/ DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -395,7 +394,7 @@ public:
 	DECLARE_WRITE16_MEMBER( microwire_mask_w );
 
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
-	virtual DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void dmasound_set_state(int level);
 	void dmasound_tick();

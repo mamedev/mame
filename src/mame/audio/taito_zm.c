@@ -114,11 +114,6 @@ ADDRESS_MAP_START( taitozoom_mn_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0xe00000, 0xe000ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0xffff) // M66220FP for comms with maincpu
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( taitozoom_mn_io_map, AS_IO, 8, driver_device )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MN10200_PORT1, MN10200_PORT1) AM_DEVREADWRITE("taito_zoom", taito_zoom_device, tms_ctrl_r, tms_ctrl_w)
-ADDRESS_MAP_END
-
 
 /***************************************************************************
 
@@ -178,8 +173,9 @@ MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
 	/* basic machine hardware */
 	MCFG_TAITO_ZOOM_ADD("taito_zoom")
 	MCFG_CPU_ADD("mn10200", MN1020012A, XTAL_25MHz/2)
+	MCFG_MN10200_READ_PORT_CB(1, DEVREAD8("taito_zoom", taito_zoom_device, tms_ctrl_r))
+	MCFG_MN10200_WRITE_PORT_CB(1, DEVWRITE8("taito_zoom", taito_zoom_device, tms_ctrl_w))
 	MCFG_CPU_PROGRAM_MAP(taitozoom_mn_map)
-	MCFG_CPU_IO_MAP(taitozoom_mn_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 

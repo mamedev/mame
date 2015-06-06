@@ -186,6 +186,7 @@ protected:
 	int find_index(UINT32 position, const std::vector<UINT32> &buf);
 	void write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg);
 	void commit_image();
+	attotime get_next_index_time(std::vector<UINT32> &buf, int index, int delta, attotime base);
 };
 
 class ui_menu_control_floppy_image : public ui_menu_control_device_image {

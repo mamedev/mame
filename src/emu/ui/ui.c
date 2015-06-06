@@ -92,6 +92,7 @@ static const input_item_id non_char_keys[] =
 
 // messagebox buffer
 static std::string messagebox_text;
+static std::string messagebox_poptext;
 static rgb_t messagebox_backcolor;
 
 // slider info
@@ -441,7 +442,7 @@ void ui_manager::update_and_render(render_container *container)
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
-		draw_text_box(container, messagebox_text.c_str(), JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		draw_text_box(container, messagebox_poptext.c_str(), JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
 	else
 		m_popup_text_end = 0;
 
@@ -868,7 +869,7 @@ void CLIB_DECL ui_manager::popup_time(int seconds, const char *text, ...)
 
 	// extract the text
 	va_start(arg,text);
-	strvprintf(messagebox_text, text, arg);
+	strvprintf(messagebox_poptext, text, arg);
 	messagebox_backcolor = UI_BACKGROUND_COLOR;
 	va_end(arg);
 

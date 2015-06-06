@@ -193,7 +193,9 @@ NETLIST_END()
 
 static NETLIST_START(nl_mario)
 
-	/* Standard stuff */
+	LOCAL_SOURCE(nl_mario_snd0)
+	LOCAL_SOURCE(nl_mario_snd7)
+	LOCAL_SOURCE(nl_mario_dac)
 
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-8)

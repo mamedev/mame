@@ -59,6 +59,9 @@
 #define MCFG_FD1793x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1793x, _clock)
 
+#define MCFG_KR1818VG93x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, KR1818VG93x, _clock)
+
 #define MCFG_FD1794x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1794x, _clock)
 
@@ -180,6 +183,7 @@ public:
 protected:
 	// Chip-specific configuration flags
 	bool disable_mfm;
+	bool enmf;
 	bool has_enmf;
 	bool inverted_bus;
 	bool side_control;
@@ -187,6 +191,7 @@ protected:
 	bool head_control;
 	bool motor_control;
 	bool ready_hooked;
+	bool nonsticky_immint;
 	int clock_ratio;
 	const int *step_times;
 	int delay_register_commit;
@@ -360,7 +365,7 @@ private:
 
 	emu_timer *t_gen, *t_cmd, *t_track, *t_sector;
 
-	bool dden, enmf, status_type_1, intrq, drq, hld, hlt, enp, force_ready;
+	bool dden, status_type_1, intrq, drq, hld, hlt, enp, force_ready;
 	int main_state, sub_state;
 	UINT8 command, track, sector, data, status, intrq_cond;
 	int last_dir;
@@ -531,6 +536,11 @@ public:
 	fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class kr1818vg93_t : public wd_fdc_analog_t {
+public:
+	kr1818vg93_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class fd1794_t : public wd_fdc_analog_t {
 public:
 	fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -596,11 +606,13 @@ protected:
 class wd2791_t : public wd_fdc_analog_t {
 public:
 	wd2791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
 };
 
 class wd2793_t : public wd_fdc_analog_t {
 public:
 	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
 };
 
 class wd2795_t : public wd_fdc_analog_t {
@@ -644,6 +656,7 @@ extern const device_type FD1781x;
 extern const device_type FD1791x;
 extern const device_type FD1792x;
 extern const device_type FD1793x;
+extern const device_type KR1818VG93x;
 extern const device_type FD1795x;
 extern const device_type FD1797x;
 

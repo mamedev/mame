@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Roberto Lavarone
 /***********************************************************************
 
@@ -15,7 +15,6 @@
 
 /* Components */
 #include "machine/ay31015.h"
-#include "machine/wd17xx.h"
 
 /* Devices */
 #include "imagedev/flopdrv.h"

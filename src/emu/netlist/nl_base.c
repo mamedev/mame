@@ -6,6 +6,7 @@
  */
 
 #include <cstring>
+#include <algorithm>
 
 #include "plib/palloc.h"
 
@@ -26,6 +27,7 @@ nl_fatalerror::nl_fatalerror(const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 	m_text = pstring(format).vprintf(ap);
+	fprintf(stderr, "%s\n", m_text.cstr());
 	va_end(ap);
 }
 
@@ -51,7 +53,7 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const
 	{
 		return palloc(nld_d_to_a_proxy , proxied);
 	}
@@ -71,7 +73,7 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const
 	{
 		return palloc(nld_d_to_a_proxy , proxied);
 	}
@@ -85,10 +87,12 @@ const netlist_logic_family_desc_t &netlist_family_CD4000 = netlist_logic_family_
 // ----------------------------------------------------------------------------------------
 
 netlist_queue_t::netlist_queue_t(netlist_base_t &nl)
-	: netlist_timed_queue<netlist_net_t *, netlist_time, 512>()
+	: netlist_timed_queue<netlist_net_t *, netlist_time>(512)
 	, netlist_object_t(QUEUE, GENERIC)
 	, pstate_callback_t()
 	, m_qsize(0)
+	, m_times(512)
+	, m_names(512)
 {
 	this->init_object(nl, "QUEUE");
 }
@@ -97,8 +101,8 @@ void netlist_queue_t::register_state(pstate_manager_t &manager, const pstring &m
 {
 	NL_VERBOSE_OUT(("register_state\n"));
 	manager.save_item(m_qsize, this, module + "." + "qsize");
-	manager.save_item(m_times, this, module + "." + "times");
-	manager.save_item(&(m_name[0][0]), this, module + "." + "names", sizeof(m_name));
+	manager.save_item(&m_times[0], this, module + "." + "times", m_times.size());
+	manager.save_item(&(m_names[0][0]), this, module + "." + "names", m_names.size() * 64);
 }
 
 void netlist_queue_t::on_pre_save()
@@ -112,8 +116,8 @@ void netlist_queue_t::on_pre_save()
 		pstring p = this->listptr()[i].object()->name();
 		int n = p.len();
 		n = std::min(63, n);
-		std::strncpy(&(m_name[i][0]), p, n);
-		m_name[i][n] = 0;
+		std::strncpy(&(m_names[i][0]), p, n);
+		m_names[i][n] = 0;
 	}
 }
 
@@ -124,9 +128,9 @@ void netlist_queue_t::on_post_load()
 	NL_VERBOSE_OUT(("current time %f qsize %d\n", netlist().time().as_double(), m_qsize));
 	for (int i = 0; i < m_qsize; i++ )
 	{
-		netlist_net_t *n = netlist().find_net(&(m_name[i][0]));
+		netlist_net_t *n = netlist().find_net(&(m_names[i][0]));
 		//NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
-		//NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(), qtemp[i].m_time.as_double()));
+		//NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
 		this->push(netlist_queue_t::entry_t(netlist_time::from_raw(m_times[i]), n));
 	}
 }
@@ -185,11 +189,11 @@ netlist_base_t::netlist_base_t()
 	:   netlist_object_t(NETLIST, GENERIC), pstate_manager_t(),
 		m_stop(netlist_time::zero),
 		m_time(netlist_time::zero),
+		m_use_deactivate(0),
 		m_queue(*this),
 		m_mainclock(NULL),
 		m_solver(NULL),
 		m_gnd(NULL),
-		m_use_deactivate(0),
 		m_setup(NULL)
 {
 }
@@ -281,6 +285,7 @@ ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 
 ATTR_COLD void netlist_base_t::rebuild_lists()
 {
+	//printf("Rebuild Lists\n");
 	for (std::size_t i = 0; i < m_nets.size(); i++)
 		m_nets[i]->rebuild_list();
 }
@@ -419,15 +424,15 @@ ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstri
 	set_logic_family(this->default_logic_family());
 	init_object(anetlist, name);
 
-#if USE_PMFDELEGATES
+#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
 	void (netlist_core_device_t::* pFunc)() = &netlist_core_device_t::update;
-#if NO_USE_PMFCONVERSION
-	static_update = pFunc;
-#else
-	static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
+	m_static_update = pFunc;
+#elif (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
+	void (netlist_core_device_t::* pFunc)() = &netlist_core_device_t::update;
+	m_static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
+#elif (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL)
+	m_static_update = pmfp::get_mfp<net_update_delegate>(&netlist_core_device_t::update, this);
 #endif
-#endif
-
 }
 
 ATTR_COLD netlist_core_device_t::~netlist_core_device_t()
@@ -605,6 +610,7 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 {
 	m_active++;
 	m_list_active.insert(term);
+	nl_assert(m_active <= num_cons());
 	if (m_active == 1)
 	{
 		if (netlist().use_deactivate())
@@ -633,6 +639,7 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
 {
 	m_active--;
+	nl_assert(m_active >= 0);
 	m_list_active.remove(term);
 	if (m_active == 0 && netlist().use_deactivate())
 			railterminal().netdev().dec_active();
@@ -648,10 +655,17 @@ ATTR_COLD void netlist_net_t::rebuild_list()
 {
 	/* rebuild m_list */
 
+	unsigned cnt = 0;
 	m_list_active.clear();
 	for (std::size_t i=0; i < m_core_terms.size(); i++)
 		if (m_core_terms[i]->state() != netlist_logic_t::STATE_INP_PASSIVE)
+		{
 			m_list_active.add(*m_core_terms[i]);
+			cnt++;
+		}
+	//if (cnt != m_active)
+		//printf("ARgh %s ==> %d != %d\n", name().cstr(), cnt, m_active);
+	m_active = cnt;
 }
 
 ATTR_COLD void netlist_net_t::save_register()
@@ -665,7 +679,7 @@ ATTR_COLD void netlist_net_t::save_register()
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
+ATTR_HOT /* inline */ void netlist_core_terminal_t::update_dev(const UINT32 mask)
 {
 	inc_stat(netdev().stat_call_count);
 	if ((state() & mask) != 0)
@@ -674,17 +688,29 @@ ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
 	}
 }
 
-ATTR_HOT inline void netlist_net_t::update_devs()
+ATTR_HOT /* inline */ void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	const int masks[4] = { 1, 5, 3, 1 };
+	const UINT32 masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
+#if 0
+	netlist_core_terminal_t * t[256];
+	netlist_core_terminal_t *p = m_list_active.first();
+	int cnt = 0;
+	while (p != NULL)
+	{
+		if ((p->state() & mask) != 0)
+			t[cnt++] = p;
+		p = m_list_active.next(p);
+	}
 
+	for (int i=0; i<cnt; i++)
+		t[i]->netdev().update_dev();
 	netlist_core_terminal_t *p = m_list_active.first();
 
 	while (p != NULL)
@@ -692,6 +718,16 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 		p->update_dev(mask);
 		p = m_list_active.next(p);
 	}
+
+#else
+	netlist_core_terminal_t *p = m_list_active.first();
+
+	while (p != NULL)
+	{
+		p->update_dev(mask);
+		p = p->m_next;
+	}
+#endif
 }
 
 ATTR_COLD void netlist_net_t::reset()
@@ -736,6 +772,7 @@ ATTR_COLD void netlist_net_t::move_connections(netlist_net_t *dest_net)
 		dest_net->register_con(*p);
 	}
 	m_core_terms.clear(); // FIXME: othernet needs to be free'd from memory
+	m_active = 0;
 }
 
 ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
@@ -1056,7 +1093,7 @@ ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, co
 // mainclock
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_logic_net_t &net)
+ATTR_HOT /* inline */ void NETLIB_NAME(mainclock)::mc_update(netlist_logic_net_t &net)
 {
 	net.toggle_new_Q();
 	net.update_devs();
@@ -1088,12 +1125,3 @@ NETLIB_UPDATE(mainclock)
 	net.set_time(netlist().time() + m_inc);
 }
 
-ATTR_HOT void netlist_base_t::push_to_queue(netlist_net_t &out, const netlist_time &attime)
-{
-	m_queue.push(netlist_queue_t::entry_t(attime, &out));
-}
-
-ATTR_HOT void netlist_base_t::remove_from_queue(netlist_net_t &out)
-{
-	m_queue.remove(&out);
-}

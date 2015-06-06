@@ -169,6 +169,11 @@ newoption {
 }
 
 newoption {
+	trigger = "OPT_FLAGS",
+	description = "OPT_FLAGS.",
+}
+
+newoption {
 	trigger = "LDOPTS",
 	description = "Additional linker options",
 }
@@ -310,6 +315,21 @@ newoption {
 	}
 }
 
+
+newoption {
+	trigger = "SHLIB",
+	description = "Generate shared libs.",
+	allowed = {
+		{ "0",   "Static libs" 	},
+		{ "1",   "Shared libs"  },
+	}
+}
+
+if _OPTIONS["SHLIB"]=="1" then
+	LIBTYPE = "SharedLib"
+else
+	LIBTYPE = "StaticLib"
+end
 
 PYTHON = "python"
 
@@ -650,7 +670,7 @@ end
 		}
 	end
 -- add -g if we need symbols, and ensure we have frame pointers
-if _OPTIONS["SYMBOLS"]~=nil then
+if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	buildoptions {
 		"-g" .. _OPTIONS["SYMLEVEL"],
 		"-fno-omit-frame-pointer",
@@ -695,7 +715,7 @@ if _OPTIONS["PROFILE"] then
 	}
 end
 
-if _OPTIONS["SYMBOLS"]~=nil then
+if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	flags {
 		"Symbols",
 	}
@@ -724,28 +744,34 @@ if _OPTIONS["OPTIMIZE"] then
 			_OPTIONS["ARCHOPTS"]
 		}
 	end
-	if _OPTIONS["LTO"]=="1" then
+	if _OPTIONS["OPT_FLAGS"] then
 		buildoptions {
-			"-flto",
+			_OPTIONS["OPT_FLAGS"]
 		}
---		buildoptions {
---			"-ffat-lto-objects",
---		}
---		buildoptions {
---			"-flto-partition=1to1",
---		}
+	end
+	if _OPTIONS["LTO"]=="1" then
+-- -flto=4 -> 4 threads
+		buildoptions {
+			"-flto=4",
+		}
+		buildoptions {
+			"-fno-fat-lto-objects",
+		}
 		linkoptions {
-			"-flto",
+			"-flto=4",
 		}
---		linkoptions {
---			"-flto-partition=1to1",
---		}
---		linkoptions {
---			"-ffat-lto-objects",
---		}
+		linkoptions {
+			"-fno-fat-lto-objects",
+		}
 		
 		
 	end
+end
+
+if _OPTIONS["SHLIB"] then
+	buildoptions {
+		"-fPIC"
+	}
 end
 
 if _OPTIONS["SSE2"]=="1" then
@@ -878,7 +904,6 @@ end
 			if (version >= 40800) then
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				buildoptions {
-					"-Wno-unused-variable",
 					"-Wno-array-bounds"
 				}
 			end

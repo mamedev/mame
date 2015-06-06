@@ -471,6 +471,7 @@ MACHINES["NCR5380N"] = true
 MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
 MACHINES["NCR53C7XX"] = true
+MACHINES["NETLIST"] = true
 MACHINES["NMC9306"] = true
 MACHINES["NSC810"] = true
 MACHINES["NSCSI"] = true
@@ -532,7 +533,6 @@ MACHINES["UPD765"] = true
 MACHINES["V3021"] = true
 MACHINES["WD_FDC"] = true
 MACHINES["WD11C00_17"] = true
-MACHINES["WD17XX"] = true
 MACHINES["WD2010"] = true
 MACHINES["WD33C93"] = true
 MACHINES["WD7600"] = true
@@ -859,7 +859,7 @@ end
 function createMESSProjects(_target, _subtarget, _name)
 	project (_name)
 	targetsubdir(_target .."_" .. _subtarget)
-	kind "StaticLib"
+	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
 	
 	options {

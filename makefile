@@ -4,9 +4,6 @@
 #
 #   Core makefile for building MAME and derivatives
 #
-#   Copyright (c) Nicola Salmoria and the MAME Team.
-#   Visit http://mamedev.org for licensing and usage restrictions.
-#
 ###########################################################################
 
 
@@ -52,6 +49,7 @@
 # MAP = 1
 # PROFILE = 1
 # ARCHOPTS =
+# OPT_FLAGS =
 # LDOPTS =
 
 # USE_SYSTEM_LIB_EXPAT = 1
@@ -396,8 +394,16 @@ ifdef OPTIMIZE
 PARAMS += --OPTIMIZE=$(OPTIMIZE)
 endif
 
+ifdef SHLIB
+PARAMS += --SHLIB=$(SHLIB)
+endif
+
 ifdef ARCHOPTS
 PARAMS += --ARCHOPTS='$(ARCHOPTS)'
+endif
+
+ifdef OPT_FLAGS
+PARAMS += --OPT_FLAGS='$(OPT_FLAGS)'
 endif
 
 ifdef MAP

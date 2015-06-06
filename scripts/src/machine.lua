@@ -2243,18 +2243,6 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/wd17xx.h,MACHINES += WD17XX
----------------------------------------------------
-
-if (MACHINES["WD17XX"]~=null) then
-	files {
-		MAME_DIR .. "src/emu/machine/wd17xx.c",
-		MAME_DIR .. "src/emu/machine/wd17xx.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/emu/machine/wd2010.h,MACHINES += WD2010
 ---------------------------------------------------
 
@@ -2662,3 +2650,14 @@ if (MACHINES["PCI9050"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/emu/machine/netlist.h,MACHINES += NETLIST
+---------------------------------------------------
+
+if (MACHINES["NETLIST"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/netlist.c",
+		MAME_DIR .. "src/emu/machine/netlist.h",
+	}
+end

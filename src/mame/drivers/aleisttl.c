@@ -4,8 +4,17 @@
 
  Allied Leisure discrete hardware games
 
+ Chase (aka Chase1) (1976)
+ Deluxe Soccer (1973)
+ Fire Power (1975)
+ Fütsball (1975)
+ Galaxy Raider (1974)
  Hesitation (1974)                AL-6500?
+ Hockey, Soccer, Tennis (1974)
+ Improbable (1974)
+ Knock Ball (1974)
  Paddle Battle (1973)
+ Ric-O-Chet (1973)
  Robot (1975)                     AL-7500
  Ski (1975)
  Street Burners (1975)            URL-8300

@@ -216,7 +216,9 @@ private:
 
 static NETLIST_START(pong)
 
-	NETLIST_MEMREGION("maincpu")
+	MEMREGION_SOURCE("maincpu")
+	PARAM(NETLIST.USE_DEACTIVATE, 1)
+	INCLUDE(pong_schematics)
 
 NETLIST_END()
 

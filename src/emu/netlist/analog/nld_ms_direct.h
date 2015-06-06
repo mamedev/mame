@@ -8,6 +8,8 @@
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
 
+#include <algorithm>
+
 #include "nld_solver.h"
 
 template <unsigned m_N, unsigned _storage_N>
@@ -15,20 +17,20 @@ class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
 public:
 
-	netlist_matrix_solver_direct_t(const netlist_solver_parameters_t &params, const int size);
-	netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, const int size);
+	netlist_matrix_solver_direct_t(const netlist_solver_parameters_t *params, const int size);
+	netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t *params, const int size);
 
 	virtual ~netlist_matrix_solver_direct_t();
 
-	/* ATTR_COLD */ virtual void vsetup(netlist_analog_net_t::list_t &nets);
-	/* ATTR_COLD */ virtual void reset() { netlist_matrix_solver_t::reset(); }
+	virtual void vsetup(netlist_analog_net_t::list_t &nets);
+	virtual void reset() { netlist_matrix_solver_t::reset(); }
 
 	ATTR_HOT inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
-	/* ATTR_COLD */ virtual void add_term(int net_idx, netlist_terminal_t *term);
+	virtual void add_term(int net_idx, netlist_terminal_t *term);
 
 	ATTR_HOT virtual nl_double vsolve();
 
@@ -206,6 +208,21 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 	}
 
 #endif
+
+	//ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	save(NLNAME(m_RHS));
+	save(NLNAME(m_last_RHS));
+	save(NLNAME(m_last_V));
+
+	for (unsigned k = 0; k < N(); k++)
+	{
+		pstring num = pstring::sprintf("%d", k);
+
+		save(m_terms[k]->go(),"GO" + num, m_terms[k]->count());
+		save(m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
+		save(m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+	}
+
 }
 
 
@@ -417,7 +434,7 @@ ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_
 }
 
 template <unsigned m_N, unsigned _storage_N>
-netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const netlist_solver_parameters_t &params, const int size)
+netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const netlist_solver_parameters_t *params, const int size)
 : netlist_matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
 , m_lp_fact(0)
@@ -434,7 +451,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, const int size)
+netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t *params, const int size)
 : netlist_matrix_solver_t(type, params)
 , m_dim(size)
 , m_lp_fact(0)

@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( cgenie_mem, AS_PROGRAM, 8, cgenie_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in machine_start
 	AM_RANGE(0xc000, 0xefff) AM_NOP // cartridge space
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(colorram_r, colorram_w ) AM_SHARE("colorram")
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(colorram_r, colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xf400, 0xf7ff) AM_RAM AM_SHARE("fontram")
 	AM_RANGE(0xf800, 0xf8ff) AM_MIRROR(0x300) AM_READ(keyboard_r)
 	AM_RANGE(0xfc00, 0xffff) AM_NOP // cartridge space
@@ -210,7 +210,7 @@ static INPUT_PORTS_START( cgenie )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L.P.") // marked as "L.P." in the manual, lightpen?
 
 	PORT_START("RST")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_TAB) PORT_NAME("Rst") PORT_CHAR(9) PORT_CHANGED_MEMBER(DEVICE_SELF, cgenie_state, rst_callback, NULL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F5) PORT_NAME("Rst") PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, cgenie_state, rst_callback, NULL)
 INPUT_PORTS_END
 
 
@@ -220,7 +220,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( cgenie_state::keyboard_r )
 {
-	int data = 0;
+	UINT8 data = 0;
 
 	for (int i = 0; i < 8; i++)
 		if (BIT(offset, i))

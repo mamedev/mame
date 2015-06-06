@@ -43,19 +43,24 @@ NETLIB_START(7493ff)
 	register_output("Q", m_Q);
 
 	save(NLNAME(m_reset));
+	save(NLNAME(m_state));
 }
 
 NETLIB_RESET(7493ff)
 {
 	m_reset = 1;
+	m_state = 0;
 	m_I.set_state(netlist_logic_t::STATE_INP_HL);
 }
 
 NETLIB_UPDATE(7493ff)
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(18);
-	//if (m_reset == 0)
-		OUTLOGIC(m_Q, (!m_Q.net().as_logic().new_Q()) & m_reset, out_delay);
+	if (m_reset != 0)
+	{
+		m_state ^= 1;
+		OUTLOGIC(m_Q, m_state, out_delay);
+	}
 }
 
 NETLIB_UPDATE(7493)
@@ -71,6 +76,7 @@ NETLIB_UPDATE(7493)
 		OUTLOGIC(C.m_Q, 0, NLTIME_FROM_NS(40));
 		OUTLOGIC(D.m_Q, 0, NLTIME_FROM_NS(40));
 		A.m_reset = B.m_reset = C.m_reset = D.m_reset = 0;
+		A.m_state = B.m_state = C.m_state = D.m_state = 0;
 	}
 	else
 	{

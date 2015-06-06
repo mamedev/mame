@@ -27,9 +27,9 @@ public:
 	: m_name(name), m_classname(classname), m_def_param(def_param)
 	{}
 
-	/* ATTR_COLD */ virtual ~netlist_base_factory_t() {}
+	virtual ~netlist_base_factory_t() {}
 
-	/* ATTR_COLD */ virtual netlist_device_t *Create() = 0;
+	virtual netlist_device_t *Create() = 0;
 
 	ATTR_COLD const pstring &name() const { return m_name; }
 	ATTR_COLD const pstring &classname() const { return m_classname; }

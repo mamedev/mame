@@ -41,6 +41,8 @@ protected:
 	UINT8 gc_bank_1;
 	bool gc_locked;
 	UINT8 m_lock_reg;
+	UINT8 m_gr10;  // high byte of background colour (in 15/16bpp)
+	UINT8 m_gr11;  // high byte of foreground colour (in 15/16bpp)
 
 	UINT8 m_cr19;
 	UINT8 m_cr1a;
