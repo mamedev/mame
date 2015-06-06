@@ -377,7 +377,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-
+#if 0
 static const UINT32 lx388palette[] =
 {
 	rgb_t(0x00, 0xff, 0x00), /* GREEN */
@@ -399,6 +399,7 @@ static const UINT32 lx388palette[] =
 	rgb_t(0x40, 0x10, 0x00), /* ALPHANUMERIC DARK ORANGE */
 	rgb_t(0xff, 0xc4, 0x18)      /* ALPHANUMERIC BRIGHT ORANGE */
 };
+#endif
 
 FLOPPY_FORMATS_MEMBER( z80ne_state::floppy_formats )
 	FLOPPY_DMK_FORMAT

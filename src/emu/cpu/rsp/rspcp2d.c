@@ -94,7 +94,7 @@ static void cfunc_ctc2(void *param);
 #define CLEAR_CLIP2_FLAG(x)         { m_vflag[CLIP2][x & 7] = 0; }
 
 #define CACHE_VALUES() \
-	const int op = m_op;    \
+	const int op = m_rspcop2_state->op;    \
 	const int vdreg = VDREG;    \
 	const int vs1reg = VS1REG;  \
 	const int vs2reg = VS2REG;  \
@@ -137,10 +137,10 @@ void rsp_cop2_drc::cfunc_unimplemented_opcode()
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		char string[200];
-		rsp_dasm_one(string, ppc, m_op);
+		rsp_dasm_one(string, ppc, m_rspcop2_state->op);
 		osd_printf_debug("%08X: %s\n", ppc, string);
 	}
-	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", m_op >> 26, m_op, ppc);
+	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", m_rspcop2_state->op >> 26, m_rspcop2_state->op, ppc);
 }
 
 static void unimplemented_opcode(void *param)
@@ -267,7 +267,7 @@ void rsp_cop2_drc::state_string_export(const int index, std::string &str)
 
 void rsp_cop2_drc::lbv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 
 	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
@@ -300,7 +300,7 @@ static void cfunc_lbv(void *param)
 
 void rsp_cop2_drc::lsv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xe;
@@ -336,7 +336,7 @@ static void cfunc_lsv(void *param)
 
 void rsp_cop2_drc::llv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
@@ -375,7 +375,7 @@ static void cfunc_llv(void *param)
 
 void rsp_cop2_drc::ldv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
@@ -414,7 +414,7 @@ static void cfunc_ldv(void *param)
 
 void rsp_cop2_drc::lqv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int offset = (op & 0x7f);
@@ -452,7 +452,7 @@ static void cfunc_lqv(void *param)
 
 void rsp_cop2_drc::lrv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -491,7 +491,7 @@ static void cfunc_lrv(void *param)
 
 void rsp_cop2_drc::lpv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -526,7 +526,7 @@ static void cfunc_lpv(void *param)
 
 void rsp_cop2_drc::luv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -561,7 +561,7 @@ static void cfunc_luv(void *param)
 
 void rsp_cop2_drc::lhv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -595,7 +595,7 @@ static void cfunc_lhv(void *param)
 
 void rsp_cop2_drc::lfv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -636,7 +636,7 @@ static void cfunc_lfv(void *param)
 
 void rsp_cop2_drc::lwv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -673,7 +673,7 @@ static void cfunc_lwv(void *param)
 
 void rsp_cop2_drc::ltv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -720,62 +720,62 @@ int rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state 
 	switch ((op >> 11) & 0x1f)
 	{
 		case 0x00:      /* LBV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lbv, this);
 			return TRUE;
 
 		case 0x01:      /* LSV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lsv, this);
 			return TRUE;
 
 		case 0x02:      /* LLV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_llv, this);
 			return TRUE;
 
 		case 0x03:      /* LDV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_ldv, this);
 			return TRUE;
 
 		case 0x04:      /* LQV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lqv, this);
 			return TRUE;
 
 		case 0x05:      /* LRV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lrv, this);
 			return TRUE;
 
 		case 0x06:      /* LPV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lpv, this);
 			return TRUE;
 
 		case 0x07:      /* LUV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_luv, this);
 			return TRUE;
 
 		case 0x08:      /* LHV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lhv, this);
 			return TRUE;
 
 		case 0x09:      /* LFV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lfv, this);
 			return TRUE;
 
 		case 0x0a:      /* LWV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_lwv, this);
 			return TRUE;
 
 		case 0x0b:      /* LTV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [m_op],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
 			UML_CALLC(block, cfunc_ltv, this);
 			return TRUE;
 
@@ -800,7 +800,7 @@ int rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state 
 
 void rsp_cop2_drc::sbv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -831,7 +831,7 @@ static void cfunc_sbv(void *param)
 
 void rsp_cop2_drc::ssv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -868,7 +868,7 @@ static void cfunc_ssv(void *param)
 
 void rsp_cop2_drc::slv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -905,7 +905,7 @@ static void cfunc_slv(void *param)
 
 void rsp_cop2_drc::sdv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0x8;
@@ -941,7 +941,7 @@ static void cfunc_sdv(void *param)
 
 void rsp_cop2_drc::sqv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -977,7 +977,7 @@ static void cfunc_sqv(void *param)
 
 void rsp_cop2_drc::srv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1017,7 +1017,7 @@ static void cfunc_srv(void *param)
 
 void rsp_cop2_drc::spv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1060,7 +1060,7 @@ static void cfunc_spv(void *param)
 
 void rsp_cop2_drc::suv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1103,7 +1103,7 @@ static void cfunc_suv(void *param)
 
 void rsp_cop2_drc::shv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1141,7 +1141,7 @@ static void cfunc_shv(void *param)
 
 void rsp_cop2_drc::sfv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1182,7 +1182,7 @@ static void cfunc_sfv(void *param)
 
 void rsp_cop2_drc::swv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1221,7 +1221,7 @@ static void cfunc_swv(void *param)
 
 void rsp_cop2_drc::stv()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -1270,62 +1270,62 @@ int rsp_cop2_drc::generate_swc2(drcuml_block *block, rsp_device::compiler_state 
 	switch ((op >> 11) & 0x1f)
 	{
 		case 0x00:      /* SBV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_sbv, this);
 			return TRUE;
 
 		case 0x01:      /* SSV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_ssv, this);
 			return TRUE;
 
 		case 0x02:      /* SLV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_slv, this);
 			return TRUE;
 
 		case 0x03:      /* SDV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_sdv, this);
 			return TRUE;
 
 		case 0x04:      /* SQV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_sqv, this);
 			return TRUE;
 
 		case 0x05:      /* SRV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_srv, this);
 			return TRUE;
 
 		case 0x06:      /* SPV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_spv, this);
 			return TRUE;
 
 		case 0x07:      /* SUV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_suv, this);
 			return TRUE;
 
 		case 0x08:      /* SHV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_shv, this);
 			return TRUE;
 
 		case 0x09:      /* SFV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_sfv, this);
 			return TRUE;
 
 		case 0x0a:      /* SWV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_swv, this);
 			return TRUE;
 
 		case 0x0b:      /* STV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_stv, this);
 			return TRUE;
 
@@ -2079,7 +2079,7 @@ static void cfunc_vaddb(void *param)
 
 void rsp_cop2_drc::vsaw()
 {
-	const int op = m_op;
+	const int op = m_rspcop2_state->op;
 	const int vdreg = VDREG;
 	const int el = EL;
 
@@ -3264,217 +3264,217 @@ int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compil
 	switch (op & 0x3f)
 	{
 		case 0x00:      /* VMULF */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmulf, this);
 			return TRUE;
 
 		case 0x01:      /* VMULU */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmulu, this);
 			return TRUE;
 
 		case 0x04:      /* VMUDL */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmudl, this);
 			return TRUE;
 
 		case 0x05:      /* VMUDM */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmudm, this);
 			return TRUE;
 
 		case 0x06:      /* VMUDN */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmudn, this);
 			return TRUE;
 
 		case 0x07:      /* VMUDH */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmudh, this);
 			return TRUE;
 
 		case 0x08:      /* VMACF */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmacf, this);
 			return TRUE;
 
 		case 0x09:      /* VMACU */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmacu, this);
 			return TRUE;
 
 		case 0x0c:      /* VMADL */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmadl, this);
 			return TRUE;
 
 		case 0x0d:      /* VMADM */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmadm, this);
 			return TRUE;
 
 		case 0x0e:      /* VMADN */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmadn, this);
 			return TRUE;
 
 		case 0x0f:      /* VMADH */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmadh, this);
 			return TRUE;
 
 		case 0x10:      /* VADD */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vadd, this);
 			return TRUE;
 
 		case 0x11:      /* VSUB */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vsub, this);
 			return TRUE;
 
 		case 0x13:      /* VABS */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vabs, this);
 			return TRUE;
 
 		case 0x14:      /* VADDC */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddc, this);
 			return TRUE;
 
 		case 0x15:      /* VSUBC */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vsubc, this);
 			return TRUE;
 
 		case 0x16:      /* VADDB */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddb, this);
 			return TRUE;
 
 		case 0x17:      /* VSUBB (reserved, functionally identical to VADDB) */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddb, this);
 			return TRUE;
 
 		case 0x18:      /* VACCB (reserved, functionally identical to VADDB) */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddb, this);
 			return TRUE;
 
 		case 0x19:      /* VSUCB (reserved, functionally identical to VADDB) */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vaddb, this);
 			return TRUE;
 
 		case 0x1d:      /* VSAW */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vsaw, this);
 			return TRUE;
 
 		case 0x20:      /* VLT */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vlt, this);
 			return TRUE;
 
 		case 0x21:      /* VEQ */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_veq, this);
 			return TRUE;
 
 		case 0x22:      /* VNE */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vne, this);
 			return TRUE;
 
 		case 0x23:      /* VGE */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vge, this);
 			return TRUE;
 
 		case 0x24:      /* VCL */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vcl, this);
 			return TRUE;
 
 		case 0x25:      /* VCH */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vch, this);
 			return TRUE;
 
 		case 0x26:      /* VCR */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vcr, this);
 			return TRUE;
 
 		case 0x27:      /* VMRG */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmrg, this);
 			return TRUE;
 
 		case 0x28:      /* VAND */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vand, this);
 			return TRUE;
 
 		case 0x29:      /* VNAND */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vnand, this);
 			return TRUE;
 
 		case 0x2a:      /* VOR */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vor, this);
 			return TRUE;
 
 		case 0x2b:      /* VNOR */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vnor, this);
 			return TRUE;
 
 		case 0x2c:      /* VXOR */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vxor, this);
 			return TRUE;
 
 		case 0x2d:      /* VNXOR */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vnxor, this);
 			return TRUE;
 
 		case 0x30:      /* VRCP */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrcp, this);
 			return TRUE;
 
 		case 0x31:      /* VRCPL */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrcpl, this);
 			return TRUE;
 
 		case 0x32:      /* VRCPH */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrcph, this);
 			return TRUE;
 
 		case 0x33:      /* VMOV */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vmov, this);
 			return TRUE;
 
 		case 0x34:      /* VRSQ */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);         // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);         // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrsq, this);
 			return TRUE;
 
 		case 0x35:      /* VRSQL */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrsql, this);
 			return TRUE;
 
 		case 0x36:      /* VRSQH */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrsqh, this);
 			return TRUE;
 
@@ -3483,7 +3483,7 @@ int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compil
 			return TRUE;
 
 		default:
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, unimplemented_opcode, &m_rsp);
 			return FALSE;
 	}
@@ -3496,7 +3496,7 @@ int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compil
 
 void rsp_cop2_drc::mfc2()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
 
 	UINT16 b1 = VREG_B(VS1REG, (el+0) & 0xf);
@@ -3511,7 +3511,7 @@ static void cfunc_mfc2(void *param)
 
 void rsp_cop2_drc::cfc2()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	if (RTREG)
 	{
 		switch(RDREG)
@@ -3576,7 +3576,7 @@ static void cfunc_cfc2(void *param)
 
 void rsp_cop2_drc::mtc2()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
 	VREG_B(VS1REG, (el+0) & 0xf) = (RTVAL >> 8) & 0xff;
 	VREG_B(VS1REG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
@@ -3590,7 +3590,7 @@ static void cfunc_mtc2(void *param)
 
 void rsp_cop2_drc::ctc2()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	switch(RDREG)
 	{
 		case 0:
@@ -3706,7 +3706,7 @@ int rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state 
 		case 0x00:  /* MFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+				UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_mfc2, this);             // callc   mfc2
 			}
 			return TRUE;
@@ -3714,18 +3714,18 @@ int rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state 
 		case 0x02:  /* CFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+				UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_cfc2, this);             // callc   cfc2
 			}
 			return TRUE;
 
 		case 0x04:  /* MTCz */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_mtc2, this);             // callc   mtc2
 			return TRUE;
 
 		case 0x06:  /* CTCz */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_ctc2, this);             // callc   ctc2
 			return TRUE;
 
