@@ -509,6 +509,13 @@ if _OPTIONS["targetos"]=="windows" then
 	configuration { }
 end
 
+
+configuration { "x64", "gmake" }
+	linkoptions {
+		"--image-base 0x100000000",
+	}
+configuration { }
+
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
 
