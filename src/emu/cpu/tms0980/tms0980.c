@@ -187,6 +187,7 @@ const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 
 // TMS0260 is similar? except opla is 32 instead of 48 terms
 
 
+// internal memory maps
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1xxx_cpu_device)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
@@ -218,8 +219,9 @@ static ADDRESS_MAP_START(data_64x9_as4, AS_DATA, 8, tms1xxx_cpu_device)
 ADDRESS_MAP_END
 
 
+// device definitions
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms1xxx_cpu_device(mconfig, TMS1000, "TMS1000", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1000", __FILE__)
+	: tms1xxx_cpu_device(mconfig, TMS1000, "TMS1000", tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, ADDRESS_MAP_NAME(program_10bit_8), 6 /* data width */, ADDRESS_MAP_NAME(data_64x4), "tms1000", __FILE__)
 { }
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
@@ -316,7 +318,7 @@ tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char
 { }
 
 
-
+// machine configs
 static MACHINE_CONFIG_FRAGMENT(tms1000)
 
 	// microinstructions PLA, output PLA
@@ -402,7 +404,7 @@ machine_config_constructor tms0270_cpu_device::device_mconfig_additions() const
 }
 
 
-
+// disasm
 offs_t tms1000_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE(tms1000);
@@ -448,15 +450,16 @@ void tms1xxx_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	m_read_k.resolve_safe(0);
-	m_write_o.resolve_safe();
-	m_write_r.resolve_safe();
-	m_power_off.resolve_safe();
-
 	m_o_mask = (1 << m_o_pins) - 1;
 	m_r_mask = (1 << m_r_pins) - 1;
 	m_pc_mask = (1 << m_pc_bits) - 1;
 	m_x_mask = (1 << m_x_bits) - 1;
+
+	// resolve callbacks
+	m_read_k.resolve_safe(0);
+	m_write_o.resolve_safe();
+	m_write_r.resolve_safe();
+	m_power_off.resolve_safe();
 
 	// zerofill
 	m_pc = 0;

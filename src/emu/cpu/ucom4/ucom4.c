@@ -62,7 +62,7 @@ ADDRESS_MAP_END
 
 // device definitions
 upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
+	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
 { }
 
 upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -124,6 +124,7 @@ void ucom4_cpu_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ucom4_cpu_device::simple_timer_cb), this));
 
+	// resolve callbacks
 	m_read_a.resolve_safe(0xf);
 	m_read_b.resolve_safe(0xf);
 	m_read_c.resolve_safe(0xf);
