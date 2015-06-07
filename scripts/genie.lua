@@ -512,7 +512,7 @@ end
 
 configuration { "x64", "gmake" }
 	linkoptions {
-		"--image-base 0x100000000",
+		"-Wl,--image-base=0x100000000",
 	}
 configuration { }
 
