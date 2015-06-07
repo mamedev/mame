@@ -15,14 +15,22 @@ includedirs {
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
-	MAME_DIR .. "3rdparty/lua/src",
-	MAME_DIR .. "3rdparty/zlib",
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
 }
 if _OPTIONS["with-bundled-expat"] then
 	includedirs {
 		MAME_DIR .. "3rdparty/expat/lib",
+	}
+end
+if _OPTIONS["with-bundled-zlib"] then
+	includedirs {
+		MAME_DIR .. "3rdparty/zlib",
+	}
+end
+if _OPTIONS["with-bundled-lua"] then
+	includedirs {
+		MAME_DIR .. "3rdparty/lua/src",
 	}
 end
 
@@ -371,8 +379,6 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/lua/src",
-		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
 		MAME_DIR .. "src/emu/cpu/m68000",
@@ -380,6 +386,16 @@ function emuProject(_target, _subtarget)
 	if _OPTIONS["with-bundled-expat"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+	end
+	if _OPTIONS["with-bundled-lua"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/lua/src",
 		}
 	end
 	
@@ -410,8 +426,6 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/lua/src",
-		MAME_DIR .. "3rdparty/zlib",
 		MAME_DIR .. "src/mess", -- some mess bus devices need this
 		MAME_DIR .. "src/mame", -- used for nes bus devices
 		GEN_DIR  .. "emu",
@@ -420,6 +434,16 @@ function emuProject(_target, _subtarget)
 	if _OPTIONS["with-bundled-expat"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+	end
+	if _OPTIONS["with-bundled-lua"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/lua/src",
 		}
 	end
 
@@ -440,13 +464,21 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/lua/src",
-		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "emu",
 	}
 	if _OPTIONS["with-bundled-expat"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+	end
+	if _OPTIONS["with-bundled-lua"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/lua/src",
 		}
 	end
 	

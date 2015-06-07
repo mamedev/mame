@@ -53,6 +53,12 @@
 # LDOPTS =
 
 # USE_SYSTEM_LIB_EXPAT = 1
+# USE_SYSTEM_LIB_ZLIB = 1
+# USE_SYSTEM_LIB_JPEG = 1
+# USE_SYSTEM_LIB_FLAC = 1
+# USE_SYSTEM_LIB_LUA = 1
+# USE_SYSTEM_LIB_SQLITE3 = 1
+# USE_SYSTEM_LIB_PORTMIDI = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
@@ -292,6 +298,30 @@ endif
 #-------------------------------------------------
 ifndef USE_SYSTEM_LIB_EXPAT
 PARAMS += --with-bundled-expat
+endif
+
+ifndef USE_SYSTEM_LIB_ZLIB
+PARAMS += --with-bundled-zlib
+endif
+
+ifndef USE_SYSTEM_LIB_JPEG
+PARAMS += --with-bundled-jpeg
+endif
+
+ifndef USE_SYSTEM_LIB_FLAC
+PARAMS += --with-bundled-flac
+endif
+
+ifndef USE_SYSTEM_LIB_LUA
+PARAMS += --with-bundled-lua
+endif
+
+ifndef USE_SYSTEM_LIB_SQLITE3
+PARAMS += --with-bundled-sqlite3
+endif
+
+ifndef USE_SYSTEM_LIB_PORTMIDI
+PARAMS += --with-bundled-portmidi
 endif
 
 #-------------------------------------------------
@@ -1048,8 +1078,12 @@ CPPCHECK_PARAMS += -Isrc/osd/modules/render
 CPPCHECK_PARAMS += -Isrc/osd/windows
 CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
 CPPCHECK_PARAMS += -I3rdparty
+ifndef USE_SYSTEM_LIB_LUA
 CPPCHECK_PARAMS += -I3rdparty/lua/src
+endif
+ifndef USE_SYSTEM_LIB_ZLIB
 CPPCHECK_PARAMS += -I3rdparty/zlib 
+endif
 CPPCHECK_PARAMS += -I3rdparty/bgfx/include
 CPPCHECK_PARAMS += -I3rdparty/bx/include
 CPPCHECK_PARAMS += -Ibuild/generated/emu 
@@ -1062,7 +1096,9 @@ CPPCHECK_PARAMS += -DMAME_DEBUG
 CPPCHECK_PARAMS += -DMAME_PROFILER
 CPPCHECK_PARAMS += -DCRLF=3
 CPPCHECK_PARAMS += -DLSB_FIRST
+ifndef USE_SYSTEM_LIB_FLAC
 CPPCHECK_PARAMS += -DFLAC__NO_DLL
+endif
 CPPCHECK_PARAMS += -DNATIVE_DRC=drcbe_x64
 CPPCHECK_PARAMS += -DLUA_COMPAT_APIINTCASTS
 CPPCHECK_PARAMS += -DWIN32
