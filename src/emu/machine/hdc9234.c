@@ -607,19 +607,19 @@ void hdc9234_device::wait_line(int line, line_state level, int substate, bool st
 	bool line_at_level = true;
 	if (line == SEEKCOMP_LINE && (seek_complete() == (level==ASSERT_LINE)))
 	{
-		logerror("%s: SEEK_COMPLETE line is already %d\n", tag(), level);
+		if (TRACE_LINES) logerror("%s: SEEK_COMPLETE line is already %d\n", tag(), level);
 	}
 	else
 	{
 		if (line == INDEX_LINE && (index_hole() == (level==ASSERT_LINE)))
 		{
-			logerror("%s: INDEX line is already %d\n", tag(), level);
+			if (TRACE_LINES) logerror("%s: INDEX line is already %d\n", tag(), level);
 		}
 		else
 		{
 			if (line == READY_LINE && (drive_ready() == (level==ASSERT_LINE)))
 			{
-				logerror("%s: READY line is already %d\n", tag(), level);
+				if (TRACE_LINES) logerror("%s: READY line is already %d\n", tag(), level);
 			}
 			else
 			{
@@ -2724,7 +2724,7 @@ void hdc9234_device::live_run_until(attotime limit)
 void hdc9234_device::live_run_hd_until(attotime limit)
 {
 	int slot = 0;
-	logerror("%s: live_run_hd\n", tag());
+	if (TRACE_LIVE) logerror("%s: live_run_hd\n", tag());
 
 	if (m_live_state.state == IDLE || m_live_state.next_state != -1)
 		return;
@@ -2745,6 +2745,12 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 		switch (m_live_state.state)
 		{
 		case SEARCH_IDAM:
+			if (TRACE_LIVE && m_last_live_state != SEARCH_IDAM)
+			{
+				logerror("%s: [%s live] SEARCH_IDAM [limit %s]\n", tag(),tts(m_live_state.time).c_str(), tts(limit).c_str());
+				m_last_live_state = m_live_state.state;
+			}
+
 			// This bit will be set when the IDAM cannot be found
 			set_bits(m_register_r[CHIP_STATUS], CS_SYNCERR, false);
 
@@ -2753,7 +2759,9 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 				if (TRACE_LIVE) logerror("%s: [%s live] SEARCH_IDAM limit reached\n", tag(), tts(m_live_state.time).c_str());
 				return;
 			}
-			logerror("%s: [%s live] Read %04x\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg);
+
+			if (TRACE_LIVE)
+				if ((m_live_state.bit_counter & 0x000f)==0) logerror("%s: [%s live] Read %04x\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg);
 
 			// [1] p. 9: The ID field sync mark must be found within 33,792 byte times
 			if (m_live_state.bit_count_total > 33792*16)
@@ -2781,6 +2789,9 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 		case READ_IDENT:
 			if (read_from_mfmhd(limit)) return;
 
+			// Repeat until we have collected 16 bits (MFM_BITS; in the other modes this is always false)
+			if (m_live_state.bit_counter & 15) break;
+
 			// Ident bytes are 111111xx
 			if ((m_live_state.data_reg & 0xfc) != 0xfc)
 			{
@@ -2805,6 +2816,9 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 			}
 
 			if (read_from_mfmhd(limit)) return;
+
+			// Repeat until we have collected 16 bits
+			if (m_live_state.bit_counter & 15) break;
 
 			if (TRACE_LIVE) logerror("%s: slot %d = %02x, crc=%04x\n", tag(), slot, m_live_state.data_reg, m_live_state.crc);
 			m_register_r[id_field[slot++]] = m_live_state.data_reg;
@@ -2834,7 +2848,8 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 
 			if (read_from_mfmhd(limit)) return;
 
-			logerror("%s: [%s live] Read %04x\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg);
+			if (TRACE_LIVE)
+				if ((m_live_state.bit_counter & 15)==0) logerror("%s: [%s live] Read %04x\n", tag(), tts(m_live_state.time).c_str(), m_live_state.shift_reg);
 
 			if (m_live_state.bit_counter > 30*16)
 			{
@@ -2855,6 +2870,8 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 
 		case READ_DATADEL_FLAG:
 			if (read_from_mfmhd(limit)) return;
+
+			if (m_live_state.bit_counter & 15) break;
 
 			if ((m_live_state.data_reg & 0xff) == 0xf8)
 			{
@@ -2896,6 +2913,9 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 				set_bits(m_register_r[INT_STATUS], ST_OVRUN, true);
 				m_out_dmarq(ASSERT_LINE);
 			}
+
+			// Repeat until we have collected 16 bits
+			if (m_live_state.bit_counter & 15) break;
 
 			slot = (m_live_state.bit_counter >> 4)-1;
 			if (TRACE_LIVE) logerror("%s: [%s live] Found data value [%d/%d] = %02X, CRC=%04x\n", tag(),tts(m_live_state.time).c_str(), slot, calc_sector_size(), m_live_state.data_reg, m_live_state.crc);
@@ -3018,6 +3038,7 @@ void hdc9234_device::live_sync()
 				m_live_state.time = attotime::never;
 			}
 		}
+
 		m_live_state.next_state = -1;
 		checkpoint();
 	}
@@ -3790,7 +3811,7 @@ void hdc9234_device::connect_hard_drive(mfm_harddisk_device* harddisk)
 {
 	m_harddisk = harddisk;
 	m_hd_encoding = m_harddisk->get_encoding();
-	logerror("%s: HD encoding = %d\n", tag(), m_hd_encoding);
+	if (TRACE_DETAIL) logerror("%s: HD encoding = %d\n", tag(), m_hd_encoding);
 }
 
 /*

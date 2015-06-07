@@ -509,13 +509,6 @@ if _OPTIONS["targetos"]=="windows" then
 	configuration { }
 end
 
-
-configuration { "x64", "gmake" }
-	linkoptions {
-		"-Wl,--image-base=0x100000000",
-	}
-configuration { }
-
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
 
@@ -930,6 +923,7 @@ end
 			end
 			if (version >= 30400) then
 				buildoptions {
+					"-Wno-inline-new-delete",
 					"-Wno-constant-logical-operand",
 				}
 			end

@@ -146,6 +146,15 @@ INLINE void rgbaint_add(rgbaint *color1, const rgbaint *color2)
 	*color1 = _mm_add_epi16(*color1, *color2);
 }
 
+/*-------------------------------------------------
+    rgbaint_add_imm - add immediate INT16 to rgbaint value
+-------------------------------------------------*/
+INLINE void rgbaint_add_imm(rgbaint *color1, const INT16 imm)
+{
+	__m128i temp = _mm_set_epi16(0, 0, 0, 0, imm, imm, imm, imm);
+	*color1 = _mm_add_epi16(*color1, temp);
+}
+
 
 /*-------------------------------------------------
     rgbint_sub - subtract two rgbint values
@@ -306,6 +315,38 @@ INLINE void rgbint_scale_channel_and_clamp(rgbint *color, const rgbint *colorsca
 	*color = _mm_min_epi16(*color, *(__m128i *)&rgbsse_statics.maxbyte);
 }
 
+INLINE void rgbint_scale_immediate_add_and_clamp(rgbint *color1, INT16 colorscale, const rgbaint *color2)
+{
+	// color2 will get mutiplied by 2^8 (256) and then divided by 2^8 by the shift by 8
+	__m128i mscale = _mm_unpacklo_epi16(_mm_set1_epi16(colorscale), _mm_set_epi16(0, 0, 0, 0, 256, 256, 256, 256));
+	*color1 = _mm_unpacklo_epi16(*color1, *color2);
+	*color1 = _mm_madd_epi16(*color1, mscale);
+	*color1 = _mm_srli_epi32(*color1, 8);
+	*color1 = _mm_packs_epi32(*color1, *color1);
+	*color1 = _mm_min_epi16(*color1, *(__m128i *)&rgbsse_statics.maxbyte);
+}
+
+INLINE void rgbaint_scale_channel_add_and_clamp(rgbaint *color1, const rgbaint *colorscale, const rgbaint *color2)
+{
+	// color2 will get mutiplied by 2^8 (256) and then divided by 2^8 by the shift by 8
+	__m128i mscale = _mm_unpacklo_epi16(*colorscale, _mm_set_epi16(0, 0, 0, 0, 256, 256, 256, 256));
+	*color1 = _mm_unpacklo_epi16(*color1, *color2);
+	*color1 = _mm_madd_epi16(*color1, mscale);
+	*color1 = _mm_srli_epi32(*color1, 8);
+	*color1 = _mm_packs_epi32(*color1, *color1);
+	*color1 = _mm_min_epi16(*color1, *(__m128i *)&rgbsse_statics.maxbyte);
+}
+
+INLINE void rgbaint_scale_channel_add_and_clamp(rgbaint *color1, const rgbaint *colorscale1, const rgbaint *color2, const rgbaint *colorscale2)
+
+{
+	__m128i mscale = _mm_unpacklo_epi16(*colorscale1, *colorscale2);
+	*color1 = _mm_unpacklo_epi16(*color1, *color2);
+	*color1 = _mm_madd_epi16(*color1, mscale);
+	*color1 = _mm_srli_epi32(*color1, 8);
+	*color1 = _mm_packs_epi32(*color1, *color1);
+	*color1 = _mm_min_epi16(*color1, *(__m128i *)&rgbsse_statics.maxbyte);
+}
 
 /*-------------------------------------------------
     rgbaint_scale_and_clamp - scale the given
