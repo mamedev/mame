@@ -44,19 +44,26 @@
 #define DUMMY_INPUT(_name)                                                     \
 		NET_REGISTER_DEV(dummy_input, _name)
 
-#define FRONTIER(_name, _IN, _OUT)                                             \
+//FIXME: Usage discouraged, use OPTIMIZE_FRONTIER instead
+#define FRONTIER_DEV(_name, _IN, _G, _OUT)                                     \
 		NET_REGISTER_DEV(frontier, _name)                                      \
 		NET_C(_IN, _name.I)                                                    \
+		NET_C(_G,  _name.G)                                                    \
 		NET_C(_OUT, _name.Q)
+
+#define OPTIMIZE_FRONTIER(_attach, _r_in, _r_out)							   \
+		setup.register_frontier(# _attach, _r_in, _r_out);
 
 #define RES_SWITCH(_name, _IN, _P1, _P2)                                       \
 		NET_REGISTER_DEV(res_sw, _name)                                        \
 		NET_C(_IN, _name.I)                                                    \
 		NET_C(_P1, _name.1)                                                    \
 		NET_C(_P2, _name.2)
+
 /* Default device to hold netlist parameters */
 #define PARAMETERS(_name)                                                      \
 		NET_REGISTER_DEV(netlistparams, _name)
+
 // -----------------------------------------------------------------------------
 // mainclock
 // -----------------------------------------------------------------------------
@@ -207,12 +214,24 @@ protected:
 
 	void start()
 	{
-		register_input("I", m_I);
-		register_output("Q", m_Q);
+		register_param("RIN", m_p_RIN, 1.0e6);
+		register_param("ROUT", m_p_ROUT, 50.0);
+
+		register_input("_I", m_I);
+		register_terminal("I",m_RIN.m_P);
+		register_terminal("G",m_RIN.m_N);
+		connect(m_I, m_RIN.m_P);
+
+		register_output("_Q", m_Q);
+		register_terminal("_OP",m_ROUT.m_P);
+		register_terminal("Q",m_ROUT.m_N);
+		connect(m_Q, m_ROUT.m_P);
 	}
 
 	void reset()
 	{
+		m_RIN.set(1.0 / m_p_RIN.Value(),0,0);
+		m_ROUT.set(1.0 / m_p_ROUT.Value(),0,0);
 	}
 
 	void update()
@@ -221,9 +240,13 @@ protected:
 	}
 
 private:
+	NETLIB_NAME(twoterm) m_RIN;
+	NETLIB_NAME(twoterm) m_ROUT;
 	netlist_analog_input_t m_I;
 	netlist_analog_output_t m_Q;
 
+	netlist_param_double_t m_p_RIN;
+	netlist_param_double_t m_p_ROUT;
 };
 
 // -----------------------------------------------------------------------------

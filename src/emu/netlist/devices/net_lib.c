@@ -52,7 +52,7 @@ void nl_initialize_factory(netlist_factory_list_t &factory)
 	ENTRY(VCCS,                 VCCS,                   "-")
 	ENTRY(CCCS,                 CCCS,                   "-")
 	ENTRY(dummy_input,          DUMMY_INPUT,            "-")
-	ENTRY(frontier,             FRONTIER,               "+I,Q")
+	ENTRY(frontier,             FRONTIER_DEV,           "+I,G,Q") 	// not intended to be used directly
 	ENTRY(QBJT_EB,              QBJT_EB,                "model")
 	ENTRY(QBJT_switch,          QBJT_SW,                "model")
 	ENTRY(ttl_input,            TTL_INPUT,              "IN")

@@ -295,6 +295,36 @@ void netlist_setup_t::register_link(const pstring &sin, const pstring &sout)
 	//  fatalerror("Error adding link %s<==%s to link list\n", sin.cstr(), sout.cstr());
 }
 
+void netlist_setup_t::register_frontier(const pstring attach, const double r_IN, const double r_OUT)
+{
+	static int frontier_cnt = 0;
+	pstring frontier_name = pstring::sprintf("frontier_%d", frontier_cnt);
+	frontier_cnt++;
+	netlist_device_t *front = register_dev("nld_frontier", frontier_name);
+	register_param(frontier_name + ".RIN", r_IN);
+	register_param(frontier_name + ".ROUT", r_OUT);
+	register_link(frontier_name + ".G", "GND");
+	pstring attfn = build_fqn(attach);
+	bool found = false;
+	for (std::size_t i = 0; i < m_links.size(); i++)
+	{
+		if (m_links[i].e1 == attfn)
+		{
+			m_links[i].e1 = front->name() + ".I";
+			found = true;
+		}
+		else if (m_links[i].e2 == attfn)
+		{
+			m_links[i].e2 = front->name() + ".I";
+			found = true;
+		}
+	}
+	if (!found)
+		netlist().error("Frontier setup: found no occurrence of %s\n", attach.cstr());
+	register_link(attach, frontier_name + ".Q");
+}
+
+
 void netlist_setup_t::register_param(const pstring &param, const double value)
 {
 	// FIXME: there should be a better way
