@@ -5,6 +5,8 @@
 #ifndef __M1COMM_H__
 #define __M1COMM_H__
 
+#define __M1COMM_SIMULATION__
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -72,6 +74,22 @@ private:
 	UINT8	m_zfg;						// z80 flip gate? purpose unknown, bit0 is stored
 	UINT8	m_cn;							// bit0 is used to enable/disable the comm board
 	UINT8	m_fg;							// flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
+	
+	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
+	emu_file m_line_tx;    // tx line - is differential, simple serial and toslink
+	char m_localhost[256];
+	char m_remotehost[256];
+	UINT8 m_buffer[0x1000];
+	
+#ifdef __M1COMM_SIMULATION__
+	UINT8 m_linkenable;
+	UINT16 m_linktimer;
+	UINT8 m_linkalive;
+	UINT8 m_linkid;
+	UINT8 m_linkcount;
+	
+	void comm_tick();
+#endif
 };
 
 // device type definition

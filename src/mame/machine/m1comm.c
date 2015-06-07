@@ -55,7 +55,7 @@ Notes:
 
 #define Z80_TAG     "m1commcpu"
 
-#define __M1COMM_VERBOSE__
+//#define __M1COMM_VERBOSE__
 
 /*************************************
  *  M1COMM Memory Map
@@ -124,8 +124,21 @@ const rom_entry *m1comm_device::device_rom_region() const
 
 m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, M1COMM, "MODEL-1 COMMUNICATION BD", tag, owner, clock, "m1comm", __FILE__),
-	m_commcpu(*this, Z80_TAG)
+	m_commcpu(*this, Z80_TAG),
+	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
+	m_line_tx(OPEN_FLAG_READ)
 {
+	// prepare localhost "filename"
+	strcat(m_localhost, "socket.");
+	strcat(m_localhost, mconfig.options().comm_localhost());
+	strcat(m_localhost, ":");
+	strcat(m_localhost, mconfig.options().comm_localport());
+
+	// prepare remotehost "filename"
+	strcat(m_remotehost, "socket.");
+	strcat(m_remotehost, mconfig.options().comm_remotehost());
+	strcat(m_remotehost, ":");
+	strcat(m_remotehost, mconfig.options().comm_remoteport());
 }
 
 //-------------------------------------------------
@@ -258,11 +271,30 @@ READ8_MEMBER(m1comm_device::cn_r)
 WRITE8_MEMBER(m1comm_device::cn_w)
 {
 	m_cn = data & 0x01;
-	
+
+#ifndef __M1COMM_SIMULATION__
 	if (!m_cn)
 		device_reset();
 	else
 		m_commcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+#else
+	if (!m_cn)
+	{
+		// reset command
+		printf("M1COMM: board disabled\n");
+		m_linkenable = 0x00;
+	}
+	else
+	{
+		// init command
+		printf("M1COMM: board enabled\n");
+		m_linkenable = 0x01;
+		m_linkid = 0x00;
+		m_linkalive = 0x00;
+		m_linkcount = 0x00;
+		m_linktimer = 0x00E8; // 58 fps * 4s
+	}
+#endif
 }
 
 READ8_MEMBER(m1comm_device::fg_r)
@@ -280,6 +312,7 @@ WRITE8_MEMBER(m1comm_device::fg_w)
 
 void m1comm_device::check_vint_irq()
 {
+#ifndef __M1COMM_SIMULATION__
 	if (m_syn & 0x02)
 	{
 		m_commcpu->set_input_line_and_vector(0, HOLD_LINE, 0xEF);
@@ -287,4 +320,246 @@ void m1comm_device::check_vint_irq()
 		printf("m1comm-INT5\n");
 #endif
 	}
+#else
+	comm_tick();
+#endif
+}
+
+#ifdef __M1COMM_SIMULATION__
+void m1comm_device::comm_tick(){
+	if (m_linkenable == 0x01)	
+	{
+		int frameStart = 0x0010;
+		int frameOffset = 0x0000;
+		int frameSize = 0x01C4;
+		int dataSize = frameSize + 1;
+		int togo = 0;
+		int recv = 0;
+		int idx = 0;
+
+		bool isMaster = (m_shared[1] == 0x01);
+		bool isSlave = (m_shared[1] == 0x02);
+		bool isRelay = (m_shared[1] == 0x00);
+
+		// if link not yet established...
+		if (m_linkalive == 0x00)
+		{
+			// check rx socket
+			if (!m_line_rx.is_open())
+			{
+				printf("M1COMM: listen on %s\n", m_localhost);
+				m_line_rx.open(m_localhost);
+			}
+			
+			// check tx socket
+			if (!m_line_tx.is_open())
+			{
+				printf("M1COMM: connect to %s\n", m_remotehost);
+				m_line_tx.open(m_remotehost);
+			}
+			
+			// if both sockets are there check ring
+			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
+			{
+				// try to read one messages
+				recv = m_line_rx.read(m_buffer, dataSize);
+				while (recv != 0)
+				{
+					// check if complete message
+					if (recv == dataSize)
+					{
+						// check if message id
+						idx = m_buffer[0];
+
+						// 0xFF - link id
+						if (idx == 0xFF)
+						{
+							if (isMaster)
+							{
+								// master gets first id and starts next state
+								m_linkid = 0x01;
+								m_linkcount = m_buffer[1];
+								m_linktimer = 0x01;
+							}
+							else if (isSlave || isRelay)
+							{
+								// slave gets own id
+								if (isSlave)
+								{
+									m_buffer[1]++;
+									m_linkid = m_buffer[1];
+								}
+
+								// slave and relay forward message
+								m_line_tx.write(m_buffer, dataSize);
+							}
+						}
+						
+						// 0xFE - link size
+						else if (idx == 0xFE)
+						{
+							if (isSlave || isRelay)
+							{
+								m_linkcount = m_buffer[1];
+
+								// slave and relay forward message
+								m_line_tx.write(m_buffer, dataSize);
+							}
+							
+							// consider it done
+							printf("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+							m_linkalive = 0x01;
+							
+							// write to shared mem
+							m_shared[0] = 0x01;
+							m_shared[2] = m_linkid;
+							m_shared[3] = m_linkcount;
+						}
+					}
+					else
+					{
+						// got only part of a message - read the rest (and drop it)
+						// TODO: combine parts and push to "ring buffer"
+						togo = dataSize - recv;
+						while (togo > 0){
+							recv = m_line_rx.read(m_buffer, togo);
+							togo -= recv;
+						}
+						printf("M1COMM: droped a message...\n");
+					}
+					
+					if (m_linkalive == 0x00)
+						recv = m_line_rx.read(m_buffer, dataSize);
+					else
+						recv = 0;
+				}
+				
+				// if we are master and link is not yet established
+				if (isMaster && (m_linkalive == 0x00))
+				{
+					// send first packet
+					if (m_linktimer == 0x00)
+					{
+						m_buffer[0] = 0xFF;
+						m_buffer[1] = 0x01;
+						m_line_tx.write(m_buffer, dataSize);
+					}
+
+					// send second packet
+					else if (m_linktimer == 0x01)
+					{
+						m_buffer[0] = 0xFE;
+						m_buffer[1] = m_linkcount;
+						m_line_tx.write(m_buffer, dataSize);
+
+						// consider it done
+						printf("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						m_linkalive = 0x01;
+
+						// write to shared mem
+						m_shared[0] = 0x01;
+						m_shared[2] = m_linkid;
+						m_shared[3] = m_linkcount;
+					}
+					
+					else if (m_linktimer > 0x02)
+					{
+						// decrease delay timer
+						m_linktimer--;
+						if (m_linktimer == 0x02)
+							m_linktimer = 0x00;
+					}
+				}
+			}
+		}	
+
+		// update "ring buffer" if link established
+		if (m_linkalive == 0x01)
+		{
+			int togo = 0;
+			// try to read one messages
+			int recv = m_line_rx.read(m_buffer, dataSize);
+			while (recv != 0)
+			{
+				// check if complete message
+				if (recv == dataSize)
+				{
+					// check if valid id
+					int idx = m_buffer[0];
+					if (idx > 0 && idx <= m_linkcount) {
+						// if not our own message
+						if (idx != m_linkid)
+						{
+							// save message to "ring buffer"
+							frameOffset = frameStart + (idx * frameSize);
+							for (int j = 0x00 ; j < frameSize ; j++)
+							{
+								m_shared[frameOffset + j] = m_buffer[1 + j];
+							}
+
+							// forward message to other nodes
+							m_line_tx.write(m_buffer, dataSize);
+						}
+					} else {
+						if (!isMaster && idx == 0xF0){
+							// 0xF0 - master addional bytes
+							for (int j = 0x06 ; j < 0x10 ; j++)
+							{
+								m_shared[j] = m_buffer[1 + j];
+							}
+
+							// forward message to other nodes
+							m_line_tx.write(m_buffer, dataSize);
+						}
+					}
+				}
+				else
+				{
+					// got only part of a message - read the rest (and drop it)
+					// TODO: combine parts and push to "ring buffer"
+					togo = dataSize - recv;
+					while (togo > 0){
+						recv = m_line_rx.read(m_buffer, togo);
+						togo -= recv;
+					}
+					printf("M1COMM: droped a message...\n");
+				}
+				recv = m_line_rx.read(m_buffer, dataSize);
+			}
+			
+			// update "ring buffer" if link established
+			// live relay does not send data
+			if (m_linkid != 0x00 && m_shared[5] == 0x01)
+			{
+				m_buffer[0] = m_linkid;
+				frameOffset = frameStart + (m_linkid * frameSize);
+				for (int j = 0x00 ; j < frameSize ; j++)
+				{
+					// push message to "ring buffer"
+					m_shared[frameOffset + j] = m_shared[frameStart + j];
+					m_buffer[1 + j] = m_shared[frameStart + j];
+				}
+				// push message to other nodes
+				m_line_tx.write(m_buffer, dataSize);
+
+				// master sends some additional status bytes 
+				if (isMaster){
+					m_buffer[0] = 0xF0;
+					for (int j = 0x00 ; j < frameSize ; j++)
+					{
+						m_buffer[1 + j] = 0x00;
+					}
+					for (int j = 0x06 ; j < 0x10 ; j++)
+					{
+						m_buffer[1 + j] = m_shared[frameStart + j];
+					}
+					// push message to other nodes
+					m_line_tx.write(m_buffer, dataSize);
+				}
+			}
+			// clear 05
+			m_shared[5] = 0x00;
+		}
+	}
+#endif
 }
