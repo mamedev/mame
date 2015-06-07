@@ -164,6 +164,18 @@ INLINE void rgbaint_add(rgbaint *color1, const rgbaint *color2)
 	color1->b += color2->b;
 }
 
+/*-------------------------------------------------
+    rgbaint_add_imm - add immediate INT16 to rgbaint value
+-------------------------------------------------*/
+
+INLINE void rgbaint_add_imm(rgbaint *color1, const INT16 imm)
+{
+	color1->a += imm;
+	color1->r += imm;
+	color1->g += imm;
+	color1->b += imm;
+}
+
 
 /*-------------------------------------------------
     rgbint_sub - subtract two rgbint values
@@ -308,7 +320,6 @@ INLINE void rgbaint_blend(rgbaint *color1, const rgbaint *color2, UINT8 color1sc
 	color1->b = (color1->b * scale1 + color2->b * scale2) >> 8;
 }
 
-
 /*-------------------------------------------------
     rgbint_scale_and_clamp - scale the given
     color by an 8.8 scale factor, immediate or
@@ -364,6 +375,50 @@ INLINE void rgbaint_scale_channel_and_clamp(rgbaint *color, const rgbaint *color
 	if ((UINT16)color->g > 255) { color->g = (color->g < 0) ? 0 : 255; }
 	color->b = (color->b * colorscale->b) >> 8;
 	if ((UINT16)color->b > 255) { color->b = (color->b < 0) ? 0 : 255; }
+}
+
+INLINE void rgbaint_scale_immediate_add_and_clamp(rgbaint *color1, INT16 colorscale, const rgbaint *color2)
+{
+	color1->a = (color1->a * colorscale) >> 8;
+	color1->a += color2->a;
+	if ((UINT16)color1->a > 255) { color1->a = (color1->a < 0) ? 0 : 255; }
+	color1->r = (color1->r * colorscale) >> 8;
+	color1->r += color2->r;
+	if ((UINT16)color1->r > 255) { color1->r = (color1->r < 0) ? 0 : 255; }
+	color1->g = (color1->g * colorscale) >> 8;
+	color1->g += color2->g;
+	if ((UINT16)color1->g > 255) { color1->g = (color1->g < 0) ? 0 : 255; }
+	color1->b = (color1->b * colorscale) >> 8;
+	color1->b += color2->b;
+	if ((UINT16)color1->b > 255) { color1->b = (color1->b < 0) ? 0 : 255; }
+}
+
+INLINE void rgbaint_scale_channel_add_and_clamp(rgbaint *color1, const rgbaint *colorscale, const rgbaint *color2)
+{
+	color1->a = (color1->a * colorscale->a) >> 8;
+	color1->a += color2->a;
+	if ((UINT16)color1->a > 255) { color1->a = (color1->a < 0) ? 0 : 255; }
+	color1->r = (color1->r * colorscale->r) >> 8;
+	color1->r += color2->r;
+	if ((UINT16)color1->r > 255) { color1->r = (color1->r < 0) ? 0 : 255; }
+	color1->g = (color1->g * colorscale->g) >> 8;
+	color1->g += color2->g;
+	if ((UINT16)color1->g > 255) { color1->g = (color1->g < 0) ? 0 : 255; }
+	color1->b = (color1->b * colorscale->b) >> 8;
+	color1->b += color2->b;
+	if ((UINT16)color1->b > 255) { color1->b = (color1->b < 0) ? 0 : 255; }
+}
+
+INLINE void rgbaint_scale_channel_add_and_clamp(rgbaint *color1, const rgbaint *colorscale1, const rgbaint *color2, const rgbaint *colorscale2)
+{
+	color1->a = (color1->a * colorscale1->a + color2->a * colorscale2->a) >> 8;
+	if ((UINT16)color1->a > 255) { color1->a = (color1->a < 0) ? 0 : 255; }
+	color1->r = (color1->r * colorscale1->r + color2->r * colorscale2->r) >> 8;
+	if ((UINT16)color1->r > 255) { color1->r = (color1->r < 0) ? 0 : 255; }
+	color1->g = (color1->g * colorscale1->g + color2->g * colorscale2->g) >> 8;
+	if ((UINT16)color1->g > 255) { color1->g = (color1->g < 0) ? 0 : 255; }
+	color1->b = (color1->b * colorscale1->b + color2->b * colorscale2->b) >> 8;
+	if ((UINT16)color1->b > 255) { color1->b = (color1->b < 0) ? 0 : 255; }
 }
 
 
