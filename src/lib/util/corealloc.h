@@ -60,10 +60,10 @@ class zeromem_t { };
 #ifndef NO_MEM_TRACKING
 
 // standard new/delete operators (try to avoid using)
-ATTR_FORCE_INLINE ATTR_USED inline void *operator new(std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, false, true, false); }
-ATTR_FORCE_INLINE ATTR_USED inline void *operator new[](std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, true, true, false); }
-ATTR_FORCE_INLINE ATTR_USED inline void operator delete(void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
-ATTR_FORCE_INLINE ATTR_USED inline void operator delete[](void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
+ATTR_FORCE_INLINE inline void *operator new(std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, false, true, false); }
+ATTR_FORCE_INLINE inline void *operator new[](std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, true, true, false); }
+ATTR_FORCE_INLINE inline void operator delete(void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
+ATTR_FORCE_INLINE inline void operator delete[](void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
 
 #endif
 
