@@ -435,7 +435,7 @@ void favorite_manager::save_favorite_games()
 	}
 
 	// attempt to open the output file
-	emu_file file(MEWUI_DIR, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(OPTION_MEWUI_PATH, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	if (file.open(favorite_filename) == FILERR_NONE)
 	{
@@ -483,7 +483,7 @@ void favorite_manager::save_favorite_games()
 bool favorite_manager::parseOpen(const char *filename)
 {
 	// Open file up in binary mode
-	emu_file fp(MEWUI_DIR, OPEN_FLAG_READ);
+	emu_file fp(machine().options().mewui_path(), OPEN_FLAG_READ);
 
 	if (fp.open(filename) == FILERR_NONE)
 	{

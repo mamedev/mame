@@ -124,7 +124,7 @@ void ui_menu::exit(running_machine &machine)
 	machine.render().texture_free(bgrnd_texture);
 	machine.render().texture_free(star_texture);
 
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < MAX_ICONS_RENDER; i++)
 		machine.render().texture_free(icons_texture[i]);
 }
 

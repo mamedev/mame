@@ -26,7 +26,6 @@
 #define UI_MENU_PROCESS_ONLYCHAR 8
 #define MAX_FILTER               10
 #define MAX_ICONS_RENDER         40
-#define MEWUI_DIR                "mewui"
 
 // GLOBAL ENUMERATORS
 enum
@@ -227,8 +226,8 @@ void load_cache_info(running_machine &machine);
 void fskip(char *s, int id = 0);
 
 // custom filter load and save
-void load_custom_filters();
-void save_custom_filters();
+void load_custom_filters(running_machine &machine);
+void save_custom_filters(running_machine &machine);
 
 // jpeg loader
 template <typename _T>

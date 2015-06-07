@@ -508,6 +508,9 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 			case 12:
 				ms = create_solver<12,12>(12, gs_threshold, use_specific);
 				break;
+			case 87:
+				ms = create_solver<87,87>(87, gs_threshold, use_specific);
+				break;
 			default:
 				if (net_count <= 16)
 				{
@@ -521,9 +524,13 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				{
 					ms = create_solver<0,64>(net_count, gs_threshold, use_specific);
 				}
+				else if (net_count <= 128)
+				{
+					ms = create_solver<0,128>(net_count, gs_threshold, use_specific);
+				}
 				else
 				{
-					netlist().error("Encountered netgroup with > 64 nets");
+					netlist().error("Encountered netgroup with > 128 nets");
 					ms = NULL; /* tease compilers */
 				}
 

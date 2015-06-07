@@ -95,16 +95,44 @@ function mainProject(_target, _subtarget)
 		"expat",
 		"softfloat",
 		"jpeg",
-		"flac",
 		"7z",
 		"formats",
 		"lua",
 		"lsqlite3",
-		"sqllite3",
-		"zlib",
 		"jsoncpp",
 		"mongoose",
 	}
+
+	if _OPTIONS["with-bundled-zlib"] then
+		links {
+			"zlib",
+		}
+	else
+		links {
+			"z",
+		}
+	end
+
+	if _OPTIONS["with-bundled-flac"] then
+		links {
+			"flac",
+		}
+	else
+		links {
+			"FLAC",
+		}
+	end
+
+	if _OPTIONS["with-bundled-sqlite3"] then
+		links {
+			"sqllite3",
+		}
+	else
+		links {
+			"sqlite3",
+		}
+	end
+
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {
 			"portmidi",
@@ -130,10 +158,15 @@ function mainProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. _target .. "/layout",
 		GEN_DIR  .. "resource",
 	}
+
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+	end
 
 	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
 		linkoptions {

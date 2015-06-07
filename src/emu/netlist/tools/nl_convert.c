@@ -230,22 +230,43 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				/* check for fourth terminal ... should be numeric net
 				 * including "0" or start with "N" (ltspice)
 				 */
-				// FIXME: we need a is_long method ..
 				ATTR_UNUSED int nval =tt[4].as_long(&cerr);
+				pstring model;
+				pstring pins ="CBE";
+
 				if ((!cerr || tt[4].startsWith("N")) && tt.size() > 5)
-					add_device("QBJT", tt[0], tt[5]);
+					model = tt[5];
 				else
-					add_device("QBJT", tt[0], tt[4]);
-				add_term(tt[1], tt[0] + ".C");
-				add_term(tt[2], tt[0] + ".B");
-				add_term(tt[3], tt[0] + ".E");
+					model = tt[4];
+				pstring_list_t m(model,"{");
+				if (m.size() == 2)
+				{
+					if (m[1].len() != 4)
+						fprintf(stderr, "error with model desc %s\n", model.cstr());
+					pins = m[1].left(3);
+				}
+				add_device("QBJT_EB", tt[0], m[0]);
+				add_term(tt[1], tt[0] + "." + pins[0]);
+				add_term(tt[2], tt[0] + "." + pins[1]);
+				add_term(tt[3], tt[0] + "." + pins[2]);
 			}
 				break;
 			case 'R':
-				val = get_sp_val(tt[3]);
-				add_device("RES", tt[0], val);
-				add_term(tt[1], tt[0] + ".1");
-				add_term(tt[2], tt[0] + ".2");
+				if (tt[0].startsWith("RV"))
+				{
+					val = get_sp_val(tt[4]);
+					add_device("POT", tt[0], val);
+					add_term(tt[1], tt[0] + ".1");
+					add_term(tt[2], tt[0] + ".2");
+					add_term(tt[3], tt[0] + ".3");
+				}
+				else
+				{
+					val = get_sp_val(tt[3]);
+					add_device("RES", tt[0], val);
+					add_term(tt[1], tt[0] + ".1");
+					add_term(tt[2], tt[0] + ".2");
+				}
 				break;
 			case 'C':
 				val = get_sp_val(tt[3]);
@@ -265,11 +286,18 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				else
 					fprintf(stderr, "Voltage Source %s not connected to GND\n", tt[0].cstr());
 				break;
+			case 'I': // Input pin special notation
+				{
+					val = get_sp_val(tt[2]);
+					add_device("ANALOG_INPUT", tt[0], val);
+					add_term(tt[1], tt[0] + ".Q");
+				}
+				break;
 			case 'D':
-				// FIXME: Rewrite resistor value
 				add_device("DIODE", tt[0], tt[3]);
-				add_term(tt[1], tt[0] + ".A");
-				add_term(tt[2], tt[0] + ".K");
+				/* FIXME ==> does Kicad use different notation from LTSPICE */
+				add_term(tt[1], tt[0] + ".K");
+				add_term(tt[2], tt[0] + ".A");
 				break;
 			case 'U':
 			case 'X':

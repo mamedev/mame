@@ -50,6 +50,7 @@ NETLIB_RESET(VCCS)
 	const nl_double m_mult = m_G.Value() * m_gfac; // 1.0 ==> 1V ==> 1A
 	const nl_double GI = NL_FCONST(1.0) / m_RI.Value();
 
+	//printf("VCCS %s RI %f\n", name().cstr(), m_RI.Value());
 	m_IP.set(GI);
 	m_IN.set(GI);
 

@@ -29,9 +29,13 @@ function createProjects_mame_dummy(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mess/layout",
-	}	
+	}
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+	end
 
 	files{
 		MAME_DIR .. "src/mess/drivers/coleco.c",

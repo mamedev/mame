@@ -102,7 +102,7 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 	build_available_list();
 
 	// load custom filter
-	load_custom_filters();
+	load_custom_filters(machine);
 
 	// load drivers cache
 	load_cache_info(machine);
@@ -1465,7 +1465,7 @@ void ui_mewui_select_game::populate_search()
 void ui_mewui_select_game::inkey_export()
 {
 	// attempt to open the output file
-	emu_file file(MEWUI_DIR, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	if (file.open("exported.xml") == FILERR_NONE)
 	{

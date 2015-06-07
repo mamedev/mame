@@ -35,7 +35,7 @@ const options_entry mewui_options::s_option_entries[] =
 	{ OPTION_HOWTO_PATH,                 "howto",  OPTION_STRING,  "path to howto image" },
 	{ OPTION_SELECT_PATH,               "select",  OPTION_STRING,  "path to select image" },
 	{ OPTION_ICONS_PATH,                 "icons",  OPTION_STRING,  "path to ICOns image" },
-
+	{ OPTION_MEWUI_PATH,                 "mewui",  OPTION_STRING,  "path to MEWUI files" },
 
 	// misc options
 	{ NULL,                                 NULL,   OPTION_HEADER, "MEWUI MISC OPTIONS" },

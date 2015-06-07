@@ -47,10 +47,8 @@ E I1     Vectored interrupt error
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "formats/m20_dsk.h"
-
-#include "machine/keyboard.h"
-
-#define KEYBOARD_TAG "keyboard"
+#include "machine/m20_kbd.h"
+#include "bus/rs232/rs232.h"
 
 class m20_state : public driver_device
 {
@@ -91,12 +89,9 @@ public:
 	DECLARE_WRITE16_MEMBER(m20_i8259_w);
 	DECLARE_READ16_MEMBER(port21_r);
 	DECLARE_WRITE16_MEMBER(port21_w);
-	DECLARE_WRITE_LINE_MEMBER(pic_irq_line_w);
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
-	DECLARE_WRITE8_MEMBER(kbd_put);
 
 private:
 	bool m_kbrecv_in_progress;
@@ -107,13 +102,9 @@ private:
 	void install_memory();
 
 public:
-	DECLARE_DRIVER_INIT(m20);
-	virtual void video_start();
 	UINT32 screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(kbd_rxrdy_int);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
 
@@ -121,10 +112,6 @@ public:
 #define MAIN_CLOCK 4000000 /* 4 MHz */
 #define PIXEL_CLOCK XTAL_4_433619MHz
 
-
-void m20_state::video_start()
-{
-}
 
 UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -153,39 +140,6 @@ UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 	return 0;
 }
-
-/* TODO: correct hookup for keyboard, keyboard uses 8048 */
-
-WRITE_LINE_MEMBER(m20_state::kbd_tx)
-{
-	UINT8 data;
-
-	if (m_kbrecv_in_progress) {
-		m_kbrecv_bitcount++;
-		m_kbrecv_data = (m_kbrecv_data >> 1) | (state ? (1<<10) : 0);
-		if (m_kbrecv_bitcount == 11) {
-			data = (m_kbrecv_data >> 1) & 0xff;
-//          printf ("0x%02X received by keyboard\n", data);
-			switch (data) {
-				case 0x03: m_kbdi8251->receive_character(2); printf ("sending 2 back from kb...\n"); break;
-				case 0x0a: break;
-				case 0x80: m_kbdi8251->receive_character(0x80); printf ("sending 0x80 back from kb...\n");break;
-				default: logerror("m20: keyboard hack got unexpected %02x\n", data); break;
-			}
-			m_kbrecv_in_progress = 0;
-		}
-	}
-	else
-	{
-		if (state == 0)
-		{
-			m_kbrecv_in_progress = 1;
-			m_kbrecv_bitcount = 1;
-			m_kbrecv_data = state ? (1<<10) : 0;
-		}
-	}
-}
-
 
 /*
 port21      =   0x21        !TTL latch
@@ -251,20 +205,6 @@ READ16_MEMBER(m20_state::m20_i8259_r)
 WRITE16_MEMBER(m20_state::m20_i8259_w)
 {
 	m_i8259->write(space, offset, (data>>1));
-}
-
-WRITE_LINE_MEMBER( m20_state::pic_irq_line_w )
-{
-	if (state)
-	{
-		//printf ("PIC raised VI\n");
-		m_maincpu->set_input_line(1, ASSERT_LINE);
-	}
-	else
-	{
-		//printf ("PIC lowered VI\n");
-		m_maincpu->set_input_line(1, CLEAR_LINE);
-	}
 }
 
 WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
@@ -795,13 +735,6 @@ static ADDRESS_MAP_START(m20_apb_io, AS_IO, 16, m20_state)
 ADDRESS_MAP_END
 #endif
 
-static INPUT_PORTS_START( m20 )
-INPUT_PORTS_END
-
-DRIVER_INIT_MEMBER(m20_state,m20)
-{
-}
-
 IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 {
 	if (! irqline)
@@ -832,41 +765,6 @@ void m20_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(m20_state::kbd_rxrdy_int)
-{
-	m_i8259->ir4_w(state);
-}
-
-static unsigned char kbxlat[] =
-{
-	0x00, '\\', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-	'o',   'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
-	'4',   '5', '6', '7', '8', '9', '-', '^', '@', '[', ';', ':', ']', ',', '.', '/',
-	0x00,  '<', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-	'O',   'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', '!', '"', '#',
-	'$',   '%', '&', '\'','(', ')', '=', 'x', 'x', '{', '+', '*', '}'
-};
-
-WRITE8_MEMBER( m20_state::kbd_put )
-{
-	if (data) {
-		if (data == 0xd) data = 0xc1;
-		else if (data == 0x20) data = 0xc0;
-		else if (data == 8) data = 0x69; /* ^H */
-		else if (data == 3) data = 0x64; /* ^C */
-		else {
-			int i;
-			for (i = 0; i < sizeof(kbxlat); i++)
-				if (data == kbxlat[i]) {
-					data = i;
-					break;
-				}
-		}
-		printf("kbd_put called with 0x%02X\n", data);
-		m_kbdi8251->receive_character(data);
-	}
-}
-
 static SLOT_INTERFACE_START( m20_floppies )
 	SLOT_INTERFACE( "5dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -874,6 +772,10 @@ SLOT_INTERFACE_END
 FLOPPY_FORMATS_MEMBER( m20_state::floppy_formats )
 	FLOPPY_M20_FORMAT
 FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START(keyboard)
+	SLOT_INTERFACE("m20", M20_KEYBOARD)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( m20, m20_state )
 	/* basic machine hardware */
@@ -917,8 +819,8 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(m20_state, kbd_tx))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(m20_state, kbd_rxrdy_int))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("kbd", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("i8259", pic8259_device, ir4_w))
 
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0)
 
@@ -930,10 +832,10 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_PIT8253_CLK2(1230782)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(m20_state, timer_tick_w))
 
-	MCFG_PIC8259_ADD("i8259", WRITELINE(m20_state, pic_irq_line_w), VCC, NULL)
+	MCFG_PIC8259_ADD("i8259", INPUTLINE("maincpu", 1), VCC, NULL)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(m20_state, kbd_put))
+	MCFG_RS232_PORT_ADD("kbd", keyboard, "m20")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_1", i8251_device, write_rxd))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
 MACHINE_CONFIG_END
@@ -963,5 +865,5 @@ ROM_START(m40)
 ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
-COMP( 1981, m20,   0,      0,      m20,    m20, m20_state,    m20,  "Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, m40,   m20,    0,      m20,    m20, m20_state,    m20, "Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, m20,   0,      0,      m20,    0,   driver_device,    0, "Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, m40,   m20,    0,      m20,    0,   driver_device,    0, "Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING | GAME_NO_SOUND)

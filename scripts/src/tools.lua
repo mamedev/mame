@@ -24,9 +24,18 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -60,11 +69,29 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -100,9 +127,18 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -138,11 +174,29 @@ links {
 	"emu",
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",	
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -179,11 +233,29 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",	
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -218,11 +290,29 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",	
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -257,9 +347,18 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -293,9 +392,18 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -329,9 +437,18 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -365,11 +482,29 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -403,9 +538,18 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -439,12 +583,30 @@ end
 links {
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	"netlist",
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -480,11 +642,29 @@ links {
 	"formats",
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -521,11 +701,29 @@ links {
 	"emu",
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",
@@ -562,11 +760,29 @@ links {
 	"emu",
 	"utils",
 	"expat",
-	"zlib",
-	"flac",
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 }
+
+if _OPTIONS["with-bundled-zlib"] then
+	links {
+		"zlib",
+	}
+else
+	links {
+		"z",
+	}
+end
+
+if _OPTIONS["with-bundled-flac"] then
+	links {
+		"flac",
+	}
+else
+	links {
+		"FLAC",
+	}
+end
 
 includedirs {
 	MAME_DIR .. "src/osd",

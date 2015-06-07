@@ -207,13 +207,13 @@ void netlist_parser::net_model()
 void netlist_parser::net_submodel()
 {
 	// don't do much
-	pstring name = get_identifier();
-	require_token(m_tok_comma);
 	pstring model = get_identifier();
+	require_token(m_tok_comma);
+	pstring name = get_identifier();
 	require_token(m_tok_param_right);
 
 	m_setup.namespace_push(name);
-	m_setup.include(name);
+	m_setup.include(model);
 	m_setup.namespace_pop();
 }
 
@@ -236,7 +236,7 @@ void netlist_parser::net_local_source()
 
 void netlist_parser::net_alias()
 {
-	pstring alias = get_identifier();
+	pstring alias = get_identifier_or_number();
 
 	require_token(m_tok_comma);
 

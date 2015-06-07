@@ -16,14 +16,20 @@ NETLIST_START(main)
     //PARAM(Solver.CONVERG, 1.0)
     //PARAM(Solver.GS_LOOPS, 30)
 
+    // Tie up +5 to opamps thought it's not currently needed
+    // Stay compatible
+    ANALOG_INPUT(V5, 5)
+    NET_C(op.VCC, V5)
+    NET_C(op1.VCC, V5)
+
     /* Opamp wired as impedance changer */
-    SUBMODEL(op, opamp)
+    SUBMODEL(opamp, op)
 
     NET_C(op.GND, GND)
     NET_C(op.PLUS, clk)
     NET_C(op.MINUS, op.OUT)
 
-    SUBMODEL(op1, opamp)
+    SUBMODEL(opamp, op1)
     /* Wired as inverting amplifier connected to output of first opamp */
 
     RES(R1, 100000)
@@ -41,7 +47,7 @@ NETLIST_START(main)
     NET_C(RL.2, GND)
     NET_C(RL.1, op1.OUT)
 
-    LOG(logX, op1.OUT)
+    //LOG(logX, op1.OUT)
     //LOG(logY, clk)
 NETLIST_END()
 
@@ -62,6 +68,8 @@ NETLIST_START(opamp)
     ALIAS(OUT, EBUF.OP) // Opamp output ...
 
     ALIAS(GND, EBUF.ON) // GND terminal
+    ALIAS(VCC, DUMMY.I) // VCC terminal
+    DUMMY_INPUT(DUMMY)
 
     /* The opamp model */
 

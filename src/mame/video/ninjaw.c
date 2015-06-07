@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Graves
 #include "emu.h"
 #include "includes/ninjaw.h"

@@ -223,7 +223,7 @@ int fuzzy_substring(const char *needle, const char *haystack)
 void save_cache_info(running_machine &machine)
 {
 	// attempt to open the output file
-	emu_file file(MEWUI_DIR, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	if (file.open("info_", emulator_info::get_configname(), ".ini") == FILERR_NONE)
 	{
@@ -277,7 +277,7 @@ void save_cache_info(running_machine &machine)
 void load_cache_info(running_machine &machine)
 {
 	// try to load driver cache
-	emu_file efile(MEWUI_DIR, OPEN_FLAG_READ);
+	emu_file efile(machine.options().mewui_path(), OPEN_FLAG_READ);
 	file_error filerr = efile.open("info_", emulator_info::get_configname(), ".ini");
 
 	// file not exist ? save and exit
@@ -333,10 +333,10 @@ void fskip(char *s, int id)
 //  save custom filters info to file
 //-------------------------------------------------
 
-void save_custom_filters()
+void save_custom_filters(running_machine &machine)
 {
 	// attempt to open the output file
-	emu_file file(MEWUI_DIR, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
 	{
@@ -365,10 +365,10 @@ void save_custom_filters()
 //  load custom filters info from file
 //-------------------------------------------------
 
-void load_custom_filters()
+void load_custom_filters(running_machine &machine)
 {
 	// attempt to open the output file
-	emu_file file(MEWUI_DIR, OPEN_FLAG_READ);
+	emu_file file(machine.options().mewui_path(), OPEN_FLAG_READ);
 
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
 	{
