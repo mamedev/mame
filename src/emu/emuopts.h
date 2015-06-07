@@ -14,7 +14,7 @@
 #define __EMUOPTS_H__
 
 #include "options.h"
-#include "mewui/options.h"
+#include "mewui/moptions.h"
 
 
 //**************************************************************************

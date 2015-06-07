@@ -228,7 +228,7 @@ void ui_menu_font_ui::handle()
 			case INFOS_SIZE:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					(menu_event->iptkey == IPT_UI_RIGHT) ? info_size += 0.05 : info_size -= 0.05;
+					(menu_event->iptkey == IPT_UI_RIGHT) ? info_size += 0.05f : info_size -= 0.05f;
 					changed = true;
 				}
 				break;

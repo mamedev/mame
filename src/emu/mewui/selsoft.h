@@ -17,7 +17,6 @@ struct c_sw_region
 {
 	std::vector<std::string> ui;
 	UINT16 actual;
-
 	void set(const char *str);
 	std::string getname(const char *str);
 };
@@ -27,7 +26,6 @@ struct c_sw_publisher
 {
 	std::vector<std::string> ui;
 	UINT16 actual;
-
 	void set(const char *str);
 	std::string getname(const char *str);
 };
@@ -37,7 +35,6 @@ struct c_sw_year
 {
 	std::vector<std::string> ui;
 	UINT16 actual;
-
 	void set(const char *str);
 };
 

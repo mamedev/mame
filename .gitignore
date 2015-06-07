@@ -20,3 +20,4 @@ src/regtests/jedutil/output
 *.pyc
 /build
 /documentation
+/mewui

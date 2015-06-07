@@ -305,7 +305,7 @@ void render_load_jpeg(_T &bitmap, emu_file &file, const char *dirname, const cha
 
 		else
 		{
-			osd_printf_verbose("Error! Cannot read JPEG data from %s file.\n", fname.c_str());
+			osd_printf_info("Error! Cannot read JPEG data from %s file.\n", fname.c_str());
 			break;
 		}
 	}

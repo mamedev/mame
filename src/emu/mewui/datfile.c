@@ -492,7 +492,7 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 				}
 			}
 			// search for software info
-			else if (readbuf[0] == DATAFILE_TAG[0])
+			else if (!readbuf.empty() && readbuf[0] == DATAFILE_TAG[0])
 			{
 				std::string readbuf_2;
 				std::getline(myfile, readbuf_2);

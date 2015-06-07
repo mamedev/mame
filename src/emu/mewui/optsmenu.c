@@ -137,10 +137,11 @@ void ui_menu_game_options::handle()
 				}
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
-					int total = machine().inifile().ini_index[machine().inifile().current_file].category.size();
+					int cfile = machine().inifile().current_file;
+					int total = machine().inifile().ini_index[cfile].category.size();
 					std::vector<std::string> s_sel(total);
 					for (int index = 0; index < total; ++index)
-						s_sel[index].assign(machine().inifile().ini_index[machine().inifile().current_file].category[index].name);
+						s_sel[index].assign(machine().inifile().ini_index[cfile].category[index].name);
 
 					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, s_sel, &machine().inifile().current_category, SELECTOR_CATEGORY)));
 				}
