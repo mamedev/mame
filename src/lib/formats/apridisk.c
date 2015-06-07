@@ -2,226 +2,147 @@
 // copyright-holders:Dirk Best
 /***************************************************************************
 
-    APRIDISK disk image format
+    APRIDISK
+
+    Disk image format for the ACT Apricot
 
 ***************************************************************************/
 
-#include "emu.h" // fatalerror
-#include "apridisk.h"
+#include "emu.h"
 #include "imageutl.h"
-#include "coretmpl.h"
+#include "apridisk.h"
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define APR_HEADER_SIZE     128
-
-/* sector types */
-#define APR_DELETED     0xe31d0000
-#define APR_MAGIC       0xe31d0001
-#define APR_COMMENT     0xe31d0002
-#define APR_CREATOR     0xe31d0003
-
-/* compression type */
-#define APR_UNCOMPRESSED    0x9e90
-#define APR_COMPRESSED      0x3e5a
-
-static const char *apr_magic = "ACT Apricot disk image\x1a\x04";
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct apr_sector
+apridisk_format::apridisk_format()
 {
-	int head;
-	int track;
-	int sector;
-	UINT8 data[512];
-};
-
-struct apr_tag
-{
-	int heads;
-	int tracks;
-	int sectors_per_track;
-	struct apr_sector sectors[2880];
-	char *comment;
-};
-
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-/* sector format:
- *
- * 00-03: sector type
- * 04-05: compression type
- * 06-07: header size
- * 08-11: data size
- * 12-13: track
- *    14: head
- *    15: sector
- */
-
-static floperr_t apr_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
-{
-	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
-//  printf("apr_read_sector %d %d %d\n", head, track, sector);
-	memcpy(buffer, tag->sectors[head * track * sector].data, buflen);
-	return FLOPPY_ERROR_SUCCESS;
 }
 
-static floperr_t apr_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
+const char *apridisk_format::name() const
 {
-	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
-//  printf("apr_read_indexed_sector %d %d %d\n", head, track, sector);
-	memcpy(buffer, tag->sectors[head * track * sector].data, buflen);
-	return FLOPPY_ERROR_SUCCESS;
+	return "apridisk";
 }
 
-/* sector length is always 512 byte */
-static floperr_t apr_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
+const char *apridisk_format::description() const
 {
-	*sector_length = 512;
-	return FLOPPY_ERROR_SUCCESS;
+	return "APRIDISK disk image";
 }
 
-static int apr_get_heads_per_disk(floppy_image_legacy *floppy)
+const char *apridisk_format::extensions() const
 {
-	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
-	return tag->heads;
+	return "dsk";
 }
 
-static int apr_get_tracks_per_disk(floppy_image_legacy *floppy)
-{
-	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
-	return tag->tracks;
-}
-
-static floperr_t apr_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
-{
-	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
-
-//  printf("apr_get_indexed_sector_info %d %d %d\n", head, track, sector_index);
-
-	/* sanity checks */
-	if (head         < 0 || head         > (tag->heads - 1))             return FLOPPY_ERROR_SEEKERROR;
-	if (track        < 0 || track        > (tag->tracks - 1))            return FLOPPY_ERROR_SEEKERROR;
-	if (sector_index < 0 || sector_index > (tag->sectors_per_track - 1)) return FLOPPY_ERROR_SEEKERROR;
-
-	if (cylinder)      *cylinder = tag->sectors[head * track * sector_index].track;
-	if (side)          *side = tag->sectors[head * track * sector_index].head;
-	if (sector)        *sector = tag->sectors[head * track * sector_index].sector;
-	if (sector_length) *sector_length = 512;
-
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-FLOPPY_IDENTIFY( apridisk_identify )
+int apridisk_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT8 header[APR_HEADER_SIZE];
+	io_generic_read(io, header, 0, APR_HEADER_SIZE);
 
-	/* get header */
-	floppy_image_read(floppy, &header, 0, sizeof(header));
+	const char magic[] = "ACT Apricot disk image\x1a\x04";
 
-	/* look for the magic string */
-	if (memcmp(header, apr_magic, sizeof(*apr_magic)) == 0)
-		*vote = 100;
+	if (memcmp(header, magic, sizeof(magic) - 1) == 0)
+		return 100;
 	else
-		*vote = 0;
-
-	return FLOPPY_ERROR_SUCCESS;
+		return 0;
 }
 
-FLOPPY_CONSTRUCT( apridisk_construct )
+bool apridisk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	struct FloppyCallbacks *callbacks;
-	struct apr_tag *tag;
+	desc_pc_sector sectors[80][2][18];
+	UINT8 sector_data[MAX_SECTORS * SECTOR_SIZE];
+	UINT8 *data_ptr = sector_data;
+	int track_count = 0, head_count = 0, sector_count = 0;
 
-	int cur_sector = 0;
-	UINT8 sector_header[16];
-	UINT64 pos = 128;
-	UINT32 type;
+	UINT64 file_size = io_generic_size(io);
+	UINT64 file_offset = APR_HEADER_SIZE;
 
-	tag = (apr_tag *)floppy_create_tag(floppy, sizeof(struct apr_tag));
-
-	if (!tag)
-		return FLOPPY_ERROR_OUTOFMEMORY;
-
-	tag->heads = 0;
-	tag->tracks = 0;
-	tag->sectors_per_track = 0;
-
-	floppy_image_read(floppy, &sector_header, pos, 16);
-	type = pick_integer_le(&sector_header, 0, 4);
-
-	while (type == APR_DELETED || type == APR_MAGIC || type == APR_COMMENT || type == APR_CREATOR)
+	while (file_offset < file_size)
 	{
+		// read sector header
+		UINT8 sector_header[16];
+		io_generic_read(io, sector_header, file_offset, 16);
+
+		UINT32 type = pick_integer_le(&sector_header, 0, 4);
 		UINT16 compression = pick_integer_le(&sector_header, 4, 2);
 		UINT16 header_size = pick_integer_le(&sector_header, 6, 2);
 		UINT32 data_size = pick_integer_le(&sector_header, 8, 4);
 
-		tag->sectors[cur_sector].head = pick_integer_le(&sector_header, 12, 1);
-		tag->sectors[cur_sector].sector = pick_integer_le(&sector_header, 13, 1);
-		tag->sectors[cur_sector].track = pick_integer_le(&sector_header, 14, 1);
+		file_offset += header_size;
 
-		pos += header_size;
-
-		if (type == APR_MAGIC)
+		switch (type)
 		{
-			if (compression == APR_UNCOMPRESSED)
+		case APR_SECTOR:
+			UINT8 head = pick_integer_le(&sector_header, 12, 1);
+			UINT8 sector = pick_integer_le(&sector_header, 13, 1);
+			UINT8 track = (UINT8) pick_integer_le(&sector_header, 14, 2);
+
+			track_count = MAX(track_count, track);
+			head_count = MAX(head_count, head);
+			sector_count = MAX(sector_count, sector);
+
+			// build sector info
+			sectors[track][head][sector - 1].head = head;
+			sectors[track][head][sector - 1].sector = sector;
+			sectors[track][head][sector - 1].track = track;
+			sectors[track][head][sector - 1].size = SECTOR_SIZE >> 8;
+			sectors[track][head][sector - 1].actual_size = SECTOR_SIZE;
+			sectors[track][head][sector - 1].deleted = false;
+			sectors[track][head][sector - 1].bad_crc = false;
+
+			// read sector data
+			switch (compression)
 			{
-				floppy_image_read(floppy, &tag->sectors[cur_sector].data, pos, data_size);
+			case APR_COMPRESSED:
+				{
+					UINT8 comp[3];
+					io_generic_read(io, comp, file_offset, 3);
+					UINT16 length = pick_integer_le(comp, 0, 2);
 
-			}
-			else if (compression == APR_COMPRESSED)
-			{
-				dynamic_buffer buffer(data_size);
-				UINT16 length;
-				UINT8 value;
+					if (length != SECTOR_SIZE)
+						fatalerror("apridisk_format: Invalid compression length %04x\n", length);
 
-				floppy_image_read(floppy, &buffer[0], pos, data_size);
-
-				length = pick_integer_le(&buffer[0], 0, 2);
-				value = pick_integer_le(&buffer[0], 2, 1);
-
-				/* not sure if this is possible */
-				if (length != 512) {
-					fatalerror("Compression unsupported\n");
+					memset(data_ptr, comp[2], SECTOR_SIZE);
 				}
+				break;
 
-				memset(&tag->sectors[cur_sector].data, value, length);
+			case APR_UNCOMPRESSED:
+				io_generic_read(io, data_ptr, file_offset, SECTOR_SIZE);
+				break;
+
+			default:
+				fatalerror("apridisk_format: Invalid compression %04x\n", compression);
 			}
-			else
-				return FLOPPY_ERROR_INVALIDIMAGE;
 
-			tag->heads = MAX(tag->sectors[cur_sector].head, tag->heads);
-			tag->tracks = MAX(tag->sectors[cur_sector].track, tag->tracks);
-			tag->sectors_per_track = MAX(tag->sectors[cur_sector].sector, tag->sectors_per_track);
+			sectors[track][head][sector - 1].data = data_ptr;
+			data_ptr += SECTOR_SIZE;
+
+			break;
+
 		}
 
-		/* seek to next sector */
-		pos += data_size;
-		cur_sector++;
-
-		floppy_image_read(floppy, &sector_header, pos, 16);
-		type = pick_integer_le(&sector_header, 0, 4);
+		file_offset += data_size;
 	}
 
-	tag->heads++;
-	tag->tracks++;
+	// track/head index are zero-based, so increase the final count by 1
+	track_count++;
+	head_count++;
 
-	callbacks = floppy_callbacks(floppy);
-	callbacks->read_sector = apr_read_sector;
-	callbacks->read_indexed_sector = apr_read_indexed_sector;
-	callbacks->get_sector_length = apr_get_sector_length;
-	callbacks->get_heads_per_disk = apr_get_heads_per_disk;
-	callbacks->get_tracks_per_disk = apr_get_tracks_per_disk;
-	callbacks->get_indexed_sector_info = apr_get_indexed_sector_info;
+	int cell_count = (sector_count == 18 ? 200000 : 100000);
 
-	return FLOPPY_ERROR_SUCCESS;
+	// now build our final track info
+	for (int track = 0; track < track_count; track++)
+		for (int head = 0; head < head_count; head++)
+			build_pc_track_mfm(track, head, image, cell_count, sector_count, sectors[track][head], 84, 80, 50, 22);
+
+	return true;
 }
+
+bool apridisk_format::save(io_generic *io, floppy_image *image)
+{
+	return false;
+}
+
+bool apridisk_format::supports_save() const
+{
+	return false;
+}
+
+const floppy_format_type FLOPPY_APRIDISK_FORMAT = &floppy_image_format_creator<apridisk_format>;
