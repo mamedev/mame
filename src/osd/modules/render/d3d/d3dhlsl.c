@@ -45,7 +45,6 @@
 #include "strconv.h"
 
 
-
 //============================================================
 //  GLOBALS
 //============================================================
@@ -151,6 +150,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 	},
 };
 
+
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -164,6 +164,7 @@ static void get_vector(const char *data, int count, float *out, int report_error
 
 typedef HRESULT (WINAPI *direct3dx9_loadeffect_ptr)(LPDIRECT3DDEVICE9 pDevice, LPCTSTR pSrcFile, const D3DXMACRO *pDefines, LPD3DXINCLUDE pInclude, DWORD Flags, LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT *ppEffect, LPD3DXBUFFER *ppCompilationErrors);
 static direct3dx9_loadeffect_ptr g_load_effect = NULL;
+
 
 //============================================================
 //  shader manager constructor
@@ -186,7 +187,6 @@ shaders::shaders()
 	cachehead = NULL;
 	initialized = false;
 }
-
 
 
 //============================================================
@@ -222,7 +222,9 @@ shaders::~shaders()
 void shaders::window_save()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture);
 	if (result != D3D_OK)
@@ -253,15 +255,21 @@ void shaders::window_save()
 void shaders::window_record()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	windows_options &options = downcast<windows_options &>(machine->options());
 	const char *filename = options.d3d_hlsl_write();
 
 	if (avi_output_file != NULL)
+	{
 		end_avi_recording();
+	}
 	else if (filename[0] != 0)
+	{
 		begin_avi_recording(filename);
+	}
 }
 
 
@@ -272,7 +280,9 @@ void shaders::window_record()
 void shaders::avi_update_snap(surface *surface)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	D3DLOCKED_RECT rect;
 
@@ -302,13 +312,18 @@ void shaders::avi_update_snap(surface *surface)
 		DWORD *src = (DWORD *)((BYTE *)rect.pBits + srcy * rect.Pitch);
 		UINT32 *dst = &avi_snap.pix32(srcy);
 
-		for(int x = 0; x < snap_width; x++)
+		for (int x = 0; x < snap_width; x++)
+		{
 			*dst++ = *src++;
+		}
 	}
 
 	// unlock
 	result = (*d3dintf->surface.unlock_rect)(avi_copy_surface);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
+	if (result != D3D_OK)
+	{
+		osd_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
+	}
 }
 
 
@@ -320,7 +335,9 @@ void shaders::avi_update_snap(surface *surface)
 void shaders::render_snapshot(surface *surface)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	D3DLOCKED_RECT rect;
 
@@ -346,9 +363,9 @@ void shaders::render_snapshot(surface *surface)
 		return;
 	}
 
-	for(int cy = 0; cy < 2; cy++)
+	for (int cy = 0; cy < 2; cy++)
 	{
-		for(int cx = 0; cx < 2; cx++)
+		for (int cx = 0; cx < 2; cx++)
 		{
 			// loop over Y
 			for (int srcy = 0; srcy < snap_height / 2; srcy++)
@@ -358,8 +375,10 @@ void shaders::render_snapshot(surface *surface)
 				DWORD *src = (DWORD *)((BYTE *)rect.pBits + toty * rect.Pitch + totx * 4);
 				UINT32 *dst = &avi_snap.pix32(srcy);
 
-				for(int x = 0; x < snap_width / 2; x++)
+				for (int x = 0; x < snap_width / 2; x++)
+				{
 					*dst++ = *src++;
+				}
 			}
 
 			int idx = cy * 2 + cx;
@@ -367,7 +386,9 @@ void shaders::render_snapshot(surface *surface)
 			emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = open_next(d3d, file, NULL, "png", idx);
 			if (filerr != FILERR_NONE)
+			{
 				return;
+			}
 
 			// add two text entries describing the image
 			std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
@@ -379,7 +400,9 @@ void shaders::render_snapshot(surface *surface)
 			// now do the actual work
 			png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, NULL);
 			if (error != PNGERR_NONE)
+			{
 				osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
+			}
 
 			// free any data allocated
 			png_free(&pnginfo);
@@ -390,25 +413,25 @@ void shaders::render_snapshot(surface *surface)
 	result = (*d3dintf->surface.unlock_rect)(snap_copy_target);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
 
-	if(snap_texture != NULL)
+	if (snap_texture != NULL)
 	{
 		(*d3dintf->texture.release)(snap_texture);
 		snap_texture = NULL;
 	}
 
-	if(snap_target != NULL)
+	if (snap_target != NULL)
 	{
 		(*d3dintf->surface.release)(snap_target);
 		snap_target = NULL;
 	}
 
-	if(snap_copy_texture != NULL)
+	if (snap_copy_texture != NULL)
 	{
 		(*d3dintf->texture.release)(snap_copy_texture);
 		snap_copy_texture = NULL;
 	}
 
-	if(snap_copy_target != NULL)
+	if (snap_copy_target != NULL)
 	{
 		(*d3dintf->surface.release)(snap_copy_target);
 		snap_copy_target = NULL;
@@ -423,13 +446,17 @@ void shaders::render_snapshot(surface *surface)
 void shaders::record_texture()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	surface *surface = avi_final_target;
 
 	// ignore if nothing to do
 	if (avi_output_file == NULL || surface == NULL)
+	{
 		return;
+	}
 
 	// get the current time
 	attotime curtime = machine->time();
@@ -462,10 +489,14 @@ void shaders::record_texture()
 void shaders::end_avi_recording()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	if (avi_output_file != NULL)
+	{
 		avi_close(avi_output_file);
+	}
 
 	avi_output_file = NULL;
 	avi_frame = 0;
@@ -511,7 +542,9 @@ void shaders::toggle()
 void shaders::begin_avi_recording(const char *name)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	// stop any existing recording
 	end_avi_recording();
@@ -668,9 +701,11 @@ void shaders::remove_render_target(render_target *rt)
 void shaders::set_texture(texture_info *texture)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
-	if(texture != NULL)
+	if (texture != NULL)
 	{
 		paused = texture->paused();
 		texture->advance_frame();
@@ -679,9 +714,13 @@ void shaders::set_texture(texture_info *texture)
 	texture_info *default_texture = d3d->get_default_texture();
 	default_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
 	if (options->yiq_enable)
+	{
 		yiq_encode_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
+	}
 	else
+	{
 		color_effect->set_texture("Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
+	}
 }
 
 
@@ -692,7 +731,9 @@ void shaders::set_texture(texture_info *texture)
 void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *renderer)
 {
 	if (!d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	g_load_effect = (direct3dx9_loadeffect_ptr)GetProcAddress(d3dintf->libhandle, "D3DXCreateEffectFromFileW");
 	if (g_load_effect == NULL)
@@ -729,7 +770,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 
 	prescale_force_x = winoptions.d3d_hlsl_prescale_x();
 	prescale_force_y = winoptions.d3d_hlsl_prescale_y();
-	if(preset == -1)
+	if (preset == -1)
 	{
 		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
 		options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
@@ -802,7 +843,6 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 }
 
 
-
 //============================================================
 //  shaders::init_fsfx_quad
 //============================================================
@@ -813,12 +853,16 @@ void shaders::init_fsfx_quad(void *vertbuf)
 	// that are guaranteed to be at a fixed position so as to simply use D3DPT_TRIANGLELIST, 0, 2
 	// instead of having to do bookkeeping about a specific screen quad
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	// get a pointer to the vertex buffer
 	fsfx_vertices = (vertex *)vertbuf;
 	if (fsfx_vertices == NULL)
+	{
 		return;
+	}
 
 	// fill in the vertexes clockwise
 	fsfx_vertices[0].x = 0.0f;
@@ -875,7 +919,6 @@ void shaders::init_fsfx_quad(void *vertbuf)
 }
 
 
-
 //============================================================
 //  shaders::create_resources
 //============================================================
@@ -883,10 +926,15 @@ void shaders::init_fsfx_quad(void *vertbuf)
 int shaders::create_resources(bool reset)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return 0;
+	}
 
 	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+	if (result != D3D_OK)
+	{
+		osd_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+	}
 
 	result = (*d3dintf->device.create_texture)(d3d->get_device(), 4, 4, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &black_texture);
 	if (result != D3D_OK)
@@ -954,19 +1002,22 @@ int shaders::create_resources(bool reset)
 	downsample_effect = new effect(this, d3d->get_device(), "downsample.fx", fx_dir);
 	vector_effect = new effect(this, d3d->get_device(), "vector.fx", fx_dir);
 
-	if (!default_effect->is_valid()) return 1;
-	if (!simple_effect->is_valid()) return 1;
-	if (!post_effect->is_valid()) return 1;
-	if (!prescale_effect->is_valid()) return 1;
-	if (!phosphor_effect->is_valid()) return 1;
-	if (!focus_effect->is_valid()) return 1;
-	if (!deconverge_effect->is_valid()) return 1;
-	if (!color_effect->is_valid()) return 1;
-	if (!yiq_encode_effect->is_valid()) return 1;
-	if (!yiq_decode_effect->is_valid()) return 1;
-	if (!bloom_effect->is_valid()) return 1;
-	if (!downsample_effect->is_valid()) return 1;
-	if (!vector_effect->is_valid()) return 1;
+	if (!default_effect->is_valid() ||
+		!simple_effect->is_valid() ||
+		!post_effect->is_valid() ||
+		!prescale_effect->is_valid() ||
+		!phosphor_effect->is_valid() ||
+		!focus_effect->is_valid() ||
+		!deconverge_effect->is_valid() ||
+		!color_effect->is_valid() ||
+		!yiq_encode_effect->is_valid() ||
+		!yiq_decode_effect->is_valid() ||
+		!bloom_effect->is_valid() ||
+		!downsample_effect->is_valid() ||
+		!vector_effect->is_valid())
+	{
+		return 1;
+	}
 
 	yiq_encode_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	yiq_encode_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
@@ -1070,7 +1121,9 @@ int shaders::create_resources(bool reset)
 void shaders::begin_draw()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	curr_effect = default_effect;
 
@@ -1085,7 +1138,10 @@ void shaders::begin_draw()
 	yiq_decode_effect->set_technique("DecodeTechnique");
 
 	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+	if (result != D3D_OK)
+	{
+		osd_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+	}
 }
 
 
@@ -1103,43 +1159,50 @@ void shaders::begin_frame()
 //  shaders::blit
 //============================================================
 
-void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYPE prim_type,
-						UINT32 prim_index, UINT32 prim_count)
+void shaders::blit(
+	surface *dst,
+	bool clear_dst,
+	D3DPRIMITIVETYPE prim_type,
+	UINT32 prim_index,
+	UINT32 prim_count)
 {
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+	HRESULT result;
 
-	curr_effect = default_effect;
-	curr_effect->update_uniforms();
+	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
+	if (result != D3D_OK)
+	{
+		osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+	}
 
-	curr_effect->set_texture("Diffuse", src);
-	curr_effect->set_float("PostPass", 1.0f);
-	curr_effect->set_float("Brighten", 1.0f);
+	if (clear_dst)
+	{
+		result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
+		if (result != D3D_OK)
+		{
+			osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+		}
+	}
 
-	unsigned int num_passes = 0;
+	UINT num_passes = 0;
 	curr_effect->begin(&num_passes, 0);
 
 	for (UINT pass = 0; pass < num_passes; pass++)
 	{
 		curr_effect->begin_pass(pass);
+		
 		// add the primitives
-		HRESULT result = (*d3dintf->device.draw_primitive)(d3d->get_device(), prim_type, prim_index, prim_count);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), prim_type, prim_index, prim_count);
+		if (result != D3D_OK) 
+		{
+			osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+		}
+		
 		curr_effect->end_pass();
 	}
 
 	curr_effect->end();
-
-	curr_effect->set_float("Brighten", 0.0f);
-
-	if (new_dst)
-	{
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, new_dst);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	}
 }
+
 
 //============================================================
 //  shaders::end_frame
@@ -1148,32 +1211,21 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 void shaders::end_frame()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
-	if(render_snap && snap_rendered)
+	if (render_snap && snap_rendered)
 	{
 		render_snapshot(snap_target);
 	}
 
 	if (!lines_pending)
-		return;
-
-	lines_pending = false;
-
-	/*render_target *rt = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
-	if (rt == NULL)
 	{
-	    return;
+		return;
 	}
 
-	blit(backbuffer, rt->render_texture[1], NULL, vecbuf_type, vecbuf_index, vecbuf_count);
-
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[1]);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);*/
+	lines_pending = false;
 }
 
 
@@ -1183,26 +1235,7 @@ void shaders::end_frame()
 
 void shaders::init_effect_info(poly_info *poly)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
-		return;
-
-	texture_info *texture = poly->get_texture();
-
-	if(PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && texture != NULL)
-	{
-		// Plug in all of the shader settings we're going to need
-		// This is extremely slow, but we're not rendering models here,
-		// just post-processing.
-		curr_effect = post_effect;
-
-		curr_effect->set_float("ScanlineOffset", (texture->get_cur_frame() == 0) ? 0.0f : options->scanline_offset);
-	}
-	else
-	{
-		curr_effect = default_effect;
-
-		curr_effect->set_float("FixedAlpha", 1.0f);
-	}
+	// nothing to do
 }
 
 
@@ -1212,13 +1245,16 @@ void shaders::init_effect_info(poly_info *poly)
 
 render_target* shaders::find_render_target(texture_info *info)
 {
-	render_target *curr = targethead;
 	UINT32 screen_index_data = (UINT32)info->get_texinfo().osddata;
 	UINT32 screen_index = screen_index_data >> 1;
 	UINT32 page_index = screen_index_data & 1;
 
-	while (curr != NULL && (curr->screen_index != screen_index || curr->page_index != page_index ||
-		curr->width != info->get_texinfo().width || curr->height != info->get_texinfo().height))
+	render_target *curr = targethead;
+	while (curr != NULL && (
+		curr->screen_index != screen_index ||
+		curr->page_index != page_index ||
+		curr->width != info->get_texinfo().width ||
+		curr->height != info->get_texinfo().height))
 	{
 		curr = curr->next;
 	}
@@ -1234,8 +1270,11 @@ render_target* shaders::find_render_target(texture_info *info)
 render_target* shaders::find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
 {
 	render_target *curr = targethead;
-
-	while (curr != NULL && (curr->width != width || curr->height != height || curr->screen_index != screen_index || curr->page_index != page_index))
+	while (curr != NULL && (
+		curr->width != width ||
+		curr->height != height ||
+		curr->screen_index != screen_index ||
+		curr->page_index != page_index))
 	{
 		curr = curr->next;
 	}
@@ -1251,8 +1290,10 @@ render_target* shaders::find_render_target(int width, int height, UINT32 screen_
 cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int height)
 {
 	cache_target *curr = cachehead;
-
-	while (curr != NULL && (curr->screen_index != screen_index || curr->width != width || curr->height != height))
+	while (curr != NULL && (
+		curr->screen_index != screen_index ||
+		curr->width != width ||
+		curr->height != height))
 	{
 		curr = curr->next;
 	}
@@ -1260,151 +1301,68 @@ cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int hei
 	return curr;
 }
 
-void shaders::ntsc_pass(render_target *rt, vec2f &sourcedims, vec2f &delta)
+void shaders::ntsc_pass(render_target *rt, poly_info *poly, int vertnum)
 {
-	UINT num_passes = 0;
-
-	if(options->yiq_enable)
+	if (!options->yiq_enable)
 	{
-		// Convert our signal into YIQ
-		curr_effect = yiq_encode_effect;
-		curr_effect->update_uniforms();
-
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[4]);
-
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-		result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-		curr_effect->begin(&num_passes, 0);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
-
-		// Convert our signal from YIQ
-		curr_effect = yiq_decode_effect;
-
-		curr_effect->set_texture("Composite", rt->render_texture[4]);
-		curr_effect->set_texture("Diffuse", curr_texture->get_finaltex());
-		curr_effect->update_uniforms();
-
-		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[3]);
-
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-		result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-		curr_effect->begin(&num_passes, 0);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
-
-		curr_effect = color_effect;
-
-		curr_effect->set_texture("Diffuse", rt->render_texture[3]);
+		return;
 	}
+
+	// Convert our signal into YIQ
+	curr_effect = yiq_encode_effect;
+	curr_effect->update_uniforms();
+
+	blit(rt->target[4], true, D3DPT_TRIANGLELIST, 0, 2);
+
+	// Convert our signal from YIQ
+	curr_effect = yiq_decode_effect;
+	curr_effect->update_uniforms();
+	curr_effect->set_texture("Composite", rt->render_texture[4]);
+	curr_effect->set_texture("Diffuse", curr_texture->get_finaltex());
+
+	blit(rt->target[3], true, D3DPT_TRIANGLELIST, 0, 2);
+
+	curr_effect = color_effect;
+
+	curr_effect->set_texture("Diffuse", rt->render_texture[3]);
 }
 
-void shaders::color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims)
+void shaders::color_convolution_pass(render_target *rt, poly_info *poly, int vertnum)
 {
-	UINT num_passes = 0;
-
 	curr_effect = color_effect;
 	curr_effect->update_uniforms();
 
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->smalltarget);
-
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	curr_effect->begin(&num_passes, 0);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	blit(rt->smalltarget, true, D3DPT_TRIANGLELIST, 0, 2);
 }
 
-void shaders::prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims)
+void shaders::prescale_pass(render_target *rt, poly_info *poly, int vertnum)
 {
-	UINT num_passes = 0;
-
 	curr_effect = prescale_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->smalltexture);
 
-	curr_effect->begin(&num_passes, 0);
-
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->prescaletarget);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	blit(rt->prescaletarget, true, D3DPT_TRIANGLELIST, 0, 2);
 }
 
-void shaders::deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims)
+void shaders::deconverge_pass(render_target *rt, poly_info *poly, int vertnum)
 {
-	UINT num_passes = 0;
-
 	curr_effect = deconverge_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->prescaletexture);
 
-	curr_effect->begin(&num_passes, 0);
-
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[2]);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	blit(rt->target[2], true, D3DPT_TRIANGLELIST, 0, 2);
 }
 
-void shaders::defocus_pass(render_target *rt, vec2f &texsize)
+void shaders::defocus_pass(render_target *rt, poly_info *poly, int vertnum)
 {
-	UINT num_passes = 0;
+	float defocus_x = options->defocus[0];
+	float defocus_y = options->defocus[1];
+	bool focus_enable = defocus_x != 0.0f || defocus_y != 0.0f;
+
+	if (!focus_enable)
+	{
+		return;
+	}
 
 	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
 
@@ -1414,48 +1372,19 @@ void shaders::defocus_pass(render_target *rt, vec2f &texsize)
 	curr_effect->set_texture("Diffuse", rt->render_texture[2]);
 	curr_effect->set_vector("Prescale", 2, prescale);
 
-	curr_effect->begin(&num_passes, 0);
-
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[0]);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	blit(rt->target[0], true, D3DPT_TRIANGLELIST, 0, 2);
 
 	// Defocus pass 2
-
 	curr_effect->set_texture("Diffuse", rt->render_texture[0]);
 
-	curr_effect->begin(&num_passes, 0);
-
-	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[1]);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 7\n", (int)result);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	blit(rt->target[1], false, D3DPT_TRIANGLELIST, 0, 2);
 }
 
-void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize, bool focus_enable)
+void shaders::phosphor_pass(render_target *rt, cache_target *ct, poly_info *poly, int vertnum)
 {
-	UINT num_passes = 0;
+	float defocus_x = options->defocus[0];
+	float defocus_y = options->defocus[1];
+	bool focus_enable = defocus_x != 0.0f || defocus_y != 0.0f;
 
 	phosphor_passthrough = false;
 
@@ -1467,23 +1396,7 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize,
 	curr_effect->set_texture("Diffuse", focus_enable ? rt->render_texture[1] : rt->render_texture[2]);
 	curr_effect->set_texture("LastPass", ct->last_texture);
 
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[0]);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 4\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	curr_effect->begin(&num_passes, 0);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	blit(rt->target[0], true, D3DPT_TRIANGLELIST, 0, 2);
 
 	// Pass along our phosphor'd screen
 	phosphor_passthrough = true;
@@ -1491,28 +1404,12 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize,
 	curr_effect->set_texture("Diffuse", rt->render_texture[0]);
 	curr_effect->set_texture("LastPass", rt->render_texture[0]);
 
-	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, ct->last_target); // Avoid changing targets due to page flipping
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	curr_effect->begin(&num_passes, 0);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	blit(ct->last_target, true, D3DPT_TRIANGLELIST, 0, 2); // Avoid changing targets due to page flipping
 }
 
-void shaders::post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum, bool prepare_bloom)
+void shaders::post_pass(render_target *rt, poly_info *poly, int vertnum, bool prepare_bloom)
 {
-	UINT num_passes = 0;
+	texture_info *texture = poly->get_texture();
 
 	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
 	bool orientation_swap_xy = (d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
@@ -1524,6 +1421,7 @@ void shaders::post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
 	curr_effect->set_texture("DiffuseTexture", rt->render_texture[0]);
+	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
 	curr_effect->set_vector("Prescale", 2, prescale);
 	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
 	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
@@ -1531,30 +1429,13 @@ void shaders::post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &
 
 	d3d->set_wrap(D3DTADDRESS_MIRROR);
 
-	HRESULT result = prepare_bloom
-		? (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[3])  // target which is used by bloom effect
-		: (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[2]);
-
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	curr_effect->begin(&num_passes, 0);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	// target 3 is used as source by bloom effect
+	blit(prepare_bloom ? rt->target[3] : rt->target[2], true, poly->get_type(), vertnum, poly->get_count());
 
 	d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(poly->get_texture()->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 }
 
-void shaders::bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
+void shaders::bloom_pass(render_target *rt, poly_info *poly, int vertnum)
 {
 	UINT num_passes = 0;
 
@@ -1570,32 +1451,15 @@ void shaders::bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_i
 	float bloom_width = rt->target_width;
 	float bloom_height = rt->target_height;
 	float bloom_dims[11][2];
-	for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
+	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
 		bloom_dims[bloom_index][0] = bloom_width;
 		bloom_dims[bloom_index][1] = bloom_height;
+
 		curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
-
-		curr_effect->begin(&num_passes, 0);
-
 		curr_effect->set_texture("DiffuseTexture", (bloom_index == 0) ? rt->render_texture[3] : rt->bloom_texture[bloom_index - 1]);
 
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->bloom_target[bloom_index]);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
-		result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-			//result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
+		blit(rt->bloom_target[bloom_index], true, D3DPT_TRIANGLELIST, 0, 2);
 
 		bloom_index++;
 		bloom_width *= 0.5f;
@@ -1623,101 +1487,43 @@ void shaders::bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_i
 	curr_effect->set_vector("Prescale", 2, prescale);
 
 	char name[9] = "Diffuse*";
-	for(int index = 1; index < bloom_index; index++)
+	for (int index = 1; index < bloom_index; index++)
 	{
 		name[7] = 'A' + index;
 		curr_effect->set_texture(name, rt->bloom_texture[index - 1]);
 	}
-	for(int index = bloom_index; index < 11; index++)
+	for (int index = bloom_index; index < 11; index++)
 	{
 		name[7] = 'A' + index;
 		curr_effect->set_texture(name, black_texture);
 	}
 
-	curr_effect->begin(&num_passes, 0);
-
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[1]);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
+	blit(rt->target[1], true, poly->get_type(), vertnum, poly->get_count());
 }
 
-void shaders::screen_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
-{
+void shaders::screen_pass(render_target *rt, poly_info *poly, int vertnum)
+{	
 	UINT num_passes = 0;
-
+	
 	curr_effect = simple_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("DiffuseTexture", rt->render_texture[1]);
 
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
 
-	curr_effect->begin(&num_passes, 0);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
+	if (avi_output_file != NULL)
 	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
+		blit(avi_final_target, false, poly->get_type(), vertnum, poly->get_count());
 	}
 
-	curr_effect->end();
-
-	// Scanlines and shadow mask, at high res for AVI logging
-	if(avi_output_file != NULL)
+	if (render_snap)
 	{
-		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, avi_final_target);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-		curr_effect->begin(&num_passes, 0);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
-	}
-
-	if(render_snap)
-	{
-		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, snap_target);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-		curr_effect->begin(&num_passes, 0);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
+		blit(snap_target, false, poly->get_type(), vertnum, poly->get_count());
 
 		snap_rendered = true;
 	}
 }
+
 
 //============================================================
 //  shaders::render_quad
@@ -1726,48 +1532,40 @@ void shaders::screen_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_
 void shaders::render_quad(poly_info *poly, int vertnum)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	UINT num_passes = 0;
 	curr_texture = poly->get_texture();
 
-	if(PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != NULL)
+	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != NULL)
 	{
 		render_target *rt = find_render_target(curr_texture);
 		if (rt == NULL)
 		{
 			return;
 		}
+
 		cache_target *ct = find_cache_target(rt->screen_index, curr_texture->get_texinfo().width, curr_texture->get_texinfo().height);
 
-		vec2f& sourcedims = curr_texture->get_rawdims();
-		vec2f delta = curr_texture->get_uvstop() - curr_texture->get_uvstart();
-		vec2f texsize(rt->width, rt->height);
-		float defocus_x = options->defocus[0];
-		float defocus_y = options->defocus[1];
-		bool focus_enable = defocus_x != 0.0f || defocus_y != 0.0f;
-
-		ntsc_pass(rt, sourcedims, delta);
-		color_convolution_pass(rt, texsize, sourcedims);
-		prescale_pass(rt, texsize, sourcedims);
-		deconverge_pass(rt, texsize, delta, sourcedims);
-		if (focus_enable)
-		{
-			defocus_pass(rt, texsize);
-		}
-		phosphor_pass(rt, ct, texsize, focus_enable);
-		post_pass(rt, texsize, delta, sourcedims, poly, vertnum, true);
-		post_pass(rt, texsize, delta, sourcedims, poly, vertnum, false);
-		bloom_pass(rt, texsize, delta, poly, vertnum);
-		screen_pass(rt, texsize, delta, poly, vertnum);
+		ntsc_pass(rt, poly, vertnum);
+		color_convolution_pass(rt, poly, vertnum);
+		prescale_pass(rt, poly, vertnum);
+		deconverge_pass(rt, poly, vertnum);
+		defocus_pass(rt, poly, vertnum);
+		phosphor_pass(rt, ct, poly, vertnum);
+		post_pass(rt, poly, vertnum, true);
+		post_pass(rt, poly, vertnum, false);
+		bloom_pass(rt, poly, vertnum);
+		screen_pass(rt, poly, vertnum);
 
 		curr_texture->increment_frame_count();
 		curr_texture->mask_frame_count(options->yiq_phase_count);
 
 		options->params_dirty = false;
-
 	}
-	else if(PRIMFLAG_GET_VECTOR(poly->get_flags()) && vector_enable)
+	else if (PRIMFLAG_GET_VECTOR(poly->get_flags()) && vector_enable)
 	{
 		render_target *rt = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 		if (rt == NULL)
@@ -1777,37 +1575,21 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		lines_pending = true;
 
-		curr_effect = vector_effect;
-		curr_effect->update_uniforms();
-
 		float time_params[2] = { 0.0f, 0.0f };
 		float length_params[3] = { poly->get_line_length(), options->vector_length_scale, options->vector_length_ratio };
+		
+		curr_effect = vector_effect;
+		curr_effect->update_uniforms();
 		curr_effect->set_vector("TimeParams", 2, time_params);
 		curr_effect->set_vector("LengthParams", 3, length_params);
 
-		curr_effect->begin(&num_passes, 0);
+		blit(rt->target[0], true, poly->get_type(), vertnum, poly->get_count());
 
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[0]);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
+		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
+		if (result != D3D_OK)
 		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			HRESULT result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
+			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 		}
-
-		curr_effect->end();
-
-		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-		curr_effect = default_effect;
-		curr_effect->update_uniforms();
-
-		curr_effect->set_float("FixedAlpha", 1.0f);
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable)
 	{
@@ -1828,31 +1610,14 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		float bloom_width = rt->target_width;
 		float bloom_height = rt->target_height;
 		float bloom_dims[11][2];
-		for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
+		for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 		{
 			bloom_dims[bloom_index][0] = bloom_width;
 			bloom_dims[bloom_index][1] = bloom_height;
 			curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
-
-			curr_effect->begin(&num_passes, 0);
-
 			curr_effect->set_texture("DiffuseTexture", (bloom_index == 0) ? rt->render_texture[0] : rt->bloom_texture[bloom_index - 1]);
 
-			HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->bloom_target[bloom_index]);
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
-			result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-			for (UINT pass = 0; pass < num_passes; pass++)
-			{
-				curr_effect->begin_pass(pass);
-				// add the primitives
-				result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-				if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-				curr_effect->end_pass();
-			}
-
-			curr_effect->end();
+			blit(rt->bloom_target[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
 
 			bloom_index++;
 			bloom_width *= 0.5f;
@@ -1881,34 +1646,18 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_effect->set_bool("PrepareVector", true);
 
 		char name[9] = "Diffuse*";
-		for(int index = 1; index < bloom_index; index++)
+		for (int index = 1; index < bloom_index; index++)
 		{
 			name[7] = 'A' + index;
 			curr_effect->set_texture(name, rt->bloom_texture[index - 1]);
 		}
-		for(int index = bloom_index; index < 11; index++)
+		for (int index = bloom_index; index < 11; index++)
 		{
 			name[7] = 'A' + index;
 			curr_effect->set_texture(name, black_texture);
 		}
 
-		curr_effect->begin(&num_passes, 0);
-
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[1]);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
-		result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
+		blit(rt->target[1], true, poly->get_type(), vertnum, poly->get_count());
 
 		/* Phosphor, todo: merge with phosphor_pass() */
 		phosphor_passthrough = false;
@@ -1921,33 +1670,33 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_effect->set_texture("Diffuse", rt->render_texture[1]);
 		curr_effect->set_texture("LastPass", rt->render_texture[2]);
 
-		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[3]);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 4\n", (int)result);
-		result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+		blit(rt->target[3], true, D3DPT_TRIANGLELIST, 0, 2);
 
-		curr_effect->begin(&num_passes, 0);
+		/* what's happening here? */
+		curr_effect = default_effect;
+		curr_effect->update_uniforms();
 
-		for (UINT pass = 0; pass < num_passes; pass++)
+		curr_effect->set_texture("Diffuse", rt->render_texture[3]);
+		curr_effect->set_float("PostPass", 1.0f);
+		curr_effect->set_float("Brighten", 1.0f);
+
+		blit(rt->target[2], true, poly->get_type(), vertnum, poly->get_count());
+
+		/* what's happening here? */	
+		curr_effect = default_effect;
+		curr_effect->update_uniforms();
+
+		curr_effect->set_texture("Diffuse", rt->render_texture[3]);
+		curr_effect->set_float("PostPass", 1.0f);
+		curr_effect->set_float("Brighten", 1.0f);
+
+		blit(backbuffer, true, poly->get_type(), vertnum, poly->get_count());
+		
+		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
+		if (result != D3D_OK)
 		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), D3DPT_TRIANGLELIST, 0, 2);
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
+			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 		}
-
-		curr_effect->end();
-
-		blit(rt->target[2], rt->render_texture[3], NULL, poly->get_type(), vertnum, poly->get_count());
-		blit(backbuffer, rt->render_texture[3], backbuffer, poly->get_type(), vertnum, poly->get_count());
-
-		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[0]);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-		result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 
 		lines_pending = false;
 	}
@@ -1955,17 +1704,22 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_effect = default_effect;
 		curr_effect->update_uniforms();
-
 		curr_effect->set_float("PostPass", 0.0f);
+		curr_effect->set_float("Brighten", 0.0f);
 
 		curr_effect->begin(&num_passes, 0);
 
 		for (UINT pass = 0; pass < num_passes; pass++)
 		{
 			curr_effect->begin_pass(pass);
+			
 			// add the primitives
 			HRESULT result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+			if (result != D3D_OK)
+			{
+				osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+			}
+			
 			curr_effect->end_pass();
 		}
 
@@ -1976,7 +1730,6 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 }
 
 
-
 //============================================================
 //  shaders::end_draw
 //============================================================
@@ -1984,7 +1737,9 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 void shaders::end_draw()
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	(*d3dintf->surface.release)(backbuffer);
 }
@@ -2055,6 +1810,7 @@ void shaders::create_vector_target(render_primitive *prim)
 		vector_enable = false;
 	}
 }
+
 
 //============================================================
 //  shaders::add_render_target - register a render target
@@ -2136,6 +1892,7 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 	return true;
 }
 
+
 //============================================================
 //  shaders::enumerate_screens
 //============================================================
@@ -2192,12 +1949,15 @@ bool shaders::register_texture(texture_info *texture)
 	hlsl_prescale_y = ((hlsl_prescale_y == 0) ? 1 : hlsl_prescale_y);
 
 	if (!add_render_target(d3d, texture, width, height, xscale * hlsl_prescale_x, yscale * hlsl_prescale_y))
+	{
 		return false;
+	}
 
 	options->params_dirty = true;
 
 	return true;
 }
+
 
 //============================================================
 //  shaders::delete_resources
@@ -2206,7 +1966,9 @@ bool shaders::register_texture(texture_info *texture)
 void shaders::delete_resources(bool reset)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
+	{
 		return;
+	}
 
 	initialized = false;
 
@@ -2343,25 +2105,25 @@ void shaders::delete_resources(bool reset)
 
 static void get_vector(const char *data, int count, float *out, int report_error)
 {
-	if (count > 3)
+	if (count > 3 &&
+		sscanf(data, "%f,%f,%f,%f", &out[0], &out[1], &out[2], &out[3]) < 4 && report_error)
 	{
-		if (sscanf(data, "%f,%f,%f,%f", &out[0], &out[1], &out[2], &out[3]) < 4 && report_error)
-			osd_printf_error("Illegal quad vector value = %s\n", data);
+		osd_printf_error("Illegal quad vector value = %s\n", data);
 	}
-	else if(count > 2)
+	else if (count > 2 &&
+		sscanf(data, "%f,%f,%f", &out[0], &out[1], &out[2]) < 3 && report_error)
 	{
-		if (sscanf(data, "%f,%f,%f", &out[0], &out[1], &out[2]) < 3 && report_error)
-			osd_printf_error("Illegal triple vector value = %s\n", data);
+		osd_printf_error("Illegal triple vector value = %s\n", data);
 	}
-	else if(count > 1)
+	else if (count > 1 &&
+		sscanf(data, "%f,%f", &out[0], &out[1]) < 2 && report_error)
 	{
-		if (sscanf(data, "%f,%f", &out[0], &out[1]) < 2 && report_error)
-			osd_printf_error("Illegal double vector value = %s\n", data);
+		osd_printf_error("Illegal double vector value = %s\n", data);
 	}
-	else if(count > 0)
+	else if (count > 0 &&
+		sscanf(data, "%f", &out[0]) < 1 && report_error)
 	{
-		if (sscanf(data, "%f", &out[0]) < 1 && report_error)
-			osd_printf_error("Illegal single vector value = %s\n", data);
+		osd_printf_error("Illegal single vector value = %s\n", data);
 	}
 }
 
@@ -2395,8 +2157,15 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 
 static INT32 slider_set(float *option, float scale, const char *fmt, std::string *str, INT32 newval)
 {
-	if (option != NULL && newval != SLIDER_NOCHANGE) *option = (float)newval * scale;
-	if (str != NULL) strprintf(*str, fmt, *option);
+	if (option != NULL && newval != SLIDER_NOCHANGE)
+	{
+		*option = (float)newval * scale;
+	}
+	if (str != NULL)
+	{
+		strprintf(*str, fmt, *option);
+	}
+	
 	return floor(*option / scale + 0.5f);
 }
 
@@ -2408,18 +2177,32 @@ static INT32 slider_shadow_mask_alpha(running_machine &machine, void *arg, std::
 static INT32 slider_shadow_mask_x_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	hlsl_options *options = (hlsl_options*)arg;
-	if (newval != SLIDER_NOCHANGE) options->shadow_mask_count_x = newval;
-	if (str != NULL) strprintf(*str, "%d", options->shadow_mask_count_x);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		options->shadow_mask_count_x = newval;
+	}	
+	if (str != NULL)
+	{
+		strprintf(*str, "%d", options->shadow_mask_count_x);
+	}
 	options->params_dirty = true;
+	
 	return options->shadow_mask_count_x;
 }
 
 static INT32 slider_shadow_mask_y_count(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	hlsl_options *options = (hlsl_options*)arg;
-	if (newval != SLIDER_NOCHANGE) options->shadow_mask_count_y = newval;
-	if (str != NULL) strprintf(*str, "%d", options->shadow_mask_count_y);
+	if (newval != SLIDER_NOCHANGE)
+	{
+		options->shadow_mask_count_y = newval;
+	}
+	if (str != NULL)
+	{
+		strprintf(*str, "%d", options->shadow_mask_count_y);
+	}
 	options->params_dirty = true;
+	
 	return options->shadow_mask_count_y;
 }
 
@@ -2831,6 +2614,7 @@ static INT32 slider_bloom_lvl10_scale(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->bloom_level10_weight), 0.01f, "%1.2f", str, newval);
 }
 
+
 //============================================================
 //  init_slider_list
 //============================================================
@@ -2932,6 +2716,7 @@ slider_state *shaders::init_slider_list()
 	return listhead;
 }
 
+
 //============================================================
 //  uniform functions
 //============================================================
@@ -2950,24 +2735,24 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 
 	switch (type)
 	{
-	case UT_INT:
-	case UT_FLOAT:
-	case UT_MATRIX:
-	case UT_SAMPLER:
-		m_count = 1;
-		break;
-	case UT_VEC2:
-		m_count = 2;
-		break;
-	case UT_VEC3:
-		m_count = 3;
-		break;
-	case UT_VEC4:
-		m_count = 4;
-		break;
-	default:
-		m_count = 1;
-		break;
+		case UT_INT:
+		case UT_FLOAT:
+		case UT_MATRIX:
+		case UT_SAMPLER:
+			m_count = 1;
+			break;
+		case UT_VEC2:
+			m_count = 2;
+			break;
+		case UT_VEC3:
+			m_count = 3;
+			break;
+		case UT_VEC4:
+			m_count = 4;
+			break;
+		default:
+			m_count = 1;
+			break;
 	}
 }
 
@@ -2987,8 +2772,7 @@ void uniform::update()
 	hlsl_options *options = shadersys->options;
 	renderer *d3d = shadersys->d3d;
 
-
-	switch(m_id)
+	switch (m_id)
 	{
 		case CU_SCREEN_DIMS:
 		{
@@ -3225,7 +3009,7 @@ void uniform::set(texture *tex)
 
 void uniform::upload()
 {
-	switch(m_type)
+	switch (m_type)
 	{
 		case UT_INT:
 			m_shader->set_int(m_handle, m_ival);
@@ -3247,6 +3031,7 @@ void uniform::upload()
 	}
 }
 
+
 //============================================================
 //  effect functions
 //============================================================
@@ -3267,9 +3052,9 @@ effect::effect(shaders *shadersys, device *dev, const char *name, const char *pa
 	TCHAR *effect_name = tstring_from_utf8(name_cstr);
 
 	HRESULT hr = (*g_load_effect)(device, effect_name, NULL, NULL, 0, NULL, &m_effect, &buffer_errors);
-	if(FAILED(hr))
+	if (FAILED(hr))
 	{
-		if(buffer_errors != NULL)
+		if (buffer_errors != NULL)
 		{
 			LPVOID compile_errors = buffer_errors->GetBufferPointer();
 			printf("Unable to compile shader: %s\n", (const char*)compile_errors); fflush(stdout);
@@ -3360,13 +3145,21 @@ void effect::set_vector(D3DXHANDLE param, int count, float *vector)
 {
 	static D3DXVECTOR4 out_vector;
 	if (count > 0)
+	{
 		out_vector.x = vector[0];
+	}
 	if (count > 1)
+	{
 		out_vector.y = vector[1];
+	}
 	if (count > 2)
+	{
 		out_vector.z = vector[2];
+	}
 	if (count > 3)
+	{
 		out_vector.w = vector[3];
+	}
 	m_effect->SetVector(param, &out_vector);
 }
 
@@ -3407,6 +3200,7 @@ ULONG effect::release()
 
 };
 
+
 //============================================================
 //  get_slider_list
 //============================================================
@@ -3415,7 +3209,6 @@ void *windows_osd_interface::get_slider_list()
 {
 	return (void*)g_slider_list;
 }
-
 
 
 // NOTE: The function below is taken directly from src/emu/video.c and should likely be moved into a global helper function.
@@ -3433,13 +3226,17 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 	const char *snapname = templ ? templ : d3d->window().machine().options().snap_name();
 
 	if (snapname == NULL || snapname[0] == 0)
+	{
 		snapname = "%g/%i";
+	}
 	std::string snapstr(snapname);
 
 	// strip any extension in the provided name
 	int index = snapstr.find_last_of('.');
 	if (index != -1)
+	{
 		snapstr.substr(0, index);
+	}
 
 	// handle %d in the template (for image devices)
 	std::string snapdev("%d_");
@@ -3449,7 +3246,9 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 	{
 		// if more %d are found, revert to default and ignore them all
 		if (snapstr.find(snapdev, pos + 3) != -1)
+		{
 			snapstr.assign("%g/%i");
+		}
 		// else if there is a single %d, try to create the correct snapname
 		else
 		{
@@ -3461,16 +3260,26 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 			int end = -1;
 
 			if ((end1 != -1) && (end2 != -1))
+			{
 				end = MIN(end1, end2);
+			}
 			else if (end1 != -1)
+			{
 				end = end1;
+			}
 			else if (end2 != -1)
+			{
 				end = end2;
+			}
 			else
+			{
 				end = snapstr.length();
+			}
 
 			if (end - pos < 3)
+			{
 				fatalerror("Something very wrong is going on!!!\n");
+			}
 
 			// copy the device name to a string
 			std::string snapdevname;
@@ -3504,7 +3313,9 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 
 			// or fallback to default
 			if (name_found == 0)
+			{
 				snapstr.assign("%g/%i");
+			}
 		}
 	}
 
@@ -3519,7 +3330,9 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 	// determine if the template has an index; if not, we always use the same name
 	std::string fname;
 	if (snapstr.find("%i") == -1)
+	{
 		fname.assign(snapstr);
+	}
 
 	// otherwise, we scan for the next available filename
 	else
@@ -3536,7 +3349,9 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 			// try to open the file; stop when we fail
 			file_error filerr = file.open(fname.c_str());
 			if (filerr != FILERR_NONE)
+			{
 				break;
+			}
 		}
 	}
 

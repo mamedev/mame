@@ -314,8 +314,7 @@ public:
 	};
 
 private:
-	void                    blit(surface *dst, texture *src, surface *new_dst,
-									D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
+	void                    blit(surface *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
 	void                    enumerate_screens();
 
 	void                    end_avi_recording();
@@ -328,15 +327,15 @@ private:
 	void                    remove_cache_target(cache_target *cache);
 
 	// Shader passes
-	void                    ntsc_pass(render_target *rt, vec2f &texsize, vec2f &delta);
-	void                    color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
-	void                    prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims);
-	void                    deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
-	void                    defocus_pass(render_target *rt, vec2f &texsize);
-	void                    phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize, bool focus_enable);
-	void                    post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum, bool prepare_bloom);
-	void                    bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
-	void                    screen_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
+	void                    ntsc_pass(render_target *rt, poly_info *poly, int vertnum);
+	void                    color_convolution_pass(render_target *rt, poly_info *poly, int vertnum);
+	void                    prescale_pass(render_target *rt, poly_info *poly, int vertnum);
+	void                    deconverge_pass(render_target *rt, poly_info *poly, int vertnum);
+	void                    defocus_pass(render_target *rt, poly_info *poly, int vertnum);
+	void                    phosphor_pass(render_target *rt, cache_target *ct, poly_info *poly, int vertnum);
+	void                    post_pass(render_target *rt, poly_info *poly, int vertnum, bool prepare_bloom);
+	void                    bloom_pass(render_target *rt, poly_info *poly, int vertnum);
+	void                    screen_pass(render_target *rt, poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
 
