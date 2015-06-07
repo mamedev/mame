@@ -30,7 +30,7 @@ ui_menu_custom_filter::~ui_menu_custom_filter()
 	if (single_menu)
 		ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
 
-	save_custom_filters();
+	save_custom_filters(machine());
 }
 
 //-------------------------------------------------
@@ -60,7 +60,6 @@ void ui_menu_custom_filter::handle()
 				{
 					custfltr::numother++;
 					custfltr::other[custfltr::numother] = FILTER_UNAVAILABLE + 1;
-					//changed = true;
 					added = true;
 				}
 				break;
