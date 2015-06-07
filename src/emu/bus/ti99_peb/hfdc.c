@@ -510,7 +510,7 @@ void myarc_hfdc_device::floppy_index_callback(floppy_image_device *floppy, int s
 */
 void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, int state)
 {
-	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD index pulse\n", tag());
+	if (TRACE_LINES) if (state==1) logerror("%s: HD index pulse\n", tag());
 	set_bits(m_status_latch, HDC_DS_INDEX, (state==ASSERT_LINE));
 	signal_drive_status();
 }
@@ -520,7 +520,7 @@ void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, i
 */
 void myarc_hfdc_device::harddisk_ready_callback(mfm_harddisk_device *harddisk, int state)
 {
-	/* if (TRACE_LINES) */ logerror("%s: HD READY = %d\n", tag(), state);
+	if (TRACE_LINES) logerror("%s: HD READY = %d\n", tag(), state);
 	set_bits(m_status_latch, HDC_DS_READY, (state==ASSERT_LINE));
 	signal_drive_status();
 }
@@ -530,7 +530,7 @@ void myarc_hfdc_device::harddisk_ready_callback(mfm_harddisk_device *harddisk, i
 */
 void myarc_hfdc_device::harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state)
 {
-	/* if (TRACE_LINES) */ logerror("%s: HD seek complete = %d\n", tag(), state);
+	if (TRACE_LINES) logerror("%s: HD seek complete = %d\n", tag(), state);
 	set_bits(m_status_latch, HDC_DS_SKCOM, (state==ASSERT_LINE));
 	signal_drive_status();
 }
@@ -1005,8 +1005,8 @@ static SLOT_INTERFACE_START( hfdc_floppies )
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( hfdc_harddisks )
-	SLOT_INTERFACE( "generic", MFM_HD_GENERIC )     // Generic high-level emulation
-//  SLOT_INTERFACE( "seagatemfm", MFM_HD_SEAGATE )        // Seagate ST-225 and others
+	SLOT_INTERFACE( "generic", MFMHD_GENERIC )     // Generic high-level emulation
+	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 and others
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
@@ -1024,9 +1024,9 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_FLOPPY_DRIVE_ADD("f4", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
 
 	// NB: Hard disks don't go without image (other than floppy drives)
-	MCFG_MFM_HARDDISK_ADD("h1", hfdc_harddisks, NULL, MFM_BYTE)
-	MCFG_MFM_HARDDISK_ADD("h2", hfdc_harddisks, NULL, MFM_BYTE)
-	MCFG_MFM_HARDDISK_ADD("h3", hfdc_harddisks, NULL, MFM_BYTE)
+	MCFG_MFM_HARDDISK_CONN_ADD("h1", hfdc_harddisks, NULL, MFM_BYTE, 3000, 20)
+	MCFG_MFM_HARDDISK_CONN_ADD("h2", hfdc_harddisks, NULL, MFM_BYTE, 2000, 20)
+	MCFG_MFM_HARDDISK_CONN_ADD("h3", hfdc_harddisks, NULL, MFM_BYTE, 2000, 20)
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour

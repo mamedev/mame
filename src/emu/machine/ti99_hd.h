@@ -44,7 +44,7 @@ class mfmhd_trackimage_cache
 public:
 	mfmhd_trackimage_cache();
 	~mfmhd_trackimage_cache();
-	void init(chd_file* chdfile, const char* tag, int trackslots, mfmhd_enc_t encoding);
+	void init(chd_file* chdfile, const char* tag, int maxcyl, int maxhead, int trackslots, mfmhd_enc_t encoding);
 	UINT16* get_trackimage(int cylinder, int head);
 
 private:
@@ -84,7 +84,11 @@ public:
 	void setup_ready_cb(ready_cb cb);
 	void setup_seek_complete_cb(seek_complete_cb cb);
 
+	// Configuration
 	void set_encoding(mfmhd_enc_t encoding) { m_encoding = encoding; }
+	void set_spinup_time(int spinupms) { m_spinupms = spinupms; }
+	void set_cache_size(int tracks) { m_cachelines = tracks;    }
+
 	mfmhd_enc_t get_encoding() { return m_encoding; }
 
 	// Active low lines. We're using ASSERT=0 / CLEAR=1
@@ -113,13 +117,21 @@ protected:
 	void                device_reset();
 	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	virtual void        setup_characteristics() = 0;
+	std::string         tts(const attotime &t);
+
 	emu_timer           *m_index_timer, *m_spinup_timer, *m_seek_timer;
 	index_pulse_cb      m_index_pulse_cb;
 	ready_cb            m_ready_cb;
 	seek_complete_cb    m_seek_complete_cb;
 
+	int m_max_cylinder;
+	int m_max_heads;
+
 private:
 	mfmhd_enc_t m_encoding;
+	int         m_spinupms;
+	int         m_cachelines;
 	bool        m_ready;
 	int         m_current_cylinder;
 	int         m_current_head;
@@ -129,6 +141,7 @@ private:
 	bool        m_seek_inward;
 	//bool      m_seeking;
 	bool        m_autotruncation;
+	bool        m_recalibrated;
 	line_state  m_step_line;    // keep the last state
 
 	attotime    m_spinup_time;
@@ -139,15 +152,30 @@ private:
 
 	void        prepare_track(int cylinder, int head);
 	void        head_move();
+	void        recalibrate();
 };
 
 class mfm_hd_generic_device : public mfm_harddisk_device
 {
 public:
 	mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	void setup_characteristics();
 };
 
-extern const device_type MFM_HD_GENERIC;
+extern const device_type MFMHD_GENERIC;
+
+class mfm_hd_st225_device : public mfm_harddisk_device
+{
+public:
+	mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	void setup_characteristics();
+};
+
+extern const device_type MFMHD_ST225;
 
 /* Connector for a MFM hard disk. See also floppy.c */
 class mfm_harddisk_connector : public device_t,
@@ -159,7 +187,7 @@ public:
 
 	mfm_harddisk_device *get_device();
 
-	void set_encoding(mfmhd_enc_t encoding) { m_encoding = encoding; }
+	void configure(mfmhd_enc_t encoding, int spinupms, int cache);
 
 protected:
 	void device_start() { };
@@ -167,14 +195,28 @@ protected:
 
 private:
 	mfmhd_enc_t m_encoding;
+	int m_spinupms;
+	int m_cachesize;
 };
 
 extern const device_type MFM_HD_CONNECTOR;
 
-#define MCFG_MFM_HARDDISK_ADD(_tag, _slot_intf, _def_slot, _enc)  \
+/*
+    Add a harddisk connector.
+    Parameters:
+    _tag = Tag of the connector
+    _slot_intf = Selection of hard drives
+    _def_slot = Default hard drive
+    _enc = Encoding (see comments in ti99_hd.c)
+    _spinupms = Spinup time in milliseconds (some configurations assume that the
+    user has turned on the hard disk before turning on the system. We cannot
+    emulate this, so we allow for shorter times)
+    _cache = number of cached MFM tracks
+*/
+#define MCFG_MFM_HARDDISK_CONN_ADD(_tag, _slot_intf, _def_slot, _enc, _spinupms, _cache)  \
 	MCFG_DEVICE_ADD(_tag, MFM_HD_CONNECTOR, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<mfm_harddisk_connector *>(device)->set_encoding(_enc);
+	static_cast<mfm_harddisk_connector *>(device)->configure(_enc, _spinupms, _cache);
 
 // ===========================================================================
 // Legacy implementation
