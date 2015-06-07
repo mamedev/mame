@@ -39,16 +39,20 @@
 		NET_CONNECT(_name, A, _A)                                                   \
 		NET_CONNECT(_name, B, _B)
 
+#if (USE_TRUTHTABLE)
+#include "nld_truthtable.h"
+NETLIB_TRUTHTABLE(7486, 2, 1, 0);
+#else
 NETLIB_DEVICE(7486,
 public:
-		netlist_logic_input_t m_A;
-		netlist_logic_input_t m_B;
-		netlist_logic_output_t m_Q;
+		netlist_logic_input_t m_I[2];
+		netlist_logic_output_t m_Q[1];
 
 		ATTR_HOT void inc_active();
 		ATTR_HOT void dec_active();
 		int m_active;
 );
+#endif
 
 #define TTL_7486_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7486_dip, _name)

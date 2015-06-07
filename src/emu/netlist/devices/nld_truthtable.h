@@ -121,7 +121,7 @@ public:
 		for (unsigned i=0; i < m_NI; i++)
 		{
 			inout[i] = inout[i].trim();
-			register_input(inout[i], m_i[i]);
+			register_input(inout[i], m_I[i]);
 		}
 		for (unsigned i=0; i < m_NO; i++)
 		{
@@ -138,7 +138,7 @@ public:
 			if (idx>=0)
 			{
 				//printf("connecting %s %d\n", out[i].cstr(), idx);
-				connect(m_Q[i], m_i[idx]);
+				connect(m_Q[i], m_I[idx]);
 				// disable ignore for this inputs altogether.
 				// FIXME: This shouldn't be necessary
 				disabled_ignore |= (1<<idx);
@@ -167,7 +167,7 @@ public:
 		m_active = 0;
 		m_ign = 0;
 		for (unsigned i = 0; i < m_NI; i++)
-			m_i[i].activate();
+			m_I[i].activate();
 		for (unsigned i=0; i<m_NO;i++)
 			if (this->m_Q[i].net().num_cons()>0)
 				m_active++;
@@ -183,26 +183,27 @@ public:
 		for (unsigned i = 0; i < m_NI; i++)
 		{
 			if (!doOUT || (m_ign & (1<<i)))
-				m_i[i].activate();
+				m_I[i].activate();
 		}
 		for (unsigned i = 0; i < m_NI; i++)
 		{
-			state |= (INPLOGIC(m_i[i]) << i);
+			state |= (INPLOGIC(m_I[i]) << i);
 			if (!doOUT)
-				if (this->m_i[i].net().time() > mt)
-					mt = this->m_i[i].net().time();
+				if (this->m_I[i].net().time() > mt)
+					mt = this->m_I[i].net().time();
 		}
 
 		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);
-		const UINT32 out = m_ttp->m_outs[nstate] & ((1 << m_NO) - 1);
-		m_ign = m_ttp->m_outs[nstate] >> m_NO;
+		const UINT32 outstate = m_ttp->m_outs[nstate];
+		const UINT32 out = outstate & ((1 << m_NO) - 1);
+		m_ign = outstate >> m_NO;
 		if (has_state)
 			m_last_state = (state << m_NO) | out;
 
 #if 0
 		for (int i = 0; i < m_NI; i++)
 			if (m_ign & (1 << i))
-				m_i[i].inactivate();
+				m_I[i].inactivate();
 #endif
 		const UINT32 timebase = nstate * m_NO;
 		if (doOUT)
@@ -214,10 +215,12 @@ public:
 			for (unsigned i = 0; i < m_NO; i++)
 				m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 
-		for (unsigned i = 0; i < m_NI; i++)
-			if (m_ign & (1 << i))
-				m_i[i].inactivate();
-
+		if (m_NI > 1 || has_state)
+		{
+			for (unsigned i = 0; i < m_NI; i++)
+				if (m_ign & (1 << i))
+					m_I[i].inactivate();
+		}
 	}
 
 	ATTR_HOT void update()
@@ -238,16 +241,24 @@ public:
 	ATTR_HOT void dec_active()
 	{
 		nl_assert(netlist().use_deactivate());
+		/* FIXME:
+		 * Based on current measurements there is no point to disable
+		 * 1 input devices. This should actually be a parameter so that we
+		 * can decide for each individual gate whether it is benefitial to
+		 * ignore deactivation.
+		 */
+		if (m_NI < 2)
+			return;
 		if (has_state == 0)
 			if (--m_active == 0)
 			{
 				for (unsigned i = 0; i< m_NI; i++)
-					m_i[i].inactivate();
+					m_I[i].inactivate();
 				m_ign = (1<<m_NI)-1;
 			}
 	}
 
-	netlist_logic_input_t m_i[m_NI];
+	netlist_logic_input_t m_I[m_NI];
 	netlist_logic_output_t m_Q[m_NO];
 
 private:

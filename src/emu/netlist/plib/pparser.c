@@ -97,6 +97,16 @@ pstring ptokenizer::get_identifier()
 	return tok.str();
 }
 
+pstring ptokenizer::get_identifier_or_number()
+{
+	token_t tok = get_token();
+	if (!(tok.is_type(IDENTIFIER) || tok.is_type(NUMBER)))
+	{
+		error("Error: expected an identifier, got <%s>\n", tok.str().cstr());
+	}
+	return tok.str();
+}
+
 double ptokenizer::get_number_double()
 {
 	token_t tok = get_token();

@@ -63,7 +63,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)                      
 #define INCLUDE(_name)                                                              \
 		setup.include(# _name);
 
-#define SUBMODEL(_name, _model)                                                     \
+#define SUBMODEL(_model, _name)                                                     \
 		setup.namespace_push(# _name);                                              \
 		NETLIST_NAME(_model)(setup);                                                \
 		setup.namespace_pop();
