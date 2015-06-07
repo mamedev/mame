@@ -506,9 +506,6 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"X64_WINDOWS_ABI",
 		}
-		linkoptions {
-			"-Wl,--image-base=0x100000000",
-		}
 	configuration { }
 end
 
