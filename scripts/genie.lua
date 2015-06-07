@@ -506,15 +506,11 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"X64_WINDOWS_ABI",
 		}
+		linkoptions {
+			"-Wl,--image-base=0x100000000",
+		}
 	configuration { }
 end
-
-
-configuration { "x64", "gmake" }
-	linkoptions {
-		"-Wl,--image-base=0x100000000",
-	}
-configuration { }
 
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
