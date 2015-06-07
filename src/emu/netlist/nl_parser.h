@@ -25,6 +25,7 @@ public:
 	void net_alias();
 	void netdev_param();
 	void net_c();
+	void frontier();
 	void device(const pstring &dev_type);
 	void netdev_netlist_start();
 	void netdev_netlist_end();
@@ -48,6 +49,7 @@ private:
 	token_id_t m_tok_comma;
 	token_id_t m_tok_ALIAS;
 	token_id_t m_tok_NET_C;
+	token_id_t m_tok_FRONTIER;
 	token_id_t m_tok_PARAM;
 	token_id_t m_tok_NET_MODEL;
 	token_id_t m_tok_NETLIST_START;

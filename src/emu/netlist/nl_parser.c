@@ -49,6 +49,7 @@ bool netlist_parser::parse(const char *buf, const pstring nlname)
 
 	m_tok_ALIAS = register_token("ALIAS");
 	m_tok_NET_C = register_token("NET_C");
+	m_tok_FRONTIER = register_token("OPTIMIZE_FRONTIER");
 	m_tok_PARAM = register_token("PARAM");
 	m_tok_NET_MODEL = register_token("NET_MODEL");
 	m_tok_INCLUDE = register_token("INCLUDE");
@@ -117,6 +118,8 @@ void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			net_alias();
 		else if (token.is(m_tok_NET_C))
 			net_c();
+		else if (token.is(m_tok_FRONTIER))
+			frontier();
 		else if (token.is(m_tok_PARAM))
 			netdev_param();
 		else if (token.is(m_tok_NET_MODEL))
@@ -215,6 +218,19 @@ void netlist_parser::net_submodel()
 	m_setup.namespace_push(name);
 	m_setup.include(model);
 	m_setup.namespace_pop();
+}
+
+void netlist_parser::frontier()
+{
+	// don't do much
+	pstring attachat = get_identifier();
+	require_token(m_tok_comma);
+	double r_IN = eval_param(get_token());
+	require_token(m_tok_comma);
+	double r_OUT = eval_param(get_token());
+	require_token(m_tok_param_right);
+
+	m_setup.register_frontier(attachat, r_IN, r_OUT);
 }
 
 void netlist_parser::net_include()

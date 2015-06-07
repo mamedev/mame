@@ -5,7 +5,29 @@
  *
  */
 
+#include <algorithm>
+
 #include "nl_convert.h"
+
+template<typename Class>
+static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
+{
+	plist_t<int> ret(sl.size());
+	for (int i=0; i<sl.size(); i++)
+		ret[i] = i;
+
+	for(int i=0; i < sl.size()-1;i++)
+    {
+        for(int j=i+1; j < sl.size(); j++)
+        {
+            if(sl[ret[i]]->name() > sl[ret[j]]->name())
+            {
+            	std::swap(ret[i], ret[j]);
+            }
+        }
+    }
+	return ret;
+}
 
 /*-------------------------------------------------
     convert - convert a spice netlist
@@ -72,17 +94,20 @@ void nl_convert_base_t::dump_nl()
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
+	plist_t<int> sorted = bubble(m_devs);
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
-		if (m_devs[i]->has_value())
-			out("%s(%s, %s)\n", m_devs[i]->type().cstr(),
-					m_devs[i]->name().cstr(), get_nl_val(m_devs[i]->value()).cstr());
-		else if (m_devs[i]->has_model())
-			out("%s(%s, \"%s\")\n", m_devs[i]->type().cstr(),
-					m_devs[i]->name().cstr(), m_devs[i]->model().cstr());
+		std::size_t j = sorted[i];
+
+		if (m_devs[j]->has_value())
+			out("%s(%s, %s)\n", m_devs[j]->type().cstr(),
+					m_devs[j]->name().cstr(), get_nl_val(m_devs[j]->value()).cstr());
+		else if (m_devs[j]->has_model())
+			out("%s(%s, \"%s\")\n", m_devs[j]->type().cstr(),
+					m_devs[j]->name().cstr(), m_devs[j]->model().cstr());
 		else
-			out("%s(%s)\n", m_devs[i]->type().cstr(),
-					m_devs[i]->name().cstr());
+			out("%s(%s)\n", m_devs[j]->type().cstr(),
+					m_devs[j]->name().cstr());
 	}
 	// print nets
 	for (std::size_t i=0; i<m_nets.size(); i++)
