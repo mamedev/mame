@@ -186,6 +186,7 @@ private:
 	bool m_xfer_pending;
 	UINT16 m_dma_value;
 	int m_dma_state;
+	bool m_drq;
 
 	// dma state
 	enum
