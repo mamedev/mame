@@ -24,7 +24,7 @@ enum
 };
 
 // Use old macro style or newer SSE2 optimized functions
-#define USE_OLD_RASTER  0
+#define USE_OLD_RASTER  1
 
 /* maximum number of TMUs */
 #define MAX_TMU                 2
