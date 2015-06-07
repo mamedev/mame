@@ -923,7 +923,6 @@ end
 			end
 			if (version >= 30400) then
 				buildoptions {
-					"-Wno-inline-new-delete",
 					"-Wno-constant-logical-operand",
 				}
 			end

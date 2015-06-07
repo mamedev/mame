@@ -31,6 +31,7 @@
 /* Some optimizations/warnings cleanups for GCC */
 #if defined(__GNUC__) && (__GNUC__ >= 3)
 #define ATTR_UNUSED             __attribute__((__unused__))
+#define ATTR_USED               __attribute__((__used__))
 #define ATTR_NORETURN           __attribute__((noreturn))
 #define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
 #define ATTR_MALLOC             __attribute__((malloc))
