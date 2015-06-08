@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+	// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Robbbert
 #pragma once
 
@@ -59,6 +59,8 @@ public:
 			m_p_paletteram(*this, "p_paletteram"),
 			m_palette(*this, "palette")
 	{ }
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	virtual void machine_start();
 

@@ -74,6 +74,8 @@ public:
 			m_video_ram(*this, "video_ram")
 	{ }
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<am9517a_device> m_dmac;

@@ -1,8 +1,8 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese, Dirk Best
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
-    ACT Apricot F1 series
+    ACT Apricot FP
 
     preliminary driver by Angelo Salese
 
@@ -25,6 +25,7 @@
 */
 
 #include "includes/apricotp.h"
+#include "formats/apridisk.h"
 #include "apricotp.lh"
 
 
@@ -211,10 +212,7 @@ void fp_state::lat_ls259_w(offs_t offset, int state)
 			m_fdc->set_floppy(m_floppy);
 
 			if (m_floppy)
-			{
-				m_floppy->set_rpm(600);
 				m_floppy->mon_w(0);
-			}
 		}
 		break;
 	}
@@ -399,20 +397,6 @@ INPUT_PORTS_END
 
 */
 
-static SLOT_INTERFACE_START( fp_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // Sony OA-D32W (600 rpm)
-SLOT_INTERFACE_END
-/*
-static LEGACY_FLOPPY_OPTIONS_START( act )
-    LEGACY_FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([2])
-        TRACKS([80])
-        SECTORS([16])
-        SECTOR_LENGTH([256])
-        FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-*/
-
 WRITE_LINE_MEMBER( fp_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
@@ -466,6 +450,15 @@ void fp_state::machine_reset()
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
+
+FLOPPY_FORMATS_MEMBER( fp_state::floppy_formats )
+	FLOPPY_APRIDISK_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( fp_floppies )
+	SLOT_INTERFACE("d32w", SONY_OA_D32W)
+SLOT_INTERFACE_END
+
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( fp )
@@ -535,8 +528,8 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq1_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", fp_floppies, NULL,   floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", fp_floppies, "d32w", fp_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", fp_floppies, NULL,   fp_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fp_state, write_centronics_busy))

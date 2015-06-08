@@ -25,6 +25,7 @@
 */
 
 #include "includes/apricotf.h"
+#include "formats/apridisk.h"
 
 
 
@@ -250,6 +251,10 @@ WRITE_LINE_MEMBER( f1_state::ctc_z2_w )
 //  floppy
 //-------------------------------------------------
 
+FLOPPY_FORMATS_MEMBER( f1_state::floppy_formats )
+	FLOPPY_APRIDISK_FORMAT
+FLOPPY_FORMATS_END
+
 static SLOT_INTERFACE_START( apricotf_floppies )
 	SLOT_INTERFACE( "d31v", SONY_OA_D31V )
 	SLOT_INTERFACE( "d32w", SONY_OA_D32W )
@@ -304,8 +309,8 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_TEST))
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats)
 MACHINE_CONFIG_END
 
 
