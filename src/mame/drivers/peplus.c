@@ -1619,7 +1619,7 @@ ROM_START( pepp0021 ) /* Normal board : Standard Draw Poker (PP0021) */
 REQUIRES Progressive link which is not currently supported
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0021_723-703.u68",   0x00000, 0x10000, CRC(58f2a68b) SHA1(72c0a29016b17f7e308a9e9b2d724771b5e26560) ) /* Game Version: 520, Library Version: 516, Video Lib Ver: 516 */
+	ROM_LOAD( "pp0021_723-703.u68",   0x00000, 0x10000, CRC(58f2a68b) SHA1(72c0a29016b17f7e308a9e9b2d724771b5e26560) ) /* Game Version: 723, Library Version: 703*/
 	
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
@@ -2303,7 +2303,7 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0085 ) /* Normal board : Joker Poker (Two Pair or Better) - Double Up always enabled */
+ROM_START( pepp0085 ) /* Normal board : Joker Poker (Two Pair or Better) (PP0085) - Double Up always enabled */
 /*
                                        w/J     w/oJ
 PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
@@ -2982,7 +2982,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0197a ) /* Normal board : Standard Draw Poker (PP0197) - 10/23/95   @ IGT  L95-2452 */
+ROM_START( pepp0197a ) /* Normal board : Standard Draw Poker (PP0197) - 07/29/96   @ IGT  L96-1219 */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -4100,7 +4100,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0467 ) /* Normal board : Uknown Bonus Poker (PP0455) */
+ROM_START( pepp0467 ) /* Normal board : Uknown Bonus Poker (PP0467) */
 /*
 PayTable   Js+  2P  3K  STR  FL  FH  4K  ?? SF  RF  (Bonus)
 -----------------------------------------------------------
@@ -7448,7 +7448,7 @@ ROM_START( pex0578p ) /* Superboard : Standard Draw Poker (X000578P+XP000038) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
-   BA       1    2    3    4    5   8  25  50 250   1000
+   BA       1    2    3    4    5   8  25  50 250    800
   % Range: 93.8-95.8%  Optimum: 97.8%  Hit Frequency: 45.3%
      Programs Available: X000578P
 */
@@ -9157,6 +9157,9 @@ ROM_START( pex2412p ) /* Superboard : Standard Draw with 5 decks (X002412P+XP000
 /*
   % Range: 93.7-95.7%  Optimum: 97.7%  Hit Frequency: 44.6%
      Programs Available: X002412P
+
+NOTE: This version uses 5 separate decks of cards, one deck for each HOLD button.
+      So things like a suited 5K are possible. Sadly, there's no paytable displayed
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000096.u67",   0x00000, 0x10000, CRC(5aca14e1) SHA1(13bcb8069f9d704983632bb60db119f7308f9d80) )
