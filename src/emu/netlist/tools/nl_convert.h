@@ -12,6 +12,7 @@
 
 //#include <cstddef>
 //#include <cstdarg>
+#include <cstring>
 
 #include "plib/pstring.h"
 #include "plib/plists.h"
