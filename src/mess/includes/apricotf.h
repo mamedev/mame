@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/apricotkb.h"
 #include "machine/buffer.h"
