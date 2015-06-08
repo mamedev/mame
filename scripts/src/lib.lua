@@ -167,8 +167,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/asst128_dsk.h",
 		MAME_DIR .. "src/lib/formats/atari_dsk.c",
 		MAME_DIR .. "src/lib/formats/atari_dsk.h",
-		MAME_DIR .. "src/lib/formats/atarist_dsk.c",
-		MAME_DIR .. "src/lib/formats/atarist_dsk.h",
 		MAME_DIR .. "src/lib/formats/atom_tap.c",
 		MAME_DIR .. "src/lib/formats/atom_tap.h",
 		MAME_DIR .. "src/lib/formats/bbc_dsk.c",
