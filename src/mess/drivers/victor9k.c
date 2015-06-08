@@ -10,7 +10,6 @@
 
     TODO:
 
-    - keyboard
     - expansion bus
         - Z80 card
         - Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
@@ -25,6 +24,14 @@
 */
 
 #include "includes/victor9k.h"
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
 
 
 
@@ -272,6 +279,13 @@ WRITE8_MEMBER( victor9k_state::via2_pa_w )
 	*/
 }
 
+void victor9k_state::update_kback()
+{
+	int kback = !(!(m_kbrdy && !m_via2_irq) && !(m_kbackctl && m_via2_irq));
+
+	m_kb->kback_w(kback);
+}
+
 WRITE8_MEMBER( victor9k_state::via2_pb_w )
 {
 	/*
@@ -290,13 +304,22 @@ WRITE8_MEMBER( victor9k_state::via2_pb_w )
 	*/
 
 	// keyboard acknowledge
-	m_kb->kback_w(BIT(data, 1));
+	m_kbackctl = BIT(data, 1);
+	update_kback();
 
 	// brightness
 	m_brt = (data >> 2) & 0x07;
 
 	// contrast
 	m_cont = data >> 5;
+}
+
+WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
+{
+	m_via2_irq = state;
+
+	m_pic->ir6_w(m_via2_irq);
+	update_kback();
 }
 
 
@@ -360,14 +383,17 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 
 WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 {
-	//logerror("KBRDY %u\n", state);
+	if (LOG) logerror("KBRDY %u\n", state);
 
 	m_via2->write_cb1(state);
+
+	m_kbrdy = state;
+	update_kback();
 }
 
 WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
 {
-	//logerror("KBDATA %u\n", state);
+	if (LOG) logerror("KBDATA %u\n", state);
 
 	m_via2->write_cb2(state);
 	m_via2->write_pa6(state);
@@ -392,9 +418,12 @@ void victor9k_state::machine_start()
 	save_item(NAME(m_brt));
 	save_item(NAME(m_cont));
 	save_item(NAME(m_via1_irq));
+	save_item(NAME(m_via2_irq));
 	save_item(NAME(m_via3_irq));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_ssda_irq));
+	save_item(NAME(m_kbrdy));
+	save_item(NAME(m_kbackctl));
 
 	// patch out SCP self test
 	m_rom->base()[0x11ab] = 0xc3;
@@ -499,7 +528,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via2_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via2_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir6_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via2_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_3_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via3_pb_w))
