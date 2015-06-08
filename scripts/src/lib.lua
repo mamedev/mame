@@ -404,8 +404,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/vt_cas.h",
 		MAME_DIR .. "src/lib/formats/vt_dsk.c",
 		MAME_DIR .. "src/lib/formats/vt_dsk.h",
-		MAME_DIR .. "src/lib/formats/vtech1_dsk.c",
-		MAME_DIR .. "src/lib/formats/vtech1_dsk.h",
 		MAME_DIR .. "src/lib/formats/wavfile.c",
 		MAME_DIR .. "src/lib/formats/wavfile.h",
 		MAME_DIR .. "src/lib/formats/wd177x_dsk.c",
