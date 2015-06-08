@@ -35,7 +35,7 @@
  TM-040               Outlaw (1976)                                             A003213                            YES       003323 - ROM (8205 @ J4)
  TM-007               Pin Pong (1974)                                           A001660                            NO
  TM-013               Pong/Super Pong (1972)                                    A001433,A000423                    NO
- TM-015               Pong Cocktail/Coup Franc (1974)                           ???????                                   NO
+ TM-015               Pong Cocktail/Coup Franc (1974)                           ???????                            NO
  TM-014               Pong Doubles/Coupe Davis (1974)                           A000785                            NO
  TM-018               Pursuit (1975)                                            K8P-B 90128                        NO
  TM-012,022,034       Quadrapong/Elimination (1974)                             A000845                            NO
