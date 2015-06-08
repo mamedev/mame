@@ -4112,7 +4112,7 @@ DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
 }
 
 //    YEAR, NAME,        PARENT,   MACHINE,  INPUT,     INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state,    cuebrick, ROT0,   "Konami", "Cue Brick (World version D)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state,    cuebrick, ROT0,   "Konami", "Cue Brick (World, version D)", GAME_SUPPORTS_SAVE )
 
 GAME( 1989, mia,         0,        mia,      mia,       tmnt_state,    mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version T)", GAME_SUPPORTS_SAVE )
 GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state,    mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version S)", GAME_SUPPORTS_SAVE )
@@ -4138,9 +4138,9 @@ GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  driver_device, 0,       
 GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght,  driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon,    driver_device, 0,        ROT90,  "Konami", "Trigon (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Bells & Whistles (World, Version L)", GAME_SUPPORTS_SAVE )
-GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Bells & Whistles (Asia, Version M)", GAME_SUPPORTS_SAVE )
-GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Detana!! Twin Bee (Japan ver. J)", GAME_SUPPORTS_SAVE )
+GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Bells & Whistles (World, version L)", GAME_SUPPORTS_SAVE )
+GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Bells & Whistles (Asia, version M)", GAME_SUPPORTS_SAVE )
+GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Detana!! Twin Bee (Japan, version J)", GAME_SUPPORTS_SAVE )
 
 GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  driver_device, 0,        ROT0,   "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, driver_device, 0,        ROT0,   "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
