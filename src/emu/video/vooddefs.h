@@ -2231,7 +2231,7 @@ ATTR_FORCE_INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 
 
 #else
 
-ATTR_FORCE_INLINE rgb_union clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
+ATTR_FORCE_INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
 {
 	rgb_union result;
 	INT16 r, g, b, a;
@@ -2277,7 +2277,7 @@ ATTR_FORCE_INLINE rgb_union clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT
 		result.rgb.b = (b < 0) ? 0 : (b > 0xff) ? 0xff : b;
 		result.rgb.a = (a < 0) ? 0 : (a > 0xff) ? 0xff : a;
 	}
-	return result;
+	return result.u;
 }
 
 #endif
