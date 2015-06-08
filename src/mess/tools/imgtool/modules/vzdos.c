@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Raphael Nabet
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /****************************************************************************
 
     vzdos.c
