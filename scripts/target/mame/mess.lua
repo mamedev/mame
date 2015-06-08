@@ -572,6 +572,7 @@ BUSES["ABCKB"] = true
 BUSES["ADAM"] = true
 BUSES["ADAMNET"] = true
 BUSES["APF"] = true
+BUSES["APRICOT_EXPANSION"] = true
 BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
 BUSES["BML3"] = true

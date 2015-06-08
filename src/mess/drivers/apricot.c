@@ -9,11 +9,8 @@
 
 ***************************************************************************/
 
-#include "bus/centronics/ctronics.h"
-#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
-#include "machine/ram.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -23,6 +20,9 @@
 #include "sound/sn76496.h"
 #include "imagedev/flopdrv.h"
 #include "formats/apridisk.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "bus/apricot/expansion.h"
 
 
 //**************************************************************************
@@ -35,7 +35,6 @@ public:
 	apricot_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	m_cpu(*this, "ic91"),
-	m_ram(*this, RAM_TAG),
 	m_iop(*this, "ic71"),
 	m_sn(*this, "ic7"),
 	m_crtc(*this, "ic30"),
@@ -89,7 +88,6 @@ protected:
 
 private:
 	required_device<i8086_cpu_device> m_cpu;
-	required_device<ram_device> m_ram;
 	required_device<i8089_device> m_iop;
 	required_device<sn76489_device> m_sn;
 	required_device<mc6845_device> m_crtc;
@@ -262,14 +260,13 @@ UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 
 
 MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 {
-	UINT8 *ram = m_ram->pointer();
 	const pen_t *pen = m_palette->pens();
 
 	for (int i = 0; i < x_count; i++)
 	{
 		UINT16 code = m_screen_buffer[(ma + i) & 0x7ff];
 		UINT16 offset = ((code & 0x7ff) << 5) | (ra << 1);
-		UINT16 data = ram[offset + 1] << 8 | ram[offset];
+		UINT16 data = m_cpu->space(AS_PROGRAM).read_word(offset);
 
 		if (m_video_mode)
 		{
@@ -302,9 +299,6 @@ MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 
 void apricot_state::machine_start()
 {
-	// install shared memory to the main cpu and the iop
-	m_cpu->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
-	m_iop->space(AS_PROGRAM).install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 }
 
 IRQ_CALLBACK_MEMBER( apricot_state::irq_callback )
@@ -322,8 +316,7 @@ IRQ_CALLBACK_MEMBER( apricot_state::irq_callback )
 //**************************************************************************
 
 static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
-//  AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("standard_ram")
-//  AM_RANGE(0x40000, 0xeffff) AM_RAMBANK("expansion_ram")
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_SHARE("screen_buffer")
 	AM_RANGE(0xfc000, 0xfffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
 ADDRESS_MAP_END
@@ -382,11 +375,6 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SOUND_ADD("ic7", SN76489, XTAL_4MHz / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256k")
-	MCFG_RAM_EXTRA_OPTIONS("384k,512k") // with 1 or 2 128k expansion boards
-
 	// devices
 	MCFG_DEVICE_ADD("ic17", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
@@ -441,6 +429,11 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("ic71", i8089_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats)
+
+	// expansion bus
+	MCFG_EXPANSION_ADD("exp", "ic91")
+	MCFG_EXPANSION_SLOT_ADD("exp:1", apricot_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apricotxi, apricot )
