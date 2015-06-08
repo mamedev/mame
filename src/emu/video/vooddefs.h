@@ -3159,7 +3159,7 @@ ATTR_FORCE_INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 f
 			/* if fog_mult is zero, we subtract the incoming color */
 			if (!FOGMODE_FOG_MULT(fogModeReg))
 			{
-				rgbint_sub(&tmpA, &tmpB);
+				rgbaint_sub(&tmpA, &tmpB);
 				//fog.rgb -= color.rgb;
 				//fr -= (RR);
 				//fg -= (GG);
@@ -3216,7 +3216,7 @@ ATTR_FORCE_INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 f
 			/* if fog_mult is 0, we add this to the original color */
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				rgbint_scale_immediate_add_and_clamp(&tmpA, fogblend, &tmpB);
+				rgbaint_scale_immediate_add_and_clamp(&tmpA, fogblend, &tmpB);
 				//color += fog;
 				//(RR) += fr;
 				//(GG) += fg;
@@ -4315,7 +4315,7 @@ ATTR_FORCE_INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32
 			sub_val.u &= 0x00ffffff;
 
 		rgba_to_rgbaint(&tmpB, (rgb_t) sub_val.u);
-		rgbint_sub(&tmpA, &tmpB);
+		rgbaint_sub(&tmpA, &tmpB);
 	}
 
 	/* blend RGB */
@@ -4569,8 +4569,10 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 			/* note that they set LOD min to 8 to "disable" a TMU */                \
 			if (TMUS >= 2 && v->tmu[1].lodmin < (8 << 8))                    {       \
 				INT32 tmp; \
+				const rgb_union texelZero = {0};  \
 				texel.u = genTexture(&v->tmu[1], dither4[x&3], TEXMODE1, v->tmu[1].lookup, extra->lodbase1, \
 															iters1, itert1, iterw1, tmp); \
+				texel.u = combineTexture(&v->tmu[1], TEXMODE1, texel, texelZero, tmp); \
 			} \
 			/* run the texture pipeline on TMU0 to produce a final */               \
 			/* result in texel */                                                   \
@@ -4659,7 +4661,7 @@ ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, const UINT8 ditherX, const UI
 		lod += ditherX << 4;
 	if (lod < (TT)->lodmin)
 		lod = (TT)->lodmin;
-	if (lod > (TT)->lodmax)
+	else if (lod > (TT)->lodmax)
 		lod = (TT)->lodmax;
 
 	/* now the LOD is in range; if we don't own this LOD, take the next one */
@@ -4845,7 +4847,7 @@ ATTR_FORCE_INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb
 			sub_val.u &= 0x00ffffff;
 
 		rgba_to_rgbaint(&tmpB, (rgb_t) sub_val.u);
-		rgbint_sub(&tmpA, &tmpB);
+		rgbaint_sub(&tmpA, &tmpB);
 	}
 
 	/* blend RGB */

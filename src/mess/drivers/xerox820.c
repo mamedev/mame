@@ -35,6 +35,15 @@
     Note:
     - MK-82 have same roms as original Big Board
     - MK-83 have 256K of RAM
+
+    8-inch formats
+    77 tracks, 1 head, 26 sectors, 128 bytes sector length, first sector id 1
+	77 tracks, 1 head, 26 sectors, 256 bytes sector length, first sector id 1
+
+	5.25-inch formats
+	40 tracks, 1 head, 18 sectors, 128 bytes sector length, first sector id 1
+	40 tracks, 2 heads, 18 sectors, 128 bytes sector length, first sector id 1
+
 */
 
 
@@ -491,34 +500,7 @@ void xerox820ii_state::machine_reset()
 
 	m_fdc->reset();
 }
-/*
-static LEGACY_FLOPPY_OPTIONS_START( xerox820 )
-    LEGACY_FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([1])
-        TRACKS([77])
-        SECTORS([26])
-        SECTOR_LENGTH([128])
-        FIRST_SECTOR_ID([1]))
-    LEGACY_FLOPPY_OPTION( ssdd8, "dsk", "8\" SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([1])
-        TRACKS([77])
-        SECTORS([26])
-        SECTOR_LENGTH([256])
-        FIRST_SECTOR_ID([1]))
-    LEGACY_FLOPPY_OPTION( sssd5, "dsk", "5.25\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([1])
-        TRACKS([40])
-        SECTORS([18])
-        SECTOR_LENGTH([128])
-        FIRST_SECTOR_ID([1]))
-    LEGACY_FLOPPY_OPTION( ssdd5, "dsk", "5.25\" SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([2])
-        TRACKS([40])
-        SECTORS([18])
-        SECTOR_LENGTH([128])
-        FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-*/
+
 
 /* F4 Character Displayer */
 static const gfx_layout xerox820_charlayout =

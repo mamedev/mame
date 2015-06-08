@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Dirk Best
+// copyright-holders:Dirk Best, Carl
 /***************************************************************************
 
     Siemens PC-D
@@ -436,9 +436,8 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 static SLOT_INTERFACE_START( pcd_floppies )
-	SLOT_INTERFACE("55f", TEAC_FD_55F)
-	SLOT_INTERFACE("55g", TEAC_FD_55G)
-	SLOT_INTERFACE("525dsqd", FLOPPY_525_QD) // the devices above cause a crash in floppy_image_format_t::generate_track_from_levels
+	SLOT_INTERFACE("55f", TEAC_FD_55F) // 80 tracks
+	SLOT_INTERFACE("55g", TEAC_FD_55G) // 77 tracks
 SLOT_INTERFACE_END
 
 FLOPPY_FORMATS_MEMBER( pcd_state::floppy_formats )
@@ -476,8 +475,8 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
 
 	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcd_floppies, "525dsqd", pcd_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcd_floppies, "525dsqd", pcd_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcd_floppies, "55f", pcd_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats)
 
 	// usart
 	MCFG_DEVICE_ADD("usart1", MC2661, XTAL_4_9152MHz)

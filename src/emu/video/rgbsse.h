@@ -315,7 +315,7 @@ INLINE void rgbint_scale_channel_and_clamp(rgbint *color, const rgbint *colorsca
 	*color = _mm_min_epi16(*color, *(__m128i *)&rgbsse_statics.maxbyte);
 }
 
-INLINE void rgbint_scale_immediate_add_and_clamp(rgbint *color1, INT16 colorscale, const rgbaint *color2)
+INLINE void rgbaint_scale_immediate_add_and_clamp(rgbaint *color1, INT16 colorscale, const rgbaint *color2)
 {
 	// color2 will get mutiplied by 2^8 (256) and then divided by 2^8 by the shift by 8
 	__m128i mscale = _mm_unpacklo_epi16(_mm_set1_epi16(colorscale), _mm_set_epi16(0, 0, 0, 0, 256, 256, 256, 256));

@@ -94,10 +94,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
 
 private:
-	bool m_kbrecv_in_progress;
-	int m_kbrecv_bitcount;
 	offs_t m_memsize;
-	UINT16 m_kbrecv_data;
 	UINT8 m_port21;
 	void install_memory();
 
