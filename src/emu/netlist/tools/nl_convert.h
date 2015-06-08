@@ -10,10 +10,6 @@
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
 
-//#include <cstddef>
-//#include <cstdarg>
-#include <cstring>
-
 #include "plib/pstring.h"
 #include "plib/plists.h"
 #include "plib/pparser.h"
