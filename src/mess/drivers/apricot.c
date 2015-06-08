@@ -11,6 +11,7 @@
 
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
+#include "machine/ram.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -36,6 +37,7 @@ public:
 	driver_device(mconfig, type, tag),
 	m_cpu(*this, "ic91"),
 	m_iop(*this, "ic71"),
+	m_ram(*this, RAM_TAG),
 	m_sn(*this, "ic7"),
 	m_crtc(*this, "ic30"),
 	m_ppi(*this, "ic17"),
@@ -89,6 +91,7 @@ protected:
 private:
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;
+	required_device<ram_device> m_ram;
 	required_device<sn76489_device> m_sn;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi;
@@ -299,6 +302,7 @@ MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 
 void apricot_state::machine_start()
 {
+	membank("ram")->set_base(m_ram->pointer());
 }
 
 IRQ_CALLBACK_MEMBER( apricot_state::irq_callback )
@@ -316,7 +320,7 @@ IRQ_CALLBACK_MEMBER( apricot_state::irq_callback )
 //**************************************************************************
 
 static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("ram")
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_SHARE("screen_buffer")
 	AM_RANGE(0xfc000, 0xfffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
 ADDRESS_MAP_END
@@ -354,6 +358,10 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_I8089_DATABUS_WIDTH(16)
 	MCFG_I8089_SINTR1(DEVWRITELINE("ic31", pic8259_device, ir0_w))
 	MCFG_I8089_SINTR2(DEVWRITELINE("ic31", pic8259_device, ir1_w))
+
+	// ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256k")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
