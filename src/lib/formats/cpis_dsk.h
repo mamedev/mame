@@ -11,14 +11,6 @@
 #ifndef CPIS_DSK_H
 #define CPIS_DSK_H
 
-#include "flopimg.h"
-
-
-/**************************************************************************/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(compis);
-
-
 #include "upd765_dsk.h"
 
 class cpis_format : public upd765_format {
