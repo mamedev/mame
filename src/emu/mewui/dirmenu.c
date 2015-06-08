@@ -16,6 +16,7 @@
 static const folders_entry s_folders_entry[] =
 {
 	{ "ROMs",                OPTION_MEDIAPATH },
+	{ "MEWUI",               OPTION_MEWUI_PATH },
 	{ "Samples",             OPTION_SAMPLEPATH },
 	{ "DATs",                OPTION_HISTORY_PATH },
 	{ "INIs",                OPTION_INIPATH },
@@ -341,6 +342,7 @@ void ui_menu_directory::handle()
 void ui_menu_directory::populate()
 {
 	item_append("Roms", NULL, 0, (void *)ROM_FOLDERS);
+	item_append("MEWUI", NULL, 0, (void *)MEWUI_FOLDERS);
 	item_append("Samples", NULL, 0, (void *)SAMPLE_FOLDERS);
 	item_append("INIs", NULL, 0, (void *)INI_FOLDERS);
 	item_append("Artwork", NULL, 0, (void *)ARTWORK_FOLDERS);
@@ -461,7 +463,7 @@ void ui_menu_display_actual::populate()
 	while (path.next(curpath, NULL))
 		folders.push_back(curpath);
 
-	if (ref_path == HISTORY_FOLDERS || ref_path == EXTRAINI_FOLDERS)
+	if (ref_path == HISTORY_FOLDERS || ref_path == EXTRAINI_FOLDERS || ref_path == MEWUI_FOLDERS)
 		item_append("Change Folder", NULL, 0, (void *)CHANGE_FOLDER);
 	else
 		item_append("Add Folder", NULL, 0, (void *)ADD_FOLDER);
