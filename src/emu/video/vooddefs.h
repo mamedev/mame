@@ -3216,7 +3216,7 @@ ATTR_FORCE_INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 f
 			/* if fog_mult is 0, we add this to the original color */
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				rgbint_scale_immediate_add_and_clamp(&tmpA, fogblend, &tmpB);
+				rgbaint_scale_immediate_add_and_clamp(&tmpA, fogblend, &tmpB);
 				//color += fog;
 				//(RR) += fr;
 				//(GG) += fg;
@@ -4315,7 +4315,7 @@ ATTR_FORCE_INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32
 			sub_val.u &= 0x00ffffff;
 
 		rgba_to_rgbaint(&tmpB, (rgb_t) sub_val.u);
-		rgbint_sub(&tmpA, &tmpB);
+		rgbaint_sub(&tmpA, &tmpB);
 	}
 
 	/* blend RGB */
@@ -4847,7 +4847,7 @@ ATTR_FORCE_INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb
 			sub_val.u &= 0x00ffffff;
 
 		rgba_to_rgbaint(&tmpB, (rgb_t) sub_val.u);
-		rgbint_sub(&tmpA, &tmpB);
+		rgbaint_sub(&tmpA, &tmpB);
 	}
 
 	/* blend RGB */
