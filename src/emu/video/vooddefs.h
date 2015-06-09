@@ -3147,7 +3147,7 @@ ATTR_FORCE_INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 f
 		/* non-constant fog comes from several sources */
 		else
 		{
-			INT16 fogblend = 0;
+			INT32 fogblend = 0;
 
 			/* if fog_add is zero, we start with the fog color */
 			if (FOGMODE_FOG_ADD(fogModeReg))
@@ -3216,7 +3216,7 @@ ATTR_FORCE_INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 f
 			/* if fog_mult is 0, we add this to the original color */
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				rgbaint_scale_immediate_add_and_clamp(&tmpA, fogblend, &tmpB);
+				rgbaint_scale_immediate_add_and_clamp(&tmpA, (INT16) fogblend, &tmpB);
 				//color += fog;
 				//(RR) += fr;
 				//(GG) += fg;
