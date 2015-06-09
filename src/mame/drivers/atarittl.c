@@ -20,6 +20,7 @@
  -------------------+---------------------------------------------------------+----------------------------------+---------+---------------------------------------
  TM-025               Anti-Aircraft (1975)                                      A000951                            YES       003127
  TM-058               Breakout/Breakout Cocktail (1976)                         A004533                            NO
+ TM-015               Cocktail Pong/Coup Franc (1974)                           ???????                            NO
  TM-048               Crash 'N Score/Stock Car (1975)                           A004256                            YES       003186(x2), 003187(x2), 004248, 004247
  TM-030               Crossfire (1975)                                          ???????                            NO?
  TM-003,005,011,020   Gran Trak 10/Trak 10/Formula K/Race Circuit (1974)        A000872,A000872 K3RT               YES       74186 Racetrack Prom (K5)
@@ -35,7 +36,6 @@
  TM-040               Outlaw (1976)                                             A003213                            YES       003323 - ROM (8205 @ J4)
  TM-007               Pin Pong (1974)                                           A001660                            NO
  TM-013               Pong/Super Pong (1972)                                    A001433,A000423                    NO
- TM-015               Pong Cocktail/Coup Franc (1974)                           ???????                            NO
  TM-014               Pong Doubles/Coupe Davis (1974)                           A000785                            NO
  TM-018               Pursuit (1975)                                            K8P-B 90128                        NO
  TM-012,022,034       Quadrapong/Elimination (1974)                             A000845                            NO
