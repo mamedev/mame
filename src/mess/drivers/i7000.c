@@ -7,6 +7,39 @@
     driver by Felipe C. da S. Sanches <juca@members.fsf.org>
     with tech info provided by Alexandre Souza (a.k.a. Tabajara).
 
+    The portuguese Wikipedia article available at
+    http://pt.wikipedia.org/wiki/Itautec_I-7000
+    also provides a technical overview of this machine:
+
+    The I-7000 was the first computer manufactured by Itautec
+    (http://www.itautec.com.br/pt-br/produtos). It was originally an 8 bit CP/M
+    computer that became an IBM PC-XT clone in later hardware revisions which
+    took the "I-7000 PC-XT" name.
+
+    * Released in 1982
+    * Operating System: SIM/M / BASIC
+    * CPU: National NSC800 D-4 at 4,00 MHz
+    * Memory: 64KB to 128KB
+    * keyboards: 80 keys (with a reduced numerical keypad and function keys)
+    * display:
+     - 40 X 25 text
+     - 80 X 25 text
+     - 160 X 100 (8 colors)
+     - 640 X 200 (monochrome, with an expansion board)
+     - 320 X 200 (16 colors, with an expansion board)
+    * Expansion slots:
+     - 1 frontal cart slot
+     - 4 internal expansion slots
+    * Ports:
+     - 1 composite video output for a color monitor
+     - 2 cassete interfaces
+     - 1 RS-232C serial port
+     - 1 parallel interface
+    * Storage:
+     - Cassetes recorder
+     - Up to 4 external floppy drives: 8" (FD/DD, 1,1MB) or 5" 1/4
+     - Up to 1 external 10 MB hard-drive
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -34,9 +67,11 @@ DRIVER_INIT_MEMBER(i7000_state, i7000)
 {
 }
 
+/*FIXME: we still need to figure out the proper memory map
+         for the maincpu and where the cartridge slot maps to. */
 static ADDRESS_MAP_START(i7000_mem, AS_PROGRAM, 8, i7000_state)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x1000, 0xffff) AM_RAM
+/* guessed */	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
+/* guessed */	AM_RANGE(0x1000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /*
