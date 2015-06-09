@@ -26,6 +26,7 @@ TODO:
 
 #include "emu.h"
 #include "video/n64.h"
+#include <algorithm>
 
 #define LOG_RDP_EXECUTION       0
 
@@ -462,7 +463,7 @@ void n64_rdp::set_subb_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input
 		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
 		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
 		case 6:     fatalerror("SET_SUBB_RGB_INPUT: key_center\n");
-		case 7:     *input_r = (UINT8*)&m_k4;                   *input_g = (UINT8*)&m_k4;                   *input_b = (UINT8*)&m_k4;                   break;
+		case 7:     *input_r = &userdata->m_k4.i.r;             *input_g = &userdata->m_k4.i.g;             *input_b = &userdata->m_k4.i.b;				break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
 					*input_r = &m_zero.i.r; *input_g = &m_zero.i.g; *input_b = &m_zero.i.b; break;
@@ -481,15 +482,15 @@ void n64_rdp::set_mul_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_
 		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
 		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
 		case 6:     *input_r = &userdata->m_key_scale.i.r;      *input_g = &userdata->m_key_scale.i.g;      *input_b = &userdata->m_key_scale.i.b;      break;
-		case 7:     *input_r = &userdata->m_combined_color.i.a; *input_g = &userdata->m_combined_color.i.a; *input_b = &userdata->m_combined_color.i.a; break;
-		case 8:     *input_r = &userdata->m_texel0_color.i.a;   *input_g = &userdata->m_texel0_color.i.a;   *input_b = &userdata->m_texel0_color.i.a;   break;
-		case 9:     *input_r = &userdata->m_texel1_color.i.a;   *input_g = &userdata->m_texel1_color.i.a;   *input_b = &userdata->m_texel1_color.i.a;   break;
-		case 10:    *input_r = &userdata->m_prim_color.i.a;     *input_g = &userdata->m_prim_color.i.a;     *input_b = &userdata->m_prim_color.i.a;     break;
-		case 11:    *input_r = &userdata->m_shade_color.i.a;    *input_g = &userdata->m_shade_color.i.a;    *input_b = &userdata->m_shade_color.i.a;    break;
-		case 12:    *input_r = &userdata->m_env_color.i.a;      *input_g = &userdata->m_env_color.i.a;      *input_b = &userdata->m_env_color.i.a;      break;
-		case 13:    *input_r = &userdata->m_lod_fraction;       *input_g = &userdata->m_lod_fraction;       *input_b = &userdata->m_lod_fraction;       break;
-		case 14:    *input_r = &userdata->m_prim_lod_fraction;  *input_g = &userdata->m_prim_lod_fraction;  *input_b = &userdata->m_prim_lod_fraction;  break;
-		case 15:    *input_r = (UINT8*)&m_k5;                   *input_g = (UINT8*)&m_k5;                   *input_b = (UINT8*)&m_k5;                   break;
+		case 7:     *input_r = &userdata->m_combined_alpha.i.r; *input_g = &userdata->m_combined_alpha.i.g; *input_b = &userdata->m_combined_alpha.i.b; break;
+		case 8:     *input_r = &userdata->m_texel0_alpha.i.r;   *input_g = &userdata->m_texel0_alpha.i.g;   *input_b = &userdata->m_texel0_alpha.i.b;   break;
+		case 9:     *input_r = &userdata->m_texel1_alpha.i.r;   *input_g = &userdata->m_texel1_alpha.i.g;   *input_b = &userdata->m_texel1_alpha.i.b;   break;
+		case 10:    *input_r = &userdata->m_prim_alpha.i.r;     *input_g = &userdata->m_prim_alpha.i.g;     *input_b = &userdata->m_prim_alpha.i.b;     break;
+		case 11:    *input_r = &userdata->m_shade_alpha.i.r;    *input_g = &userdata->m_shade_alpha.i.g;    *input_b = &userdata->m_shade_alpha.i.b;    break;
+		case 12:    *input_r = &userdata->m_env_alpha.i.r;      *input_g = &userdata->m_env_alpha.i.g;      *input_b = &userdata->m_env_alpha.i.b;      break;
+		case 13:    *input_r = &userdata->m_lod_fraction.i.r;   *input_g = &userdata->m_lod_fraction.i.g;   *input_b = &userdata->m_lod_fraction.i.b;   break;
+		case 14:    *input_r = &userdata->m_prim_lod_fraction.i.r; *input_g = &userdata->m_prim_lod_fraction.i.g;  *input_b = &userdata->m_prim_lod_fraction.i.b;  break;
+		case 15:    *input_r = &userdata->m_k5.i.r;             *input_g = &userdata->m_k5.i.g;             *input_b = &userdata->m_k5.i.b;             break;
 		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31:
 		{
@@ -532,61 +533,36 @@ void n64_rdp::set_mul_input_alpha(UINT8** input, INT32 code, rdp_span_aux* userd
 {
 	switch (code & 0x7)
 	{
-		case 0:     *input = &userdata->m_lod_fraction; break;
+		case 0:     *input = &userdata->m_lod_fraction.i.a; break;
 		case 1:     *input = &userdata->m_texel0_color.i.a; break;
 		case 2:     *input = &userdata->m_texel1_color.i.a; break;
 		case 3:     *input = &userdata->m_prim_color.i.a; break;
 		case 4:     *input = &userdata->m_shade_color.i.a; break;
 		case 5:     *input = &userdata->m_env_color.i.a; break;
-		case 6:     *input = &userdata->m_prim_lod_fraction; break;
+		case 6:     *input = &userdata->m_prim_lod_fraction.i.a; break;
 		case 7:     *input = &m_zero.i.a; break;
 	}
 }
 
-void n64_rdp::set_blender_input(INT32 cycle, INT32 which, UINT8** input_r, UINT8** input_g, UINT8** input_b, UINT8** input_a, INT32 a, INT32 b, rdp_span_aux* userdata)
+void n64_rdp::set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, UINT8** input_a, INT32 a, INT32 b, rdp_span_aux* userdata)
 {
 	switch (a & 0x3)
 	{
 		case 0:
-		{
-			if (cycle == 0)
-			{
-				*input_r = &userdata->m_pixel_color.i.r;
-				*input_g = &userdata->m_pixel_color.i.g;
-				*input_b = &userdata->m_pixel_color.i.b;
-			}
-			else
-			{
-				*input_r = &userdata->m_blended_pixel_color.i.r;
-				*input_g = &userdata->m_blended_pixel_color.i.g;
-				*input_b = &userdata->m_blended_pixel_color.i.b;
-			}
+			*input_rgb = cycle == 0 ? &userdata->m_pixel_color : &userdata->m_blended_pixel_color;
 			break;
-		}
 
 		case 1:
-		{
-			*input_r = &userdata->m_memory_color.i.r;
-			*input_g = &userdata->m_memory_color.i.g;
-			*input_b = &userdata->m_memory_color.i.b;
+			*input_rgb = &userdata->m_memory_color;
 			break;
-		}
 
 		case 2:
-		{
-			*input_r = &userdata->m_blend_color.i.r;
-			*input_g = &userdata->m_blend_color.i.g;
-			*input_b = &userdata->m_blend_color.i.b;
+			*input_rgb = &userdata->m_blend_color;
 			break;
-		}
 
 		case 3:
-		{
-			*input_r = &userdata->m_fog_color.i.r;
-			*input_g = &userdata->m_fog_color.i.g;
-			*input_b = &userdata->m_fog_color.i.b;
+			*input_rgb = &userdata->m_fog_color;
 			break;
-		}
 	}
 
 	if (which == 0)
@@ -2067,287 +2043,147 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 	rdp_poly_state* object = NULL;
 	bool valid = false;
 
-	if(flip)
+	INT32* minx = flip ? &minxhx : &minxmx;
+	INT32* maxx = flip ? &maxxmx : &maxxhx;
+	INT32* startx = flip ? maxx : minx;
+	INT32* endx = flip ? minx : maxx;
+
+	for (INT32 k = ycur; k <= ylfar; k++)
 	{
-		for (INT32 k = ycur; k <= ylfar; k++)
+		if (k == ym)
 		{
-			if (k == ym)
+			xleft = xl & ~1;
+			xleft_inc = (dxldy >> 2) & ~1;
+		}
+
+		const INT32 xstart = xleft >> 16;
+		const INT32 xend = xright >> 16;
+		const INT32 j = k >> 2;
+		const INT32 spanidx = (k - ycur) >> 2;
+		const INT32  spix = k & 3;
+		bool valid_y = !(k < yh || k >= yl);
+
+		if (spanidx >= 0 && spanidx < 2048)
+		{
+			majorxint[spix] = xend;
+			minorxint[spix] = xstart;
+			majorx[spix] = xright;
+			minorx[spix] = xleft;
+
+			if (spix == 0)
 			{
-				xleft = xl & ~1;
-				xleft_inc = (dxldy >> 2) & ~1;
+				*maxx = 0;
+				*minx = 0xfff;
 			}
 
-			const INT32 xstart = xleft >> 16; // 319
-			const INT32 xend = xright >> 16; // 0
-			const INT32 j = k >> 2;
-			const INT32 spanidx = (k - ycur) >> 2;
-			const INT32 spix = k & 3;
-			const bool valid_y = !(k < yh || k >= yl);
-
-			if (spanidx >= 0 && spanidx < 2048)
+			if (valid_y)
 			{
-				majorxint[spix] = xend; // 0
-				minorxint[spix] = xstart; // 319
-				majorx[spix] = xright; // 0x00000000
-				minorx[spix] = xleft; // 0x013f0000
-
-				if (spix == 0)
+				if (flip)
 				{
-					maxxmx = 0;
-					minxhx = 0xfff;
+					*maxx = std::max(xstart, *maxx);
+					*minx = std::min(xend, *minx);
+				}
+				else
+				{
+					*minx = std::min(xstart, *minx);
+					*maxx = std::max(xend, *maxx);
+				}
+			}
+
+			if (spix == 0)
+			{
+				if(new_object)
+				{
+					object = &object_data_alloc();
+					memcpy(object->m_tmem, m_tmem, 0x1000);
+					new_object = false;
 				}
 
-				if (valid_y)
+				spans[spanidx].userdata = (void*)((UINT8*)m_aux_buf + m_aux_buf_ptr);
+				valid = true;
+				m_aux_buf_ptr += sizeof(rdp_span_aux);
+
+				if(m_aux_buf_ptr >= EXTENT_AUX_COUNT)
 				{
-					maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
-					minxhx = (xend < minxhx) ? xend : minxhx;
+					fatalerror("n64_rdp::draw_triangle: span aux buffer overflow\n");
 				}
 
-				if (spix == 0)
-				{
-					if(new_object)
-					{
-						object = &object_data_alloc();
-						memcpy(object->m_tmem, m_tmem, 0x1000);
-						new_object = false;
-					}
+				rdp_span_aux* userdata = (rdp_span_aux*)spans[spanidx].userdata;
+				userdata->m_tmem = object->m_tmem;
 
-					spans[spanidx].userdata = (void*)((UINT8*)m_aux_buf + m_aux_buf_ptr);
-					m_aux_buf_ptr += sizeof(rdp_span_aux);
+				userdata->m_blend_color = m_blend_color;
+				userdata->m_prim_color = m_prim_color;
+				userdata->m_env_color = m_env_color;
+				userdata->m_fog_color = m_fog_color;
+				userdata->m_blend_alpha = m_blend_alpha;
+				userdata->m_prim_alpha = m_prim_alpha;
+				userdata->m_env_alpha = m_env_alpha;
+				userdata->m_fog_alpha = m_fog_alpha;
+				userdata->m_key_scale = m_key_scale;
+				userdata->m_lod_fraction = m_lod_fraction;
+				userdata->m_prim_lod_fraction = m_prim_lod_fraction;
 
-					if(m_aux_buf_ptr >= EXTENT_AUX_COUNT)
-					{
-						fatalerror("n64_rdp::draw_triangle: span aux buffer overflow\n");
-					}
+				// Setup blender data for this scanline
+				set_blender_input(0, 0, &userdata->m_color_inputs.blender1a_rgb[0], &userdata->m_color_inputs.blender1b_a[0], m_other_modes.blend_m1a_0, m_other_modes.blend_m1b_0, userdata);
+				set_blender_input(0, 1, &userdata->m_color_inputs.blender2a_rgb[0], &userdata->m_color_inputs.blender2b_a[0], m_other_modes.blend_m2a_0, m_other_modes.blend_m2b_0, userdata);
+				set_blender_input(1, 0, &userdata->m_color_inputs.blender1a_rgb[1], &userdata->m_color_inputs.blender1b_a[1], m_other_modes.blend_m1a_1, m_other_modes.blend_m1b_1, userdata);
+				set_blender_input(1, 1, &userdata->m_color_inputs.blender2a_rgb[1], &userdata->m_color_inputs.blender2b_a[1], m_other_modes.blend_m2a_1, m_other_modes.blend_m2b_1, userdata);
 
-					rdp_span_aux* userdata = (rdp_span_aux*)spans[spanidx].userdata;
-					valid = true;
+				// Setup color combiner data for this scanline
+				set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a_r[0], &userdata->m_color_inputs.combiner_rgbsub_a_g[0], &userdata->m_color_inputs.combiner_rgbsub_a_b[0], m_combine.sub_a_rgb0, userdata);
+				set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b_r[0], &userdata->m_color_inputs.combiner_rgbsub_b_g[0], &userdata->m_color_inputs.combiner_rgbsub_b_b[0], m_combine.sub_b_rgb0, userdata);
+				set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul_r[0], &userdata->m_color_inputs.combiner_rgbmul_g[0], &userdata->m_color_inputs.combiner_rgbmul_b[0], m_combine.mul_rgb0, userdata);
+				set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd_r[0], &userdata->m_color_inputs.combiner_rgbadd_g[0], &userdata->m_color_inputs.combiner_rgbadd_b[0], m_combine.add_rgb0, userdata);
+				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_a[0], m_combine.sub_a_a0, userdata);
+				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_b[0], m_combine.sub_b_a0, userdata);
+				set_mul_input_alpha(&userdata->m_color_inputs.combiner_alphamul[0], m_combine.mul_a0, userdata);
+				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphaadd[0], m_combine.add_a0, userdata);
 
-					userdata->m_tmem = object->m_tmem;
-
-					userdata->m_blend_color = m_blend_color;
-					userdata->m_prim_color = m_prim_color;
-					userdata->m_env_color = m_env_color;
-					userdata->m_fog_color = m_fog_color;
-					userdata->m_key_scale = m_key_scale;
-					userdata->m_lod_fraction = m_lod_fraction;
-					userdata->m_prim_lod_fraction = m_prim_lod_fraction;
-
-					// Setup blender data for this scanline
-					set_blender_input(0, 0, &userdata->m_color_inputs.blender1a_r[0],
-											&userdata->m_color_inputs.blender1a_g[0],
-											&userdata->m_color_inputs.blender1a_b[0],
-											&userdata->m_color_inputs.blender1b_a[0], m_other_modes.blend_m1a_0, m_other_modes.blend_m1b_0, userdata);
-					set_blender_input(0, 1, &userdata->m_color_inputs.blender2a_r[0],
-											&userdata->m_color_inputs.blender2a_g[0],
-											&userdata->m_color_inputs.blender2a_b[0],
-											&userdata->m_color_inputs.blender2b_a[0], m_other_modes.blend_m2a_0, m_other_modes.blend_m2b_0, userdata);
-					set_blender_input(1, 0, &userdata->m_color_inputs.blender1a_r[1],
-											&userdata->m_color_inputs.blender1a_g[1],
-											&userdata->m_color_inputs.blender1a_b[1],
-											&userdata->m_color_inputs.blender1b_a[1], m_other_modes.blend_m1a_1, m_other_modes.blend_m1b_1, userdata);
-					set_blender_input(1, 1, &userdata->m_color_inputs.blender2a_r[1],
-											&userdata->m_color_inputs.blender2a_g[1],
-											&userdata->m_color_inputs.blender2a_b[1],
-											&userdata->m_color_inputs.blender2b_a[1], m_other_modes.blend_m2a_1, m_other_modes.blend_m2b_1, userdata);
-
-					// Setup color combiner data for this scanline
-					set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a_r[0], &userdata->m_color_inputs.combiner_rgbsub_a_g[0], &userdata->m_color_inputs.combiner_rgbsub_a_b[0], m_combine.sub_a_rgb0, userdata);
-					set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b_r[0], &userdata->m_color_inputs.combiner_rgbsub_b_g[0], &userdata->m_color_inputs.combiner_rgbsub_b_b[0], m_combine.sub_b_rgb0, userdata);
-					set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul_r[0], &userdata->m_color_inputs.combiner_rgbmul_g[0], &userdata->m_color_inputs.combiner_rgbmul_b[0], m_combine.mul_rgb0, userdata);
-					set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd_r[0], &userdata->m_color_inputs.combiner_rgbadd_g[0], &userdata->m_color_inputs.combiner_rgbadd_b[0], m_combine.add_rgb0, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_a[0], m_combine.sub_a_a0, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_b[0], m_combine.sub_b_a0, userdata);
-					set_mul_input_alpha(&userdata->m_color_inputs.combiner_alphamul[0], m_combine.mul_a0, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphaadd[0], m_combine.add_a0, userdata);
-
-					set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a_r[1], &userdata->m_color_inputs.combiner_rgbsub_a_g[1], &userdata->m_color_inputs.combiner_rgbsub_a_b[1], m_combine.sub_a_rgb1, userdata);
-					set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b_r[1], &userdata->m_color_inputs.combiner_rgbsub_b_g[1], &userdata->m_color_inputs.combiner_rgbsub_b_b[1], m_combine.sub_b_rgb1, userdata);
-					set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul_r[1], &userdata->m_color_inputs.combiner_rgbmul_g[1], &userdata->m_color_inputs.combiner_rgbmul_b[1], m_combine.mul_rgb1, userdata);
-					set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd_r[1], &userdata->m_color_inputs.combiner_rgbadd_g[1], &userdata->m_color_inputs.combiner_rgbadd_b[1], m_combine.add_rgb1, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_a[1], m_combine.sub_a_a1, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_b[1], m_combine.sub_b_a1, userdata);
-					set_mul_input_alpha(&userdata->m_color_inputs.combiner_alphamul[1], m_combine.mul_a1, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphaadd[1], m_combine.add_a1, userdata);
-				}
-
-				if (spix == 3)
-				{
-					spans[spanidx].startx = maxxmx;
-					spans[spanidx].stopx = minxhx;
-					compute_cvg_flip(spans, majorx, minorx, majorxint, minorxint, j, yh, yl, ycur >> 2);
-				}
-
-				if (spix == ldflag)
-				{
-					((rdp_span_aux*)spans[spanidx].userdata)->m_unscissored_rx = xend;
-					xfrac = ((xright >> 8) & 0xff);
-					spans[spanidx].param[SPAN_R].start = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
-					spans[spanidx].param[SPAN_G].start = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
-					spans[spanidx].param[SPAN_B].start = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
-					spans[spanidx].param[SPAN_A].start = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
-					spans[spanidx].param[SPAN_S].start = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
-					spans[spanidx].param[SPAN_T].start = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
-					spans[spanidx].param[SPAN_W].start = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
-					spans[spanidx].param[SPAN_Z].start = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
-				}
+				set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a_r[1], &userdata->m_color_inputs.combiner_rgbsub_a_g[1], &userdata->m_color_inputs.combiner_rgbsub_a_b[1], m_combine.sub_a_rgb1, userdata);
+				set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b_r[1], &userdata->m_color_inputs.combiner_rgbsub_b_g[1], &userdata->m_color_inputs.combiner_rgbsub_b_b[1], m_combine.sub_b_rgb1, userdata);
+				set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul_r[1], &userdata->m_color_inputs.combiner_rgbmul_g[1], &userdata->m_color_inputs.combiner_rgbmul_b[1], m_combine.mul_rgb1, userdata);
+				set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd_r[1], &userdata->m_color_inputs.combiner_rgbadd_g[1], &userdata->m_color_inputs.combiner_rgbadd_b[1], m_combine.add_rgb1, userdata);
+				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_a[1], m_combine.sub_a_a1, userdata);
+				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_b[1], m_combine.sub_b_a1, userdata);
+				set_mul_input_alpha(&userdata->m_color_inputs.combiner_alphamul[1], m_combine.mul_a1, userdata);
+				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphaadd[1], m_combine.add_a1, userdata);
 			}
 
 			if (spix == 3)
 			{
-				r += drde;
-				g += dgde;
-				b += dbde;
-				a += dade;
-				s += dsde;
-				t += dtde;
-				w += dwde;
-				z += dzde;
+				spans[spanidx].startx = *startx;
+				spans[spanidx].stopx = *endx;
+				((this)->*(m_compute_cvg[flip]))(spans, majorx, minorx, majorxint, minorxint, j, yh, yl, ycur >> 2);
 			}
 
-			xleft += xleft_inc;
-			xright += xright_inc;
+			if (spix == ldflag)
+			{
+				((rdp_span_aux*)spans[spanidx].userdata)->m_unscissored_rx = xend;
+				xfrac = ((xright >> 8) & 0xff);
+				spans[spanidx].param[SPAN_R].start = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
+				spans[spanidx].param[SPAN_G].start = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
+				spans[spanidx].param[SPAN_B].start = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
+				spans[spanidx].param[SPAN_A].start = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
+				spans[spanidx].param[SPAN_S].start = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
+				spans[spanidx].param[SPAN_T].start = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
+				spans[spanidx].param[SPAN_W].start = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
+				spans[spanidx].param[SPAN_Z].start = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
+			}
 		}
-	}
-	else
-	{
-		for (INT32 k = ycur; k <= ylfar; k++)
+
+		if (spix == 3)
 		{
-			if (k == ym)
-			{
-				xleft = xl & ~1;
-				xleft_inc = (dxldy >> 2) & ~1;
-			}
-
-			const INT32 xstart = xleft >> 16;
-			const INT32 xend = xright >> 16;
-			const INT32 j = k >> 2;
-			const INT32 spanidx = j - (ycur >> 2);
-			const INT32  spix = k & 3;
-			bool valid_y = !(k < yh || k >= yl);
-
-			if (k >= 0 && k < 0x1000)
-			{
-				majorxint[spix] = xend;
-				minorxint[spix] = xstart;
-				majorx[spix] = xright;
-				minorx[spix] = xleft;
-
-				if (spix == 0)
-				{
-					maxxhx = 0;
-					minxmx = 0xfff;
-				}
-
-				if (valid_y)
-				{
-					minxmx = (xstart < minxmx) ? xstart : minxmx;
-					maxxhx = (xend > maxxhx) ? xend : maxxhx;
-				}
-
-				if (spix == 0)
-				{
-					if(new_object)
-					{
-						object = &object_data_alloc();
-						memcpy(object->m_tmem, m_tmem, 0x1000);
-						new_object = false;
-					}
-
-					spans[spanidx].userdata = (void*)((UINT8*)m_aux_buf + m_aux_buf_ptr);
-					valid = true;
-					m_aux_buf_ptr += sizeof(rdp_span_aux);
-
-					if(m_aux_buf_ptr >= EXTENT_AUX_COUNT)
-					{
-						fatalerror("n64_rdp::draw_triangle: span aux buffer overflow\n");
-					}
-
-					rdp_span_aux* userdata = (rdp_span_aux*)spans[spanidx].userdata;
-					userdata->m_tmem = object->m_tmem;
-
-					userdata->m_blend_color = m_blend_color;
-					userdata->m_prim_color = m_prim_color;
-					userdata->m_env_color = m_env_color;
-					userdata->m_fog_color = m_fog_color;
-					userdata->m_key_scale = m_key_scale;
-					userdata->m_lod_fraction = m_lod_fraction;
-					userdata->m_prim_lod_fraction = m_prim_lod_fraction;
-
-					// Setup blender data for this scanline
-					set_blender_input(0, 0, &userdata->m_color_inputs.blender1a_r[0],
-											&userdata->m_color_inputs.blender1a_g[0],
-											&userdata->m_color_inputs.blender1a_b[0],
-											&userdata->m_color_inputs.blender1b_a[0], m_other_modes.blend_m1a_0, m_other_modes.blend_m1b_0, userdata);
-					set_blender_input(0, 1, &userdata->m_color_inputs.blender2a_r[0],
-											&userdata->m_color_inputs.blender2a_g[0],
-											&userdata->m_color_inputs.blender2a_b[0],
-											&userdata->m_color_inputs.blender2b_a[0], m_other_modes.blend_m2a_0, m_other_modes.blend_m2b_0, userdata);
-					set_blender_input(1, 0, &userdata->m_color_inputs.blender1a_r[1],
-											&userdata->m_color_inputs.blender1a_g[1],
-											&userdata->m_color_inputs.blender1a_b[1],
-											&userdata->m_color_inputs.blender1b_a[1], m_other_modes.blend_m1a_1, m_other_modes.blend_m1b_1, userdata);
-					set_blender_input(1, 1, &userdata->m_color_inputs.blender2a_r[1],
-											&userdata->m_color_inputs.blender2a_g[1],
-											&userdata->m_color_inputs.blender2a_b[1],
-											&userdata->m_color_inputs.blender2b_a[1], m_other_modes.blend_m2a_1, m_other_modes.blend_m2b_1, userdata);
-
-					// Setup color combiner data for this scanline
-					set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a_r[0], &userdata->m_color_inputs.combiner_rgbsub_a_g[0], &userdata->m_color_inputs.combiner_rgbsub_a_b[0], m_combine.sub_a_rgb0, userdata);
-					set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b_r[0], &userdata->m_color_inputs.combiner_rgbsub_b_g[0], &userdata->m_color_inputs.combiner_rgbsub_b_b[0], m_combine.sub_b_rgb0, userdata);
-					set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul_r[0], &userdata->m_color_inputs.combiner_rgbmul_g[0], &userdata->m_color_inputs.combiner_rgbmul_b[0], m_combine.mul_rgb0, userdata);
-					set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd_r[0], &userdata->m_color_inputs.combiner_rgbadd_g[0], &userdata->m_color_inputs.combiner_rgbadd_b[0], m_combine.add_rgb0, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_a[0], m_combine.sub_a_a0, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_b[0], m_combine.sub_b_a0, userdata);
-					set_mul_input_alpha(&userdata->m_color_inputs.combiner_alphamul[0], m_combine.mul_a0, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphaadd[0], m_combine.add_a0, userdata);
-
-					set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a_r[1], &userdata->m_color_inputs.combiner_rgbsub_a_g[1], &userdata->m_color_inputs.combiner_rgbsub_a_b[1], m_combine.sub_a_rgb1, userdata);
-					set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b_r[1], &userdata->m_color_inputs.combiner_rgbsub_b_g[1], &userdata->m_color_inputs.combiner_rgbsub_b_b[1], m_combine.sub_b_rgb1, userdata);
-					set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul_r[1], &userdata->m_color_inputs.combiner_rgbmul_g[1], &userdata->m_color_inputs.combiner_rgbmul_b[1], m_combine.mul_rgb1, userdata);
-					set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd_r[1], &userdata->m_color_inputs.combiner_rgbadd_g[1], &userdata->m_color_inputs.combiner_rgbadd_b[1], m_combine.add_rgb1, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_a[1], m_combine.sub_a_a1, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_b[1], m_combine.sub_b_a1, userdata);
-					set_mul_input_alpha(&userdata->m_color_inputs.combiner_alphamul[1], m_combine.mul_a1, userdata);
-					set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphaadd[1], m_combine.add_a1, userdata);
-				}
-
-				if (spix == 3)
-				{
-					spans[spanidx].startx = minxmx;
-					spans[spanidx].stopx = maxxhx;
-					compute_cvg_noflip(spans, majorx, minorx, majorxint, minorxint, j, yh, yl, ycur >> 2);
-				}
-
-				if (spix == ldflag)
-				{
-					((rdp_span_aux*)spans[spanidx].userdata)->m_unscissored_rx = xend;
-					xfrac = ((xright >> 8) & 0xff);
-					spans[spanidx].param[SPAN_R].start = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
-					spans[spanidx].param[SPAN_G].start = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
-					spans[spanidx].param[SPAN_B].start = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
-					spans[spanidx].param[SPAN_A].start = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
-					spans[spanidx].param[SPAN_S].start = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
-					spans[spanidx].param[SPAN_T].start = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
-					spans[spanidx].param[SPAN_W].start = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
-					spans[spanidx].param[SPAN_Z].start = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
-				}
-			}
-
-			if (spix == 3)
-			{
-				r += drde;
-				g += dgde;
-				b += dbde;
-				a += dade;
-				s += dsde;
-				t += dtde;
-				w += dwde;
-				z += dzde;
-			}
-			xleft += xleft_inc;
-			xright += xright_inc;
+			r += drde;
+			g += dgde;
+			b += dbde;
+			a += dade;
+			s += dsde;
+			t += dtde;
+			w += dwde;
+			z += dzde;
 		}
+		xleft += xleft_inc;
+		xright += xright_inc;
 	}
 
 	if(!new_object && valid)
@@ -2577,7 +2413,10 @@ void n64_rdp::cmd_set_convert(UINT32 w1, UINT32 w2)
 	k3 = ((w2 >> 26) & 1) ? (-(0x100 - k3)) : k3;
 	k4 = ((w2 >> 17) & 1) ? (-(0x100 - k4)) : k4;
 	k5 = ((w2 >> 8) & 1) ? (-(0x100 - k5)) : k5;
-	set_yuv_factors(k0, k1, k2, k3, k4, k5);
+
+	UINT32 repl_k4 = (k4 & 0xff) * 0x01010101;
+	UINT32 repl_k5 = (k5 & 0xff) * 0x01010101;
+	set_yuv_factors(k0, k1, k2, k3, repl_k4, repl_k5);
 }
 
 void n64_rdp::cmd_set_scissor(UINT32 w1, UINT32 w2)
@@ -3061,23 +2900,27 @@ void n64_rdp::cmd_fill_rect(UINT32 w1, UINT32 w2)
 void n64_rdp::cmd_set_fog_color(UINT32 w1, UINT32 w2)
 {
 	m_fog_color.c = w2;
+	m_fog_alpha.c = m_fog_color.i.a * 0x01010101;
 }
 
 void n64_rdp::cmd_set_blend_color(UINT32 w1, UINT32 w2)
 {
 	m_blend_color.c = w2;
+	m_blend_alpha.c = m_blend_color.i.a * 0x01010101;
 }
 
 void n64_rdp::cmd_set_prim_color(UINT32 w1, UINT32 w2)
 {
 	m_misc_state.m_min_level = (w1 >> 8) & 0x1f;
-	m_prim_lod_fraction = w1 & 0xff;
+	m_prim_lod_fraction.c = (w1 & 0xff) * 0x01010101;
 	m_prim_color.c = w2;
+	m_prim_alpha.c = m_prim_color.i.a * 0x01010101;
 }
 
 void n64_rdp::cmd_set_env_color(UINT32 w1, UINT32 w2)
 {
 	m_env_color.c = w2;
+	m_env_alpha.c = m_env_color.i.a * 0x01010101;
 }
 
 void n64_rdp::cmd_set_combine(UINT32 w1, UINT32 w2)
@@ -3286,7 +3129,7 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 
 	//memset(m_hidden_bits, 3, 8388608);
 
-	m_prim_lod_fraction = 0;
+	m_prim_lod_fraction.c = 0;
 
 	for (INT32 i = 0; i < 256; i++)
 	{
@@ -3337,6 +3180,9 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 	{
 		m_dzpix_normalize[i] = (UINT16)normalize_dzpix(i & 0xffff);
 	}
+
+	m_compute_cvg[0] = &n64_rdp::compute_cvg_noflip;
+	m_compute_cvg[1] = &n64_rdp::compute_cvg_flip;
 }
 
 void n64_state::video_start()

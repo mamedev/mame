@@ -106,9 +106,9 @@ bool n64_blender_t::cycle1_noblend_noacvg_nodither(INT32* fr, INT32* fg, INT32* 
 	{
 		return false;
 	}
-	*fr = *userdata->m_color_inputs.blender1a_r[0];
-	*fg = *userdata->m_color_inputs.blender1a_g[0];
-	*fb = *userdata->m_color_inputs.blender1a_b[0];
+	*fr = (*userdata->m_color_inputs.blender1a_rgb[0]).i.r;
+	*fg = (*userdata->m_color_inputs.blender1a_rgb[0]).i.g;
+	*fb = (*userdata->m_color_inputs.blender1a_rgb[0]).i.b;
 
 	return true;
 }
@@ -121,9 +121,9 @@ bool n64_blender_t::cycle1_noblend_noacvg_dither(INT32* fr, INT32* fg, INT32* fb
 	{
 		return false;
 	}
-	*fr = m_color_dither[((*userdata->m_color_inputs.blender1a_r[0] & 0xff) << 3) | dith];
-	*fg = m_color_dither[((*userdata->m_color_inputs.blender1a_g[0] & 0xff) << 3) | dith];
-	*fb = m_color_dither[((*userdata->m_color_inputs.blender1a_b[0] & 0xff) << 3) | dith];
+	*fr = m_color_dither[(((*userdata->m_color_inputs.blender1a_rgb[0]).i.r & 0xff) << 3) | dith];
+	*fg = m_color_dither[(((*userdata->m_color_inputs.blender1a_rgb[0]).i.g & 0xff) << 3) | dith];
+	*fb = m_color_dither[(((*userdata->m_color_inputs.blender1a_rgb[0]).i.b & 0xff) << 3) | dith];
 
 	return true;
 }
@@ -136,9 +136,9 @@ bool n64_blender_t::cycle1_noblend_acvg_nodither(INT32* fr, INT32* fg, INT32* fb
 	{
 		return false;
 	}
-	*fr = *userdata->m_color_inputs.blender1a_r[0];
-	*fg = *userdata->m_color_inputs.blender1a_g[0];
-	*fb = *userdata->m_color_inputs.blender1a_b[0];
+	*fr = (*userdata->m_color_inputs.blender1a_rgb[0]).i.r;
+	*fg = (*userdata->m_color_inputs.blender1a_rgb[0]).i.g;
+	*fb = (*userdata->m_color_inputs.blender1a_rgb[0]).i.b;
 
 	return true;
 }
@@ -151,9 +151,9 @@ bool n64_blender_t::cycle1_noblend_acvg_dither(INT32* fr, INT32* fg, INT32* fb, 
 	{
 		return false;
 	}
-	*fr = m_color_dither[((*userdata->m_color_inputs.blender1a_r[0] & 0xff) << 3) | dith];
-	*fg = m_color_dither[((*userdata->m_color_inputs.blender1a_g[0] & 0xff) << 3) | dith];
-	*fb = m_color_dither[((*userdata->m_color_inputs.blender1a_b[0] & 0xff) << 3) | dith];
+	*fr = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[0]).i.r << 3) | dith];
+	*fg = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[0]).i.g << 3) | dith];
+	*fb = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[0]).i.b << 3) | dith];
 
 	return true;
 }
@@ -259,9 +259,9 @@ bool n64_blender_t::cycle2_noblend_noacvg_nodither(INT32* fr, INT32* fg, INT32* 
 	userdata->m_blended_pixel_color.i.g = g;
 	userdata->m_blended_pixel_color.i.b = b;
 	userdata->m_blended_pixel_color.i.a = userdata->m_pixel_color.i.a;
-	*fr = *userdata->m_color_inputs.blender1a_r[1];
-	*fg = *userdata->m_color_inputs.blender1a_g[1];
-	*fb = *userdata->m_color_inputs.blender1a_b[1];
+	*fr = (*userdata->m_color_inputs.blender1a_rgb[1]).i.r;
+	*fg = (*userdata->m_color_inputs.blender1a_rgb[1]).i.g;
+	*fb = (*userdata->m_color_inputs.blender1a_rgb[1]).i.b;
 
 	return true;
 }
@@ -285,9 +285,9 @@ bool n64_blender_t::cycle2_noblend_noacvg_dither(INT32* fr, INT32* fg, INT32* fb
 	userdata->m_blended_pixel_color.i.g = g;
 	userdata->m_blended_pixel_color.i.b = b;
 	userdata->m_blended_pixel_color.i.a = userdata->m_pixel_color.i.a;
-	*fr = m_color_dither[((*userdata->m_color_inputs.blender1a_r[1] & 0xff) << 3) | dith];
-	*fg = m_color_dither[((*userdata->m_color_inputs.blender1a_g[1] & 0xff) << 3) | dith];
-	*fb = m_color_dither[((*userdata->m_color_inputs.blender1a_b[1] & 0xff) << 3) | dith];
+	*fr = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[1]).i.r << 3) | dith];
+	*fg = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[1]).i.g << 3) | dith];
+	*fb = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[1]).i.b << 3) | dith];
 
 	return true;
 }
@@ -310,9 +310,9 @@ bool n64_blender_t::cycle2_noblend_acvg_nodither(INT32* fr, INT32* fg, INT32* fb
 	userdata->m_blended_pixel_color.i.g = g;
 	userdata->m_blended_pixel_color.i.b = b;
 	userdata->m_blended_pixel_color.i.a = userdata->m_pixel_color.i.a;
-	*fr = *userdata->m_color_inputs.blender1a_r[1];
-	*fg = *userdata->m_color_inputs.blender1a_g[1];
-	*fb = *userdata->m_color_inputs.blender1a_b[1];
+	*fr = (*userdata->m_color_inputs.blender1a_rgb[1]).i.r;
+	*fg = (*userdata->m_color_inputs.blender1a_rgb[1]).i.g;
+	*fb = (*userdata->m_color_inputs.blender1a_rgb[1]).i.b;
 
 	return true;
 }
@@ -335,9 +335,9 @@ bool n64_blender_t::cycle2_noblend_acvg_dither(INT32* fr, INT32* fg, INT32* fb, 
 	userdata->m_blended_pixel_color.i.g = g;
 	userdata->m_blended_pixel_color.i.b = b;
 	userdata->m_blended_pixel_color.i.a = userdata->m_pixel_color.i.a;
-	*fr = m_color_dither[((*userdata->m_color_inputs.blender1a_r[1] & 0xff) << 3) | dith];
-	*fg = m_color_dither[((*userdata->m_color_inputs.blender1a_g[1] & 0xff) << 3) | dith];
-	*fb = m_color_dither[((*userdata->m_color_inputs.blender1a_b[1] & 0xff) << 3) | dith];
+	*fr = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[1]).i.r << 3) | dith];
+	*fg = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[1]).i.g << 3) | dith];
+	*fb = m_color_dither[((*userdata->m_color_inputs.blender1a_rgb[1]).i.b << 3) | dith];
 
 	return true;
 }
@@ -460,9 +460,9 @@ void n64_blender_t::blend_with_partial_reject(INT32* r, INT32* g, INT32* b, INT3
 {
 	if (partialreject && userdata->m_pixel_color.i.a >= 0xff)
 	{
-		*r = *userdata->m_color_inputs.blender1a_r[cycle];
-		*g = *userdata->m_color_inputs.blender1a_g[cycle];
-		*b = *userdata->m_color_inputs.blender1a_b[cycle];
+		*r = (*userdata->m_color_inputs.blender1a_rgb[cycle]).i.r;
+		*g = (*userdata->m_color_inputs.blender1a_rgb[cycle]).i.g;
+		*b = (*userdata->m_color_inputs.blender1a_rgb[cycle]).i.b;
 	}
 	else
 	{
@@ -480,13 +480,13 @@ void n64_blender_t::blend_pipe(const int cycle, const int special, int* r_out, i
 	const INT32 blend2a = (*userdata->m_color_inputs.blender2b_a[cycle] >> shift_b) & mask;
 	const INT32 special_shift = special << 1;
 
-	INT32 r = (((int)(*userdata->m_color_inputs.blender1a_r[cycle]) * (int)(blend1a))) + (((int)(*userdata->m_color_inputs.blender2a_r[cycle]) * (int)(blend2a)));
-	INT32 g = (((int)(*userdata->m_color_inputs.blender1a_g[cycle]) * (int)(blend1a))) + (((int)(*userdata->m_color_inputs.blender2a_g[cycle]) * (int)(blend2a)));
-	INT32 b = (((int)(*userdata->m_color_inputs.blender1a_b[cycle]) * (int)(blend1a))) + (((int)(*userdata->m_color_inputs.blender2a_b[cycle]) * (int)(blend2a)));
+	INT32 r = (((int)(*userdata->m_color_inputs.blender1a_rgb[cycle]).i.r * (int)(blend1a))) + (((int)(*userdata->m_color_inputs.blender2a_rgb[cycle]).i.r * (int)(blend2a)));
+	INT32 g = (((int)(*userdata->m_color_inputs.blender1a_rgb[cycle]).i.g * (int)(blend1a))) + (((int)(*userdata->m_color_inputs.blender2a_rgb[cycle]).i.g * (int)(blend2a)));
+	INT32 b = (((int)(*userdata->m_color_inputs.blender1a_rgb[cycle]).i.b * (int)(blend1a))) + (((int)(*userdata->m_color_inputs.blender2a_rgb[cycle]).i.b * (int)(blend2a)));
 
-	r += ((int)*userdata->m_color_inputs.blender2a_r[cycle]) << special_shift;
-	g += ((int)*userdata->m_color_inputs.blender2a_g[cycle]) << special_shift;
-	b += ((int)*userdata->m_color_inputs.blender2a_b[cycle]) << special_shift;
+	r += (*userdata->m_color_inputs.blender2a_rgb[cycle]).i.r << special_shift;
+	g += (*userdata->m_color_inputs.blender2a_rgb[cycle]).i.g << special_shift;
+	b += (*userdata->m_color_inputs.blender2a_rgb[cycle]).i.b << special_shift;
 
 	r >>= object.m_other_modes.blend_shift;
 	g >>= object.m_other_modes.blend_shift;

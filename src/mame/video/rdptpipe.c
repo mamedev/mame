@@ -541,24 +541,27 @@ void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const
 	const bool magnify = (lod < 32);
 	const bool distant = ((lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level));
 
-	userdata->m_lod_fraction = ((lod << 3) >> l_tile) & 0xff;
+	UINT8 lod_fraction = ((lod << 3) >> l_tile) & 0xff;
 
 	if(!object.m_other_modes.sharpen_tex_en && !object.m_other_modes.detail_tex_en)
 	{
 		if (distant)
 		{
-			userdata->m_lod_fraction = 0xff;
+			lod_fraction = 0xff;
 		}
 		else if (magnify)
 		{
-			userdata->m_lod_fraction = 0;
+			lod_fraction = 0;
 		}
 	}
 
+	userdata->m_lod_fraction.i.r = userdata->m_lod_fraction.i.g = userdata->m_lod_fraction.i.b = userdata->m_lod_fraction.i.a = lod_fraction;
+	/* FIXME: ???
 	if(object.m_other_modes.sharpen_tex_en && magnify)
 	{
 		userdata->m_lod_fraction |= 0x100;
 	}
+	*/
 }
 
 void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const INT32 t, const INT32 w, const INT32 dsinc, const INT32 dtinc, const INT32 dwinc, const INT32 prim_tile, INT32* t1, INT32* t2, rdp_span_aux* userdata, const rdp_poly_state& object)
@@ -611,24 +614,27 @@ void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const
 	const bool magnify = (lod < 32);
 	const bool distant = ((lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level));
 
-	userdata->m_lod_fraction = ((lod << 3) >> l_tile) & 0xff;
+	UINT8 lod_fraction = ((lod << 3) >> l_tile) & 0xff;
 
 	if(!object.m_other_modes.sharpen_tex_en && !object.m_other_modes.detail_tex_en)
 	{
 		if (distant)
 		{
-			userdata->m_lod_fraction = 0xff;
+			lod_fraction = 0xff;
 		}
 		else if (magnify)
 		{
-			userdata->m_lod_fraction = 0;
+			lod_fraction = 0;
 		}
 	}
 
+	userdata->m_lod_fraction.i.r = userdata->m_lod_fraction.i.g = userdata->m_lod_fraction.i.b = userdata->m_lod_fraction.i.a = lod_fraction;
+
+	/* FIXME: ???
 	if(object.m_other_modes.sharpen_tex_en && magnify)
 	{
 		userdata->m_lod_fraction |= 0x100;
-	}
+	}*/
 
 	if (object.m_other_modes.tex_lod_en)
 	{

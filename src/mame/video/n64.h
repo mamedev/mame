@@ -327,13 +327,9 @@ struct color_inputs_t
 	UINT8* combiner_alphaadd[2];
 
 	// blender input
-	UINT8* blender1a_r[2];
-	UINT8* blender1a_g[2];
-	UINT8* blender1a_b[2];
+	color_t* blender1a_rgb[2];
 	UINT8* blender1b_a[2];
-	UINT8* blender2a_r[2];
-	UINT8* blender2a_g[2];
-	UINT8* blender2a_b[2];
+	color_t* blender2a_rgb[2];
 	UINT8* blender2b_a[2];
 };
 
@@ -346,19 +342,31 @@ struct rdp_span_aux
 	color_t             m_pixel_color;
 	color_t             m_inv_pixel_color;
 	color_t             m_blended_pixel_color;
+
 	color_t             m_combined_color;
+	color_t             m_combined_alpha;
 	color_t             m_texel0_color;
+	color_t             m_texel0_alpha;
 	color_t             m_texel1_color;
+	color_t             m_texel1_alpha;
 	color_t             m_next_texel_color;
+	color_t             m_next_texel_alpha;
 	color_t             m_blend_color;          /* constant blend color */
+	color_t             m_blend_alpha;          /* constant blend alpha */
 	color_t             m_prim_color;           /* flat primitive color */
+	color_t             m_prim_alpha;           /* flat primitive alpha */
 	color_t             m_env_color;            /* generic color constant ('environment') */
+	color_t             m_env_alpha;            /* generic color constant ('environment') */
 	color_t             m_fog_color;            /* generic color constant ('fog') */
+	color_t             m_fog_alpha;            /* generic color constant ('fog') */
 	color_t             m_shade_color;          /* gouraud-shaded color */
+	color_t             m_shade_alpha;          /* gouraud-shaded color */
 	color_t             m_key_scale;            /* color-keying constant */
 	color_t             m_noise_color;          /* noise */
-	UINT8               m_lod_fraction;         /* Z-based LOD fraction for this poly */
-	UINT8               m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
+	color_t				m_lod_fraction;			/* Z-based LOD fraction for this poly */
+	color_t				m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
+	color_t				m_k4;
+	color_t				m_k5;
 	color_inputs_t      m_color_inputs;
 	UINT32              m_current_pix_cvg;
 	UINT32              m_current_mem_cvg;
@@ -478,16 +486,14 @@ public:
 	UINT8       get_random() { return m_misc_state.m_random_seed += 0x13; }
 
 	// YUV Factors
-	void        set_yuv_factors(INT32 k0, INT32 k1, INT32 k2, INT32 k3, INT32 k4, INT32 k5) { m_k0 = k0; m_k1 = k1; m_k2 = k2; m_k3 = k3; m_k4 = k4; m_k5 = k5; }
+	void        set_yuv_factors(INT32 k0, INT32 k1, INT32 k2, INT32 k3, INT32 k4, INT32 k5) { m_k0 = k0; m_k1 = k1; m_k2 = k2; m_k3 = k3; m_k4.c = k4; m_k5.c = k5; }
 	INT32       get_k0() const { return m_k0; }
 	INT32       get_k1() const { return m_k1; }
 	INT32       get_k2() const { return m_k2; }
 	INT32       get_k3() const { return m_k3; }
-	INT32*      get_k4() { return &m_k4; }
-	INT32*      get_k5() { return &m_k5; }
 
 	// Blender-related (move into RDP::Blender)
-	void        set_blender_input(INT32 cycle, INT32 which, UINT8** input_r, UINT8** input_g, UINT8** input_b, UINT8** input_a, INT32 a, INT32 b, rdp_span_aux* userdata);
+	void        set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, UINT8** input_a, INT32 a, INT32 b, rdp_span_aux* userdata);
 
 	// Span rasterization
 	void        span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
@@ -565,12 +571,16 @@ public:
 
 	// Color constants
 	color_t         m_blend_color;          /* constant blend color */
+	color_t         m_blend_alpha;          /* constant blend alpha */
 	color_t         m_prim_color;           /* flat primitive color */
+	color_t         m_prim_alpha;           /* flat primitive alpha */
 	color_t         m_env_color;            /* generic color constant ('environment') */
+	color_t         m_env_alpha;            /* generic alpha constant ('environment') */
 	color_t         m_fog_color;            /* generic color constant ('fog') */
+	color_t         m_fog_alpha;            /* generic alpha constant ('fog') */
 	color_t         m_key_scale;            /* color-keying constant */
-	UINT8           m_lod_fraction;         /* Z-based LOD fraction for this poly */
-	UINT8           m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
+	color_t			m_lod_fraction;         /* Z-based LOD fraction for this poly */
+	color_t			m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
 
 	color_t         m_one;
 	color_t         m_zero;
@@ -595,8 +605,6 @@ public:
 	rectangle       m_visarea;
 
 	void            draw_triangle(bool shade, bool texture, bool zbuffer, bool rect);
-	void            compute_cvg_noflip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
-	void            compute_cvg_flip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
 
 	void*           m_aux_buf;
 	UINT32          m_aux_buf_ptr;
@@ -607,6 +615,9 @@ public:
 	n64_tile_t      m_tiles[8];
 
 private:
+	void    compute_cvg_noflip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+	void    compute_cvg_flip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+
 	void    write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp_span_aux* userdata, const rdp_poly_state &object);
 	void    read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
 	void    copy_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, INT32 m_current_pix_cvg, const rdp_poly_state &object);
@@ -617,6 +628,9 @@ private:
 
 	void    video_update16(n64_periphs* n64, bitmap_rgb32 &bitmap);
 	void    video_update32(n64_periphs* n64, bitmap_rgb32 &bitmap);
+
+	typedef void (n64_rdp::*compute_cvg_t) (extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
+	compute_cvg_t	m_compute_cvg[2];
 
 	running_machine* m_machine;
 
@@ -648,8 +662,8 @@ private:
 	INT32 m_k1;
 	INT32 m_k2;
 	INT32 m_k3;
-	INT32 m_k4;
-	INT32 m_k5;
+	color_t m_k4;
+	color_t m_k5;
 
 	// Texture perspective division
 	INT32 m_norm_point_rom[64];
