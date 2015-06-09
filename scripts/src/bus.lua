@@ -164,6 +164,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/emu/bus/apricot/expansion.h,BUSES += APRICOT_EXPANSION
+---------------------------------------------------
+
+if (BUSES["APRICOT_EXPANSION"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/bus/apricot/expansion.c",
+		MAME_DIR .. "src/emu/bus/apricot/expansion.h",
+		MAME_DIR .. "src/emu/bus/apricot/cards.c",
+		MAME_DIR .. "src/emu/bus/apricot/cards.h",
+		MAME_DIR .. "src/emu/bus/apricot/ram.c",
+		MAME_DIR .. "src/emu/bus/apricot/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/emu/bus/arcadia/slot.h,BUSES += ARCADIA
 ---------------------------------------------------
 
