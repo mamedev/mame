@@ -868,7 +868,7 @@ static MACHINE_CONFIG_DERIVED( venture, base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(venture_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(venture_audio)
@@ -890,7 +890,7 @@ static MACHINE_CONFIG_DERIVED( mtrap, venture )
 
 	/* basic machine hardware */
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(mtrap_cvsd_audio)
