@@ -11,18 +11,23 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h" //CPU was actually a NSC800 (Z80 compatible)
-
+#include "bus/generic/carts.h"
 
 class i7000_state : public driver_device
 {
 public:
 	i7000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)	{ }
+		: driver_device(mconfig, type, tag),
+			m_card(*this, "cardslot")
+	{ }
+
+	required_device<generic_slot_device> m_card;
 
 //	DECLARE_READ8_MEMBER( i7000_io_r );
 //	DECLARE_WRITE8_MEMBER( i7000_io_w );
 
 	DECLARE_DRIVER_INIT(i7000);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 };
 
 DRIVER_INIT_MEMBER(i7000_state, i7000)
@@ -42,6 +47,16 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 ADDRESS_MAP_END
 */
 
+DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
+{
+	UINT32 size = m_card->common_get_size("rom");
+
+	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
+	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
+
+	return IMAGE_INIT_PASS;
+}
+
 static MACHINE_CONFIG_START( i7000, i7000_state )
 
 	/* basic machine hardware */
@@ -49,6 +64,13 @@ static MACHINE_CONFIG_START( i7000, i7000_state )
 	MCFG_CPU_PROGRAM_MAP(i7000_mem)
 //	MCFG_CPU_IO_MAP(i7000_io)
 
+	/* Cartridge slot */
+	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "i7000_card")
+	MCFG_GENERIC_EXTENSIONS("rom")
+	MCFG_GENERIC_LOAD(i7000_state, i7000_card)
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("card_list", "i7000_card")
 MACHINE_CONFIG_END
 
 ROM_START( i7000 )
