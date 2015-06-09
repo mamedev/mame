@@ -13,19 +13,34 @@ class grchamp_state : public driver_device
 public:
 	grchamp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_radarram(*this, "radarram"),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_leftram(*this, "leftram"),
-		m_rightram(*this, "rightram"),
-		m_centerram(*this, "centerram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_radarram(*this, "radarram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_leftram(*this, "leftram"),
+		m_rightram(*this, "rightram"),
+		m_centerram(*this, "centerram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	required_shared_ptr<UINT8> m_radarram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_leftram;
+	required_shared_ptr<UINT8> m_rightram;
+	required_shared_ptr<UINT8> m_centerram;
 
 	UINT8       m_cpu0_out[16];
 	UINT8       m_cpu1_out[16];
@@ -39,13 +54,6 @@ public:
 
 	UINT16      m_collide;
 	UINT8       m_collmode;
-
-	required_shared_ptr<UINT8> m_radarram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_leftram;
-	required_shared_ptr<UINT8> m_rightram;
-	required_shared_ptr<UINT8> m_centerram;
 
 	bitmap_ind16 m_work_bitmap;
 	tilemap_t * m_text_tilemap;
@@ -64,37 +72,34 @@ public:
 	DECLARE_WRITE8_MEMBER(main_to_sub_comm_w);
 	DECLARE_READ8_MEMBER(main_to_sub_comm_r);
 	UINT8 get_pc3259_bits(int offs);
-	DECLARE_WRITE8_MEMBER(grchamp_left_w);
-	DECLARE_WRITE8_MEMBER(grchamp_center_w);
-	DECLARE_WRITE8_MEMBER(grchamp_right_w);
-	DECLARE_WRITE8_MEMBER(grchamp_portA_0_w);
-	DECLARE_WRITE8_MEMBER(grchamp_portB_0_w);
-	DECLARE_WRITE8_MEMBER(grchamp_portA_2_w);
-	DECLARE_WRITE8_MEMBER(grchamp_portB_2_w);
+	DECLARE_WRITE8_MEMBER(left_w);
+	DECLARE_WRITE8_MEMBER(center_w);
+	DECLARE_WRITE8_MEMBER(right_w);
+	DECLARE_WRITE8_MEMBER(portA_0_w);
+	DECLARE_WRITE8_MEMBER(portB_0_w);
+	DECLARE_WRITE8_MEMBER(portA_2_w);
+	DECLARE_WRITE8_MEMBER(portB_2_w);
+
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_left_tile_info);
 	TILE_GET_INFO_MEMBER(get_right_tile_info);
 	TILE_GET_INFO_MEMBER(get_center_tile_info);
-	DECLARE_PALETTE_INIT(grchamp);
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
+
+	DECLARE_PALETTE_INIT(grchamp);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	void palette_generate();
-	UINT32 screen_update_grchamp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(grchamp_cpu0_interrupt);
-	INTERRUPT_GEN_MEMBER(grchamp_cpu1_interrupt);
+
+	INTERRUPT_GEN_MEMBER(cpu0_interrupt);
+	INTERRUPT_GEN_MEMBER(cpu1_interrupt);
 	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);
+
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_objects(int y, UINT8 *objdata);
 	int collision_check(bitmap_ind16 &bitmap, int which );
 	void draw_fog(bitmap_ind16 &bitmap, const rectangle &cliprect, int fog);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<discrete_device> m_discrete;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
 };
 
 /* Discrete Sound Input Nodes */
