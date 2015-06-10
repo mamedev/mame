@@ -65,13 +65,67 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT8 *m_char_rom;
 
-//	DECLARE_READ8_MEMBER( i7000_io_r );
-//	DECLARE_WRITE8_MEMBER( i7000_io_w );
-
 	DECLARE_DRIVER_INIT(i7000);
 	DECLARE_PALETTE_INIT(i7000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
+
+	DECLARE_READ8_MEMBER( i7000_io_keyboard_r );
 };
+
+READ8_MEMBER( i7000_state::i7000_io_keyboard_r )
+{
+	static UINT8 keyvalue = 0;
+	UINT8 data = 0;
+	UINT8 key_values1[] = {0xC9, 0xC0, 0xC8, 0xD0, 0xD8, 0xe0, 0xe8, 0xF0};
+	UINT8 key_values2[] = {0xF8, 0xC1, 0xF3, 0xFD, 0xD5, 0xDB};
+
+	if (offset==1){
+        keyvalue = 0;
+        data = ioport("KEYS1")->read();
+        for (int i=0; i<8; i++){
+            if (data & 1) {
+                keyvalue = key_values1[i];
+                return 1;
+            }
+            data >>= 1;
+        }
+
+        data = ioport("KEYS2")->read();
+        for (int i=0; i<6; i++){
+            if (data & 1) {
+                keyvalue = key_values2[i];
+                return 1;
+            }
+            data >>= 1;
+        }
+        return 0;
+    }
+    //else if (offset==0)
+    return keyvalue;
+}
+
+/* Input ports */
+static INPUT_PORTS_START( i7000 )
+	PORT_START("KEYS1")
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')//0xC9
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')//0xC0
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')//0xC8
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')//0xD0
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')//0xD8
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')//0xE0
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')//0xE8
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')//0xF0
+
+	PORT_START("KEYS2")
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')//0xF8
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')//0xC1
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')//0xF3
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')//0xFD
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')//0xD5
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')//0xDB
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(i7000_state, i7000)
 {
@@ -133,7 +187,6 @@ static ADDRESS_MAP_START(i7000_mem, AS_PROGRAM, 8, i7000_state)
 //    AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("cardslot", 0)
 ADDRESS_MAP_END
 
-/*
 static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
@@ -152,7 +205,6 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 //	AM_RANGE(0x3b, 0x3b) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
 //	AM_RANGE(0x66, 0x67) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
 ADDRESS_MAP_END
-*/
 
 DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
 {
@@ -188,7 +240,7 @@ static MACHINE_CONFIG_START( i7000, i7000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(i7000_mem)
-//	MCFG_CPU_IO_MAP(i7000_io)
+	MCFG_CPU_IO_MAP(i7000_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -228,4 +280,4 @@ ROM_START( i7000 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                COMPANY    FULLNAME    FLAGS */
-COMP( 1982, i7000,  0,      0,       i7000,     0,       i7000_state, i7000, "Itautec", "I-7000",   GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, i7000,  0,      0,       i7000,     i7000,   i7000_state, i7000, "Itautec", "I-7000",   GAME_NOT_WORKING | GAME_NO_SOUND)
