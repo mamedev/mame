@@ -5120,7 +5120,7 @@ DRIVER_INIT_MEMBER(segas32_new_state,orunners) {	m_mainpcb->init_orunners(); }
 DRIVER_INIT_MEMBER(segas32_new_state, arescue)
 {
 	m_mainpcb->init_arescue(1);
-	m_slavepcb->init_arescue(1);
+	m_slavepcb->init_arescue(0);
 
 	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
 	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
