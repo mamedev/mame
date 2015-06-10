@@ -51,12 +51,15 @@ class i7000_state : public driver_device
 public:
 	i7000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+          m_maincpu(*this, "maincpu"),
           m_card(*this, "cardslot"),
           m_videoram(*this, "videoram")
     { }
 
-	virtual void video_start();
+	void video_start();
+	void machine_start();
 
+	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
 	required_shared_ptr<UINT8> m_videoram;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,6 +75,17 @@ public:
 
 DRIVER_INIT_MEMBER(i7000_state, i7000)
 {
+}
+
+void i7000_state::machine_start()
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	if (m_card->exists())
+	{
+		// 0x4000 - 0xbfff   32KB ROM
+		program.install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+	}
 }
 
 PALETTE_INIT_MEMBER(i7000_state, i7000)
@@ -115,8 +129,8 @@ UINT32 i7000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 static ADDRESS_MAP_START(i7000_mem, AS_PROGRAM, 8, i7000_state)
     AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
     AM_RANGE(0x1000, 0x1fff) AM_RAM
-    AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
-//    AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("cardslot", 0)
+    AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
+//    AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("cardslot", 0)
 ADDRESS_MAP_END
 
 /*
