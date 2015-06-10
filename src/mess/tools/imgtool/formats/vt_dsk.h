@@ -11,7 +11,7 @@
 #ifndef VT_DSK_H
 #define VT_DSK_H
 
-#include "flopimg.h"
+#include "formats/flopimg.h"
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(vz);
 

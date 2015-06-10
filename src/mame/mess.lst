@@ -1706,6 +1706,7 @@ hp9k340
 hp9k370
 hp9k380
 hp9k382
+hp64k
 
 // SpectraVideo
 svi318  // SVI-318 (PAL)
@@ -2281,6 +2282,7 @@ elwro800
 fk1
 et3400
 amu880
+i7000
 interact
 jr100
 jr100u

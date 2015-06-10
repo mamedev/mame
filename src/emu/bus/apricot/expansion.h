@@ -57,6 +57,9 @@
 	MCFG_DEVICE_ADD(_tag, APRICOT_EXPANSION_BUS, 0) \
 	apricot_expansion_bus_device::set_cpu_tag(*device, owner, _cpu_tag);
 
+#define MCFG_EXPANSION_IOP_ADD(_tag) \
+	apricot_expansion_bus_device::set_iop_tag(*device, owner, _tag);
+
 #define MCFG_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, APRICOT_EXPANSION_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
@@ -134,12 +137,10 @@ public:
 		{ return downcast<apricot_expansion_bus_device &>(device).m_int3_handler.set_callback(object); }
 
 	// inline configuration
-	static void set_cpu_tag(device_t &device, device_t *owner, const char *cpu_tag);
+	static void set_cpu_tag(device_t &device, device_t *owner, const char *tag);
+	static void set_iop_tag(device_t &device, device_t *owner, const char *tag);
 
 	void add_card(device_apricot_expansion_card_interface *card);
-
-	address_space *m_program;
-	address_space *m_io;
 
 	// from cards
 	DECLARE_WRITE_LINE_MEMBER( dma1_w );
@@ -149,6 +150,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( int2_w );
 	DECLARE_WRITE_LINE_MEMBER( int3_w );
 
+	void install_ram(offs_t addrstart, offs_t addrend, void *baseptr);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -156,6 +159,12 @@ protected:
 
 private:
 	simple_list<device_apricot_expansion_card_interface> m_dev;
+
+	// address spaces we have access to
+	address_space *m_program;
+	address_space *m_io;
+	address_space *m_program_iop;
+	address_space *m_io_iop;
 
 	devcb_write_line m_dma1_handler;
 	devcb_write_line m_dma2_handler;
@@ -166,6 +175,7 @@ private:
 
 	// configuration
 	const char *m_cpu_tag;
+	const char *m_iop_tag;
 };
 
 // device type definition

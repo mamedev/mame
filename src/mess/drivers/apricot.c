@@ -39,7 +39,6 @@ public:
 	m_cpu(*this, "ic91"),
 	m_iop(*this, "ic71"),
 	m_ram(*this, RAM_TAG),
-	m_sn(*this, "ic7"),
 	m_crtc(*this, "ic30"),
 	m_ppi(*this, "ic17"),
 	m_pic(*this, "ic31"),
@@ -73,7 +72,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(timer_out1);
 	DECLARE_WRITE_LINE_MEMBER(timer_out2);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	DECLARE_READ8_MEMBER(sio_da_r);
 	DECLARE_READ8_MEMBER(sio_ca_r);
+	DECLARE_READ8_MEMBER(sio_db_r);
 	DECLARE_READ8_MEMBER(sio_cb_r);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
@@ -94,7 +95,6 @@ private:
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;
 	required_device<ram_device> m_ram;
-	required_device<sn76489_device> m_sn;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
@@ -222,6 +222,14 @@ WRITE_LINE_MEMBER( apricot_state::timer_out2 )
 	}
 }
 
+READ8_MEMBER( apricot_state::sio_da_r )
+{
+	if (m_bus_locked)
+		return m_sio->m1_r();
+
+	return m_sio->da_r(space, offset);
+}
+
 READ8_MEMBER( apricot_state::sio_ca_r )
 {
 	if (m_bus_locked)
@@ -236,6 +244,14 @@ READ8_MEMBER( apricot_state::sio_cb_r )
 		return m_sio->m1_r();
 
 	return m_sio->cb_r(space, offset);
+}
+
+READ8_MEMBER( apricot_state::sio_db_r )
+{
+	if (m_bus_locked)
+		return m_sio->m1_r();
+
+	return m_sio->db_r(space, offset);
 }
 
 
@@ -339,9 +355,9 @@ static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
 	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76489_device, write, 0x00ff)
 	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("ic16", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE8("ic15", z80sio0_device, da_r, da_w, 0x00ff)
+	AM_RANGE(0x60, 0x61) AM_READ8(sio_da_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, da_w, 0x00ff)
 	AM_RANGE(0x62, 0x63) AM_READ8(sio_ca_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, ca_w, 0x00ff)
-	AM_RANGE(0x64, 0x65) AM_DEVREADWRITE8("ic15", z80sio0_device, db_r, db_w, 0x00ff)
+	AM_RANGE(0x64, 0x65) AM_READ8(sio_db_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, db_w, 0x00ff)
 	AM_RANGE(0x66, 0x67) AM_READ8(sio_cb_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, cb_w, 0x00ff)
 	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_device, register_r, register_w, 0x00ff)
@@ -457,6 +473,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	// expansion bus
 	MCFG_EXPANSION_ADD("exp", "ic91")
+	MCFG_EXPANSION_IOP_ADD("ic71")
 	MCFG_EXPANSION_SLOT_ADD("exp:1", apricot_expansion_cards, NULL)
 	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, NULL)
 MACHINE_CONFIG_END

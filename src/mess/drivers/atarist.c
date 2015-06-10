@@ -2453,7 +2453,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tt030 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( tt030, st )
+static MACHINE_CONFIG_DERIVED( tt030, ste )
 MACHINE_CONFIG_END
 
 
@@ -2461,7 +2461,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon, st )
+static MACHINE_CONFIG_DERIVED( falcon, ste )
 MACHINE_CONFIG_END
 
 
@@ -2469,7 +2469,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon40 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon40, st )
+static MACHINE_CONFIG_DERIVED( falcon40, ste )
 MACHINE_CONFIG_END
 
 
