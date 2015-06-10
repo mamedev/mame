@@ -245,21 +245,17 @@ void segas32_state::common_start(int multi32)
 	m_solid_ffff = auto_alloc_array(machine(), UINT16, 512);
 	memset(m_solid_ffff, 0xff, sizeof(m_solid_ffff[0]) * 512);
 
+	memset(m_system32_videoram, 0x00, 0x20000);
+
 	/* initialize videoram */
 	m_system32_videoram[0x1ff00/2] = 0x8000;
+
+	memset(m_mixer_control, 0xff, sizeof(m_mixer_control[0][0]) * 0x80 );
+
+	
+
 }
 
-
-VIDEO_START_MEMBER(segas32_state,system32)
-{
-	common_start(0);
-}
-
-
-VIDEO_START_MEMBER(segas32_state,multi32)
-{
-	common_start(1);
-}
 
 
 
