@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Thanks to Alexandre Souza (Tabajara) for contributing the initial
+cartridges data available in this softlist.
+-->
+<softwarelist name="i7000_card" description="Itautec I-7000 cartridges">
+	<software name="set78">
+		<description>I-7101 SET 78 COML v1.3 R01</description>
+		<year>198?</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x2000">
+				<rom name="i-7101_set_78_coml_v1.3_r01_703d.rom" size="0x2000" crc="12da1687" sha1="b370c2b7718cf89d69e37fc7d1d3c4d80dc5f1cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telex">
+		<description>I-7104 TELEX v1.0 R4 (Aug 31st, 1987)</description>
+		<year>1987</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="i-7104_cart_telex_v1.0_r4_a5e5_31_08_87_1.rom" size="0x2000" crc="5ae6b20d" sha1="f3cbfa81bdc828872790290a53e62750d720b457" offset="0x0000" />
+				<rom name="i-7104_cart_telex_v1.0_r4_632c_31_08_87_2.rom" size="0x2000" crc="e95dd757" sha1="f90886b8c36063643509fcad4df1061de1dc7a90" offset="0x2000" />
+				<rom name="i-7104_cart_telex_v1.0_r4_a3b4_31_08_87_3.rom" size="0x2000" crc="ef884b22" sha1="bbc3688a64292dd15fe8103bf6cadfd4a991abb9" offset="0x4000" />
+				<rom name="i-7104_cart_telex_v1.0_r4_fdcc_31_08_87_4.rom" size="0x2000" crc="82202eb9" sha1="ee2018b5b58a656630c5057b3a65316f38099265" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redator">
+		<description>I-7105 REDATOR v1.2 R02 (Sept 16th, 1983)</description>
+		<year>1983</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="i-7105_redator_v1.2_r02_16_09_83_1.rom" size="0x2000" crc="2b5bf15f" sha1="1384cab00e1596619e1ae5ae072bd23af6fe6b2e" offset="0x0000" />
+				<rom name="i-7105_redator_v1.2_r02_16_09_83_2.rom" size="0x2000" crc="22c64fc2" sha1="ef4fbe93deeea65f1705e9b5fb2ad4d376650215" offset="0x2000" />
+				<rom name="i-7105_redator_v1.2_r02_16_09_83_3.rom" size="0x2000" crc="cfb8e70b" sha1="08683feafbe28e009458a0cfb1301bedd7e03aaa" offset="0x4000" />
+				<rom name="i-7105_redator_v1.2_r02_16_09_83_4.rom" size="0x2000" crc="f8510fee" sha1="275528441d4c4a410e6be45d0ecbe465aef2afe1" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="set3278">
+		<description>I-7106 SET 3278 v1.2 R00 (Mar 21st, 1985)</description>
+		<year>1985</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x2000">
+				<rom name="i-7106_set_3278_v1.2_r00_21_03_85.rom" size="0x2000" crc="004275c8" sha1="ff42eb526f6142cff0d6ecfef8e41ef17bfac2c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="setvt52">
+		<description>I-7107 SET VT52 v1.0 R02 (Feb 25th, 1986)</description>
+		<year>1986</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x4000">
+				<rom name="i-7107_set_vt52_v1.0_r02_25_02_86_1.rom" size="0x2000" crc="ead3f48e" sha1="ec7951591cab8e8c2cb22f7e6352c709d24b9706" offset="0x0000" />
+				<rom name="i-7107_set_vt52_v1.0_r02_25_02_86_2.rom" size="0x2000" crc="da848ec0" sha1="7ed1898de94c7382c081ec3a78f60a6850daa25a" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="i7113">
+		<description>I-7113 v1.2 R02 (Mar 4th, 1986)</description>
+		<year>1986</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x2000">
+				<rom name="i-7113_v1.2_r02_04_03_86.rom" size="0x2000" crc="865da8b7" sha1="da65dc6d65bbe0b8e84c0eeda15021e2575fd696" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redelocal">
+		<description>I-7119 REDE LOCAL v1.0 R01 (Mar 21st, 1987)</description>
+		<year>1987</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x4000">
+				<rom name="i-7119_rede_local_v1.0_r01_21_03_87_1.rom" size="0x2000" crc="f0e95bc4" sha1="fa4482b005d8647dca411911b0f7048c940632c8" offset="0x0000" />
+				<rom name="i-7119_rede_local_v1.0_r01_21_03_87_2.rom" size="0x2000" crc="3b9461bf" sha1="958a71e61a91433645d402c31955fe4f64efcba0" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telex2">
+		<description>I-7120 TELEX II v1.0 R04 (Aug 31st, 1987)</description>
+		<year>1987</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="i-7120_telex_ii_v1.0_r04_31_08_87_1.rom" size="0x2000" crc="5ae6b20d" sha1="f3cbfa81bdc828872790290a53e62750d720b457" offset="0x0000" />
+				<rom name="i-7120_telex_ii_v1.0_r04_31_08_87_2.rom" size="0x2000" crc="e95dd757" sha1="f90886b8c36063643509fcad4df1061de1dc7a90" offset="0x2000" />
+				<rom name="i-7120_telex_ii_v1.0_r04_31_08_87_3.rom" size="0x2000" crc="ef884b22" sha1="bbc3688a64292dd15fe8103bf6cadfd4a991abb9" offset="0x4000" />
+				<rom name="i-7120_telex_ii_v1.0_r04_31_08_87_4.rom" size="0x2000" crc="82202eb9" sha1="ee2018b5b58a656630c5057b3a65316f38099265" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redatorv12">
+		<description>I-71XX REDATOR v1.2 R04</description>
+		<year>198?</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x8000">
+				<rom name="i-71xx_redator_v1.2_r04_1.rom" size="0x2000" crc="98105005" sha1="3cbd9de8c7e37e16d1dd143a7e735f582cf303c8" offset="0x0000" />
+				<rom name="i-71xx_redator_v1.2_r04_2.rom" size="0x2000" crc="848d665c" sha1="2095c9007f090d4510265fd3da6ef0d037c7ee86" offset="0x2000" />
+				<rom name="i-71xx_redator_v1.2_r04_3.rom" size="0x2000" crc="1e61ff21" sha1="d8e28264e7020e912774fd9bda6bacd4b227a14d" offset="0x4000" />
+				<rom name="i-71xx_redator_v1.2_r04_4.rom" size="0x2000" crc="6c6b96a6" sha1="26bac8e902d40490fcd2e9021a5de3753c0fc26a" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="setdisc">
+		<description>I-71XX SETDISC</description>
+		<year>198?</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x4000">
+				<rom name="i-71xx_setdisc_1.rom" size="0x2000" crc="0ad7d534" sha1="aecf5f01b8ffb4120f3cd4752705f6538ef70f4e" offset="0x0000" />
+				<rom name="i-71xx_setdisc_2.rom" size="0x2000" crc="51e24c2b" sha1="172699394690ee46096d9395f6894ebaa26ea6ac" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videotexto">
+		<description>I-71XX VIDEOTEXTO</description>
+		<year>198?</year>
+		<publisher>Itautec</publisher>
+		<part name="card" interface="i7000_card">
+			<dataarea name="rom" size="0x6000">
+				<rom name="i-71xx_videotexto_1.rom" size="0x2000" crc="28dda7db" sha1="ced755c40fcdf2dc2cd5263a494d51917e1010d1" offset="0x0000" />
+				<rom name="i-71xx_videotexto_2.rom" size="0x2000" crc="b4293435" sha1="5e2b96c19c4f5c63a5afa2de504d29fe64a4c908" offset="0x2000" />
+				<rom name="i-71xx_videotexto_3.rom" size="0x2000" crc="07486b26" sha1="e54e32a789e73b772516759ac26badf5805abd95" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
