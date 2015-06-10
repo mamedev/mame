@@ -9,13 +9,14 @@
 NETLIST_START(dummy)
 	SOLVER(Solver, 12000)
 	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 200)
-	PARAM(Solver.GS_LOOPS, 4)
-	PARAM(Solver.SOR_FACTOR, 1)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.GS_LOOPS, 3)
+	//PARAM(Solver.GS_THRESHOLD, 99) // Force Gaussian elimination here
+	PARAM(Solver.SOR_FACTOR, 1.05)
 	#if 0
-	PARAM(Solver.SOR_FACTOR, 1)
+	//PARAM(Solver.SOR_FACTOR, 1)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.LTE, 1e1)
+	PARAM(Solver.LTE, 1e-1)
 	#endif
 	//FIXME proper models!
 	NET_MODEL(".model 2SC945 NPN(Is=2.04f Xti=3 Eg=1.11 Vaf=6 Bf=400 Ikf=20m Xtb=1.5 Br=3.377 Rc=1 Cjc=1p Mjc=.3333 Vjc=.75 Fc=.5 Cje=25p Mje=.3333 Vje=.75 Tr=450n Tf=20n Itf=0 Vtf=0 Xtf=0 VCEO=45V ICrating=150M MFG=Toshiba)")
@@ -352,13 +353,20 @@ NETLIST_START(opamp)
 
     VCCS(G1)
     PARAM(G1.RI, RES_K(1000))
+#if 1
     PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
     RES(RP1, 1000)
     CAP(CP1, 1.59e-5)   // <== change to 1.59e-3 for 10Khz bandwidth
+#else
+    PARAM(G1.G, 1)  // typical OP-AMP amplification 100 * 1000 = 100000
+    RES(RP1, 100000)
+    CAP(CP1, 1.59e-7)   // <== change to 1.59e-3 for 10Khz bandwidth
+#endif
     VCVS(EBUF)
     PARAM(EBUF.RO, 50)
     PARAM(EBUF.G, 1)
 
+//    PARAM(EBUF.RI, 1e20)
 //    NET_C(EBUF.ON, GND)
 
     NET_C(G1.ON, GND)
@@ -373,7 +381,15 @@ NETLIST_START(opamp)
     DIODE(DN,"1N914")
 
     NET_C(DP.K, VCC)
+#if 1
     NET_C(DP.A, DN.K, RP1.1)
+#else
+    RES(RDP, 1000)
+    RES(RDN, 1000)
+    NET_C(RDP.1, DP.A)
+    NET_C(RDN.1, DN.K)
+    NET_C(RDP.2, RDN.2, RP1.1)
+#endif
     NET_C(DN.A, GND)
 
     NET_C(EBUF.IP, RP1.1)

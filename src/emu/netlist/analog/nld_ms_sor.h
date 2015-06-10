@@ -100,8 +100,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 	 * omega = 2.0 / (1.0 + nl_math::sqrt(1-rho))
 	 */
 
-	const nl_double ws = this->m_params.m_sor; //1.045; //2.0 / (1.0 + /*sin*/(3.14159 * 5.5 / (double) (m_nets.count()+1)));
-	//const nl_double ws = 2.0 / (1.0 + sin(3.14159 * 4 / (double) (this->N())));
+	const nl_double ws = this->m_params.m_sor;
 
 	ATTR_ALIGN nl_double w[_storage_N];
 	ATTR_ALIGN nl_double one_m_w[_storage_N];
@@ -114,34 +113,31 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 		nl_double gabs_t = 0.0;
 		nl_double RHS_t = 0.0;
 
+		const int term_count = this->m_terms[k]->count();
+		const nl_double * const RESTRICT gt = this->m_terms[k]->gt();
+		const nl_double * const RESTRICT go = this->m_terms[k]->go();
+		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
+		const nl_double * const *other_cur_analog = this->m_terms[k]->other_curanalog();
+
 		new_V[k] = this->m_nets[k]->m_cur_Analog;
 
+		for (unsigned i = 0; i < term_count; i++)
 		{
-			const int term_count = this->m_terms[k]->count();
-			const nl_double * const RESTRICT gt = this->m_terms[k]->gt();
-			const nl_double * const RESTRICT go = this->m_terms[k]->go();
-			const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
-			const nl_double * const *other_cur_analog = this->m_terms[k]->other_curanalog();
-
-			for (int i = 0; i < term_count; i++)
-			{
-				gtot_t = gtot_t + gt[i];
-				RHS_t = RHS_t + Idr[i];
-			}
-
-			if (USE_GABS)
-				for (int i = 0; i < term_count; i++)
-					gabs_t = gabs_t + nl_math::abs(go[i]);
-
-			for (int i = this->m_terms[k]->m_railstart; i < term_count; i++)
-				RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
+			gtot_t = gtot_t + gt[i];
+			RHS_t = RHS_t + Idr[i];
 		}
+
+		for (int i = this->m_terms[k]->m_railstart; i < term_count; i++)
+			RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
 
 		RHS[k] = RHS_t;
 
 		if (USE_GABS)
 		{
-			gabs_t *= NL_FCONST(0.95); // avoid rounding issues
+			for (int i = 0; i < term_count; i++)
+				gabs_t = gabs_t + nl_math::abs(go[i]);
+
+			gabs_t *= NL_FCONST(0.5); // derived by try and error
 			if (gabs_t <= gtot_t)
 			{
 				w[k] = ws / gtot_t;
@@ -164,7 +160,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 
 	do {
 		resched = false;
-
+		double err = 0;
 		for (int k = 0; k < iN; k++)
 		{
 			const int * RESTRICT net_other = this->m_terms[k]->net_other();
@@ -177,9 +173,12 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 
 			const nl_double new_val = new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
 
-			resched = resched || (nl_math::abs(new_val - new_V[k]) > accuracy);
+			err = std::max(nl_math::abs(new_val - new_V[k]), err);
 			new_V[k] = new_val;
 		}
+
+		if (err > accuracy)
+			resched = true;
 
 		resched_cnt++;
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
