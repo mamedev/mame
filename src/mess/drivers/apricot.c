@@ -473,6 +473,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	// expansion bus
 	MCFG_EXPANSION_ADD("exp", "ic91")
+	MCFG_EXPANSION_IOP_ADD("ic71")
 	MCFG_EXPANSION_SLOT_ADD("exp:1", apricot_expansion_cards, NULL)
 	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, NULL)
 MACHINE_CONFIG_END

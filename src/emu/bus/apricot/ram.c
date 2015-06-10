@@ -65,9 +65,9 @@ void apricot_256k_ram_device::device_start()
 void apricot_256k_ram_device::device_reset()
 {
 	if (m_sw->read() == 0)
-		m_bus->m_program->install_ram(0x40000, 0x7ffff, &m_ram[0]);
+		m_bus->install_ram(0x40000, 0x7ffff, &m_ram[0]);
 	else
-		m_bus->m_program->install_ram(0x80000, 0xbffff, &m_ram[0]);
+		m_bus->install_ram(0x80000, 0xbffff, &m_ram[0]);
 }
 
 
@@ -119,9 +119,9 @@ void apricot_128k_ram_device::device_start()
 void apricot_128k_ram_device::device_reset()
 {
 	if (m_strap->read() == 1)
-		m_bus->m_program->install_ram(0x40000, 0x5ffff, &m_ram[0]);
+		m_bus->install_ram(0x40000, 0x5ffff, &m_ram[0]);
 	else if (m_strap->read() == 2)
-		m_bus->m_program->install_ram(0x60000, 0x7ffff, &m_ram[0]);
+		m_bus->install_ram(0x60000, 0x7ffff, &m_ram[0]);
 }
 
 
@@ -173,5 +173,5 @@ void apricot_512k_ram_device::device_start()
 void apricot_512k_ram_device::device_reset()
 {
 	if (m_strap->read() == 0)
-		m_bus->m_program->install_ram(0x40000, 0xbffff, &m_ram[0]);
+		m_bus->install_ram(0x40000, 0xbffff, &m_ram[0]);
 }

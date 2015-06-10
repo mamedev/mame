@@ -62,6 +62,8 @@ apricot_expansion_bus_device::apricot_expansion_bus_device(const machine_config 
 	device_t(mconfig, APRICOT_EXPANSION_BUS, "Apricot Expansion Bus", tag, owner, clock, "apricot_exp_bus", __FILE__),
 	m_program(NULL),
 	m_io(NULL),
+	m_program_iop(NULL),
+	m_io_iop(NULL),
 	m_dma1_handler(*this),
 	m_dma2_handler(*this),
 	m_ext1_handler(*this),
@@ -102,10 +104,12 @@ void apricot_expansion_bus_device::device_start()
 void apricot_expansion_bus_device::device_reset()
 {
 	cpu_device *cpu = m_owner->subdevice<cpu_device>(m_cpu_tag);
-if (!cpu->started())
-	printf("cpu not running yet\n");
 	m_program = &cpu->space(AS_PROGRAM);
 	m_io = &cpu->space(AS_IO);
+
+	cpu_device *iop = m_owner->subdevice<cpu_device>(m_iop_tag);
+	m_program_iop = &iop->space(AS_PROGRAM);
+	m_io_iop = &iop->space(AS_IO);
 }
 
 //-------------------------------------------------
@@ -122,10 +126,20 @@ void apricot_expansion_bus_device::add_card(device_apricot_expansion_card_interf
 //  set_cpu_tag - set cpu we are attached to
 //-------------------------------------------------
 
-void apricot_expansion_bus_device::set_cpu_tag(device_t &device, device_t *owner, const char *cpu_tag)
+void apricot_expansion_bus_device::set_cpu_tag(device_t &device, device_t *owner, const char *tag)
 {
 	apricot_expansion_bus_device &bus = dynamic_cast<apricot_expansion_bus_device &>(device);
-	bus.m_cpu_tag = cpu_tag;
+	bus.m_cpu_tag = tag;
+}
+
+//-------------------------------------------------
+//  set_iop_tag - set iop we are attached to
+//-------------------------------------------------
+
+void apricot_expansion_bus_device::set_iop_tag(device_t &device, device_t *owner, const char *tag)
+{
+	apricot_expansion_bus_device &bus = dynamic_cast<apricot_expansion_bus_device &>(device);
+	bus.m_iop_tag = tag;
 }
 
 // callbacks from slot device to the host
@@ -135,6 +149,18 @@ WRITE_LINE_MEMBER( apricot_expansion_bus_device::ext1_w ) { m_ext1_handler(state
 WRITE_LINE_MEMBER( apricot_expansion_bus_device::ext2_w ) { m_ext2_handler(state); }
 WRITE_LINE_MEMBER( apricot_expansion_bus_device::int2_w ) { m_int2_handler(state); }
 WRITE_LINE_MEMBER( apricot_expansion_bus_device::int3_w ) { m_int3_handler(state); }
+
+//-------------------------------------------------
+//  install_ram - attach ram to cpu/iop
+//-------------------------------------------------
+
+void apricot_expansion_bus_device::install_ram(offs_t addrstart, offs_t addrend, void *baseptr)
+{
+	m_program->install_ram(addrstart, addrend, baseptr);
+
+	if (m_program_iop)
+		m_program_iop->install_ram(addrstart, addrend, baseptr);
+}
 
 
 //**************************************************************************
