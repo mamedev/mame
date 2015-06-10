@@ -312,7 +312,9 @@ int i8089_channel::execute_run()
 			fatalerror("%s('%s'): dma translate requested\n", shortname(), tag());
 
 		case DMA_WAIT_FOR_DEST_DRQ:
-			fatalerror("%s('%s'): wait for destination drq not supported\n", shortname(), tag());
+			if (m_drq)
+				m_dma_state = DMA_STORE;
+			break;
 
 		case DMA_STORE:
 			if (VERBOSE_DMA)
