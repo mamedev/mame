@@ -16,7 +16,8 @@ public:
 
 	// static configuration
 	static void set_address(device_t &device, int addr) { downcast<x1_010_device &>(device).m_adr = addr; }
-
+	static void set_divider(device_t &device, int div) { downcast<x1_010_device &>(device).m_divider = div; }
+	
 	DECLARE_READ8_MEMBER ( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -38,6 +39,7 @@ private:
 	required_region_ptr<INT8> m_region;       // ROM
 	int m_rate;                               // Output sampling rate (Hz)
 	int m_adr;                                // address
+	int m_divider;                            // Frequency divider (used by downtown)
 	sound_stream *  m_stream;                 // Stream handle
 	int m_sound_enable;                       // sound output enable/disable
 	UINT8   m_reg[0x2000];                // X1-010 Register & wave form area
@@ -53,6 +55,7 @@ extern const device_type X1_010;
 
 #define MCFG_X1_010_ADDRESS(_addr) \
 	x1_010_device::set_address(*device, _addr);
-
+#define MCFG_X1_010_DIVIDER(_div) \
+	x1_010_device::set_divider(*device, _div);
 
 #endif /* __X1_010_H__ */

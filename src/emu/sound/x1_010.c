@@ -90,6 +90,7 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 		m_region(*this, DEVICE_SELF),
 		m_rate(0),
 		m_adr(0),
+		m_divider(0),
 		m_stream(NULL),
 		m_sound_enable(0),
 		m_base_clock(0)
@@ -212,7 +213,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				volL     = ((reg->volume>>4)&0xf)*VOL_BASE;
 				volR     = ((reg->volume>>0)&0xf)*VOL_BASE;
 				smp_offs = m_smp_offset[ch];
-				freq     = reg->frequency;
+				freq     = reg->frequency>>m_divider;
 				// Meta Fox does write the frequency register, but this is a hack to make it "work" with the current setup
 				// This is broken for Arbalester (it writes 8), but that'll be fixed later.
 				if( freq == 0 ) freq = 4;
@@ -238,7 +239,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			} else {                                            // Wave form
 				start    = (INT8 *)&(m_reg[reg->volume*128+0x1000]);
 				smp_offs = m_smp_offset[ch];
-				freq     = (reg->pitch_hi<<8)+reg->frequency;
+				freq     = ((reg->pitch_hi<<8)+reg->frequency)>>m_divider;
 				smp_step = (UINT32)((float)m_base_clock/128.0f/1024.0f/4.0f*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
 
 				env      = (UINT8 *)&(m_reg[reg->end*128]);

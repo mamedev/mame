@@ -7823,6 +7823,7 @@ static MACHINE_CONFIG_START( downtown, seta_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_X1_010_DIVIDER(1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
