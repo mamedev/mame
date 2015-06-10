@@ -40,13 +40,13 @@ private:
 };
 
 
-// ======================> apricot_128_512k_ram_device
+// ======================> apricot_128k_ram_device
 
-class apricot_128_512k_ram_device : public device_t, public device_apricot_expansion_card_interface
+class apricot_128k_ram_device : public device_t, public device_apricot_expansion_card_interface
 {
 public:
 	// construction/destruction
-	apricot_128_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const;
@@ -54,7 +54,26 @@ protected:
 	virtual void device_reset();
 
 private:
-	required_ioport m_config;
+	required_ioport m_strap;
+
+	std::vector<UINT16> m_ram;
+};
+
+
+// ======================> apricot_512k_ram_device
+
+class apricot_512k_ram_device : public device_t, public device_apricot_expansion_card_interface
+{
+public:
+	// construction/destruction
+	apricot_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
 	required_ioport m_strap;
 
 	std::vector<UINT16> m_ram;
@@ -63,7 +82,8 @@ private:
 
 // device type definition
 extern const device_type APRICOT_256K_RAM;
-extern const device_type APRICOT_128_512K_RAM;
+extern const device_type APRICOT_128K_RAM;
+extern const device_type APRICOT_512K_RAM;
 
 
 #endif // __APRICOT_RAM__
