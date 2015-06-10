@@ -39,7 +39,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct2_t::vsolve()
 ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	build_LE_A();
-	build_LE_RHS();
+	build_LE_RHS(m_RHS);
 
 	const nl_double a = m_A[0][0];
 	const nl_double b = m_A[0][1];
@@ -53,13 +53,13 @@ ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNU
 	if (is_dynamic())
 	{
 		nl_double err = this->delta(new_val);
-		store(new_val, true);
+		store(new_val);
 		if (err > m_params.m_accuracy )
 			return 2;
 		else
 			return 1;
 	}
-	store(new_val, false);
+	store(new_val);
 	return 1;
 }
 

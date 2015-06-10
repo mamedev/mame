@@ -81,6 +81,8 @@ class terms_t
 
 	unsigned m_railstart;
 
+	plist_t<int> m_nzrd; /* non zero right of the diagonal for elimination */
+	plist_t<int> m_nz;   /* all non zero for multiplication */
 private:
 	plist_t<netlist_terminal_t *> m_term;
 	plist_t<int> m_net_other;
