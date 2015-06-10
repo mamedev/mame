@@ -217,16 +217,8 @@ void sn76496_base_device::write(UINT8 data)
 	m_sound->update();
 
 	// set number of cycles until READY is active; this is always one
-	// 'sample', i.e. it equals the clock divider exactly; until the
-	// clock divider is fully supported, we delay until one sample has
-	// played. The fact that this below is '2' and not '1' is because
-	// of a ?race condition? in the mess crvision driver, where after
-	// any sample is played at all, no matter what, the cycles_to_ready
-	// ends up never being not ready, unless this value is greater than
-	// 1. Once the full clock divider stuff is written, this should no
-	// longer be an issue.
-
-	m_cycles_to_ready = 2;
+	// 'sample', i.e. it equals the clock divider exactly
+	m_cycles_to_ready = 1;
 
 	if (data & 0x80)
 	{
