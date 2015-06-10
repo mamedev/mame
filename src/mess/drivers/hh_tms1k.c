@@ -4090,7 +4090,6 @@ WRITE8_MEMBER(tbreakup_state::expander_w)
 {
 	// TMS1025 port 1-7 data
 	m_exp_port[offset] = data;
-	prepare_display();
 }
 
 WRITE16_MEMBER(tbreakup_state::write_r)
