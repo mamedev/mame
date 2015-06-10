@@ -181,10 +181,10 @@ UINT32 i7000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 /*FIXME: we still need to figure out the proper memory map
          for the maincpu and where the cartridge slot maps to. */
 static ADDRESS_MAP_START(i7000_mem, AS_PROGRAM, 8, i7000_state)
-    AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
-    AM_RANGE(0x1000, 0x1fff) AM_RAM
-    AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
-//    AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("cardslot", 0)
+    AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("boot", 0)
+    AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("videoram")
+    AM_RANGE(0x4000, 0xffff) AM_RAM
+//  AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("cardslot", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( i7000, i7000_state )
 MACHINE_CONFIG_END
 
 ROM_START( i7000 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "boot", 0 )
 	ROM_LOAD( "i7000_boot_v1_4r02_15_10_85_d52d.rom",  0x0000, 0x1000, CRC(622412e5) SHA1(bf187a095600fd46a739c35132a85b5f39b2f867) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
