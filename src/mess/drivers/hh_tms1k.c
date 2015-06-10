@@ -87,6 +87,7 @@
     brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
   - add softwarelist for tc4 cartridges?
   - stopthiep: unable to start a game (may be intentional?)
+  - tbreakup: some of the leds flicker (rom and PLAs doublechecked)
 
 ***************************************************************************/
 
@@ -104,6 +105,9 @@
 #include "ebball.lh"
 #include "ebball2.lh"
 #include "ebball3.lh"
+#include "ebaskb2.lh"
+#include "efootb4.lh"
+#include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
 #include "gjackpot.lh"
 #include "gpoker.lh"
@@ -118,9 +122,8 @@
 #include "starwbc.lh"
 #include "stopthie.lh"
 #include "tandy12.lh" // clickable
+#include "tbreakup.lh"
 #include "tc4.lh"
-
-#include "einvader.lh" // test-layout(but still playable)
 
 #include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
@@ -1621,7 +1624,7 @@ MACHINE_CONFIG_END
 
   Entex Color Football 4
   * TMS1670 6009 MP7551 (die also labeled MP7551)
-  * * 9-digit cyan VFD display, 60 red and green LEDs behind bezel, 1bit sound
+  * 9-digit cyan VFD display, 60 red and green LEDs behind bezel, 1bit sound
 
 ***************************************************************************/
 
@@ -1679,16 +1682,16 @@ READ8_MEMBER(efootb4_state::read_k)
 
 static INPUT_PORTS_START( efootb4 )
 	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY // 2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // 3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY // 4
 
 	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY // 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY // 2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY // 3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY // 4
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Run")
@@ -1722,8 +1725,7 @@ static MACHINE_CONFIG_START( efootb4, efootb4_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(efootb4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-//  MCFG_DEFAULT_LAYOUT(layout_efootb4)
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_efootb4)
 
 	/* no video! */
 
@@ -1742,6 +1744,18 @@ MACHINE_CONFIG_END
   Entex (Electronic) Basketball 2
   * TMS1100 6010 MP1218 (die also labeled MP1218)
   * 4 7seg LEDs, and other LEDs behind bezel, 1bit sound
+
+  lamp translation table: led zz from game PCB = MESS lampyx:
+
+    11 = lamp90   21 = lamp91   31 = lamp92   41 = lamp93   51 = lamp95
+    12 = lamp80   22 = lamp81   32 = lamp82   42 = lamp83   52 = lamp85
+    13 = lamp70   23 = lamp71   33 = lamp72   43 = lamp73   53 = lamp84
+    14 = lamp60   24 = lamp61   34 = lamp62   44 = lamp63   54 = lamp75
+    15 = lamp50   25 = lamp51   35 = lamp52   45 = lamp53   55 = lamp74
+    16 = lamp40   26 = lamp41   36 = lamp42   46 = lamp43   56 = lamp65
+
+    A  = lamp94
+    B  = lamp64
 
 ***************************************************************************/
 
@@ -1836,8 +1850,7 @@ static MACHINE_CONFIG_START( ebaskb2, ebaskb2_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebaskb2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-//  MCFG_DEFAULT_LAYOUT(layout_ebaskb2)
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_ebaskb2)
 
 	/* no video! */
 
@@ -3992,7 +4005,8 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Tomy(tronics) Break Up
+  Tomy(tronics) Break Up (manufactured in Japan)
+  * PCB label TOMY B.O.
   * TMS1040 MP2726 TOMY WIPE (die labeled MP2726A)
   * TMS1025N2LL I/O expander
   * 2-digit 7seg display, 46 other leds, 1bit sound
@@ -4002,14 +4016,39 @@ MACHINE_CONFIG_END
   - Japan: Block Attack
   - UK: Break-In
 
+  lamp translation table: led zz from game PCB = MESS lampyx:
+
+    00 = -         10 = lamp50    20 = lamp42
+    01 = lamp70    11 = lamp51    21 = lamp33
+    02 = lamp71    12 = lamp52    22 = lamp22
+    03 = lamp72    13 = lamp53
+    04 = lamp73    14 = lamp43
+    05 = lamp60    15 = lamp31
+    06 = lamp61    16 = lamp32
+    07 = lamp62    17 = lamp30
+    08 = lamp63    18 = lamp41
+    09 = lamp40    19 = lamp21
+
+  the 7seg panel is lamp0x and lamp1x(aka digit0/1), and the
+  8(2*4) * 3 rectangular leds panel, where x=0,1,2,3:
+
+    lamp9x         lamp11x
+    lamp8x         lamp13x
+    lamp10x        lamp12x
+
 ***************************************************************************/
 
 class tbreakup_state : public hh_tms1k_state
 {
 public:
 	tbreakup_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_expander(*this, "expander")
 	{ }
+
+	required_device<tms1024_device> m_expander;
+	UINT8 m_exp_port[7];
+	DECLARE_WRITE8_MEMBER(expander_w);
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
@@ -4021,33 +4060,88 @@ public:
 
 protected:
 	virtual void machine_reset();
+	virtual void machine_start();
 };
 
 // handlers
 
 void tbreakup_state::prepare_display()
 {
+	// 7seg leds from R0,R1 and O0-O6
+	for (int y = 0; y < 2; y++)
+	{
+		m_display_segmask[y] = 0x7f;
+		m_display_state[y] = (m_r >> y & 1) ? (m_o & 0x7f) : 0;
+	}
+	
+	// 22 round leds from O2-O7 and expander port 7
+	for (int y = 2; y < 8; y++)
+		m_display_state[y] = (m_o >> y & 1) ? m_exp_port[6] : 0;
+
+	// 24 rectangular leds from expander ports 1-6 (not strobed)
+	for (int y = 0; y < 6; y++)
+		m_display_state[y+8] = m_exp_port[y];
+	
+	set_display_size(8, 14);
+	display_update();
+}
+
+WRITE8_MEMBER(tbreakup_state::expander_w)
+{
+	// TMS1025 port 1-7 data
+	m_exp_port[offset] = data;
 }
 
 WRITE16_MEMBER(tbreakup_state::write_r)
 {
+	// R6: speaker out
+	m_speaker->level_w(data >> 6 & 1);
+
+	// R7,R8: input mux
+	m_inp_mux = data >> 7 & 3;
+	
+	// R3-R5: TMS1025 port S
+	// R2: TMS1025 STD pin
+	m_expander->write_s(space, 0, data >> 3 & 7);
+	m_expander->write_std(data >> 2 & 1);
+
+	// R0,R1: select digit
+	m_r = ~data;
 	prepare_display();
 }
 
 WRITE16_MEMBER(tbreakup_state::write_o)
 {
+	// O0-O3: TMS1025 port H
+	m_expander->write_h(space, 0, data & 0xf);
+	
+	// O0-O7: led state
+	m_o = data;
 	prepare_display();
 }
 
 READ8_MEMBER(tbreakup_state::read_k)
 {
-	return 0;
+	// K4: fixed input
+	// K8: multiplexed inputs
+	return (m_inp_matrix[2]->read() & 4) | (read_inputs(2) & 8);
 }
 
 
 // config
 
 static INPUT_PORTS_START( tbreakup )
+	PORT_START("IN.0") // R7 K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Ball")
+
+	PORT_START("IN.1") // R8 K8
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Hit")
+
+	PORT_START("IN.2") // K4
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_CONFSETTING(    0x00, "3" )
+	PORT_CONFSETTING(    0x04, "5" )
+
 	PORT_START("IN.3") // fake
 	PORT_CONFNAME( 0x01, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, tbreakup_state, skill_switch, NULL)
 	PORT_CONFSETTING(    0x00, "Pro 1" )
@@ -4063,7 +4157,7 @@ INPUT_CHANGED_MEMBER(tbreakup_state::skill_switch)
 void tbreakup_state::set_clock()
 {
 	// MCU clock is from an analog circuit with resistor of 73K, PRO2 adds 100K
-	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 400000 : 350000);
+	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 500000 : 325000);
 }
 
 void tbreakup_state::machine_reset()
@@ -4072,17 +4166,34 @@ void tbreakup_state::machine_reset()
 	set_clock();
 }
 
+void tbreakup_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill/register for savestates
+	memset(m_exp_port, 0, sizeof(m_exp_port));
+	save_item(NAME(m_exp_port));
+}
+
 static MACHINE_CONFIG_START( tbreakup, tbreakup_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1040, 400000) // see set_clock
+	MCFG_CPU_ADD("maincpu", TMS1040, 325000) // see set_clock
 	MCFG_TMS1XXX_READ_K_CB(READ8(tbreakup_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tbreakup_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tbreakup_state, write_o))
+	
+	MCFG_DEVICE_ADD("expander", TMS1025, 0)
+	MCFG_TMS1024_WRITE_PORT_CB(1, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(2, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(3, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(4, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(5, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(6, WRITE8(tbreakup_state, expander_w))
+	MCFG_TMS1024_WRITE_PORT_CB(7, WRITE8(tbreakup_state, expander_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-//  MCFG_DEFAULT_LAYOUT(layout_tbreakup)
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_tbreakup)
 
 	/* no video! */
 
@@ -4206,7 +4317,7 @@ ROM_START( efootb4 )
 	ROM_LOAD( "6009_mp7551", 0x0000, 0x1000, CRC(54fa7244) SHA1(4d16bd825c4a2db76ca8a263c373ade15c20e270) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1400_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_efootb4_output.pla", 0, 557, CRC(5c87c753) SHA1(bde9d4aa1e57a718affd969475c0a1edcf60f444) )
 ROM_END
@@ -4250,7 +4361,7 @@ ROM_START( gjackpot )
 	ROM_LOAD( "mpf553", 0x0000, 0x1000, CRC(f45fd008) SHA1(8d5d6407a8a031a833ceedfb931f5c9d2725ecd0) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1400_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_gjackpot_output.pla", 0, 557, CRC(50e471a7) SHA1(9d862cb9f51a563882b62662c5bfe61b52e3df00) )
 ROM_END
@@ -4297,7 +4408,7 @@ ROM_START( astro )
 	ROM_LOAD( "mp1133", 0x0000, 0x1000, CRC(bc21109c) SHA1(05a433cce587d5c0c2d28b5fda5f0853ea6726bf) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1400_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_astro_output.pla", 0, 557, CRC(eb08957e) SHA1(62ae0d13a1eaafb34f1b27d7df51441b400ccd56) )
 ROM_END
@@ -4474,8 +4585,8 @@ CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Ent
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Entex", "Space Invader (Entex, TMS1100)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1980, efootb4 ,  0,        0, efootb4,   efootb4,   driver_device, 0, "Entex", "Color Football 4 (Entex)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-CONS( 1980, ebaskb2 ,  0,        0, ebaskb2,   ebaskb2,   driver_device, 0, "Entex", "Electronic Basketball 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1980, efootb4 ,  0,        0, efootb4,   efootb4,   driver_device, 0, "Entex", "Color Football 4 (Entex)", GAME_SUPPORTS_SAVE )
+CONS( 1980, ebaskb2 ,  0,        0, ebaskb2,   ebaskb2,   driver_device, 0, "Entex", "Electronic Basketball 2 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Entex", "Raise The Devil", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", GAME_SUPPORTS_SAVE )
@@ -4503,7 +4614,7 @@ CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Par
 
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE ) // some of the minigames: ***
 
-CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", GAME_SUPPORTS_SAVE )
 
 // ***: As far as MESS is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Raphael Nabet
 /*
     990_dk.c: emulation of a TI FD800 'Diablo' floppy disk controller
@@ -17,7 +17,6 @@
 
 #include "emu.h"
 
-#include "formats/basicdsk.h"
 #include "990_dk.h"
 
 /* status bits */
@@ -104,22 +103,22 @@ void fd800_machine_init(void (*interrupt_callback)(running_machine &machine, int
 */
 int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sector_id)
 {
-	/*UINT8 revolution_count;*/
-	chrn_id id;
+	//UINT8 revolution_count;*/
+	// chrn_id id;
 
-	/*revolution_count = 0;*/
+	//revolution_count = 0;*/
 
 	/*while (revolution_count < 2)*/
 	/*{*/
-		if (m_drv[unit].img->floppy_drive_get_next_id(head, &id))
-		{
-			if (cylinder_id)
-				*cylinder_id = id.C;
-			if (sector_id)
-				*sector_id = id.R;
-			return TRUE;
-		}
-	/*}*/
+	/*  if (m_drv[unit].img->floppy_drive_get_next_id(head, &id))
+	    {
+	        if (cylinder_id)
+	            *cylinder_id = id.C;
+	        if (sector_id)
+	            *sector_id = id.R;
+	        return TRUE;
+	    }
+	}*/
 
 	return FALSE;
 }
@@ -136,26 +135,26 @@ int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sect
 */
 int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_id)
 {
-	UINT8 revolution_count;
-	chrn_id id;
+/*  UINT8 revolution_count;
+    chrn_id id;
 
-	revolution_count = 0;
+    revolution_count = 0;
 
-	while (revolution_count < 2)
-	{
-		if (m_drv[unit].img->floppy_drive_get_next_id(head, &id))
-		{
-			/* compare id */
-			if ((id.R == sector) && (id.N == 0))
-			{
-				*data_id = id.data_id;
-				/* get ddam status */
-				/*w->ddam = id.flags & ID_FLAG_DELETED_DATA;*/
-				return TRUE;
-			}
-		}
-	}
-
+    while (revolution_count < 2)
+    {
+        if (m_drv[unit].img->floppy_drive_get_next_id(head, &id))
+        {
+            // compare id
+            if ((id.R == sector) && (id.N == 0))
+            {
+                *data_id = id.data_id;
+                // get ddam status
+                // w->ddam = id.flags & ID_FLAG_DELETED_DATA;
+                return TRUE;
+            }
+        }
+    }
+*/
 	return FALSE;
 }
 
@@ -170,56 +169,57 @@ int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_i
 */
 int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 {
-	int retries;
+/*  int retries;
 
-	if (cylinder > 76)
-	{
-		m_stat_reg |= status_invalid_cmd;
-		return TRUE;
-	}
+    if (cylinder > 76)
+    {
+        m_stat_reg |= status_invalid_cmd;
+        return TRUE;
+    }
 
-	if (m_drv[unit].img == NULL || !m_drv[unit].img->exists())
-	{
-		m_stat_reg |= status_drv_not_ready; /* right??? */
-		return TRUE;
-	}
+    if (m_drv[unit].img == NULL || !m_drv[unit].img->exists())
+    {
+        m_stat_reg |= status_drv_not_ready;
+        return TRUE;
+    }
 
-	if (m_drv[unit].log_cylinder[head] == -1)
-	{   /* current track ID is unknown: read it */
-		if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], NULL))
-		{
-			m_stat_reg |= status_ID_not_found;
-			return TRUE;
-		}
-	}
-	/* exit if we are already at the requested track */
-	if (m_drv[unit].log_cylinder[head] == cylinder)
-	{
-		/*m_stat_reg |= status_OP_complete;*/
-		return FALSE;
-	}
-	for (retries=0; retries<10; retries++)
-	{   /* seek to requested track */
-		m_drv[unit].img->floppy_drive_seek(cylinder-m_drv[unit].log_cylinder[head]);
-		/* update physical track position */
-		if (m_drv[unit].phys_cylinder != -1)
-			m_drv[unit].phys_cylinder += cylinder-m_drv[unit].log_cylinder[head];
-		/* read new track ID */
-		if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], NULL))
-		{
-			m_drv[unit].log_cylinder[head] = -1;
-			m_stat_reg |= status_ID_not_found;
-			return TRUE;
-		}
-		/* exit if we have reached the requested track */
-		if (m_drv[unit].log_cylinder[head] == cylinder)
-		{
-			/*m_stat_reg |= status_OP_complete;*/
-			return FALSE;
-		}
-	}
-	/* track not found */
-	m_stat_reg |= status_seek_err;
+    if (m_drv[unit].log_cylinder[head] == -1)
+    {
+        if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], NULL))
+        {
+            m_stat_reg |= status_ID_not_found;
+            return TRUE;
+        }
+    }
+
+    if (m_drv[unit].log_cylinder[head] == cylinder)
+    {
+
+        return FALSE;
+    }
+    for (retries=0; retries<10; retries++)
+    {
+        m_drv[unit].img->floppy_drive_seek(cylinder-m_drv[unit].log_cylinder[head]);
+
+        if (m_drv[unit].phys_cylinder != -1)
+            m_drv[unit].phys_cylinder += cylinder-m_drv[unit].log_cylinder[head];
+
+        if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], NULL))
+        {
+            m_drv[unit].log_cylinder[head] = -1;
+            m_stat_reg |= status_ID_not_found;
+            return TRUE;
+        }
+
+        if (m_drv[unit].log_cylinder[head] == cylinder)
+        {
+
+            return FALSE;
+        }
+    }
+
+    m_stat_reg |= status_seek_err;
+    */
 	return TRUE;
 }
 
@@ -232,32 +232,32 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 */
 int fd800_legacy_device::do_restore(int unit)
 {
-	int seek_count = 0;
-	int seek_complete;
+	int seek_complete = 0;
+/*  int seek_count = 0;
 
-	if (!m_drv[unit].img->exists())
-	{
-		m_stat_reg |= status_drv_not_ready; /* right??? */
-		return TRUE;
-	}
+    if (!m_drv[unit].img->exists())
+    {
+        m_stat_reg |= status_drv_not_ready;
+        return TRUE;
+    }
 
-	/* limit iterations to 76 to prevent an endless loop if the disc is locked */
-	while (!(seek_complete = !m_drv[unit].img->floppy_tk00_r()) && (seek_count < 76))
-	{
-		m_drv[unit].img->floppy_drive_seek(-1);
-		seek_count++;
-	}
-	if (! seek_complete)
-	{
-		m_drv[unit].phys_cylinder = -1;
-		m_stat_reg |= status_seek_err;
-	}
-	else
-	{
-		m_drv[unit].phys_cylinder = 0;
-		/*m_stat_reg |= status_OP_complete;*/
-	}
 
+    while (!(seek_complete = !m_drv[unit].img->floppy_tk00_r()) && (seek_count < 76))
+    {
+        m_drv[unit].img->floppy_drive_seek(-1);
+        seek_count++;
+    }
+    if (! seek_complete)
+    {
+        m_drv[unit].phys_cylinder = -1;
+        m_stat_reg |= status_seek_err;
+    }
+    else
+    {
+        m_drv[unit].phys_cylinder = 0;
+
+    }
+*/
 	return ! seek_complete;
 }
 
@@ -266,27 +266,28 @@ int fd800_legacy_device::do_restore(int unit)
 */
 void fd800_legacy_device::do_read(void)
 {
-	int data_id;
+/*  int data_id;
 
-	if ((m_sector == 0) || (m_sector > 26))
-	{
-		m_stat_reg |= status_invalid_cmd;
-		return;
-	}
+    if ((m_sector == 0) || (m_sector > 26))
+    {
+        m_stat_reg |= status_invalid_cmd;
+        return;
+    }
 
-	if (!find_sector(m_unit, m_head, m_sector, &data_id))
-	{
-		m_stat_reg |= status_ID_not_found;
-		return;
-	}
+    if (!find_sector(m_unit, m_head, m_sector, &data_id))
+    {
+        m_stat_reg |= status_ID_not_found;
+        return;
+    }
 
-	m_drv[m_unit].img->floppy_drive_read_sector_data(m_head, data_id, m_buf, 128);
-	m_buf_pos = 0;
-	m_buf_mode = bm_read;
-	m_recv_buf = (m_buf[m_buf_pos<<1] << 8) | m_buf[(m_buf_pos<<1)+1];
+    m_drv[m_unit].img->floppy_drive_read_sector_data(m_head, data_id, m_buf, 128);
+    m_buf_pos = 0;
+    m_buf_mode = bm_read;
+    m_recv_buf = (m_buf[m_buf_pos<<1] << 8) | m_buf[(m_buf_pos<<1)+1];
 
-	m_stat_reg |= status_XFER_ready;
-	m_stat_reg |= status_OP_complete;   /* right??? */
+    m_stat_reg |= status_XFER_ready;
+    m_stat_reg |= status_OP_complete;
+*/
 }
 
 /*
@@ -294,24 +295,24 @@ void fd800_legacy_device::do_read(void)
 */
 void fd800_legacy_device::do_write(void)
 {
-	int data_id;
+/*  int data_id;
 
-	if (m_drv[m_unit].seclen < 64)
-		/* fill with 0s */
-		memset(m_buf+(m_drv[m_unit].seclen<<1), 0, (64-m_drv[m_unit].seclen)<<1);
+    if (m_drv[m_unit].seclen < 64)
+        memset(m_buf+(m_drv[m_unit].seclen<<1), 0, (64-m_drv[m_unit].seclen)<<1);
 
-	if (!find_sector(m_unit, m_head, m_sector, &data_id))
-	{
-		m_stat_reg |= status_ID_not_found;
-		return;
-	}
+    if (!find_sector(m_unit, m_head, m_sector, &data_id))
+    {
+        m_stat_reg |= status_ID_not_found;
+        return;
+    }
 
-	m_drv[m_unit].img->floppy_drive_write_sector_data(m_head, data_id, m_buf, 128, m_ddam);
-	m_buf_pos = 0;
-	m_buf_mode = bm_write;
+    m_drv[m_unit].img->floppy_drive_write_sector_data(m_head, data_id, m_buf, 128, m_ddam);
+    m_buf_pos = 0;
+    m_buf_mode = bm_write;
 
-	m_stat_reg |= status_XFER_ready;
-	m_stat_reg |= status_OP_complete;   /* right??? */
+    m_stat_reg |= status_XFER_ready;
+    m_stat_reg |= status_OP_complete;
+*/
 }
 
 /*
@@ -319,363 +320,365 @@ void fd800_legacy_device::do_write(void)
 */
 void fd800_legacy_device::do_cmd(void)
 {
-	int unit;
-	int cylinder;
-	int head;
-	int seclen;
-	int sector;
+/*
+    int unit;
+    int cylinder;
+    int head;
+    int seclen;
+    int sector;
 
 
-	if (m_buf_mode != bm_off)
-	{   /* All commands in the midst of read or write are interpreted as Stop */
-		unit = (m_cmd_reg >> 10) & 3;
+    if (m_buf_mode != bm_off)
+    {   // All commands in the midst of read or write are interpreted as Stop
+        unit = (m_cmd_reg >> 10) & 3;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		m_buf_pos = 0;
-		m_buf_mode = bm_off;
+        m_buf_pos = 0;
+        m_buf_mode = bm_off;
 
-		m_stat_reg |= status_OP_complete;
+        m_stat_reg |= status_OP_complete;
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
 
-		return;
-	}
+        return;
+    }
 
-	switch (m_cmd_reg >> 12)
-	{
-	case 0:     /* select
-                    bits 16-25: 0s
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
+    switch (m_cmd_reg >> 12)
+    {
+    case 0:     // select
+                //    bits 16-25: 0s
+                //    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		if (!m_drv[unit].img->exists())
-			m_stat_reg |= status_drv_not_ready; /* right??? */
-		else if (m_drv[unit].img->is_readonly())
-			m_stat_reg |= status_write_prot;
-		else
-			m_stat_reg |= status_OP_complete;
+        if (!m_drv[unit].img->exists())
+            m_stat_reg |= status_drv_not_ready; // right???
+        else if (m_drv[unit].img->is_readonly())
+            m_stat_reg |= status_write_prot;
+        else
+            m_stat_reg |= status_OP_complete;
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 1:     /* seek
+    case 1:     // seek
                     bits 16-22: cylinder number (0-76)
                     bits 23-24: 0s
                     bits 25: head number (1=upper)
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
-		head = (m_cmd_reg >> 9) & 1;
-		cylinder = m_cmd_reg & 0x7f;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
+        head = (m_cmd_reg >> 9) & 1;
+        cylinder = m_cmd_reg & 0x7f;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		if (!do_seek(unit, cylinder, head))
-			m_stat_reg |= status_OP_complete;
+        if (!do_seek(unit, cylinder, head))
+            m_stat_reg |= status_OP_complete;
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 2:     /* restore
+    case 2:     // restore
                     bits 16-25: 0s
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		if (!do_restore(unit))
-			m_stat_reg |= status_OP_complete;
+        if (!do_restore(unit))
+            m_stat_reg |= status_OP_complete;
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 3:     /* sector length
+    case 3:     // sector length
                     bits 16-22: sector word count (0-64)
                     bits 23-25: 0s
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
-		seclen = m_cmd_reg & 0x7f;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
+        seclen = m_cmd_reg & 0x7f;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		if ((seclen > 64) || (seclen == 0))
-		{
-			m_stat_reg |= status_invalid_cmd;
-		}
-		else
-		{
-			m_drv[unit].seclen = seclen;
-			m_stat_reg |= status_OP_complete;
-		}
+        if ((seclen > 64) || (seclen == 0))
+        {
+            m_stat_reg |= status_invalid_cmd;
+        }
+        else
+        {
+            m_drv[unit].seclen = seclen;
+            m_stat_reg |= status_OP_complete;
+        }
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 4:     /* read
+    case 4:     // read
                     bits 16-20: sector number (1-26)
                     bits 21-23: 0s
                     bit 24: no sequential sectoring (1=active)
                     bit 25: head number (1=upper)
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
-		head = (m_cmd_reg >> 9) & 1;
-		/*non_seq_mode = (m_cmd_reg >> 8) & 1;*/
-		sector = m_cmd_reg & 0x1f;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
+        head = (m_cmd_reg >> 9) & 1;
+        //non_seq_mode = (m_cmd_reg >> 8) & 1;
+        sector = m_cmd_reg & 0x1f;
 
-		m_unit = unit;
-		m_head = head;
-		m_sector = sector;
-		/*m_non_seq_mode = non_seq_mode;*/
+        m_unit = unit;
+        m_head = head;
+        m_sector = sector;
+        //m_non_seq_mode = non_seq_mode;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		do_read();
+        do_read();
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 5:     /* read ID
+    case 5:     // read ID
                     bits 16-24: 0s
                     bit 25: head number (1=upper)
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
-		head = (m_cmd_reg >> 9) & 1;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
+        head = (m_cmd_reg >> 9) & 1;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		if (!read_id(unit, head, &cylinder, &sector))
-		{
-			m_stat_reg |= status_ID_not_found;
-		}
-		else
-		{
-			m_recv_buf = (cylinder << 8) | sector;
-			m_stat_reg |= status_OP_complete;
-		}
+        if (!read_id(unit, head, &cylinder, &sector))
+        {
+            m_stat_reg |= status_ID_not_found;
+        }
+        else
+        {
+            m_recv_buf = (cylinder << 8) | sector;
+            m_stat_reg |= status_OP_complete;
+        }
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 6:     /* read unformatted
+    case 6:     // read unformatted
                     bits 16-20: sector number (1-26)
                     bits 21-24: 0s
                     bit 25: head number (1=upper)
-                    bits 26-27: unit number (0-3) */
-		/* ... */
-		break;
+                    bits 26-27: unit number (0-3)
+        // ...
+        break;
 
-	case 7:     /* write
+    case 7:     // write
                     bits 16-20: sector number (1-26)
                     bits 21-24: 0s
                     bit 25: head number (1=upper)
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
-		head = (m_cmd_reg >> 9) & 1;
-		sector = m_cmd_reg & 0x1f;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
+        head = (m_cmd_reg >> 9) & 1;
+        sector = m_cmd_reg & 0x1f;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		if ((m_sector == 0) || (m_sector > 26))
-		{
-			m_stat_reg |= status_invalid_cmd;
-		}
-		else
-		{
-			m_unit = unit;
-			m_head = head;
-			m_sector = sector;
-			m_ddam = 0;
+        if ((m_sector == 0) || (m_sector > 26))
+        {
+            m_stat_reg |= status_invalid_cmd;
+        }
+        else
+        {
+            m_unit = unit;
+            m_head = head;
+            m_sector = sector;
+            m_ddam = 0;
 
-			m_buf_pos = 0;
-			m_buf_mode = bm_write;
-			m_stat_reg |= status_XFER_ready;
-			m_stat_reg |= status_OP_complete;   /* right??? */
-		}
+            m_buf_pos = 0;
+            m_buf_mode = bm_write;
+            m_stat_reg |= status_XFER_ready;
+            m_stat_reg |= status_OP_complete;   // right???
+        }
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 8:     /* write delete
+    case 8:     // write delete
                     bits 16-20: sector number (1-26)
                     bits 21-24: 0s
                     bit 25: head number (1=upper)
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
-		head = (m_cmd_reg >> 9) & 1;
-		sector = m_cmd_reg & 0x1f;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
+        head = (m_cmd_reg >> 9) & 1;
+        sector = m_cmd_reg & 0x1f;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		if ((m_sector == 0) || (m_sector > 26))
-		{
-			m_stat_reg |= status_invalid_cmd;
-		}
-		else
-		{
-			m_unit = unit;
-			m_head = head;
-			m_sector = sector;
-			m_ddam = 1;
+        if ((m_sector == 0) || (m_sector > 26))
+        {
+            m_stat_reg |= status_invalid_cmd;
+        }
+        else
+        {
+            m_unit = unit;
+            m_head = head;
+            m_sector = sector;
+            m_ddam = 1;
 
-			m_buf_pos = 0;
-			m_buf_mode = bm_write;
-			m_stat_reg |= status_XFER_ready;
-			m_stat_reg |= status_OP_complete;   /* right??? */
-		}
+            m_buf_pos = 0;
+            m_buf_mode = bm_write;
+            m_stat_reg |= status_XFER_ready;
+            m_stat_reg |= status_OP_complete;   // right???
+        }
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 9:     /* format track
+    case 9:     // format track
                     bits 16-23: track ID (0-255, normally current cylinder index, or 255 for bad track)
                     bit 24: verify only (1 - verify, 0 - format & verify)
                     bit 25: head number (1=upper)
-                    bits 26-27: unit number (0-3) */
-		/* ... */
-		break;
+                    bits 26-27: unit number (0-3)
+        // ...
+        break;
 
-	case 10:    /* load int mask
+    case 10:    // load int mask
                     bit 16: bad mask for interrupt (0 = unmask or enable interrupt)
-                    bits 17-27: 0s */
-		m_interrupt_f_f = m_cmd_reg & 1;
-		set_interrupt_line();
-		break;
+                    bits 17-27: 0s
+        m_interrupt_f_f = m_cmd_reg & 1;
+        set_interrupt_line();
+        break;
 
-	case 11:    /* stop
+    case 11:    // stop
                     bits 16-25: 0s
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
 
-		/* reset status */
-		m_stat_reg = unit << status_unit_shift;
+        // reset status
+        m_stat_reg = unit << status_unit_shift;
 
-		m_stat_reg |= status_OP_complete;
+        m_stat_reg |= status_OP_complete;
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 12:    /* step head
+    case 12:    // step head
                     bits 16-22: track number (0-76)
                     bits 23-25: 0s
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
-		cylinder = m_cmd_reg & 0x7f;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
+        cylinder = m_cmd_reg & 0x7f;
 
-		if (cylinder > 76)
-		{
-			m_stat_reg |= status_invalid_cmd;
-		}
-		else if ((m_drv[unit].phys_cylinder != -1) || (!do_restore(unit)))
-		{
-			m_drv[unit].img->floppy_drive_seek(cylinder-m_drv[unit].phys_cylinder);
-			m_stat_reg |= status_OP_complete;
-		}
+        if (cylinder > 76)
+        {
+            m_stat_reg |= status_invalid_cmd;
+        }
+        else if ((m_drv[unit].phys_cylinder != -1) || (!do_restore(unit)))
+        {
+            m_drv[unit].img->floppy_drive_seek(cylinder-m_drv[unit].phys_cylinder);
+            m_stat_reg |= status_OP_complete;
+        }
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 13:    /* maintenance commands
+    case 13:    // maintenance commands
                     bits 16-23: according to extended command code
-                    bits 24-27: extended command code (0-7) */
-		switch ((m_cmd_reg >> 8) & 15)
-		{
-		case 0: /* reset
-                    bits 16-23: 0s */
-			/* ... */
-			break;
-		case 1: /* retry inhibit
-                    bits 16-23: 0s */
-			/* ... */
-			break;
-		case 2: /* LED test
+                    bits 24-27: extended command code (0-7)
+        switch ((m_cmd_reg >> 8) & 15)
+        {
+        case 0: // reset
+                    bits 16-23: 0s
+            // ...
+            break;
+        case 1: // retry inhibit
+                    bits 16-23: 0s
+            // ...
+            break;
+        case 2: // LED test
                     bit 16: 1
                     bits 17-19: 0s
                     bit 20: LED #2 enable
                     bit 21: LED #3 enable
                     bit 22: LED #4 enable
-                    bit 23: enable LEDs */
-			/* ... */
-			break;
-		case 3: /* program error (a.k.a. invalid command)
-                    bits 16-23: 0s */
-			/* ... */
-			break;
-		case 4: /* memory read
+                    bit 23: enable LEDs
+            // ...
+            break;
+        case 3: // program error (a.k.a. invalid command)
+                    bits 16-23: 0s
+            // ...
+            break;
+        case 4: // memory read
                     bits 16-20: controller memory address (shifted left by 8 to generate 9900 address)
-                    bits 21-23: 0s */
-			/* ... */
-			break;
-		case 5: /* RAM load
+                    bits 21-23: 0s
+            // ...
+            break;
+        case 5: // RAM load
                     bit 16: 0
-                    bits 17-23: RAM offset (shifted left by 1 and offset by >1800 to generate 9900 address) */
-			/* ... */
-			break;
-		case 6: /* RAM run
+                    bits 17-23: RAM offset (shifted left by 1 and offset by >1800 to generate 9900 address)
+            // ...
+            break;
+        case 6: // RAM run
                     bit 16: 0
-                    bits 17-23: RAM offset (shifted left by 1 and offset by >1800 to generate 9900 address) */
-			/* ... */
-			break;
-		case 7: /* power up simulation
-                    bits 16-23: 0s */
-			/* ... */
-			break;
-		}
-		/* ... */
-		break;
+                    bits 17-23: RAM offset (shifted left by 1 and offset by >1800 to generate 9900 address)
+            // ...
+            break;
+        case 7: // power up simulation
+                    bits 16-23: 0s
+            // ...
+            break;
+        }
+        // ...
+        break;
 
-	case 14:    /* IPL
+    case 14:    // IPL
                     bits 16-22: track number (0-76)
                     bit 23: 0
                     bit 24: no sequential sectoring (1=active)
                     bit 25: head number (1=upper)
-                    bits 26-27: unit number (0-3) */
-		unit = (m_cmd_reg >> 10) & 3;
-		head = (m_cmd_reg >> 9) & 1;
-		/*non_seq_mode = (m_cmd_reg >> 8) & 1;*/
-		cylinder = m_cmd_reg & 0x7f;
+                    bits 26-27: unit number (0-3)
+        unit = (m_cmd_reg >> 10) & 3;
+        head = (m_cmd_reg >> 9) & 1;
+        //non_seq_mode = (m_cmd_reg >> 8) & 1;
+        cylinder = m_cmd_reg & 0x7f;
 
-		if (!do_seek(unit, cylinder, head))
-		{
-			m_unit = unit;
-			m_head = head;
-			m_sector = 1;
-			/*m_non_seq_mode = non_seq_mode;*/
+        if (!do_seek(unit, cylinder, head))
+        {
+            m_unit = unit;
+            m_head = head;
+            m_sector = 1;
+            //m_non_seq_mode = non_seq_mode;
 
-			do_read();
-		}
+            do_read();
+        }
 
-		m_stat_reg |= status_interrupt;
-		set_interrupt_line();
-		break;
+        m_stat_reg |= status_interrupt;
+        set_interrupt_line();
+        break;
 
-	case 15:    /* Clear Status port
-                    bits 16-27: 0s */
-		m_stat_reg = 0;
-		set_interrupt_line();
-		break;
-	}
+    case 15:    // Clear Status port
+                    bits 16-27: 0s
+        m_stat_reg = 0;
+        set_interrupt_line();
+        break;
+    }
+    */
 }
 
 /*
@@ -708,13 +711,13 @@ READ8_MEMBER( fd800_legacy_device::cru_r )
 	{
 	case 0:
 	case 1:
-		/* receive buffer */
+		// receive buffer
 		reply = m_recv_buf >> (offset*8);
 		break;
 
 	case 2:
 	case 3:
-		/* status register */
+		// status register
 		reply = m_stat_reg >> ((offset-2)*8);
 		break;
 	}
@@ -754,7 +757,7 @@ WRITE8_MEMBER( fd800_legacy_device::cru_w )
 	case 13:
 	case 14:
 	case 15:
-		/* transmit buffer */
+		// transmit buffer
 		if (data)
 			m_xmit_buf |= 1 << offset;
 		else
@@ -768,9 +771,9 @@ WRITE8_MEMBER( fd800_legacy_device::cru_w )
 			case bm_read:
 				m_buf_pos++;
 				if (m_buf_pos == m_drv[m_unit].seclen)
-				{   /* end of sector */
+				{   // end of sector
 					if (m_sector == 26)
-					{   /* end of track -> end command (right???) */
+					{   // end of track -> end command (right???)
 						m_stat_reg &= ~status_XFER_ready;
 						m_stat_reg |= status_OP_complete;
 						m_stat_reg |= status_interrupt;
@@ -778,7 +781,7 @@ WRITE8_MEMBER( fd800_legacy_device::cru_w )
 						set_interrupt_line();
 					}
 					else
-					{   /* read next sector */
+					{   // read next sector
 						m_sector++;
 						m_stat_reg &= ~status_XFER_ready | status_OP_complete | status_interrupt;
 						do_read();
@@ -795,11 +798,11 @@ WRITE8_MEMBER( fd800_legacy_device::cru_w )
 				m_buf[(m_buf_pos<<1)+1] = m_xmit_buf & 0xff;
 				m_buf_pos++;
 				if (m_buf_pos == m_drv[m_unit].seclen)
-				{   /* end of sector */
+				{   // end of sector
 					do_write();
 					if (m_sector == 26)
 					{
-						/* end of track -> end command (right???) */
+						// end of track -> end command (right???)
 						m_stat_reg &= ~status_XFER_ready;
 						m_stat_reg |= status_OP_complete;
 						m_stat_reg |= status_interrupt;
@@ -807,7 +810,7 @@ WRITE8_MEMBER( fd800_legacy_device::cru_w )
 						set_interrupt_line();
 					}
 					else
-					{   /* increment to next sector */
+					{   // increment to next sector
 						m_sector++;
 						m_stat_reg |= status_interrupt;
 						set_interrupt_line();
@@ -834,7 +837,7 @@ WRITE8_MEMBER( fd800_legacy_device::cru_w )
 	case 29:
 	case 30:
 	case 31:
-		/* command register */
+		// command register
 		if (data)
 			m_cmd_reg |= 1 << (offset-16);
 		else
@@ -845,25 +848,25 @@ WRITE8_MEMBER( fd800_legacy_device::cru_w )
 	}
 }
 
+#if 0
 LEGACY_FLOPPY_OPTIONS_START(fd800)
-#if 1
-	/* SSSD 8" */
+	// SSSD 8"
 	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([77])
 		SECTORS([26])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
-#elif 0
-	/* DSSD 8" */
+
+	// DSSD 8"
 	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" DSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
 		TRACKS([77])
 		SECTORS([26])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
-#endif
 LEGACY_FLOPPY_OPTIONS_END
+#endif
 
 void fd800_legacy_device::device_start(void)
 {
@@ -872,7 +875,7 @@ void fd800_legacy_device::device_start(void)
 
 	for (int i=0; i<MAX_FLOPPIES; i++)
 	{
-		m_drv[i].img = floppy_get_device(machine(), i);
+	//  m_drv[i].img = floppy_get_device(machine(), i);
 		m_drv[i].phys_cylinder = -1;
 		m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
 		m_drv[i].seclen = 64;

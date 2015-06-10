@@ -158,8 +158,8 @@ CIRCUIT_LAYOUT( breakout )
 	 *                              ^--- Pattern Start
 	 *                  <--------> 3 Clocks Offset
 	 */
-	EXTCLOCK(Y1, 14318000.0, "4,4,4,4,4,8")
 	EXTCLOCK(Y2, 14318000.0, "2,6,2,6,2,2,2,6")
+	EXTCLOCK(Y1, 14318000.0, "4,4,4,4,4,8")
 	PARAM(Y2.OFFSET, 3.0 / 14318000.0 + 20.0e-9 )
 #define CKBH    "Y1", Q
 #define DICECLOCK   "Y2", Q

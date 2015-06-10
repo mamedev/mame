@@ -74,12 +74,12 @@
 #define CLK_ADDR    0x0fe0
 #define RAM_ADDR    0x1000
 
-#define TRACE_EMU 1
+#define TRACE_EMU 0
 #define TRACE_CRU 0
 #define TRACE_COMP 0
 #define TRACE_RAM 0
 #define TRACE_ROM 0
-#define TRACE_LINES 1
+#define TRACE_LINES 0
 #define TRACE_MOTOR 0
 #define TRACE_DMA 0
 #define TRACE_INT 0
@@ -510,8 +510,18 @@ void myarc_hfdc_device::floppy_index_callback(floppy_image_device *floppy, int s
 */
 void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, int state)
 {
-	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD index pulse\n", tag());
+	if (TRACE_LINES) if (state==1) logerror("%s: HD index pulse\n", tag());
 	set_bits(m_status_latch, HDC_DS_INDEX, (state==ASSERT_LINE));
+	signal_drive_status();
+}
+
+/*
+    This is called back from the hard disk when READY becomes asserted.
+*/
+void myarc_hfdc_device::harddisk_ready_callback(mfm_harddisk_device *harddisk, int state)
+{
+	if (TRACE_LINES) logerror("%s: HD READY = %d\n", tag(), state);
+	set_bits(m_status_latch, HDC_DS_READY, (state==ASSERT_LINE));
 	signal_drive_status();
 }
 
@@ -520,7 +530,7 @@ void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, i
 */
 void myarc_hfdc_device::harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state)
 {
-	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD seek complete\n", tag());
+	if (TRACE_LINES) logerror("%s: HD seek complete = %d\n", tag(), state);
 	set_bits(m_status_latch, HDC_DS_SKCOM, (state==ASSERT_LINE));
 	signal_drive_status();
 }
@@ -674,6 +684,7 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 			// Dir = 0 -> outward
 			m_current_harddisk->direction_in_w((data & 0x20)? ASSERT_LINE : CLEAR_LINE);
 			m_current_harddisk->step_w((data & 0x10)? ASSERT_LINE : CLEAR_LINE);
+			m_current_harddisk->headsel_w(data & 0x0f);
 		}
 
 		// We are pushing the drive status after OUTPUT2
@@ -728,6 +739,7 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 		if (m_current_harddisk != NULL)
 		{
 			m_current_harddisk->setup_index_pulse_cb(mfm_harddisk_device::index_pulse_cb(FUNC(myarc_hfdc_device::harddisk_index_callback), this));
+			m_current_harddisk->setup_ready_cb(mfm_harddisk_device::ready_cb(FUNC(myarc_hfdc_device::harddisk_ready_callback), this));
 			m_current_harddisk->setup_seek_complete_cb(mfm_harddisk_device::seek_complete_cb(FUNC(myarc_hfdc_device::harddisk_skcom_callback), this));
 		}
 		else
@@ -993,8 +1005,8 @@ static SLOT_INTERFACE_START( hfdc_floppies )
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( hfdc_harddisks )
-	SLOT_INTERFACE( "generic", MFM_HD_GENERIC )     // Generic high-level emulation
-//  SLOT_INTERFACE( "seagatemfm", MFM_HD_SEAGATE )        // Seagate ST-225 and others
+	SLOT_INTERFACE( "generic", MFMHD_GENERIC )     // Generic high-level emulation
+	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 and others
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
@@ -1012,9 +1024,9 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_FLOPPY_DRIVE_ADD("f4", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
 
 	// NB: Hard disks don't go without image (other than floppy drives)
-	MCFG_MFM_HARDDISK_ADD("h1", hfdc_harddisks, NULL)
-	MCFG_MFM_HARDDISK_ADD("h2", hfdc_harddisks, NULL)
-	MCFG_MFM_HARDDISK_ADD("h3", hfdc_harddisks, NULL)
+	MCFG_MFM_HARDDISK_CONN_ADD("h1", hfdc_harddisks, NULL, MFM_BYTE, 3000, 20)
+	MCFG_MFM_HARDDISK_CONN_ADD("h2", hfdc_harddisks, NULL, MFM_BYTE, 2000, 20)
+	MCFG_MFM_HARDDISK_CONN_ADD("h3", hfdc_harddisks, NULL, MFM_BYTE, 2000, 20)
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour
@@ -1045,27 +1057,6 @@ ioport_constructor myarc_hfdc_device::device_input_ports() const
 }
 
 const device_type TI99_HFDC = &device_creator<myarc_hfdc_device>;
-
-mfm_harddisk_connector::mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock):
-	device_t(mconfig, MFM_HD_CONNECTOR, "MFM hard disk connector", tag, owner, clock, "mfm_hd_connector", __FILE__),
-	device_slot_interface(mconfig, *this)
-{
-}
-
-mfm_harddisk_connector::~mfm_harddisk_connector()
-{
-}
-
-mfm_harddisk_device *mfm_harddisk_connector::get_device()
-{
-	return dynamic_cast<mfm_harddisk_device *>(get_card_device());
-}
-
-void mfm_harddisk_connector::device_start()
-{
-}
-
-const device_type MFM_HD_CONNECTOR = &device_creator<mfm_harddisk_connector>;
 
 // =========================================================================
 

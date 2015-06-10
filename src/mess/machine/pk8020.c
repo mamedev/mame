@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "includes/pk8020.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 
 
@@ -157,13 +156,7 @@ READ8_MEMBER(pk8020_state::devices_r)
 						case 1 : return m_rs232->status_r(space,0);
 					}
 					break;
-		case 0x18: switch(offset & 3) {
-						case 0 : return m_wd1793->status_r(space, 0);
-						case 1 : return m_wd1793->track_r(space, 0);
-						case 2 : return m_wd1793->sector_r(space, 0);
-						case 3 : return m_wd1793->data_r(space, 0);
-					}
-					break;
+		case 0x18: return m_wd1793->read(space, offset & 0x03);
 		case 0x20: switch(offset & 1) {
 						case 0 : return m_lan->data_r(space,0);
 						case 1 : return m_lan->status_r(space,0);
@@ -187,13 +180,9 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 						case 1 : m_rs232->control_w(space,0,data); break;
 					}
 					break;
-		case 0x18: switch(offset & 3) {
-						case 0 : m_wd1793->command_w(space, 0,data);break;
-						case 1 : m_wd1793->track_w(space, 0,data);break;
-						case 2 : m_wd1793->sector_w(space, 0,data);break;
-						case 3 : m_wd1793->data_w(space, 0,data);break;
-					}
-					break;
+		case 0x18:
+			m_wd1793->write(space, offset & 0x03, data);
+			break;
 		case 0x20: switch(offset & 1) {
 						case 0 : m_lan->data_w(space,0,data); break;
 						case 1 : m_lan->control_w(space,0,data); break;
@@ -841,29 +830,28 @@ WRITE8_MEMBER(pk8020_state::pk8020_portc_w)
 
 WRITE8_MEMBER(pk8020_state::pk8020_portb_w)
 {
+	floppy_image_device *floppy = NULL;
+
 	// Turn all motors off
-	floppy_get_device(machine(), 0)->floppy_mon_w(1);
-	floppy_get_device(machine(), 1)->floppy_mon_w(1);
-	floppy_get_device(machine(), 2)->floppy_mon_w(1);
-	floppy_get_device(machine(), 3)->floppy_mon_w(1);
-	m_wd1793->set_side(BIT(data,4));
-	if (BIT(data,0)) {
-		m_wd1793->set_drive(0);
-		floppy_get_device(machine(), 0)->floppy_mon_w(0);
-		floppy_get_device(machine(), 0)->floppy_drive_set_ready_state(1, 1);
-	} else if (BIT(data,1)) {
-		m_wd1793->set_drive(1);
-		floppy_get_device(machine(), 1)->floppy_mon_w(0);
-		floppy_get_device(machine(), 1)->floppy_drive_set_ready_state(1, 1);
-	} else if (BIT(data,2)) {
-		m_wd1793->set_drive(2);
-		floppy_get_device(machine(), 2)->floppy_mon_w(0);
-		floppy_get_device(machine(), 2)->floppy_drive_set_ready_state(1, 1);
-	} else if (BIT(data,3)) {
-		m_wd1793->set_drive(3);
-		floppy_get_device(machine(), 3)->floppy_mon_w(0);
-		floppy_get_device(machine(), 3)->floppy_drive_set_ready_state(1, 1);
+	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(1);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(1);
+	if (m_floppy2->get_device()) m_floppy2->get_device()->mon_w(1);
+	if (m_floppy3->get_device()) m_floppy3->get_device()->mon_w(1);
+
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+
+	m_wd1793->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 4));
 	}
+
+	// todo: at least bit 5 and bit 7 is connected to something too...
 }
 
 READ8_MEMBER(pk8020_state::pk8020_portc_r)

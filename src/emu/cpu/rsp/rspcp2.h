@@ -135,8 +135,13 @@ protected:
 	UINT16          SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive);
 	UINT16          SATURATE_ACCUM1(int accum, UINT16 negative, UINT16 positive);
 
-	UINT32          m_op;
+	// Data that needs to be stored close to the generated DRC code
+	struct internal_rspcop2_state
+	{
+		UINT32      op;
+	};
 
+	internal_rspcop2_state *m_rspcop2_state;
 	rsp_device&     m_rsp;
 	running_machine& m_machine;
 	UINT32          m_vres[8];          /* used for temporary vector results */

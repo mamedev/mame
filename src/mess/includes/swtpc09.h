@@ -12,10 +12,8 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/generic.h"
-#include "machine/wd17xx.h"
-#include "formats/basicdsk.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
-#include "machine/wd17xx.h"
 #include "machine/6840ptm.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
@@ -38,17 +36,27 @@ public:
 	m_ptm(*this, "ptm"),
 	m_acia(*this, "acia"),
 	m_fdc(*this, "fdc"),
+	m_floppy0(*this, "fdc:0"),
+	m_floppy1(*this, "fdc:1"),
+	m_floppy2(*this, "fdc:2"),
+	m_floppy3(*this, "fdc:3"),
 	m_via(*this, "via"),
 	m_piaide(*this, "piaide"),
 	m_harddisk(*this, "harddisk"),
 	m_ide(*this, "ide")
 	{ }
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;
-	required_device<fd1793_device> m_fdc;
+	required_device<fd1793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 	optional_device<via6522_device> m_via;
 	optional_device<pia6821_device> m_piaide;
 	optional_device<device_t> m_harddisk;

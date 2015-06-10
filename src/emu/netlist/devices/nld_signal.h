@@ -18,7 +18,7 @@
 	class NETLIB_NAME(_name) : public net_signal_t<_num_input, _check, _invert>     \
 	{                                                                               \
 	public:                                                                         \
-		ATTR_COLD NETLIB_NAME(_name) ()                                             \
+		NETLIB_NAME(_name) ()                                             \
 		: net_signal_t<_num_input, _check, _invert>() { }                           \
 	}
 
@@ -35,19 +35,19 @@ public:
 	{
 	}
 
-	ATTR_COLD void start()
+	void start()
 	{
 		const char *sIN[8] = { "A", "B", "C", "D", "E", "F", "G", "H" };
 
 		register_output("Q", m_Q[0]);
 		for (int i=0; i < _numdev; i++)
 		{
-			register_input(sIN[i], m_i[i]);
+			register_input(sIN[i], m_I[i]);
 		}
 		save(NLNAME(m_active));
 	}
 
-	ATTR_COLD void reset()
+	void reset()
 	{
 		m_Q[0].initial(0);
 		m_active = 1;
@@ -57,13 +57,13 @@ public:
 	{
 		for (int i = 0; i< _numdev; i++)
 		{
-			this->m_i[i].activate();
-			if (INPLOGIC(this->m_i[i]) == _check)
+			this->m_I[i].activate();
+			if (INPLOGIC(this->m_I[i]) == _check)
 			{
 				for (int j = 0; j < i; j++)
-					this->m_i[j].inactivate();
+					this->m_I[j].inactivate();
 				for (int j = i + 1; j < _numdev; j++)
-					this->m_i[j].inactivate();
+					this->m_I[j].inactivate();
 				return _check ^ (1 ^ _invert);
 			}
 		}
@@ -80,8 +80,8 @@ public:
 			netlist_time mt = netlist_time::zero;
 			for (int i = 0; i< _numdev; i++)
 			{
-				if (this->m_i[i].net().time() > mt)
-					mt = this->m_i[i].net().time();
+				if (this->m_I[i].net().time() > mt)
+					mt = this->m_I[i].net().time();
 			}
 			netlist_sig_t r = process();
 			m_Q[0].net().set_Q_time(r, mt + times[r]);
@@ -94,7 +94,7 @@ public:
 		if (--m_active == 0)
 		{
 			for (int i = 0; i< _numdev; i++)
-				m_i[i].inactivate();
+				m_I[i].inactivate();
 		}
 	}
 
@@ -107,7 +107,7 @@ public:
 	}
 
 public:
-	netlist_logic_input_t m_i[_numdev];
+	netlist_logic_input_t m_I[_numdev];
 	netlist_logic_output_t m_Q[1];
 	INT32 m_active;
 };

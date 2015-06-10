@@ -69,6 +69,7 @@ private:
 	// Callbacks for the index hole and seek complete
 	void floppy_index_callback(floppy_image_device *floppy, int state);
 	void harddisk_index_callback(mfm_harddisk_device *harddisk, int state);
+	void harddisk_ready_callback(mfm_harddisk_device *harddisk, int state);
 	void harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state);
 
 	// Operate the floppy motors
@@ -181,26 +182,6 @@ private:
 	void set_ready(int dev, bool ready);
 	int  m_readyflags;
 };
-
-/* Connector for a MFM hard disk. See also floppy.c */
-class mfm_harddisk_connector : public device_t,
-								public device_slot_interface
-{
-public:
-	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mfm_harddisk_connector();
-
-	mfm_harddisk_device *get_device();
-
-protected:
-	void device_start();
-};
-
-extern const device_type MFM_HD_CONNECTOR;
-
-#define MCFG_MFM_HARDDISK_ADD(_tag, _slot_intf, _def_slot)  \
-	MCFG_DEVICE_ADD(_tag, MFM_HD_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false);
 
 // =========================================================================
 

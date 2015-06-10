@@ -113,7 +113,6 @@ public:
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
 	DECLARE_DRIVER_INIT(osbexec);
 	virtual void machine_reset();
-	DECLARE_PALETTE_INIT(osbexec);
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
 	DECLARE_WRITE8_MEMBER(osbexec_pia0_a_w);
@@ -311,13 +310,6 @@ static INPUT_PORTS_START( osbexec )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(osbexec_state, osbexec)
-{
-	palette.set_pen_color( 0, 0, 0, 0 ); /* Black */
-	palette.set_pen_color( 1, 0, 255, 0 );   /* Full */
-	palette.set_pen_color( 2, 0, 128, 0 );   /* Dimmed */
-}
-
 void osbexec_state::video_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
@@ -439,44 +431,11 @@ WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
  * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
  *
  */
-	/*
-static LEGACY_FLOPPY_OPTIONS_START(osbexec )
-	LEGACY_FLOPPY_OPTION( osd, "img", "Osborne single density", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([10])
-	    SECTOR_LENGTH([256])
-	    FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( odd, "img", "Osborne double density", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([5])
-	    SECTOR_LENGTH([1024])
-	    FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( ibm, "img", "IBM Personal Computer", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([8])
-	    SECTOR_LENGTH([512])
-	    FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( xerox, "img", "Xerox 820 Computer", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([18])
-	    SECTOR_LENGTH([128])
-	    FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( dec, "img", "DEC 1820 double density", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([9])
-	    SECTOR_LENGTH([512])
-	    FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-*/
 
 static SLOT_INTERFACE_START( osborne2_floppies )
 	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
 SLOT_INTERFACE_END
+
 
 TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 {
@@ -504,7 +463,7 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 		{
 			UINT8 ch = m_vram[ row_addr + x ];
 			UINT8 attr = m_vram[ 0x1000 + row_addr + x ];
-			UINT8 fg_col = ( attr & 0x80 ) ? 1 : 2;
+			UINT8 fg_col = ( attr & 0x80 ) ? 2 : 1;
 			UINT8 font_bits = m_fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ( ch & 0x7f ) * 16 + char_line ];
 
 			/* Check for underline */
@@ -575,9 +534,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD( "palette", 3 )
-	MCFG_PALETTE_INIT_OWNER(osbexec_state, osbexec)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)

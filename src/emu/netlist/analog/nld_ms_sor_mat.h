@@ -12,17 +12,20 @@
 #ifndef NLD_MS_SOR_MAT_H_
 #define NLD_MS_SOR_MAT_H_
 
+#include <algorithm>
+
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
+
 
 template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
-	netlist_matrix_solver_SOR_mat_t(const netlist_solver_parameters_t &params, int size)
+	netlist_matrix_solver_SOR_mat_t(const netlist_solver_parameters_t *params, int size)
 		: netlist_matrix_solver_direct_t<m_N, _storage_N>(netlist_matrix_solver_t::GAUSS_SEIDEL, params, size)
-		, m_omega(params.m_sor)
+		, m_omega(params->m_sor)
 		, m_lp_fact(0)
 		, m_gs_fail(0)
 		, m_gs_total(0)
@@ -36,7 +39,8 @@ public:
 
 	virtual ~netlist_matrix_solver_SOR_mat_t() {}
 
-	/* ATTR_COLD */ virtual void log_stats();
+	virtual void log_stats();
+	virtual void vsetup(netlist_analog_net_t::list_t &nets);
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
@@ -76,6 +80,18 @@ void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 				(double) this->m_gs_total / (double) this->m_stat_calculations);
 	}
 }
+
+template <unsigned m_N, unsigned _storage_N>
+void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
+{
+	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
+	this->save(NLNAME(m_omega));
+	this->save(NLNAME(m_lp_fact));
+	this->save(NLNAME(m_gs_fail));
+	this->save(NLNAME(m_gs_total));
+	this->save(NLNAME(m_Vdelta));
+}
+
 
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()

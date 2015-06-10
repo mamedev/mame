@@ -154,6 +154,13 @@ WRITE8_MEMBER( irem_audio_device::ay8910_0_portb_w )
 
 WRITE8_MEMBER( irem_audio_device::ay8910_1_porta_w )
 {
+	/*
+	 * 	45L 21 IOA0  ==> 8D
+	 *  45L 20 IOA1  ==> SD
+	 *  45L 19 IOA2  ==> OH
+	 *  45L 18 IOA3  ==> CH
+	 *
+	 */
 #ifdef MAME_DEBUG
 	if (data & 0x0f) popmessage("analog sound %x",data&0x0f);
 #endif

@@ -44,7 +44,6 @@ TODO:
 #include "sound/beep.h"
 #include "video/733_asr.h"
 
-#include "imagedev/flopdrv.h"
 #include "machine/ti99/990_dk.h"
 
 
@@ -262,12 +261,12 @@ static ADDRESS_MAP_START(cru_map_v, AS_IO, 8, ti990_4_state )
 ADDRESS_MAP_END
 
 
-static const floppy_interface ti990_4_floppy_interface =
+/* static const floppy_interface ti990_4_floppy_interface =
 {
-	FLOPPY_STANDARD_8_DSSD,
-	LEGACY_FLOPPY_OPTIONS_NAME(fd800),
-	NULL
-};
+    FLOPPY_STANDARD_8_DSSD,
+    LEGACY_FLOPPY_OPTIONS_NAME(fd800),
+    NULL
+}; */
 
 MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
 {
@@ -300,7 +299,7 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_DEVICE_ADD("fd800", FD800, 0)
 	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
+//  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
@@ -320,7 +319,7 @@ static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
 	MCFG_DEVICE_ADD("fd800", FD800, 0)
 	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
+//  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
 
 /*

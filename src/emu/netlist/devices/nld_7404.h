@@ -32,11 +32,16 @@
 
 #include "nld_signal.h"
 
+#if 1 && (USE_TRUTHTABLE)
+#include "nld_truthtable.h"
+NETLIB_TRUTHTABLE(7404, 1, 1, 0);
+#else
 NETLIB_DEVICE(7404,
 public:
-	netlist_logic_input_t m_I;
-	netlist_logic_output_t m_Q;
+	netlist_logic_input_t m_I[1];
+	netlist_logic_output_t m_Q[1];
 );
+#endif
 
 #define TTL_7404_INVERT(_name, _A)                                                  \
 		NET_REGISTER_DEV(7404, _name)                                               \

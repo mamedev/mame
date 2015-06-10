@@ -51,13 +51,13 @@ public:
 			m_id = token_id_t(-1);
 			m_token ="";
 		}
-		token_t(token_type type, const pstring str)
+		token_t(token_type type, const pstring &str)
 		{
 			m_type = type;
 			m_id = token_id_t(-1);
 			m_token = str;
 		}
-		token_t(const token_id_t id, const pstring str)
+		token_t(const token_id_t id, const pstring &str)
 		{
 			m_type = TOKEN;
 			m_id = id;
@@ -86,6 +86,7 @@ public:
 	token_t get_token();
 	pstring get_string();
 	pstring get_identifier();
+	pstring get_identifier_or_number();
 	double get_number_double();
 	long get_number_long();
 
@@ -100,20 +101,21 @@ public:
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
 	void set_number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; }
+	void set_string_char(char c) { m_string = c; }
 	void set_whitespace(pstring s) { m_whitespace = s; }
 	void set_comment(pstring start, pstring end, pstring line)
 	{
 		m_tok_comment_start = register_token(start);
 		m_tok_comment_end = register_token(end);
 		m_tok_line_comment = register_token(line);
-		m_string = '"';
 	}
 
 	token_t get_token_internal();
 	void error(const char *format, ...) ATTR_PRINTF(2,3);
 
-protected:
 	void reset(const char *p) { m_px = p; m_line = 1; m_line_ptr = p; }
+
+protected:
 	virtual void verror(pstring msg, int line_num, pstring line) = 0;
 
 private:

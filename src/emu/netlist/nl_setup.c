@@ -24,6 +24,9 @@ static NETLIST_START(base)
 	NET_REGISTER_DEV(gnd, GND)
 	NET_REGISTER_DEV(netlistparams, NETLIST)
 
+	LOCAL_SOURCE(diode_models)
+	LOCAL_SOURCE(bjt_models)
+
 	INCLUDE(diode_models);
 	INCLUDE(bjt_models);
 
@@ -34,11 +37,11 @@ NETLIST_END()
 // netlist_setup_t
 // ----------------------------------------------------------------------------------------
 
-netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
+netlist_setup_t::netlist_setup_t(netlist_base_t *netlist)
 	: m_netlist(netlist)
 	, m_proxy_cnt(0)
 {
-	netlist.set_setup(this);
+	netlist->set_setup(this);
 	m_factory = palloc(netlist_factory_list_t);
 }
 
@@ -59,6 +62,7 @@ netlist_setup_t::~netlist_setup_t()
 
 	netlist().set_setup(NULL);
 	pfree(m_factory);
+	m_sources.clear_and_free();
 
 	pstring::resetmem();
 }
@@ -104,23 +108,9 @@ netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const 
 	return register_dev(dev, name);
 }
 
-template <class T>
-static void remove_start_with(T &hm, pstring &sw)
-{
-	for (std::size_t i = hm.size() - 1; i >= 0; i--)
-	{
-		pstring x = hm[i]->name();
-		if (sw.equals(x.substr(0, sw.len())))
-		{
-			NL_VERBOSE_OUT(("removing %s\n", hm[i]->name().cstr()));
-			hm.remove(hm[i]);
-		}
-	}
-}
-
 void netlist_setup_t::remove_dev(const pstring &name)
 {
-	netlist_device_t *dev = netlist().m_devices.find(name);
+	netlist_device_t *dev = netlist().m_devices.find_by_name(name);
 	pstring temp = name + ".";
 	if (dev == NULL)
 		netlist().error("Device %s does not exist\n", name.cstr());
@@ -215,7 +205,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 			{
 				netlist_param_t &param = dynamic_cast<netlist_param_t &>(obj);
 				//printf("name: %s\n", name.cstr());
-				const pstring val = m_params_temp.find(name).e2;
+				const pstring val = m_params_temp.find_by_name(name).e2;
 				if (val != "")
 				{
 					switch (param.param_type())
@@ -305,6 +295,36 @@ void netlist_setup_t::register_link(const pstring &sin, const pstring &sout)
 	//  fatalerror("Error adding link %s<==%s to link list\n", sin.cstr(), sout.cstr());
 }
 
+void netlist_setup_t::register_frontier(const pstring attach, const double r_IN, const double r_OUT)
+{
+	static int frontier_cnt = 0;
+	pstring frontier_name = pstring::sprintf("frontier_%d", frontier_cnt);
+	frontier_cnt++;
+	netlist_device_t *front = register_dev("nld_frontier", frontier_name);
+	register_param(frontier_name + ".RIN", r_IN);
+	register_param(frontier_name + ".ROUT", r_OUT);
+	register_link(frontier_name + ".G", "GND");
+	pstring attfn = build_fqn(attach);
+	bool found = false;
+	for (std::size_t i = 0; i < m_links.size(); i++)
+	{
+		if (m_links[i].e1 == attfn)
+		{
+			m_links[i].e1 = front->name() + ".I";
+			found = true;
+		}
+		else if (m_links[i].e2 == attfn)
+		{
+			m_links[i].e2 = front->name() + ".I";
+			found = true;
+		}
+	}
+	if (!found)
+		netlist().error("Frontier setup: found no occurrence of %s\n", attach.cstr());
+	register_link(attach, frontier_name + ".Q");
+}
+
+
 void netlist_setup_t::register_param(const pstring &param, const double value)
 {
 	// FIXME: there should be a better way
@@ -327,7 +347,7 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	/* FIXME: Detect endless loop */
 	do {
 		ret = temp;
-		temp = m_alias.find(ret).e2;
+		temp = m_alias.find_by_name(ret).e2;
 	} while (temp != "");
 
 	NL_VERBOSE_OUT(("%s==>%s\n", name.cstr(), ret.cstr()));
@@ -339,13 +359,13 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 	const pstring &tname = resolve_alias(terminal_in);
 	netlist_core_terminal_t *ret;
 
-	ret = m_terminals.find(tname);
+	ret = m_terminals.find_by_name(tname);
 	/* look for default */
 	if (ret == NULL)
 	{
 		/* look for ".Q" std output */
 		pstring s = tname + ".Q";
-		ret = m_terminals.find(s);
+		ret = m_terminals.find_by_name(s);
 	}
 	if (ret == NULL && required)
 		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
@@ -359,13 +379,13 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 	const pstring &tname = resolve_alias(terminal_in);
 	netlist_core_terminal_t *ret;
 
-	ret = m_terminals.find(tname);
+	ret = m_terminals.find_by_name(tname);
 	/* look for default */
 	if (ret == NULL && atype == netlist_object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		pstring s = tname + ".Q";
-		ret = m_terminals.find(s);
+		ret = m_terminals.find_by_name(s);
 	}
 	if (ret == NULL && required)
 		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
@@ -388,7 +408,7 @@ netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool requi
 	const pstring &outname = resolve_alias(param_in_fqn);
 	netlist_param_t *ret;
 
-	ret = m_params.find(outname);
+	ret = m_params.find_by_name(outname);
 	if (ret == NULL && required)
 		netlist().error("parameter %s(%s) not found!\n", param_in_fqn.cstr(), outname.cstr());
 	if (ret != NULL)
@@ -408,7 +428,7 @@ nld_base_proxy *netlist_setup_t::get_d_a_proxy(netlist_core_terminal_t &out)
 	if (proxy == NULL)
 	{
 		// create a new one ...
-		nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(out_cast);
+		nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(&out_cast);
 		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -439,7 +459,7 @@ void netlist_setup_t::connect_input_output(netlist_core_terminal_t &in, netlist_
 	if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
 	{
 		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(in);
-		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, incast);
+		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, &incast);
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -478,7 +498,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_c
 	{
 		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(inp);
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, incast);
+		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, &incast);
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -759,13 +779,13 @@ void netlist_setup_t::resolve_inputs()
 
 	netlist().log("initialize solver ...\n");
 
-	if (m_netlist.solver() == NULL)
+	if (netlist().solver() == NULL)
 	{
 		if (has_twoterms)
 			netlist().error("No solver found for this net although analog elements are present\n");
 	}
 	else
-		m_netlist.solver()->post_start();
+		netlist().solver()->post_start();
 
 }
 
@@ -791,25 +811,47 @@ void netlist_setup_t::start_devices()
 	netlist().start();
 }
 
-void netlist_setup_t::parse(const char *buf)
-{
-	netlist_parser parser(*this);
-	parser.parse(buf);
-}
-
 void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{
-		for (netlist_core_device_t * const *entry = netlist().m_started_devices.first(); entry != NULL; entry = netlist().m_started_devices.next(entry))
+		for (std::size_t i = 0; i < netlist().m_started_devices.size(); i++)
 		{
-			//entry->object()->s
-			printf("Device %20s : %12d %12d %15ld\n", (*entry)->name().cstr(), (*entry)->stat_call_count, (*entry)->stat_update_count, (long int) (*entry)->stat_total_time / ((*entry)->stat_update_count + 1));
+			netlist_core_device_t *entry = netlist().m_started_devices[i];
+			printf("Device %20s : %12d %12d %15ld\n", entry->name().cstr(), entry->stat_call_count, entry->stat_update_count, (long int) entry->stat_total_time / (entry->stat_update_count + 1));
 		}
-		printf("Queue Start %15d\n", m_netlist.queue().m_prof_start);
-		printf("Queue End   %15d\n", m_netlist.queue().m_prof_end);
-		printf("Queue Sort  %15d\n", m_netlist.queue().m_prof_sort);
-		printf("Queue Move  %15d\n", m_netlist.queue().m_prof_sortmove);
+		printf("Queue Pushes %15d\n", m_netlist.queue().m_prof_call);
+		printf("Queue Moves  %15d\n", m_netlist.queue().m_prof_sortmove);
 	}
 #endif
+}
+
+// ----------------------------------------------------------------------------------------
+// Sources
+// ----------------------------------------------------------------------------------------
+
+void netlist_setup_t::include(const pstring &netlist_name)
+{
+	for (std::size_t i=0; i < m_sources.size(); i++)
+	{
+		if (m_sources[i]->parse(this, netlist_name))
+			return;
+	}
+	netlist().error("unable to find %s in source collection", netlist_name.cstr());
+}
+
+// ----------------------------------------------------------------------------------------
+// base sources
+// ----------------------------------------------------------------------------------------
+
+bool netlist_source_string_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	netlist_parser p(*setup);
+	return p.parse(m_str, name);
+}
+
+bool netlist_source_mem_t::parse(netlist_setup_t *setup, const pstring name)
+{
+	netlist_parser p(*setup);
+	return p.parse(m_str, name);
 }

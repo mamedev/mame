@@ -128,6 +128,7 @@ CPUS["UCOM4"] = true
 CPUS["HMCS40"] = true
 CPUS["E0C6200"] = true
 CPUS["MELPS4"] = true
+CPUS["HPHYBRID"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -471,6 +472,7 @@ MACHINES["NCR5380N"] = true
 MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
 MACHINES["NCR53C7XX"] = true
+MACHINES["NETLIST"] = true
 MACHINES["NMC9306"] = true
 MACHINES["NSC810"] = true
 MACHINES["NSCSI"] = true
@@ -532,7 +534,6 @@ MACHINES["UPD765"] = true
 MACHINES["V3021"] = true
 MACHINES["WD_FDC"] = true
 MACHINES["WD11C00_17"] = true
-MACHINES["WD17XX"] = true
 MACHINES["WD2010"] = true
 MACHINES["WD33C93"] = true
 MACHINES["WD7600"] = true
@@ -572,6 +573,7 @@ BUSES["ABCKB"] = true
 BUSES["ADAM"] = true
 BUSES["ADAMNET"] = true
 BUSES["APF"] = true
+BUSES["APRICOT_EXPANSION"] = true
 BUSES["ARCADIA"] = true
 BUSES["ASTROCADE"] = true
 BUSES["BML3"] = true
@@ -859,7 +861,7 @@ end
 function createMESSProjects(_target, _subtarget, _name)
 	project (_name)
 	targetsubdir(_target .."_" .. _subtarget)
-	kind "StaticLib"
+	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
 	
 	options {
@@ -874,11 +876,15 @@ function createMESSProjects(_target, _subtarget, _name)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mess/layout",
 		GEN_DIR  .. "mame/layout",
 		MAME_DIR .. "src/emu/cpu/m68000",
 	}
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+	end
 end
 	
 function createProjects_mame_mess(_target, _subtarget)
@@ -1016,6 +1022,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/apricotf.c",  
 	MAME_DIR .. "src/mess/drivers/apricotp.c",  
 	MAME_DIR .. "src/mess/machine/apricotkb.c", 
+	MAME_DIR .. "src/mess/machine/apricotkb_hle.c", 
 	MAME_DIR .. "src/mess/drivers/victor9k.c",
 	MAME_DIR .. "src/mess/machine/victor9kb.c",
 	MAME_DIR .. "src/mess/machine/victor9k_fdc.c", 
@@ -1597,6 +1604,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/hp9845.c",    
 	MAME_DIR .. "src/mess/drivers/hp9k.c",      
 	MAME_DIR .. "src/mess/drivers/hp9k_3xx.c",  
+        MAME_DIR .. "src/mess/drivers/hp64k.c",
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")
@@ -1880,6 +1888,7 @@ files {
 createMESSProjects(_target, _subtarget, "olivetti")
 files {          
 	MAME_DIR .. "src/mess/drivers/m20.c",       
+	MAME_DIR .. "src/mess/machine/m20_kbd.c",
 	MAME_DIR .. "src/mess/drivers/m24.c",
 	MAME_DIR .. "src/mess/machine/m24_kbd.c",
 	MAME_DIR .. "src/mess/machine/m24_z8000.c"
@@ -2604,6 +2613,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/hunter2.c", 
 	MAME_DIR .. "src/emu/machine/nsc810.c", 
 	MAME_DIR .. "src/emu/machine/nsc810.h", 
+	MAME_DIR .. "src/mess/drivers/i7000.c",
 	MAME_DIR .. "src/mess/drivers/ibm6580.c",   
 	MAME_DIR .. "src/mess/drivers/ie15.c",
 	MAME_DIR .. "src/mess/machine/ie15_kbd.c", 

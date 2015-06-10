@@ -2,19 +2,23 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    formats/trs_dsk.h
+    formats/coco_dsk.h
 
-    TRS-80 disk images
+    Tandy Color Computer / Dragon disk images
 
 *********************************************************************/
 
-#ifndef TRS_DSK_H
-#define TRS_DSK_H
+#ifndef COCO_DSK_H
+#define COCO_DSK_H
 
-#include "flopimg.h"
+#include "formats/flopimg.h"
+
 
 /**************************************************************************/
 
-LEGACY_FLOPPY_OPTIONS_EXTERN( trs80 );
+LEGACY_FLOPPY_OPTIONS_EXTERN(coco);
 
-#endif /* TRS_DSK_H */
+FLOPPY_IDENTIFY(coco_dmk_identify);
+FLOPPY_CONSTRUCT(coco_dmk_construct);
+
+#endif /* COCO_DSK_H */

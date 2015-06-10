@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff,Jarek Parchanski
 /*
     Great Swordsman (Taito) 1984

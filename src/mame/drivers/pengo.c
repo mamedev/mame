@@ -723,5 +723,5 @@ GAME( 1982, pengo2u,  pengo, pengo, pengo, driver_device, 0,        ROT90, "Sega
 GAME( 1982, pengo3u,  pengo, pengo, pengo, driver_device, 0,        ROT90, "Sega", "Pengo (set 3 not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1982, pengo4,   pengo, pengo, pengo, pengo_state, pengo,    ROT90, "Sega", "Pengo (set 4)", GAME_SUPPORTS_SAVE )
 GAME( 1982, pengob,   pengo, pengo, pengo, pengo_state, penta,    ROT90, "bootleg", "Pengo (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, penta,    pengo, pengo, pengo, pengo_state, penta,    ROT90, "bootleg", "Penta", GAME_SUPPORTS_SAVE )
+GAME( 1982, penta,    pengo, pengo, pengo, pengo_state, penta,    ROT90, "bootleg (Grinbee Shouji)", "Penta", GAME_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
 GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, driver_device, 0, ROT90, "bootleg", "Jr. Pac-Man (Pengo hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

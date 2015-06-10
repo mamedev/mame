@@ -24,6 +24,10 @@ public:
 	virtual const char *description() const;
 	virtual const char *extensions() const;
 
+protected:
+	virtual int get_track_dam_fm(const format &f, int head, int track);
+	virtual int get_track_dam_mfm(const format &f, int head, int track);
+
 private:
 	static const format formats[];
 };

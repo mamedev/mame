@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff,Jarek Parchanski
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"

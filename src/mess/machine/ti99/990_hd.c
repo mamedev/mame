@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Raphael Nabet
 /*
     990_hd.c: emulation of a generic ti990 hard disk controller, for use with

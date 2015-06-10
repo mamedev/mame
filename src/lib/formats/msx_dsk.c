@@ -8,27 +8,7 @@
 
 *********************************************************************/
 
-#include <assert.h>
-
-#include "formats/msx_dsk.h"
-#include "formats/basicdsk.h"
-
-LEGACY_FLOPPY_OPTIONS_START(msx)
-	LEGACY_FLOPPY_OPTION(msx, "dsk", "MSX SS", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(msx, "dsk", "MSX DS", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-/********************************************************************/
+#include "msx_dsk.h"
 
 //msx_format::msx_format() : wd177x_format(formats)
 msx_format::msx_format() : upd765_format(formats)

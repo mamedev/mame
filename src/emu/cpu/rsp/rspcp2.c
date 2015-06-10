@@ -131,6 +131,7 @@ rsp_cop2::rsp_cop2(rsp_device &rsp, running_machine &machine)
 	memset(m_v, 0, sizeof(m_v));
 	memset(m_vflag, 0, sizeof(m_vflag));
 	memset(m_accum, 0, sizeof(m_accum));
+	m_rspcop2_state = (internal_rspcop2_state *)rsp.m_cache.alloc_near(sizeof(internal_rspcop2_state));
 }
 
 rsp_cop2::~rsp_cop2()
@@ -2567,7 +2568,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 
 inline void rsp_cop2::mfc2()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
 
 	UINT16 b1 = VREG_B(VS1REG, (el+0) & 0xf);
@@ -2577,7 +2578,7 @@ inline void rsp_cop2::mfc2()
 
 inline void rsp_cop2::cfc2()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	if (RTREG)
 	{
 		switch(RDREG)
@@ -2636,7 +2637,7 @@ inline void rsp_cop2::cfc2()
 
 inline void rsp_cop2::mtc2()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
 	VREG_B(VS1REG, (el+0) & 0xf) = (RTVAL >> 8) & 0xff;
 	VREG_B(VS1REG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
@@ -2644,7 +2645,7 @@ inline void rsp_cop2::mtc2()
 
 inline void rsp_cop2::ctc2()
 {
-	UINT32 op = m_op;
+	UINT32 op = m_rspcop2_state->op;
 	switch(RDREG)
 	{
 		case 0:

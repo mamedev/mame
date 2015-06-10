@@ -177,7 +177,7 @@ NETLIB_UPDATE_PARAM(analog_input)
 // nld_d_to_a_proxy
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void nld_d_to_a_proxy::start()
+void nld_d_to_a_proxy::start()
 {
 	nld_base_d_to_a_proxy::start();
 
@@ -190,9 +190,11 @@ ATTR_COLD void nld_d_to_a_proxy::start()
 
 	connect(m_RV.m_N, m_Q);
 	m_Q.initial(0.0);
+
+	save(NLNAME(m_last_state));
 }
 
-ATTR_COLD void nld_d_to_a_proxy::reset()
+void nld_d_to_a_proxy::reset()
 {
 	m_RV.do_reset();
 	m_is_timestep = m_RV.m_P.net().as_analog().solver()->is_timestep();

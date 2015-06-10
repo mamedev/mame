@@ -661,6 +661,22 @@ UINT32 floppy_image_device::find_position(attotime &base, const attotime &when)
 	return (delta*floppy_ratio_1).as_ticks(1000000000/1000);
 }
 
+attotime floppy_image_device::get_next_index_time(std::vector<UINT32> &buf, int index, int delta, attotime base)
+{
+	UINT32 next_position;
+	int cells = buf.size();
+	if(index+delta < cells)
+		next_position = buf[index+delta] & floppy_image::TIME_MASK;
+	else {
+		if((buf[cells-1]^buf[0]) & floppy_image::MG_MASK)
+			delta--;
+		index = index + delta - cells + 1;
+		next_position = 200000000 + (buf[index] & floppy_image::TIME_MASK);
+	}
+
+	return base + attotime::from_nsec((UINT64(next_position)*2000/floppy_ratio_1+1)/2);
+}
+
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
 {
 	if(!image || mon)
@@ -679,15 +695,10 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(index == -1)
 		return attotime::never;
 
-	UINT32 next_position;
-	if(index < cells-1)
-		next_position = buf[index+1] & floppy_image::TIME_MASK;
-	else if((buf[index]^buf[0]) & floppy_image::MG_MASK)
-		next_position = 200000000;
-	else
-		next_position = 200000000 + (buf[1] & floppy_image::TIME_MASK);
-
-	return base + attotime::from_nsec((UINT64(next_position)*2000/floppy_ratio_1+1)/2);
+	attotime result = get_next_index_time(buf, index, 1,  base);
+	if(result > from_when)
+		return result;
+	return get_next_index_time(buf, index, 2,  base);
 }
 
 void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)

@@ -99,6 +99,36 @@ newoption {
 }
 
 newoption {
+    trigger = 'with-bundled-zlib',
+    description = 'Build bundled Zlib library',
+}
+
+newoption {
+    trigger = 'with-bundled-jpeg',
+    description = 'Build bundled JPEG library',
+}
+
+newoption {
+    trigger = 'with-bundled-flac',
+    description = 'Build bundled FLAC library',
+}
+
+newoption {
+    trigger = 'with-bundled-lua',
+    description = 'Build bundled LUA library',
+}
+
+newoption {
+    trigger = 'with-bundled-sqlite3',
+    description = 'Build bundled SQLite library',
+}
+
+newoption {
+    trigger = 'with-bundled-portmidi',
+    description = 'Build bundled PortMidi library',
+}
+
+newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {
@@ -166,6 +196,11 @@ newoption {
 newoption {
 	trigger = "ARCHOPTS",
 	description = "ARCHOPTS.",
+}
+
+newoption {
+	trigger = "OPT_FLAGS",
+	description = "OPT_FLAGS.",
 }
 
 newoption {
@@ -310,6 +345,21 @@ newoption {
 	}
 }
 
+
+newoption {
+	trigger = "SHLIB",
+	description = "Generate shared libs.",
+	allowed = {
+		{ "0",   "Static libs" 	},
+		{ "1",   "Shared libs"  },
+	}
+}
+
+if _OPTIONS["SHLIB"]=="1" then
+	LIBTYPE = "SharedLib"
+else
+	LIBTYPE = "StaticLib"
+end
 
 PYTHON = "python"
 
@@ -576,9 +626,29 @@ else
 end
 
 -- need to ensure FLAC functions are statically linked
-defines {
-	"FLAC__NO_DLL",
-}
+if _OPTIONS["with-bundled-flac"] then
+	defines {
+		"FLAC__NO_DLL",
+	}
+	end
+
+if not _OPTIONS["with-bundled-jpeg"] then
+	defines {
+		"USE_SYSTEM_JPEGLIB",
+	}
+	end
+
+if not _OPTIONS["with-bundled-portmidi"] then
+	defines {
+		"USE_SYSTEM_PORTMIDI",
+	}
+	end
+
+if not _OPTIONS["with-bundled-sqlite3"] then
+	defines {
+		"USE_SYSTEM_SQLITE",
+	}
+	end
 
 if _OPTIONS["NOASM"]=="1" then
 	defines {
@@ -650,7 +720,7 @@ end
 		}
 	end
 -- add -g if we need symbols, and ensure we have frame pointers
-if _OPTIONS["SYMBOLS"]~=nil then
+if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	buildoptions {
 		"-g" .. _OPTIONS["SYMLEVEL"],
 		"-fno-omit-frame-pointer",
@@ -695,7 +765,7 @@ if _OPTIONS["PROFILE"] then
 	}
 end
 
-if _OPTIONS["SYMBOLS"]~=nil then
+if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	flags {
 		"Symbols",
 	}
@@ -724,28 +794,34 @@ if _OPTIONS["OPTIMIZE"] then
 			_OPTIONS["ARCHOPTS"]
 		}
 	end
-	if _OPTIONS["LTO"]=="1" then
+	if _OPTIONS["OPT_FLAGS"] then
 		buildoptions {
-			"-flto",
+			_OPTIONS["OPT_FLAGS"]
 		}
---		buildoptions {
---			"-ffat-lto-objects",
---		}
---		buildoptions {
---			"-flto-partition=1to1",
---		}
+	end
+	if _OPTIONS["LTO"]=="1" then
+-- -flto=4 -> 4 threads
+		buildoptions {
+			"-flto=4",
+		}
+		buildoptions {
+			"-fno-fat-lto-objects",
+		}
 		linkoptions {
-			"-flto",
+			"-flto=4",
 		}
---		linkoptions {
---			"-flto-partition=1to1",
---		}
---		linkoptions {
---			"-ffat-lto-objects",
---		}
+		linkoptions {
+			"-fno-fat-lto-objects",
+		}
 		
 		
 	end
+end
+
+if _OPTIONS["SHLIB"] then
+	buildoptions {
+		"-fPIC"
+	}
 end
 
 if _OPTIONS["SSE2"]=="1" then
@@ -847,6 +923,7 @@ end
 			end
 			if (version >= 30400) then
 				buildoptions {
+					"-Wno-inline-new-delete",
 					"-Wno-constant-logical-operand",
 				}
 			end
@@ -878,7 +955,6 @@ end
 			if (version >= 40800) then
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				buildoptions {
-					"-Wno-unused-variable",
 					"-Wno-array-bounds"
 				}
 			end

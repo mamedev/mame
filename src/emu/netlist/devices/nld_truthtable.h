@@ -45,10 +45,10 @@ struct truthtable_desc_t
 	{
 	}
 
-	ATTR_COLD void setup(const pstring_list_t &desc, UINT32 disabled_ignore);
+	void setup(const pstring_list_t &desc, UINT32 disabled_ignore);
 
 private:
-	ATTR_COLD void help(unsigned cur, pstring_list_t list,
+	void help(unsigned cur, pstring_list_t list,
 			UINT64 state,UINT16 val, UINT8 *timing_index);
 	static unsigned count_bits(UINT32 v);
 	static UINT32 set_bits(UINT32 v, UINT32 b);
@@ -106,7 +106,7 @@ public:
 		m_desc = desc;
 	}
 
-	/* ATTR_COLD */ virtual void start()
+	virtual void start()
 	{
 		pstring header = m_desc[0];
 
@@ -121,7 +121,7 @@ public:
 		for (unsigned i=0; i < m_NI; i++)
 		{
 			inout[i] = inout[i].trim();
-			register_input(inout[i], m_i[i]);
+			register_input(inout[i], m_I[i]);
 		}
 		for (unsigned i=0; i < m_NO; i++)
 		{
@@ -138,7 +138,7 @@ public:
 			if (idx>=0)
 			{
 				//printf("connecting %s %d\n", out[i].cstr(), idx);
-				connect(m_Q[i], m_i[idx]);
+				connect(m_Q[i], m_I[idx]);
 				// disable ignore for this inputs altogether.
 				// FIXME: This shouldn't be necessary
 				disabled_ignore |= (1<<idx);
@@ -157,16 +157,17 @@ public:
 		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero; k++)
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
 #endif
-		// FIXME: save state
 		save(NLNAME(m_last_state));
 		save(NLNAME(m_ign));
 		save(NLNAME(m_active));
-
 	}
 
-	ATTR_COLD void reset()
+	void reset()
 	{
 		m_active = 0;
+		m_ign = 0;
+		for (unsigned i = 0; i < m_NI; i++)
+			m_I[i].activate();
 		for (unsigned i=0; i<m_NO;i++)
 			if (this->m_Q[i].net().num_cons()>0)
 				m_active++;
@@ -174,34 +175,35 @@ public:
 	}
 
 	template<bool doOUT>
-	ATTR_HOT inline void process()
+	inline void process()
 	{
 		netlist_time mt = netlist_time::zero;
 
 		UINT32 state = 0;
 		for (unsigned i = 0; i < m_NI; i++)
 		{
-			if (!doOUT || (m_ign & (1<<i)) != 0)
-				m_i[i].activate();
+			if (!doOUT || (m_ign & (1<<i)))
+				m_I[i].activate();
 		}
 		for (unsigned i = 0; i < m_NI; i++)
 		{
-			state |= (INPLOGIC(m_i[i]) << i);
+			state |= (INPLOGIC(m_I[i]) << i);
 			if (!doOUT)
-				if (this->m_i[i].net().time() > mt)
-					mt = this->m_i[i].net().time();
+				if (this->m_I[i].net().time() > mt)
+					mt = this->m_I[i].net().time();
 		}
 
 		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);
-		const UINT32 out = m_ttp->m_outs[nstate] & ((1 << m_NO) - 1);
-		m_ign = m_ttp->m_outs[nstate] >> m_NO;
+		const UINT32 outstate = m_ttp->m_outs[nstate];
+		const UINT32 out = outstate & ((1 << m_NO) - 1);
+		m_ign = outstate >> m_NO;
 		if (has_state)
 			m_last_state = (state << m_NO) | out;
 
 #if 0
 		for (int i = 0; i < m_NI; i++)
 			if (m_ign & (1 << i))
-				m_i[i].inactivate();
+				m_I[i].inactivate();
 #endif
 		const UINT32 timebase = nstate * m_NO;
 		if (doOUT)
@@ -213,10 +215,12 @@ public:
 			for (unsigned i = 0; i < m_NO; i++)
 				m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 
-		for (unsigned i = 0; i < m_NI; i++)
-			if (m_ign & (1 << i))
-				m_i[i].inactivate();
-
+		if (m_NI > 1 || has_state)
+		{
+			for (unsigned i = 0; i < m_NI; i++)
+				if (m_ign & (1 << i))
+					m_I[i].inactivate();
+		}
 	}
 
 	ATTR_HOT void update()
@@ -237,15 +241,24 @@ public:
 	ATTR_HOT void dec_active()
 	{
 		nl_assert(netlist().use_deactivate());
+		/* FIXME:
+		 * Based on current measurements there is no point to disable
+		 * 1 input devices. This should actually be a parameter so that we
+		 * can decide for each individual gate whether it is benefitial to
+		 * ignore deactivation.
+		 */
+		if (m_NI < 2)
+			return;
 		if (has_state == 0)
 			if (--m_active == 0)
 			{
 				for (unsigned i = 0; i< m_NI; i++)
-					m_i[i].inactivate();
+					m_I[i].inactivate();
+				m_ign = (1<<m_NI)-1;
 			}
 	}
 
-	netlist_logic_input_t m_i[m_NI];
+	netlist_logic_input_t m_I[m_NI];
 	netlist_logic_output_t m_Q[m_NO];
 
 private:
@@ -262,7 +275,7 @@ class netlist_base_factory_truthtable_t : public netlist_base_factory_t
 {
 	NETLIST_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 public:
-	ATTR_COLD netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
+	netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	: netlist_base_factory_t(name, classname, def_param)
 	{}
@@ -275,11 +288,11 @@ class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
 {
 	NETLIST_PREVENT_COPYING(netlist_factory_truthtable_t)
 public:
-	ATTR_COLD netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
+	netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	ATTR_COLD netlist_device_t *Create()
+	netlist_device_t *Create()
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
 		netlist_device_t *r = palloc(tt_type, &m_ttbl, m_desc);

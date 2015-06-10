@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Angelo Salese, Roberto Fresca, Rob Ragon
+// copyright-holders:Angelo Salese, Roberto Fresca
 /*************************************************************************************************
 
   Forte Card
@@ -486,7 +486,7 @@ WRITE8_MEMBER(fortecar_state::ayporta_w)
 */
 	int i;
 
-	for(i=0;i<8;i++)
+	for(i = 0; i < 8; i++)
 		output_set_lamp_value(i, (data >> i) & 1);
 }
 
@@ -596,22 +596,22 @@ INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout_3bpp =
 {
-	8,8,
+	8, 8,
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(2,3)+4, RGN_FRAC(1,3)+4, RGN_FRAC(0,3)+4 },
-	{ 8,9,10,11,0, 1, 2, 3 },
+	{ 8, 9, 10, 11, 0, 1, 2, 3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
 };
 
 static const gfx_layout tiles8x8_layout_6bpp =
 {
-	8,8,
+	8, 8,
 	RGN_FRAC(1,3),
 	6,
 	{ RGN_FRAC(2,3)+0, RGN_FRAC(1,3)+0, RGN_FRAC(0,3)+0, RGN_FRAC(2,3)+4, RGN_FRAC(1,3)+4, RGN_FRAC(0,3)+4 },
-	{ 8,9,10,11,0, 1, 2, 3 },
+	{ 8, 9, 10, 11, 0, 1, 2, 3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
 };
@@ -629,7 +629,7 @@ void fortecar_state::machine_reset()
 	int i;
 
 	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorythm) */
-	for(i=0;i<m_vram.bytes();i++)
+	for(i = 0; i < m_vram.bytes(); i++)
 		m_vram[i] = machine().rand();
 }
 
@@ -730,6 +730,6 @@ DRIVER_INIT_MEMBER(fortecar_state,fortecar)
 }
 
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME                        FLAGS             LAYOUT */
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY       FULLNAME                        FLAGS             LAYOUT */
 GAMEL( 1994, fortecar, 0,        fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", GAME_NOT_WORKING, layout_fortecrd )
 GAMEL( 1994, fortecrd, fortecar, fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                layout_fortecrd )

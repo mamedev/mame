@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Wilbert Pol
 /**********************************************************************
 
     ISA 8 bit XT Hard Disk Controller

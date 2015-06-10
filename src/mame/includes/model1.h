@@ -2,6 +2,7 @@
 // copyright-holders:Olivier Galibert
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
+#include "machine/m1comm.h"
 #include "cpu/v60/v60.h"
 
 #define DECLARE_TGP_FUNCTION(name) void name()
@@ -16,6 +17,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_m1audio(*this, "m1audio"),
+		m_m1comm(*this, "m1comm"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_tgp(*this, "tgp"),
 		m_screen(*this, "screen"),
@@ -29,6 +31,7 @@ public:
 
 	required_device<v60_device> m_maincpu;      // V60
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
+	optional_device<m1comm_device> m_m1comm;    // Model 1 communication board
 	optional_device<dsbz80_device> m_dsbz80;    // Digital Sound Board
 	optional_device<mb86233_cpu_device> m_tgp;
 	required_device<screen_device> m_screen;

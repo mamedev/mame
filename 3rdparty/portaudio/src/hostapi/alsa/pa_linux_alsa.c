@@ -3697,7 +3697,7 @@ static PaError PaAlsaStream_GetAvailableFrames( PaAlsaStream *self, int queryCap
         *available, int *xrunOccurred )
 {
     PaError result = paNoError;
-    unsigned long captureFrames, playbackFrames;
+    unsigned long captureFrames = 0, playbackFrames = 0;
     *xrunOccurred = 0;
 
     assert( queryCapture || queryPlayback );
@@ -4579,7 +4579,7 @@ error:
 
 PaError PaAlsa_GetStreamInputCard( PaStream* s, int* card )
 {
-    PaAlsaStream *stream;
+    PaAlsaStream *stream = NULL;
     PaError result = paNoError;
     snd_pcm_info_t* pcmInfo;
 
@@ -4598,7 +4598,7 @@ error:
 
 PaError PaAlsa_GetStreamOutputCard( PaStream* s, int* card )
 {
-    PaAlsaStream *stream;
+    PaAlsaStream *stream = NULL;
     PaError result = paNoError;
     snd_pcm_info_t* pcmInfo;
 

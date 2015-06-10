@@ -1625,7 +1625,7 @@ static INPUT_PORTS_START( ste )
 	PORT_CONFNAME( 0x01, 0x00, "Input Port 0 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
-	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, st_state, write_monochrome)
+	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ste_state, write_monochrome)
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1435)" )
 
@@ -2453,7 +2453,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tt030 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( tt030, st )
+static MACHINE_CONFIG_DERIVED( tt030, ste )
 MACHINE_CONFIG_END
 
 
@@ -2461,7 +2461,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon, st )
+static MACHINE_CONFIG_DERIVED( falcon, ste )
 MACHINE_CONFIG_END
 
 
@@ -2469,7 +2469,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon40 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon40, st )
+static MACHINE_CONFIG_DERIVED( falcon40, ste )
 MACHINE_CONFIG_END
 
 

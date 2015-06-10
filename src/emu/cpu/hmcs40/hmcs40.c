@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 
 // device definitions
 hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, polarity, 3, 10, 11, ADDRESS_MAP_NAME(program_1k), 7, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1k), 7 /* data width */, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
 { }
 
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -188,6 +188,7 @@ void hmcs40_cpu_device::device_start()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hmcs40_cpu_device::simple_timer_cb), this));
 	reset_prescaler();
 
+	// resolve callbacks
 	m_read_r0.resolve_safe(0);
 	m_read_r1.resolve_safe(0);
 	m_read_r2.resolve_safe(0);
@@ -215,6 +216,7 @@ void hmcs40_cpu_device::device_start()
 	m_prev_op = 0;
 	m_i = 0;
 	m_eint_line = 0;
+	m_halt = 0;
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_page = 0;
@@ -242,6 +244,8 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_i));
 	save_item(NAME(m_eint_line));
+	save_item(NAME(m_halt));
+	save_item(NAME(m_timer_halted_remain));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_page));
@@ -477,9 +481,25 @@ void hmcs40_cpu_device::do_interrupt()
 
 void hmcs40_cpu_device::execute_set_input(int line, int state)
 {
+	state = (state) ? 1 : 0;
+
+	// halt/unhalt mcu
+	if (line == HMCS40_INPUT_LINE_HLT && state != m_halt)
+	{
+		if (state)
+		{
+			m_timer_halted_remain = m_timer->remaining();
+			m_timer->reset();
+		}
+		else
+			m_timer->adjust(m_timer_halted_remain);
+		
+		m_halt = state;
+		return;
+	}
+	
 	if (line != 0 && line != 1)
 		return;
-	state = (state) ? 1 : 0;
 
 	// external interrupt request on rising edge
 	if (state && !m_int[line])
@@ -551,6 +571,13 @@ inline void hmcs40_cpu_device::increment_pc()
 
 void hmcs40_cpu_device::execute_run()
 {
+	// in HLT state, the internal clock is not running
+	if (m_halt)
+	{
+		m_icount = 0;
+		return;
+	}
+	
 	while (m_icount > 0)
 	{
 		// LPU is handled 1 cycle later

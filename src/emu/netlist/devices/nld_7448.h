@@ -59,7 +59,6 @@ NETLIB_SUBDEVICE(7448_sub,
 	netlist_logic_input_t m_RBIQ;
 
 	UINT8 m_state;
-	int m_active;
 
 	netlist_logic_output_t m_Q[7];  /* a .. g */
 
