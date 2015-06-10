@@ -23,6 +23,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart) { return m_subslot->read_cart(space, offset); }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) { m_subslot->write_cart(space, offset, data); }
 	virtual DECLARE_WRITE8_MEMBER(write_mapper) { m_subslot->write_mapper(space, offset, data); }
+	virtual int get_lphaser_xoffs() { return m_subslot->m_cart ? m_subslot->m_cart->get_lphaser_xoffs() : -1; }
 
 	virtual machine_config_constructor device_mconfig_additions() const;
 
