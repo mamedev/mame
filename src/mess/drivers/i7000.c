@@ -51,15 +51,22 @@ class i7000_state : public driver_device
 public:
 	i7000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_card(*this, "cardslot")
-	{ }
+          m_card(*this, "cardslot"),
+          m_videoram(*this, "videoram")
+    { }
+
+	virtual void video_start();
 
 	required_device<generic_slot_device> m_card;
+	required_shared_ptr<UINT8> m_videoram;
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT8 *m_char_rom;
 
 //	DECLARE_READ8_MEMBER( i7000_io_r );
 //	DECLARE_WRITE8_MEMBER( i7000_io_w );
 
 	DECLARE_DRIVER_INIT(i7000);
+	DECLARE_PALETTE_INIT(i7000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 };
 
@@ -67,11 +74,49 @@ DRIVER_INIT_MEMBER(i7000_state, i7000)
 {
 }
 
+PALETTE_INIT_MEMBER(i7000_state, i7000)
+{
+	palette.set_pen_color(0, rgb_t(0x33, 0x33, 0x33));
+	palette.set_pen_color(1, rgb_t(0xBB, 0xBB, 0xBB));
+}
+
+void i7000_state::video_start()
+{
+	// find memory regions
+	m_char_rom = memregion("gfx1")->base();
+}
+
+UINT32 i7000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+    offs_t addr = 0;
+
+    for (int sy = 0; sy < 25; sy++)
+    {
+        for (int sx = 0; sx < 40; sx++)
+        {
+            UINT8 data = m_videoram[addr++];
+            for (int y = 0; y < 8; y++)
+            {
+                int color = m_char_rom[data*8 + y];
+                for (int x = 0; x < 8; x++)
+                {
+                    bitmap.pix16(sy*8 + y, sx*8 + 7 - x) = (color & 1);
+                    color >>= 1;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 /*FIXME: we still need to figure out the proper memory map
          for the maincpu and where the cartridge slot maps to. */
 static ADDRESS_MAP_START(i7000_mem, AS_PROGRAM, 8, i7000_state)
-/* guessed */	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
-/* guessed */	AM_RANGE(0x1000, 0xffff) AM_RAM
+    AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
+    AM_RANGE(0x1000, 0x1fff) AM_RAM
+    AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
+//    AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("cardslot", 0)
 ADDRESS_MAP_END
 
 /*
@@ -92,12 +137,45 @@ DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
 	return IMAGE_INIT_PASS;
 }
 
+#if 0
+static const gfx_layout i7000_charlayout =
+{
+	8, 8,                   /* 8 x 8 characters */
+	256,                 /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8                 /* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( i7000 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, i7000_charlayout, 0, 8 )
+GFXDECODE_END
+#endif
+
 static MACHINE_CONFIG_START( i7000, i7000_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(i7000_mem)
 //	MCFG_CPU_IO_MAP(i7000_io)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(320, 200) /* 40x25 8x8 chars */
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+
+	MCFG_SCREEN_UPDATE_DRIVER(i7000_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
+
+//	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i7000)
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "i7000_card")
