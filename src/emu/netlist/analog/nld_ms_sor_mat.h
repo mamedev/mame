@@ -30,11 +30,6 @@ public:
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
-			pstring p = nl_util::environment("NETLIST_STATS");
-			if (p != "")
-				m_log_stats = (bool) p.as_long();
-			else
-				m_log_stats = false;
 		}
 
 	virtual ~netlist_matrix_solver_SOR_mat_t() {}
@@ -53,8 +48,6 @@ private:
 	nl_double m_lp_fact;
 	int m_gs_fail;
 	int m_gs_total;
-	bool m_log_stats;
-
 };
 
 // ----------------------------------------------------------------------------------------
@@ -64,15 +57,15 @@ private:
 template <unsigned m_N, unsigned _storage_N>
 void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 {
-	if (this->m_stat_calculations != 0 && m_log_stats)
+	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
 	{
-		this->netlist().log("==============================================\n");
-		this->netlist().log("Solver %s\n", this->name().cstr());
-		this->netlist().log("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-		this->netlist().log("       has %s elements\n", this->is_dynamic() ? "dynamic" : "no dynamic");
-		this->netlist().log("       has %s elements\n", this->is_timestep() ? "timestep" : "no timestep");
-		this->netlist().log("       %6.3f average newton raphson loops\n", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average\n",
+		this->netlist().log("==============================================");
+		this->netlist().log("Solver %s", this->name().cstr());
+		this->netlist().log("       ==> %d nets", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
+		this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
+		this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
 				this->m_stat_calculations,
 				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
 				this->m_gs_fail,
@@ -149,20 +142,19 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 
 
 	ATTR_ALIGN nl_double new_v[_storage_N] = { 0.0 };
-	const int iN = this->N();
+	const unsigned iN = this->N();
 
 	bool resched = false;
 
 	int  resched_cnt = 0;
 
 	this->build_LE_A();
-	this->build_LE_RHS();
+	this->build_LE_RHS(this->m_RHS);
 
-#if 1
 #if 0
 	static int ws_cnt = 0;
 	ws_cnt++;
-	if (0 && ws_cnt % 100 == 0)
+	if (1 && ws_cnt % 200 == 0)
 	{
 		// update omega
 		nl_double lambdaN = 0;
@@ -181,8 +173,8 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 			for (int i=0; i<iN; i++)
 				s = s + nl_math::abs(this->m_A[k][i]);
 			akk = s / akk - 1.0;
-			//if ( akk > lambdaN)
-			//  lambdaN = akk;
+			if ( akk > lambdaN)
+			    lambdaN = akk;
 			if (akk < lambda1)
 				lambda1 = akk;
 	#endif
@@ -191,99 +183,31 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 
 		//ws = 2.0 / (2.0 - lambdaN - lambda1);
 		m_omega = 2.0 / (2.0 - lambda1);
-		//printf("%f\n", ws);
+		//printf("%f %f %f\n", m_omega, lambda1, lambdaN);
 	}
 #endif
 
 	for (int k = 0; k < iN; k++)
 		new_v[k] = this->m_nets[k]->m_cur_Analog;
 
-#else
-	{
-		nl_double frob;
-		frob = 0;
-		nl_double rmin = 1e99, rmax = -1e99;
-		for (int k = 0; k < iN; k++)
-		{
-			new_v[k] = this->m_nets[k]->m_cur_Analog;
-			nl_double s=0.0;
-			for (int i = 0; i < iN; i++)
-			{
-				frob += this->m_A[k][i] * this->m_A[k][i];
-				s = s + nl_math::abs(this->m_A[k][i]);
-			}
-
-			if (s<rmin)
-				rmin = s;
-			if (s>rmax)
-				rmax = s;
-		}
-#if 0
-		nl_double frobA = nl_math::sqrt(frob /(iN));
-		if (1 &&frobA < 1.0)
-			//ws = 2.0 / (1.0 + nl_math::sqrt(1.0-frobA));
-			ws = 2.0 / (2.0 - frobA);
-		else
-			ws = 1.0;
-		ws = 0.9;
-#else
-		// calculate an estimate for rho.
-		// This is based on the Perron???Frobenius theorem for positive matrices.
-		// No mathematical proof here. The following estimates the
-		// optimal relaxation parameter pretty well. Unfortunately, the
-		// overhead is bigger than the gain. Consequently the fast GS below
-		// uses a fixed GS. One can however use this here to determine a
-		// suitable parameter.
-		nl_double rm = (rmax + rmin) * 0.5;
-		if (rm < 1.0)
-			ws = 2.0 / (1.0 + nl_math::sqrt(1.0-rm));
-		else
-			ws = 1.0;
-		if (ws > 1.02 && rmax > 1.001)
-			printf("rmin %f rmax %f ws %f\n", rmin, rmax, ws);
-#endif
-	}
-#endif
-	// Frobenius norm for (D-L)^(-1)U
-	//nl_double frobU;
-	//nl_double frobL;
-	//nl_double norm;
 	do {
 		resched = false;
 		nl_double cerr = 0.0;
-		//frobU = 0;
-		//frobL = 0;
-		//norm = 0;
 
 		for (int k = 0; k < iN; k++)
 		{
 			nl_double Idrive = 0;
-			//nl_double norm_t = 0;
-			// Reduction loops need -ffast-math
-			for (int i = 0; i < iN; i++)
-				Idrive += this->m_A[k][i] * new_v[i];
 
-#if 0
-			for (int i = 0; i < iN; i++)
-			{
-				if (i < k) frobL += this->m_A[k][i] * this->m_A[k][i] / this->m_A[k][k] /this-> m_A[k][k];
-				if (i > k) frobU += this->m_A[k][i] * this->m_A[k][i] / this->m_A[k][k] / this->m_A[k][k];
-				norm_t += nl_math::abs(this->m_A[k][i]);
-			}
-#endif
-			//if (norm_t > norm) norm = norm_t;
-#if 0
-			const nl_double new_val = (1.0-ws) * new_v[k] + ws * (this->m_RHS[k] - Idrive + this->m_A[k][k] * new_v[k]) / this->m_A[k][k];
+			const double * RESTRICT A = &this->m_A[k][0];
+			const int *p = this->m_terms[k]->m_nz.data();
+			const unsigned e = this->m_terms[k]->m_nz.size();
 
-			const nl_double e = nl_math::abs(new_val - new_v[k]);
-			cerr = (e > cerr ? e : cerr);
-			new_v[k] = new_val;
-#else
-			const nl_double delta = m_omega * (this->m_RHS[k] - Idrive) / this->m_A[k][k];
-			const nl_double adelta = nl_math::abs(delta);
-			cerr = (adelta > cerr ? adelta : cerr);
+			for (unsigned i = 0; i < e; i++)
+				Idrive = Idrive + A[p[i]] * new_v[p[i]];
+
+			const nl_double delta = m_omega * (this->m_RHS[k] - Idrive) / A[k];
+			cerr = std::max(cerr, nl_math::abs(delta));
 			new_v[k] += delta;
-#endif
 		}
 
 		if (cerr > this->m_params.m_accuracy)
@@ -291,14 +215,9 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 			resched = true;
 		}
 		resched_cnt++;
-		//ATTR_UNUSED nl_double frobUL = nl_math::sqrt((frobU + frobL) / (double) (iN) / (double) (iN));
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
-	//printf("Frobenius %f %f %f %f %f\n", nl_math::sqrt(frobU), nl_math::sqrt(frobL), frobUL, frobA, norm);
-	//printf("Omega Estimate1 %f %f\n", 2.0 / (1.0 + nl_math::sqrt(1-frobUL)), 2.0 / (1.0 + nl_math::sqrt(1-frobA)) ); //        printf("Frobenius %f\n", sqrt(frob / (double) (iN * iN) ));
-	//printf("Omega Estimate2 %f %f\n", 2.0 / (2.0 - frobUL), 2.0 / (2.0 - frobA) ); //        printf("Frobenius %f\n", sqrt(frob / (double) (iN * iN) ));
 
-
-	this->store(new_v, false);
+	this->store(new_v);
 	this->m_gs_total += resched_cnt;
 	if (resched)
 	{

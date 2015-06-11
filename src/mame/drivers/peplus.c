@@ -1446,6 +1446,7 @@ ROM_START( pepk1024 ) /* Normal (non-plus) board : Aces and Faces 4 of a Kind Bo
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  SF  RF  (Bonus)
 --------------------------------------------------------------
   ????      1    2    3    4    5   8  25  50  50 250    800
+  % Range: 95.3-97.3%  Optimum: 99.3%  Hit Frequency: 45.5%
      Programs Available: PK1024
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1616,7 +1617,13 @@ ROM_END
 
 ROM_START( pepp0021 ) /* Normal board : Standard Draw Poker (PP0021) */
 /*
-REQUIRES Progressive link which is not currently supported
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+   BA       1    2    3    4    5   8  25  50 250    800
+  % Range: 93.8-95.8%  Optimum: 97.8%  Hit Frequency: 45.3%
+     Programs Available: PP0021
+	 
+NOTE: REQUIRES Progressive link which is not currently supported
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0021_723-703.u68",   0x00000, 0x10000, CRC(58f2a68b) SHA1(72c0a29016b17f7e308a9e9b2d724771b5e26560) ) /* Game Version: 723, Library Version: 703 */
