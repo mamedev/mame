@@ -45,6 +45,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h" //CPU was actually a NSC800 (Z80 compatible)
 #include "bus/generic/carts.h"
+#include "machine/pit8253.h"
+#include "sound/speaker.h"
 
 class i7000_state : public driver_device
 {
@@ -195,11 +197,15 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 //	AM_RANGE(0x0c, 0x0c) AM_READWRITE(i7000_io_?_r, i7000_io_?_w) //0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
 //	AM_RANGE(0x10, 0x10) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
 //	AM_RANGE(0x14, 0x15) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
+
+//	AM_RANGE(0x18, 0x19) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
 //	AM_RANGE(0x1a, 0x1b) AM_READWRITE(i7000_io_buzzer_r, i7000_io_buzzer_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+
 //	AM_RANGE(0x1c, 0x1c) AM_WRITE(i7000_io_printer_data_w) //ASCII data
 //	AM_RANGE(0x1e, 0x1e) AM_READ(i7000_io_printer_status_r)
 //	AM_RANGE(0x1f, 0x1f) AM_WRITE(i7000_io_printer_strobe_w) //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
-//	AM_RANGE(0x20, 0x21) AM_READ(i7000_io_keyboard_r)
+	AM_RANGE(0x20, 0x21) AM_READ(i7000_io_keyboard_r)
 //	AM_RANGE(0x25, 0x25) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
 //	AM_RANGE(0x28, 0x2d) AM_READWRITE(i7000_io_joystick_r, i7000_io_joystick_w)
 //	AM_RANGE(0x3b, 0x3b) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
@@ -256,6 +262,20 @@ static MACHINE_CONFIG_START( i7000, i7000_state )
 
 //	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i7000)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+    /* Programmable timer */
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+//	MCFG_PIT8253_CLK0(XTAL_4MHz / 2) /* TODO: verify on PCB */
+//	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i7000_state,i7000_pit_out0))
+//	MCFG_PIT8253_CLK1(XTAL_4MHz / 2) /* TODO: verify on PCB */
+//	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(i7000_state,i7000_pit_out1))
+	MCFG_PIT8253_CLK2(XTAL_4MHz / 2) /* TODO: verify on PCB */
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "i7000_card")
 	MCFG_GENERIC_EXTENSIONS("rom")
@@ -280,4 +300,4 @@ ROM_START( i7000 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                COMPANY    FULLNAME    FLAGS */
-COMP( 1982, i7000,  0,      0,       i7000,     i7000,   i7000_state, i7000, "Itautec", "I-7000",   GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, i7000,  0,      0,       i7000,     i7000,   i7000_state, i7000, "Itautec", "I-7000",   GAME_NOT_WORKING)
