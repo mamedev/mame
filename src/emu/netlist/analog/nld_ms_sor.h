@@ -183,18 +183,6 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 		resched_cnt++;
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
-	if (newton_raphson)
-	{
-		//printf("here %s\n", this->name().cstr());
-		for (int k = 0; k < iN; k++)
-			this->m_nets[k]->m_cur_Analog += 1.0 * (new_V[k] - this->m_nets[k]->m_cur_Analog);
-	}
-	else
-	{
-		for (int k = 0; k < iN; k++)
-			this->m_nets[k]->m_cur_Analog = new_V[k];
-	}
-
 	this->m_gs_total += resched_cnt;
 	this->m_stat_calculations++;
 
@@ -204,9 +192,19 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 		this->m_gs_fail++;
 		return netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
-	else {
-		return resched_cnt;
+
+	if (newton_raphson)
+	{
+		for (int k = 0; k < iN; k++)
+			this->m_nets[k]->m_cur_Analog += 1.0 * (new_V[k] - this->m_nets[k]->m_cur_Analog);
 	}
+	else
+	{
+		for (int k = 0; k < iN; k++)
+			this->m_nets[k]->m_cur_Analog = new_V[k];
+	}
+
+	return resched_cnt;
 }
 
 
