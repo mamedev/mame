@@ -68,13 +68,13 @@ machine_config_constructor snes_multitap_device::device_mconfig_additions() cons
 //-------------------------------------------------
 
 snes_multitap_device::snes_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, SNES_MULTITAP, "Nintendo SNES / SFC Multitap Adapter", tag, owner, clock, "snes_joypad", __FILE__),
-					device_snes_control_port_interface(mconfig, *this),
-					m_port1(*this, "port1"),
-					m_port2(*this, "port2"),
-					m_port3(*this, "port3"),
-					m_port4(*this, "port4"),
-					m_cfg(*this, "CONFIG")
+	device_t(mconfig, SNES_MULTITAP, "Nintendo SNES / SFC Multitap Adapter", tag, owner, clock, "snes_multitap", __FILE__),
+	device_snes_control_port_interface(mconfig, *this),
+	m_port1(*this, "port1"),
+	m_port2(*this, "port2"),
+	m_port3(*this, "port3"),
+	m_port4(*this, "port4"),
+	m_cfg(*this, "CONFIG")
 {
 }
 
