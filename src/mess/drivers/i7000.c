@@ -203,13 +203,19 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 
 //	AM_RANGE(0x1c, 0x1c) AM_WRITE(i7000_io_printer_data_w) //ASCII data
-//	AM_RANGE(0x1e, 0x1e) AM_READ(i7000_io_printer_status_r)
+//	AM_RANGE(0x1d, 0x1d) AM_READ(i7000_io_?_w)
+//	AM_RANGE(0x1e, 0x1e) AM_READWRITE(i7000_io_printer_status_r, i7000_io_?_w)
 //	AM_RANGE(0x1f, 0x1f) AM_WRITE(i7000_io_printer_strobe_w) //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
 	AM_RANGE(0x20, 0x21) AM_READ(i7000_io_keyboard_r)
+
+//	AM_RANGE(0x24, 0x24) AM_READ(i7000_io_?_r)
 //	AM_RANGE(0x25, 0x25) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
+
 //	AM_RANGE(0x28, 0x2d) AM_READWRITE(i7000_io_joystick_r, i7000_io_joystick_w)
+
 //	AM_RANGE(0x3b, 0x3b) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
 //	AM_RANGE(0x66, 0x67) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
+//	AM_RANGE(0xbb, 0xbb) AM_WRITE(i7000_io_?_w) //may be related to page-swapping...
 ADDRESS_MAP_END
 
 DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
