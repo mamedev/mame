@@ -402,7 +402,6 @@ static const struct tms5100_coeffs T0280F_2801A_coeff =
 
 /* Mitsubishi M58817
 The Mitsubishi M58817 seems to have (partly?) copied the coefficients from the TMC0280/CD2801 above, but has some slight differences to it within the chip: the main accumulator seems to have 1 extra bit and the digital values are tapped 1 bit higher than on the TI chips. This is emulated within tms5110.c
-   ***TODO: there are 2 versions of this chip, and the interpolation behavior between the two differs slightly!
    */
 static const struct tms5100_coeffs M58817_coeff =
 {
