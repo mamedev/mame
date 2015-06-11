@@ -185,16 +185,38 @@ protected:
 
 extern const device_type TMS5100;
 
-class tms5110a_device : public tms5110_device
+class tmc0281_device : public tms5110_device
 {
 public:
-	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_start();
 };
 
-extern const device_type TMS5110A;
+extern const device_type TMC0281;
+
+class tms5100a_device : public tms5110_device
+{
+public:
+	tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type TMS5100A;
+
+class tmc0281d_device : public tms5110_device
+{
+public:
+	tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type TMC0281D;
 
 class cd2801_device : public tms5110_device
 {
@@ -207,17 +229,6 @@ protected:
 
 extern const device_type CD2801;
 
-class tmc0281_device : public tms5110_device
-{
-public:
-	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_start();
-};
-
-extern const device_type TMC0281;
-
 class cd2802_device : public tms5110_device
 {
 public:
@@ -228,6 +239,17 @@ protected:
 };
 
 extern const device_type CD2802;
+
+class tms5110a_device : public tms5110_device
+{
+public:
+	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type TMS5110A;
 
 class m58817_device : public tms5110_device
 {
