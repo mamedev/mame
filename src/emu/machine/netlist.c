@@ -467,14 +467,14 @@ void netlist_mame_cpu_device_t::device_start()
 
 	for (int i=0; i < netlist().m_nets.size(); i++)
 	{
-		netlist::netlist_net_t *n = netlist().m_nets[i];
-		if (n->isFamily(netlist::netlist_object_t::LOGIC))
+		netlist::net_t *n = netlist().m_nets[i];
+		if (n->isFamily(netlist::object_t::LOGIC))
 		{
-			state_add(i*2, n->name(), downcast<netlist::netlist_logic_net_t *>(n)->Q_state_ptr());
+			state_add(i*2, n->name(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
 		}
 		else
 		{
-			state_add(i*2+1, n->name(), downcast<netlist::netlist_analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
+			state_add(i*2+1, n->name(), downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
 		}
 	}
 

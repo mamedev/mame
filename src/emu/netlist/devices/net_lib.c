@@ -43,7 +43,7 @@ NETLIST_END()
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-void initialize_factory(netlist_factory_list_t &factory)
+void initialize_factory(factory_list_t &factory)
 {
 	ENTRY(R,                    RES,                    "R")
 	ENTRY(POT,                  POT,                    "R")
@@ -150,7 +150,7 @@ NETLIB_NAMESPACE_DEVICES_END()
 
 namespace netlist
 {
-	void initialize_factory(netlist_factory_list_t &factory)
+	void initialize_factory(factory_list_t &factory)
 	{
 		devices::initialize_factory(factory);
 	}

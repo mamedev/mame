@@ -47,23 +47,23 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(7483,
-	netlist_logic_input_t m_C0;
-	netlist_logic_input_t m_A1;
-	netlist_logic_input_t m_A2;
-	netlist_logic_input_t m_A3;
-	netlist_logic_input_t m_A4;
-	netlist_logic_input_t m_B1;
-	netlist_logic_input_t m_B2;
-	netlist_logic_input_t m_B3;
-	netlist_logic_input_t m_B4;
+	logic_input_t m_C0;
+	logic_input_t m_A1;
+	logic_input_t m_A2;
+	logic_input_t m_A3;
+	logic_input_t m_A4;
+	logic_input_t m_B1;
+	logic_input_t m_B2;
+	logic_input_t m_B3;
+	logic_input_t m_B4;
 
 	UINT8 m_lastr;
 
-	netlist_logic_output_t m_S1;
-	netlist_logic_output_t m_S2;
-	netlist_logic_output_t m_S3;
-	netlist_logic_output_t m_S4;
-	netlist_logic_output_t m_C4;
+	logic_output_t m_S1;
+	logic_output_t m_S2;
+	logic_output_t m_S3;
+	logic_output_t m_S4;
+	logic_output_t m_C4;
 
 );
 

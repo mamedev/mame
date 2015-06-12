@@ -35,13 +35,13 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(82S16,
 
-	netlist_logic_input_t m_A[8];
-	netlist_logic_input_t m_CE1Q;
-	netlist_logic_input_t m_CE2Q;
-	netlist_logic_input_t m_CE3Q;
-	netlist_logic_input_t m_WEQ;
-	netlist_logic_input_t m_DIN;
-	netlist_logic_output_t m_DOUTQ;
+	logic_input_t m_A[8];
+	logic_input_t m_CE1Q;
+	logic_input_t m_CE2Q;
+	logic_input_t m_CE3Q;
+	logic_input_t m_WEQ;
+	logic_input_t m_DIN;
+	logic_output_t m_DOUTQ;
 
 	//netlist_state_t<UINT8[256]> m_ram;
 	UINT8 m_ram[256];

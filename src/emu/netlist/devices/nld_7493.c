@@ -52,7 +52,7 @@ NETLIB_RESET(7493ff)
 {
 	m_reset = 1;
 	m_state = 0;
-	m_I.set_state(netlist_logic_t::STATE_INP_HL);
+	m_I.set_state(logic_t::STATE_INP_HL);
 }
 
 NETLIB_UPDATE(7493ff)

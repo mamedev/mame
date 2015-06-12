@@ -31,7 +31,7 @@ NETLIB_START(74175_sub)
 
 NETLIB_RESET(74175_sub)
 {
-	m_CLK.set_state(netlist_logic_t::STATE_INP_LH);
+	m_CLK.set_state(logic_t::STATE_INP_LH);
 	m_clrq = 0;
 	m_data = 0xFF;
 }

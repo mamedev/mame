@@ -42,7 +42,7 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-ATTR_COLD void terms_t::add(netlist_terminal_t *term, int net_other)
+ATTR_COLD void terms_t::add(terminal_t *term, int net_other)
 {
 	m_term.add(term);
 	m_net_other.add(net_other);
@@ -82,7 +82,7 @@ ATTR_COLD netlist_matrix_solver_t::~netlist_matrix_solver_t()
 	m_inps.clear_and_free();
 }
 
-ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets)
+ATTR_COLD void netlist_matrix_solver_t::setup(analog_net_t::list_t &nets)
 {
 	NL_VERBOSE_OUT(("New solver setup\n"));
 
@@ -97,27 +97,27 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 	{
 		NL_VERBOSE_OUT(("setting up net\n"));
 
-		netlist_analog_net_t *net = nets[k];
+		analog_net_t *net = nets[k];
 
 		net->m_solver = this;
 
 		for (std::size_t i = 0; i < net->m_core_terms.size(); i++)
 		{
-			netlist_core_terminal_t *p = net->m_core_terms[i];
+			core_terminal_t *p = net->m_core_terms[i];
 			NL_VERBOSE_OUT(("%s %s %d\n", p->name().cstr(), net->name().cstr(), (int) net->isRailNet()));
 			switch (p->type())
 			{
-				case netlist_terminal_t::TERMINAL:
+				case terminal_t::TERMINAL:
 					switch (p->netdev().family())
 					{
-						case netlist_device_t::CAPACITOR:
+						case device_t::CAPACITOR:
 							if (!m_step_devices.contains(&p->netdev()))
 								m_step_devices.add(&p->netdev());
 							break;
-						case netlist_device_t::BJT_EB:
-						case netlist_device_t::DIODE:
+						case device_t::BJT_EB:
+						case device_t::DIODE:
 						//case netlist_device_t::VCVS:
-						case netlist_device_t::BJT_SWITCH:
+						case device_t::BJT_SWITCH:
 							NL_VERBOSE_OUT(("found BJT/Diode\n"));
 							if (!m_dynamic_devices.contains(&p->netdev()))
 								m_dynamic_devices.add(&p->netdev());
@@ -126,12 +126,12 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 							break;
 					}
 					{
-						netlist_terminal_t *pterm = dynamic_cast<netlist_terminal_t *>(p);
+						terminal_t *pterm = dynamic_cast<terminal_t *>(p);
 						add_term(k, pterm);
 					}
 					NL_VERBOSE_OUT(("Added terminal\n"));
 					break;
-				case netlist_terminal_t::INPUT:
+				case terminal_t::INPUT:
 					{
 						netlist_analog_output_t *net_proxy_output = NULL;
 						for (std::size_t i = 0; i < m_inps.size(); i++)
@@ -275,7 +275,7 @@ ATTR_HOT nl_double netlist_matrix_solver_t::solve()
 // netlist_matrix_solver - Direct base
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD int netlist_matrix_solver_t::get_net_idx(netlist_net_t *net)
+ATTR_COLD int netlist_matrix_solver_t::get_net_idx(net_t *net)
 {
 	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
@@ -427,7 +427,7 @@ netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int
 
 ATTR_COLD void NETLIB_NAME(solver)::post_start()
 {
-	netlist_analog_net_t::list_t groups[256];
+	analog_net_t::list_t groups[256];
 	int cur_group = -1;
 	const int gs_threshold = m_gs_threshold.Value();
 	const bool use_specific = true;
@@ -467,7 +467,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		if (!netlist().m_nets[i]->isRailNet())
 		{
 			SOLVER_VERBOSE_OUT(("   ==> not a rail net\n"));
-			netlist_analog_net_t *n = &netlist().m_nets[i]->as_analog();
+			analog_net_t *n = &netlist().m_nets[i]->as_analog();
 			if (!n->already_processed(groups, cur_group))
 			{
 				cur_group++;
@@ -554,10 +554,10 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		for (std::size_t j=0; j<groups[i].size(); j++)
 		{
 			netlist().log("Net %" SIZETFMT ": %s", j, groups[i][j]->name().cstr());
-			netlist_net_t *n = groups[i][j];
+			net_t *n = groups[i][j];
 			for (std::size_t k = 0; k < n->m_core_terms.size(); k++)
 			{
-				const netlist_core_terminal_t *p = n->m_core_terms[k];
+				const core_terminal_t *p = n->m_core_terms[k];
 				netlist().log("   %s", p->name().cstr());
 			}
 		}

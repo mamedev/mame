@@ -40,11 +40,11 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(7450,
 public:
-	netlist_logic_input_t m_A;
-	netlist_logic_input_t m_B;
-	netlist_logic_input_t m_C;
-	netlist_logic_input_t m_D;
-	netlist_logic_output_t m_Q;
+	logic_input_t m_A;
+	logic_input_t m_B;
+	logic_input_t m_C;
+	logic_input_t m_D;
+	logic_output_t m_Q;
 );
 
 NETLIB_DEVICE(7450_dip,

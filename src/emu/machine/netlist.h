@@ -81,12 +81,12 @@ private:
 
 class netlist_mame_device_t;
 
-class netlist_mame_t : public netlist::netlist_base_t
+class netlist_mame_t : public netlist::netlist_t
 {
 public:
 
 	netlist_mame_t(netlist_mame_device_t &parent)
-	: netlist::netlist_base_t(),
+	: netlist::netlist_t(),
 		m_parent(parent)
 	{}
 	virtual ~netlist_mame_t() { };
@@ -506,11 +506,11 @@ private:
 // netdev_callback
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(analog_callback) : public netlist::netlist_device_t
+class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(analog_callback)()
-		: netlist_device_t(), m_cpu_device(NULL), m_last(0) { }
+		: device_t(), m_cpu_device(NULL), m_last(0) { }
 
 	ATTR_COLD void start()
 	{
@@ -545,7 +545,7 @@ public:
 	}
 
 private:
-	netlist::netlist_analog_input_t m_in;
+	netlist::analog_input_t m_in;
 	netlist_analog_output_delegate m_callback;
 	netlist_mame_cpu_device_t *m_cpu_device;
 	nl_double m_last;
@@ -555,11 +555,11 @@ private:
 // sound_out
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(sound_out) : public netlist::netlist_device_t
+class NETLIB_NAME(sound_out) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(sound_out)()
-		: netlist::netlist_device_t() { }
+		: netlist::device_t() { }
 
 	static const int BUFSIZE = 2048;
 
@@ -611,7 +611,7 @@ public:
 	netlist_time m_sample;
 
 private:
-	netlist::netlist_analog_input_t m_in;
+	netlist::analog_input_t m_in;
 	stream_sample_t m_cur;
 	int m_last_pos;
 	netlist_time m_last_buffer;
@@ -621,11 +621,11 @@ private:
 // sound_in
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(sound_in) : public netlist::netlist_device_t
+class NETLIB_NAME(sound_in) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(sound_in)()
-		: netlist::netlist_device_t() { }
+		: netlist::device_t() { }
 
 	static const int MAX_INPUT_CHANNELS = 10;
 
@@ -697,8 +697,8 @@ public:
 	netlist_time m_inc;
 
 private:
-	netlist::netlist_logic_input_t m_feedback;
-	netlist::netlist_logic_output_t m_Q;
+	netlist::logic_input_t m_feedback;
+	netlist::logic_output_t m_Q;
 
 	int m_pos;
 	int m_num_channel;

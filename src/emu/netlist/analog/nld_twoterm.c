@@ -35,7 +35,7 @@ ATTR_COLD void netlist_generic_diode::set_param(const nl_double Is, const nl_dou
 	m_VtInv = 1.0 / m_Vt;
 }
 
-ATTR_COLD void netlist_generic_diode::save(pstring name, netlist_object_t &parent)
+ATTR_COLD void netlist_generic_diode::save(pstring name, object_t &parent)
 {
 	parent.save(m_Vd, name + ".m_Vd");
 	parent.save(m_Id, name + ".m_Id");
@@ -47,14 +47,14 @@ ATTR_COLD void netlist_generic_diode::save(pstring name, netlist_object_t &paren
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)(const family_t afamily)
-		: netlist_device_t(afamily)
+		: device_t(afamily)
 {
 	m_P.m_otherterm = &m_N;
 	m_N.m_otherterm = &m_P;
 }
 
 ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)()
-		: netlist_device_t(TWOTERM)
+		: device_t(TWOTERM)
 {
 	m_P.m_otherterm = &m_N;
 	m_N.m_otherterm = &m_P;

@@ -77,10 +77,10 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_SUBDEVICE(74107Asub,
-	netlist_logic_input_t m_clk;
+	logic_input_t m_clk;
 
-	netlist_logic_output_t m_Q;
-	netlist_logic_output_t m_QQ;
+	logic_output_t m_Q;
+	logic_output_t m_QQ;
 
 	netlist_sig_t m_Q1;
 	netlist_sig_t m_Q2;
@@ -94,9 +94,9 @@ NETLIB_DEVICE(74107A,
 public:
 	NETLIB_NAME(74107Asub) sub;
 
-	netlist_logic_input_t m_J;
-	netlist_logic_input_t m_K;
-	netlist_logic_input_t m_clrQ;
+	logic_input_t m_J;
+	logic_input_t m_K;
+	logic_input_t m_clrQ;
 
 );
 

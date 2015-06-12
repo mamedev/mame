@@ -39,7 +39,7 @@ NETLIB_SUBDEVICE(4066,
 	NETLIB_LOGIC_FAMILY(CD4000)
 public:
 
-	netlist_analog_input_t m_control;
+	analog_input_t m_control;
 	NETLIB_NAME(R) m_R;
 
 	NETLIB_NAME(vdd_vss) *m_supply;

@@ -13,15 +13,15 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-class nld_vdd_vss : public netlist_device_t
+class nld_vdd_vss : public device_t
 {
 	public:
 		nld_vdd_vss ()
-		: netlist_device_t()
+		: device_t()
 			{ }
 
-		netlist_analog_input_t m_vdd;
-		netlist_analog_input_t m_vss;
+		analog_input_t m_vdd;
+		analog_input_t m_vss;
 
 	protected:
 		ATTR_HOT void update() {};

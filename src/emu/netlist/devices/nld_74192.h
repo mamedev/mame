@@ -44,18 +44,18 @@ NETLIB_DEVICE(74192,
 	ATTR_HOT void update_outputs();
 
 	NETLIB_NAME(9316_subABCD) m_ABCD;
-	netlist_logic_input_t m_CLEAR;
-	netlist_logic_input_t m_LOADQ;
-	netlist_logic_input_t m_CU;
-	netlist_logic_input_t m_CD;
+	logic_input_t m_CLEAR;
+	logic_input_t m_LOADQ;
+	logic_input_t m_CU;
+	logic_input_t m_CD;
 
 	INT8 m_cnt;
 	UINT8 m_last_CU;
 	UINT8 m_last_CD;
 
-	netlist_logic_output_t m_Q[4];
-	netlist_logic_output_t m_BORROWQ;
-	netlist_logic_output_t m_CARRYQ;
+	logic_output_t m_Q[4];
+	logic_output_t m_BORROWQ;
+	logic_output_t m_CARRYQ;
 );
 
 NETLIB_DEVICE_DERIVED_PURE(74192_dip, 74192);

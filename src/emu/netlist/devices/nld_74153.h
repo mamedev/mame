@@ -63,10 +63,10 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_SUBDEVICE(74153sub,
-	netlist_logic_input_t m_C[4];
-	netlist_logic_input_t m_G;
+	logic_input_t m_C[4];
+	logic_input_t m_G;
 
-	netlist_logic_output_t m_Y;
+	logic_output_t m_Y;
 
 	int m_chan;
 );
@@ -74,16 +74,16 @@ NETLIB_SUBDEVICE(74153sub,
 NETLIB_DEVICE(74153,
 public:
 	NETLIB_NAME(74153sub) m_sub;
-	netlist_logic_input_t m_A;
-	netlist_logic_input_t m_B;
+	logic_input_t m_A;
+	logic_input_t m_B;
 );
 
 NETLIB_DEVICE(74153_dip,
 
 	NETLIB_NAME(74153sub) m_1;
 	NETLIB_NAME(74153sub) m_2;
-	netlist_logic_input_t m_A;
-	netlist_logic_input_t m_B;
+	logic_input_t m_A;
+	logic_input_t m_B;
 );
 
 NETLIB_NAMESPACE_DEVICES_END()

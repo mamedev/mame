@@ -54,15 +54,15 @@ NETLIB_SUBDEVICE(7448_sub,
 	ATTR_HOT void update_outputs(UINT8 v);
 	static const UINT8 tab7448[16][7];
 
-	netlist_logic_input_t m_A;
-	netlist_logic_input_t m_B;
-	netlist_logic_input_t m_C;
-	netlist_logic_input_t m_D;
-	netlist_logic_input_t m_RBIQ;
+	logic_input_t m_A;
+	logic_input_t m_B;
+	logic_input_t m_C;
+	logic_input_t m_D;
+	logic_input_t m_RBIQ;
 
 	UINT8 m_state;
 
-	netlist_logic_output_t m_Q[7];  /* a .. g */
+	logic_output_t m_Q[7];  /* a .. g */
 
 );
 
@@ -70,8 +70,8 @@ NETLIB_DEVICE(7448,
 public:
 	NETLIB_NAME(7448_sub) sub;
 
-	netlist_logic_input_t m_LTQ;
-	netlist_logic_input_t m_BIQ;
+	logic_input_t m_LTQ;
+	logic_input_t m_BIQ;
 );
 #endif
 

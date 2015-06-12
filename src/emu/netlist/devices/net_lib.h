@@ -68,7 +68,7 @@ NETLIST_EXTERNAL(diode_models);
 NETLIST_EXTERNAL(bjt_models);
 
 namespace netlist {
-	void initialize_factory(netlist::netlist_factory_list_t &factory);
+	void initialize_factory(netlist::factory_list_t &factory);
 }
 
 #endif
