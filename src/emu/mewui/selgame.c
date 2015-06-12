@@ -1615,4 +1615,6 @@ void ui_mewui_select_game::load_cache_info()
 		m_sortedlist.push_back(&driver_list::driver(find));
 	}
 	myfile.close();
+	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
+	std::stable_sort(c_year::ui.begin(), c_year::ui.end());
 }
