@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "hdc.h"
 
-#define LOG_HDC_STATUS      1
-#define LOG_HDC_CALL        1
-#define LOG_HDC_DATA        1
+#define LOG_HDC_STATUS      0
+#define LOG_HDC_CALL        0
+#define LOG_HDC_DATA        0
 
 #define CMD_TESTREADY   0x00
 #define CMD_RECALIBRATE 0x01
