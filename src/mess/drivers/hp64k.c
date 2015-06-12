@@ -10,7 +10,6 @@
 //
 // TODO:
 // - Slot selection mechanism & low 32KW RAM
-// - Periodic interrupt
 // - Beeper
 // - Various DIP switches
 // - Floppy I/F
@@ -52,6 +51,9 @@ public:
         TIMER_DEVICE_CALLBACK_MEMBER(hp64k_kb_scan);
         DECLARE_READ16_MEMBER(hp64k_kb_r);
 
+        TIMER_DEVICE_CALLBACK_MEMBER(hp64k_line_sync);
+        DECLARE_READ16_MEMBER(hp64k_deltat_r);
+        DECLARE_WRITE16_MEMBER(hp64k_deltat_w);
 private:
         required_device<hp_5061_3011_cpu_device> m_cpu;
         required_device<i8275_device> m_crtc;
@@ -89,6 +91,9 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
         // PA = 0, IC = [0..3]
         // Keyboard input
         AM_RANGE(HP_MAKE_IOADDR(0 , 0) , HP_MAKE_IOADDR(0 , 3))   AM_READ(hp64k_kb_r)
+        // PA = 2, IC = [0..3]
+        // Line sync interrupt clear/watchdog reset
+        AM_RANGE(HP_MAKE_IOADDR(2 , 0) , HP_MAKE_IOADDR(2 , 3))   AM_READWRITE(hp64k_deltat_r , hp64k_deltat_w)
         // PA = 7, IC = 2
         // Rear-panel switches
         AM_RANGE(HP_MAKE_IOADDR(7 , 2) , HP_MAKE_IOADDR(7 , 2))   AM_READ(hp64k_rear_sw_r)
@@ -280,6 +285,25 @@ READ16_MEMBER(hp64k_state::hp64k_kb_r)
         return ret;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(hp64k_state::hp64k_line_sync)
+{
+        BIT_SET(m_irl_pending , 2);
+        hp64k_update_irl();
+}
+
+READ16_MEMBER(hp64k_state::hp64k_deltat_r)
+{
+        BIT_CLR(m_irl_pending , 2);
+        hp64k_update_irl();
+        return 0;
+}
+
+WRITE16_MEMBER(hp64k_state::hp64k_deltat_w)
+{
+        BIT_CLR(m_irl_pending , 2);
+        hp64k_update_irl();
+}
+
 static INPUT_PORTS_START(hp64k)
                 // Keyboard is arranged in a 8 x 16 matrix. Of the 128 possible positions, only 77 are used.
                 // For key arrangement on the matrix, see [1] pg 334
@@ -434,6 +458,9 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 
                 // Actual keyboard refresh rate should be between 1 and 2 kHz
                 MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp64k_state , hp64k_kb_scan , attotime::from_hz(100))
+
+                // Line sync timer. A line frequency of 60 Hz is assumed.
+                MCFG_TIMER_DRIVER_ADD_PERIODIC("linesync_timer" , hp64k_state , hp64k_line_sync , attotime::from_hz(60))
 
                 // Clock = 25 MHz / 9 * (112/114)
                 MCFG_DEVICE_ADD("crtc" , I8275 , 2729045)
