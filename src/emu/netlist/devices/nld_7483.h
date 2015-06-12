@@ -44,6 +44,8 @@
 #define TTL_7483_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7483_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_DEVICE(7483,
 	netlist_logic_input_t m_C0;
 	netlist_logic_input_t m_A1;
@@ -66,5 +68,7 @@ NETLIB_DEVICE(7483,
 );
 
 NETLIB_DEVICE_DERIVED_PURE(7483_dip, 7483);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7483_H_ */

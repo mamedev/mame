@@ -29,6 +29,8 @@
 // solver
 // ----------------------------------------------------------------------------------------
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 class NETLIB_NAME(solver);
 
 /* FIXME: these should become proper devices */
@@ -219,6 +221,6 @@ private:
 	netlist_matrix_solver_t *create_solver(int size, int gs_threshold, bool use_specific);
 };
 
-
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_SOLVER_H_ */

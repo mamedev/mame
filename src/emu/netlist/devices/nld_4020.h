@@ -40,6 +40,8 @@
 #define CD_4020_DIP(_name)                                                     \
 		NET_REGISTER_DEV(4020_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(4020_sub,
 
 	NETLIB_LOGIC_FAMILY(CD4000)
@@ -60,5 +62,7 @@ NETLIB_DEVICE(4020,
 );
 
 NETLIB_DEVICE_DERIVED_PURE(4020_dip, 4020);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_4020_H_ */

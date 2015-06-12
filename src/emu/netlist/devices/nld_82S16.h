@@ -31,6 +31,8 @@
 #define TTL_82S16_DIP(_name)                                 \
 		NET_REGISTER_DEV(82S16_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_DEVICE(82S16,
 
 	netlist_logic_input_t m_A[8];
@@ -46,5 +48,7 @@ NETLIB_DEVICE(82S16,
 );
 
 NETLIB_DEVICE_DERIVED_PURE(82S16_dip, 82S16);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_82S16_H_ */

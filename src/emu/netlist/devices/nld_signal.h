@@ -22,6 +22,8 @@
 		: net_signal_t<_num_input, _check, _invert>() { }                           \
 	}
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // net_signal_t
 // ----------------------------------------------------------------------------------------
@@ -111,5 +113,7 @@ public:
 	netlist_logic_output_t m_Q[1];
 	INT32 m_active;
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_SIGNAL_H_ */

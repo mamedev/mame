@@ -12,6 +12,8 @@
 
 #include "nld_solver.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
@@ -560,5 +562,6 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	}
 }
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_MS_DIRECT_H_ */

@@ -33,21 +33,24 @@
 #define NLD_7408_H_
 
 #include "nld_signal.h"
+#include "nld_truthtable.h"
 
 #define TTL_7408_AND(_name, _A, _B)                                                 \
 		NET_REGISTER_DEV(7408, _name)                                               \
 		NET_CONNECT(_name, A, _A)                                                   \
 		NET_CONNECT(_name, B, _B)
 
+#define TTL_7408_DIP(_name)                                                         \
+		NET_REGISTER_DEV(7408_dip, _name)
+
+NETLIB_NAMESPACE_DEVICES_START()
+
 #if (USE_TRUTHTABLE)
-#include "nld_truthtable.h"
 NETLIB_TRUTHTABLE(7408, 2, 1, 0);
 #else
 NETLIB_SIGNAL(7408, 2, 0, 1);
 #endif
 
-#define TTL_7408_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7408_dip, _name)
 
 NETLIB_DEVICE(7408_dip,
 
@@ -56,5 +59,7 @@ NETLIB_DEVICE(7408_dip,
 	NETLIB_NAME(7408) m_3;
 	NETLIB_NAME(7408) m_4;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7408_H_ */

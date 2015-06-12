@@ -64,8 +64,10 @@
 #define PARAMETERS(_name)                                                      \
 		NET_REGISTER_DEV(netlistparams, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // -----------------------------------------------------------------------------
-// mainclock
+// netlistparams
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(netlistparams,
@@ -405,5 +407,7 @@ private:
 	int m_last_state;
 	bool m_is_timestep;
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_SYSTEM_H_ */

@@ -69,6 +69,7 @@
 #define TTL_7490_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7490_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(7490,
 	ATTR_HOT void update_outputs();
@@ -88,5 +89,7 @@ NETLIB_DEVICE(7490,
 );
 
 NETLIB_DEVICE_DERIVED_PURE(7490_dip, 7490);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7490_H_ */

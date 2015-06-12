@@ -24,6 +24,8 @@
 		NET_REGISTER_DEV(log, _name)                                         \
 		NET_CONNECT(_name, I, _I)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_DEVICE(log,
 	~NETLIB_NAME(log)();
 	netlist_analog_input_t m_I;
@@ -49,5 +51,7 @@ private:
 	void *m_file;
 );
 #endif
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_LOG_H_ */

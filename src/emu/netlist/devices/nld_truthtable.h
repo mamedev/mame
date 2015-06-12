@@ -24,6 +24,23 @@
 		static const char *m_desc[];                                                \
 	}
 
+#define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
+	{ \
+	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(_in, _out, _has_state, \
+			# _name, # _name, "+" _def_params);
+
+#define TT_HEAD(_x) \
+	ttd->m_desc.add(_x);
+
+#define TT_LINE(_x) \
+	ttd->m_desc.add(_x);
+
+#define TRUTHTABLE_END() \
+	setup.factory().register_device(ttd); \
+	}
+
+NETLIB_NAMESPACE_DEVICES_START()
+
 #if 0
 static inline UINT32 remove_first_bit(UINT32 v)
 {
@@ -308,20 +325,8 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 		const pstring &name, const pstring &classname,
 		const pstring &def_param);
 
-#define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
-	{ \
-	netlist_base_factory_truthtable_t *ttd = nl_tt_factory_create(_in, _out, _has_state, \
-			# _name, # _name, "+" _def_params);
+NETLIB_NAMESPACE_DEVICES_END()
 
-#define TT_HEAD(_x) \
-	ttd->m_desc.add(_x);
-
-#define TT_LINE(_x) \
-	ttd->m_desc.add(_x);
-
-#define TRUTHTABLE_END() \
-	setup.factory().register_device(ttd); \
-	}
 
 
 #endif /* NLD_TRUTHTABLE_H_ */

@@ -25,6 +25,7 @@
 #define NE555(_name)                                                        \
 		NET_REGISTER_DEV(NE555, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(NE555,
 	NETLIB_NAME(R) m_R1;
@@ -49,5 +50,6 @@ NETLIB_DEVICE(NE555,
 
 NETLIB_DEVICE_DERIVED_PURE(NE555_dip, NE555);
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_NE555_H_ */

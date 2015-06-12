@@ -11,6 +11,9 @@
 #include "nl_factory.h"
 #include "nl_setup.h"
 
+namespace netlist
+{
+
 // ----------------------------------------------------------------------------------------
 // net_device_t_base_factory
 // ----------------------------------------------------------------------------------------
@@ -80,4 +83,6 @@ netlist_base_factory_t * netlist_factory_list_t::factory_by_name(const pstring &
 	}
 	setup.netlist().error("Class %s not found!\n", name.cstr());
 	return NULL; // appease code analysis
+}
+
 }

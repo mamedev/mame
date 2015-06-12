@@ -74,6 +74,8 @@
 #define TTL_74107_DIP(_name)                                                         \
 		NET_REGISTER_DEV(74107_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(74107Asub,
 	netlist_logic_input_t m_clk;
 
@@ -111,5 +113,7 @@ NETLIB_DEVICE(74107_dip,
 	NETLIB_NAME(74107) m_1;
 	NETLIB_NAME(74107) m_2;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_74107_H_ */

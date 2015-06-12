@@ -8,6 +8,8 @@
 #include "nld_7493.h"
 #include "../nl_setup.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(7493)
 {
 	register_sub("A", A);
@@ -118,3 +120,5 @@ NETLIB_RESET(7493_dip)
 {
 	NETLIB_NAME(7493)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

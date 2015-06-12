@@ -9,6 +9,8 @@
 #include "../nl_setup.h"
 #include "nld_solver.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 class diode
 {
 public:
@@ -248,3 +250,5 @@ NETLIB_UPDATE_TERMINALS(QBJT_EB)
 NETLIB_UPDATE_PARAM(QBJT_EB)
 {
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

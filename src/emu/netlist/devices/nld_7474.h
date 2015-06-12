@@ -54,6 +54,8 @@
 #define TTL_7474_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7474_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(7474sub,
 	netlist_logic_input_t m_CLK;
 
@@ -78,5 +80,7 @@ NETLIB_DEVICE(7474_dip,
 	NETLIB_NAME(7474) m_1;
 	NETLIB_NAME(7474) m_2;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7474_H_ */

@@ -11,6 +11,8 @@
 #include "../nl_base.h"
 #include "../analog/nld_twoterm.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 class nld_vdd_vss : public netlist_device_t
 {
 	public:
@@ -34,5 +36,7 @@ public:
 	ATTR_HOT inline nl_double vdd() { return INPANALOG(m_vdd); }
 	ATTR_HOT inline nl_double vss() { return INPANALOG(m_vss); }
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_CMOS_H_ */

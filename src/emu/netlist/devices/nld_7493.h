@@ -69,6 +69,8 @@
 #define TTL_7493_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7493_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(7493ff,
 	netlist_logic_input_t m_I;
 	netlist_logic_output_t m_Q;
@@ -88,6 +90,8 @@ NETLIB_DEVICE(7493,
 );
 
 NETLIB_DEVICE_DERIVED_PURE(7493_dip, 7493);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 
 #endif /* NLD_7493_H_ */

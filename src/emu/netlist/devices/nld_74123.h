@@ -42,6 +42,7 @@
 #define TTL_74123(_name)                                                        \
 		NET_REGISTER_DEV(74123, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(74123,
 public:
@@ -92,6 +93,8 @@ NETLIB_DEVICE(9602_dip,
 	NETLIB_NAME(74123) m_2;
 
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 
 #endif /* NLD_74123_H_ */

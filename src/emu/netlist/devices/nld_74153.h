@@ -60,6 +60,8 @@
 #define TTL_74153_DIP(_name)                                                         \
 		NET_REGISTER_DEV(74153_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(74153sub,
 	netlist_logic_input_t m_C[4];
 	netlist_logic_input_t m_G;
@@ -83,5 +85,7 @@ NETLIB_DEVICE(74153_dip,
 	netlist_logic_input_t m_A;
 	netlist_logic_input_t m_B;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_74153_H_ */

@@ -8,6 +8,8 @@
 #include "nld_legacy.h"
 #include "../nl_setup.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(nicRSFF)
 {
 	register_input("S", m_S);
@@ -72,3 +74,5 @@ NETLIB_UPDATE(nicDelay)
 	}
 	m_last = nval;
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

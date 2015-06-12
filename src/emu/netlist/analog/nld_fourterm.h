@@ -26,6 +26,8 @@
 		NET_REGISTER_DEV(VCVS, _name)
 
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // nld_VCCS
 // ----------------------------------------------------------------------------------------
@@ -166,6 +168,8 @@ protected:
 
 	netlist_param_double_t m_RO;
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 
 #endif /* NLD_FOURTERM_H_ */

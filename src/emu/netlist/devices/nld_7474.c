@@ -7,6 +7,8 @@
 
 #include "nld_7474.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 ATTR_HOT inline void NETLIB_NAME(7474sub)::newstate(const UINT8 stateQ, const UINT8 stateQQ)
 {
 	// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
@@ -124,3 +126,5 @@ NETLIB_UPDATE(7474_dip)
 	m_1.update_dev();
 	m_2.update_dev();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

@@ -35,6 +35,8 @@
 		NET_REGISTER_DEV(SN74LS629, _name)                                          \
 		NETDEV_PARAMI(_name, CAP, _cap)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(SN74LS629clk,
 	netlist_logic_input_t m_FB;
 	netlist_logic_output_t m_Y;
@@ -66,6 +68,8 @@ NETLIB_DEVICE(SN74LS629_dip,
 	NETLIB_NAME(SN74LS629) m_1;
 	NETLIB_NAME(SN74LS629) m_2;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 
 #endif /* NLD_74LS629_H_ */

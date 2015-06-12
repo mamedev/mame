@@ -34,6 +34,8 @@
 #define TTL_74193_DIP(_name)                                                         \
 		NET_REGISTER_DEV(74193_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_DEVICE(74193,
 	ATTR_HOT void update_outputs();
 
@@ -56,5 +58,7 @@ NETLIB_DEVICE(74193,
 );
 
 NETLIB_DEVICE_DERIVED_PURE(74193_dip, 74193);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_74193_H_ */

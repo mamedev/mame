@@ -10,6 +10,8 @@
 #include "nld_twoterm.h"
 #include "nld_solver.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // netlist_generic_diode
 // ----------------------------------------------------------------------------------------
@@ -288,3 +290,5 @@ NETLIB_UPDATE_TERMINALS(D)
 	m_D.update_diode(deltaV());
 	set(m_D.G(), 0.0, m_D.Ieq());
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

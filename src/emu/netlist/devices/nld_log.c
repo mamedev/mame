@@ -10,6 +10,8 @@
 #include "nld_log.h"
 //#include "sound/wavwrite.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 //FIXME: what to do with save states?
 
 NETLIB_START(log)
@@ -70,3 +72,5 @@ NETLIB_NAME(log)::~NETLIB_NAME(wav)()
 	fclose(m_file);
 }
 #endif
+
+NETLIB_NAMESPACE_DEVICES_END()

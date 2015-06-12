@@ -19,6 +19,8 @@
 
 #include "mgmres.hpp"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_GMRES_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
@@ -198,5 +200,6 @@ ATTR_HOT inline int netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_d
 	}
 }
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_MS_GMRES_H_ */

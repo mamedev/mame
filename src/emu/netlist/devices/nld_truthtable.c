@@ -8,6 +8,8 @@
 #include "nld_truthtable.h"
 #include "../plib/plists.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 unsigned truthtable_desc_t::count_bits(UINT32 v)
 {
 	unsigned ret = 0;
@@ -267,3 +269,5 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 	}
 	return NULL;
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

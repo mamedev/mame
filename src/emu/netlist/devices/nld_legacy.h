@@ -15,6 +15,8 @@
 
 #include "../nl_base.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------
@@ -49,5 +51,6 @@ NETLIB_DEVICE_WITH_PARAMS(nicDelay,
 	UINT8 m_last;
 );
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_LEGACY_H_ */

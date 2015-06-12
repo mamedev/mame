@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <algorithm>
+#include <cstdio>
 
 #include "plib/palloc.h"
 
@@ -17,6 +18,8 @@
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
+namespace netlist
+{
 //============================================================
 //  Exceptions
 //============================================================
@@ -53,9 +56,9 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const
+	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const
 	{
-		return palloc(nld_d_to_a_proxy , proxied);
+		return palloc(devices::nld_d_to_a_proxy, proxied);
 	}
 };
 
@@ -73,9 +76,9 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const
+	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t *proxied) const
 	{
-		return palloc(nld_d_to_a_proxy , proxied);
+		return palloc(devices::nld_d_to_a_proxy , proxied);
 	}
 };
 
@@ -233,10 +236,10 @@ ATTR_COLD void netlist_base_t::start()
 
 	NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
 
-	m_mainclock = get_single_device<NETLIB_NAME(mainclock)>("mainclock");
-	m_solver = get_single_device<NETLIB_NAME(solver)>("solver");
-	m_gnd = get_single_device<NETLIB_NAME(gnd)>("gnd");
-	m_params = get_single_device<NETLIB_NAME(netlistparams)>("parameter");
+	m_mainclock = get_single_device<devices:: NETLIB_NAME(mainclock)>("mainclock");
+	m_solver = get_single_device<devices::NETLIB_NAME(solver)>("solver");
+	m_gnd = get_single_device<devices::NETLIB_NAME(gnd)>("gnd");
+	m_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
 	/* make sure the solver and parameters are started first! */
 
@@ -355,7 +358,7 @@ ATTR_HOT void netlist_base_t::process_queue(const netlist_time &delta)
 				{
 					m_time = mc_time;
 					mc_time += inc;
-					NETLIB_NAME(mainclock)::mc_update(mc_net);
+					devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
 				}
 
 				const netlist_queue_t::entry_t e = *m_queue.pop();
@@ -365,7 +368,7 @@ ATTR_HOT void netlist_base_t::process_queue(const netlist_time &delta)
 			} else {
 				m_time = mc_time;
 				mc_time += inc;
-				NETLIB_NAME(mainclock)::mc_update(mc_net);
+				devices::NETLIB_NAME(mainclock)::mc_update(mc_net);
 			}
 
 			add_to_stat(m_perf_out_processed, 1);
@@ -1088,6 +1091,9 @@ ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, co
 	}
 }
 
+}
+
+NETLIB_NAMESPACE_DEVICES_START()
 
 // ----------------------------------------------------------------------------------------
 // mainclock
@@ -1125,3 +1131,4 @@ NETLIB_UPDATE(mainclock)
 	net.set_time(netlist().time() + m_inc);
 }
 
+NETLIB_NAMESPACE_DEVICES_END()

@@ -33,6 +33,8 @@
 #define CD_4016_DIP(_name)                                                         \
 		NET_REGISTER_DEV(4016_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(4066,
 	NETLIB_LOGIC_FAMILY(CD4000)
 public:
@@ -55,5 +57,7 @@ NETLIB_DEVICE(4066_dip,
 );
 
 NETLIB_DEVICE_DERIVED_PURE(4016_dip, 4066_dip);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_4066_H_ */

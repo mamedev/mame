@@ -50,15 +50,15 @@
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
 #define NETLIST_EXTERNAL(_name)                                                     \
-ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)
+ATTR_COLD void NETLIST_NAME(_name)(netlist::netlist_setup_t &setup)
 
 #define NETLIST_START(_name)                                                        \
-ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)                          \
+ATTR_COLD void NETLIST_NAME(_name)(netlist::netlist_setup_t &setup)                          \
 {
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(_name)															\
-		setup.register_source(palloc(netlist_source_proc_t, # _name, &NETLIST_NAME(_name)));
+		setup.register_source(palloc(netlist::netlist_source_proc_t, # _name, &NETLIST_NAME(_name)));
 
 #define INCLUDE(_name)                                                              \
 		setup.include(# _name);
@@ -68,14 +68,16 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)                      
 		NETLIST_NAME(_model)(setup);                                                \
 		setup.namespace_pop();
 
-class netlist_setup_t;
-
 // ----------------------------------------------------------------------------------------
 // netlist_setup_t
 // ----------------------------------------------------------------------------------------
 
+namespace netlist
+{
+
 // Forward definition so we keep nl_factory.h out of the public
 class netlist_factory_list_t;
+
 
 class netlist_setup_t
 {
@@ -151,7 +153,9 @@ public:
 	void register_link(const pstring &sin, const pstring &sout);
 	void register_param(const pstring &param, const pstring &value);
 	void register_param(const pstring &param, const double value);
+
 	void register_frontier(const pstring attach, const double r_IN, const double r_OUT);
+	void remove_connections(const pstring attach);
 
 	void register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj);
 	bool connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
@@ -216,7 +220,7 @@ private:
 	pstring objtype_as_astr(netlist_object_t &in) const;
 
 	const pstring resolve_alias(const pstring &name) const;
-	nld_base_proxy *get_d_a_proxy(netlist_core_terminal_t &out);
+	devices::nld_base_proxy *get_d_a_proxy(netlist_core_terminal_t &out);
 
 	template <class T>
 	void remove_start_with(T &hm, pstring &sw)
@@ -291,6 +295,8 @@ private:
 	void (*m_setup_func)(netlist_setup_t &);
 	pstring m_setup_func_name;
 };
+
+}
 
 
 #endif /* NLSETUP_H_ */

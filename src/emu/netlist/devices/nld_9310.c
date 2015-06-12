@@ -9,6 +9,8 @@
 
 #define MAXCNT 9
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(9310)
 {
 	register_sub("subABCD", subABCD);
@@ -231,3 +233,5 @@ NETLIB_RESET(9310_dip)
 {
 	NETLIB_NAME(9310)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

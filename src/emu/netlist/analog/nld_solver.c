@@ -40,6 +40,8 @@
 #include "omp.h"
 #endif
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 ATTR_COLD void terms_t::add(netlist_terminal_t *term, int net_other)
 {
 	m_term.add(term);
@@ -304,7 +306,7 @@ NETLIB_START(solver)
 	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
 	register_param("GS_THRESHOLD", m_gs_threshold, 6);      // below this value, gaussian elimination is used
-	register_param("NR_LOOPS", m_nr_loops, 25);             // Newton-Raphson loops
+	register_param("NR_LOOPS", m_nr_loops, 250);            // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
 	register_param("SOR_FACTOR", m_sor, 1.059);
 	register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
@@ -561,5 +563,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		}
 	}
 }
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #include "mgmres.cpp"

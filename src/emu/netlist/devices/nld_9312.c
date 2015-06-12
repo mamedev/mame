@@ -22,6 +22,8 @@
 */
 #include "nld_9312.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 #if (1 && USE_TRUTHTABLE)
 nld_9312::truthtable_t nld_9312::m_ttbl;
 
@@ -177,3 +179,4 @@ NETLIB_RESET(9312_dip)
 {
 	m_sub.do_reset();
 }
+NETLIB_NAMESPACE_DEVICES_END()

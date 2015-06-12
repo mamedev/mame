@@ -37,6 +37,9 @@ NETLIST_END()
 // netlist_setup_t
 // ----------------------------------------------------------------------------------------
 
+namespace netlist
+{
+
 netlist_setup_t::netlist_setup_t(netlist_base_t *netlist)
 	: m_netlist(netlist)
 	, m_proxy_cnt(0)
@@ -47,7 +50,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t *netlist)
 
 void netlist_setup_t::init()
 {
-	nl_initialize_factory(factory());
+	initialize_factory(factory());
 	NETLIST_NAME(base)(*this);
 }
 
@@ -295,6 +298,24 @@ void netlist_setup_t::register_link(const pstring &sin, const pstring &sout)
 	//  fatalerror("Error adding link %s<==%s to link list\n", sin.cstr(), sout.cstr());
 }
 
+void netlist_setup_t::remove_connections(const pstring pin)
+{
+	pstring pinfn = build_fqn(pin);
+	bool found = false;
+	for (std::size_t i = 0; i < m_links.size(); i++)
+	{
+		if ((m_links[i].e1 == pinfn) || (m_links[i].e2 == pinfn))
+		{
+			netlist().log("removing connection: %s <==> %s\n", m_links[i].e1.cstr(), m_links[i].e2.cstr());
+			m_links.remove_at(i);
+			found = true;
+		}
+	}
+	if (!found)
+		netlist().error("remove_connections: found no occurrence of %s\n", pin.cstr());
+}
+
+
 void netlist_setup_t::register_frontier(const pstring attach, const double r_IN, const double r_OUT)
 {
 	static int frontier_cnt = 0;
@@ -417,18 +438,18 @@ netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool requi
 }
 
 // FIXME avoid dynamic cast here
-nld_base_proxy *netlist_setup_t::get_d_a_proxy(netlist_core_terminal_t &out)
+devices::nld_base_proxy *netlist_setup_t::get_d_a_proxy(netlist_core_terminal_t &out)
 {
 	nl_assert(out.isFamily(netlist_terminal_t::LOGIC));
 
 	//printf("proxy for %s\n", out.name().cstr());;
 	netlist_logic_output_t &out_cast = dynamic_cast<netlist_logic_output_t &>(out);
-	nld_base_proxy *proxy = out_cast.get_proxy();
+	devices::nld_base_proxy *proxy = out_cast.get_proxy();
 
 	if (proxy == NULL)
 	{
 		// create a new one ...
-		nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(&out_cast);
+		devices::nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(&out_cast);
 		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -459,7 +480,7 @@ void netlist_setup_t::connect_input_output(netlist_core_terminal_t &in, netlist_
 	if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
 	{
 		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(in);
-		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, &incast);
+		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy, &incast);
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -473,7 +494,7 @@ void netlist_setup_t::connect_input_output(netlist_core_terminal_t &in, netlist_
 	}
 	else if (out.isFamily(netlist_terminal_t::LOGIC) && in.isFamily(netlist_terminal_t::ANALOG))
 	{
-		nld_base_proxy *proxy = get_d_a_proxy(out);
+		devices::nld_base_proxy *proxy = get_d_a_proxy(out);
 
 		connect_terminals(proxy->proxy_term(), in);
 		//proxy->out().net().register_con(in);
@@ -498,7 +519,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_c
 	{
 		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(inp);
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, &incast);
+		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy, &incast);
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -534,7 +555,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_co
 	else if (out.isFamily(netlist_terminal_t::LOGIC))
 	{
 		NL_VERBOSE_OUT(("connect_terminal_output: connecting proxy\n"));
-		nld_base_proxy *proxy = get_d_a_proxy(out);
+		devices::nld_base_proxy *proxy = get_d_a_proxy(out);
 
 		connect_terminals(proxy->proxy_term(), in);
 	}
@@ -767,7 +788,7 @@ void netlist_setup_t::resolve_inputs()
 	// FIXME: doesn't find internal devices. This needs to be more clever
 	for (std::size_t i=0; i < netlist().m_devices.size(); i++)
 	{
-		NETLIB_NAME(twoterm) *t = dynamic_cast<NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
+		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
 		if (t != NULL)
 		{
 			has_twoterms = true;
@@ -854,4 +875,6 @@ bool netlist_source_mem_t::parse(netlist_setup_t *setup, const pstring name)
 {
 	netlist_parser p(*setup);
 	return p.parse(m_str, name);
+}
+
 }

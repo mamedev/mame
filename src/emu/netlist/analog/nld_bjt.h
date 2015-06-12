@@ -24,6 +24,8 @@
 		NETDEV_PARAMI(_name,  model,   _model)
 
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // nld_Q - Base classes
 // ----------------------------------------------------------------------------------------
@@ -161,5 +163,7 @@ protected:
 
 private:
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_BJT_H_ */

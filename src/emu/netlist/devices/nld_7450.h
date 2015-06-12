@@ -36,6 +36,8 @@
 #define TTL_7450_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7450_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_DEVICE(7450,
 public:
 	netlist_logic_input_t m_A;
@@ -50,5 +52,7 @@ NETLIB_DEVICE(7450_dip,
 	NETLIB_NAME(7450) m_1;
 	NETLIB_NAME(7450) m_2;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7450_H_ */

@@ -66,6 +66,8 @@
 #define TTL_9316_DIP(_name)                                                         \
 		NET_REGISTER_DEV(9316_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(9316_subABCD,
 	netlist_logic_input_t m_A;
 	netlist_logic_input_t m_B;
@@ -108,5 +110,7 @@ NETLIB_DEVICE(9316,
 );
 
 NETLIB_DEVICE_DERIVED_PURE(9316_dip, 9316);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_9316_H_ */
