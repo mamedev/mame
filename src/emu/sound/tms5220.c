@@ -338,7 +338,7 @@ void tms5220_device::set_variant(int variant)
 	{
 		case TMS5220_IS_5200:
 		case TMS5220_IS_CD2501ECD:
-			m_coeff = &tms5200_coeff;
+			m_coeff = &T0285_2501E_coeff;
 			break;
 		case TMS5220_IS_5220C:
 		case TMS5220_IS_5220:

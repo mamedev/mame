@@ -20,7 +20,7 @@
 *
 *  Staff behind DECtalk itself: (mostly from http://amhistory.si.edu/archives/speechsynthesis/ss_dec.htm ):
 *     John C. Broihier
-*     Edward A. Bruckert (who followed the DECtalk IP from DEC->Compaq->HP->Force Computers->Fonix inc and still works on DECtalk as of 2012)
+*     Edward A. Bruckert (who followed the DECtalk IP from DEC->Compaq->HP->Force Computers->Fonix inc from where he retired in 2014)
 *     Dave Conroy (dtc-03 letter to sound rules; logic design, worked on dtc-01 and dtc-03, see correspondence below)
 *     Michael J. Crowley
 *     Dennis H. Klatt [1938 - Dec 30, 1988] (worked on klsyn and other parts of MITalk, wrote KLATTtalk which was exclusively licensed to DEC in 1982, worked on dtc-01 and dtc-03)
@@ -35,7 +35,6 @@
 *
 *  TODO:
 *  * DUART:
-*    * Get the duart self test to pass again; this used to work with the old non-devcb duart implementation but regressed with the newer one
 *      * The duart self tests are EXTENSIVE and make an excellent check of many of the duart internal bits.
 *        To enable the self tests rather than bypassing them, under dipswitches, set 'Skip Self Test(IP4)' to 'Open (VCC)'
 *        and under system configuration set 'Hack to prevent hang when skip self test is shorted' to 'Off'
@@ -56,7 +55,15 @@
 *  * <DONE> Figure out why the older -165/-166 and newer -409/-410 tms32010 dsp firmwares don't produce any sound, while the middle -204/-205 one does (fifo implementations were busted)
 *  * <DONE> Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
 *    * Get setup mode with the serial BREAK int working enough to actually properly save the default nvram back to the chip in emulation, and get rid of the (currently unused) nvram default image in the rom definitions
-*  * emulate/simulate the MT8060 dtmf decoder as a 16-key input device? or hook it to some simple fft code? Francois Javier's fftmorse code ran full speed on a 6mhz 80286, maybe use that?
+*  * emulate/simulate the MT8860 DTMF decoder and MT8865 DTMF filter as a 16-key input device? or hook it to some simple fft code? Francois Jalbert's fftmorse code ran full speed on a 12mhz 80286, maybe use that?
+*    Sarayan suggested this can be done in one of two ways:
+*    1. Standalone 'canned' DTMF detector and discriminator code (francois' and peter jennings' 286 code, or modern fft code)
+*    2. Emulate the MT8865 as a set of two 7th order bandpass filters with 2
+*       outputs for the low and high band (as in real life as documented on the
+*       datasheet) and emulate the MT8860 exactly as in real life as well, as a
+*       dual-input pulse-width measurement device to distinguish the 4 low and
+*       high band DTMF tones as well as their combined presence.
+*       The latter is clearly more accurate but likely slower.
 *  * figure out how to plumb diserial/rs232 to have an external application send data to the two serial ports to be spoken; this shouldn't be too hard at this point.
 *
 * LED error code list (found by experimentation and help from leeeeee):

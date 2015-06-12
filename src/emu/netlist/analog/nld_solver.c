@@ -11,8 +11,8 @@
 
 #if 0
 #pragma GCC optimize "-ffast-math"
-#pragma GCC optimize "-ftree-parallelize-loops=4"
-//#pragma GCC optimize "-funroll-loops"
+//#pragma GCC optimize "-ftree-parallelize-loops=4"
+#pragma GCC optimize "-funroll-loops"
 #pragma GCC optimize "-funswitch-loops"
 #pragma GCC optimize "-fvariable-expansion-in-unroller"
 #pragma GCC optimize "-funsafe-loop-optimizations"
@@ -32,6 +32,7 @@
 #include "nld_ms_direct2.h"
 #include "nld_ms_sor.h"
 #include "nld_ms_sor_mat.h"
+#include "nld_ms_gmres.h"
 #include "nld_twoterm.h"
 #include "../nl_lists.h"
 
@@ -410,6 +411,7 @@ netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int
 			else
 			{
 				typedef netlist_matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
+				//typedef netlist_matrix_solver_GMRES_t<m_N,_storage_N> solver_GS;
 				return palloc(solver_GS, &m_params, size);
 			}
 		}
@@ -423,7 +425,7 @@ netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int
 
 ATTR_COLD void NETLIB_NAME(solver)::post_start()
 {
-	netlist_analog_net_t::list_t groups[100];
+	netlist_analog_net_t::list_t groups[256];
 	int cur_group = -1;
 	const int gs_threshold = m_gs_threshold.Value();
 	const bool use_specific = true;
@@ -559,3 +561,5 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		}
 	}
 }
+
+#include "mgmres.cpp"

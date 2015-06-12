@@ -9,28 +9,30 @@
  *
  */
 
-#ifndef NLD_MS_SOR_H_
-#define NLD_MS_SOR_H_
+#ifndef NLD_MS_GMRES_H_
+#define NLD_MS_GMRES_H_
 
 #include <algorithm>
 
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
+#include "mgmres.hpp"
+
 template <unsigned m_N, unsigned _storage_N>
-class netlist_matrix_solver_SOR_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
+class netlist_matrix_solver_GMRES_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
-	netlist_matrix_solver_SOR_t(const netlist_solver_parameters_t *params, int size)
+	netlist_matrix_solver_GMRES_t(const netlist_solver_parameters_t *params, int size)
 		: netlist_matrix_solver_direct_t<m_N, _storage_N>(netlist_matrix_solver_t::GAUSS_SEIDEL, params, size)
-		, m_lp_fact(0)
+		, m_gmres(m_N ? m_N : size)
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
 		}
 
-	virtual ~netlist_matrix_solver_SOR_t() {}
+	virtual ~netlist_matrix_solver_GMRES_t() {}
 
 	virtual void log_stats();
 
@@ -40,7 +42,7 @@ protected:
 	ATTR_HOT virtual nl_double vsolve();
 
 private:
-	nl_double m_lp_fact;
+	gmres_t m_gmres;
 	int m_gs_fail;
 	int m_gs_total;
 };
@@ -50,7 +52,7 @@ private:
 // ----------------------------------------------------------------------------------------
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
+void netlist_matrix_solver_GMRES_t<m_N, _storage_N>::log_stats()
 {
 	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
 	{
@@ -70,27 +72,24 @@ void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
+void netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
 {
 	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
-	this->save(NLNAME(m_lp_fact));
 	this->save(NLNAME(m_gs_fail));
 	this->save(NLNAME(m_gs_total));
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve()
+ATTR_HOT nl_double netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsolve()
 {
 	this->solve_base(this);
 	return this->compute_next_timestep();
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+ATTR_HOT inline int netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const int iN = this->N();
-	bool resched = false;
-	int  resched_cnt = 0;
 
 	/* ideally, we could get an estimate for the spectral radius of
 	 * Inv(D - L) * U
@@ -100,94 +99,78 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 	 * omega = 2.0 / (1.0 + nl_math::sqrt(1-rho))
 	 */
 
-	const nl_double ws = this->m_params.m_sor;
-
-	ATTR_ALIGN nl_double w[_storage_N];
-	ATTR_ALIGN nl_double one_m_w[_storage_N];
+	int nz_num = 0;
+	int ia[_storage_N + 1];
+	int ja[_storage_N * _storage_N];
+	double a[_storage_N * _storage_N];
 	ATTR_ALIGN nl_double RHS[_storage_N];
 	ATTR_ALIGN nl_double new_V[_storage_N];
+	ATTR_ALIGN nl_double l_V[_storage_N];
 
 	for (int k = 0; k < iN; k++)
 	{
 		nl_double gtot_t = 0.0;
-		nl_double gabs_t = 0.0;
 		nl_double RHS_t = 0.0;
 
 		const int term_count = this->m_terms[k]->count();
+		const int railstart = this->m_terms[k]->m_railstart;
 		const nl_double * const RESTRICT gt = this->m_terms[k]->gt();
 		const nl_double * const RESTRICT go = this->m_terms[k]->go();
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
 		const nl_double * const *other_cur_analog = this->m_terms[k]->other_curanalog();
+		const int * RESTRICT net_other = this->m_terms[k]->net_other();
 
-		new_V[k] = this->m_nets[k]->m_cur_Analog;
-
+		ia[k] = nz_num;
+		l_V[k] = new_V[k] = this->m_nets[k]->m_cur_Analog;
 		for (unsigned i = 0; i < term_count; i++)
 		{
 			gtot_t = gtot_t + gt[i];
 			RHS_t = RHS_t + Idr[i];
 		}
-
 		for (int i = this->m_terms[k]->m_railstart; i < term_count; i++)
 			RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
 
 		RHS[k] = RHS_t;
+		// add diagonal element
+		a[nz_num] = gtot_t;
+		ja[nz_num] = k;
+		nz_num++;
 
-		if (USE_GABS)
+		int n=0;
+
+		for (int i = 0; i < railstart; i++)
 		{
-			for (int i = 0; i < term_count; i++)
-				gabs_t = gabs_t + nl_math::abs(go[i]);
-
-			gabs_t *= NL_FCONST(0.5); // derived by try and error
-			if (gabs_t <= gtot_t)
+			int j;
+			for (j = 0; j < n; j++)
 			{
-				w[k] = ws / gtot_t;
-				one_m_w[k] = NL_FCONST(1.0) - ws;
+				if (net_other[i] == ja[nz_num+j])
+				{
+					a[nz_num+j] -= go[i];
+					break;
+				}
 			}
-			else
+			if (j>=n)
 			{
-				w[k] = NL_FCONST(1.0) / (gtot_t + gabs_t);
-				one_m_w[k] = NL_FCONST(1.0) - NL_FCONST(1.0) * gtot_t / (gtot_t + gabs_t);
+				a[nz_num+n] = -go[i];
+				ja[nz_num+n] = net_other[i];
+				n++;
 			}
 		}
-		else
-		{
-			w[k] = ws / gtot_t;
-			one_m_w[k] = NL_FCONST(1.0) - ws;
-		}
+		nz_num += n;
 	}
+	ia[iN] = nz_num;
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 
-	do {
-		resched = false;
-		double err = 0;
-		for (int k = 0; k < iN; k++)
-		{
-			const int * RESTRICT net_other = this->m_terms[k]->net_other();
-			const int railstart = this->m_terms[k]->m_railstart;
-			const nl_double * RESTRICT go = this->m_terms[k]->go();
+	int gsl = m_gmres.pmgmres_ilu_cr(nz_num, ia, ja, a, new_V, RHS, 1, std::min(iN-1,20), accuracy * (double) (iN), 1e6);
 
-			nl_double Idrive = 0.0;
-			for (int i = 0; i < railstart; i++)
-				Idrive = Idrive + go[i] * new_V[net_other[i]];
-
-			const nl_double new_val = new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
-
-			err = std::max(nl_math::abs(new_val - new_V[k]), err);
-			new_V[k] = new_val;
-		}
-
-		if (err > accuracy)
-			resched = true;
-
-		resched_cnt++;
-	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
-
-	this->m_gs_total += resched_cnt;
+	m_gs_total += gsl;
 	this->m_stat_calculations++;
 
-	if (resched)
+	if (gsl>=19)
 	{
+		for (int k = 0; k < iN; k++)
+			this->m_nets[k]->m_cur_Analog = new_V[k];
 		// Fallback to direct solver ...
 		this->m_gs_fail++;
 		return netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
@@ -195,17 +178,25 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 
 	if (newton_raphson)
 	{
+		double err = 0;
+		for (int k = 0; k < iN; k++)
+			err = std::max(nl_math::abs(l_V[k] - new_V[k]), err);
+
+		//printf("here %s\n", this->name().cstr());
 		for (int k = 0; k < iN; k++)
 			this->m_nets[k]->m_cur_Analog += 1.0 * (new_V[k] - this->m_nets[k]->m_cur_Analog);
+		if (err > accuracy)
+			return 2;
+		else
+			return 1;
 	}
 	else
 	{
 		for (int k = 0; k < iN; k++)
 			this->m_nets[k]->m_cur_Analog = new_V[k];
+		return 1;
 	}
-
-	return resched_cnt;
 }
 
 
-#endif /* NLD_MS_SOR_H_ */
+#endif /* NLD_MS_GMRES_H_ */

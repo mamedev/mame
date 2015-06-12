@@ -217,20 +217,19 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 		resched_cnt++;
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
-	this->store(new_v);
+	this->m_stat_calculations++;
 	this->m_gs_total += resched_cnt;
+
 	if (resched)
 	{
 		//this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
 		this->m_gs_fail++;
 
 		this->LE_solve();
-		this->m_stat_calculations++;
 		return netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(newton_raphson);
 	}
 	else {
-		this->m_stat_calculations++;
-
+		this->store(new_v);
 		return resched_cnt;
 	}
 
