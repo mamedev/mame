@@ -267,14 +267,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
-//	AM_RANGE(0x06, 0x06) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
-//	AM_RANGE(0x08, 0x09) AM_READWRITE(i7000_io_?_r, i7000_io_?_w) //printer perhaps?
-//	AM_RANGE(0x0c, 0x0c) AM_READWRITE(i7000_io_?_r, i7000_io_?_w) //0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
-//	AM_RANGE(0x10, 0x10) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
-//	AM_RANGE(0x14, 0x15) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
+//	AM_RANGE(0x06, 0x06) AM_WRITE(i7000_io_?_w)
+//	AM_RANGE(0x08, 0x09) AM_WRITE(i7000_io_?_w) //printer perhaps?
+//	AM_RANGE(0x0c, 0x0c) AM_WRITE(i7000_io_?_w) //0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
+//	AM_RANGE(0x10, 0x10) AM_WRITE(i7000_io_?_w)
+//	AM_RANGE(0x14, 0x15) AM_WRITE(i7000_io_?_w)
 
-//	AM_RANGE(0x18, 0x19) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
-//	AM_RANGE(0x1a, 0x1b) AM_READWRITE(i7000_io_buzzer_r, i7000_io_buzzer_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 
 //	AM_RANGE(0x1c, 0x1c) AM_WRITE(i7000_io_printer_data_w) //ASCII data
@@ -287,12 +285,12 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 	AM_RANGE( 0x21, 0x21 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 
 //	AM_RANGE(0x24, 0x24) AM_READ(i7000_io_?_r)
-//	AM_RANGE(0x25, 0x25) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
+//	AM_RANGE(0x25, 0x25) AM_WRITE(i7000_io_?_w)
 
 //	AM_RANGE(0x28, 0x2d) AM_READWRITE(i7000_io_joystick_r, i7000_io_joystick_w)
 
-//	AM_RANGE(0x3b, 0x3b) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
-//	AM_RANGE(0x66, 0x67) AM_READWRITE(i7000_io_?_r, i7000_io_?_w)
+//	AM_RANGE(0x3b, 0x3b) AM_WRITE(i7000_io_?_w)
+//	AM_RANGE(0x66, 0x67) AM_WRITE(i7000_io_?_w)
 //	AM_RANGE(0xbb, 0xbb) AM_WRITE(i7000_io_?_w) //may be related to page-swapping...
 ADDRESS_MAP_END
 
