@@ -435,7 +435,7 @@ GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 //GAME(1976,  lemans,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "LeMans [TTL]",           GAME_IS_SKELETON)
 //GAME(1974,  quack,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      GAME_IS_SKELETON)
 
-// 100% TLL
+// 100% TTL
 //GAME(1974,  coupedem,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Coupe De Monde [TTL]",   GAME_IS_SKELETON)
 //GAME(1975,  crossfir,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crossfire [TTL]",        GAME_IS_SKELETON)
 //GAME(1975,  goal4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Goal 4/World Cup/Coupe De Monde [TTL]",     GAME_IS_SKELETON)

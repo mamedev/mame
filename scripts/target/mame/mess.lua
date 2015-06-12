@@ -2681,6 +2681,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/terak.c",     
 	MAME_DIR .. "src/mess/drivers/ti630.c",     
 	MAME_DIR .. "src/mess/drivers/tsispch.c",   
+	MAME_DIR .. "src/mess/drivers/tvgame.c",
 	MAME_DIR .. "src/mess/drivers/unistar.c",   
 	MAME_DIR .. "src/mess/drivers/v6809.c",     
 	MAME_DIR .. "src/mess/drivers/vector4.c",   

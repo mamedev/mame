@@ -185,7 +185,7 @@ struct tms5100_coeffs
 		/* K10 */\
 		{ -179, -122,  -61,    1,   62,  123, 179, 231 },
 
-#define TI_2801A_2501E_LPC \
+#define TI_2801_2501E_LPC \
 		/* K1  */\
 		{ -501, -498, -495, -490, -485, -478, -469, -459,\
 		  -446, -431, -412, -389, -362, -331, -295, -253,\
@@ -296,7 +296,7 @@ struct tms5100_coeffs
 		1,  0,    0,  0,   0,  0,  0,  0,\
 		0,  0,    0,  0 },
 
-// below is INACCURATE, no decap of 2802 yet!
+//TODO: Fix me! below is INACCURATE, no decap of 2802 yet!
 #define TI_2802_CHIRP \
 	/* Chirp table */\
 	{   0,  42, -44, 50, -78, 18, 37, 20,\
@@ -318,7 +318,7 @@ struct tms5100_coeffs
 		0,  0,  0,  0 },
 
 /* TMS5100/TMC0281:
-   (Die revs A, B)
+   (Die revs A, B; 1977?-1981?)
    The TMS5100NL was decapped and imaged by digshadow in April, 2013.
     The LPC table is verified to match the decap.
     It also matches the intended contents of US Patent 4,209,836 and several others.
@@ -352,7 +352,9 @@ static const struct tms5100_coeffs T0280B_0281A_coeff =
 
 /* TMS5110A/TMC0281D:
    This chip is used on the later speak & spell, and speak & spell compact;
-   The energy table differs from the original tmc0281/tms5100, but nothing else does.
+   The energy table differs from the original tmc0281/tms5100, as does the interpolation behavior,
+   which is the 'alternate' behavior.
+   The chips have datecodes in the 1983-1984 range, probably 1982 also.
    Digitally dumped via PROMOUT by PlgDavid in 2014
    */
 static const struct tms5100_coeffs T0280D_0281D_coeff =
@@ -374,13 +376,15 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
 };
 
 /* TMC0280/CD2801:
-   Used in the Speak & Math and Speak & Read
+   Used in the Speak & Math, Speak & Read, and Language Translator
    Decapped by Digshadow in 2014 http://siliconpr0n.org/map/ti/tmc0280fnl/
    Digitally dumped via PROMOUT by PlgDavid in 2014
    The coefficients are exactly the same as the TMS5200
    The coefficients also come from US Patents 4,403,965 and 4,946,391 (with one error in the patent);
 The Mitsubishi M58817 also seems to work best with these coefficients, so its possible the engineers of that chip copied them from the TI patents, see next entry
-   ***TODO: there are 2 versions of this chip, and the interpolation behavior between the two differs slightly!
+   ***TODO: there are 2 versions of this chip, and the interpolation behavior between the two differs slightly:
+   * TMC0280NLP // CD2801 with datecodes around 1980 has the same interpolation inhibit behavior as 5100/TMC0281 on unvoiced->silent transition
+   * CD2801A-NL with datecodes around 1982 have the 'alternate behavior'
    */
 static const struct tms5100_coeffs T0280F_2801A_coeff =
 {
@@ -393,7 +397,7 @@ static const struct tms5100_coeffs T0280F_2801A_coeff =
 	TI_0280_LATER_ENERGY
 	TI_0280_2801_PATENT_PITCH
 	{
-	TI_2801A_2501E_LPC
+	TI_2801_2501E_LPC
 	},
 	TI_0280_PATENT_CHIRP
 	/* interpolation coefficients */
@@ -414,7 +418,7 @@ static const struct tms5100_coeffs M58817_coeff =
 	TI_0280_LATER_ENERGY
 	TI_0280_2801_PATENT_PITCH
 	{
-	TI_2801A_2501E_LPC
+	TI_2801_2501E_LPC
 	},
 	TI_0280_PATENT_CHIRP
 	/* interpolation coefficients */
@@ -422,7 +426,9 @@ static const struct tms5100_coeffs M58817_coeff =
 };
 
 /* CD2802:
-   Used in Touch and Tell as well as the Languag Translator, this chip has a unique pitch, LPC and chirp table.
+   (1984 era?)
+   Used in Touch and Tell only (and Vocaid?), this chip has a unique pitch, LPC and chirp table.
+   Has the 'alternate' interpolation behavior.
    Digitally dumped via PROMOUT by PlgDavid in 2014
    */
 static const struct tms5100_coeffs T0280F_2802_coeff =
@@ -444,6 +450,7 @@ static const struct tms5100_coeffs T0280F_2802_coeff =
 };
    
 /* TMS5110A:
+   (1984-90 era? early chips may be called TMS5110C; later chips past 1988 or so may be called TSP5110A)
    The TMS5110A LPC coefficients were originally read from an actual TMS5110A
    chip by Jarek Burczynski using the PROMOUT pin, later verified/redumped
    by PlgDavid.
@@ -454,6 +461,7 @@ static const struct tms5100_coeffs T0280F_2802_coeff =
    The LPC table is verified from decap to match the values from Jarek and PlgDavid's PROMOUT dumps of the TMS5110.
    The LPC table matches that of the TMS5220.
    It uses the 'newer' 5200-style chirp table.
+   It has the 'alternate' interpolation behavor (tested on 5110a; 5111 behavior is unknown)
 */
 static const struct tms5100_coeffs tms5110a_coeff =
 {
@@ -463,9 +471,7 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	/* E   */
 	TI_0280_LATER_ENERGY
-	/* P   */
 	TI_5110_PITCH
 	{
 	TI_5110_5220_LPC
@@ -526,20 +532,14 @@ static const struct tms5100_coeffs pat4335277_coeff =
 		/* K10  - this was entirely missing from the patent, and I've simply copied the real TMS5220 one, which is wrong */
 		{ -205, -132,  -59,   14,  87,  160,  234,  307  },
 	},
-	/* Chirp table */
-	{   0,  42, -44, 50, -78, 18, 37, 20,
-		2, -31, -59,  2,  95, 90,  5, 15,
-		38, -4,  -91,-91, -42,-35,-36, -4,
-		37, 43,   34, 33,  15, -1, -8,-18,
-		-19,-17,   -9,-10,  -6,  0,  3,  2,
-		1,  0,    0,  0,   0,  0,  0,  0,
-		0,  0,    0,  0 },
+	TI_0280_PATENT_CHIRP
 	/* interpolation coefficients */
 	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
 
-/*
-The TMS5200CNL was decapped and imaged by digshadow in March, 2013.
+/* TMS5200/CD2501E
+ (1979-1983 era)
+The TMS5200NL was decapped and imaged by digshadow in March, 2013.
 It is equivalent to the CD2501E (internally: "TMC0285") chip used
  on the TI 99/4(A) speech module.
 The LPC table is verified to match the decap.
@@ -572,14 +572,15 @@ static const struct tms5100_coeffs T0285_2501E_coeff =
 	TI_0285_LATER_ENERGY
 	TI_2501E_PITCH
 	{
-	TI_2801A_2501E_LPC
+	TI_2801_2501E_LPC
 	},
 	TI_LATER_CHIRP
 	/* interpolation coefficients */
 	{ 0, 3, 3, 3, 2, 2, 1, 1 }
 };
 
-/*
+/* TMS5220/5220C:
+(1983 era for 5220, 1986-1992 era for 5220C; 5220C may also be called TSP5220C)
 The TMS5220NL was decapped and imaged by digshadow in April, 2013.
 The LPC table table is verified to match the decap.
 The chirp table is verified to match the decap. (sum = 0x3da)

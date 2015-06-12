@@ -171,7 +171,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 
 
 sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source)
-	: device_t( mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	: device_t( mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_cram_size( cram_size )
