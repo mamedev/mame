@@ -30,7 +30,7 @@ class hp64k_state : public driver_device
 public:
         hp64k_state(const machine_config &mconfig, device_type type, const char *tag);
 
-        //virtual void driver_start();
+        virtual void driver_start();
         //virtual void machine_start();
         virtual void video_start();
         virtual void machine_reset();
@@ -54,6 +54,10 @@ public:
         TIMER_DEVICE_CALLBACK_MEMBER(hp64k_line_sync);
         DECLARE_READ16_MEMBER(hp64k_deltat_r);
         DECLARE_WRITE16_MEMBER(hp64k_deltat_w);
+        
+        DECLARE_READ16_MEMBER(hp64k_slot_r);
+        DECLARE_WRITE16_MEMBER(hp64k_slot_w);
+        DECLARE_WRITE16_MEMBER(hp64k_slot_sel_w);
 private:
         required_device<hp_5061_3011_cpu_device> m_cpu;
         required_device<i8275_device> m_crtc;
@@ -79,10 +83,16 @@ private:
         UINT8 m_kb_row_col;
         bool m_kb_scan_on;
         bool m_kb_pressed;
+
+        // Slot selection
+	std::vector<UINT16> m_low32k_ram;
+        UINT8 m_slot_select;
+        UINT8 m_slot_map;
 };
 
 static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 16 , hp64k_state)
         AM_RANGE(0x0000 , 0x3fff) AM_ROM
+        AM_RANGE(0x4000 , 0x7fff) AM_READWRITE(hp64k_slot_r , hp64k_slot_w)
         AM_RANGE(0x8000 , 0x8001) AM_WRITE(hp64k_crtc_w)
         AM_RANGE(0x8002 , 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -97,6 +107,9 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
         // PA = 7, IC = 2
         // Rear-panel switches
         AM_RANGE(HP_MAKE_IOADDR(7 , 2) , HP_MAKE_IOADDR(7 , 2))   AM_READ(hp64k_rear_sw_r)
+        // PA = 10, IC = [0..3]
+        // Slot selection
+        AM_RANGE(HP_MAKE_IOADDR(10 , 0) , HP_MAKE_IOADDR(10 , 3)) AM_WRITE(hp64k_slot_sel_w)
         // PA = 12, IC = [0..3]
         // Interrupt mask
         AM_RANGE(HP_MAKE_IOADDR(12 , 0) , HP_MAKE_IOADDR(12 , 3)) AM_WRITE(hp64k_irl_mask_w)
@@ -114,6 +127,12 @@ hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const 
 {
 }
 
+void hp64k_state::driver_start()
+{
+        // 32kW for lower RAM
+        m_low32k_ram.resize(0x8000);
+}
+
 void hp64k_state::video_start()
 {
         m_chargen = memregion("chargen")->base();
@@ -129,6 +148,8 @@ void hp64k_state::machine_reset()
         memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
         m_kb_row_col = 0;
         m_kb_scan_on = true;
+        m_slot_select = 0;
+        m_slot_map = 3;
 }
 
 UINT8 hp64k_state::hp64k_crtc_filter(UINT8 data)
@@ -302,6 +323,52 @@ WRITE16_MEMBER(hp64k_state::hp64k_deltat_w)
 {
         BIT_CLR(m_irl_pending , 2);
         hp64k_update_irl();
+}
+
+READ16_MEMBER(hp64k_state::hp64k_slot_r)
+{
+        if (m_slot_select == 0x0a) {
+                // Slot 10 selected
+                // On this (fictional) slot is allocated the lower 32KW of RAM
+
+                switch (m_slot_map) {
+                case 0:
+                        // IDEN
+                        // ID of 32KW RAM expansion
+                        return 0x402;
+
+                case 1:
+                        // MAP1
+                        // Lower half of RAM
+                        return m_low32k_ram[ offset ];
+                        
+                default:
+                        // MAP2&3
+                        // Upper half of RAM
+                        return m_low32k_ram[ offset + 0x4000 ];
+                }
+        } else {
+                return 0;
+        }
+}
+
+WRITE16_MEMBER(hp64k_state::hp64k_slot_w)
+{
+        if (m_slot_select == 0x0a && m_slot_map != 0) {
+                if (m_slot_map != 1) {
+                        // MAP2&3
+                        offset += 0x4000;
+                }
+                logerror("slot_w %u %04x %04x\n" , offset , data , mem_mask);
+                m_low32k_ram[ offset ] &= ~mem_mask;
+                m_low32k_ram[ offset ] |= (data & mem_mask);
+        }
+}
+
+WRITE16_MEMBER(hp64k_state::hp64k_slot_sel_w)
+{
+        m_slot_map = (UINT8)offset;
+        m_slot_select = (UINT8)((data >> 8) & 0x3f);
 }
 
 static INPUT_PORTS_START(hp64k)
