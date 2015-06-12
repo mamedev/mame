@@ -7,11 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "drivenum.h"
 #include "mewui/utils.h"
 #include "mewui/inifile.h"
 #include "sound/samples.h"
 #include "audit.h"
+#include <fstream>
 
 // Years index
 UINT16 c_year::actual = 0;
@@ -58,14 +58,13 @@ const char *mewui_globals::sw_filter_text[] = { "All", "Available", "Unavailable
                                                 "Partial Supported", "Unsupported", "Region" };
 
 const char *mewui_globals::ume_text[] = { "ALL", "ARCADES", "SYSTEMS" };
-static const char *MEWUI_VERSION_TAG = "# MEWUI INFO ";
 
 size_t mewui_globals::s_filter_text = ARRAY_LENGTH(mewui_globals::filter_text);
 size_t mewui_globals::sw_filter_len = ARRAY_LENGTH(mewui_globals::sw_filter_text);
 size_t mewui_globals::s_ume_text = ARRAY_LENGTH(mewui_globals::ume_text);
 
 //-------------------------------------------------
-//  save .ini file
+//  save game options
 //-------------------------------------------------
 
 void save_game_options(running_machine &machine)
@@ -86,7 +85,7 @@ void save_game_options(running_machine &machine)
 }
 
 //-------------------------------------------------
-//  save .ini file
+//  generate general info
 //-------------------------------------------------
 
 void general_info(running_machine &machine, const game_driver *driver, std::string &buffer)
@@ -214,109 +213,6 @@ int fuzzy_substring(const char *needle, const char *haystack)
 	global_free_array(row2);
 
 	return rv;
-}
-
-//-------------------------------------------------
-//  save drivers infos to file
-//-------------------------------------------------
-
-void save_cache_info(running_machine &machine)
-{
-	// attempt to open the output file
-	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
-	if (file.open("info_", emulator_info::get_configname(), ".ini") == FILERR_NONE)
-	{
-		// generate the updated INI
-		std::string buffer = std::string("#\n# MEWUI INFO ").append(mewui_version).append("\n#\n\n");
-
-		for (int x = 0; x < driver_list::total(); ++x)
-		{
-			const game_driver *driver = &driver_list::driver(x);
-
-			if (!strcmp("___empty", driver->name))
-				continue;
-
-			cache_info infos;
-			machine_config config(*driver, machine.options());
-
-			samples_device_iterator iter(config.root_device());
-			infos.b_samples = (iter.first() != NULL) ? 1 : 0;
-
-			const screen_device *screen  = config.first_screen();
-			infos.b_vector = (screen != NULL && screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
-
-			speaker_device_iterator siter(config.root_device());
-			sound_interface_iterator snditer(config.root_device());
-			infos.b_stereo = (snditer.first() != NULL && siter.count() > 1) ? 1 : 0;
-
-			infos.b_chd = 0;
-			for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-				if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
-				{
-					infos.b_chd = 1;
-					break;
-				}
-
-			mewui_globals::driver_cache[x].b_vector = infos.b_vector;
-			mewui_globals::driver_cache[x].b_samples = infos.b_samples;
-			mewui_globals::driver_cache[x].b_stereo = infos.b_stereo;
-			mewui_globals::driver_cache[x].b_chd = infos.b_chd;
-
-			strcatprintf(buffer, "%d%d%d%d\n", infos.b_vector, infos.b_samples, infos.b_stereo, infos.b_chd);
-		}
-		file.puts(buffer.c_str());
-		file.close();
-	}
-}
-
-//-------------------------------------------------
-//  load drivers infos from file
-//-------------------------------------------------
-
-void load_cache_info(running_machine &machine)
-{
-	// try to load driver cache
-	emu_file efile(machine.options().mewui_path(), OPEN_FLAG_READ);
-	file_error filerr = efile.open("info_", emulator_info::get_configname(), ".ini");
-
-	// file not exist ? save and exit
-	if (filerr != FILERR_NONE)
-	{
-		save_cache_info(machine);
-		return;
-	}
-
-	char buffer[MAX_CHAR_INFO];
-	efile.gets(buffer, MAX_CHAR_INFO);
-	efile.gets(buffer, MAX_CHAR_INFO);
-
-	fskip(buffer, strlen(MEWUI_VERSION_TAG) + 1);
-	std::string a_rev = std::string(MEWUI_VERSION_TAG).append(mewui_version);
-
-	// version not matching ? save and exit
-	if (a_rev.compare(buffer) != 0)
-	{
-		efile.close();
-		save_cache_info(machine);
-		return;
-	}
-
-	efile.gets(buffer, MAX_CHAR_INFO);
-	efile.gets(buffer, MAX_CHAR_INFO);
-
-	for (int x = 0; x < driver_list::total(); ++x)
-	{
-		if (!strcmp("___empty", driver_list::driver(x).name))
-			continue;
-
-		efile.gets(buffer, MAX_CHAR_INFO);
-		mewui_globals::driver_cache[x].b_vector = buffer[0] - '0';
-		mewui_globals::driver_cache[x].b_samples = buffer[1] - '0';
-		mewui_globals::driver_cache[x].b_stereo = buffer[2] - '0';
-		mewui_globals::driver_cache[x].b_chd = buffer[3] - '0';
-	}
-	efile.close();
 }
 
 //-------------------------------------------------

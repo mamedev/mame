@@ -15,6 +15,7 @@
 #include "render.h"
 #include "libjpeg/jpeglib.h"
 #include <algorithm>
+#include "drivenum.h"
 
 #define MENU_FLAG_MEWUI          (1 << 6)
 #define MENU_FLAG_MEWUI_HISTORY  (1 << 7)
@@ -218,10 +219,6 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 
 // advanced search function
 int fuzzy_substring(const char *needle, const char *haystack);
-
-// drivers cache
-void save_cache_info(running_machine &machine);
-void load_cache_info(running_machine &machine);
 
 void fskip(char *s, int id = 0);
 

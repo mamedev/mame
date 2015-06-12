@@ -83,12 +83,9 @@ void inifile_manager::init_category(std::vector<IniCategoryIndex> &index, std::s
 	std::ifstream myfile(filename.c_str(), std::ifstream::binary);
 	while (std::getline(myfile, readbuf))
 	{
-		if (readbuf[0] == '[')
+		if (!readbuf.empty() && readbuf[0] == '[')
 		{
 			size_t found = readbuf.find("]");
-			if (found == std::string::npos)
-				return;
-
 			std::string name = readbuf.substr(1, found - 1);
 			if (name.compare("FOLDER_SETTINGS") == 0 || name.compare("ROOT_FOLDER") == 0)
 				continue;
@@ -101,6 +98,7 @@ void inifile_manager::init_category(std::vector<IniCategoryIndex> &index, std::s
 			}
 		}
 	}
+	myfile.close();
 }
 
 
@@ -435,7 +433,7 @@ void favorite_manager::save_favorite_games()
 	}
 
 	// attempt to open the output file
-	emu_file file(OPTION_MEWUI_PATH, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	if (file.open(favorite_filename) == FILERR_NONE)
 	{

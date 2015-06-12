@@ -26,6 +26,9 @@
 #include "mewui/custmenu.h"
 #include "info.h"
 #include <fstream>
+#include "mewui/utils.h"
+
+static const char *MEWUI_VERSION_TAG = "# MEWUI INFO ";
 
 //-------------------------------------------------
 //  sort
@@ -97,15 +100,15 @@ bool sort_game_list(const game_driver *x, const game_driver *y)
 
 ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
+	// load drivers cache
+	load_cache_info();
+
 	// build drivers list
-	build_full_list();
+//	build_full_list();
 	build_available_list();
 
 	// load custom filter
 	load_custom_filters(machine);
-
-	// load drivers cache
-	load_cache_info(machine);
 
 	if (!machine.options().remember_last())
 	{
@@ -601,32 +604,6 @@ void ui_mewui_select_game::populate()
 		reselect_last::part.clear();
 		mewui_globals::force_reselect_software = false;
 	}
-}
-
-//-------------------------------------------------
-//  build a list of all drivers
-//-------------------------------------------------
-
-void ui_mewui_select_game::build_full_list()
-{
-//machine().ui().set_startup_text("Build machine list...", true);
-	// build list
-	for (int x = 0; x < driver_list::total(); ++x)
-	{
-		if (!strcmp("___empty", driver_list::driver(x).name))
-			continue;
-
-		m_fulllist.push_back(&driver_list::driver(x));
-		c_mnfct::set(driver_list::driver(x).manufacturer);
-		c_year::set(driver_list::driver(x).year);
-	}
-
-	m_sortedlist = m_fulllist;
-
-	// sort manufacturers - years and driver
-	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
-	std::stable_sort(c_year::ui.begin(), c_year::ui.end());
-	std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sort_game_list);
 }
 
 //-------------------------------------------------
@@ -1500,4 +1477,142 @@ void ui_mewui_select_game::inkey_export()
 		fclose(pfile);
 		popmessage("Exported.xml created under mewui folder.");
 	}
+}
+
+//-------------------------------------------------
+//  save drivers infos to file
+//-------------------------------------------------
+
+void ui_mewui_select_game::save_cache_info()
+{
+	// attempt to open the output file
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+
+	if (file.open("info_", emulator_info::get_configname(), ".ini") == FILERR_NONE)
+	{
+		std::string filename(file.fullpath());
+		file.close();
+		std::ofstream myfile(filename.c_str());
+
+		// generate header
+		std::string buffer = std::string("#\n# MEWUI INFO ").append(mewui_version).append("\n#\n\n");
+		myfile << buffer;
+
+		// generate full list
+		for (int x = 0; x < driver_list::total(); ++x)
+		{
+			const game_driver *driver = &driver_list::driver(x);
+			if (!strcmp("___empty", driver->name))
+				continue;
+
+			m_fulllist.push_back(driver);
+			c_mnfct::set(driver->manufacturer);
+			c_year::set(driver->year);
+		}
+
+		m_sortedlist = m_fulllist;
+
+		// sort manufacturers - years and driver
+		std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
+		std::stable_sort(c_year::ui.begin(), c_year::ui.end());
+		std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sort_game_list);
+
+		int index = 0;
+		for (int x = 0; x < driver_list::total(); ++x)
+		{
+			const game_driver *driver = &driver_list::driver(x);
+			if (!strcmp("___empty", driver->name))
+				continue;
+
+			cache_info infos;
+			machine_config config(*driver, machine().options());
+
+			samples_device_iterator iter(config.root_device());
+			infos.b_samples = (iter.first() != NULL) ? 1 : 0;
+
+			const screen_device *screen = config.first_screen();
+			infos.b_vector = (screen != NULL && screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
+
+			speaker_device_iterator siter(config.root_device());
+			sound_interface_iterator snditer(config.root_device());
+			infos.b_stereo = (snditer.first() != NULL && siter.count() > 1) ? 1 : 0;
+
+			infos.b_chd = 0;
+			for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
+				if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
+				{
+					infos.b_chd = 1;
+					break;
+				}
+
+			mewui_globals::driver_cache[x].b_vector = infos.b_vector;
+			myfile << infos.b_vector;
+			mewui_globals::driver_cache[x].b_samples = infos.b_samples;
+			myfile << infos.b_samples;
+			mewui_globals::driver_cache[x].b_stereo = infos.b_stereo;
+			myfile << infos.b_stereo;
+			mewui_globals::driver_cache[x].b_chd = infos.b_chd;
+			myfile << infos.b_chd;
+			int find = driver_list::find(m_sortedlist[index++]->name);
+			myfile << find;
+		}
+		myfile.close();
+	}
+}
+
+//-------------------------------------------------
+//  load drivers infos from file
+//-------------------------------------------------
+
+void ui_mewui_select_game::load_cache_info()
+{
+	// try to load driver cache
+	emu_file efile(machine().options().mewui_path(), OPEN_FLAG_READ);
+	file_error filerr = efile.open("info_", emulator_info::get_configname(), ".ini");
+
+	// file not exist ? save and exit
+	if (filerr != FILERR_NONE)
+	{
+		save_cache_info();
+		return;
+	}
+
+	std::string filename(efile.fullpath());
+	efile.close();
+
+	std::ifstream myfile(filename.c_str());
+	std::string readbuf;
+	std::getline(myfile, readbuf);
+	std::getline(myfile, readbuf);
+	std::string a_rev = std::string(MEWUI_VERSION_TAG).append(mewui_version);
+
+	// version not matching ? save and exit
+	if (a_rev != readbuf)
+	{
+		myfile.close();
+		save_cache_info();
+		return;
+	}
+
+	std::getline(myfile, readbuf);
+	std::getline(myfile, readbuf);
+
+	for (int x = 0; x < driver_list::total(); ++x)
+	{
+		const game_driver *driver = &driver_list::driver(x);
+		if (!strcmp("___empty", driver->name))
+			continue;
+
+		m_fulllist.push_back(driver);
+		c_mnfct::set(driver->manufacturer);
+		c_year::set(driver->year);
+		myfile >> mewui_globals::driver_cache[x].b_vector;
+		myfile >> mewui_globals::driver_cache[x].b_samples;
+		myfile >> mewui_globals::driver_cache[x].b_stereo;
+		myfile >> mewui_globals::driver_cache[x].b_chd;
+		int find;
+		myfile >> find;
+		m_sortedlist.push_back(&driver_list::driver(find));
+	}
+	myfile.close();
 }

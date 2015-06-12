@@ -44,16 +44,16 @@ private:
 	// internal methods
 	void build_custom();
 	void build_category();
-	void build_full_list();
 	void build_available_list();
 	void build_list(std::vector<const game_driver *> &vec, const char *filter_text = NULL, int filter = 0, bool bioscheck = false);
 	void build_from_cache(std::vector<const game_driver *> &vec, int filter = 0, bool bioscheck = false);
 
 	bool no_active_search();
 	void populate_search();
+	void load_cache_info();
+	void save_cache_info();
 
 	// handlers
-//  void inkey_cancel(const ui_menu_event *menu_event);
 	void inkey_select(const ui_menu_event *menu_event);
 	void inkey_select_favorite(const ui_menu_event *menu_event);
 	void inkey_special(const ui_menu_event *menu_event);
