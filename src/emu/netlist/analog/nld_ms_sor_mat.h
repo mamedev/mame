@@ -20,12 +20,12 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 template <unsigned m_N, unsigned _storage_N>
-class netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
+class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
-	netlist_matrix_solver_SOR_mat_t(const netlist_solver_parameters_t *params, int size)
-		: netlist_matrix_solver_direct_t<m_N, _storage_N>(netlist_matrix_solver_t::GAUSS_SEIDEL, params, size)
+	matrix_solver_SOR_mat_t(const solver_parameters_t *params, int size)
+		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::GAUSS_SEIDEL, params, size)
 		, m_omega(params->m_sor)
 		, m_lp_fact(0)
 		, m_gs_fail(0)
@@ -33,7 +33,7 @@ public:
 		{
 		}
 
-	virtual ~netlist_matrix_solver_SOR_mat_t() {}
+	virtual ~matrix_solver_SOR_mat_t() {}
 
 	virtual void log_stats();
 	virtual void vsetup(analog_net_t::list_t &nets);
@@ -52,11 +52,11 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// netlist_matrix_solver - Gauss - Seidel
+// matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
+void matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 {
 	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
 	{
@@ -76,9 +76,9 @@ void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
+void matrix_solver_SOR_mat_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
-	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
+	matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
 	this->save(NLNAME(m_omega));
 	this->save(NLNAME(m_lp_fact));
 	this->save(NLNAME(m_gs_fail));
@@ -88,7 +88,7 @@ void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsetup(analog_net_t::list
 
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
+ATTR_HOT nl_double matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 {
 	/*
 	 * enable linear prediction on first newton pass
@@ -134,7 +134,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	/* The matrix based code looks a lot nicer but actually is 30% slower than
 	 * the optimized code which works directly on the data structures.
@@ -227,7 +227,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 		this->m_gs_fail++;
 
 		this->LE_solve();
-		return netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(newton_raphson);
+		return matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(newton_raphson);
 	}
 	else {
 		this->store(new_v);

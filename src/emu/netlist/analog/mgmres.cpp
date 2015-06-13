@@ -180,7 +180,7 @@ void gmres_t::diagonal_pointer_cr (const int nz_num, const int ia[], const int j
 }
 //****************************************************************************80
 
-void gmres_t::ilu_cr (const int nz_num, const int ia[], const int ja[], const double a[])
+void gmres_t::ilu_cr (const int nz_num, const int * RESTRICT ia, const int * RESTRICT ja, const double * RESTRICT a)
 
 //****************************************************************************80
 //
@@ -502,8 +502,8 @@ gmres_t::~gmres_t()
 	  delete [] m_y;
 }
 
-int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
-  double x[], const double rhs[], const int itr_max, const int mr, const double tol_abs,
+int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double * RESTRICT a,
+		double * RESTRICT x, const double * RESTRICT rhs, const int itr_max, const int mr, const double tol_abs,
   const double tol_rel )
 
 //****************************************************************************80
@@ -602,7 +602,7 @@ int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
 //
 {
 	double av;
-	double delta = 1.0e-03;
+	const double delta = 1.0e-03;
 	double htmp;
 	int itr;
 	int itr_used = 0;
@@ -640,7 +640,7 @@ int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
 		if (pre_ilu)
 			lus_cr(ia, ja, m_r);
 
-		rho = sqrt(r8vec_dot2(m_r));
+		rho = std::sqrt(r8vec_dot2(m_r));
 
 		if (verbose)
 			cout << "  ITR = " << itr << "  Residual = " << rho << "\n";
@@ -648,7 +648,7 @@ int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
 		if (itr == 0)
 			rho_tol = rho * tol_rel;
 
-		double rhoq = 1.0 / rho;
+		const double rhoq = 1.0 / rho;
 
 		for (int i = 0; i < n; i++)
 			m_v[0][i] = m_r[i] * rhoq;
@@ -665,45 +665,45 @@ int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
 		for (int k = 0; k < mr; k++)
 		{
 			k_copy = k;
+			const int k1 = k + 1;
 
-			ax_cr(ia, ja, a, m_v[k], m_v[k + 1]);
+			ax_cr(ia, ja, a, m_v[k], m_v[k1]);
 
 			if (pre_ilu)
-				lus_cr(ia, ja, m_v[k + 1]);
+				lus_cr(ia, ja, m_v[k1]);
 
-			av = sqrt(r8vec_dot2(m_v[k + 1]));
+			av = std::sqrt(r8vec_dot2(m_v[k1]));
 
 			for (int j = 0; j <= k; j++)
 			{
-				m_h[j][k] = r8vec_dot(m_v[k + 1], m_v[j]);
+				m_h[j][k] = r8vec_dot(m_v[k1], m_v[j]);
 				for (int i = 0; i < n; i++)
 				{
-					m_v[k + 1][i] = m_v[k + 1][i]
-							- m_h[j][k] * m_v[j][i];
+					m_v[k1][i] -= m_h[j][k] * m_v[j][i];
 				}
 			}
-			m_h[k + 1][k] = sqrt(r8vec_dot2(m_v[k + 1]));
+			m_h[k1][k] = std::sqrt(r8vec_dot2(m_v[k1]));
 
-			if ((av + delta * m_h[k + 1][k]) == av)
+			if ((av + delta * m_h[k1][k]) == av)
 			{
-				for (int j = 0; j < k + 1; j++)
+				for (int j = 0; j < k1; j++)
 				{
-					htmp = r8vec_dot(m_v[k + 1], m_v[j]);
+					htmp = r8vec_dot(m_v[k1], m_v[j]);
 					m_h[j][k] = m_h[j][k] + htmp;
 					for (int i = 0; i < n; i++)
 					{
-						m_v[k + 1][i] = m_v[k + 1][i] - htmp * m_v[j][i];
+						m_v[k1][i] -=  htmp * m_v[j][i];
 					}
 				}
-				m_h[k + 1][k] = sqrt(r8vec_dot2(m_v[k + 1]));
+				m_h[k1][k] = sqrt(r8vec_dot2(m_v[k1]));
 			}
 
-			if (m_h[k + 1][k] != 0.0)
+			if (m_h[k1][k] != 0.0)
 			{
 				for (int i = 0; i < n; i++)
 				{
-					m_v[k + 1][i] = m_v[k + 1][i]
-							/ m_h[k + 1][k];
+					m_v[k1][i] = m_v[k1][i]
+							/ m_h[k1][k];
 				}
 			}
 
@@ -722,17 +722,17 @@ int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
 					m_h[i][k] = m_y[i];
 				}
 			}
-			mu = sqrt(
+			mu = std::sqrt(
 					m_h[k][k] * m_h[k][k]
-							+ m_h[k + 1][k] * m_h[k + 1][k]);
+							+ m_h[k1][k] * m_h[k1][k]);
 			m_c[k] = m_h[k][k] / mu;
-			m_s[k] = -m_h[k + 1][k] / mu;
+			m_s[k] = -m_h[k1][k] / mu;
 			m_h[k][k] = m_c[k] * m_h[k][k]
-					- m_s[k] * m_h[k + 1][k];
-			m_h[k + 1][k] = 0.0;
+					- m_s[k] * m_h[k1][k];
+			m_h[k1][k] = 0.0;
 			mult_givens(m_c[k], m_s[k], k, m_g);
 
-			rho = std::abs(m_g[k + 1]);
+			rho = std::abs(m_g[k1]);
 
 			itr_used = itr_used + 1;
 
@@ -757,7 +757,7 @@ int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
 			}
 			m_y[i] = tmp / m_h[i][i];
 		}
-		double cerr = 0;
+		//double cerr = 0;
 		for (int i = 0; i < n; i++)
 		{
 			double tmp = 0.0;
@@ -765,7 +765,7 @@ int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
 			{
 				tmp += m_v[j][i] * m_y[j];
 			}
-			cerr = std::max(std::abs(tmp), cerr);
+			//cerr = std::max(std::abs(tmp), cerr);
 			x[i] += tmp;
 		}
 #if 0
@@ -795,7 +795,7 @@ int gmres_t::pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
 }
 //****************************************************************************80
 
-double gmres_t::r8vec_dot (const double a1[], const double a2[] )
+double gmres_t::r8vec_dot (const double * RESTRICT a1, const double * RESTRICT a2 )
 {
 	const int n = m_n;
 	double value = 0.0;

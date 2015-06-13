@@ -22,19 +22,19 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 template <unsigned m_N, unsigned _storage_N>
-class netlist_matrix_solver_GMRES_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
+class matrix_solver_GMRES_t: public matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
-	netlist_matrix_solver_GMRES_t(const netlist_solver_parameters_t *params, int size)
-		: netlist_matrix_solver_direct_t<m_N, _storage_N>(netlist_matrix_solver_t::GAUSS_SEIDEL, params, size)
+	matrix_solver_GMRES_t(const solver_parameters_t *params, int size)
+		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::GAUSS_SEIDEL, params, size)
 		, m_gmres(m_N ? m_N : size)
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
 		}
 
-	virtual ~netlist_matrix_solver_GMRES_t() {}
+	virtual ~matrix_solver_GMRES_t() {}
 
 	virtual void log_stats();
 
@@ -50,11 +50,11 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// netlist_matrix_solver - Gauss - Seidel
+// matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_GMRES_t<m_N, _storage_N>::log_stats()
+void matrix_solver_GMRES_t<m_N, _storage_N>::log_stats()
 {
 	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
 	{
@@ -74,22 +74,22 @@ void netlist_matrix_solver_GMRES_t<m_N, _storage_N>::log_stats()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
+void matrix_solver_GMRES_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
-	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
+	matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
 	this->save(NLNAME(m_gs_fail));
 	this->save(NLNAME(m_gs_total));
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsolve()
+ATTR_HOT nl_double matrix_solver_GMRES_t<m_N, _storage_N>::vsolve()
 {
 	this->solve_base(this);
 	return this->compute_next_timestep();
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const int iN = this->N();
 
@@ -164,18 +164,18 @@ ATTR_HOT inline int netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_d
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 
-	int gsl = m_gmres.pmgmres_ilu_cr(nz_num, ia, ja, a, new_V, RHS, 1, std::min(iN-1,20), accuracy * (double) (iN), 1e6);
+	int gsl = m_gmres.pmgmres_ilu_cr(nz_num, ia, ja, a, new_V, RHS, 12, std::min(iN-1,10), accuracy * (double) (iN), 1e6);
 
 	m_gs_total += gsl;
 	this->m_stat_calculations++;
 
-	if (gsl>=19)
+	if (gsl>119)
 	{
 		for (int k = 0; k < iN; k++)
 			this->m_nets[k]->m_cur_Analog = new_V[k];
 		// Fallback to direct solver ...
 		this->m_gs_fail++;
-		return netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
+		return matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 
 	if (newton_raphson)

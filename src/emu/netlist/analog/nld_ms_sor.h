@@ -20,19 +20,19 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 template <unsigned m_N, unsigned _storage_N>
-class netlist_matrix_solver_SOR_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
+class matrix_solver_SOR_t: public matrix_solver_direct_t<m_N, _storage_N>
 {
 public:
 
-	netlist_matrix_solver_SOR_t(const netlist_solver_parameters_t *params, int size)
-		: netlist_matrix_solver_direct_t<m_N, _storage_N>(netlist_matrix_solver_t::GAUSS_SEIDEL, params, size)
+	matrix_solver_SOR_t(const solver_parameters_t *params, int size)
+		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::GAUSS_SEIDEL, params, size)
 		, m_lp_fact(0)
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
 		}
 
-	virtual ~netlist_matrix_solver_SOR_t() {}
+	virtual ~matrix_solver_SOR_t() {}
 
 	virtual void log_stats();
 
@@ -48,11 +48,11 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// netlist_matrix_solver - Gauss - Seidel
+// matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
+void matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
 {
 	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
 	{
@@ -72,23 +72,23 @@ void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
+void matrix_solver_SOR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
-	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
+	matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
 	this->save(NLNAME(m_lp_fact));
 	this->save(NLNAME(m_gs_fail));
 	this->save(NLNAME(m_gs_total));
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve()
+ATTR_HOT nl_double matrix_solver_SOR_t<m_N, _storage_N>::vsolve()
 {
 	this->solve_base(this);
 	return this->compute_next_timestep();
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const int iN = this->N();
 	bool resched = false;
@@ -201,7 +201,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 	{
 		// Fallback to direct solver ...
 		this->m_gs_fail++;
-		return netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
+		return matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 
 	if (interleaved_dynamic_updates)

@@ -13,16 +13,16 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 // ----------------------------------------------------------------------------------------
-// netlist_generic_diode
+// generic_diode
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD netlist_generic_diode::netlist_generic_diode()
+ATTR_COLD generic_diode::generic_diode()
 {
 	m_Vd = 0.7;
 	set_param(1e-15, 1, 1e-15);
 }
 
-ATTR_COLD void netlist_generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
+ATTR_COLD void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
 {
 	static const double csqrt2 = nl_math::sqrt(2.0);
 	m_Is = Is;
@@ -35,7 +35,7 @@ ATTR_COLD void netlist_generic_diode::set_param(const nl_double Is, const nl_dou
 	m_VtInv = 1.0 / m_Vt;
 }
 
-ATTR_COLD void netlist_generic_diode::save(pstring name, object_t &parent)
+ATTR_COLD void generic_diode::save(pstring name, object_t &parent)
 {
 	parent.save(m_Vd, name + ".m_Vd");
 	parent.save(m_Id, name + ".m_Id");

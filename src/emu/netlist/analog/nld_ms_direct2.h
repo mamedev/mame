@@ -13,12 +13,12 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-class netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
+class matrix_solver_direct2_t: public matrix_solver_direct_t<2,2>
 {
 public:
 
-	netlist_matrix_solver_direct2_t(const netlist_solver_parameters_t *params)
-		: netlist_matrix_solver_direct_t<2, 2>(params, 2)
+	matrix_solver_direct2_t(const solver_parameters_t *params)
+		: matrix_solver_direct_t<2, 2>(params, 2)
 		{}
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
@@ -27,16 +27,16 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// netlist_matrix_solver - Direct2
+// matrix_solver - Direct2
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT nl_double netlist_matrix_solver_direct2_t::vsolve()
+ATTR_HOT nl_double matrix_solver_direct2_t::vsolve()
 {
-	solve_base<netlist_matrix_solver_direct2_t>(this);
+	solve_base<matrix_solver_direct2_t>(this);
 	return this->compute_next_timestep();
 }
 
-ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+ATTR_HOT inline int matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	build_LE_A();
 	build_LE_RHS(m_RHS);

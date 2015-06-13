@@ -16,7 +16,7 @@
 #include "analog/nld_solver.h"
 #include "nl_util.h"
 
-const netlist_time netlist_time::zero = netlist_time::from_raw(0);
+const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time::from_raw(0);
 
 namespace netlist
 {
@@ -40,13 +40,13 @@ fatalerror_e::fatalerror_e(const char *format, va_list ap)
 }
 
 // ----------------------------------------------------------------------------------------
-// netlist_logic_family_ttl_t
+// logic_family_ttl_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_logic_family_ttl_t : public logic_family_desc_t
+class logic_family_ttl_t : public logic_family_desc_t
 {
 public:
-	netlist_logic_family_ttl_t()
+	logic_family_ttl_t()
 	{
 		m_low_thresh_V = 0.8;
 		m_high_thresh_V = 2.0;
@@ -63,10 +63,10 @@ public:
 };
 
 //FIXME: set to proper values
-class netlist_logic_family_cd4000_t : public logic_family_desc_t
+class logic_family_cd4000_t : public logic_family_desc_t
 {
 public:
-	netlist_logic_family_cd4000_t()
+	logic_family_cd4000_t()
 	{
 		m_low_thresh_V = 0.8;
 		m_high_thresh_V = 2.0;
@@ -82,15 +82,15 @@ public:
 	}
 };
 
-const logic_family_desc_t &netlist_family_TTL = netlist_logic_family_ttl_t();
-const logic_family_desc_t &netlist_family_CD4000 = netlist_logic_family_cd4000_t();
+const logic_family_desc_t &netlist_family_TTL = logic_family_ttl_t();
+const logic_family_desc_t &netlist_family_CD4000 = logic_family_cd4000_t();
 
 // ----------------------------------------------------------------------------------------
 // netlist_queue_t
 // ----------------------------------------------------------------------------------------
 
 queue_t::queue_t(netlist_t &nl)
-	: netlist_timed_queue<net_t *, netlist_time>(512)
+	: timed_queue<net_t *, netlist_time>(512)
 	, object_t(QUEUE, GENERIC)
 	, pstate_callback_t()
 	, m_qsize(0)
@@ -492,7 +492,7 @@ device_t::~device_t()
 	//NL_VERBOSE_OUT(("~net_device_t\n");
 }
 
-ATTR_COLD netlist_setup_t &device_t::setup()
+ATTR_COLD setup_t &device_t::setup()
 {
 	return netlist().setup();
 }
@@ -535,7 +535,7 @@ ATTR_COLD void device_t::register_output(const pstring &name, logic_output_t &po
 	setup().register_object(*this, name, port);
 }
 
-ATTR_COLD void device_t::register_output(const pstring &name, netlist_analog_output_t &port)
+ATTR_COLD void device_t::register_output(const pstring &name, analog_output_t &port)
 {
 	//port.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, port);
@@ -572,13 +572,13 @@ ATTR_COLD void device_t::register_param(const pstring &sname, C &param, const T 
 	setup().register_object(*this, fullname, param);
 }
 
-template ATTR_COLD void device_t::register_param(const pstring &sname, netlist_param_double_t &param, const double initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, netlist_param_double_t &param, const float initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, netlist_param_int_t &param, const int initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, netlist_param_logic_t &param, const int initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, netlist_param_str_t &param, const char * const initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, netlist_param_str_t &param, const pstring &initialVal);
-template ATTR_COLD void device_t::register_param(const pstring &sname, netlist_param_model_t &param, const char * const initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_double_t &param, const double initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_double_t &param, const float initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_int_t &param, const int initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_logic_t &param, const int initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const char * const initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_str_t &param, const pstring &initialVal);
+template ATTR_COLD void device_t::register_param(const pstring &sname, param_model_t &param, const char * const initialVal);
 
 
 // ----------------------------------------------------------------------------------------
@@ -981,7 +981,7 @@ ATTR_COLD void logic_output_t::initial(const netlist_sig_t val)
 // netlist_analog_output_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
+ATTR_COLD analog_output_t::analog_output_t()
 	: netlist_analog_t(OUTPUT), m_proxied_net(NULL)
 {
 	this->set_net(m_my_net);
@@ -990,14 +990,14 @@ ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
 	net().as_analog().m_cur_Analog = 0.98;
 }
 
-ATTR_COLD void netlist_analog_output_t::init_object(core_device_t &dev, const pstring &aname)
+ATTR_COLD void analog_output_t::init_object(core_device_t &dev, const pstring &aname)
 {
 	core_terminal_t::init_object(dev, aname);
 	net().init_object(dev.netlist(), aname + ".net");
 	net().register_railterminal(*this);
 }
 
-ATTR_COLD void netlist_analog_output_t::initial(const nl_double val)
+ATTR_COLD void analog_output_t::initial(const nl_double val)
 {
 	// FIXME: Really necessary?
 	net().as_analog().m_cur_Analog = val * NL_FCONST(0.99);
@@ -1007,42 +1007,42 @@ ATTR_COLD void netlist_analog_output_t::initial(const nl_double val)
 // netlist_param_t & friends
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD netlist_param_t::netlist_param_t(const param_type_t atype)
+ATTR_COLD param_t::param_t(const param_type_t atype)
 	: owned_object_t(PARAM, ANALOG)
 	, m_param_type(atype)
 {
 }
 
-ATTR_COLD netlist_param_double_t::netlist_param_double_t()
-	: netlist_param_t(DOUBLE)
+ATTR_COLD param_double_t::param_double_t()
+	: param_t(DOUBLE)
 	, m_param(0.0)
 {
 }
 
-ATTR_COLD netlist_param_int_t::netlist_param_int_t()
-	: netlist_param_t(INTEGER)
+ATTR_COLD param_int_t::param_int_t()
+	: param_t(INTEGER)
 	, m_param(0)
 {
 }
 
-ATTR_COLD netlist_param_logic_t::netlist_param_logic_t()
-	: netlist_param_int_t()
+ATTR_COLD param_logic_t::param_logic_t()
+	: param_int_t()
 {
 }
 
-ATTR_COLD netlist_param_str_t::netlist_param_str_t()
-	: netlist_param_t(STRING)
+ATTR_COLD param_str_t::param_str_t()
+	: param_t(STRING)
 	, m_param("")
 {
 }
 
-ATTR_COLD netlist_param_model_t::netlist_param_model_t()
-	: netlist_param_t(MODEL)
+ATTR_COLD param_model_t::param_model_t()
+	: param_t(MODEL)
 	, m_param("")
 {
 }
 
-ATTR_COLD const pstring netlist_param_model_t::model_type() const
+ATTR_COLD const pstring param_model_t::model_type() const
 {
 	pstring tmp = this->Value();
 	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
@@ -1055,7 +1055,7 @@ ATTR_COLD const pstring netlist_param_model_t::model_type() const
 }
 
 
-ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, const nl_double defval) const
+ATTR_COLD nl_double param_model_t::model_value(const pstring &entity, const nl_double defval) const
 {
 	pstring tmp = this->Value();
 	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)

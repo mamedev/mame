@@ -8,15 +8,15 @@ public:
 	gmres_t(const int n);
 	~gmres_t();
 
-	int pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double a[],
-	  double x[], const double rhs[], const int itr_max, const int mr, const double tol_abs,
+	int pmgmres_ilu_cr (const int nz_num, int ia[], int ja[], double * RESTRICT a,
+			double * RESTRICT x, const double * RESTRICT rhs, const int itr_max, const int mr, const double tol_abs,
 	  const double tol_rel );
 
 private:
 
 	void diagonal_pointer_cr(const int nz_num, const int ia[], const int ja[]);
 	void rearrange_cr (const int nz_num, int ia[], int ja[], double a[] );
-	inline double r8vec_dot (const double a1[], const double a2[] );
+	inline double r8vec_dot (const double * RESTRICT a1, const double * RESTRICT a2 );
 	inline double r8vec_dot2 (const double a1[]);
 
 	void ax_cr(const int * RESTRICT ia, const int * RESTRICT ja, const double * RESTRICT a,
@@ -24,7 +24,7 @@ private:
 
 	void lus_cr (const int * RESTRICT ia, const int * RESTRICT ja, double * RESTRICT r);
 
-	void ilu_cr (const int nz_num, const int ia[], const int ja[], const double a[]);
+	void ilu_cr (const int nz_num, const int * RESTRICT ia, const int * RESTRICT ja, const double * RESTRICT a);
 
 	const int m_n;
 

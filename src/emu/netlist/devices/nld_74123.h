@@ -64,8 +64,8 @@ public:
 	UINT8         m_state;
 	double        m_KP;
 
-	netlist_param_double_t m_K;
-	netlist_param_double_t m_RI;
+	param_double_t m_K;
+	param_double_t m_RI;
 
 	int m_dev_type;
 );

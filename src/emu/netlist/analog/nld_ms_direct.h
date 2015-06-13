@@ -15,17 +15,17 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 template <unsigned m_N, unsigned _storage_N>
-class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
+class matrix_solver_direct_t: public matrix_solver_t
 {
 public:
 
-	netlist_matrix_solver_direct_t(const netlist_solver_parameters_t *params, const int size);
-	netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t *params, const int size);
+	matrix_solver_direct_t(const solver_parameters_t *params, const int size);
+	matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size);
 
-	virtual ~netlist_matrix_solver_direct_t();
+	virtual ~matrix_solver_direct_t();
 
 	virtual void vsetup(analog_net_t::list_t &nets);
-	virtual void reset() { netlist_matrix_solver_t::reset(); }
+	virtual void reset() { matrix_solver_t::reset(); }
 
 	ATTR_HOT inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
@@ -65,11 +65,11 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// netlist_matrix_solver_direct
+// matrix_solver_direct
 // ----------------------------------------------------------------------------------------
 
 template <unsigned m_N, unsigned _storage_N>
-netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t()
+matrix_solver_direct_t<m_N, _storage_N>::~matrix_solver_direct_t()
 {
 	for (unsigned k = 0; k < N(); k++)
 	{
@@ -80,7 +80,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
+ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
@@ -119,24 +119,24 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, terminal_t *term)
+ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
-		m_rails_temp[k].add(term, -1);
+		m_rails_temp[k].add(term, -1, false);
 	}
 	else
 	{
 		int ot = get_net_idx(&term->m_otherterm->net());
 		if (ot>=0)
 		{
-			m_terms[k]->add(term, ot);
+			m_terms[k]->add(term, ot, true);
 			SOLVER_VERBOSE_OUT(("Net %d Term %s %f %f\n", k, terms[i]->name().cstr(), terms[i]->m_gt, terms[i]->m_go));
 		}
 		/* Should this be allowed ? */
 		else // if (ot<0)
 		{
-			m_rails_temp[k].add(term, ot);
+			m_rails_temp[k].add(term, ot, true);
 			netlist().error("found term with missing othernet %s\n", term->name().cstr());
 		}
 	}
@@ -144,7 +144,7 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, 
 
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
+ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
 		netlist().error("Dimension %d less than %" SIZETFMT, m_dim, nets.size());
@@ -155,13 +155,13 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_ne
 		m_rails_temp[k].clear();
 	}
 
-	netlist_matrix_solver_t::setup(nets);
+	matrix_solver_t::setup(nets);
 
 	for (unsigned k = 0; k < N(); k++)
 	{
 		m_terms[k]->m_railstart = m_terms[k]->count();
 		for (unsigned i = 0; i < m_rails_temp[k].count(); i++)
-			this->m_terms[k]->add(m_rails_temp[k].terms()[i], m_rails_temp[k].net_other()[i]);
+			this->m_terms[k]->add(m_rails_temp[k].terms()[i], m_rails_temp[k].net_other()[i], false);
 
 		m_rails_temp[k].clear(); // no longer needed
 		m_terms[k]->set_pointers();
@@ -283,7 +283,7 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_ne
 
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
+ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 {
 	const unsigned iN = N();
 	for (unsigned k = 0; k < iN; k++)
@@ -309,7 +309,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_double * RESTRICT rhs)
+ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_double * RESTRICT rhs)
 {
 	const unsigned iN = N();
 	for (unsigned k = 0; k < iN; k++)
@@ -334,7 +334,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_d
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
+ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 {
 #if 0
 	for (int i = 0; i < N(); i++)
@@ -411,7 +411,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
+ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 		nl_double * RESTRICT x)
 {
 	const unsigned kN = N();
@@ -459,7 +459,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
+ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::delta(
 		const nl_double * RESTRICT V)
 {
 	/* FIXME: Ideally we should also include currents (RHS) here. This would
@@ -475,7 +475,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
+ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::store(
 		const nl_double * RESTRICT V)
 {
 	for (unsigned i = 0, iN=N(); i < iN; i++)
@@ -485,7 +485,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
+ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 {
 	this->solve_base(this);
 	return this->compute_next_timestep();
@@ -493,7 +493,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
+ATTR_HOT int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	nl_double new_v[_storage_N]; // = { 0.0 };
 
@@ -515,7 +515,7 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+ATTR_HOT inline int matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
 	this->build_LE_RHS(m_last_RHS);
@@ -529,8 +529,8 @@ ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_
 }
 
 template <unsigned m_N, unsigned _storage_N>
-netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const netlist_solver_parameters_t *params, const int size)
-: netlist_matrix_solver_t(GAUSSIAN_ELIMINATION, params)
+matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const solver_parameters_t *params, const int size)
+: matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
 , m_lp_fact(0)
 {
@@ -546,8 +546,8 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 }
 
 template <unsigned m_N, unsigned _storage_N>
-netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t *params, const int size)
-: netlist_matrix_solver_t(type, params)
+matrix_solver_direct_t<m_N, _storage_N>::matrix_solver_direct_t(const eSolverType type, const solver_parameters_t *params, const int size)
+: matrix_solver_t(type, params)
 , m_dim(size)
 , m_lp_fact(0)
 {

@@ -63,8 +63,8 @@ void netlist_mame_analog_input_t::static_set_name(device_t &device, const char *
 void netlist_mame_analog_input_t::device_start()
 {
 	LOG_DEV_CALLS(("start %s\n", tag()));
-	netlist::netlist_param_t *p = this->nl_owner().setup().find_param(m_param_name);
-	m_param = dynamic_cast<netlist::netlist_param_double_t *>(p);
+	netlist::param_t *p = this->nl_owner().setup().find_param(m_param_name);
+	m_param = dynamic_cast<netlist::param_double_t *>(p);
 	if (m_param == NULL)
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
@@ -95,7 +95,7 @@ void netlist_mame_analog_output_t::static_set_params(device_t &device, const cha
 	netlist.m_delegate = adelegate;
 }
 
-void netlist_mame_analog_output_t::custom_netlist_additions(netlist::netlist_setup_t &setup)
+void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	pstring dname = "OUT_" + m_in;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
@@ -137,8 +137,8 @@ void netlist_mame_logic_input_t::static_set_params(device_t &device, const char 
 void netlist_mame_logic_input_t::device_start()
 {
 	LOG_DEV_CALLS(("start %s\n", tag()));
-	netlist::netlist_param_t *p = downcast<netlist_mame_device_t *>(this->owner())->setup().find_param(m_param_name);
-	m_param = dynamic_cast<netlist::netlist_param_int_t *>(p);
+	netlist::param_t *p = downcast<netlist_mame_device_t *>(this->owner())->setup().find_param(m_param_name);
+	m_param = dynamic_cast<netlist::param_int_t *>(p);
 	if (m_param == NULL)
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
@@ -169,7 +169,7 @@ void netlist_mame_stream_input_t::device_start()
 	LOG_DEV_CALLS(("start %s\n", tag()));
 }
 
-void netlist_mame_stream_input_t::custom_netlist_additions(netlist::netlist_setup_t &setup)
+void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in)>();
 	if (snd_in == NULL)
@@ -207,7 +207,7 @@ void netlist_mame_stream_output_t::device_start()
 	LOG_DEV_CALLS(("start %s\n", tag()));
 }
 
-void netlist_mame_stream_output_t::custom_netlist_additions(netlist::netlist_setup_t &setup)
+void netlist_mame_stream_output_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	//NETLIB_NAME(sound_out) *snd_out;
 	pstring sname = pstring::sprintf("STREAM_OUT_%d", m_channel);
@@ -257,7 +257,7 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, cons
 		m_icount(0),
 		m_div(0),
 		m_rem(0),
-		m_old(netlist_time::zero),
+		m_old(netlist::netlist_time::zero),
 		m_netlist(NULL),
 		m_setup(NULL),
 		m_setup_func(NULL)
@@ -269,14 +269,14 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, devi
 		m_icount(0),
 		m_div(0),
 		m_rem(0),
-		m_old(netlist_time::zero),
+		m_old(netlist::netlist_time::zero),
 		m_netlist(NULL),
 		m_setup(NULL),
 		m_setup_func(NULL)
 {
 }
 
-void netlist_mame_device_t::static_set_constructor(device_t &device, void (*setup_func)(netlist::netlist_setup_t &))
+void netlist_mame_device_t::static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &))
 {
 	LOG_DEV_CALLS(("static_set_constructor\n"));
 	netlist_mame_device_t &netlist = downcast<netlist_mame_device_t &>(device);
@@ -295,7 +295,7 @@ void netlist_mame_device_t::device_start()
 	//printf("clock is %d\n", clock());
 
 	m_netlist = global_alloc_clear(netlist_mame_t(*this));
-	m_setup = global_alloc_clear(netlist::netlist_setup_t(m_netlist));
+	m_setup = global_alloc_clear(netlist::setup_t(m_netlist));
 	netlist().init_object(*m_netlist, "netlist");
 	m_setup->init();
 
@@ -325,7 +325,7 @@ void netlist_mame_device_t::device_start()
 
 	save_state();
 
-	m_old = netlist_time::zero;
+	m_old = netlist::netlist_time::zero;
 	m_rem = 0;
 
 }
@@ -333,7 +333,7 @@ void netlist_mame_device_t::device_start()
 void netlist_mame_device_t::device_clock_changed()
 {
 	//printf("device_clock_changed\n");
-	m_div = netlist_time::from_hz(clock()).as_raw();
+	m_div = netlist::netlist_time::from_hz(clock()).as_raw();
 	//m_rem = 0;
 	//NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clock(), m_div));
 	NL_VERBOSE_OUT(("Setting clock %d and divisor %d\n", clock(), m_div));
@@ -344,7 +344,7 @@ void netlist_mame_device_t::device_clock_changed()
 void netlist_mame_device_t::device_reset()
 {
 	LOG_DEV_CALLS(("device_reset\n"));
-	m_old = netlist_time::zero;
+	m_old = netlist::netlist_time::zero;
 	m_rem = 0;
 	netlist().do_reset();
 }
@@ -383,7 +383,7 @@ void netlist_mame_device_t::device_timer(emu_timer &timer, device_timer_id id, i
 
 ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::update_time_x()
 {
-	const netlist_time delta = netlist().time() - m_old + netlist_time::from_raw(m_rem);
+	const netlist::netlist_time delta = netlist().time() - m_old + netlist::netlist_time::from_raw(m_rem);
 	m_old = netlist().time();
 	m_icount -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
 }
@@ -529,13 +529,13 @@ ATTR_HOT void netlist_mame_cpu_device_t::execute_run()
 			m_genPC++;
 			m_genPC &= 255;
 			debugger_instruction_hook(this, m_genPC);
-			netlist().process_queue(netlist_time::from_raw(m_div));
+			netlist().process_queue(netlist::netlist_time::from_raw(m_div));
 			update_time_x();
 		}
 	}
 	else
 	{
-		netlist().process_queue(netlist_time::from_raw(m_div) * m_icount);
+		netlist().process_queue(netlist::netlist_time::from_raw(m_div) * m_icount);
 		update_time_x();
 	}
 }
@@ -576,7 +576,7 @@ void netlist_mame_sound_device_t::device_start()
 		if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.size())
 			fatalerror("illegal channel number");
 		m_out[chan] = outdevs[i];
-		m_out[chan]->m_sample = netlist_time::from_hz(clock());
+		m_out[chan]->m_sample = netlist::netlist_time::from_hz(clock());
 		m_out[chan]->m_buffer = NULL;
 	}
 
@@ -592,7 +592,7 @@ void netlist_mame_sound_device_t::device_start()
 	{
 		m_in = indevs[0];
 		m_num_inputs = m_in->resolve();
-		m_in->m_inc = netlist_time::from_hz(clock());
+		m_in->m_inc = netlist::netlist_time::from_hz(clock());
 	}
 
 	/* initialize the stream(s) */
@@ -622,11 +622,11 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 		m_in->m_buffer[i] = inputs[i];
 	}
 
-	netlist_time cur = netlist().time();
+	netlist::netlist_time cur = netlist().time();
 
-	netlist().process_queue(netlist_time::from_raw(m_div) * samples);
+	netlist().process_queue(netlist::netlist_time::from_raw(m_div) * samples);
 
-	cur += (netlist_time::from_raw(m_div) * samples);
+	cur += (netlist::netlist_time::from_raw(m_div) * samples);
 
 	for (int i=0; i < m_num_outputs; i++)
 	{
@@ -639,9 +639,9 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 // memregion source support
 // ----------------------------------------------------------------------------------------
 
-bool netlist_source_memregion_t::parse(netlist::netlist_setup_t *setup, const pstring name)
+bool netlist_source_memregion_t::parse(netlist::setup_t *setup, const pstring name)
 {
 	const char *mem = (const char *)downcast<netlist_mame_t &>(setup->netlist()).machine().root_device().memregion(m_name.cstr())->base();
-	netlist::netlist_parser p(*setup);
+	netlist::parser_t p(*setup);
 	return p.parse(mem, name);
 }

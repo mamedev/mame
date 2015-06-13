@@ -51,7 +51,7 @@ protected:
 	virtual void reset();
 	ATTR_HOT void update();
 
-	netlist_param_model_t m_model;
+	param_model_t m_model;
 private:
 	q_type m_qtype;
 };
@@ -151,8 +151,8 @@ protected:
 	ATTR_HOT void virtual update();
 	NETLIB_UPDATE_TERMINALSI();
 
-	netlist_generic_diode m_gD_BC;
-	netlist_generic_diode m_gD_BE;
+	generic_diode m_gD_BC;
+	generic_diode m_gD_BE;
 
 	nld_twoterm m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
 	nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie

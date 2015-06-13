@@ -74,8 +74,8 @@ protected:
 	terminal_t m_OP1;
 	terminal_t m_ON1;
 
-	netlist_param_double_t m_G;
-	netlist_param_double_t m_RI;
+	param_double_t m_G;
+	param_double_t m_RI;
 
 	nl_double m_gfac;
 };
@@ -110,8 +110,6 @@ class NETLIB_NAME(CCCS) : public NETLIB_NAME(VCCS)
 public:
 	ATTR_COLD NETLIB_NAME(CCCS)()
 	: NETLIB_NAME(VCCS)(CCCS), m_gfac(1.0) {  }
-	//ATTR_COLD NETLIB_NAME(CCCS)(const family_t afamily)
-	//: netlist_device_t(afamily), m_gfac(1.0) {  }
 
 protected:
 	virtual void start();
@@ -166,7 +164,7 @@ protected:
 	terminal_t m_OP2;
 	terminal_t m_ON2;
 
-	netlist_param_double_t m_RO;
+	param_double_t m_RO;
 };
 
 NETLIB_NAMESPACE_DEVICES_END()

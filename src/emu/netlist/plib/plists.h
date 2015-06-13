@@ -218,6 +218,20 @@ public:
 		m_list[m_count++] = elem;
 	}
 
+	ATTR_HOT  void insert_at(const _ListClass &elem, const std::size_t index)
+	{
+		if (m_count >= m_capacity){
+			std::size_t new_size = m_capacity * 2;
+			if (new_size < 32)
+				new_size = 32;
+			set_capacity(new_size);
+		}
+		for (std::size_t i = m_count; i>index; i--)
+			m_list[i] = m_list[i-1];
+		m_list[index] = elem;
+		m_count++;
+	}
+
 	ATTR_HOT  void remove(const _ListClass &elem)
 	{
 		for (std::size_t i = 0; i < m_count; i++)
