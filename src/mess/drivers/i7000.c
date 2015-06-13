@@ -48,6 +48,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8279.h"
 #include "sound/speaker.h"
+#include "video/mc6845.h"
 
 class i7000_state : public driver_device
 {
@@ -56,6 +57,7 @@ public:
 		: driver_device(mconfig, type, tag),
           m_maincpu(*this, "maincpu"),
           m_card(*this, "cardslot"),
+          m_gfxdecode(*this, "gfxdecode"),
           m_videoram(*this, "videoram")
     { }
 
@@ -64,11 +66,15 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<UINT8> m_videoram;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT8 *m_char_rom;
 	UINT8 m_row;
+	tilemap_t *m_bg_tilemap;
 
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	DECLARE_DRIVER_INIT(i7000);
 	DECLARE_PALETTE_INIT(i7000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
@@ -85,6 +91,10 @@ WRITE8_MEMBER( i7000_state::i7000_scanlines_w )
 READ8_MEMBER( i7000_state::i7000_kbd_r )
 {
 	UINT8 data = 0xff;
+
+    for (int i=0; i<40*25; i++){
+    	m_bg_tilemap->mark_tile_dirty(i);
+    }
 
 	if (m_row < 8)
 	{
@@ -225,36 +235,6 @@ PALETTE_INIT_MEMBER(i7000_state, i7000)
 	palette.set_pen_color(1, rgb_t(0xBB, 0xBB, 0xBB));
 }
 
-void i7000_state::video_start()
-{
-	// find memory regions
-	m_char_rom = memregion("gfx1")->base();
-}
-
-UINT32 i7000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-    offs_t addr = 0;
-
-    for (int sy = 0; sy < 25; sy++)
-    {
-        for (int sx = 0; sx < 40; sx++)
-        {
-            UINT8 data = m_videoram[addr++];
-            for (int y = 0; y < 8; y++)
-            {
-                int color = m_char_rom[data*8 + y];
-                for (int x = 0; x < 8; x++)
-                {
-                    bitmap.pix16(sy*8 + y, sx*8 + 7 - x) = (color & 1);
-                    color >>= 1;
-                }
-            }
-        }
-    }
-
-    return 0;
-}
-
 /*FIXME: we still need to figure out the proper memory map
          for the maincpu and where the cartridge slot maps to. */
 static ADDRESS_MAP_START(i7000_mem, AS_PROGRAM, 8, i7000_state)
@@ -304,7 +284,6 @@ DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
 	return IMAGE_INIT_PASS;
 }
 
-#if 0
 static const gfx_layout i7000_charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
@@ -321,7 +300,33 @@ static const gfx_layout i7000_charlayout =
 static GFXDECODE_START( i7000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, i7000_charlayout, 0, 8 )
 GFXDECODE_END
-#endif
+
+/****************************
+* Video/Character functions *
+****************************/
+
+TILE_GET_INFO_MEMBER(i7000_state::get_bg_tile_info)
+{
+	SET_TILE_INFO_MEMBER(0, /*code:*/ m_videoram[tile_index], /*color:*/ 1, 0);
+}
+
+void i7000_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(i7000_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+}
+
+UINT32 i7000_state::screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+/* ROCKWELL 6545 - Transparent Memory Addressing */
+MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
+{
+	/* What is this mandatory function meant to do ? */
+}
+
 
 static MACHINE_CONFIG_START( i7000, i7000_state )
 
@@ -333,16 +338,23 @@ static MACHINE_CONFIG_START( i7000, i7000_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 200) /* 40x25 8x8 chars */
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+//	MCFG_SCREEN_SIZE(320, 200) /* 40x25 8x8 chars */
+//	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 
-	MCFG_SCREEN_UPDATE_DRIVER(i7000_state, screen_update)
+	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
+
+	MCFG_SCREEN_UPDATE_DRIVER(i7000_state, screen_update_i7000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i7000)
+	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
 
-//	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i7000)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_20MHz) /* (?) */
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_ADDR_CHANGED_CB(i7000_state, crtc_addr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
