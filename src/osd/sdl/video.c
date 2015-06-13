@@ -756,6 +756,6 @@ static void get_resolution(const char *defdata, const char *data, osd_window_con
 		data = defdata;
 	}
 
-	if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
+	if (sscanf(data, "%dx%d@%d", &config->width, &config->height, &config->refresh) < 2 && report_error)
 		osd_printf_error("Illegal resolution value = %s\n", data);
 }
