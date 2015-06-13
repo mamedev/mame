@@ -2352,7 +2352,7 @@ do {                                                                            
 	UINT32 pix01 = texture->data[(v1 << width) + u2];                           \
 	UINT32 pix10 = texture->data[(v2 << width) + u1];                           \
 	UINT32 pix11 = texture->data[(v2 << width) + u2];                           \
-	texel = rgba_bilinear_filter(pix00, pix01, pix10, pix11, u, v);             \
+	texel = rgbaint_t::bilinear_filter(pix00, pix01, pix10, pix11, u, v);       \
 } while(0);
 
 #if ENABLE_BILINEAR

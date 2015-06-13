@@ -93,9 +93,9 @@ struct namcos22_scenenode
 struct namcos22_object_data
 {
 	/* poly / sprites */
-	rgbint fogcolor;
-	rgbint fadecolor;
-	rgbint polycolor;
+	rgbint_t fogcolor;
+	rgbint_t fadecolor;
+	rgbint_t polycolor;
 	const pen_t *pens;
 	bitmap_rgb32 *destbase;
 	bitmap_ind8 *primap;
