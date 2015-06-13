@@ -11,7 +11,7 @@
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
-
+NETLIB_NAMESPACE_DEVICES_START()
 
 class netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
 {
@@ -63,6 +63,6 @@ ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNU
 	return 1;
 }
 
-
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_MS_DIRECT2_H_ */

@@ -12,6 +12,8 @@
 
 #include "nld_solver.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
@@ -22,7 +24,7 @@ public:
 
 	virtual ~netlist_matrix_solver_direct_t();
 
-	virtual void vsetup(netlist_analog_net_t::list_t &nets);
+	virtual void vsetup(analog_net_t::list_t &nets);
 	virtual void reset() { netlist_matrix_solver_t::reset(); }
 
 	ATTR_HOT inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
@@ -30,7 +32,7 @@ public:
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
-	virtual void add_term(int net_idx, netlist_terminal_t *term);
+	virtual void add_term(int net_idx, terminal_t *term);
 
 	ATTR_HOT virtual nl_double vsolve();
 
@@ -90,7 +92,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 		 */
 		for (unsigned k = 0, iN=N(); k < iN; k++)
 		{
-			netlist_analog_net_t *n = m_nets[k];
+			analog_net_t *n = m_nets[k];
 
 			const nl_double DD_n = (n->m_cur_Analog - m_last_V[k]);
 			const nl_double hn = current_timestep();
@@ -117,7 +119,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, netlist_terminal_t *term)
+ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -142,7 +144,7 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, 
 
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
+ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
 		netlist().error("Dimension %d less than %" SIZETFMT, m_dim, nets.size());
@@ -560,5 +562,6 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	}
 }
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_MS_DIRECT_H_ */

@@ -9,6 +9,8 @@
 
 #define MAXCNT 15
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(9316)
 {
 	register_sub("subABCD", subABCD);
@@ -81,7 +83,7 @@ NETLIB_START(9316_sub)
 
 NETLIB_RESET(9316_sub)
 {
-	m_CLK.set_state(netlist_logic_t::STATE_INP_LH);
+	m_CLK.set_state(logic_t::STATE_INP_LH);
 	m_cnt = 0;
 	m_loadq = 1;
 	m_ent = 1;
@@ -226,3 +228,5 @@ NETLIB_RESET(9316_dip)
 {
 	NETLIB_NAME(9316)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

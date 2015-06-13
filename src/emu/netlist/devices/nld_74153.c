@@ -7,6 +7,8 @@
 
 #include "nld_74153.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 /* FIXME: timing is not 100% accurate, Strobe and Select inputs have a
  *        slightly longer timing.
  *        Convert this to sub-devices at some time.
@@ -110,3 +112,5 @@ NETLIB_RESET(74153_dip)
 	m_1.do_reset();
 	m_2.do_reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

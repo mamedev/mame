@@ -54,12 +54,14 @@
 #define TTL_7474_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7474_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_SUBDEVICE(7474sub,
-	netlist_logic_input_t m_CLK;
+	logic_input_t m_CLK;
 
 	INT8 m_nextD;
-	netlist_logic_output_t m_Q;
-	netlist_logic_output_t m_QQ;
+	logic_output_t m_Q;
+	logic_output_t m_QQ;
 
 	ATTR_HOT inline void newstate(const UINT8 stateQ, const UINT8 stateQQ);
 );
@@ -68,9 +70,9 @@ NETLIB_DEVICE(7474,
 public:
 	NETLIB_NAME(7474sub) sub;
 
-	netlist_logic_input_t m_D;
-	netlist_logic_input_t m_CLRQ;
-	netlist_logic_input_t m_PREQ;
+	logic_input_t m_D;
+	logic_input_t m_CLRQ;
+	logic_input_t m_PREQ;
 );
 
 NETLIB_DEVICE(7474_dip,
@@ -78,5 +80,7 @@ NETLIB_DEVICE(7474_dip,
 	NETLIB_NAME(7474) m_1;
 	NETLIB_NAME(7474) m_2;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7474_H_ */

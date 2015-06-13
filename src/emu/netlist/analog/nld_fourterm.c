@@ -9,6 +9,8 @@
 #include "../nl_setup.h"
 #include "nld_solver.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // nld_VCCS
 // ----------------------------------------------------------------------------------------
@@ -136,3 +138,5 @@ NETLIB_RESET(VCVS)
 NETLIB_UPDATE_PARAM(VCVS)
 {
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

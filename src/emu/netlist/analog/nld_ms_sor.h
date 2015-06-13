@@ -17,6 +17,8 @@
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_SOR_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
@@ -34,7 +36,7 @@ public:
 
 	virtual void log_stats();
 
-	virtual void vsetup(netlist_analog_net_t::list_t &nets);
+	virtual void vsetup(analog_net_t::list_t &nets);
 	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
 protected:
 	ATTR_HOT virtual nl_double vsolve();
@@ -70,7 +72,7 @@ void netlist_matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
+void netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
 	this->save(NLNAME(m_lp_fact));
@@ -158,6 +160,14 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 
+	/* uncommenting the line below will force dynamic updates every X iterations
+	 * althought the system has not converged yet. This is a proof of concept,
+	 * 91glub
+	 *
+	 */
+	const bool interleaved_dynamic_updates = false;
+	//const bool interleaved_dynamic_updates = newton_raphson;
+
 	do {
 		resched = false;
 		double err = 0;
@@ -181,19 +191,20 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 			resched = true;
 
 		resched_cnt++;
-	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
+	//} while (resched && (resched_cnt < this->m_params.m_gs_loops));
+	} while (resched && ((!interleaved_dynamic_updates && resched_cnt < this->m_params.m_gs_loops) || (interleaved_dynamic_updates && resched_cnt < 5 )));
 
 	this->m_gs_total += resched_cnt;
 	this->m_stat_calculations++;
 
-	if (resched)
+	if (resched && !interleaved_dynamic_updates)
 	{
 		// Fallback to direct solver ...
 		this->m_gs_fail++;
 		return netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 
-	if (newton_raphson)
+	if (interleaved_dynamic_updates)
 	{
 		for (int k = 0; k < iN; k++)
 			this->m_nets[k]->m_cur_Analog += 1.0 * (new_V[k] - this->m_nets[k]->m_cur_Analog);
@@ -207,5 +218,6 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 	return resched_cnt;
 }
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_MS_SOR_H_ */

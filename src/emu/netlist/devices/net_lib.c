@@ -41,7 +41,9 @@ NETLIST_END()
 #define ENTRY1(_nic, _name, _defparam) factory.register_device<_nic>( # _name, xstr(_nic), _defparam );
 #define ENTRY(_nic, _name, _defparam) ENTRY1(NETLIB_NAME(_nic), _name, _defparam)
 
-void nl_initialize_factory(netlist_factory_list_t &factory)
+NETLIB_NAMESPACE_DEVICES_START()
+
+void initialize_factory(factory_list_t &factory)
 {
 	ENTRY(R,                    RES,                    "R")
 	ENTRY(POT,                  POT,                    "R")
@@ -142,4 +144,14 @@ void nl_initialize_factory(netlist_factory_list_t &factory)
 	ENTRY(9316_dip,             TTL_9316_DIP,           "-")
 	ENTRY(SN74LS629_dip,        SN74LS629_DIP,          "1.CAP1,2.CAP2")
 	ENTRY(NE555_dip,            NE555_DIP,              "-")
+}
+
+NETLIB_NAMESPACE_DEVICES_END()
+
+namespace netlist
+{
+	void initialize_factory(factory_list_t &factory)
+	{
+		devices::initialize_factory(factory);
+	}
 }

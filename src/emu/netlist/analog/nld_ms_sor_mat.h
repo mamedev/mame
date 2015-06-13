@@ -17,6 +17,7 @@
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_SOR_mat_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
@@ -35,7 +36,7 @@ public:
 	virtual ~netlist_matrix_solver_SOR_mat_t() {}
 
 	virtual void log_stats();
-	virtual void vsetup(netlist_analog_net_t::list_t &nets);
+	virtual void vsetup(analog_net_t::list_t &nets);
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
@@ -75,7 +76,7 @@ void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::log_stats()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
+void netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
 	this->save(NLNAME(m_omega));
@@ -114,7 +115,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 		const nl_double rez_cts = 1.0 / this->current_timestep();
 		for (unsigned k = 0; k < this->N(); k++)
 		{
-			const netlist_analog_net_t *n = this->m_nets[k];
+			const analog_net_t *n = this->m_nets[k];
 			const nl_double nv = (n->m_cur_Analog - this->m_last_V[k]) * rez_cts ;
 			sq += nv * nv;
 			sqo += this->m_Vdelta[k] * this->m_Vdelta[k];
@@ -235,5 +236,6 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 
 }
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_MS_GAUSS_SEIDEL_H_ */

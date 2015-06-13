@@ -33,6 +33,7 @@
 #define NLD_7432_H_
 
 #include "nld_signal.h"
+#include "nld_truthtable.h"
 
 #define TTL_7432_OR(_name, _I1, _I2)                                               \
 		NET_REGISTER_DEV(7432, _name)                                               \
@@ -42,9 +43,9 @@
 #define TTL_7432_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7432_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 #if (USE_TRUTHTABLE)
-#include "nld_truthtable.h"
 NETLIB_TRUTHTABLE(7432, 2, 1, 0);
 #else
 NETLIB_SIGNAL(7432, 2, 1, 1);
@@ -57,5 +58,7 @@ NETLIB_DEVICE(7432_dip,
 	NETLIB_NAME(7432) m_3;
 	NETLIB_NAME(7432) m_4;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7432_H_ */

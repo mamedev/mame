@@ -19,6 +19,8 @@
 
 #include "mgmres.hpp"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_GMRES_t: public netlist_matrix_solver_direct_t<m_N, _storage_N>
 {
@@ -36,7 +38,7 @@ public:
 
 	virtual void log_stats();
 
-	virtual void vsetup(netlist_analog_net_t::list_t &nets);
+	virtual void vsetup(analog_net_t::list_t &nets);
 	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
 protected:
 	ATTR_HOT virtual nl_double vsolve();
@@ -72,7 +74,7 @@ void netlist_matrix_solver_GMRES_t<m_N, _storage_N>::log_stats()
 }
 
 template <unsigned m_N, unsigned _storage_N>
-void netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
+void netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
 	this->save(NLNAME(m_gs_fail));
@@ -198,5 +200,6 @@ ATTR_HOT inline int netlist_matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_d
 	}
 }
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_MS_GMRES_H_ */

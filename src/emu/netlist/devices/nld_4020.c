@@ -7,6 +7,8 @@
 
 #include "nld_4020.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(4020)
 {
 	register_sub("sub", sub);
@@ -58,7 +60,7 @@ NETLIB_START(4020_sub)
 
 NETLIB_RESET(4020_sub)
 {
-	m_IP.set_state(netlist_logic_t::STATE_INP_HL);
+	m_IP.set_state(logic_t::STATE_INP_HL);
 	m_cnt = 0;
 }
 
@@ -146,3 +148,5 @@ NETLIB_RESET(4020_dip)
 {
 	NETLIB_NAME(4020)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

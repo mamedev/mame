@@ -7,6 +7,8 @@
 
 #include "nld_7410.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 #if (USE_TRUTHTABLE)
 nld_7410::truthtable_t nld_7410::m_ttbl;
 const char *nld_7410::m_desc[] = {
@@ -57,3 +59,5 @@ NETLIB_RESET(7410_dip)
 	m_2.do_reset();
 	m_3.do_reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

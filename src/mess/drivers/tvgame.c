@@ -2,7 +2,7 @@
 // copyright-holders: Robbbert
 /***************************************************************************
 
-        Homebrew Z80-based TV Game computer by unknown person
+        Homebrew Z80-based TV Game computer by Mr. Isizu
 
         http://w01.tp1.jp/~a571632211/z80tvgame/index.html
 
@@ -130,4 +130,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY   FULLNAME       FLAGS */
-CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  driver_device, 0,    "unknown", "Z80 TV Game System", 0 )
+CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  driver_device, 0,    "Mr. Isizu", "Z80 TV Game System", 0 )

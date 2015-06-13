@@ -22,16 +22,18 @@
 		: net_signal_t<_num_input, _check, _invert>() { }                           \
 	}
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // net_signal_t
 // ----------------------------------------------------------------------------------------
 
 template <int _numdev, int _check, int _invert>
-class net_signal_t : public netlist_device_t
+class net_signal_t : public device_t
 {
 public:
 	net_signal_t()
-	: netlist_device_t(), m_active(1)
+	: device_t(), m_active(1)
 	{
 	}
 
@@ -107,9 +109,11 @@ public:
 	}
 
 public:
-	netlist_logic_input_t m_I[_numdev];
-	netlist_logic_output_t m_Q[1];
+	logic_input_t m_I[_numdev];
+	logic_output_t m_Q[1];
 	INT32 m_active;
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_SIGNAL_H_ */

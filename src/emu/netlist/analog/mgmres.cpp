@@ -4,6 +4,7 @@
 # include <iomanip>
 # include <cmath>
 # include <ctime>
+# include <cstdio>
 
 using namespace std;
 
