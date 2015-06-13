@@ -32,13 +32,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_ctrl1(*this, "ctrl1"),
-		m_ctrl2(*this, "ctrl2")
+		m_ctrl2(*this, "ctrl2"),
+		m_dac(*this, "dac")
 	{ }
 
 	required_device<avr8_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
+	required_device<dac_device> m_dac;
 
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
@@ -168,7 +170,10 @@ WRITE8_MEMBER(uzebox_state::port_d_w)
 	//  --x- x---   NC
 	//  ---- -x--   power
 	//  ---- --xx   UART MIDI
-
+	if ((m_port_d ^ data) & 0x80)
+	{
+		m_dac->write_unsigned8((data & 0x80) ? 0x3F: 0);
+	}
 	m_port_d = data;
 }
 
@@ -302,4 +307,4 @@ ROM_START( uzebox )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY   FULLNAME */
-CONS(2010, uzebox,   0,        0,        uzebox,   uzebox, driver_device,   0,  "Belogic", "Uzebox", GAME_NO_SOUND | GAME_NOT_WORKING)
+CONS(2010, uzebox,   0,        0,        uzebox,   uzebox, driver_device,   0,  "Belogic", "Uzebox", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING)
