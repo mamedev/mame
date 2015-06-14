@@ -920,9 +920,9 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 			 * disabled, forcing all samples beyond 51d to be == 51d
 			 */
 			if (m_pitch_count >= 51)
-				m_excitation_data = m_coeff->chirptable[51];
+				m_excitation_data = (INT8)m_coeff->chirptable[51];
 			else /*m_pitch_count < 51*/
-				m_excitation_data = m_coeff->chirptable[m_pitch_count];
+				m_excitation_data = (INT8)m_coeff->chirptable[m_pitch_count];
 		}
 
 		// Update LFSR *20* times every sample (once per T cycle), like patent shows

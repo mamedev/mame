@@ -1,10 +1,10 @@
-// license:GPL-2.0+
-// copyright-holders:Peter Trauner
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /******************************************************************************
 
-driver by ?
+Driver completely rewritten by Robbbert in a process begun on 2014-01-22.
 
-PeT   around February 2008:
+Based on the previous work done by PeT around February 2008, and possible others prior.
  added apfm1000 cartridge loading
  fixed apfm1000 pads
  added apf video mode
