@@ -27,6 +27,7 @@
 #include "info.h"
 #include <fstream>
 #include "mewui/utils.h"
+#include "mewui/auditmenu.h"
 
 static const char *MEWUI_VERSION_TAG = "# MEWUI INFO ";
 
@@ -104,7 +105,6 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 	load_cache_info();
 
 	// build drivers list
-//	build_full_list();
 	build_available_list();
 
 	// load custom filter
@@ -399,6 +399,10 @@ void ui_mewui_select_game::handle()
 		// handle UI_EXPORT
 		else if (menu_event->iptkey == IPT_UI_EXPORT)
 			inkey_export();
+
+		// handle UI_AUDIT_FAST
+		else if (menu_event->iptkey == IPT_UI_AUDIT_FAST)
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_audit(machine(), container, m_availablelist, m_unavailablelist, m_availsortedlist, m_unavailsortedlist, 1)));
 
 		// typed characters append to the buffer
 		else if (menu_event->iptkey == IPT_SPECIAL)
