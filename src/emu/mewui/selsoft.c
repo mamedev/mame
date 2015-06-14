@@ -501,7 +501,7 @@ void ui_menu_select_software::build_software_list()
 		}
 
 	// sort array
-	if (machine().options().ui_grouped())
+//	if (machine().options().ui_grouped())
 		std::stable_sort(ui_swlist.begin() + 1, ui_swlist.end(), compare_software);
 
 	std::sort(m_region.ui.begin(), m_region.ui.end());

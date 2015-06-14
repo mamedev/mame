@@ -617,7 +617,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (!ignoreleft && exclusive_input_pressed(IPT_UI_LEFT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
 	{
 		// Swap the right panel
-		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON1_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON1))
 			menu_event.iptkey = IPT_UI_LEFT_PANEL;
 		return;
 	}
@@ -625,7 +625,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (!ignoreright && exclusive_input_pressed(IPT_UI_RIGHT, (flags & UI_MENU_PROCESS_LR_REPEAT) ? 6 : 0))
 	{
 		// Swap the right panel
-		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON1_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON1))
 			menu_event.iptkey = IPT_UI_RIGHT_PANEL;
 		return;
 	}
@@ -634,14 +634,14 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_UP, 6))
 	{
 		// Filter
-		if (machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(JOYCODE_BUTTON1_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(JOYCODE_BUTTON1))
 		{
 			menu_event.iptkey = IPT_UI_UP_FILTER;
 			return;
 		}
 
 		// Infos
-		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2))
 		{
 			menu_event.iptkey = IPT_UI_UP_PANEL;
 			topline_datsview--;
@@ -661,14 +661,14 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_DOWN, 6))
 	{
 		// Filter
-		if (machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(JOYCODE_BUTTON1_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(JOYCODE_BUTTON1))
 		{
 			menu_event.iptkey = IPT_UI_DOWN_FILTER;
 			return;
 		}
 
 		// Infos
-		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2))
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview++;
@@ -688,7 +688,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_PAGE_UP, 6))
 	{
 		// Infos
-		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2))
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview -= right_visible_lines - 1;
@@ -710,7 +710,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_PAGE_DOWN, 6))
 	{
 		// Infos
-		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2))
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview += right_visible_lines - 1;
@@ -732,7 +732,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_HOME, 0))
 	{
 		// Infos
-		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2))
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview = 0;
@@ -750,7 +750,7 @@ void ui_menu::handle_main_keys(UINT32 flags)
 	if (exclusive_input_pressed(IPT_UI_END, 0))
 	{
 		// Infos
-		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2_INDEXED(0)))
+		if (machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(JOYCODE_BUTTON2))
 		{
 			menu_event.iptkey = IPT_UI_DOWN_PANEL;
 			topline_datsview = totallines;

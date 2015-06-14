@@ -11,6 +11,8 @@ if (_OPTIONS["osd"] == "sdl") then
 end
 
 files {
+	MAME_DIR .. "src/emu/mewui/auditmenu.c",
+	MAME_DIR .. "src/emu/mewui/auditmenu.h",
 	MAME_DIR .. "src/emu/mewui/ctrlmenu.c",
 	MAME_DIR .. "src/emu/mewui/ctrlmenu.h",
 	MAME_DIR .. "src/emu/mewui/custmenu.c",

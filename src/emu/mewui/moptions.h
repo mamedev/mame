@@ -38,8 +38,8 @@
 #define OPTION_REMEMBER_LAST          "remember_last"
 #define OPTION_ENLARGE_SNAPS          "enlarge_snaps"
 #define OPTION_FORCED4X3              "forced4x3"
-#define OPTION_GROUPED                "grouped"
-#define OPTION_AUDIT_MODE             "audit_mode"
+//#define OPTION_GROUPED                "grouped"
+//#define OPTION_AUDIT_MODE             "audit_mode"
 #define OPTION_USE_BACKGROUND         "use_background"
 #define OPTION_START_FILTER           "start_filter"
 
@@ -95,8 +95,8 @@ public:
 	bool remember_last() const { return bool_value(OPTION_REMEMBER_LAST); }
 	bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }
 	bool forced_4x3_snapshot() const { return bool_value(OPTION_FORCED4X3); }
-	bool ui_grouped() const { return bool_value(OPTION_GROUPED); }
-	bool audit_mode() const { return bool_value(OPTION_AUDIT_MODE); }
+//	bool ui_grouped() const { return bool_value(OPTION_GROUPED); }
+//	bool audit_mode() const { return bool_value(OPTION_AUDIT_MODE); }
 	bool use_background_image() const { return bool_value(OPTION_USE_BACKGROUND); }
 	int start_filter() const { return int_value(OPTION_START_FILTER); }
 

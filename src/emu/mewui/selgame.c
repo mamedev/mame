@@ -406,6 +406,21 @@ void ui_mewui_select_game::handle()
 
 		else if (menu_event->iptkey == IPT_OTHER)
 			check_filter = true;
+
+/*		else if (menu_event->iptkey == IPT_UI_CONFIGURE)
+		{
+			// if the selection is in the main screen, save it and go to submenu
+			if (selected <= visible_items)
+			{
+				m_prev_selected = selected;
+				selected = visible_items + 1;
+			}
+
+			// otherwise, retrieve the previous position
+			else
+				selected = m_prev_selected;
+		}
+*/
 	}
 
 	if (menu_event != NULL && menu_event->itemref == NULL)
@@ -656,7 +671,7 @@ void ui_mewui_select_game::build_available_list()
 				m_included[x] = 1;
 			}
 		}
-
+/*
 	// now audit excluded
 	if (machine().options().audit_mode())
 	{
@@ -680,7 +695,7 @@ void ui_mewui_select_game::build_available_list()
 			}
 		zip_file_cache_clear();
 	}
-
+*/
 	// sort
 	m_availsortedlist = m_availablelist;
 	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sort_game_list);
@@ -1104,7 +1119,7 @@ void ui_mewui_select_game::inkey_special(const ui_menu_event *menu_event)
 	// Tab key
 	else if (menu_event->unichar == 0x09)
 	{
-		// if the selection is in the main screen, save it and go to submenu
+		// if the selection is in the main screen, save and go to submenu
 		if (selected <= visible_items)
 		{
 			m_prev_selected = selected;
@@ -1130,21 +1145,21 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 	{
 		filter = mewui_globals::actual_filter;
 
-		if (machine().options().ui_grouped())
-		{
+//		if (machine().options().ui_grouped())
+//		{
 			if (filter == FILTER_AVAILABLE)
 				s_drivers = m_availsortedlist;
 			else if (filter == FILTER_UNAVAILABLE)
 				s_drivers = m_unavailsortedlist;
 			else
 				s_drivers = m_sortedlist;
-		}
-		else if (filter == FILTER_AVAILABLE)
+//		}
+/*		else if (filter == FILTER_AVAILABLE)
 			s_drivers = m_availablelist;
 		else if (filter == FILTER_UNAVAILABLE)
 			s_drivers = m_unavailablelist;
 		else
-			s_drivers = m_fulllist;
+			s_drivers = m_fulllist; */
 	}
 
 	for (int index = 0; index < s_drivers.size(); index++)
@@ -1248,22 +1263,22 @@ void ui_mewui_select_game::build_custom()
 	std::vector<const game_driver *> s_drivers;
 	bool bioscheck = false;
 
-	if (machine().options().ui_grouped())
-	{
+//	if (machine().options().ui_grouped())
+//	{
 		if (custfltr::main_filter == FILTER_AVAILABLE)
 			s_drivers = m_availsortedlist;
 		else if (custfltr::main_filter == FILTER_UNAVAILABLE)
 			s_drivers = m_unavailsortedlist;
 		else
 			s_drivers = m_sortedlist;
-	}
-	else if (custfltr::main_filter == FILTER_AVAILABLE)
+//	}
+/*	else if (custfltr::main_filter == FILTER_AVAILABLE)
 		s_drivers = m_availablelist;
 	else if (custfltr::main_filter == FILTER_UNAVAILABLE)
 		s_drivers = m_unavailablelist;
 	else
 		s_drivers = m_fulllist;
-
+*/
 	for (int index = 0; index < s_drivers.size(); ++index)
 	{
 		if ((s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_SYSTEMS)
@@ -1334,7 +1349,7 @@ void ui_mewui_select_game::build_from_cache(std::vector<const game_driver *> &s_
 {
 	if (s_drivers.empty())
 	{
-		s_drivers = (machine().options().ui_grouped()) ? m_sortedlist : m_fulllist;
+		s_drivers = /*(machine().options().ui_grouped()) ?*/ m_sortedlist /*: m_fulllist*/;
 		filter = mewui_globals::actual_filter;
 	}
 
