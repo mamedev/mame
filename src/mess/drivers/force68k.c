@@ -69,10 +69,10 @@ Based on the 68ksbc.c
 
 ****************************************************************************/
 
-#include "bus/rs232/rs232.h"
+//#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/6850acia.h"
-#include "machine/clock.h"
+//#include "machine/6850acia.h"
+//#include "machine/clock.h"
 
 class force68k_state : public driver_device
 {
@@ -80,19 +80,19 @@ public:
 	force68k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_acia1(*this, "acia1")
-		m_acia2(*this, "acia2")
-		m_acia3(*this, "acia3")
+//		m_acia1(*this, "acia1")
+//		m_acia2(*this, "acia2")
+//		m_acia3(*this, "acia3")
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+//	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia1;
-	required_device<acia6850_device> m_acia2;
-	required_device<acia6850_device> m_acia3;
+//	required_device<acia6850_device> m_acia1;
+//	required_device<acia6850_device> m_acia2;
+//	required_device<acia6850_device> m_acia3;
 };
 
 static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
@@ -114,11 +114,13 @@ static INPUT_PORTS_START( force68k )
 INPUT_PORTS_END
 
 
+#if 0
 WRITE_LINE_MEMBER(force68k_state::write_acia_clock)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);
 }
+#endif
 
 static MACHINE_CONFIG_START( force68k, force68k_state )
 	/* basic machine hardware */
