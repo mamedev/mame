@@ -7,6 +7,8 @@
 
 #include "nld_r2r_dac.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(r2r_dac)
 {
 	NETLIB_NAME(twoterm)::start();
@@ -38,3 +40,5 @@ NETLIB_UPDATE_PARAM(r2r_dac)
 
 	this->set(1.0 / m_R.Value(), V, 0.0);
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

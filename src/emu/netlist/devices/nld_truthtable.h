@@ -24,6 +24,23 @@
 		static const char *m_desc[];                                                \
 	}
 
+#define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
+	{ \
+	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(_in, _out, _has_state, \
+			# _name, # _name, "+" _def_params);
+
+#define TT_HEAD(_x) \
+	ttd->m_desc.add(_x);
+
+#define TT_LINE(_x) \
+	ttd->m_desc.add(_x);
+
+#define TRUTHTABLE_END() \
+	setup.factory().register_device(ttd); \
+	}
+
+NETLIB_NAMESPACE_DEVICES_START()
+
 #if 0
 static inline UINT32 remove_first_bit(UINT32 v)
 {
@@ -71,7 +88,7 @@ private:
 };
 
 template<unsigned m_NI, unsigned m_NO, int has_state>
-class nld_truthtable_t : public netlist_device_t
+class nld_truthtable_t : public device_t
 {
 public:
 
@@ -90,7 +107,7 @@ public:
 	};
 
 	nld_truthtable_t(truthtable_t *ttbl, const char *desc[])
-	: netlist_device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
+	: device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
 	{
 		while (*desc != NULL && **desc != 0 )
 			{
@@ -101,7 +118,7 @@ public:
 	}
 
 	nld_truthtable_t(truthtable_t *ttbl, const pstring_list_t &desc)
-	: netlist_device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
+	: device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
 	{
 		m_desc = desc;
 	}
@@ -258,8 +275,8 @@ public:
 			}
 	}
 
-	netlist_logic_input_t m_I[m_NI];
-	netlist_logic_output_t m_Q[m_NO];
+	logic_input_t m_I[m_NI];
+	logic_output_t m_Q[m_NO];
 
 private:
 
@@ -271,13 +288,13 @@ private:
 	pstring_list_t m_desc;
 };
 
-class netlist_base_factory_truthtable_t : public netlist_base_factory_t
+class netlist_base_factory_truthtable_t : public base_factory_t
 {
 	NETLIST_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 public:
 	netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: netlist_base_factory_t(name, classname, def_param)
+	: base_factory_t(name, classname, def_param)
 	{}
 	pstring_list_t m_desc;
 };
@@ -292,10 +309,10 @@ public:
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	netlist_device_t *Create()
+	device_t *Create()
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
-		netlist_device_t *r = palloc(tt_type, &m_ttbl, m_desc);
+		device_t *r = palloc(tt_type, &m_ttbl, m_desc);
 		//r->init(setup, name);
 		return r;
 	}
@@ -308,20 +325,8 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 		const pstring &name, const pstring &classname,
 		const pstring &def_param);
 
-#define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
-	{ \
-	netlist_base_factory_truthtable_t *ttd = nl_tt_factory_create(_in, _out, _has_state, \
-			# _name, # _name, "+" _def_params);
+NETLIB_NAMESPACE_DEVICES_END()
 
-#define TT_HEAD(_x) \
-	ttd->m_desc.add(_x);
-
-#define TT_LINE(_x) \
-	ttd->m_desc.add(_x);
-
-#define TRUTHTABLE_END() \
-	setup.factory().register_device(ttd); \
-	}
 
 
 #endif /* NLD_TRUTHTABLE_H_ */

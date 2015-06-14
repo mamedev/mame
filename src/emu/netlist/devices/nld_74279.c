@@ -7,6 +7,8 @@
 
 #include "nld_74279.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 nld_74279A::truthtable_t nld_74279A::m_ttbl;
 nld_74279B::truthtable_t nld_74279B::m_ttbl;
 
@@ -160,3 +162,5 @@ NETLIB_RESET(74279_dip)
 	m_3.do_reset();
 	m_4.do_reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

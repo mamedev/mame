@@ -376,7 +376,7 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 {
 	int err = 0, i, c;
 	FILE * file = NULL;
-	const int buffer_len=8192;
+	int buffer_len = 8192;
 	GLcharARB *buffer=NULL;
 
 	if(shader==NULL || shader_file==NULL)
@@ -394,6 +394,11 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 		osd_printf_warning("cannot open shader_file: %s\n", shader_file);
 		return -1;
 	}
+
+	// get the real file size
+	fseek(file, 0, SEEK_END);
+	buffer_len = (int)ftell(file);
+	fseek(file, 0, SEEK_SET);
 
 	buffer = (GLcharARB *) malloc(buffer_len);
 	memset(buffer, 0, buffer_len);

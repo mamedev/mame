@@ -7,6 +7,8 @@
 
 #include "nld_7400.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 #if (USE_TRUTHTABLE)
 nld_7400::truthtable_t nld_7400::m_ttbl;
 const char *nld_7400::m_desc[] = {
@@ -59,3 +61,5 @@ NETLIB_RESET(7400_dip)
 	m_3.do_reset();
 	m_4.do_reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

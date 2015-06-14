@@ -9,6 +9,8 @@
 
 #include "nld_74193.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(74193)
 {
 	register_input("A", m_A);
@@ -130,3 +132,5 @@ NETLIB_RESET(74193_dip)
 {
 	NETLIB_NAME(74193)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

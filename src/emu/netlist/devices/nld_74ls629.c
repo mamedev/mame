@@ -42,6 +42,8 @@
 #include "nld_74ls629.h"
 #include "../nl_setup.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(SN74LS629clk)
 {
 	register_input("FB",    m_FB);
@@ -205,3 +207,5 @@ NETLIB_RESET(SN74LS629_dip)
 	m_1.do_reset();
 	m_2.do_reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

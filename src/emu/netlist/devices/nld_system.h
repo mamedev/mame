@@ -64,8 +64,10 @@
 #define PARAMETERS(_name)                                                      \
 		NET_REGISTER_DEV(netlistparams, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // -----------------------------------------------------------------------------
-// mainclock
+// netlistparams
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(netlistparams,
@@ -79,12 +81,12 @@ public:
 
 NETLIB_DEVICE_WITH_PARAMS(mainclock,
 public:
-	netlist_logic_output_t m_Q;
+	logic_output_t m_Q;
 
 	netlist_param_double_t m_freq;
 	netlist_time m_inc;
 
-	ATTR_HOT inline static void mc_update(netlist_logic_net_t &net);
+	ATTR_HOT inline static void mc_update(logic_net_t &net);
 );
 
 // -----------------------------------------------------------------------------
@@ -92,8 +94,8 @@ public:
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(clock,
-	netlist_logic_input_t m_feedback;
-	netlist_logic_output_t m_Q;
+	logic_input_t m_feedback;
+	logic_output_t m_Q;
 
 	netlist_param_double_t m_freq;
 	netlist_time m_inc;
@@ -104,8 +106,8 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(extclock,
-	netlist_logic_input_t m_feedback;
-	netlist_logic_output_t m_Q;
+	logic_input_t m_feedback;
+	logic_output_t m_Q;
 
 	netlist_param_double_t m_freq;
 	netlist_param_str_t m_pattern;
@@ -122,7 +124,7 @@ NETLIB_DEVICE_WITH_PARAMS(extclock,
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(ttl_input,
-	netlist_logic_output_t m_Q;
+	logic_output_t m_Q;
 
 	netlist_param_logic_t m_IN;
 );
@@ -137,11 +139,11 @@ NETLIB_DEVICE_WITH_PARAMS(analog_input,
 // nld_gnd
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(gnd) : public netlist_device_t
+class NETLIB_NAME(gnd) : public device_t
 {
 public:
 	NETLIB_NAME(gnd)()
-			: netlist_device_t(GND) { }
+			: device_t(GND) { }
 
 	virtual ~NETLIB_NAME(gnd)() {}
 
@@ -170,11 +172,11 @@ private:
 // nld_dummy_input
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(dummy_input) : public netlist_device_t
+class NETLIB_NAME(dummy_input) : public device_t
 {
 public:
 	NETLIB_NAME(dummy_input)()
-			: netlist_device_t(DUMMY) { }
+			: device_t(DUMMY) { }
 
 	virtual ~NETLIB_NAME(dummy_input)() {}
 
@@ -194,7 +196,7 @@ protected:
 	}
 
 private:
-	netlist_analog_input_t m_I;
+	analog_input_t m_I;
 
 };
 
@@ -202,11 +204,11 @@ private:
 // nld_frontier
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(frontier) : public netlist_device_t
+class NETLIB_NAME(frontier) : public device_t
 {
 public:
 	NETLIB_NAME(frontier)()
-			: netlist_device_t(DUMMY) { }
+			: device_t(DUMMY) { }
 
 	virtual ~NETLIB_NAME(frontier)() {}
 
@@ -242,7 +244,7 @@ protected:
 private:
 	NETLIB_NAME(twoterm) m_RIN;
 	NETLIB_NAME(twoterm) m_ROUT;
-	netlist_analog_input_t m_I;
+	analog_input_t m_I;
 	netlist_analog_output_t m_Q;
 
 	netlist_param_double_t m_p_RIN;
@@ -253,17 +255,17 @@ private:
 // nld_res_sw
 // -----------------------------------------------------------------------------
 
-class NETLIB_NAME(res_sw) : public netlist_device_t
+class NETLIB_NAME(res_sw) : public device_t
 {
 public:
 	NETLIB_NAME(res_sw)()
-			: netlist_device_t() { }
+			: device_t() { }
 
 	virtual ~NETLIB_NAME(res_sw)() {}
 
 	netlist_param_double_t m_RON;
 	netlist_param_double_t m_ROFF;
-	netlist_logic_input_t m_I;
+	logic_input_t m_I;
 	NETLIB_NAME(R) m_R;
 
 protected:
@@ -281,11 +283,11 @@ private:
 // nld_base_proxy
 // -----------------------------------------------------------------------------
 
-class nld_base_proxy : public netlist_device_t
+class nld_base_proxy : public device_t
 {
 public:
-	nld_base_proxy(netlist_logic_t *inout_proxied, netlist_core_terminal_t *proxy_inout)
-			: netlist_device_t()
+	nld_base_proxy(logic_t *inout_proxied, core_terminal_t *proxy_inout)
+			: device_t()
 	{
 		m_logic_family = inout_proxied->logic_family();
 		m_term_proxied = inout_proxied;
@@ -294,20 +296,20 @@ public:
 
 	virtual ~nld_base_proxy() {}
 
-	netlist_logic_t &term_proxied() const { return *m_term_proxied; }
-	netlist_core_terminal_t &proxy_term() const { return *m_proxy_term; }
+	logic_t &term_proxied() const { return *m_term_proxied; }
+	core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 protected:
 
-	virtual const netlist_logic_family_desc_t &logic_family() const
+	virtual const logic_family_desc_t &logic_family() const
 	{
 		return *m_logic_family;
 	}
 
 private:
-	const netlist_logic_family_desc_t *m_logic_family;
-	netlist_logic_t *m_term_proxied;
-	netlist_core_terminal_t *m_proxy_term;
+	const logic_family_desc_t *m_logic_family;
+	logic_t *m_term_proxied;
+	core_terminal_t *m_proxy_term;
 };
 
 // -----------------------------------------------------------------------------
@@ -317,15 +319,15 @@ private:
 class nld_a_to_d_proxy : public nld_base_proxy
 {
 public:
-	nld_a_to_d_proxy(netlist_logic_input_t *in_proxied)
+	nld_a_to_d_proxy(logic_input_t *in_proxied)
 			: nld_base_proxy(in_proxied, &m_I)
 	{
 	}
 
 	virtual ~nld_a_to_d_proxy() {}
 
-	netlist_analog_input_t m_I;
-	netlist_logic_output_t m_Q;
+	analog_input_t m_I;
+	logic_output_t m_Q;
 
 protected:
 	void start()
@@ -361,10 +363,10 @@ class nld_base_d_to_a_proxy : public nld_base_proxy
 public:
 	virtual ~nld_base_d_to_a_proxy() {}
 
-	virtual netlist_logic_input_t &in() { return m_I; }
+	virtual logic_input_t &in() { return m_I; }
 
 protected:
-	nld_base_d_to_a_proxy(netlist_logic_output_t *out_proxied, netlist_core_terminal_t &proxy_out)
+	nld_base_d_to_a_proxy(logic_output_t *out_proxied, core_terminal_t &proxy_out)
 			: nld_base_proxy(out_proxied, &proxy_out)
 	{
 	}
@@ -374,7 +376,7 @@ protected:
 		register_input("I", m_I);
 	}
 
-	netlist_logic_input_t m_I;
+	logic_input_t m_I;
 
 private:
 };
@@ -382,7 +384,7 @@ private:
 class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 {
 public:
-	nld_d_to_a_proxy(netlist_logic_output_t *out_proxied)
+	nld_d_to_a_proxy(logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(out_proxied, m_RV.m_P)
 	, m_RV(TWOTERM)
 	, m_last_state(-1)
@@ -405,5 +407,7 @@ private:
 	int m_last_state;
 	bool m_is_timestep;
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_SYSTEM_H_ */

@@ -60,15 +60,15 @@
 // Extensions to interface netlist with MAME code ....
 // ----------------------------------------------------------------------------------------
 
-class netlist_source_memregion_t : public netlist_setup_t::source_t
+class netlist_source_memregion_t : public netlist::netlist_setup_t::source_t
 {
 public:
 	netlist_source_memregion_t(pstring name)
-	: netlist_setup_t::source_t(), m_name(name)
+	: netlist::netlist_setup_t::source_t(), m_name(name)
 	{
 	}
 
-	bool parse(netlist_setup_t *setup, const pstring name);
+	bool parse(netlist::netlist_setup_t *setup, const pstring name);
 private:
 	pstring m_name;
 };
@@ -81,12 +81,12 @@ private:
 
 class netlist_mame_device_t;
 
-class netlist_mame_t : public netlist_base_t
+class netlist_mame_t : public netlist::netlist_t
 {
 public:
 
 	netlist_mame_t(netlist_mame_device_t &parent)
-	: netlist_base_t(),
+	: netlist::netlist_t(),
 		m_parent(parent)
 	{}
 	virtual ~netlist_mame_t() { };
@@ -116,9 +116,9 @@ public:
 	netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file);
 	virtual ~netlist_mame_device_t() {}
 
-	static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
+	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::netlist_setup_t &));
 
-	ATTR_HOT inline netlist_setup_t &setup() { return *m_setup; }
+	ATTR_HOT inline netlist::netlist_setup_t &setup() { return *m_setup; }
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
 
 	ATTR_HOT inline netlist_time last_time_update() { return m_old; }
@@ -153,9 +153,9 @@ private:
 	netlist_time        m_old;
 
 	netlist_mame_t *    m_netlist;
-	netlist_setup_t *   m_setup;
+	netlist::netlist_setup_t *   m_setup;
 
-	void (*m_setup_func)(netlist_setup_t &);
+	void (*m_setup_func)(netlist::netlist_setup_t &);
 };
 
 inline running_machine &netlist_mame_t::machine()
@@ -179,7 +179,7 @@ public:
 	netlist_mame_cpu_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_cpu_device_t() {}
 
-	static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
+	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::netlist_setup_t &));
 
 protected:
 	// netlist_mame_device_t
@@ -256,7 +256,7 @@ public:
 	netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_sound_device_t() {}
 
-	static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
+	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::netlist_setup_t &));
 
 	inline sound_stream *get_stream() { return m_stream; }
 
@@ -306,7 +306,7 @@ public:
 	}
 	virtual ~netlist_mame_sub_interface() { }
 
-	virtual void custom_netlist_additions(netlist_setup_t &setup) { }
+	virtual void custom_netlist_additions(netlist::netlist_setup_t &setup) { }
 
 	inline netlist_mame_device_t &nl_owner() const { return *m_owner; }
 
@@ -375,7 +375,7 @@ protected:
 	virtual void device_start();
 
 private:
-	netlist_param_double_t *m_param;
+	netlist::netlist_param_double_t *m_param;
 	bool   m_auto_port;
 	pstring m_param_name;
 };
@@ -400,7 +400,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void custom_netlist_additions(netlist_setup_t &setup);
+	virtual void custom_netlist_additions(netlist::netlist_setup_t &setup);
 
 private:
 	pstring m_in;
@@ -449,7 +449,7 @@ protected:
 	virtual void device_start();
 
 private:
-	netlist_param_int_t *m_param;
+	netlist::netlist_param_int_t *m_param;
 	UINT32 m_mask;
 	UINT32 m_shift;
 	pstring m_param_name;
@@ -473,7 +473,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void custom_netlist_additions(netlist_setup_t &setup);
+	virtual void custom_netlist_additions(netlist::netlist_setup_t &setup);
 private:
 	UINT32 m_channel;
 	pstring m_param_name;
@@ -497,7 +497,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void custom_netlist_additions(netlist_setup_t &setup);
+	virtual void custom_netlist_additions(netlist::netlist_setup_t &setup);
 private:
 	UINT32 m_channel;
 	pstring m_out_name;
@@ -506,11 +506,11 @@ private:
 // netdev_callback
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(analog_callback) : public netlist_device_t
+class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(analog_callback)()
-		: netlist_device_t(), m_cpu_device(NULL), m_last(0) { }
+		: device_t(), m_cpu_device(NULL), m_last(0) { }
 
 	ATTR_COLD void start()
 	{
@@ -545,7 +545,7 @@ public:
 	}
 
 private:
-	netlist_analog_input_t m_in;
+	netlist::analog_input_t m_in;
 	netlist_analog_output_delegate m_callback;
 	netlist_mame_cpu_device_t *m_cpu_device;
 	nl_double m_last;
@@ -555,11 +555,11 @@ private:
 // sound_out
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(sound_out) : public netlist_device_t
+class NETLIB_NAME(sound_out) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(sound_out)()
-		: netlist_device_t() { }
+		: netlist::device_t() { }
 
 	static const int BUFSIZE = 2048;
 
@@ -604,14 +604,14 @@ public:
 		m_last_buffer = upto;
 	}
 
-	netlist_param_int_t m_channel;
-	netlist_param_double_t m_mult;
-	netlist_param_double_t m_offset;
+	netlist::netlist_param_int_t m_channel;
+	netlist::netlist_param_double_t m_mult;
+	netlist::netlist_param_double_t m_offset;
 	stream_sample_t *m_buffer;
 	netlist_time m_sample;
 
 private:
-	netlist_analog_input_t m_in;
+	netlist::analog_input_t m_in;
 	stream_sample_t m_cur;
 	int m_last_pos;
 	netlist_time m_last_buffer;
@@ -621,11 +621,11 @@ private:
 // sound_in
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(sound_in) : public netlist_device_t
+class NETLIB_NAME(sound_in) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(sound_in)()
-		: netlist_device_t() { }
+		: netlist::device_t() { }
 
 	static const int MAX_INPUT_CHANNELS = 10;
 
@@ -665,7 +665,7 @@ public:
 				if (i != m_num_channel)
 					netlist().error("sound input numbering has to be sequential!");
 				m_num_channel++;
-				m_param[i] = dynamic_cast<netlist_param_double_t *>(setup().find_param(m_param_name[i].Value(), true));
+				m_param[i] = dynamic_cast<netlist::netlist_param_double_t *>(setup().find_param(m_param_name[i].Value(), true));
 			}
 		}
 		return m_num_channel;
@@ -689,16 +689,16 @@ public:
 		m_pos = 0;
 	}
 
-	netlist_param_str_t m_param_name[MAX_INPUT_CHANNELS];
-	netlist_param_double_t *m_param[MAX_INPUT_CHANNELS];
+	netlist::netlist_param_str_t m_param_name[MAX_INPUT_CHANNELS];
+	netlist::netlist_param_double_t *m_param[MAX_INPUT_CHANNELS];
 	stream_sample_t *m_buffer[MAX_INPUT_CHANNELS];
-	netlist_param_double_t m_param_mult[MAX_INPUT_CHANNELS];
-	netlist_param_double_t m_param_offset[MAX_INPUT_CHANNELS];
+	netlist::netlist_param_double_t m_param_mult[MAX_INPUT_CHANNELS];
+	netlist::netlist_param_double_t m_param_offset[MAX_INPUT_CHANNELS];
 	netlist_time m_inc;
 
 private:
-	netlist_logic_input_t m_feedback;
-	netlist_logic_output_t m_Q;
+	netlist::logic_input_t m_feedback;
+	netlist::logic_output_t m_Q;
 
 	int m_pos;
 	int m_num_channel;

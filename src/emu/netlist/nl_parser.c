@@ -12,6 +12,8 @@
 //#undef NL_VERBOSE_OUT
 //#define NL_VERBOSE_OUT(x) printf x
 
+namespace netlist
+{
 // ----------------------------------------------------------------------------------------
 // A netlist parser
 // ----------------------------------------------------------------------------------------
@@ -155,7 +157,7 @@ void netlist_parser::net_truthtable_start()
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	netlist_base_factory_truthtable_t *ttd = nl_tt_factory_create(ni, no, hs,
+	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
 			name, name, "+" + def_param);
 
 	while (true)
@@ -298,8 +300,8 @@ void netlist_parser::netdev_param()
 void netlist_parser::device(const pstring &dev_type)
 {
 	pstring devname;
-	netlist_base_factory_t *f = m_setup.factory().factory_by_name(dev_type, m_setup);
-	netlist_device_t *dev;
+	base_factory_t *f = m_setup.factory().factory_by_name(dev_type, m_setup);
+	device_t *dev;
 	pstring_list_t termlist = f->term_param_list();
 	pstring_list_t def_params = f->def_params();
 
@@ -401,4 +403,5 @@ nl_double netlist_parser::eval_param(const token_t tok)
 		require_token(m_tok_param_right);
 	return ret * facs[f];
 #endif
+}
 }

@@ -69,24 +69,27 @@
 #define TTL_7490_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7490_dip, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(7490,
 	ATTR_HOT void update_outputs();
 
-	netlist_logic_input_t m_R1;
-	netlist_logic_input_t m_R2;
-	netlist_logic_input_t m_R91;
-	netlist_logic_input_t m_R92;
-	netlist_logic_input_t m_A;
-	netlist_logic_input_t m_B;
+	logic_input_t m_R1;
+	logic_input_t m_R2;
+	logic_input_t m_R91;
+	logic_input_t m_R92;
+	logic_input_t m_A;
+	logic_input_t m_B;
 
 	UINT8 m_cnt;
 	UINT8 m_last_A;
 	UINT8 m_last_B;
 
-	netlist_logic_output_t m_Q[4];
+	logic_output_t m_Q[4];
 );
 
 NETLIB_DEVICE_DERIVED_PURE(7490_dip, 7490);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7490_H_ */

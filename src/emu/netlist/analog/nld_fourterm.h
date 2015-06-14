@@ -26,6 +26,8 @@
 		NET_REGISTER_DEV(VCVS, _name)
 
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // nld_VCCS
 // ----------------------------------------------------------------------------------------
@@ -47,13 +49,13 @@
  *
  */
 
-class NETLIB_NAME(VCCS) : public netlist_device_t
+class NETLIB_NAME(VCCS) : public device_t
 {
 public:
 	ATTR_COLD NETLIB_NAME(VCCS)()
-	: netlist_device_t(VCCS), m_gfac(1.0) {  }
+	: device_t(VCCS), m_gfac(1.0) {  }
 	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
-	: netlist_device_t(afamily), m_gfac(1.0) {  }
+	: device_t(afamily), m_gfac(1.0) {  }
 
 protected:
 	virtual void start();
@@ -63,14 +65,14 @@ protected:
 
 	ATTR_COLD void start_internal(const nl_double def_RI);
 
-	netlist_terminal_t m_OP;
-	netlist_terminal_t m_ON;
+	terminal_t m_OP;
+	terminal_t m_ON;
 
-	netlist_terminal_t m_IP;
-	netlist_terminal_t m_IN;
+	terminal_t m_IP;
+	terminal_t m_IN;
 
-	netlist_terminal_t m_OP1;
-	netlist_terminal_t m_ON1;
+	terminal_t m_OP1;
+	terminal_t m_ON1;
 
 	netlist_param_double_t m_G;
 	netlist_param_double_t m_RI;
@@ -161,11 +163,13 @@ protected:
 	virtual void update_param();
 	//ATTR_HOT void update();
 
-	netlist_terminal_t m_OP2;
-	netlist_terminal_t m_ON2;
+	terminal_t m_OP2;
+	terminal_t m_ON2;
 
 	netlist_param_double_t m_RO;
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 
 #endif /* NLD_FOURTERM_H_ */

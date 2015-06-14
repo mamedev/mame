@@ -166,12 +166,12 @@ pstring filetobuf(pstring fname)
 	}
 }
 
-class netlist_tool_t : public netlist_base_t
+class netlist_tool_t : public netlist::netlist_t
 {
 public:
 
 	netlist_tool_t()
-	: netlist_base_t(), m_logs(""), m_verbose(false), m_setup(NULL)
+	: netlist::netlist_t(), m_logs(""), m_verbose(false), m_setup(NULL)
 	{
 	}
 
@@ -183,7 +183,7 @@ public:
 
 	void init()
 	{
-		m_setup = palloc(netlist_setup_t, this);
+		m_setup = palloc(netlist::netlist_setup_t, this);
 		this->init_object(*this, "netlist");
 		m_setup->init();
 	}
@@ -192,7 +192,7 @@ public:
 	{
 		// read the netlist ...
 
-		m_setup->register_source(palloc(netlist_source_mem_t, buffer));
+		m_setup->register_source(palloc(netlist::netlist_source_mem_t, buffer));
 		m_setup->include(name);
 		log_setup();
 
@@ -244,7 +244,7 @@ protected:
 	}
 
 private:
-	netlist_setup_t *m_setup;
+	netlist::netlist_setup_t *m_setup;
 };
 
 
@@ -290,9 +290,9 @@ static void listdevices()
 {
 	netlist_tool_t nt;
 	nt.init();
-	const netlist_factory_list_t::list_t &list = nt.setup().factory().list();
+	const netlist::factory_list_t::list_t &list = nt.setup().factory().list();
 
-	nt.setup().register_source(palloc(netlist_source_proc_t, "dummy", &netlist_dummy));
+	nt.setup().register_source(palloc(netlist::netlist_source_proc_t, "dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	nt.setup().start_devices();
@@ -304,8 +304,8 @@ static void listdevices()
 				list[i]->name().cstr() );
 		pstring terms("");
 
-		netlist_base_factory_t *f = list[i];
-		netlist_device_t *d = f->Create();
+		netlist::base_factory_t *f = list[i];
+		netlist::device_t *d = f->Create();
 		d->init(nt, pstring::sprintf("dummy%d", i));
 		d->start_dev();
 

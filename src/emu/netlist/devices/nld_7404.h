@@ -31,9 +31,18 @@
 #define NLD_7404_H_
 
 #include "nld_signal.h"
+#include "nld_truthtable.h"
+
+#define TTL_7404_INVERT(_name, _A)                                                  \
+		NET_REGISTER_DEV(7404, _name)                                               \
+		NET_CONNECT(_name, A, _A)
+
+#define TTL_7404_DIP(_name)                                                         \
+		NET_REGISTER_DEV(7402_dip, _name)
+
+NETLIB_NAMESPACE_DEVICES_START()
 
 #if 1 && (USE_TRUTHTABLE)
-#include "nld_truthtable.h"
 NETLIB_TRUTHTABLE(7404, 1, 1, 0);
 #else
 NETLIB_DEVICE(7404,
@@ -42,13 +51,6 @@ public:
 	netlist_logic_output_t m_Q[1];
 );
 #endif
-
-#define TTL_7404_INVERT(_name, _A)                                                  \
-		NET_REGISTER_DEV(7404, _name)                                               \
-		NET_CONNECT(_name, A, _A)
-
-#define TTL_7404_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7402_dip, _name)
 
 NETLIB_DEVICE(7404_dip,
 
@@ -59,4 +61,7 @@ NETLIB_DEVICE(7404_dip,
 	NETLIB_NAME(7404) m_5;
 	NETLIB_NAME(7404) m_6;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
+
 #endif /* NLD_7404_H_ */

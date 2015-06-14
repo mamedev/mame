@@ -7,6 +7,8 @@
 
 #include "nld_7474.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 ATTR_HOT inline void NETLIB_NAME(7474sub)::newstate(const UINT8 stateQ, const UINT8 stateQQ)
 {
 	// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
@@ -83,7 +85,7 @@ NETLIB_START(7474sub)
 
 NETLIB_RESET(7474sub)
 {
-	m_CLK.set_state(netlist_logic_t::STATE_INP_LH);
+	m_CLK.set_state(logic_t::STATE_INP_LH);
 
 	m_nextD = 0;
 	/* FIXME: required by pong doubles - need a mechanism to set this from netlist */
@@ -124,3 +126,5 @@ NETLIB_UPDATE(7474_dip)
 	m_1.update_dev();
 	m_2.update_dev();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

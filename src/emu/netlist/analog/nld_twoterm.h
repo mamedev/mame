@@ -85,18 +85,20 @@
 // Implementation
 // ----------------------------------------------------------------------------------------
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(twoterm) : public netlist_device_t
+class NETLIB_NAME(twoterm) : public device_t
 {
 public:
 	ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily);
 	ATTR_COLD NETLIB_NAME(twoterm)();
 
-	netlist_terminal_t m_P;
-	netlist_terminal_t m_N;
+	terminal_t m_P;
+	terminal_t m_N;
 
 	virtual NETLIB_UPDATE_TERMINALSI()
 	{
@@ -254,7 +256,7 @@ public:
 
 	/* owning object must save those ... */
 
-	ATTR_COLD void save(pstring name, netlist_object_t &parent);
+	ATTR_COLD void save(pstring name, object_t &parent);
 
 private:
 	nl_double m_Vd;
@@ -292,5 +294,6 @@ protected:
 };
 
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_TWOTERM_H_ */

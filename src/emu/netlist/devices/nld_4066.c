@@ -7,6 +7,7 @@
 
 #include "nld_4066.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(4066)
 {
@@ -118,3 +119,5 @@ NETLIB_UPDATE(4016_dip)
 	/* only called during startup */
 	NETLIB_NAME(4066_dip)::update();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

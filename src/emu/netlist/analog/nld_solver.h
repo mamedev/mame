@@ -29,6 +29,8 @@
 // solver
 // ----------------------------------------------------------------------------------------
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 class NETLIB_NAME(solver);
 
 /* FIXME: these should become proper devices */
@@ -66,11 +68,11 @@ class terms_t
 		m_other_curanalog.clear();
 	}
 
-	ATTR_COLD void add(netlist_terminal_t *term, int net_other);
+	ATTR_COLD void add(terminal_t *term, int net_other);
 
 	ATTR_HOT inline unsigned count() { return m_term.size(); }
 
-	ATTR_HOT inline netlist_terminal_t **terms() { return m_term.data(); }
+	ATTR_HOT inline terminal_t **terms() { return m_term.data(); }
 	ATTR_HOT inline int *net_other() { return m_net_other.data(); }
 	ATTR_HOT inline nl_double *gt() { return m_gt.data(); }
 	ATTR_HOT inline nl_double *go() { return m_go.data(); }
@@ -84,7 +86,7 @@ class terms_t
 	plist_t<int> m_nzrd; /* non zero right of the diagonal for elimination */
 	plist_t<int> m_nz;   /* all non zero for multiplication */
 private:
-	plist_t<netlist_terminal_t *> m_term;
+	plist_t<terminal_t *> m_term;
 	plist_t<int> m_net_other;
 	plist_t<nl_double> m_go;
 	plist_t<nl_double> m_gt;
@@ -92,11 +94,11 @@ private:
 	plist_t<nl_double *> m_other_curanalog;
 };
 
-class netlist_matrix_solver_t : public netlist_device_t
+class netlist_matrix_solver_t : public device_t
 {
 public:
 	typedef plist_t<netlist_matrix_solver_t *> list_t;
-	typedef netlist_core_device_t::list_t dev_list_t;
+	typedef core_device_t::list_t dev_list_t;
 
 	enum eSolverType
 	{
@@ -107,7 +109,7 @@ public:
 	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t *params);
 	virtual ~netlist_matrix_solver_t();
 
-	virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
+	virtual void vsetup(analog_net_t::list_t &nets) = 0;
 
 	template<class C>
 	void solve_base(C *p);
@@ -128,22 +130,22 @@ public:
 	virtual void start();
 	virtual void reset();
 
-	ATTR_COLD int get_net_idx(netlist_net_t *net);
+	ATTR_COLD int get_net_idx(net_t *net);
 	virtual void log_stats() {};
 
 	inline eSolverType type() const { return m_type; }
 
 protected:
 
-	ATTR_COLD void setup(netlist_analog_net_t::list_t &nets);
+	ATTR_COLD void setup(analog_net_t::list_t &nets);
 	ATTR_HOT void update_dynamic();
 
 	// should return next time step
 	ATTR_HOT virtual nl_double vsolve() = 0;
 
-	virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
+	virtual void  add_term(int net_idx, terminal_t *term) = 0;
 
-	plist_t<netlist_analog_net_t *> m_nets;
+	plist_t<analog_net_t *> m_nets;
 	plist_t<netlist_analog_output_t *> m_inps;
 
 	int m_stat_calculations;
@@ -160,8 +162,8 @@ private:
 	dev_list_t m_step_devices;
 	dev_list_t m_dynamic_devices;
 
-	netlist_logic_input_t m_fb_sync;
-	netlist_logic_output_t m_Q_sync;
+	logic_input_t m_fb_sync;
+	logic_output_t m_Q_sync;
 
 	ATTR_HOT void step(const netlist_time delta);
 
@@ -172,11 +174,11 @@ private:
 
 
 
-class NETLIB_NAME(solver) : public netlist_device_t
+class NETLIB_NAME(solver) : public device_t
 {
 public:
 	NETLIB_NAME(solver)()
-	: netlist_device_t()    { }
+	: device_t()    { }
 
 	virtual ~NETLIB_NAME(solver)();
 
@@ -191,8 +193,8 @@ protected:
 	ATTR_HOT void reset();
 	ATTR_HOT void update_param();
 
-	netlist_logic_input_t m_fb_step;
-	netlist_logic_output_t m_Q_step;
+	logic_input_t m_fb_step;
+	logic_output_t m_Q_step;
 
 	netlist_param_double_t m_freq;
 	netlist_param_double_t m_sync_delay;
@@ -219,6 +221,6 @@ private:
 	netlist_matrix_solver_t *create_solver(int size, int gs_threshold, bool use_specific);
 };
 
-
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_SOLVER_H_ */

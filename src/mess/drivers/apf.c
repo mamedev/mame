@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Peter Trauner
+// license:GPL-2.0+, BSD-3-Clause
+// copyright-holders:Peter Trauner, Robbbert
 /******************************************************************************
 
 driver by ?

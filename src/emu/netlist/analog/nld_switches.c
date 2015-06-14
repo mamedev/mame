@@ -11,6 +11,8 @@
 #define R_OFF   (1.0 / netlist().gmin())
 #define R_ON    0.01
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // SWITCH
 // ----------------------------------------------------------------------------------------
@@ -101,3 +103,5 @@ NETLIB_UPDATE_PARAM(switch2)
 {
 	update();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()
