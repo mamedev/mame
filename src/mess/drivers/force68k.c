@@ -69,6 +69,7 @@ Based on the 68ksbc.c
 
 ****************************************************************************/
 
+#include "emu.h"
 //#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 //#include "machine/6850acia.h"
@@ -79,7 +80,7 @@ class force68k_state : public driver_device
 public:
 	force68k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+		m_maincpu(*this, "maincpu")
 //		m_acia1(*this, "acia1")
 //		m_acia2(*this, "acia2")
 //		m_acia3(*this, "acia3")
@@ -96,6 +97,7 @@ private:
 };
 
 static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000007) AM_ROM /* Vectors mapped from System EPROM */
 	AM_RANGE(0x000008, 0x01ffff) AM_RAM /* DRAM */
 	AM_RANGE(0x080008, 0x09ffff) AM_ROM /* System EPROM Area */
@@ -107,7 +109,6 @@ static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
 //      AM_RANGE(0x100000, 0xfeffff) /* VMEbus Rev B addresses (24 bits) */
 //      AM_RANGE(0xff0000, 0xffffff) /* VMEbus Rev B addresses (16 bits) */
 ADDRESS_MAP_END
-
 
 /* Input ports */
 static INPUT_PORTS_START( force68k )
