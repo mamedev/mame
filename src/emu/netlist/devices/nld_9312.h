@@ -38,12 +38,17 @@
 #define NLD_9312_H_
 
 #include "nld_signal.h"
+#include "nld_truthtable.h"
 
 #define TTL_9312(_name)                                                \
 		NET_REGISTER_DEV(9312, _name)
-#if (USE_TRUTHTABLE)
-#include "nld_truthtable.h"
 
+#define TTL_9312_DIP(_name)                                            \
+		NET_REGISTER_DEV(9312_dip, _name)
+
+NETLIB_NAMESPACE_DEVICES_START()
+
+#if (USE_TRUTHTABLE)
 /* The truthtable implementation is a lot faster than
  * the carefully crafted code :-(
  */
@@ -67,12 +72,10 @@ public:
 
 #endif
 
-
-#define TTL_9312_DIP(_name)                                            \
-		NET_REGISTER_DEV(9312_dip, _name)
-
 NETLIB_DEVICE(9312_dip,
 	NETLIB_NAME(9312) m_sub;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_9312_H_ */

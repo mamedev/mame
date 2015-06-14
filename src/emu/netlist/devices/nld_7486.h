@@ -33,25 +33,32 @@
 #define NLD_7486_H_
 
 #include "nld_signal.h"
+#include "nld_truthtable.h"
 
 #define TTL_7486_XOR(_name, _A, _B)                                                 \
 		NET_REGISTER_DEV(7486, _name)                                               \
 		NET_CONNECT(_name, A, _A)                                                   \
 		NET_CONNECT(_name, B, _B)
 
+
+#define TTL_7486_DIP(_name)                                                         \
+		NET_REGISTER_DEV(7486_dip, _name)
+
+NETLIB_NAMESPACE_DEVICES_START()
+
+#if (USE_TRUTHTABLE)
+NETLIB_TRUTHTABLE(7486, 2, 1, 0);
+#else
 NETLIB_DEVICE(7486,
 public:
-		netlist_logic_input_t m_A;
-		netlist_logic_input_t m_B;
-		netlist_logic_output_t m_Q;
+		netlist_logic_input_t m_I[2];
+		netlist_logic_output_t m_Q[1];
 
 		ATTR_HOT void inc_active();
 		ATTR_HOT void dec_active();
 		int m_active;
 );
-
-#define TTL_7486_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7486_dip, _name)
+#endif
 
 NETLIB_DEVICE(7486_dip,
 
@@ -60,5 +67,7 @@ NETLIB_DEVICE(7486_dip,
 	NETLIB_NAME(7486) m_3;
 	NETLIB_NAME(7486) m_4;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_7486_H_ */

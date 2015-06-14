@@ -202,7 +202,7 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 
 CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
 {
-	return ioport(LADYBUG_P1_CONTROL_PORT_TAG)->read();
+	return m_p1_control->read();
 }
 
 CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
@@ -210,10 +210,10 @@ CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
 	UINT32 ret;
 
 	/* upright cabinet only uses a single set of controls */
-	if (ioport("DSW0")->read() & 0x20)
-		ret = ioport(LADYBUG_P2_CONTROL_PORT_TAG)->read();
+	if (m_port_dsw0->read() & 0x20)
+		ret = m_p2_control->read();
 	else
-		ret = ioport(LADYBUG_P1_CONTROL_PORT_TAG)->read();
+		ret = m_p1_control->read();
 
 	return ret;
 }

@@ -12,6 +12,9 @@
 #include "nl_util.h"
 #include "plib/pparser.h"
 
+namespace netlist
+{
+
 class netlist_parser : public ptokenizer
 {
 	NETLIST_PREVENT_COPYING(netlist_parser)
@@ -25,6 +28,7 @@ public:
 	void net_alias();
 	void netdev_param();
 	void net_c();
+	void frontier();
 	void device(const pstring &dev_type);
 	void netdev_netlist_start();
 	void netdev_netlist_end();
@@ -36,7 +40,7 @@ public:
 
 protected:
 	/* for debugging messages */
-	netlist_base_t &netlist() { return m_setup.netlist(); }
+	netlist_t &netlist() { return m_setup.netlist(); }
 
 	virtual void verror(pstring msg, int line_num, pstring line);
 private:
@@ -48,6 +52,7 @@ private:
 	token_id_t m_tok_comma;
 	token_id_t m_tok_ALIAS;
 	token_id_t m_tok_NET_C;
+	token_id_t m_tok_FRONTIER;
 	token_id_t m_tok_PARAM;
 	token_id_t m_tok_NET_MODEL;
 	token_id_t m_tok_NETLIST_START;
@@ -65,5 +70,6 @@ private:
 	const char *m_buf;
 };
 
+}
 
 #endif /* NL_PARSER_H_ */

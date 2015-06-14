@@ -453,7 +453,11 @@ READ_LINE_MEMBER( mc6845_device::vsync_r )
 void mc6845_device::recompute_parameters(bool postload)
 {
 	UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
-	//UINT16 video_char_height = (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) + 1;
+
+	// needed for the apricot, correct?
+	if (MODE_INTERLACE_AND_VIDEO)
+		m_max_ras_addr |= 1;
+
 	UINT16 video_char_height = m_max_ras_addr + 1;   // fix garbage at the bottom of the screen (eg victor9k)
 	// Would be useful for 'interlace and video' mode support...
 	// UINT16 frame_char_height = (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr / 2 : m_max_ras_addr) + 1;

@@ -14,11 +14,15 @@ project "utils"
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/zlib",
 	}
 	if _OPTIONS["with-bundled-expat"] then
 		includedirs {
 			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
 		}
 	end
 
@@ -110,8 +114,13 @@ project "formats"
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/zlib",
 	}
+
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+	end
 
 	files {
 		MAME_DIR .. "src/lib/formats/2d_dsk.c",
@@ -158,8 +167,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/asst128_dsk.h",
 		MAME_DIR .. "src/lib/formats/atari_dsk.c",
 		MAME_DIR .. "src/lib/formats/atari_dsk.h",
-		MAME_DIR .. "src/lib/formats/atarist_dsk.c",
-		MAME_DIR .. "src/lib/formats/atarist_dsk.h",
 		MAME_DIR .. "src/lib/formats/atom_tap.c",
 		MAME_DIR .. "src/lib/formats/atom_tap.h",
 		MAME_DIR .. "src/lib/formats/bbc_dsk.c",
@@ -190,8 +197,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/cgenie_dsk.h",
 		MAME_DIR .. "src/lib/formats/coco_cas.c",
 		MAME_DIR .. "src/lib/formats/coco_cas.h",
-		MAME_DIR .. "src/lib/formats/coco_dsk.c",
-		MAME_DIR .. "src/lib/formats/coco_dsk.h",
 		MAME_DIR .. "src/lib/formats/comx35_dsk.c",
 		MAME_DIR .. "src/lib/formats/comx35_dsk.h",
 		MAME_DIR .. "src/lib/formats/concept_dsk.c",
@@ -395,10 +400,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/vg5k_cas.h",
 		MAME_DIR .. "src/lib/formats/vt_cas.c",
 		MAME_DIR .. "src/lib/formats/vt_cas.h",
-		MAME_DIR .. "src/lib/formats/vt_dsk.c",
-		MAME_DIR .. "src/lib/formats/vt_dsk.h",
-		MAME_DIR .. "src/lib/formats/vtech1_dsk.c",
-		MAME_DIR .. "src/lib/formats/vtech1_dsk.h",
 		MAME_DIR .. "src/lib/formats/wavfile.c",
 		MAME_DIR .. "src/lib/formats/wavfile.h",
 		MAME_DIR .. "src/lib/formats/wd177x_dsk.c",

@@ -24,9 +24,11 @@
 		NET_REGISTER_DEV(log, _name)                                         \
 		NET_CONNECT(_name, I, _I)
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_DEVICE(log,
 	~NETLIB_NAME(log)();
-	netlist_analog_input_t m_I;
+	analog_input_t m_I;
 protected:
 	void * m_file;
 );
@@ -37,17 +39,19 @@ protected:
 		NET_CONNECT(_name, I2, _I2)
 
 NETLIB_DEVICE_DERIVED(logD, log,
-	netlist_analog_input_t m_I2;
+	analog_input_t m_I2;
 );
 
 #if 0
 NETLIB_DEVICE(wav,
 	~NETLIB_NAME(wav)();
-	netlist_analog_input_t m_I;
+	analog_input_t m_I;
 private:
 	// FIXME: rewrite sound/wavwrite.h to be an object ...
 	void *m_file;
 );
 #endif
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_LOG_H_ */

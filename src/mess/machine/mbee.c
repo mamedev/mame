@@ -1,13 +1,13 @@
-// license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller, Robbbert
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /***************************************************************************
 
     microbee.c
 
     machine driver
-    Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
+    Originally written by Juergen Buchmueller, Jan 2000
 
-    Rewritten by Robbbert
+    Rewritten by Robbbert (see notes in driver file).
 
 ****************************************************************************/
 

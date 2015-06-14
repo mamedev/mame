@@ -8,6 +8,8 @@
 #include "nld_system.h"
 #include "../analog/nld_solver.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 // ----------------------------------------------------------------------------------------
 // netlistparams
 // ----------------------------------------------------------------------------------------
@@ -271,3 +273,5 @@ NETLIB_UPDATE_PARAM(res_sw)
 {
 	// nothing, not intended to be called
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

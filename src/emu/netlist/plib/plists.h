@@ -11,6 +11,7 @@
 #define PLISTS_H_
 
 #include <cstring>
+#include <algorithm>
 
 #include "palloc.h"
 #include "pstring.h"
@@ -581,5 +582,22 @@ public:
 		return temp;
 	}
 };
+
+// ----------------------------------------------------------------------------------------
+// sort a list ... slow, I am lazy
+// elements must support ">" operator.
+// ----------------------------------------------------------------------------------------
+
+template<typename Class>
+static inline void psort_list(Class &sl)
+{
+	for(int i = 0; i < (int) sl.size() - 1; i++)
+	{
+        for(int j = i + 1; j < sl.size(); j++)
+            if(sl[i] > sl[j])
+            	std::swap(sl[i], sl[j]);
+
+	}
+}
 
 #endif /* PLISTS_H_ */

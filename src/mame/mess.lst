@@ -876,6 +876,9 @@ spt1740   // Symbol SPT 1740
 osborne1  // 1981 Osborne-1
 osbexec // 1982 Osborne Executive
 
+// Regnecentralen
+rc759   // 1984 RC759
+
 // Research Machines
 nimbus  // RM Nimbus 186
 
@@ -1706,6 +1709,7 @@ hp9k340
 hp9k370
 hp9k380
 hp9k382
+hp64k
 
 // SpectraVideo
 svi318  // SVI-318 (PAL)
@@ -2281,6 +2285,7 @@ elwro800
 fk1
 et3400
 amu880
+i7000
 interact
 jr100
 jr100u
@@ -2680,3 +2685,4 @@ leapstertv
 excali64
 bitgrpha
 bitgrphb
+tvgame

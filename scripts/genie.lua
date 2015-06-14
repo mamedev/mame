@@ -99,6 +99,36 @@ newoption {
 }
 
 newoption {
+    trigger = 'with-bundled-zlib',
+    description = 'Build bundled Zlib library',
+}
+
+newoption {
+    trigger = 'with-bundled-jpeg',
+    description = 'Build bundled JPEG library',
+}
+
+newoption {
+    trigger = 'with-bundled-flac',
+    description = 'Build bundled FLAC library',
+}
+
+newoption {
+    trigger = 'with-bundled-lua',
+    description = 'Build bundled LUA library',
+}
+
+newoption {
+    trigger = 'with-bundled-sqlite3',
+    description = 'Build bundled SQLite library',
+}
+
+newoption {
+    trigger = 'with-bundled-portmidi',
+    description = 'Build bundled PortMidi library',
+}
+
+newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {
@@ -596,9 +626,29 @@ else
 end
 
 -- need to ensure FLAC functions are statically linked
-defines {
-	"FLAC__NO_DLL",
-}
+if _OPTIONS["with-bundled-flac"] then
+	defines {
+		"FLAC__NO_DLL",
+	}
+	end
+
+if not _OPTIONS["with-bundled-jpeg"] then
+	defines {
+		"USE_SYSTEM_JPEGLIB",
+	}
+	end
+
+if not _OPTIONS["with-bundled-portmidi"] then
+	defines {
+		"USE_SYSTEM_PORTMIDI",
+	}
+	end
+
+if not _OPTIONS["with-bundled-sqlite3"] then
+	defines {
+		"USE_SYSTEM_SQLITE",
+	}
+	end
 
 if _OPTIONS["NOASM"]=="1" then
 	defines {
@@ -873,6 +923,7 @@ end
 			end
 			if (version >= 30400) then
 				buildoptions {
+					"-Wno-inline-new-delete",
 					"-Wno-constant-logical-operand",
 				}
 			end

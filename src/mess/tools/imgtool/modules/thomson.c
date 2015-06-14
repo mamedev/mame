@@ -113,7 +113,6 @@
 
 #include "imgtool.h"
 #include "iflopimg.h"
-#include "formats/basicdsk.h"
 
 #include <time.h>
 

@@ -253,7 +253,7 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 	m_via4_irq(CLEAR_LINE),
 	m_via5_irq(CLEAR_LINE),
 	m_via6_irq(CLEAR_LINE),
-	m_period(attotime::from_nsec(2130))
+	m_period(attotime::from_hz(XTAL_15MHz/32))
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;

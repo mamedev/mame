@@ -1,10 +1,10 @@
-// license:GPL-2.0+
-// copyright-holders:Peter Trauner
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /******************************************************************************
 
-driver by ?
+Driver completely rewritten by Robbbert in a process begun on 2014-01-22.
 
-PeT   around February 2008:
+Based on the previous work done by PeT around February 2008, and possible others prior.
  added apfm1000 cartridge loading
  fixed apfm1000 pads
  added apf video mode
@@ -62,6 +62,7 @@ ToDo:
 - Add back the disk support when we can get some info on it
   (6600, 6500-6503 wd179x disc controller? 6400, 6401)
 - Need to add back the disk format in the new wdc code
+  (40 tracks, 1 head, 8 sectors, 256 bytes sector length, first sector id 1)
 - Need disk-based software
 
 
@@ -494,23 +495,6 @@ static SLOT_INTERFACE_START( apf_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
 SLOT_INTERFACE_END
 
-#if 0
-static LEGACY_FLOPPY_OPTIONS_START(apfimag)
-	LEGACY_FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([8])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface apfimag_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(apfimag),
-	NULL
-};
-#endif
 
 static SLOT_INTERFACE_START(apf_cart)
 	SLOT_INTERFACE_INTERNAL("std",       APF_ROM_STD)

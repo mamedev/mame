@@ -7,6 +7,8 @@
 
 #include "nld_74107.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(74107Asub)
 {
 	register_input("CLK", m_clk);
@@ -20,7 +22,7 @@ NETLIB_START(74107Asub)
 
 NETLIB_RESET(74107Asub)
 {
-	m_clk.set_state(netlist_logic_t::STATE_INP_HL);
+	m_clk.set_state(logic_t::STATE_INP_HL);
 	m_Q.initial(0);
 	m_QQ.initial(1);
 
@@ -141,3 +143,5 @@ NETLIB_UPDATE(74107_dip)
 	m_1.update_dev();
 	m_2.update_dev();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

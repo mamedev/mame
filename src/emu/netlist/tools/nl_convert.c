@@ -5,7 +5,29 @@
  *
  */
 
+#include <algorithm>
+
 #include "nl_convert.h"
+
+template<typename Class>
+static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
+{
+	plist_t<int> ret(sl.size());
+	for (int i=0; i<sl.size(); i++)
+		ret[i] = i;
+
+	for(int i=0; i < sl.size()-1;i++)
+    {
+        for(int j=i+1; j < sl.size(); j++)
+        {
+            if(sl[ret[i]]->name() > sl[ret[j]]->name())
+            {
+            	std::swap(ret[i], ret[j]);
+            }
+        }
+    }
+	return ret;
+}
 
 /*-------------------------------------------------
     convert - convert a spice netlist
@@ -72,17 +94,20 @@ void nl_convert_base_t::dump_nl()
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
+	plist_t<int> sorted = bubble(m_devs);
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
-		if (m_devs[i]->has_value())
-			out("%s(%s, %s)\n", m_devs[i]->type().cstr(),
-					m_devs[i]->name().cstr(), get_nl_val(m_devs[i]->value()).cstr());
-		else if (m_devs[i]->has_model())
-			out("%s(%s, \"%s\")\n", m_devs[i]->type().cstr(),
-					m_devs[i]->name().cstr(), m_devs[i]->model().cstr());
+		std::size_t j = sorted[i];
+
+		if (m_devs[j]->has_value())
+			out("%s(%s, %s)\n", m_devs[j]->type().cstr(),
+					m_devs[j]->name().cstr(), get_nl_val(m_devs[j]->value()).cstr());
+		else if (m_devs[j]->has_model())
+			out("%s(%s, \"%s\")\n", m_devs[j]->type().cstr(),
+					m_devs[j]->name().cstr(), m_devs[j]->model().cstr());
 		else
-			out("%s(%s)\n", m_devs[i]->type().cstr(),
-					m_devs[i]->name().cstr());
+			out("%s(%s)\n", m_devs[j]->type().cstr(),
+					m_devs[j]->name().cstr());
 	}
 	// print nets
 	for (std::size_t i=0; i<m_nets.size(); i++)
@@ -230,22 +255,43 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				/* check for fourth terminal ... should be numeric net
 				 * including "0" or start with "N" (ltspice)
 				 */
-				// FIXME: we need a is_long method ..
 				ATTR_UNUSED int nval =tt[4].as_long(&cerr);
+				pstring model;
+				pstring pins ="CBE";
+
 				if ((!cerr || tt[4].startsWith("N")) && tt.size() > 5)
-					add_device("QBJT", tt[0], tt[5]);
+					model = tt[5];
 				else
-					add_device("QBJT", tt[0], tt[4]);
-				add_term(tt[1], tt[0] + ".C");
-				add_term(tt[2], tt[0] + ".B");
-				add_term(tt[3], tt[0] + ".E");
+					model = tt[4];
+				pstring_list_t m(model,"{");
+				if (m.size() == 2)
+				{
+					if (m[1].len() != 4)
+						fprintf(stderr, "error with model desc %s\n", model.cstr());
+					pins = m[1].left(3);
+				}
+				add_device("QBJT_EB", tt[0], m[0]);
+				add_term(tt[1], tt[0] + "." + pins[0]);
+				add_term(tt[2], tt[0] + "." + pins[1]);
+				add_term(tt[3], tt[0] + "." + pins[2]);
 			}
 				break;
 			case 'R':
-				val = get_sp_val(tt[3]);
-				add_device("RES", tt[0], val);
-				add_term(tt[1], tt[0] + ".1");
-				add_term(tt[2], tt[0] + ".2");
+				if (tt[0].startsWith("RV"))
+				{
+					val = get_sp_val(tt[4]);
+					add_device("POT", tt[0], val);
+					add_term(tt[1], tt[0] + ".1");
+					add_term(tt[2], tt[0] + ".2");
+					add_term(tt[3], tt[0] + ".3");
+				}
+				else
+				{
+					val = get_sp_val(tt[3]);
+					add_device("RES", tt[0], val);
+					add_term(tt[1], tt[0] + ".1");
+					add_term(tt[2], tt[0] + ".2");
+				}
 				break;
 			case 'C':
 				val = get_sp_val(tt[3]);
@@ -265,11 +311,18 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				else
 					fprintf(stderr, "Voltage Source %s not connected to GND\n", tt[0].cstr());
 				break;
+			case 'I': // Input pin special notation
+				{
+					val = get_sp_val(tt[2]);
+					add_device("ANALOG_INPUT", tt[0], val);
+					add_term(tt[1], tt[0] + ".Q");
+				}
+				break;
 			case 'D':
-				// FIXME: Rewrite resistor value
 				add_device("DIODE", tt[0], tt[3]);
-				add_term(tt[1], tt[0] + ".A");
-				add_term(tt[2], tt[0] + ".K");
+				/* FIXME ==> does Kicad use different notation from LTSPICE */
+				add_term(tt[1], tt[0] + ".K");
+				add_term(tt[2], tt[0] + ".A");
 				break;
 			case 'U':
 			case 'X':

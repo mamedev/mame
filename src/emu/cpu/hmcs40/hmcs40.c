@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 
 // device definitions
 hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, polarity, 3, 10, 11, ADDRESS_MAP_NAME(program_1k), 7, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1k), 7 /* data width */, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
 { }
 
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -188,6 +188,7 @@ void hmcs40_cpu_device::device_start()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hmcs40_cpu_device::simple_timer_cb), this));
 	reset_prescaler();
 
+	// resolve callbacks
 	m_read_r0.resolve_safe(0);
 	m_read_r1.resolve_safe(0);
 	m_read_r2.resolve_safe(0);

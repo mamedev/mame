@@ -892,7 +892,7 @@ static void swap_buffers(voodoo_state *v)
 
 	/* periodically log rasterizer info */
 	v->stats.swaps++;
-	if (LOG_RASTERIZERS && v->stats.swaps % 100 == 0)
+	if (LOG_RASTERIZERS && v->stats.swaps % 1000 == 0)
 		dump_rasterizer_stats(v);
 
 	/* update the statistics (debug) */
@@ -3302,10 +3302,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, v->reg[fbzColorPath].u, v->reg[fbzMode].u, iterz, iterw);
 // Start PIXEL_PIPE_BEGIN copy
 				//#define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)
-				do
-				{
 					INT32 fogdepth, biasdepth;
-					INT32 prefogr, prefogg, prefogb;
 					INT32 r, g, b, a;
 
 					(stats)->pixels_in++;
@@ -3334,7 +3331,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 							if (((v->reg[stipple].u >> stipple_index) & 1) == 0)
 							{
 								v->stats.total_stippled++;
-								goto skipdrawdepth;
+								goto nextpixel;
 							}
 						}
 					}
@@ -3343,25 +3340,40 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
 				fogdepth = biasdepth = (UINT32) sw[pix];
 
-				/* Perform depth testing */
-				DEPTH_TEST(v, stats, x, v->reg[fbzMode].u);
-
 				/* use the RGBA we stashed above */
 				color.rgb.r = r = sr[pix];
 				color.rgb.g = g = sg[pix];
 				color.rgb.b = b = sb[pix];
 				color.rgb.a = a = sa[pix];
 
-				/* apply chroma key, alpha mask, and alpha testing */
-				APPLY_CHROMAKEY(v, stats, v->reg[fbzMode].u, color);
-				APPLY_ALPHAMASK(v, stats, v->reg[fbzMode].u, color.rgb.a);
-				APPLY_ALPHATEST(v, stats, v->reg[alphaMode].u, color.rgb.a);
+				if (USE_OLD_RASTER) {
+					/* Perform depth testing */
+					DEPTH_TEST(v, stats, x, v->reg[fbzMode].u);
+	
+					/* apply chroma key, alpha mask, and alpha testing */
+					APPLY_CHROMAKEY(v, stats, v->reg[fbzMode].u, color);
+					APPLY_ALPHAMASK(v, stats, v->reg[fbzMode].u, color.rgb.a);
+					APPLY_ALPHATEST(v, stats, v->reg[alphaMode].u, color.rgb.a);
+				} else {
+					/* Perform depth testing */
+					if (!depthTest((UINT16) v->reg[zaColor].u, stats, depth[x], v->reg[fbzMode].u, biasdepth))
+						goto nextpixel;
+	
+					/* handle chroma key */
+					if (!chromaKeyTest(v, stats, v->reg[fbzMode].u, color))
+						goto nextpixel;
+					/* handle alpha mask */
+					if (!alphaMaskTest(stats, v->reg[fbzMode].u, color.rgb.a))
+						goto nextpixel;
+					/* handle alpha test */
+					if (!alphaTest(v, stats, v->reg[alphaMode].u, color.rgb.a))
+						goto nextpixel;
+				}
 
 				/* pixel pipeline part 2 handles color combine, fog, alpha, and final output */
 				PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth,
 					v->reg[fbzMode].u, v->reg[fbzColorPath].u, v->reg[alphaMode].u, v->reg[fogMode].u,
 					iterz, iterw, iterargb);
-			}
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -5658,6 +5670,7 @@ static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo)
 	/* fill in the data */
 	info->hits = 0;
 	info->polys = 0;
+	info->hash = hash;
 
 	/* hook us into the hash table */
 	info->next = v->raster_hash[hash];
@@ -5760,7 +5773,7 @@ static void dump_rasterizer_stats(voodoo_state *v)
 			break;
 
 		/* print it */
-		printf("RASTERIZER_ENTRY( 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) /* %c %8d %10d */\n",
+		printf("RASTERIZER_ENTRY( 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) /* %c %2d %8d %10d */\n",
 			best->eff_color_path,
 			best->eff_alpha_mode,
 			best->eff_fog_mode,
@@ -5768,6 +5781,7 @@ static void dump_rasterizer_stats(voodoo_state *v)
 			best->eff_tex_mode_0,
 			best->eff_tex_mode_1,
 			best->is_generic ? '*' : ' ',
+			best->hash,
 			best->polys,
 			best->hits);
 
@@ -6436,27 +6450,26 @@ RASTERIZER_ENTRY( 0x00602439, 0x00044119, 0x00000000, 0x000B0379, 0x00000009, 0x
 //RASTERIZER_ENTRY( 0x00002809,  0x00004110, 0x00000001, 0x00030FFB, 0x08241AC7, 0xFFFFFFFF )   /* in-game */
 //RASTERIZER_ENTRY( 0x00424219,  0x00000000, 0x00000001, 0x00030F7B, 0x08241AC7, 0xFFFFFFFF )   /* in-game */
 //RASTERIZER_ENTRY( 0x0200421A,  0x00001510, 0x00000001, 0x00030F7B, 0x08241AC7, 0xFFFFFFFF )   /* in-game */
-
-/* golden tee fore! series */
-RASTERIZER_ENTRY(  0x00002429, 0x00000000, 0x00000000, 0x00010FF9, 0x00000A09, 0x0C261A0F )
-RASTERIZER_ENTRY(  0x00002425, 0x00045119, 0x00000000, 0x00010F79, 0x0C224A0D, 0x0C261A0D )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x0C261ACD, 0x042210C0 )
-RASTERIZER_ENTRY(  0x00002429, 0x00000000, 0x000000C1, 0x00010FF9, 0x00000A09, 0x0C261A0F )
-RASTERIZER_ENTRY(  0x00002425, 0x00045110, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00002425, 0x00045119, 0x000000C1, 0x00010F79, 0x0C224A0D, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x000000C1, 0x00010F79, 0x0C261ACD, 0x0C2610C4 )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x000000C1, 0x00010F79, 0x00000ACD, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x000000C1, 0x00010F79, 0x0C261ACD, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00002425, 0x00045119, 0x000000C1, 0x00010FF9, 0x000000C4, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00002425, 0x00045110, 0x000000C1, 0x00010FF9, 0x000000C4, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00002425, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x0C261ACD, 0x0C2610C4 )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x00000ACD, 0x04221AC9 )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x0C261ACD, 0x04221AC9 )
-RASTERIZER_ENTRY(  0x00002425, 0x00045119, 0x000000C1, 0x00010F79, 0x0C224A0D, 0x0C261A0D )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x000000C1, 0x00010F79, 0x000000C4, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x000000C4, 0x04221AC9 )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD )
-RASTERIZER_ENTRY(  0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x0C261ACD, 0x0C261ACD )
+/* gtfore06 ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1        hash */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010F79, 0x0C261ACD, 0x0C261ACD ) /*   18  1064626   69362127 */
+RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x000000C1, 0x00010F79, 0x0C224A0D, 0x0C261ACD ) /*   47  3272483   31242799 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010F79, 0x00000ACD, 0x0C261ACD ) /*    9   221917   12348555 */
+RASTERIZER_ENTRY( 0x00002425, 0x00045110, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD ) /*   26    57291    9357989 */
+RASTERIZER_ENTRY( 0x00002429, 0x00000000, 0x000000C1, 0x00010FF9, 0x00000A09, 0x0C261A0F ) /*   12    97156    8530607 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010F79, 0x000000C4, 0x0C261ACD ) /*   55   110144    5265532 */
+RASTERIZER_ENTRY( 0x00002425, 0x00045110, 0x000000C1, 0x00010FF9, 0x000000C4, 0x0C261ACD ) /*   61    16644    1079382 */
+RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x000000C1, 0x00010FF9, 0x000000C4, 0x0C261ACD ) /*    5     8332    1065229 */
+RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x000000C1, 0x00010F79, 0x0C224A0D, 0x0C261A0D ) /*   45     8148     505013 */
+RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x00000000, 0x00010F79, 0x0C224A0D, 0x0C261A0D ) /*   84    45233     248267 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010F79, 0x0C261ACD, 0x0C2610C4 ) /*   90    10235     193036 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x0C261ACD, 0x0C261ACD ) /* * 29     3777      83777 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x0C261ACD, 0x042210C0 ) /*    2    24952      66761 */
+RASTERIZER_ENTRY( 0x00002429, 0x00000000, 0x00000000, 0x00010FF9, 0x00000A09, 0x0C261A0F ) /*   24      661      50222 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x0C261ACD, 0x04221AC9 ) /*   92    12504      43720 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x0C261ACD, 0x0C2610C4 ) /*   79     2160      43650 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x000000C4, 0x04221AC9 ) /*   19     2796      30377 */
+RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD ) /*   67     1962      14755 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x000000C4, 0x0C261ACD ) /* * 66       74       3951 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x00000ACD, 0x04221AC9 ) /*   70      374       3691 */
 
 #endif

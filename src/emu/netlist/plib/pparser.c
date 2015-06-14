@@ -97,6 +97,16 @@ pstring ptokenizer::get_identifier()
 	return tok.str();
 }
 
+pstring ptokenizer::get_identifier_or_number()
+{
+	token_t tok = get_token();
+	if (!(tok.is_type(IDENTIFIER) || tok.is_type(NUMBER)))
+	{
+		error("Error: expected an identifier, got <%s>\n", tok.str().cstr());
+	}
+	return tok.str();
+}
+
 double ptokenizer::get_number_double()
 {
 	token_t tok = get_token();
@@ -257,6 +267,7 @@ ATTR_COLD void ptokenizer::error(const char *format, ...)
 
 ppreprocessor::ppreprocessor()
 {
+	m_expr_sep.add("!");
 	m_expr_sep.add("(");
 	m_expr_sep.add(")");
 	m_expr_sep.add("+");
@@ -284,10 +295,19 @@ double ppreprocessor::expr(const pstring_list_t &sexpr, std::size_t &start, int 
 	if (tok == "(")
 	{
 		start++;
-		val = expr(sexpr, start, prio);
+		val = expr(sexpr, start, /*prio*/ 0);
 		if (sexpr[start] != ")")
 			error("parsing error!");
 		start++;
+	}
+	else if (tok == "!")
+	{
+		start++;
+		val = expr(sexpr, start, 90);
+		if (val != 0)
+			val = 0;
+		else
+			val = 1;
 	}
 	else
 	{

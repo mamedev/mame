@@ -632,6 +632,22 @@ if (CPUS["SH4"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- HP Hybrid processor
+---@src/emu/cpu/hphybrid/hphybrid.h,CPUS += HPHYBRID
+--------------------------------------------------
+
+if (CPUS["HPHYBRID"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/cpu/hphybrid/hphybrid.c",
+		MAME_DIR .. "src/emu/cpu/hphybrid/hphybrid.h",
+	}
+end
+
+if (CPUS["HPHYBRID"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/hphybrid/hphybrid_dasm.c")
+end
+
+--------------------------------------------------
 -- Hudsonsoft 6280
 ---@src/emu/cpu/h6280/h6280.h,CPUS += H6280
 --------------------------------------------------

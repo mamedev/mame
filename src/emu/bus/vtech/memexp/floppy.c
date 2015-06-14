@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Dirk Best
+// copyright-holders:Dirk Best, Olivier Galibert
 /***************************************************************************
 
     VTech Laser/VZ Floppy Controller Cartridge
@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "floppy.h"
-#include "formats/vtech1_dsk.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -44,18 +44,14 @@ const rom_entry *floppy_controller_device::device_rom_region() const
 //  machine configurations
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( floppy_controller_device::floppy_formats )
-	FLOPPY_MFI_FORMAT
-FLOPPY_FORMATS_END
-
 static SLOT_INTERFACE_START( laser_floppies )
-	SLOT_INTERFACE( "525", FLOPPY_525_SSSD )
+	SLOT_INTERFACE("525", FLOPPY_525_SSSD)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( floppy_controller )
 	MCFG_MEMEXP_SLOT_ADD("mem")
-	MCFG_FLOPPY_DRIVE_ADD("0", laser_floppies, "525", floppy_controller_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", laser_floppies, "525", floppy_controller_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("0", laser_floppies, "525", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("1", laser_floppies, "525", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 machine_config_constructor floppy_controller_device::device_mconfig_additions() const

@@ -41,8 +41,9 @@
          $31FF00 : w--- ---- ---- ---- : Screen width (0= 320, 1= 412)
                    ---- f--- ---- ---- : Bitmap format (1= 8bpp, 0= 4bpp)
                    ---- -t-- ---- ---- : Tile banking related
-                   ---- --f- ---- ---- : 1= All layers X+Y flip
-                   ---- ---- ---- 4--- : 1= X+Y flip for NBG3
+                   ---- --f- ---- ---- : 1= Global X/Y flip? (most games?)
+                   ---- ---f ---- ---- : 1= prohbit Y flip? (Air Rescue 2nd screen title, also gets set on one of the intro sequence screens)
+				   ---- ---- ---- 4--- : 1= X+Y flip for NBG3
                    ---- ---- ---- -2-- : 1= X+Y flip for NBG2
                    ---- ---- ---- --1- : 1= X+Y flip for NBG1
                    ---- ---- ---- ---0 : 1= X+Y flip for NBG0
@@ -245,21 +246,17 @@ void segas32_state::common_start(int multi32)
 	m_solid_ffff = auto_alloc_array(machine(), UINT16, 512);
 	memset(m_solid_ffff, 0xff, sizeof(m_solid_ffff[0]) * 512);
 
+	memset(m_system32_videoram, 0x00, 0x20000);
+
 	/* initialize videoram */
 	m_system32_videoram[0x1ff00/2] = 0x8000;
+
+	memset(m_mixer_control, 0xff, sizeof(m_mixer_control[0][0]) * 0x80 );
+
+	
+
 }
 
-
-VIDEO_START_MEMBER(segas32_state,system32)
-{
-	common_start(0);
-}
-
-
-VIDEO_START_MEMBER(segas32_state,multi32)
-{
-	common_start(1);
-}
 
 
 
@@ -870,7 +867,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, struct segas32_st
 	UINT32 srcx, srcx_start, srcy;
 	UINT32 srcxstep, srcystep;
 	int dstxstep, dstystep;
-	int flip, opaque;
+	int opaque;
 	int x, y;
 
 	/* get the tilemaps */
@@ -883,7 +880,18 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, struct segas32_st
 //if (screen.machine().input().code_pressed(KEYCODE_X) && bgnum == 1) opaque = 1;
 
 	/* determine if we're flipped */
-	flip = ((m_system32_videoram[0x1ff00/2] >> 9) ^ (m_system32_videoram[0x1ff00/2] >> bgnum)) & 1;
+	int global_flip = (m_system32_videoram[0x1ff00 / 2] >> 9)&1;
+	
+	int flipx = global_flip;
+	int flipy = global_flip;
+
+	
+	int layer_flip = (m_system32_videoram[0x1ff00 / 2] >> bgnum) & 1;
+
+	flipy ^= layer_flip;
+	flipx ^= layer_flip;
+
+	if ((m_system32_videoram[0x1ff00 / 2] >> 8) & 1) flipy = 0;
 
 	/* determine the clipping */
 	clipenable = (m_system32_videoram[0x1ff02/2] >> (11 + bgnum)) & 1;
@@ -923,14 +931,20 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, struct segas32_st
 	srcy += cliprect.min_y * srcystep;
 
 	/* if we're flipped, simply adjust the start/step parameters */
-	if (flip)
+	if (flipy)
+	{
+		const rectangle &visarea = screen.visible_area();
+
+		srcy += (visarea.max_y - 2 * cliprect.min_y) * srcystep;
+		srcystep = -srcystep;
+	}
+
+	if (flipx)
 	{
 		const rectangle &visarea = screen.visible_area();
 
 		srcx_start += (visarea.max_x - 2 * cliprect.min_x) * srcxstep;
-		srcy += (visarea.max_y - 2 * cliprect.min_y) * srcystep;
 		srcxstep = -srcxstep;
-		srcystep = -srcystep;
 	}
 
 	/* loop over the target rows */

@@ -142,6 +142,38 @@ sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_t
 {
 }
 
+sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, SN76496, "SN76496", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "sn76496", __FILE__)
+	{ }
+u8106_device::u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, U8106, "U8106", tag, 0x4000, 0x01, 0x02, true, false, 8, true, owner, clock, "u8106", __FILE__)
+	{ }
+y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, Y2404, "Y2404", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "y2404", __FILE__)
+	{ }
+sn76489_device::sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, SN76489, "SN76489", tag, 0x4000, 0x01, 0x02, true, false, 8, true, owner, clock, "sn76489", __FILE__)
+	{ }
+sn76489a_device::sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, SN76489A, "SN76489A", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "sn76489a", __FILE__)
+	{ }
+sn76494_device::sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, SN76494, "SN76494", tag, 0x10000, 0x04, 0x08, false, false, 1, true, owner, clock, "sn76494", __FILE__)
+	{ }
+sn94624_device::sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, SN94624, "SN94624", tag, 0x4000, 0x01, 0x02, true, false, 1, true, owner, clock, "sn94624", __FILE__)
+	{ }
+ncr7496_device::ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, NCR7496, "NCR7496", tag, 0x8000, 0x02, 0x20, false, false, 8, true, owner, clock, "ncr7496", __FILE__)
+	{ }
+gamegear_device::gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, GAMEGEAR, "Game Gear PSG", tag, 0x8000, 0x01, 0x08, true, true, 8, false, owner, clock, "gamegear_psg", __FILE__)
+	{ }
+segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:  sn76496_base_device(mconfig, SEGAPSG, "SEGA VDP PSG", tag, 0x8000, 0x01, 0x08, true, false, 8, false, owner, clock, "segapsg", __FILE__)
+	{ }
+
+
 void sn76496_base_device::device_start()
 {
 	int sample_rate = clock()/2;
@@ -217,16 +249,8 @@ void sn76496_base_device::write(UINT8 data)
 	m_sound->update();
 
 	// set number of cycles until READY is active; this is always one
-	// 'sample', i.e. it equals the clock divider exactly; until the
-	// clock divider is fully supported, we delay until one sample has
-	// played. The fact that this below is '2' and not '1' is because
-	// of a ?race condition? in the mess crvision driver, where after
-	// any sample is played at all, no matter what, the cycles_to_ready
-	// ends up never being not ready, unless this value is greater than
-	// 1. Once the full clock divider stuff is written, this should no
-	// longer be an issue.
-
-	m_cycles_to_ready = 2;
+	// 'sample', i.e. it equals the clock divider exactly
+	m_cycles_to_ready = 1;
 
 	if (data & 0x80)
 	{

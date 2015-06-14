@@ -282,6 +282,8 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 	, m_irq_state(0)
 	, m_test_state(1)
 	, m_pc(0)
+	, m_lock(false)
+	, m_lock_handler(*this)
 {
 	static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
@@ -391,6 +393,8 @@ void i8086_common_cpu_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).callimport().callexport().formatstr("%16s").noshow();
 
 	m_icountptr = &m_icount;
+
+	m_lock_handler.resolve_safe();
 }
 
 
@@ -438,6 +442,7 @@ void i8086_common_cpu_device::device_reset()
 	m_dst = 0;
 	m_src = 0;
 	m_halt = false;
+	m_lock = false;
 }
 
 
@@ -1910,7 +1915,9 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			break;
 
 		case 0xe4: // i_inal
+			if (m_lock)	m_lock_handler(1);
 			m_regs.b[AL] = read_port_byte( fetch() );
+			if (m_lock)	{ m_lock_handler(0); m_lock = false; }
 			CLK(IN_IMM8);
 			break;
 
@@ -2011,6 +2018,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 
 		case 0xf0: // i_lock
 			logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
+			m_lock = true;
 			m_no_interrupt = 1;
 			CLK(NOP);
 			break;

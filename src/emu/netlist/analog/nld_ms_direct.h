@@ -12,6 +12,8 @@
 
 #include "nld_solver.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 template <unsigned m_N, unsigned _storage_N>
 class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
@@ -22,7 +24,7 @@ public:
 
 	virtual ~netlist_matrix_solver_direct_t();
 
-	virtual void vsetup(netlist_analog_net_t::list_t &nets);
+	virtual void vsetup(analog_net_t::list_t &nets);
 	virtual void reset() { netlist_matrix_solver_t::reset(); }
 
 	ATTR_HOT inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
@@ -30,17 +32,17 @@ public:
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
-	virtual void add_term(int net_idx, netlist_terminal_t *term);
+	virtual void add_term(int net_idx, terminal_t *term);
 
 	ATTR_HOT virtual nl_double vsolve();
 
 	ATTR_HOT int solve_non_dynamic(const bool newton_raphson);
 	ATTR_HOT void build_LE_A();
-	ATTR_HOT void build_LE_RHS();
+	ATTR_HOT void build_LE_RHS(nl_double * RESTRICT rhs);
 	ATTR_HOT void LE_solve();
 	ATTR_HOT void LE_back_subst(nl_double * RESTRICT x);
 	ATTR_HOT nl_double delta(const nl_double * RESTRICT V);
-	ATTR_HOT void store(const nl_double * RESTRICT V, const bool store_RHS);
+	ATTR_HOT void store(const nl_double * RESTRICT V);
 
 	/* bring the whole system to the current time
 	 * Don't schedule a new calculation time. The recalculation has to be
@@ -88,9 +90,9 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 		 * FIXME: We should extend the logic to use either all nets or
 		 *        only output nets.
 		 */
-		for (unsigned k = 0; k < N(); k++)
+		for (unsigned k = 0, iN=N(); k < iN; k++)
 		{
-			netlist_analog_net_t *n = m_nets[k];
+			analog_net_t *n = m_nets[k];
 
 			const nl_double DD_n = (n->m_cur_Analog - m_last_V[k]);
 			const nl_double hn = current_timestep();
@@ -117,7 +119,7 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, netlist_terminal_t *term)
+ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -142,7 +144,7 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::add_term(int k, 
 
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_analog_net_t::list_t &nets)
+ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	if (m_dim < nets.size())
 		netlist().error("Dimension %d less than %" SIZETFMT, m_dim, nets.size());
@@ -209,7 +211,61 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 
 #endif
 
-	//ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	/* create a list of non zero elements right of the diagonal
+	 * These list anticipate the population of array elements by
+	 * Gaussian elimination.
+	 */
+	for (unsigned k = 0; k < N(); k++)
+	{
+		terms_t * t = m_terms[k];
+		/* pretty brutal */
+		int *other = t->net_other();
+
+		t->m_nz.clear();
+
+		if (k==0)
+			t->m_nzrd.clear();
+		else
+		{
+			t->m_nzrd = m_terms[k-1]->m_nzrd;
+			int j=0;
+			while(j < t->m_nzrd.size())
+			{
+				if (t->m_nzrd[j] < k + 1)
+					t->m_nzrd.remove_at(j);
+				else
+					j++;
+			}
+		}
+
+		for (unsigned j = 0; j < N(); j++)
+		{
+			for (unsigned i = 0; i < t->m_railstart; i++)
+			{
+				if (!t->m_nzrd.contains(other[i]) && other[i] >= k + 1)
+					t->m_nzrd.add(other[i]);
+				if (!t->m_nz.contains(other[i]))
+					t->m_nz.add(other[i]);
+			}
+		}
+		psort_list(t->m_nzrd);
+
+		t->m_nz.add(k);		// add diagonal
+		psort_list(t->m_nz);
+	}
+
+	if(0)
+		for (unsigned k = 0; k < N(); k++)
+		{
+			printf("%3d: ", k);
+			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
+				printf(" %3d", m_terms[k]->m_nzrd[j]);
+			printf("\n");
+		}
+
+	/*
+	 * save states
+	 */
 	save(NLNAME(m_RHS));
 	save(NLNAME(m_last_RHS));
 	save(NLNAME(m_last_V));
@@ -229,9 +285,10 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 {
-	for (unsigned k = 0; k < N(); k++)
+	const unsigned iN = N();
+	for (unsigned k = 0; k < iN; k++)
 	{
-		for (unsigned i=0; i < N(); i++)
+		for (unsigned i=0; i < iN; i++)
 			m_A[k][i] = 0.0;
 
 		nl_double akk  = 0.0;
@@ -247,14 +304,15 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_A()
 		m_A[k][k] += akk;
 
 		for (unsigned i = 0; i < railstart; i++)
-			m_A[k][net_other[i]] += -go[i];
+			m_A[k][net_other[i]] -= go[i];
 	}
 }
 
 template <unsigned m_N, unsigned _storage_N>
-ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
+ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS(nl_double * RESTRICT rhs)
 {
-	for (unsigned k = 0; k < N(); k++)
+	const unsigned iN = N();
+	for (unsigned k = 0; k < iN; k++)
 	{
 		nl_double rhsk_a = 0.0;
 		nl_double rhsk_b = 0.0;
@@ -271,7 +329,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE_RHS()
 			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
 			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
 
-		m_RHS[k] = rhsk_a + rhsk_b;
+		rhs[k] = rhsk_a + rhsk_b;
 	}
 }
 
@@ -314,16 +372,38 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 
 		/* FIXME: Singular matrix? */
 		const nl_double f = 1.0 / m_A[i][i];
+		const double * RESTRICT s = &m_A[i][0];
+		const int *p = m_terms[i]->m_nzrd.data();
+		const unsigned e = m_terms[i]->m_nzrd.size();
 
 		/* Eliminate column i from row j */
 
 		for (unsigned j = i + 1; j < kN; j++)
 		{
-			const nl_double f1 = - m_A[j][i] * f;
+			double * RESTRICT d = &m_A[j][0];
+			const nl_double f1 = - d[i] * f;
 			if (f1 != NL_FCONST(0.0))
 			{
-				for (unsigned k = i + 1; k < kN; k++)
-					m_A[j][k] += m_A[i][k] * f1;
+#if 0
+				/*  The code below is 30% faster than the original
+				 *  implementation which is given here for reference.
+				 *
+				 *	for (unsigned k = i + 1; k < kN; k++)
+				 *		m_A[j][k] = m_A[j][k] + m_A[i][k] * f1;
+				 */
+				double * RESTRICT d = &m_A[j][i+1];
+				const double * RESTRICT s = &m_A[i][i+1];
+				const int e = kN - i - 1;
+
+				for (int k = 0; k < e; k++)
+					d[k] = d[k] + s[k] * f1;
+#else
+				for (unsigned k = 0; k < e; k++)
+				{
+					const unsigned pk = p[k];
+					d[pk] += s[pk] * f1;
+				}
+#endif
 				m_RHS[j] += m_RHS[i] * f1;
 			}
 		}
@@ -341,9 +421,28 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 	{
 		nl_double tmp = 0;
 
+#if 1
+#if 0
+		const double * RESTRICT A = &m_A[j][j+1];
+		const double * RESTRICT xp = &x[j+1];
+		const int e = kN - j - 1;
+		for (int k = 0; k < e; k++)
+			tmp += A[k] * xp[k];
+#else
+		const double * RESTRICT A = &m_A[j][0];
+		const int *p = m_terms[j]->m_nzrd.data();
+		const unsigned e = m_terms[j]->m_nzrd.size();
+
+		for (unsigned k = 0; k < e; k++)
+		{
+			const unsigned pk = p[k];
+			tmp += A[pk] * x[pk];
+		}
+#endif
+#else
 		for (unsigned k = j + 1; k < kN; k++)
 			tmp += m_A[j][k] * x[k];
-
+#endif
 		x[j] = (m_RHS[j] - tmp) / m_A[j][j];
 	}
 #if 0
@@ -363,40 +462,32 @@ template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 		const nl_double * RESTRICT V)
 {
+	/* FIXME: Ideally we should also include currents (RHS) here. This would
+	 * need a revaluation of the right hand side after voltages have been updated
+	 * and thus belong into a different calculation. This applies to all solvers.
+	 */
+
+	const unsigned iN = this->N();
 	nl_double cerr = 0;
-	nl_double cerr2 = 0;
-	for (unsigned i = 0; i < this->N(); i++)
-	{
-		const nl_double e = nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog);
-		const nl_double e2 = nl_math::abs(m_RHS[i] - this->m_last_RHS[i]);
-		cerr = (e > cerr ? e : cerr);
-		cerr2 = (e2 > cerr2 ? e2 : cerr2);
-	}
-	// FIXME: Review
-	return cerr + cerr2*NL_FCONST(100000.0);
+	for (unsigned i = 0; i < iN; i++)
+		cerr = std::max(cerr, nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog));
+	return cerr;
 }
 
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
-		const nl_double * RESTRICT V, const bool store_RHS)
+		const nl_double * RESTRICT V)
 {
-	for (unsigned i = 0; i < this->N(); i++)
+	for (unsigned i = 0, iN=N(); i < iN; i++)
 	{
 		this->m_nets[i]->m_cur_Analog = V[i];
-	}
-	if (store_RHS)
-	{
-		for (unsigned i = 0; i < this->N(); i++)
-		{
-			this->m_last_RHS[i] = m_RHS[i];
-		}
 	}
 }
 
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 {
-	solve_base<netlist_matrix_solver_direct_t>(this);
+	this->solve_base(this);
 	return this->compute_next_timestep();
 }
 
@@ -408,17 +499,17 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 
 	this->LE_back_subst(new_v);
 
-	if (this->is_dynamic())
+	if (newton_raphson)
 	{
 		nl_double err = delta(new_v);
 
-		store(new_v, true);
+		store(new_v);
 
 		return (err > this->m_params.m_accuracy) ? 2 : 1;
 	}
 	else
 	{
-		store(new_v, false);  // ==> No need to store RHS
+		store(new_v);
 		return 1;
 	}
 }
@@ -427,7 +518,11 @@ template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
-	this->build_LE_RHS();
+	this->build_LE_RHS(m_last_RHS);
+
+	for (unsigned i=0, iN=N(); i < iN; i++)
+		m_RHS[i] = m_last_RHS[i];
+
 	this->LE_solve();
 
 	return this->solve_non_dynamic(newton_raphson);
@@ -467,5 +562,6 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	}
 }
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_MS_DIRECT_H_ */

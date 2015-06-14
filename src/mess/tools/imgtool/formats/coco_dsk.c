@@ -14,7 +14,7 @@
 
 #include "formats/coco_dsk.h"
 #include "formats/basicdsk.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "coretmpl.h"
 
 /* -----------------------------------------------------------------------

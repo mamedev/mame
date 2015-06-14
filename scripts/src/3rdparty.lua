@@ -34,6 +34,7 @@ end
 -- zlib library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-zlib"] then
 project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
 	kind "StaticLib"
@@ -71,6 +72,11 @@ project "zlib"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"z",
+}
+end
 
 --------------------------------------------------
 -- SoftFloat library objects
@@ -112,6 +118,7 @@ project "softfloat"
 -- libJPEG library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-jpeg"] then
 project "jpeg"
 	uuid "447c6800-dcfd-4c48-b72a-a8223bb409ca"
 	kind "StaticLib"
@@ -169,11 +176,17 @@ project "jpeg"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"jpeg",
+}
+end
 
 --------------------------------------------------
 -- libflac library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-flac"] then
 project "flac"
 	uuid "b6fc19e8-073a-4541-bb7b-d24b548d424a"
 	kind "StaticLib"
@@ -223,6 +236,11 @@ project "flac"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"FLAC",
+}
+end
 
 --------------------------------------------------
 -- lib7z library objects
@@ -268,6 +286,7 @@ project "7z"
 -- LUA library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-lua"] then
 project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
 	kind "StaticLib"
@@ -342,6 +361,11 @@ project "lua"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"lua",
+}
+end
 
 --------------------------------------------------
 -- sqlite3 lua library objects
@@ -362,8 +386,12 @@ project "lsqlite3"
 
 	includedirs {
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/lua/src",
 	}
+	if _OPTIONS["with-bundled-lua"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/lua/src",
+		}
+	end
 
 	files {
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
@@ -435,6 +463,7 @@ project "jsoncpp"
 -- SQLite3 library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-sqlite3"] then
 project "sqllite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
@@ -455,11 +484,17 @@ project "sqllite3"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"sqlite3",
+}
+end
 
 --------------------------------------------------
 -- portmidi library objects
 --------------------------------------------------
 if _OPTIONS["NO_USE_MIDI"]~="1" then
+if _OPTIONS["with-bundled-portmidi"] then
 project "portmidi"
 	uuid "587f2da6-3274-4a65-86a2-f13ea315bb98"
 	kind "StaticLib"
@@ -514,6 +549,11 @@ project "portmidi"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"portmidi",
+}
+end
 end	
 --------------------------------------------------
 -- BGFX library objects
