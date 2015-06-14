@@ -6,14 +6,63 @@
 
     13/06/2015
 
-    http://...
+ The info found on the link below is for a later revision of the board I have
+ but I hope it is compatible, My board is has proms from 1983 and no rev markings 
+ so probably the original.
+
+ http://bitsavers.trailing-edge.com/pdf/forceComputers/1988_Force_VMEbus_Products.pdf
+
+ Some info from that document:
+
+Address Range
+----------------------------------------------------------
+000 000 - 000 007 Initialisation vectors from system EPROM
+000 008 - 01F FFF Dynamic RAM on CPU-1 B
+000 008 - 07F FFF Dynamic RAM on CPU-1 D
+080 008 - 09F FFF SYSTEM EPROM Area
+OAO 000 - OBF FFF USER EPROMArea
+OEO 000 - OFF FFF I/O Interfaces
+100 000 - FEF FFF VMEbus addresses (A24)
+FFO 000 - FFF FFF VMEbus Short I/O (A16)
+----------------------------------------------------------
+
+Description                  Device  Lvl  IRQ Vector No.
+----------------------------------------------------------
+ ABORT                        Switch  7    31
+ Real Time Clock              58167A  6    30
+ Parallel Interface and Timer 68230   5    29
+ Terminal ACIA                6850    4    28
+ Remote ACIA                  6850    3    27
+ Host ACIA                    6850    2    26
+----------------------------------------------------------
+
+10. The VMEbus
+---------------
+The implemented VMEbus Interface includes 24 address, 16 data, 
+6 address modifier and the asynchronous control signals.
+A single level bus arbiter is provided to build multi master 
+systems. In addition to the bus arbiter, a separate slave bus 
+arbitration allows selection of the arbitration level (0-3).
+
+The address modifier range .,Short 110 Access« can be selected 
+via a jumper for variable system generation. The 7 interrupt 
+request levels of the VMEbus are fully supported from the 
+SYS68K1CPU-1 B/D. For multi-processing, each IRQ signal can be 
+enabled/disabled via a jumper field.
+
+Additionally, the SYS68K1CPU-1 B/D supports the ACFAIL, SYSRESET, 
+SYSFAIL and SYSCLK signal (16 MHz).
+
 
 Based on the 68ksbc.c
 
     TODO:
     - Memory map
     - Dump ROM:s
-    - Add 3 ACIA6850 
+    - Add 3 x ACIA6850 
+    - Add 1 x 68230 Motorola, Parallel Interface / Timer
+    - Add 1 x MM58167A RTC
+    - Add 1 x Abort Switch  
     - Add serial connector between ACIA:s and real terminal emulator
     - VME bus driver
 
