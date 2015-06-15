@@ -60,6 +60,12 @@ enum
 	MELPS4_PORTU
 };
 
+enum
+{
+	MELPS4_INPUT_LINE_INT = 0,
+	MELPS4_INPUT_LINE_T
+};
+
 
 
 // pinout reference
@@ -142,8 +148,9 @@ protected:
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 6 - 1) / 6; } // 6 t-states per machine cycle
 	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 6); } // "
 	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 1+1; } // max opcode cycles + interrupt duration
 	virtual UINT32 execute_input_lines() const { return 3; } // up to 3 (some internal)
+	virtual void execute_set_input(int line, int state);
 	virtual void execute_run();
 	virtual void execute_one();
 
@@ -189,14 +196,18 @@ protected:
 	UINT8 m_port_s;         // "
 	UINT8 m_port_f;         // "
 
-	bool m_sm, m_sms;       // subroutine mode flag + stack
+	bool m_sm, m_sms;       // subroutine mode flag + irq stack
 	bool m_ba_flag;         // temp flag indicates BA opcode was executed
 	UINT8 m_sp_param;       // temp register holding SP opcode parameter
 	UINT8 m_cps;            // DP,CY or DP',CY' selected
 	bool m_skip;            // skip next opcode
 	UINT8 m_inte;           // interrupt enable flag
-	UINT8 m_intp;           // external interrupt polarity ('40 to '44)
+	int m_intp;             // external interrupt polarity ('40 to '44)
+	bool m_irqflag[3];      // irq flags: exf, 1f, 2f (external, timer 1, timer 2)
+	bool m_tmr_irq_enabled[2];
+	int m_int_state;        // INT pin state
 	bool m_prohibit_irq;    // interrupt is prohibited during certain opcodes
+	bool m_possible_irq;    // indicate that irq needs to be rechecked
 
 	// work registers (unless specified, each is 4-bit)
 	UINT8 m_a;              // accumulator
@@ -225,6 +236,11 @@ protected:
 	devcb_write8 m_write_g;
 	devcb_write8 m_write_u;
 	devcb_write_line m_write_t;
+	
+	virtual void write_v(UINT8 data) { m_v = data; }
+	virtual void write_w(UINT8 data) { m_w = data; }
+	virtual void do_interrupt(int which);
+	virtual void check_interrupt();
 
 	UINT8 read_gen_port(int port);
 	void write_gen_port(int port, UINT8 data);
