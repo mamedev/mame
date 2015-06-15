@@ -59,36 +59,19 @@ ifeq ($(platform),)
 	endif
 endif
 
-# FIXME: TARGETOS isn't used here.  Either we need to use it here or fix
-#        the GENie lua scripts to use it where needed.  The latter is the
-#        cleaner solution, but it's not done universally yet.
-ifeq ($(platform), unix)
-	TARGETOS=linux
-else ifeq ($(platform), android)
-	TARGETOS=linux
+ifeq ($(platform), android)
 	PTR64 = 0
 	# FIXME: Need to figure out how to do this for GENie
 #	FORCE_DRC_C_BACKEND = 1
 #	CROSS_BUILD = 1
 else ifeq ($(platform), osx)
-	TARGETOS = macosx
 	PYTHON_EXECUTABLE ?= @python
 else ifeq ($(platform), ios)
-	TARGETOS = macosx
 	PTR64 = 0
 	PYTHON_EXECUTABLE ?= @python
 	# FIXME: Need to figure out how to do this for GENie
 #	CROSS_BUILD = 1
 #	FORCE_DRC_C_BACKEND = 1
-else ifeq ($(platform), qnx)
-	TARGETOS=linux
-else ifneq (,$(findstring armv,$(platform)))
-	TARGETOS=linux
-else ifeq ($(platform), wincross)
-	TARGETOS = win32
-else
-	# there shouldn't BE an else, but we assume it's win32
-	TARGETOS = win32
 endif
 
 # FIXME: Right now this will break anywhere we'd normally set CROSS_BUILD.
@@ -119,8 +102,11 @@ endif # PTR64
 endif # CROSS_BUILD
 
 BUILDFLAGS = REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR)
-PLATFLAGS = PTR64=$(PTR64) ARCH="" platform="$(PLATFORM)"
+PLATFLAGS = PTR64=$(PTR64)
 TARGETFLAGS = OSD=$(OSD)
+ifneq ($(platform),)
+	PLATFLAGS += platform="$(platform)"
+endif
 ifneq ($(ARCH),)
 	PLATFLAGS += ARCH="" LIBRETRO_ARCH="$(ARCH)"
 endif
@@ -134,6 +120,7 @@ endif
 all: build
 
 build:
+	echo platform=$(platform)
 	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS)
 
 clean:

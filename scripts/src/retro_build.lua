@@ -1,0 +1,6 @@
+buildoptions {
+	"-fPIC",
+}
+linkoptions {
+	"-fPIC",
+}

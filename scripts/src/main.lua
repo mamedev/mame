@@ -227,29 +227,50 @@ function mainProject(_target, _subtarget)
 			"libco",
 		}
 
-		-- FIXME: set the targetos based on _OPTIONS["platform"]
+		if _OPTIONS["platform"]~=nil then
+			retro_platform=_OPTIONS["platform"]
+		end
+		if _OPTIONS["LIBRETRO_ARCH"]~=nil then
+			retro_arch=_OPTIONS["ARCH"]
+		end
+
+		if retro_platform~=nil then
+			if retro_platform=="unix" then
+				_OPTIONS["TARGETOS"] = "linux"
+			elseif retro_platform=="android" then
+				_OPTIONS["TARGETOS"] = "linux"
+			elseif retro_platform=="qnx" then
+				_OPTIONS["TARGETOS"] = "linux"
+			elseif retro_platform:sub(1, 4)=="armv" then
+				_OPTIONS["TARGETOS"] = "linux"
+			elseif retro_platform=="osx" then
+				_OPTIONS["TARGETOS"] = "macosx"
+			elseif retro_platform=="ios" then
+				_OPTIONS["TARGETOS"] = "macosx"
+				targetsuffix "_libretro"
+			elseif retro_platform:sub(1, 3)=="win" then
+				_OPTIONS["TARGETOS"] = "win32"
+			end
+		end
+		-- FIXME: set BIGENDIAN and dynarec based on retro_platform/retro_arch
+
+
+		dofile(path.join("src", "retro_build.lua"))
 
 		-- "macosx" for libretro platforms "osx" and "ios"
 		if _OPTIONS["targetos"]=="macosx" then
-			buildoptions {
-				"-fPIC",
-			}
 			linkoptions {
-				"-fPIC",
 				"-Wl,-u,_retro_run",
 			}
 		end
 
 		-- "linux" for pretty much any Linux/BSD/Android…
 		if _OPTIONS["targetos"]=="linux" then
-			buildoptions {
-				"-fPIC",
-			}
 			linkoptions {
-				"-fPIC",
 				"-Wl,--version-script=" .. MAME_DIR .. "src/osd/retro/link.T",
 			}
 		end
 
 	end
 end
+
