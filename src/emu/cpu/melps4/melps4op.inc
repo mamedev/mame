@@ -419,25 +419,27 @@ void melps4_cpu_device::op_tab2()
 void melps4_cpu_device::op_tva()
 {
 	// TVA: transfer A to timer control V
-	m_v = m_a;
+	write_v(m_a);
 }
 
 void melps4_cpu_device::op_twa()
 {
 	// TWA: transfer A to timer control W
-	m_w = m_a;
+	write_w(m_a);
 }
 
 void melps4_cpu_device::op_snz1()
 {
 	// SNZ1: skip next on flag 1F
-	op_illegal();
+	m_skip = m_irqflag[1];
+	m_irqflag[1] = false;
 }
 
 void melps4_cpu_device::op_snz2()
 {
 	// SNZ2: skip next on flag 2F
-	op_illegal();
+	m_skip = m_irqflag[2];
+	m_irqflag[2] = false;
 }
 
 
@@ -631,6 +633,7 @@ void melps4_cpu_device::op_ei()
 {
 	// EI: enable interrupt flag
 	m_prohibit_irq = true;
+	m_possible_irq = true;
 	m_inte = 1;
 }
 

@@ -10,7 +10,7 @@
 */
 
 #include "m58846.h"
-#include "debugger.h"
+//#include "debugger.h"
 
 
 
@@ -50,6 +50,9 @@ offs_t m58846_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 void m58846_device::device_start()
 {
 	melps4_cpu_device::device_start();
+	
+	m_timer[0] = timer_alloc(0);
+	m_timer[1] = timer_alloc(1);
 }
 
 
@@ -61,6 +64,52 @@ void m58846_device::device_start()
 void m58846_device::device_reset()
 {
 	melps4_cpu_device::device_reset();
+	
+	// timer 1 runs continuously
+	reset_timer1();
+}
+
+
+
+//-------------------------------------------------
+//  timers
+//-------------------------------------------------
+
+void m58846_device::reset_timer1()
+{
+	// reset 7-bit prescaler
+	attotime base = attotime::from_ticks(6 * 128, unscaled_clock());
+	m_timer[0]->adjust(base);
+}
+
+void m58846_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		// timer 1
+		case 0:
+			m_irqflag[1] = true;
+			m_possible_irq = true;
+			reset_timer1();
+			break;
+
+		// timer 2
+		case 1:
+			break;
+
+		default:
+			assert_always(FALSE, "Unknown id in m58846_device::device_timer");
+			break;
+	}
+}
+
+void m58846_device::write_v(UINT8 data)
+{
+	// d0: enable timer 1 irq
+	m_tmr_irq_enabled[0] = (data & 1) ? true : false;
+	m_possible_irq = true;
+	
+	m_v = data;
 }
 
 

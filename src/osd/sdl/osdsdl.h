@@ -48,7 +48,6 @@
 #define SDLOPTION_SYNCREFRESH           "syncrefresh"
 #define SDLOPTION_KEYMAP                "keymap"
 #define SDLOPTION_KEYMAP_FILE           "keymap_file"
-#define SDLOPTION_UIMODEKEY             "uimodekey"
 
 #define SDLOPTION_SIXAXIS               "sixaxis"
 #define SDLOPTION_JOYINDEX              "joy_idx"
@@ -118,7 +117,6 @@ public:
 	// keyboard mapping
 	bool keymap() const { return bool_value(SDLOPTION_KEYMAP); }
 	const char *keymap_file() const { return value(SDLOPTION_KEYMAP_FILE); }
-	const char *ui_mode_key() const { return value(SDLOPTION_UIMODEKEY); }
 
 	// joystick mapping
 	const char *joy_index(int index) const { std::string temp; return value(strformat(temp, "%s%d", SDLOPTION_JOYINDEX, index).c_str()); }

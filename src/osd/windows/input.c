@@ -52,11 +52,6 @@ enum
 
 #define MAX_KEYS            256
 
-#define MAME_KEY            0
-#define DI_KEY              1
-#define VIRTUAL_KEY         2
-#define ASCII_KEY           3
-
 
 
 //============================================================
@@ -270,118 +265,126 @@ static const TCHAR *default_pov_name(int which);
 //============================================================
 
 // master keyboard translation table
-static const int win_key_trans_table[][4] =
+struct key_trans_entry {
+	input_item_id   mame_key;
+	INT32           di_key;
+	char            virtual_key;
+	char            ascii_key;
+	char const  *   mame_key_name;
+};
+#define KEY_TRANS_ENTRY(mame, di, virtual, ascii) { ITEM_ID_##mame, DIK_##di, virtual, ascii, "ITEM_ID_"#mame }
+static const key_trans_entry win_key_trans_table[] =
 {
-	// MAME key             dinput key          virtual key     ascii
-	{ ITEM_ID_ESC,          DIK_ESCAPE,         VK_ESCAPE,      27 },
-	{ ITEM_ID_1,            DIK_1,              '1',            '1' },
-	{ ITEM_ID_2,            DIK_2,              '2',            '2' },
-	{ ITEM_ID_3,            DIK_3,              '3',            '3' },
-	{ ITEM_ID_4,            DIK_4,              '4',            '4' },
-	{ ITEM_ID_5,            DIK_5,              '5',            '5' },
-	{ ITEM_ID_6,            DIK_6,              '6',            '6' },
-	{ ITEM_ID_7,            DIK_7,              '7',            '7' },
-	{ ITEM_ID_8,            DIK_8,              '8',            '8' },
-	{ ITEM_ID_9,            DIK_9,              '9',            '9' },
-	{ ITEM_ID_0,            DIK_0,              '0',            '0' },
-	{ ITEM_ID_MINUS,        DIK_MINUS,          VK_OEM_MINUS,   '-' },
-	{ ITEM_ID_EQUALS,       DIK_EQUALS,         VK_OEM_PLUS,    '=' },
-	{ ITEM_ID_BACKSPACE,    DIK_BACK,           VK_BACK,        8 },
-	{ ITEM_ID_TAB,          DIK_TAB,            VK_TAB,         9 },
-	{ ITEM_ID_Q,            DIK_Q,              'Q',            'Q' },
-	{ ITEM_ID_W,            DIK_W,              'W',            'W' },
-	{ ITEM_ID_E,            DIK_E,              'E',            'E' },
-	{ ITEM_ID_R,            DIK_R,              'R',            'R' },
-	{ ITEM_ID_T,            DIK_T,              'T',            'T' },
-	{ ITEM_ID_Y,            DIK_Y,              'Y',            'Y' },
-	{ ITEM_ID_U,            DIK_U,              'U',            'U' },
-	{ ITEM_ID_I,            DIK_I,              'I',            'I' },
-	{ ITEM_ID_O,            DIK_O,              'O',            'O' },
-	{ ITEM_ID_P,            DIK_P,              'P',            'P' },
-	{ ITEM_ID_OPENBRACE,    DIK_LBRACKET,       VK_OEM_4,       '[' },
-	{ ITEM_ID_CLOSEBRACE,   DIK_RBRACKET,       VK_OEM_6,       ']' },
-	{ ITEM_ID_ENTER,        DIK_RETURN,         VK_RETURN,      13 },
-	{ ITEM_ID_LCONTROL,     DIK_LCONTROL,       VK_LCONTROL,    0 },
-	{ ITEM_ID_A,            DIK_A,              'A',            'A' },
-	{ ITEM_ID_S,            DIK_S,              'S',            'S' },
-	{ ITEM_ID_D,            DIK_D,              'D',            'D' },
-	{ ITEM_ID_F,            DIK_F,              'F',            'F' },
-	{ ITEM_ID_G,            DIK_G,              'G',            'G' },
-	{ ITEM_ID_H,            DIK_H,              'H',            'H' },
-	{ ITEM_ID_J,            DIK_J,              'J',            'J' },
-	{ ITEM_ID_K,            DIK_K,              'K',            'K' },
-	{ ITEM_ID_L,            DIK_L,              'L',            'L' },
-	{ ITEM_ID_COLON,        DIK_SEMICOLON,      VK_OEM_1,       ';' },
-	{ ITEM_ID_QUOTE,        DIK_APOSTROPHE,     VK_OEM_7,       '\'' },
-	{ ITEM_ID_TILDE,        DIK_GRAVE,          VK_OEM_3,       '`' },
-	{ ITEM_ID_LSHIFT,       DIK_LSHIFT,         VK_LSHIFT,      0 },
-	{ ITEM_ID_BACKSLASH,    DIK_BACKSLASH,      VK_OEM_5,       '\\' },
-	{ ITEM_ID_BACKSLASH2,   DIK_OEM_102,        VK_OEM_102,     '<' },
-	{ ITEM_ID_Z,            DIK_Z,              'Z',            'Z' },
-	{ ITEM_ID_X,            DIK_X,              'X',            'X' },
-	{ ITEM_ID_C,            DIK_C,              'C',            'C' },
-	{ ITEM_ID_V,            DIK_V,              'V',            'V' },
-	{ ITEM_ID_B,            DIK_B,              'B',            'B' },
-	{ ITEM_ID_N,            DIK_N,              'N',            'N' },
-	{ ITEM_ID_M,            DIK_M,              'M',            'M' },
-	{ ITEM_ID_COMMA,        DIK_COMMA,          VK_OEM_COMMA,   ',' },
-	{ ITEM_ID_STOP,         DIK_PERIOD,         VK_OEM_PERIOD,  '.' },
-	{ ITEM_ID_SLASH,        DIK_SLASH,          VK_OEM_2,       '/' },
-	{ ITEM_ID_RSHIFT,       DIK_RSHIFT,         VK_RSHIFT,      0 },
-	{ ITEM_ID_ASTERISK,     DIK_MULTIPLY,       VK_MULTIPLY,    '*' },
-	{ ITEM_ID_LALT,         DIK_LMENU,          VK_LMENU,       0 },
-	{ ITEM_ID_SPACE,        DIK_SPACE,          VK_SPACE,       ' ' },
-	{ ITEM_ID_CAPSLOCK,     DIK_CAPITAL,        VK_CAPITAL,     0 },
-	{ ITEM_ID_F1,           DIK_F1,             VK_F1,          0 },
-	{ ITEM_ID_F2,           DIK_F2,             VK_F2,          0 },
-	{ ITEM_ID_F3,           DIK_F3,             VK_F3,          0 },
-	{ ITEM_ID_F4,           DIK_F4,             VK_F4,          0 },
-	{ ITEM_ID_F5,           DIK_F5,             VK_F5,          0 },
-	{ ITEM_ID_F6,           DIK_F6,             VK_F6,          0 },
-	{ ITEM_ID_F7,           DIK_F7,             VK_F7,          0 },
-	{ ITEM_ID_F8,           DIK_F8,             VK_F8,          0 },
-	{ ITEM_ID_F9,           DIK_F9,             VK_F9,          0 },
-	{ ITEM_ID_F10,          DIK_F10,            VK_F10,         0 },
-	{ ITEM_ID_NUMLOCK,      DIK_NUMLOCK,        VK_NUMLOCK,     0 },
-	{ ITEM_ID_SCRLOCK,      DIK_SCROLL,         VK_SCROLL,      0 },
-	{ ITEM_ID_7_PAD,        DIK_NUMPAD7,        VK_NUMPAD7,     0 },
-	{ ITEM_ID_8_PAD,        DIK_NUMPAD8,        VK_NUMPAD8,     0 },
-	{ ITEM_ID_9_PAD,        DIK_NUMPAD9,        VK_NUMPAD9,     0 },
-	{ ITEM_ID_MINUS_PAD,    DIK_SUBTRACT,       VK_SUBTRACT,    0 },
-	{ ITEM_ID_4_PAD,        DIK_NUMPAD4,        VK_NUMPAD4,     0 },
-	{ ITEM_ID_5_PAD,        DIK_NUMPAD5,        VK_NUMPAD5,     0 },
-	{ ITEM_ID_6_PAD,        DIK_NUMPAD6,        VK_NUMPAD6,     0 },
-	{ ITEM_ID_PLUS_PAD,     DIK_ADD,            VK_ADD,         0 },
-	{ ITEM_ID_1_PAD,        DIK_NUMPAD1,        VK_NUMPAD1,     0 },
-	{ ITEM_ID_2_PAD,        DIK_NUMPAD2,        VK_NUMPAD2,     0 },
-	{ ITEM_ID_3_PAD,        DIK_NUMPAD3,        VK_NUMPAD3,     0 },
-	{ ITEM_ID_0_PAD,        DIK_NUMPAD0,        VK_NUMPAD0,     0 },
-	{ ITEM_ID_DEL_PAD,      DIK_DECIMAL,        VK_DECIMAL,     0 },
-	{ ITEM_ID_F11,          DIK_F11,            VK_F11,         0 },
-	{ ITEM_ID_F12,          DIK_F12,            VK_F12,         0 },
-	{ ITEM_ID_F13,          DIK_F13,            VK_F13,         0 },
-	{ ITEM_ID_F14,          DIK_F14,            VK_F14,         0 },
-	{ ITEM_ID_F15,          DIK_F15,            VK_F15,         0 },
-	{ ITEM_ID_ENTER_PAD,    DIK_NUMPADENTER,    VK_RETURN,      0 },
-	{ ITEM_ID_RCONTROL,     DIK_RCONTROL,       VK_RCONTROL,    0 },
-	{ ITEM_ID_SLASH_PAD,    DIK_DIVIDE,         VK_DIVIDE,      0 },
-	{ ITEM_ID_PRTSCR,       DIK_SYSRQ,          0,              0 },
-	{ ITEM_ID_RALT,         DIK_RMENU,          VK_RMENU,       0 },
-	{ ITEM_ID_HOME,         DIK_HOME,           VK_HOME,        0 },
-	{ ITEM_ID_UP,           DIK_UP,             VK_UP,          0 },
-	{ ITEM_ID_PGUP,         DIK_PRIOR,          VK_PRIOR,       0 },
-	{ ITEM_ID_LEFT,         DIK_LEFT,           VK_LEFT,        0 },
-	{ ITEM_ID_RIGHT,        DIK_RIGHT,          VK_RIGHT,       0 },
-	{ ITEM_ID_END,          DIK_END,            VK_END,         0 },
-	{ ITEM_ID_DOWN,         DIK_DOWN,           VK_DOWN,        0 },
-	{ ITEM_ID_PGDN,         DIK_NEXT,           VK_NEXT,        0 },
-	{ ITEM_ID_INSERT,       DIK_INSERT,         VK_INSERT,      0 },
-	{ ITEM_ID_DEL,          DIK_DELETE,         VK_DELETE,      0 },
-	{ ITEM_ID_LWIN,         DIK_LWIN,           VK_LWIN,        0 },
-	{ ITEM_ID_RWIN,         DIK_RWIN,           VK_RWIN,        0 },
-	{ ITEM_ID_MENU,         DIK_APPS,           VK_APPS,        0 },
-	{ ITEM_ID_PAUSE,        DIK_PAUSE,          VK_PAUSE,       0 },
-	{ ITEM_ID_CANCEL,       0,                  VK_CANCEL,      0 },
+	//              MAME key      dinput key      virtual key     ascii
+	KEY_TRANS_ENTRY(ESC,          ESCAPE,         VK_ESCAPE,      27),
+	KEY_TRANS_ENTRY(1,            1,              '1',            '1'),
+	KEY_TRANS_ENTRY(2,            2,              '2',            '2'),
+	KEY_TRANS_ENTRY(3,            3,              '3',            '3'),
+	KEY_TRANS_ENTRY(4,            4,              '4',            '4'),
+	KEY_TRANS_ENTRY(5,            5,              '5',            '5'),
+	KEY_TRANS_ENTRY(6,            6,              '6',            '6'),
+	KEY_TRANS_ENTRY(7,            7,              '7',            '7'),
+	KEY_TRANS_ENTRY(8,            8,              '8',            '8'),
+	KEY_TRANS_ENTRY(9,            9,              '9',            '9'),
+	KEY_TRANS_ENTRY(0,            0,              '0',            '0'),
+	KEY_TRANS_ENTRY(MINUS,        MINUS,          VK_OEM_MINUS,   '-'),
+	KEY_TRANS_ENTRY(EQUALS,       EQUALS,         VK_OEM_PLUS,    '='),
+	KEY_TRANS_ENTRY(BACKSPACE,    BACK,           VK_BACK,        8),
+	KEY_TRANS_ENTRY(TAB,          TAB,            VK_TAB,         9),
+	KEY_TRANS_ENTRY(Q,            Q,              'Q',            'Q'),
+	KEY_TRANS_ENTRY(W,            W,              'W',            'W'),
+	KEY_TRANS_ENTRY(E,            E,              'E',            'E'),
+	KEY_TRANS_ENTRY(R,            R,              'R',            'R'),
+	KEY_TRANS_ENTRY(T,            T,              'T',            'T'),
+	KEY_TRANS_ENTRY(Y,            Y,              'Y',            'Y'),
+	KEY_TRANS_ENTRY(U,            U,              'U',            'U'),
+	KEY_TRANS_ENTRY(I,            I,              'I',            'I'),
+	KEY_TRANS_ENTRY(O,            O,              'O',            'O'),
+	KEY_TRANS_ENTRY(P,            P,              'P',            'P'),
+	KEY_TRANS_ENTRY(OPENBRACE,    LBRACKET,       VK_OEM_4,       '['),
+	KEY_TRANS_ENTRY(CLOSEBRACE,   RBRACKET,       VK_OEM_6,       ']'),
+	KEY_TRANS_ENTRY(ENTER,        RETURN,         VK_RETURN,      13),
+	KEY_TRANS_ENTRY(LCONTROL,     LCONTROL,       VK_LCONTROL,    0),
+	KEY_TRANS_ENTRY(A,            A,              'A',            'A'),
+	KEY_TRANS_ENTRY(S,            S,              'S',            'S'),
+	KEY_TRANS_ENTRY(D,            D,              'D',            'D'),
+	KEY_TRANS_ENTRY(F,            F,              'F',            'F'),
+	KEY_TRANS_ENTRY(G,            G,              'G',            'G'),
+	KEY_TRANS_ENTRY(H,            H,              'H',            'H'),
+	KEY_TRANS_ENTRY(J,            J,              'J',            'J'),
+	KEY_TRANS_ENTRY(K,            K,              'K',            'K'),
+	KEY_TRANS_ENTRY(L,            L,              'L',            'L'),
+	KEY_TRANS_ENTRY(COLON,        SEMICOLON,      VK_OEM_1,       ';'),
+	KEY_TRANS_ENTRY(QUOTE,        APOSTROPHE,     VK_OEM_7,       '\''),
+	KEY_TRANS_ENTRY(TILDE,        GRAVE,          VK_OEM_3,       '`'),
+	KEY_TRANS_ENTRY(LSHIFT,       LSHIFT,         VK_LSHIFT,      0),
+	KEY_TRANS_ENTRY(BACKSLASH,    BACKSLASH,      VK_OEM_5,       '\\'),
+	KEY_TRANS_ENTRY(BACKSLASH2,   OEM_102,        VK_OEM_102,     '<'),
+	KEY_TRANS_ENTRY(Z,            Z,              'Z',            'Z'),
+	KEY_TRANS_ENTRY(X,            X,              'X',            'X'),
+	KEY_TRANS_ENTRY(C,            C,              'C',            'C'),
+	KEY_TRANS_ENTRY(V,            V,              'V',            'V'),
+	KEY_TRANS_ENTRY(B,            B,              'B',            'B'),
+	KEY_TRANS_ENTRY(N,            N,              'N',            'N'),
+	KEY_TRANS_ENTRY(M,            M,              'M',            'M'),
+	KEY_TRANS_ENTRY(COMMA,        COMMA,          VK_OEM_COMMA,   ','),
+	KEY_TRANS_ENTRY(STOP,         PERIOD,         VK_OEM_PERIOD,  '.'),
+	KEY_TRANS_ENTRY(SLASH,        SLASH,          VK_OEM_2,       '/'),
+	KEY_TRANS_ENTRY(RSHIFT,       RSHIFT,         VK_RSHIFT,      0),
+	KEY_TRANS_ENTRY(ASTERISK,     MULTIPLY,       VK_MULTIPLY,    '*'),
+	KEY_TRANS_ENTRY(LALT,         LMENU,          VK_LMENU,       0),
+	KEY_TRANS_ENTRY(SPACE,        SPACE,          VK_SPACE,       ' '),
+	KEY_TRANS_ENTRY(CAPSLOCK,     CAPITAL,        VK_CAPITAL,     0),
+	KEY_TRANS_ENTRY(F1,           F1,             VK_F1,          0),
+	KEY_TRANS_ENTRY(F2,           F2,             VK_F2,          0),
+	KEY_TRANS_ENTRY(F3,           F3,             VK_F3,          0),
+	KEY_TRANS_ENTRY(F4,           F4,             VK_F4,          0),
+	KEY_TRANS_ENTRY(F5,           F5,             VK_F5,          0),
+	KEY_TRANS_ENTRY(F6,           F6,             VK_F6,          0),
+	KEY_TRANS_ENTRY(F7,           F7,             VK_F7,          0),
+	KEY_TRANS_ENTRY(F8,           F8,             VK_F8,          0),
+	KEY_TRANS_ENTRY(F9,           F9,             VK_F9,          0),
+	KEY_TRANS_ENTRY(F10,          F10,            VK_F10,         0),
+	KEY_TRANS_ENTRY(NUMLOCK,      NUMLOCK,        VK_NUMLOCK,     0),
+	KEY_TRANS_ENTRY(SCRLOCK,      SCROLL,         VK_SCROLL,      0),
+	KEY_TRANS_ENTRY(7_PAD,        NUMPAD7,        VK_NUMPAD7,     0),
+	KEY_TRANS_ENTRY(8_PAD,        NUMPAD8,        VK_NUMPAD8,     0),
+	KEY_TRANS_ENTRY(9_PAD,        NUMPAD9,        VK_NUMPAD9,     0),
+	KEY_TRANS_ENTRY(MINUS_PAD,    SUBTRACT,       VK_SUBTRACT,    0),
+	KEY_TRANS_ENTRY(4_PAD,        NUMPAD4,        VK_NUMPAD4,     0),
+	KEY_TRANS_ENTRY(5_PAD,        NUMPAD5,        VK_NUMPAD5,     0),
+	KEY_TRANS_ENTRY(6_PAD,        NUMPAD6,        VK_NUMPAD6,     0),
+	KEY_TRANS_ENTRY(PLUS_PAD,     ADD,            VK_ADD,         0),
+	KEY_TRANS_ENTRY(1_PAD,        NUMPAD1,        VK_NUMPAD1,     0),
+	KEY_TRANS_ENTRY(2_PAD,        NUMPAD2,        VK_NUMPAD2,     0),
+	KEY_TRANS_ENTRY(3_PAD,        NUMPAD3,        VK_NUMPAD3,     0),
+	KEY_TRANS_ENTRY(0_PAD,        NUMPAD0,        VK_NUMPAD0,     0),
+	KEY_TRANS_ENTRY(DEL_PAD,      DECIMAL,        VK_DECIMAL,     0),
+	KEY_TRANS_ENTRY(F11,          F11,            VK_F11,         0),
+	KEY_TRANS_ENTRY(F12,          F12,            VK_F12,         0),
+	KEY_TRANS_ENTRY(F13,          F13,            VK_F13,         0),
+	KEY_TRANS_ENTRY(F14,          F14,            VK_F14,         0),
+	KEY_TRANS_ENTRY(F15,          F15,            VK_F15,         0),
+	KEY_TRANS_ENTRY(ENTER_PAD,    NUMPADENTER,    VK_RETURN,      0),
+	KEY_TRANS_ENTRY(RCONTROL,     RCONTROL,       VK_RCONTROL,    0),
+	KEY_TRANS_ENTRY(SLASH_PAD,    DIVIDE,         VK_DIVIDE,      0),
+	KEY_TRANS_ENTRY(PRTSCR,       SYSRQ,          0,              0),
+	KEY_TRANS_ENTRY(RALT,         RMENU,          VK_RMENU,       0),
+	KEY_TRANS_ENTRY(HOME,         HOME,           VK_HOME,        0),
+	KEY_TRANS_ENTRY(UP,           UP,             VK_UP,          0),
+	KEY_TRANS_ENTRY(PGUP,         PRIOR,          VK_PRIOR,       0),
+	KEY_TRANS_ENTRY(LEFT,         LEFT,           VK_LEFT,        0),
+	KEY_TRANS_ENTRY(RIGHT,        RIGHT,          VK_RIGHT,       0),
+	KEY_TRANS_ENTRY(END,          END,            VK_END,         0),
+	KEY_TRANS_ENTRY(DOWN,         DOWN,           VK_DOWN,        0),
+	KEY_TRANS_ENTRY(PGDN,         NEXT,           VK_NEXT,        0),
+	KEY_TRANS_ENTRY(INSERT,       INSERT,         VK_INSERT,      0),
+	KEY_TRANS_ENTRY(DEL,          DELETE,         VK_DELETE,      0),
+	KEY_TRANS_ENTRY(LWIN,         LWIN,           VK_LWIN,        0),
+	KEY_TRANS_ENTRY(RWIN,         RWIN,           VK_RWIN,        0),
+	KEY_TRANS_ENTRY(MENU,         APPS,           VK_APPS,        0),
+	KEY_TRANS_ENTRY(PAUSE,        PAUSE,          VK_PAUSE,       0),
+	{       ITEM_ID_CANCEL,       0,              VK_CANCEL,      0, "ITEM_ID_CANCEL" },
 
 	// New keys introduced in Windows 2000. These have no MAME codes to
 	// preserve compatibility with old config files that may refer to them
@@ -391,18 +394,18 @@ static const int win_key_trans_table[][4] =
 	// paused). Some codes are missing because the mapping to vkey codes
 	// isn't clear, and MapVirtualKey is no help.
 
-	{ ITEM_ID_OTHER_SWITCH, DIK_MUTE,           VK_VOLUME_MUTE,         0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_VOLUMEDOWN,     VK_VOLUME_DOWN,         0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_VOLUMEUP,       VK_VOLUME_UP,           0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_WEBHOME,        VK_BROWSER_HOME,        0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_WEBSEARCH,      VK_BROWSER_SEARCH,      0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_WEBFAVORITES,   VK_BROWSER_FAVORITES,   0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_WEBREFRESH,     VK_BROWSER_REFRESH,     0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_WEBSTOP,        VK_BROWSER_STOP,        0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_WEBFORWARD,     VK_BROWSER_FORWARD,     0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_WEBBACK,        VK_BROWSER_BACK,        0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_MAIL,           VK_LAUNCH_MAIL,         0 },
-	{ ITEM_ID_OTHER_SWITCH, DIK_MEDIASELECT,    VK_LAUNCH_MEDIA_SELECT, 0 },
+	KEY_TRANS_ENTRY(OTHER_SWITCH, MUTE,           VK_VOLUME_MUTE,         0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, VOLUMEDOWN,     VK_VOLUME_DOWN,         0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, VOLUMEUP,       VK_VOLUME_UP,           0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, WEBHOME,        VK_BROWSER_HOME,        0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, WEBSEARCH,      VK_BROWSER_SEARCH,      0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, WEBFAVORITES,   VK_BROWSER_FAVORITES,   0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, WEBREFRESH,     VK_BROWSER_REFRESH,     0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, WEBSTOP,        VK_BROWSER_STOP,        0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, WEBFORWARD,     VK_BROWSER_FORWARD,     0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, WEBBACK,        VK_BROWSER_BACK,        0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, MAIL,           VK_LAUNCH_MAIL,         0),
+	KEY_TRANS_ENTRY(OTHER_SWITCH, MEDIASELECT,    VK_LAUNCH_MEDIA_SELECT, 0),
 };
 
 
@@ -424,8 +427,8 @@ INLINE input_item_id keyboard_map_scancode_to_itemid(int scancode)
 
 	// scan the table for a match
 	for (tablenum = 0; tablenum < ARRAY_LENGTH(win_key_trans_table); tablenum++)
-		if (win_key_trans_table[tablenum][DI_KEY] == scancode)
-			return (input_item_id)win_key_trans_table[tablenum][MAME_KEY];
+		if (win_key_trans_table[tablenum].di_key == scancode)
+			return (input_item_id)win_key_trans_table[tablenum].mame_key;
 
 	// default to an "other" switch
 	return ITEM_ID_OTHER_SWITCH;
@@ -706,10 +709,34 @@ int wininput_vkey_for_mame_code(input_code code)
 
 		// scan the table for a match
 		for (tablenum = 0; tablenum < ARRAY_LENGTH(win_key_trans_table); tablenum++)
-			if (win_key_trans_table[tablenum][MAME_KEY] == id)
-				return win_key_trans_table[tablenum][VIRTUAL_KEY];
+			if (win_key_trans_table[tablenum].mame_key == id)
+				return win_key_trans_table[tablenum].virtual_key;
 	}
 	return 0;
+}
+
+
+//============================================================
+//  lookup_mame_code
+//============================================================
+
+static int lookup_mame_index(const char *scode)
+{
+	for (int i = 0; i < ARRAY_LENGTH(win_key_trans_table); i++)
+	{
+		if (!strcmp(scode, win_key_trans_table[i].mame_key_name))
+			return i;
+	}
+	return -1;
+}
+
+static input_item_id lookup_mame_code(const char *scode)
+{
+	int const index = lookup_mame_index(scode);
+	if (index >= 0)
+		return win_key_trans_table[index].mame_key;
+	else
+		return ITEM_ID_INVALID;
 }
 
 
@@ -720,6 +747,7 @@ int wininput_vkey_for_mame_code(input_code code)
 void windows_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
 {
 	input_type_entry *entry;
+	const char* uimode;
 
 	// loop over the defaults
 	for (entry = typelist.first(); entry != NULL; entry = entry->next())
@@ -729,6 +757,22 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 			// (allows ALT-TAB to switch between windows apps)
 			case IPT_UI_CONFIGURE:
 				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
+				break;
+
+			// configurable UI mode switch
+			case IPT_UI_TOGGLE_UI:
+				uimode = options().ui_mode_key();
+				if (strcmp(uimode,"auto"))
+				{
+					std::string fullmode = "ITEM_ID_";
+					fullmode += uimode;
+					input_item_id const mameid_code = lookup_mame_code(fullmode.c_str());
+					if (ITEM_ID_INVALID != mameid_code)
+					{
+						input_code const ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
+						entry->defseq(SEQ_TYPE_STANDARD).set(ui_code);
+					}
+				}
 				break;
 
 			// alt-enter for fullscreen
@@ -1010,10 +1054,10 @@ static void win32_keyboard_poll(device_info *devinfo)
 	// iterate over keys
 	for (keynum = 0; keynum < ARRAY_LENGTH(win_key_trans_table); keynum++)
 	{
-		int vk = win_key_trans_table[keynum][VIRTUAL_KEY];
+		int vk = win_key_trans_table[keynum].virtual_key;
 		if (vk != 0 && (GetAsyncKeyState(vk) & 0x8000) != 0)
 		{
-			int dik = win_key_trans_table[keynum][DI_KEY];
+			int dik = win_key_trans_table[keynum].di_key;
 
 			// conver the VK code to a scancode (DIK code)
 			if (dik != 0)
