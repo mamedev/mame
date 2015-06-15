@@ -117,6 +117,7 @@ void melps4_cpu_device::device_start()
 	m_irqflag[0] = m_irqflag[1] = m_irqflag[2] = false;
 	m_tmr_irq_enabled[0] = m_tmr_irq_enabled[1] = false;
 	m_int_state = 0;
+	m_t_state = 0;
 	m_prohibit_irq = false;
 	m_possible_irq = false;
 
@@ -157,6 +158,7 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_irqflag));
 	save_item(NAME(m_tmr_irq_enabled));
 	save_item(NAME(m_int_state));
+	save_item(NAME(m_t_state));
 	save_item(NAME(m_prohibit_irq));
 	save_item(NAME(m_possible_irq));
 
@@ -327,6 +329,7 @@ void melps4_cpu_device::execute_set_input(int line, int state)
 		
 		// timer input pin
 		case MELPS4_INPUT_LINE_T:
+			write_t_in(state);
 			break;
 
 		default:
