@@ -1901,6 +1901,7 @@ geostorm        // (c) 1994 Irem (Japan)
 airass          // (c) 1993 Irem (World)
 firebarr        // (c) 1993 Irem (Japan)
 dsoccr94        // (c) 1994 Irem (Data East Corporation license)
+dsoccr94k		//
 kftgoal         // (c) 1994 Jaleco
 wpksoc          // (c) 1995 Jaleco
 
@@ -4608,8 +4609,9 @@ cottonja        // (c) 1990 (FD1094)
 ddux            // (c) 1989 (FD1094)
 dduxj           // (c) 1989 (FD1094)
 ddux1           // (c) 1989 (8751)
-dunkshot        // (c) 1986 (FD1094)
-dunkshoto       // (c) 1986 (FD1094)
+dunkshot        // (c) 1986 (FD1089A)
+dunkshota       // (c) 1986 (FD1089A)
+dunkshoto       // (c) 1986 (FD1089A)
 eswat           // (c) 1989 (FD1094)
 eswatu          // (c) 1989 (FD1094)
 eswatj          // (c) 1989 (FD1094)
@@ -7507,7 +7509,7 @@ mechattu        // A8002 'MA' (c) 1989
 mechattu1       // A8002 'MA' (c) 1989
 bbusters        // A9003 'BB' (c) 1989
 bbustersu       // A9003 'BB' (c) 1989
-bbustersu3      // A9003 'BB' (c) 1989
+bbustersua      // A9003 'BB' (c) 1989
 
 // Electrocoin on early SNK hardware
 dmndrby         // G4001 'DD' (c) 1986
