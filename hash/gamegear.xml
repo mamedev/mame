@@ -3909,7 +3909,7 @@ a certain item) -->
 		<description>Lemmings 2 - The Tribes (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
-		<part name="cart" interface="sms_cart">
+		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="lemmings 2 - the tribes [proto].bin" size="524288" crc="fbc807e1" sha1="ad0ce8fc8ce9e5ef9b68b76fb7f3eced4245d5c4" offset="000000" />
 			</dataarea>
