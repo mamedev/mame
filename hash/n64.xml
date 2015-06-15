@@ -54,6 +54,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 
 <!-- List of confirmed carts (info from pictures) -->
 <softwarelist name="n64" description="Nintendo 64 cartridges">
+	
 	<software name="007goldnu" cloneof="007goldn">
 		<description>007 - GoldenEye (USA)</description>
 		<year>1997</year>
@@ -90,7 +91,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="1080snow">
-		<description>1080° Snowboarding (Euro)</description>
+		<description>1080Â° Snowboarding (Euro)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NTEP-(EUR,AUS)"/>
@@ -110,12 +111,12 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="1080snowu" cloneof="1080snow">
-		<description>1080° Snowboarding (Jpn, USA)</description>
+		<description>1080Â° Snowboarding (Jpn, USA)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NTEJ-JPN, NUS-NTEE-USA"/>
 		<info name="release" value="19980228 (JPN)"/>
-		<info name="alt_title" value="1080°テン・エイティ スノーボーディング"/>
+		<info name="alt_title" value="1080Â°ãƒ†ãƒ³ãƒ»ã‚¨ã‚¤ãƒ†ã‚£ ã‚¹ãƒŽãƒ¼ãƒœãƒ¼ãƒ‡ã‚£ãƒ³ã‚°"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
 			<feature name="u1" value="NUS-NTEA-0" />
@@ -137,7 +138,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="NUS-NO2J-JPN"/>
 		<info name="release" value="19990319"/>
-		<info name="alt_title" value="64大相撲2"/>
+		<info name="alt_title" value="64å¤§ç›¸æ’²2"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
 			<feature name="u1" value="NUS-NO2J-0" />
@@ -473,7 +474,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CFZJ-JPN"/>
 		<info name="release" value="19980714"/>
-		<info name="alt_title" value="エフゼロ エックス"/>
+		<info name="alt_title" value="ã‚¨ãƒ•ã‚¼ãƒ­ ã‚¨ãƒƒã‚¯ã‚¹"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-03A-01" />
 			<feature name="u1" value="NUS-CFZJ-0" />
@@ -550,7 +551,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="NUS-NHKJ-JPN"/>
 		<info name="release" value="19971218"/>
-		<info name="alt_title" value="飛龍の拳ツイン"/>
+		<info name="alt_title" value="é£›é¾ã®æ‹³ãƒ„ã‚¤ãƒ³"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
 			<feature name="u1" value="NUS-NHKJ-0" />
@@ -621,7 +622,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NJPJ-JPN"/>
 		<info name="release" value="19961220"/>
-		<info name="alt_title" value="実況J.LEAGUE パーフェクトストライカー"/>
+		<info name="alt_title" value="å®Ÿæ³J.LEAGUE ãƒ‘ãƒ¼ãƒ•ã‚§ã‚¯ãƒˆã‚¹ãƒˆãƒ©ã‚¤ã‚«ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
 			<feature name="u1" value="NUS-NJPJ-0" />
@@ -831,7 +832,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="pokesnapu" cloneof="pokesnap">
-		<description>Pokémon Snap (USA)</description>
+		<description>PokÃ©mon Snap (USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPFE-USA"/>
@@ -849,7 +850,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="pokestad1" cloneof="pokestad">
-		<description>Pokémon Stadium (Euro)</description>
+		<description>PokÃ©mon Stadium (Euro)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPOP-EUR"/>
@@ -865,7 +866,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="pokestadu2" cloneof="pokestad">
-		<description>Pokémon Stadium (USA)</description>
+		<description>PokÃ©mon Stadium (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPOE-USA"/>
@@ -985,7 +986,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NFXJ-JPN"/>
 		<info name="release" value="19970427"/>
-		<info name="alt_title" value="スターフォックス64"/>
+		<info name="alt_title" value="ã‚¹ã‚¿ãƒ¼ãƒ•ã‚©ãƒƒã‚¯ã‚¹64"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
 			<feature name="u1" value="NUS-NFXJ-0" />
@@ -1167,7 +1168,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NSMJ-JPN "/>
 		<info name="release" value="19960623"/>
-		<info name="alt_title" value="スーパーマリオ64"/>
+		<info name="alt_title" value="ã‚¹ãƒ¼ãƒ‘ãƒ¼ãƒžãƒªã‚ª64"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
 			<feature name="u1" value="NUS-NSMJ-0" />
@@ -1455,7 +1456,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NYSJ-JPN"/>
 		<info name="release" value="19971221"/>
-		<info name="alt_title" value="ヨッシーストーリー"/>
+		<info name="alt_title" value="ãƒ¨ãƒƒã‚·ãƒ¼ã‚¹ãƒˆãƒ¼ãƒªãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-02" />
 			<feature name="u1" value="NUS-NYSJ-0" />
@@ -1622,7 +1623,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NGEJ-JPN"/>
 		<info name="release" value="19970823"/>
-		<info name="alt_title" value="ゴールデンアイ 007"/>
+		<info name="alt_title" value="ã‚´ãƒ¼ãƒ«ãƒ‡ãƒ³ã‚¢ã‚¤ 007"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="007 - goldeneye (japan).bin" size="12582912" crc="c26fed78" sha1="451b41b63d75677bd42db89a56679208808fcfd0" offset="000000" />
@@ -1659,7 +1660,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NUS-NTWJ"/>
 		<info name="release" value="19971219"/>
-		<info name="alt_title" value="64で発見!!たまごっち みんなでたまごっちワールド"/>
+		<info name="alt_title" value="64ã§ç™ºè¦‹!!ãŸã¾ã”ã£ã¡ ã¿ã‚“ãªã§ãŸã¾ã”ã£ã¡ãƒ¯ãƒ¼ãƒ«ãƒ‰"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="64 de hakken!! tamagotchi - minna de tamagotchi world (japan).bin" size="12582912" crc="c6400938" sha1="538ae3f3354c3fb96926d759e81cf64b827f2782" offset="000000" />
@@ -1673,7 +1674,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Altron Corporation</publisher>
 		<info name="serial" value="NUS-NHFJ-JPN"/>
 		<info name="release" value="19991105"/>
-		<info name="alt_title" value="64花札 天使の約束"/>
+		<info name="alt_title" value="64èŠ±æœ­ å¤©ä½¿ã®ç´„æŸ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="64 hanafuda - tenshi no yakusoku (japan).bin" size="8388608" crc="2b43006c" sha1="17d93494401aeadad114d8db66b85e75b714473c" offset="000000" />
@@ -1687,7 +1688,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="NUS-NOSJ-JPN"/>
 		<info name="release" value="19971128"/>
-		<info name="alt_title" value="64大相撲"/>
+		<info name="alt_title" value="64å¤§ç›¸æ’²"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="64 oozumou (japan).bin" size="16777216" crc="a6dbf8ae" sha1="da4c60c6054c374a251a7e5e718f199a37946423" offset="000000" />
@@ -1701,7 +1702,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="NUS-NTCJ"/>
 		<info name="release" value="19980807"/>
-		<info name="alt_title" value="64トランプコレクション アリスのわくわくトランプワールド"/>
+		<info name="alt_title" value="64ãƒˆãƒ©ãƒ³ãƒ—ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ ã‚¢ãƒªã‚¹ã®ã‚ãã‚ããƒˆãƒ©ãƒ³ãƒ—ãƒ¯ãƒ¼ãƒ«ãƒ‰"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="64 trump collection - alice no wakuwaku trump world (japan).bin" size="12582912" crc="34bbb95d" sha1="769cb7028262871611acb8cd5788d477e7f6c12f" offset="000000" />
@@ -1759,7 +1760,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>ASCII Entertainment</publisher>
 		<info name="serial" value="NUS-NAGJ"/>
 		<info name="release" value="19971219"/>
-		<info name="alt_title" value="エアロゲイジ"/>
+		<info name="alt_title" value="ã‚¨ã‚¢ãƒ­ã‚²ã‚¤ã‚¸"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="aerogauge (japan) (rev a).bin" size="8388608" crc="1a5f6c19" sha1="dfb171caa0091bd36526641d252839c0e72b616c" offset="000000" />
@@ -1784,7 +1785,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>I4</publisher>
 		<info name="serial" value="NUS-NS3J"/>
 		<info name="release" value="19981218"/>
-		<info name="alt_title" value="AI将棋3"/>
+		<info name="alt_title" value="AIå°†æ£‹3"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="ai shougi 3 (japan).bin" size="8388608" crc="43022243" sha1="0acf1f83ba14dbe2edbae454eea04caf2cc0030a" offset="000000" />
@@ -1842,7 +1843,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="NUS-NABJ"/>
 		<info name="release" value="19980327"/>
-		<info name="alt_title" value="エアーボーダー64"/>
+		<info name="alt_title" value="ã‚¨ã‚¢ãƒ¼ãƒœãƒ¼ãƒ€ãƒ¼64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="air boarder 64 (japan).bin" size="8388608" crc="79f2df14" sha1="0ce4d812125f7c153795bbe3835cda6c29105724" offset="000000" />
@@ -1856,7 +1857,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-ND3J (RZ008-J1)"/>
 		<info name="release" value="19990311"/>
-		<info name="alt_title" value="悪魔城ドラキュラ黙示録"/>
+		<info name="alt_title" value="æ‚ªé­”åŸŽãƒ‰ãƒ©ã‚­ãƒ¥ãƒ©é»™ç¤ºéŒ²"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="akumajou dracula mokushiroku - real action adventure (japan).bin" size="12582912" crc="ca79d5a0" sha1="78629a527b6ec02825487e3c800aa81178768039" offset="000000" />
@@ -1870,7 +1871,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-ND4J (RZ031-J1)"/>
 		<info name="release" value="19991225"/>
-		<info name="alt_title" value="悪魔城ドラキュラ黙示録外伝 レジェンド オブ コーネル"/>
+		<info name="alt_title" value="æ‚ªé­”åŸŽãƒ‰ãƒ©ã‚­ãƒ¥ãƒ©é»™ç¤ºéŒ²å¤–ä¼ ãƒ¬ã‚¸ã‚§ãƒ³ãƒ‰ ã‚ªãƒ– ã‚³ãƒ¼ãƒãƒ«"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="akumajou dracula mokushiroku gaiden - legend of cornell (japan).bin" size="16777216" crc="420ce37b" sha1="10b15a7ceb6d56720ddd7755dac6102832407110" offset="000000" />
@@ -2049,7 +2050,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NBMJ"/>
 		<info name="release" value="19970926"/>
-		<info name="alt_title" value="ばく ボンバーマン"/>
+		<info name="alt_title" value="ã°ã ãƒœãƒ³ãƒãƒ¼ãƒžãƒ³"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="baku bomberman (japan).bin" size="8388608" crc="b9faa3e4" sha1="57b5b49e61afb44a368820997706c752545c677f" offset="000000" />
@@ -2063,7 +2064,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NBVJ"/>
 		<info name="release" value="19991203"/>
-		<info name="alt_title" value="ばく ボンバーマン2"/>
+		<info name="alt_title" value="ã°ã ãƒœãƒ³ãƒãƒ¼ãƒžãƒ³2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="baku bomberman 2 (japan).bin" size="16777216" crc="850675cc" sha1="c6188f3217e28cf820040b6fb1f57db655995b38" offset="000000" />
@@ -2077,7 +2078,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>ESP Software</publisher>
 		<info name="serial" value="NUS-NBNJ"/>
 		<info name="release" value="19990903"/>
-		<info name="alt_title" value="爆裂無敵 バンガイオー"/>
+		<info name="alt_title" value="çˆ†è£‚ç„¡æ•µ ãƒãƒ³ã‚¬ã‚¤ã‚ªãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="bakuretsu muteki bangaioh (japan).bin" size="12582912" crc="2a8ce2e1" sha1="38c6653a0c4e45f25f33c97ccd2a7f5af0b57784" offset="000000" />
@@ -2091,7 +2092,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Taito Corporation</publisher>
 		<info name="serial" value="NUS-NBJJ"/>
 		<info name="release" value="19981224"/>
-		<info name="alt_title" value="爆笑人生64 めざせ!リゾート王"/>
+		<info name="alt_title" value="çˆ†ç¬‘äººç”Ÿ64 ã‚ã–ã›!ãƒªã‚¾ãƒ¼ãƒˆçŽ‹"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="bakushou jinsei 64 - mezase! resort ou (japan).bin" size="12582912" crc="5fd42464" sha1="353b62279f67634030cc66f43c4b82e516a6af28" offset="000000" />
@@ -2105,7 +2106,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NBKJ"/>
 		<info name="release" value="19981206"/>
-		<info name="alt_title" value="バンジョーとカズーイの大冒険"/>
+		<info name="alt_title" value="ãƒãƒ³ã‚¸ãƒ§ãƒ¼ã¨ã‚«ã‚ºãƒ¼ã‚¤ã®å¤§å†’é™º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="banjo to kazooie no daibouken (japan).bin" size="16777216" crc="11ad432c" sha1="9379962839a6638f8ddcfb7d917216ec40a83edb" offset="000000" />
@@ -2119,7 +2120,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NB7J"/>
 		<info name="release" value="20001127"/>
-		<info name="alt_title" value="バンジョーとカズーイの大冒険2"/>
+		<info name="alt_title" value="ãƒãƒ³ã‚¸ãƒ§ãƒ¼ã¨ã‚«ã‚ºãƒ¼ã‚¤ã®å¤§å†’é™º2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="banjo to kazooie no daibouken 2 (japan).bin" size="33554432" crc="8a3d8792" sha1="a6c8d06aa6462c1479639786eda455cd60ff6aa3" offset="000000" />
@@ -2188,7 +2189,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Visco Corporation</publisher>
 		<info name="serial" value="NUS-NVBJ"/>
 		<info name="release" value="20000428"/>
-		<info name="alt_title" value="バスラッシュ〜ECOGEAR PowerWorm Championship〜"/>
+		<info name="alt_title" value="ãƒã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã€œECOGEAR PowerWorm Championshipã€œ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="bass rush - ecogear powerworm championship (japan).bin" size="33554432" crc="0e388fae" sha1="06d9da5dfd1e16ed56fc2bd028fa3642b4905820" offset="000000" />
@@ -2290,7 +2291,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Electronic Arts Square</publisher>
 		<info name="serial" value="NUS-NB8J"/>
 		<info name="release" value="19991126"/>
-		<info name="alt_title" value="ビートル アドベンチャーレーシング"/>
+		<info name="alt_title" value="ãƒ“ãƒ¼ãƒˆãƒ« ã‚¢ãƒ‰ãƒ™ãƒ³ãƒãƒ£ãƒ¼ãƒ¬ãƒ¼ã‚·ãƒ³ã‚°"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="beetle adventure racing! (japan).bin" size="16777216" crc="4246acd8" sha1="196b70d4fd0bd361baabaee9719a5a3aa5a7f48f" offset="000000" />
@@ -2348,7 +2349,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NUS-NB5J"/>
 		<info name="release" value="20000128"/>
-		<info name="alt_title" value="バイオハザード2"/>
+		<info name="alt_title" value="ãƒã‚¤ã‚ªãƒã‚¶ãƒ¼ãƒ‰2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
 				<rom name="biohazard 2 (japan).bin" size="67108864" crc="31a3b913" sha1="8651451a9363da0b6783dee6bb99eb077b318bd5" offset="000000" />
@@ -2373,7 +2374,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NBCJ"/>
 		<info name="release" value="19970321"/>
-		<info name="alt_title" value="ブラストドーザー"/>
+		<info name="alt_title" value="ãƒ–ãƒ©ã‚¹ãƒˆãƒ‰ãƒ¼ã‚¶ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="blastdozer (japan).bin" size="8388608" crc="4605759e" sha1="68c6d95af29c647b64d5dad90c02980b772d5faf" offset="000000" />
@@ -2431,7 +2432,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Pack In Soft</publisher>
 		<info name="serial" value="NUS-NYWJ"/>
 		<info name="release" value="19990205"/>
-		<info name="alt_title" value="牧場物語2"/>
+		<info name="alt_title" value="ç‰§å ´ç‰©èªž2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="bokujou monogatari 2 (japan) (rev b).bin" size="16777216" crc="36a97d01" sha1="756ef426dd81bec87c33dc981bc4a13c92ab0aab" offset="000000" />
@@ -2445,7 +2446,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Pack In Soft</publisher>
 		<info name="serial" value="NUS-NYWJ"/>
 		<info name="release" value="19990205"/>
-		<info name="alt_title" value="牧場物語2"/>
+		<info name="alt_title" value="ç‰§å ´ç‰©èªž2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="bokujou monogatari 2 (japan) (rev a).bin" size="16777216" crc="bcfc0724" sha1="4e7f4001dbead7bcb2bac1f5379f2c3e065f5411" offset="000000" />
@@ -2459,7 +2460,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Pack In Soft</publisher>
 		<info name="serial" value="NUS-NYWJ"/>
 		<info name="release" value="19990205"/>
-		<info name="alt_title" value="牧場物語2"/>
+		<info name="alt_title" value="ç‰§å ´ç‰©èªž2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="bokujou monogatari 2 (japan).bin" size="16777216" crc="0837b349" sha1="e12e5f2fce0f27c52be2c7454b21d9b538ea2ee5" offset="000000" />
@@ -2484,7 +2485,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NHAJ"/>
 		<info name="release" value="20011220"/>
-		<info name="alt_title" value="ボンバーマン64"/>
+		<info name="alt_title" value="ãƒœãƒ³ãƒãƒ¼ãƒžãƒ³64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="bomberman 64 (japan) (arcade edition).bin" size="12582912" crc="7c532342" sha1="161639fd706dd2637fed2a14ccee73138e82fb2d" offset="000000" />
@@ -2531,7 +2532,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NBDJ"/>
 		<info name="release" value="19980430"/>
-		<info name="alt_title" value="ボンバーマンヒーローミリアン王女を救え!"/>
+		<info name="alt_title" value="ãƒœãƒ³ãƒãƒ¼ãƒžãƒ³ãƒ’ãƒ¼ãƒ­ãƒ¼ãƒŸãƒªã‚¢ãƒ³çŽ‹å¥³ã‚’æ•‘ãˆ!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="bomberman hero - mirian oujo wo sukue! (japan).bin" size="12582912" crc="f3a50116" sha1="c143fca315277496e0558c93701494a225ba4a37" offset="000000" />
@@ -2578,7 +2579,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="NUS-NBLJ"/>
 		<info name="release" value="19981218"/>
-		<info name="alt_title" value="バックバンブル"/>
+		<info name="alt_title" value="ãƒãƒƒã‚¯ãƒãƒ³ãƒ–ãƒ«"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="buck bumble (japan).bin" size="12582912" crc="24d1a591" sha1="60afbcc6afde1f22aa8031f98f9ad84b1529f848" offset="000000" />
@@ -2834,7 +2835,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Japan System Supply</publisher>
 		<info name="serial" value="NUS-NCTJ"/>
 		<info name="release" value="19971212"/>
-		<info name="alt_title" value="カメレオン ツイスト"/>
+		<info name="alt_title" value="ã‚«ãƒ¡ãƒ¬ã‚ªãƒ³ ãƒ„ã‚¤ã‚¹ãƒˆ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="chameleon twist (japan).bin" size="12582912" crc="a2dcf689" sha1="e6a1d9b94e83d1784ecaf0dec6f6a9e42feaa74d" offset="000000" />
@@ -2881,7 +2882,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Japan System Supply</publisher>
 		<info name="serial" value="NUS-NV2J"/>
 		<info name="release" value="19981225"/>
-		<info name="alt_title" value="カメレオンツイスト2"/>
+		<info name="alt_title" value="ã‚«ãƒ¡ãƒ¬ã‚ªãƒ³ãƒ„ã‚¤ã‚¹ãƒˆ2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="chameleon twist 2 (japan).bin" size="12582912" crc="f42bb75f" sha1="e659cd6059fd464ba1883a5bae8b839c14ba72f4" offset="000000" />
@@ -2928,7 +2929,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Takara</publisher>
 		<info name="serial" value="NUS-NCRJ"/>
 		<info name="release" value="19980717"/>
-		<info name="alt_title" value="チョロQ 64"/>
+		<info name="alt_title" value="ãƒãƒ§ãƒ­Q 64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="choro q 64 (japan).bin" size="8388608" crc="c5722b49" sha1="c399149b3166ce310028184610aaf312af9ba75a" offset="000000" />
@@ -2942,7 +2943,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Takara</publisher>
 		<info name="serial" value="NUS-NCGJ"/>
 		<info name="release" value="19991224"/>
-		<info name="alt_title" value="チョロQ64 2 ハチャメチャグランプリレース"/>
+		<info name="alt_title" value="ãƒãƒ§ãƒ­Q64 2 ãƒãƒãƒ£ãƒ¡ãƒãƒ£ã‚°ãƒ©ãƒ³ãƒ—ãƒªãƒ¬ãƒ¼ã‚¹"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="choro q 64 ii - hacha mecha grand prix race (japan).bin" size="12582912" crc="42ae9174" sha1="edd177a68dd0c20dd6f939cdb7a74264132dd326" offset="000000" />
@@ -2956,7 +2957,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NPKJ"/>
 		<info name="release" value="19961220"/>
-		<info name="alt_title" value="超空間ナイター プロ野球キング"/>
+		<info name="alt_title" value="è¶…ç©ºé–“ãƒŠã‚¤ã‚¿ãƒ¼ ãƒ—ãƒ­é‡Žçƒã‚­ãƒ³ã‚°"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="chou kuukan nighter pro yakyuu king (japan).bin" size="8388608" crc="c73e336c" sha1="ea7e403a37ee386f6422f4b96d4450fcd5d816f0" offset="000000" />
@@ -2970,7 +2971,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NP2J"/>
 		<info name="release" value="19990319"/>
-		<info name="alt_title" value="超空間ナイター プロ野球キング2"/>
+		<info name="alt_title" value="è¶…ç©ºé–“ãƒŠã‚¤ã‚¿ãƒ¼ ãƒ—ãƒ­é‡Žçƒã‚­ãƒ³ã‚°2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="chou kuukan nighter pro yakyuu king 2 (japan).bin" size="16777216" crc="c0fc82c0" sha1="391e91ddbff9b42a0f5563187dc66f4d2842f598" offset="000000" />
@@ -2984,7 +2985,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Atlus</publisher>
 		<info name="serial" value="NUS-NK2J"/>
 		<info name="release" value="19990219"/>
-		<info name="alt_title" value="超スノボキッズ"/>
+		<info name="alt_title" value="è¶…ã‚¹ãƒŽãƒœã‚­ãƒƒã‚º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="chou snobo kids (japan).bin" size="16777216" crc="ab53586b" sha1="36df553351def16bf92de8cada7350e0a287fd0d" offset="000000" />
@@ -2998,7 +2999,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NGTJ"/>
 		<info name="release" value="19981030"/>
-		<info name="alt_title" value="シティーツアーグランプリ〜全日本GT選手権〜"/>
+		<info name="alt_title" value="ã‚·ãƒ†ã‚£ãƒ¼ãƒ„ã‚¢ãƒ¼ã‚°ãƒ©ãƒ³ãƒ—ãƒªã€œå…¨æ—¥æœ¬GTé¸æ‰‹æ¨©ã€œ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="city-tour gp - zennihon gt senshuken (japan).bin" size="16777216" crc="7a59354b" sha1="fcad11bcdd2ad20e1c49cea89f1ed4697ddebd91" offset="000000" />
@@ -3200,7 +3201,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NCXJ"/>
 		<info name="release" value="19991208"/>
-		<info name="alt_title" value="カスタムロボ"/>
+		<info name="alt_title" value="ã‚«ã‚¹ã‚¿ãƒ ãƒ­ãƒœ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="custom robo (japan).bin" size="16777216" crc="30c84f36" sha1="9d462983d2f6c4417c328d97d430e0d62c5dac94" offset="000000" />
@@ -3214,7 +3215,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NCZJ"/>
 		<info name="release" value="20001110"/>
-		<info name="alt_title" value="カスタムロボV2"/>
+		<info name="alt_title" value="ã‚«ã‚¹ã‚¿ãƒ ãƒ­ãƒœV2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="custom robo v2 (japan).bin" size="16777216" crc="7bef9ecc" sha1="67ff98e6230470f0c3c209edb72869c715db2800" offset="000000" />
@@ -3261,7 +3262,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NDFJ (RZ037-J1)"/>
 		<info name="release" value="20001130"/>
-		<info name="alt_title" value="ダンスダンスレボリューション ディズニーダンシングミュージアム"/>
+		<info name="alt_title" value="ãƒ€ãƒ³ã‚¹ãƒ€ãƒ³ã‚¹ãƒ¬ãƒœãƒªãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³ ãƒ‡ã‚£ã‚ºãƒ‹ãƒ¼ãƒ€ãƒ³ã‚·ãƒ³ã‚°ãƒŸãƒ¥ãƒ¼ã‚¸ã‚¢ãƒ "/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="dance dance revolution - disney dancing museum (japan).bin" size="33554432" crc="e085afa0" sha1="b0931ecabc6d7c05a14c792f45bc6faac8722ab1" offset="000000" />
@@ -3319,7 +3320,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Taito Corporation</publisher>
 		<info name="serial" value="NUS-ND6J"/>
 		<info name="release" value="19990730"/>
-		<info name="alt_title" value="電車でGO ! 64"/>
+		<info name="alt_title" value="é›»è»Šã§GO ! 64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="densha de go! 64 (japan).bin" size="33554432" crc="8f63474f" sha1="ad5b14c3c571db911b2896d6c80e200b12cafdcd" offset="000000" />
@@ -3344,7 +3345,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="NUS-NDAJ"/>
 		<info name="release" value="20010810"/>
-		<info name="alt_title" value="ダービースタリオン64" />
+		<info name="alt_title" value="ãƒ€ãƒ¼ãƒ“ãƒ¼ã‚¹ã‚¿ãƒªã‚ªãƒ³64" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="derby stallion 64 (japan).bin" size="33554432" crc="922506ad" sha1="b404e2a26da5cf0ee2eecfd691ffb0385d08642a" offset="000000" />
@@ -3380,7 +3381,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Athena</publisher>
 		<info name="serial" value="NUS-CDZJ"/>
 		<info name="release" value="19980626"/>
-		<info name="alt_title" value="デザエモン3D"/>
+		<info name="alt_title" value="ãƒ‡ã‚¶ã‚¨ãƒ¢ãƒ³3D"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="dezaemon 3d (japan).bin" size="16777216" crc="8ce25c68" sha1="7ca61515b13d927e905b59390dd300945b68d218" offset="000000" />
@@ -3416,7 +3417,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NDYJ"/>
 		<info name="release" value="19971121"/>
-		<info name="alt_title" value="ディディーコング レーシング"/>
+		<info name="alt_title" value="ãƒ‡ã‚£ãƒ‡ã‚£ãƒ¼ã‚³ãƒ³ã‚° ãƒ¬ãƒ¼ã‚·ãƒ³ã‚°"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="diddy kong racing (japan).bin" size="12582912" crc="95931356" sha1="a33962564640cd80e57f7cac895ca831f123afd5" offset="000000" />
@@ -3463,7 +3464,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NDOJ"/>
 		<info name="release" value="19991210"/>
-		<info name="alt_title" value="ドンキーコング64"/>
+		<info name="alt_title" value="ãƒ‰ãƒ³ã‚­ãƒ¼ã‚³ãƒ³ã‚°64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="donkey kong 64 (japan).bin" size="33554432" crc="fbd001b9" sha1="429e7ace2a68832345bfbb3bc3aadf3a7a505d7b" offset="000000" />
@@ -3499,7 +3500,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>GameBank</publisher>
 		<info name="serial" value="NUS-NDMJ"/>
 		<info name="release" value="19970801"/>
-		<info name="alt_title" value="ドゥーム64"/>
+		<info name="alt_title" value="ãƒ‰ã‚¥ãƒ¼ãƒ 64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="doom 64 (japan).bin" size="8388608" crc="95526f13" sha1="d7d8e5636839255fd1c324b9a27511917e3c454f" offset="000000" />
@@ -3524,7 +3525,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Epoch</publisher>
 		<info name="serial" value="NUS-NDRJ"/>
 		<info name="release" value="19970321"/>
-		<info name="alt_title" value="ドラえもん のび太と3つの精霊石"/>
+		<info name="alt_title" value="ãƒ‰ãƒ©ãˆã‚‚ã‚“ ã®ã³å¤ªã¨3ã¤ã®ç²¾éœŠçŸ³"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="doraemon - nobita to 3tsu no seireiseki (japan).bin" size="8388608" crc="cad0a2c2" sha1="a35b06dc974429dbd6cbf0712a4c170fd099748a" offset="000000" />
@@ -3538,7 +3539,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Epoch</publisher>
 		<info name="serial" value="NUS-ND2J"/>
 		<info name="release" value="19981211"/>
-		<info name="alt_title" value="ドラえもん2 のび太と光の神殿"/>
+		<info name="alt_title" value="ãƒ‰ãƒ©ãˆã‚‚ã‚“2 ã®ã³å¤ªã¨å…‰ã®ç¥žæ®¿"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="doraemon 2 - nobita to hikari no shinden (japan).bin" size="12582912" crc="2de1a873" sha1="00a02647de6760fa2cf1a2ffcaada43703a8a98d" offset="000000" />
@@ -3552,7 +3553,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Epoch</publisher>
 		<info name="serial" value="NUS-N3DJ"/>
 		<info name="release" value="20000728"/>
-		<info name="alt_title" value="ドラえもん3 のび太の町SOS!"/>
+		<info name="alt_title" value="ãƒ‰ãƒ©ãˆã‚‚ã‚“3 ã®ã³å¤ªã®ç”ºSOS!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="doraemon 3 - nobita no machi sos! (japan).bin" size="16777216" crc="0b3ad913" sha1="a567aa96860525963f9dafa256036c0df5f66909" offset="000000" />
@@ -3566,7 +3567,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NAFJ"/>
 		<info name="release" value="20010414"/>
-		<info name="alt_title" value="どうぶつの森"/>
+		<info name="alt_title" value="ã©ã†ã¶ã¤ã®æ£®"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="doubutsu no mori (japan).bin" size="16777216" crc="b9fcd0a6" sha1="648b978895bc20256d48f763a72a8686f5cf549d" offset="000000" />
@@ -3616,7 +3617,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NDHJ"/>
 		<info name="release" value="19971205"/>
-		<info name="alt_title" value="デュアルヒーローズ"/>
+		<info name="alt_title" value="ãƒ‡ãƒ¥ã‚¢ãƒ«ãƒ’ãƒ¼ãƒ­ãƒ¼ã‚º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="dual heroes (japan).bin" size="12582912" crc="a3565ffc" sha1="b36e4d8a19a50711b0423469dd43b954084fe36a" offset="000000" />
@@ -3763,7 +3764,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Seta Corporation</publisher>
 		<info name="serial" value="NUS-NSTJ"/>
 		<info name="release" value="19961129"/>
-		<info name="alt_title" value="栄光のセントアンドリュース"/>
+		<info name="alt_title" value="æ „å…‰ã®ã‚»ãƒ³ãƒˆã‚¢ãƒ³ãƒ‰ãƒªãƒ¥ãƒ¼ã‚¹"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="eikou no saint andrews (japan).bin" size="8388608" crc="ce55bb19" sha1="1a313d3b4b11a16b8280b0139a15e47791c8080a" offset="000000" />
@@ -3799,7 +3800,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NETJ"/>
 		<info name="release" value="19990709"/>
-		<info name="alt_title" value="エルテイル モンスターズ"/>
+		<info name="alt_title" value="ã‚¨ãƒ«ãƒ†ã‚¤ãƒ« ãƒ¢ãƒ³ã‚¹ã‚¿ãƒ¼ã‚º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="eltale monsters (japan).bin" size="16777216" crc="3541c4bb" sha1="36fc37e9eec7157961e8accd9e40da4134055669" offset="000000" />
@@ -3824,7 +3825,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMXJ"/>
 		<info name="release" value="20000623"/>
-		<info name="alt_title" value="エキサイトバイク64"/>
+		<info name="alt_title" value="ã‚¨ã‚­ã‚µã‚¤ãƒˆãƒã‚¤ã‚¯64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="excitebike 64 (japan).bin" size="16777216" crc="9dfeb099" sha1="ad840fe563076bd600ad0ab3ad4433b3f1a72a4c" offset="000000" />
@@ -3871,7 +3872,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NEGJ"/>
 		<info name="release" value="19980529"/>
-		<info name="alt_title" value="エクストリームG"/>
+		<info name="alt_title" value="ã‚¨ã‚¯ã‚¹ãƒˆãƒªãƒ¼ãƒ G"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="extreme-g (japan).bin" size="8388608" crc="856227bb" sha1="afb26291e828e049e6913f88fc11f28d097057bf" offset="000000" />
@@ -3907,7 +3908,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NUS-NG2J"/>
 		<info name="release" value="19990910"/>
-		<info name="alt_title" value="エクストリームG2"/>
+		<info name="alt_title" value="ã‚¨ã‚¯ã‚¹ãƒˆãƒªãƒ¼ãƒ G2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="extreme-g xg2 (japan).bin" size="12582912" crc="62202d15" sha1="769e78efae2164ce03441dcdf5b2a2849f15f281" offset="000000" />
@@ -3976,7 +3977,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Video System</publisher>
 		<info name="serial" value="NUS-NFWJ"/>
 		<info name="release" value="19981218"/>
-		<info name="alt_title" value="エフワン ワールド グランプリ"/>
+		<info name="alt_title" value="ã‚¨ãƒ•ãƒ¯ãƒ³ ãƒ¯ãƒ¼ãƒ«ãƒ‰ ã‚°ãƒ©ãƒ³ãƒ—ãƒª"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="f-1 world grand prix (japan).bin" size="12582912" crc="386e127d" sha1="932ca3ddd3a6b4e4c1f7a1a1f9a77e14a009a6c0" offset="000000" />
@@ -4078,7 +4079,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Namco</publisher>
 		<info name="serial" value="NUS-NFSJ"/>
 		<info name="release" value="19971128"/>
-		<info name="alt_title" value="ファミスタ64"/>
+		<info name="alt_title" value="ãƒ•ã‚¡ãƒŸã‚¹ã‚¿64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="famista 64 (japan).bin" size="12582912" crc="51e0b88a" sha1="c14270956393834da8f670668155c41af34af7a9" offset="000000" />
@@ -4092,7 +4093,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="NUS-N8IJ"/>
 		<info name="release" value="19980424"/>
-		<info name="alt_title" value="FIFA Road to WORLD CUP 98 ワールドカップへの道"/>
+		<info name="alt_title" value="FIFA Road to WORLD CUP 98 ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚«ãƒƒãƒ—ã¸ã®é“"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="fifa - road to world cup 98 - world cup e no michi (japan).bin" size="12582912" crc="6ae6b8ed" sha1="83a86ce813e7dbb5c7d80b567f35fca7e742f8ba" offset="000000" />
@@ -4194,7 +4195,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NKAJ"/>
 		<info name="release" value="19981211"/>
-		<info name="alt_title" value="ファイティングカップ"/>
+		<info name="alt_title" value="ãƒ•ã‚¡ã‚¤ãƒ†ã‚£ãƒ³ã‚°ã‚«ãƒƒãƒ—"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="fighting cup (japan).bin" size="12582912" crc="a9740235" sha1="55f3e6e3c9fdcf0278fa494a798316600d9db4d4" offset="000000" />
@@ -4307,7 +4308,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NSIJ"/>
 		<info name="release" value="20000927"/>
-		<info name="alt_title" value="不思議のダンジョン 風来のシレン2 鬼襲来!シレン城!"/>
+		<info name="alt_title" value="ä¸æ€è­°ã®ãƒ€ãƒ³ã‚¸ãƒ§ãƒ³ é¢¨æ¥ã®ã‚·ãƒ¬ãƒ³2 é¬¼è¥²æ¥!ã‚·ãƒ¬ãƒ³åŸŽ!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="fushigi no dungeon fuurai no shiren 2 - oni shuurai! shiren jou! (japan).bin" size="33554432" crc="af0a22ef" sha1="a50ef01ec653ed48a2b857fe2834d815cbd8e972" offset="000000" />
@@ -4332,7 +4333,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NGAJ (RZ007-J1)"/>
 		<info name="release" value="19980326"/>
-		<info name="alt_title" value="ガスプ ファイターズ ネクストリーム"/>
+		<info name="alt_title" value="ã‚¬ã‚¹ãƒ— ãƒ•ã‚¡ã‚¤ã‚¿ãƒ¼ã‚º ãƒã‚¯ã‚¹ãƒˆãƒªãƒ¼ãƒ "/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="g.a.s.p!! fighters' nextream (japan).bin" size="12582912" crc="0e05ea3a" sha1="743673180188dfee89f36c76602c1a75df51716e" offset="000000" />
@@ -4346,7 +4347,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NG6J (RZ021-J1)"/>
 		<info name="release" value="19981223"/>
-		<info name="alt_title" value="がんばれゴエモン でろでろ道中オバケてんこ盛り"/>
+		<info name="alt_title" value="ãŒã‚“ã°ã‚Œã‚´ã‚¨ãƒ¢ãƒ³ ã§ã‚ã§ã‚é“ä¸­ã‚ªãƒã‚±ã¦ã‚“ã“ç››ã‚Š"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="ganbare goemon - dero dero douchuu obake tenkomori (japan).bin" size="16777216" crc="163c3c51" sha1="d8ee4e745bae3625826ff267da5404b42f36c3c2" offset="000000" />
@@ -4360,7 +4361,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NG5J (RZ005-J1)"/>
 		<info name="release" value="19970807"/>
-		<info name="alt_title" value="がんばれゴエモン ネオ桃山幕府のおどり"/>
+		<info name="alt_title" value="ãŒã‚“ã°ã‚Œã‚´ã‚¨ãƒ¢ãƒ³ ãƒã‚ªæ¡ƒå±±å¹•åºœã®ãŠã©ã‚Š"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="ganbare goemon - neo momoyama bakufu no odori (japan).bin" size="16777216" crc="69964858" sha1="b6386455c0b8f573e315976bbb47548cbafcedb3" offset="000000" />
@@ -4374,7 +4375,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-N3HJ (RZ035-J1)"/>
 		<info name="release" value="20000713"/>
-		<info name="alt_title" value="がんばれ!ニッポン!オリンピック2000"/>
+		<info name="alt_title" value="ãŒã‚“ã°ã‚Œ!ãƒ‹ãƒƒãƒãƒ³!ã‚ªãƒªãƒ³ãƒ”ãƒƒã‚¯2000"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="ganbare! nippon! olympics 2000 (japan).bin" size="12582912" crc="1c7e5d6e" sha1="ff7721bea55f0447e5eb84f5583bbb67de1348d3" offset="000000" />
@@ -4399,7 +4400,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Epoch</publisher>
 		<info name="serial" value="NUS-NGDJ"/>
 		<info name="release" value="20000407"/>
-		<info name="alt_title" value="ガントレット レジェンド"/>
+		<info name="alt_title" value="ã‚¬ãƒ³ãƒˆãƒ¬ãƒƒãƒˆ ãƒ¬ã‚¸ã‚§ãƒ³ãƒ‰"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="gauntlet legends (japan).bin" size="16777216" crc="1f3a1912" sha1="c7938e334f9fa10004355f7163d5a7f3b80d981d" offset="000000" />
@@ -4424,7 +4425,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NGLJ"/>
 		<info name="release" value="19981204"/>
-		<info name="alt_title" value="ゲッターラブ!!"/>
+		<info name="alt_title" value="ã‚²ãƒƒã‚¿ãƒ¼ãƒ©ãƒ–!!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="getter love!! cho renai party game (japan).bin" size="12582912" crc="bbd2ae37" sha1="17507afa02aec34fe3af3077ef60a4a990626160" offset="000000" />
@@ -4550,7 +4551,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NGPJ (RZ030-J1)"/>
 		<info name="release" value="19991225"/>
-		<info name="alt_title" value="ゴエモン もののけ双六"/>
+		<info name="alt_title" value="ã‚´ã‚¨ãƒ¢ãƒ³ ã‚‚ã®ã®ã‘åŒå…­"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="goemon - mononoke sugoroku (japan).bin" size="16777216" crc="f6bacbac" sha1="fbb8c3d20023ab13dc8eb95a23f10d8e1063d86b" offset="000000" />
@@ -4608,7 +4609,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="NUS-NHSJ"/>
 		<info name="release" value="20010406"/>
-		<info name="alt_title" value="ハムスター物語64"/>
+		<info name="alt_title" value="ãƒãƒ ã‚¹ã‚¿ãƒ¼ç‰©èªž64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="hamster monogatari 64 (japan).bin" size="12582912" crc="689191c6" sha1="0460de6b25d40ca4f8d7c4af671c736f029812f6" offset="000000" />
@@ -4622,7 +4623,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="NUS-NM9J"/>
 		<info name="release" value="19971226"/>
-		<info name="alt_title" value="マスターズ'98 〜遥かなるオーガスタ〜"/>
+		<info name="alt_title" value="ãƒžã‚¹ã‚¿ãƒ¼ã‚º'98 ã€œé¥ã‹ãªã‚‹ã‚ªãƒ¼ã‚¬ã‚¹ã‚¿ã€œ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="harukanaru augusta - masters '98 (japan).bin" size="16777216" crc="ad4720e2" sha1="ca7bcae17e76880d3853c96e842db4ee0538630d" offset="000000" />
@@ -4647,7 +4648,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Shouei System</publisher>
 		<info name="serial" value="NUS-NHPJ"/>
 		<info name="release" value="19971128"/>
-		<info name="alt_title" value="HEIWA パチンコワールド64"/>
+		<info name="alt_title" value="HEIWA ãƒ‘ãƒãƒ³ã‚³ãƒ¯ãƒ¼ãƒ«ãƒ‰64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="heiwa pachinko world 64 (japan).bin" size="8388608" crc="3acb817e" sha1="0143e37535187f5ff40eed1c0b7a41a195c0e724" offset="000000" />
@@ -4716,7 +4717,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>GameBank</publisher>
 		<info name="serial" value="NUS-NHXJ"/>
 		<info name="release" value="19971218"/>
-		<info name="alt_title" value="ヘクセン"/>
+		<info name="alt_title" value="ãƒ˜ã‚¯ã‚»ãƒ³"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="hexen (japan).bin" size="8388608" crc="3d157140" sha1="70adc890606315107d97adedc02d210ab7ae8a57" offset="000000" />
@@ -4785,7 +4786,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NK4J"/>
 		<info name="release" value="20000324"/>
-		<info name="alt_title" value="星のカービィ64"/>
+		<info name="alt_title" value="æ˜Ÿã®ã‚«ãƒ¼ãƒ“ã‚£64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="hoshi no kirby 64 (japan) (rev c).bin" size="33554432" crc="3dec34a5" sha1="95e28e31109a42e80a6a4afebb3157b8acc6b4ec" offset="000000" />
@@ -4799,7 +4800,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NK4J"/>
 		<info name="release" value="20000324"/>
-		<info name="alt_title" value="星のカービィ64"/>
+		<info name="alt_title" value="æ˜Ÿã®ã‚«ãƒ¼ãƒ“ã‚£64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="hoshi no kirby 64 (japan) (rev b).bin" size="33554432" crc="32d2d11e" sha1="84e2597bc65a67e8c74e47b38614c89d42e3316f" offset="000000" />
@@ -4813,7 +4814,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NK4J"/>
 		<info name="release" value="20000324"/>
-		<info name="alt_title" value="星のカービィ64"/>
+		<info name="alt_title" value="æ˜Ÿã®ã‚«ãƒ¼ãƒ“ã‚£64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="hoshi no kirby 64 (japan) (rev a).bin" size="33554432" crc="e2fab230" sha1="e2fb9469e99ca6ed48fbe19b1f57f5fd653981a3" offset="000000" />
@@ -4827,7 +4828,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NK4J"/>
 		<info name="release" value="20000324"/>
-		<info name="alt_title" value="星のカービィ64"/>
+		<info name="alt_title" value="æ˜Ÿã®ã‚«ãƒ¼ãƒ“ã‚£64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="hoshi no kirby 64 (japan).bin" size="33554432" crc="fcacbe90" sha1="8861aacdf6c36b40ae2031a85798173d8d180c91" offset="000000" />
@@ -4874,7 +4875,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="NUS-NHGJ"/>
 		<info name="release" value="19970328"/>
-		<info name="alt_title" value="ヒューマングランプリザ・ニュージェネレーション"/>
+		<info name="alt_title" value="ãƒ’ãƒ¥ãƒ¼ãƒžãƒ³ã‚°ãƒ©ãƒ³ãƒ—ãƒªã‚¶ãƒ»ãƒ‹ãƒ¥ãƒ¼ã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="human grand prix - the new generation (japan).bin" size="8388608" crc="a3fc9aea" sha1="d7bc56c4ed710091bec56c3e1485adf1c533d1c5" offset="000000" />
@@ -4899,7 +4900,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NHYJ (RZ011-J1)"/>
 		<info name="release" value="19990805"/>
-		<info name="alt_title" value="ハイブリッドヘブン"/>
+		<info name="alt_title" value="ãƒã‚¤ãƒ–ãƒªãƒƒãƒ‰ãƒ˜ãƒ–ãƒ³"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="hybrid heaven (japan).bin" size="16777216" crc="42e44701" sha1="6b755fc59f35f0f25c46f062471699533ab99da4" offset="000000" />
@@ -4957,7 +4958,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NH5J (RZ009-J1)"/>
 		<info name="release" value="19971218"/>
-		<info name="alt_title" value="ハイパーオリンピック イン ナガノ64"/>
+		<info name="alt_title" value="ãƒã‚¤ãƒ‘ãƒ¼ã‚ªãƒªãƒ³ãƒ”ãƒƒã‚¯ ã‚¤ãƒ³ ãƒŠã‚¬ãƒŽ64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="hyper olympics in nagano 64 (japan).bin" size="12582912" crc="f7c2bb67" sha1="51ea8af6b29fc99a9c61dd2242c3732b6cdf43dc" offset="000000" />
@@ -4971,7 +4972,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Seta Corporation</publisher>
 		<info name="serial" value="NUS-NIMJ"/>
 		<info name="release" value="20000421"/>
-		<info name="alt_title" value="井出洋介の麻雀塾"/>
+		<info name="alt_title" value="äº•å‡ºæ´‹ä»‹ã®éº»é›€å¡¾"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="ide yosuke no mahjong juku (japan).bin" size="12582912" crc="32003c85" sha1="278e45431689b52ce28955957b444ae4f8539199" offset="000000" />
@@ -5007,7 +5008,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="NUS-NWBJ"/>
 		<info name="release" value="19980828"/>
-		<info name="alt_title" value="イギーくんのぶら2ぽよん"/>
+		<info name="alt_title" value="ã‚¤ã‚®ãƒ¼ãã‚“ã®ã¶ã‚‰2ã½ã‚ˆã‚“"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="iggy-kun no bura bura poyon (japan).bin" size="4194304" crc="e133064b" sha1="02542cfdc3734350403e4fb7cc139953436584d8" offset="000000" />
@@ -5164,7 +5165,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NIBJ"/>
 		<info name="release" value="20000331"/>
-		<info name="alt_title" value="糸井重里のバス釣りNo.1 決定版!"/>
+		<info name="alt_title" value="ç³¸äº•é‡é‡Œã®ãƒã‚¹é‡£ã‚ŠNo.1 æ±ºå®šç‰ˆ!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="itoi shigesato no bass tsuri no. 1 kettei ban! (japan).bin" size="16777216" crc="5e9c3e4b" sha1="e9581337df0f93638ddaf328f84bfe92e5764474" offset="000000" />
@@ -5178,7 +5179,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NDSJ"/>
 		<info name="release" value="19970905"/>
-		<info name="alt_title" value="Jリーグダイナマイトサッカー64"/>
+		<info name="alt_title" value="Jãƒªãƒ¼ã‚°ãƒ€ã‚¤ãƒŠãƒžã‚¤ãƒˆã‚µãƒƒã‚«ãƒ¼64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="j.league dynamite soccer 64 (japan).bin" size="8388608" crc="67ec5f38" sha1="fbd0a8b7d405a06e3a955e6f897c667eac3f03a7" offset="000000" />
@@ -5192,7 +5193,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NJEJ"/>
 		<info name="release" value="19971024"/>
-		<info name="alt_title" value="Jリーグ イレブンビート1997"/>
+		<info name="alt_title" value="Jãƒªãƒ¼ã‚° ã‚¤ãƒ¬ãƒ–ãƒ³ãƒ“ãƒ¼ãƒˆ1997"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="j.league eleven beat 1997 (japan).bin" size="8388608" crc="b2d77747" sha1="c5d159bddc89da2224e1d32c695248998c4560bd" offset="000000" />
@@ -5206,7 +5207,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="NUS-NJLJ"/>
 		<info name="release" value="19970328"/>
-		<info name="alt_title" value="Jリーグライブ64"/>
+		<info name="alt_title" value="Jãƒªãƒ¼ã‚°ãƒ©ã‚¤ãƒ–64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="j.league live 64 (japan).bin" size="8388608" crc="8a48de94" sha1="563c4f5d0b7cbe2ec675153d52eefb2901e5b624" offset="000000" />
@@ -5220,7 +5221,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>ASCII Entertainment</publisher>
 		<info name="serial" value="NUS-NSJJ"/>
 		<info name="release" value="19990115"/>
-		<info name="alt_title" value="Jリーグタクティクスサッカー"/>
+		<info name="alt_title" value="Jãƒªãƒ¼ã‚°ã‚¿ã‚¯ãƒ†ã‚£ã‚¯ã‚¹ã‚µãƒƒã‚«ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="j.league tactics soccer (japan) (rev a).bin" size="12582912" crc="71fa1d4d" sha1="bc3a2585e96e64e1f0d8cb7c2f7f38f0a6163319" offset="000000" />
@@ -5234,7 +5235,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>ASCII Entertainment</publisher>
 		<info name="serial" value="NUS-NSJJ"/>
 		<info name="release" value="19990115"/>
-		<info name="alt_title" value="Jリーグタクティクスサッカー"/>
+		<info name="alt_title" value="Jãƒªãƒ¼ã‚°ã‚¿ã‚¯ãƒ†ã‚£ã‚¯ã‚¹ã‚µãƒƒã‚«ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="j.league tactics soccer (japan).bin" size="12582912" crc="0b6c70ea" sha1="058e9ccd131199394e0d6e6f6ea04aeeb2946d59" offset="000000" />
@@ -5248,7 +5249,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Video System</publisher>
 		<info name="serial" value="NUS-NMAJ"/>
 		<info name="release" value="19970725"/>
-		<info name="alt_title" value="雀豪シミュレーション 麻雀道64"/>
+		<info name="alt_title" value="é›€è±ªã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ éº»é›€é“64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="jangou simulation mahjong dou 64 (japan).bin" size="8388608" crc="27e9853c" sha1="d969105f2ec0d1116e35b66410acac4b207aaf3d" offset="000000" />
@@ -5306,7 +5307,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NGSJ (RZ019-J1)"/>
 		<info name="release" value="19990428"/>
-		<info name="alt_title" value="実況GIステイブル"/>
+		<info name="alt_title" value="å®Ÿæ³GIã‚¹ãƒ†ã‚¤ãƒ–ãƒ«"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou g1 stable (japan) (rev a).bin" size="16777216" crc="142072bf" sha1="6da9b4181b3aec624d9b9ce507251c319313411f" offset="000000" />
@@ -5320,7 +5321,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NGSJ (RZ019-J1)"/>
 		<info name="release" value="19990428"/>
-		<info name="alt_title" value="実況GIステイブル"/>
+		<info name="alt_title" value="å®Ÿæ³GIã‚¹ãƒ†ã‚¤ãƒ–ãƒ«"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou g1 stable (japan).bin" size="16777216" crc="97669431" sha1="076d1ef9af18a6456048a1699aad377aeab8772f" offset="000000" />
@@ -5334,7 +5335,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPSJ (RZ029-J1)"/>
 		<info name="release" value="19990729"/>
-		<info name="alt_title" value="実況J.LEAGUE1999 パーフェクトストライカー2"/>
+		<info name="alt_title" value="å®Ÿæ³J.LEAGUE1999 ãƒ‘ãƒ¼ãƒ•ã‚§ã‚¯ãƒˆã‚¹ãƒˆãƒ©ã‚¤ã‚«ãƒ¼2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou j.league 1999 - perfect striker 2 (japan) (rev a).bin" size="16777216" crc="b4131606" sha1="5a3734b75495372b0c6d45f9dd4dfcf57bc75be8" offset="000000" />
@@ -5348,7 +5349,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPSJ (RZ029-J1)"/>
 		<info name="release" value="19990729"/>
-		<info name="alt_title" value="実況J.LEAGUE1999 パーフェクトストライカー2"/>
+		<info name="alt_title" value="å®Ÿæ³J.LEAGUE1999 ãƒ‘ãƒ¼ãƒ•ã‚§ã‚¯ãƒˆã‚¹ãƒˆãƒ©ã‚¤ã‚«ãƒ¼2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou j.league 1999 - perfect striker 2 (japan).bin" size="16777216" crc="8e2f8322" sha1="25033e8ebaa71316d108de450971180b544de315" offset="000000" />
@@ -5362,7 +5363,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPAJ (RZ034-J1)"/>
 		<info name="release" value="20000429"/>
-		<info name="alt_title" value="実況パワフルプロ野球2000"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ2000"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 2000 (japan) (rev a).bin" size="16777216" crc="4e6faa43" sha1="6f32972fe2fdce0ac051787b8253950aa36487d1" offset="000000" />
@@ -5376,7 +5377,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPAJ (RZ034-J1)"/>
 		<info name="release" value="20000429"/>
-		<info name="alt_title" value="実況パワフルプロ野球2000"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ2000"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 2000 (japan).bin" size="16777216" crc="45e04c78" sha1="5705cbee7664f8eb184fd451e219f5954060b5a8" offset="000000" />
@@ -5390,7 +5391,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP4J (RZ001-J1)"/>
 		<info name="release" value="19970314"/>
-		<info name="alt_title" value="実況パワフルプロ野球4"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ4"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="jikkyou powerful pro yakyuu 4 (japan) (rev a).bin" size="12582912" crc="435126ae" sha1="44287562745c42662b61224ebfd9b483867eafee" offset="000000" />
@@ -5404,7 +5405,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP4J (RZ001-J1)"/>
 		<info name="release" value="19970314"/>
-		<info name="alt_title" value="実況パワフルプロ野球4"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ4"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="jikkyou powerful pro yakyuu 4 (japan).bin" size="12582912" crc="8d2540f1" sha1="73016b7c15bae869b0d868e62b433400503ef540" offset="000000" />
@@ -5418,7 +5419,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NJ5J (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
-		<info name="alt_title" value="実況パワフルプロ野球5"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ5"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 5 (japan) (rev b).bin" size="16777216" crc="5b39c8b2" sha1="6105e653e99e56b6e0edf80db35031bf0f0b1881" offset="000000" />
@@ -5432,7 +5433,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NJ5J (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
-		<info name="alt_title" value="実況パワフルプロ野球5"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ5"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 5 (japan) (rev a).bin" size="16777216" crc="a25d1427" sha1="483e455584f8fd4a4ad002d9718695d3a11cbfc6" offset="000000" />
@@ -5446,7 +5447,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NJ5J (RZ015-J1)"/>
 		<info name="release" value="19980326"/>
-		<info name="alt_title" value="実況パワフルプロ野球5"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ5"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 5 (japan).bin" size="16777216" crc="94fa55ff" sha1="7822e0015e716ae540e95f50c32558eaa7865174" offset="000000" />
@@ -5460,7 +5461,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J (RZ026-J1)"/>
 		<info name="release" value="19990325"/>
-		<info name="alt_title" value="実況パワフルプロ野球6"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ6"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 6 (japan) (rev b).bin" size="16777216" crc="e8d4a365" sha1="be9811a86db41f5b1f4844bc004aa34d1d4bc406" offset="000000" />
@@ -5474,7 +5475,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J (RZ026-J1)"/>
 		<info name="release" value="19990325"/>
-		<info name="alt_title" value="実況パワフルプロ野球6"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ6"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 6 (japan) (rev a).bin" size="16777216" crc="5b6351f1" sha1="713b5c8bf72d78b97df416923aad589ec3c8ec64" offset="000000" />
@@ -5488,7 +5489,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NP6J (RZ026-J1)"/>
 		<info name="release" value="19990325"/>
-		<info name="alt_title" value="実況パワフルプロ野球6"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ6"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu 6 (japan).bin" size="16777216" crc="a54e4397" sha1="ae89aa2cd42aa841984c3e9ee2e3aada1148bf2d" offset="000000" />
@@ -5502,7 +5503,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPEJ (RZ038-J1)"/>
 		<info name="release" value="20010329"/>
-		<info name="alt_title" value="実況パワフルプロ野球 Basic版2001"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ Basicç‰ˆ2001"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu basic ban 2001 (japan) (rev a).bin" size="16777216" crc="68d57df2" sha1="897d785332af3f7f055b23e7d848e60874003bd5" offset="000000" />
@@ -5516,7 +5517,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPEJ (RZ038-J1)"/>
 		<info name="release" value="20010329"/>
-		<info name="alt_title" value="実況パワフルプロ野球 Basic版2001"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ‘ãƒ¯ãƒ•ãƒ«ãƒ—ãƒ­é‡Žçƒ Basicç‰ˆ2001"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou powerful pro yakyuu basic ban 2001 (japan).bin" size="16777216" crc="4e102917" sha1="0f34cc6c6448cf4956dccdabeac0fbbd1f36dca1" offset="000000" />
@@ -5530,7 +5531,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NWSJ (RZ012-J1)"/>
 		<info name="release" value="19980604"/>
-		<info name="alt_title" value="実況ワールドサッカーワールドカップ フランス'98"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚µãƒƒã‚«ãƒ¼ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚«ãƒƒãƒ— ãƒ•ãƒ©ãƒ³ã‚¹'98"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou world soccer - world cup france '98 (japan) (rev b).bin" size="16777216" crc="55551947" sha1="b86cb29227a7173338b6a2245e760be5344379b6" offset="000000" />
@@ -5544,7 +5545,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NWSJ (RZ012-J1)"/>
 		<info name="release" value="19980604"/>
-		<info name="alt_title" value="実況ワールドサッカーワールドカップ フランス'98"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚µãƒƒã‚«ãƒ¼ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚«ãƒƒãƒ— ãƒ•ãƒ©ãƒ³ã‚¹'98"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou world soccer - world cup france '98 (japan) (rev a).bin" size="16777216" crc="7576897d" sha1="cfbdeb8a9218b147b2cff8d087b3d3fb07e9cd37" offset="000000" />
@@ -5558,7 +5559,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NWSJ (RZ012-J1)"/>
 		<info name="release" value="19980604"/>
-		<info name="alt_title" value="実況ワールドサッカーワールドカップ フランス'98"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚µãƒƒã‚«ãƒ¼ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚«ãƒƒãƒ— ãƒ•ãƒ©ãƒ³ã‚¹'98"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou world soccer - world cup france '98 (japan).bin" size="16777216" crc="970a3c24" sha1="5ffd475d721c334ed82ca7bc99ed0e17c025d1e4" offset="000000" />
@@ -5572,7 +5573,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NJ3J (RZ006-J1)"/>
 		<info name="release" value="19970918"/>
-		<info name="alt_title" value="実況ワールドサッカー3"/>
+		<info name="alt_title" value="å®Ÿæ³ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚µãƒƒã‚«ãƒ¼3"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="jikkyou world soccer 3 (japan).bin" size="8388608" crc="8755de1f" sha1="e1c73256a92e98bcb79d2d4c56efce77f0ff158b" offset="000000" />
@@ -5586,7 +5587,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="NUS-NTUJ-JPN"/>
 		<info name="release" value="19970530"/>
-		<info name="alt_title" value="時空戦士テュロック"/>
+		<info name="alt_title" value="æ™‚ç©ºæˆ¦å£«ãƒ†ãƒ¥ãƒ­ãƒƒã‚¯"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="jikuu senshi turok (japan).bin" size="8388608" crc="c3230021" sha1="182394e9772985ddd45e4459a58916fba9f386ad" offset="000000" />
@@ -5600,7 +5601,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Takara</publisher>
 		<info name="serial" value="NUS-NJGJ"/>
 		<info name="release" value="19990319"/>
-		<info name="alt_title" value="人生ゲーム64"/>
+		<info name="alt_title" value="äººç”Ÿã‚²ãƒ¼ãƒ 64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jinsei game 64 (japan).bin" size="16777216" crc="888b4265" sha1="ce9931571e9d60cc3c92458f89fbdbed214ed833" offset="000000" />
@@ -5625,7 +5626,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-NDWJ"/>
 		<info name="release" value="20000407"/>
-		<info name="alt_title" value="JOHN ROMERO'S 大刀 DAIKATANA"/>
+		<info name="alt_title" value="JOHN ROMERO'S å¤§åˆ€ DAIKATANA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="john romero's daikatana (japan).bin" size="16777216" crc="befb1434" sha1="8bda39f1e1c39020ff259b1d4d1ccb2c87d1ee38" offset="000000" />
@@ -5650,7 +5651,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NFYJ"/>
 		<info name="release" value="19990827"/>
-		<info name="alt_title" value="格闘伝承 F-Cup Maniax"/>
+		<info name="alt_title" value="æ ¼é—˜ä¼æ‰¿ F-Cup Maniax"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="kakutou denshou - f-cup maniax (japan).bin" size="16777216" crc="1e967ac0" sha1="6e7116db2a7aabd5f8d6149f34b6e187bcaaec3c" offset="000000" />
@@ -5719,7 +5720,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-NSBJ"/>
 		<info name="release" value="19991218"/>
-		<info name="alt_title" value="キングヒル64 エクストリームスノーボーディング"/>
+		<info name="alt_title" value="ã‚­ãƒ³ã‚°ãƒ’ãƒ«64 ã‚¨ã‚¯ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚¹ãƒŽãƒ¼ãƒœãƒ¼ãƒ‡ã‚£ãƒ³ã‚°"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="king hill 64 - extreme snowboarding (japan).bin" size="12582912" crc="bc5f8666" sha1="35df68d6c1be28ef72ed54ad7f19bf1504c43c2a" offset="000000" />
@@ -5733,7 +5734,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-N64J"/>
 		<info name="release" value="19981023"/>
-		<info name="alt_title" value="キラッと解決! 64探偵団"/>
+		<info name="alt_title" value="ã‚­ãƒ©ãƒƒã¨è§£æ±º! 64æŽ¢åµå›£"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="kiratto kaiketsu! 64 tanteidan (japan).bin" size="12582912" crc="9fc8a30c" sha1="c6b8349a834853501397225e29d2a7decedd07f1" offset="000000" />
@@ -5780,7 +5781,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-NKEJ"/>
 		<info name="release" value="19981127"/>
-		<info name="alt_title" value="ナイフエッジ ノーズガンナー"/>
+		<info name="alt_title" value="ãƒŠã‚¤ãƒ•ã‚¨ãƒƒã‚¸ ãƒŽãƒ¼ã‚ºã‚¬ãƒ³ãƒŠãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="knife edge - nose gunner (japan).bin" size="8388608" crc="2ff68ed9" sha1="5e1eceddb5fd98a08dd5f08ce85ff6f9dff34417" offset="000000" />
@@ -5838,7 +5839,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NLLJ"/>
 		<info name="release" value="19990528"/>
-		<info name="alt_title" value="ラストレジオンUX"/>
+		<info name="alt_title" value="ãƒ©ã‚¹ãƒˆãƒ¬ã‚¸ã‚ªãƒ³UX"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="last legion ux (japan).bin" size="12582912" crc="c3daf1aa" sha1="3d434df177270a319b83d99df74f0c2d59c8c370" offset="000000" />
@@ -5877,12 +5878,12 @@ patched out (+ a fix for internal checksum)
 				<!-- Original release, in .z64 format -->
 				<!-- rom name="mm_debug.rom" size="67108864" crc="687d8395" sha1="b38b71d2961dffb523020a67f4807a4b704e347a" offset="000000" /-->
 				<!-- .v64 version -->
-				<rom name="mm_debug.bin" size="67108864" crc="ea2e7abb" sha1="c790b3de31196645034c76e326640ccf3b8c91dd" offset="000000" />
+				<rom name="legend of zelda, the - majora's mask (europe) (en,fr,de,es) (debug edition).bin" size="67108864" crc="ea2e7abb" sha1="c790b3de31196645034c76e326640ccf3b8c91dd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zeldamaju1" cloneof="zeldamaj">
+	<software name="zeldamaju2" cloneof="zeldamaj">
 		<description>The Legend of Zelda - Majora's Mask (USA, Demo)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -5943,7 +5944,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NTSJ"/>
 		<info name="release" value="19981009"/>
-		<info name="alt_title" value="Let's スマッシュ"/>
+		<info name="alt_title" value="Let's ã‚¹ãƒžãƒƒã‚·ãƒ¥"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="let's smash (japan).bin" size="12582912" crc="33543946" sha1="7dd60d27cc1cabf70a380fa2a567621ef8e69dcd" offset="000000" />
@@ -5968,7 +5969,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="NUS-NLRJ"/>
 		<info name="release" value="19990730"/>
-		<info name="alt_title" value="ロードランナー3D"/>
+		<info name="alt_title" value="ãƒ­ãƒ¼ãƒ‰ãƒ©ãƒ³ãƒŠãƒ¼3D"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="lode runner 3-d (japan).bin" size="8388608" crc="8a1ae6a7" sha1="62c0d2599bb3ebbab3602f5e1cb5cfc2626506d4" offset="000000" />
@@ -6136,7 +6137,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NUS-NMTJ"/>
 		<info name="release" value="19981120"/>
-		<info name="alt_title" value="マジカル TETRIS チャレンジ featuring ミッキー"/>
+		<info name="alt_title" value="ãƒžã‚¸ã‚«ãƒ« TETRIS ãƒãƒ£ãƒ¬ãƒ³ã‚¸ featuring ãƒŸãƒƒã‚­ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="magical tetris challenge featuring mickey (japan).bin" size="16777216" crc="6d3eba8b" sha1="43848d4a70a0d33b4c94b340895f0a09561b6bbc" offset="000000" />
@@ -6150,7 +6151,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Koei</publisher>
 		<info name="serial" value="NUS-NMJJ"/>
 		<info name="release" value="19970404"/>
-		<info name="alt_title" value="麻雀64"/>
+		<info name="alt_title" value="éº»é›€64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="mahjong 64 (japan).bin" size="8388608" crc="0fb9138c" sha1="3c9d98dfc27e9b5a8f085a2f189f42e2a77a970e" offset="000000" />
@@ -6164,7 +6165,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NMHJ"/>
 		<info name="release" value="19970801"/>
-		<info name="alt_title" value="麻雀放浪記 CLASSIC"/>
+		<info name="alt_title" value="éº»é›€æ”¾æµªè¨˜ CLASSIC"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="mahjong hourouki classic (japan).bin" size="12582912" crc="fd9ea0d5" sha1="dbb8e86f53953abc97fa015f50523264689d3331" offset="000000" />
@@ -6178,7 +6179,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NMMJ (RZ003-J1)"/>
 		<info name="release" value="19961220"/>
-		<info name="alt_title" value="麻雀 MASTER"/>
+		<info name="alt_title" value="éº»é›€ MASTER"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="mahjong master (japan).bin" size="8388608" crc="db0b662a" sha1="734f5865d4e293a3fc28e167a0aaf79ddefe8837" offset="000000" />
@@ -6236,7 +6237,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMFJ"/>
 		<info name="release" value="19990611"/>
-		<info name="alt_title" value="マリオゴルフ64"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªã‚´ãƒ«ãƒ•64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="mario golf 64 (japan) (rev a).bin" size="33554432" crc="b2672604" sha1="c4399c37a0f63a18c6ac0d7a98e63b5c3483e4ad" offset="000000" />
@@ -6250,7 +6251,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMFJ"/>
 		<info name="release" value="19990611"/>
-		<info name="alt_title" value="マリオゴルフ64"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªã‚´ãƒ«ãƒ•64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="mario golf 64 (japan).bin" size="33554432" crc="889091fd" sha1="137b9591194489cfc33d29fa0b054d9954db4e1e" offset="000000" />
@@ -6286,7 +6287,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NKTJ"/>
 		<info name="release" value="19961214"/>
-		<info name="alt_title" value="マリオカート64"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªã‚«ãƒ¼ãƒˆ64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="mario kart 64 (japan) (rev a).bin" size="12582912" crc="26450aab" sha1="42769bc9467df9a517a88e28f9ce2b6956a7a15f" offset="000000" />
@@ -6300,7 +6301,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NKTJ"/>
 		<info name="release" value="19961214"/>
-		<info name="alt_title" value="マリオカート64"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªã‚«ãƒ¼ãƒˆ64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="mario kart 64 (japan).bin" size="12582912" crc="4711a9dc" sha1="991d4f714730cdef771ab1e32da5a324388619b7" offset="000000" />
@@ -6314,7 +6315,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Tokyo Electron</publisher>
 		<info name="serial" value="NUS-NMPJ"/>
 		<info name="release" value="19981202"/>
-		<info name="alt_title" value="マリオのふぉとぴー"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªã®ãµã‰ã¨ã´ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="mario no photopie (japan).bin" size="16777216" crc="49e24ae2" sha1="f8bba2635aade03fb700c1614f36aa5a605af85e" offset="000000" />
@@ -6339,7 +6340,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CLBJ"/>
 		<info name="release" value="19981218"/>
-		<info name="alt_title" value="マリオパーティ"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªãƒ‘ãƒ¼ãƒ†ã‚£"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="mario party (japan).bin" size="33554432" crc="7d387e37" sha1="82d03c229f37b7e8af72f4ee867022e4fa0f1f99" offset="000000" />
@@ -6364,7 +6365,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMWJ"/>
 		<info name="release" value="19991217"/>
-		<info name="alt_title" value="マリオパーティ2"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªãƒ‘ãƒ¼ãƒ†ã‚£2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="mario party 2 (japan).bin" size="33554432" crc="e19bf21c" sha1="fd523dff2f552a766993ebb5f056f15fcf52e17f" offset="000000" />
@@ -6400,7 +6401,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMVJ"/>
 		<info name="release" value="20001207"/>
-		<info name="alt_title" value="マリオパーティ3"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªãƒ‘ãƒ¼ãƒ†ã‚£3"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="mario party 3 (japan).bin" size="33554432" crc="703586d1" sha1="89b91548c6c5943e95eebfb8a4df84fb98d3d905" offset="000000" />
@@ -6425,7 +6426,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMQJ"/>
 		<info name="release" value="20000811"/>
-		<info name="alt_title" value="マリオストーリー"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªã‚¹ãƒˆãƒ¼ãƒªãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="41943040">
 				<rom name="mario story (japan).bin" size="41943040" crc="1fb7e59a" sha1="01c32f527383b4ec69ecc7805c485b7fb9a76ce0" offset="000000" />
@@ -6461,7 +6462,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NM8J"/>
 		<info name="release" value="20000721"/>
-		<info name="alt_title" value="マリオテニス64"/>
+		<info name="alt_title" value="ãƒžãƒªã‚ªãƒ†ãƒ‹ã‚¹64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="mario tennis 64 (japan).bin" size="16777216" crc="17c5515b" sha1="fb7f917aa3f40dbde33107f1c949301af8470c2e" offset="000000" />
@@ -6508,7 +6509,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NMLJ"/>
 		<info name="release" value="20010121"/>
-		<info name="alt_title" value="ミッキーのレーシングチャレンジUSA"/>
+		<info name="alt_title" value="ãƒŸãƒƒã‚­ãƒ¼ã®ãƒ¬ãƒ¼ã‚·ãƒ³ã‚°ãƒãƒ£ãƒ¬ãƒ³ã‚¸USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="mickey no racing challenge usa (japan).bin" size="33554432" crc="915a43ee" sha1="74b76cb5075663e568eebf9ac977e08cdba17ba9" offset="000000" />
@@ -6753,7 +6754,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Seta Corporation</publisher>
 		<info name="serial" value="NUS-NMSJ"/>
 		<info name="release" value="19980403"/>
-		<info name="alt_title" value="森田将棋64"/>
+		<info name="alt_title" value="æ£®ç”°å°†æ£‹64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="morita shougi 64 (japan).bin" size="8388608" crc="377b7580" sha1="41b66663b6428c040579cebeda70db2fcd063b3e" offset="000000" />
@@ -6844,7 +6845,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NMRJ"/>
 		<info name="release" value="19970718"/>
-		<info name="alt_title" value="マルチレーシングチャンピオンシップ"/>
+		<info name="alt_title" value="ãƒžãƒ«ãƒãƒ¬ãƒ¼ã‚·ãƒ³ã‚°ãƒãƒ£ãƒ³ãƒ”ã‚ªãƒ³ã‚·ãƒƒãƒ—"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="mrc - multi racing championship (japan).bin" size="12582912" crc="4ca898e3" sha1="96b6966a12c0d3deb78a26e7273ecb5aed17d5e9" offset="000000" />
@@ -7001,7 +7002,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NBAJ (RZ010-J1)"/>
 		<info name="release" value="19980129"/>
-		<info name="alt_title" value="NBA イン ザ ゾーン '98"/>
+		<info name="alt_title" value="NBA ã‚¤ãƒ³ ã‚¶ ã‚¾ãƒ¼ãƒ³ '98"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="nba in the zone '98 (japan).bin" size="12582912" crc="58b2150d" sha1="4fc0a8392ece34f8a8c524640dce2a1255c66bfc" offset="000000" />
@@ -7037,7 +7038,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NB2J (RZ023-J1)"/>
 		<info name="release" value="19990603"/>
-		<info name="alt_title" value="NBA イン ザ ゾーン 2"/>
+		<info name="alt_title" value="NBA ã‚¤ãƒ³ ã‚¶ ã‚¾ãƒ¼ãƒ³ 2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="nba in the zone 2 (japan).bin" size="12582912" crc="f736d01a" sha1="c81bce72a48686b3966815915a579f2f5de733ec" offset="000000" />
@@ -7183,7 +7184,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NUS-NEVJ"/>
 		<info name="release" value="19990625"/>
-		<info name="alt_title" value="新世紀エヴァンゲリオン"/>
+		<info name="alt_title" value="æ–°ä¸–ç´€ã‚¨ãƒ´ã‚¡ãƒ³ã‚²ãƒªã‚ªãƒ³"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="neon genesis evangelion (japan).bin" size="33554432" crc="4b8b23dc" sha1="bf10f76812ada36c304eb45ad5da794f02c560fe" offset="000000" />
@@ -7450,7 +7451,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="NUS-NHBJ"/>
 		<info name="release" value="20000421"/>
-		<info name="alt_title" value="忍たま乱太郎64 ゲームギャラリー"/>
+		<info name="alt_title" value="å¿ãŸã¾ä¹±å¤ªéƒŽ64 ã‚²ãƒ¼ãƒ ã‚®ãƒ£ãƒ©ãƒªãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="nintama rantarou 64 game gallery (japan).bin" size="8388608" crc="2d96c091" sha1="0c2ee2266c67b5afa507f5b8ece88ab565fed63a" offset="000000" />
@@ -7464,7 +7465,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NALJ"/>
 		<info name="release" value="19990115"/>
-		<info name="alt_title" value="ニンテンドウオールスター! 大乱闘スマッシュブラザーズ"/>
+		<info name="alt_title" value="ãƒ‹ãƒ³ãƒ†ãƒ³ãƒ‰ã‚¦ã‚ªãƒ¼ãƒ«ã‚¹ã‚¿ãƒ¼! å¤§ä¹±é—˜ã‚¹ãƒžãƒƒã‚·ãƒ¥ãƒ–ãƒ©ã‚¶ãƒ¼ã‚º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="nintendo all-star! dairantou smash brothers (japan).bin" size="16777216" crc="a2d1d0d1" sha1="42e5bab5d8c3b3ca3582e142094b50ecc7fea5e6" offset="000000" />
@@ -7511,7 +7512,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Pack In Soft</publisher>
 		<info name="serial" value="NUS-NUTJ"/>
 		<info name="release" value="19981127"/>
-		<info name="alt_title" value="ぬし釣り64"/>
+		<info name="alt_title" value="ã¬ã—é‡£ã‚Š64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="nushi tsuri 64 (japan) (rev a).bin" size="16777216" crc="df59e5f2" sha1="75caf0eda25d60a6e877573c3e16fb41e2d60209" offset="000000" />
@@ -7525,7 +7526,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Pack In Soft</publisher>
 		<info name="serial" value="NUS-NUTJ"/>
 		<info name="release" value="19981127"/>
-		<info name="alt_title" value="ぬし釣り64"/>
+		<info name="alt_title" value="ã¬ã—é‡£ã‚Š64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="nushi tsuri 64 (japan).bin" size="16777216" crc="02ff4df5" sha1="0c6561db721d440c1e29fabb79a53b0422ac1903" offset="000000" />
@@ -7539,7 +7540,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="NUS-NUMJ"/>
 		<info name="release" value="20000526"/>
-		<info name="alt_title" value="ぬし釣り64 −潮風にのって−"/>
+		<info name="alt_title" value="ã¬ã—é‡£ã‚Š64 âˆ’æ½®é¢¨ã«ã®ã£ã¦âˆ’"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="nushi tsuri 64 - shiokaze ni notte (japan).bin" size="33554432" crc="6a81744d" sha1="5306827ffbf9bd51f52723d87083d68db240c890" offset="000000" />
@@ -7597,7 +7598,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NOBJ"/>
 		<info name="release" value="19990714"/>
-		<info name="alt_title" value="オウガバトル 64"/>
+		<info name="alt_title" value="ã‚ªã‚¦ã‚¬ãƒãƒˆãƒ« 64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="41943040">
 				<rom name="ogre battle 64 - person of lordly caliber (japan) (rev a).bin" size="41943040" crc="d52f01fd" sha1="771bb04c814fdb741351b37bc4ca2db00f3d2a43" offset="000000" />
@@ -7644,7 +7645,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-P-NHNJ (RZ024-J1)"/>
 		<info name="release" value="19980716"/>
-		<info name="alt_title" value="オリンピックホッケーナガノ"/>
+		<info name="alt_title" value="ã‚ªãƒªãƒ³ãƒ”ãƒƒã‚¯ãƒ›ãƒƒã‚±ãƒ¼ãƒŠã‚¬ãƒŽ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="olympic hockey nagano '98 (japan).bin" size="8388608" crc="436cc625" sha1="df9d4743019fba3dd0725588f0d17d97cbb2c223" offset="000000" />
@@ -7669,7 +7670,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="NUS-NOMJ"/>
 		<info name="release" value="19990409"/>
-		<info name="alt_title" value="おねがいモンスター"/>
+		<info name="alt_title" value="ãŠã­ãŒã„ãƒ¢ãƒ³ã‚¹ã‚¿ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="onegai monsters (japan).bin" size="16777216" crc="ff03ec8a" sha1="a352a6f95b414f7563503fa39e92c604f965a11e" offset="000000" />
@@ -7694,7 +7695,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Seta Corporation</publisher>
 		<info name="serial" value="NUS-NPCJ"/>
 		<info name="release" value="19980529"/>
-		<info name="alt_title" value="パチンコ365日"/>
+		<info name="alt_title" value="ãƒ‘ãƒãƒ³ã‚³365æ—¥"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="pachinko 365 nichi (japan).bin" size="12582912" crc="41363874" sha1="a14f8b56f1f40d982e3636b328911ccc96b58bd5" offset="000000" />
@@ -7753,7 +7754,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="NUS-NPPJ"/>
 		<info name="release" value="19990129"/>
-		<info name="alt_title" value="Parlor! PRO 64 パチンコ実機シミュレーション"/>
+		<info name="alt_title" value="Parlor! PRO 64 ãƒ‘ãƒãƒ³ã‚³å®Ÿæ©Ÿã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="parlor! pro 64 - pachinko jikki simulation game (japan).bin" size="12582912" crc="66420991" sha1="2e1f15cbb6e4744d6b1c8efdc708349ab6c8982a" offset="000000" />
@@ -7767,7 +7768,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NUS-NUBJ"/>
 		<info name="release" value="19990716"/>
-		<info name="alt_title" value="PDウルトラマンバトルコレクション64"/>
+		<info name="alt_title" value="PDã‚¦ãƒ«ãƒˆãƒ©ãƒžãƒ³ãƒãƒˆãƒ«ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="pd ultraman battle collection 64 (japan).bin" size="33554432" crc="ab901b83" sha1="15a646c8e612f50a767055c352a1bef59aef49e5" offset="000000" />
@@ -7814,7 +7815,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPDJ"/>
 		<info name="release" value="20001021"/>
-		<info name="alt_title" value="パーフェクトダーク"/>
+		<info name="alt_title" value="ãƒ‘ãƒ¼ãƒ•ã‚§ã‚¯ãƒˆãƒ€ãƒ¼ã‚¯"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="perfect dark (japan).bin" size="33554432" crc="d76471db" sha1="e001af5a3069b374e0a08d1598b0833fe3128d82" offset="000000" />
@@ -7900,7 +7901,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPGJ"/>
 		<info name="release" value="19981212"/>
-		<info name="alt_title" value="ピカチュウげんきでちゅう"/>
+		<info name="alt_title" value="ãƒ”ã‚«ãƒãƒ¥ã‚¦ã’ã‚“ãã§ã¡ã‚…ã†"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="pikachuu genki de chuu (japan).bin" size="16777216" crc="2ae884cd" sha1="533ba7078e631bdcbf97776a151dbcab206fa991" offset="000000" />
@@ -7925,7 +7926,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPWJ"/>
 		<info name="release" value="19960623"/>
-		<info name="alt_title" value="パイロットウイングス64"/>
+		<info name="alt_title" value="ãƒ‘ã‚¤ãƒ­ãƒƒãƒˆã‚¦ã‚¤ãƒ³ã‚°ã‚¹64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="pilotwings 64 (japan).bin" size="8388608" crc="001ee45b" sha1="e6e8a48e433dc7a4949756e70ab18d0165a1bc6f" offset="000000" />
@@ -7950,7 +7951,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NPFJ"/>
 		<info name="release" value="19990321"/>
-		<info name="alt_title" value="ポケモンスナップ"/>
+		<info name="alt_title" value="ãƒã‚±ãƒ¢ãƒ³ã‚¹ãƒŠãƒƒãƒ—"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="pocket monsters snap (japan).bin" size="16777216" crc="100aacc0" sha1="76ea033f8d76c3add4f76d7dc718834aa1d30615" offset="000000" />
@@ -7964,7 +7965,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CPSJ"/>
 		<info name="release" value="19980801"/>
-		<info name="alt_title" value="ポケモンスタジアム"/>
+		<info name="alt_title" value="ãƒã‚±ãƒ¢ãƒ³ã‚¹ã‚¿ã‚¸ã‚¢ãƒ "/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="pocket monsters stadium (japan).bin" size="16777216" crc="3b2a3f7a" sha1="d1796076f855bd2354ffc5019eaeb2c9d7676716" offset="000000" />
@@ -7978,7 +7979,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CP2J"/>
 		<info name="release" value="19990430"/>
-		<info name="alt_title" value="ポケモンスタジアム2"/>
+		<info name="alt_title" value="ãƒã‚±ãƒ¢ãƒ³ã‚¹ã‚¿ã‚¸ã‚¢ãƒ 2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="pocket monsters stadium 2 (japan).bin" size="33554432" crc="c876be9c" sha1="17a3552f251daeb475b359aac687bcee473c13f7" offset="000000" />
@@ -7992,7 +7993,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NP3J"/>
 		<info name="release" value="20001214"/>
-		<info name="alt_title" value="ポケモンスタジアム 金銀 クリスタルバージョン対応"/>
+		<info name="alt_title" value="ãƒã‚±ãƒ¢ãƒ³ã‚¹ã‚¿ã‚¸ã‚¢ãƒ  é‡‘éŠ€ ã‚¯ãƒªã‚¹ã‚¿ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³å¯¾å¿œ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
 				<rom name="pocket monsters stadium kin gin (japan).bin" size="67108864" crc="16701567" sha1="4d40523a8fc1c212f30312bb7dcb665588bc6f1b" offset="000000" />
@@ -8001,7 +8002,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokepuzl">
-		<description>Pokémon Puzzle League (Euro)</description>
+		<description>PokÃ©mon Puzzle League (Euro)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8012,7 +8013,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokepuzlf" cloneof="pokepuzl">
-		<description>Pokémon Puzzle League (Fra)</description>
+		<description>PokÃ©mon Puzzle League (Fra)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8023,7 +8024,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokepuzlg" cloneof="pokepuzl">
-		<description>Pokémon Puzzle League (Ger)</description>
+		<description>PokÃ©mon Puzzle League (Ger)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8034,7 +8035,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokepuzlu" cloneof="pokepuzl">
-		<description>Pokémon Puzzle League (USA)</description>
+		<description>PokÃ©mon Puzzle League (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8045,7 +8046,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokesnapa" cloneof="pokesnap">
-		<description>Pokémon Snap (Aus)</description>
+		<description>PokÃ©mon Snap (Aus)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8056,7 +8057,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokesnap">
-		<description>Pokémon Snap (Euro)</description>
+		<description>PokÃ©mon Snap (Euro)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8067,7 +8068,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokesnapf" cloneof="pokesnap">
-		<description>Pokémon Snap (Fra)</description>
+		<description>PokÃ©mon Snap (Fra)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8078,7 +8079,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokesnapg" cloneof="pokesnap">
-		<description>Pokémon Snap (Ger)</description>
+		<description>PokÃ©mon Snap (Ger)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8089,7 +8090,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokesnapi" cloneof="pokesnap">
-		<description>Pokémon Snap (Ita)</description>
+		<description>PokÃ©mon Snap (Ita)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8100,7 +8101,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokesnaps" cloneof="pokesnap">
-		<description>Pokémon Snap (Spa)</description>
+		<description>PokÃ©mon Snap (Spa)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8111,7 +8112,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokesnapus" cloneof="pokesnap">
-		<description>Pokémon Snap Station (USA, Promo)</description>
+		<description>PokÃ©mon Snap Station (USA, Promo)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8122,7 +8123,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestad">
-		<description>Pokémon Stadium (Euro, Rev. A)</description>
+		<description>PokÃ©mon Stadium (Euro, Rev. A)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8133,7 +8134,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestadf" cloneof="pokestad">
-		<description>Pokémon Stadium (Fra)</description>
+		<description>PokÃ©mon Stadium (Fra)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8144,7 +8145,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestadg" cloneof="pokestad">
-		<description>Pokémon Stadium (Ger)</description>
+		<description>PokÃ©mon Stadium (Ger)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8155,7 +8156,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestadi" cloneof="pokestad">
-		<description>Pokémon Stadium (Ita)</description>
+		<description>PokÃ©mon Stadium (Ita)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8166,7 +8167,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestads" cloneof="pokestad">
-		<description>Pokémon Stadium (Spa)</description>
+		<description>PokÃ©mon Stadium (Spa)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8177,7 +8178,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestadu" cloneof="pokestad">
-		<description>Pokémon Stadium (USA, Rev. B)</description>
+		<description>PokÃ©mon Stadium (USA, Rev. B)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8188,7 +8189,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestadu1" cloneof="pokestad">
-		<description>Pokémon Stadium (USA, Rev. A)</description>
+		<description>PokÃ©mon Stadium (USA, Rev. A)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8199,7 +8200,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestd2">
-		<description>Pokémon Stadium 2 (Euro)</description>
+		<description>PokÃ©mon Stadium 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8210,7 +8211,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestd2f" cloneof="pokestd2">
-		<description>Pokémon Stadium 2 (Fra)</description>
+		<description>PokÃ©mon Stadium 2 (Fra)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8221,7 +8222,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestd2g" cloneof="pokestd2">
-		<description>Pokémon Stadium 2 (Ger)</description>
+		<description>PokÃ©mon Stadium 2 (Ger)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8232,7 +8233,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestd2i" cloneof="pokestd2">
-		<description>Pokémon Stadium 2 (Ita)</description>
+		<description>PokÃ©mon Stadium 2 (Ita)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8243,7 +8244,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestd2s" cloneof="pokestd2">
-		<description>Pokémon Stadium 2 (Spa)</description>
+		<description>PokÃ©mon Stadium 2 (Spa)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8254,7 +8255,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<software name="pokestd2u" cloneof="pokestd2">
-		<description>Pokémon Stadium 2 (USA)</description>
+		<description>PokÃ©mon Stadium 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
@@ -8281,7 +8282,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NPLJ"/>
 		<info name="release" value="19970808"/>
-		<info name="alt_title" value="パワーリーグ64"/>
+		<info name="alt_title" value="ãƒ‘ãƒ¯ãƒ¼ãƒªãƒ¼ã‚°64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="power league 64 (japan).bin" size="8388608" crc="bc7e2494" sha1="97e55b2c39f4e0390ec280a6f6d6d2777669eb43" offset="000000" />
@@ -8339,7 +8340,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Athena</publisher>
 		<info name="serial" value="NUS-NKMJ"/>
 		<info name="release" value="19971121"/>
-		<info name="alt_title" value="プロ麻雀 極64"/>
+		<info name="alt_title" value="ãƒ—ãƒ­éº»é›€ æ¥µ64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="pro mahjong kiwame 64 (japan) (rev a).bin" size="8388608" crc="fb5fcd97" sha1="ac12b381eeb7d4616dc219c96f3d04b4b95c913f" offset="000000" />
@@ -8353,7 +8354,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Athena</publisher>
 		<info name="serial" value="NUS-NKMJ"/>
 		<info name="release" value="19971121"/>
-		<info name="alt_title" value="プロ麻雀 極64"/>
+		<info name="alt_title" value="ãƒ—ãƒ­éº»é›€ æ¥µ64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="pro mahjong kiwame 64 (japan).bin" size="8388608" crc="01e83335" sha1="d58d1bd7184a69ab06f0104a0a94a1179ee7b208" offset="000000" />
@@ -8367,7 +8368,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="NUS-NNRJ"/>
 		<info name="release" value="19991105"/>
-		<info name="alt_title" value="プロ麻雀 兵 64"/>
+		<info name="alt_title" value="ãƒ—ãƒ­éº»é›€ å…µ 64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="pro mahjong tsuwamono 64 - jansou battle ni chousen (japan).bin" size="8388608" crc="388da567" sha1="7c5565519bb9041ebd25a78ca174143faf872809" offset="000000" />
@@ -8381,7 +8382,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Compile</publisher>
 		<info name="serial" value="NUS-NPTJ"/>
 		<info name="release" value="19991203"/>
-		<info name="alt_title" value="ぷよぷよ〜ん パーティー"/>
+		<info name="alt_title" value="ã·ã‚ˆã·ã‚ˆã€œã‚“ ãƒ‘ãƒ¼ãƒ†ã‚£ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="puyo puyo 4 - puyo puyon party (japan).bin" size="12582912" crc="9c32adeb" sha1="e02d3a92256a43c8aeaa6dabd2f53cd3769ef1f6" offset="000000" />
@@ -8395,7 +8396,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Compile</publisher>
 		<info name="serial" value="NUS-NPYJ"/>
 		<info name="release" value="19971031"/>
-		<info name="alt_title" value="ぷよぷよSUN64"/>
+		<info name="alt_title" value="ã·ã‚ˆã·ã‚ˆSUN64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="puyo puyo sun 64 (japan).bin" size="8388608" crc="c256544c" sha1="6ba3441890502ed5cdc27f29752f231490e49bf5" offset="000000" />
@@ -8409,7 +8410,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Taito Corporation</publisher>
 		<info name="serial" value="NUS-NPBJ"/>
 		<info name="release" value="19990305"/>
-		<info name="alt_title" value="パズルボブル64"/>
+		<info name="alt_title" value="ãƒ‘ã‚ºãƒ«ãƒœãƒ–ãƒ«64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="puzzle bobble 64 (japan).bin" size="8388608" crc="30238199" sha1="4e8b0bfb5a885919e63cb09618a0a3d938422301" offset="000000" />
@@ -8489,7 +8490,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NKRJ (RZ018-J1)"/>
 		<info name="release" value="19980723"/>
-		<info name="alt_title" value="らくがきっず"/>
+		<info name="alt_title" value="ã‚‰ããŒãã£ãš"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="rakuga kids (japan).bin" size="12582912" crc="4c07c266" sha1="9cb434635987e947f25d0ebd0e1a0f500e63adc6" offset="000000" />
@@ -8503,7 +8504,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NRAJ"/>
 		<info name="release" value="19990806"/>
-		<info name="alt_title" value="ラリー'99"/>
+		<info name="alt_title" value="ãƒ©ãƒªãƒ¼'99"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="rally '99 (japan).bin" size="8388608" crc="a1c36245" sha1="920113a96dfb15e3e8ed991c42e28734efa26599" offset="000000" />
@@ -8737,7 +8738,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NR7J"/>
 		<info name="release" value="19991224"/>
-		<info name="alt_title" value="ロボットポンコッツ64 七つの海のカラメル"/>
+		<info name="alt_title" value="ãƒ­ãƒœãƒƒãƒˆãƒãƒ³ã‚³ãƒƒãƒ„64 ä¸ƒã¤ã®æµ·ã®ã‚«ãƒ©ãƒ¡ãƒ«"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="robot ponkottsu 64 - 7tsu no umi no caramel (japan).bin" size="33554432" crc="49bb7dde" sha1="27bfaff7a8d2a3cef081af67a5e89290c6b59550" offset="000000" />
@@ -8806,7 +8807,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NUS-NRHJ"/>
 		<info name="release" value="20001122"/>
-		<info name="alt_title" value="ロックマンDASH 鋼の冒険心"/>
+		<info name="alt_title" value="ãƒ­ãƒƒã‚¯ãƒžãƒ³DASH é‹¼ã®å†’é™ºå¿ƒ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="rockman dash - hagane no boukenshin (japan).bin" size="33554432" crc="e1919c66" sha1="cd8c73a181a137dc8a4ac24e9f26ccc2518dc35f" offset="000000" />
@@ -8952,7 +8953,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Seta Corporation</publisher>
 		<info name="serial" value="NUS-NSHJ"/>
 		<info name="release" value="19960623"/>
-		<info name="alt_title" value="最強羽生将棋"/>
+		<info name="alt_title" value="æœ€å¼·ç¾½ç”Ÿå°†æ£‹"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="saikyou habu shougi (japan).bin" size="8388608" crc="e8d0810b" sha1="8a06e7a7d15e5586ff5ce5fed235e0357096c827" offset="000000" />
@@ -9054,7 +9055,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="NUS-NDCJ"/>
 		<info name="release" value="19990129"/>
-		<info name="alt_title" value="SD飛龍の拳伝説"/>
+		<info name="alt_title" value="SDé£›é¾ã®æ‹³ä¼èª¬"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="sd hiryuu no ken densetsu (japan).bin" size="12582912" crc="adf81b90" sha1="da0d9331c5a9688b674e6c72d4206fb05f1c2ee0" offset="000000" />
@@ -9156,7 +9157,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-NSGJ"/>
 		<info name="release" value="19990813"/>
-		<info name="alt_title" value="シャドウゲイト64"/>
+		<info name="alt_title" value="ã‚·ãƒ£ãƒ‰ã‚¦ã‚²ã‚¤ãƒˆ64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="shadowgate 64 - trials of the four towers (japan).bin" size="16777216" crc="f2665afd" sha1="94295ac2b5e44ad299ded088a8d43ef7a168c59d" offset="000000" />
@@ -9181,7 +9182,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NTOJ"/>
 		<info name="release" value="19980104"/>
-		<info name="alt_title" value="新日本プロレスリング 闘魂炎導 BRAVE SPIRITS"/>
+		<info name="alt_title" value="æ–°æ—¥æœ¬ãƒ—ãƒ­ãƒ¬ã‚¹ãƒªãƒ³ã‚° é—˜é­‚ç‚Žå°Ž BRAVE SPIRITS"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="shin nihon pro wrestling toukon road - brave spirits (japan).bin" size="12582912" crc="62c99de2" sha1="4da682946b4a6f586f4d525f0649d7a1e36357d9" offset="000000" />
@@ -9195,7 +9196,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NT3J"/>
 		<info name="release" value="19981226"/>
-		<info name="alt_title" value="新日本プロレス 闘魂炎導2 the next generation"/>
+		<info name="alt_title" value="æ–°æ—¥æœ¬ãƒ—ãƒ­ãƒ¬ã‚¹ é—˜é­‚ç‚Žå°Ž2 the next generation"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="shin nihon pro wrestling toukon road 2 - the next generation (japan).bin" size="33554432" crc="be0fc7e8" sha1="15b9c28584a26b60e5a2a231e5ba2897e831e8f8" offset="000000" />
@@ -9209,7 +9210,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NS2J"/>
 		<info name="release" value="19980130"/>
-		<info name="alt_title" value="シムシティ2000"/>
+		<info name="alt_title" value="ã‚·ãƒ ã‚·ãƒ†ã‚£2000"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="sim city 2000 (japan).bin" size="12582912" crc="f7a96b81" sha1="2a5b25809a5470b85db9cc0a1e6c5c44f225747b" offset="000000" />
@@ -9223,7 +9224,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Atlus</publisher>
 		<info name="serial" value="NUS-NSKJ"/>
 		<info name="release" value="19971212"/>
-		<info name="alt_title" value="スノボキッズ"/>
+		<info name="alt_title" value="ã‚¹ãƒŽãƒœã‚­ãƒƒã‚º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="snobo kids (japan).bin" size="8388608" crc="9b691df4" sha1="739ab70a45cca33e8bf884c35be338ff4ce66f11" offset="000000" />
@@ -9237,7 +9238,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NSNJ"/>
 		<info name="release" value="19981226"/>
-		<info name="alt_title" value="スノースピーダー"/>
+		<info name="alt_title" value="ã‚¹ãƒŽãƒ¼ã‚¹ãƒ”ãƒ¼ãƒ€ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="snow speeder (japan).bin" size="12582912" crc="5c98f900" sha1="2ef8591e9750066e248075dc940ec4fc080ef905" offset="000000" />
@@ -9295,7 +9296,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Video System</publisher>
 		<info name="serial" value="NUS-NSAJ"/>
 		<info name="release" value="19980319"/>
-		<info name="alt_title" value="ソニックウイングス アサルト"/>
+		<info name="alt_title" value="ã‚½ãƒ‹ãƒƒã‚¯ã‚¦ã‚¤ãƒ³ã‚°ã‚¹ ã‚¢ã‚µãƒ«ãƒˆ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="sonic wings assault (japan).bin" size="8388608" crc="1d8f9d5e" sha1="fb3e2be4927cf3fb39cce031004ff3420023eec5" offset="000000" />
@@ -9397,7 +9398,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="NUS-NDKJ"/>
 		<info name="release" value="19980327"/>
-		<info name="alt_title" value="スペースダイナマイツ"/>
+		<info name="alt_title" value="ã‚¹ãƒšãƒ¼ã‚¹ãƒ€ã‚¤ãƒŠãƒžã‚¤ãƒ„"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="space dynamites (japan).bin" size="8388608" crc="803f78ac" sha1="9b0776e967cbc97f832799ca8b16535efabc1cdf" offset="000000" />
@@ -9477,7 +9478,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NS6J"/>
 		<info name="release" value="19980710"/>
-		<info name="alt_title" value="スターソルジャー バニシングアース"/>
+		<info name="alt_title" value="ã‚¹ã‚¿ãƒ¼ã‚½ãƒ«ã‚¸ãƒ£ãƒ¼ ãƒãƒ‹ã‚·ãƒ³ã‚°ã‚¢ãƒ¼ã‚¹"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="star soldier - vanishing earth (japan).bin" size="12582912" crc="f51d4c7c" sha1="f075eeb6890065ce827a900df99e95f02f19098c" offset="000000" />
@@ -9502,7 +9503,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NJFJ"/>
 		<info name="release" value="19991201"/>
-		<info name="alt_title" value="スターツインズ"/>
+		<info name="alt_title" value="ã‚¹ã‚¿ãƒ¼ãƒ„ã‚¤ãƒ³ã‚º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="star twins (japan).bin" size="33554432" crc="c7bfb542" sha1="8f1a670d89c1252326d0979126deff532452f333" offset="000000" />
@@ -9571,7 +9572,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NRSJ"/>
 		<info name="release" value="19990827"/>
-		<info name="alt_title" value="スター・ウォーズ [出撃!ローグ中隊]"/>
+		<info name="alt_title" value="ã‚¹ã‚¿ãƒ¼ãƒ»ã‚¦ã‚©ãƒ¼ã‚º [å‡ºæ’ƒ!ãƒ­ãƒ¼ã‚°ä¸­éšŠ]"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="star wars - shutsugeki! rogue chuutai (japan).bin" size="16777216" crc="de90ade4" sha1="184a06d1967921e5bc9451d1337a529754b55c50" offset="000000" />
@@ -9585,7 +9586,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NSWJ"/>
 		<info name="release" value="19970614"/>
-		<info name="alt_title" value="スター・ウォーズ 帝国の影"/>
+		<info name="alt_title" value="ã‚¹ã‚¿ãƒ¼ãƒ»ã‚¦ã‚©ãƒ¼ã‚º å¸å›½ã®å½±"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="star wars - teikoku no kage (japan).bin" size="12582912" crc="54f66bb9" sha1="5ae92acb3035de0b62164787940f3d8272bb2708" offset="000000" />
@@ -9621,7 +9622,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NEPJ"/>
 		<info name="release" value="19990721"/>
-		<info name="alt_title" value="スター・ウォーズ エピソード1 レーサー"/>
+		<info name="alt_title" value="ã‚¹ã‚¿ãƒ¼ãƒ»ã‚¦ã‚©ãƒ¼ã‚º ã‚¨ãƒ”ã‚½ãƒ¼ãƒ‰1 ãƒ¬ãƒ¼ã‚µãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="star wars episode i - racer (japan).bin" size="33554432" crc="794412bf" sha1="4760072bb254bb7abfbf19d7664238b2cf5a6bd3" offset="000000" />
@@ -9701,7 +9702,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NB6J"/>
 		<info name="release" value="19980724"/>
-		<info name="alt_title" value="スーパービーダマン バトルフェニックス64"/>
+		<info name="alt_title" value="ã‚¹ãƒ¼ãƒ‘ãƒ¼ãƒ“ãƒ¼ãƒ€ãƒžãƒ³ ãƒãƒˆãƒ«ãƒ•ã‚§ãƒ‹ãƒƒã‚¯ã‚¹64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="super b-daman - battle phoenix 64 (japan).bin" size="12582912" crc="0be4f736" sha1="e5f4934bd4b4dc553a9a42c37a09dc24156941c4" offset="000000" />
@@ -9715,7 +9716,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Athena</publisher>
 		<info name="serial" value="NUS-NBWJ"/>
 		<info name="release" value="19990326"/>
-		<info name="alt_title" value="スーパーボウリング"/>
+		<info name="alt_title" value="ã‚¹ãƒ¼ãƒ‘ãƒ¼ãƒœã‚¦ãƒªãƒ³ã‚°"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="super bowling (japan).bin" size="8388608" crc="be01964b" sha1="8c9a5a424f3fd5c3165835bc240102f1a8bb67ad" offset="000000" />
@@ -9740,7 +9741,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-P-NSMJ"/>
 		<info name="release" value="19970718"/>
-		<info name="alt_title" value="スーパーマリオ64 (振動パック対応バージョン)"/>
+		<info name="alt_title" value="ã‚¹ãƒ¼ãƒ‘ãƒ¼ãƒžãƒªã‚ª64 (æŒ¯å‹•ãƒ‘ãƒƒã‚¯å¯¾å¿œãƒãƒ¼ã‚¸ãƒ§ãƒ³)"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="super mario 64 (japan) (rev a) (shindou edition).bin" size="8388608" crc="bc9ff5f2" sha1="2a2b85e94581545ca3c05b8f864b488b141a8a1f" offset="000000" />
@@ -9754,7 +9755,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="NUS-NSSJ"/>
 		<info name="release" value="19980717"/>
-		<info name="alt_title" value="スーパーロボットスピリッツ"/>
+		<info name="alt_title" value="ã‚¹ãƒ¼ãƒ‘ãƒ¼ãƒ­ãƒœãƒƒãƒˆã‚¹ãƒ”ãƒªãƒƒãƒ„"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="super robot spirits (japan).bin" size="16777216" crc="dab52b89" sha1="f7b7e507b7210e637ccfd2f788a95ef5c7970ec0" offset="000000" />
@@ -9768,7 +9769,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="NUS-NS4J"/>
 		<info name="release" value="19991029"/>
-		<info name="alt_title" value="スーパーロボット大戦64"/>
+		<info name="alt_title" value="ã‚¹ãƒ¼ãƒ‘ãƒ¼ãƒ­ãƒœãƒƒãƒˆå¤§æˆ¦64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="super robot taisen 64 (japan).bin" size="33554432" crc="70fbc3b8" sha1="5ba9e915c1494fa6d9e8b0d4d32f312469963777" offset="000000" />
@@ -9804,7 +9805,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Titus</publisher>
 		<info name="serial" value="NUS-NLCJ"/>
 		<info name="release" value="19980529"/>
-		<info name="alt_title" value="スーパースピードレース64"/>
+		<info name="alt_title" value="ã‚¹ãƒ¼ãƒ‘ãƒ¼ã‚¹ãƒ”ãƒ¼ãƒ‰ãƒ¬ãƒ¼ã‚¹64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="super speed race 64 (japan).bin" size="4194304" crc="d96b76c3" sha1="e2e885786198a0f44ae740ba8c5dd59eac14b207" offset="000000" />
@@ -9873,7 +9874,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPZJ (RZ022-J1)"/>
 		<info name="release" value="19980326"/>
-		<info name="alt_title" value="進め!対戦ぱずるだま 闘魂!まるたま町"/>
+		<info name="alt_title" value="é€²ã‚!å¯¾æˆ¦ã±ãšã‚‹ã ã¾ é—˜é­‚!ã¾ã‚‹ãŸã¾ç”º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="susume! taisen puzzle dama - toukon! marutama chou (japan).bin" size="8388608" crc="dc83bcd3" sha1="abd8ecdbfc3676488c4cb961439f13ef8dc7c0c7" offset="000000" />
@@ -9997,7 +9998,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Seta Corporation</publisher>
 		<info name="serial" value="NUS-NT6J"/>
 		<info name="release" value="19981113"/>
-		<info name="alt_title" value="テトリス64"/>
+		<info name="alt_title" value="ãƒ†ãƒˆãƒªã‚¹64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="tetris 64 (japan).bin" size="8388608" crc="08b4ca1b" sha1="95d42d3b33569fc2f47ac30c7de277470cb79462" offset="000000" />
@@ -10242,7 +10243,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-NGBJ"/>
 		<info name="release" value="20000317"/>
-		<info name="alt_title" value="トップギア・ハイパーバイク"/>
+		<info name="alt_title" value="ãƒˆãƒƒãƒ—ã‚®ã‚¢ãƒ»ãƒã‚¤ãƒ‘ãƒ¼ãƒã‚¤ã‚¯"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="top gear hyper-bike (japan).bin" size="16777216" crc="d9af869c" sha1="0b97dbee843094ed6320d4b795b64f7fac908dae" offset="000000" />
@@ -10278,7 +10279,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-NRCJ"/>
 		<info name="release" value="19990319"/>
-		<info name="alt_title" value="トップギア オーバードライブ"/>
+		<info name="alt_title" value="ãƒˆãƒƒãƒ—ã‚®ã‚¢ ã‚ªãƒ¼ãƒãƒ¼ãƒ‰ãƒ©ã‚¤ãƒ–"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="top gear overdrive (japan).bin" size="12582912" crc="e680b138" sha1="7a92260252f5e823f1b3b4adedc85908a0cadbb5" offset="000000" />
@@ -10314,7 +10315,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-NTRJ"/>
 		<info name="release" value="19971205"/>
-		<info name="alt_title" value="トップギア・ラリー"/>
+		<info name="alt_title" value="ãƒˆãƒƒãƒ—ã‚®ã‚¢ãƒ»ãƒ©ãƒªãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="top gear rally (japan).bin" size="8388608" crc="d8e793f5" sha1="3c29783dd963b8594d2fd41e296b2c7d9dc318f2" offset="000000" />
@@ -10352,7 +10353,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-NL2J"/>
 		<info name="release" value="20000204"/>
-		<info name="alt_title" value="トップギア・ラリー2"/>
+		<info name="alt_title" value="ãƒˆãƒƒãƒ—ã‚®ã‚¢ãƒ»ãƒ©ãƒªãƒ¼2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="top gear rally 2 (japan).bin" size="12582912" crc="ccd50a05" sha1="6c342e8e47baa3b9ee8a0a35721ec3a123b94243" offset="000000" />
@@ -10432,7 +10433,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Takara</publisher>
 		<info name="serial" value="NUS-NTBJ"/>
 		<info name="release" value="19991001"/>
-		<info name="alt_title" value="トランスフォーマー ビーストウォーズ メタルス 64"/>
+		<info name="alt_title" value="ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒžãƒ¼ ãƒ“ãƒ¼ã‚¹ãƒˆã‚¦ã‚©ãƒ¼ã‚º ãƒ¡ã‚¿ãƒ«ã‚¹ 64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="transformers - beast wars metals 64 (japan).bin" size="12582912" crc="5e972b7d" sha1="da8e453dbbd57ac3b207b44b4621ea8897141bb6" offset="000000" />
@@ -10468,7 +10469,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NGUJ"/>
 		<info name="release" value="20001121"/>
-		<info name="alt_title" value="罪と罰～地球の継承者～"/>
+		<info name="alt_title" value="ç½ªã¨ç½°ï½žåœ°çƒã®ç¶™æ‰¿è€…ï½ž"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="tsumi to batsu - hoshi no keishousha (japan).bin" size="33554432" crc="c0891399" sha1="4c9ae28811f8688a9016d293c5f67681da53cad9" offset="000000" />
@@ -10741,7 +10742,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NIRJ"/>
 		<info name="release" value="19971219"/>
-		<info name="alt_title" value="ウッチャンナンチャンの炎のチャレンジャー 電流イライラ棒"/>
+		<info name="alt_title" value="ã‚¦ãƒƒãƒãƒ£ãƒ³ãƒŠãƒ³ãƒãƒ£ãƒ³ã®ç‚Žã®ãƒãƒ£ãƒ¬ãƒ³ã‚¸ãƒ£ãƒ¼ é›»æµã‚¤ãƒ©ã‚¤ãƒ©æ£’"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="utchan nanchan no hono no challenger - denryuu ira ira bou (japan).bin" size="8388608" crc="cb8c642b" sha1="9099c31fa07c8bfdd5dc94efebb9054144a1e34c" offset="000000" />
@@ -10846,7 +10847,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="NUS-NT2J-JPN "/>
 		<info name="release" value="19990618"/>
-		<info name="alt_title" value="バイオレンスキラーTUROK NEW GENERATION"/>
+		<info name="alt_title" value="ãƒã‚¤ã‚ªãƒ¬ãƒ³ã‚¹ã‚­ãƒ©ãƒ¼TUROK NEW GENERATION"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="violence killer - turok new generation (japan).bin" size="33554432" crc="65785622" sha1="873b8520fc44db2b3910dd5f11b9aec63f17645c" offset="000000" />
@@ -10904,7 +10905,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Asmik Ace Entertainment</publisher>
 		<info name="serial" value="NUS-NA2J"/>
 		<info name="release" value="20000128"/>
-		<info name="alt_title" value="バーチャルプロレス2 〜王道継承〜"/>
+		<info name="alt_title" value="ãƒãƒ¼ãƒãƒ£ãƒ«ãƒ—ãƒ­ãƒ¬ã‚¹2 ã€œçŽ‹é“ç¶™æ‰¿ã€œ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="virtual pro wrestling 2 - oudou keishou (japan).bin" size="33554432" crc="8e33c3af" sha1="d6e4980ee08519a0af60bed5c40a71e284b1e178" offset="000000" />
@@ -10918,7 +10919,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Asmik Ace Entertainment</publisher>
 		<info name="serial" value="NUS-NVPJ"/>
 		<info name="release" value="19971219"/>
-		<info name="alt_title" value="バーチャル・プロレスリング64"/>
+		<info name="alt_title" value="ãƒãƒ¼ãƒãƒ£ãƒ«ãƒ»ãƒ—ãƒ­ãƒ¬ã‚¹ãƒªãƒ³ã‚°64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="virtual pro wrestling 64 (japan).bin" size="16777216" crc="2b4b9bef" sha1="a98df45b6fdeb368fb906a2a1fb257658739cefe" offset="000000" />
@@ -11009,7 +11010,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWRJ"/>
 		<info name="release" value="19960927"/>
-		<info name="alt_title" value="ウエーブレース64"/>
+		<info name="alt_title" value="ã‚¦ã‚¨ãƒ¼ãƒ–ãƒ¬ãƒ¼ã‚¹64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wave race 64 (japan) (rev a).bin" size="8388608" crc="a977cc81" sha1="79cb03859a973d8b65b39c0ace3100034d70eafa" offset="000000" />
@@ -11023,7 +11024,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWRJ"/>
 		<info name="release" value="19970718"/>
-		<info name="alt_title" value="ウエーブレース64 (振動パック対応バージョン)"/>
+		<info name="alt_title" value="ã‚¦ã‚¨ãƒ¼ãƒ–ãƒ¬ãƒ¼ã‚¹64 (æŒ¯å‹•ãƒ‘ãƒƒã‚¯å¯¾å¿œãƒãƒ¼ã‚¸ãƒ§ãƒ³)"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wave race 64 (japan) (rev b) (shindou edition).bin" size="8388608" crc="d3610a02" sha1="443e3c3476568de9c36582184104f2dd09b59407" offset="000000" />
@@ -11037,7 +11038,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NWRJ"/>
 		<info name="release" value="19960927"/>
-		<info name="alt_title" value="ウエーブレース64"/>
+		<info name="alt_title" value="ã‚¦ã‚¨ãƒ¼ãƒ–ãƒ¬ãƒ¼ã‚¹64"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wave race 64 (japan).bin" size="8388608" crc="0580eee7" sha1="b1b4435b15627830f7c932eb40df862eea2b38e4" offset="000000" />
@@ -11095,7 +11096,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>GameBank</publisher>
 		<info name="serial" value="NUS-NWGJ"/>
 		<info name="release" value="19980228"/>
-		<info name="alt_title" value="ウェイン・グレツキー・3Dホッケー"/>
+		<info name="alt_title" value="ã‚¦ã‚§ã‚¤ãƒ³ãƒ»ã‚°ãƒ¬ãƒ„ã‚­ãƒ¼ãƒ»3Dãƒ›ãƒƒã‚±ãƒ¼"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wayne gretzky's 3d hockey (japan).bin" size="8388608" crc="694b3b0b" sha1="0a7890d52130cfa7f6076545735c510586c230ba" offset="000000" />
@@ -11219,7 +11220,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NWTJ"/>
 		<info name="release" value="19981127"/>
-		<info name="alt_title" value="ウェットリス"/>
+		<info name="alt_title" value="ã‚¦ã‚§ãƒƒãƒˆãƒªã‚¹"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="wetrix (japan).bin" size="4194304" crc="aebafd6d" sha1="a8d2970eb0313bdf925be994f04508373715f771" offset="000000" />
@@ -11255,7 +11256,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Seta Corporation</publisher>
 		<info name="serial" value="NUS-NWCJ"/>
 		<info name="release" value="19971128"/>
-		<info name="alt_title" value="ワイルドチョッパーズ"/>
+		<info name="alt_title" value="ãƒ¯ã‚¤ãƒ«ãƒ‰ãƒãƒ§ãƒƒãƒ‘ãƒ¼ã‚º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wild choppers (japan).bin" size="8388608" crc="fed21f49" sha1="e9794038f75ddadd6f57b0981b4e077766dcca3e" offset="000000" />
@@ -11269,7 +11270,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Koei</publisher>
 		<info name="serial" value="NUS-NWDJ"/>
 		<info name="release" value="19990923"/>
-		<info name="alt_title" value="ウィン バック"/>
+		<info name="alt_title" value="ã‚¦ã‚£ãƒ³ ãƒãƒƒã‚¯"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="winback (japan) (rev a).bin" size="16777216" crc="9fbd5973" sha1="5018f33d561edd38cf6234e68a4e86dc3edfd3dc" offset="000000" />
@@ -11283,7 +11284,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Koei</publisher>
 		<info name="serial" value="NUS-NWDJ"/>
 		<info name="release" value="19990923"/>
-		<info name="alt_title" value="ウィン バック"/>
+		<info name="alt_title" value="ã‚¦ã‚£ãƒ³ ãƒãƒƒã‚¯"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="winback (japan).bin" size="16777216" crc="a5364d80" sha1="e66e96813bb9a7d4e9c6b4ff39695adcc10b7ed5" offset="000000" />
@@ -11330,7 +11331,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Enix</publisher>
 		<info name="serial" value="NUS-NJ2J"/>
 		<info name="release" value="19961122"/>
-		<info name="alt_title" value="ワンダープロジェクト ジェイツーコルロの森のジョゼット"/>
+		<info name="alt_title" value="ãƒ¯ãƒ³ãƒ€ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆ ã‚¸ã‚§ã‚¤ãƒ„ãƒ¼ã‚³ãƒ«ãƒ­ã®æ£®ã®ã‚¸ãƒ§ã‚¼ãƒƒãƒˆ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="wonder project j2 - koruro no mori no jozet (japan).bin" size="8388608" crc="8aaf74a3" sha1="585b62b5ca10a5e296a7dd0065dccb91bb620ed2" offset="000000" />
@@ -11520,7 +11521,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Asmik Ace Entertainment</publisher>
 		<info name="serial" value="NUS-NWXJ"/>
 		<info name="release" value="20000915"/>
-		<info name="alt_title" value="WWF レッスルマニア2000"/>
+		<info name="alt_title" value="WWF ãƒ¬ãƒƒã‚¹ãƒ«ãƒžãƒ‹ã‚¢2000"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="wwf wrestlemania 2000 (japan).bin" size="33554432" crc="e4e3b9a3" sha1="4128e150bc7e1291a3d388a210a50bd423e5d3e2" offset="000000" />
@@ -11556,7 +11557,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Athena</publisher>
 		<info name="serial" value="NUS-NYKJ"/>
 		<info name="release" value="19991022"/>
-		<info name="alt_title" value="夜光虫II 殺人航路"/>
+		<info name="alt_title" value="å¤œå…‰è™«II æ®ºäººèˆªè·¯"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="yakouchuu ii - satsujin kouro (japan).bin" size="33554432" crc="5c97c412" sha1="e4035072f682fe16e189e57bf6a9a35706d3028a" offset="000000" />
@@ -11570,7 +11571,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Enix</publisher>
 		<info name="serial" value="NUS-NTMJ"/>
 		<info name="release" value="19970627"/>
-		<info name="alt_title" value="ゆけゆけ!!トラブルメーカーズ"/>
+		<info name="alt_title" value="ã‚†ã‘ã‚†ã‘!!ãƒˆãƒ©ãƒ–ãƒ«ãƒ¡ãƒ¼ã‚«ãƒ¼ã‚º"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="yuke yuke!! trouble makers (japan).bin" size="8388608" crc="f8bb860c" sha1="6807ebe5f95c30baee18f5da6c170396d6b8764e" offset="000000" />
@@ -11584,7 +11585,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NZSJ"/>
 		<info name="release" value="20000427"/>
-		<info name="alt_title" value="ゼルダの伝説 ムジュラの仮面"/>
+		<info name="alt_title" value="ã‚¼ãƒ«ãƒ€ã®ä¼èª¬ ãƒ ã‚¸ãƒ¥ãƒ©ã®ä»®é¢"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="zelda no densetsu - mujura no kamen (japan) (rev a).bin" size="33554432" crc="2de56c55" sha1="666fad106735135c1a3471ef1b967c396f949ad9" offset="000000" />
@@ -11598,7 +11599,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NZSJ"/>
 		<info name="release" value="20000427"/>
-		<info name="alt_title" value="ゼルダの伝説 ムジュラの仮面"/>
+		<info name="alt_title" value="ã‚¼ãƒ«ãƒ€ã®ä¼èª¬ ãƒ ã‚¸ãƒ¥ãƒ©ã®ä»®é¢"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="zelda no densetsu - mujura no kamen (japan).bin" size="33554432" crc="3361b649" sha1="9afda65b3ae7d3714066dbccf820158c3286f423" offset="000000" />
@@ -11612,7 +11613,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CZLJ"/>
 		<info name="release" value="19981121"/>
-		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
+		<info name="alt_title" value="ã‚¼ãƒ«ãƒ€ã®ä¼èª¬ æ™‚ã®ã‚ªã‚«ãƒªãƒŠ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="zelda no densetsu - toki no ocarina (japan) (rev b).bin" size="33554432" crc="656657cd" sha1="2d8fb7140a9c5d11ce614561e5a36ffef0c17540" offset="000000" />
@@ -11626,7 +11627,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CZLJ"/>
 		<info name="release" value="19981121"/>
-		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
+		<info name="alt_title" value="ã‚¼ãƒ«ãƒ€ã®ä¼èª¬ æ™‚ã®ã‚ªã‚«ãƒªãƒŠ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="zelda no densetsu - toki no ocarina (japan) (rev a).bin" size="33554432" crc="f31c202c" sha1="1181034d5f9533f53ebe8e1c781badbee115f5aa" offset="000000" />
@@ -11640,7 +11641,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-CZLJ"/>
 		<info name="release" value="19981121"/>
-		<info name="alt_title" value="ゼルダの伝説 時のオカリナ"/>
+		<info name="alt_title" value="ã‚¼ãƒ«ãƒ€ã®ä¼èª¬ æ™‚ã®ã‚ªã‚«ãƒªãƒŠ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="zelda no densetsu - toki no ocarina (japan).bin" size="33554432" crc="b58e98bb" sha1="f9e2b6840b9103e9707ea390089a7b6943592a98" offset="000000" />
@@ -11654,7 +11655,7 @@ patched out (+ a fix for internal checksum)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-NMZJ"/>
 		<info name="release" value="19990611"/>
-		<info name="alt_title" value="ズール 魔獣使い伝説"/>
+		<info name="alt_title" value="ã‚ºãƒ¼ãƒ« é­”ç£ä½¿ã„ä¼èª¬"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="zool - majuu tsukai densetsu (japan).bin" size="12582912" crc="84428431" sha1="def9f1d097cef5857449827ae2b1291ba346c2a8" offset="000000" />
@@ -11662,8 +11663,9 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<!-- to be verified -->
-	<software name="zeldaootmq" cloneof="zeldaoot">
+<!-- to be verified -->
+
+	<software name="zeldaootmqd" cloneof="zeldaoot">
 		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Debug Edition, Ripped from GC)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
@@ -11674,39 +11676,104 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="zeldaootmq1" cloneof="zeldaoot">
-		<description>The Legend of Zelda - Ocarina of Time - Master Quest (Euro, Debug Edition?, Ripped from GC)</description>
+	<software name="zeldaootmqu" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Ripped from GC)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - ocarina of time - master quest (2003)(nintendo)[gamecube version].bin" size="33554432" crc="177fa73a" sha1="8ebf2e29313f44f2d49e5b4191971d09919e8e48" offset="000000" />
+				<rom name="legend of zelda, the - ocarina of time - master quest (usa)(2003)(nintendo)(ntsc)[gamecube version].bin" size="33554432" crc="7b89b13f" sha1="e1d070ad7b017de9f992b362164dcd9d7f820f7e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootmq" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (Euro, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="legend of zelda, the - ocarina of time - master quest (europe)(2003)(nintendo)(pal)[gamecube version].bin" size="33554432" crc="177fa73a" sha1="8ebf2e29313f44f2d49e5b4191971d09919e8e48" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootmqj" cloneof="zeldaoot">
+		<description>Zelda no Densetsu - Toki no Ocarina Ura (Jpn, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="zelda no densetsu - toki no ocarina ura (japan)(2003)(nintendo)(ntsc)[gamecube version].bin" size="33554432" crc="d97c20ba" sha1="06c3c098f0e14ed61811dfaf0e8e4519d7d7a826" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zeldaootu3" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time (USA, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="legend of zelda, the - ocarina of time (usa)(2003)(nintendo)(ntsc)[gamecube version].bin" size="33554432" crc="84bbc39f" sha1="44c75962911e13bdfdc31b35e0b8e3be6a6a49ab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaoot2" cloneof="zeldaoot">
 		<description>The Legend of Zelda - Ocarina of Time (Euro, Ripped from GC)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - ocarina of time (2003)(nintendo)(pal)[gamecube version].v64" size="33554432" crc="6e658036" sha1="580dd0bd1b6d2c51cc20a764eece84dba558964c" offset="000000" />
+				<rom name="legend of zelda, the - ocarina of time (europe)(2003)(nintendo)(pal)[gamecube version]bin" size="33554432" crc="6e658036" sha1="580dd0bd1b6d2c51cc20a764eece84dba558964c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zeldamaju2" cloneof="zeldamaj">
-		<description>The Legend of Zelda - Majora's Mask (USA, Ripped from GC)</description>
-		<year>2003?</year>
+	<software name="zeldaootj3" cloneof="zeldaoot">
+		<description>Zelda no Densetsu - Toki no Ocarina (Jpn, Ripped from GC)</description>
+		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - majora's mask (2003)(nintendo)(us)[gamecube version].v64" size="33554432" crc="52245acb" sha1="8c378b87c83b3f4de20b14accf91e7590399f5dc" offset="000000" />
+				<rom name="zelda no densetsu - toki no ocarina (japan)(2003)(nintendo)(ntsc)[gamecube version].bin" size="33554432" crc="0ac22de8" sha1="245410280d152f28d5b1c0c0fc37f384db0020cd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="zeldamaju1" cloneof="zeldamaj">
+		<description>The Legend of Zelda - Majora's Mask (USA, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="legend of zelda, the - majora's mask (2003)(nintendo)(us)[gamecube version].bin" size="33554432" crc="52245acb" sha1="8c378b87c83b3f4de20b14accf91e7590399f5dc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldamaj2" cloneof="zeldamaj">
+		<description>The Legend of Zelda - Majora's Mask (Euro, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="legend of zelda, the - majora's mask (2003)(nintendo)(europe)[gamecube version].bin" size="33554432" crc="19139e89" sha1="f4b0bedafc45c78c4428882036d46d691b650d8b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldamajj2" cloneof="zeldamaj">
+		<description>Zelda no Densetsu - Mujura no Kamen (Jpn, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="zelda no densetsu - mujura no kamen (2003)(nintendo)(japan)[gamecube version].bin" size="33554432" crc="766ebdeb" sha1="7beadea493f24f77b5be85bf2c1dbd813481549b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Non game cartridges -->
 
@@ -11826,13 +11893,12 @@ patched out (+ a fix for internal checksum)
 		<description>Dolphin Controller Test (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ドルフィン・コントローラー・テスト" />
+		<info name="alt_title" value="ãƒ‰ãƒ«ãƒ•ã‚£ãƒ³ãƒ»ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ãƒ»ãƒ†ã‚¹ãƒˆ" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="unknown test.bin" size="8388608" crc="cba61bc8" sha1="b1d514c8b50aa05c688b20121783dff6069087bf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>
