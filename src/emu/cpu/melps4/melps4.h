@@ -206,6 +206,7 @@ protected:
 	bool m_irqflag[3];      // irq flags: exf, 1f, 2f (external, timer 1, timer 2)
 	bool m_tmr_irq_enabled[2];
 	int m_int_state;        // INT pin state
+	int m_t_state;          // T input pin state
 	bool m_prohibit_irq;    // interrupt is prohibited during certain opcodes
 	bool m_possible_irq;    // indicate that irq needs to be rechecked
 
@@ -237,6 +238,7 @@ protected:
 	devcb_write8 m_write_u;
 	devcb_write_line m_write_t;
 	
+	virtual void write_t_in(int state) { m_t_state = state; }
 	virtual void write_v(UINT8 data) { m_v = data; }
 	virtual void write_w(UINT8 data) { m_w = data; }
 	virtual void do_interrupt(int which);
@@ -259,6 +261,7 @@ protected:
 	void op_tay();
 	void op_tya();
 	void op_teab();
+	void op_tabe();
 	void op_tepa();
 	void op_txa();
 	void op_tax();
@@ -284,6 +287,8 @@ protected:
 	void op_rc();
 	void op_szc();
 	void op_cma();
+	void op_rl();
+	void op_rr();
 
 	void op_sb();
 	void op_rb();
