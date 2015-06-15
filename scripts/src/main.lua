@@ -247,7 +247,7 @@ function mainProject(_target, _subtarget)
 				_OPTIONS["TARGETOS"] = "macosx"
 			elseif retro_platform=="ios" then
 				_OPTIONS["TARGETOS"] = "macosx"
-				targetsuffix "_libretro"
+				targetsuffix "_libretro_ios"
 			elseif retro_platform:sub(1, 3)=="win" then
 				_OPTIONS["TARGETOS"] = "win32"
 			end

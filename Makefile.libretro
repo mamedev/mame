@@ -101,15 +101,35 @@ endif
 endif # PTR64
 endif # CROSS_BUILD
 
+###########################################################################
+#
+#   BUILD FLAGS
+#
+###########################################################################
 BUILDFLAGS = REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR)
-PLATFLAGS = PTR64=$(PTR64)
-TARGETFLAGS = OSD=$(OSD)
+
+###########################################################################
+#
+#   PLATFORM FLAGS
+#
+###########################################################################
+PLATFLAGS =
+ifneq ($(PTR64),)
+	PLATFLAGS += PTR64=$(PTR64)
+endif
 ifneq ($(platform),)
 	PLATFLAGS += platform="$(platform)"
 endif
 ifneq ($(ARCH),)
 	PLATFLAGS += ARCH="" LIBRETRO_ARCH="$(ARCH)"
 endif
+
+###########################################################################
+#
+#   TARGET FLAGS
+#
+###########################################################################
+TARGETFLAGS = OSD=$(OSD)
 ifneq ($(TARGET),)
 	TARGETFLAGS += TARGET=$(TARGET)
 endif
