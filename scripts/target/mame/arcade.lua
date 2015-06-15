@@ -2480,6 +2480,7 @@ files {
 	MAME_DIR .. "src/mame/video/segas18.c",
 	MAME_DIR .. "src/mame/drivers/segas24.c",
 	MAME_DIR .. "src/mame/video/segas24.c",
+	MAME_DIR .. "src/mame/drivers/segam1.c",
 	MAME_DIR .. "src/mame/drivers/segas32.c",
 	MAME_DIR .. "src/mame/machine/segas32.c",
 	MAME_DIR .. "src/mame/video/segas32.c",
