@@ -4538,6 +4538,48 @@ ROM_START( dunkshot )
 	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
 ROM_END
 
+ROM_START( dunkshota ) // several roms had replacement? (different style to others) labels with 'T' markings, content identical.
+	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-10520a.a1", 0x000001, 0x8000, CRC(16e213ba) SHA1(efddff17d1802ccbea9eac69cedef62fa6b9a640) )
+	ROM_LOAD16_BYTE( "epr-10523a.a4", 0x000000, 0x8000, CRC(22e3f074) SHA1(acdb6952308957244355bedb9cc627314a0139ef) )
+	ROM_LOAD16_BYTE( "epr-10521.a2",  0x010001, 0x8000, CRC(e2d5f97a) SHA1(bf7b4a029580633fee65be89d5c9c83ff76a8484) ) // == epr-10468.a2
+	ROM_LOAD16_BYTE( "epr-10524.a5",  0x010000, 0x8000, CRC(22777314) SHA1(fbc35505a94c8d4bdb44ee058e9e2e9e9b377c5c) ) // == epr-10471.a5
+	ROM_LOAD16_BYTE( "epr-10522.a3",  0x020001, 0x8000, CRC(e5b5f754) SHA1(af02c46437e3cf62331753dc405211b7f90e3f62) )
+	ROM_LOAD16_BYTE( "epr-10525.a6",  0x020000, 0x8000, CRC(7f41f334) SHA1(631f6113f3c0c47f2dd1ee0ea6e7db4321d7366d) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10528.b9",  0x00000, 0x8000, CRC(a8a3762d) SHA1(af75df6eda0df903e2b3f9680cd128da4227961d) )
+	ROM_LOAD( "epr-10529.b10", 0x08000, 0x8000, CRC(80cbff50) SHA1(3641ee337194d56d774bf1be91939d03f3c0f77b) )
+	ROM_LOAD( "epr-10530.b11", 0x10000, 0x8000, CRC(2dbe1e52) SHA1(a6b74f88e2f47322fbde1f6682cae58caf79f6c8) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10481.b5", 0x00000, 0x8000, CRC(feb04bc9) SHA1(233dc8e3b887a88ac114723d58a909a58f0ae771) )
+	ROM_RELOAD(                      0x10000, 0x8000 )
+	ROM_LOAD16_BYTE( "epr-10477.b1", 0x00001, 0x8000, CRC(f9d3b2cb) SHA1(b530fe16882c718122bfd1de098f39e54993de28) )
+	ROM_RELOAD(                      0x10001, 0x8000 )
+	ROM_LOAD16_BYTE( "epr-10482.b6", 0x20000, 0x8000, CRC(5bc07618) SHA1(f4c88f81b407d467f958181770ea4fd32aab3daf) )
+	ROM_RELOAD(                      0x30000, 0x8000 )
+	ROM_LOAD16_BYTE( "epr-10478.b2", 0x20001, 0x8000, CRC(5b5c5c92) SHA1(1c6f1cafa0788678c80ade11560f4a8d8bb7272a) )
+	ROM_RELOAD(                      0x30001, 0x8000 )
+	ROM_LOAD16_BYTE( "epr-10483.b7", 0x40000, 0x8000, CRC(7cab4f9e) SHA1(2310a9fe604f78d74d84bea301c95e6f0e6a6085) )
+	ROM_RELOAD(                      0x50000, 0x8000 )
+	ROM_LOAD16_BYTE( "epr-10479.b3", 0x40001, 0x8000, CRC(e84190a0) SHA1(23a8799adf81e1884a8c6b4c55397b8bca2f1850) )
+	ROM_RELOAD(                      0x50001, 0x8000 )
+	ROM_LOAD16_BYTE( "epr-10527.b8", 0x60000, 0x8000, CRC(39b1a242) SHA1(cf0c0768d006a18345b66dd389acba1e8192ec53) )
+	ROM_RELOAD(                      0x70000, 0x8000 )
+	ROM_LOAD16_BYTE( "epr-10526.b4", 0x60001, 0x8000, CRC(bf200754) SHA1(60900d80cfea147b011813dde558c1d39fdd274c) )
+	ROM_RELOAD(                      0x70001, 0x8000 )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10473.a7",   0x00000, 0x08000, CRC(7f1f5a27) SHA1(7ff91b95c883b395ab4ff5e440d78e553a09e623) )
+	ROM_LOAD( "epr-10474.a8",   0x10000, 0x08000, CRC(419a656e) SHA1(aa734ae835761badeb069f99acc5fded2a19b3a3) )
+	ROM_LOAD( "epr-10475.a9",   0x20000, 0x08000, CRC(17d55e85) SHA1(0c414bafecbfaa82679cc155f15f5255c186358d) )
+	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+ROM_END
+
 
 ROM_START( dunkshoto )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -6903,6 +6945,7 @@ GAME( 1988, dduxj,      ddux,     system16b_fd1094,    ddux,     segas16b_state,
 GAME( 1988, ddux1,      ddux,     system16b_i8751,     ddux,     segas16b_state,ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1, 8751 317-0095)", 0 )
 
 GAME( 1987, dunkshot,   0,        system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev C, FD1089A 317-0022)", 0 )
+GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
 GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
 
 GAME( 1989, eswat,      0,        system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World, FD1094 317-0130)", 0 )
