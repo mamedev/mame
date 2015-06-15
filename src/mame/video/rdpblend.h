@@ -17,13 +17,7 @@
 #define _VIDEO_RDPBLEND_H_
 
 #include "emu.h"
-
-struct other_modes_t;
-struct misc_state_t;
-class n64_rdp;
-struct rdp_span_aux;
-class color_t;
-struct rdp_poly_state;
+#include "video/n64.h"
 
 class n64_blender_t
 {

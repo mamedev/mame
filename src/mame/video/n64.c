@@ -26,6 +26,9 @@ TODO:
 
 #include "emu.h"
 #include "video/n64.h"
+#include "video/rdpblend.h"
+#include "video/rdptpipe.h"
+
 #include <algorithm>
 
 #define LOG_RDP_EXECUTION       0

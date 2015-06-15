@@ -2208,16 +2208,16 @@ INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT
 	{
 		//r &= 0xfff;
 		__m128i temp = _mm_set1_epi16(0xfff);
-		colorint.set(_mm_and_si128(*(__m128i *)colorint.get_ptr(), *(__m128i *)&temp));
+		colorint.set(_mm_and_si128(colorint.get(), temp));
 		//if (r == 0xfff)
-		temp = _mm_cmpeq_epi16(*(__m128i *)colorint.get_ptr(), *(__m128i *)&temp);
+		temp = _mm_cmpeq_epi16(colorint.get(), temp);
 		//	result.rgb.r = 0;
-		colorint.set(_mm_andnot_si128(*(__m128i *)&temp, *(__m128i *)colorint.get_ptr()));
+		colorint.set(_mm_andnot_si128(temp, colorint.get()));
 		//else if (r == 0x100)
 		temp = _mm_set1_epi16(0x100);
-		temp = _mm_cmpeq_epi16(*(__m128i *)colorint.get_ptr(), *(__m128i *)&temp);
+		temp = _mm_cmpeq_epi16(colorint.get(), temp);
 		//	result.rgb.r = 0xff;
-		colorint.set(_mm_or_si128(*(__m128i *)colorint.get_ptr(), *(__m128i *)&temp));
+		colorint.set(_mm_or_si128(colorint.get(), temp));
 
 		result = colorint.to_rgba();
 	}
