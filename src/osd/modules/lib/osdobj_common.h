@@ -26,6 +26,8 @@
 //  Defines
 //============================================================
 
+#define OSDOPTION_UIMODEKEY             "uimodekey"
+
 #define OSDCOMMAND_LIST_MIDI_DEVICES    "listmidi"
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
@@ -54,9 +56,6 @@
 
 #define OSDOPTION_SWITCHRES             "switchres"
 
-#define OSDOPTION_SOUND                 "sound"
-#define OSDOPTION_AUDIO_LATENCY         "audio_latency"
-
 #define OSDOPTION_FILTER                "filter"
 #define OSDOPTION_PRESCALE              "prescale"
 
@@ -68,6 +67,9 @@
 #define OSDOPTION_GL_VBO                "gl_vbo"
 #define OSDOPTION_GL_NOTEXTURERECT      "gl_notexturerect"
 #define OSDOPTION_GL_FORCEPOW2TEXTURE   "gl_forcepow2texture"
+
+#define OSDOPTION_SOUND                 "sound"
+#define OSDOPTION_AUDIO_LATENCY         "audio_latency"
 
 #define OSDOPTION_AUDIO_OUTPUT          "audio_output"
 #define OSDOPTION_AUDIO_EFFECT          "audio_effect"
@@ -86,6 +88,9 @@ class osd_options : public cli_options
 public:
 	// construction/destruction
 	osd_options();
+
+	// keyboard mapping
+	const char *ui_mode_key() const { return value(OSDOPTION_UIMODEKEY); }
 
 	// debugging options
 	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
@@ -121,11 +126,7 @@ public:
 	// full screen options
 	bool switch_res() const { return bool_value(OSDOPTION_SWITCHRES); }
 
-	// sound options
-	const char *sound() const { return value(OSDOPTION_SOUND); }
-	int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
-
-	// video options
+	// accelerated video options
 	bool filter() const { return bool_value(OSDOPTION_FILTER); }
 	int prescale() const { return int_value(OSDOPTION_PRESCALE); }
 
@@ -138,6 +139,10 @@ public:
 	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
 	const char *shader_mame(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SHADER_MAME, index);  return value(temp.c_str()); }
 	const char *shader_screen(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SHADER_SCREEN, index);  return value(temp.c_str()); }
+
+	// sound options
+	const char *sound() const { return value(OSDOPTION_SOUND); }
+	int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
 
 	// CoreAudio specific options
 	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }

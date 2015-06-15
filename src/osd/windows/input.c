@@ -719,7 +719,11 @@ int wininput_vkey_for_mame_code(input_code code)
 
 void windows_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
 {
+	//input_item_id mameid_code;
+	//input_code ui_code;
 	input_type_entry *entry;
+	const char* uimode;
+	char fullmode[64];
 
 	// loop over the defaults
 	for (entry = typelist.first(); entry != NULL; entry = entry->next())
@@ -729,6 +733,22 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 			// (allows ALT-TAB to switch between windows apps)
 			case IPT_UI_CONFIGURE:
 				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
+				break;
+
+			// configurable UI mode switch
+			case IPT_UI_TOGGLE_UI:
+				uimode = options().ui_mode_key();
+				if (!strcmp(uimode,"auto"))
+				{
+					//mameid_code = lookup_mame_code("ITEM_ID_INSERT");
+				}
+				else
+				{
+					snprintf(fullmode, 63, "ITEM_ID_%s", uimode);
+					//mameid_code = lookup_mame_code(fullmode);
+				}
+				//ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
+				entry->defseq(SEQ_TYPE_STANDARD).set(ui_code);
 				break;
 
 			// alt-enter for fullscreen
