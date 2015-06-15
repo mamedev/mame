@@ -222,6 +222,12 @@ function mainProject(_target, _subtarget)
 		{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",    {  MAME_DIR .. "src/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
 	}
 	
+	configuration { "gmake" }
+		dependency {
+			{ ".PHONY", ".FORCE", true },
+			{ "$(OBJDIR)/src/version.o", ".FORCE", true },
+		}
+
 	configuration { "mingw*" }
 		custombuildtask {	
 			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
