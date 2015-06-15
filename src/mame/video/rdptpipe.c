@@ -434,16 +434,16 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 			rgbaint_t v2_vec((rgbaint_t)((this)->*(m_texel_fetch[index]))(sss1, sst2, tbase2, tpal, userdata).get());
 			rgbaint_t v3_vec((rgbaint_t)((this)->*(m_texel_fetch[index]))(sss2, sst2, tbase2, tpal, userdata).get());
 
-			v1_vec.sub(v3_vec);
-			v2_vec.sub(v3_vec);
+			v1_vec -= v3_vec;
+			v2_vec -= v3_vec;
 
-			v1_vec.mul_imm(invtf);
-			v2_vec.mul_imm(invsf);
+			v1_vec *= invtf;
+			v2_vec *= invsf;
 
-			v1_vec.add(v2_vec);
-			v1_vec.add_imm(0x0080);
-			v1_vec.sra(8);
-			v1_vec.add(v3_vec);
+			v1_vec += v2_vec;
+			v1_vec += 0x0080;
+			v1_vec >>= 8;
+			v1_vec += v3_vec;
 
 			TEX->set((UINT32)v1_vec.to_rgba());
 #else
@@ -464,16 +464,16 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 			rgbaint_t v1_vec((rgbaint_t)((this)->*(m_texel_fetch[index]))(sss2, sst1, tbase1, tpal, userdata).get());
 			rgbaint_t v2_vec((rgbaint_t)((this)->*(m_texel_fetch[index]))(sss1, sst2, tbase2, tpal, userdata).get());
 
-			v1_vec.sub(v0_vec);
-			v2_vec.sub(v0_vec);
+			v1_vec -= v0_vec;
+			v2_vec -= v0_vec;
 
-			v1_vec.mul_imm(sfrac);
-			v2_vec.mul_imm(tfrac);
+			v1_vec *= sfrac;
+			v2_vec *= tfrac;
 
-			v1_vec.add(v2_vec);
-			v1_vec.add_imm(0x0080);
-			v1_vec.sra(8);
-			v1_vec.add(v0_vec);
+			v1_vec += v2_vec;
+			v1_vec += 0x0080;
+			v1_vec >>= 8;
+			v1_vec += v0_vec;
 
 			TEX->set((UINT32)v1_vec.to_rgba());
 #else
@@ -493,10 +493,10 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 #if USE_SIMD
 		rgbaint_t t0_vec((rgbaint_t)((this)->*(m_texel_fetch[index]))(sss1, sst1, tbase1, tpal, userdata).get());
 
-		t0_vec.add((rgbaint_t)((this)->*(m_texel_fetch[index]))(sss2, sst1, tbase1, tpal, userdata).get());
-		t0_vec.add((rgbaint_t)((this)->*(m_texel_fetch[index]))(sss2, sst2, tbase2, tpal, userdata).get());
-		t0_vec.add((rgbaint_t)((this)->*(m_texel_fetch[index]))(sss1, sst2, tbase2, tpal, userdata).get());
-		t0_vec.shr(2);
+		t0_vec += (rgbaint_t)((this)->*(m_texel_fetch[index]))(sss2, sst1, tbase1, tpal, userdata).get();
+		t0_vec += (rgbaint_t)((this)->*(m_texel_fetch[index]))(sss2, sst2, tbase2, tpal, userdata).get();
+		t0_vec += (rgbaint_t)((this)->*(m_texel_fetch[index]))(sss1, sst2, tbase2, tpal, userdata).get();
+		t0_vec >>= 2;
 
 		TEX->set((UINT32)t0_vec.to_rgba());
 #else

@@ -74,18 +74,16 @@ public:
 
 	rgbint_t operator=(const rgbint_t& other);
 	rgbint_t& operator+=(const rgbint_t& other);
+	rgbint_t& operator+=(const INT32 other);
 	rgbint_t& operator-=(const rgbint_t& other);
 	rgbint_t& operator*=(const rgbint_t& other);
 	rgbint_t& operator*=(const INT32 other);
-	rgbint_t operator+(const rgbint_t& other);
-	rgbint_t operator-(const rgbint_t& other);
-	rgbint_t operator*(const rgbint_t& other);
-	rgbint_t operator*(const INT32 other);
+	rgbint_t& operator>>=(const INT32 shift);
 
 	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v);
 
 protected:
-	volatile __m128i	m_value;
+	__m128i	m_value;
 
 private:
 	rgbint_t(__m128i value);

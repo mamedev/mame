@@ -34,11 +34,6 @@ rgbint_t::rgbint_t(rgb_t& rgb)
 	m_value = _mm_unpacklo_epi8(_mm_cvtsi32_si128(rgb), _mm_setzero_si128());
 }
 
-rgbint_t::rgbint_t(__m128i value)
-{
-	m_value = value;
-}
-
 rgbaint_t::rgbaint_t()
 {
 	set_rgba(0, 0, 0, 0);
@@ -110,6 +105,12 @@ rgbint_t& rgbint_t::operator+=(const rgbint_t& other)
 	return *this;
 }
 
+rgbint_t& rgbint_t::operator+=(const INT32 other)
+{
+	m_value = _mm_add_epi32(m_value, _mm_set1_epi32(other));
+	return *this;
+}
+
 rgbint_t& rgbint_t::operator-=(const rgbint_t& other)
 {
 	m_value = _mm_sub_epi32(m_value, other.m_value);
@@ -129,25 +130,10 @@ rgbint_t& rgbint_t::operator*=(const INT32 other)
 	return *this;
 }
 
-rgbint_t rgbint_t::operator+(const rgbint_t& other)
+rgbint_t& rgbint_t::operator>>=(const INT32 shift)
 {
-	return _mm_add_epi32(m_value, other.m_value);
-}
-
-rgbint_t rgbint_t::operator-(const rgbint_t& other)
-{
-	return _mm_sub_epi32(m_value, other.m_value);
-}
-
-rgbint_t rgbint_t::operator*(const rgbint_t& other)
-{
-	return _mm_unpacklo_epi32(_mm_shuffle_epi32(_mm_mul_epu32(m_value, other.m_value), _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(_mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(other.m_value, 4)), _MM_SHUFFLE(0, 0, 2, 0)));
-}
-
-rgbint_t rgbint_t::operator*(const INT32 other)
-{
-	const __m128i immv = _mm_set1_epi32(other);
-	return _mm_unpacklo_epi32(_mm_shuffle_epi32(_mm_mul_epu32(m_value, immv), _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(_mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(immv, 4)), _MM_SHUFFLE(0, 0, 2, 0)));
+	m_value = _mm_srai_epi32(m_value, shift);
+	return *this;
 }
 
 /***************************************************************************
@@ -202,7 +188,7 @@ void rgbaint_t::add_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const 
 	m_value = _mm_add_epi32(m_value, temp);
 }
 
-void rgbint_t::sub(const rgbint_t& color2)
+inline void rgbint_t::sub(const rgbint_t& color2)
 {
 	m_value = _mm_sub_epi32(m_value, color2.m_value);
 }
