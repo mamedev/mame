@@ -424,7 +424,7 @@ function emuProject(_target, _subtarget)
 	end
 
 	dofile(path.join("src", "bus.lua"))
-	dofile(path.join("src", "retro_build.lua"))
+	dofile("retro_fpic.lua")
 	
 	
 	project ("dasm")

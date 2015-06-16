@@ -255,7 +255,7 @@ function mainProject(_target, _subtarget)
 		-- FIXME: set BIGENDIAN and dynarec based on retro_platform/retro_arch
 
 
-		dofile(path.join("src", "retro_build.lua"))
+		dofile("retro_fpic.lua")
 
 		-- "macosx" for libretro platforms "osx" and "ios"
 		if _OPTIONS["targetos"]=="macosx" then

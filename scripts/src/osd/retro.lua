@@ -25,7 +25,7 @@ project ("osd_" .. _OPTIONS["osd"])
 	_OPTIONS["NO_USE_MIDI"] = "1"
 
 	dofile("retro_cfg.lua")
-	dofile(path.join("..", "retro_build.lua"))
+	dofile(path.join("..", "..", "retro_fpic.lua"))
 
 	includedirs {
 		MAME_DIR .. "3rdparty",
@@ -89,7 +89,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	dofile("retro_cfg.lua")
-	dofile(path.join("..", "retro_build.lua"))
+	dofile(path.join("..", "..", "retro_fpic.lua"))
 
 	includedirs {
 		MAME_DIR .. "src/emu",
