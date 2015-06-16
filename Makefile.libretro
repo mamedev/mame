@@ -107,6 +107,9 @@ endif # CROSS_BUILD
 #
 ###########################################################################
 BUILDFLAGS = REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR)
+ifneq ($(PYTHON_EXECUTABLE),)
+	BUILDFLAGS += PYTHON_EXECUTABLE=$(PYTHON_EXECUTABLE)
+endif
 
 ###########################################################################
 #
