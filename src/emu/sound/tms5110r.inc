@@ -214,7 +214,7 @@ struct tms5100_coeffs
 		/* K8  */\
 		{ -205, -112,  -10,   92,  187,  269,  336,  387 },\
 		/* K9  */\
-		{ -249, -183, -110,  -32,   48,  126,  198,  261 }, /* on patents 4,403,965 and 4,946,391 the 4th entry is -19 which is wrong! should be -32*/\
+		{ -249, -183, -110,  -32,   48,  126,  198,  261 }, /* on patents 4,403,965 and 4,946,391 the 4th entry is 0x3ED (-19) which is a typo of the correct value of 0x3E0 (-32)*/\
 		/* K10 */\
 		{ -190, -133,  -73,  -10,   53,  115,  173,  227 },
 
@@ -390,11 +390,18 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
    Used in the Speak & Math, Speak & Read, and Language Translator
    Decapped by Digshadow in 2014 http://siliconpr0n.org/map/ti/tmc0280fnl/
    Digitally dumped via PROMOUT by PlgDavid in 2014
-   The coefficients are exactly the same as the TMS5200
-   The coefficients also come from US Patents 4,403,965 and 4,946,391 (with one error in the patent);
-The Mitsubishi M58817 also seems to work best with these coefficients, so its possible the engineers of that chip copied them from the TI patents, see next entry
-   ***TODO: there are 2 versions of this chip, and the interpolation behavior between the two differs slightly:
-   * TMC0280NLP // CD2801 with datecodes around 1980 has the same interpolation inhibit behavior as 5100/TMC0281 on unvoiced->silent transition
+   The coefficients are exactly the same as the TMS5200.
+   The coefficients also come from US Patents 4,403,965 and 4,946,391 (with
+   one typo in the patent).
+   The chirp table is very slightly different from the 4,209,836 patent one,
+   but matches the table in the 4,403,965 and 4,946,391 patents.
+   The Mitsubishi M58817 also seems to work best with these coefficients, so
+   it is possible the engineers of that chip copied them from the TI patents.
+   ***TODO: there are 2 versions of this chip, and the interpolation
+      behavior between the two differs slightly:
+   * TMC0280NLP // CD2801 with datecodes around 1980 has the same
+     interpolation inhibit behavior as 5100/TMC0281 on unvoiced->silent
+     transition.
    * CD2801A-NL with datecodes around 1982 have the 'alternate behavior'
    */
 static const struct tms5100_coeffs T0280F_2801A_coeff =
@@ -416,7 +423,10 @@ static const struct tms5100_coeffs T0280F_2801A_coeff =
 };
 
 /* Mitsubishi M58817
-The Mitsubishi M58817 seems to have (partly?) copied the coefficients from the TMC0280/CD2801 above, but has some slight differences to it within the chip: the main accumulator seems to have 1 extra bit and the digital values are tapped 1 bit higher than on the TI chips. This is emulated within tms5110.c
+The Mitsubishi M58817 seems to have (partly?) copied the coefficients from the
+TMC0280/CD2801 above, but has some slight differences to it within the chip:
+the main accumulator seems to have 1 extra bit and the digital values are
+tapped 1 bit higher than on the TI chips. This is emulated within tms5110.c
    */
 static const struct tms5100_coeffs M58817_coeff =
 {
@@ -560,16 +570,17 @@ Note that the K coefficients are VERY different from the coefficients given
  in the US 4,335,277 patent, which may have been for some sort of prototype or
  otherwise intentionally scrambled. The energy and pitch tables, however, are
  identical to that patent.
-Also note, that the K coefficients are ALMOST identical to the coefficients from the CD2802.
-The interpolation coefficients still come from the patents pending verification
- of the interpolation counter circuit from the chip decap image.
+Also note, that the K coefficients are identical to the coefficients from the
+ CD2801 (which itself is almost identical to the CD2802).
 NOTE FROM DECAP: immediately to the left of each of the K1,2,3,4,5,and 6
  coefficients in the LPC rom are extra columns containing the constants
  -510, -502, 313, 318, or in hex 0x202, 0x20A, 0x139, 0x13E.
  Those EXACT constants DO appear (rather nonsensically) on the lpc table in US
  patent 4,335,277. They are likely related to the multiplicative interpolator
  described in us patent 4,419,540; whether the 5200/2501E and the 5220 or 5220C
- actually implement this interpolator or not is unclear.
+ actually implement this interpolator or not is unclear. This interpolator
+ seems intended for chips with variable frame rate, so it may only exist
+ on the TMS/TSP5220C and CD2501ECD.
 */
 
 static const struct tms5100_coeffs T0285_2501E_coeff =

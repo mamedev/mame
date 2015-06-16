@@ -64,6 +64,13 @@ void melps4_cpu_device::op_teab()
 	m_e = m_b << 4 | m_a;
 }
 
+void melps4_cpu_device::op_tabe()
+{
+	// TABE(undocumented): transfer E to A and B
+	m_b = m_e >> 4;
+	m_a = m_e & 0xf;
+}
+
 void melps4_cpu_device::op_tepa()
 {
 	// TEPA: decode A by PLA and transfer to E
@@ -247,6 +254,22 @@ void melps4_cpu_device::op_cma()
 	m_a ^= 0xf;
 }
 
+void melps4_cpu_device::op_rl()
+{
+	// RL(undocumented): rotate A left through carry
+	UINT8 c = m_a >> 3 & 1;
+	m_a = (m_a << 1 | m_cy) & 0xf;
+	m_cy = c;
+}
+
+void melps4_cpu_device::op_rr()
+{
+	// RR(undocumented): rotate A right through carry
+	UINT8 c = m_a & 1;
+	m_a = m_a >> 1 | m_cy << 3;
+	m_cy = c;
+}
+
 
 // Bit operations
 
@@ -395,7 +418,7 @@ void melps4_cpu_device::op_trab()
 void melps4_cpu_device::op_t2ab()
 {
 	// T2AB: transfer A and B to timer 2 and timer 2 reload
-	op_illegal();
+	//op_illegal();
 }
 
 void melps4_cpu_device::op_tab1()
@@ -419,25 +442,27 @@ void melps4_cpu_device::op_tab2()
 void melps4_cpu_device::op_tva()
 {
 	// TVA: transfer A to timer control V
-	m_v = m_a;
+	write_v(m_a);
 }
 
 void melps4_cpu_device::op_twa()
 {
 	// TWA: transfer A to timer control W
-	m_w = m_a;
+	write_w(m_a);
 }
 
 void melps4_cpu_device::op_snz1()
 {
 	// SNZ1: skip next on flag 1F
-	op_illegal();
+	m_skip = m_irqflag[1];
+	m_irqflag[1] = false;
 }
 
 void melps4_cpu_device::op_snz2()
 {
 	// SNZ2: skip next on flag 2F
-	op_illegal();
+	m_skip = m_irqflag[2];
+	m_irqflag[2] = false;
 }
 
 
@@ -631,6 +656,7 @@ void melps4_cpu_device::op_ei()
 {
 	// EI: enable interrupt flag
 	m_prohibit_irq = true;
+	m_possible_irq = true;
 	m_inte = 1;
 }
 

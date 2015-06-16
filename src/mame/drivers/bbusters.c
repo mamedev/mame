@@ -788,10 +788,58 @@ ROM_END
 
 ROM_START( bbustersu )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "bbv2-3.k10",   0x000000, 0x20000, CRC(6930088b) SHA1(265f0b584d81b6fdcda5c3a2e0bd15d56443bb35) )
-	ROM_LOAD16_BYTE( "bbv2-5.k12",   0x000001, 0x20000, CRC(cfdb2c6c) SHA1(54a837dc84b74d12e931f607f3dc9ee06a7e4d31) )
-	ROM_LOAD16_BYTE( "bb-2.k8",    0x040000, 0x20000, CRC(20141805) SHA1(0958579681bda81bcf48d020a14bc147c1e575f1) )
-	ROM_LOAD16_BYTE( "bb-4.k11",   0x040001, 0x20000, CRC(d482e0e9) SHA1(e56ca92965e8954b613ba4b0e3975e3a12840c30) )
+	ROM_LOAD16_BYTE( "bb-ver3-u3.k10", 0x000000, 0x20000, CRC(c80ec3bc) SHA1(81cccc920c6dc58ccd20fb38bfede717f534986f) )
+	ROM_LOAD16_BYTE( "bb-ver3-u5.k12", 0x000001, 0x20000, CRC(5ded86d1) SHA1(de2ce91b85a1d74e60a7093211c1a7d3c27c1d72) )
+	ROM_LOAD16_BYTE( "bb-2.k8",        0x040000, 0x20000, CRC(20141805) SHA1(0958579681bda81bcf48d020a14bc147c1e575f1) )
+	ROM_LOAD16_BYTE( "bb-4.k11",       0x040001, 0x20000, CRC(d482e0e9) SHA1(e56ca92965e8954b613ba4b0e3975e3a12840c30) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "bb-1.e6",     0x000000, 0x10000, CRC(4360f2ee) SHA1(4c6b212f59389bdf4388893d2030493b110ac087) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "bb-10.l9",    0x000000, 0x20000, CRC(490c0d9b) SHA1(567c25a6d96407259c64061d674305e4117d9fa4) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "bb-f11.m16",  0x000000, 0x80000, CRC(39fdf9c0) SHA1(80392947e3a1831c3ee80139f6f3bdc3bafa4f0d) )
+	ROM_LOAD( "bb-f12.m13",  0x080000, 0x80000, CRC(69ee046b) SHA1(5c0435f1ce76b584fa8d154d7617d73c7ab5f62f) )
+	ROM_LOAD( "bb-f13.m12",  0x100000, 0x80000, CRC(f5ef840e) SHA1(dd0f630c52076e0d330f47931e68a3ae9a401078) )
+	ROM_LOAD( "bb-f14.m11",  0x180000, 0x80000, CRC(1a7df3bb) SHA1(1f27a528e6f89fe56a7342c4f1ff733da0a09327) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )
+	ROM_LOAD( "bb-f21.l10",  0x000000, 0x80000, CRC(530f595b) SHA1(820898693b878c4423de9c244f943d39ea69515e) )
+	ROM_LOAD( "bb-f22.l12",  0x080000, 0x80000, CRC(889c562e) SHA1(d19172d6515ab9793c98de75d6e41687e61a408d) )
+	ROM_LOAD( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
+	ROM_LOAD( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
+
+	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) /* Zoom table */
+	/* same rom exists in 4 different locations on the board */
+	ROM_LOAD( "bb-6.e7",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+	ROM_LOAD( "bb-7.h7",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "bbusters-eeprom.bin", 0x00, 0x100, CRC(a52ebd66) SHA1(de04db6f1510700c61bf152799452a80220ae87c) )
+ROM_END
+
+ROM_START( bbustersua )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bb-ver2-u3.k10", 0x000000, 0x20000, CRC(6930088b) SHA1(265f0b584d81b6fdcda5c3a2e0bd15d56443bb35) )
+	ROM_LOAD16_BYTE( "bb-ver2-u5.k12", 0x000001, 0x20000, CRC(cfdb2c6c) SHA1(54a837dc84b74d12e931f607f3dc9ee06a7e4d31) )
+	ROM_LOAD16_BYTE( "bb-2.k8",        0x040000, 0x20000, CRC(20141805) SHA1(0958579681bda81bcf48d020a14bc147c1e575f1) )
+	ROM_LOAD16_BYTE( "bb-4.k11",       0x040001, 0x20000, CRC(d482e0e9) SHA1(e56ca92965e8954b613ba4b0e3975e3a12840c30) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bb-1.e6",     0x000000, 0x10000, CRC(4360f2ee) SHA1(4c6b212f59389bdf4388893d2030493b110ac087) )
@@ -1020,10 +1068,11 @@ ROM_END
 /******************************************************************************/
 
 // as soon as you calibrate the guns in test mode the game refuses to boot
-GAME( 1989, bbusters, 0,        bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1989, bbustersu,bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, bbusters,   0,        bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (US, Version 3)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, bbustersua, bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1989, mechatt,  0,        mechatt,  mechatt,  driver_device, 0, ROT0,  "SNK", "Mechanized Attack (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mechattj, mechatt,  mechatt,  mechattj, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mechattu, mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mechattu1,mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US, Version 1, Single Player)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mechatt,    0,        mechatt,  mechatt,  driver_device, 0, ROT0,  "SNK", "Mechanized Attack (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mechattu,   mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US, Version 1, Single Player)", GAME_SUPPORTS_SAVE )
