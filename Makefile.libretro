@@ -36,7 +36,7 @@
 # libretro's preferred settings
 NOWERROR ?= 1
 OSD ?= retro
-PYTHON_EXECUTABLE ?= @python2
+PYTHON_EXECUTABLE ?= python2
 REGENIE ?= 1
 VERBOSE ?= 1
 
@@ -65,10 +65,10 @@ ifeq ($(platform), android)
 #	FORCE_DRC_C_BACKEND = 1
 #	CROSS_BUILD = 1
 else ifeq ($(platform), osx)
-	PYTHON_EXECUTABLE ?= @python
+	PYTHON_EXECUTABLE = python
 else ifeq ($(platform), ios)
 	PTR64 = 0
-	PYTHON_EXECUTABLE ?= @python
+	PYTHON_EXECUTABLE = python
 	# FIXME: Need to figure out how to do this for GENie
 #	CROSS_BUILD = 1
 #	FORCE_DRC_C_BACKEND = 1
