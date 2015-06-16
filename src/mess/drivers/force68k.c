@@ -82,7 +82,6 @@ Based on the 68ksbc.c
     - Dump ROM:s
     - Add 3 x ACIA6850 
     - Add 1 x 68230 Motorola, Parallel Interface / Timer
-    - Add 1 x MM58167A RTC
     - Add 1 x Abort Switch  
     - Add configurable serial connector between ACIA:s and 
       - Real terminal emulator
@@ -94,7 +93,7 @@ Based on the 68ksbc.c
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"/
+#include "cpu/m68000/m68000.h"
 #include "machine/mm58167.h"
 //#include "machine/6850acia.h"
 //#include "machine/clock.h"
@@ -168,6 +167,8 @@ static MACHINE_CONFIG_START( forcecpu1, force68k_state )
 */
 MACHINE_CONFIG_END
 
+#if 0
+
 static MACHINE_CONFIG_START( forcecpu6, force68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)  /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
@@ -191,21 +192,42 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( forcecpu6vb, force68k_state )
 	MCFG_CPU_ADD("maincpu", M68010, 12500000) /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
-
 MACHINE_CONFIG_END
+#endif
 
-/* ROM definition */
-ROM_START( force68k_rom )
+/* ROM definitions */
+ROM_START( forcecpu1 )
 	ROM_REGION(0x1000000, "maincpu", 0)
 //	ROM_LOAD( "forcesys68kV1.0L.bin", 0x0000, 0x2f78, CRC(20a8d0d0) SHA1(544fd8bd8ed017115388c8b0f7a7a59a32253e43) )
 ROM_END
 
-/* Driver */
+#if 0
+ROM_START( forcecpu6 )
+	ROM_REGION(0x1000000, "maincpu", 0)
+ROM_END
 
+ROM_START( forcecpu6a )
+	ROM_REGION(0x1000000, "maincpu", 0)
+ROM_END
+
+ROM_START( forcecpu6v )
+	ROM_REGION(0x1000000, "maincpu", 0)
+ROM_END
+
+ROM_START( forcecpu6va )
+	ROM_REGION(0x1000000, "maincpu", 0)
+ROM_END
+
+ROM_START( forcecpu6vb )
+	ROM_REGION(0x1000000, "maincpu", 0)
+ROM_END
+#endif
+
+/* Driver */
 /*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP( 1983, force68k_rom, 0,      0,       forcecpu1,      force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-1",   GAME_IS_SKELETON )
-COMP( 1989, force68k_rom, 0,      0,       forcecpu6,      force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6",   GAME_IS_SKELETON )
-COMP( 1989, force68k_rom, 0,      0,       forcecpu6a,     force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6a",  GAME_IS_SKELETON )
-COMP( 1989, force68k_rom, 0,      0,       forcecpu6v,     force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6v",  GAME_IS_SKELETON )
-COMP( 1989, force68k_rom, 0,      0,       forcecpu6va,    force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6va", GAME_IS_SKELETON )
-COMP( 1989, force68k_rom, 0,      0,       forcecpu6vb,    force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6vb", GAME_IS_SKELETON )
+COMP( 1983, forcecpu1,   0,      0,       forcecpu1,      force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-1",   GAME_IS_SKELETON )
+//COMP( 1989, forcecpu6,   0,      0,       forcecpu6,      force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6",   GAME_IS_SKELETON )
+//COMP( 1989, forcecpu6a,  0,      0,       forcecpu6a,     force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6a",  GAME_IS_SKELETON )
+//COMP( 1989, forcecpu6v,  0,      0,       forcecpu6v,     force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6v",  GAME_IS_SKELETON )
+//COMP( 1989, forcecpu6va, 0,      0,       forcecpu6va,    force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6va", GAME_IS_SKELETON )
+//COMP( 1989, forcecpu6vb, 0,      0,       forcecpu6vb,    force68k, driver_device,  0,  "Force Computers Gmbh",  "SYS68K/CPU-6vb", GAME_IS_SKELETON )
