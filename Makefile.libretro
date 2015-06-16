@@ -140,7 +140,6 @@ endif
 all: build
 
 build:
-	echo platform=$(platform)
 	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS)
 
 clean:
