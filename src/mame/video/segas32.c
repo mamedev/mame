@@ -210,6 +210,9 @@
 
 void segas32_state::common_start(int multi32)
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	int tmap;
 
 	/* remember whether or not we are multi32 */
