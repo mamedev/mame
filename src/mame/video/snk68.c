@@ -53,12 +53,7 @@ TILE_GET_INFO_MEMBER(snk68_state::get_searchar_tile_info)
 void snk68_state::common_video_start()
 {
 	m_fg_tilemap->set_transparent_pen(0);
-
-	m_fg_tilemap->set_scrolldx(0, m_screen->width() - 256);
-	m_fg_tilemap->set_scrolldy(0, m_screen->height() - 256);
-	
 	save_item(NAME(m_sprite_flip_axis));
-	save_item(NAME(m_flipscreen));
 }
 
 void snk68_state::video_start()
@@ -138,8 +133,7 @@ WRITE16_MEMBER(snk68_state::pow_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_flipscreen = data & 0x08;
-		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		flip_screen_set(data & 0x08);
 
 		m_sprite_flip_axis = data & 0x04;   // for streetsm? though might not be present on this board
 
@@ -155,26 +149,9 @@ WRITE16_MEMBER(snk68_state::searchar_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_flipscreen = data & 0x08;
-		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-
+		flip_screen_set(data & 0x08);
 		m_sprite_flip_axis = data & 0x04;
 	}
-}
-
-WRITE16_MEMBER(snk68_state::paletteram_word_w)
-{
-	UINT16 newword;
-	int r,g,b;
-
-	COMBINE_DATA(&m_paletteram[offset]);
-	newword = m_paletteram[offset];
-
-	r = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
-	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
-	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01) ;
-
-	m_palette->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 
@@ -191,7 +168,8 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	// pow has 0x4000 tiles and independent x/y flipping
 	// the other games have > 0x4000 tiles and flipping in only one direction
 	// (globally selected)
-	int const is_pow = (m_gfxdecode->gfx(1)->elements() <= 0x4000);
+	bool const is_pow = (m_gfxdecode->gfx(1)->elements() <= 0x4000);
+	bool const flip = flip_screen();
 	
 	for (int offs = 0; offs < 0x800; offs += 0x40)
 	{
@@ -204,7 +182,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		mx = ((mx + 16) & 0x1ff) - 16;
 		my = -my;
 
-		if (m_flipscreen)
+		if (flip)
 		{
 			mx = 240 - mx;
 			my = 240 - my;
@@ -242,7 +220,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					tile &= 0x7fff;
 				}
 
-				if (m_flipscreen)
+				if (flip)
 				{
 					fx = !fx;
 					fy = !fy;
@@ -259,7 +237,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				tiledata += 2;
 			}
 
-			if (m_flipscreen)
+			if (flip)
 				my -= 16;
 			else
 				my += 16;
