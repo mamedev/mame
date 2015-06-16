@@ -778,6 +778,9 @@ function createMAMEProjects(_target, _subtarget, _name)
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mame/layout",
 	}
+
+	dofile("retro_fpic.lua")
+
 end
 	
 function createProjects_mame_arcade(_target, _subtarget)
