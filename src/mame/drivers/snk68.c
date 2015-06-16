@@ -50,6 +50,12 @@ Notes:
 
 /******************************************************************************/
 
+void snk68_state::machine_start()
+{
+	save_item(NAME(m_invert_controls));
+	save_item(NAME(m_sound_status));
+}
+
 READ16_MEMBER(snk68_state::sound_status_r)
 {
 	return (m_sound_status << 8);
@@ -63,11 +69,6 @@ WRITE8_MEMBER(snk68_state::sound_status_w)
 READ16_MEMBER(snk68_state::control_1_r)
 {
 	return (ioport("P1")->read() + (ioport("P2")->read() << 8));
-}
-
-READ16_MEMBER(snk68_state::control_2_r)
-{
-	return ioport("SYSTEM")->read();
 }
 
 READ16_MEMBER(snk68_state::rotary_1_r)
@@ -119,16 +120,16 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(sound_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(control_2_r)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(pow_flipscreen16_w)   // + char bank
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(pow_flipscreen_w)   // + char bank
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* Watchdog or IRQ ack */
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* Watchdog or IRQ ack */
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram")   // 8-bit
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_SHARE("spriteram")   // only partially populated
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_word_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
@@ -137,7 +138,7 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(sound_w)
 	AM_RANGE(0x080006, 0x080007) AM_WRITE(protection_w) /* top byte unknown, bottom is protection in ikari3 and streetsm */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(searchar_flipscreen16_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(searchar_flipscreen_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(rotary_1_r) /* Player 1 rotary */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ(rotary_2_r) /* Player 2 rotary */
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ(rotary_lsb_r) /* Extra rotary bits */
@@ -147,10 +148,10 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(sound_status_r)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_SHARE("spriteram")   // only partially populated
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram") /* Mirror is used by Ikari 3 */
 	AM_RANGE(0x300000, 0x33ffff) AM_ROMBANK("bank1") /* Extra code bank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_word_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -588,7 +589,7 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a SAR board is 59.16Hz.
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update_pow)
+	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pow)
@@ -1067,23 +1068,23 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(snk68_state,searchar)
+DRIVER_INIT_MEMBER(snk68_state, searchar)
 {
-	membank("bank1")->set_base(memregion("user1")->base());
+	membank("bank1")->configure_entry(0, memregion("user1")->base());
 }
 
 /******************************************************************************/
 
-GAME( 1988, pow,       0,        pow,      pow,      driver_device, 0,        ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)", 0 )
-GAME( 1988, powj,      pow,      pow,      powj,     driver_device, 0,        ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)", 0 )
-GAME( 1989, streetsm,  0,        pow,      streetsm, driver_device, 0,        ROT0,  "SNK", "Street Smart (US version 2)", 0 )
-GAME( 1989, streetsm1, streetsm, searchar, streetsm, driver_device, 0,        ROT0,  "SNK", "Street Smart (US version 1)", 0 )
-GAME( 1989, streetsmw, streetsm, searchar, streetsj, driver_device, 0,        ROT0,  "SNK", "Street Smart (World version 1)", 0 )
-GAME( 1989, streetsmj, streetsm, searchar, streetsj, driver_device, 0,        ROT0,  "SNK", "Street Smart (Japan version 1)", 0 )
-GAME( 1989, ikari3,    0,        searchar, ikari3,   snk68_state,   searchar, ROT0,  "SNK", "Ikari III - The Rescue (World, 8-Way Joystick)", 0 )
-GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   snk68_state,   searchar, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)", 0 )
-GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   snk68_state,   searchar, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)", 0 )
-GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   snk68_state,   searchar, ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)", 0 )
-GAME( 1989, searchar,  0,        searchar, searchar, snk68_state,   searchar, ROT90, "SNK", "SAR - Search And Rescue (World)", 0 )
-GAME( 1989, searcharu, searchar, searchar, searchar, snk68_state,   searchar, ROT90, "SNK", "SAR - Search And Rescue (US)", 0 )
-GAME( 1989, searcharj, searchar, searchar, searchar, snk68_state,   searchar, ROT90, "SNK", "SAR - Search And Rescue (Japan)", 0 )
+GAME( 1988, pow,       0,        pow,      pow,      driver_device, 0,        ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, powj,      pow,      pow,      powj,     driver_device, 0,        ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, streetsm,  0,        pow,      streetsm, driver_device, 0,        ROT0,  "SNK", "Street Smart (US version 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, streetsm1, streetsm, searchar, streetsm, driver_device, 0,        ROT0,  "SNK", "Street Smart (US version 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, streetsmw, streetsm, searchar, streetsj, driver_device, 0,        ROT0,  "SNK", "Street Smart (World version 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, streetsmj, streetsm, searchar, streetsj, driver_device, 0,        ROT0,  "SNK", "Street Smart (Japan version 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ikari3,    0,        searchar, ikari3,   snk68_state, searchar,   ROT0,  "SNK", "Ikari III - The Rescue (World, 8-Way Joystick)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   snk68_state, searchar,   ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   snk68_state, searchar,   ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   snk68_state, searchar,   ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)", GAME_SUPPORTS_SAVE )
+GAME( 1989, searchar,  0,        searchar, searchar, snk68_state, searchar,   ROT90, "SNK", "SAR - Search And Rescue (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, searcharu, searchar, searchar, searchar, snk68_state, searchar,   ROT90, "SNK", "SAR - Search And Rescue (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, searcharj, searchar, searchar, searchar, snk68_state, searchar,   ROT90, "SNK", "SAR - Search And Rescue (Japan)", GAME_SUPPORTS_SAVE )
