@@ -860,7 +860,7 @@ void vertex_program_simulator::compute_scalar_operation(float t_out[4], int inst
 	case 7: // "LIT"
 		t_out[0] = 1.0;
 		t_out[1] = fmax(0, fmin(par_in[p3_C + 0], 1.0f));
-		t_out[2] = par_in[p3_C + 0] > 0 ? pow((float)fmax(par_in[p3_C + 1], 0), par_in[p3_C + 3]) : 0;
+		t_out[2] = par_in[p3_C + 0] > 0 ? pow(fmax(par_in[p3_C + 1], 0), par_in[p3_C + 3]) : 0;
 		t_out[3] = 1.0;
 		break;
 	}

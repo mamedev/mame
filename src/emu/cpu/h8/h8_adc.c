@@ -497,6 +497,5 @@ void h8_adc_2655_device::do_buffering(int buffer)
 
 int h8_adc_2655_device::get_channel_index(int count)
 {
-	throw emu_fatalerror("%s: Indexing requested but unimplemented for this device\n", tag());
-//	abort();
+	abort();
 }

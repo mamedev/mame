@@ -858,13 +858,13 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 			if (m_featureLevel <= D3D_FEATURE_LEVEL_9_2)
 			{
-				g_caps.maxTextureSize   = 2048 /*D3D_FL9_1_REQ_TEXTURE2D_U_OR_V_DIMENSION*/;
-				g_caps.maxFBAttachments = uint8_t(bx::uint32_min(1 /*D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT*/, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS));
+				g_caps.maxTextureSize   = D3D_FL9_1_REQ_TEXTURE2D_U_OR_V_DIMENSION;
+				g_caps.maxFBAttachments = uint8_t(bx::uint32_min(D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS));
 			}
 			else if (m_featureLevel == D3D_FEATURE_LEVEL_9_3)
 			{
-				g_caps.maxTextureSize   = 4096 /*D3D_FL9_3_REQ_TEXTURE2D_U_OR_V_DIMENSION*/;
-				g_caps.maxFBAttachments = uint8_t(bx::uint32_min(4 /*D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT*/, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS) );
+				g_caps.maxTextureSize   = D3D_FL9_3_REQ_TEXTURE2D_U_OR_V_DIMENSION;
+				g_caps.maxFBAttachments = uint8_t(bx::uint32_min(D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS) );
 			}
 			else
 			{
@@ -1670,8 +1670,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			if (!!(_resolution.m_flags & BGFX_RESET_MAXANISOTROPY) )
 			{
 				m_maxAnisotropy = (m_featureLevel == D3D_FEATURE_LEVEL_9_1)
-				? 2 /*D3D_FL9_1_DEFAULT_MAX_ANISOTROPY*/
-				: 16 /*D3D11_REQ_MAXANISOTROPY*/
+				? D3D_FL9_1_DEFAULT_MAX_ANISOTROPY
+				: D3D11_REQ_MAXANISOTROPY
 				;
 			}
 			else

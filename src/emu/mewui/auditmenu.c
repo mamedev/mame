@@ -85,6 +85,10 @@ ui_menu_audit::ui_menu_audit(running_machine &machine, render_container *contain
 	  m_availablesorted(availablesorted), m_unavailablesorted(unavailablesorted)
 {
 	m_audit_mode = _audit_mode;
+	m_included.resize(m_unavailable.size(), 0);
+	steps = (int)((m_unavailable.size() * 0.05) + 0.5);
+	if (steps <= 0) steps = 1;
+	x = -1;
 }
 
 ui_menu_audit::~ui_menu_audit()
@@ -97,18 +101,22 @@ ui_menu_audit::~ui_menu_audit()
 
 void ui_menu_audit::handle()
 {
-	static bool steps = false;
-
-	machine().ui().draw_text_box(container, "Audit in progress...", JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
-	if (!steps)
+	if (x == -1)
 	{
-		steps = true;
+		machine().ui().draw_text_box(container, "Audit in progress...", JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
+		x = 0;
 		return;
 	}
 
-	std::vector<UINT8> m_included(m_unavailable.size(), 0);
+	std::string text;
+	int perc = (x + steps) * 100 / m_unavailable.size();
+	strprintf(text, "Audit in progress... %3d", perc);
+	machine().ui().draw_text_box(container, text.c_str(), JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
 
-	for (size_t x = 0; x < m_unavailable.size(); ++x)
+	int start = x;
+	int count = start + steps;
+
+	for (; x < count && x < m_unavailable.size(); ++x)
 	{
 		driver_enumerator enumerator(machine().options(), m_unavailable[x]->name);
 		enumerator.next();
@@ -123,21 +131,23 @@ void ui_menu_audit::handle()
 		}
 	}
 
-	std::vector<const game_driver *> m_remove;
-	for (size_t x = 0; x < m_unavailable.size(); ++x)
-		if (!m_included[x])
-			m_remove.push_back(m_unavailable[x]);
+	for (; start < count && start < m_unavailable.size(); ++start)
+		if (!m_included[start])
+			m_remove.push_back(m_unavailable[start]);
 
-	m_unavailable = m_remove;
+	if (x == m_unavailable.size())
+	{
+		m_unavailable = m_remove;
 
-	// sort
-	m_availablesorted = m_available;
-	std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
-	m_unavailablesorted = m_unavailable;
-	std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
+		// sort
+		m_availablesorted = m_available;
+		std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
+		m_unavailablesorted = m_unavailable;
+		std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
 
-	ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
-	ui_menu::stack_pop(machine());
+		ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
+		ui_menu::stack_pop(machine());
+	}
 }
 
 //-------------------------------------------------

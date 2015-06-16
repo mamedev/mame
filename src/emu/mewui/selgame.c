@@ -401,7 +401,7 @@ void ui_mewui_select_game::handle()
 			inkey_export();
 
 		// handle UI_AUDIT_FAST
-		else if (menu_event->iptkey == IPT_UI_AUDIT_FAST)
+		else if (menu_event->iptkey == IPT_UI_AUDIT_FAST && !m_unavailablelist.empty())
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_audit(machine(), container, m_availablelist, m_unavailablelist, m_availsortedlist, m_unavailsortedlist, 1)));
 
 		// typed characters append to the buffer
