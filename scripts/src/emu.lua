@@ -384,6 +384,8 @@ function emuProject(_target, _subtarget)
 			MAME_DIR .. "3rdparty/expat/lib",
 		}
 	end
+
+	dofile("retro_fpic.lua")
 	
 	dofile(path.join("src", "cpu.lua"))
 
@@ -396,8 +398,6 @@ function emuProject(_target, _subtarget)
 
 	--	netlist now defines a project
 	dofile(path.join("src", "netlist.lua"))
-
-	dofile("retro_fpic.lua")
 	
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
