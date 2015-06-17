@@ -4,14 +4,9 @@
 
   Mitsubishi M58846 MCU
 
-  TODO:
-  - o hai
-
 */
 
 #include "m58846.h"
-//#include "debugger.h"
-
 
 
 const device_type M58846 = &device_creator<m58846_device>;
@@ -62,8 +57,6 @@ void m58846_device::device_start()
 void m58846_device::device_reset()
 {
 	melps4_cpu_device::device_reset();
-	
-	// timer 1 runs continuously
 	reset_timer();
 }
 
@@ -75,8 +68,7 @@ void m58846_device::device_reset()
 
 void m58846_device::reset_timer()
 {
-	// reset 7-bit prescaler
-	attotime base = attotime::from_ticks(6 * 128, unscaled_clock());
+	attotime base = attotime::from_ticks(6, unscaled_clock());
 	m_timer->adjust(base);
 }
 
@@ -85,9 +77,25 @@ void m58846_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	if (id != 0)
 		return;
 	
-	// timer 1 overflow
-	m_irqflag[1] = true;
-	m_possible_irq = true;
+	// timer 1: 7-bit fixed counter (manual specifically says 127)
+	if (++m_tmr_count[0] == 127)
+	{
+		m_tmr_count[0] = 0;
+		m_irqflag[1] = true;
+		m_possible_irq = true;
+	}
+	
+	// timer 2: 8-bit user defined counter with auto-reload
+	if (m_v & 8 && ++m_tmr_count[1] == 0)
+	{
+		m_tmr_count[1] = m_tmr_reload;
+		m_irqflag[2] = true;
+		m_possible_irq = true;
+		m_port_t ^= 1;
+		m_write_t(m_port_t);
+	}
+
+	// schedule next timeout
 	reset_timer();
 }
 
@@ -96,7 +104,7 @@ void m58846_device::write_v(UINT8 data)
 	// d0: enable timer 1 irq
 	// d1: enable timer 2 irq? (TODO)
 	// d2: ?
-	// d3: timer 2 enable?
+	// d3: timer 2 enable
 	m_tmr_irq_enabled[0] = (data & 1) ? true : false;
 	m_possible_irq = true;
 	
