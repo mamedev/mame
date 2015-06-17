@@ -65,9 +65,9 @@ bool n64_rdp::rdp_range_check(UINT32 addr)
 // The functions in this file should be moved into the parent Processor class.
 #include "rdpfiltr.inc"
 
-void n64_rdp::get_alpha_cvg(UINT8* comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object)
+INT32 n64_rdp::get_alpha_cvg(INT32 comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
-	INT32 temp = *comb_alpha;
+	INT32 temp = comb_alpha;
 	INT32 temp2 = userdata->m_current_pix_cvg;
 	INT32 temp3 = 0;
 
@@ -84,7 +84,7 @@ void n64_rdp::get_alpha_cvg(UINT8* comb_alpha, rdp_span_aux* userdata, const rdp
 	{
 		temp = 0xff;
 	}
-	*comb_alpha = temp;
+	return temp;
 }
 
 /*****************************************************************************/
@@ -156,90 +156,13 @@ void n64_rdp::video_update16(n64_periphs* n64, bitmap_rgb32 &bitmap)
 
 			for(INT32 i = 0; i < hres; i++)
 			{
-				color_t c;
-				//INT32 r, g, b;
-
 				UINT16 pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
-				//m_misc_state.m_current_pix_cvg = ((pix & 1) << 2) | (hidden_buffer[pixels ^ BYTE_ADDR_XOR] & 3);
 
-				//if(divot)
-				//{
-				//  if(i > 0 && i < (hres - 1))
-				//  {
-				//      prev_cvg = ((frame_buffer[(pixels - 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels - 1)^BYTE_ADDR_XOR] & 3);
-				//      next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
-				//  }
-				//}
-				c.i.r = ((pix >> 8) & 0xf8) | (pix >> 13);
-				c.i.g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
-				c.i.b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
-
-				//if(fsaa)
-				//{
-					//if (/*!vibuffering &&*/ state->m_rdp.m_misc_state.m_current_pix_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2))
-					//{
-						//video_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR],&hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64->vi_width);
-					//}
-				//}
-				//else if (dither_filter && state->m_rdp.m_misc_state.m_current_pix_cvg == 7 && i > 0 && j > 0 && i < (hres - 1) && j < (vres - 1))
-				//{
-					//if (vibuffering)
-					//{
-					//  restore_filter16_buffer(&r, &g, &b, &ViBuffer[i][j], n64->vi_width);
-					//}
-					//else
-					//{
-						//restore_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR, n64->vi_width);
-					//}
-				//}
-				//if(divot)
-				//{
-					//if (i > 0 && i < (hres - 1) && (m_misc_state.m_current_pix_cvg != 7 || prev_cvg != 7 || next_cvg != 7))
-					//{
-						//if (vibuffering)
-						//{
-						//  divot_filter16_buffer(&r, &g, &b, &ViBuffer[i][j]);
-						//}
-						//else
-						//{
-							//divot_filter16(&c.i.r, &c.i.g, &c.i.b, &frame_buffer[pixels ^ WORD_ADDR_XOR], pixels ^ WORD_ADDR_XOR);
-						//}
-					//}
-				//}
-
-				/*
-				if (gamma_dither)
-				{
-				    dith = screen.machine().rand() & 0x3f;
-				}
-				if (gamma)
-				{
-				    if (gamma_dither)
-				    {
-				        r = m_gamma_dither_table[(r << 6)|dith];
-				        g = m_gamma_dither_table[(g << 6)|dith];
-				        b = m_gamma_dither_table[(b << 6)|dith];
-				    }
-				    else
-				    {
-				        r = m_gamma_table[r];
-				        g = m_gamma_table[g];
-				        b = m_gamma_table[b];
-				    }
-				}
-				else if (gamma_dither)
-				{
-				    if (r < 255)
-				        r += (dith & 1);
-				    if (g < 255)
-				        g += (dith & 1);
-				    if (b < 255)
-				        b += (dith & 1);
-				}
-				*/
+				const UINT8 r = ((pix >> 8) & 0xf8) | (pix >> 13);
+				const UINT8 g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
+				const UINT8 b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
+				d[i] = (r << 16) | (g << 8) | b;
 				pixels++;
-
-				d[i] = c.c >> 8;//(r << 16) | (g << 8) | b; // Fix me for endianness
 			}
 			pixels +=invisiblewidth;
 		}
@@ -436,118 +359,118 @@ INT32 n64_rdp::alpha_combiner_equation(INT32 a, INT32 b, INT32 c, INT32 d)
 	return a;
 }
 
-void n64_rdp::set_suba_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_b, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_suba_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata)
 {
 	switch (code & 0xf)
 	{
-		case 0:     *input_r = &userdata->m_combined_color.i.r; *input_g = &userdata->m_combined_color.i.g; *input_b = &userdata->m_combined_color.i.b; break;
-		case 1:     *input_r = &userdata->m_texel0_color.i.r;   *input_g = &userdata->m_texel0_color.i.g;   *input_b = &userdata->m_texel0_color.i.b;   break;
-		case 2:     *input_r = &userdata->m_texel1_color.i.r;   *input_g = &userdata->m_texel1_color.i.g;   *input_b = &userdata->m_texel1_color.i.b;   break;
-		case 3:     *input_r = &userdata->m_prim_color.i.r;     *input_g = &userdata->m_prim_color.i.g;     *input_b = &userdata->m_prim_color.i.b;     break;
-		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
-		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
-		case 6:     *input_r = &m_one.i.r;                      *input_g = &m_one.i.g;                      *input_b = &m_one.i.b;                      break;
-		case 7:     *input_r = &userdata->m_noise_color.i.r;    *input_g = &userdata->m_noise_color.i.g;    *input_b = &userdata->m_noise_color.i.b;    break;
+		case 0:     *input = &userdata->m_combined_color; break;
+		case 1:     *input = &userdata->m_texel0_color; break;
+		case 2:     *input = &userdata->m_texel1_color; break;
+		case 3:     *input = &userdata->m_prim_color; break;
+		case 4:     *input = &userdata->m_shade_color; break;
+		case 5:     *input = &userdata->m_env_color; break;
+		case 6:     *input = &m_one; break;
+		case 7:     *input = &userdata->m_noise_color; break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
-					*input_r = &m_zero.i.r; *input_g = &m_zero.i.g; *input_b = &m_zero.i.b; break;
+					*input = &m_zero; break;
 		}
 	}
 }
 
-void n64_rdp::set_subb_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_b, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_subb_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata)
 {
 	switch (code & 0xf)
 	{
-		case 0:     *input_r = &userdata->m_combined_color.i.r; *input_g = &userdata->m_combined_color.i.g; *input_b = &userdata->m_combined_color.i.b; break;
-		case 1:     *input_r = &userdata->m_texel0_color.i.r;   *input_g = &userdata->m_texel0_color.i.g;   *input_b = &userdata->m_texel0_color.i.b;   break;
-		case 2:     *input_r = &userdata->m_texel1_color.i.r;   *input_g = &userdata->m_texel1_color.i.g;   *input_b = &userdata->m_texel1_color.i.b;   break;
-		case 3:     *input_r = &userdata->m_prim_color.i.r;     *input_g = &userdata->m_prim_color.i.g;     *input_b = &userdata->m_prim_color.i.b;     break;
-		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
-		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
+		case 0:     *input = &userdata->m_combined_color; break;
+		case 1:     *input = &userdata->m_texel0_color; break;
+		case 2:     *input = &userdata->m_texel1_color; break;
+		case 3:     *input = &userdata->m_prim_color; break;
+		case 4:     *input = &userdata->m_shade_color; break;
+		case 5:     *input = &userdata->m_env_color; break;
 		case 6:     fatalerror("SET_SUBB_RGB_INPUT: key_center\n");
-		case 7:     *input_r = &userdata->m_k4.i.r;             *input_g = &userdata->m_k4.i.g;             *input_b = &userdata->m_k4.i.b;				break;
+		case 7:     *input = &userdata->m_k4; break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
-					*input_r = &m_zero.i.r; *input_g = &m_zero.i.g; *input_b = &m_zero.i.b; break;
+					*input = &m_zero; break;
 		}
 	}
 }
 
-void n64_rdp::set_mul_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_b, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_mul_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata)
 {
 	switch (code & 0x1f)
 	{
-		case 0:     *input_r = &userdata->m_combined_color.i.r; *input_g = &userdata->m_combined_color.i.g; *input_b = &userdata->m_combined_color.i.b; break;
-		case 1:     *input_r = &userdata->m_texel0_color.i.r;   *input_g = &userdata->m_texel0_color.i.g;   *input_b = &userdata->m_texel0_color.i.b;   break;
-		case 2:     *input_r = &userdata->m_texel1_color.i.r;   *input_g = &userdata->m_texel1_color.i.g;   *input_b = &userdata->m_texel1_color.i.b;   break;
-		case 3:     *input_r = &userdata->m_prim_color.i.r;     *input_g = &userdata->m_prim_color.i.g;     *input_b = &userdata->m_prim_color.i.b;     break;
-		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
-		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
-		case 6:     *input_r = &userdata->m_key_scale.i.r;      *input_g = &userdata->m_key_scale.i.g;      *input_b = &userdata->m_key_scale.i.b;      break;
-		case 7:     *input_r = &userdata->m_combined_alpha.i.r; *input_g = &userdata->m_combined_alpha.i.g; *input_b = &userdata->m_combined_alpha.i.b; break;
-		case 8:     *input_r = &userdata->m_texel0_alpha.i.r;   *input_g = &userdata->m_texel0_alpha.i.g;   *input_b = &userdata->m_texel0_alpha.i.b;   break;
-		case 9:     *input_r = &userdata->m_texel1_alpha.i.r;   *input_g = &userdata->m_texel1_alpha.i.g;   *input_b = &userdata->m_texel1_alpha.i.b;   break;
-		case 10:    *input_r = &userdata->m_prim_alpha.i.r;     *input_g = &userdata->m_prim_alpha.i.g;     *input_b = &userdata->m_prim_alpha.i.b;     break;
-		case 11:    *input_r = &userdata->m_shade_alpha.i.r;    *input_g = &userdata->m_shade_alpha.i.g;    *input_b = &userdata->m_shade_alpha.i.b;    break;
-		case 12:    *input_r = &userdata->m_env_alpha.i.r;      *input_g = &userdata->m_env_alpha.i.g;      *input_b = &userdata->m_env_alpha.i.b;      break;
-		case 13:    *input_r = &userdata->m_lod_fraction.i.r;   *input_g = &userdata->m_lod_fraction.i.g;   *input_b = &userdata->m_lod_fraction.i.b;   break;
-		case 14:    *input_r = &userdata->m_prim_lod_fraction.i.r; *input_g = &userdata->m_prim_lod_fraction.i.g;  *input_b = &userdata->m_prim_lod_fraction.i.b;  break;
-		case 15:    *input_r = &userdata->m_k5.i.r;             *input_g = &userdata->m_k5.i.g;             *input_b = &userdata->m_k5.i.b;             break;
+		case 0:     *input = &userdata->m_combined_color; break;
+		case 1:     *input = &userdata->m_texel0_color; break;
+		case 2:     *input = &userdata->m_texel1_color; break;
+		case 3:     *input = &userdata->m_prim_color; break;
+		case 4:     *input = &userdata->m_shade_color; break;
+		case 5:     *input = &userdata->m_env_color; break;
+		case 6:     *input = &userdata->m_key_scale; break;
+		case 7:     *input = &userdata->m_combined_alpha; break;
+		case 8:     *input = &userdata->m_texel0_alpha; break;
+		case 9:     *input = &userdata->m_texel1_alpha; break;
+		case 10:    *input = &userdata->m_prim_alpha; break;
+		case 11:    *input = &userdata->m_shade_alpha; break;
+		case 12:    *input = &userdata->m_env_alpha; break;
+		case 13:    *input = &userdata->m_lod_fraction; break;
+		case 14:    *input = &userdata->m_prim_lod_fraction; break;
+		case 15:    *input = &userdata->m_k5; break;
 		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31:
 		{
-					*input_r = &m_zero.i.r; *input_g = &m_zero.i.g; *input_b = &m_zero.i.b; break;
+					*input = &m_zero; break;
 		}
 	}
 }
 
-void n64_rdp::set_add_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_b, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_add_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata)
 {
 	switch (code & 0x7)
 	{
-		case 0:     *input_r = &userdata->m_combined_color.i.r; *input_g = &userdata->m_combined_color.i.g; *input_b = &userdata->m_combined_color.i.b; break;
-		case 1:     *input_r = &userdata->m_texel0_color.i.r;   *input_g = &userdata->m_texel0_color.i.g;   *input_b = &userdata->m_texel0_color.i.b;   break;
-		case 2:     *input_r = &userdata->m_texel1_color.i.r;   *input_g = &userdata->m_texel1_color.i.g;   *input_b = &userdata->m_texel1_color.i.b;   break;
-		case 3:     *input_r = &userdata->m_prim_color.i.r;     *input_g = &userdata->m_prim_color.i.g;     *input_b = &userdata->m_prim_color.i.b;     break;
-		case 4:     *input_r = &userdata->m_shade_color.i.r;    *input_g = &userdata->m_shade_color.i.g;    *input_b = &userdata->m_shade_color.i.b;    break;
-		case 5:     *input_r = &userdata->m_env_color.i.r;      *input_g = &userdata->m_env_color.i.g;      *input_b = &userdata->m_env_color.i.b;      break;
-		case 6:     *input_r = &m_one.i.r;                      *input_g = &m_one.i.g;                      *input_b = &m_one.i.b;                      break;
-		case 7:     *input_r = &m_zero.i.r;                     *input_g = &m_zero.i.g;                     *input_b = &m_zero.i.b;                     break;
+		case 0:     *input = &userdata->m_combined_alpha; break;
+		case 1:     *input = &userdata->m_texel0_alpha; break;
+		case 2:     *input = &userdata->m_texel1_alpha; break;
+		case 3:     *input = &userdata->m_prim_alpha; break;
+		case 4:     *input = &userdata->m_shade_alpha; break;
+		case 5:     *input = &userdata->m_env_alpha; break;
+		case 6:     *input = &m_one; break;
+		case 7:     *input = &m_zero; break;
 	}
 }
 
-void n64_rdp::set_sub_input_alpha(UINT8** input, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_sub_input_alpha(color_t** input, INT32 code, rdp_span_aux* userdata)
 {
 	switch (code & 0x7)
 	{
-		case 0:     *input = &userdata->m_combined_color.i.a; break;
-		case 1:     *input = &userdata->m_texel0_color.i.a; break;
-		case 2:     *input = &userdata->m_texel1_color.i.a; break;
-		case 3:     *input = &userdata->m_prim_color.i.a; break;
-		case 4:     *input = &userdata->m_shade_color.i.a; break;
-		case 5:     *input = &userdata->m_env_color.i.a; break;
-		case 6:     *input = &m_one.i.a; break;
-		case 7:     *input = &m_zero.i.a; break;
+		case 0:     *input = &userdata->m_combined_alpha; break;
+		case 1:     *input = &userdata->m_texel0_alpha; break;
+		case 2:     *input = &userdata->m_texel1_alpha; break;
+		case 3:     *input = &userdata->m_prim_alpha; break;
+		case 4:     *input = &userdata->m_shade_alpha; break;
+		case 5:     *input = &userdata->m_env_alpha; break;
+		case 6:     *input = &m_one; break;
+		case 7:     *input = &m_zero; break;
 	}
 }
 
-void n64_rdp::set_mul_input_alpha(UINT8** input, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_mul_input_alpha(color_t** input, INT32 code, rdp_span_aux* userdata)
 {
 	switch (code & 0x7)
 	{
-		case 0:     *input = &userdata->m_lod_fraction.i.a; break;
-		case 1:     *input = &userdata->m_texel0_color.i.a; break;
-		case 2:     *input = &userdata->m_texel1_color.i.a; break;
-		case 3:     *input = &userdata->m_prim_color.i.a; break;
-		case 4:     *input = &userdata->m_shade_color.i.a; break;
-		case 5:     *input = &userdata->m_env_color.i.a; break;
-		case 6:     *input = &userdata->m_prim_lod_fraction.i.a; break;
-		case 7:     *input = &m_zero.i.a; break;
+		case 0:     *input = &userdata->m_lod_fraction; break;
+		case 1:     *input = &userdata->m_texel0_alpha; break;
+		case 2:     *input = &userdata->m_texel1_alpha; break;
+		case 3:     *input = &userdata->m_prim_alpha; break;
+		case 4:     *input = &userdata->m_shade_alpha; break;
+		case 5:     *input = &userdata->m_env_alpha; break;
+		case 6:     *input = &userdata->m_prim_lod_fraction; break;
+		case 7:     *input = &m_zero; break;
 	}
 }
 
-void n64_rdp::set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, UINT8** input_a, INT32 a, INT32 b, rdp_span_aux* userdata)
+void n64_rdp::set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, color_t** input_a, INT32 a, INT32 b, rdp_span_aux* userdata)
 {
 	switch (a & 0x3)
 	{
@@ -572,20 +495,20 @@ void n64_rdp::set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, U
 	{
 		switch (b & 0x3)
 		{
-			case 0:     *input_a = &userdata->m_pixel_color.i.a; break;
-			case 1:     *input_a = &userdata->m_fog_color.i.a; break;
-			case 2:     *input_a = &userdata->m_shade_color.i.a; break;
-			case 3:     *input_a = &m_zero.i.a; break;
+			case 0:     *input_a = &userdata->m_pixel_color; break;
+			case 1:     *input_a = &userdata->m_fog_alpha; break;
+			case 2:     *input_a = &userdata->m_shade_alpha; break;
+			case 3:     *input_a = &m_zero; break;
 		}
 	}
 	else
 	{
 		switch (b & 0x3)
 		{
-			case 0:     *input_a = &userdata->m_inv_pixel_color.i.a; break;
-			case 1:     *input_a = &userdata->m_memory_color.i.a; break;
-			case 2:     *input_a = &m_one.i.a; break;
-			case 3:     *input_a = &m_zero.i.a; break;
+			case 0:     *input_a = &userdata->m_inv_pixel_color; break;
+			case 1:     *input_a = &userdata->m_memory_color; break;
+			case 2:     *input_a = &m_one; break;
+			case 3:     *input_a = &m_zero; break;
 		}
 	}
 }
@@ -2133,19 +2056,19 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 				set_blender_input(1, 1, &userdata->m_color_inputs.blender2a_rgb[1], &userdata->m_color_inputs.blender2b_a[1], m_other_modes.blend_m2a_1, m_other_modes.blend_m2b_1, userdata);
 
 				// Setup color combiner data for this scanline
-				set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a_r[0], &userdata->m_color_inputs.combiner_rgbsub_a_g[0], &userdata->m_color_inputs.combiner_rgbsub_a_b[0], m_combine.sub_a_rgb0, userdata);
-				set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b_r[0], &userdata->m_color_inputs.combiner_rgbsub_b_g[0], &userdata->m_color_inputs.combiner_rgbsub_b_b[0], m_combine.sub_b_rgb0, userdata);
-				set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul_r[0], &userdata->m_color_inputs.combiner_rgbmul_g[0], &userdata->m_color_inputs.combiner_rgbmul_b[0], m_combine.mul_rgb0, userdata);
-				set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd_r[0], &userdata->m_color_inputs.combiner_rgbadd_g[0], &userdata->m_color_inputs.combiner_rgbadd_b[0], m_combine.add_rgb0, userdata);
+				set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a[0], m_combine.sub_a_rgb0, userdata);
+				set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b[0], m_combine.sub_b_rgb0, userdata);
+				set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul[0], m_combine.mul_rgb0, userdata);
+				set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd[0], m_combine.add_rgb0, userdata);
 				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_a[0], m_combine.sub_a_a0, userdata);
 				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_b[0], m_combine.sub_b_a0, userdata);
 				set_mul_input_alpha(&userdata->m_color_inputs.combiner_alphamul[0], m_combine.mul_a0, userdata);
 				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphaadd[0], m_combine.add_a0, userdata);
 
-				set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a_r[1], &userdata->m_color_inputs.combiner_rgbsub_a_g[1], &userdata->m_color_inputs.combiner_rgbsub_a_b[1], m_combine.sub_a_rgb1, userdata);
-				set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b_r[1], &userdata->m_color_inputs.combiner_rgbsub_b_g[1], &userdata->m_color_inputs.combiner_rgbsub_b_b[1], m_combine.sub_b_rgb1, userdata);
-				set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul_r[1], &userdata->m_color_inputs.combiner_rgbmul_g[1], &userdata->m_color_inputs.combiner_rgbmul_b[1], m_combine.mul_rgb1, userdata);
-				set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd_r[1], &userdata->m_color_inputs.combiner_rgbadd_g[1], &userdata->m_color_inputs.combiner_rgbadd_b[1], m_combine.add_rgb1, userdata);
+				set_suba_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_a[1], m_combine.sub_a_rgb1, userdata);
+				set_subb_input_rgb(&userdata->m_color_inputs.combiner_rgbsub_b[1], m_combine.sub_b_rgb1, userdata);
+				set_mul_input_rgb(&userdata->m_color_inputs.combiner_rgbmul[1], m_combine.mul_rgb1, userdata);
+				set_add_input_rgb(&userdata->m_color_inputs.combiner_rgbadd[1], m_combine.add_rgb1, userdata);
 				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_a[1], m_combine.sub_a_a1, userdata);
 				set_sub_input_alpha(&userdata->m_color_inputs.combiner_alphasub_b[1], m_combine.sub_b_a1, userdata);
 				set_mul_input_alpha(&userdata->m_color_inputs.combiner_alphamul[1], m_combine.mul_a1, userdata);
@@ -2386,13 +2309,13 @@ void n64_rdp::cmd_sync_full(UINT32 w1, UINT32 w2)
 
 void n64_rdp::cmd_set_key_gb(UINT32 w1, UINT32 w2)
 {
-	m_key_scale.i.b = w2 & 0xff;
-	m_key_scale.i.g = (w2 >> 16) & 0xff;
+	m_key_scale.set_b(w2 & 0xff);
+	m_key_scale.set_g((w2 >> 16) & 0xff);
 }
 
 void n64_rdp::cmd_set_key_r(UINT32 w1, UINT32 w2)
 {
-	m_key_scale.i.r = w2 & 0xff;
+	m_key_scale.set_r(w2 & 0xff);
 }
 
 void n64_rdp::cmd_set_fill_color32(UINT32 w1, UINT32 w2)
@@ -2417,9 +2340,9 @@ void n64_rdp::cmd_set_convert(UINT32 w1, UINT32 w2)
 	k4 = ((w2 >> 17) & 1) ? (-(0x100 - k4)) : k4;
 	k5 = ((w2 >> 8) & 1) ? (-(0x100 - k5)) : k5;
 
-	UINT32 repl_k4 = (k4 & 0xff) * 0x01010101;
-	UINT32 repl_k5 = (k5 & 0xff) * 0x01010101;
-	set_yuv_factors(k0, k1, k2, k3, repl_k4, repl_k5);
+	const UINT32 k4val = k4 & 0xff;
+	const UINT32 k5val = k5 & 0xff;
+	set_yuv_factors(k0, k1, k2, k3, rgbaint_t(k4val, k4val, k4val, k4val), rgbaint_t(k5val, k5val, k5val, k5val));
 }
 
 void n64_rdp::cmd_set_scissor(UINT32 w1, UINT32 w2)
@@ -2902,28 +2825,30 @@ void n64_rdp::cmd_fill_rect(UINT32 w1, UINT32 w2)
 
 void n64_rdp::cmd_set_fog_color(UINT32 w1, UINT32 w2)
 {
-	m_fog_color.c = w2;
-	m_fog_alpha.c = m_fog_color.i.a * 0x01010101;
+	m_fog_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_fog_alpha.set(m_fog_color);
 }
 
 void n64_rdp::cmd_set_blend_color(UINT32 w1, UINT32 w2)
 {
-	m_blend_color.c = w2;
-	m_blend_alpha.c = m_blend_color.i.a * 0x01010101;
+	m_blend_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_blend_alpha.set(m_blend_color);
 }
 
 void n64_rdp::cmd_set_prim_color(UINT32 w1, UINT32 w2)
 {
 	m_misc_state.m_min_level = (w1 >> 8) & 0x1f;
-	m_prim_lod_fraction.c = (w1 & 0xff) * 0x01010101;
-	m_prim_color.c = w2;
-	m_prim_alpha.c = m_prim_color.i.a * 0x01010101;
+	const UINT8 prim_lod_fraction = w1 & 0xff;
+	m_prim_lod_fraction.set_rgba(prim_lod_fraction, prim_lod_fraction, prim_lod_fraction, prim_lod_fraction);
+
+	m_prim_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_prim_alpha.set(m_prim_color);
 }
 
 void n64_rdp::cmd_set_env_color(UINT32 w1, UINT32 w2)
 {
-	m_env_color.c = w2;
-	m_env_alpha.c = m_env_color.i.a * 0x01010101;
+	m_env_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_env_alpha.set(m_env_color);
 }
 
 void n64_rdp::cmd_set_combine(UINT32 w1, UINT32 w2)
@@ -3123,8 +3048,8 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 		m_tiles[i].num = i;
 	}
 
-	m_one.c = 0xffffffff;
-	m_zero.c = 0x00000000;
+	m_one.set_rgba(0xff, 0xff, 0xff, 0xff);
+	m_zero.set_rgba(0, 0, 0, 0);
 
 	m_tmem = NULL;
 
@@ -3132,7 +3057,7 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 
 	//memset(m_hidden_bits, 3, 8388608);
 
-	m_prim_lod_fraction.c = 0;
+	m_prim_lod_fraction.set_rgba(0, 0, 0, 0);
 
 	for (INT32 i = 0; i < 256; i++)
 	{

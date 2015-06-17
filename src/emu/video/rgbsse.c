@@ -84,11 +84,6 @@ void rgbint_t::set_rgb(INT32 r, INT32 g, INT32 b)
 	m_value = _mm_set_epi32(0, r, g, b);
 }
 
-void rgbaint_t::set_rgba(INT32 a, INT32 r, INT32 g, INT32 b)
-{
-	m_value = _mm_set_epi32(a, r, g, b);
-}
-
 /***************************************************************************
     OPERATORS
 ***************************************************************************/
@@ -142,7 +137,7 @@ rgbint_t& rgbint_t::operator>>=(const INT32 shift)
 
 rgb_t rgbint_t::to_rgb()
 {
-	__m128i anded = _mm_and_si128(m_value, _mm_set_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff));
+	__m128i anded = _mm_and_si128(m_value, _mm_set1_epi32(0x000000ff));
 	return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(anded, anded), _mm_setzero_si128()));
 }
 
@@ -165,17 +160,6 @@ rgb_t rgbint_t::to_rgba_clamp()
     CORE MATH
 ***************************************************************************/
 
-void rgbint_t::add(const rgbint_t& color2)
-{
-	m_value = _mm_add_epi32(m_value, color2.m_value);
-}
-
-void rgbint_t::add_imm(const INT32 imm)
-{
-	__m128i temp = _mm_set_epi32(imm, imm, imm, imm);
-	m_value = _mm_add_epi32(m_value, temp);
-}
-
 void rgbint_t::add_imm_rgb(const INT32 r, const INT32 g, const INT32 b)
 {
 	__m128i temp = _mm_set_epi32(0, r, g, b);
@@ -186,11 +170,6 @@ void rgbaint_t::add_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const 
 {
 	__m128i temp = _mm_set_epi32(a, r, g, b);
 	m_value = _mm_add_epi32(m_value, temp);
-}
-
-inline void rgbint_t::sub(const rgbint_t& color2)
-{
-	m_value = _mm_sub_epi32(m_value, color2.m_value);
 }
 
 void rgbint_t::sub_imm(const INT32 imm)
@@ -234,31 +213,16 @@ void rgbaint_t::subr_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const
 	m_value = _mm_sub_epi32(temp, m_value);
 }
 
-void rgbint_t::mul(rgbint_t& color)
-{
-	__m128i tmp1 = _mm_mul_epu32(m_value, color.m_value);
-	__m128i tmp2 = _mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(color.m_value, 4));
-	m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
-}
-
 void rgbint_t::print()
 {
-	printf("%04x ", _mm_extract_epi16(m_value, 0));
-	printf("%04x ", _mm_extract_epi16(m_value, 1));
-	printf("%04x ", _mm_extract_epi16(m_value, 2));
-	printf("%04x ", _mm_extract_epi16(m_value, 3));
-	printf("%04x ", _mm_extract_epi16(m_value, 4));
-	printf("%04x ", _mm_extract_epi16(m_value, 5));
+	printf("%04x ", _mm_extract_epi16(m_value, 7));
 	printf("%04x ", _mm_extract_epi16(m_value, 6));
-	printf("%04x\n", _mm_extract_epi16(m_value, 7));
-}
-
-void rgbint_t::mul_imm(const INT32 imm)
-{
-	__m128i immv = _mm_set1_epi32(imm);
-	__m128i tmp1 = _mm_mul_epu32(m_value, immv);
-	__m128i tmp2 = _mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(immv, 4));
-	m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
+	printf("%04x ", _mm_extract_epi16(m_value, 5));
+	printf("%04x ", _mm_extract_epi16(m_value, 4));
+	printf("%04x ", _mm_extract_epi16(m_value, 3));
+	printf("%04x ", _mm_extract_epi16(m_value, 2));
+	printf("%04x ", _mm_extract_epi16(m_value, 1));
+	printf("%04x\n", _mm_extract_epi16(m_value, 0));
 }
 
 void rgbint_t::mul_imm_rgb(const INT32 r, const INT32 g, const INT32 b)
@@ -275,28 +239,6 @@ void rgbaint_t::mul_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const 
 	__m128i tmp1 = _mm_mul_epu32(m_value, immv);
 	__m128i tmp2 = _mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(immv, 4));
 	m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
-}
-
-void rgbint_t::shl(UINT8 shift)
-{
-	m_value = _mm_slli_epi32(m_value, shift);
-}
-
-void rgbint_t::shr(UINT8 shift)
-{
-	m_value = _mm_srli_epi32(m_value, shift);
-}
-
-void rgbint_t::sra(UINT8 shift)
-{
-	m_value = _mm_srai_epi32(m_value, shift);
-}
-
-void rgbint_t::sign_extend(const INT32 compare, const INT32 sign)
-{
-	__m128i compare_vec = _mm_set1_epi32(compare);
-	__m128i compare_mask = _mm_cmpeq_epi32(_mm_and_si128(m_value, compare_vec), compare_vec);
-	m_value = _mm_or_si128(m_value, _mm_and_si128(_mm_set1_epi32(sign), compare_mask));
 }
 
 /***************************************************************************

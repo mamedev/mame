@@ -177,12 +177,12 @@ public:
 	// Color Combiner
 	INT32       color_combiner_equation(INT32 a, INT32 b, INT32 c, INT32 d);
 	INT32       alpha_combiner_equation(INT32 a, INT32 b, INT32 c, INT32 d);
-	void        set_suba_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_b, INT32 code, rdp_span_aux* userdata);
-	void        set_subb_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_b, INT32 code, rdp_span_aux* userdata);
-	void        set_mul_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_b, INT32 code, rdp_span_aux* userdata);
-	void        set_add_input_rgb(UINT8** input_r, UINT8** input_g, UINT8** input_b, INT32 code, rdp_span_aux* userdata);
-	void        set_sub_input_alpha(UINT8** input, INT32 code, rdp_span_aux* userdata);
-	void        set_mul_input_alpha(UINT8** input, INT32 code, rdp_span_aux* userdata);
+	void        set_suba_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata);
+	void        set_subb_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata);
+	void        set_mul_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata);
+	void        set_add_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata);
+	void        set_sub_input_alpha(color_t** input, INT32 code, rdp_span_aux* userdata);
+	void        set_mul_input_alpha(color_t** input, INT32 code, rdp_span_aux* userdata);
 
 	// Texture memory
 	UINT8*      get_tmem8() { return m_tmem; }
@@ -192,14 +192,14 @@ public:
 	UINT8       get_random() { return m_misc_state.m_random_seed += 0x13; }
 
 	// YUV Factors
-	void        set_yuv_factors(INT32 k0, INT32 k1, INT32 k2, INT32 k3, INT32 k4, INT32 k5) { m_k0 = k0; m_k1 = k1; m_k2 = k2; m_k3 = k3; m_k4.c = k4; m_k5.c = k5; }
+	void        set_yuv_factors(INT32 k0, INT32 k1, INT32 k2, INT32 k3, color_t k4, color_t k5) { m_k0 = k0; m_k1 = k1; m_k2 = k2; m_k3 = k3; m_k4 = k4; m_k5 = k5; }
 	INT32       get_k0() const { return m_k0; }
 	INT32       get_k1() const { return m_k1; }
 	INT32       get_k2() const { return m_k2; }
 	INT32       get_k3() const { return m_k3; }
 
 	// Blender-related (move into RDP::Blender)
-	void        set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, UINT8** input_a, INT32 a, INT32 b, rdp_span_aux* userdata);
+	void        set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, color_t** input_a, INT32 a, INT32 b, rdp_span_aux* userdata);
 
 	// Span rasterization
 	void        span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid);
@@ -212,7 +212,7 @@ public:
 	void            tc_div_no_perspective(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 	UINT32          get_log2(UINT32 lod_clamp);
 	void            render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object);
-	void            get_alpha_cvg(UINT8* comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object);
+	INT32			get_alpha_cvg(INT32 comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object);
 
 	void            z_store(const rdp_poly_state &object, UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc);
 	UINT32          z_decompress(UINT32 zcurpixel);
@@ -324,9 +324,9 @@ private:
 	void    compute_cvg_noflip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
 	void    compute_cvg_flip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
 
-	void    write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp_span_aux* userdata, const rdp_poly_state &object);
+	void    write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object);
 	void    read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const rdp_poly_state &object);
-	void    copy_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, INT32 m_current_pix_cvg, const rdp_poly_state &object);
+	void    copy_pixel(UINT32 curpixel, color_t& color, const rdp_poly_state &object);
 	void    fill_pixel(UINT32 curpixel, const rdp_poly_state &object);
 
 	void    precalc_cvmask_derivatives(void);

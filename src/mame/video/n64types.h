@@ -4,6 +4,8 @@
 #ifndef _VIDEO_N64TYPES_H_
 #define _VIDEO_N64TYPES_H_
 
+#include "video/rgbutil.h"
+
 struct misc_state_t
 {
 	misc_state_t()
@@ -34,6 +36,7 @@ struct misc_state_t
 	UINT16 m_primitive_dz;      // Forced Delta-Z value for current primitive, if applicable
 };
 
+#if 0
 class color_t
 {
 	public:
@@ -52,7 +55,12 @@ class color_t
 			set(a, r, g, b);
 		}
 
-		void set(UINT32 color)
+		inline void set(color_t& other)
+		{
+			c = other.c;
+		}
+
+		inline void set(UINT32 color)
 		{
 			i.a = (color >> 24) & 0xff;
 			i.r = (color >> 16) & 0xff;
@@ -66,6 +74,11 @@ class color_t
 			i.r = r;
 			i.g = g;
 			i.b = b;
+		}
+
+		inline void set_direct(UINT32 color)
+		{
+			c = color;
 		}
 
 		UINT32 get()
@@ -83,6 +96,9 @@ class color_t
 #endif
 		};
 };
+#else
+#define color_t rgbaint_t
+#endif
 
 enum
 {
@@ -151,29 +167,21 @@ struct combine_modes_t
 struct color_inputs_t
 {
 	// combiner inputs
-	UINT8* combiner_rgbsub_a_r[2];
-	UINT8* combiner_rgbsub_a_g[2];
-	UINT8* combiner_rgbsub_a_b[2];
-	UINT8* combiner_rgbsub_b_r[2];
-	UINT8* combiner_rgbsub_b_g[2];
-	UINT8* combiner_rgbsub_b_b[2];
-	UINT8* combiner_rgbmul_r[2];
-	UINT8* combiner_rgbmul_g[2];
-	UINT8* combiner_rgbmul_b[2];
-	UINT8* combiner_rgbadd_r[2];
-	UINT8* combiner_rgbadd_g[2];
-	UINT8* combiner_rgbadd_b[2];
+	color_t* combiner_rgbsub_a[2];
+	color_t* combiner_rgbsub_b[2];
+	color_t* combiner_rgbmul[2];
+	color_t* combiner_rgbadd[2];
 
-	UINT8* combiner_alphasub_a[2];
-	UINT8* combiner_alphasub_b[2];
-	UINT8* combiner_alphamul[2];
-	UINT8* combiner_alphaadd[2];
+	color_t* combiner_alphasub_a[2];
+	color_t* combiner_alphasub_b[2];
+	color_t* combiner_alphamul[2];
+	color_t* combiner_alphaadd[2];
 
 	// blender input
 	color_t* blender1a_rgb[2];
-	UINT8* blender1b_a[2];
+	color_t* blender1b_a[2];
 	color_t* blender2a_rgb[2];
-	UINT8* blender2b_a[2];
+	color_t* blender2b_a[2];
 };
 
 struct other_modes_t
