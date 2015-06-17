@@ -1243,7 +1243,6 @@ files {
 	MAME_DIR .. "src/mame/audio/astrof.c",
 	MAME_DIR .. "src/mame/drivers/backfire.c",
 	MAME_DIR .. "src/mame/drivers/battlera.c",
-	MAME_DIR .. "src/mame/video/battlera.c",
 	MAME_DIR .. "src/mame/drivers/boogwing.c",
 	MAME_DIR .. "src/mame/video/boogwing.c",
 	MAME_DIR .. "src/mame/drivers/brkthru.c",

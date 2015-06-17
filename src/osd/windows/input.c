@@ -268,7 +268,7 @@ static const TCHAR *default_pov_name(int which);
 struct key_trans_entry {
 	input_item_id   mame_key;
 	INT32           di_key;
-	char            virtual_key;
+	unsigned char   virtual_key;
 	char            ascii_key;
 	char const  *   mame_key_name;
 };

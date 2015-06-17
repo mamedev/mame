@@ -5,6 +5,10 @@ class cclimber_state : public driver_device
 public:
 	cclimber_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_bigsprite_videoram(*this, "bigspriteram"),
 		m_videoram(*this, "videoram"),
 		m_column_scroll(*this, "column_scroll"),
@@ -16,11 +20,12 @@ public:
 		m_swimmer_palettebank(*this, "palettebank"),
 		m_swimmer_background_color(*this, "bgcolor"),
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
-		m_toprollr_bg_coloram(*this, "bg_coloram"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_toprollr_bg_coloram(*this, "bg_coloram") { }
+		
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT8> m_bigsprite_videoram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -42,6 +47,7 @@ public:
 	tilemap_t *m_pf_tilemap;
 	tilemap_t *m_bs_tilemap;
 	tilemap_t *m_toproller_bg_tilemap;
+
 	DECLARE_WRITE8_MEMBER(swimmer_sh_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(yamato_p0_w);
 	DECLARE_WRITE8_MEMBER(yamato_p1_w);
@@ -51,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(cclimber_colorram_w);
 	DECLARE_WRITE8_MEMBER(cannonb_flip_screen_w);
+
+	virtual void machine_start();
 	DECLARE_DRIVER_INIT(cclimber);
 	DECLARE_DRIVER_INIT(yamato);
 	DECLARE_DRIVER_INIT(ckongb);
@@ -59,12 +67,6 @@ public:
 	DECLARE_DRIVER_INIT(cannonb2);
 	DECLARE_DRIVER_INIT(cannonb);
 	DECLARE_DRIVER_INIT(dking);
-	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);
-	TILE_GET_INFO_MEMBER(swimmer_get_pf_tile_info);
-	TILE_GET_INFO_MEMBER(toprollr_get_pf_tile_info);
-	TILE_GET_INFO_MEMBER(cclimber_get_bs_tile_info);
-	TILE_GET_INFO_MEMBER(toprollr_get_bs_tile_info);
-	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
 	DECLARE_MACHINE_RESET(cclimber);
 	DECLARE_VIDEO_START(cclimber);
 	DECLARE_PALETTE_INIT(cclimber);
@@ -73,11 +75,18 @@ public:
 	DECLARE_PALETTE_INIT(yamato);
 	DECLARE_VIDEO_START(toprollr);
 	DECLARE_PALETTE_INIT(toprollr);
+
+	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(swimmer_get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(toprollr_get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(cclimber_get_bs_tile_info);
+	TILE_GET_INFO_MEMBER(toprollr_get_bs_tile_info);
+	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
+
 	UINT32 screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_yamato(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void swimmer_set_background_pen();
 	void draw_playfield(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -87,8 +96,6 @@ public:
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const UINT8 convtable[8][16]);
 	void cannonb_patch();
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };

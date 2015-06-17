@@ -31,6 +31,10 @@
   - 1980 and 1982 Mitsubishi LSI Data Books
   - M34550Mx-XXXFP datasheet (this one is MELPS 720 family)
 
+  TODO:
+  - need more drivers that use this, to be sure that emulation is accurate
+  - add output PLA
+
 */
 
 #include "melps4.h"
@@ -106,6 +110,7 @@ void melps4_cpu_device::device_start()
 	m_port_d = 0;
 	m_port_s = 0;
 	m_port_f = 0;
+	m_port_t = 0;
 
 	m_sm = m_sms = false;
 	m_ba_flag = false;
@@ -115,11 +120,14 @@ void melps4_cpu_device::device_start()
 	m_inte = 0;
 	m_intp = 1;
 	m_irqflag[0] = m_irqflag[1] = m_irqflag[2] = false;
-	m_tmr_irq_enabled[0] = m_tmr_irq_enabled[1] = false;
 	m_int_state = 0;
-	m_t_state = 0;
+	m_t_in_state = 0;
 	m_prohibit_irq = false;
 	m_possible_irq = false;
+
+	memset(m_tmr_count, 0, sizeof(m_tmr_count));
+	m_tmr_reload = 0;
+	m_tmr_irq_enabled[0] = m_tmr_irq_enabled[1] = false;
 
 	m_a = 0;
 	m_b = 0;
@@ -146,6 +154,7 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_port_d));
 	save_item(NAME(m_port_s));
 	save_item(NAME(m_port_f));
+	save_item(NAME(m_port_t));
 
 	save_item(NAME(m_sm));
 	save_item(NAME(m_sms));
@@ -156,11 +165,14 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_inte));
 	save_item(NAME(m_intp));
 	save_item(NAME(m_irqflag));
-	save_item(NAME(m_tmr_irq_enabled));
 	save_item(NAME(m_int_state));
-	save_item(NAME(m_t_state));
+	save_item(NAME(m_t_in_state));
 	save_item(NAME(m_prohibit_irq));
 	save_item(NAME(m_possible_irq));
+
+	save_item(NAME(m_tmr_count));
+	save_item(NAME(m_tmr_reload));
+	save_item(NAME(m_tmr_irq_enabled));
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
@@ -227,7 +239,7 @@ void melps4_cpu_device::device_reset()
 	write_gen_port(MELPS4_PORTF, 0);
 	write_gen_port(MELPS4_PORTG, 0);
 	write_gen_port(MELPS4_PORTU, 0);
-	m_write_t(0);
+	m_write_t(0); m_port_t = 0;
 }
 
 
@@ -419,7 +431,10 @@ void melps4_cpu_device::execute_run()
 		{
 			// if it's a long jump, skip next one as well
 			if (m_op != m_ba_op && (m_op & ~0xf) != m_sp_mask)
+			{
 				m_skip = false;
+				m_op = 0; // fake nop
+			}
 		}
 		else
 			execute_one();
