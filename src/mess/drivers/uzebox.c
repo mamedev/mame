@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
-#include "sound/dac.h"
+#include "sound/speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/snes_ctrl/ctrl.h"
@@ -33,14 +33,14 @@ public:
 		m_cart(*this, "cartslot"),
 		m_ctrl1(*this, "ctrl1"),
 		m_ctrl2(*this, "ctrl2"),
-		m_dac(*this, "dac")
+		m_speaker(*this, "speaker")
 	{ }
 
 	required_device<avr8_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
-	required_device<dac_device> m_dac;
+	required_device<speaker_sound_device> m_speaker;
 
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
@@ -172,7 +172,7 @@ WRITE8_MEMBER(uzebox_state::port_d_w)
 	//  ---- --xx   UART MIDI
 	if ((m_port_d ^ data) & 0x80)
 	{
-		m_dac->write_unsigned8((data & 0x80) ? 0x3F: 0);
+		m_speaker->level_w(data & 0x80);
 	}
 	m_port_d = data;
 }
@@ -285,9 +285,9 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_SCREEN_UPDATE_DRIVER(uzebox_state, screen_update_uzebox)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("avr8")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "avr8", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "uzebox")
 	MCFG_GENERIC_EXTENSIONS("bin,uze")
