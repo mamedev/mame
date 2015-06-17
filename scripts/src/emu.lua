@@ -394,6 +394,8 @@ function emuProject(_target, _subtarget)
 
 	--	netlist now defines a project
 	dofile(path.join("src", "netlist.lua"))
+
+	dofile("retro_fpic.lua")
 	
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
@@ -466,4 +468,6 @@ function emuProject(_target, _subtarget)
 			disasm_custombuildtask[1]
 		}
 	end
+
+	dofile("retro_fpic.lua")
 end
