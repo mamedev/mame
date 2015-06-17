@@ -176,14 +176,14 @@ void melps4_cpu_device::op_xam()
 
 void melps4_cpu_device::op_xamd()
 {
-	// XAMD j: XAM J, DEY
+	// XAMD j: XAM j, DEY
 	op_xam();
 	op_dey();
 }
 
 void melps4_cpu_device::op_xami()
 {
-	// XAMI j: XAM J, skip next on Y mask(default 0xf), increment Y
+	// XAMI j: XAM j, skip next on Y mask(default 0xf), increment Y
 	op_xam();
 	m_skip = ((m_y & m_xami_mask) == m_xami_mask);
 	m_y = (m_y + 1) & 0xf;

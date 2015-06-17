@@ -431,7 +431,10 @@ void melps4_cpu_device::execute_run()
 		{
 			// if it's a long jump, skip next one as well
 			if (m_op != m_ba_op && (m_op & ~0xf) != m_sp_mask)
+			{
 				m_skip = false;
+				m_op = 0; // fake nop
+			}
 		}
 		else
 			execute_one();
