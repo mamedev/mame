@@ -207,6 +207,7 @@ function mainProject(_target, _subtarget)
 	debugdir (MAME_DIR)
 	debugargs ("-window")
 
+	-- BEGIN libretro overrides to MAME's GENie build
 	if _OPTIONS["osd"]=="retro" then
 		newoption {
 			trigger = "platform",
@@ -264,7 +265,7 @@ function mainProject(_target, _subtarget)
 			}
 		end
 
-		-- "linux" for pretty much any Linux/BSD/Android…
+		-- "linux" for pretty much any Linux/BSD/Android...
 		if _OPTIONS["targetos"]=="linux" then
 			linkoptions {
 				"-Wl,--version-script=" .. MAME_DIR .. "src/osd/retro/link.T",
@@ -272,5 +273,6 @@ function mainProject(_target, _subtarget)
 		end
 
 	end
+	-- END libretro overrides to MAME's GENie build
 end
 

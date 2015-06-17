@@ -33,18 +33,36 @@
 #
 ###########################################################################
 
-# libretro's preferred settings
-NOWERROR ?= 1
+###########################################################################
+#
+#   LIBRETRO PREFERRED DEFAULT SETTINGS
+#
+###########################################################################
+
+# The most important setting--a conditional for our build changes
 OSD ?= retro
+
+# Disable -Werror as libretro is effectively a MAME user, not a developer
+NOWERROR ?= 1
+
+# This needs to be python2 at the moment everywhere but OS X (fixed later)
 PYTHON_EXECUTABLE ?= python2
+
+# Cause the build system to regenerate itself, in case it changed
 REGENIE ?= 1
+
+# Spew much output developers need if MAME's build breaks for some reason
 VERBOSE ?= 1
 
 
+###########################################################################
+#
+#   LIBRETRO PLATFORM GUESSING
+#
+#   If the caller doesn't specify $platform and $ARCH, we guess
+#
+###########################################################################
 
-# Try to determine libretro $(platform) if it's either not provided to us,
-# or if the user explicitly passes platform="" (i.e., for native buildtools
-# in a cross-compile)
 UNAME = $(shell uname -a)
 ifeq ($(platform),)
 	platform = unix
@@ -59,25 +77,45 @@ ifeq ($(platform),)
 	endif
 endif
 
+
+###########################################################################
+#
+#   LIBRETRO PLATFORM-SPECIFIC CONFIGURATION
+#
+#   Settings needed to get MAME to build everywhere we build it
+#
+###########################################################################
+
 ifeq ($(platform), android)
 	PTR64 = 0
-	# FIXME: Need to figure out how to do this for GENie
-#	FORCE_DRC_C_BACKEND = 1
+	# FIXME: Pass these to GENie and test...
 #	CROSS_BUILD = 1
+#	FORCE_DRC_C_BACKEND = 1
 else ifeq ($(platform), osx)
 	PYTHON_EXECUTABLE = python
 else ifeq ($(platform), ios)
 	PTR64 = 0
 	PYTHON_EXECUTABLE = python
-	# FIXME: Need to figure out how to do this for GENie
+	# FIXME: Pass these to GENie and test...
 #	CROSS_BUILD = 1
 #	FORCE_DRC_C_BACKEND = 1
 endif
 
-# FIXME: Right now this will break anywhere we'd normally set CROSS_BUILD.
+
+###########################################################################
 #
-# Mame needs PTR64 defined on 64 bit processors, we guess at it if you aren't
-# cross-compiling.  If you ARE, you need to set it yourself.
+#   PTR64 FIDDLING
+#
+#   MAME has this setting PTR64 which controls the pointer size and (for
+#   historical reasons) several other side-effects.  For example, on OS X
+#   with Intel CPU, it controls whether MAME will build i386 or x86_64
+#   versions.  This block configures it for the known non-cross-compiled
+#   build platforms we support building MAME for at the moment.  Cross-
+#   compiled targets are handled elsewhere.
+#   FIXME: Except for now they aren't.
+#
+###########################################################################
+
 ifneq ($(CROSS_BUILD),1)
 
 ifndef ($(PTR64)
@@ -101,21 +139,25 @@ endif
 endif # PTR64
 endif # CROSS_BUILD
 
+
 ###########################################################################
 #
 #   BUILD FLAGS
 #
 ###########################################################################
+
 BUILDFLAGS = REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR)
 ifneq ($(PYTHON_EXECUTABLE),)
 	BUILDFLAGS += PYTHON_EXECUTABLE=$(PYTHON_EXECUTABLE)
 endif
+
 
 ###########################################################################
 #
 #   PLATFORM FLAGS
 #
 ###########################################################################
+
 PLATFLAGS =
 ifneq ($(PTR64),)
 	PLATFLAGS += PTR64=$(PTR64)
@@ -127,11 +169,13 @@ ifneq ($(ARCH),)
 	PLATFLAGS += ARCH="" LIBRETRO_ARCH="$(ARCH)"
 endif
 
+
 ###########################################################################
 #
 #   TARGET FLAGS
 #
 ###########################################################################
+
 TARGETFLAGS = OSD=$(OSD)
 ifneq ($(TARGET),)
 	TARGETFLAGS += TARGET=$(TARGET)
@@ -139,6 +183,15 @@ endif
 ifneq ($(SUBTARGET),)
 	TARGETFLAGS += SUBTARGET=$(SUBTARGET)
 endif
+
+
+###########################################################################
+#
+#   MAKE RULES
+#
+#   We just call upstream GENie here with appropriate args
+#
+###########################################################################
 
 all: build
 
@@ -149,6 +202,7 @@ clean:
 	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS) clean
 
 .PHONY: all build clean
+
 
 ###########################################################################
 #

@@ -1,0 +1,66 @@
+MAME for libretro
+=================
+
+At the moment, the libretro port for MAME is known to be rather messy.  The
+plan is eventually to rewrite it, but it is not currently anyone's highest
+priority to do it.
+
+What follows here is a technical explanation of what libretro had to do to
+MAME's GENie build system in order to compile it as a shared library with
+the appropriate API exported to be used as a libretro core.
+
+
+## -fPIC for everyone ##
+
+Short form: If something doesn't work because it needs to be built with PIC
+and isn't, dofile("retro_fpic.lua") in the project.  You may need something
+like dofile(path.join("..", "..", "retro_fpic.lua")) depending on the dir it
+looks into.  Try the first one and fix it as necessary.
+
+Long form: A shared library requires the -fPIC option on ELF-based systems
+like Linux.  It isn't automatic because while it's necessary for a shared
+library, most code is going to run a little faster without it if you don't
+actually need it.
+
+We used to do this globally in MAME, but we can't find a place to do that
+with the GENie build.  We could ask the MAME folks, but overall relations
+between MAME and libretro are ... well, less than ideal.  Pretty much if
+we asked for advice we'd probably get some, though it wouldn't likely be
+anatomically possible, and it wouldn't help with the technical problem.
+
+So each static library in MAME requires a project declaration under GENie,
+and each project declaration needs -fPIC added to it.  The retro_fpic.lua
+file does this, conditionally, if you're using the retro OSD.  So if you
+are getting linker errors telling you to build something with -fPIC, grep
+your make output for any line without -fPIC in it (grep -v -- '-fPIC') and
+then grep that for compiler/linker lines (likely '^gcc' or '^g++' or maybe
+just '^g').  Find the bit of lua in scripts that is building that source
+file and I'll bet it's a project declaration that doesn't YET have the
+requisite dofile() call to include -fPIC in build/link options.
+
+You get to fix that if you want it to build.  :)
+
+
+## Other libretro GENie mods ##
+
+Near the bottom of scripts/src/main.lua, there's a large chunk of libretro-
+related additions and overrides at the bottom of the file.  You can spot it
+by searching for "BEGIN libretro overrides to MAME's GENie build".  Most of
+what's there is pretty self-explanatory.  It overrides MAME to build shared
+libraries, includes processing for ARCH and platform, two standard libretro
+build target variables, and jumps through a few hoops to try and make sure
+the right symbols get preserved and exported.  It probably could be split
+out into its own file, but it hasn't been for some simplicity.
+
+The only other addition is scripts/src/osd/retro.lua and its cfg file which
+isn't strictly necessary to be a separate file.  Pretty standard stuff in
+there.  The real work is in main.lua, and it's all contingent upon use of
+the retro OSD to be as minimally invasive into MAME as possible.
+
+That's about it really.  Compared to the old system, GENie is both much
+simpler and more complicated for us.  More complicated because stuff is in
+so many different places.  Simpler because it actually works on the MAME
+side of things, and our modifications shouldn't need to be too extensive to
+keep it working, once it's all sorted out.
+
+It's just a matter of getting there...
