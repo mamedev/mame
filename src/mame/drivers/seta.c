@@ -1996,7 +1996,7 @@ static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 #else
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITENOP                        // ?
 #endif
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP                        // ? VBlank IRQ Ack
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP                        // ? Sound  IRQ Ack
 ADDRESS_MAP_END
 
