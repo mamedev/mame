@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  video.c
+  cclimber.c
 
   Functions to emulate the video hardware of the machine.
 
