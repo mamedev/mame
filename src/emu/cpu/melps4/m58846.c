@@ -4,14 +4,9 @@
 
   Mitsubishi M58846 MCU
 
-  TODO:
-  - o hai
-
 */
 
 #include "m58846.h"
-//#include "debugger.h"
-
 
 
 const device_type M58846 = &device_creator<m58846_device>;

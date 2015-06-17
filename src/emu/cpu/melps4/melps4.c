@@ -31,6 +31,10 @@
   - 1980 and 1982 Mitsubishi LSI Data Books
   - M34550Mx-XXXFP datasheet (this one is MELPS 720 family)
 
+  TODO:
+  - need more drivers that use this, to be sure that emulation is accurate
+  - add output PLA
+
 */
 
 #include "melps4.h"
