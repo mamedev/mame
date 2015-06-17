@@ -195,6 +195,7 @@ protected:
 	UINT16 m_port_d;        // last written port data
 	UINT8 m_port_s;         // "
 	UINT8 m_port_f;         // "
+	UINT8 m_port_t;         // "
 
 	bool m_sm, m_sms;       // subroutine mode flag + irq stack
 	bool m_ba_flag;         // temp flag indicates BA opcode was executed
@@ -204,11 +205,14 @@ protected:
 	UINT8 m_inte;           // interrupt enable flag
 	int m_intp;             // external interrupt polarity ('40 to '44)
 	bool m_irqflag[3];      // irq flags: exf, 1f, 2f (external, timer 1, timer 2)
-	bool m_tmr_irq_enabled[2];
 	int m_int_state;        // INT pin state
-	int m_t_state;          // T input pin state
+	int m_t_in_state;       // T input pin state
 	bool m_prohibit_irq;    // interrupt is prohibited during certain opcodes
 	bool m_possible_irq;    // indicate that irq needs to be rechecked
+
+	UINT8 m_tmr_count[2];   // timer active count
+	UINT8 m_tmr_reload;     // timer(2) auto reload
+	bool m_tmr_irq_enabled[2];
 
 	// work registers (unless specified, each is 4-bit)
 	UINT8 m_a;              // accumulator
@@ -238,7 +242,7 @@ protected:
 	devcb_write8 m_write_u;
 	devcb_write_line m_write_t;
 	
-	virtual void write_t_in(int state) { m_t_state = state; }
+	virtual void write_t_in(int state) { m_t_in_state = state; }
 	virtual void write_v(UINT8 data) { m_v = data; }
 	virtual void write_w(UINT8 data) { m_w = data; }
 	virtual void do_interrupt(int which);
