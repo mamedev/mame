@@ -349,6 +349,8 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "snap"),
 }
 
+dofile(path.join("..", "retro_fpic.lua"))
+
 function emuProject(_target, _subtarget)
 
 	disasm_files = { }

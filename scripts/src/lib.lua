@@ -93,6 +93,8 @@ project "utils"
 		MAME_DIR .. "src/lib/util/zippath.h",
 	}
 
+	dofile(path.join("..", "retro_fpic.lua"))
+
 
 project "formats"
 	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
@@ -413,3 +415,4 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/itt3030_dsk.h",
 	}
 
+	dofile(path.join("..", "retro_fpic.lua"))
