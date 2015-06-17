@@ -54,7 +54,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_ioport m_port_dsw0;
+	optional_ioport m_port_dsw0;
 	optional_ioport m_p1_control;
 	optional_ioport m_p2_control;
 
