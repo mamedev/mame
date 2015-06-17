@@ -42,3 +42,70 @@
 */
 
 
+#include "emu.h"
+#include "68230pit.h"
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+// device type definition
+const device_type PIT68230 = &device_creator<pit68230_device>;
+
+//-------------------------------------------------
+//  pit68230_device - constructor
+//-------------------------------------------------
+
+pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PIT68230, "68230 PI/T", tag, owner, clock, "pit68230", __FILE__),
+		m_internal_clock(0.0),
+		m_out0_cb(*this),
+		m_out1_cb(*this),
+		m_out2_cb(*this),
+		m_irq_cb(*this)
+{
+	m_external_clock = 0.0;
+}
+
+//-------------------------------------------------
+//  tick
+//-------------------------------------------------
+
+void ptm6840_device::tick(int counter, int count)
+{
+	if (counter == 2)
+	{
+		m_t3_scaler += count;
+
+		if ( m_t3_scaler > m_t3_divisor - 1)
+		{
+			subtract_from_counter(counter, 1);
+			m_t3_scaler = 0;
+		}
+	}
+	else
+	{
+		subtract_from_counter(counter, count);
+	}
+}
+
+
+//-------------------------------------------------
+//  set_clock - set clock status (0 or 1)
+//-------------------------------------------------
+
+void ptm6840_device::set_clock(int idx, int state)
+{
+	m_clk[idx] = state;
+
+	if (!(m_control_reg[idx] & 0x02))
+	{
+		if (state)
+		{
+			tick(idx, 1);
+		}
+	}
+}
+
+WRITE_LINE_MEMBER( pit68230_device::set_c1 ) { set_clock(state); }
+
