@@ -153,3 +153,4 @@ project ("libco")
 		MAME_DIR .. "src/osd/retro/libretro-common/libco/libco.c",
 	}
 
+	dofile("retro_cfg.lua")
