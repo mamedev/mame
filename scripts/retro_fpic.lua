@@ -1,6 +1,8 @@
-buildoptions {
-	"-fPIC",
-}
-linkoptions {
-	"-fPIC",
-}
+if _OPTIONS["osd"]=="retro" then
+	buildoptions {
+		"-fPIC",
+	}
+	linkoptions {
+		"-fPIC",
+	}
+end
