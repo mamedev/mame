@@ -28,10 +28,9 @@ private:
 	std::vector<const game_driver *> &m_unavailable;
 	std::vector<const game_driver *> &m_availablesorted;
 	std::vector<const game_driver *> &m_unavailablesorted;
-	std::vector<UINT8> m_included;
-	std::vector<const game_driver *> m_remove;
 
 	int m_audit_mode, steps, x;
+	size_t m_size;
 };
 
 #endif /* __MEWUI_AUDIT_H__ */

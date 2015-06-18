@@ -105,18 +105,6 @@ ui_menu_select_software::~ui_menu_select_software()
 {
 	mewui_globals::curimage_view = CABINETS_VIEW;
 	mewui_globals::switch_image = true;
-
-	// free softwares list
-	ui_swlist.clear();
-
-	// free regions data
-	m_region.ui.clear();
-
-	// free years data
-	m_year.ui.clear();
-
-	// free publishers data
-	m_publisher.ui.clear();
 }
 
 //-------------------------------------------------
@@ -402,10 +390,12 @@ void ui_menu_select_software::build_software_list()
 
 	machine_config config(*ui_driver, machine().options());
 	software_list_device_iterator deviter(config.root_device());
+	std::vector<std::string> vlist;
 
 	// iterate thru all software lists
 	for (software_list_device *swlist = deviter.first(); swlist != NULL; swlist = deviter.next())
 	{
+		vlist.push_back(swlist->list_name());
 		for (software_info *swinfo = swlist->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
 		{
 			software_part *part = swinfo->first_part();
@@ -447,7 +437,7 @@ void ui_menu_select_software::build_software_list()
 				tmpmatches.startempty = 0;
 				tmpmatches.parentlongname.clear();
 				tmpmatches.usage.clear();
-				tmpmatches.available = true;
+				tmpmatches.available = false;
 
 				for (feature_list_item *flist = swinfo->other_info(); flist != NULL; flist = flist->next())
 					if (!strcmp(flist->name(), "usage"))
@@ -477,7 +467,8 @@ void ui_menu_select_software::build_software_list()
 	m_displaylist.resize(ui_swlist.size() + 1);
 
 	// retrieve and set the long name of software for parents
-	for (int y = 0; y < ui_swlist.size(); y++)
+	for (int y = 1; y < ui_swlist.size(); y++)
+	{
 		if (ui_swlist[y].parentname[0] != '\0')
 		{
 			bool found = false;
@@ -499,14 +490,48 @@ void ui_menu_select_software::build_software_list()
 					break;
 				}
 		}
+	}
+
+	std::string searchstr, curpath;
+	const osd_directory_entry *dir;
+	for (size_t x = 0; x < vlist.size(); ++x)
+	{
+		path_iterator path(machine().options().media_path());
+		while (path.next(curpath))
+		{
+			searchstr.assign(curpath).append(PATH_SEPARATOR).append(vlist[x]).append(";");
+			file_enumerator fpath(searchstr.c_str());
+
+			// iterate while we get new objects
+			while ((dir = fpath.next()) != NULL)
+			{
+				std::string name;
+				if (dir->type == ENTTYPE_FILE)
+					core_filename_extract_base(name, dir->name, true);
+				else if (dir->type == ENTTYPE_DIR && strcmp(dir->name, "."))
+					name = dir->name;
+				else
+					continue;
+
+				strmakelower(name);
+				for (size_t y = 0; y < ui_swlist.size(); ++y)
+				{
+					if (ui_swlist[y].shortname == name && ui_swlist[y].listname == vlist[x])
+					{
+						ui_swlist[y].available = true;
+						break;
+					}
+				}
+			}
+		}
+	}
 
 	// sort array
-//	if (machine().options().ui_grouped())
-		std::stable_sort(ui_swlist.begin() + 1, ui_swlist.end(), compare_software);
+	std::stable_sort(ui_swlist.begin() + 1, ui_swlist.end(), compare_software);
 
-	std::sort(m_region.ui.begin(), m_region.ui.end());
-	std::sort(m_year.ui.begin(), m_year.ui.end());
-	std::sort(m_publisher.ui.begin(), m_publisher.ui.end());
+	std::stable_sort(m_region.ui.begin(), m_region.ui.end());
+	std::stable_sort(m_year.ui.begin(), m_year.ui.end());
+	std::stable_sort(m_publisher.ui.begin(), m_publisher.ui.end());
 }
 
 //-------------------------------------------------

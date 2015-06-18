@@ -631,7 +631,6 @@ void ui_mewui_select_game::populate()
 
 void ui_mewui_select_game::build_available_list()
 {
-//machine().ui().set_startup_text("Initializing...\nBuild available list...", true);
 	int m_total = driver_list::total();
 	std::vector<UINT8> m_included(m_total, 0);
 
@@ -675,31 +674,7 @@ void ui_mewui_select_game::build_available_list()
 				m_included[x] = 1;
 			}
 		}
-/*
-	// now audit excluded
-	if (machine().options().audit_mode())
-	{
-		for (int x = 0; x < m_total; ++x)
-			if (!m_included[x])
-			{
-				if (!strcmp("___empty", driver_list::driver(x).name))
-					continue;
 
-				driver_enumerator enumerator(machine().options(), driver_list::driver(x).name);
-				enumerator.next();
-				media_auditor auditor(enumerator);
-				media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
-
-				// if everything looks good, include the driver
-				if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
-				{
-					m_availablelist.push_back(&driver_list::driver(x));
-					m_included[x] = 1;
-				}
-			}
-		zip_file_cache_clear();
-	}
-*/
 	// sort
 	m_availsortedlist = m_availablelist;
 	std::stable_sort(m_availsortedlist.begin(), m_availsortedlist.end(), sort_game_list);
@@ -1149,21 +1124,12 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 	{
 		filter = mewui_globals::actual_filter;
 
-//		if (machine().options().ui_grouped())
-//		{
-			if (filter == FILTER_AVAILABLE)
-				s_drivers = m_availsortedlist;
-			else if (filter == FILTER_UNAVAILABLE)
-				s_drivers = m_unavailsortedlist;
-			else
-				s_drivers = m_sortedlist;
-//		}
-/*		else if (filter == FILTER_AVAILABLE)
-			s_drivers = m_availablelist;
+		if (filter == FILTER_AVAILABLE)
+			s_drivers = m_availsortedlist;
 		else if (filter == FILTER_UNAVAILABLE)
-			s_drivers = m_unavailablelist;
+			s_drivers = m_unavailsortedlist;
 		else
-			s_drivers = m_fulllist; */
+			s_drivers = m_sortedlist;
 	}
 
 	for (int index = 0; index < s_drivers.size(); index++)
