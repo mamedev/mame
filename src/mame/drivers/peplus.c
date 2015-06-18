@@ -4768,8 +4768,10 @@ ROM_END
 
 ROM_START( pepp0757 ) /* Normal board : Double Down Stud Joker Poker (Eights or Better) (PP0757) */
 /*
-Paytable not available
-
+                                            w/J      w/oJ
+PayTable   8s+  2P  3K  STR  FL  FH  4K  SF  RF  5K   RF  (Bonus)
+----------------------------------------------------------------
+  ????      1    2   3   6    9  15  60 100 400 1000 1000  2000
   % Range: 90.3-92.3%  Optimum: 94.3%  Hit Frequency: ??.?%
      Programs Available: PP0757
 */
@@ -7307,7 +7309,7 @@ PayTable   3K  STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
-ROM_START( pex0514p ) /* Superboard : Double Double Bonus Poker (X000514P+XP000038) */
+ROM_START( pex0514p ) /* Superboard : Double Bonus Poker (X000514P+XP000038) */
 /*
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -7332,7 +7334,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
-ROM_START( pex0515p ) /* Superboard : Double Double Bonus Poker (X000515P+XP000038) */
+ROM_START( pex0515p ) /* Superboard : Double Bonus Poker (X000515P+XP000038) */
 /*
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -7357,7 +7359,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
-ROM_START( pex0516p ) /* Superboard : Double Double Bonus Poker (X000516P+XP000038) */
+ROM_START( pex0516p ) /* Superboard : Double Bonus Poker (X000516P+XP000038) */
 /*
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -7838,7 +7840,7 @@ Straights or Better on the initial deal PAY DOUBLE!
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
-ROM_START( pex2024p ) /* Superboard : Double Double Bonus Poker (X002024P+XP000038) */
+ROM_START( pex2024p ) /* Superboard : Double Bonus Poker (X002024P+XP000038) */
 /*
                                       5-K 2-4
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)

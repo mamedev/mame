@@ -162,6 +162,7 @@ protected:
 	UINT8 m_timer_increment[6];
 	UINT16 m_timer_prescale[6];
 	UINT16 m_timer_prescale_count[6];
+	bool m_ocr2_not_reached_yet;
 
 	// SPI
 	bool m_spi_active;

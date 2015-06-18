@@ -25,6 +25,7 @@
 #pragma GCC optimize "-fivopts"
 #endif
 
+#include <iostream>
 #include <algorithm>
 #include "nld_solver.h"
 #include "nld_ms_direct.h"
