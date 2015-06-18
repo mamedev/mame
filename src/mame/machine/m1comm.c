@@ -129,16 +129,20 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 	m_line_tx(OPEN_FLAG_READ)
 {
 	// prepare localhost "filename"
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
+	if (strlen(m_localhost) == 0){
+		strcat(m_localhost, "socket.");
+		strcat(m_localhost, mconfig.options().comm_localhost());
+		strcat(m_localhost, ":");
+		strcat(m_localhost, mconfig.options().comm_localport());
+	}
 
 	// prepare remotehost "filename"
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	if (strlen(m_remotehost) == 0){
+		strcat(m_remotehost, "socket.");
+		strcat(m_remotehost, mconfig.options().comm_remotehost());
+		strcat(m_remotehost, ":");
+		strcat(m_remotehost, mconfig.options().comm_remoteport());
+	}
 }
 
 //-------------------------------------------------
@@ -172,7 +176,7 @@ READ8_MEMBER(m1comm_device::dlc_reg_r)
 		return 0xFF;
 	}
 	// dirty hack to keep Z80 in RESET state
-	
+
 	UINT8 result = m_dlc_reg[offset];
 #ifdef __M1COMM_VERBOSE__
 	printf("m1comm-dlc_reg_r: read register %02x for value %02x\n", offset, result);
@@ -274,9 +278,13 @@ WRITE8_MEMBER(m1comm_device::cn_w)
 
 #ifndef __M1COMM_SIMULATION__
 	if (!m_cn)
+	{
 		device_reset();
+	}
 	else
+	{
 		m_commcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 #else
 	if (!m_cn)
 	{
@@ -326,7 +334,8 @@ void m1comm_device::check_vint_irq()
 }
 
 #ifdef __M1COMM_SIMULATION__
-void m1comm_device::comm_tick(){
+void m1comm_device::comm_tick()
+{
 	if (m_linkenable == 0x01)	
 	{
 		int frameStart = 0x0010;
@@ -344,6 +353,9 @@ void m1comm_device::comm_tick(){
 		// if link not yet established...
 		if (m_linkalive == 0x00)
 		{
+			// waiting...
+			m_shared[0] = 0x05;
+
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
@@ -529,7 +541,7 @@ void m1comm_device::comm_tick(){
 			
 			// update "ring buffer" if link established
 			// live relay does not send data
-			if (m_linkid != 0x00 && m_shared[5] == 0x01)
+			if (m_linkid != 0x00 && m_shared[5] != 0x00)
 			{
 				m_buffer[0] = m_linkid;
 				frameOffset = frameStart + (m_linkid * frameSize);
@@ -561,5 +573,5 @@ void m1comm_device::comm_tick(){
 			m_shared[5] = 0x00;
 		}
 	}
-#endif
 }
+#endif
