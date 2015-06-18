@@ -4768,8 +4768,10 @@ ROM_END
 
 ROM_START( pepp0757 ) /* Normal board : Double Down Stud Joker Poker (Eights or Better) (PP0757) */
 /*
-Paytable not available
-
+                                            w/J      w/oJ
+PayTable   8s+  2P  3K  STR  FL  FH  4K  SF  RF  5K   RF  (Bonus)
+----------------------------------------------------------------
+  ????      1    2   3   6    9  15  60 100 400 1000 1000  2000
   % Range: 90.3-92.3%  Optimum: 94.3%  Hit Frequency: ??.?%
      Programs Available: PP0757
 */
