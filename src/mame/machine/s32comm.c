@@ -7,7 +7,7 @@ System32/Multi32 Comm PCB
 
 #include "machine/s32comm.h"
 
-//#define __S32COMM_VERBOSE__
+#define __S32COMM_VERBOSE__
 
 MACHINE_CONFIG_FRAGMENT( s32comm )
 MACHINE_CONFIG_END
@@ -139,6 +139,8 @@ WRITE8_MEMBER(s32comm_device::cn_w)
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
 		m_linktimer = 0x04; //0x00E8; // 58 fps * 4s
+		
+		comm_tick();
 	}
 #endif
 }
@@ -207,6 +209,244 @@ void s32comm_device::comm_tick()
 
 void s32comm_device::comm_tick_14084()
 {
+	if (m_linkenable == 0x01)	
+	{
+		int frameStart = 0x0480;
+		int frameOffset = 0x0000;
+		int frameSize = 0x0080;
+		int dataSize = frameSize + 1;
+		int togo = 0;
+		int recv = 0;
+		int idx = 0;
+
+		bool isMaster = (m_shared[2] == 0x01);
+		bool isSlave = (m_shared[2] == 0x00);
+		bool isRelay = (m_shared[2] == 0xFF);
+
+		// if link not yet established...
+		if (m_linkalive == 0x00)
+		{
+			// waiting...
+			m_shared[4] = 0x00;
+			
+			// check rx socket
+			if (!m_line_rx.is_open())
+			{
+				printf("S32COMM: listen on %s\n", m_localhost);
+				m_line_rx.open(m_localhost);
+			}
+			
+			// check tx socket
+			if (!m_line_tx.is_open())
+			{
+				printf("S32COMM: connect to %s\n", m_remotehost);
+				m_line_tx.open(m_remotehost);
+			}
+			
+			// if both sockets are there check ring
+			if ((m_line_rx.is_open()) && (m_line_tx.is_open()))
+			{
+				// try to read one messages
+				recv = m_line_rx.read(m_buffer, dataSize);
+				while (recv != 0)
+				{
+					// check if complete message
+					if (recv == dataSize)
+					{
+						// check if message id
+						idx = m_buffer[0];
+
+						// 0xFF - link id
+						if (idx == 0xFF)
+						{
+							if (isMaster)
+							{
+								// master gets first id and starts next state
+								m_linkid = 0x01;
+								m_linkcount = m_buffer[1];
+								m_linktimer = 0x01;
+							}
+							else if (isSlave || isRelay)
+							{
+								// slave gets own id
+								if (isSlave)
+								{
+									m_buffer[1]++;
+									m_linkid = m_buffer[1];
+								}
+
+								// slave and relay forward message
+								m_line_tx.write(m_buffer, dataSize);
+							}
+						}
+						
+						// 0xFE - link size
+						else if (idx == 0xFE)
+						{
+							if (isSlave || isRelay)
+							{
+								m_linkcount = m_buffer[1];
+
+								// slave and relay forward message
+								m_line_tx.write(m_buffer, dataSize);
+							}
+							
+							// consider it done
+							printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+							m_linkalive = 0x01;
+							
+							// write to shared mem
+							m_shared[4] = 0x01;
+							m_shared[1] = m_linkid;
+							m_shared[0] = m_linkcount;
+						}
+					}
+					else
+					{
+						// got only part of a message - read the rest (and drop it)
+						// TODO: combine parts and push to "ring buffer"
+						togo = dataSize - recv;
+						while (togo > 0){
+							recv = m_line_rx.read(m_buffer, togo);
+							togo -= recv;
+						}
+						printf("S32COMM: droped a message...\n");
+					}
+					
+					if (m_linkalive == 0x00)
+						recv = m_line_rx.read(m_buffer, dataSize);
+					else
+						recv = 0;
+				}
+				
+				// if we are master and link is not yet established
+				if (isMaster && (m_linkalive == 0x00))
+				{
+					// send first packet
+					if (m_linktimer == 0x00)
+					{
+						m_buffer[0] = 0xFF;
+						m_buffer[1] = 0x01;
+						m_line_tx.write(m_buffer, dataSize);
+					}
+
+					// send second packet
+					else if (m_linktimer == 0x01)
+					{
+						m_buffer[0] = 0xFE;
+						m_buffer[1] = m_linkcount;
+						m_line_tx.write(m_buffer, dataSize);
+
+						// consider it done
+						printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						m_linkalive = 0x01;
+
+						// write to shared mem
+						m_shared[4] = 0x01;
+						m_shared[1] = m_linkid;
+						m_shared[0] = m_linkcount;
+					}
+					
+					else if (m_linktimer > 0x02)
+					{
+						// decrease delay timer
+						m_linktimer--;
+						if (m_linktimer == 0x02)
+							m_linktimer = 0x00;
+					}
+				}
+			}
+		}	
+
+		// update "ring buffer" if link established
+		if (m_linkalive == 0x01)
+		{
+			int togo = 0;
+			// try to read one messages
+			int recv = m_line_rx.read(m_buffer, dataSize);
+			while (recv != 0)
+			{
+				// check if complete message
+				if (recv == dataSize)
+				{
+					// check if valid id
+					int idx = m_buffer[0];
+					if (idx > 0 && idx <= m_linkcount) {
+						// if not our own message
+						if (idx != m_linkid)
+						{
+							// save message to "ring buffer"
+							frameOffset = idx * frameSize;
+							for (int j = 0x00 ; j < frameSize ; j++)
+							{
+								m_shared[frameOffset + j] = m_buffer[1 + j];
+							}
+
+							// forward message to other nodes
+							m_line_tx.write(m_buffer, dataSize);
+						}
+					} else {
+						if (!isMaster && idx == 0xF0){
+							// 0xF0 - master addional bytes
+							for (int j = 0x05 ; j < 0x10 ; j++)
+							{
+								m_shared[j] = m_buffer[1 + j];
+							}
+
+							// forward message to other nodes
+							m_line_tx.write(m_buffer, dataSize);
+						}
+					}
+				}
+				else
+				{
+					// got only part of a message - read the rest (and drop it)
+					// TODO: combine parts and push to "ring buffer"
+					togo = dataSize - recv;
+					while (togo > 0){
+						recv = m_line_rx.read(m_buffer, togo);
+						togo -= recv;
+					}
+					printf("S32COMM: droped a message...\n");
+				}
+				recv = m_line_rx.read(m_buffer, dataSize);
+			}
+			
+			// update "ring buffer" if link established
+			// live relay does not send data
+			if (m_linkid != 0x00 && m_shared[3] != 0x00)
+			{
+				m_buffer[0] = m_linkid;
+				frameOffset = m_linkid * frameSize;
+				for (int j = 0x00 ; j < frameSize ; j++)
+				{
+					// push message to "ring buffer"
+					m_shared[frameOffset + j] = m_shared[frameStart + j];
+					m_buffer[1 + j] = m_shared[frameStart + j];
+				}
+				// push message to other nodes
+				m_line_tx.write(m_buffer, dataSize);
+
+				// master sends some additional status bytes 
+				if (isMaster){
+					m_buffer[0] = 0xF0;
+					for (int j = 0x00 ; j < frameSize ; j++)
+					{
+						m_buffer[1 + j] = 0x00;
+					}
+					for (int j = 0x05 ; j < 0x10 ; j++)
+					{
+						m_buffer[1 + j] = m_shared[frameStart + j];
+					}
+					// push message to other nodes
+					m_line_tx.write(m_buffer, dataSize);
+				}
+			}
+			
+			// clear 03
+			m_shared[3] = 0x00;
+		}
+	}	
 }
 
 void s32comm_device::comm_tick_15612()
@@ -390,7 +630,7 @@ void s32comm_device::comm_tick_15612()
 					} else {
 						if (!isMaster && idx == 0xF0){
 							// 0xF0 - master addional bytes
-							for (int j = 0x06 ; j < 0x10 ; j++)
+							for (int j = 0x05 ; j < 0x10 ; j++)
 							{
 								m_shared[j] = m_buffer[1 + j];
 							}
@@ -436,7 +676,7 @@ void s32comm_device::comm_tick_15612()
 					{
 						m_buffer[1 + j] = 0x00;
 					}
-					for (int j = 0x06 ; j < 0x10 ; j++)
+					for (int j = 0x05 ; j < 0x10 ; j++)
 					{
 						m_buffer[1 + j] = m_shared[frameStart + j];
 					}
@@ -452,5 +692,14 @@ void s32comm_device::comm_tick_15612()
 
 void s32comm_device::comm_tick3()
 {
+	if (m_shared[0x0A] == 0x00)
+	{
+		if (m_shared[0] == 0x56 && m_shared[1] == 0x37 && m_shared[2] == 0x30)
+		{
+			m_shared[0x08] = 0x5A;
+			m_shared[0x09] = 0x38;
+			m_shared[0x0A] = 0x39;
+		}
+	}
 }
 #endif
