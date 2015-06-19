@@ -800,7 +800,7 @@ if _OPTIONS["OPTIMIZE"] then
 		}
 	end
 	if _OPTIONS["LTO"]=="1" then
--- -flto=4 -> 4 threads
+-- -flto=4 -> 4 threads, reduce if you are low on memory (less than 8G)
 		buildoptions {
 			"-flto=4",
 		}
@@ -826,7 +826,9 @@ end
 
 if _OPTIONS["SSE2"]=="1" then
 	buildoptions {
+		"-msse",
 		"-msse2",
+		"-msse3"
 	}
 end
 
