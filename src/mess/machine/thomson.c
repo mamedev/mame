@@ -1519,7 +1519,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 	else
 	{
 		std::string errmsg;
-		strprintf(errmsg,"Invalid cartridge size %" I64FMT "d", size);
+		strprintf(errmsg,"Invalid cartridge size %d", (int)size);
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.c_str());
 		return IMAGE_INIT_FAIL;
 	}
