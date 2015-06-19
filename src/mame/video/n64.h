@@ -378,6 +378,7 @@ private:
 	INT32 m_gamma_table[256];
 	INT32 m_gamma_dither_table[0x4000];
 
+	bool ignored;
 	static UINT32 s_special_9bit_clamptable[512];
 	static const z_decompress_entry_t m_z_dec_table[8];
 

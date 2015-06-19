@@ -389,18 +389,25 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 	UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.m_other_modes.en_tlut << 1) | (UINT32) object.m_other_modes.tlut_type;
 
 	INT32 sss1 = SSS, sst1 = SST;
+	printf("%08x %08x ", sss1, sst1);
 	bool maxs, maxt;
 	shift_cycle(&sss1, &sst1, &maxs, &maxt, tile);
+	printf("%08x %08x %d %d ", sss1, sst1, maxs ? 255 : 0, maxt ? 255 : 0);
 
 	INT32 sfrac = sss1 & 0x1f;
 	INT32 tfrac = sst1 & 0x1f;
 
+	printf("%d %d ", sfrac, tfrac);
+
 	clamp_cycle(&sss1, &sst1, &sfrac, &tfrac, maxs, maxt, tilenum, tile, userdata);
+
+	printf("%08x %08x %d %d ", sss1, sst1, sfrac, tfrac);
 
 	INT32 sss2 = sss1 + 1;
 	INT32 sst2 = sst1 + 1;
 
 	mask_coupled(&sss1, &sss2, &sst1, &sst2, tile);
+	printf("%08x %08x %08x %08x ", sss1, sst1, sss2, sst2);
 
 	const UINT32 tbase1 = tile.tmem + ((tile.line * sst1) & 0x1ff);
 	const UINT32 tbase2 = tile.tmem + ((tile.line * sst2) & 0x1ff);
@@ -422,6 +429,8 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 
 	sfrac <<= 3;
 	tfrac <<= 3;
+
+	printf("%d %d %d %d\n", sfrac, tfrac, invsf, invtf);
 
 	if (!center)
 	{

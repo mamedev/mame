@@ -2112,7 +2112,7 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 		xright += xright_inc;
 	}
 
-	if(!new_object && valid)
+	if(!new_object && valid && !ignored)
 	{
 		render_spans(yh >> 2, yl >> 2, tilenum, flip ? true : false, spans, rect, object);
 	}
@@ -2467,6 +2467,8 @@ void n64_rdp::cmd_set_tile_size(UINT32 w1, UINT32 w2)
 void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 {
 	//wait("LoadBlock");
+	ignored = false;
+	if (w1 != 0xf3000000 || w2 != 0x070ff200) ignored = true;
 	n64_tile_t* tile = m_tiles;
 
 	const INT32 tilenum = (w2 >> 24) & 0x7;
@@ -3029,6 +3031,7 @@ void n64_rdp::process_command_list()
 
 n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 32000>(state.machine())
 {
+	ignored = true;
 	m_aux_buf_ptr = 0;
 	m_aux_buf = NULL;
 	m_pipe_clean = true;
