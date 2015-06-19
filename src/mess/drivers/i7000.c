@@ -307,7 +307,7 @@ GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(i7000_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, /*code:*/ m_videoram[tile_index], /*color:*/ 1, 0);
+	SET_TILE_INFO_MEMBER(0, /*code:*/ m_videoram[tile_index], /*color:*/ 0, 0);
 }
 
 void i7000_state::video_start()
