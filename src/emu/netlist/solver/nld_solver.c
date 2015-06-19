@@ -35,7 +35,7 @@
 #include "nld_ms_sor.h"
 #include "nld_ms_sor_mat.h"
 #include "nld_ms_gmres.h"
-#include "nld_twoterm.h"
+//#include "nld_twoterm.h"
 #include "../nl_lists.h"
 
 #if HAS_OPENMP
@@ -428,8 +428,8 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int gs_thre
 			}
 			else
 			{
-				//typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
-				typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GS;
+				typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
+				//typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GS;
 				return palloc(solver_GS, &m_params, size);
 			}
 		}

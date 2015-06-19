@@ -5,6 +5,7 @@
  *
  */
 
+#include <solver/nld_solver.h>
 #include <cstdio>
 
 #include "plib/palloc.h"
@@ -15,7 +16,6 @@
 #include "nl_factory.h"
 #include "devices/net_lib.h"
 #include "devices/nld_system.h"
-#include "analog/nld_solver.h"
 #include "analog/nld_twoterm.h"
 
 static NETLIST_START(base)

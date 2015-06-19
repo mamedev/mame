@@ -5,10 +5,10 @@
  *
  */
 
+#include <solver/nld_solver.h>
 #include <algorithm>
 
 #include "nld_twoterm.h"
-#include "nld_solver.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 

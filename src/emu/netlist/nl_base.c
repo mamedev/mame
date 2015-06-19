@@ -5,6 +5,7 @@
  *
  */
 
+#include <solver/nld_solver.h>
 #include <cstring>
 #include <algorithm>
 #include <cstdio>
@@ -13,7 +14,6 @@
 
 #include "nl_base.h"
 #include "devices/nld_system.h"
-#include "analog/nld_solver.h"
 #include "nl_util.h"
 
 const netlist::netlist_time netlist::netlist_time::zero = netlist::netlist_time::from_raw(0);
