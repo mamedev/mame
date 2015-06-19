@@ -45,7 +45,7 @@ cartridges data available in this softlist.
 	</software>
 
 	<software name="set3278">
-		<description>I-7106 SET 3278 v1.2 R00 (Mar 21st, 1985)</description>
+		<description>I-7106 SET 3278 v1.2 R00 (Mar 21st, 1985) IBM-3278 terminal emulation</description>
 		<year>1985</year>
 		<publisher>Itautec</publisher>
 		<part name="card" interface="i7000_card">
