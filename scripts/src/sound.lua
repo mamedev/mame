@@ -1142,6 +1142,9 @@ if (SOUNDS["YM2151"]~=null) then
 end
 
 if (SOUNDS["YM2203"]~=null) then
+	defines {
+		"BUILD_YM2203=1",
+	}
 	files {
 		MAME_DIR .. "src/emu/sound/2203intf.c",
 		MAME_DIR .. "src/emu/sound/2203intf.h",
@@ -1149,6 +1152,10 @@ if (SOUNDS["YM2203"]~=null) then
 		MAME_DIR .. "src/emu/sound/ay8910.h",
 		MAME_DIR .. "src/emu/sound/fm.c",
 		MAME_DIR .. "src/emu/sound/fm.h",
+	}
+else
+	defines {
+		"BUILD_YM2203=0",
 	}
 end
 
@@ -1162,6 +1169,9 @@ if (SOUNDS["YM2413"]~=null) then
 end
 
 if (SOUNDS["YM2608"]~=null) then
+	defines {
+		"BUILD_YM2608=1",
+	}
 	files {
 		MAME_DIR .. "src/emu/sound/2608intf.c", 
 		MAME_DIR .. "src/emu/sound/2608intf.h", 
@@ -1172,9 +1182,17 @@ if (SOUNDS["YM2608"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
+else
+	defines {
+		"BUILD_YM2608=0",
+	}
 end
 
 if (SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null) then
+	defines {
+		"BUILD_YM2610=1",
+		"BUILD_YM2610B=1",
+	}
 	files {
 		MAME_DIR .. "src/emu/sound/2610intf.c", 
 		MAME_DIR .. "src/emu/sound/2610intf.h", 
@@ -1185,9 +1203,18 @@ if (SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
+else	
+	defines {
+		"BUILD_YM2610=0",
+		"BUILD_YM2610B=0",
+	}
 end
 
 if (SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
+	defines {
+		"BUILD_YM2612=1",
+		"BUILD_YM3438=1",
+	}
 	files {
 		MAME_DIR .. "src/emu/sound/2612intf.c", 
 		MAME_DIR .. "src/emu/sound/2612intf.h", 
@@ -1195,9 +1222,17 @@ if (SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
 		MAME_DIR .. "src/emu/sound/ay8910.h", 
 		MAME_DIR .. "src/emu/sound/fm2612.c",
 	}
+else	
+	defines {
+		"BUILD_YM2612=0",
+		"BUILD_YM3438=0",
+	}
 end
 
 if (SOUNDS["YM3812"]~=null) then
+	defines {
+		"BUILD_YM3812=1",
+	}
 	files {
 		MAME_DIR .. "src/emu/sound/3812intf.c", 
 		MAME_DIR .. "src/emu/sound/3812intf.h", 
@@ -1206,9 +1241,16 @@ if (SOUNDS["YM3812"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
+else	
+	defines {
+		"BUILD_YM3812=0",
+	}
 end
 
 if (SOUNDS["YM3526"]~=null) then
+	defines {
+		"BUILD_YM3526=1",
+	}
 	files {
 		MAME_DIR .. "src/emu/sound/3526intf.c", 
 		MAME_DIR .. "src/emu/sound/3526intf.h", 
@@ -1217,9 +1259,16 @@ if (SOUNDS["YM3526"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
+else	
+	defines {
+		"BUILD_YM3526=0",
+	}
 end
 
 if (SOUNDS["Y8950"]~=null) then
+	defines {
+		"BUILD_Y8950=1",
+	}
 	files {
 		MAME_DIR .. "src/emu/sound/8950intf.c", 
 		MAME_DIR .. "src/emu/sound/8950intf.h", 
@@ -1227,6 +1276,10 @@ if (SOUNDS["Y8950"]~=null) then
 		MAME_DIR .. "src/emu/sound/fmopl.h", 
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
+	}
+else	
+	defines {
+		"BUILD_Y8950=0",
 	}
 end
 
