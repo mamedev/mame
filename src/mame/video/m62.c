@@ -292,7 +292,7 @@ void m62_state::register_savestate(  )
 WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~ioport("DSW2")->read() & 1;
+	data ^= ((~ioport("DSW2")->read()) & 1);
 
 	m_flipscreen = data & 0x01;
 	if (m_flipscreen)
@@ -302,6 +302,10 @@ WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 
 	coin_counter_w(machine(), 0, data & 2);
 	coin_counter_w(machine(), 1, data & 4);
+
+	/* Sound inhibit ... connected to D6 which is not present on any board */
+	if (m_audio->m_audio_SINH != NULL)
+		m_audio->m_audio_SINH->write((data >> 3) & 1);
 }
 
 WRITE8_MEMBER(m62_state::m62_hscroll_low_w)

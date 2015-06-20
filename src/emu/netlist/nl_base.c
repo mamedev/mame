@@ -46,7 +46,7 @@ fatalerror_e::fatalerror_e(const char *format, va_list ap)
 class logic_family_ttl_t : public logic_family_desc_t
 {
 public:
-	logic_family_ttl_t()
+	logic_family_ttl_t() : logic_family_desc_t()
 	{
 		m_low_thresh_V = 0.8;
 		m_high_thresh_V = 2.0;
@@ -55,6 +55,7 @@ public:
 		m_high_V = 4.0;
 		m_R_low = 1.0;
 		m_R_high = 130.0;
+		m_is_static = true;
 	}
 	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
 	{
@@ -66,15 +67,16 @@ public:
 class logic_family_cd4000_t : public logic_family_desc_t
 {
 public:
-	logic_family_cd4000_t()
+	logic_family_cd4000_t() : logic_family_desc_t()
 	{
 		m_low_thresh_V = 0.8;
 		m_high_thresh_V = 2.0;
 		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		m_low_V = 0.1;
-		m_high_V = 4.0;
-		m_R_low = 1.0;
-		m_R_high = 130.0;
+		m_low_V = 0.05;
+		m_high_V = 4.95;
+		m_R_low = 10.0;
+		m_R_high = 10.0;
+		m_is_static = true;
 	}
 	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
 	{
@@ -84,6 +86,38 @@ public:
 
 const logic_family_desc_t &netlist_family_TTL = logic_family_ttl_t();
 const logic_family_desc_t &netlist_family_CD4000 = logic_family_cd4000_t();
+
+class logic_family_std_proxy_t : public logic_family_desc_t
+{
+public:
+	logic_family_std_proxy_t() { }
+	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
+	{
+		return palloc(devices::nld_d_to_a_proxy , proxied);
+	}
+};
+
+const logic_family_desc_t *logic_family_desc_t::from_model(const pstring &model)
+{
+
+	if (setup_t::model_value_str(model, "TYPE", "") == "TTL")
+		return &netlist_family_TTL;
+	if (setup_t::model_value_str(model, "TYPE", "") == "CD4000")
+		return &netlist_family_CD4000;
+
+	/* FIXME: Memory leak */
+	logic_family_std_proxy_t *ret = palloc(logic_family_std_proxy_t);
+
+	ret->m_low_thresh_V = setup_t::model_value(model, "IVL", 0.8);
+	ret->m_high_thresh_V = setup_t::model_value(model, "IVH", 2.0);
+	ret->m_low_V = setup_t::model_value(model, "OVL", 0.1);
+	ret->m_high_V = setup_t::model_value(model, "OVH", 4.0);
+	ret->m_R_low = setup_t::model_value(model, "ORL", 1.0);
+	ret->m_R_high = setup_t::model_value(model, "ORH", 130.0);
+
+	return ret;
+}
+
 
 // ----------------------------------------------------------------------------------------
 // netlist_queue_t
@@ -424,7 +458,8 @@ ATTR_COLD core_device_t::core_device_t(const family_t afamily)
 
 ATTR_COLD void core_device_t::init(netlist_t &anetlist, const pstring &name)
 {
-	set_logic_family(this->default_logic_family());
+	if (logic_family() == NULL)
+		set_logic_family(this->default_logic_family());
 	init_object(anetlist, name);
 
 #if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
@@ -1055,43 +1090,17 @@ ATTR_COLD const pstring param_model_t::model_type() const
 }
 
 
+ATTR_COLD const pstring param_model_t::model_value_str(const pstring &entity, const pstring defval) const
+{
+	return setup_t::model_value_str(this->Value(), entity, defval);
+}
+
 ATTR_COLD nl_double param_model_t::model_value(const pstring &entity, const nl_double defval) const
 {
-	pstring tmp = this->Value();
-	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
-	int p = tmp.ucase().find(entity.ucase() + "=");
-	if (p>=0)
-	{
-		int pblank = tmp.find(" ", p);
-		if (pblank < 0) pblank = tmp.len() + 1;
-		tmp = tmp.substr(p, pblank - p);
-		int pequal = tmp.find("=", 0);
-		if (pequal < 0)
-			netlist().error("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
-		tmp = tmp.substr(pequal+1);
-		nl_double factor = NL_FCONST(1.0);
-		switch (*(tmp.right(1).cstr()))
-		{
-			case 'm': factor = 1e-3; break;
-			case 'u': factor = 1e-6; break;
-			case 'n': factor = 1e-9; break;
-			case 'p': factor = 1e-12; break;
-			case 'f': factor = 1e-15; break;
-			case 'a': factor = 1e-18; break;
-
-		}
-		if (factor != NL_FCONST(1.0))
-			tmp = tmp.left(tmp.len() - 1);
-		return tmp.as_double() * factor;
-	}
-	else
-	{
-		netlist().log("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
-		return defval;
-	}
+	return setup_t::model_value(this->Value(), entity, defval);
 }
 
-}
+} // namespace
 
 NETLIB_NAMESPACE_DEVICES_START()
 

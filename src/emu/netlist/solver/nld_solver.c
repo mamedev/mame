@@ -266,12 +266,12 @@ void matrix_solver_t::solve_base(C *p)
 
 ATTR_HOT nl_double matrix_solver_t::solve()
 {
-	netlist_time now = netlist().time();
-	netlist_time delta = now - m_last_step;
+	const netlist_time now = netlist().time();
+	const netlist_time delta = now - m_last_step;
 
 	// We are already up to date. Avoid oscillations.
 	// FIXME: Make this a parameter!
-	if (delta < netlist_time::from_nsec(1))
+	if (delta < netlist_time::from_nsec(1)) // 20000
 		return -1.0;
 
 	/* update all terminals for new time step */
@@ -428,8 +428,8 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int gs_thre
 			}
 			else
 			{
-				//typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
-				typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GS;
+				typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
+				//typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GS;
 				return palloc(solver_GS, &m_params, size);
 			}
 		}

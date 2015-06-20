@@ -68,7 +68,8 @@
 
 
 #ifdef RES_R
-#warning "Do not include rescap.h in a netlist environment"
+// FIXME: avoid compile fails
+// #warning "Do not include rescap.h in a netlist environment"
 #endif
 
 #define RES_R(res) ((double)(res))

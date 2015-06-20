@@ -190,6 +190,11 @@ namespace netlist
 
 		void print_stats() const;
 
+		/* static support functions */
+
+		static const pstring model_value_str(const pstring &model_str, const pstring &entity, const pstring defval);
+		static nl_double model_value(const pstring &model_str, const pstring &entity, const nl_double defval);
+
 	protected:
 
 	private:

@@ -28,7 +28,7 @@
 	netlist_mame_analog_input_t::static_set_name(*device, _name);
 
 #define MCFG_NETLIST_ANALOG_MULT_OFFSET(_mult, _offset)                             \
-	netlist_mame_analog_input_t::static_set_mult_offset(*device, _mult, _offset);
+	netlist_mame_sub_interface::static_set_mult_offset(*device, _mult, _offset);
 
 #define MCFG_NETLIST_ANALOG_OUTPUT(_basetag, _tag, _IN, _class, _member, _class_tag) \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_OUTPUT, 0)                    \
@@ -425,16 +425,9 @@ public:
 
 	inline void write(const UINT32 val)
 	{
-		if (is_sound_device())
-		{
-			update_to_current_time();
-			m_param->setTo((val >> m_shift) & m_mask);
-		}
-		else
-		{
-			// FIXME: use device timer ....
-			m_param->setTo((val >> m_shift) & m_mask);
-		}
+		const UINT32 v = (val >> m_shift) & m_mask;
+		if (v != m_param->Value())
+			synchronize(0, v);
 	}
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
@@ -447,6 +440,12 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+	{
+		if (is_sound_device())
+			update_to_current_time();
+		m_param->setTo(param);
+	}
 
 private:
 	netlist::param_int_t *m_param;
@@ -575,7 +574,7 @@ public:
 
 	ATTR_COLD void reset()
 	{
-		m_cur = 0;
+		m_cur = 0.0;
 		m_last_pos = 0;
 		m_last_buffer = netlist::netlist_time::zero;
 	}
@@ -587,21 +586,29 @@ public:
 			netlist().error("sound %s: exceeded BUFSIZE\n", name().cstr());
 		while (m_last_pos < pos )
 		{
-			m_buffer[m_last_pos++] = m_cur;
+			m_buffer[m_last_pos++] = (stream_sample_t) m_cur;
 		}
 	}
 
 	ATTR_HOT void update()
 	{
-		nl_double val = INPANALOG(m_in);
+		nl_double val = INPANALOG(m_in) * m_mult.Value() + m_offset.Value();
 		sound_update(netlist().time());
-		m_cur = (stream_sample_t) (val * m_mult.Value() + m_offset.Value());
+		/* ignore spikes */
+		if (std::abs(val) < 32767.0)
+			m_cur = val;
+		else if (val > 0.0)
+			m_cur = 32767.0;
+		else
+			m_cur = -32767.0;
+
 	}
 
 	ATTR_HOT void buffer_reset(netlist::netlist_time upto)
 	{
 		m_last_pos = 0;
 		m_last_buffer = upto;
+		m_cur = 0.0;
 	}
 
 	netlist::param_int_t m_channel;
@@ -612,7 +619,7 @@ public:
 
 private:
 	netlist::analog_input_t m_in;
-	stream_sample_t m_cur;
+	double m_cur;
 	int m_last_pos;
 	netlist::netlist_time m_last_buffer;
 };
@@ -677,7 +684,7 @@ public:
 		{
 			if (m_buffer[i] == NULL)
 				break; // stop, called outside of stream_update
-			nl_double v = m_buffer[i][m_pos];
+			const nl_double v = m_buffer[i][m_pos];
 			m_param[i]->setTo(v * m_param_mult[i].Value() + m_param_offset[i].Value());
 		}
 		m_pos++;
