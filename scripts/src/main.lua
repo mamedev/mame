@@ -86,7 +86,13 @@ function mainProject(_target, _subtarget)
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 	links {
 		"osd_" .. _OPTIONS["osd"],
-		"bus",
+	}
+	if (bus_count > 0) then
+		links {
+			"bus",
+		}
+	end
+	links {
 		"netlist",
 		"optional",
 		"emu",
@@ -214,6 +220,8 @@ function mainProject(_target, _subtarget)
 		MAME_DIR .. "src/version.c",
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",
 	}
+	
+if (_OPTIONS["DRIVERS"] == nil) then 	
 	dependency {
 		{ "../../../../generated/mame/mame/drivlist.c",  MAME_DIR .. "src/mame/mess.lst", true },
 		{ "../../../../generated/mame/mame/drivlist.c" , MAME_DIR .. "src/mame/arcade.lst", true},
@@ -221,7 +229,7 @@ function mainProject(_target, _subtarget)
 	custombuildtask {
 		{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",    {  MAME_DIR .. "src/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
 	}
-	
+end	
 	configuration { "gmake" }
 		dependency {
 			{ ".PHONY", ".FORCE", true },

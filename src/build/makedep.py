@@ -22,40 +22,40 @@ components = [ ]
 
 drivers = [ ]
 
-def file_exists(srcfile, folder, inc_dir):
+def file_exists(root, srcfile, folder, inc_dir):
     includes = [ folder ]
     includes.extend(inc_dir)
     for line in includes:
         try:
-            fp = open(line + srcfile, 'rb')
+            fp = open(root + line + srcfile, 'rb')
             return line + srcfile
         except IOError:
             ignore=1
     return ''
 
-def add_c_if_exists(fullname):
+def add_c_if_exists(root, fullname):
     try:
-        fp = open(fullname, 'rb')
+        fp = open(root + fullname, 'rb')
         deps_files_included.append(fullname)
     except IOError:
         ignore=1
 
-def add_rest_if_exists(srcfile):
+def add_rest_if_exists(root, srcfile):
     t = srcfile.rsplit('/', 2)
     if t[1]=='includes':
         t[2] = t[2].replace('.h','.c')
         t[1] = 'drivers'     
-        add_c_if_exists("/".join(t))
+        add_c_if_exists(root,"/".join(t))
         t[1] = 'machine'     
-        add_c_if_exists("/".join(t))
+        add_c_if_exists(root,"/".join(t))
         t[1] = 'video'     
-        add_c_if_exists("/".join(t))
+        add_c_if_exists(root,"/".join(t))
         t[1] = 'audio'
-        add_c_if_exists("/".join(t))
+        add_c_if_exists(root,"/".join(t))
 
-def parse_file_for_deps(srcfile, folder):
+def parse_file_for_deps(root, srcfile, folder):
     try:
-        fp = open(srcfile, 'rb')
+        fp = open(root + srcfile, 'rb')
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
@@ -92,21 +92,21 @@ def parse_file_for_deps(srcfile, folder):
             if content.startswith('#include'):
                name = content[8:]
                name = name.replace('"','')
-               fullname = file_exists(name, folder,deps_include_dirs)
+               fullname = file_exists(root, name, folder,deps_include_dirs)
                if fullname in deps_files_included:
                    continue
                if fullname!='':
                    deps_files_included.append(fullname)
-                   add_c_if_exists(fullname.replace('.h','.c'))
-                   add_rest_if_exists(fullname)
+                   add_c_if_exists(root, fullname.replace('.h','.c'))
+                   add_rest_if_exists(root, fullname)
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
-                   parse_file_for_deps(fullname, newfolder)
+                   parse_file_for_deps(root, fullname, newfolder)
                continue
     return 0
 
-def parse_file(srcfile, folder):
+def parse_file(root, srcfile, folder):
     try:
-        fp = open(srcfile, 'rb')
+        fp = open(root + srcfile, 'rb')
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
@@ -143,7 +143,7 @@ def parse_file(srcfile, folder):
             if content.startswith('#include'):
                name = content[8:]
                name = name.replace('"','')
-               fullname = file_exists(name, folder,include_dirs)
+               fullname = file_exists(root, name, folder,include_dirs)
                if fullname in files_included:
                    continue
                if fullname!='':
@@ -152,13 +152,13 @@ def parse_file(srcfile, folder):
                             components.append(mappings[fullname])
                    files_included.append(fullname)
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
-                   parse_file(fullname, newfolder)
+                   parse_file(root, fullname, newfolder)
                continue
     return 0
 
-def parse_file_for_drivers(srcfile):
+def parse_file_for_drivers(root, srcfile):
     try:
-        fp = open(srcfile, 'rb')
+        fp = open(root + srcfile, 'rb')
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
@@ -213,41 +213,64 @@ def parse_lua_file(srcfile):
                mappings[name.rsplit(',', 1)[0]] = name.rsplit(',', 1)[1]
     return 0
 
-if len(sys.argv) < 4:
+if len(sys.argv) < 5:
     print('Usage:')
-    print('  makedep <source.c> <type> <target>')
+    print('  makedep <root> <source.c> <type> <target>')
     sys.exit(0)
 
-parse_lua_file('scripts/src/bus.lua')
-parse_lua_file('scripts/src/cpu.lua')
-parse_lua_file('scripts/src/machine.lua')
-parse_lua_file('scripts/src/sound.lua')
-parse_lua_file('scripts/src/video.lua')
+root = sys.argv[1] + '/'
 
-for filename in sys.argv[1].rsplit(',') :
+parse_lua_file(root +'scripts/src/bus.lua')
+parse_lua_file(root +'scripts/src/cpu.lua')
+parse_lua_file(root +'scripts/src/machine.lua')
+parse_lua_file(root +'scripts/src/sound.lua')
+parse_lua_file(root +'scripts/src/video.lua')
+
+for filename in sys.argv[2].rsplit(',') :
     deps_files_included.append(filename.replace('\\','/'))
-    parse_file_for_deps(filename,'')
+    parse_file_for_deps(root,filename,'')
 
 for filename in deps_files_included:
-    parse_file(filename,'')
+    parse_file(root,filename,'')
 
-for filename in sys.argv[1].rsplit(',') :
-    parse_file_for_drivers(filename)
+for filename in sys.argv[2].rsplit(',') :
+    parse_file_for_drivers(root,filename)
 
 	
 # display output
-if sys.argv[2]=='drivers':
-    for line in drivers:
-        sys.stdout.write("%s\n" % line)	
-if sys.argv[2]=='target':
+if sys.argv[3]=='drivers':
+	# add a reference to the ___empty driver
+	drivers.append("___empty")
+
+	# start with a header
+	print('#include "emu.h"\n')
+	print('#include "drivenum.h"\n')
+
+	#output the list of externs first
+	for drv in sorted(drivers):
+		print("GAME_EXTERN(%s);" % drv)
+	print("")
+
+	# then output the array
+	print("const game_driver * const driver_list::s_drivers_sorted[%d] =" % len(drivers))
+	print("{")
+	for drv in sorted(drivers):
+		print("\t&GAME_NAME(%s)," % drv)
+	print("};")
+	print("")
+
+	# also output a global count
+	print("int driver_list::s_driver_count = %d;\n" % len(drivers))
+
+if sys.argv[3]=='target':
     for line in components:
         sys.stdout.write("%s\n" % line)	
     sys.stdout.write('\n');
-    sys.stdout.write('function createProjects_mame_%s(_target, _subtarget)\n' % sys.argv[3]);
-    sys.stdout.write('	project ("mame_%s")\n' % sys.argv[3]);
+    sys.stdout.write('function createProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4]);
+    sys.stdout.write('	project ("mame_%s")\n' % sys.argv[4]);
     sys.stdout.write('	targetsubdir(_target .."_" .. _subtarget)\n');
     sys.stdout.write('	kind (LIBTYPE)\n');
-    sys.stdout.write('	uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[3]);
+    sys.stdout.write('	uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[4]);
     sys.stdout.write('	\n');
     sys.stdout.write('	options {\n');
     sys.stdout.write('		"ForceCPP",\n');
@@ -276,9 +299,9 @@ if sys.argv[2]=='target':
     sys.stdout.write('	}\n');
     sys.stdout.write('end\n');
     sys.stdout.write('\n');
-    sys.stdout.write('function linkProjects_mame_%s(_target, _subtarget)\n' % sys.argv[3]);
+    sys.stdout.write('function linkProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4]);
     sys.stdout.write('	links {\n');
-    sys.stdout.write('		"mame_%s",\n' % sys.argv[3]);
+    sys.stdout.write('		"mame_%s",\n' % sys.argv[4]);
     sys.stdout.write('	}\n');
     sys.stdout.write('end\n');
 
