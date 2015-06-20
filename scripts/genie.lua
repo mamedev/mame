@@ -53,7 +53,6 @@ SOUNDS  = {}
 MACHINES  = {}
 VIDEOS = {}
 BUSES  = {}
-bus_count = 0
 
 newoption {
 	trigger = "with-tools",

@@ -108,7 +108,6 @@ def parse_file(root, srcfile, folder):
     try:
         fp = open(root + srcfile, 'rb')
     except IOError:
-        sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
     in_comment = 0
     linenum = 0
@@ -153,6 +152,7 @@ def parse_file(root, srcfile, folder):
                    files_included.append(fullname)
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file(root, fullname, newfolder)
+                   parse_file(root, fullname.replace('.h','.c'), newfolder)
                continue
     return 0
 

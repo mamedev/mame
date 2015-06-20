@@ -87,7 +87,7 @@ function mainProject(_target, _subtarget)
 	links {
 		"osd_" .. _OPTIONS["osd"],
 	}
-	if (bus_count > 0) then
+	if (_OPTIONS["DRIVERS"] == nil) then 
 		links {
 			"bus",
 		}

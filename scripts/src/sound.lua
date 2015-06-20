@@ -1130,6 +1130,7 @@ end
 --@src/emu/sound/ymf262.h,SOUNDS["YMF262"] = true
 --@src/emu/sound/ymf271.h,SOUNDS["YMF271"] = true
 --@src/emu/sound/ymf278b.h,SOUNDS["YMF278B"] = true
+--@src/emu/sound/262intf.h,SOUNDS["YMF262"] = true
 ---------------------------------------------------
 
 if (SOUNDS["YM2151"]~=null) then
