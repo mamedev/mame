@@ -827,8 +827,7 @@ end
 if _OPTIONS["SSE2"]=="1" then
 	buildoptions {
 		"-msse",
-		"-msse2",
-		"-msse3"
+		"-msse2"
 	}
 end
 
