@@ -106,5 +106,6 @@ parse_lua_file('scripts/src/machine.lua')
 parse_lua_file('scripts/src/sound.lua')
 parse_lua_file('scripts/src/video.lua')
 
-parse_file(sys.argv[1],'')
+for filename in sys.argv[1].rsplit(',') :
+    parse_file(filename,'')
 
