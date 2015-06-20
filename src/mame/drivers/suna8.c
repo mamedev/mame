@@ -2165,7 +2165,7 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))	// two sample roms
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -2217,6 +2217,9 @@ Sound processor -  Z80
 24 MHz crystal
 
 ***************************************************************************/
+
+// The sample rom is from srange with 1 byte changed (first byte is FF here, instead of 77)
+// (laugh sound used when scoring a goal at the end of level 1)
 
 ROM_START( hardhead )
 	ROM_REGION( 0x48000, "maincpu", 0 ) /* Main Z80 Code */

@@ -63,7 +63,7 @@ public:
 
 	// samples
 	INT16 *m_samplebuf;
-	int m_sample;
+	int m_sample, m_play;
 	int m_numsamples;
 
 #if TILEMAPS
