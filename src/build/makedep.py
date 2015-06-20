@@ -228,7 +228,7 @@ for filename in sys.argv[1].rsplit(',') :
     deps_files_included.append(filename.replace('\\','/'))
     parse_file_for_deps(filename,'')
 
-for filename in sys.argv[1].rsplit(',') :
+for filename in deps_files_included:
     parse_file(filename,'')
 
 for filename in sys.argv[1].rsplit(',') :
