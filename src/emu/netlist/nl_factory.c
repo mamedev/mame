@@ -64,13 +64,13 @@ device_t *factory_list_t::new_device_by_classname(const pstring &classname) cons
 	return NULL; // appease code analysis
 }
 
-device_t *factory_list_t::new_device_by_name(const pstring &name, netlist_setup_t &setup) const
+device_t *factory_list_t::new_device_by_name(const pstring &name, setup_t &setup) const
 {
 	base_factory_t *f = factory_by_name(name, setup);
 	return f->Create();
 }
 
-base_factory_t * factory_list_t::factory_by_name(const pstring &name, netlist_setup_t &setup) const
+base_factory_t * factory_list_t::factory_by_name(const pstring &name, setup_t &setup) const
 {
 	for (std::size_t i=0; i < m_list.size(); i++)
 	{

@@ -3,8 +3,8 @@
 #include "netlist/devices/nld_system.h"
 #include "netlist/analog/nld_bjt.h"
 
-#define USE_FRONTIERS 0
-#define USE_FIXED_STV 0
+#define USE_FRONTIERS 1
+#define USE_FIXED_STV 1
 
 NETLIST_START(dummy)
 	SOLVER(Solver, 12000)

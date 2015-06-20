@@ -15,60 +15,60 @@
 namespace netlist
 {
 
-class netlist_parser : public ptokenizer
-{
-	NETLIST_PREVENT_COPYING(netlist_parser)
-public:
-	netlist_parser(netlist_setup_t &setup)
-	: ptokenizer(), m_setup(setup), m_buf(NULL) {}
+	class parser_t : public ptokenizer
+	{
+		NETLIST_PREVENT_COPYING(parser_t)
+	public:
+		parser_t(setup_t &setup)
+		: ptokenizer(), m_setup(setup), m_buf(NULL) {}
 
-	bool parse(const char *buf, const pstring nlname = "");
+		bool parse(const char *buf, const pstring nlname = "");
 
-	void parse_netlist(const pstring &nlname);
-	void net_alias();
-	void netdev_param();
-	void net_c();
-	void frontier();
-	void device(const pstring &dev_type);
-	void netdev_netlist_start();
-	void netdev_netlist_end();
-	void net_model();
-	void net_submodel();
-	void net_include();
-	void net_local_source();
-	void net_truthtable_start();
+		void parse_netlist(const pstring &nlname);
+		void net_alias();
+		void netdev_param();
+		void net_c();
+		void frontier();
+		void device(const pstring &dev_type);
+		void netdev_netlist_start();
+		void netdev_netlist_end();
+		void net_model();
+		void net_submodel();
+		void net_include();
+		void net_local_source();
+		void net_truthtable_start();
 
-protected:
-	/* for debugging messages */
-	netlist_t &netlist() { return m_setup.netlist(); }
+	protected:
+		/* for debugging messages */
+		netlist_t &netlist() { return m_setup.netlist(); }
 
-	virtual void verror(pstring msg, int line_num, pstring line);
-private:
+		virtual void verror(pstring msg, int line_num, pstring line);
+	private:
 
-	nl_double eval_param(const token_t tok);
+		nl_double eval_param(const token_t tok);
 
-	token_id_t m_tok_param_left;
-	token_id_t m_tok_param_right;
-	token_id_t m_tok_comma;
-	token_id_t m_tok_ALIAS;
-	token_id_t m_tok_NET_C;
-	token_id_t m_tok_FRONTIER;
-	token_id_t m_tok_PARAM;
-	token_id_t m_tok_NET_MODEL;
-	token_id_t m_tok_NETLIST_START;
-	token_id_t m_tok_NETLIST_END;
-	token_id_t m_tok_SUBMODEL;
-	token_id_t m_tok_INCLUDE;
-	token_id_t m_tok_LOCAL_SOURCE;
-	token_id_t m_tok_TRUTHTABLE_START;
-	token_id_t m_tok_TRUTHTABLE_END;
-	token_id_t m_tok_TT_HEAD;
-	token_id_t m_tok_TT_LINE;
+		token_id_t m_tok_param_left;
+		token_id_t m_tok_param_right;
+		token_id_t m_tok_comma;
+		token_id_t m_tok_ALIAS;
+		token_id_t m_tok_NET_C;
+		token_id_t m_tok_FRONTIER;
+		token_id_t m_tok_PARAM;
+		token_id_t m_tok_NET_MODEL;
+		token_id_t m_tok_NETLIST_START;
+		token_id_t m_tok_NETLIST_END;
+		token_id_t m_tok_SUBMODEL;
+		token_id_t m_tok_INCLUDE;
+		token_id_t m_tok_LOCAL_SOURCE;
+		token_id_t m_tok_TRUTHTABLE_START;
+		token_id_t m_tok_TRUTHTABLE_END;
+		token_id_t m_tok_TT_HEAD;
+		token_id_t m_tok_TT_LINE;
 
-	netlist_setup_t &m_setup;
+		setup_t &m_setup;
 
-	const char *m_buf;
-};
+		const char *m_buf;
+	};
 
 }
 

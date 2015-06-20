@@ -349,7 +349,7 @@ void ui_menu_select_software::populate()
 
 	// configure the custom rendering
 	customtop = 3.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = 5.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 5.0f * machine().ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 
 	if (old_software != -1)
 	{
@@ -469,13 +469,13 @@ void ui_menu_select_software::build_software_list()
 	// retrieve and set the long name of software for parents
 	for (int y = 1; y < ui_swlist.size(); y++)
 	{
-		if (ui_swlist[y].parentname[0] != '\0')
+		if (!ui_swlist[y].parentname.empty())
 		{
 			bool found = false;
 
 			// first scan backward
 			for (int x = y; x > 0; x--)
-				if (ui_swlist[y].parentname.compare(ui_swlist[x].shortname) == 0 && ui_swlist[y].instance.compare(ui_swlist[x].instance) == 0)
+				if (!ui_swlist[y].parentname.compare(ui_swlist[x].shortname) && !ui_swlist[y].instance.compare(ui_swlist[x].instance))
 				{
 					ui_swlist[y].parentlongname.assign(ui_swlist[x].longname);
 					found = true;
@@ -484,7 +484,7 @@ void ui_menu_select_software::build_software_list()
 
 			// not found? then scan forward
 			for (int x = y; !found && x < ui_swlist.size(); x++)
-				if (ui_swlist[y].parentname.compare(ui_swlist[x].shortname) == 0 && ui_swlist[y].instance.compare(ui_swlist[x].instance) == 0)
+				if (!ui_swlist[y].parentname.compare(ui_swlist[x].shortname) && !ui_swlist[y].instance.compare(ui_swlist[x].instance))
 				{
 					ui_swlist[y].parentlongname.assign(ui_swlist[x].longname);
 					break;
@@ -528,7 +528,6 @@ void ui_menu_select_software::build_software_list()
 
 	// sort array
 	std::stable_sort(ui_swlist.begin() + 1, ui_swlist.end(), compare_software);
-
 	std::stable_sort(m_region.ui.begin(), m_region.ui.end());
 	std::stable_sort(m_year.ui.begin(), m_year.ui.end());
 	std::stable_sort(m_publisher.ui.begin(), m_publisher.ui.end());
@@ -542,15 +541,14 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 {
 	ui_software_info *swinfo = (FPTR)selectedref > 1 ? (ui_software_info *)selectedref : NULL;
 	const game_driver *driver = NULL;
-	float width, maxwidth;
-	float x1, y1, x2, y2;
+	float width;
 	std::string tempbuf[5], filtered;
 	rgb_t color = UI_BACKGROUND_COLOR;
 	bool isstar = false;
 
 	// determine the text for the header
 	int vis_item = (m_search[0] != 0) ? visible_items : (has_empty_start ? visible_items - 1 : visible_items);
-	strprintf(tempbuf[0], "MEWUI %s (%s) (%d / %d software)", mewui_version, bare_build_version, vis_item, (int)ui_swlist.size() - 1);
+	strprintf(tempbuf[0], "MEWUI %s (%s) (%d / %d softwares)", mewui_version, bare_build_version, vis_item, (int)ui_swlist.size() - 1);
 	tempbuf[1].assign("Driver: \"").append(ui_driver->description).append("\" software list ");
 
 	if (mewui_globals::actual_sw_filter == MEWUI_SW_REGION && m_region.ui.size() != 0)
@@ -563,21 +561,21 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	tempbuf[2].assign(filtered).append("Search: ").append(m_search).append("_");
 
 	// get the size of the text
-	maxwidth = origx2 - origx1;
+	float maxwidth = origx2 - origx1;
 
 	for (int line = 0; line < 3; line++)
 	{
 		machine().ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
 										DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(width, origx2 - origx1);
+		maxwidth = MAX(width, maxwidth);
 	}
 
 	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy1 - top;
-	y2 = origy1 - UI_BOX_TB_BORDER;
+	float x1 = 0.5f - 0.5f * maxwidth;
+	float x2 = x1 + maxwidth;
+	float y1 = origy1 - top;
+	float y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
@@ -662,8 +660,8 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 		strprintf(tempbuf[1], "%s, %-.100s", swinfo->year.c_str(), swinfo->publisher.c_str());
 
 		// next line is parent/clone
-		if (swinfo->parentname[0] != '\0')
-			strprintf(tempbuf[2], "Software is clone of: %-.100s", swinfo->parentlongname[0] != '\0' ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
+		if (!swinfo->parentname.empty())
+			strprintf(tempbuf[2], "Software is clone of: %-.100s", !swinfo->parentlongname.empty() ? swinfo->parentlongname.c_str() : swinfo->parentname.c_str());
 		else
 			tempbuf[2].assign("Software is parent");
 
@@ -673,13 +671,11 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 			tempbuf[3].assign("Supported: No");
 			color = UI_RED_COLOR;
 		}
-
 		else if (swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL)
 		{
 			tempbuf[3].assign("Supported: Partial");
 			color = UI_YELLOW_COLOR;
 		}
-
 		else
 		{
 			tempbuf[3].assign("Supported: Yes");

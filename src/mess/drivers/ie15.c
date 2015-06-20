@@ -561,8 +561,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(ie15_state::scanline_callback)
 	UINT16 y = m_screen->vpos();
 
 	DBG_LOG(3,"scanline_cb",
-		("addr %03x frame %" I64FMT "d x %.4d y %.3d row %.2d e:c:s %d:%d:%d\n",
-		m_video.ptr2, m_screen->frame_number(), m_screen->hpos(), y,
+		("addr %03x frame %d x %.4d y %.3d row %.2d e:c:s %d:%d:%d\n",
+		m_video.ptr2, (int)m_screen->frame_number(), m_screen->hpos(), y,
 		y%11, m_video.enable, m_video.cursor, m_video.line25));
 
 	if (y < IE15_VERT_START) return;

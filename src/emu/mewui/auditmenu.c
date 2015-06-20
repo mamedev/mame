@@ -86,14 +86,10 @@ ui_menu_audit::ui_menu_audit(running_machine &machine, render_container *contain
 {
 	m_audit_mode = _audit_mode;
 	x = m_size = m_unavailable.size();
-	if (x < 50)
-		steps = x;
-	else if ((int)((x * 0.05) + 0.5) < 50)
-		steps = 50;
-	else
-		steps = (int)((x * 0.05) + 0.5);
+	steps = (int)((x * 0.05) + 0.5);
 
 	if (steps <= 0) steps = 1;
+	strcpy(m_search, "started");
 }
 
 ui_menu_audit::~ui_menu_audit()
@@ -106,6 +102,11 @@ ui_menu_audit::~ui_menu_audit()
 
 void ui_menu_audit::handle()
 {
+	bool fin = false;
+	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_CUSTOM_ONLY);
+	if (menu_event != NULL && menu_event->iptkey == IPT_UI_CANCEL)
+		fin = true;
+
 	if (x == m_unavailable.size())
 	{
 		machine().ui().draw_text_box(container, "Audit in progress...", JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
@@ -113,8 +114,7 @@ void ui_menu_audit::handle()
 		return;
 	}
 
-	int start = x;
-	int count = start - steps;
+	int count = x - steps;
 	for (; x > count && x >= 0; --x)
 	{
 		driver_enumerator enumerator(machine().options(), m_unavailable[x]->name);
@@ -130,12 +130,13 @@ void ui_menu_audit::handle()
 		}
 	}
 
-	if (x >= 0)
+	if (x >= 0 && !fin)
 	{
 		int perc = ((m_size - x) * 100) / m_size;
 		std::string text;
-		strprintf(text, "Audit in progress... %3d", perc);
+		strprintf(text, "Audit in progress... %3d%%", perc);
 		machine().ui().draw_text_box(container, text.c_str(), JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
+		return;
 	}
 	else
 	{
@@ -144,7 +145,6 @@ void ui_menu_audit::handle()
 		std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
 		m_unavailablesorted = m_unavailable;
 		std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
-
 		ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
 		ui_menu::stack_pop(machine());
 	}
@@ -156,4 +156,5 @@ void ui_menu_audit::handle()
 
 void ui_menu_audit::populate()
 {
+	item_append("Dummy", NULL, 0, (void *)1);
 }

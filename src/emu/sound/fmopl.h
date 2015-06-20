@@ -6,9 +6,9 @@
 #define __FMOPL_H__
 
 /* --- select emulation chips --- */
-#define BUILD_YM3812 (1)
-#define BUILD_YM3526 (1)
-#define BUILD_Y8950  (1)
+//#define BUILD_YM3812 (1)
+//#define BUILD_YM3526 (1)
+//#define BUILD_Y8950  (1)
 
 /* select output bits size of output : 8 or 16 */
 #define OPL_SAMPLE_BITS 16

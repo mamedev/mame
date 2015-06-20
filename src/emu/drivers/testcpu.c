@@ -151,14 +151,14 @@ public:
 	{
 		UINT64 fulloffs = offset;
 		UINT64 result = fulloffs + (fulloffs << 8) + (fulloffs << 16) + (fulloffs << 24) + (fulloffs << 32);
-		printf("Read from %08X & %016" I64FMT "X = %016" I64FMT "X\n", offset * 8, mem_mask, result);
+		printf("Read from %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((result&0xffffffff00000000LL) >> 32), (int)(result&0xffffffff));
 		return result;
 	}
 
 	// report writes to anywhere
 	WRITE64_MEMBER( general_w )
 	{
-		printf("Write to %08X & %016" I64FMT "X = %016" I64FMT "X\n", offset * 8, mem_mask, data);
+		printf("Write to %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((data&0xffffffff00000000LL) >> 32), (int)(data&0xffffffff));
 	}
 
 private:

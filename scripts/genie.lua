@@ -355,6 +355,11 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "DRIVERS",
+	description = "List of drivers to compile.",
+}
+
 if _OPTIONS["SHLIB"]=="1" then
 	LIBTYPE = "SharedLib"
 else
@@ -488,11 +493,16 @@ msgarchiving ("Archiving $(notdir $@)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
-	error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+if (_OPTIONS["DRIVERS"] == nil) then 
+	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
+		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+	end
+	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+else
+	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "src/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " target " .. _OPTIONS["subtarget"])
+	load(OUT_STR)()
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "src/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["DRIVERS"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.c")
 end
-dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-
 configuration { "gmake" }
 	flags {
 		"SingleOutputDir",
@@ -800,7 +810,7 @@ if _OPTIONS["OPTIMIZE"] then
 		}
 	end
 	if _OPTIONS["LTO"]=="1" then
--- -flto=4 -> 4 threads
+-- -flto=4 -> 4 threads, reduce if you are low on memory (less than 8G)
 		buildoptions {
 			"-flto=4",
 		}
@@ -826,7 +836,8 @@ end
 
 if _OPTIONS["SSE2"]=="1" then
 	buildoptions {
-		"-msse2",
+		"-msse",
+		"-msse2"
 	}
 end
 

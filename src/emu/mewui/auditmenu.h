@@ -23,7 +23,10 @@ public:
 	virtual void populate();
 	virtual void handle();
 
+	virtual bool menu_has_search_active() { return (m_search[0] != 0); }
+
 private:
+	char m_search[40];
 	std::vector<const game_driver *> &m_available;
 	std::vector<const game_driver *> &m_unavailable;
 	std::vector<const game_driver *> &m_availablesorted;

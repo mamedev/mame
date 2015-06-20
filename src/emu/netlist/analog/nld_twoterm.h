@@ -152,7 +152,7 @@ protected:
 };
 
 NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, R_base,
-	netlist_param_double_t m_R;
+	param_double_t m_R;
 );
 
 // ----------------------------------------------------------------------------------------
@@ -163,18 +163,18 @@ NETLIB_DEVICE_WITH_PARAMS(POT,
 	NETLIB_NAME(R_base) m_R1;
 	NETLIB_NAME(R_base) m_R2;
 
-	netlist_param_double_t m_R;
-	netlist_param_double_t m_Dial;
-	netlist_param_logic_t m_DialIsLog;
+	param_double_t m_R;
+	param_double_t m_Dial;
+	param_logic_t m_DialIsLog;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(POT2,
 	NETLIB_NAME(R_base) m_R1;
 
-	netlist_param_double_t m_R;
-	netlist_param_double_t m_Dial;
-	netlist_param_logic_t m_DialIsLog;
-	netlist_param_logic_t m_Reverse;
+	param_double_t m_R;
+	param_double_t m_Dial;
+	param_logic_t m_DialIsLog;
+	param_logic_t m_Reverse;
 );
 
 
@@ -200,7 +200,7 @@ protected:
 	virtual void update_param();
 	ATTR_HOT void update();
 
-	netlist_param_double_t m_C;
+	param_double_t m_C;
 
 };
 
@@ -209,10 +209,10 @@ protected:
 // A generic diode model to be used in other devices (Diode, BJT ...)
 // ----------------------------------------------------------------------------------------
 
-class netlist_generic_diode
+class generic_diode
 {
 public:
-	ATTR_COLD netlist_generic_diode();
+	ATTR_COLD generic_diode();
 
 	ATTR_HOT inline void update_diode(const nl_double nVd)
 	{
@@ -288,9 +288,9 @@ protected:
 	virtual void update_param();
 	ATTR_HOT void update();
 
-	netlist_param_model_t m_model;
+	param_model_t m_model;
 
-	netlist_generic_diode m_D;
+	generic_diode m_D;
 };
 
 

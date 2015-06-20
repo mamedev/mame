@@ -213,7 +213,7 @@ void ui_menu_selector::find_matches(const char *str)
 
 	for (; index < str_items.size(); index++)
 	{
-		if (str_items[index].compare("_skip_") == 0)
+		if (!str_items[index].compare("_skip_"))
 			continue;
 
 		// pick the best match between driver name and description

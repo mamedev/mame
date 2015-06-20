@@ -5,8 +5,8 @@
  *
  */
 
+#include <solver/nld_solver.h>
 #include "nld_system.h"
-#include "../analog/nld_solver.h"
 
 NETLIB_NAMESPACE_DEVICES_START()
 

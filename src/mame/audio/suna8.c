@@ -29,7 +29,7 @@ SAMPLES_START_CB_MEMBER(suna8_state::sh_start)
 
 WRITE8_MEMBER(suna8_state::suna8_samples_number_w)
 {
-	m_sample = data & 0xf;
+	m_sample = data;
 	logerror("%s: sample number = %02X\n", machine().describe_context(), data);
 }
 
@@ -49,30 +49,27 @@ void suna8_state::play_sample(int index)
 WRITE8_MEMBER(suna8_state::suna8_play_samples_w)
 {
 	logerror("%s: play sample = %02X\n", machine().describe_context(), data);
-	if ( data )
-	{
-		if ( ~data & 0x10 )
-		{
-			play_sample(m_sample);
-		}
-		else if ( ~data & 0x08 )
-		{
-			play_sample((m_sample & 3) + 7);
-		}
-		else if ( ~data & 0x40 )    // sparkman, second sample rom
-		{
-			play_sample(m_sample + 0x10);
-		}
-	}
+
+	// At boot: ff (ay reset) -> 00 (game writes ay enable) -> f9 (game writes to port A).
+	// Then game writes f9 -> f1 -> f9. Is bit 3 stop/reset?
+
+	if ( m_play == 0xe9 && data == 0xf9 )
+		play_sample(m_sample & 0x0f);
+	else if ( m_play == 0xb9 && data == 0xf9 ) // second sample rom
+		play_sample(((m_sample >> 4) & 0x0f) + 0x10);
+
+	m_play = data;
 }
 
 WRITE8_MEMBER(suna8_state::rranger_play_samples_w)
 {
-	if (data)
-	{
-		if (( m_sample != 0 ) && ( ~data & 0x30 ))  // don't play sample zero when those bits are active
-		{
-			play_sample(m_sample);
-		}
-	}
+	logerror("%s: play sample = %02X\n", machine().describe_context(), data);
+
+	// At boot: ff (ay reset) -> 00 (game writes ay enable) -> 30 (game writes to port A).
+	// Is bit 6 stop/reset?
+
+	if ( m_play == 0x60 && data == 0x70 )
+		play_sample(m_sample & 0x0f);
+
+	m_play = data;
 }

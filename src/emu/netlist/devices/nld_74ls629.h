@@ -56,7 +56,7 @@ public:
 	analog_input_t m_RNG;
 	analog_input_t m_FC;
 
-	netlist_param_double_t m_CAP;
+	param_double_t m_CAP;
 );
 
 #define SN74LS629_DIP(_name, _cap1, _cap2)                                        \

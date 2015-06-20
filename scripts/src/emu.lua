@@ -410,9 +410,7 @@ function emuProject(_target, _subtarget)
 
 	dofile(path.join("src", "machine.lua"))
 
-	--	netlist now defines a project
-	dofile(path.join("src", "netlist.lua"))
-
+if (_OPTIONS["DRIVERS"] == nil) then 
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
 	kind (LIBTYPE)
@@ -450,6 +448,12 @@ function emuProject(_target, _subtarget)
 	end
 
 	dofile(path.join("src", "bus.lua"))
+else
+	dofile(path.join("src", "bus.lua"))
+end
+	
+	--	netlist now defines a project
+	dofile(path.join("src", "netlist.lua"))
 
 
 	project ("dasm")
