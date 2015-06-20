@@ -2200,6 +2200,8 @@ if (MACHINES["UPD765"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/machine/upd765.c",
 		MAME_DIR .. "src/emu/machine/upd765.h",
+		MAME_DIR .. "src/emu/machine/fdc_pll.c",
+		MAME_DIR .. "src/emu/machine/fdc_pll.h",
 	}
 end
 
