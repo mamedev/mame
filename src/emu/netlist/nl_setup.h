@@ -50,11 +50,12 @@
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
 #define NETLIST_EXTERNAL(_name)                                                     \
-ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)
+		ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup);
 
 #define NETLIST_START(_name)                                                        \
 ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)                          \
 {
+
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(_name)															\

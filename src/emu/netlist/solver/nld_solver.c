@@ -428,8 +428,8 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int gs_thre
 			}
 			else
 			{
-				typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
-				//typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GS;
+				//typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
+				typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GS;
 				return palloc(solver_GS, &m_params, size);
 			}
 		}
@@ -501,7 +501,6 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		switch (net_count)
 		{
-#if 1
 			case 1:
 				ms = create_solver<1,1>(1, gs_threshold, use_specific);
 				break;
@@ -532,9 +531,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 			case 87:
 				ms = create_solver<87,87>(87, gs_threshold, use_specific);
 				break;
-#endif
 			default:
-#if 0
 				if (net_count <= 16)
 				{
 					ms = create_solver<0,16>(net_count, gs_threshold, use_specific);
@@ -548,7 +545,6 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 					ms = create_solver<0,64>(net_count, gs_threshold, use_specific);
 				}
 				else
-#endif
 					if (net_count <= 128)
 				{
 					ms = create_solver<0,128>(net_count, gs_threshold, use_specific);

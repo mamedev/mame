@@ -70,17 +70,13 @@ inline void vec_mult_scalar (const int n, const double * RESTRICT v, const doubl
 inline void vec_add_mult_scalar (const int n, const double * RESTRICT v, const double scalar, double * RESTRICT result)
 {
 	for ( unsigned i = 0; i < n; i++ )
-	{
 		result[i] += scalar * v[i];
-	}
 }
 
 inline void vec_add_ip(const int n, const double * RESTRICT v, double * RESTRICT result)
 {
 	for ( unsigned i = 0; i < n; i++ )
-	{
 		result[i] += v[i];
-	}
 }
 
 inline void vec_sub(const int n, const double * RESTRICT v1, const double * RESTRICT v2, double * RESTRICT result)
@@ -89,13 +85,21 @@ inline void vec_sub(const int n, const double * RESTRICT v1, const double * REST
 		result[i] = v1[i] - v2[i];
 }
 
-
 inline void vec_scale (const int n, double * RESTRICT v, const double scalar)
 {
 	for ( unsigned i = 0; i < n; i++ )
-	{
 		v[i] = scalar * v[i];
-	}
 }
+
+inline double vec_maxabs(const int n, const double * RESTRICT v)
+{
+	double ret = 0.0;
+	for ( unsigned i = 0; i < n; i++ )
+		ret = std::max(ret, std::abs(v[i]));
+
+	return ret;
+}
+
+
 
 #endif /* MAT_CR_H_ */

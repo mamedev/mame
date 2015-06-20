@@ -294,8 +294,8 @@ void netlist_mame_device_t::device_start()
 
 	//printf("clock is %d\n", clock());
 
-	m_netlist = global_alloc_clear(netlist_mame_t(*this));
-	m_setup = global_alloc_clear(netlist::setup_t(m_netlist));
+	m_netlist = global_alloc(netlist_mame_t(*this));
+	m_setup = global_alloc(netlist::setup_t(m_netlist));
 	netlist().init_object(*m_netlist, "netlist");
 	m_setup->init();
 
@@ -459,7 +459,7 @@ void netlist_mame_cpu_device_t::device_start()
 {
 	netlist_mame_device_t::device_start();
 
-	LOG_DEV_CALLS(("device_start %s\n", tag()));
+	LOG_DEV_CALLS(("cpu device_start %s\n", tag()));
 
 	// State support
 
@@ -550,12 +550,11 @@ netlist_mame_sound_device_t::netlist_mame_sound_device_t(const machine_config &m
 {
 }
 
-
 void netlist_mame_sound_device_t::device_start()
 {
 	netlist_mame_device_t::device_start();
 
-	LOG_DEV_CALLS(("device_start %s\n", tag()));
+	LOG_DEV_CALLS(("sound device_start %s\n", tag()));
 
 	// Configure outputs
 
