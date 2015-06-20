@@ -120,6 +120,8 @@ struct n64_tile_t
 	INT32 lshift_s, rshift_s, lshift_t, rshift_t;
 	INT32 wrapped_mask_s, wrapped_mask_t;
 	bool clamp_s, clamp_t;
+	rgbaint_t mm, invmm;
+	rgbaint_t wrapped_mask, mask, lshift, rshift, sth, stl, clamp_st;
 	UINT16 sl, tl, sh, th;      // 10.2 fixed-point, starting and ending texel row / column
 	INT32 num;
 };
@@ -272,15 +274,13 @@ struct rdp_span_aux
 	color_t             m_next_texel_color;
 	color_t             m_next_texel_alpha;
 	color_t             m_blend_color;          /* constant blend color */
-	color_t             m_blend_alpha;          /* constant blend alpha */
 	color_t             m_prim_color;           /* flat primitive color */
 	color_t             m_prim_alpha;           /* flat primitive alpha */
 	color_t             m_env_color;            /* generic color constant ('environment') */
-	color_t             m_env_alpha;            /* generic color constant ('environment') */
+	color_t             m_env_alpha;            /* generic alpha constant ('environment') */
 	color_t             m_fog_color;            /* generic color constant ('fog') */
-	color_t             m_fog_alpha;            /* generic color constant ('fog') */
 	color_t             m_shade_color;          /* gouraud-shaded color */
-	color_t             m_shade_alpha;          /* gouraud-shaded color */
+	color_t             m_shade_alpha;          /* gouraud-shaded alpha */
 	color_t             m_key_scale;            /* color-keying constant */
 	color_t             m_noise_color;          /* noise */
 	color_t				m_lod_fraction;			/* Z-based LOD fraction for this poly */
@@ -300,8 +300,7 @@ struct rdp_span_aux
 	INT32               m_dzpix_enc;
 	UINT8*              m_tmem;                /* pointer to texture cache for this polygon */
 	bool                m_start_span;
-	INT32               m_clamp_s_diff[8];
-	INT32               m_clamp_t_diff[8];
+	rgbaint_t			m_clamp_diff[8];
 };
 
 struct z_decompress_entry_t

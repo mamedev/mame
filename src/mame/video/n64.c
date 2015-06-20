@@ -429,12 +429,12 @@ void n64_rdp::set_add_input_rgb(color_t** input, INT32 code, rdp_span_aux* userd
 {
 	switch (code & 0x7)
 	{
-		case 0:     *input = &userdata->m_combined_alpha; break;
-		case 1:     *input = &userdata->m_texel0_alpha; break;
-		case 2:     *input = &userdata->m_texel1_alpha; break;
-		case 3:     *input = &userdata->m_prim_alpha; break;
-		case 4:     *input = &userdata->m_shade_alpha; break;
-		case 5:     *input = &userdata->m_env_alpha; break;
+		case 0:     *input = &userdata->m_combined_color; break;
+		case 1:     *input = &userdata->m_texel0_color; break;
+		case 2:     *input = &userdata->m_texel1_color; break;
+		case 3:     *input = &userdata->m_prim_color; break;
+		case 4:     *input = &userdata->m_shade_color; break;
+		case 5:     *input = &userdata->m_env_color; break;
 		case 6:     *input = &m_one; break;
 		case 7:     *input = &m_zero; break;
 	}
@@ -496,8 +496,8 @@ void n64_rdp::set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, c
 		switch (b & 0x3)
 		{
 			case 0:     *input_a = &userdata->m_pixel_color; break;
-			case 1:     *input_a = &userdata->m_fog_alpha; break;
-			case 2:     *input_a = &userdata->m_shade_alpha; break;
+			case 1:     *input_a = &userdata->m_fog_color; break;
+			case 2:     *input_a = &userdata->m_shade_color; break;
 			case 3:     *input_a = &m_zero; break;
 		}
 	}
@@ -2041,10 +2041,8 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 				userdata->m_prim_color = m_prim_color;
 				userdata->m_env_color = m_env_color;
 				userdata->m_fog_color = m_fog_color;
-				userdata->m_blend_alpha = m_blend_alpha;
 				userdata->m_prim_alpha = m_prim_alpha;
 				userdata->m_env_alpha = m_env_alpha;
-				userdata->m_fog_alpha = m_fog_alpha;
 				userdata->m_key_scale = m_key_scale;
 				userdata->m_lod_fraction = m_lod_fraction;
 				userdata->m_prim_lod_fraction = m_prim_lod_fraction;
@@ -2112,7 +2110,7 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 		xright += xright_inc;
 	}
 
-	if(!new_object && valid && !ignored)
+	if(!new_object && valid)
 	{
 		render_spans(yh >> 2, yl >> 2, tilenum, flip ? true : false, spans, rect, object);
 	}
@@ -2327,22 +2325,19 @@ void n64_rdp::cmd_set_fill_color32(UINT32 w1, UINT32 w2)
 void n64_rdp::cmd_set_convert(UINT32 w1, UINT32 w2)
 {
 	if(!m_pipe_clean) { m_pipe_clean = true; wait("SetConvert"); }
-	INT32 k0 = (w1 >> 13) & 0xff;
-	INT32 k1 = (w1 >> 4) & 0xff;
-	INT32 k2 = ((w1 & 7) << 5) | ((w2 >> 27) & 0x1f);
-	INT32 k3 = (w2 >> 18) & 0xff;
-	INT32 k4 = (w2 >> 9) & 0xff;
-	INT32 k5 = w2 & 0xff;
-	k0 = ((w1 >> 21) & 1) ? (-(0x100 - k0)) : k0;
-	k1 = ((w1 >> 12) & 1) ? (-(0x100 - k1)) : k1;
-	k2 = (w1 & 0xf) ? (-(0x100 - k2)) : k2;
-	k3 = ((w2 >> 26) & 1) ? (-(0x100 - k3)) : k3;
-	k4 = ((w2 >> 17) & 1) ? (-(0x100 - k4)) : k4;
-	k5 = ((w2 >> 8) & 1) ? (-(0x100 - k5)) : k5;
+	INT32 k0 = (w1 >> 13) & 0x1ff;
+	INT32 k1 = (w1 >> 4) & 0x1ff;
+	INT32 k2 = ((w1 & 0xf) << 5) | ((w2 >> 27) & 0x1f);
+	INT32 k3 = (w2 >> 18) & 0x1ff;
+	INT32 k4 = (w2 >> 9) & 0x1ff;
+	INT32 k5 = w2 & 0x1ff;
 
-	const UINT32 k4val = k4 & 0xff;
-	const UINT32 k5val = k5 & 0xff;
-	set_yuv_factors(k0, k1, k2, k3, rgbaint_t(k4val, k4val, k4val, k4val), rgbaint_t(k5val, k5val, k5val, k5val));
+	k0 = (SIGN9(k0) << 1) + 1;
+	k1 = (SIGN9(k1) << 1) + 1;
+	k2 = (SIGN9(k2) << 1) + 1;
+	k3 = (SIGN9(k3) << 1) + 1;
+
+	set_yuv_factors(rgbaint_t(0, k0, k2, k3), rgbaint_t(0, 0, k1, 0), rgbaint_t(k4, k4, k4, k4), rgbaint_t(k5, k5, k5, k5));
 }
 
 void n64_rdp::cmd_set_scissor(UINT32 w1, UINT32 w2)
@@ -2450,6 +2445,9 @@ void n64_rdp::cmd_load_tlut(UINT32 w1, UINT32 w2)
 		}
 		default:    fatalerror("RDP: load_tlut: size = %d\n", m_misc_state.m_ti_size);
 	}
+
+	m_tiles[tilenum].sth = rgbaint_t(0, m_tiles[tilenum].sh, 0, m_tiles[tilenum].th);
+	m_tiles[tilenum].stl = rgbaint_t(0, m_tiles[tilenum].sl, 0, m_tiles[tilenum].tl);
 }
 
 void n64_rdp::cmd_set_tile_size(UINT32 w1, UINT32 w2)
@@ -2462,13 +2460,14 @@ void n64_rdp::cmd_set_tile_size(UINT32 w1, UINT32 w2)
 	m_tiles[tilenum].tl = (w1 >>  0) & 0xfff;
 	m_tiles[tilenum].sh = (w2 >> 12) & 0xfff;
 	m_tiles[tilenum].th = (w2 >>  0) & 0xfff;
+
+	m_tiles[tilenum].sth = rgbaint_t(0, m_tiles[tilenum].sh, 0, m_tiles[tilenum].th);
+	m_tiles[tilenum].stl = rgbaint_t(0, m_tiles[tilenum].sl, 0, m_tiles[tilenum].tl);
 }
 
 void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 {
 	//wait("LoadBlock");
-	ignored = false;
-	if (w1 != 0xf3000000 || w2 != 0x070ff200) ignored = true;
 	n64_tile_t* tile = m_tiles;
 
 	const INT32 tilenum = (w2 >> 24) & 0x7;
@@ -2626,6 +2625,9 @@ void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 		}
 		tile[tilenum].th = tl;
 	}
+
+	m_tiles[tilenum].sth = rgbaint_t(0, m_tiles[tilenum].sh, 0, m_tiles[tilenum].th);
+	m_tiles[tilenum].stl = rgbaint_t(0, m_tiles[tilenum].sl, 0, m_tiles[tilenum].tl);
 }
 
 void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
@@ -2745,6 +2747,9 @@ void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
 
 		default:    fatalerror("RDP: load_tile: size = %d\n", m_misc_state.m_ti_size);
 	}
+
+	m_tiles[tilenum].sth = rgbaint_t(0, m_tiles[tilenum].sh, 0, m_tiles[tilenum].th);
+	m_tiles[tilenum].stl = rgbaint_t(0, m_tiles[tilenum].sl, 0, m_tiles[tilenum].tl);
 }
 
 void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
@@ -2774,8 +2779,15 @@ void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
 	tex_tile->rshift_t  = (tex_tile->shift_t < 11) ? tex_tile->shift_t : 0;
 	tex_tile->wrapped_mask_s = (tex_tile->mask_s > 10 ? 10 : tex_tile->mask_s);
 	tex_tile->wrapped_mask_t = (tex_tile->mask_t > 10 ? 10 : tex_tile->mask_t);
+	tex_tile->wrapped_mask = rgbaint_t(tex_tile->wrapped_mask_s, tex_tile->wrapped_mask_s, tex_tile->wrapped_mask_t, tex_tile->wrapped_mask_t);
 	tex_tile->clamp_s = tex_tile->cs || !tex_tile->mask_s;
 	tex_tile->clamp_t = tex_tile->ct || !tex_tile->mask_t;
+	tex_tile->mm = rgbaint_t(tex_tile->ms ? ~0 : 0, tex_tile->ms ? ~0 : 0, tex_tile->mt ? ~0 : 0, tex_tile->mt ? ~0 : 0);
+	tex_tile->invmm = rgbaint_t(tex_tile->ms ? 0 : ~0, tex_tile->ms ? 0 : ~0, tex_tile->mt ? 0 : ~0, tex_tile->mt ? 0 : ~0);
+	tex_tile->mask = rgbaint_t(tex_tile->mask_s, tex_tile->mask_s, tex_tile->mask_t, tex_tile->mask_t);
+	tex_tile->lshift = rgbaint_t(0, tex_tile->lshift_s, 0, tex_tile->lshift_t);
+	tex_tile->rshift = rgbaint_t(0, tex_tile->rshift_s, 0, tex_tile->rshift_t);
+	tex_tile->clamp_st = rgbaint_t(0, tex_tile->clamp_s ? ~0 : 0, 0, tex_tile->clamp_t ? ~0 : 0);
 
 	if (tex_tile->format == FORMAT_I && tex_tile->size > PIXEL_SIZE_8BIT)
 	{
@@ -2828,13 +2840,11 @@ void n64_rdp::cmd_fill_rect(UINT32 w1, UINT32 w2)
 void n64_rdp::cmd_set_fog_color(UINT32 w1, UINT32 w2)
 {
 	m_fog_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
-	m_fog_alpha.set(m_fog_color);
 }
 
 void n64_rdp::cmd_set_blend_color(UINT32 w1, UINT32 w2)
 {
 	m_blend_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
-	m_blend_alpha.set(m_blend_color);
 }
 
 void n64_rdp::cmd_set_prim_color(UINT32 w1, UINT32 w2)
@@ -2844,13 +2854,13 @@ void n64_rdp::cmd_set_prim_color(UINT32 w1, UINT32 w2)
 	m_prim_lod_fraction.set_rgba(prim_lod_fraction, prim_lod_fraction, prim_lod_fraction, prim_lod_fraction);
 
 	m_prim_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
-	m_prim_alpha.set(m_prim_color);
+	m_prim_alpha.set_rgba(w2 & 0xff, w2 & 0xff, w2 & 0xff, w2 & 0xff);
 }
 
 void n64_rdp::cmd_set_env_color(UINT32 w1, UINT32 w2)
 {
 	m_env_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
-	m_env_alpha.set(m_env_color);
+	m_env_alpha.set_rgba(w2 & 0xff, w2 & 0xff, w2 & 0xff, w2 & 0xff);
 }
 
 void n64_rdp::cmd_set_combine(UINT32 w1, UINT32 w2)
@@ -3031,7 +3041,6 @@ void n64_rdp::process_command_list()
 
 n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 32000>(state.machine())
 {
-	ignored = true;
 	m_aux_buf_ptr = 0;
 	m_aux_buf = NULL;
 	m_pipe_clean = true;

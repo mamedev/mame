@@ -192,11 +192,9 @@ public:
 	UINT8       get_random() { return m_misc_state.m_random_seed += 0x13; }
 
 	// YUV Factors
-	void        set_yuv_factors(INT32 k0, INT32 k1, INT32 k2, INT32 k3, color_t k4, color_t k5) { m_k0 = k0; m_k1 = k1; m_k2 = k2; m_k3 = k3; m_k4 = k4; m_k5 = k5; }
-	INT32       get_k0() const { return m_k0; }
-	INT32       get_k1() const { return m_k1; }
-	INT32       get_k2() const { return m_k2; }
-	INT32       get_k3() const { return m_k3; }
+	void        set_yuv_factors(color_t k023, color_t k1, color_t k4, color_t k5) { m_k023 = k023; m_k1 = k1; m_k4 = k4; m_k5 = k5; }
+	color_t&	get_k023() { return m_k023; }
+	color_t&	get_k1() { return m_k1; }
 
 	// Blender-related (move into RDP::Blender)
 	void        set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, color_t** input_a, INT32 a, INT32 b, rdp_span_aux* userdata);
@@ -277,13 +275,11 @@ public:
 
 	// Color constants
 	color_t         m_blend_color;          /* constant blend color */
-	color_t         m_blend_alpha;          /* constant blend alpha */
 	color_t         m_prim_color;           /* flat primitive color */
 	color_t         m_prim_alpha;           /* flat primitive alpha */
 	color_t         m_env_color;            /* generic color constant ('environment') */
 	color_t         m_env_alpha;            /* generic alpha constant ('environment') */
 	color_t         m_fog_color;            /* generic color constant ('fog') */
-	color_t         m_fog_alpha;            /* generic alpha constant ('fog') */
 	color_t         m_key_scale;            /* color-keying constant */
 	color_t			m_lod_fraction;         /* Z-based LOD fraction for this poly */
 	color_t			m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
@@ -364,10 +360,8 @@ private:
 	UINT8*  m_tmem;
 
 	// YUV factors
-	INT32 m_k0;
-	INT32 m_k1;
-	INT32 m_k2;
-	INT32 m_k3;
+	color_t m_k023;
+	color_t m_k1;
 	color_t m_k4;
 	color_t m_k5;
 
@@ -378,7 +372,6 @@ private:
 	INT32 m_gamma_table[256];
 	INT32 m_gamma_dither_table[0x4000];
 
-	bool ignored;
 	static UINT32 s_special_9bit_clamptable[512];
 	static const z_decompress_entry_t m_z_dec_table[8];
 
