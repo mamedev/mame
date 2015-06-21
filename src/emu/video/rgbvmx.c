@@ -11,7 +11,6 @@
 #if defined(__ALTIVEC__)
 
 #include "emu.h"
-#include <emmintrin.h>
 #include "rgbutil.h"
 
 /***************************************************************************
