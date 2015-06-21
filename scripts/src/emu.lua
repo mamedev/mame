@@ -314,6 +314,7 @@ files {
 	MAME_DIR .. "src/emu/video/rgbgen.h",
 	MAME_DIR .. "src/emu/video/rgbsse.c",
 	MAME_DIR .. "src/emu/video/rgbsse.h",
+	MAME_DIR .. "src/emu/video/rgbvmx.c",
 	MAME_DIR .. "src/emu/video/rgbvmx.h",
 	MAME_DIR .. "src/emu/video/vector.c",
 	MAME_DIR .. "src/emu/video/vector.h",

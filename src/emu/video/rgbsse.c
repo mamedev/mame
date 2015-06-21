@@ -10,6 +10,8 @@
 
 ***************************************************************************/
 
+#if defined(__SSE2__) || defined(_MSC_VER)
+
 #include "emu.h"
 #include <emmintrin.h>
 #include "rgbutil.h"
@@ -90,3 +92,5 @@ UINT32 rgbaint_t::bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT
 	color01 = _mm_packus_epi16(color01, color01);
 	return _mm_cvtsi128_si32(color01);
 }
+
+#endif // defined(__SSE2__) || defined(_MSC_VER)
