@@ -764,7 +764,7 @@ void construct_core_types_UI(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_UP_PANEL,         NULL,                     input_seq() )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_DOWN_PANEL,       NULL,                     input_seq() )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_EXPORT,           NULL,                     input_seq(KEYCODE_LALT, KEYCODE_E) )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_AUDIT_FAST,       "Audit Unavailable",      input_seq(KEYCODE_F1) )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_AUDIT_FAST,       "Audit Unavailable",      input_seq(KEYCODE_F1, input_seq::not_code, KEYCODE_LSHIFT) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_AUDIT_ALL,        "Audit All",              input_seq(KEYCODE_F1, KEYCODE_LSHIFT) )
 }
 

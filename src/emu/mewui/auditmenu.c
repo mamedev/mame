@@ -82,14 +82,18 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 
 ui_menu_audit::ui_menu_audit(running_machine &machine, render_container *container, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable, std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted,  int _audit_mode)
 	: ui_menu(machine, container), m_available(available), m_unavailable(unavailable),
-	  m_availablesorted(availablesorted), m_unavailablesorted(unavailablesorted)
+		m_availablesorted(availablesorted), m_unavailablesorted(unavailablesorted), m_audit_mode(_audit_mode)
 {
-	m_audit_mode = _audit_mode;
-	x = m_size = m_unavailable.size();
-	steps = (int)((x * 0.05) + 0.5);
-
-	if (steps <= 0) steps = 1;
-	strcpy(m_search, "started");
+	if (m_audit_mode == 1)
+		x = m_size = m_unavailable.size();
+	else
+	{
+		m_available.clear();
+		m_unavailable.clear();
+		m_availablesorted.clear();
+		m_unavailablesorted.clear();
+		x = m_size = driver_list::total();
+	}
 }
 
 ui_menu_audit::~ui_menu_audit()
@@ -102,52 +106,61 @@ ui_menu_audit::~ui_menu_audit()
 
 void ui_menu_audit::handle()
 {
-	bool fin = false;
-	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_CUSTOM_ONLY);
-	if (menu_event != NULL && menu_event->iptkey == IPT_UI_CANCEL)
-		fin = true;
+	process(UI_MENU_PROCESS_CUSTOM_ONLY);
 
-	if (x == m_unavailable.size())
+	if (x == m_size)
 	{
+		process(UI_MENU_PROCESS_CUSTOM_ONLY);
 		machine().ui().draw_text_box(container, "Audit in progress...", JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
-		x = m_unavailable.size() - 1;
+		x = m_size - 1;
 		return;
 	}
 
-	int count = x - steps;
-	for (; x > count && x >= 0; --x)
+	if (m_audit_mode == 1)
 	{
-		driver_enumerator enumerator(machine().options(), m_unavailable[x]->name);
-		enumerator.next();
-		media_auditor auditor(enumerator);
-		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
-
-		// if everything looks good, include the driver
-		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+		for (; x >= 0; --x)
 		{
-			m_available.push_back(m_unavailable[x]);
-			m_unavailable.erase(m_unavailable.begin() + x);
-		}
-	}
+			driver_enumerator enumerator(machine().options(), m_unavailable[x]->name);
+			enumerator.next();
+			media_auditor auditor(enumerator);
+			media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
-	if (x >= 0 && !fin)
-	{
-		int perc = ((m_size - x) * 100) / m_size;
-		std::string text;
-		strprintf(text, "Audit in progress... %3d%%", perc);
-		machine().ui().draw_text_box(container, text.c_str(), JUSTIFY_CENTER, 0.5f, 0.5f, UI_GREEN_COLOR);
-		return;
+			// if everything looks good, include the driver
+			if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+			{
+				m_available.push_back(m_unavailable[x]);
+				m_unavailable.erase(m_unavailable.begin() + x);
+			}
+		}
 	}
 	else
 	{
-		// sort
-		m_availablesorted = m_available;
-		std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
-		m_unavailablesorted = m_unavailable;
-		std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
-		ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
-		ui_menu::stack_pop(machine());
+		for (; x >= 0; --x)
+		{
+			const game_driver *driver = &driver_list::driver(x);
+			if (!strcmp("___empty", driver->name))
+				continue;
+
+			driver_enumerator enumerator(machine().options(), driver->name);
+			enumerator.next();
+			media_auditor auditor(enumerator);
+			media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+
+			// if everything looks good, include the driver
+			if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+				m_available.push_back(driver);
+			else
+				m_unavailable.push_back(driver);
+		}
 	}
+
+	// sort
+	m_availablesorted = m_available;
+	std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
+	m_unavailablesorted = m_unavailable;
+	std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
+	ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
+	ui_menu::stack_pop(machine());
 }
 
 //-------------------------------------------------

@@ -398,6 +398,10 @@ void ui_mewui_select_game::handle()
 		else if (menu_event->iptkey == IPT_UI_AUDIT_FAST && !m_unavailablelist.empty())
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_audit(machine(), container, m_availablelist, m_unavailablelist, m_availsortedlist, m_unavailsortedlist, 1)));
 
+		// handle UI_AUDIT_ALL
+		else if (menu_event->iptkey == IPT_UI_AUDIT_ALL)
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_audit(machine(), container, m_availablelist, m_unavailablelist, m_availsortedlist, m_unavailsortedlist, 2)));
+
 		// typed characters append to the buffer
 		else if (menu_event->iptkey == IPT_SPECIAL)
 			inkey_special(menu_event);
@@ -1261,11 +1265,14 @@ void ui_mewui_select_game::build_category()
 	std::vector<int> temp_filter;
 	machine().inifile().load_ini_category(temp_filter);
 
+	m_tmp.resize(temp_filter.size());
 	for (int index = 0; index < temp_filter.size(); ++index)
 	{
 		int actual = temp_filter[index];
-		m_displaylist.push_back(&driver_list::driver(actual));
+		m_tmp.push_back(&driver_list::driver(actual));
 	}
+	std::stable_sort(m_tmp.begin(), m_tmp.end(), sort_game_list);
+	m_displaylist = m_tmp;
 }
 
 //-------------------------------------------------

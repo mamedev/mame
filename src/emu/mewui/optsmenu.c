@@ -28,8 +28,8 @@
 
 ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-//	m_grouped = machine.options().ui_grouped();
-//	m_audit = machine.options().audit_mode();
+//  m_grouped = machine.options().ui_grouped();
+//  m_audit = machine.options().audit_mode();
 }
 
 //-------------------------------------------------
@@ -39,8 +39,8 @@ ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_cont
 ui_menu_game_options::~ui_menu_game_options()
 {
 	std::string error_string;
-//	machine().options().set_value(OPTION_GROUPED, m_grouped, OPTION_PRIORITY_CMDLINE, error_string);
-//	machine().options().set_value(OPTION_AUDIT_MODE, m_audit, OPTION_PRIORITY_CMDLINE, error_string);
+//  machine().options().set_value(OPTION_GROUPED, m_grouped, OPTION_PRIORITY_CMDLINE, error_string);
+//  machine().options().set_value(OPTION_AUDIT_MODE, m_audit, OPTION_PRIORITY_CMDLINE, error_string);
 	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
 	save_game_options(machine());
 	mewui_globals::switch_image = true;
@@ -78,25 +78,7 @@ void ui_menu_game_options::handle()
 				}
 				break;
 			}
-/*
-			case DISPLAY_MODE:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
-				{
-					m_grouped = !m_grouped;
-					changed = true;
-				}
-				break;
-*/
-/*
-			case AUDIT_MODE:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
-				{
-					mewui_globals::force_reset_main = true;
-					m_audit = !m_audit;
-					changed = true;
-				}
-				break;
-*/
+
 			case FILE_CATEGORY_FILTER:
 			{
 				if (menu_event->iptkey == IPT_UI_LEFT)
@@ -294,18 +276,6 @@ void ui_menu_game_options::populate()
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
-	std::string str;
-
-/*	// add grouped subitem
-	arrow_flags = (m_grouped) ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW;
-	(m_grouped) ? str.assign("Grouped") : str.assign("Classic");
-	item_append("Diplay mode", str.c_str(), arrow_flags, (void *)DISPLAY_MODE);
-*/
-/*	// add audit subitem
-	arrow_flags = (m_audit) ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW;
-	(m_audit) ? str.assign("Folders Scan + Audit Missing Files") : str.assign("Folders Scan Only");
-	item_append("Audit mode", str.c_str(), arrow_flags, (void *)AUDIT_MODE);
-*/
 	// add options items
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Customize UI", NULL, 0, (void *)CUSTOM_MENU);
