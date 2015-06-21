@@ -40,24 +40,27 @@ def add_c_if_exists(root, fullname):
     except IOError:
         ignore=1
 
-def add_rest_if_exists(root, srcfile):
+def add_rest_if_exists(root, srcfile,folder):
     t = srcfile.rsplit('/', 2)
     if t[1]=='includes':
         t[2] = t[2].replace('.h','.c')
         t[1] = 'drivers'     
         add_c_if_exists(root,"/".join(t))
+        parse_file_for_deps(root, "/".join(t), folder)
         t[1] = 'machine'     
         add_c_if_exists(root,"/".join(t))
+        parse_file_for_deps(root, "/".join(t), folder)
         t[1] = 'video'     
         add_c_if_exists(root,"/".join(t))
+        parse_file_for_deps(root, "/".join(t), folder)
         t[1] = 'audio'
         add_c_if_exists(root,"/".join(t))
+        parse_file_for_deps(root, "/".join(t), folder)
 
 def parse_file_for_deps(root, srcfile, folder):
     try:
         fp = open(root + srcfile, 'rb')
     except IOError:
-        sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
     in_comment = 0
     linenum = 0
@@ -98,7 +101,7 @@ def parse_file_for_deps(root, srcfile, folder):
                if fullname!='':
                    deps_files_included.append(fullname)
                    add_c_if_exists(root, fullname.replace('.h','.c'))
-                   add_rest_if_exists(root, fullname)
+                   add_rest_if_exists(root, fullname,folder)
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file_for_deps(root, fullname, newfolder)
                continue
@@ -145,6 +148,8 @@ def parse_file(root, srcfile, folder):
                fullname = file_exists(root, name, folder,include_dirs)
                if fullname in files_included:
                    continue
+               if "src/emu/netlist/" in fullname:
+                   continue
                if fullname!='':
                    if fullname in mappings.keys():
                         if not(mappings[fullname] in components):
@@ -152,7 +157,8 @@ def parse_file(root, srcfile, folder):
                    files_included.append(fullname)
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file(root, fullname, newfolder)
-                   parse_file(root, fullname.replace('.h','.c'), newfolder)
+                   if (fullname.endswith('.h')):
+                       parse_file(root, fullname.replace('.h','.c'), newfolder)
                continue
     return 0
 

@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "hdc.h"
 
-#define LOG_HDC_STATUS      1
-#define LOG_HDC_CALL        1
-#define LOG_HDC_DATA        1
+#define LOG_HDC_STATUS      0
+#define LOG_HDC_CALL        0
+#define LOG_HDC_DATA        0
 
 #define CMD_TESTREADY   0x00
 #define CMD_RECALIBRATE 0x01
@@ -493,15 +493,11 @@ void xt_hdc_device::execute_writesbuff()
 	hdcdma_write = 512;
 	hdcdma_size = 512;
 
-	if (no_dma())
-	{
-		do
-		{
-			dack_ws(buffer[data_cnt++]);
-		}
-		while (hdcdma_size);
-	}
-	else
+	status |= STA_READY;  // ready to recieve data
+	status |= STA_INPUT;
+	status &= ~STA_COMMAND;
+
+	if (!no_dma())
 	{
 		m_drq_handler(1);
 	}
@@ -631,7 +627,6 @@ void xt_hdc_device::command()
 			}
 
 			execute_writesbuff();
-			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
 
 		case CMD_SETPARAM:
@@ -656,32 +651,6 @@ void xt_hdc_device::command()
 			break;
 	}
 }
-
-void st11m_device::command()
-{
-	int set_error_info = 1;
-
-	csb = 0x00;
-	error = 0;
-
-	buffer_ptr = &buffer[0];
-
-	get_drive();
-
-	switch (m_current_cmd)
-	{
-	case CMD_WRITESBUFF:
-		// Would seem the ST11M has a different command for this opcode, but just what it should do, is unknown.
-		get_chsn();
-		test_ready();
-		if(no_dma()) pc_hdc_result(set_error_info);
-		break;
-	default:
-		xt_hdc_device::command();
-		return;
-	}
-}
-
 
 void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -723,7 +692,10 @@ void xt_hdc_device::data_w(int data)
 			// write to disk
 			do
 			{
-				dack_w(buffer[data_cnt++]);
+				if(m_current_cmd == CMD_WRITESBUFF)
+					dack_ws(buffer[data_cnt++]);
+				else
+					dack_w(buffer[data_cnt++]);
 			}
 			while (hdcdma_size);
 			data_cnt = 0;

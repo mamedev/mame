@@ -848,6 +848,64 @@ void setup_t::print_stats() const
 }
 
 // ----------------------------------------------------------------------------------------
+// Static
+// ----------------------------------------------------------------------------------------
+
+const pstring setup_t::model_value_str(const pstring &model_str, const pstring &entity, const pstring defval)
+{
+	pstring tmp = model_str;
+	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
+	int p = tmp.ucase().find(entity.ucase() + "=");
+	if (p>=0)
+	{
+		int pblank = tmp.find(" ", p);
+		if (pblank < 0) pblank = tmp.len() + 1;
+		tmp = tmp.substr(p, pblank - p);
+		int pequal = tmp.find("=", 0);
+		if (pequal < 0)
+			fatalerror_e("parameter %s misformat in model %s temp %s\n", entity.cstr(), model_str.cstr(), tmp.cstr());
+		tmp = tmp.substr(pequal+1);
+		return tmp;
+	}
+	else
+	{
+		//netlist().log("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
+		return defval;
+	}
+}
+
+nl_double setup_t::model_value(const pstring &model_str, const pstring &entity, const nl_double defval)
+{
+	pstring tmp = model_value_str(model_str, entity, "NOTFOUND");
+
+	nl_double factor = NL_FCONST(1.0);
+	if (tmp != "NOTFOUND")
+	{
+		char numfac = *(tmp.right(1).cstr());
+		switch (numfac)
+		{
+			case 'm': factor = 1e-3; break;
+			case 'u': factor = 1e-6; break;
+			case 'n': factor = 1e-9; break;
+			case 'p': factor = 1e-12; break;
+			case 'f': factor = 1e-15; break;
+			case 'a': factor = 1e-18; break;
+			default:
+				if (numfac < '0' || numfac > '9')
+					fatalerror_e("Unknown number factor <%c> in: %s", numfac, entity.cstr());
+		}
+		if (factor != NL_FCONST(1.0))
+			tmp = tmp.left(tmp.len() - 1);
+		return tmp.as_double() * factor;
+	}
+	else
+	{
+		//netlist().log("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
+		return defval;
+	}
+}
+
+// ----------------------------------------------------------------------------------------
 // Sources
 // ----------------------------------------------------------------------------------------
 

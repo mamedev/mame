@@ -266,12 +266,12 @@ void matrix_solver_t::solve_base(C *p)
 
 ATTR_HOT nl_double matrix_solver_t::solve()
 {
-	netlist_time now = netlist().time();
-	netlist_time delta = now - m_last_step;
+	const netlist_time now = netlist().time();
+	const netlist_time delta = now - m_last_step;
 
 	// We are already up to date. Avoid oscillations.
 	// FIXME: Make this a parameter!
-	if (delta < netlist_time::from_nsec(1))
+	if (delta < netlist_time::from_nsec(1)) // 20000
 		return -1.0;
 
 	/* update all terminals for new time step */
@@ -501,7 +501,6 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
 		switch (net_count)
 		{
-#if 1
 			case 1:
 				ms = create_solver<1,1>(1, gs_threshold, use_specific);
 				break;
@@ -532,9 +531,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 			case 87:
 				ms = create_solver<87,87>(87, gs_threshold, use_specific);
 				break;
-#endif
 			default:
-#if 0
 				if (net_count <= 16)
 				{
 					ms = create_solver<0,16>(net_count, gs_threshold, use_specific);
@@ -548,7 +545,6 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 					ms = create_solver<0,64>(net_count, gs_threshold, use_specific);
 				}
 				else
-#endif
 					if (net_count <= 128)
 				{
 					ms = create_solver<0,128>(net_count, gs_threshold, use_specific);

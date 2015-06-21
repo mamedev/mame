@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, David Haywood
+
+#include "audio/irem.h"
+
 class m62_state : public driver_device
 {
 public:
@@ -11,7 +14,9 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_audio(*this, "irem_audio")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -119,4 +124,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<irem_audio_device> m_audio;
 };

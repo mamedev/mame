@@ -38,7 +38,7 @@
 		NET_CONNECT(_name, A, _A)
 
 #define TTL_7404_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7402_dip, _name)
+		NET_REGISTER_DEV(7404_dip, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

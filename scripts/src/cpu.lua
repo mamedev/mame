@@ -21,7 +21,7 @@ files {
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null) then
+if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/drcbec.c",
 		MAME_DIR .. "src/emu/cpu/drcbec.h",

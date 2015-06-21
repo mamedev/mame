@@ -4635,12 +4635,7 @@ ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, const UINT8 ditherX, const UI
 
 	/* determine the S/T/LOD values for this texture */
 	lod = (LODBASE);
-	/* clamp W */
-	if (TEXMODE_CLAMP_NEG_W(TEXMODE) && (ITERW) < 0)
-	{
-		s = t = 0;
-	}
-	else if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))
+	if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))
 	{
 		INT32 wLog;
 		oow = fast_reciplog((ITERW), &wLog);
@@ -4654,6 +4649,11 @@ ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, const UINT8 ditherX, const UI
 		t = (ITERT) >> 14;
 	}
 
+	/* clamp W */
+	if (TEXMODE_CLAMP_NEG_W(TEXMODE) && (ITERW) < 0)
+	{
+		s = t = 0;
+	}
 
 	/* clamp the LOD */
 	lod += (TT)->lodbias;

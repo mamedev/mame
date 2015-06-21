@@ -50,11 +50,12 @@
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
 #define NETLIST_EXTERNAL(_name)                                                     \
-ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)
+		ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup);
 
 #define NETLIST_START(_name)                                                        \
 ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)                          \
 {
+
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(_name)															\
@@ -188,6 +189,11 @@ namespace netlist
 		tagmap_terminal_t  m_terminals;
 
 		void print_stats() const;
+
+		/* static support functions */
+
+		static const pstring model_value_str(const pstring &model_str, const pstring &entity, const pstring defval);
+		static nl_double model_value(const pstring &model_str, const pstring &entity, const nl_double defval);
 
 	protected:
 

@@ -30,6 +30,7 @@ public:
 		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::GAUSS_SEIDEL, params, size)
 		, m_use_iLU_preconditioning(true)
 		, m_use_more_precise_stop_condition(false)
+		, m_accuracy_mult(1.0)
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
@@ -81,6 +82,8 @@ private:
 	double m_s[_storage_N];		/* mr + 1 */
 	double * RESTRICT m_v[_storage_N + 1];		/*(mr + 1), n */
 	//double m_y[_storage_N];		/* mr + 1 */
+
+	double m_accuracy_mult;
 
 	int m_gs_fail;
 	int m_gs_total;
@@ -218,7 +221,7 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 #if 1
 	int mr = std::min(iN-1,(int) sqrt(iN));
 	int iter = 4;
-	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy  * 2.0); // * (double) (iN));
+	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
 	int failed = mr * iter;
 #else
 	int failed = 6;
@@ -294,6 +297,7 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 	 *------------------------------------------------------------------------*/
 
 	unsigned itr_used = 0;
+	double rho_delta = 0.0;
 
 	const unsigned n = this->N();
 
@@ -323,10 +327,10 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 
 		//printf("rho/accuracy = %f\n", rho_to_accuracy);
 
-		accuracy *= rho_to_accuracy;
+		rho_delta = accuracy * rho_to_accuracy;
 	}
 	else
-		accuracy *= std::sqrt((double) n);
+		rho_delta = accuracy * std::sqrt((double) n) * m_accuracy_mult;
 
 	for (unsigned itr = 0; itr < restart_max; itr++)
 	{
@@ -391,7 +395,7 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 
 			itr_used = itr_used + 1;
 
-			if (rho <= accuracy)
+			if (rho <= rho_delta)
 			{
 				last_k = k;
 				break;
@@ -419,10 +423,25 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 		for (unsigned i = 0; i <= last_k; i++)
 			vec_add_mult_scalar(n, m_v[i], m_y[i], x);
 
-		if (rho <= accuracy)
+#if 1
+		if (rho <= rho_delta)
 		{
 			break;
 		}
+#else
+		/* we try to approximate the x difference between to steps using m_v[last_k] */
+
+		double xdelta = m_y[last_k] * vec_maxabs(n, m_v[last_k]);
+		if (xdelta < accuracy)
+		{
+			if (m_accuracy_mult < 16384.0)
+				m_accuracy_mult = m_accuracy_mult * 2.0;
+			break;
+		}
+		else
+			m_accuracy_mult = m_accuracy_mult / 2.0;
+
+#endif
 	}
 
 	return itr_used;
