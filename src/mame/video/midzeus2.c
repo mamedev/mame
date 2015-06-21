@@ -1297,7 +1297,7 @@ static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *exte
 				color1 = ((color1 & 0x7c00) << 9) | ((color1 & 0x3e0) << 6) | ((color1 & 0x1f) << 3);
 				color2 = ((color2 & 0x7c00) << 9) | ((color2 & 0x3e0) << 6) | ((color2 & 0x1f) << 3);
 				color3 = ((color3 & 0x7c00) << 9) | ((color3 & 0x3e0) << 6) | ((color3 & 0x1f) << 3);
-				rgb_t filtered = rgbint_t::bilinear_filter(color0, color1, color2, color3, curu, curv);
+				rgb_t filtered = rgbaint_t::bilinear_filter(color0, color1, color2, color3, curu, curv);
 				WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, filtered);
 				*depthptr = depth;
 			}

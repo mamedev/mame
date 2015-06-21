@@ -2199,33 +2199,33 @@ while (0)
 /* use SSE on 64-bit implementations, where it can be assumed */
 #if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
 
+// NB: This code should no longer be SSE2-specific now that it uses rgbaint_t, consider removing the #define and the #else case.
 INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
 {
 	rgb_t result;
-	rgbaint_t colorint((INT16) (itera>>12), (INT16) (iterr>>12), (INT16) (iterg>>12), (INT16) (iterb>>12));
+	rgbaint_t colorint((INT32) (itera>>12), (INT32) (iterr>>12), (INT32) (iterg>>12), (INT32) (iterb>>12));
 
 	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)
 	{
 		//r &= 0xfff;
-		__m128i temp = _mm_set1_epi16(0xfff);
-		colorint.set(_mm_and_si128(colorint.get(), temp));
+		colorint.and_imm(0xfff);
 		//if (r == 0xfff)
-		temp = _mm_cmpeq_epi16(colorint.get(), temp);
+		rgbaint_t temp(colorint);
+		temp.cmpeq_imm(0xfff);
 		//	result.rgb.r = 0;
-		colorint.set(_mm_andnot_si128(temp, colorint.get()));
+		temp.xor_imm(0xffffffff);
+		colorint.and_reg(temp);
 		//else if (r == 0x100)
-		temp = _mm_set1_epi16(0x100);
-		temp = _mm_cmpeq_epi16(colorint.get(), temp);
+		temp.set(colorint);
+		temp.cmpeq_imm(0x100);
 		//	result.rgb.r = 0xff;
-		colorint.set(_mm_or_si128(colorint.get(), temp));
 
-		result = colorint.to_rgba();
+		return colorint.to_rgba();
 	}
 	else
 	{
-		result = colorint.to_rgba_clamp();
+		return colorint.to_rgba_clamp();
 	}
-	return result;
 }
 
 #else
@@ -2841,19 +2841,19 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 		{
 			default:    /* reserved */
 			case 0:     /* AZERO */
-				srcScale.set_rgba(srcAlphaScale, 0, 0, 0);
+				srcScale.set(srcAlphaScale, 0, 0, 0);
 				//(RR) = (GG) = (BB) = 0;
 				break;
 
 			case 1:     /* ASRC_ALPHA */
-				srcScale.set_rgba(srcAlphaScale, sa, sa, sa);
+				srcScale.set(srcAlphaScale, sa, sa, sa);
 				//(RR) = (sr * (sa + 1)) >> 8;
 				//(GG) = (sg * (sa + 1)) >> 8;
 				//(BB) = (sb * (sa + 1)) >> 8;
 				break;
 
 			case 2:     /* A_COLOR */
-				srcScale.set_rgba(srcAlphaScale-1, dr, dg, db);
+				srcScale.set(srcAlphaScale-1, dr, dg, db);
 				srcScale.add_imm(1);
 				//(RR) = (sr * (dr + 1)) >> 8;
 				//(GG) = (sg * (dg + 1)) >> 8;
@@ -2862,26 +2862,26 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 3:     /* ADST_ALPHA */
 				ta = da + 1;
-				srcScale.set_rgba(srcAlphaScale, ta, ta, ta);
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (da + 1)) >> 8;
 				//(GG) = (sg * (da + 1)) >> 8;
 				//(BB) = (sb * (da + 1)) >> 8;
 				break;
 
 			case 4:     /* AONE */
-				srcScale.set_rgba(srcAlphaScale, 256, 256, 256);
+				srcScale.set(srcAlphaScale, 256, 256, 256);
 				break;
 
 			case 5:     /* AOMSRC_ALPHA */
 				ta = (0x100 - sa);
-				srcScale.set_rgba(srcAlphaScale, ta, ta, ta);
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (0x100 - sa)) >> 8;
 				//(GG) = (sg * (0x100 - sa)) >> 8;
 				//(BB) = (sb * (0x100 - sa)) >> 8;
 				break;
 
 			case 6:     /* AOM_COLOR */
-				srcScale.set_rgba(srcAlphaScale, (0x100 - dr), (0x100 - dg), (0x100 - db));
+				srcScale.set(srcAlphaScale, (0x100 - dr), (0x100 - dg), (0x100 - db));
 				//(RR) = (sr * (0x100 - dr)) >> 8;
 				//(GG) = (sg * (0x100 - dg)) >> 8;
 				//(BB) = (sb * (0x100 - db)) >> 8;
@@ -2889,7 +2889,7 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 7:     /* AOMDST_ALPHA */
 				ta = (0x100 - da);
-				srcScale.set_rgba(srcAlphaScale, ta, ta, ta);
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (0x100 - da)) >> 8;
 				//(GG) = (sg * (0x100 - da)) >> 8;
 				//(BB) = (sb * (0x100 - da)) >> 8;
@@ -2897,7 +2897,7 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 15:    /* ASATURATE */
 				ta = (sa < (0x100 - da)) ? sa : (0x100 - da);
-				srcScale.set_rgba(srcAlphaScale, ta, ta, ta);
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (ta + 1)) >> 8;
 				//(GG) = (sg * (ta + 1)) >> 8;
 				//(BB) = (sb * (ta + 1)) >> 8;
@@ -2915,11 +2915,11 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 		{
 			default:    /* reserved */
 			case 0:     /* AZERO */
-				destScale.set_rgba(destAlphaScale, 0, 0, 0);
+				destScale.set(destAlphaScale, 0, 0, 0);
 				break;
 
 			case 1:     /* ASRC_ALPHA */
-				destScale.set_rgba(destAlphaScale, sa, sa, sa);
+				destScale.set(destAlphaScale, sa, sa, sa);
 				destScale.add_imm(1);
 				//(RR) += (dr * (sa + 1)) >> 8;
 				//(GG) += (dg * (sa + 1)) >> 8;
@@ -2927,7 +2927,7 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 				break;
 
 			case 2:     /* A_COLOR */
-				destScale.set_rgb((rgb_t) (((destAlphaScale-1)<<24) | (color.u & 0x00ffffff)));
+				destScale.set((rgb_t) (((destAlphaScale-1)<<24) | (color.u & 0x00ffffff)));
 				destScale.add_imm(1);
 				//(RR) += (dr * (sr + 1)) >> 8;
 				//(GG) += (dg * (sg + 1)) >> 8;
@@ -2936,14 +2936,14 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 3:     /* ADST_ALPHA */
 				ta = da + 1;
-				destScale.set_rgba(destAlphaScale, ta, ta, ta);
+				destScale.set(destAlphaScale, ta, ta, ta);
 				//(RR) += (dr * (da + 1)) >> 8;
 				//(GG) += (dg * (da + 1)) >> 8;
 				//(BB) += (db * (da + 1)) >> 8;
 				break;
 
 			case 4:     /* AONE */
-				destScale.set_rgba(destAlphaScale, 256, 256, 256);
+				destScale.set(destAlphaScale, 256, 256, 256);
 				//(RR) += dr;
 				//(GG) += dg;
 				//(BB) += db;
@@ -2951,14 +2951,14 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 5:     /* AOMSRC_ALPHA */
 				ta = (0x100 - sa);
-				destScale.set_rgba(destAlphaScale, ta, ta, ta);
+				destScale.set(destAlphaScale, ta, ta, ta);
 				//(RR) += (dr * (0x100 - sa)) >> 8;
 				//(GG) += (dg * (0x100 - sa)) >> 8;
 				//(BB) += (db * (0x100 - sa)) >> 8;
 				break;
 
 			case 6:     /* AOM_COLOR */
-				destScale.set_rgba(destAlphaScale, (0x100 - color.rgb.r), (0x100 - color.rgb.g), (0x100 - color.rgb.b));
+				destScale.set(destAlphaScale, (0x100 - color.rgb.r), (0x100 - color.rgb.g), (0x100 - color.rgb.b));
 				//(RR) += (dr * (0x100 - sr)) >> 8;
 				//(GG) += (dg * (0x100 - sg)) >> 8;
 				//(BB) += (db * (0x100 - sb)) >> 8;
@@ -2966,14 +2966,14 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 7:     /* AOMDST_ALPHA */
 				ta = (0x100 - da);
-				destScale.set_rgba(destAlphaScale, ta, ta, ta);
+				destScale.set(destAlphaScale, ta, ta, ta);
 				//(RR) += (dr * (0x100 - da)) >> 8;
 				//(GG) += (dg * (0x100 - da)) >> 8;
 				//(BB) += (db * (0x100 - da)) >> 8;
 				break;
 
 			case 15:    /* A_COLORBEFOREFOG */
-				destScale.set_rgb((rgb_t) (((destAlphaScale-1)<<24) | (preFog.u & 0x00ffffff)));
+				destScale.set((rgb_t) (((destAlphaScale-1)<<24) | (preFog.u & 0x00ffffff)));
 				destScale.add_imm(1);
 				//(RR) += (dr * (prefogr + 1)) >> 8;
 				//(GG) += (dg * (prefogg + 1)) >> 8;
@@ -3124,7 +3124,7 @@ INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  I
 		rgbaint_t tmpB((rgb_t) color.u);
 		if (FOGMODE_FOG_CONSTANT(fogModeReg))
 		{
-			tmpA.set_rgb((rgb_t) fogColorLocal.u);
+			tmpA.set((rgb_t) fogColorLocal.u);
 			/* if fog_mult is 0, we add this to the original color */
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
@@ -3149,7 +3149,7 @@ INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  I
 				fogColorLocal.u = 0;
 				//fr = fg = fb = 0;
 
-			tmpA.set_rgb((rgb_t) fogColorLocal.u);
+			tmpA.set((rgb_t) fogColorLocal.u);
 
 			/* if fog_mult is zero, we subtract the incoming color */
 			if (!FOGMODE_FOG_MULT(fogModeReg))
@@ -4296,7 +4296,7 @@ INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPA
 	if (FBZCP_CCA_ZERO_OTHER(FBZCOLORPATH))
 		c_other.u &= 0x00ffffff;
 
-	tmpA.set_rgb((rgb_t) c_other.u);
+	tmpA.set((rgb_t) c_other.u);
 
 	/* subtract a/c_local */
 	if (FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH) || (FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH)))
@@ -4309,7 +4309,7 @@ INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPA
 		if (!FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))
 			sub_val.u &= 0x00ffffff;
 
-		tmpB.set_rgb((rgb_t) sub_val.u);
+		tmpB.set((rgb_t) sub_val.u);
 		tmpA.sub(tmpB);
 	}
 
@@ -4404,9 +4404,9 @@ INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPA
 	//CLAMP(color.rgb.r, 0x00, 0xff);
 	//CLAMP(color.rgb.g, 0x00, 0xff);
 	//CLAMP(color.rgb.b, 0x00, 0xff);
-	tmpB.set_rgb((rgb_t) c_local.u);
+	tmpB.set((rgb_t) c_local.u);
 	tmpB.add_imm(1);
-	tmpC.set_rgb((rgb_t) add_val.u);
+	tmpC.set((rgb_t) add_val.u);
 	tmpA.scale_add_and_clamp(tmpB, tmpC);
 	color.u = tmpA.to_rgba();
 
@@ -4826,7 +4826,7 @@ INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_lo
 	if (TEXMODE_TCA_ZERO_OTHER(TEXMODE))
 		c_other.u &= 0x00ffffff;
 
-	tmpA.set_rgb((rgb_t) c_other.u);
+	tmpA.set((rgb_t) c_other.u);
 
 	if (TEXMODE_TC_SUB_CLOCAL(TEXMODE) || TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
 	{
@@ -4839,7 +4839,7 @@ INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_lo
 		if (!TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
 			sub_val.u &= 0x00ffffff;
 
-		tmpB.set_rgb((rgb_t) sub_val.u);
+		tmpB.set((rgb_t) sub_val.u);
 		tmpA.sub(tmpB);
 	}
 
@@ -4960,9 +4960,9 @@ INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_lo
 	//result.rgb.g = (tg < 0) ? 0 : (tg > 0xff) ? 0xff : tg;
 	//result.rgb.b = (tb < 0) ? 0 : (tb > 0xff) ? 0xff : tb;
 	//result.rgb.a = (ta < 0) ? 0 : (ta > 0xff) ? 0xff : ta;
-	tmpB.set_rgb((rgb_t) c_local.u);
+	tmpB.set((rgb_t) c_local.u);
 	tmpB.add_imm(1);
-	tmpC.set_rgb((rgb_t) add_val.u);
+	tmpC.set((rgb_t) add_val.u);
 	tmpA.scale_add_and_clamp(tmpB, tmpC);
 	result = tmpA.to_rgba();
 

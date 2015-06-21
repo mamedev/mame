@@ -2839,28 +2839,28 @@ void n64_rdp::cmd_fill_rect(UINT32 w1, UINT32 w2)
 
 void n64_rdp::cmd_set_fog_color(UINT32 w1, UINT32 w2)
 {
-	m_fog_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_fog_color.set(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
 }
 
 void n64_rdp::cmd_set_blend_color(UINT32 w1, UINT32 w2)
 {
-	m_blend_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_blend_color.set(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
 }
 
 void n64_rdp::cmd_set_prim_color(UINT32 w1, UINT32 w2)
 {
 	m_misc_state.m_min_level = (w1 >> 8) & 0x1f;
 	const UINT8 prim_lod_fraction = w1 & 0xff;
-	m_prim_lod_fraction.set_rgba(prim_lod_fraction, prim_lod_fraction, prim_lod_fraction, prim_lod_fraction);
+	m_prim_lod_fraction.set(prim_lod_fraction, prim_lod_fraction, prim_lod_fraction, prim_lod_fraction);
 
-	m_prim_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
-	m_prim_alpha.set_rgba(w2 & 0xff, w2 & 0xff, w2 & 0xff, w2 & 0xff);
+	m_prim_color.set(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_prim_alpha.set(w2 & 0xff, w2 & 0xff, w2 & 0xff, w2 & 0xff);
 }
 
 void n64_rdp::cmd_set_env_color(UINT32 w1, UINT32 w2)
 {
-	m_env_color.set_rgba(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
-	m_env_alpha.set_rgba(w2 & 0xff, w2 & 0xff, w2 & 0xff, w2 & 0xff);
+	m_env_color.set(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_env_alpha.set(w2 & 0xff, w2 & 0xff, w2 & 0xff, w2 & 0xff);
 }
 
 void n64_rdp::cmd_set_combine(UINT32 w1, UINT32 w2)
@@ -3060,8 +3060,8 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 		m_tiles[i].num = i;
 	}
 
-	m_one.set_rgba(0xff, 0xff, 0xff, 0xff);
-	m_zero.set_rgba(0, 0, 0, 0);
+	m_one.set(0xff, 0xff, 0xff, 0xff);
+	m_zero.set(0, 0, 0, 0);
 
 	m_tmem = NULL;
 
@@ -3069,7 +3069,7 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 
 	//memset(m_hidden_bits, 3, 8388608);
 
-	m_prim_lod_fraction.set_rgba(0, 0, 0, 0);
+	m_prim_lod_fraction.set(0, 0, 0, 0);
 
 	for (INT32 i = 0; i < 256; i++)
 	{

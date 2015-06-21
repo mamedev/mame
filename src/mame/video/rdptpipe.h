@@ -27,7 +27,7 @@ class n64_texture_pipe_t
 
 		n64_texture_pipe_t()
 		{
-			m_maskbits_table[0] = ~0;
+			m_maskbits_table[0] = 0x3ff;
 			for(int i = 1; i < 16; i++)
 			{
 				m_maskbits_table[i] = ((UINT16)(0xffff) >> (16 - i)) & 0x3ff;

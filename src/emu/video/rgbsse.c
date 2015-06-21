@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb,Ryan Holtz
+// copyright-holders:Vas Crabb, Ryan Holtz
 /***************************************************************************
 
     rgbsse.c
@@ -14,77 +14,60 @@
 #include <emmintrin.h>
 #include "rgbutil.h"
 
-void rgbint_t::print()
-{
-	printf("%04x ", _mm_extract_epi16(m_value, 7));
-	printf("%04x ", _mm_extract_epi16(m_value, 6));
-	printf("%04x ", _mm_extract_epi16(m_value, 5));
-	printf("%04x ", _mm_extract_epi16(m_value, 4));
-	printf("%04x ", _mm_extract_epi16(m_value, 3));
-	printf("%04x ", _mm_extract_epi16(m_value, 2));
-	printf("%04x ", _mm_extract_epi16(m_value, 1));
-	printf("%04x\n", _mm_extract_epi16(m_value, 0));
-}
-
 /***************************************************************************
     HIGHER LEVEL OPERATIONS
 ***************************************************************************/
 
-void rgbint_t::blend(const rgbint_t& other, UINT8 factor)
+void rgbaint_t::blend(const rgbaint_t& other, UINT8 factor)
 {
 	m_value = _mm_unpacklo_epi16(m_value, other.m_value);
 	m_value = _mm_madd_epi16(m_value, *(__m128i *)&rgbsse_statics.scale_table[factor][0]);
 	m_value = _mm_srli_epi32(m_value, 8);
 }
 
-void rgbint_t::scale_and_clamp(const rgbint_t& scale)
+void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 {
-	__m128i mscale = _mm_unpacklo_epi16(scale.m_value, _mm_setzero_si128());
-	m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
-	m_value = _mm_madd_epi16(m_value, mscale);
-	m_value = _mm_srli_epi32(m_value, 8);
-	m_value = _mm_min_epi16(m_value, *(__m128i *)&rgbsse_statics.maxbyte);
+	mul(scale);
+	shr(8);
+	min(255);
 }
 
-void rgbint_t::scale_imm_and_clamp(const INT16 scale)
+void rgbaint_t::scale_imm_and_clamp(const INT32 scale)
 {
-	__m128i mscale = _mm_set1_epi16(scale);
-	m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
-	m_value = _mm_madd_epi16(m_value, mscale);
-	m_value = _mm_srli_epi32(m_value, 8);
-	m_value = _mm_min_epi16(m_value, *(__m128i *)&rgbsse_statics.maxbyte);
+	mul_imm(scale);
+	shr(8);
+	min(255);
 }
 
-void rgbint_t::scale_add_and_clamp(const rgbint_t& scale, const rgbint_t& other, const rgbint_t& scale2)
+void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
 {
-	__m128i mscale = _mm_unpacklo_epi16(scale.m_value, scale2.m_value);
-	m_value = _mm_unpacklo_epi16(m_value, other.m_value);
-	m_value = _mm_madd_epi16(m_value, mscale);
-	m_value = _mm_srli_epi32(m_value, 8);
-	m_value = _mm_min_epi16(m_value, *(__m128i *)&rgbsse_statics.maxbyte);
+	mul(scale);
+	rgbaint_t color2(other);
+	color2.mul(scale2);
+
+	mul(scale);
+	add(color2);
+	shr(8);
+	min(255);
 }
 
-void rgbint_t::scale_imm_add_and_clamp(const INT16 scale, const rgbint_t& other)
+void rgbaint_t::scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
 {
-	// color2 will get mutiplied by 2^8 (256) and then divided by 2^8 by the shift by 8
-	__m128i mscale = _mm_unpacklo_epi16(_mm_set1_epi16(scale), _mm_set_epi16(0, 0, 0, 0, 256, 256, 256, 256));
-	m_value = _mm_unpacklo_epi16(m_value, other.m_value);
-	m_value = _mm_madd_epi16(m_value, mscale);
-	m_value = _mm_srli_epi32(m_value, 8);
-	m_value = _mm_min_epi16(m_value, *(__m128i *)&rgbsse_statics.maxbyte);
+	mul_imm(scale);
+	add(other);
+	shr(8);
+	min(255);
 }
 
-void rgbint_t::scale_add_and_clamp(const rgbint_t& scale, const rgbint_t& other)
+void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 {
-	// color2 will get mutiplied by 2^8 (256) and then divided by 2^8 by the shift by 8
-	__m128i mscale = _mm_unpacklo_epi16(scale.m_value, _mm_set_epi16(0, 0, 0, 0, 256, 256, 256, 256));
-	m_value = _mm_unpacklo_epi16(m_value, other.m_value);
-	m_value = _mm_madd_epi16(m_value, mscale);
-	m_value = _mm_srli_epi32(m_value, 8);
-	m_value = _mm_min_epi16(m_value, *(__m128i *)&rgbsse_statics.maxbyte);
+	mul(scale);
+	add(other);
+	shr(8);
+	min(255);
 }
 
-UINT32 rgbint_t::bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+UINT32 rgbaint_t::bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 {
 	__m128i color00 = _mm_cvtsi32_si128(rgb00);
 	__m128i color01 = _mm_cvtsi32_si128(rgb01);

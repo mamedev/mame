@@ -82,9 +82,10 @@ void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, ext
 
 void n64_rdp::rgbaz_clip(INT32 sr, INT32 sg, INT32 sb, INT32 sa, INT32* sz, rdp_span_aux* userdata)
 {
-	userdata->m_shade_color.clamp_and_clear(rgbaint_t(sa, sr, sg, sb), 0xfffffe00);
+	userdata->m_shade_color.set(sa, sr, sg, sb);
+	userdata->m_shade_color.clamp_and_clear(0xfffffe00);
 	UINT32 a = userdata->m_shade_color.get_a();
-	userdata->m_shade_alpha.set_rgba(a, a, a, a);
+	userdata->m_shade_alpha.set(a, a, a, a);
 
 	INT32 zanded = (*sz) & 0x60000;
 
@@ -235,7 +236,7 @@ inline void n64_rdp::read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const r
 	{
 		const UINT16 fword = RREADIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel);
 
-		userdata->m_memory_color.set_rgba(0, GETHICOL(fword), GETMEDCOL(fword), GETLOWCOL(fword));
+		userdata->m_memory_color.set(0, GETHICOL(fword), GETMEDCOL(fword), GETLOWCOL(fword));
 		if (object.m_other_modes.image_read_en)
 		{
 			UINT8 hbyte = HREADADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel);
@@ -251,7 +252,7 @@ inline void n64_rdp::read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const r
 	else // 32-bit framebuffer
 	{
 		const UINT32 mem = RREADIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel);
-		userdata->m_memory_color.set_rgba(0, (mem >> 24) & 0xff, (mem >> 16) & 0xff, (mem >> 8) & 0xff);
+		userdata->m_memory_color.set(0, (mem >> 24) & 0xff, (mem >> 16) & 0xff, (mem >> 8) & 0xff);
 		if (object.m_other_modes.image_read_en)
 		{
 			userdata->m_memory_color.set_a(mem & 0xff);
@@ -430,10 +431,10 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 
 			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle0]))(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tilenum, 0, userdata, object);
 			UINT32 t0a = userdata->m_texel0_color.get_a();
-			userdata->m_texel0_alpha.set_rgba(t0a, t0a, t0a, t0a);
+			userdata->m_texel0_alpha.set(t0a, t0a, t0a, t0a);
 
 			const UINT8 noise = rand() << 3; // Not accurate
-			userdata->m_noise_color.set_rgba(0, noise, noise, noise);
+			userdata->m_noise_color.set(0, noise, noise, noise);
 
 			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[1]);
 			rgbaint_t rgbsub_b(*userdata->m_color_inputs.combiner_rgbsub_b[1]);
@@ -455,7 +456,7 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 			rgbsub_a.add(rgbadd);
 			rgbsub_a.add_imm(0x0080);
 			rgbsub_a.sra_imm(8);
-			rgbsub_a.clamp_and_clear(rgbsub_a, 0xfffffe00);
+			rgbsub_a.clamp_and_clear(0xfffffe00);
 
 			userdata->m_pixel_color = rgbsub_a;
 
@@ -657,12 +658,12 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			UINT32 t0a = userdata->m_texel0_color.get_a();
 			UINT32 t1a = userdata->m_texel1_color.get_a();
 			UINT32 tna = userdata->m_next_texel_color.get_a();
-			userdata->m_texel0_alpha.set_rgba(t0a, t0a, t0a, t0a);
-			userdata->m_texel1_alpha.set_rgba(t1a, t1a, t1a, t1a);
-			userdata->m_next_texel_alpha.set_rgba(tna, tna, tna, tna);
+			userdata->m_texel0_alpha.set(t0a, t0a, t0a, t0a);
+			userdata->m_texel1_alpha.set(t1a, t1a, t1a, t1a);
+			userdata->m_next_texel_alpha.set(tna, tna, tna, tna);
 
 			const UINT8 noise = rand() << 3; // Not accurate
-			userdata->m_noise_color.set_rgba(0, noise, noise, noise);
+			userdata->m_noise_color.set(0, noise, noise, noise);
 
 			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[0]);
 			rgbaint_t rgbsub_b(*userdata->m_color_inputs.combiner_rgbsub_b[0]);
@@ -685,14 +686,14 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			rgbsub_a.add(rgbadd);
 			rgbsub_a.add_imm(0x0080);
 			rgbsub_a.sra_imm(8);
-			rgbsub_a.clamp_and_clear(rgbsub_a, 0xfffffe00);
+			rgbsub_a.clamp_and_clear(0xfffffe00);
 
 			userdata->m_combined_color.set(rgbsub_a);
 			userdata->m_texel0_color.set(userdata->m_texel1_color);
 			userdata->m_texel1_color.set(userdata->m_next_texel_color);
 
 			UINT32 ca = userdata->m_combined_color.get_a();
-			userdata->m_combined_alpha.set_rgba(ca, ca, ca, ca);
+			userdata->m_combined_alpha.set(ca, ca, ca, ca);
 			userdata->m_texel0_alpha.set(userdata->m_texel1_alpha);
 			userdata->m_texel1_alpha.set(userdata->m_next_texel_alpha);
 
@@ -716,7 +717,7 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			rgbsub_a.add(rgbadd);
 			rgbsub_a.add_imm(0x0080);
 			rgbsub_a.sra_imm(8);
-			rgbsub_a.clamp_and_clear(rgbsub_a, 0xfffffe00);
+			rgbsub_a.clamp_and_clear(0xfffffe00);
 
 			userdata->m_pixel_color.set(rgbsub_a);
 

@@ -228,7 +228,7 @@ void gaelco3d_renderer::render_noz_noperspective(INT32 scanline, const extent_t 
 			UINT32 rgb01 = palsource[m_texture[(pixeloffs + 1) & endmask]];
 			UINT32 rgb10 = palsource[m_texture[(pixeloffs + 4096) & endmask]];
 			UINT32 rgb11 = palsource[m_texture[(pixeloffs + 4097) & endmask]];
-			const UINT32 filtered = rgbint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
+			const UINT32 filtered = rgbaint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
 			dest[x] = (filtered & 0x1f) | ((filtered & 0x1ff800) >> 6);
 			zbuf[x] = zbufval;
 		}
@@ -275,7 +275,7 @@ void gaelco3d_renderer::render_normal(INT32 scanline, const extent_t &extent, co
 					UINT32 rgb01 = palsource[m_texture[(pixeloffs + 1) & endmask]];
 					UINT32 rgb10 = palsource[m_texture[(pixeloffs + 4096) & endmask]];
 					UINT32 rgb11 = palsource[m_texture[(pixeloffs + 4097) & endmask]];
-					const UINT32 filtered = rgbint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
+					const UINT32 filtered = rgbaint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
 					dest[x] = (filtered & 0x1f) | ((filtered & 0x1ff800) >> 6);
 					zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
 				}
@@ -325,7 +325,7 @@ void gaelco3d_renderer::render_alphablend(INT32 scanline, const extent_t &extent
 					UINT32 rgb01 = palsource[m_texture[(pixeloffs + 1) & endmask]];
 					UINT32 rgb10 = palsource[m_texture[(pixeloffs + 4096) & endmask]];
 					UINT32 rgb11 = palsource[m_texture[(pixeloffs + 4097) & endmask]];
-					const UINT32 filtered = rgbint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v) >> 1;
+					const UINT32 filtered = rgbaint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v) >> 1;
 					dest[x] = ((filtered & 0x0f) | ((filtered & 0x0f7800) >> 6)) + ((dest[x] >> 1) & 0x3def);
 					zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
 				}

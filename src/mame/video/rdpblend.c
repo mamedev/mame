@@ -124,7 +124,7 @@ bool n64_blender_t::cycle1_noblend_noacvg_dither(color_t& blended_pixel, int dit
 	index.shl_imm(3);
 	index.or_imm(dith);
 	index.and_imm(0x7ff);
-	blended_pixel.set_rgba(0, m_color_dither[index.get_r32()], m_color_dither[index.get_g32()], m_color_dither[index.get_b32()]);
+	blended_pixel.set(0, m_color_dither[index.get_r32()], m_color_dither[index.get_g32()], m_color_dither[index.get_b32()]);
 
 	return true;
 }
@@ -155,7 +155,7 @@ bool n64_blender_t::cycle1_noblend_acvg_dither(color_t& blended_pixel, int dith,
 	index.shl_imm(3);
 	index.or_imm(dith);
 	index.and_imm(0x7ff);
-	blended_pixel.set_rgba(0, m_color_dither[index.get_r32()], m_color_dither[index.get_g32()], m_color_dither[index.get_b32()]);
+	blended_pixel.set(0, m_color_dither[index.get_r32()], m_color_dither[index.get_g32()], m_color_dither[index.get_b32()]);
 
 	return true;
 }
@@ -191,7 +191,7 @@ bool n64_blender_t::cycle1_blend_noacvg_dither(color_t& blended_pixel, int dith,
 	rgb.shl_imm(3);
 	rgb.or_imm(dith);
 	rgb.and_imm(0x7ff);
-	blended_pixel.set_rgba(0, m_color_dither[rgb.get_r32()], m_color_dither[rgb.get_g32()], m_color_dither[rgb.get_b32()]);
+	blended_pixel.set(0, m_color_dither[rgb.get_r32()], m_color_dither[rgb.get_g32()], m_color_dither[rgb.get_b32()]);
 
 	return true;
 }
@@ -225,7 +225,7 @@ bool n64_blender_t::cycle1_blend_acvg_dither(color_t& blended_pixel, int dith, i
 	rgb.shl_imm(3);
 	rgb.or_imm(dith);
 	rgb.and_imm(0x7ff);
-	blended_pixel.set_rgba(0, m_color_dither[rgb.get_r32()], m_color_dither[rgb.get_g32()], m_color_dither[rgb.get_b32()]);
+	blended_pixel.set(0, m_color_dither[rgb.get_r32()], m_color_dither[rgb.get_g32()], m_color_dither[rgb.get_b32()]);
 
 	return true;
 }
@@ -267,7 +267,7 @@ bool n64_blender_t::cycle2_noblend_noacvg_dither(color_t& blended_pixel, int dit
 	index.shl_imm(3);
 	index.or_imm(dith);
 	index.and_imm(0x7ff);
-	blended_pixel.set_rgba(0, m_color_dither[index.get_r32()], m_color_dither[index.get_g32()], m_color_dither[index.get_b32()]);
+	blended_pixel.set(0, m_color_dither[index.get_r32()], m_color_dither[index.get_g32()], m_color_dither[index.get_b32()]);
 
 	return true;
 }
@@ -307,7 +307,7 @@ bool n64_blender_t::cycle2_noblend_acvg_dither(color_t& blended_pixel, int dith,
 	index.shl_imm(3);
 	index.or_imm(dith);
 	index.and_imm(0x7ff);
-	blended_pixel.set_rgba(0, m_color_dither[index.get_r32()], m_color_dither[index.get_g32()], m_color_dither[index.get_b32()]);
+	blended_pixel.set(0, m_color_dither[index.get_r32()], m_color_dither[index.get_g32()], m_color_dither[index.get_b32()]);
 
 	return true;
 }
@@ -351,7 +351,7 @@ bool n64_blender_t::cycle2_blend_noacvg_dither(color_t& blended_pixel, int dith,
 	rgb.shl_imm(3);
 	rgb.or_imm(dith);
 	rgb.and_imm(0x7ff);
-	blended_pixel.set_rgba(0, m_color_dither[rgb.get_r32()], m_color_dither[rgb.get_g32()], m_color_dither[rgb.get_b32()]);
+	blended_pixel.set(0, m_color_dither[rgb.get_r32()], m_color_dither[rgb.get_g32()], m_color_dither[rgb.get_b32()]);
 
 	return true;
 }
@@ -393,7 +393,7 @@ bool n64_blender_t::cycle2_blend_acvg_dither(color_t& blended_pixel, int dith, i
 	rgb.shl_imm(3);
 	rgb.or_imm(dith);
 	rgb.and_imm(0x7ff);
-	blended_pixel.set_rgba(0, m_color_dither[rgb.get_r32()], m_color_dither[rgb.get_g32()], m_color_dither[rgb.get_b32()]);
+	blended_pixel.set(0, m_color_dither[rgb.get_r32()], m_color_dither[rgb.get_g32()], m_color_dither[rgb.get_b32()]);
 
 	return true;
 }
@@ -444,7 +444,7 @@ void n64_blender_t::blend_pipe(const int cycle, const int special, color_t& out,
 		}
 		else
 		{
-			temp.set_rgba(0, 0xff, 0xff, 0xff);
+			temp.set(0, 0xff, 0xff, 0xff);
 		}
 	}
 
