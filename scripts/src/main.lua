@@ -2,6 +2,7 @@
 -- copyright-holders:MAMEdev Team
 
 function mainProject(_target, _subtarget)
+if (_OPTIONS["DRIVERS"] == nil) then 
 	if (_target == _subtarget) then
 		project (_target)
 	else
@@ -11,6 +12,9 @@ function mainProject(_target, _subtarget)
 			project (_target .. _subtarget)
 		end
 	end	
+else
+	project (_subtarget)
+end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
@@ -34,7 +38,7 @@ function mainProject(_target, _subtarget)
 	flags {
 		"Unicode",
 	}
-
+if (_OPTIONS["DRIVERS"] == nil) then 
 	configuration { "x64", "Release" }
 		targetsuffix "64"
 		if _OPTIONS["PROFILE"] then
@@ -70,7 +74,7 @@ function mainProject(_target, _subtarget)
 		if _OPTIONS["PROFILE"] then
 			targetsuffix "dp"
 		end
-
+end
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
