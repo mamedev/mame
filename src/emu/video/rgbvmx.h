@@ -471,7 +471,7 @@ protected:
 	static const VECU32				red_mask;
 	static const VECU32				green_mask;
 	static const VECU32				blue_mask;
-	static const VECU8				merge_aplha_perm;
+	static const VECU8				merge_alpha_perm;
 	static const VECU16				scale_table[256];
 };
 
