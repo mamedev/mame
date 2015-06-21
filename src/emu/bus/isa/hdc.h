@@ -125,7 +125,6 @@ class st11m_device : public xt_hdc_device
 public:
 	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void command();
 protected:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
