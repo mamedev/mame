@@ -1265,7 +1265,6 @@ void ui_mewui_select_game::build_category()
 	std::vector<int> temp_filter;
 	machine().inifile().load_ini_category(temp_filter);
 
-	m_tmp.resize(temp_filter.size());
 	for (int index = 0; index < temp_filter.size(); ++index)
 	{
 		int actual = temp_filter[index];
