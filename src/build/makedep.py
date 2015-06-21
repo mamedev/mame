@@ -145,6 +145,8 @@ def parse_file(root, srcfile, folder):
                fullname = file_exists(root, name, folder,include_dirs)
                if fullname in files_included:
                    continue
+               if "src/emu/netlist/" in fullname:
+                   continue
                if fullname!='':
                    if fullname in mappings.keys():
                         if not(mappings[fullname] in components):
@@ -152,7 +154,8 @@ def parse_file(root, srcfile, folder):
                    files_included.append(fullname)
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file(root, fullname, newfolder)
-                   parse_file(root, fullname.replace('.h','.c'), newfolder)
+                   if (fullname.endswith('.h')):
+                       parse_file(root, fullname.replace('.h','.c'), folder)
                continue
     return 0
 
