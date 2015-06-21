@@ -232,8 +232,8 @@ public:
 
 	inline void shl_imm_all(const UINT8 shift)
 	{
-		const vector unsigned char limit = { 128, 128, 128, 128, 128, 128, 128, 128 };
-		const vector unsigned char temp = { shift, shift, shift, shift, shift, shift, shift, shift };
+		const vector unsigned char limit = { 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 };
+		const vector unsigned char temp = { shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift };
 		m_value = vec_and(vec_slo(m_value, temp), (vector unsigned int)vec_cmpgt(limit, temp));
 	}
 
@@ -252,8 +252,8 @@ public:
 
 	inline void shr_imm_all(const UINT8 shift)
 	{
-		const vector unsigned char limit = { 128, 128, 128, 128, 128, 128, 128, 128 };
-		const vector unsigned char temp = { shift, shift, shift, shift, shift, shift, shift, shift };
+		const vector unsigned char limit = { 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 };
+		const vector unsigned char temp = { shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift };
 		m_value = vec_and(vec_sro(m_value, temp), (vector unsigned int)vec_cmpgt(limit, temp));
 	}
 
@@ -452,10 +452,9 @@ public:
 		return *this;
 	}
 
-	inline void merge_alpha(rgbaint_t& alpha)
+	inline void merge_alpha(const rgbaint_t& alpha)
 	{
-		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 7), 7);
-		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 6), 6);
+		m_value = vec_perm(m_value, alpha.m_value, merge_alpha_perm);
 	}
 
 	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v);
@@ -472,6 +471,7 @@ protected:
 	static const VECU32				red_mask;
 	static const VECU32				green_mask;
 	static const VECU32				blue_mask;
+	static const VECU8				merge_aplha_perm;
 	static const VECU16				scale_table[256];
 };
 

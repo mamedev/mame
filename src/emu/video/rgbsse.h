@@ -40,7 +40,7 @@ public:
 	inline rgbaint_t() { }
 	inline rgbaint_t(UINT32 rgba) { set(rgba); }
 	inline rgbaint_t(UINT32 a, UINT32 r, UINT32 g, UINT32 b) { set(a, r, g, b); }
-	inline rgbaint_t(rgb_t& rgba) { set(rgba); }
+	inline rgbaint_t(rgb_t& rgb) { set(rgb); }
 
 	inline void set(rgbaint_t& other) { m_value = other.m_value; }
 	inline void set(UINT32 rgba) { m_value = _mm_and_si128(_mm_set1_epi32(0xff), _mm_set_epi32(rgba >> 24, rgba >> 16, rgba >> 8, rgba)); }
@@ -143,22 +143,22 @@ public:
 		return _mm_extract_epi16(m_value, 0);
 	}
 
-	inline UINT16 get_a32()
+	inline UINT32 get_a32()
 	{
 		return (_mm_extract_epi16(m_value, 7) << 16) | _mm_extract_epi16(m_value, 6);
 	}
 
-	inline UINT16 get_r32()
+	inline UINT32 get_r32()
 	{
 		return (_mm_extract_epi16(m_value, 5) << 16) | _mm_extract_epi16(m_value, 4);
 	}
 
-	inline UINT16 get_g32()
+	inline UINT32 get_g32()
 	{
 		return (_mm_extract_epi16(m_value, 3) << 16) | _mm_extract_epi16(m_value, 2);
 	}
 
-	inline UINT16 get_b32()
+	inline UINT32 get_b32()
 	{
 		return (_mm_extract_epi16(m_value, 1) << 16) | _mm_extract_epi16(m_value, 0);
 	}
@@ -392,7 +392,7 @@ public:
 		return *this;
 	}
 
-	inline void merge_alpha(rgbaint_t& alpha)
+	inline void merge_alpha(const rgbaint_t& alpha)
 	{
 		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 7), 7);
 		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 6), 6);

@@ -23,6 +23,7 @@ const rgbaint_t::VECU32 rgbaint_t::alpha_mask = { 0x00000000, 0xffffffff, 0xffff
 const rgbaint_t::VECU32 rgbaint_t::red_mask = { 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff };
 const rgbaint_t::VECU32 rgbaint_t::green_mask = { 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff };
 const rgbaint_t::VECU32 rgbaint_t::blue_mask = { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 };
+const rgbaint_t::VECU8 rgbaint_t::merge_aplha_perm = { 16, 17, 18, 19, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 const rgbaint_t::VECU16 rgbaint_t::scale_table[256] = {
 	{   0, 256,   0, 256,   0, 256,   0, 256 }, {   1, 255,   1, 255,   1, 255,   1, 255 },
 	{   2, 254,   2, 254,   2, 254,   2, 254 }, {   3, 253,   3, 253,   3, 253,   3, 253 },
