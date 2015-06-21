@@ -269,22 +269,39 @@ void vrc4373_device::dma_transfer(int which)
 	if (LOG_NILE)
 		logerror("%08X:nile Start dma PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
 	int pciSel = (m_cpu_regs[NREG_DMACR1+which*0xC] & DMA_MIO) ? AS_DATA : AS_IO;
-	UINT32 mem_mask = 0xffffffff;
-	while (m_cpu_regs[NREG_DMA_REM]>0) {
-		if (0 && LOG_NILE)
-			logerror("dma_transfer PCI: %08X Mem: %08X Words Remaining: %X\n", m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
-		if (m_cpu_regs[NREG_DMACR1+which*0xC]&DMA_RW) {
-			// Read data from PCI and write to local
-			m_cpu->space(AS_PROGRAM).write_dword(m_cpu_regs[NREG_DMA_CMAR], this->space(pciSel).read_dword(m_cpu_regs[NREG_DMA_CPAR], mem_mask), mem_mask);
-		} else {
-			// Read data from local and write to PCI
-			this->space(pciSel).write_dword(m_cpu_regs[NREG_DMA_CPAR], m_cpu->space(AS_PROGRAM).read_dword(m_cpu_regs[NREG_DMA_CMAR], mem_mask), mem_mask);
-		}
-		m_cpu_regs[NREG_DMA_CMAR] += 0x4;
-		m_cpu_regs[NREG_DMA_CPAR] += 0x4;
-		m_cpu_regs[NREG_DMA_REM]--;
+	address_space *src, *dst;
+	UINT32 srcAddr, dstAddr;
+
+	if (m_cpu_regs[NREG_DMACR1+which*0xC]&DMA_RW) {
+		// Read data from PCI and write to cpu
+		src = &this->space(pciSel);
+		dst = &m_cpu->space(AS_PROGRAM);
+		srcAddr = m_cpu_regs[NREG_DMA_CPAR];
+		dstAddr = m_cpu_regs[NREG_DMA_CMAR];
+	} else {
+		// Read data from cpu and write to PCI
+		src = &m_cpu->space(AS_PROGRAM);
+		dst = &this->space(pciSel);
+		srcAddr = m_cpu_regs[NREG_DMA_CMAR];
+		dstAddr = m_cpu_regs[NREG_DMA_CPAR];
 	}
+	int count = m_cpu_regs[NREG_DMA_REM];
+	while (count>0) {
+		dst->write_dword(dstAddr, src->read_dword(srcAddr));
+		dstAddr += 0x4;
+		srcAddr += 0x4;
+		--count;
+	}
+	if (m_cpu_regs[NREG_DMACR1+which*0xC]&DMA_RW) {
+		m_cpu_regs[NREG_DMA_CPAR] = srcAddr;
+		m_cpu_regs[NREG_DMA_CMAR] = dstAddr;
+	} else {
+		m_cpu_regs[NREG_DMA_CMAR] = srcAddr;
+		m_cpu_regs[NREG_DMA_CPAR] = dstAddr;
+	}
+	m_cpu_regs[NREG_DMA_REM] = 0;
 }
+
 // CPU I/F
 READ32_MEMBER (vrc4373_device::cpu_if_r)
 {
