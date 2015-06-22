@@ -2199,7 +2199,7 @@ while (0)
 /* use SSE on 64-bit implementations, where it can be assumed */
 #if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
 
-ATTR_FORCE_INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
+INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
 {
 	rgb_t result;
 	rgbaint colorint;
@@ -2231,14 +2231,14 @@ ATTR_FORCE_INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 
 
 #else
 
-ATTR_FORCE_INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
+INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
 {
 	rgb_union result;
 	INT16 r, g, b, a;
-	r = (INT16)(iterr >> 12);                                             \
-	g = (INT16)(iterg >> 12);                                             \
-	b = (INT16)(iterb >> 12);                                             \
-	a = (INT16)(itera >> 12);                                             \
+	r = (INT16)(iterr >> 12);
+	g = (INT16)(iterg >> 12);
+	b = (INT16)(iterb >> 12);
+	a = (INT16)(itera >> 12);
 
 	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)
 	{
@@ -2400,7 +2400,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool chromaKeyTest(voodoo_state *v, stats_block *stats, UINT32 fbzModeReg, rgb_union color)
+INLINE bool chromaKeyTest(voodoo_state *v, stats_block *stats, UINT32 fbzModeReg, rgb_union color)
 {
 	if (FBZMODE_ENABLE_CHROMAKEY(fbzModeReg))
 	{
@@ -2487,7 +2487,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool alphaMaskTest(stats_block *stats, UINT32 fbzModeReg, UINT8 alpha)
+INLINE bool alphaMaskTest(stats_block *stats, UINT32 fbzModeReg, UINT8 alpha)
 {
 	if (FBZMODE_ENABLE_ALPHA_MASK(fbzModeReg))
 	{
@@ -2573,7 +2573,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool alphaTest(voodoo_state *v, stats_block *stats, UINT32 alphaModeReg, UINT8 alpha)
+INLINE bool alphaTest(voodoo_state *v, stats_block *stats, UINT32 alphaModeReg, UINT8 alpha)
 {
 	if (ALPHAMODE_ALPHATEST(alphaModeReg))
 	{
@@ -2802,14 +2802,14 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, int ditherX, int dpix, int depthX, rgb_union preFog, rgb_union &color)
+INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *dither, int dpix, UINT16 *depth, rgb_union preFog, rgb_union &color)
 {
 	if (ALPHAMODE_ALPHABLEND(ALPHAMODE))
 	{
 		//int dpix = dest[XX];
 		int dr, dg, db;
 		EXTRACT_565_TO_888(dpix, dr, dg, db);
-		int da = FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) ? depthX : 0xff;
+		int da = FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) ? depth[x] : 0xff;
 		//int sr = (RR);
 		//int sg = (GG);
 		//int sb = (BB);
@@ -2826,9 +2826,9 @@ ATTR_FORCE_INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, int ditherX,
 			//int dith = DITHER[(XX) & 3];
 
 			/* subtract the dither value */
-			dr += (15 - ditherX) >> 1;
-			dg += (15 - ditherX) >> 2;
-			db += (15 - ditherX) >> 1;
+			dr += (15 - dither[x&3]) >> 1;
+			dg += (15 - dither[x&3]) >> 2;
+			db += (15 - dither[x&3]) >> 1;
 		}
 
 		/* blend the source alpha */
@@ -3115,7 +3115,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  const UINT8 ditherX, INT32 fogDepth, rgb_union &color, INT32 iterz, INT64 iterw, rgb_union iterargb)
+INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  INT32 x, const UINT8 *dither4, INT32 fogDepth, rgb_union &color, INT32 iterz, INT64 iterw, rgb_union iterargb)
 {
 	if (FOGMODE_ENABLE_FOG(fogModeReg))
 	{
@@ -3185,7 +3185,7 @@ ATTR_FORCE_INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 f
 
 					/* apply dither */
 					if (FOGMODE_FOG_DITHER(fogModeReg))
-						deltaval += ditherX;
+						deltaval += dither4[x&3];
 					deltaval >>= 4;
 
 					/* add to the blending factor */
@@ -3758,7 +3758,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool depthTest(UINT16 zaColorReg, stats_block *stats, INT32 destDepth, UINT32 fbzModeReg, INT32 biasdepth)
+INLINE bool depthTest(UINT16 zaColorReg, stats_block *stats, INT32 destDepth, UINT32 fbzModeReg, INT32 biasdepth)
 {
 	/* handle depth buffer testing */
 	if (FBZMODE_ENABLE_DEPTHBUF(fbzModeReg))
@@ -3851,9 +3851,9 @@ ATTR_FORCE_INLINE bool depthTest(UINT16 zaColorReg, stats_block *stats, INT32 de
 		/* perform fogging */                                                       \
 		rgb_union preFog; \
 		preFog.u = color.u; \
-		applyFogging(VV, FOGMODE, FBZCOLORPATH, DITHER4[XX&3], fogdepth, color, ITERZ, ITERW, ITERAXXX); \
+		applyFogging(VV, FOGMODE, FBZCOLORPATH, XX, DITHER4, fogdepth, color, ITERZ, ITERW, ITERAXXX); \
 		/* perform alpha blending */                                                \
-		alphaBlend(FBZMODE, ALPHAMODE, DITHER[XX&3], dest[XX], depth[XX], preFog, color); \
+		alphaBlend(FBZMODE, ALPHAMODE, XX, DITHER, dest[XX], depth, preFog, color); \
 		a = color.rgb.a; r = color.rgb.r; g = color.rgb.g; b = color.rgb.b;						\
 	} 																						\
 	/* modify the pixel for debugging purposes */                               \
@@ -4183,7 +4183,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPATH, UINT32 FBZMODE, UINT32 ALPHAMODE,
+INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPATH, UINT32 FBZMODE, UINT32 ALPHAMODE,
 													rgb_union TEXELARGB, INT32 ITERZ, INT64 ITERW, rgb_union ITERARGB, rgb_union &color)
 {
 	rgb_union c_other;
@@ -4570,7 +4570,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 			if (TMUS >= 2 && v->tmu[1].lodmin < (8 << 8))                    {       \
 				INT32 tmp; \
 				const rgb_union texelZero = {0};  \
-				texel.u = genTexture(&v->tmu[1], dither4[x&3], TEXMODE1, v->tmu[1].lookup, extra->lodbase1, \
+				texel.u = genTexture(&v->tmu[1], x, dither4, TEXMODE1, v->tmu[1].lookup, extra->lodbase1, \
 															iters1, itert1, iterw1, tmp); \
 				texel.u = combineTexture(&v->tmu[1], TEXMODE1, texel, texelZero, tmp); \
 			} \
@@ -4583,7 +4583,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 				if (!v->send_config)                                                \
 				{                                                                   \
 					INT32 lod0; \
-					texelT0.u = genTexture(&v->tmu[0], dither4[x&3], TEXMODE0, v->tmu[0].lookup, extra->lodbase0, \
+					texelT0.u = genTexture(&v->tmu[0], x, dither4, TEXMODE0, v->tmu[0].lookup, extra->lodbase0, \
 																	iters0, itert0, iterw0, lod0); \
 					texel.u = combineTexture(&v->tmu[0], TEXMODE0, texelT0, texel, lod0); \
 				}                                                                   \
@@ -4625,8 +4625,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 		}                                                                       \
 	}                                                                           \
 }
-
-ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, const UINT8 ditherX, const UINT32 TEXMODE, rgb_t *LOOKUP, INT32 LODBASE, INT64 ITERS, INT64 ITERT, INT64 ITERW, INT32 &lod)
+INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UINT32 TEXMODE, rgb_t *LOOKUP, INT32 LODBASE, INT64 ITERS, INT64 ITERT, INT64 ITERW, INT32 &lod)
 {
 	UINT32 result;
 	INT32 oow, s, t, ilod;
@@ -4658,7 +4657,7 @@ ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, const UINT8 ditherX, const UI
 	/* clamp the LOD */
 	lod += (TT)->lodbias;
 	if (TEXMODE_ENABLE_LOD_DITHER(TEXMODE))
-		lod += ditherX << 4;
+		lod += dither4[x&3] << 4;
 	if (lod < (TT)->lodmin)
 		lod = (TT)->lodmin;
 	else if (lod > (TT)->lodmax)
@@ -4814,7 +4813,7 @@ ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, const UINT8 ditherX, const UI
 	return result;
 }
 
-ATTR_FORCE_INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_local, rgb_union c_other, INT32 lod)
+INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_local, rgb_union c_other, INT32 lod)
 {
 	UINT32 result;
 	//INT32 blendr, blendg, blendb, blenda;
