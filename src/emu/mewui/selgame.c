@@ -29,8 +29,6 @@
 #include "mewui/utils.h"
 #include "mewui/auditmenu.h"
 
-static const char *MEWUI_VERSION_TAG = "# MEWUI INFO ";
-
 //-------------------------------------------------
 //  sort
 //-------------------------------------------------
@@ -105,7 +103,8 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 	load_cache_info();
 
 	// build drivers list
-	build_available_list();
+	if (!mewui_globals::load_available_machines(machine, m_availablelist, m_unavailablelist, m_availsortedlist, m_unavailsortedlist))
+		build_available_list();
 
 	// load custom filter
 	load_custom_filters(machine);

@@ -355,3 +355,121 @@ void c_year::set(const char *str)
 
 	ui.push_back(name);
 }
+
+//-------------------------------------------------
+//  save drivers infos to file
+//-------------------------------------------------
+
+void mewui_globals::save_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
+                                            std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
+{
+	// attempt to open the output file
+	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+
+	if (file.open(emulator_info::get_configname(), "_avail.ini") == FILERR_NONE)
+	{
+		std::string filename(file.fullpath());
+		file.close();
+		std::ofstream myfile(filename.c_str());
+		UINT8 space = 0;
+
+		// generate header
+		std::string buffer = std::string("#\n# MEWUI INFO ").append(mewui_version).append("\n#\n\n");
+		myfile << buffer;
+		myfile << (int)available.size();
+		myfile << space;
+		myfile << (int)unavailable.size();
+		myfile << space;
+		int find = 0;
+
+		// generate available list
+		for (int x = 0; x < available.size(); ++x)
+		{
+			find = driver_list::find(available[x]->name);
+			myfile << find;
+			myfile << space;
+			find = driver_list::find(availablesorted[x]->name);
+			myfile << find;
+			myfile << space;
+		}
+
+		// generate unavailable list
+		for (int x = 0; x < unavailable.size(); ++x)
+		{
+			find = driver_list::find(unavailable[x]->name);
+			myfile << find;
+			myfile << space;
+			find = driver_list::find(unavailablesorted[x]->name);
+			myfile << find;
+			myfile << space;
+		}
+		myfile.close();
+	}
+}
+
+//-------------------------------------------------
+//  load drivers infos from file
+//-------------------------------------------------
+
+bool mewui_globals::load_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
+                                            std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
+{
+	// try to load available drivers from file
+	emu_file efile(machine.options().mewui_path(), OPEN_FLAG_READ);
+	file_error filerr = efile.open(emulator_info::get_configname(), "_avail.ini");
+
+	// file not exist ? exit
+	if (filerr != FILERR_NONE)
+		return false;
+
+	std::string filename(efile.fullpath());
+	efile.close();
+
+	std::ifstream myfile(filename.c_str());
+	std::string readbuf;
+	std::getline(myfile, readbuf);
+	std::getline(myfile, readbuf);
+	std::string a_rev = std::string(MEWUI_VERSION_TAG).append(mewui_version);
+
+	// version not matching ? exit
+	if (a_rev != readbuf)
+	{
+		myfile.close();
+		return false;
+	}
+
+	std::getline(myfile, readbuf);
+	std::getline(myfile, readbuf);
+
+	UINT8 space = 0;
+	int avsize, unavsize;
+	myfile >> avsize;
+	myfile >> space;
+	myfile >> unavsize;
+	myfile >> space;
+	int find = 0;
+
+	// load available list
+	for (int x = 0; x < avsize; ++x)
+	{
+		myfile >> find;
+		myfile >> space;
+		available.push_back(&driver_list::driver(find));
+		myfile >> find;
+		myfile >> space;
+		availablesorted.push_back(&driver_list::driver(find));
+	}
+
+	// load unavailable list
+	for (int x = 0; x < unavsize; ++x)
+	{
+		myfile >> find;
+		myfile >> space;
+		unavailable.push_back(&driver_list::driver(find));
+		myfile >> find;
+		myfile >> space;
+		unavailablesorted.push_back(&driver_list::driver(find));
+	}
+	myfile.close();
+	return true;
+}

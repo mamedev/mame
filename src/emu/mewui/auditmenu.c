@@ -10,6 +10,7 @@
 #include "ui/ui.h"
 #include "audit.h"
 #include "mewui/auditmenu.h"
+#include "mewui/utils.h"
 #include <algorithm>
 
 //-------------------------------------------------
@@ -159,6 +160,7 @@ void ui_menu_audit::handle()
 	std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
 	m_unavailablesorted = m_unavailable;
 	std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
+	mewui_globals::save_available_machines(machine(), m_available, m_unavailable, m_availablesorted, m_unavailablesorted);
 	ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
 	ui_menu::stack_pop(machine());
 }
