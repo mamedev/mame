@@ -97,9 +97,10 @@ static const res_net_info battroad_char_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VIN_TTL_OUT,
 	{
+		{ RES_NET_AMP_NONE, 0, 0, 2, {       470, 220 } },
 		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_NONE, 0, 0, 2, {       470, 220 } }
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } }
+
 	}
 };
 
@@ -155,8 +156,8 @@ static const res_net_decode_info battroad_char_decode_info =
 	0x000, 0x01f,       /* start/end */
 	/*  R      G      B */
 	{ 0x600, 0x600, 0x600 }, /* offsets */
-	{     0,     3,     6 }, /* shifts */
-	{  0x07,  0x07,  0x03 }  /* masks */
+	{     6,     3,     0 }, /* shifts */
+	{  0x03,  0x07,  0x07 }  /* masks */
 };
 
 
