@@ -153,7 +153,6 @@ public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_motor(false)
-		, m_strobe(false)
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "mc6847")
 		, m_cass(*this, "cassette")
@@ -185,7 +184,6 @@ private:
 	UINT16 m_page;
 	UINT8 *m_work_ram;
 	bool m_motor;
-	bool m_strobe;
 	bool m_centronics_busy;
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -224,16 +222,12 @@ READ8_MEMBER(spc1000_state::iplk_r)
 WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	bool m = BIT(data, 1) ? true : false;
-	bool s = BIT(data, 2) ? true : false;
+	bool s = ;
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	if (m && !m_motor)
 		m_cass->change_state(m_cass->get_state() & CASSETTE_MASK_MOTOR ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	m_motor = m;
-	if (s != m_strobe)
-	{
-		m_centronics->write_strobe(!s);
-		m_strobe = s;
-	}
+	m_centronics->write_strobe(BIT(data, 2) ? true : false);
 }
 
 WRITE8_MEMBER(spc1000_state::gmode_w)
@@ -492,7 +486,6 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, NULL, false)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(spc1000_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
