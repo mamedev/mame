@@ -2,7 +2,6 @@
 -- copyright-holders:MAMEdev Team
 
 project "netlist"
-	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid "665ef8ac-2a4c-4c3e-a05f-fd1e5db11de9"
 	kind (LIBTYPE)
 
