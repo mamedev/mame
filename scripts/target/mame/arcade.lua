@@ -876,7 +876,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/asteroid.c",
 	MAME_DIR .. "src/mame/machine/asteroid.c",
 	MAME_DIR .. "src/mame/audio/asteroid.c",
-	MAME_DIR .. "src/mame/audio/llander.c",
 	MAME_DIR .. "src/mame/drivers/atarifb.c",
 	MAME_DIR .. "src/mame/machine/atarifb.c",
 	MAME_DIR .. "src/mame/audio/atarifb.c",

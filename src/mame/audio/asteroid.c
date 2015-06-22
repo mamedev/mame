@@ -323,3 +323,5 @@ WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
 {
 	m_discrete->write(space, ASTEROID_NOISE_RESET, 0);
 }
+
+#include "llander.inc"
