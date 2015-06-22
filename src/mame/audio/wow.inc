@@ -20,16 +20,11 @@ wow_sh_ update- Null
 
 **************************************************************************/
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "includes/astrocde.h"
-
-
 /****************************************************************************
  * 64 Phonemes - currently 1 sample per phoneme, will be combined sometime!
  ****************************************************************************/
 
-static const char *const PhonemeTable[65] =
+static const char *const PhonemeTable_wow[65] =
 {
 	"EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
 	"AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",
@@ -72,7 +67,7 @@ static const char *const wowWordTable[] =
 "YI3U", "Y1IUU", "YIUUI", "Y1IUU1U1", "YI3U1", "Y1IUUL", "YIUU1L", "Y1IUUD", "YO2O2R",0
 };
 
-#define num_samples (sizeof(wowWordTable)/sizeof(char *))
+#define num_samples_wow (sizeof(wowWordTable)/sizeof(char *))
 
 
 const char *const wow_sample_names[] =
@@ -114,7 +109,7 @@ READ8_MEMBER( astrocde_state::wow_speech_r )
 	Phoneme = data & 0x3F;
 	//Intonation = data >> 6;
 
-	//logerror("Data : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
+	//logerror("Data : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable_wow[Phoneme],Intonation);
 
 	if(Phoneme==63) {
 		m_samples->stop(0);
@@ -128,11 +123,11 @@ READ8_MEMBER( astrocde_state::wow_speech_r )
 	/* Phoneme to word translation */
 
 	if (*(m_totalword) == 0) {
-		strcpy(m_totalword,PhonemeTable[Phoneme]);                      /* Copy over the first phoneme */
+		strcpy(m_totalword,PhonemeTable_wow[Phoneme]);                      /* Copy over the first phoneme */
 		if (m_plural != 0) {
 			//logerror("found a possible plural at %d\n",m_plural-1);
 			if (!strcmp("S",m_totalword)) {         /* Plural check */
-				m_samples->start(0, num_samples-2);      /* play the sample at position of word */
+				m_samples->start(0, num_samples_wow-2);      /* play the sample at position of word */
 				m_samples->set_frequency(0, 11025);    /* play at correct rate */
 				m_totalword[0] = 0;                 /* Clear the total word stack */
 				m_oldword[0] = 0;                   /* Clear the total word stack */
@@ -142,7 +137,7 @@ READ8_MEMBER( astrocde_state::wow_speech_r )
 			}
 		}
 	} else
-		strcat(m_totalword,PhonemeTable[Phoneme]);                      /* Copy over the first phoneme */
+		strcat(m_totalword,PhonemeTable_wow[Phoneme]);                      /* Copy over the first phoneme */
 
 	//logerror("Total word = %s\n",m_totalword);
 
