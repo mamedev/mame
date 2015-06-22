@@ -29,11 +29,15 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "includes/darkmist.h"
 
+void darkmist_state::machine_start()
+{
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+}
 
 WRITE8_MEMBER(darkmist_state::hw_w)
 {
 	m_hw=data;
-	membank("bank1")->set_base(&memregion("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
+	membank("bank1")->set_entry((data&0x80)?1:0);
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
@@ -389,11 +393,10 @@ void darkmist_state::decrypt_gfx()
 
 void darkmist_state::decrypt_snd()
 {
-	int i;
 	UINT8 *ROM = memregion("t5182_z80")->base();
 
-	for(i=0x0000;i<0x2000;i++)
-		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
+	for (int i = 0x0000; i < 0x8000; i++)
+		ROM[i] = BITSWAP8(ROM[i], 7, 1, 2, 3, 4, 5, 6, 0);
 }
 
 DRIVER_INIT_MEMBER(darkmist_state,darkmist)
@@ -433,7 +436,6 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	}
 
 	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
-	membank("bank1")->set_base(&ROM[0x010000]);
 
 	/* adr line swaps */
 	ROM = memregion("user1")->base();

@@ -140,7 +140,8 @@ public:
 	DECLARE_READ32_MEMBER(wyvernwg_speedup_r);
 	DECLARE_READ32_MEMBER(wyvernwga_speedup_r);
 	DECLARE_READ32_MEMBER(finalgdr_speedup_r);
-	DECLARE_READ32_MEMBER(mrkicker_speedup_r);
+	DECLARE_READ32_MEMBER(mrkickera_speedup_r);
+	DECLARE_READ16_MEMBER(mrkicker_speedup_r);
 	DECLARE_READ16_MEMBER(dquizgo2_speedup_r);
 	DECLARE_READ32_MEMBER(aoh_speedup_r);
 	DECLARE_READ16_MEMBER(jmpbreak_speedup_r);
@@ -161,7 +162,7 @@ public:
 	DECLARE_WRITE32_MEMBER(finalgdr_oki_bank_w);
 	DECLARE_WRITE32_MEMBER(aoh_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(boonggab_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(mrkickera_oki_bank_w);
+	DECLARE_WRITE16_MEMBER(mrkicker_oki_bank_w);
 	DECLARE_WRITE32_MEMBER(wyvernwg_snd_w);
 	DECLARE_WRITE16_MEMBER(misncrft_snd_w);
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
@@ -171,7 +172,7 @@ public:
 	DECLARE_DRIVER_INIT(vamphalf);
 	DECLARE_DRIVER_INIT(vamphafk);
 	DECLARE_DRIVER_INIT(coolmini);
-	DECLARE_DRIVER_INIT(mrkicker);
+	DECLARE_DRIVER_INIT(mrkickera);
 	DECLARE_DRIVER_INIT(mrdig);
 	DECLARE_DRIVER_INIT(jmpbreak);
 	DECLARE_DRIVER_INIT(dtfamily);
@@ -187,7 +188,7 @@ public:
 	DECLARE_DRIVER_INIT(boonggab);
 	DECLARE_DRIVER_INIT(wyvernwg);
 	DECLARE_DRIVER_INIT(yorijori);
-	DECLARE_DRIVER_INIT(mrkickera);
+	DECLARE_DRIVER_INIT(mrkicker);
 
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -341,7 +342,7 @@ WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)
 }
 
 
-WRITE16_MEMBER(vamphalf_state::mrkickera_oki_bank_w)
+WRITE16_MEMBER(vamphalf_state::mrkicker_oki_bank_w)
 {
 	m_oki->set_bank_base(0x40000 * (data & 0x3));
 }
@@ -457,7 +458,7 @@ static ADDRESS_MAP_START( misncrft_io, AS_IO, 16, vamphalf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolmini_io, AS_IO, 16, vamphalf_state )
-//	AM_RANGE(0x002, 0x003) AM_WRITE(mrkickera_oki_bank_w) // not coolmini?, installed on init
+//	AM_RANGE(0x002, 0x003) AM_WRITE(mrkicker_oki_bank_w) // not coolmini?, installed on init
 	AM_RANGE(0x200, 0x203) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
@@ -507,7 +508,7 @@ static ADDRESS_MAP_START( finalgdr_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x60a0, 0x60a3) AM_WRITE(finalgdr_oki_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrkicker_io, AS_IO, 32, vamphalf_state )
+static ADDRESS_MAP_START( mrkickera_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x2400, 0x2403) AM_READ(eeprom32_r)
 	AM_RANGE(0x4000, 0x4003) AM_READNOP //?
 	AM_RANGE(0x4000, 0x4003) AM_WRITE(finalgdr_eeprom_w)
@@ -985,8 +986,9 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))    // coolmini requires fast erase
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))    // dtfamily requires fast write
+	// various games require fast timing to save settings, probably because our Hyperstone core timings are incorrect
+	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1105,10 +1107,10 @@ static MACHINE_CONFIG_DERIVED( finalgdr, common )
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mrkicker, common )
+static MACHINE_CONFIG_DERIVED( mrkickera, common )
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
-	MCFG_CPU_IO_MAP(mrkicker_io)
+	MCFG_CPU_IO_MAP(mrkickera_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -2262,7 +2264,7 @@ ROMs:
 
 */
 
-ROM_START( mrkicker )
+ROM_START( mrkickera )
 	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* rom0 empty */
 	ROM_LOAD( "2-semicom.rom1", 0x080000, 0x080000, CRC(d3da29ca) SHA1(b843c650096a1c6d50f99e354ec0c93eb4406c5b) ) /* SEMICOM-003b PCB */
@@ -2288,11 +2290,11 @@ ROM_START( mrkicker )
 	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) */
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) (game also refuses to boot if program attempts to rewrite it, CPU bug or protection?) */
 	ROM_LOAD( "eeprom-mrkicker.bin", 0x0000, 0x0080, CRC(87afb8f7) SHA1(444203b793c1d7929fc5916f18b510198719cd38) )
 ROM_END
 
-ROM_START( mrkickera )
+ROM_START( mrkicker )
 	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* rom1 empty */
 	ROM_LOAD( "3-semicom.rom2", 0x080000, 0x080000, CRC(3f7fa08b) SHA1(dbffd44d8387e6ed1a4b5ec85ccf64d69a108d88) ) /* F-E1-16-010 PCB */
@@ -2321,9 +2323,6 @@ ROM_START( mrkickera )
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
 	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) */
-	ROM_LOAD( "eeprom-mrkicker.bin", 0x0000, 0x0080, CRC(87afb8f7) SHA1(444203b793c1d7929fc5916f18b510198719cd38) )
 ROM_END
 
 /*
@@ -2657,7 +2656,7 @@ READ32_MEMBER(vamphalf_state::finalgdr_speedup_r)
 	return m_wram32[0x005e874/4];
 }
 
-READ32_MEMBER(vamphalf_state::mrkicker_speedup_r)
+READ32_MEMBER(vamphalf_state::mrkickera_speedup_r)
 {
 	UINT32 pc = space.device().safe_pc();
 	if(pc == 0x469de || pc == 0x46a36)
@@ -2669,6 +2668,17 @@ READ32_MEMBER(vamphalf_state::mrkicker_speedup_r)
 	}
 
 	return m_wram32[0x00701a4/4];
+}
+
+READ16_MEMBER(vamphalf_state::mrkicker_speedup_r)
+{
+	UINT32 pc = space.device().safe_pc();
+	if(pc == 0x41ec6)
+	{
+		space.device().execute().eat_cycles(50);
+	}
+
+	return m_wram[0x00063fc0/2];
 }
 
 
@@ -2793,10 +2803,10 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
+DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 {
-//	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d2e80, 0x000d2e83, read16_delegate(FUNC(vamphalf_state::mrkickera_speedup_r), this));
-	m_maincpu->space(AS_IO).install_write_handler(0x002, 0x003, write16_delegate(FUNC(vamphalf_state::mrkickera_oki_bank_w), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
+	m_maincpu->space(AS_IO).install_write_handler(0x002, 0x003, write16_delegate(FUNC(vamphalf_state::mrkicker_oki_bank_w), this));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -2899,12 +2909,12 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
+DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
 {
 	// backup ram isn't used
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = auto_alloc_array(machine(), UINT8, 0x80*0x100);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00701a4, 0x00701a7, read32_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00701a4, 0x00701a7, read32_delegate(FUNC(vamphalf_state::mrkickera_speedup_r), this));
 	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram, 0x80*0x100);
 
 	m_palshift = 0;
@@ -2992,8 +3002,8 @@ GAME( 2000, misncrfta, misncrft, misncrft, common,   vamphalf_state, misncrft, R
 GAME( 2000, mrdig,     0,        mrdig,    common,   vamphalf_state, mrdig,    ROT0,   "Sun",               "Mr. Dig", GAME_SUPPORTS_SAVE )
 GAME( 2001, dtfamily,  0,        coolmini, common,   vamphalf_state, dtfamily, ROT0,   "SemiCom",           "Diet Family", GAME_SUPPORTS_SAVE )
 GAME( 2001, finalgdr,  0,        finalgdr, finalgdr, vamphalf_state, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", GAME_SUPPORTS_SAVE )
-GAME( 2001, mrkicker,  0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker (SEMICOM-003b PCB)", GAME_SUPPORTS_SAVE )
-GAME( 2001, mrkickera, mrkicker, coolmini, common,   vamphalf_state, mrkickera,ROT0,   "SemiCom",           "Mr. Kicker (F-E1-16-010 PCB)", GAME_SUPPORTS_SAVE )
+GAME( 2001, mrkicker,  0,        coolmini, common,   vamphalf_state, mrkicker,ROT0,    "SemiCom",           "Mr. Kicker (F-E1-16-010 PCB)", GAME_SUPPORTS_SAVE )
+GAME( 2001, mrkickera, mrkicker, mrkickera,finalgdr, vamphalf_state, mrkickera, ROT0,  "SemiCom",           "Mr. Kicker (SEMICOM-003b PCB)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // if you allow eeprom saving works then this set corrupts the eeprom and then won't boot
 GAME( 2001, toyland,   0,        coolmini, common,   vamphalf_state, toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", GAME_SUPPORTS_SAVE )
 GAME( 2001, wivernwg,  0,        wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom",           "Wivern Wings", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2001, wyvernwg,  wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

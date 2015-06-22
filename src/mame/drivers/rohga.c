@@ -1454,7 +1454,9 @@ ROM_START( wizdfire )
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
 	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "mas10",  0x00000,  0x100000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
+	// hack, sample banks 0/1 are used for the Japanese version and 2/3 are used for the English version, I can't find the bankswitch, so swap the halves.
+	ROM_LOAD( "mas10",  0x80000,  0x80000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
+	ROM_CONTINUE(0x00000, 0x80000)
 
 	ROM_REGION(0x080000, "oki2", 0 ) /* Oki samples */
 	ROM_LOAD( "mas11",  0x00000,  0x080000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
@@ -1498,7 +1500,9 @@ ROM_START( wizdfireu )
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
 	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "mas10",  0x00000,  0x100000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
+	// hack, sample banks 0/1 are used for the Japanese version and 2/3 are used for the English version, I can't find the bankswitch, so swap the halves
+	ROM_LOAD( "mas10",  0x80000,  0x80000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
+	ROM_CONTINUE(0x00000, 0x80000)
 
 	ROM_REGION(0x080000, "oki2", 0 ) /* Oki samples */
 	ROM_LOAD( "mas11",  0x00000,  0x080000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
