@@ -174,10 +174,10 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
 	 *  45L 18 IOA3  ==> CH
 	 *
 	 */
-	m_audio_BD->write_line(data & 0x01 ? 1: 0);
-	m_audio_SD->write_line(data & 0x02 ? 1: 0);
-	m_audio_OH->write_line(data & 0x04 ? 1: 0);
-	m_audio_CH->write_line(data & 0x08 ? 1: 0);
+	if (m_audio_BD) m_audio_BD->write_line(data & 0x01 ? 1: 0);
+	if (m_audio_SD) m_audio_SD->write_line(data & 0x02 ? 1: 0);
+	if (m_audio_OH) m_audio_OH->write_line(data & 0x04 ? 1: 0);
+	if (m_audio_CH) m_audio_CH->write_line(data & 0x08 ? 1: 0);
 #ifdef MAME_DEBUG
 	if (data & 0x0f) popmessage("analog sound %x",data&0x0f);
 #endif
