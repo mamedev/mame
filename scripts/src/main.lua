@@ -258,13 +258,6 @@ function mainProject(_target, _subtarget)
 
 		dofile("retro_fpic.lua")
 
-		-- "macosx" for libretro platforms "osx" and "ios"
-		if _OPTIONS["targetos"]=="macosx" then
-			linkoptions {
-				"-Wl,-u,_retro_run",
-			}
-		end
-
 		-- "linux" for pretty much any Linux/BSD/Android...
 		if _OPTIONS["targetos"]=="linux" then
 			linkoptions {
@@ -272,6 +265,14 @@ function mainProject(_target, _subtarget)
 			}
 		end
 
+		-- If we compile this into the OSD rather than the main shared library, the
+		-- linker will "helpfully" strip out the "unused" libretro API...
+		includedirs {
+			MAME_DIR .. "src/osd/retro/libretro-common/include",
+		}
+		files {
+			MAME_DIR .. "src/osd/retro/libretro.c"
+		}
 	end
 	-- END libretro overrides to MAME's GENie build
 end

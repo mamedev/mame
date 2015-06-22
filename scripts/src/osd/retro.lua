@@ -50,8 +50,13 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 		MAME_DIR .. "src/osd/modules/sound/retro_sound.c",
-		MAME_DIR .. "src/osd/retro/libretro.c",
 		MAME_DIR .. "src/osd/retro/retromain.c",
+
+		-- The public API in libretro.c is "unused" and tends to get
+		-- stripped by the "helpful" linker, so we compile it into
+		-- the top-level shared lib to avoid having to jump through
+		-- quite as many hoops.
+		-- MAME_DIR .. "src/osd/retro/libretro.c",
 	}
 
 	-- We don't support MIDI at present
