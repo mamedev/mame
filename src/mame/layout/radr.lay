@@ -52,7 +52,7 @@
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
-		<bezel element="shifter" inputtag="P1_A" inputmask="0x01">
+		<bezel element="shifter" inputtag="mainpcb:P1_A" inputmask="0x01">
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</bezel>
@@ -61,7 +61,7 @@
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
-		<bezel element="shifter" inputtag="P1_A" inputmask="0x01">
+		<bezel element="shifter" inputtag="mainpcb:P1_A" inputmask="0x01">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</bezel>
