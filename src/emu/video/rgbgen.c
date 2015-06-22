@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#if !defined(__ALTIVEC__)
+
 #include "emu.h"
 #include "rgbgen.h"
 
@@ -128,3 +130,5 @@ UINT32 rgbaint_t::bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT
 
 	return (ag0 & 0xff00ff00) | (rb0 & 0x00ff00ff);
 }
+
+#endif // !defined(__ALTIVEC__)

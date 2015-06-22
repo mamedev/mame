@@ -17,12 +17,11 @@
     TABLES
 ***************************************************************************/
 
-const rgbaint_t::VECU16 rgbaint_t::maxbyte = { 255, 255, 255, 255, 255, 255, 255, 255 };
 const rgbaint_t::VECU8  rgbaint_t::alpha_perm   = { 16, 17, 18, 19,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 };
 const rgbaint_t::VECU8  rgbaint_t::red_perm     = {  0,  1,  2,  3, 16, 17, 18, 19,  8,  9, 10, 11, 12, 13, 14, 15 };
 const rgbaint_t::VECU8  rgbaint_t::green_perm   = {  0,  1,  2,  3,  4,  5,  6,  7, 16, 17, 18, 19, 12, 13, 14, 15 };
 const rgbaint_t::VECU8  rgbaint_t::blue_perm    = {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 16, 17, 18, 19 };
-const rgbaint_t::VECU16 rgbaint_t::scale_table[256] = {
+const rgbaint_t::VECS16 rgbaint_t::scale_table[256] = {
 	{   0, 256,   0, 256,   0, 256,   0, 256 }, {   1, 255,   1, 255,   1, 255,   1, 255 },
 	{   2, 254,   2, 254,   2, 254,   2, 254 }, {   3, 253,   3, 253,   3, 253,   3, 253 },
 	{   4, 252,   4, 252,   4, 252,   4, 252 }, {   5, 251,   5, 251,   5, 251,   5, 251 },
@@ -163,8 +162,8 @@ extern const struct _rgbvmx_statics
 
 void rgbaint_t::blend(const rgbaint_t& other, UINT8 factor)
 {
-	m_value = _mm_unpacklo_epi16(m_value, other.m_value);
-	m_value = vec_add((VECU16)m_value, scale_table[factor]);
+	m_value = vec_mergeh(m_value, other.m_value);
+	m_value = vec_msum((VECS16)m_value, scale_table[factor], vec_splat_s32(0));
 	m_value = vec_sr(m_value, vec_splat_u32(8));
 }
 
@@ -212,26 +211,31 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 
 UINT32 rgbaint_t::bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 {
-	__m128i color00 = _mm_cvtsi32_si128(rgb00);
-	__m128i color01 = _mm_cvtsi32_si128(rgb01);
-	__m128i color10 = _mm_cvtsi32_si128(rgb10);
-	__m128i color11 = _mm_cvtsi32_si128(rgb11);
+	const VECS32 zero = vec_splat_s32(0);
+
+	VECS32 color00 = vec_perm((VECS32)vec_lde(0, &rgb00), zero, vec_lvsl(0, &rgb00));
+	VECS32 color01 = vec_perm((VECS32)vec_lde(0, &rgb01), zero, vec_lvsl(0, &rgb01));
+	VECS32 color10 = vec_perm((VECS32)vec_lde(0, &rgb10), zero, vec_lvsl(0, &rgb10));
+	VECS32 color11 = vec_perm((VECS32)vec_lde(0, &rgb11), zero, vec_lvsl(0, &rgb11));
 
 	/* interleave color01 and color00 at the byte level */
-	color01 = _mm_unpacklo_epi8(color01, color00);
-	color11 = _mm_unpacklo_epi8(color11, color10);
-	color01 = _mm_unpacklo_epi8(color01, _mm_setzero_si128());
-	color11 = _mm_unpacklo_epi8(color11, _mm_setzero_si128());
-	color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
-	color11 = _mm_madd_epi16(color11, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
-	color01 = _mm_slli_epi32(color01, 15);
-	color11 = _mm_srli_epi32(color11, 1);
-	color01 = _mm_max_epi16(color01, color11);
-	color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[v][0]);
-	color01 = _mm_srli_epi32(color01, 15);
-	color01 = _mm_packs_epi32(color01, color01);
-	color01 = _mm_packus_epi16(color01, color01);
-	return _mm_cvtsi128_si32(color01);
+	color01 = vec_mergeh((VECU8)color01, (VECU8)color00);
+	color11 = vec_mergeh((VECU8)color11, (VECU8)color10);
+	color01 = vec_mergeh((VECU8)zero, (VECU8)color01);
+	color11 = vec_mergeh((VECU8)zero, (VECU8)color11);
+	color01 = vec_msum((VECS16)color01, scale_table[u], zero);
+	color11 = vec_msum((VECS16)color11, scale_table[u], zero);
+	color01 = vec_sl(color01, vec_splat_u32(15));
+	color11 = vec_sr(color11, vec_splat_u32(1));
+	color01 = vec_max((VECS16)color01, (VECS16)color11);
+	color01 = vec_msum((VECS16)color01, scale_table[v], zero);
+	color01 = vec_sr(color01, vec_splat_u32(15));
+	color01 = vec_packs(color01, color01);
+	color01 = vec_packsu((VECS16)color01, (VECS16)color01);
+
+	UINT32 result;
+	vec_ste((VECU32)color01, 0, &result);
+	return result;
 }
 
 #endif // defined(__ALTIVEC__)
