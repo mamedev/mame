@@ -2,7 +2,66 @@
 // copyright-holders:Ariane Fugmann
 
 /*
-System32/Multi32 Comm PCB
+Sega System 32 Comm PCB 837-9409
+( http://images.arianchen.de/sega-comm/f1superlap_comm.jpg )
+|--------------------------------------------------------------------------------|
+|                 |-----------------|   |---------------------------------|      |
+|                 |-----------------|   |---------------------------------|      |
+|                         CNJ        PAL                CNH                      |
+|                                                       MB89374                  |
+|                                    Z80                                         |
+|                                                       MB89237A                 |
+|    PAL                           15612.17                                      |
+|                                                                                |
+|    MB8464                          MB8464                                      |
+|                CN?                                                             |
+| |---------------------------------|                                            |
+| |---------------------------------|  LED     CN? CN?                 CNK       |
+|--------------------------------------------------------------------------------|
+	Setup:
+		Z80      - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40)
+		MB89237A - Fujitsu MB89237A DMA-Controller (DIP20) [most likely i8237A clone]
+		MB89374  - Fujitsu MB89374 Data Link Controller (SDIP42)
+		MB8464   - Fujitsu MB8464 8k x8 SRAM (DIP28)
+		MB8421   - Fujitsu MB8421-12LP 2k x8 SRAM (SDIP52)
+
+	Board:
+		837-9409	F1 Super Lap
+
+	EEPROM:
+		14084.17	Rad Rally
+		15612.17	F1 Super Lap
+
+Sega System Multi32 Comm PCB 837-8792-91
+( http://images.arianchen.de/sega-comm/orunners-front.jpg )
+|--------------------------------------------------------------------------------|
+| |---------------------------------|   |---------------------------------|      |
+| |---------------------------------|   |---------------------------------|      |
+|                CN3                                    CN4                      |
+|                                                                                |
+|    Z80                   MB8421                MB89237A            MB89374     |
+|                                                                                |
+|    15033.17            PAL                                                     |
+|                                                                                |
+|    MB8464                                                              PAL     |
+|                CN1                                         CN2                 |
+| |---------------------------------|        |---------------------------------| |
+| |---------------------------------|        |---------------------------------| |
+|                                  CN8 CN9                                       |
+|--------------------------------------------------------------------------------|
+	Setup:
+		Z80      - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40)
+		MB89237A - Fujitsu MB89237A DMA-Controller (DIP20) [most likely i8237A clone]
+		MB89374  - Fujitsu MB89374 Data Link Controller (SDIP42)
+		MB8421   - Fujitsu MB8421-12LP 2k x8 SRAM (SDIP52)
+    MB8464   - Fujitsu MB8464 8k x8 SRAM (DIP28)
+
+	Board:
+		837-8676	
+		837-8792  OutRunners, Stadium Cross
+
+	EEPROM:
+		15033.17  OutRunners, Stadium Cross
 */
 
 #include "machine/s32comm.h"
