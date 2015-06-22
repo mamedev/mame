@@ -4620,6 +4620,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 		}                                                                       \
 	}                                                                           \
 }
+
 INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UINT32 TEXMODE, rgb_t *LOOKUP, INT32 LODBASE, INT64 ITERS, INT64 ITERT, INT64 ITERW, INT32 &lod)
 {
 	UINT32 result;
