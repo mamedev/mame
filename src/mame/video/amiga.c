@@ -1119,3 +1119,5 @@ MACHINE_CONFIG_FRAGMENT( ntsc_video )
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
 	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
+
+#include "amigaaga.inc"

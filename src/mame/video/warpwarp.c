@@ -2,7 +2,7 @@
 // copyright-holders:Chris Hardy
 /***************************************************************************
 
-  video.c
+  warpwarp.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -63,7 +63,6 @@ PALETTE_INIT_MEMBER(warpwarp_state,navarone)
 
 PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 {
-	int i;
 	static const int resistances_tiles_rg[] = { 1600, 820, 390 };
 	static const int resistances_tiles_b[]  = { 820, 390 };
 	static const int resistance_ball[]      = { 220 };
@@ -75,7 +74,7 @@ PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 								2, resistances_tiles_b,  weights_tiles_b,  150, 0,
 								1, resistance_ball,      weight_ball,      150, 0);
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		int bit0, bit1, bit2;
 		int r,g,b;
@@ -206,7 +205,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_videoram_w)
 
 ***************************************************************************/
 
-inline void warpwarp_state::geebee_plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen)
+inline void warpwarp_state::plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen)
 {
 	if (cliprect.contains(x, y))
 		bitmap.pix16(y, x) = pen;
@@ -229,11 +228,11 @@ void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,p
 
 		for (i = m_ball_sizey;i > 0;i--)
 			for (j = m_ball_sizex;j > 0;j--)
-				geebee_plot(bitmap, cliprect, x-j, y-i, pen);
+				plot(bitmap, cliprect, x-j, y-i, pen);
 	}
 }
 
-UINT32 warpwarp_state::screen_update_geebee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 warpwarp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
