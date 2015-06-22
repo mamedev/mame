@@ -71,7 +71,7 @@ enum profile_type
 	PROFILER_IDLE,
 	PROFILER_TOTAL
 };
-DECLARE_ENUM_OPERATORS(profile_type);
+DECLARE_ENUM_OPERATORS(profile_type)
 
 
 

@@ -420,6 +420,6 @@ public:
 	static hlsl_options     s_hlsl_presets[4];
 };
 
-};
+}
 
 #endif

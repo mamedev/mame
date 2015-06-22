@@ -229,6 +229,6 @@ struct base
 
 base *drawd3d9_init(void);
 
-};
+}
 
 #endif
