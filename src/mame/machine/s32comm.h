@@ -80,8 +80,8 @@ private:
 	void comm_tick();
 	
 	void comm_tick_14084();
+	void comm_tick_15033();
 	void comm_tick_15612();
-	void comm_tick3();
 #endif
 };
 

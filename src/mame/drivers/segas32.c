@@ -5286,6 +5286,8 @@ void segas32_state::init_orunners(void)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::orunners_custom_io_w),this));
 	m_sw1_output = &segas32_state::orunners_sw1_output;
 	m_sw2_output = &segas32_state::orunners_sw2_output;
+
+	m_s32comm->set_linktype(15033); // EPR-15033
 }
 
 
@@ -5314,6 +5316,8 @@ void segas32_state::init_scross(void)
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
 	m_sw2_output = &segas32_state::scross_sw2_output;
+
+	m_s32comm->set_linktype(15033); // EPR-15033
 }
 
 
