@@ -39,6 +39,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fgtile_info);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
+	virtual void machine_start();
 	DECLARE_DRIVER_INIT(darkmist);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(darkmist);
