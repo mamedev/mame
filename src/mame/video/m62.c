@@ -92,7 +92,6 @@ static const res_net_info m62_sprite_net_info =
 };
 
 
-/* this is a complete guess */
 static const res_net_info battroad_char_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VIN_TTL_OUT,
