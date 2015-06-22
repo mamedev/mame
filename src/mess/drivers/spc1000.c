@@ -222,7 +222,6 @@ READ8_MEMBER(spc1000_state::iplk_r)
 WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	bool m = BIT(data, 1) ? true : false;
-	bool s = ;
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	if (m && !m_motor)
 		m_cass->change_state(m_cass->get_state() & CASSETTE_MASK_MOTOR ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
