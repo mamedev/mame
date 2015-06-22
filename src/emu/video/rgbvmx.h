@@ -117,25 +117,25 @@ public:
 	inline void set_a(const UINT32 value)
 	{
 		const vector unsigned int temp = { value, 0, 0, 0 };
-		m_value = vec_or(vec_and(m_value, alpha_mask), temp);
+		m_value = vec_perm(m_value, temp, alpha_perm);
 	}
 
 	inline void set_r(const UINT32 value)
 	{
-		const vector unsigned int temp = { 0, value, 0, 0 };
-		m_value = vec_or(vec_and(m_value, red_mask), temp);
+		const vector unsigned int temp = { value, 0, 0, 0 };
+		m_value = vec_perm(m_value, temp, red_perm);
 	}
 
 	inline void set_g(const UINT32 value)
 	{
-		const vector unsigned int temp = { 0, 0, value, 0 };
-		m_value = vec_or(vec_and(m_value, green_mask), temp);
+		const vector unsigned int temp = { value, 0, 0, 0 };
+		m_value = vec_perm(m_value, temp, green_perm);
 	}
 
 	inline void set_b(const UINT32 value)
 	{
-		const vector unsigned int temp = { 0, 0, 0, value };
-		m_value = vec_or(vec_and(m_value, blue_mask), temp);
+		const vector unsigned int temp = { value, 0, 0, 0 };
+		m_value = vec_perm(m_value, temp, blue_perm);
 	}
 
 	inline UINT8 get_a()
@@ -454,7 +454,7 @@ public:
 
 	inline void merge_alpha(const rgbaint_t& alpha)
 	{
-		m_value = vec_perm(m_value, alpha.m_value, merge_alpha_perm);
+		m_value = vec_perm(m_value, alpha.m_value, alpha_perm);
 	}
 
 	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v);
@@ -467,11 +467,10 @@ protected:
 	vector VECU32					m_value;
 
 	static const VECU16				maxbyte;
-	static const VECU32				alpha_mask;
-	static const VECU32				red_mask;
-	static const VECU32				green_mask;
-	static const VECU32				blue_mask;
-	static const VECU8				merge_alpha_perm;
+	static const VECU8				alpha_perm;
+	static const VECU8				red_perm;
+	static const VECU8				green_perm;
+	static const VECU8				blue_perm;
 	static const VECU16				scale_table[256];
 };
 

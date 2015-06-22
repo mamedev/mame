@@ -18,11 +18,10 @@
 ***************************************************************************/
 
 const rgbaint_t::VECU16 rgbaint_t::maxbyte = { 255, 255, 255, 255, 255, 255, 255, 255 };
-const rgbaint_t::VECU32 rgbaint_t::alpha_mask = { 0x00000000, 0xffffffff, 0xffffffff, 0xffffffff };
-const rgbaint_t::VECU32 rgbaint_t::red_mask = { 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff };
-const rgbaint_t::VECU32 rgbaint_t::green_mask = { 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff };
-const rgbaint_t::VECU32 rgbaint_t::blue_mask = { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 };
-const rgbaint_t::VECU8 rgbaint_t::merge_alpha_perm = { 16, 17, 18, 19, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+const rgbaint_t::VECU8  rgbaint_t::alpha_perm   = { 16, 17, 18, 19,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 };
+const rgbaint_t::VECU8  rgbaint_t::red_perm     = {  0,  1,  2,  3, 16, 17, 18, 19,  8,  9, 10, 11, 12, 13, 14, 15 };
+const rgbaint_t::VECU8  rgbaint_t::green_perm   = {  0,  1,  2,  3,  4,  5,  6,  7, 16, 17, 18, 19, 12, 13, 14, 15 };
+const rgbaint_t::VECU8  rgbaint_t::blue_perm    = {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 16, 17, 18, 19 };
 const rgbaint_t::VECU16 rgbaint_t::scale_table[256] = {
 	{   0, 256,   0, 256,   0, 256,   0, 256 }, {   1, 255,   1, 255,   1, 255,   1, 255 },
 	{   2, 254,   2, 254,   2, 254,   2, 254 }, {   3, 253,   3, 253,   3, 253,   3, 253 },
