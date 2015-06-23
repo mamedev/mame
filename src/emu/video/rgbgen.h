@@ -20,6 +20,7 @@ class rgbaint_t
 {
 public:
 	inline rgbaint_t() { }
+	inline rgbaint_t(UINT32 rgba) { set(rgba); }
 	inline rgbaint_t(UINT32 a, UINT32 r, UINT32 g, UINT32 b) { set(a, r, g, b); }
 	inline rgbaint_t(rgb_t& rgba) { set(rgba); }
 
@@ -454,7 +455,24 @@ public:
 		return *this;
 	}
 
-	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v);
+	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+	{
+		UINT32 rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+		UINT32 rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
+
+		rgb00 >>= 8;
+		rgb01 >>= 8;
+		rgb10 >>= 8;
+		rgb11 >>= 8;
+
+		UINT32 ag0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+		UINT32 ag1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
+
+		rb0 = (rb0 & 0x00ff00ff) + ((((rb1 & 0x00ff00ff) - (rb0 & 0x00ff00ff)) * v) >> 8);
+		ag0 = (ag0 & 0x00ff00ff) + ((((ag1 & 0x00ff00ff) - (ag0 & 0x00ff00ff)) * v) >> 8);
+
+		return ((ag0 << 8) & 0xff00ff00) | (rb0 & 0x00ff00ff);
+	}
 
 protected:
 	UINT32 m_a;

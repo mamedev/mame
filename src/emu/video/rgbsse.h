@@ -49,8 +49,12 @@ public:
 
 	inline rgb_t to_rgba()
 	{
-		__m128i anded = _mm_and_si128(m_value, _mm_set1_epi32(0x000000ff));
-		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(anded, anded), _mm_setzero_si128()));
+		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, _mm_setzero_si128()), _mm_setzero_si128()));
+	}
+
+	inline UINT32 to_argb8()
+	{
+		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, _mm_setzero_si128()), _mm_setzero_si128()));
 	}
 
 	inline rgb_t to_rgba_clamp()
@@ -296,6 +300,13 @@ public:
 		m_value = _mm_or_si128(_mm_and_si128(val, mask), _mm_and_si128(m_value, _mm_xor_si128(mask, _mm_set1_epi32(0xffffffff))));
 	}
 
+	inline void max(const UINT32 value)
+	{
+		__m128i val = _mm_set1_epi32(value);
+		__m128i mask = _mm_cmplt_epi32(m_value, val);
+		m_value = _mm_or_si128(_mm_and_si128(val, mask), _mm_and_si128(m_value, _mm_xor_si128(mask, _mm_set1_epi32(0xffffffff))));
+	}
+
 	void blend(const rgbaint_t& other, UINT8 factor);
 
 	void scale_and_clamp(const rgbaint_t& scale);
@@ -398,7 +409,29 @@ public:
 		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 6), 6);
 	}
 
-	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v);
+	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+	{
+		__m128i color00 = _mm_cvtsi32_si128(rgb00);
+		__m128i color01 = _mm_cvtsi32_si128(rgb01);
+		__m128i color10 = _mm_cvtsi32_si128(rgb10);
+		__m128i color11 = _mm_cvtsi32_si128(rgb11);
+
+		/* interleave color01 and color00 at the byte level */
+		color01 = _mm_unpacklo_epi8(color01, color00);
+		color11 = _mm_unpacklo_epi8(color11, color10);
+		color01 = _mm_unpacklo_epi8(color01, _mm_setzero_si128());
+		color11 = _mm_unpacklo_epi8(color11, _mm_setzero_si128());
+		color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
+		color11 = _mm_madd_epi16(color11, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
+		color01 = _mm_slli_epi32(color01, 15);
+		color11 = _mm_srli_epi32(color11, 1);
+		color01 = _mm_max_epi16(color01, color11);
+		color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[v][0]);
+		color01 = _mm_srli_epi32(color01, 15);
+		color01 = _mm_packs_epi32(color01, _mm_setzero_si128());
+		color01 = _mm_packus_epi16(color01, _mm_setzero_si128());
+		return _mm_cvtsi128_si32(color01);
+	}
 
 protected:
 	__m128i	m_value;

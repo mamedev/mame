@@ -209,33 +209,4 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 	min(255);
 }
 
-UINT32 rgbaint_t::bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
-{
-	const VECS32 zero = vec_splat_s32(0);
-
-	VECS32 color00 = vec_perm((VECS32)vec_lde(0, &rgb00), zero, vec_lvsl(0, &rgb00));
-	VECS32 color01 = vec_perm((VECS32)vec_lde(0, &rgb01), zero, vec_lvsl(0, &rgb01));
-	VECS32 color10 = vec_perm((VECS32)vec_lde(0, &rgb10), zero, vec_lvsl(0, &rgb10));
-	VECS32 color11 = vec_perm((VECS32)vec_lde(0, &rgb11), zero, vec_lvsl(0, &rgb11));
-
-	/* interleave color01 and color00 at the byte level */
-	color01 = vec_mergeh((VECU8)color01, (VECU8)color00);
-	color11 = vec_mergeh((VECU8)color11, (VECU8)color10);
-	color01 = vec_mergeh((VECU8)zero, (VECU8)color01);
-	color11 = vec_mergeh((VECU8)zero, (VECU8)color11);
-	color01 = vec_msum((VECS16)color01, scale_table[u], zero);
-	color11 = vec_msum((VECS16)color11, scale_table[u], zero);
-	color01 = vec_sl(color01, vec_splat_u32(15));
-	color11 = vec_sr(color11, vec_splat_u32(1));
-	color01 = vec_max((VECS16)color01, (VECS16)color11);
-	color01 = vec_msum((VECS16)color01, scale_table[v], zero);
-	color01 = vec_sr(color01, vec_splat_u32(15));
-	color01 = vec_packs(color01, color01);
-	color01 = vec_packsu((VECS16)color01, (VECS16)color01);
-
-	UINT32 result;
-	vec_ste((VECU32)color01, 0, &result);
-	return result;
-}
-
 #endif // defined(__ALTIVEC__)

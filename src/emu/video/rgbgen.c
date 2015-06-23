@@ -109,26 +109,4 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 	if ((UINT16)m_b > 255) { m_b = (m_b < 0) ? 0 : 255; }
 }
 
-
-/*-------------------------------------------------
-    bilinear_filter - bilinear filter between
-    four pixel values; this code is derived from
-    code provided by Michael Herf
--------------------------------------------------*/
-
-UINT32 rgbaint_t::bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
-{
-	UINT32 ag0, ag1, rb0, rb1;
-
-	rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
-	rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
-	ag0 = (rgb00 & 0xff00ff00) + ((((rgb01 & 0xff00ff00) - (rgb00 & 0xff00ff00)) * u) >> 8);
-	ag1 = (rgb10 & 0xff00ff00) + ((((rgb11 & 0xff00ff00) - (rgb10 & 0xff00ff00)) * u) >> 8);
-
-	rb0 = (rb0 & 0x00ff00ff) + ((((rb1 & 0x00ff00ff) - (rb0 & 0x00ff00ff)) * v) >> 8);
-	ag0 = (ag0 & 0xff00ff00) + ((((ag1 & 0xff00ff00) - (ag0 & 0xff00ff00)) * v) >> 8);
-
-	return (ag0 & 0xff00ff00) | (rb0 & 0x00ff00ff);
-}
-
 #endif // !defined(__ALTIVEC__)

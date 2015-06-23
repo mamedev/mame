@@ -24,7 +24,7 @@ enum
 };
 
 // Use old macro style or newer SSE2 optimized functions
-#define USE_OLD_RASTER  1
+#define USE_OLD_RASTER  0
 
 /* maximum number of TMUs */
 #define MAX_TMU                 2
@@ -2219,7 +2219,7 @@ INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT
 		temp.set(colorint);
 		temp.cmpeq_imm(0x100);
 		//	result.rgb.r = 0xff;
-
+		colorint.or_reg(temp);
 		return colorint.to_rgba();
 	}
 	else
