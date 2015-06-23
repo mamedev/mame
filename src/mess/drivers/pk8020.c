@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_DEVICE_ADD("rs232", I8251, 0)
 	MCFG_DEVICE_ADD("lan", I8251, 0)
 
-	MCFG_FD1793x_ADD("wd1793", XTAL_20MHz / 20)
+	MCFG_FD1793_ADD("wd1793", XTAL_20MHz / 20)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)

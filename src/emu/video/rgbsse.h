@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb
+// copyright-holders:Vas Crabb, Ryan Holtz
 /***************************************************************************
 
     rgbsse.h
@@ -15,238 +15,6 @@
 
 #include <emmintrin.h>
 
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-/* intermediate RGB values are stored in an __m128i */
-typedef __m128i rgbint;
-
-/* intermediate RGB values are stored in an __m128i */
-typedef __m128i rgbaint;
-
-
-
-/***************************************************************************
-    BASIC CONVERSIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    rgb_comp_to_rgbint - converts a trio of RGB
-    components to an rgbint type
--------------------------------------------------*/
-
-INLINE void rgb_comp_to_rgbint(rgbint *rgb, INT16 r, INT16 g, INT16 b)
-{
-	*rgb = _mm_set_epi16(0, 0, 0, 0, 0, r, g, b);
-}
-
-
-/*-------------------------------------------------
-    rgba_comp_to_rgbint - converts a quad of RGB
-    components to an rgbint type
--------------------------------------------------*/
-
-INLINE void rgba_comp_to_rgbaint(rgbaint *rgb, INT16 a, INT16 r, INT16 g, INT16 b)
-{
-	*rgb = _mm_set_epi16(0, 0, 0, 0, a, r, g, b);
-}
-
-
-/*-------------------------------------------------
-    rgb_to_rgbint - converts a packed trio of RGB
-    components to an rgbint type
--------------------------------------------------*/
-
-INLINE void rgb_to_rgbint(rgbint *rgb, rgb_t color)
-{
-	*rgb = _mm_unpacklo_epi8(_mm_cvtsi32_si128(color), _mm_setzero_si128());
-}
-
-
-/*-------------------------------------------------
-    rgba_to_rgbaint - converts a packed quad of RGB
-    components to an rgbint type
--------------------------------------------------*/
-
-INLINE void rgba_to_rgbaint(rgbaint *rgb, rgb_t color)
-{
-	*rgb = _mm_unpacklo_epi8(_mm_cvtsi32_si128(color), _mm_setzero_si128());
-}
-
-
-/*-------------------------------------------------
-    rgbint_to_rgb - converts an rgbint back to
-    a packed trio of RGB values
--------------------------------------------------*/
-
-INLINE rgb_t rgbint_to_rgb(const rgbint *color)
-{
-	return _mm_cvtsi128_si32(_mm_packus_epi16(*color, *color));
-}
-
-
-/*-------------------------------------------------
-    rgbaint_to_rgba - converts an rgbint back to
-    a packed quad of RGB values
--------------------------------------------------*/
-
-INLINE rgb_t rgbaint_to_rgba(const rgbaint *color)
-{
-	return _mm_cvtsi128_si32(_mm_packus_epi16(*color, *color));
-}
-
-
-/*-------------------------------------------------
-    rgbint_to_rgb_clamp - converts an rgbint back
-    to a packed trio of RGB values, clamping them
-    to bytes first
--------------------------------------------------*/
-
-INLINE rgb_t rgbint_to_rgb_clamp(const rgbint *color)
-{
-	return _mm_cvtsi128_si32(_mm_packus_epi16(*color, *color));
-}
-
-
-/*-------------------------------------------------
-    rgbaint_to_rgba_clamp - converts an rgbint back
-    to a packed quad of RGB values, clamping them
-    to bytes first
--------------------------------------------------*/
-
-INLINE rgb_t rgbaint_to_rgba_clamp(const rgbaint *color)
-{
-	return _mm_cvtsi128_si32(_mm_packus_epi16(*color, *color));
-}
-
-
-
-/***************************************************************************
-    CORE MATH
-***************************************************************************/
-
-/*-------------------------------------------------
-    rgbint_add - add two rgbint values
--------------------------------------------------*/
-
-INLINE void rgbint_add(rgbint *color1, const rgbint *color2)
-{
-	*color1 = _mm_add_epi16(*color1, *color2);
-}
-
-
-/*-------------------------------------------------
-    rgbaint_add - add two rgbaint values
--------------------------------------------------*/
-
-INLINE void rgbaint_add(rgbaint *color1, const rgbaint *color2)
-{
-	*color1 = _mm_add_epi16(*color1, *color2);
-}
-
-/*-------------------------------------------------
-    rgbaint_add_imm - add immediate INT16 to rgbaint value
--------------------------------------------------*/
-INLINE void rgbaint_add_imm(rgbaint *color1, const INT16 imm)
-{
-	__m128i temp = _mm_set_epi16(0, 0, 0, 0, imm, imm, imm, imm);
-	*color1 = _mm_add_epi16(*color1, temp);
-}
-
-
-/*-------------------------------------------------
-    rgbint_sub - subtract two rgbint values
--------------------------------------------------*/
-
-INLINE void rgbint_sub(rgbint *color1, const rgbint *color2)
-{
-	*color1 = _mm_sub_epi16(*color1, *color2);
-}
-
-
-/*-------------------------------------------------
-    rgbaint_sub - subtract two rgbaint values
--------------------------------------------------*/
-
-INLINE void rgbaint_sub(rgbaint *color1, const rgbaint *color2)
-{
-	*color1 = _mm_sub_epi16(*color1, *color2);
-}
-
-
-/*-------------------------------------------------
-    rgbint_subr - reverse subtract two rgbint
-    values
--------------------------------------------------*/
-
-INLINE void rgbint_subr(rgbint *color1, const rgbint *color2)
-{
-	__m128i temp = *color1;
-	*color1 = *color2;
-	*color1 = _mm_sub_epi16(*color1, temp);
-}
-
-
-/*-------------------------------------------------
-    rgbaint_subr - reverse subtract two rgbaint
-    values
--------------------------------------------------*/
-
-INLINE void rgbaint_subr(rgbaint *color1, const rgbaint *color2)
-{
-	__m128i temp = *color1;
-	*color1 = *color2;
-	*color1 = _mm_sub_epi16(*color1, temp);
-}
-
-
-/*-------------------------------------------------
-    rgbint_shl - shift each component of an
-    rgbint struct by the given number of bits
--------------------------------------------------*/
-
-INLINE void rgbint_shl(rgbint *color, UINT8 shift)
-{
-	*color = _mm_slli_epi16(*color, shift);
-}
-
-
-/*-------------------------------------------------
-    rgbaint_shl - shift each component of an
-    rgbaint struct by the given number of bits
--------------------------------------------------*/
-
-INLINE void rgbaint_shl(rgbaint *color, UINT8 shift)
-{
-	*color = _mm_slli_epi16(*color, shift);
-}
-
-
-/*-------------------------------------------------
-    rgbint_shr - shift each component of an
-    rgbint struct by the given number of bits
--------------------------------------------------*/
-
-INLINE void rgbint_shr(rgbint *color, UINT8 shift)
-{
-	*color = _mm_srli_epi16(*color, shift);
-}
-
-
-/*-------------------------------------------------
-    rgbaint_shr - shift each component of an
-    rgbaint struct by the given number of bits
--------------------------------------------------*/
-
-INLINE void rgbaint_shr(rgbaint *color, UINT8 shift)
-{
-	*color = _mm_srli_epi16(*color, shift);
-}
-
-
-
 /***************************************************************************
     TABLES
 ***************************************************************************/
@@ -255,194 +23,418 @@ extern const struct _rgbsse_statics
 {
 	__m128  dummy_for_alignment;
 	INT16   maxbyte[8];
+	INT16	alpha_mask[8];
+	INT16	red_mask[8];
+	INT16	green_mask[8];
+	INT16	blue_mask[8];
 	INT16   scale_table[256][8];
 } rgbsse_statics;
 
-
-
 /***************************************************************************
-    HIGHER LEVEL OPERATIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    rgbint_blend - blend two colors by the given
-    scale factor
--------------------------------------------------*/
-
-INLINE void rgbint_blend(rgbint *color1, const rgbint *color2, UINT8 color1scale)
+class rgbaint_t
 {
-	*color1 = _mm_unpacklo_epi16(*color1, *color2);
-	*color1 = _mm_madd_epi16(*color1, *(__m128i *)&rgbsse_statics.scale_table[color1scale][0]);
-	*color1 = _mm_srli_epi32(*color1, 8);
-	*color1 = _mm_packs_epi32(*color1, *color1);
-}
+public:
+	inline rgbaint_t() { }
+	inline rgbaint_t(UINT32 rgba) { set(rgba); }
+	inline rgbaint_t(UINT32 a, UINT32 r, UINT32 g, UINT32 b) { set(a, r, g, b); }
+	inline rgbaint_t(rgb_t& rgb) { set(rgb); }
 
+	inline void set(rgbaint_t& other) { m_value = other.m_value; }
+	inline void set(UINT32 rgba) { m_value = _mm_and_si128(_mm_set1_epi32(0xff), _mm_set_epi32(rgba >> 24, rgba >> 16, rgba >> 8, rgba)); }
+	inline void set(UINT32 a, UINT32 r, UINT32 g, UINT32 b) { m_value = _mm_set_epi32(a, r, g, b); }
+	inline void set(rgb_t& rgb) { m_value = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_cvtsi32_si128(rgb), _mm_setzero_si128()), _mm_setzero_si128()); }
 
-/*-------------------------------------------------
-    rgbaint_blend - blend two colors by the given
-    scale factor
--------------------------------------------------*/
+	inline rgb_t to_rgba()
+	{
+		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, _mm_setzero_si128()), _mm_setzero_si128()));
+	}
 
-INLINE void rgbaint_blend(rgbaint *color1, const rgbaint *color2, UINT8 color1scale)
-{
-	rgbint_blend(color1, color2, color1scale);
-}
+	inline UINT32 to_argb8()
+	{
+		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, _mm_setzero_si128()), _mm_setzero_si128()));
+	}
 
+	inline rgb_t to_rgba_clamp()
+	{
+		return _mm_cvtsi128_si32(_mm_packus_epi16(_mm_packs_epi32(m_value, m_value), _mm_setzero_si128()));
+	}
 
-/*-------------------------------------------------
-    rgbint_scale_and_clamp - scale the given
-    color by an 8.8 scale factor, immediate or
-    per channel, and clamp to byte values
--------------------------------------------------*/
+	inline void add(const rgbaint_t& color2)
+	{
+		m_value = _mm_add_epi32(m_value, color2.m_value);
+	}
 
-INLINE void rgbint_scale_immediate_and_clamp(rgbint *color, INT16 colorscale)
-{
-	__m128i mscale = _mm_set1_epi16(colorscale);
-	*color = _mm_unpacklo_epi16(*color, _mm_setzero_si128());
-	*color = _mm_madd_epi16(*color, mscale);
-	*color = _mm_srli_epi32(*color, 8);
-	*color = _mm_packs_epi32(*color, *color);
-	*color = _mm_min_epi16(*color, *(__m128i *)&rgbsse_statics.maxbyte);
-}
+	inline void add_imm(const UINT32 imm)
+	{
+		m_value = _mm_add_epi32(m_value, _mm_set1_epi32(imm));
+	}
 
-INLINE void rgbint_scale_channel_and_clamp(rgbint *color, const rgbint *colorscale)
-{
-	__m128i mscale = _mm_unpacklo_epi16(*colorscale, _mm_setzero_si128());
-	*color = _mm_unpacklo_epi16(*color, _mm_setzero_si128());
-	*color = _mm_madd_epi16(*color, mscale);
-	*color = _mm_srli_epi32(*color, 8);
-	*color = _mm_packs_epi32(*color, *color);
-	*color = _mm_min_epi16(*color, *(__m128i *)&rgbsse_statics.maxbyte);
-}
+	inline void add_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_add_epi32(m_value, _mm_set_epi32(a, r, g, b));
+	}
 
-INLINE void rgbaint_scale_immediate_add_and_clamp(rgbaint *color1, INT16 colorscale, const rgbaint *color2)
-{
-	// color2 will get mutiplied by 2^8 (256) and then divided by 2^8 by the shift by 8
-	__m128i mscale = _mm_unpacklo_epi16(_mm_set1_epi16(colorscale), _mm_set_epi16(0, 0, 0, 0, 256, 256, 256, 256));
-	*color1 = _mm_unpacklo_epi16(*color1, *color2);
-	*color1 = _mm_madd_epi16(*color1, mscale);
-	*color1 = _mm_srli_epi32(*color1, 8);
-	*color1 = _mm_packs_epi32(*color1, *color1);
-	*color1 = _mm_min_epi16(*color1, *(__m128i *)&rgbsse_statics.maxbyte);
-}
+	inline void sub(const rgbaint_t& color2)
+	{
+		m_value = _mm_sub_epi32(m_value, color2.m_value);
+	}
 
-INLINE void rgbaint_scale_channel_add_and_clamp(rgbaint *color1, const rgbaint *colorscale, const rgbaint *color2)
-{
-	// color2 will get mutiplied by 2^8 (256) and then divided by 2^8 by the shift by 8
-	__m128i mscale = _mm_unpacklo_epi16(*colorscale, _mm_set_epi16(0, 0, 0, 0, 256, 256, 256, 256));
-	*color1 = _mm_unpacklo_epi16(*color1, *color2);
-	*color1 = _mm_madd_epi16(*color1, mscale);
-	*color1 = _mm_srli_epi32(*color1, 8);
-	*color1 = _mm_packs_epi32(*color1, *color1);
-	*color1 = _mm_min_epi16(*color1, *(__m128i *)&rgbsse_statics.maxbyte);
-}
+	inline void sub_imm(const UINT32 imm)
+	{
+		m_value = _mm_sub_epi32(m_value, _mm_set1_epi32(imm));
+	}
 
-INLINE void rgbaint_scale_channel_add_and_clamp(rgbaint *color1, const rgbaint *colorscale1, const rgbaint *color2, const rgbaint *colorscale2)
+	inline void sub_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_sub_epi32(m_value, _mm_set_epi32(a, r, g, b));
+	}
 
-{
-	__m128i mscale = _mm_unpacklo_epi16(*colorscale1, *colorscale2);
-	*color1 = _mm_unpacklo_epi16(*color1, *color2);
-	*color1 = _mm_madd_epi16(*color1, mscale);
-	*color1 = _mm_srli_epi32(*color1, 8);
-	*color1 = _mm_packs_epi32(*color1, *color1);
-	*color1 = _mm_min_epi16(*color1, *(__m128i *)&rgbsse_statics.maxbyte);
-}
+	inline void subr(rgbaint_t& color2)
+	{
+		m_value = _mm_sub_epi32(color2.m_value, m_value);
+	}
 
-/*-------------------------------------------------
-    rgbaint_scale_and_clamp - scale the given
-    color by an 8.8 scale factor, immediate or
-    per channel, and clamp to byte values
--------------------------------------------------*/
+	inline void subr_imm(const UINT32 imm)
+	{
+		m_value = _mm_sub_epi32(_mm_set1_epi32(imm), m_value);
+	}
 
-INLINE void rgbaint_scale_immediate_and_clamp(rgbaint *color, INT16 colorscale)
-{
-	rgbint_scale_immediate_and_clamp(color, colorscale);
-}
+	inline void subr_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_sub_epi32(_mm_set_epi32(a, r, g, b), m_value);
+	}
 
-INLINE void rgbaint_scale_channel_and_clamp(rgbaint *color, const rgbint *colorscale)
-{
-	rgbint_scale_channel_and_clamp(color, color);
-}
+	inline void set_a(const UINT32 value)
+	{
+		m_value = _mm_or_si128(_mm_and_si128(m_value, *(__m128i *)&rgbsse_statics.alpha_mask), _mm_set_epi32(value, 0, 0, 0));
+	}
 
+	inline void set_r(const UINT32 value)
+	{
+		m_value = _mm_or_si128(_mm_and_si128(m_value, *(__m128i *)&rgbsse_statics.red_mask), _mm_set_epi32(0, value, 0, 0));
+	}
 
-/*-------------------------------------------------
-    rgb_bilinear_filter - bilinear filter between
-    four pixel values
--------------------------------------------------*/
+	inline void set_g(const UINT32 value)
+	{
+		m_value = _mm_or_si128(_mm_and_si128(m_value, *(__m128i *)&rgbsse_statics.green_mask), _mm_set_epi32(0, 0, value, 0));
+	}
 
-INLINE UINT32 rgb_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
-{
-	__m128i color00 = _mm_cvtsi32_si128(rgb00);
-	__m128i color01 = _mm_cvtsi32_si128(rgb01);
-	__m128i color10 = _mm_cvtsi32_si128(rgb10);
-	__m128i color11 = _mm_cvtsi32_si128(rgb11);
+	inline void set_b(const UINT32 value)
+	{
+		m_value = _mm_or_si128(_mm_and_si128(m_value, *(__m128i *)&rgbsse_statics.blue_mask), _mm_set_epi32(0, 0, 0, value));
+	}
 
-	/* interleave color01 and color00 at the byte level */
-	color01 = _mm_unpacklo_epi8(color01, color00);
-	color11 = _mm_unpacklo_epi8(color11, color10);
-	color01 = _mm_unpacklo_epi8(color01, _mm_setzero_si128());
-	color11 = _mm_unpacklo_epi8(color11, _mm_setzero_si128());
-	color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
-	color11 = _mm_madd_epi16(color11, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
-	color01 = _mm_slli_epi32(color01, 15);
-	color11 = _mm_srli_epi32(color11, 1);
-	color01 = _mm_max_epi16(color01, color11);
-	color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[v][0]);
-	color01 = _mm_srli_epi32(color01, 15);
-	color01 = _mm_packs_epi32(color01, color01);
-	color01 = _mm_packus_epi16(color01, color01);
-	return _mm_cvtsi128_si32(color01);
-}
+	inline UINT8 get_a()
+	{
+		return _mm_extract_epi16(m_value, 6);
+	}
 
+	inline UINT8 get_r()
+	{
+		return _mm_extract_epi16(m_value, 4);
+	}
 
-/*-------------------------------------------------
-    rgba_bilinear_filter - bilinear filter between
-    four pixel values
--------------------------------------------------*/
+	inline UINT8 get_g()
+	{
+		return _mm_extract_epi16(m_value, 2);
+	}
 
-INLINE UINT32 rgba_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
-{
-	return rgb_bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
-}
+	inline UINT8 get_b()
+	{
+		return _mm_extract_epi16(m_value, 0);
+	}
 
+	inline UINT32 get_a32()
+	{
+		return (_mm_extract_epi16(m_value, 7) << 16) | _mm_extract_epi16(m_value, 6);
+	}
 
-/*-------------------------------------------------
-    rgbint_bilinear_filter - bilinear filter between
-    four pixel values
--------------------------------------------------*/
+	inline UINT32 get_r32()
+	{
+		return (_mm_extract_epi16(m_value, 5) << 16) | _mm_extract_epi16(m_value, 4);
+	}
 
-INLINE void rgbint_bilinear_filter(rgbint *color, UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
-{
-	__m128i color00 = _mm_cvtsi32_si128(rgb00);
-	__m128i color01 = _mm_cvtsi32_si128(rgb01);
-	__m128i color10 = _mm_cvtsi32_si128(rgb10);
-	__m128i color11 = _mm_cvtsi32_si128(rgb11);
+	inline UINT32 get_g32()
+	{
+		return (_mm_extract_epi16(m_value, 3) << 16) | _mm_extract_epi16(m_value, 2);
+	}
 
-	/* interleave color01 and color00 at the byte level */
-	color01 = _mm_unpacklo_epi8(color01, color00);
-	color11 = _mm_unpacklo_epi8(color11, color10);
-	color01 = _mm_unpacklo_epi8(color01, _mm_setzero_si128());
-	color11 = _mm_unpacklo_epi8(color11, _mm_setzero_si128());
-	color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
-	color11 = _mm_madd_epi16(color11, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
-	color01 = _mm_slli_epi32(color01, 15);
-	color11 = _mm_srli_epi32(color11, 1);
-	color01 = _mm_max_epi16(color01, color11);
-	color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[v][0]);
-	color01 = _mm_srli_epi32(color01, 15);
-	*color = _mm_packs_epi32(color01, color01);
-}
+	inline UINT32 get_b32()
+	{
+		return (_mm_extract_epi16(m_value, 1) << 16) | _mm_extract_epi16(m_value, 0);
+	}
 
+	inline void mul(const rgbaint_t& color)
+	{
+		__m128i tmp1 = _mm_mul_epu32(m_value, color.m_value);
+		__m128i tmp2 = _mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(color.m_value, 4));
+		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
+	}
 
-/*-------------------------------------------------
-    rgbaint_bilinear_filter - bilinear filter between
-    four pixel values
--------------------------------------------------*/
+	inline void mul_imm(const UINT32 imm)
+	{
+		__m128i immv = _mm_set1_epi32(imm);
+		__m128i tmp1 = _mm_mul_epu32(m_value, immv);
+		__m128i tmp2 = _mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(immv, 4));
+		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
+	}
 
-INLINE void rgbaint_bilinear_filter(rgbaint *color, UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
-{
-	rgbint_bilinear_filter(color, rgb00, rgb01, rgb10, rgb11, u, v);
-}
+	inline void mul_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		__m128i immv = _mm_set_epi32(a, r, g, b);
+		__m128i tmp1 = _mm_mul_epu32(m_value, immv);
+		__m128i tmp2 = _mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(immv, 4));
+		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
+	}
 
+	inline void shl(const rgbaint_t& shift)
+	{
+		m_value = _mm_sll_epi32(m_value, shift.m_value);
+	}
+
+	inline void shl_imm(const UINT8 shift)
+	{
+		m_value = _mm_slli_epi32(m_value, shift);
+	}
+
+	inline void shl_imm_all(const UINT8 shift)
+	{
+		m_value = _mm_slli_si128(m_value, shift >> 3);
+	}
+
+	inline void shr(const rgbaint_t& shift)
+	{
+		m_value = _mm_srl_epi32(m_value, shift.m_value);
+	}
+
+	inline void shr_imm(const UINT8 shift)
+	{
+		m_value = _mm_srli_epi32(m_value, shift);
+	}
+
+	inline void shr_imm_all(const UINT8 shift)
+	{
+		m_value = _mm_srli_si128(m_value, shift >> 3);
+	}
+
+	inline void sra(const rgbaint_t& shift)
+	{
+		m_value = _mm_sra_epi32(m_value, shift.m_value);
+	}
+
+	inline void sra_imm(const UINT8 shift)
+	{
+		m_value = _mm_srai_epi32(m_value, shift);
+	}
+
+	inline void or_reg(const rgbaint_t& color2)
+	{
+		m_value = _mm_or_si128(m_value, color2.m_value);
+	}
+
+	inline void or_imm(const UINT32 value)
+	{
+		m_value = _mm_or_si128(m_value, _mm_set1_epi32(value));
+	}
+
+	inline void or_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_or_si128(m_value, _mm_set_epi32(a, r, g, b));
+	}
+
+	inline void and_reg(const rgbaint_t& color)
+	{
+		m_value = _mm_and_si128(m_value, color.m_value);
+	}
+
+	inline void and_imm(const UINT32 value)
+	{
+		m_value = _mm_and_si128(m_value, _mm_set1_epi32(value));
+	}
+
+	inline void and_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_and_si128(m_value, _mm_set_epi32(a, r, g, b));
+	}
+
+	inline void xor_reg(const rgbaint_t& color2)
+	{
+		m_value = _mm_xor_si128(m_value, color2.m_value);
+	}
+
+	inline void xor_imm(const INT32 value)
+	{
+		m_value = _mm_xor_si128(m_value, _mm_set1_epi32(value));
+	}
+
+	inline void xor_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_xor_si128(m_value, _mm_set_epi32(a, r, g, b));
+	}
+
+	inline void clamp_and_clear(const UINT32 sign)
+	{
+		__m128i vsign = _mm_set1_epi32(sign);
+		m_value = _mm_and_si128(m_value, _mm_cmpeq_epi32(_mm_and_si128(m_value, vsign), _mm_setzero_si128()));
+		vsign = _mm_srai_epi32(vsign, 1);
+		vsign = _mm_xor_si128(vsign, _mm_set1_epi32(0xffffffff));
+		__m128i mask = _mm_cmpgt_epi32(m_value, vsign);
+		m_value = _mm_or_si128(_mm_and_si128(vsign, mask), _mm_and_si128(m_value, _mm_xor_si128(mask, _mm_set1_epi32(0xffffffff))));
+	}
+
+	inline void sign_extend(const UINT32 compare, const UINT32 sign)
+	{
+		__m128i compare_vec = _mm_set1_epi32(compare);
+		__m128i compare_mask = _mm_cmpeq_epi32(_mm_and_si128(m_value, compare_vec), compare_vec);
+		__m128i compared = _mm_and_si128(_mm_set1_epi32(sign), compare_mask);
+		m_value = _mm_or_si128(m_value, compared);
+	}
+
+	inline void min(const UINT32 value)
+	{
+		__m128i val = _mm_set1_epi32(value);
+		__m128i mask = _mm_cmpgt_epi32(m_value, val);
+		m_value = _mm_or_si128(_mm_and_si128(val, mask), _mm_and_si128(m_value, _mm_xor_si128(mask, _mm_set1_epi32(0xffffffff))));
+	}
+
+	inline void max(const UINT32 value)
+	{
+		__m128i val = _mm_set1_epi32(value);
+		__m128i mask = _mm_cmplt_epi32(m_value, val);
+		m_value = _mm_or_si128(_mm_and_si128(val, mask), _mm_and_si128(m_value, _mm_xor_si128(mask, _mm_set1_epi32(0xffffffff))));
+	}
+
+	void blend(const rgbaint_t& other, UINT8 factor);
+
+	void scale_and_clamp(const rgbaint_t& scale);
+	void scale_imm_and_clamp(const INT32 scale);
+	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
+	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
+	void scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other);
+
+	inline void cmpeq(const rgbaint_t& value)
+	{
+		m_value = _mm_cmpeq_epi32(m_value, value.m_value);
+	}
+
+	inline void cmpeq_imm(const UINT32 value)
+	{
+		m_value = _mm_cmpeq_epi32(m_value, _mm_set1_epi32(value));
+	}
+
+	inline void cmpeq_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_cmpeq_epi32(m_value, _mm_set_epi32(a, r, g, b));
+	}
+
+	inline void cmpgt(const rgbaint_t& value)
+	{
+		m_value = _mm_cmpgt_epi32(m_value, value.m_value);
+	}
+
+	inline void cmpgt_imm(const UINT32 value)
+	{
+		m_value = _mm_cmpgt_epi32(m_value, _mm_set1_epi32(value));
+	}
+
+	inline void cmpgt_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_cmpgt_epi32(m_value, _mm_set_epi32(a, r, g, b));
+	}
+
+	inline void cmplt(const rgbaint_t& value)
+	{
+		m_value = _mm_cmplt_epi32(m_value, value.m_value);
+	}
+
+	inline void cmplt_imm(const UINT32 value)
+	{
+		m_value = _mm_cmplt_epi32(m_value, _mm_set1_epi32(value));
+	}
+
+	inline void cmplt_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	{
+		m_value = _mm_cmplt_epi32(m_value, _mm_set_epi32(a, r, g, b));
+	}
+
+	inline rgbaint_t operator=(const rgbaint_t& other)
+	{
+		m_value = other.m_value;
+		return *this;
+	}
+
+	inline rgbaint_t& operator+=(const rgbaint_t& other)
+	{
+		m_value = _mm_add_epi32(m_value, other.m_value);
+		return *this;
+	}
+
+	inline rgbaint_t& operator+=(const INT32 other)
+	{
+		m_value = _mm_add_epi32(m_value, _mm_set1_epi32(other));
+		return *this;
+	}
+
+	inline rgbaint_t& operator-=(const rgbaint_t& other)
+	{
+		m_value = _mm_sub_epi32(m_value, other.m_value);
+		return *this;
+	}
+
+	inline rgbaint_t& operator*=(const rgbaint_t& other)
+	{
+		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(_mm_mul_epu32(m_value, other.m_value), _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(_mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(other.m_value, 4)), _MM_SHUFFLE(0, 0, 2, 0)));
+		return *this;
+	}
+
+	inline rgbaint_t& operator*=(const INT32 other)
+	{
+		const __m128i immv = _mm_set1_epi32(other);
+		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(_mm_mul_epu32(m_value, immv), _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(_mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(immv, 4)), _MM_SHUFFLE(0, 0, 2, 0)));
+		return *this;
+	}
+
+	inline rgbaint_t& operator>>=(const INT32 shift)
+	{
+		m_value = _mm_srai_epi32(m_value, shift);
+		return *this;
+	}
+
+	inline void merge_alpha(const rgbaint_t& alpha)
+	{
+		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 7), 7);
+		m_value = _mm_insert_epi16(m_value, _mm_extract_epi16(alpha.m_value, 6), 6);
+	}
+
+	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+	{
+		__m128i color00 = _mm_cvtsi32_si128(rgb00);
+		__m128i color01 = _mm_cvtsi32_si128(rgb01);
+		__m128i color10 = _mm_cvtsi32_si128(rgb10);
+		__m128i color11 = _mm_cvtsi32_si128(rgb11);
+
+		/* interleave color01 and color00 at the byte level */
+		color01 = _mm_unpacklo_epi8(color01, color00);
+		color11 = _mm_unpacklo_epi8(color11, color10);
+		color01 = _mm_unpacklo_epi8(color01, _mm_setzero_si128());
+		color11 = _mm_unpacklo_epi8(color11, _mm_setzero_si128());
+		color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
+		color11 = _mm_madd_epi16(color11, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
+		color01 = _mm_slli_epi32(color01, 15);
+		color11 = _mm_srli_epi32(color11, 1);
+		color01 = _mm_max_epi16(color01, color11);
+		color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[v][0]);
+		color01 = _mm_srli_epi32(color01, 15);
+		color01 = _mm_packs_epi32(color01, _mm_setzero_si128());
+		color01 = _mm_packus_epi16(color01, _mm_setzero_si128());
+		return _mm_cvtsi128_si32(color01);
+	}
+
+protected:
+	__m128i	m_value;
+};
 
 #endif /* __RGBSSE__ */

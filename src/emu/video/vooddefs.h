@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+ // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
@@ -24,7 +24,7 @@ enum
 };
 
 // Use old macro style or newer SSE2 optimized functions
-#define USE_OLD_RASTER  1
+#define USE_OLD_RASTER  0
 
 /* maximum number of TMUs */
 #define MAX_TMU                 2
@@ -2199,34 +2199,33 @@ while (0)
 /* use SSE on 64-bit implementations, where it can be assumed */
 #if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
 
+// NB: This code should no longer be SSE2-specific now that it uses rgbaint_t, consider removing the #define and the #else case.
 INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
 {
 	rgb_t result;
-	rgbaint colorint;
-	rgba_comp_to_rgbaint(&colorint, (INT16) (itera>>12), (INT16) (iterr>>12), (INT16) (iterg>>12), (INT16) (iterb>>12));
+	rgbaint_t colorint((INT32) (itera>>12), (INT32) (iterr>>12), (INT32) (iterg>>12), (INT32) (iterb>>12));
 
 	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)
 	{
 		//r &= 0xfff;
-		__m128i temp = _mm_set1_epi16(0xfff);
-		colorint = _mm_and_si128(*(__m128i *)&colorint, *(__m128i *)&temp);
+		colorint.and_imm(0xfff);
 		//if (r == 0xfff)
-		temp = _mm_cmpeq_epi16(*(__m128i *)&colorint, *(__m128i *)&temp);
+		rgbaint_t temp(colorint);
+		temp.cmpeq_imm(0xfff);
 		//	result.rgb.r = 0;
-		colorint = _mm_andnot_si128(*(__m128i *)&temp, *(__m128i *)&colorint);
+		temp.xor_imm(0xffffffff);
+		colorint.and_reg(temp);
 		//else if (r == 0x100)
-		temp = _mm_set1_epi16(0x100);
-		temp = _mm_cmpeq_epi16(*(__m128i *)&colorint, *(__m128i *)&temp);
+		temp.set(colorint);
+		temp.cmpeq_imm(0x100);
 		//	result.rgb.r = 0xff;
-		colorint = _mm_or_si128(*(__m128i *)&colorint, *(__m128i *)&temp);
-
-		result = rgbaint_to_rgba(&colorint);
+		colorint.or_reg(temp);
+		return colorint.to_rgba();
 	}
 	else
 	{
-		result = rgbaint_to_rgba_clamp(&colorint);
+		return colorint.to_rgba_clamp();
 	}
-	return result;
 }
 
 #else
@@ -2817,7 +2816,7 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 		int sa = color.rgb.a;
 		int ta;
 		int srcAlphaScale, destAlphaScale;
-		rgbaint srcScale, destScale;
+		rgbaint_t srcScale, destScale;
 
 		/* apply dither subtraction */
 		if (FBZMODE_ALPHA_DITHER_SUBTRACT(FBZMODE))
@@ -2842,20 +2841,20 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 		{
 			default:    /* reserved */
 			case 0:     /* AZERO */
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale, 0, 0, 0);
+				srcScale.set(srcAlphaScale, 0, 0, 0);
 				//(RR) = (GG) = (BB) = 0;
 				break;
 
 			case 1:     /* ASRC_ALPHA */
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale, sa, sa, sa);
+				srcScale.set(srcAlphaScale, sa, sa, sa);
 				//(RR) = (sr * (sa + 1)) >> 8;
 				//(GG) = (sg * (sa + 1)) >> 8;
 				//(BB) = (sb * (sa + 1)) >> 8;
 				break;
 
 			case 2:     /* A_COLOR */
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale-1, dr, dg, db);
-				rgbaint_add_imm(&srcScale, 1);
+				srcScale.set(srcAlphaScale-1, dr, dg, db);
+				srcScale.add_imm(1);
 				//(RR) = (sr * (dr + 1)) >> 8;
 				//(GG) = (sg * (dg + 1)) >> 8;
 				//(BB) = (sb * (db + 1)) >> 8;
@@ -2863,26 +2862,26 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 3:     /* ADST_ALPHA */
 				ta = da + 1;
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale, ta, ta, ta);
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (da + 1)) >> 8;
 				//(GG) = (sg * (da + 1)) >> 8;
 				//(BB) = (sb * (da + 1)) >> 8;
 				break;
 
 			case 4:     /* AONE */
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale, 256, 256, 256);
+				srcScale.set(srcAlphaScale, 256, 256, 256);
 				break;
 
 			case 5:     /* AOMSRC_ALPHA */
 				ta = (0x100 - sa);
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale, ta, ta, ta);
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (0x100 - sa)) >> 8;
 				//(GG) = (sg * (0x100 - sa)) >> 8;
 				//(BB) = (sb * (0x100 - sa)) >> 8;
 				break;
 
 			case 6:     /* AOM_COLOR */
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale, (0x100 - dr), (0x100 - dg), (0x100 - db));
+				srcScale.set(srcAlphaScale, (0x100 - dr), (0x100 - dg), (0x100 - db));
 				//(RR) = (sr * (0x100 - dr)) >> 8;
 				//(GG) = (sg * (0x100 - dg)) >> 8;
 				//(BB) = (sb * (0x100 - db)) >> 8;
@@ -2890,7 +2889,7 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 7:     /* AOMDST_ALPHA */
 				ta = (0x100 - da);
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale, ta, ta, ta);
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (0x100 - da)) >> 8;
 				//(GG) = (sg * (0x100 - da)) >> 8;
 				//(BB) = (sb * (0x100 - da)) >> 8;
@@ -2898,7 +2897,7 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 15:    /* ASATURATE */
 				ta = (sa < (0x100 - da)) ? sa : (0x100 - da);
-				rgba_comp_to_rgbaint(&srcScale, srcAlphaScale, ta, ta, ta);
+				srcScale.set(srcAlphaScale, ta, ta, ta);
 				//(RR) = (sr * (ta + 1)) >> 8;
 				//(GG) = (sg * (ta + 1)) >> 8;
 				//(BB) = (sb * (ta + 1)) >> 8;
@@ -2916,20 +2915,20 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 		{
 			default:    /* reserved */
 			case 0:     /* AZERO */
-				rgba_comp_to_rgbaint(&destScale, destAlphaScale, 0, 0, 0);
+				destScale.set(destAlphaScale, 0, 0, 0);
 				break;
 
 			case 1:     /* ASRC_ALPHA */
-				rgba_comp_to_rgbaint(&destScale, destAlphaScale, sa, sa, sa);
-				rgbaint_add_imm(&destScale, 1);
+				destScale.set(destAlphaScale, sa, sa, sa);
+				destScale.add_imm(1);
 				//(RR) += (dr * (sa + 1)) >> 8;
 				//(GG) += (dg * (sa + 1)) >> 8;
 				//(BB) += (db * (sa + 1)) >> 8;
 				break;
 
 			case 2:     /* A_COLOR */
-				rgba_to_rgbaint(&destScale, (rgb_t) (((destAlphaScale-1)<<24) | (color.u & 0x00ffffff)));
-				rgbaint_add_imm(&destScale, 1);
+				destScale.set((rgb_t) (((destAlphaScale-1)<<24) | (color.u & 0x00ffffff)));
+				destScale.add_imm(1);
 				//(RR) += (dr * (sr + 1)) >> 8;
 				//(GG) += (dg * (sg + 1)) >> 8;
 				//(BB) += (db * (sb + 1)) >> 8;
@@ -2937,14 +2936,14 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 3:     /* ADST_ALPHA */
 				ta = da + 1;
-				rgba_comp_to_rgbaint(&destScale, destAlphaScale, ta, ta, ta);
+				destScale.set(destAlphaScale, ta, ta, ta);
 				//(RR) += (dr * (da + 1)) >> 8;
 				//(GG) += (dg * (da + 1)) >> 8;
 				//(BB) += (db * (da + 1)) >> 8;
 				break;
 
 			case 4:     /* AONE */
-				rgba_comp_to_rgbaint(&destScale, destAlphaScale, 256, 256, 256);
+				destScale.set(destAlphaScale, 256, 256, 256);
 				//(RR) += dr;
 				//(GG) += dg;
 				//(BB) += db;
@@ -2952,14 +2951,14 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 5:     /* AOMSRC_ALPHA */
 				ta = (0x100 - sa);
-				rgba_comp_to_rgbaint(&destScale, destAlphaScale, ta, ta, ta);
+				destScale.set(destAlphaScale, ta, ta, ta);
 				//(RR) += (dr * (0x100 - sa)) >> 8;
 				//(GG) += (dg * (0x100 - sa)) >> 8;
 				//(BB) += (db * (0x100 - sa)) >> 8;
 				break;
 
 			case 6:     /* AOM_COLOR */
-				rgba_comp_to_rgbaint(&destScale, destAlphaScale, (0x100 - color.rgb.r), (0x100 - color.rgb.g), (0x100 - color.rgb.b));
+				destScale.set(destAlphaScale, (0x100 - color.rgb.r), (0x100 - color.rgb.g), (0x100 - color.rgb.b));
 				//(RR) += (dr * (0x100 - sr)) >> 8;
 				//(GG) += (dg * (0x100 - sg)) >> 8;
 				//(BB) += (db * (0x100 - sb)) >> 8;
@@ -2967,28 +2966,26 @@ INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *d
 
 			case 7:     /* AOMDST_ALPHA */
 				ta = (0x100 - da);
-				rgba_comp_to_rgbaint(&destScale, destAlphaScale, ta, ta, ta);
+				destScale.set(destAlphaScale, ta, ta, ta);
 				//(RR) += (dr * (0x100 - da)) >> 8;
 				//(GG) += (dg * (0x100 - da)) >> 8;
 				//(BB) += (db * (0x100 - da)) >> 8;
 				break;
 
 			case 15:    /* A_COLORBEFOREFOG */
-				rgba_to_rgbaint(&destScale, (rgb_t) (((destAlphaScale-1)<<24) | (preFog.u & 0x00ffffff)));
-				rgbaint_add_imm(&destScale, 1);
+				destScale.set((rgb_t) (((destAlphaScale-1)<<24) | (preFog.u & 0x00ffffff)));
+				destScale.add_imm(1);
 				//(RR) += (dr * (prefogr + 1)) >> 8;
 				//(GG) += (dg * (prefogg + 1)) >> 8;
 				//(BB) += (db * (prefogb + 1)) >> 8;
 				break;
 		}
 		// Main blend
-		rgbaint srcColor;
-		rgbaint destColor;
+		rgbaint_t srcColor((rgb_t) color.u);
+		rgbaint_t destColor(da, dr, dg, db);
 
-		rgba_to_rgbaint(&srcColor, (rgb_t) color.u);
-		rgba_comp_to_rgbaint(&destColor, da, dr, dg, db);
-		rgbaint_scale_channel_add_and_clamp(&srcColor, &srcScale, &destColor, &destScale);
-		color.u = rgbaint_to_rgba(&srcColor);
+		srcColor.scale_add_and_clamp(srcScale, destColor, destScale);
+		color.u = srcColor.to_rgba();
 		/* clamp */
 		//CLAMP((RR), 0x00, 0xff);
 		//CLAMP((GG), 0x00, 0xff);
@@ -3120,20 +3117,18 @@ INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  I
 	if (FOGMODE_ENABLE_FOG(fogModeReg))
 	{
 		UINT32 color_alpha = color.u & 0xff000000;
-		rgbaint tmpA, tmpB;
-
-		//INT32 fr, fg, fb;
+		rgbaint_t tmpA;
 
 		/* constant fog bypasses everything else */
 		rgb_union fogColorLocal = v->reg[fogColor];
-		rgba_to_rgbaint(&tmpB, (rgb_t) color.u);
+		rgbaint_t tmpB((rgb_t) color.u);
 		if (FOGMODE_FOG_CONSTANT(fogModeReg))
 		{
-			rgba_to_rgbaint(&tmpA, (rgb_t) fogColorLocal.u);
+			tmpA.set((rgb_t) fogColorLocal.u);
 			/* if fog_mult is 0, we add this to the original color */
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				rgbaint_add(&tmpA, &tmpB);
+				tmpA.add(tmpB);
 				//color += fog;
 			}
 
@@ -3142,7 +3137,7 @@ INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  I
 			//{
 				//color = fog;
 			//}
-			color.u = rgbaint_to_rgba_clamp(&tmpA);
+			color.u = tmpA.to_rgba_clamp();
 		}
 		/* non-constant fog comes from several sources */
 		else
@@ -3154,12 +3149,12 @@ INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  I
 				fogColorLocal.u = 0;
 				//fr = fg = fb = 0;
 
-			rgba_to_rgbaint(&tmpA, (rgb_t) fogColorLocal.u);
+			tmpA.set((rgb_t) fogColorLocal.u);
 
 			/* if fog_mult is zero, we subtract the incoming color */
 			if (!FOGMODE_FOG_MULT(fogModeReg))
 			{
-				rgbaint_sub(&tmpA, &tmpB);
+				tmpA.sub(tmpB);
 				//fog.rgb -= color.rgb;
 				//fr -= (RR);
 				//fg -= (GG);
@@ -3216,7 +3211,7 @@ INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  I
 			/* if fog_mult is 0, we add this to the original color */
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				rgbaint_scale_immediate_add_and_clamp(&tmpA, (INT16) fogblend, &tmpB);
+				tmpA.scale_imm_add_and_clamp((INT16) fogblend, tmpB);
 				//color += fog;
 				//(RR) += fr;
 				//(GG) += fg;
@@ -3226,13 +3221,13 @@ INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  I
 			/* otherwise this just becomes the new color */
 			else
 			{
-				rgbaint_scale_immediate_and_clamp(&tmpA, fogblend);
+				tmpA.scale_imm_and_clamp(fogblend);
 				//color = fog;
 				//(RR) = fr;
 				//(GG) = fg;
 				//(BB) = fb;
 			}
-			color.u = rgbaint_to_rgba(&tmpA);
+			color.u = tmpA.to_rgba();
 		}
 
 
@@ -3422,7 +3417,7 @@ do                                                                              
 		}                                                                       \
 																				\
 		/* weigh in each texel */                                               \
-		c_local.u = rgba_bilinear_filter(texel0, texel1, texel2, texel3, sfrac, tfrac);\
+		c_local.u = rgbaint_t::bilinear_filter(texel0, texel1, texel2, texel3, sfrac, tfrac); \
 	}                                                                           \
 																				\
 	/* select zero/other for RGB */                                             \
@@ -4289,7 +4284,7 @@ INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPA
 	UINT8 a_local = c_local.rgb.a;
 	UINT8 tmp;
 	rgb_union add_val = c_local;
-	rgbaint tmpA, tmpB, tmpC;
+	rgbaint_t tmpA, tmpB, tmpC;
 
 
 	/* select zero or c_other */
@@ -4301,7 +4296,7 @@ INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPA
 	if (FBZCP_CCA_ZERO_OTHER(FBZCOLORPATH))
 		c_other.u &= 0x00ffffff;
 
-	rgba_to_rgbaint(&tmpA, (rgb_t) c_other.u);
+	tmpA.set((rgb_t) c_other.u);
 
 	/* subtract a/c_local */
 	if (FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH) || (FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH)))
@@ -4314,8 +4309,8 @@ INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPA
 		if (!FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))
 			sub_val.u &= 0x00ffffff;
 
-		rgba_to_rgbaint(&tmpB, (rgb_t) sub_val.u);
-		rgbaint_sub(&tmpA, &tmpB);
+		tmpB.set((rgb_t) sub_val.u);
+		tmpA.sub(tmpB);
 	}
 
 	/* blend RGB */
@@ -4409,11 +4404,11 @@ INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPA
 	//CLAMP(color.rgb.r, 0x00, 0xff);
 	//CLAMP(color.rgb.g, 0x00, 0xff);
 	//CLAMP(color.rgb.b, 0x00, 0xff);
-	rgba_to_rgbaint(&tmpB, (rgb_t) c_local.u);
-	rgbaint_add_imm(&tmpB, 1);
-	rgba_to_rgbaint(&tmpC, (rgb_t) add_val.u);
-	rgbaint_scale_channel_add_and_clamp(&tmpA, &tmpB, &tmpC);
-	color.u = rgbaint_to_rgba(&tmpA);
+	tmpB.set((rgb_t) c_local.u);
+	tmpB.add_imm(1);
+	tmpC.set((rgb_t) add_val.u);
+	tmpA.scale_add_and_clamp(tmpB, tmpC);
+	color.u = tmpA.to_rgba();
 
 	/* invert */
 	if (FBZCP_CCA_INVERT_OUTPUT(FBZCOLORPATH))
@@ -4625,19 +4620,18 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 		}                                                                       \
 	}                                                                           \
 }
+
 INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UINT32 TEXMODE, rgb_t *LOOKUP, INT32 LODBASE, INT64 ITERS, INT64 ITERT, INT64 ITERW, INT32 &lod)
 {
 	UINT32 result;
-	INT32 oow, s, t, ilod;
-	INT32 smax, tmax;
-	UINT32 texbase;
+	INT32 s, t, ilod;
 
 	/* determine the S/T/LOD values for this texture */
 	lod = (LODBASE);
 	if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))
 	{
 		INT32 wLog;
-		oow = fast_reciplog((ITERW), &wLog);
+		const INT32 oow = fast_reciplog((ITERW), &wLog);
 		lod += wLog;
 		s = ((INT64)oow * (ITERS)) >> 29;
 		t = ((INT64)oow * (ITERT)) >> 29;
@@ -4669,11 +4663,11 @@ INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UIN
 		ilod++;
 
 	/* fetch the texture base */
-	texbase = (TT)->lodoffset[ilod];
+	UINT32 texbase = (TT)->lodoffset[ilod];
 
 	/* compute the maximum s and t values at this LOD */
-	smax = (TT)->wmask >> ilod;
-	tmax = (TT)->hmask >> ilod;
+	INT32 smax = (TT)->wmask >> ilod;
+	INT32 tmax = (TT)->hmask >> ilod;
 
 	/* determine whether we are point-sampled or bilinear */
 	if ((lod == (TT)->lodmin && !TEXMODE_MAGNIFICATION_FILTER(TEXMODE)) ||
@@ -4808,7 +4802,8 @@ INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UIN
 		}
 
 		/* weigh in each texel */
-		result = rgba_bilinear_filter(texel0, texel1, texel2, texel3, sfrac, tfrac);
+
+		result = rgbaint_t::bilinear_filter(texel0, texel1, texel2, texel3, sfrac, tfrac);
 	}
 	return result;
 }
@@ -4822,7 +4817,7 @@ INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_lo
 	UINT8 a_local = c_local.rgb.a;
 	rgb_union add_val = c_local;
 	UINT8 tmp;
-	rgbaint tmpA, tmpB, tmpC;
+	rgbaint_t tmpA, tmpB, tmpC;
 
 	/* select zero/other for RGB */
 	if (TEXMODE_TC_ZERO_OTHER(TEXMODE))
@@ -4832,7 +4827,7 @@ INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_lo
 	if (TEXMODE_TCA_ZERO_OTHER(TEXMODE))
 		c_other.u &= 0x00ffffff;
 
-	rgba_to_rgbaint(&tmpA, (rgb_t) c_other.u);
+	tmpA.set((rgb_t) c_other.u);
 
 	if (TEXMODE_TC_SUB_CLOCAL(TEXMODE) || TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
 	{
@@ -4845,8 +4840,8 @@ INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_lo
 		if (!TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
 			sub_val.u &= 0x00ffffff;
 
-		rgba_to_rgbaint(&tmpB, (rgb_t) sub_val.u);
-		rgbaint_sub(&tmpA, &tmpB);
+		tmpB.set((rgb_t) sub_val.u);
+		tmpA.sub(tmpB);
 	}
 
 	/* blend RGB */
@@ -4966,11 +4961,11 @@ INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_lo
 	//result.rgb.g = (tg < 0) ? 0 : (tg > 0xff) ? 0xff : tg;
 	//result.rgb.b = (tb < 0) ? 0 : (tb > 0xff) ? 0xff : tb;
 	//result.rgb.a = (ta < 0) ? 0 : (ta > 0xff) ? 0xff : ta;
-	rgba_to_rgbaint(&tmpB, (rgb_t) c_local.u);
-	rgbaint_add_imm(&tmpB, 1);
-	rgba_to_rgbaint(&tmpC, (rgb_t) add_val.u);
-	rgbaint_scale_channel_add_and_clamp(&tmpA, &tmpB, &tmpC);
-	result = rgbaint_to_rgba(&tmpA);
+	tmpB.set((rgb_t) c_local.u);
+	tmpB.add_imm(1);
+	tmpC.set((rgb_t) add_val.u);
+	tmpA.scale_add_and_clamp(tmpB, tmpC);
+	result = tmpA.to_rgba();
 
 	/* invert */
 	if (TEXMODE_TC_INVERT_OUTPUT(TEXMODE))

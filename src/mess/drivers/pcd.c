@@ -469,7 +469,7 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	// floppy disk controller
-	MCFG_WD2793x_ADD("fdc", XTAL_16MHz / 8)
+	MCFG_WD2793_ADD("fdc", XTAL_16MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)

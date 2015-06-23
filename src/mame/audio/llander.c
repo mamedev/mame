@@ -6,6 +6,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+#include "includes/asteroid.h"
+#include "sound/discrete.h"
+
 /************************************************************************/
 /* Lunar Lander Sound System Analog emulation by K.Wilkins Nov 2000     */
 /* Questions/Suggestions to mame@esplexo.co.uk                          */

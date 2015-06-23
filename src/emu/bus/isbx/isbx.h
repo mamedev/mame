@@ -83,7 +83,9 @@ public:
 	virtual void mcs1_w(address_space &space, offs_t offset, UINT8 data) { }
 	virtual UINT8 mdack_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void mdack_w(address_space &space, offs_t offset, UINT8 data) { }
+	virtual int opt0_r() { return 1; }
 	virtual void opt0_w(int state) { }
+	virtual int opt1_r() { return 1; }
 	virtual void opt1_w(int state) { }
 	virtual void tdma_w(int state) { }
 	virtual void mclk_w(int state) { }
@@ -115,7 +117,9 @@ public:
 	DECLARE_READ8_MEMBER( mdack_r ) { return m_card ? m_card->mdack_r(space, offset) : 0xff; }
 	DECLARE_WRITE8_MEMBER( mdack_w ) { if (m_card) m_card->mdack_w(space, offset, data); }
 	DECLARE_READ_LINE_MEMBER( mpst_r ) { return m_card == NULL; }
+	DECLARE_READ_LINE_MEMBER( opt0_r ) { return m_card ? m_card->opt0_r() : 1; }
 	DECLARE_WRITE_LINE_MEMBER( opt0_w ) { if (m_card) m_card->opt0_w(state); }
+	DECLARE_READ_LINE_MEMBER( opt1_r ) { return m_card ? m_card->opt1_r() : 1; }
 	DECLARE_WRITE_LINE_MEMBER( opt1_w ) { if (m_card) m_card->opt1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( tdma_w ) { if (m_card) m_card->tdma_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( mclk_w ) { if (m_card) m_card->mclk_w(state); }

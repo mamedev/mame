@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_T11_INITIAL_MODE(0xf2ff)
 	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
 
-	MCFG_DEVICE_ADD("vg93", FD1793x, 1000000)
+	MCFG_DEVICE_ADD("vg93", FD1793, 1000000)
 	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 	/* video hardware */

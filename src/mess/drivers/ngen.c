@@ -916,7 +916,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ngen_state,timer_clk_out))
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
-	MCFG_WD2797x_ADD("fdc", XTAL_20MHz / 20)
+	MCFG_WD2797_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ngen_state,fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY
@@ -1026,7 +1026,7 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ngen_state,timer_clk_out))
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
-	MCFG_WD2797x_ADD("fdc", XTAL_20MHz / 20)
+	MCFG_WD2797_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ngen_state,fdc_irq_w))
 //  MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("i386cpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY

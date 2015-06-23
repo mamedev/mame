@@ -776,7 +776,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
-	MCFG_WD1770x_ADD("wd177x", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("wd177x", XTAL_16MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
@@ -840,7 +840,7 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
-	MCFG_WD1770x_ADD("wd177x", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("wd177x", XTAL_16MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
@@ -1001,7 +1001,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* fdc */
-	MCFG_WD1770x_ADD("wd177x", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("wd177x", XTAL_16MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 
@@ -1089,8 +1089,8 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd177x")
 
-//	MCFG_WD1772x_ADD("wd177x", XTAL_16MHz / 2)
-	MCFG_WD1770x_ADD("wd177x", XTAL_16MHz / 2)
+//	MCFG_WD1772_ADD("wd177x", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("wd177x", XTAL_16MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, bbc_wd177x_drq_w))
 

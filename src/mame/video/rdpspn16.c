@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "includes/n64.h"
 #include "video/n64.h"
+#include "video/rgbutil.h"
 
 void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object)
 {
@@ -81,10 +82,10 @@ void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, ext
 
 void n64_rdp::rgbaz_clip(INT32 sr, INT32 sg, INT32 sb, INT32 sa, INT32* sz, rdp_span_aux* userdata)
 {
-	userdata->m_shade_color.i.r = s_special_9bit_clamptable[sr & 0x1ff];
-	userdata->m_shade_color.i.g = s_special_9bit_clamptable[sg & 0x1ff];
-	userdata->m_shade_color.i.b = s_special_9bit_clamptable[sb & 0x1ff];
-	userdata->m_shade_color.i.a = s_special_9bit_clamptable[sa & 0x1ff];
+	userdata->m_shade_color.set(sa, sr, sg, sb);
+	userdata->m_shade_color.clamp_and_clear(0xfffffe00);
+	UINT32 a = userdata->m_shade_color.get_a();
+	userdata->m_shade_alpha.set(a, a, a, a);
 
 	INT32 zanded = (*sz) & 0x60000;
 
@@ -130,7 +131,7 @@ void n64_rdp::rgbaz_correct_triangle(INT32 offx, INT32 offy, INT32* r, INT32* g,
 	}
 }
 
-inline void n64_rdp::write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp_span_aux* userdata, const rdp_poly_state &object)
+inline void n64_rdp::write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
 	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
 	{
@@ -143,7 +144,8 @@ inline void n64_rdp::write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp
 		}
 		else
 		{
-			finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+			color.shr_imm(3);
+			finalcolor = (color.get_r() << 11) | (color.get_g() << 6) | (color.get_b() << 1);
 		}
 
 		switch (object.m_other_modes.cvg_dest)
@@ -194,7 +196,7 @@ inline void n64_rdp::write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp
 		}
 		else
 		{
-			finalcolor = (r << 24) | (g << 16) | (b << 8);
+			finalcolor = (color.get_r() << 24) | (color.get_g() << 16) | (color.get_b() << 8);
 		}
 
 		switch (object.m_other_modes.cvg_dest)
@@ -232,59 +234,52 @@ inline void n64_rdp::read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const r
 {
 	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
 	{
-		UINT16 fword;
+		const UINT16 fword = RREADIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel);
 
+		userdata->m_memory_color.set(0, GETHICOL(fword), GETMEDCOL(fword), GETLOWCOL(fword));
 		if (object.m_other_modes.image_read_en)
 		{
-			fword = RREADIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel);
 			UINT8 hbyte = HREADADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel);
-			userdata->m_memory_color.i.a = userdata->m_current_mem_cvg << 5;
+			userdata->m_memory_color.set_a(userdata->m_current_mem_cvg << 5);
 			userdata->m_current_mem_cvg = ((fword & 1) << 2) | (hbyte & 3);
 		}
 		else
 		{
-			fword = RREADIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel);
-			userdata->m_memory_color.i.a = 0xff;
+			userdata->m_memory_color.set_a(0xff);
 			userdata->m_current_mem_cvg = 7;
 		}
-
-		userdata->m_memory_color.i.r = GETHICOL(fword);
-		userdata->m_memory_color.i.g = GETMEDCOL(fword);
-		userdata->m_memory_color.i.b = GETLOWCOL(fword);
 	}
 	else // 32-bit framebuffer
 	{
-		UINT32 mem;
-
+		const UINT32 mem = RREADIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel);
+		userdata->m_memory_color.set(0, (mem >> 24) & 0xff, (mem >> 16) & 0xff, (mem >> 8) & 0xff);
 		if (object.m_other_modes.image_read_en)
 		{
-			mem = RREADIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel);
-			userdata->m_memory_color.i.a = (mem) & 0xff;
+			userdata->m_memory_color.set_a(mem & 0xff);
 			userdata->m_current_mem_cvg = (mem >> 5) & 7;
 		}
 		else
 		{
-			mem = RREADIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel);
-			userdata->m_memory_color.i.a = 0xff;
+			userdata->m_memory_color.set_a(0xff);
 			userdata->m_current_mem_cvg = 7;
 		}
-
-		userdata->m_memory_color.i.r = (mem >> 24) & 0xff;
-		userdata->m_memory_color.i.g = (mem >> 16) & 0xff;
-		userdata->m_memory_color.i.b = (mem >> 8) & 0xff;
 	}
 }
 
-inline void n64_rdp::copy_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, INT32 m_current_pix_cvg, const rdp_poly_state &object)
+inline void n64_rdp::copy_pixel(UINT32 curpixel, color_t& color, const rdp_poly_state &object)
 {
+	const UINT32 current_pix_cvg = color.get_a() ? 7 : 0;
+	const UINT8 r = color.get_r(); // Vectorize me
+	const UINT8 g = color.get_g();
+	const UINT8 b = color.get_b();
 	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
 	{
-		RWRITEIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel, ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | ((m_current_pix_cvg >> 2) & 1));
-		HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel, m_current_pix_cvg & 3);
+		RWRITEIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel, ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | ((current_pix_cvg >> 2) & 1));
+		HWRITEADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel, current_pix_cvg & 3);
 	}
 	else // 32-bit framebuffer
 	{
-		RWRITEIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel, (r << 24) | (g << 16) | (b << 8) | (m_current_pix_cvg << 5));
+		RWRITEIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel, (r << 24) | (g << 16) | (b << 8) | (current_pix_cvg << 5));
 	}
 }
 
@@ -321,14 +316,14 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 	const INT32 tilenum = object.tilenum;
 	const bool flip = object.flip;
 
-	SpanParam r; r.w = extent.param[SPAN_R].start;
-	SpanParam g; g.w = extent.param[SPAN_G].start;
-	SpanParam b; b.w = extent.param[SPAN_B].start;
-	SpanParam a; a.w = extent.param[SPAN_A].start;
-	SpanParam z; z.w = extent.param[SPAN_Z].start;
-	SpanParam s; s.w = extent.param[SPAN_S].start;
-	SpanParam t; t.w = extent.param[SPAN_T].start;
-	SpanParam w; w.w = extent.param[SPAN_W].start;
+	span_param_t r; r.w = extent.param[SPAN_R].start;
+	span_param_t g; g.w = extent.param[SPAN_G].start;
+	span_param_t b; b.w = extent.param[SPAN_B].start;
+	span_param_t a; a.w = extent.param[SPAN_A].start;
+	span_param_t z; z.w = extent.param[SPAN_Z].start;
+	span_param_t s; s.w = extent.param[SPAN_S].start;
+	span_param_t t; t.w = extent.param[SPAN_T].start;
+	span_param_t w; w.w = extent.param[SPAN_W].start;
 
 	const UINT32 zb = object.m_misc_state.m_zb_address >> 1;
 	const UINT32 zhb = object.m_misc_state.m_zb_address;
@@ -342,8 +337,8 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 
 	m_tex_pipe.calculate_clamp_diffs(tilenum, userdata, object);
 
-	const bool partialreject = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_inv_pixel_color.i.a && userdata->m_color_inputs.blender1b_a[0] == &userdata->m_pixel_color.i.a);
-	const INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color.i.a) ? 1 : 0;
+	const bool partialreject = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_inv_pixel_color && userdata->m_color_inputs.blender1b_a[0] == &userdata->m_pixel_color);
+	const INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color) ? 1 : 0;
 
 	INT32 drinc, dginc, dbinc, dainc;
 	INT32 dzinc, dzpix;
@@ -384,7 +379,6 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 	INT32 x = xend;
 
 	const INT32 length = flip ? (xstart - xend) : (xend - xstart);
-	INT32 fir, fig, fib;
 
 	if(object.m_other_modes.z_source_sel)
 	{
@@ -436,17 +430,38 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 			rgbaz_clip(sr, sg, sb, sa, &sz, userdata);
 
 			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle0]))(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tilenum, 0, userdata, object);
-			//m_tex_pipe.Cycle(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tilenum, 0, userdata, object);
+			UINT32 t0a = userdata->m_texel0_color.get_a();
+			userdata->m_texel0_alpha.set(t0a, t0a, t0a, t0a);
 
-			userdata->m_noise_color.i.r = userdata->m_noise_color.i.g = userdata->m_noise_color.i.b = rand() << 3; // Not accurate
+			const UINT8 noise = rand() << 3; // Not accurate
+			userdata->m_noise_color.set(0, noise, noise, noise);
 
-			userdata->m_pixel_color.i.r = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_r[1],*userdata->m_color_inputs.combiner_rgbsub_b_r[1],*userdata->m_color_inputs.combiner_rgbmul_r[1],*userdata->m_color_inputs.combiner_rgbadd_r[1]);
-			userdata->m_pixel_color.i.g = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_g[1],*userdata->m_color_inputs.combiner_rgbsub_b_g[1],*userdata->m_color_inputs.combiner_rgbmul_g[1],*userdata->m_color_inputs.combiner_rgbadd_g[1]);
-			userdata->m_pixel_color.i.b = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_b[1],*userdata->m_color_inputs.combiner_rgbsub_b_b[1],*userdata->m_color_inputs.combiner_rgbmul_b[1],*userdata->m_color_inputs.combiner_rgbadd_b[1]);
-			userdata->m_pixel_color.i.a = alpha_combiner_equation(*userdata->m_color_inputs.combiner_alphasub_a[1],*userdata->m_color_inputs.combiner_alphasub_b[1],*userdata->m_color_inputs.combiner_alphamul[1],*userdata->m_color_inputs.combiner_alphaadd[1]);
+			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[1]);
+			rgbaint_t rgbsub_b(*userdata->m_color_inputs.combiner_rgbsub_b[1]);
+			rgbaint_t rgbmul(*userdata->m_color_inputs.combiner_rgbmul[1]);
+			rgbaint_t rgbadd(*userdata->m_color_inputs.combiner_rgbadd[1]);
+
+			rgbsub_a.merge_alpha(*userdata->m_color_inputs.combiner_alphasub_a[1]);
+			rgbsub_b.merge_alpha(*userdata->m_color_inputs.combiner_alphasub_b[1]);
+			rgbmul.merge_alpha(*userdata->m_color_inputs.combiner_alphamul[1]);
+			rgbadd.merge_alpha(*userdata->m_color_inputs.combiner_alphaadd[1]);
+
+			rgbsub_a.sign_extend(0x180, 0xfffffe00);
+			rgbsub_b.sign_extend(0x180, 0xfffffe00);
+			rgbadd.sign_extend(0x180, 0xfffffe00);
+
+			rgbadd.shl_imm(8);
+			rgbsub_a.sub(rgbsub_b);
+			rgbsub_a.mul(rgbmul);
+			rgbsub_a.add(rgbadd);
+			rgbsub_a.add_imm(0x0080);
+			rgbsub_a.sra_imm(8);
+			rgbsub_a.clamp_and_clear(0xfffffe00);
+
+			userdata->m_pixel_color = rgbsub_a;
 
 			//Alpha coverage combiner
-			get_alpha_cvg(&userdata->m_pixel_color.i.a, userdata, object);
+			userdata->m_pixel_color.set_a(get_alpha_cvg(userdata->m_pixel_color.get_a(), userdata, object));
 
 			const UINT32 curpixel = fb_index + x;
 			const UINT32 zbcur = zb + curpixel;
@@ -460,15 +475,12 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 				INT32 adith = 0;
 				get_dither_values(scanline, j, &cdith, &adith, object);
 
-				if (((userdata->m_blend_enable << 2) | blend_index) != 5 && machine().input().code_pressed(KEYCODE_B))
-				{
-					printf("1:%d\n", (userdata->m_blend_enable << 2) | blend_index);
-				}
-				bool rendered = ((&m_blender)->*(m_blender.blend1[(userdata->m_blend_enable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, userdata, object);
+				color_t blended_pixel;
+				bool rendered = ((&m_blender)->*(m_blender.blend1[(userdata->m_blend_enable << 2) | blend_index]))(blended_pixel, cdith, adith, partialreject, sel0, userdata, object);
 
 				if (rendered)
 				{
-					write_pixel(curpixel, fir, fig, fib, userdata, object);
+					write_pixel(curpixel, blended_pixel, userdata, object);
 					if (object.m_other_modes.z_update_en)
 					{
 						z_store(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
@@ -502,14 +514,14 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 	const INT32 tilenum = object.tilenum;
 	const bool flip = object.flip;
 
-	SpanParam r; r.w = extent.param[SPAN_R].start;
-	SpanParam g; g.w = extent.param[SPAN_G].start;
-	SpanParam b; b.w = extent.param[SPAN_B].start;
-	SpanParam a; a.w = extent.param[SPAN_A].start;
-	SpanParam z; z.w = extent.param[SPAN_Z].start;
-	SpanParam s; s.w = extent.param[SPAN_S].start;
-	SpanParam t; t.w = extent.param[SPAN_T].start;
-	SpanParam w; w.w = extent.param[SPAN_W].start;
+	span_param_t r; r.w = extent.param[SPAN_R].start;
+	span_param_t g; g.w = extent.param[SPAN_G].start;
+	span_param_t b; b.w = extent.param[SPAN_B].start;
+	span_param_t a; a.w = extent.param[SPAN_A].start;
+	span_param_t z; z.w = extent.param[SPAN_Z].start;
+	span_param_t s; s.w = extent.param[SPAN_S].start;
+	span_param_t t; t.w = extent.param[SPAN_T].start;
+	span_param_t w; w.w = extent.param[SPAN_W].start;
 
 	const UINT32 zb = object.m_misc_state.m_zb_address >> 1;
 	const UINT32 zhb = object.m_misc_state.m_zb_address;
@@ -531,9 +543,9 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 
 	m_tex_pipe.calculate_clamp_diffs(tile1, userdata, object);
 
-	bool partialreject = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_inv_pixel_color.i.a && userdata->m_color_inputs.blender1b_a[1] == &userdata->m_pixel_color.i.a);
-	INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color.i.a) ? 1 : 0;
-	INT32 sel1 = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_memory_color.i.a) ? 1 : 0;
+	bool partialreject = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_inv_pixel_color && userdata->m_color_inputs.blender1b_a[1] == &userdata->m_pixel_color);
+	INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color) ? 1 : 0;
+	INT32 sel1 = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_memory_color) ? 1 : 0;
 
 	INT32 drinc, dginc, dbinc, dainc;
 	INT32 dzinc, dzpix;
@@ -577,7 +589,6 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 	INT32 x = xend;
 
 	const INT32 length = flip ? (xstart - xend) : (xend - xstart);
-	INT32 fir, fig, fib;
 
 	if(object.m_other_modes.z_source_sel)
 	{
@@ -644,46 +655,74 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle1]))(&userdata->m_texel1_color, &userdata->m_texel0_color, sss, sst, tile2, 1, userdata, object);
 			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle1]))(&userdata->m_next_texel_color, &userdata->m_next_texel_color, sss, sst, tile2, 1, userdata, object);
 
-			userdata->m_noise_color.i.r = userdata->m_noise_color.i.g = userdata->m_noise_color.i.b = rand() << 3; // Not accurate
-			userdata->m_combined_color.i.r = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_r[0],
-																*userdata->m_color_inputs.combiner_rgbsub_b_r[0],
-																*userdata->m_color_inputs.combiner_rgbmul_r[0],
-																*userdata->m_color_inputs.combiner_rgbadd_r[0]);
-			userdata->m_combined_color.i.g = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_g[0],
-																*userdata->m_color_inputs.combiner_rgbsub_b_g[0],
-																*userdata->m_color_inputs.combiner_rgbmul_g[0],
-																*userdata->m_color_inputs.combiner_rgbadd_g[0]);
-			userdata->m_combined_color.i.b = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_b[0],
-																*userdata->m_color_inputs.combiner_rgbsub_b_b[0],
-																*userdata->m_color_inputs.combiner_rgbmul_b[0],
-																*userdata->m_color_inputs.combiner_rgbadd_b[0]);
-			userdata->m_combined_color.i.a = alpha_combiner_equation(*userdata->m_color_inputs.combiner_alphasub_a[0],
-																*userdata->m_color_inputs.combiner_alphasub_b[0],
-																*userdata->m_color_inputs.combiner_alphamul[0],
-																*userdata->m_color_inputs.combiner_alphaadd[0]);
+			UINT32 t0a = userdata->m_texel0_color.get_a();
+			UINT32 t1a = userdata->m_texel1_color.get_a();
+			UINT32 tna = userdata->m_next_texel_color.get_a();
+			userdata->m_texel0_alpha.set(t0a, t0a, t0a, t0a);
+			userdata->m_texel1_alpha.set(t1a, t1a, t1a, t1a);
+			userdata->m_next_texel_alpha.set(tna, tna, tna, tna);
 
-			userdata->m_texel0_color = userdata->m_texel1_color;
-			userdata->m_texel1_color = userdata->m_next_texel_color;
+			const UINT8 noise = rand() << 3; // Not accurate
+			userdata->m_noise_color.set(0, noise, noise, noise);
 
-			userdata->m_pixel_color.i.r = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_r[1],
-																*userdata->m_color_inputs.combiner_rgbsub_b_r[1],
-																*userdata->m_color_inputs.combiner_rgbmul_r[1],
-																*userdata->m_color_inputs.combiner_rgbadd_r[1]);
-			userdata->m_pixel_color.i.g = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_g[1],
-																*userdata->m_color_inputs.combiner_rgbsub_b_g[1],
-																*userdata->m_color_inputs.combiner_rgbmul_g[1],
-																*userdata->m_color_inputs.combiner_rgbadd_g[1]);
-			userdata->m_pixel_color.i.b = color_combiner_equation(*userdata->m_color_inputs.combiner_rgbsub_a_b[1],
-																*userdata->m_color_inputs.combiner_rgbsub_b_b[1],
-																*userdata->m_color_inputs.combiner_rgbmul_b[1],
-																*userdata->m_color_inputs.combiner_rgbadd_b[1]);
-			userdata->m_pixel_color.i.a = alpha_combiner_equation(*userdata->m_color_inputs.combiner_alphasub_a[1],
-																*userdata->m_color_inputs.combiner_alphasub_b[1],
-																*userdata->m_color_inputs.combiner_alphamul[1],
-																*userdata->m_color_inputs.combiner_alphaadd[1]);
+			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[0]);
+			rgbaint_t rgbsub_b(*userdata->m_color_inputs.combiner_rgbsub_b[0]);
+			rgbaint_t rgbmul(*userdata->m_color_inputs.combiner_rgbmul[0]);
+			rgbaint_t rgbadd(*userdata->m_color_inputs.combiner_rgbadd[0]);
+
+			rgbsub_a.merge_alpha(*userdata->m_color_inputs.combiner_alphasub_a[0]);
+			rgbsub_b.merge_alpha(*userdata->m_color_inputs.combiner_alphasub_b[0]);
+			rgbmul.merge_alpha(*userdata->m_color_inputs.combiner_alphamul[0]);
+			rgbadd.merge_alpha(*userdata->m_color_inputs.combiner_alphaadd[0]);
+
+			rgbsub_a.sign_extend(0x180, 0xfffffe00);
+			rgbsub_b.sign_extend(0x180, 0xfffffe00);
+			rgbadd.sign_extend(0x180, 0xfffffe00);
+
+			rgbadd.shl_imm(8);
+			rgbsub_a.sub(rgbsub_b);
+			rgbsub_a.mul(rgbmul);
+
+			rgbsub_a.add(rgbadd);
+			rgbsub_a.add_imm(0x0080);
+			rgbsub_a.sra_imm(8);
+			rgbsub_a.clamp_and_clear(0xfffffe00);
+
+			userdata->m_combined_color.set(rgbsub_a);
+			userdata->m_texel0_color.set(userdata->m_texel1_color);
+			userdata->m_texel1_color.set(userdata->m_next_texel_color);
+
+			UINT32 ca = userdata->m_combined_color.get_a();
+			userdata->m_combined_alpha.set(ca, ca, ca, ca);
+			userdata->m_texel0_alpha.set(userdata->m_texel1_alpha);
+			userdata->m_texel1_alpha.set(userdata->m_next_texel_alpha);
+
+			rgbsub_a.set(*userdata->m_color_inputs.combiner_rgbsub_a[1]);
+			rgbsub_b.set(*userdata->m_color_inputs.combiner_rgbsub_b[1]);
+			rgbmul.set(*userdata->m_color_inputs.combiner_rgbmul[1]);
+			rgbadd.set(*userdata->m_color_inputs.combiner_rgbadd[1]);
+
+			rgbsub_a.merge_alpha(*userdata->m_color_inputs.combiner_alphasub_a[1]);
+			rgbsub_b.merge_alpha(*userdata->m_color_inputs.combiner_alphasub_b[1]);
+			rgbmul.merge_alpha(*userdata->m_color_inputs.combiner_alphamul[1]);
+			rgbadd.merge_alpha(*userdata->m_color_inputs.combiner_alphaadd[1]);
+
+			rgbsub_a.sign_extend(0x180, 0xfffffe00);
+			rgbsub_b.sign_extend(0x180, 0xfffffe00);
+			rgbadd.sign_extend(0x180, 0xfffffe00);
+
+			rgbadd.shl_imm(8);
+			rgbsub_a.sub(rgbsub_b);
+			rgbsub_a.mul(rgbmul);
+			rgbsub_a.add(rgbadd);
+			rgbsub_a.add_imm(0x0080);
+			rgbsub_a.sra_imm(8);
+			rgbsub_a.clamp_and_clear(0xfffffe00);
+
+			userdata->m_pixel_color.set(rgbsub_a);
 
 			//Alpha coverage combiner
-			get_alpha_cvg(&userdata->m_pixel_color.i.a, userdata, object);
+			userdata->m_pixel_color.set_a(get_alpha_cvg(userdata->m_pixel_color.get_a(), userdata, object));
 
 			const UINT32 curpixel = fb_index + x;
 			const UINT32 zbcur = zb + curpixel;
@@ -695,15 +734,12 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			{
 				get_dither_values(scanline, j, &cdith, &adith, object);
 
-				if (((userdata->m_blend_enable << 2) | blend_index) != 5 && machine().input().code_pressed(KEYCODE_B))
-				{
-					printf("2:%d\n", (userdata->m_blend_enable << 2) | blend_index);
-				}
-				bool rendered = ((&m_blender)->*(m_blender.blend2[(userdata->m_blend_enable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, sel1, userdata, object);
+				color_t blended_pixel;
+				bool rendered = ((&m_blender)->*(m_blender.blend2[(userdata->m_blend_enable << 2) | blend_index]))(blended_pixel, cdith, adith, partialreject, sel0, sel1, userdata, object);
 
 				if (rendered)
 				{
-					write_pixel(curpixel, fir, fig, fib, userdata, object);
+					write_pixel(curpixel, blended_pixel, userdata, object);
 					if (object.m_other_modes.z_update_en)
 					{
 						z_store(object, zbcur, zhbcur, sz, userdata->m_dzpix_enc);
@@ -741,8 +777,8 @@ void n64_rdp::span_draw_copy(INT32 scanline, const extent_t &extent, const rdp_p
 	const INT32 xinc = flip ? 1 : -1;
 	const INT32 length = flip ? (xstart - xend) : (xend - xstart);
 
-	SpanParam s; s.w = extent.param[SPAN_S].start;
-	SpanParam t; t.w = extent.param[SPAN_T].start;
+	span_param_t s; s.w = extent.param[SPAN_S].start;
+	span_param_t t; t.w = extent.param[SPAN_T].start;
 
 	const INT32 ds = object.m_span_base.m_span_ds / 4;
 	const INT32 dt = object.m_span_base.m_span_dt / 4;
@@ -764,9 +800,9 @@ void n64_rdp::span_draw_copy(INT32 scanline, const extent_t &extent, const rdp_p
 			m_tex_pipe.copy(&userdata->m_texel0_color, sss, sst, tilenum, object, userdata);
 
 			UINT32 curpixel = fb_index + x;
-			if ((userdata->m_texel0_color.i.a != 0) || (!object.m_other_modes.alpha_compare_en))
+			if ((userdata->m_texel0_color.get_a() != 0) || (!object.m_other_modes.alpha_compare_en))
 			{
-				copy_pixel(curpixel, userdata->m_texel0_color.i.r, userdata->m_texel0_color.i.g, userdata->m_texel0_color.i.b, userdata->m_texel0_color.i.a ? 7 : 0, object);
+				copy_pixel(curpixel, userdata->m_texel0_color, object);
 			}
 		}
 

@@ -44,74 +44,74 @@
 
  */
 
-#define MCFG_FD1771x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1771x, _clock)
+#define MCFG_FD1771_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1771, _clock)
 
-#define MCFG_FD1781x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1781x, _clock)
+#define MCFG_FD1781_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1781, _clock)
 
-#define MCFG_FD1791x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1791x, _clock)
+#define MCFG_FD1791_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1791, _clock)
 
-#define MCFG_FD1792x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1792x, _clock)
+#define MCFG_FD1792_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1792, _clock)
 
-#define MCFG_FD1793x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1793x, _clock)
+#define MCFG_FD1793_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1793, _clock)
 
-#define MCFG_KR1818VG93x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, KR1818VG93x, _clock)
+#define MCFG_KR1818VG93_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, KR1818VG93, _clock)
 
-#define MCFG_FD1794x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1794x, _clock)
+#define MCFG_FD1794_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1794, _clock)
 
-#define MCFG_FD1795x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1795x, _clock)
+#define MCFG_FD1795_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1795, _clock)
 
-#define MCFG_FD1797x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1797x, _clock)
+#define MCFG_FD1797_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1797, _clock)
 
-#define MCFG_MB8866x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, MB8866x, _clock)
+#define MCFG_MB8866_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, MB8866, _clock)
 
-#define MCFG_MB8876x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, MB8876x, _clock)
+#define MCFG_MB8876_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, MB8876, _clock)
 
-#define MCFG_MB8877x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, MB8877x, _clock)
+#define MCFG_MB8877_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, MB8877, _clock)
 
-#define MCFG_FD1761x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1761x, _clock)
+#define MCFG_FD1761_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1761, _clock)
 
-#define MCFG_FD1763x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1763x, _clock)
+#define MCFG_FD1763_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1763, _clock)
 
-#define MCFG_FD1765x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1765x, _clock)
+#define MCFG_FD1765_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1765, _clock)
 
-#define MCFG_FD1767x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1767x, _clock)
+#define MCFG_FD1767_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1767, _clock)
 
-#define MCFG_WD2791x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2791x, _clock)
+#define MCFG_WD2791_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2791, _clock)
 
-#define MCFG_WD2793x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2793x, _clock)
+#define MCFG_WD2793_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2793, _clock)
 
-#define MCFG_WD2795x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2795x, _clock)
+#define MCFG_WD2795_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2795, _clock)
 
-#define MCFG_WD2797x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2797x, _clock)
+#define MCFG_WD2797_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2797, _clock)
 
-#define MCFG_WD1770x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD1770x, _clock)
+#define MCFG_WD1770_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD1770, _clock)
 
-#define MCFG_WD1772x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD1772x, _clock)
+#define MCFG_WD1772_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD1772, _clock)
 
-#define MCFG_WD1773x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD1773x, _clock)
+#define MCFG_WD1773_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD1773, _clock)
 
 #define MCFG_WD_FDC_FORCE_READY \
 	downcast<wd_fdc_t *>(device)->set_force_ready(true);
@@ -649,33 +649,34 @@ public:
 	wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1771x;
+extern const device_type FD1771;
 
-extern const device_type FD1781x;
+extern const device_type FD1781;
 
-extern const device_type FD1791x;
-extern const device_type FD1792x;
-extern const device_type FD1793x;
-extern const device_type KR1818VG93x;
-extern const device_type FD1795x;
-extern const device_type FD1797x;
+extern const device_type FD1791;
+extern const device_type FD1792;
+extern const device_type FD1793;
+extern const device_type FD1794;
+extern const device_type KR1818VG93;
+extern const device_type FD1795;
+extern const device_type FD1797;
 
-extern const device_type MB8866x;
-extern const device_type MB8876x;
-extern const device_type MB8877x;
+extern const device_type MB8866;
+extern const device_type MB8876;
+extern const device_type MB8877;
 
-extern const device_type FD1761x;
-extern const device_type FD1763x;
-extern const device_type FD1765x;
-extern const device_type FD1767x;
+extern const device_type FD1761;
+extern const device_type FD1763;
+extern const device_type FD1765;
+extern const device_type FD1767;
 
-extern const device_type WD2791x;
-extern const device_type WD2793x;
-extern const device_type WD2795x;
-extern const device_type WD2797x;
+extern const device_type WD2791;
+extern const device_type WD2793;
+extern const device_type WD2795;
+extern const device_type WD2797;
 
-extern const device_type WD1770x;
-extern const device_type WD1772x;
-extern const device_type WD1773x;
+extern const device_type WD1770;
+extern const device_type WD1772;
+extern const device_type WD1773;
 
 #endif

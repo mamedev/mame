@@ -401,6 +401,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10)
+	MCFG_MC6845_INTERLACE_ADJUST(1)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(10)
 	MCFG_MC6845_UPDATE_ROW_CB(apricot_state, crtc_update_row)
@@ -465,7 +466,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// floppy
-	MCFG_WD2797x_ADD("ic68", XTAL_4MHz / 2)
+	MCFG_WD2797_ADD("ic68", XTAL_4MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(apricot_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("ic71", i8089_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats)

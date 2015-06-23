@@ -305,7 +305,7 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 			rowmask = BYTE_REVERSE32(rowmask_ram[(y & 0x1ff) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)]) & 0xffff;
 		else
 			rowmask = 0xffff;
-		
+
 		int iix = ix & 0x1ff;
 
 		int rx1 = x1 - (rowscroll * 2);
@@ -1009,7 +1009,7 @@ inline void model3_state::write_texture8(int xpos, int ypos, int width, int heig
 			int b = 0;
 			for(j=y; j < y+8; j++)
 			{
-				for(i=x; i < x+8; i+=2) 
+				for(i=x; i < x+8; i+=2)
 				{
 					UINT16 d = data[texture_decode8[b]];
 
@@ -1096,7 +1096,7 @@ void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 			{
 				if (bitdepth)
 				{
-					write_texture16(x, y, w, h, page, (UINT16*)data);					
+					write_texture16(x, y, w, h, page, (UINT16*)data);
 				}
 				else
 				{
@@ -1125,7 +1125,7 @@ void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 			else
 			{
 				//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
-				write_texture8(xpos, ypos, width, height, page, upper_byte, lower_byte, (UINT16*)data);				
+				write_texture8(xpos, ypos, width, height, page, upper_byte, lower_byte, (UINT16*)data);
 			}
 
 			invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
@@ -1144,7 +1144,7 @@ void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 			{
 				if (bitdepth)
 				{
-					write_texture16(x, y, w, h, page, (UINT16*)data);					
+					write_texture16(x, y, w, h, page, (UINT16*)data);
 				}
 				else
 				{
@@ -1708,7 +1708,7 @@ void model3_state::draw_model(UINT32 addr)
 		sn[2] = (normal[0] * transform_matrix[2][0]) +
 				(normal[1] * transform_matrix[2][1]) +
 				(normal[2] * transform_matrix[2][2]);
-				
+
 		// TODO: depth bias
 		// transform and light vertices
 		for (i = 0; i < num_vertices; i++)
@@ -1722,7 +1722,7 @@ void model3_state::draw_model(UINT32 addr)
 
 			// transform to projection space
 			matrix_multiply_vector(vp_matrix, vect, &p[i]);
-		
+
 			clip_vert[i].x = p[i][0];
 			clip_vert[i].y = p[i][1];
 			clip_vert[i].z = p[i][2];
@@ -1770,7 +1770,7 @@ void model3_state::draw_model(UINT32 addr)
 			clip_vert[i].i = intensity;
 		}
 
-		/* clip against view frustum */	
+		/* clip against view frustum */
 		num_vertices = clip_w(clip_vert, num_vertices, clip_vert);
 		num_vertices = clip(clip_vert, num_vertices, clip_vert, 0, 0);		// W <= -X
 		num_vertices = clip(clip_vert, num_vertices, clip_vert, 0, 1);		// W <= +X
@@ -1783,18 +1783,18 @@ void model3_state::draw_model(UINT32 addr)
 		for(i=0; i < num_vertices; i++)
 		{
 			float oow = 1.0f / clip_vert[i].w;
-			
+
 			clip_vert[i].x *= oow;
 			clip_vert[i].y *= oow;
 			clip_vert[i].z *= oow;
 			clip_vert[i].u *= oow;
 			clip_vert[i].v *= oow;
-			
+
 			clip_vert[i].x = (((clip_vert[i].x * 0.5f) + 0.5f) * m_viewport_width) + m_viewport_x;
 			clip_vert[i].y = (((clip_vert[i].y * 0.5f) + 0.5f) * m_viewport_height) + m_viewport_y;
 			clip_vert[i].z = (((clip_vert[i].z * 0.5f) + 0.5f) * (m_viewport_far - m_viewport_near)) + m_viewport_near;
 		}
-		
+
 		/* backface culling */
 		if( (header[6] & 0x800000) && (!(header[1] & 0x0010)) )
 		{
@@ -1837,7 +1837,7 @@ void model3_state::draw_model(UINT32 addr)
 			}
 
 			for (i=2; i < num_vertices; i++)
-			{				
+			{
 				bool alpha = (header[6] & 0x1) || ((header[6] & 0x800000) == 0);		// put to alpha buffer if there's any transparency involved
 				m3_triangle* tri = push_triangle(alpha);
 
@@ -2159,7 +2159,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].y = tri->v[i].y;
 				v[i].p[0] = tri->v[i].w;
 				v[i].p[1] = 1.0f / tri->v[i].w;
-				v[i].p[2] = tri->v[i].u; 
+				v[i].p[2] = tri->v[i].u;
 				v[i].p[3] = tri->v[i].v;
 				v[i].p[4] = tri->v[i].i;
 			}
@@ -2234,7 +2234,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
 
-			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_alpha), this), 5, v[0], v[1], v[2]);			
+			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_alpha), this), 5, v[0], v[1], v[2]);
 		}
 		else
 		{
@@ -2266,19 +2266,17 @@ void model3_renderer::draw_scanline_solid(INT32 scanline, const extent_t &extent
 	float in = extent.param[1].start;
 	float inz = extent.param[1].dpdx;
 
-	rgbint color;
-	rgb_to_rgbint(&color, polydata.color);
+	rgbaint_t color(polydata.color);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		if (z <= zb[x])
 		{
-			rgbint c = color;
-			int ii = (int)(in);
+			rgbaint_t c(color);
 
-			rgbint_scale_immediate_and_clamp(&c, ii);
+			c.scale_imm_and_clamp((int)in);
 
-			fb[x] = 0xff000000 | rgbint_to_rgb_clamp(&c);
+			fb[x] = 0xff000000 | c.to_rgba_clamp();
 			zb[x] = z;
 		}
 
@@ -2298,8 +2296,7 @@ void model3_renderer::draw_scanline_solid_trans(INT32 scanline, const extent_t &
 	float in = extent.param[1].start;
 	float inz = extent.param[1].dpdx;
 
-	rgbint color;
-	rgb_to_rgbint(&color, polydata.color);
+	rgbaint_t color(polydata.color);
 
 	int trans = (polydata.transparency << 3) | (polydata.transparency >> 2);
 
@@ -2307,21 +2304,16 @@ void model3_renderer::draw_scanline_solid_trans(INT32 scanline, const extent_t &
 	{
 		if (z <= zb[x])
 		{
-			rgbint c = color;
+			rgbaint_t c(color);
 
-			int ii = (int)(in);
-
-			rgbint_scale_immediate_and_clamp(&c, ii);
+			c.scale_imm_and_clamp((int)in);
 
 			if (trans != 0xff)
 			{
-				rgbint fbcolor;
-				UINT32 orig = fb[x];
-				rgb_to_rgbint(&fbcolor, orig);
-				rgbint_blend(&c, &fbcolor, trans);
+				c.blend(rgbaint_t(fb[x]), trans);
 			}
 
-			fb[x] = 0xff000000 | rgbint_to_rgb_clamp(&c);
+			fb[x] = 0xff000000 | c.to_rgba_clamp();
 		}
 
 		in += inz;
@@ -2352,7 +2344,7 @@ do {                                                                            
 	UINT32 pix01 = texture->data[(v1 << width) + u2];                           \
 	UINT32 pix10 = texture->data[(v2 << width) + u1];                           \
 	UINT32 pix11 = texture->data[(v2 << width) + u2];                           \
-	texel = rgba_bilinear_filter(pix00, pix01, pix10, pix11, u, v);             \
+	texel = rgbaint_t::bilinear_filter(pix00, pix01, pix10, pix11, u, v);       \
 } while(0);
 
 #if ENABLE_BILINEAR
@@ -2387,15 +2379,13 @@ void model3_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent, 
 		if (z <= zb[x])
 		{
 			UINT32 texel;
-			TEX_FETCH();		// TODO fetch rgbint instead
+			TEX_FETCH();		// TODO fetch rgbaint_t instead
 
-			rgbint color;
-			rgb_to_rgbint(&color, texel);
+			rgbaint_t color(texel);
 
-			int ii = (int)(in);
-			rgbint_scale_immediate_and_clamp(&color, ii);
+			color.scale_imm_and_clamp((int)in);
 
-			fb[x] = 0xff000000 | rgbint_to_rgb_clamp(&color);
+			fb[x] = 0xff000000 | color.to_rgba_clamp();
 			zb[x] = z;
 		}
 
@@ -2428,25 +2418,21 @@ void model3_renderer::draw_scanline_tex_colormod(INT32 scanline, const extent_t 
 	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
 	UINT32 width = 6 + texture->width;
 
-	rgbint polycolor;
-	rgb_to_rgbint(&polycolor, polydata.color);
+	rgbaint_t polycolor(polydata.color);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		if (z <= zb[x])
 		{
 			UINT32 texel;
-			TEX_FETCH();		// TODO fetch rgbint instead
+			TEX_FETCH();		// TODO fetch rgbaint_t instead
 
-			rgbint color;
-			rgb_to_rgbint(&color, texel);
+			rgbaint_t color(texel);
 
-			rgbint_scale_channel_and_clamp(&color, &polycolor);
+			color.scale_and_clamp(polycolor);
+			color.scale_imm_and_clamp((int)in);
 
-			int ii = (int)(in);
-			rgbint_scale_immediate_and_clamp(&color, ii);
-
-			fb[x] = 0xff000000 | rgbint_to_rgb_clamp(&color);
+			fb[x] = 0xff000000 | color.to_rgba_clamp();
 			zb[x] = z;
 		}
 
@@ -2479,8 +2465,7 @@ void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &
 	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
 	UINT32 width = 6 + texture->width;
 
-	rgbint polycolor;
-	rgb_to_rgbint(&polycolor, polydata.color);
+	rgbaint_t polycolor(polydata.color);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -2492,20 +2477,13 @@ void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &
 			UINT32 fa = texel >> 24;
 			if (fa >= 0xf8)
 			{
-				rgbint color;
-				rgb_to_rgbint(&color, texel);
-	
-				rgbint_scale_channel_and_clamp(&color, &polycolor);
+				rgbaint_t color(texel);
 
-				int ii = (int)(in);
-				rgbint_scale_immediate_and_clamp(&color, ii);
+				color.scale_and_clamp(polycolor);
+				color.scale_imm_and_clamp((int)in);
+				color.blend(rgbaint_t(fb[x]), fa);
 
-				rgbint fbcolor;
-				UINT32 orig = fb[x];
-				rgb_to_rgbint(&fbcolor, orig);
-				rgbint_blend(&color, &fbcolor, fa);
-
-				fb[x] = 0xff000000 | rgbint_to_rgb_clamp(&color);
+				fb[x] = 0xff000000 | color.to_rgba_clamp();
 				zb[x] = z;
 			}
 		}
@@ -2541,8 +2519,7 @@ void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &ex
 	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
 	UINT32 width = 6 + texture->width;
 
-	rgbint polycolor;
-	rgb_to_rgbint(&polycolor, polydata.color);
+	rgbaint_t polycolor(polydata.color);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -2551,21 +2528,13 @@ void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &ex
 			UINT32 texel;
 			TEX_FETCH();
 
-			rgbint color;
-			rgb_to_rgbint(&color, texel);
+			rgbaint_t color(texel);
 
-			rgbint_scale_channel_and_clamp(&color, &polycolor);
+			color.scale_and_clamp(polycolor);
+			color.scale_imm_and_clamp((int)in);
+			color.blend(rgbaint_t(fb[x]), trans);
 
-			int ii = (int)in;
-
-			rgbint_scale_immediate_and_clamp(&color, ii);
-
-			rgbint fbcolor;
-			UINT32 orig = fb[x];
-			rgb_to_rgbint(&fbcolor, orig);
-			rgbint_blend(&color, &fbcolor, trans);
-
-			fb[x] = 0xff000000 | rgbint_to_rgb_clamp(&color);
+			fb[x] = 0xff000000 | color.to_rgba_clamp();
 		}
 
 		ooz += dooz;
@@ -2610,19 +2579,12 @@ void model3_renderer::draw_scanline_tex_alpha(INT32 scanline, const extent_t &ex
 			UINT32 fa = texel >> 24;
 			if (fa != 0)
 			{
-				rgbint color;
-				rgb_to_rgbint(&color, texel);
+				rgbaint_t color(texel);
 
-				int ii = (int)in;
+				color.scale_imm_and_clamp((int)in);
+				color.blend(rgbaint_t(fb[x]), fa);
 
-				rgbint_scale_immediate_and_clamp(&color, ii);
-
-				rgbint fbcolor;
-				UINT32 orig = fb[x];
-				rgb_to_rgbint(&fbcolor, orig);
-				rgbint_blend(&color, &fbcolor, fa);
-
-				fb[x] = 0xff000000 | rgbint_to_rgb_clamp(&color);
+				fb[x] = 0xff000000 | color.to_rgba_clamp();
 			}
 		}
 
