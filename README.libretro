@@ -1,13 +1,17 @@
 MAME for libretro
 =================
 
-At the moment, the libretro port for MAME is known to be rather messy.  The
-plan is eventually to rewrite it, but it is not currently anyone's highest
-priority to do it.
+At the moment, the libretro port for MAME (the "OSD" in MAME parlance) is
+known to be rather messy.  The plan is to rewrite it eventually, but it's
+not currently anyone's highest priority to do it.
 
 What follows here is a technical explanation of what libretro had to do to
 MAME's GENie build system in order to compile it as a shared library with
 the appropriate API exported to be used as a libretro core.
+
+The reason for this is that the person who did it (known online as either
+tjcarter or iKarith) wants others to be able to maintain the thing in his
+absence.  He'd rather not maintain the thing at all honestly.  ;)
 
 
 ## -fPIC for everyone ##
@@ -41,16 +45,39 @@ requisite dofile() call to include -fPIC in build/link options.
 You get to fix that if you want it to build.  :)
 
 
+## The problem with the OSD being a static library ##
+
+You're _not_ supposed to put the public API of a shared library into a
+static library, particularly if those symbols are "unused" by any other part
+of the shared library.  In other words, while the libretro API is contained
+within the retro OSD, the file containing the public API (libretro.c) must
+not be stripped by the helpful linker trying to optimize for you.
+
+How you do that varies quite a bit by linker, and some of them such as GNU
+ld require the options be in a specific order.  How to do that with GENie is
+not clear.
+
+To solve all of these issues at once, we leave libretro.c out of the OSD
+library and add it to the main MAME library directly.  This requires adding
+an includedirs block for the directory containing libco's header and a files
+block containing libretro.c.  These changes are near the bottom of the GENie
+project in scripts/src/main.lua.
+
+This is not a clean solution.  It just happens to be the one that works
+across platforms without jumping through hoops for every linker that comes
+along.
+
+
 ## Other libretro GENie mods ##
 
-Near the bottom of scripts/src/main.lua, there's a large chunk of libretro-
-related additions and overrides at the bottom of the file.  You can spot it
-by searching for "BEGIN libretro overrides to MAME's GENie build".  Most of
-what's there is pretty self-explanatory.  It overrides MAME to build shared
-libraries, includes processing for ARCH and platform, two standard libretro
-build target variables, and jumps through a few hoops to try and make sure
-the right symbols get preserved and exported.  It probably could be split
-out into its own file, but it hasn't been for some simplicity.
+As mentioned above, near the bottom of scripts/src/main.lua, there's a chunk
+of libretro-related additions and overrides.  You can spot it by searching
+for "BEGIN libretro overrides to MAME's GENie build".  Most of what's there
+is pretty self-explanatory.  It overrides MAME to build a shared library and
+includes processing for ARCH and platform, the two standard libretro build
+target variables, and includes the libretro.c file mentioned above.  It
+could probably be split into its own file, but hasn't been thus far for
+simplicity.
 
 The only other addition is scripts/src/osd/retro.lua and its cfg file which
 isn't strictly necessary to be a separate file.  Pretty standard stuff in
@@ -59,8 +86,35 @@ the retro OSD to be as minimally invasive into MAME as possible.
 
 That's about it really.  Compared to the old system, GENie is both much
 simpler and more complicated for us.  More complicated because stuff is in
-so many different places.  Simpler because it actually works on the MAME
-side of things, and our modifications shouldn't need to be too extensive to
-keep it working, once it's all sorted out.
+so many different places.  Simpler because modifying GENie rules like we
+have done makes for an incredibly shallow fork.
 
-It's just a matter of getting there...
+
+## Makefile.libretro ##
+
+There is still a pure Makefile named Makefile.libretro.  It guesses the ARCH
+and platform variables if they're not defined, and it passes those (renaming
+ARCH in the process) along with the OSD and several other useful arguments
+to GENie.  It's basically a major shortcut for the make command line which
+for our needs is pretty long.
+
+It's been tested building the "arcade" (used to be UME) and tiny targets,
+just pass SUBTARGET=tiny to Makefile.libretro to get the latter.
+
+
+## Final thoughts ##
+
+MAME is a beast.  It compiles to a 137MB .dylib on the Mac and a 172MB .so
+on Linux.  Nonetheless, if its retro OSD weren't such a mess, it would be a
+good example of how to port something to libretro.  Presently it still
+requires a fork, but the fork is perhaps the shallowest libretro fork we've
+got.  And while not every decision the MAME developers have ever made could
+be considered optimal, the one thing they have done is insist that every
+external dependency they have is included in their source tree—which is
+exactly what we need.
+
+MAME's GENie setup is complex, but that is because MAME is complex.  GENie
+isn't difficult to figure out if you know a bit of lua.  Indeed iKarith does
+not claim to fully understand GENie, but managed to modify the project to
+build a libretro core with only a few pointers (thanks balrog!) and a little
+grepping of 3rdparty/genie.
