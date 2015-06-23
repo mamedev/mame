@@ -1986,7 +1986,8 @@ createMAMEProjects(_target, _subtarget, "midway")
 files {
 	MAME_DIR .. "src/mame/drivers/astrocde.c",
 	MAME_DIR .. "src/mame/video/astrocde.c",
-	MAME_DIR .. "src/mame/audio/astrocde.c",
+	MAME_DIR .. "src/mame/audio/gorf.c",
+	MAME_DIR .. "src/mame/audio/wow.c",
 	MAME_DIR .. "src/mame/drivers/atlantis.c",
 	MAME_DIR .. "src/mame/drivers/balsente.c",
 	MAME_DIR .. "src/mame/machine/balsente.c",
