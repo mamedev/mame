@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0) // INS8251N
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0) // INS8251A
 
-	MCFG_MB8876x_ADD("fdc", XTAL_8MHz / 8) // guess
+	MCFG_MB8876_ADD("fdc", XTAL_8MHz / 8) // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
 

@@ -113,7 +113,7 @@ static MACHINE_CONFIG_START( slicer, slicer_state )
 	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sc2681", mc68681_device, rx_b_w))
 
-	MCFG_FD1797x_ADD("fdc", XTAL_16MHz/2/8)
+	MCFG_FD1797_ADD("fdc", XTAL_16MHz/2/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", slicer_floppies, "525dd", floppy_image_device::default_floppy_formats)

@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(rc759_state, ppi_portc_w))
 
 	// floppy disk controller
-	MCFG_WD2797x_ADD("fdc", 1000000)
+	MCFG_WD2797_ADD("fdc", 1000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir0_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
 

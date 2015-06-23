@@ -837,7 +837,7 @@ static MACHINE_CONFIG_DERIVED( super80r, super80v )
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(super80_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(super80_state, io_write_byte))
 
-	MCFG_WD2793x_ADD("fdc", XTAL_2MHz)
+	MCFG_WD2793_ADD("fdc", XTAL_2MHz)
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)

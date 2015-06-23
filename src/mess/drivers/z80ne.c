@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_FD1771x_ADD("wd1771", XTAL_2MHz / 2)
+	MCFG_FD1771_ADD("wd1771", XTAL_2MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, NULL,   z80ne_state::floppy_formats)

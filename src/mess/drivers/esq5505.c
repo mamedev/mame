@@ -657,7 +657,7 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
-	MCFG_WD1772x_ADD("wd1772", 8000000)
+	MCFG_WD1772_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
@@ -674,7 +674,7 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
-	MCFG_WD1772x_ADD("wd1772", 8000000)
+	MCFG_WD1772_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
@@ -724,7 +724,7 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
 	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 
-	MCFG_WD1772x_ADD("wd1772", 8000000)
+	MCFG_WD1772_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 

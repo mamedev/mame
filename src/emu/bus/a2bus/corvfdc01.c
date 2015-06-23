@@ -35,7 +35,7 @@ static SLOT_INTERFACE_START( corv_floppies )
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( fdc01 )
-	MCFG_FD1793x_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
+	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)

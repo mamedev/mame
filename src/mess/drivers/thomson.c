@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
 
-	MCFG_WD2793x_ADD("wd2793", XTAL_1MHz)
+	MCFG_WD2793_ADD("wd2793", XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)

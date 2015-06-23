@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// floppy
-	MCFG_WD2797x_ADD("ic68", XTAL_4MHz / 2)
+	MCFG_WD2797_ADD("ic68", XTAL_4MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(apricot_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("ic71", i8089_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats)
