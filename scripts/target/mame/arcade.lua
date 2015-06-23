@@ -2716,7 +2716,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ashnojoe.c",
 	MAME_DIR .. "src/mame/video/ashnojoe.c",
 	MAME_DIR .. "src/mame/drivers/asuka.c",
-	MAME_DIR .. "src/mame/machine/asuka.c",
+	MAME_DIR .. "src/mame/machine/bonzeadv.c",
 	MAME_DIR .. "src/mame/video/asuka.c",
 	MAME_DIR .. "src/mame/drivers/bigevglf.c",
 	MAME_DIR .. "src/mame/machine/bigevglf.c",
