@@ -62,8 +62,8 @@
 #define MCFG_KR1818VG93_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, KR1818VG93, _clock)
 
-#define MCFG_FD1794x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1794x, _clock)
+#define MCFG_FD1794_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1794, _clock)
 
 #define MCFG_FD1795_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1795, _clock)
@@ -656,6 +656,7 @@ extern const device_type FD1781;
 extern const device_type FD1791;
 extern const device_type FD1792;
 extern const device_type FD1793;
+extern const device_type FD1794;
 extern const device_type KR1818VG93;
 extern const device_type FD1795;
 extern const device_type FD1797;

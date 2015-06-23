@@ -10,7 +10,7 @@ const device_type FD1791 = &device_creator<fd1791_t>;
 const device_type FD1792 = &device_creator<fd1792_t>;
 const device_type FD1793 = &device_creator<fd1793_t>;
 const device_type KR1818VG93 = &device_creator<kr1818vg93_t>;
-const device_type FD1794x = &device_creator<fd1794_t>;
+const device_type FD1794 = &device_creator<fd1794_t>;
 const device_type FD1795 = &device_creator<fd1795_t>;
 const device_type FD1797 = &device_creator<fd1797_t>;
 const device_type MB8866 = &device_creator<mb8866_t>;
@@ -2503,7 +2503,7 @@ kr1818vg93_t::kr1818vg93_t(const machine_config &mconfig, const char *tag, devic
 	nonsticky_immint = true;
 }
 
-fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1794x, "FD1794", tag, owner, clock, "fd1794", __FILE__)
+fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1794, "FD1794", tag, owner, clock, "fd1794", __FILE__)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
