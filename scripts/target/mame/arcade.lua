@@ -2581,6 +2581,7 @@ files {
 	MAME_DIR .. "src/mame/machine/n64.c",
 	MAME_DIR .. "src/mame/video/n64.c",
 	MAME_DIR .. "src/mame/video/rdpblend.c",
+	MAME_DIR .. "src/mame/video/rdpspn16.c",
 	MAME_DIR .. "src/mame/video/rdptpipe.c",
 	MAME_DIR .. "src/mame/drivers/hanaawas.c",
 	MAME_DIR .. "src/mame/video/hanaawas.c",
