@@ -361,7 +361,7 @@ void c_year::set(const char *str)
 //-------------------------------------------------
 
 void mewui_globals::save_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
-                                            std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
+											std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -412,7 +412,7 @@ void mewui_globals::save_available_machines(running_machine &machine, std::vecto
 //-------------------------------------------------
 
 bool mewui_globals::load_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
-                                            std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
+											std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
 {
 	// try to load available drivers from file
 	emu_file efile(machine.options().mewui_path(), OPEN_FLAG_READ);
