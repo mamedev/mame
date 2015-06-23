@@ -847,6 +847,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/alg.c",
 	MAME_DIR .. "src/mame/machine/amiga.c",
 	MAME_DIR .. "src/mame/video/amiga.c",
+	MAME_DIR .. "src/mame/video/amigaaga.c",
 	MAME_DIR .. "src/mame/drivers/arcadia.c",
 	MAME_DIR .. "src/mame/drivers/cubo.c",
 	MAME_DIR .. "src/mame/drivers/mquake.c",

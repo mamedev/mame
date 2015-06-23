@@ -919,6 +919,7 @@ files {
 	MAME_DIR .. "src/mame/video/archimds.c",    
 	MAME_DIR .. "src/mame/machine/amiga.c",     
 	MAME_DIR .. "src/mame/video/amiga.c",       
+	MAME_DIR .. "src/mame/video/amigaaga.c",    
 	MAME_DIR .. "src/mame/video/tia.c",         
 	MAME_DIR .. "src/mame/machine/atari.c",     
 	MAME_DIR .. "src/mame/video/atari.c",       
