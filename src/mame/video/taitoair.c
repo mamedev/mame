@@ -249,7 +249,7 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 				else
 				{
 					/* Terrain elements, with a gradient applied. */
-					/* TODO: it's unknown if gradient color applies by global screen Y coordinate or there's a calculation to somewhere ... */
+					/*! @todo it's unknown if gradient color applies by global screen Y coordinate or there's a calculation to somewhere ... */
 					base_color = ((color & 0x3f) * 0x80) + 0x2040;
 					grad_col = (y1 >> 3) & 0x3f;
 				}
@@ -603,6 +603,9 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 				base = 0x2000;
 				cntr = c1b;
 			}
+			if(m_gradbank == true)
+				base|= 0x1000;
+			
 			*dest++ = base | (cntr >= 0x83f000 ? 0x3f : (cntr >> 12) & 0x3f);
 				
 			c1b += inc1x;

@@ -74,6 +74,8 @@ public:
 	INT16 m_frustumBottom;
 	INT16 m_eyecoordBuffer[4];  /* homogeneous */
 
+	bool m_gradbank;
+	
 	//bitmap_ind16 *m_buffer3d;
 	DECLARE_WRITE16_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(lineram_r);
