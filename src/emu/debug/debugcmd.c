@@ -2467,7 +2467,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 	if (!debug_command_parameter_cpu_space(machine, (params > 4) ? param[4] : NULL, AS_PROGRAM, space))
 		return;
 	if (!debug_command_parameter_cpu_space(machine, (params > 4) ? param[4] : NULL, AS_DECRYPTED_OPCODES, decrypted_space))
-		space = decrypted_space;
+		decrypted_space = space;
 
 	/* determine the width of the bytes */
 	cpu_device *cpudevice = downcast<cpu_device *>(&space->device());
