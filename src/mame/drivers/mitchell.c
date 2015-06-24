@@ -278,12 +278,13 @@ static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_SHARE("videoram")/* Banked char / OBJ RAM */
-	AM_RANGE(0xe000, 0xffff) AM_RAM /* Work RAM */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("ram") /* Work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("ram") /* Work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
