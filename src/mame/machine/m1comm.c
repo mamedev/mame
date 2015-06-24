@@ -563,7 +563,7 @@ void m1comm_device::comm_tick()
 					}
 					for (int j = 0x06 ; j < 0x10 ; j++)
 					{
-						m_buffer[1 + j] = m_shared[j];
+						m_buffer[1 + j] = m_shared[frameStart + j];
 					}
 					// push message to other nodes
 					m_line_tx.write(m_buffer, dataSize);
