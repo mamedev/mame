@@ -43,18 +43,21 @@ Sega System Multi32 Comm PCB 837-8792-91
 |                                                                                |
 |    15033.17             315-5610                                               |
 |                                                                                |
-|    MB8464                                                         315-5506     |
+|    MB8464A                                                        315-5506     |
 |                CN1                                         CN2                 |
 | |---------------------------------|        |---------------------------------| |
 | |---------------------------------|        |---------------------------------| |
 |                                  CN8 CN9                                       |
 |--------------------------------------------------------------------------------|
 	Setup:
+		15033.17 - INTEL D27C100 128k x8 EPROM (DIP32, labelled 'EPR-15033')
 		Z80      - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40)
 		MB89237A - Fujitsu MB89237A DMA-Controller (DIP20) [most likely i8237A clone]
 		MB89374  - Fujitsu MB89374 Data Link Controller (SDIP42)
 		MB8421   - Fujitsu MB8421-12LP 2k x8 SRAM (SDIP52)
-    MB8464   - Fujitsu MB8464 8k x8 SRAM (DIP28)
+		MB8464A  - Fujitsu MB8464-10LL 8k x8 SRAM (DIP28)
+		315-5611 - Lattice GAL16V8A PAL (DIP20)
+		315-5506 - Lattice GAL16V8A PAL (DIP20)
 
 	Board:
 		837-8676	
