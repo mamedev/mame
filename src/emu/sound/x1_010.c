@@ -22,7 +22,7 @@ Registers:
     Reg:    Bits:       Meaning:
 
     0       7--- ----   Frequency divider flag (only downtown seems to set this)
-	        -654 3---
+            -654 3---
             ---- -2--   PCM/Waveform repeat flag (0:Ones 1:Repeat) (*1)
             ---- --1-   Sound out select (0:PCM 1:Waveform)
             ---- ---0   Key on / off

@@ -252,7 +252,7 @@ void sprcros2_state::machine_start()
 {
 	membank("masterbank")->configure_entries(0, 2, memregion("master")->base() + 0x10000, 0x2000);
 	membank("slavebank")->configure_entries(0, 2, memregion("slave")->base() + 0x10000, 0x2000);
-	
+
 	save_item(NAME(m_port7));
 	save_item(NAME(m_s_port3));
 }

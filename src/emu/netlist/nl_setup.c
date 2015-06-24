@@ -39,7 +39,6 @@ NETLIST_END()
 
 namespace netlist
 {
-
 setup_t::setup_t(netlist_t *netlist)
 	: m_netlist(netlist)
 	, m_proxy_cnt(0)

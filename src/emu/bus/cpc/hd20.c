@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 /*
 
-	Dobbertin HD20 hard disk
+    Dobbertin HD20 hard disk
 
 */
 
@@ -81,7 +81,7 @@ void cpc_hd20_device::device_reset()
 READ8_MEMBER(cpc_hd20_device::hdc_r)
 {
 	UINT8 ret = 0xff;
-	
+
 	switch(offset)
 	{
 	case 0:
@@ -95,7 +95,7 @@ READ8_MEMBER(cpc_hd20_device::hdc_r)
 		ret = 0x01;
 		break;
 	}
-	
+
 	return ret;
 }
 
@@ -123,7 +123,6 @@ WRITE8_MEMBER(cpc_hd20_device::hdc_w)
 
 WRITE_LINE_MEMBER(cpc_hd20_device::irq_w)
 {
-//	if(state)
-//		m_hdc->set_ready();
+//  if(state)
+//      m_hdc->set_ready();
 }
-

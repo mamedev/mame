@@ -421,16 +421,16 @@ void info_xml_creator::output_devices()
 				if (shortnames.add(dev->shortname(), 0, FALSE) != TMERR_DUPLICATE)
 					output_one_device(*dev, temptag.c_str());
 
-                // also, check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
-                device_iterator deviter2(*dev);
-                for (device_t *device = deviter2.first(); device != NULL; device = deviter2.next())
-                {
-                    if (device->owner() == dev && device->shortname()!= NULL && strlen(device->shortname())!=0)
-                    {
-                        if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
-                            output_one_device(*device, device->tag());
-                    }
-                }
+				// also, check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
+				device_iterator deviter2(*dev);
+				for (device_t *device = deviter2.first(); device != NULL; device = deviter2.next())
+				{
+					if (device->owner() == dev && device->shortname()!= NULL && strlen(device->shortname())!=0)
+					{
+						if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
+							output_one_device(*device, device->tag());
+					}
+				}
 
 				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.c_str());
 			}

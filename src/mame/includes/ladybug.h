@@ -22,7 +22,7 @@ public:
 		m_palette(*this, "palette"),
 		m_port_dsw0(*this, "DSW0"),
 		m_p1_control(*this, "CONTP1"),
-		m_p2_control(*this, "CONTP2")	{ }
+		m_p2_control(*this, "CONTP2")   { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;

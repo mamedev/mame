@@ -397,7 +397,7 @@ static INPUT_PORTS_START( generic_input )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) ) 
+	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
 	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" ) PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(    0x00, "20000 only" )
 	PORT_DIPSETTING(    0x0c, "20000, every 40000 after" )
@@ -436,7 +436,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( kamikcab )
 	PORT_INCLUDE( generic_input )
-	
+
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x01, "5" )

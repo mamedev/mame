@@ -23,10 +23,10 @@ extern const struct _rgbsse_statics
 {
 	__m128  dummy_for_alignment;
 	INT16   maxbyte[8];
-	INT16	alpha_mask[8];
-	INT16	red_mask[8];
-	INT16	green_mask[8];
-	INT16	blue_mask[8];
+	INT16   alpha_mask[8];
+	INT16   red_mask[8];
+	INT16   green_mask[8];
+	INT16   blue_mask[8];
 	INT16   scale_table[256][8];
 } rgbsse_statics;
 
@@ -434,7 +434,7 @@ public:
 	}
 
 protected:
-	__m128i	m_value;
+	__m128i m_value;
 };
 
 #endif /* __RGBSSE__ */

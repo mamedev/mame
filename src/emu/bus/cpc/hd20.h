@@ -2,13 +2,13 @@
 // copyright-holders:Barry Rodewald
 /*
 
-	Dobbertin HD20 hard disk
+    Dobbertin HD20 hard disk
 
-	Fixed disk interface for the Amstrad CPC
-	
-	Controller: Seagate ST11M XT HD Controller
-	Disk: 3.5" 20MB Seagate, Kyocera, NEC or Miniscribe (Geometry: 615 cylinders/4 heads/17 sectors)
-	
+    Fixed disk interface for the Amstrad CPC
+
+    Controller: Seagate ST11M XT HD Controller
+    Disk: 3.5" 20MB Seagate, Kyocera, NEC or Miniscribe (Geometry: 615 cylinders/4 heads/17 sectors)
+
 */
 
 #ifndef HD20_H_
@@ -32,7 +32,7 @@ public:
 	DECLARE_READ8_MEMBER(hdc_r);
 	DECLARE_WRITE8_MEMBER(hdc_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

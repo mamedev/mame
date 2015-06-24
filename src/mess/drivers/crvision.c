@@ -699,7 +699,7 @@ void crvision_state::machine_start()
 void laser2001_state::machine_start()
 {
 	crvision_state::machine_start();
-	
+
 	// zerofill/state saving
 	m_joylatch = 0;
 	m_centronics_busy = 0;

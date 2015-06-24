@@ -32,7 +32,7 @@
  - dquizgo2: bugged video test
 
  Notes:
- 
+
  Mr Kicker: The F-E1-16-010 PCB version still needs proper speed ups
 
  Mr Kicker: Doesn't boot without a valid default eeprom, but no longer seems to fail
@@ -458,7 +458,7 @@ static ADDRESS_MAP_START( misncrft_io, AS_IO, 16, vamphalf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolmini_io, AS_IO, 16, vamphalf_state )
-//	AM_RANGE(0x002, 0x003) AM_WRITE(mrkicker_oki_bank_w) // not coolmini?, installed on init
+//  AM_RANGE(0x002, 0x003) AM_WRITE(mrkicker_oki_bank_w) // not coolmini?, installed on init
 	AM_RANGE(0x200, 0x203) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")

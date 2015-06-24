@@ -8,8 +8,8 @@
 
     Used by Jeff Vavasour's TRS-80 Emulators
 
-	TODO:
-	- Gap sizes unverified
+    TODO:
+    - Gap sizes unverified
 
 ***************************************************************************/
 

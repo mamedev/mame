@@ -43,7 +43,7 @@
                    ---- -t-- ---- ---- : Tile banking related
                    ---- --f- ---- ---- : 1= Global X/Y flip? (most games?)
                    ---- ---f ---- ---- : 1= prohbit Y flip? (Air Rescue 2nd screen title, also gets set on one of the intro sequence screens)
-				   ---- ---- ---- 4--- : 1= X+Y flip for NBG3
+                   ---- ---- ---- 4--- : 1= X+Y flip for NBG3
                    ---- ---- ---- -2-- : 1= X+Y flip for NBG2
                    ---- ---- ---- --1- : 1= X+Y flip for NBG1
                    ---- ---- ---- ---0 : 1= X+Y flip for NBG0
@@ -256,7 +256,7 @@ void segas32_state::common_start(int multi32)
 
 	memset(m_mixer_control, 0xff, sizeof(m_mixer_control[0][0]) * 0x80 );
 
-	
+
 
 }
 
@@ -884,11 +884,11 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, struct segas32_st
 
 	/* determine if we're flipped */
 	int global_flip = (m_system32_videoram[0x1ff00 / 2] >> 9)&1;
-	
+
 	int flipx = global_flip;
 	int flipy = global_flip;
 
-	
+
 	int layer_flip = (m_system32_videoram[0x1ff00 / 2] >> bgnum) & 1;
 
 	flipy ^= layer_flip;

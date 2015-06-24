@@ -163,7 +163,7 @@ const device_type ST11M_HDC = &device_creator<st11m_device>;
 
 xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, XT_HDC, "Generic PC-XT Fixed Disk Controller", tag, owner, clock, "xt_hdc", __FILE__),
-		m_irq_handler(*this),	
+		m_irq_handler(*this),
 		m_drq_handler(*this)
 {
 	m_type = STANDARD;
@@ -171,14 +171,14 @@ xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, dev
 
 xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_irq_handler(*this),	
+		m_irq_handler(*this),
 		m_drq_handler(*this)
 {
 }
 
 ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		xt_hdc_device(mconfig, EC1841_HDC, "EC1841 Fixed Disk Controller", tag, owner, clock, "ec1481", __FILE__),
-		m_irq_handler(*this),	
+		m_irq_handler(*this),
 		m_drq_handler(*this)
 {
 	m_type = EC1841;
@@ -186,7 +186,7 @@ ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, dev
 
 st11m_device::st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		xt_hdc_device(mconfig, EC1841_HDC, "Seagate ST11M Fixed Disk Controller", tag, owner, clock, "st11m", __FILE__),
-		m_irq_handler(*this),	
+		m_irq_handler(*this),
 		m_drq_handler(*this)
 {
 	m_type = ST11M;
@@ -250,7 +250,7 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 
 void xt_hdc_device::pc_hdc_result(int set_error_info)
 {
-	if ( ( hdc_control & 0x02 )) 
+	if ( ( hdc_control & 0x02 ))
 	{
 		// dip switch selected IRQ 5 or 2
 		m_irq_handler(1);
@@ -478,7 +478,7 @@ void xt_hdc_device::execute_write()
 	hdcdma_dst = hdcdma_data;
 	hdcdma_write = write_;
 	hdcdma_size = size;
-	
+
 	if (!no_dma())
 	{
 		m_drq_handler(1);

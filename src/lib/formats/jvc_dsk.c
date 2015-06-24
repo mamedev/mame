@@ -55,7 +55,7 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 
 	switch (header_size)
 	{
-	case 5:	emu_fatalerror("jvc_format: sector attribute flag unsupported\n");
+	case 5: emu_fatalerror("jvc_format: sector attribute flag unsupported\n");
 		break;
 	case 4: base_sector_id = header[3];
 		// no break

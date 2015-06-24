@@ -33,16 +33,16 @@ delegate_mfp::raw_mfp_data delegate_mfp::s_null_mfp = { 0 };
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)
 
 /**
- * @fn	delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_class *&object) const
+ * @fn  delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_class *&object) const
  *
- * @brief	-------------------------------------------------
- * 			  delegate_convert_raw - given an object and an raw function, adjust the object base
- * 			  and return the actual final code pointer
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            delegate_convert_raw - given an object and an raw function, adjust the object base
+ *            and return the actual final code pointer
+ *          -------------------------------------------------.
  *
- * @param [in,out]	object	[in,out] If non-null, the object.
+ * @param [in,out]  object  [in,out] If non-null, the object.
  *
- * @return	The given data converted to a generic.
+ * @return  The given data converted to a generic.
  */
 
 delegate_generic_function delegate_mfp::convert_to_generic(delegate_generic_class *&object) const

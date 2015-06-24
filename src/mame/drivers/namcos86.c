@@ -323,7 +323,7 @@ void namcos86_state::machine_start()
 		membank("bank1")->configure_entries(0, 32, memregion("user1")->base(), 0x2000);
 
 	membank("bank2")->configure_entries(0, 4, memregion("cpu2")->base() + 0x10000, 0x2000);
-	
+
 	save_item(NAME(m_wdog));
 }
 

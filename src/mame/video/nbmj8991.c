@@ -289,7 +289,7 @@ void nbmj8991_state::gfxdraw()
 void nbmj8991_state::video_start()
 {
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
-	
+
 	int width = m_screen->width();
 	int height = m_screen->height();
 
@@ -297,9 +297,9 @@ void nbmj8991_state::video_start()
 	m_videoram = auto_alloc_array(machine(), UINT8, width * height);
 	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
 	memset(m_videoram, 0x00, (width * height * sizeof(UINT8)));
-	
+
 	m_screen_refresh = 1;
-	
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_blitter_destx));
@@ -316,7 +316,7 @@ void nbmj8991_state::video_start()
 	save_pointer(NAME(m_videoram), width * height);
 	save_pointer(NAME(m_clut), 0x800);
 	save_item(NAME(m_flipscreen_old));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj8991_state::postload), this));
 }
 

@@ -476,7 +476,7 @@ void n64_texture_pipe_t::lod_1cycle(INT32* sss, INT32* sst, const INT32 s, const
 	/* FIXME: ???
 	if(object.m_other_modes.sharpen_tex_en && magnify)
 	{
-		userdata->m_lod_fraction |= 0x100;
+	    userdata->m_lod_fraction |= 0x100;
 	}
 	*/
 }
@@ -550,7 +550,7 @@ void n64_texture_pipe_t::lod_2cycle(INT32* sss, INT32* sst, const INT32 s, const
 	/* FIXME: ???
 	if(object.m_other_modes.sharpen_tex_en && magnify)
 	{
-		userdata->m_lod_fraction |= 0x100;
+	    userdata->m_lod_fraction |= 0x100;
 	}*/
 
 	if (object.m_other_modes.tex_lod_en)

@@ -490,7 +490,7 @@ void melps4_cpu_device::op_b()
 {
 	// B xy: branch
 	m_prohibit_irq = true;
-	
+
 	// determine new page:
 	// - short call: subroutine page
 	// - short jump: current page, or sub. page + 1 when in sub. mode
@@ -503,9 +503,9 @@ void melps4_cpu_device::op_b()
 	}
 	else if (m_sm)
 		page = m_sm_page | (m_op >> 7 & 1);
-	
+
 	m_pc = page << 7 | (m_op & 0x7f);
-	
+
 	// if BA opcode was executed, set PC low 4 bits to A
 	if (m_ba_flag)
 	{

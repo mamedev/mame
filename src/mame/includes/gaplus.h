@@ -51,7 +51,7 @@ public:
 	required_device<palette_device> m_palette;
 	namco58xx_device *m_namco58xx;
 	namco56xx_device *m_namco56xx;
-	
+
 	required_shared_ptr<UINT8> m_customio_3;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;

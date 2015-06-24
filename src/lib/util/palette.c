@@ -468,14 +468,14 @@ void palette_t::normalize_range(UINT32 start, UINT32 end, int lum_min, int lum_m
 }
 
 /**
- * @fn	void palette_t::update_adjusted_color(UINT32 group, UINT32 index)
+ * @fn  void palette_t::update_adjusted_color(UINT32 group, UINT32 index)
  *
- * @brief	-------------------------------------------------
- * 			  update_adjusted_color - update a color index by group and index pair
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            update_adjusted_color - update a color index by group and index pair
+ *          -------------------------------------------------.
  *
- * @param	group	The group.
- * @param	index	Zero-based index of the.
+ * @param   group   The group.
+ * @param   index   Zero-based index of the.
  */
 
 void palette_t::update_adjusted_color(UINT32 group, UINT32 index)

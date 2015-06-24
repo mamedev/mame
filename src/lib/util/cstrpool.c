@@ -71,11 +71,11 @@ bool const_string_pool::contains(const char *string)
 }
 
 /**
- * @fn	const_string_pool::pool_chunk::pool_chunk()
+ * @fn  const_string_pool::pool_chunk::pool_chunk()
  *
- * @brief	-------------------------------------------------
- * 			  pool_chunk - constructor
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            pool_chunk - constructor
+ *          -------------------------------------------------.
  */
 
 const_string_pool::pool_chunk::pool_chunk()
@@ -85,15 +85,15 @@ const_string_pool::pool_chunk::pool_chunk()
 }
 
 /**
- * @fn	const char *const_string_pool::pool_chunk::add(const char *string)
+ * @fn  const char *const_string_pool::pool_chunk::add(const char *string)
  *
- * @brief	-------------------------------------------------
- * 			  add - add a string to this pool
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            add - add a string to this pool
+ *          -------------------------------------------------.
  *
- * @param	string	The string to add.
+ * @param   string  The string to add.
  *
- * @return	null if it fails, else a char*.
+ * @return  null if it fails, else a char*.
  */
 
 const char *const_string_pool::pool_chunk::add(const char *string)

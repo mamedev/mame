@@ -1097,15 +1097,15 @@ png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int 
 ********************************************************************************/
 
 /**
- * @fn	png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
+ * @fn  png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
  *
- * @brief	Mng capture start.
+ * @brief   Mng capture start.
  *
- * @param [in,out]	fp	  	If non-null, the fp.
- * @param [in,out]	bitmap	The bitmap.
- * @param	rate		  	The rate.
+ * @param [in,out]  fp      If non-null, the fp.
+ * @param [in,out]  bitmap  The bitmap.
+ * @param   rate            The rate.
  *
- * @return	A png_error.
+ * @return  A png_error.
  */
 
 png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
@@ -1131,17 +1131,17 @@ png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
 }
 
 /**
- * @fn	png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
+ * @fn  png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
  *
- * @brief	Mng capture frame.
+ * @brief   Mng capture frame.
  *
- * @param [in,out]	fp	  	If non-null, the fp.
- * @param [in,out]	info  	If non-null, the information.
- * @param [in,out]	bitmap	The bitmap.
- * @param	palette_length	Length of the palette.
- * @param	palette		  	The palette.
+ * @param [in,out]  fp      If non-null, the fp.
+ * @param [in,out]  info    If non-null, the information.
+ * @param [in,out]  bitmap  The bitmap.
+ * @param   palette_length  Length of the palette.
+ * @param   palette         The palette.
  *
- * @return	A png_error.
+ * @return  A png_error.
  */
 
 png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
@@ -1150,13 +1150,13 @@ png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int
 }
 
 /**
- * @fn	png_error mng_capture_stop(core_file *fp)
+ * @fn  png_error mng_capture_stop(core_file *fp)
  *
- * @brief	Mng capture stop.
+ * @brief   Mng capture stop.
  *
- * @param [in,out]	fp	If non-null, the fp.
+ * @param [in,out]  fp  If non-null, the fp.
  *
- * @return	A png_error.
+ * @return  A png_error.
  */
 
 png_error mng_capture_stop(core_file *fp)

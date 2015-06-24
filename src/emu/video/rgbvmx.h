@@ -487,19 +487,19 @@ public:
 	}
 
 protected:
-	typedef vector unsigned char	VECU8;
-	typedef vector signed short		VECS16;
-	typedef vector unsigned short	VECU16;
-	typedef vector signed int		VECS32;
-	typedef vector unsigned int		VECU32;
+	typedef vector unsigned char    VECU8;
+	typedef vector signed short     VECS16;
+	typedef vector unsigned short   VECU16;
+	typedef vector signed int       VECS32;
+	typedef vector unsigned int     VECU32;
 
-	vector VECU32					m_value;
+	vector VECU32                   m_value;
 
-	static const VECU8				alpha_perm;
-	static const VECU8				red_perm;
-	static const VECU8				green_perm;
-	static const VECU8				blue_perm;
-	static const VECS16				scale_table[256];
+	static const VECU8              alpha_perm;
+	static const VECU8              red_perm;
+	static const VECU8              green_perm;
+	static const VECU8              blue_perm;
+	static const VECS16             scale_table[256];
 };
 
 

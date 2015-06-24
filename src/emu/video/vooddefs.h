@@ -1,4 +1,4 @@
- // license:BSD-3-Clause
+	// license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
@@ -2212,13 +2212,13 @@ INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT
 		//if (r == 0xfff)
 		rgbaint_t temp(colorint);
 		temp.cmpeq_imm(0xfff);
-		//	result.rgb.r = 0;
+		//  result.rgb.r = 0;
 		temp.xor_imm(0xffffffff);
 		colorint.and_reg(temp);
 		//else if (r == 0x100)
 		temp.set(colorint);
 		temp.cmpeq_imm(0x100);
-		//	result.rgb.r = 0xff;
+		//  result.rgb.r = 0xff;
 		colorint.or_reg(temp);
 		return colorint.to_rgba();
 	}
@@ -3842,15 +3842,15 @@ INLINE bool depthTest(UINT16 zaColorReg, stats_block *stats, INT32 destDepth, UI
 																					\
 		/* perform alpha blending */                                                \
 		APPLY_ALPHA_BLEND(FBZMODE, ALPHAMODE, XX, DITHER, r, g, b, a);              \
-	} else { 																			\
+	} else {                                                                            \
 		/* perform fogging */                                                       \
 		rgb_union preFog; \
 		preFog.u = color.u; \
 		applyFogging(VV, FOGMODE, FBZCOLORPATH, XX, DITHER4, fogdepth, color, ITERZ, ITERW, ITERAXXX); \
 		/* perform alpha blending */                                                \
 		alphaBlend(FBZMODE, ALPHAMODE, XX, DITHER, dest[XX], depth, preFog, color); \
-		a = color.rgb.a; r = color.rgb.r; g = color.rgb.g; b = color.rgb.b;						\
-	} 																						\
+		a = color.rgb.a; r = color.rgb.r; g = color.rgb.g; b = color.rgb.b;                     \
+	}                                                                                       \
 	/* modify the pixel for debugging purposes */                               \
 	MODIFY_PIXEL(VV);                                                           \
 																				\
@@ -4589,7 +4589,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 			}                                                                   \
 																					\
 			/* colorpath pipeline selects source colors and does blending */        \
-			iterargb.u = clampARGB(iterr, iterg, iterb, itera, FBZCOLORPATH);			\
+			iterargb.u = clampARGB(iterr, iterg, iterb, itera, FBZCOLORPATH);           \
 			if (!combineColor(v, stats, FBZCOLORPATH, FBZMODE, ALPHAMODE, texel, iterz, iterw, iterargb, color)) \
 				goto skipdrawdepth; \
 		} \

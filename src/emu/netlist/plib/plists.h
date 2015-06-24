@@ -97,7 +97,7 @@ public:
 	plist_t() : std::vector<_ListClass>() {}
 	plist_t(const int numElements) : std::vector<_ListClass>(numElements) {}
 
-	 void add(const _ListClass &elem) { this->push_back(elem); }
+		void add(const _ListClass &elem) { this->push_back(elem); }
 	void clear_and_free()
 	{
 		for (_ListClass *i = this->data(); i < this->data() + this->size(); i++)
@@ -106,7 +106,7 @@ public:
 		}
 		this->clear();
 	}
-	 bool contains(const _ListClass &elem) const
+		bool contains(const _ListClass &elem) const
 	{
 		for (const _ListClass *i = this->data(); i < this->data() + this->size(); i++)
 		{
@@ -116,7 +116,7 @@ public:
 		return false;
 	}
 
-	 void remove(const _ListClass &elem)
+		void remove(const _ListClass &elem)
 	{
 		for (int i = 0; i < this->size(); i++)
 		{
@@ -127,12 +127,12 @@ public:
 			}
 		}
 	}
-	 void remove_at(const int pos)
+		void remove_at(const int pos)
 	{
 		this->erase(this->begin() + pos);
 	}
 
-	 int indexof(const _ListClass &elem) const
+		int indexof(const _ListClass &elem) const
 	{
 		for (int i = 0; i < this->size(); i++)
 		{
@@ -539,7 +539,6 @@ public:
 	pstring_list_t(const pstring &str, const pstring &onstr, bool ignore_empty = false)
 	: plist_t<pstring>()
 	{
-
 		int p = 0;
 		int pn;
 
@@ -607,9 +606,9 @@ static inline void psort_list(Class &sl)
 {
 	for(int i = 0; i < (int) sl.size() - 1; i++)
 	{
-        for(int j = i + 1; j < sl.size(); j++)
-            if(sl[i] > sl[j])
-            	std::swap(sl[i], sl[j]);
+		for(int j = i + 1; j < sl.size(); j++)
+			if(sl[i] > sl[j])
+				std::swap(sl[i], sl[j]);
 
 	}
 }

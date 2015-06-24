@@ -19,7 +19,7 @@ struct mat_cr_t
 	unsigned nz_num;
 	unsigned ia[_storage_N + 1];
 	unsigned ja[_storage_N * _storage_N];
-	unsigned diag[_storage_N];		 /* n */
+	unsigned diag[_storage_N];       /* n */
 
 	void mult_vec(const double * RESTRICT A, const double * RESTRICT x, double * RESTRICT res)
 	{
@@ -85,14 +85,14 @@ struct mat_cr_t
 		/*
 		 * Solve a linear equation Ax = r
 		 * where
-		 * 		A = L*U
+		 *      A = L*U
 		 *
-		 * 		L unit lower triangular
-		 * 		U upper triangular
+		 *      L unit lower triangular
+		 *      U upper triangular
 		 *
 		 * ==> LUx = r
 		 *
-		 * ==> Ux = L⁻¹r = w
+		 * ==> Ux = L?????r = w
 		 *
 		 * ==> r = Lw
 		 *

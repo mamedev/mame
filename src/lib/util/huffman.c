@@ -731,18 +731,18 @@ huffman_8bit_decoder::huffman_8bit_decoder()
 }
 
 /**
- * @fn	huffman_error huffman_8bit_decoder::decode(const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dlength)
+ * @fn  huffman_error huffman_8bit_decoder::decode(const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dlength)
  *
- * @brief	-------------------------------------------------
- * 			  decode - decode a full buffer
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            decode - decode a full buffer
+ *          -------------------------------------------------.
  *
- * @param	source			Source for the.
- * @param	slength			The slength.
- * @param [in,out]	dest	If non-null, destination for the.
- * @param	dlength			The dlength.
+ * @param   source          Source for the.
+ * @param   slength         The slength.
+ * @param [in,out]  dest    If non-null, destination for the.
+ * @param   dlength         The dlength.
  *
- * @return	A huffman_error.
+ * @return  A huffman_error.
  */
 
 huffman_error huffman_8bit_decoder::decode(const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dlength)

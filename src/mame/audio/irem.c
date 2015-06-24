@@ -168,7 +168,7 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45M_portb_w )
 WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
 {
 	/*
-	 * 	45L 21 IOA0  ==> BD
+	 *  45L 21 IOA0  ==> BD
 	 *  45L 20 IOA1  ==> SD
 	 *  45L 19 IOA2  ==> OH
 	 *  45L 18 IOA3  ==> CH
@@ -465,7 +465,7 @@ NETLIST_START(kidniki_interface)
 	TTL_INPUT(I_BD0, 1)
 	//CLOCK(I_BD0, 5)
 	TTL_INPUT(I_CH0, 1)
-	//CLOCK(I_CH0, 2.2	)
+	//CLOCK(I_CH0, 2.2  )
 	TTL_INPUT(I_OH0, 1)
 	//CLOCK(I_OH0, 1.0)
 	ANALOG_INPUT(I_MSM2K0, 0)

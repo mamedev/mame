@@ -170,9 +170,8 @@ typedef UINT8 netlist_sig_t;
 //  MACROS / netlist devices
 //============================================================
 
-#define NETLIB_NAMESPACE_DEVICES_START()	namespace netlist { namespace devices {
-
-#define NETLIB_NAMESPACE_DEVICES_END()	}}
+#define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
+#define NETLIB_NAMESPACE_DEVICES_END()  }}
 
 #define NETLIB_NAME(_chip) nld_ ## _chip
 
@@ -292,7 +291,7 @@ namespace netlist
 		fatalerror_e(const char *format, va_list ap);
 		virtual ~fatalerror_e() throw() {}
 
-		 const pstring &text() { return m_text; }
+			const pstring &text() { return m_text; }
 	private:
 		pstring m_text;
 	};
@@ -432,7 +431,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 	// netlist_owned_object_t
 	// -----------------------------------------------------------------------------
-	
+
 	class owned_object_t : public object_t
 	{
 		NETLIST_PREVENT_COPYING(owned_object_t)

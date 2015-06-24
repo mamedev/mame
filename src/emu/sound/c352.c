@@ -489,7 +489,7 @@ void c352_device::device_start()
 			divider=332;
 			break;
 	}
-	
+
 	m_sample_rate_base = clock() / divider;
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);

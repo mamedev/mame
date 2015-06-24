@@ -33,7 +33,7 @@ protected:
 	// timers
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void write_v(UINT8 data);
-	
+
 	emu_timer *m_timer;
 	void reset_timer();
 };

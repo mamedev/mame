@@ -250,7 +250,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 		}
 		psort_list(t->m_nzrd);
 
-		t->m_nz.add(k);		// add diagonal
+		t->m_nz.add(k);     // add diagonal
 		psort_list(t->m_nz);
 	}
 
@@ -388,8 +388,8 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				/*  The code below is 30% faster than the original
 				 *  implementation which is given here for reference.
 				 *
-				 *	for (unsigned k = i + 1; k < kN; k++)
-				 *		m_A[j][k] = m_A[j][k] + m_A[i][k] * f1;
+				 *  for (unsigned k = i + 1; k < kN; k++)
+				 *      m_A[j][k] = m_A[j][k] + m_A[i][k] * f1;
 				 */
 				double * RESTRICT d = &m_A[j][i+1];
 				const double * RESTRICT s = &m_A[i][i+1];

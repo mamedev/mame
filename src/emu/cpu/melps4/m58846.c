@@ -76,7 +76,7 @@ void m58846_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	if (id != 0)
 		return;
-	
+
 	// timer 1: 7-bit fixed counter (manual specifically says 127)
 	if (++m_tmr_count[0] == 127)
 	{
@@ -84,7 +84,7 @@ void m58846_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_irqflag[1] = true;
 		m_possible_irq = true;
 	}
-	
+
 	// timer 2: 8-bit user defined counter with auto-reload
 	if (m_v & 8 && ++m_tmr_count[1] == 0)
 	{
@@ -107,7 +107,7 @@ void m58846_device::write_v(UINT8 data)
 	// d3: timer 2 enable
 	m_tmr_irq_enabled[0] = (data & 1) ? true : false;
 	m_possible_irq = true;
-	
+
 	m_v = data;
 }
 

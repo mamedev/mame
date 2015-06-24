@@ -2367,7 +2367,7 @@ ROM_END
 DRIVER_INIT_MEMBER(cclimber_state,yamato)
 {
 	yamato_decode(machine(),"maincpu");
-	
+
 	save_item(NAME(m_yamato_p0));
 	save_item(NAME(m_yamato_p1));
 }
@@ -2376,7 +2376,7 @@ DRIVER_INIT_MEMBER(cclimber_state,yamato)
 DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 {
 	toprollr_decode(machine(), "maincpu", "user1");
-	
+
 	save_item(NAME(m_toprollr_rombank));
 }
 

@@ -137,7 +137,7 @@ void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param
 			assert_always(FALSE, "Unknown id in spacefb_state::device_timer");
 	}
 }
- 
+
 TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 {
 	int next_vpos;
@@ -172,7 +172,7 @@ void spacefb_state::start_interrupt_timer()
 void spacefb_state::machine_start()
 {
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
-	
+
 	save_item(NAME(m_sound_latch));
 }
 

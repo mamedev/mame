@@ -155,12 +155,12 @@ MD5Final(md5byte digest[16], struct MD5Context *ctx)
  */
 
 /**
- * @fn	void MD5Transform(UWORD32 buf[4], UWORD32 const in[16])
+ * @fn  void MD5Transform(UWORD32 buf[4], UWORD32 const in[16])
  *
- * @brief	Md 5 transform.
+ * @brief   Md 5 transform.
  *
- * @param	buf	The buffer.
- * @param	in 	The in.
+ * @param   buf The buffer.
+ * @param   in  The in.
  */
 
 void

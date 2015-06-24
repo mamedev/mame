@@ -17,7 +17,6 @@
 template <unsigned _storage_N>
 struct pvector
 {
-
 	pvector(unsigned size)
 	: m_N(size) { }
 
