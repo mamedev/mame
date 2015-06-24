@@ -95,12 +95,12 @@ m4510_device::mi_4510_nd::mi_4510_nd(m4510_device *_base) : mi_4510_normal(_base
 
 UINT8 m4510_device::mi_4510_nd::read_sync(UINT16 adr)
 {
-	return program->read_byte(base->map(adr));
+	return sprogram->read_byte(base->map(adr));
 }
 
 UINT8 m4510_device::mi_4510_nd::read_arg(UINT16 adr)
 {
-	return sprogram->read_byte(base->map(adr));
+	return program->read_byte(base->map(adr));
 }
 
 #include "cpu/m6502/m4510.inc"

@@ -19,7 +19,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-
+		m_bank0d(*this, "bank0d"),
+		m_bank1(*this, "bank1"),
+		m_bank1d(*this, "bank1d"),
 		m_prot_opcode_toggle(0),
 		m_remap_sound(0)
 		{ }
@@ -34,6 +36,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_memory_bank m_bank0d;
+	required_memory_bank m_bank1;
+	optional_memory_bank m_bank1d;
 
 	UINT8 m_rombank;
 	UINT8 m_rombank_latch;
