@@ -60,7 +60,6 @@ Sega System Multi32 Comm PCB 837-8792-91
 		315-5506 - Lattice GAL16V8A PAL (DIP20)
 
 	Board:
-		837-8676	
 		837-8792  OutRunners, Stadium Cross
 
 	EEPROM:
