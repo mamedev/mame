@@ -447,7 +447,10 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 				return palloc(solver_GMRES, &m_params, size);
 			}
 			else
+			{
 				netlist().error("Unknown solver type: %s\n", m_iterative_solver.Value().cstr());
+				return NULL;
+			}
 		}
 		else
 		{
