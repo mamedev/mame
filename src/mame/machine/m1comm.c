@@ -242,7 +242,7 @@ WRITE8_MEMBER(m1comm_device::syn_w)
 
 READ8_MEMBER(m1comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | 0xFE;
+	UINT8 result = m_zfg | (~m_fg << 7) | 0x7e;
 #ifdef __M1COMM_VERBOSE__
 	printf("m1comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
