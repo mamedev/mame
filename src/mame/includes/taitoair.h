@@ -102,7 +102,9 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset );
+
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
 	void multVecMtx(const INT16* vec4, const float* m, float* result);
 	void airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* m);

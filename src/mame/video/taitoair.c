@@ -70,11 +70,20 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	return draw_sprites(bitmap,cliprect, 0x3f8 / 2);
+}
+
+/*!
+ @param start_offset DMA sprite offset source
+ @return value acquired by a pause flag acquisition.
+ */
+int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
-
+	//const UINT16 stop_values[4] = { 0xc00, 0, 0, 0 };
 	address_space &space = machine().driver_data()->generic_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
@@ -84,12 +93,19 @@ void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	int tile_offs;              /* sprite chain offset */
 	int zoomx, zoomy;           /* zoom value */
 
-	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
+	for (offs = start_offset; offs >= 0; offs -= 0x008 / 2)
 	{
-		/* TODO: remove this aberration of nature */
-		if (offs <  0x01b0 && priority == 0)    continue;
-		if (offs >= 0x01b0 && priority == 1)    continue;
-
+		/*!
+		 Starting at a particular sequence, sprite DMA seems to stop there and resume via "something", 
+		 effectively drawing any other sprite with better priority in the framebuffer scheme of things.
+		 
+		 @todo reported sequence for DMA pause flag is 0x0c** 0x0000 0x0000 0x0000. 
+		       Verify how exactly via HW test. Continuing may be determined by a DMA bit write. 
+		 */
+		if(m_tc0080vco->sprram_r(space, offs + 0, 0xffff) == 0xc00 ||
+		   m_tc0080vco->sprram_r(space, offs + 0, 0xffff) == 0xcff) // Air Inferno
+			return offs - 8/2;
+		
 		x0        =  m_tc0080vco->sprram_r(space, offs + 1, 0xffff) & 0x3ff;
 		y0        =  m_tc0080vco->sprram_r(space, offs + 0, 0xffff) & 0x3ff;
 		zoomx     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x7f00) >> 8;
@@ -97,6 +113,7 @@ void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		tile_offs = (m_tc0080vco->sprram_r(space, offs + 3, 0xffff) & 0x1fff) << 2;
 		ysize     = size[(m_tc0080vco->sprram_r(space, offs, 0xffff) & 0x0c00) >> 10];
 
+		
 		if (tile_offs)
 		{
 			/* Convert zoomy value to real value as zoomx */
@@ -181,6 +198,8 @@ void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 		}
 	}
+	
+	return 0;
 }
 
 void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
@@ -240,7 +259,12 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 				if (xx2 > cliprect.max_x)
 					xx2 = cliprect.max_x;
 
-				if(color & 0x40)
+				if(machine().input().code_pressed(KEYCODE_Q))
+				{
+					base_color = machine().rand() & 0x3fff;
+					grad_col = 0;
+				}
+				else if(color & 0x40)
 				{
 					/* Non-terrain elements are colored with this. */
 					base_color = (color & 0x3f) + 0x340;
@@ -573,6 +597,7 @@ void taitoair_state::video_start()
 
 UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int sprite_ptr;
 	m_tc0080vco->tilemap_update();
 
 	UINT32 counter1 = (m_tc0430grw[0] << 16) | m_tc0430grw[1];
@@ -618,15 +643,15 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
-	draw_sprites(bitmap, cliprect, 0);
-
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
+	sprite_ptr = draw_sprites(bitmap, cliprect);
+	
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
-
-	draw_sprites(bitmap, cliprect, 1);
-
+	
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
+
+	draw_sprites(bitmap, cliprect, sprite_ptr);
 
 	/* Hacky 3d bitmap */
 	//copybitmap_trans(bitmap, m_buffer3d, 0, 0, 0, 0, cliprect, 0);
