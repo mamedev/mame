@@ -27,14 +27,10 @@ public:
 	matrix_solver_SOR_t(const solver_parameters_t *params, int size)
 		: matrix_solver_direct_t<m_N, _storage_N>(matrix_solver_t::GAUSS_SEIDEL, params, size)
 		, m_lp_fact(0)
-		, m_gs_fail(0)
-		, m_gs_total(0)
 		{
 		}
 
 	virtual ~matrix_solver_SOR_t() {}
-
-	virtual void log_stats();
 
 	virtual void vsetup(analog_net_t::list_t &nets);
 	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
@@ -43,41 +39,18 @@ protected:
 
 private:
 	nl_double m_lp_fact;
-	int m_gs_fail;
-	int m_gs_total;
 };
 
 // ----------------------------------------------------------------------------------------
 // matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_SOR_t<m_N, _storage_N>::log_stats()
-{
-	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
-	{
-		this->netlist().log("==============================================");
-		this->netlist().log("Solver %s", this->name().cstr());
-		this->netlist().log("       ==> %d nets", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-		this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
-		this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
-		this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
-				this->m_stat_calculations,
-				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
-				this->m_gs_fail,
-				100.0 * (double) this->m_gs_fail / (double) this->m_stat_calculations,
-				(double) this->m_gs_total / (double) this->m_stat_calculations);
-	}
-}
 
 template <unsigned m_N, unsigned _storage_N>
 void matrix_solver_SOR_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
 	this->save(NLNAME(m_lp_fact));
-	this->save(NLNAME(m_gs_fail));
-	this->save(NLNAME(m_gs_total));
 }
 
 template <unsigned m_N, unsigned _storage_N>
@@ -194,13 +167,13 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 	//} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 	} while (resched && ((!interleaved_dynamic_updates && resched_cnt < this->m_params.m_gs_loops) || (interleaved_dynamic_updates && resched_cnt < 5 )));
 
-	this->m_gs_total += resched_cnt;
+	this->m_iterative_total += resched_cnt;
 	this->m_stat_calculations++;
 
 	if (resched && !interleaved_dynamic_updates)
 	{
 		// Fallback to direct solver ...
-		this->m_gs_fail++;
+		this->m_iterative_fail++;
 		return matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 

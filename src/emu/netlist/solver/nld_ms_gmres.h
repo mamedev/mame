@@ -31,8 +31,6 @@ public:
 		, m_use_iLU_preconditioning(true)
 		, m_use_more_precise_stop_condition(false)
 		, m_accuracy_mult(1.0)
-		, m_gs_fail(0)
-		, m_gs_total(0)
 		{
 			int mr=this->N(); /* FIXME: maximum iterations locked in here */
 
@@ -54,8 +52,6 @@ public:
 		for (int i = 0; i < this->N(); i++)
 			delete[] m_v[i];
 	}
-
-	virtual void log_stats();
 
 	virtual void vsetup(analog_net_t::list_t &nets);
 	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
@@ -83,42 +79,17 @@ private:
 	double * RESTRICT m_v[_storage_N + 1];      /*(mr + 1), n */
 	//double m_y[_storage_N];       /* mr + 1 */
 
-	double m_accuracy_mult;
-
-	int m_gs_fail;
-	int m_gs_total;
+	double m_accuracy_mult; // FXIME: Save state
 };
 
 // ----------------------------------------------------------------------------------------
-// matrix_solver - Gauss - Seidel
+// matrix_solver - GMRES
 // ----------------------------------------------------------------------------------------
-
-template <unsigned m_N, unsigned _storage_N>
-void matrix_solver_GMRES_t<m_N, _storage_N>::log_stats()
-{
-	if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
-	{
-		this->netlist().log("==============================================");
-		this->netlist().log("Solver %s", this->name().cstr());
-		this->netlist().log("       ==> %d nets", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-		this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
-		this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
-		this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
-				this->m_stat_calculations,
-				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
-				this->m_gs_fail,
-				100.0 * (double) this->m_gs_fail / (double) this->m_stat_calculations,
-				(double) this->m_gs_total / (double) this->m_stat_calculations);
-	}
-}
 
 template <unsigned m_N, unsigned _storage_N>
 void matrix_solver_GMRES_t<m_N, _storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_direct_t<m_N, _storage_N>::vsetup(nets);
-	this->save(NLNAME(m_gs_fail));
-	this->save(NLNAME(m_gs_total));
 
 	int nz = 0;
 	const int iN = this->N();
@@ -220,6 +191,7 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 	const nl_double accuracy = this->m_params.m_accuracy;
 #if 1
 	int mr = std::min(iN-1,(int) sqrt(iN));
+	mr = std::min(mr, this->m_params.m_gs_loops);
 	int iter = 4;
 	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
 	int failed = mr * iter;
@@ -228,7 +200,7 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 	//int gsl = tt_ilu_cr(new_V, RHS, failed, accuracy);
 	int gsl = tt_gs_cr(new_V, RHS, failed, accuracy);
 #endif
-	m_gs_total += gsl;
+	this->m_iterative_total += gsl;
 	this->m_stat_calculations++;
 
 	if (gsl>=failed)
@@ -236,7 +208,7 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 		//for (int k = 0; k < iN; k++)
 		//  this->m_nets[k]->m_cur_Analog = new_V[k];
 		// Fallback to direct solver ...
-		this->m_gs_fail++;
+		this->m_iterative_fail++;
 		return matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 

@@ -131,9 +131,28 @@ public:
 	virtual void reset();
 
 	ATTR_COLD int get_net_idx(net_t *net);
-	virtual void log_stats() {};
 
 	inline eSolverType type() const { return m_type; }
+
+	virtual void log_stats()
+	{
+		if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
+		{
+			this->netlist().log("==============================================");
+			this->netlist().log("Solver %s", this->name().cstr());
+			this->netlist().log("       ==> %d nets", (unsigned) this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+			this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
+			this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
+			this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+			this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
+					this->m_stat_calculations,
+					this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
+					this->m_iterative_fail,
+					100.0 * (double) this->m_iterative_fail / (double) this->m_stat_calculations,
+					(double) this->m_iterative_total / (double) this->m_stat_calculations);
+		}
+	}
+
 
 protected:
 
@@ -151,6 +170,8 @@ protected:
 	int m_stat_calculations;
 	int m_stat_newton_raphson;
 	int m_stat_vsolver_calls;
+	int m_iterative_fail;
+	int m_iterative_total;
 
 	const solver_parameters_t &m_params;
 
@@ -205,6 +226,7 @@ protected:
 	param_logic_t  m_dynamic;
 	param_double_t m_min_timestep;
 
+	param_str_t m_iterative_solver;
 	param_int_t m_nr_loops;
 	param_int_t m_gs_loops;
 	param_int_t m_gs_threshold;
@@ -218,7 +240,7 @@ private:
 	solver_parameters_t m_params;
 
 	template <int m_N, int _storage_N>
-	matrix_solver_t *create_solver(int size, int gs_threshold, bool use_specific);
+	matrix_solver_t *create_solver(int size, bool use_specific);
 };
 
 NETLIB_NAMESPACE_DEVICES_END()
