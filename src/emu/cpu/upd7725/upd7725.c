@@ -326,7 +326,7 @@ void necdsp_device::execute_run()
 			debugger_instruction_hook(this, regs.pc);
 		}
 
-		opcode = m_direct->read_decrypted_dword(regs.pc<<2)>>8;
+		opcode = m_direct->read_dword(regs.pc<<2)>>8;
 		regs.pc++;
 		switch(opcode >> 22)
 		{

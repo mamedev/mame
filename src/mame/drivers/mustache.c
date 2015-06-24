@@ -191,8 +191,6 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_PALETTE_INIT_OWNER(mustache_state, mustache)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)  // for seibu_sound_decrypt on the MAIN cpu (not sound)
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", YM_CLOCK)
@@ -272,7 +270,7 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	for (i = 0; i < 2*G2; i++)
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 
-	m_cpu_decrypt->decrypt("maincpu",0x8000);
+	seibu_sound_device::apply_decrypt(NULL, NULL, 0xc000);
 }
 
 

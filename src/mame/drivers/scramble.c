@@ -405,6 +405,11 @@ static ADDRESS_MAP_START( harem_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rombank")                  // bitswapped rom
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, scramble_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("rombank_decrypted")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( harem_sound_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READNOP
@@ -1675,6 +1680,7 @@ static MACHINE_CONFIG_DERIVED( harem, scramble )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(harem_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(harem_sound_map)

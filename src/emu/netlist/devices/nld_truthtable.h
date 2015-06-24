@@ -35,6 +35,9 @@
 #define TT_LINE(_x) \
 	ttd->m_desc.add(_x);
 
+#define TT_FAMILY(_x) \
+	ttd->m_family = netlist::logic_family_desc_t::from_model(_x);
+
 #define TRUTHTABLE_END() \
 	setup.factory().register_device(ttd); \
 	}
@@ -294,9 +297,17 @@ class netlist_base_factory_truthtable_t : public base_factory_t
 public:
 	netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: base_factory_t(name, classname, def_param)
+	: base_factory_t(name, classname, def_param), m_family(&netlist_family_TTL)
 	{}
+
+	virtual ~netlist_base_factory_truthtable_t()
+	{
+		if (!m_family->m_is_static)
+			pfree(m_family);
+	}
+
 	pstring_list_t m_desc;
+	const logic_family_desc_t * m_family;
 };
 
 
@@ -313,6 +324,7 @@ public:
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
 		device_t *r = palloc(tt_type, &m_ttbl, m_desc);
+		r->set_logic_family(m_family);
 		//r->init(setup, name);
 		return r;
 	}

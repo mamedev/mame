@@ -58,7 +58,7 @@ t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t 
 int t11_device::ROPCODE()
 {
 	PC &= 0xfffe;
-	int val = m_direct->read_decrypted_word(PC);
+	int val = m_direct->read_word(PC);
 	PC += 2;
 	return val;
 }

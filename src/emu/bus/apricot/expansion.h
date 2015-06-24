@@ -2,42 +2,42 @@
 // copyright-holders:Dirk Best
 /***************************************************************************
 
-	ACT Apricot Expansion Slot
+    ACT Apricot Expansion Slot
 
        A          B
 
-	 -12V   32   +12V
-	  +5V   31   +5V
-	 DB0    30   DB1
-	 DB2    29   DB3
-	 DB4    28   DB5
-	 DB6    27   DB7
-	 AB10   26   AB9
-	 AB11   25   AB12
-	/AMWC   24   /MRDC
-	/DMA2   23   DT/R
-	/DMA1   22   /IORC
-	/MWTC   21   /RES
-	/IOWC   20   /AIOWC
-	  GND   19   GND
-	/CLK5   18   DEN
-	/IRDY   17   /MRDY
-	/EXT1   16   /EXT2
-	/INT3   15   /ALE
-	  AB6   14   /INT2
-	  AB8   13   AB7
-	  DB9   12   DB8
-	 DB11   11   DB10
-	 DB13   10   DB12
-	 DB15    9   DB14
-	  AB2    8   AB1
-	  AB4    7   AB3
-	  AB0    6   AB5
-	 AB14    5   AB13
-	 AB15    4   AB16
-	 AB17    3   AB18
-	 AB19    2   /BHE
-	  NMI    1   CLK15
+     -12V   32   +12V
+      +5V   31   +5V
+     DB0    30   DB1
+     DB2    29   DB3
+     DB4    28   DB5
+     DB6    27   DB7
+     AB10   26   AB9
+     AB11   25   AB12
+    /AMWC   24   /MRDC
+    /DMA2   23   DT/R
+    /DMA1   22   /IORC
+    /MWTC   21   /RES
+    /IOWC   20   /AIOWC
+      GND   19   GND
+    /CLK5   18   DEN
+    /IRDY   17   /MRDY
+    /EXT1   16   /EXT2
+    /INT3   15   /ALE
+      AB6   14   /INT2
+      AB8   13   AB7
+      DB9   12   DB8
+     DB11   11   DB10
+     DB13   10   DB12
+     DB15    9   DB14
+      AB2    8   AB1
+      AB4    7   AB3
+      AB0    6   AB5
+     AB14    5   AB13
+     AB15    4   AB16
+     AB17    3   AB18
+     AB19    2   /BHE
+      NMI    1   CLK15
 
 ***************************************************************************/
 

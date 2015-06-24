@@ -452,15 +452,15 @@ int xml_get_attribute_int_format(xml_data_node *node, const char *attribute)
 -------------------------------------------------*/
 
 /**
- * @fn	float xml_get_attribute_float(xml_data_node *node, const char *attribute, float defvalue)
+ * @fn  float xml_get_attribute_float(xml_data_node *node, const char *attribute, float defvalue)
  *
- * @brief	XML get attribute float.
+ * @brief   XML get attribute float.
  *
- * @param [in,out]	node	If non-null, the node.
- * @param	attribute   	The attribute.
- * @param	defvalue		The defvalue.
+ * @param [in,out]  node    If non-null, the node.
+ * @param   attribute       The attribute.
+ * @param   defvalue        The defvalue.
  *
- * @return	A float.
+ * @return  A float.
  */
 
 float xml_get_attribute_float(xml_data_node *node, const char *attribute, float defvalue)
@@ -480,15 +480,15 @@ float xml_get_attribute_float(xml_data_node *node, const char *attribute, float 
 -------------------------------------------------*/
 
 /**
- * @fn	xml_attribute_node *xml_set_attribute(xml_data_node *node, const char *name, const char *value)
+ * @fn  xml_attribute_node *xml_set_attribute(xml_data_node *node, const char *name, const char *value)
  *
- * @brief	XML set attribute.
+ * @brief   XML set attribute.
  *
- * @param [in,out]	node	If non-null, the node.
- * @param	name			The name.
- * @param	value			The value.
+ * @param [in,out]  node    If non-null, the node.
+ * @param   name            The name.
+ * @param   value           The value.
  *
- * @return	null if it fails, else an xml_attribute_node*.
+ * @return  null if it fails, else an xml_attribute_node*.
  */
 
 xml_attribute_node *xml_set_attribute(xml_data_node *node, const char *name, const char *value)
@@ -520,15 +520,15 @@ xml_attribute_node *xml_set_attribute(xml_data_node *node, const char *name, con
 -------------------------------------------------*/
 
 /**
- * @fn	xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name, int value)
+ * @fn  xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name, int value)
  *
- * @brief	XML set attribute int.
+ * @brief   XML set attribute int.
  *
- * @param [in,out]	node	If non-null, the node.
- * @param	name			The name.
- * @param	value			The value.
+ * @param [in,out]  node    If non-null, the node.
+ * @param   name            The name.
+ * @param   value           The value.
  *
- * @return	null if it fails, else an xml_attribute_node*.
+ * @return  null if it fails, else an xml_attribute_node*.
  */
 
 xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name, int value)
@@ -545,15 +545,15 @@ xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name,
 -------------------------------------------------*/
 
 /**
- * @fn	xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *name, float value)
+ * @fn  xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *name, float value)
  *
- * @brief	XML set attribute float.
+ * @brief   XML set attribute float.
  *
- * @param [in,out]	node	If non-null, the node.
- * @param	name			The name.
- * @param	value			The value.
+ * @param [in,out]  node    If non-null, the node.
+ * @param   name            The name.
+ * @param   value           The value.
  *
- * @return	null if it fails, else an xml_attribute_node*.
+ * @return  null if it fails, else an xml_attribute_node*.
  */
 
 xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *name, float value)
@@ -575,13 +575,13 @@ xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *nam
 -------------------------------------------------*/
 
 /**
- * @fn	const char *xml_normalize_string(const char *string)
+ * @fn  const char *xml_normalize_string(const char *string)
  *
- * @brief	XML normalize string.
+ * @brief   XML normalize string.
  *
- * @param	string	The string.
+ * @param   string  The string.
  *
- * @return	null if it fails, else a char*.
+ * @return  null if it fails, else a char*.
  */
 
 const char *xml_normalize_string(const char *string)
@@ -623,13 +623,13 @@ const char *xml_normalize_string(const char *string)
 -------------------------------------------------*/
 
 /**
- * @fn	static void *expat_malloc(size_t size)
+ * @fn  static void *expat_malloc(size_t size)
  *
- * @brief	Expat malloc.
+ * @brief   Expat malloc.
  *
- * @param	size	The size.
+ * @param   size    The size.
  *
- * @return	null if it fails, else a void*.
+ * @return  null if it fails, else a void*.
  */
 
 static void *expat_malloc(size_t size)
@@ -640,11 +640,11 @@ static void *expat_malloc(size_t size)
 }
 
 /**
- * @fn	static void expat_free(void *ptr)
+ * @fn  static void expat_free(void *ptr)
  *
- * @brief	Expat free.
+ * @brief   Expat free.
  *
- * @param [in,out]	ptr	If non-null, the pointer.
+ * @param [in,out]  ptr If non-null, the pointer.
  */
 
 static void expat_free(void *ptr)
@@ -654,14 +654,14 @@ static void expat_free(void *ptr)
 }
 
 /**
- * @fn	static void *expat_realloc(void *ptr, size_t size)
+ * @fn  static void *expat_realloc(void *ptr, size_t size)
  *
- * @brief	Expat realloc.
+ * @brief   Expat realloc.
  *
- * @param [in,out]	ptr	If non-null, the pointer.
- * @param	size	   	The size.
+ * @param [in,out]  ptr If non-null, the pointer.
+ * @param   size        The size.
  *
- * @return	null if it fails, else a void*.
+ * @return  null if it fails, else a void*.
  */
 
 static void *expat_realloc(void *ptr, size_t size)
@@ -684,14 +684,14 @@ static void *expat_realloc(void *ptr, size_t size)
 -------------------------------------------------*/
 
 /**
- * @fn	static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
+ * @fn  static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
  *
- * @brief	Expat setup parser.
+ * @brief   Expat setup parser.
  *
- * @param [in,out]	parse_info	If non-null, information describing the parse.
- * @param [in,out]	opts	  	If non-null, options for controlling the operation.
+ * @param [in,out]  parse_info  If non-null, information describing the parse.
+ * @param [in,out]  opts        If non-null, options for controlling the operation.
  *
- * @return	An int.
+ * @return  An int.
  */
 
 static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
@@ -746,13 +746,13 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 -------------------------------------------------*/
 
 /**
- * @fn	static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes)
+ * @fn  static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes)
  *
- * @brief	Expat element start.
+ * @brief   Expat element start.
  *
- * @param [in,out]	data	If non-null, the data.
- * @param	name			The name.
- * @param	attributes  	The attributes.
+ * @param [in,out]  data    If non-null, the data.
+ * @param   name            The name.
+ * @param   attributes      The attributes.
  */
 
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes)
@@ -785,13 +785,13 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 -------------------------------------------------*/
 
 /**
- * @fn	static void expat_data(void *data, const XML_Char *s, int len)
+ * @fn  static void expat_data(void *data, const XML_Char *s, int len)
  *
- * @brief	Expat data.
+ * @brief   Expat data.
  *
- * @param [in,out]	data	If non-null, the data.
- * @param	s				The const XML_Char * to process.
- * @param	len				The length.
+ * @param [in,out]  data    If non-null, the data.
+ * @param   s               The const XML_Char * to process.
+ * @param   len             The length.
  */
 
 static void expat_data(void *data, const XML_Char *s, int len)
@@ -833,12 +833,12 @@ static void expat_data(void *data, const XML_Char *s, int len)
 -------------------------------------------------*/
 
 /**
- * @fn	static void expat_element_end(void *data, const XML_Char *name)
+ * @fn  static void expat_element_end(void *data, const XML_Char *name)
  *
- * @brief	Expat element end.
+ * @brief   Expat element end.
  *
- * @param [in,out]	data	If non-null, the data.
- * @param	name			The name.
+ * @param [in,out]  data    If non-null, the data.
+ * @param   name            The name.
  */
 
 static void expat_element_end(void *data, const XML_Char *name)
@@ -892,15 +892,15 @@ static void expat_element_end(void *data, const XML_Char *name)
 -------------------------------------------------*/
 
 /**
- * @fn	static xml_data_node *add_child(xml_data_node *parent, const char *name, const char *value)
+ * @fn  static xml_data_node *add_child(xml_data_node *parent, const char *name, const char *value)
  *
- * @brief	Adds a child.
+ * @brief   Adds a child.
  *
- * @param [in,out]	parent	If non-null, the parent.
- * @param	name		  	The name.
- * @param	value		  	The value.
+ * @param [in,out]  parent  If non-null, the parent.
+ * @param   name            The name.
+ * @param   value           The value.
  *
- * @return	null if it fails, else an xml_data_node*.
+ * @return  null if it fails, else an xml_data_node*.
  */
 
 static xml_data_node *add_child(xml_data_node *parent, const char *name, const char *value)
@@ -946,15 +946,15 @@ static xml_data_node *add_child(xml_data_node *parent, const char *name, const c
 -------------------------------------------------*/
 
 /**
- * @fn	static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, const char *value)
+ * @fn  static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, const char *value)
  *
- * @brief	Adds an attribute.
+ * @brief   Adds an attribute.
  *
- * @param [in,out]	node	If non-null, the node.
- * @param	name			The name.
- * @param	value			The value.
+ * @param [in,out]  node    If non-null, the node.
+ * @param   name            The name.
+ * @param   value           The value.
  *
- * @return	null if it fails, else an xml_attribute_node*.
+ * @return  null if it fails, else an xml_attribute_node*.
  */
 
 static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, const char *value)
@@ -1001,13 +1001,13 @@ static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, 
 -------------------------------------------------*/
 
 /**
- * @fn	static void write_node_recursive(xml_data_node *node, int indent, core_file *file)
+ * @fn  static void write_node_recursive(xml_data_node *node, int indent, core_file *file)
  *
- * @brief	Writes a node recursive.
+ * @brief   Writes a node recursive.
  *
- * @param [in,out]	node	If non-null, the node.
- * @param	indent			The indent.
- * @param [in,out]	file	If non-null, the file.
+ * @param [in,out]  node    If non-null, the node.
+ * @param   indent          The indent.
+ * @param [in,out]  file    If non-null, the file.
  */
 
 static void write_node_recursive(xml_data_node *node, int indent, core_file *file)
@@ -1054,11 +1054,11 @@ static void write_node_recursive(xml_data_node *node, int indent, core_file *fil
 -------------------------------------------------*/
 
 /**
- * @fn	static void free_node_recursive(xml_data_node *node)
+ * @fn  static void free_node_recursive(xml_data_node *node)
  *
- * @brief	Free node recursive.
+ * @brief   Free node recursive.
  *
- * @param [in,out]	node	If non-null, the node.
+ * @param [in,out]  node    If non-null, the node.
  */
 
 static void free_node_recursive(xml_data_node *node)

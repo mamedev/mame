@@ -5954,7 +5954,6 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 ******************************************************/
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	int x;
 
@@ -5971,8 +5970,6 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 
 		ROM[x+0x10000] = code;
 	}
-
-	space.set_decrypted_region(0x8000, 0xffff, memregion("maincpu")->base() + 0x18000);
 }
 
 
@@ -5988,7 +5985,6 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 ******************************************************/
 
 	UINT8 *ROM = memregion("maincpu")->base();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	int x;
 
@@ -6025,8 +6021,6 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 
 		ROM[x+0x10000] = code;
 	}
-
-	space.set_decrypted_region(0x6000, 0xffff, memregion("maincpu")->base() + 0x16000);
 }
 
 

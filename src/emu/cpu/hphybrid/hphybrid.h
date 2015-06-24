@@ -24,7 +24,7 @@
 // Input lines
 #define HPHYBRID_IRH    0       // High-level interrupt
 #define HPHYBRID_IRL    1       // Low-level interrupt
-#define HPHYBRID_INT_LVLS	2	// Levels of interrupt
+#define HPHYBRID_INT_LVLS   2   // Levels of interrupt
 
 #define HPHYBRID_DMAR   2       // DMA request
 #define HPHYBRID_HALT   3       // "Halt" input
@@ -66,76 +66,76 @@ class hp_hybrid_cpu_device : public cpu_device
 {
 public:
 protected:
-        hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
-    
-        // device-level overrides
-        virtual void device_start();
-        virtual void device_reset();
+		hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
-        // device_execute_interface overrides
-        virtual UINT32 execute_min_cycles() const { return 6; }
-        virtual UINT32 execute_max_cycles() const { return 25; }
-        virtual UINT32 execute_input_lines() const { return 2; }
-        virtual UINT32 execute_default_irq_vector() const { return 0xffff; }
-        virtual void execute_run();
-        virtual void execute_set_input(int inputnum, int state);
+		// device-level overrides
+		virtual void device_start();
+		virtual void device_reset();
 
-        UINT16 execute_one(UINT16 opcode);
-        UINT16 execute_one_sub(UINT16 opcode);
+		// device_execute_interface overrides
+		virtual UINT32 execute_min_cycles() const { return 6; }
+		virtual UINT32 execute_max_cycles() const { return 25; }
+		virtual UINT32 execute_input_lines() const { return 2; }
+		virtual UINT32 execute_default_irq_vector() const { return 0xffff; }
+		virtual void execute_run();
+		virtual void execute_set_input(int inputnum, int state);
 
-        // device_memory_interface overrides
-        virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+		UINT16 execute_one(UINT16 opcode);
+		UINT16 execute_one_sub(UINT16 opcode);
 
-        // device_state_interface overrides
-        void state_string_export(const device_state_entry &entry, std::string &str);
-    
-        // device_disasm_interface overrides
-        virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-        virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-        virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+		// device_memory_interface overrides
+		virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+
+		// device_state_interface overrides
+		void state_string_export(const device_state_entry &entry, std::string &str);
+
+		// device_disasm_interface overrides
+		virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
+		virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
+		virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 private:
-        address_space_config m_program_config;
-        address_space_config m_io_config;
-    
-        address_space *m_program;
-        direct_read_data *m_direct;
-        address_space *m_io;
-        int m_icount;
-   
-        // State of processor
-        UINT16 m_reg_A;     // Register A
-        UINT16 m_reg_B;     // Register B
-        UINT16 m_reg_P;     // Register P
-        UINT16 m_reg_R;     // Register R
-        UINT16 m_reg_C;     // Register C
-        UINT16 m_reg_D;     // Register D
-        UINT16 m_reg_IV;    // Register IV
-        UINT8  m_reg_PA[ HPHYBRID_INT_LVLS + 1 ];   // Stack of register PA (4 bit-long)
-        UINT16 m_flags;     // Flags (carry, overflow, cb, db, int en, dma en, dma dir)
-        UINT8  m_dmapa;     // DMA peripheral address (4 bits)
-        UINT16 m_dmama;     // DMA address
-        UINT16 m_dmac;      // DMA counter
-        UINT16 m_reg_I;     // Instruction register
+		address_space_config m_program_config;
+		address_space_config m_io_config;
 
-        UINT16 get_ea(UINT16 opcode);
-        void do_add(UINT16& addend1 , UINT16 addend2);
-        UINT16 get_skip_addr(UINT16 opcode , bool condition) const;
-        UINT16 get_skip_addr_sc(UINT16 opcode , UINT16& v , unsigned n);
-        void do_pw(UINT16 opcode);
-        void check_for_interrupts(void);
-    
-        UINT16 RM(UINT16 addr);
-        void   WM(UINT16 addr , UINT16 v);
-        void   WMB(UINT32 addr , UINT8 v);
-        UINT16 RIO(UINT8 pa , UINT8 ic);
-        void   WIO(UINT8 pa , UINT8 ic , UINT16 v);
+		address_space *m_program;
+		direct_read_data *m_direct;
+		address_space *m_io;
+		int m_icount;
+
+		// State of processor
+		UINT16 m_reg_A;     // Register A
+		UINT16 m_reg_B;     // Register B
+		UINT16 m_reg_P;     // Register P
+		UINT16 m_reg_R;     // Register R
+		UINT16 m_reg_C;     // Register C
+		UINT16 m_reg_D;     // Register D
+		UINT16 m_reg_IV;    // Register IV
+		UINT8  m_reg_PA[ HPHYBRID_INT_LVLS + 1 ];   // Stack of register PA (4 bit-long)
+		UINT16 m_flags;     // Flags (carry, overflow, cb, db, int en, dma en, dma dir)
+		UINT8  m_dmapa;     // DMA peripheral address (4 bits)
+		UINT16 m_dmama;     // DMA address
+		UINT16 m_dmac;      // DMA counter
+		UINT16 m_reg_I;     // Instruction register
+
+		UINT16 get_ea(UINT16 opcode);
+		void do_add(UINT16& addend1 , UINT16 addend2);
+		UINT16 get_skip_addr(UINT16 opcode , bool condition) const;
+		UINT16 get_skip_addr_sc(UINT16 opcode , UINT16& v , unsigned n);
+		void do_pw(UINT16 opcode);
+		void check_for_interrupts(void);
+
+		UINT16 RM(UINT16 addr);
+		void   WM(UINT16 addr , UINT16 v);
+		void   WMB(UINT32 addr , UINT8 v);
+		UINT16 RIO(UINT8 pa , UINT8 ic);
+		void   WIO(UINT8 pa , UINT8 ic , UINT16 v);
 };
 
 class hp_5061_3011_cpu_device : public hp_hybrid_cpu_device
 {
 public:
-        hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 extern const device_type HP_5061_3011;

@@ -58,10 +58,10 @@
 NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE_WITH_PARAMS_DERIVED(r2r_dac, twoterm,
-	netlist_param_double_t m_VIN;
-	netlist_param_double_t m_R;
-	netlist_param_int_t m_num;
-	netlist_param_int_t m_val;
+	param_double_t m_VIN;
+	param_double_t m_R;
+	param_int_t m_num;
+	param_int_t m_val;
 );
 
 NETLIB_NAMESPACE_DEVICES_END()

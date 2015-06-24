@@ -38,6 +38,7 @@ public:
 			m_segaic16vid(*this, "segaic16vid"),
 			m_sprites(*this, "sprites"),
 			m_workram(*this, "nvram"),
+			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
 			m_video_control(0),
 			m_mcu_control(0),
 			m_n7751_command(0),
@@ -136,6 +137,7 @@ protected:
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
+	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;
 
 	// configuration
 	read16_delegate         m_custom_io_r;

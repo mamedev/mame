@@ -159,10 +159,11 @@ INPUT_PORTS_END
 
 const device_type XT_HDC = &device_creator<xt_hdc_device>;
 const device_type EC1841_HDC = &device_creator<ec1841_device>;
+const device_type ST11M_HDC = &device_creator<st11m_device>;
 
 xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, XT_HDC, "Generic PC-XT Fixed Disk Controller", tag, owner, clock, "xt_hdc", __FILE__),
-		m_irq_handler(*this),	
+		m_irq_handler(*this),
 		m_drq_handler(*this)
 {
 	m_type = STANDARD;
@@ -170,22 +171,30 @@ xt_hdc_device::xt_hdc_device(const machine_config &mconfig, const char *tag, dev
 
 xt_hdc_device::xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_irq_handler(*this),	
+		m_irq_handler(*this),
 		m_drq_handler(*this)
 {
 }
 
 ec1841_device::ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		xt_hdc_device(mconfig, EC1841_HDC, "EC1841 Fixed Disk Controller", tag, owner, clock, "ec1481", __FILE__),
-		m_irq_handler(*this),	
+		m_irq_handler(*this),
 		m_drq_handler(*this)
 {
 	m_type = EC1841;
 }
 
+st11m_device::st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		xt_hdc_device(mconfig, EC1841_HDC, "Seagate ST11M Fixed Disk Controller", tag, owner, clock, "st11m", __FILE__),
+		m_irq_handler(*this),
+		m_drq_handler(*this)
+{
+	m_type = ST11M;
+}
+
 void xt_hdc_device::device_start()
 {
-	buffer.resize(17*4*512);
+	buffer.resize(256*512);   // maximum possible transfer
 	timer = timer_alloc();
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
@@ -241,7 +250,7 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 
 void xt_hdc_device::pc_hdc_result(int set_error_info)
 {
-	if ( ( hdc_control & 0x02 )) 
+	if ( ( hdc_control & 0x02 ))
 	{
 		// dip switch selected IRQ 5 or 2
 		m_irq_handler(1);
@@ -425,24 +434,25 @@ void xt_hdc_device::execute_read()
 	int size = sector_cnt[drv] * 512;
 	int read_ = 0;
 
+	if(sector_cnt[drv] == 0)
+		size = 256 * 512;
+
 	disk = pc_hdc_file(drv);
 	if (!disk)
 		return;
+
+	status |= STA_READY;  // ready to recieve data
+	status &= ~STA_INPUT;
+	status &= ~STA_COMMAND;
 
 	hdcdma_src = hdcdma_data;
 	hdcdma_read = read_;
 	hdcdma_size = size;
 
-	if (no_dma())
-	{
-		do
-		{
-			buffer[data_cnt++] = dack_r();
-		} while (hdcdma_read || hdcdma_size);
-	}
-	else
+	if(!no_dma())
 	{
 		m_drq_handler(1);
+		if(!hdcdma_size) pc_hdc_result(0);
 	}
 }
 
@@ -454,23 +464,22 @@ void xt_hdc_device::execute_write()
 	int size = sector_cnt[drv] * 512;
 	int write_ = 512;
 
+	if(sector_cnt[drv] == 0)
+		size = 256 * 512;
+
 	disk = pc_hdc_file(drv);
 	if (!disk)
 		return;
+
+	status |= STA_READY;  // ready to recieve data
+	status |= STA_INPUT;
+	status &= ~STA_COMMAND;
 
 	hdcdma_dst = hdcdma_data;
 	hdcdma_write = write_;
 	hdcdma_size = size;
 
-	if (no_dma())
-	{
-		do
-		{
-			dack_w(buffer[data_cnt++]);
-		}
-		while (hdcdma_write || hdcdma_size);
-	}
-	else
+	if (!no_dma())
 	{
 		m_drq_handler(1);
 	}
@@ -484,15 +493,11 @@ void xt_hdc_device::execute_writesbuff()
 	hdcdma_write = 512;
 	hdcdma_size = 512;
 
-	if (no_dma())
-	{
-		do
-		{
-			dack_ws(buffer[data_cnt++]);
-		}
-		while (hdcdma_write || hdcdma_size);
-	}
-	else
+	status |= STA_READY;  // ready to recieve data
+	status |= STA_INPUT;
+	status &= ~STA_COMMAND;
+
+	if (!no_dma())
 	{
 		m_drq_handler(1);
 	}
@@ -535,29 +540,29 @@ void xt_hdc_device::command()
 {
 	int set_error_info = 1;
 	int old_error = error;          /* Previous error data is needed for CMD_SENSE */
-	UINT8 cmd;
 	const char *command_name;
 
 	csb = 0x00;
 	error = 0;
 
 	buffer_ptr = &buffer[0];
-	cmd = buffer[0];
 
 	get_drive();
+	data_cnt = 0;
 
 	if (LOG_HDC_STATUS)
 	{
-		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
+		command_name = hdc_command_names[m_current_cmd] ? hdc_command_names[m_current_cmd] : "Unknown";
 		logerror("%s pc_hdc_command(): Executing command; cmd=0x%02x (%s) drv=%d\n",
-			machine().describe_context(), cmd, command_name, drv);
+			machine().describe_context(), m_current_cmd, command_name, drv);
 	}
 
-	switch (cmd)
+	switch (m_current_cmd)
 	{
 		case CMD_TESTREADY:
 			set_error_info = 0;
 			test_ready();
+			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
 		case CMD_SENSE:
 			/* Perform error code translation. This may need to be expanded in the future. */
@@ -566,9 +571,11 @@ void xt_hdc_device::command()
 			buffer[data_cnt++] = ((cylinder[drv] >> 2) & 0xc0) | sector[drv];
 			buffer[data_cnt++] = cylinder[drv] & 0xff;
 			set_error_info = 0;
+			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
 		case CMD_RECALIBRATE:
 			get_chsn();
+			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
 
 		case CMD_FORMATDRV:
@@ -579,6 +586,7 @@ void xt_hdc_device::command()
 		case CMD_DRIVEDIAG:
 			get_chsn();
 			test_ready();
+			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
 
 		case CMD_READ:
@@ -593,6 +601,8 @@ void xt_hdc_device::command()
 
 			if (test_ready())
 				execute_read();
+			else
+				pc_hdc_result(1);
 			set_error_info = 0;
 			break;
 
@@ -626,21 +636,21 @@ void xt_hdc_device::command()
 			rwc[drv] = ((buffer[9]&3)<<8) | buffer[10];
 			wp[drv] = ((buffer[11]&3)<<8) | buffer[12];
 			ecc[drv] = buffer[13];
+			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
 
 		case CMD_GETECC:
 			buffer[data_cnt++] = ecc[drv];
+			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
 
 		case CMD_READSBUFF:
 		case CMD_RAMDIAG:
 		case CMD_INTERNDIAG:
+			if(no_dma()) pc_hdc_result(set_error_info);
 			break;
-
 	}
-	if(no_dma()) pc_hdc_result(set_error_info);
 }
-
 
 void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -670,12 +680,34 @@ void xt_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param
  */
 void xt_hdc_device::data_w(int data)
 {
-	if( data_cnt == 0 )
+	if(!(status & STA_COMMAND) && m_current_cmd != CMD_SETPARAM)
 	{
 		if (LOG_HDC_DATA)
-			logerror("hdc_data_w $%02x: ", data);
+			logerror("hdc_data_w PIO $%02x (%i) (%s): \n", data,data_cnt,hdc_command_names[m_current_cmd] ? hdc_command_names[m_current_cmd] : "Unknown");
+		// PIO data transfer
+		buffer[data_cnt++] = data;
+		if(data_cnt >= hdcdma_size)
+		{
+			data_cnt = 0;
+			// write to disk
+			do
+			{
+				if(m_current_cmd == CMD_WRITESBUFF)
+					dack_ws(buffer[data_cnt++]);
+				else
+					dack_w(buffer[data_cnt++]);
+			}
+			while (hdcdma_size);
+			data_cnt = 0;
+			pc_hdc_result(1);
+		}
+		return;
+	}
 
+	if( data_cnt == 0 )
+	{
 		buffer_ptr = &buffer[0];
+		m_current_cmd = data;
 		data_cnt = 6;   /* expect 6 bytes including this one */
 		status &= ~STA_READY;
 		status &= ~STA_INPUT;
@@ -719,14 +751,16 @@ void xt_hdc_device::data_w(int data)
 	if (data_cnt)
 	{
 		if (LOG_HDC_DATA)
-			logerror("hdc_data_w $%02x\n", data);
+			logerror("hdc_data_w $%02x (%i) (%s): \n", data,data_cnt,hdc_command_names[m_current_cmd] ? hdc_command_names[m_current_cmd] : "Unknown");
 
 		*buffer_ptr++ = data;
 		// XXX ec1841 wants this
-		if (buffer[0] == CMD_SETPARAM && data_cnt == 9 && (m_type == EC1841)) {
+		if (m_current_cmd == CMD_SETPARAM && data_cnt == 9 && (m_type == EC1841)) {
 			status &= ~STA_READY;
 		} else {
 			status |= STA_READY;
+			if(m_current_cmd == CMD_SETPARAM && data_cnt == 9)  // some controllers want geometry info as data, not as a command (true for the Seagate ST11M?)
+				status &= ~STA_COMMAND;
 		}
 		if (--data_cnt == 0)
 		{
@@ -784,6 +818,29 @@ void xt_hdc_device::control_w(int data)
 UINT8 xt_hdc_device::data_r()
 {
 	UINT8 data = 0xff;
+
+	if(!(status & STA_COMMAND) && (m_current_cmd == CMD_READ || m_current_cmd == CMD_READLONG || m_current_cmd == CMD_READSBUFF))
+	{
+		// PIO data transfer
+		if(data_cnt == 0)
+		{
+			do
+			{
+				buffer[data_cnt++] = dack_r();
+			} while (hdcdma_read);
+			data_cnt = 0;
+		}
+		data = buffer[data_cnt++];
+		if(data_cnt >= ((sector_cnt[drv] * 512) ? (sector_cnt[drv] * 512) : (256 * 512)))
+		{
+			data_cnt = 0;
+			pc_hdc_result(1);
+		}
+		if (LOG_HDC_DATA)
+			logerror("hdc_data_r PIO $%02x (%i): \n", data,data_cnt);
+		return data;
+	}
+
 	if( data_cnt )
 	{
 		data = *buffer_ptr++;
@@ -795,6 +852,8 @@ UINT8 xt_hdc_device::data_r()
 			status &= ~STA_SELECT;
 			status |= STA_COMMAND;
 		}
+		if (LOG_HDC_DATA)
+			logerror("hdc_data_r $%02x (%i): \n", data,data_cnt);
 	}
 	return data;
 }

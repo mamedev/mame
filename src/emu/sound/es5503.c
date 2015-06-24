@@ -184,9 +184,9 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 					// channel strobe is always valid when reading; this allows potentially banking per voice
 					m_channel_strobe = (ctrl>>4) & 0xf;
-					data = (INT32)m_direct->read_raw_byte(ramptr + wtptr) ^ 0x80;
+					data = (INT32)m_direct->read_byte(ramptr + wtptr) ^ 0x80;
 
-					if (m_direct->read_raw_byte(ramptr + wtptr) == 0x00)
+					if (m_direct->read_byte(ramptr + wtptr) == 0x00)
 					{
 						halt_osc(osc, 1, &acc, resshift);
 					}

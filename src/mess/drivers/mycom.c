@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	/* Devices */
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_FD1771x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_FD1771_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 

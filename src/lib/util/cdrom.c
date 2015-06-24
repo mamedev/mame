@@ -28,39 +28,39 @@
     DEBUGGING
 ***************************************************************************/
 
-/** @brief	The verbose. */
+/** @brief  The verbose. */
 #define VERBOSE (0)
 #if VERBOSE
 
 /**
- * @def	LOG(x) do
+ * @def LOG(x) do
  *
- * @brief	A macro that defines log.
+ * @brief   A macro that defines log.
  *
- * @param	x	The void to process.
+ * @param   x   The void to process.
  */
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /**
- * @fn	void CLIB_DECL logerror(const char *text, ...) ATTR_PRINTF(1,2);
+ * @fn  void CLIB_DECL logerror(const char *text, ...) ATTR_PRINTF(1,2);
  *
- * @brief	Logerrors the given text.
+ * @brief   Logerrors the given text.
  *
- * @param	text	The text.
+ * @param   text    The text.
  *
- * @return	A CLIB_DECL.
+ * @return  A CLIB_DECL.
  */
 
 void CLIB_DECL logerror(const char *text, ...) ATTR_PRINTF(1,2);
 #else
 
 /**
- * @def	LOG(x);
+ * @def LOG(x);
  *
- * @brief	A macro that defines log.
+ * @brief   A macro that defines log.
  *
- * @param	x	The void to process.
+ * @param   x   The void to process.
  */
 
 #define LOG(x)
@@ -72,26 +72,26 @@ void CLIB_DECL logerror(const char *text, ...) ATTR_PRINTF(1,2);
     CONSTANTS
 ***************************************************************************/
 
-/** @brief	offset within sector. */
+/** @brief  offset within sector. */
 const int SYNC_OFFSET = 0x000;
-/** @brief	12 bytes. */
+/** @brief  12 bytes. */
 const int SYNC_NUM_BYTES = 12;
 
-/** @brief	offset within sector. */
+/** @brief  offset within sector. */
 const int MODE_OFFSET = 0x00f;
 
-/** @brief	offset within sector. */
+/** @brief  offset within sector. */
 const int ECC_P_OFFSET = 0x81c;
-/** @brief	2 lots of 86. */
+/** @brief  2 lots of 86. */
 const int ECC_P_NUM_BYTES = 86;
-/** @brief	24 bytes each. */
+/** @brief  24 bytes each. */
 const int ECC_P_COMP = 24;
 
-/** @brief	The ECC q offset. */
+/** @brief  The ECC q offset. */
 const int ECC_Q_OFFSET = ECC_P_OFFSET + 2 * ECC_P_NUM_BYTES;
-/** @brief	2 lots of 52. */
+/** @brief  2 lots of 52. */
 const int ECC_Q_NUM_BYTES = 52;
-/** @brief	43 bytes each. */
+/** @brief  43 bytes each. */
 const int ECC_Q_COMP = 43;
 
 
@@ -101,20 +101,20 @@ const int ECC_Q_COMP = 43;
 ***************************************************************************/
 
 /**
- * @struct	cdrom_file
+ * @struct  cdrom_file
  *
- * @brief	A cdrom file.
+ * @brief   A cdrom file.
  */
 
 struct cdrom_file
 {
-	/** @brief	The chd. */
+	/** @brief  The chd. */
 	chd_file *          chd;                /* CHD file */
-	/** @brief	The cdtoc. */
+	/** @brief  The cdtoc. */
 	cdrom_toc           cdtoc;              /* TOC for the CD */
-	/** @brief	Information describing the track. */
+	/** @brief  Information describing the track. */
 	chdcd_track_input_info track_info;      /* track info */
-	/** @brief	The fhandle[ CD maximum tracks]. */
+	/** @brief  The fhandle[ CD maximum tracks]. */
 	core_file *         fhandle[CD_MAX_TRACKS];/* file handle */
 };
 
@@ -130,15 +130,15 @@ struct cdrom_file
 -------------------------------------------------*/
 
 /**
- * @fn	INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
+ * @fn  INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
  *
- * @brief	Physical to chd lba.
+ * @brief   Physical to chd lba.
  *
- * @param [in,out]	file		If non-null, the file.
- * @param	physlba				The physlba.
- * @param [in,out]	tracknum	The tracknum.
+ * @param [in,out]  file        If non-null, the file.
+ * @param   physlba             The physlba.
+ * @param [in,out]  tracknum    The tracknum.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
@@ -164,15 +164,15 @@ INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &trac
 -------------------------------------------------*/
 
 /**
- * @fn	INLINE UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
+ * @fn  INLINE UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
  *
- * @brief	Logical to chd lba.
+ * @brief   Logical to chd lba.
  *
- * @param [in,out]	file		If non-null, the file.
- * @param	loglba				The loglba.
- * @param [in,out]	tracknum	The tracknum.
+ * @param [in,out]  file        If non-null, the file.
+ * @param   loglba              The loglba.
+ * @param [in,out]  tracknum    The tracknum.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 INLINE UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
@@ -208,13 +208,13 @@ INLINE UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &trackn
 ***************************************************************************/
 
 /**
- * @fn	cdrom_file *cdrom_open(const char *inputfile)
+ * @fn  cdrom_file *cdrom_open(const char *inputfile)
  *
- * @brief	Queries if a given cdrom open.
+ * @brief   Queries if a given cdrom open.
  *
- * @param	inputfile	The inputfile.
+ * @param   inputfile   The inputfile.
  *
- * @return	null if it fails, else a cdrom_file*.
+ * @return  null if it fails, else a cdrom_file*.
  */
 
 cdrom_file *cdrom_open(const char *inputfile)
@@ -304,13 +304,13 @@ cdrom_file *cdrom_open(const char *inputfile)
 -------------------------------------------------*/
 
 /**
- * @fn	cdrom_file *cdrom_open(chd_file *chd)
+ * @fn  cdrom_file *cdrom_open(chd_file *chd)
  *
- * @brief	Queries if a given cdrom open.
+ * @brief   Queries if a given cdrom open.
  *
- * @param [in,out]	chd	If non-null, the chd.
+ * @param [in,out]  chd If non-null, the chd.
  *
- * @return	null if it fails, else a cdrom_file*.
+ * @return  null if it fails, else a cdrom_file*.
  */
 
 cdrom_file *cdrom_open(chd_file *chd)
@@ -402,11 +402,11 @@ cdrom_file *cdrom_open(chd_file *chd)
 -------------------------------------------------*/
 
 /**
- * @fn	void cdrom_close(cdrom_file *file)
+ * @fn  void cdrom_close(cdrom_file *file)
  *
- * @brief	Cdrom close.
+ * @brief   Cdrom close.
  *
- * @param [in,out]	file	If non-null, the file.
+ * @param [in,out]  file    If non-null, the file.
  */
 
 void cdrom_close(cdrom_file *file)
@@ -432,19 +432,19 @@ void cdrom_close(cdrom_file *file)
 ***************************************************************************/
 
 /**
- * @fn	chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length)
+ * @fn  chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length)
  *
- * @brief	Reads partial sector.
+ * @brief   Reads partial sector.
  *
- * @param [in,out]	file	If non-null, the file.
- * @param [in,out]	dest	If non-null, destination for the.
- * @param	lbasector   	The lbasector.
- * @param	chdsector   	The chdsector.
- * @param	tracknum		The tracknum.
- * @param	startoffs   	The startoffs.
- * @param	length			The length.
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  dest    If non-null, destination for the.
+ * @param   lbasector       The lbasector.
+ * @param   chdsector       The chdsector.
+ * @param   tracknum        The tracknum.
+ * @param   startoffs       The startoffs.
+ * @param   length          The length.
  *
- * @return	The partial sector.
+ * @return  The partial sector.
  */
 
 chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length)
@@ -506,17 +506,17 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 -------------------------------------------------*/
 
 /**
- * @fn	UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype, bool phys)
+ * @fn  UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype, bool phys)
  *
- * @brief	Cdrom read data.
+ * @brief   Cdrom read data.
  *
- * @param [in,out]	file  	If non-null, the file.
- * @param	lbasector	  	The lbasector.
- * @param [in,out]	buffer	If non-null, the buffer.
- * @param	datatype	  	The datatype.
- * @param	phys		  	true to physical.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   lbasector       The lbasector.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   datatype        The datatype.
+ * @param   phys            true to physical.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype, bool phys)
@@ -592,16 +592,16 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 -------------------------------------------------*/
 
 /**
- * @fn	UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool phys)
+ * @fn  UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool phys)
  *
- * @brief	Cdrom read subcode.
+ * @brief   Cdrom read subcode.
  *
- * @param [in,out]	file  	If non-null, the file.
- * @param	lbasector	  	The lbasector.
- * @param [in,out]	buffer	If non-null, the buffer.
- * @param	phys		  	true to physical.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   lbasector       The lbasector.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   phys            true to physical.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool phys)
@@ -642,14 +642,14 @@ UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool
 -------------------------------------------------*/
 
 /**
- * @fn	UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
+ * @fn  UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
  *
- * @brief	Cdrom get track.
+ * @brief   Cdrom get track.
  *
- * @param [in,out]	file	If non-null, the file.
- * @param	frame			The frame.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   frame           The frame.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
@@ -672,14 +672,14 @@ UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
 -------------------------------------------------*/
 
 /**
- * @fn	UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
+ * @fn  UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
  *
- * @brief	Cdrom get track start.
+ * @brief   Cdrom get track start.
  *
- * @param [in,out]	file	If non-null, the file.
- * @param	track			The track.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   track           The track.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
@@ -700,14 +700,14 @@ UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
 -------------------------------------------------*/
 
 /**
- * @fn	UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track)
+ * @fn  UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track)
  *
- * @brief	Cdrom get track start physical.
+ * @brief   Cdrom get track start physical.
  *
- * @param [in,out]	file	If non-null, the file.
- * @param	track			The track.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   track           The track.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track)
@@ -732,13 +732,13 @@ UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track)
 -------------------------------------------------*/
 
 /**
- * @fn	int cdrom_get_last_track(cdrom_file *file)
+ * @fn  int cdrom_get_last_track(cdrom_file *file)
  *
- * @brief	Cdrom get last track.
+ * @brief   Cdrom get last track.
  *
- * @param [in,out]	file	If non-null, the file.
+ * @param [in,out]  file    If non-null, the file.
  *
- * @return	An int.
+ * @return  An int.
  */
 
 int cdrom_get_last_track(cdrom_file *file)
@@ -756,14 +756,14 @@ int cdrom_get_last_track(cdrom_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn	int cdrom_get_adr_control(cdrom_file *file, int track)
+ * @fn  int cdrom_get_adr_control(cdrom_file *file, int track)
  *
- * @brief	Cdrom get address control.
+ * @brief   Cdrom get address control.
  *
- * @param [in,out]	file	If non-null, the file.
- * @param	track			The track.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   track           The track.
  *
- * @return	An int.
+ * @return  An int.
  */
 
 int cdrom_get_adr_control(cdrom_file *file, int track)
@@ -785,14 +785,14 @@ int cdrom_get_adr_control(cdrom_file *file, int track)
 -------------------------------------------------*/
 
 /**
- * @fn	int cdrom_get_track_type(cdrom_file *file, int track)
+ * @fn  int cdrom_get_track_type(cdrom_file *file, int track)
  *
- * @brief	Cdrom get track type.
+ * @brief   Cdrom get track type.
  *
- * @param [in,out]	file	If non-null, the file.
- * @param	track			The track.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   track           The track.
  *
- * @return	An int.
+ * @return  An int.
  */
 
 int cdrom_get_track_type(cdrom_file *file, int track)
@@ -810,13 +810,13 @@ int cdrom_get_track_type(cdrom_file *file, int track)
 -------------------------------------------------*/
 
 /**
- * @fn	const cdrom_toc *cdrom_get_toc(cdrom_file *file)
+ * @fn  const cdrom_toc *cdrom_get_toc(cdrom_file *file)
  *
- * @brief	Cdrom get TOC.
+ * @brief   Cdrom get TOC.
  *
- * @param [in,out]	file	If non-null, the file.
+ * @param [in,out]  file    If non-null, the file.
  *
- * @return	null if it fails, else a cdrom_toc*.
+ * @return  null if it fails, else a cdrom_toc*.
  */
 
 const cdrom_toc *cdrom_get_toc(cdrom_file *file)
@@ -840,13 +840,13 @@ const cdrom_toc *cdrom_get_toc(cdrom_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn	static void cdrom_get_info_from_type_string(const char *typestring, UINT32 *trktype, UINT32 *datasize)
+ * @fn  static void cdrom_get_info_from_type_string(const char *typestring, UINT32 *trktype, UINT32 *datasize)
  *
- * @brief	Cdrom get information from type string.
+ * @brief   Cdrom get information from type string.
  *
- * @param	typestring			The typestring.
- * @param [in,out]	trktype 	If non-null, the trktype.
- * @param [in,out]	datasize	If non-null, the datasize.
+ * @param   typestring          The typestring.
+ * @param [in,out]  trktype     If non-null, the trktype.
+ * @param [in,out]  datasize    If non-null, the datasize.
  */
 
 static void cdrom_get_info_from_type_string(const char *typestring, UINT32 *trktype, UINT32 *datasize)
@@ -935,12 +935,12 @@ static void cdrom_get_info_from_type_string(const char *typestring, UINT32 *trkt
 -------------------------------------------------*/
 
 /**
- * @fn	void cdrom_convert_type_string_to_track_info(const char *typestring, cdrom_track_info *info)
+ * @fn  void cdrom_convert_type_string_to_track_info(const char *typestring, cdrom_track_info *info)
  *
- * @brief	Cdrom convert type string to track information.
+ * @brief   Cdrom convert type string to track information.
  *
- * @param	typestring  	The typestring.
- * @param [in,out]	info	If non-null, the information.
+ * @param   typestring      The typestring.
+ * @param [in,out]  info    If non-null, the information.
  */
 
 void cdrom_convert_type_string_to_track_info(const char *typestring, cdrom_track_info *info)
@@ -955,12 +955,12 @@ void cdrom_convert_type_string_to_track_info(const char *typestring, cdrom_track
 -------------------------------------------------*/
 
 /**
- * @fn	void cdrom_convert_type_string_to_pregap_info(const char *typestring, cdrom_track_info *info)
+ * @fn  void cdrom_convert_type_string_to_pregap_info(const char *typestring, cdrom_track_info *info)
  *
- * @brief	Cdrom convert type string to pregap information.
+ * @brief   Cdrom convert type string to pregap information.
  *
- * @param	typestring  	The typestring.
- * @param [in,out]	info	If non-null, the information.
+ * @param   typestring      The typestring.
+ * @param [in,out]  info    If non-null, the information.
  */
 
 void cdrom_convert_type_string_to_pregap_info(const char *typestring, cdrom_track_info *info)
@@ -975,12 +975,12 @@ void cdrom_convert_type_string_to_pregap_info(const char *typestring, cdrom_trac
 -------------------------------------------------*/
 
 /**
- * @fn	void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_track_info *info)
+ * @fn  void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_track_info *info)
  *
- * @brief	Cdrom convert subtype string to track information.
+ * @brief   Cdrom convert subtype string to track information.
  *
- * @param	typestring  	The typestring.
- * @param [in,out]	info	If non-null, the information.
+ * @param   typestring      The typestring.
+ * @param [in,out]  info    If non-null, the information.
  */
 
 void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_track_info *info)
@@ -1004,12 +1004,12 @@ void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_tr
 -------------------------------------------------*/
 
 /**
- * @fn	void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_track_info *info)
+ * @fn  void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_track_info *info)
  *
- * @brief	Cdrom convert subtype string to pregap information.
+ * @brief   Cdrom convert subtype string to pregap information.
  *
- * @param	typestring  	The typestring.
- * @param [in,out]	info	If non-null, the information.
+ * @param   typestring      The typestring.
+ * @param [in,out]  info    If non-null, the information.
  */
 
 void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_track_info *info)
@@ -1032,13 +1032,13 @@ void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_t
 -------------------------------------------------*/
 
 /**
- * @fn	const char *cdrom_get_type_string(UINT32 trktype)
+ * @fn  const char *cdrom_get_type_string(UINT32 trktype)
  *
- * @brief	Cdrom get type string.
+ * @brief   Cdrom get type string.
  *
- * @param	trktype	The trktype.
+ * @param   trktype The trktype.
  *
- * @return	null if it fails, else a char*.
+ * @return  null if it fails, else a char*.
  */
 
 const char *cdrom_get_type_string(UINT32 trktype)
@@ -1064,13 +1064,13 @@ const char *cdrom_get_type_string(UINT32 trktype)
 -------------------------------------------------*/
 
 /**
- * @fn	const char *cdrom_get_subtype_string(UINT32 subtype)
+ * @fn  const char *cdrom_get_subtype_string(UINT32 subtype)
  *
- * @brief	Cdrom get subtype string.
+ * @brief   Cdrom get subtype string.
  *
- * @param	subtype	The subtype.
+ * @param   subtype The subtype.
  *
- * @return	null if it fails, else a char*.
+ * @return  null if it fails, else a char*.
  */
 
 const char *cdrom_get_subtype_string(UINT32 subtype)
@@ -1095,14 +1095,14 @@ const char *cdrom_get_subtype_string(UINT32 subtype)
 -------------------------------------------------*/
 
 /**
- * @fn	chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
+ * @fn  chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
  *
- * @brief	Cdrom parse metadata.
+ * @brief   Cdrom parse metadata.
  *
- * @param [in,out]	chd	If non-null, the chd.
- * @param [in,out]	toc	If non-null, the TOC.
+ * @param [in,out]  chd If non-null, the chd.
+ * @param [in,out]  toc If non-null, the TOC.
  *
- * @return	A chd_error.
+ * @return  A chd_error.
  */
 
 chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
@@ -1272,14 +1272,14 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 -------------------------------------------------*/
 
 /**
- * @fn	chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
+ * @fn  chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
  *
- * @brief	Cdrom write metadata.
+ * @brief   Cdrom write metadata.
  *
- * @param [in,out]	chd	If non-null, the chd.
- * @param	toc		   	The TOC.
+ * @param [in,out]  chd If non-null, the chd.
+ * @param   toc         The TOC.
  *
- * @return	A chd_error.
+ * @return  A chd_error.
  */
 
 chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
@@ -1327,9 +1327,9 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 }
 
 /**
- * @brief	-------------------------------------------------
- * 			  ECC lookup tables pre-calculated tables for ECC data calcs
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            ECC lookup tables pre-calculated tables for ECC data calcs
+ *          -------------------------------------------------.
  */
 
 static const UINT8 ecclow[256] =
@@ -1352,7 +1352,7 @@ static const UINT8 ecclow[256] =
 	0xfd, 0xff, 0xf9, 0xfb, 0xf5, 0xf7, 0xf1, 0xf3, 0xed, 0xef, 0xe9, 0xeb, 0xe5, 0xe7, 0xe1, 0xe3
 };
 
-/** @brief	The ecchigh[ 256]. */
+/** @brief  The ecchigh[ 256]. */
 static const UINT8 ecchigh[256] =
 {
 	0x00, 0xf4, 0xf5, 0x01, 0xf7, 0x03, 0x02, 0xf6, 0xf3, 0x07, 0x06, 0xf2, 0x04, 0xf0, 0xf1, 0x05,
@@ -1374,10 +1374,10 @@ static const UINT8 ecchigh[256] =
 };
 
 /**
- * @brief	-------------------------------------------------
- * 			  poffsets - each row represents the addresses used to calculate a byte of the ECC P
- * 			  data 86 (*2) ECC P bytes, 24 values represented by each
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            poffsets - each row represents the addresses used to calculate a byte of the ECC P
+ *            data 86 (*2) ECC P bytes, 24 values represented by each
+ *          -------------------------------------------------.
  */
 
 static const UINT16 poffsets[ECC_P_NUM_BYTES][ECC_P_COMP] =
@@ -1471,10 +1471,10 @@ static const UINT16 poffsets[ECC_P_NUM_BYTES][ECC_P_COMP] =
 };
 
 /**
- * @brief	-------------------------------------------------
- * 			  qoffsets - each row represents the addresses used to calculate a byte of the ECC Q
- * 			  data 52 (*2) ECC Q bytes, 43 values represented by each
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            qoffsets - each row represents the addresses used to calculate a byte of the ECC Q
+ *            data 52 (*2) ECC Q bytes, 43 values represented by each
+ *          -------------------------------------------------.
  */
 
 static const UINT16 qoffsets[ECC_Q_NUM_BYTES][ECC_Q_COMP] =
@@ -1547,17 +1547,17 @@ inline UINT8 ecc_source_byte(const UINT8 *sector, UINT32 offset)
 }
 
 /**
- * @fn	void ecc_compute_bytes(const UINT8 *sector, const UINT16 *row, int rowlen, UINT8 &val1, UINT8 &val2)
+ * @fn  void ecc_compute_bytes(const UINT8 *sector, const UINT16 *row, int rowlen, UINT8 &val1, UINT8 &val2)
  *
- * @brief	-------------------------------------------------
- * 			  ecc_compute_bytes - calculate an ECC value (P or Q)
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            ecc_compute_bytes - calculate an ECC value (P or Q)
+ *          -------------------------------------------------.
  *
- * @param	sector			The sector.
- * @param	row				The row.
- * @param	rowlen			The rowlen.
- * @param [in,out]	val1	The first value.
- * @param [in,out]	val2	The second value.
+ * @param   sector          The sector.
+ * @param   row             The row.
+ * @param   rowlen          The rowlen.
+ * @param [in,out]  val1    The first value.
+ * @param [in,out]  val2    The second value.
  */
 
 void ecc_compute_bytes(const UINT8 *sector, const UINT16 *row, int rowlen, UINT8 &val1, UINT8 &val2)
@@ -1574,15 +1574,15 @@ void ecc_compute_bytes(const UINT8 *sector, const UINT16 *row, int rowlen, UINT8
 }
 
 /**
- * @fn	bool ecc_verify(const UINT8 *sector)
+ * @fn  bool ecc_verify(const UINT8 *sector)
  *
- * @brief	-------------------------------------------------
- * 			  ecc_verify - verify the P and Q ECC codes in a sector
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            ecc_verify - verify the P and Q ECC codes in a sector
+ *          -------------------------------------------------.
  *
- * @param	sector	The sector.
+ * @param   sector  The sector.
  *
- * @return	true if it succeeds, false if it fails.
+ * @return  true if it succeeds, false if it fails.
  */
 
 bool ecc_verify(const UINT8 *sector)
@@ -1608,14 +1608,14 @@ bool ecc_verify(const UINT8 *sector)
 }
 
 /**
- * @fn	void ecc_generate(UINT8 *sector)
+ * @fn  void ecc_generate(UINT8 *sector)
  *
- * @brief	-------------------------------------------------
- * 			  ecc_generate - generate the P and Q ECC codes for a sector, overwriting any
- * 			  existing codes
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            ecc_generate - generate the P and Q ECC codes for a sector, overwriting any
+ *            existing codes
+ *          -------------------------------------------------.
  *
- * @param [in,out]	sector	If non-null, the sector.
+ * @param [in,out]  sector  If non-null, the sector.
  */
 
 void ecc_generate(UINT8 *sector)
@@ -1630,13 +1630,13 @@ void ecc_generate(UINT8 *sector)
 }
 
 /**
- * @fn	void ecc_clear(UINT8 *sector)
+ * @fn  void ecc_clear(UINT8 *sector)
  *
- * @brief	-------------------------------------------------
- * 			  ecc_clear - erase the ECC P and Q cods to 0 within a sector
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            ecc_clear - erase the ECC P and Q cods to 0 within a sector
+ *          -------------------------------------------------.
  *
- * @param [in,out]	sector	If non-null, the sector.
+ * @param [in,out]  sector  If non-null, the sector.
  */
 
 void ecc_clear(UINT8 *sector)

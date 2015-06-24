@@ -49,21 +49,13 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 				bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 }
 
-void deco102_decrypt_cpu(running_machine &machine, const char *cputag, int address_xor, int data_select_xor, int opcode_select_xor)
+void deco102_decrypt_cpu(UINT16 *rom, UINT16 *opcodes, int size, int address_xor, int data_select_xor, int opcode_select_xor)
 {
-	int i;
-	address_space &space = machine.device(cputag)->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion(cputag)->base();
-	int size = machine.root_device().memregion(cputag)->bytes();
-	UINT16 *opcodes = auto_alloc_array(machine, UINT16, size / 2);
 	std::vector<UINT16> buf(size / 2);
 
 	memcpy(&buf[0], rom, size);
 
-	space.set_decrypted_region(0, size - 1, opcodes);
-	((m68000_base_device*)machine.device(cputag))->set_encrypted_opcode_range(0, size);
-
-	for (i = 0; i < size / 2; i++)
+	for (int i = 0; i < size / 2; i++)
 	{
 		int src;
 

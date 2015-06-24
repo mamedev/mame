@@ -35,7 +35,7 @@ class NETLIB_NAME(solver);
 
 /* FIXME: these should become proper devices */
 
-struct netlist_solver_parameters_t
+struct solver_parameters_t
 {
 	nl_double m_accuracy;
 	nl_double m_lte;
@@ -68,7 +68,7 @@ class terms_t
 		m_other_curanalog.clear();
 	}
 
-	ATTR_COLD void add(terminal_t *term, int net_other);
+	ATTR_COLD void add(terminal_t *term, int net_other, bool sorted);
 
 	ATTR_HOT inline unsigned count() { return m_term.size(); }
 
@@ -94,10 +94,10 @@ private:
 	plist_t<nl_double *> m_other_curanalog;
 };
 
-class netlist_matrix_solver_t : public device_t
+class matrix_solver_t : public device_t
 {
 public:
-	typedef plist_t<netlist_matrix_solver_t *> list_t;
+	typedef plist_t<matrix_solver_t *> list_t;
 	typedef core_device_t::list_t dev_list_t;
 
 	enum eSolverType
@@ -106,8 +106,8 @@ public:
 		GAUSS_SEIDEL
 	};
 
-	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t *params);
-	virtual ~netlist_matrix_solver_t();
+	ATTR_COLD matrix_solver_t(const eSolverType type, const solver_parameters_t *params);
+	virtual ~matrix_solver_t();
 
 	virtual void vsetup(analog_net_t::list_t &nets) = 0;
 
@@ -131,9 +131,28 @@ public:
 	virtual void reset();
 
 	ATTR_COLD int get_net_idx(net_t *net);
-	virtual void log_stats() {};
 
 	inline eSolverType type() const { return m_type; }
+
+	virtual void log_stats()
+	{
+		if (this->m_stat_calculations != 0 && this->m_params.m_log_stats)
+		{
+			this->netlist().log("==============================================");
+			this->netlist().log("Solver %s", this->name().cstr());
+			this->netlist().log("       ==> %d nets", (unsigned) this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+			this->netlist().log("       has %s elements", this->is_dynamic() ? "dynamic" : "no dynamic");
+			this->netlist().log("       has %s elements", this->is_timestep() ? "timestep" : "no timestep");
+			this->netlist().log("       %6.3f average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+			this->netlist().log("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average",
+					this->m_stat_calculations,
+					this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
+					this->m_iterative_fail,
+					100.0 * (double) this->m_iterative_fail / (double) this->m_stat_calculations,
+					(double) this->m_iterative_total / (double) this->m_stat_calculations);
+		}
+	}
+
 
 protected:
 
@@ -146,13 +165,15 @@ protected:
 	virtual void  add_term(int net_idx, terminal_t *term) = 0;
 
 	plist_t<analog_net_t *> m_nets;
-	plist_t<netlist_analog_output_t *> m_inps;
+	plist_t<analog_output_t *> m_inps;
 
 	int m_stat_calculations;
 	int m_stat_newton_raphson;
 	int m_stat_vsolver_calls;
+	int m_iterative_fail;
+	int m_iterative_total;
 
-	const netlist_solver_parameters_t &m_params;
+	const solver_parameters_t &m_params;
 
 	ATTR_HOT inline nl_double current_timestep() { return m_cur_ts; }
 private:
@@ -196,29 +217,30 @@ protected:
 	logic_input_t m_fb_step;
 	logic_output_t m_Q_step;
 
-	netlist_param_double_t m_freq;
-	netlist_param_double_t m_sync_delay;
-	netlist_param_double_t m_accuracy;
-	netlist_param_double_t m_gmin;
-	netlist_param_double_t m_lte;
-	netlist_param_double_t m_sor;
-	netlist_param_logic_t  m_dynamic;
-	netlist_param_double_t m_min_timestep;
+	param_double_t m_freq;
+	param_double_t m_sync_delay;
+	param_double_t m_accuracy;
+	param_double_t m_gmin;
+	param_double_t m_lte;
+	param_double_t m_sor;
+	param_logic_t  m_dynamic;
+	param_double_t m_min_timestep;
 
-	netlist_param_int_t m_nr_loops;
-	netlist_param_int_t m_gs_loops;
-	netlist_param_int_t m_gs_threshold;
-	netlist_param_int_t m_parallel;
+	param_str_t m_iterative_solver;
+	param_int_t m_nr_loops;
+	param_int_t m_gs_loops;
+	param_int_t m_gs_threshold;
+	param_int_t m_parallel;
 
-	netlist_param_logic_t  m_log_stats;
+	param_logic_t  m_log_stats;
 
-	netlist_matrix_solver_t::list_t m_mat_solvers;
+	matrix_solver_t::list_t m_mat_solvers;
 private:
 
-	netlist_solver_parameters_t m_params;
+	solver_parameters_t m_params;
 
 	template <int m_N, int _storage_N>
-	netlist_matrix_solver_t *create_solver(int size, int gs_threshold, bool use_specific);
+	matrix_solver_t *create_solver(int size, bool use_specific);
 };
 
 NETLIB_NAMESPACE_DEVICES_END()

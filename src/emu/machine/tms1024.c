@@ -3,10 +3,10 @@
 /*
 
   Texas Instruments TMS1024/TMS1025 I/O expander
-  
+
   No documentation was available, just a pinout.
   Other than more port pins, TMS1025 is assumed to be same as TMS1024.
-  
+
   TODO:
   - writes to port 0
   - what's the MS pin?
@@ -99,13 +99,13 @@ WRITE8_MEMBER(tms1024_device::write_s)
 WRITE_LINE_MEMBER(tms1024_device::write_std)
 {
 	state = (state) ? 1 : 0;
-	
+
 	// output on rising edge
 	if (state && !m_std)
 	{
 		if (m_s != 0)
 			(*m_write_port[m_s-1])((offs_t)(m_s-1), m_h);
 	}
-	
+
 	m_std = state;
 }

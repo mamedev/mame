@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_MB8876x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_MB8876_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 

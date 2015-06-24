@@ -411,15 +411,15 @@ int jedbin_parse(const void *data, size_t length, jed_data *result)
 -------------------------------------------------*/
 
 /**
- * @fn	size_t jedbin_output(const jed_data *data, void *result, size_t length)
+ * @fn  size_t jedbin_output(const jed_data *data, void *result, size_t length)
  *
- * @brief	Jedbin output.
+ * @brief   Jedbin output.
  *
- * @param	data	  	The data.
- * @param [out]	result	If non-null, the result.
- * @param	length	  	The length.
+ * @param   data        The data.
+ * @param [out] result  If non-null, the result.
+ * @param   length      The length.
  *
- * @return	A size_t.
+ * @return  A size_t.
  */
 
 size_t jedbin_output(const jed_data *data, void *result, size_t length)

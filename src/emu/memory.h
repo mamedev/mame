@@ -37,7 +37,8 @@ enum address_spacenum
 	// alternate address space names for common use
 	AS_PROGRAM = AS_0,              // program address space
 	AS_DATA = AS_1,                 // data address space
-	AS_IO = AS_2                    // I/O address space
+	AS_IO = AS_2,                   // I/O address space
+	AS_DECRYPTED_OPCODES = AS_3     // decrypted opcodes, when separate from data accesses
 };
 DECLARE_ENUM_OPERATORS(address_spacenum);
 
@@ -166,8 +167,7 @@ public:
 
 	// getters
 	address_space &space() const { return m_space; }
-	UINT8 *raw() const { return m_raw; }
-	UINT8 *decrypted() const { return m_decrypted; }
+	UINT8 *ptr() const { return m_ptr; }
 
 	// see if an address is within bounds, or attempt to update it if not
 	bool address_is_valid(offs_t byteaddress) { return EXPECTED(byteaddress >= m_bytestart && byteaddress <= m_byteend) || set_direct_region(byteaddress); }
@@ -178,21 +178,14 @@ public:
 
 	// custom update callbacks and configuration
 	direct_update_delegate set_direct_update(direct_update_delegate function);
-	void explicit_configure(offs_t bytestart, offs_t byteend, offs_t bytemask, void *raw, void *decrypted = NULL);
+	void explicit_configure(offs_t bytestart, offs_t byteend, offs_t bytemask, void *raw);
 
-	// accessor methods for reading raw data
-	void *read_raw_ptr(offs_t byteaddress, offs_t directxor = 0);
-	UINT8 read_raw_byte(offs_t byteaddress, offs_t directxor = 0);
-	UINT16 read_raw_word(offs_t byteaddress, offs_t directxor = 0);
-	UINT32 read_raw_dword(offs_t byteaddress, offs_t directxor = 0);
-	UINT64 read_raw_qword(offs_t byteaddress, offs_t directxor = 0);
-
-	// accessor methods for reading decrypted data
-	void *read_decrypted_ptr(offs_t byteaddress, offs_t directxor = 0);
-	UINT8 read_decrypted_byte(offs_t byteaddress, offs_t directxor = 0);
-	UINT16 read_decrypted_word(offs_t byteaddress, offs_t directxor = 0);
-	UINT32 read_decrypted_dword(offs_t byteaddress, offs_t directxor = 0);
-	UINT64 read_decrypted_qword(offs_t byteaddress, offs_t directxor = 0);
+	// accessor methods
+	void *read_ptr(offs_t byteaddress, offs_t directxor = 0);
+	UINT8 read_byte(offs_t byteaddress, offs_t directxor = 0);
+	UINT16 read_word(offs_t byteaddress, offs_t directxor = 0);
+	UINT32 read_dword(offs_t byteaddress, offs_t directxor = 0);
+	UINT64 read_qword(offs_t byteaddress, offs_t directxor = 0);
 
 private:
 	// internal helpers
@@ -202,8 +195,7 @@ private:
 
 	// internal state
 	address_space &             m_space;
-	UINT8 *                     m_raw;                  // direct access data pointer (raw)
-	UINT8 *                     m_decrypted;            // direct access data pointer (decrypted)
+	UINT8 *                     m_ptr;                  // direct access data pointer
 	offs_t                      m_bytemask;             // byte address mask
 	offs_t                      m_bytestart;            // minimum valid byte address
 	offs_t                      m_byteend;              // maximum valid byte address
@@ -354,9 +346,6 @@ public:
 	offs_t address_to_byte_end(offs_t address) const { return m_config.addr2byte_end(address); }
 	offs_t byte_to_address(offs_t address) const { return m_config.byte2addr(address); }
 	offs_t byte_to_address_end(offs_t address) const { return m_config.byte2addr_end(address); }
-
-	// decryption
-	void set_decrypted_region(offs_t addrstart, offs_t addrend, void *base);
 
 	// direct access
 	direct_update_delegate set_direct_update_handler(direct_update_delegate function) { return m_direct->set_direct_update(function); }
@@ -566,11 +555,10 @@ class memory_bank
 		read_or_write           m_readorwrite;      // used for read or write?
 	};
 
-	// a bank_entry contains a raw and decrypted pointer
+	// a bank_entry contains a pointer
 	struct bank_entry
 	{
-		UINT8 *         m_raw;
-		UINT8 *         m_decrypted;
+		UINT8 *         m_ptr;
 	};
 
 public:
@@ -586,7 +574,6 @@ public:
 	bool anonymous() const { return m_anonymous; }
 	offs_t bytestart() const { return m_bytestart; }
 	void *base() const { return *m_baseptr; }
-	void *base_decrypted() const { return *m_basedptr; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *name() const { return m_name.c_str(); }
 
@@ -602,13 +589,10 @@ public:
 
 	// set the base explicitly
 	void set_base(void *base);
-	void set_base_decrypted(void *base);
 
 	// configure and set entries
 	void configure_entry(int entrynum, void *base);
 	void configure_entries(int startentry, int numentries, void *base, offs_t stride);
-	void configure_decrypted_entry(int entrynum, void *base);
-	void configure_decrypted_entries(int startentry, int numentries, void *base, offs_t stride);
 	void set_entry(int entrynum);
 
 private:
@@ -620,7 +604,6 @@ private:
 	memory_bank *           m_next;                 // next bank in sequence
 	running_machine &       m_machine;              // need the machine to free our memory
 	UINT8 **                m_baseptr;              // pointer to our base pointer in the global array
-	UINT8 **                m_basedptr;             // same for the decrypted base pointer
 	UINT16                  m_index;                // array index for this handler
 	bool                    m_anonymous;            // are we anonymous or explicit?
 	offs_t                  m_bytestart;            // byte-adjusted start offset
@@ -747,7 +730,7 @@ public:
 	void dump(FILE *file);
 
 	// pointers to a bank pointer (internal usage only)
-	UINT8 **bank_pointer_addr(UINT8 index, bool decrypted = false) { return decrypted ? &m_bankd_ptr[index] : &m_bank_ptr[index]; }
+	UINT8 **bank_pointer_addr(UINT8 index) { return &m_bank_ptr[index]; }
 
 	// regions
 	memory_region *region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian);
@@ -766,7 +749,6 @@ private:
 	bool                        m_initialized;          // have we completed initialization?
 
 	UINT8 *                     m_bank_ptr[TOTAL_MEMORY_BANKS];  // array of bank pointers
-	UINT8 *                     m_bankd_ptr[TOTAL_MEMORY_BANKS]; // array of decrypted bank pointers
 
 	simple_list<address_space>  m_spacelist;            // list of address spaces
 	simple_list<memory_block>   m_blocklist;            // head of the list of memory blocks
@@ -887,102 +869,67 @@ private:
 //**************************************************************************
 
 //-------------------------------------------------
-//  read_raw_ptr - return a pointer to valid RAM
+//  read_ptr - return a pointer to valid RAM
 //  referenced by the address, or NULL if no RAM
 //  backing that address
 //-------------------------------------------------
 
-inline void *direct_read_data::read_raw_ptr(offs_t byteaddress, offs_t directxor)
+inline void *direct_read_data::read_ptr(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return &m_raw[(byteaddress ^ directxor) & m_bytemask];
-	return NULL;
-}
-
-inline void *direct_read_data::read_decrypted_ptr(offs_t byteaddress, offs_t directxor)
-{
-	if (address_is_valid(byteaddress))
-		return &m_decrypted[(byteaddress ^ directxor) & m_bytemask];
+		return &m_ptr[(byteaddress ^ directxor) & m_bytemask];
 	return NULL;
 }
 
 
 //-------------------------------------------------
-//  read_raw_byte - read a byte via the
+//  read_byte - read a byte via the
 //  direct_read_data class
 //-------------------------------------------------
 
-inline UINT8 direct_read_data::read_raw_byte(offs_t byteaddress, offs_t directxor)
+inline UINT8 direct_read_data::read_byte(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return m_raw[(byteaddress ^ directxor) & m_bytemask];
-	return m_space.read_byte(byteaddress);
-}
-
-inline UINT8 direct_read_data::read_decrypted_byte(offs_t byteaddress, offs_t directxor)
-{
-	if (address_is_valid(byteaddress))
-		return m_decrypted[(byteaddress ^ directxor) & m_bytemask];
+		return m_ptr[(byteaddress ^ directxor) & m_bytemask];
 	return m_space.read_byte(byteaddress);
 }
 
 
 //-------------------------------------------------
-//  read_raw_word - read a word via the
+//  read_word - read a word via the
 //  direct_read_data class
 //-------------------------------------------------
 
-inline UINT16 direct_read_data::read_raw_word(offs_t byteaddress, offs_t directxor)
+inline UINT16 direct_read_data::read_word(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT16 *>(&m_raw[(byteaddress ^ directxor) & m_bytemask]);
-	return m_space.read_word(byteaddress);
-}
-
-inline UINT16 direct_read_data::read_decrypted_word(offs_t byteaddress, offs_t directxor)
-{
-	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT16 *>(&m_decrypted[(byteaddress ^ directxor) & m_bytemask]);
+		return *reinterpret_cast<UINT16 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_word(byteaddress);
 }
 
 
 //-------------------------------------------------
-//  read_raw_dword - read a dword via the
+//  read_dword - read a dword via the
 //  direct_read_data class
 //-------------------------------------------------
 
-inline UINT32 direct_read_data::read_raw_dword(offs_t byteaddress, offs_t directxor)
+inline UINT32 direct_read_data::read_dword(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT32 *>(&m_raw[(byteaddress ^ directxor) & m_bytemask]);
-	return m_space.read_dword(byteaddress);
-}
-
-inline UINT32 direct_read_data::read_decrypted_dword(offs_t byteaddress, offs_t directxor)
-{
-	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT32 *>(&m_decrypted[(byteaddress ^ directxor) & m_bytemask]);
+		return *reinterpret_cast<UINT32 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_dword(byteaddress);
 }
 
 
 //-------------------------------------------------
-//  read_raw_qword - read a qword via the
+//  read_qword - read a qword via the
 //  direct_read_data class
 //-------------------------------------------------
 
-inline UINT64 direct_read_data::read_raw_qword(offs_t byteaddress, offs_t directxor)
+inline UINT64 direct_read_data::read_qword(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT64 *>(&m_raw[(byteaddress ^ directxor) & m_bytemask]);
-	return m_space.read_qword(byteaddress);
-}
-
-inline UINT64 direct_read_data::read_decrypted_qword(offs_t byteaddress, offs_t directxor)
-{
-	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT64 *>(&m_decrypted[(byteaddress ^ directxor) & m_bytemask]);
+		return *reinterpret_cast<UINT64 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_qword(byteaddress);
 }
 

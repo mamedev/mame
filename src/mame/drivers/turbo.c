@@ -539,7 +539,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")    // FIX PAGE
 	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREAD("i8255_0", i8255_device, read) AM_WRITE(buckrog_i8255_0_w)    // 8255
 	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("i8255_1", i8255_device, read, write)            // 8255
@@ -555,6 +554,9 @@ static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM                                                 // SCRATCH
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, turbo_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buckrog_cpu2_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -919,6 +921,7 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(buckrog_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("subcpu", Z80, MASTER_CLOCK/4)
@@ -1178,7 +1181,7 @@ ROM_END
 
 
 ROM_START( buckrog ) /* CPU BOARD Sega ID#  834-5158-01, ROM BOARD Sega ID# 834-5152-01 */
-	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "epr-5265.cpu-ic3", 0x0000, 0x4000, CRC(f0055e97) SHA1(f6ee2afd6fef710949087d1cb04cbc242d1fa9f5) ) /* encrypted Z80 code, SEGA 315-5014 CPU */
 	ROM_LOAD( "epr-5266.cpu-ic4", 0x4000, 0x4000, CRC(7d084c39) SHA1(ef2c0a2a59e14d9e196fd3837139fc5acf0f63be) ) /* encrypted Z80 code, SEGA 315-5014 CPU */
 
@@ -1584,7 +1587,28 @@ DRIVER_INIT_MEMBER(turbo_state,turbo_enc)
 
 DRIVER_INIT_MEMBER(turbo_state,buckrog_enc)
 {
-	buckrog_decode(machine(), "maincpu");
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x80,0x00,0x88,0x08 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...0...0...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0x80,0x20,0x00 },   /* ...0...0...0...1 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...1...0 */
+		{ 0x80,0x00,0x88,0x08 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...0...1...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0x80,0x20,0x00 },   /* ...0...1...0...0 */
+		{ 0x80,0x00,0x88,0x08 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...0...1 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...1...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0x80,0x20,0x00 },   /* ...0...1...1...1 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...0...0 */
+		{ 0x80,0x00,0x88,0x08 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...1 */
+		{ 0x80,0x00,0x88,0x08 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...0...1...1 */
+		{ 0x80,0x00,0x88,0x08 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...1...0...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...1...0...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...1...1...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0xa8,0xa0,0x88,0x80 }    /* ...1...1...1...1 */
+	};
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 }
 
 

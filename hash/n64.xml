@@ -54,6 +54,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 
 <!-- List of confirmed carts (info from pictures) -->
 <softwarelist name="n64" description="Nintendo 64 cartridges">
+
 	<software name="007goldnu" cloneof="007goldn">
 		<description>007 - GoldenEye (USA)</description>
 		<year>1997</year>
@@ -5877,12 +5878,12 @@ patched out (+ a fix for internal checksum)
 				<!-- Original release, in .z64 format -->
 				<!-- rom name="mm_debug.rom" size="67108864" crc="687d8395" sha1="b38b71d2961dffb523020a67f4807a4b704e347a" offset="000000" /-->
 				<!-- .v64 version -->
-				<rom name="mm_debug.bin" size="67108864" crc="ea2e7abb" sha1="c790b3de31196645034c76e326640ccf3b8c91dd" offset="000000" />
+				<rom name="legend of zelda, the - majora's mask (europe) (en,fr,de,es) (debug edition).bin" size="67108864" crc="ea2e7abb" sha1="c790b3de31196645034c76e326640ccf3b8c91dd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zeldamaju1" cloneof="zeldamaj">
+	<software name="zeldamaju2" cloneof="zeldamaj">
 		<description>The Legend of Zelda - Majora's Mask (USA, Demo)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -11662,8 +11663,9 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<!-- to be verified -->
-	<software name="zeldaootmq" cloneof="zeldaoot">
+<!-- to be verified -->
+
+	<software name="zeldaootmqd" cloneof="zeldaoot">
 		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Debug Edition, Ripped from GC)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
@@ -11674,39 +11676,104 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="zeldaootmq1" cloneof="zeldaoot">
-		<description>The Legend of Zelda - Ocarina of Time - Master Quest (Euro, Debug Edition?, Ripped from GC)</description>
+	<software name="zeldaootmqu" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Ripped from GC)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - ocarina of time - master quest (2003)(nintendo)[gamecube version].bin" size="33554432" crc="177fa73a" sha1="8ebf2e29313f44f2d49e5b4191971d09919e8e48" offset="000000" />
+				<rom name="legend of zelda, the - ocarina of time - master quest (usa)(2003)(nintendo)(ntsc)[gamecube version].bin" size="33554432" crc="7b89b13f" sha1="e1d070ad7b017de9f992b362164dcd9d7f820f7e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootmq" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (Euro, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="legend of zelda, the - ocarina of time - master quest (europe)(2003)(nintendo)(pal)[gamecube version].bin" size="33554432" crc="177fa73a" sha1="8ebf2e29313f44f2d49e5b4191971d09919e8e48" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootmqj" cloneof="zeldaoot">
+		<description>Zelda no Densetsu - Toki no Ocarina Ura (Jpn, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="zelda no densetsu - toki no ocarina ura (japan)(2003)(nintendo)(ntsc)[gamecube version].bin" size="33554432" crc="d97c20ba" sha1="06c3c098f0e14ed61811dfaf0e8e4519d7d7a826" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zeldaootu3" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time (USA, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="legend of zelda, the - ocarina of time (usa)(2003)(nintendo)(ntsc)[gamecube version].bin" size="33554432" crc="84bbc39f" sha1="44c75962911e13bdfdc31b35e0b8e3be6a6a49ab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaoot2" cloneof="zeldaoot">
 		<description>The Legend of Zelda - Ocarina of Time (Euro, Ripped from GC)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - ocarina of time (2003)(nintendo)(pal)[gamecube version].v64" size="33554432" crc="6e658036" sha1="580dd0bd1b6d2c51cc20a764eece84dba558964c" offset="000000" />
+				<rom name="legend of zelda, the - ocarina of time (europe)(2003)(nintendo)(pal)[gamecube version].bin" size="33554432" crc="6e658036" sha1="580dd0bd1b6d2c51cc20a764eece84dba558964c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zeldamaju2" cloneof="zeldamaj">
-		<description>The Legend of Zelda - Majora's Mask (USA, Ripped from GC)</description>
-		<year>2003?</year>
+	<software name="zeldaootj3" cloneof="zeldaoot">
+		<description>Zelda no Densetsu - Toki no Ocarina (Jpn, Ripped from GC)</description>
+		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - majora's mask (2003)(nintendo)(us)[gamecube version].v64" size="33554432" crc="52245acb" sha1="8c378b87c83b3f4de20b14accf91e7590399f5dc" offset="000000" />
+				<rom name="zelda no densetsu - toki no ocarina (japan)(2003)(nintendo)(ntsc)[gamecube version].bin" size="33554432" crc="0ac22de8" sha1="245410280d152f28d5b1c0c0fc37f384db0020cd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="zeldamaju1" cloneof="zeldamaj">
+		<description>The Legend of Zelda - Majora's Mask (USA, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="legend of zelda, the - majora's mask (2003)(nintendo)(us)[gamecube version].bin" size="33554432" crc="52245acb" sha1="8c378b87c83b3f4de20b14accf91e7590399f5dc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldamaj2" cloneof="zeldamaj">
+		<description>The Legend of Zelda - Majora's Mask (Euro, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="legend of zelda, the - majora's mask (2003)(nintendo)(europe)[gamecube version].bin" size="33554432" crc="19139e89" sha1="f4b0bedafc45c78c4428882036d46d691b650d8b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldamajj2" cloneof="zeldamaj">
+		<description>Zelda no Densetsu - Mujura no Kamen (Jpn, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="zelda no densetsu - mujura no kamen (2003)(nintendo)(japan)[gamecube version].bin" size="33554432" crc="766ebdeb" sha1="7beadea493f24f77b5be85bf2c1dbd813481549b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Non game cartridges -->
 
@@ -11833,6 +11900,5 @@ patched out (+ a fix for internal checksum)
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

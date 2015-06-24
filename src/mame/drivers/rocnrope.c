@@ -199,7 +199,7 @@ INTERRUPT_GEN_MEMBER(rocnrope_state::vblank_irq)
 static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
+	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(rocnrope_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rocnrope_state,  vblank_irq)
 
@@ -356,14 +356,11 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
 {
-	UINT8 *decrypted = konami1_decode(machine(), "maincpu");
-
-	decrypted[0x703d] = 0x98;   /* fix one instruction */
+	memregion("maincpu")->base()[0x703d] = 0x98^0x88;   /* fix one instruction */
 }
 
 DRIVER_INIT_MEMBER(rocnrope_state,rocnropk)
 {
-	konami1_decode(machine(), "maincpu");
 }
 
 

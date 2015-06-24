@@ -869,6 +869,7 @@ void avr8_device::device_reset()
 		m_timer_prescale_count[t] = 0;
 	}
 
+	m_ocr2_not_reached_yet = true;
 	m_interrupt_pending = false;
 	m_elapsed_cycles = 0;
 }
@@ -1553,22 +1554,26 @@ void avr8_device::timer2_tick()
 		switch(wgm2)
 		{
 			case WGM02_FAST_PWM:
-				if(count == ocr2[reg])
+				if (reg==0)
 				{
-					if (reg == 0)
+					if (count >= m_r[AVR8_REGIDX_OCR2A])
 					{
-						m_r[AVR8_REGIDX_TIFR2] |= AVR8_TIFR2_TOV2_MASK;
-						count = 0;
-						increment = 0;
-					}
-
-					m_r[AVR8_REGIDX_TIFR2] |= ocf2[reg];
-				}
-				else if(count == 0)
-				{
-					if (reg == 0)
-					{
-						m_r[AVR8_REGIDX_TIFR2] &= ~AVR8_TIFR2_TOV2_MASK;
+						if (count >= 0xFF)
+						{
+							//Turn on
+							m_io->write_byte(AVR8_IO_PORTD, m_io->read_byte(AVR8_IO_PORTD) | (1 << 7));
+							m_r[AVR8_REGIDX_TCNT2] = 0;
+							m_ocr2_not_reached_yet = true;
+						}
+						else
+						{
+							if (m_ocr2_not_reached_yet)
+							{
+								//Turn off
+								m_io->write_byte(AVR8_IO_PORTD, m_io->read_byte(AVR8_IO_PORTD) & ~(1 << 7));
+								m_ocr2_not_reached_yet = false;
+							}
+						}
 					}
 				}
 				break;
@@ -1585,7 +1590,7 @@ void avr8_device::timer2_tick()
 
 					m_r[AVR8_REGIDX_TIFR2] |= ocf2[reg];
 				}
-				else if(count == 0)
+				else if (count == 0)
 				{
 					if (reg == 0)
 					{
@@ -1616,7 +1621,7 @@ void avr8_device::timer2_tick()
 		*/
 	}
 
-	m_r[AVR8_REGIDX_TCNT2] = count + increment;
+	m_r[AVR8_REGIDX_TCNT2] += increment;
 
 	update_interrupt(AVR8_INTIDX_OCF2A);
 	update_interrupt(AVR8_INTIDX_OCF2B);

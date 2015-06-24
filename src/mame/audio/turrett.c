@@ -103,7 +103,7 @@ void turrett_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			for (int s = 0; s < samples; ++s)
 			{
-				INT16 sample = m_direct->read_raw_word(addr << 1);
+				INT16 sample = m_direct->read_word(addr << 1);
 
 				if ((UINT16)sample == 0x8000)
 				{

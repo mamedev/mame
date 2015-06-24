@@ -41,7 +41,7 @@ public:
 	void dack_w(int data);
 	void dack_ws(int data);
 
-	void command();
+	virtual void command();
 	void data_w(int data);
 	void reset_w(int data);
 	void select_w(int data);
@@ -67,11 +67,19 @@ protected:
 	void get_chsn();
 	int test_ready();
 
+	dynamic_buffer buffer;                  /* data buffer */
+	UINT8 *buffer_ptr;          /* data pointer */
+	int csb;                /* command status byte */
+	int status;         /* drive status */
+	int error;          /* error code */
+
 	enum {
 		STANDARD,
-		EC1841
+		EC1841,
+		ST11M
 	};
 	int m_type;
+	UINT8 m_current_cmd;
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
 
@@ -90,14 +98,9 @@ private:
 	int sector_cnt[2];      /* sector count */
 	int control[2];         /* control */
 
-	int csb;                /* command status byte */
-	int status;         /* drive status */
-	int error;          /* error code */
 	emu_timer *timer;
 
 	int data_cnt;                /* data count */
-	dynamic_buffer buffer;                  /* data buffer */
-	UINT8 *buffer_ptr;          /* data pointer */
 	UINT8 hdc_control;
 
 	UINT8 hdcdma_data[512];
@@ -117,8 +120,19 @@ protected:
 	devcb_write_line m_drq_handler;
 };
 
+class st11m_device : public xt_hdc_device
+{
+public:
+	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_drq_handler;
+};
+
 extern const device_type XT_HDC;
 extern const device_type EC1841_HDC;
+extern const device_type ST11M_HDC;
 
 // ======================> isa8_hdc_device
 

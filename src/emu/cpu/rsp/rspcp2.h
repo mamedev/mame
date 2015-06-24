@@ -16,9 +16,6 @@
 #include "cpu/drcuml.h"
 #include "rsp.h"
 
-#define USE_SIMD        (0)
-#define SIMUL_SIMD      (0)
-
 union VECTOR_REG
 {
 	UINT64 d[2];

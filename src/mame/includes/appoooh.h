@@ -16,7 +16,8 @@ public:
 		m_msm(*this, "msm"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -65,6 +66,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

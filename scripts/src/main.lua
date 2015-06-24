@@ -2,6 +2,7 @@
 -- copyright-holders:MAMEdev Team
 
 function mainProject(_target, _subtarget)
+if (_OPTIONS["DRIVERS"] == nil) then 
 	if (_target == _subtarget) then
 		project (_target)
 	else
@@ -11,6 +12,9 @@ function mainProject(_target, _subtarget)
 			project (_target .. _subtarget)
 		end
 	end	
+else
+	project (_subtarget)
+end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
@@ -34,7 +38,7 @@ function mainProject(_target, _subtarget)
 	flags {
 		"Unicode",
 	}
-
+if (_OPTIONS["DRIVERS"] == nil) then 
 	configuration { "x64", "Release" }
 		targetsuffix "64"
 		if _OPTIONS["PROFILE"] then
@@ -70,7 +74,7 @@ function mainProject(_target, _subtarget)
 		if _OPTIONS["PROFILE"] then
 			targetsuffix "dp"
 		end
-
+end
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
@@ -86,17 +90,23 @@ function mainProject(_target, _subtarget)
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 	links {
 		"osd_" .. _OPTIONS["osd"],
-		"bus",
+	}
+	if (_OPTIONS["DRIVERS"] == nil) then 
+		links {
+			"bus",
+		}
+	end
+	links {
 		"netlist",
 		"optional",
 		"emu",
+		"formats",
 		"dasm",
 		"utils",
 		"expat",
 		"softfloat",
 		"jpeg",
 		"7z",
-		"formats",
 		"lua",
 		"lsqlite3",
 		"jsoncpp",
@@ -214,6 +224,8 @@ function mainProject(_target, _subtarget)
 		MAME_DIR .. "src/version.c",
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",
 	}
+	
+if (_OPTIONS["DRIVERS"] == nil) then 	
 	dependency {
 		{ "../../../../generated/mame/mame/drivlist.c",  MAME_DIR .. "src/mame/mess.lst", true },
 		{ "../../../../generated/mame/mame/drivlist.c" , MAME_DIR .. "src/mame/arcade.lst", true},
@@ -221,7 +233,13 @@ function mainProject(_target, _subtarget)
 	custombuildtask {
 		{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",    {  MAME_DIR .. "src/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
 	}
-	
+end	
+	configuration { "gmake" }
+		dependency {
+			{ ".PHONY", ".FORCE", true },
+			{ "$(OBJDIR)/src/version.o", ".FORCE", true },
+		}
+
 	configuration { "mingw*" }
 		custombuildtask {	
 			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},

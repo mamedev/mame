@@ -256,8 +256,8 @@ void apricot_keyboard_hle_device::rcv_complete()
 	m_data_in = get_received_char();
 
 	// reset command? send keyboard ready (likely needs a delay, just disable for now)
-//	if (m_data_in == 0xe8)
-//		transmit_register_setup(0xfb);
+//  if (m_data_in == 0xe8)
+//      transmit_register_setup(0xfb);
 }
 
 WRITE_LINE_MEMBER( apricot_keyboard_hle_device::rxd_w )

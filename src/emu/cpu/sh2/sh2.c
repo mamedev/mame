@@ -150,6 +150,7 @@ ADDRESS_MAP_END
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SH2, "SH-2", tag, owner, clock, "sh2", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh2_internal_map))
+	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, 32, 0)
 	, m_is_slave(0)
 	, m_cpu_type(CPU_TYPE_SH2)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
@@ -187,6 +188,7 @@ void sh2_device::device_stop()
 sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh2_internal_map))
+	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, 32, 0)
 	, m_is_slave(0)
 	, m_cpu_type(cpu_type)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
@@ -214,6 +216,15 @@ sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+const address_space_config *sh2_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_program_config : NULL;
+	default:                   return NULL;
+	}
+}
 
 offs_t sh2_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
@@ -2397,7 +2408,8 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_decrypted_program = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : &space(AS_PROGRAM);
+	m_direct = &m_decrypted_program->direct();
 	m_internal = &space(AS_PROGRAM);
 
 	save_item(NAME(m_sh2_state->pc));

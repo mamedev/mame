@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
 
-	MCFG_DEVICE_ADD("mb8877", MB8877x, MAIN_CLOCK/16)
+	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/16)
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)

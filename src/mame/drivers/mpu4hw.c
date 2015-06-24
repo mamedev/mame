@@ -2394,7 +2394,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m_frkstn)
 }
 
 // thanks to Project Amber for descramble information
-void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
+static void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
 {
 	for (int i=start;i<end;i++)
 	{

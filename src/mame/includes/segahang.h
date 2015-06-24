@@ -35,7 +35,8 @@ public:
 			m_segaic16road(*this, "segaic16road"),
 			m_workram(*this, "workram"),
 			m_sharrier_video(false),
-			m_adc_select(0)
+			m_adc_select(0),
+			m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	// PPI read/write callbacks
@@ -107,5 +108,6 @@ protected:
 	// internal state
 	UINT8                   m_adc_select;
 	bool                    m_shadow;
+	optional_shared_ptr<UINT16> m_decrypted_opcodes;
 	TIMER_DEVICE_CALLBACK_MEMBER(hangon_irq);
 };

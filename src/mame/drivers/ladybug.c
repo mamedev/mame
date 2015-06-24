@@ -142,6 +142,10 @@ static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, ladybug_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
@@ -786,6 +790,10 @@ static MACHINE_CONFIG_START( ladybug, ladybug_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( dorodon, ladybug )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sraider, ladybug_state )
 
@@ -1043,15 +1051,11 @@ DRIVER_INIT_MEMBER(ladybug_state,dorodon)
 	/* decode the opcodes */
 
 	offs_t i;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *table = memregion("user1")->base();
 
-	space.set_decrypted_region(0x0000, 0x5fff, decrypted);
-
 	for (i = 0; i < 0x6000; i++)
-		decrypted[i] = table[rom[i]];
+		m_decrypted_opcodes[i] = table[rom[i]];
 }
 
 
@@ -1059,7 +1063,7 @@ GAME( 1981, cavenger, 0,       ladybug, cavenger, driver_device, 0,       ROT0, 
 GAME( 1981, ladybug,  0,       ladybug, ladybug, driver_device,  0,       ROT270, "Universal", "Lady Bug", GAME_SUPPORTS_SAVE )
 GAME( 1981, ladybugb, ladybug, ladybug, ladybug, driver_device,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, ladybgb2, ladybug, ladybug, ladybug, driver_device,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dorodon,  0,       ladybug, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 1)", GAME_SUPPORTS_SAVE ) // license or bootleg?
-GAME( 1982, dorodon2, dorodon, ladybug, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 2)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1982, dorodon,  0,       dorodon, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 1)", GAME_SUPPORTS_SAVE ) // license or bootleg?
+GAME( 1982, dorodon2, dorodon, dorodon, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 2)", GAME_SUPPORTS_SAVE ) // "
 GAME( 1982, snapjack, 0,       ladybug, snapjack, driver_device, 0,       ROT0,   "Universal", "Snap Jack", GAME_SUPPORTS_SAVE )
 GAME( 1982, sraider,  0,       sraider, sraider, driver_device,  0,       ROT270, "Universal", "Space Raider", GAME_SUPPORTS_SAVE )

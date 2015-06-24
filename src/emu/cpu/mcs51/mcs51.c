@@ -379,8 +379,8 @@ ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag,
 ***************************************************************************/
 
 /* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)         m_direct->read_decrypted_byte(pc)
-#define ROP_ARG(pc)     m_direct->read_raw_byte(pc)
+#define ROP(pc)         m_direct->read_byte(pc)
+#define ROP_ARG(pc)     m_direct->read_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
 #define CODEMEM_R(a)    (UINT8)m_program->read_byte(a)
@@ -1996,7 +1996,7 @@ void mcs51_cpu_device::execute_run()
 		/* Read next opcode */
 		PPC = PC;
 		debugger_instruction_hook(this, PC);
-		op = m_direct->read_decrypted_byte(PC++);
+		op = m_direct->read_byte(PC++);
 
 		/* process opcode and count cycles */
 		m_inst_cycles = mcs51_cycles[op];

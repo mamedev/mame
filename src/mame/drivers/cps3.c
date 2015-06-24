@@ -745,13 +745,11 @@ void cps3_state::cps3_decrypt_bios()
 	int i;
 	UINT32 *coderegion = (UINT32*)memregion("bios")->base();
 
-	m_decrypted_bios = (UINT32*)memregion("bios")->base();
-
 	for (i=0;i<0x80000;i+=4)
 	{
 		UINT32 dword = coderegion[i/4];
 		UINT32 xormask = cps3_mask(i, m_key1, m_key2);
-		m_decrypted_bios[i/4] = dword ^ xormask;
+		coderegion[i/4] = dword ^ xormask;
 	}
 #if 0
 	/* Dump to file */
@@ -811,13 +809,6 @@ void cps3_state::init_crypt(UINT32 key1, UINT32 key2, int altEncryption)
 	m_maincpu->sh2drc_add_fastram(0x040C0030, 0x040C003b, 0, &m_tilemap30_regs_base[0]);
 
 	cps3_decrypt_bios();
-	m_decrypted_gamerom = auto_alloc_array(machine(), UINT32, 0x1000000/4);
-
-
-	m_0xc0000000_ram_decrypted = auto_alloc_array(machine(), UINT32, 0x400/4);
-
-	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), this));
 
 	init_common();
 }
@@ -1357,43 +1348,6 @@ WRITE32_MEMBER(cps3_state::cps3_0xc0000000_ram_w)
 	// store a decrypted copy
 	m_0xc0000000_ram_decrypted[offset] = m_0xc0000000_ram[offset]^cps3_mask(offset*4+0xc0000000, m_key1, m_key2);
 }
-
-
-
-DIRECT_UPDATE_MEMBER(cps3_state::cps3_direct_handler)
-{
-//  if(DEBUG_PRINTF) printf("address %04x\n",address);
-
-	/* BIOS ROM */
-	if (address < 0x80000)
-	{
-		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, m_decrypted_bios);
-		return ~0;
-	}
-	/* RAM */
-	else if (address >= 0x06000000 && address <= 0x06ffffff)
-	{
-		UINT8 *decrypted = (UINT8*)m_decrypted_gamerom;
-		UINT8 *raw = decrypted;
-
-		if (m_altEncryption) raw = (UINT8*) m_user4region;
-
-		direct.explicit_configure(0x06000000, 0x06ffffff, 0x00ffffff, raw, decrypted);
-
-		return ~0;
-	}
-	else if (address >= 0xc0000000 && address <= 0xc00003ff)
-	{
-		//direct->decrypted = (void*)m_0xc0000000_ram_decrypted;
-		direct.explicit_configure(0xc0000000, 0xc00003ff, 0x3ff, (UINT8*)m_0xc0000000_ram.target(), (UINT8*)m_0xc0000000_ram_decrypted);
-		return ~0;
-	}
-
-	/* anything else falls through to NOPs */
-	direct.explicit_configure(address, address, 0, (UINT8*)m_nops, (UINT8*)m_nops);
-	return ~0;
-}
-
 
 WRITE32_MEMBER(cps3_state::cram_bank_w)
 {
@@ -2249,6 +2203,12 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE(cps3_0xc0000000_ram_w ) AM_SHARE("0xc0000000_ram") /* Executes code from here */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 32, cps3_state )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("bios", 0) // Bios ROM
+	AM_RANGE(0x06000000, 0x06ffffff) AM_ROM AM_SHARE("decrypted_gamerom")
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_ROM AM_SHARE("0xc0000000_ram_decrypted")
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( cps3 )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -2551,8 +2511,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cps3, cps3_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
+	MCFG_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
 	MCFG_CPU_PROGRAM_MAP(cps3_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
 	MCFG_SH2_DMA_KLUDGE_CB(cps3_state, dma_callback)

@@ -45,7 +45,7 @@ void st0016_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, 44100);
 	m_ram_read_cb.resolve_safe(0);
-	
+
 	save_item(NAME(m_vpos));
 	save_item(NAME(m_frac));
 	save_item(NAME(m_lponce));

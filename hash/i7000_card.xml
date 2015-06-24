@@ -78,7 +78,7 @@ cartridges data available in this softlist.
 		</part>
 	</software>
 
-	<software name="redelocal">
+	<software name="redelocl">
 		<description>I-7119 REDE LOCAL v1.0 R01 (Mar 21st, 1987)</description>
 		<year>1987</year>
 		<publisher>Itautec</publisher>
@@ -104,7 +104,7 @@ cartridges data available in this softlist.
 		</part>
 	</software>
 
-	<software name="redatorv12">
+	<software name="redtrv12">
 		<description>I-71XX REDATOR v1.2 R04</description>
 		<year>198?</year>
 		<publisher>Itautec</publisher>
@@ -130,7 +130,7 @@ cartridges data available in this softlist.
 		</part>
 	</software>
 
-	<software name="videotexto">
+	<software name="vdeotxto">
 		<description>I-71XX VIDEOTEXTO</description>
 		<year>198?</year>
 		<publisher>Itautec</publisher>

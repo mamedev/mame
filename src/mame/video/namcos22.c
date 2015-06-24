@@ -83,9 +83,9 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 	int fogfactor = 0xff - extra.fogfactor;
 	int fadefactor = 0xff - extra.fadefactor;
 	int alphafactor = 0xff - m_state.m_poly_translucency;
-	rgbint fogcolor = extra.fogcolor;
-	rgbint fadecolor = extra.fadecolor;
-	rgbint polycolor = extra.polycolor;
+	rgbaint_t fogcolor = extra.fogcolor;
+	rgbaint_t fadecolor = extra.fadecolor;
+	rgbaint_t polycolor = extra.polycolor;
 	int polyfade_enabled = extra.pfade_enabled;
 	int penmask = 0xff;
 	int penshift = 0;
@@ -118,18 +118,17 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 		for (int x = extent.startx; x < extent.stopx; x++)
 		{
 			float ooz = 1.0f / z;
-			int tx = (int)(u * ooz);
-			int ty = (int)(v * ooz) + bn;
-			int to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
-			int pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
+			INT32 tx = (int)(u * ooz);
+			INT32 ty = (int)(v * ooz) + bn;
+			INT32 to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
+			INT32 pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
 			// pen = 0x55; // debug: disable textures
 
-			rgbint rgb;
-			rgb_to_rgbint(&rgb, pens[pen >> penshift & penmask]);
+			rgbaint_t rgb(pens[pen >> penshift & penmask]);
 
 			// apply shading before fog
-			int shade = i*ooz;
-			rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
+			INT32 shade = i*ooz;
+			rgb.scale_imm_and_clamp(shade << 2);
 
 			// per-z distance fogging
 			if (zfog_enabled)
@@ -142,26 +141,30 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 				if (fogfactor > 0)
 				{
 					if (fogfactor > 0xff) fogfactor = 0xff;
-					rgbint_blend(&rgb, &fogcolor, 0xff - fogfactor);
+					rgb.blend(fogcolor, 0xff - fogfactor);
 				}
 			}
 			else if (fogfactor != 0xff) // direct
-				rgbint_blend(&rgb, &fogcolor, fogfactor);
+			{
+				rgb.blend(fogcolor, fogfactor);
+			}
 
 			if (polyfade_enabled)
-				rgbint_scale_channel_and_clamp(&rgb, &polycolor);
+			{
+				rgb.scale_and_clamp(polycolor);
+			}
 
 			if (fadefactor != 0xff)
-				rgbint_blend(&rgb, &fadecolor, fadefactor);
+			{
+				rgb.blend(fadecolor, fadefactor);
+			}
 
 			if (alphafactor != 0xff)
 			{
-				rgbint mix;
-				rgb_to_rgbint(&mix, dest[x]);
-				rgbint_blend(&rgb, &mix, alphafactor);
+				rgb.blend(rgbaint_t(dest[x]), alphafactor);
 			}
 
-			dest[x] = rgbint_to_rgb(&rgb);
+			dest[x] = rgb.to_rgba();
 			primap[x] |= prioverchar;
 
 			u += du;
@@ -181,8 +184,7 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 			int pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
 			// pen = 0x55; // debug: disable textures
 
-			rgbint rgb;
-			rgb_to_rgbint(&rgb, pens[pen >> penshift & penmask]);
+			rgbaint_t rgb(pens[pen >> penshift & penmask]);
 
 			// per-z distance fogging
 			if (zfog_enabled)
@@ -193,19 +195,25 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 				else cz = (cz < 0) ? 0 : 0x1fff;
 				fogfactor = czram[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ cz];
 				if (fogfactor != 0)
-					rgbint_blend(&rgb, &fogcolor, 0xff - fogfactor);
+				{
+					rgb.blend(fogcolor, 0xff - fogfactor);
+				}
 			}
 			else if (fogfactor != 0xff) // direct
-				rgbint_blend(&rgb, &fogcolor, fogfactor);
+			{
+				rgb.blend(fogcolor, fogfactor);
+			}
 
 			// apply shading after fog
 			int shade = i*ooz;
-			rgbint_scale_immediate_and_clamp(&rgb, shade << 2);
+			rgb.scale_imm_and_clamp(shade << 2);
 
 			if (polyfade_enabled)
-				rgbint_scale_channel_and_clamp(&rgb, &polycolor);
+			{
+				rgb.scale_and_clamp(polycolor);
+			}
 
-			dest[x] = rgbint_to_rgb(&rgb);
+			dest[x] = rgb.to_rgba();
 			primap[x] |= prioverchar;
 
 			u += du;
@@ -227,8 +235,8 @@ void namcos22_renderer::renderscanline_sprite(INT32 scanline, const extent_t &ex
 	int alphafactor = extra.alpha;
 	int fogfactor = 0xff - extra.fogfactor;
 	int fadefactor = 0xff - extra.fadefactor;
-	rgbint fogcolor = extra.fogcolor;
-	rgbint fadecolor = extra.fadecolor;
+	rgbaint_t fogcolor(extra.fogcolor);
+	rgbaint_t fadecolor(extra.fadecolor);
 	UINT8 *source = (UINT8 *)extra.source + y_index * extra.line_modulo;
 	UINT32 *dest = &extra.destbase->pix32(scanline);
 	UINT8 *primap = &extra.primap->pix8(scanline);
@@ -238,23 +246,24 @@ void namcos22_renderer::renderscanline_sprite(INT32 scanline, const extent_t &ex
 		int pen = source[(int)x_index];
 		if (pen != 0xff)
 		{
-			rgbint rgb;
-			rgb_to_rgbint(&rgb, pal[pen]);
+			rgbaint_t rgb(pal[pen]);
 
 			if (fogfactor != 0xff)
-				rgbint_blend(&rgb, &fogcolor, fogfactor);
+			{
+				rgb.blend(fogcolor, fogfactor);
+			}
 
 			if (fadefactor != 0xff)
-				rgbint_blend(&rgb, &fadecolor, fadefactor);
+			{
+				rgb.blend(fadecolor, fadefactor);
+			}
 
 			if (alphafactor != 0xff)
 			{
-				rgbint mix;
-				rgb_to_rgbint(&mix, dest[x]);
-				rgbint_blend(&rgb, &mix, alphafactor);
+				rgb.blend(rgbaint_t(dest[x]), alphafactor);
 			}
 
-			dest[x] = rgbint_to_rgb(&rgb);
+			dest[x] = rgb.to_rgba();
 			primap[x] |= prioverchar;
 		}
 		x_index += dx;
@@ -356,12 +365,12 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		if (m_state.m_mixer_flags & 1)
 		{
 			extra.fadefactor = m_state.m_screen_fade_factor;
-			rgb_comp_to_rgbint(&extra.fadecolor, m_state.m_screen_fade_r, m_state.m_screen_fade_g, m_state.m_screen_fade_b);
+			extra.fadecolor.set(0, m_state.m_screen_fade_r, m_state.m_screen_fade_g, m_state.m_screen_fade_b);
 		}
 
 		// poly fade
 		extra.pfade_enabled = m_state.m_poly_fade_enabled;
-		rgb_comp_to_rgbint(&extra.polycolor, m_state.m_poly_fade_r, m_state.m_poly_fade_g, m_state.m_poly_fade_b);
+		extra.polycolor.set(0, m_state.m_poly_fade_r, m_state.m_poly_fade_g, m_state.m_poly_fade_b);
 
 		/* poly fog (not completely accurate yet)
 
@@ -432,7 +441,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			if (nthword(m_state.m_czattr, 4) & (4 << (cztype * 4)))
 			{
 				int delta = (INT16)nthword(m_state.m_czattr, cztype);
-				rgb_comp_to_rgbint(&extra.fogcolor, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
+				extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 				if (direct)
 				{
 					int cz = ((flags & 0x1fff00) + cz_adjust) >> 8;
@@ -462,7 +471,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		if (m_state.m_mixer_flags & 1)
 		{
 			extra.pfade_enabled = m_state.m_poly_fade_enabled;
-			rgb_comp_to_rgbint(&extra.polycolor, m_state.m_poly_fade_r, m_state.m_poly_fade_g, m_state.m_poly_fade_b);
+			extra.polycolor.set(0, m_state.m_poly_fade_r, m_state.m_poly_fade_g, m_state.m_poly_fade_b);
 		}
 
 		// poly fog
@@ -470,7 +479,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		{
 			int cztype = flags & 3;
 			int czcolor = cztype & nthbyte(&m_state.m_fog_colormask, cztype);
-			rgb_comp_to_rgbint(&extra.fogcolor, m_state.m_fog_r_per_cztype[czcolor], m_state.m_fog_g_per_cztype[czcolor], m_state.m_fog_b_per_cztype[czcolor]);
+			extra.fogcolor.set(0, m_state.m_fog_r_per_cztype[czcolor], m_state.m_fog_g_per_cztype[czcolor], m_state.m_fog_b_per_cztype[czcolor]);
 
 			if (direct)
 			{
@@ -555,7 +564,7 @@ void namcos22_renderer::poly3d_drawsprite(
 		if (m_state.m_mixer_flags & 2)
 		{
 			extra.fadefactor = m_state.m_screen_fade_factor;
-			rgb_comp_to_rgbint(&extra.fadecolor, m_state.m_screen_fade_r, m_state.m_screen_fade_g, m_state.m_screen_fade_b);
+			extra.fadecolor.set(0, m_state.m_screen_fade_r, m_state.m_screen_fade_g, m_state.m_screen_fade_b);
 		}
 
 		// fog, 0xfe is a special case for sprite priority over textlayer
@@ -563,7 +572,7 @@ void namcos22_renderer::poly3d_drawsprite(
 		{
 			// or does it fetch from poly-cz ram? that will break timecris though
 			extra.fogfactor = cz_factor;
-			rgb_comp_to_rgbint(&extra.fogcolor, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
+			extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 		}
 
 		render_triangle_fan(m_cliprect, render_delegate(FUNC(namcos22_renderer::renderscanline_sprite), this), 2, 4, vert);
@@ -1883,8 +1892,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 	// prepare fader
 	bool fade_enabled = (m_mixer_flags & 2) && m_screen_fade_factor;
 	int fade_factor = 0xff - m_screen_fade_factor;
-	rgbint fade_color;
-	rgb_comp_to_rgbint(&fade_color, m_screen_fade_r, m_screen_fade_g, m_screen_fade_b);
+	rgbaint_t fade_color(0, m_screen_fade_r, m_screen_fade_g, m_screen_fade_b);
 
 	// mix textlayer with poly/sprites
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -1897,8 +1905,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 			// skip if transparent or under poly/sprite
 			if (pri[x] == prival)
 			{
-				rgbint rgb;
-				rgb_to_rgbint(&rgb, pens[src[x]]);
+				rgbaint_t rgb(pens[src[x]]);
 
 				// apply alpha
 				if (alpha_factor)
@@ -1906,9 +1913,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 					UINT8 pen = src[x] & 0xff;
 					if ((pen & 0xf) == alpha_mask || pen == alpha_check12 || pen == alpha_check13)
 					{
-						rgbint mix;
-						rgb_to_rgbint(&mix, dest[x]);
-						rgbint_blend(&rgb, &mix, 0xff - alpha_factor);
+						rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
 					}
 				}
 
@@ -1916,29 +1921,27 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 				if (spot_enabled)
 				{
 					UINT8 pen = src[x] & 0xff;
-					rgbint mix;
-					rgb_to_rgbint(&mix, dest[x]);
+					rgbaint_t mix(dest[x]);
 					if (spot_flags & 8)
 					{
 						// mix with per-channel brightness
-						rgbint shade;
-						rgb_comp_to_rgbint(&shade,
-							(0xff - (m_spotram[pen << 2 | 1] & 0xff)) << 2,
-							(0xff - (m_spotram[pen << 2 | 2] & 0xff)) << 2,
-							(0xff - (m_spotram[pen << 2 | 3] & 0xff)) << 2
-						);
-						rgbint_scale_channel_and_clamp(&mix, &shade);
+						rgbaint_t shade(0, (0xff - (m_spotram[pen << 2 | 1] & 0xff)) << 2, (0xff - (m_spotram[pen << 2 | 2] & 0xff)) << 2, (0xff - (m_spotram[pen << 2 | 3] & 0xff)) << 2);
+						mix.scale_and_clamp(shade);
 					}
 
 					int spot_factor = 0xff - (m_spotram[pen << 2] & 0xff);
 					if (spot_factor < spot_limit)
-						rgbint_blend(&rgb, &mix, spot_factor);
+					{
+						rgb.blend(mix, spot_factor);
+					}
 				}
 
 				if (fade_enabled)
-					rgbint_blend(&rgb, &fade_color, fade_factor);
+				{
+					rgb.blend(fade_color, fade_factor);
+				}
 
-				dest[x] = rgbint_to_rgb(&rgb);
+				dest[x] = rgb.to_rgba();
 			}
 		}
 	}
@@ -1954,12 +1957,13 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 	// prepare fader and shadow factor
 	bool fade_enabled = m_mixer_flags & 2 && m_poly_fade_enabled;
 	bool shadow_enabled = (m_mixer_flags & 0x100) != 0; // ? (ridgerac is the only game not using shadow)
-	rgbint fade_color, rgb_mix[3];
 
-	rgb_comp_to_rgbint(&fade_color, m_poly_fade_r, m_poly_fade_g, m_poly_fade_b);
-	rgb_comp_to_rgbint(&rgb_mix[0], nthbyte(m_mixer, 0x08), nthbyte(m_mixer, 0x09), nthbyte(m_mixer, 0x0a)); // pen c
-	rgb_comp_to_rgbint(&rgb_mix[1], nthbyte(m_mixer, 0x0b), nthbyte(m_mixer, 0x0c), nthbyte(m_mixer, 0x0d)); // pen d
-	rgb_comp_to_rgbint(&rgb_mix[2], nthbyte(m_mixer, 0x0e), nthbyte(m_mixer, 0x0f), nthbyte(m_mixer, 0x10)); // pen e
+	rgbaint_t fade_color(0, m_poly_fade_r, m_poly_fade_g, m_poly_fade_b);
+	rgbaint_t rgb_mix[3] = {
+		rgbaint_t(0, nthbyte(m_mixer, 0x08), nthbyte(m_mixer, 0x09), nthbyte(m_mixer, 0x0a)), // pen c
+		rgbaint_t(0, nthbyte(m_mixer, 0x0b), nthbyte(m_mixer, 0x0c), nthbyte(m_mixer, 0x0d)), // pen d
+		rgbaint_t(0, nthbyte(m_mixer, 0x0e), nthbyte(m_mixer, 0x0f), nthbyte(m_mixer, 0x10))  // pen e
+	};
 
 	// mix textlayer with poly/sprites
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -1973,7 +1977,7 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 			if (pri[x] == 2)
 			{
 				// apply shadow
-				rgbint rgb;
+				rgbaint_t rgb;
 				switch (src[x] & 0xff)
 				{
 					case 0xfc:
@@ -1981,24 +1985,26 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 					case 0xfe:
 						if (shadow_enabled)
 						{
-							rgb_to_rgbint(&rgb, dest[x]);
-							rgbint_scale_channel_and_clamp(&rgb, &rgb_mix[(src[x] & 0xf) - 0xc]);
+							rgb.set(dest[x]);
+							rgb.scale_and_clamp(rgb_mix[(src[x] & 0xf) - 0xc]);
 							break;
 						}
 						// (fall through)
 					default:
-						rgb_to_rgbint(&rgb, pens[src[x]]);
+						rgb.set(pens[src[x]]);
 						break;
 				}
 
 				if (fade_enabled)
-					rgbint_scale_channel_and_clamp(&rgb, &fade_color);
+				{
+					rgb.scale_and_clamp(fade_color);
+				}
 
 				// BTANB note: fading to white does not affect color channels set to 00,
 				// eg. a rr-gg-bb of 3f-7f-00 will fade to ff-ff-00 and not ff-ff-ff
 				// seen in victlapw attract mode
 
-				dest[x] = rgbint_to_rgb(&rgb);
+				dest[x] = rgb.to_rgba();
 			}
 		}
 	}
@@ -2279,15 +2285,13 @@ UINT32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb
 	screen.priority().fill(0, cliprect);
 
 	// background color
-	rgbint bg_color;
-	rgb_comp_to_rgbint(&bg_color, nthbyte(m_mixer, 0x08), nthbyte(m_mixer, 0x09), nthbyte(m_mixer, 0x0a));
+	rgbaint_t bg_color(0, nthbyte(m_mixer, 0x08), nthbyte(m_mixer, 0x09), nthbyte(m_mixer, 0x0a));
 	if (m_mixer_flags & 1 && m_screen_fade_factor)
 	{
-		rgbint fade_color;
-		rgb_comp_to_rgbint(&fade_color, m_screen_fade_r, m_screen_fade_g, m_screen_fade_b);
-		rgbint_blend(&bg_color, &fade_color, 0xff - m_screen_fade_factor);
+		rgbaint_t fade_color(0, m_screen_fade_r, m_screen_fade_g, m_screen_fade_b);
+		bg_color.blend(fade_color, 0xff - m_screen_fade_factor);
 	}
-	bitmap.fill(rgbint_to_rgb(&bg_color), cliprect);
+	bitmap.fill(bg_color.to_rgba(), cliprect);
 
 	// layers
 	UINT8 layer = nthbyte(m_mixer, 0x1f);

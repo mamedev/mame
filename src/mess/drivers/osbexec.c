@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 
 	MCFG_Z80SIO2_ADD("sio", MAIN_CLOCK/6, 0, 0, 0, 0)
 
-	MCFG_DEVICE_ADD("mb8877", MB8877x, MAIN_CLOCK/24)
+	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)

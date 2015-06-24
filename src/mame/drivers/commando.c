@@ -72,6 +72,10 @@ static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0xff80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, commando_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -245,6 +249,7 @@ static MACHINE_CONFIG_START( commando, commando_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PHI_MAIN)  // ???
 	MCFG_CPU_PROGRAM_MAP(commando_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", commando_state,  commando_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, PHI_B)    // 3 MHz
@@ -281,7 +286,7 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( commando )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "cm04.9m",  0x0000, 0x8000, CRC(8438b694) SHA1(e154478d8f1b635355bd777370acabe49cb9d309) )
 	ROM_LOAD( "cm03.8m",  0x8000, 0x4000, CRC(35486542) SHA1(531a85c9e03970ce037be84f2240c2df6f6e3ec1) )
 
@@ -317,7 +322,7 @@ ROM_START( commando )
 ROM_END
 
 ROM_START( commandou )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "u4-f.9m",  0x0000, 0x8000, CRC(a6118935) SHA1(d5811968b23d61e344e151747bcc3c0ed2b9497b) )
 	ROM_LOAD( "u3-f.8m",  0x8000, 0x4000, CRC(24f49684) SHA1(d38a7bd9f3b506747a03f6b94c3f8a2d9fc59166) )
 
@@ -353,7 +358,7 @@ ROM_START( commandou )
 ROM_END
 
 ROM_START( commandoj )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "so04.9m", 0x0000, 0x8000, CRC(d3f2bfb3) SHA1(738a5673ac6a907cb04cfb125e8aab3f7437b9d2) )
 	ROM_LOAD( "so03.8m", 0x8000, 0x4000, CRC(ed01f472) SHA1(fa181293ae8f0fee78d412259eb81f6de1e1307a) )
 
@@ -389,7 +394,7 @@ ROM_START( commandoj )
 ROM_END
 
 ROM_START( commandob )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "commandob_04_9m_27256.bin",  0x0000, 0x8000, CRC(348a7654) SHA1(f3668c47c154a9c7d7afeabb0259c9bc56e847ac) )
 	ROM_LOAD( "cm03.8m",  0x8000, 0x4000, CRC(35486542) SHA1(531a85c9e03970ce037be84f2240c2df6f6e3ec1) )
 
@@ -433,7 +438,7 @@ ROM_START( commandob )
 ROM_END
 
 ROM_START( commandob2 )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "10",  0x0000, 0x8000, CRC(ab5d1469) SHA1(05935155365bef3c40823101303a3857af1c71e6) )
 	ROM_LOAD( "11",  0x8000, 0x4000, CRC(d1a43ba1) SHA1(dbaedcd3a1b489a01b7f783fda6fcad203758717) )
 
@@ -507,7 +512,7 @@ ROM_START( commandob2 )
 ROM_END
 
 ROM_START( commandou2 )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "uc4.9m",   0x0000, 0x8000, CRC(89ee8e17) SHA1(68db271af8b0f400ca95df5672983bfb87f3f84a) )
 	ROM_LOAD( "uc3.8m",   0x8000, 0x4000, CRC(72a1a529) SHA1(fe7797206e38bd78e817b6c351d5cb943720fe6c) )
 
@@ -543,7 +548,7 @@ ROM_START( commandou2 )
 ROM_END
 
 ROM_START( sinvasn )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "sp04.9m",  0x0000, 0x8000, CRC(33f9601e) SHA1(71182227b77fccbbc1d89b5828aa86dcc64ca05e) )
 	ROM_LOAD( "sp03.8m",  0x8000, 0x4000, CRC(c7fb43b3) SHA1(36d0dffdacc36a6b6a77101d942c0821846f3275) )
 
@@ -579,7 +584,7 @@ ROM_START( sinvasn )
 ROM_END
 
 ROM_START( sinvasnb )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "u4",       0x0000, 0x8000, CRC(834ba0de) SHA1(85f40559e6a436f3f752b6e862a419a5b9481fa8) )
 	ROM_LOAD( "u3",       0x8000, 0x4000, CRC(07e4ee3a) SHA1(6d7665b3072f075893ef37e55147b10271d069ef) )
 
@@ -618,40 +623,26 @@ ROM_END
 
 DRIVER_INIT_MEMBER(commando_state,commando)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0xc000);
-	int A;
-
-	space.set_decrypted_region(0x0000, 0xbfff, decrypt);
 
 	// the first opcode is *not* encrypted
-	decrypt[0] = rom[0];
-	for (A = 1; A < 0xc000; A++)
+	m_decrypted_opcodes[0] = rom[0];
+	for (int A = 1; A < 0xc000; A++)
 	{
-		int src;
-
-		src = rom[A];
-		decrypt[A] = (src & 0x11) | ((src & 0xe0) >> 4) | ((src & 0x0e) << 4);
+		UINT8 src = rom[A];
+		m_decrypted_opcodes[A] = (src & 0x11) | ((src & 0xe0) >> 4) | ((src & 0x0e) << 4);
 	}
 }
 
 DRIVER_INIT_MEMBER(commando_state,spaceinv)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0xc000);
-	int A;
-
-	space.set_decrypted_region(0x0000, 0xbfff, decrypt);
 
 	// the first opcode *is* encrypted
-	for (A = 0; A < 0xc000; A++)
+	for (int A = 0; A < 0xc000; A++)
 	{
-		int src;
-
-		src = rom[A];
-		decrypt[A] = (src & 0x11) | ((src & 0xe0) >> 4) | ((src & 0x0e) << 4);
+		UINT8 src = rom[A];
+		m_decrypted_opcodes[A] = (src & 0x11) | ((src & 0xe0) >> 4) | ((src & 0x0e) << 4);
 	}
 }
 

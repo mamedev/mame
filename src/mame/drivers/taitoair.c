@@ -138,7 +138,9 @@ the TMS320C25 is being used as a co-processor to relieve the
 along with the 68000.
 
 Gradiation RAM is used to display a rotatable gradient background.
-The rotation is most likely handled by the TC0430GRW ROZ chip.
+The rotation is handled by the TC0430GRW ROZ chip which outputs
+coordinates for a X=a1+b1*x+c1*y, Y=a2+b2*x+c2*y mapping.  The
+coordinates are used unconventionally as indices in a color palette.
 
 "Power common ram" is for communication with a processor
 controlling the sit-in-cabinet (deluxe mechanized version only).
@@ -160,7 +162,7 @@ DIPs are the same as topland, which is clearly wrong if you try
 them ("SWB:7,8" do not set Coin B to multiple credits for each
 coin!)
 
-Therefore, some verificiation could still be needed, once the
+Therefore, some verification could still be needed, once the
 emulation is complete.
 
 
@@ -241,6 +243,7 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
+	m_gradbank = (data & 0x40);
 	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", space.device().safe_pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
@@ -313,15 +316,6 @@ WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
 	g = (g << 1) | (g & 1);
 	b = (b << 1) | (b & 1);
 
-	/* TODO: I'm sure that normal paletteram and gradiation ram mixes in some way ... */
-	//pal_r = ((m_paletteram[(offset >> 7) + 0x300] & 0x000f) >> 0) * 0x11;
-	//pal_g = ((m_paletteram[(offset >> 7) + 0x300] & 0x01e0) >> 5) * 0x11;
-	//pal_b = ((m_paletteram[(offset >> 7) + 0x300] & 0x7c00) >> 10) * 0x11;
-
-	//if(r == 0) { r = (pal_r); }
-	//if(g == 0) { g = (pal_g); }
-	//if(b == 0) { b = (pal_b); }
-
 	m_palette->set_pen_color(offset+0x2000, r, g, b);
 }
 
@@ -385,13 +379,13 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w) /* Pause the TMS32025 */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_SHARE("gradram")                 /* "gradiation ram (0/1)" */
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_SHARE("gradram") /* "gradiation ram (0/1)" */
 	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE(airsys_paletteram16_w) AM_SHARE("paletteram")
 	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)    /* tilemaps, sprites */
 	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_SHARE("line_ram")    /* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM AM_SHARE("dsp_ram") /* "dsp common ram" (TMS320C25) */
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("backregs") /* TC0430GRW? */
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("tc0430grw") /* TC0430GRW roz transform coefficients */
 	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
 	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
 	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff) /* other I/O */
@@ -685,7 +679,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
+	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
 	MCFG_SCREEN_PALETTE("palette")

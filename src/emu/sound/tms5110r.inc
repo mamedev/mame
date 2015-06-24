@@ -39,19 +39,19 @@
 	*/
 
 	/* Chip types based on die marks from decap:
-    chip type
-    |||||| rom number
-    |||||| |||||
-    VVVVVV VVVVV
-    T0280A 0281  = 1978 speak & spell, unknown difference to below, assumed same? uses old chirp
-    T0280B 0281A = 1979 speak & spell, also == TMS5100, uses old chirp
-    ?????? ????? (no decap; likely 'T0280D 0281D') = 1980 speak & spell, 1981 speak & spell compact, changed energy table, otherwise same as above, uses old chirp
-    T0280F 2801A = 1980 speak & math, 1980 speak and read, uses old chirp
-    ?????? ????? (no decap; likely 'T0280F 2802') = touch and tell, language translator; uses a unique chirp rom.
-    ?????? ????? = TMS5110
-    T0280F 5110A = TMS5110AN2L
-    
-    
+	chip type
+	|||||| rom number
+	|||||| |||||
+	VVVVVV VVVVV
+	T0280A 0281  = 1978 speak & spell, unknown difference to below, assumed same? uses old chirp
+	T0280B 0281A = 1979 speak & spell, also == TMS5100, uses old chirp
+	?????? ????? (no decap; likely 'T0280D 0281D') = 1980 speak & spell, 1981 speak & spell compact, changed energy table, otherwise same as above, uses old chirp
+	T0280F 2801A = 1980 speak & math, 1980 speak and read, uses old chirp
+	?????? ????? (no decap; likely 'T0280F 2802') = touch and tell, language translator; uses a unique chirp rom.
+	?????? ????? = TMS5110
+	T0280F 5110A = TMS5110AN2L
+
+
 	*/
 
 /* chip rom contents defines */
@@ -111,9 +111,9 @@ struct tms5100_coeffs
 #define TI_0280_2801_PATENT_PITCH \
 	/* P  */\
 	{  0,   41,  43,  45,  47,  49,  51,  53,  \
-	   55,  58,  60,  63,  66,  70,  73,  76,  \
-	   79,  83,  87,  90,  94,  99,  103, 107,  \
-	   112, 118, 123, 129, 134, 140, 147, 153 },
+		55,  58,  60,  63,  66,  70,  73,  76,  \
+		79,  83,  87,  90,  94,  99,  103, 107,  \
+		112, 118, 123, 129, 134, 140, 147, 153 },
 
 #define TI_2802_PITCH \
 	/* P */\
@@ -155,14 +155,14 @@ struct tms5100_coeffs
 #define TI_0280_PATENT_LPC \
 		/* K1  */\
 		{ -501, -497, -493, -488, -480, -471, -460, -446,\
-		  -427, -405, -378, -344, -305, -259, -206, -148,\
-		   -86,  -21,   45,  110,  171,  227,  277,  320,\
-		   357,  388,  413,  434,  451,  464,  474,  498 },\
+			-427, -405, -378, -344, -305, -259, -206, -148,\
+			-86,  -21,   45,  110,  171,  227,  277,  320,\
+			357,  388,  413,  434,  451,  464,  474,  498 },\
 		/* K2  */\
 		{ -349, -328, -305, -280, -252, -223, -192, -158,\
-		  -124,  -88,  -51,  -14,  23,    60,   97,  133,\
-		   167,  199,  230,  259,  286,  310,  333,  354,\
-		   372,  389,  404,  417,  429,  439,  449,  506 },\
+			-124,  -88,  -51,  -14,  23,    60,   97,  133,\
+			167,  199,  230,  259,  286,  310,  333,  354,\
+			372,  389,  404,  417,  429,  439,  449,  506 },\
 		/* K3  */\
 		{ -397, -365, -327, -282, -229, -170, -104, -36,\
 			35,  104,  169,  228,  281,  326,  364, 396 },\
@@ -188,17 +188,17 @@ struct tms5100_coeffs
 #define TI_2801_2501E_LPC \
 		/* K1  */\
 		{ -501, -498, -495, -490, -485, -478, -469, -459,\
-		  -446, -431, -412, -389, -362, -331, -295, -253,\
-		  -207, -156, -102,  -45,   13,   70,  126,  179,\
-		   228,  272,  311,  345,  374,  399,  420,  437 },\
+			-446, -431, -412, -389, -362, -331, -295, -253,\
+			-207, -156, -102,  -45,   13,   70,  126,  179,\
+			228,  272,  311,  345,  374,  399,  420,  437 },\
 		/* K2  */\
 		{ -376, -357, -335, -312, -286, -258, -227, -195,\
-		  -161, -124,  -87,  -49,  -10,   29,   68,  106,\
-		   143,  178,  212,  243,  272,  299,  324,  346,\
-		   366,  384,  400,  414,  427,  438,  448,  506 },\
+			-161, -124,  -87,  -49,  -10,   29,   68,  106,\
+			143,  178,  212,  243,  272,  299,  324,  346,\
+			366,  384,  400,  414,  427,  438,  448,  506 },\
 		/* K3  */\
 		{ -407, -381, -349, -311, -268, -218, -162, -102,\
-		   -39,   25,   89,  149,  206,  257,  302,  341 },\
+			-39,   25,   89,  149,  206,  257,  302,  341 },\
 		/* K4  */\
 		{ -290, -252, -209, -163, -114,  -62,   -9,   44,\
 			97,  147,  194,  238,  278,  313,  344,  371 },\
@@ -207,14 +207,14 @@ struct tms5100_coeffs
 			49,  101,  150,  196,  239,  278,  313,  344 },\
 		/* K6  */\
 		{ -193, -152, -109,  -65,  -20,   26,   71,  115,\
-		   158,  198,  235,  270,  301,  330,  355,  377 },\
+			158,  198,  235,  270,  301,  330,  355,  377 },\
 		/* K7  */\
 		{ -254, -218, -180, -140,  -97,  -53,   -8,   36,\
 			81,  124,  165,  204,  240,  274,  304,  332 },\
 		/* K8  */\
 		{ -205, -112,  -10,   92,  187,  269,  336,  387 },\
 		/* K9  */\
-		{ -249, -183, -110,  -32,   48,  126,  198,  261 }, /* on patents 4,403,965 and 4,946,391 the 4th entry is -19 which is wrong! should be -32*/\
+		{ -249, -183, -110,  -32,   48,  126,  198,  261 }, /* on patents 4,403,965 and 4,946,391 the 4th entry is 0x3ED (-19) which is a typo of the correct value of 0x3E0 (-32)*/\
 		/* K10 */\
 		{ -190, -133,  -73,  -10,   53,  115,  173,  227 },
 
@@ -222,26 +222,26 @@ struct tms5100_coeffs
 #define TI_2802_LPC \
 		/* K1 */\
 		{ -501, -498, -495, -490, -485, -478, -469, -459,\
-		  -446, -431, -412, -389, -362, -331, -295, -253,\
-		  -207, -156, -102,  -45,   13,   70,  126,  179,\
-		   228,  272,  311,  345,  374,  399,  420,  437},\
+			-446, -431, -412, -389, -362, -331, -295, -253,\
+			-207, -156, -102,  -45,   13,   70,  126,  179,\
+			228,  272,  311,  345,  374,  399,  420,  437},\
 		/* K2 */\
 		{ -376, -357, -335, -312, -286, -258, -227, -195,\
-		  -161, -124,  -87,  -49,  -10,   29,   68,  106,\
-		   143,  178,  212,  243,  272,  299,  324,  346,\
-		   366,  384,  400,  414,  427,  438,  448,  506},\
+			-161, -124,  -87,  -49,  -10,   29,   68,  106,\
+			143,  178,  212,  243,  272,  299,  324,  346,\
+			366,  384,  400,  414,  427,  438,  448,  506},\
 		/* K3 */\
 		{ -407, -381, -349, -311, -268, -218, -162, -102,\
-		   -39,   25,   89,  149,  206,  257,  302,  341},\
+			-39,   25,   89,  149,  206,  257,  302,  341},\
 		/* K4 */\
 		{ -289, -248, -202, -152,  -98,  -43,   14,   71,\
-		   125,  177,  225,  269,  307,  341,  371,  506},\
+			125,  177,  225,  269,  307,  341,  371,  506},\
 		/* K5 */\
 		{ -318, -283, -245, -202, -156, -107,  -56,   -3,\
 			49,  101,  150,  196,  239,  278,  313,  344},\
 		/* K6 */\
 		{ -193, -152, -109,  -65,  -20,   26,   71,  115,\
-		   158,  198,  235,  270,  301,  330,  355,  377},\
+			158,  198,  235,  270,  301,  330,  355,  377},\
 		/* K7 */\
 		{ -254, -218, -180, -140,  -97,  -53,   -8,   36,\
 			81,  124,  165,  204,  240,  274,  304,  332},\
@@ -255,20 +255,20 @@ struct tms5100_coeffs
 #define TI_5110_5220_LPC \
 		/* K1  */\
 		{ -501, -498, -497, -495, -493, -491, -488, -482,\
-		  -478, -474, -469, -464, -459, -452, -445, -437,\
-		  -412, -380, -339, -288, -227, -158,  -81,   -1,\
+			-478, -474, -469, -464, -459, -452, -445, -437,\
+			-412, -380, -339, -288, -227, -158,  -81,   -1,\
 			80,  157,  226,  287,  337,  379,  411,  436 },\
 		/* K2  */\
 		{ -328, -303, -274, -244, -211, -175, -138,  -99,\
-		   -59,  -18,   24,   64,  105,  143,  180,  215,\
-		   248,  278,  306,  331,  354,  374,  392,  408,\
-		   422,  435,  445,  455,  463,  470,  476,  506 },\
+			-59,  -18,   24,   64,  105,  143,  180,  215,\
+			248,  278,  306,  331,  354,  374,  392,  408,\
+			422,  435,  445,  455,  463,  470,  476,  506 },\
 		/* K3  */\
 		{ -441, -387, -333, -279, -225, -171, -117,  -63,\
 			-9,   45,   98,  152,  206,  260,  314,  368  },\
 		/* K4  */\
 		{ -328, -273, -217, -161, -106,  -50,    5,   61,\
-		   116,  172,  228,  283,  339,  394,  450,  506  },\
+			116,  172,  228,  283,  339,  394,  450,  506  },\
 		/* K5  */\
 		{ -328, -282, -235, -189, -142,  -96,  -50,   -3,\
 			43,   90,  136,  182,  229,  275,  322,  368  },\
@@ -288,34 +288,45 @@ struct tms5100_coeffs
 /* chirp */
 #define TI_0280_PATENT_CHIRP \
 	/* Chirp table */\
-	{   0,  42, -44, 50, -78, 18, 37, 20,\
-		2, -31, -59,  2,  95, 90,  5, 15,\
-		38, -4,  -91,-91, -42,-35,-36, -4,\
-		37, 43,   34, 33,  15, -1, -8,-18,\
-		-19,-17,   -9,-10,  -6,  0,  3,  2,\
-		1,  0,    0,  0,   0,  0,  0,  0,\
-		0,  0,    0,  0 },
+	{   0x00, 0x2a, 0xd4, 0x32, 0xb2, 0x12, 0x25, 0x14,\
+		0x02, 0xe1, 0xc5, 0x02, 0x5f, 0x5a, 0x05, 0x0f,\
+		0x26, 0xfc, 0xa5, 0xa5, 0xd6, 0xdd, 0xdc, 0xfc,\
+		0x25, 0x2b, 0x22, 0x21, 0x0f, 0xff, 0xf8, 0xee,\
+		0xed, 0xef, 0xf7, 0xf6, 0xfa, 0x00, 0x03, 0x02,\
+		0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00 },
+
+// almost, but not exactly the same as the patent chirp above (25 bits differ)
+#define TI_2801_CHIRP \
+	/* Chirp table */\
+	{   0x00, 0x2b, 0xd4, 0x33, 0xb3, 0x12, 0x25, 0x14,\
+		0x02, 0xe2, 0xc6, 0x03, 0x60, 0x5b, 0x05, 0x0f,\
+		0x26, 0xfc, 0xa6, 0xa5, 0xd6, 0xdd, 0xdd, 0xfd,\
+		0x25, 0x2b, 0x23, 0x22, 0x0f, 0xff, 0xf8, 0xef,\
+		0xed, 0xef, 0xf7, 0xf7, 0xfa, 0x01, 0x04, 0x03,\
+		0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00 },
 
 //TODO: Fix me! below is INACCURATE, no decap of 2802 yet!
 #define TI_2802_CHIRP \
 	/* Chirp table */\
-	{   0,  42, -44, 50, -78, 18, 37, 20,\
-		2, -31, -59,  2,  95, 90,  5, 15,\
-		38, -4,  -91,-91, -42,-35,-36, -4,\
-		37, 43,   34, 33,  15, -1, -8,-18,\
-		-19,-17,   -9,-10,  -6,  0,  3,  2,\
-		1,  0,    0,  0,   0,  0,  0,  0,\
-		0,  0,    0,  0 },
+	{   0x00, 0xa3, 0xbe, 0xee, 0x38, 0x78, 0x7f, 0x3e,\
+		0xe2, 0xe0, 0x26, 0x19, 0xce, 0x06, 0x1e, 0xd0,\
+		0x12, 0xcd, 0xea, 0xde, 0xda, 0x02, 0xff, 0x06,\
+		0xfe, 0x00, 0xfe, 0xfb, 0xfd, 0xfd, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00 },
 
 #define TI_LATER_CHIRP \
 	/* Chirp table */\
-	{   0x00, 0x03, 0x0F, 0x28, 0x4C, 0x6C, 0x71, 0x50,\
-		0x25, 0x26, 0x4C, 0x44, 0x1A, 0x32, 0x3B, 0x13,\
-		0x37, 0x1A, 0x25, 0x1F, 0x1D, 0x00, 0x00, 0x00,\
-		0,  0,  0,  0,  0,  0,  0,  0,\
-		0,  0,  0,  0,  0,  0,  0,  0,\
-		0,  0,  0,  0,  0,  0,  0,  0,\
-		0,  0,  0,  0 },
+	{   0x00, 0x03, 0x0f, 0x28, 0x4c, 0x6c, 0x71, 0x50,\
+		0x25, 0x26, 0x4c, 0x44, 0x1a, 0x32, 0x3b, 0x13,\
+		0x37, 0x1a, 0x25, 0x1f, 0x1d, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
+		0x00, 0x00, 0x00, 0x00 },
 
 /* TMS5100/TMC0281:
    (Die revs A, B; 1977?-1981?)
@@ -379,11 +390,18 @@ static const struct tms5100_coeffs T0280D_0281D_coeff =
    Used in the Speak & Math, Speak & Read, and Language Translator
    Decapped by Digshadow in 2014 http://siliconpr0n.org/map/ti/tmc0280fnl/
    Digitally dumped via PROMOUT by PlgDavid in 2014
-   The coefficients are exactly the same as the TMS5200
-   The coefficients also come from US Patents 4,403,965 and 4,946,391 (with one error in the patent);
-The Mitsubishi M58817 also seems to work best with these coefficients, so its possible the engineers of that chip copied them from the TI patents, see next entry
-   ***TODO: there are 2 versions of this chip, and the interpolation behavior between the two differs slightly:
-   * TMC0280NLP // CD2801 with datecodes around 1980 has the same interpolation inhibit behavior as 5100/TMC0281 on unvoiced->silent transition
+   The coefficients are exactly the same as the TMS5200.
+   The coefficients also come from US Patents 4,403,965 and 4,946,391 (with
+   one typo in the patent).
+   The chirp table is very slightly different from the 4,209,836 patent one,
+   but matches the table in the 4,403,965 and 4,946,391 patents.
+   The Mitsubishi M58817 also seems to work best with these coefficients, so
+   it is possible the engineers of that chip copied them from the TI patents.
+   ***TODO: there are 2 versions of this chip, and the interpolation
+      behavior between the two differs slightly:
+   * TMC0280NLP // CD2801 with datecodes around 1980 has the same
+     interpolation inhibit behavior as 5100/TMC0281 on unvoiced->silent
+     transition.
    * CD2801A-NL with datecodes around 1982 have the 'alternate behavior'
    */
 static const struct tms5100_coeffs T0280F_2801A_coeff =
@@ -399,13 +417,16 @@ static const struct tms5100_coeffs T0280F_2801A_coeff =
 	{
 	TI_2801_2501E_LPC
 	},
-	TI_0280_PATENT_CHIRP
+	TI_2801_CHIRP
 	/* interpolation coefficients */
 	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
 
 /* Mitsubishi M58817
-The Mitsubishi M58817 seems to have (partly?) copied the coefficients from the TMC0280/CD2801 above, but has some slight differences to it within the chip: the main accumulator seems to have 1 extra bit and the digital values are tapped 1 bit higher than on the TI chips. This is emulated within tms5110.c
+The Mitsubishi M58817 seems to have (partly?) copied the coefficients from the
+TMC0280/CD2801 above, but has some slight differences to it within the chip:
+the main accumulator seems to have 1 extra bit and the digital values are
+tapped 1 bit higher than on the TI chips. This is emulated within tms5110.c
    */
 static const struct tms5100_coeffs M58817_coeff =
 {
@@ -420,7 +441,7 @@ static const struct tms5100_coeffs M58817_coeff =
 	{
 	TI_2801_2501E_LPC
 	},
-	TI_0280_PATENT_CHIRP
+	TI_2801_CHIRP
 	/* interpolation coefficients */
 	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
@@ -448,7 +469,7 @@ static const struct tms5100_coeffs T0280F_2802_coeff =
 	/* interpolation coefficients */
 	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
-   
+
 /* TMS5110A:
    (1984-90 era? early chips may be called TMS5110C; later chips past 1988 or so may be called TSP5110A)
    The TMS5110A LPC coefficients were originally read from an actual TMS5110A
@@ -549,16 +570,17 @@ Note that the K coefficients are VERY different from the coefficients given
  in the US 4,335,277 patent, which may have been for some sort of prototype or
  otherwise intentionally scrambled. The energy and pitch tables, however, are
  identical to that patent.
-Also note, that the K coefficients are ALMOST identical to the coefficients from the CD2802.
-The interpolation coefficients still come from the patents pending verification
- of the interpolation counter circuit from the chip decap image.
+Also note, that the K coefficients are identical to the coefficients from the
+ CD2801 (which itself is almost identical to the CD2802).
 NOTE FROM DECAP: immediately to the left of each of the K1,2,3,4,5,and 6
  coefficients in the LPC rom are extra columns containing the constants
  -510, -502, 313, 318, or in hex 0x202, 0x20A, 0x139, 0x13E.
  Those EXACT constants DO appear (rather nonsensically) on the lpc table in US
  patent 4,335,277. They are likely related to the multiplicative interpolator
  described in us patent 4,419,540; whether the 5200/2501E and the 5220 or 5220C
- actually implement this interpolator or not is unclear.
+ actually implement this interpolator or not is unclear. This interpolator
+ seems intended for chips with variable frame rate, so it may only exist
+ on the TMS/TSP5220C and CD2501ECD.
 */
 
 static const struct tms5100_coeffs T0285_2501E_coeff =

@@ -1203,12 +1203,12 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block *block, compiler_stat
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
 			UINT32 sum = seqhead->opptr.l[0];
-			void *base = m_direct->read_decrypted_ptr(seqhead->physpc);
+			void *base = m_direct->read_ptr(seqhead->physpc);
 			UML_LOAD(block, uml::I0, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);             // load    i0,base,0,dword
 
 			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
-				base = m_direct->read_decrypted_ptr(seqhead->delay.first()->physpc);
+				base = m_direct->read_ptr(seqhead->delay.first()->physpc);
 				UML_LOAD(block, uml::I1, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);         // load    i1,base,dword
 				UML_ADD(block, uml::I0, uml::I0, uml::I1);                                 // add     i0,i0,i1
 
@@ -1224,20 +1224,20 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block *block, compiler_stat
 	else
 	{
 		UINT32 sum = 0;
-		void *base = m_direct->read_decrypted_ptr(seqhead->physpc);
+		void *base = m_direct->read_ptr(seqhead->physpc);
 		UML_LOAD(block, uml::I0, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);                 // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_decrypted_ptr(curdesc->physpc);
+				base = m_direct->read_ptr(curdesc->physpc);
 				UML_LOAD(block, uml::I1, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);         // load    i1,base,dword
 				UML_ADD(block, uml::I0, uml::I0, uml::I1);                                 // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
 				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
-					base = m_direct->read_decrypted_ptr(curdesc->delay.first()->physpc);
+					base = m_direct->read_ptr(curdesc->delay.first()->physpc);
 					UML_LOAD(block, uml::I1, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);     // load    i1,base,dword
 					UML_ADD(block, uml::I0, uml::I0, uml::I1);                             // add     i0,i0,i1
 					sum += curdesc->delay.first()->opptr.l[0];

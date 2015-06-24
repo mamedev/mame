@@ -625,6 +625,10 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas1x_bootleg_state )
+	AM_RANGE(0x000000, 0x0bffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 void segas1x_bootleg_state::datsu_set_pages(  )
 {
 	UINT16 page;
@@ -2159,6 +2163,7 @@ static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb1_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  sys16_interrupt)
 
 
@@ -2187,6 +2192,7 @@ static MACHINE_CONFIG_DERIVED( goldnaxeb2, goldnaxeb1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb2_map)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
 MACHINE_CONFIG_END
 
 
@@ -2202,6 +2208,7 @@ static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bayrouteb2_map)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
 
 	MCFG_FRAGMENT_ADD(system16_datsu_sound)
 
@@ -3462,28 +3469,23 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,wb3bbl)
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb1)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 	UINT8 *KEY = memregion("decryption")->base();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 data[0x1000];
+	UINT16 data[0x800];
 
 	// the decryption key is in a rom (part of an MSDOS executable...)
 	for (i = 0; i < 0x800; i++)
 	{
-		KEY[i] = KEY[i] ^ 0xff;
-		data[(i * 2) + 0] = ((KEY[i] & 0x80) >> 1) | ((KEY[i] & 0x40) >> 2) | ((KEY[i] & 0x20) >> 3) | ((KEY[i] & 0x10) >> 4);
-		data[(i * 2) + 1] = ((KEY[i] & 0x08) << 3) | ((KEY[i] & 0x04) << 2) | ((KEY[i] & 0x02) << 1) | ((KEY[i] & 0x01) << 0);
+		UINT8 k = KEY[i] ^ 0xff;
+		data[i] = ((k & 0x80) << 7) | ((k & 0x40) << 6) | ((k & 0x20) << 5) | ((k & 0x10) << 4) | ((k & 0x08) << 3) | ((k & 0x04) << 2) | ((k & 0x02) << 1) | ((k & 0x01) << 0);
 	}
 
-	m_decrypted_region = auto_alloc_array(machine(), UINT8, 0xc0000);
-	memcpy(m_decrypted_region, ROM, 0xc0000);
+	memcpy(m_decrypted_opcodes, ROM, 0xc0000);
 
-	for (i = 0; i < 0x40000; i++)
+	for (i = 0; i < 0x20000; i++)
 	{
-		m_decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
+		m_decrypted_opcodes[i] = ROM[i] ^ data[i & 0x7ff];
 	}
-
-	space.set_decrypted_region(0x00000, 0xbffff, m_decrypted_region);
 
 	DRIVER_INIT_CALL(common);
 
@@ -3499,23 +3501,20 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb1)
 	//
 	// for now we use the code which is present in the unprotected bootleg set
 	// and modify the rom to use it
-	UINT16 *ROM2;
-	UINT16 *decrypted_region2;
 
 	// decrypt
 	DRIVER_INIT_CALL(goldnaxeb1);
 
-	ROM2 = (UINT16*)memregion("maincpu")->base();
-	decrypted_region2 = (UINT16*)m_decrypted_region;
+	UINT16 *ROM = (UINT16*)memregion("maincpu")->base();
 
 	// patch interrupt vector
-	ROM2[0x0070/2] = 0x000b;
-	ROM2[0x0072/2] = 0xf000;
+	ROM[0x0070/2] = 0x000b;
+	ROM[0x0072/2] = 0xf000;
 
 	// patch check for code in RAM
-	decrypted_region2[0x107e/2] = 0x48e7;
-	decrypted_region2[0x1080/2] = 0x000b;
-	decrypted_region2[0x1082/2] = 0xf000;
+	m_decrypted_opcodes[0x107e/2] = 0x48e7;
+	m_decrypted_opcodes[0x1080/2] = 0x000b;
+	m_decrypted_opcodes[0x1082/2] = 0xf000;
 }
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb2)

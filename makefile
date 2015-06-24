@@ -89,6 +89,8 @@
 
 # QT_HOME = /usr/lib64/qt48/
 
+# DRIVERS = src/mame/drivers/1942.c,src/mame/drivers/cops.c
+
 -include useroptions.mak
 
 ###########################################################################
@@ -237,6 +239,15 @@ endif
 endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
+# Emscripten
+ifeq ($(findstring emcc,$(CC)),emcc)
+TARGETOS := asmjs
+ARCHITECTURE :=
 ifndef NOASM
 	NOASM := 1
 endif
@@ -597,6 +608,10 @@ ifdef QT_HOME
 PARAMS += --QT_HOME='$(QT_HOME)'
 endif
 
+ifdef DRIVERS
+PARAMS += --DRIVERS='$(DRIVERS)'
+endif
+
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------
@@ -619,9 +634,13 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/netlist.lua \
 	scripts/toolchain.lua \
 	scripts/src/osd/modules.lua \
-	scripts/target/$(TARGET)/$(SUBTARGET).lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
+
+ifndef DRIVERS
+SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET).lua
+endif
+
 ifdef REGENIE
 SCRIPTS+= regenie
 endif

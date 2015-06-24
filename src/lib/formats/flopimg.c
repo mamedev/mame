@@ -2565,7 +2565,7 @@ void floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const UINT8 *bi
 		}
 		// f8, f9, fa, fb
 		if(shift_reg == 0xf56a || shift_reg == 0xf56b ||
-		   shift_reg == 0xf56e || shift_reg == 0xf56f) {       // data mark
+			shift_reg == 0xf56e || shift_reg == 0xf56f) {       // data mark
 			if(dblk_count < 100)
 				dblk[dblk_count++] = i+1;
 		}

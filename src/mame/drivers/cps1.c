@@ -622,6 +622,10 @@ ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8, cps_state )   // used by cps2.
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("qsound_ram2")
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START( qsound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cps_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("decrypted")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sf2m3_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800010, 0x800011) AM_READ_PORT("IN1")            /* Player input ports */
@@ -3238,6 +3242,7 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 
 	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(qsound_decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250) // measured (cps2.c)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
@@ -11551,27 +11556,35 @@ DRIVER_INIT_MEMBER( cps_state, sf2m8 )
 	DRIVER_INIT_CALL(cps1);
 }
 
+void cps_state::kabuki_setup(void (*decode)(UINT8 *src, UINT8 *dst))
+{
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
+	UINT8 *rom = memregion("audiocpu")->base();
+	decode(rom, decrypt);
+	membank("decrypted")->set_base(decrypt);
+}
+
 DRIVER_INIT_MEMBER(cps_state,wof)
 {
-	wof_decode(machine());
+	kabuki_setup(wof_decode);
 	DRIVER_INIT_CALL(cps1);
 }
 
 DRIVER_INIT_MEMBER(cps_state,dino)
 {
-	dino_decode(machine());
+	kabuki_setup(dino_decode);
 	DRIVER_INIT_CALL(cps1);
 }
 
 DRIVER_INIT_MEMBER(cps_state,punisher)
 {
-	punisher_decode(machine());
+	kabuki_setup(punisher_decode);
 	DRIVER_INIT_CALL(cps1);
 }
 
 DRIVER_INIT_MEMBER(cps_state,slammast)
 {
-	slammast_decode(machine());
+	kabuki_setup(slammast_decode);
 	DRIVER_INIT_CALL(cps1);
 }
 

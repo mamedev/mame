@@ -3275,76 +3275,69 @@ f0012->84204    f0014->8420c    f0016->8400c
 
 ROM_START( rodland )
 	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
-	ROM_LOAD16_BYTE( "rl_02.rom", 0x000000, 0x020000, CRC(c7e00593) SHA1(055b7bcabf90ed6d5edc2797d0f85a5d49b8693b) )
-	ROM_LOAD16_BYTE( "rl_01.rom", 0x000001, 0x020000, CRC(2e748ca1) SHA1(285414af11aad36f3bd7020365ff90eb696d2de3) )
-	ROM_LOAD16_BYTE( "rl_03.rom", 0x040000, 0x010000, CRC(62fdf6d7) SHA1(ffde7e7f5b3b548bc980b9dee767f693046ecab2) )
-	ROM_LOAD16_BYTE( "rl_04.rom", 0x040001, 0x010000, CRC(44163c86) SHA1(1c56d79531af0312e7cd3dc66cf61b55dd1a6e51) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_2.ROM2", 0x000000, 0x020000, CRC(c7e00593) SHA1(055b7bcabf90ed6d5edc2797d0f85a5d49b8693b) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_1.ROM1", 0x000001, 0x020000, CRC(2e748ca1) SHA1(285414af11aad36f3bd7020365ff90eb696d2de3) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_3.ROM3", 0x040000, 0x010000, CRC(62fdf6d7) SHA1(ffde7e7f5b3b548bc980b9dee767f693046ecab2) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_4.ROM4", 0x040001, 0x010000, CRC(44163c86) SHA1(1c56d79531af0312e7cd3dc66cf61b55dd1a6e51) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
-	ROM_LOAD16_BYTE( "rl_05.rom", 0x000000, 0x010000, CRC(c1617c28) SHA1(1b3440055c083b74270fe06b5f42e7d1337efeca) )
-	ROM_LOAD16_BYTE( "rl_06.rom", 0x000001, 0x010000, CRC(663392b2) SHA1(99052639e934d1ca18888c9c7fa061c1d3508fd4) )
+		ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+		ROM_LOAD16_BYTE( "JALECO_ROD_LAND_5.ROM5", 0x000000, 0x010000, CRC(c1617c28) SHA1(1b3440055c083b74270fe06b5f42e7d1337efeca) )
+		ROM_LOAD16_BYTE( "JALECO_ROD_LAND_6.ROM6", 0x000001, 0x010000, CRC(663392b2) SHA1(99052639e934d1ca18888c9c7fa061c1d3508fd4) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
-	ROM_LOAD( "rl_23.rom", 0x000000, 0x020000, CRC(ac60e771) SHA1(97c2ac1ed89c171a0db98befa6c3c10754d64880) )
-	ROM_CONTINUE(          0x030000, 0x010000 )
-	ROM_CONTINUE(          0x050000, 0x010000 )
-	ROM_CONTINUE(          0x020000, 0x010000 )
-	ROM_CONTINUE(          0x040000, 0x010000 )
-	ROM_CONTINUE(          0x060000, 0x020000 )
+	ROM_LOAD( "LH534H31.ROM14", 0x000000, 0x080000, CRC(8201e1bb) SHA1(3304100dcab7b67cee021869a50f4295c8635814) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
-	ROM_LOAD( "rl_18.rom", 0x000000, 0x080000, CRC(f3b30ca6) SHA1(f2f88c24a009b6695f7548aebd37b25d1fd19892) )
+	ROM_LOAD( "LH534H32.ROM18", 0x000000, 0x080000, CRC(f3b30ca6) SHA1(f2f88c24a009b6695f7548aebd37b25d1fd19892) )
 
 	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
-	ROM_LOAD( "rl_19.bin", 0x000000, 0x020000, CRC(124d7e8f) SHA1(d7885a10085cc3389bd0e26e9d54adb8929218c0) )
+	ROM_LOAD( "LH2311J0.ROM19", 0x000000, 0x020000, CRC(124d7e8f) SHA1(d7885a10085cc3389bd0e26e9d54adb8929218c0) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
-	ROM_LOAD( "rl_14.rom", 0x000000, 0x080000, CRC(08d01bf4) SHA1(b9333d11572f46992cdd668908fbc1c33d841f8d) )
+	ROM_LOAD( "LH534H33.ROM23", 0x000000, 0x080000, CRC(936db174) SHA1(4dfb2c31bc4bbf659184fe18e320d19f326b3ec5) )
 
 	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
-	ROM_LOAD( "rl_10.rom", 0x000000, 0x040000, CRC(e1d1cd99) SHA1(6604111d37455c1bd59c1469d9ee7841e7dec913) )
+	ROM_LOAD( "LH5321T5.ROM10", 0x000000, 0x040000, CRC(e1d1cd99) SHA1(6604111d37455c1bd59c1469d9ee7841e7dec913) )
 
 	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
-	ROM_LOAD( "rl_08.rom", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
+	ROM_LOAD( "S202000DR.ROM8", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "rl.bin",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "PS89013A.M14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 
 ROM_START( rodlandj )
 	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
-	ROM_LOAD16_BYTE( "rl_2.bin", 0x000000, 0x020000, CRC(b1d2047e) SHA1(75d282b7614c5f4b76ab44e34fea9e87ab8b992c) )
-	ROM_LOAD16_BYTE( "rl_1.bin", 0x000001, 0x020000, CRC(3c47c2a3) SHA1(62e66a2f53aeacf92551ba64ae4ce14c2e982bb0) )
-	ROM_LOAD16_BYTE( "rl_3.bin", 0x040000, 0x010000, CRC(c5b1075f) SHA1(a8bcc0e9dbb4b731bc0b7e5a8e0efc3d142505b9) )
-	ROM_LOAD16_BYTE( "rl_4.bin", 0x040001, 0x010000, CRC(9ec61048) SHA1(71b6af054a528af04e23affff635a9358537cd3b) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_2.ROM2", 0x000000, 0x020000, CRC(b1d2047e) SHA1(75d282b7614c5f4b76ab44e34fea9e87ab8b992c) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_1.ROM1", 0x000001, 0x020000, CRC(3c47c2a3) SHA1(62e66a2f53aeacf92551ba64ae4ce14c2e982bb0) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_3.ROM3", 0x040000, 0x010000, CRC(c5b1075f) SHA1(a8bcc0e9dbb4b731bc0b7e5a8e0efc3d142505b9) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_4.ROM4", 0x040001, 0x010000, CRC(9ec61048) SHA1(71b6af054a528af04e23affff635a9358537cd3b) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
-	ROM_LOAD16_BYTE( "rl_05.rom", 0x000000, 0x010000, CRC(c1617c28) SHA1(1b3440055c083b74270fe06b5f42e7d1337efeca) )
-	ROM_LOAD16_BYTE( "rl_06.rom", 0x000001, 0x010000, CRC(663392b2) SHA1(99052639e934d1ca18888c9c7fa061c1d3508fd4) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_5.ROM5", 0x000000, 0x010000, CRC(c1617c28) SHA1(1b3440055c083b74270fe06b5f42e7d1337efeca) )
+	ROM_LOAD16_BYTE( "JALECO_ROD_LAND_6.ROM6", 0x000001, 0x010000, CRC(663392b2) SHA1(99052639e934d1ca18888c9c7fa061c1d3508fd4) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
-	/* address and data lines are mangled, but otherwise identical to rl_23.rom */
-	ROM_LOAD( "rl_14.bin", 0x000000, 0x080000, CRC(8201e1bb) SHA1(3304100dcab7b67cee021869a50f4295c8635814) )
+		ROM_LOAD( "LH534H31.ROM14", 0x000000, 0x080000, CRC(8201e1bb) SHA1(3304100dcab7b67cee021869a50f4295c8635814) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
-	ROM_LOAD( "rl_18.rom", 0x000000, 0x080000, CRC(f3b30ca6) SHA1(f2f88c24a009b6695f7548aebd37b25d1fd19892) )
+	ROM_LOAD( "LH534H32.ROM18", 0x000000, 0x080000, CRC(f3b30ca6) SHA1(f2f88c24a009b6695f7548aebd37b25d1fd19892) )
 
 	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
-	ROM_LOAD( "rl_19.bin", 0x000000, 0x020000, CRC(124d7e8f) SHA1(d7885a10085cc3389bd0e26e9d54adb8929218c0) )
+	ROM_LOAD( "LH2311J0.ROM19", 0x000000, 0x020000, CRC(124d7e8f) SHA1(d7885a10085cc3389bd0e26e9d54adb8929218c0) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
-	/* was a bad dump (first and second half identical), reconstructed from rl_14.rom */
-	ROM_LOAD( "rl_23.bin", 0x000000, 0x080000, CRC(936db174) SHA1(4dfb2c31bc4bbf659184fe18e320d19f326b3ec5) )
+		ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
+		ROM_LOAD( "LH534H33.ROM23", 0x000000, 0x080000, CRC(936db174) SHA1(4dfb2c31bc4bbf659184fe18e320d19f326b3ec5) )
 
 	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
-	ROM_LOAD( "rl_10.rom", 0x000000, 0x040000, CRC(e1d1cd99) SHA1(6604111d37455c1bd59c1469d9ee7841e7dec913) )
+	ROM_LOAD( "LH5321T5.ROM10", 0x000000, 0x040000, CRC(e1d1cd99) SHA1(6604111d37455c1bd59c1469d9ee7841e7dec913) )
 
 	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
-	ROM_LOAD( "rl_08.rom", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
+	ROM_LOAD( "S202000DR.ROM8", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "rl.bin",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "PS89013A.M14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 /* 100% identical to rodlandj, but not encrypted */
@@ -3361,31 +3354,26 @@ ROM_START( rodlandjb )
 	ROM_LOAD16_BYTE( "rl02.bin", 0x000000, 0x010000, CRC(d26eae8f) SHA1(1c6d514e6d006f78fa7b24d18a3eb4c5a4c5cbce) )
 	ROM_LOAD16_BYTE( "rl01.bin", 0x000001, 0x010000, CRC(04cf24bc) SHA1(e754cce3c83a7088daf90e753fbb0df9ef7fc9be) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
-	ROM_LOAD( "rl_23.rom", 0x000000, 0x020000, CRC(ac60e771) SHA1(97c2ac1ed89c171a0db98befa6c3c10754d64880) )
-	ROM_CONTINUE(          0x030000, 0x010000 )
-	ROM_CONTINUE(          0x050000, 0x010000 )
-	ROM_CONTINUE(          0x020000, 0x010000 )
-	ROM_CONTINUE(          0x040000, 0x010000 )
-	ROM_CONTINUE(          0x060000, 0x020000 )
+		ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
+		ROM_LOAD( "LH534H31.ROM14", 0x000000, 0x080000, CRC(8201e1bb) SHA1(3304100dcab7b67cee021869a50f4295c8635814) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
-	ROM_LOAD( "rl_18.rom", 0x000000, 0x080000, CRC(f3b30ca6) SHA1(f2f88c24a009b6695f7548aebd37b25d1fd19892) )
+		ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
+		ROM_LOAD( "LH534H32.ROM18", 0x000000, 0x080000, CRC(f3b30ca6) SHA1(f2f88c24a009b6695f7548aebd37b25d1fd19892) )
 
-	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
-	ROM_LOAD( "rl_19.bin", 0x000000, 0x020000, CRC(124d7e8f) SHA1(d7885a10085cc3389bd0e26e9d54adb8929218c0) )
+		ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
+		ROM_LOAD( "LH2311J0.ROM19", 0x000000, 0x020000, CRC(124d7e8f) SHA1(d7885a10085cc3389bd0e26e9d54adb8929218c0) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
-	ROM_LOAD( "rl_14.rom", 0x000000, 0x080000, CRC(08d01bf4) SHA1(b9333d11572f46992cdd668908fbc1c33d841f8d) )
+		ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
+		ROM_LOAD( "LH534H33.ROM23", 0x000000, 0x080000, CRC(936db174) SHA1(4dfb2c31bc4bbf659184fe18e320d19f326b3ec5) )
 
-	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
-	ROM_LOAD( "rl_10.rom", 0x000000, 0x040000, CRC(e1d1cd99) SHA1(6604111d37455c1bd59c1469d9ee7841e7dec913) )
+		ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+		ROM_LOAD( "LH5321T5.ROM10", 0x000000, 0x040000, CRC(e1d1cd99) SHA1(6604111d37455c1bd59c1469d9ee7841e7dec913) )
 
-	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
-	ROM_LOAD( "rl_08.rom", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
+		ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+		ROM_LOAD( "S202000DR.ROM8", 0x000000, 0x040000, CRC(8a49d3a7) SHA1(68cb8cf2753b39c253d0edaa8ef2c54fd1f6ebe5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "rl.bin",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+	ROM_LOAD( "PS89013A.M14",    0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
 
 
@@ -3679,7 +3667,7 @@ ROM_START( tshingen )
 ROM_END
 
 
-void megasys1_state::rodlandj_gfx_unmangle(const char *region)
+void megasys1_state::rodland_gfx_unmangle(const char *region)
 {
 	UINT8 *rom = memregion(region)->base();
 	int size = memregion(region)->bytes();
@@ -4003,15 +3991,24 @@ DRIVER_INIT_MEMBER(megasys1_state,phantasm)
 
 DRIVER_INIT_MEMBER(megasys1_state,rodland)
 {
+		rodland_gfx_unmangle("gfx1");
+		rodland_gfx_unmangle("gfx4");
+
 	rodland_rom_decode(machine(), "maincpu");
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,rodlandj)
 {
-	rodlandj_gfx_unmangle("gfx1");
-	rodlandj_gfx_unmangle("gfx4");
+	rodland_gfx_unmangle("gfx1");
+	rodland_gfx_unmangle("gfx4");
 
 	astyanax_rom_decode(machine(), "maincpu");
+}
+
+DRIVER_INIT_MEMBER(megasys1_state,rodlandjb)
+{
+	rodland_gfx_unmangle("gfx1");
+	rodland_gfx_unmangle("gfx4");
 }
 
 READ16_MEMBER(megasys1_state::soldamj_spriteram16_r)
@@ -4150,7 +4147,7 @@ GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, std
 GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", 0 )
 GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
-GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  driver_device,  0,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
+GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state,  rodlandjb,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
 GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
 GAME( 1990, monkelf,  avspirit, system_B,          avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", 0 )

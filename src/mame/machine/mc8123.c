@@ -377,46 +377,17 @@ static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
 	return decrypt(val,key[tbl_num + (opcode ? 0 : 0x1000)],opcode);
 }
 
-
-void mc8123_decrypt_rom(running_machine &machine, const char *cpu, const char *keyrgn, const char *bankname, int numbanks)
+void mc8123_decode(UINT8 *rom, UINT8 *opcodes, const UINT8 *key, int length)
 {
-	address_space &space = machine.device(cpu)->memory().space(AS_PROGRAM);
-	int fixed_length = numbanks == 1 ? 0xc000 : 0x8000;
-	UINT8 *decrypted1 = auto_alloc_array(machine, UINT8, fixed_length);
-	UINT8 *decrypted2 = numbanks > 1 ? auto_alloc_array(machine, UINT8, 0x4000 * numbanks) : 0;
-	UINT8 *rom = machine.root_device().memregion(cpu)->base();
-	UINT8 *key = machine.root_device().memregion(keyrgn)->base();
-	int A, bank;
-
-	space.set_decrypted_region(0x0000, fixed_length-1, decrypted1);
-
-	for (A = 0x0000;A < fixed_length;A++)
+	for (int A = 0x0000;A < length;A++)
 	{
+		int adr = A >= 0xc000 ? (A & 0x3fff) | 0x8000 : A;
 		UINT8 src = rom[A];
 
 		/* decode the opcodes */
-		decrypted1[A] = mc8123_decrypt(A,src,key,1);
+		opcodes[A] = mc8123_decrypt(adr,src,key,1);
 
 		/* decode the data */
-		rom[A] = mc8123_decrypt(A,src,key,0);
-	}
-
-	if (bankname != NULL)
-	{
-		machine.root_device().membank(bankname)->configure_decrypted_entries(0, numbanks, decrypted2, 0x4000);
-
-		for (bank = 0; bank < numbanks; ++bank)
-		{
-			for (A = 0x8000;A < 0xc000;A++)
-			{
-				UINT8 src = rom[0x8000 + 0x4000*bank + A];
-
-				/* decode the opcodes */
-				decrypted2[0x4000 * bank + (A-0x8000)] = mc8123_decrypt(A,src,key,1);
-
-				/* decode the data */
-				rom[0x8000 + 0x4000*bank + A] = mc8123_decrypt(A,src,key,0);
-			}
-		}
+		rom[A] = mc8123_decrypt(adr,src,key,0);
 	}
 }

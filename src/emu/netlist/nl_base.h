@@ -164,17 +164,14 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
-//typedef UINT8 netlist_sig_t;
-
-#define netlist_sig_t UINT8
+typedef UINT8 netlist_sig_t;
 
 //============================================================
 //  MACROS / netlist devices
 //============================================================
 
-#define NETLIB_NAMESPACE_DEVICES_START()	namespace netlist { namespace devices {
-
-#define NETLIB_NAMESPACE_DEVICES_END()	}}
+#define NETLIB_NAMESPACE_DEVICES_START()    namespace netlist { namespace devices {
+#define NETLIB_NAMESPACE_DEVICES_END()  }}
 
 #define NETLIB_NAME(_chip) nld_ ## _chip
 
@@ -274,7 +271,7 @@ namespace netlist
 {
 	namespace devices
 	{
-		class netlist_matrix_solver_t;
+		class matrix_solver_t;
 		class NETLIB_NAME(gnd);
 		class NETLIB_NAME(solver);
 		class NETLIB_NAME(mainclock);
@@ -294,7 +291,7 @@ namespace netlist
 		fatalerror_e(const char *format, va_list ap);
 		virtual ~fatalerror_e() throw() {}
 
-		 const pstring &text() { return m_text; }
+			const pstring &text() { return m_text; }
 	private:
 		pstring m_text;
 	};
@@ -303,9 +300,10 @@ namespace netlist
 	class analog_net_t;
 	class logic_net_t;
 	class net_t;
-	class netlist_setup_t;
+	class setup_t;
 	class netlist_t;
 	class core_device_t;
+	class param_model_t;
 
 	// -----------------------------------------------------------------------------
 	// netlist_output_family_t
@@ -314,6 +312,7 @@ namespace netlist
 	class logic_family_desc_t
 	{
 	public:
+		logic_family_desc_t() : m_is_static(false) {}
 		virtual ~logic_family_desc_t() {}
 		virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const = 0;
 
@@ -323,6 +322,10 @@ namespace netlist
 		nl_double m_high_V;
 		nl_double m_R_low;
 		nl_double m_R_high;
+
+		bool m_is_static;
+
+		static const logic_family_desc_t *from_model(const pstring &model);
 	};
 
 	class logic_family_t
@@ -428,7 +431,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 	// netlist_owned_object_t
 	// -----------------------------------------------------------------------------
-	
+
 	class owned_object_t : public object_t
 	{
 		NETLIST_PREVENT_COPYING(owned_object_t)
@@ -810,7 +813,7 @@ namespace netlist
 			return m_cur_Analog;
 		}
 
-		ATTR_HOT devices::netlist_matrix_solver_t *solver() { return m_solver; }
+		ATTR_HOT devices::matrix_solver_t *solver() { return m_solver; }
 
 		ATTR_COLD bool already_processed(list_t *groups, int cur_group);
 		ATTR_COLD void process_net(list_t *groups, int &cur_group);
@@ -828,7 +831,7 @@ namespace netlist
 		nl_double m_h_n_m_1;
 
 		//FIXME: needed by current solver code
-		devices::netlist_matrix_solver_t *m_solver;
+		devices::matrix_solver_t *m_solver;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -859,12 +862,12 @@ namespace netlist
 		logic_net_t m_my_net;
 	};
 
-	class netlist_analog_output_t : public netlist_analog_t
+	class analog_output_t : public netlist_analog_t
 	{
-		NETLIST_PREVENT_COPYING(netlist_analog_output_t)
+		NETLIST_PREVENT_COPYING(analog_output_t)
 	public:
 
-		ATTR_COLD netlist_analog_output_t();
+		ATTR_COLD analog_output_t();
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 		virtual void reset()
@@ -886,9 +889,9 @@ namespace netlist
 	// net_param_t
 	// -----------------------------------------------------------------------------
 
-	class netlist_param_t : public owned_object_t
+	class param_t : public owned_object_t
 	{
-		NETLIST_PREVENT_COPYING(netlist_param_t)
+		NETLIST_PREVENT_COPYING(param_t)
 	public:
 
 		enum param_type_t {
@@ -899,7 +902,7 @@ namespace netlist
 			LOGIC
 		};
 
-		ATTR_COLD netlist_param_t(const param_type_t atype);
+		ATTR_COLD param_t(const param_type_t atype);
 
 		ATTR_HOT  param_type_t param_type() const { return m_param_type; }
 
@@ -911,87 +914,57 @@ namespace netlist
 		const param_type_t m_param_type;
 	};
 
-	class netlist_param_double_t : public netlist_param_t
+	template <class C, param_t::param_type_t T>
+	class param_template_t : public param_t
 	{
-		NETLIST_PREVENT_COPYING(netlist_param_double_t)
+		NETLIST_PREVENT_COPYING(param_template_t)
 	public:
-		ATTR_COLD netlist_param_double_t();
+		ATTR_COLD param_template_t()
+		: param_t(T)
+		, m_param(C(0))
+		{
+		}
 
-		ATTR_HOT  void setTo(const nl_double param);
-		ATTR_COLD  void initial(const nl_double val) { m_param = val; }
-		ATTR_HOT  nl_double Value() const        { return m_param;   }
+		operator const C() const { return Value(); }
+
+		ATTR_HOT  void setTo(const C &param);
+		ATTR_COLD  void initial(const C &val) { m_param = val; }
+		ATTR_HOT  C Value() const { return m_param;   }
 
 	protected:
 		virtual void save_register()
 		{
-			save(NLNAME(m_param));
-			netlist_param_t::save_register();
+			/* pstrings not yet supported, these need special logic */
+			if (T != param_t::STRING && T != param_t::MODEL)
+				save(NLNAME(m_param));
+			param_t::save_register();
 		}
 
+		C m_param;
 	private:
-		nl_double m_param;
 	};
 
-	class netlist_param_int_t : public netlist_param_t
+	typedef param_template_t<nl_double, param_t::DOUBLE> param_double_t;
+	typedef param_template_t<int, param_t::INTEGER> param_int_t;
+	typedef param_template_t<pstring, param_t::STRING> param_str_t;
+
+	class param_logic_t : public param_int_t
 	{
-		NETLIST_PREVENT_COPYING(netlist_param_int_t)
+		NETLIST_PREVENT_COPYING(param_logic_t)
 	public:
-		ATTR_COLD netlist_param_int_t();
-
-		ATTR_HOT  void setTo(const int param);
-		ATTR_COLD  void initial(const int val) { m_param = val; }
-
-		ATTR_HOT  int Value() const     { return m_param;     }
-
-	protected:
-		virtual void save_register()
-		{
-			save(NLNAME(m_param));
-			netlist_param_t::save_register();
-		}
-
-	private:
-		int m_param;
+		ATTR_COLD param_logic_t() : param_int_t() { };
 	};
 
-	class netlist_param_logic_t : public netlist_param_int_t
+	class param_model_t : public param_template_t<pstring, param_t::MODEL>
 	{
-		NETLIST_PREVENT_COPYING(netlist_param_logic_t)
+		NETLIST_PREVENT_COPYING(param_model_t)
 	public:
-		ATTR_COLD netlist_param_logic_t();
-	};
-
-	class netlist_param_str_t : public netlist_param_t
-	{
-		NETLIST_PREVENT_COPYING(netlist_param_str_t)
-	public:
-		ATTR_COLD netlist_param_str_t();
-
-		ATTR_HOT  void setTo(const pstring &param);
-		ATTR_COLD  void initial(const pstring &val) { m_param = val; }
-
-		ATTR_HOT  const pstring &Value() const     { return m_param;     }
-
-	private:
-		pstring m_param;
-	};
-
-	class netlist_param_model_t : public netlist_param_t
-	{
-		NETLIST_PREVENT_COPYING(netlist_param_model_t)
-	public:
-		ATTR_COLD netlist_param_model_t();
-
-		ATTR_COLD  void initial(const pstring &val) { m_param = val; }
-
-		ATTR_HOT  const pstring &Value() const     { return m_param;     }
+		ATTR_COLD param_model_t() : param_template_t<pstring, param_t::MODEL>() { }
 
 		/* these should be cached! */
 		ATTR_COLD nl_double model_value(const pstring &entity, const nl_double defval = 0.0) const;
+		ATTR_COLD const pstring model_value_str(const pstring &entity, const pstring defval = "") const;
 		ATTR_COLD const pstring model_type() const;
-
-	private:
-		pstring m_param;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1047,7 +1020,7 @@ namespace netlist
 
 		ATTR_HOT  nl_double TERMANALOG(const terminal_t &term) const { return term.net().as_analog().Q_Analog(); }
 
-		ATTR_HOT  void OUTANALOG(netlist_analog_output_t &out, const nl_double val)
+		ATTR_HOT  void OUTANALOG(analog_output_t &out, const nl_double val)
 		{
 			out.set_Q(val);
 		}
@@ -1102,12 +1075,12 @@ namespace netlist
 
 		virtual void init(netlist_t &anetlist, const pstring &name);
 
-		ATTR_COLD netlist_setup_t &setup();
+		ATTR_COLD setup_t &setup();
 
 		ATTR_COLD void register_sub(const pstring &name, device_t &dev);
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
 		ATTR_COLD void register_terminal(const pstring &name, terminal_t &port);
-		ATTR_COLD void register_output(const pstring &name, netlist_analog_output_t &out);
+		ATTR_COLD void register_output(const pstring &name, analog_output_t &out);
 		ATTR_COLD void register_output(const pstring &name, logic_output_t &out);
 		ATTR_COLD void register_input(const pstring &name, analog_input_t &in);
 		ATTR_COLD void register_input(const pstring &name, logic_input_t &in);
@@ -1133,7 +1106,7 @@ namespace netlist
 	// netlist_queue_t
 	// -----------------------------------------------------------------------------
 
-	class queue_t : public netlist_timed_queue<net_t *, netlist_time>,
+	class queue_t : public timed_queue<net_t *, netlist_time>,
 							public object_t,
 							public pstate_callback_t
 	{
@@ -1187,8 +1160,8 @@ namespace netlist
 
 		ATTR_COLD void rebuild_lists(); /* must be called after post_load ! */
 
-		ATTR_COLD void set_setup(netlist_setup_t *asetup) { m_setup = asetup;  }
-		ATTR_COLD netlist_setup_t &setup() { return *m_setup; }
+		ATTR_COLD void set_setup(setup_t *asetup) { m_setup = asetup;  }
+		ATTR_COLD setup_t &setup() { return *m_setup; }
 
 		ATTR_COLD net_t *find_net(const pstring &name);
 
@@ -1283,7 +1256,7 @@ namespace netlist
 
 
 		devices::NETLIB_NAME(netlistparams) *m_params;
-		netlist_setup_t *m_setup;
+		setup_t *m_setup;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1292,22 +1265,8 @@ namespace netlist
 
 	PSTATE_INTERFACE(object_t, m_netlist, name())
 
-	ATTR_HOT inline void netlist_param_str_t::setTo(const pstring &param)
-	{
-		m_param = param;
-		netdev().update_param();
-	}
-
-	ATTR_HOT inline void netlist_param_int_t::setTo(const int param)
-	{
-		if (m_param != param)
-		{
-			m_param = param;
-			netdev().update_param();
-		}
-	}
-
-	ATTR_HOT inline void netlist_param_double_t::setTo(const nl_double param)
+	template <class C, param_t::param_type_t T>
+	ATTR_HOT inline void param_template_t<C, T>::setTo(const C &param)
 	{
 		if (m_param != param)
 		{
@@ -1416,7 +1375,7 @@ namespace netlist
 		return net().as_analog().Q_Analog();
 	}
 
-	ATTR_HOT inline void netlist_analog_output_t::set_Q(const nl_double newQ)
+	ATTR_HOT inline void analog_output_t::set_Q(const nl_double newQ)
 	{
 		if (newQ != net().as_analog().m_cur_Analog)
 		{

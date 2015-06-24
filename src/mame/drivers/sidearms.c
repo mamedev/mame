@@ -978,7 +978,7 @@ ROM_START( turtshipk )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "t-4.8a",        0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
 
-	ROM_REGION( 0x04000, "gfx1", 0 ) /* Really a 27128? */ 
+	ROM_REGION( 0x04000, "gfx1", 0 ) /* Really a 27128? */
 	ROM_LOAD( "turtship.005",  0x00000, 0x04000, CRC(651fef75) SHA1(9c821a2ee30c222987f0d4192133776490d6a4e0) ) /* characters */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
@@ -1002,69 +1002,69 @@ ROM_START( turtshipk )
 ROM_END
 
 ROM_START( turtshipko )
-        ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
-        ROM_LOAD( "T-3.G5",  0x00000, 0x08000, CRC(cd789535) SHA1(3c4f94c751645b61066177fbf3157924ad177c32) )
-        ROM_LOAD( "T-2.G3",  0x08000, 0x08000, CRC(253678c0) SHA1(1470fd936003462d480c759658628ea085d4bd71) )
-        ROM_LOAD( "T-1.E3",  0x10000, 0x08000, CRC(d6fdc376) SHA1(3f4e1fde8b83e3762f9499dfe291309efe940093) )
+		ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
+		ROM_LOAD( "T-3.G5",  0x00000, 0x08000, CRC(cd789535) SHA1(3c4f94c751645b61066177fbf3157924ad177c32) )
+		ROM_LOAD( "T-2.G3",  0x08000, 0x08000, CRC(253678c0) SHA1(1470fd936003462d480c759658628ea085d4bd71) )
+		ROM_LOAD( "T-1.E3",  0x10000, 0x08000, CRC(d6fdc376) SHA1(3f4e1fde8b83e3762f9499dfe291309efe940093) )
 
-        ROM_REGION( 0x10000, "audiocpu", 0 )
-        ROM_LOAD( "T-4.A8",        0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
+		ROM_REGION( 0x10000, "audiocpu", 0 )
+		ROM_LOAD( "T-4.A8",        0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
 
-        ROM_REGION( 0x04000, "gfx1", 0 )
-        ROM_LOAD( "T-5.K8",  0x00000, 0x04000, CRC(35c3dbc5) SHA1(6700c72e5e0f7bd1429d342cb5d3daccd6b1b70f) ) /* characters */
-        ROM_CONTINUE(          0x00000, 0x04000 )   /* A14 tied high, only upper half is used */
+		ROM_REGION( 0x04000, "gfx1", 0 )
+		ROM_LOAD( "T-5.K8",  0x00000, 0x04000, CRC(35c3dbc5) SHA1(6700c72e5e0f7bd1429d342cb5d3daccd6b1b70f) ) /* characters */
+		ROM_CONTINUE(          0x00000, 0x04000 )   /* A14 tied high, only upper half is used */
 
-        ROM_REGION( 0x80000, "gfx2", 0 )
-        ROM_LOAD( "T-8.D1",  0x00000, 0x10000, CRC(2f0b2336) SHA1(a869e0a50aab7d29afbca46fa04bd470488a8eeb) ) /* tiles */
-        ROM_LOAD( "T-10.C3",       0x10000, 0x10000, CRC(6a0072f4) SHA1(d74b53ed90a4d01020a179f263a39b7547b8f82e) )
-        ROM_RELOAD( 0x30000,       0x10000)
-        ROM_LOAD( "T-11.D3",       0x20000, 0x10000, CRC(53da6cb1) SHA1(52720746298adb01828f959f81b385d268c94343) )
-        ROM_LOAD( "T-6.A1",  0x40000, 0x10000, CRC(a7cce654) SHA1(f6c99622dcacc1d76021ca29b0bbceefbb75c499) )
-        ROM_LOAD( "T-7.C1",        0x50000, 0x10000, CRC(90dd8415) SHA1(8e9d43ff9164fb287ab82df7da8890976b9d21c7) )
-        ROM_RELOAD( 0x70000,       0x10000)
-        ROM_LOAD( "T-9.A3",        0x60000, 0x10000, CRC(44762916) SHA1(3427066fc02d1b9b71a59ac41d3332d5cd8d1423) )
+		ROM_REGION( 0x80000, "gfx2", 0 )
+		ROM_LOAD( "T-8.D1",  0x00000, 0x10000, CRC(2f0b2336) SHA1(a869e0a50aab7d29afbca46fa04bd470488a8eeb) ) /* tiles */
+		ROM_LOAD( "T-10.C3",       0x10000, 0x10000, CRC(6a0072f4) SHA1(d74b53ed90a4d01020a179f263a39b7547b8f82e) )
+		ROM_RELOAD( 0x30000,       0x10000)
+		ROM_LOAD( "T-11.D3",       0x20000, 0x10000, CRC(53da6cb1) SHA1(52720746298adb01828f959f81b385d268c94343) )
+		ROM_LOAD( "T-6.A1",  0x40000, 0x10000, CRC(a7cce654) SHA1(f6c99622dcacc1d76021ca29b0bbceefbb75c499) )
+		ROM_LOAD( "T-7.C1",        0x50000, 0x10000, CRC(90dd8415) SHA1(8e9d43ff9164fb287ab82df7da8890976b9d21c7) )
+		ROM_RELOAD( 0x70000,       0x10000)
+		ROM_LOAD( "T-9.A3",        0x60000, 0x10000, CRC(44762916) SHA1(3427066fc02d1b9b71a59ac41d3332d5cd8d1423) )
 
-        ROM_REGION( 0x40000, "gfx3", 0 )
-        ROM_LOAD( "T-13.I1",       0x00000, 0x10000, CRC(1cc87f50) SHA1(d7d8a4376b556675dafa0a407bb34b6017f17e7d) ) /* sprites */
-        ROM_LOAD( "T-15.I3",       0x10000, 0x10000, CRC(775ee5d9) SHA1(e39eb558cc2d5cdf4c87b96f85af72e5600b995e) )
-        ROM_LOAD( "T-12.G1",       0x20000, 0x10000, CRC(57783312) SHA1(57942e8c3b7be63ea62bae3c104cb2842eb6b755) )
-        ROM_LOAD( "T-14.G3",       0x30000, 0x10000, CRC(a30e3346) SHA1(150a837fb5d4705df9e8e9a94f78cff0e1c57d64) )
+		ROM_REGION( 0x40000, "gfx3", 0 )
+		ROM_LOAD( "T-13.I1",       0x00000, 0x10000, CRC(1cc87f50) SHA1(d7d8a4376b556675dafa0a407bb34b6017f17e7d) ) /* sprites */
+		ROM_LOAD( "T-15.I3",       0x10000, 0x10000, CRC(775ee5d9) SHA1(e39eb558cc2d5cdf4c87b96f85af72e5600b995e) )
+		ROM_LOAD( "T-12.G1",       0x20000, 0x10000, CRC(57783312) SHA1(57942e8c3b7be63ea62bae3c104cb2842eb6b755) )
+		ROM_LOAD( "T-14.G3",       0x30000, 0x10000, CRC(a30e3346) SHA1(150a837fb5d4705df9e8e9a94f78cff0e1c57d64) )
 
-        ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
-        ROM_LOAD( "T-16.F9",  0x00000, 0x08000, CRC(9b377277) SHA1(4858560e35144727aea958023f3df785baa994a8) )
+		ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
+		ROM_LOAD( "T-16.F9",  0x00000, 0x08000, CRC(9b377277) SHA1(4858560e35144727aea958023f3df785baa994a8) )
 ROM_END
 
 ROM_START( turtshipkn )
-        ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
-        ROM_LOAD( "T-3.G5",   0x00000, 0x08000, CRC(529b091c) SHA1(9a3a885dbf1f9d3c3c326418efdcb4f6f96eb4ae) )
-        ROM_LOAD( "T-2.G3",    0x08000, 0x08000, CRC(d2f30195) SHA1(d64f088ed776658563943e8cde086842d0d899f8) )
-        ROM_LOAD( "T-1.E3",   0x10000, 0x08000, CRC(2d02da90) SHA1(5cf059e04e145861f9877cefa2c7168e6ded19ac) )
+		ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
+		ROM_LOAD( "T-3.G5",   0x00000, 0x08000, CRC(529b091c) SHA1(9a3a885dbf1f9d3c3c326418efdcb4f6f96eb4ae) )
+		ROM_LOAD( "T-2.G3",    0x08000, 0x08000, CRC(d2f30195) SHA1(d64f088ed776658563943e8cde086842d0d899f8) )
+		ROM_LOAD( "T-1.E3",   0x10000, 0x08000, CRC(2d02da90) SHA1(5cf059e04e145861f9877cefa2c7168e6ded19ac) )
 
-        ROM_REGION( 0x10000, "audiocpu", 0 )
-        ROM_LOAD( "T-4.A8",    0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
+		ROM_REGION( 0x10000, "audiocpu", 0 )
+		ROM_LOAD( "T-4.A8",    0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
 
-        ROM_REGION( 0x04000, "gfx1", 0 )
-        ROM_LOAD( "T-5.K8",    0x00000, 0x04000, CRC(5c2ee02d) SHA1(c8d3dbdaab943c1639795915cf275951501a2a77) ) /* characters */
-        ROM_CONTINUE(          0x00000, 0x04000 )   /* A14 tied high, only upper half is used */
+		ROM_REGION( 0x04000, "gfx1", 0 )
+		ROM_LOAD( "T-5.K8",    0x00000, 0x04000, CRC(5c2ee02d) SHA1(c8d3dbdaab943c1639795915cf275951501a2a77) ) /* characters */
+		ROM_CONTINUE(          0x00000, 0x04000 )   /* A14 tied high, only upper half is used */
 
-        ROM_REGION( 0x80000, "gfx2", 0 )
-        ROM_LOAD( "T-8.D1",  0x00000, 0x10000, CRC(2f0b2336) SHA1(a869e0a50aab7d29afbca46fa04bd470488a8eeb) ) /* tiles */
-        ROM_LOAD( "T-10.C3",       0x10000, 0x10000, CRC(6a0072f4) SHA1(d74b53ed90a4d01020a179f263a39b7547b8f82e) )
-        ROM_RELOAD( 0x30000,       0x10000)
-        ROM_LOAD( "T-11.D3",       0x20000, 0x10000, CRC(53da6cb1) SHA1(52720746298adb01828f959f81b385d268c94343) )
-        ROM_LOAD( "T-6.A1",  0x40000, 0x10000, CRC(a7cce654) SHA1(f6c99622dcacc1d76021ca29b0bbceefbb75c499) )
-        ROM_LOAD( "T-7.C1",        0x50000, 0x10000, CRC(90dd8415) SHA1(8e9d43ff9164fb287ab82df7da8890976b9d21c7) )
-        ROM_RELOAD( 0x70000,       0x10000)
-        ROM_LOAD( "T-9.A3",        0x60000, 0x10000, CRC(44762916) SHA1(3427066fc02d1b9b71a59ac41d3332d5cd8d1423) )
+		ROM_REGION( 0x80000, "gfx2", 0 )
+		ROM_LOAD( "T-8.D1",  0x00000, 0x10000, CRC(2f0b2336) SHA1(a869e0a50aab7d29afbca46fa04bd470488a8eeb) ) /* tiles */
+		ROM_LOAD( "T-10.C3",       0x10000, 0x10000, CRC(6a0072f4) SHA1(d74b53ed90a4d01020a179f263a39b7547b8f82e) )
+		ROM_RELOAD( 0x30000,       0x10000)
+		ROM_LOAD( "T-11.D3",       0x20000, 0x10000, CRC(53da6cb1) SHA1(52720746298adb01828f959f81b385d268c94343) )
+		ROM_LOAD( "T-6.A1",  0x40000, 0x10000, CRC(a7cce654) SHA1(f6c99622dcacc1d76021ca29b0bbceefbb75c499) )
+		ROM_LOAD( "T-7.C1",        0x50000, 0x10000, CRC(90dd8415) SHA1(8e9d43ff9164fb287ab82df7da8890976b9d21c7) )
+		ROM_RELOAD( 0x70000,       0x10000)
+		ROM_LOAD( "T-9.A3",        0x60000, 0x10000, CRC(44762916) SHA1(3427066fc02d1b9b71a59ac41d3332d5cd8d1423) )
 
-        ROM_REGION( 0x40000, "gfx3", 0 )
-        ROM_LOAD( "T-13.I1",       0x00000, 0x10000, CRC(1cc87f50) SHA1(d7d8a4376b556675dafa0a407bb34b6017f17e7d) ) /* sprites */
-        ROM_LOAD( "T-15.I3",       0x10000, 0x10000, CRC(3bf91fb8) SHA1(1c8368dc8d52c3c48a85391f00c91a80fa5d781d) )
-        ROM_LOAD( "T-12.G1",       0x20000, 0x10000, CRC(57783312) SHA1(57942e8c3b7be63ea62bae3c104cb2842eb6b755) )
-        ROM_LOAD( "T-14.G3",       0x30000, 0x10000, CRC(ee162dc0) SHA1(127b3cb3ddd47aa8ee70cad2d54b1306ad8f10e8) )
+		ROM_REGION( 0x40000, "gfx3", 0 )
+		ROM_LOAD( "T-13.I1",       0x00000, 0x10000, CRC(1cc87f50) SHA1(d7d8a4376b556675dafa0a407bb34b6017f17e7d) ) /* sprites */
+		ROM_LOAD( "T-15.I3",       0x10000, 0x10000, CRC(3bf91fb8) SHA1(1c8368dc8d52c3c48a85391f00c91a80fa5d781d) )
+		ROM_LOAD( "T-12.G1",       0x20000, 0x10000, CRC(57783312) SHA1(57942e8c3b7be63ea62bae3c104cb2842eb6b755) )
+		ROM_LOAD( "T-14.G3",       0x30000, 0x10000, CRC(ee162dc0) SHA1(127b3cb3ddd47aa8ee70cad2d54b1306ad8f10e8) )
 
-        ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
-        ROM_LOAD( "T-16.F9",  0x00000, 0x08000, CRC(9b377277) SHA1(4858560e35144727aea958023f3df785baa994a8) )
+		ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
+		ROM_LOAD( "T-16.F9",  0x00000, 0x08000, CRC(9b377277) SHA1(4858560e35144727aea958023f3df785baa994a8) )
 ROM_END
 
 

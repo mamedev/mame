@@ -51,7 +51,7 @@
 		NET_C(_G,  _name.G)                                                    \
 		NET_C(_OUT, _name.Q)
 
-#define OPTIMIZE_FRONTIER(_attach, _r_in, _r_out)							   \
+#define OPTIMIZE_FRONTIER(_attach, _r_in, _r_out)                              \
 		setup.register_frontier(# _attach, _r_in, _r_out);
 
 #define RES_SWITCH(_name, _IN, _P1, _P2)                                       \
@@ -72,7 +72,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE_WITH_PARAMS(netlistparams,
 public:
-		netlist_param_logic_t m_use_deactivate;
+		param_logic_t m_use_deactivate;
 );
 
 // -----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ NETLIB_DEVICE_WITH_PARAMS(mainclock,
 public:
 	logic_output_t m_Q;
 
-	netlist_param_double_t m_freq;
+	param_double_t m_freq;
 	netlist_time m_inc;
 
 	ATTR_HOT inline static void mc_update(logic_net_t &net);
@@ -97,7 +97,7 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 	logic_input_t m_feedback;
 	logic_output_t m_Q;
 
-	netlist_param_double_t m_freq;
+	param_double_t m_freq;
 	netlist_time m_inc;
 );
 
@@ -109,9 +109,9 @@ NETLIB_DEVICE_WITH_PARAMS(extclock,
 	logic_input_t m_feedback;
 	logic_output_t m_Q;
 
-	netlist_param_double_t m_freq;
-	netlist_param_str_t m_pattern;
-	netlist_param_double_t m_offset;
+	param_double_t m_freq;
+	param_str_t m_pattern;
+	param_double_t m_offset;
 
 	UINT8 m_cnt;
 	UINT8 m_size;
@@ -126,13 +126,13 @@ NETLIB_DEVICE_WITH_PARAMS(extclock,
 NETLIB_DEVICE_WITH_PARAMS(ttl_input,
 	logic_output_t m_Q;
 
-	netlist_param_logic_t m_IN;
+	param_logic_t m_IN;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(analog_input,
-	netlist_analog_output_t m_Q;
+	analog_output_t m_Q;
 
-	netlist_param_double_t m_IN;
+	param_double_t m_IN;
 );
 
 // -----------------------------------------------------------------------------
@@ -164,7 +164,7 @@ protected:
 	}
 
 private:
-	netlist_analog_output_t m_Q;
+	analog_output_t m_Q;
 
 };
 
@@ -245,10 +245,10 @@ private:
 	NETLIB_NAME(twoterm) m_RIN;
 	NETLIB_NAME(twoterm) m_ROUT;
 	analog_input_t m_I;
-	netlist_analog_output_t m_Q;
+	analog_output_t m_Q;
 
-	netlist_param_double_t m_p_RIN;
-	netlist_param_double_t m_p_ROUT;
+	param_double_t m_p_RIN;
+	param_double_t m_p_ROUT;
 };
 
 // -----------------------------------------------------------------------------
@@ -263,8 +263,8 @@ public:
 
 	virtual ~NETLIB_NAME(res_sw)() {}
 
-	netlist_param_double_t m_RON;
-	netlist_param_double_t m_ROFF;
+	param_double_t m_RON;
+	param_double_t m_ROFF;
 	logic_input_t m_I;
 	NETLIB_NAME(R) m_R;
 
@@ -342,6 +342,7 @@ protected:
 
 	ATTR_HOT void update()
 	{
+		//printf("%s: %f\n", name().cstr(), m_I.Q_Analog());
 		if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
 			OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
 		else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
@@ -402,7 +403,7 @@ protected:
 	ATTR_HOT void update();
 
 private:
-	netlist_analog_output_t m_Q;
+	analog_output_t m_Q;
 	nld_twoterm m_RV;
 	int m_last_state;
 	bool m_is_timestep;

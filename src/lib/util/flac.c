@@ -609,15 +609,15 @@ FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame 
 }
 
 /**
- * @fn	void flac_decoder::error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
+ * @fn  void flac_decoder::error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
  *
- * @brief	-------------------------------------------------
- * 			  error_callback - handle errors (ignore them)
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            error_callback - handle errors (ignore them)
+ *          -------------------------------------------------.
  *
- * @param	decoder			   	The decoder.
- * @param	status			   	The status.
- * @param [in,out]	client_data	If non-null, information describing the client.
+ * @param   decoder             The decoder.
+ * @param   status              The status.
+ * @param [in,out]  client_data If non-null, information describing the client.
  */
 
 void flac_decoder::error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)

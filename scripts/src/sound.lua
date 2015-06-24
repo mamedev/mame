@@ -12,10 +12,10 @@
 
 ---------------------------------------------------
 -- DACs
---@src/emu/sound/dac.h,SOUNDS += DAC
---@src/emu/sound/dmadac.h,SOUNDS += DMADAC
---@src/emu/sound/speaker.h,SOUNDS += SPEAKER
---@src/emu/sound/beep.h,SOUNDS += BEEP
+--@src/emu/sound/dac.h,SOUNDS["DAC"] = true
+--@src/emu/sound/dmadac.h,SOUNDS["DMADAC"] = true
+--@src/emu/sound/speaker.h,SOUNDS["SPEAKER"] = true
+--@src/emu/sound/beep.h,SOUNDS["BEEP"] = true
 ---------------------------------------------------
 
 if (SOUNDS["DAC"]~=null) then
@@ -50,7 +50,7 @@ end
 
 ---------------------------------------------------
 -- CD audio
---@src/emu/sound/cdda.h,SOUNDS += CDDA
+--@src/emu/sound/cdda.h,SOUNDS["CDDA"] = true
 ---------------------------------------------------
 
 if (SOUNDS["CDDA"]~=null) then
@@ -64,7 +64,7 @@ end
 
 ---------------------------------------------------
 -- Discrete component audio
---@src/emu/sound/discrete.h,SOUNDS += DISCRETE
+--@src/emu/sound/discrete.h,SOUNDS["DISCRETE"] = true
 ---------------------------------------------------
 
 if (SOUNDS["DISCRETE"]~=null) then
@@ -87,7 +87,7 @@ end
 
 ---------------------------------------------------
 -- AC97
---@src/emu/sound/pic-ac97.h,SOUNDS += AC97
+--@src/emu/sound/pic-ac97.h,SOUNDS["AC97"] = true
 ---------------------------------------------------
 
 if (SOUNDS["AC97"]~=null) then
@@ -101,8 +101,8 @@ end
 
 ---------------------------------------------------
 -- Apple custom sound chips
---@src/emu/sound/asc.h,SOUNDS += ASC
---@src/emu/sound/awacs.h,SOUNDS += AWACS
+--@src/emu/sound/asc.h,SOUNDS["ASC"] = true
+--@src/emu/sound/awacs.h,SOUNDS["AWACS"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ASC"]~=null) then
@@ -122,8 +122,8 @@ end
 
 ---------------------------------------------------
 -- Atari custom sound chips
---@src/emu/sound/pokey.h,SOUNDS += POKEY
---@src/emu/sound/tiaintf.h,SOUNDS += TIA
+--@src/emu/sound/pokey.h,SOUNDS["POKEY"] = true
+--@src/emu/sound/tiaintf.h,SOUNDS["TIA"] = true
 ---------------------------------------------------
 
 if (SOUNDS["POKEY"]~=null) then
@@ -146,7 +146,7 @@ end
 
 ---------------------------------------------------
 -- Amiga audio hardware
---@src/emu/sound/amiga.h,SOUNDS += AMIGA
+--@src/emu/sound/amiga.h,SOUNDS["AMIGA"] = true
 ---------------------------------------------------
 
 if (SOUNDS["AMIGA"]~=null) then
@@ -160,7 +160,7 @@ end
 
 ---------------------------------------------------
 -- Bally Astrocade sound system
---@src/emu/sound/astrocde.h,SOUNDS += ASTROCADE
+--@src/emu/sound/astrocde.h,SOUNDS["ASTROCADE"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ASTROCADE"]~=null) then
@@ -175,7 +175,7 @@ end
 ---------------------------------------------------
 ---------------------------------------------------
 -- AC97
---@src/emu/sound/pic-ac97.h,SOUNDS += AC97
+--@src/emu/sound/pic-ac97.h,SOUNDS["AC97"] = true
 ---------------------------------------------------
 
 if (SOUNDS["AC97"]~=null) then
@@ -185,7 +185,7 @@ if (SOUNDS["AC97"]~=null) then
 	}
 end
 -- CEM 3394 analog synthesizer chip
---@src/emu/sound/cem3394.h,SOUNDS += CEM3394
+--@src/emu/sound/cem3394.h,SOUNDS["CEM3394"] = true
 ---------------------------------------------------
 
 if (SOUNDS["CEM3394"]~=null) then
@@ -199,7 +199,7 @@ end
 
 ---------------------------------------------------
 -- Creative Labs SB0400 Audigy2 Value
---@src/emu/sound/sb0400.h,SOUNDS += AC97
+--@src/emu/sound/sb0400.h,SOUNDS["SB0400"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SB0400"]~=null) then
@@ -212,7 +212,7 @@ end
 
 --------------------------------------------------
 -- Creative Labs Ensonic AudioPCI97 ES1373
---@src/emu/sound/es1373.h,SOUNDS += ES1373
+--@src/emu/sound/es1373.h,SOUNDS["ES1373"] = true
 --------------------------------------------------
 
 if (SOUNDS["ES1373"]~=null) then
@@ -224,7 +224,7 @@ end
 
 ---------------------------------------------------
 -- Data East custom sound chips
---@src/emu/sound/bsmt2000.h,SOUNDS += BSMT2000
+--@src/emu/sound/bsmt2000.h,SOUNDS["BSMT2000"] = true
 ---------------------------------------------------
 
 if (SOUNDS["BSMT2000"]~=null) then
@@ -238,7 +238,7 @@ end
 
 ---------------------------------------------------
 -- Ensoniq 5503 (Apple IIgs)
---@src/emu/sound/es5503.h,SOUNDS += ES5503
+--@src/emu/sound/es5503.h,SOUNDS["ES5503"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ES5503"]~=null) then
@@ -252,7 +252,7 @@ end
 
 ---------------------------------------------------
 -- Ensoniq 5505/5506
---@src/emu/sound/es5506.h,SOUNDS += ES5505
+--@src/emu/sound/es5506.h,SOUNDS["ES5505"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ES5505"]~=null or SOUNDS["ES5506"]~=null) then
@@ -265,7 +265,7 @@ end
 
 ---------------------------------------------------
 -- Ensoniq "pump" device, interfaces 5505/5506 with 5510
---@src/emu/sound/esqpump.h,SOUNDS += ESQPUMP
+--@src/emu/sound/esqpump.h,SOUNDS["ESQPUMP"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ESQPUMP"]~=null) then
@@ -278,7 +278,7 @@ end
 
 ---------------------------------------------------
 -- Excellent Systems ADPCM sound chip
---@src/emu/sound/es8712.h,SOUNDS += ES8712
+--@src/emu/sound/es8712.h,SOUNDS["ES8712"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ES8712"]~=null) then
@@ -292,7 +292,7 @@ end
 
 ---------------------------------------------------
 -- Gaelco custom sound chips
---@src/emu/sound/gaelco.h,SOUNDS += GAELCO_CG1V
+--@src/emu/sound/gaelco.h,SOUNDS["GAELCO_CG1V"] = true
 ---------------------------------------------------
 
 if (SOUNDS["GAELCO_CG1V"]~=null or SOUNDS["GAELCO_GAE1"]~=null) then
@@ -305,7 +305,7 @@ end
 
 ---------------------------------------------------
 -- RCA CDP1863
---@src/emu/sound/cdp1863.h,SOUNDS += CDP1863
+--@src/emu/sound/cdp1863.h,SOUNDS["CDP1863"] = true
 ---------------------------------------------------
 
 if (SOUNDS["CDP1863"]~=null) then
@@ -319,7 +319,7 @@ end
 
 ---------------------------------------------------
 -- RCA CDP1864
---@src/emu/sound/cdp1864.h,SOUNDS += CDP1864
+--@src/emu/sound/cdp1864.h,SOUNDS["CDP1864"] = true
 ---------------------------------------------------
 
 if (SOUNDS["CDP1864"]~=null) then
@@ -333,7 +333,7 @@ end
 
 ---------------------------------------------------
 -- RCA CDP1869
---@src/emu/sound/cdp1869.h,SOUNDS += CDP1869
+--@src/emu/sound/cdp1869.h,SOUNDS["CDP1869"] = true
 ---------------------------------------------------
 
 if (SOUNDS["CDP1869"]~=null) then
@@ -347,7 +347,7 @@ end
 
 ---------------------------------------------------
 -- GI AY-8910
---@src/emu/sound/ay8910.h,SOUNDS += AY8910
+--@src/emu/sound/ay8910.h,SOUNDS["AY8910"] = true
 ---------------------------------------------------
 
 if (SOUNDS["AY8910"]~=null) then
@@ -361,7 +361,7 @@ end
 
 ---------------------------------------------------
 -- Harris HC55516 CVSD
---@src/emu/sound/hc55516.h,SOUNDS += HC55516
+--@src/emu/sound/hc55516.h,SOUNDS["HC55516"] = true
 ---------------------------------------------------
 
 if (SOUNDS["HC55516"]~=null) then
@@ -375,7 +375,7 @@ end
 
 ---------------------------------------------------
 -- Hudsonsoft C6280 sound chip
---@src/emu/sound/c6280.h,SOUNDS += C6280
+--@src/emu/sound/c6280.h,SOUNDS["C6280"] = true
 ---------------------------------------------------
 
 if (SOUNDS["C6280"]~=null) then
@@ -389,7 +389,7 @@ end
 
 ---------------------------------------------------
 -- ICS2115 sound chip
---@src/emu/sound/ics2115.h,SOUNDS += ICS2115
+--@src/emu/sound/ics2115.h,SOUNDS["ICS2115"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ICS2115"]~=null) then
@@ -403,7 +403,7 @@ end
 
 ---------------------------------------------------
 -- Imagetek I5000 sound
---@src/emu/sound/i5000.h,SOUNDS += I5000_SND
+--@src/emu/sound/i5000.h,SOUNDS["I5000_SND"] = true
 ---------------------------------------------------
 
 if (SOUNDS["I5000_SND"]~=null) then
@@ -417,7 +417,7 @@ end
 
 ---------------------------------------------------
 -- Irem custom sound chips
---@src/emu/sound/iremga20.h,SOUNDS += IREMGA20
+--@src/emu/sound/iremga20.h,SOUNDS["IREMGA20"] = true
 ---------------------------------------------------
 
 if (SOUNDS["IREMGA20"]~=null) then
@@ -431,12 +431,12 @@ end
 
 ---------------------------------------------------
 -- Konami custom sound chips
---@src/emu/sound/k005289.h,SOUNDS += K005289
---@src/emu/sound/k007232.h,SOUNDS += K007232
---@src/emu/sound/k051649.h,SOUNDS += K051649
---@src/emu/sound/k053260.h,SOUNDS += K053260
---@src/emu/sound/k054539.h,SOUNDS += K054539
---@src/emu/sound/k056800.h,SOUNDS += K056800
+--@src/emu/sound/k005289.h,SOUNDS["K005289"] = true
+--@src/emu/sound/k007232.h,SOUNDS["K007232"] = true
+--@src/emu/sound/k051649.h,SOUNDS["K051649"] = true
+--@src/emu/sound/k053260.h,SOUNDS["K053260"] = true
+--@src/emu/sound/k054539.h,SOUNDS["K054539"] = true
+--@src/emu/sound/k056800.h,SOUNDS["K056800"] = true
 ---------------------------------------------------
 
 if (SOUNDS["K005289"]~=null) then
@@ -484,7 +484,7 @@ end
 
 ---------------------------------------------------
 -- L7A1045 L6028 DSP-A 
---@src/emu/sound/l7a1045_l6028_dsp_a.h,SOUNDS += L7A1045
+--@src/emu/sound/l7a1045_l6028_dsp_a.h,SOUNDS["L7A1045"] = true
 ---------------------------------------------------
 
 if (SOUNDS["L7A1045"]~=null) then
@@ -497,7 +497,7 @@ end
 
 ---------------------------------------------------
 -- LMC1992 mixer chip
---@src/emu/sound/lmc1992.h,SOUNDS += LMC1992
+--@src/emu/sound/lmc1992.h,SOUNDS["LMC1992"] = true
 ---------------------------------------------------
 
 if (SOUNDS["LMC1992"]~=null) then
@@ -511,7 +511,7 @@ end
 
 ---------------------------------------------------
 -- MAS 3507D MPEG 1/2 Layer 2/3 Audio Decoder
---@src/emu/sound/mas3507d.h,SOUNDS += MAS3507D
+--@src/emu/sound/mas3507d.h,SOUNDS["MAS3507D"] = true
 ---------------------------------------------------
 
 if (SOUNDS["MAS3507D"]~=null) then
@@ -525,7 +525,7 @@ end
 
 ---------------------------------------------------
 -- MOS 6560VIC
---@src/emu/sound/mos6560.h,SOUNDS += MOS656X
+--@src/emu/sound/mos6560.h,SOUNDS["MOS656X"] = true
 ---------------------------------------------------
 
 if (SOUNDS["MOS656X"]~=null) then
@@ -539,7 +539,7 @@ end
 
 ---------------------------------------------------
 -- MOS 7360 TED
---@src/emu/sound/mos7360.h,SOUNDS += MOS7360
+--@src/emu/sound/mos7360.h,SOUNDS["MOS7360"] = true
 ---------------------------------------------------
 
 if (SOUNDS["MOS7360"]~=null) then
@@ -553,10 +553,10 @@ end
 
 ---------------------------------------------------
 -- Namco custom sound chips
---@src/emu/sound/namco.h,SOUNDS += NAMCO
---@src/emu/sound/n63701x.h,SOUNDS += NAMCO_63701X
---@src/emu/sound/c140.h,SOUNDS += C140
---@src/emu/sound/c352.h,SOUNDS += C352
+--@src/emu/sound/namco.h,SOUNDS["NAMCO"] = true
+--@src/emu/sound/n63701x.h,SOUNDS["NAMCO_63701X"] = true
+--@src/emu/sound/c140.h,SOUNDS["C140"] = true
+--@src/emu/sound/c352.h,SOUNDS["C352"] = true
 ---------------------------------------------------
 
 if (SOUNDS["NAMCO"]~=null or SOUNDS["NAMCO_15XX"]~=null or SOUNDS["NAMCO_CUS30"]~=null) then
@@ -591,7 +591,7 @@ end
 
 ---------------------------------------------------
 -- National Semiconductor Digitalker
---@src/emu/sound/digitalk.h,SOUNDS += DIGITALKER
+--@src/emu/sound/digitalk.h,SOUNDS["DIGITALKER"] = true
 ---------------------------------------------------
 
 if (SOUNDS["DIGITALKER"]~=null) then
@@ -605,7 +605,7 @@ end
 
 ---------------------------------------------------
 -- Nintendo custom sound chips
---@src/emu/sound/nes_apu.h,SOUNDS += NES_APU
+--@src/emu/sound/nes_apu.h,SOUNDS["NES_APU"] = true
 ---------------------------------------------------
 
 if (SOUNDS["NES_APU"]~=null) then
@@ -620,7 +620,7 @@ end
 
 ---------------------------------------------------
 -- NEC uPD7759 ADPCM sample player
---@src/emu/sound/upd7759.h,SOUNDS += UPD7759
+--@src/emu/sound/upd7759.h,SOUNDS["UPD7759"] = true
 ---------------------------------------------------
 
 if (SOUNDS["UPD7759"]~=null) then
@@ -634,12 +634,12 @@ end
 
 ---------------------------------------------------
 -- OKI ADPCM sample players
---@src/emu/sound/okim6258.h,SOUNDS += OKIM6258
---@src/emu/sound/msm5205.h,SOUNDS += MSM5205
---@src/emu/sound/msm5232.h,SOUNDS += MSM5232
---@src/emu/sound/okim6376.h,SOUNDS += OKIM6376
---@src/emu/sound/okim6295.h,SOUNDS += OKIM6295
---@src/emu/sound/okim9810.h,SOUNDS += OKIM9810
+--@src/emu/sound/okim6258.h,SOUNDS["OKIM6258"] = true
+--@src/emu/sound/msm5205.h,SOUNDS["MSM5205"] = true
+--@src/emu/sound/msm5232.h,SOUNDS["MSM5232"] = true
+--@src/emu/sound/okim6376.h,SOUNDS["OKIM6376"] = true
+--@src/emu/sound/okim6295.h,SOUNDS["OKIM6295"] = true
+--@src/emu/sound/okim9810.h,SOUNDS["OKIM9810"] = true
 ---------------------------------------------------
 
 if (SOUNDS["OKIM6258"]~=null or SOUNDS["OKIM6295"]~=null or SOUNDS["OKIM9810"]~=null or SOUNDS["I5000_SND"]~=null) then
@@ -695,7 +695,7 @@ end
 
 ---------------------------------------------------
 -- Philips SAA1099
---@src/emu/sound/saa1099.h,SOUNDS += SAA1099
+--@src/emu/sound/saa1099.h,SOUNDS["SAA1099"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SAA1099"]~=null) then
@@ -709,7 +709,7 @@ end
 
 ---------------------------------------------------
 -- AdMOS QS1000
---@src/emu/sound/qs1000.h,SOUNDS += QS1000
+--@src/emu/sound/qs1000.h,SOUNDS["QS1000"] = true
 ---------------------------------------------------
 
 if (SOUNDS["QS1000"]~=null) then
@@ -723,7 +723,7 @@ end
 
 ---------------------------------------------------
 -- QSound sample player
---@src/emu/sound/qsound.h,SOUNDS += QSOUND
+--@src/emu/sound/qsound.h,SOUNDS["QSOUND"] = true
 ---------------------------------------------------
 
 if (SOUNDS["QSOUND"]~=null) then
@@ -740,8 +740,8 @@ end
 
 ---------------------------------------------------
 -- Ricoh sample players
---@src/emu/sound/rf5c68.h,SOUNDS += RF5C68
---@src/emu/sound/rf5c400.h,SOUNDS += RF5C400
+--@src/emu/sound/rf5c68.h,SOUNDS["RF5C68"] = true
+--@src/emu/sound/rf5c400.h,SOUNDS["RF5C400"] = true
 ---------------------------------------------------
 
 if (SOUNDS["RF5C68"]~=null) then
@@ -762,10 +762,10 @@ end
 
 ---------------------------------------------------
 -- Sega custom sound chips
---@src/emu/sound/segapcm.h,SOUNDS += SEGAPCM
---@src/emu/sound/multipcm.h,SOUNDS += MULTIPCM
---@src/emu/sound/scsp.h,SOUNDS += SCSP
---@src/emu/sound/aica.h,SOUNDS += AICA
+--@src/emu/sound/segapcm.h,SOUNDS["SEGAPCM"] = true
+--@src/emu/sound/multipcm.h,SOUNDS["MULTIPCM"] = true
+--@src/emu/sound/scsp.h,SOUNDS["SCSP"] = true
+--@src/emu/sound/aica.h,SOUNDS["AICA"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SEGAPCM"]~=null) then
@@ -802,9 +802,9 @@ end
 
 ---------------------------------------------------
 -- Seta custom sound chips
---@src/emu/sound/st0016.h,SOUNDS += ST0016
---@src/emu/sound/nile.h,SOUNDS += NILE
---@src/emu/sound/x1_010.h,SOUNDS += X1_010
+--@src/emu/sound/st0016.h,SOUNDS["ST0016"] = true
+--@src/emu/sound/nile.h,SOUNDS["NILE"] = true
+--@src/emu/sound/x1_010.h,SOUNDS["X1_010"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ST0016"]~=null) then
@@ -832,7 +832,7 @@ end
 
 ---------------------------------------------------
 -- SID custom sound chips
---@src/emu/sound/mos6581.h,SOUNDS += SID6581
+--@src/emu/sound/mos6581.h,SOUNDS["SID6581"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SID6581"]~=null or SOUNDS["SID8580"]~=null) then
@@ -854,7 +854,7 @@ end
 
 ---------------------------------------------------
 -- SNK(?) custom stereo sn76489a clone
---@src/emu/sound/t6w28.h,SOUNDS += T6W28
+--@src/emu/sound/t6w28.h,SOUNDS["T6W28"] = true
 ---------------------------------------------------
 
 if (SOUNDS["T6W28"]~=null) then
@@ -868,7 +868,7 @@ end
 
 ---------------------------------------------------
 -- SNK custom wave generator
---@src/emu/sound/snkwave.h,SOUNDS += SNKWAVE
+--@src/emu/sound/snkwave.h,SOUNDS["SNKWAVE"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SNKWAVE"]~=null) then
@@ -882,7 +882,7 @@ end
 
 ---------------------------------------------------
 -- Sony custom sound chips
---@src/emu/sound/spu.h,SOUNDS += SPU
+--@src/emu/sound/spu.h,SOUNDS["SPU"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SPU"]~=null) then
@@ -898,7 +898,7 @@ end
 
 ---------------------------------------------------
 -- SP0256 speech synthesizer
---@src/emu/sound/sp0256.h,SOUNDS += SP0256
+--@src/emu/sound/sp0256.h,SOUNDS["SP0256"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SP0256"]~=null) then
@@ -912,7 +912,7 @@ end
 
 ---------------------------------------------------
 -- SP0250 speech synthesizer
---@src/emu/sound/sp0250.h,SOUNDS += SP0250
+--@src/emu/sound/sp0250.h,SOUNDS["SP0250"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SP0250"]~=null) then
@@ -925,7 +925,7 @@ end
 
 ---------------------------------------------------
 -- S14001A speech synthesizer
---@src/emu/sound/s14001a.h,SOUNDS += S14001A
+--@src/emu/sound/s14001a.h,SOUNDS["S14001A"] = true
 ---------------------------------------------------
 
 if (SOUNDS["S14001A"]~=null) then
@@ -939,7 +939,7 @@ end
 
 ---------------------------------------------------
 -- Texas Instruments SN76477 analog chip
---@src/emu/sound/sn76477.h,SOUNDS += SN76477
+--@src/emu/sound/sn76477.h,SOUNDS["SN76477"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SN76477"]~=null) then
@@ -953,7 +953,7 @@ end
 
 ---------------------------------------------------
 -- Texas Instruments SN76496
---@src/emu/sound/sn76496.h,SOUNDS += SN76496
+--@src/emu/sound/sn76496.h,SOUNDS["SN76496"] = true
 ---------------------------------------------------
 
 if (SOUNDS["SN76496"]~=null) then
@@ -967,7 +967,7 @@ end
 
 ---------------------------------------------------
 -- Texas Instruments TMS36xx doorbell chime
---@src/emu/sound/tms36xx.h,SOUNDS += TMS36XX
+--@src/emu/sound/tms36xx.h,SOUNDS["TMS36XX"] = true
 ---------------------------------------------------
 
 if (SOUNDS["TMS36XX"]~=null) then
@@ -981,7 +981,7 @@ end
 
 ---------------------------------------------------
 -- Texas Instruments TMS3615 Octave Multiple Tone Synthesizer
---@src/emu/sound/tms3615.h,SOUNDS += TMS3615
+--@src/emu/sound/tms3615.h,SOUNDS["TMS3615"] = true
 ---------------------------------------------------
 
 if (SOUNDS["TMS3615"]~=null) then
@@ -995,7 +995,7 @@ end
 
 ---------------------------------------------------
 -- Texas Instruments TMS5100-series speech synthesizers
---@src/emu/sound/tms5110.h,SOUNDS += TMS5110
+--@src/emu/sound/tms5110.h,SOUNDS["TMS5110"] = true
 ---------------------------------------------------
 
 if (SOUNDS["TMS5110"]~=null) then
@@ -1008,7 +1008,7 @@ end
 
 ---------------------------------------------------
 -- Texas Instruments TMS5200-series speech synthesizers
---@src/emu/sound/tms5220.h,SOUNDS += TMS5220
+--@src/emu/sound/tms5220.h,SOUNDS["TMS5220"] = true
 ---------------------------------------------------
 if (SOUNDS["TMS5220"]~=null) then
 	files {
@@ -1023,7 +1023,7 @@ end
 
 ---------------------------------------------------
 -- Toshiba T6721A voice synthesizer
---@src/emu/sound/t6721a.h,SOUNDS += T6721A
+--@src/emu/sound/t6721a.h,SOUNDS["T6721A"] = true
 ---------------------------------------------------
 
 if (SOUNDS["T6721A"]~=null) then
@@ -1037,7 +1037,7 @@ end
 
 ---------------------------------------------------
 -- Toshiba TC8830F sample player/recorder
---@src/emu/sound/tc8830f.h,SOUNDS += TC8830F
+--@src/emu/sound/tc8830f.h,SOUNDS["TC8830F"] = true
 ---------------------------------------------------
 
 if (SOUNDS["TC8830F"]~=null) then
@@ -1050,7 +1050,7 @@ end
 
 ---------------------------------------------------
 -- NEC uPD7752
---@src/emu/sound/upd7752.h,SOUNDS += UPD7752
+--@src/emu/sound/upd7752.h,SOUNDS["UPD7752"] = true
 ---------------------------------------------------
 
 if (SOUNDS["UPD7752"]~=null) then
@@ -1063,7 +1063,7 @@ end
 
 ---------------------------------------------------
 -- VLM5030 speech synthesizer
---@src/emu/sound/vlm5030.h,SOUNDS += VLM5030
+--@src/emu/sound/vlm5030.h,SOUNDS["VLM5030"] = true
 ---------------------------------------------------
 
 if (SOUNDS["VLM5030"]~=null) then
@@ -1076,7 +1076,7 @@ end
 
 ---------------------------------------------------
 -- Votrax speech synthesizer
---@src/emu/sound/votrax.h,SOUNDS += VOTRAX
+--@src/emu/sound/votrax.h,SOUNDS["VOTRAX"] = true
 ---------------------------------------------------
 
 if (SOUNDS["VOTRAX"]~=null) then
@@ -1090,7 +1090,7 @@ end
 
 ---------------------------------------------------
 -- VRender0 custom sound chip
---@src/emu/sound/vrender0.h,SOUNDS += VRENDER0
+--@src/emu/sound/vrender0.h,SOUNDS["VRENDER0"] = true
 ---------------------------------------------------
 
 if (SOUNDS["VRENDER0"]~=null) then
@@ -1104,7 +1104,7 @@ end
 
 ---------------------------------------------------
 -- WAVE file (used for MESS cassette)
---@src/emu/sound/wave.h,SOUNDS += WAVE
+--@src/emu/sound/wave.h,SOUNDS["WAVE"] = true
 ---------------------------------------------------
 
 if (SOUNDS["WAVE"]~=null) then
@@ -1118,18 +1118,19 @@ end
 
 ---------------------------------------------------
 -- Yamaha FM synthesizers
---@src/emu/sound/2151intf.h,SOUNDS += YM2151
---@src/emu/sound/2203intf.h,SOUNDS += YM2203
---@src/emu/sound/2413intf.h,SOUNDS += YM2413
---@src/emu/sound/2608intf.h,SOUNDS += YM2608
---@src/emu/sound/2610intf.h,SOUNDS += YM2610
---@src/emu/sound/2612intf.h,SOUNDS += YM2612
---@src/emu/sound/3812intf.h,SOUNDS += YM3812
---@src/emu/sound/3526intf.h,SOUNDS += YM3526
---@src/emu/sound/8950intf.h,SOUNDS += Y8950
---@src/emu/sound/ymf262.h,SOUNDS += YMF262
---@src/emu/sound/ymf271.h,SOUNDS += YMF271
---@src/emu/sound/ymf278b.h,SOUNDS += YMF278B
+--@src/emu/sound/2151intf.h,SOUNDS["YM2151"] = true
+--@src/emu/sound/2203intf.h,SOUNDS["YM2203"] = true
+--@src/emu/sound/2413intf.h,SOUNDS["YM2413"] = true
+--@src/emu/sound/2608intf.h,SOUNDS["YM2608"] = true
+--@src/emu/sound/2610intf.h,SOUNDS["YM2610"] = true
+--@src/emu/sound/2612intf.h,SOUNDS["YM2612"] = true
+--@src/emu/sound/3812intf.h,SOUNDS["YM3812"] = true
+--@src/emu/sound/3526intf.h,SOUNDS["YM3526"] = true
+--@src/emu/sound/8950intf.h,SOUNDS["Y8950"] = true
+--@src/emu/sound/ymf262.h,SOUNDS["YMF262"] = true
+--@src/emu/sound/ymf271.h,SOUNDS["YMF271"] = true
+--@src/emu/sound/ymf278b.h,SOUNDS["YMF278B"] = true
+--@src/emu/sound/262intf.h,SOUNDS["YMF262"] = true
 ---------------------------------------------------
 
 if (SOUNDS["YM2151"]~=null) then
@@ -1138,17 +1139,6 @@ if (SOUNDS["YM2151"]~=null) then
 		MAME_DIR .. "src/emu/sound/2151intf.h",
 		MAME_DIR .. "src/emu/sound/ym2151.c",
 		MAME_DIR .. "src/emu/sound/ym2151.h",
-	}
-end
-
-if (SOUNDS["YM2203"]~=null) then
-	files {
-		MAME_DIR .. "src/emu/sound/2203intf.c",
-		MAME_DIR .. "src/emu/sound/2203intf.h",
-		MAME_DIR .. "src/emu/sound/ay8910.c",
-		MAME_DIR .. "src/emu/sound/ay8910.h",
-		MAME_DIR .. "src/emu/sound/fm.c",
-		MAME_DIR .. "src/emu/sound/fm.h",
 	}
 end
 
@@ -1161,7 +1151,20 @@ if (SOUNDS["YM2413"]~=null) then
 	}
 end
 
-if (SOUNDS["YM2608"]~=null) then
+if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null or SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then	
+--if (SOUNDS["YM2203"]~=null) then	
+	files {
+		MAME_DIR .. "src/emu/sound/2203intf.c",
+		MAME_DIR .. "src/emu/sound/2203intf.h",
+		MAME_DIR .. "src/emu/sound/ay8910.c",
+		MAME_DIR .. "src/emu/sound/ay8910.h",
+		MAME_DIR .. "src/emu/sound/fm.c",
+		MAME_DIR .. "src/emu/sound/fm.h",
+	}
+--end
+
+
+--if (SOUNDS["YM2608"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/sound/2608intf.c", 
 		MAME_DIR .. "src/emu/sound/2608intf.h", 
@@ -1172,9 +1175,9 @@ if (SOUNDS["YM2608"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
-end
+--end
 
-if (SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null) then
+--if (SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/sound/2610intf.c", 
 		MAME_DIR .. "src/emu/sound/2610intf.h", 
@@ -1185,9 +1188,9 @@ if (SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
-end
+--end
 
-if (SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
+--if (SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/sound/2612intf.c", 
 		MAME_DIR .. "src/emu/sound/2612intf.h", 
@@ -1195,9 +1198,11 @@ if (SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
 		MAME_DIR .. "src/emu/sound/ay8910.h", 
 		MAME_DIR .. "src/emu/sound/fm2612.c",
 	}
+--end
 end
 
-if (SOUNDS["YM3812"]~=null) then
+if (SOUNDS["YM3812"]~=null or SOUNDS["YM3526"]~=null or SOUNDS["Y8950"]~=null) then
+--if (SOUNDS["YM3812"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/sound/3812intf.c", 
 		MAME_DIR .. "src/emu/sound/3812intf.h", 
@@ -1206,9 +1211,9 @@ if (SOUNDS["YM3812"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
-end
+--end
 
-if (SOUNDS["YM3526"]~=null) then
+--if (SOUNDS["YM3526"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/sound/3526intf.c", 
 		MAME_DIR .. "src/emu/sound/3526intf.h", 
@@ -1217,9 +1222,9 @@ if (SOUNDS["YM3526"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
-end
+--end
 
-if (SOUNDS["Y8950"]~=null) then
+--if (SOUNDS["Y8950"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/sound/8950intf.c", 
 		MAME_DIR .. "src/emu/sound/8950intf.h", 
@@ -1228,6 +1233,7 @@ if (SOUNDS["Y8950"]~=null) then
 		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 		MAME_DIR .. "src/emu/sound/ymdeltat.h",
 	}
+--end
 end
 
 if (SOUNDS["YMF262"]~=null) then
@@ -1257,7 +1263,7 @@ end
 
 ---------------------------------------------------
 -- Yamaha YMZ280B ADPCM
---@src/emu/sound/ymz280b.h,SOUNDS += YMZ280B
+--@src/emu/sound/ymz280b.h,SOUNDS["YMZ280B"] = true
 ---------------------------------------------------
 
 if (SOUNDS["YMZ280B"]~=null) then
@@ -1269,7 +1275,7 @@ end
 
 ---------------------------------------------------
 -- Yamaha YMZ770 AMM
---@src/emu/sound/ymz770.h,SOUNDS += YMZ770
+--@src/emu/sound/ymz770.h,SOUNDS["YMZ770"] = true
 ---------------------------------------------------
 
 if (SOUNDS["YMZ770"]~=null) then
@@ -1283,7 +1289,7 @@ end
 
 ---------------------------------------------------
 -- ZOOM ZSG-2
---@src/emu/sound/zsg2.h,SOUNDS += ZSG2
+--@src/emu/sound/zsg2.h,SOUNDS["ZSG2"] = true
 ---------------------------------------------------
 
 if (SOUNDS["ZSG2"]~=null) then
@@ -1295,7 +1301,7 @@ end
 
 ---------------------------------------------------
 -- VRC6
---@src/emu/sound/vrc6.h,SOUNDS += VRC6
+--@src/emu/sound/vrc6.h,SOUNDS["VRC6"] = true
 ---------------------------------------------------
 
 if (SOUNDS["VRC6"]~=null) then

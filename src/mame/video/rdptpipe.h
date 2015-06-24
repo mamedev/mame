@@ -17,18 +17,12 @@
 #define _VIDEO_RDPTEXPIPE_H_
 
 #include "emu.h"
-
-struct other_modes_t;
-struct misc_state_t;
-class color_t;
-struct rdp_span_aux;
-struct rdp_poly_state;
-struct n64_tile_t;
+#include "video/n64types.h"
 
 class n64_texture_pipe_t
 {
 	public:
-		typedef UINT32 (n64_texture_pipe_t::*texel_fetcher_t) (INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		typedef void (n64_texture_pipe_t::*texel_fetcher_t) (rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 		typedef void (n64_texture_pipe_t::*texel_cycler_t) (color_t* TEX, color_t* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux* userdata, const rdp_poly_state& object);
 
 		n64_texture_pipe_t()
@@ -114,57 +108,60 @@ class n64_texture_pipe_t
 		bool                m_start_span;
 
 	private:
-		void                mask(INT32* S, INT32* T, const n64_tile_t& tile);
-		void                mask_coupled(INT32* S, INT32* S1, INT32* T, INT32* T1, const n64_tile_t& tile);
+		void                mask(rgbaint_t& st, const n64_tile_t& tile);
+		void                mask_coupled(rgbaint_t& sstt, const n64_tile_t& tile);
 
-		void                shift_cycle(INT32* S, INT32* T, bool* maxs, bool* maxt, const n64_tile_t& tile);
-		void                shift_copy(INT32* S, INT32* T, const n64_tile_t& tile);
+		rgbaint_t           shift_cycle(rgbaint_t& st, const n64_tile_t& tile);
+		void                shift_copy(rgbaint_t& st, const n64_tile_t& tile);
 
-		void                clamp_cycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata);
-		void                clamp_cycle_light(INT32* S, INT32* T, const bool maxs, const bool maxt, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata);
+		void                clamp_cycle(rgbaint_t& st, rgbaint_t& stfrac, rgbaint_t& maxst, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata);
+		void                clamp_cycle_light(rgbaint_t& st, rgbaint_t& maxst, const INT32 tilenum, const n64_tile_t& tile, rdp_span_aux* userdata);
 
-		UINT32              fetch_nop(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_nop(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 
-		UINT32              fetch_rgba16_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_rgba16_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_rgba16_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_rgba32_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_rgba32_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_rgba32_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_rgba16_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_rgba16_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_rgba16_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_rgba32_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_rgba32_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_rgba32_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 
-		UINT32              fetch_yuv(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_yuv(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 
-		UINT32              fetch_ci4_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ci4_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ci4_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ci8_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ci8_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ci8_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ci4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ci4_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ci4_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ci8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ci8_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ci8_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 
-		UINT32              fetch_ia4_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ia4_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ia4_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ia8_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ia8_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ia8_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ia16_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ia16_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_ia16_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia4_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia4_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia8_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia8_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia16_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia16_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_ia16_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 
-		UINT32              fetch_i4_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_i4_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_i4_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_i8_tlut0(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_i8_tlut1(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
-		UINT32              fetch_i8_raw(INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_i4_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_i4_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_i4_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_i8_tlut0(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_i8_tlut1(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
+		void                fetch_i8_raw(rgbaint_t& out, INT32 s, INT32 t, INT32 tbase, INT32 tpal, rdp_span_aux* userdata);
 
 		texel_fetcher_t     m_texel_fetch[16*5];
 
 		n64_rdp*            m_rdp;
 
 		INT32               m_maskbits_table[16];
-		UINT32              m_expand_16to32_table[0x10000];
+		color_t             m_expand_16to32_table[0x10000];
 		UINT16              m_lod_lookup[0x80000];
+
+		rgbaint_t           m_st2_add;
+		rgbaint_t           m_v1;
 };
 
 #endif // _VIDEO_RDPTEXPIPE_H_

@@ -51,6 +51,7 @@ private:
 	device_t &          m_device;               // underlying device
 	device_disasm_interface *m_disasmintf;      // disassembly interface
 	address_space &     m_space;                // address space to display
+	address_space &     m_decrypted_space;      // address space to display for decrypted opcodes
 };
 
 

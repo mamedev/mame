@@ -73,15 +73,15 @@ DRIVER_INIT_MEMBER(suna8_state,hardhead)
 			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank0d->set_base(memregion("maincpu")->base());
+	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Non encrypted bootleg */
 DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x48000);
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank0d->set_base(memregion("maincpu")->base() + 0x48000);
+	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -137,14 +137,13 @@ DRIVER_INIT_MEMBER(suna8_state, brickzn_common)
 	m_decrypt = brickzn_decrypt();
 
 	// Non-banked opcodes
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
+	m_bank0d->set_base(m_decrypt);
 
 	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
-	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	// Opcode banks: 00-1f normal opcode decryption:
-	membank("bank1")->configure_decrypted_entries(0, 16, m_decrypt + 0x10000, 0x4000);
-	membank("bank1")->configure_decrypted_entries(16, 16, m_decrypt + 0x10000, 0x4000);
+	m_bank1d->configure_entries(0, 16, m_decrypt + 0x10000, 0x4000);
+	m_bank1d->configure_entries(16, 16, m_decrypt + 0x10000, 0x4000);
 }
 
 DRIVER_INIT_MEMBER(suna8_state,brickzn)
@@ -203,14 +202,7 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 
 DRIVER_INIT_MEMBER(suna8_state,brickzn11)
 {
-	// No encryption
-	UINT8   *decrypt =  memregion("maincpu")->base();
-
-	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
-	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
-	// Opcode banks: 00-1f normal opcode decryption:
-	membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
-	membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -220,14 +212,13 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn11)
 
 DRIVER_INIT_MEMBER(suna8_state,hardhea2)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
+	m_bank0d->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -296,7 +287,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 	membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), UINT8, 0x2000 * 2), 0x2000);
 }
 
@@ -307,14 +298,13 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 DRIVER_INIT_MEMBER(suna8_state,starfigh)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
+	m_bank0d->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -383,7 +373,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 	decrypt[0x2696] = 0xc9; // work ram writes disable, corrupt next routine
 	decrypt[0x4e9a] = 0x00; // work ram writes disable, flip background sprite
 
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -393,14 +383,13 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 
 DRIVER_INIT_MEMBER(suna8_state,sparkman)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
+	m_bank0d->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -467,7 +456,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 	decrypt[0x1ac4] = 0x00;
 	decrypt[0x1ac5] = 0x00;
 
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -538,7 +527,7 @@ WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
 	int bank = data & 0x0f;
 
 	if (data & ~0xef)   logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",space.device().safe_pc(),data);
-	membank("bank1")->set_entry(bank);
+	m_bank1->set_entry(bank);
 }
 
 
@@ -571,7 +560,6 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")  // Sprites
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( hardhead_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP // ? IRQ Ack
@@ -595,7 +583,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 
 	if (data & ~0xf7)   logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",space.device().safe_pc(),data);
 
-	membank("bank1")->set_entry(bank);
+	m_bank1->set_entry(bank);
 
 	flip_screen_set(data & 0x20);
 	coin_lockout_w ( machine(), 0,  data & 0x40);
@@ -694,7 +682,9 @@ WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
 
 	if (data & ~0x0f)   logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",space.device().safe_pc(),data);
 
-	membank("bank1")->set_entry(bank + (membank("bank1")->entry() & 0x10));
+	m_bank1->set_entry(bank + (m_bank1->entry() & 0x10));
+	if(m_bank1d)
+		m_bank1d->set_entry(m_bank1->entry());
 
 	m_rombank = data;
 }
@@ -812,13 +802,11 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 
 		if (m_prot_opcode_toggle == 0)
 		{
-			address_space &space = m_maincpu->space(AS_PROGRAM);
-			space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
+			m_bank0d->set_base(m_decrypt);
 		}
 		else
 		{
-			address_space &space = m_maincpu->space(AS_PROGRAM);
-			space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base());
+			m_bank0d->set_base(memregion("maincpu")->base());
 		}
 	}
 }
@@ -838,7 +826,9 @@ WRITE8_MEMBER(suna8_state::brickzn_prot2_w)
 	m_remap_sound = ((m_prot2 ^ data) == 0xf8) ? 1 : 0;
 
 	// Select alternate data decryption, see code at 787e:
-	membank("bank1")->set_entry((membank("bank1")->entry() & 0x0f) + ((m_prot2 == (data | 0xdc)) ? 0x10 : 0));
+	m_bank1->set_entry((m_bank1->entry() & 0x0f) + ((m_prot2 == (data | 0xdc)) ? 0x10 : 0));
+	if(m_bank1d)
+		m_bank1d->set_entry(m_bank1->entry());
 
 	m_prot2_prev = m_prot2;
 	m_prot2 = data;
@@ -883,6 +873,11 @@ static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, brickzn_banked_paletteram_w) AM_SHARE("paletteram")      // Palette (Banked)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("wram")                                            // Work RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)   // Sprites (Banked)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, suna8_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brickzn_io_map, AS_IO, 8, suna8_state )
@@ -940,7 +935,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_rombank_w)
 
 	if (data & ~0x0f)   logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",space.device().safe_pc(),data);
 
-	membank("bank1")->set_entry(bank);
+	m_bank1->set_entry(bank);
 
 	m_rombank = data;
 }
@@ -1079,7 +1074,7 @@ WRITE8_MEMBER(suna8_state::starfigh_leds_w)
 
 	int bank = m_rombank_latch & 0x0f;
 
-	membank("bank1")->set_entry(bank);
+	m_bank1->set_entry(bank);
 
 	m_rombank = m_rombank_latch;
 	logerror("CPU #0 - PC %04X: rom bank = %02X\n",space.device().safe_pc(), m_rombank);
@@ -1192,7 +1187,7 @@ WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 
 	int bank = m_rombank_latch & 0x0f;
 
-	membank("bank1")->set_entry(bank);
+	m_bank1->set_entry(bank);
 
 	m_rombank = m_rombank_latch;
 	logerror("CPU #0 - PC %04X: rom bank = %02X\n",space.device().safe_pc(), m_rombank);
@@ -1868,6 +1863,7 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hardhead_map)
 	MCFG_CPU_IO_MAP(hardhead_io_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)      /* No NMI */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
@@ -1892,23 +1888,20 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim12)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1925,6 +1918,7 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(rranger_map)
 	MCFG_CPU_IO_MAP(rranger_io_map)
+//	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
@@ -1948,23 +1942,20 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, rranger_play_samples_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1979,7 +1970,9 @@ MACHINE_RESET_MEMBER(suna8_state,brickzn)
 	m_protection_val = m_prot2 = m_prot2_prev = 0xff;
 	m_paletteram_enab = 1;  // for brickzn11
 	m_remap_sound = 0;
-	membank("bank1")->set_entry(0);
+	m_bank1->set_entry(0);
+	if(m_bank1d)
+		m_bank1d->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( brickzn11, suna8_state )
@@ -2015,34 +2008,33 @@ static MACHINE_CONFIG_START( brickzn11, suna8_state )
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_brickzn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     // 3MHz (measured)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    // 1.5MHz (measured)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.17)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.17)
 
 	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.17)
 
 	MCFG_DAC_ADD("dac3")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.17)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.17)
 
 	MCFG_DAC_ADD("dac4")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.17)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( brickzn, brickzn11 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(brickzn_map)
 	MCFG_CPU_IO_MAP(brickzn_io_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -2073,6 +2065,7 @@ static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA T568009 */
 	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
@@ -2092,6 +2085,7 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(starfigh_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	/* The sound section is identical to that of hardhead */
@@ -2117,23 +2111,20 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_starfigh)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -2146,6 +2137,7 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
 	MCFG_CPU_PROGRAM_MAP(sparkman_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)               /* ? */
@@ -2170,23 +2162,20 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_sparkman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))  // two sample roms
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -2231,6 +2220,9 @@ Sound processor -  Z80
 24 MHz crystal
 
 ***************************************************************************/
+
+// The sample rom is from srange with 1 byte changed (first byte is FF here, instead of 77)
+// (laugh sound used when scoring a goal at the end of level 1)
 
 ROM_START( hardhead )
 	ROM_REGION( 0x48000, "maincpu", 0 ) /* Main Z80 Code */
@@ -2926,7 +2918,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(suna8_state,suna8)
 {
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (v2.0)",                0 )

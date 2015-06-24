@@ -183,7 +183,7 @@ public:
 
 	void init()
 	{
-		m_setup = palloc(netlist::netlist_setup_t, this);
+		m_setup = palloc(netlist::setup_t, this);
 		this->init_object(*this, "netlist");
 		m_setup->init();
 	}
@@ -244,7 +244,7 @@ protected:
 	}
 
 private:
-	netlist::netlist_setup_t *m_setup;
+	netlist::setup_t *m_setup;
 };
 
 
@@ -275,7 +275,7 @@ static void run(tool_options_t &opts)
 	printf("runnning ...\n");
 	t = osd_ticks();
 
-	nt.process_queue(netlist_time::from_double(ttr));
+	nt.process_queue(netlist::netlist_time::from_double(ttr));
 	nt.stop();
 
 	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
@@ -292,7 +292,7 @@ static void listdevices()
 	nt.init();
 	const netlist::factory_list_t::list_t &list = nt.setup().factory().list();
 
-	nt.setup().register_source(palloc(netlist::netlist_source_proc_t, "dummy", &netlist_dummy));
+	nt.setup().register_source(palloc(netlist::source_proc_t, "dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 	nt.setup().start_devices();

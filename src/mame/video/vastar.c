@@ -2,7 +2,7 @@
 // copyright-holders:Allard van der Bas
 /***************************************************************************
 
-  video.c
+  vastar.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -20,12 +20,9 @@
 
 TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 {
-	UINT8 *videoram = m_fgvideoram;
-	int code, color, fxy;
-
-	code = videoram[tile_index + 0x800] | (videoram[tile_index + 0x400] << 8);
-	color = videoram[tile_index];
-	fxy = (code & 0xc00) >> 10; // maybe, based on the other layers
+	int code = m_fgvideoram[tile_index + 0x800] | (m_fgvideoram[tile_index + 0x400] << 8);
+	int color = m_fgvideoram[tile_index];
+	int fxy = (code & 0xc00) >> 10; // maybe, based on the other layers
 	SET_TILE_INFO_MEMBER(0,
 			code,
 			color & 0x3f,
@@ -34,12 +31,9 @@ TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
 {
-	UINT8 *videoram = m_bg1videoram;
-	int code, color, fxy;
-
-	code = videoram[tile_index + 0x800] | (videoram[tile_index] << 8);
-	color = videoram[tile_index + 0xc00];
-	fxy = (code & 0xc00) >> 10;
+	int code = m_bg1videoram[tile_index + 0x800] | (m_bg1videoram[tile_index] << 8);
+	int color = m_bg1videoram[tile_index + 0xc00];
+	int fxy = (code & 0xc00) >> 10;
 	SET_TILE_INFO_MEMBER(4,
 			code,
 			color & 0x3f,
@@ -48,12 +42,9 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
 
 TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
 {
-	UINT8 *videoram = m_bg2videoram;
-	int code, color, fxy;
-
-	code = videoram[tile_index + 0x800] | (videoram[tile_index] << 8);
-	color = videoram[tile_index + 0xc00];
-	fxy = (code & 0xc00) >> 10;
+	int code = m_bg2videoram[tile_index + 0x800] | (m_bg2videoram[tile_index] << 8);
+	int color = m_bg2videoram[tile_index + 0xc00];
+	int fxy = (code & 0xc00) >> 10;
 	SET_TILE_INFO_MEMBER(3,
 			code,
 			color & 0x3f,
@@ -88,19 +79,19 @@ void vastar_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vastar_state::vastar_fgvideoram_w)
+WRITE8_MEMBER(vastar_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vastar_state::vastar_bg1videoram_w)
+WRITE8_MEMBER(vastar_state::bg1videoram_w)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vastar_state::vastar_bg2videoram_w)
+WRITE8_MEMBER(vastar_state::bg2videoram_w)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -123,25 +114,17 @@ WRITE8_MEMBER(vastar_state::vastar_bg2videoram_w)
 // forward order instead
 void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram1;
-	UINT8 *spriteram_2 = m_spriteram2;
-	UINT8 *spriteram_3 = m_spriteram3;
-	int offs;
-
-//  for (offs = 0; offs < 0x40; offs += 2)
-	for (offs = 0x40-2; offs >=0; offs -= 2)
+//  for (int offs = 0; offs < 0x40; offs += 2)
+	for (int offs = 0x40-2; offs >=0; offs -= 2)
 	{
-		int code, sx, sy, color, flipx, flipy;
-
-
-		code = ((spriteram_3[offs] & 0xfc) >> 2) + ((spriteram_2[offs] & 0x01) << 6)
+		int code = ((m_spriteram3[offs] & 0xfc) >> 2) + ((m_spriteram2[offs] & 0x01) << 6)
 				+ ((offs & 0x20) << 2);
 
-		sx = spriteram_3[offs + 1];
-		sy = spriteram[offs];
-		color = spriteram[offs + 1] & 0x3f;
-		flipx = spriteram_3[offs] & 0x02;
-		flipy = spriteram_3[offs] & 0x01;
+		int sx = m_spriteram3[offs + 1];
+		int sy = m_spriteram1[offs];
+		int color = m_spriteram1[offs + 1] & 0x3f;
+		int flipx = m_spriteram3[offs] & 0x02;
+		int flipy = m_spriteram3[offs] & 0x01;
 
 		if (flip_screen())
 		{
@@ -149,7 +132,7 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		if (spriteram_2[offs] & 0x08)   /* double width */
+		if (m_spriteram2[offs] & 0x08)   /* double width */
 		{
 			if (!flip_screen())
 				sy = 224 - sy;
@@ -180,11 +163,9 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	}
 }
 
-UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vastar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
-	for (i = 0;i < 32;i++)
+	for (int i = 0;i < 32;i++)
 	{
 		m_bg1_tilemap->set_scrolly(i,m_bg1_scroll[i]);
 		m_bg2_tilemap->set_scrolly(i,m_bg2_scroll[i]);

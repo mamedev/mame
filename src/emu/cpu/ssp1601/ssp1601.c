@@ -43,7 +43,7 @@
 
 #define PPC    m_ppc.w.h
 
-#define FETCH() m_direct->read_decrypted_word(rPC++ << 1)
+#define FETCH() m_direct->read_word(rPC++ << 1)
 #define PROGRAM_WORD(a) m_program->read_word((a) << 1)
 #define GET_PPC_OFFS() PPC
 

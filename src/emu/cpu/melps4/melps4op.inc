@@ -64,6 +64,13 @@ void melps4_cpu_device::op_teab()
 	m_e = m_b << 4 | m_a;
 }
 
+void melps4_cpu_device::op_tabe()
+{
+	// TABE(undocumented): transfer E to A and B
+	m_a = m_e & 0xf;
+	m_b = m_e >> 4;
+}
+
 void melps4_cpu_device::op_tepa()
 {
 	// TEPA: decode A by PLA and transfer to E
@@ -169,14 +176,14 @@ void melps4_cpu_device::op_xam()
 
 void melps4_cpu_device::op_xamd()
 {
-	// XAMD j: XAM J, DEY
+	// XAMD j: XAM j, DEY
 	op_xam();
 	op_dey();
 }
 
 void melps4_cpu_device::op_xami()
 {
-	// XAMI j: XAM J, skip next on Y mask(default 0xf), increment Y
+	// XAMI j: XAM j, skip next on Y mask(default 0xf), increment Y
 	op_xam();
 	m_skip = ((m_y & m_xami_mask) == m_xami_mask);
 	m_y = (m_y + 1) & 0xf;
@@ -245,6 +252,22 @@ void melps4_cpu_device::op_cma()
 {
 	// CMA: complement A
 	m_a ^= 0xf;
+}
+
+void melps4_cpu_device::op_rl()
+{
+	// RL(undocumented): rotate A left through carry
+	UINT8 c = m_a >> 3 & 1;
+	m_a = (m_a << 1 | m_cy) & 0xf;
+	m_cy = c;
+}
+
+void melps4_cpu_device::op_rr()
+{
+	// RR(undocumented): rotate A right through carry
+	UINT8 c = m_a & 1;
+	m_a = m_a >> 1 | m_cy << 3;
+	m_cy = c;
 }
 
 
@@ -383,61 +406,66 @@ void melps4_cpu_device::op_szj()
 void melps4_cpu_device::op_t1ab()
 {
 	// T1AB: transfer A and B to timer 1
-	op_illegal();
+	m_tmr_count[0] = m_b << 4 | m_a;
 }
 
 void melps4_cpu_device::op_trab()
 {
 	// TRAB: transfer A and B to timer 2 reload
-	op_illegal();
+	m_tmr_reload = m_b << 4 | m_a;
 }
 
 void melps4_cpu_device::op_t2ab()
 {
 	// T2AB: transfer A and B to timer 2 and timer 2 reload
-	op_illegal();
+	m_tmr_reload = m_tmr_count[1] = m_b << 4 | m_a;
 }
 
 void melps4_cpu_device::op_tab1()
 {
 	// TAB1: transfer timer 1 to A and B
-	op_illegal();
+	m_a = m_tmr_count[0] & 0xf;
+	m_b = m_tmr_count[0] >> 4;
 }
 
 void melps4_cpu_device::op_tabr()
 {
 	// TABR: transfer timer 2 reload to A and B
-	op_illegal();
+	m_a = m_tmr_reload & 0xf;
+	m_b = m_tmr_reload >> 4;
 }
 
 void melps4_cpu_device::op_tab2()
 {
 	// TAB2: transfer timer 2 to A and B
-	op_illegal();
+	m_a = m_tmr_count[1] & 0xf;
+	m_b = m_tmr_count[1] >> 4;
 }
 
 void melps4_cpu_device::op_tva()
 {
 	// TVA: transfer A to timer control V
-	m_v = m_a;
+	write_v(m_a);
 }
 
 void melps4_cpu_device::op_twa()
 {
 	// TWA: transfer A to timer control W
-	m_w = m_a;
+	write_w(m_a);
 }
 
 void melps4_cpu_device::op_snz1()
 {
 	// SNZ1: skip next on flag 1F
-	op_illegal();
+	m_skip = m_irqflag[1];
+	m_irqflag[1] = false;
 }
 
 void melps4_cpu_device::op_snz2()
 {
 	// SNZ2: skip next on flag 2F
-	op_illegal();
+	m_skip = m_irqflag[2];
+	m_irqflag[2] = false;
 }
 
 
@@ -462,7 +490,7 @@ void melps4_cpu_device::op_b()
 {
 	// B xy: branch
 	m_prohibit_irq = true;
-	
+
 	// determine new page:
 	// - short call: subroutine page
 	// - short jump: current page, or sub. page + 1 when in sub. mode
@@ -475,9 +503,9 @@ void melps4_cpu_device::op_b()
 	}
 	else if (m_sm)
 		page = m_sm_page | (m_op >> 7 & 1);
-	
+
 	m_pc = page << 7 | (m_op & 0x7f);
-	
+
 	// if BA opcode was executed, set PC low 4 bits to A
 	if (m_ba_flag)
 	{
@@ -631,6 +659,7 @@ void melps4_cpu_device::op_ei()
 {
 	// EI: enable interrupt flag
 	m_prohibit_irq = true;
+	m_possible_irq = true;
 	m_inte = 1;
 }
 

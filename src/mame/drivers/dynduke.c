@@ -283,6 +283,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state, interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
+	SEIBU_SOUND_SYSTEM_ENCRYPTED_FULL()
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
@@ -607,7 +608,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dynduke_state,dynduke)
 {
-	m_seibu_sound->decrypt("audiocpu",0x20000);
 }
 
 /* Game Drivers */

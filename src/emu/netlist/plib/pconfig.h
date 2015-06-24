@@ -145,10 +145,10 @@ public:
 	// construct from any member function pointer
 	class generic_class;
 	typedef void (*generic_function)();
-	
+
 	#if (PSTANDALONE)
 	typedef std::size_t FPTR;
-	#endif 
+	#endif
 
 	template<typename _MemberFunctionType>
 	pmfp(_MemberFunctionType mfp)

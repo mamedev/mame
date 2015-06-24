@@ -1004,6 +1004,12 @@ int ay8910_device::ay8910_read_ym()
 		/*
 		   even if the port is set as output, we still need to return the external
 		   data. Some games, like kidniki, need this to work.
+
+		   FIXME: The io ports are designed as open collector outputs. Bits 7 and 8 of AY_ENABLE
+		   only enable (low) or disable (high) the pull up resistors. The YM2149 datasheet
+		   specifies those pull up resistors as 60k to 600k (min / max).
+		   We do need a callback for those two flags. Kid Niki (Irem m62) is one such
+		   case were it makes a difference in comparison to a standard TTL output.
 		 */
 		if (!m_port_a_read_cb.isnull())
 			m_regs[AY_PORTA] = m_port_a_read_cb(0);

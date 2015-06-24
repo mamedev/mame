@@ -160,14 +160,14 @@ static UINT32 timer_next;
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M_RDOP(Addr) ((unsigned)m_direct->read_decrypted_byte(Addr))
+#define M_RDOP(Addr) ((unsigned)m_decrypted_opcodes_direct->read_byte(Addr))
 
 /****************************************************************************/
 /* M6800_RDOP_ARG() is identical to M6800_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M_RDOP_ARG(Addr) ((unsigned)m_direct->read_raw_byte(Addr))
+#define M_RDOP_ARG(Addr) ((unsigned)m_direct->read_byte(Addr))
 
 /* macros to access memory */
 #define IMMBYTE(b)  b = M_RDOP_ARG(PCD); PC++
@@ -535,6 +535,7 @@ const device_type HD6303Y = &device_creator<hd6303y_cpu_device>;
 m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, M6800, "M6800", tag, owner, clock, "m6800", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
+	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 	, m_has_io(false)
 	, m_out_sc2_func(*this)
@@ -548,6 +549,7 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *ta
 m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool has_io, int clock_divider, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
+	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 	, m_has_io(has_io)
 	, m_out_sc2_func(*this)
@@ -623,6 +625,17 @@ hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char
 hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: hd6301_cpu_device(mconfig, HD6303Y, "HD6303Y", tag, owner, clock, "hd6303y", __FILE__)
 {
+}
+
+const address_space_config *m6800_cpu_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_IO:                return m_has_io ? &m_io_config : NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : NULL;
+	default:                   return NULL;
+	}
 }
 
 
@@ -1039,6 +1052,8 @@ void m6800_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
+	m_decrypted_opcodes = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_program;
+	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
 	if ( m_has_io )
 		m_io = &space(AS_IO);
 

@@ -31,6 +31,10 @@
   - 1980 and 1982 Mitsubishi LSI Data Books
   - M34550Mx-XXXFP datasheet (this one is MELPS 720 family)
 
+  TODO:
+  - need more drivers that use this, to be sure that emulation is accurate
+  - add output PLA
+
 */
 
 #include "melps4.h"
@@ -46,12 +50,15 @@ void melps4_cpu_device::state_string_export(const device_state_entry &entry, std
 	{
 		// obviously not from a single flags register, letters are made up
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c %c%c%c",
 				m_intp ? 'P':'p',
 				m_inte ? 'I':'i',
 				m_sm   ? 'S':'s',
 				m_cps  ? 'D':'d',
-				m_cy   ? 'C':'c'
+				m_cy   ? 'C':'c',
+				m_irqflag[0] ? 'X':'.', // exf
+				m_irqflag[1] ? '1':'.', // 1f
+				m_irqflag[2] ? '2':'.'  // 2f
 			);
 			break;
 
@@ -78,7 +85,7 @@ void melps4_cpu_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 	m_d_mask = (1 << m_d_pins) - 1;
-	
+
 	// resolve callbacks
 	m_read_k.resolve_safe(0);
 	m_read_d.resolve_safe(0);
@@ -99,10 +106,11 @@ void melps4_cpu_device::device_start()
 	m_op = 0;
 	m_prev_op = 0;
 	m_bitmask = 0;
-	
+
 	m_port_d = 0;
 	m_port_s = 0;
 	m_port_f = 0;
+	m_port_t = 0;
 
 	m_sm = m_sms = false;
 	m_ba_flag = false;
@@ -111,7 +119,15 @@ void melps4_cpu_device::device_start()
 	m_skip = false;
 	m_inte = 0;
 	m_intp = 1;
+	m_irqflag[0] = m_irqflag[1] = m_irqflag[2] = false;
+	m_int_state = 0;
+	m_t_in_state = 0;
 	m_prohibit_irq = false;
+	m_possible_irq = false;
+
+	memset(m_tmr_count, 0, sizeof(m_tmr_count));
+	m_tmr_reload = 0;
+	m_tmr_irq_enabled[0] = m_tmr_irq_enabled[1] = false;
 
 	m_a = 0;
 	m_b = 0;
@@ -138,6 +154,7 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_port_d));
 	save_item(NAME(m_port_s));
 	save_item(NAME(m_port_f));
+	save_item(NAME(m_port_t));
 
 	save_item(NAME(m_sm));
 	save_item(NAME(m_sms));
@@ -147,7 +164,15 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_skip));
 	save_item(NAME(m_inte));
 	save_item(NAME(m_intp));
+	save_item(NAME(m_irqflag));
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_t_in_state));
 	save_item(NAME(m_prohibit_irq));
+	save_item(NAME(m_possible_irq));
+
+	save_item(NAME(m_tmr_count));
+	save_item(NAME(m_tmr_reload));
+	save_item(NAME(m_tmr_irq_enabled));
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
@@ -165,7 +190,7 @@ void melps4_cpu_device::device_start()
 
 	// register state for debugger
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_cy).formatstr("%5s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_cy).formatstr("%9s").noshow();
 
 	state_add(MELPS4_PC, "PC", m_pc).formatstr("%04X");
 	state_add(MELPS4_A, "A", m_a).formatstr("%2d"); // show in decimal
@@ -194,25 +219,27 @@ void melps4_cpu_device::device_reset()
 {
 	m_sm = m_sms = false;
 	m_ba_flag = false;
-	m_prohibit_irq = false;
-	
 	m_skip = false;
 	m_op = m_prev_op = 0;
 	m_pc = m_prev_pc = 0;
-	m_inte = 0;
-	m_intp = 1;
 	op_lcps(); // CPS=0
 
-	m_v = 0;
-	m_w = 0;
-	
+	// clear interrupts
+	m_inte = 0;
+	m_intp = 1;
+	write_v(0);
+	write_w(0);
+	m_irqflag[0] = m_irqflag[1] = m_irqflag[2] = false;
+	m_prohibit_irq = false;
+	m_possible_irq = false;
+
 	// clear ports
 	write_d_pin(MELPS4_PORTD_CLR, 0);
 	write_gen_port(MELPS4_PORTS, 0);
 	write_gen_port(MELPS4_PORTF, 0);
 	write_gen_port(MELPS4_PORTG, 0);
 	write_gen_port(MELPS4_PORTU, 0);
-	m_write_t(0);
+	m_write_t(0); m_port_t = 0;
 }
 
 
@@ -230,7 +257,7 @@ UINT8 melps4_cpu_device::read_gen_port(int port)
 			return m_port_s | m_read_s(port, 0xff);
 		case MELPS4_PORTF:
 			return m_port_f | (m_read_f(port, 0xff) & 0xf);
-		
+
 		default:
 			break;
 	}
@@ -257,7 +284,7 @@ void melps4_cpu_device::write_gen_port(int port, UINT8 data)
 		case MELPS4_PORTU:
 			m_write_u(port, data & 1, 0xff);
 			break;
-		
+
 		default:
 			break;
 	}
@@ -279,7 +306,7 @@ void melps4_cpu_device::write_d_pin(int bit, int state)
 		m_port_d = 0;
 		m_write_d(bit, 0, 0xffff);
 	}
-	
+
 	// set/reset one port D pin
 	else
 	{
@@ -287,6 +314,74 @@ void melps4_cpu_device::write_d_pin(int bit, int state)
 		m_port_d = ((m_port_d & (~(1 << bit))) | (state << bit)) & m_d_mask;
 		m_write_d(bit, m_port_d, 0xffff);
 	}
+}
+
+
+
+//-------------------------------------------------
+//  interrupts
+//-------------------------------------------------
+
+void melps4_cpu_device::execute_set_input(int line, int state)
+{
+	state = (state) ? 1 : 0;
+
+	switch (line)
+	{
+		// external interrupt
+		case MELPS4_INPUT_LINE_INT:
+			// irq on rising/falling edge
+			if (state != m_int_state && state == m_intp)
+			{
+				m_irqflag[0] = true;
+				m_possible_irq = true;
+			}
+			m_int_state = state;
+			break;
+
+		// timer input pin
+		case MELPS4_INPUT_LINE_T:
+			write_t_in(state);
+			break;
+
+		default:
+			break;
+	}
+}
+
+void melps4_cpu_device::do_interrupt(int which)
+{
+	m_inte = 0;
+	m_irqflag[which] = false;
+
+	m_icount--;
+	push_pc();
+	m_sms = m_sm;
+	m_sm = false;
+	m_op = 0; // fake nop
+	m_pc = m_int_page << 7 | (which * 2);
+
+	standard_irq_callback(which);
+}
+
+void melps4_cpu_device::check_interrupt()
+{
+	if (!m_inte)
+		return;
+
+	int which = 0;
+
+	// assume that lower irq vectors have higher priority
+	if (m_irqflag[0])
+		which = 0;
+	else if (m_irqflag[1] && m_tmr_irq_enabled[0])
+		which = 1;
+	else if (m_irqflag[2] && m_tmr_irq_enabled[1])
+		which = 2;
+	else
+		return;
+
+	do_interrupt(which);
 }
 
 
@@ -313,9 +408,15 @@ void melps4_cpu_device::execute_run()
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
-		
-		// irq is not accepted during skip or LXY, LA, EI, DI, RT/RTS/RTI or any branch
-		//..
+
+		// Interrupts are not accepted during skips or LXY, LA, EI, DI, RT/RTS/RTI or any branch.
+		// Documentation is conflicting here: older docs say that it is allowed during skips,
+		// newer docs specifically say when interrupts are prohibited.
+		if (m_possible_irq && !m_prohibit_irq && !m_skip)
+		{
+			m_possible_irq = false;
+			check_interrupt();
+		}
 		m_prohibit_irq = false;
 
 		// fetch next opcode
@@ -330,7 +431,10 @@ void melps4_cpu_device::execute_run()
 		{
 			// if it's a long jump, skip next one as well
 			if (m_op != m_ba_op && (m_op & ~0xf) != m_sp_mask)
+			{
 				m_skip = false;
+				m_op = 0; // fake nop
+			}
 		}
 		else
 			execute_one();

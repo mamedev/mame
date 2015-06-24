@@ -116,7 +116,7 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type ty
 UINT8 i8086_cpu_device::fetch_op()
 {
 	UINT8 data;
-	data = m_direct->read_decrypted_byte(pc(), m_fetch_xor);
+	data = m_direct->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -124,7 +124,7 @@ UINT8 i8086_cpu_device::fetch_op()
 UINT8 i8086_cpu_device::fetch()
 {
 	UINT8 data;
-	data = m_direct->read_raw_byte(pc(), m_fetch_xor);
+	data = m_direct->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
@@ -1915,9 +1915,9 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 			break;
 
 		case 0xe4: // i_inal
-			if (m_lock)	m_lock_handler(1);
+			if (m_lock) m_lock_handler(1);
 			m_regs.b[AL] = read_port_byte( fetch() );
-			if (m_lock)	{ m_lock_handler(0); m_lock = false; }
+			if (m_lock) { m_lock_handler(0); m_lock = false; }
 			CLK(IN_IMM8);
 			break;
 

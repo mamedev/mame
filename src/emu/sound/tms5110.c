@@ -497,21 +497,17 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 		}
 		else
 		{
-						/* generate voiced samples here */
+			// generate voiced samples here
 			/* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
 			 * function has a chirp/peak and then a long chain of zeroes.
-			 * The last entry of the chirp rom is at address 0b110011 (50d), the 51st sample,
+			 * The last entry of the chirp rom is at address 0b110011 (51d), the 52nd sample,
 			 * and if the address reaches that point the ADDRESS incrementer is
-			 * disabled, forcing all samples beyond 50d to be == 50d
-			 * (address 50d holds zeroes)
+			 * disabled, forcing all samples beyond 51d to be == 51d
 			 */
-
-		/*if (m_coeff->subtype & (SUBTYPE_TMS5100 | SUBTYPE_M58817))*/
-
-		if (m_pitch_count > 50)
-			current_val = m_coeff->chirptable[50];
-		else
-			current_val = m_coeff->chirptable[m_pitch_count];
+			if (m_pitch_count >= 51)
+				current_val = (INT8)m_coeff->chirptable[51];
+			else /*m_pitch_count < 51*/
+				current_val = (INT8)m_coeff->chirptable[m_pitch_count];
 		}
 
 		/* Update LFSR *20* times every sample, like patent shows */

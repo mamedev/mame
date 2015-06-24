@@ -205,7 +205,6 @@ private:
 	void cp1610_jd(UINT16 addr);
 	void cp1610_do_sdbd();
 	void cp1610_do_jumps();
-
 };
 
 

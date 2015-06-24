@@ -16,7 +16,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_row_scroll(*this, "row_scroll"),
 		m_spriteram2(*this, "spriteram2"),
-		m_colorram(*this, "colorram") { }
+		m_colorram(*this, "colorram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -29,6 +30,7 @@ public:
 	required_shared_ptr<UINT8> m_row_scroll;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	UINT8 m_portb;
 	tilemap_t *m_bg_tilemap;

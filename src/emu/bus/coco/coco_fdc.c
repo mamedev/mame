@@ -154,7 +154,7 @@ WRITE_LINE_MEMBER( coco_fdc_device::fdc_drq_w )
 //**************************************************************************
 
 static MACHINE_CONFIG_FRAGMENT(coco_fdc)
-	MCFG_WD1773x_ADD(WD_TAG, XTAL_8MHz)
+	MCFG_WD1773_ADD(WD_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(coco_fdc_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(coco_fdc_device, fdc_drq_w))
 
@@ -425,7 +425,7 @@ WRITE8_MEMBER(coco_fdc_device::write)
 //**************************************************************************
 
 static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
-	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_1MHz)
+	MCFG_WD2797_ADD(WD2797_TAG, XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", coco_fdc_floppies, "qd", coco_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", coco_fdc_floppies, "qd", coco_fdc_device::floppy_formats)

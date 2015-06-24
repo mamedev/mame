@@ -35,7 +35,8 @@ public:
 			m_pf4_rowscroll(*this, "pf4_rowscroll"),
 			m_sprgen1(*this, "spritegen1"),
 			m_sprgen2(*this, "spritegen2"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	/* devices */
@@ -57,6 +58,7 @@ public:
 	required_device<decospr_device> m_sprgen1;
 	required_device<decospr_device> m_sprgen2;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT16> m_decrypted_opcodes;
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(boogwing);

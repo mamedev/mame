@@ -493,11 +493,11 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 		}
 		else
 			m_timer->adjust(m_timer_halted_remain);
-		
+
 		m_halt = state;
 		return;
 	}
-	
+
 	if (line != 0 && line != 1)
 		return;
 
@@ -577,7 +577,7 @@ void hmcs40_cpu_device::execute_run()
 		m_icount = 0;
 		return;
 	}
-	
+
 	while (m_icount > 0)
 	{
 		// LPU is handled 1 cycle later

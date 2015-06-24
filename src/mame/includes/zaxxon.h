@@ -19,7 +19,8 @@ public:
 		m_dials(*this, "DIAL"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_colorram(*this, "colorram") { }
+		m_colorram(*this, "colorram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<samples_device> m_samples;
@@ -31,6 +32,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	UINT8 m_int_enabled;
 	UINT8 m_coin_status[3];

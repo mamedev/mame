@@ -543,7 +543,7 @@ UINT8 i386_device::FETCH()
 	if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
 		PF_THROW(error);
 
-	value = m_direct->read_decrypted_byte(address & m_a20_mask);
+	value = m_direct->read_byte(address & m_a20_mask);
 #ifdef DEBUG_MISSING_OPCODE
 	m_opcode_bytes[m_opcode_bytes_length] = value;
 	m_opcode_bytes_length = (m_opcode_bytes_length + 1) & 15;
@@ -564,7 +564,7 @@ UINT16 i386_device::FETCH16()
 		if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
 			PF_THROW(error);
 		address &= m_a20_mask;
-		value = m_direct->read_decrypted_word(address);
+		value = m_direct->read_word(address);
 		m_eip += 2;
 		m_pc += 2;
 	}
@@ -585,7 +585,7 @@ UINT32 i386_device::FETCH32()
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		value = m_direct->read_decrypted_dword(address);
+		value = m_direct->read_dword(address);
 		m_eip += 4;
 		m_pc += 4;
 	}

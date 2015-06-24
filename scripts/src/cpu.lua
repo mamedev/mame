@@ -21,7 +21,7 @@ files {
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null) then
+if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/drcbec.c",
 		MAME_DIR .. "src/emu/cpu/drcbec.h",
@@ -50,7 +50,7 @@ end
 
 --------------------------------------------------
 -- Signetics 8X300 / Scientific Micro Systems SMS300
---@src/emu/cpu/8x300/8x300.h,CPUS += 8X300
+--@src/emu/cpu/8x300/8x300.h,CPUS["8X300"] = true
 --------------------------------------------------
 
 if (CPUS["8X300"]~=null) then
@@ -66,7 +66,7 @@ end
 
 --------------------------------------------------
 -- ARCangent A4
---@src/emu/cpu/arc/arc.h,CPUS += ARC
+--@src/emu/cpu/arc/arc.h,CPUS["ARC"] = true
 --------------------------------------------------
 
 if (CPUS["ARC"]~=null) then
@@ -82,7 +82,7 @@ end
 
 --------------------------------------------------
 -- ARcompact (ARCtangent-A5, ARC 600, ARC 700)
---@src/emu/cpu/arc/arc.h,CPUS += ARCOMPACT
+--@src/emu/cpu/arc/arc.h,CPUS["ARCOMPACT"] = true
 --------------------------------------------------
 
 if (CPUS["ARCOMPACT"]~=null) then
@@ -111,8 +111,8 @@ end
 --------------------------------------------------
 -- Acorn ARM series
 --
----@src/emu/cpu/arm/arm.h,CPUS += ARM
----@src/emu/cpu/arm7/arm7.h,CPUS += ARM7
+--@src/emu/cpu/arm/arm.h,CPUS["ARM"] = true
+--@src/emu/cpu/arm7/arm7.h,CPUS["ARM7"] = true
 --------------------------------------------------
 
 if (CPUS["ARM"]~=null) then
@@ -141,7 +141,7 @@ end
 
 --------------------------------------------------
 -- Advanced Digital Chips SE3208
----@src/emu/cpu/se3208/se3208.h,CPUS += SE3208
+--@src/emu/cpu/se3208/se3208.h,CPUS["SE3208"] = true
 --------------------------------------------------
 
 if (CPUS["SE3208"]~=null) then
@@ -157,7 +157,7 @@ end
 
 --------------------------------------------------
 -- American Microsystems, Inc.(AMI) S2000 series
----@src/emu/cpu/amis2000/amis2000.h,CPUS += AMIS2000
+--@src/emu/cpu/amis2000/amis2000.h,CPUS["AMIS2000"] = true
 --------------------------------------------------
 
 if (CPUS["AMIS2000"]~=null) then
@@ -173,7 +173,7 @@ end
 
 --------------------------------------------------
 -- Alpha 8201
----@src/emu/cpu/alph8201/alph8201.h,CPUS += ALPHA8201
+--@src/emu/cpu/alph8201/alph8201.h,CPUS["ALPHA8201"] = true
 --------------------------------------------------
 
 if (CPUS["ALPHA8201"]~=null) then
@@ -189,7 +189,7 @@ end
 
 --------------------------------------------------
 -- Analog Devices ADSP21xx series
----@src/emu/cpu/adsp2100/adsp2100.h,CPUS += ADSP21XX
+--@src/emu/cpu/adsp2100/adsp2100.h,CPUS["ADSP21XX"] = true
 --------------------------------------------------
 
 if (CPUS["ADSP21XX"]~=null) then
@@ -205,7 +205,7 @@ end
 
 --------------------------------------------------
 -- Analog Devices "Sharc" ADSP21062
----@src/emu/cpu/sharc/sharc.h,CPUS += ADSP21062
+--@src/emu/cpu/sharc/sharc.h,CPUS["ADSP21062"] = true
 --------------------------------------------------
 
 if (CPUS["ADSP21062"]~=null) then
@@ -221,7 +221,7 @@ end
 
 --------------------------------------------------
 -- APEXC
----@src/emu/cpu/apexc/apexc.h,CPUS += APEXC
+--@src/emu/cpu/apexc/apexc.h,CPUS["APEXC"] = true
 --------------------------------------------------
 
 if (CPUS["APEXC"]~=null) then
@@ -237,7 +237,7 @@ end
 
 --------------------------------------------------
 -- AT&T DSP16A
----@src/emu/cpu/dsp16/dsp16.h,CPUS += DSP16A
+--@src/emu/cpu/dsp16/dsp16.h,CPUS["DSP16A"] = true
 --------------------------------------------------
 
 if (CPUS["DSP16A"]~=null) then
@@ -253,7 +253,7 @@ end
 
 --------------------------------------------------
 -- AT&T DSP32C
----@src/emu/cpu/dsp32/dsp32.h,CPUS += DSP32C
+--@src/emu/cpu/dsp32/dsp32.h,CPUS["DSP32C"] = true
 --------------------------------------------------
 
 if (CPUS["DSP32C"]~=null) then
@@ -269,7 +269,7 @@ end
 
 --------------------------------------------------
 -- Atari custom RISC processor
----@src/emu/cpu/asap/asap.h,CPUS += ASAP
+--@src/emu/cpu/asap/asap.h,CPUS["ASAP"] = true
 --------------------------------------------------
 
 if (CPUS["ASAP"]~=null) then
@@ -285,7 +285,7 @@ end
 
 --------------------------------------------------
 -- AMD Am29000
----@src/emu/cpu/am29000/am29000.h,CPUS += AM29000
+--@src/emu/cpu/am29000/am29000.h,CPUS["AM29000"] = true
 --------------------------------------------------
 
 if (CPUS["AM29000"]~=null) then
@@ -301,7 +301,7 @@ end
 
 --------------------------------------------------
 -- Atari Jaguar custom DSPs
----@src/emu/cpu/jaguar/jaguar.h,CPUS += JAGUAR
+--@src/emu/cpu/jaguar/jaguar.h,CPUS["JAGUAR"] = true
 --------------------------------------------------
 
 if (CPUS["JAGUAR"]~=null) then
@@ -317,7 +317,7 @@ end
 
 --------------------------------------------------
 -- Simutrek Cube Quest bit-sliced CPUs
----@src/emu/cpu/cubeqcpu/cubeqcpu.h,CPUS += CUBEQCPU
+--@src/emu/cpu/cubeqcpu/cubeqcpu.h,CPUS["CUBEQCPU"] = true
 --------------------------------------------------
 
 if (CPUS["CUBEQCPU"]~=null) then
@@ -333,7 +333,7 @@ end
 
 --------------------------------------------------
 -- Ensoniq ES5510 ('ESP') DSP
----@src/emu/cpu/es5510/es5510.h,CPUS += ES5510
+--@src/emu/cpu/es5510/es5510.h,CPUS["ES5510"] = true
 --------------------------------------------------
 
 if (CPUS["ES5510"]~=null) then
@@ -345,7 +345,7 @@ end
 
 --------------------------------------------------
 -- Entertainment Sciences AM29116-based RIP
----@src/emu/cpu/esrip/esrip.h,CPUS += ESRIP
+--@src/emu/cpu/esrip/esrip.h,CPUS["ESRIP"] = true
 --------------------------------------------------
 
 if (CPUS["ESRIP"]~=null) then
@@ -361,7 +361,7 @@ end
 
 --------------------------------------------------
 -- Seiko Epson E0C6200 series
----@src/emu/cpu/e0c6200/e0c6200.h,CPUS += E0C6200
+--@src/emu/cpu/e0c6200/e0c6200.h,CPUS["E0C6200"] = true
 --------------------------------------------------
 
 if (CPUS["E0C6200"]~=null) then
@@ -379,7 +379,7 @@ end
 
 --------------------------------------------------
 -- RCA COSMAC
----@src/emu/cpu/cosmac/cosmac.h,CPUS += COSMAC
+--@src/emu/cpu/cosmac/cosmac.h,CPUS["COSMAC"] = true
 --------------------------------------------------
 
 if (CPUS["COSMAC"]~=null) then
@@ -395,7 +395,7 @@ end
 
 --------------------------------------------------
 -- National Semiconductor COP400 family
----@src/emu/cpu/cop400/cop400.h,CPUS += COP400
+--@src/emu/cpu/cop400/cop400.h,CPUS["COP400"] = true
 --------------------------------------------------
 
 if (CPUS["COP400"]~=null) then
@@ -413,7 +413,7 @@ end
 
 --------------------------------------------------
 -- CP1610
----@src/emu/cpu/cp1610/cp1610.h,CPUS += CP1610
+--@src/emu/cpu/cp1610/cp1610.h,CPUS["CP1610"] = true
 --------------------------------------------------
 
 if (CPUS["CP1610"]~=null) then
@@ -429,7 +429,7 @@ end
 
 --------------------------------------------------
 -- Cinematronics vector "CPU"
----@src/emu/cpu/ccpu/ccpu.h,CPUS += CCPU
+--@src/emu/cpu/ccpu/ccpu.h,CPUS["CCPU"] = true
 --------------------------------------------------
 
 if (CPUS["CCPU"]~=null) then
@@ -445,7 +445,7 @@ end
 
 --------------------------------------------------
 -- DEC T-11
----@src/emu/cpu/t11/t11.h,CPUS += T11
+--@src/emu/cpu/t11/t11.h,CPUS["T11"] = true
 --------------------------------------------------
 
 if (CPUS["T11"]~=null) then
@@ -461,7 +461,7 @@ end
 
 --------------------------------------------------
 -- F8
----@src/emu/cpu/f8/f8.h,CPUS += F8
+--@src/emu/cpu/f8/f8.h,CPUS["F8"] = true
 --------------------------------------------------
 
 if (CPUS["F8"]~=null) then
@@ -477,7 +477,7 @@ end
 
 --------------------------------------------------
 -- G65816
----@src/emu/cpu/g65816/g65816.h,CPUS += G65816
+--@src/emu/cpu/g65816/g65816.h,CPUS["G65816"] = true
 --------------------------------------------------
 
 if (CPUS["G65816"]~=null) then
@@ -498,7 +498,7 @@ end
 
 --------------------------------------------------
 -- Hitachi H8 (16/32-bit H8/300, H8/300H, H8S2000 and H8S2600 series)
----@src/emu/cpu/h8/h8.h,CPUS += H8
+--@src/emu/cpu/h8/h8.h,CPUS["H8"] = true
 --------------------------------------------------
 
 if (CPUS["H8"]~=null) then
@@ -560,7 +560,7 @@ end
 
 --------------------------------------------------
 -- Hitachi HCD62121
----@src/emu/cpu/hcd62121/hcd62121.h,CPUS += HCD62121
+--@src/emu/cpu/hcd62121/hcd62121.h,CPUS["HCD62121"] = true
 --------------------------------------------------
 
 if (CPUS["HCD62121"]~=null) then
@@ -576,7 +576,7 @@ end
 
 --------------------------------------------------
 -- Hitachi HMCS40 series
----@src/emu/cpu/hmcs40/hmcs40.h,CPUS += HMCS40
+--@src/emu/cpu/hmcs40/hmcs40.h,CPUS["HMCS40"] = true
 --------------------------------------------------
 
 if (CPUS["HMCS40"]~=null) then
@@ -592,7 +592,7 @@ end
 
 --------------------------------------------------
 -- Hitachi SH1/SH2
----@src/emu/cpu/sh2/sh2.h,CPUS += SH2
+--@src/emu/cpu/sh2/sh2.h,CPUS["SH2"] = true
 --------------------------------------------------
 
 if (CPUS["SH2"]~=null) then
@@ -609,7 +609,7 @@ end
 
 --------------------------------------------------
 -- Hitachi SH4
----@src/emu/cpu/sh4/sh4.h,CPUS += SH4
+--@src/emu/cpu/sh4/sh4.h,CPUS["SH4"] = true
 --------------------------------------------------
 
 if (CPUS["SH4"]~=null) then
@@ -633,7 +633,7 @@ end
 
 --------------------------------------------------
 -- HP Hybrid processor
----@src/emu/cpu/hphybrid/hphybrid.h,CPUS += HPHYBRID
+--@src/emu/cpu/hphybrid/hphybrid.h,CPUS["HPHYBRID"] = true
 --------------------------------------------------
 
 if (CPUS["HPHYBRID"]~=null) then
@@ -649,7 +649,7 @@ end
 
 --------------------------------------------------
 -- Hudsonsoft 6280
----@src/emu/cpu/h6280/h6280.h,CPUS += H6280
+--@src/emu/cpu/h6280/h6280.h,CPUS["H6280"] = true
 --------------------------------------------------
 
 if (CPUS["H6280"]~=null) then
@@ -665,7 +665,7 @@ end
 
 --------------------------------------------------
 -- Hyperstone E1 series
----@src/emu/cpu/e132xs/e132xs.h,CPUS += E1
+--@src/emu/cpu/e132xs/e132xs.h,CPUS["E1"] = true
 --------------------------------------------------
 
 if (CPUS["E1"]~=null) then
@@ -681,7 +681,7 @@ end
 
 --------------------------------------------------
 -- 15IE-00-013 CPU ("Microprogrammed Control Device")
----@src/emu/cpu/ie15/ie15.h,CPUS += IE15
+--@src/emu/cpu/ie15/ie15.h,CPUS["IE15"] = true
 --------------------------------------------------
 
 if (CPUS["IE15"]~=null) then
@@ -697,7 +697,7 @@ end
 
 --------------------------------------------------
 -- Intel 4004
----@src/emu/cpu/i4004/i4004.h,CPUS += I4004
+--@src/emu/cpu/i4004/i4004.h,CPUS["I4004"] = true
 --------------------------------------------------
 
 if (CPUS["I4004"]~=null) then
@@ -713,7 +713,7 @@ end
 
 --------------------------------------------------
 -- Intel 8008
----@src/emu/cpu/i8008/i8008.h,CPUS += I8008
+--@src/emu/cpu/i8008/i8008.h,CPUS["I8008"] = true
 --------------------------------------------------
 
 if (CPUS["I8008"]~=null) then
@@ -729,7 +729,7 @@ end
 
 --------------------------------------------------
 --  National Semiconductor SC/MP
----@src/emu/cpu/scmp/scmp.h,CPUS += SCMP
+--@src/emu/cpu/scmp/scmp.h,CPUS["SCMP"] = true
 --------------------------------------------------
 
 if (CPUS["SCMP"]~=null) then
@@ -745,7 +745,7 @@ end
 
 --------------------------------------------------
 -- Intel 8080/8085A
----@src/emu/cpu/i8085/i8085.h,CPUS += I8085
+--@src/emu/cpu/i8085/i8085.h,CPUS["I8085"] = true
 --------------------------------------------------
 
 if (CPUS["I8085"]~=null) then
@@ -761,7 +761,7 @@ end
 
 --------------------------------------------------
 -- Intel 8089
----@src/emu/cpu/i8085/i8089.h,CPUS += I8089
+--@src/emu/cpu/i8089/i8089.h,CPUS["I8089"] = true
 --------------------------------------------------
 
 if (CPUS["I8089"]~=null) then
@@ -780,7 +780,7 @@ end
 
 --------------------------------------------------
 -- Intel MCS-48 (8039 and derivatives)
----@src/emu/cpu/mcs48/mcs48.h,CPUS += MCS48
+--@src/emu/cpu/mcs48/mcs48.h,CPUS["MCS48"] = true
 --------------------------------------------------
 
 if (CPUS["MCS48"]~=null) then
@@ -796,7 +796,7 @@ end
 
 --------------------------------------------------
 -- Intel 8051 and derivatives
----@src/emu/cpu/mcs51/mcs51.h,CPUS += MCS51
+--@src/emu/cpu/mcs51/mcs51.h,CPUS["MCS51"] = true
 --------------------------------------------------
 
 if (CPUS["MCS51"]~=null) then
@@ -812,7 +812,7 @@ end
 
 --------------------------------------------------
 -- Intel MCS-96
----@src/emu/cpu/mcs96/mcs96.h,CPUS += MCS96
+--@src/emu/cpu/mcs96/mcs96.h,CPUS["MCS96"] = true
 --------------------------------------------------
 
 if (CPUS["MCS96"]~=null) then
@@ -839,9 +839,9 @@ end
 
 --------------------------------------------------
 -- Intel 80x86 series
----@src/emu/cpu/i86/i86.h,CPUS += I86
----@src/emu/cpu/i86/i286.h,CPUS += I86
----@src/emu/cpu/i386/i386.h,CPUS += I386
+--@src/emu/cpu/i86/i86.h,CPUS["I86"] = true
+--@src/emu/cpu/i86/i286.h,CPUS["I86"] = true
+--@src/emu/cpu/i386/i386.h,CPUS["I386"] = true
 --------------------------------------------------
 
 if (CPUS["I86"]~=null) then
@@ -872,7 +872,7 @@ end
 
 --------------------------------------------------
 -- Intel i860
----@src/emu/cpu/i860/i860.h,CPUS += I860
+--@src/emu/cpu/i860/i860.h,CPUS["I860"] = true
 --------------------------------------------------
 
 if (CPUS["I860"]~=null) then
@@ -888,7 +888,7 @@ end
 
 --------------------------------------------------
 -- Intel i960
----@src/emu/cpu/i960/i960.h,CPUS += I960
+--@src/emu/cpu/i960/i960.h,CPUS["I960"] = true
 --------------------------------------------------
 
 if (CPUS["I960"]~=null) then
@@ -904,7 +904,7 @@ end
 
 --------------------------------------------------
 -- LH5801
----@src/emu/cpu/lh5801/lh5801.h,CPUS += LH5801
+--@src/emu/cpu/lh5801/lh5801.h,CPUS["LH5801"] = true
 --------------------------------------------------
 
 if (CPUS["LH5801"]~=null) then
@@ -920,7 +920,7 @@ end
 --------
 ------------------------------------------
 -- Manchester Small-Scale Experimental Machine
----@src/emu/cpu/ssem/ssem.h,CPUS += SSEM
+--@src/emu/cpu/ssem/ssem.h,CPUS["SSEM"] = true
 --------------------------------------------------
 
 if (CPUS["SSEM"]~=null) then
@@ -936,7 +936,7 @@ end
 
 --------------------------------------------------
 -- Fujitsu MB88xx
----@src/emu/cpu/mb88xx/mb88xx.h,CPUS += MB88XX
+--@src/emu/cpu/mb88xx/mb88xx.h,CPUS["MB88XX"] = true
 --------------------------------------------------
 
 if (CPUS["MB88XX"]~=null) then
@@ -952,7 +952,7 @@ end
 
 --------------------------------------------------
 -- Fujitsu MB86233
----@src/emu/cpu/mb86233/mb86233.h,CPUS += MB86233
+--@src/emu/cpu/mb86233/mb86233.h,CPUS["MB86233"] = true
 --------------------------------------------------
 
 if (CPUS["MB86233"]~=null) then
@@ -968,7 +968,7 @@ end
 
 --------------------------------------------------
 -- Fujitsu MB86235
----@src/emu/cpu/mb86233/mb86235.h,CPUS += MB86235
+--@src/emu/cpu/mb86233/mb86235.h,CPUS["MB86235"] = true
 --------------------------------------------------
 
 if (CPUS["MB86235"]~=null) then
@@ -984,7 +984,7 @@ end
 
 --------------------------------------------------
 -- Microchip PIC16C5x
----@src/emu/cpu/pic16c5x/pic16c5x.h,CPUS += PIC16C5X
+--@src/emu/cpu/pic16c5x/pic16c5x.h,CPUS["PIC16C5X"] = true
 --------------------------------------------------
 
 if (CPUS["PIC16C5X"]~=null) then
@@ -1000,7 +1000,7 @@ end
 
 --------------------------------------------------
 -- Microchip PIC16C62x
----@src/emu/cpu/pic16c62x/pic16c62x.h,CPUS += PIC16C62X
+--@src/emu/cpu/pic16c62x/pic16c62x.h,CPUS["PIC16C62X"] = true
 --------------------------------------------------
 
 if (CPUS["PIC16C62X"]~=null) then
@@ -1017,7 +1017,7 @@ end
 --------------------------------------------------
 -- MIPS R3000 (MIPS I/II) series
 -- MIPS R4000 (MIPS III/IV) series
----@src/emu/cpu/mips/mips3.h,CPUS += MIPS
+--@src/emu/cpu/mips/mips3.h,CPUS["MIPS"] = true
 --------------------------------------------------
 
 if (CPUS["MIPS"]~=null) then
@@ -1041,7 +1041,7 @@ end
 
 --------------------------------------------------
 -- Sony PlayStation CPU (R3000-based + GTE)
----@src/emu/cpu/psx/psx.h,CPUS += PSX
+--@src/emu/cpu/psx/psx.h,CPUS["PSX"] = true
 --------------------------------------------------
 
 if (CPUS["PSX"]~=null) then
@@ -1069,7 +1069,7 @@ end
 
 --------------------------------------------------
 -- Mitsubishi MELPS 4 series
----@src/emu/cpu/melps4/melps4.h,CPUS += MELPS4
+--@src/emu/cpu/melps4/melps4.h,CPUS["MELPS4"] = true
 --------------------------------------------------
 
 if (CPUS["MELPS4"]~=null) then
@@ -1087,7 +1087,7 @@ end
 
 --------------------------------------------------
 -- Mitsubishi M37702 and M37710 (based on 65C816)
----@src/emu/cpu/m37710/m37710.h,CPUS += M37710
+--@src/emu/cpu/m37710/m37710.h,CPUS["M37710"] = true
 --------------------------------------------------
 
 if (CPUS["M37710"]~=null) then
@@ -1107,23 +1107,23 @@ end
 
 --------------------------------------------------
 -- Mostek 6502 and its many derivatives
----@src/emu/cpu/m6502/m6502.h,CPUS += M6502
----@src/emu/cpu/m6502/deco16.h,CPUS += M6502
----@src/emu/cpu/m6502/m4510.h,CPUS += M6502
----@src/emu/cpu/m6502/m65ce02.h,CPUS += M6502
----@src/emu/cpu/m6502/m65c02.h,CPUS += M6502
----@src/emu/cpu/m6502/r65c02.h,CPUS += M6502
----@src/emu/cpu/m6502/m65sc02.h,CPUS += M6502
----@src/emu/cpu/m6502/m6504.h,CPUS += M6502
----@src/emu/cpu/m6502/m6509.h,CPUS += M6502
----@src/emu/cpu/m6502/m6510.h,CPUS += M6502
----@src/emu/cpu/m6502/m6510t.h,CPUS += M6502
----@src/emu/cpu/m6502/m7501.h,CPUS += M6502
----@src/emu/cpu/m6502/m8502.h,CPUS += M6502
----@src/emu/cpu/m6502/n2a03.h,CPUS += M6502
----@src/emu/cpu/m6502/m740.h,CPUS += M6502
----@src/emu/cpu/m6502/m3745x.h,CPUS += M6502
----@src/emu/cpu/m6502/m5074x.h,CPUS += M6502
+--@src/emu/cpu/m6502/m6502.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/deco16.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m4510.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m65ce02.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m65c02.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/r65c02.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m65sc02.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m6504.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m6509.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m6510.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m6510t.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m7501.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m8502.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/n2a03.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m740.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m3745x.h,CPUS["M6502"] = true
+--@src/emu/cpu/m6502/m5074x.h,CPUS["M6502"] = true
 
 --------------------------------------------------
 
@@ -1195,7 +1195,7 @@ end
 
 --------------------------------------------------
 -- Motorola 680x
----@src/emu/cpu/m6800/m6800.h,CPUS += M6800
+--@src/emu/cpu/m6800/m6800.h,CPUS["M6800"] = true
 --------------------------------------------------
 
 if (CPUS["M6800"]~=null) then
@@ -1211,7 +1211,7 @@ end
 
 --------------------------------------------------
 -- Motorola 6805
----@src/emu/cpu/m6805/m6805.h,CPUS += M6805
+--@src/emu/cpu/m6805/m6805.h,CPUS["M6805"] = true
 --------------------------------------------------
 
 if (CPUS["M6805"]~=null) then
@@ -1227,9 +1227,9 @@ end
 
 --------------------------------------------------
 -- Motorola 6809
----@src/emu/cpu/m6809/m6809.h,CPUS += M6809
----@src/emu/cpu/m6809/hd6309.h,CPUS += M6809
----@src/emu/cpu/m6809/konami.h,CPUS += M6809
+--@src/emu/cpu/m6809/m6809.h,CPUS["M6809"] = true
+--@src/emu/cpu/m6809/hd6309.h,CPUS["M6809"] = true
+--@src/emu/cpu/m6809/konami.h,CPUS["M6809"] = true
 --------------------------------------------------
 
 if (CPUS["M6809"]~=null) then
@@ -1263,7 +1263,7 @@ end
 
 --------------------------------------------------
 -- Motorola 68HC11
----@src/emu/cpu/mc68hc11/mc68hc11.h,CPUS += MC68HC11
+--@src/emu/cpu/mc68hc11/mc68hc11.h,CPUS["MC68HC11"] = true
 --------------------------------------------------
 
 if (CPUS["MC68HC11"]~=null) then
@@ -1279,7 +1279,7 @@ end
 
 --------------------------------------------------
 -- Motorola 68000 series
----@src/emu/cpu/m68000/m68000.h,CPUS += M680X0
+--@src/emu/cpu/m68000/m68000.h,CPUS["M680X0"] = true
 --------------------------------------------------
 
 if (CPUS["M680X0"]~=null) then
@@ -1297,7 +1297,7 @@ end
 
 --------------------------------------------------
 -- Motorola/Freescale dsp56k
----@src/emu/cpu/dsp56k/dsp56k.h,CPUS += DSP56156
+--@src/emu/cpu/dsp56k/dsp56k.h,CPUS["DSP56156"] = true
 --------------------------------------------------
 
 if (CPUS["DSP56156"]~=null) then
@@ -1322,8 +1322,8 @@ end
 --------------------------------------------------
 -- PDP-1
 -- TX0
----@src/emu/cpu/pdp1/pdp1.h,CPUS += PDP1
----@src/emu/cpu/pdp1/tx0.h,CPUS += PDP1
+--@src/emu/cpu/pdp1/pdp1.h,CPUS["PDP1"] = true
+--@src/emu/cpu/pdp1/tx0.h,CPUS["PDP1"] = true
 --------------------------------------------------
 
 if (CPUS["PDP1"]~=null) then
@@ -1342,7 +1342,7 @@ end
 
 --------------------------------------------------
 -- Motorola PowerPC series
----@src/emu/cpu/powerpc/ppc.h,CPUS += POWERPC
+--@src/emu/cpu/powerpc/ppc.h,CPUS["POWERPC"] = true
 --------------------------------------------------
 
 if (CPUS["POWERPC"]~=null) then
@@ -1361,8 +1361,8 @@ end
 
 --------------------------------------------------
 -- NEC V-series Intel-compatible
----@src/emu/cpu/nec/nec.h,CPUS += NEC
----@src/emu/cpu/v30mz/v30mz.h,CPUS += V30MZ
+--@src/emu/cpu/nec/nec.h,CPUS["NEC"] = true
+--@src/emu/cpu/v30mz/v30mz.h,CPUS["V30MZ"] = true
 --------------------------------------------------
 
 if (CPUS["NEC"]~=null) then
@@ -1394,7 +1394,7 @@ end
 
 --------------------------------------------------
 -- NEC V60/V70
----@src/emu/cpu/v60/v60.h,CPUS += V60
+--@src/emu/cpu/v60/v60.h,CPUS["V60"] = true
 --------------------------------------------------
 
 if (CPUS["V60"]~=null) then
@@ -1410,7 +1410,7 @@ end
 
 --------------------------------------------------
 -- NEC V810 (uPD70732)
----@src/emu/cpu/v810/v810.h,CPUS += V810
+--@src/emu/cpu/v810/v810.h,CPUS["V810"] = true
 --------------------------------------------------
 
 if (CPUS["V810"]~=null) then
@@ -1426,7 +1426,7 @@ end
 
 --------------------------------------------------
 -- NEC uPD7725
----@src/emu/cpu/upd7725/upd7725.h,CPUS += UPD7725
+--@src/emu/cpu/upd7725/upd7725.h,CPUS["UPD7725"] = true
 --------------------------------------------------
 
 if (CPUS["UPD7725"]~=null) then
@@ -1442,7 +1442,7 @@ end
 
 --------------------------------------------------
 -- NEC uPD7810 series
----@src/emu/cpu/upd7810/upd7810.h,CPUS += UPD7810
+--@src/emu/cpu/upd7810/upd7810.h,CPUS["UPD7810"] = true
 --------------------------------------------------
 
 if (CPUS["UPD7810"]~=null) then
@@ -1460,7 +1460,7 @@ end
 
 --------------------------------------------------
 -- NEC uCOM-4 series
----@src/emu/cpu/ucom4/ucom4.h,CPUS += UCOM4
+--@src/emu/cpu/ucom4/ucom4.h,CPUS["UCOM4"] = true
 --------------------------------------------------
 
 if (CPUS["UCOM4"]~=null) then
@@ -1476,7 +1476,7 @@ end
 
 --------------------------------------------------
 -- Nintendo Minx
----@src/emu/cpu/minx/minx.h,CPUS += MINX
+--@src/emu/cpu/minx/minx.h,CPUS["MINX"] = true
 --------------------------------------------------
 
 if (CPUS["MINX"]~=null) then
@@ -1492,7 +1492,7 @@ end
 
 --------------------------------------------------
 -- Nintendo/SGI RSP (R3000-based + vector processing)
----@src/emu/cpu/rsp/rsp.h,CPUS += RSP
+--@src/emu/cpu/rsp/rsp.h,CPUS["RSP"] = true
 --------------------------------------------------
 
 if (CPUS["RSP"]~=null) then
@@ -1515,7 +1515,7 @@ end
 
 --------------------------------------------------
 -- Panasonic MN10200
----@src/emu/cpu/mn10200/mn10200.h,CPUS += MN10200
+--@src/emu/cpu/mn10200/mn10200.h,CPUS["MN10200"] = true
 --------------------------------------------------
 
 if (CPUS["MN10200"]~=null) then
@@ -1531,7 +1531,7 @@ end
 
 --------------------------------------------------
 -- Saturn
----@src/emu/cpu/saturn/saturn.h,CPUS += SATURN
+--@src/emu/cpu/saturn/saturn.h,CPUS["SATURN"] = true
 --------------------------------------------------
 
 if (CPUS["SATURN"]~=null) then
@@ -1547,7 +1547,7 @@ end
 
 --------------------------------------------------
 -- Signetics 2650
----@src/emu/cpu/s2650/s2650.h,CPUS += S2650
+--@src/emu/cpu/s2650/s2650.h,CPUS["S2650"] = true
 --------------------------------------------------
 
 if (CPUS["S2650"]~=null) then
@@ -1563,7 +1563,7 @@ end
 
 --------------------------------------------------
 -- SC61860
----@src/emu/cpu/sc61860/sc61860.h,CPUS += SC61860
+--@src/emu/cpu/sc61860/sc61860.h,CPUS["SC61860"] = true
 --------------------------------------------------
 
 if (CPUS["SC61860"]~=null) then
@@ -1579,7 +1579,7 @@ end
 
 --------------------------------------------------
 -- SM8500
----@src/emu/cpu/sm8500/sm8500.h,CPUS += SM8500
+--@src/emu/cpu/sm8500/sm8500.h,CPUS["SM8500"] = true
 --------------------------------------------------
 
 if (CPUS["SM8500"]~=null) then
@@ -1595,7 +1595,7 @@ end
 
 --------------------------------------------------
 -- Sony/Nintendo SPC700
----@src/emu/cpu/spc700/spc700.h,CPUS += SPC700
+--@src/emu/cpu/spc700/spc700.h,CPUS["SPC700"] = true
 --------------------------------------------------
 
 if (CPUS["SPC700"]~=null) then
@@ -1611,7 +1611,7 @@ end
 
 --------------------------------------------------
 -- SSP1601
----@src/emu/cpu/ssp1601/ssp1601.h,CPUS += SSP1601
+--@src/emu/cpu/ssp1601/ssp1601.h,CPUS["SSP1601"] = true
 --------------------------------------------------
 
 if (CPUS["SSP1601"]~=null) then
@@ -1627,7 +1627,7 @@ end
 
 --------------------------------------------------
 -- SunPlus u'nSP
----@src/emu/cpu/unsp/unsp.h,CPUS += UNSP
+--@src/emu/cpu/unsp/unsp.h,CPUS["UNSP"] = true
 --------------------------------------------------
 
 if (CPUS["UNSP"]~=null) then
@@ -1643,7 +1643,7 @@ end
 
 --------------------------------------------------
 -- Atmel 8-bit AVR
----@src/emu/cpu/avr8/avr8.h,CPUS += AVR8
+--@src/emu/cpu/avr8/avr8.h,CPUS["AVR8"] = true
 --------------------------------------------------
 
 if (CPUS["AVR8"]~=null) then
@@ -1659,7 +1659,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS0980
----@src/emu/cpu/tms0980/tms0980.h,CPUS += TMS0980
+--@src/emu/cpu/tms0980/tms0980.h,CPUS["TMS0980"] = true
 --------------------------------------------------
 
 if (CPUS["TMS0980"]~=null) then
@@ -1675,7 +1675,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS7000 series
----@src/emu/cpu/tms7000/tms7000.h,CPUS += TMS7000
+--@src/emu/cpu/tms7000/tms7000.h,CPUS["TMS7000"] = true
 --------------------------------------------------
 
 if (CPUS["TMS7000"]~=null) then
@@ -1691,9 +1691,9 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS99xx series
----@src/emu/cpu/tms9900/tms9900.h,CPUS += TMS9900
----@src/emu/cpu/tms9900/tms9980a.h,CPUS += TMS9900
----@src/emu/cpu/tms9900/tms9995.h,CPUS += TMS9900
+--@src/emu/cpu/tms9900/tms9900.h,CPUS["TMS9900"] = true
+--@src/emu/cpu/tms9900/tms9980a.h,CPUS["TMS9900"] = true
+--@src/emu/cpu/tms9900/tms9995.h,CPUS["TMS9900"] = true
 
 --------------------------------------------------
 
@@ -1716,7 +1716,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS340x0 graphics controllers
----@src/emu/cpu/tms34010/tms34010.h,CPUS += TMS340X0
+--@src/emu/cpu/tms34010/tms34010.h,CPUS["TMS340X0"] = true
 --------------------------------------------------
 
 if (CPUS["TMS340X0"]~=null) then
@@ -1732,7 +1732,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS3201x DSP
----@src/emu/cpu/tms32010/tms32010.h,CPUS += TMS32010
+--@src/emu/cpu/tms32010/tms32010.h,CPUS["TMS32010"] = true
 --------------------------------------------------
 
 if (CPUS["TMS32010"]~=null) then
@@ -1748,7 +1748,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS3202x DSP
----@src/emu/cpu/tms32025/tms32025.h,CPUS += TMS32025
+--@src/emu/cpu/tms32025/tms32025.h,CPUS["TMS32025"] = true
 --------------------------------------------------
 
 if (CPUS["TMS32025"]~=null) then
@@ -1764,7 +1764,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS3203x DSP
----@src/emu/cpu/tms32031/tms32031.h,CPUS += TMS32031
+--@src/emu/cpu/tms32031/tms32031.h,CPUS["TMS32031"] = true
 --------------------------------------------------
 
 if (CPUS["TMS32031"]~=null) then
@@ -1780,7 +1780,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS3205x DSP
----@src/emu/cpu/tms32051/tms32051.h,CPUS += TMS32051
+--@src/emu/cpu/tms32051/tms32051.h,CPUS["TMS32051"] = true
 --------------------------------------------------
 
 if (CPUS["TMS32051"]~=null) then
@@ -1796,7 +1796,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS3208x DSP
----@src/emu/cpu/tms32082/tms32082.h,CPUS += TMS32082_MP
+--@src/emu/cpu/tms32082/tms32082.h,CPUS["TMS32082"] = true
 --------------------------------------------------
 
 if (CPUS["TMS32082"]~=null) then
@@ -1814,7 +1814,7 @@ end
 
 --------------------------------------------------
 -- Texas Instruments TMS57002 DSP
----@src/emu/cpu/tms57002/tms57002.h,CPUS += TMS57002
+--@src/emu/cpu/tms57002/tms57002.h,CPUS["TMS57002"] = true
 --------------------------------------------------
 
 if (CPUS["TMS57002"]~=null) then
@@ -1840,7 +1840,7 @@ end
 
 --------------------------------------------------
 -- Toshiba TLCS-90 Series
----@src/emu/cpu/tlcs90/tlcs90.h,CPUS += TLCS90
+--@src/emu/cpu/tlcs90/tlcs90.h,CPUS["TLCS90"] = true
 --------------------------------------------------
 
 if (CPUS["TLCS90"]~=null) then
@@ -1852,7 +1852,7 @@ end
 
 --------------------------------------------------
 -- Toshiba TLCS-900 Series
----@src/emu/cpu/tlcs900/tlcs900.h,CPUS += TLCS900
+--@src/emu/cpu/tlcs900/tlcs900.h,CPUS["TLCS900"] = true
 --------------------------------------------------
 
 if (CPUS["TLCS900"]~=null) then
@@ -1868,7 +1868,8 @@ end
 
 --------------------------------------------------
 -- Zilog Z80
----@src/emu/cpu/z80/z80.h,CPUS += Z80
+--@src/emu/cpu/z80/z80.h,CPUS["Z80"] = true
+--@src/emu/cpu/z80/z80daisy.h,CPUS["Z80"] = true
 --------------------------------------------------
 
 if (CPUS["Z80"]~=null) then
@@ -1892,7 +1893,7 @@ end
 
 --------------------------------------------------
 -- Sharp LR35902 (Game Boy CPU)
----@src/emu/cpu/lr35902/lr35902.h,CPUS += LR35902
+--@src/emu/cpu/lr35902/lr35902.h,CPUS["LR35902"] = true
 --------------------------------------------------
 
 if (CPUS["LR35902"]~=null) then
@@ -1908,7 +1909,7 @@ end
 
 --------------------------------------------------
 -- Zilog Z180
----@src/emu/cpu/z180/z180.h,CPUS += Z180
+--@src/emu/cpu/z180/z180.h,CPUS["Z180"] = true
 --------------------------------------------------
 
 if (CPUS["Z180"]~=null) then
@@ -1926,7 +1927,7 @@ end
 
 --------------------------------------------------
 -- Zilog Z8000
----@src/emu/cpu/z8000/z8000.h,CPUS += Z8000
+--@src/emu/cpu/z8000/z8000.h,CPUS["Z8000"] = true
 --------------------------------------------------
 
 if (CPUS["Z8000"]~=null) then
@@ -1942,7 +1943,7 @@ end
 
 --------------------------------------------------
 -- Zilog Z8
----@src/emu/cpu/z8/z8.h,CPUS += Z8
+--@src/emu/cpu/z8/z8.h,CPUS["Z8"] = true
 --------------------------------------------------
 
 if (CPUS["Z8"]~=null) then
@@ -1958,7 +1959,7 @@ end
 
 --------------------------------------------------
 -- Argonaut SuperFX
----@src/emu/cpu/superfx/superfx.h,CPUS += SUPERFX
+--@src/emu/cpu/superfx/superfx.h,CPUS["SUPERFX"] = true
 --------------------------------------------------
 
 if (CPUS["SUPERFX"]~=null) then
@@ -1974,7 +1975,7 @@ end
 
 --------------------------------------------------
 -- Rockwell PPS-4
----@src/emu/cpu/pps4/pps4.h,CPUS += PPS4
+--@src/emu/cpu/pps4/pps4.h,CPUS["PPS4"] = true
 --------------------------------------------------
 
 if (CPUS["PPS4"]~=null) then
@@ -1990,7 +1991,7 @@ end
 
 --------------------------------------------------
 -- Hitachi HD61700
----@src/emu/cpu/hd61700/hd61700.h,CPUS += HD61700
+--@src/emu/cpu/hd61700/hd61700.h,CPUS["HD61700"] = true
 --------------------------------------------------
 
 if (CPUS["HD61700"]~=null) then
@@ -2006,7 +2007,7 @@ end
 
 --------------------------------------------------
 -- Sanyo LC8670
----@src/emu/cpu/lc8670/lc8670.h,CPUS += LC8670
+--@src/emu/cpu/lc8670/lc8670.h,CPUS["LC8670"] = true
 --------------------------------------------------
 
 if (CPUS["LC8670"]~=null) then
@@ -2022,7 +2023,7 @@ end
 
 --------------------------------------------------
 -- Sega SCU DSP
----@src/emu/cpu/scudsp/scudsp.h,CPUS += SCUDSP
+--@src/emu/cpu/scudsp/scudsp.h,CPUS["SCUDSP"] = true
 --------------------------------------------------
 
 if (CPUS["SCUDSP"]~=null) then
@@ -2038,7 +2039,7 @@ end
 
 --------------------------------------------------
 -- Sunplus Technology S+core
----@src/emu/cpu/score/score.h,CPUS += SCORE
+--@src/emu/cpu/score/score.h,CPUS["SCORE"] = true
 --------------------------------------------------
 
 if (CPUS["SCORE"]~=null) then
@@ -2054,7 +2055,7 @@ end
 
 --------------------------------------------------
 -- Xerox Alto-II
----@src/emu/cpu/alto2/alto2cpu.h,CPUS += ALTO2
+--@src/emu/cpu/alto2/alto2cpu.h,CPUS["ALTO2"] = true
 --------------------------------------------------
 
 if (CPUS["ALTO2"]~=null) then

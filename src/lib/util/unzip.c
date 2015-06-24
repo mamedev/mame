@@ -69,25 +69,25 @@
 #define ZIPUNCMP        0x16
 
 /**
- * @def	ZIPFNLN
+ * @def ZIPFNLN
  *
- * @brief	A macro that defines zipfnln.
+ * @brief   A macro that defines zipfnln.
  */
 
 #define ZIPFNLN         0x1a
 
 /**
- * @def	ZIPXTRALN
+ * @def ZIPXTRALN
  *
- * @brief	A macro that defines zipxtraln.
+ * @brief   A macro that defines zipxtraln.
  */
 
 #define ZIPXTRALN       0x1c
 
 /**
- * @def	ZIPNAME
+ * @def ZIPNAME
  *
- * @brief	A macro that defines zipname.
+ * @brief   A macro that defines zipname.
  */
 
 #define ZIPNAME         0x1e
@@ -99,13 +99,13 @@
 ***************************************************************************/
 
 /**
- * @fn	INLINE UINT16 read_word(UINT8 *buf)
+ * @fn  INLINE UINT16 read_word(UINT8 *buf)
  *
- * @brief	Reads a word.
+ * @brief   Reads a word.
  *
- * @param [in,out]	buf	If non-null, the buffer.
+ * @param [in,out]  buf If non-null, the buffer.
  *
- * @return	The word.
+ * @return  The word.
  */
 
 INLINE UINT16 read_word(UINT8 *buf)
@@ -114,13 +114,13 @@ INLINE UINT16 read_word(UINT8 *buf)
 }
 
 /**
- * @fn	INLINE UINT32 read_dword(UINT8 *buf)
+ * @fn  INLINE UINT32 read_dword(UINT8 *buf)
  *
- * @brief	Reads a double word.
+ * @brief   Reads a double word.
  *
- * @param [in,out]	buf	If non-null, the buffer.
+ * @param [in,out]  buf If non-null, the buffer.
  *
- * @return	The double word.
+ * @return  The double word.
  */
 
 INLINE UINT32 read_dword(UINT8 *buf)
@@ -134,7 +134,7 @@ INLINE UINT32 read_dword(UINT8 *buf)
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/** @brief	The zip cache[ zip cache size]. */
+/** @brief  The zip cache[ zip cache size]. */
 static zip_file *zip_cache[ZIP_CACHE_SIZE];
 
 
@@ -165,14 +165,14 @@ static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buff
 -------------------------------------------------*/
 
 /**
- * @fn	zip_error zip_file_open(const char *filename, zip_file **zip)
+ * @fn  zip_error zip_file_open(const char *filename, zip_file **zip)
  *
- * @brief	Queries if a given zip file open.
+ * @brief   Queries if a given zip file open.
  *
- * @param	filename   	Filename of the file.
- * @param [in,out]	zip	If non-null, the zip.
+ * @param   filename    Filename of the file.
+ * @param [in,out]  zip If non-null, the zip.
  *
- * @return	A zip_error.
+ * @return  A zip_error.
  */
 
 zip_error zip_file_open(const char *filename, zip_file **zip)
@@ -267,11 +267,11 @@ error:
 -------------------------------------------------*/
 
 /**
- * @fn	void zip_file_close(zip_file *zip)
+ * @fn  void zip_file_close(zip_file *zip)
  *
- * @brief	Zip file close.
+ * @brief   Zip file close.
  *
- * @param [in,out]	zip	If non-null, the zip.
+ * @param [in,out]  zip If non-null, the zip.
  */
 
 void zip_file_close(zip_file *zip)
@@ -305,9 +305,9 @@ void zip_file_close(zip_file *zip)
 -------------------------------------------------*/
 
 /**
- * @fn	void zip_file_cache_clear(void)
+ * @fn  void zip_file_cache_clear(void)
  *
- * @brief	Zip file cache clear.
+ * @brief   Zip file cache clear.
  */
 
 void zip_file_cache_clear(void)
@@ -335,13 +335,13 @@ void zip_file_cache_clear(void)
 -------------------------------------------------*/
 
 /**
- * @fn	const zip_file_header *zip_file_first_file(zip_file *zip)
+ * @fn  const zip_file_header *zip_file_first_file(zip_file *zip)
  *
- * @brief	Zip file first file.
+ * @brief   Zip file first file.
  *
- * @param [in,out]	zip	If non-null, the zip.
+ * @param [in,out]  zip If non-null, the zip.
  *
- * @return	null if it fails, else a zip_file_header*.
+ * @return  null if it fails, else a zip_file_header*.
  */
 
 const zip_file_header *zip_file_first_file(zip_file *zip)
@@ -358,13 +358,13 @@ const zip_file_header *zip_file_first_file(zip_file *zip)
 -------------------------------------------------*/
 
 /**
- * @fn	const zip_file_header *zip_file_next_file(zip_file *zip)
+ * @fn  const zip_file_header *zip_file_next_file(zip_file *zip)
  *
- * @brief	Zip file next file.
+ * @brief   Zip file next file.
  *
- * @param [in,out]	zip	If non-null, the zip.
+ * @param [in,out]  zip If non-null, the zip.
  *
- * @return	null if it fails, else a zip_file_header*.
+ * @return  null if it fails, else a zip_file_header*.
  */
 
 const zip_file_header *zip_file_next_file(zip_file *zip)
@@ -425,15 +425,15 @@ const zip_file_header *zip_file_next_file(zip_file *zip)
 -------------------------------------------------*/
 
 /**
- * @fn	zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
+ * @fn  zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
  *
- * @brief	Zip file decompress.
+ * @brief   Zip file decompress.
  *
- * @param [in,out]	zip   	If non-null, the zip.
- * @param [in,out]	buffer	If non-null, the buffer.
- * @param	length		  	The length.
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   length          The length.
  *
- * @return	A zip_error.
+ * @return  A zip_error.
  */
 
 zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
@@ -484,11 +484,11 @@ zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
 -------------------------------------------------*/
 
 /**
- * @fn	static void free_zip_file(zip_file *zip)
+ * @fn  static void free_zip_file(zip_file *zip)
  *
- * @brief	Free zip file.
+ * @brief   Free zip file.
  *
- * @param [in,out]	zip	If non-null, the zip.
+ * @param [in,out]  zip If non-null, the zip.
  */
 
 static void free_zip_file(zip_file *zip)
@@ -518,13 +518,13 @@ static void free_zip_file(zip_file *zip)
 -------------------------------------------------*/
 
 /**
- * @fn	static zip_error read_ecd(zip_file *zip)
+ * @fn  static zip_error read_ecd(zip_file *zip)
  *
- * @brief	Reads an ecd.
+ * @brief   Reads an ecd.
  *
- * @param [in,out]	zip	If non-null, the zip.
+ * @param [in,out]  zip If non-null, the zip.
  *
- * @return	The ecd.
+ * @return  The ecd.
  */
 
 static zip_error read_ecd(zip_file *zip)
@@ -602,14 +602,14 @@ static zip_error read_ecd(zip_file *zip)
 -------------------------------------------------*/
 
 /**
- * @fn	static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
+ * @fn  static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
  *
- * @brief	Gets compressed data offset.
+ * @brief   Gets compressed data offset.
  *
- * @param [in,out]	zip   	If non-null, the zip.
- * @param [in,out]	offset	If non-null, the offset.
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param [in,out]  offset  If non-null, the offset.
  *
- * @return	The compressed data offset.
+ * @return  The compressed data offset.
  */
 
 static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
@@ -650,16 +650,16 @@ static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
 -------------------------------------------------*/
 
 /**
- * @fn	static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
+ * @fn  static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
  *
- * @brief	Decompress the data type 0.
+ * @brief   Decompress the data type 0.
  *
- * @param [in,out]	zip   	If non-null, the zip.
- * @param	offset		  	The offset.
- * @param [in,out]	buffer	If non-null, the buffer.
- * @param	length		  	The length.
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param   offset          The offset.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   length          The length.
  *
- * @return	A zip_error.
+ * @return  A zip_error.
  */
 
 static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
@@ -684,16 +684,16 @@ static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buff
 -------------------------------------------------*/
 
 /**
- * @fn	static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
+ * @fn  static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
  *
- * @brief	Decompress the data type 8.
+ * @brief   Decompress the data type 8.
  *
- * @param [in,out]	zip   	If non-null, the zip.
- * @param	offset		  	The offset.
- * @param [in,out]	buffer	If non-null, the buffer.
- * @param	length		  	The length.
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param   offset          The offset.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   length          The length.
  *
- * @return	A zip_error.
+ * @return  A zip_error.
  */
 
 static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)

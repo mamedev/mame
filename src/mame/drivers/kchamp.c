@@ -115,6 +115,10 @@ static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, kchamp_state )
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(kchamp_flipscreen_w)
@@ -400,6 +404,7 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_map)
 	MCFG_CPU_IO_MAP(kchampvs_io_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
@@ -701,26 +706,19 @@ ROM_START( karatevs )
 ROM_END
 
 
-UINT8 *kchamp_state::decrypt_code()
+void kchamp_state::decrypt_code()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *rom = memregion("maincpu")->base();
-	int A;
-
-	space.set_decrypted_region(0x0000, 0xffff, decrypted);
-
-	for (A = 0; A < 0x10000; A++)
-		decrypted[A] = (rom[A] & 0x55) | ((rom[A] & 0x88) >> 2) | ((rom[A] & 0x22) << 2);
-
-	return decrypted;
+	for (int A = 0; A < 0x10000; A++)
+		m_decrypted_opcodes[A] = (rom[A] & 0x55) | ((rom[A] & 0x88) >> 2) | ((rom[A] & 0x22) << 2);
 }
 
 
 DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 {
+	decrypt_code();
+
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypted = decrypt_code();
 	int A;
 
 	/*
@@ -732,14 +730,14 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 	    turns the encryption on, but this doesn't explain the
 	    encrypted address for the jump.
 	 */
-	decrypted[0] = rom[0];  /* this is a jump */
+	m_decrypted_opcodes[0] = rom[0];  /* this is a jump */
 	A = rom[1] + 256 * rom[2];
-	decrypted[A] = rom[A];  /* fix opcode on first jump address (again, a jump) */
+	m_decrypted_opcodes[A] = rom[A];  /* fix opcode on first jump address (again, a jump) */
 	rom[A+1] ^= 0xee;       /* fix address of the second jump */
 	A = rom[A+1] + 256 * rom[A+2];
-	decrypted[A] = rom[A];  /* fix third opcode (ld a,$xx) */
+	m_decrypted_opcodes[A] = rom[A];  /* fix third opcode (ld a,$xx) */
 	A += 2;
-	decrypted[A] = rom[A];  /* fix fourth opcode (ld ($xxxx),a */
+	m_decrypted_opcodes[A] = rom[A];  /* fix fourth opcode (ld ($xxxx),a */
 	/* and from here on, opcodes are encrypted */
 
 	m_counter = 0;

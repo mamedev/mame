@@ -32,7 +32,7 @@ public:
 			m_dsp_ram(*this, "dsp_ram"),
 			m_paletteram(*this, "paletteram"),
 			m_gradram(*this, "gradram"),
-			m_backregs(*this, "backregs"),
+			m_tc0430grw(*this, "tc0430grw"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_dsp(*this, "dsp"),
@@ -49,7 +49,7 @@ public:
 	required_shared_ptr<UINT16> m_dsp_ram;          // Shared 68000/TMS32025 RAM
 	required_shared_ptr<UINT16> m_paletteram;
 	required_shared_ptr<UINT16> m_gradram;
-	required_shared_ptr<UINT16> m_backregs;
+	required_shared_ptr<UINT16> m_tc0430grw;
 
 	/* video-related */
 	taitoair_poly  m_q;
@@ -74,6 +74,8 @@ public:
 	INT16 m_frustumBottom;
 	INT16 m_eyecoordBuffer[4];  /* homogeneous */
 
+	bool m_gradbank;
+	
 	//bitmap_ind16 *m_buffer3d;
 	DECLARE_WRITE16_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(lineram_r);
@@ -100,7 +102,9 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset );
+
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
 	void multVecMtx(const INT16* vec4, const float* m, float* result);
 	void airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* m);

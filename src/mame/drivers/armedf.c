@@ -2184,7 +2184,7 @@ DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
 /*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,                     MONITOR, COMPANY,                        FULLNAME, FLAGS */
 GAME( 1987, legion,   0,        legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE )
 GAME( 1987, legionj,  legion,   legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", GAME_SUPPORTS_SAVE )
-GAME( 1987, legionjb, legion,   legionjb, legion,   armedf_state,   legionjb, ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", GAME_SUPPORTS_SAVE) /* blitter protection removed */
+GAME( 1987, legionjb, legion,   legionjb, legion,   armedf_state,   legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", GAME_SUPPORTS_SAVE) /* blitter protection removed */
 
 GAME( 1987, terraf,   0,        terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", GAME_SUPPORTS_SAVE )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", GAME_SUPPORTS_SAVE )

@@ -2108,7 +2108,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk1))
 
-	MCFG_MB8877x_ADD("mb8877a", XTAL_1MHz)
+	MCFG_MB8877_ADD("mb8877a", XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)

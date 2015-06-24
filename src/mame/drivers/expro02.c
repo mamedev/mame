@@ -1621,28 +1621,28 @@ ROM_START( fantsia2a )
 ROM_END
 
 /* sole change seems to be copyright date, PCB has chip references instead of grid references.  Not correcting all labels in other sets in case these are legitimate labels */
-ROM_START( fantsia2n ) 
-        ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
-        ROM_LOAD16_BYTE( "prog2.g17",    0x000000, 0x80000, CRC(57c59972) SHA1(4b1da928b537cf340a67026d07bc3dfc078b0d0f) )
-        ROM_LOAD16_BYTE( "prog1.f17",    0x000001, 0x80000, CRC(bf2d9a26) SHA1(92f0c1bd32f1e5e0ede3ba847242a212dfae4986) )
-        ROM_LOAD16_BYTE( "scr2.g16",     0x100000, 0x80000, CRC(887b1bc5) SHA1(b6fcdc8a56ea25758f363224d256e9b6c8e30244) )
-        ROM_LOAD16_BYTE( "scr1.f16",     0x100001, 0x80000, CRC(cbba3182) SHA1(a484819940fa1ef18ce679465c31075798748bac) )
-        ROM_LOAD16_BYTE( "scr4.g15",     0x200000, 0x80000, CRC(ce97e411) SHA1(be0ed41362db03f384229c708f2ba4146e5cb501) )
-        ROM_LOAD16_BYTE( "scr3.f15",     0x200001, 0x80000, CRC(480cc2e8) SHA1(38fe57ba1e34537f8be65fcc023ccd43369a5d94) )
-        ROM_LOAD16_BYTE( "scr6.g14",     0x300000, 0x80000, CRC(b29d49de) SHA1(854b76755acf58fb8a4648a0ce72ea6bdf26c555) )
-        ROM_LOAD16_BYTE( "scr5.f14",     0x300001, 0x80000, CRC(d5f88b83) SHA1(518a1f6732149f2851bbedca61f7313c39beb91b) )
-        ROM_LOAD16_BYTE( "scr8.g20",     0x400000, 0x80000, CRC(694ae2b3) SHA1(82b7a565290fce07c8393af4718fd1e6136928e9) )
-        ROM_LOAD16_BYTE( "scr7.f20",     0x400001, 0x80000, CRC(6068712c) SHA1(80a136d76dca566772e34d832ac11b8c7d6ce9ab) )
+ROM_START( fantsia2n )
+		ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+		ROM_LOAD16_BYTE( "prog2.g17",    0x000000, 0x80000, CRC(57c59972) SHA1(4b1da928b537cf340a67026d07bc3dfc078b0d0f) )
+		ROM_LOAD16_BYTE( "prog1.f17",    0x000001, 0x80000, CRC(bf2d9a26) SHA1(92f0c1bd32f1e5e0ede3ba847242a212dfae4986) )
+		ROM_LOAD16_BYTE( "scr2.g16",     0x100000, 0x80000, CRC(887b1bc5) SHA1(b6fcdc8a56ea25758f363224d256e9b6c8e30244) )
+		ROM_LOAD16_BYTE( "scr1.f16",     0x100001, 0x80000, CRC(cbba3182) SHA1(a484819940fa1ef18ce679465c31075798748bac) )
+		ROM_LOAD16_BYTE( "scr4.g15",     0x200000, 0x80000, CRC(ce97e411) SHA1(be0ed41362db03f384229c708f2ba4146e5cb501) )
+		ROM_LOAD16_BYTE( "scr3.f15",     0x200001, 0x80000, CRC(480cc2e8) SHA1(38fe57ba1e34537f8be65fcc023ccd43369a5d94) )
+		ROM_LOAD16_BYTE( "scr6.g14",     0x300000, 0x80000, CRC(b29d49de) SHA1(854b76755acf58fb8a4648a0ce72ea6bdf26c555) )
+		ROM_LOAD16_BYTE( "scr5.f14",     0x300001, 0x80000, CRC(d5f88b83) SHA1(518a1f6732149f2851bbedca61f7313c39beb91b) )
+		ROM_LOAD16_BYTE( "scr8.g20",     0x400000, 0x80000, CRC(694ae2b3) SHA1(82b7a565290fce07c8393af4718fd1e6136928e9) )
+		ROM_LOAD16_BYTE( "scr7.f20",     0x400001, 0x80000, CRC(6068712c) SHA1(80a136d76dca566772e34d832ac11b8c7d6ce9ab) )
 
-        ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
-        ROM_LOAD( "23_OBJ1.U5",      0x00000, 0x80000, CRC(b45c9234) SHA1(b5eeec91b9c6952b338130458405997e1a51bf2f) )
-        ROM_LOAD( "obj2.2i",      0x80000, 0x80000, CRC(ea6e3861) SHA1(463b40f5441231a0451571a0b8afe1ed0fd4b164) )
+		ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+		ROM_LOAD( "23_OBJ1.U5",      0x00000, 0x80000, CRC(b45c9234) SHA1(b5eeec91b9c6952b338130458405997e1a51bf2f) )
+		ROM_LOAD( "obj2.2i",      0x80000, 0x80000, CRC(ea6e3861) SHA1(463b40f5441231a0451571a0b8afe1ed0fd4b164) )
 
-        ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
-        /* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
-        ROM_LOAD( "music2.1b",    0x00000, 0x80000, CRC(23cc4f9c) SHA1(06b5342c25de966ce590917c571e5b19af1fef7d) )
-        ROM_RELOAD(               0x40000, 0x80000 )
-        ROM_LOAD( "music1.1a",    0xc0000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+		ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+		/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+		ROM_LOAD( "music2.1b",    0x00000, 0x80000, CRC(23cc4f9c) SHA1(06b5342c25de966ce590917c571e5b19af1fef7d) )
+		ROM_RELOAD(               0x40000, 0x80000 )
+		ROM_LOAD( "music1.1a",    0xc0000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
 ROM_START( wownfant)

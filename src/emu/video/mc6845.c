@@ -92,6 +92,7 @@ mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this, false),
 		m_show_border_area(true),
+		m_interlace_adjust(0),
 		m_visarea_adjust_min_x(0),
 		m_visarea_adjust_max_x(0),
 		m_visarea_adjust_min_y(0),
@@ -108,6 +109,7 @@ mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MC6845, "MC6845 CRTC", tag, owner, clock, "mc6845", __FILE__),
 		device_video_interface(mconfig, *this, false),
 		m_show_border_area(true),
+		m_interlace_adjust(0),
 		m_visarea_adjust_min_x(0),
 		m_visarea_adjust_max_x(0),
 		m_visarea_adjust_min_y(0),
@@ -218,7 +220,7 @@ WRITE8_MEMBER( mc6845_device::register_w )
 		case 0x06:  m_vert_disp        =   data & 0x7f; break;
 		case 0x07:  m_vert_sync_pos    =   data & 0x7f; break;
 		case 0x08:  m_mode_control     =   data & 0xff; break;
-		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
+		case 0x09:  m_max_ras_addr     =   data & 0x1f; if (MODE_INTERLACE_AND_VIDEO) m_max_ras_addr += m_interlace_adjust; break;
 		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
 		case 0x0b:  m_cursor_end_ras   =   data & 0x1f; break;
 		case 0x0c:  m_disp_start_addr  = ((data & 0x3f) << 8) | (m_disp_start_addr & 0x00ff); break;
@@ -453,10 +455,6 @@ READ_LINE_MEMBER( mc6845_device::vsync_r )
 void mc6845_device::recompute_parameters(bool postload)
 {
 	UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
-
-	// needed for the apricot, correct?
-	if (MODE_INTERLACE_AND_VIDEO)
-		m_max_ras_addr |= 1;
 
 	UINT16 video_char_height = m_max_ras_addr + 1;   // fix garbage at the bottom of the screen (eg victor9k)
 	// Would be useful for 'interlace and video' mode support...

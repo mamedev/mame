@@ -164,7 +164,6 @@ public:
 
 	class eagle_tokenizer : public ptokenizer
 	{
-
 	public:
 		eagle_tokenizer(nl_convert_eagle_t &convert)
 		: ptokenizer(), m_convert(convert)

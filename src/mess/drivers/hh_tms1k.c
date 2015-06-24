@@ -4073,7 +4073,7 @@ void tbreakup_state::prepare_display()
 		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (m_r >> y & 1) ? (m_o & 0x7f) : 0;
 	}
-	
+
 	// 22 round leds from O2-O7 and expander port 7
 	for (int y = 2; y < 8; y++)
 		m_display_state[y] = (m_o >> y & 1) ? m_exp_port[6] : 0;
@@ -4081,7 +4081,7 @@ void tbreakup_state::prepare_display()
 	// 24 rectangular leds from expander ports 1-6 (not strobed)
 	for (int y = 0; y < 6; y++)
 		m_display_state[y+8] = m_exp_port[y];
-	
+
 	set_display_size(8, 14);
 	display_update();
 }
@@ -4099,7 +4099,7 @@ WRITE16_MEMBER(tbreakup_state::write_r)
 
 	// R7,R8: input mux
 	m_inp_mux = data >> 7 & 3;
-	
+
 	// R3-R5: TMS1025 port S
 	// R2: TMS1025 STD pin
 	m_expander->write_s(space, 0, data >> 3 & 7);
@@ -4114,7 +4114,7 @@ WRITE16_MEMBER(tbreakup_state::write_o)
 {
 	// O0-O3: TMS1025 port H
 	m_expander->write_h(space, 0, data & 0xf);
-	
+
 	// O0-O7: led state
 	m_o = data;
 	prepare_display();
@@ -4182,7 +4182,7 @@ static MACHINE_CONFIG_START( tbreakup, tbreakup_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(tbreakup_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tbreakup_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tbreakup_state, write_o))
-	
+
 	MCFG_DEVICE_ADD("expander", TMS1025, 0)
 	MCFG_TMS1024_WRITE_PORT_CB(1, WRITE8(tbreakup_state, expander_w))
 	MCFG_TMS1024_WRITE_PORT_CB(2, WRITE8(tbreakup_state, expander_w))

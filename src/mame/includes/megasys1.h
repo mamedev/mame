@@ -126,6 +126,7 @@ public:
 	DECLARE_DRIVER_INIT(iganinju);
 	DECLARE_DRIVER_INIT(cybattlr);
 	DECLARE_DRIVER_INIT(rodlandj);
+	DECLARE_DRIVER_INIT(rodlandjb);
 	DECLARE_DRIVER_INIT(avspirit);
 	DECLARE_DRIVER_INIT(monkelf);
 	DECLARE_DRIVER_INIT(edf);
@@ -150,7 +151,7 @@ public:
 	void create_tilemaps();
 	void megasys1_priority_create();
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void rodlandj_gfx_unmangle(const char *region);
+	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

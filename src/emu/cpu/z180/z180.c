@@ -85,6 +85,7 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 	: cpu_device(mconfig, Z180, "Z180", tag, owner, clock, "z180", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_decrypted_opcodes_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 {
 }
 
@@ -766,6 +767,18 @@ static UINT8 *SZHVC_sub;
 #include "z180fd.inc"
 #include "z180ed.inc"
 #include "z180op.inc"
+
+
+const address_space_config *z180_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_IO:                return &m_io_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : NULL;
+	default:                   return NULL;
+	}
+}
 
 UINT8 z180_device::z180_readcontrol(offs_t port)
 {
@@ -1956,6 +1969,8 @@ void z180_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
+	m_oprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_program;
+	m_odirect = &m_oprogram->direct();
 	m_iospace = &space(AS_IO);
 
 	/* set up the state table */

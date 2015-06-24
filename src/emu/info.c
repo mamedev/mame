@@ -374,6 +374,12 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 //  output_devices - print the XML info for devices
 //  with roms and for devices that can be mounted
 //  in slots
+//  The current solution works to some extent, but
+//  it is limited by the fact that devices are only
+//  acknowledged when attached to a driver (so that
+//  for instance sub-sub-devices could never appear
+//  in the xml input if they are not also attached
+//  directly to a driver as device or sub-device)
 //-------------------------------------------------
 
 typedef tagmap_t<FPTR> slot_map;
@@ -414,6 +420,17 @@ void info_xml_creator::output_devices()
 
 				if (shortnames.add(dev->shortname(), 0, FALSE) != TMERR_DUPLICATE)
 					output_one_device(*dev, temptag.c_str());
+
+				// also, check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
+				device_iterator deviter2(*dev);
+				for (device_t *device = deviter2.first(); device != NULL; device = deviter2.next())
+				{
+					if (device->owner() == dev && device->shortname()!= NULL && strlen(device->shortname())!=0)
+					{
+						if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
+							output_one_device(*device, device->tag());
+					}
+				}
 
 				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.c_str());
 			}

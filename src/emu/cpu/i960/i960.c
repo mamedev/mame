@@ -109,22 +109,22 @@ UINT32 i960_cpu_device::get_ea(UINT32 opcode)
 			return m_r[abase] + (m_r[index] << scale);
 
 		case 0xc:
-			ret = m_direct->read_decrypted_dword(m_IP);
+			ret = m_direct->read_dword(m_IP);
 			m_IP += 4;
 			return ret;
 
 		case 0xd:
-			ret = m_direct->read_decrypted_dword(m_IP) + m_r[abase];
+			ret = m_direct->read_dword(m_IP) + m_r[abase];
 			m_IP += 4;
 			return ret;
 
 		case 0xe:
-			ret = m_direct->read_decrypted_dword(m_IP) + (m_r[index] << scale);
+			ret = m_direct->read_dword(m_IP) + (m_r[index] << scale);
 			m_IP += 4;
 			return ret;
 
 		case 0xf:
-			ret = m_direct->read_decrypted_dword(m_IP) + m_r[abase] + (m_r[index] << scale);
+			ret = m_direct->read_dword(m_IP) + m_r[abase] + (m_r[index] << scale);
 			m_IP += 4;
 			return ret;
 
@@ -1932,7 +1932,7 @@ void i960_cpu_device::execute_run()
 
 		m_bursting = 0;
 
-		opcode = m_direct->read_decrypted_dword(m_IP);
+		opcode = m_direct->read_dword(m_IP);
 		m_IP += 4;
 
 		execute_op(opcode);

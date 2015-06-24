@@ -453,7 +453,7 @@ GFXDECODE_END
 void slapshot_state::machine_start()
 {
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
-	
+
 	m_int6_timer = timer_alloc(TIMER_SLAPSHOT_INTERRUPT6);
 }
 

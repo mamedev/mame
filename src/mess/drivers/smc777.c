@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// floppy controller
-	MCFG_MB8876x_ADD("fdc", XTAL_1MHz)
+	MCFG_MB8876_ADD("fdc", XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(smc777_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(smc777_state, fdc_drq_w))
 

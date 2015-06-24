@@ -72,7 +72,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram"),
-		m_generic_paletteram_16(*this, "paletteram")
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	int m_input_addr;
@@ -89,6 +90,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;
 	optional_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	void igs025_to_igs022_callback( void );
 
@@ -847,13 +849,11 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 	int size = 0x040000;
 
 	UINT8 *data = memregion("maincpu")->base();
-	UINT8 *code = auto_alloc_array(machine(), UINT8, size);
+	UINT8 *code = m_decrypted_opcodes;
 	memcpy(code, data, size);
 
 	starzan_decrypt(data, size, false); // data
 	starzan_decrypt(code, size, true);  // opcodes
-
-	m_maincpu->space(AS_PROGRAM).set_decrypted_region(0x00000, 0x3ffff, code);
 
 	mgcs_flip_sprites();
 }
@@ -1347,6 +1347,10 @@ static ADDRESS_MAP_START( iqblocka_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, igs017_state )
+	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(igs017_state::nmi_enable_w)
@@ -3706,6 +3710,10 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( starzan, iqblocka )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
 
 
 // mgcs
@@ -4669,5 +4677,5 @@ GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT
 GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",              "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1999?, tarzan,   0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",              "Tarzan (V109C)",                              GAME_NOT_WORKING )
 GAME( 1999?, tarzana,  tarzan,   iqblocka, iqblocka, igs017_state, tarzana,  ROT0, "IGS",              "Tarzan (V107)",                               GAME_NOT_WORKING )
-GAME( 2000?, starzan,  0,        iqblocka, iqblocka, igs017_state, starzan,  ROT0, "IGS / G.F. Gioca", "Super Tarzan (Italy, V100I)",                 GAME_NOT_WORKING )
+GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, starzan,  ROT0, "IGS / G.F. Gioca", "Super Tarzan (Italy, V100I)",                 GAME_NOT_WORKING )
 GAME( ????,  spkrform, spk116it, spkrform, spkrform, igs017_state, spkrform, ROT0, "IGS",              "Super Poker (v100xD03) / Formosa",            GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )

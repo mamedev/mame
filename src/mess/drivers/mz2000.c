@@ -833,7 +833,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_MB8877x_ADD("mb8877a", XTAL_1MHz)
+	MCFG_MB8877_ADD("mb8877a", XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)

@@ -17,42 +17,42 @@
 /*
  * The following options determine how object::update is called.
  * NL_PMF_TYPE_VIRTUAL
- * 		Use stock virtual call
+ *      Use stock virtual call
  *
  * NL_PMF_TYPE_GNUC_PMF
- * 		Use standard pointer to member function syntax
+ *      Use standard pointer to member function syntax
  *
- * 	NL_PMF_TYPE_GNUC_PMF_CONV
- * 		Use gnu extension and convert the pmf to a function pointer.
- * 		This is not standard compliant and needs
- * 		-Wno-pmf-conversions to compile.
+ *  NL_PMF_TYPE_GNUC_PMF_CONV
+ *      Use gnu extension and convert the pmf to a function pointer.
+ *      This is not standard compliant and needs
+ *      -Wno-pmf-conversions to compile.
  *
- * 	NL_PMF_TYPE_INTERNAL
- * 		Use the same approach as MAME for deriving the function pointer.
- * 		This is compiler-dependant as well
+ *  NL_PMF_TYPE_INTERNAL
+ *      Use the same approach as MAME for deriving the function pointer.
+ *      This is compiler-dependant as well
  *
- * 	Benchmarks for ./nltool -c run -f src/mame/drivers/nl_pong.c -t 10 -n pong_fast
+ *  Benchmarks for ./nltool -c run -f src/mame/drivers/nl_pong.c -t 10 -n pong_fast
  *
- * 	NL_PMF_TYPE_INTERNAL: 		215%
- *	NL_PMF_TYPE_GNUC_PMF: 		163%
- * 	NL_PMF_TYPE_GNUC_PMF_CONV: 	215%
- *  NL_PMF_TYPE_VIRTUAL:	 	213%
+ *  NL_PMF_TYPE_INTERNAL:       215%
+ *  NL_PMF_TYPE_GNUC_PMF:       163%
+ *  NL_PMF_TYPE_GNUC_PMF_CONV:  215%
+ *  NL_PMF_TYPE_VIRTUAL:        213%
  *
- *	The whole exercise was done to avoid virtual calls. In prior versions of
- *	netlist, the INTERNAL and GNUC_PMF_CONV approach provided significant improvement.
- *	Since than, ATTR_COLD was removed from functions declared as virtual.
- *	This may explain that the recent benchmarks show no difference at all.
+ *  The whole exercise was done to avoid virtual calls. In prior versions of
+ *  netlist, the INTERNAL and GNUC_PMF_CONV approach provided significant improvement.
+ *  Since than, ATTR_COLD was removed from functions declared as virtual.
+ *  This may explain that the recent benchmarks show no difference at all.
  *
- *	Disappointing is the GNUC_PMF performance.
+ *  Disappointing is the GNUC_PMF performance.
  */
 
 // This will be autodetected
 //#define NL_PMF_TYPE 3
 
-#define NL_PMF_TYPE_VIRTUAL			0
-#define NL_PMF_TYPE_GNUC_PMF		1
-#define NL_PMF_TYPE_GNUC_PMF_CONV	2
-#define NL_PMF_TYPE_INTERNAL		3
+#define NL_PMF_TYPE_VIRTUAL         0
+#define NL_PMF_TYPE_GNUC_PMF        1
+#define NL_PMF_TYPE_GNUC_PMF_CONV   2
+#define NL_PMF_TYPE_INTERNAL        3
 
 #ifndef NL_PMF_TYPE
 	#if PHAS_PMF_INTERNAL

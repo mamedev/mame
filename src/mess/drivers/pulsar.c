@@ -247,7 +247,7 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	MCFG_COM8116_FR_HANDLER(WRITELINE(pulsar_state, fr_w))
 	MCFG_COM8116_FT_HANDLER(WRITELINE(pulsar_state, ft_w))
 
-	MCFG_FD1797x_ADD("fdc", XTAL_4MHz / 2)
+	MCFG_FD1797_ADD("fdc", XTAL_4MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 

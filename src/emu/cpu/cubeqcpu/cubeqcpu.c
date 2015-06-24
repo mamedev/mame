@@ -520,7 +520,7 @@ void cquestsnd_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = m_direct->read_decrypted_qword(SND_PC << 3);
+		UINT64 inst = m_direct->read_qword(SND_PC << 3);
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
 
@@ -776,7 +776,7 @@ void cquestrot_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = m_direct->read_decrypted_qword(ROT_PC << 3);
+		UINT64 inst = m_direct->read_qword(ROT_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
@@ -1196,7 +1196,7 @@ void cquestlin_cpu_device::execute_run()
 		int prog = (m_clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
 		m_curpc = LINE_PC;
-		UINT64 inst = m_direct->read_decrypted_qword(LINE_PC << 3);
+		UINT64 inst = m_direct->read_qword(LINE_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;

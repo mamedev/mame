@@ -626,26 +626,17 @@ INLINE unsigned int m68k_read_immediate_32(m68000_base_device *m68k, unsigned in
 
 INLINE unsigned int m68k_read_pcrelative_8(m68000_base_device *m68k, unsigned int address)
 {
-	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
-		return ((m68k->/*memory.*/readimm16(address&~1)>>(8*(1-(address & 1))))&0xff);
-
-	return m68k->/*memory.*/read8(address);
+	return ((m68k->/*memory.*/readimm16(address&~1)>>(8*(1-(address & 1))))&0xff);
 }
 
 INLINE unsigned int m68k_read_pcrelative_16(m68000_base_device *m68k, unsigned int address)
 {
-	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
-		return m68k->/*memory.*/readimm16(address);
-
-	return m68k->/*memory.*/read16(address);
+	return m68k->/*memory.*/readimm16(address);
 }
 
 INLINE unsigned int m68k_read_pcrelative_32(m68000_base_device *m68k, unsigned int address)
 {
-	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
-		return m68k_read_immediate_32(m68k, address);
-
-	return m68k->/*memory.*/read32(address);
+	return m68k_read_immediate_32(m68k, address);
 }
 
 

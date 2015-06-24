@@ -323,7 +323,7 @@
 #include "machine/timekpr.h"
 #include "video/k001604.h"
 #include "video/poly.h"
-#include "video/rgbgen.h"
+#include "video/rgbutil.h"
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"
 
@@ -895,7 +895,7 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 			rgb_t texel10 = texture_fetch(&m_texture_ram[tex_address], iu, iv+1, texture_width, tex_format);
 			rgb_t texel11 = texture_fetch(&m_texture_ram[tex_address], iu+1, iv+1, texture_width, tex_format);
 
-			rgb_t texel = rgba_bilinear_filter(texel00, texel01, texel10, texel11, (int)(lerp_u * 255), (int)(lerp_v * 255));
+			rgb_t texel = rgbaint_t::bilinear_filter(texel00, texel01, texel10, texel11, (int)(lerp_u * 255), (int)(lerp_v * 255));
 
 #endif
 

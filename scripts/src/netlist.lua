@@ -2,7 +2,6 @@
 -- copyright-holders:MAMEdev Team
 
 project "netlist"
-	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid "665ef8ac-2a4c-4c3e-a05f-fd1e5db11de9"
 	kind (LIBTYPE)
 
@@ -55,18 +54,20 @@ project "netlist"
 		MAME_DIR .. "src/emu/netlist/analog/nld_bjt.h",
 		MAME_DIR .. "src/emu/netlist/analog/nld_fourterm.c",
 		MAME_DIR .. "src/emu/netlist/analog/nld_fourterm.h",
-		MAME_DIR .. "src/emu/netlist/analog/nld_solver.c",
-		MAME_DIR .. "src/emu/netlist/analog/nld_solver.h",
 		MAME_DIR .. "src/emu/netlist/analog/nld_switches.c",
 		MAME_DIR .. "src/emu/netlist/analog/nld_switches.h",
 		MAME_DIR .. "src/emu/netlist/analog/nld_twoterm.c",
 		MAME_DIR .. "src/emu/netlist/analog/nld_twoterm.h",
 		MAME_DIR .. "src/emu/netlist/analog/nld_opamps.c",
 		MAME_DIR .. "src/emu/netlist/analog/nld_opamps.h",
-		MAME_DIR .. "src/emu/netlist/analog/nld_ms_direct.h",
-		MAME_DIR .. "src/emu/netlist/analog/nld_ms_direct1.h",
-		MAME_DIR .. "src/emu/netlist/analog/nld_ms_direct2.h",
-		MAME_DIR .. "src/emu/netlist/analog/nld_ms_gauss_seidel.h",
+    MAME_DIR .. "src/emu/netlist/solver/nld_solver.c",
+    MAME_DIR .. "src/emu/netlist/solver/nld_solver.h",
+		MAME_DIR .. "src/emu/netlist/solver/nld_ms_direct.h",
+		MAME_DIR .. "src/emu/netlist/solver/nld_ms_direct1.h",
+		MAME_DIR .. "src/emu/netlist/solver/nld_ms_direct2.h",
+		MAME_DIR .. "src/emu/netlist/solver/nld_ms_sor.h",
+    MAME_DIR .. "src/emu/netlist/solver/nld_ms_sor_math.h",
+    MAME_DIR .. "src/emu/netlist/solver/nld_ms_gmres.h",
 		MAME_DIR .. "src/emu/netlist/devices/nld_4020.c",
 		MAME_DIR .. "src/emu/netlist/devices/nld_4020.h",
 		MAME_DIR .. "src/emu/netlist/devices/nld_4066.c",

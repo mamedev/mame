@@ -1305,12 +1305,11 @@ static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *e
 				rgb_t color1 = WAVERAM_READ16(palbase, texel1);
 				rgb_t color2 = WAVERAM_READ16(palbase, texel2);
 				rgb_t color3 = WAVERAM_READ16(palbase, texel3);
-				rgb_t filtered;
 				color0 = ((color0 & 0x7fe0) << 6) | (color0 & 0x1f);
 				color1 = ((color1 & 0x7fe0) << 6) | (color1 & 0x1f);
 				color2 = ((color2 & 0x7fe0) << 6) | (color2 & 0x1f);
 				color3 = ((color3 & 0x7fe0) << 6) | (color3 & 0x1f);
-				filtered = rgb_bilinear_filter(color0, color1, color2, color3, curu, curv);
+				rgb_t filtered = rgbaint_t::bilinear_filter(color0, color1, color2, color3, curu, curv);
 				WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, ((filtered >> 6) & 0x7fe0) | (filtered & 0x1f));
 				*depthptr = depth;
 			}

@@ -40,15 +40,7 @@ warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, cons
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
 
-void warpwarp_sound_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

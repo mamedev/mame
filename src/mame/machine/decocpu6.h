@@ -13,7 +13,7 @@ protected:
 	class mi_decrypt : public mi_default_normal {
 	public:
 		virtual ~mi_decrypt() {}
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
 	};
 
 	virtual void device_start();

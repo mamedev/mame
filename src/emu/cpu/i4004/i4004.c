@@ -36,7 +36,7 @@ i4004_cpu_device::i4004_cpu_device(const machine_config &mconfig, const char *ta
 
 UINT8 i4004_cpu_device::ROP()
 {
-	UINT8 retVal = m_direct->read_decrypted_byte(GET_PC.w.l);
+	UINT8 retVal = m_direct->read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x0fff;
 	m_PC = GET_PC;
 	return retVal;
@@ -44,7 +44,7 @@ UINT8 i4004_cpu_device::ROP()
 
 UINT8 i4004_cpu_device::READ_ROM()
 {
-	return m_direct->read_decrypted_byte((GET_PC.w.l & 0x0f00) | m_R[0]);
+	return m_direct->read_byte((GET_PC.w.l & 0x0f00) | m_R[0]);
 }
 
 void i4004_cpu_device::WPM()
@@ -56,7 +56,7 @@ void i4004_cpu_device::WPM()
 
 UINT8 i4004_cpu_device::ARG()
 {
-	UINT8 retVal = m_direct->read_raw_byte(GET_PC.w.l);
+	UINT8 retVal = m_direct->read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x0fff;
 	m_PC = GET_PC;
 	return retVal;

@@ -35,6 +35,8 @@ CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
 CA021  Akai Katana
 
 CMDL01 Medal Mahjong Moukari Bancho
+       Pirates of Gappori http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
+       Oooku http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
 
 Note: CA018 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
       CA020 - Do-Don-Pachi Dai-ou-jou Tamashii on PGM2 platform

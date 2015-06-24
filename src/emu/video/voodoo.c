@@ -211,7 +211,8 @@ static TIMER_CALLBACK( stall_cpu_callback );
 static void stall_cpu(voodoo_state *v, int state, attotime current_time);
 static TIMER_CALLBACK( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
-static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, bool lfb_3d);
+static INT32 lfb_direct_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
+static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
 static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data);
 
@@ -1943,7 +1944,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 					/* loop over words */
 					for (i = 0; i < count; i++)
-						cycles += lfb_w(v, target++, *src++, 0xffffffff, true);
+						cycles += lfb_w(v, target++, *src++, 0xffffffff);
 
 					break;
 				}
@@ -2931,8 +2932,52 @@ default_case:
  *  Voodoo LFB writes
  *
  *************************************/
+static INT32 lfb_direct_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
+{
+	UINT16 *dest;
+	UINT32 destmax;
+	int x, y;
+	UINT32 bufoffs;
 
-static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, bool lfb_3d)
+	/* statistics */
+	v->stats.lfb_writes++;
+
+	/* byte swizzling */
+	if (LFBMODE_BYTE_SWIZZLE_WRITES(v->reg[lfbMode].u))
+	{
+		data = FLIPENDIAN_INT32(data);
+		mem_mask = FLIPENDIAN_INT32(mem_mask);
+	}
+
+	/* word swapping */
+	if (LFBMODE_WORD_SWAP_WRITES(v->reg[lfbMode].u))
+	{
+		data = (data << 16) | (data >> 16);
+		mem_mask = (mem_mask << 16) | (mem_mask >> 16);
+	}
+
+	// TODO: This direct write is not verified.
+	// For direct lfb access just write the data
+	/* compute X,Y */
+	offset <<= 1;
+	x = offset & ((1 << v->fbi.lfb_stride) - 1);
+	y = (offset >> v->fbi.lfb_stride);
+	dest = (UINT16 *)(v->fbi.ram + v->fbi.lfb_base*4);
+	destmax = (v->fbi.mask + 1 - v->fbi.lfb_base*4) / 2;
+	bufoffs = y * v->fbi.rowpixels + x;
+	if (bufoffs >= destmax) {
+		logerror("lfb_direct_w: Buffer offset out of bounds x=%i y=%i offset=%08X bufoffs=%08X data=%08X\n", x, y, offset, (UINT32) bufoffs, data);
+		return 0;
+	}
+	if (ACCESSING_BITS_0_15)
+		dest[bufoffs + 0] = data&0xffff;
+	if (ACCESSING_BITS_16_31)
+		dest[bufoffs + 1] = data>>16;
+	if (LOG_LFB) logerror("VOODOO.%d.LFB:write direct (%d,%d) = %08X & %08X\n", v->index, x, y, data, mem_mask);
+	return 0;
+}
+
+static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	UINT16 *dest, *depth;
 	UINT32 destmax, depthmax;
@@ -2942,29 +2987,6 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 
 	/* statistics */
 	v->stats.lfb_writes++;
-
-	// TODO: This direct write is not verified.
-	// For direct lfb access just write the data
-	if (!lfb_3d) {
-		UINT32 bufoffs;
-		/* compute X,Y */
-		offset <<= 1;
-		x = offset & ((1 << v->fbi.lfb_stride) - 1);
-		y = (offset >> v->fbi.lfb_stride);
-		dest = (UINT16 *)(v->fbi.ram + v->fbi.lfb_base*4);
-		destmax = (v->fbi.mask + 1 - v->fbi.lfb_base*4) / 2;
-		bufoffs = y * v->fbi.rowpixels + x;
-		if (bufoffs >= destmax) {
-			logerror("LFB_W: Buffer offset out of bounds x=%i y=%i lfb_3d=%i offset=%08X bufoffs=%08X data=%08X\n", x, y, lfb_3d, offset, (UINT32) bufoffs, data);
-			return 0;
-		}
-		if (ACCESSING_BITS_0_15)
-			dest[bufoffs + 0] = data&0xffff;
-		if (ACCESSING_BITS_16_31)
-			dest[bufoffs + 1] = data>>16;
-		if (LOG_LFB) logerror("VOODOO.%d.LFB:write direct (%d,%d) = %08X & %08X\n", v->index, x, y, data, mem_mask);
-		return 0;
-	}
 
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_WRITES(v->reg[lfbMode].u))
@@ -3187,9 +3209,6 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	depth = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs);
 	depthmax = (v->fbi.mask + 1 - v->fbi.auxoffs) / 2;
 
-	/* wait for any outstanding work to finish */
-	poly_wait(v->poly, "LFB Write");
-
 	/* simple case: no pipeline */
 	if (!LFBMODE_ENABLE_PIXEL_PIPELINE(v->reg[lfbMode].u))
 	{
@@ -3208,6 +3227,9 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 
 		/* compute dithering */
 		COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(v->reg[fbzMode].u, y);
+
+		/* wait for any outstanding work to finish */
+		poly_wait(v->poly, "LFB Write");
 
 		/* loop over up to two pixels */
 		for (pix = 0; mask; pix++)
@@ -3349,7 +3371,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				if (USE_OLD_RASTER) {
 					/* Perform depth testing */
 					DEPTH_TEST(v, stats, x, v->reg[fbzMode].u);
-	
+
 					/* apply chroma key, alpha mask, and alpha testing */
 					APPLY_CHROMAKEY(v, stats, v->reg[fbzMode].u, color);
 					APPLY_ALPHAMASK(v, stats, v->reg[fbzMode].u, color.rgb.a);
@@ -3358,7 +3380,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 					/* Perform depth testing */
 					if (!depthTest((UINT16) v->reg[zaColor].u, stats, depth[x], v->reg[fbzMode].u, biasdepth))
 						goto nextpixel;
-	
+
 					/* handle chroma key */
 					if (!chromaKeyTest(v, stats, v->reg[fbzMode].u, color))
 						goto nextpixel;
@@ -3369,6 +3391,9 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 					if (!alphaTest(v, stats, v->reg[alphaMode].u, color.rgb.a))
 						goto nextpixel;
 				}
+
+				/* wait for any outstanding work to finish */
+				poly_wait(v->poly, "LFB Write");
 
 				/* pixel pipeline part 2 handles color combine, fog, alpha, and final output */
 				PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth,
@@ -3606,7 +3631,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 						mem_mask &= 0xffff0000;
 					address &= 0xffffff;
 
-					cycles = lfb_w(v, address, data, mem_mask, true);
+					cycles = lfb_w(v, address, data, mem_mask);
 				}
 			}
 
@@ -3732,7 +3757,7 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 		else if (offset & (0x800000/4))
 			cycles = texture_w(v, offset, data);
 		else
-			cycles = lfb_w(v, offset, data, mem_mask, true);
+			cycles = lfb_w(v, offset, data, mem_mask);
 
 		/* if we ended up with cycles, mark the operation pending */
 		if (cycles)
@@ -4769,7 +4794,7 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_w )
 		logerror("%s:banshee_w(YUV:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x3fffff, data, mem_mask);
 	else if (offset < 0x2000000/4)
 	{
-		lfb_w(v, offset & 0xffffff/4, data, mem_mask, true);
+		lfb_w(v, offset & 0xffffff/4, data, mem_mask);
 	} else {
 		logerror("%s:banshee_w Address out of range %08X = %08X & %08X\n", machine().describe_context(), (offset*4), data, mem_mask);
 	}
@@ -4803,7 +4828,7 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_fb_w )
 		}
 	}
 	else
-		lfb_w(v, offset - v->fbi.lfb_base, data, mem_mask, false);
+		lfb_direct_w(v, offset - v->fbi.lfb_base, data, mem_mask);
 }
 
 

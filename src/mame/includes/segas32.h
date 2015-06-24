@@ -32,7 +32,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	required_device<timer_device> m_irq_timer_0;
 	required_device<timer_device> m_irq_timer_1;
 	optional_device<s32comm_device> m_s32comm;
@@ -271,7 +271,7 @@ public:
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
-//	virtual void device_start();
+//  virtual void device_start();
 //  virtual void device_reset();
 };
 
@@ -301,4 +301,3 @@ protected:
 extern const UINT8 ga2_v25_opcode_table[];
 
 extern const device_type SEGA_S32_PCB;
-

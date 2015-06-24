@@ -199,7 +199,7 @@ extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, u
 #define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(addr)          m_direct->read_decrypted_word((addr), m_opcodexor)
+#define READ_OP(addr)          m_direct->read_word((addr), m_opcodexor)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
-	MCFG_FD1793x_ADD(FDC_TAG, XTAL_1MHz)
+	MCFG_FD1793_ADD(FDC_TAG, XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
