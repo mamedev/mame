@@ -575,36 +575,43 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 {
 	m_tc0080vco->tilemap_update();
 
-	bitmap.fill(0, cliprect);
+	UINT32 counter1 = (m_tc0430grw[0] << 16) | m_tc0430grw[1];
+	UINT32 inc1x    = INT16(m_tc0430grw[2]);
+	UINT32 inc1y    = INT16(m_tc0430grw[3]);
+	UINT32 counter2 = (m_tc0430grw[4] << 16) | m_tc0430grw[5];
+	UINT32 inc2x    = INT16(m_tc0430grw[6]);
+	UINT32 inc2y    = INT16(m_tc0430grw[7]);
 
-	{
-		int x,y;
+	// Deltas are 118/31
+	int dx = cliprect.min_x      + 118;
+	int dy = cliprect.min_y - 48 + 31;
 
-		/*
-		[0x980000-3] dword for Y 0
-		[0x980004-7] dword for rotation param 0
-		[0x980008-b] dword for Y 1
-		[0x98000c-f] dword for rotation param 1
-		*/
+	counter1 += dx*inc1x + dy*inc1y;
+	counter2 += dx*inc2x + dy*inc2y;
 
-		for(y=cliprect.min_y;y<cliprect.max_y/2;y++)
-		{
-			for(x=cliprect.min_x;x<cliprect.max_x;x++)
-			{
-				bitmap.pix16(y, x) = 0x2000 + (0x3f - ((y >> 2) & 0x3f));
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+		UINT32 c1b = counter1;
+		UINT32 c2b = counter2;
+		UINT16 *dest = &bitmap.pix(y, cliprect.min_x);
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
+			UINT16 base = 0;
+			UINT32 cntr = 0;
+			if(c2b & 0x800000) {
+				base = 0x2040;
+				cntr = c2b;
+			} else if(c1b & 0x800000) {
+				base = 0x2000;
+				cntr = c1b;
 			}
+			*dest++ = base | (cntr >= 0x83f000 ? 0x3f : (cntr >> 12) & 0x3f);
+				
+			c1b += inc1x;
+			c2b += inc2x;
 		}
-
-		#if 0
-		for(y=cliprect.max_y/2;y<cliprect.max_y;y++)
-		{
-			for(x=cliprect.min_x;x<cliprect.max_x;x++)
-			{
-				bitmap.pix16(y, x) = 0x2040 + (0x3f - ((y >> 2) & 0x3f));
-			}
-		}
-		#endif
+		counter1 += inc1y;
+		counter2 += inc2y;
 	}
+		
 
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
