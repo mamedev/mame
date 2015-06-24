@@ -133,7 +133,6 @@ class rsp_device : public cpu_device
 	friend class rsp_frontend;
 	friend class rsp_cop2;
 	friend class rsp_cop2_drc;
-	friend class rsp_cop2_simd;
 
 public:
 	// construction/destruction
