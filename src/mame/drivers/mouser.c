@@ -75,9 +75,12 @@ static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("P2") AM_WRITE(mouser_sound_interrupt_w) /* byte to sound cpu */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, mouser_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mouser_sound_map, AS_PROGRAM, 8, mouser_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(mouser_sound_byte_r)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(mouser_sound_nmi_clear_w)
@@ -199,6 +202,7 @@ static MACHINE_CONFIG_START( mouser, mouser_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mouser_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mouser_state,  mouser_nmi_interrupt) /* NMI is masked externally */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ??? */
@@ -232,12 +236,12 @@ MACHINE_CONFIG_END
 
 
 ROM_START( mouser )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
+	ROM_REGION( 0x6000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
 	ROM_LOAD( "m0.5e",         0x0000, 0x2000, CRC(b56e00bc) SHA1(f3b23212590d91f1d19b1c7a98c560fbe5943185) )
 	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )
 	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -256,12 +260,12 @@ ROM_END
 
 
 ROM_START( mouserc )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
+	ROM_REGION( 0x6000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
 	ROM_LOAD( "83001.0",       0x0000, 0x2000, CRC(e20f9601) SHA1(f559a470784bda0bee9cab257a548238365acaa6) )
 	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )   // 83001.1
 	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )   // 83001.2
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )   // 83001.5
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -284,16 +288,12 @@ DRIVER_INIT_MEMBER(mouser_state,mouser)
 	/* Decode the opcodes */
 
 	offs_t i;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 	UINT8 *table = memregion("user1")->base();
-
-	space.set_decrypted_region(0x0000, 0x5fff, decrypted);
 
 	for (i = 0; i < 0x6000; i++)
 	{
-		decrypted[i] = table[rom[i]];
+		m_decrypted_opcodes[i] = table[rom[i]];
 	}
 }
 

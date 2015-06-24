@@ -78,10 +78,10 @@ private:
 
 	double m_c[_storage_N + 1];  /* mr + 1 */
 	double m_g[_storage_N + 1];  /* mr + 1 */
-	double * RESTRICT m_ht[_storage_N];	 /* mr, (mr + 1) */
-	double m_s[_storage_N];		/* mr + 1 */
-	double * RESTRICT m_v[_storage_N + 1];		/*(mr + 1), n */
-	//double m_y[_storage_N];		/* mr + 1 */
+	double * RESTRICT m_ht[_storage_N];  /* mr, (mr + 1) */
+	double m_s[_storage_N];     /* mr + 1 */
+	double * RESTRICT m_v[_storage_N + 1];      /*(mr + 1), n */
+	//double m_y[_storage_N];       /* mr + 1 */
 
 	double m_accuracy_mult;
 
@@ -234,7 +234,7 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 	if (gsl>=failed)
 	{
 		//for (int k = 0; k < iN; k++)
-		//	this->m_nets[k]->m_cur_Analog = new_V[k];
+		//  this->m_nets[k]->m_cur_Analog = new_V[k];
 		// Fallback to direct solver ...
 		this->m_gs_fail++;
 		return matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_dynamic(newton_raphson);
@@ -264,11 +264,11 @@ ATTR_HOT inline int matrix_solver_GMRES_t<m_N, _storage_N>::vsolve_non_dynamic(c
 
 static inline void givens_mult( const double c, const double s, double * RESTRICT g0, double * RESTRICT g1 )
 {
-  const double tg0 = c * *g0 - s * *g1;
-  const double tg1 = s * *g0 + c * *g1;
+	const double tg0 = c * *g0 - s * *g1;
+	const double tg1 = s * *g0 + c * *g1;
 
-  *g0 = tg0;
-  *g1 = tg1;
+	*g0 = tg0;
+	*g1 = tg1;
 }
 
 template <unsigned m_N, unsigned _storage_N>
@@ -289,10 +289,10 @@ int matrix_solver_GMRES_t<m_N, _storage_N>::solve_ilu_gmres (double * RESTRICT x
 	 *
 	 * Yousef Saad,
 	 * Iterative Methods for Sparse Linear Systems,
-     * Second Edition,
-     * SIAM, 20003,
-     * ISBN: 0898715342,
-     * LC: QA188.S17.
+	 * Second Edition,
+	 * SIAM, 20003,
+	 * ISBN: 0898715342,
+	 * LC: QA188.S17.
 	 *
 	 *------------------------------------------------------------------------*/
 

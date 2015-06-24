@@ -99,7 +99,6 @@ public:
 
 const logic_family_desc_t *logic_family_desc_t::from_model(const pstring &model)
 {
-
 	if (setup_t::model_value_str(model, "TYPE", "") == "TTL")
 		return &netlist_family_TTL;
 	if (setup_t::model_value_str(model, "TYPE", "") == "CD4000")

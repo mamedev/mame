@@ -215,15 +215,15 @@ bool crc16_t::from_string(const char *string, int length)
 }
 
 /**
- * @fn	const char *crc16_t::as_string(std::string &buffer) const
+ * @fn  const char *crc16_t::as_string(std::string &buffer) const
  *
- * @brief	-------------------------------------------------
- * 			  as_string - convert to a string
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            as_string - convert to a string
+ *          -------------------------------------------------.
  *
- * @param [in,out]	buffer	The buffer.
+ * @param [in,out]  buffer  The buffer.
  *
- * @return	null if it fails, else a char*.
+ * @return  null if it fails, else a char*.
  */
 
 const char *crc16_t::as_string(std::string &buffer) const
@@ -233,14 +233,14 @@ const char *crc16_t::as_string(std::string &buffer) const
 }
 
 /**
- * @fn	void crc16_creator::append(const void *data, UINT32 length)
+ * @fn  void crc16_creator::append(const void *data, UINT32 length)
  *
- * @brief	-------------------------------------------------
- * 			  append - hash a block of data, appending to the currently-accumulated value
- * 			-------------------------------------------------.
+ * @brief   -------------------------------------------------
+ *            append - hash a block of data, appending to the currently-accumulated value
+ *          -------------------------------------------------.
  *
- * @param	data  	The data.
- * @param	length	The length.
+ * @param   data    The data.
+ * @param   length  The length.
  */
 
 void crc16_creator::append(const void *data, UINT32 length)

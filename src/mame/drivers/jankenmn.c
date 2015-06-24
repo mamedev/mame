@@ -263,7 +263,7 @@ ADDRESS_MAP_END
 
 /*
   Writes to port 30h....
-  
+
   They are coming from different code chunks, but seems that at least
   they have different functions. Writes from 00B6h are unknown, whilst
   others coming from 00D6h are counters. Sometimes whilst one increase,
@@ -276,7 +276,7 @@ ADDRESS_MAP_END
   is written to the port. Maybe is a leftover, or just a connector to
   hook the multiplier's 'roulette style' matrix lamps for other Janken
   Man games...
-  
+
   ':maincpu' (00B6): unmapped io memory write to 0030 = 01 & FF
   ':maincpu' (00D6): unmapped io memory write to 0030 = 2F & FF
   ':maincpu' (0103): unmapped io memory write to 0030 = 00 & FF

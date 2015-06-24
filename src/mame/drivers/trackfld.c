@@ -892,7 +892,7 @@ INTERRUPT_GEN_MEMBER(trackfld_state::vblank_nmi)
 static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state,  vblank_irq)
 
@@ -1010,8 +1010,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mastkin, trackfld )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(mastkin_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wizzquiz, trackfld )
@@ -1421,24 +1424,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(trackfld_state,trackfld)
 {
-	konami1_decode(machine(), "maincpu");
 }
 
 DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypt;
-	int A;
 
-	/* "konami1" encrypted opcodes */
-	decrypt = konami1_decode(machine(), "maincpu");
-
-	/* not encrypted opcodes */
-	for (A = 0; A < 0x6000; A++)
-		decrypt[A] = rom[A];
-
-	space.set_decrypted_region(0x0000, 0xffff, decrypt);
+	machine().device<konami1_device>("maincpu")->set_encryption_boundary(0x6000);
 
 	space.install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),this));
 	space.nop_write(0x1000, 0x1000);

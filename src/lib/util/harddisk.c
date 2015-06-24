@@ -98,13 +98,13 @@ chd_file *hard_disk_get_chd(hard_disk_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn	hard_disk_info *hard_disk_get_info(hard_disk_file *file)
+ * @fn  hard_disk_info *hard_disk_get_info(hard_disk_file *file)
  *
- * @brief	Hard disk get information.
+ * @brief   Hard disk get information.
  *
- * @param [in,out]	file	If non-null, the file.
+ * @param [in,out]  file    If non-null, the file.
  *
- * @return	null if it fails, else a hard_disk_info*.
+ * @return  null if it fails, else a hard_disk_info*.
  */
 
 hard_disk_info *hard_disk_get_info(hard_disk_file *file)
@@ -119,15 +119,15 @@ hard_disk_info *hard_disk_get_info(hard_disk_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn	UINT32 hard_disk_read(hard_disk_file *file, UINT32 lbasector, void *buffer)
+ * @fn  UINT32 hard_disk_read(hard_disk_file *file, UINT32 lbasector, void *buffer)
  *
- * @brief	Hard disk read.
+ * @brief   Hard disk read.
  *
- * @param [in,out]	file  	If non-null, the file.
- * @param	lbasector	  	The lbasector.
- * @param [in,out]	buffer	If non-null, the buffer.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   lbasector       The lbasector.
+ * @param [in,out]  buffer  If non-null, the buffer.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 UINT32 hard_disk_read(hard_disk_file *file, UINT32 lbasector, void *buffer)
@@ -143,15 +143,15 @@ UINT32 hard_disk_read(hard_disk_file *file, UINT32 lbasector, void *buffer)
 -------------------------------------------------*/
 
 /**
- * @fn	UINT32 hard_disk_write(hard_disk_file *file, UINT32 lbasector, const void *buffer)
+ * @fn  UINT32 hard_disk_write(hard_disk_file *file, UINT32 lbasector, const void *buffer)
  *
- * @brief	Hard disk write.
+ * @brief   Hard disk write.
  *
- * @param [in,out]	file	If non-null, the file.
- * @param	lbasector   	The lbasector.
- * @param	buffer			The buffer.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   lbasector       The lbasector.
+ * @param   buffer          The buffer.
  *
- * @return	An UINT32.
+ * @return  An UINT32.
  */
 
 UINT32 hard_disk_write(hard_disk_file *file, UINT32 lbasector, const void *buffer)

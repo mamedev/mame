@@ -34,6 +34,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_sprite_position(*this, "spritepos"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen")
@@ -55,6 +56,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_sprite_position;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	required_device<samples_device> m_samples;
 

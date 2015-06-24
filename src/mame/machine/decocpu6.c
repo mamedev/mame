@@ -24,10 +24,10 @@ void deco_cpu6_device::device_reset()
 	m6502_device::device_reset();
 }
 
-UINT8 deco_cpu6_device::mi_decrypt::read_decrypted(UINT16 adr)
+UINT8 deco_cpu6_device::mi_decrypt::read_sync(UINT16 adr)
 {
 	if (adr&1)
-		return BITSWAP8(direct->read_raw_byte(adr),6,4,7,5,3,2,1,0);
+		return BITSWAP8(direct->read_byte(adr),6,4,7,5,3,2,1,0);
 	else
-		return direct->read_raw_byte(adr);
+		return direct->read_byte(adr);
 }

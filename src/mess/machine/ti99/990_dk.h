@@ -52,10 +52,10 @@ private:
 	int m_buf_pos;
 	buf_mode_t m_buf_mode;
 	int m_unit;
-//	int m_head;
+//  int m_head;
 	int m_sector;
 	/*int m_non_seq_mode;*/
-//	int m_ddam;
+//  int m_ddam;
 
 	struct
 	{

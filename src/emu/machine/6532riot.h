@@ -113,7 +113,7 @@ private:
 	UINT8           m_timershift;
 	UINT8           m_timerstate;
 	emu_timer *     m_timer;
-	
+
 	enum
 	{
 		TIMER_END_CB

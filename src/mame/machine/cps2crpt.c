@@ -632,12 +632,8 @@ static void optimise_sboxes(struct optimised_sbox* out, const struct sbox* in)
 
 
 
-static void cps2_decrypt(running_machine &machine, const UINT32 *master_key, UINT32 upper_limit)
+static void cps2_decrypt(running_machine &machine, UINT16 *rom, UINT16 *dec, int length, const UINT32 *master_key, UINT32 upper_limit)
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	int length = machine.root_device().memregion("maincpu")->bytes();
-	UINT16 *dec = auto_alloc_array(machine, UINT16, length/2);
 	int i;
 	UINT32 key1[4];
 	struct optimised_sbox sboxes1[4*4];
@@ -714,16 +710,13 @@ static void cps2_decrypt(running_machine &machine, const UINT32 *master_key, UIN
 				&sboxes2[0*4], &sboxes2[1*4], &sboxes2[2*4], &sboxes2[3*4],
 				key2[0], key2[1], key2[2], key2[3]);
 		}
-		// copy the unencrypted part (not really needed)
+		// copy the unencrypted part
 		while (a < length/2)
 		{
 			dec[a] = rom[a];
 			a += 0x10000;
 		}
 	}
-
-	space.set_decrypted_region(0x000000, length - 1, dec);
-	((m68000_base_device*)machine.device("maincpu"))->set_encrypted_opcode_range(0, length);
 }
 
 
@@ -1017,7 +1010,7 @@ DRIVER_INIT_MEMBER(cps_state,cps2crpt)
 		if (strcmp(k->name, gamename) == 0)
 		{
 			// we have a proper key so use it to decrypt
-			cps2_decrypt(machine(), k->keys, k->upper_limit ? k->upper_limit : 0x400000);
+			cps2_decrypt(machine(), (UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, memregion("maincpu")->bytes(), k->keys, k->upper_limit ? k->upper_limit : 0x400000);
 
 			break;
 		}

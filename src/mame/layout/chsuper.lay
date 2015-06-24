@@ -173,7 +173,7 @@
 			<color red="0.1" green="0.05" blue="0.0" />
 		</rect>
 	</element>
- 
+
 	<element name="start_b" defstate="0">
 		<rect state="1">
 			<color red="0.0" green="0.8" blue="0.0" />
@@ -257,6 +257,6 @@
 		<bezel name="lamp6" element="start" inputtag="IN0" inputmask="0x08">
 			<bounds x="3.57" y="3.07" width="0.31" height="0.20" />
 		</bezel>
-		
+
 	</view>
 </mamelayout>

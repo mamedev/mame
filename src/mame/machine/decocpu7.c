@@ -20,9 +20,9 @@ void deco_cpu7_device::device_reset()
 	static_cast<mi_decrypt *>(mintf)->had_written = false;
 }
 
-UINT8 deco_cpu7_device::mi_decrypt::read_decrypted(UINT16 adr)
+UINT8 deco_cpu7_device::mi_decrypt::read_sync(UINT16 adr)
 {
-	UINT8 res = direct->read_raw_byte(adr);
+	UINT8 res = direct->read_byte(adr);
 	if(had_written) {
 		had_written = false;
 		if((adr & 0x0104) == 0x0104)

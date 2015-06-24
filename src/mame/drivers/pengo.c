@@ -73,12 +73,14 @@ class pengo_state : public pacman_state
 {
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pacman_state(mconfig, type, tag) { }
+		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(penta);
 	DECLARE_DRIVER_INIT(pengo);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 };
 
 
@@ -125,7 +127,7 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram") /* video and color RAM, scratchpad RAM, sprite codes */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM
+	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
@@ -141,6 +143,13 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x9070, 0x9070) AM_WRITENOP
 	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("IN1")
 	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("IN0")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, pengo_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 
@@ -366,6 +375,7 @@ static MACHINE_CONFIG_START( pengo, pengo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 
 	/* video hardware */
@@ -397,6 +407,7 @@ static MACHINE_CONFIG_DERIVED( jrpacmbl, pengo )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jrpacmbl_map)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 MACHINE_CONFIG_END
@@ -631,7 +642,29 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pengo_state,pengo)
 {
-	pengo_decode(machine(), "maincpu");
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0xa0,0x80,0xa8,0x88 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...0...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...0...0...1 */
+		{ 0xa0,0x80,0x20,0x00 }, { 0xa0,0x80,0x20,0x00 },   /* ...0...0...1...0 */
+		{ 0x08,0x28,0x88,0xa8 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...0...1...1 */
+		{ 0x08,0x00,0x88,0x80 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...1...0...0 */
+		{ 0xa0,0x80,0x20,0x00 }, { 0x08,0x00,0x88,0x80 },   /* ...0...1...0...1 */
+		{ 0xa0,0x80,0x20,0x00 }, { 0xa0,0x80,0x20,0x00 },   /* ...0...1...1...0 */
+		{ 0xa0,0x80,0x20,0x00 }, { 0x00,0x08,0x20,0x28 },   /* ...0...1...1...1 */
+		{ 0x88,0x80,0x08,0x00 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...0...0...0 */
+		{ 0x88,0x80,0x08,0x00 }, { 0x00,0x08,0x20,0x28 },   /* ...1...0...0...1 */
+		{ 0x08,0x28,0x88,0xa8 }, { 0x08,0x28,0x88,0xa8 },   /* ...1...0...1...0 */
+		{ 0xa0,0x80,0xa8,0x88 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...0...1...1 */
+		{ 0x08,0x00,0x88,0x80 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...0...0 */
+		{ 0x00,0x08,0x20,0x28 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...0...1 */
+		{ 0x08,0x28,0x88,0xa8 }, { 0x08,0x28,0x88,0xa8 },   /* ...1...1...1...0 */
+		{ 0x08,0x00,0x88,0x80 }, { 0xa0,0x80,0x20,0x00 }    /* ...1...1...1...1 */
+	};
+
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 }
 
 
@@ -677,14 +710,10 @@ DRIVER_INIT_MEMBER(pengo_state,penta)
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },    /* ...1...1...0.... */
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }     /* ...1...1...1.... */
 	};
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
+
 	UINT8 *rom = memregion("maincpu")->base();
-	int A;
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
-
-	for (A = 0x0000;A < 0x8000;A++)
+	for (int A = 0x0000;A < 0x8000;A++)
 	{
 		int i,j;
 		UINT8 src;
@@ -706,7 +735,7 @@ DRIVER_INIT_MEMBER(pengo_state,penta)
 		/* now decode the opcodes */
 		/* pick the translation table from bits 4, 8 and 12 of the address */
 		i = ((A >> 4) & 1) + (((A >> 8) & 1) << 1) + (((A >> 12) & 1) << 2);
-		decrypt[A] = src ^ opcode_xortable[i][j];
+		m_decrypted_opcodes[A] = src ^ opcode_xortable[i][j];
 	}
 }
 

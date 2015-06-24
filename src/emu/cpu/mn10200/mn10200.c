@@ -539,7 +539,6 @@ void mn10200_device::execute_run()
 {
 	while (m_cycles > 0)
 	{
-
 	// internal peripheral, external pin, or prev instruction may have changed irq state
 	while (m_possible_irq)
 	{

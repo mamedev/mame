@@ -139,6 +139,7 @@ WRITE8_MEMBER(jongkyo_state::bank_select_w)
 		m_rom_bank |= mask;
 
 	membank("bank1")->set_entry(m_rom_bank);
+	membank("bank1d")->set_entry(m_rom_bank);
 }
 
 WRITE8_MEMBER(jongkyo_state::mux_w)
@@ -241,6 +242,11 @@ static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")    // banked (8 banks)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, jongkyo_state )
+	AM_RANGE(0x0000, 0x6bff) AM_ROMBANK("bank0d")
+	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
 
@@ -488,6 +494,7 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_CPU_ADD("maincpu", Z80,JONGKYO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(jongkyo_memmap)
 	MCFG_CPU_IO_MAP(jongkyo_portmap)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
 
 
@@ -518,12 +525,13 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( jongkyo )
-	ROM_REGION( 0x9000, "maincpu", 0 )
+	ROM_REGION( 0x8c00, "maincpu", 0 )
 	ROM_LOAD( "epr-6258", 0x00000, 0x02000, CRC(fb8b7bcc) SHA1(8ece7c2c82c237b4b51829d412b2109b96ccd0e7) )
 	ROM_LOAD( "epr-6259", 0x02000, 0x02000, CRC(e46cde5d) SHA1(1cbe1677cfb3fa9f76ad90d5b1446ce9cefee6b7) )
 	ROM_LOAD( "epr-6260", 0x04000, 0x02000, CRC(369a5365) SHA1(037a2971a59ab339595b333cbdfd4cbb104de2be) )
-	ROM_LOAD( "epr-6262", 0x06000, 0x01000, CRC(ecf50f34) SHA1(ecfa1a9360d8fbcbed457d46e53bae77f6d78c1d) )
-	ROM_LOAD( "epr-6261", 0x07000, 0x02000, CRC(9c475ae1) SHA1(b993c2636dafed9f80fa87e71921c3c85c039e45) )  // banked at 6c00-6fff
+	ROM_LOAD( "epr-6262", 0x06000, 0x00c00, CRC(ecf50f34) SHA1(ecfa1a9360d8fbcbed457d46e53bae77f6d78c1d) )
+	ROM_IGNORE(0x400)
+	ROM_LOAD( "epr-6261", 0x06c00, 0x02000, CRC(9c475ae1) SHA1(b993c2636dafed9f80fa87e71921c3c85c039e45) )  // banked at 6c00-6fff
 
 	ROM_REGION( 0x300, "proms", 0 )
 	/* colours */
@@ -544,17 +552,44 @@ ROM_END
 
 DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
 {
-	int i;
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x28,0x08,0xa8,0x88 }, { 0xa0,0xa8,0x20,0x28 },   /* ...0...0...0...0 */
+		{ 0x80,0x88,0xa0,0xa8 }, { 0xa0,0xa8,0x20,0x28 },   /* ...0...0...0...1 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x20,0xa0,0x00,0x80 },   /* ...0...0...1...0 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x80,0x88,0xa0,0xa8 },   /* ...0...0...1...1 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x08,0x88,0x00,0x80 },   /* ...0...1...0...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x08,0x88,0x00,0x80 },   /* ...0...1...0...1 */
+		{ 0x20,0xa0,0x00,0x80 }, { 0x20,0xa0,0x00,0x80 },   /* ...0...1...1...0 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x08,0x88,0x00,0x80 },   /* ...0...1...1...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0xa8,0x20,0x28 },   /* ...1...0...0...0 */
+		{ 0x80,0x88,0xa0,0xa8 }, { 0x80,0x88,0xa0,0xa8 },   /* ...1...0...0...1 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x20,0xa0,0x00,0x80 },   /* ...1...0...1...0 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x80,0x88,0xa0,0xa8 },   /* ...1...0...1...1 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...1...0...0 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x80,0x88,0xa0,0xa8 },   /* ...1...1...0...1 */
+		{ 0x28,0x08,0xa8,0x88 }, { 0x20,0xa0,0x00,0x80 },   /* ...1...1...1...0 */
+		{ 0x80,0x88,0xa0,0xa8 }, { 0x08,0x88,0x00,0x80 }    /* ...1...1...1...1 */
+	};
+
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
-	for (i = 0x6000; i < 0x9000; ++i)
+	for (int i = 0x6000; i < 0x8c00; ++i)
 	{
 		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
 	}
 
+	UINT8 *opcodes = auto_alloc_array(machine(), UINT8, 0x6c00+0x400*8);
+
 	/* then do the standard Sega decryption */
-	jongkyo_decode(machine(), "maincpu");
+	sega_decode(rom, opcodes, 0x6c00, convtable, 8, 0x400);
+
+	membank("bank1")->configure_entries(0, 8, rom+0x6c00, 0x400);
+	membank("bank1d")->configure_entries(0, 8, opcodes+0x6c00, 0x400);
+	membank("bank0d")->set_base(opcodes);
 }
 
 

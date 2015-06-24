@@ -73,7 +73,7 @@ private:
 	pstring m_name;
 };
 
-#define MEMREGION_SOURCE(_name)	\
+#define MEMREGION_SOURCE(_name) \
 		setup.register_source(palloc(netlist_source_memregion_t, _name));
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \

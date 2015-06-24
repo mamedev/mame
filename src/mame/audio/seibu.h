@@ -31,6 +31,7 @@
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 
+ADDRESS_MAP_EXTERN(seibu_sound_decrypted_opcodes_map, 8);
 ADDRESS_MAP_EXTERN(seibu_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu2_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu2_airraid_sound_map, 8);
@@ -58,7 +59,10 @@ public:
 	DECLARE_READ8_MEMBER( main_data_pending_r );
 	DECLARE_WRITE8_MEMBER( main_data_w );
 	DECLARE_WRITE8_MEMBER( pending_w );
-	void decrypt(const char *cpu,int length);
+
+	static void apply_decrypt(UINT8 *rom, UINT8 *opcodes, int length);
+	void set_encryption(int mode);
+	UINT8 *get_custom_decrypt();
 	void update_irq_lines(int param);
 
 protected:
@@ -67,6 +71,9 @@ protected:
 	virtual void device_reset();
 
 	private:
+	int m_encryption_mode;
+	UINT8 *m_decrypted_opcodes;
+
 	// internal state
 	device_t *m_sound_cpu;
 	UINT8 m_main2sub[2];
@@ -187,6 +194,24 @@ extern const device_type SEIBU_ADPCM;
 	MCFG_CPU_ADD("audiocpu", Z80, freq)                             \
 	MCFG_CPU_PROGRAM_MAP(seibu3_adpcm_sound_map)                    \
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+
+#define SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()							\
+	MCFG_DEVICE_MODIFY("seibu_sound")								\
+	downcast<seibu_sound_device *>(device)->set_encryption(1);		\
+	MCFG_DEVICE_MODIFY("audiocpu")									\
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
+
+#define SEIBU_SOUND_SYSTEM_ENCRYPTED_FULL()							\
+	MCFG_DEVICE_MODIFY("seibu_sound")								\
+	downcast<seibu_sound_device *>(device)->set_encryption(2);		\
+	MCFG_DEVICE_MODIFY("audiocpu")									\
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
+
+#define SEIBU_SOUND_SYSTEM_ENCRYPTED_CUSTOM()						\
+	MCFG_DEVICE_MODIFY("seibu_sound")								\
+	downcast<seibu_sound_device *>(device)->set_encryption(3);		\
+	MCFG_DEVICE_MODIFY("audiocpu")									\
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 
 #define SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(freq1,freq2)            \
 	MCFG_SPEAKER_STANDARD_MONO("mono")                              \

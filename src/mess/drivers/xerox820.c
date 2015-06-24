@@ -38,11 +38,11 @@
 
     8-inch formats
     77 tracks, 1 head, 26 sectors, 128 bytes sector length, first sector id 1
-	77 tracks, 1 head, 26 sectors, 256 bytes sector length, first sector id 1
+    77 tracks, 1 head, 26 sectors, 256 bytes sector length, first sector id 1
 
-	5.25-inch formats
-	40 tracks, 1 head, 18 sectors, 128 bytes sector length, first sector id 1
-	40 tracks, 2 heads, 18 sectors, 128 bytes sector length, first sector id 1
+    5.25-inch formats
+    40 tracks, 1 head, 18 sectors, 128 bytes sector length, first sector id 1
+    40 tracks, 2 heads, 18 sectors, 128 bytes sector length, first sector id 1
 
 */
 

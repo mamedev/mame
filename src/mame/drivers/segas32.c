@@ -9,10 +9,10 @@
     Still to do:
         * fix protection
         * fix jpark correctly
-		* priorities in multi32 appear wrong - stadium cross map screen
-		                                   and title fight ingame backgrounds
-		* should f1lap be set up as a twin cabinet / direct link or can it
-		  be operated as a single screen, unlike f1en/air rescue
+        * priorities in multi32 appear wrong - stadium cross map screen
+                                           and title fight ingame backgrounds
+        * should f1lap be set up as a twin cabinet / direct link or can it
+          be operated as a single screen, unlike f1en/air rescue
 
 ****************************************************************************
 
@@ -1818,7 +1818,7 @@ static INPUT_PORTS_START( f1en )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Steering Wheel")
 
 	PORT_START("mainpcb:ANALOG2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Gas Pedal") 
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Gas Pedal")
 
 	PORT_START("mainpcb:ANALOG3")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Brake Pedal")
@@ -5096,26 +5096,26 @@ READ16_MEMBER(segas32_new_state::dual_pcb_slave)
 
 
 
-DRIVER_INIT_MEMBER(segas32_new_state,titlef) {	m_mainpcb->init_titlef(); }
-DRIVER_INIT_MEMBER(segas32_new_state,slipstrm) {	m_mainpcb->init_slipstrm(); }
-DRIVER_INIT_MEMBER(segas32_new_state,radm) {	m_mainpcb->init_radm(); }
-DRIVER_INIT_MEMBER(segas32_new_state,holo) {	m_mainpcb->init_holo(); }
-DRIVER_INIT_MEMBER(segas32_new_state,svf) {	m_mainpcb->init_svf(); }
-DRIVER_INIT_MEMBER(segas32_new_state,jleague) {	m_mainpcb->init_jleague(); }
-DRIVER_INIT_MEMBER(segas32_new_state,jpark) {	m_mainpcb->init_jpark(); }
-DRIVER_INIT_MEMBER(segas32_new_state,ga2) {	m_mainpcb->init_ga2(); }
-DRIVER_INIT_MEMBER(segas32_new_state,scross) {	m_mainpcb->init_scross(); }
-DRIVER_INIT_MEMBER(segas32_new_state,spidman) {	m_mainpcb->init_spidman(); }
-DRIVER_INIT_MEMBER(segas32_new_state,sonicp) {	m_mainpcb->init_sonicp(); }
-DRIVER_INIT_MEMBER(segas32_new_state,dbzvrvs) {	m_mainpcb->init_dbzvrvs(); }
-DRIVER_INIT_MEMBER(segas32_new_state,brival) {	m_mainpcb->init_brival(); }
-DRIVER_INIT_MEMBER(segas32_new_state,harddunk) {	m_mainpcb->init_harddunk(); }
-DRIVER_INIT_MEMBER(segas32_new_state,arabfgt) {	m_mainpcb->init_arabfgt(); }
-DRIVER_INIT_MEMBER(segas32_new_state,sonic) {	m_mainpcb->init_sonic(); }
-DRIVER_INIT_MEMBER(segas32_new_state,alien3) {	m_mainpcb->init_alien3(); }
-DRIVER_INIT_MEMBER(segas32_new_state,darkedge) {	m_mainpcb->init_darkedge(); }
-DRIVER_INIT_MEMBER(segas32_new_state,radr) {	m_mainpcb->init_radr(); }
-DRIVER_INIT_MEMBER(segas32_new_state,orunners) {	m_mainpcb->init_orunners(); }
+DRIVER_INIT_MEMBER(segas32_new_state,titlef) {  m_mainpcb->init_titlef(); }
+DRIVER_INIT_MEMBER(segas32_new_state,slipstrm) {    m_mainpcb->init_slipstrm(); }
+DRIVER_INIT_MEMBER(segas32_new_state,radm) {    m_mainpcb->init_radm(); }
+DRIVER_INIT_MEMBER(segas32_new_state,holo) {    m_mainpcb->init_holo(); }
+DRIVER_INIT_MEMBER(segas32_new_state,svf) { m_mainpcb->init_svf(); }
+DRIVER_INIT_MEMBER(segas32_new_state,jleague) { m_mainpcb->init_jleague(); }
+DRIVER_INIT_MEMBER(segas32_new_state,jpark) {   m_mainpcb->init_jpark(); }
+DRIVER_INIT_MEMBER(segas32_new_state,ga2) { m_mainpcb->init_ga2(); }
+DRIVER_INIT_MEMBER(segas32_new_state,scross) {  m_mainpcb->init_scross(); }
+DRIVER_INIT_MEMBER(segas32_new_state,spidman) { m_mainpcb->init_spidman(); }
+DRIVER_INIT_MEMBER(segas32_new_state,sonicp) {  m_mainpcb->init_sonicp(); }
+DRIVER_INIT_MEMBER(segas32_new_state,dbzvrvs) { m_mainpcb->init_dbzvrvs(); }
+DRIVER_INIT_MEMBER(segas32_new_state,brival) {  m_mainpcb->init_brival(); }
+DRIVER_INIT_MEMBER(segas32_new_state,harddunk) {    m_mainpcb->init_harddunk(); }
+DRIVER_INIT_MEMBER(segas32_new_state,arabfgt) { m_mainpcb->init_arabfgt(); }
+DRIVER_INIT_MEMBER(segas32_new_state,sonic) {   m_mainpcb->init_sonic(); }
+DRIVER_INIT_MEMBER(segas32_new_state,alien3) {  m_mainpcb->init_alien3(); }
+DRIVER_INIT_MEMBER(segas32_new_state,darkedge) {    m_mainpcb->init_darkedge(); }
+DRIVER_INIT_MEMBER(segas32_new_state,radr) {    m_mainpcb->init_radr(); }
+DRIVER_INIT_MEMBER(segas32_new_state,orunners) {    m_mainpcb->init_orunners(); }
 
 DRIVER_INIT_MEMBER(segas32_new_state, arescue)
 {
@@ -5131,7 +5131,6 @@ DRIVER_INIT_MEMBER(segas32_new_state, arescue)
 }
 
 DRIVER_INIT_MEMBER(segas32_new_state,f1en) {
-	
 	m_mainpcb->init_f1en();
 	m_slavepcb->init_f1en();
 
@@ -5164,7 +5163,7 @@ void segas32_state::init_arescue(int m_hasdsp)
 {
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
 	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(FUNC(segas32_state::arescue_dsp_r),this), write16_delegate(FUNC(segas32_state::arescue_dsp_w),this));
-	
+
 	for (int i = 0; i < 6; i++)
 		m_arescue_dsp_io[i] = 0x00;
 

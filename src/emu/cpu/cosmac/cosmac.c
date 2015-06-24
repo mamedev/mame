@@ -533,7 +533,7 @@ offs_t cdp1802_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 
 inline UINT8 cosmac_device::read_opcode(offs_t pc)
 {
-	return m_direct->read_decrypted_byte(pc);
+	return m_direct->read_byte(pc);
 }
 
 

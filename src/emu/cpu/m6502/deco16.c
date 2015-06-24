@@ -41,7 +41,13 @@ void deco16_device::device_start()
 
 const address_space_config *deco16_device::memory_space_config(address_spacenum spacenum) const
 {
-	return spacenum == AS_PROGRAM ? &program_config : spacenum == AS_IO ? &io_config : NULL;
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &program_config;
+	case AS_IO:                return &io_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : NULL;
+	default:                   return NULL;
+	}
 }
 
 #include "cpu/m6502/deco16.inc"

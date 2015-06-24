@@ -295,15 +295,15 @@ static bool process_field(jed_data *data, const UINT8 **src, const UINT8 *srcend
 -------------------------------------------------*/
 
 /**
- * @fn	int pla_parse(const void *data, size_t length, jed_data *result)
+ * @fn  int pla_parse(const void *data, size_t length, jed_data *result)
  *
- * @brief	Pla parse.
+ * @brief   Pla parse.
  *
- * @param	data	  	The data.
- * @param	length	  	The length.
- * @param [out]	result	If non-null, the result.
+ * @param   data        The data.
+ * @param   length      The length.
+ * @param [out] result  If non-null, the result.
  *
- * @return	An int.
+ * @return  An int.
  */
 
 int pla_parse(const void *data, size_t length, jed_data *result)

@@ -27,7 +27,6 @@
 
 namespace netlist
 {
-
 	struct netlist_time
 	{
 	public:

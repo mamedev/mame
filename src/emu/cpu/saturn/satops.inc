@@ -9,7 +9,7 @@ int saturn_device::READ_OP()
 {
 	UINT8 data;
 	m_icount-=3;
-		data=m_direct->read_decrypted_byte(m_pc);
+		data=m_direct->read_byte(m_pc);
 	saturn_assert(data<0x10);
 	m_pc=(m_pc+1)&0xfffff;
 	return data;
@@ -19,7 +19,7 @@ int saturn_device::READ_OP_ARG()
 {
 	UINT8 data;
 	m_icount-=3;
-		data=m_direct->read_raw_byte(m_pc);
+		data=m_direct->read_byte(m_pc);
 	saturn_assert(data<0x10);
 	m_pc=(m_pc+1)&0xfffff;
 	return data;

@@ -4,12 +4,12 @@
 
     Regnecentralen RC759
 
-	TODO:
-	- Emulate the Intel 82730 CRT controller and figure out the rest
-	- Connect iSBX bus
-	- (much later) move floppy/external printer to the slot interface
+    TODO:
+    - Emulate the Intel 82730 CRT controller and figure out the rest
+    - Connect iSBX bus
+    - (much later) move floppy/external printer to the slot interface
 
-	Status: Hangs waiting for an answer from the 82730
+    Status: Hangs waiting for an answer from the 82730
 
 ***************************************************************************/
 
@@ -256,27 +256,27 @@ static ADDRESS_MAP_START( rc759_io, AS_IO, 16, rc759_state )
 	AM_RANGE(0x000, 0x003) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x020, 0x021) AM_READ8(keyboard_r, 0x00ff)
 	AM_RANGE(0x050, 0x05f) AM_READWRITE8(rtc_r, rtc_w, 0x00ff) // and sound
-//	AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
+//  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
 	AM_RANGE(0x070, 0x077) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x080, 0x0ff) AM_READWRITE8(nvram_r, nvram_w, 0x00ff)
-//	AM_RANGE(0x100, 0x101) net
+//  AM_RANGE(0x100, 0x101) net
 	AM_RANGE(0x180, 0x1bf) AM_READWRITE8(palette_r, palette_w, 0x00ff)
-//	AM_RANGE(0x230, 0x231) crt reset
-//	AM_RANGE(0x240, 0x241) crt ch. att.
-//	AM_RANGE(0x250, 0x251) local printer data (centronics)
-//	AM_RANGE(0x260, 0x261) local printer control (centronics)
+//  AM_RANGE(0x230, 0x231) crt reset
+//  AM_RANGE(0x240, 0x241) crt ch. att.
+//  AM_RANGE(0x250, 0x251) local printer data (centronics)
+//  AM_RANGE(0x260, 0x261) local printer control (centronics)
 	AM_RANGE(0x280, 0x287) AM_DEVREADWRITE8("fdc", wd2797_t, read, write, 0x00ff)
 	AM_RANGE(0x288, 0x289) AM_WRITE8(floppy_control_w, 0x00ff)
-//	AM_RANGE(0x28a, 0x28b) external printer data
-//	AM_RANGE(0x28d, 0x28d) external printer control
+//  AM_RANGE(0x28a, 0x28b) external printer data
+//  AM_RANGE(0x28d, 0x28d) external printer control
 	AM_RANGE(0x28e, 0x28f) AM_READWRITE8(floppy_ack_r, floppy_reserve_w, 0x00ff)
 	AM_RANGE(0x290, 0x291) AM_WRITE8(floppy_release_w, 0x00ff)
-//	AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
-//	AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
-//	AM_RANGE(0x300, 0x30f) isbx1
-//	AM_RANGE(0x310, 0x31f) isbx2
-//	AM_RANGE(0x320, 0x321) isbx dma ack
-//	AM_RANGE(0x330, 0x331) isbx tc
+//  AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
+//  AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
+//  AM_RANGE(0x300, 0x30f) isbx1
+//  AM_RANGE(0x310, 0x31f) isbx2
+//  AM_RANGE(0x320, 0x321) isbx dma ack
+//  AM_RANGE(0x330, 0x331) isbx tc
 ADDRESS_MAP_END
 
 

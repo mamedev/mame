@@ -569,26 +569,26 @@ ROM_END
 
 ROM_START( bioniccbl )
 	ROM_REGION( 0x40000, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "02l.bin",   0x00000, 0x10000, CRC(b2fe1ddb) SHA1(892f19124993add96edabdba3aafeecc6668c5d9) ) 
-	ROM_LOAD16_BYTE( "03l.bin",   0x00001, 0x10000, CRC(427a003d) SHA1(5a379fe2942e5565810939d5eb843003226222cc) ) 
-	ROM_LOAD16_BYTE( "02u.bin",   0x20000, 0x10000, CRC(27f04bb6) SHA1(41d17b84b34dc8b2e5dfa67794a8df3e898b740b) ) 
-	ROM_LOAD16_BYTE( "03u.bin",   0x20001, 0x10000, CRC(c01547b1) SHA1(563bf6be4f10f5e6eb5b562266accf168f62bf30) ) 
+	ROM_LOAD16_BYTE( "02l.bin",   0x00000, 0x10000, CRC(b2fe1ddb) SHA1(892f19124993add96edabdba3aafeecc6668c5d9) )
+	ROM_LOAD16_BYTE( "03l.bin",   0x00001, 0x10000, CRC(427a003d) SHA1(5a379fe2942e5565810939d5eb843003226222cc) )
+	ROM_LOAD16_BYTE( "02u.bin",   0x20000, 0x10000, CRC(27f04bb6) SHA1(41d17b84b34dc8b2e5dfa67794a8df3e898b740b) )
+	ROM_LOAD16_BYTE( "03u.bin",   0x20001, 0x10000, CRC(c01547b1) SHA1(563bf6be4f10f5e6eb5b562266accf168f62bf30) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "01.bin",       0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) ) 
+	ROM_LOAD( "01.bin",       0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP ) // 19.bin (protected)
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "06.bin",       0x00000, 0x4000, CRC(4e6b81d9) SHA1(052784d789b0c9193edf218fa1883b6e3b7df988) ) 
+	ROM_LOAD( "06.bin",       0x00000, 0x4000, CRC(4e6b81d9) SHA1(052784d789b0c9193edf218fa1883b6e3b7df988) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "05.bin",       0x00000, 0x8000, CRC(9bf8dc7f) SHA1(539a52087ed1f58839b6aa8c0b5ed249f4f4041e) ) 
-	ROM_LOAD( "04.bin",       0x08000, 0x8000, CRC(1b43bf63) SHA1(b80d675a07cebd83daf202d1c3d3f7c2dedf5c30) ) 
+	ROM_LOAD( "05.bin",       0x00000, 0x8000, CRC(9bf8dc7f) SHA1(539a52087ed1f58839b6aa8c0b5ed249f4f4041e) )
+	ROM_LOAD( "04.bin",       0x08000, 0x8000, CRC(1b43bf63) SHA1(b80d675a07cebd83daf202d1c3d3f7c2dedf5c30) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "ts_12.17f",    0x00000, 0x8000, CRC(e4b4619e) SHA1(3bec8399ffb28fd50ce6ae88d90b091eadf8bda1) ) // 09.bin   
+	ROM_LOAD( "ts_12.17f",    0x00000, 0x8000, CRC(e4b4619e) SHA1(3bec8399ffb28fd50ce6ae88d90b091eadf8bda1) ) // 09.bin
 	ROM_LOAD( "ts_11.15f",    0x08000, 0x8000, CRC(ab30237a) SHA1(ea6c07df992ba48f9eca7daa4ea775faa94358d2) ) // 08.bin
 	ROM_LOAD( "ts_17.17g",    0x10000, 0x8000, CRC(deb657e4) SHA1(b36b468f9bbb7a4937286230d3f6caa14c61d4dd) ) // 13.bin
 	ROM_LOAD( "ts_16.15g",    0x18000, 0x8000, CRC(d363b5f9) SHA1(1dd3991d99db2d6bcbdb12879ba50a01fef95004) ) // 12.bin
@@ -598,10 +598,10 @@ ROM_START( bioniccbl )
 	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) ) // 18.bin
 
 	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "07.bin",       0x00000, 0x10000, CRC(a0e78996) SHA1(810a54e657c0faaff6a8494acaf803d1d2151893) ) 
-	ROM_LOAD( "11.bin",       0x10000, 0x10000, CRC(37cb11c2) SHA1(af8c2ae4bb6e6c13ea3e8b7c96e5b18f1eb1d5a5) ) 
-	ROM_LOAD( "15.bin",       0x20000, 0x10000, CRC(4e0354ce) SHA1(d3256c891b44c6593b0b44c0d0a3e754ce78c1cb) ) 
-	ROM_LOAD( "16.bin",       0x30000, 0x10000, CRC(ac89e5cc) SHA1(aa7e065ece6d25b7e83fadcd22c09e1f7dc0b86f) ) 
+	ROM_LOAD( "07.bin",       0x00000, 0x10000, CRC(a0e78996) SHA1(810a54e657c0faaff6a8494acaf803d1d2151893) )
+	ROM_LOAD( "11.bin",       0x10000, 0x10000, CRC(37cb11c2) SHA1(af8c2ae4bb6e6c13ea3e8b7c96e5b18f1eb1d5a5) )
+	ROM_LOAD( "15.bin",       0x20000, 0x10000, CRC(4e0354ce) SHA1(d3256c891b44c6593b0b44c0d0a3e754ce78c1cb) )
+	ROM_LOAD( "16.bin",       0x30000, 0x10000, CRC(ac89e5cc) SHA1(aa7e065ece6d25b7e83fadcd22c09e1f7dc0b86f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */

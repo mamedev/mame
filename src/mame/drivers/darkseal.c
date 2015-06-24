@@ -7,7 +7,7 @@
     Dark Seal (Rev 4)    (c) 1990 Data East Corporation (Japanese version)
     Gate Of Doom (Rev 4) (c) 1990 Data East Corporation (USA version)
     Gate of Doom (Rev 1) (c) 1990 Data East Corporation (USA version)
-  
+
     Board:  DE-0332-2
 
     Emulation by Bryan McPhail, mish@tendril.co.uk

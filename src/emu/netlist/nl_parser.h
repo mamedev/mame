@@ -14,7 +14,6 @@
 
 namespace netlist
 {
-
 	class parser_t : public ptokenizer
 	{
 		NETLIST_PREVENT_COPYING(parser_t)

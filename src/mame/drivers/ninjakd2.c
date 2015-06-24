@@ -374,7 +374,6 @@ static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -452,6 +451,12 @@ static ADDRESS_MAP_START( ninjakd2_sound_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(ninjakd2_pcm_play_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, ninjakd2_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("soundcpu", 0x8000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjakd2_sound_io, AS_IO, 8, ninjakd2_state )
@@ -909,7 +914,7 @@ MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
+static MACHINE_CONFIG_START( ninjakd2_core, ninjakd2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
@@ -956,7 +961,12 @@ static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mnight, ninjakd2 )
+static MACHINE_CONFIG_DERIVED( ninjakd2, ninjakd2_core )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mnight, ninjakd2_core )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -969,7 +979,7 @@ static MACHINE_CONFIG_DERIVED( mnight, ninjakd2 )
 	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2 )
+static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2_core )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1469,15 +1479,14 @@ void ninjakd2_state::gfx_unscramble()
 
 DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
 {
-	mc8123_decrypt_rom(machine(), "soundcpu", "user1", NULL, 0);
+	mc8123_decode(memregion("soundcpu")->base(), m_decrypted_opcodes, memregion("user1")->base(), 0x8000);
 
 	gfx_unscramble();
 }
 
 DRIVER_INIT_MEMBER(ninjakd2_state,bootleg)
 {
-	address_space &space = m_soundcpu->space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, memregion("soundcpu")->base() + 0x10000);
+	memcpy(m_decrypted_opcodes, memregion("soundcpu")->base() + 0x10000, 0x8000);
 
 	gfx_unscramble();
 }

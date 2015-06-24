@@ -233,8 +233,8 @@ subclass has been created.  It's called memory_interface, declared in
 m6502_device, and provides the following accessors:
 
 - UINT8 read(UINT16 adr)                  - normal read
-- UINT8 read_direct(UINT16 adr)           - direct read
-- UINT8 read_decrypted(UINT16 adr)        - decrypted data read
+- UINT8 read_sync(UINT16 adr)             - opcode read with sync active (first byte of opcode)
+- UINT8 read_arg(UINT16 adr)              - opcode read with sync inactive (rest of opcode)
 - void write(UINT16 adr, UINT8 val)       - normal write
 
 - UINT8 read_9(UINT16 adr)                - special y-indexed 6509 read, defaults to read()

@@ -72,8 +72,8 @@ protected:
 
 	UINT8 M_RDMEM(UINT16 A) { return m_program->read_byte(A); }
 	void M_WRMEM(UINT16 A,UINT8 V) { m_program->write_byte(A, V); }
-	UINT8 M_RDOP(UINT16 A) { return m_direct->read_decrypted_byte(A); }
-	UINT8 M_RDOP_ARG(UINT16 A) { return m_direct->read_raw_byte(A); }
+	UINT8 M_RDOP(UINT16 A) { return m_direct->read_byte(A); }
+	UINT8 M_RDOP_ARG(UINT16 A) { return m_direct->read_byte(A); }
 	UINT8 RD_REG(UINT8 x) { return m_RAM[(m_regPtr<<3)+(x)]; }
 	void WR_REG(UINT8 x, UINT8 d) { m_RAM[(m_regPtr<<3)+(x)]=(d); }
 

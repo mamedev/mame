@@ -511,7 +511,7 @@ offs_t h8_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom
 UINT16 h8_device::read16i(UINT32 adr)
 {
 	icount--;
-	return direct->read_decrypted_word(adr & ~1);
+	return direct->read_word(adr & ~1);
 }
 
 UINT16 h8_device::fetch()

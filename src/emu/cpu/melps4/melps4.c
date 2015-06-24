@@ -85,7 +85,7 @@ void melps4_cpu_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 	m_d_mask = (1 << m_d_pins) - 1;
-	
+
 	// resolve callbacks
 	m_read_k.resolve_safe(0);
 	m_read_d.resolve_safe(0);
@@ -106,7 +106,7 @@ void melps4_cpu_device::device_start()
 	m_op = 0;
 	m_prev_op = 0;
 	m_bitmask = 0;
-	
+
 	m_port_d = 0;
 	m_port_s = 0;
 	m_port_f = 0;
@@ -257,7 +257,7 @@ UINT8 melps4_cpu_device::read_gen_port(int port)
 			return m_port_s | m_read_s(port, 0xff);
 		case MELPS4_PORTF:
 			return m_port_f | (m_read_f(port, 0xff) & 0xf);
-		
+
 		default:
 			break;
 	}
@@ -284,7 +284,7 @@ void melps4_cpu_device::write_gen_port(int port, UINT8 data)
 		case MELPS4_PORTU:
 			m_write_u(port, data & 1, 0xff);
 			break;
-		
+
 		default:
 			break;
 	}
@@ -306,7 +306,7 @@ void melps4_cpu_device::write_d_pin(int bit, int state)
 		m_port_d = 0;
 		m_write_d(bit, 0, 0xffff);
 	}
-	
+
 	// set/reset one port D pin
 	else
 	{
@@ -325,7 +325,7 @@ void melps4_cpu_device::write_d_pin(int bit, int state)
 void melps4_cpu_device::execute_set_input(int line, int state)
 {
 	state = (state) ? 1 : 0;
-	
+
 	switch (line)
 	{
 		// external interrupt
@@ -338,7 +338,7 @@ void melps4_cpu_device::execute_set_input(int line, int state)
 			}
 			m_int_state = state;
 			break;
-		
+
 		// timer input pin
 		case MELPS4_INPUT_LINE_T:
 			write_t_in(state);
@@ -353,14 +353,14 @@ void melps4_cpu_device::do_interrupt(int which)
 {
 	m_inte = 0;
 	m_irqflag[which] = false;
-	
+
 	m_icount--;
 	push_pc();
 	m_sms = m_sm;
 	m_sm = false;
 	m_op = 0; // fake nop
 	m_pc = m_int_page << 7 | (which * 2);
-	
+
 	standard_irq_callback(which);
 }
 
@@ -370,7 +370,7 @@ void melps4_cpu_device::check_interrupt()
 		return;
 
 	int which = 0;
-	
+
 	// assume that lower irq vectors have higher priority
 	if (m_irqflag[0])
 		which = 0;
@@ -380,7 +380,7 @@ void melps4_cpu_device::check_interrupt()
 		which = 2;
 	else
 		return;
-	
+
 	do_interrupt(which);
 }
 
@@ -408,7 +408,7 @@ void melps4_cpu_device::execute_run()
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
-		
+
 		// Interrupts are not accepted during skips or LXY, LA, EI, DI, RT/RTS/RTI or any branch.
 		// Documentation is conflicting here: older docs say that it is allowed during skips,
 		// newer docs specifically say when interrupts are prohibited.

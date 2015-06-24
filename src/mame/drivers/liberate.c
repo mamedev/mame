@@ -263,6 +263,10 @@ static ADDRESS_MAP_START( liberate_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, liberate_state )
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( prosoccr_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
@@ -397,7 +401,7 @@ static INPUT_PORTS_START( generic_input )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) ) 
+	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
 	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" ) PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(    0x00, "20000 only" )
 	PORT_DIPSETTING(    0x0c, "20000, every 40000 after" )
@@ -436,7 +440,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( kamikcab )
 	PORT_INCLUDE( generic_input )
-	
+
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x01, "5" )
@@ -719,7 +723,7 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 	m_bank = 0;
 }
 
-static MACHINE_CONFIG_START( liberate, liberate_state )
+static MACHINE_CONFIG_START( liberate_base, liberate_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
@@ -761,7 +765,12 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( liberatb, liberate )
+static MACHINE_CONFIG_DERIVED( liberate, liberate_base )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( liberatb, liberate_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
@@ -769,14 +778,14 @@ static MACHINE_CONFIG_DERIVED( liberatb, liberate )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( boomrang, liberate )
+static MACHINE_CONFIG_DERIVED( boomrang, liberate_base )
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_boomrang)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( prosoccr, liberate )
+static MACHINE_CONFIG_DERIVED( prosoccr, liberate_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1268,21 +1277,14 @@ DRIVER_INIT_MEMBER(liberate_state,yellowcb)
 
 DRIVER_INIT_MEMBER(liberate_state,liberate)
 {
-	int A;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	space.set_decrypted_region(0x0000, 0xffff, decrypted);
-
 	/* Swap bits for opcodes only, not data */
-	for (A = 0; A < 0x10000; A++) {
-		decrypted[A] = (ROM[A] & 0xd7) | ((ROM[A] & 0x08) << 2) | ((ROM[A] & 0x20) >> 2);
-		decrypted[A] = (decrypted[A] & 0xbb) | ((decrypted[A] & 0x04) << 4) | ((decrypted[A] & 0x40) >> 4);
-		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
+	for (int A = 0; A < 0x8000; A++) {
+		m_decrypted_opcodes[A] = (ROM[A+0x8000] & 0xd7) | ((ROM[A+0x8000] & 0x08) << 2) | ((ROM[A+0x8000] & 0x20) >> 2);
+		m_decrypted_opcodes[A] = (m_decrypted_opcodes[A] & 0xbb) | ((m_decrypted_opcodes[A] & 0x04) << 4) | ((m_decrypted_opcodes[A] & 0x40) >> 4);
+		m_decrypted_opcodes[A] = (m_decrypted_opcodes[A] & 0x7d) | ((m_decrypted_opcodes[A] & 0x02) << 6) | ((m_decrypted_opcodes[A] & 0x80) >> 6);
 	}
-
-	membank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
 }
 
 /*************************************

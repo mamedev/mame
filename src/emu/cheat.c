@@ -1138,7 +1138,7 @@ void cheat_manager::reload()
 	m_disabled = false;
 
 	// load the cheat file, if it's a system that has a software list then try softlist_name/shortname.xml first,
-	// if it fails to load then try to load via crc32 - basename/crc32.xml ( eg. 01234567.xml ) 
+	// if it fails to load then try to load via crc32 - basename/crc32.xml ( eg. 01234567.xml )
 	image_interface_iterator iter(machine().root_device());
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 		if (image->exists())
@@ -1153,7 +1153,7 @@ void cheat_manager::reload()
 				load_cheats(filename.c_str());
 				break;
 			}
-			// else we are loading outside the software list, try to load machine_basename/crc32.xml			
+			// else we are loading outside the software list, try to load machine_basename/crc32.xml
 			else
 			{
 				UINT32 crc = image->crc();

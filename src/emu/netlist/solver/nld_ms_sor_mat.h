@@ -175,7 +175,7 @@ ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic
 				s = s + nl_math::abs(this->m_A[k][i]);
 			akk = s / akk - 1.0;
 			if ( akk > lambdaN)
-			    lambdaN = akk;
+				lambdaN = akk;
 			if (akk < lambda1)
 				lambda1 = akk;
 	#endif

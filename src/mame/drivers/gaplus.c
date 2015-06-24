@@ -499,7 +499,7 @@ void gaplus_state::machine_start()
 			m_namco56xx = machine().device<namco56xx_device>("namcoio_2");
 			break;
 	}
-	
+
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));

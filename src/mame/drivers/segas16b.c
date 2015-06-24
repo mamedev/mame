@@ -926,8 +926,8 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 		case 2: // 3rd ROM base, or board-specific banking
 			switch (m_romboard)
 			{
-				case ROM_BOARD_171_5358_SMALL:  mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom2base", 0x20000, write16_delegate()); break;
-				case ROM_BOARD_171_5358:        mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom2base", 0x40000, write16_delegate()); break;
+				case ROM_BOARD_171_5358_SMALL:  mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom2base", "decrypted_rom2base", 0x20000, write16_delegate()); break;
+				case ROM_BOARD_171_5358:        mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom2base", "decrypted_rom2base", 0x40000, write16_delegate()); break;
 				case ROM_BOARD_171_5521:
 				case ROM_BOARD_171_5704:        mapper.map_as_handler(0x00000, 0x10000, 0xff0000, read16_delegate(), write16_delegate(FUNC(segas16b_state::rom_5704_bank_w), this)); break;
 				case ROM_BOARD_171_5797:        mapper.map_as_handler(0x00000, 0x10000, 0xff0000, read16_delegate(FUNC(segas16b_state::unknown_rgn2_r), this), write16_delegate(FUNC(segas16b_state::unknown_rgn2_w), this)); break;
@@ -939,10 +939,10 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 		case 1: // 2nd ROM base, banking & math, or sound for Korean games
 			switch (m_romboard)
 			{
-				case ROM_BOARD_171_5358_SMALL:  mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom1base", 0x10000, write16_delegate()); break;
-				case ROM_BOARD_171_5358:        mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom1base", 0x20000, write16_delegate()); break;
+				case ROM_BOARD_171_5358_SMALL:  mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom1base", "decrypted_rom1base", 0x10000, write16_delegate()); break;
+				case ROM_BOARD_171_5358:        mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom1base", "decrypted_rom1base", 0x20000, write16_delegate()); break;
 				case ROM_BOARD_171_5521:
-				case ROM_BOARD_171_5704:        mapper.map_as_rom(0x00000, 0x40000, 0xfc0000, "rom1base", 0x40000, write16_delegate()); break;
+				case ROM_BOARD_171_5704:        mapper.map_as_rom(0x00000, 0x40000, 0xfc0000, "rom1base", "decrypted_rom1base", 0x40000, write16_delegate()); break;
 				case ROM_BOARD_KOREAN:          mapper.map_as_handler(0x00000, 0x10000, 0xff0000, read16_delegate(), write16_delegate(FUNC(segas16b_state::atomicp_sound_w), this)); break;
 				case ROM_BOARD_171_5797:        mapper.map_as_handler(0x00000, 0x04000, 0xffc000, read16_delegate(FUNC(segas16b_state::rom_5797_bank_math_r), this), write16_delegate(FUNC(segas16b_state::rom_5797_bank_math_w), this)); break;
 				default:                        assert(false);
@@ -952,12 +952,12 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 		case 0: // 1st ROM base
 			switch (m_romboard)
 			{
-				case ROM_BOARD_171_5358_SMALL:  mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom0base", 0x00000, write16_delegate()); break;
-				case ROM_BOARD_171_5358:        mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom0base", 0x00000, write16_delegate()); break;
+				case ROM_BOARD_171_5358_SMALL:  mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate()); break;
+				case ROM_BOARD_171_5358:        mapper.map_as_rom(0x00000, 0x20000, 0xfe0000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate()); break;
 				case ROM_BOARD_171_5521:
-				case ROM_BOARD_171_5704:        mapper.map_as_rom(0x00000, 0x40000, 0xfc0000, "rom0base", 0000000, write16_delegate()); break;
-				case ROM_BOARD_KOREAN:          mapper.map_as_rom(0x00000, 0x40000, 0xfc0000, "rom0base", 0000000, write16_delegate()); break;
-				case ROM_BOARD_171_5797:        mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", 0000000, write16_delegate()); break;
+				case ROM_BOARD_171_5704:        mapper.map_as_rom(0x00000, 0x40000, 0xfc0000, "rom0base", "decrypted_rom0base", 0000000, write16_delegate()); break;
+				case ROM_BOARD_KOREAN:          mapper.map_as_rom(0x00000, 0x40000, 0xfc0000, "rom0base", "decrypted_rom0base", 0000000, write16_delegate()); break;
+				case ROM_BOARD_171_5797:        mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0000000, write16_delegate()); break;
 				default:                        assert(false);
 			}
 			break;
@@ -1740,6 +1740,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16b_state )
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, segas16b_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
+	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16b_state )
@@ -3320,6 +3326,10 @@ static MACHINE_CONFIG_START( system16b, segas16b_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( system16b_mc8123, system16b )
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16b_fd1089a, system16b )
 	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK_10MHz)
@@ -6759,7 +6769,7 @@ DRIVER_INIT_MEMBER(segas16b_state,aceattac_5358)
 DRIVER_INIT_MEMBER(segas16b_state,aliensyn7_5358_small)
 {
 	DRIVER_INIT_CALL(generic_5358_small);
-	mc8123_decrypt_rom(machine(), "soundcpu", "mcu", NULL, 0);
+	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mcu")->base(), 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,altbeast_5521)
@@ -6783,7 +6793,7 @@ DRIVER_INIT_MEMBER(segas16b_state,altbeas5_5521)
 DRIVER_INIT_MEMBER(segas16b_state,altbeas4_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
-	mc8123_decrypt_rom(machine(), "soundcpu", "mcu", NULL, 0);
+	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mcu")->base(), 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,ddux_5704)
@@ -6841,7 +6851,7 @@ DRIVER_INIT_MEMBER(segas16b_state,passshtj_5358)
 DRIVER_INIT_MEMBER(segas16b_state,cencourt_5358)
 {
 	DRIVER_INIT_CALL(passshtj_5358);
-	mc8123_decrypt_rom(machine(), "soundcpu", "mcu", NULL, 0);
+	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mcu")->base(), 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
@@ -6859,13 +6869,13 @@ DRIVER_INIT_MEMBER(segas16b_state,defense_5358_small)
 DRIVER_INIT_MEMBER(segas16b_state,shinobi4_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
-	mc8123_decrypt_rom(machine(), "soundcpu", "mcu", NULL, 0);
+	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mcu")->base(), 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,shinobi3_5358)
 {
 	DRIVER_INIT_CALL(generic_5358);
-	mc8123_decrypt_rom(machine(), "soundcpu", "mcu", NULL, 0);
+	mc8123_decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, memregion("mcu")->base(), 0x8000);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,sjryuko_5358_small)
@@ -6910,7 +6920,7 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 GAME( 1988, aceattac,   0,        system16b_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", 0 )
 
 GAME( 1987, aliensyn,   0,        system16b,           aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
-GAME( 1987, aliensyn7,  aliensyn, system16b,           aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
+GAME( 1987, aliensyn7,  aliensyn, system16b_mc8123,    aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
 GAME( 1987, aliensyn3,  aliensyn, system16b_fd1089a,   aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
 GAME( 1987, aliensynj,  aliensyn, system16b_fd1089a,   aliensynj,segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 6, Japan, new, System 16B, FD1089A 317-0033)", 0 )
 
@@ -6918,7 +6928,7 @@ GAME( 1988, altbeast,   0,        system16b_i8751,     altbeast, segas16b_state,
 GAME( 1988, altbeastj,  altbeast, system16b_i8751,     altbeast, segas16b_state,altbeasj_5521,      ROT0,   "Sega", "Juuouki (set 7, Japan, 8751 317-0077)", 0 )
 GAME( 1988, altbeast6,  altbeast, system16b_i8751,     altbeast, segas16b_state,altbeas5_5521,      ROT0,   "Sega", "Altered Beast (set 6, 8751 317-0076)", 0 )
 GAME( 1988, altbeast5,  altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Altered Beast (set 5, FD1094 317-0069)", 0 )
-GAME( 1988, altbeast4,  altbeast, system16b,           altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4, MC-8123B 317-0066)", 0 )
+GAME( 1988, altbeast4,  altbeast, system16b_mc8123,    altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4, MC-8123B 317-0066)", 0 )
 GAME( 1988, altbeastj3, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 3, Japan, FD1094 317-0068)", 0 )
 GAME( 1988, altbeast2,  altbeast, system16b,           altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 2, MC-8123B 317-0066)", 0 )
 GAME( 1988, altbeastj1, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 1, Japan, FD1094 317-0065)", 0 )
@@ -6974,7 +6984,7 @@ GAME( 1989, mvpj,       mvp,      system16b_fd1094,     mvp,     segas16b_state,
 GAME( 1988, passsht,    0,        system16b_fd1094,    passsht,  segas16b_state,generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players, FD1094 317-0080)", 0 )
 GAME( 1988, passshta,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (World, 4 Players, FD1094 317-0074)", 0 )
 GAME( 1988, passshtj,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (Japan, 4 Players, FD1094 317-0070)", 0 )
-GAME( 1988, cencourt,   passsht,  system16b,           cencourt, segas16b_state,cencourt_5358,      ROT270, "Sega", "Center Court (World, 4 Players, prototype, MC-8123B)", 0 )
+GAME( 1988, cencourt,   passsht,  system16b_mc8123,    cencourt, segas16b_state,cencourt_5358,      ROT270, "Sega", "Center Court (World, 4 Players, prototype, MC-8123B)", 0 )
 
 GAME( 1991, riotcity,   0,        system16b,           riotcity, segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
 
@@ -6985,8 +6995,8 @@ GAME( 1987, sdib,       sdi,      system16b_fd1089a,   sdi,      segas16b_state,
 GAME( 1987, sdibl,      sdi,      system16b,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg)", 0 )
 
 GAME( 1987, shinobi5,   shinobi,  system16b,           shinobi,  segas16b_state,generic_5521,       ROT0,   "Sega", "Shinobi (set 5, System 16B, unprotected)", 0 )
-GAME( 1987, shinobi4,   shinobi,  system16b,           shinobi,  segas16b_state,shinobi4_5521,      ROT0,   "Sega", "Shinobi (set 4, System 16B, MC-8123B 317-0054)", 0 )
-GAME( 1987, shinobi3,   shinobi,  system16b,           shinobi,  segas16b_state,shinobi3_5358,      ROT0,   "Sega", "Shinobi (set 3, System 16B, MC-8123B 317-0054)", 0 )
+GAME( 1987, shinobi4,   shinobi,  system16b_mc8123,    shinobi,  segas16b_state,shinobi4_5521,      ROT0,   "Sega", "Shinobi (set 4, System 16B, MC-8123B 317-0054)", 0 )
+GAME( 1987, shinobi3,   shinobi,  system16b_mc8123,    shinobi,  segas16b_state,shinobi3_5358,      ROT0,   "Sega", "Shinobi (set 3, System 16B, MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi2,   shinobi,  system16b_fd1094,    shinobi,  segas16b_state,generic_5358,       ROT0,   "Sega", "Shinobi (set 2, System 16B, FD1094 317-0049)", 0 )
 
 GAME( 1987, sonicbom,   0,        system16b_fd1094,    sonicbom, segas16b_state,generic_5358,       ROT270, "Sega", "Sonic Boom (FD1094 317-0053)", 0 )

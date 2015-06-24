@@ -295,13 +295,13 @@ std::string strmakeupper(std::string& str)
 }
 
 /**
- * @fn	std::string strmakelower(std::string& str)
+ * @fn  std::string strmakelower(std::string& str)
  *
- * @brief	Strmakelowers the given string.
+ * @brief   Strmakelowers the given string.
  *
- * @param [in,out]	str	The string.
+ * @param [in,out]  str The string.
  *
- * @return	A std::string.
+ * @return  A std::string.
  */
 
 std::string strmakelower(std::string& str)
@@ -311,15 +311,15 @@ std::string strmakelower(std::string& str)
 }
 
 /**
- * @fn	int strreplace(std::string &str, const std::string& search, const std::string& replace)
+ * @fn  int strreplace(std::string &str, const std::string& search, const std::string& replace)
  *
- * @brief	Strreplaces.
+ * @brief   Strreplaces.
  *
- * @param [in,out]	str	The string.
- * @param	search	   	The search.
- * @param	replace	   	The replace.
+ * @param [in,out]  str The string.
+ * @param   search      The search.
+ * @param   replace     The replace.
  *
- * @return	An int.
+ * @return  An int.
  */
 
 int strreplace(std::string &str, const std::string& search, const std::string& replace)

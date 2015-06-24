@@ -88,7 +88,7 @@ protected:
 	UINT8 m_h;      // 4-bit data latch
 	UINT8 m_s;      // 3-bit port select
 	UINT8 m_std;    // strobe pin
-	
+
 	// callbacks
 	devcb_write8 m_write_port1, m_write_port2, m_write_port3, m_write_port4, m_write_port5, m_write_port6, m_write_port7;
 	devcb_write8 *m_write_port[7];

@@ -88,6 +88,8 @@ public:
 	};
 
 protected:
+	required_memory_bank m_decrypted_opcodes_bank;
+
 	// device overrides
 	virtual void device_start();
 	virtual void device_reset();

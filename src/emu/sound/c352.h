@@ -26,7 +26,7 @@ enum
 
 #define MCFG_C352_DIVIDER(_setting) \
 	c352_device::static_set_divider(*device, _setting);
-	
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -43,7 +43,7 @@ public:
 
 	// inline configuration helpers
 	static void static_set_divider(device_t &device, int setting);
-	
+
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
@@ -108,7 +108,7 @@ private:
 	c352_ch_t m_c352_ch[32];
 	int m_sample_rate_base;
 	int m_divider;
-	
+
 	long m_channel_l[2048*2];
 	long m_channel_r[2048*2];
 	long m_channel_l2[2048*2];

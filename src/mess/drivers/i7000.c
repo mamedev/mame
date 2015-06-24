@@ -51,9 +51,9 @@ class i7000_state : public driver_device
 public:
 	i7000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-          m_card(*this, "cardslot"),
-          m_videoram(*this, "videoram")
-    { }
+			m_card(*this, "cardslot"),
+			m_videoram(*this, "videoram")
+	{ }
 
 	virtual void video_start();
 
@@ -62,8 +62,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT8 *m_char_rom;
 
-//	DECLARE_READ8_MEMBER( i7000_io_r );
-//	DECLARE_WRITE8_MEMBER( i7000_io_w );
+//  DECLARE_READ8_MEMBER( i7000_io_r );
+//  DECLARE_WRITE8_MEMBER( i7000_io_w );
 
 	DECLARE_DRIVER_INIT(i7000);
 	DECLARE_PALETTE_INIT(i7000);
@@ -88,42 +88,42 @@ void i7000_state::video_start()
 
 UINT32 i7000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-    offs_t addr = 0;
+	offs_t addr = 0;
 
-    for (int sy = 0; sy < 25; sy++)
-    {
-        for (int sx = 0; sx < 40; sx++)
-        {
-            UINT8 data = m_videoram[addr++];
-            for (int y = 0; y < 8; y++)
-            {
-                int color = m_char_rom[data*8 + y];
-                for (int x = 0; x < 8; x++)
-                {
-                    bitmap.pix16(sy*8 + y, sx*8 + 7 - x) = (color & 1);
-                    color >>= 1;
-                }
-            }
-        }
-    }
+	for (int sy = 0; sy < 25; sy++)
+	{
+		for (int sx = 0; sx < 40; sx++)
+		{
+			UINT8 data = m_videoram[addr++];
+			for (int y = 0; y < 8; y++)
+			{
+				int color = m_char_rom[data*8 + y];
+				for (int x = 0; x < 8; x++)
+				{
+					bitmap.pix16(sy*8 + y, sx*8 + 7 - x) = (color & 1);
+					color >>= 1;
+				}
+			}
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
 /*FIXME: we still need to figure out the proper memory map
          for the maincpu and where the cartridge slot maps to. */
 static ADDRESS_MAP_START(i7000_mem, AS_PROGRAM, 8, i7000_state)
-    AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
-    AM_RANGE(0x1000, 0x1fff) AM_RAM
-    AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
 //    AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("cardslot", 0)
 ADDRESS_MAP_END
 
 /*
 static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(i7000_io_r, i7000_io_w)
+    ADDRESS_MAP_UNMAP_HIGH
+    ADDRESS_MAP_GLOBAL_MASK (0xff)
+    AM_RANGE(0x00, 0xff) AM_READWRITE(i7000_io_r, i7000_io_w)
 ADDRESS_MAP_END
 */
 
@@ -161,7 +161,7 @@ static MACHINE_CONFIG_START( i7000, i7000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(i7000_mem)
-//	MCFG_CPU_IO_MAP(i7000_io)
+//  MCFG_CPU_IO_MAP(i7000_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -175,7 +175,7 @@ static MACHINE_CONFIG_START( i7000, i7000_state )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
 
-//	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i7000)
+//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", i7000)
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "i7000_card")

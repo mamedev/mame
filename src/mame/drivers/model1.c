@@ -742,9 +742,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 		irq_raise(m_sound_irq);
 
 		m_m1audio->check_fifo_irq();
-		
+
 		if (m_m1comm != NULL)
-			m_m1comm->check_vint_irq();			
+			m_m1comm->check_vint_irq();
 	}
 }
 
@@ -960,7 +960,7 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xb00000, 0xb00fff) AM_DEVREADWRITE8("m1comm", m1comm_device, share_r, share_w, 0xffff)
 	AM_RANGE(0xb01000, 0xb01001) AM_DEVREADWRITE8("m1comm", m1comm_device, cn_r, cn_w, 0x00ff)
 	AM_RANGE(0xb01002, 0xb01003) AM_DEVREADWRITE8("m1comm", m1comm_device, fg_r, fg_w, 0x00ff)
-	
+
 	AM_RANGE(0xc00000, 0xc0003f) AM_READWRITE(io_r, io_w)
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
@@ -1599,7 +1599,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SEGAM1AUDIO_ADD("m1audio")
-	
+
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
 

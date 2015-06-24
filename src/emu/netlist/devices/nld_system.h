@@ -51,7 +51,7 @@
 		NET_C(_G,  _name.G)                                                    \
 		NET_C(_OUT, _name.Q)
 
-#define OPTIMIZE_FRONTIER(_attach, _r_in, _r_out)							   \
+#define OPTIMIZE_FRONTIER(_attach, _r_in, _r_out)                              \
 		setup.register_frontier(# _attach, _r_in, _r_out);
 
 #define RES_SWITCH(_name, _IN, _P1, _P2)                                       \

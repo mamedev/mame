@@ -312,68 +312,68 @@ NETLIST_END()
 
 NETLIST_START(opamp)
 
-    /* Opamp model from
-     *
-     * http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
-     *
-     * Bandwidth 1Mhz
-     *
-     */
+	/* Opamp model from
+	 *
+	 * http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
+	 *
+	 * Bandwidth 1Mhz
+	 *
+	 */
 
-    /* Terminal definitions for calling netlists */
+	/* Terminal definitions for calling netlists */
 
-    ALIAS(PLUS, G1.IP) // Positive input
-    ALIAS(MINUS, G1.IN) // Negative input
-    ALIAS(OUT, EBUF.OP) // Opamp output ...
+	ALIAS(PLUS, G1.IP) // Positive input
+	ALIAS(MINUS, G1.IN) // Negative input
+	ALIAS(OUT, EBUF.OP) // Opamp output ...
 
-    ALIAS(GND, EBUF.ON) // GND terminal
-    ALIAS(VCC, DUMMY.I) // VCC terminal
-    DUMMY_INPUT(DUMMY)
+	ALIAS(GND, EBUF.ON) // GND terminal
+	ALIAS(VCC, DUMMY.I) // VCC terminal
+	DUMMY_INPUT(DUMMY)
 
-    /* The opamp model */
+	/* The opamp model */
 
-    VCCS(G1)
-    PARAM(G1.RI, RES_K(1000))
+	VCCS(G1)
+	PARAM(G1.RI, RES_K(1000))
 #if 1
-    PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
-    RES(RP1, 1000)
-    CAP(CP1, 1.59e-5)   // <== change to 1.59e-3 for 10Khz bandwidth
+	PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
+	RES(RP1, 1000)
+	CAP(CP1, 1.59e-5)   // <== change to 1.59e-3 for 10Khz bandwidth
 #else
-    PARAM(G1.G, 1)  // typical OP-AMP amplification 100 * 1000 = 100000
-    RES(RP1, 100000)
-    CAP(CP1, 1.59e-7)   // <== change to 1.59e-3 for 10Khz bandwidth
+	PARAM(G1.G, 1)  // typical OP-AMP amplification 100 * 1000 = 100000
+	RES(RP1, 100000)
+	CAP(CP1, 1.59e-7)   // <== change to 1.59e-3 for 10Khz bandwidth
 #endif
-    VCVS(EBUF)
-    PARAM(EBUF.RO, 50)
-    PARAM(EBUF.G, 1)
+	VCVS(EBUF)
+	PARAM(EBUF.RO, 50)
+	PARAM(EBUF.G, 1)
 
 //    PARAM(EBUF.RI, 1e20)
 //    NET_C(EBUF.ON, GND)
 
-    NET_C(G1.ON, GND)
-    NET_C(RP1.2, GND)
-    NET_C(CP1.2, GND)
-    NET_C(EBUF.IN, GND)
+	NET_C(G1.ON, GND)
+	NET_C(RP1.2, GND)
+	NET_C(CP1.2, GND)
+	NET_C(EBUF.IN, GND)
 
-    NET_C(RP1.1, G1.OP)
-    NET_C(CP1.1, RP1.1)
+	NET_C(RP1.1, G1.OP)
+	NET_C(CP1.1, RP1.1)
 
-    DIODE(DP,"1N914")
-    DIODE(DN,"1N914")
+	DIODE(DP,"1N914")
+	DIODE(DN,"1N914")
 
-    NET_C(DP.K, VCC)
+	NET_C(DP.K, VCC)
 #if 1
-    NET_C(DP.A, DN.K, RP1.1)
+	NET_C(DP.A, DN.K, RP1.1)
 #else
-    RES(RDP, 1000)
-    RES(RDN, 1000)
-    NET_C(RDP.1, DP.A)
-    NET_C(RDN.1, DN.K)
-    NET_C(RDP.2, RDN.2, RP1.1)
+	RES(RDP, 1000)
+	RES(RDN, 1000)
+	NET_C(RDP.1, DP.A)
+	NET_C(RDN.1, DN.K)
+	NET_C(RDP.2, RDN.2, RP1.1)
 #endif
-    NET_C(DN.A, GND)
+	NET_C(DN.A, GND)
 
-    NET_C(EBUF.IP, RP1.1)
+	NET_C(EBUF.IP, RP1.1)
 
 NETLIST_END()
 

@@ -1029,17 +1029,17 @@ static file_error osd_or_zlib_read(core_file *file, void *buffer, UINT64 offset,
 -------------------------------------------------*/
 
 /**
- * @fn	static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
+ * @fn  static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
  *
- * @brief	OSD or zlib write.
+ * @brief   OSD or zlib write.
  *
- * @param [in,out]	file  	If non-null, the file.
- * @param	buffer		  	The buffer.
- * @param	offset		  	The offset.
- * @param	length		  	The length.
- * @param [in,out]	actual	If non-null, the actual.
+ * @param [in,out]  file    If non-null, the file.
+ * @param   buffer          The buffer.
+ * @param   offset          The offset.
+ * @param   length          The length.
+ * @param [in,out]  actual  If non-null, the actual.
  *
- * @return	A file_error.
+ * @return  A file_error.
  */
 
 static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)

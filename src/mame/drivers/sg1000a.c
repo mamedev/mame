@@ -126,13 +126,15 @@ class sg1000a_state : public driver_device
 public:
 	sg1000a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
 	DECLARE_DRIVER_INIT(sg1000a);
 	DECLARE_DRIVER_INIT(chwrestl);
 	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 };
 
 
@@ -143,9 +145,13 @@ public:
  *************************************/
 
 static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, sg1000a_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // separate region needed for decrypting
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_MIRROR(0x400)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, sg1000a_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, sg1000a_state )
@@ -285,6 +291,11 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( sg1000ax, sg1000a )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
 /*************************************
  *
  *  ROM definitions
@@ -324,8 +335,30 @@ DRIVER_INIT_MEMBER(sg1000a_state,sg1000a)
 
 DRIVER_INIT_MEMBER(sg1000a_state,chwrestl)
 {
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x28,0x08,0xa8,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...0...0...0 */
+		{ 0x28,0x08,0xa8,0x88 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...0...1 */
+		{ 0x88,0x80,0x08,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...0...0...1...0 */
+		{ 0x88,0x08,0x80,0x00 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...1...1 */
+		{ 0x28,0x08,0xa8,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...0...0 */
+		{ 0x88,0x80,0x08,0x00 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...0...1 */
+		{ 0x88,0x08,0x80,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...0...1...1...0 */
+		{ 0xa0,0x80,0xa8,0x88 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...1...1...1 */
+		{ 0x80,0xa0,0x00,0x20 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...0...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...0...1 */
+		{ 0x80,0xa0,0x00,0x20 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...0...1...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...0...1...1 */
+		{ 0xa0,0x80,0xa8,0x88 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...1...0...0 */
+		{ 0x80,0xa0,0x00,0x20 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...1...0...1 */
+		{ 0xa0,0x80,0xa8,0x88 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...1...1...0 */
+		{ 0xa0,0x80,0xa8,0x88 }, { 0xa0,0x80,0xa8,0x88 }    /* ...1...1...1...1 */
+	};
+
 	DRIVER_INIT_CALL(sg1000a);
-	regulus_decode(machine(), "maincpu");
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 }
 
 /*************************************
@@ -334,6 +367,6 @@ DRIVER_INIT_MEMBER(sg1000a_state,chwrestl)
  *
  *************************************/
 
-GAME( 1984, chboxing, 0, sg1000a, chboxing, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Boxing", 0 )
-GAME( 1985, chwrestl, 0, sg1000a, chwrestl, sg1000a_state, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0 )
-GAME( 1985, dokidoki, 0, sg1000a, dokidoki, sg1000a_state, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0 )
+GAME( 1984, chboxing, 0, sg1000a,  chboxing, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Boxing", 0 )
+GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0 )
+GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0 )

@@ -76,7 +76,7 @@ static MACHINE_CONFIG_START( segam1, segam1_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state,  irq1_line_hold)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state,  irq1_line_hold)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -103,7 +103,7 @@ ROM_START( bingpty )
 	ROM_LOAD( "epr-14845.bin", 0x00000, 0x20000, CRC(90d47101) SHA1(7bc002c104e3dbde1986aaec54112d5658eab523) )
 
 	ROM_REGION( 0x8000, "m1comm", 0 ) /* Z80 Code */
-	ROM_LOAD( "epr-14221a.bin", 0x00000, 0x8000, CRC(a13e67a4) SHA1(4cd269c7f04a64ae7806c8784f86bf6553a25d85) )	
+	ROM_LOAD( "epr-14221a.bin", 0x00000, 0x8000, CRC(a13e67a4) SHA1(4cd269c7f04a64ae7806c8784f86bf6553a25d85) )
 
 	// dumps of the X-Board part, and the LINK PCB are missing.
 ROM_END

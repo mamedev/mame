@@ -884,6 +884,9 @@ static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                                         /* RAM */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, cps_state )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_SHARE("decrypted_opcodes")                                           /* 68000 ROM */
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM                                                                         /* 68000 ROM */
@@ -1215,6 +1218,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(cps2_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, cps2_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
@@ -1251,6 +1255,7 @@ static MACHINE_CONFIG_DERIVED( dead_cps2, cps2 )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dead_cps2_map)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gigaman2, cps2 )
@@ -1258,6 +1263,8 @@ static MACHINE_CONFIG_DERIVED( gigaman2, cps2 )
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	MCFG_DEVICE_REMOVE("qsound")
+
+	MCFG_CPU_MODIFY("maincpu")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
@@ -8660,8 +8667,6 @@ void cps_state::gigaman2_gfx_reorder()
 DRIVER_INIT_MEMBER(cps_state,gigaman2)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
-	int length = memregion("maincpu")->bytes();
 
 	gigaman2_gfx_reorder();
 
@@ -8671,8 +8676,8 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
 	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(FUNC(cps_state::gigaman2_dummyqsound_r),this), write16_delegate(FUNC(cps_state::gigaman2_dummyqsound_w), this)); // no qsound..
-	space.set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
-	m_maincpu->set_encrypted_opcode_range(0, length);
+
+	memcpy(m_decrypted_opcodes, memregion("maincpu")->base()+0x200000, 0x200000);
 
 	/* no digital volume switches on this? */
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);

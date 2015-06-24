@@ -184,7 +184,7 @@ INTERRUPT_GEN_MEMBER(sbasketb_state::vblank_irq)
 static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
+	MCFG_CPU_ADD("maincpu", KONAMI1, 1400000)        /* 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 
@@ -218,6 +218,13 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED(sbasketbu, sbasketb)
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 MACHINE_CONFIG_END
 
 
@@ -396,10 +403,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sbasketb_state,sbasketb)
 {
-	konami1_decode(machine(), "maincpu");
 }
 
-GAME( 1984, sbasketb, 0,        sbasketb, sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbasketh, sbasketb, sbasketb, sbasketb, driver_device, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbasketg, sbasketb, sbasketb, sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbaskete, sbasketb, sbasketb, sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbasketb, 0,        sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbasketh, sbasketb, sbasketbu, sbasketb, driver_device, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbasketg, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbaskete, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)", GAME_SUPPORTS_SAVE )

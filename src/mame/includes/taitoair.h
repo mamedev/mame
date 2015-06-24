@@ -32,7 +32,7 @@ public:
 			m_dsp_ram(*this, "dsp_ram"),
 			m_paletteram(*this, "paletteram"),
 			m_gradram(*this, "gradram"),
-			m_backregs(*this, "backregs"),
+			m_tc0430grw(*this, "tc0430grw"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_dsp(*this, "dsp"),
@@ -49,7 +49,7 @@ public:
 	required_shared_ptr<UINT16> m_dsp_ram;          // Shared 68000/TMS32025 RAM
 	required_shared_ptr<UINT16> m_paletteram;
 	required_shared_ptr<UINT16> m_gradram;
-	required_shared_ptr<UINT16> m_backregs;
+	required_shared_ptr<UINT16> m_tc0430grw;
 
 	/* video-related */
 	taitoair_poly  m_q;

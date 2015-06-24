@@ -283,10 +283,10 @@ struct rdp_span_aux
 	color_t             m_shade_alpha;          /* gouraud-shaded alpha */
 	color_t             m_key_scale;            /* color-keying constant */
 	color_t             m_noise_color;          /* noise */
-	color_t				m_lod_fraction;			/* Z-based LOD fraction for this poly */
-	color_t				m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
-	color_t				m_k4;
-	color_t				m_k5;
+	color_t             m_lod_fraction;         /* Z-based LOD fraction for this poly */
+	color_t             m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
+	color_t             m_k4;
+	color_t             m_k5;
 	color_inputs_t      m_color_inputs;
 	UINT32              m_current_pix_cvg;
 	UINT32              m_current_mem_cvg;
@@ -300,7 +300,7 @@ struct rdp_span_aux
 	INT32               m_dzpix_enc;
 	UINT8*              m_tmem;                /* pointer to texture cache for this polygon */
 	bool                m_start_span;
-	rgbaint_t			m_clamp_diff[8];
+	rgbaint_t           m_clamp_diff[8];
 };
 
 struct z_decompress_entry_t

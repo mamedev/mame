@@ -34,7 +34,7 @@ bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	UINT16 opcode;
 
 	/* fetch the opcode */
-	opcode = desc.opptr.w[0] = m_sh2->m_direct->read_decrypted_word(desc.physpc, SH2_CODE_XOR(0));
+	opcode = desc.opptr.w[0] = m_sh2->m_direct->read_word(desc.physpc, SH2_CODE_XOR(0));
 
 	/* all instructions are 2 bytes and most are a single cycle */
 	desc.length = 2;

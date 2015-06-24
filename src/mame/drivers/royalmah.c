@@ -1454,7 +1454,7 @@ static INPUT_PORTS_START( tahjong )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )  // "COIN1", but not working
 
 	PORT_START("DSW1")  // port $10
-	PORT_DIPNAME( 0x07, 0x07, "SWB:1,2,3" ) PORT_DIPLOCATION("SWB:1,2,3")	// only with bets on
+	PORT_DIPNAME( 0x07, 0x07, "SWB:1,2,3" ) PORT_DIPLOCATION("SWB:1,2,3")   // only with bets on
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -3605,8 +3605,8 @@ ROM_START( tahjong )
 	ROM_LOAD( "p2.bin", 0x01000, 0x1000, CRC(c33e3cc3) SHA1(707c437f180ddd2916b5806f208e0a478207d528) )
 	ROM_LOAD( "p3.bin", 0x02000, 0x1000, CRC(9e741a74) SHA1(6c8e8eb04331d48b72e2be270c13dbf8deb76005) )
 	ROM_LOAD( "p4.bin", 0x03000, 0x1000, CRC(dc6ae62b) SHA1(d0c51047f734c885b7f19972c1bf0408199fde51) )
-	ROM_LOAD( "p5.bin", 0x04000, 0x1000, CRC(cc9123a3) SHA1(75276045247a0c9ac5810be01f3b58ad63101f9b) )	// same as royalmj (unused)
-	ROM_LOAD( "p6.bin", 0x05000, 0x1000, CRC(92150a0f) SHA1(5c97ba5014abdba4afc78e02e7d90e6ca4d777ac) )	// ""
+	ROM_LOAD( "p5.bin", 0x04000, 0x1000, CRC(cc9123a3) SHA1(75276045247a0c9ac5810be01f3b58ad63101f9b) ) // same as royalmj (unused)
+	ROM_LOAD( "p6.bin", 0x05000, 0x1000, CRC(92150a0f) SHA1(5c97ba5014abdba4afc78e02e7d90e6ca4d777ac) ) // ""
 
 	ROM_LOAD( "s1.bin", 0x10000, 0x4000, CRC(beff21af) SHA1(4dc40a1ac4e36401b1ad8ae3954af6e5001e0a67) )
 	ROM_LOAD( "s2.bin", 0x14000, 0x4000, CRC(fed42e7c) SHA1(31136dff07bd1883dc2d107823ba83a34abf003d) )

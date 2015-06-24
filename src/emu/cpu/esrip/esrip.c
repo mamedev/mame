@@ -1901,7 +1901,7 @@ void esrip_device::execute_run()
 		m_pl7 = m_l7;
 
 		/* Latch instruction */
-		inst = m_direct->read_decrypted_qword(RIP_PC << 3);
+		inst = m_direct->read_qword(RIP_PC << 3);
 
 		in_h = inst >> 32;
 		in_l = inst & 0xffffffff;

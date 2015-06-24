@@ -537,14 +537,14 @@ optreserr_t option_resolution_isvalidvalue(const char *specification, int option
 }
 
 /**
- * @fn	int option_resolution_contains(const char *specification, int option_char)
+ * @fn  int option_resolution_contains(const char *specification, int option_char)
  *
- * @brief	Option resolution contains.
+ * @brief   Option resolution contains.
  *
- * @param	specification	The specification.
- * @param	option_char  	The option character.
+ * @param   specification   The specification.
+ * @param   option_char     The option character.
  *
- * @return	An int.
+ * @return  An int.
  */
 
 int option_resolution_contains(const char *specification, int option_char)
@@ -553,13 +553,13 @@ int option_resolution_contains(const char *specification, int option_char)
 }
 
 /**
- * @fn	const char *option_resolution_error_string(optreserr_t err)
+ * @fn  const char *option_resolution_error_string(optreserr_t err)
  *
- * @brief	Option resolution error string.
+ * @brief   Option resolution error string.
  *
- * @param	err	The error.
+ * @param   err The error.
  *
- * @return	null if it fails, else a char*.
+ * @return  null if it fails, else a char*.
  */
 
 const char *option_resolution_error_string(optreserr_t err)

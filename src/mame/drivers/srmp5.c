@@ -243,7 +243,7 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 void srmp5_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
-	
+
 	save_item(NAME(m_input_select));
 	save_item(NAME(m_cmd1));
 	save_item(NAME(m_cmd2));

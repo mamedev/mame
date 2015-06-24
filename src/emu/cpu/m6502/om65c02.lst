@@ -181,7 +181,7 @@ bra_rel
 	TMP = read_pc();
 	read_pc_noinc();
 	if(page_changing(PC, INT8(TMP))) {
-		read_direct(set_l(PC, PC+INT8(TMP)));
+		read_arg(set_l(PC, PC+INT8(TMP)));
 	}
 	PC += INT8(TMP);
 	prefetch();
@@ -199,13 +199,13 @@ brk_c_imp
 	write(SP, irq_taken || nmi_state ? P & ~F_B : P);
 	dec_SP();
 	if(irq_taken && nmi_state) {
-		PC = read_direct(0xfffa);
-		PC = set_h(PC, read_direct(0xfffb));
+		PC = read_arg(0xfffa);
+		PC = set_h(PC, read_arg(0xfffb));
 		nmi_state = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
-		PC = read_direct(0xfffe);
-		PC = set_h(PC, read_direct(0xffff));
+		PC = read_arg(0xfffe);
+		PC = set_h(PC, read_arg(0xffff));
 		if(irq_taken)
 			standard_irq_callback(IRQ_LINE);
 	}

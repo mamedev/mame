@@ -194,18 +194,6 @@ void atarisy2_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-DIRECT_UPDATE_MEMBER( atarisy2_state::atarisy2_direct_handler )
-{
-	/* make sure slapstic area looks like ROM */
-	if (address >= 0x8000 && address < 0x8200)
-	{
-		direct.explicit_configure(0x8000, 0x81ff, 0x1ff, reinterpret_cast<UINT8 *>(m_slapstic_base.target()));
-		return ~0;
-	}
-	return address;
-}
-
-
 MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_start();
@@ -223,8 +211,6 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 	atarigen_state::machine_reset();
 	m_slapstic->slapstic_reset();
 	scanline_timer_reset(*m_screen, 64);
-
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_state::atarisy2_direct_handler), this));
 
 	m_p2portwr_state = 0;
 	m_p2portrd_state = 0;

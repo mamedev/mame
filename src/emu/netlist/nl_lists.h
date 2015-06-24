@@ -19,7 +19,6 @@
 
 namespace netlist
 {
-
 	template <class _Element, class _Time>
 	class timed_queue
 	{

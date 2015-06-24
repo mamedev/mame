@@ -17,15 +17,15 @@ static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
 		ret[i] = i;
 
 	for(int i=0; i < sl.size()-1;i++)
-    {
-        for(int j=i+1; j < sl.size(); j++)
-        {
-            if(sl[ret[i]]->name() > sl[ret[j]]->name())
-            {
-            	std::swap(ret[i], ret[j]);
-            }
-        }
-    }
+	{
+		for(int j=i+1; j < sl.size(); j++)
+		{
+			if(sl[ret[i]]->name() > sl[ret[j]]->name())
+			{
+				std::swap(ret[i], ret[j]);
+			}
+		}
+	}
 	return ret;
 }
 
@@ -179,7 +179,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"M",   "CAP_M(%g)", 1.0e-3 },
 		{"u",   "CAP_U(%g)", 1.0e-6 }, /* eagle */
 		{"U",   "CAP_U(%g)", 1.0e-6 },
-		{"µ",   "CAP_U(%g)", 1.0e-6	},
+		{"??",   "CAP_U(%g)", 1.0e-6    },
 		{"N",   "CAP_N(%g)", 1.0e-9 },
 		{"P",   "CAP_P(%g)", 1.0e-12},
 		{"F",   "%ge-15",    1.0e-15},
@@ -444,7 +444,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 				pstring devname = token.str();
 				pstring pin = tok.get_string();
 				add_term(netname, devname + "." + pin);
-				token = tok.get_token();				}
+				token = tok.get_token();                }
 		}
 		else
 		{
@@ -454,5 +454,3 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 	}
 
 }
-
-

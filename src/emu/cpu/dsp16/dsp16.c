@@ -373,7 +373,7 @@ inline void dsp16_device::data_write(const UINT16& addr, const UINT16& data)
 inline UINT32 dsp16_device::opcode_read(const UINT8 pcOffset)
 {
 	const UINT16 readPC = m_pc + pcOffset;
-	return m_direct->read_decrypted_dword(readPC << 1);
+	return m_direct->read_dword(readPC << 1);
 }
 
 

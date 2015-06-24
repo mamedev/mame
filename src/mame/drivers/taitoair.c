@@ -138,7 +138,9 @@ the TMS320C25 is being used as a co-processor to relieve the
 along with the 68000.
 
 Gradiation RAM is used to display a rotatable gradient background.
-The rotation is most likely handled by the TC0430GRW ROZ chip.
+The rotation is handled by the TC0430GRW ROZ chip which outputs
+coordinates for a X=a1+b1*x+c1*y, Y=a2+b2*x+c2*y mapping.  The
+coordinates are used unconventionally as indices in a color palette.
 
 "Power common ram" is for communication with a processor
 controlling the sit-in-cabinet (deluxe mechanized version only).
@@ -160,7 +162,7 @@ DIPs are the same as topland, which is clearly wrong if you try
 them ("SWB:7,8" do not set Coin B to multiple credits for each
 coin!)
 
-Therefore, some verificiation could still be needed, once the
+Therefore, some verification could still be needed, once the
 emulation is complete.
 
 
@@ -391,7 +393,7 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_SHARE("line_ram")    /* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM AM_SHARE("dsp_ram") /* "dsp common ram" (TMS320C25) */
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("backregs") /* TC0430GRW? */
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("tc0430grw") /* TC0430GRW roz transform coefficients */
 	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
 	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
 	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff) /* other I/O */

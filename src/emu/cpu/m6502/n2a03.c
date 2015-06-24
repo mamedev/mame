@@ -38,14 +38,14 @@ UINT8 n2a03_device::mi_2a03_normal::read(UINT16 adr)
 	return program->read_byte(adr);
 }
 
-UINT8 n2a03_device::mi_2a03_normal::read_direct(UINT16 adr)
+UINT8 n2a03_device::mi_2a03_normal::read_sync(UINT16 adr)
 {
-	return direct->read_raw_byte(adr);
+	return sdirect->read_byte(adr);
 }
 
-UINT8 n2a03_device::mi_2a03_normal::read_decrypted(UINT16 adr)
+UINT8 n2a03_device::mi_2a03_normal::read_arg(UINT16 adr)
 {
-	return direct->read_decrypted_byte(adr);
+	return direct->read_byte(adr);
 }
 
 void n2a03_device::mi_2a03_normal::write(UINT16 adr, UINT8 val)
@@ -58,12 +58,12 @@ UINT8 n2a03_device::mi_2a03_nd::read(UINT16 adr)
 	return program->read_byte(adr);
 }
 
-UINT8 n2a03_device::mi_2a03_nd::read_direct(UINT16 adr)
+UINT8 n2a03_device::mi_2a03_nd::read_sync(UINT16 adr)
 {
-	return program->read_byte(adr);
+	return sprogram->read_byte(adr);
 }
 
-UINT8 n2a03_device::mi_2a03_nd::read_decrypted(UINT16 adr)
+UINT8 n2a03_device::mi_2a03_nd::read_arg(UINT16 adr)
 {
 	return program->read_byte(adr);
 }

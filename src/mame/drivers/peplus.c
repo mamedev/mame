@@ -1622,12 +1622,12 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
    BA       1    2    3    4    5   8  25  50 250    800
   % Range: 93.8-95.8%  Optimum: 97.8%  Hit Frequency: 45.3%
      Programs Available: PP0021
-	 
+
 NOTE: REQUIRES Progressive link which is not currently supported
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0021_723-703.u68",   0x00000, 0x10000, CRC(58f2a68b) SHA1(72c0a29016b17f7e308a9e9b2d724771b5e26560) ) /* Game Version: 723, Library Version: 703 */
-	
+
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
 	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )

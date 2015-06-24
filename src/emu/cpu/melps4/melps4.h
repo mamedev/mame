@@ -191,7 +191,7 @@ protected:
 	UINT16 m_op;
 	UINT16 m_prev_op;
 	UINT8 m_bitmask;        // opcode bit argument
-	
+
 	UINT16 m_port_d;        // last written port data
 	UINT8 m_port_s;         // "
 	UINT8 m_port_f;         // "
@@ -241,7 +241,7 @@ protected:
 	devcb_write8 m_write_g;
 	devcb_write8 m_write_u;
 	devcb_write_line m_write_t;
-	
+
 	virtual void write_t_in(int state) { m_t_in_state = state; }
 	virtual void write_v(UINT8 data) { m_v = data; }
 	virtual void write_w(UINT8 data) { m_w = data; }

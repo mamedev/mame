@@ -309,13 +309,13 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 -------------------------------------------------*/
 
 /**
- * @fn	const char *utf8_previous_char(const char *utf8string)
+ * @fn  const char *utf8_previous_char(const char *utf8string)
  *
- * @brief	UTF 8 previous character.
+ * @brief   UTF 8 previous character.
  *
- * @param	utf8string	The UTF 8string.
+ * @param   utf8string  The UTF 8string.
  *
- * @return	null if it fails, else a char*.
+ * @return  null if it fails, else a char*.
  */
 
 const char *utf8_previous_char(const char *utf8string)
@@ -333,13 +333,13 @@ const char *utf8_previous_char(const char *utf8string)
 -------------------------------------------------*/
 
 /**
- * @fn	int utf8_is_valid_string(const char *utf8string)
+ * @fn  int utf8_is_valid_string(const char *utf8string)
  *
- * @brief	UTF 8 is valid string.
+ * @brief   UTF 8 is valid string.
  *
- * @param	utf8string	The UTF 8string.
+ * @param   utf8string  The UTF 8string.
  *
- * @return	An int.
+ * @return  An int.
  */
 
 int utf8_is_valid_string(const char *utf8string)

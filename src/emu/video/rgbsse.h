@@ -23,10 +23,10 @@ extern const struct _rgbsse_statics
 {
 	__m128  dummy_for_alignment;
 	INT16   maxbyte[8];
-	INT16	alpha_mask[8];
-	INT16	red_mask[8];
-	INT16	green_mask[8];
-	INT16	blue_mask[8];
+	INT16   alpha_mask[8];
+	INT16   red_mask[8];
+	INT16   green_mask[8];
+	INT16   blue_mask[8];
 	INT16   scale_table[256][8];
 } rgbsse_statics;
 
@@ -200,11 +200,6 @@ public:
 		m_value = _mm_slli_epi32(m_value, shift);
 	}
 
-	inline void shl_imm_all(const UINT8 shift)
-	{
-		m_value = _mm_slli_si128(m_value, shift >> 3);
-	}
-
 	inline void shr(const rgbaint_t& shift)
 	{
 		m_value = _mm_srl_epi32(m_value, shift.m_value);
@@ -213,11 +208,6 @@ public:
 	inline void shr_imm(const UINT8 shift)
 	{
 		m_value = _mm_srli_epi32(m_value, shift);
-	}
-
-	inline void shr_imm_all(const UINT8 shift)
-	{
-		m_value = _mm_srli_si128(m_value, shift >> 3);
 	}
 
 	inline void sra(const rgbaint_t& shift)
@@ -434,7 +424,7 @@ public:
 	}
 
 protected:
-	__m128i	m_value;
+	__m128i m_value;
 };
 
 #endif /* __RGBSSE__ */

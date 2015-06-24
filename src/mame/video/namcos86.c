@@ -148,7 +148,7 @@ void namcos86_state::video_start()
 	}
 
 	m_spriteram = m_rthunder_spriteram + 0x1800;
-	
+
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));

@@ -183,9 +183,9 @@ void gaplus_state::video_start()
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0xff);
 
 	starfield_init();
-	
+
 	save_item(NAME(m_starfield_control));
-	
+
 	for (int i = 0; i < MAX_STARS; i++)
 	{
 		save_item(NAME(m_stars[i].x), i);

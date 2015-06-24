@@ -219,7 +219,7 @@ offs_t tms32010_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
  *  used to greatly speed up emulation
  */
 
-#define TMS32010_RDOP(A) (m_direct->read_decrypted_word((A)<<1))
+#define TMS32010_RDOP(A) (m_direct->read_word((A)<<1))
 
 
 /****************************************************************************
@@ -228,7 +228,7 @@ offs_t tms32010_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define TMS32010_RDOP_ARG(A) (m_direct->read_raw_word((A)<<1))
+#define TMS32010_RDOP_ARG(A) (m_direct->read_word((A)<<1))
 
 
 /************************************************************************

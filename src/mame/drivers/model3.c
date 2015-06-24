@@ -5690,9 +5690,9 @@ DRIVER_INIT_MEMBER(model3_state,scud)
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
-	
-//	UINT32 *rom = (UINT32*)memregion("user1")->base();
-//	rom[(0x799de8^4)/4] = 0x00050208;		// secret debug menu
+
+//  UINT32 *rom = (UINT32*)memregion("user1")->base();
+//  rom[(0x799de8^4)/4] = 0x00050208;       // secret debug menu
 }
 
 DRIVER_INIT_MEMBER(model3_state,scudplus)
@@ -5952,7 +5952,7 @@ DRIVER_INIT_MEMBER(model3_state,eca)
 
 	// base = 0xffc80000
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
-	
+
 	// cabinet network error
 	rom[(0x4a45e4^4)/4] = 0x60000000;
 

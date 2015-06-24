@@ -13,13 +13,13 @@ brk_16_imp
 	write(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
 	if(nmi_state) {
-		PC = read_direct(0xfff7);
-		PC = set_h(PC, read_direct(0xfff6));
+		PC = read_arg(0xfff7);
+		PC = set_h(PC, read_arg(0xfff6));
 		nmi_state = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
-		PC = read_direct(0xfff3);
-		PC = set_h(PC, read_direct(0xfff2));
+		PC = read_arg(0xfff3);
+		PC = set_h(PC, read_arg(0xfff2));
 		if(irq_taken)
 			standard_irq_callback(IRQ_LINE);
 	}
@@ -95,7 +95,7 @@ vbl_zpg
 
 #   exceptions
 reset_16
-	PC = read_direct(0xfff1);
-	PC = set_h(PC, read_direct(0xfff0));
+	PC = read_arg(0xfff1);
+	PC = set_h(PC, read_arg(0xfff0));
 	prefetch();
 	inst_state = -1;

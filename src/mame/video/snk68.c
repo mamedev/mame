@@ -62,7 +62,7 @@ void snk68_state::video_start()
 	m_fg_tile_offset = 0;
 
 	common_video_start();
-	
+
 	save_item(NAME(m_fg_tile_offset));
 }
 
@@ -170,7 +170,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	// (globally selected)
 	bool const is_pow = (m_gfxdecode->gfx(1)->elements() <= 0x4000);
 	bool const flip = flip_screen();
-	
+
 	for (int offs = 0; offs < 0x800; offs += 0x40)
 	{
 		int mx = (m_spriteram[offs + 2*group] & 0xff) << 4;

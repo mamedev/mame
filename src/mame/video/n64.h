@@ -193,8 +193,8 @@ public:
 
 	// YUV Factors
 	void        set_yuv_factors(color_t k023, color_t k1, color_t k4, color_t k5) { m_k023 = k023; m_k1 = k1; m_k4 = k4; m_k5 = k5; }
-	color_t&	get_k023() { return m_k023; }
-	color_t&	get_k1() { return m_k1; }
+	color_t&    get_k023() { return m_k023; }
+	color_t&    get_k1() { return m_k1; }
 
 	// Blender-related (move into RDP::Blender)
 	void        set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, color_t** input_a, INT32 a, INT32 b, rdp_span_aux* userdata);
@@ -210,7 +210,7 @@ public:
 	void            tc_div_no_perspective(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 	UINT32          get_log2(UINT32 lod_clamp);
 	void            render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object);
-	INT32			get_alpha_cvg(INT32 comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object);
+	INT32           get_alpha_cvg(INT32 comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object);
 
 	void            z_store(const rdp_poly_state &object, UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc);
 	UINT32          z_decompress(UINT32 zcurpixel);
@@ -281,8 +281,8 @@ public:
 	color_t         m_env_alpha;            /* generic alpha constant ('environment') */
 	color_t         m_fog_color;            /* generic color constant ('fog') */
 	color_t         m_key_scale;            /* color-keying constant */
-	color_t			m_lod_fraction;         /* Z-based LOD fraction for this poly */
-	color_t			m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
+	color_t         m_lod_fraction;         /* Z-based LOD fraction for this poly */
+	color_t         m_prim_lod_fraction;    /* fixed LOD fraction for this poly */
 
 	color_t         m_one;
 	color_t         m_zero;
@@ -332,7 +332,7 @@ private:
 	void    video_update32(n64_periphs* n64, bitmap_rgb32 &bitmap);
 
 	typedef void (n64_rdp::*compute_cvg_t) (extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
-	compute_cvg_t	m_compute_cvg[2];
+	compute_cvg_t   m_compute_cvg[2];
 
 	running_machine* m_machine;
 

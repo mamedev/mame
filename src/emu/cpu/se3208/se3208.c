@@ -1738,7 +1738,7 @@ void se3208_device::execute_run()
 {
 	do
 	{
-		UINT16 Opcode=m_direct->read_decrypted_word(m_PC, WORD_XOR_LE(0));
+		UINT16 Opcode=m_direct->read_word(m_PC, WORD_XOR_LE(0));
 
 		debugger_instruction_hook(this, m_PC);
 
