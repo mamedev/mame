@@ -61,19 +61,23 @@ void n64_texture_pipe_t::set_machine(running_machine &machine)
 		}
 	}
 
-	m_st2_add.set(0, 1, 0, 1);
+	m_st2_add.set(1, 0, 1, 0);
 	m_v1.set(1, 1, 1, 1);
 }
 
 void n64_texture_pipe_t::mask(rgbaint_t& st, const n64_tile_t& tile)
 {
+	UINT32 s_mask_bits = m_maskbits_table[tile.mask_s];
+	UINT32 t_mask_bits = m_maskbits_table[tile.mask_t];
+	rgbaint_t maskbits(s_mask_bits, s_mask_bits, t_mask_bits, t_mask_bits);
+
 	rgbaint_t wrap(st);
 	wrap.sra(tile.wrapped_mask);
 	wrap.and_reg(m_v1);
 	wrap.cmpeq(m_v1);
 	wrap.and_reg(tile.mm);
 	st.xor_reg(wrap);
-	st.and_reg(rgbaint_t(0, m_maskbits_table[tile.mask_s], 0, m_maskbits_table[tile.mask_t]));
+	st.and_reg(maskbits);
 }
 
 void n64_texture_pipe_t::mask_coupled(rgbaint_t& sstt, const n64_tile_t& tile)
@@ -239,21 +243,16 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, IN
 	const n64_tile_t& tile = object.m_tiles[tilenum];
 	const UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.m_other_modes.en_tlut << 1) | (UINT32) object.m_other_modes.tlut_type;
 
-	rgbaint_t st1(0, SSS, 0, SST);
-	rgbaint_t maxst = shift_cycle(st1, tile);
-	rgbaint_t stfrac(st1);
+	rgbaint_t st(0, SSS, 0, SST);
+	rgbaint_t maxst = shift_cycle(st, tile);
+	rgbaint_t stfrac(st);
 	stfrac.and_imm(0x1f);
 
-	clamp_cycle(st1, stfrac, maxst, tilenum, tile, userdata);
+	clamp_cycle(st, stfrac, maxst, tilenum, tile, userdata);
 
-	rgbaint_t sstt(st1);
-	sstt.add(m_st2_add);
-	sstt.shl_imm_all(32);
-	sstt.or_reg(st1);
+	mask_coupled(st, tile);
 
-	mask_coupled(sstt, tile);
-
-	const UINT32 tbase = tile.tmem + ((tile.line * st1.get_b32()) & 0x1ff);
+	const UINT32 tbase = tile.tmem + ((tile.line * st.get_b32()) & 0x1ff);
 
 	bool upper = ((stfrac.get_r32() + stfrac.get_b32()) >= 0x20);
 
@@ -272,7 +271,7 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, INT32 SSS, IN
 	stfrac.shl_imm(3);
 
 	rgbaint_t t0;
-	((this)->*(m_texel_fetch[index]))(t0, st1.get_r32(), st1.get_b32(), tbase, tile.palette, userdata);
+	((this)->*(m_texel_fetch[index]))(t0, st.get_r32(), st.get_b32(), tbase, tile.palette, userdata);
 	if (object.m_other_modes.convert_one && cycle)
 	{
 		t0.set(*prev);
@@ -299,17 +298,14 @@ void n64_texture_pipe_t::cycle_linear_lerp(color_t* TEX, color_t* prev, INT32 SS
 	UINT32 tpal = tile.palette;
 	UINT32 index = (tile.format << 4) | (tile.size << 2) | ((UINT32) object.m_other_modes.en_tlut << 1) | (UINT32) object.m_other_modes.tlut_type;
 
-	rgbaint_t st1(0, SSS, 0, SST);
-	rgbaint_t maxst = shift_cycle(st1, tile);
-	rgbaint_t stfrac = st1;
+	rgbaint_t sstt(SSS, SSS, SST, SST);
+	rgbaint_t maxst = shift_cycle(sstt, tile);
+	rgbaint_t stfrac = sstt;
 	stfrac.and_imm(0x1f);
 
-	clamp_cycle(st1, stfrac, maxst, tilenum, tile, userdata);
+	clamp_cycle(sstt, stfrac, maxst, tilenum, tile, userdata);
 
-	rgbaint_t sstt(st1);
 	sstt.add(m_st2_add);
-	sstt.shl_imm_all(32);
-	sstt.or_reg(st1);
 
 	mask_coupled(sstt, tile);
 

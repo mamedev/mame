@@ -200,20 +200,6 @@ public:
 		m_b <<= shift;
 	}
 
-	inline void shl_imm_all(const UINT8 shift)
-	{
-		if (shift == 0)
-			return;
-
-		m_a <<= shift;
-		m_a |= m_r >> (32 - shift);
-		m_r <<= shift;
-		m_r |= m_g >> (32 - shift);
-		m_g <<= shift;
-		m_g |= m_b >> (32 - shift);
-		m_b <<= shift;
-	}
-
 	inline void shr(const rgbaint_t& shift)
 	{
 		m_a >>= shift.m_a;
@@ -231,20 +217,6 @@ public:
 		m_r >>= shift;
 		m_g >>= shift;
 		m_b >>= shift;
-	}
-
-	inline void shr_imm_all(const UINT8 shift)
-	{
-		if (shift == 0)
-			return;
-
-		m_b >>= shift;
-		m_b |= m_g << (32 - shift);
-		m_g >>= shift;
-		m_g |= m_r << (32 - shift);
-		m_r >>= shift;
-		m_r |= m_a << (32 - shift);
-		m_a >>= shift;
 	}
 
 	inline void sra(const rgbaint_t& shift)

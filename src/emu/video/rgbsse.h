@@ -200,11 +200,6 @@ public:
 		m_value = _mm_slli_epi32(m_value, shift);
 	}
 
-	inline void shl_imm_all(const UINT8 shift)
-	{
-		m_value = _mm_slli_si128(m_value, shift >> 3);
-	}
-
 	inline void shr(const rgbaint_t& shift)
 	{
 		m_value = _mm_srl_epi32(m_value, shift.m_value);
@@ -213,11 +208,6 @@ public:
 	inline void shr_imm(const UINT8 shift)
 	{
 		m_value = _mm_srli_epi32(m_value, shift);
-	}
-
-	inline void shr_imm_all(const UINT8 shift)
-	{
-		m_value = _mm_srli_si128(m_value, shift >> 3);
 	}
 
 	inline void sra(const rgbaint_t& shift)

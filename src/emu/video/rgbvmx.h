@@ -230,13 +230,6 @@ public:
 		m_value = vec_sl(m_value, temp);
 	}
 
-	inline void shl_imm_all(const UINT8 shift)
-	{
-		const vector unsigned char limit = { 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 };
-		const vector unsigned char temp = { shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift };
-		m_value = vec_and(vec_slo(m_value, temp), (vector unsigned int)vec_cmpgt(limit, temp));
-	}
-
 	inline void shr(const rgbaint_t& shift)
 	{
 		const vector unsigned int limit = { 32, 32, 32, 32 };
@@ -248,13 +241,6 @@ public:
 	{
 		const vector unsigned int temp = { shift, shift, shift, shift };
 		m_value = vec_sr(m_value, temp);
-	}
-
-	inline void shr_imm_all(const UINT8 shift)
-	{
-		const vector unsigned char limit = { 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 };
-		const vector unsigned char temp = { shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift, shift };
-		m_value = vec_and(vec_sro(m_value, temp), (vector unsigned int)vec_cmpgt(limit, temp));
 	}
 
 	inline void sra(const rgbaint_t& shift)
