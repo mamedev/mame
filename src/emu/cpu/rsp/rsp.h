@@ -14,6 +14,7 @@
 #ifndef __RSP_H__
 #define __RSP_H__
 
+#include "emu.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 

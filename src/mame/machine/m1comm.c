@@ -129,16 +129,20 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 	m_line_tx(OPEN_FLAG_READ)
 {
 	// prepare localhost "filename"
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
+	if (strlen(m_localhost) == 0){
+		strcat(m_localhost, "socket.");
+		strcat(m_localhost, mconfig.options().comm_localhost());
+		strcat(m_localhost, ":");
+		strcat(m_localhost, mconfig.options().comm_localport());
+	}
 
 	// prepare remotehost "filename"
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	if (strlen(m_remotehost) == 0){
+		strcat(m_remotehost, "socket.");
+		strcat(m_remotehost, mconfig.options().comm_remotehost());
+		strcat(m_remotehost, ":");
+		strcat(m_remotehost, mconfig.options().comm_remoteport());
+	}
 }
 
 //-------------------------------------------------
@@ -238,7 +242,7 @@ WRITE8_MEMBER(m1comm_device::syn_w)
 
 READ8_MEMBER(m1comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | 0xFE;
+	UINT8 result = m_zfg | (~m_fg << 7) | 0x7e;
 #ifdef __M1COMM_VERBOSE__
 	printf("m1comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -265,7 +269,7 @@ WRITE8_MEMBER(m1comm_device::share_w)
 
 READ8_MEMBER(m1comm_device::cn_r)
 {
-	return m_cn | 0xFE;
+	return m_cn | 0xfe;
 }
 
 WRITE8_MEMBER(m1comm_device::cn_w)
@@ -292,14 +296,14 @@ WRITE8_MEMBER(m1comm_device::cn_w)
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
-		m_linktimer = 0x00E8; // 58 fps * 4s
+		m_linktimer = 0x00e8; // 58 fps * 4s
 	}
 #endif
 }
 
 READ8_MEMBER(m1comm_device::fg_r)
 {
-	return m_fg | (~m_zfg << 7) | 0x7E;
+	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
 WRITE8_MEMBER(m1comm_device::fg_w)
@@ -315,7 +319,7 @@ void m1comm_device::check_vint_irq()
 #ifndef __M1COMM_SIMULATION__
 	if (m_syn & 0x02)
 	{
-		m_commcpu->set_input_line_and_vector(0, HOLD_LINE, 0xEF);
+		m_commcpu->set_input_line_and_vector(0, HOLD_LINE, 0xef);
 #ifdef __M1COMM_VERBOSE__
 		printf("m1comm-INT5\n");
 #endif
@@ -326,12 +330,13 @@ void m1comm_device::check_vint_irq()
 }
 
 #ifdef __M1COMM_SIMULATION__
-void m1comm_device::comm_tick(){
-	if (m_linkenable == 0x01)
+void m1comm_device::comm_tick()
+{
+	if (m_linkenable == 0x01)	
 	{
 		int frameStart = 0x0010;
 		int frameOffset = 0x0000;
-		int frameSize = 0x01C4;
+		int frameSize = 0x01c4;
 		int dataSize = frameSize + 1;
 		int togo = 0;
 		int recv = 0;
@@ -344,6 +349,9 @@ void m1comm_device::comm_tick(){
 		// if link not yet established...
 		if (m_linkalive == 0x00)
 		{
+			// waiting...
+			m_shared[0] = 0x05;
+
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
@@ -372,7 +380,7 @@ void m1comm_device::comm_tick(){
 						idx = m_buffer[0];
 
 						// 0xFF - link id
-						if (idx == 0xFF)
+						if (idx == 0xff)
 						{
 							if (isMaster)
 							{
@@ -396,7 +404,7 @@ void m1comm_device::comm_tick(){
 						}
 
 						// 0xFE - link size
-						else if (idx == 0xFE)
+						else if (idx == 0xfe)
 						{
 							if (isSlave || isRelay)
 							{
@@ -440,7 +448,7 @@ void m1comm_device::comm_tick(){
 					// send first packet
 					if (m_linktimer == 0x00)
 					{
-						m_buffer[0] = 0xFF;
+						m_buffer[0] = 0xff;
 						m_buffer[1] = 0x01;
 						m_line_tx.write(m_buffer, dataSize);
 					}
@@ -448,7 +456,7 @@ void m1comm_device::comm_tick(){
 					// send second packet
 					else if (m_linktimer == 0x01)
 					{
-						m_buffer[0] = 0xFE;
+						m_buffer[0] = 0xfe;
 						m_buffer[1] = m_linkcount;
 						m_line_tx.write(m_buffer, dataSize);
 
@@ -501,7 +509,7 @@ void m1comm_device::comm_tick(){
 							m_line_tx.write(m_buffer, dataSize);
 						}
 					} else {
-						if (!isMaster && idx == 0xF0){
+						if (!isMaster && idx == 0xf0){
 							// 0xF0 - master addional bytes
 							for (int j = 0x06 ; j < 0x10 ; j++)
 							{
@@ -529,7 +537,7 @@ void m1comm_device::comm_tick(){
 
 			// update "ring buffer" if link established
 			// live relay does not send data
-			if (m_linkid != 0x00 && m_shared[5] == 0x01)
+			if (m_linkid != 0x00 && m_shared[5] != 0x00)
 			{
 				m_buffer[0] = m_linkid;
 				frameOffset = frameStart + (m_linkid * frameSize);
@@ -544,14 +552,14 @@ void m1comm_device::comm_tick(){
 
 				// master sends some additional status bytes
 				if (isMaster){
-					m_buffer[0] = 0xF0;
+					m_buffer[0] = 0xf0;
 					for (int j = 0x00 ; j < frameSize ; j++)
 					{
 						m_buffer[1 + j] = 0x00;
 					}
 					for (int j = 0x06 ; j < 0x10 ; j++)
 					{
-						m_buffer[1 + j] = m_shared[frameStart + j];
+						m_buffer[1 + j] = m_shared[j];
 					}
 					// push message to other nodes
 					m_line_tx.write(m_buffer, dataSize);
@@ -561,5 +569,5 @@ void m1comm_device::comm_tick(){
 			m_shared[5] = 0x00;
 		}
 	}
-#endif
 }
+#endif

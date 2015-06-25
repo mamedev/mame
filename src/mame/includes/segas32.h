@@ -8,6 +8,7 @@
 
 #include "machine/eepromser.h"
 #include "sound/multipcm.h"
+#include "machine/s32comm.h"
 
 
 
@@ -34,6 +35,7 @@ public:
 
 	required_device<timer_device> m_irq_timer_0;
 	required_device<timer_device> m_irq_timer_1;
+	optional_device<s32comm_device> m_s32comm;
 
 	typedef void (segas32_state::*sys32_output_callback)(int which, UINT16 data);
 

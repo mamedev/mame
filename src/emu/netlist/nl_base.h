@@ -914,88 +914,57 @@ namespace netlist
 		const param_type_t m_param_type;
 	};
 
-	class param_double_t : public param_t
+	template <class C, param_t::param_type_t T>
+	class param_template_t : public param_t
 	{
-		NETLIST_PREVENT_COPYING(param_double_t)
+		NETLIST_PREVENT_COPYING(param_template_t)
 	public:
-		ATTR_COLD param_double_t();
+		ATTR_COLD param_template_t()
+		: param_t(T)
+		, m_param(C(0))
+		{
+		}
 
-		ATTR_HOT  void setTo(const nl_double param);
-		ATTR_COLD  void initial(const nl_double val) { m_param = val; }
-		ATTR_HOT  nl_double Value() const        { return m_param;   }
+		operator const C() const { return Value(); }
+
+		ATTR_HOT  void setTo(const C &param);
+		ATTR_COLD  void initial(const C &val) { m_param = val; }
+		ATTR_HOT  C Value() const { return m_param;   }
 
 	protected:
 		virtual void save_register()
 		{
-			save(NLNAME(m_param));
+			/* pstrings not yet supported, these need special logic */
+			if (T != param_t::STRING && T != param_t::MODEL)
+				save(NLNAME(m_param));
 			param_t::save_register();
 		}
 
+		C m_param;
 	private:
-		nl_double m_param;
 	};
 
-	class param_int_t : public param_t
-	{
-		NETLIST_PREVENT_COPYING(param_int_t)
-	public:
-		ATTR_COLD param_int_t();
-
-		ATTR_HOT  void setTo(const int param);
-		ATTR_COLD  void initial(const int val) { m_param = val; }
-
-		ATTR_HOT  int Value() const     { return m_param;     }
-
-	protected:
-		virtual void save_register()
-		{
-			save(NLNAME(m_param));
-			param_t::save_register();
-		}
-
-	private:
-		int m_param;
-	};
+	typedef param_template_t<nl_double, param_t::DOUBLE> param_double_t;
+	typedef param_template_t<int, param_t::INTEGER> param_int_t;
+	typedef param_template_t<pstring, param_t::STRING> param_str_t;
 
 	class param_logic_t : public param_int_t
 	{
 		NETLIST_PREVENT_COPYING(param_logic_t)
 	public:
-		ATTR_COLD param_logic_t();
+		ATTR_COLD param_logic_t() : param_int_t() { };
 	};
 
-	class param_str_t : public param_t
-	{
-		NETLIST_PREVENT_COPYING(param_str_t)
-	public:
-		ATTR_COLD param_str_t();
-
-		ATTR_HOT  void setTo(const pstring &param);
-		ATTR_COLD  void initial(const pstring &val) { m_param = val; }
-
-		ATTR_HOT  const pstring &Value() const     { return m_param;     }
-
-	private:
-		pstring m_param;
-	};
-
-	class param_model_t : public param_t
+	class param_model_t : public param_template_t<pstring, param_t::MODEL>
 	{
 		NETLIST_PREVENT_COPYING(param_model_t)
 	public:
-		ATTR_COLD param_model_t();
-
-		ATTR_COLD  void initial(const pstring &val) { m_param = val; }
-
-		ATTR_HOT  const pstring &Value() const     { return m_param;     }
+		ATTR_COLD param_model_t() : param_template_t<pstring, param_t::MODEL>() { }
 
 		/* these should be cached! */
 		ATTR_COLD nl_double model_value(const pstring &entity, const nl_double defval = 0.0) const;
 		ATTR_COLD const pstring model_value_str(const pstring &entity, const pstring defval = "") const;
 		ATTR_COLD const pstring model_type() const;
-
-	private:
-		pstring m_param;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1296,22 +1265,8 @@ namespace netlist
 
 	PSTATE_INTERFACE(object_t, m_netlist, name())
 
-	ATTR_HOT inline void param_str_t::setTo(const pstring &param)
-	{
-		m_param = param;
-		netdev().update_param();
-	}
-
-	ATTR_HOT inline void param_int_t::setTo(const int param)
-	{
-		if (m_param != param)
-		{
-			m_param = param;
-			netdev().update_param();
-		}
-	}
-
-	ATTR_HOT inline void param_double_t::setTo(const nl_double param)
+	template <class C, param_t::param_type_t T>
+	ATTR_HOT inline void param_template_t<C, T>::setTo(const C &param)
 	{
 		if (m_param != param)
 		{

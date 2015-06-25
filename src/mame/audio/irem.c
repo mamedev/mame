@@ -402,13 +402,14 @@ NETLIST_START(kidniki_interface)
 	PARAM(Solver.GS_LOOPS, 2)
 #else
 	SOLVER(Solver, 12000)
-	PARAM(Solver.ACCURACY, 1e-8)
+	PARAM(Solver.ACCURACY, 1e-9)
 	PARAM(Solver.NR_LOOPS, 300)
-	PARAM(Solver.GS_LOOPS, 2)
+	PARAM(Solver.GS_LOOPS, 1)
 	PARAM(Solver.GS_THRESHOLD, 99)
+	PARAM(Solver.ITERATIVE, "SOR")
 #endif
 	//PARAM(Solver.GS_THRESHOLD, 99) // Force Gaussian elimination here
-	PARAM(Solver.SOR_FACTOR, 1.05)
+	PARAM(Solver.SOR_FACTOR, 1.00)
 	//FIXME proper models!
 	NET_MODEL(".model 2SC945 NPN(Is=2.04f Xti=3 Eg=1.11 Vaf=6 Bf=400 Ikf=20m Xtb=1.5 Br=3.377 Rc=1 Cjc=1p Mjc=.3333 Vjc=.75 Fc=.5 Cje=25p Mje=.3333 Vje=.75 Tr=450n Tf=20n Itf=0 Vtf=0 Xtf=0 VCEO=45V ICrating=150M MFG=Toshiba)")
 	NET_MODEL(".model 1S1588 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")

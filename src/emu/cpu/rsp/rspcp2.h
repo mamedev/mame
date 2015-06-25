@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz,Tyler J. Stachecki
 /***************************************************************************
 
     rspcp2.h
@@ -15,6 +15,37 @@
 
 #include "cpu/drcuml.h"
 #include "rsp.h"
+#include "rspdiv.h"
+
+#define SIMD_OFF		(1)
+
+#if (defined(__SSE2__) || defined(__SSE3__) || defined(__SSSE3__) || defined(__SSE4_1__) || defined(__SSE4_2__))
+#define SSE_AVAILABLE	(1)
+#else
+#define SSE_AVAILABLE	(0)
+#endif
+
+#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (SSE_AVAILABLE || defined(_MSC_VER)) && defined(PTR64) && !SIMD_OFF
+#define USE_SIMD	(1)
+#else
+#define USE_SIMD	(0)
+#endif
+
+#if USE_SIMD
+#ifdef __SSE4_2__
+#include <nmmintrin.h>
+#elif defined(__SSE4_1__)
+#include <smmintrin.h>
+#elif defined(__SSSE3__)
+#include <tmmintrin.h>
+#elif defined(__SSE3__)
+#include <pmmintrin.h>
+#else
+#include <emmintrin.h>
+#endif
+
+typedef __m128i rsp_vec_t;
+#endif
 
 union VECTOR_REG
 {
@@ -22,6 +53,9 @@ union VECTOR_REG
 	UINT32 l[4];
 	INT16 s[8];
 	UINT8 b[16];
+#if USE_SIMD
+	rsp_vec_t v;
+#endif
 };
 
 union ACCUMULATOR_REG
@@ -152,10 +186,148 @@ protected:
 	UINT32          m_reciprocal_high;
 	INT32           m_dp_allowed;
 
+#if USE_SIMD
+	typedef struct
+	{
+		rsp_vec_t dummy_for_alignment;
+		const UINT16 logic_mask[2][8];
+		const UINT16 vrsq_mask_table[8][8];
+		const UINT16 shuffle_keys[16][8];
+		const UINT16 sll_b2l_keys[16][8];
+		const UINT16 sll_l2b_keys[16][8];
+		const UINT16 srl_b2l_keys[16][8];
+		const UINT16 ror_b2l_keys[16][8];
+		const UINT16 rol_l2b_keys[16][8];
+		const UINT16 ror_l2b_keys[16][8];
+	} vec_helpers_t;
+
+	static const vec_helpers_t m_vec_helpers;
+
+	rsp_vec_t vec_load_and_shuffle_operand(const UINT16* src, UINT32 element);
+	static inline rsp_vec_t vec_load_unshuffled_operand(const UINT16* src)
+	{
+		return _mm_load_si128((rsp_vec_t*) src);
+	}
+	static inline void vec_write_operand(UINT16* dest, rsp_vec_t src)
+	{
+		_mm_store_si128((rsp_vec_t*) dest, src);
+	}
+	static inline rsp_vec_t read_acc_lo(const UINT16 *acc)
+	{
+		return vec_load_unshuffled_operand(acc + sizeof(rsp_vec_t) * 2);
+	}
+	static inline rsp_vec_t read_acc_mid(const UINT16 *acc)
+	{
+		return vec_load_unshuffled_operand(acc + sizeof(rsp_vec_t));
+	}
+	static inline rsp_vec_t read_acc_hi(const UINT16 *acc)
+	{
+		return vec_load_unshuffled_operand(acc);
+	}
+	static inline rsp_vec_t read_vcc_lo(const UINT16 *vcc)
+	{
+		return vec_load_unshuffled_operand(vcc + sizeof(rsp_vec_t));
+	}
+	static inline rsp_vec_t read_vcc_hi(const UINT16 *vcc)
+	{
+		return vec_load_unshuffled_operand(vcc);
+	}
+	static inline rsp_vec_t read_vco_lo(const UINT16 *vco)
+	{
+		return vec_load_unshuffled_operand(vco + sizeof(rsp_vec_t));
+	}
+	static inline rsp_vec_t read_vco_hi(const UINT16 *vco)
+	{
+		return vec_load_unshuffled_operand(vco);
+	}
+	static inline rsp_vec_t read_vce(const UINT16 *vce)
+	{
+		return vec_load_unshuffled_operand(vce + sizeof(rsp_vec_t));
+	}
+	static inline void write_acc_lo(UINT16 *acc, rsp_vec_t acc_lo)
+	{
+		return vec_write_operand(acc + sizeof(rsp_vec_t) * 2, acc_lo);
+	}
+	static inline void write_acc_mid(UINT16 *acc, rsp_vec_t acc_mid)
+	{
+		return vec_write_operand(acc + sizeof(rsp_vec_t), acc_mid);
+	}
+	static inline void write_acc_hi(UINT16 *acc, rsp_vec_t acc_hi)
+	{
+		return vec_write_operand(acc, acc_hi);
+	}
+	static inline void write_vcc_lo(UINT16 *vcc, rsp_vec_t vcc_lo)
+	{
+		return vec_write_operand(vcc + sizeof(rsp_vec_t), vcc_lo);
+	}
+	static inline void write_vcc_hi(UINT16 *vcc, rsp_vec_t vcc_hi)
+	{
+		return vec_write_operand(vcc, vcc_hi);
+	}
+	static inline void write_vco_lo(UINT16 *vcc, rsp_vec_t vco_lo)
+	{
+		return vec_write_operand(vcc + sizeof(rsp_vec_t), vco_lo);
+	}
+	static inline void write_vco_hi(UINT16 *vcc, rsp_vec_t vco_hi)
+	{
+		return vec_write_operand(vcc, vco_hi);
+	}
+	static inline void write_vce(UINT16 *vce, rsp_vec_t vce_r)
+	{
+		return vec_write_operand(vce, vce_r);
+	}
+
+	static inline INT16 get_flags(const UINT16 *flags)
+	{
+		return (INT16)_mm_movemask_epi8(
+			_mm_packs_epi16(
+				_mm_load_si128((rsp_vec_t*) (flags + sizeof(rsp_vec_t))),
+				_mm_load_si128((rsp_vec_t*) flags)
+			)
+		);
+	}
+
+	static inline rsp_vec_t vec_zero()
+	{
+		return _mm_setzero_si128();
+	}
+
+	void vec_load_group1(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
+	void vec_load_group2(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
+	void vec_load_group4(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
+	void vec_store_group1(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
+	void vec_store_group2(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
+	void vec_store_group4(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
+
+#include "clamp.h"
+#include "vabs.h"
+#include "vadd.h"
+#include "vaddc.h"
+#include "vand.h"
+#include "vch.h"
+#include "vcmp.h"
+#include "vcl.h"
+#include "vcr.h"
+#include "vmac.h"
+#include "vmrg.h"
+#include "vmul.h"
+#include "vmulh.h"
+#include "vmull.h"
+#include "vmulm.h"
+#include "vmuln.h"
+#include "vor.h"
+#include "vsub.h"
+#include "vsubc.h"
+#include "vxor.h"
+#endif
+
 private:
 	void            handle_lwc2(UINT32 op);
 	void            handle_swc2(UINT32 op);
 	void            handle_vector_ops(UINT32 op);
+
+	UINT32			m_div_in;
+	UINT32			m_div_out;
 };
 
 #endif /* __RSPCP2_H__ */

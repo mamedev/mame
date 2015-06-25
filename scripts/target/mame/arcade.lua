@@ -2425,6 +2425,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/model1.c",
 	MAME_DIR .. "src/mame/machine/model1.c",
 	MAME_DIR .. "src/mame/video/model1.c",
+	MAME_DIR .. "src/mame/machine/s32comm.c",
 	MAME_DIR .. "src/mame/machine/m1comm.c",
 	MAME_DIR .. "src/mame/audio/dsbz80.c",
 	MAME_DIR .. "src/mame/drivers/model2.c",

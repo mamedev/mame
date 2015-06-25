@@ -1021,7 +1021,7 @@ ATTR_COLD analog_output_t::analog_output_t()
 	this->set_net(m_my_net);
 	set_state(STATE_OUT);
 
-	net().as_analog().m_cur_Analog = 0.98;
+	net().as_analog().m_cur_Analog = NL_FCONST(0.99);
 }
 
 ATTR_COLD void analog_output_t::init_object(core_device_t &dev, const pstring &aname)
@@ -1044,35 +1044,6 @@ ATTR_COLD void analog_output_t::initial(const nl_double val)
 ATTR_COLD param_t::param_t(const param_type_t atype)
 	: owned_object_t(PARAM, ANALOG)
 	, m_param_type(atype)
-{
-}
-
-ATTR_COLD param_double_t::param_double_t()
-	: param_t(DOUBLE)
-	, m_param(0.0)
-{
-}
-
-ATTR_COLD param_int_t::param_int_t()
-	: param_t(INTEGER)
-	, m_param(0)
-{
-}
-
-ATTR_COLD param_logic_t::param_logic_t()
-	: param_int_t()
-{
-}
-
-ATTR_COLD param_str_t::param_str_t()
-	: param_t(STRING)
-	, m_param("")
-{
-}
-
-ATTR_COLD param_model_t::param_model_t()
-	: param_t(MODEL)
-	, m_param("")
 {
 }
 

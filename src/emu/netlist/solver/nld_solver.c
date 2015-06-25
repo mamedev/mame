@@ -87,6 +87,8 @@ ATTR_COLD matrix_solver_t::matrix_solver_t(const eSolverType type, const solver_
 : m_stat_calculations(0),
 	m_stat_newton_raphson(0),
 	m_stat_vsolver_calls(0),
+	m_iterative_fail(0),
+	m_iterative_total(0),
 	m_params(*params),
 	m_cur_ts(0),
 	m_type(type)
@@ -177,6 +179,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 		}
 		NL_VERBOSE_OUT(("added net with %" SIZETFMT " populated connections\n", net->m_core_terms.size()));
 	}
+
 }
 
 
@@ -203,6 +206,11 @@ ATTR_COLD void matrix_solver_t::start()
 
 	save(NLNAME(m_last_step));
 	save(NLNAME(m_cur_ts));
+	save(NLNAME(m_stat_calculations));
+	save(NLNAME(m_stat_newton_raphson));
+	save(NLNAME(m_stat_vsolver_calls));
+	save(NLNAME(m_iterative_fail));
+	save(NLNAME(m_iterative_total));
 
 }
 
@@ -319,6 +327,8 @@ NETLIB_START(solver)
 
 	register_param("FREQ", m_freq, 48000.0);
 
+	register_param("ITERATIVE", m_iterative_solver, "SOR");
+
 	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
 	register_param("GS_THRESHOLD", m_gs_threshold, 6);      // below this value, gaussian elimination is used
@@ -411,7 +421,7 @@ NETLIB_UPDATE(solver)
 }
 
 template <int m_N, int _storage_N>
-matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int gs_threshold, const bool use_specific)
+matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_specific)
 {
 	if (use_specific && m_N == 1)
 		return palloc(matrix_solver_direct1_t, &m_params);
@@ -419,18 +429,27 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int gs_thre
 		return palloc(matrix_solver_direct2_t, &m_params);
 	else
 	{
-		if (size >= gs_threshold)
+		if (size >= m_gs_threshold)
 		{
-			if (USE_MATRIX_GS)
+			if (pstring("SOR_MAT").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_SOR_mat_t<m_N,_storage_N> solver_mat;
 				return palloc(solver_mat, &m_params, size);
 			}
-			else
+			else if (pstring("SOR").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
-				//typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GS;
 				return palloc(solver_GS, &m_params, size);
+			}
+			else if (pstring("GMRES").equals(m_iterative_solver))
+			{
+				typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GMRES;
+				return palloc(solver_GMRES, &m_params, size);
+			}
+			else
+			{
+				netlist().error("Unknown solver type: %s\n", m_iterative_solver.Value().cstr());
+				return NULL;
 			}
 		}
 		else
@@ -445,7 +464,6 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 {
 	analog_net_t::list_t groups[256];
 	int cur_group = -1;
-	const int gs_threshold = m_gs_threshold.Value();
 	const bool use_specific = true;
 
 	m_params.m_accuracy = m_accuracy.Value();
@@ -502,52 +520,52 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 		switch (net_count)
 		{
 			case 1:
-				ms = create_solver<1,1>(1, gs_threshold, use_specific);
+				ms = create_solver<1,1>(1, use_specific);
 				break;
 			case 2:
-				ms = create_solver<2,2>(2, gs_threshold, use_specific);
+				ms = create_solver<2,2>(2, use_specific);
 				break;
 			case 3:
-				ms = create_solver<3,3>(3, gs_threshold, use_specific);
+				ms = create_solver<3,3>(3, use_specific);
 				break;
 			case 4:
-				ms = create_solver<4,4>(4, gs_threshold, use_specific);
+				ms = create_solver<4,4>(4, use_specific);
 				break;
 			case 5:
-				ms = create_solver<5,5>(5, gs_threshold, use_specific);
+				ms = create_solver<5,5>(5, use_specific);
 				break;
 			case 6:
-				ms = create_solver<6,6>(6, gs_threshold, use_specific);
+				ms = create_solver<6,6>(6, use_specific);
 				break;
 			case 7:
-				ms = create_solver<7,7>(7, gs_threshold, use_specific);
+				ms = create_solver<7,7>(7, use_specific);
 				break;
 			case 8:
-				ms = create_solver<8,8>(8, gs_threshold, use_specific);
+				ms = create_solver<8,8>(8, use_specific);
 				break;
 			case 12:
-				ms = create_solver<12,12>(12, gs_threshold, use_specific);
+				ms = create_solver<12,12>(12, use_specific);
 				break;
 			case 87:
-				ms = create_solver<87,87>(87, gs_threshold, use_specific);
+				ms = create_solver<87,87>(87, use_specific);
 				break;
 			default:
 				if (net_count <= 16)
 				{
-					ms = create_solver<0,16>(net_count, gs_threshold, use_specific);
+					ms = create_solver<0,16>(net_count, use_specific);
 				}
 				else if (net_count <= 32)
 				{
-					ms = create_solver<0,32>(net_count, gs_threshold, use_specific);
+					ms = create_solver<0,32>(net_count, use_specific);
 				}
 				else if (net_count <= 64)
 				{
-					ms = create_solver<0,64>(net_count, gs_threshold, use_specific);
+					ms = create_solver<0,64>(net_count, use_specific);
 				}
 				else
 					if (net_count <= 128)
 				{
-					ms = create_solver<0,128>(net_count, gs_threshold, use_specific);
+					ms = create_solver<0,128>(net_count, use_specific);
 				}
 				else
 				{
