@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t vec_vcr(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *ge, rsp_vec_t *le) {
+inline rsp_vec_t vec_vcr(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *ge, rsp_vec_t *le) {
 	// sign = (vs ^ vt) < 0
 	rsp_vec_t sign = _mm_xor_si128(vs, vt);
 	sign = _mm_srai_epi16(sign, 15);

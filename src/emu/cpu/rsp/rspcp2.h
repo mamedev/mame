@@ -51,7 +51,7 @@ union VECTOR_REG
 {
 	UINT64 d[2];
 	UINT32 l[4];
-	INT16 s[8];
+	UINT16 s[8];
 	UINT8 b[16];
 #if USE_SIMD
 	rsp_vec_t v;
@@ -187,6 +187,32 @@ protected:
 	INT32           m_dp_allowed;
 
 #if USE_SIMD
+	enum rsp_flags_t {
+		RSP_VCO = 0,
+		RSP_VCC = 1,
+		RSP_VCE = 2
+	};
+
+	enum rsp_acc_t {
+		RSP_ACC_LO = 16,
+		RSP_ACC_MD = 8,
+		RSP_ACC_HI = 0,
+	};
+
+	union aligned_rsp_2vect_t {
+		rsp_vec_t __align[2];
+		UINT16 s[16];
+	};
+
+	union aligned_rsp_3vect_t {
+		rsp_vec_t __align[3];
+		UINT16 s[24];
+	};
+
+	aligned_rsp_2vect_t m_flags[3];
+	aligned_rsp_3vect_t m_acc;
+	UINT32 m_dp_flag;
+
 	typedef struct
 	{
 		rsp_vec_t dummy_for_alignment;
@@ -308,7 +334,9 @@ protected:
 #include "vcmp.h"
 #include "vcl.h"
 #include "vcr.h"
+#include "vdivh.h"
 #include "vmac.h"
+#include "vmov.h"
 #include "vmrg.h"
 #include "vmul.h"
 #include "vmulh.h"
@@ -316,6 +344,8 @@ protected:
 #include "vmulm.h"
 #include "vmuln.h"
 #include "vor.h"
+#include "vrcpsq.h"
+#include "vrsq.h"
 #include "vsub.h"
 #include "vsubc.h"
 #include "vxor.h"

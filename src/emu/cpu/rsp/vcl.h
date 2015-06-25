@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t vec_vcl(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *ge, rsp_vec_t *le, rsp_vec_t eq, rsp_vec_t sign, rsp_vec_t vce)
+inline rsp_vec_t vec_vcl(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *ge, rsp_vec_t *le, rsp_vec_t eq, rsp_vec_t sign, rsp_vec_t vce)
 {
 	// sign_negvt = sign ? -vt : vt
 	rsp_vec_t sign_negvt = _mm_xor_si128(vt, sign);

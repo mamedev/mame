@@ -81,7 +81,7 @@ private:
 	int lastIRQStat;
 	IRQType_t IRQType;
 
-	Chan channel[1];
+	Chan channel[2];
 
 	devcb_write_line intrq_cb;
 

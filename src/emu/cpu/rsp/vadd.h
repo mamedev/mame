@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t vec_vadd(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t carry, rsp_vec_t *acc_lo)
+inline rsp_vec_t vec_vadd(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t carry, rsp_vec_t *acc_lo)
 {
 	// VCC uses unsaturated arithmetic.
 	rsp_vec_t vd = _mm_add_epi16(vs, vt);
