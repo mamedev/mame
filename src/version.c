@@ -17,4 +17,4 @@ const char build_version[] = BARE_BUILD_VERSION " (" __DATE__")";
 
 // MEWUI version
 extern const char mewui_version[];
-const char mewui_version[] = "1.62a r21";
+const char mewui_version[] = "1.63";

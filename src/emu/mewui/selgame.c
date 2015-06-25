@@ -511,8 +511,10 @@ void ui_mewui_select_game::populate()
 				case FILTER_VECTOR:
 				case FILTER_STEREO:
 				case FILTER_SAMPLES:
+				case FILTER_NOSAMPLES:
 				case FILTER_RASTER:
 				case FILTER_CHD:
+				case FILTER_NOCHD:
 					build_from_cache(m_tmp);
 					break;
 
@@ -1166,6 +1168,11 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
+			case FILTER_NOSAVE:
+				if (!(s_drivers[index]->flags & GAME_SUPPORTS_SAVE))
+					m_displaylist.push_back(s_drivers[index]);
+				break;
+
 			case FILTER_YEAR:
 				if (!core_stricmp(filter_text, s_drivers[index]->year))
 					m_displaylist.push_back(s_drivers[index]);
@@ -1244,7 +1251,9 @@ void ui_mewui_select_game::build_custom()
 			case FILTER_VECTOR:
 			case FILTER_RASTER:
 			case FILTER_CHD:
+			case FILTER_NOCHD:
 			case FILTER_SAMPLES:
+			case FILTER_NOSAMPLES:
 			case FILTER_STEREO:
 				build_from_cache(s_drivers, filter, bioscheck);
 				break;
@@ -1315,6 +1324,11 @@ void ui_mewui_select_game::build_from_cache(std::vector<const game_driver *> &s_
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 
+			case FILTER_NOSAMPLES:
+				if (!mewui_globals::driver_cache[idx].b_samples)
+					m_displaylist.push_back(s_drivers[index]);
+				break;
+
 			case FILTER_STEREO:
 				if (mewui_globals::driver_cache[idx].b_stereo)
 					m_displaylist.push_back(s_drivers[index]);
@@ -1322,6 +1336,11 @@ void ui_mewui_select_game::build_from_cache(std::vector<const game_driver *> &s_
 
 			case FILTER_CHD:
 				if (mewui_globals::driver_cache[idx].b_chd)
+					m_displaylist.push_back(s_drivers[index]);
+				break;
+
+			case FILTER_NOCHD:
+				if (!mewui_globals::driver_cache[idx].b_chd)
 					m_displaylist.push_back(s_drivers[index]);
 				break;
 		}

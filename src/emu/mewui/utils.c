@@ -52,7 +52,8 @@ std::vector<cache_info> mewui_globals::driver_cache(driver_list::total() + 1);
 
 const char *mewui_globals::filter_text[] = { "All", "Available", "Unavailable", "Working", "Not Mechanical", "Category", "Favorites", "BIOS",
 												"Originals", "Clones", "Not Working", "Mechanical", "Manufacturers", "Years", "Support Save",
-												"CHD", "Use Samples", "Stereo", "Vertical", "Horizontal", "Raster", "Vectors", "Custom" };
+												"Not Support Save", "CHD", "No CHD", "Use Samples", "Not Use Samples", "Stereo", "Vertical",
+												"Horizontal", "Raster", "Vectors", "Custom" };
 
 const char *mewui_globals::sw_filter_text[] = { "All", "Available", "Unavailable", "Originals", "Clones", "Years", "Publishers", "Supported",
 												"Partial Supported", "Unsupported", "Region" };
