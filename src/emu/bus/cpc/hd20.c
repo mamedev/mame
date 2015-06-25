@@ -80,7 +80,7 @@ void cpc_hd20_device::device_reset()
 
 READ8_MEMBER(cpc_hd20_device::hdc_r)
 {
-	UINT8 ret = 0xff;
+	UINT8 ret = 0x00;
 
 	switch(offset)
 	{
@@ -93,6 +93,9 @@ READ8_MEMBER(cpc_hd20_device::hdc_r)
 	case 2:
 		m_hdc->set_ready();
 		ret = 0x01;
+		break;
+	case 4:
+		m_hdc->reset_w(0);  // reset on read also?
 		break;
 	}
 
