@@ -524,7 +524,8 @@ segas32_state::segas32_state(const machine_config &mconfig, const char *tag, dev
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_irq_timer_0(*this, "v60_irq0"),
-		m_irq_timer_1(*this, "v60_irq1")
+		m_irq_timer_1(*this, "v60_irq1"),
+		m_s32comm(*this, "s32comm")
 {
 }
 
@@ -761,6 +762,8 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
 	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int),this));
 	if (m_system32_prot_vblank)
 		(this->*m_system32_prot_vblank)();
+	if (m_s32comm != NULL)
+		m_s32comm->check_vint_irq();
 }
 
 
@@ -1363,6 +1366,9 @@ static ADDRESS_MAP_START( system32_map, AS_PROGRAM, 16, segas32_state )
 	AM_RANGE(0x600000, 0x60ffff) AM_MIRROR(0x0e0000) AM_READWRITE(system32_paletteram_r, system32_paletteram_w) AM_SHARE("paletteram.0")
 	AM_RANGE(0x610000, 0x61007f) AM_MIRROR(0x0eff80) AM_READWRITE(system32_mixer_r, system32_mixer_w)
 	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE(shared_ram_16_r, shared_ram_16_w)
+	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE8("s32comm", s32comm_device, share_r, share_w, 0x00ff)
+	AM_RANGE(0x801000, 0x801001) AM_DEVREADWRITE8("s32comm", s32comm_device, cn_r, cn_w, 0x00ff)
+	AM_RANGE(0x801002, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, fg_r, fg_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x0fff80) AM_READWRITE(io_chip_r, io_chip_w)
 	AM_RANGE(0xc00040, 0xc0007f) AM_MIRROR(0x0fff80) AM_READWRITE(io_expansion_r, io_expansion_w)
 	AM_RANGE(0xd00000, 0xd0000f) AM_MIRROR(0x07fff0) AM_READWRITE(interrupt_control_16_r, interrupt_control_16_w)
@@ -1384,6 +1390,9 @@ static ADDRESS_MAP_START( multi32_map, AS_PROGRAM, 32, segas32_state )
 	AM_RANGE(0x680000, 0x68ffff) AM_MIRROR(0x060000) AM_READWRITE(multi32_paletteram_1_r, multi32_paletteram_1_w) AM_SHARE("paletteram.1")
 	AM_RANGE(0x690000, 0x69007f) AM_MIRROR(0x06ff80) AM_WRITE(multi32_mixer_1_w)
 	AM_RANGE(0x700000, 0x701fff) AM_MIRROR(0x0fe000) AM_READWRITE(shared_ram_32_r, shared_ram_32_w)
+	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE8("s32comm", s32comm_device, share_r, share_w, 0x00ff00ff)
+	AM_RANGE(0x801000, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, cn_r, cn_w, 0x000000ff)
+	AM_RANGE(0x801000, 0x801003) AM_DEVREADWRITE8("s32comm", s32comm_device, fg_r, fg_w, 0x00ff0000)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x07ff80) AM_READWRITE(io_chip_0_r, io_chip_0_w)
 	AM_RANGE(0xc00040, 0xc0007f) AM_MIRROR(0x07ff80) AM_READWRITE(io_expansion_0_r, io_expansion_0_w)
 	AM_RANGE(0xc80000, 0xc8001f) AM_MIRROR(0x07ff80) AM_READWRITE(io_chip_1_r, io_chip_1_w)
@@ -2477,6 +2486,8 @@ static MACHINE_CONFIG_FRAGMENT( system32 )
 	MCFG_RF5C68_ADD("rfsnd", RFC_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
+	
+	MCFG_S32COMM_ADD("s32comm")
 MACHINE_CONFIG_END
 
 const device_type SEGA_S32_REGULAR_DEVICE = &device_creator<segas32_regular_state>;
@@ -2561,6 +2572,8 @@ static MACHINE_CONFIG_FRAGMENT( multi32 )
 	MCFG_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	
+	MCFG_S32COMM_ADD("s32comm")
 MACHINE_CONFIG_END
 
 
@@ -5147,9 +5160,6 @@ DRIVER_INIT_MEMBER(segas32_new_state,f1en) {
 DRIVER_INIT_MEMBER(segas32_new_state,f1lap)
 {
 	m_mainpcb->init_f1lap();
-	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x800000, 0x800fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x801000, 0x801003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
 }
 
 
@@ -5227,6 +5237,8 @@ void segas32_state::init_f1lap(void)
 	m_system32_prot_vblank = &segas32_state::f1lap_fd1149_vblank;
 
 	m_sw1_output = &segas32_state::f1lap_sw1_output;
+		
+	m_s32comm->set_linktype(15612); // EPR-15612
 }
 
 
@@ -5273,6 +5285,8 @@ void segas32_state::init_orunners(void)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::orunners_custom_io_w),this));
 	m_sw1_output = &segas32_state::orunners_sw1_output;
 	m_sw2_output = &segas32_state::orunners_sw2_output;
+
+	m_s32comm->set_linktype(15033); // EPR-15033
 }
 
 
@@ -5289,6 +5303,8 @@ void segas32_state::init_radr(void)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
 	m_sw1_output = &segas32_state::radm_sw1_output;
 	m_sw2_output = &segas32_state::radr_sw2_output;
+		
+	m_s32comm->set_linktype(14084); // EPR-14084
 }
 
 
@@ -5299,6 +5315,8 @@ void segas32_state::init_scross(void)
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
 	m_sw2_output = &segas32_state::scross_sw2_output;
+
+	m_s32comm->set_linktype(15033); // EPR-15033
 }
 
 
