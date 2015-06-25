@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t vec_vabs(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *acc_lo)
+inline rsp_vec_t vec_vabs(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *acc_lo)
 {
 	rsp_vec_t vs_zero = _mm_cmpeq_epi16(vs, zero);
 	rsp_vec_t sign_lt = _mm_srai_epi16(vs, 15);

@@ -19,21 +19,22 @@ rsp_vec_t vec_vrsq(INT32 dp, UINT32 src, UINT32 e, UINT32 dest, UINT32 de)
 	}
 
 	// Handle edge cases.
+	INT32 result;
 	if (data == 0)
 	{
-		result = 0x7fffFFFFU;
+		result = 0x7fffffff;
 	}
 	else if (input == -32768)
 	{
-    	result = 0xffff0000U;
+    	result = 0xffff0000;
 	}
 	else // Main case: compute the reciprocal.
 	{
 		UINT32 shift = count_leading_zeros(data);
 
-		UINT32 idx = (((UINT64) data << shift) & 0x7FC00000U) >> 22;
-		idx = (idx | 0x200) & 0x3FE | (shift % 2);
-		INT32 result = rsp_reciprocal_rom[idx];
+		UINT32 idx = (((UINT64) data << shift) & 0x7fc00000) >> 22;
+		idx = ((idx | 0x200) & 0x3fe) | (shift % 2);
+		result = rsp_divtable[idx];
 
 		result = ((0x10000 | result) << 14) >> ((31 - shift) >> 1);
 		result = result ^ input_mask;
