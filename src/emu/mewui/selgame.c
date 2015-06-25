@@ -1407,10 +1407,27 @@ void ui_mewui_select_game::populate_search()
 
 void ui_mewui_select_game::inkey_export()
 {
+	std::string filename("exported");
+	emu_file infile(machine().options().mewui_path(), OPEN_FLAG_READ);
+	if (infile.open(filename.c_str(), ".xml") == FILERR_NONE)
+	{
+		for (int seq = 0; ; seq++)
+		{
+			std::string seqtext;
+			strprintf(seqtext, "%s_%04d", filename.c_str(), seq);
+			file_error filerr = infile.open(seqtext.c_str(), ".xml");
+			if (filerr != FILERR_NONE)
+			{
+				filename = seqtext;
+				break;
+			}
+		}
+	}
+
 	// attempt to open the output file
 	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-	if (file.open("exported.xml") == FILERR_NONE)
+	if (file.open(filename.c_str(), ".xml") == FILERR_NONE)
 	{
 		FILE *pfile;
 		std::string fullpath(file.fullpath());
@@ -1441,7 +1458,7 @@ void ui_mewui_select_game::inkey_export()
 		info_xml_creator creator(drivlist);
 		creator.output(pfile);
 		fclose(pfile);
-		popmessage("Exported.xml created under mewui folder.");
+		popmessage("%s.xml saved under mewui folder.", filename.c_str());
 	}
 }
 
