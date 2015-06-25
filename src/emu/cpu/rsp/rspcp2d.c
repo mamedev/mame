@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "rsp.h"
-#include "rspdiv.h"
 #include "rspcp2.h"
 #include "rspcp2d.h"
 #include "cpu/drcfe.h"

@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "debugger.h"
 #include "rsp.h"
-#include "rspdiv.h"
 #include "rspfe.h"
 #include "rspcp2.h"
 #include "cpu/drcfe.h"
