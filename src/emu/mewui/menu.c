@@ -932,7 +932,6 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 	int afilter = (software) ? mewui_globals::actual_sw_filter : mewui_globals::actual_filter;
 	int *hover = (software) ? &l_sw_hover : &l_hover;
 	const char **text = (software) ? mewui_globals::sw_filter_text : mewui_globals::filter_text;
-
 	float sc = y2 - y1 - (2.0f * UI_BOX_TB_BORDER);
 
 	if ((text_lenght * line_height) > sc)
@@ -942,12 +941,14 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 		line_height = machine().ui().get_line_height() * text_size;
 	}
 
+	float text_sign = machine().ui().get_string_width_ex("_# ", text_size);
 	for (int x = 0; x < text_lenght; x++)
 	{
 		float total_width;
 
 		// compute width of left hand side
 		total_width = machine().ui().get_string_width_ex(text[x], text_size);
+		total_width += text_sign;
 
 		// track the maximum
 		if (total_width > left_width)
@@ -968,6 +969,7 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 
 	for (int filter = 0; filter < text_lenght; filter++)
 	{
+		std::string str(text[filter]);
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
 
 		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y1 + line_height > mouse_y)
@@ -982,7 +984,31 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			container->add_rect(x1, y1, x2, y1 + line_height, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
-		machine().ui().draw_text_full(container, text[filter], x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
+		float x1t = x1 + text_sign;
+		if (!software && afilter == FILTER_CUSTOM)
+		{
+			if (filter == custfltr::main_filter)
+			{
+				str.assign("_# ").append(text[filter]);
+				x1t -= text_sign;
+			}
+			else
+			{
+				for (int count = 1; count <= custfltr::numother; count++)
+				{
+					int cfilter = custfltr::other[count];
+					if (cfilter == filter)
+					{
+						str.assign("_# ").append(text[filter]);
+						x1t -= text_sign;
+						break;
+					}
+				}
+			}
+			convert_command_glyph(str);
+		}
+
+		machine().ui().draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
 										DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
 
 		y1 += line_height;
