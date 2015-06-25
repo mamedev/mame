@@ -66,6 +66,10 @@ inline void vec_mult_scalar (const int n, const double * RESTRICT v, const doubl
 	}
 }
 
+#ifndef __clang__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 inline void vec_add_mult_scalar (const int n, const double * RESTRICT v, const double scalar, double * RESTRICT result)
 {
 	for ( unsigned i = 0; i < n; i++ )
@@ -83,6 +87,9 @@ inline void vec_sub(const int n, const double * RESTRICT v1, const double * REST
 	for ( unsigned i = 0; i < n; i++ )
 		result[i] = v1[i] - v2[i];
 }
+#ifndef __clang__
+#pragma GCC diagnostic pop
+#endif
 
 inline void vec_scale (const int n, double * RESTRICT v, const double scalar)
 {
