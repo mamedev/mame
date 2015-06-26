@@ -1029,7 +1029,9 @@ std::string &ui_manager::warnings_string(std::string &str)
 	// add a warning if any ROMs were loaded with warnings
 	if (rom_load_warnings(machine()) > 0)
 	{
-		str.append("One or more ROMs/CHDs for this game are incorrect. The ");
+		str.append("One or more ROMs/CHDs for this ");
+		str.append(emulator_info::get_gamenoun());
+		str.append( "game are incorrect. The ");
 		str.append(emulator_info::get_gamenoun());
 		str.append(" may not run correctly.\n");
 		if (machine().system().flags & WARNING_FLAGS)
@@ -1065,25 +1067,36 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append("The video emulation isn't 100% accurate.\n");
 		if (machine().system().flags & GAME_IMPERFECT_SOUND)
 			str.append("The sound emulation isn't 100% accurate.\n");
-		if (machine().system().flags & GAME_NO_SOUND)
-			str.append("The game lacks sound.\n");
+		if (machine().system().flags & GAME_NO_SOUND) {
+			str.append("The ");
+			str.append(emulator_info::get_gamenoun());
+			str.append(" lacks sound.\n");
+		}
 		if (machine().system().flags & GAME_NO_COCKTAIL)
 			str.append("Screen flipping in cocktail mode is not supported.\n");
 
 		// check if external artwork is present before displaying this warning?
-		if (machine().system().flags & GAME_REQUIRES_ARTWORK)
-			str.append("The game requires external artwork files\n");
+		if (machine().system().flags & GAME_REQUIRES_ARTWORK) {
+			str.append("The ");
+			str.append(emulator_info::get_gamenoun());
+			str.append(" requires external artwork files\n");
+		}
 
 		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
 		if (machine().system().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
 		{
 			// add the strings for these warnings
-			if (machine().system().flags & GAME_UNEMULATED_PROTECTION)
-				str.append("The game has protection which isn't fully emulated.\n");
+			if (machine().system().flags & GAME_UNEMULATED_PROTECTION) {
+				str.append("The ");
+				str.append(emulator_info::get_gamenoun());
+				str.append(" has protection which isn't fully emulated.\n");
+			}
 			if (machine().system().flags & GAME_NOT_WORKING) {
 				str.append("\nTHIS ");
 				str.append(emulator_info::get_capgamenoun());
-				str.append(" DOESN'T WORK. The emulation for this game is not yet complete. "
+				str.append(" DOESN'T WORK. The emulation for this ");
+				str.append(emulator_info::get_gamenoun());
+				str.append(" is not yet complete. "
 						"There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 			}
 			if (machine().system().flags & GAME_MECHANICAL) {
@@ -1109,8 +1122,11 @@ std::string &ui_manager::warnings_string(std::string &str)
 					if ((drivlist.driver().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL)) == 0)
 					{
 						// this one works, add a header and display the name of the clone
-						if (!foundworking)
-							str.append("\n\nThere are working clones of this game: ");
+						if (!foundworking) {
+							str.append("\n\nThere are working clones of this ");
+							str.append(emulator_info::get_gamenoun());
+							str.append(": ");
+						}
 						else
 							str.append(", ");
 						str.append(drivlist.driver().name);
