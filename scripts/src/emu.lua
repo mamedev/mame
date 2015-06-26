@@ -310,7 +310,6 @@ files {
 	MAME_DIR .. "src/emu/video/generic.h",
 	MAME_DIR .. "src/emu/video/resnet.c",
 	MAME_DIR .. "src/emu/video/resnet.h",
-	MAME_DIR .. "src/emu/video/rgbutil.c",
 	MAME_DIR .. "src/emu/video/rgbutil.h",
 	MAME_DIR .. "src/emu/video/rgbgen.c",
 	MAME_DIR .. "src/emu/video/rgbgen.h",

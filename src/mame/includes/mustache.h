@@ -8,21 +8,21 @@ public:
 	mustache_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cpu_decrypt(*this, "seibu_sound"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<seibu_sound_device> m_cpu_decrypt;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	tilemap_t *m_bg_tilemap;
 	int m_control_byte;

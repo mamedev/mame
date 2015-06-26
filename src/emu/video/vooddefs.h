@@ -3211,7 +3211,7 @@ INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  I
 			/* if fog_mult is 0, we add this to the original color */
 			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
 			{
-				tmpA.scale_imm_add_and_clamp((INT16) fogblend, tmpB);
+				tmpA.scale_imm_add_and_clamp((INT32) fogblend, tmpB);
 				//color += fog;
 				//(RR) += fr;
 				//(GG) += fg;

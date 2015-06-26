@@ -12,7 +12,9 @@
 
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) osd_printf_debug x; } while (0)
 
-#define TIME_PER_SECTOR                     (attotime::from_usec(100))
+#define TIME_PER_SECTOR_WRITE               (attotime::from_usec(100))
+/* read time <2 breaks primrag2, ==100 breaks bm1stmix */
+#define TIME_PER_SECTOR_READ                (attotime::from_usec(2))
 #define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
 #define TIME_BETWEEN_SECTORS                (attotime::from_nsec(400))
 
@@ -393,8 +395,7 @@ void ata_mass_storage_device::fill_buffer()
 		if (m_sector_count > 0)
 		{
 			set_dasp(ASSERT_LINE);
-
-			start_busy(TIME_PER_SECTOR, PARAM_COMMAND);
+			start_busy(TIME_PER_SECTOR_READ, PARAM_COMMAND);
 		}
 		break;
 	}
@@ -519,13 +520,13 @@ void ata_mass_storage_device::process_buffer()
 			else
 			{
 				/* set a timer to do the write */
-				start_busy(TIME_PER_SECTOR, PARAM_COMMAND);
+				start_busy(TIME_PER_SECTOR_WRITE, PARAM_COMMAND);
 			}
 		}
 		else
 		{
 			/* set a timer to do the write */
-			start_busy(TIME_PER_SECTOR, PARAM_COMMAND);
+			start_busy(TIME_PER_SECTOR_WRITE, PARAM_COMMAND);
 		}
 	}
 }

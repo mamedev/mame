@@ -25,7 +25,10 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette"),
+		m_bank1(*this, "bank1"),
+		m_bank0d(*this, "bank0d"),
+		m_bank1d(*this, "bank1d") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -40,6 +43,9 @@ public:
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_memory_bank m_bank1;
+	optional_memory_bank m_bank0d;
+	optional_memory_bank m_bank1d;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
