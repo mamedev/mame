@@ -6930,7 +6930,7 @@ GAME( 1988, altbeast6,  altbeast, system16b_i8751,     altbeast, segas16b_state,
 GAME( 1988, altbeast5,  altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Altered Beast (set 5, FD1094 317-0069)", 0 )
 GAME( 1988, altbeast4,  altbeast, system16b_mc8123,    altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4, MC-8123B 317-0066)", 0 )
 GAME( 1988, altbeastj3, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 3, Japan, FD1094 317-0068)", 0 )
-GAME( 1988, altbeast2,  altbeast, system16b,           altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 2, MC-8123B 317-0066)", 0 )
+GAME( 1988, altbeast2,  altbeast, system16b_mc8123,    altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 2, MC-8123B 317-0066)", 0 )
 GAME( 1988, altbeastj1, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 1, Japan, FD1094 317-0065)", 0 )
 
 GAME( 1990, aurail,     0,        system16b,           aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 3, US, unprotected)", 0 )
