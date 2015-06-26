@@ -15,7 +15,7 @@
  Lie Detector (1976)        UNKNOWN   Unreleased     Unreleased
  Sea Battle (1976/04)       UNKNOWN
  Soccer (1973/11)           YES       500880         500889
- Trivia (1975/11)           YES
+ Trivia (1975/11)           YES       550436
  Volly (1973/03?)           YES       500378A        500322A
  Wipe Out (1974/01)         YES       500986B/C      500963B/?
 
