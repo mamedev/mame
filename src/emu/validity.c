@@ -326,6 +326,8 @@ void validity_checker::validate_one(const game_driver &driver)
 void validity_checker::validate_core()
 {
 	// basic system checks
+	if (~0 != -1) osd_printf_error("Machine must be two's complement\n");
+
 	UINT8 a = 0xff;
 	UINT8 b = a + 1;
 	if (b > a) osd_printf_error("UINT8 must be 8 bits\n");
@@ -339,6 +341,16 @@ void validity_checker::validate_core()
 	if (sizeof(UINT32) != 4) osd_printf_error("UINT32 must be 32 bits\n");
 	if (sizeof(INT64)  != 8) osd_printf_error("INT64 must be 64 bits\n");
 	if (sizeof(UINT64) != 8) osd_printf_error("UINT64 must be 64 bits\n");
+
+	// check signed right shift
+	INT8  a8 = -3;
+	INT16 a16 = -3;
+	INT32 a32 = -3;
+	INT64 a64 = -3;
+	if (a8  >> 1 != -2) osd_printf_error("INT8 right shift must be arithmetic\n");
+	if (a16 >> 1 != -2) osd_printf_error("INT16 right shift must be arithmetic\n");
+	if (a32 >> 1 != -2) osd_printf_error("INT32 right shift must be arithmetic\n");
+	if (a64 >> 1 != -2) osd_printf_error("INT64 right shift must be arithmetic\n");
 
 	// check pointer size
 #ifdef PTR64
