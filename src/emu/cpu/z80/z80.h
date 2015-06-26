@@ -137,12 +137,12 @@ protected:
 	void illegal_1();
 	void illegal_2();
 
-	PROTOTYPES(op);
-	PROTOTYPES(cb);
-	PROTOTYPES(dd);
-	PROTOTYPES(ed);
-	PROTOTYPES(fd);
-	PROTOTYPES(xycb);
+	PROTOTYPES(op)
+	PROTOTYPES(cb)
+	PROTOTYPES(dd)
+	PROTOTYPES(ed)
+	PROTOTYPES(fd)
+	PROTOTYPES(xycb)
 
 	void halt();
 	void leave_halt();

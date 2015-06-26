@@ -179,7 +179,7 @@ protected:
 	void prefix##_f8(); void prefix##_f9(); void prefix##_fa(); void prefix##_fb(); \
 	void prefix##_fc(); void prefix##_fd(); void prefix##_fe(); void prefix##_ff();
 
-	PROTOTYPES(op);
+	PROTOTYPES(op)
 
 	UINT32 translated(UINT16 addr);
 	void h6280_cycles(int cyc);

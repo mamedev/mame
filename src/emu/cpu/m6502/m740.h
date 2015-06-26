@@ -33,7 +33,7 @@ public:
 			M740_INT13_LINE, // (ffe2)
 			M740_INT14_LINE, // (ffe0)
 			M740_MAX_INT_LINE = M740_INT14_LINE,
-			M740_SET_OVERFLOW = m6502_device::V_LINE,
+			M740_SET_OVERFLOW = m6502_device::V_LINE
 		};
 
 		m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -73,7 +73,7 @@ protected:
 		CHIP_TYPE_R3051,
 		CHIP_TYPE_R3052,
 		CHIP_TYPE_R3071,
-		CHIP_TYPE_R3081,
+		CHIP_TYPE_R3081
 	};
 
 	// construction/destruction

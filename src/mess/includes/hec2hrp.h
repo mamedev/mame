@@ -88,7 +88,7 @@ public:
 		m_floppy0(*this, "wd179x:0")
 	{}
 
-	DECLARE_FLOPPY_FORMATS(minidisc_formats);
+	DECLARE_FLOPPY_FORMATS(minidisc_formats)
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;

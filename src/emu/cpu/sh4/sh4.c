@@ -3474,7 +3474,7 @@ inline void sh34_base_device::execute_one_0000(const UINT16 opcode)
 		case 0xef:  MAC_L(opcode); break;
 		case 0xff:  MAC_L(opcode); break;
 	}
-};
+}
 
 inline void sh34_base_device::execute_one_4000(const UINT16 opcode)
 {

@@ -95,7 +95,7 @@ enum
 	AVR8_SREG_S,
 	AVR8_SREG_H,
 	AVR8_SREG_T,
-	AVR8_SREG_I,
+	AVR8_SREG_I
 };
 
 // I/O Enums

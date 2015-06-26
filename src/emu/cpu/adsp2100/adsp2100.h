@@ -208,7 +208,7 @@ protected:
 		CHIP_TYPE_ADSP2104,
 		CHIP_TYPE_ADSP2105,
 		CHIP_TYPE_ADSP2115,
-		CHIP_TYPE_ADSP2181,
+		CHIP_TYPE_ADSP2181
 	};
 
 	// construction/destruction

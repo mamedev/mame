@@ -48,7 +48,7 @@ enum
 	MCS51_T2_LINE,          /* P1.0: Timer 2 External Input */
 	MCS51_T2EX_LINE,        /* P1.1: Timer 2 Capture Reload Trigger */
 
-	DS5002FP_PFI_LINE,      /* DS5002FP Power fail interrupt */
+	DS5002FP_PFI_LINE       /* DS5002FP Power fail interrupt */
 };
 
 /* special I/O space ports */
@@ -59,7 +59,7 @@ enum
 	MCS51_PORT_P1   = 0x20001,
 	MCS51_PORT_P2   = 0x20002,
 	MCS51_PORT_P3   = 0x20003,
-	MCS51_PORT_TX   = 0x20004,  /* P3.1 */
+	MCS51_PORT_TX   = 0x20004   /* P3.1 */
 };
 
 /* At least CMOS devices may be forced to read from ports configured as output.

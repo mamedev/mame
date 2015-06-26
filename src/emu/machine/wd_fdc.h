@@ -322,7 +322,7 @@ private:
 		WRITE_BYTE,
 		WRITE_BYTE_DONE,
 		WRITE_SECTOR_PRE,
-		WRITE_SECTOR_PRE_BYTE,
+		WRITE_SECTOR_PRE_BYTE
 	};
 
 	struct live_info {

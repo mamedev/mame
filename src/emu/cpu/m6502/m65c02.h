@@ -68,7 +68,7 @@ protected:
 enum {
 	M65C02_IRQ_LINE = m6502_device::IRQ_LINE,
 	M65C02_NMI_LINE = m6502_device::NMI_LINE,
-	M65C02_SET_OVERFLOW = m6502_device::V_LINE,
+	M65C02_SET_OVERFLOW = m6502_device::V_LINE
 };
 
 extern const device_type M65C02;

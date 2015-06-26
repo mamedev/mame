@@ -2245,25 +2245,25 @@ CPU_DISASSEMBLE( dasm_coldfire )
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
 }
 
-offs_t m68000_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); };
-offs_t m68000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); };
-offs_t m68301_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); };
-offs_t m68008_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, buffer, pc, oprom, opram, options); };
-offs_t m68008plcc_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, buffer, pc, oprom, opram, options); };
-offs_t m68010_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68010)(this, buffer, pc, oprom, opram, options); };
-offs_t m68ec020_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
-offs_t m68020_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
-offs_t m68020fpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
-offs_t m68020pmmu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
-offs_t m68020hmmu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
-offs_t m68ec030_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec030)(this, buffer, pc, oprom, opram, options); };
-offs_t m68030_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68030)(this, buffer, pc, oprom, opram, options); };
-offs_t m68ec040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec040)(this, buffer, pc, oprom, opram, options); };
-offs_t m68lc040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68lc040)(this, buffer, pc, oprom, opram, options); };
-offs_t m68040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68040)(this, buffer, pc, oprom, opram, options); };
-offs_t scc68070_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); };
-offs_t fscpu32_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_fscpu32)(this, buffer, pc, oprom, opram, options); };
-offs_t mcf5206e_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_coldfire)(this, buffer, pc, oprom, opram, options); };
+offs_t m68000_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); }
+offs_t m68000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); }
+offs_t m68301_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); }
+offs_t m68008_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, buffer, pc, oprom, opram, options); }
+offs_t m68008plcc_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, buffer, pc, oprom, opram, options); }
+offs_t m68010_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68010)(this, buffer, pc, oprom, opram, options); }
+offs_t m68ec020_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
+offs_t m68020_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
+offs_t m68020fpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
+offs_t m68020pmmu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
+offs_t m68020hmmu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
+offs_t m68ec030_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec030)(this, buffer, pc, oprom, opram, options); }
+offs_t m68030_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68030)(this, buffer, pc, oprom, opram, options); }
+offs_t m68ec040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec040)(this, buffer, pc, oprom, opram, options); }
+offs_t m68lc040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68lc040)(this, buffer, pc, oprom, opram, options); }
+offs_t m68040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68040)(this, buffer, pc, oprom, opram, options); }
+offs_t scc68070_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); }
+offs_t fscpu32_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_fscpu32)(this, buffer, pc, oprom, opram, options); }
+offs_t mcf5206e_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_coldfire)(this, buffer, pc, oprom, opram, options); }
 
 
 /* Service an interrupt request and start exception processing */

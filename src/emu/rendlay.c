@@ -261,13 +261,14 @@ static int xml_get_attribute_int_with_subst(running_machine &machine, xml_data_n
 {
 	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, NULL);
 	int value;
+	unsigned int uvalue;
 
 	if (string == NULL)
 		return defvalue;
 	if (string[0] == '$')
-		return (sscanf(&string[1], "%X", &value) == 1) ? value : defvalue;
+		return (sscanf(&string[1], "%X", &uvalue) == 1) ? uvalue : defvalue;
 	if (string[0] == '0' && string[1] == 'x')
-		return (sscanf(&string[2], "%X", &value) == 1) ? value : defvalue;
+		return (sscanf(&string[2], "%X", &uvalue) == 1) ? uvalue : defvalue;
 	if (string[0] == '#')
 		return (sscanf(&string[1], "%d", &value) == 1) ? value : defvalue;
 	return (sscanf(&string[0], "%d", &value) == 1) ? value : defvalue;

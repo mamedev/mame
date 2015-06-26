@@ -19,7 +19,7 @@ enum
 	S2650_EXT_PORT      = 0x00ff,   /* M/~IO=0 D/~C=x E/~NE=1 */
 	S2650_CTRL_PORT     = 0x0100,   /* M/~IO=0 D/~C=0 E/~NE=0 */
 	S2650_DATA_PORT     = 0x0101,   /* M/~IO=0 D/~C=1 E/~NE=0 */
-	S2650_SENSE_PORT    = 0x0102,   /* Fake Sense Line */
+	S2650_SENSE_PORT    = 0x0102    /* Fake Sense Line */
 };
 
 

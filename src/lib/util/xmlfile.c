@@ -411,13 +411,14 @@ int xml_get_attribute_int(xml_data_node *node, const char *attribute, int defval
 {
 	const char *string = xml_get_attribute_string(node, attribute, NULL);
 	int value;
+	unsigned int uvalue;
 
 	if (string == NULL)
 		return defvalue;
 	if (string[0] == '$')
-		return (sscanf(&string[1], "%X", &value) == 1) ? value : defvalue;
+		return (sscanf(&string[1], "%X", &uvalue) == 1) ? uvalue : defvalue;
 	if (string[0] == '0' && string[1] == 'x')
-		return (sscanf(&string[2], "%X", &value) == 1) ? value : defvalue;
+		return (sscanf(&string[2], "%X", &uvalue) == 1) ? uvalue : defvalue;
 	if (string[0] == '#')
 		return (sscanf(&string[1], "%d", &value) == 1) ? value : defvalue;
 	return (sscanf(&string[0], "%d", &value) == 1) ? value : defvalue;
