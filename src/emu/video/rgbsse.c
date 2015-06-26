@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-#if defined(__SSE2__) || defined(_MSC_VER)
+#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
 
 #include "emu.h"
 #include <emmintrin.h>
@@ -30,17 +30,17 @@ void rgbaint_t::blend(const rgbaint_t& other, UINT8 factor)
 void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 {
 	mul(scale);
-	shr(8);
-	min(255);
+	sra(8);
 	max(0);
+	min(255);
 }
 
 void rgbaint_t::scale_imm_and_clamp(const INT32 scale)
 {
 	mul_imm(scale);
-	shr(8);
-	min(255);
+	sra(8);
 	max(0);
+	min(255);
 }
 
 void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
@@ -50,27 +50,27 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 
 	mul(scale);
 	add(color2);
-	shr(8);
-	min(255);
+	sra(8);
 	max(0);
+	min(255);
 }
 
 void rgbaint_t::scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
 {
 	mul_imm(scale);
 	add(other);
-	shr(8);
-	min(255);
+	sra(8);
 	max(0);
+	min(255);
 }
 
 void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 {
 	mul(scale);
+	sra(8);
 	add(other);
-	shr(8);
-	min(255);
 	max(0);
+	min(255);
 }
 
 #endif // defined(__SSE2__) || defined(_MSC_VER)

@@ -170,14 +170,14 @@ void rgbaint_t::blend(const rgbaint_t& other, UINT8 factor)
 void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 {
 	mul(scale);
-	shr(8);
+	sra(8);
 	min(255);
 }
 
 void rgbaint_t::scale_imm_and_clamp(const INT32 scale)
 {
 	mul_imm(scale);
-	shr(8);
+	sra(8);
 	min(255);
 }
 
@@ -189,7 +189,7 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 
 	mul(scale);
 	add(color2);
-	shr(8);
+	sra(8);
 	min(255);
 }
 
@@ -197,7 +197,7 @@ void rgbaint_t::scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& othe
 {
 	mul_imm(scale);
 	add(other);
-	shr(8);
+	sra(8);
 	min(255);
 }
 
@@ -205,7 +205,7 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 {
 	mul(scale);
 	add(other);
-	shr(8);
+	sra(8);
 	min(255);
 }
 
