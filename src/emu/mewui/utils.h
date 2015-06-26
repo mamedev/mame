@@ -25,7 +25,7 @@
 #define CR                       0x0d   //  '\n' and '\r' meanings are swapped in some
 #define LF                       0x0a   //  compilers (e.g., Mac compilers)
 #define UI_MENU_PROCESS_ONLYCHAR 8
-#define MAX_FILTER               10
+#define MAX_FILTER               7
 #define MAX_ICONS_RENDER         40
 
 #define MEWUI_VERSION_TAG        "# MEWUI INFO "
@@ -129,6 +129,16 @@ enum
 	MEWUI_ARCADES,
 	MEWUI_SYSTEMS,
 	MEWUI_MAME_LAST = MEWUI_SYSTEMS
+};
+
+enum
+{
+	HOVER_DAT_UP = -6,
+	HOVER_DAT_DOWN,
+	HOVER_UI_LEFT,
+	HOVER_UI_RIGHT,
+	HOVER_ARROW_UP,
+	HOVER_ARROW_DOWN
 };
 
 // GLOBAL STRUCTURES

@@ -248,7 +248,7 @@ void ui_menu::draw_select_game()
 						0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
 
 			if (hover == itemnum)
-				hover = -2;
+				hover = HOVER_ARROW_UP;
 		}
 		// if we're on the bottom line, display the down arrow
 		else if (linenum == visible_lines - 1 && itemnum != visible_items - 1)
@@ -257,7 +257,7 @@ void ui_menu::draw_select_game()
 						0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 
 			if (hover == itemnum)
-				hover = -1;
+				hover = HOVER_ARROW_DOWN;
 		}
 		// if we're just a divider, draw a line
 		else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
@@ -813,27 +813,27 @@ void ui_menu::handle_main_events(UINT32 flags)
 				{
 					if (hover >= 0 && hover < item.size())
 						selected = hover;
-					else if (hover == -2)
+					else if (hover == HOVER_ARROW_UP)
 					{
 						selected -= visitems;
 						if (selected < 0)
 							selected = 0;
 						top_line -= visitems - (top_line + visible_lines == visible_items);
 					}
-					else if (hover == -1)
+					else if (hover == HOVER_ARROW_DOWN)
 					{
 						selected += visible_lines - 2 + (selected == 0);
 						if (selected >= visible_items)
 							selected = visible_items - 1;
 						top_line += visible_lines - 2;
 					}
-					else if (hover == -3)
+					else if (hover == HOVER_UI_RIGHT)
 						menu_event.iptkey = IPT_UI_RIGHT;
-					else if (hover == -4)
+					else if (hover == HOVER_UI_LEFT)
 						menu_event.iptkey = IPT_UI_LEFT;
-					else if (hover == -5)
+					else if (hover == HOVER_DAT_DOWN)
 						topline_datsview += right_visible_lines - 1;
-					else if (hover == -6)
+					else if (hover == HOVER_DAT_UP)
 						topline_datsview -= right_visible_lines - 1;
 					else if (r_hover >= RP_FIRST && r_hover <= RP_LAST)
 					{
@@ -989,7 +989,7 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 		{
 			if (filter == custfltr::main_filter)
 			{
-				str.assign("_# ").append(text[filter]);
+				str.assign("@custom1 ").append(text[filter]);
 				x1t -= text_sign;
 			}
 			else
@@ -999,7 +999,7 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 					int cfilter = custfltr::other[count];
 					if (cfilter == filter)
 					{
-						str.assign("_# ").append(text[filter]);
+						strprintf(str, "@custom%d %s", count + 1, text[filter]);
 						x1t -= text_sign;
 						break;
 					}
@@ -1573,14 +1573,14 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
 	{
 		machine().ui().draw_textured_box(container, ar_x0 + 0.01f, ar_y0, ar_x1 - 0.01f, ar_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
 											hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-		hover = -3;
+		hover = HOVER_UI_RIGHT;
 		fgcolor_right = UI_MOUSEOVER_COLOR;
 	}
 	else if (mouse_hit && al_x0 <= mouse_x && al_x1 > mouse_x && al_y0 <= mouse_y && al_y1 > mouse_y && current != dmin)
 	{
 		machine().ui().draw_textured_box(container, al_x0 + 0.01f, al_y0, al_x1 - 0.01f, al_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
 											hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-		hover = -4;
+		hover = HOVER_UI_LEFT;
 		fgcolor_left = UI_MOUSEOVER_COLOR;
 	}
 
@@ -1663,7 +1663,7 @@ void ui_menu::info_arrow(int ub, float origx1, float origx2, float oy1, float li
 	{
 		machine().ui().draw_textured_box(container, origx1 + 0.01f, oy1, origx2 - 0.01f, oy1 + (line_height * text_size), UI_MOUSEOVER_BG_COLOR,
 											rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-		hover = (!ub) ? -6 : -5;
+		hover = (!ub) ? HOVER_DAT_UP : HOVER_DAT_DOWN;
 		fgcolor = UI_MOUSEOVER_COLOR;
 	}
 
