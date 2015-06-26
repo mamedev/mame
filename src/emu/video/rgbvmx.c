@@ -171,6 +171,7 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 {
 	mul(scale);
 	sra(8);
+	max(0);
 	min(255);
 }
 
@@ -178,34 +179,37 @@ void rgbaint_t::scale_imm_and_clamp(const INT32 scale)
 {
 	mul_imm(scale);
 	sra(8);
+	max(0);
 	min(255);
 }
 
 void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
 {
-	mul(scale);
 	rgbaint_t color2(other);
 	color2.mul(scale2);
 
 	mul(scale);
 	add(color2);
 	sra(8);
+	max(0);
 	min(255);
 }
 
 void rgbaint_t::scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
 {
 	mul_imm(scale);
-	add(other);
 	sra(8);
+	add(other);
+	max(0);
 	min(255);
 }
 
 void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 {
 	mul(scale);
-	add(other);
 	sra(8);
+	add(other);
+	max(0);
 	min(255);
 }
 
