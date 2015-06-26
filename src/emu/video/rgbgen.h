@@ -125,7 +125,7 @@ public:
 
 	inline UINT8 get_a()
 	{
-		return m_r;
+		return m_a;
 	}
 
 	inline UINT8 get_r()
