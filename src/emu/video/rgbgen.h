@@ -105,7 +105,7 @@ public:
 
 	inline void set_a(const INT32 value)
 	{
-		m_r = value;
+		m_a = value;
 	}
 
 	inline void set_r(const INT32 value)
