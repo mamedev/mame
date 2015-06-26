@@ -16,21 +16,6 @@
 #include <emmintrin.h>
 
 /***************************************************************************
-    TABLES
-***************************************************************************/
-
-extern const struct _rgbsse_statics
-{
-	__m128  dummy_for_alignment;
-	INT16   maxbyte[8];
-	INT16   alpha_mask[8];
-	INT16   red_mask[8];
-	INT16   green_mask[8];
-	INT16   blue_mask[8];
-	INT16   scale_table[256][8];
-} rgbsse_statics;
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -105,22 +90,22 @@ public:
 
 	inline void set_a(const INT32 value)
 	{
-		m_value = _mm_or_si128(_mm_and_si128(m_value, *(__m128i *)&rgbsse_statics.alpha_mask), _mm_set_epi32(value, 0, 0, 0));
+		m_value = _mm_or_si128(_mm_and_si128(m_value, alpha_mask()), _mm_set_epi32(value, 0, 0, 0));
 	}
 
 	inline void set_r(const INT32 value)
 	{
-		m_value = _mm_or_si128(_mm_and_si128(m_value, *(__m128i *)&rgbsse_statics.red_mask), _mm_set_epi32(0, value, 0, 0));
+		m_value = _mm_or_si128(_mm_and_si128(m_value, red_mask()), _mm_set_epi32(0, value, 0, 0));
 	}
 
 	inline void set_g(const INT32 value)
 	{
-		m_value = _mm_or_si128(_mm_and_si128(m_value, *(__m128i *)&rgbsse_statics.green_mask), _mm_set_epi32(0, 0, value, 0));
+		m_value = _mm_or_si128(_mm_and_si128(m_value, green_mask()), _mm_set_epi32(0, 0, value, 0));
 	}
 
 	inline void set_b(const INT32 value)
 	{
-		m_value = _mm_or_si128(_mm_and_si128(m_value, *(__m128i *)&rgbsse_statics.blue_mask), _mm_set_epi32(0, 0, 0, value));
+		m_value = _mm_or_si128(_mm_and_si128(m_value, blue_mask()), _mm_set_epi32(0, 0, 0, value));
 	}
 
 	inline UINT8 get_a()
@@ -417,12 +402,12 @@ public:
 		color11 = _mm_unpacklo_epi8(color11, color10);
 		color01 = _mm_unpacklo_epi8(color01, _mm_setzero_si128());
 		color11 = _mm_unpacklo_epi8(color11, _mm_setzero_si128());
-		color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
-		color11 = _mm_madd_epi16(color11, *(__m128i *)&rgbsse_statics.scale_table[u][0]);
+		color01 = _mm_madd_epi16(color01, scale_factor(u));
+		color11 = _mm_madd_epi16(color11, scale_factor(u));
 		color01 = _mm_slli_epi32(color01, 15);
 		color11 = _mm_srli_epi32(color11, 1);
 		color01 = _mm_max_epi16(color01, color11);
-		color01 = _mm_madd_epi16(color01, *(__m128i *)&rgbsse_statics.scale_table[v][0]);
+		color01 = _mm_madd_epi16(color01, scale_factor(v));
 		color01 = _mm_srli_epi32(color01, 15);
 		color01 = _mm_packs_epi32(color01, _mm_setzero_si128());
 		color01 = _mm_packus_epi16(color01, _mm_setzero_si128());
@@ -430,7 +415,26 @@ public:
 	}
 
 protected:
+	struct _statics
+	{
+		__m128  dummy_for_alignment;
+		INT16   alpha_mask[8];
+		INT16   red_mask[8];
+		INT16   green_mask[8];
+		INT16   blue_mask[8];
+		INT16   scale_table[256][8];
+	};
+
+	static inline __m128i alpha_mask() { return *(__m128i *)&statics.alpha_mask[0]; }
+	static inline __m128i red_mask() { return *(__m128i *)&statics.red_mask[0]; }
+	static inline __m128i green_mask() { return *(__m128i *)&statics.green_mask[0]; }
+	static inline __m128i blue_mask() { return *(__m128i *)&statics.blue_mask[0]; }
+	static inline __m128i scale_factor(UINT8 index) { return *(__m128i *)&statics.scale_table[index][0]; }
+
 	__m128i m_value;
+
+	static const _statics statics;
+
 };
 
 #endif /* __RGBSSE__ */

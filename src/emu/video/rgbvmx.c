@@ -152,9 +152,6 @@ const rgbaint_t::VECS16 rgbaint_t::scale_table[256] = {
 	{ 254,   2, 254,   2, 254,   2, 254,   2 }, { 255,   1, 255,   1, 255,   1, 255,   1 }
 };
 
-extern const struct _rgbvmx_statics
-{
-} rgbvmx_statics;
 
 /***************************************************************************
     HIGHER LEVEL OPERATIONS
