@@ -58,8 +58,8 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 void rgbaint_t::scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
 {
 	mul_imm(scale);
-	add(other);
 	sra(8);
+	add(other);
 	max(0);
 	min(255);
 }
