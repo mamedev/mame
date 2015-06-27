@@ -40,13 +40,6 @@ inline void vec_set (const std::size_t n, const double &scalar, double * RESTRIC
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] = scalar;
 }
-<<<<<<< Upstream, based on branch 'master' of https://github.com/mamedev/mame.git
-#if HAS_OPENMP
-#include "omp.h"
-#endif
-=======
-
->>>>>>> 96a5dc9 Hopefully fix more "maybes" which maybe popup sometime in the future. Maybe. (nw)
 inline double vecmult (const std::size_t n, const double * RESTRICT a1, const double * RESTRICT a2 )
 {
 
