@@ -756,6 +756,11 @@ static void get_resolution(const char *defdata, const char *data, osd_window_con
 		data = defdata;
 	}
 
-	if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
+	if (sscanf(data, "%dx%dx%d", &config->width, &config->height, &config->depth) < 2 && report_error)
 		osd_printf_error("Illegal resolution value = %s\n", data);
+
+	const char * at_pos = strchr(data, '@');
+	if (at_pos)
+		if (sscanf(at_pos + 1, "%d", &config->refresh) < 1 && report_error)
+			osd_printf_error("Illegal refresh rate in resolution value = %s\n", data);
 }
