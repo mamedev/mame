@@ -333,6 +333,7 @@ namespace netlist
 	public:
 
 		logic_family_t() : m_logic_family(NULL) {}
+		~logic_family_t() { }
 
 		ATTR_HOT  const logic_family_desc_t *logic_family() const { return m_logic_family; }
 		ATTR_COLD void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
