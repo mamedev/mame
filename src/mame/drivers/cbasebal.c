@@ -34,6 +34,7 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 	/* bits 0-4 select ROM bank */
 	//logerror("%04x: bankswitch %02x\n", space.device().safe_pc(), data);
 	membank("bank1")->set_entry(data & 0x1f);
+	membank("bank1d")->set_entry(data & 0x1f);
 
 	/* bit 5 used but unknown */
 
@@ -228,8 +229,6 @@ GFXDECODE_END
 
 void cbasebal_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x4000);
-
 	save_item(NAME(m_rambank));
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_spritebank));
@@ -340,9 +339,9 @@ DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
 	int size = memregion("maincpu")->bytes();
 	UINT8 *dst = auto_alloc_array(machine(), UINT8, size);
 	pang_decode(src, dst, size);
-	membank("bank1")->configure_entries(0, 16, src + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 32, src + 0x10000, 0x4000);
 	membank("bank0d")->set_base(dst);
-	membank("bank1d")->configure_entries(0, 16, dst + 0x10000, 0x4000);
+	membank("bank1d")->configure_entries(0, 32, dst + 0x10000, 0x4000);
 }
 
 
