@@ -297,7 +297,7 @@ class netlist_base_factory_truthtable_t : public base_factory_t
 public:
 	netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: base_factory_t(name, classname, def_param), m_family(&netlist_family_TTL)
+	: base_factory_t(name, classname, def_param), m_family(netlist_family_TTL)
 	{}
 
 	virtual ~netlist_base_factory_truthtable_t()
@@ -307,7 +307,7 @@ public:
 	}
 
 	pstring_list_t m_desc;
-	const logic_family_desc_t * m_family;
+	logic_family_desc_t *m_family;
 };
 
 
