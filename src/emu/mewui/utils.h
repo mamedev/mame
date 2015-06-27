@@ -25,7 +25,7 @@
 #define CR                       0x0d   //  '\n' and '\r' meanings are swapped in some
 #define LF                       0x0a   //  compilers (e.g., Mac compilers)
 #define UI_MENU_PROCESS_ONLYCHAR 8
-#define MAX_FILTER               7
+#define MAX_CUST_FILTER          8
 #define MAX_ICONS_RENDER         40
 
 #define MEWUI_VERSION_TAG        "# MEWUI INFO "
@@ -224,9 +224,9 @@ struct custfltr
 {
 	static UINT16  main_filter;
 	static UINT16  numother;
-	static UINT16  other[MAX_FILTER];
-	static UINT16  mnfct[MAX_FILTER];
-	static UINT16  year[MAX_FILTER];
+	static UINT16  other[MAX_CUST_FILTER];
+	static UINT16  mnfct[MAX_CUST_FILTER];
+	static UINT16  year[MAX_CUST_FILTER];
 };
 
 // GLOBAL FUNCTIONS

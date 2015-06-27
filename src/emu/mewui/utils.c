@@ -40,9 +40,9 @@ UINT8 mewui_globals::ume_system = 0;
 // Custom filter
 UINT16 custfltr::main_filter = 0;
 UINT16 custfltr::numother = 0;
-UINT16 custfltr::other[MAX_FILTER];
-UINT16 custfltr::mnfct[MAX_FILTER];
-UINT16 custfltr::year[MAX_FILTER];
+UINT16 custfltr::other[MAX_CUST_FILTER];
+UINT16 custfltr::mnfct[MAX_CUST_FILTER];
+UINT16 custfltr::year[MAX_CUST_FILTER];
 
 std::string reselect_last::driver;
 std::string reselect_last::software;
