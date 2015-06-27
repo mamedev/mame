@@ -780,6 +780,7 @@ speed of 3.8 MHz */
 
 static SLOT_INTERFACE_START( amstrad_floppies )
 	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
+	SLOT_INTERFACE( "35ssdd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( aleste_floppies )
@@ -913,7 +914,7 @@ static MACHINE_CONFIG_DERIVED( amstrad, amstrad_nofdc )
 	MCFG_UPD765A_ADD("upd765", true, true)
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 MACHINE_CONFIG_END
@@ -991,7 +992,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpcplus_exp_cards, NULL, false)
