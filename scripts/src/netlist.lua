@@ -9,10 +9,10 @@ project "netlist"
 		"ForceCPP",
 	}
 
-        configuration { "linux-gcc" }
-                buildoptions {
-                        "-Wno-maybe-uninitialized",
-                }
+	configuration { "linux-gcc" }
+		buildoptions {
+			"-Wno-maybe-uninitialized",
+		}
 
 	includedirs {
 		MAME_DIR .. "src/emu/netlist",
