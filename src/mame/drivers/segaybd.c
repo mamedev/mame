@@ -828,6 +828,19 @@ static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( motor_map, AS_PROGRAM, 8, segaybd_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+/*
+static ADDRESS_MAP_START( motor_portmap, AS_IO, 8, segaybd_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+*/
+
 //**************************************************************************
 //  GENERIC PORT DEFINITIONS
 //**************************************************************************
@@ -1422,6 +1435,15 @@ static MACHINE_CONFIG_DERIVED( yboard_link, yboard )
 	MCFG_MB8421_INTR_HANDLER(WRITELINE(segaybd_state, mb8421_intr))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( yboard_deluxe, yboard )
+
+	// basic machine hardware
+	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2 ) // 8 Mhz(guessed)
+	MCFG_CPU_PROGRAM_MAP(motor_map)
+//	MCFG_CPU_IO_MAP(motor_portmap)
+
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
@@ -1513,8 +1535,82 @@ ROM_START( gforce2 )
 	ROM_RELOAD(                  0x120000, 0x20000 )
 	ROM_RELOAD(                  0x140000, 0x20000 )
 	ROM_RELOAD(                  0x160000, 0x20000 )
+ROM_END
 
-	ROM_REGION( 0x10000, "motorcpu", 0 )        // Z80 motor CPU (for super deluxe unit)
+//  Galaxy Force 2 (World, Super Deluxe unit), Sega Y-board
+//  CPU: 68000 (317-????)
+//
+ROM_START( gforce2sd )
+	ROM_REGION( 0x080000, "maincpu", 0 ) // M
+	ROM_LOAD16_BYTE( "epr-11688.25",   0x000000, 0x20000, CRC(c845f2df) SHA1(17586a5f83170e99f28cd35b28e85e503e7bbe75) )
+	ROM_LOAD16_BYTE( "epr-11687.24",   0x000001, 0x20000, CRC(1cbefbbf) SHA1(28d473707cf042baca9d3a75ef22a5beb8c993f7) )
+
+	ROM_REGION( 0x040000, "subx", 0 ) // X
+	ROM_LOAD16_BYTE( "epr-11875.81",   0x000000, 0x20000, CRC(c81701c6) SHA1(00c269f18c5eded7a0e4b6354779cd80db827409) )
+	ROM_LOAD16_BYTE( "epr-11874.80",   0x000001, 0x20000, CRC(5301fd79) SHA1(60a751c168d519cd45a9575e138514d580bce9b6) )
+
+	ROM_REGION( 0x040000, "suby", 0 ) // Y
+	ROM_LOAD16_BYTE( "epr-11816b.54",   0x000000, 0x20000, CRC(317dd0c2) SHA1(7f1c7dcfb111385e2a94912975c2f9bfe78445ac) )
+	ROM_LOAD16_BYTE( "epr-11815b.53",   0x000001, 0x20000, CRC(f1fb22f1) SHA1(da3ce521b0a19b391913c35af34084d29edceca7) )
+
+	ROM_REGION16_BE( 0x080000, "bsprites", 0 )
+	ROM_LOAD16_BYTE( "mpr-11467.16",   0x000000, 0x20000, CRC(6e60e736) SHA1(73086744cb2fe1ce162f851cb879755c21819b33) )
+	ROM_LOAD16_BYTE( "mpr-11468.14",   0x000001, 0x20000, CRC(74ca9ca5) SHA1(c6f27ce43ef270088e6155c8240fd15afa5729fd) )
+	ROM_LOAD16_BYTE( "epr-11694.17",   0x040000, 0x20000, CRC(7e297b84) SHA1(bbf1aa2b0b6b1f9fdaf9bea77d24b7f4f9320696) )
+	ROM_LOAD16_BYTE( "epr-11695.15",   0x040001, 0x20000, CRC(38a864be) SHA1(ef7d89511713d695f6a454c42f079d3507d9690d) )
+
+	ROM_REGION64_BE( 0x400000, "ysprites", 0)
+	ROMX_LOAD( "mpr-11469.67",   0x000000, 0x20000, CRC(ed7a2299) SHA1(1aecf9ccba1fed0b7908008e798c522251a08b0f), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11470.75",   0x000001, 0x20000, CRC(34dea550) SHA1(da95b8346c3530573461553629af4cc493bbb4af), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11477.63",   0x000002, 0x20000, CRC(a2784653) SHA1(00a123d1fc8116ca678d6d8dbf1a5450feee014d), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11478.71",   0x000003, 0x20000, CRC(8b778993) SHA1(015ae757d26cd6e69bdf79e237f62743a8f41e0c), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11471.86",   0x000004, 0x20000, CRC(f1974069) SHA1(c8beb1a2ce430e3e6478c87c7053a58f8f31a140), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11472.114",  0x000005, 0x20000, CRC(0d24409a) SHA1(ee00e23b0c548918b89dd48ed3f8b0370388659e), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11479.82",   0x000006, 0x20000, CRC(ecd6138a) SHA1(bbc157a1f9b7e24d16e6f126d95c448736e83791), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11480.110",  0x000007, 0x20000, CRC(64ad66c5) SHA1(aaab6999aa88b3340b16ee1188a8432477e16625), ROM_SKIP(7) )
+
+	ROMX_LOAD( "mpr-11473.66",   0x100000, 0x20000, CRC(0538c6ec) SHA1(9397db188f12cf8cd91841794134760f30f83893), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11474.74",   0x100001, 0x20000, CRC(eb923c50) SHA1(f997d2bc7f674eae4243eaf640d8faffa41d9521), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11481.62",   0x100002, 0x20000, CRC(78e652b6) SHA1(8c70609172908131fef8cbe05f810dbd3d120eba), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11482.70",   0x100003, 0x20000, CRC(2f879766) SHA1(ca5835d0bb77fe7de83ad336a82111cb2f96cd41), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11475.85",   0x100004, 0x20000, CRC(69cfec89) SHA1(db2a9b03fff727f198fb5cbfb9c281ac3bbc5623), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11476.113",  0x100005, 0x20000, CRC(a60b9b79) SHA1(6e9aa51923c12f5658bd17deb6c032e08c91dade), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11483.81",   0x100006, 0x20000, CRC(d5d3a505) SHA1(fa7662346b954d3faf0e8fcf138004231676845c), ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-11484.109",  0x100007, 0x20000, CRC(b8a56a50) SHA1(ccbc391d6f60b88630d7a93b8bb6e365a8d59ed8), ROM_SKIP(7) )
+
+	ROMX_LOAD( "epr-11696.65",   0x200000, 0x20000, CRC(99e8e49e) SHA1(ab6e1d74af412ec2f939043d7dc26f4b2e34a528), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11697.73",   0x200001, 0x20000, CRC(7545c52e) SHA1(bdb0ccf233e10e9449aa367db5a5b5f209bee969), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11700.61",   0x200002, 0x20000, CRC(e13839c1) SHA1(4975b5314797d11c782b0478eaa84eaf9980b1cd), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11701.69",   0x200003, 0x20000, CRC(9fb3d365) SHA1(bfcf4abfa91aa41b16f01b7bafe97cd865167fbc), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11698.84",   0x200004, 0x20000, CRC(cfeba3e2) SHA1(826b73858ca5ea05688246d36b1f607356974ca9), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11699.112",  0x200005, 0x20000, CRC(4a00534a) SHA1(9a637b45b140420937b232bf690ef8bc3d43f5ad), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11702.80",   0x200006, 0x20000, CRC(2a09c627) SHA1(c6b0a618b4ddd9d227d3472544b62ebef966b041), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11703.108",  0x200007, 0x20000, CRC(43bb7d9f) SHA1(e36d208937f56f0af14292184c80ca939c32c378), ROM_SKIP(7) )
+
+	ROMX_LOAD( "epr-11524.64",   0x300000, 0x20000, CRC(5d35849f) SHA1(b86fb230ed0901dfdb525e7a47d9c9ad8031a3f6), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11525.72",   0x300001, 0x20000, CRC(9ae47552) SHA1(43268dd5f79282aabd8972994437de1b2d2acc40), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11532.60",   0x300002, 0x20000, CRC(b3565ddb) SHA1(3208744d43a11f4de8a6b626cc9113ad63d36807), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11533.68",   0x300003, 0x20000, CRC(f5d16e8a) SHA1(3b5c1582794a0e69707264879b544ac48afd9337), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11526.83",   0x300004, 0x20000, CRC(094cb3f0) SHA1(4b30e24dfd33c9922ffd5665cd9631b1f24243da), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11527.111",  0x300005, 0x20000, CRC(e821a144) SHA1(eeec0e51798645cce8f9a7e686178268398977fb), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11534.79",   0x300006, 0x20000, CRC(b7f0ad7c) SHA1(987b198692db365f3a81e88e5eec526775c318c6), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-11535.107",  0x300007, 0x20000, CRC(95da7a46) SHA1(ffe6cd80eecc7c53a1155396ede0720d975d2c3b), ROM_SKIP(7) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )        // Z80 sound CPU
+	ROM_LOAD( "epr-11693.102",   0x000000, 0x10000, CRC(0497785c) SHA1(f077e71efdc96d6eb3f1a1f989650466554fb13a) ) // 11516A
+
+	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASEFF )    // SegaPCM samples
+	ROM_LOAD( "mpr-11465.107",   0x000000, 0x80000, CRC(e1436dab) SHA1(363f4c111de38cb1d82b245e4fcc65308f506e6a) )
+	ROM_LOAD( "epr-11516.106",   0x080000, 0x20000, CRC(19d0e17f) SHA1(7171131226cf1fe260a2db310fad2ec264adca26) )
+	ROM_RELOAD(                  0x0a0000, 0x20000 )
+	ROM_RELOAD(                  0x0c0000, 0x20000 )
+	ROM_RELOAD(                  0x0e0000, 0x20000 )
+	ROM_LOAD( "epr-11814.105",   0x100000, 0x20000, CRC(0b05d376) SHA1(8d0c0be2fd9dbc714c82c7cd1c439d5ff65e1317) ) // 11517
+	ROM_RELOAD(                  0x120000, 0x20000 )
+	ROM_RELOAD(                  0x140000, 0x20000 )
+	ROM_RELOAD(                  0x160000, 0x20000 )
+
+	ROM_REGION( 0x10000, "motorcpu", 0 )        // Z80 motor CPU
 	ROM_LOAD( "motorpcb.prg",   0x000000, 0x08000, CRC(fecee31e) SHA1(b50a26896a71d4741bbdc4ae51c3702585531b7e) ) // sega epr label??
 ROM_END
 
@@ -2668,6 +2764,7 @@ DRIVER_INIT_MEMBER(segaybd_state,rchase)
 
 //    YEAR, NAME,      PARENT,  MACHINE, INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
 GAME( 1988, gforce2,   0,        yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", GAME_SUPPORTS_SAVE )
+GAME( 1988, gforce2sd, gforce2, yboard_deluxe,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", GAME_SUPPORTS_SAVE )
 GAME( 1988, gforce2ja, gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", GAME_SUPPORTS_SAVE )
 GAME( 1988, gforce2j,  gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", GAME_SUPPORTS_SAVE )
 
