@@ -415,7 +415,6 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
-
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("dac2", DMADAC, 0)
@@ -433,6 +432,8 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "n64")
+
+	MCFG_FORCE_NO_DRC()
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( n64dd, n64 )
