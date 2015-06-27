@@ -350,6 +350,18 @@ ROM_START (coleco)
 	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(2) )
 ROM_END
 
+/*  ONYX (Prototype)
+    Unreleased Brazilian Colecovision clone by Microdigital.
+
+    It was never released and the only known prototypes were uncovered by an ex-employee of Microdigital
+    called Cláudio Cassens who donated it to collectors (Eduardo Luccas) in June 2015.
+    -- Felipe Sanches
+*/
+ROM_START (onyx)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "onyx.rom", 0x0000, 0x2000, CRC(011c32e7) SHA1(f44263221e330b2590dffc1a6f43ed2591fe19be) )
+ROM_END
+
 /*  PAL Colecovision BIOS
 
 Country: Italy
@@ -388,6 +400,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   INIT              COMPANY             FULLNAME                            FLAGS
 CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device, 0, "Coleco",           "ColecoVision (NTSC)",              0 )
+CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, driver_device, 0, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
 CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, driver_device, 0, "Coleco",           "ColecoVision (PAL)",               0 )
 CONS( 1983, svi603,   coleco,   0,      coleco,   coleco, driver_device, 0, "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
 CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  driver_device, 0, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
