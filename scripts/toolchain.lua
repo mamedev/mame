@@ -833,12 +833,14 @@ function toolchain(_buildDir, _subDir)
 		flags {
 			"Optimize",
 		}
-		buildoptions {
-			"-fPIC",
-		}
-		linkoptions {
-			"-fPIC",
-		}
+		if _OPTIONS["targetos"] != "windows" then
+			buildoptions {
+				"-fPIC",
+			}
+			linkoptions {
+				"-fPIC",
+			}
+		end
 		USE_BGFX = 0
 	-- END libretro overrides to MAME's GENie build
 
