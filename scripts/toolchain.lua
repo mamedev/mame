@@ -839,6 +839,7 @@ function toolchain(_buildDir, _subDir)
 		linkoptions {
 			"-fPIC",
 		}
+		USE_BGFX = 0
 	-- END libretro overrides to MAME's GENie build
 
 	configuration {} -- reset configuration
