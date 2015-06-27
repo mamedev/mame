@@ -147,9 +147,9 @@ NETLIB_RESET(logic_input)
 
 NETLIB_STOP(logic_input)
 {
-	if (logic_family() != NULL)
-		if (!logic_family()->m_is_static)
-			pfree(logic_family());
+	if (m_logic_family != NULL)
+		if (!m_logic_family->m_is_static)
+			pfree(m_logic_family);
 }
 
 

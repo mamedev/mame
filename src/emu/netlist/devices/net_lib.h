@@ -64,8 +64,8 @@
 
 #include "nld_legacy.h"
 
-NETLIST_EXTERNAL(diode_models);
-NETLIST_EXTERNAL(bjt_models);
+NETLIST_EXTERNAL(diode_models)
+NETLIST_EXTERNAL(bjt_models)
 
 namespace netlist {
 	void initialize_factory(netlist::factory_list_t &factory);

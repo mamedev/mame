@@ -6,7 +6,7 @@
  */
 
 #include <algorithm>
-
+#include <cstdio>
 #include "nl_convert.h"
 
 template<typename Class>
