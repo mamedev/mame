@@ -371,6 +371,9 @@ end
 configurations {
 	"Debug",
 	"Release",
+	-- BEGIN libretro overrides to MAME's GENie build
+	"libretrodso",
+	-- END libretro overrides to MAME's GENie build
 }
 
 platforms {

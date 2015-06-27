@@ -880,8 +880,6 @@ function createMESSProjects(_target, _subtarget, _name)
 		GEN_DIR  .. "mame/layout",
 		MAME_DIR .. "src/emu/cpu/m68000",
 	}
-
-	dofile("retro_fpic.lua")
 end
 	
 function createProjects_mame_mess(_target, _subtarget)

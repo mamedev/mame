@@ -826,6 +826,21 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "rpi" .. "/bin")
 		objdir (_buildDir .. "rpi" .. "/obj")
 
+	-- BEGIN libretro overrides to MAME's GENie build
+	configuration { "libretrodso" }
+		targetdir (_buildDir .. "libretro" .. "/obj")
+		objdir (_buildDir .. "libretro" .. "/obj")
+		flags {
+			"Optimize",
+		}
+		buildoptions {
+			"-fPIC",
+		}
+		linkoptions {
+			"-fPIC",
+		}
+	-- END libretro overrides to MAME's GENie build
+
 	configuration {} -- reset configuration
 
 	return true

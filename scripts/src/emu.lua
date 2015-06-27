@@ -349,8 +349,6 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "snap"),
 }
 
-dofile(path.join("..", "retro_fpic.lua"))
-
 function emuProject(_target, _subtarget)
 
 	disasm_files = { }
@@ -384,8 +382,6 @@ function emuProject(_target, _subtarget)
 			MAME_DIR .. "3rdparty/expat/lib",
 		}
 	end
-
-	dofile("retro_fpic.lua")
 	
 	dofile(path.join("src", "cpu.lua"))
 
@@ -428,8 +424,6 @@ function emuProject(_target, _subtarget)
 	end
 
 	dofile(path.join("src", "bus.lua"))
-	dofile("retro_fpic.lua")
-	
 	
 	project ("dasm")
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
@@ -470,6 +464,4 @@ function emuProject(_target, _subtarget)
 			disasm_custombuildtask[1]
 		}
 	end
-
-	dofile("retro_fpic.lua")
 end

@@ -24,8 +24,6 @@ project "expat"
 			"-Wshadow"
 		}
 	end
-
-	dofile(path.join("..", "retro_fpic.lua"))
 else
 links {
 	"expat",
@@ -74,8 +72,6 @@ project "zlib"
 		}
 	end
 
-	dofile(path.join("..", "retro_fpic.lua"))
-
 --------------------------------------------------
 -- SoftFloat library objects
 --------------------------------------------------
@@ -111,8 +107,6 @@ project "softfloat"
 			"-Wshadow"
 		}
 	end
-
-	dofile(path.join("..", "retro_fpic.lua"))
 
 --------------------------------------------------
 -- libJPEG library objects
@@ -176,8 +170,6 @@ project "jpeg"
 		}
 	end
 
-	dofile(path.join("..", "retro_fpic.lua"))
-
 --------------------------------------------------
 -- libflac library objects
 --------------------------------------------------
@@ -232,8 +224,6 @@ project "flac"
 		}
 	end
 
-	dofile(path.join("..", "retro_fpic.lua"))
-
 --------------------------------------------------
 -- lib7z library objects
 --------------------------------------------------
@@ -273,8 +263,6 @@ project "7z"
 			"-Wshadow"
 		}
 	end
-
-	dofile(path.join("..", "retro_fpic.lua"))
 
 --------------------------------------------------
 -- LUA library objects
@@ -355,8 +343,6 @@ project "lua"
 		}
 	end
 
-	dofile(path.join("..", "retro_fpic.lua"))
-
 --------------------------------------------------
 -- sqlite3 lua library objects
 --------------------------------------------------
@@ -388,8 +374,6 @@ project "lsqlite3"
 		}
 	end
 
-	dofile(path.join("..", "retro_fpic.lua"))
-
 --------------------------------------------------
 -- mongoose library objects
 --------------------------------------------------
@@ -419,8 +403,6 @@ project "mongoose"
 		}
 	end
 
-	dofile(path.join("..", "retro_fpic.lua"))
-
 --------------------------------------------------
 -- jsoncpp library objects
 --------------------------------------------------
@@ -449,8 +431,6 @@ project "jsoncpp"
 		}
 	end
 
-	dofile(path.join("..", "retro_fpic.lua"))
-
 --------------------------------------------------
 -- SQLite3 library objects
 --------------------------------------------------
@@ -475,8 +455,6 @@ project "sqllite3"
 			"-Wshadow"
 		}
 	end
-
-	dofile(path.join("..", "retro_fpic.lua"))
 
 --------------------------------------------------
 -- portmidi library objects
@@ -536,8 +514,6 @@ project "portmidi"
 			"-Wshadow"
 		}
 	end
-
-	dofile(path.join("..", "retro_fpic.lua"))
 end	
 --------------------------------------------------
 -- BGFX library objects
@@ -628,8 +604,6 @@ project "bgfx"
 			"-Wshadow"
 		}
 	end
-
-	dofile(path.join("..", "retro_fpic.lua"))
 end
 
 --------------------------------------------------
@@ -761,8 +735,6 @@ project "portaudio"
 			"-Wshadow"
 		}
 	end
-
-	dofile(path.join("..", "retro_fpic.lua"))
 		
 --------------------------------------------------
 -- UnitTest++ library objects
@@ -835,5 +807,3 @@ project "unittest-cpp"
 			MAME_DIR .. "3rdparty/unittest-cpp/UnitTest++/Win32/TimeHelpers.h",
 		}
 	end
-
-	dofile(path.join("..", "retro_fpic.lua"))

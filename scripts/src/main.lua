@@ -256,8 +256,6 @@ function mainProject(_target, _subtarget)
 		-- FIXME: set BIGENDIAN and dynarec based on retro_platform/retro_arch
 
 
-		dofile("retro_fpic.lua")
-
 		-- "linux" for pretty much any Linux/BSD/Android...
 		if _OPTIONS["targetos"]=="linux" then
 			linkoptions {

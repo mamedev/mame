@@ -136,8 +136,6 @@ function createProjects_mame_tiny(_target, _subtarget)
 		MAME_DIR .. "src/mame/drivers/looping.c",
 		MAME_DIR .. "src/mame/drivers/supertnk.c",
 	}
-
-	dofile("retro_fpic.lua")
 end
 
 function linkProjects_mame_tiny(_target, _subtarget)

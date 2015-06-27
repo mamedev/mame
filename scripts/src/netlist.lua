@@ -150,5 +150,3 @@ project "netlist"
 		MAME_DIR .. "src/emu/netlist/devices/nld_truthtable.c",
 		MAME_DIR .. "src/emu/netlist/devices/nld_truthtable.h",
 }
-
-	dofile(path.join("..", "retro_fpic.lua"))

@@ -146,7 +146,7 @@ endif # CROSS_BUILD
 #
 ###########################################################################
 
-BUILDFLAGS = REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR)
+BUILDFLAGS = REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR) CONFIG=libretrodso
 ifneq ($(PYTHON_EXECUTABLE),)
 	BUILDFLAGS += PYTHON_EXECUTABLE=$(PYTHON_EXECUTABLE)
 endif
