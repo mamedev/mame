@@ -14,37 +14,6 @@ tjcarter or iKarith) wants others to be able to maintain the thing in his
 absence.  He'd rather not maintain the thing at all honestly.  ;)
 
 
-## -fPIC for everyone ##
-
-Short form: If something doesn't work because it needs to be built with PIC
-and isn't, dofile("retro_fpic.lua") in the project.  You may need something
-like dofile(path.join("..", "..", "retro_fpic.lua")) depending on the dir it
-looks into.  Try the first one and fix it as necessary.
-
-Long form: A shared library requires the -fPIC option on ELF-based systems
-like Linux.  It isn't automatic because while it's necessary for a shared
-library, most code is going to run a little faster without it if you don't
-actually need it.
-
-We used to do this globally in MAME, but we can't find a place to do that
-with the GENie build.  We could ask the MAME folks, but overall relations
-between MAME and libretro are ... well, less than ideal.  Pretty much if
-we asked for advice we'd probably get some, though it wouldn't likely be
-anatomically possible, and it wouldn't help with the technical problem.
-
-So each static library in MAME requires a project declaration under GENie,
-and each project declaration needs -fPIC added to it.  The retro_fpic.lua
-file does this, conditionally, if you're using the retro OSD.  So if you
-are getting linker errors telling you to build something with -fPIC, grep
-your make output for any line without -fPIC in it (grep -v -- '-fPIC') and
-then grep that for compiler/linker lines (likely '^gcc' or '^g++' or maybe
-just '^g').  Find the bit of lua in scripts that is building that source
-file and I'll bet it's a project declaration that doesn't YET have the
-requisite dofile() call to include -fPIC in build/link options.
-
-You get to fix that if you want it to build.  :)
-
-
 ## The problem with the OSD being a static library ##
 
 You're _not_ supposed to put the public API of a shared library into a
