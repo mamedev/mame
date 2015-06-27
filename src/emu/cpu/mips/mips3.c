@@ -192,7 +192,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	memset(m_fastram, 0, sizeof(m_fastram));
 	memset(m_hotspot, 0, sizeof(m_hotspot));
 
-	m_isdrc = mconfig.options().drc() ? true : false;
+	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
 }
 
 

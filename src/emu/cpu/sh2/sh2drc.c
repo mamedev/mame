@@ -11,6 +11,7 @@
 #include "debugger.h"
 #include "sh2.h"
 #include "sh2comn.h"
+#include "mconfig.h"
 
 extern unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode);
 
@@ -2945,7 +2946,7 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 
 void sh2_device::sh2drc_set_options(UINT32 options)
 {
-	if (!machine().options().drc()) return;
+	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
 	m_drcoptions = options;
 }
 
@@ -2957,7 +2958,7 @@ void sh2_device::sh2drc_set_options(UINT32 options)
 
 void sh2_device::sh2drc_add_pcflush(offs_t address)
 {
-	if (!machine().options().drc()) return;
+	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
 
 	if (m_pcfsel < ARRAY_LENGTH(m_pcflushes))
 		m_pcflushes[m_pcfsel++] = address;

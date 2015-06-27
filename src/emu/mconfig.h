@@ -17,6 +17,7 @@
 #ifndef __MCONFIG_H__
 #define __MCONFIG_H__
 
+#include "emuopts.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -61,6 +62,7 @@ public:
 	std::string             m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
 	INT32                   m_watchdog_vblank_count;    // number of VBLANKs until the watchdog kills us
 	attotime                m_watchdog_time;            // length of time until the watchdog kills us
+	bool					m_force_no_drc;				// whether or not to force DRC off
 
 	// other parameters
 	const char *            m_default_layout;           // default layout for this machine
@@ -133,6 +135,9 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
 	config.m_perfect_cpu_quantum = owner->subtag(_cputag);
 
+// recompilation parameters
+#define MCFG_FORCE_NO_DRC() \
+	config.m_force_no_drc = true;
 
 // watchdog configuration
 #define MCFG_WATCHDOG_VBLANK_INIT(_count) \
