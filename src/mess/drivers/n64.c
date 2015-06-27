@@ -389,6 +389,7 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
+	MCFG_FORCE_NO_DRC()
 	MCFG_CPU_CONFIG(config)
 	MCFG_CPU_PROGRAM_MAP(n64_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", n64_mess_state, n64_reset_poll)

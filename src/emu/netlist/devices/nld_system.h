@@ -18,8 +18,13 @@
 // -----------------------------------------------------------------------------
 
 #define TTL_INPUT(_name, _v)                                                   \
-		NET_REGISTER_DEV(ttl_input, _name)                                     \
+		NET_REGISTER_DEV(logic_input, _name)                                   \
 		PARAM(_name.IN, _v)
+
+#define LOGIC_INPUT(_name, _v, _family)                                        \
+		NET_REGISTER_DEV(logic_input, _name)                                   \
+		PARAM(_name.IN, _v)													   \
+		PARAM(_name.FAMILY, _family)
 
 #define ANALOG_INPUT(_name, _v)                                                \
 		NET_REGISTER_DEV(analog_input, _name)                                  \
@@ -123,10 +128,13 @@ NETLIB_DEVICE_WITH_PARAMS(extclock,
 // Special support devices ...
 // -----------------------------------------------------------------------------
 
-NETLIB_DEVICE_WITH_PARAMS(ttl_input,
+NETLIB_DEVICE_WITH_PARAMS(logic_input,
+
+	virtual void stop();
 	logic_output_t m_Q;
 
 	param_logic_t m_IN;
+	param_model_t m_FAMILY;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(analog_input,

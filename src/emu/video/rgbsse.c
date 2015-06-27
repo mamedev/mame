@@ -166,9 +166,15 @@ const struct rgbaint_t::_statics rgbaint_t::statics =
 
 void rgbaint_t::blend(const rgbaint_t& other, UINT8 factor)
 {
-	m_value = _mm_unpacklo_epi16(m_value, other.m_value);
-	m_value = _mm_madd_epi16(m_value, scale_factor(factor));
-	m_value = _mm_srli_epi32(m_value, 8);
+	__m128i scale1 = _mm_set1_epi32(factor);
+	__m128i scale2 = _mm_sub_epi32(_mm_set1_epi32(0x100), scale1);
+
+	rgbaint_t scaled_other(other);
+	scaled_other.mul(scale2);
+
+	mul(scale1);
+	add(scaled_other);
+	sra(8);
 }
 
 void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)

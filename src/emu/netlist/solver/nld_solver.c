@@ -279,7 +279,8 @@ ATTR_HOT nl_double matrix_solver_t::solve()
 
 	// We are already up to date. Avoid oscillations.
 	// FIXME: Make this a parameter!
-	if (delta < netlist_time::from_nsec(1)) // 20000
+	//if (delta < netlist_time::from_nsec(1)) // 20000
+	if (delta < netlist_time::from_nsec(20000)) // 20000
 		return -1.0;
 
 	/* update all terminals for new time step */
@@ -382,8 +383,8 @@ NETLIB_UPDATE(solver)
 #if HAS_OPENMP && USE_OPENMP
 	if (m_parallel.Value())
 	{
-		omp_set_num_threads(4);
-		omp_set_dynamic(0);
+		omp_set_num_threads(3);
+		//omp_set_dynamic(0);
 		#pragma omp parallel
 		{
 			#pragma omp for

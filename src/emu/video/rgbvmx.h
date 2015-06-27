@@ -199,7 +199,8 @@ public:
 	inline void mul(const rgbaint_t& color)
 	{
 		const VECU32 shift = vec_splat_u32(-16);
-		const VECU32 temp = vec_add(vec_mule((VECU16)m_value, (VECU16)vec_sl(color.m_value, shift)), vec_mule((VECU16)vec_sl(m_value, shift), (VECU16)color.m_value));
+		VECU32 temp = vec_rl(color.m_value, shift);
+		temp = vec_add(vec_mule((VECU16)m_value, (VECU16)temp), vec_mulo((VECU16)m_value, (VECU16)temp));
 		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)color.m_value));
 	}
 
@@ -207,7 +208,8 @@ public:
 	{
 		const VECU32 shift = vec_splat_u32(-16);
 		const VECU32 value = { imm, imm, imm, imm };
-		const VECU32 temp = vec_add(vec_mule((VECU16)m_value, (VECU16)vec_sl(value, shift)), vec_mule((VECU16)vec_sl(m_value, shift), (VECU16)value));
+		VECU32 temp = vec_rl(value, shift);
+		temp = vec_msum((VECU16)m_value, (VECU16)temp, vec_splat_u32(0));
 		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
 	}
 
@@ -215,7 +217,8 @@ public:
 	{
 		const VECU32 shift = vec_splat_u32(-16);
 		const VECU32 value = { a, r, g, b };
-		const VECU32 temp = vec_add(vec_mule((VECU16)m_value, (VECU16)vec_sl(value, shift)), vec_mule((VECU16)vec_sl(m_value, shift), (VECU16)value));
+		VECU32 temp = vec_rl(value, shift);
+		temp = vec_msum((VECU16)m_value, (VECU16)temp, vec_splat_u32(0));
 		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
 	}
 
@@ -425,7 +428,8 @@ public:
 	inline rgbaint_t& operator*=(const rgbaint_t& other)
 	{
 		const VECU32 shift = vec_splat_u32(-16);
-		const VECU32 temp = vec_add(vec_mule((VECU16)m_value, (VECU16)vec_sl(other.m_value, shift)), vec_mule((VECU16)vec_sl(m_value, shift), (VECU16)other.m_value));
+		VECU32 temp = vec_rl(other.m_value, shift);
+		temp = vec_msum((VECU16)m_value, (VECU16)temp, vec_splat_u32(0));
 		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)other.m_value));
 		return *this;
 	}
@@ -434,7 +438,8 @@ public:
 	{
 		const VECU32 shift = vec_splat_u32(-16);
 		const VECS32 value = { other, other, other, other };
-		const VECU32 temp = vec_add(vec_mule((VECU16)m_value, (VECU16)vec_sl(value, shift)), vec_mule((VECU16)vec_sl(m_value, shift), (VECU16)value));
+		VECU32 temp = vec_rl(value, shift);
+		temp = vec_msum((VECU16)m_value, (VECU16)temp, vec_splat_u32(0));
 		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
 		return *this;
 	}

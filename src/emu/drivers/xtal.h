@@ -52,6 +52,7 @@ enum
 	XTAL_1_9968MHz      = 1996800,      /* NEC PC-98xx */
 	XTAL_2MHz           = 2000000,
 	XTAL_2_01216MHz     = 2012160,      /* Cidelsa Draco sound board */
+	XTAL_2_097152MHz    = 2097152,      /* Icatel 1995 - Brazilian public payphone */
 	XTAL_2_4576MHz      = 2457600,      /* Atari ST MFP, NEC PC-98xx */
 	XTAL_2_5MHz         = 2500000,      /* Janken Man units */
 	XTAL_3MHz           = 3000000,      /* Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */

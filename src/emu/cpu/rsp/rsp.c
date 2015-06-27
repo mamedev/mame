@@ -139,7 +139,7 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_sp_reg_w_func(*this)
 	, m_sp_set_status_func(*this)
 {
-	m_isdrc = mconfig.options().drc() ? true : false;
+	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
 }
 
 offs_t rsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)

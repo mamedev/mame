@@ -180,13 +180,14 @@ ai1000  // Casio AI-1000
 cfx9850 // Casio CFX-9850
 
 // Coleco
-coleco  // ColecoVision (Original BIOS)
-colecop // Colecovision PAL (Italy)
+coleco   // ColecoVision (Original BIOS)
+colecop  // Colecovision PAL (Italy)
 svi603   // Spectravideo SVI-603 Coleco Game Adapter
 czz50    // Bit Corporation Chuang Zao Zhe 50
-dina      // Telegames Dina
-prsarcde  // Telegames Personal Arcade
-adam      // Coleco Adam
+dina     // Telegames Dina
+prsarcde // Telegames Personal Arcade
+adam     // Coleco Adam
+onyx     // Microdigital ONYX (Brazilian Coleco clone / unreleased prototype)
 
 // NEC
 pce    // PC/Engine NEC 1987-1993
@@ -2281,6 +2282,7 @@ bcs3b
 bcs3c
 bob85
 c80
+ds348 //Sigtron Daruma
 mc1000
 d6809
 mk85
@@ -2290,6 +2292,7 @@ fk1
 et3400
 amu880
 i7000
+icatel
 interact
 jr100
 jr100u
