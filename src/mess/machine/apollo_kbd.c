@@ -251,10 +251,10 @@ void apollo_kbd_device::mouse::read_mouse()
 		int y = m_device->m_io_mouse3->read();
 
 		/* sign extend values < 0 */
-		if (x & 0x800)
-			x |= 0xfffff000;
-		if (y & 0x800)
-			y |= 0xfffff000;
+		if (x & 0x80)
+			x |= 0xffffff00;
+		if (y & 0x80)
+			y |= 0xffffff00;
 		y = -y;
 
 		if (m_last_b < 0)
@@ -270,10 +270,6 @@ void apollo_kbd_device::mouse::read_mouse()
 
 			int dx = x - m_last_x;
 			int dy = y - m_last_y;
-
-			// slow down huge mouse movements
-			dx = dx > 50 ? 50 : dx < -50 ? -50 : dx;
-			dy = dy > 50 ? 50 : dy < -50 ? -50 : dy;
 
 			LOG2(("read_mouse: b=%02x x=%d y=%d dx=%d dy=%d", b, x, y, dx, dy));
 
@@ -982,9 +978,9 @@ INPUT_PORTS_START( apollo_kbd )
 	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Center mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 
 	PORT_START("mouse2")  // X-axis
-	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(200) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(200) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("mouse3")  // Y-axis
-	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(200) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(200) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 INPUT_PORTS_END
