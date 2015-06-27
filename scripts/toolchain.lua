@@ -833,7 +833,7 @@ function toolchain(_buildDir, _subDir)
 		flags {
 			"Optimize",
 		}
-		if _OPTIONS["targetos"] != "windows" then
+		if _OPTIONS["targetos"] ~= "windows" then
 			buildoptions {
 				"-fPIC",
 			}
