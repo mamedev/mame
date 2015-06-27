@@ -4114,7 +4114,7 @@ ROM_START( radm )
 	ROM_LOAD( "epr-13686.bin", 0x00000, 0x8000, CRC(317a2857) SHA1(e0788dc7a7d214d9c4d26b24e44c1a0dc9ae477c) ) /* cabinet movement */
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
-	ROM_LOAD16_WORD( "mainpcb:eeprom-radm.ic76", 0x0000, 0x0080, CRC(b1737c06) SHA1(29448a6effeb53322a93158feb9a62bc6ad31f21) )
+	ROM_LOAD16_WORD( "eeprom-radm.ic76", 0x0000, 0x0080, CRC(b1737c06) SHA1(29448a6effeb53322a93158feb9a62bc6ad31f21) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4153,7 +4153,7 @@ ROM_START( radmu )
 	ROM_LOAD( "epr-13686.bin", 0x00000, 0x8000, CRC(317a2857) SHA1(e0788dc7a7d214d9c4d26b24e44c1a0dc9ae477c) ) /* cabinet movement */
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
-	ROM_LOAD16_WORD( "mainpcb:eeprom-radm.ic76", 0x0000, 0x0080, CRC(b1737c06) SHA1(29448a6effeb53322a93158feb9a62bc6ad31f21) )
+	ROM_LOAD16_WORD( "eeprom-radm.ic76", 0x0000, 0x0080, CRC(b1737c06) SHA1(29448a6effeb53322a93158feb9a62bc6ad31f21) )
 ROM_END
 
 
@@ -4201,7 +4201,7 @@ ROM_START( radr )
 	ROM_LOAD( "epr-14084.17", 0x00000, 0x8000, CRC(f14ed074) SHA1(e1bb23eac85e3236046527c5c7688f6f23d43aef) ) /* cabinet link */
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
-	ROM_LOAD16_WORD( "mainpcb:eeprom-radr.ic76", 0x0000, 0x0080, CRC(602032c6) SHA1(fecf14017e537fe870457d2a8d4f86ec6d442b90) )
+	ROM_LOAD16_WORD( "eeprom-radr.ic76", 0x0000, 0x0080, CRC(602032c6) SHA1(fecf14017e537fe870457d2a8d4f86ec6d442b90) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4246,7 +4246,7 @@ ROM_START( radru )
 	ROM_LOAD( "epr-14084.17", 0x00000, 0x8000, CRC(f14ed074) SHA1(e1bb23eac85e3236046527c5c7688f6f23d43aef) ) /* cabinet link */
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
-	ROM_LOAD16_WORD( "mainpcb:eeprom-radr.ic76", 0x0000, 0x0080, CRC(602032c6) SHA1(fecf14017e537fe870457d2a8d4f86ec6d442b90) )
+	ROM_LOAD16_WORD( "eeprom-radr.ic76", 0x0000, 0x0080, CRC(602032c6) SHA1(fecf14017e537fe870457d2a8d4f86ec6d442b90) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -4291,7 +4291,7 @@ ROM_START( radrj )
 	ROM_LOAD( "epr-14084.17", 0x00000, 0x8000, CRC(f14ed074) SHA1(e1bb23eac85e3236046527c5c7688f6f23d43aef) ) /* cabinet link */
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
-	ROM_LOAD16_WORD( "mainpcb:eeprom-radr.ic76", 0x0000, 0x0080, CRC(602032c6) SHA1(fecf14017e537fe870457d2a8d4f86ec6d442b90) )
+	ROM_LOAD16_WORD( "eeprom-radr.ic76", 0x0000, 0x0080, CRC(602032c6) SHA1(fecf14017e537fe870457d2a8d4f86ec6d442b90) )
 ROM_END
 
 
