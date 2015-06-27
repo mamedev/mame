@@ -1,4 +1,4 @@
-// license:MAME|GPL-2.0+
+// license:GPL-2.0+
 // copyright-holders: Felipe Sanches
 /***************************************************************************
 
@@ -265,5 +265,5 @@ ROM_START( icatel )
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 1995, icatel,   0,      0,      icatel,     0,        icatel_state, icatel, "ICATEL", "TPCI (Brazilian public payphone)",    GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
+COMP( 1995, icatel,   0,      0,      icatel,     0,        icatel_state, icatel, "Icatel", "TPCI (Brazilian public payphone)",    GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
 /*The hardware was clearly manufactured in 1995. There's no evindence of the actual date of the firmware.*/

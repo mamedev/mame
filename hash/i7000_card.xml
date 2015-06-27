@@ -45,7 +45,7 @@ cartridges data available in this softlist.
 	</software>
 
 	<software name="set3278">
-		<description>I-7106 SET 3278 v1.2 R00 (Mar 21st, 1985)</description>
+		<description>I-7106 SET 3278 v1.2 R00 (Mar 21st, 1985) IBM-3278 terminal emulation</description>
 		<year>1985</year>
 		<publisher>Itautec</publisher>
 		<part name="card" interface="i7000_card">
@@ -60,9 +60,11 @@ cartridges data available in this softlist.
 		<year>1986</year>
 		<publisher>Itautec</publisher>
 		<part name="card" interface="i7000_card">
-			<dataarea name="rom" size="0x4000">
+			<dataarea name="rom" size="0x6000">
 				<rom name="i-7107_set_vt52_v1.0_r02_25_02_86_1.rom" size="0x2000" crc="ead3f48e" sha1="ec7951591cab8e8c2cb22f7e6352c709d24b9706" offset="0x0000" />
-				<rom name="i-7107_set_vt52_v1.0_r02_25_02_86_2.rom" size="0x2000" crc="da848ec0" sha1="7ed1898de94c7382c081ec3a78f60a6850daa25a" offset="0x2000" />
+                <!-- the 2nd EPROM connector is unpopulated -->
+				<rom name="i-7107_set_vt52_v1.0_r02_25_02_86_2.rom" size="0x2000" crc="da848ec0" sha1="7ed1898de94c7382c081ec3a78f60a6850daa25a" offset="0x4000" />
+                <!-- the 4th EPROM connector is unpopulated -->
 			</dataarea>
 		</part>
 	</software>
