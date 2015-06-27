@@ -1168,7 +1168,8 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 
 	// create the SDL window
 	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
-	window->m_extra_flags |= SDL_WINDOW_RESIZABLE;
+	window->m_extra_flags |= (window->fullscreen() ?
+			/*SDL_WINDOW_BORDERLESS |*/ SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 #if defined(SDLMAME_WIN32)
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
@@ -1200,10 +1201,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		if (window->m_win_config.refresh)
 			mode.refresh_rate = window->m_win_config.refresh;
 
-		// Set the mode we want SDL to use for this window while fullscreen
-		SDL_SetWindowDisplayMode(window->sdl_window(), &mode);
-		// Now actually go fullscreen
-		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN);
+		SDL_SetWindowDisplayMode(window->sdl_window(), &mode);    // Try to set mode
 #ifndef SDLMAME_WIN32
 		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
 		 * is in place after the mode switch - which will most likely be the case
