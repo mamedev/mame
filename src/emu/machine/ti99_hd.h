@@ -44,16 +44,23 @@ class mfmhd_trackimage_cache
 public:
 	mfmhd_trackimage_cache();
 	~mfmhd_trackimage_cache();
-	void init(chd_file* chdfile, const char* tag, int maxcyl, int maxhead, int trackslots, mfmhd_enc_t encoding);
-	UINT16* get_trackimage(int cylinder, int head);
+	void        init(chd_file* chdfile, const char* tag, int maxcyl, int maxhead, int trackslots, mfmhd_enc_t encoding);
+	UINT16*     get_trackimage(int cylinder, int head);
+	void        mark_current_as_dirty();
+	void        cleanup();
+	void        write_back_one();
 
 private:
 	void        mfm_encode(mfmhd_trackimage* slot, int& position, UINT8 byte, int count=1);
 	void        mfm_encode_a1(mfmhd_trackimage* slot, int& position);
 	void        mfm_encode_mask(mfmhd_trackimage* slot, int& position, UINT8 byte, int count, int mask);
+	UINT8       mfm_decode(UINT16 raw);
+
 	chd_error   load_track(mfmhd_trackimage* slot, int cylinder, int head, int sectorcount, int size, int interleave);
 	void        write_back(mfmhd_trackimage* timg);
 	int         chs_to_lba(int cylinder, int head, int sector);
+	UINT8       cylinder_to_ident(int cylinder);
+
 	chd_file*   m_chd;
 
 	const char* m_tagdev;
@@ -65,6 +72,8 @@ private:
 	int         m_heads;
 	int         m_sectors_per_track;
 	int         m_sectorsize;
+
+	int         m_calc_interleave;
 	void        showtrack(UINT16* enctrack, int length);
 	const char* tag() { return m_tagdev; }
 };
@@ -96,8 +105,14 @@ public:
 	line_state      seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; } ;
 	line_state      trk00_r() { return m_current_cylinder==0? ASSERT_LINE : CLEAR_LINE; }
 
+	// Common routine for read/write
+	bool            find_position(attotime &from_when, const attotime &limit, int &bytepos, int &bitpos);
+
 	// Data output towards controller
 	bool            read(attotime &from_when, const attotime &limit, UINT16 &data);
+
+	// Data input from controller
+	bool            write(attotime &from_when, const attotime &limit, UINT16 data);
 
 	// Step
 	void            step_w(line_state line);
@@ -107,6 +122,7 @@ public:
 	void            headsel_w(int head) { m_current_head = head & 0x0f; }
 
 	bool            call_load();
+	void            call_unload();
 
 	// Tells us the time when the track ends (next index pulse)
 	attotime        track_end_time();
@@ -117,10 +133,9 @@ protected:
 	void                device_reset();
 	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	virtual void        setup_characteristics() = 0;
 	std::string         tts(const attotime &t);
 
-	emu_timer           *m_index_timer, *m_spinup_timer, *m_seek_timer;
+	emu_timer           *m_index_timer, *m_spinup_timer, *m_seek_timer, *m_cache_timer;
 	index_pulse_cb      m_index_pulse_cb;
 	ready_cb            m_ready_cb;
 	seek_complete_cb    m_seek_complete_cb;
@@ -159,9 +174,6 @@ class mfm_hd_generic_device : public mfm_harddisk_device
 {
 public:
 	mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	void setup_characteristics();
 };
 
 extern const device_type MFMHD_GENERIC;
@@ -170,9 +182,6 @@ class mfm_hd_st225_device : public mfm_harddisk_device
 {
 public:
 	mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	void setup_characteristics();
 };
 
 extern const device_type MFMHD_ST225;
