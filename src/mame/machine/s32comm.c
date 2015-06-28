@@ -103,20 +103,18 @@ s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, d
 	m_line_tx(OPEN_FLAG_READ)
 {
 	// prepare localhost "filename"
-	if (strlen(m_localhost) == 0){
-		strcat(m_localhost, "socket.");
-		strcat(m_localhost, mconfig.options().comm_localhost());
-		strcat(m_localhost, ":");
-		strcat(m_localhost, mconfig.options().comm_localport());
-	}
+	m_localhost[0] = 0;
+	strcat(m_localhost, "socket.");
+	strcat(m_localhost, mconfig.options().comm_localhost());
+	strcat(m_localhost, ":");
+	strcat(m_localhost, mconfig.options().comm_localport());
 
 	// prepare remotehost "filename"
-	if (strlen(m_remotehost) == 0){
-		strcat(m_remotehost, "socket.");
-		strcat(m_remotehost, mconfig.options().comm_remotehost());
-		strcat(m_remotehost, ":");
-		strcat(m_remotehost, mconfig.options().comm_remoteport());
-	}
+	m_remotehost[0] = 0;
+	strcat(m_remotehost, "socket.");
+	strcat(m_remotehost, mconfig.options().comm_remotehost());
+	strcat(m_remotehost, ":");
+	strcat(m_remotehost, mconfig.options().comm_remoteport());
 }
 
 //-------------------------------------------------
@@ -528,7 +526,7 @@ void s32comm_device::comm_tick_15033()
 		bool isRelay = (m_shared[2] == 0x02);
 
 		// if link not yet established - Z80 reply check?
-		if (m_linkalive == 0x00 && m_shared[0] == 0x56 && m_shared[1] == 0x37 && m_shared[2] == 0x30 && m_shared[0x0A] == 0x00)
+		if (m_linkalive == 0x00 && m_shared[0] == 0x56 && m_shared[1] == 0x37 && m_shared[2] == 0x30)
 		{
 			for (int j = 0x003 ; j < 0x0800 ; j++)
 			{
