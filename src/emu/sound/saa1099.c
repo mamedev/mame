@@ -159,7 +159,7 @@ saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, d
 void saa1099_device::device_start()
 {
 	/* copy global parameters */
-	m_master_clock = clock;
+	m_master_clock = clock();
 	m_sample_rate = clock() / 256;
 
 	/* for each chip allocate one stream */
