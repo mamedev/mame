@@ -37,7 +37,7 @@ enum pstate_data_type_e {
 	DT_INT8,
 	DT_INT,
 	DT_BOOLEAN,
-	DT_FLOAT,
+	DT_FLOAT
 };
 
 template<typename _ItemType> struct nl_datatype

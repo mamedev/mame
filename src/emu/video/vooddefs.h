@@ -26,9 +26,6 @@ enum
 // Use old macro style or newer SSE2 optimized functions
 #define USE_OLD_RASTER  0
 
-// Use old table lookup versus straight double divide
-#define USE_FAST_RECIP  1
-
 /* maximum number of TMUs */
 #define MAX_TMU                 2
 
@@ -2203,7 +2200,7 @@ while (0)
 #if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64)
 
 // NB: This code should no longer be SSE2-specific now that it uses rgbaint_t, consider removing the #define and the #else case.
-ATTR_FORCE_INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
+INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
 {
 	rgb_t result;
 	rgbaint_t colorint((INT32) (itera>>12), (INT32) (iterr>>12), (INT32) (iterg>>12), (INT32) (iterb>>12));
@@ -2233,7 +2230,7 @@ ATTR_FORCE_INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 
 
 #else
 
-ATTR_FORCE_INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
+INLINE UINT32 clampARGB(INT32 iterr, INT32 iterg, INT32 iterb, INT32 itera, UINT32 FBZCP)
 {
 	rgb_union result;
 	INT16 r, g, b, a;
@@ -2402,7 +2399,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool chromaKeyTest(voodoo_state *v, stats_block *stats, UINT32 fbzModeReg, rgb_union color)
+INLINE bool chromaKeyTest(voodoo_state *v, stats_block *stats, UINT32 fbzModeReg, rgb_union color)
 {
 	if (FBZMODE_ENABLE_CHROMAKEY(fbzModeReg))
 	{
@@ -2575,7 +2572,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool alphaTest(voodoo_state *v, stats_block *stats, UINT32 alphaModeReg, UINT8 alpha)
+INLINE bool alphaTest(voodoo_state *v, stats_block *stats, UINT32 alphaModeReg, UINT8 alpha)
 {
 	if (ALPHAMODE_ALPHATEST(alphaModeReg))
 	{
@@ -2804,7 +2801,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *dither, int dpix, UINT16 *depth, rgb_union preFog, rgb_union &color)
+INLINE void alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32 x, const UINT8 *dither, int dpix, UINT16 *depth, rgb_union preFog, rgb_union &color)
 {
 	if (ALPHAMODE_ALPHABLEND(ALPHAMODE))
 	{
@@ -3115,7 +3112,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  INT32 x, const UINT8 *dither4, INT32 fogDepth, rgb_union &color, INT32 iterz, INT64 iterw, rgb_union iterargb)
+INLINE void applyFogging(voodoo_state *v, UINT32 fogModeReg, UINT32 fbzCpReg,  INT32 x, const UINT8 *dither4, INT32 fogDepth, rgb_union &color, INT32 iterz, INT64 iterw, rgb_union iterargb)
 {
 	if (FOGMODE_ENABLE_FOG(fogModeReg))
 	{
@@ -3254,21 +3251,17 @@ do                                                                              
 {                                                                               \
 	INT32 blendr, blendg, blendb, blenda;                                       \
 	INT32 tr, tg, tb, ta;                                                       \
-	INT32 s, t, lod, ilod;                                                 \
+	INT32 oow, s, t, lod, ilod;                                                 \
 	INT32 smax, tmax;                                                           \
 	UINT32 texbase;                                                             \
 	rgb_union c_local;                                                          \
-	                                                                            \
+																				\
 	/* determine the S/T/LOD values for this texture */                         \
 	if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))                                    \
 	{                                                                           \
-		if (USE_FAST_RECIP) {                                                     \
-			const INT32 oow = fast_reciplog((ITERW), &lod);                         \
-			s = ((INT64)oow * (ITERS)) >> 29;                                       \
-			t = ((INT64)oow * (ITERT)) >> 29;                                       \
-		} else {                                                                  \
-				multi_reciplog(ITERS, ITERT, ITERW, lod, s, t);                      \
-		}                                                                       \
+		oow = fast_reciplog((ITERW), &lod);                                     \
+		s = ((INT64)oow * (ITERS)) >> 29;                                       \
+		t = ((INT64)oow * (ITERT)) >> 29;                                       \
 		lod += (LODBASE);                                                       \
 	}                                                                           \
 	else                                                                        \
@@ -3760,7 +3753,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool depthTest(UINT16 zaColorReg, stats_block *stats, INT32 destDepth, UINT32 fbzModeReg, INT32 biasdepth)
+INLINE bool depthTest(UINT16 zaColorReg, stats_block *stats, INT32 destDepth, UINT32 fbzModeReg, INT32 biasdepth)
 {
 	/* handle depth buffer testing */
 	if (FBZMODE_ENABLE_DEPTHBUF(fbzModeReg))
@@ -4185,7 +4178,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-ATTR_FORCE_INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPATH, UINT32 FBZMODE, UINT32 ALPHAMODE,
+INLINE bool combineColor(voodoo_state *VV, stats_block *STATS, UINT32 FBZCOLORPATH, UINT32 FBZMODE, UINT32 ALPHAMODE,
 													rgb_union TEXELARGB, INT32 ITERZ, INT64 ITERW, rgb_union ITERARGB, rgb_union &color)
 {
 	rgb_union c_other;
@@ -4628,39 +4621,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 	}                                                                           \
 }
 
-// ******************************************************************************************************************************
-// Computes a log2 of a 16.32 value to 2 fractional bits of precision.
-// The return value is coded as a 24.8 value.
-// The maximum error using a 4 bit lookup from the mantissa is 0.0875, which is less than 1/2 lsb (0.125) for 2 bits of fraction.
-// ******************************************************************************************************************************
-ATTR_FORCE_INLINE INT32 new_log2(double &value)
-{
-	static const INT32 new_log2_table[16] = {0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244};
-	UINT64 ival = *((UINT64 *)&value);
-	// We zero the result if negative so don't worry about the sign bit
-	INT32 exp = (ival>>52);
-	exp -= 1023+32;
-	exp <<= 8;
-	UINT32 addr = (UINT64)(ival>>48) & 0xf;
-	exp += new_log2_table[addr];
-	// Return 0 if negative
-	return (ival & ((UINT64)1<<63)) ? 0 : exp;
-}
-
-// Computes A/C and B/C and returns log2 of 1/C
-// A, B and C are 16.32 values.  The results are 14.18.
-ATTR_FORCE_INLINE void multi_reciplog(INT64 valueA, INT64 valueB, INT64 valueC, INT32 &log, INT32 &resA, INT32 &resB)
-{
-	double recip = 1.0f/valueC;
-	double resAD = valueA * recip * ((INT64)1<<(47-29));
-	double resBD = valueB * recip * ((INT64)1<<(47-29));
-  log = new_log2(recip);
-  resA = resAD;
-  resB = resBD;
-}
-
-
-ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UINT32 TEXMODE, rgb_t *LOOKUP, INT32 LODBASE, INT64 ITERS, INT64 ITERT, INT64 ITERW, INT32 &lod)
+INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4, const UINT32 TEXMODE, rgb_t *LOOKUP, INT32 LODBASE, INT64 ITERS, INT64 ITERT, INT64 ITERW, INT32 &lod)
 {
 	UINT32 result;
 	INT32 s, t, ilod;
@@ -4670,14 +4631,10 @@ ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4
 	if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))
 	{
 		INT32 wLog;
-		if (USE_FAST_RECIP) {
-			const INT32 oow = fast_reciplog((ITERW), &wLog);
-			s = ((INT64)oow * (ITERS)) >> 29;
-			t = ((INT64)oow * (ITERT)) >> 29;
-		} else {
-			multi_reciplog(ITERS, ITERT, ITERW, wLog, s, t);
-		}
+		const INT32 oow = fast_reciplog((ITERW), &wLog);
 		lod += wLog;
+		s = ((INT64)oow * (ITERS)) >> 29;
+		t = ((INT64)oow * (ITERT)) >> 29;
 	}
 	else
 	{
@@ -4851,7 +4808,7 @@ ATTR_FORCE_INLINE UINT32 genTexture(tmu_state *TT, INT32 x, const UINT8 *dither4
 	return result;
 }
 
-ATTR_FORCE_INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_local, rgb_union c_other, INT32 lod)
+INLINE UINT32 combineTexture(tmu_state *TT, const UINT32 TEXMODE, rgb_union c_local, rgb_union c_other, INT32 lod)
 {
 	UINT32 result;
 	//INT32 blendr, blendg, blendb, blenda;

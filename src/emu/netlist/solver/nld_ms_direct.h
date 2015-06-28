@@ -257,10 +257,10 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 	if(0)
 		for (unsigned k = 0; k < N(); k++)
 		{
-			printf("%3d: ", k);
+			netlist().log("%3d: ", k);
 			for (unsigned j = 0; j < m_terms[k]->m_nzrd.size(); j++)
-				printf(" %3d", m_terms[k]->m_nzrd[j]);
-			printf("\n");
+				netlist().log(" %3d", m_terms[k]->m_nzrd[j]);
+			netlist().log("\n");
 		}
 
 	/*

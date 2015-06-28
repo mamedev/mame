@@ -30,14 +30,16 @@ private:
 };
 #endif
 
+#if !defined(__clang__) && !defined(_MSC_VER)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
 inline void vec_set (const std::size_t n, const double &scalar, double * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] = scalar;
 }
-#if HAS_OPENMP
-#include "omp.h"
-#endif
 inline double vecmult (const std::size_t n, const double * RESTRICT a1, const double * RESTRICT a2 )
 {
 
@@ -67,10 +69,6 @@ inline void vec_mult_scalar (const std::size_t n, const double * RESTRICT v, con
 	}
 }
 
-#ifndef __clang__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
 inline void vec_add_mult_scalar (const std::size_t n, const double * RESTRICT v, const double scalar, double * RESTRICT result)
 {
 	for ( std::size_t i = 0; i < n; i++ )
@@ -88,9 +86,6 @@ inline void vec_sub(const std::size_t n, const double * RESTRICT v1, const doubl
 	for ( std::size_t i = 0; i < n; i++ )
 		result[i] = v1[i] - v2[i];
 }
-#ifndef __clang__
-#pragma GCC diagnostic pop
-#endif
 
 inline void vec_scale (const std::size_t n, double * RESTRICT v, const double scalar)
 {
@@ -106,7 +101,8 @@ inline double vec_maxabs(const std::size_t n, const double * RESTRICT v)
 
 	return ret;
 }
-
-
+#if !defined(__clang__) && !defined(_MSC_VER)
+#pragma GCC diagnostic pop
+#endif
 
 #endif /* MAT_CR_H_ */

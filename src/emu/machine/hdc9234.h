@@ -270,16 +270,16 @@ private:
 	// Resets the PLL to the given time
 	void pll_reset(const attotime &when, bool write);
 
-	// Encodes the byte using FM or MFM. Changes the m_live_state members
-	// shift_reg, data_reg, and last_data_bit
-	void encode_byte(UINT8 byte);
-
 	// Puts the word into the shift register directly. Changes the m_live_state members
 	// shift_reg, and last_data_bit
 	void encode_raw(UINT16 word);
 
 	// Encodes a byte in FM or MFM. Called by encode_byte.
 	UINT16 encode(UINT8 byte);
+
+	// Encodes a byte in FM or MFM. Called by encode_byte.
+	UINT16 encode_hd(UINT8 byte);
+	UINT16 encode_a1_hd();
 
 	// Encode the latest byte again
 	void encode_again();
@@ -298,6 +298,9 @@ private:
 
 	// Read from the MFM HD
 	bool read_from_mfmhd(const attotime &limit);
+
+	// Write to the MFM HD
+	bool write_to_mfmhd(const attotime &limit);
 
 	// ==============================================
 	//   Command state machine
