@@ -372,7 +372,8 @@ configurations {
 	"Debug",
 	"Release",
 	-- BEGIN libretro overrides to MAME's GENie build
-	"libretrodso",
+	"libretrodbg",
+	"libretro",
 	-- END libretro overrides to MAME's GENie build
 }
 

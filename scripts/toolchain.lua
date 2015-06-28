@@ -827,13 +827,20 @@ function toolchain(_buildDir, _subDir)
 		objdir (_buildDir .. "rpi" .. "/obj")
 
 	-- BEGIN libretro overrides to MAME's GENie build
-	configuration { "libretrodso" }
-		targetdir (_buildDir .. "libretro" .. "/obj")
-		objdir (_buildDir .. "libretro" .. "/obj")
+	configuration { "libretrodb" }
+		targetdir (_buildDir .. "libretro" .. "/debug")
+		objdir (_buildDir .. "libretro" .. "/debug")
+		flags {
+			"Symbols",
+		}
+	configuration { "libretro" }
+		targetdir (_buildDir .. "libretro" .. "/release")
+		objdir (_buildDir .. "libretro" .. "/release")
 		flags {
 			"Optimize",
 		}
-		if _OPTIONS["targetos"] ~= "windows" then
+	configuration { "libretro*" }
+		if _OPTIONS["targetos"] ~= "windows" and _OPTIONS["targetos"] ~= "macosx" then
 			buildoptions {
 				"-fPIC",
 			}
