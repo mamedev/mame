@@ -77,7 +77,6 @@ ifeq ($(platform),)
 	endif
 endif
 
-
 ###########################################################################
 #
 #   LIBRETRO PLATFORM-SPECIFIC CONFIGURATION
@@ -169,6 +168,15 @@ ifneq ($(PTR64),)
 endif
 ifneq ($(platform),)
 	PLATFLAGS += platform="$(platform)"
+endif
+ifeq ($(platform),win)
+	ifeq ($(MSYSTEM),MINGW64)
+		MINGW64 ?= /mingw64
+		PLATFLAGS += MINGW64=$(MINGW64)
+	else ifeq ($(MSYSTEM),MINGW32)
+		MINGW32 ?= /mingw32
+		PLATFLAGS += MINGW32=$(MINGW32)
+	endif
 endif
 ifneq ($(ARCH),)
 	PLATFLAGS += ARCH="" LIBRETRO_ARCH="$(ARCH)"
