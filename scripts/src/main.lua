@@ -277,4 +277,3 @@ function mainProject(_target, _subtarget)
 	end
 	-- END libretro overrides to MAME's GENie build
 end
-
