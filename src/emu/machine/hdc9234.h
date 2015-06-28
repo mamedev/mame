@@ -375,6 +375,9 @@ private:
 	// Signals to abort writing
 	bool m_stopwrite;
 
+	// Flag to remember whether we found the first sector during a physical access
+	bool m_first_sector_found;
+
 	// Used for formatting
 	int m_sector_count;
 	int m_sector_size;
