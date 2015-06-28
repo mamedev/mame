@@ -159,9 +159,16 @@ const rgbaint_t::VECS16 rgbaint_t::scale_table[256] = {
 
 void rgbaint_t::blend(const rgbaint_t& other, UINT8 factor)
 {
-	m_value = vec_mergeh(m_value, other.m_value);
-	m_value = vec_msum((VECS16)m_value, scale_table[factor], vec_splat_s32(0));
-	m_value = vec_sr(m_value, vec_splat_u32(8));
+	const VECU32 shift = vec_splat_u32(-16);
+	const VECS32 scale1 = { factor, factor, factor, factor };
+	const VECS32 scale2 = { 0x100 - factor, 0x100 - factor, 0x100 - factor, 0x100 - factor, };
+
+	VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(scale1, shift), vec_splat_u32(0));
+	temp = vec_msum((VECU16)other.m_value, (VECU16)vec_rl(scale2, shift), temp);
+
+	m_value = vec_msum((VECU16)m_value, (VECU16)scale1, vec_mulo((VECU16)other.m_value, (VECU16)scale2));
+	m_value = vec_add(vec_sl(temp, shift), (VECU32)m_value);
+	sra(8);
 }
 
 void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
