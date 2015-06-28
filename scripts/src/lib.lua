@@ -412,3 +412,4 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/itt3030_dsk.c",
 		MAME_DIR .. "src/lib/formats/itt3030_dsk.h",
 	}
+
