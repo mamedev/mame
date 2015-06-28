@@ -7,18 +7,19 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cmath>
 #include "nl_convert.h"
 
 template<typename Class>
 static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
 {
 	plist_t<int> ret(sl.size());
-	for (int i=0; i<sl.size(); i++)
+	for (unsigned i=0; i<sl.size(); i++)
 		ret[i] = i;
 
-	for(int i=0; i < sl.size()-1;i++)
+	for(unsigned i=0; i < sl.size(); i++)
 	{
-		for(int j=i+1; j < sl.size(); j++)
+		for(unsigned j=i+1; j < sl.size(); j++)
 		{
 			if(sl[ret[i]]->name() > sl[ret[j]]->name())
 			{
@@ -44,7 +45,7 @@ void nl_convert_base_t::out(const char *format, ...)
 
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
-	m_pins.add(palloc(pin_alias_t, devname + "." + name, devname + "." + alias), false);
+	m_pins.add(palloc(pin_alias_t(devname + "." + name, devname + "." + alias)), false);
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
@@ -54,15 +55,15 @@ void nl_convert_base_t::add_ext_alias(const pstring &alias)
 
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, const pstring &amodel)
 {
-	m_devs.add(palloc(dev_t, atype, aname, amodel), false);
+	m_devs.add(palloc(dev_t(atype, aname, amodel)), false);
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, double aval)
 {
-	m_devs.add(palloc(dev_t, atype, aname, aval), false);
+	m_devs.add(palloc(dev_t(atype, aname, aval)), false);
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 {
-	m_devs.add(palloc(dev_t, atype, aname), false);
+	m_devs.add(palloc(dev_t(atype, aname)), false);
 }
 
 void nl_convert_base_t::add_term(pstring netname, pstring termname)
@@ -70,7 +71,7 @@ void nl_convert_base_t::add_term(pstring netname, pstring termname)
 	net_t * net = m_nets.find_by_name(netname);
 	if (net == NULL)
 	{
-		net = palloc(net_t, netname);
+		net = palloc(net_t(netname));
 		m_nets.add(net, false);
 	}
 
@@ -136,7 +137,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 		int i = 0;
 		while (m_units[i].m_unit != "-" )
 		{
-			if (m_units[i].m_mult <= nl_math::abs(val))
+			if (m_units[i].m_mult <= std::abs(val))
 				break;
 			i++;
 		}

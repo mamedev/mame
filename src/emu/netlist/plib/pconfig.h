@@ -27,6 +27,18 @@
 #include <cstddef>
 #endif
 
+
+//============================================================
+//  Standard defines
+//============================================================
+
+// prevent implicit copying
+#define P_PREVENT_COPYING(_name)          		\
+	private:                                    \
+		_name(const _name &);                   \
+		_name &operator=(const _name &);
+
+
 //============================================================
 //  Compiling standalone
 //============================================================

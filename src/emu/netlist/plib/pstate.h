@@ -24,9 +24,9 @@
 	template<typename C> ATTR_COLD void obj::save(C &state, const pstring &stname) \
 	{ manager->save_item(state, this, module + "." + stname); } \
 	template<typename C, std::size_t N> ATTR_COLD void obj::save(C (&state)[N], const pstring &stname) \
-	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false); } \
+	{ manager->save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false); } \
 	template<typename C> ATTR_COLD void obj::save(C *state, const pstring &stname, const int count) \
-	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(C), count, state, false);   }
+	{ manager->save_state_ptr(module + "." + stname, pstate_datatype<C>::type, this, sizeof(C), count, state, false);   }
 
 enum pstate_data_type_e {
 	NOT_SUPPORTED,
@@ -40,13 +40,13 @@ enum pstate_data_type_e {
 	DT_FLOAT
 };
 
-template<typename _ItemType> struct nl_datatype
+template<typename _ItemType> struct pstate_datatype
 {
 	static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
 	static const bool is_ptr = false;
 };
 
-template<typename _ItemType> struct nl_datatype<_ItemType *>
+template<typename _ItemType> struct pstate_datatype<_ItemType *>
 {
 	static const pstate_data_type_e type = pstate_data_type_e(NOT_SUPPORTED);
 	static const bool is_ptr = true;
@@ -55,8 +55,8 @@ template<typename _ItemType> struct nl_datatype<_ItemType *>
 //template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
 
 #define NETLIST_SAVE_TYPE(TYPE, TYPEDESC) \
-		template<> struct nl_datatype<TYPE>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = false;}; \
-		template<> struct nl_datatype<TYPE *>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = true;}
+		template<> struct pstate_datatype<TYPE>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = false;}; \
+		template<> struct pstate_datatype<TYPE *>{ static const pstate_data_type_e type = pstate_data_type_e(TYPEDESC); static const bool is_ptr = true;}
 
 NETLIST_SAVE_TYPE(char, DT_INT8);
 NETLIST_SAVE_TYPE(double, DT_DOUBLE);
@@ -128,26 +128,25 @@ public:
 
 	template<typename C> ATTR_COLD void save_item(C &state, const void *owner, const pstring &stname)
 	{
-		save_state_ptr(stname, nl_datatype<C>::type, owner, sizeof(C), 1, &state, nl_datatype<C>::is_ptr);
+		save_state_ptr(stname, pstate_datatype<C>::type, owner, sizeof(C), 1, &state, pstate_datatype<C>::is_ptr);
 	}
 
 	template<typename C, std::size_t N> ATTR_COLD void save_item(C (&state)[N], const void *owner, const pstring &stname)
 	{
-		save_state_ptr(stname, nl_datatype<C>::type, owner, sizeof(state[0]), N, &(state[0]), false);
+		save_state_ptr(stname, pstate_datatype<C>::type, owner, sizeof(state[0]), N, &(state[0]), false);
 	}
 
 	template<typename C> ATTR_COLD void save_item(C *state, const void *owner, const pstring &stname, const int count)
 	{
-		save_state_ptr(stname, nl_datatype<C>::type, owner, sizeof(C), count, state, false);
+		save_state_ptr(stname, pstate_datatype<C>::type, owner, sizeof(C), count, state, false);
 	}
 
 	ATTR_COLD void pre_save();
 	ATTR_COLD void post_load();
 	ATTR_COLD void remove_save_items(const void *owner);
 
-	inline const pstate_entry_t::list_t &save_list() const { return m_save; }
+	const pstate_entry_t::list_t &save_list() const { return m_save; }
 
-	// FIXME: should be protected
 	ATTR_COLD void save_state_ptr(const pstring &stname, const pstate_data_type_e, const void *owner, const int size, const int count, void *ptr, bool is_ptr);
 
 protected:

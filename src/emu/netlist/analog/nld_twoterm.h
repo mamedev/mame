@@ -217,8 +217,6 @@ public:
 
 	ATTR_HOT inline void update_diode(const nl_double nVd)
 	{
-		//FIXME: Optimize cutoff case
-
 		if (nVd < NL_FCONST(-5.0) * m_Vt)
 		{
 			m_Vd = nVd;
@@ -227,16 +225,14 @@ public:
 		}
 		else if (nVd < m_Vcrit)
 		{
+			const nl_double eVDVt = nl_math::exp(nVd * m_VtInv);
 			m_Vd = nVd;
-
-			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
 			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
 		else
 		{
-			nl_double a = (nVd - m_Vd) * m_VtInv;
-			if (a < NL_FCONST(1e-12) - NL_FCONST(1.0)) a = NL_FCONST(1e-12) - NL_FCONST(1.0);
+			const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(1e-12) - NL_FCONST(1.0));
 			m_Vd = m_Vd + nl_math::e_log1p(a) * m_Vt;
 
 			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);

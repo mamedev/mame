@@ -43,8 +43,8 @@ void NETLIB_NAME(VCCS)::start_internal(const nl_double def_RI)
 	m_ON.m_otherterm = &m_IP;
 	m_ON1.m_otherterm = &m_IN;
 
-	connect(m_OP, m_OP1);
-	connect(m_ON, m_ON1);
+	connect_late(m_OP, m_OP1);
+	connect_late(m_ON, m_ON1);
 }
 
 NETLIB_RESET(VCCS)
@@ -70,7 +70,6 @@ NETLIB_UPDATE_PARAM(VCCS)
 NETLIB_UPDATE(VCCS)
 {
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
-	/* Big FIXME ... */
 	if (!m_IP.net().isRailNet())
 		m_IP.schedule_solve();
 	else if (!m_IN.net().isRailNet())
@@ -122,8 +121,8 @@ NETLIB_START(VCVS)
 	m_OP2.m_otherterm = &m_ON2;
 	m_ON2.m_otherterm = &m_OP2;
 
-	connect(m_OP2, m_OP1);
-	connect(m_ON2, m_ON1);
+	connect_late(m_OP2, m_OP1);
+	connect_late(m_ON2, m_ON1);
 }
 
 NETLIB_RESET(VCVS)

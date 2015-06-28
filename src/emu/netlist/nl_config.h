@@ -136,12 +136,6 @@
 #define HAS_OPENMP (0)
 #endif
 
-// prevent implicit copying
-#define NETLIST_PREVENT_COPYING(_name)          \
-	private:                                    \
-		_name(const _name &);                   \
-		_name &operator=(const _name &);
-
 //============================================================
 //  Performance tracking
 //============================================================

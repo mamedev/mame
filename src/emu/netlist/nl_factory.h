@@ -22,7 +22,7 @@ namespace netlist
 
 	class base_factory_t
 	{
-		NETLIST_PREVENT_COPYING(base_factory_t)
+		P_PREVENT_COPYING(base_factory_t)
 	public:
 		ATTR_COLD base_factory_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
@@ -48,7 +48,7 @@ namespace netlist
 	template <class C>
 	class factory_t : public base_factory_t
 	{
-		NETLIST_PREVENT_COPYING(factory_t)
+		P_PREVENT_COPYING(factory_t)
 	public:
 		ATTR_COLD factory_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
@@ -74,7 +74,7 @@ namespace netlist
 		ATTR_COLD void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			m_list.add(palloc(factory_t< _C >, name, classname, def_param));
+			m_list.add(palloc(factory_t< _C >(name, classname, def_param)));
 		}
 
 		ATTR_COLD void register_device(base_factory_t *factory)

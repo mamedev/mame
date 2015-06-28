@@ -228,7 +228,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 		else
 		{
 			t->m_nzrd = m_terms[k-1]->m_nzrd;
-			int j=0;
+			unsigned j=0;
 			while(j < t->m_nzrd.size())
 			{
 				if (t->m_nzrd[j] < k + 1)
@@ -242,7 +242,7 @@ ATTR_COLD void matrix_solver_direct_t<m_N, _storage_N>::vsetup(analog_net_t::lis
 		{
 			for (unsigned i = 0; i < t->m_railstart; i++)
 			{
-				if (!t->m_nzrd.contains(other[i]) && other[i] >= k + 1)
+				if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
 					t->m_nzrd.add(other[i]);
 				if (!t->m_nz.contains(other[i]))
 					t->m_nz.add(other[i]);
@@ -373,7 +373,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 		/* FIXME: Singular matrix? */
 		const nl_double f = 1.0 / m_A[i][i];
 		const double * RESTRICT s = &m_A[i][0];
-		const int *p = m_terms[i]->m_nzrd.data();
+		const unsigned *p = m_terms[i]->m_nzrd.data();
 		const unsigned e = m_terms[i]->m_nzrd.size();
 
 		/* Eliminate column i from row j */
@@ -430,7 +430,7 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 			tmp += A[k] * xp[k];
 #else
 		const double * RESTRICT A = &m_A[j][0];
-		const int *p = m_terms[j]->m_nzrd.data();
+		const unsigned *p = m_terms[j]->m_nzrd.data();
 		const unsigned e = m_terms[j]->m_nzrd.size();
 
 		for (unsigned k = 0; k < e; k++)
@@ -447,9 +447,9 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 	}
 #if 0
 	printf("Solution:\n");
-	for (int i = 0; i < N(); i++)
+	for (unsigned i = 0; i < N(); i++)
 	{
-		for (int k = 0; k < N(); k++)
+		for (unsigned k = 0; k < N(); k++)
 			printf("%f ", m_A[i][k]);
 		printf("| %f = %f \n", x[i], m_RHS[i]);
 	}

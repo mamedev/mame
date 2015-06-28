@@ -119,10 +119,6 @@ NETLIB_UPDATE(R)
 
 NETLIB_UPDATE_PARAM(R)
 {
-	//printf("updating %s to %f\n", name().cstr(), m_R.Value());
-
-	// FIXME: Only attached nets should be brought up to current time
-	//netlist().solver()->update_to_current_time(); // bring up current time
 	update_dev();
 	if (m_R.Value() > 1e-9)
 		set_R(m_R.Value());
@@ -143,7 +139,7 @@ NETLIB_START(POT)
 	register_subalias("2", m_R1.m_N);
 	register_subalias("3", m_R2.m_N);
 
-	connect(m_R2.m_P, m_R1.m_N);
+	connect_late(m_R2.m_P, m_R1.m_N);
 
 	register_param("R", m_R, 1.0 / netlist().gmin());
 	register_param("DIAL", m_Dial, 0.5);
@@ -168,9 +164,6 @@ NETLIB_UPDATE_PARAM(POT)
 	nl_double v = m_Dial.Value();
 	if (m_DialIsLog.Value())
 		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
-
-	// FIXME: Only attached nets should be brought up to current time
-	//netlist().solver()->update_to_current_time(); // bring up current time
 
 	m_R1.update_dev();
 	m_R2.update_dev();
@@ -216,9 +209,6 @@ NETLIB_UPDATE_PARAM(POT2)
 		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
 	if (m_Reverse.Value())
 		v = 1.0 - v;
-
-	// FIXME: Only attached nets should be brought up to current time
-	//netlist().solver()->update_to_current_time(); // bring up current time
 
 	m_R1.update_dev();
 

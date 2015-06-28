@@ -50,7 +50,7 @@ void initialize_factory(factory_list_t &factory)
 	ENTRY(POT2,                 POT2,                   "R")
 	ENTRY(C,                    CAP,                    "C")
 	ENTRY(D,                    DIODE,                  "model")
-	ENTRY(VCVS,                 VCVS,                   "-")        // FIXME: STD parameters ?
+	ENTRY(VCVS,                 VCVS,                   "-")
 	ENTRY(VCCS,                 VCCS,                   "-")
 	ENTRY(CCCS,                 CCCS,                   "-")
 	ENTRY(dummy_input,          DUMMY_INPUT,            "-")
