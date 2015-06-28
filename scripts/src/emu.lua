@@ -425,7 +425,6 @@ function emuProject(_target, _subtarget)
 
 	dofile(path.join("src", "bus.lua"))
 	
-
 	project ("dasm")
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
 	kind (LIBTYPE)
