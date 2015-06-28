@@ -1131,13 +1131,20 @@ ROM_START( doncdoon )
 	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
-
+/* Mayjinsen 3
+ * PCB marking: "SeTa // 3D Rom PCB-2A // SETA CORPORATION // MADE IN JAPAN"
+ * PCB has:
+ * U1 CIC-NUS; CIC-NUS-5101 security chip (Sharp SM5K3 MCU)
+ * U2 BU9850; BU9850 4k Serial EEPROM (Rohm, proprietary/custom part?)
+ * U3 NUS64M: "MXC991789M // MX23L6402-35A // NUS-ZSCJ-0 // 1Q4787A2" Macronix custom latchable self-addressable mask rom
+ * Internal checksum is verified to match rom dump
+ */
 ROM_START( mayjin3 )
 	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
 	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
-	ROM_LOAD16_WORD_SWAP( "nus-zscj.u3", 0x000000, 0x800000, CRC(8b36eb91) SHA1(179745625c16c6813d5f8d29bfd7628783d55806) )
+	ROM_LOAD16_WORD_SWAP( "nus-zscj-0.u3", 0x000000, 0x800000, CRC(52a37340) SHA1(b5834bfde5b8a7e20415b2593abd76ec95ab27c7) ) // U3 NUS64M
 
 	ROM_REGION16_BE( 0x80, "normpoint", 0 )
 	ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
@@ -1163,4 +1170,4 @@ GAME( 2003, twrshaft, aleck64,  aleck64, twrshaft, aleck64_state, aleck64, ROT0,
 GAME( 2003, hipai,    aleck64,  aleck64, hipai, aleck64_state,    aleck64, ROT0, "Aruze / Seta", "Hi Pai Paradise", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 2003, doncdoon, aleck64,  aleck64, doncdoon, aleck64_state, aleck64, ROT0, "Aruze", "Hanabi de Doon! - Don-chan Puzzle", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 2003, kurufev,  aleck64,  aleck64, kurufev, aleck64_state,  aleck64, ROT0, "Aruze / Takumi", "Kurukuru Fever", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
