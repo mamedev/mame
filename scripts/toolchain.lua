@@ -827,15 +827,15 @@ function toolchain(_buildDir, _subDir)
 		objdir (_buildDir .. "rpi" .. "/obj")
 
 	-- BEGIN libretro overrides to MAME's GENie build
-	configuration { "libretrodb" }
-		targetdir (_buildDir .. "libretro" .. "/debug")
-		objdir (_buildDir .. "libretro" .. "/debug")
+	configuration { "libretrodbg" }
+		targetdir (_buildDir .. _ACTION .. "/libretro/debug")
+		objdir (_buildDir .. _ACTION .. "/libretro/debug")
 		flags {
 			"Symbols",
 		}
 	configuration { "libretro" }
-		targetdir (_buildDir .. "libretro" .. "/release")
-		objdir (_buildDir .. "libretro" .. "/release")
+		targetdir (_buildDir .. _ACTION .. "/libretro/release")
+		objdir (_buildDir .. _ACTION .. "/libretro/release")
 		flags {
 			"Optimize",
 		}
