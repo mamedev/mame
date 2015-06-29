@@ -1847,16 +1847,13 @@ void ui_menu::draw_palette_menu()
 		else
 		{
 			const char *subitem_text = pitem.subtext;
-//			float item_width;
 			rgb_t color = rgb_t((UINT32)strtoul(subitem_text, NULL, 16));
 
 			// draw the left-side text
 			machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-//						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, NULL);
 						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 
 			// give 2 spaces worth of padding
-//			item_width += 2.0f * gutter_width;
 			float subitem_width = machine().ui().get_string_width("FF00FF00");
 
 			machine().ui().draw_outlined_box(container, effective_left + effective_width - subitem_width, line_y0,
