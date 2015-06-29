@@ -142,9 +142,6 @@ private:
 	// Recent address
 	int m_address;
 
-	// DMA in progress
-	bool m_dma_in_progress;
-
 	// Device Service Routine ROM (firmware)
 	UINT8*  m_dsrrom;
 
