@@ -65,7 +65,7 @@ void ui_menu_palette_sel::handle()
 void ui_menu_palette_sel::populate()
 {
 	for (int x = 0; x < ARRAY_LENGTH(m_palette); ++x)
-		item_append(m_palette[x].m_name, m_palette[x].m_argb, MENU_FLAG_MEWUI_PALETTE, (void *)(FPTR)x);
+		item_append(m_palette[x].m_name, m_palette[x].m_argb, MENU_FLAG_MEWUI_PALETTE, (void *)(FPTR)(x + 1));
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 }
