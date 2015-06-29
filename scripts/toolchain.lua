@@ -849,6 +849,7 @@ function toolchain(_buildDir, _subDir)
 			}
 		end
 		USE_BGFX = 0
+		_OPTIONS["NO_USE_MIDI"] = "1"
 	-- END libretro overrides to MAME's GENie build
 
 	configuration {} -- reset configuration
