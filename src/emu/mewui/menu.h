@@ -54,6 +54,9 @@ private:
 	// draw game list
 	void draw_select_game();
 
+	// draw game list
+	void draw_palette_menu();
+
 	void get_title_search(std::string &title, std::string &search);
 
 	// handle keys

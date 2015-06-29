@@ -21,6 +21,7 @@
 #define MENU_FLAG_MEWUI_HISTORY  (1 << 7)
 #define MENU_FLAG_MEWUI_SWLIST   (1 << 8)
 #define MENU_FLAG_MEWUI_FAVORITE (1 << 9)
+#define MENU_FLAG_MEWUI_PALETTE  (1 << 10)
 #define MAX_CHAR_INFO            256
 #define CR                       0x0d   //  '\n' and '\r' meanings are swapped in some
 #define LF                       0x0a   //  compilers (e.g., Mac compilers)

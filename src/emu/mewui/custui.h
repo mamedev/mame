@@ -20,7 +20,7 @@
 
 struct s_color_table
 {
-	rgb_t      color;
+	rgb_t       color;
 	const char  *option;
 };
 
@@ -98,8 +98,8 @@ private:
 
 #ifdef MEWUI_WINDOWS
 	c_uifonts m_class;
-	void list();
-	bool m_bold, m_italic;
+	void      list();
+	bool      m_bold, m_italic;
 #endif
 
 	float info_min_size, info_max_size, info_size;
@@ -138,10 +138,10 @@ public:
 
 private:
 
-	rgb_t          *color;
+	rgb_t           *color;
 	char            m_search[4];
 	bool            key_active;
-	int          lock_ref;
+	int             lock_ref;
 	std::string     title;
 
 	enum
@@ -149,7 +149,8 @@ private:
 		RGB_ALPHA = 1,
 		RGB_RED,
 		RGB_GREEN,
-		RGB_BLUE
+		RGB_BLUE,
+		PALETTE_CHOOSE
 	};
 
 	void inkey_special(const ui_menu_event *menu_event);

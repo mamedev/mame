@@ -11,6 +11,7 @@
 #include "mewui/utils.h"
 #include "mewui/selector.h"
 #include "mewui/custui.h"
+#include "mewui/palsel.h"
 
 /***************************************************************************
     CUSTOM UI CLASS
@@ -690,6 +691,7 @@ void ui_menu_rgb_ui::handle()
 		menu_event = process(UI_MENU_PROCESS_ONLYCHAR);
 
 	if (menu_event != NULL && menu_event->itemref != NULL)
+	{
 		switch ((FPTR)menu_event->itemref)
 		{
 			case RGB_ALPHA:
@@ -775,7 +777,13 @@ void ui_menu_rgb_ui::handle()
 				}
 
 				break;
+
+			case PALETTE_CHOOSE:
+				if (menu_event->iptkey == IPT_UI_SELECT)
+					ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_palette_sel(machine(), container, *color)));
+				break;
 		}
+	}
 
 	if (changed)
 		reset(UI_MENU_RESET_REMEMBER_REF);
@@ -829,6 +837,8 @@ void ui_menu_rgb_ui::populate()
 		item_append("Blue", s_text.c_str(), 0, (void *)RGB_BLUE);
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	item_append("Choose from palette", NULL, 0, (void *)PALETTE_CHOOSE);
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
@@ -843,7 +853,7 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	float x1, x2, y1, y2, width, maxwidth;
 
 	// top text
-	std::string topbuf = std::string(title).append(" - RGB Settings");
+	std::string topbuf = std::string(title).append(" - ARGB Settings");
 
 	maxwidth = origx2 - origx1;
 
@@ -870,7 +880,7 @@ void ui_menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, f
 	machine().ui().draw_text_full(container, topbuf.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
 									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
-	std::string sampletxt("Color preview");
+	std::string sampletxt("Color preview =");
 
 	maxwidth = origx2 - origx1;
 	machine().ui().draw_text_full(container, sampletxt.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,

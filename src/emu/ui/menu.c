@@ -279,6 +279,8 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 		draw_text_box();
 	else if ((item[0].flags & MENU_FLAG_MEWUI ) != 0 || (item[0].flags & MENU_FLAG_MEWUI_SWLIST ) != 0)
 		draw_select_game();
+	else if ((item[0].flags & MENU_FLAG_MEWUI_PALETTE ) != 0)
+		draw_palette_menu();
 	else
 		draw(flags & UI_MENU_PROCESS_CUSTOM_ONLY);
 

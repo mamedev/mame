@@ -72,7 +72,6 @@ void save_game_options(running_machine &machine)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
 	if (file.open(emulator_info::get_configname(), ".ini") == FILERR_NONE)
 	{
 		// generate the updated INI
@@ -80,7 +79,6 @@ void save_game_options(running_machine &machine)
 		file.puts(machine.options().output_ini(initext));
 		file.close();
 	}
-
 	else
 		popmessage("**Error to save %s.ini**", emulator_info::get_configname());
 }
@@ -96,7 +94,6 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 	strcatprintf(buffer, "Manufacturer: %-.100s\n", driver->manufacturer);
 
 	int cloneof = driver_list::non_bios_clone(*driver);
-
 	if (cloneof != -1)
 		strcatprintf(buffer, "Driver is Clone of: %-.100s\n", driver_list::driver(cloneof).description);
 	else
@@ -234,25 +231,21 @@ void save_custom_filters(running_machine &machine)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
 	{
 		// generate custom filters info
 		std::string cinfo;
-		strcatprintf(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
-		cinfo.append("Main filter = ").append(mewui_globals::filter_text[FILTER_ALL + custfltr::main_filter]).append("\n");
+		strprintf(cinfo, "Total filters = %d\n", (custfltr::numother + 1));
+		cinfo.append("Main filter = ").append(mewui_globals::filter_text[custfltr::main_filter]).append("\n");
 
 		for (int x = 1; x <= custfltr::numother; x++)
 		{
-			cinfo.append("Other filter = ").append(mewui_globals::filter_text[FILTER_ALL + custfltr::other[x]]).append("\n");
-
+			cinfo.append("Other filter = ").append(mewui_globals::filter_text[custfltr::other[x]]).append("\n");
 			if (custfltr::other[x] == FILTER_MANUFACTURER)
 				cinfo.append("  Manufacturer filter = ").append(c_mnfct::ui[custfltr::mnfct[x]]).append("\n");
-
 			else if (custfltr::other[x] == FILTER_YEAR)
 				cinfo.append("  Year filter = ").append(c_year::ui[custfltr::year[x]]).append("\n");
 		}
-
 		file.puts(cinfo.c_str());
 		file.close();
 	}
@@ -266,7 +259,6 @@ void load_custom_filters(running_machine &machine)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_READ);
-
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == FILERR_NONE)
 	{
 		char buffer[MAX_CHAR_INFO];
@@ -295,7 +287,6 @@ void load_custom_filters(running_machine &machine)
 				if (!strncmp(cb, mewui_globals::filter_text[y], strlen(mewui_globals::filter_text[y])))
 				{
 					custfltr::other[x] = y;
-
 					if (y == FILTER_MANUFACTURER)
 					{
 						file.gets(buffer, MAX_CHAR_INFO);
@@ -304,7 +295,6 @@ void load_custom_filters(running_machine &machine)
 							if (!strncmp(ab, c_mnfct::ui[z].c_str(), c_mnfct::ui[z].length()))
 								custfltr::mnfct[x] = z;
 					}
-
 					else if (y == FILTER_YEAR)
 					{
 						file.gets(buffer, MAX_CHAR_INFO);
@@ -366,7 +356,6 @@ void mewui_globals::save_available_machines(running_machine &machine, std::vecto
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
 	if (file.open(emulator_info::get_configname(), "_avail.ini") == FILERR_NONE)
 	{
 		std::string filename(file.fullpath());
@@ -377,32 +366,26 @@ void mewui_globals::save_available_machines(running_machine &machine, std::vecto
 		// generate header
 		std::string buffer = std::string("#\n# MEWUI INFO ").append(mewui_version).append("\n#\n\n");
 		myfile << buffer;
-		myfile << (int)available.size();
-		myfile << space;
-		myfile << (int)unavailable.size();
-		myfile << space;
+		myfile << (int)available.size() << space;
+		myfile << (int)unavailable.size() << space;
 		int find = 0;
 
 		// generate available list
 		for (int x = 0; x < available.size(); ++x)
 		{
 			find = driver_list::find(available[x]->name);
-			myfile << find;
-			myfile << space;
+			myfile << find << space;
 			find = driver_list::find(availablesorted[x]->name);
-			myfile << find;
-			myfile << space;
+			myfile << find << space;
 		}
 
 		// generate unavailable list
 		for (int x = 0; x < unavailable.size(); ++x)
 		{
 			find = driver_list::find(unavailable[x]->name);
-			myfile << find;
-			myfile << space;
+			myfile << find << space;
 			find = driver_list::find(unavailablesorted[x]->name);
-			myfile << find;
-			myfile << space;
+			myfile << find << space;
 		}
 		myfile.close();
 	}
@@ -444,31 +427,24 @@ bool mewui_globals::load_available_machines(running_machine &machine, std::vecto
 
 	UINT8 space = 0;
 	int avsize, unavsize;
-	myfile >> avsize;
-	myfile >> space;
-	myfile >> unavsize;
-	myfile >> space;
+	myfile >> avsize >> space >> unavsize >> space;
 	int find = 0;
 
 	// load available list
 	for (int x = 0; x < avsize; ++x)
 	{
-		myfile >> find;
-		myfile >> space;
+		myfile >> find >> space;
 		available.push_back(&driver_list::driver(find));
-		myfile >> find;
-		myfile >> space;
+		myfile >> find >> space;
 		availablesorted.push_back(&driver_list::driver(find));
 	}
 
 	// load unavailable list
 	for (int x = 0; x < unavsize; ++x)
 	{
-		myfile >> find;
-		myfile >> space;
+		myfile >> find >> space;
 		unavailable.push_back(&driver_list::driver(find));
-		myfile >> find;
-		myfile >> space;
+		myfile >> find >> space;
 		unavailablesorted.push_back(&driver_list::driver(find));
 	}
 	myfile.close();

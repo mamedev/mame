@@ -1670,3 +1670,203 @@ void ui_menu::info_arrow(int ub, float origx1, float origx2, float oy1, float li
 	draw_arrow(container, 0.5f * (origx1 + origx2) - 0.5f * (ud_arrow_width * text_size), oy1 + 0.25f * (line_height * text_size),
 				0.5f * (origx1 + origx2) + 0.5f * (ud_arrow_width * text_size), oy1 + 0.75f * (line_height * text_size), fgcolor, orientation);
 }
+
+//-------------------------------------------------
+//  draw - draw a menu
+//-------------------------------------------------
+
+void ui_menu::draw_palette_menu()
+{
+	float line_height = machine().ui().get_line_height();
+	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
+	float ud_arrow_width = line_height * machine().render().ui_aspect();
+	float gutter_width = lr_arrow_width * 1.3f;
+	int itemnum, linenum;
+	bool mouse_hit, mouse_button;
+	float mouse_x = -1, mouse_y = -1;
+
+	if (machine().options().use_background_image() && machine().options().system() == NULL && bgrnd_bitmap->valid())
+		container->add_quad(0.0f, 0.0f, 1.0f, 1.0f, ARGB_WHITE, bgrnd_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	// compute the width and height of the full menu
+	float visible_width = 0;
+	float visible_main_menu_height = 0;
+	for (itemnum = 0; itemnum < item.size(); itemnum++)
+	{
+		const ui_menu_item &pitem = item[itemnum];
+
+		// compute width of left hand side
+		float total_width = gutter_width + machine().ui().get_string_width(pitem.text) + gutter_width;
+
+		// add in width of right hand side
+		if (pitem.subtext)
+			total_width += 2.0f * gutter_width + machine().ui().get_string_width(pitem.subtext);
+
+		// track the maximum
+		if (total_width > visible_width)
+			visible_width = total_width;
+
+		// track the height as well
+		visible_main_menu_height += line_height;
+	}
+
+	// account for extra space at the top and bottom
+	float visible_extra_menu_height = customtop + custombottom;
+
+	// add a little bit of slop for rounding
+	visible_width += 0.01f;
+	visible_main_menu_height += 0.01f;
+
+	// if we are too wide or too tall, clamp it down
+	if (visible_width + 2.0f * UI_BOX_LR_BORDER > 1.0f)
+		visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
+
+	// if the menu and extra menu won't fit, take away part of the regular menu, it will scroll
+	if (visible_main_menu_height + visible_extra_menu_height + 2.0f * UI_BOX_TB_BORDER > 1.0f)
+		visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
+
+	int visible_lines = floor(visible_main_menu_height / line_height);
+	visible_main_menu_height = (float)visible_lines * line_height;
+
+	// compute top/left of inner menu area by centering
+	float visible_left = (1.0f - visible_width) * 0.5f;
+	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+
+	// if the menu is at the bottom of the extra, adjust
+	visible_top += customtop;
+
+	// first add us a box
+	float x1 = visible_left - UI_BOX_LR_BORDER;
+	float y1 = visible_top - UI_BOX_TB_BORDER;
+	float x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
+	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+
+	// determine the first visible line based on the current selection
+	int top_line = selected - visible_lines / 2;
+	if (top_line < 0)
+		top_line = 0;
+	if (top_line + visible_lines >= item.size())
+		top_line = item.size() - visible_lines;
+
+	// determine effective positions taking into account the hilighting arrows
+	float effective_width = visible_width - 2.0f * gutter_width;
+	float effective_left = visible_left + gutter_width;
+
+	// locate mouse
+	mouse_hit = false;
+	mouse_button = false;
+	INT32 mouse_target_x, mouse_target_y;
+	render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
+	if (mouse_target != NULL)
+		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+			mouse_hit = true;
+
+	// loop over visible lines
+	hover = item.size() + 1;
+	float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+	float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+
+	for (linenum = 0; linenum < visible_lines; linenum++)
+	{
+		float line_y = visible_top + (float)linenum * line_height;
+		itemnum = top_line + linenum;
+		const ui_menu_item &pitem = item[itemnum];
+		const char *itemtext = pitem.text;
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
+		rgb_t fgcolor2 = UI_SUBITEM_COLOR;
+		rgb_t fgcolor3 = UI_CLONE_COLOR;
+		float line_y0 = line_y;
+		float line_y1 = line_y + line_height;
+
+		// set the hover if this is our item
+		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && pitem.is_selectable())
+			hover = itemnum;
+
+		// if we're selected, draw with a different background
+		if (itemnum == selected && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0)
+		{
+			fgcolor = UI_SELECTED_COLOR;
+			bgcolor = UI_SELECTED_BG_COLOR;
+			fgcolor2 = UI_SELECTED_COLOR;
+			fgcolor3 = UI_SELECTED_COLOR;
+		}
+
+		// else if the mouse is over this item, draw with a different background
+		else if (itemnum == hover && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) == 0)
+		{
+			fgcolor = UI_MOUSEOVER_COLOR;
+			bgcolor = UI_MOUSEOVER_BG_COLOR;
+			fgcolor2 = UI_MOUSEOVER_COLOR;
+			fgcolor3 = UI_MOUSEOVER_COLOR;
+		}
+
+		// if we have some background hilighting to do, add a quad behind everything else
+		if (bgcolor != UI_TEXT_BG_COLOR)
+			highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
+
+		// if we're on the top line, display the up arrow
+		if (linenum == 0 && top_line != 0)
+		{
+			draw_arrow(container,
+								0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+								line_y + 0.25f * line_height,
+								0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+								line_y + 0.75f * line_height,
+								fgcolor,
+								ROT0);
+			if (hover == itemnum)
+				hover = -2;
+		}
+
+		// if we're on the bottom line, display the down arrow
+		else if (linenum == visible_lines - 1 && itemnum != item.size() - 1)
+		{
+			draw_arrow(container,
+								0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+								line_y + 0.25f * line_height,
+								0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+								line_y + 0.75f * line_height,
+								fgcolor,
+								ROT0 ^ ORIENTATION_FLIP_Y);
+			if (hover == itemnum)
+				hover = -1;
+		}
+
+		// if we're just a divider, draw a line
+		else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
+			container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+		// if we don't have a subitem, just draw the string centered
+		else if (pitem.subtext == NULL)
+			machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
+						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+
+		// otherwise, draw the item on the left and the subitem text on the right
+		else
+		{
+			const char *subitem_text = pitem.subtext;
+//			float item_width;
+			rgb_t color = rgb_t((UINT32)strtoul(subitem_text, NULL, 16));
+
+			// draw the left-side text
+			machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
+//						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, NULL);
+						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+
+			// give 2 spaces worth of padding
+//			item_width += 2.0f * gutter_width;
+			float subitem_width = machine().ui().get_string_width("FF00FF00");
+
+			machine().ui().draw_outlined_box(container, effective_left + effective_width - subitem_width, line_y0,
+			                                 effective_left + effective_width, line_y1, color);
+		}
+	}
+
+	// if there is something special to add, do it by calling the virtual method
+	custom_render((selected >= 0 && selected < item.size()) ? item[selected].ref : NULL, customtop, custombottom, x1, y1, x2, y2);
+
+	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
+}

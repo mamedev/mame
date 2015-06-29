@@ -28,8 +28,6 @@
 
 ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-//  m_grouped = machine.options().ui_grouped();
-//  m_audit = machine.options().audit_mode();
 }
 
 //-------------------------------------------------
@@ -38,9 +36,6 @@ ui_menu_game_options::ui_menu_game_options(running_machine &machine, render_cont
 
 ui_menu_game_options::~ui_menu_game_options()
 {
-	std::string error_string;
-//  machine().options().set_value(OPTION_GROUPED, m_grouped, OPTION_PRIORITY_CMDLINE, error_string);
-//  machine().options().set_value(OPTION_AUDIT_MODE, m_audit, OPTION_PRIORITY_CMDLINE, error_string);
 	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
 	save_game_options(machine());
 	mewui_globals::switch_image = true;
