@@ -50,10 +50,11 @@ void ui_menu_palette_sel::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
+		{
 			m_original = rgb_t((UINT32)strtoul(item[selected].subtext, NULL, 16));
-
-		ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
-		ui_menu::stack_pop(machine());
+			ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
+			ui_menu::stack_pop(machine());
+		}
 	}
 }
 

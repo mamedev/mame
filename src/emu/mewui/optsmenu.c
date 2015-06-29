@@ -272,7 +272,6 @@ void ui_menu_game_options::populate()
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	// add options items
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Customize UI", NULL, 0, (void *)CUSTOM_MENU);
 	item_append("Display Options", NULL, 0, (void *)DISPLAY_MENU);
 	item_append("Sound Options", NULL, 0, (void *)SOUND_MENU);
