@@ -488,7 +488,7 @@ protected:
 	typedef __vector signed int     VECS32;
 	typedef __vector unsigned int   VECU32;
 
-	vector VECS32                   m_value;
+	VECS32                          m_value;
 
 	static const VECU8              alpha_perm;
 	static const VECU8              red_perm;
