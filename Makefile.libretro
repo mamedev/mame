@@ -54,6 +54,9 @@ REGENIE ?= 1
 # Spew much output developers need if MAME's build breaks for some reason
 VERBOSE ?= 1
 
+# You probably shouldn't need to set this anymore (find libretro section of
+# scripts/toolchain.lua)
+# PTR64 = 1
 
 ###########################################################################
 #

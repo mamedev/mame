@@ -827,16 +827,6 @@ function toolchain(_buildDir, _subDir)
 		objdir (_buildDir .. "rpi" .. "/obj")
 
 	-- BEGIN libretro overrides to MAME's GENie build
-	configuration { "libretrodbg" }
-		targetdir (_buildDir .. _ACTION .. "/libretro/debug")
-		flags {
-			"Symbols",
-		}
-	configuration { "libretro" }
-		targetdir (_buildDir .. _ACTION .. "/libretro/release")
-		flags {
-			"Optimize",
-		}
 	configuration { "libretro*" }
 		objdir (_buildDir .. _ACTION .. "/libretro/obj")
 
@@ -894,6 +884,16 @@ function toolchain(_buildDir, _subDir)
 		-- libretro does not (yet) support MIDI.
 		_OPTIONS["NO_USE_MIDI"] = "1"
 
+	configuration { "libretrodbg" }
+		targetdir (_buildDir .. _ACTION .. "/libretro/debug")
+		flags {
+			"Symbols",
+		}
+	configuration { "libretro" }
+		targetdir (_buildDir .. _ACTION .. "/libretro/release")
+		flags {
+			"Optimize",
+		}
 	-- END libretro overrides to MAME's GENie build
 
 	configuration {} -- reset configuration
