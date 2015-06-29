@@ -22,8 +22,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		"ForceCPP",
 	}
 
-	_OPTIONS["NO_USE_MIDI"] = "1"
-
 	dofile("retro_cfg.lua")
 
 	includedirs {
