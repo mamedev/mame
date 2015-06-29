@@ -72,9 +72,6 @@ function mainProject(_target, _subtarget)
 		end
 
 	configuration { "mingw*" or "vs*" }
-	-- BEGIN libretro overrides to MAME's GENie build
-	configuration { not "libretrodso" and "mingw*" or "vs*" }
-	-- END libretro overrides to MAME's GENie build
 		targetextension ".exe"
 
 	configuration { "asmjs" }
