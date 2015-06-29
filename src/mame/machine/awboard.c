@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "awboard.h"
+#include <algorithm>
 
 /*
 
@@ -70,6 +71,56 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
   from AW_MPR_FIRST_FILE_INDEX register. Cannot be used for reading EPR-ROM
   data nor even MPR-ROM file system sub-area data.
 
+ AW_PIO_DATA                                             Register addres: 0x5f7080
+ +-------------------------------------------------------------------------------+
+ |                                  bit15-0                                      |
+ +-------------------------------------------------------------------------------+
+ |                Read/Write word from/to ROM board address space                |
+ +-------------------------------------------------------------------------------+
+
+  Using this register data can be read or written to ROM BD at AW_EPR_OFFSET directly,
+  decryption is not used, flash ROMs (re)programming via CFI commands possible.
+
+  Type 2 ROM BD have MPR_BANK register at AW_EPR_OFFSET 007fffff, which selects
+  1 of 4 mask ROM banks.
+
+ROM board internal layouts:
+
+ Type 1:
+
+ 00000000 - 00800000 IC18 flash ROM
+ 00800000 - 01000000 unk, probably mirror of above
+ 01000000 - 02000000 IC10 \
+        .....               mask ROMs
+ 07000000 - 08000000 IC17 /
+
+ Type 2:
+
+ 00000000 - 00800000 FMEM1 flash ROM
+ 00800000 - 01000000 FMEM2 flash ROM
+ 01000000 - 02000000 unk, probably mirror of above
+ 02000000 - 04000000 MROM1 MROM4 MROM7 MROM10 \               
+ 04000000 - 06000000 MROM2 MROM5 MROM8 MROM11   banked mask ROMs
+ 06000000 - 08000000 MROM3 MROM6 MROM9 MROM12 /                
+
+ Type 3:
+
+ 00000000 - 01000000 U3  flash ROM
+ 01000000 - 02000000 U1  flash ROM
+ 02000000 - 03000000 U4  flash ROM
+ 03000000 - 04000000 U2  flash ROM
+ 04000000 - 05000000 U15 flash ROM
+ 05000000 - 06000000 U17 flash ROM
+ 06000000 - 07000000 U14 flash ROM
+ 07000000 - 08000000 U16 flash ROM
+
+ Development:
+
+ 00000000 - 00800000 IC12 \          
+        .....               flash ROMs
+ 07800000 - 08000000 IC27 /          
+
+ 
  In short:
 
      EPR-ROM
@@ -116,7 +167,6 @@ ADDRESS_MAP_END
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__)
 {
-	region_is_decrypted = false;
 	keyregion = 0;
 }
 
@@ -188,7 +238,7 @@ UINT16 aw_rom_board::decrypt(UINT16 cipherText, UINT32 address, const UINT32 key
 	aux = BITSWAP16(cipherText,
 					pbox[15],pbox[14],pbox[13],pbox[12],pbox[11],pbox[10],pbox[9],pbox[8],
 					pbox[7],pbox[6],pbox[5],pbox[4],pbox[3],pbox[2],pbox[1],pbox[0]);
-	aux = aux ^ BITSWAP16(address >> 1, 13,5,2, 14,10,9,4, 15,11,6,1, 12,8,7,3,0);
+	aux = aux ^ BITSWAP16(address, 13,5,2, 14,10,9,4, 15,11,6,1, 12,8,7,3,0);
 
 	b0 = aux&0x1f;
 	b1 = (aux>>5)&0xf;
@@ -203,12 +253,8 @@ UINT16 aw_rom_board::decrypt(UINT16 cipherText, UINT32 address, const UINT32 key
 	return ((b3<<13)|(b2<<9)|(b1<<5)|b0)^(key&0xffff);
 }
 
-void aw_rom_board::decrypt_region()
+void aw_rom_board::set_key()
 {
-	if(region_is_decrypted)
-		return;
-	region_is_decrypted = true;
-
 	if(!m_region)
 		throw emu_fatalerror("AW-ROM-BOARD: region %s is missing\n", tag());
 
@@ -223,17 +269,15 @@ void aw_rom_board::decrypt_region()
 		throw emu_fatalerror("AW-ROM-BOARD: key region %s has incorrect size (%d, expected 4)\n", keyregion, kr->bytes());
 
 	const UINT8 *krp = kr->base();
-	UINT32 key = (krp[0] << 24) | (krp[1] << 16) | (krp[2] << 8) | krp[3];
-	UINT16 *src = (UINT16 *)m_region->base();
-	UINT32 rom_size = m_region->bytes();
-	for(UINT32 i=0; i<rom_size/2; i++)
-		src[i] = decrypt(src[i], i*2, key);
+	rombd_key = (krp[0] << 24) | (krp[1] << 16) | (krp[2] << 8) | krp[3];
 }
 
 void aw_rom_board::device_start()
 {
 	naomi_g1_device::device_start();
-	decrypt_region();
+	set_key();
+
+	mpr_offset = decrypt16(0x58/2) | (decrypt16(0x5a/2) << 16);
 
 	save_item(NAME(epr_offset));
 	save_item(NAME(mpr_record_index));
@@ -241,7 +285,7 @@ void aw_rom_board::device_start()
 	save_item(NAME(mpr_file_offset));
 	save_item(NAME(dma_offset));
 	save_item(NAME(dma_limit));
-	save_item(NAME(adjust_off));
+	save_item(NAME(mpr_bank));
 }
 
 void aw_rom_board::device_reset()
@@ -251,7 +295,7 @@ void aw_rom_board::device_reset()
 	mpr_record_index = 0;
 	mpr_first_file_index = 0;
 	mpr_file_offset = 0;
-	adjust_off = 0;
+	mpr_bank = 0;
 
 	dma_offset = 0;
 	dma_limit  = 0;
@@ -259,8 +303,10 @@ void aw_rom_board::device_reset()
 
 READ16_MEMBER(aw_rom_board::pio_r)
 {
-	// FIXME: this must return original encrypted data, used by Extreme Hunt 2 in ROM TEST
-	UINT16 retval = m_region->u16(epr_offset * 2);
+	UINT32 roffset = epr_offset & 0x3ffffff;
+	if (roffset >= (mpr_offset / 2))
+		roffset += mpr_bank * 0x4000000;
+	UINT16 retval = (m_region->bytes() > roffset) ? m_region->u16(roffset) : 0;
 	epr_offset++;
 	return retval;
 }
@@ -268,8 +314,8 @@ READ16_MEMBER(aw_rom_board::pio_r)
 WRITE16_MEMBER(aw_rom_board::pio_w)
 {
 	// write to ROM board address space, including FlashROM programming using CFI (TODO)
-	if (epr_offset == 0x7fffff) // special register which changes ROMBD addressing
-		adjust_off = data;
+	if (epr_offset == 0x7fffff)
+		mpr_bank = data & 3;
 	epr_offset++;
 }
 
@@ -305,7 +351,7 @@ WRITE16_MEMBER(aw_rom_board::mpr_file_offsetl_w)
 
 WRITE16_MEMBER(aw_rom_board::mpr_file_offseth_w)
 {
-	mpr_file_offset = ((mpr_file_offset & 0x0000ffff) | ((data -(adjust_off*0x0100))<< 16));
+	mpr_file_offset = (mpr_file_offset & 0x0000ffff) | (data << 16);
 
 	recalc_dma_offset(MPR_FILE);
 }
@@ -315,20 +361,27 @@ void aw_rom_board::recalc_dma_offset(int mode)
 	switch(mode) {
 	case EPR:
 		dma_offset = epr_offset * 2;
-		dma_limit  = 0x1000000;
+		dma_limit  = mpr_offset;
 		break;
 
 	case MPR_RECORD:
-		dma_offset = 0x1000000 + mpr_record_index * 0x40;
-		dma_limit  = m_region->bytes();
+		dma_offset = mpr_offset + mpr_record_index * 0x40;
+		dma_limit = std::min((UINT32)0x8000000, m_region->bytes());
 		break;
 
 	case MPR_FILE: {
-		const UINT8 *entry = m_region->base() + 0x1000000 + mpr_first_file_index * 0x40;
-		dma_offset = 0x1000000 + (entry[8] | (entry[9] << 8) | (entry[10] << 16) | (entry[11] << 24)) + mpr_file_offset*2;
-		dma_limit  = m_region->bytes();
+		UINT32 filedata_offs = (mpr_bank * 0x8000000 + mpr_offset + mpr_first_file_index * 0x40 + 8) / 2;
+		dma_offset = decrypt16(filedata_offs) | (decrypt16(filedata_offs + 1) << 16);
+		dma_offset = (mpr_offset + dma_offset + mpr_file_offset * 2) & 0x7ffffff;
+		dma_limit  = std::min((UINT32)0x8000000, m_region->bytes());
 		break;
 	}
+	}
+
+	if (dma_offset >= mpr_offset) {
+		UINT32 bank_base = mpr_bank * 0x8000000;
+		dma_offset += bank_base;
+		dma_limit = std::min(dma_limit + bank_base, m_region->bytes());
 	}
 }
 
@@ -340,8 +393,11 @@ void aw_rom_board::dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram
 		return;
 	}
 
-	limit = dma_limit - dma_offset;
-	base = m_region->base() + dma_offset;
+	UINT32 offset = dma_offset / 2;
+	for (int i = 0; i < 16; i++)
+		decrypted_buf[i] = decrypt16(offset + i);
+	base = (UINT8*)decrypted_buf;
+	limit = 32;
 }
 
 void aw_rom_board::dma_advance(UINT32 size)

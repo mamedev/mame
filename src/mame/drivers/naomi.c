@@ -1094,7 +1094,7 @@ key matrix is shown in below
 Guru's Readme
 -------------
 
-Atomis Wave (system overview)
+Atomis Wave (codename SYSTEM X) system overview
 Sammy/SEGA, 2002
 
 The Atomiswave System is basically just a Sega Dreamcast using ROM carts.
@@ -1352,7 +1352,7 @@ This type is manufactured by Sega when Sammy merged with Sega.
 
 171-8355A
 PC BD A/W 128M FLASH
-837-14608 (sticker for Extreme Hunting 2 Tournament Edition)
+837-14608 (sticker for Extreme Hunting 2 Tournament Edition, Sega Bass Fishing Challenge, Sega Clay Challenge)
 837-14695 (sticker for Dirty Pigskin Football)
 |----------------------------|
 | XC9536*         U16   U2*  |
@@ -1375,11 +1375,14 @@ Notes:
           J2 - 6 pin connector for programming the XC9536 CPLD and/or the flash ROMs
       XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
                Sega 315-xxxx part number with a sticker over the top of it.
+               all known games on this type ROM BD have the same part# and decryption key.
 
                Game                                  Part#      Sticker
                ---------------------------------------------------------
                Extreme Hunting 2 Tournament Edition  315-6428P  315-6248
-               Dirty Pigskin Football                ?          ?
+               Dirty Pigskin Football                315-6248   -
+               Sega Bass Fishing Challenge           315-6248   -
+               Sega Clay Challenge                   315-6248   -
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
@@ -1389,6 +1392,37 @@ Notes:
                positions are present when manufactured, each board is programmed to requirements and
                depending on the total data length, some ROMs may be empty.
 
+
+Development ROM board:
+
+few unreleased and many prototype game versions known to exist on this ROM board,
+currently only Rumble Fish 2 prototype dumped
+
+PC BD SYSTEMX 3MODE FLASH Rev.B
+1111-00001402
+|--------------------------------------------|
+|    CN3                                     |
+|                                            |
+||-|           IC14 IC17 IC20 IC23           |
+|| | XC9536                                  |
+|| |                                         |
+|| |                                         |
+||CN1          IC12 IC15 IC18 IC21 IC24 IC26 |
+|| |                                         |
+|| |                                         |
+|| | XC2S30                                  |
+||-|           IC13 IC16 IC19 IC22 IC25 IC27 |
+|    17S30                                   |
+| CN2                                        |
+|--------------------------------------------|
+Notes:
+         CN1 - This connector plugs into the main board through 'PC RELAY BD SX CRTG V1' adapter.
+         CN2 - 8 pin connector
+         CN3 - 6 pin connector for programming the XC9536 CPLD
+      XC9536 - Xilinx XC9536XL in-system programmable CPLD (PLCC44), stamped JULIE_DEV
+      XC2S30 - Xilinx XC2S30 Spartan-II FPGA (TQFP144), Rumble Fish 2 have printed sticker A08
+      17S30  - Xilinx 17S30APC OTP Configuration PROM, stamped SXFLS
+   IC12-IC27 - Fujitsu MBM29DL640E 64M TSOP48 flash ROMs 
 
 
 Network Board
@@ -8501,6 +8535,27 @@ DRIVER_INIT_MEMBER(naomi_state,atomiswave)
 	aw_ctrl_type = 0;
 }
 
+READ64_MEMBER(naomi_state::xtrmhnt2_hack_r)
+{
+	// disable ALL.Net board check
+	if (space.device().safe_pc() == 0xc03cb30)
+	{
+		dc_ram[0x357fe/8] |= (UINT64)0x200 << 48;
+		dc_ram[0x358e2/8] |= (UINT64)0x200 << 16;
+		dc_ram[0x38bb2/8] |= (UINT64)0x200 << 16;
+		dc_ram[0x38bee/8] |= (UINT64)0x200 << 48;
+	}
+	if (space.device().safe_pc() == 0xc108240)
+		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & U64(0xffffffffffff0000)) | (UINT64)0x0009;
+	return 0;
+}
+
+DRIVER_INIT_MEMBER(naomi_state,xtrmhnt2)
+{
+	DRIVER_INIT_CALL(atomiswave);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64_delegate(FUNC(naomi_state::xtrmhnt2_hack_r), this));
+}
+
 ROM_START( fotns )
 	AW_BIOS
 
@@ -8653,15 +8708,15 @@ ROM_END
 ROM_START( ngbc )
 	AW_BIOS
 
-	ROM_REGION( 0xf000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax3301p01.fmem1", 0x0000000, 0x0800000, CRC(6dd78275) SHA1(72d4cab58dbcebd666db21aeef190378ef447580) )
-	ROM_LOAD( "ax3301m01.mrom1", 0x1000000, 0x2000000, CRC(e6013de9) SHA1(ccbc7c2e76153348646d75938d5c008dc80df17d) )
-	ROM_LOAD( "ax3302m01.mrom2", 0x3000000, 0x2000000, CRC(f7cfef6c) SHA1(c9e6231499a9c9c8650d9e61f34ff1fcce8d442c) )
-	ROM_LOAD( "ax3303m01.mrom3", 0x5000000, 0x2000000, CRC(0cdf8647) SHA1(0423f96842bef2c2ff454318dc6960b5052c0551) )
-	ROM_LOAD( "ax3304m01.mrom4", 0x7000000, 0x2000000, CRC(2f031db0) SHA1(3214735f04fadf160137f0585bfc1a27eeecfac6) )
-	ROM_LOAD( "ax3305m01.mrom5", 0x9000000, 0x2000000, CRC(f6668aaa) SHA1(6a78f8f0c7d7a71854ff87329290d38970cfb476) )
-	ROM_LOAD( "ax3306m01.mrom6", 0xb000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
-	ROM_LOAD( "ax3307m01.mrom7", 0xd000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
+	ROM_REGION( 0x14000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "ax3301p01.fmem1", 0x00000000, 0x0800000, CRC(6dd78275) SHA1(72d4cab58dbcebd666db21aeef190378ef447580) )
+	ROM_LOAD( "ax3301m01.mrom1", 0x02000000, 0x2000000, CRC(e6013de9) SHA1(ccbc7c2e76153348646d75938d5c008dc80df17d) )
+	ROM_LOAD( "ax3302m01.mrom2", 0x04000000, 0x2000000, CRC(f7cfef6c) SHA1(c9e6231499a9c9c8650d9e61f34ff1fcce8d442c) )
+	ROM_LOAD( "ax3303m01.mrom3", 0x06000000, 0x2000000, CRC(0cdf8647) SHA1(0423f96842bef2c2ff454318dc6960b5052c0551) )
+	ROM_LOAD( "ax3304m01.mrom4", 0x0a000000, 0x2000000, CRC(2f031db0) SHA1(3214735f04fadf160137f0585bfc1a27eeecfac6) )
+	ROM_LOAD( "ax3305m01.mrom5", 0x0c000000, 0x2000000, CRC(f6668aaa) SHA1(6a78f8f0c7d7a71854ff87329290d38970cfb476) )
+	ROM_LOAD( "ax3306m01.mrom6", 0x0e000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
+	ROM_LOAD( "ax3307m01.mrom7", 0x12000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "ax3301f01.bin", 0, 4, CRC(9afe949b) SHA1(4f7b039f3287da61a53a2d012993bfb57e1459bd) )
@@ -8804,15 +8859,15 @@ ROM_END
 ROM_START( kofxi )
 	AW_BIOS
 
-	ROM_REGION( 0xf000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax3201p01.fmem1", 0x0000000, 0x0800000, CRC(6dbdd71b) SHA1(cce3897b104f5d923d8136485fc80eb9717ff4b5) )
-	ROM_LOAD( "ax3201m01.mrom1", 0x1000000, 0x2000000, CRC(7f9d6af9) SHA1(001064ad1b8c3408efe799dc766c2728dc6512a9) )
-	ROM_LOAD( "ax3202m01.mrom2", 0x3000000, 0x2000000, CRC(1ae40afa) SHA1(9ee7957c86cc3a71e6971ddcd906a82c5b1e16f1) )
-	ROM_LOAD( "ax3203m01.mrom3", 0x5000000, 0x2000000, CRC(8c5e3bfd) SHA1(b5443e2a1b88642cc57c5287a3122376c2d48de9) )
-	ROM_LOAD( "ax3204m01.mrom4", 0x7000000, 0x2000000, CRC(ba97f80c) SHA1(36f672fe833e13f0bab036b02c39123066327e20) )
-	ROM_LOAD( "ax3205m01.mrom5", 0x9000000, 0x2000000, CRC(3c747067) SHA1(54b7ff73d618e2e4e40c125c6cfe99016e69ad1a) )
-	ROM_LOAD( "ax3206m01.mrom6", 0xb000000, 0x2000000, CRC(cb81e5f5) SHA1(07faee02a58ac9c600ab3cdd525d22c16b35222d) )
-	ROM_LOAD( "ax3207m01.mrom7", 0xd000000, 0x2000000, CRC(164f6329) SHA1(a72c8cbe4ac7b98edda3d4434f6c81a370b8c39b) )
+	ROM_REGION( 0x14000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "ax3201p01.fmem1", 0x00000000, 0x0800000, CRC(6dbdd71b) SHA1(cce3897b104f5d923d8136485fc80eb9717ff4b5) )
+	ROM_LOAD( "ax3201m01.mrom1", 0x02000000, 0x2000000, CRC(7f9d6af9) SHA1(001064ad1b8c3408efe799dc766c2728dc6512a9) )
+	ROM_LOAD( "ax3202m01.mrom2", 0x04000000, 0x2000000, CRC(1ae40afa) SHA1(9ee7957c86cc3a71e6971ddcd906a82c5b1e16f1) )
+	ROM_LOAD( "ax3203m01.mrom3", 0x06000000, 0x2000000, CRC(8c5e3bfd) SHA1(b5443e2a1b88642cc57c5287a3122376c2d48de9) )
+	ROM_LOAD( "ax3204m01.mrom4", 0x0a000000, 0x2000000, CRC(ba97f80c) SHA1(36f672fe833e13f0bab036b02c39123066327e20) )
+	ROM_LOAD( "ax3205m01.mrom5", 0x0c000000, 0x2000000, CRC(3c747067) SHA1(54b7ff73d618e2e4e40c125c6cfe99016e69ad1a) )
+	ROM_LOAD( "ax3206m01.mrom6", 0x0e000000, 0x2000000, CRC(cb81e5f5) SHA1(07faee02a58ac9c600ab3cdd525d22c16b35222d) )
+	ROM_LOAD( "ax3207m01.mrom7", 0x12000000, 0x2000000, CRC(164f6329) SHA1(a72c8cbe4ac7b98edda3d4434f6c81a370b8c39b) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "ax3201f01.bin", 0, 4, CRC(065d7fc6) SHA1(e4f18126e9f4e6747ffc5d0664766986fc07c127) )
@@ -8832,18 +8887,18 @@ ROM_START( dirtypig )
 	ROM_LOAD( "695-0014.u16", 0x7000000, 0x1000000, CRC(730180a4) SHA1(017b82e2d2744695e3e521d35a8511ecc1c8ab43) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "695-0014.bin", 0, 4, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_LOAD( "315-6248.bin", 0, 4, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
 ROM_END
 
 ROM_START( mslug6 )
 	AW_BIOS
 
-	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASE)
+	ROM_REGION( 0xc000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "ax3001p01.fmem1", 0x0000000, 0x0800000, CRC(af67dbce) SHA1(5aba108caf3e4ced6994bc26e752d4e225c231e8) )
-	ROM_LOAD( "ax3001m01.mrom1", 0x1000000, 0x2000000, CRC(e56417ee) SHA1(27692ad5c1093aff0973d2aafd01a5e30c7bfbbe) )
-	ROM_LOAD( "ax3002m01.mrom2", 0x3000000, 0x2000000, CRC(1be3bbc1) SHA1(d75ce5c855c9c4eeacdbf84d440c73a94de060fe) )
-	ROM_LOAD( "ax3003m01.mrom3", 0x5000000, 0x2000000, CRC(4fe37370) SHA1(85d51db94c3e34265e37b636d6545ed2801ba5a6) )
-	ROM_LOAD( "ax3004m01.mrom4", 0x7000000, 0x2000000, CRC(2f4c4c6f) SHA1(5815c28fdaf0429003986e725c0015fe4c08721f) )
+	ROM_LOAD( "ax3001m01.mrom1", 0x2000000, 0x2000000, CRC(e56417ee) SHA1(27692ad5c1093aff0973d2aafd01a5e30c7bfbbe) )
+	ROM_LOAD( "ax3002m01.mrom2", 0x4000000, 0x2000000, CRC(1be3bbc1) SHA1(d75ce5c855c9c4eeacdbf84d440c73a94de060fe) )
+	ROM_LOAD( "ax3003m01.mrom3", 0x6000000, 0x2000000, CRC(4fe37370) SHA1(85d51db94c3e34265e37b636d6545ed2801ba5a6) )
+	ROM_LOAD( "ax3004m01.mrom4", 0xa000000, 0x2000000, CRC(2f4c4c6f) SHA1(5815c28fdaf0429003986e725c0015fe4c08721f) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "ax3001f01.bin", 0, 4, CRC(0b9939e9) SHA1(4ca1225c7c9993542a67035a054ac579ed021de5) )
@@ -8852,15 +8907,15 @@ ROM_END
 ROM_START( samsptk )
 	AW_BIOS
 
-	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ax2901p01.fmem1", 0x0000000, 0x0800000, CRC(58e0030b) SHA1(ed8a66833beeb56d83770123eff28df0f25221d1) )
-	ROM_LOAD( "ax2901m01.mrom1", 0x1000000, 0x2000000, CRC(dbbbd90d) SHA1(102ee0b249a3e0ca2f659b6c515816c522ad78d0) )
-	ROM_LOAD( "ax2902m01.mrom2", 0x3000000, 0x2000000, CRC(a3bd7890) SHA1(9b8d934d6ebc3ef688cd8a6de47657a0663fea10) )
-	ROM_LOAD( "ax2903m01.mrom3", 0x5000000, 0x2000000, CRC(56f50fdd) SHA1(8a5a4a99108c0279056998046c7b332e80121dee) )
-	ROM_LOAD( "ax2904m01.mrom4", 0x7000000, 0x2000000, CRC(8a3ae175) SHA1(966f527a92e24c8eb770344697f2edf6140cf971) )
-	ROM_LOAD( "ax2905m01.mrom5", 0x9000000, 0x2000000, CRC(429877ba) SHA1(88e1f3bc682b18d331e328ef8754065109cf9bda) )
-	ROM_LOAD( "ax2906m01.mrom6", 0xb000000, 0x2000000, CRC(cb95298d) SHA1(5fb5d5a0d6801df61101a1b23de0c14ff29ef654) )
-	ROM_LOAD( "ax2907m01.mrom7", 0xd000000, 0x2000000, CRC(48015081) SHA1(3c0a0a6dc9ab7bf889579477699e612c3092f9bf) )
+	ROM_REGION( 0x14000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "ax2901p01.fmem1", 0x00000000, 0x0800000, CRC(58e0030b) SHA1(ed8a66833beeb56d83770123eff28df0f25221d1) )
+	ROM_LOAD( "ax2901m01.mrom1", 0x02000000, 0x2000000, CRC(dbbbd90d) SHA1(102ee0b249a3e0ca2f659b6c515816c522ad78d0) )
+	ROM_LOAD( "ax2902m01.mrom2", 0x04000000, 0x2000000, CRC(a3bd7890) SHA1(9b8d934d6ebc3ef688cd8a6de47657a0663fea10) )
+	ROM_LOAD( "ax2903m01.mrom3", 0x06000000, 0x2000000, CRC(56f50fdd) SHA1(8a5a4a99108c0279056998046c7b332e80121dee) )
+	ROM_LOAD( "ax2904m01.mrom4", 0x0a000000, 0x2000000, CRC(8a3ae175) SHA1(966f527a92e24c8eb770344697f2edf6140cf971) )
+	ROM_LOAD( "ax2905m01.mrom5", 0x0c000000, 0x2000000, CRC(429877ba) SHA1(88e1f3bc682b18d331e328ef8754065109cf9bda) )
+	ROM_LOAD( "ax2906m01.mrom6", 0x0e000000, 0x2000000, CRC(cb95298d) SHA1(5fb5d5a0d6801df61101a1b23de0c14ff29ef654) )
+	ROM_LOAD( "ax2907m01.mrom7", 0x12000000, 0x2000000, CRC(48015081) SHA1(3c0a0a6dc9ab7bf889579477699e612c3092f9bf) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "ax2901f01.bin", 0, 4, CRC(8a6267aa) SHA1(9705bed35acb87d578f0efcf4f74b2a4b1a7be2e) )
@@ -8887,13 +8942,13 @@ ROM_END
 ROM_START( rumblef2 )
 	AW_BIOS
 
-	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASE)
+	ROM_REGION( 0xe000000, "rom_board", ROMREGION_ERASE)
 	ROM_LOAD( "ax3401p01.fmem1", 0x0000000, 0x0800000, CRC(a33601cf) SHA1(2dd60a9c3a2517f2257ab69288fa95645de133fa) )
-	ROM_LOAD( "ax3401m01.mrom1", 0x1000000, 0x2000000, CRC(60894d4c) SHA1(5b21af3c7c82d4d64bfd8498c26283111ada1298) )
-	ROM_LOAD( "ax3402m01.mrom2", 0x3000000, 0x2000000, CRC(e4224cc9) SHA1(dcab06fcf48cda286f93d2b37f03a83abf3230cb) )
-	ROM_LOAD( "ax3403m01.mrom3", 0x5000000, 0x2000000, CRC(081c0edb) SHA1(63a3f1b5f9d7ca4367868c492236406f23996cc3) )
-	ROM_LOAD( "ax3404m01.mrom4", 0x7000000, 0x2000000, CRC(a426b443) SHA1(617aab42e432a80b0663281fb7faa6c14ef4f149) )
-	ROM_LOAD( "ax3405m01.mrom5", 0x9000000, 0x2000000, CRC(4766ce56) SHA1(349b82013a75905ae5520b14a87702c9038a5def) )
+	ROM_LOAD( "ax3401m01.mrom1", 0x2000000, 0x2000000, CRC(60894d4c) SHA1(5b21af3c7c82d4d64bfd8498c26283111ada1298) )
+	ROM_LOAD( "ax3402m01.mrom2", 0x4000000, 0x2000000, CRC(e4224cc9) SHA1(dcab06fcf48cda286f93d2b37f03a83abf3230cb) )
+	ROM_LOAD( "ax3403m01.mrom3", 0x6000000, 0x2000000, CRC(081c0edb) SHA1(63a3f1b5f9d7ca4367868c492236406f23996cc3) )
+	ROM_LOAD( "ax3404m01.mrom4", 0xa000000, 0x2000000, CRC(a426b443) SHA1(617aab42e432a80b0663281fb7faa6c14ef4f149) )
+	ROM_LOAD( "ax3405m01.mrom5", 0xc000000, 0x2000000, CRC(4766ce56) SHA1(349b82013a75905ae5520b14a87702c9038a5def) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "ax3401f01.bin", 0, 4, CRC(952919a1) SHA1(d343fdbbd1d8b651401133f21facc1584bb66c04) )
@@ -8922,7 +8977,7 @@ ROM_START( rumblf2p )
 	// IC27 populated, empty
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "key.bin", 0, 4, CRC(757054c4) SHA1(7d5556d0940c582adbcf5697c7b81453d0c91153) )
+	ROM_LOAD( "julie_dev.bin", 0, 4, CRC(757054c4) SHA1(7d5556d0940c582adbcf5697c7b81453d0c91153) )
 ROM_END
 
 ROM_START( claychal )
@@ -8939,7 +8994,7 @@ ROM_START( claychal )
 	ROM_LOAD( "608-2161.u16", 0x7000000, 0x1000100, CRC(14f8ca87) SHA1(778c048da9434ffda600e35ad5aca29e02cc98c0) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "608-2161.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
 ROM_END
 
 ROM_START( basschal )
@@ -8955,8 +9010,8 @@ ROM_START( basschal )
 	ROM_LOAD( "610-0811.u14", 0x6000000, 0x1000100, CRC(9f33f186) SHA1(d656f3c11dba50620158394866054e08cdc7f4f0) )
 	ROM_LOAD( "610-0811.u16", 0x7000000, 0x1000100, CRC(5f0a3bd1) SHA1(39c66fce9ef0660491372e1aa4faff5b21524177) )
 
-	ROM_REGION( 4, "rom_key", 0 )   // same as claychal.  lazy!
-	ROM_LOAD( "610-0811.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "315-6248.bin", 0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
 ROM_END
 
 /* All games have the regional titles at the start of the IC22 rom in the following order
@@ -9319,6 +9374,6 @@ GAME( 2005, kofnw,    awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Samm
 GAME( 2005, kofnwj,   kofnw,  aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave (Japan)", GAME_FLAGS )
 GAME( 2005, xtrmhunt, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sammy",                    "Extreme Hunting", GAME_FLAGS )
 GAME( 2006, mslug6,   awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2006, xtrmhnt2, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )
+GAME( 2006, xtrmhnt2, awbios, aw2c, aw2c, naomi_state, xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )
 GAME( 2008, claychal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )
 GAME( 2009, basschal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )
