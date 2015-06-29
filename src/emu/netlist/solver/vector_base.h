@@ -30,7 +30,7 @@ private:
 };
 #endif
 
-#if !defined(__clang__) && !defined(_MSC_VER)
+#ifndef __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
@@ -101,7 +101,7 @@ inline double vec_maxabs(const std::size_t n, const double * RESTRICT v)
 
 	return ret;
 }
-#if !defined(__clang__) && !defined(_MSC_VER)
+#ifndef __clang__
 #pragma GCC diagnostic pop
 #endif
 
