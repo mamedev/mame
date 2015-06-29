@@ -104,47 +104,19 @@ endif
 ###########################################################################
 
 ifeq ($(platform), android)
-	PTR64 = 0
+#	PTR64 = 0
 	# FIXME: Pass these to GENie and test...
 #	CROSS_BUILD = 1
 #	FORCE_DRC_C_BACKEND = 1
 else ifeq ($(platform), osx)
 	PYTHON_EXECUTABLE = python
 else ifeq ($(platform), ios)
-	PTR64 = 0
+#	PTR64 = 0
 	PYTHON_EXECUTABLE = python
 	# FIXME: Pass these to GENie and test...
 #	CROSS_BUILD = 1
 #	FORCE_DRC_C_BACKEND = 1
 endif
-
-
-###########################################################################
-#
-#   PTR64 FIDDLING
-#
-#   MAME has this setting PTR64 which controls the pointer size and (for
-#   historical reasons) several other side-effects.  For example, on OS X
-#   with Intel CPU, it controls whether MAME will build i386 or x86_64
-#   versions.  This block configures it for the known non-cross-compiled
-#   build platforms we support building MAME for at the moment.  Cross-
-#   compiled targets are handled elsewhere.
-#   FIXME: Except for now they aren't.
-#
-###########################################################################
-
-ifneq ($(CROSS_BUILD),1)
-
-ifndef ($(PTR64)
-	PTR64 = 0
-	ifeq ($(LIBRETRO_CPU),x86_64)
-		PTR64 = 1
-	else ifeq ($(LIBRETRO_CPU),ppc64)
-		PTR64 = 1
-	endif
-endif # PTR64
-
-endif # CROSS_BUILD
 
 
 ###########################################################################
@@ -180,16 +152,18 @@ endif
 ifeq ($(platform),win)
 	ifeq ($(MSYSTEM),MINGW64)
 		MINGW64 ?= /mingw64
-		PLATFLAGS += MINGW64=$(MINGW64)
+		PLATFLAGS += MINGW64="$(MINGW64)"
 	else ifeq ($(MSYSTEM),MINGW32)
 		MINGW32 ?= /mingw32
-		PLATFLAGS += MINGW32=$(MINGW32)
+		PLATFLAGS += MINGW32="$(MINGW32)"
 	endif
 endif
 ifneq ($(LIBRETRO_CPU),)
 	PLATFLAGS += ARCH="" LIBRETRO_CPU="$(LIBRETRO_CPU)"
 endif
-
+ifneq ($(FORCE_DRC_C_BACKEND),)
+	PLATFLAGS += FORCE_DRC_C_BACKEND="$(FORCE_DRC_C_BACKEND)"
+endif
 
 ###########################################################################
 #

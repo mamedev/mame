@@ -862,6 +862,7 @@ function toolchain(_buildDir, _subDir)
 			LIBRETRO_OS=_OPTIONS["LIBRETRO_OS"]
 		end
 
+		-- Set TARGETOS based on LIBRETRO_OS if we know
 		if LIBRETRO_OS~=nil then
 			-- most things are "linux" (ish).
 			local targetos = "linux"
@@ -872,17 +873,19 @@ function toolchain(_buildDir, _subDir)
 			end
 			_OPTIONS["TARGETOS"] = targetos
 		end
+
 		-- FIXME: set BIGENDIAN and dynarec based on retro_platform/retro_arch
+		if LIBRETRO_CPU~=nil then
+			if LIBRETRO_CPU=="x86_64" or LIBRETRO_CPU=="ppc64" then
+				defines { "PTR64=1" }
+			end
+		end
 
 
 		-- MS and Apple don't need -fPIC, but pretty much everything else does.
 		if _OPTIONS["targetos"] ~= "windows" and _OPTIONS["targetos"] ~= "macosx" then
-			buildoptions {
-				"-fPIC",
-			}
-			linkoptions {
-				"-fPIC",
-			}
+			buildoptions { "-fPIC" }
+			linkoptions { "-fPIC" }
 		end
 
 		-- Never use BGFX for libretro (Windows can force this on otherwise)
