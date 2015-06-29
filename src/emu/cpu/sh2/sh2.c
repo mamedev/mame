@@ -208,7 +208,7 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_nocode(NULL)
 	, m_out_of_cycles(NULL)
 {
-	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
+	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc);
 }
 
 sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

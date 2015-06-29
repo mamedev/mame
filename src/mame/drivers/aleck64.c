@@ -837,6 +837,7 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
+	MCFG_FORCE_NO_DRC()
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 	MCFG_MIPS3_SYSTEM_CLOCK(62500000)
@@ -850,6 +851,7 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_RSP_SP_SET_STATUS_CB(DEVWRITE32("rcp",n64_periphs, sp_set_status))
 	MCFG_CPU_PROGRAM_MAP(rsp_map)
 
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -859,6 +861,7 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
+
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("dac1", DMADAC, 0)
@@ -867,8 +870,6 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_N64_PERIPHS_ADD("rcp");
-
-	MCFG_FORCE_NO_DRC()
 MACHINE_CONFIG_END
 
 UINT32 aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
