@@ -39,9 +39,6 @@
 #
 ###########################################################################
 
-# The most important setting--a conditional for our build changes
-OSD ?= retro
-
 # Disable -Werror as libretro is effectively a MAME user, not a developer
 NOWERROR ?= 1
 
@@ -174,7 +171,7 @@ endif
 #
 ###########################################################################
 
-TARGETFLAGS = OSD=$(OSD)
+TARGETFLAGS =
 ifneq ($(TARGET),)
 	TARGETFLAGS += TARGET=$(TARGET)
 endif
