@@ -63,17 +63,35 @@ VERBOSE ?= 1
 #
 ###########################################################################
 
-UNAME = $(shell uname -a)
+UNAME_S = $(shell uname -s)
+UNAME_M = $(shell uname -m)
 ifeq ($(platform),)
 	platform = unix
-	ifeq ($(UNAME),)
+	ifeq ($(UNAME_S),)
 		platform = win
-	else ifneq ($(findstring MINGW,$(UNAME)),)
+	else ifneq ($(findstring MINGW,$(UNAME_S)),)
 		platform = win
-	else ifneq ($(findstring Darwin,$(UNAME)),)
+	else ifneq ($(findstring Darwin,$(UNAME_S)),)
 		platform = osx
-	else ifneq ($(findstring win,$(UNAME)),)
+	else ifneq ($(findstring win,$(UNAME_S)),)
 		platform = win
+	endif
+endif
+ifeq ($(ARCH),)
+	LIBRETRO_CPU = $(ARCH)
+endif
+ifeq ($(LIBRETRO_CPU),)
+	ifeq ($(UNAME_M),)
+		ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+			LIBRETRO_CPU = x86_64
+		endif
+		ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
+			LIBRETRO_CPU = x86_64
+		endif
+	else ifeq ($(UNAME_M),amd64)
+		LIBRETRO_CPU = x86_64
+	else
+		LIBRETRO_CPU = $(UNAME_M)
 	endif
 endif
 
@@ -119,23 +137,13 @@ ifneq ($(CROSS_BUILD),1)
 
 ifndef ($(PTR64)
 	PTR64 = 0
-ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
-	PTR64 = 1
-endif
-ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
-	PTR64 = 1
-endif
-ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
-	PTR64 = 1
-endif
-ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-	PTR64 = 1
-endif
-ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
-	PTR64 = 1
-endif
-
+	ifeq ($(LIBRETRO_CPU),x86_64)
+		PTR64 = 1
+	else ifeq ($(LIBRETRO_CPU),ppc64)
+		PTR64 = 1
+	endif
 endif # PTR64
+
 endif # CROSS_BUILD
 
 
@@ -167,7 +175,7 @@ ifneq ($(PTR64),)
 	PLATFLAGS += PTR64=$(PTR64)
 endif
 ifneq ($(platform),)
-	PLATFLAGS += platform="$(platform)"
+	PLATFLAGS += LIBRETRO_OS="$(platform)"
 endif
 ifeq ($(platform),win)
 	ifeq ($(MSYSTEM),MINGW64)
@@ -178,8 +186,8 @@ ifeq ($(platform),win)
 		PLATFLAGS += MINGW32=$(MINGW32)
 	endif
 endif
-ifneq ($(ARCH),)
-	PLATFLAGS += ARCH="" LIBRETRO_ARCH="$(ARCH)"
+ifneq ($(LIBRETRO_CPU),)
+	PLATFLAGS += ARCH="" LIBRETRO_CPU="$(LIBRETRO_CPU)"
 endif
 
 

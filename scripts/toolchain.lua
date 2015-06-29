@@ -839,6 +839,43 @@ function toolchain(_buildDir, _subDir)
 		}
 	configuration { "libretro*" }
 		objdir (_buildDir .. _ACTION .. "/libretro/obj")
+
+		-- $ARCH means something to Apple/Clang, so we can't use it here.
+		-- Instead, use ARCH="" LIBRETRO_CPU="$ARCH" on the make cmdline.
+		--
+		-- NB: $ARCH has caused libretro problems before, LIBRETRO_CPU will
+		--     replace it everywhere at some point.
+		newoption {
+			trigger = "LIBRETRO_CPU",
+			description = "libretro CPU/architecture variable",
+		}
+		if _OPTIONS["LIBRETRO_CPU"]~=nil then
+			LIBRETRO_CPU=_OPTIONS["LIBRETRO_CPU"]
+		end
+
+		-- $platform we could keep using, but $LIBRETRO_OS seems safer.
+		newoption {
+			trigger = "LIBRETRO_OS",
+			description = "libretro OS/platform variable",
+		}
+		if _OPTIONS["LIBRETRO_OS"]~=nil then
+			LIBRETRO_OS=_OPTIONS["LIBRETRO_OS"]
+		end
+
+		if LIBRETRO_OS~=nil then
+			-- most things are "linux" (ish).
+			local targetos = "linux"
+			if LIBRETRO_OS=="osx" or LIBRETRO_OS=="ios" then
+				targetos = "macosx"
+			elseif LIBRETRO_OS:sub(1, 4)=="armv" then
+				targetos = "win32"
+			end
+			_OPTIONS["TARGETOS"] = targetos
+		end
+		-- FIXME: set BIGENDIAN and dynarec based on retro_platform/retro_arch
+
+
+		-- MS and Apple don't need -fPIC, but pretty much everything else does.
 		if _OPTIONS["targetos"] ~= "windows" and _OPTIONS["targetos"] ~= "macosx" then
 			buildoptions {
 				"-fPIC",
@@ -847,8 +884,13 @@ function toolchain(_buildDir, _subDir)
 				"-fPIC",
 			}
 		end
+
+		-- Never use BGFX for libretro (Windows can force this on otherwise)
 		USE_BGFX = 0
+
+		-- libretro does not (yet) support MIDI.
 		_OPTIONS["NO_USE_MIDI"] = "1"
+
 	-- END libretro overrides to MAME's GENie build
 
 	configuration {} -- reset configuration

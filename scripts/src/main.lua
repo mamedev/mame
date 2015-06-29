@@ -209,52 +209,12 @@ function mainProject(_target, _subtarget)
 
 	-- BEGIN libretro overrides to MAME's GENie build
 	if _OPTIONS["osd"]=="retro" then
-		newoption {
-			trigger = "platform",
-			description = "libretro OS/platform variable",
-		}
-
-		-- $ARCH means something to Apple/Clang, so we can't use it here.
-		-- Instead, use ARCH="" LIBRETRO_ARCH="$ARCH" on the make cmdline.
-		newoption {
-			trigger = "LIBRETRO_ARCH",
-			description = "libretro CPU/architecture variable",
-		}
-
 		kind "SharedLib"
 		targetsuffix "_libretro"
 		targetprefix ""
 		links {
 			"libco",
 		}
-
-		if _OPTIONS["platform"]~=nil then
-			retro_platform=_OPTIONS["platform"]
-		end
-		if _OPTIONS["LIBRETRO_ARCH"]~=nil then
-			retro_arch=_OPTIONS["ARCH"]
-		end
-
-		if retro_platform~=nil then
-			if retro_platform=="unix" then
-				_OPTIONS["TARGETOS"] = "linux"
-			elseif retro_platform=="android" then
-				_OPTIONS["TARGETOS"] = "linux"
-			elseif retro_platform=="qnx" then
-				_OPTIONS["TARGETOS"] = "linux"
-			elseif retro_platform:sub(1, 4)=="armv" then
-				_OPTIONS["TARGETOS"] = "linux"
-			elseif retro_platform=="osx" then
-				_OPTIONS["TARGETOS"] = "macosx"
-			elseif retro_platform=="ios" then
-				_OPTIONS["TARGETOS"] = "macosx"
-				targetsuffix "_libretro_ios"
-			elseif retro_platform:sub(1, 3)=="win" then
-				_OPTIONS["TARGETOS"] = "win32"
-			end
-		end
-		-- FIXME: set BIGENDIAN and dynarec based on retro_platform/retro_arch
-
 
 		-- "linux" for pretty much any Linux/BSD/Android...
 		if _OPTIONS["targetos"]=="linux" then
