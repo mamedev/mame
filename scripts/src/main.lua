@@ -77,6 +77,33 @@ function mainProject(_target, _subtarget)
 	configuration { "asmjs" }
 		targetextension ".bc"  
 
+	-- BEGIN libretro overrides to MAME's GENie build
+	configuration { "libretro*" }
+		kind "SharedLib"
+		targetsuffix "_libretro"
+		targetprefix ""
+
+		includedirs {
+			MAME_DIR .. "src/osd/retro/libretro-common/include",
+		}
+		links { "libco" }
+
+		-- Workaround: Compile the public libretro API into the shlib
+		-- rather than the OSD to keep linkers from being "helpful"
+		-- and stripping it out.
+		files {
+			MAME_DIR .. "src/osd/retro/libretro.c"
+		}
+
+		-- Ensure the public API is made public with GNU ld
+		if _OPTIONS["targetos"]=="linux" then
+			linkoptions {
+				"-Wl,--version-script=" .. MAME_DIR .. "src/osd/retro/link.T",
+			}
+		end
+
+	-- END libretro overrides to MAME's GENie build
+
 	configuration { }
 
 	if _OPTIONS["SEPARATE_BIN"]~="1" then 
@@ -206,31 +233,4 @@ function mainProject(_target, _subtarget)
 
 	debugdir (MAME_DIR)
 	debugargs ("-window")
-
-	-- BEGIN libretro overrides to MAME's GENie build
-	if _OPTIONS["osd"]=="retro" then
-		kind "SharedLib"
-		targetsuffix "_libretro"
-		targetprefix ""
-		links {
-			"libco",
-		}
-
-		-- "linux" for pretty much any Linux/BSD/Android...
-		if _OPTIONS["targetos"]=="linux" then
-			linkoptions {
-				"-Wl,--version-script=" .. MAME_DIR .. "src/osd/retro/link.T",
-			}
-		end
-
-		-- If we compile this into the OSD rather than the main shared library, the
-		-- linker will "helpfully" strip out the "unused" libretro API...
-		includedirs {
-			MAME_DIR .. "src/osd/retro/libretro-common/include",
-		}
-		files {
-			MAME_DIR .. "src/osd/retro/libretro.c"
-		}
-	end
-	-- END libretro overrides to MAME's GENie build
 end
