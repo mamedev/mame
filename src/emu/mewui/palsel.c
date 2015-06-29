@@ -12,14 +12,14 @@
 #include "mewui/palsel.h"
 
 static const palcolor m_palette[] = {
-	{ "Bianco",    "FFFFFFFF" },
-	{ "Rosso",     "FFFF0000" },
-	{ "Arancione", "FFFFA500" },
-	{ "Giallo",    "FFFFFF00" },
-	{ "Verde",     "FF00FF00" },
-	{ "Blu",       "FF0000FF" },
-	{ "Viola",     "FF8F00FF" },
-	{ "Nero",      "FF000000" }
+	{ "White",    "FFFFFFFF" },
+	{ "Red",     "FFFF0000" },
+	{ "Orange", "FFFFA500" },
+	{ "Yellow",    "FFFFFF00" },
+	{ "Green",     "FF00FF00" },
+	{ "Blue",       "FF0000FF" },
+	{ "Violet",     "FF8F00FF" },
+	{ "Black",      "FF000000" }
 };
 
 //-------------------------------------------------
