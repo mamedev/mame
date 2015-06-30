@@ -38,7 +38,7 @@ public:
 
 	enum {
 		MODE_16M_64k = 0, /// 16Mbit ROM, 64kBit RAM
-		MODE_4M_256k = 1, /// 4Mbit ROM, 256kBit RAM
+		MODE_4M_256k = 1  /// 4Mbit ROM, 256kBit RAM
 	};
 
 	// construction/destruction

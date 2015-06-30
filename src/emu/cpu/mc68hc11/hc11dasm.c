@@ -25,7 +25,7 @@ enum
 	EA_IND_Y_IMM8_REL,
 	PAGE2,
 	PAGE3,
-	PAGE4,
+	PAGE4
 };
 
 struct M68HC11_OPCODE {

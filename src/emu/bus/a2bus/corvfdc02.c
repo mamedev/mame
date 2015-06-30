@@ -221,7 +221,7 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT
 						break;
 				}
 
-				logerror("corvfdc02: selecting drive %d: %p\n", data & 3, floppy);
+				logerror("corvfdc02: selecting drive %d: %p\n", data & 3, (void *) floppy);
 
 				if (floppy != m_curfloppy)
 				{

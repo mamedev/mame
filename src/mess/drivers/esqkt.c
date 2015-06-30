@@ -181,7 +181,7 @@ READ16_MEMBER(esqkt_state::esq5506_read_adc)
 WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
-};
+}
 
 WRITE8_MEMBER(esqkt_state::duart_output)
 {

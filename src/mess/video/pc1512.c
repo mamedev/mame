@@ -461,7 +461,7 @@ int pc1512_state::get_color(UINT8 data)
 	}
 
 	return color;
-};
+}
 
 MC6845_UPDATE_ROW( pc1512_state::draw_graphics_1 )
 {

@@ -35,7 +35,7 @@ enum
 	EWDS = 0,       // erase/write disable
 	WRAL,           // write all registers
 	ERAL,           // erase all registers
-	EWEN,           // erase/write enable
+	EWEN            // erase/write enable
 };
 
 // states

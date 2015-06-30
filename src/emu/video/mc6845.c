@@ -1479,7 +1479,7 @@ PALETTE_INIT_MEMBER(mos8563_device, mos8563)
 	palette.set_pen_color(13, rgb_t(0xff, 0xff, 0x55));
 	palette.set_pen_color(14, rgb_t(0xaa, 0xaa, 0xaa));
 	palette.set_pen_color(15, rgb_t::white);
-};
+}
 
 
 void mos8563_device::update_cursor_state()

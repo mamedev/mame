@@ -193,7 +193,7 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 	}
 	else
 		m_kp_matrix = data;
-};
+}
 
 static MACHINE_CONFIG_START( sc2, sc2_state )
 	/* basic machine hardware */

@@ -1875,7 +1875,7 @@ void apollo_graphics_15i::device_reset()
 				= auto_alloc_array(machine(), UINT16, m_image_memory_size);
 		assert(m_image_memory != NULL);
 
-		MLOG1(("device reset apollo graphics: buffer=%p size=%0x", m_image_memory, m_image_memory_size));
+		MLOG1(("device reset apollo graphics: buffer=%p size=%0x", (void *) m_image_memory, m_image_memory_size));
 	}
 
 	memset(m_color_lookup_table, 0, sizeof(m_color_lookup_table));

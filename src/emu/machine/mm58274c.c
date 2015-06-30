@@ -147,7 +147,7 @@ attotime mm58274c_device::interrupt_period_table(int val)
 		case 7: return attotime::from_seconds(60);
 		default: fatalerror("out of range\n");
 	}
-};
+}
 
 READ8_MEMBER( mm58274c_device::read )
 {

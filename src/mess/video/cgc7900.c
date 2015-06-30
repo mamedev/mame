@@ -34,7 +34,7 @@ PALETTE_INIT_MEMBER(cgc7900_state, cgc7900)
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff));
 	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0x00));
 	palette.set_pen_color(7, rgb_t::white);
-};
+}
 
 /***************************************************************************
     READ/WRITE HANDLERS
