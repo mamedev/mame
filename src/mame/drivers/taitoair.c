@@ -220,6 +220,13 @@ cpu #2 (PC=00000609): unmapped memory word read from 00006838 & FFFF
 cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 
 ****************************************************************************/
+/*!
+ @todo - Framebuffer DMA requires palette switch to be selected dynamically, see at first stage Course Select in Top Landing;
+       - Air Inferno: exception with DIVIDE BY ZERO after some time of gameplay;   
+	   - Air Inferno: Expert course has wrong 3d geometry;
+	   - Top Landing: Night stages might have wrong priority for stars-above-sea;
+	   - Input limiters / analog thresholds for both games;
+ */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -370,6 +377,33 @@ WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
 	membank("z80bank")->set_entry(data & 3);
 }
 
+/*!
+	@brief Framebuffer DMA control
+	@regs [0] x--- ---- ---- ---- copy framebuffer to the screen
+	      [0] --x- ---- ---- ---- unknown, used on POST test
+		  [0] 1001 1111 1111 1111 used by Air Inferno after erase op, erase -> copy?
+		  [0] 0001 1111 1111 1111 erase op?
+		  [1] xxxx xxxx xxxx xxxx fill value? 0xffff by Top Landing, 0x0000 Air Inferno
+		  [2] (unused)
+		  [3] both games uses 0xb7, most likely a register setting.
+*/
+WRITE16_MEMBER(taitoair_state::dma_regs_w)
+{	
+	printf("%08x %04x\n",offset,data);
+	
+	if(offset == 0 && ACCESSING_BITS_8_15)
+	{
+		if(data == 0x1fff)
+		{
+			fb_erase_op();
+		}
+		else if(data & 0x8000)
+		{
+			/*! @todo it also flushes current palette. */
+			fb_copy_op();
+		}
+	}
+}
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -382,7 +416,7 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_SHARE("gradram") /* "gradiation ram (0/1)" */
 	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE(airsys_paletteram16_w) AM_SHARE("paletteram")
 	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)    /* tilemaps, sprites */
-//	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
+	AM_RANGE(0x906000, 0x906007) AM_WRITE(dma_regs_w) // DMA?
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_SHARE("line_ram")    /* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM AM_SHARE("dsp_ram") /* "dsp common ram" (TMS320C25) */
 	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("tc0430grw") /* TC0430GRW roz transform coefficients */
@@ -585,10 +619,10 @@ static INPUT_PORTS_START( topland )
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START(STICK2_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xf800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START(STICK3_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ainferno )
@@ -645,10 +679,10 @@ static INPUT_PORTS_START( ainferno )
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START(STICK2_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START(STICK3_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -953,6 +987,6 @@ ROM_END
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY  FULLNAME */
-GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", GAME_NOT_WORKING )
+GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, ainferno, 0,        airsys,   ainferno, driver_device, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", GAME_NOT_WORKING )
 GAME( 1990, ainfernoj,ainferno, airsys,   ainferno, driver_device, 0,        ROT0,    "Taito Corporation Japan", "Air Inferno (Japan)", GAME_NOT_WORKING )

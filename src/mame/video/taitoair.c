@@ -259,23 +259,25 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 				if (xx2 > cliprect.max_x)
 					xx2 = cliprect.max_x;
 
-				if(header & 0x4000 || machine().input().code_pressed(KEYCODE_Q))
+				if(header & 0x4000 && machine().input().code_pressed(KEYCODE_Q))
 				{
 					base_color = machine().rand() & 0x3fff;
 					grad_col = 0;
 				}
-				else if(header & 0x40)
-				{
-					/* Non-terrain elements are colored with this. */
-					base_color = (header & 0x3f) + 0x340;
-					grad_col = 0;
-				}
-				else
+				else if(m_paletteram[(header & 0xff)+0x300] & 0x8000)
 				{
 					/* Terrain elements, with a gradient applied. */
 					/*! @todo it's unknown if gradient color applies by global screen Y coordinate or there's a calculation to somewhere ... */
 					base_color = ((header & 0x3f) * 0x80) + 0x2040;
+					if(header & 0x3fe0)
+						base_color = machine().rand() & 0x3fff;
 					grad_col = (y1 >> 3) & 0x3f;
+				}
+				else
+				{
+					/* Non-terrain elements are colored with this. */
+					base_color = (header & 0xff) + 0x300;
+					grad_col = 0;
 				}
 
 				while (xx1 <= xx2)
@@ -388,8 +390,84 @@ void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect,
   dsp handlers
 ***************************************************************************/
 
-/*
-    TODO: still don't know how this works. It calls three values (0x1fff-0x5fff-0xdfff), for two or three offsets.
+void taitoair_state::fb_copy_op()
+{
+	/*! @todo declare once */
+	rectangle cliprect;
+
+	/* printf("%04x -> %d\n",data,offset); */
+
+	cliprect.min_x = 0;
+	cliprect.min_y = 3*16;
+	cliprect.max_x = m_screen->width() - 1;
+	cliprect.max_y = m_screen->height() - 1;
+	
+	/* clear screen fb */
+	m_framebuffer[1]->fill(0, cliprect);
+	/* copy buffer fb into screen fb (at this stage we are ready to draw) */
+	copybitmap_trans(*m_framebuffer[1], *m_framebuffer[0], 0, 0, 0, 0, cliprect, 0);
+	/* now clear buffer fb */
+	m_framebuffer[0]->fill(0, cliprect);
+}
+
+void taitoair_state::fb_erase_op()
+{
+	/*! @todo declare once */
+	rectangle cliprect;
+
+	/* printf("%04x -> %d\n",data,offset); */
+
+	cliprect.min_x = 0;
+	cliprect.min_y = 3*16;
+	cliprect.max_x = m_screen->width() - 1;
+	cliprect.max_y = m_screen->height() - 1;
+	
+	m_framebuffer[0]->fill(0, cliprect);
+	m_framebuffer[1]->fill(0, cliprect);
+}
+
+void taitoair_state::fb_fill_op()
+{
+	/*! @todo declare once */
+	rectangle cliprect;
+
+	/* printf("%04x -> %d\n",data,offset); */
+
+	cliprect.min_x = 0;
+	cliprect.min_y = 3*16;
+	cliprect.max_x = m_screen->width() - 1;
+	cliprect.max_y = m_screen->height() - 1;
+	
+	if (m_line_ram[0x3fff])
+	{
+		int adr = 0x3fff;
+
+		while (adr >= 0 && m_line_ram[adr] && m_line_ram[adr] != 0x4000)
+		{
+			int pcount = 0;
+			m_q.header = m_line_ram[adr--];
+			while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(m_line_ram[adr] & 0xc000))
+			{
+				m_q.p[pcount].y = m_line_ram[adr--] + 3 * 16;
+				m_q.p[pcount].x = m_line_ram[adr--];
+				pcount++;
+			}
+			adr--;
+			m_q.pcount = pcount;
+			if (!(m_line_ram[adr] & 0x8000))
+			{
+				m_q.header |= 0x4000;
+				logerror("special poly at %04x\n", adr);
+				while(adr >= 0 && !(m_line_ram[adr] & 0xc000))
+					adr--;
+			}
+			fill_poly(*m_framebuffer[0], cliprect, &m_q);
+		}
+	}
+}
+
+/*!
+    @todo still don't know how this works. It calls three values (0x1fff-0x5fff-0xdfff), for two or three offsets.
     In theory this should fit into framebuffer draw, display, clear and swap in some way.
 */
 WRITE16_MEMBER(taitoair_state::dsp_flags_w)
@@ -407,43 +485,13 @@ WRITE16_MEMBER(taitoair_state::dsp_flags_w)
 		/* clear and copy operation if offset is 0x3001 */
 		if(offset == 1)
 		{
-			/* clear screen fb */
-			m_framebuffer[1]->fill(0, cliprect);
-			/* copy buffer fb into screen fb (at this stage we are ready to draw) */
-			copybitmap_trans(*m_framebuffer[1], *m_framebuffer[0], 0, 0, 0, 0, cliprect, 0);
-			/* now clear buffer fb */
-			m_framebuffer[0]->fill(0, cliprect);
+			fb_copy_op();
 		}
 
 		/* if offset 0x3001 OR 0x3002 we put data in the buffer fb */
 		if(offset)
 		{
-			if (m_line_ram[0x3fff])
-			{
-				int adr = 0x3fff;
-
-				while (adr >= 0 && m_line_ram[adr] && m_line_ram[adr] != 0x4000)
-				{
-					int pcount = 0;
-					m_q.header = m_line_ram[adr--];
-					while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(m_line_ram[adr] & 0xc000))
-					{
-						m_q.p[pcount].y = m_line_ram[adr--] + 3 * 16;
-						m_q.p[pcount].x = m_line_ram[adr--];
-						pcount++;
-					}
-					adr--;
-					m_q.pcount = pcount;
-					if (!(m_line_ram[adr] & 0x8000))
-					{
-						m_q.header |= 0x4000;
-						logerror("special poly at %04x\n", adr);
-						while(adr >= 0 && !(m_line_ram[adr] & 0xc000))
-							adr--;
-					}
-					fill_poly(*m_framebuffer[0], cliprect, &m_q);
-				}
-			}
+			fb_fill_op();
 		}
 	}
 }
@@ -505,13 +553,14 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 	}
 		
 
-	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+
 	sprite_ptr = draw_sprites(bitmap, cliprect);
-	
-	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);	
 	
 	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 
