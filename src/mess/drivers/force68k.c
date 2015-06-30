@@ -74,13 +74,13 @@ enabled/disabled via a jumper field.
 Additionally, the SYS68K1CPU-1 B/D supports the ACFAIL, SYSRESET, 
 SYSFAIL and SYSCLK signal (16 MHz).
 
-
 Based on the 68ksbc.c
 
     TODO:
     - Memory map
     - Dump ROM:s
-    - Add 3 x ACIA6850 
+    - Finish 3 x ACIA6850, terminal serial interface first
+    - Add 1 x 14411 Motorola, Baudrate Generator
     - Add 1 x 68230 Motorola, Parallel Interface / Timer
     - Add 1 x Abort Switch  
     - Add configurable serial connector between ACIA:s and 
@@ -92,7 +92,7 @@ Based on the 68ksbc.c
 ****************************************************************************/
 
 #include "emu.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mm58167.h"
 #include "machine/6850acia.h"
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x000000, 0x000000) AM_ROM /* Vectors mapped from System EPROM */
 //	AM_RANGE(0x000008, 0x01ffff) AM_RAM /* DRAM */
-	AM_RANGE(0x000000, 0x01ffff) AM_RAM /* All DRAM for debug */
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM /* All DRAM for debug */
 	AM_RANGE(0x080000, 0x09ffff) AM_ROM /* System EPROM Area */
 //        AM_RANGE(0x0e0400, 0x0e0420) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00)
 	AM_RANGE(0x0c0040, 0x0c0041) AM_DEVREADWRITE8("aciahost", acia6850_device, status_r, control_w, 0x00ff)
@@ -139,6 +139,7 @@ static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
 //	AM_RANGE(0x0a0000, 0x0bffff) AM_ROM /* User EPROM Area   */
 //      AM_RANGE(0x0e0000, 0x0fffff) AM_READWRITE_PORT /* IO interfaces */
 //      AM_RANGE(0x100000, 0xfeffff) /* VMEbus Rev B addresses (24 bits) */
+	AM_RANGE(0x100000, 0x1fffff) AM_RAM /* DRAM for Zbug */
 //      AM_RANGE(0xff0000, 0xffffff) /* VMEbus Rev B addresses (16 bits) */
 ADDRESS_MAP_END
 
@@ -177,10 +178,18 @@ static MACHINE_CONFIG_START( fccpu1, force68k_state )
 
         /* P4/Terminal Port config */
 	MCFG_DEVICE_ADD("aciaterm", ACIA6850, 0)
+
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232trm", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("aciaterm", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("aciaterm", acia6850_device, write_cts))
+
         MCFG_DEVICE_ADD("aciaterm_clock", CLOCK, 153600) /* 9600 x 16 */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
 
-        /* P5/Host Port config */
+        /* P5/Remote Port config */
 	MCFG_DEVICE_ADD("aciaremt", ACIA6850, 0)
         MCFG_DEVICE_ADD("aciaremt_clock", CLOCK, 153600) /* 9600 x 16 */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
@@ -229,6 +238,7 @@ MACHINE_CONFIG_END
 /* ROM definitions */
 ROM_START( fccpu1 )
 	ROM_REGION(0x1000000, "maincpu", 0)
+	ROM_LOAD( "zbug4.bin", 0x0000, 0x3000, CRC(670d96ee) SHA1(57fbe38ae4fb06b8d9afe21d92fdd981adbf1bb1) )
 //	ROM_LOAD( "forcesys68kV1.0L.bin", 0x0000, 0x2f78, CRC(20a8d0d0) SHA1(544fd8bd8ed017115388c8b0f7a7a59a32253e43) )
 ROM_END
 
