@@ -21,7 +21,10 @@ const device_type SM510 = &device_creator<sm510_device>;
 
 // internal memory maps
 static ADDRESS_MAP_START(program_2_7k, AS_PROGRAM, 8, sm510_base_device)
-	AM_RANGE(0x0000, 0x0aff) AM_ROM
+	AM_RANGE(0x0000, 0x02af) AM_ROM
+	AM_RANGE(0x0400, 0x06af) AM_ROM
+	AM_RANGE(0x0800, 0x0aaf) AM_ROM
+	AM_RANGE(0x0c00, 0x0eaf) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -87,20 +90,22 @@ void sm510_base_device::device_start()
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
-	m_op = 0;
-	m_prev_op = 0;
 	m_pc = 0;
 	m_prev_pc = 0;
+	m_op = 0;
+	m_prev_op = 0;
+	m_param = 0;
 	m_acc = 0;
 	m_bl = 0;
 	m_bm = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));
-	save_item(NAME(m_op));
-	save_item(NAME(m_prev_op));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
+	save_item(NAME(m_op));
+	save_item(NAME(m_prev_op));
+	save_item(NAME(m_param));
 	save_item(NAME(m_acc));
 	save_item(NAME(m_bl));
 	save_item(NAME(m_bm));

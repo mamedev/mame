@@ -67,10 +67,10 @@ protected:
 	int m_prgmask;
 	int m_datamask;
 
-	UINT16 m_prev_pc;
 	UINT16 m_pc;
-	UINT8 m_prev_op;
+	UINT16 m_prev_pc;
 	UINT8 m_op;
+	UINT8 m_prev_op;
 	UINT8 m_param;
 	int m_stack_levels;
 	UINT16 m_stack[2];
