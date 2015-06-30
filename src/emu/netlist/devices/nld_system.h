@@ -230,12 +230,12 @@ protected:
 		register_input("_I", m_I);
 		register_terminal("I",m_RIN.m_P);
 		register_terminal("G",m_RIN.m_N);
-		connect(m_I, m_RIN.m_P);
+		connect_late(m_I, m_RIN.m_P);
 
 		register_output("_Q", m_Q);
 		register_terminal("_OP",m_ROUT.m_P);
 		register_terminal("Q",m_ROUT.m_N);
-		connect(m_Q, m_ROUT.m_P);
+		connect_late(m_Q, m_ROUT.m_P);
 	}
 
 	void reset()

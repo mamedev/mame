@@ -288,12 +288,20 @@ void parser_t::net_c()
 void parser_t::netdev_param()
 {
 	pstring param;
-	nl_double val;
 	param = get_identifier();
 	require_token(m_tok_comma);
-	val = eval_param(get_token());
+	token_t tok = get_token();
+	if (tok.is_type(STRING))
+	{
+		NL_VERBOSE_OUT(("Parser: Param: %s %s\n", param.cstr(), tok.str().cstr()));
+		m_setup.register_param(param, tok.str());
+	}
+	else
+	{
+		nl_double val = eval_param(tok);
 	NL_VERBOSE_OUT(("Parser: Param: %s %f\n", param.cstr(), val));
 	m_setup.register_param(param, val);
+	}
 	require_token(m_tok_param_right);
 }
 

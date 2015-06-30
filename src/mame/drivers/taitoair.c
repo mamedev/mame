@@ -220,6 +220,14 @@ cpu #2 (PC=00000609): unmapped memory word read from 00006838 & FFFF
 cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 
 ****************************************************************************/
+/*!
+ @todo - Framebuffer DMA requires palette switch to be selected dynamically, see at first stage Course Select in Top Landing;
+	   - Air Inferno: missing landing monitor camera (blackened);
+	   - Air Inferno: missing 3d HUD graphics;
+	   - Air Inferno: Expert course has wrong 3d geometry;
+	   - Top Landing: Night stages might have wrong priority for stars-above-sea;
+	   - Input limiters / analog thresholds for both games;
+ */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -370,6 +378,33 @@ WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
 	membank("z80bank")->set_entry(data & 3);
 }
 
+/*!
+	@brief Framebuffer DMA control
+	@regs [0] x--- ---- ---- ---- copy framebuffer to the screen
+	      [0] --x- ---- ---- ---- unknown, used on POST test
+		  [0] 1001 1111 1111 1111 used by Air Inferno after erase op, erase -> copy?
+		  [0] 0001 1111 1111 1111 erase op?
+		  [1] xxxx xxxx xxxx xxxx fill value? 0xffff by Top Landing, 0x0000 Air Inferno
+		  [2] (unused)
+		  [3] both games uses 0xb7, most likely a register setting.
+*/
+WRITE16_MEMBER(taitoair_state::dma_regs_w)
+{	
+	printf("%08x %04x\n",offset,data);
+	
+	if(offset == 0 && ACCESSING_BITS_8_15)
+	{
+		if(data == 0x1fff)
+		{
+			fb_erase_op();
+		}
+		else if(data & 0x8000)
+		{
+			/*! @todo it also flushes current palette. */
+			fb_copy_op();
+		}
+	}
+}
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -382,7 +417,7 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_SHARE("gradram") /* "gradiation ram (0/1)" */
 	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE(airsys_paletteram16_w) AM_SHARE("paletteram")
 	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)    /* tilemaps, sprites */
-	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
+	AM_RANGE(0x906000, 0x906007) AM_WRITE(dma_regs_w) // DMA?
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_SHARE("line_ram")    /* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM AM_SHARE("dsp_ram") /* "dsp common ram" (TMS320C25) */
 	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("tc0430grw") /* TC0430GRW roz transform coefficients */
@@ -412,33 +447,101 @@ ADDRESS_MAP_END
 
 /********************************** TMS32025 ********************************/
 
-/*
-Air Inferno:
+WRITE16_MEMBER(taitoair_state::dsp_test_start_w)
+{
+	m_dsp_test_object_type = data;
+	m_dsp_test_or_clip = 0;
+	m_dsp_test_and_clip = 0xf;
+}
 
-write to 0x3404 - almost always 0x00fd / 0xff38  (253, -200)
-write to 0x3408 /
+WRITE16_MEMBER(taitoair_state::dsp_test_x_w)
+{
+	m_dsp_test_x = data;
+}
 
-write to 0x341b - May not be numeric - it's weird.  stays stable,
-                  then freaks out just before "quad: unknown value 0066"
-                  This function seems to break things up into different polygon
-                  'classes'
+WRITE16_MEMBER(taitoair_state::dsp_test_y_w)
+{
+	m_dsp_test_y = data;
+}
 
-write to 0x3418 - X value
-write to 0x3419 - Y value
-write to 0x341a - Z value
-read to 0x341b, puts data to internal RAM 0x380 - 0x384 - 0x388 - 0x38c
+WRITE16_MEMBER(taitoair_state::dsp_test_z_w)
+{
+	m_dsp_test_z = data;
+}
 
-checks 0x341c - if != to 0 then skip ... ?
-checks 0x341d - if == to 0 then skip ... ?
+READ16_MEMBER(taitoair_state::dsp_test_point_r)
+{
+	UINT16 r = 0;
+	if(m_dsp_test_x < -m_dsp_test_z)
+		r |= 1;
+	if(m_dsp_test_x >  m_dsp_test_z)
+		r |= 2;
+	if(m_dsp_test_y < -m_dsp_test_z)
+		r |= 4;
+	if(m_dsp_test_y >  m_dsp_test_z)
+		r |= 8;
 
-write to 0x3405 ; X value
-write to 0x3409 ; Y value
-write to 0x3406 ; Z value
-write to 0x340a ; Z value
-read to 0x340b, puts to line RAM (y) with offset + 0x160
-read to 0x3407, puts to line RAM (x) with offset + 0x5d
+	m_dsp_test_or_clip |= r;
+	m_dsp_test_and_clip &= r;
+	return r;
+}
 
-*/
+READ16_MEMBER(taitoair_state::dsp_test_or_clip_r)
+{
+	return m_dsp_test_or_clip;
+}
+
+READ16_MEMBER(taitoair_state::dsp_test_and_clip_r)
+{
+	return m_dsp_test_and_clip;
+}
+
+WRITE16_MEMBER(taitoair_state::dsp_muldiv_a_1_w)
+{
+	m_dsp_muldiv_a_1 = data;
+}
+
+WRITE16_MEMBER(taitoair_state::dsp_muldiv_b_1_w)
+{
+	m_dsp_muldiv_b_1 = data;
+}
+
+WRITE16_MEMBER(taitoair_state::dsp_muldiv_c_1_w)
+{
+	m_dsp_muldiv_c_1 = data;
+}
+
+READ16_MEMBER(taitoair_state::dsp_muldiv_1_r)
+{
+	if(m_dsp_muldiv_c_1 == 0)
+		return 0xffff; /**< @todo true value? */
+	
+	return m_dsp_muldiv_a_1*m_dsp_muldiv_b_1/m_dsp_muldiv_c_1;
+}
+
+WRITE16_MEMBER(taitoair_state::dsp_muldiv_a_2_w)
+{
+	m_dsp_muldiv_a_2 = data;
+}
+
+WRITE16_MEMBER(taitoair_state::dsp_muldiv_b_2_w)
+{
+	m_dsp_muldiv_b_2 = data;
+}
+
+WRITE16_MEMBER(taitoair_state::dsp_muldiv_c_2_w)
+{
+	m_dsp_muldiv_c_2 = data;
+}
+
+READ16_MEMBER(taitoair_state::dsp_muldiv_2_r)
+{
+	if(m_dsp_muldiv_c_2 == 0)
+		return 0xffff; /**< @todo true value? */
+	
+	return m_dsp_muldiv_a_2*m_dsp_muldiv_b_2/m_dsp_muldiv_c_2;
+}
+
 
 static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -447,18 +550,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, taitoair_state )
 	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
 	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
-	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_frustum_left_w)
-	AM_RANGE(0x3405, 0x3405) AM_WRITE(dsp_x_eyecoord_w)
-	AM_RANGE(0x3406, 0x3406) AM_WRITE(dsp_z_eyecoord_w)
-	AM_RANGE(0x3407, 0x3407) AM_READ(dsp_x_return_r)
-	AM_RANGE(0x3408, 0x3408) AM_WRITE(dsp_frustum_bottom_w)
-	AM_RANGE(0x3409, 0x3409) AM_WRITE(dsp_y_eyecoord_w)
-	AM_RANGE(0x340a, 0x340a) AM_WRITE(dsp_rasterize_w)      /* Just a (lame) guess */
-	AM_RANGE(0x340b, 0x340b) AM_READ(dsp_y_return_r)
-//  AM_RANGE(0x3418, 0x341a) AM_WRITE(dsp_sqrt_w)
-//  AM_RANGE(0x341b, 0x341b) AM_WRITE(dsp_sqrt_r)
-//  AM_RANGE(0x341c, 0x341c) AM_READ(dsp_sqrt_flags1_r)
-//  AM_RANGE(0x341d, 0x341d) AM_READ(dsp_sqrt_flags2_r)
+	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_muldiv_a_1_w)
+	AM_RANGE(0x3405, 0x3405) AM_WRITE(dsp_muldiv_b_1_w)
+	AM_RANGE(0x3406, 0x3406) AM_WRITE(dsp_muldiv_c_1_w)
+	AM_RANGE(0x3407, 0x3407) AM_READ(dsp_muldiv_1_r)
+
+	AM_RANGE(0x3408, 0x3408) AM_WRITE(dsp_muldiv_a_2_w)
+	AM_RANGE(0x3409, 0x3409) AM_WRITE(dsp_muldiv_b_2_w)
+	AM_RANGE(0x340a, 0x340a) AM_WRITE(dsp_muldiv_c_2_w)
+	AM_RANGE(0x340b, 0x340b) AM_READ(dsp_muldiv_2_r)
+
+	AM_RANGE(0x3418, 0x3418) AM_WRITE(dsp_test_x_w)
+	AM_RANGE(0x3419, 0x3419) AM_WRITE(dsp_test_y_w)
+	AM_RANGE(0x341a, 0x341a) AM_WRITE(dsp_test_z_w)
+	AM_RANGE(0x341b, 0x341b) AM_READWRITE(dsp_test_point_r, dsp_test_start_w)
+	AM_RANGE(0x341c, 0x341c) AM_READ(dsp_test_and_clip_r)
+	AM_RANGE(0x341d, 0x341d) AM_READ(dsp_test_or_clip_r)
+
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(lineram_r, lineram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
 ADDRESS_MAP_END
@@ -518,10 +626,10 @@ static INPUT_PORTS_START( topland )
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START(STICK2_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xf800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START(STICK3_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ainferno )
@@ -578,10 +686,10 @@ static INPUT_PORTS_START( ainferno )
 	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START(STICK2_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START(STICK3_PORT_TAG)
-	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -628,7 +736,7 @@ void taitoair_state::machine_start()
 {
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	save_item(NAME(m_q.col));
+	save_item(NAME(m_q.header));
 	save_item(NAME(m_q.pcount));
 
 	for (int i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
@@ -886,6 +994,6 @@ ROM_END
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY  FULLNAME */
-GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", GAME_NOT_WORKING )
+GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, ainferno, 0,        airsys,   ainferno, driver_device, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", GAME_NOT_WORKING )
 GAME( 1990, ainfernoj,ainferno, airsys,   ainferno, driver_device, 0,        ROT0,    "Taito Corporation Japan", "Air Inferno (Japan)", GAME_NOT_WORKING )

@@ -88,9 +88,6 @@ NETLIB_RESET(7474sub)
 	m_CLK.set_state(logic_t::STATE_INP_LH);
 
 	m_nextD = 0;
-	/* FIXME: required by pong doubles - need a mechanism to set this from netlist */
-	//m_Q.initial(1);
-	//m_QQ.initial(1);
 }
 
 NETLIB_START(7474_dip)

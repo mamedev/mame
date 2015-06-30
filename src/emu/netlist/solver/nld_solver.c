@@ -126,19 +126,19 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 			switch (p->type())
 			{
 				case terminal_t::TERMINAL:
-					switch (p->netdev().family())
+					switch (p->device().family())
 					{
 						case device_t::CAPACITOR:
-							if (!m_step_devices.contains(&p->netdev()))
-								m_step_devices.add(&p->netdev());
+							if (!m_step_devices.contains(&p->device()))
+								m_step_devices.add(&p->device());
 							break;
 						case device_t::BJT_EB:
 						case device_t::DIODE:
 						//case device_t::VCVS:
 						case device_t::BJT_SWITCH:
 							NL_VERBOSE_OUT(("found BJT/Diode\n"));
-							if (!m_dynamic_devices.contains(&p->netdev()))
-								m_dynamic_devices.add(&p->netdev());
+							if (!m_dynamic_devices.contains(&p->device()))
+								m_dynamic_devices.add(&p->device());
 							break;
 						default:
 							break;
@@ -202,7 +202,7 @@ ATTR_COLD void matrix_solver_t::start()
 {
 	register_output("Q_sync", m_Q_sync);
 	register_input("FB_sync", m_fb_sync);
-	connect(m_fb_sync, m_Q_sync);
+	connect_direct(m_fb_sync, m_Q_sync);
 
 	save(NLNAME(m_last_step));
 	save(NLNAME(m_cur_ts));
@@ -279,8 +279,7 @@ ATTR_HOT nl_double matrix_solver_t::solve()
 
 	// We are already up to date. Avoid oscillations.
 	// FIXME: Make this a parameter!
-	//if (delta < netlist_time::from_nsec(1)) // 20000
-	if (delta < netlist_time::from_nsec(20000)) // 20000
+	if (delta < netlist_time::from_nsec(1)) // 20000
 		return -1.0;
 
 	/* update all terminals for new time step */
@@ -346,7 +345,7 @@ NETLIB_START(solver)
 	// internal staff
 
 	register_input("FB_step", m_fb_step);
-	connect(m_fb_step, m_Q_step);
+	connect_late(m_fb_step, m_Q_step);
 
 }
 
@@ -425,9 +424,9 @@ template <int m_N, int _storage_N>
 matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_specific)
 {
 	if (use_specific && m_N == 1)
-		return palloc(matrix_solver_direct1_t, &m_params);
+		return palloc(matrix_solver_direct1_t(&m_params));
 	else if (use_specific && m_N == 2)
-		return palloc(matrix_solver_direct2_t, &m_params);
+		return palloc(matrix_solver_direct2_t(&m_params));
 	else
 	{
 		if (size >= m_gs_threshold)
@@ -435,17 +434,17 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 			if (pstring("SOR_MAT").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_SOR_mat_t<m_N,_storage_N> solver_mat;
-				return palloc(solver_mat, &m_params, size);
+				return palloc(solver_mat(&m_params, size));
 			}
 			else if (pstring("SOR").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
-				return palloc(solver_GS, &m_params, size);
+				return palloc(solver_GS(&m_params, size));
 			}
 			else if (pstring("GMRES").equals(m_iterative_solver))
 			{
 				typedef matrix_solver_GMRES_t<m_N,_storage_N> solver_GMRES;
-				return palloc(solver_GMRES, &m_params, size);
+				return palloc(solver_GMRES(&m_params, size));
 			}
 			else
 			{
@@ -456,7 +455,7 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const bool use_sp
 		else
 		{
 			typedef matrix_solver_direct_t<m_N,_storage_N> solver_D;
-			return palloc(solver_D, &m_params, size);
+			return palloc(solver_D(&m_params, size));
 		}
 	}
 }

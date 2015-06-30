@@ -22,7 +22,7 @@ namespace netlist
 	template <class _Element, class _Time>
 	class timed_queue
 	{
-		NETLIST_PREVENT_COPYING(timed_queue)
+		P_PREVENT_COPYING(timed_queue)
 	public:
 
 		class entry_t

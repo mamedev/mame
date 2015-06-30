@@ -221,7 +221,6 @@ void nbmj9195_state::machine_reset()
 
 DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ROM = memregion("audiocpu")->base();
 
 	// sound program patch

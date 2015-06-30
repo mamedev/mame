@@ -58,7 +58,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)                     
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(_name)                                                         \
-		setup.register_source(palloc(netlist::source_proc_t, # _name, &NETLIST_NAME(_name)));
+		setup.register_source(palloc(netlist::source_proc_t(# _name, &NETLIST_NAME(_name))));
 
 #define INCLUDE(_name)                                                              \
 		setup.include(# _name);
@@ -80,7 +80,7 @@ namespace netlist
 
 	class setup_t
 	{
-		NETLIST_PREVENT_COPYING(setup_t)
+		P_PREVENT_COPYING(setup_t)
 	public:
 
 		// ----------------------------------------------------------------------------------------
@@ -148,8 +148,11 @@ namespace netlist
 		void register_model(const pstring &model);
 		void register_alias(const pstring &alias, const pstring &out);
 		void register_alias_nofqn(const pstring &alias, const pstring &out);
+
 		void register_link_arr(const pstring &terms);
+		void register_link_fqn(const pstring &sin, const pstring &sout);
 		void register_link(const pstring &sin, const pstring &sout);
+
 		void register_param(const pstring &param, const pstring &value);
 		void register_param(const pstring &param, const double value);
 

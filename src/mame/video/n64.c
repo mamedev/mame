@@ -2446,8 +2446,8 @@ void n64_rdp::cmd_load_tlut(UINT32 w1, UINT32 w2)
 		default:    fatalerror("RDP: load_tlut: size = %d\n", m_misc_state.m_ti_size);
 	}
 
-	m_tiles[tilenum].sth = rgbaint_t(0, m_tiles[tilenum].sh, 0, m_tiles[tilenum].th);
-	m_tiles[tilenum].stl = rgbaint_t(0, m_tiles[tilenum].sl, 0, m_tiles[tilenum].tl);
+	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
+	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
 }
 
 void n64_rdp::cmd_set_tile_size(UINT32 w1, UINT32 w2)
@@ -2461,8 +2461,8 @@ void n64_rdp::cmd_set_tile_size(UINT32 w1, UINT32 w2)
 	m_tiles[tilenum].sh = (w2 >> 12) & 0xfff;
 	m_tiles[tilenum].th = (w2 >>  0) & 0xfff;
 
-	m_tiles[tilenum].sth = rgbaint_t(0, m_tiles[tilenum].sh, 0, m_tiles[tilenum].th);
-	m_tiles[tilenum].stl = rgbaint_t(0, m_tiles[tilenum].sl, 0, m_tiles[tilenum].tl);
+	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
+	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
 }
 
 void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
@@ -2626,8 +2626,8 @@ void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 		tile[tilenum].th = tl;
 	}
 
-	m_tiles[tilenum].sth = rgbaint_t(0, m_tiles[tilenum].sh, 0, m_tiles[tilenum].th);
-	m_tiles[tilenum].stl = rgbaint_t(0, m_tiles[tilenum].sl, 0, m_tiles[tilenum].tl);
+	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
+	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
 }
 
 void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
@@ -2748,8 +2748,8 @@ void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
 		default:    fatalerror("RDP: load_tile: size = %d\n", m_misc_state.m_ti_size);
 	}
 
-	m_tiles[tilenum].sth = rgbaint_t(0, m_tiles[tilenum].sh, 0, m_tiles[tilenum].th);
-	m_tiles[tilenum].stl = rgbaint_t(0, m_tiles[tilenum].sl, 0, m_tiles[tilenum].tl);
+	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
+	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
 }
 
 void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
@@ -2785,9 +2785,9 @@ void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
 	tex_tile->mm = rgbaint_t(tex_tile->ms ? ~0 : 0, tex_tile->ms ? ~0 : 0, tex_tile->mt ? ~0 : 0, tex_tile->mt ? ~0 : 0);
 	tex_tile->invmm = rgbaint_t(tex_tile->ms ? 0 : ~0, tex_tile->ms ? 0 : ~0, tex_tile->mt ? 0 : ~0, tex_tile->mt ? 0 : ~0);
 	tex_tile->mask = rgbaint_t(tex_tile->mask_s, tex_tile->mask_s, tex_tile->mask_t, tex_tile->mask_t);
-	tex_tile->lshift = rgbaint_t(0, tex_tile->lshift_s, 0, tex_tile->lshift_t);
-	tex_tile->rshift = rgbaint_t(0, tex_tile->rshift_s, 0, tex_tile->rshift_t);
-	tex_tile->clamp_st = rgbaint_t(0, tex_tile->clamp_s ? ~0 : 0, 0, tex_tile->clamp_t ? ~0 : 0);
+	tex_tile->lshift = rgbaint_t(tex_tile->lshift_s, tex_tile->lshift_s, tex_tile->lshift_t, tex_tile->lshift_t);
+	tex_tile->rshift = rgbaint_t(tex_tile->rshift_s, tex_tile->rshift_s, tex_tile->rshift_t, tex_tile->rshift_t);
+	tex_tile->clamp_st = rgbaint_t(tex_tile->clamp_s ? ~0 : 0, tex_tile->clamp_s ? ~0 : 0, tex_tile->clamp_t ? ~0 : 0, tex_tile->clamp_t ? ~0 : 0);
 
 	if (tex_tile->format == FORMAT_I && tex_tile->size > PIXEL_SIZE_8BIT)
 	{

@@ -9,12 +9,12 @@
 #define PPARSER_H_
 
 #include "pconfig.h"
-#include "../nl_config.h" // FIXME
-#include "../nl_util.h"
+#include "pstring.h"
+#include "plists.h"
 
 class ptokenizer
 {
-	NETLIST_PREVENT_COPYING(ptokenizer)
+	P_PREVENT_COPYING(ptokenizer)
 public:
 	virtual ~ptokenizer() {}
 
@@ -146,7 +146,7 @@ private:
 
 class ppreprocessor
 {
-	NETLIST_PREVENT_COPYING(ppreprocessor)
+	P_PREVENT_COPYING(ppreprocessor)
 public:
 
 	struct define_t

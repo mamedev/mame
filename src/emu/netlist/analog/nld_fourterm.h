@@ -99,9 +99,7 @@ protected:
  *
  *   RI = 1
  *
- *   FIXME: This needs extremely high levels of accuracy to work
- *          With the current default of 1mv we can only measure
- *          currents of 1mA.
+ *   This needs high levels of accuracy to work with 1 Ohm RI.
  *
  */
 

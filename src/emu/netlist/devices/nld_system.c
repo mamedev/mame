@@ -44,7 +44,7 @@ NETLIB_START(clock)
 	register_param("FREQ", m_freq, 7159000.0 * 5.0);
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
-	connect(m_feedback, m_Q);
+	connect_late(m_feedback, m_Q);
 }
 
 NETLIB_RESET(clock)
@@ -75,7 +75,7 @@ NETLIB_START(extclock)
 	register_param("OFFSET", m_offset, 0.0);
 	m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
 
-	connect(m_feedback, m_Q);
+	connect_late(m_feedback, m_Q);
 	{
 		netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
 		pstring_list_t pat(m_pattern.Value(),",");
@@ -202,7 +202,7 @@ void nld_d_to_a_proxy::start()
 	register_output("_Q", m_Q);
 	register_subalias("Q", m_RV.m_P);
 
-	connect(m_RV.m_N, m_Q);
+	connect_direct(m_RV.m_N, m_Q);
 
 	save(NLNAME(m_last_state));
 }
