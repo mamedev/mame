@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t vec_vaddc(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *sn)
+inline rsp_vec_t vec_vaddc(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *sn)
 {
 	rsp_vec_t sat_sum = _mm_adds_epu16(vs, vt);
 	rsp_vec_t unsat_sum = _mm_add_epi16(vs, vt);

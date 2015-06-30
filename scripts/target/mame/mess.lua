@@ -129,6 +129,7 @@ CPUS["HMCS40"] = true
 CPUS["E0C6200"] = true
 CPUS["MELPS4"] = true
 CPUS["HPHYBRID"] = true
+CPUS["SM510"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -287,6 +288,7 @@ VIDEOS["HUC6261"] = true
 VIDEOS["HUC6270"] = true
 VIDEOS["HUC6272"] = true
 VIDEOS["I8244"] = true
+VIDEOS["I82730"] = true
 VIDEOS["I8275"] = true
 --VIDEOS+= M50458"] = true
 --VIDEOS+= MB90082"] = true
@@ -2589,7 +2591,8 @@ files {
 	MAME_DIR .. "src/mess/drivers/cxhumax.c",   
 	MAME_DIR .. "src/mess/drivers/czk80.c",     
 	MAME_DIR .. "src/mess/drivers/d6800.c",     
-	MAME_DIR .. "src/mess/drivers/d6809.c",     
+	MAME_DIR .. "src/mess/drivers/d6809.c",
+	MAME_DIR .. "src/mess/drivers/daruma.c",     
 	MAME_DIR .. "src/mess/drivers/digel804.c",  
 	MAME_DIR .. "src/mess/drivers/dim68k.c",    
 	MAME_DIR .. "src/mess/drivers/dm7000.c",    
@@ -2621,6 +2624,7 @@ files {
 	MAME_DIR .. "src/emu/machine/nsc810.h", 
 	MAME_DIR .. "src/mess/drivers/i7000.c",
 	MAME_DIR .. "src/mess/drivers/ibm6580.c",   
+	MAME_DIR .. "src/mess/drivers/icatel.c",
 	MAME_DIR .. "src/mess/drivers/ie15.c",
 	MAME_DIR .. "src/mess/machine/ie15_kbd.c", 
 	MAME_DIR .. "src/mess/drivers/if800.c",     

@@ -1,10 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t vec_vrcp_vrsq(UINT32 iw, INT32 dp, UINT32 src, UINT32 e, UINT32 dest, UINT32 de)
+inline rsp_vec_t vec_vrcp_vrsq(UINT32 iw, INT32 dp, UINT32 src, UINT32 e, UINT32 dest, UINT32 de)
 {
-	UINT32 shift, idx;
-
 	// Get the element from VT.
 	INT16 vt = m_v[src].s[e & 0x7];
 
@@ -37,7 +35,7 @@ static inline rsp_vec_t vec_vrcp_vrsq(UINT32 iw, INT32 dp, UINT32 src, UINT32 e,
 
 		if (iw & 0x4) // VRSQ
 		{
-			idx = (idx | 0x200) & 0x3FE | (shift % 2);
+			idx = ((idx | 0x200) & 0x3fe) | (shift % 2);
 			result = rsp_divtable[idx];
 
 			result = ((0x10000 | result) << 14) >> ((31 - shift) >> 1);

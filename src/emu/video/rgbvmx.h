@@ -22,34 +22,35 @@ class rgbaint_t
 public:
 	inline rgbaint_t() { }
 	inline rgbaint_t(UINT32 rgba) { set(rgba); }
-	inline rgbaint_t(UINT32 a, UINT32 r, UINT32 g, UINT32 b) { set(a, r, g, b); }
+	inline rgbaint_t(INT32 a, INT32 r, INT32 g, INT32 b) { set(a, r, g, b); }
 	inline rgbaint_t(rgb_t& rgb) { set(rgb); }
 
 	inline void set(rgbaint_t& other) { m_value = other.m_value; }
 
 	inline void set(UINT32 rgba)
 	{
-		const vector unsigned int zero = vec_splat_u32(0);
-		const vector unsigned char temp = vec_perm(vec_lde(0, &rgba), zero, vec_lvsl(0, &rgba));
-		m_value = vec_mergeh((vector unsigned short)zero, (vector unsigned short)vec_mergeh((vector unsigned char)zero, temp));
+		const VECU32 zero = { 0, 0, 0, 0 };
+		const VECS8 temp = vec_perm(vec_lde(0, &rgba), zero, vec_lvsl(0, &rgba));
+		m_value = vec_mergeh((VECS16)zero, (VECS16)vec_mergeh((VECS8)zero, temp));
 	}
 
-	inline void set(UINT32 a, UINT32 r, UINT32 g, UINT32 b)
+	inline void set(INT32 a, INT32 r, INT32 g, INT32 b)
 	{
-		vector unsigned int result = { a, r, g, b };
+		VECS32 result = { a, r, g, b };
 		m_value = result;
 	}
 
 	inline void set(rgb_t& rgb)
 	{
-		const vector unsigned int zero = vec_splat_u32(0);
-		const vector unsigned char temp = vec_perm(vec_lde(0, rgb.ptr()), zero, vec_lvsl(0, rgb.ptr()));
-		m_value = vec_mergeh((vector unsigned short)zero, (vector unsigned short)vec_mergeh((vector unsigned char)zero, temp));
+		const VECU32 zero = { 0, 0, 0, 0 };
+		const VECS8 temp = vec_perm(vec_lde(0, rgb.ptr()), zero, vec_lvsl(0, rgb.ptr()));
+		m_value = vec_mergeh((VECS16)zero, (VECS16)vec_mergeh((VECS8)zero, temp));
 	}
 
 	inline rgb_t to_rgba()
 	{
-		const vector unsigned int temp = vec_splat((vector unsigned int)vec_pack(vec_pack(m_value, m_value), vec_splat_u16(0)), 0);
+		VECU32 temp = vec_pack(m_value, m_value);
+		temp = vec_pack((VECU16)temp, (VECU16)temp);
 		UINT32 result;
 		vec_ste(temp, 0, &result);
 		return result;
@@ -57,7 +58,8 @@ public:
 
 	inline rgb_t to_rgba_clamp()
 	{
-		const vector unsigned int temp = vec_splat((vector unsigned int)vec_packsu(vec_packsu(m_value, m_value), vec_splat_u16(0)), 0);
+		VECU32 temp = vec_packs(m_value, m_value);
+		temp = vec_packsu((VECU16)temp, (VECU16)temp);
 		UINT32 result;
 		vec_ste(temp, 0, &result);
 		return result;
@@ -68,15 +70,15 @@ public:
 		m_value = vec_add(m_value, color2.m_value);
 	}
 
-	inline void add_imm(const UINT32 imm)
+	inline void add_imm(const INT32 imm)
 	{
-		const vector unsigned int temp = { imm, imm, imm, imm };
+		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_add(m_value, temp);
 	}
 
-	inline void add_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void add_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_add(m_value, temp);
 	}
 
@@ -85,15 +87,15 @@ public:
 		m_value = vec_sub(m_value, color2.m_value);
 	}
 
-	inline void sub_imm(const UINT32 imm)
+	inline void sub_imm(const INT32 imm)
 	{
-		const vector unsigned int temp = { imm, imm, imm, imm };
+		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_sub(m_value, temp);
 	}
 
-	inline void sub_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void sub_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_sub(m_value, temp);
 	}
 
@@ -102,156 +104,156 @@ public:
 		m_value = vec_sub(color2.m_value, m_value);
 	}
 
-	inline void subr_imm(const UINT32 imm)
+	inline void subr_imm(const INT32 imm)
 	{
-		const vector unsigned int temp = { imm, imm, imm, imm };
+		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_sub(temp, m_value);
 	}
 
-	inline void subr_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void subr_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_sub(temp, m_value);
 	}
 
-	inline void set_a(const UINT32 value)
+	inline void set_a(const INT32 value)
 	{
-		const vector unsigned int temp = { value, 0, 0, 0 };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, alpha_perm);
 	}
 
-	inline void set_r(const UINT32 value)
+	inline void set_r(const INT32 value)
 	{
-		const vector unsigned int temp = { value, 0, 0, 0 };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, red_perm);
 	}
 
-	inline void set_g(const UINT32 value)
+	inline void set_g(const INT32 value)
 	{
-		const vector unsigned int temp = { value, 0, 0, 0 };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, green_perm);
 	}
 
-	inline void set_b(const UINT32 value)
+	inline void set_b(const INT32 value)
 	{
-		const vector unsigned int temp = { value, 0, 0, 0 };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, blue_perm);
 	}
 
 	inline UINT8 get_a()
 	{
 		UINT8 result;
-		vec_ste(vec_splat((vector unsigned char)m_value, 3), 0, &result);
+		vec_ste(vec_splat((VECU8)m_value, 3), 0, &result);
 		return result;
 	}
 
 	inline UINT8 get_r()
 	{
 		UINT8 result;
-		vec_ste(vec_splat((vector unsigned char)m_value, 7), 0, &result);
+		vec_ste(vec_splat((VECU8)m_value, 7), 0, &result);
 		return result;
 	}
 
 	inline UINT8 get_g()
 	{
 		UINT8 result;
-		vec_ste(vec_splat((vector unsigned char)m_value, 11), 0, &result);
+		vec_ste(vec_splat((VECU8)m_value, 11), 0, &result);
 		return result;
 	}
 
 	inline UINT8 get_b()
 	{
 		UINT8 result;
-		vec_ste(vec_splat((vector unsigned char)m_value, 15), 0, &result);
+		vec_ste(vec_splat((VECU8)m_value, 15), 0, &result);
 		return result;
 	}
 
-	inline UINT32 get_a32()
+	inline INT32 get_a32()
 	{
-		UINT32 result;
+		INT32 result;
 		vec_ste(vec_splat(m_value, 0), 0, &result);
 		return result;
 	}
 
-	inline UINT32 get_r32()
+	inline INT32 get_r32()
 	{
-		UINT32 result;
+		INT32 result;
 		vec_ste(vec_splat(m_value, 1), 0, &result);
 		return result;
 	}
 
-	inline UINT32 get_g32()
+	inline INT32 get_g32()
 	{
-		UINT32 result;
+		INT32 result;
 		vec_ste(vec_splat(m_value, 2), 0, &result);
 		return result;
 	}
 
-	inline UINT32 get_b32()
+	inline INT32 get_b32()
 	{
-		UINT32 result;
+		INT32 result;
 		vec_ste(vec_splat(m_value, 3), 0, &result);
 		return result;
 	}
 
 	inline void mul(const rgbaint_t& color)
 	{
-		const vector unsigned int shift = vec_splat_u32(-16);
-		const vector unsigned int temp = vec_add(vec_mule((vector unsigned short)m_value, (vector unsigned short)vec_sl(color.m_value, shift)), vec_mule((vector unsigned short)vec_sl(m_value, shift), (vector unsigned short)color.m_value));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((vector unsigned short)m_value, (vector unsigned short)color.m_value));
+		const VECU32 shift = vec_splat_u32(-16);
+		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(color.m_value, shift), vec_splat_u32(0));
+		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)color.m_value));
 	}
 
-	inline void mul_imm(const UINT32 imm)
+	inline void mul_imm(const INT32 imm)
 	{
-		const vector unsigned int value = { imm, imm, imm, imm };
-		const vector unsigned int shift = vec_splat_u32(-16);
-		const vector unsigned int temp = vec_add(vec_mule((vector unsigned short)m_value, (vector unsigned short)vec_sl(value, shift)), vec_mule((vector unsigned short)vec_sl(m_value, shift), (vector unsigned short)value));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((vector unsigned short)m_value, (vector unsigned short)value));
+		const VECU32 value = { imm, imm, imm, imm };
+		const VECU32 shift = vec_splat_u32(-16);
+		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(value, shift), vec_splat_u32(0));
+		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
 	}
 
-	inline void mul_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void mul_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int value = { a, r, g, b };
-		const vector unsigned int shift = vec_splat_u32(-16);
-		const vector unsigned int temp = vec_add(vec_mule((vector unsigned short)m_value, (vector unsigned short)vec_sl(value, shift)), vec_mule((vector unsigned short)vec_sl(m_value, shift), (vector unsigned short)value));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((vector unsigned short)m_value, (vector unsigned short)value));
+		const VECU32 value = { a, r, g, b };
+		const VECU32 shift = vec_splat_u32(-16);
+		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(value, shift), vec_splat_u32(0));
+		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
 	}
 
 	inline void shl(const rgbaint_t& shift)
 	{
-		const vector unsigned int limit = { 32, 32, 32, 32 };
-		const vector unsigned int temp = vec_splat(shift.m_value, 3);
+		const VECU32 limit = { 32, 32, 32, 32 };
+		const VECU32 temp = vec_splat(shift.m_value, 3);
 		m_value = vec_and(vec_sl(m_value, temp), vec_cmpgt(limit, temp));
 	}
 
 	inline void shl_imm(const UINT8 shift)
 	{
-		const vector unsigned int temp = { shift, shift, shift, shift };
+		const VECU32 temp = { shift, shift, shift, shift };
 		m_value = vec_sl(m_value, temp);
 	}
 
 	inline void shr(const rgbaint_t& shift)
 	{
-		const vector unsigned int limit = { 32, 32, 32, 32 };
-		const vector unsigned int temp = vec_splat(shift.m_value, 3);
+		const VECU32 limit = { 32, 32, 32, 32 };
+		const VECU32 temp = vec_splat(shift.m_value, 3);
 		m_value = vec_and(vec_sr(m_value, temp), vec_cmpgt(limit, temp));
 	}
 
 	inline void shr_imm(const UINT8 shift)
 	{
-		const vector unsigned int temp = { shift, shift, shift, shift };
+		const VECU32 temp = { shift, shift, shift, shift };
 		m_value = vec_sr(m_value, temp);
 	}
 
 	inline void sra(const rgbaint_t& shift)
 	{
-		const vector unsigned int limit = { 31, 31, 31, 31 };
-		m_value = vec_sra(m_value, vec_min(vec_splat(shift.m_value, 3), limit));
+		const VECU32 limit = { 31, 31, 31, 31 };
+		m_value = vec_sra(m_value, vec_min((VECU32)vec_splat(shift.m_value, 3), limit));
 	}
 
 	inline void sra_imm(const UINT8 shift)
 	{
-		const vector unsigned int temp = { shift, shift, shift, shift };
+		const VECU32 temp = { shift, shift, shift, shift };
 		m_value = vec_sra(m_value, temp);
 	}
 
@@ -260,15 +262,15 @@ public:
 		m_value = vec_or(m_value, color2.m_value);
 	}
 
-	inline void or_imm(const UINT32 value)
+	inline void or_imm(const INT32 value)
 	{
-		const vector unsigned int temp = { value, value, value, value };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_or(m_value, temp);
 	}
 
-	inline void or_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void or_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_or(m_value, temp);
 	}
 
@@ -277,15 +279,15 @@ public:
 		m_value = vec_and(m_value, color.m_value);
 	}
 
-	inline void and_imm(const UINT32 value)
+	inline void and_imm(const INT32 value)
 	{
-		const vector unsigned int temp = { value, value, value, value };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_and(m_value, temp);
 	}
 
-	inline void and_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void and_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_and(m_value, temp);
 	}
 
@@ -296,38 +298,44 @@ public:
 
 	inline void xor_imm(const INT32 value)
 	{
-		const vector unsigned int temp = { value, value, value, value };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_xor(m_value, temp);
 	}
 
-	inline void xor_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void xor_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_xor(m_value, temp);
 	}
 
 	inline void clamp_and_clear(const UINT32 sign)
 	{
-		const vector unsigned int vzero = vec_splat_u32(0);
-		vector unsigned int vsign = { sign, sign, sign, sign };
+		const VECS32 vzero = { 0, 0, 0, 0 };
+		VECS32 vsign = { sign, sign, sign, sign };
 		m_value = vec_and(m_value, vec_cmpeq(vec_and(m_value, vsign), vzero));
 		vsign = vec_nor(vec_sra(vsign, vec_splat_u32(1)), vzero);
-		const vector unsigned int mask = vec_cmpgt(m_value, vsign);
+		const VECS32 mask = vec_cmpgt(m_value, vsign);
 		m_value = vec_or(vec_and(vsign, mask), vec_and(m_value, vec_nor(mask, vzero)));
 	}
 
 	inline void sign_extend(const UINT32 compare, const UINT32 sign)
 	{
-		const vector unsigned int compare_vec = { compare, compare, compare, compare };
-		const vector unsigned int compare_mask = vec_cmpeq(vec_and(m_value, compare_vec), compare_vec);
-		const vector unsigned int sign_vec = { sign, sign, sign, sign };
+		const VECS32 compare_vec = { compare, compare, compare, compare };
+		const VECS32 compare_mask = vec_cmpeq(vec_and(m_value, compare_vec), compare_vec);
+		const VECS32 sign_vec = { sign, sign, sign, sign };
 		m_value = vec_or(m_value, vec_and(sign_vec, compare_mask));
 	}
 
-	inline void min(const UINT32 value)
+	inline void min(const INT32 value)
 	{
-		const vector unsigned int temp = { value, value, value, value };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_min(m_value, temp);
+	}
+
+	inline void max(const INT32 value)
+	{
+		const VECS32 temp = { value, value, value, value };
+		m_value = vec_max(m_value, temp);
 	}
 
 	void blend(const rgbaint_t& other, UINT8 factor);
@@ -343,15 +351,15 @@ public:
 		m_value = vec_cmpeq(m_value, value.m_value);
 	}
 
-	inline void cmpeq_imm(const UINT32 value)
+	inline void cmpeq_imm(const INT32 value)
 	{
-		const vector unsigned int temp = { value, value, value, value };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_cmpeq(m_value, temp);
 	}
 
-	inline void cmpeq_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void cmpeq_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_cmpeq(m_value, temp);
 	}
 
@@ -360,15 +368,15 @@ public:
 		m_value = vec_cmpgt(m_value, value.m_value);
 	}
 
-	inline void cmpgt_imm(const UINT32 value)
+	inline void cmpgt_imm(const INT32 value)
 	{
-		const vector unsigned int temp = { value, value, value, value };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_cmpgt(m_value, temp);
 	}
 
-	inline void cmpgt_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void cmpgt_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_cmpgt(m_value, temp);
 	}
 
@@ -377,15 +385,15 @@ public:
 		m_value = vec_cmplt(m_value, value.m_value);
 	}
 
-	inline void cmplt_imm(const UINT32 value)
+	inline void cmplt_imm(const INT32 value)
 	{
-		const vector unsigned int temp = { value, value, value, value };
+		const VECS32 temp = { value, value, value, value };
 		m_value = vec_cmplt(m_value, temp);
 	}
 
-	inline void cmplt_imm_rgba(const UINT32 a, const UINT32 r, const UINT32 g, const UINT32 b)
+	inline void cmplt_imm_rgba(const INT32 a, const INT32 r, const INT32 g, const INT32 b)
 	{
-		const vector unsigned int temp = { a, r, g, b };
+		const VECS32 temp = { a, r, g, b };
 		m_value = vec_cmplt(m_value, temp);
 	}
 
@@ -403,7 +411,7 @@ public:
 
 	inline rgbaint_t& operator+=(const INT32 other)
 	{
-		const vector unsigned int temp = { other, other, other, other };
+		const VECS32 temp = { other, other, other, other };
 		m_value = vec_add(m_value, temp);
 		return *this;
 	}
@@ -416,24 +424,24 @@ public:
 
 	inline rgbaint_t& operator*=(const rgbaint_t& other)
 	{
-		const vector unsigned int shift = vec_splat_u32(-16);
-		const vector unsigned int temp = vec_add(vec_mule((vector unsigned short)m_value, (vector unsigned short)vec_sl(other.m_value, shift)), vec_mule((vector unsigned short)vec_sl(m_value, shift), (vector unsigned short)other.m_value));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((vector unsigned short)m_value, (vector unsigned short)other.m_value));
+		const VECU32 shift = vec_splat_u32(-16);
+		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(other.m_value, shift), vec_splat_u32(0));
+		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)other.m_value));
 		return *this;
 	}
 
 	inline rgbaint_t& operator*=(const INT32 other)
 	{
-		const vector unsigned int value = { other, other, other, other };
-		const vector unsigned int shift = vec_splat_u32(-16);
-		const vector unsigned int temp = vec_add(vec_mule((vector unsigned short)m_value, (vector unsigned short)vec_sl(value, shift)), vec_mule((vector unsigned short)vec_sl(m_value, shift), (vector unsigned short)value));
-		m_value = vec_add(vec_sl(temp, shift), vec_mulo((vector unsigned short)m_value, (vector unsigned short)value));
+		const VECS32 value = { other, other, other, other };
+		const VECU32 shift = vec_splat_u32(-16);
+		const VECU32 temp = vec_msum((VECU16)m_value, (VECU16)vec_rl(value, shift), vec_splat_u32(0));
+		m_value = vec_add(vec_sl(temp, shift), vec_mulo((VECU16)m_value, (VECU16)value));
 		return *this;
 	}
 
 	inline rgbaint_t& operator>>=(const INT32 shift)
 	{
-		const vector unsigned int temp = { shift, shift, shift, shift };
+		const VECU32 temp = { shift, shift, shift, shift };
 		m_value = vec_sra(m_value, temp);
 		return *this;
 	}
@@ -473,13 +481,14 @@ public:
 	}
 
 protected:
-	typedef vector unsigned char    VECU8;
-	typedef vector signed short     VECS16;
-	typedef vector unsigned short   VECU16;
-	typedef vector signed int       VECS32;
-	typedef vector unsigned int     VECU32;
+	typedef __vector signed char    VECS8;
+	typedef __vector unsigned char  VECU8;
+	typedef __vector signed short   VECS16;
+	typedef __vector unsigned short VECU16;
+	typedef __vector signed int     VECS32;
+	typedef __vector unsigned int   VECU32;
 
-	vector VECU32                   m_value;
+	VECS32                          m_value;
 
 	static const VECU8              alpha_perm;
 	static const VECU8              red_perm;

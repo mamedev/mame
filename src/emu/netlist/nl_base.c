@@ -84,8 +84,8 @@ public:
 	}
 };
 
-const logic_family_desc_t &netlist_family_TTL = logic_family_ttl_t();
-const logic_family_desc_t &netlist_family_CD4000 = logic_family_cd4000_t();
+logic_family_desc_t *netlist_family_TTL = palloc(logic_family_ttl_t);
+logic_family_desc_t *netlist_family_CD4000 = palloc(logic_family_cd4000_t);
 
 class logic_family_std_proxy_t : public logic_family_desc_t
 {
@@ -97,12 +97,12 @@ public:
 	}
 };
 
-const logic_family_desc_t *logic_family_desc_t::from_model(const pstring &model)
+logic_family_desc_t *logic_family_desc_t::from_model(const pstring &model)
 {
 	if (setup_t::model_value_str(model, "TYPE", "") == "TTL")
-		return &netlist_family_TTL;
+		return netlist_family_TTL;
 	if (setup_t::model_value_str(model, "TYPE", "") == "CD4000")
-		return &netlist_family_CD4000;
+		return netlist_family_CD4000;
 
 	/* FIXME: Memory leak */
 	logic_family_std_proxy_t *ret = palloc(logic_family_std_proxy_t);

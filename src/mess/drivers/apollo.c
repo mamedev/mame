@@ -597,11 +597,20 @@ WRITE16_MEMBER(apollo_state::apollo_atbus_io_w)
 
 READ16_MEMBER(apollo_state::apollo_atbus_memory_r)
 {
-	return 0xffff;
+	// Motorola CPU is MSB first, ISA Bus is LSB first
+	UINT16 data = m_isa->prog16_swap_r(space, offset, mem_mask);
+
+	SLOG2(("apollo_atbus_memory_r at %08x = %04x & %04x", offset*2, data, mem_mask));
+
+	return data;
 }
 
 WRITE16_MEMBER(apollo_state::apollo_atbus_memory_w)
 {
+	SLOG2(("apollo_atbus_memory_w at %08x = %04x & %04x", offset*2, data, mem_mask));
+
+	// Motorola CPU is MSB first, ISA Bus is LSB first
+	m_isa->prog16_swap_w(space, offset, data, mem_mask);
 }
 
 /***************************************************************************
@@ -703,8 +712,6 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
-		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
-
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM /* 8MB RAM */
 		AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
@@ -743,8 +750,6 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
-		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
-
 		AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
@@ -777,8 +782,6 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
-		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
-
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
@@ -806,8 +809,6 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x009600, 0x0096ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
-
-		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
@@ -851,8 +852,6 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
-		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
-
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN5500_RAM_BASE, DN5500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
@@ -893,8 +892,6 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
-
-		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		AM_RANGE(DN5500_RAM_BASE, DN5500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")

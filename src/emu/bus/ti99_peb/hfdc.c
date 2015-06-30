@@ -90,7 +90,7 @@
     Modern implementation.
 */
 myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_expansion_card_device(mconfig, TI99_HFDC, "Myarc Hard and Floppy Disk Controller", tag, owner, clock, "ti99_hfdc_new", __FILE__),
+	: ti_expansion_card_device(mconfig, TI99_HFDC, "Myarc Hard and Floppy Disk Controller", tag, owner, clock, "ti99_hfdc", __FILE__),
 		m_hdc9234(*this, FDC_TAG),
 		m_clock(*this, CLOCK_TAG)
 {
@@ -227,7 +227,9 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 			// 0101 10xx xxxx xxxx  bank 2
 			// 0101 11xx xxxx xxxx  bank 3
 			int bank = (m_address & 0x0c00) >> 10;
-			*value = m_buffer_ram[(m_ram_page[bank]<<10) | (m_address & 0x03ff)];
+
+			// If a DMA is in progress, do not respond
+			if (m_dip == CLEAR_LINE) *value = m_buffer_ram[(m_ram_page[bank]<<10) | (m_address & 0x03ff)];
 			if (TRACE_RAM)
 			{
 				if ((m_address & 1)==0)  // only show even addresses with words
@@ -305,7 +307,9 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 			// 0101 11xx xxxx xxxx  bank 3
 			int bank = (m_address & 0x0c00) >> 10;
 			if (TRACE_RAM) logerror("%s: %04x[%02x] <- %02x\n", tag(), m_address & 0xffff, m_ram_page[bank], data);
-			m_buffer_ram[(m_ram_page[bank]<<10) | (m_address & 0x03ff)] = data;
+
+			// When a DMA is in progress, do not change anything
+			if (m_dip == CLEAR_LINE) m_buffer_ram[(m_ram_page[bank]<<10) | (m_address & 0x03ff)] = data;
 			return;
 		}
 		// The rest is ROM
@@ -704,6 +708,8 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 	// Check if we have a new floppy
 	if (m_floppy_unit[index] != m_current_floppy)
 	{
+		// Clear all latched flags from other drives
+		m_status_latch = 0;
 		disconnect_floppy_drives();
 		if (TRACE_LINES) logerror("%s: Select floppy drive DSK%d\n", tag(), index+1);
 
@@ -729,6 +735,8 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 {
 	if (m_harddisk_unit[index] != m_current_harddisk)
 	{
+		// Clear all latched flags form other drives
+		m_status_latch = 0;
 		disconnect_hard_drives();
 		if (TRACE_LINES) logerror("%s: Select hard disk WDS%d\n", tag(), index+1);
 
@@ -832,7 +840,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 }
 
 /*
-    Read a byte from the onboard SRAM
+    Read a byte from the onboard SRAM. This is called from the HDC9234.
 */
 READ8_MEMBER( myarc_hfdc_device::read_buffer )
 {
@@ -844,7 +852,7 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 }
 
 /*
-    Write a byte to the onboard SRAM
+    Write a byte to the onboard SRAM. This is called from the HDC9234.
 */
 WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
 {
@@ -1067,7 +1075,7 @@ const device_type TI99_HFDC = &device_creator<myarc_hfdc_device>;
 #define LOG logerror
 
 myarc_hfdc_legacy_device::myarc_hfdc_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_expansion_card_device(mconfig, TI99_HFDC_LEG, "Myarc Hard and Floppy Disk Controller LEGACY", tag, owner, clock, "ti99_hfdc", __FILE__),
+	: ti_expansion_card_device(mconfig, TI99_HFDC_LEG, "Myarc Hard and Floppy Disk Controller LEGACY", tag, owner, clock, "ti99_hfdc_leg", __FILE__),
 		m_hdc9234(*this, FDC_TAG),
 		m_clock(*this, CLOCK_TAG)
 {

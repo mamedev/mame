@@ -537,8 +537,8 @@ UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
 		return &m_decrypted_opcodes[state][0];
 
 	// otherwise, allocate and decrypt
-	m_decrypted_opcodes[state].resize(0x100000/2);
-	memset(&m_decrypted_opcodes[state][0], 0, 0x100000);
+	m_decrypted_opcodes[state].resize(0x200000/2);
+	memset(&m_decrypted_opcodes[state][0], 0, 0x200000);
 	m_fd1094.decrypt(m_baseaddress, m_size, m_rgnoffset, &m_decrypted_opcodes[state][0], state);
 	return &m_decrypted_opcodes[state][0];
 }

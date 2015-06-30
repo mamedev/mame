@@ -33,153 +33,207 @@ const rsp_cop2::vec_helpers_t rsp_cop2::m_vec_helpers = {
 		{  0,  0,  0,  0,  0,  0,  0, ~0 }
 	},
 	{ // shuffle_keys
-/* -- */{0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e},
-/* -- */{0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e},
+		{ 0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e }, /* -- */
+		{ 0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e }, /* -- */
 
-/* 0q */{0x0100, 0x0100, 0x0504, 0x0504, 0x0908, 0x0908, 0x0d0c, 0x0d0c},
-/* 1q */{0x0302, 0x0302, 0x0706, 0x0706, 0x0b0a, 0x0b0a, 0x0f0e, 0x0f0e},
+		{ 0x0100, 0x0100, 0x0504, 0x0504, 0x0908, 0x0908, 0x0d0c, 0x0d0c }, /* 0q */
+		{ 0x0302, 0x0302, 0x0706, 0x0706, 0x0b0a, 0x0b0a, 0x0f0e, 0x0f0e }, /* 1q */
 
-/* 0h */{0x0100, 0x0100, 0x0100, 0x0100, 0x0908, 0x0908, 0x0908, 0x0908},
-/* 1h */{0x0302, 0x0302, 0x0302, 0x0302, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a},
-/* 2h */{0x0504, 0x0504, 0x0504, 0x0504, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c},
-/* 3h */{0x0706, 0x0706, 0x0706, 0x0706, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e},
+		{ 0x0100, 0x0100, 0x0100, 0x0100, 0x0908, 0x0908, 0x0908, 0x0908 }, /* 0h */
+		{ 0x0302, 0x0302, 0x0302, 0x0302, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a }, /* 1h */
+		{ 0x0504, 0x0504, 0x0504, 0x0504, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c }, /* 2h */
+		{ 0x0706, 0x0706, 0x0706, 0x0706, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e }, /* 3h */
 
-/* 0w */{0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100},
-/* 1w */{0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302},
-/* 2w */{0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504},
-/* 3w */{0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706},
-/* 4w */{0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908},
-/* 5w */{0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a},
-/* 6w */{0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c},
-/* 7w */{0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e}
+		{ 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100 }, /* 0w */
+		{ 0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302 }, /* 1w */
+		{ 0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504 }, /* 2w */
+		{ 0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706 }, /* 3w */
+		{ 0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908 }, /* 4w */
+		{ 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a }, /* 5w */
+		{ 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c }, /* 6w */
+		{ 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e }  /* 7w */
 	},
 	{ // sll_b2l_keys
-		{0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d},
-		{0x0102, 0x8000, 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c},
-		{0x0001, 0x8080, 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b},
-		{0x8000, 0x8080, 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a},
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0102, 0x8000, 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c },
+		{ 0x0001, 0x8080, 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b },
+		{ 0x8000, 0x8080, 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a },
 
-		{0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809},
-		{0x8080, 0x8080, 0x0102, 0x8000, 0x0506, 0x0304, 0x090a, 0x0708},
-		{0x8080, 0x8080, 0x0001, 0x8080, 0x0405, 0x0203, 0x0809, 0x0607},
-		{0x8080, 0x8080, 0x8000, 0x8080, 0x0304, 0x0102, 0x0708, 0x0506},
+		{ 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
+		{ 0x8080, 0x8080, 0x0102, 0x8000, 0x0506, 0x0304, 0x090a, 0x0708 },
+		{ 0x8080, 0x8080, 0x0001, 0x8080, 0x0405, 0x0203, 0x0809, 0x0607 },
+		{ 0x8080, 0x8080, 0x8000, 0x8080, 0x0304, 0x0102, 0x0708, 0x0506 },
 
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x0102, 0x8000, 0x0506, 0x0304},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x0001, 0x8080, 0x0405, 0x0203},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8000, 0x8080, 0x0304, 0x0102},
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0102, 0x8000, 0x0506, 0x0304 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0001, 0x8080, 0x0405, 0x0203 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8000, 0x8080, 0x0304, 0x0102 },
 
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0102, 0x8000},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0001, 0x8080},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8000, 0x8080}
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0102, 0x8000 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0001, 0x8080 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8000, 0x8080 }
 	},
 	{ // sll_l2b_keys
-		{0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d},
-		{0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e},
-		{0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f},
-		{0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08},
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e },
+		{ 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f },
+		{ 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08 },
 
-		{0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809},
-		{0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a},
-		{0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b},
-		{0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04},
+		{ 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
+		{ 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a },
+		{ 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b },
+		{ 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04 },
 
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700},
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700 },
 
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203},
-		{0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380}
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380 }
 	},
 	{ // srl_b2l_keys
-		{0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d},
-		{0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f80, 0x0d0e},
-		{0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x8080, 0x0e0f},
-		{0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x8080, 0x0f80},
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f80, 0x0d0e },
+		{ 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x8080, 0x0e0f },
+		{ 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x8080, 0x0f80 },
 
-		{0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x8080, 0x8080},
-		{0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f80, 0x0d0e, 0x8080, 0x8080},
-		{0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x8080, 0x0e0f, 0x8080, 0x8080},
-		{0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x8080, 0x0f80, 0x8080, 0x8080},
+		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x8080, 0x8080 },
+		{ 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f80, 0x0d0e, 0x8080, 0x8080 },
+		{ 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x8080, 0x0e0f, 0x8080, 0x8080 },
+		{ 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x8080, 0x0f80, 0x8080, 0x8080 },
 
-		{0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x8080, 0x8080, 0x8080, 0x8080},
-		{0x0b0c, 0x090a, 0x0f80, 0x0d0e, 0x8080, 0x8080, 0x8080, 0x8080},
-		{0x0c0d, 0x0a0b, 0x8080, 0x0e0f, 0x8080, 0x8080, 0x8080, 0x8080},
-		{0x0d0e, 0x0b0c, 0x8080, 0x0f80, 0x8080, 0x8080, 0x8080, 0x8080},
+		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0b0c, 0x090a, 0x0f80, 0x0d0e, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0c0d, 0x0a0b, 0x8080, 0x0e0f, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0d0e, 0x0b0c, 0x8080, 0x0f80, 0x8080, 0x8080, 0x8080, 0x8080 },
 
-		{0x0e0f, 0x0c0d, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080},
-		{0x0f80, 0x0d0e, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080},
-		{0x8080, 0x0e0f, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080},
-		{0x8080, 0x0f80, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080}
+		{ 0x0e0f, 0x0c0d, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0f80, 0x0d0e, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x8080, 0x0e0f, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x8080, 0x0f80, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 }
 	},
 	{ // ror_b2l_keys
-		{0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d},
-		{0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f00, 0x0d0e},
-		{0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x0001, 0x0e0f},
-		{0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x0102, 0x0f00},
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f00, 0x0d0e },
+		{ 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x0001, 0x0e0f },
+		{ 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x0102, 0x0f00 },
 
-		{0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001},
-		{0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f00, 0x0d0e, 0x0304, 0x0102},
-		{0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x0001, 0x0e0f, 0x0405, 0x0203},
-		{0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x0102, 0x0f00, 0x0506, 0x0304},
+		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
+		{ 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f00, 0x0d0e, 0x0304, 0x0102 },
+		{ 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x0001, 0x0e0f, 0x0405, 0x0203 },
+		{ 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x0102, 0x0f00, 0x0506, 0x0304 },
 
-		{0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405},
-		{0x0b0c, 0x090a, 0x0f00, 0x0d0e, 0x0304, 0x0102, 0x0708, 0x0506},
-		{0x0c0d, 0x0a0b, 0x0001, 0x0e0f, 0x0405, 0x0203, 0x0809, 0x0607},
-		{0x0d0e, 0x0b0c, 0x0102, 0x0f00, 0x0506, 0x0304, 0x090a, 0x0708},
+		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x0b0c, 0x090a, 0x0f00, 0x0d0e, 0x0304, 0x0102, 0x0708, 0x0506 },
+		{ 0x0c0d, 0x0a0b, 0x0001, 0x0e0f, 0x0405, 0x0203, 0x0809, 0x0607 },
+		{ 0x0d0e, 0x0b0c, 0x0102, 0x0f00, 0x0506, 0x0304, 0x090a, 0x0708 },
 
-		{0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809},
-		{0x0f00, 0x0d0e, 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a},
-		{0x0001, 0x0e0f, 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b},
-		{0x0102, 0x0f00, 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c}
+		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
+		{ 0x0f00, 0x0d0e, 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a },
+		{ 0x0001, 0x0e0f, 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b },
+		{ 0x0102, 0x0f00, 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c }
 	},
 	{ // rol_l2b_keys
-		{0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d},
-		{0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e},
-		{0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f},
-		{0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08},
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e },
+		{ 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f },
+		{ 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08 },
 
-		{0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809},
-		{0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a},
-		{0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b},
-		{0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04},
+		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
+		{ 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a },
+		{ 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b },
+		{ 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04 },
 
-		{0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405},
-		{0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506},
-		{0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607},
-		{0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400},
+		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506 },
+		{ 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607 },
+		{ 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400 },
 
-		{0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001},
-		{0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102},
-		{0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203},
-		{0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c}
+		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
+		{ 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102 },
+		{ 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203 },
+		{ 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c }
 	},
 	{ // ror_l2b_keys
-		{0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d},
-		{0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c},
-		{0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203},
-		{0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102},
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c },
+		{ 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203 },
+		{ 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102 },
 
-		{0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001},
-		{0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700},
-		{0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607},
-		{0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506},
+		{ 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
+		{ 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700 },
+		{ 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607 },
+		{ 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506 },
 
-		{0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405},
-		{0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04},
-		{0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b},
-		{0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a},
+		{ 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04 },
+		{ 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b },
+		{ 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a },
 
-		{0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809},
-		{0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08},
-		{0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f},
-		{0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e}
+		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809 },
+		{ 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08 },
+		{ 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f },
+		{ 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e }
 	}
 };
+
+#ifndef __SSSE3__
+rsp_vec_t rsp_cop2::vec_load_and_shuffle_operand(const UINT16* src, UINT32 element)
+{
+	if (element >= 8) // element => 0w ... 7w
+	{
+		UINT16 word_lo;
+
+		memcpy(&word_lo, src + (element - 8), sizeof(word_lo));
+		UINT64 dword = word_lo | ((UINT32) word_lo << 16);
+
+		return _mm_shuffle_epi32(_mm_loadl_epi64((rsp_vec_t*) &dword), _MM_SHUFFLE(0,0,0,0));
+	}
+	else if (element >= 4) // element => 0h ... 3h
+	{
+		UINT16 word_lo;
+		UINT16 word_hi;
+
+		memcpy(&word_hi, src + element - 0, sizeof(word_hi));
+		memcpy(&word_lo, src + element - 4, sizeof(word_lo));
+		UINT64 dword = word_lo | ((UINT32) word_hi << 16);
+
+		rsp_vec_t v = _mm_loadl_epi64((rsp_vec_t*) &dword);
+		v = _mm_shufflelo_epi16(v, _MM_SHUFFLE(1,1,0,0));
+		return _mm_shuffle_epi32(v, _MM_SHUFFLE(1,1,0,0));
+	}
+	else if (element >= 2) // element => 0q ... 1q
+	{
+		rsp_vec_t v = vec_load_unshuffled_operand(src);
+
+		if (element == 2) {
+			v = _mm_shufflelo_epi16(v, _MM_SHUFFLE(3,3,1,1));
+			v = _mm_shufflehi_epi16(v, _MM_SHUFFLE(3,3,1,1));
+		}
+		else
+		{
+			v = _mm_shufflelo_epi16(v, _MM_SHUFFLE(2,2,0,0));
+			v = _mm_shufflehi_epi16(v, _MM_SHUFFLE(2,2,0,0));
+		}
+
+		return v;
+	}
+
+	return vec_load_unshuffled_operand(src);
+}
+#else
+rsp_vec_t rsp_cop2::vec_load_and_shuffle_operand(const UINT16* src, UINT32 element)
+{
+	rsp_vec_t operand = _mm_load_si128((rsp_vec_t*) src);
+	rsp_vec_t key = _mm_load_si128((rsp_vec_t*) m_vec_helpers.shuffle_keys[element]);
+
+	return _mm_shuffle_epi8(operand, key);
+}
+#endif
 #endif
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
@@ -1092,6 +1146,17 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Multiplies signed integer by signed integer * 2
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmulf_vmulu(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1131,6 +1196,17 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmulf_vmulu(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1174,6 +1250,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The low slice of accumulator is stored into destination element
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadl_vmudl(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1204,6 +1295,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The middle slice of accumulator is stored into destination element
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadm_vmudm(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1235,6 +1341,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The low slice of accumulator is stored into destination element
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadn_vmudn(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1265,6 +1386,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The highest 32 bits of accumulator is saturated into destination element
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadh_vmudh(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1296,6 +1432,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added to accumulator
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmacf_vmacu(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1330,6 +1481,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmacf_vmacu(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -1383,6 +1549,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The low slice of accumulator is stored into destination element
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadl_vmudl(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -1415,6 +1596,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The middle slice of accumulator is stored into destination element
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadm_vmudm(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1449,6 +1645,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The low slice of accumulator is stored into destination element
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadn_vmudn(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1486,6 +1697,21 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The highest 32 bits of accumulator is saturated into destination element
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadh_vmudh(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -1519,6 +1745,18 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// TODO: check VS2REG == VDREG
 
 #if USE_SIMD
+			rsp_vec_t acc_lo;
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t carry = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vadd(vs, vt_shuffle, carry, &acc_lo);
+
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, acc_lo);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1551,6 +1789,18 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// TODO: check VS2REG == VDREG
 
 #if USE_SIMD
+			rsp_vec_t acc_lo;
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t carry = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vsub(vs, vt_shuffle, carry, &acc_lo);
+
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, acc_lo);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -1583,6 +1833,15 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// the result to destination register
 
 #if USE_SIMD
+			rsp_vec_t acc_lo;
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vabs(vs, vt_shuffle, vec_zero(), &acc_lo);
+
+			write_acc_lo(acc, acc_lo);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -1628,6 +1887,17 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// TODO: check VS2REG = VDREG
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t sn;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vaddc(vs, vt_shuffle, vec_zero(), &sn);
+
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, sn);
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CARRY_FLAGS();
@@ -1663,6 +1933,17 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// TODO: check VS2REG = VDREG
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t eq, sn;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vsubc(vs, vt_shuffle, vec_zero(), &eq, &sn);
+
+			write_vco_hi(m_flags[RSP_VCO].s, eq);
+			write_vco_lo(m_flags[RSP_VCO].s, sn);
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CARRY_FLAGS();
@@ -1700,6 +1981,18 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Stores high, middle or low slice of accumulator to destination vector
 
 #if USE_SIMD
+			switch (EL)
+			{
+				case 8:
+					break;
+				case 9:
+					break;
+				case 10:
+					break;
+
+				default:
+					break;
+			}
 #else
 			switch (EL)
 			{
@@ -1746,6 +2039,22 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Moves the element in VS2 to destination vector
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le;
+
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_veq_vge_vlt_vne(op, vs, vt_shuffle, vec_zero(), &le, eq, sign);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, vec_zero());
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP2_FLAGS();
@@ -1797,6 +2106,22 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Moves the element in VS2 to destination vector
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le;
+
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_veq_vge_vlt_vne(op, vs, vt_shuffle, vec_zero(), &le, eq, sign);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, vec_zero());
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP2_FLAGS();
@@ -1836,6 +2161,22 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Moves the element in VS2 to destination vector
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le;
+
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_veq_vge_vlt_vne(op, vs, vt_shuffle, vec_zero(), &le, eq, sign);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, vec_zero());
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP2_FLAGS();
@@ -1876,6 +2217,22 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Moves the element in VS2 to destination vector
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le;
+
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_veq_vge_vlt_vne(op, vs, vt_shuffle, vec_zero(), &le, eq, sign);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, vec_zero());
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP2_FLAGS();
@@ -1915,6 +2272,25 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Vector clip low
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t ge = read_vcc_hi(m_flags[RSP_VCC].s);
+			rsp_vec_t le = read_vcc_lo(m_flags[RSP_VCC].s);
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+			rsp_vec_t vce = read_vce(m_flags[RSP_VCE].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vcl(vs, vt_shuffle, vec_zero(), &ge, &le, eq, sign, vce);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, ge);
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_vce(m_flags[RSP_VCE].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -2012,6 +2388,20 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Vector clip high
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t ge, le, sign, eq, vce;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vch(vs, vt_shuffle, vec_zero(), &ge, &le, &eq, &sign, &vce);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, ge);
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, eq);
+			write_vco_lo(m_flags[RSP_VCO].s, sign);
+			write_vce(m_flags[RSP_VCE].s, vce);
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			CLEAR_CARRY_FLAGS();
 			CLEAR_COMPARE_FLAGS();
@@ -2099,6 +2489,20 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Vector clip reverse
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t ge, le;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vcr(vs, vt_shuffle, vec_zero(), &ge, &le);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, ge);
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_vce(m_flags[RSP_VCE].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			CLEAR_CARRY_FLAGS();
 			CLEAR_COMPARE_FLAGS();
@@ -2161,6 +2565,17 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Merges two vectors according to compare flags
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le = read_vcc_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmrg(vs, vt_shuffle, le);
+
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -2189,6 +2604,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Bitwise AND of two vector registers
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vand_vnand(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -2209,6 +2632,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Bitwise NOT AND of two vector registers
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vand_vnand(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -2229,6 +2660,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Bitwise OR of two vector registers
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vor_vnor(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			for (i = 0; i < 8; i++)
 			{
@@ -2249,6 +2688,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Bitwise NOT OR of two vector registers
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vor_vnor(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -2269,6 +2716,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Bitwise XOR of two vector registers
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vxor_vnxor(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -2289,6 +2744,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Bitwise NOT XOR of two vector registers
 
 #if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vxor_vnxor(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
 #else
 			for (i=0; i < 8; i++)
 			{
@@ -2310,6 +2773,12 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Calculates reciprocal
 
 #if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			INT32 dp = op & m_dp_flag;
+			m_dp_flag = 0;
+
+			m_v[VDREG].v = vec_vrcp_vrsq(op, dp, VS2REG, EL, VDREG, VS1REG);
 #else
 			INT32 shifter = 0;
 
@@ -2373,6 +2842,12 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Calculates reciprocal low part
 
 #if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			INT32 dp = op & m_dp_flag;
+			m_dp_flag = 0;
+
+			m_v[VDREG].v = vec_vrcp_vrsq(op, dp, VS2REG, EL, VDREG, VS1REG);
 #else
 			INT32 shifter = 0;
 
@@ -2452,6 +2927,11 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Calculates reciprocal high part
 
 #if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			m_dp_flag = 1;
+
+			m_v[VDREG].v = vec_vdivh(VS2REG, EL, VDREG, VS1REG);
 #else
 			m_reciprocal_high = (VREG_S(VS2REG, EL & 7)) << 16;
 			m_dp_allowed = 1;
@@ -2477,6 +2957,8 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Moves element from vector to destination vector
 
 #if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+			m_v[VDREG].v = vec_vmov(VS2REG, EL, VDREG, VS1REG);
 #else
 			VREG_S(VDREG, VS1REG & 7) = VREG_S(VS2REG, EL & 7);
 			for (i = 0; i < 8; i++)
@@ -2497,6 +2979,12 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Calculates reciprocal square-root
 
 #if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			INT32 dp = op & m_dp_flag;
+			m_dp_flag = 0;
+
+			m_v[VDREG].v = vec_vrcp_vrsq(op, dp, VS2REG, EL, VDREG, VS1REG);
 #else
 			INT32 shifter = 0;
 
@@ -2561,6 +3049,12 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Calculates reciprocal square-root low part
 
 #if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			INT32 dp = op & m_dp_flag;
+			m_dp_flag = 0;
+
+			m_v[VDREG].v = vec_vrcp_vrsq(op, dp, VS2REG, EL, VDREG, VS1REG);
 #else
 			INT32 shifter = 0;
 			INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
@@ -2643,6 +3137,11 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Calculates reciprocal square-root high part
 
 #if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			m_dp_flag = 1;
+
+			m_v[VDREG].v = vec_vdivh(VS2REG, EL, VDREG, VS1REG);
 #else
 			m_reciprocal_high = (VREG_S(VS2REG, EL & 7)) << 16;
 			m_dp_allowed = 1;

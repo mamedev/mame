@@ -131,22 +131,34 @@ NETLIB_UPDATE(extclock)
 // logic_input
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(ttl_input)
+NETLIB_START(logic_input)
 {
+	/* make sure we get the family first */
+	register_param("FAMILY", m_FAMILY, ".model FAMILY(TYPE=TTL)");
+	set_logic_family(logic_family_desc_t::from_model(m_FAMILY.Value()));
+
 	register_output("Q", m_Q);
 	register_param("IN", m_IN, 0);
 }
 
-NETLIB_RESET(ttl_input)
+NETLIB_RESET(logic_input)
 {
 }
 
-NETLIB_UPDATE(ttl_input)
+NETLIB_STOP(logic_input)
+{
+	if (m_logic_family != NULL)
+		if (!m_logic_family->m_is_static)
+			pfree(m_logic_family);
+}
+
+
+NETLIB_UPDATE(logic_input)
 {
 	OUTLOGIC(m_Q, m_IN.Value() & 1, netlist_time::from_nsec(1));
 }
 
-NETLIB_UPDATE_PARAM(ttl_input)
+NETLIB_UPDATE_PARAM(logic_input)
 {
 	update();
 }

@@ -241,9 +241,9 @@ typedef UINT8 netlist_sig_t;
 		, _priv)
 
 #define NETLIB_LOGIC_FAMILY(_fam)                                               \
-virtual const logic_family_desc_t *default_logic_family()     \
+virtual logic_family_desc_t *default_logic_family()						        \
 {                                                                               \
-	return &netlist_family_ ## _fam;                                            \
+	return netlist_family_ ## _fam;                                             \
 }
 
 
@@ -325,7 +325,7 @@ namespace netlist
 
 		bool m_is_static;
 
-		static const logic_family_desc_t *from_model(const pstring &model);
+		static logic_family_desc_t *from_model(const pstring &model);
 	};
 
 	class logic_family_t
@@ -333,12 +333,13 @@ namespace netlist
 	public:
 
 		logic_family_t() : m_logic_family(NULL) {}
+		~logic_family_t() { }
 
-		ATTR_HOT  const logic_family_desc_t *logic_family() const { return m_logic_family; }
-		ATTR_COLD void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
+		ATTR_HOT  logic_family_desc_t *logic_family() const { return m_logic_family; }
+		ATTR_COLD void set_logic_family(logic_family_desc_t *fam) { m_logic_family = fam; }
 
-	private:
-		const logic_family_desc_t *m_logic_family;
+	protected:
+		logic_family_desc_t *m_logic_family;
 	};
 
 	/* Terminals inherit the family description from the netlist_device
@@ -348,8 +349,9 @@ namespace netlist
 	 * Only devices of type GENERIC should have a family description entry
 	 */
 
-	extern const logic_family_desc_t &netlist_family_TTL;
-	extern const logic_family_desc_t &netlist_family_CD4000;
+
+	extern logic_family_desc_t *netlist_family_TTL;
+	extern logic_family_desc_t *netlist_family_CD4000;
 
 
 	// -----------------------------------------------------------------------------
@@ -1044,9 +1046,9 @@ namespace netlist
 		ATTR_HOT virtual void update() { }
 		virtual void start() { }
 		virtual void stop() { }                                                  \
-		virtual const logic_family_desc_t *default_logic_family()
+		virtual logic_family_desc_t *default_logic_family()
 		{
-			return &netlist_family_TTL;
+			return netlist_family_TTL;
 		}
 
 	private:

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t vec_vmrg(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t le)
+inline rsp_vec_t vec_vmrg(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t le)
 {
 #ifdef __SSE4_1__
 	return _mm_blendv_epi8(vt, vs, le);

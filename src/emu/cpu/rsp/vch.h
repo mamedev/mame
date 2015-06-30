@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t vec_vch(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *ge, rsp_vec_t *le, rsp_vec_t *eq, rsp_vec_t *sign, rsp_vec_t *vce) {
+inline rsp_vec_t vec_vch(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *ge, rsp_vec_t *le, rsp_vec_t *eq, rsp_vec_t *sign, rsp_vec_t *vce) {
 	// sign = (vs ^ vt) < 0
 	*sign = _mm_xor_si128(vs, vt);
 	*sign = _mm_cmplt_epi16(*sign, zero);

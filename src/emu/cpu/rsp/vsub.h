@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-static inline rsp_vec_t rsp_vsub(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t carry, rsp_vec_t *acc_lo)
+inline rsp_vec_t vec_vsub(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t carry, rsp_vec_t *acc_lo)
 {
 	// acc_lo uses saturated arithmetic.
 	rsp_vec_t unsat_diff = _mm_sub_epi16(vt, carry);

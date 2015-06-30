@@ -66,17 +66,14 @@
    ECC
    Write long (see MODE register; only useful with ECC)
    Tape operations
-   Hard disk operation
+   Read track (HD)
 
    === Implemented but untested ===
    Burst mode
    Restore
    Poll drives
    Seek/Read ID
-   Multi-sector read/write
-   Usage of seek complete
-   Read/write sectors physical
-   Read track
+   Read track (floppy)
 */
 
 /*
@@ -305,7 +302,7 @@ enum
 	STEP_ON,
 	STEP_OFF,
 	RESTORE_CHECK,
-	WAIT_SEEK_COMPLETE,
+	WAIT_SEEK_COMPLETE,   // 0x08
 	SEEK_COMPLETE,
 	HEAD_DELAY,
 	WAITINDEX0,
@@ -313,7 +310,7 @@ enum
 	TRACKSTART,
 	TRACKDONE,
 	POLL1,
-	POLL2,
+	POLL2,        // 0x10
 	POLL3,
 
 	READ_ID = 0x40,
@@ -335,11 +332,12 @@ enum
 	LIVE_STATES = 0x80,
 	SEARCH_IDAM,
 	SEARCH_IDAM_FAILED,
+	VERIFY_FAILED,
 	READ_TWO_MORE_A1_IDAM,
 	READ_IDENT,
 	READ_ID_FIELDS_INTO_REGS,
 	SEARCH_DAM,
-	READ_TWO_MORE_A1_DAM,
+	READ_TWO_MORE_A1_DAM,        // 0x88
 	READ_DATADEL_FLAG,
 	SEARCH_DAM_FAILED,
 	READ_SECTOR_DATA,
@@ -347,7 +345,7 @@ enum
 	WRITE_DAM_AND_SECTOR,
 	WRITE_SEC_SKIP_GAP2,
 	WRITE_SEC_SKIP_GAP2_LOOP,
-	WRITE_SEC_BYTE,
+	WRITE_SEC_BYTE,              // 0x90
 	WRITE_SEC_NEXT_BYTE,
 
 	WRITE_TRACK_BYTE,
@@ -358,7 +356,7 @@ enum
 
 	FORMAT_TRACK,
 	WRITE_GAP0,
-	WRITE_GAP1,
+	WRITE_GAP1,             // 0x98
 	WRITE_GAP2,
 	WRITE_GAP3,
 	WRITE_GAP4,
@@ -366,7 +364,7 @@ enum
 	WRITE_IXAM,
 	WRITE_FC,
 	WRITE_IDAM_SYNC,
-	WRITE_IDAM,
+	WRITE_IDAM,            // 0xa0
 	WRITE_HEADER,
 	WRITE_IDENT,
 
@@ -375,7 +373,7 @@ enum
 	WRITE_DATAMARK,
 	WRITE_SECDATA,
 	WRITE_DATA_CRC,
-	WRITE_DONE,
+	WRITE_DONE,            // 0xa8
 	WRITE_HEADER_CRC,
 
 	READ_TRACK,
@@ -605,6 +603,7 @@ void hdc9234_device::wait_time(emu_timer *tm, const attotime &delay, int param)
 void hdc9234_device::wait_line(int line, line_state level, int substate, bool stopwrite)
 {
 	bool line_at_level = true;
+
 	if (line == SEEKCOMP_LINE && (seek_complete() == (level==ASSERT_LINE)))
 	{
 		if (TRACE_LINES) logerror("%s: SEEK_COMPLETE line is already %d\n", tag(), level);
@@ -636,6 +635,7 @@ void hdc9234_device::wait_line(int line, line_state level, int substate, bool st
 	if (line_at_level)
 	{
 		m_substate = substate;
+		m_event_line = UNDEF;
 		m_state_after_line = UNDEF;
 		reenter_command_processing();
 	}
@@ -755,7 +755,7 @@ void hdc9234_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			break;
 
 		default:
-			logerror("%s: unknown substate %d in read_id\n", tag(), m_substate);
+			logerror("%s: unknown substate %02x in read_id\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -788,6 +788,10 @@ void hdc9234_device::verify(int& cont, bool verify_all)
 			// find the desired sector.
 
 			if (TRACE_VERIFY && TRACE_SUBSTATES) logerror("%s: substate VERIFY\n", tag());
+			if (TRACE_VERIFY) logerror("%s: VERIFY: Find sector CHS=(%d,%d,%d)\n", tag(),
+					desired_cylinder(),
+					desired_head(),
+					desired_sector());
 
 			// If an error occurred (no IDAM found), terminate the command
 			// (This test is only relevant when we did not have a seek phase before)
@@ -815,6 +819,7 @@ void hdc9234_device::verify(int& cont, bool verify_all)
 					desired_sector());
 				m_substate = DATA_TRANSFER;
 				cont = NEXT;
+				m_first_sector_found = true;
 			}
 			else
 			{
@@ -837,19 +842,16 @@ void hdc9234_device::verify(int& cont, bool verify_all)
 			break;
 
 		case VERIFY3:
-			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
+			if (TRACE_VERIFY) logerror("%s: Total bytes read: %d\n", tag(), m_live_state.bit_count_total / 16);
+			if ((m_register_r[CHIP_STATUS] & CS_COMPERR) != 0)
 			{
 				if (TRACE_FAIL) logerror("%s: VERIFY failed to find sector CHS=(%d,%d,%d)\n", tag(), desired_cylinder(), desired_head(), desired_sector());
-				// live_run has set the sync error; clear it
-				set_bits(m_register_r[CHIP_STATUS], CS_SYNCERR, false);
-				// and set the compare error bit instead
-				set_bits(m_register_r[CHIP_STATUS], CS_COMPERR, true);
 				cont = ERROR;
 				break;
 			}
 
 			// Continue with the loop
-			if (verify_all)
+			if (verify_all || !m_first_sector_found)
 			{
 				// this is for the logical sector reading/writing
 				m_substate = VERIFY1;
@@ -865,7 +867,7 @@ void hdc9234_device::verify(int& cont, bool verify_all)
 			break;
 
 		default:
-			logerror("%s: unknown substate %d in verify\n", tag(), m_substate);
+			logerror("%s: unknown substate %02x in verify\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -896,7 +898,7 @@ void hdc9234_device::data_transfer(int& cont)
 		switch (m_substate)
 		{
 		case DATA_TRANSFER:
-			if (TRACE_TRANSFER && TRACE_SUBSTATES) logerror("%s: substate DATA_TRANSFER\n", tag());
+			if (TRACE_TRANSFER && TRACE_SUBSTATES) logerror("%s: substate DATA_TRANSFER (%s)\n", tag(), m_write? "write" : "read");
 
 			// Count from 0 again
 			m_live_state.bit_count_total = 0;
@@ -956,7 +958,7 @@ void hdc9234_device::data_transfer(int& cont)
 			}
 			else
 			{
-				if (TRACE_TRANSFER) logerror("%s: Sector successfully read\n", tag());
+				if (TRACE_TRANSFER) logerror("%s: Sector successfully read (count=%d)\n", tag(), m_register_w[SECTOR_COUNT]-1);
 
 				// Update the DMA registers for multi-sector operations
 				if (m_multi_sector)
@@ -998,7 +1000,7 @@ void hdc9234_device::data_transfer(int& cont)
 			break;
 
 		case DATA_TRANSFER_WRITE:
-			if (TRACE_TRANSFER) logerror("%s: Sector successfully written\n", tag());
+			if (TRACE_TRANSFER) logerror("%s: Sector successfully written (count=%d)\n", tag(), m_register_w[SECTOR_COUNT]-1);
 
 			// Update the DMA registers for multi-sector operations
 			if (m_multi_sector)
@@ -1029,7 +1031,7 @@ void hdc9234_device::data_transfer(int& cont)
 			break;
 
 		default:
-			logerror("%s: unknown substate %d in data_transfer\n", tag(), m_substate);
+			logerror("%s: unknown substate %02x in data_transfer\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -1479,7 +1481,7 @@ void hdc9234_device::seek_read_id()
 			cont = SUCCESS;
 			break;
 		default:
-			logerror("%s: unknown substate %d in seek_read_id\n", tag(), m_substate);
+			logerror("%s: unknown substate %02x in seek_read_id\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -1520,6 +1522,7 @@ void hdc9234_device::read_sectors()
 		m_multi_sector = (m_register_w[SECTOR_COUNT] != 1);
 		m_write = false;
 		m_substate = READ_ID;
+		m_first_sector_found = false;
 	}
 
 	int cont = NEXT;
@@ -1540,7 +1543,7 @@ void hdc9234_device::read_sectors()
 			data_transfer(cont);
 			break;
 		default:
-			logerror("%s: unknown substate %d in read_sectors\n", tag(), m_substate);
+			logerror("%s: unknown substate %02x in read_sectors\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -1703,6 +1706,7 @@ void hdc9234_device::format_track()
 		switch (m_substate)
 		{
 		case WAITINDEX0:
+			if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Formatting - wait for index hole\n", tag());
 			if (!index_hole())
 			{
 				m_substate = WAITINDEX1;
@@ -1711,6 +1715,7 @@ void hdc9234_device::format_track()
 			else
 			{
 				// We're above the index hole right now, so wait for the line going down
+				if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Index hole just passing by ... waiting for next\n", tag());
 				wait_line(INDEX_LINE, ASSERT_LINE, WAITINDEX1, false);
 				cont = WAIT;
 			}
@@ -1721,8 +1726,8 @@ void hdc9234_device::format_track()
 			cont = WAIT;
 			break;
 		case TRACKSTART:
+			if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Formatting - index hole arrived\n", tag());
 			live_start(FORMAT_TRACK);
-			wait_line(INDEX_LINE, ASSERT_LINE, TRACKDONE, true);
 			cont = WAIT;
 			break;
 		case TRACKDONE:
@@ -1756,6 +1761,8 @@ void hdc9234_device::format_track()
     |  1  |NoSeek|Logical|Normal|RedWC|  Precompensation |
     +-----+------+-------+------+-----+-----+-----+------+
 
+    Write physical: typical value 11000000
+    Write logical : typical value 10110000
 */
 void hdc9234_device::write_sectors()
 {
@@ -1772,9 +1779,28 @@ void hdc9234_device::write_sectors()
 		m_precompensation = (current_command() & 0x07);
 		// Important for DATA TRANSFER
 		m_transfer_enabled = true;
-		m_sync_size = fm_mode()? 6 : 12;
-		m_gap2_size = fm_mode()? 11 : 22;
+
+		// Something interesting here:
+		//
+		// The values for sync and gap2 are passed to the formatting routing
+		// but how do we know their values right now, when we are writing sectors?
+		// Since this is not clearly stated in the specification, we have to
+		// use the default values here
+		// Actually, why can we choose that value for formatting in the first place?
+
+		if (using_floppy())
+		{
+			m_sync_size = fm_mode()? 6 : 12;
+			m_gap2_size = fm_mode()? 11 : 22;
+		}
+		else
+		{
+			// Values for HD
+			m_sync_size = 13;
+			m_gap2_size = 3;
+		}
 		m_write = false; // until we're writing
+		m_first_sector_found = false;
 	}
 
 	int cont = NEXT;
@@ -1796,7 +1822,7 @@ void hdc9234_device::write_sectors()
 			data_transfer(cont);
 			break;
 		default:
-			logerror("%s: unknown substate %d in write_sectors\n", tag(), m_substate);
+			logerror("%s: unknown substate %02x in write_sectors\n", tag(), m_substate);
 			cont = ERROR;
 		}
 	}
@@ -1871,7 +1897,7 @@ bool hdc9234_device::found_mark(int state)
 */
 void hdc9234_device::live_start(int state)
 {
-	if (TRACE_LIVE) logerror("%s: [%s] Live start substate=%d\n", tag(), ttsn().c_str(), state);
+	if (TRACE_LIVE) logerror("%s: [%s] Live start substate=%02x\n", tag(), ttsn().c_str(), state);
 	m_live_state.time = machine().time();
 	m_live_state.state = state;
 	m_live_state.next_state = -1;
@@ -1919,9 +1945,9 @@ void hdc9234_device::live_run_until(attotime limit)
 	if (TRACE_LIVE)
 	{
 		if (limit == attotime::never)
-			logerror("%s: [%s live] live_run, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("%s: [%s live] live_run, live_state=%02x, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 		else
-			logerror("%s: [%s live] live_run until %s, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("%s: [%s live] live_run until %s, live_state=%02x, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 	}
 
 	if (limit == attotime::never)
@@ -1972,7 +1998,11 @@ void hdc9234_device::live_run_until(attotime limit)
 			// [1] p. 9: The ID field sync mark must be found within 33,792 byte times
 			if (m_live_state.bit_count_total > 33792*16)
 			{
-				wait_for_realtime(SEARCH_IDAM_FAILED);
+				// Desired sector not found within time
+				if (m_substate == VERIFY3)
+					wait_for_realtime(VERIFY_FAILED);
+				else
+					wait_for_realtime(SEARCH_IDAM_FAILED);
 				return;
 			}
 
@@ -2005,6 +2035,11 @@ void hdc9234_device::live_run_until(attotime limit)
 
 		case SEARCH_IDAM_FAILED:
 			set_bits(m_register_r[CHIP_STATUS], CS_SYNCERR, true);
+			m_live_state.state = IDLE;
+			return;
+
+		case VERIFY_FAILED:
+			set_bits(m_register_r[CHIP_STATUS], CS_COMPERR, true);
 			m_live_state.state = IDLE;
 			return;
 
@@ -2052,7 +2087,13 @@ void hdc9234_device::live_run_until(attotime limit)
 			if ((m_live_state.data_reg & 0xfc) != 0xfc)
 			{
 				// This may happen when we accidentally locked onto the DAM. Look for the next IDAM.
-				if (TRACE_LIVE) logerror("%s: Missing ident data after A1A1A1\n", tag());
+				if (TRACE_LIVE)
+				{
+					if (m_live_state.data_reg == 0xf8 || m_live_state.data_reg == 0xfb)
+						logerror("%s: [%s live] Looks like a DAM; continue to next mark\n", tag(), tts(m_live_state.time).c_str());
+					else
+						logerror("%s: [%s live] Missing ident data after A1A1A1, and it was not DAM; format corrupt?\n", tag(), tts(m_live_state.time).c_str());
+				}
 				m_live_state.state = SEARCH_IDAM;
 				break;
 			}
@@ -2089,8 +2130,6 @@ void hdc9234_device::live_run_until(attotime limit)
 			if(slot > 4)
 			{
 				// We successfully read the ID fields; let's wait for the machine time to catch up.
-				m_live_state.bit_count_total = 0;
-
 				if ((current_command() & 0xfe) == 0x5a)
 					// Continue if we're reading a complete track
 					wait_for_realtime(READ_TRACK_ID_DONE);
@@ -2588,6 +2627,7 @@ void hdc9234_device::live_run_until(attotime limit)
 
 		case WRITE_GAP4:
 			// Write bytes up to the end of the track
+			wait_line(INDEX_LINE, ASSERT_LINE, TRACKDONE, true);
 			if (TRACE_WRITE && TRACE_DETAIL && m_last_live_state != WRITE_GAP4)
 			{
 				logerror("%s: Writing GAP4\n", tag());
@@ -2720,6 +2760,10 @@ void hdc9234_device::live_run_until(attotime limit)
     otherwise, used to replay the read/write operation up to the point where the event happened
 
     THIS IS THE HARDDISK-ONLY LIVE_RUN
+
+    NB: Although unlikely, hard disks may be recorded in FM format with this controller
+    [1], section "Drive select", table
+    This is currently unsupported; hard disks are forced to MFM
 */
 void hdc9234_device::live_run_hd_until(attotime limit)
 {
@@ -2732,13 +2776,17 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 	if (TRACE_LIVE)
 	{
 		if (limit == attotime::never)
-			logerror("%s: [%s live] live_run_hd, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("%s: [%s live] live_run_hd, live_state=%02x, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 		else
-			logerror("%s: [%s live] live_run_hd until %s, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("%s: [%s live] live_run_hd until %s, live_state=%02x, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 	}
 
 	// We did not specify an upper time bound, so we take the next index pulse
-	if (m_harddisk != NULL) limit = m_harddisk->track_end_time();
+	if (limit == attotime::never && m_harddisk != NULL)
+	{
+		limit = m_harddisk->track_end_time();
+		if (TRACE_LIVE) logerror("%s: [%s live] live_run_hd new limit %s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str());
+	}
 
 	while (true)
 	{
@@ -2766,7 +2814,11 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 			// [1] p. 9: The ID field sync mark must be found within 33,792 byte times
 			if (m_live_state.bit_count_total > 33792*16)
 			{
-				wait_for_realtime(SEARCH_IDAM_FAILED);
+				// Desired sector not found within time
+				if (m_substate == VERIFY3)
+					wait_for_realtime(VERIFY_FAILED);
+				else
+					wait_for_realtime(SEARCH_IDAM_FAILED);
 				return;
 			}
 
@@ -2786,6 +2838,11 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 			m_live_state.state = IDLE;
 			return;
 
+		case VERIFY_FAILED:
+			set_bits(m_register_r[CHIP_STATUS], CS_COMPERR, true);
+			m_live_state.state = IDLE;
+			return;
+
 		case READ_IDENT:
 			if (read_from_mfmhd(limit)) return;
 
@@ -2795,8 +2852,13 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 			// Ident bytes are 111111xx
 			if ((m_live_state.data_reg & 0xfc) != 0xfc)
 			{
-				// This may happen when we accidentally locked onto the DAM. Look for the next IDAM.
-				if (TRACE_LIVE) logerror("%s: Missing ident byte after A1\n", tag());
+				if (TRACE_LIVE)
+				{
+					if (m_live_state.data_reg == 0xf8 || m_live_state.data_reg == 0xfb)
+						logerror("%s: [%s live] Looks like a DAM; continue to next mark\n", tag(), tts(m_live_state.time).c_str());
+					else
+						logerror("%s: [%s live] Missing ident data after A1, and it was not DAM; format corrupt?\n", tag(), tts(m_live_state.time).c_str());
+				}
 				m_live_state.state = SEARCH_IDAM;
 			}
 			else
@@ -2826,8 +2888,6 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 			if(slot > 5)
 			{
 				// We successfully read the ID fields; let's wait for the machine time to catch up.
-				m_live_state.bit_count_total = 0;
-
 				if ((current_command() & 0xfe) == 0x5a)
 					// Continue if we're reading a complete track
 					wait_for_realtime(READ_TRACK_ID_DONE);
@@ -2976,11 +3036,288 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 				if (TRACE_LIVE) logerror("%s: [%s live] Byte %02x sent via DMA\n", tag(),tts(m_live_state.time).c_str(), m_register_r[DATA] & 0xff);
 			}
 			m_live_state.state = READ_SECTOR_DATA;
+			break;
+
+		// ==== Track R/W operations (HD), also used for sector writing ===============
+
+		case READ_TRACK_BYTE:
+			// The pause is implemented by doing dummy reads on the hard disk
+			if (read_from_mfmhd(limit))
+			{
+				if (TRACE_LIVE) logerror("%s: [%s live] return; limit=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str());
+				return;
+			}
+
+			// Repeat until we have collected 16 bits
+			if ((m_live_state.bit_counter & 15)==0)
+			{
+				if (TRACE_READ && TRACE_DETAIL) logerror("%s: [%s live] Read byte %02x, repeat = %d\n", tag(), tts(m_live_state.time).c_str(), m_live_state.data_reg, m_live_state.repeat);
+				wait_for_realtime(READ_TRACK_NEXT_BYTE);
+				return;
+			}
+			break;
+
+		case READ_TRACK_NEXT_BYTE:
+			m_live_state.state = READ_TRACK_BYTE;
+			m_live_state.repeat--;
+			if (m_live_state.repeat == 0)
+			{
+				// All bytes read
+				m_live_state.state = m_live_state.return_state;
+				checkpoint();
+			}
+			break;
+
+		case WRITE_TRACK_BYTE:
+			if (write_to_mfmhd(limit))
+			{
+				logerror("%s: [%s live] write limit reached\n", tag(), tts(m_live_state.time).c_str());
+				return;
+			}
+
+			if (m_live_state.bit_counter == 0)
+			{
+				// All bits written; get the next byte into the shift register
+				wait_for_realtime(WRITE_TRACK_NEXT_BYTE);
+				return;
+			}
+			break;
+
+		case WRITE_TRACK_NEXT_BYTE:
+			m_live_state.state = WRITE_TRACK_BYTE;
+			m_live_state.repeat--;
+
+			// Write all bytes
+			if (m_live_state.repeat == 0)
+			{
+				// All bytes written
+				m_live_state.state = m_live_state.return_state;
+				checkpoint();
+			}
+			else
+				encode_again();
 
 			break;
 
+			// ======= HD sector write =====================================
+
+		case WRITE_DAM_AND_SECTOR:
+			if (TRACE_LIVE) logerror("%s: [%s live] Skipping GAP2\n", tag(), tts(m_live_state.time).c_str());
+			skip_on_track(m_gap2_size, WRITE_DAM_SYNC);
+
+			break;
+
+		case WRITE_DAM_SYNC:
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sync zeros\n", tag());
+
+			// Clear the overrun/underrun flag
+			set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
+			write_on_track(encode_hd(0x00), m_sync_size, WRITE_A1);
+			break;
+
+		case WRITE_A1:
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write one A1\n", tag());
+			write_on_track(encode_a1_hd(), 1, WRITE_DATAMARK);
+			break;
+
+		case WRITE_DATAMARK:
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write data mark\n", tag());
+
+			// Init the CRC for the ident byte and sector
+			m_live_state.crc = 0x443b; // value for 1*A1
+
+			write_on_track(encode_hd(m_deleted? 0xf8 : 0xfb), 1, WRITE_SECDATA);
+
+			m_live_state.byte_counter = calc_sector_size();
+
+			// Set the over/underrun flag and hope that it will be cleared before we start writing
+			// (only for sector writing)
+			if (m_substate == DATA_TRANSFER_WRITE)
+			{
+				set_bits(m_register_r[INT_STATUS], ST_OVRUN, true);
+				m_out_dmarq(ASSERT_LINE);
+			}
+			break;
+
+		case WRITE_SECDATA:
+			if (m_substate == DATA_TRANSFER_WRITE)
+			{
+				// Check whether DMA has been acknowledged
+				if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
+				{
+					// No, then stop here
+					m_live_state.state= NO_DMA_ACK;
+				}
+				else
+				{
+					if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sector byte, %d to go\n", tag(), m_live_state.byte_counter);
+
+					// For floppies, set this for each byte; for hard disk, set it only at the beginning
+					if (m_live_state.byte_counter == calc_sector_size())
+						m_out_dip(ASSERT_LINE);
+
+					m_register_r[DATA] = m_register_w[DATA] = m_in_dma(0, 0xff);
+
+					if (m_live_state.byte_counter == 0)
+					{
+						m_out_dip(CLEAR_LINE);
+						m_out_dmarq(CLEAR_LINE);
+					}
+
+					if (m_live_state.byte_counter > 0)
+					{
+						m_live_state.byte_counter--;
+						write_on_track(encode_hd(m_register_r[DATA]), 1, WRITE_SECDATA);
+					}
+					else
+					{
+						m_live_state.state = WRITE_DATA_CRC;
+						// TODO: Prepare for ECC; this is "only" CRC
+						m_live_state.byte_counter = 2;
+					}
+				}
+			}
+			else
+			{
+				// We are here in the context of track formatting. Write a
+				// blank sector
+				write_on_track(encode_hd(0xe5), m_sector_size, WRITE_DATA_CRC);
+				m_live_state.byte_counter = 2;
+			}
+			break;
+
+		case WRITE_DATA_CRC:
+			if (m_live_state.byte_counter > 0)
+			{
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write CRC\n", tag());
+				m_live_state.byte_counter--;
+				write_on_track(encode_hd((m_live_state.crc >> 8) & 0xff), 1, WRITE_DATA_CRC);
+			}
+			else
+				// Write a filler byte so that the last CRC bit is saved correctly
+				write_on_track(encode_hd(0xff), 1, WRITE_DONE);
+
+			break;
+
+		case WRITE_DONE:
+			if (m_substate == DATA_TRANSFER_WRITE)
+			{
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write sector complete\n", tag());
+				m_live_state.state = IDLE;
+				return;
+			}
+			else
+			{
+				// Continue for track writing: Write GAP3
+				m_live_state.state = WRITE_GAP3;
+			}
+			break;
+
+		// =========== HD formatting =============
+		// Live states for track formatting
+			// Write GAP 1
+			// Per sector
+			//    Write Sync+IDAM
+			//    Write Sector header+CRC
+			//    Write GAP2
+			//    Write Sync+DAM
+			//    Write Sector data
+			//    Write CRC bytes
+			//    Write GAP3
+			// Write GAP4 until the next pulse
+		// ==================================================
+		case FORMAT_TRACK:
+			if (TRACE_LIVE) logerror("%s: FORMAT_TRACK\n", tag());
+			m_live_state.state = WRITE_GAP1;
+			break;
+
+		case WRITE_GAP1:
+			// GAP1 length is in DMA15_8
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing GAP1; size=%d\n", tag(), m_gap1_size);
+			write_on_track(encode_hd(0x4e), m_gap1_size, WRITE_IDAM_SYNC);
+			break;
+
+		case WRITE_IDAM_SYNC:
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing IDAM sync, size=%d\n", tag(), m_sync_size);
+			write_on_track(encode_hd(0x00), m_sync_size, WRITE_IDAM);
+			break;
+
+		case WRITE_IDAM:
+			// Set the over/underrun flag and hope that it will be cleared before we enter the next state (after writing)
+			set_bits(m_register_r[INT_STATUS], ST_OVRUN, true);
+			m_out_dmarq(ASSERT_LINE);
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing IDAM and header\n", tag());
+			write_on_track(encode_a1_hd(), 1, WRITE_HEADER);
+			m_live_state.byte_counter = 5;          // TODO: Check this for AT mode
+			m_live_state.crc = 0xffff;
+			break;
+
+		case WRITE_HEADER:
+			if ((m_register_r[INT_STATUS] & ST_OVRUN)!=0)
+				// No DMA (we do not get access to the ID table); exit
+				m_live_state.state= NO_DMA_ACK;
+			else
+			{
+				m_out_dip(ASSERT_LINE);
+				m_live_state.byte_counter--;
+				UINT8 headbyte = m_in_dma(0, 0xff);
+				write_on_track(encode_hd(headbyte), 1, (m_live_state.byte_counter>0)? WRITE_HEADER : WRITE_HEADER_CRC);
+
+				if (m_live_state.byte_counter==0)
+				{
+					m_out_dip(CLEAR_LINE);
+					m_out_dmarq(CLEAR_LINE);
+					// we will go to WRITE_HEADER_CRC state; set the byte counter for CRC
+					m_live_state.byte_counter = 2;
+				}
+			}
+			break;
+
+		case WRITE_HEADER_CRC:
+			if (m_live_state.byte_counter > 0)
+			{
+				UINT8 crct = (m_live_state.crc >> 8) & 0xff;
+				if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Write CRC byte %02x\n", tag(), crct);
+				m_live_state.byte_counter--;
+				write_on_track(encode_hd(crct), 1, WRITE_HEADER_CRC);
+			}
+			else
+				m_live_state.state = WRITE_GAP2;
+			break;
+
+		case WRITE_GAP2:
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing GAP2, size=%d\n", tag(), m_gap2_size);
+			write_on_track(encode_hd(0x4e), m_gap2_size, WRITE_DAM_SYNC);
+			break;
+
+		case WRITE_GAP3:
+			m_sector_count--;
+			if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: Writing GAP3, size=%d\n", tag(), m_gap3_size);
+			write_on_track(encode_hd(0x4e), m_gap3_size, (m_sector_count>0)? WRITE_IDAM_SYNC : WRITE_GAP4);
+			break;
+
+		case WRITE_GAP4:
+			// Write bytes up to the end of the track
+			wait_line(INDEX_LINE, ASSERT_LINE, TRACKDONE, true);
+			if (TRACE_WRITE && TRACE_DETAIL && m_last_live_state != WRITE_GAP4)
+			{
+				logerror("%s: Writing GAP4\n", tag());
+				m_last_live_state = WRITE_GAP4;
+			}
+			// Write a single byte; when the index hole shows up, the live run will be aborted
+			write_on_track(encode_hd(0x4e), 1, WRITE_GAP4);
+			break;
+// --------------------------------------------------------
+
+		// ==================================================
+		// Live states for track reading
+		// ==================================================
+
+		// Quite simple. Read the next ID fields, then the sector contents.
+		// Continue until the next index hole shows up (live_abort).
+
 		default:
-			if (TRACE_LIVE) logerror("%s: Unknown state: %d\n", tag(), m_live_state.state);
+			if (TRACE_LIVE) logerror("%s: Unknown state: %02x\n", tag(), m_live_state.state);
 			break;
 		}
 	}
@@ -3112,7 +3449,7 @@ void hdc9234_device::wait_for_realtime(int state)
 {
 	m_live_state.next_state = state;
 	m_timer->adjust(m_live_state.time - machine().time());
-	if (TRACE_LIVE) logerror("%s: [%s live] Waiting for real time [%s] to catch up; next state = %d\n", tag(), tts(m_live_state.time).c_str(), ttsn().c_str(), state);
+	if (TRACE_LIVE) logerror("%s: [%s live] Waiting for real time [%s] to catch up; next state = %02x\n", tag(), tts(m_live_state.time).c_str(), ttsn().c_str(), state);
 }
 
 /*
@@ -3188,16 +3525,17 @@ UINT16 hdc9234_device::encode(UINT8 byte)
 	bool last_bit_set;
 	check_pos =  0x80;
 
+	m_live_state.data_reg = byte;
+	raw = 0;
+
 	if (fm_mode())
 	{
-		// Set all clock bits
-		raw = 0xaaaa;
-
+		raw = 0;
 		// FM: data bit = 1 -> encode as 11
 		//     data bit = 0 -> encode as 10
 		for (int i=0; i<8; i++)
 		{
-			if (byte & check_pos) raw |= 0x4000 >> (2*i);
+			raw = (raw << 2) | (((byte & check_pos)!=0)? 0x11 : 0x10);
 			check_pos >>= 1;
 		}
 		last_bit_set = ((byte & 1)!=0);
@@ -3205,38 +3543,25 @@ UINT16 hdc9234_device::encode(UINT8 byte)
 	else
 	{
 		last_bit_set = m_live_state.last_data_bit;
-		raw = 0;
+
 		for (int i=0; i<8; i++)
 		{
 			bool bit_set = ((byte & check_pos)!=0);
 
 			// MFM: data bit = 1 -> encode as 01
 			//      data bit = 0 -> encode as x0 (x = !last_bit)
-			if (bit_set)
-				raw |= 0x4000 >> (2*i);
-			else
-				raw |= (last_bit_set? 0x0000 : 0x8000) >> (2*i);
 
+			raw <<= 2;
+			if (bit_set) raw |= 1;
+			else
+			{
+				if (!last_bit_set) raw |= 2;
+			}
 			last_bit_set = bit_set;
 			check_pos >>= 1;
 		}
 	}
-	m_live_state.data_reg = byte;
 	return raw;
-}
-
-/*
-    Encode a byte for FM or MFM recording. Result is returned in the
-    shift register of m_live_state.
-*/
-void hdc9234_device::encode_byte(UINT8 byte)
-{
-	UINT16 raw = encode(byte);
-	m_live_state.bit_counter = 16;
-	m_live_state.last_data_bit = raw & 1;
-	m_live_state.shift_reg = m_live_state.shift_reg_save = raw;
-	if (TRACE_WRITE && TRACE_DETAIL) logerror("%s: [%s live] Write %02x (%04x)\n", tag(), tts(m_live_state.time).c_str(), byte, raw);
-	checkpoint();
 }
 
 void hdc9234_device::encode_again()
@@ -3279,9 +3604,13 @@ void hdc9234_device::pll_reset(const attotime &when, bool output)
 void hdc9234_device::checkpoint()
 {
 	// Commit bits from pll buffer to disk until live time (if there is something to write)
-	if (using_floppy()) m_pll.commit(m_floppy, m_live_state.time);
+	// For HD we do not use a PLL in this implementation
+	if (using_floppy())
+	{
+		m_pll.commit(m_floppy, m_live_state.time);
+		m_checkpoint_pll = m_pll;
+	}
 	m_checkpoint_state = m_live_state;
-	m_checkpoint_pll = m_pll;
 }
 
 // ===========================================================================
@@ -3294,7 +3623,6 @@ void hdc9234_device::checkpoint()
     Return false: valid return
 
     Updates the CRC and the shift register. Also, the time is updated.
-
 */
 bool hdc9234_device::read_from_mfmhd(const attotime &limit)
 {
@@ -3355,6 +3683,124 @@ bool hdc9234_device::read_from_mfmhd(const attotime &limit)
 	}
 
 	return false;
+}
+
+/*
+    Write one bit or complete byte from the shift register to the hard disk
+    at the point of time specified by the time in the live_state.
+    Return true: the time limit has been reached
+    Return false: valid return
+    Updates the CRC and the shift register. Also, the time is updated.
+*/
+bool hdc9234_device::write_to_mfmhd(const attotime &limit)
+{
+	UINT16 data = 0;
+	int count;
+	bool offlimit;
+
+	if (m_hd_encoding == MFM_BITS)
+	{
+		data = ((m_live_state.shift_reg & 0x8000)==0)? 0:1;
+		count = 1;
+	}
+	else
+	{
+		// We'll write the complete shift register in one go
+		data = m_live_state.shift_reg;
+		count = 16;
+	}
+	offlimit = m_harddisk->write(m_live_state.time, limit, data);
+	if (offlimit) return true;
+
+	m_live_state.bit_counter -= count;
+
+	// Calculate the CRC
+	if ((m_live_state.bit_counter & 1)==0)
+	{
+		if (m_hd_encoding == MFM_BITS)
+		{
+			if ((m_live_state.crc ^ ((data==0)? 0x8000 : 0x0000)) & 0x8000)
+				m_live_state.crc = (m_live_state.crc << 1) ^ 0x1021;
+			else
+				m_live_state.crc = m_live_state.crc << 1;
+		}
+		else
+		{
+			// Take the data byte from the stored copy in the data_reg
+			m_live_state.crc = ccitt_crc16_one(m_live_state.crc, m_live_state.data_reg);
+		}
+	}
+
+	m_live_state.shift_reg = (m_live_state.shift_reg << count) & 0xffff;
+	return false;
+}
+
+UINT16 hdc9234_device::encode_hd(UINT8 byte)
+{
+	UINT16 cells;
+	UINT8 check_pos;
+	bool last_bit_set;
+	check_pos =  0x80;
+
+	last_bit_set = m_live_state.last_data_bit;
+	cells = 0;
+
+	int databit = (m_hd_encoding==SEPARATED)? 0x0080 : 0x4000;
+	int shift = (m_hd_encoding==SEPARATED)? 1 : 2;
+	int clockbit = 0x8000;
+
+	if (m_hd_encoding != SEPARATED_SIMPLE)
+	{
+		for (int i=0; i<8; i++)
+		{
+			bool bit_set = ((byte & check_pos)!=0);
+
+			// MFM: data bit = 1 -> encode as 01
+			//      data bit = 0 -> encode as x0 (x = !last_bit)
+
+			if (bit_set)
+				cells |= databit;
+			else
+				cells |= (last_bit_set? 0x0000 : clockbit);
+
+			databit >>= shift;
+			clockbit >>= shift;
+
+			last_bit_set = bit_set;
+			check_pos >>= 1;
+		}
+	}
+	else
+	{
+		cells = byte & 0x00ff;
+	}
+
+	m_live_state.data_reg = byte;
+	return cells;
+}
+
+UINT16 hdc9234_device::encode_a1_hd()
+{
+	UINT16 cells = 0;
+
+	switch (m_hd_encoding)
+	{
+	case MFM_BITS:
+	case MFM_BYTE:
+		cells = 0x4489;
+		break;
+	case SEPARATED:
+		cells = 0x0aa1;
+		break;
+	case SEPARATED_SIMPLE:
+		cells = 0xffa1;
+		break;
+	}
+
+	m_live_state.last_data_bit = true;
+	m_live_state.data_reg = 0xa1;
+	m_live_state.bit_counter = 16;
+	return cells;
 }
 
 
@@ -3486,7 +3932,7 @@ void hdc9234_device::process_command()
 
 void hdc9234_device::reenter_command_processing()
 {
-	if (TRACE_DELAY) logerror("%s: Re-enter command processing; live state = %d\n", tag(), m_live_state.state);
+	if (TRACE_DELAY) logerror("%s: Re-enter command processing; live state = %02x\n", tag(), m_live_state.state);
 	// Do we have a live run on the track?
 	if (m_live_state.state != IDLE)
 	{
@@ -3498,7 +3944,7 @@ void hdc9234_device::reenter_command_processing()
 	// We're here when there is no live_run anymore
 	// Where were we last time?
 	// Take care not to restart commands because of the index callback
-	if (TRACE_DELAY) logerror("%s: Continue with substate %d\n", tag(), m_substate);
+	if (TRACE_DELAY) logerror("%s: Continue with substate %02x\n", tag(), m_substate);
 	if (m_executing && m_substate != UNDEF) (this->*m_command)();
 	auxbus_out();
 }
@@ -3881,6 +4327,7 @@ void hdc9234_device::device_reset()
 	m_deleted = false;
 	m_executing = false;
 	m_event_line = UNDEF;
+	m_first_sector_found = false;
 	m_initialized = true;
 	m_line_level = CLEAR_LINE;
 	m_live_state.state = IDLE;

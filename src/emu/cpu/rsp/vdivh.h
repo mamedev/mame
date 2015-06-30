@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyler J. Stachecki,Ryan Holtz
 
-rsp_vec_t vec_vdivh(UINT32 src, UINT32 e, UINT32 dest, UINT32 de)
+inline rsp_vec_t vec_vdivh(UINT32 src, UINT32 e, UINT32 dest, UINT32 de)
 {
 	// Get the element from VT.
 	m_div_in = m_v[src].s[e & 0x7];
