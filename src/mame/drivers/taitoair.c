@@ -222,7 +222,8 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 ****************************************************************************/
 /*!
  @todo - Framebuffer DMA requires palette switch to be selected dynamically, see at first stage Course Select in Top Landing;
-       - Air Inferno: exception with DIVIDE BY ZERO after some time of gameplay;   
+	   - Air Inferno: missing landing monitor camera (blackened);
+	   - Air Inferno: missing 3d HUD graphics;
 	   - Air Inferno: Expert course has wrong 3d geometry;
 	   - Top Landing: Night stages might have wrong priority for stars-above-sea;
 	   - Input limiters / analog thresholds for both games;
@@ -512,6 +513,9 @@ WRITE16_MEMBER(taitoair_state::dsp_muldiv_c_1_w)
 
 READ16_MEMBER(taitoair_state::dsp_muldiv_1_r)
 {
+	if(m_dsp_muldiv_c_1 == 0)
+		return 0xffff; /**< @todo true value? */
+	
 	return m_dsp_muldiv_a_1*m_dsp_muldiv_b_1/m_dsp_muldiv_c_1;
 }
 
@@ -532,6 +536,9 @@ WRITE16_MEMBER(taitoair_state::dsp_muldiv_c_2_w)
 
 READ16_MEMBER(taitoair_state::dsp_muldiv_2_r)
 {
+	if(m_dsp_muldiv_c_2 == 0)
+		return 0xffff; /**< @todo true value? */
+	
 	return m_dsp_muldiv_a_2*m_dsp_muldiv_b_2/m_dsp_muldiv_c_2;
 }
 
