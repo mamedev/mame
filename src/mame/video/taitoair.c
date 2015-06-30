@@ -202,7 +202,7 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	return 0;
 }
 
-void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
+void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 header, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
 {
 	if (y1 > cliprect.max_y)
 		return;
@@ -259,22 +259,22 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 				if (xx2 > cliprect.max_x)
 					xx2 = cliprect.max_x;
 
-				if(machine().input().code_pressed(KEYCODE_Q))
+				if(header & 0x4000 || machine().input().code_pressed(KEYCODE_Q))
 				{
 					base_color = machine().rand() & 0x3fff;
 					grad_col = 0;
 				}
-				else if(color & 0x40)
+				else if(header & 0x40)
 				{
 					/* Non-terrain elements are colored with this. */
-					base_color = (color & 0x3f) + 0x340;
+					base_color = (header & 0x3f) + 0x340;
 					grad_col = 0;
 				}
 				else
 				{
 					/* Terrain elements, with a gradient applied. */
 					/*! @todo it's unknown if gradient color applies by global screen Y coordinate or there's a calculation to somewhere ... */
-					base_color = ((color & 0x3f) * 0x80) + 0x2040;
+					base_color = ((header & 0x3f) * 0x80) + 0x2040;
 					grad_col = (y1 >> 3) & 0x3f;
 				}
 
@@ -299,7 +299,7 @@ void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect,
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
 	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT * 2];
-	int color = q->col;
+	UINT16 header = q->header;
 	int pcount = q->pcount;
 
 	for (i = 0; i < pcount; i++)
@@ -340,7 +340,7 @@ void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect,
 	{
 		if (p[ps1 - 1].y == p[ps2 + 1].y)
 		{
-			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
+			fill_slope(bitmap, cliprect, header, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
 			cury = p[ps1 - 1].y;
 			if (cury >= limy)
 				break;
@@ -359,7 +359,7 @@ void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		}
 		else if (p[ps1 - 1].y < p[ps2 + 1].y)
 		{
-			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
+			fill_slope(bitmap, cliprect, header, x1, x2, sl1, sl2, cury, p[ps1 - 1].y, &x1, &x2);
 			cury = p[ps1 - 1].y;
 			if (cury >= limy)
 				break;
@@ -371,7 +371,7 @@ void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		}
 		else
 		{
-			fill_slope(bitmap, cliprect, color, x1, x2, sl1, sl2, cury, p[ps2 + 1].y, &x1, &x2);
+			fill_slope(bitmap, cliprect, header, x1, x2, sl1, sl2, cury, p[ps2 + 1].y, &x1, &x2);
 			cury = p[ps2 + 1].y;
 			if (cury >= limy)
 				break;
@@ -421,29 +421,26 @@ WRITE16_MEMBER(taitoair_state::dsp_flags_w)
 			if (m_line_ram[0x3fff])
 			{
 				int adr = 0x3fff;
-//              struct taitoair_poly q;
 
 				while (adr >= 0 && m_line_ram[adr] && m_line_ram[adr] != 0x4000)
 				{
-					int pcount;
-					if (!(m_line_ram[adr] & 0x8000) || adr < 10)
-					{
-						logerror("quad: unknown value %04x at %04x\n", m_line_ram[adr], adr);
-						break;
-					}
-					m_q.col = m_line_ram[adr] & 0x7f;//((m_line_ram[adr] & 0x007f) * 0x80) + 0x2040;
-
-					adr--;
-					pcount = 0;
+					int pcount = 0;
+					m_q.header = m_line_ram[adr--];
 					while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(m_line_ram[adr] & 0xc000))
 					{
-						m_q.p[pcount].y = m_line_ram[adr] + 3 * 16;
-						m_q.p[pcount].x = m_line_ram[adr - 1];
+						m_q.p[pcount].y = m_line_ram[adr--] + 3 * 16;
+						m_q.p[pcount].x = m_line_ram[adr--];
 						pcount++;
-						adr -= 2;
 					}
 					adr--;
 					m_q.pcount = pcount;
+					if (!(m_line_ram[adr] & 0x8000))
+					{
+						m_q.header |= 0x4000;
+						logerror("special poly at %04x\n", adr);
+						while(adr >= 0 && !(m_line_ram[adr] & 0xc000))
+							adr--;
+					}
 					fill_poly(*m_framebuffer[0], cliprect, &m_q);
 				}
 			}
