@@ -423,7 +423,7 @@ void taitoair_state::fb_erase_op()
 	cliprect.max_y = m_screen->height() - 1;
 	
 	m_framebuffer[0]->fill(0, cliprect);
-	m_framebuffer[1]->fill(0, cliprect);
+	//m_framebuffer[1]->fill(0, cliprect);
 }
 
 void taitoair_state::fb_fill_op()
