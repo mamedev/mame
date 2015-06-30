@@ -890,7 +890,7 @@ void ui_menu::handle_main_events(UINT32 flags)
 					else if (hover == HOVER_B_SETTINGS)
 					{
 						menu_event.iptkey = IPT_UI_SELECT;
-						menu_event.itemref = (void *)1;
+						selected = visible_items + 1;
 						stop = true;
 					}
 					else if (r_hover >= RP_FIRST && r_hover <= RP_LAST)
@@ -1520,25 +1520,22 @@ void ui_menu::draw_star(render_container *container, float x0, float y0)
 void ui_menu::draw_toolbar(render_container *container, float x1, float y1, float x2, float y2)
 {
 	float x_pixel = 1.0f / container->manager().ui_target().width();
-	x1 = (x1 + x2) * 0.5f - x_pixel * (MEWUI_TOOLBAR_BUTTONS * 16);
+	x1 = (x1 + x2) * 0.5f - x_pixel * (MEWUI_TOOLBAR_BUTTONS * 18);
 
 	for (int z = 0; z < MEWUI_TOOLBAR_BUTTONS; ++z)
 	{
 		if (toolbar_bitmap[z]->valid())
 		{
 			x2 = x1 + x_pixel * 32;
-
+			rgb_t color(0xE5FFFFFF);
 			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
 			{
-				container->add_line(x1, y1, x2, y1, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-				container->add_line(x2, y1, x2, y2, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-				container->add_line(x2, y2, x1, y2, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-				container->add_line(x1, y2, x1, y1, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				hover = HOVER_B_ADDFAV + z;
+				color = ARGB_WHITE;
 			}
 
-			container->add_quad(x1, y1, x2, y2, ARGB_WHITE, toolbar_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			x1 += x_pixel * 32;
+			container->add_quad(x1, y1, x2, y2, color, toolbar_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			x1 += x_pixel * 36;
 		}
 	}
 }
