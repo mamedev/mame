@@ -281,4 +281,56 @@ NETLIB_UPDATE_TERMINALS(D)
 	set(m_D.G(), 0.0, m_D.Ieq());
 }
 
+// ----------------------------------------------------------------------------------------
+// nld_VS
+// ----------------------------------------------------------------------------------------
+
+NETLIB_START(VS)
+{
+	NETLIB_NAME(twoterm)::start();
+
+	register_param("R", m_R, 0.1);
+	register_param("V", m_V, 0.0);
+
+	register_terminal("P", m_P);
+	register_terminal("N", m_N);
+}
+
+NETLIB_RESET(VS)
+{
+	NETLIB_NAME(twoterm)::reset();
+	this->set(1.0 / m_R, m_V, 0.0);
+}
+
+NETLIB_UPDATE(VS)
+{
+	NETLIB_NAME(twoterm)::update();
+}
+
+// ----------------------------------------------------------------------------------------
+// nld_CS
+// ----------------------------------------------------------------------------------------
+
+NETLIB_START(CS)
+{
+	NETLIB_NAME(twoterm)::start();
+
+	register_param("I", m_I, 1.0);
+
+	register_terminal("P", m_P);
+	register_terminal("N", m_N);
+}
+
+NETLIB_RESET(CS)
+{
+	NETLIB_NAME(twoterm)::reset();
+	printf("m_I %f\n", m_I.Value());
+	this->set(0.0, 0.0, m_I);
+}
+
+NETLIB_UPDATE(CS)
+{
+	NETLIB_NAME(twoterm)::update();
+}
+
 NETLIB_NAMESPACE_DEVICES_END()
