@@ -126,6 +126,7 @@ public:
 	DECLARE_DRIVER_INIT(iganinju);
 	DECLARE_DRIVER_INIT(cybattlr);
 	DECLARE_DRIVER_INIT(rodlandj);
+	DECLARE_DRIVER_INIT(rittam);
 	DECLARE_DRIVER_INIT(rodlandjb);
 	DECLARE_DRIVER_INIT(avspirit);
 	DECLARE_DRIVER_INIT(monkelf);
