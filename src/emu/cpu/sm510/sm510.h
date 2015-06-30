@@ -85,6 +85,7 @@ protected:
 
 	// misc internal helpers
 	void increment_pc();
+	virtual void get_opcode_param();
 
 	UINT8 ram_r();
 	void ram_w(UINT8 data);

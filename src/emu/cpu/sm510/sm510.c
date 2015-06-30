@@ -143,6 +143,18 @@ void sm510_base_device::device_reset()
 
 inline void sm510_base_device::increment_pc()
 {
+	m_pc = (m_pc + 1) & m_prgmask;
+}
+
+void sm510_base_device::get_opcode_param()
+{
+	// LBL, TL, TML, TM opcodes are 2 bytes
+	if (m_op == 0x5f || (m_op & 0xf0) == 0x70 || m_op >= 0xc0)
+	{
+		m_icount -= 2; // guessed
+		m_param = m_program->read_byte(m_pc);
+		increment_pc();
+	}
 }
 
 void sm510_base_device::execute_run()
@@ -155,12 +167,10 @@ void sm510_base_device::execute_run()
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
-		m_icount--;
+		m_icount -= 2; // 61us typical
 		m_op = m_program->read_byte(m_pc);
-		//m_param = fetch_opcode_param();
-
-
 		increment_pc();
+		get_opcode_param();
 
 		// handle opcode
 
