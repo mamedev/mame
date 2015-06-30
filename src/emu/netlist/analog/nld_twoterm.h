@@ -40,27 +40,35 @@
 // ----------------------------------------------------------------------------------------
 
 #define RES(_name, _R)                                                         \
-		NET_REGISTER_DEV(R, _name)                                                  \
+		NET_REGISTER_DEV(R, _name)                                             \
 		NETDEV_PARAMI(_name, R, _R)
 
-#define POT(_name, _R)                                                       \
-		NET_REGISTER_DEV(POT, _name)                                                \
+#define POT(_name, _R)                                                         \
+		NET_REGISTER_DEV(POT, _name)                                           \
 		NETDEV_PARAMI(_name, R, _R)
 
 /* Does not have pin 3 connected */
-#define POT2(_name, _R)                                                       \
-		NET_REGISTER_DEV(POT2, _name)                                                \
+#define POT2(_name, _R)                                                        \
+		NET_REGISTER_DEV(POT2, _name)                                          \
 		NETDEV_PARAMI(_name, R, _R)
 
 
 #define CAP(_name, _C)                                                         \
-		NET_REGISTER_DEV(C, _name)                                                  \
+		NET_REGISTER_DEV(C, _name)                                             \
 		NETDEV_PARAMI(_name, C, _C)
 
 /* Generic Diode */
-#define DIODE(_name,  _model)                                                    \
-		NET_REGISTER_DEV(D, _name)                                                  \
+#define DIODE(_name,  _model)                                                  \
+		NET_REGISTER_DEV(D, _name)                                             \
 		NETDEV_PARAMI(_name, model, _model)
+
+#define VS(_name, _V)                                                          \
+		NET_REGISTER_DEV(VS, _name)                                            \
+		NETDEV_PARAMI(_name, V, _V)
+
+#define CS(_name, _I)                                                          \
+		NET_REGISTER_DEV(CS, _name)                                            \
+		NETDEV_PARAMI(_name, I, _I)
 
 // ----------------------------------------------------------------------------------------
 // Generic macros
@@ -288,6 +296,43 @@ protected:
 	param_model_t m_model;
 
 	generic_diode m_D;
+};
+
+// ----------------------------------------------------------------------------------------
+// nld_VS - Voltage source
+//
+// netlist voltage source must have inner resistance
+// ----------------------------------------------------------------------------------------
+
+class NETLIB_NAME(VS) : public NETLIB_NAME(twoterm)
+{
+public:
+	ATTR_COLD NETLIB_NAME(VS)() : NETLIB_NAME(twoterm)(VS) { }
+
+protected:
+	virtual void start();
+	virtual void reset();
+	ATTR_HOT void update();
+
+	param_double_t m_R;
+	param_double_t m_V;
+};
+
+// ----------------------------------------------------------------------------------------
+// nld_CS - Current source
+// ----------------------------------------------------------------------------------------
+
+class NETLIB_NAME(CS) : public NETLIB_NAME(twoterm)
+{
+public:
+	ATTR_COLD NETLIB_NAME(CS)() : NETLIB_NAME(twoterm)(CS) { }
+
+protected:
+	virtual void start();
+	virtual void reset();
+	ATTR_HOT void update();
+
+	param_double_t m_I;
 };
 
 

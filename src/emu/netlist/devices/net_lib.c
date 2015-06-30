@@ -53,6 +53,8 @@ void initialize_factory(factory_list_t &factory)
 	ENTRY(VCVS,                 VCVS,                   "-")
 	ENTRY(VCCS,                 VCCS,                   "-")
 	ENTRY(CCCS,                 CCCS,                   "-")
+	ENTRY(VS,	                VS,                     "V")
+	ENTRY(CS,                   CS,                     "I")
 	ENTRY(dummy_input,          DUMMY_INPUT,            "-")
 	ENTRY(frontier,             FRONTIER_DEV,           "+I,G,Q")   // not intended to be used directly
 	ENTRY(QBJT_EB,              QBJT_EB,                "model")
