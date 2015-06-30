@@ -867,12 +867,7 @@ void ui_menu::handle_main_events(UINT32 flags)
 						topline_datsview += right_visible_lines - 1;
 					else if (hover == HOVER_DAT_UP)
 						topline_datsview -= right_visible_lines - 1;
-					else if (hover == HOVER_B_ADDFAV)
-					{
-						menu_event.iptkey = IPT_UI_FAVORITES;
-						stop = true;
-					}
-					else if (hover == HOVER_B_DELFAV)
+					else if (hover == HOVER_B_FAV)
 					{
 						menu_event.iptkey = IPT_UI_FAVORITES;
 						stop = true;
@@ -887,10 +882,26 @@ void ui_menu::handle_main_events(UINT32 flags)
 						menu_event.iptkey = IPT_UI_HISTORY;
 						stop = true;
 					}
+					else if (hover == HOVER_B_MAMEINFO)
+					{
+						menu_event.iptkey = IPT_UI_MAMEINFO;
+						stop = true;
+					}
+					else if (hover == HOVER_B_COMMAND)
+					{
+						menu_event.iptkey = IPT_UI_COMMAND;
+						stop = true;
+					}
 					else if (hover == HOVER_B_SETTINGS)
 					{
 						menu_event.iptkey = IPT_UI_SELECT;
 						selected = visible_items + 1;
+						stop = true;
+					}
+					else if (hover == HOVER_B_FOLDERS)
+					{
+						menu_event.iptkey = IPT_UI_SELECT;
+						selected = visible_items + 2;
 						stop = true;
 					}
 					else if (r_hover >= RP_FIRST && r_hover <= RP_LAST)
@@ -1519,6 +1530,15 @@ void ui_menu::draw_star(render_container *container, float x0, float y0)
 
 void ui_menu::draw_toolbar(render_container *container, float x1, float y1, float x2, float y2)
 {
+	// draw a box
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
+
+	// take off the borders
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+	y2 -= UI_BOX_TB_BORDER;
+
 	float x_pixel = 1.0f / container->manager().ui_target().width();
 	x1 = (x1 + x2) * 0.5f - x_pixel * (MEWUI_TOOLBAR_BUTTONS * 18);
 
@@ -1527,10 +1547,10 @@ void ui_menu::draw_toolbar(render_container *container, float x1, float y1, floa
 		if (toolbar_bitmap[z]->valid())
 		{
 			x2 = x1 + x_pixel * 32;
-			rgb_t color(0xE5FFFFFF);
+			rgb_t color(0xEFEFEFEF);
 			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
 			{
-				hover = HOVER_B_ADDFAV + z;
+				hover = HOVER_B_FAV + z;
 				color = ARGB_WHITE;
 			}
 

@@ -748,24 +748,6 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 	y1 = origy1 - top;
 	draw_ume_box(x1, y1, x2, y2);
 
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = y2;
-	y2 = origy1 - UI_BOX_TB_BORDER;
-
-	// draw a box
-	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
-
-	// draw toolbar
-	draw_toolbar(container, x1, y1, x2, y2);
-
 	// determine the text to render below
 	if (mewui_globals::actual_filter != FILTER_FAVORITE_GAME)
 		driver = ((FPTR)selectedref > 2) ? (const game_driver *)selectedref : NULL;
@@ -873,6 +855,15 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 		tempbuf[3].clear();
 		tempbuf[4].assign("MEWUI by dankan1890 http://sourceforge.net/projects/mewui");
 	}
+
+	// compute our bounds
+	x1 = 0.5f - 0.5f * maxwidth;
+	x2 = x1 + maxwidth;
+	y1 = y2;
+	y2 = origy1 - UI_BOX_TB_BORDER;
+
+	// draw toolbar
+	draw_toolbar(container, x1, y1, x2, y2);
 
 	// get the size of the text
 	maxwidth = origx2 - origx1;
