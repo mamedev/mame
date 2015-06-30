@@ -126,6 +126,12 @@ void ui_menu::exit(running_machine &machine)
 
 	for (int i = 0; i < MAX_ICONS_RENDER; i++)
 		machine.render().texture_free(icons_texture[i]);
+
+	for (int i = 0; i < MEWUI_TOOLBAR_BUTTONS; i++)
+	{
+		machine.render().texture_free(sw_toolbar_texture[i]);
+		machine.render().texture_free(toolbar_texture[i]);
+	}
 }
 
 
@@ -543,7 +549,7 @@ void ui_menu::draw(bool customonly)
 									fgcolor,
 									ROT0);
 				if (hover == itemnum)
-					hover = -2;
+					hover = HOVER_ARROW_UP;
 			}
 
 			// if we're on the bottom line, display the down arrow
@@ -557,7 +563,7 @@ void ui_menu::draw(bool customonly)
 									fgcolor,
 									ROT0 ^ ORIENTATION_FLIP_Y);
 				if (hover == itemnum)
-					hover = -1;
+					hover = HOVER_ARROW_DOWN;
 			}
 
 			// if we're just a divider, draw a line
@@ -763,12 +769,12 @@ void ui_menu::handle_events()
 			case UI_EVENT_MOUSE_DOWN:
 				if (hover >= 0 && hover < item.size())
 					selected = hover;
-				else if (hover == -2)
+				else if (hover == HOVER_ARROW_UP)
 				{
 					selected -= visitems - 1;
 					validate_selection(1);
 				}
-				else if (hover == -1)
+				else if (hover == HOVER_ARROW_DOWN)
 				{
 					selected += visitems - 1;
 					validate_selection(1);

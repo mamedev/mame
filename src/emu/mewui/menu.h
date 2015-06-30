@@ -8,6 +8,9 @@ public:
 	// draw UME box
 	void draw_ume_box(float x1, float y1, float x2, float y2);
 
+	// draw UME box
+	void draw_toolbar(render_container *container, float x1, float y1, float x2, float y2);
+
 	// draw star
 	void draw_star(render_container *container, float x0, float y0);
 
@@ -33,9 +36,14 @@ private:
 	static bitmap_argb32 *snapx_bitmap, *no_avail_bitmap, *bgrnd_bitmap, *star_bitmap;
 	static bitmap_rgb32 *hilight_main_bitmap;
 	static render_texture *snapx_texture, *hilight_main_texture, *bgrnd_texture, *star_texture;
-
 	static render_texture *icons_texture[40];
 	static bitmap_argb32 *icons_bitmap[40];
+
+	// toolbar
+	static render_texture *toolbar_texture[5];
+	static bitmap_argb32 *toolbar_bitmap[5];
+	static render_texture *sw_toolbar_texture[5];
+	static bitmap_argb32 *sw_toolbar_bitmap[5];
 
 	// mouse handling
 	bool mouse_hit, mouse_button;

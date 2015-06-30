@@ -22,6 +22,8 @@ render_texture *ui_menu::snapx_texture;
 render_texture *ui_menu::hilight_main_texture;
 render_texture *ui_menu::bgrnd_texture;
 render_texture *ui_menu::star_texture;
+render_texture *ui_menu::toolbar_texture[MEWUI_TOOLBAR_BUTTONS];
+render_texture *ui_menu::sw_toolbar_texture[MEWUI_TOOLBAR_BUTTONS];
 render_texture *ui_menu::icons_texture[MAX_ICONS_RENDER];
 bitmap_argb32 *ui_menu::snapx_bitmap;
 bitmap_argb32 *ui_menu::no_avail_bitmap;
@@ -29,6 +31,8 @@ bitmap_argb32 *ui_menu::star_bitmap;
 bitmap_argb32 *ui_menu::bgrnd_bitmap;
 bitmap_argb32 *ui_menu::icons_bitmap[MAX_ICONS_RENDER];
 bitmap_rgb32 *ui_menu::hilight_main_bitmap;
+bitmap_argb32 *ui_menu::toolbar_bitmap[MEWUI_TOOLBAR_BUTTONS];
+bitmap_argb32 *ui_menu::sw_toolbar_bitmap[MEWUI_TOOLBAR_BUTTONS];
 
 /***************************************************************************
     CONSTANTS
@@ -94,7 +98,6 @@ void ui_menu::init_mewui(running_machine &machine)
 	for (int i = 0; i < MAX_ICONS_RENDER; i++)
 	{
 		icons_bitmap[i] = auto_alloc(machine, bitmap_argb32(32, 32));
-		//icons_texture[i] = machine.render().texture_alloc(render_texture::hq_scale);
 		icons_texture[i] = machine.render().texture_alloc();
 	}
 
@@ -117,6 +120,35 @@ void ui_menu::init_mewui(running_machine &machine)
 	}
 	else
 		bgrnd_bitmap->reset();
+
+	// create a texture for toolbar
+	emu_file toolfile(machine.options().mewui_path(), OPEN_FLAG_READ);
+	for (int x = 0; x < MEWUI_TOOLBAR_BUTTONS; ++x)
+	{
+		toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32);
+		toolbar_texture[x] = machine.render().texture_alloc(render_texture::hq_scale);
+		std::string text;
+		strprintf(text, "button%d.png", x);
+		render_load_png(*toolbar_bitmap[x], toolfile, NULL, text.c_str());
+		if (toolbar_bitmap[x]->valid())
+			toolbar_texture[x]->set_bitmap(*toolbar_bitmap[x], toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
+		else
+			toolbar_bitmap[x]->reset();
+	}
+
+	// create a texture for toolbar
+	for (int x = 0; x < MEWUI_TOOLBAR_BUTTONS; ++x)
+	{
+		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32);
+		sw_toolbar_texture[x] = machine.render().texture_alloc(render_texture::hq_scale);
+		std::string text;
+		strprintf(text, "sbutton%d.png", x);
+		render_load_png(*sw_toolbar_bitmap[x], toolfile, NULL, text.c_str());
+		if (sw_toolbar_bitmap[x]->valid())
+			sw_toolbar_texture[x]->set_bitmap(*sw_toolbar_bitmap[x], sw_toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
+		else
+			sw_toolbar_bitmap[x]->reset();
+	}
 }
 
 
@@ -835,6 +867,32 @@ void ui_menu::handle_main_events(UINT32 flags)
 						topline_datsview += right_visible_lines - 1;
 					else if (hover == HOVER_DAT_UP)
 						topline_datsview -= right_visible_lines - 1;
+					else if (hover == HOVER_B_ADDFAV)
+					{
+						menu_event.iptkey = IPT_UI_FAVORITES;
+						stop = true;
+					}
+					else if (hover == HOVER_B_DELFAV)
+					{
+						menu_event.iptkey = IPT_UI_FAVORITES;
+						stop = true;
+					}
+					else if (hover == HOVER_B_EXPORT)
+					{
+						menu_event.iptkey = IPT_UI_EXPORT;
+						stop = true;
+					}
+					else if (hover == HOVER_B_HISTORY)
+					{
+						menu_event.iptkey = IPT_UI_HISTORY;
+						stop = true;
+					}
+					else if (hover == HOVER_B_SETTINGS)
+					{
+						menu_event.iptkey = IPT_UI_SELECT;
+						menu_event.itemref = (void *)1;
+						stop = true;
+					}
 					else if (r_hover >= RP_FIRST && r_hover <= RP_LAST)
 					{
 						mewui_globals::rpanel_infos = r_hover;
@@ -1456,6 +1514,37 @@ void ui_menu::draw_star(render_container *container, float x0, float y0)
 }
 
 //-------------------------------------------------
+//  draw toolbar
+//-------------------------------------------------
+
+void ui_menu::draw_toolbar(render_container *container, float x1, float y1, float x2, float y2)
+{
+	float x_pixel = 1.0f / container->manager().ui_target().width();
+	x1 = (x1 + x2) * 0.5f - x_pixel * (MEWUI_TOOLBAR_BUTTONS * 16);
+
+	for (int z = 0; z < MEWUI_TOOLBAR_BUTTONS; ++z)
+	{
+		if (toolbar_bitmap[z]->valid())
+		{
+			x2 = x1 + x_pixel * 32;
+
+			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
+			{
+				container->add_line(x1, y1, x2, y1, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container->add_line(x2, y1, x2, y2, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container->add_line(x2, y2, x1, y2, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container->add_line(x1, y2, x1, y1, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				hover = HOVER_B_ADDFAV + z;
+			}
+
+			container->add_quad(x1, y1, x2, y2, ARGB_WHITE, toolbar_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			x1 += x_pixel * 32;
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  perform rendering of image
 //-------------------------------------------------
 
@@ -1817,7 +1906,7 @@ void ui_menu::draw_palette_menu()
 								fgcolor,
 								ROT0);
 			if (hover == itemnum)
-				hover = -2;
+				hover = HOVER_ARROW_UP;
 		}
 
 		// if we're on the bottom line, display the down arrow
@@ -1831,7 +1920,7 @@ void ui_menu::draw_palette_menu()
 								fgcolor,
 								ROT0 ^ ORIENTATION_FLIP_Y);
 			if (hover == itemnum)
-				hover = -1;
+				hover = HOVER_ARROW_DOWN;
 		}
 
 		// if we're just a divider, draw a line
