@@ -93,6 +93,61 @@ protected:
 	void push_stack();
 
 	// opcode handlers
+	void op_lb();
+	void op_lbl();
+	void op_sbm();
+	void op_exbla();
+	void op_incb();
+	void op_decb();
+
+	void op_atpl();
+	void op_rtn0();
+	void op_rtn1();
+	void op_tl();
+	void op_tml();
+	void op_tm();
+	void op_t();
+
+	void op_exc();
+	void op_bdc();
+	void op_exci();
+	void op_excd();
+	void op_lda();
+	void op_lax();
+	void op_wr();
+	void op_ws();
+
+	void op_kta();
+	void op_atbp();
+	void op_atl();
+	void op_atfc();
+	void op_atr();
+
+	void op_add();
+	void op_add11();
+	void op_adx();
+	void op_coma();
+	void op_rot();
+	void op_rc();
+	void op_sc();
+
+	void op_tb();
+	void op_tc();
+	void op_tam();
+	void op_tmi();
+	void op_ta0();
+	void op_tabl();
+	void op_tis();
+	void op_tal();
+	void op_tf1();
+	void op_tf4();
+
+	void op_rm();
+	void op_sm();
+	void op_skip();
+	void op_cend();
+	void op_idiv();
+
 	void op_illegal();
 };
 
