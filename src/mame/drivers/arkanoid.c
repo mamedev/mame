@@ -1365,6 +1365,40 @@ MACHINE_CONFIG_END
 /***************************************************************************/
 
 /* ROMs */
+/* rom numbering, with guesses:
+	A75 01   = Z80 code 1/2 v1.0 Japan
+	A75 01-1 = Z80 code 1/2 v1.1 Japan and USA/Romstar
+	A75 02   = Z80 code 2/2 v1.0 Japan
+	A75 03   = GFX 1/3
+	A75 04   = GFX 2/3
+	A75 05   = GFX 3/3
+	A75 06   = MC68705P5 MCU code, v1.0 Japan and v1.0 USA/Romstar
+	A75 07   = PROM red
+	A75 08   = PROM green
+	A75 09   = PROM blue
+	A75 10   = Z80 code 2/2 v1.1 USA/Romstar
+	A75 11   = Z80 code 2/2 v1.2 Japan (paired with 01-1 v1.1 Japan)
+	(A75 12 through 17 are unknown, could be another two sets of z80 code plus mc68705p5)
+	A75 18   = Z80 code v2.0 2/2 USA/Romstar
+	A75 19   = Z80 code v2.0 1/2 USA/Romstar
+	A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar
+	A75 21   = Z80 code v2.0 1/2 Japan
+	A75 22   = Z80 code v2.0 2/2 Japan
+	A75 23   = MC68705P5 MCU code, v2.0 Japan
+	A75 24   = Z80 code v2.1 1/2 Japan
+	A75 25   = Z80 code v2.1 2/2 Japan
+	A75 26   = MC68705P5 MCU code, v2.1 Japan
+	A75 27   = Z80 code 1/2 Tournament
+	A75 28   = Z80 code 2/2 Tournament
+	A75 29   = GFX 1/3 Tournament
+	A75 30   = GFX 2/3 Tournament
+	A75 31   = GFX 3/3 Tournament
+	A75 32   = MC68705P5 MCU code, Tournament
+	A75 33   = PROM red Tournament
+	A75 34   = PROM green Tournament
+	A75 35   = PROM blue Tournament
+	(one of the 21/22/23 or 24/25/26 sets is likely 'world'? or are these really two japan sets?)
+*/
 
 ROM_START( arkanoid )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1411,23 +1445,24 @@ ROM_START( arkanoidu )
 	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* blue component */
 ROM_END
 
+/* Observed on a real TAITO J1100075A pcb (with K1100181A sticker), pcb is white painted, and has a "ROMSTAR(C) // All Rights Reserved // Serial No. // No 14128" sticker */
 ROM_START( arkanoiduo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a75-01-1.ic17", 0x0000, 0x8000, CRC(5bcda3b0) SHA1(52cadd38b5f8e8856f007a9c602d6b508f30be65) )
-	ROM_LOAD( "a75-10.ic16",   0x8000, 0x8000, CRC(a1769e15) SHA1(fbb45731246a098b29eb08de5d63074b496aaaba) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Silkscreen: "IC17 27256" and "IC16 27256" */
+	ROM_LOAD( "a75__01-1.ic17", 0x0000, 0x8000, CRC(5bcda3b0) SHA1(52cadd38b5f8e8856f007a9c602d6b508f30be65) )
+	ROM_LOAD( "a75__10.ic16",   0x8000, 0x8000, CRC(a1769e15) SHA1(fbb45731246a098b29eb08de5d63074b496aaaba) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-06.ic14",   0x0000, 0x0800, CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) // ok for this set
+	ROM_REGION( 0x0800, "mcu", 0 )  /* Silkscreen: "IC14 P5", 2k for the MC68705P5S protected microcontroller */
+	ROM_LOAD( "a75__06.ic14",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* Possible bootleg code??, need to re-verify the real decapped/extracted data here */
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
-	ROM_LOAD( "a75-04.ic63",   0x08000, 0x8000, CRC(71fae199) SHA1(5d253c46ccf4cd2976a5fb8b8713f0f345443d06) )
-	ROM_LOAD( "a75-05.ic62",   0x10000, 0x8000, CRC(c76374e2) SHA1(7520dd48de20db60a2038f134dcaa454988e7874) )
+	ROM_REGION( 0x18000, "gfx1", 0 ) /* Silkscreen: "IC62 27128/256", "IC63 27128/256", "IC64 27128/256" */
+	ROM_LOAD( "a75__03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
+	ROM_LOAD( "a75__04.ic63",   0x08000, 0x8000, CRC(71fae199) SHA1(5d253c46ccf4cd2976a5fb8b8713f0f345443d06) )
+	ROM_LOAD( "a75__05.ic62",   0x10000, 0x8000, CRC(c76374e2) SHA1(7520dd48de20db60a2038f134dcaa454988e7874) )
 
-	ROM_REGION( 0x0600, "proms", 0 ) /* BPROMs are silkscreened as 7621, actual BPROMs used are MMI 6306-1N */
-	ROM_LOAD( "a75-07.ic24",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )  /* red component */
-	ROM_LOAD( "a75-08.ic23",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )  /* green component */
-	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* blue component */
+	ROM_REGION( 0x0600, "proms", 0 ) /* Silkscreen: "IC22 7621", "IC23 7621", "IC24 7621", but the actual BPROMs used are either MMI 6306-1N or Fairchild MB7116E */
+	ROM_LOAD( "a75-07.ic24",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )  /* Chip Silkscreen: "A75-07"; red component */
+	ROM_LOAD( "a75-08.ic23",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) )  /* Chip Silkscreen: "A75-08"; green component */
+	ROM_LOAD( "a75-09.ic22",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) )  /* Chip Silkscreen: "A75-09"; blue component */
 ROM_END
 
 ROM_START( arkanoidj )
