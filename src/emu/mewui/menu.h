@@ -9,7 +9,7 @@ public:
 	void draw_ume_box(float x1, float y1, float x2, float y2);
 
 	// draw UME box
-	void draw_toolbar(render_container *container, float x1, float y1, float x2, float y2);
+	void draw_toolbar(render_container *container, float x1, float y1, float x2, float y2, bool software = false);
 
 	// draw star
 	void draw_star(render_container *container, float x0, float y0);

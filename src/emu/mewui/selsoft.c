@@ -348,7 +348,8 @@ void ui_menu_select_software::populate()
 	item_append(MENU_SEPARATOR_ITEM, NULL, flags_mewui, NULL);
 
 	// configure the custom rendering
-	customtop = 3.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	float y_pixel = 1.0f / container->manager().ui_target().height();
+	customtop = 3.0f * machine().ui().get_line_height() + 5.0f * UI_BOX_TB_BORDER + 32 * y_pixel;
 	custombottom = 5.0f * machine().ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 
 	if (old_software != -1)
@@ -545,6 +546,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	std::string tempbuf[5], filtered;
 	rgb_t color = UI_BACKGROUND_COLOR;
 	bool isstar = false;
+	float tbarspace = (1.0f / container->manager().ui_target().height()) * 32;
 
 	// determine the text for the header
 	int vis_item = (m_search[0] != 0) ? visible_items : (has_empty_start ? visible_items - 1 : visible_items);
@@ -575,7 +577,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	float x1 = 0.5f - 0.5f * maxwidth;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
-	float y2 = origy1 - UI_BOX_TB_BORDER;
+	float y2 = origy1 - 3.0f * UI_BOX_TB_BORDER - tbarspace;
 
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
@@ -584,7 +586,6 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 	x1 += UI_BOX_LR_BORDER;
 	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
 	for (int line = 0; line < 3; line++)
@@ -697,6 +698,15 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 		tempbuf[3].clear();
 		tempbuf[4].assign("MEWUI by dankan1890 http://sourceforge.net/projects/mewui");
 	}
+
+	// compute our bounds
+	x1 = 0.5f - 0.5f * maxwidth;
+	x2 = x1 + maxwidth;
+	y1 = y2;
+	y2 = origy1 - UI_BOX_TB_BORDER;
+
+	// draw toolbar
+	draw_toolbar(container, x1, y1, x2, y2, true);
 
 	// get the size of the text
 	maxwidth = origx2 - origx1;

@@ -142,7 +142,7 @@ void ui_menu::init_mewui(running_machine &machine)
 		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32);
 		sw_toolbar_texture[x] = machine.render().texture_alloc(render_texture::hq_scale);
 		std::string text;
-		strprintf(text, "sbutton%d.png", x);
+		strprintf(text, "swbutton%d.png", x);
 		render_load_png(*sw_toolbar_bitmap[x], toolfile, NULL, text.c_str());
 		if (sw_toolbar_bitmap[x]->valid())
 			sw_toolbar_texture[x]->set_bitmap(*sw_toolbar_bitmap[x], sw_toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
@@ -1528,7 +1528,7 @@ void ui_menu::draw_star(render_container *container, float x0, float y0)
 //  draw toolbar
 //-------------------------------------------------
 
-void ui_menu::draw_toolbar(render_container *container, float x1, float y1, float x2, float y2)
+void ui_menu::draw_toolbar(render_container *container, float x1, float y1, float x2, float y2, bool software)
 {
 	// draw a box
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
@@ -1539,12 +1539,20 @@ void ui_menu::draw_toolbar(render_container *container, float x1, float y1, floa
 	y1 += UI_BOX_TB_BORDER;
 	y2 -= UI_BOX_TB_BORDER;
 
+	render_texture **t_texture = (software) ? sw_toolbar_texture : toolbar_texture;
+	bitmap_argb32 **t_bitmap = (software) ? sw_toolbar_bitmap : toolbar_bitmap;
+
+	int m_valid = 0;
+	for (int x = 0; x < MEWUI_TOOLBAR_BUTTONS; ++x)
+		if (t_bitmap[x]->valid())
+			m_valid++;
+
 	float x_pixel = 1.0f / container->manager().ui_target().width();
-	x1 = (x1 + x2) * 0.5f - x_pixel * (MEWUI_TOOLBAR_BUTTONS * 18);
+	x1 = (x1 + x2) * 0.5f - x_pixel * (m_valid * 18);
 
 	for (int z = 0; z < MEWUI_TOOLBAR_BUTTONS; ++z)
 	{
-		if (toolbar_bitmap[z]->valid())
+		if (t_bitmap[z]->valid())
 		{
 			x2 = x1 + x_pixel * 32;
 			rgb_t color(0xEFEFEFEF);
@@ -1554,7 +1562,7 @@ void ui_menu::draw_toolbar(render_container *container, float x1, float y1, floa
 				color = ARGB_WHITE;
 			}
 
-			container->add_quad(x1, y1, x2, y2, color, toolbar_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			x1 += x_pixel * 36;
 		}
 	}
