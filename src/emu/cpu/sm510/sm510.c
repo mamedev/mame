@@ -6,6 +6,9 @@
 
   References:
   - 1990 Sharp Microcomputers Data Book
+  
+  TODO:
+  - proper support for LFSR program counter in debugger
 
 */
 
@@ -130,6 +133,7 @@ void sm510_base_device::device_start()
 
 void sm510_base_device::device_reset()
 {
+	m_pc = 0x37 << 6;
 }
 
 
@@ -143,7 +147,10 @@ void sm510_base_device::device_reset()
 
 inline void sm510_base_device::increment_pc()
 {
-	m_pc = (m_pc + 1) & m_prgmask;
+	// PL(program counter low 6 bits) is a simple LFSR: newbit = (bit0==bit1)
+	// PU,PM(high bits) specify page, PL specifies steps within page
+	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : 0x20;
+	m_pc = feed | (m_pc >> 1 & 0x1f) | (m_pc & ~0x3f);
 }
 
 void sm510_base_device::get_opcode_param()

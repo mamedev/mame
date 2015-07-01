@@ -24,6 +24,7 @@
  @MP1221   TMS1100   1980, Entex Raise The Devil
  *MP1296   TMS1100?  1982, Entex Black Knight
  *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
+ *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
  *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000 (? note: VFD-capable)
  @MP2105   TMS1370   1979, Gakken Poker

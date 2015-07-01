@@ -82,7 +82,7 @@ static const UINT32 s_flags[] =
 };
 
 // next program counter in sequence (relative)
-static const INT16 s_next_pc[0x40] =
+static const INT8 s_next_pc[0x40] =
 {
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32+0x40,
