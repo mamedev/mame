@@ -102,12 +102,30 @@ device_t *setup_t::register_dev(device_t *dev, const pstring &name)
 	return dev;
 }
 
+void setup_t::register_lib_entry(const pstring &name)
+{
+	if (m_lib.contains(name))
+		netlist().warning("Lib entry collection already contains %s. IGNORED", name.cstr());
+	else
+		m_lib.add(name);
+}
+
 device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 {
-	device_t *dev = factory().new_device_by_classname(classname);
-	if (dev == NULL)
-		netlist().error("Class %s not found!\n", classname.cstr());
-	return register_dev(dev, name);
+	if (m_lib.contains(classname))
+	{
+		namespace_push(name);
+		include(classname);
+		namespace_pop();
+		return NULL;
+	}
+	else
+	{
+		device_t *dev = factory().new_device_by_classname(classname);
+		if (dev == NULL)
+			netlist().error("Class %s not found!\n", classname.cstr());
+		return register_dev(dev, name);
+	}
 }
 
 void setup_t::remove_dev(const pstring &name)
