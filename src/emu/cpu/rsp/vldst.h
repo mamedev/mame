@@ -4,6 +4,8 @@
 // LBV, LDV, LLV, LSV, SBV, SDV, SLV, SSV
 inline void vec_lbdlsv_sbdlsv(UINT32 iw, UINT32 rs)
 {
+	rs &= 0xfff;
+
 	const UINT32 shift_and_idx = (iw >> 11) & 0x3;
 	rsp_vec_t dqm = _mm_loadl_epi64((rsp_vec_t *) (m_vec_helpers.bdls_lut[shift_and_idx]));
 
@@ -31,6 +33,8 @@ inline void vec_lfhpuv_sfhpuv(UINT32 iw, UINT32 rs)
 		RSP_MEM_REQUEST_FOURTH
 	};
 
+	rs &= 0xfff;
+
 	const UINT32 addr = rs + (sign_extend_6(iw) << 3);
 	const UINT32 element = (iw >> 21) & 0xf;
 	UINT16* regp = m_v[(iw >> 16) & 0x1f].s;
@@ -49,6 +53,8 @@ inline void vec_lfhpuv_sfhpuv(UINT32 iw, UINT32 rs)
 // LQV, LRV, SQV, SRV
 inline void vec_lqrv_sqrv(UINT32 iw, UINT32 rs)
 {
+	rs &= 0xfff;
+
 	const UINT32 addr = rs + (sign_extend_6(iw) << 4);
 	const UINT32 element = (iw >> 21) & 0xf;
 	UINT16* regp = m_v[(iw >> 16) & 0x1f].s;

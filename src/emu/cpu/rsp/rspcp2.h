@@ -251,7 +251,7 @@ protected:
 
 	rsp_vec_t vec_load_and_shuffle_operand(const UINT16* src, UINT32 element);
 	static inline UINT32 sign_extend_6(INT32 i) {
-		return (i << (32 - 7)) >> (32 - 7);
+		return ((i << (32 - 7)) >> (32 - 7)) & 0xfff;
 	}
 	static inline rsp_vec_t vec_load_unshuffled_operand(const UINT16* src)
 	{
