@@ -100,7 +100,10 @@ memory_entry *memory_entry::s_freehead = NULL;
 //  OPERATOR REPLACEMENTS
 //**************************************************************************
 
-#ifndef NO_MEM_TRACKING
+// BEGIN libretro overrides to disable MAME's operator rplacements
+//ifndef NO_MEM_TRACKING
+#if 0
+// END libretro overrides to disable MAME's operator rplacements
 
 // standard new/delete operators (try to avoid using)
 void *operator new(std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, false, true, false); }
