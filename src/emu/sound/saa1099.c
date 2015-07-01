@@ -59,7 +59,7 @@
     0x18 | x--- ---- | Envelope generator 0 control enable (0 = off, 1 = on)
     0x19 | --xx xxxx | Envelope generator 1 parameters
     0x19 | x--- ---- | Envelope generator 1 control enable (0 = off, 1 = on)
-         |           |s
+         |           |
     0x1c | ---- ---x | All channels enable (0 = off, 1 = on)
     0x1c | ---- --x- | Synch & Reset generators
 
