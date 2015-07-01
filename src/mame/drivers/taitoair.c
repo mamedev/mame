@@ -121,7 +121,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 TODO    (TC0080VCO issues shared with TaitoH driver)
 ----
 
- - Need to implement BG1 : sprite priority. Currently not clear how this works.
  - Fix sprite coordinates.
  - Improve zoom y coordinate.
 
@@ -147,9 +146,6 @@ controlling the sit-in-cabinet (deluxe mechanized version only).
 The interface is similar to that used by Midnight Landing
 and though undumped, the motor CPU program may be identical.
 
-[Offer dip-selectable kludge of the analogue stick inputs so that
-keyboard play is possible?]
-
 Unknown control bits remain in the 0x140000 write.
 
 
@@ -169,8 +165,6 @@ emulation is complete.
 Topland
 -------
 
-Sprite/tile priority bad.
-
 After demo game in attract, palette seems too dark for a while.
 Palette corruption has occurred with areas not restored after a fade.
 Don't know why. (Perhaps 68000 relies on feedback from co-processor
@@ -188,45 +182,17 @@ discarded. But the cpu waits for a bit to be zero... some
 sort of frame flag or some "ready" message from the 3d h/w
 perhaps? The two writes seem to take only two values.
 
-
-Ainferno
---------
-
-Sprite/tile priority bad.
-
-More unmapped 320C25 reads and writes. This could be some sort of
-I/O device?? The MCU program is longer than the Topland one.
-
-cpu #2 (PC=000000C3): unmapped memory word write to 00006808 = 00FD & FFFF
-cpu #2 (PC=000000C8): unmapped memory word write to 00006810 = FF38 & FFFF
-cpu #2 (PC=000005A0): unmapped memory word write to 00006836 = 804E & FFFF
-cpu #2 (PC=000005B2): unmapped memory word write to 00006830 = FFFF & FFFF
-cpu #2 (PC=000005B5): unmapped memory word write to 00006832 = FFFE & FFFF
-cpu #2 (PC=000005B8): unmapped memory word write to 00006834 = FBCA & FFFF
-cpu #2 (PC=000005B9): unmapped memory word read from 00006836 & FFFF
-cpu #2 (PC=000005CC): unmapped memory word write to 00006830 = FFFF & FFFF
-cpu #2 (PC=000005CF): unmapped memory word write to 00006832 = FFFE & FFFF
-cpu #2 (PC=000005D2): unmapped memory word write to 00006834 = FBCA & FFFF
-cpu #2 (PC=000005D3): unmapped memory word read from 00006836 & FFFF
-cpu #2 (PC=000005E6): unmapped memory word write to 00006830 = FFFF & FFFF
-cpu #2 (PC=000005E9): unmapped memory word write to 00006832 = FFFE & FFFF
-cpu #2 (PC=000005EC): unmapped memory word write to 00006834 = FC8F & FFFF
-cpu #2 (PC=000005ED): unmapped memory word read from 00006836 & FFFF
-cpu #2 (PC=00000600): unmapped memory word write to 00006830 = FFFF & FFFF
-cpu #2 (PC=00000603): unmapped memory word write to 00006832 = FFFE & FFFF
-cpu #2 (PC=00000606): unmapped memory word write to 00006834 = FC8F & FFFF
-cpu #2 (PC=00000607): unmapped memory word read from 00006836 & FFFF
-cpu #2 (PC=00000609): unmapped memory word read from 00006838 & FFFF
-cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
-
 ****************************************************************************/
 /*!
- @todo - Framebuffer DMA requires palette switch to be selected dynamically, see at first stage Course Select in Top Landing;
+ @todo - Framebuffer DMA requires palette switch to be selected dynamically, see at first stage Course Select in Top Landing. 
+         My gut feeling is that 3d poly fill operation actually copies to internal buffer then a DMA op actually do the buffer-to-screen copy, including gradiation ROZ too;
 	   - Air Inferno: missing landing monitor camera (blackened);
 	   - Air Inferno: missing 3d HUD graphics;
 	   - Air Inferno: Expert course has wrong 3d geometry;
+	   - Air Inferno: Almost surely crashing during replay has missing smoke effect, looks quit odd atm.
 	   - Top Landing: Night stages might have wrong priority for stars-above-sea;
 	   - Input limiters / analog thresholds for both games;
+	   - Special thanks to syq for being a cunt.
  */
 
 #include "emu.h"
