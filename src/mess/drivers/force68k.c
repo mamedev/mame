@@ -111,6 +111,7 @@ public:
 	{
 	}
 	DECLARE_READ16_MEMBER(bootvect_r);
+	virtual void machine_start();
 	DECLARE_WRITE_LINE_MEMBER(write_aciahost_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_aciaterm_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_aciaremt_clock);
@@ -121,6 +122,8 @@ private:
 	required_device<acia6850_device> m_aciahost;
 	required_device<acia6850_device> m_aciaterm;
 	required_device<acia6850_device> m_aciaremt;
+	// Pointer to ROM0
+	UINT16  *m_sysrom;
 };
 
 static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
@@ -146,10 +149,14 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( force68k )
 INPUT_PORTS_END
 
+void force68k_state::machine_start()
+{
+	m_sysrom = (UINT16*)(memregion("maincpu")->base() + 0x080000);
+}
+
 READ16_MEMBER(force68k_state::bootvect_r)
 { 
-  UINT16 ret[] = {0x0000, 0x0000, 0x0008, 0x2000}; // Fake reset values
-  return ret[offset];
+        return m_sysrom[offset];
 }
 
 WRITE_LINE_MEMBER(force68k_state::write_aciahost_clock)
@@ -241,8 +248,8 @@ MACHINE_CONFIG_END
 
 /* ROM definitions */
 ROM_START( fccpu1 )
-	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD( "zbug4.bin", 0x080000, 0x3000, CRC(670d96ee) SHA1(57fbe38ae4fb06b8d9afe21d92fdd981adbf1bb1) )
+	ROM_REGION(0x1000000, "maincpu", 0)
+        ROM_LOAD( "zbug5.bin", 0x080000, 0x3000, CRC(04445fe1) SHA1(d59214171385aead05279e31fe9d354c63fb893a) )
 //	ROM_LOAD( "forcesys68kV1.0L.bin", 0x0000, 0x2f78, CRC(20a8d0d0) SHA1(544fd8bd8ed017115388c8b0f7a7a59a32253e43) )
 ROM_END
 
