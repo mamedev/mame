@@ -101,6 +101,8 @@ void sm510_base_device::device_start()
 	m_acc = 0;
 	m_bl = 0;
 	m_bm = 0;
+	m_c = 0;
+	m_skip = false;
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -112,6 +114,8 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_acc));
 	save_item(NAME(m_bl));
 	save_item(NAME(m_bm));
+	save_item(NAME(m_c));
+	save_item(NAME(m_skip));
 
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
@@ -198,7 +202,7 @@ void sm510_base_device::execute_run()
 			case 0x18: op_lda(); break;
 			case 0x1c: op_excd(); break;
 			case 0x54: op_tmi(); break;
-			case 0x70: case 0x74: case 0x78: op_tl();
+			case 0x70: case 0x74: case 0x78: op_tl(); break;
 			case 0x7c: op_tml(); break;
 
 			default:

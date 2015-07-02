@@ -39,32 +39,42 @@ void sm510_base_device::push_stack()
 
 void sm510_base_device::op_lb()
 {
-	// x
+	// LB x: load BM/BL with 4-bit immediate value (partial)
+	op_illegal();
 }
 
 void sm510_base_device::op_lbl()
 {
-	// x
+	// LBL xy: load BM/BL with 8-bit immediate value
+	op_illegal();
 }
 
 void sm510_base_device::op_sbm()
 {
-	// x
+	// SBM: set BM high bit for next opcode
+	op_illegal();
 }
 
 void sm510_base_device::op_exbla()
 {
-	// x
+	// EXBLA: exchange BL with ACC
+	UINT8 a = m_acc;
+	m_acc = m_bl;
+	m_bl = a;
 }
 
 void sm510_base_device::op_incb()
 {
-	// x
+	// INCB: increment BL, skip next on overflow
+	m_bl = (m_bl + 1) & 0xf;
+	m_skip = (m_bl == 0);
 }
 
 void sm510_base_device::op_decb()
 {
-	// x
+	// DECB: decrement BL, skip next on overflow
+	m_bl = (m_bl - 1) & 0xf;
+	m_skip = (m_bl == 0xf);
 }
 
 
@@ -72,37 +82,45 @@ void sm510_base_device::op_decb()
 
 void sm510_base_device::op_atpl()
 {
-	// x
+	// ATPL: load PC low bits with ACC
+	m_pc = (m_pc & ~0xf) | m_acc;
 }
 
 void sm510_base_device::op_rtn0()
 {
-	// x
+	// RTN0: return from subroutine
+	pop_stack();
 }
 
 void sm510_base_device::op_rtn1()
 {
-	// x
+	// RTN1: return from subroutine, skip next
+	op_rtn0();
+	m_skip = true;
 }
 
 void sm510_base_device::op_tl()
 {
-	// x
+	// TL xyz: longjump
+	op_illegal();
 }
 
 void sm510_base_device::op_tml()
 {
-	// x
+	// TML xyz: x
+	op_illegal();
 }
 
 void sm510_base_device::op_tm()
 {
-	// x
+	// TM xyz: x
+	op_illegal();
 }
 
 void sm510_base_device::op_t()
 {
-	// x
+	// T xy: jump within current page
+	m_pc = (m_pc & ~0x3f) | (m_op & 0x3f);
 }
 
 
@@ -110,42 +128,57 @@ void sm510_base_device::op_t()
 
 void sm510_base_device::op_exc()
 {
-	// x
+	// EXC x: exchange ACC with RAM, xor BM with x
+	UINT8 a = m_acc;
+	m_acc = ram_r();
+	ram_w(a);
+	m_bm ^= (m_op & 3);
 }
 
 void sm510_base_device::op_bdc()
 {
-	// x
+	// BDC: x
+	op_illegal();
 }
 
 void sm510_base_device::op_exci()
 {
-	// x
+	// EXCI x: EXC x, INCB
+	op_exc();
+	op_incb();
 }
 
 void sm510_base_device::op_excd()
 {
-	// x
+	// EXCD x: EXC x, DECB
+	op_exc();
+	op_decb();
 }
 
 void sm510_base_device::op_lda()
 {
-	// x
+	// LDA x: load ACC with RAM, xor BM with x
+	m_acc = ram_r();
+	m_bm ^= (m_op & 3);
 }
 
 void sm510_base_device::op_lax()
 {
-	// x
+	// LAX x: load ACC with immediate value, skip any next LAX
+	if ((m_op & ~0xf) != (m_prev_op & ~0xf))
+		m_acc = m_op & 0xf;
 }
 
 void sm510_base_device::op_wr()
 {
-	// x
+	// WR: shift 0 into W
+	op_illegal();
 }
 
 void sm510_base_device::op_ws()
 {
-	// x
+	// WR: shift 1 into W
+	op_illegal();
 }
 
 
@@ -153,27 +186,32 @@ void sm510_base_device::op_ws()
 
 void sm510_base_device::op_kta()
 {
-	// x
+	// KTA: input K to ACC
+	op_illegal();
 }
 
 void sm510_base_device::op_atbp()
 {
-	// x
+	// ATBP: output ACC to BP
+	op_illegal();
 }
 
 void sm510_base_device::op_atl()
 {
-	// x
+	// ATL: input L to ACC
+	op_illegal();
 }
 
 void sm510_base_device::op_atfc()
 {
-	// x
+	// ATFC: input Y to ACC
+	op_illegal();
 }
 
 void sm510_base_device::op_atr()
 {
-	// x
+	// ATR: output ACC to R
+	op_illegal();
 }
 
 
@@ -181,37 +219,51 @@ void sm510_base_device::op_atr()
 
 void sm510_base_device::op_add()
 {
-	// x
+	// ADD: add RAM to ACC
+	m_acc = (m_acc + ram_r()) & 0xf;
 }
 
 void sm510_base_device::op_add11()
 {
-	// x
+	// ADD11: add RAM and carry to ACC and carry, skip next on carry
+	m_acc += ram_r() + m_c;
+	m_c = m_acc >> 4 & 1;
+	m_skip = (m_c == 1);
+	m_acc &= 0xf;
 }
 
 void sm510_base_device::op_adx()
 {
-	// x
+	// ADX x: add immediate value to ACC, skip next on carry
+	m_acc += (m_op & 0xf);
+	m_skip = (m_acc & 0x10) ? true : false;
+	m_acc &= 0xf;
 }
 
 void sm510_base_device::op_coma()
 {
-	// x
+	// COMA: complement ACC
+	m_acc ^= 0xf;
 }
 
 void sm510_base_device::op_rot()
 {
-	// x
+	// ROT: rotate ACC left through carry
+	m_acc = m_acc << 1 | m_c;
+	m_c = m_acc >> 4 & 1;
+	m_acc &= 0xf;
 }
 
 void sm510_base_device::op_rc()
 {
-	// x
+	// RC: reset carry
+	m_c = 0;
 }
 
 void sm510_base_device::op_sc()
 {
-	// x
+	// SC: set carry
+	m_c = 1;
 }
 
 
@@ -219,52 +271,62 @@ void sm510_base_device::op_sc()
 
 void sm510_base_device::op_tb()
 {
-	// x
+	// TB: x
+	op_illegal();
 }
 
 void sm510_base_device::op_tc()
 {
-	// x
+	// TC: skip next if no carry
+	m_skip = !m_c;
 }
 
 void sm510_base_device::op_tam()
 {
-	// x
+	// TAM: skip next if ACC equals RAM
+	m_skip = (m_acc == ram_r());
 }
 
 void sm510_base_device::op_tmi()
 {
-	// x
+	// TMI x: skip next if RAM bit is set
+	m_skip = (ram_r() & 1 << (m_op & 3)) ? true : false;
 }
 
 void sm510_base_device::op_ta0()
 {
-	// x
+	// TA0: skip next if ACC is clear
+	m_skip = !m_acc;
 }
 
 void sm510_base_device::op_tabl()
 {
-	// x
+	// TABL: skip next of ACC equals BL
+	m_skip = (m_acc == m_bl);
 }
 
 void sm510_base_device::op_tis()
 {
-	// x
+	// TIS: x
+	op_illegal();
 }
 
 void sm510_base_device::op_tal()
 {
-	// x
+	// TAL: x
+	op_illegal();
 }
 
 void sm510_base_device::op_tf1()
 {
-	// x
+	// TF1: x
+	op_illegal();
 }
 
 void sm510_base_device::op_tf4()
 {
-	// x
+	// TF4: x
+	op_illegal();
 }
 
 
@@ -272,12 +334,14 @@ void sm510_base_device::op_tf4()
 
 void sm510_base_device::op_rm()
 {
-	// x
+	// RM x: reset RAM bit
+	ram_w(ram_r() & ~(1 << (m_op & 3)));
 }
 
 void sm510_base_device::op_sm()
 {
-	// x
+	// SM x: set RAM bit
+	ram_w(ram_r() | (1 << (m_op & 3)));
 }
 
 
@@ -285,17 +349,19 @@ void sm510_base_device::op_sm()
 
 void sm510_base_device::op_skip()
 {
-	// no operation
+	// SKIP: no operation
 }
 
 void sm510_base_device::op_cend()
 {
-	// clock stop
+	// CEND: stop clock
+	op_illegal();
 }
 
 void sm510_base_device::op_idiv()
 {
-	// reset DIV
+	// IDIV: reset divider
+	op_illegal();
 }
 
 void sm510_base_device::op_illegal()

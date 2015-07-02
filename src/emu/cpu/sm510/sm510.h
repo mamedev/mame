@@ -79,6 +79,8 @@ protected:
 	UINT8 m_acc;
 	UINT8 m_bl;
 	UINT8 m_bm;
+	UINT8 m_c;
+	bool m_skip;
 
 	// i/o handlers
 	//..
