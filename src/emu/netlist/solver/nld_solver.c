@@ -162,7 +162,7 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 						if (net_proxy_output == NULL)
 						{
 							net_proxy_output = palloc(analog_output_t);
-							net_proxy_output->init_object(*this, this->name() + "." + pstring::sprintf("m%" SIZETFMT, m_inps.size()));
+							net_proxy_output->init_object(*this, this->name() + "." + pstring::sprintf("m%" SIZETFMT, SIZET_PRINTF(m_inps.size())));
 							m_inps.add(net_proxy_output);
 							net_proxy_output->m_proxied_net = &p->net().as_analog();
 						}
@@ -511,7 +511,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 	}
 
 	// setup the solvers
-	netlist().log("Found %d net groups in %" SIZETFMT " nets\n", cur_group + 1, netlist().m_nets.size());
+	netlist().log("Found %d net groups in %" SIZETFMT " nets\n", cur_group + 1, SIZET_PRINTF(netlist().m_nets.size()));
 	for (int i = 0; i <= cur_group; i++)
 	{
 		matrix_solver_t *ms;
@@ -576,19 +576,19 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				break;
 		}
 
-		register_sub(pstring::sprintf("Solver_%" SIZETFMT,m_mat_solvers.size()), *ms);
+		register_sub(pstring::sprintf("Solver_%" SIZETFMT,SIZET_PRINTF(m_mat_solvers.size())), *ms);
 
 		ms->vsetup(groups[i]);
 
 		m_mat_solvers.add(ms);
 
 		netlist().log("Solver %s", ms->name().cstr());
-		netlist().log("       # %d ==> %" SIZETFMT " nets", i, groups[i].size()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		netlist().log("       # %d ==> %" SIZETFMT " nets", i, SIZET_PRINTF(groups[i].size())); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
 		netlist().log("       has %s elements", ms->is_dynamic() ? "dynamic" : "no dynamic");
 		netlist().log("       has %s elements", ms->is_timestep() ? "timestep" : "no timestep");
 		for (std::size_t j=0; j<groups[i].size(); j++)
 		{
-			netlist().log("Net %" SIZETFMT ": %s", j, groups[i][j]->name().cstr());
+			netlist().log("Net %" SIZETFMT ": %s", SIZET_PRINTF(j), groups[i][j]->name().cstr());
 			net_t *n = groups[i][j];
 			for (std::size_t k = 0; k < n->m_core_terms.size(); k++)
 			{
