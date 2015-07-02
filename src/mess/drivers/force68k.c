@@ -110,7 +110,7 @@ public:
   		  m_aciaremt(*this, "aciaremt")
 	{
 	}
-
+	DECLARE_READ16_MEMBER(bootvect_r);
 	DECLARE_WRITE_LINE_MEMBER(write_aciahost_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_aciaterm_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_aciaremt_clock);
@@ -124,22 +124,21 @@ private:
 };
 
 static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
-	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x000000, 0x000000) AM_ROM /* Vectors mapped from System EPROM */
-//	AM_RANGE(0x000008, 0x01ffff) AM_RAM /* DRAM */
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM /* All DRAM for debug */
-	AM_RANGE(0x080000, 0x09ffff) AM_ROM /* System EPROM Area */
-//        AM_RANGE(0x0e0400, 0x0e0420) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00)
+        ADDRESS_MAP_UNMAP_HIGH
+        AM_RANGE(0x000000, 0x000007) AM_ROM AM_READ(bootvect_r) /* Vectors mapped from System EPROM */
+        AM_RANGE(0x000008, 0x01ffff) AM_RAM /* DRAM */
+        AM_RANGE(0x080000, 0x09ffff) AM_ROM /* System EPROM Area */
+//	AM_RANGE(0x0a0000, 0x0bffff) AM_ROM /* User EPROM Area   */
 	AM_RANGE(0x0c0040, 0x0c0041) AM_DEVREADWRITE8("aciahost", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0c0042, 0x0c0043) AM_DEVREADWRITE8("aciahost", acia6850_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x0c0080, 0x0c0081) AM_DEVREADWRITE8("aciaterm", acia6850_device, status_r, control_w, 0xff00)
 	AM_RANGE(0x0c0082, 0x0c0083) AM_DEVREADWRITE8("aciaterm", acia6850_device, data_r, data_w, 0xff00)
 	AM_RANGE(0x0c0100, 0x0c0101) AM_DEVREADWRITE8("aciaremt", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0c0102, 0x0c0103) AM_DEVREADWRITE8("aciaremt", acia6850_device, data_r, data_w, 0x00ff)
-//	AM_RANGE(0x0a0000, 0x0bffff) AM_ROM /* User EPROM Area   */
+//      AM_RANGE(0x0e0400, 0x0e0420) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00)
 //      AM_RANGE(0x0e0000, 0x0fffff) AM_READWRITE_PORT /* IO interfaces */
+	AM_RANGE(0x100000, 0x1fffff) AM_RAM /* DRAM for bin patched bug, remove once not needed */
 //      AM_RANGE(0x100000, 0xfeffff) /* VMEbus Rev B addresses (24 bits) */
-	AM_RANGE(0x100000, 0x1fffff) AM_RAM /* DRAM for Zbug */
 //      AM_RANGE(0xff0000, 0xffffff) /* VMEbus Rev B addresses (16 bits) */
 ADDRESS_MAP_END
 
@@ -147,6 +146,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( force68k )
 INPUT_PORTS_END
 
+READ16_MEMBER(force68k_state::bootvect_r)
+{ 
+  UINT16 ret[] = {0x0000, 0x0000, 0x0008, 0x2000}; // Fake reset values
+  return ret[offset];
+}
 
 WRITE_LINE_MEMBER(force68k_state::write_aciahost_clock)
 { 
