@@ -463,7 +463,7 @@ pstring ppreprocessor::process(const pstring &contents)
 				}
 			}
 			else
-				error(pstring::sprintf("unknown directive on line %" SIZETFMT ": %s\n", i, line.cstr()));
+				error(pstring::sprintf("unknown directive on line %" SIZETFMT ": %s\n", SIZET_PRINTF(i), line.cstr()));
 		}
 		else
 		{

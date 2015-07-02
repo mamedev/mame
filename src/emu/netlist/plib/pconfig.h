@@ -48,6 +48,11 @@
 #undef ATTR_COLD
 #define ATTR_COLD
 
+static inline std::size_t SIZET_PRINTF(const std::size_t &v)
+{
+	return (unsigned) v;
+}
+
 /* use MAME */
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)
 #define PHAS_PMF_INTERNAL 1
@@ -147,6 +152,11 @@ typedef int64_t      INT64;
 #define SIZETFMT   "u"
 #endif
 #endif
+
+static inline std::size_t SIZET_PRINTF(const std::size_t &v)
+{
+	return (unsigned) v;
+}
 
 #endif
 
