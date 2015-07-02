@@ -419,7 +419,7 @@ private:
 	enum
 	{
 		RE_STATUS_IDLE              = 0,
-		RE_STATUS_COMMAND           = 1,
+		RE_STATUS_COMMAND           = 1
 	};
 
 	enum
@@ -431,7 +431,7 @@ private:
 		POLY_A      = 4,
 		POLY_U      = 5,
 		POLY_V      = 6,
-		POLY_W      = 7,
+		POLY_W      = 7
 	};
 };
 
@@ -444,7 +444,7 @@ public:
 	{
 		EVENT_EMPTY,
 		EVENT_HALF_FULL,
-		EVENT_FULL,
+		EVENT_FULL
 	};
 
 	typedef delegate<void (EventType)> event_delegate;
@@ -687,7 +687,7 @@ public:
 	enum
 	{
 		MAIN_INT_M2S = 0x01,
-		MAIN_INT_S2M = 0x02,
+		MAIN_INT_S2M = 0x02
 	};
 
 	UINT8 m_m2s_int_enable;

@@ -86,9 +86,9 @@ enum input_changed_enum
 	IC_VR2
 };
 
-NETLIST_EXTERNAL(pongdoubles);
-NETLIST_EXTERNAL(pong_fast);
-NETLIST_EXTERNAL(breakout);
+NETLIST_EXTERNAL(pongdoubles)
+NETLIST_EXTERNAL(pong_fast)
+NETLIST_EXTERNAL(breakout)
 
 class ttl_mono_state : public driver_device
 {

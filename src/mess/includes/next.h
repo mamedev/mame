@@ -141,7 +141,7 @@ protected:
 		DMA_SUPDATE      = 0x02,
 		DMA_READ         = 0x04,
 		DMA_COMPLETE     = 0x08,
-		DMA_BUSEXC       = 0x10,
+		DMA_BUSEXC       = 0x10
 	};
 
 	static const char *dma_targets[0x20];

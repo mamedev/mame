@@ -27,7 +27,7 @@
 	static_cast<floppy_connector *>(device)->set_formats(_formats);
 
 #define DECLARE_FLOPPY_FORMATS(_name) \
-	static const floppy_format_type _name [];
+	static const floppy_format_type _name []
 
 #define FLOPPY_FORMATS_MEMBER(_member) \
 	const floppy_format_type _member [] = {

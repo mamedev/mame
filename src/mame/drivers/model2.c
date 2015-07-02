@@ -129,7 +129,7 @@
 enum {
 	DSP_TYPE_TGP    = 1,
 	DSP_TYPE_SHARC  = 2,
-	DSP_TYPE_TGPX4  = 3,
+	DSP_TYPE_TGPX4  = 3
 };
 
 
