@@ -168,12 +168,12 @@ WRITE_LINE_MEMBER(force68k_state::write_aciaremt_clock)
 
 static MACHINE_CONFIG_START( fccpu1, force68k_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) 
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) 
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
 
         /* P3/Host Port config */
 	MCFG_DEVICE_ADD("aciahost", ACIA6850, 0)
-        MCFG_DEVICE_ADD("aciahost_clock", CLOCK, 153600) /* 9600 x 16 */
+        MCFG_DEVICE_ADD("aciahost_clock", CLOCK, XTAL_15_36MHz) /* 9600 x 16 */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciahost_clock))
 
         /* P4/Terminal Port config */
@@ -186,12 +186,12 @@ static MACHINE_CONFIG_START( fccpu1, force68k_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("aciaterm", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("aciaterm", acia6850_device, write_cts))
 
-        MCFG_DEVICE_ADD("aciaterm_clock", CLOCK, 153600) /* 9600 x 16 */
+        MCFG_DEVICE_ADD("aciaterm_clock", CLOCK, XTAL_15_36MHz) /* 9600 x 16 */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
 
         /* P5/Remote Port config */
 	MCFG_DEVICE_ADD("aciaremt", ACIA6850, 0)
-        MCFG_DEVICE_ADD("aciaremt_clock", CLOCK, 153600) /* 9600 x 16 */
+        MCFG_DEVICE_ADD("aciaremt_clock", CLOCK, XTAL_15_36MHz) /* 9600 x 16 */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
 
 /*
@@ -210,35 +210,35 @@ MACHINE_CONFIG_END
 #if 0
 
 static MACHINE_CONFIG_START( fccpu6, force68k_state )
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)  /* Jumper B10 Mode B */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)  /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fccpu6a, force68k_state )
-	MCFG_CPU_ADD("maincpu", M68000, 12500000) /* Jumper B10 Mode A */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12_5MHz) /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fccpu6v, force68k_state )
-	MCFG_CPU_ADD("maincpu", M68010, 8000000)  /* Jumper B10 Mode B */
+	MCFG_CPU_ADD("maincpu", M68010, XTAL_8MHz)  /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fccpu6va, force68k_state )
-	MCFG_CPU_ADD("maincpu", M68010, 12500000) /* Jumper B10 Mode A */
+	MCFG_CPU_ADD("maincpu", M68010, XTAL_12_5MHz) /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fccpu6vb, force68k_state )
-	MCFG_CPU_ADD("maincpu", M68010, 12500000) /* Jumper B10 Mode A */
+	MCFG_CPU_ADD("maincpu", M68010, XTAL_12_5MHz) /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
 MACHINE_CONFIG_END
 #endif
 
 /* ROM definitions */
 ROM_START( fccpu1 )
-	ROM_REGION(0x1000000, "maincpu", 0)
-	ROM_LOAD( "zbug4.bin", 0x0000, 0x3000, CRC(670d96ee) SHA1(57fbe38ae4fb06b8d9afe21d92fdd981adbf1bb1) )
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD( "zbug4.bin", 0x080000, 0x3000, CRC(670d96ee) SHA1(57fbe38ae4fb06b8d9afe21d92fdd981adbf1bb1) )
 //	ROM_LOAD( "forcesys68kV1.0L.bin", 0x0000, 0x2f78, CRC(20a8d0d0) SHA1(544fd8bd8ed017115388c8b0f7a7a59a32253e43) )
 ROM_END
 
