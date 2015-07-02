@@ -59,7 +59,7 @@
 static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 #if !defined( MODEL2_TRANSLUCENT)
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const m2_poly_extra_data *extra = (const m2_poly_extra_data *)extradata;
 	model2_state *state = extra->state;
 	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
 	UINT32 *p = &destmap->pix32(scanline);
@@ -111,7 +111,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 /* textured render path */
 static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const m2_poly_extra_data *extra = (const m2_poly_extra_data *)extradata;
 	model2_state *state = extra->state;
 	bitmap_rgb32 *destmap = (bitmap_rgb32 *)dest;
 	UINT32 *p = &destmap->pix32(scanline);

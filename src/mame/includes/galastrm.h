@@ -5,7 +5,7 @@
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
 
-struct tempsprite
+struct gs_tempsprite
 {
 	int gfx;
 	int code,color;
@@ -53,8 +53,8 @@ public:
 	int m_tc0610_1_addr;
 	UINT32 m_mem[2];
 	INT16 m_tc0610_ctrl_reg[2][8];
-	struct tempsprite *m_spritelist;
-	struct tempsprite *m_sprite_ptr_pre;
+	struct gs_tempsprite *m_spritelist;
+	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
 	bitmap_ind16 m_polybitmap;
 	legacy_poly_manager *m_poly;
