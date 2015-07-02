@@ -476,7 +476,7 @@ void firebeat_gcu_device::draw_object(UINT32 *cmd)
 	// 0x01: -------- xxxxxxxx xxxxxx-- --------   object y
 	// 0x01: -----x-- -------- -------- --------   object x flip
 	// 0x01: ----x--- -------- -------- --------   object y flip
-	// 0x01: ---x---- -------- -------- --------   object alpha enable (?)
+	// 0x01: --xx---- -------- -------- --------   object alpha enable (different blend modes?)
 	// 0x01: -x------ -------- -------- --------   object transparency enable (?)
 
 	// 0x02: -------- -------- ------xx xxxxxxxx   object width
@@ -493,7 +493,7 @@ void firebeat_gcu_device::draw_object(UINT32 *cmd)
 	int yscale = (cmd[3] >> 10) & 0x1ff;
 	bool xflip = (cmd[1] & 0x04000000) ? true : false;
 	bool yflip = (cmd[1] & 0x08000000) ? true : false;
-	bool alpha_enable = (cmd[1] & 0x10000000) ? true : false;
+	bool alpha_enable = (cmd[1] & 0x30000000) ? true : false;
 	bool trans_enable = (cmd[1] & 0x40000000) ? true : false;
 	UINT32 address = cmd[0] & 0xffffff;
 	int alpha_level = (cmd[2] >> 27) & 0x1f;
@@ -682,6 +682,11 @@ void firebeat_gcu_device::draw_character(UINT32 *cmd)
 		y += m_fb_origin_y;
 	}
 
+	color[0] = cmd[2] >> 16;
+	color[1] = cmd[2] & 0xffff;
+	color[2] = cmd[3] >> 16;
+	color[3] = cmd[3] & 0xffff;
+
 #if PRINT_GCU
 	printf("%s Draw Char %08X, x %d, y %d\n", basetag(), address, x, y);
 #endif
@@ -699,7 +704,7 @@ void firebeat_gcu_device::draw_character(UINT32 *cmd)
 		for (int i=0; i < 8; i++)
 		{
 			int p = (line >> ((7-i) * 2)) & 3;
-			vram16[(fbaddr+x+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[p];
+			vram16[(fbaddr+x+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[p] | 0x8000;
 		}
 	}
 }
