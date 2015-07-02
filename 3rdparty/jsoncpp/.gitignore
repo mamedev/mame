@@ -10,4 +10,27 @@
 /libs/
 /doc/doxyfile
 /dist/
-/include/json/version.h
+#/version
+#/include/json/version.h
+
+# MSVC project files:
+*.sln
+*.vcxproj
+*.filters
+*.user
+*.sdf
+*.opensdf
+*.suo
+
+# MSVC build files:
+*.lib
+*.obj
+*.tlog/
+*.pdb
+
+# CMake-generated files:
+CMakeFiles/
+CTestTestFile.cmake
+cmake_install.cmake
+pkg-config/jsoncpp.pc
+jsoncpp_lib_static.dir/
