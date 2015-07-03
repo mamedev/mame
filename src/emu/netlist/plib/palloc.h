@@ -8,6 +8,8 @@
 #ifndef PALLOC_H_
 #define PALLOC_H_
 
+#include <cstdio>
+
 #include "pconfig.h"
 
 //============================================================
@@ -28,81 +30,71 @@
 #define ATTR_ALIGN
 #endif
 
+class pmemory_pool;
+
+extern pmemory_pool *ppool;
 
 void *palloc_raw(const size_t size);
 void pfree_raw(void *p);
 
-template<typename T>
-inline T *palloc_t()
-{
-	void *p = palloc_raw(sizeof(T));
-	return new (p) T();
-}
+void* operator new(std::size_t size, pmemory_pool *pool) throw (std::bad_alloc);
 
-template<typename T, typename P1>
-inline T *palloc_t(P1 p1)
-{
-	void *p = palloc_raw(sizeof(T));
-	return new (p) T(p1);
-}
-
-template<typename T, typename P1, typename P2>
-inline T *palloc_t(P1 p1, P2 p2)
-{
-	void *p = palloc_raw(sizeof(T));
-	return new (p) T(p1, p2);
-}
-
-template<typename T, typename P1, typename P2, typename P3>
-inline T *palloc_t(P1 p1, P2 p2, P3 p3)
-{
-	void *p = palloc_raw(sizeof(T));
-	return new (p) T(p1, p2, p3);
-}
-
-template<typename T, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
-inline T *palloc_t(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7)
-{
-	void *p = palloc_raw(sizeof(T));
-	return new (p) T(p1, p2, p3, p4, p5, p6, p7);
-}
+void operator delete(void *ptr, pmemory_pool *pool);
 
 template<typename T>
 inline void pfree_t(T *p)
 {
 	p->~T();
 	pfree_raw(p);
-	//delete p;
 }
 
 template <typename T>
 inline T *palloc_array_t(size_t N)
 {
-	return new T[N];
+	//printf("here palloc_array %d\n", (unsigned) N);
+	char *buf = reinterpret_cast<char *>(palloc_raw(N * sizeof(T) + 64*2));
+	size_t *s = reinterpret_cast<size_t *>(buf);
+	*s = N;
+	buf += 64;
+	T *p = reinterpret_cast<T *>(buf);
+	for (size_t i = 0; i < N; i++)
+		new(reinterpret_cast<void *>(&p[i])) T();
+	return p;
 }
 
 template <typename T>
 inline void pfree_array_t(T *p)
 {
-	delete[] p;
+	char *buf = reinterpret_cast<char *>(p);
+	buf -= 64;
+	size_t *s = reinterpret_cast<size_t *>(buf);
+	size_t N = *s;
+	//printf("here pfree_array %d\n", (unsigned) N);
+	while (N > 0)
+	{
+			p->~T();
+			p++;
+			N--;
+	}
+	pfree_raw(s);
 }
 
-#if 1
-#define palloc(T, ...)        palloc_t<T>(__VA_ARGS__)
+#define palloc(T)        	  new(ppool) T
 #define pfree(_ptr)           pfree_t(_ptr)
-#else
-#define palloc(T, ...)        new T(__VA_ARGS__)
-#define pfree(_ptr)           delete(_ptr)
-#endif
+
+#if 1
 #define palloc_array(T, N)    palloc_array_t<T>(N)
 #define pfree_array(_ptr)     pfree_array_t(_ptr)
-
 #else
+#define palloc_array(T, N)    new T[N]
+#define pfree_array(_ptr)     delete[] _ptr
+#endif
+#else
+#include "corealloc.h"
 
 #define ATTR_ALIGN
 
-#include "corealloc.h"
-#define palloc(T, ...)        global_alloc(T(__VA_ARGS__))
+#define palloc(T)        	  global_alloc(T)
 #define pfree(_ptr)           global_free(_ptr)
 
 #define palloc_array(T, N)    global_alloc_array(T, N)

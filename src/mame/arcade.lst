@@ -4506,6 +4506,9 @@ stactics        // (c) 1981 Sega
 turbo           // (c) 1981 Sega
 turboa          // (c) 1981 Sega
 turbob          // (c) 1981 Sega
+turboc			// (c) 1981 Sega
+turbod			// (c) 1981 Sega
+turbobl         // bootleg
 subroc3d        // (c) 1982 Sega
 buckrog         // (c) 1982 Sega
 buckrogn        // (c) 1982 Sega
@@ -8691,6 +8694,7 @@ stdragon        // (c) 1989
 stdragona       // (c) 1989
 rodland         // (c) 1990
 rodlandj        // (c) 1990 (Japan)
+rittam		// Prototype or hack of Rod-Land
 rodlandjb       // bootleg
 avspirit        // (c) 1991
 phantasm        // (c) 1991 (Japan)

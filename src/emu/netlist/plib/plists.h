@@ -313,10 +313,12 @@ private:
 
 			if (cnt > new_capacity)
 				cnt = new_capacity;
-			for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
-				*pd = *ps;
 			if (m_list != NULL)
+			{
+				for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
+					*pd = *ps;
 				this->dealloc(m_list);
+			}
 			m_list = m_new;
 			m_count = cnt;
 		}
@@ -604,9 +606,9 @@ public:
 template<typename Class>
 static inline void psort_list(Class &sl)
 {
-	for(int i = 0; i < (int) sl.size() - 1; i++)
+	for(unsigned i = 0; i < sl.size(); i++)
 	{
-		for(int j = i + 1; j < sl.size(); j++)
+		for(unsigned j = i + 1; j < sl.size(); j++)
 			if(sl[i] > sl[j])
 				std::swap(sl[i], sl[j]);
 

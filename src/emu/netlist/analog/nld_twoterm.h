@@ -40,27 +40,35 @@
 // ----------------------------------------------------------------------------------------
 
 #define RES(_name, _R)                                                         \
-		NET_REGISTER_DEV(R, _name)                                                  \
+		NET_REGISTER_DEV(R, _name)                                             \
 		NETDEV_PARAMI(_name, R, _R)
 
-#define POT(_name, _R)                                                       \
-		NET_REGISTER_DEV(POT, _name)                                                \
+#define POT(_name, _R)                                                         \
+		NET_REGISTER_DEV(POT, _name)                                           \
 		NETDEV_PARAMI(_name, R, _R)
 
 /* Does not have pin 3 connected */
-#define POT2(_name, _R)                                                       \
-		NET_REGISTER_DEV(POT2, _name)                                                \
+#define POT2(_name, _R)                                                        \
+		NET_REGISTER_DEV(POT2, _name)                                          \
 		NETDEV_PARAMI(_name, R, _R)
 
 
 #define CAP(_name, _C)                                                         \
-		NET_REGISTER_DEV(C, _name)                                                  \
+		NET_REGISTER_DEV(C, _name)                                             \
 		NETDEV_PARAMI(_name, C, _C)
 
 /* Generic Diode */
-#define DIODE(_name,  _model)                                                    \
-		NET_REGISTER_DEV(D, _name)                                                  \
+#define DIODE(_name,  _model)                                                  \
+		NET_REGISTER_DEV(D, _name)                                             \
 		NETDEV_PARAMI(_name, model, _model)
+
+#define VS(_name, _V)                                                          \
+		NET_REGISTER_DEV(VS, _name)                                            \
+		NETDEV_PARAMI(_name, V, _V)
+
+#define CS(_name, _I)                                                          \
+		NET_REGISTER_DEV(CS, _name)                                            \
+		NETDEV_PARAMI(_name, I, _I)
 
 // ----------------------------------------------------------------------------------------
 // Generic macros
@@ -217,8 +225,6 @@ public:
 
 	ATTR_HOT inline void update_diode(const nl_double nVd)
 	{
-		//FIXME: Optimize cutoff case
-
 		if (nVd < NL_FCONST(-5.0) * m_Vt)
 		{
 			m_Vd = nVd;
@@ -227,16 +233,14 @@ public:
 		}
 		else if (nVd < m_Vcrit)
 		{
+			const nl_double eVDVt = nl_math::exp(nVd * m_VtInv);
 			m_Vd = nVd;
-
-			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
 			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
 		else
 		{
-			nl_double a = (nVd - m_Vd) * m_VtInv;
-			if (a < NL_FCONST(1e-12) - NL_FCONST(1.0)) a = NL_FCONST(1e-12) - NL_FCONST(1.0);
+			const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(1e-12) - NL_FCONST(1.0));
 			m_Vd = m_Vd + nl_math::e_log1p(a) * m_Vt;
 
 			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
@@ -292,6 +296,43 @@ protected:
 	param_model_t m_model;
 
 	generic_diode m_D;
+};
+
+// ----------------------------------------------------------------------------------------
+// nld_VS - Voltage source
+//
+// netlist voltage source must have inner resistance
+// ----------------------------------------------------------------------------------------
+
+class NETLIB_NAME(VS) : public NETLIB_NAME(twoterm)
+{
+public:
+	ATTR_COLD NETLIB_NAME(VS)() : NETLIB_NAME(twoterm)(VS) { }
+
+protected:
+	virtual void start();
+	virtual void reset();
+	ATTR_HOT void update();
+
+	param_double_t m_R;
+	param_double_t m_V;
+};
+
+// ----------------------------------------------------------------------------------------
+// nld_CS - Current source
+// ----------------------------------------------------------------------------------------
+
+class NETLIB_NAME(CS) : public NETLIB_NAME(twoterm)
+{
+public:
+	ATTR_COLD NETLIB_NAME(CS)() : NETLIB_NAME(twoterm)(CS) { }
+
+protected:
+	virtual void start();
+	virtual void reset();
+	ATTR_HOT void update();
+
+	param_double_t m_I;
 };
 
 

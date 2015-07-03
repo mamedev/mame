@@ -124,7 +124,7 @@ struct mat_cr_t
 			double tmp = 0.0;
 			const unsigned j1 = diag[im1] + 1;
 			const unsigned j2 = ia[im1+1];
-			for (int j = j1; j < j2; j++ )
+			for (unsigned j = j1; j < j2; j++ )
 				tmp += LU[j] * r[ja[j]];
 			r[im1] = (r[im1] - tmp) / LU[diag[im1]];
 		}

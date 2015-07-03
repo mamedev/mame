@@ -63,7 +63,7 @@ ATTR_HOT nl_double matrix_solver_SOR_t<m_N, _storage_N>::vsolve()
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
-	const int iN = this->N();
+	const unsigned iN = this->N();
 	bool resched = false;
 	int  resched_cnt = 0;
 
@@ -82,13 +82,13 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 	ATTR_ALIGN nl_double RHS[_storage_N];
 	ATTR_ALIGN nl_double new_V[_storage_N];
 
-	for (int k = 0; k < iN; k++)
+	for (unsigned k = 0; k < iN; k++)
 	{
 		nl_double gtot_t = 0.0;
 		nl_double gabs_t = 0.0;
 		nl_double RHS_t = 0.0;
 
-		const int term_count = this->m_terms[k]->count();
+		const unsigned term_count = this->m_terms[k]->count();
 		const nl_double * const RESTRICT gt = this->m_terms[k]->gt();
 		const nl_double * const RESTRICT go = this->m_terms[k]->go();
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
@@ -102,14 +102,14 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 			RHS_t = RHS_t + Idr[i];
 		}
 
-		for (int i = this->m_terms[k]->m_railstart; i < term_count; i++)
+		for (unsigned i = this->m_terms[k]->m_railstart; i < term_count; i++)
 			RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
 
 		RHS[k] = RHS_t;
 
 		if (USE_GABS)
 		{
-			for (int i = 0; i < term_count; i++)
+			for (unsigned i = 0; i < term_count; i++)
 				gabs_t = gabs_t + nl_math::abs(go[i]);
 
 			gabs_t *= NL_FCONST(0.5); // derived by try and error
@@ -144,14 +144,14 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 	do {
 		resched = false;
 		double err = 0;
-		for (int k = 0; k < iN; k++)
+		for (unsigned k = 0; k < iN; k++)
 		{
 			const int * RESTRICT net_other = this->m_terms[k]->net_other();
-			const int railstart = this->m_terms[k]->m_railstart;
+			const unsigned railstart = this->m_terms[k]->m_railstart;
 			const nl_double * RESTRICT go = this->m_terms[k]->go();
 
 			nl_double Idrive = 0.0;
-			for (int i = 0; i < railstart; i++)
+			for (unsigned i = 0; i < railstart; i++)
 				Idrive = Idrive + go[i] * new_V[net_other[i]];
 
 			const nl_double new_val = new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
@@ -179,12 +179,12 @@ ATTR_HOT inline int matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dynamic(con
 
 	if (interleaved_dynamic_updates)
 	{
-		for (int k = 0; k < iN; k++)
+		for (unsigned k = 0; k < iN; k++)
 			this->m_nets[k]->m_cur_Analog += 1.0 * (new_V[k] - this->m_nets[k]->m_cur_Analog);
 	}
 	else
 	{
-		for (int k = 0; k < iN; k++)
+		for (unsigned k = 0; k < iN; k++)
 			this->m_nets[k]->m_cur_Analog = new_V[k];
 	}
 

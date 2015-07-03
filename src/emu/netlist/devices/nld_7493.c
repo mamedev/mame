@@ -27,8 +27,8 @@ NETLIB_START(7493)
 	register_subalias("QC", C.m_Q);
 	register_subalias("QD", D.m_Q);
 
-	connect(C.m_I, B.m_Q);
-	connect(D.m_I, C.m_Q);
+	connect_late(C.m_I, B.m_Q);
+	connect_late(D.m_I, C.m_Q);
 }
 
 NETLIB_RESET(7493)

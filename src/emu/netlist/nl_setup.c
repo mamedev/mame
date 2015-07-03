@@ -102,12 +102,30 @@ device_t *setup_t::register_dev(device_t *dev, const pstring &name)
 	return dev;
 }
 
+void setup_t::register_lib_entry(const pstring &name)
+{
+	if (m_lib.contains(name))
+		netlist().warning("Lib entry collection already contains %s. IGNORED", name.cstr());
+	else
+		m_lib.add(name);
+}
+
 device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 {
-	device_t *dev = factory().new_device_by_classname(classname);
-	if (dev == NULL)
-		netlist().error("Class %s not found!\n", classname.cstr());
-	return register_dev(dev, name);
+	if (m_lib.contains(classname))
+	{
+		namespace_push(name);
+		include(classname);
+		namespace_pop();
+		return NULL;
+	}
+	else
+	{
+		device_t *dev = factory().new_device_by_classname(classname);
+		if (dev == NULL)
+			netlist().error("Class %s not found!\n", classname.cstr());
+		return register_dev(dev, name);
+	}
 }
 
 void setup_t::remove_dev(const pstring &name)
@@ -288,13 +306,16 @@ void setup_t::register_link_arr(const pstring &terms)
 }
 
 
-void setup_t::register_link(const pstring &sin, const pstring &sout)
+void setup_t::register_link_fqn(const pstring &sin, const pstring &sout)
 {
-	link_t temp = link_t(build_fqn(sin), build_fqn(sout));
+	link_t temp = link_t(sin, sout);
 	NL_VERBOSE_OUT(("link %s <== %s\n", sin.cstr(), sout.cstr()));
 	m_links.add(temp);
-	//if (!(m_links.add(sin + "." + sout, temp, false)==TMERR_NONE))
-	//  fatalerror("Error adding link %s<==%s to link list\n", sin.cstr(), sout.cstr());
+}
+
+void setup_t::register_link(const pstring &sin, const pstring &sout)
+{
+	register_link_fqn(build_fqn(sin), build_fqn(sout));
 }
 
 void setup_t::remove_connections(const pstring pin)
@@ -479,7 +500,7 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 	if (out.isFamily(terminal_t::ANALOG) && in.isFamily(terminal_t::LOGIC))
 	{
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
-		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy, &incast);
+		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(&incast));
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -518,7 +539,7 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 	{
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy, &incast);
+		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(&incast));
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;

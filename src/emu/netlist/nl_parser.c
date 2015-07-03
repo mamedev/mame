@@ -56,6 +56,7 @@ bool parser_t::parse(const char *buf, const pstring nlname)
 	m_tok_NET_MODEL = register_token("NET_MODEL");
 	m_tok_INCLUDE = register_token("INCLUDE");
 	m_tok_LOCAL_SOURCE = register_token("LOCAL_SOURCE");
+	m_tok_LOCAL_LIB_ENTRY = register_token("LOCAL_LIB_ENTRY");
 	m_tok_SUBMODEL = register_token("SUBMODEL");
 	m_tok_NETLIST_START = register_token("NETLIST_START");
 	m_tok_NETLIST_END = register_token("NETLIST_END");
@@ -63,6 +64,7 @@ bool parser_t::parse(const char *buf, const pstring nlname)
 	m_tok_TRUTHTABLE_END = register_token("TRUTHTABLE_END");
 	m_tok_TT_HEAD = register_token("TT_HEAD");
 	m_tok_TT_LINE = register_token("TT_LINE");
+	m_tok_TT_FAMILY = register_token("TT_FAMILY");
 
 	bool in_nl = false;
 
@@ -134,6 +136,11 @@ void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			net_local_source();
 		else if (token.is(m_tok_TRUTHTABLE_START))
 			net_truthtable_start();
+		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
+		{
+			m_setup.register_lib_entry(get_identifier());
+			require_token(m_tok_param_right);
+		}
 		else if (token.is(m_tok_NETLIST_END))
 		{
 			netdev_netlist_end();
@@ -174,6 +181,12 @@ void parser_t::net_truthtable_start()
 		{
 			require_token(m_tok_param_left);
 			ttd->m_desc.add(get_string());
+			require_token(m_tok_param_right);
+		}
+		else if (token.is(m_tok_TT_FAMILY))
+		{
+			require_token(m_tok_param_left);
+			ttd->m_family = netlist::logic_family_desc_t::from_model(get_string());
 			require_token(m_tok_param_right);
 		}
 		else
@@ -288,66 +301,84 @@ void parser_t::net_c()
 void parser_t::netdev_param()
 {
 	pstring param;
-	nl_double val;
 	param = get_identifier();
 	require_token(m_tok_comma);
-	val = eval_param(get_token());
+	token_t tok = get_token();
+	if (tok.is_type(STRING))
+	{
+		NL_VERBOSE_OUT(("Parser: Param: %s %s\n", param.cstr(), tok.str().cstr()));
+		m_setup.register_param(param, tok.str());
+	}
+	else
+	{
+		nl_double val = eval_param(tok);
 	NL_VERBOSE_OUT(("Parser: Param: %s %f\n", param.cstr(), val));
 	m_setup.register_param(param, val);
+	}
 	require_token(m_tok_param_right);
 }
 
 void parser_t::device(const pstring &dev_type)
 {
-	pstring devname;
-	base_factory_t *f = m_setup.factory().factory_by_name(dev_type, m_setup);
-	device_t *dev;
-	pstring_list_t termlist = f->term_param_list();
-	pstring_list_t def_params = f->def_params();
-
-	std::size_t cnt;
-
-	devname = get_identifier();
-
-	dev = f->Create();
-	m_setup.register_dev(dev, devname);
-
-	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
-
-	cnt = 0;
-	while (cnt < def_params.size())
+	if (m_setup.is_library_item(dev_type))
 	{
-		pstring paramfq = devname + "." + def_params[cnt];
+		pstring devname = get_identifier();
+		m_setup.namespace_push(devname);
+		m_setup.include(dev_type);
+		m_setup.namespace_pop();
+		require_token(m_tok_param_right);
+	}
+	else
+	{
+		base_factory_t *f = m_setup.factory().factory_by_name(dev_type, m_setup);
+		device_t *dev;
+		pstring_list_t termlist = f->term_param_list();
+		pstring_list_t def_params = f->def_params();
 
-		NL_VERBOSE_OUT(("Defparam: %s\n", paramfq.cstr()));
-		require_token(m_tok_comma);
+		std::size_t cnt;
+
+		pstring devname = get_identifier();
+
+		dev = f->Create();
+		m_setup.register_dev(dev, devname);
+
+		NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
+
+		cnt = 0;
+		while (cnt < def_params.size())
+		{
+			pstring paramfq = devname + "." + def_params[cnt];
+
+			NL_VERBOSE_OUT(("Defparam: %s\n", paramfq.cstr()));
+			require_token(m_tok_comma);
+			token_t tok = get_token();
+			if (tok.is_type(STRING))
+			{
+				m_setup.register_param(paramfq, tok.str());
+			}
+			else
+			{
+				nl_double val = eval_param(tok);
+				m_setup.register_param(paramfq, val);
+			}
+			cnt++;
+		}
+
 		token_t tok = get_token();
-		if (tok.is_type(STRING))
+		cnt = 0;
+		while (tok.is(m_tok_comma) && cnt < termlist.size())
 		{
-			m_setup.register_param(paramfq, tok.str());
+			pstring output_name = get_identifier();
+
+			m_setup.register_link(devname + "." + termlist[cnt], output_name);
+
+			cnt++;
+			tok = get_token();
 		}
-		else
-		{
-			nl_double val = eval_param(tok);
-			m_setup.register_param(paramfq, val);
-		}
-		cnt++;
+		if (cnt != termlist.size())
+			m_setup.netlist().error("netlist: input count mismatch for %s - expected %" SIZETFMT " found %" SIZETFMT "\n", devname.cstr(), SIZET_PRINTF(termlist.size()), SIZET_PRINTF(cnt));
+		require_token(tok, m_tok_param_right);
 	}
-
-	token_t tok = get_token();
-	cnt = 0;
-	while (tok.is(m_tok_comma) && cnt < termlist.size())
-	{
-		pstring output_name = get_identifier();
-
-		m_setup.register_link(devname + "." + termlist[cnt], output_name);
-
-		cnt++;
-		tok = get_token();
-	}
-	if (cnt != termlist.size())
-		m_setup.netlist().error("netlist: input count mismatch for %s - expected %" SIZETFMT " found %" SIZETFMT "\n", devname.cstr(), termlist.size(), cnt);
-	require_token(tok, m_tok_param_right);
 }
 
 

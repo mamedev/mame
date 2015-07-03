@@ -38,11 +38,11 @@ NETLIB_START(74123)
 	register_param("K", m_K, 0.4);
 	register_param("RI", m_RI, 400.0); // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 
-	connect(m_RP_Q, m_RP.m_I);
-	connect(m_RN_Q, m_RN.m_I);
+	connect_late(m_RP_Q, m_RP.m_I);
+	connect_late(m_RN_Q, m_RN.m_I);
 
-	connect(m_RN.m_R.m_P, m_RP.m_R.m_N);
-	connect(m_CV, m_RN.m_R.m_P);
+	connect_late(m_RN.m_R.m_P, m_RP.m_R.m_N);
+	connect_late(m_CV, m_RN.m_R.m_P);
 
 	m_KP = 1.0 / (1.0 + exp(m_K.Value()));
 
@@ -136,7 +136,7 @@ NETLIB_START(74123_dip)
 	register_subalias("6", m_2.m_RN.m_R.m_N);
 	register_subalias("7", m_2.m_RN.m_R.m_P);
 	register_subalias("8", m_1.m_RN.m_R.m_N);
-	connect(m_1.m_RN.m_R.m_N, m_2.m_RN.m_R.m_N);
+	connect_late(m_1.m_RN.m_R.m_N, m_2.m_RN.m_R.m_N);
 
 	register_subalias("9", m_2.m_A);
 	register_subalias("10", m_2.m_B);
@@ -146,7 +146,7 @@ NETLIB_START(74123_dip)
 	register_subalias("14", m_1.m_RN.m_R.m_N);
 	register_subalias("15", m_1.m_RN.m_R.m_P);
 	register_subalias("16", m_1.m_RP.m_R.m_P);
-	connect(m_1.m_RP.m_R.m_P, m_2.m_RP.m_R.m_P);
+	connect_late(m_1.m_RP.m_R.m_P, m_2.m_RP.m_R.m_P);
 }
 
 NETLIB_UPDATE(74123_dip)
@@ -178,7 +178,7 @@ NETLIB_START(9602_dip)
 	register_subalias("6", m_1.m_Q);
 	register_subalias("7", m_1.m_QQ);
 	register_subalias("8", m_1.m_RN.m_R.m_N);
-	connect(m_1.m_RN.m_R.m_N, m_2.m_RN.m_R.m_N);
+	connect_late(m_1.m_RN.m_R.m_N, m_2.m_RN.m_R.m_N);
 
 	register_subalias("9", m_2.m_QQ);
 	register_subalias("10", m_2.m_Q);
@@ -188,7 +188,7 @@ NETLIB_START(9602_dip)
 	register_subalias("14", m_2.m_RN.m_R.m_P); // RC2
 	register_subalias("15", m_2.m_RN.m_R.m_N); // C2
 	register_subalias("16", m_1.m_RP.m_R.m_P);
-	connect(m_1.m_RP.m_R.m_P, m_2.m_RP.m_R.m_P);
+	connect_late(m_1.m_RP.m_R.m_P, m_2.m_RP.m_R.m_P);
 }
 
 NETLIB_UPDATE(9602_dip)

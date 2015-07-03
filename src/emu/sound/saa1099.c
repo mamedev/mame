@@ -263,24 +263,24 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			}
 
 			// if the noise is enabled
-			if (m->channels[ch].noise_enable)
+			if (m_channels[ch].noise_enable)
 			{
 				// if the noise level is high (noise 0: chan 0-2, noise 1: chan 3-5)
-				if (m->noise[ch/3].level & 1)
+				if (m_noise[ch/3].level & 1)
 				{
 					// subtract to avoid overflows, also use only half amplitude
-					output_l -= m->channels[ch].amplitude[ LEFT] * m->channels[ch].envelope[ LEFT] / 16 / 2;
-					output_r -= m->channels[ch].amplitude[RIGHT] * m->channels[ch].envelope[RIGHT] / 16 / 2;
+					output_l -= m_channels[ch].amplitude[ LEFT] * m_channels[ch].envelope[ LEFT] / 16 / 2;
+					output_r -= m_channels[ch].amplitude[RIGHT] * m_channels[ch].envelope[RIGHT] / 16 / 2;
 				}
 			}
 			// if the square wave is enabled
-			if (m->channels[ch].freq_enable)
+			if (m_channels[ch].freq_enable)
 			{
 				// if the channel level is high
-				if (m->channels[ch].level & 1)
+				if (m_channels[ch].level & 1)
 				{
-					output_l += m->channels[ch].amplitude[ LEFT] * m->channels[ch].envelope[ LEFT] / 16;
-					output_r += m->channels[ch].amplitude[RIGHT] * m->channels[ch].envelope[RIGHT] / 16;
+					output_l += m_channels[ch].amplitude[ LEFT] * m_channels[ch].envelope[ LEFT] / 16;
+					output_r += m_channels[ch].amplitude[RIGHT] * m_channels[ch].envelope[RIGHT] / 16;
 				}
 			}
 		}

@@ -164,6 +164,7 @@ if (CPUS["AMIS2000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/amis2000/amis2000.c",
 		MAME_DIR .. "src/emu/cpu/amis2000/amis2000.h",
+		MAME_DIR .. "src/emu/cpu/amis2000/amis2000op.c",
 	}
 end
 
@@ -583,6 +584,7 @@ if (CPUS["HMCS40"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40.c",
 		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40.h",
+		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40op.c",
 	}
 end
 
@@ -1076,6 +1078,7 @@ if (CPUS["MELPS4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/melps4/melps4.c",
 		MAME_DIR .. "src/emu/cpu/melps4/melps4.h",
+		MAME_DIR .. "src/emu/cpu/melps4/melps4op.c",
 		MAME_DIR .. "src/emu/cpu/melps4/m58846.c",
 		MAME_DIR .. "src/emu/cpu/melps4/m58846.h",
 	}
@@ -1467,6 +1470,7 @@ if (CPUS["UCOM4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ucom4/ucom4.c",
 		MAME_DIR .. "src/emu/cpu/ucom4/ucom4.h",
+		MAME_DIR .. "src/emu/cpu/ucom4/ucom4op.c",
 	}
 end
 
@@ -1546,6 +1550,41 @@ if (CPUS["SATURN"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Sharp SM510 series
+--@src/emu/cpu/sm510/sm510.h,CPUS["SM510"] = true
+--------------------------------------------------
+
+if (CPUS["SM510"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/cpu/sm510/sm510.c",
+		MAME_DIR .. "src/emu/cpu/sm510/sm510.h",
+		MAME_DIR .. "src/emu/cpu/sm510/sm510op.c",
+		MAME_DIR .. "src/emu/cpu/sm510/sm510core.c",
+		MAME_DIR .. "src/emu/cpu/sm510/sm511core.c",
+	}
+end
+
+if (CPUS["SM510"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sm510/sm510d.c")
+end
+
+--------------------------------------------------
+-- Sharp SM8500
+--@src/emu/cpu/sm8500/sm8500.h,CPUS["SM8500"] = true
+--------------------------------------------------
+
+if (CPUS["SM8500"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/cpu/sm8500/sm8500.c",
+		MAME_DIR .. "src/emu/cpu/sm8500/sm8500.h",
+	}
+end
+
+if (CPUS["SM8500"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sm8500/sm8500d.c")
+end
+
+--------------------------------------------------
 -- Signetics 2650
 --@src/emu/cpu/s2650/s2650.h,CPUS["S2650"] = true
 --------------------------------------------------
@@ -1575,22 +1614,6 @@ end
 
 if (CPUS["SC61860"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sc61860/scdasm.c")
-end
-
---------------------------------------------------
--- SM8500
---@src/emu/cpu/sm8500/sm8500.h,CPUS["SM8500"] = true
---------------------------------------------------
-
-if (CPUS["SM8500"]~=null) then
-	files {
-		MAME_DIR .. "src/emu/cpu/sm8500/sm8500.c",
-		MAME_DIR .. "src/emu/cpu/sm8500/sm8500.h",
-	}
-end
-
-if (CPUS["SM8500"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sm8500/sm8500d.c")
 end
 
 --------------------------------------------------

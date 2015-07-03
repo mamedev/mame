@@ -199,6 +199,23 @@ protected:
 		RSP_ACC_HI = 0,
 	};
 
+	enum rsp_mem_request_type {
+		RSP_MEM_REQUEST_NONE,
+		RSP_MEM_REQUEST_INT_MEM,
+		RSP_MEM_REQUEST_VECTOR,
+		RSP_MEM_REQUEST_FOURTH,
+		RSP_MEM_REQUEST_HALF,
+		RSP_MEM_REQUEST_PACK,
+		RSP_MEM_REQUEST_QUAD,
+		RSP_MEM_REQUEST_REST,
+		RSP_MEM_REQUEST_UPACK
+	};
+
+	union aligned_rsp_1vect_t {
+		rsp_vec_t __align;
+		UINT16 s[8];
+	};
+
 	union aligned_rsp_2vect_t {
 		rsp_vec_t __align[2];
 		UINT16 s[16];
@@ -209,6 +226,7 @@ protected:
 		UINT16 s[24];
 	};
 
+	aligned_rsp_1vect_t m_vdqm;
 	aligned_rsp_2vect_t m_flags[3];
 	aligned_rsp_3vect_t m_acc;
 	UINT32 m_dp_flag;
@@ -225,11 +243,16 @@ protected:
 		const UINT16 ror_b2l_keys[16][8];
 		const UINT16 rol_l2b_keys[16][8];
 		const UINT16 ror_l2b_keys[16][8];
+		const UINT16 qr_lut[16][8];
+		const UINT16 bdls_lut[4][4];
 	} vec_helpers_t;
 
 	static const vec_helpers_t m_vec_helpers;
 
 	rsp_vec_t vec_load_and_shuffle_operand(const UINT16* src, UINT32 element);
+	static inline UINT32 sign_extend_6(INT32 i) {
+		return ((i << (32 - 7)) >> (32 - 7)) & 0xfff;
+	}
 	static inline rsp_vec_t vec_load_unshuffled_operand(const UINT16* src)
 	{
 		return _mm_load_si128((rsp_vec_t*) src);
@@ -319,11 +342,11 @@ protected:
 	}
 
 	void vec_load_group1(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
-	void vec_load_group2(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
-	void vec_load_group4(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
+	void vec_load_group2(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type);
+	void vec_load_group4(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type);
 	void vec_store_group1(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
-	void vec_store_group2(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
-	void vec_store_group4(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm);
+	void vec_store_group2(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type);
+	void vec_store_group4(UINT32 addr, UINT32 element, UINT16* regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type);
 
 #include "clamp.h"
 #include "vabs.h"
@@ -349,6 +372,7 @@ protected:
 #include "vsub.h"
 #include "vsubc.h"
 #include "vxor.h"
+#include "vldst.h"
 #endif
 
 private:

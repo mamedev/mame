@@ -3,6 +3,9 @@
 
 // HMCS40 opcode handlers
 
+#include "hmcs40.h"
+
+
 // internal helpers
 
 inline UINT8 hmcs40_cpu_device::ram_r()
@@ -82,7 +85,7 @@ void hmcs40_cpu_device::op_xamr()
 
 	// HMCS42: MR0 on file 0, MR4-MR15 on file 4 (there is no file 1-3)
 	// HMCS43: MR0-MR3 on file 0-3, MR4-MR15 on file 4
-	if (m_family == FAMILY_HMCS42 || m_family == FAMILY_HMCS43)
+	if (m_family == HMCS40_FAMILY_HMCS42 || m_family == HMCS40_FAMILY_HMCS43)
 		address |= (address < 4) ? (address << 4) : 0x40;
 
 	// HMCS44/45/46/47: all on last file

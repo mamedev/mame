@@ -163,6 +163,8 @@ public:
 	void ccfunc_sp_set_status_cb();
 	void ccfunc_unimplemented();
 
+	UINT8* get_dmem() { return m_dmem8; }
+
 protected:
 	// device-level overrides
 	virtual void device_start();

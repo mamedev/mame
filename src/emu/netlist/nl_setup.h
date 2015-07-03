@@ -49,23 +49,27 @@
 
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
-#define NETLIST_EXTERNAL(_name)                                                     \
+#define NETLIST_EXTERNAL(_name)                                                \
 		ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup);
 
-#define NETLIST_START(_name)                                                        \
-ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)                          \
+#define NETLIST_START(_name)                                                   \
+ATTR_COLD void NETLIST_NAME(_name)(netlist::setup_t &setup)                    \
 {
 #define NETLIST_END()  }
 
-#define LOCAL_SOURCE(_name)                                                         \
-		setup.register_source(palloc(netlist::source_proc_t, # _name, &NETLIST_NAME(_name)));
+#define LOCAL_SOURCE(_name)                                                    \
+		setup.register_source(palloc(netlist::source_proc_t(# _name, &NETLIST_NAME(_name))));
 
-#define INCLUDE(_name)                                                              \
+#define LOCAL_LIB_ENTRY(_name)                                                 \
+		LOCAL_SOURCE(_name)													   \
+		setup.register_lib_entry(# _name);
+
+#define INCLUDE(_name)                                                         \
 		setup.include(# _name);
 
-#define SUBMODEL(_model, _name)                                                     \
-		setup.namespace_push(# _name);                                              \
-		NETLIST_NAME(_model)(setup);                                                \
+#define SUBMODEL(_model, _name)                                                \
+		setup.namespace_push(# _name);                                         \
+		NETLIST_NAME(_model)(setup);                                           \
 		setup.namespace_pop();
 
 // ----------------------------------------------------------------------------------------
@@ -80,7 +84,7 @@ namespace netlist
 
 	class setup_t
 	{
-		NETLIST_PREVENT_COPYING(setup_t)
+		P_PREVENT_COPYING(setup_t)
 	public:
 
 		// ----------------------------------------------------------------------------------------
@@ -145,11 +149,16 @@ namespace netlist
 		device_t *register_dev(const pstring &classname, const pstring &name);
 		void remove_dev(const pstring &name);
 
+		void register_lib_entry(const pstring &name);
+
 		void register_model(const pstring &model);
 		void register_alias(const pstring &alias, const pstring &out);
 		void register_alias_nofqn(const pstring &alias, const pstring &out);
+
 		void register_link_arr(const pstring &terms);
+		void register_link_fqn(const pstring &sin, const pstring &sout);
 		void register_link(const pstring &sin, const pstring &sout);
+
 		void register_param(const pstring &param, const pstring &value);
 		void register_param(const pstring &param, const double value);
 
@@ -183,6 +192,8 @@ namespace netlist
 		factory_list_t &factory() { return *m_factory; }
 		const factory_list_t &factory() const { return *m_factory; }
 
+		bool is_library_item(const pstring &name) const { return m_lib.contains(name); }
+
 		/* not ideal, but needed for save_state */
 		tagmap_terminal_t  m_terminals;
 
@@ -212,6 +223,7 @@ namespace netlist
 
 		pstack_t<pstring> m_stack;
 		source_t::list_t m_sources;
+		plist_t<pstring> m_lib;
 
 
 		void connect_terminals(core_terminal_t &in, core_terminal_t &out);

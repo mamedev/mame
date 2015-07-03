@@ -188,19 +188,19 @@ ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic
 	}
 #endif
 
-	for (int k = 0; k < iN; k++)
+	for (unsigned k = 0; k < iN; k++)
 		new_v[k] = this->m_nets[k]->m_cur_Analog;
 
 	do {
 		resched = false;
 		nl_double cerr = 0.0;
 
-		for (int k = 0; k < iN; k++)
+		for (unsigned k = 0; k < iN; k++)
 		{
 			nl_double Idrive = 0;
 
 			const double * RESTRICT A = &this->m_A[k][0];
-			const int *p = this->m_terms[k]->m_nz.data();
+			const unsigned *p = this->m_terms[k]->m_nz.data();
 			const unsigned e = this->m_terms[k]->m_nz.size();
 
 			for (unsigned i = 0; i < e; i++)

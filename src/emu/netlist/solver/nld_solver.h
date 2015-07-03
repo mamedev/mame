@@ -52,7 +52,7 @@ struct solver_parameters_t
 
 class terms_t
 {
-	NETLIST_PREVENT_COPYING(terms_t)
+	P_PREVENT_COPYING(terms_t)
 
 	public:
 	ATTR_COLD terms_t() : m_railstart(0)
@@ -83,8 +83,8 @@ class terms_t
 
 	unsigned m_railstart;
 
-	plist_t<int> m_nzrd; /* non zero right of the diagonal for elimination */
-	plist_t<int> m_nz;   /* all non zero for multiplication */
+	plist_t<unsigned> m_nzrd; /* non zero right of the diagonal for elimination */
+	plist_t<unsigned> m_nz;   /* all non zero for multiplication */
 private:
 	plist_t<terminal_t *> m_term;
 	plist_t<int> m_net_other;

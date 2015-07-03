@@ -3,16 +3,17 @@
 #include "netlist/devices/nld_system.h"
 #include "netlist/analog/nld_bjt.h"
 
-#define USE_FRONTIERS 1
-#define USE_FIXED_STV 1
+#define USE_FRONTIERS 0
+#define USE_FIXED_STV 0
 
 NETLIST_START(dummy)
 	SOLVER(Solver, 12000)
-	PARAM(Solver.ACCURACY, 1e-8)
+	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 300)
-	PARAM(Solver.GS_LOOPS, 3)
+	PARAM(Solver.GS_LOOPS, 23)
 	//PARAM(Solver.GS_THRESHOLD, 99) // Force Gaussian elimination here
 	PARAM(Solver.SOR_FACTOR, 1.05)
+	PARAM(Solver.ITERATIVE, "GMRES")
 	#if 0
 	//PARAM(Solver.SOR_FACTOR, 1)
 	PARAM(Solver.DYNAMIC_TS, 1)

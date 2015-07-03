@@ -183,7 +183,7 @@ public:
 
 	void init()
 	{
-		m_setup = palloc(netlist::setup_t, this);
+		m_setup = palloc(netlist::setup_t(this));
 		this->init_object(*this, "netlist");
 		m_setup->init();
 	}
@@ -192,7 +192,7 @@ public:
 	{
 		// read the netlist ...
 
-		m_setup->register_source(palloc(netlist::netlist_source_mem_t, buffer));
+		m_setup->register_source(palloc(netlist::netlist_source_mem_t(buffer)));
 		m_setup->include(name);
 		log_setup();
 
@@ -292,7 +292,7 @@ static void listdevices()
 	nt.init();
 	const netlist::factory_list_t::list_t &list = nt.setup().factory().list();
 
-	nt.setup().register_source(palloc(netlist::source_proc_t, "dummy", &netlist_dummy));
+	nt.setup().register_source(palloc(netlist::source_proc_t("dummy", &netlist_dummy)));
 	nt.setup().include("dummy");
 
 	nt.setup().start_devices();

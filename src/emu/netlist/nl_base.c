@@ -59,7 +59,7 @@ public:
 	}
 	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
 	{
-		return palloc(devices::nld_d_to_a_proxy, proxied);
+		return palloc(devices::nld_d_to_a_proxy(proxied));
 	}
 };
 
@@ -80,7 +80,7 @@ public:
 	}
 	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
 	{
-		return palloc(devices::nld_d_to_a_proxy , proxied);
+		return palloc(devices::nld_d_to_a_proxy(proxied));
 	}
 };
 
@@ -93,7 +93,7 @@ public:
 	logic_family_std_proxy_t() { }
 	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
 	{
-		return palloc(devices::nld_d_to_a_proxy , proxied);
+		return palloc(devices::nld_d_to_a_proxy(proxied));
 	}
 };
 
@@ -104,7 +104,6 @@ logic_family_desc_t *logic_family_desc_t::from_model(const pstring &model)
 	if (setup_t::model_value_str(model, "TYPE", "") == "CD4000")
 		return netlist_family_CD4000;
 
-	/* FIXME: Memory leak */
 	logic_family_std_proxy_t *ret = palloc(logic_family_std_proxy_t);
 
 	ret->m_low_thresh_V = setup_t::model_value(model, "IVL", 0.8);
@@ -138,7 +137,7 @@ void queue_t::register_state(pstate_manager_t &manager, const pstring &module)
 	NL_VERBOSE_OUT(("register_state\n"));
 	manager.save_item(m_qsize, this, module + "." + "qsize");
 	manager.save_item(&m_times[0], this, module + "." + "times", m_times.size());
-	manager.save_item(&(m_names[0][0]), this, module + "." + "names", m_names.size() * 64);
+	manager.save_item(&(m_names[0].m_buf[0]), this, module + "." + "names", m_names.size() * sizeof(names_t));
 }
 
 void queue_t::on_pre_save()
@@ -152,8 +151,8 @@ void queue_t::on_pre_save()
 		pstring p = this->listptr()[i].object()->name();
 		int n = p.len();
 		n = std::min(63, n);
-		std::strncpy(&(m_names[i][0]), p, n);
-		m_names[i][n] = 0;
+		std::strncpy(m_names[i].m_buf, p, n);
+		m_names[i].m_buf[n] = 0;
 	}
 }
 
@@ -164,7 +163,7 @@ void queue_t::on_post_load()
 	NL_VERBOSE_OUT(("current time %f qsize %d\n", netlist().time().as_double(), m_qsize));
 	for (int i = 0; i < m_qsize; i++ )
 	{
-		net_t *n = netlist().find_net(&(m_names[i][0]));
+		net_t *n = netlist().find_net(m_names[i].m_buf);
 		//NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
 		//NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(),  netlist_time::from_raw(m_times[i]).as_double()));
 		this->push(queue_t::entry_t(netlist_time::from_raw(m_times[i]), n));
@@ -203,18 +202,18 @@ ATTR_COLD const pstring &object_t::name() const
 // netlist_owned_object_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD owned_object_t::owned_object_t(const type_t atype,
+ATTR_COLD device_object_t::device_object_t(const type_t atype,
 		const family_t afamily)
 : object_t(atype, afamily)
-, m_netdev(NULL)
+, m_device(NULL)
 {
 }
 
-ATTR_COLD void owned_object_t::init_object(core_device_t &dev,
+ATTR_COLD void device_object_t::init_object(core_device_t &dev,
 		const pstring &aname)
 {
 	object_t::init_object(dev.netlist(), aname);
-	m_netdev = &dev;
+	m_device = &dev;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -571,7 +570,6 @@ ATTR_COLD void device_t::register_output(const pstring &name, logic_output_t &po
 
 ATTR_COLD void device_t::register_output(const pstring &name, analog_output_t &port)
 {
-	//port.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, port);
 }
 
@@ -584,14 +582,18 @@ ATTR_COLD void device_t::register_input(const pstring &name, logic_input_t &inp)
 
 ATTR_COLD void device_t::register_input(const pstring &name, analog_input_t &inp)
 {
-	//inp.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, inp);
 	m_terminals.add(inp.name());
 }
 
-ATTR_COLD void device_t::connect(core_terminal_t &t1, core_terminal_t &t2)
+ATTR_COLD void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
 {
-	/* FIXME: These should really first be collected like NET_C connects */
+	//printf("device %s: connect %s to %s\n", name().cstr(), t1.name().cstr(), t2.name().cstr());
+	setup().register_link_fqn(t1.name(), t2.name());
+}
+
+ATTR_COLD void device_t::connect_direct(core_terminal_t &t1, core_terminal_t &t2)
+{
 	if (!setup().connect(t1, t2))
 		netlist().error("Error connecting %s to %s\n", t1.name().cstr(), t2.name().cstr());
 }
@@ -652,7 +654,7 @@ ATTR_HOT void net_t::inc_active(core_terminal_t &term)
 	{
 		if (netlist().use_deactivate())
 		{
-			railterminal().netdev().inc_active();
+			railterminal().device().inc_active();
 			//m_cur_Q = m_new_Q;
 		}
 		if (m_in_queue == 0)
@@ -679,7 +681,7 @@ ATTR_HOT void net_t::dec_active(core_terminal_t &term)
 	nl_assert(m_active >= 0);
 	m_list_active.remove(term);
 	if (m_active == 0 && netlist().use_deactivate())
-			railterminal().netdev().dec_active();
+			railterminal().device().dec_active();
 }
 
 ATTR_COLD void net_t::register_railterminal(core_terminal_t &mr)
@@ -721,7 +723,7 @@ ATTR_HOT /* inline */ void core_terminal_t::update_dev(const UINT32 mask)
 	inc_stat(netdev().stat_call_count);
 	if ((state() & mask) != 0)
 	{
-		netdev().update_dev();
+		device().update_dev();
 	}
 }
 
@@ -808,7 +810,7 @@ ATTR_COLD void net_t::move_connections(net_t *dest_net)
 		core_terminal_t *p = m_core_terms[i];
 		dest_net->register_con(*p);
 	}
-	m_core_terms.clear(); // FIXME: othernet needs to be free'd from memory
+	m_core_terms.clear();
 	m_active = 0;
 }
 
@@ -923,7 +925,7 @@ ATTR_COLD void analog_net_t::process_net(list_t *groups, int &cur_group)
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD core_terminal_t::core_terminal_t(const type_t atype, const family_t afamily)
-: owned_object_t(atype, afamily)
+: device_object_t(atype, afamily)
 , plinkedlist_element_t<core_terminal_t>()
 , m_net(NULL)
 , m_state(STATE_NONEX)
@@ -1033,8 +1035,7 @@ ATTR_COLD void analog_output_t::init_object(core_device_t &dev, const pstring &a
 
 ATTR_COLD void analog_output_t::initial(const nl_double val)
 {
-	// FIXME: Really necessary?
-	net().as_analog().m_cur_Analog = val * NL_FCONST(0.99);
+	net().as_analog().m_cur_Analog = val;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1042,7 +1043,7 @@ ATTR_COLD void analog_output_t::initial(const nl_double val)
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD param_t::param_t(const param_type_t atype)
-	: owned_object_t(PARAM, ANALOG)
+	: device_object_t(PARAM, ANALOG)
 	, m_param_type(atype)
 {
 }

@@ -9,45 +9,35 @@
 #define USE_FIXED_STV 0
 #endif
 
-NETLIST_EXTERNAL(LM324_DIP)
-NETLIST_EXTERNAL(LM358_DIP)
+/* ----------------------------------------------------------------------------
+ *  Library section header START
+ * ---------------------------------------------------------------------------*/
 
 #ifndef __PLIB_PREPROCESSOR__
-#define MC14584B_GATE(_name)                                          \
+
+#define MC14584B_GATE(_name)                    		                      \
 		NET_REGISTER_DEV_X(MC14584B_GATE, _name)
+
+#define MC14584B_DIP(_name)            	        		                      \
+		NET_REGISTER_DEV_X(MC14584B_DIP, _name)
+
+#define LM324_DIP(_name)            			                              \
+		NET_REGISTER_DEV_X(LM324_DIP, _name)
+
+#define LM358_DIP(_name)            			                              \
+		NET_REGISTER_DEV_X(LM358_DIP, _name)
+
+NETLIST_EXTERNAL(kidniki_lib)
+
 #endif
 
-NETLIST_START(kidniki_lib)
-	TRUTHTABLE_START(MC14584B_GATE, 1, 1, 0, "A,B")
-		TT_HEAD(" A | Q ")
-		TT_LINE(" 0 | 1 |100")
-		TT_LINE(" 1 | 0 |100")
-		TT_FAMILY(".model MC14584B FAMILY(IVL=2.1 IVH=2.7 OVL=0.05 OVH=4.95 ORL=10.0 ORH 10.0)")
-	TRUTHTABLE_END()
-NETLIST_END()
+/* ----------------------------------------------------------------------------
+ *  Library section header END
+ * ---------------------------------------------------------------------------*/
 
-NETLIST_START(MC14584B_DIP)
-	MC14584B_GATE(s1)
-	MC14584B_GATE(s2)
-	MC14584B_GATE(s3)
-	MC14584B_GATE(s4)
-	MC14584B_GATE(s5)
-	MC14584B_GATE(s6)
-
-	ALIAS( 1, s1.A)
-	ALIAS( 2, s1.Q)
-	ALIAS( 3, s2.A)
-	ALIAS( 4, s2.Q)
-	ALIAS( 5, s3.A)
-	ALIAS( 6, s3.Q)
-
-	ALIAS( 8, s4.Q)
-	ALIAS( 9, s4.A)
-	ALIAS(10, s5.Q)
-	ALIAS(11, s5.A)
-	ALIAS(12, s6.Q)
-	ALIAS(13, s6.A)
-NETLIST_END()
+/* ----------------------------------------------------------------------------
+ *  Kidniki schematics
+ * ---------------------------------------------------------------------------*/
 
 NETLIST_START(kidniki_schematics)
 	//  EESCHEMA NETLIST VERSION 1.1 (SPICE FORMAT) CREATION DATE: SAT 06 JUN 2015 01:06:26 PM CEST
@@ -58,8 +48,17 @@ NETLIST_START(kidniki_schematics)
 	// .END
 
 	LOCAL_SOURCE(kidniki_lib)
-
 	INCLUDE(kidniki_lib)
+
+	/*
+	 * Workaround: The simplified opamp model does not correctly
+	 * model the internals of the inputs.
+	 */
+
+	ANALOG_INPUT(VWORKAROUND, 2.061)
+	RES(RWORKAROUND, RES_K(27))
+	NET_C(VWORKAROUND.Q, RWORKAROUND.1)
+	NET_C(XU1.6, RWORKAROUND.2)
 
 	CAP(C200, CAP_N(100))
 	CAP(C28, CAP_U(1))
@@ -118,10 +117,12 @@ NETLIST_START(kidniki_schematics)
 	QBJT_EB(Q7, "2SC945")
 	QBJT_EB(Q9, "2SC945")
 
-	SUBMODEL(LM324_DIP,XU1)
-	SUBMODEL(LM358_DIP,XU2)
+	LM324_DIP(XU1)
+	LM358_DIP(XU2)
+	//SUBMODEL(LM324_DIP,XU1)
+	//SUBMODEL(LM358_DIP,XU2)
 
-	SUBMODEL(MC14584B_DIP, XU3)
+	MC14584B_DIP(XU3)
 
 	RES(R100, RES_K(560))
 	RES(R101, RES_K(150))
@@ -309,7 +310,24 @@ NETLIST_START(kidniki_schematics)
 	NET_C(I_MSM3K0.Q, R200.2)
 	NET_C(I_MSM2K0.Q, R201.2)
 	NET_C(R200.1, R201.1, C200.1)
+
+	/* Amplifier stage */
+
+	CAP(C26, CAP_U(1))
+	RES(R25, 560)
+	RES(R26, RES_K(47))
+	CAP(C29, CAP_U(0.01))
+
+	NET_C(RV1.2, C26.1)
+	NET_C(C26.2, R25.1)
+	NET_C(R25.2, R26.1, C29.1)
+	NET_C(R26.2, C29.2, GND)
+
 NETLIST_END()
+
+/* ----------------------------------------------------------------------------
+ *  Library section body START
+ * ---------------------------------------------------------------------------*/
 
 NETLIST_START(opamp)
 
@@ -426,3 +444,41 @@ NETLIST_START(LM358_DIP)
 	ALIAS( 4, op1.GND)
 	ALIAS( 8, op1.VCC)
 NETLIST_END()
+
+NETLIST_START(MC14584B_DIP)
+	MC14584B_GATE(s1)
+	MC14584B_GATE(s2)
+	MC14584B_GATE(s3)
+	MC14584B_GATE(s4)
+	MC14584B_GATE(s5)
+	MC14584B_GATE(s6)
+
+	ALIAS( 1, s1.A)
+	ALIAS( 2, s1.Q)
+	ALIAS( 3, s2.A)
+	ALIAS( 4, s2.Q)
+	ALIAS( 5, s3.A)
+	ALIAS( 6, s3.Q)
+
+	ALIAS( 8, s4.Q)
+	ALIAS( 9, s4.A)
+	ALIAS(10, s5.Q)
+	ALIAS(11, s5.A)
+	ALIAS(12, s6.Q)
+	ALIAS(13, s6.A)
+NETLIST_END()
+
+NETLIST_START(kidniki_lib)
+	TRUTHTABLE_START(MC14584B_GATE, 1, 1, 0, "")
+		TT_HEAD(" A | Q ")
+		TT_LINE(" 0 | 1 |100")
+		TT_LINE(" 1 | 0 |100")
+		TT_FAMILY(".model MC14584B FAMILY(IVL=2.1 IVH=2.7 OVL=0.05 OVH=4.95 ORL=10.0 ORH 10.0)")
+	TRUTHTABLE_END()
+
+	LOCAL_LIB_ENTRY(LM324_DIP)
+	LOCAL_LIB_ENTRY(LM358_DIP)
+	LOCAL_LIB_ENTRY(MC14584B_DIP)
+
+NETLIST_END()
+
