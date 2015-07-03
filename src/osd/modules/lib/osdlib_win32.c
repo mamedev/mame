@@ -112,7 +112,7 @@ int osd_get_num_processors(void)
 void *osd_malloc(size_t size)
 {
 #ifndef MALLOC_DEBUG
-	return HeapAlloc(GetProcessHeap(), 0, size);
+	return malloc(size);
 #else
 	// add in space for the size
 	size += sizeof(size_t);
@@ -134,7 +134,7 @@ void *osd_malloc(size_t size)
 void *osd_malloc_array(size_t size)
 {
 #ifndef MALLOC_DEBUG
-	return HeapAlloc(GetProcessHeap(), 0, size);
+	return malloc(size);
 #else
 	// add in space for the size
 	size += sizeof(size_t);
@@ -169,7 +169,7 @@ void *osd_malloc_array(size_t size)
 void osd_free(void *ptr)
 {
 #ifndef MALLOC_DEBUG
-	HeapFree(GetProcessHeap(), 0, ptr);
+	free(ptr);
 #else
 	size_t size = reinterpret_cast<size_t *>(ptr)[-1];
 
