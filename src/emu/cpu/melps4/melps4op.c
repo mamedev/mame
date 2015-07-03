@@ -3,6 +3,9 @@
 
 // MELPS 4 opcode handlers
 
+#include "melps4.h"
+
+
 // internal helpers
 
 inline UINT8 melps4_cpu_device::ram_r()

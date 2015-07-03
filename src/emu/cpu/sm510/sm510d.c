@@ -11,6 +11,8 @@
 #include "sm510.h"
 
 
+// common
+
 enum e_mnemonics
 {
 	mILL,
@@ -73,6 +75,9 @@ static const INT8 s_next_pc[0x40] =
 };
 
 
+
+// SM510 disasm
+
 static const UINT8 sm510_mnemonic[0x100] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
@@ -96,8 +101,6 @@ static const UINT8 sm510_mnemonic[0x100] =
 	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // E
 	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM    // F
 };
-
-
 
 CPU_DISASSEMBLE(sm510)
 {
@@ -141,4 +144,13 @@ CPU_DISASSEMBLE(sm510)
 	}
 	
 	return len | s_flags[instr] | DASMFLAG_SUPPORTED;
+}
+
+
+
+// SM511 disasm
+
+CPU_DISASSEMBLE(sm511)
+{
+	return 1;
 }

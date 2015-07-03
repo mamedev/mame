@@ -164,6 +164,7 @@ if (CPUS["AMIS2000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/amis2000/amis2000.c",
 		MAME_DIR .. "src/emu/cpu/amis2000/amis2000.h",
+		MAME_DIR .. "src/emu/cpu/amis2000/amis2000op.c",
 	}
 end
 
@@ -583,6 +584,7 @@ if (CPUS["HMCS40"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40.c",
 		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40.h",
+		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40op.c",
 	}
 end
 
@@ -1076,6 +1078,7 @@ if (CPUS["MELPS4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/melps4/melps4.c",
 		MAME_DIR .. "src/emu/cpu/melps4/melps4.h",
+		MAME_DIR .. "src/emu/cpu/melps4/melps4op.c",
 		MAME_DIR .. "src/emu/cpu/melps4/m58846.c",
 		MAME_DIR .. "src/emu/cpu/melps4/m58846.h",
 	}
@@ -1467,6 +1470,7 @@ if (CPUS["UCOM4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ucom4/ucom4.c",
 		MAME_DIR .. "src/emu/cpu/ucom4/ucom4.h",
+		MAME_DIR .. "src/emu/cpu/ucom4/ucom4op.c",
 	}
 end
 
@@ -1555,6 +1559,8 @@ if (CPUS["SM510"]~=null) then
 		MAME_DIR .. "src/emu/cpu/sm510/sm510.c",
 		MAME_DIR .. "src/emu/cpu/sm510/sm510.h",
 		MAME_DIR .. "src/emu/cpu/sm510/sm510op.c",
+		MAME_DIR .. "src/emu/cpu/sm510/sm510core.c",
+		MAME_DIR .. "src/emu/cpu/sm510/sm511core.c",
 	}
 end
 
