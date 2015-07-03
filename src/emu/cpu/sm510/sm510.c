@@ -15,8 +15,6 @@
 #include "sm510.h"
 #include "debugger.h"
 
-#include "sm510op.inc"
-
 // MCU types
 
 const device_type SM510 = &device_creator<sm510_device>;
@@ -47,23 +45,6 @@ sm510_device::sm510_device(const machine_config &mconfig, const char *tag, devic
 
 
 // disasm
-void sm510_base_device::state_string_export(const device_state_entry &entry, std::string &str)
-{
-	#if 0
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			strprintf(str, "%c%c",
-				m_c ? 'C':'c',
-				m_s ? 'S':'s'
-			);
-			break;
-
-		default: break;
-	}
-	#endif
-}
-
 offs_t sm510_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE(sm510);
@@ -124,7 +105,7 @@ void sm510_base_device::device_start()
 	state_add(SM510_BM,  "BM",  m_bm).formatstr("%01X");
 
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_pc).formatstr("%2s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -137,7 +118,10 @@ void sm510_base_device::device_start()
 
 void sm510_base_device::device_reset()
 {
-	m_pc = 0x37 << 6;
+	m_skip = false;
+	m_op = m_prev_op = 0;
+	do_branch(3, 7, 0);
+	m_prev_pc = m_pc;
 }
 
 
@@ -156,10 +140,10 @@ inline void sm510_base_device::increment_pc()
 
 void sm510_base_device::get_opcode_param()
 {
-	// LBL, TL, TML, TM opcodes are 2 bytes
-	if (m_op == 0x5f || (m_op & 0xf0) == 0x70 || m_op >= 0xc0)
+	// LBL, TL, TML opcodes are 2 bytes
+	if (m_op == 0x5f || (m_op & 0xf0) == 0x70)
 	{
-		m_icount -= 2; // guessed
+		m_icount--;
 		m_param = m_program->read_byte(m_pc);
 		increment_pc();
 	}
@@ -175,12 +159,19 @@ void sm510_base_device::execute_run()
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
-		m_icount -= 2; // 61us typical
+		m_icount--;
 		m_op = m_program->read_byte(m_pc);
 		increment_pc();
 		get_opcode_param();
 
-		// handle opcode
+		// handle opcode if it's not skipped
+		if (m_skip)
+		{
+			m_skip = false;
+			m_op = 0; // fake nop
+		}
+		else //execute_one();
+
 		switch (m_op & 0xf0)
 		{
 			case 0x20: op_lax(); break;

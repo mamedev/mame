@@ -3,17 +3,22 @@
 
 // SM510 opcode handlers
 
+#include "sm510.h"
+
+
 // internal helpers
 
 inline UINT8 sm510_base_device::ram_r()
 {
-	UINT8 address = (m_bm << 4 | m_bl) & m_datamask;
+	int bmh = (m_prev_op == 0x02) ? (1 << (m_datawidth-1)) : 0; // from SBM
+	UINT8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
 inline void sm510_base_device::ram_w(UINT8 data)
 {
-	UINT8 address = (m_bm << 4 | m_bl) & m_datamask;
+	int bmh = (m_prev_op == 0x02) ? (1 << (m_datawidth-1)) : 0; // from SBM
+	UINT8 address = (bmh | m_bm << 4 | m_bl) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -31,6 +36,18 @@ void sm510_base_device::push_stack()
 	m_stack[0] = m_pc;
 }
 
+void sm510_base_device::do_branch(UINT8 pu, UINT8 pm, UINT8 pl)
+{
+	// set new PC(Pu/Pm/Pl)
+	m_pc = ((pu << 10 & 0xc00) | (pm << 6 & 0x3c0) | (pl & 0x03f)) & m_prgmask;
+}
+
+inline UINT8 sm510_base_device::bitmask(UINT8 param)
+{
+	// bitmask from immediate opcode param
+	return 1 << (param & 3);
+}
+
 
 
 // instruction set
@@ -46,13 +63,14 @@ void sm510_base_device::op_lb()
 void sm510_base_device::op_lbl()
 {
 	// LBL xy: load BM/BL with 8-bit immediate value
-	op_illegal();
+	m_bl = m_param & 0xf;
+	m_bm = (m_param & m_datamask) >> 4;
 }
 
 void sm510_base_device::op_sbm()
 {
-	// SBM: set BM high bit for next opcode
-	op_illegal();
+	// SBM: set BM high bit for next opcode - handled in ram_r/w
+	assert(m_op == 0x02);
 }
 
 void sm510_base_device::op_exbla()
@@ -82,7 +100,7 @@ void sm510_base_device::op_decb()
 
 void sm510_base_device::op_atpl()
 {
-	// ATPL: load PC low bits with ACC
+	// ATPL: load Pl(PC low bits) with ACC
 	m_pc = (m_pc & ~0xf) | m_acc;
 }
 
@@ -99,29 +117,34 @@ void sm510_base_device::op_rtn1()
 	m_skip = true;
 }
 
+void sm510_base_device::op_t()
+{
+	// T xy: jump(transfer) within current page
+	m_pc = (m_pc & ~0x3f) | (m_op & 0x3f);
+}
+
 void sm510_base_device::op_tl()
 {
-	// TL xyz: longjump
-	op_illegal();
+	// TL xyz: long jump
+	do_branch(m_param >> 6 & 3, m_op & 0xf, m_param & 0x3f);
 }
 
 void sm510_base_device::op_tml()
 {
-	// TML xyz: x
-	op_illegal();
+	// TML xyz: long call
+	push_stack();
+	do_branch(m_param >> 6 & 3, m_op & 3, m_param & 0x3f);
 }
 
 void sm510_base_device::op_tm()
 {
-	// TM xyz: x
-	op_illegal();
+	// TM x: indirect subroutine call, pointers(IDX) are in page 0
+	m_icount--;
+	push_stack();
+	UINT8 idx = m_program->read_byte(m_op & 0x3f);
+	do_branch(idx >> 6 & 3, 4, idx & 0x3f);
 }
 
-void sm510_base_device::op_t()
-{
-	// T xy: jump within current page
-	m_pc = (m_pc & ~0x3f) | (m_op & 0x3f);
-}
 
 
 // Data transfer instructions
@@ -236,7 +259,7 @@ void sm510_base_device::op_adx()
 {
 	// ADX x: add immediate value to ACC, skip next on carry
 	m_acc += (m_op & 0xf);
-	m_skip = (m_acc & 0x10) ? true : false;
+	m_skip = ((m_acc & 0x10) != 0);
 	m_acc &= 0xf;
 }
 
@@ -248,10 +271,10 @@ void sm510_base_device::op_coma()
 
 void sm510_base_device::op_rot()
 {
-	// ROT: rotate ACC left through carry
-	m_acc = m_acc << 1 | m_c;
-	m_c = m_acc >> 4 & 1;
-	m_acc &= 0xf;
+	// ROT: rotate ACC right through carry
+	UINT8 c = m_acc & 1;
+	m_acc = m_acc >> 1 | m_c << 3;
+	m_c = c;
 }
 
 void sm510_base_device::op_rc()
@@ -290,7 +313,7 @@ void sm510_base_device::op_tam()
 void sm510_base_device::op_tmi()
 {
 	// TMI x: skip next if RAM bit is set
-	m_skip = (ram_r() & 1 << (m_op & 3)) ? true : false;
+	m_skip = ((ram_r() & bitmask(m_op)) != 0);
 }
 
 void sm510_base_device::op_ta0()
@@ -335,13 +358,13 @@ void sm510_base_device::op_tf4()
 void sm510_base_device::op_rm()
 {
 	// RM x: reset RAM bit
-	ram_w(ram_r() & ~(1 << (m_op & 3)));
+	ram_w(ram_r() & ~bitmask(m_op));
 }
 
 void sm510_base_device::op_sm()
 {
 	// SM x: set RAM bit
-	ram_w(ram_r() | (1 << (m_op & 3)));
+	ram_w(ram_r() | bitmask(m_op));
 }
 
 

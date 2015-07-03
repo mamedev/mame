@@ -36,6 +36,16 @@
 // align allocations to start or end of the page?
 #define GUARD_ALIGN_START   0
 
+#if defined(__BIGGEST_ALIGNMENT__)
+#define MAX_ALIGNMENT       __BIGGEST_ALIGNMENT__
+#elif defined(__AVX__)
+#define MAX_ALIGNMENT       32
+#elif defined(__SSE__) || defined(__x86_64__) || defined(_M_X64)
+#define MAX_ALIGNMENT       16
+#else
+#define MAX_ALIGNMENT       sizeof(INT64)
+#endif
+
 
 //============================================================
 //  GLOBAL VARIABLES
@@ -112,17 +122,22 @@ int osd_get_num_processors(void)
 void *osd_malloc(size_t size)
 {
 #ifndef MALLOC_DEBUG
-	return HeapAlloc(GetProcessHeap(), 0, size);
+	return malloc(size);
 #else
-	// add in space for the size
-	size += sizeof(size_t);
+	// add in space for the size and offset
+	size += MAX_ALIGNMENT + sizeof(size_t) + 2;
+	size &= ~size_t(1);
 
 	// basic objects just come from the heap
-	void *result = HeapAlloc(GetProcessHeap(), 0, size);
+	UINT8 *const block = reinterpret_cast<UINT8 *>(HeapAlloc(GetProcessHeap(), 0, size));
+	if (block == NULL)
+		return NULL;
+	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<FPTR>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(FPTR(MAX_ALIGNMENT) - 1));
 
 	// store the size and return and pointer to the data afterward
-	*reinterpret_cast<size_t *>(result) = size;
-	return reinterpret_cast<UINT8 *>(result) + sizeof(size_t);
+	*reinterpret_cast<size_t *>(block) = size;
+	*(result - 1) = result - block;
+	return result;
 #endif
 }
 
@@ -134,13 +149,14 @@ void *osd_malloc(size_t size)
 void *osd_malloc_array(size_t size)
 {
 #ifndef MALLOC_DEBUG
-	return HeapAlloc(GetProcessHeap(), 0, size);
+	return malloc(size);
 #else
-	// add in space for the size
-	size += sizeof(size_t);
+	// add in space for the size and offset
+	size += MAX_ALIGNMENT + sizeof(size_t) + 2;
+	size &= ~size_t(1);
 
 	// round the size up to a page boundary
-	size_t rounded_size = ((size + sizeof(void *) + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
+	size_t const rounded_size = ((size + sizeof(void *) + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
 
 	// reserve that much memory, plus two guard pages
 	void *page_base = VirtualAlloc(NULL, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
@@ -153,11 +169,13 @@ void *osd_malloc_array(size_t size)
 		return NULL;
 
 	// work backwards from the page base to get to the block base
-	void *result = GUARD_ALIGN_START ? page_base : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
+	UINT8 *const block = GUARD_ALIGN_START ? reinterpret_cast<UINT8 *>(page_base) : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
+	UINT8 *const result = reinterpret_cast<UINT8 *>(reinterpret_cast<FPTR>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(FPTR(MAX_ALIGNMENT) - 1));
 
 	// store the size at the start with a flag indicating it has a guard page
-	*reinterpret_cast<size_t *>(result) = size | 0x80000000;
-	return reinterpret_cast<UINT8 *>(result) + sizeof(size_t);
+	*reinterpret_cast<size_t *>(block) = size | 1;
+	*(result - 1) = result - block;
+	return result;
 #endif
 }
 
@@ -169,18 +187,21 @@ void *osd_malloc_array(size_t size)
 void osd_free(void *ptr)
 {
 #ifndef MALLOC_DEBUG
-	HeapFree(GetProcessHeap(), 0, ptr);
+	free(ptr);
 #else
-	size_t size = reinterpret_cast<size_t *>(ptr)[-1];
+	UINT8 const offset = *(reinterpret_cast<UINT8 *>(ptr) - 1);
+	UINT8 *const block = reinterpret_cast<UINT8 *>(ptr) - offset;
+	size_t const size = *reinterpret_cast<size_t *>(block);
 
-	// if no guard page, just free the pointer
-	if ((size & 0x80000000) == 0)
-		HeapFree(GetProcessHeap(), 0, reinterpret_cast<UINT8 *>(ptr) - sizeof(size_t));
-
-	// large items need more care
+	if ((size & 0x1) == 0)
+	{
+		// if no guard page, just free the pointer
+		HeapFree(GetProcessHeap(), 0, block);
+	}
 	else
 	{
-		ULONG_PTR page_base = (reinterpret_cast<ULONG_PTR>(ptr) - sizeof(size_t)) & ~(PAGE_SIZE - 1);
+		// large items need more care
+		ULONG_PTR const page_base = reinterpret_cast<ULONG_PTR>(block) & ~(PAGE_SIZE - 1);
 		VirtualFree(reinterpret_cast<void *>(page_base - PAGE_SIZE), 0, MEM_RELEASE);
 	}
 #endif
