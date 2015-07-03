@@ -30,7 +30,7 @@ def file_exists(root, srcfile, folder, inc_dir):
             fp = open(root + line + srcfile, 'rb')
             return line + srcfile
         except IOError:
-            ignore=1
+            pass
     return ''
 
 def add_c_if_exists(root, fullname):
@@ -38,7 +38,7 @@ def add_c_if_exists(root, fullname):
         fp = open(root + fullname, 'rb')
         deps_files_included.append(fullname)
     except IOError:
-        ignore=1
+        pass
 
 def add_rest_if_exists(root, srcfile,folder):
     t = srcfile.rsplit('/', 2)
