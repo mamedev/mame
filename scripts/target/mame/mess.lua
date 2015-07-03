@@ -755,6 +755,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"memotech",
 		"mgu",
 		"microkey",
+		"microsoft",
 		"mit",
 		"mits",
 		"mitsubishi",
@@ -940,7 +941,6 @@ files {
 	MAME_DIR .. "src/mame/video/n64.c",         
 	MAME_DIR .. "src/mame/video/rdpblend.c",    
 	MAME_DIR .. "src/mame/video/rdptpipe.c",    
-	MAME_DIR .. "src/mame/video/rdpspn16.c",    
 	MAME_DIR .. "src/mame/machine/megadriv.c",  
 	MAME_DIR .. "src/mame/drivers/naomi.c",     
 	MAME_DIR .. "src/mame/machine/awboard.c",   
@@ -1749,6 +1749,11 @@ files {
 	MAME_DIR .. "src/mess/drivers/primo.c",
 	MAME_DIR .. "src/mess/machine/primo.c",
 	MAME_DIR .. "src/mess/video/primo.c", 
+}
+
+createMESSProjects(_target, _subtarget, "microsoft")
+files {               
+	MAME_DIR .. "src/mess/drivers/xbox.c",    
 }
 
 createMESSProjects(_target, _subtarget, "mit")

@@ -4515,13 +4515,14 @@ void z8002_device::Z76_ssN0_dddd_addr()
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR_RAW(OP1);
+	UINT16 temp = RW(src);  // store src in case dst == src
 	if (segmented_mode()) {
 		RL(dst) = addr;
 	}
 	else {
 		RW(dst) = addr;
 	}
-	add_to_addr_reg(dst, RW(src));
+	add_to_addr_reg(dst, temp);
 }
 
 /******************************************
