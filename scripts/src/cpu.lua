@@ -1554,6 +1554,7 @@ if (CPUS["SM510"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sm510/sm510.c",
 		MAME_DIR .. "src/emu/cpu/sm510/sm510.h",
+		MAME_DIR .. "src/emu/cpu/sm510/sm510op.c",
 	}
 end
 
