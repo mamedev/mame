@@ -1,8 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:F. Ulivi
-//
-// TODO:
-// - DMA
 
 #include "emu.h"
 #include "debugger.h"
@@ -32,8 +29,8 @@ enum {
 // Bits in m_flags
 #define HPHYBRID_C_BIT      0   // Carry/extend
 #define HPHYBRID_O_BIT      1   // Overflow
-#define HPHYBRID_CB_BIT 2   // Cb
-#define HPHYBRID_DB_BIT 3   // Db
+#define HPHYBRID_CB_BIT         2	// Cb
+#define HPHYBRID_DB_BIT         3	// Db
 #define HPHYBRID_INTEN_BIT  4   // Interrupt enable
 #define HPHYBRID_DMAEN_BIT  5   // DMA enable
 #define HPHYBRID_DMADIR_BIT 6   // DMA direction (1 = OUT)
@@ -42,6 +39,7 @@ enum {
 #define HPHYBRID_IRL_BIT    9   // IRL requested
 #define HPHYBRID_IRH_SVC_BIT    10  // IRH in service
 #define HPHYBRID_IRL_SVC_BIT    11  // IRL in service
+#define HPHYBRID_DMAR_BIT       12      // DMA request
 
 #define HPHYBRID_IV_MASK        0xfff0  // IV mask
 
@@ -50,6 +48,15 @@ enum {
 #define HP_RESET_ADDR   0x0020
 
 const device_type HP_5061_3011 = &device_creator<hp_5061_3011_cpu_device>;
+
+WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
+{
+        if (state) {
+                BIT_SET(m_flags , HPHYBRID_DMAR_BIT);
+        } else {
+                BIT_CLR(m_flags , HPHYBRID_DMAR_BIT);
+        }
+}
 
 hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
 : cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
@@ -127,13 +134,16 @@ void hp_hybrid_cpu_device::device_reset()
 void hp_hybrid_cpu_device::execute_run()
 {
 		do {
-				debugger_instruction_hook(this, m_reg_P);
+                if (BIT(m_flags , HPHYBRID_DMAEN_BIT) && BIT(m_flags , HPHYBRID_DMAR_BIT)) {
+                        handle_dma();
+                } else {
+                        debugger_instruction_hook(this, m_reg_P);
 
-				// Check for interrupts
-				check_for_interrupts();
+                        // Check for interrupts
+                        check_for_interrupts();
 
-				// TODO: check dma
-				m_reg_I = execute_one(m_reg_I);
+                        m_reg_I = execute_one(m_reg_I);
+                }
 		} while (m_icount > 0);
 }
 
@@ -766,6 +776,32 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 		WM(++m_reg_R , m_reg_P);
 		m_reg_P = RM(get_ea(0xc008));
 		m_reg_I = RM(m_reg_P);
+}
+
+void hp_hybrid_cpu_device::handle_dma(void)
+{
+        // Patent hints at the fact that terminal count is detected by bit 15 of dmac being 1 after decrementing
+        bool tc = BIT(--m_dmac , 15) != 0;
+        UINT16 tmp;
+
+        if (BIT(m_flags , HPHYBRID_DMADIR_BIT)) {
+                // "Outward" DMA: memory -> peripheral
+                tmp = RM(m_dmama++);
+                WIO(m_dmapa , tc ? 2 : 0 , tmp);
+                m_icount -= 10;
+        } else {
+                // "Inward" DMA: peripheral -> memory
+                tmp = RIO(m_dmapa , tc ? 2 : 0);
+                WM(m_dmama++ , tmp);
+                m_icount -= 9;
+        }
+
+        // This is the one of the biggest question marks: is the DMA automatically disabled on TC?
+        // Here we assume it is. After all it would make no difference because there is no way
+        // to read the DMA enable flag back, so each time the DMA is needed it has to be enabled again.
+        if (tc) {
+                BIT_CLR(m_flags , HPHYBRID_DMAEN_BIT);
+        }
 }
 
 UINT16 hp_hybrid_cpu_device::RM(UINT16 addr)
