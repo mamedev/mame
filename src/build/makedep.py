@@ -209,8 +209,6 @@ def parse_lua_file(srcfile):
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
-    in_comment = 0
-    linenum = 0
     for line in fp.readlines():
         content = line.strip()
         if len(content)>0:
