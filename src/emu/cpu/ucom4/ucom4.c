@@ -15,17 +15,8 @@
 
 */
 
-enum
-{
-	NEC_UCOM43 = 0,
-	NEC_UCOM44,
-	NEC_UCOM45
-};
-
 #include "ucom4.h"
 #include "debugger.h"
-
-#include "ucom4op.inc"
 
 
 // uCOM-43 products: 2000x8 ROM, RAM size custom, supports full instruction set

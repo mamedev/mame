@@ -11,23 +11,12 @@
 
 */
 
-enum
-{
-	FAMILY_HMCS42 = 0,
-	FAMILY_HMCS43,
-	FAMILY_HMCS44,
-	FAMILY_HMCS45,
-	FAMILY_HMCS46,
-	FAMILY_HMCS47,
-};
-
 #define IS_PMOS 0
 #define IS_CMOS ~0
 
 #include "hmcs40.h"
 #include "debugger.h"
 
-#include "hmcs40op.inc"
 
 // MCU types
 
@@ -90,7 +79,7 @@ ADDRESS_MAP_END
 
 // device definitions
 hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1k), 7 /* data width */, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1k), 7 /* data width */, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
 { }
 
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -108,7 +97,7 @@ hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, d
 
 
 hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS44, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
 hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -126,7 +115,7 @@ hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, d
 
 
 hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS45, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
 hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

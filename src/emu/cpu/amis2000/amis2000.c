@@ -21,8 +21,6 @@
 #include "amis2000.h"
 #include "debugger.h"
 
-#include "amis2000op.inc"
-
 
 // S2000 is the most basic one, 64 nibbles internal RAM and 1KB internal ROM
 // S2150 increased RAM to 80 nibbles and ROM to 1.5KB
