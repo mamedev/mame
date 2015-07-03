@@ -389,6 +389,8 @@ namespace netlist
 			VCVS,       // Voltage controlled voltage source
 			VCCS,       // Voltage controlled current source
 			CCCS,       // Current controlled current source
+			VS,			// Voltage Source
+			CS,			// Current Source
 			GND         // GND device
 		};
 

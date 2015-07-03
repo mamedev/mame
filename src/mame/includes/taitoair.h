@@ -119,6 +119,7 @@ public:
 	DECLARE_READ16_MEMBER(stick2_input_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(dsp_flags_w);
+	DECLARE_WRITE16_MEMBER(dma_regs_w);
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -126,7 +127,10 @@ public:
 	UINT32 screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset );
-
+	void fb_copy_op(void);
+	void fb_fill_op(void);
+	void fb_erase_op(void);
+	
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 header, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
 	int projectEyeCoordToScreen(float* projectionMatrix,const int Res,INT16* eyePoint3d,int type);

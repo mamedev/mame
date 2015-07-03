@@ -11,6 +11,7 @@
 
 #include "../nl_setup.h"
 #include "../nl_base.h"
+#include "../nl_factory.h"
 #include "../analog/nld_twoterm.h"
 
 // -----------------------------------------------------------------------------
@@ -416,6 +417,45 @@ private:
 	int m_last_state;
 	bool m_is_timestep;
 };
+
+
+class factory_lib_entry_t : public base_factory_t
+{
+	P_PREVENT_COPYING(factory_lib_entry_t)
+public:
+
+	ATTR_COLD factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
+			const pstring &def_param)
+	: base_factory_t(name, classname, def_param), m_setup(setup) { }
+
+	class dummy : public device_t
+	{
+	public:
+		dummy(const pstring &dev_name) : device_t(), m_dev_name(dev_name) { }
+	protected:
+		virtual void init(netlist_t &anetlist, const pstring &aname)
+		{
+			anetlist.setup().namespace_push(aname);
+			anetlist.setup().include(m_dev_name);
+			anetlist.setup().namespace_pop();
+		}
+		void start() { }
+		void reset() { }
+		void update() { }
+
+		pstring m_dev_name;
+	};
+
+	ATTR_COLD device_t *Create()
+	{
+		device_t *r = palloc(dummy(this->name()));
+		return r;
+	}
+
+private:
+	setup_t &m_setup;
+};
+
 
 NETLIB_NAMESPACE_DEVICES_END()
 

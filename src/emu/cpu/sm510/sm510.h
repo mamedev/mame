@@ -42,6 +42,8 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 2 - 1) / 2; } // default 2 cycles per machine cycle
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); } // "
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 2; }
 	virtual UINT32 execute_input_lines() const { return 1; }
@@ -55,7 +57,6 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -79,19 +80,79 @@ protected:
 	UINT8 m_acc;
 	UINT8 m_bl;
 	UINT8 m_bm;
+	UINT8 m_c;
+	bool m_skip;
 
 	// i/o handlers
 	//..
 
 	// misc internal helpers
 	void increment_pc();
+	virtual void get_opcode_param();
 
 	UINT8 ram_r();
 	void ram_w(UINT8 data);
 	void pop_stack();
 	void push_stack();
+	void do_branch(UINT8 pu, UINT8 pm, UINT8 pl);
+	UINT8 bitmask(UINT8 param);
 
 	// opcode handlers
+	void op_lb();
+	void op_lbl();
+	void op_sbm();
+	void op_exbla();
+	void op_incb();
+	void op_decb();
+
+	void op_atpl();
+	void op_rtn0();
+	void op_rtn1();
+	void op_tl();
+	void op_tml();
+	void op_tm();
+	void op_t();
+
+	void op_exc();
+	void op_bdc();
+	void op_exci();
+	void op_excd();
+	void op_lda();
+	void op_lax();
+	void op_wr();
+	void op_ws();
+
+	void op_kta();
+	void op_atbp();
+	void op_atl();
+	void op_atfc();
+	void op_atr();
+
+	void op_add();
+	void op_add11();
+	void op_adx();
+	void op_coma();
+	void op_rot();
+	void op_rc();
+	void op_sc();
+
+	void op_tb();
+	void op_tc();
+	void op_tam();
+	void op_tmi();
+	void op_ta0();
+	void op_tabl();
+	void op_tis();
+	void op_tal();
+	void op_tf1();
+	void op_tf4();
+
+	void op_rm();
+	void op_sm();
+	void op_skip();
+	void op_cend();
+	void op_idiv();
+
 	void op_illegal();
 };
 

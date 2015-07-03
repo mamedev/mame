@@ -337,7 +337,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)
 				{
-					pstring term = pstring::sprintf("%s.%" SIZETFMT, xname.cstr(), i);
+					pstring term = pstring::sprintf("%s.%" SIZETFMT, xname.cstr(), SIZET_PRINTF(i));
 					add_term(tt[i], term);
 				}
 				break;
