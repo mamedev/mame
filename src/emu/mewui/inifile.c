@@ -391,6 +391,8 @@ void favorite_manager::parse_favorite()
 		while (readbuf[0] == '[')
 			std::getline(myfile, readbuf);
 
+		UINT8 space;
+		int passo = 1;
 		while (std::getline(myfile, readbuf))
 		{
 			ui_software_info tmpmatches;
@@ -399,7 +401,7 @@ void favorite_manager::parse_favorite()
 			std::getline(myfile, tmpmatches.parentname);
 			std::getline(myfile, tmpmatches.year);
 			std::getline(myfile, tmpmatches.publisher);
-			myfile >> tmpmatches.supported;
+			myfile >> tmpmatches.supported >> space;
 			std::getline(myfile, tmpmatches.part);
 			std::getline(myfile, readbuf);
 			int dx = driver_list::find(readbuf.c_str());
@@ -407,11 +409,11 @@ void favorite_manager::parse_favorite()
 			std::getline(myfile, tmpmatches.listname);
 			std::getline(myfile, tmpmatches.interface);
 			std::getline(myfile, tmpmatches.instance);
-			myfile >> tmpmatches.startempty;
+			myfile >> tmpmatches.startempty >> space;
 			std::getline(myfile, tmpmatches.parentlongname);
 			std::getline(myfile, tmpmatches.usage);
 			std::getline(myfile, tmpmatches.devicetype);
-			myfile >> tmpmatches.available;
+			myfile >> tmpmatches.available >> space;
 			favorite_list.push_back(tmpmatches);
 		}
 		myfile.close();
@@ -441,7 +443,7 @@ void favorite_manager::save_favorite_games()
 		file.close();
 
 		std::ofstream myfile(filename.c_str());
-
+		UINT8 space = 0;
 		// generate the favorite INI
 		std::string favtext;
 		std::string headtext("[ROOT_FOLDER]\n[Favorite]\n\n");
@@ -454,17 +456,17 @@ void favorite_manager::save_favorite_games()
 			myfile << favorite_list[current].parentname << "\n";
 			myfile << favorite_list[current].year << "\n";
 			myfile << favorite_list[current].publisher << "\n";
-			myfile << favorite_list[current].supported;
+			myfile << favorite_list[current].supported << space;
 			myfile << favorite_list[current].part << "\n";
 			myfile << favorite_list[current].driver->name << "\n";
 			myfile << favorite_list[current].listname << "\n";
 			myfile << favorite_list[current].interface << "\n";
 			myfile << favorite_list[current].instance << "\n";
-			myfile << favorite_list[current].startempty;
+			myfile << favorite_list[current].startempty << space;
 			myfile << favorite_list[current].parentlongname << "\n";
 			myfile << favorite_list[current].usage << "\n";
 			myfile << favorite_list[current].devicetype << "\n";
-			myfile << favorite_list[current].available;
+			myfile << favorite_list[current].available << space;
 		}
 		myfile.close();
 	}

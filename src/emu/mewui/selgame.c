@@ -558,6 +558,7 @@ void ui_mewui_select_game::populate()
 		// iterate over entries
 		for (size_t x = 0; x < machine().favorite().favorite_list.size(); x++)
 		{
+osd_printf_info("fav size = %d\n", (int)machine().favorite().favorite_list.size());
 			if (machine().favorite().favorite_list[x].startempty == 1)
 			{
 				bool cloneof = strcmp(machine().favorite().favorite_list[x].driver->parent, "0");
@@ -812,7 +813,7 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 		isstar = machine().favorite().isgame_favorite(*swinfo);
 
 		// first line is system
-		strprintf(tempbuf[0], "System: %-.100s", swinfo->driver->name);
+		strprintf(tempbuf[0], "System: %-.100s", swinfo->driver->description);
 
 		// next line is year, publisher
 		strprintf(tempbuf[1], "%s, %-.100s", swinfo->year.c_str(), swinfo->publisher.c_str());
