@@ -1,8 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:F. Ulivi
-//
-// TODO:
-// - DMA
 
 #include "emu.h"
 #include "debugger.h"
