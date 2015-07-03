@@ -14,7 +14,7 @@ NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_START(74123)
 {
-	if ((m_dev_type != 9602) || (m_dev_type != 4538) )
+	if ((m_dev_type != 9602) && (m_dev_type != 4538) )
 		m_dev_type = 74123;
 
 	register_sub("RP", m_RP);
