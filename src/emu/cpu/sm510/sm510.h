@@ -42,6 +42,8 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 2 - 1) / 2; } // default 2 cycles per machine cycle
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); } // "
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 2; }
 	virtual UINT32 execute_input_lines() const { return 1; }
@@ -55,7 +57,6 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -93,6 +94,8 @@ protected:
 	void ram_w(UINT8 data);
 	void pop_stack();
 	void push_stack();
+	void do_branch(UINT8 pu, UINT8 pm, UINT8 pl);
+	UINT8 bitmask(UINT8 param);
 
 	// opcode handlers
 	void op_lb();
