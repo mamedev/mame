@@ -3,6 +3,9 @@
 
 // SM510 opcode handlers
 
+#include "sm510.h"
+
+
 // internal helpers
 
 inline UINT8 sm510_base_device::ram_r()
@@ -33,7 +36,7 @@ void sm510_base_device::push_stack()
 	m_stack[0] = m_pc;
 }
 
-inline void sm510_base_device::do_branch(UINT8 pu, UINT8 pm, UINT8 pl)
+void sm510_base_device::do_branch(UINT8 pu, UINT8 pm, UINT8 pl)
 {
 	// set new PC(Pu/Pm/Pl)
 	m_pc = ((pu << 10 & 0xc00) | (pm << 6 & 0x3c0) | (pl & 0x03f)) & m_prgmask;

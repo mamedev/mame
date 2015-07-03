@@ -15,8 +15,6 @@
 #include "sm510.h"
 #include "debugger.h"
 
-#include "sm510op.inc"
-
 // MCU types
 
 const device_type SM510 = &device_creator<sm510_device>;
