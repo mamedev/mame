@@ -70,6 +70,10 @@
 #define PARAMETERS(_name)                                                      \
 		NET_REGISTER_DEV(netlistparams, _name)
 
+#define FUNCTION(_name, _N)				                                       \
+		NET_REGISTER_DEV(function, _name)                                      \
+		PARAM(_name.N, _N)
+
 NETLIB_NAMESPACE_DEVICES_START()
 
 // -----------------------------------------------------------------------------
@@ -258,6 +262,49 @@ private:
 
 	param_double_t m_p_RIN;
 	param_double_t m_p_ROUT;
+};
+
+/* -----------------------------------------------------------------------------
+ * nld_function
+ *
+ * FIXME: Currently a proof of concept to get congo bongo working
+ * ----------------------------------------------------------------------------- */
+
+class NETLIB_NAME(function) : public device_t
+{
+public:
+	NETLIB_NAME(function)()
+			: device_t() { }
+
+	virtual ~NETLIB_NAME(function)() {}
+
+protected:
+
+	void start()
+	{
+		register_param("INPUTS", m_N, 2);
+		register_output("Q", m_Q);
+
+		for (int i=0; i < m_N; i++)
+			register_input(pstring::sprintf("I%d", i), m_I[i]);
+	}
+
+	void reset()
+	{
+		m_Q.initial(0.0);
+	}
+
+	void update()
+	{
+		nl_double val = INPANALOG(m_I[0]) * INPANALOG(m_I[1]) * 0.2;
+		OUTANALOG(m_Q, val);
+	}
+
+private:
+
+	param_int_t m_N;
+	analog_output_t m_Q;
+	analog_input_t m_I[10];
 };
 
 // -----------------------------------------------------------------------------
