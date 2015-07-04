@@ -155,48 +155,48 @@ void ui_menu_display_options::populate()
 #ifdef MEWUI_WINDOWS
 	// add hardware stretch option
 	item_append("Hardware Stretch", m_options[HWSTRETCH_ENABLED] ? "On" : "Off",
-				m_options[HWSTRETCH_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HWSTRETCH_ENABLED);
+	            m_options[HWSTRETCH_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HWSTRETCH_ENABLED);
 
 	// add Triple Buffer option
 	item_append("Triple Buffering", m_options[TBUFFER_ENABLED] ? "On" : "Off",
-				m_options[TBUFFER_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)TBUFFER_ENABLED);
+	            m_options[TBUFFER_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)TBUFFER_ENABLED);
 
 	// add HLSL option
 	item_append("HLSL", m_options[HLSL_ENABLED] ? "On" : "Off",
-				m_options[HLSL_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HLSL_ENABLED);
+	            m_options[HLSL_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)HLSL_ENABLED);
 #endif
 
 	// add bilinear option
 	item_append("Bilinear Filtering", m_options[FILTER_ENABLED] ? "On" : "Off",
-				m_options[FILTER_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)FILTER_ENABLED);
+	            m_options[FILTER_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)FILTER_ENABLED);
 
 	// add Bitmap Prescale option
 	item_append("Bitmap Prescaling", m_options[PRESCALE_ENABLED] ? "On" : "Off",
-				m_options[PRESCALE_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)PRESCALE_ENABLED);
+	            m_options[PRESCALE_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)PRESCALE_ENABLED);
 
 	// add multithreaded rendering option
 	item_append("Multi-Threaded Rendering", m_options[MT_ENABLED] ? "On" : "Off",
-				m_options[MT_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)MT_ENABLED);
+	            m_options[MT_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)MT_ENABLED);
 
 	// add Window Mode option
 	item_append("Enable Window Mode", m_options[WINDOW_ENABLED] ? "On" : "Off",
-				m_options[WINDOW_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)WINDOW_ENABLED);
+	            m_options[WINDOW_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)WINDOW_ENABLED);
 
 	// add Aspect Ratio option
 	item_append("Enforce Aspect Ratio", m_options[KAR_ENABLED] ? "On" : "Off",
-				m_options[KAR_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)KAR_ENABLED);
+	            m_options[KAR_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)KAR_ENABLED);
 
 	// add Maximized option
 	item_append("Start Out Maximized", m_options[MAXIM_ENABLED] ? "On" : "Off",
-				m_options[MAXIM_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)MAXIM_ENABLED);
+	            m_options[MAXIM_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)MAXIM_ENABLED);
 
 	// add Synchronized Refresh option
 	item_append("Synchronized Refresh", m_options[SYNCREF_ENABLED] ? "On" : "Off",
-				m_options[SYNCREF_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)SYNCREF_ENABLED);
+	            m_options[SYNCREF_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)SYNCREF_ENABLED);
 
 	// add Vertical Sync option
 	item_append("Wait Vertical Sync", m_options[WAITSYNC_ENABLED] ? "On" : "Off",
-				m_options[WAITSYNC_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)WAITSYNC_ENABLED);
+	            m_options[WAITSYNC_ENABLED] ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)WAITSYNC_ENABLED);
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
@@ -212,7 +212,7 @@ void ui_menu_display_options::custom_render(void *selectedref, float top, float 
 	float width;
 
 	machine().ui().draw_text_full(container, "Display Options", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -232,5 +232,5 @@ void ui_menu_display_options::custom_render(void *selectedref, float top, float 
 
 	// draw the text within it
 	machine().ui().draw_text_full(container, "Display Options", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }

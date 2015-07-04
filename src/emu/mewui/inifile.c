@@ -114,7 +114,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 	bool search_clones = false;
 	std::string file_name(ini_index[current_file].name);
 	long offset = ini_index[current_file].category[current_category].offset;
-	std::string  carriage("\r\n");
+	std::string carriage("\r\n");
 
 	if (!core_stricmp(file_name.c_str(), "category.ini") || !core_stricmp(file_name.c_str(), "alltime.ini"))
 		search_clones = true;
@@ -124,9 +124,7 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 		std::ifstream myfile(fullpath.c_str(), std::ifstream::binary);
 		int num_game = driver_list::total();
 		std::string readbuf;
-
 		myfile.seekg(offset, myfile.beg);
-
 		while (std::getline(myfile, readbuf))
 		{
 			if (readbuf[0] == '[') break;
@@ -139,7 +137,6 @@ void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
 			{
 				temp_filter.push_back(dfind);
 				int clone_of = driver_list::non_bios_clone(dfind);
-
 				if (clone_of == -1)
 				{
 					for (int x = 0; x < num_game; x++)
@@ -194,7 +191,6 @@ favorite_manager::favorite_manager(running_machine &machine)
 void favorite_manager::add_favorite_game(const game_driver *driver)
 {
 	ui_software_info tmpmatches;
-
 	tmpmatches.shortname.assign(driver->name);
 	tmpmatches.longname.assign(driver->description);
 	tmpmatches.parentname.clear();
@@ -211,7 +207,6 @@ void favorite_manager::add_favorite_game(const game_driver *driver)
 	tmpmatches.usage.clear();
 	tmpmatches.devicetype.clear();
 	tmpmatches.available = true;
-
 	favorite_list.push_back(tmpmatches);
 	save_favorite_games();
 }
@@ -456,44 +451,27 @@ void favorite_manager::save_favorite_games()
 
 		// generate the favorite INI
 		std::string text("[ROOT_FOLDER]\n[Favorite]\n\n");
-		file.puts(text.c_str());
 
 		for (size_t current = 0; current < favorite_list.size(); current++)
 		{
-			text = favorite_list[current].shortname + "\n";
-			file.puts(text.c_str());
-			text = favorite_list[current].longname + "\n";
-			file.puts(text.c_str());
-			text = favorite_list[current].parentname + "\n";
-			file.puts(text.c_str());
-			text = favorite_list[current].year + "\n";
-			file.puts(text.c_str());
-			text = favorite_list[current].publisher + "\n";
-			file.puts(text.c_str());
-			strprintf(text, "%d\n", favorite_list[current].supported);
-			file.puts(text.c_str());
-			text = favorite_list[current].part + "\n";
-			file.puts(text.c_str());
-			text.assign(favorite_list[current].driver->name).append("\n");
-			file.puts(text.c_str());
-			text = favorite_list[current].listname + "\n";
-			file.puts(text.c_str());
-			text = favorite_list[current].interface + "\n";
-			file.puts(text.c_str());
-			text = favorite_list[current].instance + "\n";
-			file.puts(text.c_str());
-			strprintf(text, "%d\n", favorite_list[current].startempty);
-			file.puts(text.c_str());
-			text = favorite_list[current].parentlongname + "\n";
-			file.puts(text.c_str());
-			text = favorite_list[current].usage + "\n";
-			file.puts(text.c_str());
-			text = favorite_list[current].devicetype + "\n";
-			file.puts(text.c_str());
-			strprintf(text, "%d\n", favorite_list[current].available);
-			file.puts(text.c_str());
+			text += favorite_list[current].shortname + "\n";
+			text += favorite_list[current].longname + "\n";
+			text += favorite_list[current].parentname + "\n";
+			text += favorite_list[current].year + "\n";
+			text += favorite_list[current].publisher + "\n";
+			strcatprintf(text, "%d\n", favorite_list[current].supported);
+			text += favorite_list[current].part + "\n";
+			strcatprintf(text, "%s\n", favorite_list[current].driver->name);
+			text += favorite_list[current].listname + "\n";
+			text += favorite_list[current].interface + "\n";
+			text += favorite_list[current].instance + "\n";
+			strcatprintf(text, "%d\n", favorite_list[current].startempty);
+			text += favorite_list[current].parentlongname + "\n";
+			text += favorite_list[current].usage + "\n";
+			text += favorite_list[current].devicetype + "\n";
+			strcatprintf(text, "%d\n", favorite_list[current].available);
 		}
+		file.puts(text.c_str());
 		file.close();
 	}
 }
-

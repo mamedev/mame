@@ -53,7 +53,6 @@ void ui_menu_controller_mapping::handle()
 
 	// process the menu
 	const ui_menu_event *menu_event = process(0);
-
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
@@ -116,7 +115,7 @@ void ui_menu_controller_mapping::custom_render(void *selectedref, float top, flo
 	float width, maxwidth = origx2 - origx1;
 
 	machine().ui().draw_text_full(container, "Device Mapping", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(maxwidth, width);
 
@@ -136,7 +135,7 @@ void ui_menu_controller_mapping::custom_render(void *selectedref, float top, flo
 
 	// draw the text within it
 	machine().ui().draw_text_full(container, "Device Mapping", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 }
 

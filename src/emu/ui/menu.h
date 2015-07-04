@@ -21,18 +21,18 @@
 ***************************************************************************/
 
 // flags for menu items
-#define MENU_FLAG_LEFT_ARROW		(1 << 0)
-#define MENU_FLAG_RIGHT_ARROW	   (1 << 1)
-#define MENU_FLAG_INVERT			(1 << 2)
-#define MENU_FLAG_MULTILINE		 (1 << 3)
-#define MENU_FLAG_REDTEXT		   (1 << 4)
-#define MENU_FLAG_DISABLE		   (1 << 5)
+#define MENU_FLAG_LEFT_ARROW        (1 << 0)
+#define MENU_FLAG_RIGHT_ARROW       (1 << 1)
+#define MENU_FLAG_INVERT            (1 << 2)
+#define MENU_FLAG_MULTILINE         (1 << 3)
+#define MENU_FLAG_REDTEXT           (1 << 4)
+#define MENU_FLAG_DISABLE           (1 << 5)
 
 // special menu item for separators
-#define MENU_SEPARATOR_ITEM		 "---"
+#define MENU_SEPARATOR_ITEM         "---"
 
 // flags to pass to ui_menu_process
-#define UI_MENU_PROCESS_NOKEYS	  1
+#define UI_MENU_PROCESS_NOKEYS      1
 #define UI_MENU_PROCESS_LR_REPEAT   2
 #define UI_MENU_PROCESS_CUSTOM_ONLY 4
 
@@ -53,26 +53,26 @@ enum ui_menu_reset_options
 // menu-related events
 struct ui_menu_event
 {
-	void			*itemref;		   // reference for the selected item
-	int			 iptkey;			 // one of the IPT_* values from inptport.h
-	unicode_char	unichar;			// unicode character if iptkey == IPT_SPECIAL
+	void         *itemref;   // reference for the selected item
+	int          iptkey;     // one of the IPT_* values from inptport.h
+	unicode_char unichar;    // unicode character if iptkey == IPT_SPECIAL
 };
 
 struct ui_menu_pool
 {
-	ui_menu_pool	*next;		   // chain to next one
-	UINT8		   *top;			// top of the pool
-	UINT8		   *end;			// end of the pool
+	ui_menu_pool   *next;    // chain to next one
+	UINT8          *top;     // top of the pool
+	UINT8          *end;     // end of the pool
 };
 
 
 class ui_menu_item
 {
 public:
-	const char	  *text;
-	const char	  *subtext;
-	UINT32			  flags;
-	void			*ref;
+	const char  *text;
+	const char  *subtext;
+	UINT32      flags;
+	void        *ref;
 
 	inline bool is_selectable() const;
 };
@@ -85,18 +85,18 @@ public:
 
 	running_machine &machine() const { return m_machine; }
 
-	render_container			*container;	 // render_container we render to
-	ui_menu_event	   menu_event;		 // the UI menu_event that occurred
-	ui_menu					 *parent;		// pointer to parent menu
-	int				 resetpos;		   // reset position
-	void						*resetref;	  // reset reference
-	int				 selected;		   // which item is selected
-	int				 hover;			  // which item is being hovered over
-	int				 visitems;		   // number of visible items
-	float			   customtop;		  // amount of extra height to add at the top
-	float			   custombottom;	   // amount of extra height to add at the bottom
-	ui_menu_pool				*pool;		  // list of memory pools
-	std::vector<ui_menu_item>   item;		   // array of items
+	render_container            *container;   // render_container we render to
+	ui_menu_event               menu_event;   // the UI menu_event that occurred
+	ui_menu                     *parent;      // pointer to parent menu
+	int                         resetpos;     // reset position
+	void                        *resetref;    // reset reference
+	int                         selected;     // which item is selected
+	int                         hover;        // which item is being hovered over
+	int                         visitems;     // number of visible items
+	float                       customtop;    // amount of extra height to add at the top
+	float                       custombottom; // amount of extra height to add at the bottom
+	ui_menu_pool                *pool;        // list of memory pools
+	std::vector<ui_menu_item>   item;         // array of items
 
 	// free all items in the menu, and all memory allocated from the memory pool
 	void reset(ui_menu_reset_options options);
@@ -172,7 +172,7 @@ private:
 	static render_texture *hilight_texture, *arrow_texture;
 
 	bool m_special_main_menu;
-	running_machine &m_machine;		  // machine we are attached to
+	running_machine &m_machine;  // machine we are attached to
 
 	void draw(bool customonly);
 	void draw_text_box();

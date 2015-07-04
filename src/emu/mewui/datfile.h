@@ -16,13 +16,13 @@
 //-------------------------------------------------
 struct tDatafileIndex
 {
-	long offset;
+	long              offset;
 	const game_driver *driver;
 };
 
 struct sDataDrvIndex
 {
-	long offset;
+	long        offset;
 	std::string name;
 };
 
@@ -35,12 +35,12 @@ struct tMenuIndex
 struct SoftwareItem
 {
 	std::string softname;
-	long offset;
+	long        offset;
 };
 
 struct SoftwareListIndex
 {
-	std::string listname;
+	std::string               listname;
 	std::vector<SoftwareItem> item_list;
 };
 
@@ -75,7 +75,6 @@ private:
 	std::vector<tDatafileIndex> hist_idx, mame_idx, mess_idx, cmd_idx, sysi_idx, story_idx;
 	std::vector<sDataDrvIndex> drv_idx, drvmess_idx;
 	std::vector<tMenuIndex> menu_idx;
-
 	std::vector<SoftwareListIndex> sListIndex;
 
 	// internal helpers
@@ -100,7 +99,6 @@ private:
 
 	// internal state
 	running_machine  &m_machine;             // reference to our machine
-
 	std::string         fullpath;
 	static std::string  history_revision, mame_revision, mess_revision, sysinfo_revision, story_revision;
 };

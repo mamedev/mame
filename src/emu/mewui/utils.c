@@ -51,12 +51,12 @@ std::string reselect_last::part;
 std::vector<cache_info> mewui_globals::driver_cache(driver_list::total() + 1);
 
 const char *mewui_globals::filter_text[] = { "All", "Available", "Unavailable", "Working", "Not Mechanical", "Category", "Favorites", "BIOS",
-												"Originals", "Clones", "Not Working", "Mechanical", "Manufacturers", "Years", "Support Save",
-												"Not Support Save", "CHD", "No CHD", "Use Samples", "Not Use Samples", "Stereo", "Vertical",
-												"Horizontal", "Raster", "Vectors", "Custom" };
+                                             "Originals", "Clones", "Not Working", "Mechanical", "Manufacturers", "Years", "Support Save",
+                                             "Not Support Save", "CHD", "No CHD", "Use Samples", "Not Use Samples", "Stereo", "Vertical",
+                                             "Horizontal", "Raster", "Vectors", "Custom" };
 
 const char *mewui_globals::sw_filter_text[] = { "All", "Available", "Unavailable", "Originals", "Clones", "Years", "Publishers", "Supported",
-												"Partial Supported", "Unsupported", "Region" };
+                                                "Partial Supported", "Unsupported", "Region" };
 
 const char *mewui_globals::ume_text[] = { "ALL", "ARCADES", "SYSTEMS" };
 
@@ -214,16 +214,6 @@ int fuzzy_substring(const char *needle, const char *haystack)
 }
 
 //-------------------------------------------------
-//  cut off final CR/LF
-//-------------------------------------------------
-
-void fskip(char *s, int id)
-{
-	for (; s[id] && s[id] != CR && s[id] != LF; id++) ;
-	s[id] = '\0';
-}
-
-//-------------------------------------------------
 //  save custom filters info to file
 //-------------------------------------------------
 
@@ -352,7 +342,7 @@ void c_year::set(const char *str)
 //-------------------------------------------------
 
 void mewui_globals::save_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
-											std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
+                                            std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -396,7 +386,7 @@ void mewui_globals::save_available_machines(running_machine &machine, std::vecto
 //-------------------------------------------------
 
 bool mewui_globals::load_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
-											std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
+                                            std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted)
 {
 	// try to load available drivers from file
 	emu_file efile(machine.options().mewui_path(), OPEN_FLAG_READ);

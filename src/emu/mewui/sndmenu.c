@@ -145,7 +145,7 @@ void ui_menu_sound_options::custom_render(void *selectedref, float top, float bo
 {
 	float width;
 	machine().ui().draw_text_full(container, "Sound Options", 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+	                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = MAX(origx2 - origx1, width);
 
@@ -165,5 +165,5 @@ void ui_menu_sound_options::custom_render(void *selectedref, float top, float bo
 
 	// draw the text within it
 	machine().ui().draw_text_full(container, "Sound Options", x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }

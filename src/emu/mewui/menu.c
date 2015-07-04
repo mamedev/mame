@@ -270,14 +270,14 @@ void ui_menu::draw_select_game()
 		// if we have some background hilighting to do, add a quad behind everything else
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			machine().ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1,
-												bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture,
-												PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			                                 bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture,
+			                                 PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		// if we're on the top line, display the up arrow
 		if (linenum == 0 && top_line != 0)
 		{
 			draw_arrow(container, 0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-						0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
+			           0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
 
 			if (hover == itemnum)
 				hover = HOVER_ARROW_UP;
@@ -294,7 +294,7 @@ void ui_menu::draw_select_game()
 		// if we're just a divider, draw a line
 		else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 			container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height,
-								UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			                    UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		// draw the item centered
 		else if (pitem.subtext == NULL)
 		{
@@ -315,8 +315,8 @@ void ui_menu::draw_select_game()
 				space = machine().ui().get_line_height() * container->manager().ui_aspect() * 1.5f;
 			}
 			machine().ui().draw_text_full(container, itemtext, effective_left + space, line_y, effective_width - space,
-											JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor,
-											bgcolor, NULL, NULL);
+			                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor,
+			                              bgcolor, NULL, NULL);
 		}
 		else
 		{
@@ -326,16 +326,16 @@ void ui_menu::draw_select_game()
 
 			// compute right space for subitem
 			machine().ui().draw_text_full(container, subitem_text, effective_left, line_y, machine().ui().get_string_width(pitem.subtext),
-											JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, NULL);
+			                              JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, NULL);
 			subitem_width += gutter_width;
 
 			// draw the item left-justified
 			machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width - subitem_width,
-											JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, NULL);
+			                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, NULL);
 
 			// draw the subitem right-justified
 			machine().ui().draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-											JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, NULL, NULL);
+			                              JUSTIFY_RIGHT, WRAP_NEVER, DRAW_NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, NULL, NULL);
 		}
 	}
 
@@ -369,14 +369,14 @@ void ui_menu::draw_select_game()
 		// if we have some background hilighting to do, add a quad behind everything else
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			machine().ui().draw_textured_box(container, line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(255, 43, 43, 43),
-												hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			                                 hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 			container->add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
-								UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			                    UI_LINE_WIDTH, UI_TEXT_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
 			machine().ui().draw_text_full(container, itemtext, effective_left, line, effective_width,
-											JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+			                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 		line += line_height;
 	}
 
@@ -1078,7 +1078,7 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 		}
 
 		machine().ui().draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
-										DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
+		                              DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
 
 		y1 += line_height;
 	}
@@ -1101,7 +1101,7 @@ void ui_menu::draw_ume_box(float x1, float y1, float x2, float y2)
 		float width;
 		// compute width of left hand side
 		machine().ui().draw_text_full(container, mewui_globals::ume_text[x], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_NEVER,
-										DRAW_NONE, UI_TEXT_COLOR, ARGB_BLACK, &width, NULL, text_size);
+		                              DRAW_NONE, UI_TEXT_COLOR, ARGB_BLACK, &width, NULL, text_size);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
@@ -1135,7 +1135,7 @@ void ui_menu::draw_ume_box(float x1, float y1, float x2, float y2)
 			container->add_rect(x1, y1, x2, y1 + line_height, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		machine().ui().draw_text_full(container, mewui_globals::ume_text[filter], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_NEVER,
-										DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
+		                              DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
 
 		y1 += line_height;
 	}
@@ -1179,16 +1179,16 @@ float ui_menu::draw_right_box_title(float x1, float y1, float x2, float y2)
 		if (mewui_globals::rpanel_infos != cells)
 		{
 			container->add_line(x1, y1 + line_height, x1 + midl, y1 + line_height, UI_LINE_WIDTH,
-								UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			                    UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			fgcolor = UI_CLONE_COLOR;
 		}
 
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			container->add_rect(x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
-								bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+			                    bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 
 		machine().ui().draw_text_full(container, buffer[cells].c_str(), x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
-										JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+		                              JUSTIFY_CENTER, WRAP_NEVER, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 		x1 = x1 + midl;
 	}
 
@@ -1251,13 +1251,13 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 		for (int x = MEWUI_FIRST_LOAD; x < MEWUI_LAST_LOAD; x++)
 		{
 			machine().ui().draw_text_full(container, dats_info[x], origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-											WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
+			                              WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
 			txt_lenght += 0.01f;
 			title_size = MAX(txt_lenght, title_size);
 		}
 
 		machine().ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-										WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+		                              WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 		draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::curdats_view, MEWUI_FIRST_LOAD, MEWUI_LAST_LOAD, title_size);
 
@@ -1294,12 +1294,12 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 		if (buffer.empty())
 		{
 			machine().ui().draw_text_full(container, "No Infos Available", origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
-											WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+			                              WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 			return;
 		}
 		else if (mewui_globals::curdats_view != MEWUI_STORY_LOAD && mewui_globals::curdats_view != MEWUI_COMMAND_LOAD)
 			machine().ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), &totallines,
-										xstart, xend, text_size);
+			                         xstart, xend, text_size);
 		else
 			machine().ui().wrap_text(container, buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * gutter_width), &totallines, xstart, xend, text_size);
 
@@ -1329,8 +1329,8 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 				int last_underscore = tempbuf.find_last_of('_');
 				if (last_underscore == -1)
 					machine().ui().draw_text_full(container, tempbuf.c_str(), origx1, oy1, origx2 - origx1, JUSTIFY_CENTER,
-													WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL,
-													text_size);
+					                              WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL,
+					                              text_size);
 				else
 				{
 					float effective_width = origx2 - origx1 - gutter_width;
@@ -1341,13 +1341,13 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 					float item_width;
 
 					machine().ui().draw_text_full(container, first_part.c_str(), effective_left, oy1, effective_width,
-													JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-													&item_width, NULL, text_size);
+					                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					                              &item_width, NULL, text_size);
 
 					machine().ui().draw_text_full(container, last_part.c_str(), effective_left + item_width, oy1,
-													origx2 - origx1 - 2.0f * gutter_width - item_width, JUSTIFY_RIGHT,
-													WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-													NULL, NULL, text_size);
+					                              origx2 - origx1 - 2.0f * gutter_width - item_width, JUSTIFY_RIGHT,
+					                              WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					                              NULL, NULL, text_size);
 					}
 			}
 
@@ -1363,20 +1363,20 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 					std::string last_part(tempbuf.substr(first_dspace + 1));
 					strtrimspace(last_part);
 					machine().ui().draw_text_full(container, first_part.c_str(), effective_left, oy1, effective_width,
-													JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-													NULL, NULL, text_size);
+					                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					                              NULL, NULL, text_size);
 
 					machine().ui().draw_text_full(container, last_part.c_str(), effective_left, oy1, origx2 - origx1 - 2.0f * gutter_width,
-													JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-													NULL, NULL, text_size);
+					                              JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+					                              NULL, NULL, text_size);
 				}
 				else
 					machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
-													WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
+					                              WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
 			}
 			else
 				machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, JUSTIFY_LEFT,
-												WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
+				                              WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL, text_size);
 
 			oy1 += (line_height * text_size);
 		}
@@ -1395,7 +1395,7 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 		if (soft->usage.empty())
 		{
 			machine().ui().draw_text_full(container, "History", origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-											DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+			                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 			mewui_globals::cur_sw_dats_view = 0;
 		}
 		else
@@ -1409,14 +1409,14 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 			for (int x = 0; x < 2; x++)
 			{
 				machine().ui().draw_text_full(container, t_text[x].c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-												DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
+				                              DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
 				txt_lenght += 0.01f;
 				title_size = MAX(txt_lenght, title_size);
 			}
 
 			machine().ui().draw_text_full(container, t_text[mewui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-											JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-											NULL, NULL);
+			                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+			                              NULL, NULL);
 
 			draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::cur_sw_dats_view, 0, 1, title_size);
 		}
@@ -1445,12 +1445,12 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 		if (buffer.empty())
 		{
 			machine().ui().draw_text_full(container, "No Infos Available", origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, JUSTIFY_CENTER,
-											WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+			                              WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 			return;
 		}
 		else
 			machine().ui().wrap_text(container, buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), &totallines,
-										xstart, xend, text_size);
+			                         xstart, xend, text_size);
 
 		int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
 		if (totallines < r_visible_lines)
@@ -1474,8 +1474,8 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 				info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
 			else
 				machine().ui().draw_text_full(container, tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1,
-												JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
-												NULL, NULL, text_size);
+				                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR,
+				                              NULL, NULL, text_size);
 			oy1 += (line_height * text_size);
 		}
 
@@ -1500,13 +1500,13 @@ std::string ui_menu::arts_render_common(float origx1, float origy1, float origx2
 	for (int x = FIRST_VIEW; x < LAST_VIEW; x++)
 	{
 		machine().ui().draw_text_full(container, arts_info[x].title, origx1, origy1, origx2 - origx1, JUSTIFY_CENTER,
-										WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
+		                              WRAP_TRUNCATE, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_lenght, NULL);
 		txt_lenght += 0.01f;
 		title_size = MAX(txt_lenght, title_size);
 	}
 
 	machine().ui().draw_text_full(container, snaptext.c_str(), origx1, origy1, origx2 - origx1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-									DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+	                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, mewui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
 
@@ -1583,11 +1583,9 @@ void ui_menu::arts_render_images(bitmap_argb32 *tmp_bitmap, float origx1, float 
 	{
 		tmp_bitmap->reset();
 		tmp_bitmap->allocate(256, 256);
-
 		for (int x = 0; x < 256; x++)
 			for (int y = 0; y < 256; y++)
 				tmp_bitmap->pix32(y, x) = no_avail_bitmap->pix32(y, x);
-
 		no_available = true;
 	}
 
@@ -1686,14 +1684,14 @@ void ui_menu::draw_common_arrow(float origx1, float origy1, float origx2, float 
 	if (mouse_hit && ar_x0 <= mouse_x && ar_x1 > mouse_x && ar_y0 <= mouse_y && ar_y1 > mouse_y && current!= dmax)
 	{
 		machine().ui().draw_textured_box(container, ar_x0 + 0.01f, ar_y0, ar_x1 - 0.01f, ar_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
-											hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		                                 hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		hover = HOVER_UI_RIGHT;
 		fgcolor_right = UI_MOUSEOVER_COLOR;
 	}
 	else if (mouse_hit && al_x0 <= mouse_x && al_x1 > mouse_x && al_y0 <= mouse_y && al_y1 > mouse_y && current != dmin)
 	{
 		machine().ui().draw_textured_box(container, al_x0 + 0.01f, al_y0, al_x1 - 0.01f, al_y1, UI_MOUSEOVER_BG_COLOR, rgb_t(255, 43, 43, 43),
-											hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		                                 hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		hover = HOVER_UI_LEFT;
 		fgcolor_left = UI_MOUSEOVER_COLOR;
 	}
@@ -1776,13 +1774,13 @@ void ui_menu::info_arrow(int ub, float origx1, float origx2, float oy1, float li
 	if (mouse_hit && origx1 <= mouse_x && origx2 > mouse_x && oy1 <= mouse_y && oy1 + (line_height * text_size) > mouse_y)
 	{
 		machine().ui().draw_textured_box(container, origx1 + 0.01f, oy1, origx2 - 0.01f, oy1 + (line_height * text_size), UI_MOUSEOVER_BG_COLOR,
-											rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		                                 rgb_t(255, 43, 43, 43), hilight_main_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
 		hover = (!ub) ? HOVER_DAT_UP : HOVER_DAT_DOWN;
 		fgcolor = UI_MOUSEOVER_COLOR;
 	}
 
 	draw_arrow(container, 0.5f * (origx1 + origx2) - 0.5f * (ud_arrow_width * text_size), oy1 + 0.25f * (line_height * text_size),
-				0.5f * (origx1 + origx2) + 0.5f * (ud_arrow_width * text_size), oy1 + 0.75f * (line_height * text_size), fgcolor, orientation);
+	           0.5f * (origx1 + origx2) + 0.5f * (ud_arrow_width * text_size), oy1 + 0.75f * (line_height * text_size), fgcolor, orientation);
 }
 
 //-------------------------------------------------
@@ -1924,12 +1922,12 @@ void ui_menu::draw_palette_menu()
 		if (linenum == 0 && top_line != 0)
 		{
 			draw_arrow(container,
-								0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-								line_y + 0.25f * line_height,
-								0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-								line_y + 0.75f * line_height,
-								fgcolor,
-								ROT0);
+			           0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+			           line_y + 0.25f * line_height,
+			           0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+			           line_y + 0.75f * line_height,
+			           fgcolor,
+			           ROT0);
 			if (hover == itemnum)
 				hover = HOVER_ARROW_UP;
 		}
@@ -1938,12 +1936,12 @@ void ui_menu::draw_palette_menu()
 		else if (linenum == visible_lines - 1 && itemnum != item.size() - 1)
 		{
 			draw_arrow(container,
-								0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-								line_y + 0.25f * line_height,
-								0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-								line_y + 0.75f * line_height,
-								fgcolor,
-								ROT0 ^ ORIENTATION_FLIP_Y);
+			           0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+			           line_y + 0.25f * line_height,
+			           0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+			           line_y + 0.75f * line_height,
+			           fgcolor,
+			           ROT0 ^ ORIENTATION_FLIP_Y);
 			if (hover == itemnum)
 				hover = HOVER_ARROW_DOWN;
 		}
@@ -1955,7 +1953,7 @@ void ui_menu::draw_palette_menu()
 		// if we don't have a subitem, just draw the string centered
 		else if (pitem.subtext == NULL)
 			machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+			                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 
 		// otherwise, draw the item on the left and the subitem text on the right
 		else
@@ -1965,7 +1963,7 @@ void ui_menu::draw_palette_menu()
 
 			// draw the left-side text
 			machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+			                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 
 			// give 2 spaces worth of padding
 			float subitem_width = machine().ui().get_string_width("FF00FF00");

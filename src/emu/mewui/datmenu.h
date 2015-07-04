@@ -28,7 +28,7 @@ public:
 
 private:
 	const game_driver *ui_driver;
-	int flags;
+	int               flags;
 	bool get_data(const game_driver *driver, int flags);
 };
 
@@ -65,7 +65,7 @@ public:
 private:
 	const game_driver   *ui_driver;
 	FPTR                param;
-	std::string      title;
+	std::string         title;
 };
 
 //-------------------------------------------------

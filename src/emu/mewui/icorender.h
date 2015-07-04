@@ -93,7 +93,6 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	file.read(buffer, size);
 
 	LPICONDIR icoDir = (LPICONDIR)buffer;
-
 	int iconsCount = icoDir->idCount;
 
 	if (icoDir->idReserved != 0 || icoDir->idType != 1 || iconsCount == 0 || iconsCount > 20)
@@ -106,7 +105,6 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	UINT8* cursor = buffer;
 	cursor += 6;
 	ICONDIRENTRY* dirEntry = (ICONDIRENTRY*)(cursor);
-
 	int maxSize = 0;
 	int offset = 0;
 	int maxBitCount = 0;
@@ -115,7 +113,6 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		int w = dirEntry->bWidth;
 		int h = dirEntry->bHeight;
 		int bitCount = dirEntry->wBitCount;
-
 		if (w * h > maxSize || bitCount > maxBitCount) // we choose icon with max resolution
 		{
 			width = w;
@@ -146,7 +143,6 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 				bitmap.pix32(y, x) = rgb_t(cursor[shift2 + 3], cursor[shift2 + 2], cursor[shift2 + 1], cursor[shift2]);
 			}
 	}
-
 	else if (realBitsCount == 24)
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++)
@@ -154,8 +150,7 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 				int shift2 = 3 * (x + (height - y - 1) * width);
 				bitmap.pix32(y, x) = rgb_t(255, cursor[shift2 + 2], cursor[shift2 + 1], cursor[shift2]);
 			}
-
-	else if (realBitsCount == 8)  /// 256 colors
+	else if (realBitsCount == 8)  // 256 colors
 	{
 		// 256 color table
 		UINT8 *colors = cursor;
@@ -168,8 +163,7 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 				bitmap.pix32(y, x) = rgb_t(255, colors[index + 2], colors[index + 1], colors[index]);
 			}
 	}
-
-	else if (realBitsCount == 4)  /// 16 colors
+	else if (realBitsCount == 4)  // 16 colors
 	{
 		// 16 color table
 		UINT8 *colors = cursor;
@@ -187,13 +181,12 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 				bitmap.pix32(y, x) = rgb_t(255, colors[index + 2], colors[index + 1], colors[index]);
 			}
 	}
-
-	else if (realBitsCount == 1)  /// 2 colors
+	else if (realBitsCount == 1)  // 2 colors
 	{
 		// 2 color table
 		UINT8 *colors = cursor;
 		cursor += 2 * 4;
-		int boundary = width; //!!! 32 bit boundary (http://www.daubnet.com/en/file-format-ico)
+		int boundary = width; // !!! 32 bit boundary (http://www.daubnet.com/en/file-format-ico)
 		while (boundary % 32 != 0) boundary++;
 
 		for (int x = 0; x < width; x++)
@@ -213,7 +206,7 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 	// Read AND mask after base color data - 1 BIT MASK
 	if (hasAndMask)
 	{
-		int boundary = width * realBitsCount; //!!! 32 bit boundary (http://www.daubnet.com/en/file-format-ico)
+		int boundary = width * realBitsCount; // !!! 32 bit boundary (http://www.daubnet.com/en/file-format-ico)
 		while (boundary % 32 != 0) boundary++;
 		cursor += boundary * height / 8;
 
@@ -233,7 +226,6 @@ void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 				bitmap.pix32(y, x) = colors;
 			}
 	}
-
 	file.close();
 	global_free_array(buffer);
 }

@@ -53,7 +53,6 @@ bool sorted_game_list(const game_driver *x, const game_driver *y)
 
 	if (!clonex && !cloney)
 		return (cs_stricmp(x->description, y->description) < 0);
-
 	else if (clonex && cloney)
 	{
 		if (!cs_stricmp(x->parent, y->parent))

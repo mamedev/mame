@@ -25,7 +25,7 @@
 	CONSTANTS
 ***************************************************************************/
 
-#define UI_MENU_POOL_SIZE	   65536
+#define UI_MENU_POOL_SIZE  65536
 
 /***************************************************************************
 	GLOBAL VARIABLES
@@ -573,12 +573,12 @@ void ui_menu::draw(bool customonly)
 			// draw the subitem left-justified
 			else if (pitem.subtext == NULL && (pitem.flags & MENU_FLAG_MEWUI_HISTORY) != 0)
 				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-							JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+				                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 
 			// if we don't have a subitem, just draw the string centered
 			else if (pitem.subtext == NULL)
 				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-							JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+				                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 
 			// otherwise, draw the item on the left and the subitem text on the right
 			else
@@ -589,7 +589,7 @@ void ui_menu::draw(bool customonly)
 
 				// draw the left-side text
 				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-							JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, NULL);
+				                              JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, NULL);
 
 				// give 2 spaces worth of padding
 				item_width += 2.0f * gutter_width;
@@ -614,7 +614,7 @@ void ui_menu::draw(bool customonly)
 
 				// draw the subitem right-justified
 				machine().ui().draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, NULL);
+				                              JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, NULL);
 
 				// apply arrows
 				if (itemnum == selected && (pitem.flags & MENU_FLAG_LEFT_ARROW))
@@ -652,7 +652,7 @@ void ui_menu::draw(bool customonly)
 
 		// compute the multi-line target width/height
 		machine().ui().draw_text_full(container, pitem.subtext, 0, 0, visible_width * 0.75f,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
+		                              JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
 
 		// determine the target location
 		target_x = visible_left + visible_width - target_width - UI_BOX_LR_BORDER;
@@ -667,7 +667,7 @@ void ui_menu::draw(bool customonly)
 										 target_y + target_height + UI_BOX_TB_BORDER,
 										 subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
 		machine().ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
+		                              JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 	}
 
 	// if there is something special to add, do it by calling the virtual method
@@ -677,7 +677,6 @@ void ui_menu::draw(bool customonly)
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());
 	if (history_flag && (top_line + visible_lines >= item.size()))
 		selected = item.size() - 1;
-
 }
 
 void ui_menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -702,7 +701,7 @@ void ui_menu::draw_text_box()
 
 	// compute the multi-line target width/height
 	machine().ui().draw_text_full(container, text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
-				JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
+	                              JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
 	target_height += 2.0f * line_height;
 	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
 		target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
@@ -727,23 +726,22 @@ void ui_menu::draw_text_box()
 
 	// add a box around that
 	machine().ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER - gutter_width,
-						target_y - UI_BOX_TB_BORDER,
-						target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
-									 target_y + target_height + UI_BOX_TB_BORDER,
-									 (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
+                                     target_y - UI_BOX_TB_BORDER,
+                                     target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
+                                     target_y + target_height + UI_BOX_TB_BORDER,
+                                     (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	machine().ui().draw_text_full(container, text, target_x, target_y, target_width,
-				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+	                              JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	// draw the "return to prior menu" text with a hilight behind it
-	highlight(
-						container,
-						target_x + 0.5f * UI_LINE_WIDTH,
-						target_y + target_height - line_height,
-						target_x + target_width - 0.5f * UI_LINE_WIDTH,
-						target_y + target_height,
-						UI_SELECTED_BG_COLOR);
+	highlight(container,
+              target_x + 0.5f * UI_LINE_WIDTH,
+              target_y + target_height - line_height,
+              target_x + target_width - 0.5f * UI_LINE_WIDTH,
+              target_y + target_height,
+              UI_SELECTED_BG_COLOR);
 	machine().ui().draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
-				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
+	                              JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 
 	// artificially set the hover to the last item so a double-click exits
 	hover = item.size() - 1;

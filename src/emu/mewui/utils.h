@@ -223,9 +223,9 @@ struct mewui_globals
 	static std::vector<cache_info> driver_cache;
 
 	static void save_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
-										std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted);
+                                        std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted);
 	static bool load_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
-										std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted);
+                                        std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted);
 };
 
 // Custom filter class
@@ -248,8 +248,6 @@ void general_info(running_machine &machine, const game_driver *driver, std::stri
 
 // advanced search function
 int fuzzy_substring(const char *needle, const char *haystack);
-
-void fskip(char *s, int id = 0);
 
 // custom filter load and save
 void load_custom_filters(running_machine &machine);
