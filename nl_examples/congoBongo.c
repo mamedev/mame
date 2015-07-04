@@ -1,6 +1,7 @@
 #include "netlist/devices/net_lib.h"
 #include "netlist/devices/nld_system.h"
 #include "netlist/analog/nld_bjt.h"
+#include "netlist/analog/nld_twoterm.h"
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -8,23 +9,26 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
-#define DM7416_GATE(_name)                    		                      \
+#define DM7416_GATE(_name)                    		                           \
 		NET_REGISTER_DEV_X(DM7416_GATE, _name)
 
-#define DM7416_DIP(_name)            	        		                      \
+#define DM7416_DIP(_name)            	        		                       \
 		NET_REGISTER_DEV_X(DM7416_DIP, _name)
 
-#define MB3614_DIP(_name)            			                              \
+#define MB3614_DIP(_name)            			                               \
 		NET_REGISTER_DEV_X(MB3614_DIP, _name)
 
-#define LM358_DIP(_name)            			                              \
+#define LM358_DIP(_name)            			                               \
 		NET_REGISTER_DEV_X(LM358_DIP, _name)
 
-#define CD4001_NOR(_name)                                            \
+#define CD4001_NOR(_name)                                                      \
 		NET_REGISTER_DEV_X(CD4001_NOR, _name)
 
-#define CD4001_DIP(_name)                                                         \
-		NET_REGISTER_DEV_X(CD4001_dip, _name)
+#define CD4001_DIP(_name)                                                      \
+		NET_REGISTER_DEV_X(CD4001_DIP, _name)
+
+#define G501534_DIP(_name)                                                     \
+		NET_REGISTER_DEV_X(G501534_DIP, _name)
 
 
 NETLIST_EXTERNAL(congob_lib)
@@ -49,6 +53,22 @@ NETLIST_START(dummy)
 	LOCAL_SOURCE(congob_lib)
 	INCLUDE(congob_lib)
 
+	TTL_INPUT(I_BASS_DRUM0, 0)
+	TTL_INPUT(I_CONGA_H0, 0)
+	TTL_INPUT(I_CONGA_L0, 0)
+	TTL_INPUT(I_GORILLA0, 0)
+	TTL_INPUT(I_RIM0, 0)
+
+	ALIAS(I_V0.Q, GND.Q)
+
+	ANALOG_INPUT(I_V12, 12)
+	ANALOG_INPUT(I_V5, 5)
+	ANALOG_INPUT(I_V6, 6)
+
+	// FIXME: Same as 1N4148
+	NET_MODEL(".model 1S2075 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75)")
+
+	NET_MODEL(".model 2SC1941 NPN(IS=46.416f BF=210 NF=1.0022 VAF=600 IKF=500m ISE=60f NE=1.5 BR=2.0122 NR=1.0022 VAR=10G IKR=10G ISC=300p NC=2 RB=13.22 IRB=10G RBM=13.22 RE=100m RC=790m CJE=26.52p VJE=900m MJE=518m TF=1.25n XTF=10 VTF=10 ITF=500m PTF=0 CJC=4.89p VJC=750m MJC=237m XCJC=500m TR=100n CJS=0 VJS=750m MJS=500m XTB=1.5 EG=1.11 XTI=3 KF=0 AF=1 FC=500m)")
 
 	CAP(C20, CAP_N(68))
 	CAP(C21, CAP_U(1))
@@ -75,8 +95,8 @@ NETLIST_START(dummy)
 	CAP(C42, CAP_N(6.8))
 	CAP(C43, CAP_N(47))
 	CAP(C44, CAP_U(1))
-	CAP(C45, CAP_U(33))
-	CAP(C46, CAP_N(100))
+	//CAP(C45, CAP_U(33))
+	//CAP(C46, CAP_N(100))
 	CAP(C47, CAP_U(470))
 	CAP(C48, CAP_N(1.5))
 	CAP(C49, CAP_U(220))
@@ -90,25 +110,16 @@ NETLIST_START(dummy)
 	CAP(C57, CAP_N(47))
 	CAP(C58, CAP_N(22))
 	CAP(C59, CAP_U(10))
-	CAP(C60, CAP_N(22))
+	//CAP(C60, CAP_N(22))
 	CAP(C62, CAP_N(22))
-	DIODE(D1, "DIODE")
-	DIODE(D2, "DIODE")
-	DIODE(D3, "DIODE")
-	DIODE(D4, "DIODE")
-	DIODE(D5, "DIODE")
-	DIODE(D6, "DIODE")
-	DIODE(D7, "DIODE")
-	DIODE(D8, "DIODE")
-	ANALOG_INPUT(I_BASS_DRUM0, 0)
-	ANALOG_INPUT(I_CONGA_H0, 0)
-	ANALOG_INPUT(I_CONGA_L0, 0)
-	ANALOG_INPUT(I_GORILLA0, 0)
-	ANALOG_INPUT(I_RIM0, 0)
-	ANALOG_INPUT(I_V0, 0)
-	ANALOG_INPUT(I_V12, 0)
-	ANALOG_INPUT(I_V5, 0)
-	ANALOG_INPUT(I_V6, 0)
+	DIODE(D1, "1S2075")
+	DIODE(D2, "1S2075")
+	DIODE(D3, "1S2075")
+	DIODE(D4, "1S2075")
+	DIODE(D5, "1S2075")
+	DIODE(D6, "1S2075")
+	DIODE(D7, "1S2075")
+	DIODE(D8, "1S2075")
 	QBJT_EB(Q2, "2SC1941")
 	RES(R21, RES_K(10))
 	RES(R22, RES_K(47))
@@ -183,46 +194,45 @@ NETLIST_START(dummy)
 	RES(R91, RES_K(10))
 	RES(R92, RES_K(15))
 	RES(R93, RES_K(15))
-	DM7416_DIP(XU6)
 	MB3614_DIP(XU13)
+	G501534_DIP(XU15)
 	MB3614_DIP(XU16)
 	MB3614_DIP(XU17)
 	CD4001_DIP(XU18)
-	G501534_DIP(XU15)
 	CD4538_DIP(XU19)
 	MM5837_DIP(XU20)
-	NET_C(GND)
+	DM7416_DIP(XU6)
 	NET_C(D1.K, C21.2, R23.1)
 	NET_C(D1.A, C20.1, R22.1)
 	NET_C(XU13.1, C37.2, C36.1, R48.1)
 	NET_C(XU13.2, C35.2, R48.2)
 	NET_C(XU13.3, R44.1, R46.2, R45.1)
-	NET_C(XU13.4, R27.1, R21.1, R37.1, R31.1, R47.1, R41.1, R57.1, R51.1, C46.2, C45.2, XU17.4, R80.2, XU16.4, XU20.4, XU15.12, I_V12.Q)
+	NET_C(XU13.4, R27.1, R21.1, R37.1, R31.1, R47.1, R41.1, R57.1, R51.1, /*C46.2, C45.2,*/ XU17.4, R80.2, XU16.4, XU20.4, XU15.12, I_V12.Q)
 	NET_C(XU13.5, R54.1, R56.2, R55.1)
 	NET_C(XU13.6, C41.2, R58.2, R60.2)
 	NET_C(XU13.7, C44.2, C42.1, R58.1, R61.1)
 	NET_C(XU13.8, C29.2, C31.1, R38.1)
 	NET_C(XU13.9, C30.2, R38.2)
 	NET_C(XU13.10, R34.1, R36.2, R35.1)
-	NET_C(XU13.11, C22.2, R29.2, R25.2, R23.2, R22.2, XU6.1, XU6.5, C28.2, R39.2, R35.2, R33.2, R32.2, C34.2, R49.2, R45.2, R43.2, R42.2, C40.2, R59.2, R55.2, R53.2, R52.2, C43.2, R69.1, R64.1, C49.2, C48.2, C47.2, C46.1, C45.1, XU17.11, XU19.1, XU19.4, XU19.8, XU19.12, XU19.15, R81.1, C56.2, C55.2, C53.2, C52.2, XU18.1, XU18.2, XU18.7, XU18.12, XU18.13, C54.2, XU16.11, R84.1, R88.1, Q2.C, C58.2, C60.2, XU20.1, XU20.2, XU15.4, I_V0.Q)
+	NET_C(XU13.11, C22.2, R29.2, R25.2, R23.2, R22.2, XU6.1, XU6.3, XU6.7, C28.2, R39.2, R35.2, R33.2, R32.2, C34.2, R49.2, R45.2, R43.2, R42.2, C40.2, R59.2, R55.2, R53.2, R52.2, C43.2, R69.1, R64.1, C49.2, C48.2, C47.2, /*C46.1, C45.1,*/ XU17.11, XU19.1, XU19.4, XU19.8, XU19.12, XU19.15, R81.1, C56.2, C55.2, C53.2, C52.2, XU18.1, XU18.2, XU18.7, XU18.12, XU18.13, C54.2, XU16.11, R84.1, R88.1, Q2.E, C58.2, /* C60.2, */ XU20.1, XU20.2, XU15.4, I_V0.Q)
 	NET_C(XU13.12, R24.1, R26.2, R25.1)
 	NET_C(XU13.13, C23.2, R28.2)
 	NET_C(XU13.14, C25.2, C24.1, R28.1)
 	NET_C(C25.1, R30.2)
 	NET_C(C24.2, C23.1, R29.1)
 	NET_C(C21.1, R24.2)
-	NET_C(C20.2, R21.2, XU6.6)
+	NET_C(C20.2, R21.2, XU6.8)
 	NET_C(C22.1, R27.2, R26.1)
 	NET_C(R30.1, R40.1, R50.1, R62.1, XU15.3)
-	NET_C(XU6.2, XU19.7, XU18.3, XU18.11, XU15.5, XU15.6, XU15.7, XU15.8, XU15.9, XU15.10, XU15.11, XU15.14)
-	NET_C(XU6.3, I_CONGA_L0.Q)
-	NET_C(XU6.4, C26.2, R31.2)
-	NET_C(XU6.7, I_BASS_DRUM0.Q)
-	NET_C(XU6.8, C38.2, R51.2)
-	NET_C(XU6.9, I_RIM0.Q)
-	NET_C(XU6.10, C32.2, R41.2)
-	NET_C(XU6.11, I_CONGA_H0.Q)
-	NET_C(XU6.12, XU16.3, R86.2, I_V6.Q)
+	//NET_C(XU6.2, XU6.4, XU19.7, XU18.3, XU18.11, XU15.5, XU15.6, XU15.7, XU15.8, XU15.9, XU15.10, XU15.11, XU15.14)
+	NET_C(XU6.5, I_CONGA_L0.Q)
+	NET_C(XU6.6, C26.2, R31.2)
+	NET_C(XU6.9, I_BASS_DRUM0.Q)
+	NET_C(XU6.10, C38.2, R51.2)
+	NET_C(XU6.11, I_RIM0.Q)
+	NET_C(XU6.12, C32.2, R41.2)
+	NET_C(XU6.13, I_CONGA_H0.Q)
+	NET_C(XU6.14, D5.A, XU19.16, R70.2, R76.2, R71.2, XU18.14, I_V5.Q)
 	NET_C(D2.K, C27.2, R33.1)
 	NET_C(D2.A, C26.1, R32.1)
 	NET_C(C29.1, R40.2)
@@ -250,7 +260,6 @@ NETLIST_START(dummy)
 	NET_C(R67.1, C49.1, XU17.10)
 	NET_C(R68.1, R69.2, XU17.9)
 	NET_C(R68.2, C50.1, XU17.8, C51.1)
-	NET_C(D5.A, XU19.16, R70.2, R76.2, R71.2, XU18.14, I_V5.Q)
 	NET_C(XU17.1, XU16.6, C62.1)
 	NET_C(XU17.2, R82.1, C62.2, R85.2)
 	NET_C(XU17.3, R83.1, R84.2)
@@ -273,17 +282,18 @@ NETLIST_START(dummy)
 	NET_C(R74.1, R75.1, C54.1, XU16.10)
 	NET_C(XU16.1, R91.1, R92.2)
 	NET_C(XU16.2, R90.1, R91.2)
+	NET_C(XU16.3, R86.2, I_V6.Q)
 	NET_C(XU16.5, R86.1, R87.2)
 	NET_C(XU16.7, R87.1, D8.K, R90.2)
 	NET_C(XU16.8, XU16.9, XU15.13)
 	NET_C(XU16.12, R93.1, C58.1)
 	NET_C(XU16.13, XU16.14, C57.1, C59.2)
-	NET_C(R85.1, Q2.B)
+	NET_C(R85.1, Q2.C)
 	NET_C(R89.1, D8.A)
-	NET_C(R89.2, R88.2, Q2.E)
+	NET_C(R89.2, R88.2, Q2.B)
 	NET_C(R92.1, C57.2, R93.2)
 	NET_C(C59.1, XU15.1)
-	NET_C(C60.1, XU15.2)
+	//NET_C(C60.1, XU15.2)
 NETLIST_END()
 
 NETLIST_START(opamp)
@@ -391,12 +401,16 @@ NETLIST_START(DM7416_DIP)
 	DM7416_GATE(s5)
 	DM7416_GATE(s6)
 
+	DUMMY_INPUT(GND)
+	DUMMY_INPUT(VCC)
+
 	ALIAS( 1, s1.A)
 	ALIAS( 2, s1.Q)
 	ALIAS( 3, s2.A)
 	ALIAS( 4, s2.Q)
 	ALIAS( 5, s3.A)
 	ALIAS( 6, s3.Q)
+	ALIAS( 7, GND.I)
 
 	ALIAS( 8, s4.Q)
 	ALIAS( 9, s4.A)
@@ -404,6 +418,7 @@ NETLIST_START(DM7416_DIP)
 	ALIAS(11, s5.A)
 	ALIAS(12, s6.Q)
 	ALIAS(13, s6.A)
+	ALIAS(14, VCC.I)
 NETLIST_END()
 
 NETLIST_START(CD4001_DIP)
@@ -412,12 +427,16 @@ NETLIST_START(CD4001_DIP)
 	CD4001_NOR(s3)
 	CD4001_NOR(s4)
 
+	DUMMY_INPUT(VSS)
+	DUMMY_INPUT(VDD)
+
 	ALIAS( 1, s1.A)
 	ALIAS( 2, s1.B)
 	ALIAS( 3, s1.Q)
 	ALIAS( 4, s2.Q)
 	ALIAS( 5, s2.A)
 	ALIAS( 6, s2.B)
+	ALIAS( 7, VDD.I)
 
 	ALIAS( 8, s3.A)
 	ALIAS( 9, s3.B)
@@ -425,14 +444,39 @@ NETLIST_START(CD4001_DIP)
 	ALIAS(11, s4.Q)
 	ALIAS(12, s4.A)
 	ALIAS(13, s4.B)
+	ALIAS(14, VSS.I)
+
 NETLIST_END()
 
+NETLIST_START(G501534_DIP)
+	FUNCTION(f, 2)
+
+	/*
+	 * 12:   VCC
+	 *  4:   GND
+	 *  1:   IN
+	 *  3:	 OUT
+	 * 13:	 CV
+	 *  2:   RDL - connected via Capacitor to ground
+	 */
+
+	DUMMY_INPUT(DU1)
+	DUMMY_INPUT(DU2)
+
+	ALIAS(12, DU1.I)
+	ALIAS(4,  DU2.I)
+	ALIAS(2,  DU2.I)
+	ALIAS(1,  f.I0)
+	ALIAS(13, f.I1)
+	ALIAS(3,  f.Q)
+
+NETLIST_END()
 
 NETLIST_START(congob_lib)
 	TRUTHTABLE_START(DM7416_GATE, 1, 1, 0, "")
 		TT_HEAD(" A | Q ")
-		TT_LINE(" 0 | 1 |100")
-		TT_LINE(" 1 | 0 |100")
+		TT_LINE(" 0 | 1 |15")
+		TT_LINE(" 1 | 0 |23")
 		TT_FAMILY(".model DM7416 FAMILY(IVL=0.8 IVH=2.0 OVL=0.1 OVH=4.95 ORL=10.0 ORH=1.0e8)")
 	TRUTHTABLE_END()
 
@@ -450,5 +494,6 @@ NETLIST_START(congob_lib)
 	LOCAL_LIB_ENTRY(CD4001_DIP)
 	LOCAL_LIB_ENTRY(DM7416_DIP)
 	LOCAL_LIB_ENTRY(MB3614_DIP)
+	LOCAL_LIB_ENTRY(G501534_DIP)
 
 NETLIST_END()

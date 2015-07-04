@@ -113,7 +113,7 @@ NETLIB_DEVICE(9602_dip,
  */
 
 #define CD4538_DIP(_name)                                                         \
-		NET_REGISTER_DEV(4548_dip, _name)
+		NET_REGISTER_DEV(4538_dip, _name)
 
 NETLIB_DEVICE(4538_dip,
 	NETLIB_LOGIC_FAMILY(CD4000)
