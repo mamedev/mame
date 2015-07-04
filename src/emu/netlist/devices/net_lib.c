@@ -153,6 +153,7 @@ void initialize_factory(factory_list_t &factory)
 	ENTRY(9316_dip,             TTL_9316_DIP,           "-")
 	ENTRY(SN74LS629_dip,        SN74LS629_DIP,          "1.CAP1,2.CAP2")
 	ENTRY(NE555_dip,            NE555_DIP,              "-")
+	ENTRY(MM5837_dip,           MM5837_DIP,             "-")
 }
 
 NETLIB_NAMESPACE_DEVICES_END()
