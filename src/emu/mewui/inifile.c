@@ -382,41 +382,57 @@ bool favorite_manager::isgame_favorite(ui_software_info &swinfo)
 
 void favorite_manager::parse_favorite()
 {
-	if (parseOpen(favorite_filename))
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_READ);
+
+	if (file.open(favorite_filename) == FILERR_NONE)
 	{
-		std::ifstream myfile(fullpath.c_str());
-		std::string readbuf;
+		char readbuf[1024];
+		std::string text;
 
-		std::getline(myfile, readbuf);
+		file.gets(readbuf, 1024);
 		while (readbuf[0] == '[')
-			std::getline(myfile, readbuf);
+			file.gets(readbuf, 1024);
 
-		UINT8 space;
-		int passo = 1;
-		while (std::getline(myfile, readbuf))
+		while (file.gets(readbuf, 1024))
 		{
 			ui_software_info tmpmatches;
-			tmpmatches.shortname = readbuf;
-			std::getline(myfile, tmpmatches.longname);
-			std::getline(myfile, tmpmatches.parentname);
-			std::getline(myfile, tmpmatches.year);
-			std::getline(myfile, tmpmatches.publisher);
-			myfile >> tmpmatches.supported >> space;
-			std::getline(myfile, tmpmatches.part);
-			std::getline(myfile, readbuf);
-			int dx = driver_list::find(readbuf.c_str());
+			tmpmatches.shortname = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.longname = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.parentname = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.year = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.publisher = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.supported = atoi(readbuf);
+			file.gets(readbuf, 1024);
+			tmpmatches.part = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			text = strtrimspace(text.assign(readbuf));
+			int dx = driver_list::find(text.c_str());
+			if (dx == -1) continue;
 			tmpmatches.driver = &driver_list::driver(dx);
-			std::getline(myfile, tmpmatches.listname);
-			std::getline(myfile, tmpmatches.interface);
-			std::getline(myfile, tmpmatches.instance);
-			myfile >> tmpmatches.startempty >> space;
-			std::getline(myfile, tmpmatches.parentlongname);
-			std::getline(myfile, tmpmatches.usage);
-			std::getline(myfile, tmpmatches.devicetype);
-			myfile >> tmpmatches.available >> space;
+			file.gets(readbuf, 1024);
+			tmpmatches.listname = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.interface = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.instance = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.startempty = atoi(readbuf);
+			file.gets(readbuf, 1024);
+			tmpmatches.parentlongname = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.usage = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.devicetype = strtrimspace(text.assign(readbuf));
+			file.gets(readbuf, 1024);
+			tmpmatches.available = atoi(readbuf);
 			favorite_list.push_back(tmpmatches);
 		}
-		myfile.close();
+		file.close();
 	}
 }
 
@@ -426,71 +442,58 @@ void favorite_manager::parse_favorite()
 
 void favorite_manager::save_favorite_games()
 {
-	// if the list is empty, then deletes the file
-	if (favorite_list.empty())
-	{
-		if (parseOpen(favorite_filename))
-			remove(fullpath.c_str());
-		return;
-	}
-
 	// attempt to open the output file
 	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	if (file.open(favorite_filename) == FILERR_NONE)
 	{
-		std::string filename(file.fullpath());
-		file.close();
+		if (favorite_list.empty())
+		{
+			file.remove_on_close();
+			file.close();
+			return;
+		}
 
-		std::ofstream myfile(filename.c_str());
-		UINT8 space = 0;
 		// generate the favorite INI
-		std::string favtext;
-		std::string headtext("[ROOT_FOLDER]\n[Favorite]\n\n");
-		myfile << headtext;
+		std::string text("[ROOT_FOLDER]\n[Favorite]\n\n");
+		file.puts(text.c_str());
 
 		for (size_t current = 0; current < favorite_list.size(); current++)
 		{
-			myfile << favorite_list[current].shortname << "\n";
-			myfile << favorite_list[current].longname << "\n";
-			myfile << favorite_list[current].parentname << "\n";
-			myfile << favorite_list[current].year << "\n";
-			myfile << favorite_list[current].publisher << "\n";
-			myfile << favorite_list[current].supported << space;
-			myfile << favorite_list[current].part << "\n";
-			myfile << favorite_list[current].driver->name << "\n";
-			myfile << favorite_list[current].listname << "\n";
-			myfile << favorite_list[current].interface << "\n";
-			myfile << favorite_list[current].instance << "\n";
-			myfile << favorite_list[current].startempty << space;
-			myfile << favorite_list[current].parentlongname << "\n";
-			myfile << favorite_list[current].usage << "\n";
-			myfile << favorite_list[current].devicetype << "\n";
-			myfile << favorite_list[current].available << space;
+			text = favorite_list[current].shortname + "\n";
+			file.puts(text.c_str());
+			text = favorite_list[current].longname + "\n";
+			file.puts(text.c_str());
+			text = favorite_list[current].parentname + "\n";
+			file.puts(text.c_str());
+			text = favorite_list[current].year + "\n";
+			file.puts(text.c_str());
+			text = favorite_list[current].publisher + "\n";
+			file.puts(text.c_str());
+			strprintf(text, "%d\n", favorite_list[current].supported);
+			file.puts(text.c_str());
+			text = favorite_list[current].part + "\n";
+			file.puts(text.c_str());
+			text.assign(favorite_list[current].driver->name).append("\n");
+			file.puts(text.c_str());
+			text = favorite_list[current].listname + "\n";
+			file.puts(text.c_str());
+			text = favorite_list[current].interface + "\n";
+			file.puts(text.c_str());
+			text = favorite_list[current].instance + "\n";
+			file.puts(text.c_str());
+			strprintf(text, "%d\n", favorite_list[current].startempty);
+			file.puts(text.c_str());
+			text = favorite_list[current].parentlongname + "\n";
+			file.puts(text.c_str());
+			text = favorite_list[current].usage + "\n";
+			file.puts(text.c_str());
+			text = favorite_list[current].devicetype + "\n";
+			file.puts(text.c_str());
+			strprintf(text, "%d\n", favorite_list[current].available);
+			file.puts(text.c_str());
 		}
-		myfile.close();
+		file.close();
 	}
 }
 
-//-------------------------------------------------
-//  open up file for reading
-//-------------------------------------------------
-
-//-------------------------------------------------
-//  open up file for reading
-//-------------------------------------------------
-
-bool favorite_manager::parseOpen(const char *filename)
-{
-	// Open file up in binary mode
-	emu_file fp(machine().options().mewui_path(), OPEN_FLAG_READ);
-
-	if (fp.open(filename) == FILERR_NONE)
-	{
-		fullpath.assign(fp.fullpath());
-		fp.close();
-		return true;
-	}
-
-	return false;
-}

@@ -109,12 +109,8 @@ private:
 	// parse file mewui_favorite
 	void parse_favorite();
 
-	// file open/close
-	bool parseOpen(const char *filename);
-
 	// internal state
 	running_machine &m_machine;  // reference to our machine
-	std::string     fullpath;
 };
 
 #endif  /* __MEWUI_INIFILE_H__ */
