@@ -28,6 +28,7 @@ def file_exists(root, srcfile, folder, inc_dir):
     for line in includes:
         try:
             fp = open(root + line + srcfile, 'rb')
+            fp.close()
             return line + srcfile
         except IOError:
             pass
@@ -36,6 +37,7 @@ def file_exists(root, srcfile, folder, inc_dir):
 def add_c_if_exists(root, fullname):
     try:
         fp = open(root + fullname, 'rb')
+        fp.close()
         deps_files_included.append(fullname)
     except IOError:
         pass
@@ -105,6 +107,7 @@ def parse_file_for_deps(root, srcfile, folder):
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file_for_deps(root, fullname, newfolder)
                continue
+    fp.close()
     return 0
 
 def parse_file(root, srcfile, folder):
@@ -160,6 +163,7 @@ def parse_file(root, srcfile, folder):
                    if (fullname.endswith('.h')):
                        parse_file(root, fullname.replace('.h','.c'), newfolder)
                continue
+    fp.close()
     return 0
 
 def parse_file_for_drivers(root, srcfile):
