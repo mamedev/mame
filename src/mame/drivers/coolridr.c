@@ -409,6 +409,7 @@ public:
 	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
 	DECLARE_WRITE32_MEMBER(sysh1_char_w);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
+	DECLARE_READ32_MEMBER(aquastge_hack_r);
 	DECLARE_READ16_MEMBER(h1_soundram_r);
 	DECLARE_READ16_MEMBER(h1_soundram2_r);
 	DECLARE_WRITE16_MEMBER(h1_soundram_w);
@@ -423,6 +424,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sh7032_w);
 	UINT16 m_sh7032_regs[0x200];
 	DECLARE_DRIVER_INIT(coolridr);
+	DECLARE_DRIVER_INIT(aquastge);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -827,7 +829,7 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 			UINT16 basex = scrollx>>4;
 			for (int x=0;x<32;x++)
 			{
-				vram_data = (m_h1_vram[(basex&0x7f)+((basey&0x3f)*0x80)+base_offset] & 0xffff);
+				vram_data = (m_h1_vram[((basex&0x7f)+((basey&0x3f)*0x80)+base_offset)&0x07ffff] & 0xffff);
 				color = m_color_bank + ((vram_data & 0x800) >> 11) * 4;
 				/* bike select enables bits 15-12, pretty sure one of these is tile bank (because there's a solid pen on 0x3ff / 0x7ff). */
 				tile = (vram_data & 0x7ff) | ((vram_data & 0x8000) >> 4);
@@ -3665,6 +3667,56 @@ ROM_START( coolridr )
 ROM_END
 
 
+ROM_START( aquastge )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */
+	ROM_LOAD32_WORD_SWAP( "epr-18280.ic30", 0x0000000, 0x080000, CRC(4038352a) SHA1(fe951592e2462c701c740da4ec77435ae3026eab) )
+	ROM_LOAD32_WORD_SWAP( "epr-18279.ic29", 0x0000002, 0x080000, CRC(9697cbcd) SHA1(4afa9a3f85b9d4483dafae8a98526ae32abd7103) )
+	ROM_LOAD32_WORD_SWAP( "epr-18282.ic32", 0x0100000, 0x080000, CRC(53684dd8) SHA1(59759f6e3f815280a2406cc2133fc46e673cc76a))
+	ROM_LOAD32_WORD_SWAP( "epr-18281.ic31", 0x0100002, 0x080000, CRC(f1233190) SHA1(471578c9343ac7198d73bee73975656c52e0bc5d) )
+
+	/* Page 12 of the service manual states that these 4 regions are tested, so I believe that they are read by the SH-2 */
+	ROM_REGION32_BE( 0x1000000, "gfx_data", ROMREGION_ERASEFF ) /* SH2 code */
+	ROM_LOAD32_WORD_SWAP( "mpr-18283.ic17", 0x0c00002, 0x0200000, CRC(f42e2e72) SHA1(caf8733b6888ee718032c55f64da14590353517e) )
+	ROM_RELOAD(0x0000002, 0x0200000)
+	ROM_LOAD32_WORD_SWAP( "mpr-18284.ic18", 0x0c00000, 0x0200000, CRC(5fdf3c1f) SHA1(9976fe4afc3234eecbaf47a2e0f951b6fe1cb5f5) )
+	ROM_RELOAD(0x0000000, 0x0200000)
+
+	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
+
+	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
+	ROM_LOAD16_WORD_SWAP( "epr-18278.ic12", 0x000000, 0x020000,  CRC(e601132a) SHA1(bed103ef2e0dfa8bb485d93d661142b82c23088b) )
+
+	/* these are compressed sprite data */
+	ROM_REGION( 0x2800000, "compressedgfx", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "mpr-18289.ic5", 0x0000000, 0x0200000, CRC(fb212692) SHA1(da2f77564e718276c66b0f02e72a97d7b3653c35) ) // 0004
+	ROM_RELOAD(0x0200000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18288.ic4", 0x0400000, 0x0200000, CRC(558c82ee) SHA1(e2ae4f2e81c7360eedd1b18e36d1f6ca6c015fee) ) // 9000
+	ROM_RELOAD(0x0600000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18287.ic3", 0x0800000, 0x0200000, CRC(bf8743d8) SHA1(8d0e0691ec062f1939db8f6b75edb92d34417f81) ) // 4900
+	ROM_RELOAD(0x0a00000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18286.ic2", 0x0c00000, 0x0200000, CRC(3eb95e9a) SHA1(d565e5f353327e16f7ead2251fd9a503bf46e210) ) // 0490
+	ROM_RELOAD(0x0e00000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18285.ic1", 0x1000000, 0x0200000, CRC(8390453c) SHA1(e7d3a6579d9805a71b954bb248a2da749e9d9d38) ) // 0049
+	ROM_RELOAD(0x1200000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18294.ic10",0x1400000, 0x0200000, CRC(341ebd4a) SHA1(9d9a1c09d81a50132edcc18a99266416683f4ff6) ) // 0004
+	ROM_RELOAD(0x1600000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18293.ic9", 0x1800000, 0x0200000, CRC(f76bc076) SHA1(f5a8f9bd26b2e8533a1fbf8da6938373df971749)) // 9000
+	ROM_RELOAD(0x1a00000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18292.ic8", 0x1c00000, 0x0200000, CRC(59a713f9) SHA1(388b833fa6fb930f26c80674606505ec80668a16) ) // 4900
+	ROM_RELOAD(0x01e0000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18291.ic7", 0x2000000, 0x0200000, CRC(b6c167bd) SHA1(4990bae50e8804b2e1048aa5c64b086e8427073f) ) // 0490
+	ROM_RELOAD(0x2200000, 0x0200000)
+	ROM_LOAD16_WORD_SWAP( "mpr-18290.ic6", 0x2400000, 0x0200000, CRC(11f7adb0) SHA1(a72f9892f93506456edc7ffc66224446a58ca38b) ) // 0049
+	ROM_RELOAD(0x2600000, 0x0200000)
+
+	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
+	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
+	ROM_FILL( 0x000000, 0x80000, 0 )
+ROM_END
+
+
 /*
 TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then expect that this buffer goes low IN the irq routines.
       The Watchdog Timer is setted up with these params:
@@ -3704,6 +3756,20 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 }
 
 
+READ32_MEMBER(coolridr_state::aquastge_hack_r)
+{
+	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+
+	if ((pc == 0x6009e76) || (pc == 0x6009e78))
+		return 0;
+	else
+	{
+//		printf("pc %08x\n", pc);
+	}
+
+	return m_sysh1_workram_h[0xc3fd8/4];
+}
+
 
 DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 {
@@ -3719,4 +3785,17 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]);
 }
 
+DRIVER_INIT_MEMBER(coolridr_state, aquastge)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
+
+	
+
+
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+}
+
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAME( 1995, aquastge,    0, coolridr,    coolridr, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",GAME_NOT_WORKING)
+
