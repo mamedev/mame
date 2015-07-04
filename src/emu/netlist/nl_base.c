@@ -588,8 +588,13 @@ ATTR_COLD void device_t::register_input(const pstring &name, analog_input_t &inp
 
 ATTR_COLD void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
 {
+#if 1
 	//printf("device %s: connect %s to %s\n", name().cstr(), t1.name().cstr(), t2.name().cstr());
 	setup().register_link_fqn(t1.name(), t2.name());
+#else
+	if (!setup().connect(t1, t2))
+		netlist().error("Error connecting %s to %s\n", t1.name().cstr(), t2.name().cstr());
+#endif
 }
 
 ATTR_COLD void device_t::connect_direct(core_terminal_t &t1, core_terminal_t &t2)

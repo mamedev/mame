@@ -17,6 +17,7 @@
 #include "machine/mc146818.h"
 #include "imagedev/snapquik.h"
 #include "bus/cpc/cpcexp.h"
+#include "bus/cpc/ddi1.h"
 #include "bus/cpc/cpc_ssa1.h"
 #include "bus/cpc/cpc_rom.h"
 #include "bus/cpc/mface2.h"

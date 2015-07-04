@@ -283,6 +283,11 @@ public:
 		and_imm_rgba(color.m_a, color.m_r, color.m_g, color.m_b);
 	}
 
+	inline void andnot_reg(const rgbaint_t& color)
+	{
+		and_imm_rgba(~color.m_a, ~color.m_r, ~color.m_g, ~color.m_b);
+	}
+
 	inline void and_imm(const INT32 imm)
 	{
 		and_imm_rgba(imm, imm, imm, imm);
@@ -328,6 +333,14 @@ public:
 		if (m_b & sign)
 			m_b = 0;
 
+		m_a = (m_a < 0) ? 0 : (m_a > 255) ? 255 : m_a;
+		m_r = (m_r < 0) ? 0 : (m_r > 255) ? 255 : m_r;
+		m_g = (m_g < 0) ? 0 : (m_g > 255) ? 255 : m_g;
+		m_b = (m_b < 0) ? 0 : (m_b > 255) ? 255 : m_b;
+	}
+
+	inline void clamp_to_uint8()
+	{
 		m_a = (m_a < 0) ? 0 : (m_a > 255) ? 255 : m_a;
 		m_r = (m_r < 0) ? 0 : (m_r > 255) ? 255 : m_r;
 		m_g = (m_g < 0) ? 0 : (m_g > 255) ? 255 : m_g;
@@ -427,6 +440,24 @@ public:
 		return *this;
 	}
 
+	inline rgbaint_t& operator+=(const rgbaint_t& other)
+	{
+		m_a += other.m_a;
+		m_r += other.m_r;
+		m_g += other.m_g;
+		m_b += other.m_b;
+		return *this;
+	}
+
+	inline rgbaint_t& operator+=(const INT32 other)
+	{
+		m_a += other;
+		m_r += other;
+		m_g += other;
+		m_b += other;
+		return *this;
+	}
+
 	static UINT32 bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 	{
 		UINT32 rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
@@ -444,6 +475,26 @@ public:
 		ag0 = (ag0 & 0x00ff00ff) + ((((ag1 & 0x00ff00ff) - (ag0 & 0x00ff00ff)) * v) >> 8);
 
 		return ((ag0 << 8) & 0xff00ff00) | (rb0 & 0x00ff00ff);
+	}
+
+	inline void bilinear_filter_rgbaint(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+	{
+		UINT32 rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+		UINT32 rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
+
+		rgb00 >>= 8;
+		rgb01 >>= 8;
+		rgb10 >>= 8;
+		rgb11 >>= 8;
+
+		UINT32 ag0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
+		UINT32 ag1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
+
+		rb0 = (rb0 & 0x00ff00ff) + ((((rb1 & 0x00ff00ff) - (rb0 & 0x00ff00ff)) * v) >> 8);
+		ag0 = (ag0 & 0x00ff00ff) + ((((ag1 & 0x00ff00ff) - (ag0 & 0x00ff00ff)) * v) >> 8);
+
+		UINT32 result = ((ag0 << 8) & 0xff00ff00) | (rb0 & 0x00ff00ff);
+		this->set(result);
 	}
 
 protected:

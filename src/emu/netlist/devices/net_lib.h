@@ -50,6 +50,7 @@
 #include "nld_9316.h"
 
 #include "nld_ne555.h"
+#include "nld_mm5837.h"
 
 #include "nld_r2r_dac.h"
 

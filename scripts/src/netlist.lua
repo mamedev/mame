@@ -136,6 +136,8 @@ project "netlist"
 		MAME_DIR .. "src/emu/netlist/devices/nld_9316.h",
 		MAME_DIR .. "src/emu/netlist/devices/nld_ne555.c",
 		MAME_DIR .. "src/emu/netlist/devices/nld_ne555.h",
+    MAME_DIR .. "src/emu/netlist/devices/nld_mm5837.c",
+    MAME_DIR .. "src/emu/netlist/devices/nld_mm5837.h",
 		MAME_DIR .. "src/emu/netlist/devices/nld_r2r_dac.c",
 		MAME_DIR .. "src/emu/netlist/devices/nld_r2r_dac.h",
 		MAME_DIR .. "src/emu/netlist/devices/nld_legacy.c",
