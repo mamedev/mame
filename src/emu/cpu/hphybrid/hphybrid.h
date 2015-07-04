@@ -126,7 +126,7 @@ private:
 		UINT16 get_skip_addr_sc(UINT16 opcode , UINT16& v , unsigned n);
 		void do_pw(UINT16 opcode);
 		void check_for_interrupts(void);
-        void handle_dma(void);
+                void handle_dma(void);
 
 		UINT16 RM(UINT16 addr);
 		void   WM(UINT16 addr , UINT16 v);
