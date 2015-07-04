@@ -60,7 +60,8 @@ struct mg_connection {
 struct mg_server; // Opaque structure describing server instance
 enum mg_result { MG_FALSE, MG_TRUE, MG_MORE };
 enum mg_event {
-  MG_POLL = 100,  // Callback return value is ignored
+  MG_POLL = 100,  // If callback returns MG_TRUE connection closes
+                  // after all of data is sent
   MG_CONNECT,     // If callback returns MG_FALSE, connect fails
   MG_AUTH,        // If callback returns MG_FALSE, authentication fails
   MG_REQUEST,     // If callback returns MG_FALSE, Mongoose continues with req
@@ -103,8 +104,10 @@ void mg_send_status(struct mg_connection *, int status_code);
 void mg_send_header(struct mg_connection *, const char *name, const char *val);
 size_t mg_send_data(struct mg_connection *, const void *data, int data_len);
 size_t mg_printf_data(struct mg_connection *, const char *format, ...);
+size_t mg_vprintf_data(struct mg_connection *, const char *format, va_list ap);
 size_t mg_write(struct mg_connection *, const void *buf, size_t len);
 size_t mg_printf(struct mg_connection *conn, const char *fmt, ...);
+size_t mg_vprintf(struct mg_connection *conn, const char *fmt, va_list ap);
 
 size_t mg_websocket_write(struct mg_connection *, int opcode,
                           const char *data, size_t data_len);
@@ -118,6 +121,8 @@ const char *mg_get_header(const struct mg_connection *, const char *name);
 const char *mg_get_mime_type(const char *name, const char *default_mime_type);
 int mg_get_var(const struct mg_connection *conn, const char *var_name,
                char *buf, size_t buf_len);
+int mg_get_var_n(const struct mg_connection *conn, const char *var_name,
+                 char *buf, size_t buf_len, int n);
 int mg_parse_header(const char *hdr, const char *var_name, char *buf, size_t);
 int mg_parse_multipart(const char *buf, int buf_len,
                        char *var_name, int var_name_len,
