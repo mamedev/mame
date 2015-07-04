@@ -80,12 +80,10 @@ public:
 	int screen_index;
 	int page_index;
 
-	surface *prescaletarget;
-	texture *prescaletexture;
-	surface *smalltarget;
-	texture *smalltexture;
-	surface *target[5];
-	texture *render_texture[5];
+	surface *prescale_target[2];
+	texture *prescale_texture[2];
+	surface *native_target[2];
+	texture *native_texture[2];
 
 	render_target *next;
 	render_target *prev;
