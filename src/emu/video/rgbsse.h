@@ -221,6 +221,11 @@ public:
 		m_value = _mm_and_si128(m_value, color.m_value);
 	}
 
+	inline void andnot_reg(const rgbaint_t& color)
+	{
+		m_value = _mm_andnot_si128(color.m_value, m_value);
+	}
+
 	inline void and_imm(const INT32 value)
 	{
 		m_value = _mm_and_si128(m_value, _mm_set1_epi32(value));
@@ -254,6 +259,14 @@ public:
 		vsign = _mm_xor_si128(vsign, _mm_set1_epi32(0xffffffff));
 		__m128i mask = _mm_cmpgt_epi32(m_value, vsign);
 		m_value = _mm_or_si128(_mm_and_si128(vsign, mask), _mm_and_si128(m_value, _mm_xor_si128(mask, _mm_set1_epi32(0xffffffff))));
+	}
+
+	inline void clamp_to_uint8()
+	{
+		m_value = _mm_packs_epi32(m_value, _mm_setzero_si128());
+		m_value = _mm_packus_epi16(m_value, _mm_setzero_si128());
+		m_value = _mm_unpacklo_epi8(m_value, _mm_setzero_si128());
+		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
 	}
 
 	inline void sign_extend(const UINT32 compare, const UINT32 sign)
@@ -412,6 +425,27 @@ public:
 		color01 = _mm_packs_epi32(color01, _mm_setzero_si128());
 		color01 = _mm_packus_epi16(color01, _mm_setzero_si128());
 		return _mm_cvtsi128_si32(color01);
+	}
+
+	inline void bilinear_filter_rgbaint(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+	{
+		__m128i color00 = _mm_cvtsi32_si128(rgb00);
+		__m128i color01 = _mm_cvtsi32_si128(rgb01);
+		__m128i color10 = _mm_cvtsi32_si128(rgb10);
+		__m128i color11 = _mm_cvtsi32_si128(rgb11);
+
+		/* interleave color01 and color00 at the byte level */
+		color01 = _mm_unpacklo_epi8(color01, color00);
+		color11 = _mm_unpacklo_epi8(color11, color10);
+		color01 = _mm_unpacklo_epi8(color01, _mm_setzero_si128());
+		color11 = _mm_unpacklo_epi8(color11, _mm_setzero_si128());
+		color01 = _mm_madd_epi16(color01, scale_factor(u));
+		color11 = _mm_madd_epi16(color11, scale_factor(u));
+		color01 = _mm_slli_epi32(color01, 15);
+		color11 = _mm_srli_epi32(color11, 1);
+		color01 = _mm_max_epi16(color01, color11);
+		color01 = _mm_madd_epi16(color01, scale_factor(v));
+		m_value = _mm_srli_epi32(color01, 15);
 	}
 
 protected:
