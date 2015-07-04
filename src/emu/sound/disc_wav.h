@@ -186,6 +186,7 @@ DISCRETE_CLASS_STEP_RESET(dss_schmitt_osc, 1,
 
 /* Not yet implemented */
 DISCRETE_CLASS_STEP_RESET(dss_adsrenv,  1,
+    int dummy; // make C++ happy about empty macro fields
 	//double          m_phase;
 );
 
