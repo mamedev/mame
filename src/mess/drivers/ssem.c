@@ -89,7 +89,7 @@ enum
 	PANEL_LNUP, PANEL_LNDN,
 
 	// Halt
-	PANEL_HALT,
+	PANEL_HALT
 };
 
 INPUT_CHANGED_MEMBER(ssem_state::panel_check)
