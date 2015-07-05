@@ -870,37 +870,44 @@ void ui_menu::handle_main_events(UINT32 flags)
 					else if (hover == HOVER_B_FAV)
 					{
 						menu_event.iptkey = IPT_UI_FAVORITES;
+						popmessage(NULL);
 						stop = true;
 					}
 					else if (hover == HOVER_B_EXPORT)
 					{
 						menu_event.iptkey = IPT_UI_EXPORT;
+						popmessage(NULL);
 						stop = true;
 					}
 					else if (hover == HOVER_B_HISTORY)
 					{
 						menu_event.iptkey = IPT_UI_HISTORY;
+						popmessage(NULL);
 						stop = true;
 					}
 					else if (hover == HOVER_B_MAMEINFO)
 					{
 						menu_event.iptkey = IPT_UI_MAMEINFO;
+						popmessage(NULL);
 						stop = true;
 					}
 					else if (hover == HOVER_B_COMMAND)
 					{
 						menu_event.iptkey = IPT_UI_COMMAND;
+						popmessage(NULL);
 						stop = true;
 					}
 					else if (hover == HOVER_B_SETTINGS)
 					{
 						menu_event.iptkey = IPT_UI_SELECT;
+						popmessage(NULL);
 						selected = visible_items + 1;
 						stop = true;
 					}
 					else if (hover == HOVER_B_FOLDERS)
 					{
 						menu_event.iptkey = IPT_UI_SELECT;
+						popmessage(NULL);
 						selected = visible_items + 2;
 						stop = true;
 					}
