@@ -935,9 +935,9 @@ ROM_START( jumpingi )
         ROM_LOAD( "26.IC119",            0x98000, 0x08000, CRC(7e1d58d8) SHA1(d586a018c3ec3e6e6a39992170d324361e03c68a) )
 
         ROM_REGION( 0x200, "pals", 0 )
-        ROM_LOAD( "jumping-pal16r6.bin",             0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) )
-        ROM_LOAD( "jumping-pal20l8.bin",             0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) )
-        ROM_LOAD( "pal16l8a.ic51.bin",               0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // z80 address decoder?
+        ROM_LOAD( "JP2.IC56",            0x000, 0x104, CRC(12e9a7b8) SHA1(a0ce8b6083c9adfcb4bdbca87f63a01f292525f3) ) // PAL16R6A-2CN
+        ROM_LOAD( "JP1.IC13",            0x000, 0x144, CRC(76944f81) SHA1(ab78e4e157ffdc13aea5dc360268b2640e60d19c) ) // PAL20L8A-2CNS
+        ROM_LOAD( "JP3.IC51",            0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // PAL16L8A-2CN z80 address decoder?
 ROM_END
 
 DRIVER_INIT_MEMBER(rbisland_state,rbisland)
