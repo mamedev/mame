@@ -56,9 +56,6 @@ public:
 	// Part of configuration
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
 
-	// Floppy interface
-	DECLARE_WRITE_LINE_MEMBER( indexhole );
-
 	// Genmod support
 	DECLARE_INPUT_CHANGED_MEMBER( genmod_changed );
 	void set_genmod(bool set);
@@ -245,17 +242,5 @@ protected:
 
 #define MCFG_PERIBOX_READY_HANDLER( _ready ) \
 	devcb = &peribox_device::static_set_ready_callback( *device, DEVCB_##_ready );
-
-
-/*
-    The following defines are required because the WD17xx device start implementation
-    assumes that the floppy devices are either at root level or at the parent
-    level. Our floppy devices, however, are at the grandparent level as seen from
-    the controller.
-*/
-#define PFLOPPY_0 ":peb:floppy0"
-#define PFLOPPY_1 ":peb:floppy1"
-#define PFLOPPY_2 ":peb:floppy2"
-#define PFLOPPY_3 ":peb:floppy3"
 
 #endif /* __PBOX__ */
