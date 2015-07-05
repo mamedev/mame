@@ -98,6 +98,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(halt_apb_w);
 	DECLARE_WRITE_LINE_MEMBER(int_w);
+	MC6845_UPDATE_ROW(update_row);
 
 private:
 	offs_t m_memsize;
@@ -105,8 +106,6 @@ private:
 	void install_memory();
 
 public:
-	UINT32 screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
@@ -116,32 +115,34 @@ public:
 #define PIXEL_CLOCK XTAL_4_433619MHz
 
 
-UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+MC6845_UPDATE_ROW( m20_state::update_row )
 {
-	int x,y,i;
-	UINT8 pen;
-	UINT32 count;
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	int i;
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	count = (0);
-
-	for(y=0; y<256; y++)
+	for ( i = 0; i < x_count; i++ )
 	{
-		for(x=0; x<512; x+=16)
-		{
-			for (i = 0; i < 16; i++)
-			{
-				pen = (m_p_videoram[count]) >> (15 - i) & 1;
+		UINT16 offset = ((ma | (ra << 1)) << 4) + i;
+		UINT16 data = m_p_videoram[ offset ];
 
-				if (screen.visible_area().contains(x + i, y))
-					bitmap.pix32(y, x + i) = m_palette->pen(pen);
-			}
-
-			count++;
-		}
+		*p = palette[( data & 0x8000 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x4000 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x2000 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x1000 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0800 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0400 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0200 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0100 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0080 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0040 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0020 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0010 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0008 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0004 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0002 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0001 ) ? 1 : 0]; p++;
 	}
-	return 0;
 }
 
 /*
@@ -708,7 +709,9 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
 
 	AM_RANGE(0x60, 0x61) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
+	AM_RANGE(0x62, 0x63) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0xff00) // FIXME
 	AM_RANGE(0x62, 0x63) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
+	AM_RANGE(0x64, 0x65) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 
 	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
 
@@ -799,7 +802,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m20_state, screen_update_m20)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */
@@ -811,6 +814,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8) /* hand tuned to get ~50 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
+	MCFG_MC6845_UPDATE_ROW_CB(m20_state, update_row)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 
