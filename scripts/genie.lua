@@ -129,6 +129,11 @@ newoption {
 }
 
 newoption {
+    trigger = 'with-bundled-portaudio',
+    description = 'Build bundled PortAudio library',
+}
+
+newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {
