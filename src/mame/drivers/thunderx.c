@@ -649,7 +649,7 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 	MCFG_SCREEN_REFRESH_RATE(59.17)             /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )  /* verified on scontra and thunderx PCBs */
 	MCFG_SCREEN_UPDATE_DRIVER(thunderx_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

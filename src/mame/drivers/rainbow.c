@@ -679,11 +679,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( jumping, rbisland_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb - system11 */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4) /* verified on pcb - system11 */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough unless otherwise */
@@ -713,10 +713,10 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/8) /* verified on pcb - system11 */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/8) /* verified on pcb - system11 */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

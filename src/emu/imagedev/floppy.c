@@ -18,7 +18,7 @@
 */
 
 // Show step operation
-#define TRACE_STEP 1
+#define TRACE_STEP 0
 
 // device type definition
 const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
