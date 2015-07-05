@@ -1300,11 +1300,13 @@ cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int hei
 	return curr;
 }
 
-void shaders::ntsc_pass(render_target *rt, poly_info *poly, int vertnum)
+int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
+	int next_index = source_index;
+
 	if (!options->yiq_enable)
 	{
-		return;
+		return next_index;
 	}
 
 	// Convert our signal into YIQ
@@ -1313,56 +1315,77 @@ void shaders::ntsc_pass(render_target *rt, poly_info *poly, int vertnum)
 	
 	// initial "Diffuse"  texture is set in shaders::set_texture()
 
-	blit(rt->native_target[0], true, D3DPT_TRIANGLELIST, 0, 2);
+	next_index = rt->next_index(next_index);
+	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 
 	// Convert our signal from YIQ
 	curr_effect = yiq_decode_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Composite", rt->native_texture[0]);
+	curr_effect->set_texture("Composite", rt->native_texture[next_index]);
 	curr_effect->set_texture("Diffuse", curr_texture->get_finaltex());
 
-	blit(rt->native_target[1], true, D3DPT_TRIANGLELIST, 0, 2);
+	next_index = rt->next_index(next_index);
+	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 	
-	color_effect->set_texture("Diffuse", rt->native_texture[1]);
+	color_effect->set_texture("Diffuse", rt->native_texture[next_index]);
+
+	return next_index;
 }
 
-void shaders::color_convolution_pass(render_target *rt, poly_info *poly, int vertnum)
+int shaders::color_convolution_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
+	int next_index = source_index;
+
 	curr_effect = color_effect;
 	curr_effect->update_uniforms();
 	
 	// initial "Diffuse" texture is set in shaders::set_texture() or the result of shaders::ntsc_pass()
-	
-	blit(rt->native_target[0], true, D3DPT_TRIANGLELIST, 0, 2);
+
+	next_index = rt->next_index(next_index);
+	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+
+	return next_index;
 }
 
-void shaders::prescale_pass(render_target *rt, poly_info *poly, int vertnum)
+int shaders::prescale_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
+	int next_index = source_index;
+
 	curr_effect = prescale_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->native_texture[0]);
+	curr_effect->set_texture("Diffuse", rt->native_texture[next_index]);
 
-	blit(rt->prescale_target[0], true, D3DPT_TRIANGLELIST, 0, 2);
+	next_index = rt->next_index(next_index);
+	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+
+	return next_index;
 }
 
-void shaders::deconverge_pass(render_target *rt, poly_info *poly, int vertnum)
+int shaders::deconverge_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
+	int next_index = source_index;
+
 	curr_effect = deconverge_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[0]);
+	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
 
-	blit(rt->prescale_target[1], true, D3DPT_TRIANGLELIST, 0, 2);
+	next_index = rt->next_index(next_index);
+	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
+
+	return next_index;
 }
 
-void shaders::defocus_pass(render_target *rt, poly_info *poly, int vertnum)
+int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
+	int next_index = source_index;
+
 	float defocus_x = options->defocus[0];
 	float defocus_y = options->defocus[1];
 	bool focus_enable = defocus_x != 0.0f || defocus_y != 0.0f;
 
 	if (!focus_enable)
 	{
-		return;
+		return next_index;
 	}
 
 	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
@@ -1370,19 +1393,25 @@ void shaders::defocus_pass(render_target *rt, poly_info *poly, int vertnum)
 	// Defocus pass 1
 	curr_effect = focus_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[1]);
+	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
 	curr_effect->set_vector("Prescale", 2, prescale);
 
-	blit(rt->prescale_target[0], true, D3DPT_TRIANGLELIST, 0, 2);
+	next_index = rt->next_index(next_index);
+	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 
 	// Defocus pass 2
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[0]);
+	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
 
-	blit(rt->prescale_target[1], false, D3DPT_TRIANGLELIST, 0, 2);
+	next_index = rt->next_index(next_index);
+	blit(rt->prescale_target[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+
+	return next_index;
 }
 
-void shaders::phosphor_pass(render_target *rt, cache_target *ct, poly_info *poly, int vertnum)
+int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum)
 {
+	int next_index = source_index;
+
 	phosphor_passthrough = false;
 
 	curr_effect = phosphor_effect;
@@ -1390,24 +1419,29 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, poly_info *poly
 
 	float rtsize[2] = { rt->target_width, rt->target_height };
 	curr_effect->set_vector("TargetDims", 2, rtsize);
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[1]);
+	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
 	curr_effect->set_texture("LastPass", ct->last_texture);
 
-	blit(rt->prescale_target[0], true, D3DPT_TRIANGLELIST, 0, 2);
+	next_index = rt->next_index(next_index);
+	blit(rt->prescale_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 	
 	phosphor_passthrough = true;
 
 	// Pass along our phosphor'd screen
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->prescale_texture[0]);
-	curr_effect->set_texture("LastPass", rt->prescale_texture[0]);
+	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+	curr_effect->set_texture("LastPass", rt->prescale_texture[next_index]);
 
 	// Avoid changing targets due to page flipping
 	blit(ct->last_target, true, D3DPT_TRIANGLELIST, 0, 2);
+
+	return next_index;
 }
 
-void shaders::post_pass(render_target *rt, poly_info *poly, int vertnum, bool prepare_bloom)
+int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom)
 {
+	int next_index = source_index;
+
 	texture_info *texture = poly->get_texture();
 
 	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
@@ -1420,7 +1454,7 @@ void shaders::post_pass(render_target *rt, poly_info *poly, int vertnum, bool pr
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
-	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[0]);
+	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
 	curr_effect->set_vector("Prescale", 2, prescale);
 	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
@@ -1429,19 +1463,26 @@ void shaders::post_pass(render_target *rt, poly_info *poly, int vertnum, bool pr
 
 	d3d->set_wrap(D3DTADDRESS_MIRROR);
 
-	blit(prepare_bloom ? rt->bloom_target[0] : rt->prescale_target[1], true, poly->get_type(), vertnum, poly->get_count());
-
+	next_index = rt->next_index(next_index);
+	blit(prepare_bloom ? rt->bloom_target[0] : rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+	
 	d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(poly->get_texture()->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
+
+	return next_index;
 }
 
-void shaders::bloom_pass(render_target *rt, poly_info *poly, int vertnum)
+int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
+	int next_index = source_index;
+
 	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
+	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
 
 	curr_effect = downsample_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_float("BloomRescale", options->raster_bloom_scale);
+	curr_effect->set_float("BloomRescale", prepare_vector ? options->vector_bloom_scale : options->raster_bloom_scale);
 	curr_effect->set_vector("Prescale", 2, prescale);
+	curr_effect->set_bool("PrepareVector", prepare_vector);
 
 	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	int bloom_index = 0;
@@ -1458,7 +1499,7 @@ void shaders::bloom_pass(render_target *rt, poly_info *poly, int vertnum)
 			curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
 			curr_effect->set_texture("DiffuseTexture", rt->bloom_texture[bloom_index - 1]);
 
-			blit(rt->bloom_target[bloom_index], true, D3DPT_TRIANGLELIST, 0, 2);
+			blit(rt->bloom_target[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
 		}
 
 		bloom_index++;
@@ -1469,6 +1510,7 @@ void shaders::bloom_pass(render_target *rt, poly_info *poly, int vertnum)
 	curr_effect = bloom_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_vector("Prescale", 2, prescale);
+	curr_effect->set_bool("PrepareVector", prepare_vector);
 
 	float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
 	float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
@@ -1494,16 +1536,22 @@ void shaders::bloom_pass(render_target *rt, poly_info *poly, int vertnum)
 		name[7] = 'A' + index;
 		curr_effect->set_texture(name, black_texture);
 	}
-	curr_effect->set_texture("DiffuseA", rt->prescale_texture[1]);
 
-	blit(rt->prescale_target[0], true, poly->get_type(), vertnum, poly->get_count());
+	curr_effect->set_texture("DiffuseA", rt->prescale_texture[next_index]);
+
+	next_index = rt->next_index(next_index);
+	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+
+	return next_index;
 }
 
-void shaders::screen_pass(render_target *rt, poly_info *poly, int vertnum)
+int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {	
+	int next_index = source_index;
+
 	curr_effect = simple_effect;
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[0]);
+	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
 
 	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
 
@@ -1518,6 +1566,8 @@ void shaders::screen_pass(render_target *rt, poly_info *poly, int vertnum)
 
 		snap_rendered = true;
 	}
+
+	return next_index;
 }
 
 
@@ -1545,16 +1595,18 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		cache_target *ct = find_cache_target(rt->screen_index, curr_texture->get_texinfo().width, curr_texture->get_texinfo().height);
 
-		ntsc_pass(rt, poly, vertnum);
-		color_convolution_pass(rt, poly, vertnum);
-		prescale_pass(rt, poly, vertnum);
-		deconverge_pass(rt, poly, vertnum);
-		defocus_pass(rt, poly, vertnum);
-		phosphor_pass(rt, ct, poly, vertnum);
-		post_pass(rt, poly, vertnum, true);
-		post_pass(rt, poly, vertnum, false);
-		bloom_pass(rt, poly, vertnum);
-		screen_pass(rt, poly, vertnum);
+		int next_index = 0;
+
+		next_index = ntsc_pass(rt, next_index, poly, vertnum);
+		next_index = color_convolution_pass(rt, next_index, poly, vertnum);
+		next_index = prescale_pass(rt, next_index, poly, vertnum);
+		next_index = deconverge_pass(rt, next_index, poly, vertnum);
+		next_index = defocus_pass(rt, next_index, poly, vertnum);
+		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
+		next_index = post_pass(rt, next_index, poly, vertnum, true);
+		next_index = post_pass(rt, next_index, poly, vertnum, false);
+		next_index = bloom_pass(rt, next_index, poly, vertnum);
+		next_index = screen_pass(rt, next_index, poly, vertnum);
 
 		curr_texture->increment_frame_count();
 		curr_texture->mask_frame_count(options->yiq_phase_count);
@@ -1597,93 +1649,26 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		
 		cache_target *ct = find_cache_target(rt->screen_index, rt->width, rt->height);
 
-		/* Bloom, todo: merge with bloom_pass() */
-		curr_effect = downsample_effect;
-		curr_effect->update_uniforms();
-		curr_effect->set_float("BloomRescale", options->vector_bloom_scale);
-		curr_effect->set_bool("PrepareVector", true);
+		int next_index = 0;
 
-		float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
-		int bloom_index = 0;
-		float bloom_width = rt->target_width;
-		float bloom_height = rt->target_height;
-		float bloom_dims[11][2];
-		for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
-		{
-			bloom_dims[bloom_index][0] = bloom_width;
-			bloom_dims[bloom_index][1] = bloom_height;
-			curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
-			curr_effect->set_texture("DiffuseTexture", (bloom_index == 0) ? rt->prescale_texture[0] : rt->bloom_texture[bloom_index - 1]);
-
-			blit(rt->bloom_target[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
-
-			bloom_index++;
-			bloom_width *= 0.5f;
-			bloom_height *= 0.5f;
-		}
-
-		// Bloom composite pass
-		curr_effect = bloom_effect;
+		// render into first bloom target
+		curr_effect = default_effect;
 		curr_effect->update_uniforms();
 
-		float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
-		float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
-		float weight89A[3]  = { options->bloom_level8_weight, options->bloom_level9_weight, options->bloom_level10_weight };
-		curr_effect->set_vector("Level0123Weight", 4, weight0123);
-		curr_effect->set_vector("Level4567Weight", 4, weight4567);
-		curr_effect->set_vector("Level89AWeight", 3, weight89A);
-		curr_effect->set_vector("Level01Size", 4, bloom_dims[0]);
-		curr_effect->set_vector("Level23Size", 4, bloom_dims[2]);
-		curr_effect->set_vector("Level45Size", 4, bloom_dims[4]);
-		curr_effect->set_vector("Level67Size", 4, bloom_dims[6]);
-		curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
-		curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
+		curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+		curr_effect->set_float("PostPass", 1.0f);
+		curr_effect->set_float("Brighten", 1.0f);
 
-		curr_effect->set_bool("PrepareVector", true);
+		blit(rt->bloom_target[0], true, poly->get_type(), vertnum, poly->get_count());
 
-		char name[9] = "Diffuse*";
-		for (int index = 1; index < bloom_index; index++)
-		{
-			name[7] = 'A' + index;
-			curr_effect->set_texture(name, rt->bloom_texture[index - 1]);
-		}
-		for (int index = bloom_index; index < 11; index++)
-		{
-			name[7] = 'A' + index;
-			curr_effect->set_texture(name, black_texture);
-		}
-		curr_effect->set_texture("DiffuseA", rt->prescale_texture[0]);
-
-		blit(rt->prescale_target[1], true, poly->get_type(), vertnum, poly->get_count());
-
-		/* Phosphor, todo: merge with phosphor_pass() */
-		phosphor_passthrough = false;
-
-		curr_effect = phosphor_effect;
-		curr_effect->update_uniforms();
-
-		float rtsize[2] = { d3d->get_width(), d3d->get_height() };
-		curr_effect->set_vector("TargetDims", 2, rtsize);
-		curr_effect->set_texture("Diffuse", rt->prescale_texture[1]);
-		curr_effect->set_texture("LastPass", ct->last_texture);
-
-		blit(rt->prescale_target[0], true, D3DPT_TRIANGLELIST, 0, 2);
-
-		phosphor_passthrough = true;
-
-		// Pass along our phosphor'd screen
-		curr_effect->update_uniforms();
-		curr_effect->set_texture("Diffuse", rt->prescale_texture[0]);
-		curr_effect->set_texture("LastPass", rt->prescale_texture[0]);
-
-		// Avoid changing targets due to page flipping
-		blit(ct->last_target, true, D3DPT_TRIANGLELIST, 0, 2);
+		next_index = bloom_pass(rt, next_index, poly, vertnum);
+		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
 
 		// render to screen backbuffer
 		curr_effect = default_effect;
 		curr_effect->update_uniforms();
 
-		curr_effect->set_texture("Diffuse", rt->prescale_texture[0]);
+		curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
 		curr_effect->set_float("PostPass", 1.0f);
 		curr_effect->set_float("Brighten", 1.0f);
 

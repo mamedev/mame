@@ -67,6 +67,7 @@ public:
 	~render_target();
 
 	bool init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	int next_index(int index) { return ++index > 1 ? 0 : index; }
 
 	int target_width;
 	int target_height;

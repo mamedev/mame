@@ -327,15 +327,15 @@ private:
 	void                    remove_cache_target(cache_target *cache);
 
 	// Shader passes
-	void                    ntsc_pass(render_target *rt, poly_info *poly, int vertnum);
-	void                    color_convolution_pass(render_target *rt, poly_info *poly, int vertnum);
-	void                    prescale_pass(render_target *rt, poly_info *poly, int vertnum);
-	void                    deconverge_pass(render_target *rt, poly_info *poly, int vertnum);
-	void                    defocus_pass(render_target *rt, poly_info *poly, int vertnum);
-	void                    phosphor_pass(render_target *rt, cache_target *ct, poly_info *poly, int vertnum);
-	void                    post_pass(render_target *rt, poly_info *poly, int vertnum, bool prepare_bloom);
-	void                    bloom_pass(render_target *rt, poly_info *poly, int vertnum);
-	void                    screen_pass(render_target *rt, poly_info *poly, int vertnum);
+	int                     ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     color_convolution_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     prescale_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     deconverge_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     defocus_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     phosphor_pass(render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum);
+	int                     post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
+	int                     bloom_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
 
