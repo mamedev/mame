@@ -837,6 +837,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"toshiba",
 		"trainer",
 		"trs",
+		"ultimachine",
 		"ultratec",
 		"unisys",
 		"veb",
@@ -2442,6 +2443,11 @@ files {
 	MAME_DIR .. "src/mess/machine/trs80m2kb.c", 
 	MAME_DIR .. "src/mess/drivers/tandy2k.c",
 	MAME_DIR .. "src/mess/machine/tandy2kb.c", 
+}
+
+createMESSProjects(_target, _subtarget, "ultimachine")
+files {
+	MAME_DIR .. "src/mess/drivers/rambo.c",
 }
 
 createMESSProjects(_target, _subtarget, "ultratec")
