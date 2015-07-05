@@ -195,13 +195,15 @@ void sm510_base_device::op_lax()
 void sm510_base_device::op_wr()
 {
 	// WR: shift 0 into W
-	op_illegal();
+	m_w = m_w << 1 | 0;
+	m_write_s(0, m_w, 0xff);
 }
 
 void sm510_base_device::op_ws()
 {
 	// WR: shift 1 into W
-	op_illegal();
+	m_w = m_w << 1 | 1;
+	m_write_s(0, m_w, 0xff);
 }
 
 
@@ -210,7 +212,7 @@ void sm510_base_device::op_ws()
 void sm510_base_device::op_kta()
 {
 	// KTA: input K to ACC
-	op_illegal();
+	m_acc = m_read_k(0, 0xff);
 }
 
 void sm510_base_device::op_atbp()
