@@ -14,6 +14,16 @@
 
 // I/O ports setup
 
+// 4-bit K input port
+#define MCFG_SM510_READ_K_CB(_devcb) \
+	sm510_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
+
+// 8-bit S strobe output port
+#define MCFG_SM510_WRITE_S_CB(_devcb) \
+	sm510_base_device::set_write_s_callback(*device, DEVCB_##_devcb);
+
+
+
 // pinout reference
 
 /*
@@ -31,10 +41,13 @@ public:
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
+		, m_read_k(*this)
+		, m_write_s(*this)
 	{ }
 
 	// static configuration helpers
-	//..
+	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_k.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_s_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -56,7 +69,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 0x40; } // actually 2, but debugger doesn't like non-linear pc
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -82,9 +95,11 @@ protected:
 	UINT8 m_bm;
 	UINT8 m_c;
 	bool m_skip;
+	UINT8 m_w;
 
 	// i/o handlers
-	//..
+	devcb_read16 m_read_k;
+	devcb_write8 m_write_s;
 
 	// misc internal helpers
 	void increment_pc();

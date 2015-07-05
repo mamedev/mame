@@ -115,7 +115,7 @@ CPU_DISASSEMBLE(sm510)
 	if (bits >= 8)
 	{
 		// note: disasm view shows correct parameter, but raw view does not
-		// note2: oprom array negative index access is intentional
+		// note2: oprom array negative index doesn't work either :(
 		param = oprom[s_next_pc[pc & 0x3f]];
 		len++;
 	}
@@ -141,6 +141,10 @@ CPU_DISASSEMBLE(sm510)
 			UINT16 address = (param << 4 & 0xc00) | (mask << 6 & 0x3c0) | (param & 0x03f);
 			dst += sprintf(dst, "$%03X", address);
 		}
+		
+		// show param offset
+		if (bits >= 8)
+			dst += sprintf(dst, " [$%03X]", pc + s_next_pc[pc & 0x3f]);
 	}
 	
 	return len | s_flags[instr] | DASMFLAG_SUPPORTED;

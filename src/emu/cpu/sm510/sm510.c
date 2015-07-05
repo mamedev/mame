@@ -36,7 +36,8 @@ void sm510_base_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 
 	// resolve callbacks
-	//..
+	m_read_k.resolve_safe(0);
+	m_write_s.resolve_safe();
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
@@ -50,6 +51,7 @@ void sm510_base_device::device_start()
 	m_bm = 0;
 	m_c = 0;
 	m_skip = false;
+	m_w = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -63,6 +65,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_bm));
 	save_item(NAME(m_c));
 	save_item(NAME(m_skip));
+	save_item(NAME(m_w));
 
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
