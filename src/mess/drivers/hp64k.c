@@ -1160,7 +1160,7 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 				MCFG_SCREEN_REFRESH_RATE(60)
 				MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
-						MCFG_FD1791_ADD("fdc" , XTAL_4MHz / 4)
+		                MCFG_FD1791_ADD("fdc" , XTAL_4MHz / 4)
 						MCFG_WD_FDC_FORCE_READY
 						MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_flp_intrq_w))
 						MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(hp64k_state , hp64k_flp_drq_w))
