@@ -1550,6 +1550,7 @@ void ui_menu::draw_toolbar(render_container *container, float x1, float y1, floa
 	float x_pixel = 1.0f / container->manager().ui_target().width();
 	x1 = (x1 + x2) * 0.5f - x_pixel * (m_valid * 18);
 
+	bool hovered = false;
 	for (int z = 0; z < MEWUI_TOOLBAR_BUTTONS; ++z)
 	{
 		if (t_bitmap[z]->valid())
@@ -1559,8 +1560,12 @@ void ui_menu::draw_toolbar(render_container *container, float x1, float y1, floa
 			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
 			{
 				hover = HOVER_B_FAV + z;
+				hovered = true;
 				color = ARGB_WHITE;
+				popmessage("%s", mewui_globals::hover_msg[z]);
 			}
+			else if (!hovered)
+				popmessage(NULL);
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			x1 += x_pixel * 36;

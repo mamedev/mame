@@ -214,7 +214,7 @@ struct c_year
 struct mewui_globals
 {
 	static UINT16       actual_filter, actual_sw_filter;
-	static const char   *filter_text[], *sw_filter_text[], *ume_text[];
+	static const char   *filter_text[], *sw_filter_text[], *ume_text[], *hover_msg[];
 	static size_t       s_filter_text, sw_filter_len, s_ume_text;
 	static UINT8        curimage_view, curdats_view, ume_system, cur_sw_dats_view, rpanel_infos;
 	static bool         switch_image, redraw_icon, default_image;

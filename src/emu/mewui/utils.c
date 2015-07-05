@@ -60,6 +60,15 @@ const char *mewui_globals::sw_filter_text[] = { "All", "Available", "Unavailable
 
 const char *mewui_globals::ume_text[] = { "ALL", "ARCADES", "SYSTEMS" };
 
+const char *mewui_globals::hover_msg[] = { "Add or remove favorites",
+                                           "Export displayed list to file",
+                                           "Show history.dat info",
+                                           "Show mameinfo.dat / messinfo.dat info",
+                                           "Show command.dat info",
+                                           "Setup directories",
+                                           "Configure options"
+                                           };
+
 size_t mewui_globals::s_filter_text = ARRAY_LENGTH(mewui_globals::filter_text);
 size_t mewui_globals::sw_filter_len = ARRAY_LENGTH(mewui_globals::sw_filter_text);
 size_t mewui_globals::s_ume_text = ARRAY_LENGTH(mewui_globals::ume_text);
