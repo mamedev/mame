@@ -23,14 +23,17 @@
 
 #include "ti99_hd.h"
 
-#define TRACE_STEPS 1
-#define TRACE_SIGNALS 1
+#define TRACE_STEPS 0
+#define TRACE_SIGNALS 0
 #define TRACE_READ 0
 #define TRACE_WRITE 0
-#define TRACE_CACHE 1
+#define TRACE_CACHE 0
 #define TRACE_RWTRACK 0
 #define TRACE_BITS 0
 #define TRACE_DETAIL 0
+#define TRACE_TIMING 0
+#define TRACE_IMAGE 0
+#define TRACE_STATE 1
 
 enum
 {
@@ -163,7 +166,7 @@ attotime mfm_harddisk_device::track_end_time()
 	if (!m_revolution_start_time.is_never())
 	{
 		endtime = m_revolution_start_time + nexttime;
-		if (TRACE_DETAIL) logerror("%s: Track start time = %s, end time = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(endtime).c_str());
+		if (TRACE_TIMING) logerror("%s: Track start time = %s, end time = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(endtime).c_str());
 	}
 	return endtime;
 }
@@ -218,7 +221,7 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 				{
 					m_ready = true;
 					m_recalibrated = true;
-					if (TRACE_SIGNALS) logerror("%s: Spinup complete, drive recalibrated and positioned at cylinder %d; drive is READY\n", tag(), m_current_cylinder);
+					if (TRACE_STATE) logerror("%s: Spinup complete, drive recalibrated and positioned at cylinder %d; drive is READY\n", tag(), m_current_cylinder);
 					if (!m_ready_cb.isnull()) m_ready_cb(this, ASSERT_LINE);
 				}
 				else
@@ -358,7 +361,7 @@ bool mfm_harddisk_device::find_position(attotime &from_when, const attotime &lim
 	// Reached the end
 	if (bytepos >= 10416)
 	{
-		if (TRACE_DETAIL) logerror("%s: Reached end: rev_start = %s, live = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(from_when).c_str());
+		if (TRACE_TIMING) logerror("%s: Reached end: rev_start = %s, live = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(from_when).c_str());
 		m_revolution_start_time += m_rev_time;
 		cell = (from_when - m_revolution_start_time).as_ticks(10000000);
 		bytepos = cell / 16;
@@ -366,7 +369,7 @@ bool mfm_harddisk_device::find_position(attotime &from_when, const attotime &lim
 
 	if (bytepos < 0)
 	{
-		if (TRACE_DETAIL) logerror("%s: Negative cell number: rev_start = %s, live = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(from_when).c_str());
+		if (TRACE_TIMING) logerror("%s: Negative cell number: rev_start = %s, live = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(from_when).c_str());
 		bytepos = 0;
 	}
 	bit = cell % 16;
@@ -450,7 +453,7 @@ bool mfm_harddisk_device::write(attotime &from_when, const attotime &limit, UINT
 		track[bytepos] = cdata;
 	}
 
-	if (TRACE_WRITE) if ((bitpos&0x0f)==0) logerror("%s: Writing data=%04x (c=%d,h=%d) at position %d\n", tag(), track[bytepos], m_current_cylinder, m_current_head, bytepos);
+	if (TRACE_WRITE) if ((bitpos&0x0f)==0) logerror("%s: Wrote data=%04x (c=%d,h=%d) at position %04x\n", tag(), track[bytepos], m_current_cylinder, m_current_head, bytepos);
 	return false;
 }
 
@@ -809,11 +812,15 @@ chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinde
 
 	int sec_il_start = 0;
 	int sec_number = 0;
+	int identfield = 0;
+	int cylfield = 0;
+	int headfield = 0;
+	int sizefield = (size >> 7)-1;
 
 	// Round up
 	int delta = (sectorcount + interleave-1) / interleave;
 
-	if (TRACE_DETAIL) logerror("%s: cyl=%02x head=%02x: sector sequence = ", tag(), cylinder&0xff, head&0xff);
+	if (TRACE_DETAIL) logerror("%s: cyl=%d head=%d: sector sequence = ", tag(), cylinder, head);
 	for (int sector = 0; sector < sectorcount; sector++)
 	{
 		if (TRACE_DETAIL) logerror("%02d ", sec_number);
@@ -823,13 +830,18 @@ chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinde
 
 		// Write IDAM
 		mfm_encode_a1(slot, position);
-		mfm_encode(slot, position, cylinder_to_ident(cylinder));
 
-		// Write header (according to MDM5: CHSL)
-		mfm_encode(slot, position, cylinder & 0xff);
-		mfm_encode(slot, position, head & 0xff);
+		// Write header
+		identfield = cylinder_to_ident(cylinder);
+		cylfield = cylinder & 0xff;
+		headfield = ((cylinder & 0x700)>>4) | (head&0x0f);
+
+		mfm_encode(slot, position, identfield);
+		mfm_encode(slot, position, cylfield);
+		mfm_encode(slot, position, headfield);
 		mfm_encode(slot, position, sec_number);
-		mfm_encode(slot, position, (size >> 7)-1);
+		mfm_encode(slot, position, sizefield);
+		// logerror("%s: Created header (%02x,%02x,%02x,%02x)\n", tag(), identfield, cylfield, headfield, sector);
 
 		// Write CRC for header.
 		int crc = m_current_crc;
@@ -847,9 +859,16 @@ chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinde
 		mfm_encode(slot, position, 0xfb);
 
 		// Get sector content from CHD
-		chd_error state = m_chd->read_units(chs_to_lba(cylinder, head, sec_number), sector_content);
-		if (state != CHDERR_NONE)
-			break;
+		int lbaposition = chs_to_lba(cylinder, head, sec_number);
+		if (lbaposition>=0)
+		{
+			chd_error state = m_chd->read_units(lbaposition, sector_content);
+			if (state != CHDERR_NONE) break;
+		}
+		else
+		{
+			logerror("%s: Invalid CHS data (%d,%d,%d); not loading from CHD\n", tag(), cylinder, head, sector);
+		}
 
 		for (int i=0; i < size; i++)
 			mfm_encode(slot, position, sector_content[i]);
@@ -874,7 +893,7 @@ chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinde
 	{
 		// Fill the rest with 0x4e
 		mfm_encode(slot, position, 0x4e, TRACKIMAGE_SIZE-position);
-		if (TRACE_DETAIL)
+		if (TRACE_IMAGE)
 		{
 			showtrack(slot->encdata, TRACKIMAGE_SIZE);
 		}
@@ -929,6 +948,7 @@ void mfmhd_trackimage_cache::write_back(mfmhd_trackimage* slot)
 	UINT8 byte;
 	bool search_header = true;
 
+	int ident = 0;
 	int cylinder = 0;
 	int head = 0;
 	int sector = 0;
@@ -938,6 +958,16 @@ void mfmhd_trackimage_cache::write_back(mfmhd_trackimage* slot)
 	int calc_interleave = 0;
 	int interleave_prec = -1;
 	bool check_interleave = true;
+
+	if (TRACE_IMAGE)
+	{
+		for (int i=0; i < TRACKIMAGE_SIZE; i++)
+		{
+			if ((i % 16)==0) logerror("\n%04x: ", i);
+			logerror("%02x ", (m_encoding==MFM_BITS || m_encoding==MFM_BYTE)? mfm_decode(track[i]) : (track[i]&0xff));
+		}
+		logerror("\n");
+	}
 
 	// We have to go through the bytes of the track and save a sector as soon as one shows up
 	while (bytepos < TRACKIMAGE_SIZE)
@@ -979,10 +1009,17 @@ void mfmhd_trackimage_cache::write_back(mfmhd_trackimage* slot)
 					if (search_header)
 					{
 						// Found a header
-						// ident = buffer[0];   // check?
-						cylinder = buffer[1];
-						head = buffer[2];
+						ident = buffer[0];
+						// Highest three bits are in the head field
+						cylinder = buffer[1] | ((buffer[2]&0x70)<<4);
+						head = buffer[2] & 0x0f;
 						sector = buffer[3];
+						int identexp = cylinder_to_ident(cylinder);
+
+						if (identexp != ident)
+						{
+							logerror("%s: MFM HD: Field error; ident = %02x (expected %02x) for sector chs=(%d,%d,%d)\n", tag(), ident, identexp, cylinder, head, sector);
+						}
 
 						// Count the sectors for the interleave
 						if (check_interleave)
@@ -1005,19 +1042,28 @@ void mfmhd_trackimage_cache::write_back(mfmhd_trackimage* slot)
 					{
 						// Sector contents
 						// Write the sectors to the CHD
-						if (TRACE_DETAIL) logerror("%s: MFM HD: Writing sector chs=(%d,%d,%d) to CHD\n", tag(), cylinder, head, sector);
-						chd_error state = m_chd->write_units(chs_to_lba(cylinder, head, sector), buffer);
-
-						if (state != CHDERR_NONE)
+						int lbaposition = chs_to_lba(cylinder, head, sector);
+						if (lbaposition>=0)
 						{
-							logerror("%s: MFM HD: Write error while writing sector chs=(%d,%d,%d)\n", tag(), cylinder, head, sector);
+							if (TRACE_DETAIL) logerror("%s: MFM HD: Writing sector chs=(%d,%d,%d) to CHD\n", tag(), cylinder, head, sector);
+							chd_error state = m_chd->write_units(chs_to_lba(cylinder, head, sector), buffer);
+
+							if (state != CHDERR_NONE)
+							{
+								logerror("%s: MFM HD: Write error while writing sector chs=(%d,%d,%d)\n", tag(), cylinder, head, sector);
+							}
 						}
+						else
+						{
+							logerror("%s: Invalid CHS data in track image: (%d,%d,%d); not saving to CHD\n", tag(), cylinder, head, sector);
+						}
+
 						search_header = true;
 					}
 				}
 				else
 				{
-					logerror("%s: MFM HD: CRC error\n", tag());
+					logerror("%s: MFM HD: CRC error in %s of (%d,%d,%d)\n", tag(), search_header? "header" : "data", cylinder, head, sector);
 					search_header = true;
 				}
 				// search next A1
