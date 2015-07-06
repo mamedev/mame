@@ -1924,7 +1924,7 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sstingry_sound_map)
 	MCFG_CPU_IO_MAP(kyros_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  2*60)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
 	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
@@ -1978,7 +1978,7 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6) /* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_sound_map)
 	MCFG_CPU_IO_MAP(kyros_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq0_line_hold,  2*60)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
