@@ -10,7 +10,7 @@
 #include "cpu/m6502/m6502.h"
 #include "formats/basicdsk.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cassette_tx );
 	DECLARE_WRITE_LINE_MEMBER( write_cassette_clock );
 
-	DECLARE_WRITE_LINE_MEMBER(osi470_index_callback);
+	void floppy_index_callback(floppy_image_device *floppy, int state);
 
 	DECLARE_PALETTE_INIT(osi630);
 
@@ -126,19 +126,23 @@ public:
 class c1pmf_state : public c1p_state
 {
 public:
-	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: c1p_state(mconfig, type, tag),
-			m_floppy(*this, FLOPPY_0)
+	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		c1p_state(mconfig, type, tag),
+		m_floppy0(*this, "floppy0"),
+		m_floppy1(*this, "floppy1")
 	{ }
-
-	required_device<legacy_floppy_image_device> m_floppy;
-
-	virtual void machine_start();
 
 	DECLARE_READ8_MEMBER( osi470_pia_pa_r );
 	DECLARE_WRITE8_MEMBER( osi470_pia_pa_w );
 	DECLARE_WRITE8_MEMBER( osi470_pia_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
+
+protected:
+	virtual void machine_start();
+
+private:
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 class uk101_state : public sb2m600_state
