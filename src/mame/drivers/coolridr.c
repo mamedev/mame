@@ -344,7 +344,8 @@ public:
 
 	// store the blit params here
 	UINT32 m_spriteblit[12];
-
+	UINT32 m_vregs_address;
+	
 	UINT32 m_clipvals[2][3];
 	UINT8  m_clipblitterMode[2]; // hack
 
@@ -782,6 +783,7 @@ void coolridr_state::coolriders_drawgfx_transpen(bitmap_ind16 &dest, const recta
 void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	int bg_r,bg_g,bg_b;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if(m_pen_fill[which])
 	{
@@ -807,7 +809,7 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 		UINT8 transpen_setting;
 		gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
 		#define VREG(_offs) \
-			m_framebuffer_vram[(0x9b80+_offs+which*0x40)/4]
+			space.read_dword(m_vregs_address+_offs+which*0x40)
 
 		scrollx = (VREG(0x2c) >> 16) & 0x7ff;
 		scrolly = VREG(0x2c) & 0x3ff;
@@ -2729,7 +2731,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 
 	do{
 		cmd = (m_framebuffer_vram[(0+dma_index)/4] & 0xfc000000) >> 24;
-
+		
 		switch(cmd)
 		{
 			case 0x00: /* end of list marker */
@@ -2740,6 +2742,8 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				src = (m_framebuffer_vram[(0+dma_index)/4] & 0x03ffffff);
 				dst = (m_framebuffer_vram[(4+dma_index)/4]);
 				size = m_framebuffer_vram[(8+dma_index)/4];
+				printf("%08x %08x %04x\n",src,dst,size);
+
 				if(dst & 0xfff00001)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
 				dst &= 0x000ffffe;
@@ -2795,12 +2799,17 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				dma_index+=0xc;
 				break;
 
-			case 0x04: /* init - value 0x040c80d2 (unknown purpose, slave mode?) */
+				break;
 			case 0x10: /* sets up look-up for tilemap video registers */
+				m_vregs_address = (m_framebuffer_vram[(0+dma_index)/4] & 0x03ffffff);
+				dma_index+=4;
+				break;
+			case 0x04: /* init - value 0x040c80d2 (unknown purpose, slave mode?) */
 			case 0x20: /* screen 1 - linescroll/zoom table? (default values) */
 			case 0x24: /* screen 2 / */
 			case 0x50: /* screen 1 - unknown */
 			case 0x54: /* screen 2 / */
+				//printf("%02x %08x\n",cmd,m_framebuffer_vram[(0+dma_index)/4]);
 				dma_index+=4;
 				break;
 			case 0x30: /* screen 1 - 0x80 at boot, then 0x808080  */
@@ -2858,6 +2867,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(aquastge_h1_map, AS_PROGRAM, 32, coolridr_state)
 	AM_RANGE(0x03c00000, 0x03c0ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
+	AM_RANGE(0x03f50000, 0x03f5ffff) AM_RAM // video registers
 	AM_RANGE(0x03e10000, 0x03e1ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_IMPORT_FROM(system_h1_map)
