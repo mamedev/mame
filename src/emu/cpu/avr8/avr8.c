@@ -3541,7 +3541,7 @@ void avr8_device::execute_run()
 										opcycles = 2;
 										break;
 									case 0x0010:    // EIJMP
-										m_pc = ZREG + m_r[AVR8_REGIDX_EIND] - 1;
+										m_pc = (m_r[AVR8_REGIDX_EIND] << 16 | ZREG) - 1;
 										opcycles = 2;
 										break;
 									default:
