@@ -49,7 +49,7 @@ NETLIB_START(SN74LS629clk)
 	register_input("FB",    m_FB);
 	register_output("Y",    m_Y);
 
-	connect(m_FB, m_Y);
+	connect_late(m_FB, m_Y);
 
 	reset();
 
@@ -89,9 +89,9 @@ NETLIB_START(SN74LS629)
 	register_input("FC",     m_FC);
 	register_subalias("GND",    m_R_FC.m_N);
 
-	connect(m_FC, m_R_FC.m_P);
-	connect(m_RNG, m_R_RNG.m_P);
-	connect(m_R_FC.m_N, m_R_RNG.m_N);
+	connect_late(m_FC, m_R_FC.m_P);
+	connect_late(m_RNG, m_R_RNG.m_P);
+	connect_late(m_R_FC.m_N, m_R_RNG.m_N);
 
 	register_subalias("Y", m_clock.m_Y);
 	register_param("CAP", m_CAP, 1e-6);
@@ -143,7 +143,7 @@ NETLIB_UPDATE(SN74LS629)
 		freq += k9 * v_rng * v_freq_3;
 		freq += k10 * v_rng * v_freq_4;
 
-		freq *= NL_FCONST(0.1e-6) / m_CAP.Value();
+		freq *= NL_FCONST(0.1e-6) / m_CAP;
 
 		// FIXME: we need a possibility to remove entries from queue ...
 		//        or an exact model ...
@@ -189,7 +189,7 @@ NETLIB_START(SN74LS629_dip)
 
 	register_subalias("8",  m_1.m_R_FC.m_N);
 	register_subalias("9",  m_1.m_R_FC.m_N);
-	connect(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
+	connect_late(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
 
 	register_subalias("10",  m_2.m_clock.m_Y);
 

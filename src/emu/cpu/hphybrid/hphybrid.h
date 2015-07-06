@@ -65,6 +65,8 @@
 class hp_hybrid_cpu_device : public cpu_device
 {
 public:
+        DECLARE_WRITE_LINE_MEMBER(dmar_w);
+
 protected:
 		hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
@@ -124,6 +126,7 @@ private:
 		UINT16 get_skip_addr_sc(UINT16 opcode , UINT16& v , unsigned n);
 		void do_pw(UINT16 opcode);
 		void check_for_interrupts(void);
+                void handle_dma(void);
 
 		UINT16 RM(UINT16 addr);
 		void   WM(UINT16 addr , UINT16 v);

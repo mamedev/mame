@@ -678,7 +678,7 @@ INLINE UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address)
 			// do a cache fill if the line is invalid or the tags don't match
 			if ((!m68k->ic_valid[idx]) || (m68k->ic_address[idx] != tag))
 			{
-				m68k->ic_data[idx] = m68k->read32(address & ~3);
+				UINT32 data = m68k->read32(address & ~3);
 
 //              printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
 
@@ -686,6 +686,7 @@ INLINE UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address)
 				if (!m68k->mmu_tmp_buserror_occurred)
 				{
 					m68k->ic_address[idx] = tag;
+					m68k->ic_data[idx] = data;
 					m68k->ic_valid[idx] = true;
 				}
 				else

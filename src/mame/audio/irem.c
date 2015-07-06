@@ -389,42 +389,33 @@ ADDRESS_MAP_END
  * https://www.youtube.com/watch?v=aarl0xfBQf0
  *
  */
+
 #define USE_FRONTIERS 1
 #define USE_FIXED_STV 1
 
 #include "nl_kidniki.c"
 
 NETLIST_START(kidniki_interface)
-#if 0
-	SOLVER(Solver, 12000)
-	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 300)
-	PARAM(Solver.GS_LOOPS, 2)
-#else
-	SOLVER(Solver, 12000)
-	PARAM(Solver.ACCURACY, 1e-9)
+
+#if (USE_FRONTIERS)
+	SOLVER(Solver, 18000)
+	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 300)
 	PARAM(Solver.GS_LOOPS, 1)
 	PARAM(Solver.GS_THRESHOLD, 99)
 	PARAM(Solver.ITERATIVE, "SOR")
-#endif
-	//PARAM(Solver.GS_THRESHOLD, 99) // Force Gaussian elimination here
+	PARAM(Solver.PARALLEL, 1)
 	PARAM(Solver.SOR_FACTOR, 1.00)
-	//FIXME proper models!
-	NET_MODEL(".model 2SC945 NPN(Is=2.04f Xti=3 Eg=1.11 Vaf=6 Bf=400 Ikf=20m Xtb=1.5 Br=3.377 Rc=1 Cjc=1p Mjc=.3333 Vjc=.75 Fc=.5 Cje=25p Mje=.3333 Vje=.75 Tr=450n Tf=20n Itf=0 Vtf=0 Xtf=0 VCEO=45V ICrating=150M MFG=Toshiba)")
-	NET_MODEL(".model 1S1588 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
+#else
+	SOLVER(Solver, 12000)
+	PARAM(Solver.ACCURACY, 1e-8)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.GS_LOOPS, 20)
+	PARAM(Solver.ITERATIVE, "GMRES")
+	PARAM(Solver.PARALLEL, 0)
+#endif
 
 	LOCAL_SOURCE(kidniki_schematics)
-
-	/*
-	 * Workaround: The simplified opamp model does not correctly
-	 * model the internals of the inputs.
-	 */
-
-	ANALOG_INPUT(VWORKAROUND, 2.061)
-	RES(RWORKAROUND, RES_K(27))
-	NET_C(VWORKAROUND.Q, RWORKAROUND.1)
-	NET_C(XU1.6, RWORKAROUND.2)
 
 	ANALOG_INPUT(I_V5, 5)
 	//ANALOG_INPUT(I_V0, 0)
@@ -461,34 +452,31 @@ NETLIST_START(kidniki_interface)
 	ALIAS(I_SINH0, SINH_DUMMY.2)
 #endif
 
-	TTL_INPUT(I_SD0, 1)
+	NET_MODEL(".model AY8910PORT FAMILY(OVL=0.05 OVH=4.95 ORL=100.0 ORH=0.5k)")
+
+	LOGIC_INPUT(I_SD0, 1, "AY8910PORT")
 	//CLOCK(I_SD0, 5)
-	TTL_INPUT(I_BD0, 1)
+	LOGIC_INPUT(I_BD0, 1, "AY8910PORT")
 	//CLOCK(I_BD0, 5)
-	TTL_INPUT(I_CH0, 1)
+	LOGIC_INPUT(I_CH0, 1, "AY8910PORT")
 	//CLOCK(I_CH0, 2.2  )
-	TTL_INPUT(I_OH0, 1)
+	LOGIC_INPUT(I_OH0, 1, "AY8910PORT")
 	//CLOCK(I_OH0, 1.0)
 	ANALOG_INPUT(I_MSM2K0, 0)
 	ANALOG_INPUT(I_MSM3K0, 0)
 
 	INCLUDE(kidniki_schematics)
 
-	CAP(C26, CAP_U(1))
-	RES(R25, 560)
-	RES(R26, RES_K(47))
-	CAP(C29, CAP_U(0.01))
-
-	NET_C(RV1.2, C26.1)
-	NET_C(C26.2, R25.1)
-	NET_C(R25.2, R26.1, C29.1)
-	NET_C(R26.2, C29.2, GND)
-
 	#if (USE_FRONTIERS)
 	OPTIMIZE_FRONTIER(C63.2, RES_K(27), RES_K(1))
 	OPTIMIZE_FRONTIER(R31.2, RES_K(5.1), 50)
 	OPTIMIZE_FRONTIER(R29.2, RES_K(2.7), 50)
 	OPTIMIZE_FRONTIER(R87.2, RES_K(68), 50)
+
+	OPTIMIZE_FRONTIER(R50.1, RES_K(2.2), 50)
+	OPTIMIZE_FRONTIER(R55.1, RES_K(510), 50)
+	OPTIMIZE_FRONTIER(R84.2, RES_K(50), RES_K(5))
+
 	#endif
 
 NETLIST_END()

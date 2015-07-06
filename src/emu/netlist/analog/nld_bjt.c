@@ -83,10 +83,10 @@ NETLIB_START(QBJT_switch)
 	register_terminal("_B1", m_BC_dummy.m_P);
 	register_terminal("_C1", m_BC_dummy.m_N);
 
-	connect(m_RB.m_N, m_RC.m_N);
+	connect_late(m_RB.m_N, m_RC.m_N);
 
-	connect(m_RB.m_P, m_BC_dummy.m_P);
-	connect(m_RC.m_P, m_BC_dummy.m_N);
+	connect_late(m_RB.m_P, m_BC_dummy.m_P);
+	connect_late(m_RC.m_P, m_BC_dummy.m_N);
 
 	save(NLNAME(m_state_on));
 
@@ -185,9 +185,9 @@ NETLIB_START(QBJT_EB)
 	register_terminal("_E1", m_D_EC.m_P);
 	register_terminal("_C1", m_D_EC.m_N);
 
-	connect(m_D_EB.m_P, m_D_EC.m_P);
-	connect(m_D_EB.m_N, m_D_CB.m_N);
-	connect(m_D_CB.m_P, m_D_EC.m_N);
+	connect_late(m_D_EB.m_P, m_D_EC.m_P);
+	connect_late(m_D_EB.m_N, m_D_CB.m_N);
+	connect_late(m_D_CB.m_P, m_D_EC.m_N);
 
 	m_gD_BE.save("m_D_BE", *this);
 	m_gD_BC.save("m_D_BC", *this);

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz,Tyler J. Stachecki
 /***************************************************************************
 
     rspcp2.c
@@ -11,13 +11,564 @@
 
 #include "emu.h"
 #include "rsp.h"
-#include "rspdiv.h"
 #include "rspcp2.h"
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
 
-using namespace uml;
+#if USE_SIMD
+#include <emmintrin.h>
+
+const rsp_cop2::vec_helpers_t rsp_cop2::m_vec_helpers = {
+	{ 0 },
+	{ // logic_mask
+		{  0,  0,  0,  0,  0,  0,  0,  0 },
+		{ ~0, ~0, ~0, ~0, ~0, ~0, ~0, ~0 }
+	},
+	{ // vrsq_mask_table
+		{ ~0,  0,  0,  0,  0,  0,  0,  0 },
+		{  0, ~0,  0,  0,  0,  0,  0,  0 },
+		{  0,  0, ~0,  0,  0,  0,  0,  0 },
+		{  0,  0,  0, ~0,  0,  0,  0,  0 },
+		{  0,  0,  0,  0, ~0,  0,  0,  0 },
+		{  0,  0,  0,  0,  0, ~0,  0,  0 },
+		{  0,  0,  0,  0,  0,  0, ~0,  0 },
+		{  0,  0,  0,  0,  0,  0,  0, ~0 }
+	},
+	{ // shuffle_keys
+		{ 0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e }, /* -- */
+		{ 0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e }, /* -- */
+
+		{ 0x0100, 0x0100, 0x0504, 0x0504, 0x0908, 0x0908, 0x0d0c, 0x0d0c }, /* 0q */
+		{ 0x0302, 0x0302, 0x0706, 0x0706, 0x0b0a, 0x0b0a, 0x0f0e, 0x0f0e }, /* 1q */
+
+		{ 0x0100, 0x0100, 0x0100, 0x0100, 0x0908, 0x0908, 0x0908, 0x0908 }, /* 0h */
+		{ 0x0302, 0x0302, 0x0302, 0x0302, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a }, /* 1h */
+		{ 0x0504, 0x0504, 0x0504, 0x0504, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c }, /* 2h */
+		{ 0x0706, 0x0706, 0x0706, 0x0706, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e }, /* 3h */
+
+		{ 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100 }, /* 0w */
+		{ 0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302, 0x0302 }, /* 1w */
+		{ 0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504, 0x0504 }, /* 2w */
+		{ 0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706, 0x0706 }, /* 3w */
+		{ 0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908, 0x0908 }, /* 4w */
+		{ 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a, 0x0b0a }, /* 5w */
+		{ 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c, 0x0d0c }, /* 6w */
+		{ 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e }  /* 7w */
+	},
+	{ // sll_b2l_keys
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0102, 0x8000, 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c },
+		{ 0x0001, 0x8080, 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b },
+		{ 0x8000, 0x8080, 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a },
+
+		{ 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
+		{ 0x8080, 0x8080, 0x0102, 0x8000, 0x0506, 0x0304, 0x090a, 0x0708 },
+		{ 0x8080, 0x8080, 0x0001, 0x8080, 0x0405, 0x0203, 0x0809, 0x0607 },
+		{ 0x8080, 0x8080, 0x8000, 0x8080, 0x0304, 0x0102, 0x0708, 0x0506 },
+
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0102, 0x8000, 0x0506, 0x0304 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0001, 0x8080, 0x0405, 0x0203 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8000, 0x8080, 0x0304, 0x0102 },
+
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0102, 0x8000 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0001, 0x8080 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8000, 0x8080 }
+	},
+	{ // sll_l2b_keys
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e },
+		{ 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f },
+		{ 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08 },
+
+		{ 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
+		{ 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a },
+		{ 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b },
+		{ 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04 },
+
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700 },
+
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380 }
+	},
+	{ // srl_b2l_keys
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f80, 0x0d0e },
+		{ 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x8080, 0x0e0f },
+		{ 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x8080, 0x0f80 },
+
+		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x8080, 0x8080 },
+		{ 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f80, 0x0d0e, 0x8080, 0x8080 },
+		{ 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x8080, 0x0e0f, 0x8080, 0x8080 },
+		{ 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x8080, 0x0f80, 0x8080, 0x8080 },
+
+		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0b0c, 0x090a, 0x0f80, 0x0d0e, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0c0d, 0x0a0b, 0x8080, 0x0e0f, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0d0e, 0x0b0c, 0x8080, 0x0f80, 0x8080, 0x8080, 0x8080, 0x8080 },
+
+		{ 0x0e0f, 0x0c0d, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0f80, 0x0d0e, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x8080, 0x0e0f, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x8080, 0x0f80, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 }
+	},
+	{ // ror_b2l_keys
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f00, 0x0d0e },
+		{ 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x0001, 0x0e0f },
+		{ 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x0102, 0x0f00 },
+
+		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
+		{ 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f00, 0x0d0e, 0x0304, 0x0102 },
+		{ 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x0001, 0x0e0f, 0x0405, 0x0203 },
+		{ 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x0102, 0x0f00, 0x0506, 0x0304 },
+
+		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x0b0c, 0x090a, 0x0f00, 0x0d0e, 0x0304, 0x0102, 0x0708, 0x0506 },
+		{ 0x0c0d, 0x0a0b, 0x0001, 0x0e0f, 0x0405, 0x0203, 0x0809, 0x0607 },
+		{ 0x0d0e, 0x0b0c, 0x0102, 0x0f00, 0x0506, 0x0304, 0x090a, 0x0708 },
+
+		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
+		{ 0x0f00, 0x0d0e, 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a },
+		{ 0x0001, 0x0e0f, 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b },
+		{ 0x0102, 0x0f00, 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c }
+	},
+	{ // rol_l2b_keys
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e },
+		{ 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f },
+		{ 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08 },
+
+		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
+		{ 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a },
+		{ 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b },
+		{ 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04 },
+
+		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506 },
+		{ 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607 },
+		{ 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400 },
+
+		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
+		{ 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102 },
+		{ 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203 },
+		{ 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c }
+	},
+	{ // ror_l2b_keys
+		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d },
+		{ 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c },
+		{ 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203 },
+		{ 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102 },
+
+		{ 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
+		{ 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700 },
+		{ 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607 },
+		{ 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506 },
+
+		{ 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
+		{ 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04 },
+		{ 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b },
+		{ 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a },
+
+		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809 },
+		{ 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08 },
+		{ 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f },
+		{ 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e }
+	},
+	{ // qr_lut
+		{ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0xff00, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0xff00, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+
+		{ 0x0000, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff},
+		{ 0x0000, 0x0000, 0xff00, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0xff00, 0xffff, 0xffff, 0xffff, 0xffff },
+
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0xff00, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xff00, 0xffff, 0xffff },
+
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xff00, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xff00 }
+	},
+	{ // bdls_lut - mask to denote which part of the vector to load/store.
+		{ 0x00ff, 0x0000, 0x0000, 0x0000 }, // B
+		{ 0xffff, 0x0000, 0x0000, 0x0000 }, // S
+		{ 0xffff, 0xffff, 0x0000, 0x0000 }, // L
+		{ 0xffff, 0xffff, 0xffff, 0xffff }  // D
+	}
+};
+
+#ifndef __SSSE3__
+// TODO: Highly optimized. More of a stopgap measure.
+static inline rsp_vec_t sse2_pshufb(rsp_vec_t v, const UINT16 *keys)
+{
+	UINT8 dest[16];
+	UINT8 temp[16];
+
+	_mm_storeu_si128((rsp_vec_t *) temp, v);
+
+	for (UINT32 j = 0; j < 8; j++)
+	{
+		UINT16 key = keys[j];
+		UINT8 key_hi = key >> 8;
+		UINT8 key_lo = key >> 0;
+
+		dest[(j << 1) + 1] = key_hi == 0x80 ? 0x00 : temp[key_hi];
+		dest[(j << 1) + 0] = key_lo == 0x80 ? 0x00 : temp[key_lo];
+	}
+
+	return _mm_loadu_si128((rsp_vec_t *) dest);
+}
+
+rsp_vec_t rsp_cop2::vec_load_and_shuffle_operand(const UINT16* src, UINT32 element)
+{
+	if (element >= 8) // element => 0w ... 7w
+	{
+		UINT16 word_lo;
+
+		memcpy(&word_lo, src + (element - 8), sizeof(word_lo));
+		UINT64 dword = word_lo | ((UINT32) word_lo << 16);
+
+		return _mm_shuffle_epi32(_mm_loadl_epi64((rsp_vec_t*) &dword), _MM_SHUFFLE(0,0,0,0));
+	}
+	else if (element >= 4) // element => 0h ... 3h
+	{
+		UINT16 word_lo;
+		UINT16 word_hi;
+
+		memcpy(&word_hi, src + element - 0, sizeof(word_hi));
+		memcpy(&word_lo, src + element - 4, sizeof(word_lo));
+		UINT64 dword = word_lo | ((UINT32) word_hi << 16);
+
+		rsp_vec_t v = _mm_loadl_epi64((rsp_vec_t*) &dword);
+		v = _mm_shufflelo_epi16(v, _MM_SHUFFLE(1,1,0,0));
+		return _mm_shuffle_epi32(v, _MM_SHUFFLE(1,1,0,0));
+	}
+	else if (element >= 2) // element => 0q ... 1q
+	{
+		rsp_vec_t v = vec_load_unshuffled_operand(src);
+
+		if (element == 2) {
+			v = _mm_shufflelo_epi16(v, _MM_SHUFFLE(3,3,1,1));
+			v = _mm_shufflehi_epi16(v, _MM_SHUFFLE(3,3,1,1));
+		}
+		else
+		{
+			v = _mm_shufflelo_epi16(v, _MM_SHUFFLE(2,2,0,0));
+			v = _mm_shufflehi_epi16(v, _MM_SHUFFLE(2,2,0,0));
+		}
+
+		return v;
+	}
+
+	return vec_load_unshuffled_operand(src);
+}
+#else
+rsp_vec_t rsp_cop2::vec_load_and_shuffle_operand(const UINT16* src, UINT32 element)
+{
+	rsp_vec_t operand = _mm_load_si128((rsp_vec_t*) src);
+	rsp_vec_t key = _mm_load_si128((rsp_vec_t*) m_vec_helpers.shuffle_keys[element]);
+
+	return _mm_shuffle_epi8(operand, key);
+}
+#endif
+//
+// SSSE3+ accelerated loads for group I. Byteswap big-endian to 2-byte
+// little-endian vector. Start at vector element offset, discarding any
+// wraparound as necessary.
+//
+// TODO: Reverse-engineer what happens when loads to vector elements must
+//       wraparound. Do we just discard the data, as below, or does the
+//       data effectively get rotated around the edge of the vector?
+//
+void rsp_cop2::vec_load_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_vec_t reg, rsp_vec_t dqm)
+{
+	UINT32 offset = addr & 0x7;
+	UINT32 ror = offset - element;
+
+	// Always load in 8-byte chunks to emulate wraparound.
+	rsp_vec_t data;
+	if (offset) {
+		UINT32 aligned_addr_lo = addr & ~0x7;
+		UINT32 aligned_addr_hi = (aligned_addr_lo + 8) & 0xFFF;
+
+		data = _mm_loadl_epi64((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr_lo));
+		rsp_vec_t temp = _mm_loadl_epi64((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr_hi));
+		data = _mm_unpacklo_epi64(data, temp);
+	}
+	else
+	{
+		data = _mm_loadl_epi64((rsp_vec_t *) (m_rsp.get_dmem() + addr));
+	}
+
+	// Shift the DQM up to the point where we mux in the data.
+#ifndef __SSSE3__
+	dqm = sse2_pshufb(dqm, m_vec_helpers.sll_b2l_keys[element]);
+#else
+	rsp_vec_t ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.sll_b2l_keys[element]));
+	dqm = _mm_shuffle_epi8(dqm, ekey);
+#endif
+
+  // Align the data to the DQM so we can mask it in.
+#ifndef __SSSE3__
+	data = sse2_pshufb(data, m_vec_helpers.ror_b2l_keys[ror & 0xF]);
+#else
+	ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.ror_b2l_keys[ror & 0xF]));
+	data = _mm_shuffle_epi8(data, ekey);
+#endif
+
+  // Mask and mux in the data.
+#ifdef __SSE4_1__
+	reg = _mm_blendv_epi8(reg, data, dqm);
+#else
+	data = _mm_and_si128(dqm, data);
+	reg = _mm_andnot_si128(dqm, reg);
+	reg = _mm_or_si128(data, reg);
+#endif
+
+	_mm_store_si128((rsp_vec_t *) regp, reg);
+}
+
+//
+// SSSE3+ accelerated loads for group II.
+//
+// TODO: Reverse-engineer what happens when loads to vector elements must
+//       wraparound. Do we just discard the data, as below, or does the
+//       data effectively get rotated around the edge of the vector?
+//
+// TODO: Reverse-engineer what happens when element != 0.
+//
+void rsp_cop2::vec_load_group2(UINT32 addr, UINT32 element, UINT16 *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
+	UINT32 offset = addr & 0x7;
+	rsp_vec_t data;
+
+	// Always load in 8-byte chunks to emulate wraparound.
+	if (offset) {
+		UINT32 aligned_addr_lo = addr & ~0x7;
+		UINT32 aligned_addr_hi = (aligned_addr_lo + 8) & 0xFFF;
+		UINT64 datalow, datahigh;
+
+		memcpy(&datalow, m_rsp.get_dmem() + aligned_addr_lo, sizeof(datalow));
+		memcpy(&datahigh, m_rsp.get_dmem() + aligned_addr_hi, sizeof(datahigh));
+
+		// TODO: Test for endian issues?
+		datahigh >>= ((8 - offset) << 3);
+		datalow <<= (offset << 3);
+		datalow = datahigh | datalow;
+
+		data = _mm_loadl_epi64((rsp_vec_t *) &datalow);
+	}
+	else
+	{
+		data = _mm_loadl_epi64((rsp_vec_t *) (m_rsp.get_dmem() + addr));
+	}
+
+	// "Unpack" the data.
+	data = _mm_unpacklo_epi8(_mm_setzero_si128(), data);
+
+	if (request_type != RSP_MEM_REQUEST_PACK)
+	{
+		data = _mm_srli_epi16(data, 1);
+	}
+
+	_mm_store_si128((rsp_vec_t *) regp, data);
+}
+
+//
+// SSSE3+ accelerated loads for group IV. Byteswap big-endian to 2-byte
+// little-endian vector. Stop loading at quadword boundaries.
+//
+// TODO: Reverse-engineer what happens when loads from vector elements
+//       must wraparound (i.e., the address offset is small, starting
+//       element is large).
+//
+void rsp_cop2::vec_load_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type)
+{
+	UINT32 aligned_addr = addr & 0xFF0;
+	UINT32 offset = addr & 0xF;
+
+	rsp_vec_t data = _mm_load_si128((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr));
+
+	UINT32 ror;
+	if (request_type == RSP_MEM_REQUEST_QUAD)
+	{
+		ror = 16 - element + offset;
+	}
+	else
+	{
+		// TODO: How is this adjusted for LRV when e != 0?
+		dqm = _mm_cmpeq_epi8(_mm_setzero_si128(), dqm);
+		ror = 16 - offset;
+	}
+
+#ifndef __SSSE3__
+	data = sse2_pshufb(data, m_vec_helpers.ror_b2l_keys[ror & 0xF]);
+	dqm = sse2_pshufb(dqm, m_vec_helpers.ror_b2l_keys[ror & 0xF]);
+#else
+	rsp_vec_t dkey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.ror_b2l_keys[ror & 0xF]));
+	data = _mm_shuffle_epi8(data, dkey);
+	dqm = _mm_shuffle_epi8(dqm, dkey);
+#endif
+
+	// Mask and mux in the data.
+#ifdef __SSE4_1__
+	data = _mm_blendv_epi8(reg, data, dqm);
+#else
+	data = _mm_and_si128(dqm, data);
+	reg = _mm_andnot_si128(dqm, reg);
+	data = _mm_or_si128(data, reg);
+#endif
+
+	_mm_store_si128((rsp_vec_t *) regp, data);
+}
+
+//
+// SSE3+ accelerated stores for group I. Byteswap 2-byte little-endian
+// vector back to big-endian. Start at vector element offset, wrapping
+// around the edge of the vector as necessary.
+//
+// TODO: Reverse-engineer what happens when stores from vector elements
+//       must wraparound. Do we just stop storing the data, or do we
+//       continue storing from the front of the vector, as below?
+//
+void rsp_cop2::vec_store_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_vec_t reg, rsp_vec_t dqm)
+{
+	UINT32 offset = addr & 0x7;
+	UINT32 ror = element - offset;
+
+	// Shift the DQM up to the point where we mux in the data.
+#ifndef __SSSE3__
+	dqm = sse2_pshufb(dqm, m_vec_helpers.sll_l2b_keys[offset]);
+#else
+	__m182i ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.sll_l2b_keys[offset]));
+	dqm = _mm_shuffle_epi8(dqm, ekey);
+#endif
+
+	// Rotate the reg to align with the DQM.
+#ifndef __SSSE3__
+	reg = sse2_pshufb(reg, m_vec_helpers.ror_l2b_keys[ror & 0xF]);
+#else
+	ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.ror_l2b_keys[ror & 0xF]));
+	reg = _mm_shuffle_epi8(reg, ekey);
+#endif
+
+	// Always load in 8-byte chunks to emulate wraparound.
+	rsp_vec_t data;
+	if (offset)
+	{
+		UINT32 aligned_addr_lo = addr & ~0x7;
+		UINT32 aligned_addr_hi = (aligned_addr_lo + 8) & 0xFFF;
+
+		data = _mm_loadl_epi64((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr_lo));
+		rsp_vec_t temp = _mm_loadl_epi64((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr_hi));
+		data = _mm_unpacklo_epi64(data, temp);
+
+		// Mask and mux in the data.
+#ifdef __SSE4_1__
+		data = _mm_blendv_epi8(data, reg, dqm);
+#else
+		data = _mm_andnot_si128(dqm, data);
+		reg = _mm_and_si128(dqm, reg);
+		data = _mm_or_si128(data, reg);
+#endif
+
+		_mm_storel_epi64((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr_lo), data);
+
+		data = _mm_srli_si128(data, 8);
+		_mm_storel_epi64((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr_hi), data);
+	}
+	else
+	{
+		data = _mm_loadl_epi64((rsp_vec_t *) (m_rsp.get_dmem() + addr));
+
+		// Mask and mux in the data.
+#ifdef __SSE4_1__
+		data = _mm_blendv_epi8(data, reg, dqm);
+#else
+		data = _mm_andnot_si128(dqm, data);
+		reg = _mm_and_si128(dqm, reg);
+		data = _mm_or_si128(data, reg);
+#endif
+
+		_mm_storel_epi64((rsp_vec_t *) (m_rsp.get_dmem() + addr), data);
+	}
+}
+
+//
+// SSE3+ accelerated stores for group II. Byteswap 2-byte little-endian
+// vector back to big-endian. Start at vector element offset, wrapping
+// around the edge of the vector as necessary.
+//
+// TODO: Reverse-engineer what happens when stores from vector elements
+//       must wraparound. Do we just stop storing the data, or do we
+//       continue storing from the front of the vector, as below?
+//
+// TODO: Reverse-engineer what happens when element != 0.
+//
+void rsp_cop2::vec_store_group2(UINT32 addr, UINT32 element, UINT16 *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
+	// "Pack" the data.
+	if (request_type != RSP_MEM_REQUEST_PACK)
+	{
+		reg = _mm_slli_epi16(reg, 1);
+	}
+
+	reg = _mm_srai_epi16(reg, 8);
+	reg = _mm_packs_epi16(reg, reg);
+
+	// TODO: Always store in 8-byte chunks to emulate wraparound.
+	_mm_storel_epi64((rsp_vec_t *) (m_rsp.get_dmem() + addr), reg);
+}
+
+//
+// SSE3+ accelerated stores for group IV. Byteswap 2-byte little-endian
+// vector back to big-endian. Stop storing at quadword boundaries.
+//
+void rsp_cop2::vec_store_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
+	UINT32 aligned_addr = addr & 0xFF0;
+	UINT32 offset = addr & 0xF;
+	UINT32 rol = offset;
+
+	rsp_vec_t data = _mm_load_si128((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr));
+
+	if (request_type == RSP_MEM_REQUEST_QUAD)
+	{
+		rol -= element;
+	}
+	else
+	{
+		// TODO: How is this adjusted for SRV when e != 0?
+		dqm = _mm_cmpeq_epi8(_mm_setzero_si128(), dqm);
+	}
+
+#ifndef __SSSE3__
+	reg = sse2_pshufb(reg, m_vec_helpers.rol_l2b_keys[rol & 0xF]);
+#else
+	rsp_vec_t ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.rol_l2b_keys[rol & 0xF]));
+	reg = _mm_shuffle_epi8(reg, ekey);
+#endif
+
+  // Mask and mux out the data, write.
+#ifdef __SSE4_1__
+	data = _mm_blendv_epi8(data, reg, dqm);
+#else
+	reg = _mm_and_si128(dqm, reg);
+	data = _mm_andnot_si128(dqm, data);
+	data = _mm_or_si128(data, reg);
+#endif
+
+	_mm_store_si128((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr), data);
+}
+#endif
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
@@ -100,6 +651,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 		VREG_S(VDREG, 7) = m_vres[7];   \
 }
 
+#if !USE_SIMD
 static const int vector_elements_2[16][8] =
 {
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },     // none
@@ -119,6 +671,7 @@ static const int vector_elements_2[16][8] =
 	{ 6, 6, 6, 6, 6, 6, 6, 6 },     // 6
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },     // 7
 };
+#endif
 
 rsp_cop2::rsp_cop2(rsp_device &rsp, running_machine &machine)
 	: m_rsp(rsp)
@@ -279,14 +832,16 @@ void rsp_cop2::state_string_export(const int index, std::string &str)
 
 void rsp_cop2::handle_lwc2(UINT32 op)
 {
+	int base = (op >> 21) & 0x1f;
+#if !USE_SIMD
 	int i, end;
 	UINT32 ea;
 	int dest = (op >> 16) & 0x1f;
-	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 		offset |= 0xffffffc0;
+#endif
 
 	switch ((op >> 11) & 0x1f)
 	{
@@ -299,8 +854,12 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Load 1 byte to vector byte index
 
+#if USE_SIMD
+			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + offset : offset;
 			VREG_B(dest, index) = m_rsp.READ8(ea);
+#endif
 			break;
 		}
 		case 0x01:      /* LSV */
@@ -312,6 +871,9 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 2 bytes starting from vector byte index
 
+#if USE_SIMD
+			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 2) : (offset * 2);
 
 			end = index + 2;
@@ -321,6 +883,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_B(dest, i) = m_rsp.READ8(ea);
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x02:      /* LLV */
@@ -332,6 +895,9 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 4 bytes starting from vector byte index
 
+#if USE_SIMD
+			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 4) : (offset * 4);
 
 			end = index + 4;
@@ -341,6 +907,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_B(dest, i) = m_rsp.READ8(ea);
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x03:      /* LDV */
@@ -352,6 +919,9 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 8 bytes starting from vector byte index
 
+#if USE_SIMD
+			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 			end = index + 8;
@@ -361,6 +931,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_B(dest, i) = m_rsp.READ8(ea);
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x04:      /* LQV */
@@ -372,6 +943,9 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads up to 16 bytes starting from vector byte index
 
+#if USE_SIMD
+			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			end = index + (16 - (ea & 0xf));
@@ -382,6 +956,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_B(dest, i) = m_rsp.READ8(ea);
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x05:      /* LRV */
@@ -393,6 +968,9 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
+#if USE_SIMD
+			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			index = 16 - ((ea & 0xf) - index);
@@ -404,6 +982,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_B(dest, i) = m_rsp.READ8(ea);
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x06:      /* LPV */
@@ -415,12 +994,16 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the upper 8 bits of each element
 
+#if USE_SIMD
+			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 			for (i=0; i < 8; i++)
 			{
 				VREG_S(dest, i) = m_rsp.READ8(ea + (((16-index) + i) & 0xf)) << 8;
 			}
+#endif
 			break;
 		}
 		case 0x07:      /* LUV */
@@ -432,12 +1015,16 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of each element
 
+#if USE_SIMD
+			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 			for (i=0; i < 8; i++)
 			{
 				VREG_S(dest, i) = m_rsp.READ8(ea + (((16-index) + i) & 0xf)) << 7;
 			}
+#endif
 			break;
 		}
 		case 0x08:      /* LHV */
@@ -449,12 +1036,16 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of each element, with 2-byte stride
 
+#if USE_SIMD
+			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			for (i=0; i < 8; i++)
 			{
 				VREG_S(dest, i) = m_rsp.READ8(ea + (((16-index) + (i<<1)) & 0xf)) << 7;
 			}
+#endif
 			break;
 		}
 		case 0x09:      /* LFV */
@@ -466,6 +1057,9 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
 
+#if USE_SIMD
+			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			// not sure what happens if 16-byte boundary is crossed...
@@ -477,6 +1071,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_S(dest, i) = m_rsp.READ8(ea) << 7;
 				ea += 4;
 			}
+#endif
 			break;
 		}
 		case 0x0a:      /* LWV */
@@ -489,6 +1084,8 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
 
+#if USE_SIMD
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			end = (16 - index) + 16;
@@ -498,6 +1095,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_B(dest, i & 0xf) = m_rsp.READ8(ea);
 				ea += 4;
 			}
+#endif
 			break;
 		}
 		case 0x0b:      /* LTV */
@@ -511,6 +1109,8 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 
 			// FIXME: has a small problem with odd indices
 
+#if USE_SIMD
+#else
 			int element;
 			int vs = dest;
 			int ve = dest + 8;
@@ -532,6 +1132,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 
 				ea += 2;
 			}
+#endif
 			break;
 		}
 
@@ -550,15 +1151,17 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 
 void rsp_cop2::handle_swc2(UINT32 op)
 {
+	int base = (op >> 21) & 0x1f;
+#if !USE_SIMD
 	int i, end;
 	int eaoffset;
 	UINT32 ea;
 	int dest = (op >> 16) & 0x1f;
-	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 		offset |= 0xffffffc0;
+#endif
 
 	switch ((op >> 11) & 0x1f)
 	{
@@ -571,8 +1174,12 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 1 byte from vector byte index
 
+#if USE_SIMD
+			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + offset : offset;
 			m_rsp.WRITE8(ea, VREG_B(dest, index));
+#endif
 			break;
 		}
 		case 0x01:      /* SSV */
@@ -584,6 +1191,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 2 bytes starting from vector byte index
 
+#if USE_SIMD
+			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 2) : (offset * 2);
 
 			end = index + 2;
@@ -593,6 +1203,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				m_rsp.WRITE8(ea, VREG_B(dest, i));
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x02:      /* SLV */
@@ -604,6 +1215,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 4 bytes starting from vector byte index
 
+#if USE_SIMD
+			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 4) : (offset * 4);
 
 			end = index + 4;
@@ -613,6 +1227,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				m_rsp.WRITE8(ea, VREG_B(dest, i));
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x03:      /* SDV */
@@ -624,6 +1239,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 8 bytes starting from vector byte index
 
+#if USE_SIMD
+			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 
 			end = index + 8;
@@ -633,6 +1251,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				m_rsp.WRITE8(ea, VREG_B(dest, i));
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x04:      /* SQV */
@@ -644,6 +1263,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from vector byte index until 16-byte boundary
 
+#if USE_SIMD
+			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			end = index + (16 - (ea & 0xf));
@@ -653,6 +1275,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				m_rsp.WRITE8(ea, VREG_B(dest, i & 0xf));
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x05:      /* SRV */
@@ -664,6 +1287,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
+#if USE_SIMD
+			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			int o;
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
@@ -676,6 +1302,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				m_rsp.WRITE8(ea, VREG_B(dest, ((i + o) & 0xf)));
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x06:      /* SPV */
@@ -687,6 +1314,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores upper 8 bits of each element
 
+#if USE_SIMD
+			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 			end = index + 8;
 
@@ -702,6 +1332,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				}
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x07:      /* SUV */
@@ -713,6 +1344,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores bits 14-7 of each element
 
+#if USE_SIMD
+			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 8) : (offset * 8);
 			end = index + 8;
 
@@ -728,6 +1362,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				}
 				ea++;
 			}
+#endif
 			break;
 		}
 		case 0x08:      /* SHV */
@@ -739,6 +1374,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores bits 14-7 of each element, with 2-byte stride
 
+#if USE_SIMD
+			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			for (i=0; i < 8; i++)
@@ -749,6 +1387,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				m_rsp.WRITE8(ea, d);
 				ea += 2;
 			}
+#endif
 			break;
 		}
 		case 0x09:      /* SFV */
@@ -762,6 +1401,9 @@ void rsp_cop2::handle_swc2(UINT32 op)
 
 			// FIXME: only works for index 0 and index 8
 
+#if USE_SIMD
+			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			eaoffset = ea & 0xf;
@@ -774,6 +1416,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				m_rsp.WRITE8(ea + (eaoffset & 0xf), VREG_S(dest, i) >> 7);
 				eaoffset += 4;
 			}
+#endif
 			break;
 		}
 		case 0x0a:      /* SWV */
@@ -786,6 +1429,8 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			// Stores the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
 
+#if USE_SIMD
+#else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			eaoffset = ea & 0xf;
@@ -798,6 +1443,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				m_rsp.WRITE8(ea + (eaoffset & 0xf), VREG_B(dest, i & 0xf));
 				eaoffset++;
 			}
+#endif
 			break;
 		}
 		case 0x0b:      /* STV */
@@ -809,6 +1455,8 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores one element from maximum of 8 vectors, while incrementing element index
 
+#if USE_SIMD
+#else
 			int element;
 			int vs = dest;
 			int ve = dest + 8;
@@ -828,6 +1476,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				eaoffset += 2;
 				element++;
 			}
+#endif
 			break;
 		}
 
@@ -905,7 +1554,9 @@ UINT16 rsp_cop2::SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 po
 
 void rsp_cop2::handle_vector_ops(UINT32 op)
 {
+#if !USE_SIMD
 	int i;
+#endif
 
 	// Opcode legend:
 	//    E = VS2 element type
@@ -924,6 +1575,19 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Multiplies signed integer by signed integer * 2
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmulf_vmulu(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -948,8 +1612,9 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				}
 			}
 			WRITEBACK_RESULT();
-
+#endif
 			break;
+
 		}
 
 		case 0x01:      /* VMULU */
@@ -960,6 +1625,19 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// ------------------------------------------------------
 			//
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmulf_vmulu(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -986,6 +1664,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				}
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1000,6 +1679,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Stores the higher 16 bits of the 32-bit result to accumulator
 			// The low slice of accumulator is stored into destination element
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadl_vmudl(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				UINT32 s1 = (UINT32)(UINT16)VREG_S(VS1REG, i);
@@ -1013,6 +1709,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				m_vres[i] = ACCUM_L(i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1027,6 +1724,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into accumulator
 			// The middle slice of accumulator is stored into destination element
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadm_vmudm(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -1040,6 +1754,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				m_vres[i] = ACCUM_M(i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 
 		}
@@ -1055,6 +1770,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into accumulator
 			// The low slice of accumulator is stored into destination element
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadn_vmudn(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT32 s1 = (UINT16)VREG_S(VS1REG, i);     // not sign-extended
@@ -1068,6 +1800,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				m_vres[i] = ACCUM_L(i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1082,6 +1815,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into highest 32 bits of accumulator, the low slice is zero
 			// The highest 32 bits of accumulator is saturated into destination element
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadh_vmudh(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -1097,6 +1847,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				m_vres[i] = (INT16)(r);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1110,6 +1861,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Multiplies signed integer by signed integer * 2
 			// The result is added to accumulator
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmacf_vmacu(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -1131,6 +1899,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				m_vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 		case 0x09:      /* VMACU */
@@ -1141,6 +1910,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// ------------------------------------------------------
 			//
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmacf_vmacu(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -1177,6 +1963,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				}
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1191,6 +1978,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Adds the higher 16 bits of the 32-bit result to accumulator
 			// The low slice of accumulator is stored into destination element
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadl_vmudl(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				UINT32 s1 = (UINT32)(UINT16)VREG_S(VS1REG, i);
@@ -1206,6 +2010,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				m_vres[i] = SATURATE_ACCUM(i, 0, 0x0000, 0xffff);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1220,6 +2025,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into accumulator
 			// The middle slice of accumulator is stored into destination element
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadm_vmudm(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				UINT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -1237,6 +2059,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				m_vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1251,6 +2074,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into accumulator
 			// The low slice of accumulator is stored into destination element
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadn_vmudn(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT32 s1 = (UINT16)VREG_S(VS1REG, i);     // not sign-extended
@@ -1271,6 +2111,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 
+#endif
 			break;
 		}
 
@@ -1285,6 +2126,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into highest 32 bits of accumulator, the low slice is zero
 			// The highest 32 bits of accumulator is saturated into destination element
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t acc_lo, acc_mid, acc_hi;
+
+			acc_lo = read_acc_lo(acc);
+			acc_mid = read_acc_mid(acc);
+			acc_hi = read_acc_hi(acc);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmadh_vmudh(op, vs, vt_shuffle, vec_zero(), &acc_lo, &acc_mid, &acc_hi);
+
+			write_acc_lo(acc, acc_lo);
+			write_acc_mid(acc, acc_mid);
+			write_acc_hi(acc, acc_hi);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -1301,6 +2159,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 
+#endif
 			break;
 		}
 
@@ -1315,6 +2174,20 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG == VDREG
 
+#if USE_SIMD
+			rsp_vec_t acc_lo;
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t carry = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vadd(vs, vt_shuffle, carry, &acc_lo);
+
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, acc_lo);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -1330,6 +2203,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CARRY_FLAGS();
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1344,6 +2218,20 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG == VDREG
 
+#if USE_SIMD
+			rsp_vec_t acc_lo;
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t carry = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vsub(vs, vt_shuffle, carry, &acc_lo);
+
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, acc_lo);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				INT32 s1 = (INT32)(INT16)VREG_S(VS1REG, i);
@@ -1360,6 +2248,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CARRY_FLAGS();
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1373,6 +2262,17 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Changes the sign of source register 2 if source register 1 is negative and stores
 			// the result to destination register
 
+#if USE_SIMD
+			rsp_vec_t acc_lo;
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vabs(vs, vt_shuffle, vec_zero(), &acc_lo);
+
+			write_acc_lo(acc, acc_lo);
+#else
 			for (i=0; i < 8; i++)
 			{
 				INT16 s1 = (INT16)VREG_S(VS1REG, i);
@@ -1401,6 +2301,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1415,6 +2316,19 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG = VDREG
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t sn;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vaddc(vs, vt_shuffle, vec_zero(), &sn);
+
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, sn);
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CARRY_FLAGS();
 
@@ -1433,6 +2347,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				}
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1447,6 +2362,19 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG = VDREG
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t eq, sn;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vsubc(vs, vt_shuffle, vec_zero(), &eq, &sn);
+
+			write_vco_hi(m_flags[RSP_VCO].s, eq);
+			write_vco_lo(m_flags[RSP_VCO].s, sn);
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CARRY_FLAGS();
 
@@ -1469,6 +2397,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				}
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1481,6 +2410,25 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Stores high, middle or low slice of accumulator to destination vector
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			switch (EL)
+			{
+				case 8:
+					m_v[VDREG].v = read_acc_hi(acc);
+					break;
+				case 9:
+					m_v[VDREG].v = read_acc_mid(acc);
+					break;
+				case 10:
+					m_v[VDREG].v = read_acc_lo(acc);
+					break;
+
+				default:
+					m_v[VDREG].v = _mm_setzero_si128();
+					break;
+			}
+#else
 			switch (EL)
 			{
 				case 0x08:      // VSAWH
@@ -1511,6 +2459,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 					printf("RSP: VSAW: el = %d\n", EL);//??? ???
 					exit(0);
 			}
+#endif
 			break;
 		}
 
@@ -1524,6 +2473,24 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are less than VS2
 			// Moves the element in VS2 to destination vector
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le;
+
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_veq_vge_vlt_vne(op, vs, vt_shuffle, vec_zero(), &le, eq, sign);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, vec_zero());
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP2_FLAGS();
 
@@ -1559,6 +2526,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_CARRY_FLAGS();
 			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1572,6 +2540,24 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are equal with VS2
 			// Moves the element in VS2 to destination vector
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le;
+
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_veq_vge_vlt_vne(op, vs, vt_shuffle, vec_zero(), &le, eq, sign);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, vec_zero());
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP2_FLAGS();
 
@@ -1595,6 +2581,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CARRY_FLAGS();
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1608,6 +2595,24 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are not equal with VS2
 			// Moves the element in VS2 to destination vector
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le;
+
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_veq_vge_vlt_vne(op, vs, vt_shuffle, vec_zero(), &le, eq, sign);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, vec_zero());
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP2_FLAGS();
 
@@ -1632,6 +2637,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_CARRY_FLAGS();
 			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1645,6 +2651,24 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are greater or equal with VS2
 			// Moves the element in VS2 to destination vector
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le;
+
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_veq_vge_vlt_vne(op, vs, vt_shuffle, vec_zero(), &le, eq, sign);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, vec_zero());
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP2_FLAGS();
 
@@ -1669,6 +2693,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_CARRY_FLAGS();
 			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1681,6 +2706,27 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip low
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t ge = read_vcc_hi(m_flags[RSP_VCC].s);
+			rsp_vec_t le = read_vcc_lo(m_flags[RSP_VCC].s);
+			rsp_vec_t eq = read_vco_hi(m_flags[RSP_VCO].s);
+			rsp_vec_t sign = read_vco_lo(m_flags[RSP_VCO].s);
+			rsp_vec_t vce = read_vce(m_flags[RSP_VCE].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vcl(vs, vt_shuffle, vec_zero(), &ge, &le, eq, sign, vce);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, ge);
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_vce(m_flags[RSP_VCE].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				INT16 s1 = VREG_S(VS1REG, i);
@@ -1763,6 +2809,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CLIP1_FLAGS();
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1775,6 +2822,22 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip high
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t ge, le, sign, eq, vce;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vch(vs, vt_shuffle, vec_zero(), &ge, &le, &eq, &sign, &vce);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, ge);
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, eq);
+			write_vco_lo(m_flags[RSP_VCO].s, sign);
+			write_vce(m_flags[RSP_VCE].s, vce);
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			CLEAR_CARRY_FLAGS();
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP1_FLAGS();
@@ -1847,6 +2910,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1859,6 +2923,22 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip reverse
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t ge, le;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vcr(vs, vt_shuffle, vec_zero(), &ge, &le);
+
+			write_vcc_hi(m_flags[RSP_VCC].s, ge);
+			write_vcc_lo(m_flags[RSP_VCC].s, le);
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_vce(m_flags[RSP_VCE].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			CLEAR_CARRY_FLAGS();
 			CLEAR_COMPARE_FLAGS();
 			CLEAR_CLIP1_FLAGS();
@@ -1906,6 +2986,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				m_vres[i] = ACCUM_L(i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -1918,6 +2999,19 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Merges two vectors according to compare flags
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+			rsp_vec_t le = read_vcc_lo(m_flags[RSP_VCO].s);
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vmrg(vs, vt_shuffle, le);
+
+			write_vco_hi(m_flags[RSP_VCO].s, vec_zero());
+			write_vco_lo(m_flags[RSP_VCO].s, vec_zero());
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				if (COMPARE_FLAG(i) != 0)
@@ -1932,6 +3026,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 		case 0x28:      /* VAND */
@@ -1943,12 +3038,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise AND of two vector registers
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vand_vnand(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				m_vres[i] = VREG_S(VS1REG, i) & VREG_S(VS2REG, VEC_EL_2(EL, i));
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 		case 0x29:      /* VNAND */
@@ -1960,12 +3066,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT AND of two vector registers
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vand_vnand(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				m_vres[i] = ~((VREG_S(VS1REG, i) & VREG_S(VS2REG, VEC_EL_2(EL, i))));
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 		case 0x2a:      /* VOR */
@@ -1977,12 +3094,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise OR of two vector registers
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vor_vnor(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			for (i = 0; i < 8; i++)
 			{
 				m_vres[i] = VREG_S(VS1REG, i) | VREG_S(VS2REG, VEC_EL_2(EL, i));
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 		case 0x2b:      /* VNOR */
@@ -1994,12 +3122,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT OR of two vector registers
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vor_vnor(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			for (i=0; i < 8; i++)
 			{
 				m_vres[i] = ~((VREG_S(VS1REG, i) | VREG_S(VS2REG, VEC_EL_2(EL, i))));
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 		case 0x2c:      /* VXOR */
@@ -2011,12 +3150,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise XOR of two vector registers
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vxor_vnxor(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			for (i=0; i < 8; i++)
 			{
 				m_vres[i] = VREG_S(VS1REG, i) ^ VREG_S(VS2REG, VEC_EL_2(EL, i));
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 		case 0x2d:      /* VNXOR */
@@ -2028,12 +3178,23 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT XOR of two vector registers
 
+#if USE_SIMD
+			UINT16 *acc = m_acc.s;
+
+			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
+			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
+
+			m_v[VDREG].v = vec_vxor_vnxor(op, vs, vt_shuffle);
+
+			write_acc_lo(acc, m_v[VDREG].v);
+#else
 			for (i=0; i < 8; i++)
 			{
 				m_vres[i] = ~((VREG_S(VS1REG, i) ^ VREG_S(VS2REG, VEC_EL_2(EL, i))));
 				SET_ACCUM_L(m_vres[i], i);
 			}
 			WRITEBACK_RESULT();
+#endif
 			break;
 		}
 
@@ -2045,6 +3206,15 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// ------------------------------------------------------
 			//
 			// Calculates reciprocal
+
+#if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			INT32 dp = op & m_dp_flag;
+			m_dp_flag = 0;
+
+			m_v[VDREG].v = vec_vrcp_vrsq(op, dp, VS2REG, EL, VDREG, VS1REG);
+#else
 			INT32 shifter = 0;
 
 			INT32 rec = (INT16)(VREG_S(VS2REG, EL & 7));
@@ -2093,6 +3263,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 
 
+#endif
 			break;
 		}
 
@@ -2105,6 +3276,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal low part
 
+#if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			INT32 dp = op & m_dp_flag;
+			m_dp_flag = 0;
+
+			m_v[VDREG].v = vec_vrcp_vrsq(op, dp, VS2REG, EL, VDREG, VS1REG);
+#else
 			INT32 shifter = 0;
 
 			INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
@@ -2169,6 +3348,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
 			}
 
+#endif
 			break;
 		}
 
@@ -2181,6 +3361,13 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal high part
 
+#if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			m_dp_flag = 1;
+
+			m_v[VDREG].v = vec_vdivh(VS2REG, EL, VDREG, VS1REG);
+#else
 			m_reciprocal_high = (VREG_S(VS2REG, EL & 7)) << 16;
 			m_dp_allowed = 1;
 
@@ -2191,6 +3378,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			VREG_S(VDREG, VS1REG & 7) = (INT16)(m_reciprocal_res >> 16);
 
+#endif
 			break;
 		}
 
@@ -2203,11 +3391,16 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Moves element from vector to destination vector
 
+#if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+			m_v[VDREG].v = vec_vmov(VS2REG, EL, VDREG, VS1REG);
+#else
 			VREG_S(VDREG, VS1REG & 7) = VREG_S(VS2REG, EL & 7);
 			for (i = 0; i < 8; i++)
 			{
 				SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
 			}
+#endif
 			break;
 		}
 
@@ -2220,6 +3413,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root
 
+#if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			INT32 dp = op & m_dp_flag;
+			m_dp_flag = 0;
+
+			m_v[VDREG].v = vec_vrcp_vrsq(op, dp, VS2REG, EL, VDREG, VS1REG);
+#else
 			INT32 shifter = 0;
 
 			INT32 rec = (INT16)(VREG_S(VS2REG, EL & 7));
@@ -2269,6 +3470,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
 			}
 
+#endif
 			break;
 		}
 
@@ -2281,6 +3483,14 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root low part
 
+#if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			INT32 dp = op & m_dp_flag;
+			m_dp_flag = 0;
+
+			m_v[VDREG].v = vec_vrcp_vrsq(op, dp, VS2REG, EL, VDREG, VS1REG);
+#else
 			INT32 shifter = 0;
 			INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
 			INT32 datainput = rec;
@@ -2348,6 +3558,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
 			}
 
+#endif
 			break;
 		}
 
@@ -2360,6 +3571,13 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root high part
 
+#if USE_SIMD
+			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
+
+			m_dp_flag = 1;
+
+			m_v[VDREG].v = vec_vdivh(VS2REG, EL, VDREG, VS1REG);
+#else
 			m_reciprocal_high = (VREG_S(VS2REG, EL & 7)) << 16;
 			m_dp_allowed = 1;
 
@@ -2369,6 +3587,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 
 			VREG_S(VDREG, VS1REG & 7) = (INT16)(m_reciprocal_res >> 16);    // store high part
+#endif
 			break;
 		}
 

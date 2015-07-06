@@ -47,8 +47,10 @@ E I1     Vectored interrupt error
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "formats/m20_dsk.h"
+#include "formats/pc_dsk.h"
 #include "machine/m20_kbd.h"
 #include "bus/rs232/rs232.h"
+#include "machine/m20_8086.h"
 
 class m20_state : public driver_device
 {
@@ -64,6 +66,7 @@ public:
 		m_fd1797(*this, "fd1797"),
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
+		m_apb(*this, "apb"),
 		m_p_videoram(*this, "p_videoram"),
 		m_palette(*this, "palette")
 	{
@@ -78,6 +81,7 @@ public:
 	required_device<fd1797_t> m_fd1797;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
+	optional_device<m20_8086_device> m_apb;
 
 	required_shared_ptr<UINT16> m_p_videoram;
 	required_device<palette_device> m_palette;
@@ -92,6 +96,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
+	DECLARE_WRITE_LINE_MEMBER(halt_apb_w);
+	DECLARE_WRITE_LINE_MEMBER(int_w);
+	MC6845_UPDATE_ROW(update_row);
 
 private:
 	offs_t m_memsize;
@@ -99,8 +106,6 @@ private:
 	void install_memory();
 
 public:
-	UINT32 screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
@@ -110,32 +115,34 @@ public:
 #define PIXEL_CLOCK XTAL_4_433619MHz
 
 
-UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+MC6845_UPDATE_ROW( m20_state::update_row )
 {
-	int x,y,i;
-	UINT8 pen;
-	UINT32 count;
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	int i;
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	count = (0);
-
-	for(y=0; y<256; y++)
+	for ( i = 0; i < x_count; i++ )
 	{
-		for(x=0; x<512; x+=16)
-		{
-			for (i = 0; i < 16; i++)
-			{
-				pen = (m_p_videoram[count]) >> (15 - i) & 1;
+		UINT16 offset = ((ma | (ra << 1)) << 4) + i;
+		UINT16 data = m_p_videoram[ offset ];
 
-				if (screen.visible_area().contains(x + i, y))
-					bitmap.pix32(y, x + i) = m_palette->pen(pen);
-			}
-
-			count++;
-		}
+		*p = palette[( data & 0x8000 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x4000 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x2000 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x1000 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0800 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0400 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0200 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0100 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0080 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0040 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0020 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0010 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0008 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0004 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0002 ) ? 1 : 0]; p++;
+		*p = palette[( data & 0x0001 ) ? 1 : 0]; p++;
 	}
-	return 0;
 }
 
 /*
@@ -226,7 +233,9 @@ WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 	 * 8253 is programmed in square wave mode, not rate
 	 * generator mode.
 	 */
-	m_maincpu->set_input_line(0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
+	if(m_apb)
+		m_apb->nvi_w(state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
 }
 
 
@@ -700,7 +709,9 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
 
 	AM_RANGE(0x60, 0x61) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
+	AM_RANGE(0x62, 0x63) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0xff00) // FIXME
 	AM_RANGE(0x62, 0x63) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
+	AM_RANGE(0x64, 0x65) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 
 	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
 
@@ -714,23 +725,8 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 
 	AM_RANGE(0x140, 0x143) AM_READWRITE(m20_i8259_r, m20_i8259_w)
 
+	AM_RANGE(0x3ffa, 0x3ffd) AM_DEVWRITE("apb", m20_8086_device, handshake_w)
 ADDRESS_MAP_END
-
-#if 0
-static ADDRESS_MAP_START(m20_apb_mem, AS_PROGRAM, 16, m20_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x007ff ) AM_RAM
-	AM_RANGE( 0xf0000, 0xf7fff ) AM_RAM //mirrored?
-	AM_RANGE( 0xfc000, 0xfffff ) AM_ROM AM_REGION("apb_bios",0)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(m20_apb_io, AS_IO, 16, m20_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff) // may not be needed
-	//0x4060 crtc address
-	//0x4062 crtc data
-ADDRESS_MAP_END
-#endif
 
 IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 {
@@ -738,6 +734,13 @@ IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 		return 0xff; // NVI, value ignored
 	else
 		return m_i8259->acknowledge();
+}
+
+WRITE_LINE_MEMBER(m20_state::int_w)
+{
+	if(m_apb && !m_apb->halted())
+		m_apb->vi_w(state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void m20_state::machine_start()
@@ -755,10 +758,15 @@ void m20_state::machine_reset()
 	else
 		m_port21 = 0xff;
 
+	if(system_bios() > 0)  // bits have different meanings?
+		m_port21 &= ~8;
+
 	m_fd1797->reset();
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
 	m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
+	if(m_apb)
+		m_apb->m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -767,7 +775,8 @@ static SLOT_INTERFACE_START( m20_floppies )
 SLOT_INTERFACE_END
 
 FLOPPY_FORMATS_MEMBER( m20_state::floppy_formats )
-	FLOPPY_M20_FORMAT
+	FLOPPY_M20_FORMAT,
+	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START(keyboard)
@@ -787,20 +796,13 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_RAM_DEFAULT_VALUE(0)
 	MCFG_RAM_EXTRA_OPTIONS("128K,192K,224K,256K,384K,512K")
 
-#if 0
-	MCFG_CPU_ADD("apb", I8086, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(m20_apb_mem)
-	MCFG_CPU_IO_MAP(m20_apb_io)
-	MCFG_DEVICE_DISABLE()
-#endif
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m20_state, screen_update_m20)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */
@@ -812,6 +814,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8) /* hand tuned to get ~50 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
+	MCFG_MC6845_UPDATE_ROW_CB(m20_state, update_row)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 
@@ -829,10 +832,12 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_PIT8253_CLK2(1230782)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(m20_state, timer_tick_w))
 
-	MCFG_PIC8259_ADD("i8259", INPUTLINE("maincpu", 1), VCC, NULL)
+	MCFG_PIC8259_ADD("i8259", WRITELINE(m20_state, int_w), VCC, NULL)
 
 	MCFG_RS232_PORT_ADD("kbd", keyboard, "m20")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_1", i8251_device, write_rxd))
+
+	MCFG_DEVICE_ADD("apb", M20_8086, 0)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
 MACHINE_CONFIG_END

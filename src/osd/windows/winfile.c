@@ -242,6 +242,9 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 
 file_error osd_truncate(osd_file *file, UINT64 offset)
 {
+	if (!file || !file->handle)
+		return FILERR_FAILURE;
+
 	DWORD result;
 	LONG upper = offset >> 32;
 

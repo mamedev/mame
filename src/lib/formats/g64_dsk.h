@@ -30,15 +30,17 @@ public:
 protected:
 	enum
 	{
-		SIGNATURE = 0x0,
-		VERSION = 0x8,
-		TRACK_COUNT = 0x9,
-		MAX_TRACK_SIZE = 0xa,
-		TRACK_OFFSET = 0xc,
-		SPEED_ZONE = 0x15c,
-		MASTERING = 0x2ac,
-		TRACK_DATA = 0x2ac,
-		TRACK_LENGTH = 0x1ef8
+		POS_SIGNATURE = 0x0,
+		POS_VERSION = 0x8,
+		POS_TRACK_COUNT = 0x9,
+		POS_MAX_TRACK_SIZE = 0xa,
+		POS_TRACK_OFFSET = 0xc
+	};
+
+	enum
+	{
+		TRACK_LENGTH = 0x1ef8,
+		TRACK_COUNT = 84
 	};
 
 	static const UINT32 c1541_cell_size[];

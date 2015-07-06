@@ -16,7 +16,7 @@ namespace netlist
 {
 	class parser_t : public ptokenizer
 	{
-		NETLIST_PREVENT_COPYING(parser_t)
+		P_PREVENT_COPYING(parser_t)
 	public:
 		parser_t(setup_t &setup)
 		: ptokenizer(), m_setup(setup), m_buf(NULL) {}
@@ -59,10 +59,12 @@ namespace netlist
 		token_id_t m_tok_SUBMODEL;
 		token_id_t m_tok_INCLUDE;
 		token_id_t m_tok_LOCAL_SOURCE;
+		token_id_t m_tok_LOCAL_LIB_ENTRY;
 		token_id_t m_tok_TRUTHTABLE_START;
 		token_id_t m_tok_TRUTHTABLE_END;
 		token_id_t m_tok_TT_HEAD;
 		token_id_t m_tok_TT_LINE;
+		token_id_t m_tok_TT_FAMILY;
 
 		setup_t &m_setup;
 

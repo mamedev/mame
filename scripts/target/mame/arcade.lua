@@ -128,6 +128,8 @@ CPUS["ARCOMPACT"] = true
 CPUS["HMCS40"] = true
 --CPUS["E0C6200"] = true
 --CPUS["MELPS4"] = true
+--CPUS["HPHYBRID"] = true
+--CPUS["SM510"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -2582,7 +2584,6 @@ files {
 	MAME_DIR .. "src/mame/machine/n64.c",
 	MAME_DIR .. "src/mame/video/n64.c",
 	MAME_DIR .. "src/mame/video/rdpblend.c",
-	MAME_DIR .. "src/mame/video/rdpspn16.c",
 	MAME_DIR .. "src/mame/video/rdptpipe.c",
 	MAME_DIR .. "src/mame/drivers/hanaawas.c",
 	MAME_DIR .. "src/mame/video/hanaawas.c",

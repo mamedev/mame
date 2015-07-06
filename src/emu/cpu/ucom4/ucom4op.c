@@ -3,6 +3,9 @@
 
 // uCOM-4 opcode handlers
 
+#include "ucom4.h"
+
+
 // internal helpers
 
 inline UINT8 ucom4_cpu_device::ram_r()

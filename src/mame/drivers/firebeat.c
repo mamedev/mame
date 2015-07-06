@@ -82,9 +82,9 @@
     ------------------------------------------------------------------
     GQ972      GQ972          2000    Beatmania III
     GQ972(?)   ?              2001    Beatmania III Append 6th Mix
-    GQ972(?)   ?              2002    Beatmania III Append 7th Mix
+    GQ972(?)   GCB07          2002    Beatmania III Append 7th Mix
     GQ972(?)   ?              2000    Beatmania III Append Core Remix
-    GQ972(?)   ?              2003    Beatmania III The Final
+    GQ972(?)   GCC01          2003    Beatmania III The Final
     GQ974      GQ974          2000    Keyboardmania
     GQ974      GCA01          2000    Keyboardmania 2nd Mix
     GQ974      GCA12          2001    Keyboardmania 3rd Mix
@@ -92,13 +92,13 @@
     GQ977      GQ977          2000    Para Para Dancing
     GQ977      GC977          2000    Para Para Paradise 1.1
     GQ977      GQA11          2000    Para Para Paradise 1st Mix+
-    GQA02(?)   ?              2000    Pop'n Music 4
-    ???        ?              2000    Pop'n Music 5
-    ???        ?              2001    Pop'n Music 6
+    GQA02(?)   GQ986          2000    Pop'n Music 4
+    ???        G?A04          2000    Pop'n Music 5
+    ???        GQA16          2001    Pop'n Music 6
     GQA02      GCB00          2001    Pop'n Music 7
-    ???        ?              2002    Pop'n Music 8
+    ???        GQB30          2002    Pop'n Music 8
     ???        ?              2000    Pop'n Music Animelo
-    ???        ?              2001    Pop'n Music Animelo 2
+    ???        GEA02          2001    Pop'n Music Animelo 2
     ???        ?              2001    Pop'n Music Mickey Tunes
 
     TODO:
@@ -144,13 +144,9 @@
 #include "firebeat.lh"
 
 
-struct GCU_REGS
-{
-	UINT32 *vram;
-	UINT32 vram_read_address;
-	UINT32 vram_write_fifo_address;
-	UINT32 visible_area;
-};
+#define DUMP_VRAM 0
+#define PRINT_GCU 0
+
 
 struct IBUTTON_SUBKEY
 {
@@ -163,6 +159,717 @@ struct IBUTTON
 {
 	IBUTTON_SUBKEY subkey[3];
 };
+
+#define MCFG_FIREBEAT_GCU_CPU_TAG(_tag) \
+	firebeat_gcu_device::static_set_cpu_tag(*device, _tag);
+
+class firebeat_gcu_device : public device_t
+{
+public:
+	firebeat_gcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<firebeat_gcu_device &>(device).m_cputag = tag; }
+
+	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ32_MEMBER(read);
+	DECLARE_WRITE32_MEMBER(write);
+
+	struct framebuffer
+	{
+		UINT32 base;
+		int width;
+		int height;
+	};
+
+protected:
+	virtual void device_start();
+	virtual void device_stop();
+	virtual void device_reset();
+
+private:
+	void execute_command(UINT32 *cmd);
+	void execute_display_list(UINT32 addr);
+	void draw_object(UINT32 *cmd);
+	void fill_rect(UINT32 *cmd);
+	void draw_character(UINT32 *cmd);
+	void fb_config(UINT32 *cmd);
+
+	UINT32 *m_vram;
+	UINT32 m_vram_read_addr;
+	UINT32 m_vram_fifo0_addr;
+	UINT32 m_vram_fifo1_addr;
+	UINT32 m_vram_fifo0_mode;
+	UINT32 m_vram_fifo1_mode;
+	UINT32 m_command_fifo0[4];
+	UINT32 m_command_fifo0_ptr;
+	UINT32 m_command_fifo1[4];
+	UINT32 m_command_fifo1_ptr;
+
+	const char* m_cputag;
+	device_t* m_cpu;
+
+	framebuffer m_frame[4];
+	UINT32 m_fb_origin_x;
+	UINT32 m_fb_origin_y;
+};
+
+const device_type FIREBEAT_GCU = &device_creator<firebeat_gcu_device>;
+
+firebeat_gcu_device::firebeat_gcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, FIREBEAT_GCU, "FireBeat GCU", tag, owner, clock, "firebeat_gcu", __FILE__)
+{
+}
+
+READ32_MEMBER(firebeat_gcu_device::read)
+{
+	int reg = offset * 4;
+
+	// VRAM Read
+	if (reg >= 0x80 && reg < 0x100)
+	{
+		return m_vram[m_vram_read_addr + offset - 0x20];
+	}
+
+	switch (reg)
+	{
+		case 0x78:		// GCU Status
+			/* ppd checks bits 0x0041 of the upper halfword on interrupt */
+			return 0xffff0005;
+
+		default:
+			break;
+	}
+
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(firebeat_gcu_device::write)
+{
+	int reg = offset * 4;
+
+	switch (reg)
+	{
+		case 0x10:
+			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
+			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
+			if (ACCESSING_BITS_16_31 && (data & 0x00010000) == 0)
+				m_cpu->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			if (ACCESSING_BITS_0_15)
+#if PRINT_GCU
+				printf("%s_w: %02X, %08X, %08X\n", basetag(), reg, data, mem_mask);
+#endif
+			break;
+
+		case 0x14:		// ?
+			break;
+
+		case 0x18:		// ?
+			break;
+
+		case 0x20:		// Framebuffer 0 Origin(?)
+			break;
+
+		case 0x24:		// Framebuffer 1 Origin(?)
+			break;
+
+		case 0x28:		// Framebuffer 2 Origin(?)
+			break;
+
+		case 0x2c:		// Framebuffer 3 Origin(?)
+			break;
+
+		case 0x30:		// Framebuffer 0 Dimensions
+			if (ACCESSING_BITS_16_31)
+				m_frame[0].height = (data >> 16) & 0xffff;
+			if (ACCESSING_BITS_0_15)
+				m_frame[0].width = data & 0xffff;
+			break;
+
+		case 0x34:		// Framebuffer 1 Dimensions
+			if (ACCESSING_BITS_16_31)
+				m_frame[1].height = (data >> 16) & 0xffff;
+			if (ACCESSING_BITS_0_15)
+				m_frame[1].width = data & 0xffff;
+			break;
+
+		case 0x38:		// Framebuffer 2 Dimensions
+			if (ACCESSING_BITS_16_31)
+				m_frame[2].height = (data >> 16) & 0xffff;
+			if (ACCESSING_BITS_0_15)
+				m_frame[2].width = data & 0xffff;
+			break;
+
+		case 0x3c:		// Framebuffer 3 Dimensions
+			if (ACCESSING_BITS_16_31)
+				m_frame[3].height = (data >> 16) & 0xffff;
+			if (ACCESSING_BITS_0_15)
+				m_frame[3].width = data & 0xffff;
+			break;
+
+		case 0x40:		// Framebuffer 0 Base
+			m_frame[0].base = data;
+#if PRINT_GCU
+			printf("%s FB0 Base: %08X\n", basetag(), data);
+#endif
+			break;
+
+		case 0x44:		// Framebuffer 1 Base
+			m_frame[1].base = data;
+#if PRINT_GCU
+			printf("%s FB1 Base: %08X\n", basetag(), data);
+#endif
+			break;
+
+		case 0x48:		// Framebuffer 2 Base
+			m_frame[2].base = data;
+#if PRINT_GCU
+			printf("%s FB2 Base: %08X\n", basetag(), data);
+#endif
+			break;
+
+		case 0x4c:		// Framebuffer 3 Base
+			m_frame[3].base = data;
+#if PRINT_GCU
+			printf("%s FB3 Base: %08X\n", basetag(), data);
+#endif
+			break;
+
+		case 0x5c:		// VRAM Read Address
+			m_vram_read_addr = (data & 0xffffff) / 2;
+			break;
+
+		case 0x60:		// VRAM Port 0 Write Address
+			m_vram_fifo0_addr = (data & 0xffffff) / 2;
+			break;
+
+		case 0x68:		// VRAM Port 0/1 Mode
+			if (ACCESSING_BITS_16_31)
+				m_vram_fifo0_mode = data >> 16;
+			if (ACCESSING_BITS_0_15)
+				m_vram_fifo1_mode = data & 0xffff;
+			break;
+
+		case 0x70:		// VRAM Port 0 Write FIFO
+			if (m_vram_fifo0_mode & 0x100)
+			{
+				// write to command fifo
+				m_command_fifo0[m_command_fifo0_ptr] = data;
+				m_command_fifo0_ptr++;
+
+				// execute when filled
+				if (m_command_fifo0_ptr >= 4)
+				{
+					//printf("GCU FIFO0 exec: %08X %08X %08X %08X\n", m_command_fifo0[0], m_command_fifo0[1], m_command_fifo0[2], m_command_fifo0[3]);
+					execute_command(m_command_fifo0);
+					m_command_fifo0_ptr = 0;
+				}
+			}
+			else	
+			{
+				// write to VRAM fifo
+				m_vram[m_vram_fifo0_addr] = data;
+				m_vram_fifo0_addr++;
+			}
+			break;
+
+		case 0x64:		// VRAM Port 1 Write Address
+			m_vram_fifo1_addr = (data & 0xffffff) / 2;
+			printf("GCU FIFO1 addr = %08X\n", data);
+			break;
+
+		case 0x74:		// VRAM Port 1 Write FIFO
+			printf("GCU FIFO1 write = %08X\n", data);
+
+			if (m_vram_fifo1_mode & 0x100)
+			{
+				// write to command fifo
+				m_command_fifo1[m_command_fifo1_ptr] = data;
+				m_command_fifo1_ptr++;
+
+				// execute when filled
+				if (m_command_fifo1_ptr >= 4)
+				{
+					printf("GCU FIFO1 exec: %08X %08X %08X %08X\n", m_command_fifo1[0], m_command_fifo1[1], m_command_fifo1[2], m_command_fifo1[3]);
+					m_command_fifo1_ptr = 0;
+				}
+			}
+			else	
+			{
+				// write to VRAM fifo
+				m_vram[m_vram_fifo1_addr] = data;
+				m_vram_fifo1_addr++;
+			}
+			break;
+
+		default:
+			//printf("%s_w: %02X, %08X, %08X\n", basetag(), reg, data, mem_mask);
+			break;
+	}
+}
+
+int firebeat_gcu_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT16 *vram16 = (UINT16*)m_vram;
+
+	int x = 0;
+	int y = 0;
+	int width = m_frame[0].width;
+	int height = m_frame[0].height;	
+
+	if (width != 0 && height != 0)
+	{
+		rectangle visarea = screen.visible_area();
+		if ((visarea.max_x+1) != width || (visarea.max_y+1) != height)
+		{
+			visarea.max_x = width-1;
+			visarea.max_y = height-1;
+			screen.configure(width, height, visarea, screen.frame_period().attoseconds);
+		}
+	}
+
+	int fb_pitch = 1024;
+
+	for (int j=0; j < height; j++)
+	{
+		UINT16 *d = &bitmap.pix16(j, x);
+		int li = ((j+y) * fb_pitch) + x;
+		UINT32 fbaddr0 = m_frame[0].base + li;
+		UINT32 fbaddr1 = m_frame[1].base + li;
+//		UINT32 fbaddr2 = m_frame[2].base + li;
+//		UINT32 fbaddr3 = m_frame[3].base + li;
+
+		for (int i=0; i < width; i++)
+		{
+			UINT16 pix0 = vram16[fbaddr0 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+			UINT16 pix1 = vram16[fbaddr1 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+//			UINT16 pix2 = vram16[fbaddr2 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+//			UINT16 pix3 = vram16[fbaddr3 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+
+			if (pix0 & 0x8000)
+			{
+				d[i] = pix0 & 0x7fff;
+			}
+			else
+			{
+				d[i] = pix1 & 0x7fff;
+			}
+
+			fbaddr0++;
+			fbaddr1++;
+//			fbaddr2++;
+//			fbaddr3++;
+		}
+	}
+
+	return 0;
+}
+
+void firebeat_gcu_device::draw_object(UINT32 *cmd)
+{
+	// 0x00: xxx----- -------- -------- --------   command (5)
+	// 0x00: ---x---- -------- -------- --------   0: absolute coordinates
+	//                                             1: relative coordinates from framebuffer origin
+	// 0x00: ----xx-- -------- -------- --------   ?
+	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   object data address in vram
+
+	// 0x01: -------- -------- ------xx xxxxxxxx   object x
+	// 0x01: -------- xxxxxxxx xxxxxx-- --------   object y
+	// 0x01: -----x-- -------- -------- --------   object x flip
+	// 0x01: ----x--- -------- -------- --------   object y flip
+	// 0x01: --xx---- -------- -------- --------   object alpha enable (different blend modes?)
+	// 0x01: -x------ -------- -------- --------   object transparency enable (?)
+
+	// 0x02: -------- -------- ------xx xxxxxxxx   object width
+	// 0x02: -------- -----xxx xxxxxx-- --------   object x scale
+
+	// 0x03: -------- -------- ------xx xxxxxxxx   object height
+	// 0x03: -------- -----xxx xxxxxx-- --------   object y scale
+
+	int x = cmd[1] & 0x3ff;
+	int y = (cmd[1] >> 10) & 0x3fff;
+	int width = (cmd[2] & 0x3ff) + 1;
+	int height = (cmd[3] & 0x3ff)  + 1;
+	int xscale = (cmd[2] >> 10) & 0x1ff;
+	int yscale = (cmd[3] >> 10) & 0x1ff;
+	bool xflip = (cmd[1] & 0x04000000) ? true : false;
+	bool yflip = (cmd[1] & 0x08000000) ? true : false;
+	bool alpha_enable = (cmd[1] & 0x30000000) ? true : false;
+	bool trans_enable = (cmd[1] & 0x40000000) ? true : false;
+	UINT32 address = cmd[0] & 0xffffff;
+	int alpha_level = (cmd[2] >> 27) & 0x1f;
+	bool relative_coords = (cmd[0] & 0x10000000) ? true : false;
+	
+	if (relative_coords)
+	{
+		x += m_fb_origin_x;
+		y += m_fb_origin_y;
+	}
+
+	UINT16 *vram16 = (UINT16*)m_vram;
+
+	if (xscale == 0 || yscale == 0)
+	{
+		return;
+	}
+
+#if PRINT_GCU
+	printf("%s Draw Object %08X, x %d, y %d, w %d, h %d [%08X %08X %08X %08X]\n", basetag(), address, x, y, width, height, cmd[0], cmd[1], cmd[2], cmd[3]);
+#endif
+
+	width = (((width * 65536) / xscale) * 64) / 65536;
+	height = (((height * 65536) / yscale) * 64) / 65536;
+
+	int fb_pitch = 1024;
+
+	int v = 0;
+	for (int j=0; j < height; j++)
+	{
+		int index;
+		int xinc;
+		UINT32 fbaddr = ((j+y) * fb_pitch) + x;
+		
+		if (yflip)
+		{
+			index = address + ((height - 1 - (v >> 6)) * 1024);
+		}
+		else
+		{
+			index = address + ((v >> 6) * 1024);
+		}
+
+		if (xflip)
+		{
+			fbaddr += width;
+			xinc = -1;
+		}
+		else
+		{
+			xinc = 1;
+		}
+
+		int u = 0;
+		for (int i=0; i < width; i++)
+		{
+			UINT16 pix = vram16[((index + (u >> 6)) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)) & 0xffffff];
+			bool draw = !trans_enable || (trans_enable && (pix & 0x8000));
+			if (alpha_enable)
+			{
+				if (draw)
+				{
+					if ((pix & 0x7fff) != 0)
+					{
+						UINT16 srcpix = vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+
+						UINT32 sr = (srcpix >> 10) & 0x1f;
+						UINT32 sg = (srcpix >>  5) & 0x1f;
+						UINT32 sb = (srcpix >>  0) & 0x1f;
+						UINT32 r = (pix >> 10) & 0x1f;
+						UINT32 g = (pix >>  5) & 0x1f;
+						UINT32 b = (pix >>  0) & 0x1f;
+
+						sr += (r * alpha_level) >> 4;
+						sg += (g * alpha_level) >> 4;
+						sb += (b * alpha_level) >> 4;
+
+						if (sr > 0x1f) sr = 0x1f;
+						if (sg > 0x1f) sg = 0x1f;
+						if (sb > 0x1f) sb = 0x1f;
+
+						vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = (sr << 10) | (sg << 5) | sb | 0x8000;
+					}
+				}
+			}
+			else
+			{
+				if (draw)
+				{
+					vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = pix | 0x8000;
+				}
+			}
+
+			fbaddr += xinc;
+			u += xscale;
+		}
+
+		v += yscale;
+	}
+}
+
+void firebeat_gcu_device::fill_rect(UINT32 *cmd)
+{
+	// 0x00: xxx----- -------- -------- --------	   command (4)
+	// 0x00: ---x---- -------- -------- --------   0: absolute coordinates
+	//                                             1: relative coordinates from framebuffer origin
+	// 0x00: ----xx-- -------- -------- --------   ?
+	// 0x00: -------- -------- ------xx xxxxxxxx   width
+	// 0x00: -------- ----xxxx xxxxxx-- --------   height
+
+	// 0x01: -------- -------- ------xx xxxxxxxx   x
+	// 0x01: -------- xxxxxxxx xxxxxx-- --------   y
+
+	// 0x02: xxxxxxxx xxxxxxxx -------- --------   fill pattern pixel 0
+	// 0x02: -------- -------- xxxxxxxx xxxxxxxx   fill pattern pixel 1
+
+	// 0x03: xxxxxxxx xxxxxxxx -------- --------   fill pattern pixel 2
+	// 0x03: -------- -------- xxxxxxxx xxxxxxxx   fill pattern pixel 3
+
+	int x = cmd[1] & 0x3ff;
+	int y = (cmd[1] >> 10) & 0x3fff;
+	int width = (cmd[0] & 0x3ff) + 1;
+	int height = ((cmd[0] >> 10) & 0x3ff) + 1;
+	bool relative_coords = (cmd[0] & 0x10000000) ? true : false;
+
+	if (relative_coords)
+	{
+		x += m_fb_origin_x;
+		y += m_fb_origin_y;
+	}
+
+	UINT16 color[4];
+	color[0] = (cmd[2] >> 16);
+	color[1] = (cmd[2] & 0xffff);
+	color[2] = (cmd[3] >> 16);
+	color[3] = (cmd[3] & 0xffff);
+
+#if PRINT_GCU
+	printf("%s Fill Rect x %d, y %d, w %d, h %d, %08X %08X [%08X %08X %08X %08X]\n", basetag(), x, y, width, height, cmd[2], cmd[3], cmd[0], cmd[1], cmd[2], cmd[3]);
+#endif
+
+	int x1 = x;
+	int x2 = x + width;
+	int y1 = y;
+	int y2 = y + height;
+
+	UINT16 *vram16 = (UINT16*)m_vram;
+
+	int fb_pitch = 1024;
+
+	for (int j=y1; j < y2; j++)
+	{
+		UINT32 fbaddr = j * fb_pitch;
+		for (int i=x1; i < x2; i++)
+		{
+			vram16[(fbaddr+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[i&3];
+		}
+	}
+}
+
+void firebeat_gcu_device::draw_character(UINT32 *cmd)
+{
+	// 0x00: xxx----- -------- -------- --------   command (7)
+	// 0x00: ---x---- -------- -------- --------   0: absolute coordinates
+	//                                             1: relative coordinates from framebuffer base (unverified, should be same as other operations)
+	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   character data address in vram
+
+	// 0x01: -------- -------- ------xx xxxxxxxx   character x
+	// 0x01: -------- ----xxxx xxxxxx-- --------   character y
+
+	// 0x02: xxxxxxxx xxxxxxxx -------- --------   color 0
+	// 0x02: -------- -------- xxxxxxxx xxxxxxxx   color 1
+
+	// 0x03: xxxxxxxx xxxxxxxx -------- --------   color 2
+	// 0x03: -------- -------- xxxxxxxx xxxxxxxx   color 3
+
+	int x = cmd[1] & 0x3ff;
+	int y = (cmd[1] >> 10) & 0x3ff;
+	UINT32 address = cmd[0] & 0xffffff;
+	UINT16 color[4];
+	bool relative_coords = (cmd[0] & 0x10000000) ? true : false;
+
+	if (relative_coords)
+	{
+		x += m_fb_origin_x;
+		y += m_fb_origin_y;
+	}
+
+	color[0] = cmd[2] >> 16;
+	color[1] = cmd[2] & 0xffff;
+	color[2] = cmd[3] >> 16;
+	color[3] = cmd[3] & 0xffff;
+
+#if PRINT_GCU
+	printf("%s Draw Char %08X, x %d, y %d\n", basetag(), address, x, y);
+#endif
+
+	UINT16 *vram16 = (UINT16*)m_vram;
+	int fb_pitch = 1024;
+
+	for (int j=0; j < 8; j++)
+	{
+		UINT32 fbaddr = (y+j) * fb_pitch;
+		UINT16 line = vram16[address ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+
+		address += 4;
+
+		for (int i=0; i < 8; i++)
+		{
+			int p = (line >> ((7-i) * 2)) & 3;
+			vram16[(fbaddr+x+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[p] | 0x8000;
+		}
+	}
+}
+
+void firebeat_gcu_device::fb_config(UINT32 *cmd)
+{
+	// 0x00: xxx----- -------- -------- --------   command (3)
+
+	// 0x01: -------- -------- -------- --------   unused?
+
+	// 0x02: -------- -------- ------xx xxxxxxxx   Framebuffer Origin X
+
+	// 0x03: -------- -------- --xxxxxx xxxxxxxx   Framebuffer Origin Y
+
+#if PRINT_GCU
+	printf("%s FB Config %08X %08X %08X %08X\n", basetag(), cmd[0], cmd[1], cmd[2], cmd[3]);
+#endif
+
+	m_fb_origin_x = cmd[2] & 0x3ff;
+	m_fb_origin_y = cmd[3] & 0x3fff;
+}
+
+void firebeat_gcu_device::execute_display_list(UINT32 addr)
+{
+	bool end = false;
+
+	int counter = 0;
+
+#if PRINT_GCU
+	printf("%s Exec Display List %08X\n", basetag(), addr);
+#endif
+
+	addr /= 2;
+	while (!end && counter < 0x1000 && addr < (0x2000000/4))
+	{
+		UINT32 *cmd = &m_vram[addr];
+		addr += 4;
+
+		int command = (cmd[0] >> 29) & 0x7;
+
+		switch (command)
+		{
+			case 0:		// NOP?
+				break;
+
+			case 1:		// Execute display list
+				execute_display_list(cmd[0] & 0xffffff);
+				break;
+
+			case 2:		// End of display list
+				end = true;
+				break;
+
+			case 3:		// Framebuffer config
+				fb_config(cmd);
+				break;
+
+			case 4:		// Fill rectangle
+				fill_rect(cmd);
+				break;
+
+			case 5:		// Draw object
+				draw_object(cmd);
+				break;
+
+			case 7:		// Draw 8x8 character (2 bits per pixel)
+				draw_character(cmd);
+				break;
+
+			default:
+				printf("GCU Unknown command %08X %08X %08X %08X\n", cmd[0], cmd[1], cmd[2], cmd[3]);
+				break;
+		}
+		counter++;
+	};
+}
+
+void firebeat_gcu_device::execute_command(UINT32* cmd)
+{
+	int command = (cmd[0] >> 29) & 0x7;
+
+#if PRINT_GCU
+	printf("%s Exec Command %08X, %08X, %08X, %08X\n", basetag(), cmd[0], cmd[1], cmd[2], cmd[3]);
+#endif
+
+	switch (command)
+	{
+		case 0:		// NOP?
+			break;
+
+		case 1:		// Execute display list
+			execute_display_list(cmd[0] & 0xffffff);
+			break;
+
+		case 2:		// End of display list
+			break;
+
+		case 3:		// Framebuffer config				
+			fb_config(cmd);
+			break;
+
+		case 4:		// Fill rectangle
+			fill_rect(cmd);
+			break;
+
+		case 5:		// Draw object
+			draw_object(cmd);
+			break;
+
+		case 7:		// Draw 8x8 character (2 bits per pixel)
+			draw_character(cmd);
+			break;
+
+		default:
+			printf("GCU Unknown command %08X %08X %08X %08X\n", cmd[0], cmd[1], cmd[2], cmd[3]);
+			break;
+	}
+}
+
+void firebeat_gcu_device::device_start()
+{
+	m_cpu = machine().device(m_cputag);
+
+	m_vram = auto_alloc_array(machine(), UINT32, 0x2000000/4);
+	memset(m_vram, 0, 0x2000000);
+}
+
+void firebeat_gcu_device::device_reset()
+{
+	m_vram_read_addr = 0;
+	m_command_fifo0_ptr = 0;
+	m_command_fifo1_ptr = 0;
+	m_vram_fifo0_addr = 0;
+	m_vram_fifo1_addr = 0;
+
+	for (int i=0; i < 4; i++)
+	{
+		m_frame[i].base = 0;
+		m_frame[i].width = 0;
+		m_frame[i].height = 0;
+	}
+}
+
+void firebeat_gcu_device::device_stop()
+{
+#if DUMP_VRAM
+	char filename[200];
+	sprintf(filename, "%s_vram.bin", basetag());
+	printf("dumping %s\n", filename);
+	FILE *file = fopen(filename, "wb");
+	int i;
+	
+	for (i=0; i < 0x2000000/4; i++)
+	{
+		fputc((m_vram[i] >> 24) & 0xff, file);
+		fputc((m_vram[i] >> 16) & 0xff, file);
+		fputc((m_vram[i] >> 8) & 0xff, file);
+		fputc((m_vram[i] >> 0) & 0xff, file);
+	}
+	
+	fclose(file);
+#endif
+}
+
+
 
 
 
@@ -180,7 +887,9 @@ public:
 		m_duart_com(*this, "duart_com"),
 		m_kbd0(*this, "kbd0"),
 		m_kbd1(*this, "kbd1"),
-		m_ata(*this, "ata")
+		m_ata(*this, "ata"),
+		m_gcu0(*this, "gcu0"),
+		m_gcu1(*this, "gcu1")
 	{ }
 
 	required_device<ppc4xx_device> m_maincpu;
@@ -193,11 +902,12 @@ public:
 	optional_device<midi_keyboard_device> m_kbd0;
 	optional_device<midi_keyboard_device> m_kbd1;
 	required_device<ata_interface_device> m_ata;
+	required_device<firebeat_gcu_device> m_gcu0;
+	required_device<firebeat_gcu_device> m_gcu1;
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
 //  emu_timer *m_keyboard_timer;
-	GCU_REGS m_gcu[2];
 	int m_tick;
 	int m_layer;
 	int m_cab_data_ptr;
@@ -218,10 +928,6 @@ public:
 	UINT32 screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
-	DECLARE_READ32_MEMBER(gcu0_r);
-	DECLARE_WRITE32_MEMBER(gcu0_w);
-	DECLARE_READ32_MEMBER(gcu1_r);
-	DECLARE_WRITE32_MEMBER(gcu1_w);
 	DECLARE_READ32_MEMBER(input_r);
 	DECLARE_READ32_MEMBER(sensor_r );
 	DECLARE_READ32_MEMBER(flashram_r);
@@ -252,13 +958,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
 	DECLARE_READ16_MEMBER(spu_unk_r);
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
-	void gcu_draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd);
-	void gcu_fill_rect(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *cmd);
-	void gcu_draw_character(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd);
-	void gcu_exec_display_list(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 address);
-	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip);
-	UINT32 GCU_r(int chip, UINT32 offset, UINT32 mem_mask);
-	void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask);
 	void set_ibutton(UINT8 *data);
 	int ibutton_w(UINT8 data);
 	DECLARE_WRITE8_MEMBER(security_w);
@@ -277,566 +976,10 @@ public:
 
 VIDEO_START_MEMBER(firebeat_state,firebeat)
 {
-	m_gcu[0].vram = auto_alloc_array(machine(), UINT32, 0x2000000/4);
-	m_gcu[1].vram = auto_alloc_array(machine(), UINT32, 0x2000000/4);
-	memset(m_gcu[0].vram, 0, 0x2000000);
-	memset(m_gcu[1].vram, 0, 0x2000000);
 }
 
-
-void firebeat_state::gcu_draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
-{
-	// 0x00: xxx----- -------- -------- --------   command type
-	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   object data address in vram
-
-	// 0x01: -------- -------- ------xx xxxxxxxx   object x
-	// 0x01: -------- ----xxxx xxxxxx-- --------   object y
-	// 0x01: -----x-- -------- -------- --------   object x flip
-	// 0x01: ----x--- -------- -------- --------   object y flip
-	// 0x01: ---x---- -------- -------- --------   object alpha enable (?)
-
-	// 0x02: -------- -------- ------xx xxxxxxxx   object width
-	// 0x02: -------- -----xxx xxxxxx-- --------   object x scale
-
-	// 0x03: -------- -------- ------xx xxxxxxxx   object height
-	// 0x03: -------- -----xxx xxxxxx-- --------   object y scale
-
-	int x               = cmd[1] & 0x3ff;
-	int y               = (cmd[1] >> 10) & 0x3ff;
-	int width           = (cmd[2] & 0x3ff) + 1;
-	int height          = (cmd[3] & 0x3ff) + 1;
-	int xscale          = (cmd[2] >> 10) & 0x1ff;
-	int yscale          = (cmd[3] >> 10) & 0x1ff;
-	int xflip           = (cmd[1] & 0x04000000) ? 1 : 0;
-	int yflip           = (cmd[1] & 0x08000000) ? 1 : 0;
-	int alpha_enable    = (cmd[1] & 0x10000000) ? 1 : 0;
-	UINT32 address      = cmd[0] & 0xffffff;
-	int alpha_level     = (cmd[2] >> 27) & 0x1f;
-
-	int i, j;
-	int u, v;
-	UINT16 *vr = (UINT16*)m_gcu[chip].vram;
-
-	if (xscale == 0 || yscale == 0)
-	{
-		xscale = 0x40;
-		yscale = 0x40;
-		return;
-	}
-
-	//if ((cmd[2] >> 24) != 0x84 && (cmd[2] >> 24) != 0x04 && (cmd[2] >> 24) != 0x00)
-	//  printf("Unknown value = %d, %d\n", (cmd[2] >> 27) & 0x1f, (cmd[2] >> 22) & 0x1f);
-
-	width   = (((width * 65536) / xscale) * 64) / 65536;
-	height  = (((height * 65536) / yscale) * 64) / 65536;
-
-	if (y > cliprect.max_y || x > cliprect.max_x) {
-		return;
-	}
-	if ((y+height) > cliprect.max_y) {
-		height = cliprect.max_y - y;
-	}
-	if ((x+width) > cliprect.max_x) {
-		width = cliprect.max_x - x;
-	}
-
-	v = 0;
-	for (j=0; j < height; j++)
-	{
-		int xi;
-		int index;
-		UINT16 *d = &bitmap.pix16(j+y, x);
-		//int index = address + ((v >> 6) * 1024);
-
-		if (yflip)
-		{
-			index = address + ((height - 1 - (v >> 6)) * 1024);
-		}
-		else
-		{
-			index = address + ((v >> 6) * 1024);
-		}
-
-		if (xflip)
-		{
-			d += width;
-			xi = -1;
-		}
-		else
-		{
-			xi = 1;
-		}
-
-		u = 0;
-		for (i=0; i < width; i++)
-		{
-			UINT16 pix = vr[((index + (u >> 6)) ^ 1) & 0xffffff];
-
-			if (alpha_enable)
-			{
-				if (pix & 0x8000)
-				{
-					if ((pix & 0x7fff) != 0)
-					{
-						//*d = pix & 0x7fff;
-						UINT16 srcpix = *d;
-						/*
-						UINT32 r = pix & 0x7c00;
-						UINT32 g = pix & 0x03e0;
-						UINT32 b = pix & 0x001f;
-
-						UINT32 sr = srcpix & 0x7c00;
-						UINT32 sg = srcpix & 0x03e0;
-						UINT32 sb = srcpix & 0x001f;
-
-						sr += r;
-						sg += g;
-						sb += b;
-						if (sr > 0x7c00) sr = 0x7c00;
-						if (sg > 0x03e0) sg = 0x03e0;
-						if (sb > 0x001f) sb = 0x001f;
-
-						*d = sr | sg | sb;
-						*/
-
-						UINT32 sr = (srcpix >> 10) & 0x1f;
-						UINT32 sg = (srcpix >>  5) & 0x1f;
-						UINT32 sb = (srcpix >>  0) & 0x1f;
-						UINT32 r = (pix >> 10) & 0x1f;
-						UINT32 g = (pix >>  5) & 0x1f;
-						UINT32 b = (pix >>  0) & 0x1f;
-
-						sr += (r * alpha_level) >> 4;
-						sg += (g * alpha_level) >> 4;
-						sb += (b * alpha_level) >> 4;
-
-						if (sr > 0x1f) sr = 0x1f;
-						if (sg > 0x1f) sg = 0x1f;
-						if (sb > 0x1f) sb = 0x1f;
-
-						*d = (sr << 10) | (sg << 5) | sb;
-					}
-				}
-			}
-			else
-			{
-				if (pix & 0x8000)
-				{
-					*d = pix & 0x7fff;
-				}
-			}
-
-			if ((cmd[0] & 0x10000000) == 0)
-				*d = 0x7fff;
-
-			d += xi;
-			u += xscale;
-		}
-
-		v += yscale;
-	}
-}
-
-void firebeat_state::gcu_fill_rect(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *cmd)
-{
-	int i, j;
-	int x1, y1, x2, y2;
-
-	int x               = cmd[1] & 0x3ff;
-	int y               = (cmd[1] >> 10) & 0x3ff;
-	int width           = (cmd[0] & 0x3ff) + 1;
-	int height          = ((cmd[0] >> 10) & 0x3ff) + 1;
-
-	UINT16 color[4];
-
-	color[0] = (cmd[2] >> 16);
-	color[1] = (cmd[2] >>  0);
-	color[2] = (cmd[3] >> 16);
-	color[3] = (cmd[3] >>  0);
-
-	x1 = x;
-	x2 = x + width;
-	y1 = y;
-	y2 = y + height;
-
-	if ((color[0] & 0x8000) == 0 && (color[1] & 0x8000) == 0 && (color[2] & 0x8000) == 0 && (color[3] & 0x8000) == 0)
-	{
-		// optimization, nothing to fill
-		return;
-	}
-
-	// clip
-	if (x1 < cliprect.min_x)    x1 = cliprect.min_x;
-	if (y1 < cliprect.min_y)    y1 = cliprect.min_y;
-	if (x2 > cliprect.max_x)    x2 = cliprect.max_x;
-	if (y2 > cliprect.max_y)    y2 = cliprect.max_y;
-
-	for (j=y1; j < y2; j++)
-	{
-		UINT16 *d = &bitmap.pix16(j);
-		for (i=x1; i < x2; i++)
-		{
-			if (color[i&3] & 0x8000)
-			{
-				d[i] = color[i&3] & 0x7fff;
-			}
-		}
-	}
-}
-
-void firebeat_state::gcu_draw_character(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd)
-{
-	// 0x00: xxx----- -------- -------- --------   command type
-	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   character data address in vram
-
-	// 0x01: -------- -------- ------xx xxxxxxxx   character x
-	// 0x01: -------- ----xxxx xxxxxx-- --------   character y
-
-	// 0x02: xxxxxxxx xxxxxxxx -------- --------   color 0
-	// 0x02: -------- -------- xxxxxxxx xxxxxxxx   color 1
-
-	// 0x03: xxxxxxxx xxxxxxxx -------- --------   color 2
-	// 0x03: -------- -------- xxxxxxxx xxxxxxxx   color 3
-
-	int i, j;
-	int x               = cmd[1] & 0x3ff;
-	int y               = (cmd[1] >> 10) & 0x3ff;
-	UINT32 address      = cmd[0] & 0xffffff;
-	UINT16 color[4];
-
-	UINT16 *vr = (UINT16*)m_gcu[chip].vram;
-
-	color[0] = (cmd[2] >> 16) & 0xffff;
-	color[1] = (cmd[2] >>  0) & 0xffff;
-	color[2] = (cmd[3] >> 16) & 0xffff;
-	color[3] = (cmd[3] >>  0) & 0xffff;
-
-
-	if (y > cliprect.max_y || x > cliprect.max_x) {
-		return;
-	}
-
-
-	for (j=0; j < 8; j++)
-	{
-		UINT16 *d = &bitmap.pix16(y+j, x);
-		UINT16 line = vr[address^1];
-
-		address += 4;
-
-		for (i=0; i < 8; i++)
-		{
-			int pix = (line >> ((7-i) * 2)) & 3;
-			d[i] = color[pix];
-		}
-	}
-}
-
-void firebeat_state::gcu_exec_display_list(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 address)
-{
-	int counter = 0;
-	int end = 0;
-
-	int i = address / 4;
-	if (i < 0) i = 0;
-	while (!end && counter < 0x1000 && i < (0x2000000/4))
-	{
-		int command;
-		UINT32 cmd[4];
-		cmd[0] = m_gcu[chip].vram[i+0];
-		cmd[1] = m_gcu[chip].vram[i+1];
-		cmd[2] = m_gcu[chip].vram[i+2];
-		cmd[3] = m_gcu[chip].vram[i+3];
-
-		command = (cmd[0] >> 29) & 0x7;
-
-		switch (command)
-		{
-			case 0x0:       // ???
-			{
-				break;
-			}
-
-			case 0x1:       // Branch
-			{
-				gcu_exec_display_list(bitmap, cliprect, chip, cmd[0] & 0xffffff);
-				break;
-			}
-
-			case 0x2:       // End of display list
-			{
-				end = 1;
-				break;
-			}
-
-			case 0x3:       // ???
-			{
-				break;
-			}
-
-			case 0x4:       // Fill rectangle
-			{
-				gcu_fill_rect(bitmap, cliprect, cmd);
-				break;
-			}
-
-			case 0x5:       // Draw object
-			{
-				gcu_draw_object(bitmap, cliprect, chip, cmd);
-				break;
-			}
-
-			case 0x7:       // Draw 8x8 Character (2-bits per pixel)
-			{
-				gcu_draw_character(bitmap, cliprect, chip, cmd);
-				break;
-			}
-
-			default:
-				//printf("Unknown command %08X %08X %08X %08X at %08X\n", cmd[0], cmd[1], cmd[2], cmd[3], i*4);
-				break;
-		}
-
-		i += 4;
-		counter++;
-	};
-}
-
-UINT32 firebeat_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip)
-{
-	bitmap.fill(0, cliprect);
-
-	if ((core_strnicmp(machine().system().name, "popn", 4) == 0) || (core_strnicmp(machine().system().name, "bm3", 3) == 0))
-	{
-		gcu_exec_display_list( bitmap, cliprect, chip, 0x1f80000);
-	}
-	else
-	{
-		if (m_layer >= 2)
-		{
-			gcu_exec_display_list(bitmap, cliprect, chip, 0x8000);
-			gcu_exec_display_list(bitmap, cliprect, chip, 0x0000);
-			gcu_exec_display_list(bitmap, cliprect, chip, 0x10000);
-		}
-		else if (m_layer == 0)
-		{
-			gcu_exec_display_list(bitmap, cliprect, chip, 0x200000);
-
-			//gcu_exec_display_list(bitmap, cliprect, chip, 0x186040);
-		}
-		else if (m_layer == 1)
-		{
-			gcu_exec_display_list(bitmap, cliprect, chip, 0x1d0800);
-
-			gcu_exec_display_list(bitmap, cliprect, chip, 0x1a9440);
-		}
-	}
-
-	m_tick++;
-	if (m_tick >= 5)
-	{
-		m_tick = 0;
-		if (machine().input().code_pressed(KEYCODE_0))
-		{
-			m_layer++;
-			if (m_layer > 2)
-			{
-				m_layer = 0;
-			}
-		}
-
-		/*
-		if (machine().input().code_pressed_once(KEYCODE_9))
-		{
-		    FILE *file = fopen("vram0.bin", "wb");
-		    int i;
-
-		    for (i=0; i < 0x2000000/4; i++)
-		    {
-		        fputc((m_gcu[0].vram[i] >> 24) & 0xff, file);
-		        fputc((m_gcu[0].vram[i] >> 16) & 0xff, file);
-		        fputc((m_gcu[0].vram[i] >> 8) & 0xff, file);
-		        fputc((m_gcu[0].vram[i] >> 0) & 0xff, file);
-		    }
-
-		    fclose(file);
-		    file = fopen("vram1.bin", "wb");
-
-		    for (i=0; i < 0x2000000/4; i++)
-		    {
-		        fputc((m_gcu[1].vram[i] >> 24) & 0xff, file);
-		        fputc((m_gcu[1].vram[i] >> 16) & 0xff, file);
-		        fputc((m_gcu[1].vram[i] >> 8) & 0xff, file);
-		        fputc((m_gcu[1].vram[i] >> 0) & 0xff, file);
-		    }
-
-		    fclose(file);
-		}
-		*/
-	}
-
-	return 0;
-}
-
-UINT32 firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 0); }
-UINT32 firebeat_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 1); }
-
-UINT32 firebeat_state::GCU_r(int chip, UINT32 offset, UINT32 mem_mask)
-{
-	int reg = offset * 4;
-
-	/* VRAM Read */
-	if (reg >= 0x80 && reg < 0x100)
-	{
-		return m_gcu[chip].vram[m_gcu[chip].vram_read_address + ((reg/4) - 0x20)];
-	}
-
-	switch(reg)
-	{
-		case 0x78:      /* GCU Status */
-			/* ppd checks bits 0x0041 of the upper halfword on interrupt */
-			return 0xffff0005;
-
-		default:
-			break;
-	}
-
-	return 0xffffffff;
-}
-
-void firebeat_state::GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
-{
-	int reg = offset * 4;
-
-	if (reg != 0x70 && chip == 0)
-	{
-		//printf("%s:gcu%d_w: %08X, %08X, %08X at %08X\n", machine().describe_context(), chip, data, offset, mem_mask);
-		//logerror("%s:gcu%d_w: %08X, %08X, %08X at %08X\n", cmachine->describe_context(), hip, data, offset, mem_mask);
-	}
-
-	switch(reg)
-	{
-		case 0x10:      /* ??? */
-			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
-			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
-			if (ACCESSING_BITS_16_31 && (data & 0x0001) == 0)
-				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-			break;
-
-		case 0x30:
-		//case 0x34:
-		//case 0x38:
-		//case 0x3c:
-		{
-			COMBINE_DATA( &m_gcu[chip].visible_area );
-			if (ACCESSING_BITS_0_15)
-			{
-				screen_device_iterator iter(machine().root_device());
-				screen_device *screen = iter.byindex(chip);
-
-				if (screen != NULL)
-				{
-					rectangle visarea = screen->visible_area();
-					int width, height;
-
-					width = (m_gcu[chip].visible_area & 0xffff);
-					height = (m_gcu[chip].visible_area >> 16) & 0xffff;
-
-					visarea.max_x = width-1;
-					visarea.max_y = height-1;
-
-					screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, screen->frame_period().attoseconds);
-				}
-			}
-			break;
-		}
-
-		case 0x40:      /* framebuffer config */
-			// HACK: switch display lists at the right times for the ParaParaParadise games until we
-			// do the video emulation properly
-			if (core_strnicmp(machine().system().name, "pp", 2) == 0)
-			{
-				switch (data)
-				{
-					case 0x00080000:    // post
-						m_layer = 0;
-						break;
-
-					case 0x00008400:    // startup tests
-						if (m_layer != 2)
-						{
-							m_layer = 1;
-						}
-						break;
-
-					case 0x00068400:    // game & svc menu
-						m_layer = 2;
-						break;
-				}
-			}
-			else if (core_strnicmp(machine().system().name, "kbm", 3) == 0)
-			{
-				switch (data)
-				{
-					case 0x00080000:    // post
-						m_layer = 0;
-						break;
-
-					case 0x0000c400:    // game & svn menu
-						m_layer = 2;
-						break;
-				}
-			}
-			break;
-
-		//case 0x44:    /* ??? */
-		//  break;
-
-		case 0x5c:      /* VRAM Read Address */
-			m_gcu[chip].vram_read_address = (data & 0xffffff) / 2;
-			break;
-
-		case 0x60:      /* VRAM FIFO Write Address */
-			m_gcu[chip].vram_write_fifo_address = (data & 0xffffff) / 2;
-
-	//      printf("gcu%d_w: %08X, %08X, %08X\n", chip, data, offset, mem_mask);
-			break;
-
-		case 0x68:      /* Unknown */
-		{
-			break;
-		}
-
-		case 0x70:      /* VRAM FIFO Write */
-			m_gcu[chip].vram[m_gcu[chip].vram_write_fifo_address] = data;
-			m_gcu[chip].vram_write_fifo_address++;
-			break;
-
-		default:
-	//      printf("gcu%d_w: %08X, %08X, %08X\n", chip, data, offset, mem_mask);
-			break;
-	}
-}
-
-READ32_MEMBER(firebeat_state::gcu0_r)
-{
-	return GCU_r(0, offset, mem_mask);
-}
-
-WRITE32_MEMBER(firebeat_state::gcu0_w)
-{
-	GCU_w(0, offset, data, mem_mask);
-}
-
-READ32_MEMBER(firebeat_state::gcu1_r)
-{
-	return GCU_r(1, offset, mem_mask);
-}
-
-WRITE32_MEMBER(firebeat_state::gcu1_w)
-{
-	GCU_w(1, offset, data, mem_mask);
-}
+UINT32 firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu0->draw(screen, bitmap, cliprect); }
+UINT32 firebeat_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu1->draw(screen, bitmap, cliprect); }
 
 /*****************************************************************************/
 
@@ -1508,8 +1651,8 @@ static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
 	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_DEVREADWRITE8("duart_com", pc16552_device, read, write, 0xffffffff)
 	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0xffffffff)
 	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
-	AM_RANGE(0x7e800000, 0x7e8000ff) AM_READWRITE(gcu0_r, gcu0_w)
-	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE(gcu1_r, gcu1_w)
+	AM_RANGE(0x7e800000, 0x7e8000ff) AM_DEVREADWRITE("gcu0", firebeat_gcu_device, read, write)
+	AM_RANGE(0x7e800100, 0x7e8001ff) AM_DEVREADWRITE("gcu1", firebeat_gcu_device, read, write)
 	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(ata_command_r, ata_command_w)
 	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(ata_control_r, ata_control_w)
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)       /* System BIOS */
@@ -1724,6 +1867,12 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
+	MCFG_DEVICE_ADD("gcu0", FIREBEAT_GCU, 0)
+	MCFG_FIREBEAT_GCU_CPU_TAG("maincpu")
+
+	MCFG_DEVICE_ADD("gcu1", FIREBEAT_GCU, 0)
+	MCFG_FIREBEAT_GCU_CPU_TAG("maincpu")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1777,6 +1926,12 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+
+	MCFG_DEVICE_ADD("gcu0", FIREBEAT_GCU, 0)
+	MCFG_FIREBEAT_GCU_CPU_TAG("maincpu")
+
+	MCFG_DEVICE_ADD("gcu1", FIREBEAT_GCU, 0)
+	MCFG_FIREBEAT_GCU_CPU_TAG("maincpu")
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

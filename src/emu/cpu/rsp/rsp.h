@@ -14,6 +14,7 @@
 #ifndef __RSP_H__
 #define __RSP_H__
 
+#include "emu.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 
@@ -161,6 +162,8 @@ public:
 	void ccfunc_unimplemented_opcode();
 	void ccfunc_sp_set_status_cb();
 	void ccfunc_unimplemented();
+
+	UINT8* get_dmem() { return m_dmem8; }
 
 protected:
 	// device-level overrides

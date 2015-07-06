@@ -28,17 +28,19 @@ def file_exists(root, srcfile, folder, inc_dir):
     for line in includes:
         try:
             fp = open(root + line + srcfile, 'rb')
+            fp.close()
             return line + srcfile
         except IOError:
-            ignore=1
+            pass
     return ''
 
 def add_c_if_exists(root, fullname):
     try:
         fp = open(root + fullname, 'rb')
+        fp.close()
         deps_files_included.append(fullname)
     except IOError:
-        ignore=1
+        pass
 
 def add_rest_if_exists(root, srcfile,folder):
     t = srcfile.rsplit('/', 2)
@@ -105,6 +107,7 @@ def parse_file_for_deps(root, srcfile, folder):
                    newfolder = fullname.rsplit('/', 1)[0] + '/'
                    parse_file_for_deps(root, fullname, newfolder)
                continue
+    fp.close()
     return 0
 
 def parse_file(root, srcfile, folder):
@@ -160,6 +163,7 @@ def parse_file(root, srcfile, folder):
                    if (fullname.endswith('.h')):
                        parse_file(root, fullname.replace('.h','.c'), newfolder)
                continue
+    fp.close()
     return 0
 
 def parse_file_for_drivers(root, srcfile):
@@ -209,8 +213,6 @@ def parse_lua_file(srcfile):
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
-    in_comment = 0
-    linenum = 0
     for line in fp.readlines():
         content = line.strip()
         if len(content)>0:
@@ -271,43 +273,42 @@ if sys.argv[3]=='drivers':
 if sys.argv[3]=='target':
     for line in components:
         sys.stdout.write("%s\n" % line)	
-    sys.stdout.write('\n');
-    sys.stdout.write('function createProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4]);
-    sys.stdout.write('	project ("mame_%s")\n' % sys.argv[4]);
-    sys.stdout.write('	targetsubdir(_target .."_" .. _subtarget)\n');
-    sys.stdout.write('	kind (LIBTYPE)\n');
-    sys.stdout.write('	uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[4]);
-    sys.stdout.write('	\n');
-    sys.stdout.write('	options {\n');
-    sys.stdout.write('		"ForceCPP",\n');
-    sys.stdout.write('	}\n');
-    sys.stdout.write('	\n');
-    sys.stdout.write('	includedirs {\n');
-    sys.stdout.write('		MAME_DIR .. "src/osd",\n');
-    sys.stdout.write('		MAME_DIR .. "src/emu",\n');
-    sys.stdout.write('		MAME_DIR .. "src/mame",\n');
-    sys.stdout.write('		MAME_DIR .. "src/mess",\n');
-    sys.stdout.write('		MAME_DIR .. "src/lib",\n');
-    sys.stdout.write('		MAME_DIR .. "src/lib/util",\n');
-    sys.stdout.write('		MAME_DIR .. "3rdparty",\n');
-    sys.stdout.write('		GEN_DIR  .. "mame/layout",\n');
-    sys.stdout.write('		GEN_DIR  .. "mess/layout",\n');
-    sys.stdout.write('	}\n');
-    sys.stdout.write('	if _OPTIONS["with-bundled-zlib"] then\n');
-    sys.stdout.write('		includedirs {\n');
-    sys.stdout.write('			MAME_DIR .. "3rdparty/zlib",\n');
-    sys.stdout.write('		}\n');
-    sys.stdout.write('	end\n');
-    sys.stdout.write('\n');
-    sys.stdout.write('	files{\n');
+    sys.stdout.write('\n')
+    sys.stdout.write('function createProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4])
+    sys.stdout.write('	project ("mame_%s")\n' % sys.argv[4])
+    sys.stdout.write('	targetsubdir(_target .."_" .. _subtarget)\n')
+    sys.stdout.write('	kind (LIBTYPE)\n')
+    sys.stdout.write('	uuid (os.uuid("drv-mame-%s"))\n' % sys.argv[4])
+    sys.stdout.write('	\n')
+    sys.stdout.write('	options {\n')
+    sys.stdout.write('		"ForceCPP",\n')
+    sys.stdout.write('	}\n')
+    sys.stdout.write('	\n')
+    sys.stdout.write('	includedirs {\n')
+    sys.stdout.write('		MAME_DIR .. "src/osd",\n')
+    sys.stdout.write('		MAME_DIR .. "src/emu",\n')
+    sys.stdout.write('		MAME_DIR .. "src/mame",\n')
+    sys.stdout.write('		MAME_DIR .. "src/mess",\n')
+    sys.stdout.write('		MAME_DIR .. "src/lib",\n')
+    sys.stdout.write('		MAME_DIR .. "src/lib/util",\n')
+    sys.stdout.write('		MAME_DIR .. "3rdparty",\n')
+    sys.stdout.write('		GEN_DIR  .. "mame/layout",\n')
+    sys.stdout.write('		GEN_DIR  .. "mess/layout",\n')
+    sys.stdout.write('	}\n')
+    sys.stdout.write('	if _OPTIONS["with-bundled-zlib"] then\n')
+    sys.stdout.write('		includedirs {\n')
+    sys.stdout.write('			MAME_DIR .. "3rdparty/zlib",\n')
+    sys.stdout.write('		}\n')
+    sys.stdout.write('	end\n')
+    sys.stdout.write('\n')
+    sys.stdout.write('	files{\n')
     for line in deps_files_included:
-        sys.stdout.write('		MAME_DIR .. "%s",\n' % line);
-    sys.stdout.write('	}\n');
-    sys.stdout.write('end\n');
-    sys.stdout.write('\n');
-    sys.stdout.write('function linkProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4]);
-    sys.stdout.write('	links {\n');
-    sys.stdout.write('		"mame_%s",\n' % sys.argv[4]);
-    sys.stdout.write('	}\n');
-    sys.stdout.write('end\n');
-
+        sys.stdout.write('		MAME_DIR .. "%s",\n' % line)
+    sys.stdout.write('	}\n')
+    sys.stdout.write('end\n')
+    sys.stdout.write('\n')
+    sys.stdout.write('function linkProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4])
+    sys.stdout.write('	links {\n')
+    sys.stdout.write('		"mame_%s",\n' % sys.argv[4])
+    sys.stdout.write('	}\n')
+    sys.stdout.write('end\n')

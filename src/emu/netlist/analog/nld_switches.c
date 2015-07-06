@@ -65,7 +65,7 @@ NETLIB_START(switch2)
 
 	register_param("POS", m_POS, 0);
 
-	connect(m_R[0].m_N, m_R[1].m_N);
+	connect_late(m_R[0].m_N, m_R[1].m_N);
 
 	register_subalias("1", m_R[0].m_P);
 	register_subalias("2", m_R[1].m_P);

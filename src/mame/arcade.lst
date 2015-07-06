@@ -3442,6 +3442,7 @@ xmvsf           // 04/10/1996 (c) 1996 (Euro)
 xmvsfr1         // 10/09/1996 (c) 1996 (Euro)
 xmvsfu          // 23/10/1996 (c) 1996 (USA)
 xmvsfur1        // 04/10/1996 (c) 1996 (USA)
+xmvsfur2		// 10/09/1996 (c) 1996 (USA)
 xmvsfj          // 04/10/1996 (c) 1996 (Japan)
 xmvsfjr1        // 10/09/1996 (c) 1996 (Japan)
 xmvsfjr2        // 09/09/1996 (c) 1996 (Japan)
@@ -4505,6 +4506,9 @@ stactics        // (c) 1981 Sega
 turbo           // (c) 1981 Sega
 turboa          // (c) 1981 Sega
 turbob          // (c) 1981 Sega
+turboc			// (c) 1981 Sega
+turbod			// (c) 1981 Sega
+turbobl         // bootleg
 subroc3d        // (c) 1982 Sega
 buckrog         // (c) 1982 Sega
 buckrogn        // (c) 1982 Sega
@@ -4791,6 +4795,7 @@ rascot          // 1991.?? Royal Ascot (Japan)
 				// 1988.08 Galaxy Force (US)
 gforce2j        // 1988.07 Galaxy Force II (Japan)
 gforce2ja       // 1988.07 Galaxy Force II (Japan)
+gforce2sd       // 1988.?? Galaxy Force II (World, Super Deluxe unit)
 gforce2         // 1988.?? Galaxy Force II (World)
 				// 1988.12 Galaxy Force II (US)
 				// 1988.08 Power Drift (US)
@@ -4921,6 +4926,7 @@ netmerc         // ?? Info available in time ??
 
 // Sega H1 games
 coolridr        // 1995.04 Cool Riders
+aquastge
 
 // Sega ST-V games
 stvbios
@@ -5611,6 +5617,7 @@ sprtshot        // 2002.12 Sports Shooting USA
 ggx15           // 2003.03 Guilty Gear X Ver.1.5
 demofist        // 2003.06 Demolish Fist
 dolphin         // 2003.08 Dolphin Blue
+kov7sprt        // 2003.11 Knights of Valour - The Seven Sprits
 ggisuka         // 2003.12 Guilty Gear Isuka
 				// 2003.12 Sangoku Senki Shichisei Tensei (IGS)
 rumblef         // 2004.03 The Rumble Fish
@@ -5621,7 +5628,7 @@ kofnwj          // 2004.07 The King of Fighters Neo Wave (Japan)
 xtrmhunt        // 2004.09 Extreme Hunting
 dirtypig        // 2004.09 Dirty Pig Skin Football
 ftspeed         // 2004.09 Faster than Speed
-kov7sprt        // 2004.?? Knights of Valour - The Seven Sprits
+rumblf2p        // 2005.01 The Rumble Fish 2 (prototype)
 anmlbskt        // 2005.01 Animal Basket (date is inside of ROM, probably earlier than release)
 vfurlong        // 2005.03 Net Select Keiba Victory Furlong
 rumblef2        // 2005.03 The Rumble Fish 2
@@ -5631,8 +5638,8 @@ kofxi           // 2005.10 The King of Fighters XI
 fotns           // 2005.12 Hokuto no Ken
 mslug6          // 2006.02 Metal Slug 6
 xtrmhnt2        // 2006.09 Extreme Hunting 2 Tournament Edition
-claychal        // 2008.?? Sega Clay Challenge
-basschal        // 2009.?? Sega Bass Challenge
+claychal        // 2008.11 Sega Clay Challenge
+basschal        // 2009.02 Sega Bass Challenge
 
 // Hikaru
 hikaru          // 2000.?? Hikaru BIOS
@@ -8688,6 +8695,7 @@ stdragon        // (c) 1989
 stdragona       // (c) 1989
 rodland         // (c) 1990
 rodlandj        // (c) 1990 (Japan)
+rittam		// Prototype or hack of Rod-Land
 rodlandjb       // bootleg
 avspirit        // (c) 1991
 phantasm        // (c) 1991 (Japan)

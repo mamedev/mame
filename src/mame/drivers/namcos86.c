@@ -318,11 +318,12 @@ WRITE8_MEMBER(namcos86_state::cus115_w)
 void namcos86_state::machine_start()
 {
 	if (!memregion("user1")->base())
-		membank("bank1")->configure_entries(0, 4, memregion("cpu1")->base() + 0x10000, 0x2000);
+		membank("bank1")->configure_entries(0, 4, memregion("cpu1")->base(), 0x2000);
 	else
 		membank("bank1")->configure_entries(0, 32, memregion("user1")->base(), 0x2000);
 
-	membank("bank2")->configure_entries(0, 4, memregion("cpu2")->base() + 0x10000, 0x2000);
+	if (membank("bank2"))
+		membank("bank2")->configure_entries(0, 4, memregion("cpu2")->base(), 0x2000);
 
 	save_item(NAME(m_wdog));
 }
@@ -358,58 +359,123 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
 ADDRESS_MAP_END
 
 
-#define CPU2_MEMORY(NAME,ADDR_SPRITE,ADDR_VIDEO1,ADDR_VIDEO2,ADDR_ROM,ADDR_BANK,ADDR_WDOG,ADDR_INT) \
-static ADDRESS_MAP_START( NAME##_cpu2_map, AS_PROGRAM, 8, namcos86_state )                          \
-	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_RAM AM_WRITE(spriteram_w) AM_SHARE("spriteram")  \
-	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_RAM AM_WRITE(videoram1_w) AM_SHARE("videoram1")   \
-	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_RAM AM_WRITE(videoram2_w) AM_SHARE("videoram2")   \
-	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_ROMBANK("bank2")                              \
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                                             \
-/*  { ADDR_BANK+0x00, ADDR_BANK+0x02 } layer 2 scroll registers would be here */                \
-	AM_RANGE(ADDR_BANK+0x03, ADDR_BANK+0x03) AM_WRITE(bankswitch2_w)                            \
-/*  { ADDR_BANK+0x04, ADDR_BANK+0x06 } layer 3 scroll registers would be here */                \
-	AM_RANGE(ADDR_WDOG, ADDR_WDOG) AM_WRITE(watchdog2_w)                                        \
-	AM_RANGE(ADDR_INT, ADDR_INT) AM_WRITE(int_ack2_w)   /* IRQ acknowledge */                   \
+// skykiddx and hopmappy cpu2 programs do nothing but sit in a loop resetting the watchdog
+// shared RAM is presumably mapped somewhere, but it's impossible to infer from program behaviour
+static ADDRESS_MAP_START( hopmappy_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(watchdog2_w)
+	AM_RANGE(0x9400, 0x9400) AM_WRITE(int_ack2_w)
 ADDRESS_MAP_END
 
-#define UNUSED 0x4000
-/*                     SPRITE  VIDEO1  VIDEO2  ROM     BANK    WDOG    IRQACK */
-CPU2_MEMORY( hopmappy, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, 0x9000, UNUSED )
-CPU2_MEMORY( skykiddx, UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, 0x9000, 0x9400 )
-CPU2_MEMORY( roishtar, 0x0000, 0x6000, 0x4000, UNUSED, UNUSED, 0xa000, 0xb000 )
-CPU2_MEMORY( genpeitd, 0x4000, 0x0000, 0x2000, UNUSED, UNUSED, 0xb000, 0x8800 )
-CPU2_MEMORY( rthunder, 0x0000, 0x2000, 0x4000, 0x6000, 0xd800, 0x8000, 0x8800 )
-CPU2_MEMORY( wndrmomo, 0x2000, 0x4000, 0x6000, UNUSED, UNUSED, 0xc000, 0xc800 )
-#undef UNUSED
-
-
-#define MCU_MEMORY(NAME,ADDR_LOWROM,ADDR_INPUT,ADDR_UNK1,ADDR_UNK2)         \
-static ADDRESS_MAP_START( NAME##_mcu_map, AS_PROGRAM, 8, namcos86_state )   \
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r,m6801_io_w) \
-	AM_RANGE(0x0080, 0x00ff) AM_RAM                                                     \
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */ \
-	AM_RANGE(0x1400, 0x1fff) AM_RAM                                                     \
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write) \
-	AM_RANGE(ADDR_INPUT+0x20, ADDR_INPUT+0x20) AM_READ_PORT("IN0")                      \
-	AM_RANGE(ADDR_INPUT+0x21, ADDR_INPUT+0x21) AM_READ_PORT("IN1")                      \
-	AM_RANGE(ADDR_INPUT+0x30, ADDR_INPUT+0x30) AM_READ(dsw0_r)                          \
-	AM_RANGE(ADDR_INPUT+0x31, ADDR_INPUT+0x31) AM_READ(dsw1_r)                          \
-	AM_RANGE(ADDR_LOWROM, ADDR_LOWROM+0x3fff) AM_ROM                                    \
-	AM_RANGE(0x8000, 0xbfff) AM_ROM                                                     \
-	AM_RANGE(0xf000, 0xffff) AM_ROM                                                     \
-	AM_RANGE(ADDR_UNK1, ADDR_UNK1) AM_WRITENOP /* ??? written (not always) at end of interrupt */   \
-	AM_RANGE(ADDR_UNK2, ADDR_UNK2) AM_WRITENOP /* ??? written (not always) at end of interrupt */   \
+static ADDRESS_MAP_START( roishtar_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(watchdog2_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(int_ack2_w)   // IRQ acknowledge
 ADDRESS_MAP_END
 
-#define UNUSED 0x4000
-/*                    LOWROM   INPUT    UNK1    UNK2 */
-MCU_MEMORY( hopmappy, UNUSED, 0x2000, 0x8000, 0x8800 )
-MCU_MEMORY( skykiddx, UNUSED, 0x2000, 0x8000, 0x8800 )
-MCU_MEMORY( roishtar, 0x0000, 0x6000, 0x8000, 0x9800 )
-MCU_MEMORY( genpeitd, 0x4000, 0x2800, 0xa000, 0xa800 )
-MCU_MEMORY( rthunder, 0x4000, 0x2000, 0xb000, 0xb800 )
-MCU_MEMORY( wndrmomo, 0x4000, 0x3800, 0xc000, 0xc800 )
-#undef UNUSED
+static ADDRESS_MAP_START( genpeitd_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(watchdog2_w)
+	AM_RANGE(0x8800, 0x8800) AM_WRITE(int_ack2_w)   // IRQ acknowledge
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rthunder_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog2_w)
+	AM_RANGE(0x8800, 0x8800) AM_WRITE(int_ack2_w)   // IRQ acknowledge
+//  { 0xd800, 0xd802 } layer 2 scroll registers would be here
+	AM_RANGE(0xd803, 0xd803) AM_WRITE(bankswitch2_w)
+//  { 0xd804, 0xd806 } layer 3 scroll registers would be here
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( wndrmomo_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(watchdog2_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(int_ack2_w)   // IRQ acknowledge
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( common_mcu_map, AS_PROGRAM, 8, namcos86_state )
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r,m6801_io_w)
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)
+	AM_RANGE(0x1400, 0x1fff) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM // external ROM
+	AM_RANGE(0xf000, 0xffff) AM_ROM // internal ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hopmappy_mcu_map, AS_PROGRAM, 8, namcos86_state )
+	AM_IMPORT_FROM(common_mcu_map)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("IN0")
+	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("IN1")
+	AM_RANGE(0x2030, 0x2030) AM_READ(dsw0_r)
+	AM_RANGE(0x2031, 0x2031) AM_READ(dsw1_r)
+	AM_RANGE(0x8000, 0x8000) AM_WRITENOP // ??? written (not always) at end of interrupt
+	AM_RANGE(0x8800, 0x8800) AM_WRITENOP // ??? written (not always) at end of interrupt
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( roishtar_mcu_map, AS_PROGRAM, 8, namcos86_state )
+	AM_IMPORT_FROM(common_mcu_map)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x6020, 0x6020) AM_READ_PORT("IN0")
+	AM_RANGE(0x6021, 0x6021) AM_READ_PORT("IN1")
+	AM_RANGE(0x6030, 0x6030) AM_READ(dsw0_r)
+	AM_RANGE(0x6031, 0x6031) AM_READ(dsw1_r)
+	AM_RANGE(0x8000, 0x8000) AM_WRITENOP // ??? written (not always) at end of interrupt
+	AM_RANGE(0x9800, 0x9800) AM_WRITENOP // ??? written (not always) at end of interrupt
+ADDRESS_MAP_END
+
+// are these three actually different, or are the I/O ports simply mirrored from 0x2000-0x3fff?
+static ADDRESS_MAP_START( genpeitd_mcu_map, AS_PROGRAM, 8, namcos86_state )
+	AM_IMPORT_FROM(common_mcu_map)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x2820, 0x2820) AM_READ_PORT("IN0")
+	AM_RANGE(0x2821, 0x2821) AM_READ_PORT("IN1")
+	AM_RANGE(0x2830, 0x2830) AM_READ(dsw0_r)
+	AM_RANGE(0x2831, 0x2831) AM_READ(dsw1_r)
+	AM_RANGE(0x4000, 0x7fff) AM_ROM
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ??? written (not always) at end of interrupt
+	AM_RANGE(0xa800, 0xa800) AM_WRITENOP // ??? written (not always) at end of interrupt
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rthunder_mcu_map, AS_PROGRAM, 8, namcos86_state )
+	AM_IMPORT_FROM(common_mcu_map)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("IN0")
+	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("IN1")
+	AM_RANGE(0x2030, 0x2030) AM_READ(dsw0_r)
+	AM_RANGE(0x2031, 0x2031) AM_READ(dsw1_r)
+	AM_RANGE(0x4000, 0x7fff) AM_ROM
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP // ??? written (not always) at end of interrupt
+	AM_RANGE(0xb800, 0xb800) AM_WRITENOP // ??? written (not always) at end of interrupt
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( wndrmomo_mcu_map, AS_PROGRAM, 8, namcos86_state )
+	AM_IMPORT_FROM(common_mcu_map)
+	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("IN0")
+	AM_RANGE(0x3821, 0x3821) AM_READ_PORT("IN1")
+	AM_RANGE(0x3830, 0x3830) AM_READ(dsw0_r)
+	AM_RANGE(0x3831, 0x3831) AM_READ(dsw1_r)
+	AM_RANGE(0x4000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_WRITENOP // ??? written (not always) at end of interrupt
+	AM_RANGE(0xc800, 0xc800) AM_WRITENOP // ??? written (not always) at end of interrupt
+ADDRESS_MAP_END
 
 
 READ8_MEMBER(namcos86_state::readFF)
@@ -1020,17 +1086,6 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( skykiddx, hopmappy )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(skykiddx_cpu2_map)
-
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(skykiddx_mcu_map)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_DERIVED( roishtar, hopmappy )
 
 	/* basic machine hardware */
@@ -1095,13 +1150,13 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( skykiddx )
-	ROM_REGION( 0x18000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "sk3_2.9d",     0x00000, 0x8000, CRC(74b8f8e2) SHA1(0c9f0a283c764d5db59abea17a7f3285718b4501) )
 	ROM_LOAD( "sk3_1b.9c",    0x08000, 0x8000, CRC(767b3514) SHA1(7b85e520e56924235d1f4987333f183c914fafc1) )
-	ROM_LOAD( "sk3_2.9d",     0x10000, 0x8000, CRC(74b8f8e2) SHA1(0c9f0a283c764d5db59abea17a7f3285718b4501) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
-	ROM_LOAD( "sk3_3.12c",    0x8000, 0x8000, CRC(6d1084c4) SHA1(0045e01cbeb750c50a561420f1577de8cd881894) )
+	ROM_REGION( 0x10000, "cpu2", 0 )
 	/* 12d empty */
+	ROM_LOAD( "sk3_3.12c",    0x8000, 0x8000, CRC(6d1084c4) SHA1(0045e01cbeb750c50a561420f1577de8cd881894) )
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )
 	ROM_LOAD( "sk3_9.7r",     0x00000, 0x08000, CRC(48675b17) SHA1(434babcf5454364a17e529daae16e6f623ca75dd) )  /* plane 1,2 */
@@ -1131,13 +1186,13 @@ ROM_START( skykiddx )
 ROM_END
 
 ROM_START( skykiddxo )
-	ROM_REGION( 0x18000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "sk3_2.9d",     0x00000, 0x8000, CRC(74b8f8e2) SHA1(0c9f0a283c764d5db59abea17a7f3285718b4501) )
 	ROM_LOAD( "sk3_1.9c",     0x08000, 0x8000, CRC(5722a291) SHA1(0b3ca2585bf5c18214c1337dce8f92027e9d78c2) )
-	ROM_LOAD( "sk3_2.9d",     0x10000, 0x8000, CRC(74b8f8e2) SHA1(0c9f0a283c764d5db59abea17a7f3285718b4501) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
-	ROM_LOAD( "sk3_3.12c",    0x8000, 0x8000, CRC(6d1084c4) SHA1(0045e01cbeb750c50a561420f1577de8cd881894) )
+	ROM_REGION( 0x10000, "cpu2", 0 )
 	/* 12d empty */
+	ROM_LOAD( "sk3_3.12c",    0x8000, 0x8000, CRC(6d1084c4) SHA1(0045e01cbeb750c50a561420f1577de8cd881894) )
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )
 	ROM_LOAD( "sk3_9.7r",     0x00000, 0x08000, CRC(48675b17) SHA1(434babcf5454364a17e529daae16e6f623ca75dd) )  /* plane 1,2 */
@@ -1167,13 +1222,13 @@ ROM_START( skykiddxo )
 ROM_END
 
 ROM_START( hopmappy )
-	ROM_REGION( 0x18000, "cpu1", 0 )
-	ROM_LOAD( "hm1_1.9c",     0x08000, 0x8000, CRC(1a83914e) SHA1(6cb96b2518f4b867e20bd5d31ac6913d09c95f06) )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
+	ROM_LOAD( "hm1_1.9c",     0x08000, 0x8000, CRC(1a83914e) SHA1(6cb96b2518f4b867e20bd5d31ac6913d09c95f06) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
-	ROM_LOAD( "hm1_2.12c",    0xc000, 0x4000, CRC(c46cda65) SHA1(1131b4aa0a446569e1eb9f59964548058c7993e2) )
+	ROM_REGION( 0x10000, "cpu2", 0 )
 	/* 12d empty */
+	ROM_LOAD( "hm1_2.12c",    0xc000, 0x4000, CRC(c46cda65) SHA1(1131b4aa0a446569e1eb9f59964548058c7993e2) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
 	ROM_LOAD( "hm1_6.7r",     0x00000, 0x04000, CRC(fd0e8887) SHA1(b76737d22bb1c1ae4d700ea6796e8d91f6ffa275) )  /* plane 1,2 */
@@ -1202,13 +1257,13 @@ ROM_START( hopmappy )
 ROM_END
 
 ROM_START( roishtar )
-	ROM_REGION( 0x18000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "ri1_2.9d",     0x04000, 0x2000, CRC(fcd58d91) SHA1(e7b6d7afd7cf6c374ee90d6499ea0f205e742b21) )
 	ROM_LOAD( "ri1_1c.9c",    0x08000, 0x8000, CRC(14acbacb) SHA1(3c6130f9e5a4ba84be0cc3547c1086707ee3b8e9) )
-	ROM_LOAD( "ri1_2.9d",     0x14000, 0x2000, CRC(fcd58d91) SHA1(e7b6d7afd7cf6c374ee90d6499ea0f205e742b21) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
-	ROM_LOAD( "ri1_3.12c",    0x8000, 0x8000, CRC(a39829f7) SHA1(e08114d5154367a3cc36f1485253f18044a1888d) )
+	ROM_REGION( 0x10000, "cpu2", 0 )
 	/* 12d empty */
+	ROM_LOAD( "ri1_3.12c",    0x8000, 0x8000, CRC(a39829f7) SHA1(e08114d5154367a3cc36f1485253f18044a1888d) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
 	ROM_LOAD( "ri1_14.7r",    0x00000, 0x04000, CRC(de8154b4) SHA1(70a65e4656cf9fcf5c54e84c628ec95393e856fb) )  /* plane 1,2 */
@@ -1244,13 +1299,13 @@ ROM_START( roishtar )
 ROM_END
 
 ROM_START( genpeitd )
-	ROM_REGION( 0x18000, "cpu1", 0 )
-	ROM_LOAD( "gt1_1b.9c",    0x08000, 0x8000, CRC(75396194) SHA1(2a526064fb91b2796c913f3050867352ac63e643) )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
+	ROM_LOAD( "gt1_1b.9c",    0x08000, 0x8000, CRC(75396194) SHA1(2a526064fb91b2796c913f3050867352ac63e643) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
-	ROM_LOAD( "gt1_2.12c",    0xc000, 0x4000, CRC(302f2cb6) SHA1(19c39afb7d49d80aeaaf67a837cd02bfd3d64fbd) )
+	ROM_REGION( 0x10000, "cpu2", 0 )
 	/* 12d empty */
+	ROM_LOAD( "gt1_2.12c",    0xc000, 0x4000, CRC(302f2cb6) SHA1(19c39afb7d49d80aeaaf67a837cd02bfd3d64fbd) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "gt1_7.7r",     0x00000, 0x10000, CRC(ea77a211) SHA1(32b8ae11723b6223b42225805acd0dcab65516a5) )  /* plane 1,2 */
@@ -1295,13 +1350,13 @@ ROM_START( genpeitd )
 ROM_END
 
 ROM_START( rthunder )
-	ROM_REGION( 0x18000, "cpu1", 0 )
-	ROM_LOAD( "rt3_1b.9c",    0x8000, 0x8000, CRC(7d252a1b) SHA1(cb92709e94eb273b3ce44c55cd252170ad1017f4) )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
+	ROM_LOAD( "rt3_1b.9c",    0x8000, 0x8000, CRC(7d252a1b) SHA1(cb92709e94eb273b3ce44c55cd252170ad1017f4) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "rt3_3.12d",    0x00000, 0x8000, CRC(a13f601c) SHA1(8987174e364d20eeab706c3e0d4e0d3c2b96723c) )
 	ROM_LOAD( "rt3_2b.12c",   0x08000, 0x8000, CRC(a7ea46ee) SHA1(52e8757aacb4e01f8432125729e2323c48ebc4f5) )
-	ROM_LOAD( "rt3_3.12d",    0x10000, 0x8000, CRC(a13f601c) SHA1(8987174e364d20eeab706c3e0d4e0d3c2b96723c) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "rt1_7.7r",     0x00000, 0x10000, CRC(a85efa39) SHA1(1ed63b421a93960668cb4558c1ca1b3c86b1f6be) )  /* plane 1,2 */
@@ -1346,13 +1401,13 @@ ROM_START( rthunder )
 ROM_END
 
 ROM_START( rthunder2 )
-	ROM_REGION( 0x18000, "cpu1", 0 )
-	ROM_LOAD( "rt2_1.9c",    0x8000, 0x8000, CRC(7eaa9fdf) SHA1(aecc338b025eb5cd48c26ffb2c658d03478361c8) )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
+	ROM_LOAD( "rt2_1.9c",    0x8000, 0x8000, CRC(7eaa9fdf) SHA1(aecc338b025eb5cd48c26ffb2c658d03478361c8) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "rt2_3.12d",   0x00000, 0x8000, CRC(f5d439d8) SHA1(87c610913e86c2dca5ec64f7a96ef3a0ddfe5968) )
 	ROM_LOAD( "rt2_2.12c",   0x08000, 0x8000, CRC(1c0e29e0) SHA1(17f6981d10414d14535835919bb05413498421f1) )
-	ROM_LOAD( "rt2_3.12d",    0x10000, 0x8000, CRC(f5d439d8) SHA1(87c610913e86c2dca5ec64f7a96ef3a0ddfe5968) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "rt1_7.7r",     0x00000, 0x10000, CRC(a85efa39) SHA1(1ed63b421a93960668cb4558c1ca1b3c86b1f6be) )  /* plane 1,2 */
@@ -1397,13 +1452,13 @@ ROM_START( rthunder2 )
 ROM_END
 
 ROM_START( rthunder1 )
-	ROM_REGION( 0x18000, "cpu1", 0 )
-	ROM_LOAD( "r1",           0x8000, 0x8000, CRC(6f8c1252) SHA1(586f2e33dd16f31131e4ae9423d639fdc6555c9c) )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
+	ROM_LOAD( "r1",           0x8000, 0x8000, CRC(6f8c1252) SHA1(586f2e33dd16f31131e4ae9423d639fdc6555c9c) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "r3",           0x00000, 0x8000, CRC(aaa82885) SHA1(fc2bec3cf7e2de5f90174a2ed3bacfa94b6819f4) )
 	ROM_LOAD( "r2",           0x08000, 0x8000, CRC(f22a03d8) SHA1(5b81fc82813978d5cb69402be72b9ccc585fa1d0) )
-	ROM_LOAD( "r3",           0x10000, 0x8000, CRC(aaa82885) SHA1(fc2bec3cf7e2de5f90174a2ed3bacfa94b6819f4) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "rt1_7.7r",     0x00000, 0x10000, CRC(a85efa39) SHA1(1ed63b421a93960668cb4558c1ca1b3c86b1f6be) )  /* plane 1,2 */
@@ -1448,13 +1503,14 @@ ROM_START( rthunder1 )
 ROM_END
 
 ROM_START( wndrmomo )
-	ROM_REGION( 0x18000, "cpu1", 0 )
-	ROM_LOAD( "wm1_1.9c",     0x8000, 0x8000, CRC(34b50bf0) SHA1(112c8c8a0a16382008cacd2e484f91fa9338d10a) )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	/* 9d empty */
+	ROM_LOAD( "wm1_1.9c",     0x8000, 0x8000, CRC(34b50bf0) SHA1(112c8c8a0a16382008cacd2e484f91fa9338d10a) )
 
-	ROM_REGION( 0x18000, "cpu2", 0 )
-	ROM_LOAD( "wm1_2.12c",    0x8000, 0x8000, CRC(3181efd0) SHA1(01a2e0e4c8ced6f48b6e70393a3c4152b079e9b0) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
 	/* 12d empty */
+	ROM_LOAD( "wm1_2.12c",    0x8000, 0x8000, CRC(3181efd0) SHA1(01a2e0e4c8ced6f48b6e70393a3c4152b079e9b0) )
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )
 	ROM_LOAD( "wm1_6.7r",     0x00000, 0x08000, CRC(93955fbb) SHA1(cffd457886c40bf709b573237165ae8fa9784e32) )  /* plane 1,2 */
@@ -1555,12 +1611,12 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 
 
 
-GAME( 1986, skykiddx, 0,        skykiddx, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 1)", 0 )
-GAME( 1986, skykiddxo,skykiddx, skykiddx, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 2)", 0 )
-GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, namco86, ROT0,   "Namco", "Hopping Mappy", 0 )
-GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, namco86, ROT0,   "Namco", "The Return of Ishtar", 0 )
-GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, namco86, ROT0,   "Namco", "Genpei ToumaDen", 0 )
-GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 3)", 0 )
-GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 2)", 0 )
-GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 1)", 0 )
-GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, namco86, ROT0,   "Namco", "Wonder Momo", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco", "Sky Kid Deluxe (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, namco86, ROT0,   "Namco", "Hopping Mappy", GAME_SUPPORTS_SAVE )
+GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, namco86, ROT0,   "Namco", "The Return of Ishtar", GAME_SUPPORTS_SAVE )
+GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, namco86, ROT0,   "Namco", "Genpei ToumaDen", GAME_SUPPORTS_SAVE )
+GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco", "Rolling Thunder (rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, namco86, ROT0,   "Namco", "Wonder Momo", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

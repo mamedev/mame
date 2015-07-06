@@ -241,9 +241,9 @@ typedef UINT8 netlist_sig_t;
 		, _priv)
 
 #define NETLIB_LOGIC_FAMILY(_fam)                                               \
-virtual const logic_family_desc_t *default_logic_family()     \
+virtual logic_family_desc_t *default_logic_family()						        \
 {                                                                               \
-	return &netlist_family_ ## _fam;                                            \
+	return netlist_family_ ## _fam;                                             \
 }
 
 
@@ -325,7 +325,7 @@ namespace netlist
 
 		bool m_is_static;
 
-		static const logic_family_desc_t *from_model(const pstring &model);
+		static logic_family_desc_t *from_model(const pstring &model);
 	};
 
 	class logic_family_t
@@ -333,12 +333,13 @@ namespace netlist
 	public:
 
 		logic_family_t() : m_logic_family(NULL) {}
+		~logic_family_t() { }
 
-		ATTR_HOT  const logic_family_desc_t *logic_family() const { return m_logic_family; }
-		ATTR_COLD void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
+		ATTR_HOT  logic_family_desc_t *logic_family() const { return m_logic_family; }
+		ATTR_COLD void set_logic_family(logic_family_desc_t *fam) { m_logic_family = fam; }
 
-	private:
-		const logic_family_desc_t *m_logic_family;
+	protected:
+		logic_family_desc_t *m_logic_family;
 	};
 
 	/* Terminals inherit the family description from the netlist_device
@@ -348,8 +349,9 @@ namespace netlist
 	 * Only devices of type GENERIC should have a family description entry
 	 */
 
-	extern const logic_family_desc_t &netlist_family_TTL;
-	extern const logic_family_desc_t &netlist_family_CD4000;
+
+	extern logic_family_desc_t *netlist_family_TTL;
+	extern logic_family_desc_t *netlist_family_CD4000;
 
 
 	// -----------------------------------------------------------------------------
@@ -358,7 +360,7 @@ namespace netlist
 
 	class object_t
 	{
-		NETLIST_PREVENT_COPYING(object_t)
+		P_PREVENT_COPYING(object_t)
 	public:
 		enum type_t {
 			TERMINAL = 0,
@@ -387,6 +389,8 @@ namespace netlist
 			VCVS,       // Voltage controlled voltage source
 			VCCS,       // Voltage controlled current source
 			CCCS,       // Current controlled current source
+			VS,			// Voltage Source
+			CS,			// Current Source
 			GND         // GND device
 		};
 
@@ -432,26 +436,27 @@ namespace netlist
 	// netlist_owned_object_t
 	// -----------------------------------------------------------------------------
 
-	class owned_object_t : public object_t
+	class device_object_t : public object_t
 	{
-		NETLIST_PREVENT_COPYING(owned_object_t)
+		P_PREVENT_COPYING(device_object_t)
 	public:
-		ATTR_COLD owned_object_t(const type_t atype, const family_t afamily);
+		ATTR_COLD device_object_t(const type_t atype, const family_t afamily);
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
 
-		ATTR_HOT  core_device_t &netdev() const { return *m_netdev; }
+		core_device_t &device() const { return *m_device; }
 	private:
-		core_device_t * m_netdev;
+		core_device_t * m_device;
 	};
+
 
 	// -----------------------------------------------------------------------------
 	// netlist_core_terminal_t
 	// -----------------------------------------------------------------------------
 
-	class core_terminal_t : public owned_object_t, public plinkedlist_element_t<core_terminal_t>
+	class core_terminal_t : public device_object_t, public plinkedlist_element_t<core_terminal_t>
 	{
-		NETLIST_PREVENT_COPYING(core_terminal_t)
+		P_PREVENT_COPYING(core_terminal_t)
 	public:
 
 		typedef plist_t<core_terminal_t *> list_t;
@@ -494,7 +499,7 @@ namespace netlist
 		virtual void save_register()
 		{
 			save(NLNAME(m_state));
-			owned_object_t::save_register();
+			device_object_t::save_register();
 		}
 
 	private:
@@ -504,7 +509,7 @@ namespace netlist
 
 	class terminal_t : public core_terminal_t
 	{
-		NETLIST_PREVENT_COPYING(terminal_t)
+		P_PREVENT_COPYING(terminal_t)
 	public:
 
 		typedef plist_t<terminal_t *> list_t;
@@ -655,7 +660,7 @@ namespace netlist
 
 	class net_t : public object_t
 	{
-		NETLIST_PREVENT_COPYING(net_t)
+		P_PREVENT_COPYING(net_t)
 	public:
 
 		typedef plist_t<net_t *> list_t;
@@ -735,7 +740,7 @@ namespace netlist
 
 	class logic_net_t : public net_t
 	{
-		NETLIST_PREVENT_COPYING(logic_net_t)
+		P_PREVENT_COPYING(logic_net_t)
 	public:
 
 		typedef plist_t<logic_net_t *> list_t;
@@ -795,7 +800,7 @@ namespace netlist
 
 	class analog_net_t : public net_t
 	{
-		NETLIST_PREVENT_COPYING(analog_net_t)
+		P_PREVENT_COPYING(analog_net_t)
 	public:
 
 		typedef plist_t<analog_net_t *> list_t;
@@ -840,7 +845,7 @@ namespace netlist
 
 	class logic_output_t : public logic_t
 	{
-		NETLIST_PREVENT_COPYING(logic_output_t)
+		P_PREVENT_COPYING(logic_output_t)
 	public:
 
 		ATTR_COLD logic_output_t();
@@ -864,7 +869,7 @@ namespace netlist
 
 	class analog_output_t : public netlist_analog_t
 	{
-		NETLIST_PREVENT_COPYING(analog_output_t)
+		P_PREVENT_COPYING(analog_output_t)
 	public:
 
 		ATTR_COLD analog_output_t();
@@ -889,9 +894,9 @@ namespace netlist
 	// net_param_t
 	// -----------------------------------------------------------------------------
 
-	class param_t : public owned_object_t
+	class param_t : public device_object_t
 	{
-		NETLIST_PREVENT_COPYING(param_t)
+		P_PREVENT_COPYING(param_t)
 	public:
 
 		enum param_type_t {
@@ -917,7 +922,7 @@ namespace netlist
 	template <class C, param_t::param_type_t T>
 	class param_template_t : public param_t
 	{
-		NETLIST_PREVENT_COPYING(param_template_t)
+		P_PREVENT_COPYING(param_template_t)
 	public:
 		ATTR_COLD param_template_t()
 		: param_t(T)
@@ -950,14 +955,14 @@ namespace netlist
 
 	class param_logic_t : public param_int_t
 	{
-		NETLIST_PREVENT_COPYING(param_logic_t)
+		P_PREVENT_COPYING(param_logic_t)
 	public:
 		ATTR_COLD param_logic_t() : param_int_t() { };
 	};
 
 	class param_model_t : public param_template_t<pstring, param_t::MODEL>
 	{
-		NETLIST_PREVENT_COPYING(param_model_t)
+		P_PREVENT_COPYING(param_model_t)
 	public:
 		ATTR_COLD param_model_t() : param_template_t<pstring, param_t::MODEL>() { }
 
@@ -968,12 +973,12 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// net_device_t
+	// core_device_t
 	// -----------------------------------------------------------------------------
 
 	class core_device_t : public object_t, public logic_family_t
 	{
-		NETLIST_PREVENT_COPYING(core_device_t)
+		P_PREVENT_COPYING(core_device_t)
 	public:
 
 		typedef plist_t<core_device_t *> list_t;
@@ -1044,9 +1049,9 @@ namespace netlist
 		ATTR_HOT virtual void update() { }
 		virtual void start() { }
 		virtual void stop() { }                                                  \
-		virtual const logic_family_desc_t *default_logic_family()
+		virtual logic_family_desc_t *default_logic_family()
 		{
-			return &netlist_family_TTL;
+			return netlist_family_TTL;
 		}
 
 	private:
@@ -1062,10 +1067,13 @@ namespace netlist
 	#endif
 	};
 
+	// -----------------------------------------------------------------------------
+	// device_t
+	// -----------------------------------------------------------------------------
 
 	class device_t : public core_device_t
 	{
-		NETLIST_PREVENT_COPYING(device_t)
+		P_PREVENT_COPYING(device_t)
 	public:
 
 		ATTR_COLD device_t();
@@ -1085,7 +1093,8 @@ namespace netlist
 		ATTR_COLD void register_input(const pstring &name, analog_input_t &in);
 		ATTR_COLD void register_input(const pstring &name, logic_input_t &in);
 
-		ATTR_COLD void connect(core_terminal_t &t1, core_terminal_t &t2);
+		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
+		ATTR_COLD void connect_direct(core_terminal_t &t1, core_terminal_t &t2);
 
 		plist_t<pstring> m_terminals;
 
@@ -1122,9 +1131,10 @@ namespace netlist
 		void on_post_load();
 
 	private:
+		struct names_t { char m_buf[64]; };
 		int m_qsize;
 		parray_t<netlist_time::INTERNALTYPE> m_times;
-		parray_t<char[64]> m_names;
+		parray_t<names_t> m_names;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1134,7 +1144,7 @@ namespace netlist
 
 	class netlist_t : public object_t, public pstate_manager_t
 	{
-		NETLIST_PREVENT_COPYING(netlist_t)
+		P_PREVENT_COPYING(netlist_t)
 	public:
 
 		netlist_t();
@@ -1271,7 +1281,7 @@ namespace netlist
 		if (m_param != param)
 		{
 			m_param = param;
-			netdev().update_param();
+			device().update_param();
 		}
 	}
 

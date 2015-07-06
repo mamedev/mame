@@ -120,8 +120,9 @@ WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
 
 WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x0f);
-	membank("bank1d")->set_entry(data & 0x0f);
+	m_bank1->set_entry(data & 0x0f);
+	if(m_bank1d)
+		m_bank1d->set_entry(data & 0x0f);
 }
 
 /*************************************
@@ -310,7 +311,7 @@ static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w) /* Banked palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram")/* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w) AM_SHARE("videoram") /* Banked char / OBJ RAM */
-	AM_RANGE(0xe000, 0xffff) AM_RAM     /* Work RAM */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("ram")     /* Work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
@@ -2099,9 +2100,9 @@ ROM_END
 
 void mitchell_state::bootleg_decode()
 {
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank0d")->set_base(memregion("maincpu")->base() + 0x50000);
-	membank("bank1d")->configure_entries(0, 16, memregion("maincpu")->base() + 0x60000, 0x4000);
+	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank0d->set_base(memregion("maincpu")->base() + 0x50000);
+	m_bank1d->configure_entries(0, 16, memregion("maincpu")->base() + 0x60000, 0x4000);
 }
 
 
@@ -2111,9 +2112,9 @@ void mitchell_state::configure_banks(void (*decode)(UINT8 *src, UINT8 *dst, int 
 	int size = memregion("maincpu")->bytes();
 	UINT8 *dst = auto_alloc_array(machine(), UINT8, size);
 	decode(src, dst, size);
-	membank("bank1")->configure_entries(0, 16, src + 0x10000, 0x4000);
-	membank("bank0d")->set_base(dst);
-	membank("bank1d")->configure_entries(0, 16, dst + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 16, src + 0x10000, 0x4000);
+	m_bank0d->set_base(dst);
+	m_bank1d->configure_entries(0, 16, dst + 0x10000, 0x4000);
 }
 
 
@@ -2184,7 +2185,7 @@ DRIVER_INIT_MEMBER(mitchell_state,qsangoku)
 DRIVER_INIT_MEMBER(mitchell_state,mgakuen)
 {
 	m_input_type = 1;
-	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_maincpu->space(AS_IO).install_read_port(0x03, 0x03, "DSW0");
 	m_maincpu->space(AS_IO).install_read_port(0x04, 0x04, "DSW1");
 }

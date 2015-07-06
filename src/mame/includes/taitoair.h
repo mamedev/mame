@@ -18,7 +18,7 @@ struct taitoair_spoint {
 struct taitoair_poly {
 	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT];
 	int pcount;
-	int col;
+	UINT16 header;
 };
 
 
@@ -76,6 +76,35 @@ public:
 
 	bool m_gradbank;
 	
+	DECLARE_READ16_MEMBER(dsp_m_r);
+	DECLARE_WRITE16_MEMBER(dsp_m_w);
+
+	UINT16 m_dsp_test_object_type;
+	INT16 m_dsp_test_or_clip, m_dsp_test_and_clip;
+	INT16 m_dsp_test_x, m_dsp_test_y, m_dsp_test_z;
+
+	DECLARE_WRITE16_MEMBER(dsp_test_start_w);
+	DECLARE_WRITE16_MEMBER(dsp_test_x_w);
+	DECLARE_WRITE16_MEMBER(dsp_test_y_w);
+	DECLARE_WRITE16_MEMBER(dsp_test_z_w);
+	DECLARE_READ16_MEMBER(dsp_test_point_r);
+	DECLARE_READ16_MEMBER(dsp_test_or_clip_r);
+	DECLARE_READ16_MEMBER(dsp_test_and_clip_r);
+
+	INT16 m_dsp_muldiv_a_1, m_dsp_muldiv_b_1, m_dsp_muldiv_c_1;
+
+	DECLARE_WRITE16_MEMBER(dsp_muldiv_a_1_w);
+	DECLARE_WRITE16_MEMBER(dsp_muldiv_b_1_w);
+	DECLARE_WRITE16_MEMBER(dsp_muldiv_c_1_w);
+	DECLARE_READ16_MEMBER(dsp_muldiv_1_r);
+
+	INT16 m_dsp_muldiv_a_2, m_dsp_muldiv_b_2, m_dsp_muldiv_c_2;
+
+	DECLARE_WRITE16_MEMBER(dsp_muldiv_a_2_w);
+	DECLARE_WRITE16_MEMBER(dsp_muldiv_b_2_w);
+	DECLARE_WRITE16_MEMBER(dsp_muldiv_c_2_w);
+	DECLARE_READ16_MEMBER(dsp_muldiv_2_r);
+
 	//bitmap_ind16 *m_buffer3d;
 	DECLARE_WRITE16_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(lineram_r);
@@ -90,24 +119,19 @@ public:
 	DECLARE_READ16_MEMBER(stick2_input_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(dsp_flags_w);
-	DECLARE_WRITE16_MEMBER(dsp_x_eyecoord_w);
-	DECLARE_WRITE16_MEMBER(dsp_y_eyecoord_w);
-	DECLARE_WRITE16_MEMBER(dsp_z_eyecoord_w);
-	DECLARE_WRITE16_MEMBER(dsp_frustum_left_w);
-	DECLARE_WRITE16_MEMBER(dsp_frustum_bottom_w);
-	DECLARE_WRITE16_MEMBER(dsp_rasterize_w);
-	DECLARE_READ16_MEMBER(dsp_x_return_r);
-	DECLARE_READ16_MEMBER(dsp_y_return_r);
+	DECLARE_WRITE16_MEMBER(dma_regs_w);
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset );
-
-	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
-	void multVecMtx(const INT16* vec4, const float* m, float* result);
-	void airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* m);
+	void fb_copy_op(void);
+	void fb_fill_op(void);
+	void fb_erase_op(void);
+	
+	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 header, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
 	int projectEyeCoordToScreen(float* projectionMatrix,const int Res,INT16* eyePoint3d,int type);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

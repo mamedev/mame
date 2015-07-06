@@ -129,6 +129,7 @@ CPUS["HMCS40"] = true
 CPUS["E0C6200"] = true
 CPUS["MELPS4"] = true
 CPUS["HPHYBRID"] = true
+CPUS["SM510"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -287,6 +288,7 @@ VIDEOS["HUC6261"] = true
 VIDEOS["HUC6270"] = true
 VIDEOS["HUC6272"] = true
 VIDEOS["I8244"] = true
+VIDEOS["I82730"] = true
 VIDEOS["I8275"] = true
 --VIDEOS+= M50458"] = true
 --VIDEOS+= MB90082"] = true
@@ -753,6 +755,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"memotech",
 		"mgu",
 		"microkey",
+		"microsoft",
 		"mit",
 		"mits",
 		"mitsubishi",
@@ -938,7 +941,6 @@ files {
 	MAME_DIR .. "src/mame/video/n64.c",         
 	MAME_DIR .. "src/mame/video/rdpblend.c",    
 	MAME_DIR .. "src/mame/video/rdptpipe.c",    
-	MAME_DIR .. "src/mame/video/rdpspn16.c",    
 	MAME_DIR .. "src/mame/machine/megadriv.c",  
 	MAME_DIR .. "src/mame/drivers/naomi.c",     
 	MAME_DIR .. "src/mame/machine/awboard.c",   
@@ -1749,6 +1751,11 @@ files {
 	MAME_DIR .. "src/mess/video/primo.c", 
 }
 
+createMESSProjects(_target, _subtarget, "microsoft")
+files {               
+	MAME_DIR .. "src/mess/drivers/xbox.c",    
+}
+
 createMESSProjects(_target, _subtarget, "mit")
 files {               
 	MAME_DIR .. "src/mess/drivers/tx0.c",
@@ -1890,6 +1897,7 @@ createMESSProjects(_target, _subtarget, "olivetti")
 files {          
 	MAME_DIR .. "src/mess/drivers/m20.c",       
 	MAME_DIR .. "src/mess/machine/m20_kbd.c",
+	MAME_DIR .. "src/mess/machine/m20_8086.c",
 	MAME_DIR .. "src/mess/drivers/m24.c",
 	MAME_DIR .. "src/mess/machine/m24_kbd.c",
 	MAME_DIR .. "src/mess/machine/m24_z8000.c"
@@ -2111,6 +2119,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "sharp")
 files {             
+	MAME_DIR .. "src/mess/drivers/hh_sm510.c",
 	MAME_DIR .. "src/mess/video/mz700.c",       
 	MAME_DIR .. "src/mess/drivers/mz700.c",     
 	MAME_DIR .. "src/mess/drivers/pc1500.c",    
@@ -2589,7 +2598,8 @@ files {
 	MAME_DIR .. "src/mess/drivers/cxhumax.c",   
 	MAME_DIR .. "src/mess/drivers/czk80.c",     
 	MAME_DIR .. "src/mess/drivers/d6800.c",     
-	MAME_DIR .. "src/mess/drivers/d6809.c",     
+	MAME_DIR .. "src/mess/drivers/d6809.c",
+	MAME_DIR .. "src/mess/drivers/daruma.c",     
 	MAME_DIR .. "src/mess/drivers/digel804.c",  
 	MAME_DIR .. "src/mess/drivers/dim68k.c",    
 	MAME_DIR .. "src/mess/drivers/dm7000.c",    
@@ -2621,6 +2631,7 @@ files {
 	MAME_DIR .. "src/emu/machine/nsc810.h", 
 	MAME_DIR .. "src/mess/drivers/i7000.c",
 	MAME_DIR .. "src/mess/drivers/ibm6580.c",   
+	MAME_DIR .. "src/mess/drivers/icatel.c",
 	MAME_DIR .. "src/mess/drivers/ie15.c",
 	MAME_DIR .. "src/mess/machine/ie15_kbd.c", 
 	MAME_DIR .. "src/mess/drivers/if800.c",     

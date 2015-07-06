@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "debugger.h"
 #include "rsp.h"
-#include "rspdiv.h"
 #include "rspfe.h"
 #include "rspcp2.h"
 #include "cpu/drcfe.h"
@@ -184,7 +183,7 @@ static void cfunc_write32(void *param)
 
 void rsp_device::rspdrc_set_options(UINT32 options)
 {
-	if (!machine().options().drc()) return;
+	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
 	m_drcoptions = options;
 }
 
@@ -308,7 +307,7 @@ void rsp_device::execute_run_drc()
 
 void rsp_device::rspdrc_flush_drc_cache()
 {
-	if (!machine().options().drc()) return;
+	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
 	m_cache_dirty = TRUE;
 }
 

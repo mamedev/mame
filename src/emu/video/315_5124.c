@@ -1613,8 +1613,11 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_hcounter));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_current_palette));
-	save_item(NAME(m_tmpbitmap));
-	save_item(NAME(m_y1_bitmap));
+
+	// these were created with register_screen_bitmap which is dynamic, and will reallocate if the screen size changes, saving them is NOT safe with the current core.
+	// The Genesis VDP (315_5313.c) which uses this as a base in order to support the legacy SMS operaiton mode can change resolutions for example.
+	//save_item(NAME(m_tmpbitmap));
+	//save_item(NAME(m_y1_bitmap));
 	save_item(NAME(m_draw_time));
 	save_item(NAME(m_sprite_base));
 	save_item(NAME(m_sprite_pattern_line));

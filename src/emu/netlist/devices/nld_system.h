@@ -11,6 +11,7 @@
 
 #include "../nl_setup.h"
 #include "../nl_base.h"
+#include "../nl_factory.h"
 #include "../analog/nld_twoterm.h"
 
 // -----------------------------------------------------------------------------
@@ -18,8 +19,13 @@
 // -----------------------------------------------------------------------------
 
 #define TTL_INPUT(_name, _v)                                                   \
-		NET_REGISTER_DEV(ttl_input, _name)                                     \
+		NET_REGISTER_DEV(logic_input, _name)                                   \
 		PARAM(_name.IN, _v)
+
+#define LOGIC_INPUT(_name, _v, _family)                                        \
+		NET_REGISTER_DEV(logic_input, _name)                                   \
+		PARAM(_name.IN, _v)													   \
+		PARAM(_name.FAMILY, _family)
 
 #define ANALOG_INPUT(_name, _v)                                                \
 		NET_REGISTER_DEV(analog_input, _name)                                  \
@@ -63,6 +69,10 @@
 /* Default device to hold netlist parameters */
 #define PARAMETERS(_name)                                                      \
 		NET_REGISTER_DEV(netlistparams, _name)
+
+#define FUNCTION(_name, _N)				                                       \
+		NET_REGISTER_DEV(function, _name)                                      \
+		PARAM(_name.N, _N)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -123,10 +133,13 @@ NETLIB_DEVICE_WITH_PARAMS(extclock,
 // Special support devices ...
 // -----------------------------------------------------------------------------
 
-NETLIB_DEVICE_WITH_PARAMS(ttl_input,
+NETLIB_DEVICE_WITH_PARAMS(logic_input,
+
+	virtual void stop();
 	logic_output_t m_Q;
 
 	param_logic_t m_IN;
+	param_model_t m_FAMILY;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(analog_input,
@@ -222,12 +235,12 @@ protected:
 		register_input("_I", m_I);
 		register_terminal("I",m_RIN.m_P);
 		register_terminal("G",m_RIN.m_N);
-		connect(m_I, m_RIN.m_P);
+		connect_late(m_I, m_RIN.m_P);
 
 		register_output("_Q", m_Q);
 		register_terminal("_OP",m_ROUT.m_P);
 		register_terminal("Q",m_ROUT.m_N);
-		connect(m_Q, m_ROUT.m_P);
+		connect_late(m_Q, m_ROUT.m_P);
 	}
 
 	void reset()
@@ -249,6 +262,49 @@ private:
 
 	param_double_t m_p_RIN;
 	param_double_t m_p_ROUT;
+};
+
+/* -----------------------------------------------------------------------------
+ * nld_function
+ *
+ * FIXME: Currently a proof of concept to get congo bongo working
+ * ----------------------------------------------------------------------------- */
+
+class NETLIB_NAME(function) : public device_t
+{
+public:
+	NETLIB_NAME(function)()
+			: device_t() { }
+
+	virtual ~NETLIB_NAME(function)() {}
+
+protected:
+
+	void start()
+	{
+		register_param("INPUTS", m_N, 2);
+		register_output("Q", m_Q);
+
+		for (int i=0; i < m_N; i++)
+			register_input(pstring::sprintf("I%d", i), m_I[i]);
+	}
+
+	void reset()
+	{
+		m_Q.initial(0.0);
+	}
+
+	void update()
+	{
+		nl_double val = INPANALOG(m_I[0]) * INPANALOG(m_I[1]) * 0.2;
+		OUTANALOG(m_Q, val);
+	}
+
+private:
+
+	param_int_t m_N;
+	analog_output_t m_Q;
+	analog_input_t m_I[10];
 };
 
 // -----------------------------------------------------------------------------
@@ -408,6 +464,45 @@ private:
 	int m_last_state;
 	bool m_is_timestep;
 };
+
+
+class factory_lib_entry_t : public base_factory_t
+{
+	P_PREVENT_COPYING(factory_lib_entry_t)
+public:
+
+	ATTR_COLD factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
+			const pstring &def_param)
+	: base_factory_t(name, classname, def_param), m_setup(setup) { }
+
+	class dummy : public device_t
+	{
+	public:
+		dummy(const pstring &dev_name) : device_t(), m_dev_name(dev_name) { }
+	protected:
+		virtual void init(netlist_t &anetlist, const pstring &aname)
+		{
+			anetlist.setup().namespace_push(aname);
+			anetlist.setup().include(m_dev_name);
+			anetlist.setup().namespace_pop();
+		}
+		void start() { }
+		void reset() { }
+		void update() { }
+
+		pstring m_dev_name;
+	};
+
+	ATTR_COLD device_t *Create()
+	{
+		device_t *r = palloc(dummy(this->name()));
+		return r;
+	}
+
+private:
+	setup_t &m_setup;
+};
+
 
 NETLIB_NAMESPACE_DEVICES_END()
 

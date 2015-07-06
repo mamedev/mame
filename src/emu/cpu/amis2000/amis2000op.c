@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+
 // AMI S2000 opcode handlers
+
+#include "amis2000.h"
+
 
 // internal helpers
 

@@ -33,7 +33,7 @@ Dumping Notes:
     27128           EPR-6162A (the "A" letter is handwritten), EPR-6163, EPR-6164, EPR-6157, EPR-6155, EPR-6153
                         EPR-6151, EPR-6149, EPR-6158, EPR-6156, EPR-6154, EPR-6152, EPR-6150
     2732            EPR-6148
-    82S129          PR-5501 (located on video overlay pcb)
+    82S129          PR-5501 (located on video overlay pcb [834-5175])
 
     (not dumped)
     DMPAL16R6JC     315-5072.ic9, 315-5071.ic10

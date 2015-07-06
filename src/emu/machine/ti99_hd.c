@@ -14,7 +14,8 @@
 
 **************************************************************************/
 
-// TODO: Format
+// TODO: Define format by a file
+//       Save interleave in CHD
 
 #include "emu.h"
 #include "formats/imageutl.h"
@@ -25,16 +26,21 @@
 #define TRACE_STEPS 0
 #define TRACE_SIGNALS 0
 #define TRACE_READ 0
+#define TRACE_WRITE 0
 #define TRACE_CACHE 0
 #define TRACE_RWTRACK 0
 #define TRACE_BITS 0
 #define TRACE_DETAIL 0
+#define TRACE_TIMING 0
+#define TRACE_IMAGE 0
+#define TRACE_STATE 1
 
 enum
 {
 	INDEX_TM = 0,
 	SPINUP_TM,
-	SEEK_TM
+	SEEK_TM,
+	CACHE_TM
 };
 
 enum
@@ -46,6 +52,8 @@ enum
 
 #define TRACKSLOTS 5
 #define TRACKIMAGE_SIZE 10416       // Provide the buffer for a complete track, including preambles and gaps
+
+#define OFFLIMIT -1
 
 std::string mfm_harddisk_device::tts(const attotime &t)
 {
@@ -61,6 +69,8 @@ mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_t
 {
 	m_spinupms = 10000;
 	m_cachelines = TRACKSLOTS;
+	m_max_cylinder = 0;
+	m_max_heads = 0;
 }
 
 mfm_harddisk_device::~mfm_harddisk_device()
@@ -72,6 +82,8 @@ void mfm_harddisk_device::device_start()
 	m_index_timer = timer_alloc(INDEX_TM);
 	m_spinup_timer = timer_alloc(SPINUP_TM);
 	m_seek_timer = timer_alloc(SEEK_TM);
+	m_cache_timer = timer_alloc(CACHE_TM);
+
 	m_rev_time = attotime::from_hz(60);
 
 	// MFM drives have a revolution rate of 3600 rpm (i.e. 60/sec)
@@ -81,6 +93,9 @@ void mfm_harddisk_device::device_start()
 	m_spinup_timer->adjust(attotime::from_msec(m_spinupms));
 
 	m_cache = global_alloc(mfmhd_trackimage_cache);
+
+	// In 5 second period, check whether the cache has dirty lines
+	m_cache_timer->adjust(attotime::from_msec(5000), 0, attotime::from_msec(5000));
 }
 
 void mfm_harddisk_device::device_reset()
@@ -101,7 +116,6 @@ void mfm_harddisk_device::device_stop()
 
 bool mfm_harddisk_device::call_load()
 {
-	setup_characteristics();
 	bool loaded = harddisk_image_device::call_load();
 	if (loaded==IMAGE_INIT_PASS)
 	{
@@ -112,6 +126,12 @@ bool mfm_harddisk_device::call_load()
 		logerror("%s: Could not load CHD\n", tag());
 	}
 	return loaded;
+}
+
+void mfm_harddisk_device::call_unload()
+{
+	m_cache->cleanup();
+	harddisk_image_device::call_unload();
 }
 
 void mfm_harddisk_device::setup_index_pulse_cb(index_pulse_cb cb)
@@ -146,7 +166,7 @@ attotime mfm_harddisk_device::track_end_time()
 	if (!m_revolution_start_time.is_never())
 	{
 		endtime = m_revolution_start_time + nexttime;
-		if (TRACE_DETAIL) logerror("%s: Track start time = %s, end time = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(endtime).c_str());
+		if (TRACE_TIMING) logerror("%s: Track start time = %s, end time = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(endtime).c_str());
 	}
 	return endtime;
 }
@@ -167,6 +187,10 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 	case SPINUP_TM:
 		recalibrate();
+		break;
+
+	case CACHE_TM:
+		m_cache->write_back_one();
 		break;
 
 	case SEEK_TM:
@@ -197,7 +221,7 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 				{
 					m_ready = true;
 					m_recalibrated = true;
-					if (TRACE_SIGNALS) logerror("%s: Spinup complete, drive recalibrated and positioned at cylinder %d; drive is READY\n", tag(), m_current_cylinder);
+					if (TRACE_STATE) logerror("%s: Spinup complete, drive recalibrated and positioned at cylinder %d; drive is READY\n", tag(), m_current_cylinder);
 					if (!m_ready_cb.isnull()) m_ready_cb(this, ASSERT_LINE);
 				}
 				else
@@ -315,12 +339,49 @@ void mfm_harddisk_device::step_w(line_state line)
 }
 
 /*
-    Reading bytes from the hard disk.
-    This is the byte-level access to the hard disk. We deliver the next data byte
-    together with the clock byte.
+    Find the position of the cell.
+    Returns true when the current time exceeds the limit.
+    Returns the position as an index into the track array and the bit number.
+*/
+bool mfm_harddisk_device::find_position(attotime &from_when, const attotime &limit, int &bytepos, int &bit)
+{
+	// As we stop some few cells early each track, we adjust our position
+	// to the track start
+	if (from_when < m_revolution_start_time) from_when = m_revolution_start_time;
 
-    Returns true if the time limit will be exceeded before reading the complete byte.
-    Otherwise returns the byte at the given position together with the clock byte.
+	// Calculate the position in the track, given the from_when time and the revolution_start_time.
+	// Each cell takes 100 ns (@10 MHz)
+	int cell = (from_when - m_revolution_start_time).as_ticks(10000000);
+
+	from_when += attotime::from_nsec((m_encoding==MFM_BITS)? 100 : 1600);
+	if (from_when > limit) return true;
+
+	bytepos = cell / 16;
+
+	// Reached the end
+	if (bytepos >= 10416)
+	{
+		if (TRACE_TIMING) logerror("%s: Reached end: rev_start = %s, live = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(from_when).c_str());
+		m_revolution_start_time += m_rev_time;
+		cell = (from_when - m_revolution_start_time).as_ticks(10000000);
+		bytepos = cell / 16;
+	}
+
+	if (bytepos < 0)
+	{
+		if (TRACE_TIMING) logerror("%s: Negative cell number: rev_start = %s, live = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(from_when).c_str());
+		bytepos = 0;
+	}
+	bit = cell % 16;
+
+	return false;
+}
+
+/*
+    Reading bytes from the hard disk.
+
+    Returns true if the time limit will be exceeded before reading the bit or complete byte.
+    Otherwise returns the bit at the given position, or the complete data byte with the clock byte.
 */
 bool mfm_harddisk_device::read(attotime &from_when, const attotime &limit, UINT16 &cdata)
 {
@@ -332,44 +393,20 @@ bool mfm_harddisk_device::read(attotime &from_when, const attotime &limit, UINT1
 		throw emu_fatalerror("Cannot read CHD image");
 	}
 
-	// We stop some few cells early each track, so lift the from_when time over
-	// the 2 microseconds.
-	if (from_when < m_revolution_start_time) from_when = m_revolution_start_time;
-
-	// Calculate the position in the track, given the from_when time and the revolution_start_time.
-	// Each cell takes 100 ns (10 MHz)
-
-	int cell = (from_when - m_revolution_start_time).as_ticks(10000000);
-
+	// Get a copy for later debug output
 	attotime fw = from_when;
 
-	from_when += attotime::from_nsec((m_encoding==MFM_BITS)? 100 : 1600);
-	if (from_when > limit) return true;
+	int bytepos = 0;
+	int bitpos = 0;
 
-
-	int bytepos = cell / 16;
-
-	// Reached the end
-	if (bytepos >= 10416)
-	{
-		if (TRACE_DETAIL) logerror("%s: Reached end: rev_start = %s, live = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(fw).c_str());
-		m_revolution_start_time += m_rev_time;
-		cell = (from_when - m_revolution_start_time).as_ticks(10000000);
-		bytepos = cell / 16;
-	}
-
-	if (bytepos < 0)
-	{
-		if (TRACE_DETAIL) logerror("%s: Negative cell number: rev_start = %s, live = %s\n", tag(), tts(m_revolution_start_time).c_str(), tts(fw).c_str());
-		bytepos = 0;
-	}
+	bool offlimit = find_position(from_when, limit, bytepos, bitpos);
+	if (offlimit) return true;
 
 	if (m_encoding == MFM_BITS)
 	{
 		// We will deliver a single bit
-		int cellno = cell % 16;
-		cdata = ((track[bytepos] << cellno) & 0x8000) >> 15;
-		if (TRACE_BITS) logerror("%s: Reading (c=%d,h=%d,bit=%d) at cell %d [%s] = %d\n", tag(), m_current_cylinder, m_current_head, cellno, cell, tts(fw).c_str(), cdata);
+		cdata = ((track[bytepos] << bitpos) & 0x8000) >> 15;
+		if (TRACE_BITS) logerror("%s: Reading (c=%d,h=%d,bit=%d) at cell %d [%s] = %d\n", tag(), m_current_cylinder, m_current_head, bitpos, ((bytepos<<4) + bitpos), tts(fw).c_str(), cdata);
 	}
 	else
 	{
@@ -380,25 +417,55 @@ bool mfm_harddisk_device::read(attotime &from_when, const attotime &limit, UINT1
 	return false;
 }
 
+/*
+    Writing bytes to the hard disk.
+
+    Returns true if the time limit will be exceeded before writing the bit or complete byte.
+*/
+bool mfm_harddisk_device::write(attotime &from_when, const attotime &limit, UINT16 cdata)
+{
+	UINT16* track = m_cache->get_trackimage(m_current_cylinder, m_current_head);
+
+	if (track==NULL)
+	{
+		// What shall we do in this case?
+		throw emu_fatalerror("Cannot read CHD image");
+	}
+
+	int bytepos = 0;
+	int bitpos = 0;
+
+	bool offlimit = find_position(from_when, limit, bytepos, bitpos);
+	if (offlimit) return true;
+
+	m_cache->mark_current_as_dirty();
+
+	if (m_encoding == MFM_BITS)
+	{
+		// We will write a single bit
+		if (cdata != 0) track[bytepos] |= (0x8000 >> bitpos);
+		else track[bytepos] &= ~(0x8000 >> bitpos);
+		bitpos++;
+	}
+	else
+	{
+		// We will write a whole byte
+		track[bytepos] = cdata;
+	}
+
+	if (TRACE_WRITE) if ((bitpos&0x0f)==0) logerror("%s: Wrote data=%04x (c=%d,h=%d) at position %04x\n", tag(), track[bytepos], m_current_cylinder, m_current_head, bytepos);
+	return false;
+}
+
 mfm_hd_generic_device::mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : mfm_harddisk_device(mconfig, MFMHD_GENERIC, "Generic MFM hard disk", tag, owner, clock, "mfm_harddisk", __FILE__)
 {
-}
-
-void mfm_hd_generic_device::setup_characteristics()
-{
-	m_max_cylinder = 0;
-	m_max_heads = 0;
 }
 
 const device_type MFMHD_GENERIC = &device_creator<mfm_hd_generic_device>;
 
 mfm_hd_st225_device::mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : mfm_harddisk_device(mconfig, MFMHD_ST225, "Seagate ST-225 MFM hard disk", tag, owner, clock, "mfm_hd_st225", __FILE__)
-{
-}
-
-void mfm_hd_st225_device::setup_characteristics()
 {
 	m_max_cylinder = 615;
 	m_max_heads = 4;
@@ -423,17 +490,57 @@ mfmhd_trackimage_cache::~mfmhd_trackimage_cache()
 	mfmhd_trackimage* current = m_tracks;
 	if (TRACE_CACHE) logerror("%s: MFM HD cache destroy\n", tag());
 
-	// Still dirty?
 	while (current != NULL)
 	{
-		if (TRACE_CACHE) logerror("%s: MFM HD cache: evict line cylinder=%d head=%d\n", tag(), current->cylinder, current->head);
-		if (current->dirty) write_back(current);
 		global_free_array(current->encdata);
 		mfmhd_trackimage* currenttmp = current->next;
 		global_free(current);
 		current = currenttmp;
 	}
 }
+
+void mfmhd_trackimage_cache::write_back_one()
+{
+	mfmhd_trackimage* current = m_tracks;
+
+	while (current != NULL)
+	{
+		if (current->dirty)
+		{
+			if (TRACE_CACHE) logerror("%s: MFM HD cache: write back line c=%d h=%d\n", tag(), current->cylinder, current->head);
+			write_back(current);
+			break;
+		}
+		mfmhd_trackimage* currenttmp = current->next;
+		current = currenttmp;
+	}
+}
+
+void mfmhd_trackimage_cache::cleanup()
+{
+	mfmhd_trackimage* current = m_tracks;
+	if (TRACE_CACHE) logerror("%s: MFM HD cache cleanup\n", tag());
+
+	// Still dirty?
+	while (current != NULL)
+	{
+		if (TRACE_CACHE) logerror("%s: MFM HD cache: evict line cylinder=%d head=%d\n", tag(), current->cylinder, current->head);
+		if (current->dirty) write_back(current);
+		mfmhd_trackimage* currenttmp = current->next;
+		current = currenttmp;
+	}
+}
+
+/*
+    Marks the recently loaded track as dirty. As every writing operations
+    is preceded by a lookup, writing will always be done on the first track in the list.
+*/
+void mfmhd_trackimage_cache::mark_current_as_dirty()
+{
+	m_tracks->dirty = true;
+}
+
+const char *encnames[] = { "MFM_BITS","MFM_BYTE","SEPARATE","SSIMPLE " };
 
 /*
     Initialize the cache by loading the first <trackslots> tracks.
@@ -443,11 +550,12 @@ void mfmhd_trackimage_cache::init(chd_file* chdfile, const char* dtag, int maxcy
 	m_encoding = encoding;
 	m_tagdev = dtag;
 
-	if (TRACE_CACHE) logerror("%s: MFM HD cache init; using encoding %d\n", m_tagdev, encoding);
+	if (TRACE_CACHE) logerror("%s: MFM HD cache init; using encoding %s; cache size is %d tracks\n", m_tagdev, encnames[encoding], trackslots);
 	chd_error state = CHDERR_NONE;
 	mfmhd_trackimage* previous = NULL;
 	mfmhd_trackimage* current = NULL;
 	std::string metadata;
+	m_calc_interleave = 0;
 
 	m_chd = chdfile;
 
@@ -528,6 +636,20 @@ int mfmhd_trackimage_cache::chs_to_lba(int cylinder, int head, int sector)
 	}
 	else return -1;
 }
+
+/*
+    Calculate the ident byte from the cylinder. The specification does not
+    define idents beyond cylinder 1023, but formatting programs seem to
+    continue with 0xfd for cylinders between 1024 and 2047.
+*/
+UINT8 mfmhd_trackimage_cache::cylinder_to_ident(int cylinder)
+{
+	if (cylinder < 256) return 0xfe;
+	if (cylinder < 512) return 0xff;
+	if (cylinder < 768) return 0xfc;
+	return 0xfd;
+}
+
 
 /*
     Delivers the track image.
@@ -666,6 +788,7 @@ void mfmhd_trackimage_cache::mfm_encode_mask(mfmhd_trackimage* slot, int& positi
 
 /*
     Load a track from the CHD.
+    TODO: Isolate the encoding into a separate format definition
 */
 chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinder, int head, int sectorcount, int size, int interleave)
 {
@@ -673,36 +796,52 @@ chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinde
 
 	UINT8 sector_content[1024];
 
-	if (TRACE_RWTRACK) logerror("%s: MFM HD cache: load (c=%d,h=%d) from CHD\n", tag(), cylinder, head);
+	if (TRACE_RWTRACK) logerror("%s: MFM HD cache: load track (c=%d,h=%d) from CHD\n", tag(), cylinder, head);
 
 	m_lastbit = false;
 	int position = 0; // will be incremented by each encode call
+
+	// According to MDM5 formatting:
+	// gap0=16 gap1=16 gap2=3 gap3=22 sync=13 count=32 size=2
+
+	// HFDC manual: When using the hard disk format, the values for GAP0 and GAP1 must
+	// both be set to the same number and loaded in the appropriate registers.
 
 	// Gap 1
 	mfm_encode(slot, position, 0x4e, 16);
 
 	int sec_il_start = 0;
 	int sec_number = 0;
+	int identfield = 0;
+	int cylfield = 0;
+	int headfield = 0;
+	int sizefield = (size >> 7)-1;
 
 	// Round up
 	int delta = (sectorcount + interleave-1) / interleave;
 
-	if (TRACE_DETAIL) logerror("cyl=%02x head=%02x: sector sequence = ", cylinder&0xff, head&0xff);
+	if (TRACE_DETAIL) logerror("%s: cyl=%d head=%d: sector sequence = ", tag(), cylinder, head);
 	for (int sector = 0; sector < sectorcount; sector++)
 	{
 		if (TRACE_DETAIL) logerror("%02d ", sec_number);
+
 		// Sync gap
 		mfm_encode(slot, position, 0x00, 13);
 
 		// Write IDAM
 		mfm_encode_a1(slot, position);
-		mfm_encode(slot, position, 0xfe);           // ID field?
 
 		// Write header
-		mfm_encode(slot, position, cylinder & 0xff);
-		mfm_encode(slot, position, head & 0xff);
+		identfield = cylinder_to_ident(cylinder);
+		cylfield = cylinder & 0xff;
+		headfield = ((cylinder & 0x700)>>4) | (head&0x0f);
+
+		mfm_encode(slot, position, identfield);
+		mfm_encode(slot, position, cylfield);
+		mfm_encode(slot, position, headfield);
 		mfm_encode(slot, position, sec_number);
-		mfm_encode(slot, position, (size >> 7)-1);
+		mfm_encode(slot, position, sizefield);
+		// logerror("%s: Created header (%02x,%02x,%02x,%02x)\n", tag(), identfield, cylfield, headfield, sector);
 
 		// Write CRC for header.
 		int crc = m_current_crc;
@@ -720,9 +859,16 @@ chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinde
 		mfm_encode(slot, position, 0xfb);
 
 		// Get sector content from CHD
-		chd_error state = m_chd->read_units(chs_to_lba(cylinder, head, sec_number), sector_content);
-		if (state != CHDERR_NONE)
-			break;
+		int lbaposition = chs_to_lba(cylinder, head, sec_number);
+		if (lbaposition>=0)
+		{
+			chd_error state = m_chd->read_units(lbaposition, sector_content);
+			if (state != CHDERR_NONE) break;
+		}
+		else
+		{
+			logerror("%s: Invalid CHS data (%d,%d,%d); not loading from CHD\n", tag(), cylinder, head, sector);
+		}
 
 		for (int i=0; i < size; i++)
 			mfm_encode(slot, position, sector_content[i]);
@@ -747,7 +893,7 @@ chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinde
 	{
 		// Fill the rest with 0x4e
 		mfm_encode(slot, position, 0x4e, TRACKIMAGE_SIZE-position);
-		if (TRACE_DETAIL)
+		if (TRACE_IMAGE)
 		{
 			showtrack(slot->encdata, TRACKIMAGE_SIZE);
 		}
@@ -760,13 +906,192 @@ chd_error mfmhd_trackimage_cache::load_track(mfmhd_trackimage* slot, int cylinde
 	return state;
 }
 
+enum
+{
+	SEARCH_A1=0,
+	FOUND_A1,
+	DAM_FOUND,
+	CHECK_CRC
+};
+
+UINT8 mfmhd_trackimage_cache::mfm_decode(UINT16 raw)
+{
+	unsigned int value = 0;
+
+	for (int i=0; i < 8; i++)
+	{
+		value <<= 1;
+
+		value |= (raw & 0x4000);
+		raw <<= 2;
+	}
+	return (value >> 14) & 0xff;
+}
+
 /*
-    TODO: Maybe use a scheduled write-back in addition to the eviction.
+    TODO: The CHD/track conversion should go in a separate format definition (see floppy)
+    (can also handle different header formats there)
 */
 void mfmhd_trackimage_cache::write_back(mfmhd_trackimage* slot)
 {
-	if (TRACE_RWTRACK) logerror("%s: MFM HD cache: write back (c=%d,h=%d) to CHD\n", tag(), slot->cylinder, slot->head);
+	if (TRACE_CACHE) logerror("%s: MFM HD cache: write back (c=%d,h=%d) to CHD\n", tag(), slot->cylinder, slot->head);
+
+	UINT8 buffer[1024]; // for header or sector content
+
+	UINT16 *track = slot->encdata;
+
+	int bytepos = 0;
+	int state = SEARCH_A1;
+	int count = 0;
+	int pos = 0;
+	UINT16 crc = 0;
+	UINT8 byte;
+	bool search_header = true;
+
+	int ident = 0;
+	int cylinder = 0;
+	int head = 0;
+	int sector = 0;
+
+	int headerpos = 0;
+
+	int calc_interleave = 0;
+	int interleave_prec = -1;
+	bool check_interleave = true;
+
+	if (TRACE_IMAGE)
+	{
+		for (int i=0; i < TRACKIMAGE_SIZE; i++)
+		{
+			if ((i % 16)==0) logerror("\n%04x: ", i);
+			logerror("%02x ", (m_encoding==MFM_BITS || m_encoding==MFM_BYTE)? mfm_decode(track[i]) : (track[i]&0xff));
+		}
+		logerror("\n");
+	}
+
+	// We have to go through the bytes of the track and save a sector as soon as one shows up
+	while (bytepos < TRACKIMAGE_SIZE)
+	{
+		switch (state)
+		{
+		case SEARCH_A1:
+			if (((m_encoding==MFM_BITS || m_encoding==MFM_BYTE) && track[bytepos]==0x4489)
+				|| (m_encoding==SEPARATED && track[bytepos]==0x0aa1)
+				|| (m_encoding==SEPARATED_SIMPLE && track[bytepos]==0xffa1))
+			{
+				state = FOUND_A1;
+				count = search_header? 7 : 259;
+				crc = 0x443b; // init value with a1
+				pos = 0;
+			}
+			bytepos++;
+			break;
+
+		case FOUND_A1:
+			// read next values into array
+			if (m_encoding==MFM_BITS || m_encoding==MFM_BYTE)
+			{
+				byte = mfm_decode(track[bytepos]);
+			}
+			else byte = (track[bytepos] & 0xff);
+
+			crc = ccitt_crc16_one(crc, byte);
+			// logerror("%s: MFM HD: Byte = %02x, CRC=%04x\n", tag(), byte, crc);
+
+			// Put byte into buffer
+			// but not the data mark and the CRC
+			if (search_header || (count > 2 &&  count < 259)) buffer[pos++] = byte;
+
+			if (--count == 0)
+			{
+				if (crc==0)
+				{
+					if (search_header)
+					{
+						// Found a header
+						ident = buffer[0];
+						// Highest three bits are in the head field
+						cylinder = buffer[1] | ((buffer[2]&0x70)<<4);
+						head = buffer[2] & 0x0f;
+						sector = buffer[3];
+						int identexp = cylinder_to_ident(cylinder);
+
+						if (identexp != ident)
+						{
+							logerror("%s: MFM HD: Field error; ident = %02x (expected %02x) for sector chs=(%d,%d,%d)\n", tag(), ident, identexp, cylinder, head, sector);
+						}
+
+						// Count the sectors for the interleave
+						if (check_interleave)
+						{
+							if (interleave_prec == -1) interleave_prec = sector;
+							else
+							{
+								if (sector == interleave_prec+1) check_interleave = false;
+								calc_interleave++;
+							}
+						}
+
+						if (calc_interleave == 0) calc_interleave = sector - buffer[3];
+						// size = buffer[4];
+						search_header = false;
+						if (TRACE_DETAIL) logerror("%s: MFM HD: Found sector chs=(%d,%d,%d)\n", tag(), cylinder, head, sector);
+						headerpos = pos;
+					}
+					else
+					{
+						// Sector contents
+						// Write the sectors to the CHD
+						int lbaposition = chs_to_lba(cylinder, head, sector);
+						if (lbaposition>=0)
+						{
+							if (TRACE_DETAIL) logerror("%s: MFM HD: Writing sector chs=(%d,%d,%d) to CHD\n", tag(), cylinder, head, sector);
+							chd_error state = m_chd->write_units(chs_to_lba(cylinder, head, sector), buffer);
+
+							if (state != CHDERR_NONE)
+							{
+								logerror("%s: MFM HD: Write error while writing sector chs=(%d,%d,%d)\n", tag(), cylinder, head, sector);
+							}
+						}
+						else
+						{
+							logerror("%s: Invalid CHS data in track image: (%d,%d,%d); not saving to CHD\n", tag(), cylinder, head, sector);
+						}
+
+						search_header = true;
+					}
+				}
+				else
+				{
+					logerror("%s: MFM HD: CRC error in %s of (%d,%d,%d)\n", tag(), search_header? "header" : "data", cylinder, head, sector);
+					search_header = true;
+				}
+				// search next A1
+				state = SEARCH_A1;
+
+				if (!search_header && (pos - headerpos) > 30)
+				{
+					logerror("%s: MFM HD: Error; missing DAM; searching next header\n", tag());
+					search_header = true;
+				}
+			}
+			bytepos++;
+			break;
+		}
+	}
+	// Clear the dirty flag
 	slot->dirty = false;
+
+	if (check_interleave == false)
+	{
+		// Successfully determined the interleave
+		m_calc_interleave = calc_interleave;
+	}
+
+	if (TRACE_CACHE)
+	{
+		logerror("%s: MFM HD cache: write back complete (c=%d,h=%d), interleave = %d\n", tag(), slot->cylinder, slot->head, m_calc_interleave);
+	}
 }
 
 /*
@@ -822,493 +1147,3 @@ void mfm_harddisk_connector::device_config_complete()
 }
 
 const device_type MFM_HD_CONNECTOR = &device_creator<mfm_harddisk_connector>;
-
-// ================================================================
-
-// ===========================================================================
-// Legacy implementation
-// ===========================================================================
-
-#include "smc92x4.h"
-
-#define TI99HD_BLOCKNOTFOUND -1
-
-#define LOG logerror
-#define VERBOSE 0
-
-#define GAP1 16
-#define GAP2 8
-#define GAP3 15
-#define GAP4 340
-#define SYNC 13
-
-mfm_harddisk_legacy_device::mfm_harddisk_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TI99_MFMHD_LEG, "MFM Harddisk LEGACY", tag, owner, clock, "mfm_harddisk_leg", __FILE__)
-{
-}
-
-/*
-    Calculate the ident byte from the cylinder. The specification does not
-    define idents beyond cylinder 1023, but formatting programs seem to
-    continue with 0xfd for cylinders between 1024 and 2047.
-*/
-UINT8 mfm_harddisk_legacy_device::cylinder_to_ident(int cylinder)
-{
-	if (cylinder < 256) return 0xfe;
-	if (cylinder < 512) return 0xff;
-	if (cylinder < 768) return 0xfc;
-	if (cylinder < 1024) return 0xfd;
-	return 0xfd;
-}
-
-/*
-    Returns the linear sector number, given the CHS data.
-*/
-bool mfm_harddisk_legacy_device::harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, int sector, UINT32 *lba)
-{
-	const hard_disk_info *info;
-
-	if ( hdfile != NULL)
-	{
-		info = hard_disk_get_info(hdfile);
-
-		if (    (cylinder >= info->cylinders) ||
-				(head >= info->heads) ||
-				(sector >= info->sectors))
-		return false;
-
-		*lba = (cylinder * info->heads + head)
-				* info->sectors
-				+ sector;
-		return true;
-	}
-	return false;
-}
-
-/* Accessor functions */
-void mfm_harddisk_legacy_device::read_sector(int cylinder, int head, int sector, UINT8 *buf)
-{
-	UINT32 lba;
-	if (VERBOSE>5) LOG("ti99_hd: read_sector(%d, %d, %d)\n", cylinder, head, sector);
-	hard_disk_file *file = m_drive->get_hard_disk_file();
-
-	if (cylinder != m_current_cylinder)
-	{
-		return;
-	}
-
-	if (file==NULL)
-	{
-		m_status &= ~MFMHD_READY;
-		return;
-	}
-
-	if (!harddisk_chs_to_lba(file, cylinder, head, sector, &lba))
-	{
-		m_status &= ~MFMHD_READY;
-		return;
-	}
-
-	if (!hard_disk_read(file, lba, buf))
-	{
-		m_status &= ~MFMHD_READY;
-		return;
-	}
-	/* printf("ti99_hd read sector  c=%04d h=%02d s=%02d\n", cylinder, head, sector); */
-	m_status |= MFMHD_READY;
-}
-
-void mfm_harddisk_legacy_device::write_sector(int cylinder, int head, int sector, UINT8 *buf)
-{
-	UINT32 lba;
-	if (VERBOSE>5) LOG("ti99_hd: write_sector(%d, %d, %d)\n", cylinder, head, sector);
-	hard_disk_file *file = m_drive->get_hard_disk_file();
-
-	if (file==NULL)
-	{
-		m_status &= ~MFMHD_READY;
-		return;
-	}
-
-	if (!harddisk_chs_to_lba(file, cylinder, head, sector, &lba))
-	{
-		m_status &= ~MFMHD_READY;
-		m_status |= MFMHD_WRFAULT;
-		return;
-	}
-
-	if (!hard_disk_write(file, lba, buf))
-	{
-		m_status &= ~MFMHD_READY;
-		m_status |= MFMHD_WRFAULT;
-		return;
-	}
-
-	m_status |= MFMHD_READY;
-}
-
-/*
-    Searches a block containing number * byte, starting at the given
-    position. Returns the position of the first byte of the block.
-*/
-int mfm_harddisk_legacy_device::find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size_t number)
-{
-	int i = start;
-	size_t current = number;
-	while (i < stop && current > 0)
-	{
-		if (buffer[i++] != byte)
-		{
-			current = number;
-		}
-		else
-		{
-			current--;
-		}
-	}
-	if (current==0)
-	{
-		return i - number;
-	}
-	else
-		return TI99HD_BLOCKNOTFOUND;
-}
-
-int mfm_harddisk_legacy_device::get_track_length()
-{
-	int count;
-	int size;
-	hard_disk_file *file = m_drive->get_hard_disk_file();
-	const hard_disk_info *info;
-
-	if (file==NULL) return 0;
-	info = hard_disk_get_info(file);
-
-	count = info->sectors;
-	size = info->sectorbytes/128;
-	return GAP1 + count*(SYNC+12+GAP2+SYNC+size*128+GAP3)+GAP4;
-}
-
-/*
-    Reads a complete track. We have to rebuild the gaps. This is basically
-    done in the same way as in the SDF format in ti99_dsk.
-
-    WARNING: This function is untested! We need to create a suitable
-    application program for the TI which makes use of it.
-*/
-void mfm_harddisk_legacy_device::read_track(int head, UINT8 *trackdata)
-{
-	/* We assume an interleave of 3 for 32 sectors. */
-	int step = 3;
-	UINT32 lba;
-	int i;
-
-	int size;
-	int position = 0;
-	int sector;
-	int crc;
-	int count;
-
-	const hard_disk_info *info;
-	hard_disk_file *file = m_drive->get_hard_disk_file();
-
-	if (file==NULL)
-	{
-		m_status &= ~MFMHD_READY;
-		return;
-	}
-
-	info = hard_disk_get_info(file);
-
-	count = info->sectors;
-	size = info->sectorbytes/128;
-
-	/* Write lead-in. */
-	memset(trackdata, 0x4e, GAP1);
-
-	position += GAP1;
-	for (i=0; i < count; i++)
-	{
-		sector = (i*step) % info->sectors;
-		memset(&trackdata[position], 0x00, SYNC);
-		position += SYNC;
-
-		/* Write sync */
-		trackdata[position++] = 0xa1;
-
-		/* Write IDAM */
-		trackdata[position++] = cylinder_to_ident(m_current_cylinder);
-		trackdata[position++] = m_current_cylinder;
-		trackdata[position++] = head;
-		trackdata[position++] = sector;
-		trackdata[position++] = (size==1)? 0x00 : (0x01 << (size-1));
-
-		/* Set CRC16 */
-		crc = ccitt_crc16(0xffff, &trackdata[position-5], 5);
-		trackdata[position++] = (crc>>8)&0xff;
-		trackdata[position++] = crc & 0xff;
-
-		/* Write Gap2 */
-		memset(&trackdata[position], 0x4e, GAP2);
-		position += GAP2;
-
-		/* Write sync */
-		memset(&trackdata[position], 0x00, SYNC);
-		position += SYNC;
-		trackdata[position++] = 0xa1;
-
-		/* Write DAM */
-		trackdata[position++] = 0xfb;
-
-		/* Locate the sector content in the image and load it. */
-
-		if (!harddisk_chs_to_lba(file, m_current_cylinder, head, sector, &lba))
-		{
-			m_status &= ~MFMHD_READY;
-			return;
-		}
-
-		if (!hard_disk_read(file, lba, &trackdata[position]))
-		{
-			m_status &= ~MFMHD_READY;
-			return;
-		}
-
-		position += info->sectorbytes;
-
-		/* Set CRC16. Includes the address mark. */
-		crc = ccitt_crc16(0xffff, &trackdata[position-size-1], size+1);
-		trackdata[position++] = (crc>>8)&0xff;
-		trackdata[position++] = crc & 0xff;
-
-		/* Write remaining 3 bytes which would have been used for ECC. */
-		memset(&trackdata[position], 0x00, 3);
-		position += 3;
-
-		/* Write Gap3 */
-		memset(&trackdata[position], 0x4e, GAP3);
-		position += GAP3;
-	}
-	/* Write Gap 4 */
-	memset(&trackdata[position], 0x4e, GAP4);
-	position += GAP4;
-
-	m_status |= MFMHD_READY;
-}
-
-/*
-    Writes a track to the image. We need to isolate the sector contents.
-    This is basically done in the same way as in the SDF format in ti99_dsk.
-*/
-void mfm_harddisk_legacy_device::write_track(int head, UINT8 *track_image, int data_count)
-{
-	int current_pos = 0;
-	bool found;
-	// UINT8 wident;
-	UINT8 whead = 0, wsector = 0;
-	// UINT8 wsize;
-	UINT16 wcyl = 0;
-	int state;
-
-	/* Only search in the first 100 bytes for the start. */
-
-	UINT32 lba;
-	hard_disk_file *file = m_drive->get_hard_disk_file();
-
-	/* printf("ti99_hd write track c=%d h=%d\n", m_current_cylinder, head); */
-
-	if (file==NULL)
-	{
-		m_status &= ~MFMHD_READY;
-		return;
-	}
-
-	current_pos = find_block(track_image, 0, 100, 0x4e, GAP1);
-
-	// In case of defect formats, we continue as far as possible. This
-	// may lead to sectors not being written. */
-	if (current_pos==TI99HD_BLOCKNOTFOUND)
-	{
-		logerror("ti99_hd error: write track: Cannot find GAP1 for cylinder %d, head %d.\n", m_current_cylinder, head);
-		/* What now? The track data are illegal, so we refuse to continue. */
-		m_status |= MFMHD_WRFAULT;
-		return;
-	}
-
-	/* Get behind GAP1 */
-	current_pos += GAP1;
-	found = false;
-
-	while (current_pos < data_count)
-	{
-		/* We must find the address block to determine the sector. */
-		int new_pos = find_block(track_image, current_pos, data_count, 0x00, SYNC);
-		if (new_pos==TI99HD_BLOCKNOTFOUND)
-		{
-			/* Forget about the rest; we're done. */
-			if (found) break;  /* we were already successful, so all ok */
-			logerror("ti99_hd error: write track: Cannot find sync for track %d, head %d.\n", m_current_cylinder, head);
-			m_status |= MFMHD_WRFAULT;
-			return;
-		}
-		found = true;
-
-		new_pos = new_pos + SYNC; /* skip sync bytes */
-
-		if (track_image[new_pos]==0xa1)
-		{
-			/* IDAM found. */
-			current_pos = new_pos + 1;
-			// wident = track_image[current_pos];  // unused
-			wcyl = track_image[current_pos+1] + ((track_image[current_pos+2]&0x70)<<4);
-			whead = track_image[current_pos+2]&0x0f;
-			wsector = track_image[current_pos+3];
-			// wsize = track_image[current_pos+4];  // unused
-
-			if (wcyl == m_current_cylinder && whead == head)
-			{
-				if (!harddisk_chs_to_lba(file, wcyl, whead, wsector, &lba))
-				{
-					m_status |= MFMHD_WRFAULT;
-					return;
-				}
-
-				/* Skip to the sector content. */
-				new_pos = find_block(track_image, current_pos, data_count, 0x00, SYNC);
-				current_pos = new_pos + SYNC;
-				if (track_image[current_pos]==0xa1)
-				{
-					current_pos += 2;
-					state = hard_disk_write(file, lba, track_image+current_pos);
-					if (state==0)
-					{
-						logerror("ti99_hd error: write track: Write error during formatting cylinder %d, head %d\n", wcyl, whead);
-						m_status |= MFMHD_WRFAULT;
-						return;
-					}
-					current_pos = current_pos+256+2; /* Skip contents and CRC */
-				}
-				else
-				{
-					logerror("ti99_hd error: write track: Cannot find DAM for cylinder %d, head %d, sector %d.\n", wcyl, whead, wsector);
-					m_status |= MFMHD_WRFAULT;
-					return;
-				}
-			}
-			else
-			{
-				logerror("ti99_hd error: write track: Cylinder/head mismatch. Drive is on cyl=%d, head=%d, track data say cyl=%d, head=%d\n", m_current_cylinder, head, wcyl, whead);
-				m_status |= MFMHD_WRFAULT;
-			}
-		}
-		else
-		{
-			logerror("ti99_hd error: write track: Invalid track image for cyl=%d, head=%d. Cannot find any IDAM in track data.\n",  m_current_cylinder, head);
-			m_status |= MFMHD_WRFAULT;
-			return;
-		}
-	}
-}
-
-UINT8 mfm_harddisk_legacy_device::get_status()
-{
-	UINT8 status = 0;
-	hard_disk_file *file = m_drive->get_hard_disk_file();
-	if (file!=NULL)
-		status |= MFMHD_READY;
-
-	if (m_current_cylinder==0)
-		status |= MFMHD_TRACK00;
-
-	if (!m_seeking)
-		status |= MFMHD_SEEKCOMP;
-
-	if (m_id_index == 0)
-		status |= MFMHD_INDEX;
-
-	m_status = status;
-	if (VERBOSE>5) LOG("ti99_hd: request status reply = %02x\n", status);
-	return status;
-}
-
-void mfm_harddisk_legacy_device::seek(int direction)
-{
-	const hard_disk_info *info;
-	hard_disk_file *file = m_drive->get_hard_disk_file();
-
-	if (file==NULL) return;
-
-	info = hard_disk_get_info(file);
-
-	m_seeking = true;
-
-	if (direction<0)
-	{
-		if (m_current_cylinder>0)
-			m_current_cylinder--;
-	}
-	else
-	{
-		if (m_current_cylinder < info->cylinders)
-			m_current_cylinder++;
-	}
-
-	// TODO: Requires timer
-
-	m_seeking = false;
-}
-
-void mfm_harddisk_legacy_device::get_next_id(int head, chrn_id_hd *id)
-{
-	const hard_disk_info *info;
-	hard_disk_file *file;
-	int interleave = 3;
-
-	file = m_drive->get_hard_disk_file();
-
-	if (file==NULL)
-	{
-		m_status &= ~MFMHD_READY;
-		return;
-	}
-
-	info = hard_disk_get_info(file);
-
-	m_current_head = head;
-
-	/* TODO: implement an interleave suitable for the number of sectors in the track. */
-	m_id_index = (m_id_index + interleave) % info->sectors;
-
-	/* build a new info block. */
-	id->C = m_current_cylinder;
-	id->H = m_current_head;
-	id->R = m_id_index;
-	id->N = 1;
-	id->data_id = m_id_index;
-	id->flags = 0;
-}
-
-void mfm_harddisk_legacy_device::device_start()
-{
-	m_current_cylinder = 0;
-	m_current_head = 0;
-}
-
-void mfm_harddisk_legacy_device::device_reset()
-{
-	m_drive = static_cast<harddisk_image_device *>(subdevice("drive"));
-	m_seeking = false;
-	m_status = 0;
-	m_id_index = 0;
-}
-
-MACHINE_CONFIG_FRAGMENT( mfmhd )
-	MCFG_HARDDISK_ADD("drive")
-MACHINE_CONFIG_END
-
-machine_config_constructor mfm_harddisk_legacy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mfmhd );
-}
-
-const device_type TI99_MFMHD_LEG = &device_creator<mfm_harddisk_legacy_device>;

@@ -106,7 +106,8 @@ void seibu_sound_device::device_start()
 
 		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
 		membank(":seibu_bank1")->set_entry(0);
-	}
+	} else
+		membank(":seibu_bank1")->set_base(rom + 0x8000);
 
 	switch(m_encryption_mode) {
 	case 0: break;

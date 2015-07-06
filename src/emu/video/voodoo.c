@@ -1458,8 +1458,14 @@ INLINE INT32 prepare_tmu(tmu_state *t)
 	/* adjust the result: negative to get the log of the original value */
 	/* plus 12 to account for the extra exponent, and divided by 2 to */
 	/* get the log of the square root of texdx */
-	(void)fast_reciplog(texdx, &lodbase);
-	return (-lodbase + (12 << 8)) / 2;
+	#if USE_FAST_RECIP == 1
+		(void)fast_reciplog(texdx, &lodbase);
+		return (-lodbase + (12 << 8)) / 2;
+	#else
+		double tmpTex = texdx;
+		lodbase = new_log2(tmpTex);
+		return (lodbase + (12 << 8)) / 2;
+	#endif
 }
 
 
@@ -3303,8 +3309,6 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 					iterw = (UINT32) sw[pix] << 16;
 				}
 				INT32 iterz = sw[pix] << 12;
-				rgb_union color;
-				rgb_union iterargb = { 0 };
 
 				/* apply clipping */
 				if (FBZMODE_ENABLE_CLIPPING(v->reg[fbzMode].u))
@@ -3319,6 +3323,13 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 						goto nextpixel;
 					}
 				}
+				#if USE_OLD_RASTER == 1
+					rgb_union color;
+					rgb_union iterargb = { 0 };
+				#else
+					rgbaint_t color, preFog;
+					rgbaint_t iterargb(0);
+				#endif
 
 				/* pixel pipeline part 1 handles depth testing and stippling */
 				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, v->reg[fbzColorPath].u, v->reg[fbzMode].u, iterz, iterw);
@@ -3362,35 +3373,38 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
 				fogdepth = biasdepth = (UINT32) sw[pix];
 
-				/* use the RGBA we stashed above */
-				color.rgb.r = r = sr[pix];
-				color.rgb.g = g = sg[pix];
-				color.rgb.b = b = sb[pix];
-				color.rgb.a = a = sa[pix];
-
-				if (USE_OLD_RASTER) {
+				#if USE_OLD_RASTER == 1
 					/* Perform depth testing */
 					DEPTH_TEST(v, stats, x, v->reg[fbzMode].u);
+
+					/* use the RGBA we stashed above */
+					color.rgb.r = r = sr[pix];
+					color.rgb.g = g = sg[pix];
+					color.rgb.b = b = sb[pix];
+					color.rgb.a = a = sa[pix];
 
 					/* apply chroma key, alpha mask, and alpha testing */
 					APPLY_CHROMAKEY(v, stats, v->reg[fbzMode].u, color);
 					APPLY_ALPHAMASK(v, stats, v->reg[fbzMode].u, color.rgb.a);
 					APPLY_ALPHATEST(v, stats, v->reg[alphaMode].u, color.rgb.a);
-				} else {
+				#else
 					/* Perform depth testing */
 					if (!depthTest((UINT16) v->reg[zaColor].u, stats, depth[x], v->reg[fbzMode].u, biasdepth))
 						goto nextpixel;
+
+					/* use the RGBA we stashed above */
+					color.set(sa[pix], sr[pix], sg[pix], sb[pix]);
 
 					/* handle chroma key */
 					if (!chromaKeyTest(v, stats, v->reg[fbzMode].u, color))
 						goto nextpixel;
 					/* handle alpha mask */
-					if (!alphaMaskTest(stats, v->reg[fbzMode].u, color.rgb.a))
+					if (!alphaMaskTest(stats, v->reg[fbzMode].u, color.get_a()))
 						goto nextpixel;
 					/* handle alpha test */
-					if (!alphaTest(v, stats, v->reg[alphaMode].u, color.rgb.a))
+					if (!alphaTest(v, stats, v->reg[alphaMode].u, color.get_a()))
 						goto nextpixel;
-				}
+				#endif
 
 				/* wait for any outstanding work to finish */
 				poly_wait(v->poly, "LFB Write");
@@ -6496,5 +6510,6 @@ RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x000000C4, 0x
 RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD ) /*   67     1962      14755 */
 RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x000000C4, 0x0C261ACD ) /* * 66       74       3951 */
 RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x00000ACD, 0x04221AC9 ) /*   70      374       3691 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD ) /* * 20      350       7928 */
 
 #endif

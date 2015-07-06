@@ -179,6 +179,8 @@ public:
 	void hlt_w(bool state);
 
 	bool enp_r();
+        
+	void index_callback(floppy_image_device *floppy, int state);
 
 protected:
 	// Chip-specific configuration flags
@@ -420,7 +422,6 @@ private:
 	void command_end();
 
 	void spinup();
-	void index_callback(floppy_image_device *floppy, int state);
 	void ready_callback(floppy_image_device *floppy, int state);
 	bool sector_matches() const;
 	bool is_ready();

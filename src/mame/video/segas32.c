@@ -832,6 +832,23 @@ int segas32_state::compute_clipping_extents(screen_device &screen, int enable, i
 }
 
 
+void segas32_state::compute_tilemap_flips(int bgnum, int &flipx, int &flipy)
+{
+	/* determine if we're flipped */
+	int global_flip = (m_system32_videoram[0x1ff00 / 2] >> 9)&1;
+
+	flipx = global_flip;
+	flipy = global_flip;
+
+	int layer_flip = (m_system32_videoram[0x1ff00 / 2] >> bgnum) & 1;
+
+	flipy ^= layer_flip;
+	flipx ^= layer_flip;
+
+	// this bit is set on Air Rescue (screen 2) title screen, during the Air Rescue introduction demo, and in f1en when you win a single player race
+	// it seems to prohibit (at least) the per-tilemap y flipping (maybe global y can override it)
+	if ((m_system32_videoram[0x1ff00 / 2] >> 8) & 1) flipy = 0;
+}
 
 /*************************************
  *
@@ -881,20 +898,10 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, struct segas32_st
 //opaque = (m_system32_videoram[0x1ff8e/2] >> (8 + bgnum)) & 1;
 //if (screen.machine().input().code_pressed(KEYCODE_Z) && bgnum == 0) opaque = 1;
 //if (screen.machine().input().code_pressed(KEYCODE_X) && bgnum == 1) opaque = 1;
+	int flipx, flipy;
 
-	/* determine if we're flipped */
-	int global_flip = (m_system32_videoram[0x1ff00 / 2] >> 9)&1;
-
-	int flipx = global_flip;
-	int flipy = global_flip;
-
-
-	int layer_flip = (m_system32_videoram[0x1ff00 / 2] >> bgnum) & 1;
-
-	flipy ^= layer_flip;
-	flipx ^= layer_flip;
-
-	if ((m_system32_videoram[0x1ff00 / 2] >> 8) & 1) flipy = 0;
+	// todo determine flipping
+	compute_tilemap_flips(bgnum, flipx, flipy);
 
 	/* determine the clipping */
 	clipenable = (m_system32_videoram[0x1ff02/2] >> (11 + bgnum)) & 1;
@@ -1030,6 +1037,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, struct segas32_st
  *
  *************************************/
 
+
 void segas32_state::update_tilemap_rowscroll(screen_device &screen, struct segas32_state::layer_info *layer, const rectangle &cliprect, int bgnum)
 {
 	int clipenable, clipout, clips, clipdraw_start;
@@ -1040,7 +1048,7 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, struct segas
 	int xscroll, yscroll;
 	UINT16 *table;
 	int srcx, srcy;
-	int flip, opaque;
+	int opaque;
 	int x, y;
 
 	/* get the tilemaps */
@@ -1052,8 +1060,11 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, struct segas
 //if (screen.machine().input().code_pressed(KEYCODE_C) && bgnum == 2) opaque = 1;
 //if (screen.machine().input().code_pressed(KEYCODE_V) && bgnum == 3) opaque = 1;
 
-	/* determine if we're flipped */
-	flip = ((m_system32_videoram[0x1ff00/2] >> 9) ^ (m_system32_videoram[0x1ff00/2] >> bgnum)) & 1;
+	int flipx, flipy;
+
+	// todo determine flipping
+	compute_tilemap_flips(bgnum, flipx, flipy);
+
 
 	/* determine the clipping */
 	clipenable = (m_system32_videoram[0x1ff02/2] >> (11 + bgnum)) & 1;
@@ -1089,36 +1100,33 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, struct segas
 			int srcxstep;
 
 			/* if we're not flipped, things are straightforward */
-			if (!flip)
+			if (!flipx)
 			{
-				/* get starting scroll values */
 				srcx = cliprect.min_x + xscroll;
-				srcxstep = 1;
-				srcy = yscroll + y;
-
-				/* apply row scroll/select */
-				if (rowscroll)
-					srcx += table[0x000 + 0x100 * (bgnum - 2) + y] & 0x3ff;
-				if (rowselect)
-					srcy = (yscroll + table[0x200 + 0x100 * (bgnum - 2) + y]) & 0x1ff;
+				srcxstep = 1;				
+			}
+			else
+			{	
+				srcx = cliprect.max_x + xscroll;
+				srcxstep = -1;
 			}
 
-			/* otherwise, we have to do some contortions */
+			if (!flipy)
+			{
+				srcy = yscroll + y;
+			}
 			else
 			{
 				const rectangle &visarea = screen.visible_area();
-
-				/* get starting scroll values */
-				srcx = cliprect.max_x + xscroll;
-				srcxstep = -1;
 				srcy = yscroll + visarea.max_y - y;
-
-				/* apply row scroll/select */
-				if (rowscroll)
-					srcx += table[0x000 + 0x100 * (bgnum - 2) + y] & 0x3ff;
-				if (rowselect)
-					srcy = (yscroll + table[0x200 + 0x100 * (bgnum - 2) + y]) & 0x1ff;
 			}
+
+			/* apply row scroll/select */
+			if (rowscroll)
+				srcx += table[0x000 + 0x100 * (bgnum - 2) + y] & 0x3ff;
+			if (rowselect)
+				srcy = (yscroll + table[0x200 + 0x100 * (bgnum - 2) + y]) & 0x1ff;
+
 
 			/* look up the pages and get their source pixmaps */
 			bitmap_ind16 &tm0 = tilemaps[((srcy >> 7) & 2) + 0]->pixmap();
