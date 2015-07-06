@@ -78,7 +78,6 @@ Based on the 68ksbc.c
 
     TODO:
     - Memory map
-    - Dump ROM:s
     - Finish 3 x ACIA6850, terminal serial interface first
     - Add 1 x 14411 Motorola, Baudrate Generator
     - Add 1 x 68230 Motorola, Parallel Interface / Timer
@@ -249,8 +248,9 @@ MACHINE_CONFIG_END
 /* ROM definitions */
 ROM_START( fccpu1 )
 	ROM_REGION(0x1000000, "maincpu", 0)
-        ROM_LOAD( "zbug5.bin", 0x080000, 0x3000, CRC(04445fe1) SHA1(d59214171385aead05279e31fe9d354c63fb893a) )
-//	ROM_LOAD( "forcesys68kV1.0L.bin", 0x0000, 0x2f78, CRC(20a8d0d0) SHA1(544fd8bd8ed017115388c8b0f7a7a59a32253e43) )
+//        ROM_LOAD( "zbug5.bin", 0x080000, 0x3000, CRC(04445fe1) SHA1(d59214171385aead05279e31fe9d354c63fb893a) )
+        ROM_LOAD16_BYTE( "fccpu1V1.0L.j8.bin", 0x080001, 0x2000, CRC(3ac6f08f) SHA1(502f6547b508d8732bd68bbbb2402d8c30fefc3b) )
+        ROM_LOAD16_BYTE( "fccpu1V1.0L.j9.bin", 0x080000, 0x2000, CRC(035315fb) SHA1(90dc44d9c25d28428233e6846da6edce2d69e440) )
 ROM_END
 
 #if 0
