@@ -38,6 +38,7 @@ public:
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
+		, m_lcd_ram(*this, "lcd_ram")
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
@@ -75,16 +76,15 @@ protected:
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
+	required_shared_ptr<UINT8> m_lcd_ram;
 
 	int m_prgwidth;
 	int m_datawidth;
 	int m_prgmask;
 	int m_datamask;
 
-	UINT16 m_pc;
-	UINT16 m_prev_pc;
-	UINT8 m_op;
-	UINT8 m_prev_op;
+	UINT16 m_pc, m_prev_pc;
+	UINT8 m_op, m_prev_op;
 	UINT8 m_param;
 	int m_stack_levels;
 	UINT16 m_stack[2];
@@ -96,6 +96,9 @@ protected:
 	UINT8 m_c;
 	bool m_skip;
 	UINT8 m_w;
+	UINT16 m_div;
+	bool m_bdc;
+	bool m_cend;
 
 	// i/o handlers
 	devcb_read16 m_read_k;
