@@ -429,6 +429,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 
+	UINT32 m_colbase;
+
 	void coolriders_drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty);
 
@@ -477,6 +479,7 @@ public:
 		coolridr_state* state;
 		UINT32 clipvals[3];
 		int screen;
+		int colbase;
 	};
 
 	static int comp_sprite_z(const void *q1, const void *q2);
@@ -1948,8 +1951,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		UINT32 lastSpriteNumber = 0xffffffff;
 		UINT16 blankcount = 0;
-		int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
-		int color_offs2 = (0x7b20 + (b2colorNumber & 0x7ff))*0x40 * 5;
+		int color_offs = (object->colbase + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
+		int color_offs2 = (object->colbase + (b2colorNumber & 0x7ff))*0x40 * 5;
 		for (int h = 0; h < used_hCellCount; h++)
 		{
 			int current_decoded = false;
@@ -2241,6 +2244,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	cool_render_object* testobject = (cool_render_object *)malloc(sizeof(cool_render_object));
 
 	testobject->state = this;
+	testobject->colbase = m_colbase;
 
 	for (int i=0;i<12;i++)
 		testobject->spriteblit[i] = m_spriteblit[i];
@@ -2478,7 +2482,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 
 		//blit mode 10 00 00000003
 		//blit mode 10 01 00000002
-		//blit mode 10 02 00007b20  << this is the palette base for the sprites
+		//blit mode 10 02 00007b20  << this is the palette base for the sprites (but not in aquastage where it gets set to 0x210 and colbase is 0?) ( m_colbase )
 		//blit mode 10 00 00000002
 		//blit mode 10 01 00000001
 		//blit mode 10 02 00040204
@@ -3840,25 +3844,15 @@ ROM_START( aquastge )
 	/* these are compressed sprite data */
 	ROM_REGION( 0x2800000, "compressedgfx", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "mpr-18289.ic5", 0x0000000, 0x0200000, CRC(fb212692) SHA1(da2f77564e718276c66b0f02e72a97d7b3653c35) ) // 0004
-	ROM_RELOAD(0x0200000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18288.ic4", 0x0400000, 0x0200000, CRC(558c82ee) SHA1(e2ae4f2e81c7360eedd1b18e36d1f6ca6c015fee) ) // 9000
-	ROM_RELOAD(0x0600000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18287.ic3", 0x0800000, 0x0200000, CRC(bf8743d8) SHA1(8d0e0691ec062f1939db8f6b75edb92d34417f81) ) // 4900
-	ROM_RELOAD(0x0a00000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18286.ic2", 0x0c00000, 0x0200000, CRC(3eb95e9a) SHA1(d565e5f353327e16f7ead2251fd9a503bf46e210) ) // 0490
-	ROM_RELOAD(0x0e00000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18285.ic1", 0x1000000, 0x0200000, CRC(8390453c) SHA1(e7d3a6579d9805a71b954bb248a2da749e9d9d38) ) // 0049
-	ROM_RELOAD(0x1200000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18294.ic10",0x1400000, 0x0200000, CRC(341ebd4a) SHA1(9d9a1c09d81a50132edcc18a99266416683f4ff6) ) // 0004
-	ROM_RELOAD(0x1600000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18293.ic9", 0x1800000, 0x0200000, CRC(f76bc076) SHA1(f5a8f9bd26b2e8533a1fbf8da6938373df971749)) // 9000
-	ROM_RELOAD(0x1a00000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18292.ic8", 0x1c00000, 0x0200000, CRC(59a713f9) SHA1(388b833fa6fb930f26c80674606505ec80668a16) ) // 4900
-	ROM_RELOAD(0x01e0000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18291.ic7", 0x2000000, 0x0200000, CRC(b6c167bd) SHA1(4990bae50e8804b2e1048aa5c64b086e8427073f) ) // 0490
-	ROM_RELOAD(0x2200000, 0x0200000)
 	ROM_LOAD16_WORD_SWAP( "mpr-18290.ic6", 0x2400000, 0x0200000, CRC(11f7adb0) SHA1(a72f9892f93506456edc7ffc66224446a58ca38b) ) // 0049
-	ROM_RELOAD(0x2600000, 0x0200000)
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
@@ -3929,6 +3923,8 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 
+	m_colbase = 0x7b20;
+
 	// work around the hack when mapping the workram directly
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060d7fff, 0, &m_sysh1_workram_h[0]);
 	m_maincpu->sh2drc_add_fastram(0x060d9000, 0x060fffff, 0, &m_sysh1_workram_h[0xd9000/4]);
@@ -3945,6 +3941,8 @@ DRIVER_INIT_MEMBER(coolridr_state, aquastge)
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+
+	m_colbase = 0;
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
