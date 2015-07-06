@@ -23,14 +23,14 @@ static const pen_t pens_from_color_prom[] =
 };
 
 
-WRITE8_MEMBER(vicdual_state::vicdual_palette_bank_w)
+WRITE8_MEMBER(vicdual_state::palette_bank_w)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_palette_bank = data & 3;
 }
 
 
-UINT32 vicdual_state::screen_update_vicdual_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 x = 0;
 	UINT8 y = cliprect.min_y;
@@ -80,7 +80,7 @@ UINT32 vicdual_state::screen_update_vicdual_bw(screen_device &screen, bitmap_rgb
 }
 
 
-UINT32 vicdual_state::screen_update_vicdual_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *color_prom = (UINT8 *)memregion("proms")->base();
 	UINT8 x = 0;
@@ -138,12 +138,12 @@ UINT32 vicdual_state::screen_update_vicdual_color(screen_device &screen, bitmap_
 }
 
 
-UINT32 vicdual_state::screen_update_vicdual_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 vicdual_state::screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (vicdual_is_cabinet_color())
-		screen_update_vicdual_color(screen, bitmap, cliprect);
+	if (is_cabinet_color())
+		screen_update_color(screen, bitmap, cliprect);
 	else
-		screen_update_vicdual_bw(screen, bitmap, cliprect);
+		screen_update_bw(screen, bitmap, cliprect);
 
 	return 0;
 }
