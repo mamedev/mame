@@ -25,7 +25,8 @@
 
 enum
 {
-	SM510_PC=1, SM510_ACC, SM510_BL, SM510_BM
+	SM510_PC=1, SM510_ACC, SM510_BL, SM510_BM,
+	SM510_C, SM510_W
 };
 
 void sm510_base_device::device_start()
@@ -52,6 +53,9 @@ void sm510_base_device::device_start()
 	m_c = 0;
 	m_skip = false;
 	m_w = 0;
+	m_div = 0;
+	m_bdc = false;
+	m_cend = false;
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -66,12 +70,17 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_c));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_w));
+	save_item(NAME(m_div));
+	save_item(NAME(m_bdc));
+	save_item(NAME(m_cend));
 
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
 	state_add(SM510_ACC, "ACC", m_acc).formatstr("%01X");
 	state_add(SM510_BL,  "BL",  m_bl).formatstr("%01X");
 	state_add(SM510_BM,  "BM",  m_bm).formatstr("%01X");
+	state_add(SM510_C,   "C",   m_c).formatstr("%01X");
+	state_add(SM510_W,   "W",   m_w).formatstr("%02X");
 
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
@@ -88,6 +97,8 @@ void sm510_base_device::device_start()
 void sm510_base_device::device_reset()
 {
 	m_skip = false;
+	m_bdc = false;
+	m_cend = false;
 	m_op = m_prev_op = 0;
 	do_branch(3, 7, 0);
 	m_prev_pc = m_pc;

@@ -160,8 +160,8 @@ void sm510_base_device::op_exc()
 
 void sm510_base_device::op_bdc()
 {
-	// BDC: x
-	op_illegal();
+	// BDC: enable LCD bleeder current with C
+	m_bdc = (m_c != 0);
 }
 
 void sm510_base_device::op_exci()
@@ -380,13 +380,13 @@ void sm510_base_device::op_skip()
 void sm510_base_device::op_cend()
 {
 	// CEND: stop clock
-	op_illegal();
+	m_cend = true;
 }
 
 void sm510_base_device::op_idiv()
 {
 	// IDIV: reset divider
-	op_illegal();
+	m_div = 0;
 }
 
 void sm510_base_device::op_illegal()
