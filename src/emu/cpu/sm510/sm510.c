@@ -36,8 +36,13 @@ void sm510_base_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 
+	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::div_timer_cb), this));
+	reset_divider();
+
 	// resolve callbacks
 	m_read_k.resolve_safe(0);
+	m_read_ba.resolve_safe(1);
+	m_read_b.resolve_safe(1);
 	m_write_s.resolve_safe();
 
 	// zerofill
@@ -53,9 +58,11 @@ void sm510_base_device::device_start()
 	m_c = 0;
 	m_skip = false;
 	m_w = 0;
-	m_div = 0;
-	m_bdc = false;
-	m_cend = false;
+//	m_div = 0;
+	m_1s = false;
+	m_bp = false;
+	m_bc = false;
+	m_halt = false;
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -71,8 +78,10 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_skip));
 	save_item(NAME(m_w));
 	save_item(NAME(m_div));
-	save_item(NAME(m_bdc));
-	save_item(NAME(m_cend));
+	save_item(NAME(m_1s));
+	save_item(NAME(m_bp));
+	save_item(NAME(m_bc));
+	save_item(NAME(m_halt));
 
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
@@ -97,11 +106,66 @@ void sm510_base_device::device_start()
 void sm510_base_device::device_reset()
 {
 	m_skip = false;
-	m_bdc = false;
-	m_cend = false;
+	m_halt = false;
 	m_op = m_prev_op = 0;
 	do_branch(3, 7, 0);
 	m_prev_pc = m_pc;
+	
+	// lcd is on (Bp on, BC off)
+	m_bp = true;
+	m_bc = false;
+	
+	// y=0(bs), r=0
+}
+
+
+
+//-------------------------------------------------
+//  interrupt/timer
+//-------------------------------------------------
+
+void sm510_base_device::wake_me_up()
+{
+	// in halt mode, wake up after 1S signal or K input
+	if (m_halt)
+	{
+		m_halt = false;
+		do_branch(1, 0, 0);
+		
+		standard_irq_callback(0);
+
+		// note: official doc warns that Bl/Bm and the stack are undefined
+		// after waking up, but we leave it unchanged
+	}
+}
+
+void sm510_base_device::execute_set_input(int line, int state)
+{
+	if (line != 0)
+		return;
+}
+
+TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
+{
+	// no need to increment it by 1 everytime, since only the
+	// highest bits are accessible
+	m_div = (m_div + 0x800) & 0x7fff;
+	
+	// 1S signal on overflow(falling edge of f1)
+	if (m_div == 0)
+	{
+		m_1s = true;
+		wake_me_up();
+	}
+
+	// schedule next timeout
+	m_div_timer->adjust(attotime::from_ticks(0x800, unscaled_clock()));
+}
+
+void sm510_base_device::reset_divider()
+{
+	m_div = 0;
+	m_div_timer->adjust(attotime::from_ticks(0x800, unscaled_clock()));
 }
 
 
@@ -120,6 +184,13 @@ void sm510_base_device::increment_pc()
 
 void sm510_base_device::execute_run()
 {
+	// nothing to do if in halt mode
+	if (m_halt)
+	{
+		m_icount = 0;
+		return;
+	}
+	
 	while (m_icount > 0)
 	{
 		// remember previous state

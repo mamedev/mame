@@ -161,7 +161,7 @@ void sm510_base_device::op_exc()
 void sm510_base_device::op_bdc()
 {
 	// BDC: enable LCD bleeder current with C
-	m_bdc = (m_c != 0);
+	m_bc = (m_c != 0);
 }
 
 void sm510_base_device::op_exci()
@@ -217,8 +217,8 @@ void sm510_base_device::op_kta()
 
 void sm510_base_device::op_atbp()
 {
-	// ATBP: output ACC to BP
-	op_illegal();
+	// ATBP: output ACC to BP(internal LCD backplate signal)
+	m_bp = ((m_acc & 1) != 0);
 }
 
 void sm510_base_device::op_atl()
@@ -296,8 +296,8 @@ void sm510_base_device::op_sc()
 
 void sm510_base_device::op_tb()
 {
-	// TB: x
-	op_illegal();
+	// TB: skip next if B(beta) pin is set
+	m_skip = (m_read_b() != 0);
 }
 
 void sm510_base_device::op_tc()
@@ -326,32 +326,33 @@ void sm510_base_device::op_ta0()
 
 void sm510_base_device::op_tabl()
 {
-	// TABL: skip next of ACC equals BL
+	// TABL: skip next if ACC equals BL
 	m_skip = (m_acc == m_bl);
 }
 
 void sm510_base_device::op_tis()
 {
-	// TIS: x
-	op_illegal();
+	// TIS: skip next if 1S(gamma flag) is clear, reset it after
+	m_skip = !m_1s;
+	m_1s = false;
 }
 
 void sm510_base_device::op_tal()
 {
-	// TAL: x
-	op_illegal();
+	// TAL: skip next if BA pin is set
+	m_skip = (m_read_ba() != 0);
 }
 
 void sm510_base_device::op_tf1()
 {
-	// TF1: x
-	op_illegal();
+	// TF1: skip next if divider F1(d14) is set
+	m_skip = ((m_div & 0x4000) != 0);
 }
 
 void sm510_base_device::op_tf4()
 {
-	// TF4: x
-	op_illegal();
+	// TF4: skip next if divider F4(d11) is set
+	m_skip = ((m_div & 0x0800) != 0);
 }
 
 
@@ -379,14 +380,14 @@ void sm510_base_device::op_skip()
 
 void sm510_base_device::op_cend()
 {
-	// CEND: stop clock
-	m_cend = true;
+	// CEND: stop clock (halt the cpu and go into low-power mode)
+	m_halt = true;
 }
 
 void sm510_base_device::op_idiv()
 {
 	// IDIV: reset divider
-	m_div = 0;
+	reset_divider();
 }
 
 void sm510_base_device::op_illegal()
