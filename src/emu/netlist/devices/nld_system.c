@@ -288,4 +288,97 @@ NETLIB_UPDATE_PARAM(res_sw)
 	// nothing, not intended to be called
 }
 
+/* -----------------------------------------------------------------------------
+ * nld_function
+ * ----------------------------------------------------------------------------- */
+
+NETLIB_START(function)
+{
+	register_param("N", m_N, 2);
+	register_param("FUNC", m_func, "");
+	register_output("Q", m_Q);
+
+	for (int i=0; i < m_N; i++)
+		register_input(pstring::sprintf("A%d", i), m_I[i]);
+
+	pstring_list_t cmds(m_func.Value(), " ");
+	m_precompiled.clear();
+
+	for (std::size_t i=0; i < cmds.size(); i++)
+	{
+		pstring cmd = cmds[i];
+		rpn_inst rc;
+		if (cmd == "+")
+			rc.m_cmd = ADD;
+		else if (cmd == "-")
+			rc.m_cmd = SUB;
+		else if (cmd == "*")
+			rc.m_cmd = MULT;
+		else if (cmd == "/")
+			rc.m_cmd = DIV;
+		else if (cmd == "/")
+			rc.m_cmd = DIV;
+		else if (cmd.startsWith("A"))
+		{
+			rc.m_cmd = PUSH_INPUT;
+			rc.m_param = cmd.substr(1).as_long();
+		}
+		else
+		{
+			bool err = false;
+			rc.m_cmd = PUSH_CONST;
+			rc.m_param = cmd.as_double(&err);
+			if (err)
+				netlist().error("nld_function: unknown/misformatted token <%s> in <%s>", cmd.cstr(), m_func.Value().cstr());
+		}
+		m_precompiled.add(rc);
+	}
+
+}
+
+NETLIB_RESET(function)
+{
+	m_Q.initial(0.0);
+}
+
+NETLIB_UPDATE(function)
+{
+	//nl_double val = INPANALOG(m_I[0]) * INPANALOG(m_I[1]) * 0.2;
+	//OUTANALOG(m_Q, val);
+	nl_double stack[20];
+	unsigned ptr = 0;
+	unsigned e = m_precompiled.size();
+	for (unsigned i = 0; i<e; i++)
+	{
+		rpn_inst &rc = m_precompiled[i];
+		switch (rc.m_cmd)
+		{
+			case ADD:
+				ptr--;
+				stack[ptr-1] = stack[ptr] + stack[ptr-1];
+				break;
+			case MULT:
+				ptr--;
+				stack[ptr-1] = stack[ptr] * stack[ptr-1];
+				break;
+			case SUB:
+				ptr--;
+				stack[ptr-1] = stack[ptr-1] - stack[ptr];
+				break;
+			case DIV:
+				ptr--;
+				stack[ptr-1] = stack[ptr-1] / stack[ptr];
+				break;
+			case PUSH_INPUT:
+				stack[ptr++] = INPANALOG(m_I[(int) rc.m_param]);
+				break;
+			case PUSH_CONST:
+				stack[ptr++] = rc.m_param;
+				break;
+		}
+	}
+	OUTANALOG(m_Q, stack[ptr-1]);
+}
+
+
 NETLIB_NAMESPACE_DEVICES_END()

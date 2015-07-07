@@ -70,9 +70,10 @@
 #define PARAMETERS(_name)                                                      \
 		NET_REGISTER_DEV(netlistparams, _name)
 
-#define FUNCTION(_name, _N)				                                       \
+#define AFUNC(_name, _N, _F)			                                       \
 		NET_REGISTER_DEV(function, _name)                                      \
-		PARAM(_name.N, _N)
+		PARAM(_name.N, _N)													   \
+		PARAM(_name.FUNC, _F)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -280,31 +281,34 @@ public:
 
 protected:
 
-	void start()
-	{
-		register_param("INPUTS", m_N, 2);
-		register_output("Q", m_Q);
-
-		for (int i=0; i < m_N; i++)
-			register_input(pstring::sprintf("I%d", i), m_I[i]);
-	}
-
-	void reset()
-	{
-		m_Q.initial(0.0);
-	}
-
-	void update()
-	{
-		nl_double val = INPANALOG(m_I[0]) * INPANALOG(m_I[1]) * 0.2;
-		OUTANALOG(m_Q, val);
-	}
+	void start();
+	void reset();
+	void update();
 
 private:
 
+	enum rpn_cmd
+	{
+		ADD,
+		MULT,
+		SUB,
+		DIV,
+		PUSH_CONST,
+		PUSH_INPUT,
+	};
+
+	struct rpn_inst
+	{
+		rpn_cmd m_cmd;
+		nl_double m_param;
+	};
+
 	param_int_t m_N;
+	param_str_t m_func;
 	analog_output_t m_Q;
 	analog_input_t m_I[10];
+
+	plist_t<rpn_inst> m_precompiled;
 };
 
 // -----------------------------------------------------------------------------
