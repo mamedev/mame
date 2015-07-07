@@ -73,9 +73,11 @@ NETLIB_UPDATE(74123)
 	else // 4538
 	{
 		m_trig = (INPLOGIC(m_B) ^ 1) | INPLOGIC(m_A);
-		res = res | INPLOGIC(m_A) | (INPLOGIC(m_B) ^ 1);
+		// The line below is from the datasheet truthtable ... doesn't make sense at all
+		//res = res | INPLOGIC(m_A) | (INPLOGIC(m_B) ^ 1);
 		t_AB_to_Q = NLTIME_FROM_NS(300);
 		t_C_to_Q = NLTIME_FROM_NS(250);
+		//printf("m_trig %d res %d\n", m_trig, res);
 	}
 
 	if (res)
