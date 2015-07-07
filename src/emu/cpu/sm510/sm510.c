@@ -44,6 +44,7 @@ void sm510_base_device::device_start()
 	m_read_ba.resolve_safe(1);
 	m_read_b.resolve_safe(1);
 	m_write_s.resolve_safe();
+	m_write_r.resolve_safe();
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
@@ -60,6 +61,7 @@ void sm510_base_device::device_start()
 	m_w = 0;
 //	m_div = 0;
 	m_1s = false;
+	m_k_active = false;
 	m_bp = false;
 	m_bc = false;
 	m_halt = false;
@@ -79,6 +81,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_w));
 	save_item(NAME(m_div));
 	save_item(NAME(m_1s));
+	save_item(NAME(m_k_active));
 	save_item(NAME(m_bp));
 	save_item(NAME(m_bc));
 	save_item(NAME(m_halt));
@@ -115,6 +118,7 @@ void sm510_base_device::device_reset()
 	m_bp = true;
 	m_bc = false;
 	
+	m_write_r(0, 0, 0xff);
 	// y=0(bs), r=0
 }
 
@@ -143,6 +147,9 @@ void sm510_base_device::execute_set_input(int line, int state)
 {
 	if (line != 0)
 		return;
+	
+	// set K input lines active state
+	m_k_active = (state != 0);
 }
 
 TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
@@ -184,15 +191,21 @@ void sm510_base_device::increment_pc()
 
 void sm510_base_device::execute_run()
 {
-	// nothing to do if in halt mode
-	if (m_halt)
-	{
-		m_icount = 0;
-		return;
-	}
-	
 	while (m_icount > 0)
 	{
+		if (m_halt)
+		{
+			// wake up from K input (note: 1S signal is handled above)
+			if (m_k_active)
+				wake_me_up();
+			else
+			{
+				// got nothing to do
+				m_icount = 0;
+				return;
+			}
+		}
+
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
