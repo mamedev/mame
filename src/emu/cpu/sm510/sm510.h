@@ -14,9 +14,17 @@
 
 // I/O ports setup
 
-// 4-bit K input port
+// 4-bit K input port (pull-down)
 #define MCFG_SM510_READ_K_CB(_devcb) \
 	sm510_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
+
+// 1-bit BA input pin (pull-up)
+#define MCFG_SM510_READ_BA_CB(_devcb) \
+	sm510_base_device::set_read_ba_callback(*device, DEVCB_##_devcb);
+
+// 1-bit B(beta) input pin (pull-up)
+#define MCFG_SM510_READ_B_CB(_devcb) \
+	sm510_base_device::set_read_b_callback(*device, DEVCB_##_devcb);
 
 // 8-bit S strobe output port
 #define MCFG_SM510_WRITE_S_CB(_devcb) \
@@ -43,11 +51,15 @@ public:
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
 		, m_read_k(*this)
+		, m_read_ba(*this)
+		, m_read_b(*this)
 		, m_write_s(*this)
 	{ }
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_k.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_ba_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_ba.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_b.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_s_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(object); }
 
 protected:
@@ -61,7 +73,7 @@ protected:
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 2; }
 	virtual UINT32 execute_input_lines() const { return 1; }
-	//virtual void execute_set_input(int line, int state);
+	virtual void execute_set_input(int line, int state);
 	virtual void execute_run();
 	virtual void execute_one() { } // -> child class
 
@@ -89,6 +101,7 @@ protected:
 	int m_stack_levels;
 	UINT16 m_stack[2];
 	int m_icount;
+	emu_timer *m_div_timer;
 	
 	UINT8 m_acc;
 	UINT8 m_bl;
@@ -97,15 +110,22 @@ protected:
 	bool m_skip;
 	UINT8 m_w;
 	UINT16 m_div;
-	bool m_bdc;
-	bool m_cend;
+	bool m_1s;
+	bool m_bp;
+	bool m_bc;
+	bool m_halt;
 
 	// i/o handlers
-	devcb_read16 m_read_k;
+	devcb_read8 m_read_k;
+	devcb_read_line m_read_ba;
+	devcb_read_line m_read_b;
 	devcb_write8 m_write_s;
 
 	// misc internal helpers
 	void increment_pc();
+	TIMER_CALLBACK_MEMBER(div_timer_cb);
+	void wake_me_up();
+	virtual void reset_divider();
 	virtual void get_opcode_param() { } // -> child class
 
 	UINT8 ram_r();
