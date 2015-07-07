@@ -888,3 +888,13 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 
 	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }
+
+READ16_MEMBER(sh1_device::sh7032_r)
+{
+	return m_sh7032_regs[offset];
+}
+
+WRITE16_MEMBER(sh1_device::sh7032_w)
+{
+	COMBINE_DATA(&m_sh7032_regs[offset]);
+}

@@ -500,6 +500,12 @@ class sh1_device : public sh2_device
 public:
 	// construction/destruction
 	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+
+	DECLARE_READ16_MEMBER(sh7032_r);
+	DECLARE_WRITE16_MEMBER(sh7032_w);
+private:
+	UINT16 m_sh7032_regs[0x200];
+	address_space_config m_program_config, m_decrypted_program_config;	
 };
 
 
