@@ -144,7 +144,7 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
 static ADDRESS_MAP_START( sh2_internal_map, AS_PROGRAM, 32, sh2_device )
 	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
-	AM_RANGE(0xe0000000, 0xffffffff) AM_READWRITE(sh2_internal_r, sh2_internal_w)
+	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh2_internal_r, sh2_internal_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
@@ -244,39 +244,65 @@ offs_t sh2_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-
 UINT8 sh2_device::RB(offs_t A)
 {
-	return m_program->read_byte(A & AM);
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+		return m_program->read_byte(A & AM);
+
+	return m_program->read_byte(A);
 }
 
 UINT16 sh2_device::RW(offs_t A)
 {
-	return m_program->read_word(A & AM);
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+		return m_program->read_word(A & AM);
+
+	return m_program->read_word(A);
 }
 
 UINT32 sh2_device::RL(offs_t A)
-{		
+{
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
-	return m_program->read_dword(A & AM);
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+		return m_program->read_dword(A & AM);
+
+	return m_program->read_dword(A);
 }
 
 void sh2_device::WB(offs_t A, UINT8 V)
-{	
-	m_program->write_byte(A & AM,V);
+{
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+	{
+		m_program->write_byte(A & AM,V);
+		return;
+	}
+	
+	m_program->write_byte(A,V);
 }
 
 void sh2_device::WW(offs_t A, UINT16 V)
 {
-	m_program->write_word(A & AM,V);
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+	{
+		m_program->write_word(A & AM,V);
+		return;
+	}
+	
+	m_program->write_word(A,V);
 }
 
 void sh2_device::WL(offs_t A, UINT32 V)
 {
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+	{
+		m_program->write_dword(A & AM,V);
+		return;
+	}
+	
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
-	m_program->write_dword(A & AM,V);
+	m_program->write_dword(A,V);
 }
 
 /*  code                 cycles  t-bit
