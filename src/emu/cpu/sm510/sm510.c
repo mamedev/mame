@@ -132,6 +132,8 @@ void sm510_base_device::wake_me_up()
 		m_halt = false;
 		do_branch(1, 0, 0);
 		
+		standard_irq_callback(0);
+
 		// note: official doc warns that Bl/Bm and the stack are undefined
 		// after waking up, but we leave it unchanged
 	}

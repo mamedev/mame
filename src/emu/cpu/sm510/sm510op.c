@@ -339,7 +339,7 @@ void sm510_base_device::op_tis()
 
 void sm510_base_device::op_tal()
 {
-	// TB: skip next if BA pin is set
+	// TAL: skip next if BA pin is set
 	m_skip = (m_read_ba() != 0);
 }
 
