@@ -374,6 +374,80 @@
 		</part>
 	</software>
 
+	<software name="pbw128">
+		<description>Paperback Writer 128</description>
+		<year>1985</year>
+		<publisher>Digital Solutions</publisher>
+		<info name="protection" value="none" />
+		<info name="serial" value="KC002264" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="kc002264.g64" size="287512" crc="ea540ddd" sha1="6e1b1679a4a5525c2b2cd82f7d2ea9115f62ab4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbw128a" cloneof="pbw128">
+		<description>Paperback Writer 128 (Alt)</description>
+		<year>1985</year>
+		<publisher>Digital Solutions</publisher>
+		<info name="protection" value="none" />
+		<info name="serial" value="UC004217" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="uc004217.g64" size="287512" crc="63c96e73" sha1="05cf4f02448d72fd57be0b335810b8f429b8d81f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpw">
+		<description>Term Paper Writer</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="protection" value="xemag" />
+		<info name="serial" value="DD-606-04" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="572316">
+				<rom name="dd-606-04.g71" size="572316" crc="d3490406" sha1="8ece5c70dacfc7005a601534f07c9e3e05e3e266" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greatwar">
+		<description>The Great War</description>
+		<year>1987</year>
+		<publisher>Free Spirit Software</publisher>
+		<info name="protection" value="none" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="greatwar.g64" size="279582" crc="177ea4f4" sha1="e6f86ba6221ef3676f8560dc13a3b5df3eff2d57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ypfp128">
+		<description>Sylvia Porter's Personal Finance Series - Your Personal Financial Planner 128</description>
+		<year>1984</year>
+		<publisher>Timeworks</publisher>
+		<info name="protection" value="none" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="ypfp128-a.g64" size="287512" crc="5d1ef4c7" sha1="07dcd3c21cd4d3d0be1425f44e701c6d68af4f40" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="ypfp128-b.g64" size="279582" crc="ec4b0485" sha1="4d0820ee76f00a43cf6cae48407b11ba8652274d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="1570demo">
 		<description>Commodore 1570/1571 Test Demo</description>
 		<year>198?</year>
