@@ -494,6 +494,31 @@ public:
 	void func_SUBV();
 };
 
+class sh2a_device : public sh2_device
+{
+public:
+	// construction/destruction
+	sh2a_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+
+	DECLARE_READ32_MEMBER(dma_sar0_r);
+	DECLARE_WRITE32_MEMBER(dma_sar0_w);
+	DECLARE_READ32_MEMBER(dma_dar0_r);
+	DECLARE_WRITE32_MEMBER(dma_dar0_w);
+	DECLARE_READ16_MEMBER(dma_tcr0_r);
+	DECLARE_WRITE16_MEMBER(dma_tcr0_w);
+
+	DECLARE_READ16_MEMBER(sh7021_r);
+	DECLARE_WRITE16_MEMBER(sh7021_w);
+private:
+	UINT16 m_sh7021_regs[0x200];
+	struct
+	{
+		UINT32              sar;	/**< Source Address Register */
+		UINT32              dar;	/**< Destination Address Register */
+		UINT16				tcr;	/**< Transfer Count Register */
+	} m_dma[4];
+
+};
 
 class sh1_device : public sh2_device
 {
@@ -531,6 +556,7 @@ private:
 
 extern const device_type SH1;
 extern const device_type SH2;
+extern const device_type SH2A;
 
 
 #endif /* __SH2_H__ */

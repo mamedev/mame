@@ -124,7 +124,7 @@
 
 const device_type SH1 = &device_creator<sh1_device>;
 const device_type SH2 = &device_creator<sh2_device>;
-
+const device_type SH2A = &device_creator<sh2a_device>;
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for
@@ -141,19 +141,36 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
     sh2_internal_map - maps SH2 built-ins
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sh2_internal_map, AS_PROGRAM, 32, sh2_device )
+static ADDRESS_MAP_START( sh7604_map, AS_PROGRAM, 32, sh2_device )
 	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
+/*! 
+  @todo: cps3boot breaks with this enabled. Needs customization ...
+  */
+//	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
 	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh7604_r, sh7604_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sh7021_map, AS_PROGRAM, 32, sh2a_device )
+//  overrides
+	AM_RANGE(0x05ffff40, 0x05ffff43) AM_READWRITE(dma_sar0_r, dma_sar0_w)
+	AM_RANGE(0x05ffff44, 0x05ffff47) AM_READWRITE(dma_dar0_r, dma_dar0_w)
+	AM_RANGE(0x05ffff48, 0x05ffff4b) AM_READWRITE16(dma_tcr0_r, dma_tcr0_w,0x0000ffff)
+//  fall-back
+ 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff) // SH-7032H internal i/o
+//	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+//	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
+//  fall-back
  	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
+//	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+//	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 ADDRESS_MAP_END
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SH2, "SH-2", tag, owner, clock, "sh2", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh2_internal_map))
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh7604_map))
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, 32, 0)
 	, m_is_slave(0)
 	, m_cpu_type(CPU_TYPE_SH2)
@@ -213,6 +230,11 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_out_of_cycles(NULL)
 {
 	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
+}
+
+sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sh2_device(mconfig, SH1, "SH-2A", tag, owner, clock, "sh2a", __FILE__, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7021_map), 28 )
+{
 }
 
 sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

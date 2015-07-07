@@ -882,12 +882,66 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }
 
+/*
+ SH-7021 on-chip device
+ */
+
+READ32_MEMBER(sh2a_device::dma_sar0_r)
+{
+	return m_dma[0].sar;
+}
+
+WRITE32_MEMBER(sh2a_device::dma_sar0_w)
+{
+	COMBINE_DATA(&m_dma[0].sar);
+}
+
+READ32_MEMBER(sh2a_device::dma_dar0_r)
+{
+	return m_dma[0].dar;
+}
+
+WRITE32_MEMBER(sh2a_device::dma_dar0_w)
+{
+	COMBINE_DATA(&m_dma[0].dar);
+}
+
+READ16_MEMBER(sh2a_device::dma_tcr0_r)
+{
+	return m_dma[0].tcr;
+}
+
+WRITE16_MEMBER(sh2a_device::dma_tcr0_w)
+{
+	printf("%04x\n",data);
+	COMBINE_DATA(&m_dma[0].tcr);
+}
+
+/*!
+  @brief Dummy debug interface
+  */
 READ16_MEMBER(sh1_device::sh7032_r)
 {
 	return m_sh7032_regs[offset];
 }
 
+/*!
+  @brief Dummy debug interface
+ */
 WRITE16_MEMBER(sh1_device::sh7032_w)
 {
 	COMBINE_DATA(&m_sh7032_regs[offset]);
+}
+
+READ16_MEMBER(sh2a_device::sh7021_r)
+{
+	return m_sh7021_regs[offset];
+}
+
+/*!
+  @brief Dummy debug interface
+ */
+WRITE16_MEMBER(sh2a_device::sh7021_w)
+{
+	COMBINE_DATA(&m_sh7021_regs[offset]);
 }
