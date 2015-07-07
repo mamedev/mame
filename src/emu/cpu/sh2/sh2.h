@@ -149,6 +149,7 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	address_space *m_program, *m_decrypted_program;
 
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
@@ -195,7 +196,6 @@ private:
 	UINT32 m_pcflushes[16];           // pcflush entries
 
 	INT8    m_irq_line_state[17];
-	address_space *m_program, *m_decrypted_program;
 protected:
 	direct_read_data *m_direct;
 private:
@@ -504,11 +504,16 @@ public:
 	DECLARE_WRITE32_MEMBER(dma_sar0_w);
 	DECLARE_READ32_MEMBER(dma_dar0_r);
 	DECLARE_WRITE32_MEMBER(dma_dar0_w);
+	DECLARE_READ16_MEMBER(dmaor_r);
+	DECLARE_WRITE16_MEMBER(dmaor_w);
 	DECLARE_READ16_MEMBER(dma_tcr0_r);
 	DECLARE_WRITE16_MEMBER(dma_tcr0_w);
-
+	DECLARE_READ16_MEMBER(dma_chcr0_r);
+	DECLARE_WRITE16_MEMBER(dma_chcr0_w);
 	DECLARE_READ16_MEMBER(sh7021_r);
 	DECLARE_WRITE16_MEMBER(sh7021_w);
+	void sh7032_dma_exec(int ch);
+	
 private:
 	UINT16 m_sh7021_regs[0x200];
 	struct
@@ -516,7 +521,9 @@ private:
 		UINT32              sar;	/**< Source Address Register */
 		UINT32              dar;	/**< Destination Address Register */
 		UINT16				tcr;	/**< Transfer Count Register */
+		UINT16				chcr;	/**< Channel Control Register */
 	} m_dma[4];
+	UINT16 m_dmaor;					/**< DMA Operation Register (status flags) */
 
 };
 
