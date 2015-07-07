@@ -421,9 +421,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
-	DECLARE_READ16_MEMBER(sh7032_r);
-	DECLARE_WRITE16_MEMBER(sh7032_w);
-	UINT16 m_sh7032_regs[0x200];
 	DECLARE_DRIVER_INIT(coolridr);
 	DECLARE_DRIVER_INIT(aquastge);
 	virtual void machine_start();
@@ -3011,16 +3008,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 	COMBINE_DATA(&m_sound_dma[offset]);
 }
 
-/* TODO: place-holder, to be moved in the SH core ... */
-READ16_MEMBER(coolridr_state::sh7032_r)
-{
-	return m_sh7032_regs[offset];
-}
 
-WRITE16_MEMBER(coolridr_state::sh7032_w)
-{
-	COMBINE_DATA(&m_sh7032_regs[offset]);
-}
 
 static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE("share2") // note: SH7032 only supports 64KB
@@ -3038,7 +3026,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
+//	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
 	AM_RANGE(0x06000000, 0x060001ff) AM_RAM AM_SHARE("nvram") // backup RAM
 	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITE8(lamps_w,0x000000ff)
 	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")

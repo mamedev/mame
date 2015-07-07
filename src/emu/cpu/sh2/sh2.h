@@ -105,7 +105,7 @@ class sh2_device : public cpu_device
 public:
 	// construction/destruction
 	sh2_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
-	sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type);
+	sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type,address_map_constructor internal_map);
 
 	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
 	static void set_dma_kludge_callback(device_t &device, sh2_dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
@@ -505,7 +505,6 @@ public:
 	DECLARE_WRITE16_MEMBER(sh7032_w);
 private:
 	UINT16 m_sh7032_regs[0x200];
-	address_space_config m_program_config, m_decrypted_program_config;	
 };
 
 

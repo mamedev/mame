@@ -147,8 +147,8 @@ static ADDRESS_MAP_START( sh2_internal_map, AS_PROGRAM, 32, sh2_device )
 	AM_RANGE(0xe0000000, 0xffffffff) AM_READWRITE(sh2_internal_r, sh2_internal_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh2_device )
-
+static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
+ 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
 ADDRESS_MAP_END
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -189,9 +189,9 @@ void sh2_device::device_stop()
 }
 
 
-sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type)
+sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal_map )
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh2_internal_map))
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, 32, 0)
 	, m_is_slave(0)
 	, m_cpu_type(cpu_type)
@@ -216,9 +216,7 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 }
 
 sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sh2_device(mconfig, SH1, "SH-1", tag, owner, clock, "sh1", __FILE__, CPU_TYPE_SH1 ),
-	m_program_config("program", ENDIANNESS_BIG, 32, 28, 0, ADDRESS_MAP_NAME(sh7032_map)),
-	m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, 28, 0)
+	: sh2_device(mconfig, SH1, "SH-1", tag, owner, clock, "sh1", __FILE__, CPU_TYPE_SH1, ADDRESS_MAP_NAME(sh7032_map) )
 {
 }
 
