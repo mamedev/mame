@@ -53,12 +53,10 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	for (int track = 0; track < track_count; track++)
 	{
-		int cylinder = track;
+		int cylinder = track % TRACK_COUNT;
 
-		if (track >= TRACK_COUNT) {
-			cylinder -= TRACK_COUNT;
+		if (track == TRACK_COUNT)
 			head = 1;
-		}
 
 		UINT32 tpos = POS_TRACK_OFFSET + (track * 4);
 		UINT32 spos = tpos + (track_count * 4);
@@ -78,7 +76,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		UINT16 track_bytes = pick_integer_le(&img[0], dpos, 2);
 		int track_size = track_bytes * 8;
 
-		LOG_FORMATS("head %u track %u size %u cell %ld\n", head, cylinder, track_size, 200000000L/track_size);
+		LOG_FORMATS("head %u track %u offs %u size %u cell %ld\n", head, cylinder, dpos, track_bytes, 200000000L/track_size);
 
 		generate_track_from_bitstream(cylinder, head, &img[dpos+2], track_size, image);
 	}
@@ -170,12 +168,12 @@ const char *g64_format::name() const
 
 const char *g64_format::description() const
 {
-	return "Commodore 1541 GCR disk image";
+	return "Commodore 1541/1571 GCR disk image";
 }
 
 const char *g64_format::extensions() const
 {
-	return "g64,g41";
+	return "g64,g41,g71";
 }
 
 const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_format>;
