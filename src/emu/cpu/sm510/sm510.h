@@ -30,6 +30,13 @@
 #define MCFG_SM510_WRITE_S_CB(_devcb) \
 	sm510_base_device::set_write_s_callback(*device, DEVCB_##_devcb);
 
+// 2-bit R melody output port
+#define MCFG_SM510_WRITE_R_CB(_devcb) \
+	sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
+
+// when in halt state, any K input going High can wake up the CPU,
+// driver is required to use execute_set_input(SM510_INPUT_LINE_K, state)
+#define SM510_INPUT_LINE_K 0
 
 
 // pinout reference
@@ -54,6 +61,7 @@ public:
 		, m_read_ba(*this)
 		, m_read_b(*this)
 		, m_write_s(*this)
+		, m_write_r(*this)
 	{ }
 
 	// static configuration helpers
@@ -61,6 +69,7 @@ public:
 	template<class _Object> static devcb_base &set_read_ba_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_ba.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_read_b.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_s_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_s.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_r.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -111,6 +120,7 @@ protected:
 	UINT8 m_w;
 	UINT16 m_div;
 	bool m_1s;
+	bool m_k_active;
 	bool m_bp;
 	bool m_bc;
 	bool m_halt;
@@ -120,6 +130,7 @@ protected:
 	devcb_read_line m_read_ba;
 	devcb_read_line m_read_b;
 	devcb_write8 m_write_s;
+	devcb_write8 m_write_r;
 
 	// misc internal helpers
 	void increment_pc();
