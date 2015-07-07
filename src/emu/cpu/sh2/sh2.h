@@ -112,8 +112,8 @@ public:
 	static void set_dma_fifo_data_available_callback(device_t &device, sh2_dma_fifo_data_available_delegate callback) { downcast<sh2_device &>(device).m_dma_fifo_data_available_cb = callback; }
 	static void set_ftcsr_read_callback(device_t &device, sh2_ftcsr_read_delegate callback) { downcast<sh2_device &>(device).m_ftcsr_read_cb = callback; }
 
-	DECLARE_WRITE32_MEMBER( sh2_internal_w );
-	DECLARE_READ32_MEMBER( sh2_internal_r );
+	DECLARE_WRITE32_MEMBER( sh7604_w );
+	DECLARE_READ32_MEMBER( sh7604_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
 	void sh2_set_frt_input(int state);

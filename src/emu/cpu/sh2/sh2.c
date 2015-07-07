@@ -144,7 +144,7 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
 static ADDRESS_MAP_START( sh2_internal_map, AS_PROGRAM, 32, sh2_device )
 	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
-	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh2_internal_r, sh2_internal_w)
+	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh7604_r, sh7604_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )

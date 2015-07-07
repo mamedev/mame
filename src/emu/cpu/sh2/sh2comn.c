@@ -461,13 +461,9 @@ void sh2_device::sh2_dmac_check(int dma)
 	}
 }
 
-WRITE32_MEMBER( sh2_device::sh2_internal_w )
+WRITE32_MEMBER( sh2_device::sh7604_w )
 {
 	UINT32 old;
-
-	if (m_isdrc)
-		offset &= 0x7f;
-
 
 	old = m_m[offset];
 	COMBINE_DATA(m_m+offset);
@@ -688,11 +684,8 @@ WRITE32_MEMBER( sh2_device::sh2_internal_w )
 	}
 }
 
-READ32_MEMBER( sh2_device::sh2_internal_r )
+READ32_MEMBER( sh2_device::sh7604_r )
 {
-	if (m_isdrc)
-	offset &= 0x7f;
-
 //  logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
 	switch( offset )
 	{
