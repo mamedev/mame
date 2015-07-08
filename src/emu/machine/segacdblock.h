@@ -26,21 +26,25 @@ Template for skeleton device
 
 // ======================> segacdblock_device
 
-class segacdblock_device : public device_t
+class segacdblock_device : public device_t,
+						   public device_memory_interface
 {
 public:
 	// construction/destruction
 	segacdblock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE32_MEMBER( write );
+	DECLARE_READ32_MEMBER( read );
 
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	address_space_config        m_space_config;
+	address_space *m_space;
 };
 
 

@@ -18,6 +18,8 @@ Template for skeleton device
 // device type definition
 const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
 
+static ADDRESS_MAP_START( map, AS_0, 32, segacdblock_device )
+ADDRESS_MAP_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -28,10 +30,17 @@ const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
 //-------------------------------------------------
 
 segacdblock_device::segacdblock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGACDBLOCK, "Sega Saturn CD-Block (HLE)", tag, owner, clock, "segacdblock", __FILE__)
+	: device_t(mconfig, SEGACDBLOCK, "Sega Saturn CD-Block (HLE)", tag, owner, clock, "segacdblock", __FILE__),
+		device_memory_interface(mconfig, *this),
+		m_space_config("segacdblock", ENDIANNESS_BIG, 32,32, 0, NULL, *ADDRESS_MAP_NAME(map))
 {
 }
 
+
+const address_space_config *segacdblock_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -49,6 +58,7 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 
 void segacdblock_device::device_start()
 {
+	m_space = &space(AS_0);
 }
 
 
@@ -65,11 +75,12 @@ void segacdblock_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( segacdblock_device::read )
+READ32_MEMBER( segacdblock_device::read )
 {
-	return 0;
+	return m_space->read_dword(offset);
 }
 
-WRITE8_MEMBER( segacdblock_device::write )
+WRITE32_MEMBER( segacdblock_device::write )
 {
+	m_space->write_dword(offset,data);
 }
