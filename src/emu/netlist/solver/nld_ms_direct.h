@@ -495,21 +495,43 @@ ATTR_HOT nl_double matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 template <unsigned m_N, unsigned _storage_N>
 ATTR_HOT int matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
-	nl_double new_v[_storage_N]; // = { 0.0 };
+	nl_double new_V[_storage_N]; // = { 0.0 };
 
-	this->LE_back_subst(new_v);
+	this->LE_back_subst(new_V);
 
 	if (newton_raphson)
 	{
-		nl_double err = delta(new_v);
-
-		store(new_v);
+#if 0
+		/* limiting just doesn't work. */
+		const unsigned iN = this->N();
+		double err = 0;
+		for (unsigned k = 0; k < iN; k++)
+		{
+			const double ov = this->m_nets[k]->m_cur_Analog;
+			double d = new_V[k] - ov;
+			err = std::max(nl_math::abs(d), err);
+		}
+		double a = 1.05;
+		for (unsigned k = 0; k < iN; k++)
+		{
+			const double ov = this->m_nets[k]->m_cur_Analog;
+			double d = new_V[k] - ov;
+			const double nv = ov + a * d;
+			this->m_nets[k]->m_cur_Analog = nv;
+		}
 
 		return (err > this->m_params.m_accuracy) ? 2 : 1;
+#else
+		nl_double err = delta(new_V);
+
+		store(new_V);
+
+		return (err > this->m_params.m_accuracy) ? 2 : 1;
+#endif
 	}
 	else
 	{
-		store(new_v);
+		store(new_V);
 		return 1;
 	}
 }

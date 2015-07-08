@@ -1209,7 +1209,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(cps_state,cps2)
 {
-	if (m_audiocpu != NULL) // gigaman2 has no audiocpu
+	if (m_audiocpu != NULL) // gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -1262,7 +1262,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gigaman2, cps2 )
 
 	MCFG_DEVICE_REMOVE("audiocpu")
-
+	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 	MCFG_DEVICE_REMOVE("qsound")
 
 	MCFG_CPU_MODIFY("maincpu")

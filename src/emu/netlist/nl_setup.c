@@ -256,22 +256,29 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						break;
 						case param_t::MODEL:
 						{
-							pstring search = (".model " + val + " ").ucase();
-							bool found = false;
-							for (std::size_t i=0; i < m_models.size(); i++)
+							if (val.startsWith(".model "))
 							{
-								if (m_models[i].ucase().startsWith(search))
-								{
-									//int pl=m_models[i].find("(");
-									//int pr=m_models[i].find(")");
-									//dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
-									dynamic_cast<param_model_t &>(param).initial(m_models[i]);
-									found = true;
-									break;
-								}
+								dynamic_cast<param_model_t &>(param).initial(val);
 							}
-							if (!found)
-								netlist().error("Model %s not found\n", val.cstr());
+							else
+							{
+								pstring search = (".model " + val + " ").ucase();
+								bool found = false;
+								for (std::size_t i=0; i < m_models.size(); i++)
+								{
+									if (m_models[i].ucase().startsWith(search))
+									{
+										//int pl=m_models[i].find("(");
+										//int pr=m_models[i].find(")");
+										//dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
+										dynamic_cast<param_model_t &>(param).initial(m_models[i]);
+										found = true;
+										break;
+									}
+								}
+								if (!found)
+									netlist().error("Model %s not found\n", val.cstr());
+							}
 						}
 						break;
 						default:
@@ -813,8 +820,13 @@ void setup_t::resolve_inputs()
 		{
 			has_twoterms = true;
 			if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+#if 0
 				netlist().error("Found device %s connected only to railterminals %s/%s\n",
 						t->name().cstr(), t->m_N.net().name().cstr(), t->m_P.net().name().cstr());
+#else
+				netlist().warning("Found device %s connected only to railterminals %s/%s\n",
+					t->name().cstr(), t->m_N.net().name().cstr(), t->m_P.net().name().cstr());
+#endif
 		}
 	}
 
@@ -892,6 +904,7 @@ const pstring setup_t::model_value_str(const pstring &model_str, const pstring &
 	else
 	{
 		//netlist().log("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
+		//printf("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
 		return defval;
 	}
 }

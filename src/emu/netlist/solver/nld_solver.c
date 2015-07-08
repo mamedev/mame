@@ -262,7 +262,7 @@ void matrix_solver_t::solve_base(C *p)
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
-			netlist().warning("NEWTON_LOOPS exceeded ... reschedule");
+			netlist().warning("NEWTON_LOOPS exceeded on net %s... reschedule", this->name().cstr());
 			m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
 		}
 	}

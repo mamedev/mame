@@ -223,20 +223,20 @@ void sm510_base_device::op_atbp()
 
 void sm510_base_device::op_atl()
 {
-	// ATL: input L to ACC
+	// ATL: output ACC to L
 	op_illegal();
 }
 
 void sm510_base_device::op_atfc()
 {
-	// ATFC: input Y to ACC
+	// ATFC: output ACC to Y
 	op_illegal();
 }
 
 void sm510_base_device::op_atr()
 {
 	// ATR: output ACC to R
-	op_illegal();
+	m_write_r(0, m_acc & 3, 0xff);
 }
 
 
