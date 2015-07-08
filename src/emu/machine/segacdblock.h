@@ -36,7 +36,22 @@ public:
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
+	
+	DECLARE_READ16_MEMBER( cr0_r );
+	DECLARE_READ16_MEMBER( cr1_r );
+	DECLARE_READ16_MEMBER( cr2_r );
+	DECLARE_READ16_MEMBER( cr3_r );	
 
+	DECLARE_WRITE16_MEMBER( cr0_w );
+	DECLARE_WRITE16_MEMBER( cr1_w );
+	DECLARE_WRITE16_MEMBER( cr2_w );
+	DECLARE_WRITE16_MEMBER( cr3_w );
+	
+	DECLARE_READ16_MEMBER( hirq_r );	
+	DECLARE_WRITE16_MEMBER( hirq_w );
+
+	DECLARE_READ16_MEMBER( hirq_mask_r );	
+	DECLARE_WRITE16_MEMBER( hirq_mask_w );	
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -45,6 +60,13 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	address_space_config        m_space_config;
 	address_space *m_space;
+	
+private:
+
+	
+	UINT16 m_cr[4];
+	UINT16 m_hirq;
+	UINT16 m_hirq_mask;
 };
 
 
