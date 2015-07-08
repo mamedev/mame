@@ -47,6 +47,7 @@ test1f diagnostic hacks:
 #include "includes/stv.h"
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"
+#include "machine/segacdblock.h"
 
 #include "bus/saturn/sat_slot.h"
 #include "bus/saturn/rom.h"
@@ -62,6 +63,7 @@ public:
 				, m_exp(*this, "exp")
 				, m_nvram(*this, "nvram")
 				, m_smpc_nv(*this, "smpc_nv")
+				, m_cdblock(*this, "sh1_hle")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
@@ -88,6 +90,7 @@ public:
 	required_device<sat_cart_slot_device> m_exp;
 	required_device<nvram_device> m_nvram;
 	required_device<nvram_device> m_smpc_nv;    // TODO: move this in the base class saturn_state and add it to stv in MAME
+	required_device<segacdblock_device> m_cdblock;
 };
 
 
@@ -118,7 +121,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM // External Battery RAM area
 	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
 	AM_RANGE(0x05000000, 0x057fffff) AM_READ(abus_dummy_r)
-	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
+	//AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_device, read, write, 0xffffffff)
@@ -247,14 +250,14 @@ INPUT_CHANGED_MEMBER(sat_console_state::nmi_reset)
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
 {
-	if(newval)
-		stvcd_set_tray_open();
+//	if(newval)
+//		stvcd_set_tray_open();
 }
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_close)
 {
-	if(newval)
-		stvcd_set_tray_close();
+//	if(newval)
+//		stvcd_set_tray_close();
 }
 
 static INPUT_PORTS_START( saturn )
@@ -639,7 +642,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	save_item(NAME(m_smpc.SR));
 	save_item(NAME(m_smpc.SMEM));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sat_console_state::stvcd_exit), this));
+//	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sat_console_state::stvcd_exit), this));
 
 	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
 	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
@@ -687,7 +690,7 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	m_maincpu->set_unscaled_clock(MASTER_CLOCK_320/2);
 	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
 
-	stvcd_reset();
+//	stvcd_reset();
 
 	m_vdp2.old_crmd = -1;
 	m_vdp2.old_tvmd = -1;
@@ -729,8 +732,9 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
 	MCFG_NVRAM_ADD_0FILL("smpc_nv") // TODO: default for each region (+ move it inside SMPC when converted to device)
 
-	MCFG_TIMER_DRIVER_ADD("sector_timer", sat_console_state, stv_sector_cb)
-	MCFG_TIMER_DRIVER_ADD("sh1_cmd", sat_console_state, stv_sh1_sim)
+	MCFG_SEGACDBLOCK_ADD("sh1_hle", 0) // TODO: clock
+	//MCFG_TIMER_DRIVER_ADD("sector_timer", sat_console_state, stv_sector_cb)
+	//MCFG_TIMER_DRIVER_ADD("sh1_cmd", sat_console_state, stv_sh1_sim)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

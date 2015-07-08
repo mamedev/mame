@@ -1799,6 +1799,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/emu/machine/rp5c01.h,MACHINES["SEGACDBLOCK"] = true
+---------------------------------------------------
+
+
+if (MACHINES["SEGACDBLOCK"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/segacdblock.c",
+		MAME_DIR .. "src/emu/machine/segacdblock.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/emu/machine/rp5c01.h,MACHINES["RP5C01"] = true
 ---------------------------------------------------
 
