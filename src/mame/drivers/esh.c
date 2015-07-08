@@ -13,6 +13,12 @@ Notes:
     Two joysticks appear in the IO TEST, but the photos of the control panel I've seen show only 1.
     Eshb has some junk in the IO TEST screen.  Maybe a bad dump?
 
+    (Stretching a 256x256 display into 704x478 canvas makes no sense at all - i tried this at 
+    http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Released_Programs_-_FunaiGakkenEshsAurunmilla
+    my guess is that the 256x256 display needs to be stretched to 682x512, and then offsetted somewhere
+    over the (laserdisk) 704x480 display area - please confirm this as an evidence - nitrofurano)
+
+
 Todo:
     - LD TROUBLE message pops up after each cycle in attract.  NMI-related?
     - Convert to tilemaps (see next ToDo for feasibility).
