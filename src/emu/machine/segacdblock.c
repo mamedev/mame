@@ -48,12 +48,12 @@ const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
 0x25890028 	MPEGRGB 	MPEG RGB Data Transfer Register 
 */
 static ADDRESS_MAP_START( map, AS_0, 32, segacdblock_device )
-	AM_RANGE(0x08, 0x0b) AM_READWRITE16(hirq_r,hirq_w,0xffffffff)
-	AM_RANGE(0x0c, 0x0f) AM_READWRITE16(hirq_mask_r,hirq_mask_w,0xffffffff)
-	AM_RANGE(0x18, 0x1b) AM_READWRITE16(cr0_r,cr0_w,0xffffffff)
-	AM_RANGE(0x1c, 0x1f) AM_READWRITE16(cr1_r,cr1_w,0xffffffff)
-	AM_RANGE(0x20, 0x23) AM_READWRITE16(cr2_r,cr2_w,0xffffffff)
-	AM_RANGE(0x24, 0x27) AM_READWRITE16(cr3_r,cr3_w,0xffffffff)
+	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf000) AM_READWRITE16(hirq_r,hirq_w,0xffffffff)
+	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xf000) AM_READWRITE16(hirq_mask_r,hirq_mask_w,0xffffffff)
+	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xf000) AM_READWRITE16(cr0_r,cr0_w,0xffffffff)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xf000) AM_READWRITE16(cr1_r,cr1_w,0xffffffff)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0xf000) AM_READWRITE16(cr2_r,cr2_w,0xffffffff)
+	AM_RANGE(0x24, 0x27) AM_MIRROR(0xf000) AM_READWRITE16(cr3_r,cr3_w,0xffffffff)
 
 ADDRESS_MAP_END
 
@@ -68,7 +68,7 @@ ADDRESS_MAP_END
 segacdblock_device::segacdblock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGACDBLOCK, "Sega Saturn CD-Block (HLE)", tag, owner, clock, "segacdblock", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("segacdblock", ENDIANNESS_BIG, 32,6, 0, NULL, *ADDRESS_MAP_NAME(map))
+		m_space_config("segacdblock", ENDIANNESS_BIG, 32,16, 0, NULL, *ADDRESS_MAP_NAME(map))
 {
 }
 
@@ -104,6 +104,11 @@ void segacdblock_device::device_start()
 
 void segacdblock_device::device_reset()
 {
+	// init_command_regs
+	m_cr[0] = 'C' << 8 | 0;
+	m_cr[1] = 'D' << 8 | 'B';
+	m_cr[2] = 'L' << 8 | 'O';
+	m_cr[3] = 'C' << 8 | 'K';
 }
 
 
@@ -113,10 +118,10 @@ void segacdblock_device::device_reset()
 
 READ32_MEMBER( segacdblock_device::read )
 {
-	return m_space->read_dword(offset+0x05800000);
+	return m_space->read_dword(offset*4);
 }
 
 WRITE32_MEMBER( segacdblock_device::write )
 {
-	m_space->write_dword(offset+0x05800000,data);
+	m_space->write_dword(offset*4,data);
 }
