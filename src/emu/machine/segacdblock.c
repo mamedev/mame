@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:LGPL-2.1+
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
@@ -21,6 +21,7 @@ WRITE16_MEMBER(segacdblock_device::hirq_w){	COMBINE_DATA(&m_hirq); }
 READ16_MEMBER(segacdblock_device::hirq_mask_r){	return m_hirq_mask; }
 WRITE16_MEMBER(segacdblock_device::hirq_mask_w) {	COMBINE_DATA(&m_hirq_mask); }
 
+// 0x6001fd8 start of Command Registers
 READ16_MEMBER(segacdblock_device::cr0_r){	return m_cr[0]; }
 WRITE16_MEMBER(segacdblock_device::cr0_w){ COMBINE_DATA(&m_cr[0]);}
 
@@ -54,7 +55,6 @@ static ADDRESS_MAP_START( map, AS_0, 32, segacdblock_device )
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xf000) AM_READWRITE16(cr1_r,cr1_w,0xffffffff)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xf000) AM_READWRITE16(cr2_r,cr2_w,0xffffffff)
 	AM_RANGE(0x24, 0x27) AM_MIRROR(0xf000) AM_READWRITE16(cr3_r,cr3_w,0xffffffff)
-
 ADDRESS_MAP_END
 
 //**************************************************************************
@@ -105,7 +105,7 @@ void segacdblock_device::device_start()
 void segacdblock_device::device_reset()
 {
 	// init_command_regs
-	m_cr[0] = 'C' << 8 | 0;
+	m_cr[0] = 'C';
 	m_cr[1] = 'D' << 8 | 'B';
 	m_cr[2] = 'L' << 8 | 'O';
 	m_cr[3] = 'C' << 8 | 'K';
