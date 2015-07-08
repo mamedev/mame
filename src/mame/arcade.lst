@@ -12818,16 +12818,17 @@ cashtrn     //
 // TAB Austria
 // Quizard (Philips CD-I based HW)
 cdibios         // Base unit
-quizard         // (c) TAB Austria 1996
-quizrd12        // (c) TAB Austria 1996
-quizrd17        // (c) TAB Austria 1996
-quizrd18        // (c) TAB Austria 199?
-quizrd22        // (c) TAB Austria 1995
-quizrd23        // (c) TAB Austria 199?
-quizrd34        // (c) TAB Austria 199?
-quizrr42        // (c) TAB Austria 1998
-quizrr41        // (c) TAB Austria 1998
-quizrr40        // (c) TAB Austria 1997
+quizard         // (c) TAB Austria 199?
+quizard_17      // (c) TAB Austria 1996
+quizard_12      // (c) TAB Austria 1996
+quizard_10		// (c) TAB Austria 1996
+quizard2        // (c) TAB Austria 1995
+quizard2_23     // (c) TAB Austria 199?
+quizard3        // (c) TAB Austria 1996
+quizard3_32     // (c) TAB Austria 1996
+quizard4        // (c) TAB Austria 1998
+quizard4_41     // (c) TAB Austria 1998
+quizard4_40     // (c) TAB Austria 1997
 
 // Impera (Philips CD-I based HW)
 magicard        // (c) 199? Impera
