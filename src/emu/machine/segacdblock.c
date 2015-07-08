@@ -15,24 +15,88 @@ Template for skeleton device
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+// HIRQ definitions
+#define CMOK 0x0001 // command dispatch possible
+#define DRDY 0x0002 // data transfer preparations complete
+#define CSCT 0x0004 // finished reading 1 sector
+#define BFUL 0x0008 // CD buffer full
+#define PEND 0x0010 // CD playback completed
+#define DCHG 0x0020 // disc change / tray open
+#define ESEL 0x0040 // selector settings processing complete
+#define EHST 0x0080 // host input/output processing complete
+#define ECPY 0x0100 // duplication/move processing complete
+#define EFLS 0x0200 // file system processing complete
+#define SCDQ 0x0400 // subcode Q update completed
+#define MPED 0x0800 // MPEG-related processing complete
+#define MPCM 0x1000 // MPEG action uncertain
+#define MPST 0x2000 // MPEG interrupt status report
+
+// CD status (hi byte of CR1) definitions:
+// (these defines are shifted up 8)
+#define CD_STAT_BUSY     0x0000     // status change in progress
+#define CD_STAT_PAUSE    0x0100     // CD block paused (temporary stop)
+#define CD_STAT_STANDBY  0x0200     // CD drive stopped
+#define CD_STAT_PLAY     0x0300     // CD play in progress
+#define CD_STAT_SEEK     0x0400     // drive seeking
+#define CD_STAT_SCAN     0x0500     // drive scanning
+#define CD_STAT_OPEN     0x0600     // tray is open
+#define CD_STAT_NODISC   0x0700     // no disc present
+#define CD_STAT_RETRY    0x0800     // read retry in progress
+#define CD_STAT_ERROR    0x0900     // read data error occurred
+#define CD_STAT_FATAL    0x0a00     // fatal error (hard reset required)
+#define CD_STAT_PERI     0x2000     // periodic response if set, else command response
+#define CD_STAT_TRANS    0x4000     // data transfer request if set
+#define CD_STAT_WAIT     0x8000     // waiting for command if set, else executed immediately
+#define CD_STAT_REJECT   0xff00     // ultra-fatal error.
+
+
+void segacdblock_device::sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4)
+{
+	m_cr[0] = r1;
+	m_cr[1] = r2;
+	m_cr[2] = r3;
+	m_cr[3] = r4;
+}
+
+void segacdblock_device::set_flag(UINT16 which)
+{
+	m_hirq |= which;
+}
+
+void segacdblock_device::clear_flag(UINT16 which)
+{
+	m_hirq &= ~which;
+}
+
 READ16_MEMBER(segacdblock_device::hirq_r){	return m_hirq; }
-WRITE16_MEMBER(segacdblock_device::hirq_w){	COMBINE_DATA(&m_hirq); }
+WRITE16_MEMBER(segacdblock_device::hirq_w)
+{
+	COMBINE_DATA(&m_hirq);
+	 
+	if(m_hirq & CMOK) /**< @todo needs fucntion irq_mask too */
+	{
+		m_hs = true;
+
+		clear_flag(CMOK);
+		sh1_writes_registers(CD_STAT_BUSY,0,0,0);
+	}
+}
 
 READ16_MEMBER(segacdblock_device::hirq_mask_r){	return m_hirq_mask; }
-WRITE16_MEMBER(segacdblock_device::hirq_mask_w) {	COMBINE_DATA(&m_hirq_mask); }
+WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { COMBINE_DATA(&m_hirq_mask); }
 
-// 0x6001fd8 start of Command Registers
-READ16_MEMBER(segacdblock_device::cr0_r){	return m_cr[0]; }
-WRITE16_MEMBER(segacdblock_device::cr0_w){ COMBINE_DATA(&m_cr[0]);}
+// 0x6001fd8 cd-block string check
+READ16_MEMBER(segacdblock_device::cr0_r){ return m_cr[0]; }
+WRITE16_MEMBER(segacdblock_device::cr0_w){ printf("%04x 0\n",data); COMBINE_DATA(&m_cr[0]);}
 
-READ16_MEMBER(segacdblock_device::cr1_r){	return m_cr[1]; }
-WRITE16_MEMBER(segacdblock_device::cr1_w){ COMBINE_DATA(&m_cr[1]);}
+READ16_MEMBER(segacdblock_device::cr1_r){ return m_cr[1]; }
+WRITE16_MEMBER(segacdblock_device::cr1_w){ printf("%04x 1\n",data); COMBINE_DATA(&m_cr[1]);}
 
-READ16_MEMBER(segacdblock_device::cr2_r){	return m_cr[2]; }
-WRITE16_MEMBER(segacdblock_device::cr2_w){ COMBINE_DATA(&m_cr[2]);}
+READ16_MEMBER(segacdblock_device::cr2_r){ return m_cr[2]; }
+WRITE16_MEMBER(segacdblock_device::cr2_w){ printf("%04x 2\n",data); COMBINE_DATA(&m_cr[2]);}
 
-READ16_MEMBER(segacdblock_device::cr3_r){	return m_cr[3]; }
-WRITE16_MEMBER(segacdblock_device::cr3_w){ COMBINE_DATA(&m_cr[3]);}
+READ16_MEMBER(segacdblock_device::cr3_r){ return m_cr[3]; }
+WRITE16_MEMBER(segacdblock_device::cr3_w){ printf("%04x 3\n",data); COMBINE_DATA(&m_cr[3]);}
 
 
 // device type definition
@@ -109,6 +173,7 @@ void segacdblock_device::device_reset()
 	m_cr[1] = 'D' << 8 | 'B';
 	m_cr[2] = 'L' << 8 | 'O';
 	m_cr[3] = 'C' << 8 | 'K';
+	m_hs = false;
 }
 
 

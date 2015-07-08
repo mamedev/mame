@@ -63,10 +63,14 @@ protected:
 	
 private:
 
-	
 	UINT16 m_cr[4];
-	UINT16 m_hirq;
 	UINT16 m_hirq_mask;
+	UINT16 m_hirq;
+	bool m_hs;
+	
+	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
+	void set_flag(UINT16 which);
+	void clear_flag(UINT16 which);
 };
 
 
