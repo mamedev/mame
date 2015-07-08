@@ -1663,7 +1663,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_unused();
 
 // analog settings
-// if this macro is not used, the minimum defaluts to 0 and maximum defaults to the mask value
+// if this macro is not used, the minimum defaults to 0 and maximum defaults to the mask value
 #define PORT_MINMAX(_min, _max) \
 	configurer.field_set_min_max(_min, _max);
 

@@ -59,7 +59,7 @@ public:
 
 protected:
 	enum {
-		ST_IDLE, ST_START, ST_BIT, ST_PARITY, ST_STOP, ST_LAST_TICK,
+		ST_IDLE, ST_START, ST_BIT, ST_PARITY, ST_STOP, ST_LAST_TICK
 	};
 
 	static const char *const state_names[];

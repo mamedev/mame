@@ -37,7 +37,7 @@ ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_
 {
 	// set our instruction counter
 	m_icountptr = &m_icount;
-};
+}
 
 //-------------------------------------------------
 //  device_start - start up the device

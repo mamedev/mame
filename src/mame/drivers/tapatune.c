@@ -54,14 +54,15 @@ class tapatune_state : public driver_device
 public:
 	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videocpu(*this, "videocpu"),
 		m_maincpu(*this, "maincpu"),
+		m_videocpu(*this, "videocpu"),
 		m_bsmt(*this, "bsmt"),
 		m_videoram(*this, "videoram") {}
 
-	optional_device<cpu_device> m_videocpu;
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_videocpu;
 	required_device<bsmt2000_device> m_bsmt;
+
 	optional_shared_ptr<UINT16> m_videoram;
 
 	UINT8   m_paletteram[0x300];
@@ -589,5 +590,5 @@ ROM_END
  *
  *************************************/
 
-GAME(1994, tapatune, 0, tapatune,      tapatune, driver_device, 0, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", 0 )
-GAME(1994, srockbwl, 0, tapatune_base, tapatune, driver_device, 0, ROT0, "Bromley", "Super Rock and Bowl (V1.1)", GAME_IS_SKELETON_MECHANICAL )
+GAME(1994, tapatune, 0, tapatune,      tapatune, driver_device, 0, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", GAME_SUPPORTS_SAVE )
+GAME(1994, srockbwl, 0, tapatune_base, tapatune, driver_device, 0, ROT0, "Bromley", "Super Rock and Bowl (V1.1)", GAME_IS_SKELETON_MECHANICAL | GAME_SUPPORTS_SAVE )

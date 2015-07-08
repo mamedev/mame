@@ -209,7 +209,7 @@ protected:
 		PPC_MODEL_7457              = 0x80020101,   /* "Apollo 7", version 1.1 */
 		PPC_MODEL_MPC8240           = 0x00810101,   /* "Kahlua" */
 		PPC_MODEL_MPC8241           = 0x80811014,   /* "Kahlua Lt" */
-		PPC_MODEL_MPC8245           = 0x80811014,   /* "Kahlua II" */
+		PPC_MODEL_MPC8245           = 0x80811014    /* "Kahlua II" */
 	};
 
 public:

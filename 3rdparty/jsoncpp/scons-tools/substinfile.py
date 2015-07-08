@@ -1,3 +1,8 @@
+# Copyright 2010 Baptiste Lepilleur
+# Distributed under MIT license, or public domain if desired and
+# recognized in your jurisdiction.
+# See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+
 import re
 from SCons.Script import *  # the usual scons stuff you get in a SConscript
 import collections
@@ -70,7 +75,7 @@ def generate(env):
         return target, source
 
 ##    env.Append(TOOLS = 'substinfile')       # this should be automaticaly done by Scons ?!?
-    subst_action = SCons.Action.Action( subst_in_file, subst_in_file_string )
+    subst_action = SCons.Action.Action(subst_in_file, subst_in_file_string)
     env['BUILDERS']['SubstInFile'] = Builder(action=subst_action, emitter=subst_emitter)
 
 def exists(env):

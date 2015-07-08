@@ -225,8 +225,8 @@ int sound_stream::input_source_outputnum(int inputnum) const
 
 void sound_stream::set_input(int index, sound_stream *input_stream, int output_index, float gain)
 {
-	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", this, m_device.tag(),
-			index, input_stream, output_index, (double) gain));
+	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", (void *)this, m_device.tag(),
+			index, (void *)input_stream, output_index, (double) gain));
 
 	// make sure it's a valid input
 	if (index >= m_input.size())
@@ -605,7 +605,7 @@ void sound_stream::generate_samples(int samples)
 	if (samples <= 0)
 		return;
 
-	VPRINTF(("generate_samples(%p, %d)\n", this, samples));
+	VPRINTF(("generate_samples(%p, %d)\n", (void *) this, samples));
 
 	// ensure all inputs are up to date and generate resampled data
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
@@ -637,7 +637,7 @@ void sound_stream::generate_samples(int samples)
 	}
 
 	// run the callback
-	VPRINTF(("  callback(%p, %d)\n", this, samples));
+	VPRINTF(("  callback(%p, %d)\n", (void *)this, samples));
 	m_callback(*this, inputs, outputs, samples);
 	VPRINTF(("  callback done\n"));
 }

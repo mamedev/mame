@@ -9180,12 +9180,12 @@ DRIVER_INIT_MEMBER(cps_state,singbrd)
 READ16_MEMBER( cps_state::gigaman2_dummyqsound_r )
 {
 	return m_gigaman2_dummyqsound_ram[offset];
-};
+}
 
 WRITE16_MEMBER( cps_state::gigaman2_dummyqsound_w )
 {
 	m_gigaman2_dummyqsound_ram[offset] = data;
-};
+}
 
 /* rearrange the graphics data into the normal order */
 void cps_state::gigaman2_gfx_reorder()

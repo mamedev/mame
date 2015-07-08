@@ -448,7 +448,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 				duart_irq_state = 0;
 	}
 	update_irq_to_maincpu();
-};
+}
 
 WRITE8_MEMBER(esq5505_state::duart_output)
 {

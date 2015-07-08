@@ -209,7 +209,7 @@ enum smram
 	SMRAM_EIP    = 0x1F0,
 	SMRAM_EFLAGS = 0x1F4,
 	SMRAM_CR3    = 0x1F8,
-	SMRAM_CR0    = 0x1FC,
+	SMRAM_CR0    = 0x1FC
 };
 
 enum smram_intel_p5
@@ -245,7 +245,7 @@ enum smram_intel_p5
 	SMRAM_IP5_IDTACC  = 0x198,
 	SMRAM_IP5_TRLIM   = 0x19C,
 	SMRAM_IP5_TRBASE  = 0x1A0,
-	SMRAM_IP5_TRACC   = 0x1A4,
+	SMRAM_IP5_TRACC   = 0x1A4
 };
 
 /* Protected mode exceptions */

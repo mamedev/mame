@@ -103,7 +103,7 @@ public:
 		m_io_modifiers(*this, "MODIFIERS"),
 		m_io_config(*this, "CONFIG") { }
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats)
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<UINT8> m_videoram;

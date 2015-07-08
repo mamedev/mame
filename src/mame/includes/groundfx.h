@@ -3,7 +3,7 @@
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
 
-struct tempsprite
+struct gfx_tempsprite
 {
 	int gfx;
 	int code,color;
@@ -43,7 +43,7 @@ public:
 	UINT16 m_coin_word;
 	UINT16 m_frame_counter;
 	UINT16 m_port_sel;
-	struct tempsprite *m_spritelist;
+	struct gfx_tempsprite *m_spritelist;
 	UINT16 m_rotate_ctrl[8];
 	rectangle m_hack_cliprect;
 

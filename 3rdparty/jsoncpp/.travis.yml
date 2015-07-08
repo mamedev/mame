@@ -2,17 +2,24 @@
 # http://about.travis-ci.org/docs/user/build-configuration/
 # This file can be validated on:
 # http://lint.travis-ci.org/
-before_install: sudo apt-get install cmake
+
+#before_install: sudo apt-get install -y cmake
+# cmake is pre-installed in Travis for both linux and osx
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq valgrind
+os:
+  - linux
 language: cpp
 compiler:
   - gcc
   - clang
-script: cmake -DJSONCPP_LIB_BUILD_SHARED=$SHARED_LIBRARY -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_VERBOSE_MAKEFILE=$VERBOSE_MAKE . && make
+script: ./travis.sh
 env:
   matrix:
-    - SHARED_LIBRARY=ON BUILD_TYPE=release VERBOSE_MAKE=false
-    - SHARED_LIBRARY=OFF BUILD_TYPE=release VERBOSE_MAKE=false
-    - SHARED_LIBRARY=OFF BUILD_TYPE=debug VERBOSE VERBOSE_MAKE=true
+    - SHARED_LIB=ON  STATIC_LIB=ON CMAKE_PKG=ON  BUILD_TYPE=release VERBOSE_MAKE=false
+    - SHARED_LIB=OFF STATIC_LIB=ON CMAKE_PKG=OFF BUILD_TYPE=debug   VERBOSE_MAKE=true VERBOSE
 notifications:
   email:
     - aaronjjacobs@gmail.com

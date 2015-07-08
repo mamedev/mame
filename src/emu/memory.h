@@ -40,7 +40,7 @@ enum address_spacenum
 	AS_IO = AS_2,                   // I/O address space
 	AS_DECRYPTED_OPCODES = AS_3     // decrypted opcodes, when separate from data accesses
 };
-DECLARE_ENUM_OPERATORS(address_spacenum);
+DECLARE_ENUM_OPERATORS(address_spacenum)
 
 // read or write constants
 enum read_or_write

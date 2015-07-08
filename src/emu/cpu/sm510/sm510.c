@@ -145,7 +145,7 @@ void sm510_base_device::wake_me_up()
 
 void sm510_base_device::execute_set_input(int line, int state)
 {
-	if (line != 0)
+	if (line != SM510_INPUT_LINE_K)
 		return;
 	
 	// set K input lines active state

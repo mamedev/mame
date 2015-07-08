@@ -80,7 +80,7 @@ private:
 		C352_FLG_FILTER     = 0x0004,   // don't apply filter
 		C352_FLG_REVLOOP    = 0x0003,   // loop backwards
 		C352_FLG_LOOP       = 0x0002,   // loop forward
-		C352_FLG_REVERSE    = 0x0001,   // play sample backwards
+		C352_FLG_REVERSE    = 0x0001    // play sample backwards
 	};
 
 	struct c352_ch_t

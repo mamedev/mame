@@ -211,7 +211,7 @@ enum {
 	TMS57002_XBA,
 	TMS57002_XOA,
 	TMS57002_XRD,
-	TMS57002_XWR,
+	TMS57002_XWR
 };
 
 extern const device_type TMS57002;

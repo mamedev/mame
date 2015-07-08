@@ -225,14 +225,14 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
 
 	    bit     description
 
-	    PB0     DAV / DATA STROBE
-	    PB1     EOI / VFU?
+	    PB0     STROBE/DAV
+	    PB1     PI/EOI
 	    PB2     REN
 	    PB3     ATN
 	    PB4     IFC
-	    PB5     SRQ
-	    PB6     NRFD
-	    PB7     NDAC
+	    PB5     SRQ/BUSY SRQ
+	    PB6     NRFD/ACK RFD
+	    PB7     SEL/DAC
 
 	*/
 

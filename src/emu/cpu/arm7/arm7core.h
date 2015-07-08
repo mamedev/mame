@@ -148,7 +148,7 @@ enum
 	eARM_ARCHFLAGS_MMU  = 8,        // has on-board MMU (traditional ARM style like the SA1110)
 	eARM_ARCHFLAGS_SA   = 16,       // StrongARM extensions (enhanced TLB)
 	eARM_ARCHFLAGS_XSCALE   = 32,       // XScale extensions (CP14, enhanced TLB)
-	eARM_ARCHFLAGS_MODE26   = 64,       // supports 26-bit backwards compatibility mode
+	eARM_ARCHFLAGS_MODE26   = 64        // supports 26-bit backwards compatibility mode
 };
 
 

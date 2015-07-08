@@ -143,7 +143,8 @@ WRITE8_MEMBER( monty_state::ioDisplayWrite )
 
 		// Pixel color
 		const bool on = (com >> i) & 0x01;
-		m_pixels[(y*42) + x] = on ? 0xffffffff : 0xff000000;
+		if (x < 42)
+			m_pixels[(y*42) + x] = on ? 0xffffffff : 0xff000000;
 	}
 }
 

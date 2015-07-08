@@ -26,7 +26,7 @@ public:
 
 enum {
 	M7501_IRQ_LINE = m6502_device::IRQ_LINE,
-	M7501_NMI_LINE = m6502_device::NMI_LINE,
+	M7501_NMI_LINE = m6502_device::NMI_LINE
 };
 
 extern const device_type M7501;

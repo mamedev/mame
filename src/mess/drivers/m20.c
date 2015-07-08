@@ -119,29 +119,18 @@ MC6845_UPDATE_ROW( m20_state::update_row )
 {
 	UINT32  *p = &bitmap.pix32(y);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
+	int i, j;
 
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ((ma | (ra << 1)) << 4) + i;
 		UINT16 data = m_p_videoram[ offset ];
 
-		*p = palette[( data & 0x8000 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x4000 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x2000 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x1000 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0800 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0400 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0200 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0100 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0080 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0040 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0020 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0010 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0008 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0004 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0002 ) ? 1 : 0]; p++;
-		*p = palette[( data & 0x0001 ) ? 1 : 0]; p++;
+		for ( j = 15; j >= 0; j-- )
+		{
+			*p = palette[( data & 1 << j ) ? 1 : 0];
+			p++;
+		}
 	}
 }
 

@@ -623,4 +623,4 @@ static void set_interfaces(base *d3dptr)
 	d3dptr->vertexbuf = d3d9_vertex_buffer_interface;
 }
 
-};
+}

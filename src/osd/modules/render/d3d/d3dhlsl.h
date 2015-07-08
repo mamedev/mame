@@ -36,7 +36,7 @@ public:
 		UT_FLOAT,
 		UT_INT,
 		UT_MATRIX,
-		UT_SAMPLER,
+		UT_SAMPLER
 	} uniform_type;
 
 	enum
@@ -96,7 +96,7 @@ public:
 		CU_BLOOM_LVL4567_WEIGHTS,
 		CU_BLOOM_LVL89A_WEIGHTS,
 
-		CU_COUNT,
+		CU_COUNT
 	};
 
 	uniform(effect *shader, const char *name, uniform_type type, int id);
@@ -420,6 +420,6 @@ public:
 	static hlsl_options     s_hlsl_presets[4];
 };
 
-};
+}
 
 #endif

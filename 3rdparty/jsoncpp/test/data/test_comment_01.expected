@@ -1,5 +1,7 @@
 .={}
+// Comment for array
 .test=[]
+// Comment within array
 .test[0]={}
 .test[0].a="aaa"
 .test[1]={}

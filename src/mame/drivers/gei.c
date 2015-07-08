@@ -386,7 +386,7 @@ READ8_MEMBER(gei_state::banksel_1_r)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
 	return 0x03;
-};
+}
 
 READ8_MEMBER(gei_state::banksel_2_r)
 {

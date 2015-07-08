@@ -3181,7 +3181,7 @@ inline void emit_cvttpd2dq_r128_m128(x86code *&emitptr, UINT8 dreg, x86_memref m
 inline void emit_roundpd_r128_r128_imm(x86code *&emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)        { emit_op_modrm_reg(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
 inline void emit_roundpd_r128_m128_imm(x86code *&emitptr, UINT8 dreg, x86_memref memref, UINT8 imm) { emit_op_modrm_mem(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, memref); emit_byte(emitptr, imm); }
 
-};
+}
 
 #undef X86EMIT_SIZE
 
