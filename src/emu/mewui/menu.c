@@ -13,6 +13,7 @@
 #include "rendfont.h"
 #include "mewui/custmenu.h"
 #include "mewui/icorender.h"
+#include "mewui/toolbar.h"
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -45,20 +46,20 @@ struct ui_arts_info
 static const ui_arts_info arts_info[] =
 {
 	{ "Snapshots",       OPTION_SNAPSHOT_DIRECTORY,  "snap" },
-	{ "Cabinets",        OPTION_CABINETS_PATH,  "cabinets;cabdevs" },
-	{ "Control Panels",  OPTION_CPANELS_PATH,   "cpanel" },
-	{ "PCBs",            OPTION_PCBS_PATH,      "pcb" },
-	{ "Flyers",          OPTION_FLYERS_PATH,    "flyers" },
-	{ "Titles",          OPTION_TITLES_PATH,    "titles" },
-	{ "Artwork Preview", OPTION_ARTPREV_PATH,   "artwork preview" },
-	{ "Bosses",          OPTION_BOSSES_PATH,    "bosses" },
-	{ "Logos",           OPTION_LOGOS_PATH,     "logo" },
-	{ "Versus",          OPTION_VERSUS_PATH,    "versus" },
-	{ "Game Over",       OPTION_GAMEOVER_PATH,  "gameover" },
-	{ "HowTo",           OPTION_HOWTO_PATH,     "howto" },
-	{ "Scores",          OPTION_SCORES_PATH,    "scores" },
-	{ "Select",          OPTION_SELECT_PATH,    "select" },
-	{ "Marquees",        OPTION_MARQUEES_PATH,  "marquees" },
+	{ "Cabinets",        OPTION_CABINETS_PATH,       "cabinets;cabdevs" },
+	{ "Control Panels",  OPTION_CPANELS_PATH,        "cpanel" },
+	{ "PCBs",            OPTION_PCBS_PATH,           "pcb" },
+	{ "Flyers",          OPTION_FLYERS_PATH,         "flyers" },
+	{ "Titles",          OPTION_TITLES_PATH,         "titles" },
+	{ "Artwork Preview", OPTION_ARTPREV_PATH,        "artwork preview" },
+	{ "Bosses",          OPTION_BOSSES_PATH,         "bosses" },
+	{ "Logos",           OPTION_LOGOS_PATH,          "logo" },
+	{ "Versus",          OPTION_VERSUS_PATH,         "versus" },
+	{ "Game Over",       OPTION_GAMEOVER_PATH,       "gameover" },
+	{ "HowTo",           OPTION_HOWTO_PATH,          "howto" },
+	{ "Scores",          OPTION_SCORES_PATH,         "scores" },
+	{ "Select",          OPTION_SELECT_PATH,         "select" },
+	{ "Marquees",        OPTION_MARQUEES_PATH,       "marquees" },
 	{ NULL }
 };
 
@@ -122,30 +123,61 @@ void ui_menu::init_mewui(running_machine &machine)
 		bgrnd_bitmap->reset();
 
 	// create a texture for toolbar
+	std::vector<const UINT32 *> v_bmp;
+	v_bmp.push_back(toolbar_bitmap_bmp0);
+	v_bmp.push_back(toolbar_bitmap_bmp1);
+	v_bmp.push_back(toolbar_bitmap_bmp2);
+	v_bmp.push_back(toolbar_bitmap_bmp3);
+	v_bmp.push_back(toolbar_bitmap_bmp4);
+	v_bmp.push_back(toolbar_bitmap_bmp5);
+	v_bmp.push_back(toolbar_bitmap_bmp6);
+
 	emu_file toolfile(machine.options().mewui_path(), OPEN_FLAG_READ);
+//	emu_file exfile(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+//	exfile.open("toolbar.h");
 	for (int x = 0; x < MEWUI_TOOLBAR_BUTTONS; ++x)
 	{
-		toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32);
-		toolbar_texture[x] = machine.render().texture_alloc(render_texture::hq_scale);
-		std::string text;
-		strprintf(text, "button%d.png", x);
-		render_load_png(*toolbar_bitmap[x], toolfile, NULL, text.c_str());
+		toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
+		toolbar_texture[x] = machine.render().texture_alloc();
+		UINT32 *dst = &toolbar_bitmap[x]->pix32(0);
+		memcpy(dst, v_bmp[x], 32 * 32 * sizeof(UINT32));
+//		std::string text;
+//		strprintf(text, "button%d.png", x);
+//		render_load_png(*toolbar_bitmap[x], toolfile, NULL, text.c_str());
 		if (toolbar_bitmap[x]->valid())
+		{
+/*			std::string out;
+			strprintf(out, "static const UINT32 toolbar_bitmap_bmp%d[] =\n{\n", x);
+			for (int y = 0; y < toolbar_bitmap[x]->height(); y++)
+			{
+				strcatprintf(out, "\t");
+				for (int z = 0; z < toolbar_bitmap[x]->width(); z++)
+				{
+					strcatprintf(out, "0x%08X, ", toolbar_bitmap[x]->pix32(y, z));
+				}
+				strcatprintf(out, "\n");
+			}
+			strcatprintf(out, "};\n\n");
+			exfile.puts(out.c_str()); */
 			toolbar_texture[x]->set_bitmap(*toolbar_bitmap[x], toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
+		}
 		else
 			toolbar_bitmap[x]->reset();
 	}
+//	exfile.close();
 
 	// create a texture for toolbar
 	for (int x = 0; x < MEWUI_TOOLBAR_BUTTONS; ++x)
 	{
-		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32);
-		sw_toolbar_texture[x] = machine.render().texture_alloc(render_texture::hq_scale);
-		std::string text;
-		strprintf(text, "swbutton%d.png", x);
-		render_load_png(*sw_toolbar_bitmap[x], toolfile, NULL, text.c_str());
-		if (sw_toolbar_bitmap[x]->valid())
+		sw_toolbar_bitmap[x] = auto_alloc(machine, bitmap_argb32(32, 32));
+		sw_toolbar_texture[x] = machine.render().texture_alloc();
+		UINT32 *dst;
+		if (x == 0 || x == 2)
+		{
+			dst = &sw_toolbar_bitmap[x]->pix32(0);
+			memcpy(dst, v_bmp[x], 32 * 32 * sizeof(UINT32));
 			sw_toolbar_texture[x]->set_bitmap(*sw_toolbar_bitmap[x], sw_toolbar_bitmap[x]->cliprect(), TEXFORMAT_ARGB32);
+		}
 		else
 			sw_toolbar_bitmap[x]->reset();
 	}
