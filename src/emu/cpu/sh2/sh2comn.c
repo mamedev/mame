@@ -366,6 +366,7 @@ void sh2_device::sh2_do_dma(int dma)
 
 
 		LOG(("SH2.%s: DMA %d complete\n", tag(), dma));
+		m_m[0x62+4*dma] = 0;
 		m_m[0x63+4*dma] |= 2;
 		m_dma_timer_active[dma] = 0;
 		m_dma_irq[dma] |= 1;
@@ -460,6 +461,7 @@ void sh2_device::sh2_dmac_check(int dma)
 		}
 	}
 }
+
 
 WRITE32_MEMBER( sh2_device::sh7604_w )
 {

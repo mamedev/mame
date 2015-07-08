@@ -147,6 +147,7 @@ static ADDRESS_MAP_START( sh7604_map, AS_PROGRAM, 32, sh2_device )
   @todo: cps3boot breaks with this enabled. Needs customization ...
   */
 //	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
+//	AM_RANGE(0xffffff88, 0xffffff8b) AM_READWRITE(dma_dtcr0_r,dma_dtcr0_w)
 	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh7604_r, sh7604_w)
 ADDRESS_MAP_END
 
@@ -166,8 +167,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
 //  fall-back
  	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
-//	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
-//	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 ADDRESS_MAP_END
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
