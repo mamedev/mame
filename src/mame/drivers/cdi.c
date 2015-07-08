@@ -525,21 +525,7 @@ ROM_END
 
 // Quizard 2
 
-ROM_START( quizard2 )
-	ROM_REGION(0x80000, "maincpu", 0)
-	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
-
-	ROM_REGION(0x2000, "cdic", 0)
-	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	ROM_REGION(0x2000, "slave", 0)
-	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
-
-	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizard22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
-ROM_END
-
-ROM_START( quizard2_23 ) /* CD-ROM printed ??/?? */
+ROM_START( quizard2 ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -551,6 +537,20 @@ ROM_START( quizard2_23 ) /* CD-ROM printed ??/?? */
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
+ROM_END
+
+ROM_START( quizard2_22 )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizard22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 ROM_END
 
 // Quizard 3
@@ -643,8 +643,8 @@ GAME( 1995, quizard_17,  quizard,      quizard17,      quizard, driver_device,  
 GAME( 1995, quizard_12,  quizard,      quizard12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1995, quizard_10,  quizard,      quizard12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.0)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizard2,    cdibios,      quizard22,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizard2_23, quizard2,     quizard23,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.3)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2,    cdibios,      quizard23,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.3)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2_22, quizard2,     quizard22,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
 GAME( 1995, quizard3,    cdibios,      quizard3,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.4)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1996, quizard3_32, quizard3,     quizard32,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )

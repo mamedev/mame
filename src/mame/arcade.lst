@@ -6466,6 +6466,7 @@ esckids         // GX975 (c) 1991 (Asia)
 esckidsj        // GX975 (c) 1991 (Japan)
 vendetta        // GX081 (c) 1991 (World)
 vendettar       // GX081 (c) 1991 (World)
+vendettaz		// GX081 (c) 1991 (World)
 vendetta2p      // GX081 (c) 1991 (World)
 vendetta2peba   // GX081 (c) 1991 (World)
 vendetta2pu     // GX081 (c) 1991 (Asia)
@@ -12823,7 +12824,7 @@ quizard_17      // (c) TAB Austria 1996
 quizard_12      // (c) TAB Austria 1996
 quizard_10		// (c) TAB Austria 1996
 quizard2        // (c) TAB Austria 1995
-quizard2_23     // (c) TAB Austria 199?
+quizard2_22     // (c) TAB Austria 199?
 quizard3        // (c) TAB Austria 1996
 quizard3_32     // (c) TAB Austria 1996
 quizard4        // (c) TAB Austria 1998
