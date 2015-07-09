@@ -22,12 +22,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_96_32x4, AS_DATA, 8, sm510_base_device)
 	AM_RANGE(0x00, 0x5f) AM_RAM
-	AM_RANGE(0x60, 0x7f) AM_RAM AM_SHARE("lcd_ram")
+	AM_RANGE(0x60, 0x6f) AM_RAM AM_SHARE("lcd_ram_a")
+	AM_RANGE(0x70, 0x7f) AM_RAM AM_SHARE("lcd_ram_b")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_80_48x4, AS_DATA, 8, sm510_base_device)
 	AM_RANGE(0x00, 0x4f) AM_RAM
-	AM_RANGE(0x50, 0x7f) AM_RAM AM_SHARE("lcd_ram")
+	AM_RANGE(0x50, 0x5f) AM_RAM AM_SHARE("lcd_ram_c")
+	AM_RANGE(0x60, 0x6f) AM_RAM AM_SHARE("lcd_ram_a")
+	AM_RANGE(0x70, 0x7f) AM_RAM AM_SHARE("lcd_ram_b")
 ADDRESS_MAP_END
 
 
