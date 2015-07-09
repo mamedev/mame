@@ -1072,8 +1072,41 @@ ROM_START( dreamwld )
 ROM_END
 
 
+ROM_START( gaialast )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "4", 0x000000, 0x040000, CRC(10cc2dee) SHA1(0719333ff391ee7935c6e4cea7e8e75369aeb9d0) )
+	ROM_LOAD32_BYTE( "5", 0x000001, 0x040000, CRC(c55f6f11) SHA1(13d543b0770bebdd4c6e064b56fd6cc2ec929566) )
+	ROM_LOAD32_BYTE( "2", 0x000002, 0x040000, CRC(549e594a) SHA1(728c6b51cc478ad7251bcbe6d7f4f4e6a2ee4a4e) )
+	ROM_LOAD32_BYTE( "3", 0x000003, 0x040000, CRC(a8e845d8) SHA1(f8c7e702bd747a22e76c861effec4cd3cd2f3fc9) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data - from baryona set, assumed to be the same */
+	//ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2dbad410) SHA1(bb788ea14bb605be9af9c8f8adec94ad1c17ab55))
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "10", 0x000000, 0x200000, CRC(5822ef93) SHA1(8ce22c30f8027f35c5f72eb6ce57a74540dd55da) )
+	ROM_LOAD16_WORD_SWAP( "11", 0x200000, 0x200000, CRC(f4f5770d) SHA1(ac850483cae321d286a09fe93ce7e49725722de0) )
+	ROM_LOAD16_WORD_SWAP( "12", 0x400000, 0x200000, CRC(a1f04571) SHA1(c29b3b3c209b63ad44ebfa5afb4b1832965e0936) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "8",0x000000, 0x200000, CRC(32d16985) SHA1(2b7a20eea09e7d2debd42469e9f6ae49310f5747) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "6", 0x000000, 0x020000, CRC(5c82feed) SHA1(1857afecf1081adf015ade1efb5930e3a7deef78) )
+	ROM_LOAD16_BYTE( "7", 0x000001, 0x020000, CRC(9d7f04ae) SHA1(55fb82626060fe0ddc03ed3ef402ccf998063d27) )
+
+	ROM_REGION( 0x10000, "unknown", 0 )
+	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
 GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",         "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
 GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong
+GAME( 1999, gaialast, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "SemiCom", "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
 GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )
