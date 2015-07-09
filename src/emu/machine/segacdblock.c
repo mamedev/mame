@@ -4,11 +4,15 @@
 
 Template for skeleton device
 
+4c68
+3bba reject routine -> 0xf8 r14
+3bbc peri routine -> 0 r14
+33cc open, nodisc, fatal -> r0
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/segacdblock.h"
-
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -49,13 +53,18 @@ Template for skeleton device
 #define CD_STAT_WAIT     0x8000     // waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00     // ultra-fatal error.
 
-
 void segacdblock_device::sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4)
 {
 	m_cr[0] = r1;
 	m_cr[1] = r2;
 	m_cr[2] = r3;
 	m_cr[3] = r4;
+}
+
+void segacdblock_device::write_fad()
+{
+	m_cr[3] = 1 | m_fad >> 16; /**< @todo track number */
+	m_cr[4] = m_fad & 0xffff;
 }
 
 void segacdblock_device::set_flag(UINT16 which)
@@ -68,17 +77,27 @@ void segacdblock_device::clear_flag(UINT16 which)
 	m_hirq &= ~which;
 }
 
+UINT16 segacdblock_device::read_cd_state()
+{
+	return m_cr[0] & 0xff00; 
+}
+
+void segacdblock_device::write_cd_state(UINT16 which)
+{
+	m_cr[0] = (m_cr[0] & 0xff) | which; 
+}
+
+
 READ16_MEMBER(segacdblock_device::hirq_r){	return m_hirq; }
 WRITE16_MEMBER(segacdblock_device::hirq_w)
 {
-	COMBINE_DATA(&m_hirq);
+	clear_flag(data);
 	 
-	if(m_hirq & CMOK) /**< @todo needs fucntion irq_mask too */
+	if((m_hirq & CMOK) == 0) /**< @todo needs fucntion irq_mask too */
 	{
-		m_hs = true;
-
-		clear_flag(CMOK);
-		sh1_writes_registers(CD_STAT_BUSY,0,0,0);
+		sh1_writes_registers(CD_STAT_BUSY,0,0,0); /**< @todo it's of course faster than 150 Hz, but how much? */
+		m_cd_timer->adjust(attotime::from_hz(clock()));
+		debugger_break(machine());
 	}
 }
 
@@ -151,6 +170,47 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 {
 }
 
+void segacdblock_device::cmd_init()
+{
+	sh1_writes_registers(CD_STAT_NODISC,0,0,0);
+}
+
+void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	printf("tick\n");
+	assert(id == CD_TIMER);
+	
+	if(m_hirq & CMOK)
+		return;
+	
+		
+	if(read_cd_state() & CD_STAT_PERI) // waiting for command
+	{
+		//write_cd_state(CD_STAT_PERI); /**< @todo command */
+		//write_fad();
+		m_cd_timer->adjust(attotime::from_hz(clock()));
+		return;
+	}
+	
+	if(read_cd_state() == CD_STAT_BUSY)
+	{
+		switch(m_cr[0] & 0xff)
+		{
+			case 0x00:
+				sh1_writes_registers(CD_STAT_NODISC,0,0,0);
+				break;
+			case 0x04:
+				cmd_init();
+				break;
+		}
+		
+		set_flag(CMOK);
+		//write_fad();
+		//m_cd_timer->adjust(attotime::from_hz(clock()));
+		return;
+	}
+	
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -159,6 +219,8 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 void segacdblock_device::device_start()
 {
 	m_space = &space(AS_0);
+	m_cd_timer = timer_alloc(CD_TIMER);
+	//m_cd_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 
 
@@ -173,7 +235,8 @@ void segacdblock_device::device_reset()
 	m_cr[1] = 'D' << 8 | 'B';
 	m_cr[2] = 'L' << 8 | 'O';
 	m_cr[3] = 'C' << 8 | 'K';
-	m_hs = false;
+	m_cd_timer->reset();
+	m_fad = 150;
 }
 
 
@@ -188,5 +251,5 @@ READ32_MEMBER( segacdblock_device::read )
 
 WRITE32_MEMBER( segacdblock_device::write )
 {
-	m_space->write_dword(offset*4,data);
+	m_space->write_dword(offset*4,data|data<<16);
 }

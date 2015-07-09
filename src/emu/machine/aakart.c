@@ -25,10 +25,10 @@ const device_type AAKART = &device_creator<aakart_device>;
 #define RAK1 0xfe
 #define RAK2 0xfd
 #define BACK 0x3f
-#define SMAK 0x33   /* keyboard + mouse ack */
-#define MACK 0x32   /* mouse ack */
-#define SACK 0x31   /* keyboard ack */
-#define NACK 0x30   /* no data ack */
+#define SMAK 0x33   /**< keyboard + mouse ack */
+#define MACK 0x32   /**< mouse ack */
+#define SACK 0x31   /**< keyboard ack */
+#define NACK 0x30   /**< no data ack */
 #define RQID 0x20
 
 //**************************************************************************

@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
 	MCFG_NVRAM_ADD_0FILL("smpc_nv") // TODO: default for each region (+ move it inside SMPC when converted to device)
 
-	MCFG_SEGACDBLOCK_ADD("sh1_hle", 0) // TODO: clock
+	MCFG_SEGACDBLOCK_ADD("sh1_hle", 75) // 150, @todo
 	//MCFG_TIMER_DRIVER_ADD("sector_timer", sat_console_state, stv_sector_cb)
 	//MCFG_TIMER_DRIVER_ADD("sh1_cmd", sat_console_state, stv_sh1_sim)
 

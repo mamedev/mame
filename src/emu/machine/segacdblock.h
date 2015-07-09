@@ -58,19 +58,25 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	address_space_config        m_space_config;
 	address_space *m_space;
 	
 private:
-
+	static const device_timer_id CD_TIMER = 0;
 	UINT16 m_cr[4];
 	UINT16 m_hirq_mask;
 	UINT16 m_hirq;
-	bool m_hs;
+	UINT32 m_fad;
 	
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
+	void cmd_init();
 	void set_flag(UINT16 which);
 	void clear_flag(UINT16 which);
+	emu_timer *m_cd_timer;
+	UINT16 read_cd_state();
+	void write_cd_state(UINT16 which);
+	void write_fad();
 };
 
 
