@@ -24,8 +24,8 @@
 
 #else
 #include <stdint.h>
-#include <cstddef>
 #endif
+#include <cstddef>
 
 
 //============================================================
