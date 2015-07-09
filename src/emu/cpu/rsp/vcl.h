@@ -29,7 +29,7 @@ inline rsp_vec_t vec_vcl(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *
 	// Blend everything together. Caveat: we don't update
 	// the results of ge/le if ne is false, so be careful.
 	rsp_vec_t do_le = _mm_andnot_si128(eq, sign);
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	*le = _mm_blendv_epi8(*le, le_eq, do_le);
 #else
 	le_eq = _mm_and_si128(do_le, le_eq);
@@ -38,7 +38,7 @@ inline rsp_vec_t vec_vcl(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *
 #endif
 
 	rsp_vec_t do_ge = _mm_or_si128(sign, eq);
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	*ge = _mm_blendv_epi8(ge_eq, *ge, do_ge);
 #else
 	*ge = _mm_and_si128(do_ge, *ge);
@@ -47,7 +47,7 @@ inline rsp_vec_t vec_vcl(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *
 #endif
 
   // Mux the result based on the value of sign.
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	rsp_vec_t mux_mask = _mm_blendv_epi8(*ge, *le, sign);
 #else
 	do_le = _mm_and_si128(sign, *le);
@@ -55,7 +55,7 @@ inline rsp_vec_t vec_vcl(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *
 	rsp_vec_t mux_mask  = _mm_or_si128(do_le, do_ge);
 #endif
 
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	return _mm_blendv_epi8(vs, sign_negvt, mux_mask);
 #else
 	sign_negvt = _mm_and_si128(mux_mask, sign_negvt);
