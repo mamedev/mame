@@ -670,6 +670,74 @@ static INPUT_PORTS_START( cutefght )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( gaialast )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0000fffc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+
+	PORT_START("c00004")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0003,  0x0001, DEF_STR( Lives )  )  PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(       0x0002, "1" )
+	PORT_DIPSETTING(       0x0003, "2" )
+	PORT_DIPSETTING(       0x0001, "3" )
+	PORT_DIPSETTING(       0x0000, "4" )
+	PORT_DIPNAME( 0x0004,  0x0000, "Bomb Stock" )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(       0x0004, "2" )
+	PORT_DIPSETTING(       0x0000, "3" )
+	PORT_DIPNAME( 0x0008,  0x0000, "Lock Vertical Scroll" )  PORT_DIPLOCATION("SW2:4") // if Off the game pans the screen up/down when you move up/down
+	PORT_DIPSETTING(       0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, IP_ACTIVE_LOW, "SW2:6" ) // these are listed as ticket payout in test mode, but I believe
+	PORT_DIPUNUSED_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW2:7" ) // that to be a leftover from some redemption game
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1") /* Title screen sounds only */
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPSETTING(      0x2000, "Level 1" ) // listed as 'Level 3' in service mode
+	PORT_DIPSETTING(      0x1000, "Level 2" ) // ^^
+	PORT_DIPSETTING(      0x0000, "Level 3" )
+	PORT_DIPSETTING(      0x7000, "Level 4" )
+	PORT_DIPSETTING(      0x6000, "Level 5" )
+	PORT_DIPSETTING(      0x5000, "Level 6" )
+	PORT_DIPSETTING(      0x4000, "Level 7" )
+	PORT_DIPSETTING(      0x3000, "Level 8" ) // listed as 'Little' in service mode, but still clearly the most difficult
+	PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )
+INPUT_PORTS_END
+
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -1128,5 +1196,5 @@ GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "Sem
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                  "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
 GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom",          "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong
-GAME( 1999, gaialast, 0,      baryon,   rolcrush, dreamwld_state, gaialast, ROT0,   "SemiCom / XESS",   "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
+GAME( 1999, gaialast, 0,      baryon,   gaialast, dreamwld_state, gaialast, ROT0,   "SemiCom / XESS",   "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
 GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                  "Dream World", GAME_SUPPORTS_SAVE )
