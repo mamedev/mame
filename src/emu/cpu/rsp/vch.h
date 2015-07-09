@@ -20,7 +20,7 @@ inline rsp_vec_t vec_vch(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *
 	rsp_vec_t diff_gez = _mm_or_si128(diff_lez, diff_zero);
 	diff_lez = _mm_cmpeq_epi16(zero, diff_lez);
 
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	*ge = _mm_blendv_epi8(diff_gez, vt_neg, *sign);
 	*le = _mm_blendv_epi8(vt_neg, diff_lez, *sign);
 #else
@@ -42,7 +42,7 @@ inline rsp_vec_t vec_vch(rsp_vec_t vs, rsp_vec_t vt, rsp_vec_t zero, rsp_vec_t *
 	*eq = _mm_cmpeq_epi16(*eq, zero);
 
 	// Compute result:
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	rsp_vec_t diff_sel_mask = _mm_blendv_epi8(*ge, *le, *sign);
 	return _mm_blendv_epi8(vs, sign_negvt, diff_sel_mask);
 #else

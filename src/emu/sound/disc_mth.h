@@ -22,19 +22,16 @@
  ***********************************************************************/
 
 #include "discrete.h"
-/* fix pedantic for C++98, compiler optmizes it out anyway */
 
-#define EVEN_DUMMIES_GET_NAMES int dummy;
+DISCRETE_CLASS_STEP(dst_adder, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_adder, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_clamp, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_clamp, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_divide, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_divide, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_gain, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_gain, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
-
-DISCRETE_CLASS_STEP(dst_logic_inv, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_logic_inv, 1, /* no context */ );
 
 DISCRETE_CLASS_STEP_RESET(dst_bits_decode, 8,
 	int             m_count;
@@ -44,17 +41,17 @@ DISCRETE_CLASS_STEP_RESET(dst_bits_decode, 8,
 	int             m_last_had_x_time;
 );
 
-DISCRETE_CLASS_STEP(dst_logic_and, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_logic_and, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_logic_nand, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_logic_nand, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_logic_or, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_logic_or, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_logic_nor, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_logic_nor, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_logic_xor, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_logic_xor, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_logic_nxor, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_logic_nxor, 1, /* no context */ );
 
 DISCRETE_CLASS_STEP_RESET(dst_logic_dff, 1,
 	int             m_last_clk;
@@ -75,7 +72,7 @@ DISCRETE_CLASS_STEP_RESET(dst_logic_shift, 1,
 	UINT8           m_last;
 );
 
-DISCRETE_CLASS_STEP(dst_lookup_table, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_lookup_table, 1, /* no context */ );
 
 DISCRETE_CLASS_STEP_RESET(dst_multiplex, 1,
 	int             m_size;
@@ -100,12 +97,11 @@ DISCRETE_CLASS_STEP_RESET(dst_samphold, 1,
 	int             m_clocktype;
 );
 
-DISCRETE_CLASS_STEP(dst_switch, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_switch, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_aswitch, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_aswitch, 1, /* no context */ );
 
-//figure this out...
-//DISCRETE_CLASS_STEP(, 1, EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(, 1, /* no context */ );
 class DISCRETE_CLASS_NAME(dst_transform): public discrete_base_node, public discrete_step_interface
 {
 	DISCRETE_CLASS_CONSTRUCTOR(dst_transform, base)
@@ -232,13 +228,13 @@ DISCRETE_CLASS_STEP_RESET(dst_tvca_op_amp, 1,
 	UINT8           m_has_r4;
 );
 
-DISCRETE_CLASS_STEP(dst_xtime_buffer, 1,  EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_xtime_buffer, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_xtime_and, 1,   EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_xtime_and, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_xtime_or, 1,   EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_xtime_or, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_xtime_xor, 1,   EVEN_DUMMIES_GET_NAMES /* no context */ );
+DISCRETE_CLASS_STEP(dst_xtime_xor, 1, /* no context */ );
 
 
 #endif /* __DISC_WAV_H__ */

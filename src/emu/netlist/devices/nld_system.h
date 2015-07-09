@@ -299,6 +299,7 @@ private:
 
 	struct rpn_inst
 	{
+		rpn_inst() : m_cmd(ADD), m_param(0.0) { }
 		rpn_cmd m_cmd;
 		nl_double m_param;
 	};

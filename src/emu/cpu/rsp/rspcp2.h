@@ -25,20 +25,20 @@
 #define SSE_AVAILABLE	(0)
 #endif
 
-#if (!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (SSE_AVAILABLE || defined(_MSC_VER)) && defined(PTR64) && !SIMD_OFF
+#if (SSE_AVAILABLE || defined(_MSC_VER)) && defined(PTR64) && !SIMD_OFF
 #define USE_SIMD	(1)
 #else
 #define USE_SIMD	(0)
 #endif
 
 #if USE_SIMD
-#ifdef __SSE4_2__
+#if (defined(__SSE4_2__) || defined(_MSC_VER))
 #include <nmmintrin.h>
-#elif defined(__SSE4_1__)
+#elif (defined(__SSE4_1__) || defined(_MSC_VER))
 #include <smmintrin.h>
-#elif defined(__SSSE3__)
+#elif (defined(__SSSE3__) || defined(_MSC_VER))
 #include <tmmintrin.h>
-#elif defined(__SSE3__)
+#elif (defined(__SSE3__ ) || defined(_MSC_VER))
 #include <pmmintrin.h>
 #else
 #include <emmintrin.h>
@@ -160,6 +160,9 @@ public:
 	void            log_instruction_execution();
 	virtual void    cfunc_unimplemented_opcode() { }
 
+	void			dump(UINT32 op);
+    void            dump_dmem();
+
 protected:
 	virtual int     generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return TRUE; }
 
@@ -177,8 +180,11 @@ protected:
 	running_machine& m_machine;
 	UINT32          m_vres[8];          /* used for temporary vector results */
 
+#if USE_SIMD
+	__declspec(align(16)) VECTOR_REG      m_v[32];
+#else
 	VECTOR_REG      m_v[32];
-
+#endif
 	ACCUMULATOR_REG m_accum[8];
 	UINT16          m_vflag[6][8];
 
@@ -226,9 +232,9 @@ protected:
 		UINT16 s[24];
 	};
 
-	aligned_rsp_1vect_t m_vdqm;
-	aligned_rsp_2vect_t m_flags[3];
-	aligned_rsp_3vect_t m_acc;
+	__declspec(align(16)) aligned_rsp_1vect_t m_vdqm;
+	__declspec(align(16)) aligned_rsp_2vect_t m_flags[3];
+	__declspec(align(16)) aligned_rsp_3vect_t m_acc;
 	UINT32 m_dp_flag;
 
 	typedef struct
@@ -245,6 +251,8 @@ protected:
 		const UINT16 ror_l2b_keys[16][8];
 		const UINT16 qr_lut[16][8];
 		const UINT16 bdls_lut[4][4];
+		const UINT16 word_reverse[8];
+		const UINT16 byte_reverse[8];
 	} vec_helpers_t;
 
 	static const vec_helpers_t m_vec_helpers;
@@ -253,7 +261,7 @@ protected:
 	static inline UINT32 sign_extend_6(INT32 i) {
 		return ((i << (32 - 7)) >> (32 - 7)) & 0xfff;
 	}
-	static inline rsp_vec_t vec_load_unshuffled_operand(const UINT16* src)
+	static inline rsp_vec_t vec_load_unshuffled_operand(const void* src)
 	{
 		return _mm_load_si128((rsp_vec_t*) src);
 	}
@@ -261,21 +269,21 @@ protected:
 	{
 		_mm_store_si128((rsp_vec_t*) dest, src);
 	}
-	static inline rsp_vec_t read_acc_lo(const UINT16 *acc)
-	{
-		return vec_load_unshuffled_operand(acc + sizeof(rsp_vec_t) * 2);
-	}
-	static inline rsp_vec_t read_acc_mid(const UINT16 *acc)
+	static inline rsp_vec_t read_acc_lo(const UINT16* acc)
 	{
 		return vec_load_unshuffled_operand(acc + sizeof(rsp_vec_t));
 	}
-	static inline rsp_vec_t read_acc_hi(const UINT16 *acc)
+	static inline rsp_vec_t read_acc_mid(const UINT16* acc)
+	{
+		return vec_load_unshuffled_operand(acc + (sizeof(rsp_vec_t) >> 1));
+	}
+	static inline rsp_vec_t read_acc_hi(const void* acc)
 	{
 		return vec_load_unshuffled_operand(acc);
 	}
 	static inline rsp_vec_t read_vcc_lo(const UINT16 *vcc)
 	{
-		return vec_load_unshuffled_operand(vcc + sizeof(rsp_vec_t));
+		return vec_load_unshuffled_operand(vcc + (sizeof(rsp_vec_t) >> 1));
 	}
 	static inline rsp_vec_t read_vcc_hi(const UINT16 *vcc)
 	{
@@ -283,7 +291,7 @@ protected:
 	}
 	static inline rsp_vec_t read_vco_lo(const UINT16 *vco)
 	{
-		return vec_load_unshuffled_operand(vco + sizeof(rsp_vec_t));
+		return vec_load_unshuffled_operand(vco + (sizeof(rsp_vec_t) >> 1));
 	}
 	static inline rsp_vec_t read_vco_hi(const UINT16 *vco)
 	{
@@ -291,15 +299,15 @@ protected:
 	}
 	static inline rsp_vec_t read_vce(const UINT16 *vce)
 	{
-		return vec_load_unshuffled_operand(vce + sizeof(rsp_vec_t));
+		return vec_load_unshuffled_operand(vce);
 	}
 	static inline void write_acc_lo(UINT16 *acc, rsp_vec_t acc_lo)
 	{
-		return vec_write_operand(acc + sizeof(rsp_vec_t) * 2, acc_lo);
+		return vec_write_operand(acc + sizeof(rsp_vec_t), acc_lo);
 	}
 	static inline void write_acc_mid(UINT16 *acc, rsp_vec_t acc_mid)
 	{
-		return vec_write_operand(acc + sizeof(rsp_vec_t), acc_mid);
+		return vec_write_operand(acc + (sizeof(rsp_vec_t) >> 1), acc_mid);
 	}
 	static inline void write_acc_hi(UINT16 *acc, rsp_vec_t acc_hi)
 	{
@@ -307,7 +315,7 @@ protected:
 	}
 	static inline void write_vcc_lo(UINT16 *vcc, rsp_vec_t vcc_lo)
 	{
-		return vec_write_operand(vcc + sizeof(rsp_vec_t), vcc_lo);
+		return vec_write_operand(vcc + (sizeof(rsp_vec_t) >> 1), vcc_lo);
 	}
 	static inline void write_vcc_hi(UINT16 *vcc, rsp_vec_t vcc_hi)
 	{
@@ -315,7 +323,7 @@ protected:
 	}
 	static inline void write_vco_lo(UINT16 *vcc, rsp_vec_t vco_lo)
 	{
-		return vec_write_operand(vcc + sizeof(rsp_vec_t), vco_lo);
+		return vec_write_operand(vcc + (sizeof(rsp_vec_t) >> 1), vco_lo);
 	}
 	static inline void write_vco_hi(UINT16 *vcc, rsp_vec_t vco_hi)
 	{
@@ -330,7 +338,7 @@ protected:
 	{
 		return (INT16)_mm_movemask_epi8(
 			_mm_packs_epi16(
-				_mm_load_si128((rsp_vec_t*) (flags + sizeof(rsp_vec_t))),
+				_mm_load_si128((rsp_vec_t*) (flags + (sizeof(rsp_vec_t) >> 1))),
 				_mm_load_si128((rsp_vec_t*) flags)
 			)
 		);

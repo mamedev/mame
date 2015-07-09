@@ -34,6 +34,8 @@ const device_type VS920A = &device_creator<vs920a_text_tilemap_device>;
 
 vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VS920A, "VS920A Text Tilemap", tag, owner, clock, "vs920a", __FILE__),
+	m_vram(NULL),
+	m_pal_base(0),
 	m_gfx_region(0),
 	m_gfxdecode(*this)
 
@@ -48,6 +50,7 @@ void vs920a_text_tilemap_device::device_start()
 
 	m_vram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
 	save_pointer(NAME(m_vram), 0x1000/2);
+	save_item(NAME(m_pal_base));
 
 
 	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(vs920a_text_tilemap_device::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
@@ -106,11 +109,6 @@ tilemap_t* vs920a_text_tilemap_device::get_tilemap()
 void vs920a_text_tilemap_device::set_pal_base(int pal_base)
 {
 	m_pal_base = pal_base;
-}
-
-void vs920a_text_tilemap_device::set_gfx_region(int gfx_region)
-{
-	m_gfx_region = gfx_region;
 }
 
 void vs920a_text_tilemap_device::draw(screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority)

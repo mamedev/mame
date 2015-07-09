@@ -18,7 +18,7 @@ inline rsp_vec_t vec_vmadn_vmudn(UINT32 iw, rsp_vec_t vs, rsp_vec_t vt, rsp_vec_
 
 	if (iw & 0x8) // VMADN
 	{
-		// Tricky part: start accumulate everything.
+		// Tricky part: start accumulating everything.
 		// Get/keep the carry as we'll add it in later.
 		rsp_vec_t overflow_mask = _mm_adds_epu16(*acc_lo, lo);
 		*acc_lo = _mm_add_epi16(*acc_lo, lo);

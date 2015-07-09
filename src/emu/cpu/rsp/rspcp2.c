@@ -5,7 +5,7 @@
     rspcp2.c
 
     Universal machine language-based Nintendo/SGI RSP COP2 emulator.
-    Written by Harmony of the MESS team.
+    Written by Ryan Holtz of the MAME team.
 
 ***************************************************************************/
 
@@ -20,17 +20,17 @@ const rsp_cop2::vec_helpers_t rsp_cop2::m_vec_helpers = {
 	{ 0 },
 	{ // logic_mask
 		{  0,  0,  0,  0,  0,  0,  0,  0 },
-		{ ~0, ~0, ~0, ~0, ~0, ~0, ~0, ~0 }
+		{ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff }
 	},
 	{ // vrsq_mask_table
-		{ ~0,  0,  0,  0,  0,  0,  0,  0 },
-		{  0, ~0,  0,  0,  0,  0,  0,  0 },
-		{  0,  0, ~0,  0,  0,  0,  0,  0 },
-		{  0,  0,  0, ~0,  0,  0,  0,  0 },
-		{  0,  0,  0,  0, ~0,  0,  0,  0 },
-		{  0,  0,  0,  0,  0, ~0,  0,  0 },
-		{  0,  0,  0,  0,  0,  0, ~0,  0 },
-		{  0,  0,  0,  0,  0,  0,  0, ~0 }
+		{ 0xffff,  0,  0,  0,  0,  0,  0,  0 },
+		{  0, 0xffff,  0,  0,  0,  0,  0,  0 },
+		{  0,  0, 0xffff,  0,  0,  0,  0,  0 },
+		{  0,  0,  0, 0xffff,  0,  0,  0,  0 },
+		{  0,  0,  0,  0, 0xffff,  0,  0,  0 },
+		{  0,  0,  0,  0,  0, 0xffff,  0,  0 },
+		{  0,  0,  0,  0,  0,  0, 0xffff,  0 },
+		{  0,  0,  0,  0,  0,  0,  0, 0xffff }
 	},
 	{ // shuffle_keys
 		{ 0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e }, /* -- */
@@ -54,161 +54,167 @@ const rsp_cop2::vec_helpers_t rsp_cop2::m_vec_helpers = {
 		{ 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e, 0x0f0e }  /* 7w */
 	},
 	{ // sll_b2l_keys
-		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
-		{ 0x0102, 0x8000, 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c },
-		{ 0x0001, 0x8080, 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b },
-		{ 0x8000, 0x8080, 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a },
+		{ 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c },
+		{ 0x8003, 0x0201, 0x0007, 0x0605, 0x040b, 0x0a09, 0x080f, 0x0e0d },
+		{ 0x8080, 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e },
+		{ 0x8080, 0x8003, 0x0201, 0x0007, 0x0605, 0x040b, 0x0a09, 0x080f },
 
-		{ 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
-		{ 0x8080, 0x8080, 0x0102, 0x8000, 0x0506, 0x0304, 0x090a, 0x0708 },
-		{ 0x8080, 0x8080, 0x0001, 0x8080, 0x0405, 0x0203, 0x0809, 0x0607 },
-		{ 0x8080, 0x8080, 0x8000, 0x8080, 0x0304, 0x0102, 0x0708, 0x0506 },
+		{ 0x8080, 0x8080, 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908 },
+		{ 0x8080, 0x8080, 0x8003, 0x0201, 0x0007, 0x0605, 0x040b, 0x0a09 },
+		{ 0x8080, 0x8080, 0x8080, 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a },
+		{ 0x8080, 0x8080, 0x8080, 0x8003, 0x0201, 0x0007, 0x0605, 0x040b },
 
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0102, 0x8000, 0x0506, 0x0304 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0001, 0x8080, 0x0405, 0x0203 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8000, 0x8080, 0x0304, 0x0102 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0302, 0x0100, 0x0706, 0x0504 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8003, 0x0201, 0x0007, 0x0605 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0302, 0x0100, 0x0706 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8003, 0x0201, 0x0007 },
 
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0102, 0x8000 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0001, 0x8080 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8000, 0x8080 }
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0302, 0x0100 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8003, 0x0201 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0302 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8003 },
 	},
 	{ // sll_l2b_keys
-		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
-		{ 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e },
-		{ 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f },
-		{ 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08 },
+		{ 0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e },
+		{ 0x0201, 0x8003, 0x0605, 0x0007, 0x0a09, 0x040b, 0x0e0d, 0x080f },
+		{ 0x0302, 0x8080, 0x0706, 0x0100, 0x0b0a, 0x0504, 0x0f0e, 0x0908 },
+		{ 0x8003, 0x8080, 0x0007, 0x0201, 0x040b, 0x0605, 0x080f, 0x0a09 },
 
-		{ 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
-		{ 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a },
-		{ 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b },
-		{ 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506, 0x0b04 },
+		{ 0x8080, 0x8080, 0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a },
+		{ 0x8080, 0x8080, 0x0201, 0x8003, 0x0605, 0x0007, 0x0a09, 0x040b },
+		{ 0x8080, 0x8080, 0x0302, 0x8080, 0x0706, 0x0100, 0x0b0a, 0x0504 },
+		{ 0x8080, 0x8080, 0x8003, 0x8080, 0x0007, 0x0201, 0x040b, 0x0605 },
 
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607, 0x0405 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700, 0x0506 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001, 0x0607 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102, 0x0700 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0100, 0x0302, 0x0504, 0x0706 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0201, 0x8003, 0x0605, 0x0007 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x0302, 0x8080, 0x0706, 0x0100 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8003, 0x8080, 0x0007, 0x0201 },
 
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203, 0x0001 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380, 0x0102 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0203 },
-		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0380 }
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0100, 0x0302 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0201, 0x8003 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x0302, 0x8080 },
+		{ 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8003, 0x8080 },
 	},
 	{ // srl_b2l_keys
-		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
-		{ 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f80, 0x0d0e },
-		{ 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x8080, 0x0e0f },
-		{ 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x8080, 0x0f80 },
+		{ 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c },
+		{ 0x0201, 0x0007, 0x0605, 0x040b, 0x0a09, 0x080f, 0x0e0d, 0x0c80 },
+		{ 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x8080 },
+		{ 0x0007, 0x0605, 0x040b, 0x0a09, 0x080f, 0x0e0d, 0x0c80, 0x8080 },
 
-		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x8080, 0x8080 },
-		{ 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f80, 0x0d0e, 0x8080, 0x8080 },
-		{ 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x8080, 0x0e0f, 0x8080, 0x8080 },
-		{ 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x8080, 0x0f80, 0x8080, 0x8080 },
+		{ 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x8080, 0x8080 },
+		{ 0x0605, 0x040b, 0x0a09, 0x080f, 0x0e0d, 0x0c80, 0x8080, 0x8080 },
+		{ 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x8080, 0x8080, 0x8080 },
+		{ 0x040b, 0x0a09, 0x080f, 0x0e0d, 0x0c80, 0x8080, 0x8080, 0x8080 },
 
-		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x8080, 0x8080, 0x8080, 0x8080 },
-		{ 0x0b0c, 0x090a, 0x0f80, 0x0d0e, 0x8080, 0x8080, 0x8080, 0x8080 },
-		{ 0x0c0d, 0x0a0b, 0x8080, 0x0e0f, 0x8080, 0x8080, 0x8080, 0x8080 },
-		{ 0x0d0e, 0x0b0c, 0x8080, 0x0f80, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0a09, 0x080f, 0x0e0d, 0x0c80, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0908, 0x0f0e, 0x0d0c, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x080f, 0x0e0d, 0x0c80, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
 
-		{ 0x0e0f, 0x0c0d, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
-		{ 0x0f80, 0x0d0e, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
-		{ 0x8080, 0x0e0f, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
-		{ 0x8080, 0x0f80, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 }
+		{ 0x0f0e, 0x0d0c, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0e0d, 0x0c80, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0d0c, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
+		{ 0x0c80, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080, 0x8080 },
 	},
 	{ // ror_b2l_keys
-		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
-		{ 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f00, 0x0d0e },
-		{ 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x0001, 0x0e0f },
-		{ 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x0102, 0x0f00 },
+		{ 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c },
+		{ 0x0201, 0x0007, 0x0605, 0x040b, 0x0a09, 0x080f, 0x0e0d, 0x0c03 },
+		{ 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x0302 },
+		{ 0x0007, 0x0605, 0x040b, 0x0a09, 0x080f, 0x0e0d, 0x0c03, 0x0201 },
 
-		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
-		{ 0x0708, 0x0506, 0x0b0c, 0x090a, 0x0f00, 0x0d0e, 0x0304, 0x0102 },
-		{ 0x0809, 0x0607, 0x0c0d, 0x0a0b, 0x0001, 0x0e0f, 0x0405, 0x0203 },
-		{ 0x090a, 0x0708, 0x0d0e, 0x0b0c, 0x0102, 0x0f00, 0x0506, 0x0304 },
+		{ 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x0302, 0x0100 },
+		{ 0x0605, 0x040b, 0x0a09, 0x080f, 0x0e0d, 0x0c03, 0x0201, 0x0007 },
+		{ 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x0302, 0x0100, 0x0706 },
+		{ 0x040b, 0x0a09, 0x080f, 0x0e0d, 0x0c03, 0x0201, 0x0007, 0x0605 },
 
-		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
-		{ 0x0b0c, 0x090a, 0x0f00, 0x0d0e, 0x0304, 0x0102, 0x0708, 0x0506 },
-		{ 0x0c0d, 0x0a0b, 0x0001, 0x0e0f, 0x0405, 0x0203, 0x0809, 0x0607 },
-		{ 0x0d0e, 0x0b0c, 0x0102, 0x0f00, 0x0506, 0x0304, 0x090a, 0x0708 },
+		{ 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x0302, 0x0100, 0x0706, 0x0504 },
+		{ 0x0a09, 0x080f, 0x0e0d, 0x0c03, 0x0201, 0x0007, 0x0605, 0x040b },
+		{ 0x0908, 0x0f0e, 0x0d0c, 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a },
+		{ 0x080f, 0x0e0d, 0x0c03, 0x0201, 0x0007, 0x0605, 0x040b, 0x0a09 },
 
-		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
-		{ 0x0f00, 0x0d0e, 0x0304, 0x0102, 0x0708, 0x0506, 0x0b0c, 0x090a },
-		{ 0x0001, 0x0e0f, 0x0405, 0x0203, 0x0809, 0x0607, 0x0c0d, 0x0a0b },
-		{ 0x0102, 0x0f00, 0x0506, 0x0304, 0x090a, 0x0708, 0x0d0e, 0x0b0c }
+		{ 0x0f0e, 0x0d0c, 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908 },
+		{ 0x0e0d, 0x0c03, 0x0201, 0x0007, 0x0605, 0x040b, 0x0a09, 0x080f },
+		{ 0x0d0c, 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e },
+		{ 0x0c03, 0x0201, 0x0007, 0x0605, 0x040b, 0x0a09, 0x080f, 0x0e0d },
 	},
 	{ // rol_l2b_keys
-		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d },
-		{ 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e },
-		{ 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f },
-		{ 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08 },
+		{ 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c },
+		{ 0x0003, 0x0e01, 0x0407, 0x0205, 0x080b, 0x0609, 0x0c0f, 0x0a0d },
+		{ 0x0100, 0x0f0e, 0x0504, 0x0302, 0x0908, 0x0706, 0x0d0c, 0x0b0a },
+		{ 0x0e01, 0x0c0f, 0x0205, 0x0003, 0x0609, 0x0407, 0x0a0d, 0x080b },
 
-		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809 },
-		{ 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a },
-		{ 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b },
-		{ 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506, 0x0b04 },
+		{ 0x0f0e, 0x0d0c, 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908 },
+		{ 0x0c0f, 0x0a0d, 0x0003, 0x0e01, 0x0407, 0x0205, 0x080b, 0x0609 },
+		{ 0x0d0c, 0x0b0a, 0x0100, 0x0f0e, 0x0504, 0x0302, 0x0908, 0x0706 },
+		{ 0x0a0d, 0x080b, 0x0e01, 0x0c0f, 0x0205, 0x0003, 0x0609, 0x0407 },
 
-		{ 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
-		{ 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400, 0x0506 },
-		{ 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607 },
-		{ 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0400 },
+		{ 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x0302, 0x0100, 0x0706, 0x0504 },
+		{ 0x080b, 0x0609, 0x0c0f, 0x0a0d, 0x0003, 0x0e01, 0x0407, 0x0205 },
+		{ 0x0908, 0x0706, 0x0d0c, 0x0b0a, 0x0100, 0x0f0e, 0x0504, 0x0302 },
+		{ 0x0609, 0x0407, 0x0a0d, 0x080b, 0x0e01, 0x0c0f, 0x0205, 0x0003 },
 
-		{ 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
-		{ 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102 },
-		{ 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203 },
-		{ 0x0102, 0x0400, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c }
+		{ 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x0302, 0x0100 },
+		{ 0x0407, 0x0205, 0x080b, 0x0609, 0x0c0f, 0x0a0d, 0x0003, 0x0e01 },
+		{ 0x0504, 0x0302, 0x0908, 0x0706, 0x0d0c, 0x0b0a, 0x0100, 0x0f0e },
+		{ 0x0205, 0x0003, 0x0609, 0x0407, 0x0a0d, 0x080b, 0x0e01, 0x0c0f },
 	},
 	{ // ror_l2b_keys
-		{ 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d },
-		{ 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c },
-		{ 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203 },
-		{ 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102 },
+		{ 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c },
+		{ 0x0205, 0x0003, 0x0609, 0x0407, 0x0a0d, 0x080b, 0x0e01, 0x0c0f },
+		{ 0x0504, 0x0302, 0x0908, 0x0706, 0x0d0c, 0x0b0a, 0x0100, 0x0f0e },
+		{ 0x0407, 0x0205, 0x080b, 0x0609, 0x0c0f, 0x0a0d, 0x0003, 0x0e01 },
 
-		{ 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001 },
-		{ 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700 },
-		{ 0x0405, 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607 },
-		{ 0x0b04, 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506 },
+		{ 0x0706, 0x0504, 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x0302, 0x0100 },
+		{ 0x0609, 0x0407, 0x0a0d, 0x080b, 0x0e01, 0x0c0f, 0x0205, 0x0003 },
+		{ 0x0908, 0x0706, 0x0d0c, 0x0b0a, 0x0100, 0x0f0e, 0x0504, 0x0302 },
+		{ 0x080b, 0x0609, 0x0c0f, 0x0a0d, 0x0003, 0x0e01, 0x0407, 0x0205 },
 
-		{ 0x0c0b, 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405 },
-		{ 0x090a, 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04 },
-		{ 0x0809, 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b },
-		{ 0x0f08, 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a },
+		{ 0x0b0a, 0x0908, 0x0f0e, 0x0d0c, 0x0302, 0x0100, 0x0706, 0x0504 },
+		{ 0x0a0d, 0x080b, 0x0e01, 0x0c0f, 0x0205, 0x0003, 0x0609, 0x0407 },
+		{ 0x0d0c, 0x0b0a, 0x0100, 0x0f0e, 0x0504, 0x0302, 0x0908, 0x0706 },
+		{ 0x0c0f, 0x0a0d, 0x0003, 0x0e01, 0x0407, 0x0205, 0x080b, 0x0609 },
 
-		{ 0x0e0f, 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809 },
-		{ 0x0d0e, 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08 },
-		{ 0x0c0d, 0x0203, 0x0001, 0x0607, 0x0405, 0x0c0b, 0x0809, 0x0e0f },
-		{ 0x030c, 0x0102, 0x0700, 0x0506, 0x0b04, 0x090a, 0x0f08, 0x0d0e }
+		{ 0x0f0e, 0x0d0c, 0x0302, 0x0100, 0x0706, 0x0504, 0x0b0a, 0x0908 },
+		{ 0x0e01, 0x0c0f, 0x0205, 0x0003, 0x0609, 0x0407, 0x0a0d, 0x080b },
+		{ 0x0100, 0x0f0e, 0x0504, 0x0302, 0x0908, 0x0706, 0x0d0c, 0x0b0a },
+		{ 0x0003, 0x0e01, 0x0407, 0x0205, 0x080b, 0x0609, 0x0c0f, 0x0a0d },
 	},
 	{ // qr_lut
 		{ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
-		{ 0xff00, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
-		{ 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
-		{ 0x0000, 0xff00, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0xffff, 0xff00, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0xffff, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0xff00, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
 
 		{ 0x0000, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff},
-		{ 0x0000, 0x0000, 0xff00, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
-		{ 0x0000, 0x0000, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff },
-		{ 0x0000, 0x0000, 0x0000, 0xff00, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0xffff, 0xff00, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0xffff, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0xff00, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff },
 
 		{ 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xffff, 0xffff, 0xffff },
-		{ 0x0000, 0x0000, 0x0000, 0x0000, 0xff00, 0xffff, 0xffff, 0xffff },
-		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xffff, 0xffff },
-		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xff00, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xff00, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0x0000, 0xffff, 0xffff },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0xff00, 0x0000, 0xffff, 0xffff },
 
 		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xffff },
-		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xff00, 0xffff },
-		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff },
-		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xff00 }
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0xff00 },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xffff, 0x0000 },
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0xff00, 0x0000 }
 	},
 	{ // bdls_lut - mask to denote which part of the vector to load/store.
-		{ 0x00ff, 0x0000, 0x0000, 0x0000 }, // B
-		{ 0xffff, 0x0000, 0x0000, 0x0000 }, // S
+		{ 0x0000, 0xff00, 0x0000, 0x0000 }, // B
+		{ 0x0000, 0xffff, 0x0000, 0x0000 }, // S
 		{ 0xffff, 0xffff, 0x0000, 0x0000 }, // L
 		{ 0xffff, 0xffff, 0xffff, 0xffff }  // D
-	}
+	},
+    { // word_reverse
+        0x0706, 0x0504, 0x0302, 0x0100, 0x0f0e, 0x0d0c, 0x0b0a, 0x0908
+    },
+    { // byte_reverse
+        0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d
+    }
 };
 
-#ifndef __SSSE3__
+#if !(defined(__SSSE3__) || defined(_MSC_VER))
 // TODO: Highly optimized. More of a stopgap measure.
 static inline rsp_vec_t sse2_pshufb(rsp_vec_t v, const UINT16 *keys)
 {
@@ -312,7 +318,7 @@ void rsp_cop2::vec_load_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 	}
 
 	// Shift the DQM up to the point where we mux in the data.
-#ifndef __SSSE3__
+#if !(defined(__SSSE3__) || defined(_MSC_VER))
 	dqm = sse2_pshufb(dqm, m_vec_helpers.sll_b2l_keys[element]);
 #else
 	rsp_vec_t ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.sll_b2l_keys[element]));
@@ -320,7 +326,7 @@ void rsp_cop2::vec_load_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 #endif
 
   // Align the data to the DQM so we can mask it in.
-#ifndef __SSSE3__
+#if !(defined(__SSSE3__) || defined(_MSC_VER))
 	data = sse2_pshufb(data, m_vec_helpers.ror_b2l_keys[ror & 0xF]);
 #else
 	ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.ror_b2l_keys[ror & 0xF]));
@@ -328,7 +334,7 @@ void rsp_cop2::vec_load_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 #endif
 
   // Mask and mux in the data.
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	reg = _mm_blendv_epi8(reg, data, dqm);
 #else
 	data = _mm_and_si128(dqm, data);
@@ -374,14 +380,18 @@ void rsp_cop2::vec_load_group2(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 	}
 
 	// "Unpack" the data.
-	data = _mm_unpacklo_epi8(_mm_setzero_si128(), data);
+    rsp_vec_t zero = _mm_setzero_si128();
+	data = _mm_unpacklo_epi8(zero, data);
 
 	if (request_type != RSP_MEM_REQUEST_PACK)
 	{
 		data = _mm_srli_epi16(data, 1);
 	}
 
-	_mm_store_si128((rsp_vec_t *) regp, data);
+    data = _mm_shufflehi_epi16(data, _MM_SHUFFLE(0, 1, 2, 3));
+    data = _mm_shufflelo_epi16(data, _MM_SHUFFLE(0, 1, 2, 3));
+
+    _mm_store_si128((rsp_vec_t *) regp, data);
 }
 
 //
@@ -396,6 +406,7 @@ void rsp_cop2::vec_load_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 {
 	UINT32 aligned_addr = addr & 0xFF0;
 	UINT32 offset = addr & 0xF;
+    static UINT32 call_count = 0;
 
 	rsp_vec_t data = _mm_load_si128((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr));
 
@@ -411,7 +422,7 @@ void rsp_cop2::vec_load_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 		ror = 16 - offset;
 	}
 
-#ifndef __SSSE3__
+#if !(defined(__SSSE3__) || defined(_MSC_VER))
 	data = sse2_pshufb(data, m_vec_helpers.ror_b2l_keys[ror & 0xF]);
 	dqm = sse2_pshufb(dqm, m_vec_helpers.ror_b2l_keys[ror & 0xF]);
 #else
@@ -421,7 +432,7 @@ void rsp_cop2::vec_load_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 #endif
 
 	// Mask and mux in the data.
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	data = _mm_blendv_epi8(reg, data, dqm);
 #else
 	data = _mm_and_si128(dqm, data);
@@ -430,6 +441,8 @@ void rsp_cop2::vec_load_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_ve
 #endif
 
 	_mm_store_si128((rsp_vec_t *) regp, data);
+
+    call_count++;
 }
 
 //
@@ -447,15 +460,15 @@ void rsp_cop2::vec_store_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 	UINT32 ror = element - offset;
 
 	// Shift the DQM up to the point where we mux in the data.
-#ifndef __SSSE3__
+#if !(defined(__SSSE3__) || defined(_MSC_VER))
 	dqm = sse2_pshufb(dqm, m_vec_helpers.sll_l2b_keys[offset]);
 #else
-	__m182i ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.sll_l2b_keys[offset]));
+	rsp_vec_t ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.sll_l2b_keys[offset]));
 	dqm = _mm_shuffle_epi8(dqm, ekey);
 #endif
 
 	// Rotate the reg to align with the DQM.
-#ifndef __SSSE3__
+#if !(defined(__SSSE3__) || defined(_MSC_VER))
 	reg = sse2_pshufb(reg, m_vec_helpers.ror_l2b_keys[ror & 0xF]);
 #else
 	ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.ror_l2b_keys[ror & 0xF]));
@@ -474,7 +487,7 @@ void rsp_cop2::vec_store_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 		data = _mm_unpacklo_epi64(data, temp);
 
 		// Mask and mux in the data.
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 		data = _mm_blendv_epi8(data, reg, dqm);
 #else
 		data = _mm_andnot_si128(dqm, data);
@@ -492,7 +505,7 @@ void rsp_cop2::vec_store_group1(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 		data = _mm_loadl_epi64((rsp_vec_t *) (m_rsp.get_dmem() + addr));
 
 		// Mask and mux in the data.
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 		data = _mm_blendv_epi8(data, reg, dqm);
 #else
 		data = _mm_andnot_si128(dqm, data);
@@ -525,7 +538,14 @@ void rsp_cop2::vec_store_group2(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 	reg = _mm_srai_epi16(reg, 8);
 	reg = _mm_packs_epi16(reg, reg);
 
-	// TODO: Always store in 8-byte chunks to emulate wraparound.
+#if !(defined(__SSSE3__) || defined(_MSC_VER))
+	reg = sse2_pshufb(reg, m_vec_helpers.byte_reverse);
+#else
+	rsp_vec_t dkey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.byte_reverse));
+	reg = _mm_shuffle_epi8(reg, dkey);
+#endif
+
+    // TODO: Always store in 8-byte chunks to emulate wraparound.
 	_mm_storel_epi64((rsp_vec_t *) (m_rsp.get_dmem() + addr), reg);
 }
 
@@ -550,7 +570,7 @@ void rsp_cop2::vec_store_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 		dqm = _mm_cmpeq_epi8(_mm_setzero_si128(), dqm);
 	}
 
-#ifndef __SSSE3__
+#if !(defined(__SSSE3__) || defined(_MSC_VER))
 	reg = sse2_pshufb(reg, m_vec_helpers.rol_l2b_keys[rol & 0xF]);
 #else
 	rsp_vec_t ekey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.rol_l2b_keys[rol & 0xF]));
@@ -558,7 +578,7 @@ void rsp_cop2::vec_store_group4(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 #endif
 
   // Mask and mux out the data, write.
-#ifdef __SSE4_1__
+#if (defined(__SSE4_1__) || defined(_MSC_VER))
 	data = _mm_blendv_epi8(data, reg, dqm);
 #else
 	reg = _mm_and_si128(dqm, reg);
@@ -684,6 +704,12 @@ rsp_cop2::rsp_cop2(rsp_device &rsp, running_machine &machine)
 	memset(m_v, 0, sizeof(m_v));
 	memset(m_vflag, 0, sizeof(m_vflag));
 	memset(m_accum, 0, sizeof(m_accum));
+#if USE_SIMD
+    memset(&m_acc, 0, sizeof(m_acc));
+    memset(&m_flags, 0, sizeof(aligned_rsp_2vect_t) * 3);
+    m_div_out = 0;
+    m_div_in = 0;
+#endif
 	m_rspcop2_state = (internal_rspcop2_state *)rsp.m_cache.alloc_near(sizeof(internal_rspcop2_state));
 }
 
@@ -854,12 +880,14 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Load 1 byte to vector byte index
 
+            //printf("LBV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + offset : offset;
 			VREG_B(dest, index) = m_rsp.READ8(ea);
 #endif
+			//
 			break;
 		}
 		case 0x01:      /* LSV */
@@ -871,6 +899,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 2 bytes starting from vector byte index
 
+            //printf("LSV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -884,6 +913,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x02:      /* LLV */
@@ -895,6 +925,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 4 bytes starting from vector byte index
 
+            //printf("LLV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -908,6 +939,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x03:      /* LDV */
@@ -919,6 +951,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads 8 bytes starting from vector byte index
 
+            //printf("LDV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -932,6 +965,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x04:      /* LQV */
@@ -943,6 +977,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads up to 16 bytes starting from vector byte index
 
+            //printf("LQV ");
 #if USE_SIMD
 			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -957,6 +992,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x05:      /* LRV */
@@ -968,6 +1004,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
+            //printf("LRV ");
 #if USE_SIMD
 			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -983,6 +1020,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x06:      /* LPV */
@@ -994,6 +1032,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the upper 8 bits of each element
 
+            //printf("LPV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1004,6 +1043,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_S(dest, i) = m_rsp.READ8(ea + (((16-index) + i) & 0xf)) << 8;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x07:      /* LUV */
@@ -1015,6 +1055,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of each element
 
+            //printf("LUV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1025,6 +1066,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_S(dest, i) = m_rsp.READ8(ea + (((16-index) + i) & 0xf)) << 7;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x08:      /* LHV */
@@ -1036,6 +1078,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of each element, with 2-byte stride
 
+            //printf("LHV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1046,6 +1089,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				VREG_S(dest, i) = m_rsp.READ8(ea + (((16-index) + (i<<1)) & 0xf)) << 7;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x09:      /* LFV */
@@ -1057,6 +1101,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			//
 			// Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
 
+            //printf("LFV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1072,6 +1117,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				ea += 4;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x0a:      /* LWV */
@@ -1084,6 +1130,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
 
+            //printf("LWV ");
 #if USE_SIMD
 #else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
@@ -1096,6 +1143,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				ea += 4;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x0b:      /* LTV */
@@ -1109,22 +1157,27 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 
 			// FIXME: has a small problem with odd indices
 
-#if USE_SIMD
+            //printf("LTV ");
+#if 0
 #else
-			int element;
-			int vs = dest;
-			int ve = dest + 8;
+	        INT32 index = (op >> 7) & 0xf;
+	        INT32 offset = (op & 0x7f);
+	        if (offset & 0x40)
+		        offset |= 0xffffffc0;
+
+            INT32 vs = (op >> 16) & 0x1f;
+			INT32 ve = vs + 8;
 			if (ve > 32)
 				ve = 32;
 
-			element = 7 - (index >> 1);
+			INT32 element = 7 - (index >> 1);
 
 			if (index & 1)  fatalerror("RSP: LTV: index = %d\n", index);
 
-			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+			UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
 			ea = ((ea + 8) & ~0xf) + (index & 1);
-			for (i=vs; i < ve; i++)
+			for (INT32 i = vs; i < ve; i++)
 			{
 				element = ((8 - (index >> 1) + (i-vs)) << 1);
 				VREG_B(i, (element & 0xf)) = m_rsp.READ8(ea);
@@ -1133,6 +1186,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 				ea += 2;
 			}
 #endif
+			//
 			break;
 		}
 
@@ -1174,12 +1228,14 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 1 byte from vector byte index
 
+            //printf("SBV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + offset : offset;
 			m_rsp.WRITE8(ea, VREG_B(dest, index));
 #endif
+			//
 			break;
 		}
 		case 0x01:      /* SSV */
@@ -1191,6 +1247,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 2 bytes starting from vector byte index
 
+            //printf("SSV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1204,6 +1261,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x02:      /* SLV */
@@ -1215,6 +1273,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 4 bytes starting from vector byte index
 
+            //printf("SLV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1228,6 +1287,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x03:      /* SDV */
@@ -1239,6 +1299,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores 8 bytes starting from vector byte index
 
+            //printf("SDV ");
 #if USE_SIMD
 			vec_lbdlsv_sbdlsv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1252,6 +1313,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x04:      /* SQV */
@@ -1263,6 +1325,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from vector byte index until 16-byte boundary
 
+            //printf("SQV ");
 #if USE_SIMD
 			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1276,6 +1339,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x05:      /* SRV */
@@ -1287,6 +1351,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores up to 16 bytes starting from right side until 16-byte boundary
 
+            //printf("SRV ");
 #if USE_SIMD
 			vec_lqrv_sqrv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1303,6 +1368,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x06:      /* SPV */
@@ -1314,6 +1380,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores upper 8 bits of each element
 
+            //printf("SPV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1333,6 +1400,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x07:      /* SUV */
@@ -1344,6 +1412,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores bits 14-7 of each element
 
+            //printf("SUV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1363,6 +1432,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				ea++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x08:      /* SHV */
@@ -1374,6 +1444,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores bits 14-7 of each element, with 2-byte stride
 
+            //printf("SHV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1388,6 +1459,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				ea += 2;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x09:      /* SFV */
@@ -1401,6 +1473,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 
 			// FIXME: only works for index 0 and index 8
 
+            //printf("SFV ");
 #if USE_SIMD
 			vec_lfhpuv_sfhpuv(op, m_rsp.m_rsp_state->r[base]);
 #else
@@ -1417,6 +1490,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				eaoffset += 4;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x0a:      /* SWV */
@@ -1429,6 +1503,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			// Stores the full 128-bit vector starting from vector byte index and wrapping to index 0
 			// after byte index 15
 
+            //printf("SWV ");
 #if USE_SIMD
 #else
 			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
@@ -1444,6 +1519,7 @@ void rsp_cop2::handle_swc2(UINT32 op)
 				eaoffset++;
 			}
 #endif
+			//
 			break;
 		}
 		case 0x0b:      /* STV */
@@ -1455,28 +1531,34 @@ void rsp_cop2::handle_swc2(UINT32 op)
 			//
 			// Stores one element from maximum of 8 vectors, while incrementing element index
 
-#if USE_SIMD
+            //printf("STV ");
+#if 0
 #else
-			int element;
-			int vs = dest;
-			int ve = dest + 8;
+	        INT32 index = (op >> 7) & 0xf;
+	        INT32 offset = (op & 0x7f);
+	        if (offset & 0x40)
+		        offset |= 0xffffffc0;
+
+			INT32 vs = (op >> 16) & 0x1f;
+			INT32 ve = vs + 8;
 			if (ve > 32)
 				ve = 32;
 
-			element = 8 - (index >> 1);
+			INT32 element = 8 - (index >> 1);
 
-			ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
+			UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
-			eaoffset = (ea & 0xf) + (element * 2);
+			INT32 eaoffset = (ea & 0xf) + (element * 2);
 			ea &= ~0xf;
 
-			for (i=vs; i < ve; i++)
+            for (INT32 i = vs; i < ve; i++)
 			{
 				m_rsp.WRITE16(ea + (eaoffset & 0xf), VREG_S(i, element & 0x7));
 				eaoffset += 2;
 				element++;
 			}
 #endif
+			//
 			break;
 		}
 
@@ -1575,6 +1657,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Multiplies signed integer by signed integer * 2
 
+            //printf("MULF ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1613,6 +1696,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 
 		}
@@ -1625,6 +1709,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// ------------------------------------------------------
 			//
 
+            //printf("MULU ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1665,6 +1750,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -1679,6 +1765,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Stores the higher 16 bits of the 32-bit result to accumulator
 			// The low slice of accumulator is stored into destination element
 
+            //printf("MUDL ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1710,6 +1797,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -1724,6 +1812,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into accumulator
 			// The middle slice of accumulator is stored into destination element
 
+            //printf("MUDM ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1755,6 +1844,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 
 		}
@@ -1770,13 +1860,12 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into accumulator
 			// The low slice of accumulator is stored into destination element
 
+            //printf("MUDN ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
-			rsp_vec_t acc_lo, acc_mid, acc_hi;
-
-			acc_lo = read_acc_lo(acc);
-			acc_mid = read_acc_mid(acc);
-			acc_hi = read_acc_hi(acc);
+			rsp_vec_t acc_lo = read_acc_lo(acc);
+			rsp_vec_t acc_mid = read_acc_mid(acc);
+			rsp_vec_t acc_hi = read_acc_hi(acc);
 
 			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
 			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
@@ -1801,6 +1890,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -1815,6 +1905,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is stored into highest 32 bits of accumulator, the low slice is zero
 			// The highest 32 bits of accumulator is saturated into destination element
 
+            //printf("MUDH ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1848,6 +1939,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -1861,6 +1953,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Multiplies signed integer by signed integer * 2
 			// The result is added to accumulator
 
+            //printf("MACF ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1900,6 +1993,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 		case 0x09:      /* VMACU */
@@ -1910,6 +2004,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// ------------------------------------------------------
 			//
 
+            //printf("MACU ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -1964,6 +2059,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -1978,6 +2074,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Adds the higher 16 bits of the 32-bit result to accumulator
 			// The low slice of accumulator is stored into destination element
 
+            //printf("MADL ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2011,6 +2108,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2025,6 +2123,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into accumulator
 			// The middle slice of accumulator is stored into destination element
 
+            //printf("MADM ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2060,6 +2159,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2074,6 +2174,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into accumulator
 			// The low slice of accumulator is stored into destination element
 
+            //printf("MADN ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2112,6 +2213,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			WRITEBACK_RESULT();
 
 #endif
+			//
 			break;
 		}
 
@@ -2126,6 +2228,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// The result is added into highest 32 bits of accumulator, the low slice is zero
 			// The highest 32 bits of accumulator is saturated into destination element
 
+            //printf("MADH ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t acc_lo, acc_mid, acc_hi;
@@ -2160,6 +2263,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			WRITEBACK_RESULT();
 
 #endif
+			//
 			break;
 		}
 
@@ -2174,6 +2278,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG == VDREG
 
+            //printf("ADD ");
 #if USE_SIMD
 			rsp_vec_t acc_lo;
 			UINT16 *acc = m_acc.s;
@@ -2204,6 +2309,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_CARRY_FLAGS();
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2218,6 +2324,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG == VDREG
 
+            //printf("SUB ");
 #if USE_SIMD
 			rsp_vec_t acc_lo;
 			UINT16 *acc = m_acc.s;
@@ -2249,6 +2356,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_CARRY_FLAGS();
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2262,6 +2370,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Changes the sign of source register 2 if source register 1 is negative and stores
 			// the result to destination register
 
+            //printf("ABS ");
 #if USE_SIMD
 			rsp_vec_t acc_lo;
 			UINT16 *acc = m_acc.s;
@@ -2302,6 +2411,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2316,6 +2426,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG = VDREG
 
+            //printf("ADDC ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t sn;
@@ -2348,6 +2459,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2362,6 +2474,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			// TODO: check VS2REG = VDREG
 
+            //printf("SUBC ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t eq, sn;
@@ -2398,6 +2511,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2410,6 +2524,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Stores high, middle or low slice of accumulator to destination vector
 
+            //printf("SAW ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			switch (EL)
@@ -2460,6 +2575,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 					exit(0);
 			}
 #endif
+			//
 			break;
 		}
 
@@ -2473,6 +2589,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are less than VS2
 			// Moves the element in VS2 to destination vector
 
+            //printf("LT ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le;
@@ -2527,6 +2644,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2540,6 +2658,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are equal with VS2
 			// Moves the element in VS2 to destination vector
 
+            //printf("EQ ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le;
@@ -2582,6 +2701,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_CARRY_FLAGS();
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2595,6 +2715,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are not equal with VS2
 			// Moves the element in VS2 to destination vector
 
+            //printf("NE ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le;
@@ -2638,6 +2759,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2651,6 +2773,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			// Sets compare flags if elements in VS1 are greater or equal with VS2
 			// Moves the element in VS2 to destination vector
 
+            //printf("GE ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t le;
@@ -2694,6 +2817,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_ZERO_FLAGS();
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2706,6 +2830,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip low
 
+            //printf("CL ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -2717,7 +2842,6 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
 			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
-
 			m_v[VDREG].v = vec_vcl(vs, vt_shuffle, vec_zero(), &ge, &le, eq, sign, vce);
 
 			write_vcc_hi(m_flags[RSP_VCC].s, ge);
@@ -2732,11 +2856,11 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				INT16 s1 = VREG_S(VS1REG, i);
 				INT16 s2 = VREG_S(VS2REG, VEC_EL_2(EL, i));
 
-				if (CARRY_FLAG(i) != 0)
+				if (CARRY_FLAG(i) != 0) // vco_lo
 				{
-					if (ZERO_FLAG(i) != 0)
+					if (ZERO_FLAG(i) != 0) // vco_hi
 					{
-						if (COMPARE_FLAG(i) != 0)
+						if (COMPARE_FLAG(i) != 0) // vcc_lo
 						{
 							SET_ACCUM_L(-(UINT16)s2, i);
 						}
@@ -2747,7 +2871,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 					}
 					else
 					{
-						if (CLIP1_FLAG(i) != 0)
+						if (CLIP1_FLAG(i) != 0) // vce
 						{
 							if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
 							{
@@ -2777,9 +2901,9 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				}
 				else
 				{
-					if (ZERO_FLAG(i) != 0)
+					if (ZERO_FLAG(i) != 0) // vco_hi
 					{
-						if (CLIP2_FLAG(i) != 0)
+						if (CLIP2_FLAG(i) != 0) // vcc_hi
 						{
 							SET_ACCUM_L(s2, i);
 						}
@@ -2805,11 +2929,12 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 				m_vres[i] = ACCUM_L(i);
 			}
-			CLEAR_CARRY_FLAGS();
-			CLEAR_ZERO_FLAGS();
-			CLEAR_CLIP1_FLAGS();
+			CLEAR_CARRY_FLAGS(); // vco_lo
+			CLEAR_ZERO_FLAGS(); // vco_hi
+			CLEAR_CLIP1_FLAGS(); // vce
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2822,6 +2947,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip high
 
+            //printf("CH ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t ge, le, sign, eq, vce;
@@ -2911,6 +3037,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2923,6 +3050,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector clip reverse
 
+            //printf("CR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 			rsp_vec_t ge, le;
@@ -2987,6 +3115,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -2999,9 +3128,10 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Merges two vectors according to compare flags
 
+            //printf("MRG ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
-			rsp_vec_t le = read_vcc_lo(m_flags[RSP_VCO].s);
+			rsp_vec_t le = read_vcc_lo(m_flags[RSP_VCC].s);
 
 			rsp_vec_t vs = vec_load_unshuffled_operand(m_v[VS1REG].s);
 			rsp_vec_t vt_shuffle = vec_load_and_shuffle_operand(m_v[VS2REG].s, EL);
@@ -3027,6 +3157,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 		case 0x28:      /* VAND */
@@ -3038,6 +3169,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise AND of two vector registers
 
+            //printf("AND ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3055,6 +3187,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 		case 0x29:      /* VNAND */
@@ -3066,6 +3199,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT AND of two vector registers
 
+            //printf("NAND ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3083,6 +3217,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 		case 0x2a:      /* VOR */
@@ -3094,6 +3229,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise OR of two vector registers
 
+            //printf("OR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3111,6 +3247,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 		case 0x2b:      /* VNOR */
@@ -3122,6 +3259,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT OR of two vector registers
 
+            //printf("NOR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3139,6 +3277,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 		case 0x2c:      /* VXOR */
@@ -3150,6 +3289,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise XOR of two vector registers
 
+            //printf("XOR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3167,6 +3307,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 		case 0x2d:      /* VNXOR */
@@ -3178,6 +3319,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Bitwise NOT XOR of two vector registers
 
+            //printf("NXOR ");
 #if USE_SIMD
 			UINT16 *acc = m_acc.s;
 
@@ -3195,6 +3337,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 			WRITEBACK_RESULT();
 #endif
+			//
 			break;
 		}
 
@@ -3207,6 +3350,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal
 
+            //printf("RCP ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3264,6 +3408,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 
 #endif
+			//
 			break;
 		}
 
@@ -3276,6 +3421,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal low part
 
+            //printf("RCPL ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3349,6 +3495,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 
 #endif
+			//
 			break;
 		}
 
@@ -3361,6 +3508,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal high part
 
+            //printf("RCPH ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3379,6 +3527,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			VREG_S(VDREG, VS1REG & 7) = (INT16)(m_reciprocal_res >> 16);
 
 #endif
+			//
 			break;
 		}
 
@@ -3391,6 +3540,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Moves element from vector to destination vector
 
+            //printf("MOV ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 			m_v[VDREG].v = vec_vmov(VS2REG, EL, VDREG, VS1REG);
@@ -3401,6 +3551,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
 			}
 #endif
+			//
 			break;
 		}
 
@@ -3413,6 +3564,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root
 
+            //printf("RSQ ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3471,6 +3623,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 
 #endif
+			//
 			break;
 		}
 
@@ -3483,6 +3636,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root low part
 
+            //printf("RSQL ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3559,6 +3713,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			}
 
 #endif
+			//
 			break;
 		}
 
@@ -3571,6 +3726,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Calculates reciprocal square-root high part
 
+            //printf("RSQH ");
 #if USE_SIMD
 			write_acc_lo(m_acc.s, vec_load_and_shuffle_operand(m_v[VS2REG].s, EL));
 
@@ -3588,6 +3744,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 
 			VREG_S(VDREG, VS1REG & 7) = (INT16)(m_reciprocal_res >> 16);    // store high part
 #endif
+			//
 			break;
 		}
 
@@ -3600,6 +3757,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			//
 			// Vector null instruction
 
+            //printf("NOP ");
 			break;
 		}
 
@@ -3622,6 +3780,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			// | 010010 | 00000 | TTTTT | DDDDD | IIII | 0000000 |
 			// ---------------------------------------------------
 			//
+            //printf("MFC2 ");
 			int el = (op >> 7) & 0xf;
 			UINT16 b1 = VREG_B(RDREG, (el+0) & 0xf);
 			UINT16 b2 = VREG_B(RDREG, (el+1) & 0xf);
@@ -3636,8 +3795,16 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			// | 010010 | 00010 | TTTTT | DDDDD | 00000000000 |
 			// ------------------------------------------------
 			//
+            //printf("CFC2 ");
 			if (RTREG)
 			{
+#if USE_SIMD
+                INT32 src = RDREG & 3;
+                if (src == 3) {
+                    src = 2;
+                }
+                RTVAL = get_flags(m_flags[src].s);
+#else
 				switch(RDREG)
 				{
 					case 0:
@@ -3689,6 +3856,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 						((CLIP1_FLAG(6) & 1) << 6) |
 						((CLIP1_FLAG(7) & 1) << 7);
 				}
+#endif
 			}
 			break;
 		}
@@ -3700,6 +3868,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			// | 010010 | 00100 | TTTTT | DDDDD | IIII | 0000000 |
 			// ---------------------------------------------------
 			//
+            //printf("MTC2 ");
 			int el = (op >> 7) & 0xf;
 			W_VREG_B(RDREG, (el+0) & 0xf, (RTVAL >> 8) & 0xff);
 			W_VREG_B(RDREG, (el+1) & 0xf, (RTVAL >> 0) & 0xff);
@@ -3713,6 +3882,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			// | 010010 | 00110 | TTTTT | DDDDD | 00000000000 |
 			// ------------------------------------------------
 			//
+            //printf("CTC2 ");
 			switch(RDREG)
 			{
 				case 0:
@@ -3775,6 +3945,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 		{
+            //printf("V");
 			handle_vector_ops(op);
 			break;
 		}
@@ -3783,6 +3954,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			m_rsp.unimplemented_opcode(op);
 			break;
 	}
+	//dump(op);
 }
 
 inline void rsp_cop2::mfc2()
@@ -3975,4 +4147,55 @@ void rsp_cop2::log_instruction_execution()
 		prev_vecs[i].d[0] = m_v[i].d[0];
 		prev_vecs[i].d[1] = m_v[i].d[1];
 	}
+}
+
+void rsp_cop2::dump(UINT32 op)
+{
+	printf("%08x ", op);
+	for (int i = 0; i < 32; i++)
+	{
+		printf("%08x ", m_rsp.m_rsp_state->r[i]);
+	}
+	printf("\n");
+
+	for (int i = 0; i < 32; i++)
+	{
+		printf("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", VREG_B(i, 0), VREG_B(i, 1), VREG_B(i, 2), VREG_B(i, 3), VREG_B(i, 4), VREG_B(i, 5), VREG_B(i, 6), VREG_B(i, 7), VREG_B(i, 8), VREG_B(i, 9), VREG_B(i, 10), VREG_B(i, 11), VREG_B(i, 12), VREG_B(i, 13), VREG_B(i, 14), VREG_B(i, 15));
+	}
+
+#if USE_SIMD
+    printf("acc_h: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[0], m_acc.s[1], m_acc.s[2], m_acc.s[3], m_acc.s[4], m_acc.s[5], m_acc.s[6], m_acc.s[7]);
+    printf("acc_m: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[8], m_acc.s[9], m_acc.s[10], m_acc.s[11], m_acc.s[12], m_acc.s[13], m_acc.s[14], m_acc.s[15]);
+    printf("acc_l: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_acc.s[16], m_acc.s[17], m_acc.s[18], m_acc.s[19], m_acc.s[20], m_acc.s[21], m_acc.s[22], m_acc.s[23]);
+    printf("vcc_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCC].s[0], m_flags[RSP_VCC].s[1], m_flags[RSP_VCC].s[2], m_flags[RSP_VCC].s[3], m_flags[RSP_VCC].s[4], m_flags[RSP_VCC].s[5], m_flags[RSP_VCC].s[6], m_flags[RSP_VCC].s[7]);
+    printf("vcc_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCC].s[8], m_flags[RSP_VCC].s[9], m_flags[RSP_VCC].s[10], m_flags[RSP_VCC].s[11], m_flags[RSP_VCC].s[12], m_flags[RSP_VCC].s[13], m_flags[RSP_VCC].s[14], m_flags[RSP_VCC].s[15]);
+    printf("vco_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCO].s[0], m_flags[RSP_VCO].s[1], m_flags[RSP_VCO].s[2], m_flags[RSP_VCO].s[3], m_flags[RSP_VCO].s[4], m_flags[RSP_VCO].s[5], m_flags[RSP_VCO].s[6], m_flags[RSP_VCO].s[7]);
+    printf("vco_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCO].s[8], m_flags[RSP_VCO].s[9], m_flags[RSP_VCO].s[10], m_flags[RSP_VCO].s[11], m_flags[RSP_VCO].s[12], m_flags[RSP_VCO].s[13], m_flags[RSP_VCO].s[14], m_flags[RSP_VCO].s[15]);
+    printf("vce:    %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_flags[RSP_VCE].s[0], m_flags[RSP_VCE].s[1], m_flags[RSP_VCE].s[2], m_flags[RSP_VCE].s[3], m_flags[RSP_VCE].s[4], m_flags[RSP_VCE].s[5], m_flags[RSP_VCE].s[6], m_flags[RSP_VCE].s[7]);
+#else
+    printf("acc_h: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_H(0), ACCUM_H(1), ACCUM_H(2), ACCUM_H(3), ACCUM_H(4), ACCUM_H(5), ACCUM_H(6), ACCUM_H(7));
+    printf("acc_m: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_M(0), ACCUM_M(1), ACCUM_M(2), ACCUM_M(3), ACCUM_M(4), ACCUM_M(5), ACCUM_M(6), ACCUM_M(7));
+    printf("acc_l: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", ACCUM_L(0), ACCUM_L(1), ACCUM_L(2), ACCUM_L(3), ACCUM_L(4), ACCUM_L(5), ACCUM_L(6), ACCUM_L(7));
+    printf("vcc_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[4][0], m_vflag[4][1], m_vflag[4][2], m_vflag[4][3], m_vflag[4][4], m_vflag[4][5], m_vflag[4][6], m_vflag[4][7]);
+    printf("vcc_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[1][0], m_vflag[1][1], m_vflag[1][2], m_vflag[1][3], m_vflag[1][4], m_vflag[1][5], m_vflag[1][6], m_vflag[1][7]);
+    printf("vco_hi: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[3][0], m_vflag[3][1], m_vflag[3][2], m_vflag[3][3], m_vflag[3][4], m_vflag[3][5], m_vflag[3][6], m_vflag[3][7]);
+    printf("vco_lo: %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[0][0], m_vflag[0][1], m_vflag[0][2], m_vflag[0][3], m_vflag[0][4], m_vflag[0][5], m_vflag[0][6], m_vflag[0][7]);
+    printf("vce:    %04x|%04x|%04x|%04x|%04x|%04x|%04x|%04x\n", m_vflag[2][0], m_vflag[2][1], m_vflag[2][2], m_vflag[2][3], m_vflag[2][4], m_vflag[2][5], m_vflag[2][6], m_vflag[2][7]);
+#endif
+}
+
+void rsp_cop2::dump_dmem()
+{
+    UINT8* dmem = m_rsp.get_dmem();
+    printf("\n");
+    for (int i = 0; i < 0x1000; i += 32)
+    {
+        printf("%04x: ", i);
+        for (int j = 0; j < 32; j++)
+        {
+            printf("%02x ", dmem[i + j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }

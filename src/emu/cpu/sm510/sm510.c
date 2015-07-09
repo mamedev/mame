@@ -12,6 +12,7 @@
   
   TODO:
   - proper support for LFSR program counter in debugger
+  - callback for lcd screen as MAME bitmap (when needed)
 
 */
 
@@ -36,15 +37,16 @@ void sm510_base_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 
-	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::div_timer_cb), this));
-	reset_divider();
-
 	// resolve callbacks
 	m_read_k.resolve_safe(0);
 	m_read_ba.resolve_safe(1);
 	m_read_b.resolve_safe(1);
 	m_write_s.resolve_safe();
 	m_write_r.resolve_safe();
+
+	m_write_sega.resolve_safe();
+	m_write_segb.resolve_safe();
+	m_write_segc.resolve_safe();
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
@@ -59,7 +61,7 @@ void sm510_base_device::device_start()
 	m_c = 0;
 	m_skip = false;
 	m_w = 0;
-//	m_div = 0;
+	m_div = 0;
 	m_1s = false;
 	m_k_active = false;
 	m_bp = false;
@@ -98,6 +100,9 @@ void sm510_base_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
 
 	m_icountptr = &m_icount;
+
+	init_divider();
+	init_lcd_driver();
 }
 
 
@@ -120,6 +125,45 @@ void sm510_base_device::device_reset()
 	
 	m_write_r(0, 0, 0xff);
 	// y=0(bs), r=0
+}
+
+
+
+//-------------------------------------------------
+//  lcd driver
+//-------------------------------------------------
+
+inline UINT16 sm510_base_device::get_lcd_row(int column, UINT8* ram)
+{
+	// output 0 if lcd blackpate/bleeder is off, or in case row doesn't exist
+	if (ram == NULL || m_bc || !m_bp)
+		return 0;
+	
+	UINT16 rowdata = 0;
+	for (int i = 0; i < 0x10; i++)
+		rowdata |= (ram[i] >> column & 1) << i;
+	
+	return rowdata;
+}
+
+TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
+{
+	// 4 columns, 16 segments per row
+	for (int h = 0; h < 4; h++)
+	{
+		m_write_sega(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
+		m_write_segb(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
+		m_write_segc(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
+	}
+	
+	// schedule next timeout
+	m_lcd_timer->adjust(attotime::from_ticks(0x200, unscaled_clock()));
+}
+
+void sm510_base_device::init_lcd_driver()
+{
+	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::lcd_timer_cb), this));
+	m_lcd_timer->adjust(attotime::from_ticks(0x200, unscaled_clock())); // 64hz default
 }
 
 
@@ -173,6 +217,12 @@ void sm510_base_device::reset_divider()
 {
 	m_div = 0;
 	m_div_timer->adjust(attotime::from_ticks(0x800, unscaled_clock()));
+}
+
+void sm510_base_device::init_divider()
+{
+	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::div_timer_cb), this));
+	reset_divider();
 }
 
 
