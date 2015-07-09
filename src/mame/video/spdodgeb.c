@@ -8,10 +8,8 @@
 PALETTE_INIT_MEMBER(spdodgeb_state, spdodgeb)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -73,6 +71,12 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 void spdodgeb_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spdodgeb_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(spdodgeb_state::background_scan),this),8,8,64,32);
+
+	membank("mainbank")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+
+	save_item(NAME(m_tile_palbank));
+	save_item(NAME(m_sprite_palbank));
+	save_item(NAME(m_lastscroll));
 }
 
 
@@ -83,7 +87,7 @@ void spdodgeb_state::video_start()
 ***************************************************************************/
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::spdodgeb_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::interrupt)
 {
 	int scanline = param;
 
@@ -99,20 +103,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::spdodgeb_interrupt)
 	}
 }
 
-WRITE8_MEMBER(spdodgeb_state::spdodgeb_scrollx_lo_w)
+WRITE8_MEMBER(spdodgeb_state::scrollx_lo_w)
 {
 	m_lastscroll = (m_lastscroll & 0x100) | data;
 }
 
-WRITE8_MEMBER(spdodgeb_state::spdodgeb_ctrl_w)
+WRITE8_MEMBER(spdodgeb_state::ctrl_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
-
 	/* bit 0 = flip screen */
 	flip_screen_set(data & 0x01);
 
 	/* bit 1 = ROM bank switch */
-	membank("bank1")->set_base(rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
+	membank("mainbank")->set_entry((~data & 0x02) >> 1);
 
 	/* bit 2 = scroll high bit */
 	m_lastscroll = (m_lastscroll & 0x0ff) | ((data & 0x04) << 6);
@@ -128,7 +130,7 @@ WRITE8_MEMBER(spdodgeb_state::spdodgeb_ctrl_w)
 	m_sprite_palbank = (data & 0xc0) >> 6;
 }
 
-WRITE8_MEMBER(spdodgeb_state::spdodgeb_videoram_w)
+WRITE8_MEMBER(spdodgeb_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -148,22 +150,17 @@ WRITE8_MEMBER(spdodgeb_state::spdodgeb_videoram_w)
 
 void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	UINT8 *src;
-	int i;
-
-	src = spriteram;
 
 /*  240-SY   Z|F|CLR|WCH WHICH    SX
     xxxxxxxx x|x|xxx|xxx xxxxxxxx xxxxxxxx
 */
-	for (i = 0;i < m_spriteram.bytes();i += 4)
+	for (int i = 0;i < m_spriteram.bytes();i += 4)
 	{
-		int attr = src[i+1];
-		int which = src[i+2]+((attr & 0x07)<<8);
-		int sx = src[i+3];
-		int sy = 240 - src[i];
+		int attr = m_spriteram[i+1];
+		int which = m_spriteram[i+2]+((attr & 0x07)<<8);
+		int sx = m_spriteram[i+3];
+		int sy = 240 - m_spriteram[i];
 		int size = (attr & 0x80) >> 7;
 		int color = (attr & 0x38) >> 3;
 		int flipx = ~attr & 0x40;
@@ -203,7 +200,7 @@ void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 #undef DRAW_SPRITE
 
 
-UINT32 spdodgeb_state::screen_update_spdodgeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 spdodgeb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,m_lastscroll+5);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
