@@ -365,7 +365,7 @@ NETLIST_START(opamp)
 	AFUNC(fUL, 1, "A0 1.2 +")
 
 	ALIAS(VCC, fUH.A0) // VCC terminal
-	ALIAS(GND, fUL.A0) // VCC terminal
+	ALIAS(GND, fUL.A0) // VGND terminal
 
 	AFUNC(fVREF, 2, "A0 A1 + 0.5 *")
 	NET_C(fUH.A0, fVREF.A0)
