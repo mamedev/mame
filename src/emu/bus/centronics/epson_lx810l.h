@@ -116,7 +116,7 @@ private:
 	UINT8 m_fakemem;
 
 	enum {
-		TIMER_CR,
+		TIMER_CR
 	};
 };
 

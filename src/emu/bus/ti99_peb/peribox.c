@@ -450,7 +450,7 @@ peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char
 	// a maximum address space of 512 KiB in the box. With the Genmod
 	// modification, the full 2 MiB space is available.
 	m_address_prefix = 0x00000;
-};
+}
 
 // The BwG controller will not run with the Geneve due to its wait state
 // logic; it assumes that before reading 5FF6 (data register), address 5FF7
@@ -501,7 +501,7 @@ peribox_998_device::peribox_998_device(const machine_config &mconfig, const char
 : peribox_device(mconfig, PERIBOX_998, "Peripheral expansion box 99/8", tag, owner, clock, "peribox_998", __FILE__)
 {
 	m_address_prefix = 0x70000;
-};
+}
 
 // The BwG controller will not run with the TI-99/8 for the same reason why
 // it won't work with the Geneve.
@@ -540,7 +540,7 @@ peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *
 : peribox_device(mconfig, PERIBOX_SG, "Peripheral expansion box SGCPU", tag, owner, clock, "peribox_sg", __FILE__)
 {
 	m_address_prefix = 0x70000;
-};
+}
 
 SLOT_INTERFACE_START( peribox_slotp )
 	SLOT_INTERFACE("pcode", TI99_P_CODE)
@@ -581,7 +581,7 @@ peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *
 : peribox_device(mconfig, PERIBOX_EV, "Peripheral expansion box EVPC", tag, owner, clock, "peribox_ev", __FILE__)
 {
 	m_address_prefix = 0x70000;
-};
+}
 
 MACHINE_CONFIG_FRAGMENT( peribox_ev_device )
 	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT2, peribox_ev_slot, "evpc" )

@@ -53,7 +53,7 @@ enum
 	STATE_S2,
 	STATE_S3,
 	STATE_SW,
-	STATE_S4,
+	STATE_S4
 };
 
 

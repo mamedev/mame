@@ -66,7 +66,7 @@ enum model_t
 	PCIMODEL_MAC_PBG3WALLST1,
 	PCIMODEL_MAC_PBG3WALLST2,
 
-	PCIMODEL_MAC_PIPPIN,    // Apple/Bandai Pippin
+	PCIMODEL_MAC_PIPPIN    // Apple/Bandai Pippin
 
 };
 

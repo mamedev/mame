@@ -352,7 +352,8 @@ static void mbc55x_debug(running_machine &machine, int ref, int params, const ch
 	mbc55x_state *state = machine.driver_data<mbc55x_state>();
 	if(params>0)
 	{
-		sscanf(param[0],"%d",&state->m_debug_machine);
+		int temp;
+		sscanf(param[0],"%d",&temp); state->m_debug_machine = temp;
 	}
 	else
 	{

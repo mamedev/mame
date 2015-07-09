@@ -174,7 +174,7 @@ void mc68681_device::update_interrupts()
 		write_irq(CLEAR_LINE);
 		m_read_vector = false;  // clear IACK too
 	}
-};
+}
 
 double mc68681_device::duart68681_get_ct_rate()
 {
@@ -286,7 +286,7 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 		duart68681_start_ct(0xffff);
 	}
 
-};
+}
 
 READ8_MEMBER( mc68681_device::read )
 {
@@ -630,7 +630,7 @@ int mc68681_device::calc_baud(int ch, UINT8 data)
 	}
 
 	return baud_rate;
-};
+}
 
 void mc68681_device::clear_ISR_bits(int mask)
 {
@@ -901,7 +901,7 @@ UINT8 mc68681_channel::read_rx_fifo()
 //  printf("Rx read %02x\n", rv);
 
 	return rv;
-};
+}
 
 UINT8 mc68681_channel::read_chan_reg(int reg)
 {
@@ -976,7 +976,7 @@ void mc68681_channel::write_MR(UINT8 data)
 	}
 	recalc_framing();
 	update_interrupts();
-};
+}
 
 void mc68681_channel::recalc_framing()
 {
@@ -1114,7 +1114,7 @@ void mc68681_channel::write_CR(UINT8 data)
 	}
 
 	update_interrupts();
-};
+}
 
 void mc68681_channel::write_TX(UINT8 data)
 {
@@ -1139,7 +1139,7 @@ void mc68681_channel::write_TX(UINT8 data)
 	transmit_register_setup(tx_data);
 
 	update_interrupts();
-};
+}
 
 void mc68681_channel::ACR_updated()
 {

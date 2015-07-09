@@ -200,7 +200,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_b_w )
 	m_led_sel = (m_led_sel & 0xff) | ((data & 0x03)<<8);
 
 	m_speaker->level_w(BIT(data, 6));
-};
+}
 
 READ8_MEMBER( chessmst_state::pio2_port_a_r )
 {

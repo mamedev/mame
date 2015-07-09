@@ -113,7 +113,7 @@ private:
 		REG_B_UIE = 16,
 		REG_B_AIE = 32,
 		REG_B_PIE = 64,
-		REG_B_SET = 128,
+		REG_B_SET = 128
 	};
 
 	enum

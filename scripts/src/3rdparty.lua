@@ -414,7 +414,7 @@ project "mongoose"
 		"ForceCPP",
 	}
 	defines {
-		"MONGOOSE_ENABLE_THREADS",
+--		"MONGOOSE_ENABLE_THREADS",  -- newest version does this now
 		"NS_STACK_SIZE=0"
 	}
 
@@ -580,6 +580,11 @@ project "bgfx"
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
+		buildoptions {		
+			"-Wno-error=pedantic",
+			"-Wno-pedantic"
+		}
+
 
 	configuration { "osx*" }
 		includedirs {

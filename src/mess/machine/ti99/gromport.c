@@ -2066,7 +2066,7 @@ rpk::rpk(emu_options& options, const char* sysname)
 	//,m_system_name(sysname)
 {
 	m_sockets.reset();
-};
+}
 
 rpk::~rpk()
 {
@@ -2126,12 +2126,12 @@ void rpk::close()
 rpk_socket::rpk_socket(const char* id, int length, UINT8* contents, const char *pathname)
 : m_id(id), m_length(length), m_next(NULL), m_contents(contents), m_pathname(pathname)
 {
-};
+}
 
 rpk_socket::rpk_socket(const char* id, int length, UINT8* contents)
 : m_id(id), m_length(length), m_next(NULL), m_contents(contents), m_pathname(NULL)
 {
-};
+}
 
 /*
     Locate a file in the ZIP container
@@ -2234,7 +2234,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 	const char* ram_type;
 	const char* ram_filename;
 	const char* ram_pname;
-	int length;
+	unsigned int length;
 	UINT8* contents;
 
 	// find the length attribute

@@ -91,7 +91,7 @@ private:
 	{
 		DCD_IRQ_NONE = 0,
 		DCD_IRQ_READ_DATA,
-		DCD_IRQ_READ_STATUS,
+		DCD_IRQ_READ_STATUS
 	};
 
 	devcb_write_line m_txd_handler;

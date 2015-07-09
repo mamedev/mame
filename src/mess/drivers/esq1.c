@@ -537,7 +537,7 @@ ADDRESS_MAP_END
 WRITE_LINE_MEMBER(esq1_state::duart_irq_handler)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
-};
+}
 
 WRITE8_MEMBER(esq1_state::duart_output)
 {

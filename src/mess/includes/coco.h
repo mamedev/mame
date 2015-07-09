@@ -188,7 +188,7 @@ private:
 		HIRES_RIGHT = 0x01,
 		HIRES_RIGHT_COCOMAX3 = 0x02,
 		HIRES_LEFT = 0x03,
-		HIRES_LEFT_COCOMAX3 = 0x04,
+		HIRES_LEFT_COCOMAX3 = 0x04
 	};
 
 	struct analog_input_t

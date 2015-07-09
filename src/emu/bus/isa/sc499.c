@@ -1287,7 +1287,7 @@ sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig
 void sc499_ctape_image_device::device_config_complete()
 {
 	update_names(SC499_CTAPE, "ctape", "ct");
-};
+}
 
 
 UINT8 *sc499_ctape_image_device::read_block(int block_num)

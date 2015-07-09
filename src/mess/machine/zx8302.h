@@ -183,7 +183,7 @@ private:
 		MODE_SER2               = 0x08,
 		MODE_MDV                = 0x10,
 		MODE_NET                = 0x18,
-		MODE_MASK               = 0x18,
+		MODE_MASK               = 0x18
 	};
 
 	enum
@@ -192,7 +192,7 @@ private:
 		INT_INTERFACE           = 0x02,
 		INT_TRANSMIT            = 0x04,
 		INT_FRAME               = 0x08,
-		INT_EXTERNAL            = 0x10,
+		INT_EXTERNAL            = 0x10
 	};
 
 	enum
@@ -200,7 +200,7 @@ private:
 		STATUS_NETWORK_PORT     = 0x01,
 		STATUS_TX_BUFFER_FULL   = 0x02,
 		STATUS_RX_BUFFER_FULL   = 0x04,
-		STATUS_MICRODRIVE_GAP   = 0x08,
+		STATUS_MICRODRIVE_GAP   = 0x08
 	};
 
 	int m_rtc_clock;              // the RTC clock (pin 30) of the chip

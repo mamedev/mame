@@ -54,7 +54,7 @@ class alphatro_state : public driver_device
 public:
 	enum
 	{
-		TIMER_SYSTEM,
+		TIMER_SYSTEM
 	};
 
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
