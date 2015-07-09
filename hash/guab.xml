@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="guab" description="JPM Give us a Break floppy disks">
+
+	<software name="guab3">
+		<description>Give us a Break (3rd edition)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="guab3.dsk" size="737280" crc="ecb41e06" sha1="2900a95046b38312c6035ea394b04b62c1d29f42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guab3a">
+		<description>Give us a Break (3rd edition alt?)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="guab7c.dsk" size="737280" crc="f5f10f87" sha1="80e540339efbfe59b656d6cd4f466a17df84c123" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guab4">
+		<description>Give us a Break (4th edition)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="guab8d.dsk" size="737280" crc="b87c55ce" sha1="20debbefae194276b0813518634cf52bed093e73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guab6">
+		<description>Give us a Break (6th edition)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="guabf6.dsk" size="737280" crc="08804c28" sha1="608d89d598b7acb133814540dba98cea29c6cad6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guab6a">
+		<description>Give us a Break (6th edition alt?)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="guab9f.dsk" size="737280" crc="85329fe9" sha1="f5ca1956c37b786fa0a4f8f0607a0a2b19d3fbb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guab7">
+		<description>Give us a Break (7th edition)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="guab9g.dsk" size="737280" crc="6b8c36f9" sha1="1d9f4d943f2962603bbe39e5b58befe15954a6d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guab21">
+		<description>Give us a Break (21st edition)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="guab21.dsk" size="737280" crc="558ee009" sha1="d2a02662216e10f80a215044f1929df7255b6136" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guab43">
+		<description>Give us a Break (43rd edition)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="guab43.dsk" size="737280" crc="1fd8f614" sha1="656ce33c93a9d0e81ec7fcdd8f4e4b2f9ad1e485" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crisscrs">
+		<description>Criss Cross (Sweden)</description>
+		<year>1986</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="crisscrs.dsk" size="737280" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenup">
+		<description>Ten Up (compendium 17)</description>
+		<year>1988</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="10up17.dsk" size="737280" crc="7bc328df" sha1="5f8e40d8ffc370fb19be9e386befa5fcd1f35a75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenup3">
+		<description>Ten Up (compendium 3)</description>
+		<year>1988</year>
+		<publisher>JPM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="10up3.dsk" size="737280" crc="2767f017" sha1="1c6551b089c3e3df48e0c03bd502b91fd88f0e94" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
