@@ -80,8 +80,9 @@ Based on the 68ksbc.c
     - Memory map
     - Finish 3 x ACIA6850, terminal serial interface first
     - Add 1 x 14411 Motorola, Baudrate Generator
+      - Add switches to strap baudrate configuration
     - Add 1 x 68230 Motorola, Parallel Interface / Timer
-    - Add 1 x Abort Switch  
+    - Add 1 x Abort Switch
     - Add configurable serial connector between ACIA:s and 
       - Real terminal emulator
       - Debug console
@@ -96,6 +97,8 @@ Based on the 68ksbc.c
 #include "machine/mm58167.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+
+#define BAUDGEN_CLOCK XTAL_1_8432MHz
 
 class force68k_state : public driver_device
 {
@@ -138,8 +141,8 @@ static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
 	AM_RANGE(0x0c0100, 0x0c0101) AM_DEVREADWRITE8("aciaremt", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0c0102, 0x0c0103) AM_DEVREADWRITE8("aciaremt", acia6850_device, data_r, data_w, 0x00ff)
 //      AM_RANGE(0x0e0400, 0x0e0420) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00)
-//      AM_RANGE(0x0e0000, 0x0fffff) AM_READWRITE_PORT /* IO interfaces */
-	AM_RANGE(0x100000, 0x1fffff) AM_RAM /* DRAM for bin patched bug, remove once not needed */
+//      AM_RANGE(0x0e0000, 0x0fffff) AM_READWRITE_PORT /* PI/T 68230 IO interfaces */
+//	AM_RANGE(0x100000, 0x1fffff) AM_RAM /* DRAM for bin patched bug, remove once not needed */
 //      AM_RANGE(0x100000, 0xfeffff) /* VMEbus Rev B addresses (24 bits) */
 //      AM_RANGE(0xff0000, 0xffffff) /* VMEbus Rev B addresses (16 bits) */
 ADDRESS_MAP_END
@@ -178,7 +181,7 @@ WRITE_LINE_MEMBER(force68k_state::write_aciaremt_clock)
 
 static MACHINE_CONFIG_START( fccpu1, force68k_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) 
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2) 
 	MCFG_CPU_PROGRAM_MAP(force68k_mem)
 
         /* P3/Host Port config */
@@ -196,7 +199,8 @@ static MACHINE_CONFIG_START( fccpu1, force68k_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("aciaterm", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("aciaterm", acia6850_device, write_cts))
 
-        MCFG_DEVICE_ADD("aciaterm_clock", CLOCK, XTAL_15_36MHz) /* 9600 x 16 */
+	//MCFG_DEVICE_ADD("aciaterm_clock", CLOCK, XTAL_15_36MHz) /* 9600 x 16 */
+        MCFG_DEVICE_ADD("aciaterm_clock", CLOCK, BAUDGEN_CLOCK / 2) 
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
 
         /* P5/Remote Port config */
