@@ -403,14 +403,14 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 
 READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 {
-  static int count = 0;
+  //static int count = 0;
 
 	UINT8 *protdata = memregion("user1")->base();
 	size_t protsize = memregion("user1")->bytes();
 	UINT8 dat = protdata[(m_protindex++) % protsize];
 
-  printf("protection read %04x %02x\n", count, dat);
-  count++;
+  //printf("protection read %04x %02x\n", count, dat);
+  //count++;
 
 	// real hw returns 00 after end of data, I haven't checked if it's possible to overflow the read counter
 	// and read out the internal rom.
@@ -1124,9 +1124,9 @@ ROM_START( gaialast )
 	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
-GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",         "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
-GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong
-GAME( 1999, gaialast, dreamwld,      baryon,   rolcrush, dreamwld_state, gaialast, ROT0,   "SemiCom", "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
-GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )
+GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                  "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
+GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom",          "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong
+GAME( 1999, gaialast, 0,      baryon,   rolcrush, dreamwld_state, gaialast, ROT0,   "SemiCom / XESS",   "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
+GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                  "Dream World", GAME_SUPPORTS_SAVE )
