@@ -180,8 +180,11 @@ protected:
 	running_machine& m_machine;
 	UINT32          m_vres[8];          /* used for temporary vector results */
 
+#if USE_SIMD
 	__declspec(align(16)) VECTOR_REG      m_v[32];
-
+#else
+	VECTOR_REG      m_v[32];
+#endif
 	ACCUMULATOR_REG m_accum[8];
 	UINT16          m_vflag[6][8];
 
