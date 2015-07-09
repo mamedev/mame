@@ -78,8 +78,6 @@ public:
 	DECLARE_READ16_MEMBER(guab_tms34061_r);
 	DECLARE_WRITE16_MEMBER(ef9369_w);
 	DECLARE_READ16_MEMBER(ef9369_r);
-	DECLARE_READ16_MEMBER(wd1773_r);
-	DECLARE_WRITE16_MEMBER(wd1773_w);
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -317,16 +315,6 @@ INPUT_CHANGED_MEMBER(guab_state::coin_inserted)
  *
  ****************************************/
 
-READ16_MEMBER( guab_state::wd1773_r )
-{
-	return m_fdc->read(space, offset);
-}
-
-WRITE16_MEMBER( guab_state::wd1773_w )
-{
-	m_fdc->write(space, offset, data & 0xff);
-}
-
 WRITE16_MEMBER(guab_state::io_w)
 {
 	switch (offset)
@@ -406,7 +394,7 @@ static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x0c0080, 0x0c0083) AM_NOP /* ACIA 1 */
 	AM_RANGE(0x0c00a0, 0x0c00a3) AM_NOP /* ACIA 2 */
 	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
-	AM_RANGE(0x0c00e0, 0x0c00e7) AM_READWRITE(wd1773_r, wd1773_w)
+	AM_RANGE(0x0c00e0, 0x0c00e7) AM_DEVREADWRITE8("fdc", wd1773_t, read, write, 0x00ff)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x100000, 0x100003) AM_READWRITE(ef9369_r, ef9369_w)
 	AM_RANGE(0x800000, 0xb0ffff) AM_READWRITE(guab_tms34061_r, guab_tms34061_w)
