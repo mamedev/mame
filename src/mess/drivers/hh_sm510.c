@@ -13,8 +13,7 @@
 #include "cpu/sm510/sm510.h"
 #include "sound/speaker.h"
 
-// internal artwork
-//..
+#include "hh_sm510_test.lh" // common test-layout - use external artwork
 
 
 class hh_sm510_state : public driver_device
@@ -36,6 +35,7 @@ public:
 	// misc common
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
 	int m_inp_lines;                    // number of input mux columns
+	UINT8 m_lcd_output_cache[3*4*0x10];
 
 	UINT8 read_inputs(int columns);
 
@@ -43,6 +43,7 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	virtual DECLARE_READ8_MEMBER(input_r);
 	virtual DECLARE_WRITE8_MEMBER(input_w);
+	virtual DECLARE_WRITE16_MEMBER(lcd_segment_w);
 
 protected:
 	virtual void machine_start();
@@ -57,10 +58,12 @@ void hh_sm510_state::machine_start()
 	// zerofill
 	m_inp_mux = 0;
 //	m_inp_lines = 0;
+	memset(m_lcd_output_cache, ~0, sizeof(m_lcd_output_cache));
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_inp_lines));
+	/* save_item(NAME(m_lcd_output_cache)); */ // don't save!
 }
 
 void hh_sm510_state::machine_reset()
@@ -75,6 +78,30 @@ void hh_sm510_state::machine_reset()
 
 ***************************************************************************/
 
+// lcd panel - on lcd handhelds, usually not a generic x/y screen device
+
+WRITE16_MEMBER(hh_sm510_state::lcd_segment_w)
+{
+	for (int seg = 0; seg < 0x10; seg++)
+	{
+		int state = data >> seg & 1;
+		int index = offset << 4 | seg;
+
+		if (state != m_lcd_output_cache[index])
+		{
+			// output to x.y, where x = row a/b/c*4 + H1-4, y = seg1-16
+			char buf[0x10];
+			sprintf(buf, "%d.%d", offset, seg);
+			output_set_value(buf, state);
+
+			m_lcd_output_cache[index] = state;
+		}
+	}
+}
+
+
+// generic input handlers - usually S output is input mux, and K input for buttons
+
 UINT8 hh_sm510_state::read_inputs(int columns)
 {
 	UINT8 ret = 0;
@@ -86,9 +113,6 @@ UINT8 hh_sm510_state::read_inputs(int columns)
 
 	return ret;
 }
-
-
-// generic input handlers - usually S output is input mux, and K input for buttons
 
 void hh_sm510_state::update_k_line()
 {
@@ -174,9 +198,13 @@ static MACHINE_CONFIG_START( ktopgun, ktopgun_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(ktopgun_state, speaker_w))
+
+	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
 
 	/* no video! */
 
@@ -238,9 +266,13 @@ static MACHINE_CONFIG_START( gnwmndon, gnwmndon_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(gnwmndon_state, speaker_w))
+
+	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
 
 	/* no video! */
 
@@ -274,6 +306,6 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Konami", "Top Gun (Konami)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1989, ktopgun,   0,        0, ktopgun,   ktopgun,   driver_device, 0, "Konami", "Top Gun (Konami)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 
-CONS( 1982, gnwmndon,  0,        0, gnwmndon,  gnwmndon,  driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1982, gnwmndon,  0,        0, gnwmndon,  gnwmndon,  driver_device, 0, "Nintendo", "Game & Watch: Mickey & Donald", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
