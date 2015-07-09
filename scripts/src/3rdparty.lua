@@ -580,11 +580,6 @@ project "bgfx"
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
-		buildoptions {		
-			"-Wno-error=pedantic",
-			"-Wno-pedantic"
-		}
-
 
 	configuration { "osx*" }
 		includedirs {
