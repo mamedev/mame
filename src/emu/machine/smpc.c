@@ -683,6 +683,10 @@ void saturn_state::smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_s
 			printf ("SMPC: CD %s\n",(data & 1) ? "off" : "on");
 			machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(saturn_state::smpc_cd_enable),this),data & 1);
 			break;
+		case 0x0a:
+		case 0x0b:
+			popmessage ("SMPC: NETLINK %s, contact MAMEdev",(data & 1) ? "off" : "on");
+			break;
 		case 0x0d:
 			if(LOG_SMPC) printf ("SMPC: System Reset\n");
 			smpc_system_reset();
