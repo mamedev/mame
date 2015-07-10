@@ -1,0 +1,10 @@
+language: cpp
+env:
+  - SUBTARGET=arcade
+  - SUBTARGET=mess
+script: make -j2
+sudo: required
+before_install:
+  - sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libasound2-dev
