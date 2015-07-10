@@ -35,7 +35,7 @@ public:
 	// misc common
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
 	int m_inp_lines;                    // number of input mux columns
-	UINT8 m_lcd_output_cache[3*4*0x10];
+	UINT8 m_lcd_output_cache[0x100];
 
 	UINT8 read_inputs(int columns);
 
@@ -89,7 +89,7 @@ WRITE16_MEMBER(hh_sm510_state::lcd_segment_w)
 
 		if (state != m_lcd_output_cache[index])
 		{
-			// output to x.y, where x = row a/b/c*4 + H1-4, y = seg1-16
+			// output to x.y, where x = row a/b/bs/c*4 + H1-4, y = seg1-16
 			char buf[0x10];
 			sprintf(buf, "%d.%d", offset, seg);
 			output_set_value(buf, state);
@@ -198,6 +198,7 @@ static MACHINE_CONFIG_START( ktopgun, ktopgun_state )
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
 	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(ktopgun_state, speaker_w))
@@ -266,6 +267,7 @@ static MACHINE_CONFIG_START( gnwmndon, gnwmndon_state )
 	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
 	MCFG_SM510_WRITE_SEGA_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_WRITE_SEGB_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_WRITE_SEGBS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(gnwmndon_state, speaker_w))

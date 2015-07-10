@@ -13,6 +13,7 @@
   TODO:
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
+  - LCD bs pin blink mode via Y register
 
 */
 
@@ -46,6 +47,7 @@ void sm510_base_device::device_start()
 
 	m_write_sega.resolve_safe();
 	m_write_segb.resolve_safe();
+	m_write_segbs.resolve_safe();
 	m_write_segc.resolve_safe();
 
 	// zerofill
@@ -64,6 +66,8 @@ void sm510_base_device::device_start()
 	m_div = 0;
 	m_1s = false;
 	m_k_active = false;
+	m_l = 0;
+	m_y = 0;
 	m_bp = false;
 	m_bc = false;
 	m_halt = false;
@@ -84,6 +88,8 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_div));
 	save_item(NAME(m_1s));
 	save_item(NAME(m_k_active));
+	save_item(NAME(m_l));
+	save_item(NAME(m_y));
 	save_item(NAME(m_bp));
 	save_item(NAME(m_bc));
 	save_item(NAME(m_halt));
@@ -119,12 +125,12 @@ void sm510_base_device::device_reset()
 	do_branch(3, 7, 0);
 	m_prev_pc = m_pc;
 	
-	// lcd is on (Bp on, BC off)
+	// lcd is on (Bp on, BC off, bs(y) off)
 	m_bp = true;
 	m_bc = false;
+	m_y = 0;
 	
 	m_write_r(0, 0, 0xff);
-	// y=0(bs), r=0
 }
 
 
@@ -148,12 +154,17 @@ inline UINT16 sm510_base_device::get_lcd_row(int column, UINT8* ram)
 
 TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
 {
-	// 4 columns, 16 segments per row
+	// 4 columns
 	for (int h = 0; h < 4; h++)
 	{
+		// 16 segments per row from upper part of RAM
 		m_write_sega(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
 		m_write_segb(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
 		m_write_segc(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
+		
+		// bs output from L and Y regs
+		UINT8 bs = m_l >> h & 1;
+		m_write_segbs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
 	
 	// schedule next timeout
@@ -172,19 +183,21 @@ void sm510_base_device::init_lcd_driver()
 //  interrupt/timer
 //-------------------------------------------------
 
-void sm510_base_device::wake_me_up()
+bool sm510_base_device::wake_me_up()
 {
 	// in halt mode, wake up after 1S signal or K input
-	if (m_halt)
+	if (m_k_active || m_1s)
 	{
+		// note: official doc warns that Bl/Bm and the stack are undefined
+		// after waking up, but we leave it unchanged
 		m_halt = false;
 		do_branch(1, 0, 0);
 		
 		standard_irq_callback(0);
-
-		// note: official doc warns that Bl/Bm and the stack are undefined
-		// after waking up, but we leave it unchanged
+		return true;
 	}
+	else
+		return false;
 }
 
 void sm510_base_device::execute_set_input(int line, int state)
@@ -204,10 +217,7 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 	
 	// 1S signal on overflow(falling edge of f1)
 	if (m_div == 0)
-	{
 		m_1s = true;
-		wake_me_up();
-	}
 
 	// schedule next timeout
 	m_div_timer->adjust(attotime::from_ticks(0x800, unscaled_clock()));
@@ -243,17 +253,13 @@ void sm510_base_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		if (m_halt)
+		m_icount--;
+
+		if (m_halt && !wake_me_up())
 		{
-			// wake up from K input (note: 1S signal is handled above)
-			if (m_k_active)
-				wake_me_up();
-			else
-			{
-				// got nothing to do
-				m_icount = 0;
-				return;
-			}
+			// got nothing to do
+			m_icount = 0;
+			return;
 		}
 
 		// remember previous state
@@ -262,7 +268,6 @@ void sm510_base_device::execute_run()
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
-		m_icount--;
 		m_op = m_program->read_byte(m_pc);
 		increment_pc();
 		get_opcode_param();
