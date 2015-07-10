@@ -207,9 +207,6 @@ const rsp_cop2::vec_helpers_t rsp_cop2::m_vec_helpers = {
 		{ 0xffff, 0xffff, 0xffff, 0xffff }  // D
 	},
     { // word_reverse
-        0x0706, 0x0504, 0x0302, 0x0100, 0x0f0e, 0x0d0c, 0x0b0a, 0x0908
-    },
-    { // byte_reverse
         0x0203, 0x0001, 0x0607, 0x0405, 0x0a0b, 0x0809, 0x0e0f, 0x0c0d
     }
 };
@@ -539,9 +536,9 @@ void rsp_cop2::vec_store_group2(UINT32 addr, UINT32 element, UINT16 *regp, rsp_v
 	reg = _mm_packs_epi16(reg, reg);
 
 #if !(defined(__SSSE3__) || defined(_MSC_VER))
-	reg = sse2_pshufb(reg, m_vec_helpers.byte_reverse);
+	reg = sse2_pshufb(reg, m_vec_helpers.word_reverse);
 #else
-	rsp_vec_t dkey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.byte_reverse));
+	rsp_vec_t dkey = _mm_load_si128((rsp_vec_t *) (m_vec_helpers.word_reverse));
 	reg = _mm_shuffle_epi8(reg, dkey);
 #endif
 
@@ -3882,9 +3879,32 @@ void rsp_cop2::handle_cop2(UINT32 op)
 			// | 010010 | 00110 | TTTTT | DDDDD | 00000000000 |
 			// ------------------------------------------------
 			//
-            //printf("CTC2 ");
 			switch(RDREG)
 			{
+#if USE_SIMD
+				case 0:
+				case 1:
+				case 2:
+					UINT16 r0 = (RTVAL & (1 << 0)) ? 0xffff : 0;
+					UINT16 r1 = (RTVAL & (1 << 1)) ? 0xffff : 0;
+					UINT16 r2 = (RTVAL & (1 << 2)) ? 0xffff : 0;
+					UINT16 r3 = (RTVAL & (1 << 3)) ? 0xffff : 0;
+					UINT16 r4 = (RTVAL & (1 << 4)) ? 0xffff : 0;
+					UINT16 r5 = (RTVAL & (1 << 5)) ? 0xffff : 0;
+					UINT16 r6 = (RTVAL & (1 << 6)) ? 0xffff : 0;
+					UINT16 r7 = (RTVAL & (1 << 7)) ? 0xffff : 0;
+					m_flags[RDREG].__align[0] = _mm_set_epi16(r7, r6, r5, r4, r3, r2, r1, r0);
+					r0 = (RTVAL & (1 << 8)) ? 0xffff : 0;
+					r1 = (RTVAL & (1 << 9)) ? 0xffff : 0;
+					r2 = (RTVAL & (1 << 10)) ? 0xffff : 0;
+					r3 = (RTVAL & (1 << 11)) ? 0xffff : 0;
+					r4 = (RTVAL & (1 << 12)) ? 0xffff : 0;
+					r5 = (RTVAL & (1 << 13)) ? 0xffff : 0;
+					r6 = (RTVAL & (1 << 14)) ? 0xffff : 0;
+					r7 = (RTVAL & (1 << 15)) ? 0xffff : 0;
+					m_flags[RDREG].__align[1] = _mm_set_epi16(r7, r6, r5, r4, r3, r2, r1, r0);
+					break;
+#else
 				case 0:
 					CLEAR_CARRY_FLAGS();
 					CLEAR_ZERO_FLAGS();
@@ -3938,6 +3958,7 @@ void rsp_cop2::handle_cop2(UINT32 op)
 					if (RTVAL & (1 << 6)) { SET_CLIP1_FLAG(6); }
 					if (RTVAL & (1 << 7)) { SET_CLIP1_FLAG(7); }
 					break;
+#endif
 			}
 			break;
 		}

@@ -181,7 +181,7 @@ void ui_menu_font_ui::list()
 	ReleaseDC( NULL, hDC );
 
 	// sort
-	std::sort(m_class.ui.begin(), m_class.ui.end());
+	std::stable_sort(m_class.ui.begin(), m_class.ui.end());
 
 	// add default string to the top of array
 	m_class.ui.insert(m_class.ui.begin(), std::string("default"));

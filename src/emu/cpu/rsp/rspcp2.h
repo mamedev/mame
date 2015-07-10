@@ -252,7 +252,6 @@ protected:
 		const UINT16 qr_lut[16][8];
 		const UINT16 bdls_lut[4][4];
 		const UINT16 word_reverse[8];
-		const UINT16 byte_reverse[8];
 	} vec_helpers_t;
 
 	static const vec_helpers_t m_vec_helpers;
@@ -299,7 +298,7 @@ protected:
 	}
 	static inline rsp_vec_t read_vce(const UINT16 *vce)
 	{
-		return vec_load_unshuffled_operand(vce);
+		return vec_load_unshuffled_operand(vce + (sizeof(rsp_vec_t) >> 1));
 	}
 	static inline void write_acc_lo(UINT16 *acc, rsp_vec_t acc_lo)
 	{
@@ -331,17 +330,12 @@ protected:
 	}
 	static inline void write_vce(UINT16 *vce, rsp_vec_t vce_r)
 	{
-		return vec_write_operand(vce, vce_r);
+		return vec_write_operand(vce + (sizeof(rsp_vec_t) >> 1), vce_r);
 	}
 
 	static inline INT16 get_flags(const UINT16 *flags)
 	{
-		return (INT16)_mm_movemask_epi8(
-			_mm_packs_epi16(
-				_mm_load_si128((rsp_vec_t*) (flags + (sizeof(rsp_vec_t) >> 1))),
-				_mm_load_si128((rsp_vec_t*) flags)
-			)
-		);
+        return _mm_movemask_epi8(_mm_packs_epi16(_mm_load_si128((rsp_vec_t*) (flags + (sizeof(rsp_vec_t) >> 1))), _mm_load_si128((rsp_vec_t*) flags)));
 	}
 
 	static inline rsp_vec_t vec_zero()

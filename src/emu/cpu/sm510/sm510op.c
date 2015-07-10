@@ -224,13 +224,13 @@ void sm510_base_device::op_atbp()
 void sm510_base_device::op_atl()
 {
 	// ATL: output ACC to L
-	op_illegal();
+	m_l = m_acc;
 }
 
 void sm510_base_device::op_atfc()
 {
 	// ATFC: output ACC to Y
-	op_illegal();
+	m_y = m_acc;
 }
 
 void sm510_base_device::op_atr()

@@ -45,11 +45,16 @@
 #define MCFG_SM510_WRITE_SEGC_CB(_devcb) \
 	sm510_base_device::set_write_segc_callback(*device, DEVCB_##_devcb);
 
+// LCD bs output: same as above, but only data d0 used
+#define MCFG_SM510_WRITE_SEGBS_CB(_devcb) \
+	sm510_base_device::set_write_segbs_callback(*device, DEVCB_##_devcb);
+
 enum
 {
-	SM510_PORT_SEGA = 0,
-	SM510_PORT_SEGB = 4,
-	SM510_PORT_SEGC = 8
+	SM510_PORT_SEGA = 0x00,
+	SM510_PORT_SEGB = 0x04,
+	SM510_PORT_SEGBS = 0x08,
+	SM510_PORT_SEGC = 0x0c
 };
 
 
@@ -71,7 +76,7 @@ public:
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
-		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this)
+		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
 		, m_read_k(*this)
 		, m_read_ba(*this), m_read_b(*this)
 		, m_write_s(*this)
@@ -88,6 +93,7 @@ public:
 	template<class _Object> static devcb_base &set_write_sega_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_sega.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_segb_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_segb.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_segc_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_segc.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_segbs_callback(device_t &device, _Object object) { return downcast<sm510_base_device &>(device).m_write_segbs.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -139,8 +145,10 @@ protected:
 
 	// lcd driver
 	optional_shared_ptr<UINT8> m_lcd_ram_a, m_lcd_ram_b, m_lcd_ram_c;
-	devcb_write16 m_write_sega, m_write_segb, m_write_segc;
+	devcb_write16 m_write_sega, m_write_segb, m_write_segc, m_write_segbs;
 	emu_timer *m_lcd_timer;
+	UINT8 m_l;
+	UINT8 m_y;
 	bool m_bp;
 	bool m_bc;
 
@@ -154,7 +162,7 @@ protected:
 	bool m_1s;
 
 	TIMER_CALLBACK_MEMBER(div_timer_cb);
-	void wake_me_up();
+	bool wake_me_up();
 	virtual void reset_divider();
 	void init_divider();
 

@@ -775,6 +775,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"novag",
 		"ns",
 		"olivetti",
+		"olympia",
 		"omnibyte",
 		"orion",
 		"osborne",
@@ -1902,6 +1903,11 @@ files {
 	MAME_DIR .. "src/mess/drivers/m24.c",
 	MAME_DIR .. "src/mess/machine/m24_kbd.c",
 	MAME_DIR .. "src/mess/machine/m24_z8000.c"
+}
+
+createMESSProjects(_target, _subtarget, "olympia")
+files {          
+	MAME_DIR .. "src/mess/drivers/peoplepc.c"
 }
 
 createMESSProjects(_target, _subtarget, "ns")

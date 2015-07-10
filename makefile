@@ -691,7 +691,7 @@ CHECK_CLANG      :=
 else
 GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
 ifneq ($(OS),solaris)
-CLANG_VERSION    := $(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
+CLANG_VERSION    := $(shell clang --version  2> /dev/null | grep '[0-9]\.[0-9]' -o | head -n 1)
 endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 CHECK_CLANG      := $(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
