@@ -743,7 +743,6 @@ europc  // 1988 Schneider Euro PC (CGA or Hercules)
 compc1  // 1984 Commodore PC-1
 pc10iii // 1987 Commodore PC-10 III
 pc7000  // 1985 Sharp PC-7000
-olypeopl // Olympia People PC
 sx16    // Sanyo SX-16
 mbc16   // Sanyo MBC-16
 ataripc3
@@ -752,6 +751,7 @@ ssam88s
 // Non-PC msdos
 pcd     // Siemens PC-D
 slicer  // 1983 Slicer Computers
+olypeopl // Olympia People PC
 
 // PC Junior
 ibmpcjr   // 1984 IBM PC Jr
