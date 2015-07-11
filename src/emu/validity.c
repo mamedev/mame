@@ -186,7 +186,7 @@ void validity_checker::check_shared_source(const game_driver &driver)
 //  check_all - check all drivers
 //-------------------------------------------------
 
-void validity_checker::check_all()
+bool validity_checker::check_all()
 {
 	// start by checking core stuff
 	validate_begin();
@@ -218,6 +218,8 @@ void validity_checker::check_all()
 
 	// cleanup
 	validate_end();
+
+	return !(m_errors > 0 || m_warnings > 0);
 }
 
 

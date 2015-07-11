@@ -1550,7 +1550,9 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
 	{
 		validity_checker valid(m_options);
-		valid.check_all();
+		bool result = valid.check_all();
+		if (!result)
+			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed!\n");
 		return;
 	}
 
