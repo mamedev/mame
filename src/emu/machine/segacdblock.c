@@ -34,6 +34,7 @@ Template for skeleton device
 #define MPED 0x0800 // MPEG-related processing complete
 #define MPCM 0x1000 // MPEG action uncertain
 #define MPST 0x2000 // MPEG interrupt status report
+// 0xbe1: clears DRDY, CSCT, BFUL, PEND,
 
 // CD status (hi byte of CR1) definitions:
 // (these defines are shifted up 8)
@@ -79,12 +80,12 @@ void segacdblock_device::clear_flag(UINT16 which)
 
 UINT16 segacdblock_device::read_cd_state()
 {
-	return m_cr[0] & 0xff00; 
+	return m_cr[0] & 0xff00;
 }
 
 void segacdblock_device::write_cd_state(UINT16 which)
 {
-	m_cr[0] = (m_cr[0] & 0xff) | which; 
+	m_cr[0] = (m_cr[0] & 0xff) | which;
 }
 
 
@@ -92,12 +93,12 @@ READ16_MEMBER(segacdblock_device::hirq_r){	return m_hirq; }
 WRITE16_MEMBER(segacdblock_device::hirq_w)
 {
 	clear_flag(data);
-	 
+
 	if((m_hirq & CMOK) == 0) /**< @todo needs fucntion irq_mask too */
 	{
-		sh1_writes_registers(CD_STAT_BUSY,0,0,0); /**< @todo it's of course faster than 150 Hz, but how much? */
-		m_cd_timer->adjust(attotime::from_hz(clock()));
-		debugger_break(machine());
+		//sh1_writes_registers(CD_STAT_BUSY,0,0,0); /**< @todo it's of course faster than 150 Hz, but how much? */
+		//m_cd_timer->adjust(attotime::from_hz(clock()));
+		//debugger_break(machine());
 	}
 }
 
@@ -129,7 +130,7 @@ const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
 0x2589001C 	CR2 	Command Register 2
 0x25890020 	CR3 	Command Register 3
 0x25890024 	CR4 	Command Register 4
-0x25890028 	MPEGRGB 	MPEG RGB Data Transfer Register 
+0x25890028 	MPEGRGB 	MPEG RGB Data Transfer Register
 */
 static ADDRESS_MAP_START( map, AS_0, 32, segacdblock_device )
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf000) AM_READWRITE16(hirq_r,hirq_w,0xffffffff)
@@ -177,21 +178,39 @@ void segacdblock_device::cmd_init()
 
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	printf("tick\n");
-	assert(id == CD_TIMER);
-	
+	assert(id == SH1_TIMER);
+
+	m_sh1_ticks ++;
+	//m_sh1_ticks &= 0xff;
+	//if(m_sh1_ticks == 0)
+
+	if(m_sh1_inited == false && m_sh1_ticks >= 0x4000)
+	{
+		m_sh1_inited = true;
+		set_flag(CMOK);
+	}
+	else
+	{
+		if((m_sh1_ticks & 0xff) == 0)
+		{
+			//popmessage("%04x %04x %04x %04x",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+		}
+	}
+
+	popmessage("%04x",m_sh1_ticks);
+
+#if 0
 	if(m_hirq & CMOK)
 		return;
-	
-		
+
 	if(read_cd_state() & CD_STAT_PERI) // waiting for command
 	{
 		//write_cd_state(CD_STAT_PERI); /**< @todo command */
 		//write_fad();
-		m_cd_timer->adjust(attotime::from_hz(clock()));
+		m_sh1_timer->adjust(attotime::from_hz(clock()));
 		return;
 	}
-	
+
 	if(read_cd_state() == CD_STAT_BUSY)
 	{
 		switch(m_cr[0] & 0xff)
@@ -203,13 +222,13 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				cmd_init();
 				break;
 		}
-		
+
 		set_flag(CMOK);
 		//write_fad();
 		//m_cd_timer->adjust(attotime::from_hz(clock()));
 		return;
 	}
-	
+#endif
 }
 
 //-------------------------------------------------
@@ -219,8 +238,8 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 void segacdblock_device::device_start()
 {
 	m_space = &space(AS_0);
-	m_cd_timer = timer_alloc(CD_TIMER);
-	//m_cd_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_sh1_timer = timer_alloc(SH1_TIMER);
+
 }
 
 
@@ -235,8 +254,11 @@ void segacdblock_device::device_reset()
 	m_cr[1] = 'D' << 8 | 'B';
 	m_cr[2] = 'L' << 8 | 'O';
 	m_cr[3] = 'C' << 8 | 'K';
-	m_cd_timer->reset();
 	m_fad = 150;
+	m_sh1_timer->reset();
+	m_sh1_timer->adjust(attotime::from_hz(clock()*256), 0, attotime::from_hz(clock()*256));
+	m_sh1_ticks = 0;
+	m_sh1_inited = false;
 }
 
 
@@ -246,10 +268,10 @@ void segacdblock_device::device_reset()
 
 READ32_MEMBER( segacdblock_device::read )
 {
-	return m_space->read_dword(offset*4);
+	return m_space->read_word(offset*4)|(m_space->read_word(offset*4)<<16);
 }
 
 WRITE32_MEMBER( segacdblock_device::write )
 {
-	m_space->write_dword(offset*4,data|data<<16);
+	m_space->write_word(offset*4,data|data<<16);
 }
