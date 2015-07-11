@@ -152,4 +152,8 @@ project "netlist"
 		MAME_DIR .. "src/emu/netlist/devices/nld_signal.h",
 		MAME_DIR .. "src/emu/netlist/devices/nld_truthtable.c",
 		MAME_DIR .. "src/emu/netlist/devices/nld_truthtable.h",
+    MAME_DIR .. "src/emu/netlist/macro/TTL74XX.c",
+    MAME_DIR .. "src/emu/netlist/macro/TTL74XX.h",
+    MAME_DIR .. "src/emu/netlist/macro/CD4XXX.c",
+    MAME_DIR .. "src/emu/netlist/macro/CD4XXX.h",
 }

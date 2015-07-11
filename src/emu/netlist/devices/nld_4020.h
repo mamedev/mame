@@ -3,7 +3,7 @@
 /*
  * nld_4020.h
  *
- *  CD4020: CMOS Ripple-Carry Binary Counters/Dividers
+ *  CD4020: 14-Stage Ripple Carry Binary Counters
  *
  *          +--------------+
  *      Q12 |1     ++    16| VDD

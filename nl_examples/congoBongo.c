@@ -9,23 +9,11 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
-#define DM7416_GATE(_name)                    		                           \
-		NET_REGISTER_DEV_X(DM7416_GATE, _name)
-
-#define DM7416_DIP(_name)            	        		                       \
-		NET_REGISTER_DEV_X(DM7416_DIP, _name)
-
 #define MB3614_DIP(_name)            			                               \
 		NET_REGISTER_DEV_X(MB3614_DIP, _name)
 
 #define LM358_DIP(_name)            			                               \
 		NET_REGISTER_DEV_X(LM358_DIP, _name)
-
-#define CD4001_NOR(_name)                                                      \
-		NET_REGISTER_DEV_X(CD4001_NOR, _name)
-
-#define CD4001_DIP(_name)                                                      \
-		NET_REGISTER_DEV_X(CD4001_DIP, _name)
 
 #define G501534_DIP(_name)                                                     \
 		NET_REGISTER_DEV_X(G501534_DIP, _name)
@@ -90,7 +78,7 @@ NETLIST_START(dummy)
 
 	INCLUDE(CongoBongo_schematics)
 
-	OPTIMIZE_FRONTIER(C51.1, RES_K(50), 50)
+	OPTIMIZE_FRONTIER(C51.1, RES_K(20), 50)
 	OPTIMIZE_FRONTIER(R77.2, RES_K(20), 50)
 
 	OPTIMIZE_FRONTIER(C25.2, RES_K(240), 50)
@@ -237,7 +225,7 @@ NETLIST_START(CongoBongo_schematics)
 	CD4001_DIP(XU18)
 	CD4538_DIP(XU19)
 	MM5837_DIP(XU20)
-	DM7416_DIP(XU6)
+	TTL_7416_DIP(XU6)
 	NET_C(D1.A, C21.2, R23.1)
 	NET_C(D1.K, C20.1, R22.1)
 	NET_C(XU13.1, C37.2, C36.1, R48.1)
@@ -381,7 +369,7 @@ NETLIST_START(opamp_mod)
 	RES(RP1, 1e6)
 	CAP(CP1, 0.0318e-6)
 #else
-	PARAM(G1.G, 0.0002)
+	PARAM(G1.G, 0.002)
 	PARAM(G1.CURLIM, 0.002)
 	RES(RP1, 9.5e6)
 	CAP(CP1, 0.0033e-6)
@@ -423,7 +411,7 @@ NETLIST_START(opamp_mod)
 NETLIST_END()
 
 NETLIST_START(MB3614_DIP)
-#if 1
+#if 0
 	SUBMODEL(opamp_mod, op1)
 	SUBMODEL(opamp_mod, op2)
 	SUBMODEL(opamp_mod, op3)
@@ -432,89 +420,37 @@ NETLIST_START(MB3614_DIP)
 	/* The opamp actually has an FPF of about 500k. This doesn't work here and causes oscillations.
 	 * FPF here therefore about half the Solver clock.
 	 */
-	OPAMP(op1, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
+	OPAMP(op1, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=110k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
 	OPAMP(op2, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
 	OPAMP(op3, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
-	OPAMP(op4, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
+	OPAMP(op4, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=110k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
 #endif
 	ALIAS( 1, op1.OUT)
 	ALIAS( 2, op1.MINUS)
 	ALIAS( 3, op1.PLUS)
 
-	ALIAS( 7, op2.OUT)
-	ALIAS( 6, op2.MINUS)
+	ALIAS( 4, op1.VCC)
+
 	ALIAS( 5, op2.PLUS)
+	ALIAS( 6, op2.MINUS)
+	ALIAS( 7, op2.OUT)
 
 	ALIAS( 8, op3.OUT)
 	ALIAS( 9, op3.MINUS)
 	ALIAS(10, op3.PLUS)
 
-	ALIAS(14, op4.OUT)
-	ALIAS(13, op4.MINUS)
+	ALIAS(11, op1.GND)
+
 	ALIAS(12, op4.PLUS)
+	ALIAS(13, op4.MINUS)
+	ALIAS(14, op4.OUT)
 
 	NET_C(op1.GND, op2.GND, op3.GND, op4.GND)
 	NET_C(op1.VCC, op2.VCC, op3.VCC, op4.VCC)
 
-	ALIAS(11, op1.GND)
-	ALIAS( 4, op1.VCC)
 NETLIST_END()
 
 
-NETLIST_START(DM7416_DIP)
-	DM7416_GATE(s1)
-	DM7416_GATE(s2)
-	DM7416_GATE(s3)
-	DM7416_GATE(s4)
-	DM7416_GATE(s5)
-	DM7416_GATE(s6)
-
-	DUMMY_INPUT(GND)
-	DUMMY_INPUT(VCC)
-
-	ALIAS( 1, s1.A)
-	ALIAS( 2, s1.Q)
-	ALIAS( 3, s2.A)
-	ALIAS( 4, s2.Q)
-	ALIAS( 5, s3.A)
-	ALIAS( 6, s3.Q)
-	ALIAS( 7, GND.I)
-
-	ALIAS( 8, s4.Q)
-	ALIAS( 9, s4.A)
-	ALIAS(10, s5.Q)
-	ALIAS(11, s5.A)
-	ALIAS(12, s6.Q)
-	ALIAS(13, s6.A)
-	ALIAS(14, VCC.I)
-NETLIST_END()
-
-NETLIST_START(CD4001_DIP)
-	CD4001_NOR(s1)
-	CD4001_NOR(s2)
-	CD4001_NOR(s3)
-	CD4001_NOR(s4)
-
-	DUMMY_INPUT(VSS)
-	DUMMY_INPUT(VDD)
-
-	ALIAS( 1, s1.A)
-	ALIAS( 2, s1.B)
-	ALIAS( 3, s1.Q)
-	ALIAS( 4, s2.Q)
-	ALIAS( 5, s2.A)
-	ALIAS( 6, s2.B)
-	ALIAS( 7, VDD.I)
-
-	ALIAS( 8, s3.A)
-	ALIAS( 9, s3.B)
-	ALIAS(10, s3.Q)
-	ALIAS(11, s4.Q)
-	ALIAS(12, s4.A)
-	ALIAS(13, s4.B)
-	ALIAS(14, VSS.I)
-
-NETLIST_END()
 
 NETLIST_START(G501534_DIP)
 	AFUNC(f, 2, "A0 A1 0.2 * *")
@@ -545,26 +481,9 @@ NETLIST_START(G501534_DIP)
 NETLIST_END()
 
 NETLIST_START(congob_lib)
-	TRUTHTABLE_START(DM7416_GATE, 1, 1, 0, "")
-		TT_HEAD(" A | Q ")
-		TT_LINE(" 0 | 1 |15")
-		TT_LINE(" 1 | 0 |23")
-		TT_FAMILY(".model DM7416 FAMILY(IVL=0.8 IVH=2.0 OVL=0.1 OVH=4.95 ORL=10.0 ORH=1.0e8)")
-	TRUTHTABLE_END()
-
-	TRUTHTABLE_START(CD4001_NOR, 2, 1, 0, "")
-		TT_HEAD("A , B | Q ")
-		TT_LINE("0,0|1|85")
-		TT_LINE("X,1|0|120")
-		TT_LINE("1,X|0|120")
-		TT_FAMILY(".model CD4000 FAMILY(TYPE=CD4000)")
-	TRUTHTABLE_END()
-
 
 	//LOCAL_LIB_ENTRY(LM324_DIP)
 	//LOCAL_LIB_ENTRY(LM358_DIP)
-	LOCAL_LIB_ENTRY(CD4001_DIP)
-	LOCAL_LIB_ENTRY(DM7416_DIP)
 	LOCAL_LIB_ENTRY(MB3614_DIP)
 	LOCAL_LIB_ENTRY(G501534_DIP)
 
