@@ -96,13 +96,6 @@ READ16_MEMBER(segacdblock_device::hirq_r){	return m_hirq; }
 WRITE16_MEMBER(segacdblock_device::hirq_w)
 {
 	m_hirq &= data;
-
-	if((m_hirq & CMOK) == 0) /**< @todo needs fucntion irq_mask too */
-	{
-		//sh1_writes_registers(CD_STAT_BUSY,0,0,0); /**< @todo it's of course faster than 150 Hz, but how much? */
-		//m_cd_timer->adjust(attotime::from_hz(clock()));
-		//debugger_break(machine());
-	}
 }
 
 READ16_MEMBER(segacdblock_device::hirq_mask_r){	return m_hirq_mask; }
@@ -270,24 +263,31 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		if(m_sh1_ticks >= 0x4000)
 		{
 			m_sh1_inited = true;
-			set_flag(0xffff);
+
 		}
 	}
 	else
 	{
-		if((m_sh1_ticks & 0xff) == 0)
+		if((m_sh1_ticks & 0xff) != 0)
 		{
-			m_dr[0] = CD_STAT_NODISC;
+			m_dr[0] = CD_STAT_PERI | CD_STAT_NODISC;
 			m_dr[1] = 0x0000;
 			m_dr[2] = 0x0000;
 			m_dr[3] = 0x0000;
 			set_flag(SCDQ);
+		}
+		else
+		{
 
 			if(m_cmd_issued == 0xf)
 			{
 				switch(m_cr[0] >> 8)
 				{
 					case 0x00:
+						m_dr[0] = CD_STAT_NODISC;
+						m_dr[1] = 0x0000;
+						m_dr[2] = 0x0000;
+						m_dr[3] = 0x0000;
 						cd_cmd_status();
 						break;
 					case 0x01:
@@ -384,6 +384,7 @@ void segacdblock_device::device_reset()
 	m_sh1_ticks = 0;
 	m_sh1_inited = false;
 	m_cmd_issued = 0;
+	m_hirq = 0xffff;
 }
 
 
