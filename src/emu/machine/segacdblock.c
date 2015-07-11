@@ -73,6 +73,9 @@ void segacdblock_device::set_flag(UINT16 which)
 	m_hirq |= which;
 }
 
+/*!
+ @todo: wrong and not needed
+ */
 void segacdblock_device::clear_flag(UINT16 which)
 {
 	m_hirq &= ~which;
@@ -92,7 +95,7 @@ void segacdblock_device::write_cd_state(UINT16 which)
 READ16_MEMBER(segacdblock_device::hirq_r){	return m_hirq; }
 WRITE16_MEMBER(segacdblock_device::hirq_w)
 {
-	clear_flag(data);
+	m_hirq &= data;
 
 	if((m_hirq & CMOK) == 0) /**< @todo needs fucntion irq_mask too */
 	{
@@ -176,6 +179,16 @@ void segacdblock_device::cd_cmd_status()
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_get_hw_info()
+{
+	m_dr[0] = CD_STAT_NODISC;
+	m_dr[1] = 0x0201;
+	m_dr[2] = 0x0000;
+	m_dr[3] = 0x0400;
+	set_flag(CMOK);
+}
+
+
 void segacdblock_device::cd_cmd_init(UINT8 init_flags)
 {
 	m_dr[0] = CD_STAT_NODISC;
@@ -199,6 +212,15 @@ void segacdblock_device::cd_cmd_end_transfer()
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_get_copy_error()
+{
+	m_dr[0] = CD_STAT_NODISC | 0;
+	m_dr[1] = 0;
+	m_dr[2] = 0;
+	m_dr[3] = 0;
+	set_flag(CMOK);
+}
+
 void segacdblock_device::cd_cmd_abort()
 {
 	set_flag(EFLS);
@@ -206,6 +228,34 @@ void segacdblock_device::cd_cmd_abort()
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_auth_device(bool isMPEGauth)
+{
+	if(isMPEGauth == true)
+		set_flag(MPED);
+	else
+		set_flag(EFLS|CSCT);
+
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_device_auth_status(bool isMPEGauth)
+{
+	if(isMPEGauth == true)
+	{
+		m_dr[0] = CD_STAT_NODISC | 0;
+		m_dr[1] = 2; /**< @todo: check if card present */
+		m_dr[2] = 0;
+		m_dr[3] = 0;
+	}
+	else
+	{
+		m_dr[0] = CD_STAT_NODISC | 0;
+		m_dr[1] = 4; /**< @todo: various auth states */
+		m_dr[2] = 0;
+		m_dr[3] = 0;
+	}
+	set_flag(CMOK);
+}
 
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -231,6 +281,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			m_dr[1] = 0x0000;
 			m_dr[2] = 0x0000;
 			m_dr[3] = 0x0000;
+			set_flag(SCDQ);
 
 			if(m_cmd_issued == 0xf)
 			{
@@ -239,14 +290,30 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 					case 0x00:
 						cd_cmd_status();
 						break;
+					case 0x01:
+						cd_cmd_get_hw_info();
+						break;
 					case 0x04:
 						cd_cmd_init(m_cr[0] & 0xff);
 						break;
 					case 0x06:
 						cd_cmd_end_transfer();
 						break;
+					case 0x67:
+						cd_cmd_get_copy_error();
+						break;
 					case 0x75:
 						cd_cmd_abort();
+						break;
+					case 0xe0:
+						if(m_cr[1] > 1)
+							printf("%04x auth command\n",m_cr[1]);
+						cd_cmd_auth_device(m_cr[1] == 1);
+						break;
+					case 0xe1:
+						if(m_cr[1] > 1)
+							printf("%04x auth command\n",m_cr[1]);
+						cd_cmd_device_auth_status(m_cr[1] == 1);
 						break;
 					default:
 						printf("%04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);

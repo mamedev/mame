@@ -76,11 +76,17 @@ private:
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
 
 	void cd_cmd_status();
+	void cd_cmd_get_hw_info();
 	// ...
 	void cd_cmd_init(UINT8 init_flags);
 	// ...
 	void cd_cmd_end_transfer();
+	void cd_cmd_get_copy_error();
 	void cd_cmd_abort();
+
+	void cd_cmd_auth_device(bool isMPEGauth);
+	void cd_cmd_device_auth_status(bool isMPEGauth);
+
 
 	void set_flag(UINT16 which);
 	void clear_flag(UINT16 which);
