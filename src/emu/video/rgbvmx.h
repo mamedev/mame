@@ -140,56 +140,56 @@ public:
 		m_value = vec_perm(m_value, temp, blue_perm);
 	}
 
-	inline UINT8 get_a()
+	inline UINT8 get_a() const
 	{
 		UINT8 result;
 		vec_ste(vec_splat((VECU8)m_value, 3), 0, &result);
 		return result;
 	}
 
-	inline UINT8 get_r()
+	inline UINT8 get_r() const
 	{
 		UINT8 result;
 		vec_ste(vec_splat((VECU8)m_value, 7), 0, &result);
 		return result;
 	}
 
-	inline UINT8 get_g()
+	inline UINT8 get_g() const
 	{
 		UINT8 result;
 		vec_ste(vec_splat((VECU8)m_value, 11), 0, &result);
 		return result;
 	}
 
-	inline UINT8 get_b()
+	inline UINT8 get_b() const
 	{
 		UINT8 result;
 		vec_ste(vec_splat((VECU8)m_value, 15), 0, &result);
 		return result;
 	}
 
-	inline INT32 get_a32()
+	inline INT32 get_a32() const
 	{
 		INT32 result;
 		vec_ste(vec_splat(m_value, 0), 0, &result);
 		return result;
 	}
 
-	inline INT32 get_r32()
+	inline INT32 get_r32() const
 	{
 		INT32 result;
 		vec_ste(vec_splat(m_value, 1), 0, &result);
 		return result;
 	}
 
-	inline INT32 get_g32()
+	inline INT32 get_g32() const
 	{
 		INT32 result;
 		vec_ste(vec_splat(m_value, 2), 0, &result);
 		return result;
 	}
 
-	inline INT32 get_b32()
+	inline INT32 get_b32() const
 	{
 		INT32 result;
 		vec_ste(vec_splat(m_value, 3), 0, &result);

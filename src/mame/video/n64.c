@@ -2660,6 +2660,7 @@ void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
     }
     topad = 0; // ????
 */
+
 	switch (m_misc_state.m_ti_size)
 	{
 		case PIXEL_SIZE_8BIT:
@@ -2755,7 +2756,6 @@ void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
 void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
 {
 	//wait("SetTile");
-
 	const INT32 tilenum = (w2 >> 24) & 0x7;
 	n64_tile_t* tex_tile = &m_tiles[tilenum];
 
@@ -2784,7 +2784,8 @@ void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
 	tex_tile->clamp_t = tex_tile->ct || !tex_tile->mask_t;
 	tex_tile->mm = rgbaint_t(tex_tile->ms ? ~0 : 0, tex_tile->ms ? ~0 : 0, tex_tile->mt ? ~0 : 0, tex_tile->mt ? ~0 : 0);
 	tex_tile->invmm = rgbaint_t(tex_tile->ms ? 0 : ~0, tex_tile->ms ? 0 : ~0, tex_tile->mt ? 0 : ~0, tex_tile->mt ? 0 : ~0);
-	tex_tile->mask = rgbaint_t(tex_tile->mask_s, tex_tile->mask_s, tex_tile->mask_t, tex_tile->mask_t);
+	tex_tile->mask = rgbaint_t(tex_tile->mask_s ? ~0 : 0, tex_tile->mask_s ? ~0 : 0, tex_tile->mask_t ? ~0 : 0, tex_tile->mask_t ? ~0 : 0);
+	tex_tile->invmask = rgbaint_t(tex_tile->mask_s ? 0 : ~0, tex_tile->mask_s ? 0 : ~0, tex_tile->mask_t ? 0 : ~0, tex_tile->mask_t ? 0 : ~0);
 	tex_tile->lshift = rgbaint_t(tex_tile->lshift_s, tex_tile->lshift_s, tex_tile->lshift_t, tex_tile->lshift_t);
 	tex_tile->rshift = rgbaint_t(tex_tile->rshift_s, tex_tile->rshift_s, tex_tile->rshift_t, tex_tile->rshift_t);
 	tex_tile->clamp_st = rgbaint_t(tex_tile->clamp_s ? ~0 : 0, tex_tile->clamp_s ? ~0 : 0, tex_tile->clamp_t ? ~0 : 0, tex_tile->clamp_t ? ~0 : 0);
@@ -2809,7 +2810,6 @@ void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
 void n64_rdp::cmd_fill_rect(UINT32 w1, UINT32 w2)
 {
 	//if(m_pending_mode_block) { wait("Block on pending mode-change"); m_pending_mode_block = false; }
-
 	const UINT32 xh = (w2 >> 12) & 0xfff;
 	const UINT32 xl = (w1 >> 12) & 0xfff;
 	const UINT32 yh = (w2 >>  0) & 0xfff;
@@ -3041,6 +3041,8 @@ void n64_rdp::process_command_list()
 
 n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 32000>(state.machine())
 {
+	ignore = false;
+	dolog = false;
 	m_aux_buf_ptr = 0;
 	m_aux_buf = NULL;
 	m_pipe_clean = true;
@@ -3054,11 +3056,6 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 	m_end = 0;
 	m_current = 0;
 	m_status = 0x88;
-
-	for (INT32 i = 0; i < 8; i++)
-	{
-		m_tiles[i].num = i;
-	}
 
 	m_one.set(0xff, 0xff, 0xff, 0xff);
 	m_zero.set(0, 0, 0, 0);

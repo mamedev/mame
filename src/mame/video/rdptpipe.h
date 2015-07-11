@@ -27,7 +27,7 @@ class n64_texture_pipe_t
 
 		n64_texture_pipe_t()
 		{
-			m_maskbits_table[0] = 0x3ff;
+			m_maskbits_table[0] = 0xffff;
 			for(int i = 1; i < 16; i++)
 			{
 				m_maskbits_table[i] = ((UINT16)(0xffff) >> (16 - i)) & 0x3ff;
@@ -108,8 +108,7 @@ class n64_texture_pipe_t
 		bool                m_start_span;
 
 	private:
-		void                mask(rgbaint_t& st, const n64_tile_t& tile);
-		void                mask_coupled(rgbaint_t& sstt, const n64_tile_t& tile);
+		void                mask(rgbaint_t& sstt, const n64_tile_t& tile);
 
 		rgbaint_t           shift_cycle(rgbaint_t& st, const n64_tile_t& tile);
 		void                shift_copy(rgbaint_t& st, const n64_tile_t& tile);
