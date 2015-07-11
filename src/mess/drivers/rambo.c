@@ -223,5 +223,5 @@ ROM_START( metamaq2 )
     ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT                         COMPANY   FULLNAME */
-COMP(2012, metamaq2,      0,    rambo,     rambo,      0,    rambo_state, rambo,    "Metamaquina", "Metamaquina 2 desktop 3d printer", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   CLASS        INIT         COMPANY           FULLNAME */
+COMP(2012, metamaq2,      0,        0,   rambo,    0,      rambo_state, rambo,    "Metamaquina", "Metamaquina 2 desktop 3d printer", GAME_NOT_WORKING | GAME_NO_SOUND)
