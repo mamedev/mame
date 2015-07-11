@@ -1174,7 +1174,7 @@ ROM_START( gaialast )
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
 
 	ROM_REGION( 0x6c9, "user1", ROMREGION_ERASEFF ) /* Protection data  */
-	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 , BAD_DUMP CRC(ed1a5a4b) SHA1(9cbfbab4579eb50d0519ca7e7ef1c123eb8bd827) ) /* re-encrypted version of dreamwld data, not verified yet */
+	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 , CRC(d3403b7b) SHA1(712a7f27fc41b632d584237f7641e8ae20035111) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
 	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2dbad410) SHA1(bb788ea14bb605be9af9c8f8adec94ad1c17ab55))
@@ -1199,5 +1199,5 @@ GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "Sem
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                  "Cute Fighter", GAME_SUPPORTS_SAVE ) 
 GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom",          "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE )
-GAME( 1999, gaialast, 0,      baryon,   gaialast, driver_device, 0, ROT0,   "SemiCom / XESS",           "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
+GAME( 1999, gaialast, 0,      baryon,   gaialast, driver_device, 0, ROT0,   "SemiCom / XESS",           "Gaia - The Last Choice of Earth", GAME_SUPPORTS_SAVE )
 GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                  "Dream World", GAME_SUPPORTS_SAVE )
