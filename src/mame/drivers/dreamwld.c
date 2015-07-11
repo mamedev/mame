@@ -163,6 +163,7 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	UINT32 *source = m_spritebuf1;
 	UINT32 *finish = m_spritebuf1 + 0x1000 / 4;
 	UINT16 *redirect = (UINT16 *)memregion("spritelut")->base();
+	int xoffset = 4;
 
 	while (source < finish)
 	{
@@ -185,6 +186,9 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		xinc = 16;
 		yinc = 16;
+
+		xpos += xoffset;
+		xpos &= 0x1ff;
 
 		if (xflip)
 		{
@@ -297,8 +301,9 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 	int layer0_scrolly = m_vregs[(0x000 / 4)]+32;
 	int layer1_scrolly = m_vregs[(0x008 / 4)]+32;
 
-	int layer0_scrollx = m_vregs[(0x004 / 4)] + 3;
-	int layer1_scrollx = m_vregs[(0x00c / 4)] + 5;
+	int layer0_scrollx = m_vregs[(0x004 / 4)] + 0;
+	int layer1_scrollx = m_vregs[(0x00c / 4)] + 2;
+
 	UINT32 layer0_ctrl = m_vregs[0x010 / 4];
 	UINT32 layer1_ctrl = m_vregs[0x014 / 4];
 
@@ -796,7 +801,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_REFRESH_RATE(57.793)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(512,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
 	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
 	MCFG_SCREEN_PALETTE("palette")
