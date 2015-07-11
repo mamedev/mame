@@ -555,6 +555,19 @@ ATTR_COLD void device_t::register_subalias(const pstring &name, core_terminal_t 
 		m_terminals.add(alias);
 }
 
+ATTR_COLD void device_t::register_subalias(const pstring &name, const pstring &aliased)
+{
+	pstring alias = this->name() + "." + name;
+	pstring aliased_fqn = this->name() + "." + aliased;
+
+	// everything already fully qualified
+	setup().register_alias_nofqn(alias, aliased_fqn);
+
+	// FIXME: make this working again
+	//if (term.isType(terminal_t::INPUT) || term.isType(terminal_t::TERMINAL))
+	//	m_terminals.add(name);
+}
+
 ATTR_COLD void device_t::register_terminal(const pstring &name, terminal_t &port)
 {
 	setup().register_object(*this, name, port);
@@ -588,13 +601,12 @@ ATTR_COLD void device_t::register_input(const pstring &name, analog_input_t &inp
 
 ATTR_COLD void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
 {
-#if 1
-	//printf("device %s: connect %s to %s\n", name().cstr(), t1.name().cstr(), t2.name().cstr());
 	setup().register_link_fqn(t1.name(), t2.name());
-#else
-	if (!setup().connect(t1, t2))
-		netlist().error("Error connecting %s to %s\n", t1.name().cstr(), t2.name().cstr());
-#endif
+}
+
+ATTR_COLD void device_t::connect_late(const pstring &t1, const pstring &t2)
+{
+	setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
 }
 
 ATTR_COLD void device_t::connect_direct(core_terminal_t &t1, core_terminal_t &t2)

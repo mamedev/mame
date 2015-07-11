@@ -14,6 +14,10 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
+//#define nl_ext_double __float128 // slow, very slow
+//#define nl_ext_double long double // slightly slower
+#define nl_ext_double double
+
 template <unsigned m_N, unsigned _storage_N>
 class matrix_solver_direct_t: public matrix_solver_t
 {
@@ -50,7 +54,8 @@ protected:
 	 */
 	ATTR_HOT nl_double compute_next_timestep();
 
-	ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	ATTR_ALIGN nl_ext_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	//ATTR_ALIGN nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
 	ATTR_ALIGN nl_double m_RHS[_storage_N];
 	ATTR_ALIGN nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
 	ATTR_ALIGN nl_double m_last_V[_storage_N];
@@ -356,7 +361,8 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			unsigned maxrow = i;
 			for (unsigned j = i + 1; j < kN; j++)
 			{
-				if (nl_math::abs(m_A[j][i]) > nl_math::abs(m_A[maxrow][i]))
+				//if (std::abs(m_A[j][i]) > std::abs(m_A[maxrow][i]))
+				if (m_A[j][i] * m_A[j][i] > m_A[maxrow][i] * m_A[maxrow][i])
 					maxrow = j;
 			}
 
@@ -368,43 +374,63 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 				}
 				std::swap(m_RHS[i], m_RHS[maxrow]);
 			}
-		}
+			/* FIXME: Singular matrix? */
+			const nl_double f = 1.0 / m_A[i][i];
+			const nl_ext_double * RESTRICT s = &m_A[i][i+1];
 
-		/* FIXME: Singular matrix? */
-		const nl_double f = 1.0 / m_A[i][i];
-		const double * RESTRICT s = &m_A[i][0];
-		const unsigned *p = m_terms[i]->m_nzrd.data();
-		const unsigned e = m_terms[i]->m_nzrd.size();
+			/* Eliminate column i from row j */
 
-		/* Eliminate column i from row j */
-
-		for (unsigned j = i + 1; j < kN; j++)
-		{
-			double * RESTRICT d = &m_A[j][0];
-			const nl_double f1 = - d[i] * f;
-			if (f1 != NL_FCONST(0.0))
+			for (unsigned j = i + 1; j < kN; j++)
 			{
-#if 0
-				/*  The code below is 30% faster than the original
-				 *  implementation which is given here for reference.
-				 *
-				 *  for (unsigned k = i + 1; k < kN; k++)
-				 *      m_A[j][k] = m_A[j][k] + m_A[i][k] * f1;
-				 */
-				double * RESTRICT d = &m_A[j][i+1];
-				const double * RESTRICT s = &m_A[i][i+1];
-				const int e = kN - i - 1;
-
-				for (int k = 0; k < e; k++)
-					d[k] = d[k] + s[k] * f1;
-#else
-				for (unsigned k = 0; k < e; k++)
+				nl_ext_double * RESTRICT d = &m_A[j][i+1];
+				const nl_double f1 = - m_A[j][i] * f;
+				if (f1 != NL_FCONST(0.0))
 				{
-					const unsigned pk = p[k];
-					d[pk] += s[pk] * f1;
+					const unsigned e = kN - i - 1;
+					for (unsigned k = 0; k < e; k++)
+						d[k] = d[k] + s[k] * f1;
+					m_RHS[j] += m_RHS[i] * f1;
 				}
-#endif
-				m_RHS[j] += m_RHS[i] * f1;
+			}
+		}
+		else
+		{
+			/* FIXME: Singular matrix? */
+			const nl_double f = 1.0 / m_A[i][i];
+			const nl_ext_double * RESTRICT s = &m_A[i][0];
+			const unsigned *p = m_terms[i]->m_nzrd.data();
+			const unsigned e = m_terms[i]->m_nzrd.size();
+
+			/* Eliminate column i from row j */
+
+			for (unsigned j = i + 1; j < kN; j++)
+			{
+				nl_ext_double * RESTRICT d = &m_A[j][0];
+				const nl_double f1 = - d[i] * f;
+				if (f1 != NL_FCONST(0.0))
+				{
+	#if 0
+					/*  The code below is 30% faster than the original
+					 *  implementation which is given here for reference.
+					 *
+					 *  for (unsigned k = i + 1; k < kN; k++)
+					 *      m_A[j][k] = m_A[j][k] + m_A[i][k] * f1;
+					 */
+					double * RESTRICT d = &m_A[j][i+1];
+					const double * RESTRICT s = &m_A[i][i+1];
+					const int e = kN - i - 1;
+
+					for (int k = 0; k < e; k++)
+						d[k] = d[k] + s[k] * f1;
+	#else
+					for (unsigned k = 0; k < e; k++)
+					{
+						const unsigned pk = p[k];
+						d[pk] += s[pk] * f1;
+					}
+	#endif
+					m_RHS[j] += m_RHS[i] * f1;
+				}
 			}
 		}
 	}
@@ -422,14 +448,14 @@ ATTR_HOT void matrix_solver_direct_t<m_N, _storage_N>::LE_back_subst(
 		nl_double tmp = 0;
 
 #if 1
-#if 0
-		const double * RESTRICT A = &m_A[j][j+1];
-		const double * RESTRICT xp = &x[j+1];
-		const int e = kN - j - 1;
-		for (int k = 0; k < e; k++)
+#if (USE_PIVOT_SEARCH)
+		const nl_ext_double * RESTRICT A = &m_A[j][j+1];
+		const nl_double * RESTRICT xp = &x[j+1];
+		const unsigned e = kN - j - 1;
+		for (unsigned k = 0; k < e; k++)
 			tmp += A[k] * xp[k];
 #else
-		const double * RESTRICT A = &m_A[j][0];
+		const nl_ext_double * RESTRICT A = &m_A[j][0];
 		const unsigned *p = m_terms[j]->m_nzrd.data();
 		const unsigned e = m_terms[j]->m_nzrd.size();
 

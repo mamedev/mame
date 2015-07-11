@@ -199,7 +199,7 @@ ATTR_HOT inline int matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non_dynamic
 		{
 			nl_double Idrive = 0;
 
-			const double * RESTRICT A = &this->m_A[k][0];
+			const nl_ext_double * RESTRICT A = &this->m_A[k][0];
 			const unsigned *p = this->m_terms[k]->m_nz.data();
 			const unsigned e = this->m_terms[k]->m_nz.size();
 

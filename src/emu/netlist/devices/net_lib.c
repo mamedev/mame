@@ -58,8 +58,10 @@ void initialize_factory(factory_list_t &factory)
 	ENTRY(VCVS,                 VCVS,                   "-")
 	ENTRY(VCCS,                 VCCS,                   "-")
 	ENTRY(CCCS,                 CCCS,                   "-")
+	ENTRY(LVCCS,                LVCCS,                  "-")
 	ENTRY(VS,	                VS,                     "V")
 	ENTRY(CS,                   CS,                     "I")
+	ENTRY(OPAMP,                OPAMP,                  "model")
 	ENTRY(dummy_input,          DUMMY_INPUT,            "-")
 	ENTRY(frontier,             FRONTIER_DEV,           "+I,G,Q")   // not intended to be used directly
 	ENTRY(function,             AFUNC, 		            "N,FUNC")   // only for macro devices - NO FEEDBACK loops

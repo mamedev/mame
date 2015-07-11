@@ -388,6 +388,7 @@ namespace netlist
 			BJT_SWITCH, // BJT(Switch)
 			VCVS,       // Voltage controlled voltage source
 			VCCS,       // Voltage controlled current source
+			LVCCS,      // Voltage controlled current source (Current limited)
 			CCCS,       // Current controlled current source
 			VS,			// Voltage Source
 			CS,			// Current Source
@@ -1087,12 +1088,14 @@ namespace netlist
 
 		ATTR_COLD void register_sub(const pstring &name, device_t &dev);
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
+		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
 		ATTR_COLD void register_terminal(const pstring &name, terminal_t &port);
 		ATTR_COLD void register_output(const pstring &name, analog_output_t &out);
 		ATTR_COLD void register_output(const pstring &name, logic_output_t &out);
 		ATTR_COLD void register_input(const pstring &name, analog_input_t &in);
 		ATTR_COLD void register_input(const pstring &name, logic_input_t &in);
 
+		ATTR_COLD void connect_late(const pstring &t1, const pstring &t2);
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
 		ATTR_COLD void connect_direct(core_terminal_t &t1, core_terminal_t &t2);
 
