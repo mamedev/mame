@@ -148,26 +148,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-	DECLARE_DRIVER_INIT(gaialast);
 };
 
-DRIVER_INIT_MEMBER(dreamwld_state,gaialast)
-{
-	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
-
-	mem16[(0x6c / 2)^1] = 0x000f;
-	mem16[(0x6e / 2)^1] = 0xf800;
-	mem16[(0x70 / 2)^1] = 0x000f;
-	mem16[(0x72 / 2)^1] = 0xf800;
-	mem16[(0x74 / 2)^1] = 0x000f;
-	mem16[(0x76 / 2)^1] = 0xf800;
-	mem16[(0x78 / 2)^1] = 0x000f;
-	mem16[(0x7a / 2)^1] = 0xf800;
-	mem16[(0x7c / 2)^1] = 0x000f;
-	mem16[(0x7e / 2)^1] = 0xf800;
-
-}
 
 
 void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -1164,14 +1146,12 @@ ROM_START( gaialast )
 	ROM_LOAD32_BYTE( "5", 0x000001, 0x040000, CRC(c55f6f11) SHA1(13d543b0770bebdd4c6e064b56fd6cc2ec929566) )
 	ROM_LOAD32_BYTE( "2", 0x000002, 0x040000, CRC(549e594a) SHA1(728c6b51cc478ad7251bcbe6d7f4f4e6a2ee4a4e) )
 	ROM_LOAD32_BYTE( "3", 0x000003, 0x040000, CRC(a8e845d8) SHA1(f8c7e702bd747a22e76c861effec4cd3cd2f3fc9) )
-	ROM_LOAD("dreamcode",  0x100000-0x800, 0x800, CRC(4a93805f) SHA1(992e409beb91da7a0aaf0d0d1314e28c506b2746) )
-	
 
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
 
 	ROM_REGION( 0x6c9, "user1", ROMREGION_ERASEFF ) /* Protection data  */
-	//ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
+	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 , BAD_DUMP CRC(ed1a5a4b) SHA1(9cbfbab4579eb50d0519ca7e7ef1c123eb8bd827) ) /* re-encrypted version of dreamwld data, not verified yet */
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
 	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2dbad410) SHA1(bb788ea14bb605be9af9c8f8adec94ad1c17ab55))
@@ -1196,5 +1176,5 @@ GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "Sem
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                  "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
 GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom",          "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong
-GAME( 1999, gaialast, 0,      baryon,   gaialast, dreamwld_state, gaialast, ROT0,   "SemiCom / XESS",   "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
+GAME( 1999, gaialast, 0,      baryon,   gaialast, driver_device, 0, ROT0,   "SemiCom / XESS",           "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
 GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                  "Dream World", GAME_SUPPORTS_SAVE )
