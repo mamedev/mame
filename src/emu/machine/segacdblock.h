@@ -81,9 +81,13 @@ private:
 	void cd_cmd_init(UINT8 init_flags);
 	// ...
 	void cd_cmd_end_transfer();
+
+	void cd_cmd_set_sector_length();
+	void cd_cmd_reset_selector();
 	void cd_cmd_get_copy_error();
 	void cd_cmd_abort();
 
+	// ...
 	void cd_cmd_auth_device(bool isMPEGauth);
 	void cd_cmd_device_auth_status(bool isMPEGauth);
 

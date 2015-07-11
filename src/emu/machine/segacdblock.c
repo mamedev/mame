@@ -205,6 +205,20 @@ void segacdblock_device::cd_cmd_end_transfer()
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_reset_selector()
+{
+	// ...
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_set_sector_length()
+{
+	// ...
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
 void segacdblock_device::cd_cmd_get_copy_error()
 {
 	m_dr[0] = CD_STAT_NODISC | 0;
@@ -213,6 +227,7 @@ void segacdblock_device::cd_cmd_get_copy_error()
 	m_dr[3] = 0;
 	set_flag(CMOK);
 }
+
 
 void segacdblock_device::cd_cmd_abort()
 {
@@ -224,7 +239,9 @@ void segacdblock_device::cd_cmd_abort()
 void segacdblock_device::cd_cmd_auth_device(bool isMPEGauth)
 {
 	if(isMPEGauth == true)
-		set_flag(MPED);
+	{
+		//set_flag(MPED);
+	}
 	else
 		set_flag(EFLS|CSCT);
 
@@ -236,7 +253,7 @@ void segacdblock_device::cd_cmd_device_auth_status(bool isMPEGauth)
 	if(isMPEGauth == true)
 	{
 		m_dr[0] = CD_STAT_NODISC | 0;
-		m_dr[1] = 2; /**< @todo: check if card present */
+		m_dr[1] = 0; /**< @todo: 2 if card present */
 		m_dr[2] = 0;
 		m_dr[3] = 0;
 	}
@@ -299,6 +316,15 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 					case 0x06:
 						cd_cmd_end_transfer();
 						break;
+
+					case 0x48:
+						cd_cmd_reset_selector();
+						break;
+
+					case 0x60:
+						cd_cmd_set_sector_length();
+						break;
+
 					case 0x67:
 						cd_cmd_get_copy_error();
 						break;
@@ -317,6 +343,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 						break;
 					default:
 						printf("%04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+						//set_flag(CMOK);
 				}
 				m_cmd_issued = 0;
 			}
