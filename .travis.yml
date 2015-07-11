@@ -3,12 +3,12 @@ compiler:
   - gcc
   - clang
 env:
-  - SUBTARGET=arcade
-  - SUBTARGET=mess
+  - SUBTARGET=arcade MAME=mamearcade64
+  - SUBTARGET=mess   MAME=mess64
 script:
   - if [ $CC == 'clang' ];
-    then make -j2 linux_x64_clang;
-    else make -j2;
+    then make -j2 linux_x64_clang && ./$MAME -validate;
+    else make -j2 && ./$MAME -validate;
     fi
 sudo: required
 before_install:
