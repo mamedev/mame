@@ -5,6 +5,7 @@
 Template for skeleton device
 
 ***************************************************************************/
+#include "cdrom.h"
 
 #pragma once
 
@@ -52,6 +53,8 @@ public:
 
 	DECLARE_READ16_MEMBER( hirq_mask_r );
 	DECLARE_WRITE16_MEMBER( hirq_mask_w );
+
+	cdrom_file *cdrom;
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -59,6 +62,8 @@ protected:
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 	address_space_config        m_space_config;
 	address_space *m_space;
 
@@ -70,8 +75,10 @@ private:
 	UINT16 m_hirq;
 	UINT32 m_fad;
 	UINT32 m_sh1_ticks;
-	bool m_sh1_inited;
+	UINT16 m_cd_state;
 	UINT8 m_cmd_issued;
+	bool m_sh1_inited;
+	bool m_isDiscInTray;
 
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
 	void cd_standard_return(bool isPeri);

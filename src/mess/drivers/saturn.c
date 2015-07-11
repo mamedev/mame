@@ -755,10 +755,6 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
 MACHINE_CONFIG_END
 
 static SLOT_INTERFACE_START(saturn_cart)
@@ -773,8 +769,8 @@ SLOT_INTERFACE_END
 
 
 MACHINE_CONFIG_DERIVED( saturnus, saturn )
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
+	//MCFG_CDROM_ADD( "cdrom" )
+	//MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-U")
 
@@ -784,8 +780,8 @@ MACHINE_CONFIG_DERIVED( saturnus, saturn )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturneu, saturn )
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
+	//MCFG_CDROM_ADD( "cdrom" )
+	//MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","PAL")
 
@@ -795,8 +791,8 @@ MACHINE_CONFIG_DERIVED( saturneu, saturn )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( saturnjp, saturn )
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("sat_cdrom")
+	//MCFG_CDROM_ADD( "cdrom" )
+	//MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-J")
 
@@ -824,7 +820,7 @@ void sat_console_state::saturn_init_driver(int rgn)
 	//m_slave->sh2drc_add_fastram(0x00200000, 0x002fffff, 0, &m_workram_l[0]);
 	//m_slave->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_workram_h[0]);
 //#endif
-	
+
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	m_minit_boost = 400;
 	m_sinit_boost = 400;

@@ -13,7 +13,9 @@ Template for skeleton device
 #include "emu.h"
 #include "machine/segacdblock.h"
 #include "debugger.h"
-
+#include "imagedev/chd_cd.h"
+#include "cdrom.h"
+#include "sound/cdda.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -137,6 +139,16 @@ static ADDRESS_MAP_START( map, AS_0, 32, segacdblock_device )
 	AM_RANGE(0x24, 0x27) AM_MIRROR(0xf000) AM_READWRITE16(cr3_r,cr3_w,0xffffffff)
 ADDRESS_MAP_END
 
+static MACHINE_CONFIG_FRAGMENT( segacdblock_config )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("sat_cdrom")
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /**< @todo: reference to main sound routing? */
+	MCFG_SOUND_ADD("cdda", CDDA, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -158,6 +170,11 @@ const address_space_config *segacdblock_device::memory_space_config(address_spac
 	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
+machine_config_constructor segacdblock_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( segacdblock_config );
+}
+
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
 //  on this device
@@ -167,9 +184,11 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 {
 }
 
+
+
 void segacdblock_device::cd_standard_return(bool isPeri)
 {
-	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0) | CD_STAT_NODISC;
+	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0) | m_cd_state;
 	m_dr[1] = 0x0000;
 	m_dr[2] = 0x0000;
 	m_dr[3] = 0x0000;
@@ -184,7 +203,7 @@ void segacdblock_device::cd_cmd_status()
 
 void segacdblock_device::cd_cmd_get_hw_info()
 {
-	m_dr[0] = CD_STAT_NODISC;
+	m_dr[0] = m_cd_state;
 	m_dr[1] = 0x0201;
 	m_dr[2] = 0x0000;
 	m_dr[3] = 0x0400;
@@ -198,13 +217,13 @@ void segacdblock_device::cd_cmd_init(UINT8 init_flags)
 
 	if(init_flags & 1)
 		set_flag(ESEL|EHST|ECPY|EFLS|SCDQ);
-//	sh1_writes_registers(CD_STAT_NODISC,0,0,0);
+
 	set_flag(CMOK);
 }
 
 void segacdblock_device::cd_cmd_end_transfer()
 {
-	m_dr[0] = CD_STAT_NODISC | 0xff;
+	m_dr[0] = m_cd_state | 0xff;
 	m_dr[1] = 0xffff;
 	m_dr[2] = 0;
 	m_dr[3] = 0;
@@ -232,7 +251,7 @@ void segacdblock_device::cd_cmd_set_sector_length()
 
 void segacdblock_device::cd_cmd_get_copy_error()
 {
-	m_dr[0] = CD_STAT_NODISC | 0;
+	m_dr[0] = m_cd_state | 0;
 	m_dr[1] = 0;
 	m_dr[2] = 0;
 	m_dr[3] = 0;
@@ -267,14 +286,14 @@ void segacdblock_device::cd_cmd_device_auth_status(bool isMPEGauth)
 {
 	if(isMPEGauth == true)
 	{
-		m_dr[0] = CD_STAT_NODISC | 0;
+		m_dr[0] = m_cd_state | 0;
 		m_dr[1] = 0; /**< @todo: 2 if card present */
 		m_dr[2] = 0;
 		m_dr[3] = 0;
 	}
 	else
 	{
-		m_dr[0] = CD_STAT_NODISC | 0;
+		m_dr[0] = m_cd_state | 0;
 		m_dr[1] = 4; /**< @todo: various auth states */
 		m_dr[2] = 0;
 		m_dr[3] = 0;
@@ -302,29 +321,36 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	{
 		if((m_sh1_ticks & 0xff) != 0)
 		{
+			if(m_isDiscInTray == true)
+				m_cd_state = CD_STAT_PAUSE;
+			else
+				m_cd_state = CD_STAT_NODISC;
 			cd_standard_return(true);
 			set_flag(SCDQ);
 		}
 		else
 		{
 
+
 			if(m_cmd_issued == 0xf)
 			{
+				if(m_cr[0] != 0)
+				printf("CD CMD: %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+
 				switch(m_cr[0] >> 8)
 				{
 					case 0x00:
-						m_dr[0] = CD_STAT_NODISC;
-						m_dr[1] = 0x0000;
-						m_dr[2] = 0x0000;
-						m_dr[3] = 0x0000;
 						cd_cmd_status();
 						break;
+
 					case 0x01:
 						cd_cmd_get_hw_info();
 						break;
+
 					case 0x04:
 						cd_cmd_init(m_cr[0] & 0xff);
 						break;
+
 					case 0x06:
 						cd_cmd_end_transfer();
 						break;
@@ -354,44 +380,13 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 						cd_cmd_device_auth_status(m_cr[1] == 1);
 						break;
 					default:
-						printf("%04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+						printf("Unhandled %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
 						//set_flag(CMOK);
 				}
 				m_cmd_issued = 0;
 			}
 		}
 	}
-
-#if 0
-	if(m_hirq & CMOK)
-		return;
-
-	if(read_cd_state() & CD_STAT_PERI) // waiting for command
-	{
-		//write_cd_state(CD_STAT_PERI); /**< @todo command */
-		//write_fad();
-		m_sh1_timer->adjust(attotime::from_hz(clock()));
-		return;
-	}
-
-	if(read_cd_state() == CD_STAT_BUSY)
-	{
-		switch(m_cr[0] & 0xff)
-		{
-			case 0x00:
-				sh1_writes_registers(CD_STAT_NODISC,0,0,0);
-				break;
-			case 0x04:
-				cmd_init();
-				break;
-		}
-
-		set_flag(CMOK);
-		//write_fad();
-		//m_cd_timer->adjust(attotime::from_hz(clock()));
-		return;
-	}
-#endif
 }
 
 //-------------------------------------------------
@@ -424,6 +419,15 @@ void segacdblock_device::device_reset()
 	m_sh1_inited = false;
 	m_cmd_issued = 0;
 	m_hirq = 0xffff;
+
+	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
+	if (cddevice!=NULL)
+	{
+		cdrom = cddevice->get_cdrom_file();
+		m_isDiscInTray = true;
+	}
+	else
+		m_isDiscInTray = false;
 }
 
 
