@@ -361,10 +361,10 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 			else
 				/* per-line rowscroll */
 				x0 = linebase[(i+32)&0xff];
-		}
+		}		
 
 		tmptilemap0->set_scrollx(
-		(i + layer0_scrolly) % 1024,
+		(i + layer0_scrolly) & 0x3ff,
 		layer0_scrollx + x0 );
 
 
@@ -383,8 +383,9 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 
 
 		tmptilemap1->set_scrollx(
-		(i + layer1_scrolly) % 1024,
+		(i + layer1_scrolly) & 0x3ff,
 		layer1_scrollx + x1 );
+
 	}
 
 
