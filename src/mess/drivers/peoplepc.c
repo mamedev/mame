@@ -24,6 +24,8 @@ public:
 		m_8251key(*this, "i8251_0"),
 		m_8251ser(*this, "i8251_1"),
 		m_fdc(*this, "upd765"),
+		m_flop0(*this, "upd765:0"),
+		m_flop1(*this, "upd765:1"),
 		m_dmac(*this, "i8257"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_gvram(*this, "gvram"),
@@ -36,6 +38,8 @@ public:
 	required_device<i8251_device> m_8251key;
 	required_device<i8251_device> m_8251ser;
 	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_flop0;
+	required_device<floppy_connector> m_flop1;
 	required_device<i8257_device> m_dmac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<UINT16> m_gvram;
@@ -59,6 +63,7 @@ public:
 	UINT8 m_dma0pg;
 protected:
 	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 static const gfx_layout peoplepc_charlayout =
@@ -163,16 +168,22 @@ void peoplepc_state::floppy_unload(floppy_image_device *dev)
 	dev->mon_w(1);
 }
 
+void peoplepc_state::machine_reset()
+{
+	m_flop0->get_device()->mon_w(!m_flop0->get_device()->exists());
+	m_flop1->get_device()->mon_w(!m_flop1->get_device()->exists());
+}
+
 void peoplepc_state::machine_start()
 {
 	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(machine().device<palette_device>("palette"), peoplepc_charlayout, &m_charram[0], 0, 1, 0)));
 	m_dma0pg = 0;
 
 	// FIXME: cheat as there no docs about how or obvious ports that set to control the motor
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(peoplepc_state::floppy_load), this));
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(peoplepc_state::floppy_unload), this));
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(peoplepc_state::floppy_load), this));
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(peoplepc_state::floppy_unload), this));
+	m_flop0->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(peoplepc_state::floppy_load), this));
+	m_flop0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(peoplepc_state::floppy_unload), this));
+	m_flop1->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(peoplepc_state::floppy_load), this));
+	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(peoplepc_state::floppy_unload), this));
 }
 
 static ADDRESS_MAP_START( peoplepc_map, AS_PROGRAM, 16, peoplepc_state )
@@ -280,8 +291,12 @@ MACHINE_CONFIG_END
 
 ROM_START( olypeopl )
 	ROM_REGION(0x2000,"maincpu", 0)
-	ROM_LOAD16_BYTE( "uo1271c0.bin", 0x00000, 0x1000, CRC(c9187bce) SHA1(464e1f96046657b49afa4223ede1040650643d58))
-	ROM_LOAD16_BYTE( "uo1271d0.bin", 0x00001, 0x1000, CRC(10e6437b) SHA1(0b77bb7a62f0a8240602f4cdcc3d6765e62894f4))
+	ROM_SYSTEM_BIOS(0, "hd",  "HD ROM")
+	ROMX_LOAD( "u01271c0.bin", 0x00000, 0x1000, CRC(8e0ef114) SHA1(774bab0a3e29853e9f6b951cf73082063ea61e6d), ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD( "u01271d0.bin", 0x00001, 0x1000, CRC(e2419bf9) SHA1(d88381f8709c91e2adba08f378e29bd0d19ee5ae), ROM_SKIP(1)|ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "2fd",  "2 FD ROM")
+	ROMX_LOAD( "u01277f3.bin", 0x00000, 0x1000, CRC(428ff135) SHA1(ec11f0e43455570c40f5dc4b84f8420da5939368), ROM_SKIP(1)|ROM_BIOS(2))
+	ROMX_LOAD( "u01277g3.bin", 0x00001, 0x1000, CRC(3295691c) SHA1(7d7ade62117d11656b8dd86cf0703127616d55bc), ROM_SKIP(1)|ROM_BIOS(2))
 ROM_END
 
 COMP( 198?, olypeopl,   0,    0,         olypeopl,      0, driver_device,      0,      "Olympia", "People PC", GAME_NOT_WORKING|GAME_NO_SOUND)

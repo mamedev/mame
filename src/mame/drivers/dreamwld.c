@@ -121,6 +121,11 @@ public:
 	required_shared_ptr<UINT32> m_vregs;
 	required_shared_ptr<UINT32> m_workram;
 
+	UINT16* m_lineram16;
+
+	DECLARE_READ16_MEMBER(lineram16_r) { return m_lineram16[offset]; }
+	DECLARE_WRITE16_MEMBER(lineram16_w) { COMBINE_DATA(&m_lineram16[offset]); }
+
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_bg2_tilemap;
@@ -148,26 +153,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-	DECLARE_DRIVER_INIT(gaialast);
 };
 
-DRIVER_INIT_MEMBER(dreamwld_state,gaialast)
-{
-	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
-
-	mem16[(0x6c / 2)^1] = 0x000f;
-	mem16[(0x6e / 2)^1] = 0xf800;
-	mem16[(0x70 / 2)^1] = 0x000f;
-	mem16[(0x72 / 2)^1] = 0xf800;
-	mem16[(0x74 / 2)^1] = 0x000f;
-	mem16[(0x76 / 2)^1] = 0xf800;
-	mem16[(0x78 / 2)^1] = 0x000f;
-	mem16[(0x7a / 2)^1] = 0xf800;
-	mem16[(0x7c / 2)^1] = 0x000f;
-	mem16[(0x7e / 2)^1] = 0xf800;
-
-}
 
 
 void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -176,6 +163,7 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	UINT32 *source = m_spritebuf1;
 	UINT32 *finish = m_spritebuf1 + 0x1000 / 4;
 	UINT16 *redirect = (UINT16 *)memregion("spritelut")->base();
+	int xoffset = 4;
 
 	while (source < finish)
 	{
@@ -198,6 +186,9 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		xinc = 16;
 		yinc = 16;
+
+		xpos += xoffset;
+		xpos &= 0x1ff;
 
 		if (xflip)
 		{
@@ -273,15 +264,17 @@ void dreamwld_state::video_start()
 	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
 	m_bg2_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap->set_scroll_rows(256); // line scrolling
+	m_bg_tilemap->set_scroll_rows(64*16); // line scrolling
 	m_bg_tilemap->set_scroll_cols(1);
 
-	m_bg2_tilemap->set_scroll_rows(256);    // line scrolling
+	m_bg2_tilemap->set_scroll_rows(64*16);    // line scrolling
 	m_bg2_tilemap->set_scroll_cols(1);
 
 	m_spritebuf1 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
 	m_spritebuf2 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
 
+	m_lineram16 = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x400 / 2);
+	save_pointer(NAME(m_lineram16), 0x400/2);
 
 }
 
@@ -305,13 +298,31 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 	tmptilemap0 = m_bg_tilemap;
 	tmptilemap1 = m_bg2_tilemap;
 
-	int layer0_scrolly = m_vregs[(0x400 / 4)] + 32;
-	int layer1_scrolly = m_vregs[(0x400 / 4) + 2] + 32;
+	int layer0_scrolly = m_vregs[(0x000 / 4)]+32;
+	int layer1_scrolly = m_vregs[(0x008 / 4)]+32;
 
-	int layer0_scrollx = m_vregs[(0x400 / 4) + 1] + 3;
-	int layer1_scrollx = m_vregs[(0x400 / 4) + 3] + 5;
-	UINT32 layer0_ctrl = m_vregs[0x412 / 4];
-	UINT32 layer1_ctrl = m_vregs[0x416 / 4];
+	int layer0_scrollx = m_vregs[(0x004 / 4)] + 0;
+	int layer1_scrollx = m_vregs[(0x00c / 4)] + 2;
+
+	UINT32 layer0_ctrl = m_vregs[0x010 / 4];
+	UINT32 layer1_ctrl = m_vregs[0x014 / 4];
+
+	m_tilebank[0] = (layer0_ctrl >> 6) & 1;
+	m_tilebank[1] = (layer1_ctrl >> 6) & 1;
+
+	if (m_tilebank[0] != m_tilebankold[0])
+	{
+		m_tilebankold[0] = m_tilebank[0];
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	if (m_tilebank[1] != m_tilebankold[1])
+	{
+		m_tilebankold[1] = m_tilebank[1];
+		m_bg2_tilemap->mark_all_dirty();
+	}
+
+
 
 	tmptilemap0->set_scrolly(0, layer0_scrolly);
 	tmptilemap1->set_scrolly(0, layer1_scrolly);
@@ -340,56 +351,49 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 	{
 		int x0 = 0, x1 = 0;
 
+		UINT16* linebase;
+		
+		
+
 		/* layer 0 */
-		UINT16 *vregs = reinterpret_cast<UINT16 *>(m_vregs.target());
+		linebase = &m_lineram16[0x000];
+
 		if (layer0_ctrl & 0x0300)
 		{
 			if (layer0_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x0 = vregs[BYTE_XOR_BE(0x000/2 + i/16)];
+				x0 = linebase[((i+32)&0xff)/16];
 			else
 				/* per-line rowscroll */
-				x0 = vregs[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
-		}
+				x0 = linebase[(i+32)&0xff];
+		}		
 
-
-			tmptilemap0->set_scrollx(
-			(i + layer0_scrolly) % 256 /*tilemap_width(tm0size) */,
-			layer0_scrollx + x0 );
+		tmptilemap0->set_scrollx(
+		(i + layer0_scrolly) & 0x3ff,
+		layer0_scrollx + x0 );
 
 
 		/* layer 1 */
+		linebase = &m_lineram16[0x200/2];
+
 		if (layer1_ctrl & 0x0300)
 		{
 			if (layer1_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x1 = vregs[BYTE_XOR_BE(0x200/2 + i/16)];
+				x1 = linebase[((i+32)&0xff)/16];
 			else
 				/* per-line rowscroll */
-				x1 = vregs[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
+				x1 = linebase[(i+32)&0xff];
 		}
 
 
-			tmptilemap1->set_scrollx(
-			(i + layer1_scrolly) % 256 /* tilemap_width(tm1size) */,
-			layer1_scrollx + x1 );
+		tmptilemap1->set_scrollx(
+		(i + layer1_scrolly) & 0x3ff,
+		layer1_scrollx + x1 );
+
 	}
 
 
-	m_tilebank[0] = (m_vregs[(0x400 / 4) + 4] >> 6) & 1;
-	m_tilebank[1] = (m_vregs[(0x400 / 4) + 5] >> 6) & 1;
-
-	if (m_tilebank[0] != m_tilebankold[0])
-	{
-		m_tilebankold[0] = m_tilebank[0];
-		m_bg_tilemap->mark_all_dirty();
-	}
-
-	if (m_tilebank[1] != m_tilebankold[1])
-	{
-		m_tilebankold[1] = m_tilebank[1];
-		m_bg2_tilemap->mark_all_dirty();
-	}
 
 	tmptilemap0->draw(screen, bitmap, cliprect, 0, 0);
 	tmptilemap1->draw(screen, bitmap, cliprect, 0, 0);
@@ -452,7 +456,8 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_SHARE("bg_videoram")
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_SHARE("bg2_videoram")
-	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_SHARE("vregs")  // scroll regs etc.
+	AM_RANGE(0x804000, 0x8043ff) AM_READWRITE16(lineram16_r, lineram16_w, 0xffffffff)  // linescroll
+	AM_RANGE(0x804400, 0x805fff) AM_RAM AM_SHARE("vregs")
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
@@ -796,7 +801,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_REFRESH_RATE(57.793)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(512,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
 	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1164,14 +1169,12 @@ ROM_START( gaialast )
 	ROM_LOAD32_BYTE( "5", 0x000001, 0x040000, CRC(c55f6f11) SHA1(13d543b0770bebdd4c6e064b56fd6cc2ec929566) )
 	ROM_LOAD32_BYTE( "2", 0x000002, 0x040000, CRC(549e594a) SHA1(728c6b51cc478ad7251bcbe6d7f4f4e6a2ee4a4e) )
 	ROM_LOAD32_BYTE( "3", 0x000003, 0x040000, CRC(a8e845d8) SHA1(f8c7e702bd747a22e76c861effec4cd3cd2f3fc9) )
-	ROM_LOAD("dreamcode",  0x100000-0x800, 0x800, CRC(4a93805f) SHA1(992e409beb91da7a0aaf0d0d1314e28c506b2746) )
-	
 
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
 
 	ROM_REGION( 0x6c9, "user1", ROMREGION_ERASEFF ) /* Protection data  */
-	//ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
+	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 , CRC(d3403b7b) SHA1(712a7f27fc41b632d584237f7641e8ae20035111) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
 	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2dbad410) SHA1(bb788ea14bb605be9af9c8f8adec94ad1c17ab55))
@@ -1194,7 +1197,7 @@ ROM_END
 
 GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                  "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
-GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom",          "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong
-GAME( 1999, gaialast, 0,      baryon,   gaialast, dreamwld_state, gaialast, ROT0,   "SemiCom / XESS",   "Gaia - The Last Choice of Earth", GAME_NOT_WORKING )
+GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                  "Cute Fighter", GAME_SUPPORTS_SAVE ) 
+GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom",          "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE )
+GAME( 1999, gaialast, 0,      baryon,   gaialast, driver_device, 0, ROT0,   "SemiCom / XESS",           "Gaia - The Last Choice of Earth", GAME_SUPPORTS_SAVE )
 GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                  "Dream World", GAME_SUPPORTS_SAVE )

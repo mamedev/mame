@@ -240,11 +240,20 @@ NETLIB_RESET(C)
 NETLIB_UPDATE_PARAM(C)
 {
 	//step_time(1.0/48000.0);
+	m_GParallel = netlist().gmin() * m_C.Value();
 }
 
 NETLIB_UPDATE(C)
 {
 	NETLIB_NAME(twoterm)::update();
+}
+
+ATTR_HOT void NETLIB_NAME(C)::step_time(const nl_double st)
+{
+	/* Gpar should support convergence */
+	const nl_double G = m_C.Value() / st +  m_GParallel;
+	const nl_double I = -G * deltaV();
+	set(G, 0.0, I);
 }
 
 // ----------------------------------------------------------------------------------------

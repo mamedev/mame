@@ -123,42 +123,42 @@ public:
 		m_b = value;
 	}
 
-	inline UINT8 get_a()
+	inline UINT8 get_a() const
 	{
 		return m_a;
 	}
 
-	inline UINT8 get_r()
+	inline UINT8 get_r() const
 	{
 		return m_r;
 	}
 
-	inline UINT8 get_g()
+	inline UINT8 get_g() const
 	{
 		return m_g;
 	}
 
-	inline UINT8 get_b()
+	inline UINT8 get_b() const
 	{
 		return m_b;
 	}
 
-	inline INT32 get_a32()
+	inline INT32 get_a32() const
 	{
 		return m_a;
 	}
 
-	inline INT32 get_r32()
+	inline INT32 get_r32() const
 	{
 		return m_r;
 	}
 
-	inline INT32 get_g32()
+	inline INT32 get_g32() const
 	{
 		return m_g;
 	}
 
-	inline INT32 get_b32()
+	inline INT32 get_b32() const
 	{
 		return m_b;
 	}

@@ -26,7 +26,7 @@
 		</part>
 	</software>
 
-	<software name="1001demoa">
+	<software name="1001demoa" cloneof="1001demo">
 		<description>Commodore SFD-1001 Test/Demo</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
@@ -62,7 +62,7 @@
 		</part>
 	</software>
 
-	<software name="datestond">
+	<software name="dateston">
 		<description>The Datestones of Ryn A Microquest</description>
 		<year>1979</year>
 		<publisher>Automated Simulations</publisher>
@@ -98,7 +98,7 @@
 		</part>
 	</software>
 
-	<software name="hellfired">
+	<software name="hellfire">
 		<description>Hellfire Warrior</description>
 		<year>1980</year>
 		<publisher>Automated Simulations</publisher>

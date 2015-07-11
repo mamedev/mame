@@ -1634,7 +1634,7 @@ GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon, driver_device,   0,        ROT90
 GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 2)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 3)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxonj,  zaxxon, szaxxon,  zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "bootleg", "Jackson",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, szaxxon,  zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "bootleg", "Jackson",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware but extra sound board plugged into 8255 PPI socket and encrypted cpu */
 GAME( 1982, szaxxon,  0,      szaxxon,  szaxxon, zaxxon_state,   szaxxon,  ROT90,  "Sega",    "Super Zaxxon (315-5013)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

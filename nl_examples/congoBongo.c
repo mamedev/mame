@@ -49,9 +49,9 @@ NETLIST_START(dummy)
 // .END
 
 	SOLVER(Solver, 24000)
-	PARAM(Solver.ACCURACY, 1e-8)
+	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 90)
-	PARAM(Solver.SOR_FACTOR, 0.00001)
+	PARAM(Solver.SOR_FACTOR, 0.001)
 	PARAM(Solver.GS_LOOPS, 1)
 	//PARAM(Solver.GS_THRESHOLD, 99)
 	PARAM(Solver.ITERATIVE, "SOR")
@@ -334,7 +334,7 @@ NETLIST_START(CongoBongo_schematics)
 	NET_C(C61.1, R94.2)
 NETLIST_END()
 
-NETLIST_START(opamp)
+NETLIST_START(opamp_mod)
 
 	/* Opamp model from
 	 *
@@ -365,7 +365,7 @@ NETLIST_START(opamp)
 	AFUNC(fUL, 1, "A0 1.2 +")
 
 	ALIAS(VCC, fUH.A0) // VCC terminal
-	ALIAS(GND, fUL.A0) // VCC terminal
+	ALIAS(GND, fUL.A0) // VGND terminal
 
 	AFUNC(fVREF, 2, "A0 A1 + 0.5 *")
 	NET_C(fUH.A0, fVREF.A0)
@@ -374,13 +374,18 @@ NETLIST_START(opamp)
 	NET_C(EBUF.ON, fVREF)
 	/* The opamp model */
 
-	VCCS(G1)
+	LVCCS(G1)
 	PARAM(G1.RI, RES_K(1000))
-
+#if 0
 	PARAM(G1.G, 0.0022)
 	RES(RP1, 1e6)
 	CAP(CP1, 0.0318e-6)
-
+#else
+	PARAM(G1.G, 0.0002)
+	PARAM(G1.CURLIM, 0.002)
+	RES(RP1, 9.5e6)
+	CAP(CP1, 0.0033e-6)
+#endif
 	VCVS(EBUF)
 	PARAM(EBUF.RO, 50)
 	PARAM(EBUF.G, 1)
@@ -395,21 +400,43 @@ NETLIST_START(opamp)
 
 	DIODE(DP,".model tt D(IS=1e-15 N=1)")
 	DIODE(DN,".model tt D(IS=1e-15 N=1)")
-
+#if 1
 	NET_C(DP.K, fUH.Q)
 	NET_C(fUL.Q, DN.A)
 	NET_C(DP.A, DN.K, RP1.1)
+#else
+	/*
+	 * This doesn't add any performance by decreasing iteration loops.
+	 * To the contrary, it significantly decreases iterations
+	 */
+	RES(RH1, 0.1)
+	RES(RL1, 0.1)
+	NET_C(DP.K, RH1.1)
+	NET_C(RH1.2, fUH.Q)
+	NET_C(fUL.Q, RL1.1)
+	NET_C(RL1.2, DN.A)
+	NET_C(DP.A, DN.K, RP1.1)
 
+#endif
 	NET_C(EBUF.IP, RP1.1)
 
 NETLIST_END()
 
 NETLIST_START(MB3614_DIP)
-	SUBMODEL(opamp, op1)
-	SUBMODEL(opamp, op2)
-	SUBMODEL(opamp, op3)
-	SUBMODEL(opamp, op4)
-
+#if 1
+	SUBMODEL(opamp_mod, op1)
+	SUBMODEL(opamp_mod, op2)
+	SUBMODEL(opamp_mod, op3)
+	SUBMODEL(opamp_mod, op4)
+#else
+	/* The opamp actually has an FPF of about 500k. This doesn't work here and causes oscillations.
+	 * FPF here therefore about half the Solver clock.
+	 */
+	OPAMP(op1, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
+	OPAMP(op2, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
+	OPAMP(op3, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
+	OPAMP(op4, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
+#endif
 	ALIAS( 1, op1.OUT)
 	ALIAS( 2, op1.MINUS)
 	ALIAS( 3, op1.PLUS)

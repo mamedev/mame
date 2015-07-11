@@ -675,11 +675,11 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 MACHINE_CONFIG_END
 
 
-/* Jumping: The PCB has 2 Xtals, 24MHz and 16MHz */
+/* Jumping: The PCB has 2 Xtals, 18.432MHz and 24MHz */
 static MACHINE_CONFIG_START( jumping, rbisland_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 
@@ -720,6 +720,12 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
+/* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
+static MACHINE_CONFIG_DERIVED( jumpingi, jumping )
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz/2)  /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(jumping_map)
+        MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                   DRIVERS
@@ -968,4 +974,4 @@ GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, rbisland,  
 GAME( 1988, rbislande, rbisland, rbisland, rbisland, rbisland_state, rbislande, ROT0, "Taito Corporation", "Rainbow Islands (Extra)", GAME_SUPPORTS_SAVE )
 GAME( 1989, jumping,   rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg",          "Jumping (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, jumpinga,  rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, jumpingi,  rbisland, jumping,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 3, Imnoe PCB)", GAME_SUPPORTS_SAVE )
+GAME( 1988, jumpingi,  rbisland, jumpingi,  jumping, rbisland_state,  jumping,   ROT0, "bootleg (Seyutu)", "Jumping (set 3, Imnoe PCB)", GAME_SUPPORTS_SAVE )

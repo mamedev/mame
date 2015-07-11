@@ -2816,7 +2816,7 @@
 
 	<software name="spacei">
 		<description>Space Invaders</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Unknown</publisher>
 
 		<!-- pet8032 cb2snd Side A: invaders -->
@@ -2926,7 +2926,7 @@
 
 	<software name="timec">
 		<description>Time Chess</description>
-		<year>198_</year>
+		<year>198?</year>
 
 		<!-- pet8032 Side A: time chess -->
 		<publisher>Unknown</publisher>

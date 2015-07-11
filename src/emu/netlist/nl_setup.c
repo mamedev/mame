@@ -919,6 +919,7 @@ nl_double setup_t::model_value(const pstring &model_str, const pstring &entity, 
 		char numfac = *(tmp.right(1).cstr());
 		switch (numfac)
 		{
+			case 'M': factor = 1e6; break;
 			case 'k': factor = 1e3; break;
 			case 'm': factor = 1e-3; break;
 			case 'u': factor = 1e-6; break;
