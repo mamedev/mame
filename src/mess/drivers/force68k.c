@@ -77,17 +77,16 @@ SYSFAIL and SYSCLK signal (16 MHz).
 Based on the 68ksbc.c
 
     TODO:
-    - Memory map
     - Finish 3 x ACIA6850, terminal serial interface first
     - Add 1 x 14411 Motorola, Baudrate Generator
       - Add switches to strap baudrate configuration
-    - Add 1 x 68230 Motorola, Parallel Interface / Timer
+      - figure our why rs232 "terminal" is not working as for 68ksbc
+    - Finish 1 x 68230 Motorola, Parallel Interface / Timer
     - Add 1 x Abort Switch
     - Add configurable serial connector between ACIA:s and 
-      - Real terminal emulator
+      - Real terminal emulator, ie rs232 "socket"
       - Debug console
-    - VME bus driver
-
+    - Add VME bus driver
 
 ****************************************************************************/
 
@@ -95,6 +94,7 @@ Based on the 68ksbc.c
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mm58167.h"
+#include "machine/68230pit.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 
@@ -107,11 +107,13 @@ public:
 		driver_device(mconfig, type, tag),
 		  //		m_rtc(*this, "rtc")
 		  m_maincpu(*this, "maincpu"),
+		  m_pit(*this, "pit"),
 		  m_aciahost(*this, "aciahost"),
  		  m_aciaterm(*this, "aciaterm"),
   		  m_aciaremt(*this, "aciaremt")
 	{
 	}
+
 	DECLARE_READ16_MEMBER(bootvect_r);
 	virtual void machine_start();
 	DECLARE_WRITE_LINE_MEMBER(write_aciahost_clock);
@@ -121,10 +123,12 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	//	required_device<mm58167_device> m_rtc;
+	required_device<pit68230_device> m_pit;
 	required_device<acia6850_device> m_aciahost;
 	required_device<acia6850_device> m_aciaterm;
 	required_device<acia6850_device> m_aciaremt;
-	// Pointer to ROM0
+
+	// Pointer to System ROMs needed by bootvect_r
 	UINT16  *m_sysrom;
 };
 
@@ -140,8 +144,9 @@ static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
 	AM_RANGE(0x0c0082, 0x0c0083) AM_DEVREADWRITE8("aciaterm", acia6850_device, data_r, data_w, 0xff00)
 	AM_RANGE(0x0c0100, 0x0c0101) AM_DEVREADWRITE8("aciaremt", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0c0102, 0x0c0103) AM_DEVREADWRITE8("aciaremt", acia6850_device, data_r, data_w, 0x00ff)
-//      AM_RANGE(0x0e0400, 0x0e0420) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00)
-//      AM_RANGE(0x0e0000, 0x0fffff) AM_READWRITE_PORT /* PI/T 68230 IO interfaces */
+//      AM_RANGE(0x0c0401, 0x0c042f) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00)
+        AM_RANGE(0x0e0000, 0x0e0035) AM_DEVREADWRITE8("pit", pit68230_device, data_r, data_w, 0x00ff) 
+//      AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */
 //	AM_RANGE(0x100000, 0x1fffff) AM_RAM /* DRAM for bin patched bug, remove once not needed */
 //      AM_RANGE(0x100000, 0xfeffff) /* VMEbus Rev B addresses (24 bits) */
 //      AM_RANGE(0xff0000, 0xffffff) /* VMEbus Rev B addresses (16 bits) */
@@ -199,7 +204,6 @@ static MACHINE_CONFIG_START( fccpu1, force68k_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("aciaterm", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("aciaterm", acia6850_device, write_cts))
 
-	//MCFG_DEVICE_ADD("aciaterm_clock", CLOCK, XTAL_15_36MHz) /* 9600 x 16 */
         MCFG_DEVICE_ADD("aciaterm_clock", CLOCK, BAUDGEN_CLOCK / 2) 
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
 
@@ -208,17 +212,9 @@ static MACHINE_CONFIG_START( fccpu1, force68k_state )
         MCFG_DEVICE_ADD("aciaremt_clock", CLOCK, XTAL_15_36MHz) /* 9600 x 16 */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
 
-/*
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	/* PIT Parallel Interface and Timer device */
+	MCFG_DEVICE_ADD("pit", PIT68230, 0)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_acia_clock))
-*/
 MACHINE_CONFIG_END
 
 #if 0
@@ -252,7 +248,7 @@ MACHINE_CONFIG_END
 /* ROM definitions */
 ROM_START( fccpu1 )
 	ROM_REGION(0x1000000, "maincpu", 0)
-//        ROM_LOAD( "zbug5.bin", 0x080000, 0x3000, CRC(04445fe1) SHA1(d59214171385aead05279e31fe9d354c63fb893a) )
+
         ROM_LOAD16_BYTE( "fccpu1V1.0L.j8.bin", 0x080001, 0x2000, CRC(3ac6f08f) SHA1(502f6547b508d8732bd68bbbb2402d8c30fefc3b) )
         ROM_LOAD16_BYTE( "fccpu1V1.0L.j9.bin", 0x080000, 0x2000, CRC(035315fb) SHA1(90dc44d9c25d28428233e6846da6edce2d69e440) )
 ROM_END
