@@ -65,14 +65,23 @@ protected:
 private:
 	static const device_timer_id SH1_TIMER = 0;
 	UINT16 m_cr[4];
+	UINT16 m_dr[4];
 	UINT16 m_hirq_mask;
 	UINT16 m_hirq;
 	UINT32 m_fad;
 	UINT32 m_sh1_ticks;
 	bool m_sh1_inited;
+	UINT8 m_cmd_issued;
 
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
-	void cmd_init();
+
+	void cd_cmd_status();
+	// ...
+	void cd_cmd_init(UINT8 init_flags);
+	// ...
+	void cd_cmd_end_transfer();
+	void cd_cmd_abort();
+
 	void set_flag(UINT16 which);
 	void clear_flag(UINT16 which);
 	emu_timer *m_sh1_timer;

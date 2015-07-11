@@ -106,17 +106,17 @@ READ16_MEMBER(segacdblock_device::hirq_mask_r){	return m_hirq_mask; }
 WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { COMBINE_DATA(&m_hirq_mask); }
 
 // 0x6001fd8 cd-block string check
-READ16_MEMBER(segacdblock_device::cr0_r){ return m_cr[0]; }
-WRITE16_MEMBER(segacdblock_device::cr0_w){ printf("%04x 0\n",data); COMBINE_DATA(&m_cr[0]);}
+READ16_MEMBER(segacdblock_device::cr0_r){ return m_dr[0]; }
+WRITE16_MEMBER(segacdblock_device::cr0_w){ m_cmd_issued |= 1; COMBINE_DATA(&m_cr[0]);}
 
-READ16_MEMBER(segacdblock_device::cr1_r){ return m_cr[1]; }
-WRITE16_MEMBER(segacdblock_device::cr1_w){ printf("%04x 1\n",data); COMBINE_DATA(&m_cr[1]);}
+READ16_MEMBER(segacdblock_device::cr1_r){ return m_dr[1]; }
+WRITE16_MEMBER(segacdblock_device::cr1_w){ m_cmd_issued |= 2; COMBINE_DATA(&m_cr[1]);}
 
-READ16_MEMBER(segacdblock_device::cr2_r){ return m_cr[2]; }
-WRITE16_MEMBER(segacdblock_device::cr2_w){ printf("%04x 2\n",data); COMBINE_DATA(&m_cr[2]);}
+READ16_MEMBER(segacdblock_device::cr2_r){ return m_dr[2]; }
+WRITE16_MEMBER(segacdblock_device::cr2_w){ m_cmd_issued |= 4; COMBINE_DATA(&m_cr[2]);}
 
-READ16_MEMBER(segacdblock_device::cr3_r){ return m_cr[3]; }
-WRITE16_MEMBER(segacdblock_device::cr3_w){ printf("%04x 3\n",data); COMBINE_DATA(&m_cr[3]);}
+READ16_MEMBER(segacdblock_device::cr3_r){ return m_dr[3]; }
+WRITE16_MEMBER(segacdblock_device::cr3_w){ m_cmd_issued |= 8; COMBINE_DATA(&m_cr[3]);}
 
 
 // device type definition
@@ -171,10 +171,41 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 {
 }
 
-void segacdblock_device::cmd_init()
+void segacdblock_device::cd_cmd_status()
 {
-	sh1_writes_registers(CD_STAT_NODISC,0,0,0);
+	set_flag(CMOK);
 }
+
+void segacdblock_device::cd_cmd_init(UINT8 init_flags)
+{
+	m_dr[0] = CD_STAT_NODISC;
+	m_dr[1] = 0x0000;
+	m_dr[2] = 0x0000;
+	m_dr[3] = 0x0000;
+
+	if(init_flags & 1)
+		set_flag(ESEL|EHST|ECPY|EFLS|SCDQ);
+//	sh1_writes_registers(CD_STAT_NODISC,0,0,0);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_end_transfer()
+{
+	m_dr[0] = CD_STAT_NODISC | 0xff;
+	m_dr[1] = 0xffff;
+	m_dr[2] = 0;
+	m_dr[3] = 0;
+	// EHST
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_abort()
+{
+	set_flag(EFLS);
+	// ...
+	set_flag(CMOK);
+}
+
 
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -184,20 +215,46 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	//m_sh1_ticks &= 0xff;
 	//if(m_sh1_ticks == 0)
 
-	if(m_sh1_inited == false && m_sh1_ticks >= 0x4000)
+	if(m_sh1_inited == false)
 	{
-		m_sh1_inited = true;
-		set_flag(CMOK);
+		if(m_sh1_ticks >= 0x4000)
+		{
+			m_sh1_inited = true;
+			set_flag(0xffff);
+		}
 	}
 	else
 	{
 		if((m_sh1_ticks & 0xff) == 0)
 		{
-			//popmessage("%04x %04x %04x %04x",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+			m_dr[0] = CD_STAT_NODISC;
+			m_dr[1] = 0x0000;
+			m_dr[2] = 0x0000;
+			m_dr[3] = 0x0000;
+
+			if(m_cmd_issued == 0xf)
+			{
+				switch(m_cr[0] >> 8)
+				{
+					case 0x00:
+						cd_cmd_status();
+						break;
+					case 0x04:
+						cd_cmd_init(m_cr[0] & 0xff);
+						break;
+					case 0x06:
+						cd_cmd_end_transfer();
+						break;
+					case 0x75:
+						cd_cmd_abort();
+						break;
+					default:
+						printf("%04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+				}
+				m_cmd_issued = 0;
+			}
 		}
 	}
-
-	popmessage("%04x",m_sh1_ticks);
 
 #if 0
 	if(m_hirq & CMOK)
@@ -250,15 +307,16 @@ void segacdblock_device::device_start()
 void segacdblock_device::device_reset()
 {
 	// init_command_regs
-	m_cr[0] = 'C';
-	m_cr[1] = 'D' << 8 | 'B';
-	m_cr[2] = 'L' << 8 | 'O';
-	m_cr[3] = 'C' << 8 | 'K';
+	m_dr[0] = 'C';
+	m_dr[1] = 'D' << 8 | 'B';
+	m_dr[2] = 'L' << 8 | 'O';
+	m_dr[3] = 'C' << 8 | 'K';
 	m_fad = 150;
 	m_sh1_timer->reset();
 	m_sh1_timer->adjust(attotime::from_hz(clock()*256), 0, attotime::from_hz(clock()*256));
 	m_sh1_ticks = 0;
 	m_sh1_inited = false;
+	m_cmd_issued = 0;
 }
 
 
@@ -273,5 +331,6 @@ READ32_MEMBER( segacdblock_device::read )
 
 WRITE32_MEMBER( segacdblock_device::write )
 {
-	m_space->write_word(offset*4,data|data<<16);
+	if(mem_mask == 0xffff0000)
+		m_space->write_word(offset*4,data>>16);
 }
