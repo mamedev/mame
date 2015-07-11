@@ -4,41 +4,30 @@
 
     Motorola MC68230 PI/T Parallell Interface and Timer
 
+Revisions
+ 2015-07-15 JLE initial
+
+Todo
+ - Add clock and timers
+ - Add all missing registers
+ - Add configuration
 **********************************************************************/
 
 /*
-  Registers  
------------------------------------------------------------------------
-  Offset        Reset R/W 
-  RS1-RS5 Name  Value Reset Description
------------------------------------------------------------------------
-  0x00 RW PGCR         No   Port General Control register
-  0x01 RW PSRR         No   Port Service Request register
-  0x02 RW PADDR        No   Port A Data Direction register
-  0x03 RW PBDDR        No   Port B Data Direction register
-  0x04 RW PCDDR        No   Port C Data Direction register
-  0x05 RW PIVR         No   Port Interrupt vector register
-  0x06 RW PACR         No   Port A Control register
-  0x07 RW PBCR         No   Port B Control register
-  0x08 RW PADR         May  Port A Data register
-  0x09 RW PBDR         May  Port B Data register
-  0x0a RO PAAR         No   Port A Alternate register
-  0x0b RO PBAR         No   Port B Alternate register
-  0x0c RW PCDR         No   Port C Data register
-  0x0d RW PSR          May  Port Status register
-  0x0e n/a
-  0x0f n/a
-  0x10 RW TCR          No   Timer Control Register
-  0x11 RW TIVR         No   Timer Interrupt Vector Register
-  0x12 n/a
-  0x13 RW CPRH         No   Counter Preload Register High
-  0x14 RW CPRM         No   Counter Preload Register Middle
-  0x15 RW CPRL         No   Counter Preload Register Low
-  0x17 RO CNTRH        No   Counter Register High
-  0x18 RO CNTRM        No   Counter Register Middle
-  0x19 RO CNTRL        No   Counter Register Low
-  0x1A RW TSR          May  Timer Status Register
+Force CPU-1 init sequence
+0801EA 0E0000 W 0000 PGCR  data_w: 0000 -> 0000 & 00ff
+0801EA 0E0002 W 0000 PSRR  data_w: 0000 -> 0001 & 00ff
+0801EA 0E0004 W FFFF PADDR data_w: 00ff -> 0002 & 00ff
+0801EA 0E0006 W 0000 PBDDR data_w: 0000 -> 0003 & 00ff
+0801F0 0E000C W 6060 PACR  data_w: 0060 -> 0006 & 00ff
+0801F6 0E000E W A0A0 PBCR  data_w: 00a0 -> 0007 & 00ff
+0801FC 0E0000 W 3030 PGCR  data_w: 0030 -> 0000 & 00ff
+080202 0E000E W A8A8 PBCR  data_w: 00a8 -> 0007 & 00ff
+080210 0E000E W A0A0 PBCR  data_w: 00a0 -> 0007 & 00ff
 
+Force CPU-1 after one keypress in terminal
+081DC0 0E000C W 6868 PACR
+081DC8 0E000C W 6060 PACR
 */
 
 
@@ -57,55 +46,66 @@ const device_type PIT68230 = &device_creator<pit68230_device>;
 //-------------------------------------------------
 
 pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PIT68230, "68230 PI/T", tag, owner, clock, "pit68230", __FILE__),
-		m_internal_clock(0.0),
-		m_out0_cb(*this),
-		m_out1_cb(*this),
-		m_out2_cb(*this),
-		m_irq_cb(*this)
+        : device_t(mconfig, PIT68230, "Motorola 68230 PI/T", tag, owner, clock, "pit68230", __FILE__),
+	m_internal_clock(0.0)
 {
-	m_external_clock = 0.0;
 }
 
-//-------------------------------------------------
-//  tick
-//-------------------------------------------------
-
-void ptm6840_device::tick(int counter, int count)
+void pit68230_device::device_start()
 {
-	if (counter == 2)
-	{
-		m_t3_scaler += count;
-
-		if ( m_t3_scaler > m_t3_divisor - 1)
-		{
-			subtract_from_counter(counter, 1);
-			m_t3_scaler = 0;
-		}
-	}
-	else
-	{
-		subtract_from_counter(counter, count);
-	}
+  printf("PIT68230 device started\n");
 }
 
-
-//-------------------------------------------------
-//  set_clock - set clock status (0 or 1)
-//-------------------------------------------------
-
-void ptm6840_device::set_clock(int idx, int state)
+void pit68230_device::device_reset()
 {
-	m_clk[idx] = state;
-
-	if (!(m_control_reg[idx] & 0x02))
-	{
-		if (state)
-		{
-			tick(idx, 1);
-		}
-	}
+  printf("PIT68230 device reseted\n");
+  m_pgcr = 0;
+  m_psrr = 0;
+  m_paddr = 0;
+  m_pbddr = 0;
+  m_pacr = 0;
+  m_pbcr = 0;
 }
 
-WRITE_LINE_MEMBER( pit68230_device::set_c1 ) { set_clock(state); }
+WRITE8_MEMBER( pit68230_device::data_w )
+{
+  printf("data_w: %04x -> ", data);
+  switch (offset)
+  {
+  case PIT_68230_PGCR: 
+    printf("PGCR");
+    m_pgcr = data;
+    break;
+  case PIT_68230_PSRR: 
+    printf("PSRR");
+    m_psrr = data;
+    break;
+  case PIT_68230_PADDR: 
+    printf("PADDR");
+    m_paddr = data;
+    break;
+  case PIT_68230_PBDDR: 
+    printf("PBDDR");
+    m_pbddr = data;
+    break;
+  case PIT_68230_PACR: 
+    printf("PACR");
+    m_pacr = data;
+    break;
+  case PIT_68230_PBCR: 
+    printf("PBCR");
+    m_pbcr = data;
+    break;
+  default:
+    printf("unhandled register %02x", offset);
+  }
+  printf("\n");
+}
+
+READ8_MEMBER( pit68230_device::data_r )
+{
+  printf("data_r: %04x & %04x\n", offset, mem_mask);
+  return (UINT8) 0;
+}
+
 
