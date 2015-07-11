@@ -988,7 +988,6 @@ int shaders::create_resources(bool reset)
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
 
 	default_effect = new effect(this, d3d->get_device(), "primary.fx", fx_dir);
-	simple_effect = new effect(this, d3d->get_device(), "simple.fx", fx_dir);
 	post_effect = new effect(this, d3d->get_device(), "post.fx", fx_dir);
 	prescale_effect = new effect(this, d3d->get_device(), "prescale.fx", fx_dir);
 	phosphor_effect = new effect(this, d3d->get_device(), "phosphor.fx", fx_dir);
@@ -1002,7 +1001,6 @@ int shaders::create_resources(bool reset)
 	vector_effect = new effect(this, d3d->get_device(), "vector.fx", fx_dir);
 
 	if (!default_effect->is_valid() ||
-		!simple_effect->is_valid() ||
 		!post_effect->is_valid() ||
 		!prescale_effect->is_valid() ||
 		!phosphor_effect->is_valid() ||
@@ -1078,8 +1076,6 @@ int shaders::create_resources(bool reset)
 
 	bloom_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
-	simple_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-
 	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 	post_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
 	post_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
@@ -1127,7 +1123,6 @@ void shaders::begin_draw()
 	curr_effect = default_effect;
 
 	default_effect->set_technique("TestTechnique");
-	simple_effect->set_technique("TestTechnique");
 	post_effect->set_technique("ScanMaskTechnique");
 	phosphor_effect->set_technique("TestTechnique");
 	focus_effect->set_technique("TestTechnique");
@@ -1167,18 +1162,21 @@ void shaders::blit(
 {
 	HRESULT result;
 
-	result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
-	if (result != D3D_OK)
+	if (dst != NULL)
 	{
-		osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	}
-
-	if (clear_dst)
-	{
-		result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
+		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
 		if (result != D3D_OK)
 		{
-			osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+			osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+		}
+
+		if (clear_dst)
+		{
+			result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
+			if (result != D3D_OK)
+			{
+				osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+			}
 		}
 	}
 
@@ -1444,13 +1442,16 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 
 	texture_info *texture = poly->get_texture();
 
-	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
+	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
+	float prescale[2] = {
+		prepare_vector ? 1.0f : (float)hlsl_prescale_x,
+		prepare_vector ? 1.0f : (float)hlsl_prescale_y };
 	bool orientation_swap_xy =
 		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 	bool rotation_swap_xy =
 		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
 		(d3d->window().target()->orientation() & ROT270) == ROT270;
-
+	
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
@@ -1464,9 +1465,40 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	d3d->set_wrap(D3DTADDRESS_MIRROR);
 
 	next_index = rt->next_index(next_index);
-	blit(prepare_bloom ? rt->bloom_target[0] : rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+	blit(prepare_bloom ? rt->native_target[next_index] : rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
 	
 	d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(poly->get_texture()->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
+
+	return next_index;
+}
+
+int shaders::downsample_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
+{
+	int next_index = source_index;
+
+	curr_effect = downsample_effect;
+	curr_effect->update_uniforms();
+
+	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
+	int bloom_index = 0;
+	float bloom_width = rt->target_width;
+	float bloom_height = rt->target_height;
+	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
+	{
+		bloom_dims[bloom_index][0] = bloom_width;
+		bloom_dims[bloom_index][1] = bloom_height;
+
+		curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
+		curr_effect->set_texture("DiffuseTexture", (bloom_index == 0) ? rt->native_texture[next_index] : rt->bloom_texture[bloom_index - 1]);
+
+		blit(rt->bloom_target[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
+
+		bloom_index++;
+		bloom_width *= 0.5f;
+		bloom_height *= 0.5f;
+	}
+	
+	bloom_count = bloom_index;
 
 	return next_index;
 }
@@ -1475,46 +1507,35 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 {
 	int next_index = source_index;
 
-	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
 	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
-
-	curr_effect = downsample_effect;
-	curr_effect->update_uniforms();
-	curr_effect->set_float("BloomRescale", prepare_vector ? options->vector_bloom_scale : options->raster_bloom_scale);
-	curr_effect->set_vector("Prescale", 2, prescale);
-	curr_effect->set_bool("PrepareVector", prepare_vector);
-
-	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
-	int bloom_index = 0;
-	float bloom_width = rt->target_width;
-	float bloom_height = rt->target_height;
-	float bloom_dims[11][2];
-	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
-	{
-		bloom_dims[bloom_index][0] = bloom_width;
-		bloom_dims[bloom_index][1] = bloom_height;
-
-		if (bloom_index > 0)
-		{
-			curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
-			curr_effect->set_texture("DiffuseTexture", rt->bloom_texture[bloom_index - 1]);
-
-			blit(rt->bloom_target[bloom_index], true, poly->get_type(), vertnum, poly->get_count());
-		}
-
-		bloom_index++;
-		bloom_width *= 0.5f;
-		bloom_height *= 0.5f;
-	}
+	float prescale[2] = {
+		prepare_vector ? 1.0f : (float)hlsl_prescale_x / 2.0f,
+		prepare_vector ? 1.0f : (float)hlsl_prescale_y / 2.0f }; // no prescale for vector, half prescale for raster
+	float bloom_rescale = prepare_vector
+		? options->vector_bloom_scale 
+		: options->raster_bloom_scale;
 
 	curr_effect = bloom_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_vector("Prescale", 2, prescale);
-	curr_effect->set_bool("PrepareVector", prepare_vector);
 
-	float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
-	float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
-	float weight89A[3]  = { options->bloom_level8_weight, options->bloom_level9_weight, options->bloom_level10_weight };
+	float weight0123[4] = {
+		options->bloom_level0_weight,
+		options->bloom_level1_weight * bloom_rescale,
+		options->bloom_level2_weight * bloom_rescale,
+		options->bloom_level3_weight * bloom_rescale
+	};
+	float weight4567[4] = {
+		options->bloom_level4_weight * bloom_rescale,
+		options->bloom_level5_weight * bloom_rescale,
+		options->bloom_level6_weight * bloom_rescale,
+		options->bloom_level7_weight * bloom_rescale
+	};
+	float weight89A[3]  = { 
+		options->bloom_level8_weight * bloom_rescale,
+		options->bloom_level9_weight * bloom_rescale,
+		options->bloom_level10_weight * bloom_rescale
+	};
 	curr_effect->set_vector("Level0123Weight", 4, weight0123);
 	curr_effect->set_vector("Level4567Weight", 4, weight4567);
 	curr_effect->set_vector("Level89AWeight", 3, weight89A);
@@ -1525,19 +1546,19 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
 	curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
 
+	curr_effect->set_texture("DiffuseA", rt->prescale_texture[next_index]);
+
 	char name[9] = "Diffuse*";
-	for (int index = 1; index < bloom_index; index++)
+	for (int index = 1; index < bloom_count; index++)
 	{
 		name[7] = 'A' + index;
 		curr_effect->set_texture(name, rt->bloom_texture[index - 1]);
 	}
-	for (int index = bloom_index; index < 11; index++)
+	for (int index = bloom_count; index < 11; index++)
 	{
 		name[7] = 'A' + index;
 		curr_effect->set_texture(name, black_texture);
 	}
-
-	curr_effect->set_texture("DiffuseA", rt->prescale_texture[next_index]);
 
 	next_index = rt->next_index(next_index);
 	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
@@ -1549,11 +1570,16 @@ int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, i
 {	
 	int next_index = source_index;
 
-	curr_effect = simple_effect;
-	curr_effect->update_uniforms();
-	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
+	bool prepare_vector = PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable;
 
-	blit(backbuffer, false, poly->get_type(), vertnum, poly->get_count());
+	curr_effect = default_effect;
+	curr_effect->update_uniforms();
+
+	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
+	curr_effect->set_bool("PostPass", true);
+	curr_effect->set_float("Brighten", prepare_vector ? 1.0f : 0.0f);
+
+	blit(backbuffer, true, poly->get_type(), vertnum, poly->get_count());
 
 	if (avi_output_file != NULL)
 	{
@@ -1582,7 +1608,6 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		return;
 	}
 
-	UINT num_passes = 0;
 	curr_texture = poly->get_texture();
 
 	if (PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != NULL)
@@ -1603,9 +1628,18 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = deconverge_pass(rt, next_index, poly, vertnum);
 		next_index = defocus_pass(rt, next_index, poly, vertnum);
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
+
+		// create bloom textures
+		int phosphor_index = next_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, true);
+		next_index = downsample_pass(rt, next_index, poly, vertnum);
+
+		// apply bloom textures
+		next_index = phosphor_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, false);
 		next_index = bloom_pass(rt, next_index, poly, vertnum);
+
+		// render on screen
 		next_index = screen_pass(rt, next_index, poly, vertnum);
 
 		curr_texture->increment_frame_count();
@@ -1623,6 +1657,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		lines_pending = true;
 
+		int next_index = 0;
+
 		float time_params[2] = { 0.0f, 0.0f };
 		float length_params[3] = { poly->get_line_length(), options->vector_length_scale, options->vector_length_ratio };
 		
@@ -1631,7 +1667,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_effect->set_vector("TimeParams", 2, time_params);
 		curr_effect->set_vector("LengthParams", 3, length_params);
 
-		blit(rt->prescale_target[0], true, poly->get_type(), vertnum, poly->get_count());
+		blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
 
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
 		if (result != D3D_OK)
@@ -1651,29 +1687,32 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		int next_index = 0;
 
-		// render into first bloom target
 		curr_effect = default_effect;
 		curr_effect->update_uniforms();
 
 		curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
-		curr_effect->set_float("PostPass", 1.0f);
+		curr_effect->set_bool("PostPass", true);
 		curr_effect->set_float("Brighten", 1.0f);
 
-		blit(rt->bloom_target[0], true, poly->get_type(), vertnum, poly->get_count());
-
-		next_index = bloom_pass(rt, next_index, poly, vertnum);
+		next_index = rt->next_index(next_index);
+		blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
+		
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
 
-		// render to screen backbuffer
 		curr_effect = default_effect;
 		curr_effect->update_uniforms();
 
 		curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
-		curr_effect->set_float("PostPass", 1.0f);
+		curr_effect->set_bool("PostPass", true);
 		curr_effect->set_float("Brighten", 1.0f);
 
-		blit(backbuffer, true, poly->get_type(), vertnum, poly->get_count());
+		next_index = rt->next_index(next_index);
+		blit(rt->native_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
 		
+		next_index = downsample_pass(rt, next_index, poly, vertnum);
+		next_index = bloom_pass(rt, next_index, poly, vertnum);
+		next_index = screen_pass(rt, next_index, poly, vertnum);
+
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
 		if (result != D3D_OK)
 		{
@@ -1686,26 +1725,10 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	{
 		curr_effect = default_effect;
 		curr_effect->update_uniforms();
-		curr_effect->set_float("PostPass", 0.0f);
+		curr_effect->set_bool("PostPass", false);
 		curr_effect->set_float("Brighten", 0.0f);
 
-		curr_effect->begin(&num_passes, 0);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			
-			// add the primitives
-			HRESULT result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK)
-			{
-				osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			}
-			
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
+		blit(NULL, false, poly->get_type(), vertnum, poly->get_count());
 	}
 
 	curr_texture = NULL;
@@ -1989,11 +2012,6 @@ void shaders::delete_resources(bool reset)
 	{
 		delete default_effect;
 		default_effect = NULL;
-	}
-	if (simple_effect != NULL)
-	{
-		delete simple_effect;
-		simple_effect = NULL;
 	}
 	if (post_effect != NULL)
 	{

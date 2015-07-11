@@ -334,6 +334,7 @@ private:
 	int                     defocus_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     phosphor_pass(render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum);
 	int                     post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
+	int                     downsample_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     bloom_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     screen_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);
 
@@ -357,6 +358,8 @@ private:
 	int                     prescale_size_y;            // prescale size y
 	int                     hlsl_prescale_x;            // hlsl prescale x
 	int                     hlsl_prescale_y;            // hlsl prescale y
+	float                   bloom_dims[11][2];          // bloom texture dimensions
+	int                     bloom_count;                // count of used bloom textures
 	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
@@ -394,7 +397,6 @@ private:
 	surface *               backbuffer;                 // pointer to our device's backbuffer
 	effect *                curr_effect;                // pointer to the currently active effect object
 	effect *                default_effect;             // pointer to the primary-effect object
-	effect *                simple_effect;              // pointer to the simple-effect object
 	effect *                prescale_effect;            // pointer to the prescale-effect object
 	effect *                post_effect;                // pointer to the post-effect object
 	effect *                focus_effect;               // pointer to the focus-effect object

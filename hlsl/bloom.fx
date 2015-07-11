@@ -177,7 +177,7 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 
-uniform float2 Prescale = float2(8.0f, 8.0f);
+uniform float2 Prescale = float2(1.0f, 1.0f);
 
 uniform float4 Level01Size;
 uniform float4 Level23Size;
@@ -192,10 +192,6 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 ScreenDimsTexel = 1.0f / ScreenDims;
-
-	float2 HalfPrescale = Prescale * 0.5f;
-
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
@@ -204,26 +200,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Color = Input.Color;
 
-	// Vector graphics is not prescaled it has the size of the screen
-	if (PrepareVector)
-	{
-		Output.TexCoord01 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level01Size;
-		Output.TexCoord23 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level23Size;
-		Output.TexCoord45 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level45Size;
-		Output.TexCoord67 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level67Size;
-		Output.TexCoord89 = Input.Position.xyxy / ScreenDims.xyxy + 1.0f / Level89Size;
-		Output.TexCoordA  = Input.Position.xy   / ScreenDims.xy   + 1.0f / LevelASize;
-	}
-	else
-	{
-		Output.TexCoord01 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level01Size;
-		Output.TexCoord23 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level23Size;
-		Output.TexCoord45 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level45Size;
-		Output.TexCoord67 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level67Size;
-		Output.TexCoord89 = Input.Position.xyxy / ScreenDims.xyxy + HalfPrescale.xyxy / Level89Size;
-		Output.TexCoordA  = Input.Position.xy   / ScreenDims.xy   + HalfPrescale.xy   / LevelASize;
-	}
-
+	float2 TexCoord = Input.Position.xy / ScreenDims;
+	Output.TexCoord01 = TexCoord.xyxy + Prescale.xyxy / Level01Size;
+	Output.TexCoord23 = TexCoord.xyxy + Prescale.xyxy / Level23Size;
+	Output.TexCoord45 = TexCoord.xyxy + Prescale.xyxy / Level45Size;
+	Output.TexCoord67 = TexCoord.xyxy + Prescale.xyxy / Level67Size;
+	Output.TexCoord89 = TexCoord.xyxy + Prescale.xyxy / Level89Size;
+	Output.TexCoordA  = TexCoord.xy   + Prescale.xy / LevelASize;
+	
 	return Output;
 }
 
