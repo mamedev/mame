@@ -167,8 +167,18 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 {
 }
 
+void segacdblock_device::cd_standard_return(bool isPeri)
+{
+	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0) | CD_STAT_NODISC;
+	m_dr[1] = 0x0000;
+	m_dr[2] = 0x0000;
+	m_dr[3] = 0x0000;
+}
+
+
 void segacdblock_device::cd_cmd_status()
 {
+	cd_standard_return(false);
 	set_flag(CMOK);
 }
 
@@ -184,10 +194,7 @@ void segacdblock_device::cd_cmd_get_hw_info()
 
 void segacdblock_device::cd_cmd_init(UINT8 init_flags)
 {
-	m_dr[0] = CD_STAT_NODISC;
-	m_dr[1] = 0x0000;
-	m_dr[2] = 0x0000;
-	m_dr[3] = 0x0000;
+	cd_standard_return(false);
 
 	if(init_flags & 1)
 		set_flag(ESEL|EHST|ECPY|EFLS|SCDQ);
@@ -208,6 +215,8 @@ void segacdblock_device::cd_cmd_end_transfer()
 void segacdblock_device::cd_cmd_reset_selector()
 {
 	// ...
+	cd_standard_return(false);
+
 	set_flag(ESEL);
 	set_flag(CMOK);
 }
@@ -215,6 +224,8 @@ void segacdblock_device::cd_cmd_reset_selector()
 void segacdblock_device::cd_cmd_set_sector_length()
 {
 	// ...
+	cd_standard_return(false);
+
 	set_flag(ESEL);
 	set_flag(CMOK);
 }
@@ -231,6 +242,8 @@ void segacdblock_device::cd_cmd_get_copy_error()
 
 void segacdblock_device::cd_cmd_abort()
 {
+	cd_standard_return(false);
+
 	set_flag(EFLS);
 	// ...
 	set_flag(CMOK);
@@ -244,6 +257,8 @@ void segacdblock_device::cd_cmd_auth_device(bool isMPEGauth)
 	}
 	else
 		set_flag(EFLS|CSCT);
+
+	cd_standard_return(false);
 
 	set_flag(CMOK);
 }
@@ -287,10 +302,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	{
 		if((m_sh1_ticks & 0xff) != 0)
 		{
-			m_dr[0] = CD_STAT_PERI | CD_STAT_NODISC;
-			m_dr[1] = 0x0000;
-			m_dr[2] = 0x0000;
-			m_dr[3] = 0x0000;
+			cd_standard_return(true);
 			set_flag(SCDQ);
 		}
 		else

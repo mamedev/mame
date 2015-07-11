@@ -74,6 +74,7 @@ private:
 	UINT8 m_cmd_issued;
 
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
+	void cd_standard_return(bool isPeri);
 
 	void cd_cmd_status();
 	void cd_cmd_get_hw_info();
