@@ -27,16 +27,16 @@
 #include "../nl_base.h"
 #include "nld_cmos.h"
 
-#define CD_4066_DIP(_name)                                                         \
-		NET_REGISTER_DEV(4066_dip, _name)
+#define CD4066_DIP(_name)                                                      \
+		NET_REGISTER_DEV(CD4066_DIP, _name)
 
-#define CD_4016_DIP(_name)                                                         \
-		NET_REGISTER_DEV(4016_dip, _name)
+#define CD4016_DIP(_name)                                                      \
+		NET_REGISTER_DEV(CD4016_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_SUBDEVICE(4066,
-	NETLIB_LOGIC_FAMILY(CD4000)
+NETLIB_SUBDEVICE(CD4066,
+	NETLIB_LOGIC_FAMILY(CD4XXX)
 public:
 
 	analog_input_t m_control;
@@ -46,17 +46,17 @@ public:
 	nl_double m_base_r;
 );
 
-NETLIB_DEVICE(4066_dip,
-	NETLIB_LOGIC_FAMILY(CD4000)
+NETLIB_DEVICE(CD4066_DIP,
+	NETLIB_LOGIC_FAMILY(CD4XXX)
 
-	NETLIB_NAME(4066) m_A;
-	NETLIB_NAME(4066) m_B;
-	NETLIB_NAME(4066) m_C;
-	NETLIB_NAME(4066) m_D;
+	NETLIB_NAME(CD4066) m_A;
+	NETLIB_NAME(CD4066) m_B;
+	NETLIB_NAME(CD4066) m_C;
+	NETLIB_NAME(CD4066) m_D;
 	NETLIB_NAME(vdd_vss) m_supply;
 );
 
-NETLIB_DEVICE_DERIVED_PURE(4016_dip, 4066_dip);
+NETLIB_DEVICE_DERIVED_PURE(CD4016_DIP, CD4066_DIP);
 
 NETLIB_NAMESPACE_DEVICES_END()
 

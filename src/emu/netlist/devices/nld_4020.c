@@ -9,7 +9,7 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_START(4020)
+NETLIB_START(CD4020)
 {
 	register_sub("sub", sub);
 	register_sub("supply", m_supply);
@@ -32,13 +32,13 @@ NETLIB_START(4020)
 	register_subalias("VSS", m_supply.m_vss);
 }
 
-NETLIB_RESET(4020)
+NETLIB_RESET(CD4020)
 {
 	sub.do_reset();
 }
 
 
-NETLIB_START(4020_sub)
+NETLIB_START(CD4020_sub)
 {
 	register_input("IP", m_IP);
 
@@ -58,13 +58,13 @@ NETLIB_START(4020_sub)
 	save(NLNAME(m_cnt));
 }
 
-NETLIB_RESET(4020_sub)
+NETLIB_RESET(CD4020_sub)
 {
 	m_IP.set_state(logic_t::STATE_INP_HL);
 	m_cnt = 0;
 }
 
-NETLIB_UPDATE(4020_sub)
+NETLIB_UPDATE(CD4020_sub)
 {
 	UINT8 cnt = m_cnt;
 	cnt = ( cnt + 1) & 0x3fff;
@@ -72,7 +72,7 @@ NETLIB_UPDATE(4020_sub)
 	m_cnt = cnt;
 }
 
-NETLIB_UPDATE(4020)
+NETLIB_UPDATE(CD4020)
 {
 	if (INPLOGIC(m_RESET))
 	{
@@ -87,7 +87,7 @@ NETLIB_UPDATE(4020)
 		sub.m_IP.activate_hl();
 }
 
-inline NETLIB_FUNC_VOID(4020_sub, update_outputs, (const UINT16 cnt))
+inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const UINT16 cnt))
 {
 	/* static */ const netlist_time out_delayQn[14] = {
 			NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),
@@ -104,9 +104,9 @@ inline NETLIB_FUNC_VOID(4020_sub, update_outputs, (const UINT16 cnt))
 		OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn[i]);
 }
 
-NETLIB_START(4020_dip)
+NETLIB_START(CD4020_DIP)
 {
-	NETLIB_NAME(4020)::start();
+	NETLIB_NAME(CD4020)::start();
 
 		/*          +--------------+
 		*      Q12 |1     ++    16| VDD
@@ -139,14 +139,14 @@ NETLIB_START(4020_dip)
 	register_subalias("16", m_supply.m_vdd);
 }
 
-NETLIB_UPDATE(4020_dip)
+NETLIB_UPDATE(CD4020_DIP)
 {
-	NETLIB_NAME(4020)::update();
+	NETLIB_NAME(CD4020)::update();
 }
 
-NETLIB_RESET(4020_dip)
+NETLIB_RESET(CD4020_DIP)
 {
-	NETLIB_NAME(4020)::reset();
+	NETLIB_NAME(CD4020)::reset();
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

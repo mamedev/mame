@@ -24,7 +24,7 @@
 		NETDEV_PARAMI(_name, model, _model)
 
 #define LM3900(_name)                                                          \
-	SUBMODEL(opamp_lm3900, name)
+	SUBMODEL(opamp_lm3900, _name)
 
 // ----------------------------------------------------------------------------------------
 // Devices ...

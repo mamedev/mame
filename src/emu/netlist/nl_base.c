@@ -64,10 +64,10 @@ public:
 };
 
 //FIXME: set to proper values
-class logic_family_cd4000_t : public logic_family_desc_t
+class logic_family_cd4xxx_t : public logic_family_desc_t
 {
 public:
-	logic_family_cd4000_t() : logic_family_desc_t()
+	logic_family_cd4xxx_t() : logic_family_desc_t()
 	{
 		m_low_thresh_V = 0.8;
 		m_high_thresh_V = 2.0;
@@ -85,7 +85,7 @@ public:
 };
 
 logic_family_desc_t *netlist_family_TTL = palloc(logic_family_ttl_t);
-logic_family_desc_t *netlist_family_CD4000 = palloc(logic_family_cd4000_t);
+logic_family_desc_t *netlist_family_CD4XXX = palloc(logic_family_cd4xxx_t);
 
 class logic_family_std_proxy_t : public logic_family_desc_t
 {
@@ -101,8 +101,8 @@ logic_family_desc_t *logic_family_desc_t::from_model(const pstring &model)
 {
 	if (setup_t::model_value_str(model, "TYPE", "") == "TTL")
 		return netlist_family_TTL;
-	if (setup_t::model_value_str(model, "TYPE", "") == "CD4000")
-		return netlist_family_CD4000;
+	if (setup_t::model_value_str(model, "TYPE", "") == "CD4XXX")
+		return netlist_family_CD4XXX;
 
 	logic_family_std_proxy_t *ret = palloc(logic_family_std_proxy_t);
 
