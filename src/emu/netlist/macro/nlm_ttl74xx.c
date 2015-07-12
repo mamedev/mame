@@ -1,5 +1,6 @@
 
-#include "TTL74XX.h"
+#include "nlm_ttl74xx.h"
+
 #include "devices/nld_truthtable.h"
 #include "devices/nld_system.h"
 
