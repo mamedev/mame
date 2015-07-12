@@ -141,6 +141,7 @@ READ16_MEMBER(segacdblock_device::datatrns_r)
 			}
 			break;
 		default:
+			debugger_break(machine());
 			break;
 	}
 
@@ -253,6 +254,7 @@ void segacdblock_device::cd_cmd_get_toc()
 
 void segacdblock_device::cd_cmd_get_session_info(UINT8 param)
 {
+	m_cd_state = CD_STAT_PAUSE;
 	m_dr[0] = m_cd_state;
 	m_dr[1] = 0;
 	switch(param)
@@ -616,11 +618,30 @@ void segacdblock_device::device_reset()
 
 READ32_MEMBER( segacdblock_device::read )
 {
-	return m_space->read_word(offset*4)|(m_space->read_word(offset*4)<<16);
+	UINT32 res;
+
+	res = 0;
+
+	if(mem_mask == 0xffff0000)
+		res|= m_space->read_word(offset*4)<<16;
+
+	if(mem_mask == 0x0000ffff)
+		res|= m_space->read_word(offset*4)<<0;
+
+	if(mem_mask == 0xffffffff)
+		debugger_break(machine());
+
+	return res;
 }
 
 WRITE32_MEMBER( segacdblock_device::write )
 {
 	if(mem_mask == 0xffff0000)
 		m_space->write_word(offset*4,data>>16);
+
+	if(mem_mask == 0x0000ffff)
+		m_space->write_word(offset*4,data);
+
+	if(mem_mask == 0xffffffff)
+		debugger_break(machine());
 }
