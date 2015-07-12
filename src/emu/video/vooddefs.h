@@ -2941,7 +2941,7 @@ INLINE void ATTR_FORCE_INLINE alphaBlend(UINT32 FBZMODE, UINT32 ALPHAMODE, INT32
 		// Main blend
 		rgbaint_t destColor(da, dr, dg, db);
 
-		srcColor.scale_add_and_clamp(srcScale, destColor, destScale);
+		srcColor.scale2_add_and_clamp(srcScale, destColor, destScale);
 		/* clamp */
 		//CLAMP((RR), 0x00, 0xff);
 		//CLAMP((GG), 0x00, 0xff);
