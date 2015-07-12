@@ -348,12 +348,12 @@ int datfile_manager::index_mame_mess_info(std::vector<tDatafileIndex> &index, st
 			if (mame_revision.empty() && readbuf.compare(0, t_mame, TAG_MAMEINFO_R) == 0)
 			{
 				size_t found = readbuf.find(" ", t_mame + 1);
-				mame_revision.assign(readbuf.substr(t_mame + 1, found - t_mame));
+				mame_revision = readbuf.substr(t_mame + 1, found - t_mame);
 			}
 			else if (mess_revision.empty() && readbuf.compare(0, t_mess, TAG_MESSINFO_R) == 0)
 			{
 				size_t found = readbuf.find(" ", t_mess + 1);
-				mess_revision.assign(readbuf.substr(t_mess + 1, found - t_mess));
+				mess_revision = readbuf.substr(t_mess + 1, found - t_mess);
 			}
 			// TAG_INFO
 			else if (readbuf.compare(0, t_info, TAG_INFO) == 0)
@@ -363,9 +363,9 @@ int datfile_manager::index_mame_mess_info(std::vector<tDatafileIndex> &index, st
 
 				size_t found = readbuf.find_last_not_of(carriage);
 				if (found != std::string::npos)
-					name.assign(readbuf.substr(t_info + 1, found - t_info));
+					name = readbuf.substr(t_info + 1, found - t_info);
 				else
-					name.assign(readbuf.substr(t_info + 1));
+					name = readbuf.substr(t_info + 1);
 
 				if (xid.compare(0, t_tag, TAG_MAME) == 0)
 				{
@@ -383,7 +383,7 @@ int datfile_manager::index_mame_mess_info(std::vector<tDatafileIndex> &index, st
 				else if (xid.compare(0, t_drv, TAG_DRIVER) == 0)
 				{
 					sDataDrvIndex idx_drv;
-					idx_drv.name.assign(name);
+					idx_drv.name = name;
 					idx_drv.offset = myfile.tellg();
 					index_drv.push_back(idx_drv);
 					drvcount++;
@@ -422,12 +422,12 @@ int datfile_manager::index_datafile(std::vector<tDatafileIndex> &index, int &swc
 			if (history_revision.empty() && readbuf.compare(0, t_hist, TAG_HISTORY_R) == 0)
 			{
 				size_t found = readbuf.find(" ", t_hist + 1);
-				history_revision.assign(readbuf.substr(t_hist + 1, found - t_hist));
+				history_revision = readbuf.substr(t_hist + 1, found - t_hist);
 			}
 			else if (sysinfo_revision.empty() && readbuf.compare(0, t_sysinfo, TAG_SYSINFO_R) == 0)
 			{
 				size_t found = readbuf.find(".", t_sysinfo + 1);
-				sysinfo_revision.assign(readbuf.substr(t_sysinfo + 1, found - t_sysinfo));
+				sysinfo_revision = readbuf.substr(t_sysinfo + 1, found - t_sysinfo);
 			}
 			else if (story_revision.empty() && readbuf.compare(0, t_story, TAG_STORY_R) == 0)
 			{

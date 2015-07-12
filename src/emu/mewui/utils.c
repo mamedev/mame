@@ -51,12 +51,12 @@ std::string reselect_last::part;
 std::vector<cache_info> mewui_globals::driver_cache(driver_list::total() + 1);
 
 const char *mewui_globals::filter_text[] = { "All", "Available", "Unavailable", "Working", "Not Mechanical", "Category", "Favorites", "BIOS",
-                                             "Originals", "Clones", "Not Working", "Mechanical", "Manufacturers", "Years", "Support Save",
-                                             "Not Support Save", "CHD", "No CHD", "Use Samples", "Not Use Samples", "Stereo", "Vertical",
-                                             "Horizontal", "Raster", "Vectors", "Custom" };
+												"Originals", "Clones", "Not Working", "Mechanical", "Manufacturers", "Years", "Support Save",
+												"Not Support Save", "CHD", "No CHD", "Use Samples", "Not Use Samples", "Stereo", "Vertical",
+												"Horizontal", "Raster", "Vectors", "Custom" };
 
 const char *mewui_globals::sw_filter_text[] = { "All", "Available", "Unavailable", "Originals", "Clones", "Years", "Publishers", "Supported",
-                                                "Partial Supported", "Unsupported", "Region" };
+												"Partial Supported", "Unsupported", "Region" };
 
 const char *mewui_globals::ume_text[] = { "ALL", "ARCADES", "SYSTEMS" };
 
@@ -336,5 +336,3 @@ void c_year::set(const char *str)
 
 	ui.push_back(name);
 }
-
-

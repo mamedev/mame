@@ -505,6 +505,31 @@ void ui_menu::arts_render(void *selectedref, float origx1, float origy1, float o
 				}
 			}
 
+			// if fail again, attemp to load from parent file
+			if (!tmp_bitmap->valid())
+			{
+				// set clone status
+				bool cloneof = strcmp(driver->parent, "0");
+				if (cloneof)
+				{
+					int cx = driver_list::find(driver->parent);
+					if (cx != -1 && ((driver_list::driver(cx).flags & GAME_IS_BIOS_ROOT) != 0))
+						cloneof = false;
+				}
+
+				if (cloneof)
+				{
+					fullname.assign(driver->parent).append(".png");
+					render_load_png(*tmp_bitmap, snapfile, NULL, fullname.c_str());
+
+					if (!tmp_bitmap->valid())
+					{
+						fullname.assign(driver->parent).append(".jpg");
+						render_load_jpeg(*tmp_bitmap, snapfile, NULL, fullname.c_str());
+					}
+				}
+			}
+
 			olddriver = driver;
 			mewui_globals::switch_image = false;
 			arts_render_images(tmp_bitmap, origx1, origy1, origx2, origy2, false);
