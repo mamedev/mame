@@ -182,7 +182,7 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 void rgbaint_t::scale_imm_and_clamp(const INT32 scale)
 {
 	mul_imm(scale);
-	srsra_imma(8);
+	sra_imm(8);
 	max(0);
 	min(255);
 }
