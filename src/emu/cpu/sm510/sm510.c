@@ -67,6 +67,7 @@ void sm510_base_device::device_start()
 	m_1s = false;
 	m_k_active = false;
 	m_l = 0;
+	m_x = 0;
 	m_y = 0;
 	m_bp = false;
 	m_bc = false;
@@ -89,6 +90,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_1s));
 	save_item(NAME(m_k_active));
 	save_item(NAME(m_l));
+	save_item(NAME(m_x));
 	save_item(NAME(m_y));
 	save_item(NAME(m_bp));
 	save_item(NAME(m_bc));
@@ -162,8 +164,8 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
 		m_write_segb(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
 		m_write_segc(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
 		
-		// bs output from L and Y regs
-		UINT8 bs = m_l >> h & 1;
+		// bs output from L/X and Y regs
+		UINT8 bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
 		m_write_segbs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
 	
