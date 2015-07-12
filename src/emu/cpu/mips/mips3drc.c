@@ -778,7 +778,7 @@ void mips3_device::static_generate_exception(UINT8 exception, int recover, const
 
 	/* choose our target PC */
 	UML_ADD(block, I0, I3, 0xbfc00200);                             // add     i0,i3,0xbfc00200
-	UML_TEST(block, I1, SR_BEV);                                            // test    i1,SR_BEV
+	UML_TEST(block, CPR032(COP0_Status), SR_BEV);                   // test    CPR032(COP0_Status),SR_BEV
 	UML_JMPc(block, COND_NZ, skip);                                                 // jnz     <skip>
 	UML_ADD(block, I0, I3, 0x80000000);                             // add     i0,i3,0x80000000,z
 	UML_LABEL(block, skip);                                                     // <skip>:
