@@ -146,10 +146,11 @@ public:
 	vec2f &                 get_uvstop() { return m_stop; }
 	vec2f &                 get_rawdims() { return m_rawdims; }
 
+	static void             compute_size_subroutine(texture_manager* texture_manager, int texwidth, int texheight, int* p_width, int* p_height);
+
 private:
 	void prescale();
 	void compute_size(int texwidth, int texheight);
-	void compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height);
 
 	texture_manager *       m_texture_manager;          // texture manager pointer
 

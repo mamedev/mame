@@ -78,7 +78,9 @@ uniform float2 Prescale = float2(8.0f, 8.0f);
 
 uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
 uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
+
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures 
+uniform bool PrepareVector = false;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -106,7 +108,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
-	Output.TexCoord = Input.TexCoord;
+	Output.TexCoord = PrepareVector ? (Input.Position.xy / ScreenDims) : Input.TexCoord;
 
 	Output.Color = Input.Color;
 
@@ -377,7 +379,9 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	}
 
 	// Output
-	float4 Output = BaseColor * Input.Color;
+	float4 Output = PrepareVector
+		? BaseColor * (Input.Color + float4(1.0f, 1.0f, 1.0f, 0.0f))
+		: BaseColor * Input.Color;
 	Output.a = 1.0f;
 
 	// Light Reflection Simulation (may not affect bloom)

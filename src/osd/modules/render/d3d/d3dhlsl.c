@@ -1462,6 +1462,24 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 
+	if (prepare_vector)
+	{
+		int source_width = d3d->get_width();
+		int source_height = d3d->get_height();
+		int target_width = 0;
+		int target_height = 0;
+
+		texture_info::compute_size_subroutine(d3d->get_texture_manager(), source_width, source_height, &target_width, &target_height);
+
+		// todo: fix fullscreen
+		float source_dims[2] = { (float)target_width, (float)source_height };
+		float source_rect[2] = { 1.0f, 1.0f };
+
+		curr_effect->set_bool("PrepareVector", prepare_vector);
+		curr_effect->set_vector("SourceDims", 2, source_dims);
+		curr_effect->set_vector("SourceRect", 2, source_rect);
+	}
+
 	d3d->set_wrap(D3DTADDRESS_MIRROR);
 
 	next_index = rt->next_index(next_index);
@@ -1696,21 +1714,20 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		next_index = rt->next_index(next_index);
 		blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
-		
+
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
 
-		curr_effect = default_effect;
-		curr_effect->update_uniforms();
-
-		curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
-		curr_effect->set_bool("PostPass", true);
-		curr_effect->set_float("Brighten", 1.0f);
-
-		next_index = rt->next_index(next_index);
-		blit(rt->native_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
-		
+		// create bloom textures
+		int phosphor_index = next_index;
+		next_index = post_pass(rt, next_index, poly, vertnum, true);
 		next_index = downsample_pass(rt, next_index, poly, vertnum);
+
+		// apply bloom textures
+		next_index = phosphor_index;
+		next_index = post_pass(rt, next_index, poly, vertnum, false);
 		next_index = bloom_pass(rt, next_index, poly, vertnum);
+
+		// render on screen
 		next_index = screen_pass(rt, next_index, poly, vertnum);
 
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
