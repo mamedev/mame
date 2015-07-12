@@ -214,18 +214,13 @@ struct c_year
 struct mewui_globals
 {
 	static UINT16       actual_filter, actual_sw_filter;
-	static const char   *filter_text[], *sw_filter_text[], *ume_text[], *hover_msg[];
+	static const char   *filter_text[], *sw_filter_text[], *ume_text[];
 	static size_t       s_filter_text, sw_filter_len, s_ume_text;
 	static UINT8        curimage_view, curdats_view, ume_system, cur_sw_dats_view, rpanel_infos;
 	static bool         switch_image, redraw_icon, default_image;
 	static bool         force_reselect_software, force_reset_main;
 	static int          visible_main_lines, visible_sw_lines;
 	static std::vector<cache_info> driver_cache;
-
-	static void save_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
-                                        std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted);
-	static bool load_available_machines(running_machine &machine, std::vector<const game_driver *> &available, std::vector<const game_driver *> &unavailable,
-                                        std::vector<const game_driver *> &availablesorted, std::vector<const game_driver *> &unavailablesorted);
 };
 
 // Custom filter class

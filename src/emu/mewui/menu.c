@@ -65,6 +65,10 @@ static const ui_arts_info arts_info[] =
 
 static const char *dats_info[] = { "General Info", "History", "Mameinfo", "Sysinfo", "Messinfo", "Command", "Mamescore" };
 
+static const char *hover_msg[] = { "Add or remove favorites", "Export displayed list to file", "Show history.dat info",
+                                           "Show mameinfo.dat / messinfo.dat info", "Show command.dat info", "Setup directories",
+                                           "Configure options" };
+
 //-------------------------------------------------
 //  init - initialize the mewui menu system
 //-------------------------------------------------
@@ -1593,7 +1597,7 @@ void ui_menu::draw_toolbar(render_container *container, float x1, float y1, floa
 				hover = HOVER_B_FAV + z;
 				color = ARGB_WHITE;
 				float ypos = y2 + machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-				machine().ui().draw_text_box(container, mewui_globals::hover_msg[z], JUSTIFY_CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
+				machine().ui().draw_text_box(container, hover_msg[z], JUSTIFY_CENTER, 0.5f, ypos, UI_BACKGROUND_COLOR);
 			}
 
 			container->add_quad(x1, y1, x2, y2, color, t_texture[z], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));

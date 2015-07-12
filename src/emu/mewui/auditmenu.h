@@ -31,6 +31,7 @@ private:
 
 	int m_audit_mode, x;
 	size_t m_size;
+	void save_available_machines();
 };
 
 #endif /* __MEWUI_AUDIT_H__ */

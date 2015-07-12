@@ -12,6 +12,7 @@
 #include "mewui/auditmenu.h"
 #include "mewui/utils.h"
 #include <algorithm>
+#include <fstream>
 
 //-------------------------------------------------
 //  sort
@@ -159,7 +160,7 @@ void ui_menu_audit::handle()
 	std::stable_sort(m_availablesorted.begin(), m_availablesorted.end(), sorted_game_list);
 	m_unavailablesorted = m_unavailable;
 	std::stable_sort(m_unavailablesorted.begin(), m_unavailablesorted.end(), sorted_game_list);
-	mewui_globals::save_available_machines(machine(), m_available, m_unavailable, m_availablesorted, m_unavailablesorted);
+	save_available_machines();
 	ui_menu::menu_stack->parent->reset(UI_MENU_RESET_SELECT_FIRST);
 	ui_menu::stack_pop(machine());
 }
@@ -171,4 +172,47 @@ void ui_menu_audit::handle()
 void ui_menu_audit::populate()
 {
 	item_append("Dummy", NULL, 0, (void *)1);
+}
+
+//-------------------------------------------------
+//  save drivers infos to file
+//-------------------------------------------------
+
+void ui_menu_audit::save_available_machines()
+{
+	// attempt to open the output file
+	emu_file file(machine().options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file.open(emulator_info::get_configname(), "_avail.ini") == FILERR_NONE)
+	{
+		std::string filename(file.fullpath());
+		file.close();
+		std::ofstream myfile(filename.c_str());
+		UINT8 space = 0;
+
+		// generate header
+		std::string buffer = std::string("#\n").append(MEWUI_VERSION_TAG).append(mewui_version).append("\n#\n\n");
+		myfile << buffer;
+		myfile << (int)m_available.size() << space;
+		myfile << (int)m_unavailable.size() << space;
+		int find = 0;
+
+		// generate available list
+		for (int x = 0; x < m_available.size(); ++x)
+		{
+			find = driver_list::find(m_available[x]->name);
+			myfile << find << space;
+			find = driver_list::find(m_availablesorted[x]->name);
+			myfile << find << space;
+		}
+
+		// generate unavailable list
+		for (int x = 0; x < m_unavailable.size(); ++x)
+		{
+			find = driver_list::find(m_unavailable[x]->name);
+			myfile << find << space;
+			find = driver_list::find(m_unavailablesorted[x]->name);
+			myfile << find << space;
+		}
+		myfile.close();
+	}
 }

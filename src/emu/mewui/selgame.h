@@ -52,6 +52,8 @@ private:
 	void populate_search();
 	void load_cache_info();
 	void save_cache_info();
+	void save_available_machines();
+	bool load_available_machines();
 
 	// handlers
 	void inkey_select(const ui_menu_event *menu_event);
