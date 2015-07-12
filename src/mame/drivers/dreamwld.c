@@ -5,10 +5,11 @@
     SemiCom 68020 based hardware
     Driver by David Haywood
 
-Baryon - Future Assault   (c) 1997 SemiCom
-Cute Fighter              (c) 1998 SemiCom
-Rolling Crush             (c) 1999 Trust / SemiCom
-Dream World               (c) 2000 SemiCom
+Baryon - Future Assault          (c) 1997 SemiCom / Tirano
+Cute Fighter                     (c) 1998 SemiCom
+Rolling Crush                    (c) 1999 Trust / SemiCom
+Gaia - The Last Choice of Earth  (c) 1999 SemiCom / XESS
+Dream World                      (c) 2000 SemiCom
 
 Note: There is a SemiCom game known as Lode Quest 1998(?). This game is very similar to Dream World.
       It's not known if Lode Quest is a alternate title or a prequel of Dream World.
