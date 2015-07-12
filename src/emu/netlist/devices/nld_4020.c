@@ -104,49 +104,4 @@ inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const UINT16 cnt))
 		OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn[i]);
 }
 
-NETLIB_START(CD4020_DIP)
-{
-	NETLIB_NAME(CD4020)::start();
-
-		/*          +--------------+
-		*      Q12 |1     ++    16| VDD
-		*      Q13 |2           15| Q11
-		*      Q14 |3           14| Q10
-		*       Q6 |4    4020   13| Q8
-		*       Q5 |5           12| Q9
-		*       Q7 |6           11| RESET
-		*       Q4 |7           10| IP (Input pulses)
-		*      VSS |8            9| Q1
-		*          +--------------+
-		*/
-
-	register_subalias("1", sub.m_Q[11]);
-	register_subalias("2", sub.m_Q[12]);
-	register_subalias("3", sub.m_Q[13]);
-	register_subalias("4", sub.m_Q[5]);
-	register_subalias("5", sub.m_Q[4]);
-	register_subalias("6", sub.m_Q[6]);
-	register_subalias("7", sub.m_Q[3]);
-	register_subalias("8", m_supply.m_vss);
-
-	register_subalias("9", sub.m_Q[0]);
-	register_subalias("10", sub.m_IP);
-	register_subalias("11", m_RESET);
-	register_subalias("12", sub.m_Q[8]);
-	register_subalias("13", sub.m_Q[7]);
-	register_subalias("14", sub.m_Q[9]);
-	register_subalias("15", sub.m_Q[10]);
-	register_subalias("16", m_supply.m_vdd);
-}
-
-NETLIB_UPDATE(CD4020_DIP)
-{
-	NETLIB_NAME(CD4020)::update();
-}
-
-NETLIB_RESET(CD4020_DIP)
-{
-	NETLIB_NAME(CD4020)::reset();
-}
-
 NETLIB_NAMESPACE_DEVICES_END()

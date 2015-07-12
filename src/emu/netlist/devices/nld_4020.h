@@ -38,11 +38,8 @@
 		NET_CONNECT(_name, VDD,  _VDD)                                         \
 		NET_CONNECT(_name, VSS,  _VSS)
 
-#define CD4020(_name, _IP, _RESET, _VDD, _VSS)                                 \
+#define CD4020(_name)                                                          \
 		NET_REGISTER_DEV(CD4020, _name)
-
-#define CD4020_DIP(_name)                                                      \
-		NET_REGISTER_DEV(CD4020_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -64,8 +61,6 @@ NETLIB_DEVICE(CD4020,
 	NETLIB_NAME(vdd_vss) m_supply;
 	logic_input_t m_RESET;
 );
-
-NETLIB_DEVICE_DERIVED_PURE(CD4020_DIP, CD4020);
 
 NETLIB_NAMESPACE_DEVICES_END()
 
