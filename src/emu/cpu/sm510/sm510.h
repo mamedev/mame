@@ -45,7 +45,7 @@
 #define MCFG_SM510_WRITE_SEGC_CB(_devcb) \
 	sm510_base_device::set_write_segc_callback(*device, DEVCB_##_devcb);
 
-// LCD bs output: same as above, but only data d0 used
+// LCD bs output: same as above, but only up to 2 bits used
 #define MCFG_SM510_WRITE_SEGBS_CB(_devcb) \
 	sm510_base_device::set_write_segbs_callback(*device, DEVCB_##_devcb);
 
@@ -128,7 +128,7 @@ protected:
 	int m_datamask;
 
 	UINT16 m_pc, m_prev_pc;
-	UINT8 m_op, m_prev_op;
+	UINT16 m_op, m_prev_op;
 	UINT8 m_param;
 	int m_stack_levels;
 	UINT16 m_stack[2];
@@ -147,7 +147,7 @@ protected:
 	optional_shared_ptr<UINT8> m_lcd_ram_a, m_lcd_ram_b, m_lcd_ram_c;
 	devcb_write16 m_write_sega, m_write_segb, m_write_segc, m_write_segbs;
 	emu_timer *m_lcd_timer;
-	UINT8 m_l;
+	UINT8 m_l, m_x;
 	UINT8 m_y;
 	bool m_bp;
 	bool m_bc;
@@ -176,13 +176,14 @@ protected:
 	// misc internal helpers
 	void increment_pc();
 	virtual void get_opcode_param() { } // -> child class
+	virtual void update_w_latch() { }
 
 	UINT8 ram_r();
 	void ram_w(UINT8 data);
 	void pop_stack();
 	void push_stack();
 	void do_branch(UINT8 pu, UINT8 pm, UINT8 pl);
-	UINT8 bitmask(UINT8 param);
+	UINT8 bitmask(UINT16 param);
 
 	// opcode handlers
 	void op_lb();
@@ -206,11 +207,13 @@ protected:
 	void op_excd();
 	void op_lda();
 	void op_lax();
+	void op_ptw();
 	void op_wr();
 	void op_ws();
 
 	void op_kta();
 	void op_atbp();
+	void op_atx();
 	void op_atl();
 	void op_atfc();
 	void op_atr();
@@ -236,6 +239,12 @@ protected:
 
 	void op_rm();
 	void op_sm();
+	
+	void op_pre();
+	void op_sme();
+	void op_rme();
+	void op_tmel();
+	
 	void op_skip();
 	void op_cend();
 	void op_idiv();
@@ -253,6 +262,8 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	virtual void execute_one();
 	virtual void get_opcode_param();
+	
+	virtual void update_w_latch() { m_write_s(0, m_w, 0xff); } // W is connected directly to S
 };
 
 

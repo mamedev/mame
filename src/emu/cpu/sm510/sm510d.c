@@ -15,39 +15,45 @@
 
 enum e_mnemonics
 {
-	mILL,
+	mILL, mEXT,
 	mLB, mLBL, mSBM, mEXBLA, mINCB, mDECB,
 	mATPL, mRTN0, mRTN1, mTL, mTML, mTM, mT,
-	mEXC, mBDC, mEXCI, mEXCD, mLDA, mLAX, mWR, mWS,
-	mKTA, mATBP, mATL, mATFC, mATR,
+	mEXC, mBDC, mEXCI, mEXCD, mLDA, mLAX, mPTW, mWR, mWS,
+	mKTA, mATBP, mATX, mATL, mATFC, mATR,
 	mADD, mADD11, mADX, mCOMA, mROT, mRC, mSC,
 	mTB, mTC, mTAM, mTMI, mTA0, mTABL, mTIS, mTAL, mTF1, mTF4,
-	mRM, mSM, mSKIP, mCEND, mIDIV
+	mRM, mSM,
+	mPRE, mSME, mRME, mTMEL,
+	mSKIP, mCEND, mIDIV
 };
 
 static const char *const s_mnemonics[] =
 {
-	"?",
+	"?", "",
 	"LB", "LBL", "SBM", "EXBLA", "INCB", "DECB",
 	"ATPL", "RTN0", "RTN1", "TL", "TML", "TM", "T",
-	"EXC", "BDC", "EXCI", "EXCD", "LDA", "LAX", "WR", "WS",
-	"KTA", "ATBP", "ATL", "ATFC", "ATR",
+	"EXC", "BDC", "EXCI", "EXCD", "LDA", "LAX", "PTW", "WR", "WS",
+	"KTA", "ATBP", "ATX", "ATL", "ATFC", "ATR",
 	"ADD", "ADD11", "ADX", "COMA", "ROT", "RC", "SC",
 	"TB", "TC", "TAM", "TMI", "TA0", "TABL", "TIS", "TAL", "TF1", "TF4",
-	"RM", "SM", "SKIP", "CEND", "IDIV"
+	"RM", "SM",
+	"PRE", "SME", "RME", "TMEL",
+	"SKIP", "CEND", "IDIV"
 };
 
 // number of bits per opcode parameter, 8 or larger means 2-byte opcode
 static const UINT8 s_bits[] =
 {
-	0,
+	0, 8,
 	4, 8, 0, 0, 0, 0,
 	0, 0, 0, 4+8, 2+8, 6, 6,
-	2, 0, 2, 2, 2, 4, 0, 0,
-	0, 0, 0, 0, 0,
+	2, 0, 2, 2, 2, 4, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
 	0, 0, 4, 0, 0, 0, 0,
 	0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-	2, 2, 0, 0, 0
+	2, 2,
+	8, 0, 0, 0,
+	0, 0, 0
 };
 
 #define _OVER DASMFLAG_STEP_OVER
@@ -55,14 +61,16 @@ static const UINT8 s_bits[] =
 
 static const UINT32 s_flags[] =
 {
-	0,
+	0, 0,
 	0, 0, 0, 0, 0, 0,
 	0, _OUT, _OUT, 0, _OVER, _OVER, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, _OVER, 0
+	0, 0,
+	0, 0, 0, 0,
+	0, _OVER, 0
 };
 
 // next program counter in sequence (relative)
@@ -78,7 +86,7 @@ static const INT8 s_next_pc[0x40] =
 
 // common disasm
 
-static offs_t sm510_common_disasm(const UINT8 *lut_mnemonic, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static offs_t sm510_common_disasm(const UINT8 *lut_mnemonic, const UINT8 *lut_extended, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	// get raw opcode
 	UINT8 op = oprom[0];
@@ -95,6 +103,11 @@ static offs_t sm510_common_disasm(const UINT8 *lut_mnemonic, char *buffer, offs_
 		param = oprom[s_next_pc[pc & 0x3f]];
 		len++;
 	}
+	
+	// extended opcode
+	bool is_extended = (instr == mEXT);
+	if (is_extended)
+		instr = lut_extended[param];
 
 	// disassemble it
 	char *dst = buffer;
@@ -110,7 +123,8 @@ static offs_t sm510_common_disasm(const UINT8 *lut_mnemonic, char *buffer, offs_
 		}
 		else if (bits <= 8)
 		{
-			dst += sprintf(dst, "$%02X", param);
+			if (!is_extended)
+				dst += sprintf(dst, "$%02X", param);
 		}
 		else
 		{
@@ -155,13 +169,47 @@ static const UINT8 sm510_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(sm510)
 {
-	return sm510_common_disasm(sm510_mnemonic, buffer, pc, oprom, opram);
+	return sm510_common_disasm(sm510_mnemonic, NULL, buffer, pc, oprom, opram);
 }
 
 
 // SM511 disasm
 
+static const UINT8 sm511_mnemonic[0x100] =
+{
+/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+	mROT,  0,     mSBM,  mATPL, mRM,   mRM,   mRM,   mRM,   mADD,  mADD11,mCOMA, mEXBLA,mSM,   mSM,   mSM,   mSM,   // 0
+	mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mLDA,  mLDA,  mLDA,  mLDA,  mEXCD, mEXCD, mEXCD, mEXCD, // 1
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 2
+	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 3
+
+	mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 4
+	mKTA,  mTB,   mTC,   mTAM,  mTMI,  mTMI,  mTMI,  mTMI,  mTIS,  mATL,  mTA0,  mTABL, mATX,  0,     mTAL,  mLBL,  // 5
+	mEXT,  mPRE,  mWR,   mWS,   mINCB, 0,     mRC,   mSC,   mTML,  mTML,  mTML,  mTML,  mDECB, mPTW,  mRTN0, mRTN1, // 6
+	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   // 7
+
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // 8
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // 9
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // A
+	mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    mT,    // B
+
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // C
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // D
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   // E
+	mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM,   mTM    // F
+};
+
+static const UINT8 sm511_extended[0x10] =
+{
+	mRME,  mSME,  mTMEL, mATFC, mBDC,  mATBP, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     // 60 3
+};
+
 CPU_DISASSEMBLE(sm511)
 {
-	return sm510_common_disasm(sm510_mnemonic, buffer, pc, oprom, opram);
+	// create extended opcode table
+	UINT8 ext[0x100];
+	memset(ext, 0, 0x100);
+	memcpy(ext + 0x30, sm511_extended, 0x10);
+	
+	return sm510_common_disasm(sm511_mnemonic, ext, buffer, pc, oprom, opram);
 }
