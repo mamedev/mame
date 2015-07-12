@@ -54,7 +54,8 @@ public:
 	DECLARE_READ16_MEMBER( hirq_mask_r );
 	DECLARE_WRITE16_MEMBER( hirq_mask_w );
 
-	cdrom_file *cdrom;
+	DECLARE_READ16_MEMBER( datatrns_r );
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -79,12 +80,32 @@ private:
 	UINT8 m_cmd_issued;
 	bool m_sh1_inited;
 	bool m_isDiscInTray;
+	bool m_TOCPhase;
+	bool m_TransferActive;
+
+	cdrom_file *cdrom;
+
+	enum transT
+	{
+		XFERTYPE_INVALID,
+		XFERTYPE_TOC,
+		XFERTYPE_FILEINFO_1,
+		XFERTYPE_FILEINFO_254,
+		XFERTYPE_SUBQ,
+		XFERTYPE_SUBRW
+	};
+
+	transT xfertype;
+	UINT32 m_dma_src,m_dma_size;
+	UINT8 tocbuf[102*4]; /**< @todo make common buffer instead */
+	void sh1_TOCRetrieve();
 
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
 	void cd_standard_return(bool isPeri);
 
 	void cd_cmd_status();
 	void cd_cmd_get_hw_info();
+	void cd_cmd_get_toc();
 	// ...
 	void cd_cmd_init(UINT8 init_flags);
 	// ...

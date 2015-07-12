@@ -56,6 +56,10 @@ Template for skeleton device
 #define CD_STAT_WAIT     0x8000     // waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00     // ultra-fatal error.
 
+// device type definition
+const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
+
+
 void segacdblock_device::sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4)
 {
 	m_cr[0] = r1;
@@ -116,9 +120,31 @@ WRITE16_MEMBER(segacdblock_device::cr2_w){ m_cmd_issued |= 4; COMBINE_DATA(&m_cr
 READ16_MEMBER(segacdblock_device::cr3_r){ return m_dr[3]; }
 WRITE16_MEMBER(segacdblock_device::cr3_w){ m_cmd_issued |= 8; COMBINE_DATA(&m_cr[3]);}
 
+READ16_MEMBER(segacdblock_device::datatrns_r)
+{
+	UINT16 res;
 
-// device type definition
-const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
+	res = 0xffff;
+
+	switch(xfertype)
+	{
+		case XFERTYPE_TOC:
+			res = tocbuf[m_dma_src]<<8 | tocbuf[m_dma_src+1];
+			m_dma_src += 2;
+
+			if (m_dma_src > m_dma_size)
+			{
+				m_dma_src = 0;
+				xfertype = XFERTYPE_INVALID;
+			}
+			break;
+		default:
+			break;
+	}
+
+	return res;
+}
+
 
 /*
  	DTR 	Data Transfer Register
@@ -131,6 +157,7 @@ const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
 0x25890028 	MPEGRGB 	MPEG RGB Data Transfer Register
 */
 static ADDRESS_MAP_START( map, AS_0, 32, segacdblock_device )
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xf000) AM_READ16(datatrns_r,0xffffffff)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf000) AM_READWRITE16(hirq_r,hirq_w,0xffffffff)
 	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xf000) AM_READWRITE16(hirq_mask_r,hirq_mask_w,0xffffffff)
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xf000) AM_READWRITE16(cr0_r,cr0_w,0xffffffff)
@@ -210,6 +237,17 @@ void segacdblock_device::cd_cmd_get_hw_info()
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_get_toc()
+{
+	m_TransferActive = true;
+	m_dr[0] = CD_STAT_TRANS | m_cd_state;
+	m_dr[1] = 102*2;
+	m_dr[2] = 0;
+	m_dr[3] = 0;
+	m_TOCPhase = true;
+	//set_flag(DRDY); // ...
+	set_flag(CMOK);
+}
 
 void segacdblock_device::cd_cmd_init(UINT8 init_flags)
 {
@@ -223,10 +261,24 @@ void segacdblock_device::cd_cmd_init(UINT8 init_flags)
 
 void segacdblock_device::cd_cmd_end_transfer()
 {
-	m_dr[0] = m_cd_state | 0xff;
-	m_dr[1] = 0xffff;
+	m_TransferActive = false;
+	m_cd_state &= ~CD_STAT_TRANS;
+
+	if(m_dma_size != 0)
+	{
+		m_dr[0] = m_cd_state | ((m_dma_size >> 17) & 0xff);
+		m_dr[1] = (m_dma_size>>1) & 0xffff;
+	}
+	else
+	{
+		m_dr[0] = m_cd_state | 0xff;
+		m_dr[1] = 0xffff;
+	}
 	m_dr[2] = 0;
 	m_dr[3] = 0;
+
+
+	m_dma_size = 0;
 	// EHST
 	set_flag(CMOK);
 }
@@ -265,6 +317,8 @@ void segacdblock_device::cd_cmd_abort()
 
 	set_flag(EFLS);
 	// ...
+	xfertype = XFERTYPE_INVALID;
+	m_dma_size = 0;
 	set_flag(CMOK);
 }
 
@@ -301,6 +355,99 @@ void segacdblock_device::cd_cmd_device_auth_status(bool isMPEGauth)
 	set_flag(CMOK);
 }
 
+void segacdblock_device::sh1_TOCRetrieve()
+{
+	int i, ntrks, tocptr, fad;
+
+	//xfertype = XFERTYPE_TOC;
+	m_dma_src = 0;
+	m_dma_size = 102*4;
+
+	if (cdrom)
+		ntrks = cdrom_get_last_track(cdrom);
+	else
+		ntrks = 0;
+
+	// data format for Saturn TOC:
+	// no header.
+	// 4 bytes per track
+	// top nibble of first byte is CTRL info
+	// low nibble is ADR
+	// next 3 bytes are FAD address (LBA + 150)
+	// there are always 99 track entries (0-98)
+	// unused tracks are ffffffff.
+	// entries 99-101 are metadata
+
+	tocptr = 0; // starting point of toc entries
+
+	for (i = 0; i < ntrks; i++)
+	{
+		if (cdrom)
+		{
+			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
+			//HACK: ddsom does not enter ingame with the line above!
+			tocbuf[tocptr] = cdrom_get_adr_control(cdrom, i)<<4 | 0x01;
+		}
+		else
+		{
+			tocbuf[tocptr] = 0xff;
+		}
+
+		if (cdrom)
+		{
+			fad = cdrom_get_track_start(cdrom, i) + 150;
+
+			tocbuf[tocptr+1] = (fad>>16)&0xff;
+			tocbuf[tocptr+2] = (fad>>8)&0xff;
+			tocbuf[tocptr+3] = fad&0xff;
+		}
+		else
+		{
+			tocbuf[tocptr+1] = 0xff;
+			tocbuf[tocptr+2] = 0xff;
+			tocbuf[tocptr+3] = 0xff;
+		}
+
+		tocptr += 4;
+	}
+
+	// fill in the rest
+	for ( ; i < 99; i++)
+	{
+		tocbuf[tocptr] = 0xff;
+		tocbuf[tocptr+1] = 0xff;
+		tocbuf[tocptr+2] = 0xff;
+		tocbuf[tocptr+3] = 0xff;
+
+		tocptr += 4;
+	}
+
+	// tracks 99-101 are special metadata
+	// $$$FIXME: what to do with the address info for these?
+	tocptr = 99 * 4;
+	tocbuf[tocptr] = tocbuf[0]; // get ctrl/adr from first track
+	tocbuf[tocptr+1] = 1;   // first track's track #
+	tocbuf[tocptr+2] = 0;
+	tocbuf[tocptr+3] = 0;
+
+	tocbuf[tocptr+4] = tocbuf[(ntrks-1)*4]; // ditto for last track
+	tocbuf[tocptr+5] = ntrks;   // last track's track #
+	tocbuf[tocptr+6] = 0;
+	tocbuf[tocptr+7] = 0;
+
+	// get total disc length (start of lead-out)
+	fad = cdrom_get_track_start(cdrom, 0xaa) + 150;
+
+	tocbuf[tocptr+8] = tocbuf[0];
+	tocbuf[tocptr+9]  = (fad>>16)&0xff;
+	tocbuf[tocptr+10] = (fad>>8)&0xff;
+	tocbuf[tocptr+11] = fad&0xff;
+
+	xfertype = XFERTYPE_TOC;
+	m_TOCPhase = false;
+	set_flag(DRDY);
+}
+
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id == SH1_TIMER);
@@ -321,17 +468,22 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	{
 		if((m_sh1_ticks & 0xff) != 0)
 		{
+			if(m_TOCPhase == true)
+				sh1_TOCRetrieve();
+
 			if(m_isDiscInTray == true)
 				m_cd_state = CD_STAT_PAUSE;
 			else
 				m_cd_state = CD_STAT_NODISC;
+
+			if(m_TransferActive == true)
+				m_cd_state|= CD_STAT_TRANS;
+
 			cd_standard_return(true);
 			set_flag(SCDQ);
 		}
 		else
 		{
-
-
 			if(m_cmd_issued == 0xf)
 			{
 				if(m_cr[0] != 0)
@@ -345,6 +497,10 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 
 					case 0x01:
 						cd_cmd_get_hw_info();
+						break;
+
+					case 0x02:
+						cd_cmd_get_toc();
 						break;
 
 					case 0x04:
@@ -420,14 +576,8 @@ void segacdblock_device::device_reset()
 	m_cmd_issued = 0;
 	m_hirq = 0xffff;
 
-	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
-	if (cddevice!=NULL)
-	{
-		cdrom = cddevice->get_cdrom_file();
-		m_isDiscInTray = true;
-	}
-	else
-		m_isDiscInTray = false;
+	cdrom = subdevice<cdrom_image_device>("cdrom")->get_cdrom_file();
+	m_isDiscInTray = cdrom != NULL;
 }
 
 
