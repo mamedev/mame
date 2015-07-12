@@ -132,6 +132,8 @@ READ16_MEMBER(segacdblock_device::datatrns_r)
 			res = tocbuf[m_dma_src]<<8 | tocbuf[m_dma_src+1];
 			m_dma_src += 2;
 
+			//printf("%04x\n",res);
+
 			if (m_dma_src > m_dma_size)
 			{
 				m_dma_src = 0;
@@ -218,7 +220,7 @@ void segacdblock_device::cd_standard_return(bool isPeri)
 	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0) | m_cd_state;
 	m_dr[1] = 0x0000;
 	m_dr[2] = 0x0000;
-	m_dr[3] = 0x0000;
+	m_dr[3] = 150;
 }
 
 
@@ -246,6 +248,33 @@ void segacdblock_device::cd_cmd_get_toc()
 	m_dr[3] = 0;
 	m_TOCPhase = true;
 	//set_flag(DRDY); // ...
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_get_session_info(UINT8 param)
+{
+	m_dr[0] = m_cd_state;
+	m_dr[1] = 0;
+	switch(param)
+	{
+		case 0: // lead out
+			m_dr[2] = 0x0100 | ((m_DiscLeadOut >> 16) & 0xff);
+			m_dr[3] = m_DiscLeadOut & 0xffff;
+			break;
+
+		case 1: // lead in
+			m_dr[2] = 0x0100 | 0;
+			m_dr[3] = 0;
+			break;
+
+		default: // unknown
+			popmessage("Get Session Info used with param %02x, contact MAMEdev",param);
+			m_dr[2] = 0;
+			m_dr[3] = 0;
+			break;
+	}
+
+	printf("Returns: %04x %04x %04x %04x\n",m_dr[0],m_dr[1],m_dr[2],m_dr[3]);
 	set_flag(CMOK);
 }
 
@@ -387,22 +416,15 @@ void segacdblock_device::sh1_TOCRetrieve()
 			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
 			//HACK: ddsom does not enter ingame with the line above!
 			tocbuf[tocptr] = cdrom_get_adr_control(cdrom, i)<<4 | 0x01;
-		}
-		else
-		{
-			tocbuf[tocptr] = 0xff;
-		}
 
-		if (cdrom)
-		{
 			fad = cdrom_get_track_start(cdrom, i) + 150;
-
 			tocbuf[tocptr+1] = (fad>>16)&0xff;
 			tocbuf[tocptr+2] = (fad>>8)&0xff;
 			tocbuf[tocptr+3] = fad&0xff;
 		}
 		else
 		{
+			tocbuf[tocptr] = 0xff;
 			tocbuf[tocptr+1] = 0xff;
 			tocbuf[tocptr+2] = 0xff;
 			tocbuf[tocptr+3] = 0xff;
@@ -438,6 +460,7 @@ void segacdblock_device::sh1_TOCRetrieve()
 	// get total disc length (start of lead-out)
 	fad = cdrom_get_track_start(cdrom, 0xaa) + 150;
 
+	m_DiscLeadOut = fad;
 	tocbuf[tocptr+8] = tocbuf[0];
 	tocbuf[tocptr+9]  = (fad>>16)&0xff;
 	tocbuf[tocptr+10] = (fad>>8)&0xff;
@@ -503,6 +526,10 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 						cd_cmd_get_toc();
 						break;
 
+					case 0x03:
+						cd_cmd_get_session_info(m_cr[0] & 0xff);
+						break;
+
 					case 0x04:
 						cd_cmd_init(m_cr[0] & 0xff);
 						break;
@@ -522,9 +549,11 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 					case 0x67:
 						cd_cmd_get_copy_error();
 						break;
+
 					case 0x75:
 						cd_cmd_abort();
 						break;
+
 					case 0xe0:
 						if(m_cr[1] > 1)
 							printf("%04x auth command\n",m_cr[1]);

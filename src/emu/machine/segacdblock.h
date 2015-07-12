@@ -82,6 +82,7 @@ private:
 	bool m_isDiscInTray;
 	bool m_TOCPhase;
 	bool m_TransferActive;
+	UINT32 m_DiscLeadOut;
 
 	cdrom_file *cdrom;
 
@@ -97,6 +98,8 @@ private:
 
 	transT xfertype;
 	UINT32 m_dma_src,m_dma_size;
+
+
 	UINT8 tocbuf[102*4]; /**< @todo make common buffer instead */
 	void sh1_TOCRetrieve();
 
@@ -106,6 +109,8 @@ private:
 	void cd_cmd_status();
 	void cd_cmd_get_hw_info();
 	void cd_cmd_get_toc();
+	void cd_cmd_get_session_info(UINT8 param);
+
 	// ...
 	void cd_cmd_init(UINT8 init_flags);
 	// ...
