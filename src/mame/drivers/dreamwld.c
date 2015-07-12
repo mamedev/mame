@@ -5,10 +5,11 @@
     SemiCom 68020 based hardware
     Driver by David Haywood
 
-Baryon - Future Assault   (c) 1997 SemiCom
-Cute Fighter              (c) 1998 SemiCom
-Rolling Crush             (c) 1999 Trust / SemiCom
-Dream World               (c) 2000 SemiCom
+Baryon - Future Assault          (c) 1997 SemiCom / Tirano
+Cute Fighter                     (c) 1998 SemiCom
+Rolling Crush                    (c) 1999 Trust / SemiCom
+Gaia - The Last Choice of Earth  (c) 1999 SemiCom / XESS
+Dream World                      (c) 2000 SemiCom
 
 Note: There is a SemiCom game known as Lode Quest 1998(?). This game is very similar to Dream World.
       It's not known if Lode Quest is a alternate title or a prequel of Dream World.
@@ -1162,6 +1163,54 @@ ROM_START( dreamwld )
 	ROM_LOAD( "11.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
+/*
+
+Gaia - The Last Choice of Earth
+SemiCom / XESS, 1999
+
+PCB Layout
+----------
+
+|-------------------------------------------------|
+|    M6295* 27C40*  62256   ACTEL           ROM8  |
+|VOL M6295  ROM1    62256   A40MX04               |
+|    PAL  PAL       32MHz                         |
+| 62256  62256              PAL                   |
+| ROM2 ROM4       68EC020   PAL    PAL            |
+| ROM3 ROM5                 PAL    PAL            |
+|J 62256 62256              PAL                   |
+|A                          PAL    27MHz          |
+|M                                 PAL            |
+|M                         ACTEL    M5M44260      |
+|A             6116        A40MX04  M5M44260      |
+|              6116                               |
+|                          PAL                    |
+|              6264        PAL                    |
+| DSW2         6264                               |
+| DSW2   8752               ROM9                  |
+|                    ROM6   ROM10   ROM12         |
+|3* 4*               ROM7   ROM11   27C160*       |
+|-------------------------------------------------|
+
+Same PCB as Cute Fighter / Dream World PCB except one OKI M6295 and it's sample rom are unpopulated
+IE: Same configuration as Rolling Crush
+
+No labels on any of the roms.
+
+Program roms 2 through 5 are MX27C2000
+Rom 1 is a TMS 27C040
+Rom 9 is a MX26C512
+Roms 6 & 7 are MX26C1000
+Roms 8 and 10 through 12 are ST M27C160
+
+* denotes unpopulated components
+  3 & 4 are 10 pin headers
+
+Main CPU 68EC020FG16           @ 16MHz [32/2]
+AD-65 (OKI MSM6295 rebadged)   @ 1MHz [32/32]. pin 7 LOW
+Atmel AT89C52 MCU (secured)    @ 16MHZ [32/2]
+
+*/
 
 ROM_START( gaialast )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -1177,7 +1226,10 @@ ROM_START( gaialast )
 	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 , CRC(d3403b7b) SHA1(712a7f27fc41b632d584237f7641e8ae20035111) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
-	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2dbad410) SHA1(bb788ea14bb605be9af9c8f8adec94ad1c17ab55))
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2dbad410) SHA1(bb788ea14bb605be9af9c8f8adec94ad1c17ab55) )
+
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
+	/* not populared */
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD16_WORD_SWAP( "10", 0x000000, 0x200000, CRC(5822ef93) SHA1(8ce22c30f8027f35c5f72eb6ce57a74540dd55da) )
