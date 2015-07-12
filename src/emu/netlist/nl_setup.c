@@ -26,9 +26,15 @@ static NETLIST_START(base)
 
 	LOCAL_SOURCE(diode_models)
 	LOCAL_SOURCE(bjt_models)
+	LOCAL_SOURCE(family_models)
+	LOCAL_SOURCE(TTL74XX_lib)
+	LOCAL_SOURCE(CD4XXX_lib)
 
 	INCLUDE(diode_models);
 	INCLUDE(bjt_models);
+	INCLUDE(family_models);
+	INCLUDE(TTL74XX_lib);
+	INCLUDE(CD4XXX_lib);
 
 NETLIST_END()
 
@@ -167,6 +173,19 @@ void setup_t::register_alias(const pstring &alias, const pstring &out)
 	register_alias_nofqn(alias_fqn, out_fqn);
 }
 
+void setup_t::register_dippins_arr(const pstring &terms)
+{
+	pstring_list_t list(terms,", ");
+	if (list.size() == 0 || (list.size() % 2) == 1)
+		netlist().error("You must pass an equal number of pins to DIPPINS");
+	unsigned n = list.size();
+	for (unsigned i = 0; i < n / 2; i++)
+	{
+		register_alias(pstring::sprintf("%d", i+1), list[i * 2]);
+		register_alias(pstring::sprintf("%d", n-i), list[i * 2 + 1]);
+	}
+}
+
 pstring setup_t::objtype_as_astr(object_t &in) const
 {
 	switch (in.type())
@@ -192,6 +211,26 @@ pstring setup_t::objtype_as_astr(object_t &in) const
 	netlist().error("Unknown object type %d\n", in.type());
 	return "Error";
 }
+
+const pstring setup_t::get_model_str(const pstring val) const
+{
+	if (val.startsWith(".model ") || val.find("(") >= 0)
+	{
+		return val;
+	}
+	else
+	{
+		pstring search = (".model " + val + " ").ucase();
+		for (std::size_t i=0; i < m_models.size(); i++)
+		{
+			if (m_models[i].ucase().startsWith(search))
+				return m_models[i];
+		}
+		netlist().error("Model %s not found\n", val.cstr());
+		return ""; /* please compiler */
+	}
+}
+
 
 void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 {
@@ -255,32 +294,8 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 						}
 						break;
 						case param_t::MODEL:
-						{
-							if (val.startsWith(".model "))
-							{
-								dynamic_cast<param_model_t &>(param).initial(val);
-							}
-							else
-							{
-								pstring search = (".model " + val + " ").ucase();
-								bool found = false;
-								for (std::size_t i=0; i < m_models.size(); i++)
-								{
-									if (m_models[i].ucase().startsWith(search))
-									{
-										//int pl=m_models[i].find("(");
-										//int pr=m_models[i].find(")");
-										//dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
-										dynamic_cast<param_model_t &>(param).initial(m_models[i]);
-										found = true;
-										break;
-									}
-								}
-								if (!found)
-									netlist().error("Model %s not found\n", val.cstr());
-							}
-						}
-						break;
+							dynamic_cast<param_model_t &>(param).initial(get_model_str(val));
+							break;
 						default:
 							netlist().error("Parameter is not supported %s : %s\n", name.cstr(), val.cstr());
 					}

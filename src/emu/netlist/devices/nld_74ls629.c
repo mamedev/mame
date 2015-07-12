@@ -150,7 +150,7 @@ NETLIB_UPDATE(SN74LS629)
 		m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
 		//m_clock.update();
 
-		NL_VERBOSE_OUT(("%s %f %f %f\n", name().cstr(), v_freq, v_rng, freq));
+		//NL_VERBOSE_OUT(("%s %f %f %f\n", name().cstr(), v_freq, v_rng, freq));
 	}
 
 	if (!m_clock.m_enableq && INPLOGIC(m_ENQ))

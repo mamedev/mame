@@ -101,12 +101,12 @@ WRITE8_MEMBER(hexion_state::coincntr_w)
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
 }
 
-WRITE_LINE_MEMBER(hexion_state::hexion_irq_ack_w)
+WRITE_LINE_MEMBER(hexion_state::irq_ack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(hexion_state::hexion_nmi_ack_w)
+WRITE_LINE_MEMBER(hexion_state::nmi_ack_w)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -115,8 +115,8 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(hexion_bankedram_r, hexion_bankedram_w)
-	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(hexion_bankctrl_w)
+	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(bankedram_r, bankedram_w)
+	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(bankctrl_w)
 	AM_RANGE(0xe000, 0xe000) AM_NOP
 	AM_RANGE(0xe800, 0xe87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
 	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
@@ -131,9 +131,9 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf403, 0xf403) AM_READ_PORT("P2")
 	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
 	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf480, 0xf480) AM_WRITE(hexion_bankswitch_w)
+	AM_RANGE(0xf480, 0xf480) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(hexion_gfxrom_select_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(gfxrom_select_w)
 	AM_RANGE(0xf540, 0xf540) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
@@ -141,8 +141,8 @@ static ADDRESS_MAP_START( hexionb_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(hexion_bankedram_r, hexion_bankedram_w)
-	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(hexion_bankctrl_w)
+	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(bankedram_r, bankedram_w)
+	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(bankctrl_w)
 	AM_RANGE(0xe000, 0xe000) AM_NOP
 	AM_RANGE(0xe800, 0xe87f) AM_NOP // all the code to use the k051649 is still present
 	AM_RANGE(0xe880, 0xe889) AM_NOP // but the bootleg has an additional M6295 @ 0xf5c0 instead
@@ -157,9 +157,9 @@ static ADDRESS_MAP_START( hexionb_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf403, 0xf403) AM_READ_PORT("P2")
 	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
 	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf480, 0xf480) AM_WRITE(hexion_bankswitch_w)
+	AM_RANGE(0xf480, 0xf480) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(hexion_gfxrom_select_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(gfxrom_select_w)
 	AM_RANGE(0xf540, 0xf540) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf5c0, 0xf5c0) AM_DEVWRITE("oki2", okim6295_device, write)
 ADDRESS_MAP_END
@@ -224,7 +224,7 @@ static GFXDECODE_START( hexion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::hexion_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 {
 	int scanline = param;
 
@@ -240,11 +240,11 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, hexion_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, hexion_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, hexion_nmi_ack_w))
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update_hexion)
+	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexion)

@@ -374,7 +374,7 @@ public:
 
 	void scale_and_clamp(const rgbaint_t& scale);
 	void scale_imm_and_clamp(const INT32 scale);
-	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
+	void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
 	void scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other);
 

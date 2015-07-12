@@ -351,7 +351,7 @@ namespace netlist
 
 
 	extern logic_family_desc_t *netlist_family_TTL;
-	extern logic_family_desc_t *netlist_family_CD4000;
+	extern logic_family_desc_t *netlist_family_CD4XXX;
 
 
 	// -----------------------------------------------------------------------------

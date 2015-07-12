@@ -9,7 +9,7 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_START(4020)
+NETLIB_START(CD4020)
 {
 	register_sub("sub", sub);
 	register_sub("supply", m_supply);
@@ -32,13 +32,13 @@ NETLIB_START(4020)
 	register_subalias("VSS", m_supply.m_vss);
 }
 
-NETLIB_RESET(4020)
+NETLIB_RESET(CD4020)
 {
 	sub.do_reset();
 }
 
 
-NETLIB_START(4020_sub)
+NETLIB_START(CD4020_sub)
 {
 	register_input("IP", m_IP);
 
@@ -58,13 +58,13 @@ NETLIB_START(4020_sub)
 	save(NLNAME(m_cnt));
 }
 
-NETLIB_RESET(4020_sub)
+NETLIB_RESET(CD4020_sub)
 {
 	m_IP.set_state(logic_t::STATE_INP_HL);
 	m_cnt = 0;
 }
 
-NETLIB_UPDATE(4020_sub)
+NETLIB_UPDATE(CD4020_sub)
 {
 	UINT8 cnt = m_cnt;
 	cnt = ( cnt + 1) & 0x3fff;
@@ -72,7 +72,7 @@ NETLIB_UPDATE(4020_sub)
 	m_cnt = cnt;
 }
 
-NETLIB_UPDATE(4020)
+NETLIB_UPDATE(CD4020)
 {
 	if (INPLOGIC(m_RESET))
 	{
@@ -87,7 +87,7 @@ NETLIB_UPDATE(4020)
 		sub.m_IP.activate_hl();
 }
 
-inline NETLIB_FUNC_VOID(4020_sub, update_outputs, (const UINT16 cnt))
+inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const UINT16 cnt))
 {
 	/* static */ const netlist_time out_delayQn[14] = {
 			NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),
@@ -102,51 +102,6 @@ inline NETLIB_FUNC_VOID(4020_sub, update_outputs, (const UINT16 cnt))
 	OUTLOGIC(m_Q[0], 0, out_delayQn[0]);
 	for (int i=3; i<14; i++)
 		OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn[i]);
-}
-
-NETLIB_START(4020_dip)
-{
-	NETLIB_NAME(4020)::start();
-
-		/*          +--------------+
-		*      Q12 |1     ++    16| VDD
-		*      Q13 |2           15| Q11
-		*      Q14 |3           14| Q10
-		*       Q6 |4    4020   13| Q8
-		*       Q5 |5           12| Q9
-		*       Q7 |6           11| RESET
-		*       Q4 |7           10| IP (Input pulses)
-		*      VSS |8            9| Q1
-		*          +--------------+
-		*/
-
-	register_subalias("1", sub.m_Q[11]);
-	register_subalias("2", sub.m_Q[12]);
-	register_subalias("3", sub.m_Q[13]);
-	register_subalias("4", sub.m_Q[5]);
-	register_subalias("5", sub.m_Q[4]);
-	register_subalias("6", sub.m_Q[6]);
-	register_subalias("7", sub.m_Q[3]);
-	register_subalias("8", m_supply.m_vss);
-
-	register_subalias("9", sub.m_Q[0]);
-	register_subalias("10", sub.m_IP);
-	register_subalias("11", m_RESET);
-	register_subalias("12", sub.m_Q[8]);
-	register_subalias("13", sub.m_Q[7]);
-	register_subalias("14", sub.m_Q[9]);
-	register_subalias("15", sub.m_Q[10]);
-	register_subalias("16", m_supply.m_vdd);
-}
-
-NETLIB_UPDATE(4020_dip)
-{
-	NETLIB_NAME(4020)::update();
-}
-
-NETLIB_RESET(4020_dip)
-{
-	NETLIB_NAME(4020)::reset();
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

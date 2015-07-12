@@ -22,6 +22,9 @@
 #define ALIAS(_alias, _name)                                                        \
 	setup.register_alias(# _alias, # _name);
 
+#define DIPPINS(_pin1, ...)                                                          \
+		setup.register_dippins_arr( #_pin1 ", " # __VA_ARGS__);
+
 #define NET_REGISTER_DEV(_type, _name)                                              \
 		setup.register_dev(NETLIB_NAME_STR(_type), # _name);
 
@@ -153,6 +156,8 @@ namespace netlist
 
 		void register_model(const pstring &model);
 		void register_alias(const pstring &alias, const pstring &out);
+		void register_dippins_arr(const pstring &terms);
+
 		void register_alias_nofqn(const pstring &alias, const pstring &out);
 
 		void register_link_arr(const pstring &terms);
@@ -164,6 +169,8 @@ namespace netlist
 
 		void register_frontier(const pstring attach, const double r_IN, const double r_OUT);
 		void remove_connections(const pstring attach);
+
+		const pstring get_model_str(const pstring val) const;
 
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
 		bool connect(core_terminal_t &t1, core_terminal_t &t2);

@@ -50,6 +50,7 @@ bool parser_t::parse(const char *buf, const pstring nlname)
 	m_tok_comma = register_token(",");
 
 	m_tok_ALIAS = register_token("ALIAS");
+	m_tok_DIPPINS = register_token("DIPPINS");
 	m_tok_NET_C = register_token("NET_C");
 	m_tok_FRONTIER = register_token("OPTIMIZE_FRONTIER");
 	m_tok_PARAM = register_token("PARAM");
@@ -120,6 +121,8 @@ void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 
 		if (token.is(m_tok_ALIAS))
 			net_alias();
+		else if (token.is(m_tok_DIPPINS))
+			dippins();
 		else if (token.is(m_tok_NET_C))
 			net_c();
 		else if (token.is(m_tok_FRONTIER))
@@ -186,7 +189,7 @@ void parser_t::net_truthtable_start()
 		else if (token.is(m_tok_TT_FAMILY))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_family = netlist::logic_family_desc_t::from_model(get_string());
+			ttd->m_family = netlist::logic_family_desc_t::from_model(m_setup.get_model_str(get_string()));
 			require_token(m_tok_param_right);
 		}
 		else
@@ -296,6 +299,33 @@ void parser_t::net_c()
 			error("expected a comma, found <%s>", n.str().cstr());
 	}
 
+}
+
+void parser_t::dippins()
+{
+	pstring_list_t pins;
+
+	pins.add(get_identifier());
+	require_token(m_tok_comma);
+
+	while (true)
+	{
+		pstring t1 = get_identifier();
+		pins.add(t1);
+		token_t n = get_token();
+		if (n.is(m_tok_param_right))
+			break;
+		if (!n.is(m_tok_comma))
+			error("expected a comma, found <%s>", n.str().cstr());
+	}
+	if ((pins.size() % 2) == 1)
+		error("You must pass an equal number of pins to DIPPINS");
+	unsigned n = pins.size();
+	for (unsigned i = 0; i < n / 2; i++)
+	{
+		m_setup.register_alias(pstring::sprintf("%d", i+1), pins[i*2]);
+		m_setup.register_alias(pstring::sprintf("%d", n-i), pins[i*2 + 1]);
+	}
 }
 
 void parser_t::netdev_param()

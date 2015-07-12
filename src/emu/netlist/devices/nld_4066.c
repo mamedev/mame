@@ -9,19 +9,19 @@
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_START(4066)
+NETLIB_START(CD4066)
 {
 	register_input("CTL", m_control);
 	register_sub("R", m_R);
 	m_base_r = 270.0;
 }
 
-NETLIB_RESET(4066)
+NETLIB_RESET(CD4066)
 {
 	m_R.do_reset();
 }
 
-NETLIB_UPDATE(4066)
+NETLIB_UPDATE(CD4066)
 {
 	nl_double sup = (m_supply->vdd() - m_supply->vss());
 	nl_double low = NL_FCONST(0.45) * sup;
@@ -56,7 +56,7 @@ NETLIB_UPDATE(4066)
 }
 
 
-NETLIB_START(4066_dip)
+NETLIB_START(CD4066_DIP)
 {
 	register_sub("supply", m_supply);
 	m_A.m_supply = m_B.m_supply = m_C.m_supply = m_D.m_supply = &m_supply;
@@ -85,7 +85,7 @@ NETLIB_START(4066_dip)
 
 }
 
-NETLIB_RESET(4066_dip)
+NETLIB_RESET(CD4066_DIP)
 {
 	m_A.do_reset();
 	m_B.do_reset();
@@ -93,7 +93,7 @@ NETLIB_RESET(4066_dip)
 	m_D.do_reset();
 }
 
-NETLIB_UPDATE(4066_dip)
+NETLIB_UPDATE(CD4066_DIP)
 {
 	/* only called during startup */
 	m_A.update_dev();
@@ -102,22 +102,22 @@ NETLIB_UPDATE(4066_dip)
 	m_D.update_dev();
 }
 
-NETLIB_START(4016_dip)
+NETLIB_START(CD4016_DIP)
 {
-	NETLIB_NAME(4066_dip)::start();
+	NETLIB_NAME(CD4066_DIP)::start();
 
 	m_A.m_base_r = m_B.m_base_r = m_C.m_base_r = m_D.m_base_r = 1000.0;
 }
 
-NETLIB_RESET(4016_dip)
+NETLIB_RESET(CD4016_DIP)
 {
-	NETLIB_NAME(4066_dip)::reset();
+	NETLIB_NAME(CD4066_DIP)::reset();
 }
 
-NETLIB_UPDATE(4016_dip)
+NETLIB_UPDATE(CD4016_DIP)
 {
 	/* only called during startup */
-	NETLIB_NAME(4066_dip)::update();
+	NETLIB_NAME(CD4066_DIP)::update();
 }
 
 NETLIB_NAMESPACE_DEVICES_END()

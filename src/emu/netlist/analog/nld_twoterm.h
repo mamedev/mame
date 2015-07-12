@@ -241,7 +241,7 @@ public:
 		else
 		{
 #if 1
-			const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(1e-1) - NL_FCONST(1.0));
+			const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(0.5) - NL_FCONST(1.0));
 			m_Vd = m_Vd + nl_math::e_log1p(a) * m_Vt;
 #else
 			m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
