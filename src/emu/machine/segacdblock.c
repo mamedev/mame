@@ -341,6 +341,11 @@ void segacdblock_device::cd_cmd_get_copy_error()
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_change_dir()
+{
+	// ...
+	set_flag(CMOK);
+}
 
 void segacdblock_device::cd_cmd_abort()
 {
@@ -550,6 +555,10 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 
 					case 0x67:
 						cd_cmd_get_copy_error();
+						break;
+
+					case 0x70:
+						cd_cmd_change_dir();
 						break;
 
 					case 0x75:

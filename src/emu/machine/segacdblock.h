@@ -106,22 +106,24 @@ private:
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
 	void cd_standard_return(bool isPeri);
 
+	// 0x00
 	void cd_cmd_status();
 	void cd_cmd_get_hw_info();
 	void cd_cmd_get_toc();
 	void cd_cmd_get_session_info(UINT8 param);
-
-	// ...
 	void cd_cmd_init(UINT8 init_flags);
-	// ...
 	void cd_cmd_end_transfer();
 
+	// 0x60
 	void cd_cmd_set_sector_length();
 	void cd_cmd_reset_selector();
 	void cd_cmd_get_copy_error();
+
+	// 0x70
+	void cd_cmd_change_dir();
 	void cd_cmd_abort();
 
-	// ...
+	// 0xe0
 	void cd_cmd_auth_device(bool isMPEGauth);
 	void cd_cmd_device_auth_status(bool isMPEGauth);
 
