@@ -69,13 +69,15 @@ protected:
 	address_space *m_space;
 
 private:
-	static const device_timer_id SH1_TIMER = 0;
+	static const device_timer_id PERI_TIMER = 0;
+	static const device_timer_id CMD_TIMER = 1;
+	static const device_timer_id CD_TIMER = 2;
+
 	UINT16 m_cr[4];
 	UINT16 m_dr[4];
 	UINT16 m_hirq_mask;
 	UINT16 m_hirq;
 	UINT32 m_fad;
-	UINT32 m_sh1_ticks;
 	UINT16 m_cd_state;
 	UINT8 m_cmd_issued;
 	bool m_sh1_inited;
@@ -114,9 +116,11 @@ private:
 	void cd_cmd_init(UINT8 init_flags);
 	void cd_cmd_end_transfer();
 
+	// 0x40
+	void cd_cmd_reset_selector();
+	
 	// 0x60
 	void cd_cmd_set_sector_length();
-	void cd_cmd_reset_selector();
 	void cd_cmd_get_copy_error();
 
 	// 0x70
@@ -124,13 +128,17 @@ private:
 	void cd_cmd_abort();
 
 	// 0xe0
-	void cd_cmd_auth_device(bool isMPEGauth);
-	void cd_cmd_device_auth_status(bool isMPEGauth);
-
+	void cd_cmd_auth_device(UINT16 AuthType);
+	void cd_cmd_device_auth_status(UINT16 AuthType);
+	void SH2SendsCommand();
+	void SH1CommandExecute();
 
 	void set_flag(UINT16 which);
 	void clear_flag(UINT16 which);
-	emu_timer *m_sh1_timer;
+	//emu_timer *m_sh1_timer;
+	emu_timer *m_peri_timer;
+	emu_timer *m_cmd_timer;
+	emu_timer *m_cd_timer;
 	UINT16 read_cd_state();
 	void write_cd_state(UINT16 which);
 	void write_fad();

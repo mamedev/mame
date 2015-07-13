@@ -107,6 +107,15 @@ WRITE16_MEMBER(segacdblock_device::hirq_w)
 READ16_MEMBER(segacdblock_device::hirq_mask_r){	return m_hirq_mask; }
 WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { COMBINE_DATA(&m_hirq_mask); }
 
+void segacdblock_device::SH2SendsCommand()
+{
+	if(m_cmd_issued != 0xf)
+		fatalerror("SH-2 attempted to write a command in-the-middle %04x\n",m_cmd_issued);
+	
+	m_cmd_timer->adjust(attotime::from_hz(16667));
+	m_peri_timer->adjust(attotime::never);
+}
+
 // 0x6001fd8 cd-block string check
 READ16_MEMBER(segacdblock_device::cr0_r){ return m_dr[0]; }
 WRITE16_MEMBER(segacdblock_device::cr0_w){ m_cmd_issued |= 1; COMBINE_DATA(&m_cr[0]);}
@@ -118,7 +127,7 @@ READ16_MEMBER(segacdblock_device::cr2_r){ return m_dr[2]; }
 WRITE16_MEMBER(segacdblock_device::cr2_w){ m_cmd_issued |= 4; COMBINE_DATA(&m_cr[2]);}
 
 READ16_MEMBER(segacdblock_device::cr3_r){ return m_dr[3]; }
-WRITE16_MEMBER(segacdblock_device::cr3_w){ m_cmd_issued |= 8; COMBINE_DATA(&m_cr[3]);}
+WRITE16_MEMBER(segacdblock_device::cr3_w){ m_cmd_issued |= 8; COMBINE_DATA(&m_cr[3]); SH2SendsCommand(); }
 
 READ16_MEMBER(segacdblock_device::datatrns_r)
 {
@@ -214,7 +223,35 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 {
 }
 
+void segacdblock_device::SH1CommandExecute()
+{
+	switch(m_cr[0] >> 8)
+	{
+		case 0x00:	cd_cmd_status(); break;
+		case 0x01: 	cd_cmd_get_hw_info(); break;
+		case 0x02:	cd_cmd_get_toc(); break;
+		case 0x03:	cd_cmd_get_session_info(m_cr[0] & 0xff); break;
+		case 0x04:	cd_cmd_init(m_cr[0] & 0xff); break;
+		case 0x06:	cd_cmd_end_transfer(); break;
 
+		case 0x48:	cd_cmd_reset_selector(); break;
+
+		case 0x60:  cd_cmd_set_sector_length(); break;
+		case 0x67:	cd_cmd_get_copy_error(); break;
+
+		case 0x70:	cd_cmd_change_dir(); break;
+		case 0x75:	cd_cmd_abort(); break;
+
+		case 0xe0:	cd_cmd_auth_device(m_cr[1]); break;
+		case 0xe1:  cd_cmd_device_auth_status(m_cr[1]);  break;
+		default:
+			printf("Unhandled %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+						//set_flag(CMOK);
+	}
+	m_cmd_issued = 0;
+	// @todo: timer changes with cd timer, maybe we could disable this during data/audio playback and enable that instead?
+	m_peri_timer->adjust(attotime::from_usec(16667), 0, attotime::from_usec(16667));	
+}
 
 void segacdblock_device::cd_standard_return(bool isPeri)
 {
@@ -358,36 +395,41 @@ void segacdblock_device::cd_cmd_abort()
 	set_flag(CMOK);
 }
 
-void segacdblock_device::cd_cmd_auth_device(bool isMPEGauth)
+void segacdblock_device::cd_cmd_auth_device(UINT16 AuthType)
 {
-	if(isMPEGauth == true)
+	switch(AuthType)
 	{
-		//set_flag(MPED);
+		case 0: // CD-Rom
+			set_flag(EFLS|CSCT);
+			break;
+		case 1: // MPEG
+			//set_flag(MPED);
+			break;
 	}
-	else
-		set_flag(EFLS|CSCT);
 
 	cd_standard_return(false);
 
 	set_flag(CMOK);
 }
 
-void segacdblock_device::cd_cmd_device_auth_status(bool isMPEGauth)
+void segacdblock_device::cd_cmd_device_auth_status(UINT16 AuthType)
 {
-	if(isMPEGauth == true)
+	switch(AuthType)
 	{
-		m_dr[0] = m_cd_state | 0;
-		m_dr[1] = 0; /**< @todo: 2 if card present */
-		m_dr[2] = 0;
-		m_dr[3] = 0;
+		case 0: // CD-Rom
+			m_dr[0] = m_cd_state | 0;
+			m_dr[1] = 4; /**< @todo: various auth states */
+			m_dr[2] = 0;
+			m_dr[3] = 0;
+			break;
+		case 1:
+			m_dr[0] = m_cd_state | 0;
+			m_dr[1] = 0; /**< @todo: 2 if card present */
+			m_dr[2] = 0;
+			m_dr[3] = 0;
+			break;
 	}
-	else
-	{
-		m_dr[0] = m_cd_state | 0;
-		m_dr[1] = 4; /**< @todo: various auth states */
-		m_dr[2] = 0;
-		m_dr[3] = 0;
-	}
+	
 	set_flag(CMOK);
 }
 
@@ -480,8 +522,28 @@ void segacdblock_device::sh1_TOCRetrieve()
 
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	assert(id == SH1_TIMER);
+	assert(id < CD_TIMER+1);
 
+	if(id == CMD_TIMER)
+		SH1CommandExecute();
+	else if(id == PERI_TIMER)
+	{
+		if(m_TOCPhase == true)
+			sh1_TOCRetrieve();
+
+		if(m_isDiscInTray == true)
+			m_cd_state = CD_STAT_PAUSE;
+		else
+			m_cd_state = CD_STAT_NODISC;
+
+		if(m_TransferActive == true)
+			m_cd_state|= CD_STAT_TRANS;
+
+		cd_standard_return(true);
+		set_flag(SCDQ);
+	}
+	
+	#if 0
 	m_sh1_ticks ++;
 	//m_sh1_ticks &= 0xff;
 	//if(m_sh1_ticks == 0)
@@ -519,70 +581,12 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				if(m_cr[0] != 0)
 				printf("CD CMD: %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
 
-				switch(m_cr[0] >> 8)
-				{
-					case 0x00:
-						cd_cmd_status();
-						break;
 
-					case 0x01:
-						cd_cmd_get_hw_info();
-						break;
-
-					case 0x02:
-						cd_cmd_get_toc();
-						break;
-
-					case 0x03:
-						cd_cmd_get_session_info(m_cr[0] & 0xff);
-						break;
-
-					case 0x04:
-						cd_cmd_init(m_cr[0] & 0xff);
-						break;
-
-					case 0x06:
-						cd_cmd_end_transfer();
-						break;
-
-					case 0x48:
-						cd_cmd_reset_selector();
-						break;
-
-					case 0x60:
-						cd_cmd_set_sector_length();
-						break;
-
-					case 0x67:
-						cd_cmd_get_copy_error();
-						break;
-
-					case 0x70:
-						cd_cmd_change_dir();
-						break;
-
-					case 0x75:
-						cd_cmd_abort();
-						break;
-
-					case 0xe0:
-						if(m_cr[1] > 1)
-							printf("%04x auth command\n",m_cr[1]);
-						cd_cmd_auth_device(m_cr[1] == 1);
-						break;
-					case 0xe1:
-						if(m_cr[1] > 1)
-							printf("%04x auth command\n",m_cr[1]);
-						cd_cmd_device_auth_status(m_cr[1] == 1);
-						break;
-					default:
-						printf("Unhandled %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
-						//set_flag(CMOK);
-				}
 				m_cmd_issued = 0;
 			}
 		}
 	}
+	#endif
 }
 
 //-------------------------------------------------
@@ -592,8 +596,10 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 void segacdblock_device::device_start()
 {
 	m_space = &space(AS_0);
-	m_sh1_timer = timer_alloc(SH1_TIMER);
-
+	//m_sh1_timer = timer_alloc(SH1_TIMER);
+	m_peri_timer = timer_alloc(PERI_TIMER);
+	m_cmd_timer = timer_alloc(CMD_TIMER);
+	m_cd_timer = timer_alloc(CD_TIMER);
 }
 
 
@@ -609,9 +615,10 @@ void segacdblock_device::device_reset()
 	m_dr[2] = 'L' << 8 | 'O';
 	m_dr[3] = 'C' << 8 | 'K';
 	m_fad = 150;
-	m_sh1_timer->reset();
-	m_sh1_timer->adjust(attotime::from_hz(clock()*256), 0, attotime::from_hz(clock()*256));
-	m_sh1_ticks = 0;
+	m_peri_timer->reset();
+	m_cmd_timer->reset();
+	m_cd_timer->reset();
+	//m_sh1_timer->adjust(attotime::from_hz(clock()*256), 0, attotime::from_hz(clock()*256));
 	m_sh1_inited = false;
 	m_cmd_issued = 0;
 	m_hirq = 0xffff;
