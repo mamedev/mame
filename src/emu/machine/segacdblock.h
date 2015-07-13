@@ -111,6 +111,27 @@ private:
 	sourceT sourcetype;
 	UINT32 m_dma_src,m_dma_size;
 
+	struct filterT
+	{
+		UINT8 mode;
+		UINT8 chan;
+		UINT8 smmask;
+		UINT8 cimask;
+		UINT8 fid;
+		UINT8 smval;
+		UINT8 cival;
+		UINT8 condtrue;
+		UINT8 condfalse;
+		UINT32 fad;
+		UINT32 range;
+	};
+	
+	
+	#define MAX_FILTERS (24)
+
+	filterT CDFilters[MAX_FILTERS];
+	filterT *CDDeviceConnection;
+
 	void dma_setup();
 
 	UINT8 tocbuf[102*4]; /**< @todo Subchannel Q of lead-in */
@@ -128,6 +149,8 @@ private:
 	void cd_cmd_init(UINT8 init_flags);
 	void cd_cmd_end_transfer();
 
+	// 0x30
+	void cd_cmd_set_device_connection(UINT8 param);
 	// 0x40
 	void cd_cmd_reset_selector();
 	

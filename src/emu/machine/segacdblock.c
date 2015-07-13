@@ -1,14 +1,36 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese
-/***************************************************************************
+// copyright-holders:Angelo Salese, R. Belmont
+/*!
+@brief Sega Saturn CD-Block HLE device implementation
+@discussion 
+  (Yet) Another tilt at the windmill in 2015 by Angelo Salese, 
+  based off old stvcd.c driver started in 2011 by R.Belmont.
 
-Template for skeleton device
+  Not *yet* decapped SH-1 more or less executes this code.
+  Information sources:
+  - Tyranid's document
+  - A commented disassembly I made of the Saturn BIOS's CD code
+  - Yabuse's cs2.c
+  - The ISO/IEC "Yellow Book" CD-ROM standard, 1995 version
 
+  Address is mostly in terms of FAD (Frame ADdress).
+  FAD is absolute number of frames from the start of the disc.
+  In other words, FAD = LBA + 150; FAD is the same units as
+  LBA except it counts starting at absolute zero instead of
+  the first sector (00:02:00 in MSF format).
+ 
+@see http://wiki.yabause.org/index.php5?title=CDBlock
+
+@asmnotes
 4c68
 3bba reject routine -> 0xf8 r14
 3bbc peri routine -> 0 r14
 33cc open, nodisc, fatal -> r0
-***************************************************************************/
+
+@todo
+- (fill up this section once pull request these files);
+
+*/
 
 
 #include "emu.h"
@@ -233,6 +255,8 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x04:	cd_cmd_init(m_cr[0] & 0xff); break;
 		case 0x06:	cd_cmd_end_transfer(); break;
 
+		case 0x30:	cd_cmd_set_device_connection(m_cr[2] >> 8); break;
+		
 		case 0x48:	cd_cmd_reset_selector(); break;
 
 		case 0x60:  cd_cmd_set_sector_length(); break;
@@ -349,6 +373,19 @@ void segacdblock_device::cd_cmd_end_transfer()
 
 	m_dma_size = 0;
 	// EHST
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_set_device_connection(UINT8 param)
+{
+	if(param >= MAX_FILTERS) // mostly 0xff, expect that anything above this disables anyway
+		CDDeviceConnection = (filterT *)NULL;
+	else
+		CDDeviceConnection = &CDFilters[param];
+
+	cd_standard_return(false);
+
+	set_flag(ESEL);
 	set_flag(CMOK);
 }
 
@@ -529,6 +566,9 @@ void segacdblock_device::dma_setup()
 {
 	switch(sourcetype)
 	{
+		case SOURCE_NONE:
+			// ...
+			break;
 		case SOURCE_TOC:
 			memcpy(m_DMABuffer,tocbuf,102*4);
 			m_dma_size = 102*4;
@@ -536,6 +576,10 @@ void segacdblock_device::dma_setup()
 			xfertype = CDDMA_INPROGRESS;
 			set_flag(DRDY);
 			sourcetype = SOURCE_NONE;
+			break;
+		case SOURCE_DATA:
+			break;
+		case SOURCE_AUDIO:
 			break;
 	}
 }
@@ -548,8 +592,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		SH1CommandExecute();
 	else if(id == PERI_TIMER)
 	{
-		if(sourcetype != SOURCE_NONE)
-			dma_setup();
+		dma_setup();
 
 		if(m_isDiscInTray == true)
 			m_cd_state = CD_STAT_PAUSE;
