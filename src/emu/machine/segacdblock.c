@@ -32,6 +32,7 @@
 
 */
 
+#define DUMP_DIR_ENTRIES 0
 
 #include "emu.h"
 #include "machine/segacdblock.h"
@@ -93,8 +94,8 @@ void segacdblock_device::sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, U
 
 void segacdblock_device::write_fad()
 {
-	m_cr[3] = 1 | m_fad >> 16; /**< @todo track number */
-	m_cr[4] = m_fad & 0xffff;
+	m_cr[3] = 1 | m_FAD >> 16; /**< @todo track number */
+	m_cr[4] = m_FAD & 0xffff;
 }
 
 void segacdblock_device::set_flag(UINT16 which)
@@ -261,10 +262,10 @@ void segacdblock_device::SH1CommandExecute()
 		
 		case 0x48:	cd_cmd_reset_selector(m_cr[0] & 0xff, m_cr[2] >> 8); break;
 
-		case 0x60:  cd_cmd_set_sector_length(); break;
+		case 0x60:  cd_cmd_set_sector_length(m_cr[0] & 0xff, m_cr[1] >> 8); break;
 		case 0x67:	cd_cmd_get_copy_error(); break;
 
-		case 0x70:	cd_cmd_change_dir(); break;
+		case 0x70:	cd_cmd_change_dir(((m_cr[2] & 0xff)<<16) | (m_cr[3] & 0xffff) ); break;
 		case 0x75:	cd_cmd_abort(); break;
 
 		case 0xe0:	cd_cmd_auth_device(m_cr[1]); break;
@@ -276,6 +277,35 @@ void segacdblock_device::SH1CommandExecute()
 	m_cmd_issued = 0;
 	// @todo: timer changes with cd timer, maybe we could disable this during data/audio playback and enable that instead?
 	m_peri_timer->adjust(attotime::from_usec(16667), 0, attotime::from_usec(16667));	
+}
+
+segacdblock_device::blockT *segacdblock_device::cd_alloc_block(UINT8 *blknum)
+{
+	INT32 i;
+
+	// search the 200 available blocks for a free one
+	for (i = 0; i < 200; i++)
+	{
+		if (blocks[i].size == -1)
+		{
+			freeblocks--;
+			if (freeblocks <= 0)
+			{
+				//buffull = 1;
+				fatalerror("buffull in cd_alloc_block\n");
+			}
+
+			blocks[i].size = m_SectorLengthIn;
+			*blknum = i;
+
+			//CDROM_LOG(("CD: allocating block %d, size %x\n", i, m_SectorLengthIn))
+
+			return &blocks[i];
+		}
+	}
+
+	set_flag(BFUL);
+	return (blockT *)NULL;
 }
 
 void segacdblock_device::cd_free_block(blockT *blktofree)
@@ -300,6 +330,198 @@ void segacdblock_device::cd_free_block(blockT *blktofree)
 	//buffull = 0;
 	//hirqreg &= ~BFUL;
 }
+
+void segacdblock_device::cd_readblock(UINT32 fad, UINT8 *dat)
+{
+	if (cdrom)
+	{
+		cdrom_read_data(cdrom, fad-150, dat, CD_TRACK_MODE1);
+	}
+}
+
+// iso9660 parsing
+void segacdblock_device::read_new_dir(UINT32 fileno)
+{
+	int foundpd, i;
+	UINT32 cfad;//, dirfad;
+	UINT8 sect[2048];
+
+	if (fileno == 0xffffff)
+	{
+		cfad = 166;     // first sector of directory as per iso9660 specs
+
+		foundpd = 0;    // search for primary vol. desc
+		while ((!foundpd) && (cfad < 200))
+		{
+			if(m_SectorLengthIn != 2048)
+				popmessage("Sector Length %d, contact MAMEdev (0)",m_SectorLengthIn);
+
+			memset(sect, 0, 2048);
+			cd_readblock(cfad++, sect);
+
+			if ((sect[1] == 'C') && (sect[2] == 'D') && (sect[3] == '0') && (sect[4] == '0') && (sect[5] == '1'))
+			{
+				switch (sect[0])
+				{
+					case 0: // boot record
+						break;
+
+					case 1: // primary vol. desc
+						foundpd = 1;
+						break;
+
+					case 2: // secondary vol desc
+						break;
+
+					case 3: // vol. section descriptor
+						break;
+
+					case 0xff:
+						cfad = 200;
+						break;
+				}
+			}
+		}
+
+		// got primary vol. desc.
+		if (foundpd)
+		{
+			//dirfad = sect[140] | (sect[141]<<8) | (sect[142]<<16) | (sect[143]<<24);
+			//dirfad += 150;
+
+			// parse root entry
+			curroot.firstfad = sect[158] | (sect[159]<<8) | (sect[160]<<16) | (sect[161]<<24);
+			curroot.firstfad += 150;
+			curroot.length = sect[166] | (sect[167]<<8) | (sect[168]<<16) | (sect[169]<<24);
+			curroot.flags = sect[181];
+			for (i = 0; i < sect[188]; i++)
+			{
+				curroot.name[i] = sect[189+i];
+			}
+			curroot.name[i] = '\0'; // terminate
+
+			// easy to fix, but make sure we *need* to first
+			if (curroot.length > MAX_DIR_SIZE)
+			{
+				fatalerror("ERROR: root directory too big (%d)\n", curroot.length);
+			}
+
+			// done with all that, read the root directory now
+			make_dir_current(curroot.firstfad);
+		}
+	}
+	else
+	{
+		if (curdir[fileno].length > MAX_DIR_SIZE)
+		{
+			osd_printf_error("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
+		}
+		make_dir_current(curdir[fileno].firstfad);
+	}
+}
+
+// makes the directory pointed to by FAD current
+void segacdblock_device::make_dir_current(UINT32 fad)
+{
+	int i;
+	UINT32 nextent, numentries;
+	dynamic_buffer sect(MAX_DIR_SIZE);
+	direntryT *curentry;
+
+	memset(&sect[0], 0, MAX_DIR_SIZE);
+	if(m_SectorLengthIn != 2048)
+		popmessage("Sector Length %d, contact MAMEdev (1)",m_SectorLengthIn);
+
+	for (i = 0; i < (curroot.length/2048); i++)
+	{
+		cd_readblock(fad+i, &sect[2048*i]);
+	}
+
+	nextent = 0;
+	numentries = 0;
+	while (nextent < MAX_DIR_SIZE)
+	{
+		if (sect[nextent])
+		{
+			nextent += sect[nextent];
+			numentries++;
+		}
+		else
+		{
+			nextent = MAX_DIR_SIZE;
+		}
+	}
+
+	curdir.resize(numentries);
+	curentry = &curdir[0];
+	numfiles = numentries;
+
+	nextent = 0;
+	while (numentries)
+	{
+		// [0] record size
+		// [1] xa record size
+		// [2-5] lba
+		// [6-9] (lba?)
+		// [10-13] size
+		// [14-17] (size?)
+		// [18] year
+		// [19] month
+		// [20] day
+		// [21] hour
+		// [22] minute
+		// [23] second
+		// [24] gmt offset
+		// [25] flags
+		// [26] file unit size
+		// [27] interleave gap size
+		// [28-29] volume sequencer number
+		// [30-31] (volume sequencer number?)
+		// [32] name character size
+		// [33+ ...] file name
+
+		curentry->record_size = sect[nextent+0];
+		curentry->xa_record_size = sect[nextent+1];
+		curentry->firstfad = sect[nextent+2] | (sect[nextent+3]<<8) | (sect[nextent+4]<<16) | (sect[nextent+5]<<24);
+		curentry->firstfad += 150;
+		curentry->length = sect[nextent+10] | (sect[nextent+11]<<8) | (sect[nextent+12]<<16) | (sect[nextent+13]<<24);
+		curentry->year = sect[nextent+18];
+		curentry->month = sect[nextent+19];
+		curentry->day = sect[nextent+20];
+		curentry->hour = sect[nextent+21];
+		curentry->minute = sect[nextent+22];
+		curentry->second = sect[nextent+23];
+		curentry->gmt_offset = sect[nextent+24];
+		curentry->flags = sect[nextent+25];
+		curentry->file_unit_size = sect[nextent+26];
+		curentry->interleave_gap_size = sect[nextent+27];
+		curentry->volume_sequencer_number = sect[nextent+28] | (sect[nextent+29] << 8);
+
+		for (i = 0; i < sect[nextent+32]; i++)
+		{
+			curentry->name[i] = sect[nextent+33+i];
+		}
+		curentry->name[i] = '\0';   // terminate
+		#if DUMP_DIR_ENTRIES
+		printf("%08x %08x %s %d/%d/%d\n",curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
+		#endif
+		
+		nextent += sect[nextent];
+		curentry++;
+		numentries--;
+	}
+
+	for (i = 0; i < numfiles; i++)
+	{
+		if (!(curdir[i].flags & 0x02))
+		{
+			firstfile = i;
+			i = numfiles;
+		}
+	}
+}
+
+
 
 void segacdblock_device::cd_standard_return(bool isPeri)
 {
@@ -414,7 +636,7 @@ void segacdblock_device::cd_cmd_play_disc()
 		if(start_pos == 0xffffff)
 			return; // @todo intentional for debugging
 	
-		m_fad = start_pos & 0xfffff;
+		m_FAD = start_pos & 0xfffff;
 	}
 	else 
 		return; // @todo intentional for debugging
@@ -424,7 +646,7 @@ void segacdblock_device::cd_cmd_play_disc()
 		if(end_pos == 0xffffff)
 			return; // @todo intentional for debugging
 	
-		m_fadend = end_pos & 0xfffff;
+		m_FADEnd = end_pos & 0xfffff;
 	}
 	else 
 		return; // @todo intentional for debugging
@@ -526,9 +748,14 @@ void segacdblock_device::cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_n
 	set_flag(CMOK);
 }
 
-void segacdblock_device::cd_cmd_set_sector_length()
+void segacdblock_device::cd_cmd_set_sector_length(UINT8 length_in, UINT8 length_out)
 {
-	// ...
+	const int sectorSizes[4] = { 2048, 2336, 2340, 2352 };
+	assert(length_in < 4);
+	assert(length_out < 4);
+	m_SectorLengthIn = sectorSizes[length_in];
+	m_SectorLengthOut = sectorSizes[length_out];
+	
 	cd_standard_return(false);
 
 	set_flag(ESEL);
@@ -544,9 +771,10 @@ void segacdblock_device::cd_cmd_get_copy_error()
 	set_flag(CMOK);
 }
 
-void segacdblock_device::cd_cmd_change_dir()
+void segacdblock_device::cd_cmd_change_dir(UINT32 dir_entry)
 {
-	// ...
+	read_new_dir(dir_entry);
+	set_flag(EFLS);
 	set_flag(CMOK);
 }
 
@@ -712,6 +940,212 @@ void segacdblock_device::dma_setup()
 	}
 }
 
+segacdblock_device::partitionT *segacdblock_device::cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
+{
+	int match, keepgoing;
+	partitionT *filterprt = (partitionT *)NULL;
+
+	//CDROM_LOG(("cd_filterdata, trktype %d\n", trktype))
+	match = 1;
+	keepgoing = 2;
+	m_LastBuffer = flt->condtrue;
+
+	// loop on the filters
+	do
+	{
+		// FAD range check?
+		/* according to an obscure document note, this switches the filter connector to be false if the range fails ... I think ... */
+		if (flt->mode & 0x40)
+		{
+			if ((m_FAD < flt->fad) || (m_FAD > (flt->fad + flt->range)))
+			{
+				//printf("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
+				match = 0;
+				//m_LastBuffer = flt->condfalse;
+				//flt = &filters[m_LastBuffer];
+			}
+		}
+
+		if ((trktype != CD_TRACK_AUDIO) && (curblock.data[15] == 2))
+		{
+			if (flt->mode & 1)  // file number
+			{
+				if (curblock.fnum != flt->fid)
+				{
+					printf("fnum reject\n");
+					match = 0;
+				}
+			}
+
+			if (flt->mode & 2)  // channel number
+			{
+				if (curblock.chan != flt->chan)
+				{
+					printf("channel number reject\n");
+					match = 0;
+				}
+			}
+
+			if (flt->mode & 4)  // sub mode
+			{
+				if((curblock.subm & flt->smmask) != flt->smval)
+				{
+					printf("sub mode reject\n");
+					match = 0;
+				}
+			}
+
+			if (flt->mode & 8)  // coding information
+			{
+				if((curblock.cinf & flt->cimask) != flt->cival)
+				{
+					printf("coding information reject\n");
+					match = 0;
+				}
+			}
+
+			if (flt->mode & 0x10)   // reverse subheader conditions
+			{
+				match ^= 1;
+			}
+		}
+
+		if (match)
+		{
+			//m_LastBuffer = flt->condtrue;
+			//filterprt = &partitions[m_LastBuffer];
+			// we're done
+			keepgoing = 0;
+		}
+		else
+		{
+			m_LastBuffer = flt->condfalse;
+
+			// reject sector if no match on either connector
+			if ((m_LastBuffer == 0xff) || (keepgoing == 0))
+			{
+				*p_ok = 0;
+				return (partitionT *)NULL;
+			}
+
+			// try again using the filter that was on the "false" connector
+			flt = &CDFilters[m_LastBuffer];
+			match = 1;
+
+			// and exit if we fail
+			keepgoing--;
+		}
+	} while (keepgoing);
+
+	filterprt = &partitions[m_LastBuffer];
+
+	// try to allocate a block
+	filterprt->blocks[filterprt->numblks] = cd_alloc_block(&filterprt->bnum[filterprt->numblks]);
+
+	// did the allocation succeed?
+	if (filterprt->blocks[filterprt->numblks] == (blockT *)NULL)
+	{
+		*p_ok = 0;
+		return (partitionT *)NULL;
+	}
+
+	// copy working block to the newly allocated one
+	memcpy(filterprt->blocks[filterprt->numblks], &curblock, sizeof(blockT));
+
+	// and massage the data format a bit
+	switch  (curblock.size)
+	{
+		case 2048:  // user data
+			if (curblock.data[15] == 2)
+			{
+				// mode 2
+				memcpy(&filterprt->blocks[filterprt->numblks]->data[0], &curblock.data[24], curblock.size);
+			}
+			else
+			{
+				// mode 1
+				memcpy(&filterprt->blocks[filterprt->numblks]->data[0], &curblock.data[16], curblock.size);
+			}
+			break;
+
+		case 2324:  // Mode 2 Form 2 data
+			memcpy(&filterprt->blocks[filterprt->numblks]->data[0], &curblock.data[24], curblock.size);
+			break;
+
+		case 2336:  // Mode 2 Form 2 skip sync/header
+			memcpy(&filterprt->blocks[filterprt->numblks]->data[0], &curblock.data[16], curblock.size);
+			break;
+
+		case 2340:  // Mode 2 Form 2 skip sync only
+			memcpy(&filterprt->blocks[filterprt->numblks]->data[0], &curblock.data[12], curblock.size);
+			break;
+
+		case 2352:  // want all data, it's already done, so don't do it again :)
+			break;
+	}
+
+	// update the status of the partition
+	if (filterprt->size == -1)
+		filterprt->size = 0;
+
+	filterprt->size += filterprt->blocks[filterprt->numblks]->size;
+	filterprt->numblks++;
+
+	*p_ok = 1;
+	return filterprt;
+}
+
+// read a single sector off the CD, applying the current filter(s) as necessary
+segacdblock_device::partitionT *segacdblock_device::cd_read_filtered_sector(INT32 fad, UINT8 *p_ok)
+{
+	int trktype;
+
+	//if ((cddevice != NULL) && (!buffull))
+	if (CDDeviceConnection != NULL)
+	{
+		// find out the track's type
+		trktype = cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad-150));
+
+		// now get a raw 2352 byte sector - if it's mode 1, get mode1_raw
+		if ((trktype == CD_TRACK_MODE1) || (trktype == CD_TRACK_MODE1_RAW))
+		{
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE1_RAW);
+		}
+		else if (trktype != CD_TRACK_AUDIO) // if not audio it must be mode 2 so get mode2_raw
+		{
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE2_RAW);
+		}
+		else
+		{
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_AUDIO);
+		}
+
+		curblock.size = m_SectorLengthIn;
+		curblock.FAD = fad;
+
+		// if track is Mode 2, get the subheader values
+		if ((trktype != CD_TRACK_AUDIO) && (curblock.data[15] == 2))
+		{
+			curblock.chan = curblock.data[17];
+			curblock.fnum = curblock.data[16];
+			curblock.subm = curblock.data[18];
+			curblock.cinf = curblock.data[19];
+
+			// if it's Form 2, the length is actually 2324 bytes
+			if (curblock.subm & 0x20)
+			{
+				curblock.size = 2324;
+			}
+		}
+
+		return cd_filterdata(CDDeviceConnection, trktype, &*p_ok);
+	}
+
+	*p_ok = 0;
+	return (partitionT *)NULL;
+}
+
+
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id < CD_TIMER+1);
@@ -735,7 +1169,47 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	}
 	else if(id == CD_TIMER)
 	{
-		printf("tick tock\n");
+		if(m_cd_state == CD_STAT_PLAY)
+		{
+			UINT8 p_ok;
+				popmessage("%08x %08x",m_FAD,m_FADEnd);
+
+			if (cdrom)
+			{
+
+				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, m_FAD)) != CD_TRACK_AUDIO)
+				{
+					cd_read_filtered_sector(m_FAD,&p_ok);
+					//machine().device<cdda_device>("cdda")->stop_audio(); //stop any pending CD-DA
+				}
+				else
+				{
+					p_ok = 1; // TODO
+					//machine().device<cdda_device>("cdda")->start_audio(cd_curfad, 1);
+				}
+			}
+			
+			if(p_ok)
+			{
+				m_FAD ++;
+				m_FADEnd --;
+				set_flag(CSCT);
+				
+				if(m_FADEnd)
+					m_cd_timer->adjust(attotime::from_hz(150)); // @todo use the clock Luke
+				else
+				{
+					m_cd_state = CD_STAT_PAUSE;
+					set_flag(PEND);
+					
+					// @todo EFLS for File command
+				}
+
+				return;
+			}
+			
+			m_cd_state = CD_STAT_PAUSE;
+		}
 	}
 	
 }
@@ -766,7 +1240,7 @@ void segacdblock_device::device_reset()
 	m_dr[1] = 'D' << 8 | 'B';
 	m_dr[2] = 'L' << 8 | 'O';
 	m_dr[3] = 'C' << 8 | 'K';
-	m_fad = 150;
+	m_FAD = 150;
 	m_peri_timer->reset();
 	m_cmd_timer->reset();
 	m_cd_timer->reset();

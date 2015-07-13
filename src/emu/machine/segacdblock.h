@@ -14,6 +14,7 @@ Template for skeleton device
 
 #define MAX_BLOCKS  (200)
 #define MAX_FILTERS (24)
+#define MAX_DIR_SIZE    (256*1024)
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -78,8 +79,8 @@ private:
 	UINT16 m_dr[4];
 	UINT16 m_hirq_mask;
 	UINT16 m_hirq;
-	UINT32 m_fad;
-	UINT32 m_fadend;
+	UINT32 m_FAD;
+	UINT32 m_FADEnd;
 	UINT16 m_cd_state;
 	UINT8 m_cmd_issued;
 	bool m_sh1_inited;
@@ -90,6 +91,27 @@ private:
 
 	cdrom_file *cdrom;
 
+	struct direntryT
+	{
+		UINT8 record_size;
+		UINT8 xa_record_size;
+		UINT32 firstfad;        // first sector of file
+		UINT32 length;      // length of file
+		UINT8 year;
+		UINT8 month;
+		UINT8 day;
+		UINT8 hour;
+		UINT8 minute;
+		UINT8 second;
+		UINT8 gmt_offset;
+		UINT8 flags;        // iso9660 flags
+		UINT8 file_unit_size;
+		UINT8 interleave_gap_size;
+		UINT16 volume_sequencer_number;
+		UINT8 name[128];
+	};
+
+	
 	enum transT
 	{
 		CDDMA_STOPPED,
@@ -153,16 +175,22 @@ private:
 	filterT *CDDeviceConnection;
 	partitionT partitions[MAX_FILTERS];
 	blockT blocks[MAX_BLOCKS];
+	blockT curblock;
+	partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok);
+	partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok);
 
 	void dma_setup();
 
 	UINT8 tocbuf[102*4]; /**< @todo Subchannel Q of lead-in */
 	UINT8 *m_DMABuffer;
+	UINT8 m_LastBuffer;
 	void TOCRetrieve();
 
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
 	void cd_standard_return(bool isPeri);
+	blockT *cd_alloc_block(UINT8 *blknum);
 	void cd_free_block(blockT *blktofree);
+	int freeblocks;
 
 	// 0x00
 	void cd_cmd_status();
@@ -181,11 +209,11 @@ private:
 	void cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_number);
 	
 	// 0x60
-	void cd_cmd_set_sector_length();
+	void cd_cmd_set_sector_length(UINT8 length_in, UINT8 length_out);
 	void cd_cmd_get_copy_error();
 
 	// 0x70
-	void cd_cmd_change_dir();
+	void cd_cmd_change_dir(UINT32 dir_entry);
 	void cd_cmd_abort();
 
 	// 0xe0
@@ -203,6 +231,16 @@ private:
 	UINT16 read_cd_state();
 	void write_cd_state(UINT16 which);
 	void write_fad();
+	int m_SectorLengthIn;
+	int m_SectorLengthOut;
+	void read_new_dir(UINT32 fileno);
+	void make_dir_current(UINT32 fad);
+	void cd_readblock(UINT32 fad, UINT8 *dat);
+	direntryT curroot;       // root entry of current filesystem
+	std::vector<direntryT> curdir;       // current directory
+	int numfiles;            // # of entries in current directory
+	int firstfile;           // first non-directory file
+
 };
 
 
