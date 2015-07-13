@@ -1170,14 +1170,22 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	}
 	else if(id == CD_TIMER)
 	{
-		if(m_cd_state == CD_STAT_PLAY)
+		if((m_cd_state & 0x0f00) == CD_STAT_PAUSE)
+		{
+			if(!(m_hirq & BFUL))
+				m_cd_state = CD_STAT_PLAY;
+			
+			m_cd_timer->adjust(attotime::from_hz(150));
+			
+		}
+		else if((m_cd_state & 0x0f00) == CD_STAT_PLAY)
 		{
 			UINT8 p_ok;
-				popmessage("%08x %08x",m_FAD,m_FADEnd);
+			
+			popmessage("%08x %08x",m_FAD,m_FADEnd);
 
 			if (cdrom)
 			{
-
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, m_FAD)) != CD_TRACK_AUDIO)
 				{
 					cd_read_filtered_sector(m_FAD,&p_ok);
@@ -1196,20 +1204,20 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				m_FADEnd --;
 				set_flag(CSCT);
 				
-				if(m_FADEnd)
-					m_cd_timer->adjust(attotime::from_hz(150)); // @todo use the clock Luke
-				else
+				if(!m_FADEnd)
 				{
 					m_cd_state = CD_STAT_PAUSE;
 					set_flag(PEND);
 					
 					// @todo EFLS for File command
+					return;
 				}
-
-				return;
 			}
+		
+			if(m_hirq & BFUL)
+				m_cd_state = CD_STAT_PAUSE;
 			
-			m_cd_state = CD_STAT_PAUSE;
+			m_cd_timer->adjust(attotime::from_hz(150));
 		}
 	}
 	
