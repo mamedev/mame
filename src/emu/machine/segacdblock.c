@@ -10,6 +10,7 @@ Template for skeleton device
 33cc open, nodisc, fatal -> r0
 ***************************************************************************/
 
+
 #include "emu.h"
 #include "machine/segacdblock.h"
 #include "debugger.h"
@@ -135,24 +136,18 @@ READ16_MEMBER(segacdblock_device::datatrns_r)
 
 	res = 0xffff;
 
-	switch(xfertype)
+	if(xfertype == CDDMA_INPROGRESS)
 	{
-		case XFERTYPE_TOC:
-			res = tocbuf[m_dma_src]<<8 | tocbuf[m_dma_src+1];
-			m_dma_src += 2;
-
-			//printf("%04x\n",res);
-
-			if (m_dma_src > m_dma_size)
-			{
-				m_dma_src = 0;
-				xfertype = XFERTYPE_INVALID;
-			}
-			break;
-		default:
-			debugger_break(machine());
-			break;
+		res = m_DMABuffer[m_dma_src]<<8 | m_DMABuffer[m_dma_src+1]; // @todo Make this 16-bits
+		m_dma_src += 2;
+		if(m_dma_src > m_dma_size)
+		{
+			m_dma_src = 0;
+			xfertype = CDDMA_STOPPED;
+		}
 	}
+	else
+		debugger_break(machine());
 
 	return res;
 }
@@ -225,6 +220,10 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 
 void segacdblock_device::SH1CommandExecute()
 {
+	if(m_cr[0] != 0)
+		printf("CD CMD: %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+
+	
 	switch(m_cr[0] >> 8)
 	{
 		case 0x00:	cd_cmd_status(); break;
@@ -284,7 +283,9 @@ void segacdblock_device::cd_cmd_get_toc()
 	m_dr[1] = 102*2;
 	m_dr[2] = 0;
 	m_dr[3] = 0;
-	m_TOCPhase = true;
+	m_dma_src = 0;
+	m_dma_size = 0;
+	sourcetype = SOURCE_TOC;
 	//set_flag(DRDY); // ...
 	set_flag(CMOK);
 }
@@ -390,7 +391,8 @@ void segacdblock_device::cd_cmd_abort()
 
 	set_flag(EFLS);
 	// ...
-	xfertype = XFERTYPE_INVALID;
+	xfertype = CDDMA_STOPPED;
+	sourcetype = SOURCE_NONE;
 	m_dma_size = 0;
 	set_flag(CMOK);
 }
@@ -433,13 +435,13 @@ void segacdblock_device::cd_cmd_device_auth_status(UINT16 AuthType)
 	set_flag(CMOK);
 }
 
-void segacdblock_device::sh1_TOCRetrieve()
+void segacdblock_device::TOCRetrieve()
 {
 	int i, ntrks, tocptr, fad;
 
 	//xfertype = XFERTYPE_TOC;
-	m_dma_src = 0;
-	m_dma_size = 102*4;
+	//m_dma_src = 0;
+	//m_dma_size = 102*4;
 
 	if (cdrom)
 		ntrks = cdrom_get_last_track(cdrom);
@@ -515,9 +517,9 @@ void segacdblock_device::sh1_TOCRetrieve()
 	tocbuf[tocptr+10] = (fad>>8)&0xff;
 	tocbuf[tocptr+11] = fad&0xff;
 
-	xfertype = XFERTYPE_TOC;
-	m_TOCPhase = false;
-	set_flag(DRDY);
+//	xfertype = XFERTYPE_TOC;
+//	m_TOCPhase = false;
+//	set_flag(DRDY);
 }
 
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -528,8 +530,18 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		SH1CommandExecute();
 	else if(id == PERI_TIMER)
 	{
-		if(m_TOCPhase == true)
-			sh1_TOCRetrieve();
+		if(sourcetype == SOURCE_TOC)
+		{
+			/*!
+			  @todo DMA timing into account ...
+			  */
+			memcpy(m_DMABuffer,tocbuf,102*4);
+			m_dma_size = 102*4;
+			m_dma_src = 0;
+			xfertype = CDDMA_INPROGRESS;
+			set_flag(DRDY);
+			sourcetype = SOURCE_NONE;
+		}
 
 		if(m_isDiscInTray == true)
 			m_cd_state = CD_STAT_PAUSE;
@@ -543,50 +555,6 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		set_flag(SCDQ);
 	}
 	
-	#if 0
-	m_sh1_ticks ++;
-	//m_sh1_ticks &= 0xff;
-	//if(m_sh1_ticks == 0)
-
-	if(m_sh1_inited == false)
-	{
-		if(m_sh1_ticks >= 0x4000)
-		{
-			m_sh1_inited = true;
-
-		}
-	}
-	else
-	{
-		if((m_sh1_ticks & 0xff) != 0)
-		{
-			if(m_TOCPhase == true)
-				sh1_TOCRetrieve();
-
-			if(m_isDiscInTray == true)
-				m_cd_state = CD_STAT_PAUSE;
-			else
-				m_cd_state = CD_STAT_NODISC;
-
-			if(m_TransferActive == true)
-				m_cd_state|= CD_STAT_TRANS;
-
-			cd_standard_return(true);
-			set_flag(SCDQ);
-		}
-		else
-		{
-			if(m_cmd_issued == 0xf)
-			{
-				if(m_cr[0] != 0)
-				printf("CD CMD: %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
-
-
-				m_cmd_issued = 0;
-			}
-		}
-	}
-	#endif
 }
 
 //-------------------------------------------------
@@ -600,6 +568,7 @@ void segacdblock_device::device_start()
 	m_peri_timer = timer_alloc(PERI_TIMER);
 	m_cmd_timer = timer_alloc(CMD_TIMER);
 	m_cd_timer = timer_alloc(CD_TIMER);
+	m_DMABuffer = auto_alloc_array_clear(machine(), UINT8, 2352);
 }
 
 
@@ -618,12 +587,20 @@ void segacdblock_device::device_reset()
 	m_peri_timer->reset();
 	m_cmd_timer->reset();
 	m_cd_timer->reset();
+	
+	xfertype = CDDMA_STOPPED;
+	sourcetype = SOURCE_NONE;
+	m_dma_size = 0;
+	m_dma_src = 0;
 	//m_sh1_timer->adjust(attotime::from_hz(clock()*256), 0, attotime::from_hz(clock()*256));
 	m_sh1_inited = false;
 	m_cmd_issued = 0;
 	m_hirq = 0xffff;
 
 	cdrom = subdevice<cdrom_image_device>("cdrom")->get_cdrom_file();
+	if(cdrom != NULL)
+		TOCRetrieve();
+	
 	m_isDiscInTray = cdrom != NULL;
 }
 

@@ -90,20 +90,31 @@ private:
 
 	enum transT
 	{
-		XFERTYPE_INVALID,
-		XFERTYPE_TOC,
+		CDDMA_STOPPED,
+		CDDMA_INPROGRESS
+		/*XFERTYPE_TOC,
 		XFERTYPE_FILEINFO_1,
 		XFERTYPE_FILEINFO_254,
 		XFERTYPE_SUBQ,
-		XFERTYPE_SUBRW
+		XFERTYPE_SUBRW*/
+	};
+	
+	enum sourceT
+	{
+		SOURCE_NONE,
+		SOURCE_TOC,
+		SOURCE_DATA,
+		SOURCE_AUDIO
 	};
 
 	transT xfertype;
+	sourceT sourcetype;
 	UINT32 m_dma_src,m_dma_size;
 
 
-	UINT8 tocbuf[102*4]; /**< @todo make common buffer instead */
-	void sh1_TOCRetrieve();
+	UINT8 tocbuf[102*4]; /**< @todo Subchannel Q of lead-in */
+	UINT8 *m_DMABuffer;
+	void TOCRetrieve();
 
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
 	void cd_standard_return(bool isPeri);
