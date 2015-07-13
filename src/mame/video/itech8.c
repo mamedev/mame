@@ -90,7 +90,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/tlc34076.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/itech8.h"
 
@@ -112,18 +111,18 @@
  *
  *************************************/
 
-#define BLITTER_ADDRHI          blitter_data[0]
-#define BLITTER_ADDRLO          blitter_data[1]
-#define BLITTER_FLAGS           blitter_data[2]
-#define BLITTER_STATUS          blitter_data[3]
-#define BLITTER_WIDTH           blitter_data[4]
-#define BLITTER_HEIGHT          blitter_data[5]
-#define BLITTER_MASK            blitter_data[6]
-#define BLITTER_OUTPUT          blitter_data[7]
-#define BLITTER_XSTART          blitter_data[8]
-#define BLITTER_YCOUNT          blitter_data[9]
-#define BLITTER_XSTOP           blitter_data[10]
-#define BLITTER_YSKIP           blitter_data[11]
+#define BLITTER_ADDRHI          m_blitter_data[0]
+#define BLITTER_ADDRLO          m_blitter_data[1]
+#define BLITTER_FLAGS           m_blitter_data[2]
+#define BLITTER_STATUS          m_blitter_data[3]
+#define BLITTER_WIDTH           m_blitter_data[4]
+#define BLITTER_HEIGHT          m_blitter_data[5]
+#define BLITTER_MASK            m_blitter_data[6]
+#define BLITTER_OUTPUT          m_blitter_data[7]
+#define BLITTER_XSTART          m_blitter_data[8]
+#define BLITTER_YCOUNT          m_blitter_data[9]
+#define BLITTER_XSTOP           m_blitter_data[10]
+#define BLITTER_YSKIP           m_blitter_data[11]
 
 #define BLITFLAG_SHIFT          0x01
 #define BLITFLAG_XFLIP          0x02
@@ -150,6 +149,14 @@ void itech8_state::video_start()
 	/* fetch the GROM base */
 	m_grom_base = memregion("grom")->base();
 	m_grom_size = memregion("grom")->bytes();
+	
+	save_item(NAME(m_blitter_data));
+	save_item(NAME(m_blit_in_progress));
+	save_item(NAME(m_page_select));
+	save_item(NAME(m_fetch_offset));
+	save_item(NAME(m_fetch_rle_count));
+	save_item(NAME(m_fetch_rle_value));
+	save_item(NAME(m_fetch_rle_literal));
 }
 
 
@@ -160,7 +167,7 @@ void itech8_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::itech8_palette_w)
+WRITE8_MEMBER(itech8_state::palette_w)
 {
 	m_tlc34076->write(space, offset/2, data);
 }
@@ -173,7 +180,7 @@ WRITE8_MEMBER(itech8_state::itech8_palette_w)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::itech8_page_w)
+WRITE8_MEMBER(itech8_state::page_w)
 {
 	m_screen->update_partial(m_screen->vpos());
 	logerror("%04x:display_page = %02X (%d)\n", space.device().safe_pc(), data, m_screen->vpos());
@@ -256,7 +263,6 @@ inline void itech8_state::consume_rle(int count)
 
 void itech8_state::perform_blit(address_space &space)
 {
-	UINT8 *blitter_data = m_blitter_data;
 	offs_t addr = m_tms34061->m_display.regs[TMS34061_XYADDRESS] | ((m_tms34061->m_display.regs[TMS34061_XYOFFSET] & 0x300) << 8);
 	UINT8 shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
 	int transparent = (BLITTER_FLAGS & BLITFLAG_TRANSPARENT);
@@ -395,7 +401,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
 {
 	/* turn off blitting and generate an interrupt */
 	m_blit_in_progress = 0;
-	itech8_update_interrupts(-1, -1, 1);
+	update_interrupts(-1, -1, 1);
 
 	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", m_screen->vpos());
 }
@@ -408,7 +414,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
  *
  *************************************/
 
-READ8_MEMBER(itech8_state::itech8_blitter_r)
+READ8_MEMBER(itech8_state::blitter_r)
 {
 	int result = m_blitter_data[offset / 2];
 	static const char *const portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
@@ -422,7 +428,7 @@ READ8_MEMBER(itech8_state::itech8_blitter_r)
 	/* a read from offset 3 clears the interrupt and returns the status */
 	if (offset == 3)
 	{
-		itech8_update_interrupts(-1, -1, 0);
+		update_interrupts(-1, -1, 0);
 		if (m_blit_in_progress)
 			result |= 0x80;
 		else
@@ -437,13 +443,11 @@ READ8_MEMBER(itech8_state::itech8_blitter_r)
 }
 
 
-WRITE8_MEMBER(itech8_state::itech8_blitter_w)
+WRITE8_MEMBER(itech8_state::blitter_w)
 {
-	UINT8 *blitter_data = m_blitter_data;
-
 	/* low bit seems to be ignored */
 	offset /= 2;
-	blitter_data[offset] = data;
+	m_blitter_data[offset] = data;
 
 	/* a write to offset 3 starts things going */
 	if (offset == 3)
@@ -453,18 +457,18 @@ WRITE8_MEMBER(itech8_state::itech8_blitter_w)
 		{
 			logerror("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
 						(m_tms34061->m_display.regs[TMS34061_XYOFFSET] >> 8) & 0x0f, m_tms34061->m_display.regs[TMS34061_XYADDRESS],
-						m_grom_bank, blitter_data[0], blitter_data[1],
-						blitter_data[4], blitter_data[5],
-						blitter_data[2]);
+						m_grom_bank, m_blitter_data[0], m_blitter_data[1],
+						m_blitter_data[4], m_blitter_data[5],
+						m_blitter_data[2]);
 			logerror("   %02X %02X %02X [%02X] %02X %02X %02X [%02X]-%02X %02X %02X %02X [%02X %02X %02X %02X]\n",
-						blitter_data[0], blitter_data[1],
-						blitter_data[2], blitter_data[3],
-						blitter_data[4], blitter_data[5],
-						blitter_data[6], blitter_data[7],
-						blitter_data[8], blitter_data[9],
-						blitter_data[10], blitter_data[11],
-						blitter_data[12], blitter_data[13],
-						blitter_data[14], blitter_data[15]);
+						m_blitter_data[0], m_blitter_data[1],
+						m_blitter_data[2], m_blitter_data[3],
+						m_blitter_data[4], m_blitter_data[5],
+						m_blitter_data[6], m_blitter_data[7],
+						m_blitter_data[8], m_blitter_data[9],
+						m_blitter_data[10], m_blitter_data[11],
+						m_blitter_data[12], m_blitter_data[13],
+						m_blitter_data[14], m_blitter_data[15]);
 		}
 
 		/* perform the blit */
@@ -472,7 +476,7 @@ WRITE8_MEMBER(itech8_state::itech8_blitter_w)
 		m_blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
-		machine().scheduler().timer_set(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12), timer_expired_delegate(FUNC(itech8_state::blitter_done),this));
+		m_blitter_done_timer->adjust(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12));
 	}
 
 	/* debugging */
@@ -487,7 +491,7 @@ WRITE8_MEMBER(itech8_state::itech8_blitter_w)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::itech8_tms34061_w)
+WRITE8_MEMBER(itech8_state::tms34061_w)
 {
 	int func = (offset >> 9) & 7;
 	int col = offset & 0xff;
@@ -502,7 +506,7 @@ WRITE8_MEMBER(itech8_state::itech8_tms34061_w)
 }
 
 
-READ8_MEMBER(itech8_state::itech8_tms34061_r)
+READ8_MEMBER(itech8_state::tms34061_r)
 {
 	int func = (offset >> 9) & 7;
 	int col = offset & 0xff;
@@ -570,7 +574,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(itech8_state::grmatch_palette_update)
  *
  *************************************/
 
-UINT32 itech8_state::screen_update_itech8_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 page_offset;
 	int x, y;
@@ -606,7 +610,7 @@ UINT32 itech8_state::screen_update_itech8_2layer(screen_device &screen, bitmap_r
 }
 
 
-UINT32 itech8_state::screen_update_itech8_grmatch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 itech8_state::screen_update_grmatch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 page_offset;
 	int x, y;
@@ -653,7 +657,7 @@ UINT32 itech8_state::screen_update_itech8_grmatch(screen_device &screen, bitmap_
 }
 
 
-UINT32 itech8_state::screen_update_itech8_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 itech8_state::screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 page_offset;
 	int x, y;
@@ -684,7 +688,7 @@ UINT32 itech8_state::screen_update_itech8_2page(screen_device &screen, bitmap_rg
 }
 
 
-UINT32 itech8_state::screen_update_itech8_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 itech8_state::screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 page_offset;
 	int x, y;
