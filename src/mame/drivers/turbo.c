@@ -1138,10 +1138,9 @@ ROM_END
 
 ROM_START( turboc )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	// based on other sets this seems to be the 'a' revision, previous MAME labels had it missing tho so needs confirming
-    ROM_LOAD( "epr-1363_t5a.ic76",  0x0000, 0x2000, CRC(5c110fb6) SHA1(fdcdf488bd112db12aa22c4b7e9f34004185d4ce) )
-    ROM_LOAD( "epr-1364_t5a.ic89",  0x2000, 0x2000, CRC(6a341693) SHA1(428927c4a14bf82225875012c255d25dcffaf2ab) )
-    ROM_LOAD( "epr-1365_t5a.ic103", 0x4000, 0x2000, CRC(3b6b0dc8) SHA1(3ebfa3f9fabd444ee105591acb6984b6b3523725) )
+	ROM_LOAD( "epr-1363_t5a.ic76",  0x0000, 0x2000, CRC(5c110fb6) SHA1(fdcdf488bd112db12aa22c4b7e9f34004185d4ce) )
+	ROM_LOAD( "epr-1364_t5a.ic89",  0x2000, 0x2000, CRC(6a341693) SHA1(428927c4a14bf82225875012c255d25dcffaf2ab) )
+	ROM_LOAD( "epr-1365_t5a.ic103", 0x4000, 0x2000, CRC(3b6b0dc8) SHA1(3ebfa3f9fabd444ee105591acb6984b6b3523725) )
 
 	ROM_REGION( 0x20000, "sprites", 0 ) /* sprite data */
 	ROM_LOAD( "epr-1246.prom-ic84", 0x00000, 0x2000, CRC(555bfe9a) SHA1(1e56385475eeff044dcd9b44a154991d3efe995e) ) /* level 0 */
