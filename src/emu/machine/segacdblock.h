@@ -57,7 +57,8 @@ public:
 	DECLARE_WRITE16_MEMBER( hirq_mask_w );
 
 	DECLARE_READ16_MEMBER( datatrns_r );
-
+	DECLARE_READ32_MEMBER( datatrns32_r );
+	
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -246,7 +247,9 @@ private:
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
 	void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum);
-
+	UINT32 xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
+	bool DeleteSectorMode;
+	void cd_defragblocks(partitionT *part);
 };
 
 

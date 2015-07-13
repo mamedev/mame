@@ -153,6 +153,89 @@ WRITE16_MEMBER(segacdblock_device::cr2_w){ m_cmd_issued |= 4; COMBINE_DATA(&m_cr
 READ16_MEMBER(segacdblock_device::cr3_r){ return m_dr[3]; }
 WRITE16_MEMBER(segacdblock_device::cr3_w){ m_cmd_issued |= 8; COMBINE_DATA(&m_cr[3]); SH2SendsCommand(); }
 
+void segacdblock_device::cd_defragblocks(partitionT *part)
+{
+	UINT32 i, j;
+	blockT *temp;
+	UINT8 temp2;
+
+	for (i = 0; i < (MAX_BLOCKS-1); i++)
+	{
+		for (j = i+1; j < MAX_BLOCKS; j++)
+		{
+			if ((part->blocks[i] == (blockT *)NULL) && (part->blocks[j] != (blockT *)NULL))
+			{
+				temp = part->blocks[i];
+				part->blocks[i] = part->blocks[j];
+				part->blocks[j] = temp;
+
+				temp2 = part->bnum[i];
+				part->bnum[i] = part->bnum[j];
+				part->bnum[j] = temp2;
+			}
+		}
+	}
+}
+
+READ32_MEMBER(segacdblock_device::datatrns32_r)
+{
+	UINT32 res;
+	
+	res = -1;
+	if(xfertype == CDDMA_INPROGRESS)
+	{
+		if (xfersect < xfersectnum)
+		{
+			// get next longword
+			res = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
+				  (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
+				  (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
+				  (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
+
+			m_dma_size += 4;
+			xferoffs += 4;
+
+			// did we run out of sector?
+			if (xferoffs >= transpart->blocks[xfersect]->size)
+			{
+				//CDROM_LOG(("CD: finished xfer of block %d of %d\n", xfersect+1, xfersectnum))
+
+				xferoffs = 0;
+				xfersect++;
+			}
+		}
+		else    // sectors are done, kill 'em all if we can
+		{
+			if (DeleteSectorMode == true)
+			{
+				INT32 i;
+
+				//CDROM_LOG(("Killing sectors in done\n"))
+
+				// deallocate the blocks
+				for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+				{
+					cd_free_block(transpart->blocks[i]);
+					transpart->blocks[i] = (blockT *)NULL;
+					transpart->bnum[i] = 0xff;
+				}
+
+				// defrag what's left
+				cd_defragblocks(transpart);
+
+				// clean up our state
+				transpart->size -= m_dma_size;
+				transpart->numblks -= xfersectnum;
+
+				/* @todo check this */
+				//xfertype = CDDMA_STOPPED;
+			}
+		}
+	}
+	
+	return res;
+}
+
 READ16_MEMBER(segacdblock_device::datatrns_r)
 {
 	UINT16 res;
@@ -187,13 +270,14 @@ READ16_MEMBER(segacdblock_device::datatrns_r)
 0x25890028 	MPEGRGB 	MPEG RGB Data Transfer Register
 */
 static ADDRESS_MAP_START( map, AS_0, 32, segacdblock_device )
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xf000) AM_READ16(datatrns_r,0xffffffff)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf000) AM_READWRITE16(hirq_r,hirq_w,0xffffffff)
-	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xf000) AM_READWRITE16(hirq_mask_r,hirq_mask_w,0xffffffff)
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xf000) AM_READWRITE16(cr0_r,cr0_w,0xffffffff)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xf000) AM_READWRITE16(cr1_r,cr1_w,0xffffffff)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0xf000) AM_READWRITE16(cr2_r,cr2_w,0xffffffff)
-	AM_RANGE(0x24, 0x27) AM_MIRROR(0xf000) AM_READWRITE16(cr3_r,cr3_w,0xffffffff)
+	AM_RANGE(0x18000, 0x18003) AM_READ(datatrns32_r)
+	AM_RANGE(0x90000, 0x90003) AM_MIRROR(0xf000) AM_READ16(datatrns_r,0xffffffff)
+	AM_RANGE(0x90008, 0x9000b) AM_MIRROR(0xf000) AM_READWRITE16(hirq_r,hirq_w,0xffffffff)
+	AM_RANGE(0x9000c, 0x9000f) AM_MIRROR(0xf000) AM_READWRITE16(hirq_mask_r,hirq_mask_w,0xffffffff)
+	AM_RANGE(0x90018, 0x9001b) AM_MIRROR(0xf000) AM_READWRITE16(cr0_r,cr0_w,0xffffffff)
+	AM_RANGE(0x9001c, 0x9001f) AM_MIRROR(0xf000) AM_READWRITE16(cr1_r,cr1_w,0xffffffff)
+	AM_RANGE(0x90020, 0x90023) AM_MIRROR(0xf000) AM_READWRITE16(cr2_r,cr2_w,0xffffffff)
+	AM_RANGE(0x90024, 0x90027) AM_MIRROR(0xf000) AM_READWRITE16(cr3_r,cr3_w,0xffffffff)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( segacdblock_config )
@@ -217,7 +301,7 @@ MACHINE_CONFIG_END
 segacdblock_device::segacdblock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGACDBLOCK, "Sega Saturn CD-Block (HLE)", tag, owner, clock, "segacdblock", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("segacdblock", ENDIANNESS_BIG, 32,16, 0, NULL, *ADDRESS_MAP_NAME(map))
+		m_space_config("segacdblock", ENDIANNESS_BIG, 32,20, 0, NULL, *ADDRESS_MAP_NAME(map))
 {
 }
 
@@ -798,17 +882,25 @@ void segacdblock_device::cd_cmd_get_then_delete_sector()
 	
 	// @todo reject states
 	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
-	m_dma_src = 0;
-	m_dma_size = 0;
+//	m_dma_src = 0;
+//	m_dma_size = 0;
 	transpart = &partitions[bufnum];
 
 	m_TransferActive = true;
 	cd_standard_return(false); // cheap hack
-	m_dr[0] = CD_STAT_TRANS | m_cd_state;
 	
-	sourcetype = SOURCE_DATA;
+	m_dr[0] = CD_STAT_TRANS | m_cd_state;
+	xferoffs = 0;
+	xfersect = 0;
+	m_dma_size = 0;
+	xfersectpos = sectofs;
+	xfersectnum = sectnum;
+	xfertype = CDDMA_INPROGRESS;
+//	sourcetype = SOURCE_DATA;
 	set_flag(EHST);
+	set_flag(DRDY);
 	set_flag(CMOK);
+	DeleteSectorMode = true;
 }
 
 void segacdblock_device::cd_cmd_get_copy_error()
@@ -983,7 +1075,9 @@ void segacdblock_device::dma_setup()
 			sourcetype = SOURCE_NONE;
 			break;
 		case SOURCE_DATA:
+			xfertype = CDDMA_INPROGRESS;
 			set_flag(DRDY);
+			sourcetype = SOURCE_NONE;
 			break;
 		case SOURCE_AUDIO:
 			break;
@@ -1361,8 +1455,8 @@ READ32_MEMBER( segacdblock_device::read )
 		res|= m_space->read_word(offset*4)<<0;
 
 	if(mem_mask == 0xffffffff)
-		debugger_break(machine());
-
+		res = m_space->read_dword(offset*4);
+		
 	return res;
 }
 
