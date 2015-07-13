@@ -220,6 +220,9 @@ private:
 
 	// 0x70
 	void cd_cmd_change_dir(UINT32 dir_entry);
+	void cd_cmd_get_file_system_scope();
+	
+	void cd_cmd_read_file();
 	void cd_cmd_abort();
 
 	// 0xe0
@@ -250,6 +253,7 @@ private:
 	UINT32 xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
 	bool DeleteSectorMode;
 	void cd_defragblocks(partitionT *part);
+	bool m_playtype;
 };
 
 

@@ -353,6 +353,8 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x67:	cd_cmd_get_copy_error(); break;
 
 		case 0x70:	cd_cmd_change_dir(((m_cr[2] & 0xff)<<16) | (m_cr[3] & 0xffff) ); break;
+		case 0x72:	cd_cmd_get_file_system_scope(); break;
+		case 0x74:  cd_cmd_read_file(); break;
 		case 0x75:	cd_cmd_abort(); break;
 
 		case 0xe0:	cd_cmd_auth_device(m_cr[1]); break;
@@ -623,7 +625,7 @@ void segacdblock_device::cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, 
 
 void segacdblock_device::cd_standard_return(bool isPeri)
 {
-	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0) | m_cd_state;
+	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0) | m_cd_state | ((m_playtype == true) ? 0x80 : 0);
 	m_dr[1] = 0x0000;
 	m_dr[2] = 0x0100 | ((m_FAD >> 16) & 0xff);
 	m_dr[3] = m_FAD & 0xffff;
@@ -751,8 +753,10 @@ void segacdblock_device::cd_cmd_play_disc()
 
 	m_cd_state = CD_STAT_PLAY;
 	m_cd_timer->adjust(attotime::from_hz(150)); // @todo use the clock Luke
-
+	m_playtype = false;
+	
 	cd_standard_return(false);
+	set_flag(EHST);
 	set_flag(CMOK);
 }
 
@@ -917,6 +921,43 @@ void segacdblock_device::cd_cmd_change_dir(UINT32 dir_entry)
 	read_new_dir(dir_entry);
 	set_flag(EFLS);
 	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_get_file_system_scope()
+{
+	m_dr[0] = m_cd_state;
+	m_dr[1] = numfiles; // # of files in directory
+	m_dr[2] = 0x0100;   // report directory held
+	m_dr[3] = firstfile;    // first file id
+	set_flag(EFLS);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_read_file()
+{
+	UINT16 file_offset,file_filter,file_id,file_size;
+
+	file_offset = ((m_cr[0] & 0xff)<<8)|(m_cr[1] & 0xff); /* correct? */
+	file_filter = m_cr[2] >> 8;
+	file_id = ((m_cr[2] & 0xff) << 16)|(m_cr[3]);
+	file_size = ((curdir[file_id].length + m_SectorLengthIn - 1) / m_SectorLengthIn) - file_offset;
+
+	m_FAD = (curdir[file_id].firstfad + file_offset);
+	m_FADEnd = file_size;
+	//		cd_stat = CD_STAT_PLAY|0x80;    // set "cd-rom" bit
+	//		cd_curfad = (curdir[file_id].firstfad + file_offset);
+	//		fadstoplay = file_size;
+	if(file_filter < 0x24)
+		CDDeviceConnection = &CDFilters[file_filter];
+	else
+		CDDeviceConnection = (filterT *)NULL;
+	
+	m_cd_state = CD_STAT_PLAY;
+	m_playtype = true;
+	cd_standard_return(false);
+	m_cd_timer->adjust(attotime::from_hz(150)); // @todo use the clock Luke
+	
+//	printf("Read file %08x (%08x %08x) %02x %d\n",curdir[file_id].firstfad,cd_curfad,fadstoplay,file_filter,sectlenin);
 }
 
 void segacdblock_device::cd_cmd_abort()
@@ -1352,7 +1393,8 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 					m_cd_state = CD_STAT_PAUSE;
 					set_flag(PEND);
 					
-					// @todo EFLS for File command
+					if(m_playtype == true)
+						set_flag(EFLS);
 					return;
 				}
 			}
