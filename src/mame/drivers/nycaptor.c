@@ -303,7 +303,7 @@ READ8_MEMBER(nycaptor_state::nycaptor_generic_control_r)
 WRITE8_MEMBER(nycaptor_state::nycaptor_generic_control_w)
 {
 	m_generic_control_reg = data;
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + ((data&0x08)>>3)*0x4000 );
+	membank("bank1")->set_entry((data&0x08)>>3);
 }
 
 static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
@@ -404,10 +404,8 @@ READ8_MEMBER(nycaptor_state::cyclshtg_mcu_status_r1)
 
 WRITE8_MEMBER(nycaptor_state::cyclshtg_generic_control_w)
 {
-	int bank = (data >> 2) & 3;
-
 	m_generic_control_reg = data;
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + bank*0x4000 );
+	membank("bank1")->set_entry((data >> 2) & 3);
 }
 
 
@@ -741,6 +739,11 @@ GFXDECODE_END
 
 void nycaptor_state::machine_start()
 {
+	if (m_gametype == 0)
+		membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	else
+		membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	
 	save_item(NAME(m_generic_control_reg));
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
