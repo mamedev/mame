@@ -111,6 +111,7 @@ private:
 	sourceT sourcetype;
 	UINT32 m_dma_src,m_dma_size;
 
+	void dma_setup();
 
 	UINT8 tocbuf[102*4]; /**< @todo Subchannel Q of lead-in */
 	UINT8 *m_DMABuffer;

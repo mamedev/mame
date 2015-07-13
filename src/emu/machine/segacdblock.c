@@ -522,6 +522,24 @@ void segacdblock_device::TOCRetrieve()
 //	set_flag(DRDY);
 }
 
+/*!
+ @todo Of course DMA needs steps ...
+ */
+void segacdblock_device::dma_setup()
+{
+	switch(sourcetype)
+	{
+		case SOURCE_TOC:
+			memcpy(m_DMABuffer,tocbuf,102*4);
+			m_dma_size = 102*4;
+			m_dma_src = 0;
+			xfertype = CDDMA_INPROGRESS;
+			set_flag(DRDY);
+			sourcetype = SOURCE_NONE;
+			break;
+	}
+}
+
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id < CD_TIMER+1);
@@ -530,18 +548,8 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		SH1CommandExecute();
 	else if(id == PERI_TIMER)
 	{
-		if(sourcetype == SOURCE_TOC)
-		{
-			/*!
-			  @todo DMA timing into account ...
-			  */
-			memcpy(m_DMABuffer,tocbuf,102*4);
-			m_dma_size = 102*4;
-			m_dma_src = 0;
-			xfertype = CDDMA_INPROGRESS;
-			set_flag(DRDY);
-			sourcetype = SOURCE_NONE;
-		}
+		if(sourcetype != SOURCE_NONE)
+			dma_setup();
 
 		if(m_isDiscInTray == true)
 			m_cd_state = CD_STAT_PAUSE;
