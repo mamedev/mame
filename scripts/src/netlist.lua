@@ -156,4 +156,6 @@ project "netlist"
     MAME_DIR .. "src/emu/netlist/macro/nlm_ttl74xx.h",
     MAME_DIR .. "src/emu/netlist/macro/nlm_cd4xxx.c",
     MAME_DIR .. "src/emu/netlist/macro/nlm_cd4xxx.h",
+    MAME_DIR .. "src/emu/netlist/macro/nlm_opamp.c",
+    MAME_DIR .. "src/emu/netlist/macro/nlm_opamp.h",
 }

@@ -29,13 +29,14 @@ static NETLIST_START(base)
 	LOCAL_SOURCE(family_models)
 	LOCAL_SOURCE(TTL74XX_lib)
 	LOCAL_SOURCE(CD4XXX_lib)
-
+	LOCAL_SOURCE(OPAMP_lib)
 
 	INCLUDE(diode_models);
 	INCLUDE(bjt_models);
 	INCLUDE(family_models);
 	INCLUDE(TTL74XX_lib);
 	INCLUDE(CD4XXX_lib);
+	INCLUDE(OPAMP_lib);
 
 NETLIST_END()
 
@@ -399,8 +400,17 @@ void setup_t::register_param(const pstring &param, const pstring &value)
 {
 	pstring fqn = build_fqn(param);
 
-	if (!(m_params_temp.add(link_t(fqn, value), false)==true))
-		netlist().error("Error adding parameter %s to parameter list\n", param.cstr());
+	int idx = m_params_temp.index_by_name(fqn);
+	if (idx < 0)
+	{
+		if (!(m_params_temp.add(link_t(fqn, value), false)==true))
+			netlist().error("Unexpected error adding parameter %s to parameter list\n", param.cstr());
+	}
+	else
+	{
+		netlist().warning("Overwriting %s old <%s> new <%s>\n", fqn.cstr(), m_params_temp[idx].e2.cstr(), value.cstr());
+		m_params_temp[idx].e2 = value;
+	}
 }
 
 const pstring setup_t::resolve_alias(const pstring &name) const

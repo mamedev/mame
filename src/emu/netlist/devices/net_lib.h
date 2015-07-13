@@ -56,13 +56,15 @@
 
 #include "nld_log.h"
 
+#include "../macro/nlm_cd4xxx.h"
+#include "../macro/nlm_ttl74xx.h"
+#include "../macro/nlm_opamp.h"
+
 #include "../analog/nld_bjt.h"
 #include "../analog/nld_fourterm.h"
 #include "../analog/nld_switches.h"
 #include "../analog/nld_twoterm.h"
 #include "../analog/nld_opamps.h"
-#include "../macro/nlm_cd4xxx.h"
-#include "../macro/nlm_ttl74xx.h"
 #include "../solver/nld_solver.h"
 
 #include "nld_legacy.h"

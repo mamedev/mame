@@ -3,6 +3,17 @@
 
 #include "../nl_setup.h"
 
+/*
+ * Devices:
+ *
+ * CD4001_NOR : single gate
+ * CD4001_DIP : dip package
+ * CD4020_DIP : dip package (device model in core)
+ * CD4016_DIP : dip package (device model in core)
+ * CD4066_DIP : dip package (device model in core)
+ *
+ */
+
 #ifndef __PLIB_PREPROCESSOR__
 
 /* ----------------------------------------------------------------------------

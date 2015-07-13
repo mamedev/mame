@@ -9,9 +9,6 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
-#define MB3614_DIP(_name)            			                               \
-		NET_REGISTER_DEV_X(MB3614_DIP, _name)
-
 #define LM358_DIP(_name)            			                               \
 		NET_REGISTER_DEV_X(LM358_DIP, _name)
 
@@ -77,6 +74,12 @@ NETLIST_START(dummy)
 	NET_MODEL(".model 2SC1941 NPN(IS=46.416f BF=210 NF=1.0022 VAF=600 IKF=500m ISE=60f NE=1.5 BR=2.0122 NR=1.0022 VAR=10G IKR=10G ISC=300p NC=2 RB=13.22 IRB=10G RBM=13.22 RE=100m RC=790m CJE=26.52p VJE=900m MJE=518m TF=1.25n XTF=10 VTF=10 ITF=500m PTF=0 CJC=4.89p VJC=750m MJC=237m XCJC=500m TR=100n CJS=0 VJS=750m MJS=500m XTB=1.5 EG=1.11 XTI=3 KF=0 AF=1 FC=500m)")
 
 	INCLUDE(CongoBongo_schematics)
+
+	/* The opamp actually has an FPF of about 500k. This doesn't work here and causes oscillations.
+	 * FPF here therefore about half the Solver clock.
+	 */
+	PARAM(XU16.B.model, "MB3614_SLOW")
+	PARAM(XU17.C.model, "MB3614_SLOW")
 
 	OPTIMIZE_FRONTIER(C51.1, RES_K(20), 50)
 	OPTIMIZE_FRONTIER(R77.2, RES_K(20), 50)
@@ -226,6 +229,7 @@ NETLIST_START(CongoBongo_schematics)
 	CD4538_DIP(XU19)
 	MM5837_DIP(XU20)
 	TTL_7416_DIP(XU6)
+
 	NET_C(D1.A, C21.2, R23.1)
 	NET_C(D1.K, C20.1, R22.1)
 	NET_C(XU13.1, C37.2, C36.1, R48.1)
@@ -410,47 +414,6 @@ NETLIST_START(opamp_mod)
 
 NETLIST_END()
 
-NETLIST_START(MB3614_DIP)
-#if 0
-	SUBMODEL(opamp_mod, op1)
-	SUBMODEL(opamp_mod, op2)
-	SUBMODEL(opamp_mod, op3)
-	SUBMODEL(opamp_mod, op4)
-#else
-	/* The opamp actually has an FPF of about 500k. This doesn't work here and causes oscillations.
-	 * FPF here therefore about half the Solver clock.
-	 */
-	OPAMP(op1, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=110k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
-	OPAMP(op2, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
-	OPAMP(op3, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=11k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
-	OPAMP(op4, ".model MB3614 OPAMP(TYPE=3 VLH=2.0 VLL=0.2 FPF=5 UGF=110k SLEW=0.6M RI=1000k RO=50 DAB=0.002)")
-#endif
-	ALIAS( 1, op1.OUT)
-	ALIAS( 2, op1.MINUS)
-	ALIAS( 3, op1.PLUS)
-
-	ALIAS( 4, op1.VCC)
-
-	ALIAS( 5, op2.PLUS)
-	ALIAS( 6, op2.MINUS)
-	ALIAS( 7, op2.OUT)
-
-	ALIAS( 8, op3.OUT)
-	ALIAS( 9, op3.MINUS)
-	ALIAS(10, op3.PLUS)
-
-	ALIAS(11, op1.GND)
-
-	ALIAS(12, op4.PLUS)
-	ALIAS(13, op4.MINUS)
-	ALIAS(14, op4.OUT)
-
-	NET_C(op1.GND, op2.GND, op3.GND, op4.GND)
-	NET_C(op1.VCC, op2.VCC, op3.VCC, op4.VCC)
-
-NETLIST_END()
-
-
 
 NETLIST_START(G501534_DIP)
 	AFUNC(f, 2, "A0 A1 0.2 * *")
@@ -482,9 +445,6 @@ NETLIST_END()
 
 NETLIST_START(congob_lib)
 
-	//LOCAL_LIB_ENTRY(LM324_DIP)
-	//LOCAL_LIB_ENTRY(LM358_DIP)
-	LOCAL_LIB_ENTRY(MB3614_DIP)
 	LOCAL_LIB_ENTRY(G501534_DIP)
 
 NETLIST_END()
