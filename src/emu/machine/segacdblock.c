@@ -94,7 +94,7 @@ void segacdblock_device::sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, U
 
 void segacdblock_device::write_fad()
 {
-	m_cr[3] = 1 | m_FAD >> 16; /**< @todo track number */
+	m_cr[3] = 0x100 | m_FAD >> 16; /**< @todo track number */
 	m_cr[4] = m_FAD & 0xffff;
 }
 
@@ -288,11 +288,11 @@ segacdblock_device::blockT *segacdblock_device::cd_alloc_block(UINT8 *blknum)
 	{
 		if (blocks[i].size == -1)
 		{
-			freeblocks--;
-			if (freeblocks <= 0)
+			//freeblocks--;
+			//if (freeblocks <= 0)
 			{
 				//buffull = 1;
-				fatalerror("buffull in cd_alloc_block\n");
+			//	fatalerror("buffull in cd_alloc_block\n");
 			}
 
 			blocks[i].size = m_SectorLengthIn;
@@ -527,8 +527,8 @@ void segacdblock_device::cd_standard_return(bool isPeri)
 {
 	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0) | m_cd_state;
 	m_dr[1] = 0x0000;
-	m_dr[2] = 0x0000;
-	m_dr[3] = 150;
+	m_dr[2] = 0x0100 | ((m_FAD >> 16) & 0xff);
+	m_dr[3] = m_FAD & 0xffff;
 }
 
 
@@ -1045,6 +1045,7 @@ segacdblock_device::partitionT *segacdblock_device::cd_filterdata(filterT *flt, 
 	// did the allocation succeed?
 	if (filterprt->blocks[filterprt->numblks] == (blockT *)NULL)
 	{
+		printf("mammt\n");
 		*p_ok = 0;
 		return (partitionT *)NULL;
 	}
@@ -1235,6 +1236,7 @@ void segacdblock_device::device_start()
 
 void segacdblock_device::device_reset()
 {
+	INT32 i,j;
 	// init_command_regs
 	m_dr[0] = 'C';
 	m_dr[1] = 'D' << 8 | 'B';
@@ -1254,6 +1256,29 @@ void segacdblock_device::device_reset()
 	m_cmd_issued = 0;
 	m_hirq = 0xffff;
 
+	m_LastBuffer = 0xff;
+
+	// reset buffer partitions
+	for (i = 0; i < MAX_FILTERS; i++)
+	{
+		partitions[i].size = -1;
+		partitions[i].numblks = 0;
+
+		for (j = 0; j < MAX_BLOCKS; j++)
+		{
+			partitions[i].blocks[j] = (blockT *)NULL;
+			partitions[i].bnum[j] = 0xff;
+		}
+	}
+
+	// reset blocks
+	for (i = 0; i < MAX_BLOCKS; i++)
+	{
+		blocks[i].size = -1;
+		memset(&blocks[i].data, 0, CD_MAX_SECTOR_DATA);
+	}
+
+	
 	cdrom = subdevice<cdrom_image_device>("cdrom")->get_cdrom_file();
 	if(cdrom != NULL)
 		TOCRetrieve();
