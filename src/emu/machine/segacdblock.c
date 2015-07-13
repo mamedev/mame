@@ -262,7 +262,10 @@ void segacdblock_device::SH1CommandExecute()
 		
 		case 0x48:	cd_cmd_reset_selector(m_cr[0] & 0xff, m_cr[2] >> 8); break;
 
+		case 0x51:  cd_cmd_get_sector_number(m_cr[2] >> 8); break;
+		
 		case 0x60:  cd_cmd_set_sector_length(m_cr[0] & 0xff, m_cr[1] >> 8); break;
+		case 0x63:  cd_cmd_get_then_delete_sector(); break;
 		case 0x67:	cd_cmd_get_copy_error(); break;
 
 		case 0x70:	cd_cmd_change_dir(((m_cr[2] & 0xff)<<16) | (m_cr[3] & 0xffff) ); break;
@@ -521,7 +524,18 @@ void segacdblock_device::make_dir_current(UINT32 fad)
 	}
 }
 
-
+void segacdblock_device::cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum)
+{
+	if (*sectoffs == 0xffff)
+	{
+		// last sector
+		printf("CD: Don't know how to handle offset ffff\n");
+	}
+	else if (*sectnum == 0xffff)
+	{
+		*sectnum = partitions[bufnum].numblks - *sectoffs;
+	}
+}
 
 void segacdblock_device::cd_standard_return(bool isPeri)
 {
@@ -748,6 +762,20 @@ void segacdblock_device::cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_n
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_get_sector_number(UINT8 buffer_number)
+{
+	m_dr[0] = m_cd_state;
+	m_dr[1] = 0;
+	m_dr[2] = 0;
+	if (partitions[buffer_number].size == -1)
+		m_dr[3] = 0;
+	else
+		m_dr[3] = partitions[buffer_number].numblks;
+
+	set_flag(DRDY);
+	set_flag(CMOK);
+}
+
 void segacdblock_device::cd_cmd_set_sector_length(UINT8 length_in, UINT8 length_out)
 {
 	const int sectorSizes[4] = { 2048, 2336, 2340, 2352 };
@@ -759,6 +787,27 @@ void segacdblock_device::cd_cmd_set_sector_length(UINT8 length_in, UINT8 length_
 	cd_standard_return(false);
 
 	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_get_then_delete_sector()
+{
+	UINT32 sectnum = m_cr[3];
+	UINT32 sectofs = m_cr[1];
+	UINT32 bufnum = m_cr[2]>>8;
+	
+	// @todo reject states
+	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+	m_dma_src = 0;
+	m_dma_size = 0;
+	transpart = &partitions[bufnum];
+
+	m_TransferActive = true;
+	cd_standard_return(false); // cheap hack
+	m_dr[0] = CD_STAT_TRANS | m_cd_state;
+	
+	sourcetype = SOURCE_DATA;
+	set_flag(EHST);
 	set_flag(CMOK);
 }
 
@@ -934,6 +983,7 @@ void segacdblock_device::dma_setup()
 			sourcetype = SOURCE_NONE;
 			break;
 		case SOURCE_DATA:
+			set_flag(DRDY);
 			break;
 		case SOURCE_AUDIO:
 			break;
@@ -1045,7 +1095,6 @@ segacdblock_device::partitionT *segacdblock_device::cd_filterdata(filterT *flt, 
 	// did the allocation succeed?
 	if (filterprt->blocks[filterprt->numblks] == (blockT *)NULL)
 	{
-		printf("mammt\n");
 		*p_ok = 0;
 		return (partitionT *)NULL;
 	}

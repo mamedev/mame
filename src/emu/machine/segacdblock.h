@@ -174,6 +174,7 @@ private:
 	filterT CDFilters[MAX_FILTERS];
 	filterT *CDDeviceConnection;
 	partitionT partitions[MAX_FILTERS];
+	partitionT *transpart;
 	blockT blocks[MAX_BLOCKS];
 	blockT curblock;
 	partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok);
@@ -207,9 +208,13 @@ private:
 	void cd_cmd_set_device_connection(UINT8 param);
 	// 0x40
 	void cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_number);
+
+	// 0x50
+	void cd_cmd_get_sector_number(UINT8 buffer_number);
 	
 	// 0x60
 	void cd_cmd_set_sector_length(UINT8 length_in, UINT8 length_out);
+	void cd_cmd_get_then_delete_sector();
 	void cd_cmd_get_copy_error();
 
 	// 0x70
@@ -240,6 +245,7 @@ private:
 	std::vector<direntryT> curdir;       // current directory
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
+	void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum);
 
 };
 
