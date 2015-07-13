@@ -12,7 +12,8 @@ Template for skeleton device
 #ifndef __SEGACDBLOCKDEV_H__
 #define __SEGACDBLOCKDEV_H__
 
-
+#define MAX_BLOCKS  (200)
+#define MAX_FILTERS (24)
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -78,6 +79,7 @@ private:
 	UINT16 m_hirq_mask;
 	UINT16 m_hirq;
 	UINT32 m_fad;
+	UINT32 m_fadend;
 	UINT16 m_cd_state;
 	UINT8 m_cmd_issued;
 	bool m_sh1_inited;
@@ -107,6 +109,25 @@ private:
 		SOURCE_AUDIO
 	};
 
+	struct blockT
+	{
+		INT32 size; // size of block
+		INT32 FAD;  // FAD on disc
+		UINT8 data[CD_MAX_SECTOR_DATA];
+		UINT8 chan; // channel
+		UINT8 fnum; // file number
+		UINT8 subm; // subchannel mode
+		UINT8 cinf; // coding information
+	};
+
+	struct partitionT
+	{
+		INT32 size;
+		blockT *blocks[MAX_BLOCKS];
+		UINT8 bnum[MAX_BLOCKS];
+		UINT8 numblks;
+	};
+	
 	transT xfertype;
 	sourceT sourcetype;
 	UINT32 m_dma_src,m_dma_size;
@@ -126,11 +147,12 @@ private:
 		UINT32 range;
 	};
 	
-	
-	#define MAX_FILTERS (24)
+
 
 	filterT CDFilters[MAX_FILTERS];
 	filterT *CDDeviceConnection;
+	partitionT partitions[MAX_FILTERS];
+	blockT blocks[MAX_BLOCKS];
 
 	void dma_setup();
 
@@ -140,6 +162,7 @@ private:
 
 	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
 	void cd_standard_return(bool isPeri);
+	void cd_free_block(blockT *blktofree);
 
 	// 0x00
 	void cd_cmd_status();
@@ -149,10 +172,13 @@ private:
 	void cd_cmd_init(UINT8 init_flags);
 	void cd_cmd_end_transfer();
 
+	// 0x10
+	void cd_cmd_play_disc();
+	
 	// 0x30
 	void cd_cmd_set_device_connection(UINT8 param);
 	// 0x40
-	void cd_cmd_reset_selector();
+	void cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_number);
 	
 	// 0x60
 	void cd_cmd_set_sector_length();

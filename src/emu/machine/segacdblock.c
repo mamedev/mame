@@ -254,10 +254,12 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x03:	cd_cmd_get_session_info(m_cr[0] & 0xff); break;
 		case 0x04:	cd_cmd_init(m_cr[0] & 0xff); break;
 		case 0x06:	cd_cmd_end_transfer(); break;
+		
+		case 0x10:  cd_cmd_play_disc(); break;
 
 		case 0x30:	cd_cmd_set_device_connection(m_cr[2] >> 8); break;
 		
-		case 0x48:	cd_cmd_reset_selector(); break;
+		case 0x48:	cd_cmd_reset_selector(m_cr[0] & 0xff, m_cr[2] >> 8); break;
 
 		case 0x60:  cd_cmd_set_sector_length(); break;
 		case 0x67:	cd_cmd_get_copy_error(); break;
@@ -274,6 +276,29 @@ void segacdblock_device::SH1CommandExecute()
 	m_cmd_issued = 0;
 	// @todo: timer changes with cd timer, maybe we could disable this during data/audio playback and enable that instead?
 	m_peri_timer->adjust(attotime::from_usec(16667), 0, attotime::from_usec(16667));	
+}
+
+void segacdblock_device::cd_free_block(blockT *blktofree)
+{
+	INT32 i;
+
+	if(blktofree == NULL)
+	{
+		return;
+	}
+
+	for (i = 0; i < 200; i++)
+	{
+		if (&blocks[i] == blktofree)
+		{
+//			CDROM_LOG(("CD: freeing block %d\n", i))
+		}
+	}
+
+	blktofree->size = -1;
+	//freeblocks++;
+	//buffull = 0;
+	//hirqreg &= ~BFUL;
 }
 
 void segacdblock_device::cd_standard_return(bool isPeri)
@@ -376,6 +401,41 @@ void segacdblock_device::cd_cmd_end_transfer()
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_play_disc()
+{
+	UINT8 play_mode = m_cr[2] >> 8;
+	if(play_mode)
+		return; // @todo intentional for debugging
+	
+	UINT32 start_pos = ((m_cr[0] & 0xff) << 16) | (m_cr[1] & 0xffff);
+	UINT32 end_pos = ((m_cr[2] & 0xff) << 16) | (m_cr[3] & 0xffff);
+	if(start_pos & 0x800000)
+	{
+		if(start_pos == 0xffffff)
+			return; // @todo intentional for debugging
+	
+		m_fad = start_pos & 0xfffff;
+	}
+	else 
+		return; // @todo intentional for debugging
+
+	if(end_pos & 0x800000)
+	{
+		if(end_pos == 0xffffff)
+			return; // @todo intentional for debugging
+	
+		m_fadend = end_pos & 0xfffff;
+	}
+	else 
+		return; // @todo intentional for debugging
+
+	m_cd_state = CD_STAT_PLAY;
+	m_cd_timer->adjust(attotime::from_hz(150)); // @todo use the clock Luke
+
+	cd_standard_return(false);
+	set_flag(CMOK);
+}
+
 void segacdblock_device::cd_cmd_set_device_connection(UINT8 param)
 {
 	if(param >= MAX_FILTERS) // mostly 0xff, expect that anything above this disables anyway
@@ -389,9 +449,77 @@ void segacdblock_device::cd_cmd_set_device_connection(UINT8 param)
 	set_flag(CMOK);
 }
 
-void segacdblock_device::cd_cmd_reset_selector()
+void segacdblock_device::cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_number)
 {
-	// ...
+	int i;
+	if(reset_flags == 0)
+	{
+		if(buffer_number < MAX_FILTERS)
+		{
+			for (i = 0; i < MAX_BLOCKS; i++)
+			{
+				cd_free_block(partitions[buffer_number].blocks[i]);
+				partitions[buffer_number].blocks[i] = (blockT *)NULL;
+				partitions[buffer_number].bnum[i] = 0xff;
+			}
+
+			partitions[buffer_number].size = -1;
+			partitions[buffer_number].numblks = 0;
+		}
+		else
+			return; // @todo intentional for debugging
+	}
+	else
+	{
+		/* reset false filter output conditions */
+		/* TODO: check these two. */
+		if(reset_flags & 0x80)
+		{
+			for(i=0;i<MAX_FILTERS;i++)
+				CDFilters[i].condfalse = 0;
+		}
+
+		/* reset true filter output conditions */
+		if(reset_flags & 0x40)
+		{
+			for(i=0;i<MAX_FILTERS;i++)
+				CDFilters[i].condtrue = 0;
+		}
+
+		/* reset filter conditions*/
+		if(reset_flags & 0x10)
+		{
+			for(i=0;i<MAX_FILTERS;i++)
+			{
+				CDFilters[i].fad = 0;
+				CDFilters[i].range = 0xffffffff;
+				CDFilters[i].mode = 0;
+				CDFilters[i].chan = 0;
+				CDFilters[i].smmask = 0;
+				CDFilters[i].cimask = 0;
+				CDFilters[i].fid = 0;
+				CDFilters[i].smval = 0;
+				CDFilters[i].cival = 0;
+			}
+		}
+		/* reset partition buffer data */
+		if(reset_flags & 0x4)
+		{
+			for(i=0;i<MAX_FILTERS;i++)
+			{
+				for (int j = 0; j < MAX_BLOCKS; j++)
+				{
+					cd_free_block(partitions[i].blocks[j]);
+					partitions[i].blocks[j] = (blockT *)NULL;
+					partitions[i].bnum[j] = 0xff;
+				}
+
+				partitions[i].size = -1;
+				partitions[i].numblks = 0;
+			}
+//				buffull = sectorstore = 0;
+		}
+	}
 	cd_standard_return(false);
 
 	set_flag(ESEL);
@@ -604,6 +732,10 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 
 		cd_standard_return(true);
 		set_flag(SCDQ);
+	}
+	else if(id == CD_TIMER)
+	{
+		printf("tick tock\n");
 	}
 	
 }
