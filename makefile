@@ -60,6 +60,7 @@
 # USE_SYSTEM_LIB_LUA = 1
 # USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
+# USE_SYSTEM_LIB_PORTAUDIO = 1
 
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
@@ -334,6 +335,10 @@ endif
 
 ifndef USE_SYSTEM_LIB_PORTMIDI
 PARAMS += --with-bundled-portmidi
+endif
+
+ifndef USE_SYSTEM_LIB_PORTAUDIO
+PARAMS += --with-bundled-portaudio
 endif
 
 #-------------------------------------------------
