@@ -20,7 +20,13 @@
  * ---------------------------------------------------------------------------*/
 
 #define CD4020_DIP(_name)                                                      \
-		NET_REGISTER_DEV(CD4020_DIP, _name)
+		NET_REGISTER_DEV_X(CD4020_DIP, _name)
+
+#define CD4066_DIP(_name)                                                      \
+		NET_REGISTER_DEV_X(CD4066_DIP, _name)
+
+#define CD4016_DIP(_name)                                                      \
+		NET_REGISTER_DEV_X(CD4016_DIP, _name)
 
 /* ----------------------------------------------------------------------------
  *  External declarations

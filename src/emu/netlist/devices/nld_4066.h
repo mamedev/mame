@@ -27,36 +27,21 @@
 #include "../nl_base.h"
 #include "nld_cmos.h"
 
-#define CD4066_DIP(_name)                                                      \
-		NET_REGISTER_DEV(CD4066_DIP, _name)
-
-#define CD4016_DIP(_name)                                                      \
-		NET_REGISTER_DEV(CD4016_DIP, _name)
+#define CD4066_GATE(_name)                                                     \
+		NET_REGISTER_DEV(CD4066_GATE, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
-NETLIB_SUBDEVICE(CD4066,
+NETLIB_DEVICE(CD4066_GATE,
 	NETLIB_LOGIC_FAMILY(CD4XXX)
 public:
 
 	analog_input_t m_control;
 	NETLIB_NAME(R) m_R;
 
-	NETLIB_NAME(vdd_vss) *m_supply;
-	nl_double m_base_r;
-);
-
-NETLIB_DEVICE(CD4066_DIP,
-	NETLIB_LOGIC_FAMILY(CD4XXX)
-
-	NETLIB_NAME(CD4066) m_A;
-	NETLIB_NAME(CD4066) m_B;
-	NETLIB_NAME(CD4066) m_C;
-	NETLIB_NAME(CD4066) m_D;
 	NETLIB_NAME(vdd_vss) m_supply;
+	param_double_t m_base_r;
 );
-
-NETLIB_DEVICE_DERIVED_PURE(CD4016_DIP, CD4066_DIP);
 
 NETLIB_NAMESPACE_DEVICES_END()
 
