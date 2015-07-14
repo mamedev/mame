@@ -1031,7 +1031,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 	{
 		str.append("One or more ROMs/CHDs for this ");
 		str.append(emulator_info::get_gamenoun());
-		str.append( "game are incorrect. The ");
+		str.append(" are incorrect. The ");
 		str.append(emulator_info::get_gamenoun());
 		str.append(" may not run correctly.\n");
 		if (machine().system().flags & WARNING_FLAGS)
