@@ -63,7 +63,7 @@ sm512_device::sm512_device(const machine_config &mconfig, const char *tag, devic
 
 void sm511_device::get_opcode_param()
 {
-	// LBL, PRE, TL, TML and prefix opcodes are 2 bytes
+	// XXX?, LBL, PRE, TL, TML and prefix opcodes are 2 bytes
 	if (m_op == 0x01 || (m_op >= 0x5f && m_op <= 0x61) || (m_op & 0xf0) == 0x70 || (m_op & 0xfc) == 0x68)
 	{
 		m_icount--;

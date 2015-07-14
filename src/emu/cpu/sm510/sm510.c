@@ -3,9 +3,9 @@
 /*
 
   Sharp SM510 MCU family - known chips:
-  - SM510: x
-  - SM511: x
-  - SM512: x
+  - SM510: 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
+  - SM511: 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
+  - SM512: 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
   
   Other chips that may be in the same family, investigate more when one of
   them needs to get emulated: SM500, SM530, SM531, ..

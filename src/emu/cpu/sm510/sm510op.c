@@ -432,7 +432,7 @@ void sm510_base_device::op_cend()
 void sm510_base_device::op_idiv()
 {
 	// IDIV: reset divider
-	reset_divider();
+	m_div = 0;
 }
 
 void sm510_base_device::op_illegal()

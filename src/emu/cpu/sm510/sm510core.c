@@ -44,39 +44,6 @@ offs_t sm510_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 
 
 
-
-//-------------------------------------------------
-//  divider
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(sm510_device::div_timer_cb)
-{
-	// no need to increment it by 1 everytime, since only the
-	// highest bits are accessible
-	m_div = (m_div + 0x800) & 0x7fff;
-	
-	// 1S signal on overflow(falling edge of f1)
-	if (m_div == 0)
-		m_1s = true;
-
-	// schedule next timeout
-	m_div_timer->adjust(attotime::from_ticks(0x800, unscaled_clock()));
-}
-
-void sm510_device::reset_divider()
-{
-	m_div = 0;
-	m_div_timer->adjust(attotime::from_ticks(0x800, unscaled_clock()));
-}
-
-void sm510_device::init_divider()
-{
-	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_device::div_timer_cb), this));
-	reset_divider();
-}
-
-
-
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------

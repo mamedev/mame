@@ -156,7 +156,7 @@ protected:
 
 	UINT16 get_lcd_row(int column, UINT8* ram);
 	TIMER_CALLBACK_MEMBER(lcd_timer_cb);
-	virtual void init_lcd_driver();
+	void init_lcd_driver();
 
 	// melody controller
 	optional_region_ptr<UINT8> m_melody_rom;
@@ -175,9 +175,8 @@ protected:
 	bool m_1s;
 
 	bool wake_me_up();
-	virtual void reset_divider() { m_div = 0; }
-	virtual void init_divider();
-	virtual TIMER_CALLBACK_MEMBER(div_timer_cb);
+	void init_divider();
+	TIMER_CALLBACK_MEMBER(div_timer_cb);
 	
 	// other i/o handlers
 	devcb_read8 m_read_k;
@@ -277,11 +276,6 @@ protected:
 	virtual void get_opcode_param();
 	
 	virtual void update_w_latch() { m_write_s(0, m_w, 0xff); } // W is connected directly to S
-	
-	// divider
-	virtual TIMER_CALLBACK_MEMBER(div_timer_cb);
-	virtual void reset_divider();
-	virtual void init_divider();
 };
 
 
