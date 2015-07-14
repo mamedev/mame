@@ -43,6 +43,7 @@ offs_t sm510_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 }
 
 
+
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------

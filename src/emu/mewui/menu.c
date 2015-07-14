@@ -1138,6 +1138,29 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 			convert_command_glyph(str);
 		}
 
+		if (software && afilter == MEWUI_SW_CUSTOM)
+		{
+			if (filter == sw_custfltr::main_filter)
+			{
+				str.assign("@custom1 ").append(text[filter]);
+				x1t -= text_sign;
+			}
+			else
+			{
+				for (int count = 1; count <= sw_custfltr::numother; count++)
+				{
+					int cfilter = sw_custfltr::other[count];
+					if (cfilter == filter)
+					{
+						strprintf(str, "@custom%d %s", count + 1, text[filter]);
+						x1t -= text_sign;
+						break;
+					}
+				}
+			}
+			convert_command_glyph(str);
+		}
+
 		machine().ui().draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
 		                              DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
 

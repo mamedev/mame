@@ -1,52 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-/************************************************************************************************************
+/***************************************************************************
 
-Dongfang Shenlong ("Eastern Dragon")
-BMC 1999
+BMC games using a 68k + VDB40817/SYA70521
 
 driver by Luca Elia
+
 Similar to bmcbowl, koftball, popobear
 
-PCB Layout
-----------
+CPU:    68000
+Video:  BMC VDB40817 + BMC SYA70521
+Sound:  M6295 + UM3567
+Other:  BMC B816140 (CPLD)
 
-BMC-A81212
-|---------------------------------------|
-|          CH-A-401  CH-M-301  CH-M-701 |
-|M11B416256A                   UM3567   |
-|42MHz     CH-M-201  CH-M-101     M6295 |
-|      VDB40817                        1|
-|              HM86171-80        VOL   0|
-|      SYA70521                        W|
-|                        LM324   7805  A|
-|DSW1                                  Y|
-|      68000                   TDA2003  |
-|DSW2       CH-M-505  CH-M-605          |
-|            6264     6264             2|
-|DSW3  CPLD   74HC132 74LS05           2|
-|                 555                  W|
-|DSW4                                  A|
-|        BATT  SW       JAMMA          Y|
-|---------------------------------------|
-Notes:
-      RAM - M11B416256, 6264(x2)
-      VDB40817/SYA70521 - Unknown QFP100
-      CPLD - unknown PLCC44 chip labelled 'BMC B816140'
-      BATT - 5.5 volt 0.047F super cap
-      68000 @10.50MHz (42/4)
-      M6295 @1.05MHz (42/40)
-      UM3567 @3.50MHz (42/12)
-      HSync - 15.440kHz
-      VSync - 58.935Hz
-
-************************************************************************************************************/
+***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "video/ramdac.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
-#include "video/ramdac.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 
@@ -69,6 +42,7 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
+	// Devices
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_shared_ptr<UINT16> m_videoram_1;
@@ -82,6 +56,27 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	// Protection
+	UINT16 m_prot_val;
+	DECLARE_READ16_MEMBER(prot_r);
+	DECLARE_WRITE16_MEMBER(prot_w);
+	DECLARE_READ16_MEMBER(unk_r);
+
+	// I/O
+	UINT16 m_mux;
+	DECLARE_WRITE16_MEMBER(mux_w);
+	DECLARE_READ16_MEMBER(dsw_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	DECLARE_READ16_MEMBER(mjmaglmp_dsw_r);
+	DECLARE_READ16_MEMBER(mjmaglmp_key_r);
+
+	// Interrrupts
+	UINT16 m_irq_enable;
+	DECLARE_WRITE16_MEMBER(irq_enable_w);
+	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	// Video
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
@@ -89,20 +84,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_t3_tile_info);
 	DECLARE_WRITE16_MEMBER(videoram_1_w);
 	DECLARE_WRITE16_MEMBER(videoram_2_w);
-
-	UINT16 m_prot_val;
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_READ16_MEMBER(unk_r);
-
-	UINT16 m_mux;
-	DECLARE_WRITE16_MEMBER(mux_w);
-	DECLARE_READ16_MEMBER(dsw_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-
-	UINT16 m_irq_enable;
-	DECLARE_WRITE16_MEMBER(irq_enable_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
 
 	bitmap_ind16 *m_pixbitmap;
 	void pixbitmap_redraw();
@@ -113,8 +94,6 @@ public:
 	virtual void video_start();
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	UINT32 screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void save_state()
 	{
@@ -439,6 +418,74 @@ static ADDRESS_MAP_START( bmcpokr_mem, AS_PROGRAM, 16, bmcpokr_state )
 	AM_RANGE(0x3b0000, 0x3b0001) AM_READ_PORT("INPUTS2")
 ADDRESS_MAP_END
 
+
+READ16_MEMBER(bmcpokr_state::mjmaglmp_dsw_r)
+{
+	switch ((m_mux >> 4) & 7)
+	{
+		case 7: return ioport("DSW1")->read() << 8;
+		case 6: return ioport("DSW2")->read() << 8;
+		case 5: return ioport("DSW3")->read() << 8;
+		case 3: return ioport("DSW4")->read() << 8;
+	}
+	return 0xff << 8;
+}
+
+READ16_MEMBER(bmcpokr_state::mjmaglmp_key_r)
+{
+	UINT16 key = 0x3f;
+	switch ((m_mux >> 4) & 7)
+	{
+		case 0: key = ioport("KEY1")->read(); break;
+		case 1: key = ioport("KEY2")->read(); break;
+		case 2: key = ioport("KEY3")->read(); break;
+		case 3: key = ioport("KEY4")->read(); break;
+		case 4: key = ioport("KEY5")->read(); break;
+	}
+	return ioport("INPUTS")->read() | (key & 0x3f);
+}
+
+static ADDRESS_MAP_START( mjmaglmp_map, AS_PROGRAM, 16, bmcpokr_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("nvram")
+
+	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(videoram_1_w) AM_SHARE("videoram_1")
+	AM_RANGE(0x288000, 0x28ffff) AM_RAM_WRITE(videoram_2_w) AM_SHARE("videoram_2")
+	AM_RANGE(0x290000, 0x297fff) AM_RAM
+
+	AM_RANGE(0x2a0000, 0x2dffff) AM_RAM_WRITE(pixram_w) AM_SHARE("pixram")
+
+	AM_RANGE(0x2ff800, 0x2ff9ff) AM_RAM AM_SHARE("scrollram_1")
+	AM_RANGE(0x2ffa00, 0x2ffbff) AM_RAM AM_SHARE("scrollram_2")
+	AM_RANGE(0x2ffc00, 0x2ffdff) AM_RAM AM_SHARE("scrollram_3")
+	AM_RANGE(0x2ffe00, 0x2fffff) AM_RAM
+
+	AM_RANGE(0x320000, 0x320003) AM_RAM AM_SHARE("layerctrl")
+
+	AM_RANGE(0x388000, 0x388001) AM_WRITE(mux_w)
+
+	AM_RANGE(0x390000, 0x390001) AM_READ(mjmaglmp_dsw_r)
+
+	AM_RANGE(0x398000, 0x398001) AM_READ(mjmaglmp_key_r)
+
+	AM_RANGE(0x3c8800, 0x3c8803) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0x3c9000, 0x3c9001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+
+	AM_RANGE(0x3c9800, 0x3c9801) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x00ff )
+	AM_RANGE(0x3c9802, 0x3c9803) AM_DEVWRITE8("ramdac",ramdac_device, pal_w,   0x00ff )
+	AM_RANGE(0x3c9804, 0x3c9805) AM_DEVWRITE8("ramdac",ramdac_device, mask_w,  0x00ff )
+
+	AM_RANGE(0x3ca000, 0x3ca001) AM_RAM // 3ca001.b, rw
+	AM_RANGE(0x3ca002, 0x3ca003) AM_RAM // 3ca003.b, w(9d)
+	AM_RANGE(0x3ca006, 0x3ca007) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x3ca008, 0x3ca009) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x3ca00e, 0x3ca00f) AM_RAM AM_SHARE("priority")    // 3ca00f.b, w (priority?)
+	AM_RANGE(0x3ca016, 0x3ca017) AM_WRITE(pixpal_w)
+	AM_RANGE(0x3ca018, 0x3ca019) AM_RAM // 3ca019.b, w
+	AM_RANGE(0x3ca01a, 0x3ca01b) AM_READ(unk_r) AM_WRITENOP
+	AM_RANGE(0x3ca01c, 0x3ca01d) AM_RAM // 3ca01d.b, w(0)
+ADDRESS_MAP_END
+
 /***************************************************************************
                                 Input Ports
 ***************************************************************************/
@@ -562,6 +609,154 @@ static INPUT_PORTS_START( bmcpokr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mjmaglmp )
+	PORT_START("INPUTS")
+	// Joystick controls:
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1         ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // START
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // UP
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // DOWN
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // LEFT
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // RIGHT
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // 1P E1 (select)
+
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2          ) // NOTE
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  ) // KEY DOWN
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // PAY
+    PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_SPECIAL        ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bmcpokr_state,hopper_r, NULL)  // HOPPER
+	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW       ) // ACCOUNT
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1       ) PORT_NAME("Reset") // RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // (unused)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // 1P E2 (bet)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // 1P E3 (select)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1          ) // COIN
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1           ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH    ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+
+	PORT_START("KEY5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE    ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL    ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPNAME( 0x02, 0x00, "Doube-Up Game" )             PORT_DIPLOCATION("DIP1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Sw. Function" )         PORT_DIPLOCATION("DIP1:3")
+	PORT_DIPSETTING(    0x00, "Coin" )
+	PORT_DIPSETTING(    0x04, "Note" )
+	PORT_DIPNAME( 0x08, 0x08, "Pay Sw. Function" )          PORT_DIPLOCATION("DIP1:4")
+	PORT_DIPSETTING(    0x00, "Pay-Out" )
+	PORT_DIPSETTING(    0x08, "Key-Down" )
+	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                 PORT_DIPLOCATION("DIP1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPNAME( 0x20, 0x20, "Direct Double" )             PORT_DIPLOCATION("DIP1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPNAME( 0x40, 0x40, "Coin Acceptor" )             PORT_DIPLOCATION("DIP1:7")
+	PORT_DIPSETTING(    0x00, "Mechanical" )
+	PORT_DIPSETTING(    0x40, "Electronic" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Controls ) )         PORT_DIPLOCATION("DIP2:1")
+	PORT_DIPSETTING(    0x01, "Keyboard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
+	PORT_DIPNAME( 0x02, 0x02, "Key-In Limit" )              PORT_DIPLOCATION("DIP2:2")
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x02, "5000" )
+	PORT_DIPNAME( 0x04, 0x04, "Double Lose Pool" )          PORT_DIPLOCATION("DIP2:3")
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x04, "100" )
+	PORT_DIPNAME( 0x18, 0x18, "Double Over / Round Bonus" ) PORT_DIPLOCATION("DIP2:4,5")
+	PORT_DIPSETTING(    0x10, "100 / 10" )
+	PORT_DIPSETTING(    0x18, "200 / 10" )
+	PORT_DIPSETTING(    0x08, "300 / 15" )
+	PORT_DIPSETTING(    0x00, "500 / 25" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x03, "Pay-Out Rate" )              PORT_DIPLOCATION("DIP3:1,2")
+	PORT_DIPSETTING(    0x02, "75" )
+	PORT_DIPSETTING(    0x01, "82" )
+	PORT_DIPSETTING(    0x03, "85" )
+	PORT_DIPSETTING(    0x00, "88" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Double-Up Rate" )            PORT_DIPLOCATION("DIP3:3,4")
+	PORT_DIPSETTING(    0x08, "95" )
+	PORT_DIPSETTING(    0x04, "96" )
+	PORT_DIPSETTING(    0x00, "97" )
+	PORT_DIPSETTING(    0x0c, "98" )
+	PORT_DIPNAME( 0x30, 0x30, "Game Enhance Type" )         PORT_DIPLOCATION("DIP3:5,6")
+	PORT_DIPSETTING(    0x10, "Small" )
+	PORT_DIPSETTING(    0x00, "Big" )
+	PORT_DIPSETTING(    0x30, "Normal" )
+	PORT_DIPSETTING(    0x20, "Bonus" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Credit Limit" )              PORT_DIPLOCATION("DIP3:7,8")
+	PORT_DIPSETTING(    0x00, "300" )
+	PORT_DIPSETTING(    0x80, "500" )
+	PORT_DIPSETTING(    0x40, "1000" )
+	PORT_DIPSETTING(    0xc0, "2000" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "Max Bet" )                   PORT_DIPLOCATION("DIP4:1")
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x06, 0x06, "Min Bet" )                   PORT_DIPLOCATION("DIP4:2,3")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x06, "3" )
+	PORT_DIPSETTING(    0x04, "6" )
+	PORT_DIPSETTING(    0x02, "9" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DIP4:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x60, 0x60, "Credits Per Key-In" )        PORT_DIPLOCATION("DIP4:6,7")
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x60, "10" )
+	PORT_DIPSETTING(    0x20, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP4:8" )
+INPUT_PORTS_END
+
 /***************************************************************************
                                 Graphics Layout
 ***************************************************************************/
@@ -636,8 +831,52 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mjmaglmp, bmcpokr )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mjmaglmp_map)
+MACHINE_CONFIG_END
+
 /***************************************************************************
                                 ROMs Loading
+***************************************************************************/
+
+/***************************************************************************
+
+Dongfang Shenlong ("Eastern Dragon")
+BMC 1999
+
+PCB Layout
+----------
+
+BMC-A81212
+|---------------------------------------|
+|          CH-A-401  CH-M-301  CH-M-701 |
+|M11B416256A                   UM3567   |
+|42MHz     CH-M-201  CH-M-101     M6295 |
+|      VDB40817                        1|
+|              HM86171-80        VOL   0|
+|      SYA70521                        W|
+|                        LM324   7805  A|
+|DSW1                                  Y|
+|      68000                   TDA2003  |
+|DSW2       CH-M-505  CH-M-605          |
+|            6264     6264             2|
+|DSW3  CPLD   74HC132 74LS05           2|
+|                 555                  W|
+|DSW4                                  A|
+|        BATT  SW       JAMMA          Y|
+|---------------------------------------|
+Notes:
+      RAM - M11B416256, 6264(x2)
+      VDB40817/SYA70521 - Unknown QFP100
+      CPLD - unknown PLCC44 chip labelled 'BMC B816140'
+      BATT - 5.5 volt 0.047F super cap
+      68000 @10.50MHz (42/4)
+      M6295 @1.05MHz (42/40)
+      UM3567 @3.50MHz (42/12)
+      HSync - 15.440kHz
+      VSync - 58.935Hz
+
 ***************************************************************************/
 
 ROM_START( bmcpokr )
@@ -655,4 +894,59 @@ ROM_START( bmcpokr )
 	ROM_LOAD( "ch-m-701.u10", 0x00000, 0x40000,  CRC(e01be644) SHA1(b68682786d5b40cb5672cfd7f717adcfb8fac7d3) )
 ROM_END
 
-GAME( 1999, bmcpokr,    0, bmcpokr,    bmcpokr, driver_device,    0, ROT0,  "BMC", "Dongfang Shenlong", GAME_SUPPORTS_SAVE )
+/***************************************************************************
+
+Mahjong Magic Lamp (BMC, 2000)
+
+PCB Layout
+----------
+
+BMC-A70809
+  |--------------------------------------|
+|-|               6116          555      |
+|            0.1UF    JA-A-602  JA-A-502 |
+|                                  68000 |
+|   TD62003                   42MHz      |
+|            PAL                         |
+|            PAL                 51C4160 |
+|                         SYA70521       |
+|-|    U3567                             |
+  |                                      |
+  |             HM86171   VDB40817       |
+|-| VOL                             DSW4 |
+|  7805  6295                       DSW3 |
+|  AMP          JA-A-301 JA-A-401   DSW2 |
+|-|    JA-A-901 JA-A-201 JA-A-101   DSW1 |
+  |--------------------------------------|
+Notes:
+      68000   - clock 10.5000MHz [42/4]
+      M6295   - clock 1.0500MHz [42/40]. Pin 7 HIGH
+      U3567   - = YM2413, clock 3.5000MHz [42/12]
+      HM86171 - HMC RAMDAC. Clock input 10.5000MHz [42/4]
+      VDB/SYA - custom QFP100 GFX chips badged with BMC logo
+      51C4160 - SOJ40 video RAM, possibly 4M DRAM (256k x 16-bit)
+      555     - 555 Timer
+      DSW1-4  - 8-position DIP switches
+      AMP     - NEC uPC1241H
+      VSync   - 58.9342Hz
+      HSync   - 15.4408kHz
+
+***************************************************************************/
+
+ROM_START( mjmaglmp )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "ja-a-602.u10", 0x000000, 0x20000, CRC(b69e235c) SHA1(04e5d0d667de29680e4a35d0d98b587447e54ce3) )
+	ROM_LOAD16_BYTE( "ja-a-502.u11", 0x000001, 0x20000, CRC(bb609da3) SHA1(ffadc20912e0a9ebe0d1a1f7f94dfaccb48be5c1) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "ja-a-101.u41", 0x000000, 0x80000, CRC(7878b9a1) SHA1(7efacb063b47e518c4d3856e90d7532f478e54dd) )
+	ROM_LOAD16_BYTE( "ja-a-201.u42", 0x000001, 0x80000, CRC(b74f3b2b) SHA1(09724909a14aebc135029d97fafcd215a84f05e3) )
+	ROM_LOAD16_BYTE( "ja-a-301.u43", 0x100000, 0x80000, CRC(2bbaf65e) SHA1(d792054671671a2e479b89ad29bc7b3f935804f9) )
+	ROM_LOAD16_BYTE( "ja-a-401.u44", 0x100001, 0x80000, CRC(9292acb1) SHA1(01ce7997305dd5fdc5dc2b801046303a4d8a89c0) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
+ROM_END
+
+GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  driver_device, 0, ROT0, "BMC", "Dongfang Shenlong",             GAME_SUPPORTS_SAVE )
+GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, driver_device, 0, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", GAME_SUPPORTS_SAVE )

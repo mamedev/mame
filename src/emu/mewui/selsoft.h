@@ -12,33 +12,6 @@
 
 #include "mewui/utils.h"
 
-// Software region class
-struct c_sw_region
-{
-	std::vector<std::string> ui;
-	UINT16 actual;
-	void set(const char *str);
-	std::string getname(const char *str);
-};
-
-// Publishers
-struct c_sw_publisher
-{
-	std::vector<std::string> ui;
-	UINT16 actual;
-	void set(const char *str);
-	std::string getname(const char *str);
-};
-
-// Years
-struct c_sw_year
-{
-	std::vector<std::string> ui;
-	UINT16 actual;
-	void set(const char *str);
-};
-
-
 // Menu Class
 class ui_menu_select_software : public ui_menu
 {
@@ -62,10 +35,15 @@ private:
 
 	ui_software_info *searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *> m_displaylist;
-	std::vector<ui_software_info> ui_swlist;
+	std::vector<ui_software_info> m_swlist;
+	std::vector<ui_software_info *> m_tmp;
+	std::vector<ui_software_info *> m_sortedlist;
+	std::vector<ui_software_info *> m_availsortedlist;
+	std::vector<ui_software_info *> m_unavailsortedlist;
 
 	void build_software_list();
-	void build_list();
+	void build_list(std::vector<ui_software_info *> &vec, const char *filter_text = NULL, int filter = -1);
+	void build_custom();
 	void find_matches(const char *str, int count);
 
 	// handlers

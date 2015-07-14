@@ -44,6 +44,14 @@ UINT16 custfltr::other[MAX_CUST_FILTER];
 UINT16 custfltr::mnfct[MAX_CUST_FILTER];
 UINT16 custfltr::year[MAX_CUST_FILTER];
 
+// Custom filter
+UINT16 sw_custfltr::main_filter = 0;
+UINT16 sw_custfltr::numother = 0;
+UINT16 sw_custfltr::other[MAX_CUST_FILTER];
+UINT16 sw_custfltr::mnfct[MAX_CUST_FILTER];
+UINT16 sw_custfltr::year[MAX_CUST_FILTER];
+UINT16 sw_custfltr::region[MAX_CUST_FILTER];
+
 std::string reselect_last::driver;
 std::string reselect_last::software;
 std::string reselect_last::part;
@@ -56,7 +64,7 @@ const char *mewui_globals::filter_text[] = { "All", "Available", "Unavailable", 
 												"Horizontal", "Raster", "Vectors", "Custom" };
 
 const char *mewui_globals::sw_filter_text[] = { "All", "Available", "Unavailable", "Originals", "Clones", "Years", "Publishers", "Supported",
-												"Partial Supported", "Unsupported", "Region" };
+												"Partial Supported", "Unsupported", "Region", "Custom" };
 
 const char *mewui_globals::ume_text[] = { "ALL", "ARCADES", "SYSTEMS" };
 
@@ -335,4 +343,101 @@ void c_year::set(const char *str)
 		return;
 
 	ui.push_back(name);
+}
+
+//-------------------------------------------------
+//  save custom filters info to file
+//-------------------------------------------------
+
+void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year)
+{
+	// attempt to open the output file
+	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file.open("custom_", driver->name, "_filter.ini") == FILERR_NONE)
+	{
+		// generate custom filters info
+		std::string cinfo;
+		strprintf(cinfo, "Total filters = %d\n", (sw_custfltr::numother + 1));
+		cinfo.append("Main filter = ").append(mewui_globals::sw_filter_text[sw_custfltr::main_filter]).append("\n");
+
+		for (int x = 1; x <= sw_custfltr::numother; x++)
+		{
+			cinfo.append("Other filter = ").append(mewui_globals::sw_filter_text[sw_custfltr::other[x]]).append("\n");
+			if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS)
+				cinfo.append("  Manufacturer filter = ").append(m_publisher.ui[sw_custfltr::mnfct[x]]).append("\n");
+			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
+				cinfo.append("  Year filter = ").append(m_year.ui[sw_custfltr::year[x]]).append("\n");
+			else if (sw_custfltr::other[x] == MEWUI_SW_REGION)
+				cinfo.append("  Region filter = ").append(m_region.ui[sw_custfltr::region[x]]).append("\n");
+		}
+		file.puts(cinfo.c_str());
+		file.close();
+	}
+}
+
+//-------------------------------------------------
+//  load custom filters info from file
+//-------------------------------------------------
+
+void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year)
+{
+	// attempt to open the output file
+	emu_file file(machine.options().mewui_path(), OPEN_FLAG_READ);
+	if (file.open("custom_", driver->name, "_filter.ini") == FILERR_NONE)
+	{
+		char buffer[MAX_CHAR_INFO];
+
+		// get number of filters
+		file.gets(buffer, MAX_CHAR_INFO);
+		char *pb = strchr(buffer, '=');
+		sw_custfltr::numother = atoi(++pb) - 1;
+
+		// get main filter
+		file.gets(buffer, MAX_CHAR_INFO);
+		pb = strchr(buffer, '=') + 2;
+
+		for (int y = 0; y < mewui_globals::sw_filter_len; y++)
+			if (!strncmp(pb, mewui_globals::sw_filter_text[y], strlen(mewui_globals::sw_filter_text[y])))
+			{
+				sw_custfltr::main_filter = y;
+				break;
+			}
+
+		for (int x = 1; x <= sw_custfltr::numother; x++)
+		{
+			file.gets(buffer, MAX_CHAR_INFO);
+			char *cb = strchr(buffer, '=') + 2;
+			for (int y = 0; y < mewui_globals::sw_filter_len; y++)
+				if (!strncmp(cb, mewui_globals::sw_filter_text[y], strlen(mewui_globals::sw_filter_text[y])))
+				{
+					sw_custfltr::other[x] = y;
+					if (y == MEWUI_SW_PUBLISHERS)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *ab = strchr(buffer, '=') + 2;
+						for (int z = 0; z < m_publisher.ui.size(); z++)
+							if (!strncmp(ab, m_publisher.ui[z].c_str(), m_publisher.ui[z].length()))
+								sw_custfltr::mnfct[x] = z;
+					}
+					else if (y == MEWUI_SW_YEARS)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *db = strchr(buffer, '=') + 2;
+						for (int z = 0; z < m_year.ui.size(); z++)
+							if (!strncmp(db, m_year.ui[z].c_str(), m_year.ui[z].length()))
+								sw_custfltr::year[x] = z;
+					}
+					else if (y == MEWUI_SW_REGION)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *eb = strchr(buffer, '=') + 2;
+						for (int z = 0; z < m_region.ui.size(); z++)
+							if (!strncmp(eb, m_region.ui[z].c_str(), m_region.ui[z].length()))
+								sw_custfltr::year[x] = z;
+					}
+				}
+		}
+		file.close();
+	}
+
 }

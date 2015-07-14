@@ -4,6 +4,7 @@
 #include "devices/nld_truthtable.h"
 #include "devices/nld_system.h"
 #include "devices/nld_4020.h"
+#include "devices/nld_4066.h"
 
 /*
  *   CD4001BC: Quad 2-Input NOR Buffered B Series Gate
@@ -81,7 +82,78 @@ NETLIST_START(CD4020_DIP)
 
 NETLIST_END()
 
+/*  CD4066: Quad Bilateral Switch
+ *
+ *          +--------------+
+ *   INOUTA |1     ++    14| VDD
+ *   OUTINA |2           13| CONTROLA
+ *   OUTINB |3           12| CONTROLD
+ *   INOUTB |4    4066   11| INOUTD
+ * CONTROLB |5           10| OUTIND
+ * CONTROLC |6            9| OUTINC
+ *      VSS |7            8| INOUTC
+ *          +--------------+
+ *
+ *  FIXME: These devices are slow (~125 ns). THis is currently not reflected
+ *
+ *  Naming conventions follow National semiconductor datasheet
+ *
+ */
+
+NETLIST_START(CD4066_DIP)
+	CD4066_GATE(A)
+	CD4066_GATE(B)
+	CD4066_GATE(C)
+	CD4066_GATE(D)
+
+	NET_C(A.PS.VDD, B.PS.VDD, C.PS.VDD, D.PS.VDD)
+	NET_C(A.PS.VSS, B.PS.VSS, C.PS.VSS, D.PS.VSS)
+
+	PARAM(A.BASER, 270.0)
+	PARAM(B.BASER, 270.0)
+	PARAM(C.BASER, 270.0)
+	PARAM(D.BASER, 270.0)
+
+	DIPPINS(      /*          +--------------+          */
+		A.R.1,    /*   INOUTA |1     ++    14| VDD      */ A.PS.VDD,
+		A.R.2,    /*   OUTINA |2           13| CONTROLA */ A.CTL,
+	    B.R.1,    /*   OUTINB |3           12| CONTROLD */ D.CTL,
+		B.R.2,    /*   INOUTB |4    4066   11| INOUTD   */ D.R.1,
+		B.CTL,    /* CONTROLB |5           10| OUTIND   */ D.R.2,
+		C.CTL,    /* CONTROLC |6            9| OUTINC   */ C.R.1,
+		A.PS.VSS, /*      VSS |7            8| INOUTC   */ C.R.2
+			      /*          +--------------+          */
+	)
+NETLIST_END()
+
+NETLIST_START(CD4016_DIP)
+	CD4066_GATE(A)
+	CD4066_GATE(B)
+	CD4066_GATE(C)
+	CD4066_GATE(D)
+
+	NET_C(A.PS.VDD, B.PS.VDD, C.PS.VDD, D.PS.VDD)
+	NET_C(A.PS.VSS, B.PS.VSS, C.PS.VSS, D.PS.VSS)
+
+	PARAM(A.BASER, 1000.0)
+	PARAM(B.BASER, 1000.0)
+	PARAM(C.BASER, 1000.0)
+	PARAM(D.BASER, 1000.0)
+
+	DIPPINS(      /*          +--------------+          */
+		A.R.1,    /*   INOUTA |1     ++    14| VDD      */ A.PS.VDD,
+		A.R.2,    /*   OUTINA |2           13| CONTROLA */ A.CTL,
+	    B.R.1,    /*   OUTINB |3           12| CONTROLD */ D.CTL,
+		B.R.2,    /*   INOUTB |4    4016   11| INOUTD   */ D.R.1,
+		B.CTL,    /* CONTROLB |5           10| OUTIND   */ D.R.2,
+		C.CTL,    /* CONTROLC |6            9| OUTINC   */ C.R.1,
+		A.PS.VSS, /*      VSS |7            8| INOUTC   */ C.R.2
+			      /*          +--------------+          */
+	)
+NETLIST_END()
+
 NETLIST_START(CD4XXX_lib)
+
 	TRUTHTABLE_START(CD4001_NOR, 2, 1, 0, "")
 		TT_HEAD("A , B | Q ")
 		TT_LINE("0,0|1|85")
@@ -94,5 +166,7 @@ NETLIST_START(CD4XXX_lib)
 
 	/* DIP ONLY */
 	LOCAL_LIB_ENTRY(CD4020_DIP)
+	LOCAL_LIB_ENTRY(CD4016_DIP)
+	LOCAL_LIB_ENTRY(CD4066_DIP)
 
 NETLIST_END()

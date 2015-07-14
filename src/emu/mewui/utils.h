@@ -121,7 +121,8 @@ enum
 	MEWUI_SW_PARTIAL_SUPPORTED,
 	MEWUI_SW_UNSUPPORTED,
 	MEWUI_SW_REGION,
-	MEWUI_SW_LAST = MEWUI_SW_REGION
+	MEWUI_SW_CUSTOM,
+	MEWUI_SW_LAST = MEWUI_SW_CUSTOM
 };
 
 enum
@@ -210,6 +211,32 @@ struct c_year
 	static UINT16 actual;
 };
 
+// Software region class
+struct c_sw_region
+{
+	std::vector<std::string> ui;
+	UINT16 actual;
+	void set(const char *str);
+	std::string getname(const char *str);
+};
+
+// Publishers
+struct c_sw_publisher
+{
+	std::vector<std::string> ui;
+	UINT16 actual;
+	void set(const char *str);
+	std::string getname(const char *str);
+};
+
+// Years
+struct c_sw_year
+{
+	std::vector<std::string> ui;
+	UINT16 actual;
+	void set(const char *str);
+};
+
 // GLOBAL CLASS
 struct mewui_globals
 {
@@ -233,6 +260,17 @@ struct custfltr
 	static UINT16  year[MAX_CUST_FILTER];
 };
 
+// Custom filter class
+struct sw_custfltr
+{
+	static UINT16  main_filter;
+	static UINT16  numother;
+	static UINT16  other[MAX_CUST_FILTER];
+	static UINT16  mnfct[MAX_CUST_FILTER];
+	static UINT16  year[MAX_CUST_FILTER];
+	static UINT16  region[MAX_CUST_FILTER];
+};
+
 // GLOBAL FUNCTIONS
 
 // save options to file
@@ -247,6 +285,10 @@ int fuzzy_substring(const char *needle, const char *haystack);
 // custom filter load and save
 void load_custom_filters(running_machine &machine);
 void save_custom_filters(running_machine &machine);
+
+// custom software filter load and save
+void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year);
+void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year);
 
 // jpeg loader
 template <typename _T>

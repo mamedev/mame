@@ -63,8 +63,8 @@ sm512_device::sm512_device(const machine_config &mconfig, const char *tag, devic
 
 void sm511_device::get_opcode_param()
 {
-	// LBL, PRE, TL, TML and prefix opcodes are 2 bytes
-	if ((m_op >= 0x5f && m_op <= 0x61) || (m_op & 0xf0) == 0x70 || (m_op & 0xfc) == 0x68)
+	// XXX?, LBL, PRE, TL, TML and prefix opcodes are 2 bytes
+	if (m_op == 0x01 || (m_op >= 0x5f && m_op <= 0x61) || (m_op & 0xf0) == 0x70 || (m_op & 0xfc) == 0x68)
 	{
 		m_icount--;
 		m_param = m_program->read_byte(m_pc);
@@ -102,6 +102,7 @@ void sm511_device::execute_one()
 			switch (m_op)
 			{
 		case 0x00: op_rot(); break;
+//		case 0x01: op_xxx(); break; // ?
 		case 0x02: op_sbm(); break;
 		case 0x03: op_atpl(); break;
 		case 0x08: op_add(); break;
@@ -129,8 +130,6 @@ void sm511_device::execute_one()
 //		case 0x65: op_idiv(); break;
 		case 0x66: op_rc(); break;
 		case 0x67: op_sc(); break;
-//		case 0x68: op_tf1(); break;
-//		case 0x69: op_tf4(); break;
 		case 0x6c: op_decb(); break;
 		case 0x6d: op_ptw(); break;
 		case 0x6e: op_rtn0(); break;

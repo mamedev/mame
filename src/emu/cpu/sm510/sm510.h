@@ -77,6 +77,7 @@ public:
 		, m_stack_levels(stack_levels)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
 		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
+		, m_melody_rom(*this, "music")
 		, m_read_k(*this)
 		, m_read_ba(*this), m_read_b(*this)
 		, m_write_s(*this)
@@ -140,6 +141,7 @@ protected:
 	UINT8 m_c;
 	bool m_skip;
 	UINT8 m_w;
+	UINT8 m_r;
 	bool m_k_active;
 	bool m_halt;
 
@@ -154,18 +156,28 @@ protected:
 
 	UINT16 get_lcd_row(int column, UINT8* ram);
 	TIMER_CALLBACK_MEMBER(lcd_timer_cb);
-	virtual void init_lcd_driver();
+	void init_lcd_driver();
 
-	// clock divider
+	// melody controller
+	optional_region_ptr<UINT8> m_melody_rom;
+	UINT8 m_melody_rd;
+	UINT8 m_melody_step_count;
+	UINT8 m_melody_duty_count;
+	UINT8 m_melody_duty_index;
+	UINT8 m_melody_address;
+
+	void clock_melody();
+	void init_melody();
+
+	// interrupt/divider
 	emu_timer *m_div_timer;
 	UINT16 m_div;
 	bool m_1s;
 
-	TIMER_CALLBACK_MEMBER(div_timer_cb);
 	bool wake_me_up();
-	virtual void reset_divider();
 	void init_divider();
-
+	TIMER_CALLBACK_MEMBER(div_timer_cb);
+	
 	// other i/o handlers
 	devcb_read8 m_read_k;
 	devcb_read_line m_read_ba;
@@ -175,7 +187,7 @@ protected:
 
 	// misc internal helpers
 	void increment_pc();
-	virtual void get_opcode_param() { } // -> child class
+	virtual void get_opcode_param() { }
 	virtual void update_w_latch() { }
 
 	UINT8 ram_r();

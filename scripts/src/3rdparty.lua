@@ -650,6 +650,7 @@ end
 -- PortAudio library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-portaudio"] then
 project "portaudio"
 	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
 	kind "StaticLib"
@@ -775,6 +776,11 @@ project "portaudio"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"portaudio",
+}
+end
 		
 --------------------------------------------------
 -- UnitTest++ library objects

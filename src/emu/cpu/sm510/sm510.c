@@ -3,17 +3,23 @@
 /*
 
   Sharp SM510 MCU family - known chips:
-  - SM510: x
-  - SM511: x
-  - SM512: x
+  - SM510: 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
+  - SM511: 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
+  - SM512: 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
+  
+  Other chips that may be in the same family, investigate more when one of
+  them needs to get emulated: SM500, SM530, SM531, ..
 
   References:
   - 1990 Sharp Microcomputers Data Book
+  - 1996 Sharp Microcomputer Databook
   
   TODO:
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
-  - LCD bs pin blink mode via Y register
+  - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
+  - LB/SBM is correct?
+  - SM511 unknown opcodes
 
 */
 
@@ -63,6 +69,7 @@ void sm510_base_device::device_start()
 	m_c = 0;
 	m_skip = false;
 	m_w = 0;
+	m_r = 0;
 	m_div = 0;
 	m_1s = false;
 	m_k_active = false;
@@ -72,6 +79,11 @@ void sm510_base_device::device_start()
 	m_bp = false;
 	m_bc = false;
 	m_halt = false;
+	m_melody_rd = 0;
+	m_melody_step_count = 0;
+	m_melody_duty_count = 0;
+	m_melody_duty_index = 0;
+	m_melody_address = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -86,6 +98,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_c));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_w));
+	save_item(NAME(m_r));
 	save_item(NAME(m_div));
 	save_item(NAME(m_1s));
 	save_item(NAME(m_k_active));
@@ -95,6 +108,11 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_bp));
 	save_item(NAME(m_bc));
 	save_item(NAME(m_halt));
+	save_item(NAME(m_melody_rd));
+	save_item(NAME(m_melody_step_count));
+	save_item(NAME(m_melody_duty_count));
+	save_item(NAME(m_melody_duty_index));
+	save_item(NAME(m_melody_address));
 
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
@@ -109,8 +127,10 @@ void sm510_base_device::device_start()
 
 	m_icountptr = &m_icount;
 
+	// init peripherals
 	init_divider();
 	init_lcd_driver();
+	init_melody();
 }
 
 
@@ -132,7 +152,9 @@ void sm510_base_device::device_reset()
 	m_bc = false;
 	m_y = 0;
 	
+	m_r = 0;
 	m_write_r(0, 0, 0xff);
+	m_melody_rd &= ~1;
 }
 
 
@@ -175,6 +197,7 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
 
 void sm510_base_device::init_lcd_driver()
 {
+	// note: in reality, this timer runs at high frequency off the main divider, strobing one segment at a time
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::lcd_timer_cb), this));
 	m_lcd_timer->adjust(attotime::from_ticks(0x200, unscaled_clock())); // 64hz default
 }
@@ -182,7 +205,83 @@ void sm510_base_device::init_lcd_driver()
 
 
 //-------------------------------------------------
-//  interrupt/timer
+//  melody controller
+//-------------------------------------------------
+
+void sm510_base_device::clock_melody()
+{
+	if (!m_melody_rom)
+		return;
+
+	// tone cycle table (SM511/SM512 datasheet fig.5)
+	// cmd 0 = cmd, 1 = stop, > 13 = illegal(unknown)
+	static const UINT8 lut_tone_cycles[4*16] =
+	{
+		0, 0, 7, 8, 8, 9, 9, 10,11,11,12,13,14,14, 7*2, 8*2,
+		0, 0, 8, 8, 9, 9, 10,11,11,12,13,13,14,15, 8*2, 8*2,
+		0, 0, 8, 8, 9, 9, 10,10,11,12,12,13,14,15, 8*2, 8*2,
+		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 8*2, 9*2
+	};
+	
+	UINT8 cmd = m_melody_rom[m_melody_address] & 0x3f;
+	UINT8 out = 0;
+	
+	// clock duty cycle if tone is active
+	if ((cmd & 0xf) > 1)
+	{
+		out = m_melody_duty_index & m_melody_rd & 1;
+		m_melody_duty_count++;
+		int index = m_melody_duty_index << 4 | (cmd & 0xf);
+		int shift = ~cmd >> 4 & 1; // OCT
+
+		if (m_melody_duty_count >= (lut_tone_cycles[index] << shift))
+		{
+			m_melody_duty_count = 0;
+			m_melody_duty_index = (m_melody_duty_index + 1) & 3;
+		}
+	}
+	else if ((cmd & 0xf) == 1)
+	{
+		// rest tell signal
+		m_melody_rd |= 2;
+	}
+	
+	// clock time base on F8(d7)
+	if ((m_div & 0x7f) == 0)
+	{
+		UINT8 mask = (cmd & 0x20) ? 0x1f : 0x0f;
+		m_melody_step_count = (m_melody_step_count + 1) & mask;
+
+		if (m_melody_step_count == 0)
+			m_melody_address++;
+	}
+	
+	// output to R pin
+	if (out != m_r)
+	{
+		m_write_r(0, out, 0xff);
+		m_r = out;
+	}
+}
+
+void sm510_base_device::init_melody()
+{
+	if (!m_melody_rom)
+		return;
+
+	// verify melody rom
+	for (int i = 0; i < 0x100; i++)
+	{
+		UINT8 data = m_melody_rom[i];
+		if (data & 0xc0 || (data & 0x0f) > 13)
+			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag(), data, i);
+	}
+}
+
+
+
+//-------------------------------------------------
+//  interrupt/divider
 //-------------------------------------------------
 
 bool sm510_base_device::wake_me_up()
@@ -213,28 +312,19 @@ void sm510_base_device::execute_set_input(int line, int state)
 
 TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 {
-	// no need to increment it by 1 everytime, since only the
-	// highest bits are accessible
-	m_div = (m_div + 0x800) & 0x7fff;
-	
+	m_div = (m_div + 1) & 0x7fff;
+
 	// 1S signal on overflow(falling edge of f1)
 	if (m_div == 0)
 		m_1s = true;
-
-	// schedule next timeout
-	m_div_timer->adjust(attotime::from_ticks(0x800, unscaled_clock()));
-}
-
-void sm510_base_device::reset_divider()
-{
-	m_div = 0;
-	m_div_timer->adjust(attotime::from_ticks(0x800, unscaled_clock()));
+	
+	clock_melody();
 }
 
 void sm510_base_device::init_divider()
 {
 	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::div_timer_cb), this));
-	reset_divider();
+	m_div_timer->adjust(attotime::from_ticks(1, unscaled_clock()), 0, attotime::from_ticks(1, unscaled_clock()));
 }
 
 

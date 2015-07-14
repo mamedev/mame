@@ -1740,7 +1740,7 @@ void hdc9234_device::format_track()
 		switch (m_substate)
 		{
 		case WAITINDEX0:
-			if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Format track - waiting for index hole\n", tag());
+			if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Format track; looking for track start\n", tag());
 			if (!index_hole())
 			{
 				m_substate = WAITINDEX1;
@@ -1749,13 +1749,14 @@ void hdc9234_device::format_track()
 			else
 			{
 				// We're above the index hole right now, so wait for the line going down
-				if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Index hole just passing by ... waiting for next\n", tag());
-				wait_line(INDEX_LINE, ASSERT_LINE, WAITINDEX1, false);
+				if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Index hole just passing by ... \n", tag());
+				wait_line(INDEX_LINE, CLEAR_LINE, WAITINDEX1, false);
 				cont = WAIT;
 			}
 			break;
 		case WAITINDEX1:
 			// Waiting for the next rising edge
+			if (TRACE_FORMAT && TRACE_DETAIL) logerror("%s: Waiting for next index hole\n", tag());
 			wait_line(INDEX_LINE, ASSERT_LINE, TRACKSTART, false);
 			cont = WAIT;
 			break;
@@ -2503,8 +2504,9 @@ void hdc9234_device::live_run_until(attotime limit)
 				write_on_track(encode((m_live_state.crc >> 8) & 0xff), 1, WRITE_DATA_CRC);
 			}
 			else
-				// Write a filler byte so that the last CRC bit is saved correctly
-				write_on_track(encode(0xff), 1, WRITE_DONE);
+				// Write a filler byte so that the last CRC bit is saved correctly (why actually?)
+				// write_on_track(encode(0xff), 1, WRITE_DONE);
+				m_live_state.state = WRITE_DONE;
 
 			break;
 
@@ -3609,7 +3611,7 @@ UINT16 hdc9234_device::encode(UINT8 byte)
 		//     data bit = 0 -> encode as 10
 		for (int i=0; i<8; i++)
 		{
-			raw = (raw << 2) | (((byte & check_pos)!=0)? 0x11 : 0x10);
+			raw = (raw << 2) | (((byte & check_pos)!=0)? 0x03 : 0x02);
 			check_pos >>= 1;
 		}
 		last_bit_set = ((byte & 1)!=0);
