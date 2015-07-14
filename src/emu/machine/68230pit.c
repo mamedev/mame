@@ -65,6 +65,7 @@ void pit68230_device::device_reset()
   m_pbddr = 0;
   m_pacr = 0;
   m_pbcr = 0;
+  m_padr = 0;
   m_pbdr = 0;
 }
 
@@ -133,6 +134,10 @@ READ8_MEMBER( pit68230_device::data_r )
   case PIT_68230_PBCR: 
     printf("PBCR");
     data = m_pbcr;
+    break;
+  case PIT_68230_PADR:
+    printf("PADR");
+    data = m_padr;
     break;
   case PIT_68230_PBDR: 
     printf("PBDR");

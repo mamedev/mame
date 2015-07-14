@@ -61,8 +61,10 @@ private:
 	UINT8  m_psrr;  // Port Service Request register
 	UINT8  m_paddr; // Port A Data Direction register
 	UINT8  m_pbddr; // Port B Data Direction register
+	UINT8  m_pcddr; // Port C Data Direction register
 	UINT8  m_pacr;  // Port A Control register
 	UINT8  m_pbcr;  // Port B Control register
+	UINT8  m_padr;  // Port A Data register
 	UINT8  m_pbdr;  // Port B Data register
 };
 
