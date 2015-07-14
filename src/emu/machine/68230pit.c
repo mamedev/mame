@@ -65,6 +65,7 @@ void pit68230_device::device_reset()
   m_pbddr = 0;
   m_pacr = 0;
   m_pbcr = 0;
+  m_pbdr = 0;
 }
 
 WRITE8_MEMBER( pit68230_device::data_w )
@@ -104,8 +105,45 @@ WRITE8_MEMBER( pit68230_device::data_w )
 
 READ8_MEMBER( pit68230_device::data_r )
 {
-  printf("data_r: %04x & %04x\n", offset, mem_mask);
-  return (UINT8) 0;
+  UINT8 data = 0;
+
+  printf("data_r: ");
+  switch (offset)
+  {
+  case PIT_68230_PGCR: 
+    printf("PGCR");
+    data = m_pgcr;
+    break;
+  case PIT_68230_PSRR: 
+    printf("PSRR");
+    data = m_psrr;
+    break;
+  case PIT_68230_PADDR: 
+    printf("PADDR");
+    data = m_paddr;
+    break;
+  case PIT_68230_PBDDR: 
+    printf("PBDDR");
+    data = m_pbddr;
+    break;
+  case PIT_68230_PACR: 
+    printf("PACR");
+    data = m_pacr;
+    break;
+  case PIT_68230_PBCR: 
+    printf("PBCR");
+    data = m_pbcr;
+    break;
+  case PIT_68230_PBDR: 
+    printf("PBDR");
+    data = m_pbdr;
+    break;
+  default:
+    printf("unhandled register %02x", offset);
+  }
+  printf("\n");
+
+  return data;
 }
 
 

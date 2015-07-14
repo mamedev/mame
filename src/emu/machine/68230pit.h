@@ -63,6 +63,7 @@ private:
 	UINT8  m_pbddr; // Port B Data Direction register
 	UINT8  m_pacr;  // Port A Control register
 	UINT8  m_pbcr;  // Port B Control register
+	UINT8  m_pbdr;  // Port B Data register
 };
 
 
