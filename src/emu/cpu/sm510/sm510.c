@@ -12,11 +12,14 @@
 
   References:
   - 1990 Sharp Microcomputers Data Book
+  - 1996 Sharp Microcomputer Databook
   
   TODO:
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register
+  - LB opcode
+  - SM511 unknown opcodes
 
 */
 
@@ -151,6 +154,7 @@ void sm510_base_device::device_reset()
 	
 	m_r = 0;
 	m_write_r(0, 0, 0xff);
+	m_melody_rd &= ~1;
 }
 
 
