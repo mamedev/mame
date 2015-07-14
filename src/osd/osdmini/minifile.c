@@ -113,7 +113,7 @@ file_error osd_truncate(osd_file *file, UINT64 offset)
 		return FILERR_FAILURE;
 
 	result = ftruncate(fileno((FILE *)file), offset);
-	if (!result)
+	if (result)
 		return FILERR_FAILURE;
 
 	return FILERR_NONE;
