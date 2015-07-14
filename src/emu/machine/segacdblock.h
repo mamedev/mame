@@ -86,7 +86,7 @@ private:
 	UINT8 m_cmd_issued;
 	bool m_sh1_inited;
 	bool m_isDiscInTray;
-	bool m_TOCPhase;
+	//bool m_TOCPhase;
 	bool m_TransferActive;
 	UINT32 m_DiscLeadOut;
 
@@ -189,7 +189,6 @@ private:
 	UINT8 m_LastBuffer;
 	void TOCRetrieve();
 
-	void sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4);
 	void cd_standard_return(bool isPeri);
 	blockT *cd_alloc_block(UINT8 *blknum);
 	void cd_free_block(blockT *blktofree);
@@ -255,7 +254,7 @@ private:
 	bool DeleteSectorMode;
 	void cd_defragblocks(partitionT *part);
 	bool m_playtype;
-	bool m_BufferFull;
+	//bool m_BufferFull;
 };
 
 

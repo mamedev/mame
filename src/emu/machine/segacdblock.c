@@ -85,19 +85,6 @@
 const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
 
 
-void segacdblock_device::sh1_writes_registers(UINT16 r1, UINT16 r2, UINT16 r3, UINT16 r4)
-{
-	m_cr[0] = r1;
-	m_cr[1] = r2;
-	m_cr[2] = r3;
-	m_cr[3] = r4;
-}
-
-void segacdblock_device::write_fad()
-{
-	m_cr[3] = 0x100 | m_FAD >> 16; /**< @todo track number */
-	m_cr[4] = m_FAD & 0xffff;
-}
 
 void segacdblock_device::set_flag(UINT16 which)
 {
@@ -1445,6 +1432,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			
 			printf("%08x %08x\n",m_FAD,m_FADEnd);
 
+			p_ok = 0;
 			if (cdrom)
 			{
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, m_FAD)) != CD_TRACK_AUDIO)
