@@ -13,6 +13,12 @@ Notes:
                                         inverted DIP logic?
                                         CPU2 maps RAM over where its ROM lives
 
+(istellar seems to have the same display innacuracy as esh has, stretching 256x256 into 704x478 makes no sense
+    - my guess is that 256x256 should be stretched to 682x512 (or 256x240 to 682x480), and then
+    overimposed to 704x480 - i made a test at http://www.boriel.com/wiki/en/index.php/ZX_BASIC:Released_Programs_-_FunaiGakkenInterstellarLaserFantasy 
+    - 682 is a result of a cross multiplication, as 240 horizontal pixels from the tiles will fit over 640 pixels from the laserdisk,
+    256 will fit over 682)
+
 Todo:
     How does one best make one DIP switch bit from address 0x02 tie to two bits from address 0x03?
     Get real ROM labels!  The current labels are unfortunately a bit odd.
