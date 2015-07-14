@@ -208,10 +208,16 @@ private:
 	// 0x30
 	void cd_cmd_set_device_connection(UINT8 param);
 	// 0x40
+	void cd_cmd_set_filter_mode(UINT8 mode, UINT8 filter_number);
+	void cd_cmd_set_filter_subheader_conditions();
+	void cd_cmd_set_filter_connection(UINT8 filter_number);
 	void cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_number);
-
+	
 	// 0x50
+	void cd_cmd_get_buffer_size();
 	void cd_cmd_get_sector_number(UINT8 buffer_number);
+	void cd_cmd_calculate_actual_size();
+	void cd_cmd_get_actual_size();
 	
 	// 0x60
 	void cd_cmd_set_sector_length(UINT8 length_in, UINT8 length_out);
@@ -256,6 +262,7 @@ private:
 	bool m_playtype;
 	sega_cdrom_get_adr_control(cdrom_file *file, int track);
 	int m_CurrentTrack;
+	int m_CalculateActualSize;
 	//bool m_BufferFull;
 };
 

@@ -30,6 +30,7 @@
 
 @todo
 - (fill up this section once pull request these files);
+- use #define or a struct instead of m_cr[x] (starts counting from 1, shrug)
 
 */
 
@@ -336,9 +337,15 @@ void segacdblock_device::SH1CommandExecute()
 
 		case 0x30:	cd_cmd_set_device_connection(m_cr[2] >> 8); break;
 		
+		case 0x42:  cd_cmd_set_filter_subheader_conditions(); break;
+		case 0x44:  cd_cmd_set_filter_mode(m_cr[0] & 0xff, m_cr[2] >> 8); break;
+		case 0x46: cd_cmd_set_filter_connection(m_cr[2] >> 8); break;
 		case 0x48:	cd_cmd_reset_selector(m_cr[0] & 0xff, m_cr[2] >> 8); break;
 
+		case 0x50:  cd_cmd_get_buffer_size(); break;
 		case 0x51:  cd_cmd_get_sector_number(m_cr[2] >> 8); break;
+		case 0x52:  cd_cmd_calculate_actual_size(); break;
+		case 0x53:  cd_cmd_get_actual_size(); break;
 		
 		case 0x60:  cd_cmd_set_sector_length(m_cr[0] & 0xff, m_cr[1] >> 8); break;
 		case 0x63:  cd_cmd_get_then_delete_sector(); break;
@@ -822,6 +829,53 @@ void segacdblock_device::cd_cmd_set_device_connection(UINT8 param)
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_set_filter_subheader_conditions()
+{
+	UINT8 filter_number = (m_cr[2]>>8)&0xff;
+
+	CDFilters[filter_number].chan = m_cr[0] & 0xff;
+	CDFilters[filter_number].smmask = (m_cr[1]>>8)&0xff;
+	CDFilters[filter_number].cimask = m_cr[1]&0xff;
+	CDFilters[filter_number].fid = m_cr[2]&0xff;
+	CDFilters[filter_number].smval = (m_cr[3]>>8)&0xff;
+	CDFilters[filter_number].cival = m_cr[3]&0xff;
+
+	cd_standard_return(false);
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_set_filter_connection(UINT8 filter_number)
+{
+	if (m_cr[0] & 1)    // set true condition
+		CDFilters[filter_number].condtrue = (m_cr[1]>>8)&0xff;
+
+	if (m_cr[0] & 2)    // set false condition
+		CDFilters[filter_number].condfalse = m_cr[1]&0xff;
+
+	set_flag(ESEL);
+	set_flag(CMOK);
+	cd_standard_return(false);
+}
+
+void segacdblock_device::cd_cmd_set_filter_mode(UINT8 mode, UINT8 filter_number)
+{
+	// initialize filter?
+	if (mode & 0x80)
+	{
+		memset(&CDFilters[filter_number], 0, sizeof(filterT));
+	}
+	else
+	{
+		CDFilters[filter_number].mode = mode;
+	}
+
+	cd_standard_return(false);
+
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
 void segacdblock_device::cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_number)
 {
 	int i;
@@ -899,6 +953,16 @@ void segacdblock_device::cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_n
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_get_buffer_size()
+{
+	m_dr[0] = m_cd_state;
+	m_dr[1] = (freeblocks > 200) ? 200 : freeblocks;
+	m_dr[2] = 0x1800;
+	m_dr[3] = 200;
+	set_flag(CMOK);
+
+}
+
 void segacdblock_device::cd_cmd_get_sector_number(UINT8 buffer_number)
 {
 	m_dr[0] = m_cd_state;
@@ -907,7 +971,6 @@ void segacdblock_device::cd_cmd_get_sector_number(UINT8 buffer_number)
 	if (partitions[buffer_number].size == -1)
 	{
 		m_dr[3] = 0;
-		debugger_break(machine());
 	}
 	else
 		m_dr[3] = partitions[buffer_number].numblks;
@@ -917,6 +980,41 @@ void segacdblock_device::cd_cmd_get_sector_number(UINT8 buffer_number)
 	printf("%d\n",m_dr[3]);
 	
 	set_flag(DRDY);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_calculate_actual_size()
+{
+	UINT32 bufnum = m_cr[2]>>8;
+	UINT32 sectoffs = m_cr[1];
+	UINT32 numsect = m_cr[3];
+
+	m_CalculateActualSize = 0;
+	if (partitions[bufnum].size != -1)
+	{
+		INT32 i;
+
+		for (i = 0; i < numsect; i++)
+		{
+			if (partitions[bufnum].blocks[sectoffs+i])
+			{
+				m_CalculateActualSize += (partitions[bufnum].blocks[sectoffs+i]->size / 2);
+			}
+		}
+	}
+
+	cd_standard_return(false);
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_get_actual_size()
+{
+	m_dr[0] = m_cd_state | ((m_CalculateActualSize>>16)&0xff);
+	m_dr[1] = (m_CalculateActualSize & 0xffff);
+	m_dr[2] = 0;
+	m_dr[3] = 0;
+	set_flag(ESEL);
 	set_flag(CMOK);
 }
 
