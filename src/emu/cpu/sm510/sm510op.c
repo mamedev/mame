@@ -248,7 +248,11 @@ void sm510_base_device::op_atfc()
 void sm510_base_device::op_atr()
 {
 	// ATR: output ACC to R
-	m_write_r(0, m_acc & 3, 0xff);
+	if (m_r != (m_acc & 3))
+	{
+		m_r = m_acc & 3;
+		m_write_r(0, m_r, 0xff);
+	}
 }
 
 
@@ -387,26 +391,28 @@ void sm510_base_device::op_sm()
 
 void sm510_base_device::op_pre()
 {
-	// PRE x: x
-	op_illegal();
+	// PRE x: melody ROM pointer preset
+	m_melody_address = m_param;
+	m_melody_step_count = 0;
 }
 
 void sm510_base_device::op_sme()
 {
-	// SME: x
-	op_illegal();
+	// SME: set melody enable
+	m_melody_rd |= 1;
 }
 
 void sm510_base_device::op_rme()
 {
-	// RME: x
-	op_illegal();
+	// RME: reset melody enable
+	m_melody_rd &= ~1;
 }
 
 void sm510_base_device::op_tmel()
 {
-	// TMEL: x
-	op_illegal();
+	// TMEL: skip next if rest signal is set, reset it
+	m_skip = ((m_melody_rd & 2) != 0);
+	m_melody_rd &= ~2;
 }
 
 
