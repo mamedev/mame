@@ -5352,6 +5352,22 @@ ROM_START( mayab )
 	ROM_LOAD( "promat02.bin",  0x200, 0x200, CRC(e38eb360) SHA1(739960dd57ec3305edd57aa63816a81ddfbebf3e) )
 ROM_END
 
+ROM_START( mayac )
+	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "e16", 0x00000, 0x10000, CRC(badafb62) SHA1(eabe390f5b3ca6acd4b194b65b81fda7ddca35b8) )
+	ROM_LOAD( "e15", 0x28000, 0x10000, CRC(7ea5b49a) SHA1(aaae848669d9f88c0660f46cc801e4eb0f5e3b89) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "g18", 0x00000, 0x40000, CRC(b621955c) SHA1(8bb3cf16585f33e81921efe7958cf8ca08e8df7f) )
+	ROM_LOAD( "g16", 0x40000, 0x40000, CRC(26b1c824) SHA1(e1a1a51ef94a3933d5fe4b3d47ad2c1dfb9a1c19) )
+	ROM_LOAD( "g15", 0x80000, 0x40000, CRC(f7c6f77e) SHA1(27ba271ec67504dc0c6f9b20362206bbd4b0d90a) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs // wrong for this set
+	ROM_LOAD( "promat01.bin",  0x000, 0x200, BAD_DUMP CRC(d276bf61) SHA1(987058b37182a54a360a80a2f073b000606a11c9) ) // FIXED BITS (0xxxxxxx)
+	ROM_LOAD( "promat02.bin",  0x200, 0x200, BAD_DUMP CRC(e38eb360) SHA1(739960dd57ec3305edd57aa63816a81ddfbebf3e) )
+ROM_END
+
+
 ROM_START( inca )
 	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "am27c512.1", 0x00000, 0x10000, CRC(b0d513f7) SHA1(65ef4702302bbfc7c7a77f7353120ee3f5c94b31) )
@@ -5440,12 +5456,11 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 
 	}
 }
+	
 
-DRIVER_INIT_MEMBER(dynax_state,maya)
+DRIVER_INIT_MEMBER(dynax_state, maya_common)
 {
 	/* Address lines scrambling on 1 z80 rom */
-	int i;
-	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
 	UINT8   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
@@ -5456,13 +5471,39 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 		rom[0] = temp[0];   rom[1] = temp[4];   rom[2] = temp[1];   rom[3] = temp[5];
 		rom[4] = temp[2];   rom[5] = temp[6];   rom[6] = temp[3];   rom[7] = temp[7];
 	}
+}
+
+
+DRIVER_INIT_MEMBER(dynax_state,maya)
+{
+	DRIVER_INIT_CALL(maya_common);
+
+	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	int i;
 
 	/* Address lines scrambling on the blitter data roms */
 	{
 		dynamic_buffer rom(0xc0000);
 		memcpy(&rom[0], gfx, 0xc0000);
 		for (i = 0; i < 0xc0000; i++)
-			gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
+			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+	}
+}
+
+
+DRIVER_INIT_MEMBER(dynax_state,mayac)
+{
+	DRIVER_INIT_CALL(maya_common);
+
+	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	int i;
+
+	/* Address lines scrambling on the blitter data roms */
+	{
+		dynamic_buffer rom(0xc0000);
+		memcpy(&rom[0], gfx, 0xc0000);
+		for (i = 0; i < 0xc0000; i++)
+			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 	}
 }
 
@@ -7339,10 +7380,11 @@ GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   driver_device, 0,        ROT
 GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, driver_device, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          GAME_SUPPORTS_SAVE )
 GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          GAME_SUPPORTS_SAVE )
 GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, driver_device, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  GAME_SUPPORTS_SAVE )
-/* these 5 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
+/* these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
 GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
 GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
 GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  GAME_SUPPORTS_SAVE )
+GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state,   mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
 GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "<unknown>",                "Inca",                                                          GAME_SUPPORTS_SAVE )
 GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state,   blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           GAME_SUPPORTS_SAVE )
 
