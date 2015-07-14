@@ -77,10 +77,7 @@ SYSFAIL and SYSCLK signal (16 MHz).
 Based on the 68ksbc.c
 
     TODO:
-    - Finish 3 x ACIA6850, terminal serial interface first
-    - Add 1 x 14411 Motorola, Baudrate Generator
-      - Add switches to strap baudrate configuration
-      - figure our why rs232 "terminal" is not working as for 68ksbc
+    - Finish 2 x ACIA6850, host and remote interface left, terminal works 
     - Finish 1 x 68230 Motorola, Parallel Interface / Timer
     - Add 1 x Abort Switch
     - Add configurable serial connector between ACIA:s and 
