@@ -3609,7 +3609,7 @@ UINT16 hdc9234_device::encode(UINT8 byte)
 		//     data bit = 0 -> encode as 10
 		for (int i=0; i<8; i++)
 		{
-			raw = (raw << 2) | (((byte & check_pos)!=0)? 0x11 : 0x10);
+			raw = (raw << 2) | (((byte & check_pos)!=0)? 0x03 : 0x02);
 			check_pos >>= 1;
 		}
 		last_bit_set = ((byte & 1)!=0);
