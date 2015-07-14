@@ -1,8 +1,8 @@
-// license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese, R. Belmont
 /***************************************************************************
 
-Template for skeleton device
+Sega Saturn CD-Block HLE device implementation
 
 ***************************************************************************/
 #include "cdrom.h"
@@ -255,6 +255,7 @@ private:
 	bool DeleteSectorMode;
 	void cd_defragblocks(partitionT *part);
 	bool m_playtype;
+	bool m_BufferFull;
 };
 
 

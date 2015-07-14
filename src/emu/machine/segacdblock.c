@@ -26,6 +26,7 @@
 3bba reject routine -> 0xf8 r14
 3bbc peri routine -> 0 r14
 33cc open, nodisc, fatal -> r0
+2f10 "Last CD-DMA buffer address write %08x",r14
 
 @todo
 - (fill up this section once pull request these files);
@@ -194,13 +195,10 @@ READ32_MEMBER(segacdblock_device::datatrns32_r)
 
 			m_dma_size += 4;
 			xferoffs += 4;
-
-			printf("%08x ",res);
 			
 			// did we run out of sector?
 			if (xferoffs >= transpart->blocks[xfersect]->size)
 			{
-				printf("\n");
 			//CDROM_LOG(("CD: finished xfer of block %d of %d\n", xfersect+1, xfersectnum))				
 				xferoffs = 0;
 				xfersect++;
