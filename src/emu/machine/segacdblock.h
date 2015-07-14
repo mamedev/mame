@@ -184,6 +184,7 @@ private:
 	void dma_setup();
 
 	UINT8 tocbuf[102*4]; /**< @todo Subchannel Q of lead-in */
+	UINT8 finfbuf[256];
 	UINT8 *m_DMABuffer;
 	UINT8 m_LastBuffer;
 	void TOCRetrieve();
@@ -221,7 +222,7 @@ private:
 	// 0x70
 	void cd_cmd_change_dir(UINT32 dir_entry);
 	void cd_cmd_get_file_system_scope();
-	
+	void cd_cmd_get_file_info(UINT32 fileid);
 	void cd_cmd_read_file();
 	void cd_cmd_abort();
 
