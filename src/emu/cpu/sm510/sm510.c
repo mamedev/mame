@@ -17,8 +17,8 @@
   TODO:
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
-  - LCD bs pin blink mode via Y register
-  - LB opcode
+  - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
+  - LB/SBM is correct?
   - SM511 unknown opcodes
 
 */

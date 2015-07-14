@@ -57,7 +57,10 @@ inline UINT8 sm510_base_device::bitmask(UINT16 param)
 void sm510_base_device::op_lb()
 {
 	// LB x: load BM/BL with 4-bit immediate value (partial)
-	op_illegal();
+	m_bm = (m_bm & 4) | (m_op & 3);
+	m_bl = m_op >> 2 & 3;
+	if (m_bl == 3)
+		m_bl |= 0xc;
 }
 
 void sm510_base_device::op_lbl()
