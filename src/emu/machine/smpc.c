@@ -938,6 +938,9 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 			break;
 	}
 
+	if(machine().input().code_pressed(KEYCODE_Z))
+		return machine().rand();
+	
 	return res;
 }
 

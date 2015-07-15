@@ -35,6 +35,7 @@
 */
 
 #define DUMP_DIR_ENTRIES 0
+#define TRY_SINGLE_STEP 0
 
 #include "emu.h"
 #include "machine/segacdblock.h"
@@ -196,7 +197,7 @@ READ32_MEMBER(segacdblock_device::datatrns32_r)
 		else    // sectors are done, kill 'em all if we can
 		{
 			m_TransferActive = false;
-			cd_standard_return(false);
+			//cd_standard_return(false);
 			if (DeleteSectorMode == true)
 			{
 				INT32 i;
@@ -204,7 +205,11 @@ READ32_MEMBER(segacdblock_device::datatrns32_r)
 				//CDROM_LOG(("Killing sectors in done\n"))
 
 				// deallocate the blocks
+				#if TRY_SINGLE_STEP
+				i  = xfersectpos+xfersect;
+				#else
 				for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+				#endif
 				{
 					cd_free_block(transpart->blocks[i]);
 					transpart->blocks[i] = (blockT *)NULL;
@@ -348,7 +353,7 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x51:  cd_cmd_get_sector_number(m_cr[2] >> 8); break;
 		case 0x52:  cd_cmd_calculate_actual_size(); break;
 		case 0x53:  cd_cmd_get_actual_size(); break;
-		
+		//case 0x54: Falcom Classics 2
 		case 0x60:  cd_cmd_set_sector_length(m_cr[0] & 0xff, m_cr[1] >> 8); break;
 		case 0x61:  cd_cmd_get_sector(false); break;
 		case 0x62:  cd_cmd_delete_sector(); break;
@@ -709,6 +714,9 @@ void segacdblock_device::cd_cmd_init(UINT8 init_flags)
 	if(init_flags & 1)
 		set_flag(ESEL|EHST|ECPY|EFLS|SCDQ);
 
+	if(init_flags & 0x10)
+		debugger_break(machine());
+	
 	set_flag(CMOK);
 }
 
@@ -742,8 +750,11 @@ void segacdblock_device::cd_cmd_end_transfer()
 			DeleteSectorMode = false;
 
 			// deallocate the blocks
-			//i = xfersectpos+xfersectnum;
+			#if TRY_SINGLE_STEP
+			i = xfersectpos+xfersect;
+			#else
 			for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+			#endif
 			{
 				cd_free_block(transpart->blocks[i]);
 				transpart->blocks[i] = (blockT *)NULL;
@@ -789,30 +800,30 @@ void segacdblock_device::cd_cmd_play_disc()
 {
 	UINT8 play_mode = m_cr[2] >> 8;
 	if(play_mode)
-		return; // @todo intentional for debugging
+		debugger_break(machine());
 	
 	UINT32 start_pos = ((m_cr[0] & 0xff) << 16) | (m_cr[1] & 0xffff);
 	UINT32 end_pos = ((m_cr[2] & 0xff) << 16) | (m_cr[3] & 0xffff);
 	if(start_pos & 0x800000)
 	{
 		if(start_pos == 0xffffff)
-			return; // @todo intentional for debugging
+			debugger_break(machine());
 	
 		m_FAD = start_pos & 0xfffff;
 		m_CurrentTrack = cdrom_get_track(cdrom, m_FAD-150);
 	}
 	else 
-		return; // @todo intentional for debugging
+		debugger_break(machine());
 
 	if(end_pos & 0x800000)
 	{
 		if(end_pos == 0xffffff)
-			return; // @todo intentional for debugging
+			debugger_break(machine());
 	
 		m_FADEnd = end_pos & 0xfffff;
 	}
 	else 
-		return; // @todo intentional for debugging
+		debugger_break(machine());
 
 	m_cd_state = CD_STAT_PLAY;
 	m_cd_timer->reset();
