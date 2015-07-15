@@ -1181,8 +1181,8 @@ void v99x8_device::mode_graphic23(const pen_t *pens, _PixelType *ln, int line)
 	int pattern, x, xx, line2, name, charcode,
 	colour, colourmask, patternmask, xxx;
 
-	colourmask = (m_cont_reg[3] & 0x7f) * 8 | 7;
-	patternmask = (m_cont_reg[4] & 0x03) * 256 | (colourmask & 255);
+	colourmask = ((m_cont_reg[3] & 0x7f) * 8) | 7;
+	patternmask = ((m_cont_reg[4] & 0x03) * 256) | 0xff;
 
 	nametbl_addr =  (m_cont_reg[2] << 10);
 	colourtbl_addr =  ((m_cont_reg[3] & 0x80) << 6) + (m_cont_reg[10] << 14);
