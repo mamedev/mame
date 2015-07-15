@@ -1,6 +1,6 @@
 # **MEWUI** #
 
-[![Build Status](https://travis-ci.org/dankan1890/mewui.svg)](https://travis-ci.org/dankan1890/mewui)
+[![Build Status](https://travis-ci.org/dankan1890/mewui.svg)](https://travis-ci.org/dankan1890/mewui) [![Build status](https://ci.appveyor.com/api/projects/status/rswl8b39pw8gl5b1?svg=true)](https://ci.appveyor.com/project/dankan1890/mewui)
 
 What is MEWUI?
 =============
