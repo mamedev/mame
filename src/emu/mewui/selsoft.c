@@ -565,13 +565,7 @@ void ui_menu_select_software::build_software_list()
 	std::stable_sort(m_publisher.ui.begin(), m_publisher.ui.end());
 
 	for (size_t x = 1; x < m_swlist.size(); ++x)
-	{
 		m_sortedlist.push_back(&m_swlist[x]);
-		if (m_swlist[x].available)
-			m_availsortedlist.push_back(&m_swlist[x]);
-		else
-			m_unavailsortedlist.push_back(&m_swlist[x]);
-	}
 }
 
 //-------------------------------------------------

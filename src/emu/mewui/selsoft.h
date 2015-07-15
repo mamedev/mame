@@ -38,8 +38,6 @@ private:
 	std::vector<ui_software_info> m_swlist;
 	std::vector<ui_software_info *> m_tmp;
 	std::vector<ui_software_info *> m_sortedlist;
-	std::vector<ui_software_info *> m_availsortedlist;
-	std::vector<ui_software_info *> m_unavailsortedlist;
 
 	void build_software_list();
 	void build_list(std::vector<ui_software_info *> &vec, const char *filter_text = NULL, int filter = -1);
