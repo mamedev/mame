@@ -64,6 +64,8 @@
 #define MPCM 0x1000 // MPEG action uncertain
 #define MPST 0x2000 // MPEG interrupt status report
 // 0xbe1: clears DRDY, CSCT, BFUL, PEND,
+// 0xd56 - 0xdd4
+// 0xb96 - 0xdc6
 
 // CD status (hi byte of CR1) definitions:
 // (these defines are shifted up 8)
@@ -326,7 +328,7 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 void segacdblock_device::SH1CommandExecute()
 {
 	if(m_cr[0] != 0 &&((m_cr[0] & 0xff00) != 0x5100))
-		printf("CD CMD: %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+		printf("CD CMD: %04x %04x %04x %04x (%04x %04x)\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3],m_hirq,m_hirq_mask);
 
 	
 	switch(m_cr[0] >> 8)
@@ -1701,6 +1703,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			set_flag(CSCT);
 
 			//printf("FREE %d\n",freeblocks);
+
 			if(!(m_hirq & BFUL) && m_TempPause == true)
 			{
 				m_TempPause = false;
