@@ -1,3 +1,7 @@
+# **MEWUI** #
+
+[![Build Status](https://travis-ci.org/dankan1890/mewui.svg)](https://travis-ci.org/dankan1890/mewui)
+
 What is MEWUI?
 =============
 
