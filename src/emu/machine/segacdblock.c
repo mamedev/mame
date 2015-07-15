@@ -798,10 +798,18 @@ void segacdblock_device::cd_cmd_end_transfer()
 
 void segacdblock_device::cd_cmd_play_disc()
 {
-	UINT8 play_mode = m_cr[2] >> 8;
+	UINT8 play_mode = (m_cr[2] >> 8) & 0x7f;
 	if(play_mode)
+	{
+		printf("play mode enabled %02x\n",play_mode);
 		debugger_break(machine());
+	}
 	
+	if(m_cr[2] & 0x8000)
+	{
+		printf("preserve current position\n");
+		debugger_break(machine());
+	}
 	UINT32 start_pos = ((m_cr[0] & 0xff) << 16) | (m_cr[1] & 0xffff);
 	UINT32 end_pos = ((m_cr[2] & 0xff) << 16) | (m_cr[3] & 0xffff);
 	if(start_pos & 0x800000)
@@ -812,19 +820,25 @@ void segacdblock_device::cd_cmd_play_disc()
 		m_FAD = start_pos & 0xfffff;
 		m_CurrentTrack = cdrom_get_track(cdrom, m_FAD-150);
 	}
-	else 
+	else
+	{
+		printf("track mode\n");
 		debugger_break(machine());
-
+	}
 	if(end_pos & 0x800000)
 	{
 		if(end_pos == 0xffffff)
+		{
+			printf("end position doesn't change\n");
 			debugger_break(machine());
-	
+		}
 		m_FADEnd = end_pos & 0xfffff;
 	}
-	else 
+	else
+	{
+		printf("resume pause state\n");
 		debugger_break(machine());
-
+	}
 	m_cd_state = CD_STAT_PLAY;
 	m_cd_timer->reset();
 	m_cd_timer->adjust(attotime::from_hz(150)); // @todo use the clock Luke
@@ -853,6 +867,8 @@ void segacdblock_device::cd_cmd_set_filter_range(UINT8 filter_number)
 	CDFilters[filter_number].fad = ((m_cr[0] & 0xff)<<16) | m_cr[1];
 	CDFilters[filter_number].range = ((m_cr[2] & 0xff)<<16) | m_cr[3];
 
+	printf("FAD Range set %08x %08x\n",CDFilters[filter_number].fad,CDFilters[filter_number].range);
+	debugger_break(machine());
 	
 	cd_standard_return(false);
 	set_flag(ESEL);
@@ -1442,7 +1458,7 @@ segacdblock_device::partitionT *segacdblock_device::cd_filterdata(filterT *flt, 
 		{
 			if ((m_FAD < flt->fad) || (m_FAD > (flt->fad + flt->range)))
 			{
-				//printf("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
+				printf("curfad reject %08x %08x %08x %08x\n",m_FAD,m_FADEnd,flt->fad,flt->fad+flt->range);
 				match = 0;
 				//m_LastBuffer = flt->condfalse;
 				//flt = &filters[m_LastBuffer];
@@ -1660,7 +1676,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		{
 			set_flag(CSCT);
 
-			printf("FREE %d\n",freeblocks);
+			//printf("FREE %d\n",freeblocks);
 			if(!(m_hirq & BFUL) && m_TempPause == true)
 			{
 				m_TempPause = false;
