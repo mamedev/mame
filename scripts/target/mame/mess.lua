@@ -1630,6 +1630,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/isbc.c",
 	MAME_DIR .. "src/mess/machine/isbc_215g.c", 
 	MAME_DIR .. "src/mess/drivers/rex6000.c",   
+	MAME_DIR .. "src/mess/drivers/sdk80.c",     
 	MAME_DIR .. "src/mess/drivers/sdk85.c",     
 	MAME_DIR .. "src/mess/drivers/sdk86.c",   
 	MAME_DIR .. "src/mess/drivers/imds2.c",  
