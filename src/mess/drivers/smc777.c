@@ -129,7 +129,6 @@ private:
 	UINT8 m_raminh,m_raminh_pending_change; //bankswitch
 	UINT8 m_raminh_prefetch;
 	UINT8 m_irq_mask;
-	UINT8 m_keyb_direct;
 	UINT8 m_pal_mode;
 	UINT8 m_keyb_cmd;
 	UINT8 m_crtc_vreg[0x20];
