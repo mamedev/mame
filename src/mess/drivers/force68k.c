@@ -135,6 +135,7 @@ public:
 		driver_device(mconfig, type, tag),
 		  //		m_rtc(*this, "rtc")
 		  m_maincpu(*this, "maincpu"),
+		  m_rtc(*this, "rtc"),
 		  m_pit(*this, "pit"),
 		  m_aciahost(*this, "aciahost"),
  		  m_aciaterm(*this, "aciaterm"),
@@ -150,7 +151,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	//	required_device<mm58167_device> m_rtc;
+	required_device<mm58167_device> m_rtc;
 	required_device<pit68230_device> m_pit;
 	required_device<acia6850_device> m_aciahost;
 	required_device<acia6850_device> m_aciaterm;
@@ -172,7 +173,7 @@ static ADDRESS_MAP_START(force68k_mem, AS_PROGRAM, 16, force68k_state)
 	AM_RANGE(0x0c0082, 0x0c0083) AM_DEVREADWRITE8("aciaterm", acia6850_device, data_r, data_w, 0xff00)
 	AM_RANGE(0x0c0100, 0x0c0101) AM_DEVREADWRITE8("aciaremt", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0c0102, 0x0c0103) AM_DEVREADWRITE8("aciaremt", acia6850_device, data_r, data_w, 0x00ff)
-//      AM_RANGE(0x0c0401, 0x0c042f) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xff00)
+        AM_RANGE(0x0c0400, 0x0c042f) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0x00ff)
         AM_RANGE(0x0e0000, 0x0e0035) AM_DEVREADWRITE8("pit", pit68230_device, data_r, data_w, 0x00ff) 
 //      AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */
 //      AM_RANGE(0x100000, 0xfeffff) /* VMEbus Rev B addresses (24 bits) */
@@ -238,6 +239,9 @@ static MACHINE_CONFIG_START( fccpu1, force68k_state )
 	MCFG_DEVICE_ADD("aciaremt", ACIA6850, 0)
         MCFG_DEVICE_ADD("aciaremt_clock", CLOCK, ACIA_CLOCK)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
+
+	/* RTC Real Time Clock device */
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
 
 	/* PIT Parallel Interface and Timer device */
 	MCFG_DEVICE_ADD("pit", PIT68230, 0)
