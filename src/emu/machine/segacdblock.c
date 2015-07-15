@@ -353,7 +353,7 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x51:  cd_cmd_get_sector_number(m_cr[2] >> 8); break;
 		case 0x52:  cd_cmd_calculate_actual_size(); break;
 		case 0x53:  cd_cmd_get_actual_size(); break;
-		//case 0x54: Falcom Classics 2
+		case 0x54:  cd_cmd_get_sector_info(m_cr[1] & 0xff,m_cr[2] >> 8); break; // Falcom Classics 2
 		case 0x60:  cd_cmd_set_sector_length(m_cr[0] & 0xff, m_cr[1] >> 8); break;
 		case 0x61:  cd_cmd_get_sector(false); break;
 		case 0x62:  cd_cmd_delete_sector(); break;
@@ -802,16 +802,19 @@ void segacdblock_device::cd_cmd_play_disc()
 	if(play_mode)
 	{
 		printf("play mode enabled %02x\n",play_mode);
-		debugger_break(machine());
+		//debugger_break(machine());
 	}
 	
-	if(m_cr[2] & 0x8000)
-	{
-		printf("preserve current position\n");
-		debugger_break(machine());
-	}
+
 	UINT32 start_pos = ((m_cr[0] & 0xff) << 16) | (m_cr[1] & 0xffff);
 	UINT32 end_pos = ((m_cr[2] & 0xff) << 16) | (m_cr[3] & 0xffff);
+	if(m_cr[2] & 0x8000)
+	{
+		printf("preserve current position %04x\n",m_cr[2]);
+		debugger_break(machine());
+		end_pos += m_FADEnd;
+	}
+
 	if(start_pos & 0x800000)
 	{
 		if(start_pos == 0xffffff)
@@ -825,6 +828,7 @@ void segacdblock_device::cd_cmd_play_disc()
 		printf("track mode\n");
 		debugger_break(machine());
 	}
+	
 	if(end_pos & 0x800000)
 	{
 		if(end_pos == 0xffffff)
@@ -868,7 +872,7 @@ void segacdblock_device::cd_cmd_set_filter_range(UINT8 filter_number)
 	CDFilters[filter_number].range = ((m_cr[2] & 0xff)<<16) | m_cr[3];
 
 	printf("FAD Range set %08x %08x\n",CDFilters[filter_number].fad,CDFilters[filter_number].range);
-	debugger_break(machine());
+	//debugger_break(machine());
 	
 	cd_standard_return(false);
 	set_flag(ESEL);
@@ -1066,6 +1070,26 @@ void segacdblock_device::cd_cmd_get_actual_size()
 	m_dr[1] = (m_CalculateActualSize & 0xffff);
 	m_dr[2] = 0;
 	m_dr[3] = 0;
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_get_sector_info(UINT8 sector_offset, UINT8 buffer_number)
+{
+	if (buffer_number >= MAX_FILTERS || !partitions[buffer_number].blocks[sector_offset])
+	{
+		m_dr[0] |= CD_STAT_REJECT & 0xff00;
+		printf("Get sector info reject\n");
+		debugger_break(machine());
+	}
+	else
+	{
+		m_dr[0] = m_cd_state | ((partitions[buffer_number].blocks[sector_offset]->FAD >> 16) & 0xff);
+		m_dr[1] = partitions[buffer_number].blocks[sector_offset]->FAD & 0xffff;
+		m_dr[2] = ((partitions[buffer_number].blocks[sector_offset]->fnum & 0xff) << 8) | (partitions[buffer_number].blocks[sector_offset]->chan & 0xff);
+		m_dr[3] = ((partitions[buffer_number].blocks[sector_offset]->subm & 0xff) << 8) | (partitions[buffer_number].blocks[sector_offset]->cinf & 0xff);
+	}
+	
 	set_flag(ESEL);
 	set_flag(CMOK);
 }

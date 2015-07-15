@@ -218,6 +218,7 @@ private:
 	void cd_cmd_get_buffer_size();
 	void cd_cmd_get_sector_number(UINT8 buffer_number);
 	void cd_cmd_calculate_actual_size();
+	void cd_cmd_get_sector_info(UINT8 sector_offset, UINT8 buffer_number);
 	void cd_cmd_get_actual_size();
 	
 	// 0x60
