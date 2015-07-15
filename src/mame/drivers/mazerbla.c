@@ -21,7 +21,7 @@ ZPU-2000 - main cpu board (Zentral (sic) Processor Unit)
  - 32 dipswitches in 4 banks of 8
  - four 'test button' style switches
  - one 4Mhz xtal @A1
- - this same board is shared with cliff hanger (clifhgr.c)
+ - this same board is shared with cliff hanger (cliffhgr.c)
 
 CFB-1000 - video/subcpu board (Color Frame Board)
  - this board has a sub-cpu on it and four roms (six sockets for roms, two empty)
@@ -48,7 +48,7 @@ VSB-2000 - sound/speech/subcpu board (Voice and Sound Board)
    - PROMS: 82s123: @B8 @B9; 82s129: @G8 @G9 (all dumped)
 
 CRF-1001 - RF Filter board for video/audio output
- - this same board is shared with cliff hanger (clifhgr.c)
+ - this same board is shared with cliff hanger (cliffhgr.c)
 
 Versions:
 ======
@@ -61,7 +61,7 @@ roms for all roms except the zpu-2000 board.
 
 Issues:
 ======
-Sprites leave trails in both ganes
+Sprites leave trails in both games
 Sprites should be transparent (color 0x0f)
 Screen flickers heavily in Great Guns (double buffer issue?).
 
@@ -233,7 +233,6 @@ public:
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	void rom_bank_select();
 };
 
 
@@ -351,14 +350,9 @@ WRITE8_MEMBER(mazerbla_state::cfb_vbank_w)
 WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)
 {
 	m_gfx_rom_bank = data;
-	rom_bank_select();
+	
+	membank("bank1")->set_entry(m_gfx_rom_bank);
 }
-
-void mazerbla_state::rom_bank_select()
-{
-	membank("bank1")->set_base(memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
-}
-
 
 #if 0
 WRITE8_MEMBER(mazerbla_state::vcu_video_reg_w)
@@ -1386,6 +1380,8 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 
 void mazerbla_state::machine_start()
 {
+	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
+	
 	save_item(NAME(m_vcu_video_reg));
 	save_item(NAME(m_vcu_gfx_addr));
 	save_item(NAME(m_vcu_gfx_param_addr));
@@ -1413,8 +1409,6 @@ void mazerbla_state::machine_start()
 
 	save_item(NAME(m_vsb_ls273));
 	save_item(NAME(m_soundlatch));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(mazerbla_state::rom_bank_select), this));
 }
 
 void mazerbla_state::machine_reset()

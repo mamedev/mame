@@ -191,6 +191,24 @@ void mb_vcu_device::device_start()
 				3,  resistances_gb, m_weights_b,    3600,   0,
 				2,  resistances_r,  m_weights_r,    3600,   0);
 	}
+	
+	save_item(NAME(m_status));
+	save_pointer(NAME(m_ram), 0x800);
+	save_pointer(NAME(m_palram), 0x100);
+	save_item(NAME(m_param_offset_latch));
+	save_item(NAME(m_xpos));
+	save_item(NAME(m_ypos));
+	save_item(NAME(m_color1));
+	save_item(NAME(m_color2));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_pix_xsize));
+	save_item(NAME(m_pix_ysize));
+	save_item(NAME(m_vregs));
+	save_item(NAME(m_bk_color));
+	save_item(NAME(m_vbank));
+	save_item(NAME(m_weights_r));
+	save_item(NAME(m_weights_g));
+	save_item(NAME(m_weights_b));
 }
 
 
