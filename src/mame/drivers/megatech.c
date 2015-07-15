@@ -1451,7 +1451,7 @@ ROM_END
 /* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
 /*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
 /* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
-/* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Marvel / Sega",         "Spider-Man vs The Kingpin (Mega-Tech)", GAME_NOT_WORKING )
+/* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega / Marvel",         "Spider-Man vs The Kingpin (Mega-Tech)", GAME_NOT_WORKING )
 /* 55 */ GAME( 1991, mt_calga, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "California Games (Mega-Tech)", GAME_NOT_WORKING )
 /* 56 */ // unknown
 /* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megatech, mtech_state, mt_crt, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
