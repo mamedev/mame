@@ -161,7 +161,7 @@ void segacdblock_device::cd_defragblocks(partitionT *part)
 				temp2 = part->bnum[i];
 				part->bnum[i] = part->bnum[j];
 				part->bnum[j] = temp2;
-				printf("Defrag %d %d\n",i,j);
+				//printf("Defrag %d %d\n",i,j);
 			}
 		}
 	}
@@ -320,7 +320,7 @@ void segacdblock_device::device_validity_check(validity_checker &valid) const
 
 void segacdblock_device::SH1CommandExecute()
 {
-	if(m_cr[0] != 0)
+	if(m_cr[0] != 0 &&((m_cr[0] & 0xff00) != 0x5100))
 		printf("CD CMD: %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
 
 	
@@ -334,12 +334,14 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x06:	cd_cmd_end_transfer(); break;
 		
 		case 0x10:  cd_cmd_play_disc(); break;
-
+		case 0x11:  m_cd_state = CD_STAT_PAUSE; set_flag(CMOK); break; // ...
+		
 		case 0x30:	cd_cmd_set_device_connection(m_cr[2] >> 8); break;
 		
+		case 0x40:	cd_cmd_set_filter_range(m_cr[2] >> 8); break;
 		case 0x42:  cd_cmd_set_filter_subheader_conditions(); break;
 		case 0x44:  cd_cmd_set_filter_mode(m_cr[0] & 0xff, m_cr[2] >> 8); break;
-		case 0x46: cd_cmd_set_filter_connection(m_cr[2] >> 8); break;
+		case 0x46:	cd_cmd_set_filter_connection(m_cr[2] >> 8); break;
 		case 0x48:	cd_cmd_reset_selector(m_cr[0] & 0xff, m_cr[2] >> 8); break;
 
 		case 0x50:  cd_cmd_get_buffer_size(); break;
@@ -348,7 +350,9 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x53:  cd_cmd_get_actual_size(); break;
 		
 		case 0x60:  cd_cmd_set_sector_length(m_cr[0] & 0xff, m_cr[1] >> 8); break;
-		case 0x63:  cd_cmd_get_then_delete_sector(); break;
+		case 0x61:  cd_cmd_get_sector(false); break;
+		case 0x62:  cd_cmd_delete_sector(); break;
+		case 0x63:  cd_cmd_get_sector(true); break; // get then delete sector
 		case 0x67:	cd_cmd_get_copy_error(); break;
 
 		case 0x70:	cd_cmd_change_dir(((m_cr[2] & 0xff)<<16) | (m_cr[3] & 0xffff) ); break;
@@ -772,6 +776,8 @@ void segacdblock_device::cd_cmd_end_transfer()
 			set_flag(EHST);
 		}
 	}
+	else
+		set_flag(EHST);
 	
 	m_dma_size = 0;
 	set_flag(CMOK);
@@ -825,6 +831,17 @@ void segacdblock_device::cd_cmd_set_device_connection(UINT8 param)
 
 	cd_standard_return(false);
 
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_set_filter_range(UINT8 filter_number)
+{
+	CDFilters[filter_number].fad = ((m_cr[0] & 0xff)<<16) | m_cr[1];
+	CDFilters[filter_number].range = ((m_cr[2] & 0xff)<<16) | m_cr[3];
+
+	
+	cd_standard_return(false);
 	set_flag(ESEL);
 	set_flag(CMOK);
 }
@@ -977,7 +994,7 @@ void segacdblock_device::cd_cmd_get_sector_number(UINT8 buffer_number)
 
 	
 
-	printf("%d\n",m_dr[3]);
+	//printf("%d\n",m_dr[3]);
 	
 	set_flag(DRDY);
 	set_flag(CMOK);
@@ -1032,7 +1049,7 @@ void segacdblock_device::cd_cmd_set_sector_length(UINT8 length_in, UINT8 length_
 	set_flag(CMOK);
 }
 
-void segacdblock_device::cd_cmd_get_then_delete_sector()
+void segacdblock_device::cd_cmd_get_sector(bool AutoDelete)
 {
 	UINT32 sectnum = m_cr[3];
 	UINT32 sectofs = m_cr[1];
@@ -1067,7 +1084,54 @@ void segacdblock_device::cd_cmd_get_then_delete_sector()
 	set_flag(EHST);
 	set_flag(DRDY);
 	set_flag(CMOK);
-	DeleteSectorMode = true;
+	DeleteSectorMode = AutoDelete;
+}
+
+void segacdblock_device::cd_cmd_delete_sector()
+{
+	UINT32 sectnum = m_cr[3];
+	UINT32 sectofs = m_cr[1];
+	UINT32 bufnum = m_cr[2]>>8;
+
+	if (partitions[bufnum].numblks < sectnum)
+	{
+		printf("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
+		m_dr[0] = CD_STAT_REJECT;
+	
+		set_flag(CMOK|EHST);
+		debugger_break(machine());
+		return;
+	}	
+	// @todo reject states
+	m_TransferActive = false;
+	cd_standard_return(false); // cheap hack
+	
+	m_dr[0] = m_cd_state;
+	
+	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+	for (INT32 i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+	{
+		partitions[bufnum].size -= partitions[bufnum].blocks[i]->size;
+		cd_free_block(partitions[bufnum].blocks[i]);
+		partitions[bufnum].blocks[i] = (blockT *)NULL;
+		partitions[bufnum].bnum[i] = 0xff;
+	}
+
+	// defrag what's left
+	cd_defragblocks(transpart);
+
+	partitions[bufnum].numblks -= sectnum;
+
+	// clean up our state
+	//transpart->size -= m_dma_size;
+	//transpart->numblks -= xfersectnum;
+
+	/* @todo check this */
+	//xfertype = CDDMA_STOPPED;
+
+	
+	set_flag(EHST);
+	set_flag(CMOK);
 }
 
 void segacdblock_device::cd_cmd_get_copy_error()
@@ -1565,9 +1629,11 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	{
 		if((m_cd_state & 0x0f00) == CD_STAT_PAUSE)
 		{
-			//if(!(m_hirq & BFUL))
-			//	m_cd_state = CD_STAT_PLAY;
-			
+			if(!(m_hirq & BFUL) && m_TempPause == true)
+			{
+				m_TempPause = false;
+				m_cd_state = CD_STAT_PLAY;
+			}
 			m_cd_timer->adjust(attotime::from_hz(150));
 			
 		}
@@ -1613,7 +1679,9 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			if(m_hirq & BFUL)
 			{
 				//m_cd_state = CD_STAT_PAUSE;
-				printf("%04x\n",m_hirq);
+				m_TempPause = true;
+				m_cd_state = CD_STAT_PAUSE;
+				printf("%04x %d\n",m_hirq,freeblocks);
 			}			
 			m_cd_timer->adjust(attotime::from_hz(150));
 			
