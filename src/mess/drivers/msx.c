@@ -23,6 +23,7 @@
 **
 ** Todo/known issues:
 ** - piopx7/piopx7uk/piopxv60: Laserdisc integration doesn't exist
+** - piopx7: Is this a pal or an ntsc machine?
 ** - spc800: Haven't been able to test operation of the han rom yet
 ** - svi728: Expansion slot not emulated
 ** - svi738: v9938 not emulated
@@ -79,6 +80,13 @@
 ** - cpg120: Remove ports
 ** - cpg120: Add V9958
 **
+** TODO:
+** - Add T6950 support. T6950 is selectable between pal and ntsc by a pin.
+**
+** Possibly missing machines:
+** - Sanyo MPC-1 (T6950)
+** - Toshibo HX-51i (T7937)
+** - Sony HB-101 (TMS9118)
 ************************************************************************
 
 This following list is probably incomplete. Corrections are welcome.
@@ -1395,7 +1403,77 @@ static MACHINE_CONFIG_DERIVED( msx_ntsc, msx )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( msx_tms9118, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9118, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9128, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9918, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9918, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9918a, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9928, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( msx_pal, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9129, msx )
+	/* Video hardware */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9129, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( msx_tms9929, msx )
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -1592,6 +1670,7 @@ static MACHINE_CONFIG_DERIVED( ax170, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T7937 (in ax170mk2)
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_ROM("arab", 1, 0, 1, 2, "maincpu", 0x8000)
@@ -1650,7 +1729,7 @@ ROM_START (canonv20)
 	ROM_LOAD ("v20bios.rom", 0x0000, 0x8000, CRC(e9ccd789) SHA1(8963fc041975f31dc2ab1019cfdd4967999de53e))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( canonv20, msx_pal )
+static MACHINE_CONFIG_DERIVED( canonv20, msx_tms9929 )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1698,9 +1777,10 @@ ROM_START (mx10)
 	ROM_LOAD( "mx10bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( mx10, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( mx10, msx_tms9118 )
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
+	// Z80: uPD780C-1
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 3, 1) // 16KB RAM
@@ -1720,6 +1800,7 @@ ROM_END
 static MACHINE_CONFIG_DERIVED( mx15, msx_ntsc )
 	// FDC: None, 0 drives
 	// 3 Cartridge slots
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 3, 1) // 16KB RAM
@@ -1756,13 +1837,14 @@ ROM_START (pv7)
 	ROM_LOAD("pv7bios.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( pv7, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( pv7, msx_tms9118 )
 	// AY8910?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot + expansion slot, or 2 cartridge slots?
 	// By adding a Casio KB-7 2 additional cartridge slots become available and 8KB extra RAM?
 	// No cassette port
 	// No printer port
+	// Z80: uPD780C-1
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 3, 1)   /* 8KB RAM */
@@ -1780,7 +1862,7 @@ ROM_START (pv16)
 	ROM_LOAD("pv16.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( pv16, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( pv16, msx_tms9118 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -1868,7 +1950,7 @@ ROM_START (dpc200)
 	ROM_LOAD ("200han.rom",  0x8000, 0x4000, CRC(97478efb) SHA1(4421fa2504cbce18f7c84b5ea97f04e017007f07))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( dpc200, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( dpc200, msx_tms9918 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -1909,7 +1991,7 @@ ROM_START (cpc50a)
 	ROM_LOAD ("50abios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cpc50a, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( cpc50a, msx_tms9918 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1932,7 +2014,7 @@ ROM_START (cpc50b)
 	ROM_LOAD ("50bbios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cpc50b, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( cpc50b, msx_tms9118 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1? Cartridge slot
@@ -1954,7 +2036,7 @@ ROM_START (cpc51)
 	ROM_LOAD ("51bios.rom", 0x0000, 0x8000, CRC(c3a868ef) SHA1(a08a940aa87313509e00bc5ac7494d53d8e03492))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cpc51, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( cpc51, msx_tms9118 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 1 Cartridge slot
@@ -2016,10 +2098,11 @@ ROM_START (fspc800)
 	ROM_LOAD ("spc800bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( fspc800, msx_pal )
+static MACHINE_CONFIG_DERIVED( fspc800, msx_tms9929 )
 	// AY8910?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// Z80: GSS Z8400APS
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 1, 0, 0, 4)  /* 64KB RAM */
@@ -2101,7 +2184,7 @@ ROM_START (gsfc200)
 	ROM_LOAD ("fc200bios.rom.u5b", 0x4000, 0x4000, CRC(1a99b1a1) SHA1(e18f72271b64693a2a2bc226e1b9ebd0448e07c0))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( gsfc200, msx_pal )
+static MACHINE_CONFIG_DERIVED( gsfc200, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2165,7 +2248,7 @@ ROM_START (expert10)
 	ROM_LOAD ("expbios.rom", 0x0000, 0x8000, CRC(07610d77) SHA1(ef3e010eb57e4476700a3bbff9d2119ab3acdf62))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( expert10, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( expert10, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2184,7 +2267,7 @@ ROM_START (expert11)
 	ROM_LOAD ("expbios11.rom", 0x0000, 0x8000, CRC(efb4b972) SHA1(d6720845928ee848cfa88a86accb067397685f02))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( expert11, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( expert11, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2227,7 +2310,7 @@ static MACHINE_CONFIG_DERIVED( expertdp, msx_ntsc )
 	// AY8910/YM2149?
 	// FDC: mb8877a, 1 3.5" DSDD drive
 	// 2 Cartridge slots
-	// MSX Engine T7937A
+	// MSX Engine T7937A (also VDP)
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -2319,6 +2402,7 @@ static MACHINE_CONFIG_DERIVED( mbh50, msx_ntsc )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("rom", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -2457,7 +2541,7 @@ ROM_START (cf1200)
 	ROM_LOAD ("1200bios.rom", 0x0000, 0x8000, CRC(5ad03407) SHA1(c7a2c5baee6a9f0e1c6ee7d76944c0ab1886796c))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cf1200, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( cf1200, msx_tms9918a )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2586,7 +2670,7 @@ ROM_START (fs4000)
 	ROM_LOAD ("4000kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( fs4000, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( fs4000, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2613,7 +2697,7 @@ ROM_START (fs4000a)
 	ROM_LOAD ("4000kfn.rom", 0, 0x20000, CRC(956dc96d) SHA1(9ed3ab6d893632b9246e91b412cd5db519e7586b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( fs4000a, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( fs4000a, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2675,7 +2759,7 @@ ROM_START (cf2700g)
 	ROM_LOAD ("cf2700g.rom", 0x0000, 0x8000, CRC(4aa194f4) SHA1(69bf27b610e11437dad1f7a1c37a63179a293d12))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cf2700g, msx_pal )
+static MACHINE_CONFIG_DERIVED( cf2700g, msx_tms9929 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2734,7 +2818,7 @@ ROM_START (vg8000)
 	ROM_LOAD ("8000bios.rom", 0x0000, 0x8000, CRC(efd970b0) SHA1(42252cf87deeb58181a7bfec7c874190a1351779))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg8000, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg8000, msx_tms9129 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2755,7 +2839,7 @@ ROM_START (vg8010)
 	ROM_LOAD ("8010bios.rom", 0x0000, 0x8000, CRC(efd970b0) SHA1(42252cf87deeb58181a7bfec7c874190a1351779))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg8010, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg8010, msx_tms9129 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2776,7 +2860,7 @@ ROM_START (vg8010f)
 	ROM_LOAD ("8010fbios.rom", 0x0000, 0x8000, CRC(df57c9ca) SHA1(898630ad1497dc9a329580c682ee55c4bcb9c30c))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg8010f, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg8010f, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2797,7 +2881,7 @@ ROM_START (vg802000)
 	ROM_LOAD ("8020-00bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg802000, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg802000, msx_tms9929 )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2817,7 +2901,7 @@ ROM_START (vg802020)
 	ROM_LOAD ("8020-20bios.rom", 0x0000, 0x8000, CRC(a317e6b4) SHA1(e998f0c441f4f1800ef44e42cd1659150206cf79))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( vg802020, msx_pal )
+static MACHINE_CONFIG_DERIVED( vg802020, msx_tms9129 )
 	// YM2149 (in S-3527 MSX Engine)
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2865,6 +2949,7 @@ static MACHINE_CONFIG_DERIVED( piopx7, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// TMS9928 is this were an ntsc machine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram", 0, 0, 2, 2)   /* 32KB RAM */
@@ -2885,7 +2970,7 @@ ROM_START (piopx7uk)
 	ROM_LOAD ("videoart.rom",    0xc000, 0x8000, CRC(0ba148dc) SHA1(b7b4e4cd40a856bb071976e6cf0f5e546fc86a78))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( piopx7uk, msx_pal )
+static MACHINE_CONFIG_DERIVED( piopx7uk, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2908,7 +2993,7 @@ ROM_START (piopxv60)
 	ROM_FILL( 0xa000, 0x2000, 0x6E )
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( piopxv60, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( piopxv60, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -2995,6 +3080,8 @@ static MACHINE_CONFIG_DERIVED( mpc200, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2? Cartridge slots
+	// T6950
+	// T7775 MSX Engine
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -3031,7 +3118,7 @@ ROM_START (phc28l)
 	ROM_LOAD ("28lbios.rom", 0x0000, 0x8000, CRC(d2110d66) SHA1(d3af963e2529662eae63f04a2530454685a1989f))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( phc28l, msx_pal )
+static MACHINE_CONFIG_DERIVED( phc28l, msx_tms9929 )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3051,7 +3138,7 @@ ROM_START (phc28s)
 	ROM_LOAD ("28sbios.rom", 0x0000, 0x8000, CRC(e5cf6b3c) SHA1(b1cce60ef61c058f5e42ef7ac635018d1a431168))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( phc28s, msx_pal )
+static MACHINE_CONFIG_DERIVED( phc28s, msx_tms9929 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3091,7 +3178,7 @@ ROM_START (hotbit11)
 	ROM_LOAD ("hotbit11.rom", 0x0000, 0x8000, CRC(b6942694) SHA1(663f8c512d04d213fa616b0db5eefe3774012a4b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hotbit11, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( hotbit11, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3111,7 +3198,7 @@ ROM_START (hotbit12)
 	ROM_LOAD ("hotbit12.rom", 0x0000, 0x8000, CRC(f59a4a0c) SHA1(9425815446d468058705bae545ffa13646744a87))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hotbit12, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( hotbit12, msx_tms9128 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3198,6 +3285,7 @@ static MACHINE_CONFIG_DERIVED( hb10p, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -3218,6 +3306,7 @@ static MACHINE_CONFIG_DERIVED( hb20p, msx_pal )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
@@ -3390,7 +3479,7 @@ ROM_START (hb75p)
 	ROM_LOAD ("75pnote.ic44", 0x8000, 0x4000, CRC(492b12f8) SHA1(b262aedc71b445303f84efe5e865cbb71fd7d952))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hb75p, msx_pal )
+static MACHINE_CONFIG_DERIVED( hb75p, msx_tms9929 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots?
@@ -3434,7 +3523,7 @@ ROM_START (hb701fd)
 	ROM_LOAD ("hb701fddisk.rom", 0x8000, 0x4000, CRC(71961d9d) SHA1(2144036d6573d666143e890e5413956bfe8f66c5))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hb701fd, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( hb701fd, msx_tms9928 )
 	// YM2149 (in S-1985)
 	// FDC: WD2793?, 1 3.5" SSDD drive
 	// 2 Cartridge slots
@@ -3461,7 +3550,7 @@ ROM_START (svi728)
 //  ROM_LOAD ("707disk.rom", 0x8000, 0x4000, CRC(f9978853) SHA1(6aa856cc56eb98863c9da7a566571605682b5c6b))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( svi728, msx_pal )
+static MACHINE_CONFIG_DERIVED( svi728, msx_tms9129 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 1 Cartridge slots, 1 Expansion slot (eg for SVI-707)
@@ -3670,7 +3759,7 @@ ROM_START (tadpc200)
 	ROM_LOAD ("dpc200bios.rom", 0x0000, 0x8000, CRC(8205795e) SHA1(829c00c3114f25b3dae5157c0a238b52a3ac37db))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( tadpc200, msx_pal )
+static MACHINE_CONFIG_DERIVED( tadpc200, msx_tms9129 )
 	// AY8910
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3852,11 +3941,11 @@ ROM_START (hx20)
 	ROM_LOAD ("hx20word.rom", 0x8000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hx20, msx_pal )
+static MACHINE_CONFIG_DERIVED( hx20, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
-	// T6950 VDP instead of TMS9928A
+	// T6950
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram1", 0, 0, 2, 2)   /* 32KB RAM */
@@ -3876,7 +3965,7 @@ ROM_START (hx20i)
 	ROM_LOAD ("hx20iword.rom", 0x8000, 0x8000, CRC(39b3e1c0) SHA1(9f7cfa932bd7dfd0d9ecaadc51655fb557c2e125))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hx20i, msx_pal )
+static MACHINE_CONFIG_DERIVED( hx20i, msx_tms9129 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3903,7 +3992,7 @@ ROM_START (hx21)
 	ROM_LOAD ("hx21kfn.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hx21, msx_ntsc )
+static MACHINE_CONFIG_DERIVED( hx21, msx_tms9928 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
@@ -3974,11 +4063,12 @@ ROM_START (hx22i)
 	ROM_LOAD ("hx22iword.rom", 0x8000, 0x8000, CRC(f9e29c66) SHA1(3289336b2c12161fd926a7e5ce865770ae7038af))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( hx22i, msx_pal )
+static MACHINE_CONFIG_DERIVED( hx22i, msx_tms9929 )
 	// AY8910/YM2149?
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
 	// RS232C builtin?
+	// Z80: LH0080A
 
 	MCFG_MSX_LAYOUT_ROM("bios", 0, 0, 0, 2, "maincpu", 0x0000)
 	MCFG_MSX_LAYOUT_RAM("ram1", 0, 0, 2, 2)   /* 32KB RAM */
@@ -4101,7 +4191,7 @@ ROM_START (cx5m)
 	ROM_LOAD ("cx5mbios.rom", 0x0000, 0x8000, CRC(e2242b53) SHA1(706dd67036baeec7127e4ccd8c8db8f6ce7d0e4c))
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( cx5m, msx_pal )
+static MACHINE_CONFIG_DERIVED( cx5m, msx_tms9929 )
 	// YM2149
 	// FDC: None, 0 drives
 	// 2 Cartridge slots
