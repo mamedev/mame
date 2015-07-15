@@ -356,6 +356,7 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x67:	cd_cmd_get_copy_error(); break;
 
 		case 0x70:	cd_cmd_change_dir(((m_cr[2] & 0xff)<<16) | (m_cr[3] & 0xffff) ); break;
+		case 0x71:  cd_cmd_read_directory(m_cr[2] >> 8);
 		case 0x72:	cd_cmd_get_file_system_scope(); break;
 		case 0x73:	cd_cmd_get_file_info(((m_cr[2] & 0xff)<<16) | (m_cr[3] & 0xffff)); break;
 		case 0x74:  cd_cmd_read_file(); break;
@@ -365,6 +366,7 @@ void segacdblock_device::SH1CommandExecute()
 		case 0xe1:  cd_cmd_device_auth_status(m_cr[1]);  break;
 		default:
 			printf("Unhandled %04x %04x %04x %04x\n",m_cr[0],m_cr[1],m_cr[2],m_cr[3]);
+			debugger_break(machine());
 						//set_flag(CMOK);
 	}
 	m_cmd_issued = 0;
@@ -990,9 +992,15 @@ void segacdblock_device::cd_cmd_get_sector_number(UINT8 buffer_number)
 		m_dr[3] = 0;
 	}
 	else
+	{
 		m_dr[3] = partitions[buffer_number].numblks;
-
-	
+		if(m_dr[3] == 0)
+		{
+			//printf("%d\n",partitions[buffer_number].size);
+			//debugger_break(machine());
+			
+		}
+	}	
 
 	//printf("%d\n",m_dr[3]);
 	
@@ -1116,7 +1124,7 @@ void segacdblock_device::cd_cmd_delete_sector()
 		partitions[bufnum].blocks[i] = (blockT *)NULL;
 		partitions[bufnum].bnum[i] = 0xff;
 	}
-
+	
 	// defrag what's left
 	cd_defragblocks(transpart);
 
@@ -1146,6 +1154,16 @@ void segacdblock_device::cd_cmd_get_copy_error()
 void segacdblock_device::cd_cmd_change_dir(UINT32 dir_entry)
 {
 	read_new_dir(dir_entry);
+	set_flag(EFLS);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_read_directory(UINT8 filter_number)
+{
+	if(filter_number< 0x24)
+		CDDeviceConnection = &CDFilters[filter_number];
+	else
+		CDDeviceConnection = (filterT *)NULL;
 	set_flag(EFLS);
 	set_flag(CMOK);
 }
@@ -1629,11 +1647,15 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	{
 		if((m_cd_state & 0x0f00) == CD_STAT_PAUSE)
 		{
+			set_flag(CSCT);
+
+			printf("FREE %d\n",freeblocks);
 			if(!(m_hirq & BFUL) && m_TempPause == true)
 			{
 				m_TempPause = false;
 				m_cd_state = CD_STAT_PLAY;
 			}
+			
 			m_cd_timer->adjust(attotime::from_hz(150));
 			
 		}
@@ -1654,6 +1676,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				else
 				{
 					p_ok = 1; // TODO
+					
 					//machine().device<cdda_device>("cdda")->start_audio(cd_curfad, 1);
 				}
 			}
@@ -1682,7 +1705,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				m_TempPause = true;
 				m_cd_state = CD_STAT_PAUSE;
 				printf("%04x %d\n",m_hirq,freeblocks);
-			}			
+			}
 			m_cd_timer->adjust(attotime::from_hz(150));
 			
 			

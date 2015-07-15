@@ -229,6 +229,7 @@ private:
 
 	// 0x70
 	void cd_cmd_change_dir(UINT32 dir_entry);
+	void cd_cmd_read_directory(UINT8 filter_number);
 	void cd_cmd_get_file_system_scope();
 	void cd_cmd_get_file_info(UINT32 fileid);
 	void cd_cmd_read_file();
