@@ -196,7 +196,7 @@ ui_menu_font_ui::~ui_menu_font_ui()
 {
 	std::string error_string;
 
-#if MEWUI_WINDOWS
+#ifdef MEWUI_WINDOWS
 	std::string name(m_class.ui[m_class.actual]);
 	if (m_class.ui[m_class.actual] != "default")
 	{
