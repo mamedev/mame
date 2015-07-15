@@ -308,6 +308,10 @@ Xyzolog - Electric Software
 
 -->
 
+<!--
+tap2crt hacks have "Rom Made From File By N.G" at 0x40.
+-->
+
 <!-- GAMES -->
 
 <!-- Confirmed dumps from cart -->
@@ -2117,21 +2121,7 @@ kept for now until finding out what those bytes affect...
 
 	<!-- Glitches in msx driver, works fine in some Japanese machines, like cf1200 -->
 	<software name="btanuki">
-		<description>Batten Tanuki no Daibouken (Jpn, v1.03)</description>
-		<year>1986</year>
-		<publisher>Tecno Soft</publisher>
-		<info name="serial" value="MXTJ-11002" />
-		<info name="alt_title" value="ばってんタヌキの大冒険" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="batten tanuki no daibouken (japan) (v1.03).rom" size="32768" crc="eba0738d" sha1="9b58c70b976ca1d841185de862e7d663ec9db56b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Glitches in msx driver, works fine in some Japanese machines, like cf1200 -->
-	<software name="btanukia" cloneof="btanuki">
-		<description>Batten Tanuki no Daibouken (Jpn)</description>
+		<description>Batten Tanuki no Daibouken (Jpn, v1.04)</description> <!-- (c) 1985 Tecno Soft v 1.04  1986.06.14 ST 13:25 -->
 		<year>1986</year>
 		<publisher>Tecno Soft</publisher>
 		<info name="serial" value="MXTJ-11002" />
@@ -2144,8 +2134,22 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<!-- Glitches in msx driver, works fine in some Japanese machines, like cf1200 -->
+	<software name="btanukia" cloneof="btanuki">
+		<description>Batten Tanuki no Daibouken (Jpn, v1.03)</description> <!-- (c) 1985 Tecno Soft v 1.03  1986.02.07 FR 10:27 -->
+		<year>1986</year>
+		<publisher>Tecno Soft</publisher>
+		<info name="serial" value="MXTJ-11002" />
+		<info name="alt_title" value="ばってんタヌキの大冒険" />
+		<part name="cart" interface="msx_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="batten tanuki no daibouken (japan) (v1.03).rom" size="32768" crc="eba0738d" sha1="9b58c70b976ca1d841185de862e7d663ec9db56b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Glitches in msx driver, works fine in some Japanese machines, like cf1200 -->
 	<software name="btanukib" cloneof="btanuki">
-		<description>Batten Tanuki no Daibouken (Jpn, Alt)</description>
+		<description>Batten Tanuki no Daibouken (Jpn, v1.0)</description> <!-- 1985 DEC 24 V1.0 -->
 		<year>1986</year>
 		<publisher>Tecno Soft</publisher>
 		<info name="serial" value="MXTJ-11002" />
@@ -2171,8 +2175,9 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="clapton2">
+		<!-- STAR DESTROYER.Coryright 1983 by T&E SOFT Inc.Programed by KATSUO.HOSOKAWA 1983.9.27 (TUE) AM. -->
 		<description>Battleship Clapton II (Jpn)</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEX-03" />
 		<info name="alt_title" value="バトルシップ・クラプトンII" />
@@ -2183,7 +2188,9 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- seems to be a hack of the tape release -->
 	<software name="clapton2a" cloneof="clapton2">
+		<!-- STAR DESTROYER.Coryright 1984 by T&E SOFT Inc.Programed by KATSUO.HOSOKAWA 1984.5.10 (THU) AM. -->
 		<description>Battleship Clapton II (Jpn, Alt)</description>
 		<year>1984</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -2309,7 +2316,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack?? -->
+<!-- tap2crt hack -->
 	<software name="binary">
 		<description>Binary Land (Jpn?)</description>
 		<year>19??</year>
@@ -2499,7 +2506,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack?? -->
+<!-- tap2crt hack -->
 	<software name="ericflo" cloneof="bombman">
 		<description>Eric and the Floaters (Euro)</description>
 		<year>1985?</year>
@@ -4409,7 +4416,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack?? -->
+<!-- tap2crt hack -->
 	<software name="dtank">
 		<description>Driller Tanks (Jpn)</description>
 		<year>1984</year>
@@ -5001,6 +5008,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+<!-- tap2crt hack -->
 	<software name="fireresca" cloneof="fireresc">
 		<description>Fire Rescue (Jpn, Alt)</description>
 		<year>1984</year>
@@ -5100,7 +5108,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack?? -->
+<!-- tap2crt hack -->
 	<software name="lesflics">
 		<description>Les Flics (Euro)</description>
 		<year>1985</year>
@@ -5246,7 +5254,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack?? -->
+<!-- tap2crt hack -->
 	<software name="fpanic">
 		<description>Fruit Panic (Jpn?)</description>
 		<year>1984</year>
@@ -10195,7 +10203,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack?? -->
+<!-- tap2crt hack -->
 	<software name="punchy">
 		<description>Punchy (Euro?)</description>
 		<year>1984</year>
@@ -11179,7 +11187,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack?? -->
+<!-- tap2crt hack -->
 	<software name="spacewlk">
 		<description>Space Walk (Euro)</description>
 		<year>1985?</year>
@@ -11258,10 +11266,11 @@ kept for now until finding out what those bytes affect...
 <!-- only tape released? tap2crt hack?? -->
 	<software name="spyvssp2">
 		<description>Spy vs Spy II - The Island Caper (Euro)</description>
-		<year>1987?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986?</year>
+		<publisher>Databyte? Aackosoft?</publisher>
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="49152">
+			<feature name="mapper" value="KONAMI-SCC" />
+			<dataarea name="rom" size="65536">
 				<rom name="spy vs spy ii - the island caper (europe).rom" size="49152" crc="8f65c0f9" sha1="1d129bde09c9db2433b334d36762704de94983ba" offset="0" />
 			</dataarea>
 		</part>
@@ -13683,6 +13692,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+<!-- tap2crt hack -->
 	<software name="psyched" supported="no">
 		<description>Psychedelia (Euro)</description>
 		<year>19??</year>
@@ -13811,6 +13821,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+<!-- tap2crt hack -->
 	<software name="zen">
 		<description>Zen Assembler (Euro)</description>
 		<year>1986</year>
