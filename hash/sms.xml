@@ -4247,7 +4247,7 @@
 		<description>NBA Jam (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>Acclaim</publisher>
-		<info name="usage" value="Only runs with certain drivers, e.g. smsj - others show SOFTWARE ERROR" />
+		<info name="usage" value="Lacks a valid header, so only runs with certain drivers, e.g. smsj - others show SOFTWARE ERROR" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="nba jam [proto].bin" size="524288" crc="332a847d" sha1="690addaea2b5f9b8d1c8788540ec7f695b396ff8" offset="000000" status="baddump"/>

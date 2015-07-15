@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="sorcerer_flop" description="Exidy Sorcerer floppies">
+<softwarelist name="sorcerer_flop" description="Exidy Sorcerer disk images">
 
 	<software name="cpm">
-		<description>CP/M v.1.42/3</description>
+		<description>45K CP/M v.1.42/3</description>
 		<year>1979</year>
 		<publisher>Exidy</publisher>
-		<part name="flop1" interface="floppy_8"><!-- appears as "Inc. v2.1 (1978)(Digital Research)" in TOSEC -->
+		<part name="flop1" interface="floppy_8">
+			<!-- appears as "Inc. v2.1 (1978)(Digital Research)" in TOSEC -->
 			<dataarea name="flop" size="332640">
 				<rom name="cpm disk1.dsk" size="332640" crc="6e4f423c" sha1="debe6a5c92a639adb03a19baa41586c5ca6db025" offset="0" />
 			</dataarea>

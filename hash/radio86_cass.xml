@@ -5,9 +5,10 @@
 <!-- GAMES -->
 
 	<software name="bomber">
-		<description>BOMBER</description>
-		<year>19??</year>
+		<description>Bombardirovshchik</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Бомбардировщик"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4106">
 				<rom name="bomber.gam" size="4106" crc="991dca1d" sha1="bb40f0ef81e83740e75b137b22eedd0e6054909d" offset="0" />
@@ -15,10 +16,11 @@
 		</part>
 	</software>
 
-	<software name="cherv">
-		<description>CHERV</description>
-		<year>19??</year>
+	<software name="cherv" supported="no">
+		<description>Chervyak</description>
+		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Червяк"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2170">
 				<rom name="cherv.rkr" size="2170" crc="e33cfaf0" sha1="d559388c30da391fcb4729017da326659494a405" offset="0" />
@@ -27,9 +29,10 @@
 	</software>
 
 	<software name="chess">
-		<description>CHESS</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shakhmaty (Riga)</description>
+		<year>1987</year>
+		<publisher>Riga</publisher>
+		<info name="alt_title" value="Шахматы"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="28939">
 				<rom name="chess.gam" size="28939" crc="d9d8dc47" sha1="71733932ceb7a7659cd288dd0e79338c6ad241eb" offset="0" />
@@ -38,9 +41,10 @@
 	</software>
 
 	<software name="chess2">
-		<description>CHESS2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shakhmaty (Handikraft)</description>
+		<year>198?</year>
+		<publisher>Handikraft</publisher>
+		<info name="alt_title" value="Шахматы"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="26377">
 				<rom name="chess2.rkr" size="26377" crc="f5acd428" sha1="bacae294474212c308005d114efe018490736e9a" offset="0" />
@@ -49,9 +53,10 @@
 	</software>
 
 	<software name="circus">
-		<description>CIRCUS</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tsirk</description>
+		<year>1986</year>
+		<publisher>S.N. Popov</publisher>
+		<info name="alt_title" value="Цирк"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7657">
 				<rom name="circus.rkr" size="7657" crc="71a4ec9a" sha1="9b9b8a2bf787d489d98d670a74d74920920a7e78" offset="0" />
@@ -60,9 +65,10 @@
 	</software>
 
 	<software name="diverse">
-		<description>DIVERSE</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Diversant</description>
+		<year>1989</year>
+		<publisher>Khar'kov</publisher>
+		<info name="alt_title" value="Диверсант"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5914">
 				<rom name="diverse.gam" size="5914" crc="0b3e04a0" sha1="6c944fe89d7f3442b5d1b0ff112f8c5b078feb36" offset="0" />
@@ -71,10 +77,11 @@
 	</software>
 
 	<software name="estakan">
-		<description>E_STAKAN</description>
-		<year>19??</year>
+		<description>Stakan</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
+		<info name="alt_title" value="Стакан"/>
 			<dataarea name="cass" size="1546">
 				<rom name="e_stakan.rkr" size="1546" crc="ba2382a7" sha1="8c30f40d9808019b2b4c44f3cf6e1b072ecd7689" offset="0" />
 			</dataarea>
@@ -82,9 +89,9 @@
 	</software>
 
 	<software name="gfire">
-		<description>GFIRE</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Crossfire (v002, Mikrosha)</description>
+		<year>1988</year>
+		<publisher>A.V. Zyryanov</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="11290">
 				<rom name="gfire.gam" size="11290" crc="05f71aa3" sha1="eb9a3445e647cec98c4bd6b13b02ee0fa649cf54" offset="0" />
@@ -93,9 +100,10 @@
 	</software>
 
 	<software name="glass1">
-		<description>GLASS1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Stakan (v3.1)</description>
+		<year>1988</year>
+		<publisher>Kolomna "Integral"</publisher>
+		<info name="alt_title" value="Стакан"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1544">
 				<rom name="glass1.gam" size="1544" crc="59ac91fd" sha1="cf6571c2959de26a0535e19ca92dbabfe9b31982" offset="0" />
@@ -104,9 +112,10 @@
 	</software>
 
 	<software name="glass2">
-		<description>GLASS2</description>
-		<year>19??</year>
+		<description>Stakan (Alt)</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Стакан"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2313">
 				<rom name="glass2.gam" size="2313" crc="7cbc470e" sha1="243ee409333c3da68e9a3fb8f7b80482f3fe538e" offset="0" />
@@ -115,9 +124,10 @@
 	</software>
 
 	<software name="kalah">
-		<description>KALAH</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Kalakh</description>
+		<year>198?</year>
+		<publisher>Handikraft</publisher>
+		<info name="alt_title" value="Калах"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="10250">
 				<rom name="kalah.rkr" size="10250" crc="7f1c82c5" sha1="9018a51deba7e2bc2deb8b191cb67103a8392b43" offset="0" />
@@ -126,9 +136,9 @@
 	</software>
 
 	<software name="klad">
-		<description>KLAD</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Klad (v1.4)</description>
+		<year>1987</year>
+		<publisher>Riga</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="13145">
 				<rom name="klad.rkr" size="13145" crc="e8c83232" sha1="52650060a5b7e69661d518180110c4835b8d5cc6" offset="0" />
@@ -136,10 +146,12 @@
 		</part>
 	</software>
 
+	<!-- Checksum: 3B3E / Actual amount: 3C3E -->
 	<software name="krestno">
-		<description>KRESTNO</description>
-		<year>19??</year>
+		<description>Krestiki-Noliki</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Крестики-Нолики"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5131">
 				<rom name="krestno.gam" size="5131" crc="1cf3470e" sha1="f4d1e456ae31334b269ddf16ab1682aa83b87120" offset="0" />
@@ -148,9 +160,10 @@
 	</software>
 
 	<software name="krestnoa">
-		<description>KRESTNO (Alt)</description>
-		<year>19??</year>
+		<description>Krestiki-Noliki (Alt)</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Крестики-Нолики"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5187">
 				<rom name="krestno.rkr" size="5187" crc="cf99a8de" sha1="0dbb5e031ed7bd49dcafee43b1d56ab017ff6735" offset="0" />
@@ -159,9 +172,9 @@
 	</software>
 
 	<software name="krok">
-		<description>KROK</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Krok (v1.1)</description>
+		<year>1988</year>
+		<publisher>MIG</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6922">
 				<rom name="krok.gam" size="6922" crc="81237cfe" sha1="3cffe752f34d32d2529a691ddac2b3182af86431" offset="0" />
@@ -170,9 +183,10 @@
 	</software>
 
 	<software name="labyrint">
-		<description>LABYRINT</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pogonya v Labirinte</description>
+		<year>1989</year>
+		<publisher>Kapustin Yar</publisher>
+		<info name="alt_title" value="Погоня в Лабиринте"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7967">
 				<rom name="labyrint.gam" size="7967" crc="1f5a0274" sha1="355573557f28bfd1f9b3354f08185882418d3482" offset="0" />
@@ -181,9 +195,10 @@
 	</software>
 
 	<software name="lest">
-		<description>LEST</description>
-		<year>19??</year>
+		<description>Lestnitsa</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Лестница"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1643">
 				<rom name="lest.rkr" size="1643" crc="6e54b2d3" sha1="5fb86edef9f3d010666a18b033ad66ba2dc5b532" offset="0" />
@@ -192,9 +207,10 @@
 	</software>
 
 	<software name="lestn1">
-		<description>LESTN1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Lestnitsa-1</description>
+		<year>198?</year>
+		<publisher>YU.B. Simonov</publisher>
+		<info name="alt_title" value="Лестница-1"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7977">
 				<rom name="lestn1.rkr" size="7977" crc="69800ec6" sha1="abb01543c809227512237f9ec3ba964329bbb704" offset="0" />
@@ -202,10 +218,10 @@
 		</part>
 	</software>
 
-	<software name="life">
-		<description>LIFE</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="life" supported="partial"><!-- graphical errors, crashes -->
+		<description>Life</description>
+		<year>198?</year>
+		<publisher>VCP</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3946">
 				<rom name="life.rkr" size="3946" crc="108b30a7" sha1="2ce0d8e01ac6dc7d7c406473d7cb1aefd7256ac4" offset="0" />
@@ -213,10 +229,10 @@
 		</part>
 	</software>
 
-	<software name="lorunner">
-		<description>LORUNNER</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="ldrun">
+		<description>Lode Runner</description>
+		<year>198?</year>
+		<publisher>BSV</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="12554">
 				<rom name="lorunner.gam" size="12554" crc="1071c1dc" sha1="e11e5274562d7991f56a9b6c1cfede6e22e7293a" offset="0" />
@@ -225,9 +241,9 @@
 	</software>
 
 	<software name="maze">
-		<description>MAZE</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Maze (v1.05)</description>
+		<year>1988</year>
+		<publisher>SC80</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7946">
 				<rom name="maze.gam" size="7946" crc="c2c2dcc7" sha1="f89fb113a467e096dc94971300eb890844039bf2" offset="0" />
@@ -236,9 +252,10 @@
 	</software>
 
 	<software name="otello">
-		<description>OTELLO</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Otello</description>
+		<year>1987</year>
+		<publisher>YU.O. Kononov</publisher>
+		<info name="alt_title" value="ОТЕЛЛО"/>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6058">
 				<rom name="otello.rkr" size="6058" crc="0ad1b91c" sha1="0a3b6787ad815466695ad4ccd8693d01dc41d021" offset="0" />
@@ -246,9 +263,9 @@
 		</part>
 	</software>
 
-	<software name="pacman">
-		<description>PACMAN</description>
-		<year>19??</year>
+	<software name="pacman87">
+		<description>Pacman-87</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4543">
@@ -257,9 +274,9 @@
 		</part>
 	</software>
 
-	<software name="pacmana" cloneof="pacman">
-		<description>PACMAN (Alt)</description>
-		<year>19??</year>
+	<software name="pacman">
+		<description>PACMAN</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="9830">
@@ -268,9 +285,9 @@
 		</part>
 	</software>
 
-	<software name="pacman1">
-		<description>PACMAN1</description>
-		<year>19??</year>
+	<software name="pacmana" cloneof="pacman">
+		<description>PACMAN (Alt)</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="9819">
@@ -281,7 +298,7 @@
 
 	<software name="paket">
 		<description>PAKET</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="16075">
@@ -292,7 +309,7 @@
 
 	<software name="paket2">
 		<description>PAKET2</description>
-		<year>19??</year>
+		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="16623">
@@ -303,7 +320,7 @@
 
 	<software name="pingpong">
 		<description>PINGPONG</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2945">
@@ -314,7 +331,7 @@
 
 	<software name="piton">
 		<description>PITON</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="520">
@@ -325,7 +342,7 @@
 
 	<software name="pitona" cloneof="piton">
 		<description>PITON (Alt)</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="402">
@@ -336,7 +353,7 @@
 
 	<software name="pusher">
 		<description>PUSHER</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1198">
@@ -347,7 +364,7 @@
 
 	<software name="pvo">
 		<description>PVO</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1291">
@@ -358,7 +375,7 @@
 
 	<software name="rendzu">
 		<description>RENDZU</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1967">
@@ -369,7 +386,7 @@
 
 	<software name="reversi2">
 		<description>REVERSI2</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="22537">
@@ -380,7 +397,7 @@
 
 	<software name="rikoshet">
 		<description>RIKOSHET</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="12248">
@@ -391,7 +408,7 @@
 
 	<software name="sdemise">
 		<description>SDEMISE</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6291">
@@ -402,7 +419,7 @@
 
 	<software name="skachki">
 		<description>SKACHKI</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1288">
@@ -413,7 +430,7 @@
 
 	<software name="skvotch">
 		<description>SKVOTCH</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="716">
@@ -424,7 +441,7 @@
 
 	<software name="slams">
 		<description>SLAMS</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3848">
@@ -435,7 +452,7 @@
 
 	<software name="sos1">
 		<description>SOS1</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4106">
@@ -446,7 +463,7 @@
 
 	<software name="sos2">
 		<description>SOS2</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3307">
@@ -457,7 +474,7 @@
 
 	<software name="spgames">
 		<description>SP_GAMES</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2057">
@@ -468,7 +485,7 @@
 
 	<software name="spiton">
 		<description>SPITON</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="16154">
@@ -479,7 +496,7 @@
 
 	<software name="stranger">
 		<description>STRANGER</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4139">
@@ -490,7 +507,7 @@
 
 	<software name="svvi">
 		<description>SVVI</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="13465">
@@ -501,7 +518,7 @@
 
 	<software name="tapper">
 		<description>TAPPER</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4106">
@@ -512,7 +529,7 @@
 
 	<software name="tennis">
 		<description>TENNIS</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4949">
@@ -523,7 +540,7 @@
 
 	<software name="tennisa" cloneof="tennis">
 		<description>TENNIS (Alt)</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2371">
@@ -534,7 +551,7 @@
 
 	<software name="tetr2">
 		<description>TETR2</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3212">
@@ -545,7 +562,7 @@
 
 	<software name="tetris1">
 		<description>TETRIS1</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1288">
@@ -556,7 +573,7 @@
 
 	<software name="tetris4">
 		<description>TETRIS4</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1644">
@@ -567,7 +584,7 @@
 
 	<software name="tochki">
 		<description>TOCHKI</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1185">
@@ -578,7 +595,7 @@
 
 	<software name="udaw">
 		<description>UDAW</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2058">
@@ -589,7 +606,7 @@
 
 	<software name="utka">
 		<description>UTKA</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1851">
@@ -600,7 +617,7 @@
 
 	<software name="volcano">
 		<description>VOLCANO</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4089">
@@ -611,7 +628,7 @@
 
 	<software name="xonixs">
 		<description>XONIX-S</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2057">
@@ -622,7 +639,7 @@
 
 	<software name="xonix">
 		<description>XONIX</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1995">
@@ -633,7 +650,7 @@
 
 	<software name="xonix1">
 		<description>XONIX1</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2828">
@@ -644,7 +661,7 @@
 
 	<software name="xonixzm">
 		<description>XONIXZM</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3832">
@@ -655,7 +672,7 @@
 
 	<software name="zstatio">
 		<description>Z-STATIO</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2154">
@@ -666,7 +683,7 @@
 
 	<software name="zagib">
 		<description>ZAGIB</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1035">
@@ -677,7 +694,7 @@
 
 	<software name="zmei">
 		<description>ZMEI</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4250">
@@ -691,7 +708,7 @@
 
 	<software name="asmed">
 		<description>ASM_ED</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4105">
@@ -702,7 +719,7 @@
 
 	<software name="assmmic">
 		<description>ASSM_MIC</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4185">
@@ -713,7 +730,7 @@
 
 	<software name="basic80">
 		<description>BASIC80</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6665">
@@ -724,7 +741,7 @@
 
 	<software name="basicok">
 		<description>BASIC_OK</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="8201">
@@ -735,7 +752,7 @@
 
 	<software name="basicpr">
 		<description>BASIC_PR</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7433">
@@ -746,7 +763,7 @@
 
 	<software name="basicrk">
 		<description>BASIC_RK</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6847">
@@ -757,7 +774,7 @@
 
 	<software name="basicmus">
 		<description>BASICMUS</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="10741">
@@ -768,7 +785,7 @@
 
 	<software name="basicpc">
 		<description>BASICPC</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="8201">
@@ -779,7 +796,7 @@
 
 	<software name="basicser">
 		<description>BASICSER</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7433">
@@ -790,7 +807,7 @@
 
 	<software name="basmic">
 		<description>BASMIC</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6601">
@@ -801,7 +818,7 @@
 
 	<software name="basmikr">
 		<description>BASMIKR</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="8202">
@@ -812,7 +829,7 @@
 
 	<software name="bsmold">
 		<description>BS_M_OLD</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="8201">
@@ -823,7 +840,7 @@
 
 	<software name="bspsf">
 		<description>BS_PSF</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6729">
@@ -834,7 +851,7 @@
 
 	<software name="bssvvi">
 		<description>BS_SVVI</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6905">
@@ -845,7 +862,7 @@
 
 	<software name="c">
 		<description>C</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="18440">
@@ -856,7 +873,7 @@
 
 	<software name="constmag">
 		<description>CONSTMAG</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="123">
@@ -867,7 +884,7 @@
 
 	<software name="cpm">
 		<description>CPM</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="687">
@@ -878,7 +895,7 @@
 
 	<software name="debug">
 		<description>DEBUG</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4873">
@@ -889,7 +906,7 @@
 
 	<software name="dssmcpm">
 		<description>DSSM-CPM</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5929">
@@ -900,7 +917,7 @@
 
 	<software name="dumped">
 		<description>DUMPED</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="647">
@@ -911,7 +928,7 @@
 
 	<software name="eddssm">
 		<description>ED-DSSM</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4105">
@@ -922,7 +939,7 @@
 
 	<software name="eddssm2">
 		<description>ED-DSSM2</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4103">
@@ -933,7 +950,7 @@
 
 	<software name="edsort">
 		<description>ED-SORT</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3743">
@@ -944,7 +961,7 @@
 
 	<software name="edmasm">
 		<description>EDMASM</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4103">
@@ -955,7 +972,7 @@
 
 	<software name="forth">
 		<description>FORTH</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="17869">
@@ -966,7 +983,7 @@
 
 	<software name="fulledit">
 		<description>FULLEDIT</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4105">
@@ -977,7 +994,7 @@
 
 	<software name="hexedit1">
 		<description>HEXEDIT1</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3753">
@@ -988,7 +1005,7 @@
 
 	<software name="hexedit2">
 		<description>HEXEDIT2</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3753">
@@ -999,7 +1016,7 @@
 
 	<software name="linkrk">
 		<description>LINKRK</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="729">
@@ -1010,7 +1027,7 @@
 
 	<software name="morse16">
 		<description>MORSE16</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="744">
@@ -1021,7 +1038,7 @@
 
 	<software name="music">
 		<description>MUSIC</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4681">
@@ -1032,7 +1049,7 @@
 
 	<software name="muzsyst">
 		<description>MUZ_SYST</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4601">
@@ -1043,7 +1060,7 @@
 
 	<software name="muzukred">
 		<description>MUZUKRED</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2670">
@@ -1054,7 +1071,7 @@
 
 	<software name="pascal">
 		<description>PASCAL</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="16392">
@@ -1065,7 +1082,7 @@
 
 	<software name="progr1">
 		<description>PROGR1</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2057">
@@ -1076,7 +1093,7 @@
 
 	<software name="progr2">
 		<description>PROGR2</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1125">
@@ -1087,7 +1104,7 @@
 
 	<software name="progr3">
 		<description>PROGR3</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1545">
@@ -1098,7 +1115,7 @@
 
 	<software name="redasm">
 		<description>REDASM</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4024">
@@ -1109,7 +1126,7 @@
 
 	<software name="spcomp">
 		<description>SP_COMP</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="304">
@@ -1120,7 +1137,7 @@
 
 	<software name="wel">
 		<description>WEL</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5640">

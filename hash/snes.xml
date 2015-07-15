@@ -1977,9 +1977,9 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="enhancement" value="DSP1" />
             <feature name="pcb" value="SHVC-2Q0N-X1" />
             <feature name="u1" value="U1 EPROM" />
-            <feature name="u2" value="U2 EPROM" /> <!- - emtpy slot - ->
+            <feature name="u2" value="U2 EPROM" /> <!- - empty slot - ->
             <feature name="u3" value="U3" /> <!- - EPL16P8B - ->
-            <feature name="u4" value="U4 DRAM" /> <!- - emtpy slot - ->
+            <feature name="u4" value="U4 DRAM" /> <!- - empty slot - ->
             <feature name="u5" value="U5" /> <!- - 2/10/2 FLY DSP (D77P25D) - ->
             <feature name="u6" value="U6" /> <!- - 74HCU04 - ->
             <feature name="u7" value="U7" /> <!- - CIC - ->
@@ -54626,7 +54626,7 @@ List of unclassified roms
 	</software>
 
 	<software name="soundfct">
-		<description>Sound Factory (Jpn)</description>
+		<description>Sound Factory (Jpn, Prototype)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63793,9 +63793,9 @@ List of unclassified roms
 	</software>
 
 	<software name="agingcas">
-		<description>Aging Cassette (Jpn)</description>
+		<description>SNSP Aging Test (Jpn, v1.02)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="131072">

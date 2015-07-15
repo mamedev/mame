@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="kayproii" description="Kaypro II disk images">
+<softwarelist name="kayproii" description="Kaypro II system disk images">
 
 <!-- Operating systems -->
 
 	<software name="cpmboot">
-		<description>CP/M 2.2 Boot Disk (Ger)</description>
+		<description>Kaypro CP/M 2.2 (GM v2.72)</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -15,8 +15,8 @@
 		</part>
 	</software>
 
-	<software name="cpm22">
-		<description>CP/M 2.2</description>
+	<software name="64kcpm22">
+		<description>64k CP/M v2.2</description>
 		<year>19??</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -28,7 +28,8 @@
 
 <!-- Programs -->
 
-	<software name="calc">
+	<!-- making copies of the "Perfect" disks will still result in the master disk message -->
+	<software name="calc" supported="no">
 		<description>Perfect Calc v1.00</description>
 		<year>1982</year>
 		<publisher>Perfect Software</publisher>
@@ -39,7 +40,7 @@
 		</part>
 	</software>
 
-	<software name="speller">
+	<software name="speller" supported="no">
 		<description>Perfect Speller</description>
 		<year>1982</year>
 		<publisher>Perfect Software</publisher>
@@ -50,7 +51,7 @@
 		</part>
 	</software>
 
-	<software name="writer">
+	<software name="writer" supported="no">
 		<description>Perfect Writer</description>
 		<year>1982</year>
 		<publisher>Perfect Software</publisher>
@@ -61,7 +62,8 @@
 		</part>
 	</software>
 
-	<software name="writerdoc" cloneof="writer">
+	<!-- these are to be used with writer in flop1 -->
+	<software name="writdoc" supported="no">
 		<description>Perfect Writer - Docs and Utilities</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -72,7 +74,7 @@
 		</part>
 	</software>
 
-	<software name="writerless" cloneof="writer">
+	<software name="writless" supported="no">
 		<description>Perfect Writer - Lessons</description>
 		<year>198?</year>
 		<publisher>Perfect Software</publisher>
@@ -83,8 +85,8 @@
 		</part>
 	</software>
 
-	<software name="profit">
-		<description>Profit Plan</description>
+	<software name="profit" supported="no">
+		<description>ProfitPlan</description>
 		<year>1982</year>
 		<publisher>Chang Laboratories</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -94,7 +96,7 @@
 		</part>
 	</software>
 
-	<software name="teach">
+	<software name="teach" supported="no">
 		<description>Select - Teach</description>
 		<year>1981</year>
 		<publisher>Select Information Systems</publisher>
@@ -105,7 +107,7 @@
 		</part>
 	</software>
 
-	<software name="workproc">
+	<software name="workproc" supported="no">
 		<description>Select - Work Processor</description>
 		<year>1981</year>
 		<publisher>Select Information Systems</publisher>
@@ -117,7 +119,7 @@
 	</software>
 
 	<software name="wordstar">
-		<description>WordStar v3.3</description>
+		<description>WordStar (Release 3.3, #ABH874G7)</description>
 		<year>1983</year>
 		<publisher>MicroPro</publisher>
 		<part name="flop1" interface="floppy_5_25">

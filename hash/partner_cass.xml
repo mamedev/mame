@@ -598,7 +598,7 @@
 	</software>
 
 	<software name="tetris4">
-		<description>TETRIS4</description>
+		<description>Unknown Tetris game</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="partner_cass">
@@ -608,7 +608,7 @@
 		</part>
 	</software>
 
-	<software name="torpatt">
+	<software name="torpatk">
 		<description>Torpednaya Ataka</description>
 		<year>1990</year>
 		<publisher>UPP-8 VOS?</publisher>

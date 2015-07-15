@@ -908,7 +908,6 @@ Unreleased (possibly no prototypes exist):
 		<description>Ultra Vortek (v0.94, Prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="J9082E 700782-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="ultra vortek (world) (v0.94) (beta).j64" size="4194304" crc="a27823d8" sha1="e3bd433bc4a573f3b05652239a6614c3878a04d1" offset="000000" />

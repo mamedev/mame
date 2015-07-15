@@ -2,24 +2,31 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 TODO:
-add first release date were applicable
 add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
-add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
 add ntsc pal compatibility (<sharedfeat name="compatibility" value="NTSC,PAL"/>)
-add rom names from pcbs (lack of)
-add serials for radiola and jopacs
+add rom names and other chips from pcbs (need pics)
+add brazil, canada, radiola entries ("need to be confirmed/dumped")
 -->
 <!--
 Undumped:
 Spaans          (spanish to dutch translator)
 Crazy Horses
 
-Protos:
+USA:
+Pairs               )
+Space Rendezvous    } released on one cart in Europe
+Logic               )
+
+Jopac:
+Des Chiffres et des Lettres
+
+Prototypes:
 Bastion         youtube.com/watch?v=cFdmgs4r7_E
 Catburglar      youtube.com/watch?v=DDsWDFxy0oE
 Himalaya        youtube.com/watch?v=L_lvOs6EnA4
 SoundTool       youtube.com/watch?v=7JYn6B7rxqw
 Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
+Melrep          (real name unknown, label on eeprom)
 
 http://www.ozyr.com/rene/PICS/protos.jpg
 Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
@@ -37,18 +44,20 @@ Pick Axe Pete
 
 Unreleased, possibly no prototypes exist:
 A Turma da Mônica [Mônica's Gang]
-Pink Panther
+Pink Panther (programmed by Ed Averett?)
 Clean Up Yer Act (programmed by Robert S. Harris, never completed)
 Star Wars (GST Video)
 Moonsweeper (Imagic)
 Fathom (Imagic)
 -->
 <!--
-NOTE:
-PAL colours leave a lot to be desired
-Chess needs emulation of the C7010 Chess Module, which had a NSC800 CMOS microprocessor, which gave the G7000 extra CPU and memory.
-The C7420 Home Computer Module, which contains a Z80 microprocessor running at 3.574 MHz,
-adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
+TO BE EMULATED (possibly when the Voice is slotified):
+C7010 Chess Module - NSC800 CMOS microprocessor running at 4.43 MHz, 2K RAM, 8K ROM (ROM to be dumped, existing ROM underdumped?)
+      http://www.cyberroach.com/vidpac/vidhard/new_vid_c7010.htm
+C7420 Home Computer Module - Z80A microprocessor running at 3.574 MHz, adds 16K RAM and 18K ROM
+      "one 2564 8K*8 EPROM and one windowless 2564 8K*8 PROM in the add-on and one 2516 2K*8 EPROM in the cartridge.
+      8K ROM is being taken up by the Microsoft Z80 BASIC."
+      http://www.cyberroach.com/vidpac/vidhard/new_vid_c7420.htm
 -->
 <softwarelist name="odyssey2" description="Magnavox Odyssey2 cartridges">
 <!-- Philips Videopac G7000/Magnavox Odyssey² carts -->
@@ -59,6 +68,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="9"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -72,6 +82,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AC9406"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -106,10 +117,11 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="musician">
+	<software name="musician" supported="no">
 		<description>Musician (Euro)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
+		<info name="programmer" value="Jon Shuttleworth &amp; Peter van Twist" />
 		<info name="serial" value="31"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -125,6 +137,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Robert L. Cheezem" />
 		<info name="serial" value="AC9440"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -134,11 +147,13 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 	</software>
 
 <!-- Educational -->
-	<software name="number">
+	<software name="scholmth">
 		<description>Playschool Maths (Euro) ~ I've Got Your Number (USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AC9413 (USA) ~ 13 (Euro)"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -147,12 +162,13 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="2mthecho">
+	<software name="mathecho">
 		<description>Mathematician/Echo (Euro) ~ Math-a-Magic!/Echo! (USA)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
-		<info name="usage" value="Press 1 for Mathematician/Math-a-Magic, press 2 for Echo" />
+		<info name="usage" value="Press 1 for Mathematician/Math-a-Magic, press 4 for Echo" />
 		<info name="serial" value="AJ9405 (USA) ~ 7 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -161,11 +177,13 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="2mthechf" cloneof="2mthecho">
+	<software name="mathechof" cloneof="mathecho">
 		<description>Mathématicien/Echo (Fra)</description>
 		<year>1980</year>
 		<publisher>Radiola</publisher>
-		<info name="usage" value="Press 1 for Mathématicien, press 2 for Echo" />
+		<info name="usage" value="Press 1 for Mathématicien, press 4 for Echo" />
+		<info name="serial" value="7"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -191,6 +209,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Morse (Fra)</description>
 		<year>1983</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="45"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -203,8 +222,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Nimble Numbers Ned! (USA)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Robert S. Harris" />
 		<info name="serial" value="AC9439"/>
+		<info name="programmer" value="Robert S. Harris" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -214,15 +233,19 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 	</software>
 
 	<software name="sidspell">
-		<description>Sid the Spellbinder (USA)</description>
+		<description>S.I.D. the Spellbinder (USA)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Sam Overton" />
 		<info name="serial" value="AC9438"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
 				<rom name="sid the spellbinder (usa).bin" size="4096" crc="1b9f2f16" sha1="dfed128d213d4192313f85fe2b8716579c2fc995" offset="0" />
+			</dataarea>
+			<!-- Additional Speech data for The Voice -->
+			<dataarea name="speech" size="16384">
+				<rom name="spr128-004.bin" size="16384" crc="e79dfb75" sha1="37f33d79ffd1739d7c2f226b010a1eac28d74ca0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -281,6 +304,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>4 en 1 Ligne (Fra)</description>
 		<year>1982</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="40"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -289,11 +313,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="alieninv">
+	<software name="spacemon">
 		<description>Space Monster (Euro) ~ Alien Invaders - Plus! (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AA9428 (USA) ~ 22 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -302,11 +327,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="alpine">
+	<software name="skiing">
 		<description>Skiing (Euro) ~ Alpine Skiing! (USA)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AK9418 (USA) ~ 25 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -315,10 +341,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="ski" cloneof="alpine">
+	<software name="ski" cloneof="skiing">
 		<description>Ski (Fra)</description>
 		<year>1979</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="25"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -327,7 +355,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="2armrsub">
+	<software name="2warbtle">
 		<description>Air-Sea War/Battle (Euro) ~ Armored Encounter!/Sub Chase! (USA)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
@@ -345,6 +373,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Atlantis (Euro, USA)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
+		<info name="serial" value="720076-1A"/>
 		<info name="programmer" value="Jeff Ronnie" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -359,6 +388,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AC9445"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -384,7 +414,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Blobbers (Euro)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="56"/>
+		<info name="serial" value="57"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -393,12 +423,13 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="2blckbrk">
+	<software name="2dambust">
 		<description>Dam Buster (Euro) ~ Blockout!/Breakdown! (USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 0 then 1 for Blockout/Dam Buster, press 0 then 2 for Breakdown" />
 		<info name="serial" value="AA9427 (USA) ~ 29 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -407,10 +438,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="magique" cloneof="2blckbrk">
+	<software name="magique" cloneof="2dambust">
 		<description>Le Mûr Magique (Fra)</description>
 		<year>1981</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="29"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -425,6 +458,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for League Night Bowling, press 2 for Tournament Play Bowling, press 3 for Basketball" />
 		<info name="serial" value="AJ9404 (USA) ~ 6 (Euro)"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -437,7 +471,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Jeu de Quilles/Basketball (Fra)</description>
 		<year>1978</year>
 		<publisher>Radiola</publisher>
-		<info name="usage" value="Press 1 for (League Night Bowling), press 2 for (Tournament Play Bowling), press 3 for Basketball" />
+		<info name="usage" value="Press 1 for 'League Night Bowling', press 2 for 'Tournament Play Bowling', press 3 for Basketball" />
+		<info name="serial" value="6"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -450,6 +486,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Buraco Negro! (Bra)</description>
 		<year>1984</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9473"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -462,6 +499,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Neutron Star (Euro, Prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
+		<info name="programmer" value="Graham Thomasson"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -470,11 +508,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="casino">
+	<software name="vegasgam">
 		<description>Las Vegas Gambling (Euro) ~ Casino Slot Machine! (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AA9426 (USA) ~ 23 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -483,10 +522,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="lasvegas" cloneof="casino">
+	<software name="lasvegas" cloneof="vegasgam">
 		<description>Las Vegas (Fra)</description>
 		<year>1980</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="23"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -535,10 +576,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="chezmxme"><!-- I know it's a clone of something... -->
+	<software name="chezmxme">
 		<description>Chez Maxime (Fra)</description>
 		<year>198?</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="VXT A08"/>
+		<info name="alt_title" value="Restaurant"/><!-- alternate manual containing 6 languages -->
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -564,6 +607,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Desafio Chinês! (Bra)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9462"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -576,6 +620,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Clay Pigeon! (Bra)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9474"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -588,6 +633,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Comando Noturno! (Bra)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9475"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -613,6 +659,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AB9431 (USA) ~ 41 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -627,23 +674,11 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<info name="usage" value="Uses the 2nd joystick" />
 		<info name="serial" value="11"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="cosmic conflict (europe).bin" size="2048" crc="f4c2075e" sha1="a22f99dcc4aba3126f5b5bbbf2a3890878ac953b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="conflit" cloneof="cosmic">
-		<description>Conflit Cosmique (Can, Fra?)</description>
-		<year>1980</year>
-		<publisher>Philips</publisher>
-		<info name="usage" value="Uses the 2nd joystick" />
-		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="2048">
-				<rom name="conflit cosmique (canada).bin" size="2048" crc="2f6e4b46" sha1="e54fe13ee27884524255063aa6fd69e4598a5104" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -653,10 +688,27 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Uses the 2nd joystick" />
+		<info name="serial" value="11"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
 				<rom name="cosmic conflict (europe) (alt).bin" size="2048" crc="2a5f0b2b" sha1="9f8f10c9e6e1a5e07eb5a6eee4e0fe19fcaee17f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conflit" cloneof="cosmic">
+		<description>Conflit Cosmique (Can)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<info name="serial" value="AJ9411"/>
+		<info name="programmer" value="Sam Overton" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="2048">
+				<rom name="conflit cosmique (canada).bin" size="2048" crc="2f6e4b46" sha1="e54fe13ee27884524255063aa6fd69e4598a5104" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -667,6 +719,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<info name="usage" value="Uses the 2nd joystick" />
 		<info name="serial" value="AJ9411"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -679,6 +732,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Demon Attack (Euro, USA)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
+		<info name="serial" value="720075-1A"/>
 		<info name="programmer" value="Dave Johnson" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -688,7 +742,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="2dpthmrk" supported="partial">
+	<software name="2dpthmrk">
 		<description>Depth Charge/Marksman (Euro)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
@@ -717,11 +771,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="soccer">
+	<software name="elctftbl">
 		<description>Electronic Table Football (Euro) ~ Electronic Table Soccer (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AA9423 (USA) ~ 27 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -748,6 +803,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AC9436 (USA) ~ 39 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -801,6 +857,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AJ9410"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -814,6 +871,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AC9434 (USA) ~ 46 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -826,6 +884,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Wall Street (Bra)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9434"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -852,6 +912,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AK9416"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -866,6 +927,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<info name="usage" value="Move joystick when game is on screen." />
 		<info name="serial" value="AK9420 (USA) ~ 36 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -879,6 +941,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1981</year>
 		<publisher>Radiola</publisher>
 		<info name="usage" value="Move joystick when game is on screen." />
+		<info name="serial" value="36"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -904,8 +968,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Jumping Acrobats (Euro)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Jim Butler" />
 		<info name="serial" value="33"/>
+		<info name="programmer" value="Jim Butler" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -918,6 +982,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Jumping Acrobats (Euro, Alt)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="33"/>
 		<info name="programmer" value="Jim Butler" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -931,8 +996,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>P.T. Barnum's Acrobats! (USA)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Jim Butler" />
 		<info name="serial" value="AC9443"/>
+		<info name="programmer" value="Jim Butler" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -941,11 +1006,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="kckrazy">
+	<software name="crazchse">
 		<description>Crazy Chase (Euro) ~ K.C.'s Krazy Chase! (USA)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AC9442 (USA) ~ 44 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -954,12 +1020,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="bees">
-		<description>Killer Bees! (USA)</description><!-- also "Killer Bees (Euro)[Videopac 52]"? -->
+	<software name="kllrbees">
+		<description>Killer Bees! (USA)</description><!-- same as "Killer Bees (Euro)[Videopac 52]"? -->
 		<year>1983</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Robert S. Harris" />
 		<info name="serial" value="AC9447"/>
+		<info name="programmer" value="Robert S. Harris" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -981,11 +1047,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="lsvsblck">
+	<software name="blckjack">
 		<description>Blackjack (Euro) ~ Las Vegas Blackjack! (USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AJ9401 (USA) ~ 5 (Euro)"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -994,10 +1061,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="blackjck" cloneof="lsvsblck">
+	<software name="blckjackf" cloneof="blckjack">
 		<description>Blackjack (Fra)</description>
 		<year>1980</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="5"/>
+		<info name="programmer" value="Sam Overton" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1023,6 +1092,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Guerre Lazer (Fra)</description>
 		<year>1980</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="18"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1036,6 +1106,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AK9414"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1048,6 +1119,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Balão Travesso! (Bra)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9476"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1072,7 +1144,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Martian Threat (Euro, Prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Jake Dowding?" /><!-- first prototype found was named "Jake" -->
+		<info name="programmer" value="Jake Dowding" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1101,6 +1173,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Magnavox</publisher>
 		<info name="usage" value="Press 1 for Matchmaker 1 player, press 2 for Matchmaker 2 players, press 3 for Buzzword, press 4 for Logix" />
 		<info name="serial" value="AJ9407"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1126,8 +1199,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Monkeyshines (Euro) ~ Monkeyshines! (USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AB9432 (USA) ~ 37 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1153,6 +1226,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Chat et Souris (Fra)</description>
 		<year>1983</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="47"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1165,8 +1239,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Munchkin (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="38"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1175,12 +1249,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="kcmunch">
+	<software name="kcmunch" cloneof="munchkin">
 		<description>K.C. Munchkin! (USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AC9435"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1215,12 +1289,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="pachinko">
+	<software name="basktgme">
 		<description>Basket Game (Euro) ~ Pachinko! (USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AA9425 (USA) ~ 26 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1234,6 +1308,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
 		<info name="serial" value="AC9437 (USA) ~ 43 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1256,7 +1331,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 	</software>
 
 	<software name="playtag">
-		<description>Plantage ~ Play Tag (Euro, Prototype)</description>
+		<description>Play Tag (Euro, Prototype)</description><!-- also known as "Catch" or "Plantage" -->
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -1271,8 +1346,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Electronic Billiards (Euro) ~ Pocket Billiards! (USA)</description>
 		<year>1978</year>
 		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AC9424 (USA) ~ 35 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1285,6 +1360,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Billard Américain (Fra)</description>
 		<year>1978</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="35"/>
 		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -1298,7 +1374,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Popeye (Euro)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<info name="serial" value="981519"/>
+		<info name="programmer" value="Gil Williamson &amp; Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1311,7 +1388,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Popeye (Bra)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<info name="serial" value="06 AV 9484"/>
+		<info name="programmer" value="Gil Williamson &amp; Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1326,6 +1404,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<publisher>Philips</publisher>
 		<info name="usage" value="Uses the 2nd joystick" />
 		<info name="serial" value="AC9448"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1338,7 +1417,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Q*bert (Euro)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<info name="serial" value="981517"/>
+		<info name="programmer" value="Gil Williamson &amp; Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1351,8 +1431,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Quest for the Rings (Euro, USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AC9429 (USA) ~ 42 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1365,6 +1445,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>La Quête des Anneux (Fra)</description>
 		<year>1982</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="42"/>
 		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -1378,6 +1459,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Barão Vermelho! (Bra)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9477"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1402,6 +1484,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Robot City (Euro, Prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
+		<info name="programmer" value="Graham Thomasson"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1414,8 +1497,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Samurai (Euro)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="15"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1424,12 +1507,12 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="dynasty" cloneof="samurai">
+	<software name="dynasty" cloneof="samurai"><!-- "Directional Dynasty!"? -->
 		<description>Dynasty! (USA)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AK9421"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1442,8 +1525,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Satellite Attack (Euro)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="34"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1456,8 +1539,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>UFO! (USA)</description>
 		<year>1982</year>
 		<publisher>Magnavox</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AB9430"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1470,6 +1553,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Syracuse (Fra)</description>
 		<year>1981</year>
 		<publisher>Jopac</publisher>
+		<info name="serial" value="VXT A07"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1495,6 +1579,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>O Segredo do Faraó! (Bra)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9464"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1535,6 +1620,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1978</year>
 		<publisher>Radiola</publisher>
 		<info name="usage" value="Press 1 for Course de Voitures, press 2 for 3-lap Autodrome, press 4 for 15-lap Autodrome, press 5 for Cryptogramme" />
+		<info name="serial" value="1"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1559,8 +1645,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Stone Sling (Euro)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Robert L. Cheezem" />
 		<info name="serial" value="20"/>
+		<info name="programmer" value="Robert L. Cheezem" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1573,8 +1659,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Smithereens! (USA)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Robert L. Cheezem" />
 		<info name="serial" value="AC9441"/>
+		<info name="programmer" value="Robert L. Cheezem" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1587,8 +1673,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Super Bee (Euro)</description>
 		<year>1983</year>
 		<publisher>GST Video</publisher>
-		<info name="programmer" value="Mick Rouse" />
 		<info name="serial" value="50"/>
+		<info name="programmer" value="Mick Rouse" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1601,6 +1687,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Super Bee! (Bra)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
+		<info name="serial" value="06 AV 9472"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="4096">
@@ -1613,6 +1700,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Super Cobra (Euro)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="981505"/>
+		<info name="programmer" value="Graham Thomasson"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1625,6 +1714,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Super Cobra (Bra)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="06 AV 9486"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1637,8 +1727,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Take the Money and Run (Euro) ~ Take the Money and Run! (USA)</description>
 		<year>1978</year>
 		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="programmer" value="Ed Averett"/>
 		<info name="serial" value="AJ9412 (USA) ~ 12 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1651,6 +1741,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Prendre l'Argent et Fuir (Fra)</description>
 		<year>1978</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="12"/>
 		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -1665,6 +1756,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1979</year>
 		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
 		<info name="serial" value="AK9415 (USA) ~ 24 (Euro)"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1677,6 +1769,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Flipper (Fra)</description>
 		<year>1980</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="24"/>
+		<info name="programmer" value="Ed Averett"/>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1689,8 +1783,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Turtles (Euro)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Jim Butler" />
 		<info name="serial" value="49"/>
+		<info name="programmer" value="Jim Butler" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1700,11 +1794,11 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 	</software>
 
 	<software name="turtlesu" cloneof="turtles">
-		<description>Turtles (USA)</description>
+		<description>Turtles! (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
-		<info name="programmer" value="Jim Butler" />
 		<info name="serial" value="AC9446"/>
+		<info name="programmer" value="Jim Butler" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1717,7 +1811,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Tutankham (Euro, Prototype)</description>
 		<year>198?</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<info name="programmer" value="Gil Williamson &amp; Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="8192">
@@ -1730,8 +1824,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Electronic Volleyball (Euro) ~ Volleyball! (USA)</description>
 		<year>1979</year>
 		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
-		<info name="programmer" value="Ed Averett" />
 		<info name="serial" value="AA9422 (USA) ~ 28 (Euro)"/>
+		<info name="programmer" value="Ed Averett" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="2048">
@@ -1744,6 +1838,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<description>Volleyball (Fra)</description>
 		<year>1979</year>
 		<publisher>Radiola</publisher>
+		<info name="serial" value="28"/>
 		<info name="programmer" value="Ed Averett" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />

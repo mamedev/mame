@@ -126,7 +126,7 @@
 	</software>
 
 	<software name="voice41">
-		<description>Speech syntesis software v.?.?</description>
+		<description>Speech synthesis software v.?.?</description>
 		<year>19??</year>
 		<publisher>??</publisher>
 		<part name="flop1" interface="floppy_5_25">

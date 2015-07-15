@@ -2,7 +2,34 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <softwarelist name="svmu" description="Sega Visual Memory Unit quickloads">
+<!--
+These need to be dumped (sorted by Dreamcast game):
+[*] Not stand-alone so the VMU is unplugged/Dreamcast turned off after transfer to keep the data on the VMU
+VMU game/app                            Dreamcast game
 
+Mini Anima Notebook                     Animastar
+Rich Life Collection                    Climax Landers
+Yogurt's Big Adventure                  Climax Landers
+Bababa Battle                           Image Real Sound - Kaze No Regret
+Jet Set Radio - Graffiti Download Tool  Jet Set Radio [*]
+Fumio                                   Pocke-Kano: Yumi, Shizuka, Fumio: Pocke-Kano
+Shizuka                                 Pocke-Kano: Yumi, Shizuka, Fumio: Pocke-Kano
+Yumi                                    Pocke-Kano: Yumi, Shizuka, Fumio: Pocke-Kano
+Collect Gachara                         Rent A Hero No. 1
+Sega Rally 2 - Record Viewer            Sega Rally 2
+Shenmue Goodies                         Shenmue [on the Passport disc, is this shenmues and shenmuea (shenmuea is from PAL disc)?]
+Pinta Quest                             Skies Of Arcadia [good dump needed, if possible]
+Chao Puzzle                             Sonic Adventure [*]
+Speed Devils - Championship Viewer      Speed Devils
+Climax Editor #2                        Super Runabout
+Climax Editor #1                        Time Stalkers
+Tokyo Bus Guide - PDA Quiz              Tokyo Bus Guide
+
+These may be only on special edition Godzilla VMUs, and possibly lost:
+Atsumete Godzilla                       Godzilla Generations
+Gamera Dream Battle                     Godzilla Generations
+Mothra Dream Battle                     Godzilla Generations
+-->
 	<software name="chaoadv1">
 		<description>Chao Adventure</description>
 		<year>1999</year>
@@ -10,7 +37,20 @@
 		<info name="source" value="Sonic Adventure" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="65536">
-				<rom name="chao adventure (1999)(sega)[sonic adventure].vms" size="65536" crc="09e93592" sha1="f35738795fd1799bbffb6c3df8d4f208ccf437b5" offset="0" />
+				<rom name="chao_adventure.vms" size="65536" crc="09e93592" sha1="f35738795fd1799bbffb6c3df8d4f208ccf437b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Sonic Adventure/ O Sanpo -->
+	<software name="chaoadv1p" cloneof="chaoadv1">
+		<description>Chao Adventure (Prototype, E3)</description><!-- AFAIK, the only difference is the addition of a title screen -->
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="ソニックアドベンチャー／おさんぽ (Dreamcast description)"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="65536">
+				<rom name="o sanpo adventure.vms" size="65536" crc="663a79be" sha1="af3ab014bd6982899517b34dbe0c98471d4c004c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +62,7 @@
 		<info name="source" value="Sonic Adventure 2" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="65536">
-				<rom name="chao adventure 2 (sega)(2001)[sonic adventure 2].vms" size="65536" crc="9c464d76" sha1="4190654ed0cede2d852fbe7c7f612a4c1b4a45b3" offset="0" />
+				<rom name="chao adv 2.vms" size="65536" crc="9c464d76" sha1="4190654ed0cede2d852fbe7c7f612a4c1b4a45b3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +74,7 @@
 		<info name="source" value="Sonic Adventure 2" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="65536">
-				<rom name="chao adventure 2 (2001)(sega)(fr)[sonic adventure 2].vms" size="65536" crc="20f25e00" sha1="6e57f9447fdbcf69fddbb3b7a187f7043dcd9de0" offset="0" />
+				<rom name="chao adv 2_f.vms" size="65536" crc="20f25e00" sha1="6e57f9447fdbcf69fddbb3b7a187f7043dcd9de0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,215 +86,583 @@
 		<info name="source" value="Evolution 2" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="15360">
-				<rom name="linear watch (2000)(esp software)[evolution 2].vms" size="15360" crc="16b6f34c" sha1="556b7d4235c08e03e1eec0bb6527f63dc5ec78a4" offset="0" />
+				<rom name="linear watch.vms" size="15360" crc="16b6f34c" sha1="556b7d4235c08e03e1eec0bb6527f63dc5ec78a4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mvsc2">
-		<description>Marvel VS. Capcom 2 vs. Com (Jpn)</description>
+		<description>Marvel vs. Capcom 2 vs. COM (Jpn)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<info name="source" value="Marvel vs. Capcom 2" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="32768">
-				<rom name="marvel vs. capcom 2 vs. com (2000)(capcom)(jp)[marvel vs. capcom 2].vms" size="32768" crc="3f621910" sha1="b52bed579019bec07b818c802b72277be0c4430c" offset="0" />
+				<rom name="mvs.c2_vs.com.vms" size="32768" crc="3f621910" sha1="b52bed579019bec07b818c802b72277be0c4430c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="popnm1">
-		<description>Pop 'n Music Vol. 1 (Jpn)</description>
+	<software name="pacit">
+		<description>PAC-it</description>
+		<year>2000</year>
+		<publisher>Namco</publisher>
+		<info name="source" value="Namco Museum" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="4608">
+				<rom name="pacit.vms" size="4608" crc="29a2ecf1" sha1="b2e99c95757f0a5371c58d468b52631650cd01f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popnmus1">
+		<description>Doko Demo Pop 'n Music (Jpn)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
-		<info name="source" value="Pop 'n Music" />
+		<info name="source" value="Pop 'n Music 2" />
+		<info name="alt_title" value ="どこでもポップンミュージック"/>
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="28672">
-				<rom name="pop 'n music vol. 1 (1999)(konami)(jp)[pop 'n music].vms" size="28672" crc="7ce75350" sha1="339ebf13c557c14851e171202d3b105dee9fce6b" offset="0" />
+				<rom name="popn vm.vms" size="28672" crc="7ce75350" sha1="339ebf13c557c14851e171202d3b105dee9fce6b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="popnm2">
-		<description>Pop 'n Music Vol. 2 (Jpn)</description>
+	<software name="popnmus2">
+		<description>Doko Demo Pop 'n Music Vol. 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
-		<info name="source" value="Pop 'n Music" />
+		<info name="source" value="Pop 'n Music 3" />
+		<info name="alt_title" value="どこでもポップンミュージックVol.2"/>
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="30720">
-				<rom name="pop 'n music vol. 2 (2000)(konami)(jp)[pop 'n music].vms" size="30720" crc="c2a1cd70" sha1="3dfbd8cf625728040676e17409b10914cb9917e7" offset="0" />
+				<rom name="popn vm vol2.vms" size="30720" crc="c2a1cd70" sha1="3dfbd8cf625728040676e17409b10914cb9917e7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="popnm3">
-		<description>Pop 'n Music Vol. 3 (Jpn)</description>
+	<software name="popnmus3">
+		<description>Doko Demo Pop 'n Music Vol. 3 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
-		<info name="source" value="Pop 'n Music" />
+		<info name="source" value="Pop 'n Music 4" />
+		<info name="alt_title" value="どこでもポップンミュージックVol.3"/>
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="30720">
-				<rom name="pop 'n music vol. 3 (2000)(konami)(jp)[pop 'n music].vms" size="30720" crc="96fef522" sha1="56a46d89187a04d26fe20cc4b697b23eebedb96e" offset="0" />
+				<rom name="popn vm vol3.vms" size="30720" crc="96fef522" sha1="56a46d89187a04d26fe20cc4b697b23eebedb96e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pstone">
+	<software name="pwrstone">
 		<description>Powerstone Mini</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
 		<info name="source" value="Power Stone" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="65536">
-				<rom name="powerstone mini (1999)(capcom)[power stone].vms" size="65536" crc="04d6a41f" sha1="177781ab7023de28216b33d237d2ee7e57b66205" offset="0" />
+				<rom name="p.stone mini.vms" size="65536" crc="59e7cf40" sha1="3d958599b9d7b1d169a53f723316869844373348" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pstone2">
-		<description>Power Stone 2 Mini Store (Jpn)</description>
+		<description>Power Stone 2 - Mini Zukan (Jpn)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<info name="source" value="Power Stone 2" />
+		<info name="alt_title" value="Power Stone 2 - ミ二ズカン"/>
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="65536">
-				<rom name="power stone 2 mini store (2000)(capcom)(jp)[power stone 2].vms" size="65536" crc="81d456d2" sha1="6ff653848c3dc3205d72363357fc63db4cbf359c" offset="0" />
+				<rom name="powerstone 2 filer.vms" size="65536" crc="81d456d2" sha1="6ff653848c3dc3205d72363357fc63db4cbf359c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="segagt">
+		<description>Homopoke - Isuzu (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="Sega GT" />
+		<info name="alt_title" value="ホモポケ イフブ"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="65536">
+				<rom name="segagt minigame.vms" size="65536" crc="9eed83ea" sha1="8ea70e846a9a42877a62a790d8329dd72fe4749f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gtameric">
-		<description>Sega GT Pocket America</description>
+		<description>Pocket GT - America</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="source" value="Sega GT" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="65536">
-				<rom name="sega gt pocket america (2000)(sega - wow-ent)[sega gt].vms" size="65536" crc="20084dc1" sha1="5268f5a02bc21239fd0ea2d25b08cbc00bc83220" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gt">
-		<description>Sega GT (Jpn)</description>
-		<year>2000</year>
-		<publisher>Sega</publisher>
-		<info name="source" value="Sega GT" />
-		<part name="quik" interface="svmu_quik">
-			<dataarea name="rom" size="65536">
-				<rom name="sega gt (2000)(sega)(jp)[sega gt].vms" size="65536" crc="9eed83ea" sha1="8ea70e846a9a42877a62a790d8329dd72fe4749f" offset="0" />
+				<rom name="mini game.vms" size="65536" crc="20084dc1" sha1="5268f5a02bc21239fd0ea2d25b08cbc00bc83220" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gteurope">
-		<description>Sega GT Pocket Europe</description>
+		<description>Pocket GT - Europe</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="source" value="Sega GT" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="65536">
-				<rom name="sega gt pocket europe (2000)(sega - wow-ent)[sega gt].vms" size="65536" crc="c8490720" sha1="e82dce08ad914ff275f1cfcf64e90d4c8c00d58a" offset="0" />
+				<rom name="mini game.vms" size="65536" crc="c8490720" sha1="e82dce08ad914ff275f1cfcf64e90d4c8c00d58a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gtjapan">
-		<description>Sega GT Pocket Japan</description>
+		<description>Pocket GT - Japan</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="source" value="Sega GT" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="65536">
-				<rom name="sega gt pocket japan (2000)(sega - wow-ent)[sega gt].vms" size="65536" crc="7d4b5c34" sha1="32e0dae07dd17de9981c84de9e12b2af6677353d" offset="0" />
+				<rom name="mini game.vms" size="65536" crc="7d4b5c34" sha1="32e0dae07dd17de9981c84de9e12b2af6677353d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="shenmue">
-		<description>Shenmue (Jpn)</description>
+	<software name="shenmuea">
+		<description>Atsumete Shenmue '99 Autumn Tokyo Game Show (Jpn)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
-		<info name="source" value="Shenmue" />
+		<info name="alt_title" value="ｱﾂﾒﾃｼｪﾝﾑｰ'99 AUTUMN ﾄｳｷｮｳｹﾞｰﾑｼｮｳ (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="25263">
+				<rom name="atsumete shenmue.vms" size="25263" crc="127317db" sha1="b29814a494cd0197aaa387b586a9297383dda748" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shenmues">
+		<description>Atsumete Shenmue '99 Spring Tokyo Game Show (Jpn, Bad?)</description><!-- contains remnants of character data -->
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="ｱﾂﾒﾃｼｪﾝﾑｰ '99SPRING ﾄｳｷｮｳｹﾞｰﾑｼｮｳ (Dreamcast description)" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="25600">
-				<rom name="shenmue (1999)(sega)(jp)[shenmue].vms" size="25600" crc="3fcab726" sha1="ea52613cf39b965266ad32501d8caa6286de4e57" offset="0" />
+				<rom name="atsumete shenmue.vms" size="25600" crc="3fcab726" sha1="ea52613cf39b965266ad32501d8caa6286de4e57" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sc31mini">
-		<description>Soul Calibur 3-1 Mini (Jpn)</description>
+	<software name="sctxtadv">
+		<description>SoulCalibur Text Adventure - Shenhua's Story (Jpn)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
 		<info name="source" value="SoulCalibur" />
-		<part name="quik" interface="svmu_quik">
-			<dataarea name="rom" size="50176">
-				<rom name="soul calibur 3-1 mini (1999)(namco)(jp)[soulcalibur].vms" size="50176" crc="d23dfe42" sha1="bf34e85fb481a3e920dab7517dd170c28f5c4ad5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sctext">
-		<description>SoulCalibur Text Adventure (Jpn)</description>
-		<year>1999</year>
-		<publisher>Namco</publisher>
-		<info name="source" value="SoulCalibur" />
+		<info name="alt_title" value="ソウルキャリバー/VMゲーム　2 (Dreamcast description)" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="50688">
-				<rom name="soulcalibur text adventure (1999)(namco)(jp)[soulcalibur].vms" size="50688" crc="eedc89ee" sha1="3783708b76cdfd2a5f027c39ff45236c1244baa4" offset="0" />
+				<rom name="calibur vm adv game.vms" size="50688" crc="eedc89ee" sha1="3783708b76cdfd2a5f027c39ff45236c1244baa4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scvmugp">
-		<description>SoulCalibur VMU Game Pack </description>
+	<software name="sclbrvmu">
+		<description>SoulCalibur Mini-Game 3 Pack</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
 		<info name="source" value="SoulCalibur" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="50176">
-				<rom name="soulcalibur vmu game pack (1999)(namco)[soulcalibur].vms" size="50176" crc="6068eb49" sha1="b3d87d67b8ca59887e9680b4213239881bb4360c" offset="0" />
+				<rom name="sc vmu game pak.vms" size="50176" crc="6068eb49" sha1="b3d87d67b8ca59887e9680b4213239881bb4360c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc31mini" cloneof="sclbrvmu">
+		<description>SoulCalibur 3-1 Mini (Jpn)</description>
+		<year>1999</year>
+		<publisher>Namco</publisher>
+		<info name="source" value="SoulCalibur" />
+		<info name="alt-title" value="ソウルキャリバー/VMゲーム 1 (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="50176">
+				<rom name="calibur vm gamepack.vms" size="50176" crc="d23dfe42" sha1="bf34e85fb481a3e920dab7517dd170c28f5c4ad5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="trickjr">
-		<description>TrickStyle Junior</description>
+		<description>TrickStyle Jr.</description>
 		<year>1999</year>
 		<publisher>Acclaim</publisher>
 		<info name="source" value="TrickStyle" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="3584">
-				<rom name="trickstyle junior (1999)(acclaim)[trickstyle].vms" size="3584" crc="966659f9" sha1="5b46e07f30ecf53ebdfc17eb4accaf3e3d4fa92a" offset="0" />
+				<rom name="trickstyle jr..vms" size="3584" crc="966659f9" sha1="5b46e07f30ecf53ebdfc17eb4accaf3e3d4fa92a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="vmufootb">
-		<description>VMU Football (USA)</description>   <!-- orginally free from dreamcast.com -->
+		<description>VMU Football</description> <!-- originally free from dreamcast.com -->
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="19990929"/>
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="56320">
-				<rom name="vmu football (200x)(sega)(us).vms" size="56320" crc="f0287a8b" sha1="2d75813088b5037b4b1c685fcf4cf428b4411729" offset="0" />
+				<rom name="vmu football.vms" size="56320" crc="f0287a8b" sha1="2d75813088b5037b4b1c685fcf4cf428b4411729" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zombie">
-		<description>Zombie Revenge Training Game</description>
+		<description>Zombie Raising</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="source" value="Zombie Revenge" />
 		<part name="quik" interface="svmu_quik">
 			<dataarea name="rom" size="56320">
-				<rom name="zombie revenge training game (1999)(sega)[zombie revenge].vms" size="56320" crc="7b4ce3c7" sha1="68b584f7c5c7ac119c12641e8b1f01a726c58881" offset="0" />
+				<rom name="zombie revenge.vms" size="56320" crc="7b4ce3c7" sha1="68b584f7c5c7ac119c12641e8b1f01a726c58881" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+<!-- CardCaptor Sakura -->
+	<software name="ccsbreak">
+		<description>Burokkubasuta Kero-chan (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="CardCaptor Sakura" />
+		<info name="alt_title" value="ブロックバスター ケロちゃん (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="20480">
+				<rom name="burokkubasuta kerochan.vms" size="20480" crc="babdddc3" sha1="44d5dde17ff3cd54de0485860929b6169f4eff0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-<!-- Samples from the Katana SDK -->
+	<software name="ccsoyatu">
+		<description>Oyatsu Hanta Kero-chan (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="CardCaptor Sakura" />
+		<info name="alt_title" value="おやつハンターケロちゃん (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="10752">
+				<rom name="oyatsuhanta kerochan.vms" size="10752" crc="382e3b85" sha1="218877ad8bde01b6ed2b76eabbf5fb18426a2052" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccstobak">
+		<description>Tobase Kero-chan (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="CardCaptor Sakura" />
+		<info name="alt_title" value="とばせケロちゃん (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="12288">
+				<rom name="tobase kerochan.vms" size="12288" crc="4165c915" sha1="f98cde80bfc5c0f7a2d61a4d13f54bca5ad7178d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccskero">
+		<description>Kero-chan Tokei (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="CardCaptor Sakura" />
+		<info name="alt_title" value="ケロちゃんとけい (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="4608">
+				<rom name="kerochan tokei.vms" size="4608" crc="d2262ab8" sha1="a8107212008ca88237828633eca044a9625fd596" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccssakur">
+		<description>Sakura-chan Tokei (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="CardCaptor Sakura" />
+		<info name="alt_title" value="さくらちゃんとけい (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="4608">
+				<rom name="sakurachan tokei.vms" size="4608" crc="41c70a75" sha1="1578ccc5c3365e2d678971fa928e5c55d81e79a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccsswars">
+		<description>Sakura Taisen 3 ~ Pari no Futari (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="CardCaptor Sakura" />
+		<info name="alt_title" value="サクラ大戦３ 巴里のふたり (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="32768">
+				<rom name="sakura 3 vm minigame.vms" size="32768" crc="3928d440" sha1="f1f550318a5f8274bd35f58b3cdce3006732e713" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccsrikun">
+		<description>Ri-kun Tokei (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="CardCaptor Sakura" />
+		<info name="alt_title" value="リーくんとけい (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="4608">
+				<rom name="rikun tokei.vms" size="4608" crc="0c240045" sha1="6da7cd5c031a0a8709a1dd3adbf085395f319d38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccstomo">
+		<description>Tomoyo-chan Tokei (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="source" value="CardCaptor Sakura" />
+		<info name="alt_title" value="ともよちゃんとけい (Dreamcast description)" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="4608">
+				<rom name="tomoyochan tokei.vms" size="4608" crc="6320c857" sha1="dae79c0f0c30d1182cb501c810e3f1817851f8e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Evil Twin -->
+<!-- These were not included in the final game, but were released by the programmer -->
+	<software name="fatrain">
+		<description>Fat Rain (Prototype)</description>
+		<year>2000</year>
+		<publisher>Ubisoft</publisher>
+		<info name="programmer" value="Omar Cornut" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="9960">
+				<rom name="fat rain.vms" size="9960" crc="71e31666" sha1="1f1b37c01f35a9636884f375683b87f98c44d8af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glucky">
+		<description>Glucky Laby (Prototype)</description>
+		<year>2000</year>
+		<publisher>Ubisoft</publisher>
+		<info name="programmer" value="Omar Cornut" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="33751">
+				<rom name="glucky laby.vms" size="33751" crc="e8dc8756" sha1="729ce23b12b02c112a548ffb9be919ae0922a1ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paper">
+		<description>Paper Attack (Prototype)</description>
+		<year>2000</year>
+		<publisher>Ubisoft</publisher>
+		<info name="programmer" value="Omar Cornut" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="9310">
+				<rom name="paper attack.vms" size="9310" crc="d7b33182" sha1="579b8fd417634cdd8eca244f950829aa9d6bd146" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swampy">
+		<description>Swampy (Prototype)</description>
+		<year>2000</year>
+		<publisher>Ubisoft</publisher>
+		<info name="programmer" value="Omar Cornut" />
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="9061">
+				<rom name="swampy.vms" size="9061" crc="21b6bba1" sha1="50a8bfe9d1c7c80da4beec8c70e68a5132d73d6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Samples from the Katana SDK (r9: Japanese comments, r10: English comments + "sleep.bin", same binaries in both) -->
+<!-- names taken from ASM sources -->
+	<software name="btimer">
+		<description>Base Timer Interrupt Usage Sample 1 (1.00)</description>
+		<year>1998</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19981208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1453">
+				<rom name="b_timer1.vms" size="1453" crc="d700f593" sha1="a2dcc91aeb03cc2979ddd2eec4d7b0928323c39c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="button">
+		<description>Button Status Detection Sample 1 (1.00)</description>
+		<year>1998</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19981208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1527">
+				<rom name="button1.vms" size="1527" crc="5f30a9ec" sha1="248c949ffdc419a1f0384cf5b8a6427161d3cd9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flashmem">
+		<description>Flash Memory Usage Sample 1 (1.01)</description>
+		<year>1999</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19990208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1792">
+				<rom name="flash1.vms" size="1792" crc="98405d05" sha1="0d9dac96149269bf83ee7f3eb48f43029160e366" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volicon">
+		<description>Volume Icon Data (1.00)</description>
+		<year>1998</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19981208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="704">
+				<rom name="icondata.vms" size="704" crc="8dc97832" sha1="062bb35bc43217cbc39b41034df34c492d39703a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcd1">
+		<description>LCD display processing sample 1 (1.00)</description>
+		<year>1998</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19981208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1320">
+				<rom name="lcd1.vms" size="1320" crc="f0c24980" sha1="a22a25370d47ab275ff65d627c47da2adb08a3bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcd2">
+		<description>LCD display processing sample 2 (1.00)</description>
+		<year>1998</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19981208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1504">
+				<rom name="lcd2.vms" size="1504" crc="beb4672c" sha1="ce612cacf99a54932631094b117fe092d4927777" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lowbatt">
+		<description>Low Battery Detection and Data Save Sample 1 (1.01)</description>
+		<year>1999</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19990208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1536">
+				<rom name="lowbatt1.vms" size="1536" crc="7fe6ed92" sha1="c7d7d032882c7361eedac33042e08b31907ad4ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minsec">
+		<description>Minutes:Seconds counter (LCD display, Timer (T0) interrupt, Sound samples used) (1.01)</description>
+		<year>1999</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19990208"/>
+		<info name="alt_title" value="分・秒カウンタ (LCD表示, タイマ(T0)割り込み, サウンド使用サンプル)"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1585">
+				<rom name="minute1.vms" size="1585" crc="a9018a3a" sha1="b15962c70579d4770fc02c3ba55aadf0125cb848" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scomms1">
+		<description>Serial Communications Sample 1 (Data Transmission) (1.01)</description>
+		<year>1999</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19990208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1309">
+				<rom name="sio1.vms" size="1309" crc="19b20803" sha1="226a40969068d46ded79c87cc5a5b19fe35f2652" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scomms2">
+		<description>Serial Communications Sample 2 (Data Reception) (1.01)</description>
+		<year>1999</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19990208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1557">
+				<rom name="sio2.vms" size="1557" crc="d4ef200e" sha1="6e720e692468f262d85dc8c06930f8f47ebe8dfd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scomms3">
+		<description>Serial Communications Sample 3 (Interrupt-Driven Serial Driver with Reception Buffer) (1.01)</description>
+		<year>1999</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19990208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1699">
+				<rom name="sio3.vms" size="1699" crc="994b7715" sha1="f9b5ba20d497f7b67d740d9f1810ffe3800d28f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sleep">
+		<description>Sleep Function Sample Program (1.00)</description>
+		<year>1999</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19990914"/>
+		<info name="alt_title" value="SLEEP機能 サンプルプログラム"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="2338">
+				<rom name="sleep.vms" size="2338" crc="e80a0fff" sha1="a3102407f29c2d1f2d5d3391b30328b234d2dabc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sound">
+		<description>Sound Usage Sample 1 (1.00)</description>
+		<year>1998</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19981208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1206">
+				<rom name="sound1.vms" size="1206" crc="99230a92" sha1="a3912bf5c6d97d2d1ef0fe8fe4853db8838c16bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timer">
+		<description>Timer/Counter T0 Interrupt Usage Sample 1 (1.00)</description>
+		<year>1998</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19981208"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="1235">
+				<rom name="timer1.vms" size="1235" crc="da87168c" sha1="f9a4b78488e633b4d836356b2613e74c9e16bd3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sample">
+		<description>Sample Game (1.12)</description>
+		<year>1999</year>
+		<publisher>SEGA Enterprises</publisher>
+		<info name="release" value="19990105"/>
+		<part name="quik" interface="svmu_quik">
+			<dataarea name="rom" size="10196">
+				<rom name="total.vms" size="10196" crc="2bea4b28" sha1="8b51a4d9bc878b4f2578a74ba5216dcec684ef4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

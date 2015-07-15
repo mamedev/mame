@@ -138,8 +138,8 @@ Houma Hunter Lime Dai 9 wa
 Houma Hunter Lime Dai 10 wa
 Houma Hunter Lime Dai 12 wa
 Kikou Soushin Val-Kaizer
-Konya'mo Asamade Powerful Mahjong 2 Data Shuu
-Konya'mo Asamade Powerful Mahjong 2 Data Shuu Masako chan Gumi
+Kon'ya mo Asamade Powerful Mahjong 2 Data Shuu
+Kon'ya mo Asamade Powerful Mahjong 2 Data Shuu Masako chan Gumi
 LIFRAIM
 Mahjong Koukaiki
 Reserve
@@ -368,17 +368,6 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 
 <softwarelist name="x68k_flop" description="Sharp X68k disk images">
 
-
-	<software name="177">
-		<description>177</description>
-		<year>1986?</year>
-		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261824">
-				<rom name="177 (1986)(macadamia).dim" size="1261824" crc="cdecc90f" sha1="364db17876a468f2da59362f7e2de198b2653f87" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="2069ad">
 		<description>2069 AD</description>
@@ -977,6 +966,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="abart1">
 		<description>All Bishoujo Art Graphics Vol. 1</description>
 		<year>1992</year>
@@ -989,6 +979,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="abart2">
 		<description>All Bishoujo Art Graphics Vol. 2</description>
 		<year>1993</year>
@@ -1001,6 +992,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="abart3">
 		<description>All Bishoujo Art Graphics Vol. 3</description>
 		<year>1993</year>
@@ -1013,6 +1005,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="abart4">
 		<description>All Bishoujo Art Graphics Vol. 4</description>
 		<year>1993</year>
@@ -1235,19 +1228,19 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<info name="release" value="19910912" />
 		<info name="usage" value="Requires Disk 1 and Disk 3 mounted to boot" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk 1 - System (しすてむ)" />
 			<dataarea name="flop" size="1261824">
 				<rom name="aquales (1991)(exact)(disk 1 of 3).dim" size="1261824" crc="c03bb393" sha1="f752eb5b7c56f96a466c1f1da26682e2142c33a8" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk 2 - Opening (お～ぷにん)" />
 			<dataarea name="flop" size="1261824">
 				<rom name="aquales (1991)(exact)(disk 2 of 3).dim" size="1261824" crc="d178d948" sha1="35fe019806f31906baade488f3c9714328f6d430" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk 3 - Data (で～た)" />
 			<dataarea name="flop" size="1261824">
 				<rom name="aquales (1991)(exact)(disk 3 of 3).dim" size="1261824" crc="5954a3e4" sha1="510755526ecce6589a60ace5f3fe0332d91723c0" offset="000000" />
 			</dataarea>
@@ -1879,6 +1872,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="bgfxd1">
 		<description>Bishoujo Graphic Data Shuu Vol. 1</description>
 		<year>199?</year>
@@ -1890,6 +1884,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="bgfxd2">
 		<description>Bishoujo Graphic Data Shuu Vol. 2</description>
 		<year>199?</year>
@@ -1901,6 +1896,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="bgfxd3">
 		<description>Bishoujo Graphic Data Shuu Vol. 3</description>
 		<year>199?</year>
@@ -1912,6 +1908,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="bgfxd4">
 		<description>Bishoujo Graphic Data Shuu Vol. 4</description>
 		<year>199?</year>
@@ -1923,6 +1920,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="bgfxd5">
 		<description>Bishoujo Graphic Data Shuu Vol. 5</description>
 		<year>199?</year>
@@ -1934,6 +1932,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
+	<!-- contains PC-9801 files -->
 	<software name="bgfxd6">
 		<description>Bishoujo Graphic Data Shuu Vol. 6</description>
 		<year>199?</year>
@@ -7569,7 +7568,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="powermj2">
-		<description>Kon'yamo Asamade Powerful Mahjong 2</description>
+		<description>Kon'ya mo Asamade Powerful Mahjong 2</description>
 		<year>1989</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<info name="alt_title" value="今夜も朝までPOWERFULまあじゃん2" />
@@ -20271,6 +20270,18 @@ a contest among doujin programmers...  -->
 
 
 
+	<software name="177">
+		<description>177</description>
+		<year>1996</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Beauty Planets" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="177 (1986)(macadamia).dim" size="1261824" crc="cdecc90f" sha1="364db17876a468f2da59362f7e2de198b2653f87" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3meka" supported="partial">
 		<description>3 Meekaa</description>
 		<year>1994</year>
@@ -22720,7 +22731,7 @@ a contest among doujin programmers...  -->
 	</software>
 
 	<software name="dslayer">
-		<description>Dragon Slayer (L1.1)</description>
+		<description>Dragon Slayer α+ (L1.1)</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Beauty Planets" />

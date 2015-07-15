@@ -2,8 +2,8 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="nes_datach" description="Nintendo Entertainment System - Datach Joint ROM System mini-cartridges">
 
-	<software name="dtc_brsh" supported="partial">
-		<description>Datach - Battle Rush - Build Up Robot Tournament (Jpn)</description>
+	<software name="batrush" supported="partial">
+		<description>Datach - Battle Rush - Build Up Robot Tournament</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-BURT"/>
@@ -20,8 +20,8 @@
 		</part>
 	</software>
 
-	<software name="dtc_cray">
-		<description>Datach - Crayon Shin-Chan - Ora to Poi Poi (Jpn)</description>
+	<software name="crayon">
+		<description>Datach - Crayon Shin-Chan - Ora to Poi Poi</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-CSOPP"/>
@@ -36,8 +36,8 @@
 		</part>
 	</software>
 
-	<software name="dtc_dbz">
-		<description>Datach - Dragon Ball Z - Gekitou Tenkaichi Budou Kai (Jpn)</description>
+	<software name="dbzgtbk">
+		<description>Datach - Dragon Ball Z - Gekitou Tenkaichi Budou Kai</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-DBZ"/>
@@ -52,8 +52,8 @@
 		</part>
 	</software>
 
-	<software name="dtc_jltp">
-		<description>Datach - J League Super Top Players (Jpn)</description>
+	<software name="jlgstop">
+		<description>Datach - J League Super Top Players</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-STP"/>
@@ -68,8 +68,8 @@
 		</part>
 	</software>
 
-	<software name="dtc_sdgn">
-		<description>Datach - SD Gundam - Gundam Wars (Jpn)</description>
+	<software name="sdgndgw">
+		<description>Datach - SD Gundam - Gundam Wars</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-SDGW"/>
@@ -85,8 +85,8 @@
 		</part>
 	</software>
 
-	<software name="dtc_ultr">
-		<description>Datach - Ultraman Club - Supokon Fight! (Jpn)</description>
+	<software name="ultraclb">
+		<description>Datach - Ultraman Club - Supokon Fight!</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-UCSF"/>
@@ -101,8 +101,8 @@
 		</part>
 	</software>
 
-	<software name="dtc_yuyu">
-		<description>Datach - Yu Yu Hakusho - Bakutou Ankoku Bujutsu Kai (Jpn)</description>
+	<software name="yuyubak">
+		<description>Datach - Yu Yu Hakusho - Bakutou Ankoku Bujutsu Kai</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-BABK"/>

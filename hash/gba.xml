@@ -14,7 +14,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bqjp-0 j2.u1" size="16777216" crc="20929ec1" sha1="717b2a739c8932374ab48a9c2bbd76a44b4cf2f3" offset="000000" />
 			</dataarea>
@@ -30,7 +29,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-alxp-0 h2.u1" size="4194304" crc="e94aafc9" sha1="51d36aa7c16cdf8bca93e40f6c680f54ed3519f2" offset="000000" />
@@ -47,7 +45,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-10" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-awrp-0 i2.u1" size="8388608" crc="66fb29e9" sha1="d5f06a82c3e5f963ef169763edc2d691fed8124e" offset="000000" />
@@ -64,7 +61,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-a5ap-0 h2.u1" size="4194304" crc="daec2264" sha1="a478f5880c484a70a5fdefc42f73aae2eb948168" offset="000000" />
@@ -81,7 +77,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bihp-0 j2.u1" size="16777216" crc="b8dc715b" sha1="102304aab2816c3483618498cab65c1626f1ced5" offset="000000" />
@@ -101,7 +96,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-bvdj-0 j2.u1" size="4194304" crc="904b55d4" sha1="51c1a436f59f2d480a33836acf2645cd5442f2a5" offset="000000" />
@@ -121,7 +115,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bvhj-0 j2.u1" size="16777216" crc="0867dc29" sha1="106595acb960ecbf05dfc1909a0b7e08ee3ef1c6" offset="000000" />
@@ -141,7 +134,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bvej-0 j2.u1" size="16777216" crc="d5d43b4b" sha1="437e3093928ce9b0705476053a059d70f9f84ae3" offset="000000" />
@@ -162,7 +154,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u4" value="U4 74LV4040" /><!-- 37C7E1K -->
 			<feature name="u5" value="U5 TLV272" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="boktai - the sun is in your hand (europe) (en,fr,de,es,it).bin" size="16777216" crc="9686c36b" sha1="64f7bf0f0560f6e94da33b549d3206678b29f557" offset="000000" />
@@ -179,7 +170,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-aonp-0 h2.u1" size="4194304" crc="dfa1a201" sha1="179523e4c6da0dc050626ac69862f2a6e880f70d" offset="000000" />
@@ -198,7 +188,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- E060857G -->
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bixj-0 i2.u1" size="8388608" crc="498443da" sha1="df835357ee70fc0b6c6eb606d9ff1dcc97eba9d3" offset="000000" />
@@ -215,7 +204,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-aedp-0 h2.u1" size="4194304" crc="98d72420" sha1="965ce9750705fd576cd73ef3450c6537bb6f9c68" offset="000000" />
@@ -232,7 +220,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bcje-0 j2.u1" size="16777216" crc="ba511fb2" sha1="44259e249eb3d8e9ad6fb8f62557f7a2748919e2" offset="000000" />
@@ -249,7 +236,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-fsmp-0 f2.u1" size="4194304" crc="7eddffad" sha1="06bdee2bb21c46bacf8d8cbe4f40dd52df117195" offset="000000" />
@@ -285,7 +271,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bbkj-0 i2.u1" size="8388608" crc="89b09753" sha1="ec5671abbb5dc39531f2e3630fc968ee050e12b2" offset="000000" />
@@ -302,7 +287,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-a9de-0 j2.u1" size="16777216" crc="60cd3207" sha1="38c7bafdc2e6d7b9700385c01fbef6b6888e4a33" offset="000000" />
@@ -319,7 +303,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a6tp-0 i2.u1" size="8388608" crc="46736f58" sha1="1c37f9b838d00ccf54e152466310ee722886a599" offset="000000" />
@@ -336,7 +319,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-alge-0 i2.u1" size="8388608" crc="d47ccff4" sha1="a3c8c76742f11fc6a3f6e3fcca20992458cac0b5" offset="000000" />
@@ -352,7 +334,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-ad7p-0 h2.u1" size="4194304" crc="f14b65ef" sha1="dabf722af4e3d879d421987817e7320c1e02293b" offset="000000" />
 			</dataarea>
@@ -371,7 +352,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-be4j-0 j2.u1" size="16777216" crc="620784af" sha1="36d3271c8ea33b9d10a77738f7916b7efe749bc7" offset="000000" />
@@ -391,7 +371,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" /><!-- LV2416 -->
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
 				<rom name="f-zero - maximum velocity (usa, europe).bin" size="4194304" crc="bd5e9798" sha1="8a08e29ec987f9cbdde21c34d5f7657aa7ba0be6" offset="000000" />
@@ -409,7 +388,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-b7fp-0 i2.u1" size="8388608" crc="d8c7553b" sha1="ad593a9bdbe8b4ee3fd3b8fea66c06fcb6a66534" offset="000000" />
@@ -426,7 +404,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-affp-0 h2.u1" size="4194304" crc="9dd5e6fa" sha1="0ff0852b7763149f77544e9a8aef5f2174178bd1" offset="000000" />
@@ -444,7 +421,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256A -->
 			<feature name="u3" value="U3" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-ae7x-0 j2.u1" size="16777216" crc="4a805ed1" sha1="c37e3bae84b53e6972ed7608541a62896fa5d6a3" offset="000000" />
@@ -460,7 +436,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="ABG-E01-01" />
 			<feature name="u1" value="U1 32M MROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-afoe-0 h2.u1" size="4194304" crc="bee67855" sha1="c3175d11fadd85ac743b837a161ae1be89429a7a" offset="000000" />
 			</dataarea>
@@ -476,7 +451,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-br8p-0 i2.u1" size="8388608" crc="cf190f2e" sha1="e1e3940eb8216dfec8a4f112cdb26050d9cf3fa9" offset="000000" />
@@ -492,7 +466,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-ag4e-0 h2.u1" size="4194304" crc="eade083f" sha1="dfcfc6d1ad2bc629429d9ebaae0e9452efa8d0d6" offset="000000" />
 			</dataarea>
@@ -507,7 +480,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-40" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-bggp-0 h2.u1" size="4194304" crc="56b9e9e1" sha1="5ecf4ead4b22a5916086a34bbf2abf299aaf3401" offset="000000" />
 			</dataarea>
@@ -523,7 +495,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-10" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-agss-0 i2.u1" size="8388608" crc="c63008d6" sha1="de0bdc889594b012cad213ca83707feb81ada28b" offset="000000" />
@@ -540,7 +511,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bhgp-0 i2.u1" size="8388608" crc="8c541d13" sha1="f30ab501b09026ae045faf8573220d4f9c113376" offset="000000" />
@@ -557,7 +527,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bhte-0 j2.u1" size="16777216" crc="c0bccaad" sha1="5be308501f0cfe0c30c60ef1fbf886707cdacd29" offset="000000" />
@@ -574,7 +543,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-ahrp-0 i2.u1" size="8388608" crc="f755065c" sha1="40d3f693e444192c94a0ff3cd9ed5f64162ac777" offset="000000" />
@@ -592,7 +560,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a4nd-0 i2.u1" size="8388608" crc="c11757d7" sha1="60f2a30b55c0e32754897b4d5df6ce06f8b71a37" offset="000000" />
@@ -608,7 +575,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 32M MROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-aaep-0 h2.u1" size="4194304" crc="2b666fed" sha1="561a1b4fc09701ba1a7d25006e3a3ea5eba43ec2" offset="000000" />
 			</dataarea>
@@ -623,7 +589,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-40" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-aaee-0 h2.u1" size="4194304" crc="59dfab9e" sha1="26042bbc068390246b3b01f02571659e08414a64" offset="000000" />
 			</dataarea>
@@ -639,7 +604,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-ah9p-0 i2.u1" size="8388608" crc="eacdfe0f" sha1="46d6e59c3677cc296e053fdd1e9fc21551883589" offset="000000" />
@@ -656,7 +620,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-bpip-0 h2.u1" size="4194304" crc="757a4efb" sha1="c49742f964a698ccce0520e24368a9d425a29b4d" offset="000000" />
@@ -673,7 +636,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-ajrp-0 i2.u1" size="8388608" crc="716dc010" sha1="4210e8a4225a076c01c39239941e2aff1c056f71" offset="000000" />
@@ -690,7 +652,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-bkhe-0 h2.u1" size="4194304" crc="2b207d1f" sha1="49b28f83d1085592cd7207f8a157c86a9253f047" offset="000000" />
@@ -707,7 +668,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-akoe-0 i2.u1" size="8388608" crc="2b92eb8e" sha1="06a42bba1c892f77c7d12381fbf243fb294363cc" offset="000000" />
@@ -723,7 +683,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 32M MROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-al9p-0 i2.u1" size="8388608" crc="4235fac3" sha1="e10a28df676334c9b10c04d054dc81c262c6da25" offset="000000" />
 			</dataarea>
@@ -739,7 +698,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bzmp-0 j2.u1" size="16777216" crc="e8637292" sha1="cff199b36ff173fb6faf152653d1bccf87c26fb7" offset="000000" />
@@ -756,7 +714,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-blsp-0 i2.u1" size="8388608" crc="a88587a6" sha1="8a3c17617c2ee950b43616a3cf9d6279fde21050" offset="000000" />
@@ -773,7 +730,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bltp-0 i2.u1" size="8388608" crc="2b8b3964" sha1="4dd3450826739935df46ef212f161b31bf38ccc3" offset="000000" />
@@ -790,7 +746,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-alvp-0 h2.u1" size="4194304" crc="1c008d32" sha1="3c48005f1ea64cefa0b165793c537ca68507c572" offset="000000" />
@@ -807,7 +762,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-01" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-amkp-0 h2.u1" size="4194304" crc="20025842" sha1="2cdfc94cbe7a7f4efe00d98dd33ebb5f50cf91f0" offset="000000" />
@@ -827,7 +781,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-btmj-0 j2.u1" size="16777216" crc="975e8d98" sha1="434cde6974421cd75977692882ba40a6539d3e8e" offset="000000" />
@@ -845,7 +798,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bmep-0 j2.u1" size="16777216" crc="7d902b62" sha1="7007f087a3022bd0d9d9b0d99489096f877794ff" offset="000000" />
@@ -862,7 +814,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bmhp-0 j2.u1" size="16777216" crc="f23150a4" sha1="47761911475e9548c81fed78e3d3336ddae89a58" offset="000000" />
@@ -879,7 +830,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a6mp-0 i2.u1" size="8388608" crc="01b4d95e" sha1="5d6f8fb1f52803a54e9857e53d0b88173cf8f48a" offset="000000" />
@@ -896,7 +846,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E11-01" />
 			<feature name="u1" value="U1 MASK ROM AGB" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- M645R256 -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a3xe-0 i2.u1" size="8388608" crc="c0c780f9" sha1="3d21905b6e860d39a00ba643779776de4c73c411" offset="000000" />
@@ -915,7 +864,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-br6e-0 i2.u1" size="8388608" crc="dee6f2a9" sha1="0676ecd4d58a976af3346caebb44b9b6489ad099" offset="000000" />
@@ -935,7 +883,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" /><!-- LV2416 -->
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="metroid fusion (europe) (en,fr,de,es,it).bin" size="8388608" crc="974e46ab" sha1="cc46d54b70c1ee38c856ee6e58ec712136763389" offset="000000" />
@@ -951,7 +898,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-a5me-0 h2.u1" size="4194304" crc="a4e12d4b" sha1="cd60f0aacdada987f7935d7a5fa2cd3242abc145" offset="000000" />
 			</dataarea>
@@ -966,7 +912,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-40" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-bmcp-0 h2.u1" size="4194304" crc="4a72170a" sha1="556c74e4676ff53bf3a31e0e6c3b08009bba8581" offset="000000" />
 			</dataarea>
@@ -984,7 +929,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="33554432">
 				<rom name="agb-a3uj-0 k2.u1" size="33554432" crc="42ac9cb9" sha1="4f0f493e12c2a8c61b2d809af03f7abf87a85776" offset="000000" />
@@ -1000,7 +944,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-azmp-0 i2.u1" size="8388608" crc="17cd149a" sha1="74b8f11a719d2ebdd36a594814ad01a9b79a115e" offset="000000" />
 			</dataarea>
@@ -1016,7 +959,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bn7p-0 i2.u1" size="8388608" crc="f4c0d140" sha1="e5298b2482a769aa6458955cd6b18db3ac3f3a20" offset="000000" />
@@ -1035,7 +977,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- HT01 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bkrj-0 i2.u1" size="8388608" crc="1b00bc2c" sha1="110a7ae6e5886c10f2018d5293e9c1430299ed42" offset="000000" />
@@ -1051,7 +992,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 32M MROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-agpp-0 i2.u1" size="8388608" crc="966fa650" sha1="cb6f269ee34b1f93ec0cbf71549e2a83278665e5" offset="000000" />
 			</dataarea>
@@ -1067,7 +1007,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agp-apip-0 i2.u1" size="4194304" crc="ff7d5f62" sha1="05b61e4fe58ae614352f29705fae9c53393685cb" offset="000000" />
 			</dataarea>
@@ -1085,7 +1024,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="33554432">
 				<rom name="agb-b24j-0 k2.u1" size="33554432" crc="1a1baa50" sha1="4bc9370edebb3da5bdf768eeced689fda3f8b77b" offset="000000" />
@@ -1104,7 +1042,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u2" value="1M/512K FLASH U2" /><!-- E050357G -->
 			<feature name="u3" value="U3 RTC" /><!-- S3511 -->
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - edicion esmeralda (spain).bin" size="16777216" crc="8c4d3108" sha1="fe1558a3dcb0360ab558969e09b690888b846dd9" offset="000000" />
@@ -1121,7 +1058,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- LE26FV10N1TS -->
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bpre-0 j2.u1" size="16777216" crc="dd88761c" sha1="41cb23d8dccc8ebd7c649cd8fbb58eeace6e2fdc" offset="000000" />
@@ -1140,7 +1076,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u2" value="1M/512K FLASH U2" /><!-- E030557 -->
 			<feature name="u3" value="U3 RTC" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - edicion rubi (spain).bin" size="16777216" crc="eb0729cf" sha1="1f49f7289253dcbfecbc4c5ba3e67aa0652ec83c" offset="000000" />
@@ -1160,7 +1095,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" /><!-- LV2416 -->
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="pocket music (europe) (en,fr,de,es,it).bin" size="8388608" crc="a3fd418a" sha1="3484ca53d9bee6cf258df44c8825e18e128a2821" offset="000000" />
@@ -1177,7 +1111,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bq3p-0 j2.u1" size="16777216" crc="9914da23" sha1="78e51cb33f52ebd17383faf0f153d91e677dcac9" offset="000000" />
@@ -1197,7 +1130,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-brij-0 j2.u1" size="16777216" crc="349d7025" sha1="67f8adacff79c15d028fffd90de3a77d9ad0602d" offset="000000" />
@@ -1214,7 +1146,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-arsp-0 h2.u1" size="4194304" crc="5ee9d6c5" sha1="d9484e947d41d03dd3a5fe447872304b04106626" offset="000000" />
@@ -1230,7 +1161,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 32M MROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-asdx-0 h2.u1" size="4194304" crc="8b0079cb" sha1="444cf64593ef7a9ef7a2bef56271ad154a1e9fa7" offset="000000" />
 			</dataarea>
@@ -1249,7 +1179,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-v49j-0 i2.u1" size="8388608" crc="b17532ee" sha1="84afa7108e4d604e7b1a6d105df5760869a247fa" offset="000000" />
@@ -1257,7 +1186,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-<!-- does this need RTC too? -->
+<!-- needs RTC -->
 	<software name="sennenkz" supported="no">
 		<description>Sennen Kazoku (Jpn)</description>
 		<year>2005</year>
@@ -1271,7 +1200,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u2" value="1M/512K FLASH U2" /><!-- E043957G -->
 			<feature name="u3" value="U3 RTC" /><!-- S3511 -->
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="16777216">
 				<rom name="sennen kazoku (japan).bin" size="16777216" crc="a2f6976c" sha1="4dcd7cee46d3a5e848a22eb371bebbbc2fb8d488" offset="000000" />
@@ -1288,7 +1216,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bxcs-0 j2.u1" size="16777216" crc="769a7666" sha1="069b7e991a35a78b321959f2f19470952c331dfc" offset="000000" />
@@ -1305,7 +1232,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bsex-0 i2.u1" size="8388608" crc="ac1d8c97" sha1="1f28ab954789f3946e851d5a132cda4edb9b74dd" offset="000000" />
@@ -1322,7 +1248,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="33554432">
 				<rom name="agb-b46p-0 k2.u1" size="33554432" crc="8b1bc7df" sha1="702a109bd60d2e288814968d49caacdfd14ae2c6" offset="000000" />
@@ -1339,7 +1264,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-asip-0 j2.u1" size="16777216" crc="abaf519c" sha1="fb5662172fadebf4577f6f6f163741fc041c11e6" offset="000000" />
@@ -1355,7 +1279,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-bsdp-0 h2.u1" size="4194304" crc="b92a8a88" sha1="0a329c22bbd92e05da5496cdfe0837913eddbdfb" offset="000000" />
 			</dataarea>
@@ -1371,7 +1294,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-asop-0 i2.u1" size="8388608" crc="6232839b" sha1="eb00f101af23d728075ac2117e27ecd8a4b4c3e9" offset="000000" />
@@ -1387,7 +1309,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agp-aspp-0 h2.u1" size="4194304" crc="98ad67e6" sha1="b67caab6316a8478129f43672572277f411f211d" offset="000000" />
 			</dataarea>
@@ -1403,7 +1324,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bstp-0 j2.u1" size="16777216" crc="e53ba082" sha1="afc4a0aff7255d74fe3d24c4146a11bd573dc12f" offset="000000" />
@@ -1422,7 +1342,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bdqj-0 j2.u1" size="16777216" crc="4dcf6e20" sha1="4657c3070bd7ad8ce89f0491fc0f19a4f14ada88" offset="000000" />
@@ -1439,7 +1358,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a3ap-0 i2.u1" size="8388608" crc="639e9d3b" sha1="bd52eb4b4ebe438e9b9ecaac792bd389725cde41" offset="000000" />
@@ -1456,7 +1374,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-an8e-0 i2.u1" size="8388608" crc="01a0fca8" sha1="262e9393119cb1991a27a3ddd5a070ae3c60cee9" offset="000000" />
@@ -1473,7 +1390,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bntp-0 i2.u1" size="8388608" crc="15bdf0ad" sha1="f425099c7bdde046a78eeb2a963612343d8d2ee5" offset="000000" />
@@ -1489,7 +1405,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-ao3p-0 i2.u1" size="8388608" crc="16c3cac3" sha1="48ee4cb5c17ed1dbcae0cb9bdf9e54210ceed93c" offset="000000" />
 			</dataarea>
@@ -1505,7 +1420,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bxsp-0 j2.u1" size="16777216" crc="4a975f48" sha1="1d50c04eb8ede1cf9776e392f0275688ed7f69cb" offset="000000" />
@@ -1522,7 +1436,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- A624K0111X -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bxse-0 j2.u1" size="16777216" crc="37b0b53d" sha1="0d40f012093838b667cd3b79caabb43adca8f034" offset="000000" />
@@ -1539,7 +1452,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-athp-0 i2.u1" size="8388608" crc="812dc57a" sha1="029f8fcabee3e4e0339db77c80961191b5bb84e9" offset="000000" />
@@ -1555,7 +1467,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 32M MROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-atgp-0 h2.u1" size="4194304" crc="fdbe5a26" sha1="68ccb866bcb82a1c884ef40d74540e63ce0d5bd1" offset="000000" />
 			</dataarea>
@@ -1573,7 +1484,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-btrj-0 i2.u1" size="8388608" crc="ec325c92" sha1="287286f6fb0e405fcf57b35eef99139445b663c6" offset="000000" />
@@ -1592,7 +1502,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-biij-0 h2.u1" size="4194304" crc="5a7e762b" sha1="18dfee7e1ed1e53c70f3686276524a0723eec741" offset="000000" />
@@ -1608,7 +1517,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 32M MROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-at4p-0 i2.u1" size="8388608" crc="07a32299" sha1="30489d1c72faab5ed7a7b86c459d750dae0208e4" offset="000000" />
 			</dataarea>
@@ -1621,10 +1529,9 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="AGB-BOCE-USA, AGB-BOCP-EUR"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-" />
+			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- 39VF512 -->
-
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="33554432">
 				<rom name="agb-bocp-0 k2.u1" size="33554432" crc="8b3330bb" sha1="8efd27375d1f92b43fe0d1c93a63c08b7a259acc" offset="000000" />
@@ -1633,10 +1540,10 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="wariotws">
-		<description>WarioWare - Twisted! (USA)</description>
+		<description>WarioWare - Twisted! (USA, Aus?)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-RZWE-USA"/>
+		<info name="serial" value="AGB-RZWE-(USA/AUS)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-MOM-01" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -1644,7 +1551,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" /><!-- X01A -->
 			<feature name="u4" value="U4" /><!-- blank slot -->
 			<feature name="p1" value="P1" /><!-- AGB-MOG-01 -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-rzwe-0 j2.u1" size="16777216" crc="cb4e844b" sha1="f0102d0d6f7596fe853d5d0a94682718278e083a" offset="000000" />
@@ -1661,7 +1567,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9853 -->
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-awop-0.u1" size="8388608" crc="c4aa2b7b" sha1="2c077de84348c6e09581a0a523376056a2aeba95" offset="000000" />
@@ -1684,7 +1589,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" /><!-- LV2416 -->
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="yu-gi-oh! - the eternal duelist soul (usa).bin" size="8388608" crc="dfd07a36" sha1="510fbba212aca9bab95ea12f8fd933e62ee34dea" offset="000000" />
@@ -1702,7 +1606,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K SRAM" /><!-- MB85R256S -->
 			<feature name="u3" value="U3" /><!-- blank slot -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
 				<rom name="agb-by6e-0 k2.u1" size="33554432" crc="f968a196" sha1="9689337d6aac1ce9699ab60aac73fc2cfdccad9b" offset="000000" />
@@ -1719,7 +1622,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E11-01" />
 			<feature name="u1" value="U1 MASK ROM AGB" />
 			<feature name="u2" value="U2 256K FRAM" /><!-- M645R256 -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-aywe-0 j2.u1" size="16777216" crc="39b5e771" sha1="53d4ae06d1b605f8925c53d6c585478d73ff55c0" offset="000000" />
@@ -1741,7 +1643,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" /><!-- LV2416 -->
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="yu-gi-oh! duel monsters international - worldwide edition (japan) (en,ja,fr,de,es,it) (rev 1).bin" size="16777216" crc="1becf9d3" sha1="e16dd5848bcbaffdc60d5d5548d60f4311f4615c" offset="000000" />
@@ -1758,7 +1659,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" /><!-- 9854 -->
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bmzp-0 i2.u1" size="8388608" crc="897b2893" sha1="9096450c4b29ab6e317d94ca09ee82f5b74dd4b1" offset="000000" />
@@ -1779,7 +1679,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<!-- no visible internal markings, using u1 and u2 for consistency -->
 			<feature name="u1" value="AGS-ZMAJ-0" />
 			<feature name="u2" value="AGB-MAGMA" /><!-- has EPSON logo, processor? -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
 				<rom name="ags-zmaj-0.u1" size="4194304" crc="ba997cfa" sha1="b950f9b1e5eaa81b653be6da5cdd7a1bf1e548e6" offset="000000" />
@@ -1798,7 +1697,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a7op-0.u1" size="8388608" crc="56c83c16" sha1="f4363923181b71448ddd6e28ac72d30b3ecfc019" offset="000000" />
@@ -1815,7 +1713,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-20" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-aw2e-0.u1" size="8388608" crc="5ad0e571" sha1="14dd0b22c894865867aff89e8116b2dffae25605" offset="000000" />
@@ -1832,7 +1729,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-abjp-0.u1" size="8388608" crc="3a23efd7" sha1="25c6cf94b1b54a1ac5058460faad00cf93d272f5" offset="000000" />
@@ -1849,7 +1745,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-fzlp-0.u1" size="4194304" crc="68b1b7a8" sha1="d47be5a160fc8e7b9f789ad7ba8867ef65b4d448" offset="000000" />
@@ -1866,7 +1761,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-flbp-0.u1" size="4194304" crc="f2dc3b09" sha1="ab608fc378cd0f8fb905b1b8d5b85400ee00ccfb" offset="000000" />
@@ -1882,7 +1776,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-aawe-0.u1" size="4194304" crc="59781c54" sha1="21b593c0fbdeacfbf0f72895fba2401fd7b60b65" offset="000000" />
 			</dataarea>
@@ -1898,7 +1791,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-admp-0.u1" size="8388608" crc="58c641b3" sha1="af2b2206777651c7993c1ae9008d07c31430207e" offset="000000" />
@@ -1915,7 +1807,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-ad9p-0.u1" size="8388608" crc="dc7dab56" sha1="f01522ee46f5aa821adbba0a97b1a745ff9059f5" offset="000000" />
@@ -1933,7 +1824,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bfip-0.u1" size="8388608" crc="1abbc24f" sha1="031204fbbfd00a2ece04eae590596cdf676d9537" offset="000000" />
@@ -1951,7 +1841,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3" /><!-- ? -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bffe-0.u1" size="16777216" crc="1b39cdab" sha1="6472695d69661490f78245e2982e1e676c080be7" offset="000000" />
@@ -1968,7 +1857,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-20" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_flash_512" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-afxe-0.u1" size="16777216" crc="5645e56c" sha1="4ac05441f4de70a4ec3dd932116346c61b8783d9" offset="000000" />
@@ -1984,7 +1872,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-40" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="33554432">
 				<rom name="agb-mdbe-0.u1" size="33554432" crc="da559199" sha1="dc85cccc0cede3fc11d257995cd7d3cc64ca00e0" offset="000000" />
 			</dataarea>
@@ -1998,7 +1885,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<info name="serial" value="AGB-MSHE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-40" />
-
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="33554432">
 				<rom name="agb-mshe-0.u1" size="33554432" crc="363c3eb8" sha1="dc4c959a7740315d892633869f7fc6382aadbb0e" offset="000000" />
@@ -2015,7 +1901,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-agqp-0.u1" size="4194304" crc="dff3e861" sha1="63300c8cbb3b3622e6b5f7fef7e552c24aee9c86" offset="000000" />
@@ -2032,7 +1917,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-10" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-agsp-0.u1" size="8388608" crc="e1fb68e8" sha1="5c4695205413df7db52b9a184815a07783999971" offset="000000" />
@@ -2049,7 +1933,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-20" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-agfe-0.u1" size="16777216" crc="606a1c4d" sha1="b500663220cb9bf56b9f8e8c0c544f1d6fa3a824" offset="000000" />
@@ -2066,7 +1949,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a7hp-0.u1" size="8388608" crc="342816db" sha1="0218e3be69334cac752d5ad5b3763a26252cb88b" offset="000000" />
@@ -2084,7 +1966,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3" /><!-- ? -->
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a4np-0.u1" size="8388608" crc="f50f82ad" sha1="7ba1ec1e46ce424e3c6fd72e4e8d5e9eb5ede247" offset="000000" />
@@ -2101,7 +1982,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bkmp-0.u1" size="8388608" crc="71c505c8" sha1="eb4099911dbd28073c554f4d4fa35cbeed82bc6b" offset="000000" />
@@ -2118,7 +1998,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bkme-0.u1" size="8388608" crc="fa946fc6" sha1="d2baaec3c20b48bebe79ebe27761cd107fd067bf" offset="000000" />
@@ -2135,7 +2014,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-aldp-0.u1" size="4194304" crc="958097d2" sha1="275c631804a1186ab3dab6abf7cb5ad84a4ff9d4" offset="000000" />
@@ -2152,7 +2030,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-azlp-0.u1" size="8388608" crc="5a164321" sha1="3bb7f97ada7d60d8d334b271084effd1db853b32" offset="000000" />
@@ -2172,7 +2049,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" />
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="lego island 2 - the brickster's revenge (europe) (en,fr,de,es,it,nl,sv,da).bin" size="8388608" crc="c7b5d987" sha1="db07408de790da24e313688cd85abd69eea6a21e" offset="000000" />
@@ -2192,7 +2068,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" />
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="metroid - zero mission (usa).bin" size="8388608" crc="5c61a844" sha1="5de8536afe1f0078ee6fe1089f890e8c7aa0a6e8" offset="000000" />
@@ -2211,7 +2086,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-10" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-agsj-0.u1" size="8388608" crc="fb96d9de" sha1="35ef9e4c9f38183ebd6a3e3923a11ce9a4333718" offset="000000" />
@@ -2227,7 +2101,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-apcp-0.u1" size="4194304" crc="e1578d25" sha1="750a6b6c36f75b2605a1dfceefce7f27aa2191e3" offset="000000" />
 			</dataarea>
@@ -2243,7 +2116,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-20" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bpge-0.u1" size="16777216" crc="d69c96cc" sha1="574fa542ffebb14be69902d1d36f1ec0a4afd71e" offset="000000" />
@@ -2262,7 +2134,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u2" value="1M/512K FLASH U2" />
 			<feature name="u3" value="U3 RTC" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - ruby version (europe) (rev 1).bin" size="16777216" crc="61641576" sha1="610b96a9c9a7d03d2bafb655e7560ccff1a6d894" offset="000000" />
@@ -2281,10 +2152,29 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u2" value="1M/512K FLASH U2" />
 			<feature name="u3" value="U3 RTC" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - sapphire version (europe) (rev 1).bin" size="16777216" crc="bafedae5" sha1="4722efb8cd45772ca32555b98fd3b9719f8e60a9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokesaphj" cloneof="pokesaph">
+		<description>Pocket Monsters - Sapphire (Jpn)</description>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="AGB-AXPJ-JPN"/>
+		<info name="release" value="20021121"/>
+		<info name="alt_title" value="ポケットモンスター サファイア"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E05-01" />
+			<feature name="u1" value="U1 GPIO MASK ROM" />
+			<feature name="u2" value="1M/512K FLASH U2" />
+			<feature name="u3" value="U3 RTC" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_flash_1m" />
+			<dataarea name="rom" size="8388608">
+				<rom name="pocket monsters - sapphire (japan).bin" size="8388608" crc="fd1eeb78" sha1="3233342c2f3087e6ffe6c1791cd5867db07df842" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2296,7 +2186,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-blap-0.u1" size="4194304" crc="0ed5f375" sha1="28846f9a21ddec18d7cda51b6491b80c7e904f68" offset="000000" />
 			</dataarea>
@@ -2311,7 +2200,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-as2x-0.u1" size="8388608" crc="c492c46d" sha1="469d32d6f0ec58f71cdf120bc85b9f18c04fd396" offset="000000" />
 			</dataarea>
@@ -2326,7 +2214,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bswe-0.u1" size="8388608" crc="94d2737a" sha1="4ce7c96146456b10db85d7bf4a6b0f588ea370b9" offset="000000" />
 			</dataarea>
@@ -2341,7 +2228,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a2wp-0.u1" size="8388608" crc="677854af" sha1="4966ce40938df2b0ffd262c6aa6c4461b9fa8922" offset="000000" />
 			</dataarea>
@@ -2357,7 +2243,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-ayhp-0.u1" size="4194304" crc="209958e5" sha1="c36bfb2c0d5050be17cb66210adde3851d80e878" offset="000000" />
@@ -2374,7 +2259,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-01" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-amap-0.u1" size="4194304" crc="1e4c6d6a" sha1="f071d45d8f5cb05b48d7d2b804c6cb6a79ad96fb" offset="000000" />
@@ -2391,7 +2275,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-ax4e-1.bin" size="4194304" crc="88dab27f" sha1="532f3307021637474b6dd37da059ca360f612337" offset="000000" />
@@ -2409,7 +2292,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-bqxe-0.u1" size="16777216" crc="68215047" sha1="1ff9d19032466227ae7aaebb0161c531aaf60428" offset="000000" />
@@ -2426,7 +2308,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-ar6p-0.u1" size="8388608" crc="6863ce1a" sha1="092179cd51657a4572fa855eb3e5bc3f46c1d76f" offset="000000" />
@@ -2442,7 +2323,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-azqe-0.u1" size="8388608" crc="8b14f9ec" sha1="5d76ab06e6433604f5070ba78b5448f81c6c7a04" offset="000000" />
 			</dataarea>
@@ -2461,7 +2341,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="u3" value="U3" />
 			<feature name="u4" value="U4 PST3425" />
 			<feature name="bt1" value="CR1616" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="wario land 4 (usa, europe).bin" size="8388608" crc="d6141609" sha1="b9fe05a8080e124b67bce6a623234ee3b518a2c1" offset="000000" />
@@ -2478,7 +2357,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E11-01" />
 			<feature name="u1" value="U1 MASK ROM AGB" />
 			<feature name="u2" value="U2 256K FRAM" />
-
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-azwp-0.u1" size="8388608" crc="500ca178" sha1="aad81e722aa88f98913c0354e559f845c4689cce" offset="000000" />
@@ -2495,7 +2373,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-20" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-aw9p-0.u1" size="4194304" crc="09f02f6a" sha1="8b3d5fe031c634b7037bfaf361f83d81ac16e1ec" offset="000000" />
@@ -2512,7 +2389,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="pcb" value="AGB-E02-10" />
 			<feature name="u1" value="U1 MASKROM AGB" />
 			<feature name="u2" value="U2 512K FLASH MEMORY" />
-
 			<feature name="slot" value="gba_flash" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-azep-0.u1" size="8388608" crc="973496e0" sha1="2441dcc18125514596c36b7ebc090f3fb3644fdb" offset="000000" />
@@ -4584,7 +4460,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="jimnvsjng" cloneof="jimnvsjn">
-		<description>Jimmy Neutron Boy Genius vs. Jimmy Negatron (Ger)</description>
+		<description>Jimmy Neutron vs. Jimmy Negatron (Ger)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -4595,7 +4471,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="jimnvsjngp" cloneof="jimnvsjn">
-		<description>Jimmy Neutron vs. Jimmy Negatron (Ger, Prototype)</description>
+		<description>Jimmy Neutron vs. Jimmy Negatron (Ger, Prototype v201D)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -14243,7 +14119,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<description>Finding Nemo (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-AZIE-USA, AGB-AZIP"/>
+		<info name="serial" value="AGB-AZIE-USA, AGB-AZIP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="finding nemo (usa, europe).bin" size="8388608" crc="3b098667" sha1="a0c98d05b0854bb724f1ea5df89f19f77e6beb79" offset="000000" />
@@ -27264,21 +27140,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="pokesaphj" cloneof="pokesaph">
-		<description>Pocket Monsters - Sapphire (Jpn)</description>
-		<year>2002</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AXPJ-JPN"/>
-		<info name="release" value="20021121"/>
-		<info name="alt_title" value="ポケットモンスター サファイア"/>
-		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
-			<dataarea name="rom" size="8388608">
-				<rom name="pocket monsters - sapphire (japan).bin" size="8388608" crc="fd1eeb78" sha1="3233342c2f3087e6ffe6c1791cd5867db07df842" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pcketprf">
 		<description>Pocket Professor - Kwik Notes - Vol. 1 (USA)</description>
 		<year>2006</year>
@@ -29487,7 +29348,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="rcktpwbbp" cloneof="rcktpwbb">
-		<description>Rocket Power - Beach Bandits (USA, Prototype V0.14)</description>
+		<description>Rocket Power - Beach Bandits (USA, Prototype v0.14)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">

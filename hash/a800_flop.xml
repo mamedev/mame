@@ -6,8 +6,13 @@
     (skeleton list)
 
     note: many 'original' floppy images are in .atx format, whereas cracked / unprotected ones are .atr format
-          .atx is unsupported, although apparently has been reverse engineered (insert info link here)
-          There are also images in .xex format?
+          .atx is unsupported, although has been reverse engineered (http://www.whizzosoftware.com/sio2arduino/vapi.html)
+          .pro is unsupported, has been partially reverse engineered, although relies on phantom sectors
+               (http://www.whizzosoftware.com/sio2arduino/prosys.html)
+          .xex format are executables
+          other formats listed here: http://computers.mcbx.netne.net/8bit/atari8/index.htm#images
+
+    note: .atr images marked as [k-file] are modified images (http://atariage.com/forums/topic/130681-what-is-that-k-file-in-tosec/)
 
 -->
 

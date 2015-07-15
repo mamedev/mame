@@ -571,19 +571,20 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="virtuoso">
-		<!-- Original images (unknown source)
+	<!-- there is a Virtuoso prototype dated 19951219, the game was a port from 3DO and DOS -->
+	<software name="psalm69">
+		<!-- Original images (unknown source) (http://forum.redump.org/topic/7883/psx-virtuoso-two-builds/)
 		<rom name="virtuoso (prototype 1996-05-14).ccd" size="1178"     crc="4a4d26ac"/>
 		<rom name="virtuoso (prototype 1996-05-14).cue" size="228"      crc="20483bb0"/>
 		<rom name="virtuoso (prototype 1996-05-14).img" size="75607392" crc="3ffa24c3"/>
 		<rom name="virtuoso (prototype 1996-05-14).sub" size="3086016"  crc="d6099623"/>
 		-->
-		<description>Virtuoso (Prototype, 19960514)</description>
+		<description>Psalm 69 (Alpha Test Version 2.1, 19960514)</description>
 		<year>1996</year>
-		<publisher>Data East?</publisher>
+		<publisher>Elite Systems</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="virtuoso" sha1="17b12ec274b92acb586f4660303bbb21309c0702" />
+				<disk name="psalm 69" sha1="17b12ec274b92acb586f4660303bbb21309c0702" />
 			</diskarea>
 		</part>
 	</software>
@@ -703,7 +704,7 @@ A few comments on these:
 
 	<!-- Redump.org sets -->
 
-	<software name="raidendx" supported="yes"> <!-- Hamster re-release -->
+	<software name="raidendx"> <!-- Hamster re-release -->
 		<!-- Original images (Redump)
 		<rom name="Raiden DX (Japan) (v1.1).bin" size="218183280" crc="c1ce0640"/>
 		<rom name="Raiden DX (Japan) (v1.1).cue" size="90"        crc="d6a6816b"/>
@@ -719,7 +720,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="raidendxo" cloneof="raidendx" supported="yes"> <!-- original release) -->
+	<software name="raidendxo" cloneof="raidendx"> <!-- original release) -->
 		<!-- Original images (Redump)
 		<rom name="Raiden DX (Japan) (v1.0).bin" size="218162112" crc="81711972"/>
 		<rom name="Raiden DX (Japan) (v1.0).cue" size="90"        crc="60bd611b"/>
@@ -735,7 +736,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="raidenpr" supported="yes">
+	<software name="raidenpr">
 		<!-- Original images (Redump)
 		<rom name="Raiden Project, The (USA).bin" size="58007376" crc="4e820d9a"/>
 		<rom name="Raiden Project, The (USA).cue" size="91"       crc="d060cba4"/>
@@ -841,12 +842,12 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="19ji03pu" supported="no">
+	<software name="19ji03bu" supported="no">
 		<!-- Unknown source
 		<rom name="19 ji 03 pun Ueno Hatsu Yakou Ressha (Japan) [SLPS-01865].bin" size="482529264" crc="866a1b3a" />
 		<rom name="19 ji 03 pun Ueno Hatsu Yakou Ressha (Japan) [SLPS-01865].cue" size="121" crc="1693f9fd" />
 		-->
-		<description>19 ji 03 pun Ueno Hatsu Yakou Ressha (Jpn)</description>
+		<description>19-ji 03-bu Ueno Hatsu Yakou Ressha (Jpn)</description>
 		<year>1999</year>
 		<publisher>Visit</publisher>
 		<info name="alt_title" value="19時03分　上野発夜光列車"/>
@@ -930,7 +931,7 @@ A few comments on these:
 		<rom name="A Ressha de Ikou Z Mezase - Tairiku Oudan (Japan) (Track 7) [SLPS-02050].bin" size="37046352" crc="4ff10625" />
 		<rom name="A Ressha de Ikou Z Mezase - Tairiku Oudan (Japan) [SLPS-02050].cue" size="934" crc="458134ac" />
 		-->
-		<description>A Ressha de Ikou Z Mezase - Tairiku Oudan (Jpn)</description>
+		<description>A Ressha de Ikou Z - Mezase! Tairiku Oudan (Jpn)</description>
 		<year>1999</year>
 		<publisher>Artdink</publisher>
 		<info name="alt_title" value="A列車で行こうZ 目指せ！大陸横断"/>
@@ -986,7 +987,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="acidjapa" supported="no">
+	<software name="acid" supported="no">
 		<!-- Unknown source
 		<rom name="Acid (Japan) (SLPS-02119).bin" size="749629440" crc="40900258" />
 		<rom name="Acid (Japan) (SLPS-02119).cue" size="91" crc="164a1a32" />
@@ -1132,7 +1133,7 @@ A few comments on these:
 		<rom name="Advanced Variable Geo (Japan) (Track 21) [SLPS-00208].bin" size="32403504" crc="72ee5fcd" />
 		<rom name="Advanced Variable Geo (Japan) [SLPS-00208].cue" size="2420" crc="7f95c070" />
 		-->
-		<description>Advanced Variable Geo (Jpn)</description>
+		<description>Advanced V.G. (Jpn)</description>
 		<year>1996</year>
 		<publisher>TGL</publisher>
 		<info name="alt_title" value="アドヴァンスト ヴァリアブル・ジオ"/>
@@ -1196,7 +1197,7 @@ A few comments on these:
 		<rom name="Agent Armstrong (Japan) [SLPS-01073].bin" size="19145280" crc="43b7de21" />
 		<rom name="Agent Armstrong (Japan) [SLPS-01073].cue" size="102" crc="5dd96f46" />
 		-->
-		<description>Agent Armstrong (Jpn)</description>
+		<description>Agent Armstrong - Himitsu Shirei Daisakusen (Jpn)</description>
 		<year>1997</year>
 		<publisher>We Net</publisher>
 		<info name="alt_title" value="エージェントアームストロング 秘密司令大作戦"/>
@@ -1254,7 +1255,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="airsthej" supported="no">
+	<software name="airs" supported="no">
 		<!-- Unknown source
 		<rom name="Airs, The (Japan) [SLPS-01916].bin" size="727466544" crc="a2819c30" />
 		<rom name="Airs, The (Japan) [SLPS-01916].cue" size="94" crc="d32b617a" />
@@ -1346,7 +1347,7 @@ A few comments on these:
 	</software>
 
 	<!-- boot ok -->
-	<software name="akagawaj" supported="no">
+	<software name="akagawa" supported="no">
 		<description>Akagawa Jirou - Yasoukyoku 2 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Victor</publisher>
@@ -1360,7 +1361,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="alabamaj" supported="no">
+	<software name="alabama" supported="no">
 		<!-- Unknown source
 		<rom name="Alabama (Japan) [SLPS-02961].bin" size="709753632" crc="48cc5ab1" />
 		<rom name="Alabama (Japan) [SLPS-02961].cue" size="528" crc="3b96b795" />
@@ -1396,7 +1397,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="alivejap" supported="no">
+	<software name="alive" supported="no">
 		<!-- Unknown source
 		<rom name="Alive (Japan) (Disc 1) [SLPS-01527].bin" size="726314064" crc="093c79b2" />
 		<rom name="Alive (Japan) (Disc 1) [SLPS-01527].cue" size="99" crc="de2666da" />
@@ -1448,12 +1449,12 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="ananjari" supported="no">
+	<software name="ananjar" supported="no">
 		<!-- Unknown source
 		<rom name="Annanjarin (Japan) [SLPS-01424].bin" size="294616224" crc="9b6bf38a" />
 		<rom name="Annanjarin (Japan) [SLPS-01424].cue" size="97" crc="8a17e591" />
 		-->
-		<description>A Nanjarin (Jpn)</description>
+		<description>A~tsu Nanjarin (Jpn)</description>
 		<year>1998</year>
 		<publisher>To One</publisher>
 		<info name="alt_title" value="あっナンジャリン"/>
@@ -1785,7 +1786,7 @@ A few comments on these:
 		<rom name="Arcade Hits - Frisky Tom (Japan) [SLPM-87118].bin" size="106825488" crc="f3ced46e" />
 		<rom name="Arcade Hits - Frisky Tom (Japan) [SLPM-87118].CUE" size="115" crc="9fa3cdbf" />
 		-->
-		<description>Arcade Hits - Frisky Tom (Jpn, Major Wave Serie)</description>
+		<description>Arcade Hits - Frisky Tom (Jpn, Major Wave Series)</description>
 		<year>2002</year>
 		<publisher>Hamster</publisher>
 		<info name="alt_title" value="アーケード・ヒッツ　～フリスキー・トム～"/>
@@ -1949,7 +1950,7 @@ A few comments on these:
 		<rom name="Arthur to Astaroth no Nazo Makaimura - Incredible Toons (Japan) (Track 19) [SLPS-00363].bin" size="37044000" crc="9281934f" />
 		<rom name="Arthur to Astaroth no Nazo Makaimura - Incredible Toons (Japan) [SLPS-00363].cue" size="2838" crc="25870c39" />
 		-->
-		<description>Arthur To Astaroth No Nazo Maikamura - Incredible Toons (Jpn)</description>
+		<description>Arthur to Astaroth no Nazo Makaimura - Incredible Toons (Jpn)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<info name="alt_title" value="アーサーとアスタロトの謎魔界村"/>
@@ -2213,7 +2214,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="azitojap" supported="no">
+	<software name="azito" supported="no">
 		<!-- Unknown source
 		<rom name="Azito (Japan) (Track 1) [SLPS-00683].bin" size="118364400" crc="36243df9" />
 		<rom name="Azito (Japan) (Track 2) [SLPS-00683].bin" size="158510688" crc="7e6b0617" />
@@ -2238,7 +2239,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="azito3ja" supported="no">
+	<software name="azito3" supported="no">
 		<!-- Unknown source
 		<rom name="Azito 3 (Japan) (Track 1) [SLPS-02496].bin" size="560004144" crc="384e1311" />
 		<rom name="Azito 3 (Japan) (Track 2) [SLPS-02496].bin" size="42514752" crc="46b04509" />
@@ -2275,7 +2276,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="bluelege" supported="no">
+	<software name="blue" supported="no">
 		<!-- Unknown source
 		<rom name="b.l.u.e. - Legend of Water (Japan) [SLPS-01459].bin" size="450445632" crc="17286c73" />
 		<rom name="b.l.u.e. - Legend of Water (Japan) [SLPS-01459].cue" size="169" crc="494f1da3" />
@@ -10457,12 +10458,12 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="loderun2" supported="no">
+	<software name="ldrun2" supported="no">
 		<!-- Unknown source
 		<rom name="Lode Runner 2 (Japan) [SLPM-86460].bin" size="682461024" crc="9a7777f2" />
 		<rom name="Lode Runner 2 (Japan) [SLPM-86460].cue" size="2210" crc="a528187a" />
 		-->
-		<description>Lode Runner 2 (Jpn, SuperLite 1500 Serie)</description>
+		<description>Lode Runner 2 (Jpn, SuperLite 1500 Series)</description>
 		<year>2000</year>
 		<publisher>Success</publisher>
 		<info name="alt_title" value="SuperLite1500シリーズ ロードランナー2"/>
@@ -10475,7 +10476,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="loderunx" supported="no">
+	<software name="ldrunx" supported="no">
 		<!-- Unknown source
 		<rom name="Lode Runner Extra (Japan) [SLPS-00641].bin" size="633297168" crc="70b7c46d" />
 		<rom name="Lode Runner Extra (Japan) [SLPS-00641].cue" size="3051" crc="b17c43f9" />
@@ -10806,7 +10807,7 @@ A few comments on these:
 		<rom name="Maestro Music, The (Japan) [SLPM-86585].bin" size="282625728" crc="c5f3edb5" />
 		<rom name="Maestro Music, The (Japan) [SLPM-86585].cue" size="167" crc="80eb9171" />
 		-->
-		<description>The Maestro Music (Japan, with Baton Stick)</description>
+		<description>The Maestro Music (Jpn, with Baton Stick)</description>
 		<year>2000</year>
 		<publisher>Global A</publisher>
 		<info name="alt_title" value="ザ・マエストロムジーク&#40;バトンコントローラ同梱版&#41;"/>
@@ -11833,7 +11834,7 @@ A few comments on these:
 	</software>
 
 	<!-- boot OK -->
-	<software name="mrdrille" supported="no">
+	<software name="mrdrillg" supported="no">
 		<!-- Unknown source
 		<rom name="Mr. Driller G (Japan) [SLPS-03336].bin" size="642429984" crc="7df09940" />
 		<rom name="Mr. Driller G (Japan) [SLPS-03336].cue" size="98" crc="25ad987f" />
@@ -13312,7 +13313,7 @@ A few comments on these:
 		<rom name="Picnic! Excellent (Japan) [SLPS-01345].bin" size="116066496" crc="f8014d99" />
 		<rom name="Picnic! Excellent (Japan) [SLPS-01345].cue" size="230" crc="b11fbc2e" />
 		-->
-		<description>Pikinya! Excellent(Japan)</description>
+		<description>Pikinya! Excellent (Jpn)</description>
 		<year>1998</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ピキーニャ エクセレンテ"/>
@@ -14913,7 +14914,7 @@ A few comments on these:
 		<rom name="SD Gundam G-Generation F (Japan) (Disc 3) (Track 2) [SLPS-02902].bin" size="31747296" crc="96ad956d" />
 		<rom name="SD Gundam G-Generation F (Japan) (Disc 3) [SLPS-02902].cue" size="255" crc="aa8274d3" />
 		-->
-		<description>SD Gundam G Generation-F (Limited Edition)(Japan)</description>
+		<description>SD Gundam G Generation-F (Jpn, Limited Edition)</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="SDガンダムG GENERATION－F(限定版)"/>
@@ -19604,7 +19605,7 @@ A few comments on these:
 		<rom name="King of Braves Gaogaigar - Blockaded Numbers (Japan) [SLPS-01980].bin" size="708417696" crc="312b7d05" />
 		<rom name="King of Braves Gaogaigar - Blockaded Numbers (Japan) [SLPS-01980].cue" size="131" crc="54b7c369" />
 		-->
-		<description>Yuusha-Ou GaoGaiGar - Blockaded Numbers(Japan)</description>
+		<description>Yuusha-Ou GaoGaiGar - Blockaded Numbers (Jpn)</description>
 		<year>1999</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="勇者王ガオガイガー"/>
@@ -19964,7 +19965,7 @@ A few comments on these:
 	</software>
 
 	<!-- boot ok -->
-	<software name="terracon" supported="yes">
+	<software name="terracon">
 		<description>Terracon (Euro)</description>
 		<year>2000</year>
 		<publisher>Sony</publisher>
