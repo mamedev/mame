@@ -266,7 +266,7 @@ private:
 	bool DeleteSectorMode;
 	void cd_defragblocks(partitionT *part);
 	bool m_playtype;
-	sega_cdrom_get_adr_control(cdrom_file *file, int track);
+	int sega_cdrom_get_adr_control(cdrom_file *file, int track);
 	int m_CurrentTrack;
 	int m_CalculateActualSize;
 	bool m_TempPause;
