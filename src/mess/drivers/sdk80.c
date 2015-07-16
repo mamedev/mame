@@ -10,16 +10,27 @@ There is no speaker or storage facility in the standard kit.
 
 Download the User Manual to get the operating procedures.
 
+Monitor Commands:
+D  Display memory contents
+G  Go to address (execute program at address)
+I  Insert hex code
+M  Move blocks of memory
+S  Substitute memory locations
+X  Examine registers
+
+Please note this rom set boots into BASIC, not monitor.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/pit8253.h"
-#include "machine/i8251.h"
-#include "machine/i8255.h"
-#include "machine/i8279.h"
-#include "machine/ay31015.h"
-#include "bus/rs232/rs232.h"
+//#include "machine/pit8253.h"
+//#include "machine/i8251.h"
+//#include "machine/i8255.h"
+//#include "machine/i8279.h"
+//#include "machine/ay31015.h"
+//#include "bus/rs232/rs232.h"
+#include "machine/terminal.h"
 
 
 class sdk80_state : public driver_device
@@ -28,29 +39,52 @@ public:
 	sdk80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
+	DECLARE_READ8_MEMBER(portec_r);
+	DECLARE_READ8_MEMBER(ported_r);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	UINT8 m_digit;
+	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 static ADDRESS_MAP_START(sdk80_mem, AS_PROGRAM, 8, sdk80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sdk80_io, AS_IO, 8, sdk80_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xec, 0xec) AM_READ(portec_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
+	AM_RANGE(0xed, 0xed) AM_READ(ported_r)
+	//AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	//AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sdk80 )
 INPUT_PORTS_END
+
+READ8_MEMBER( sdk80_state::portec_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+READ8_MEMBER( sdk80_state::ported_r )
+{
+	return (m_term_data) ? 3 : 1;
+}
 
 #if 0
 /* Graphics Output */
@@ -101,20 +135,25 @@ READ8_MEMBER( sdk80_state::kbd_r )
 	return data;
 }
 
+WRITE8_MEMBER( sdk80_state::kbd_put )
+{
+	m_term_data = data;
+}
+
 static MACHINE_CONFIG_START( sdk80, sdk80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, 500000)
 	MCFG_CPU_PROGRAM_MAP(sdk80_mem)
 	MCFG_CPU_IO_MAP(sdk80_io)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+//	MCFG_DEVICE_ADD("uart", I8251, 0)
+//	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+//	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+//	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+//	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+//	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+//	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 
 // old references to other drivers have been left in
 //	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
@@ -171,6 +210,9 @@ static MACHINE_CONFIG_START( sdk80, sdk80_state )
 //	MCFG_I8279_IN_RL_CB(READ8(sdk80_state, kbd_r))                  // kbd RL lines
 //	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
 //	MCFG_I8279_IN_CTRL_CB(VCC)
+
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sdk80_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -187,4 +229,4 @@ ROM_START( sdk80 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS           INIT   COMPANY   FULLNAME  FLAGS */
-COMP( 1975, sdk80,  0,       0,     sdk80,     sdk80,  driver_device,  0,     "Intel",  "SDK-80", GAME_NO_SOUND_HW)
+COMP( 1975, sdk80,  0,       0,     sdk80,     sdk80,  driver_device,  0,     "Intel",  "SDK-80", GAME_NO_SOUND_HW | GAME_NOT_WORKING )
