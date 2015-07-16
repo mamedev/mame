@@ -32,6 +32,11 @@
 - (fill up this section once pull request these files);
 - use #define or a struct instead of m_cr[x] (starts counting from 1, shrug)
 
+@notes
+- doomj: A work RAM H buffer (0x260666b0) never zeroed during gameplay;
+- whp: Has TH Control Pad issue with SMPC;
+
+
 */
 
 #define DUMP_DIR_ENTRIES 0
@@ -85,6 +90,8 @@
 #define CD_STAT_WAIT     0x8000     // waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00     // ultra-fatal error.
 
+#define DEBUG_CDSPEED 150
+
 // device type definition
 const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
 
@@ -92,6 +99,12 @@ const device_type SEGACDBLOCK = &device_creator<segacdblock_device>;
 
 void segacdblock_device::set_flag(UINT16 which)
 {
+	if(m_hirq & CMOK && which & CMOK)
+	{
+		printf("CMOK setted up with CMOK enabled ...\n");
+		debugger_break(machine());
+	}
+	
 	m_hirq |= which;
 }
 
@@ -253,8 +266,10 @@ READ16_MEMBER(segacdblock_device::datatrns_r)
 		}
 	}
 	else
-		debugger_break(machine());
-
+	{
+		printf("DMA stalled, with %08x %08x\n",m_dma_src,m_dma_size);
+		//debugger_break(machine());
+	}
 	return res;
 }
 
@@ -341,7 +356,7 @@ void segacdblock_device::SH1CommandExecute()
 		case 0x06:	cd_cmd_end_transfer(); break;
 		
 		case 0x10:  cd_cmd_play_disc(); break;
-		case 0x11:  m_cd_state = CD_STAT_PAUSE; set_flag(CMOK); break; // ...
+		case 0x11:  cd_cmd_seek(); break; // ...
 		
 		case 0x30:	cd_cmd_set_device_connection(m_cr[2] >> 8); break;
 		
@@ -414,25 +429,30 @@ segacdblock_device::blockT *segacdblock_device::cd_alloc_block(UINT8 *blknum)
 void segacdblock_device::cd_free_block(blockT *blktofree)
 {
 	INT32 i;
-
+	int debug_var;
+	
 	if(blktofree == NULL)
 	{
 		return;
 	}
 
+	debug_var = 0;
 	for (i = 0; i < 200; i++)
 	{
 		if (&blocks[i] == blktofree)
 		{
 //			CDROM_LOG(("CD: freeing block %d\n", i))
-			blktofree->size = -1;
-			freeblocks++;
-			m_hirq &= ~BFUL;
+			debug_var ++;
 			printf("Free block %d\n",i);
 		}
 	}
 
-
+	if(debug_var > 1)
+		debugger_break(machine());
+	
+	blktofree->size = -1;
+	freeblocks++;
+	m_hirq &= ~BFUL;
 }
 
 void segacdblock_device::cd_readblock(UINT32 fad, UINT8 *dat)
@@ -711,14 +731,21 @@ void segacdblock_device::cd_cmd_get_session_info(UINT8 param)
 
 void segacdblock_device::cd_cmd_init(UINT8 init_flags)
 {
-	cd_standard_return(false);
 
 	if(init_flags & 1)
 		set_flag(ESEL|EHST|ECPY|EFLS|SCDQ);
 
 	if(init_flags & 0x10)
+	{
+		printf("CD 1x speed selected\n");
 		debugger_break(machine());
+	}
+	m_cd_state = CD_STAT_PAUSE;
+	m_FAD = 150;
+	m_FADEnd = 0;
 	
+	cd_standard_return(false);
+
 	set_flag(CMOK);
 }
 
@@ -800,6 +827,7 @@ void segacdblock_device::cd_cmd_end_transfer()
 
 void segacdblock_device::cd_cmd_play_disc()
 {
+	bool status_change;
 	UINT8 play_mode = (m_cr[2] >> 8) & 0x7f;
 	if(play_mode)
 	{
@@ -812,9 +840,13 @@ void segacdblock_device::cd_cmd_play_disc()
 	UINT32 end_pos = ((m_cr[2] & 0xff) << 16) | (m_cr[3] & 0xffff);
 	if(m_cr[2] & 0x8000)
 	{
-		printf("preserve current position %04x\n",m_cr[2]);
+		printf("preserve current position %04x %08x?\n",m_cr[2],m_FADEnd);
 		debugger_break(machine());
-		end_pos += m_FADEnd;
+		cd_standard_return(false);
+		set_flag(EHST);
+		set_flag(CMOK);
+		return;
+		//end_pos += m_FADEnd;
 	}
 
 	if(start_pos & 0x800000)
@@ -845,14 +877,52 @@ void segacdblock_device::cd_cmd_play_disc()
 		printf("resume pause state\n");
 		debugger_break(machine());
 	}
-	m_cd_state = CD_STAT_PLAY;
-	m_cd_timer->reset();
-	m_cd_timer->adjust(attotime::from_hz(150)); // @todo use the clock Luke
+	status_change = (m_cd_state & 0x0f00) != CD_STAT_PLAY;
+	
+	if(status_change == true)
+	{
+		m_cd_state = CD_STAT_PLAY;
+		m_cd_timer->reset();
+		m_cd_timer->adjust(attotime::from_hz(DEBUG_CDSPEED)); // @todo use the clock Luke
+	}
 	m_playtype = false;
 	
 	cd_standard_return(false);
 	set_flag(EHST);
 	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_seek()
+{
+	 if(m_cr[0] & 0x80)
+	 {
+		UINT32 start_pos = ((m_cr[0] & 0xff) << 16) | (m_cr[1] & 0xffff);
+		 
+		if(start_pos == 0xffffff)
+			m_cd_state = CD_STAT_PAUSE;
+		else
+		{
+			printf("Seek with FAD address\n");
+			debugger_break(machine());
+		}
+	 }
+	 else
+	 {
+		if((m_cr[1] >> 8) != 0)
+		{
+			m_cd_state = CD_STAT_PAUSE;
+			m_CurrentTrack = m_cr[1]>>8;;
+			m_FAD = cdrom_get_track_start(cdrom, m_CurrentTrack-1);
+			printf("New FAD %08x\n",m_FAD);
+		}
+		else
+		{
+			printf("Standby?\n");
+			debugger_break(machine());
+		}
+	 }
+	 //m_cd_state = CD_STAT_PAUSE; 
+	 set_flag(CMOK);
 }
 
 void segacdblock_device::cd_cmd_set_device_connection(UINT8 param)
@@ -1288,7 +1358,7 @@ void segacdblock_device::cd_cmd_read_file()
 	m_playtype = true;
 	cd_standard_return(false);
 	m_cd_timer->reset();
-	m_cd_timer->adjust(attotime::from_hz(150)); // @todo use the clock Luke
+	m_cd_timer->adjust(attotime::from_hz(DEBUG_CDSPEED)); // @todo use the clock Luke
 	
 	printf("Read file %08x (%08x %08x) %02x %d\n",curdir[file_id].firstfad,m_FAD,m_FADEnd,file_filter,m_SectorLengthIn);
 	set_flag(EFLS);
@@ -1451,6 +1521,8 @@ void segacdblock_device::dma_setup()
 			xfertype = CDDMA_INPROGRESS;
 			set_flag(DRDY);
 			sourcetype = SOURCE_NONE;
+			printf("TOC on bus executed\n");
+			//debugger_break(machine());
 			break;
 		case SOURCE_DATA:
 			memcpy(m_DMABuffer,finfbuf,12);
@@ -1671,11 +1743,17 @@ segacdblock_device::partitionT *segacdblock_device::cd_read_filtered_sector(INT3
 	return (partitionT *)NULL;
 }
 
-
+#define FREE_HIRQ(_val_,_key_) \
+	if(machine().input().code_pressed_once(_key_)) \
+	{ \
+		log_free_hirq = true; \
+		m_hirq ^= _val_; \
+	}
+	
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id < CD_TIMER+1);
-
+	
 	if(id == CMD_TIMER)
 		SH1CommandExecute();
 	else if(id == PERI_TIMER)
@@ -1698,11 +1776,29 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	}
 	else if(id == CD_TIMER)
 	{
+		bool log_free_hirq;
+
+		log_free_hirq = false;
+			
+		//printf("FREE %d\n",freeblocks);
+
+		FREE_HIRQ(CMOK,KEYCODE_Q);
+		FREE_HIRQ(DRDY,KEYCODE_W);
+		FREE_HIRQ(CSCT,KEYCODE_E);
+		FREE_HIRQ(BFUL,KEYCODE_R);
+		FREE_HIRQ(PEND,KEYCODE_T);
+		FREE_HIRQ(ESEL,KEYCODE_Y);
+		FREE_HIRQ(EHST,KEYCODE_U);
+		FREE_HIRQ(ECPY,KEYCODE_I);
+		FREE_HIRQ(EFLS,KEYCODE_O);
+		if(log_free_hirq == true)
+			popmessage("Free HIRQ! (%04x)",m_hirq);
+
+		
 		if((m_cd_state & 0x0f00) == CD_STAT_PAUSE)
 		{
 			set_flag(CSCT);
 
-			//printf("FREE %d\n",freeblocks);
 
 			if(!(m_hirq & BFUL) && m_TempPause == true)
 			{
@@ -1710,13 +1806,14 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				m_cd_state = CD_STAT_PLAY;
 			}
 			
-			m_cd_timer->adjust(attotime::from_hz(150));
+			m_cd_timer->adjust(attotime::from_hz(DEBUG_CDSPEED));
 			
 		}
 		else if((m_cd_state & 0x0f00) == CD_STAT_PLAY)
 		{
 			UINT8 p_ok;
 			
+			if(m_FADEnd)
 			printf("FAD %08x %08x\n",m_FAD,m_FADEnd);
 
 			p_ok = 0;
@@ -1742,7 +1839,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				m_FAD ++;
 				m_FADEnd --;
 				
-				if(!m_FADEnd)
+				if(m_FADEnd <= 0)
 				{
 					m_cd_state = CD_STAT_PAUSE;
 					set_flag(PEND);
@@ -1760,7 +1857,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				m_cd_state = CD_STAT_PAUSE;
 				printf("%04x %d\n",m_hirq,freeblocks);
 			}
-			m_cd_timer->adjust(attotime::from_hz(150));
+			m_cd_timer->adjust(attotime::from_hz(DEBUG_CDSPEED));
 			
 			
 			//if(m_TransferActive == true)

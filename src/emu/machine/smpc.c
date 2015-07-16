@@ -1024,13 +1024,13 @@ WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
 		{
 			if(data & 0x40)
 			{
-				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
+				if(LOG_PAD_CMD) printf("SMPC: BREAK request %02x\n",data);
 				m_smpc.SR &= 0x0f;
 				m_smpc.intback_stage = 0;
 			}
 			else if(data & 0x80)
 			{
-				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
+				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request %02x\n",data);
 				machine().scheduler().timer_set(attotime::from_usec(700), timer_expired_delegate(FUNC(saturn_state::intback_peripheral),this),0); /* TODO: is timing correct? */
 				m_smpc.OREG[31] = 0x10;
 				m_smpc.SF = 0x01; //TODO: set hand-shake flag?

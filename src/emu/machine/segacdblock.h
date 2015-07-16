@@ -81,7 +81,7 @@ private:
 	UINT16 m_hirq_mask;
 	UINT16 m_hirq;
 	UINT32 m_FAD;
-	UINT32 m_FADEnd;
+	INT32 m_FADEnd;
 	UINT16 m_cd_state;
 	UINT8 m_cmd_issued;
 	bool m_sh1_inited;
@@ -204,6 +204,7 @@ private:
 
 	// 0x10
 	void cd_cmd_play_disc();
+	void cd_cmd_seek();
 	
 	// 0x30
 	void cd_cmd_set_device_connection(UINT8 param);
