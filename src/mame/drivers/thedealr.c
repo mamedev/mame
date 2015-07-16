@@ -392,7 +392,9 @@ Full House     10      10      10       8   x Bet
 Return Rate 111.9%  110.7%  106.6%  105.8%  Jacks or Better
 Return Rate  94.7%   92.9%   89.4%   87.8%  Two Pair
 
-Calculated returns based on 1 coin bet and paytable as shown above, Two Pair through Royal Flush without bonuses
+NOTE: Jackpot & Mini Jackpot values based on 10 Coin Max Bet. Values increase with higher Max Bet values.
+
+Calculated returns based on 1 coin bet and paytable as shown above, Two Pair through Royal Flush without bonuses.
 */
 	PORT_DIPNAME( 0xc0, 0xc0, "Payout Percentage" ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "87.8%" )  PORT_CONDITION("DSW3", 0x02, EQUALS, 0x02)
