@@ -174,7 +174,9 @@ bits(7:4) and bit(24)), X, and Y:
 
 #define MODIFY_PIXEL(VV)
 
-
+// Need to turn off cycle eating when debugging MIPS drc
+// otherwise timer interrupts won't match nodrc debug mode.
+#define EAT_CYCLES          (1)
 
 
 /*************************************
@@ -3951,7 +3953,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			/* bit 31 is not used */
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(1000);
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
@@ -3964,7 +3966,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 		case vRetrace:
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(10);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(10);
 			result = v->screen->vpos();
 			break;
 
@@ -3979,7 +3981,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			result = v->fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(1000);
 			break;
 
 		case cmdFifoAMin:
