@@ -91,7 +91,7 @@ For games that require the time to be set, skip through the set time screen at l
 	</software>
 
 	<software name="pokezcrd">
-		<description>Pok&#233;mon Zany Cards (USA, Euro, Aus)</description>
+		<description>Pok&#233;mon Zany Cards (Aus, Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="20011116 (US)"/>
@@ -152,7 +152,7 @@ For games that require the time to be set, skip through the set time screen at l
 	</software>
 
 	<software name="pokpartyu" cloneof="pokparty" supported="partial">
-		<description>Pok&#233;mon Party Mini (USA, Aus)</description>
+		<description>Pok&#233;mon Party Mini (Aus, USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="20011116"/>
@@ -177,7 +177,7 @@ For games that require the time to be set, skip through the set time screen at l
 	</software>
 
 	<software name="pokepinb" supported="partial">
-		<description>Pok&#233;mon Pinball Mini (USA, Euro, Aus)</description>
+		<description>Pok&#233;mon Pinball Mini (Aus, Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="20011116"/>
@@ -323,7 +323,7 @@ For games that require the time to be set, skip through the set time screen at l
 	</software>
 
 	<software name="ppuzzlc" supported="partial">
-		<description>Pok&#233;mon Puzzle Collection (USA, Euro, Aus)</description><!-- only USA is confirmed -->
+		<description>Pok&#233;mon Puzzle Collection (Aus, Euro, USA)</description><!-- only USA is confirmed -->
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="20011116"/>

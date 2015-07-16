@@ -80,8 +80,8 @@
 		<description>Stakan</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="radio86_cass">
 		<info name="alt_title" value="Стакан"/>
+		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1546">
 				<rom name="e_stakan.rkr" size="1546" crc="ba2382a7" sha1="8c30f40d9808019b2b4c44f3cf6e1b072ecd7689" offset="0" />
 			</dataarea>

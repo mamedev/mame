@@ -15560,7 +15560,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="gamenko">
-		<description>Game no Kandume Otokuyou (Jpn, Sega Channel)</description>
+		<description>Game no Kandume Otokuyou (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
