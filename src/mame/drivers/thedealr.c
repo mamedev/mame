@@ -453,7 +453,6 @@ Fever Mode:
 	PORT_DIPNAME( 0x80, 0x80, "Coin In / Coin Out" ) PORT_DIPLOCATION("SW3:8") /* No credit - payout waiting for hopper??? */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
 
 	PORT_START("DSW4")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:7" )	// X in service mode
