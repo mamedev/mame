@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nigel Barnes
+// copyright-holders:Nigel Barnes,Ryan Holtz
 /***************************************************************************
 
         Intel SDK-80
@@ -24,14 +24,14 @@ Please note this rom set boots into BASIC, not monitor.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-//#include "machine/pit8253.h"
-//#include "machine/i8251.h"
-//#include "machine/i8255.h"
-//#include "machine/i8279.h"
+#include "machine/i8251.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 //#include "machine/ay31015.h"
-//#include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
 
+#define I8251A_TAG		"usart"
+#define I8251A_BAUD_TAG	"usart_baud"
+#define RS232_TAG		"rs232"
 
 class sdk80_state : public driver_device
 {
@@ -39,21 +39,25 @@ public:
 	sdk80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
+		, m_usart(*this, I8251A_TAG)
+		, m_rs232(*this, RS232_TAG)
+		, m_usart_baud_rate(*this, I8251A_BAUD_TAG)
+		, m_usart_divide_counter(0)
+		, m_usart_clock_state(0)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_READ8_MEMBER(portec_r);
-	DECLARE_READ8_MEMBER(ported_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
+
 private:
-	UINT8 m_digit;
-	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<i8251_device> m_usart;
+	required_device<rs232_port_device> m_rs232;
+	required_ioport m_usart_baud_rate;
+
+	UINT8 m_usart_divide_counter;
+	UINT8 m_usart_clock_state;
 };
 
 static ADDRESS_MAP_START(sdk80_mem, AS_PROGRAM, 8, sdk80_state)
@@ -65,26 +69,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sdk80_io, AS_IO, 8, sdk80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xec, 0xec) AM_READ(portec_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE(0xed, 0xed) AM_READ(ported_r)
-	//AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	//AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE(I8251A_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE(I8251A_TAG, i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sdk80 )
+	PORT_START(I8251A_BAUD_TAG)
+	PORT_DIPNAME( 0x3f, 0x01, "i8251 Baud Rate" )
+	PORT_DIPSETTING(    0x01, "4800")
+	PORT_DIPSETTING(    0x02, "2400")
+	PORT_DIPSETTING(    0x04, "1200")
+	PORT_DIPSETTING(    0x08, "600")
+	PORT_DIPSETTING(    0x10, "300")
+	PORT_DIPSETTING(    0x20, "150")
+	PORT_DIPSETTING(    0x40, "75")
 INPUT_PORTS_END
-
-READ8_MEMBER( sdk80_state::portec_r )
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( sdk80_state::ported_r )
-{
-	return (m_term_data) ? 3 : 1;
-}
 
 #if 0
 /* Graphics Output */
@@ -111,67 +110,37 @@ UINT32 sdk80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-WRITE8_MEMBER( sdk80_state::scanlines_w )
+WRITE_LINE_MEMBER( sdk80_state::usart_clock_tick )
 {
-	m_digit = data;
-}
+	UINT8 old_counter = m_usart_divide_counter;
+	m_usart_divide_counter++;
 
-WRITE8_MEMBER( sdk80_state::digit_w )
-{
-	if (m_digit < 6)
-		output_set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
-}
-
-READ8_MEMBER( sdk80_state::kbd_r )
-{
-	UINT8 data = 0xff;
-
-	if (m_digit < 3)
+	UINT8 transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
+	if (transition)
 	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%X",m_digit);
-		data = ioport(kbdrow)->read();
+		m_usart->write_txc(m_usart_clock_state);
+		m_usart->write_rxc(m_usart_clock_state);
+		m_usart_clock_state ^= 1;
 	}
-	return data;
-}
-
-WRITE8_MEMBER( sdk80_state::kbd_put )
-{
-	m_term_data = data;
 }
 
 static MACHINE_CONFIG_START( sdk80, sdk80_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, 500000)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz/9)
 	MCFG_CPU_PROGRAM_MAP(sdk80_mem)
 	MCFG_CPU_IO_MAP(sdk80_io)
 
-//	MCFG_DEVICE_ADD("uart", I8251, 0)
-//	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-//	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-//	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-//	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-//	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-//	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
 
-// old references to other drivers have been left in
-//	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-//	MCFG_PIT8253_CLK0(MAIN_CLOCK_X1) /* heartbeat IRQ */
-//	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
-//	MCFG_PIT8253_CLK1(MAIN_CLOCK_X1) /* Memory Refresh */
-//	MCFG_PIT8253_CLK2(MAIN_CLOCK_X1) /* RS-232c */
-//	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc9801_state, write_uart_clock))
-
-//	MCFG_DEVICE_ADD("ppi8255_sys", I8255, 0)
-//	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-//	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
-//	MCFG_I8255_IN_PORTC_CB(CONSTANT(0xa0)) // 0x80 cpu triple fault reset flag?
-//	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc9801_state, ppi_sys_portc_w))
-
-//	MCFG_DEVICE_ADD("ppi8255_prn", I8255, 0)
-	/* TODO: check this one */
-//	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW5"))
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_18_432MHz/60)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sdk80_state, usart_clock_tick))
 
 	/* video hardware */
 	// 96364 crt controller
@@ -195,7 +164,7 @@ static MACHINE_CONFIG_START( sdk80, sdk80_state )
 
 //	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	// uart
+	// Video board UART
 //	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
 //	MCFG_AY31015_TX_CLOCK(( XTAL_16MHz / 16 ) / 256)
 //	MCFG_AY31015_RX_CLOCK(( XTAL_16MHz / 16 ) / 256)
@@ -211,8 +180,8 @@ static MACHINE_CONFIG_START( sdk80, sdk80_state )
 //	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
 //	MCFG_I8279_IN_CTRL_CB(VCC)
 
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sdk80_state, kbd_put))
+	//MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	//MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sdk80_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
