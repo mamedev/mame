@@ -11,10 +11,10 @@
 #include "mewui/sndmenu.h"
 #include "mewui/selector.h"
 
-#ifdef MEWUI_SDL
-#include "../osd/sdl/osdsdl.h"
-#else
+#ifdef MEWUI_WINDOWS
 #include "../osd/windows/winmain.h"
+//#else
+//#include "../osd/windows/winmain.h"
 #endif
 
 const int ui_menu_sound_options::sound_rate[] = { 11025, 22050, 44100, 48000 };
@@ -25,10 +25,10 @@ const int ui_menu_sound_options::sound_rate[] = { 11025, 22050, 44100, 48000 };
 
 ui_menu_sound_options::ui_menu_sound_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-#ifdef MEWUI_SDL
-	sdl_options &options = downcast<sdl_options &>(machine.options());
-#else
+#ifdef MEWUI_WINDOWS
 	windows_options &options = downcast<windows_options &>(machine.options());
+#else
+	osd_options &options = downcast<osd_options &>(machine.options());
 #endif
 
 	m_sample_rate = machine.options().sample_rate();

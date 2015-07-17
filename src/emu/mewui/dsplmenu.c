@@ -13,15 +13,14 @@
 #include "mewui/utils.h"
 
 // SDL
-#ifdef MEWUI_SDL
-#include "../osd/modules/lib/osdobj_common.h"
-const char *ui_menu_display_options::video_modes[] = { "auto", "opengl", "soft", "accel" };
-const char *ui_menu_display_options::video_modes_label[] = { "Auto", "OpenGL", "Software", "SDL2 Accelerated" };
-// WINDOWS
-#else
+#ifdef MEWUI_WINDOWS
 #include "../osd/windows/winmain.h"
 const char *ui_menu_display_options::video_modes[] = { "auto", "d3d", "gdi", "ddraw", "opengl" };
 const char *ui_menu_display_options::video_modes_label[] = { "Auto", "Direct3D", "GDI", "DirectDraw", "OpenGL" };
+#else
+//#include "../osd/modules/lib/osdobj_common.h"
+const char *ui_menu_display_options::video_modes[] = { "auto", "opengl", "soft", "accel" };
+const char *ui_menu_display_options::video_modes_label[] = { "Auto", "OpenGL", "Software", "SDL2 Accelerated" };
 #endif
 
 /**************************************************
@@ -33,10 +32,10 @@ const char *ui_menu_display_options::video_modes_label[] = { "Auto", "Direct3D",
 
 ui_menu_display_options::ui_menu_display_options(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
-#ifdef MEWUI_SDL
-	sdl_options &options = downcast<sdl_options &>(machine.options());
-#else
+#ifdef MEWUI_WINDOWS
 	windows_options &options = downcast<windows_options &>(machine.options());
+#else
+	osd_options &options = downcast<osd_options &>(machine.options());
 #endif
 
 	// osd
