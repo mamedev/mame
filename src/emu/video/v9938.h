@@ -29,16 +29,6 @@
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
 	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
 
-// init functions
-
-#define MODEL_V9938 (0)
-#define MODEL_V9958 (1)
-
-// resolutions
-#define RENDER_HIGH (0)
-#define RENDER_LOW  (1)
-#define RENDER_AUTO (2)
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -47,7 +37,6 @@
 // device type definition
 extern const device_type V9938;
 extern const device_type V9958;
-
 
 
 
@@ -70,7 +59,6 @@ public:
 		m_int_callback.set_callback(irq);
 	}
 	int interrupt ();
-	void set_resolution (int);
 	int get_transpen();
 	bitmap_ind16 &get_bitmap() { return m_bitmap; }
 	void update_mouse_state(int mx_delta, int my_delta, int button_state);
@@ -113,24 +101,24 @@ private:
 	void check_int();
 	void register_write(int reg, int data);
 
-	template<typename _PixelType, int _Width> void default_border(const pen_t *pens, _PixelType *ln);
-	template<typename _PixelType, int _Width> void graphic7_border(const pen_t *pens, _PixelType *ln);
-	template<typename _PixelType, int _Width> void graphic5_border(const pen_t *pens, _PixelType *ln);
-	template<typename _PixelType, int _Width> void mode_text1(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_text2(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_multi(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_graphic1(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_graphic23(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_graphic4(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_graphic5(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_graphic6(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_graphic7(const pen_t *pens, _PixelType *ln, int line);
+	void default_border(const pen_t *pens, UINT16 *ln);
+	void graphic7_border(const pen_t *pens, UINT16 *ln);
+	void graphic5_border(const pen_t *pens, UINT16 *ln);
+	void mode_text1(const pen_t *pens, UINT16 *ln, int line);
+	void mode_text2(const pen_t *pens, UINT16 *ln, int line);
+	void mode_multi(const pen_t *pens, UINT16 *ln, int line);
+	void mode_graphic1(const pen_t *pens, UINT16 *ln, int line);
+	void mode_graphic23(const pen_t *pens, UINT16 *ln, int line);
+	void mode_graphic4(const pen_t *pens, UINT16 *ln, int line);
+	void mode_graphic5(const pen_t *pens, UINT16 *ln, int line);
+	void mode_graphic6(const pen_t *pens, UINT16 *ln, int line);
+	void mode_graphic7(const pen_t *pens, UINT16 *ln, int line);
 //  template<typename _PixelType, int _Width> void mode_yae(const pen_t *pens, _PixelType *ln, int line);
 //  template<typename _PixelType, int _Width> void mode_yjk(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void mode_unknown(const pen_t *pens, _PixelType *ln, int line);
-	template<typename _PixelType, int _Width> void default_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8 *col);
-	template<typename _PixelType, int _Width> void graphic5_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8 *col);
-	template<typename _PixelType, int _Width> void graphic7_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8 *col);
+	void mode_unknown(const pen_t *pens, UINT16 *ln, int line);
+	void default_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *col);
+	void graphic5_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *col);
+	void graphic7_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *col);
 
 	void sprite_mode1(int line, UINT8 *col);
 	void sprite_mode2(int line, UINT8 *col);
@@ -197,8 +185,6 @@ private:
 	int m_scanline;
 	// blinking
 	int m_blink, m_blink_count;
-	// size
-	int m_size, m_size_old, m_size_auto, m_size_now;
 	// mouse
 	UINT8 m_mx_delta, m_my_delta;
 	// mouse & lightpen
@@ -228,12 +214,9 @@ private:
 	{
 		UINT8 m;
 		void (v99x8_device::*visible_16)(const pen_t *, UINT16*, int);
-		void (v99x8_device::*visible_16s)(const pen_t *, UINT16*, int);
 		void (v99x8_device::*border_16)(const pen_t *, UINT16*);
-		void (v99x8_device::*border_16s)(const pen_t *, UINT16*);
 		void (v99x8_device::*sprites)(int, UINT8*);
 		void (v99x8_device::*draw_sprite_16)(const pen_t *, UINT16*, UINT8*);
-		void (v99x8_device::*draw_sprite_16s)(const pen_t *, UINT16*, UINT8*);
 	} ;
 	static const v99x8_mode s_modes[];
 	required_device<palette_device> m_palette;
