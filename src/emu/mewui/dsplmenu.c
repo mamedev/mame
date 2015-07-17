@@ -116,7 +116,7 @@ void ui_menu_display_options::handle()
 				else if (menu_event->iptkey == IPT_UI_SELECT)
 				{
 					int total = ARRAY_LENGTH(video_modes_label);
-					std::vector<std::string> s_sel(total + 1);
+					std::vector<std::string> s_sel(total);
 					for (int index = 0; index < total; index++)
 						s_sel[index].assign(video_modes_label[index]);
 
