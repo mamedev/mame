@@ -14,7 +14,7 @@
 
 // SDL
 #ifdef MEWUI_SDL
-#include "../osd/sdl/osdsdl.h"
+#include "../osd/modules/lib/osdobj_common.h"
 const char *ui_menu_display_options::video_modes[] = { "auto", "opengl", "soft", "accel" };
 const char *ui_menu_display_options::video_modes_label[] = { "Auto", "OpenGL", "Software", "SDL2 Accelerated" };
 // WINDOWS
