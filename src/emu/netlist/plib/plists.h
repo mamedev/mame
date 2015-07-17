@@ -364,6 +364,14 @@ public:
 		return _ListClass(NULL);
 	}
 
+	int index_by_name(const pstring &name) const
+	{
+		for (std::size_t i=0; i < this->size(); i++)
+			if (get_name((*this)[i]) == name)
+				return (int) i;
+		return -1;
+	}
+
 	void remove_by_name(const pstring &name)
 	{
 		plist_t<_ListClass>::remove(find_by_name(name));

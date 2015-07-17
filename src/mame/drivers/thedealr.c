@@ -371,37 +371,88 @@ static INPUT_PORTS_START( thedealr )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
-	PORT_DIPNAME( 0xc0, 0xc0, "SW1:7,8" ) PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0xc0, "0" )
-	PORT_DIPSETTING(    0x80, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
+/*
+ Switches 7 & 8 control the payout as follows:
+
+            Off/Off Off/On  On/Off  On/On   Notes
+		    ---------------------------------------------------------------------------------------------
+Jackpot MB   5000    5000    5000    2000   Ryl Flush bonus at Max Bet
+   Jackpot   2500    2500    2500    1000   Ryl Flush bonus at 5 coins + 500 (or 200) per coin up to Max Bet
+   Mini JP   1500    1500    1000     500   Str Flush bonus at Max Bet
+ Ryl Flush    500     500     500     200   x Bet
+ Str Flush    150     150     100      50   x Bet
+        4K     60      60      40      25   x Bet
+Full House     10      10      10       8   x Bet
+     Flush      7       6       7       6   x Bet
+  Straight      5       5       5       5   x Bet
+        3K      3       3       3       4   x Bet
+  Two pair      2       2       2       2   x Bet
+    Jacks+      1       1       1       1   x Bet (When enabled - DSW 3-2)
+
+Return Rate 111.9%  110.7%  106.6%  105.8%  Jacks or Better
+Return Rate  94.7%   92.9%   89.4%   87.8%  Two Pair
+
+NOTE: Jackpot & Mini Jackpot values based on 10 Coin Max Bet. Values increase with higher Max Bet values.
+
+Calculated returns based on 1 coin bet and paytable as shown above, Two Pair through Royal Flush without bonuses.
+*/
+	PORT_DIPNAME( 0xc0, 0xc0, "Payout Percentage" ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, "87.8%" )  PORT_CONDITION("DSW3", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x40, "89.4%" )  PORT_CONDITION("DSW3", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x80, "92.9%" )  PORT_CONDITION("DSW3", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc0, "94.7%" )  PORT_CONDITION("DSW3", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "105.8%" ) PORT_CONDITION("DSW3", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, "106.6%" ) PORT_CONDITION("DSW3", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, "110.7%" ) PORT_CONDITION("DSW3", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, "111.9%" ) PORT_CONDITION("DSW3", 0x02, EQUALS, 0x00)
 
 	PORT_START("DSW2")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
-	PORT_DIPNAME( 0x06, 0x06, "SW2:2,3" ) PORT_DIPLOCATION("SW2:2,3")
-	PORT_DIPSETTING(    0x06, "0" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x18, 0x18, "SW2:4,5" ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "0" )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+	PORT_DIPNAME( 0xe0, 0xe0, "Max Bet" ) PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPSETTING(    0xc0, "5" )
+	PORT_DIPSETTING(    0xe0, "10" )
+	PORT_DIPSETTING(    0xa0, "20" )
+	PORT_DIPSETTING(    0x80, "20 Duplicate" )
+	PORT_DIPSETTING(    0x40, "30" )
+	PORT_DIPSETTING(    0x00, "30 Duplicate" )
+	PORT_DIPSETTING(    0x60, "60" )
+	PORT_DIPSETTING(    0x20, "60 Duplicate" )
 
 	PORT_START("DSW3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPNAME( 0x02, 0x02, "Lowest Paid Hand" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, "Two Pair" )
+	PORT_DIPSETTING(    0x00, "Jacks or Better" )
+	PORT_DIPNAME( 0x04, 0x04, "Double Up" ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+/*
+Fever Mode:
+  Overrides Jacks or Better
+  3 of a Kind winning hand Jacks or higher enters Fever Mode
+  You start with a pair of your 3 of a Kind cards & you draw 3 cards each hand.
+    Jacks through Kings get 5 Fever Mode Draws
+	Aces get 15 Fever Mode Draws
+*/
+	PORT_DIPNAME( 0x20, 0x20, "Fever Mode" ) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" ) /* Overrides Coinage - 1C / 1C */
+	PORT_DIPNAME( 0x80, 0x80, "Coin In / Coin Out" ) PORT_DIPLOCATION("SW3:8") /* No credit - payout waiting for hopper??? */
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:7" )	// X in service mode
