@@ -8,7 +8,7 @@
   - SM512: 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
   
   Other chips that may be in the same family, investigate more when one of
-  them needs to get emulated: SM500, SM530, SM531, ..
+  them needs to get emulated: SM500, SM530/31, SM4A, SM3903, ..
 
   References:
   - 1990 Sharp Microcomputers Data Book
