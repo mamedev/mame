@@ -1978,7 +1978,7 @@ ROM_START( hotrod )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
 	ROM_REGION( 0x1d6000, "floppy", 0)
-	ROM_LOAD( "ds3-5000-01d_3p_turbo.img", 0x000000, 0x1d6000, CRC(627e8053) SHA1(d1a95f99078f5a29cccacfb1b30c3c9ead7b605c) )
+	ROM_LOAD( "ds3-5000-01d_3p_turbo.img", 0x000000, 0x1d6000, CRC(842006fd) SHA1(d5432f58c0fb39f2bf62786a0d842bdd469ab2cb) )
 ROM_END
 
 ROM_START( hotroda )
@@ -1987,7 +1987,16 @@ ROM_START( hotroda )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
 	ROM_REGION( 0x1d6000, "floppy", 0)
-	ROM_LOAD( "ds3-5000-01d.img", 0x000000, 0x1d6000, CRC(abf67b02) SHA1(f397435eaad691ff5a38d6d1d27840ed95a62df3) ) // World? 3 Player TURBO
+	ROM_LOAD( "ds3-5000-01d.img", 0x000000, 0x1d6000, CRC(e25c6b63) SHA1(fbf86d2ebccd8053b990939f63f5497907d18321) )
+ROM_END
+
+ROM_START( hotrodja )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-11339.ic2", 0x000000, 0x20000, CRC(75130e73) SHA1(e079739f4a3da3807aac570442c5afef1a7d7b0e) )
+	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
+
+	ROM_REGION( 0x1d6000, "floppy", 0)
+	ROM_LOAD( "ds3-5000-01a-rev-b.img", 0x000000, 0x1d6000, CRC(c18f6dca) SHA1(6f2b5a9567a340324a5f3fb57a3b744de0924a23) )
 ROM_END
 
 ROM_START( hotrodj )
@@ -1996,7 +2005,7 @@ ROM_START( hotrodj )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
 	ROM_REGION( 0x1d6000, "floppy", 0)
-	ROM_LOAD( "ds3-5000-01a-rev-b.img", 0x000000, 0x1d6000, CRC(a39a0c2d) SHA1(ea8104c2266c48f480837aa7679c0a6f0c5e5452) ) // Japanese 4 Player
+	ROM_LOAD( "ds3-5000-01a-rev-c.img", 0x000000, 0x1d6000, CRC(852f9b5f) SHA1(159e161f55beed0f90cce8a73b0aeb4564d6af90) )
 ROM_END
 
 ROM_START( qgh )
@@ -2466,7 +2475,8 @@ DRIVER_INIT_MEMBER(segas24_state,roughrac)
 /* Disk Based Games */
 /* 01 */GAME( 1988, hotrod,    0,        system24_floppy,        hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
 /* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy,        hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy,        hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy,        hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
+/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy,        hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
 /* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
 /* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, segas24_state, sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
 /* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", GAME_NOT_WORKING ) /* MISSING disk image */
