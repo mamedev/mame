@@ -2938,8 +2938,9 @@ ROM_START( mj3evo )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0021b", 0, SHA1(c97d1dc95cdf1b4bd5d7cf6b4db0757f3d6bd723) )
 
+	// PIC label is unknown
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	ROM_LOAD( "317-xxxx-jpn.pic", 0x000000, 0x004000, NO_DUMP )
+	ROM_LOAD( "317-xxxx-jpn.pic", 0x000000, 0x004000, CRC(650fcc94) SHA1(c88488900460fb3deecb3cf376fc043b10c020ef) )
 ROM_END
 
 /*
