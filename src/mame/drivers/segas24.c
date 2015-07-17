@@ -2080,7 +2080,7 @@ ROM_START( bnzabros )
 	ROM_RELOAD ( 0x180001, 0x40000)
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
-	ROM_LOAD( "ds3-5000-07d.img", 0x000000, 0x1c2000, CRC(ea7a3302) SHA1(5f92efb2e1135c1f3eeca38ba5789739a22dbd11) ) /* Region letter needs to be verfied */
+	ROM_LOAD( "ds3-5000-07d.img", 0x000000, 0x1c2000, CRC(2e70251f) SHA1(1c2616dfa5cc15e8ebf1424012f2dd66f3a001a1) ) /* Region letter needs to be verfied */
 ROM_END
 
 ROM_START( bnzabrosj )
@@ -2120,7 +2120,7 @@ ROM_START( sspirits )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
-	ROM_LOAD( "ds3-5000-02-.img", 0x000000, 0x1c2000, CRC(cefbda69) SHA1(5b47ae0f1584ce1eb697246273ba761bd9e981c1)  )
+	ROM_LOAD( "ds3-5000-02-.img", 0x000000, 0x1c2000, CRC(179b98e9) SHA1(f6fc52c599c336d5c6f7aa199515268b4b3218a8) )
 ROM_END
 
 ROM_START( sspiritj )
@@ -2166,7 +2166,7 @@ ROM_START( sgmastc )
 	ROM_LOAD( "317-0058-05c.key", 0x0000, 0x2000, CRC(ae0eabe5) SHA1(692d7565bf9c5b32cc80bb4bd88c9193aa04cbb0) )
 
 	ROM_REGION( 0x1c2000, "floppy", 0)
-	ROM_LOAD( "ds3-5000-05c.img", 0x000000, 0x1c2000, CRC(06c4f834) SHA1(5e178ed0edff7721c93f76da2e03ae188dc5efa4) )
+	ROM_LOAD( "ds3-5000-05c.img", 0x000000, 0x1c2000, CRC(63a6ef3a) SHA1(f39fe0bf8930de994b1a77e0ba787d249d73c5e5) )
 ROM_END
 
 ROM_START( sgmastj )
