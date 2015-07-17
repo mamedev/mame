@@ -18,7 +18,7 @@
 const char *ui_menu_display_options::video_modes[] = { "auto", "d3d", "gdi", "ddraw", "opengl" };
 const char *ui_menu_display_options::video_modes_label[] = { "Auto", "Direct3D", "GDI", "DirectDraw", "OpenGL" };
 #else
-//#include "../osd/modules/lib/osdobj_common.h"
+#include "../osd/modules/lib/osdobj_common.h"
 const char *ui_menu_display_options::video_modes[] = { "auto", "opengl", "soft", "accel" };
 const char *ui_menu_display_options::video_modes_label[] = { "Auto", "OpenGL", "Software", "SDL2 Accelerated" };
 #endif

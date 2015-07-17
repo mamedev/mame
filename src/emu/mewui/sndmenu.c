@@ -13,8 +13,8 @@
 
 #ifdef MEWUI_WINDOWS
 #include "../osd/windows/winmain.h"
-//#else
-//#include "../osd/windows/winmain.h"
+#else
+#include "../osd/modules/lib/osdobj_common.h"
 #endif
 
 const int ui_menu_sound_options::sound_rate[] = { 11025, 22050, 44100, 48000 };
