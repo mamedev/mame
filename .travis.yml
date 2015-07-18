@@ -1,3 +1,10 @@
+os:
+  - linux
+  - osx
+matrix:
+  allow_failures:
+    - os: osx
+
 language: cpp
 compiler:
   - gcc
@@ -6,13 +13,16 @@ env:
   - SUBTARGET=arcade MAME=mamearcade64
   - SUBTARGET=mess   MAME=mess64
 script:
-  - if [ $CC == 'clang' ];
-    then make -j2 linux_x64_clang && ./$MAME -validate;
-    else make -j2 OPTIMIZE=0      && ./$MAME -validate;
-    fi
+  - if [ $TRAVIS_OS_NAME == 'linux' ];
+    then if [ $CC == 'clang' ]; then make -j2 linux_x64_clang && ./$MAME -validate; else make -j2 OPTIMIZE=0      && ./$MAME -validate; fi
+    else if [ $CC == 'clang' ]; then make -j2 macosx_x64_clang && ./$MAME -validate; else make -j2 OPTIMIZE=0      && ./$MAME -validate; fi
 sudo: required
 before_install:
-  - sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y
-  - sudo add-apt-repository ppa:shahar-evron/qt-backports -y
-  - sudo apt-get update -qq
-  - sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libasound2-dev libqt4-dev libqt4-dev-bin
+  - if [ $TRAVIS_OS_NAME == 'linux' ];
+    then sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y;
+    sudo add-apt-repository ppa:shahar-evron/qt-backports -y;
+    sudo apt-get update -qq;
+    sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libasound2-dev libqt4-dev libqt4-dev-bin;
+    else brew update; brew install -y sdl2-dev sdl2-ttf-dev asound2-dev qt4-dev qt4-dev-bin;
+    fi
+
