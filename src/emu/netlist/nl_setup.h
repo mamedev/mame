@@ -32,9 +32,6 @@
 #define NET_REGISTER_DEV_X(_type, _name)                                            \
 		setup.register_dev(# _type, # _name);
 
-#define NET_REMOVE_DEV(_name)                                                       \
-		setup.remove_dev(# _name);
-
 #define NET_REGISTER_SIGNAL(_type, _name)                                           \
 		NET_REGISTER_DEV(_type ## _ ## sig, _name)
 
@@ -133,10 +130,8 @@ namespace netlist
 			const pstring &name() const { return e1; }
 		};
 
-		typedef pnamedlist_t<link_t> tagmap_nstring_t;
-		typedef pnamedlist_t<param_t *> tagmap_param_t;
+		//typedef pnamedlist_t<link_t> tagmap_nstring_t;
 		typedef pnamedlist_t<core_terminal_t *> tagmap_terminal_t;
-		typedef plist_t<link_t> tagmap_link_t;
 
 		setup_t(netlist_t *netlist);
 		~setup_t();
@@ -217,10 +212,11 @@ namespace netlist
 
 		netlist_t *m_netlist;
 
-		tagmap_nstring_t m_alias;
-		tagmap_param_t  m_params;
-		tagmap_link_t   m_links;
-		tagmap_nstring_t m_params_temp;
+		phashmap_t<pstring, pstring> m_alias;
+		phashmap_t<pstring, param_t *>  m_params;
+		phashmap_t<pstring, pstring> m_params_temp;
+
+		plist_t<link_t> m_links;
 
 		factory_list_t *m_factory;
 
@@ -245,6 +241,7 @@ namespace netlist
 		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);
 
+#if 0
 		template <class T>
 		void remove_start_with(T &hm, pstring &sw)
 		{
@@ -258,6 +255,7 @@ namespace netlist
 				}
 			}
 		}
+#endif
 	};
 
 	// ----------------------------------------------------------------------------------------

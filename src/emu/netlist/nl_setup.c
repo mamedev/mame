@@ -136,27 +136,6 @@ device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 	}
 }
 
-void setup_t::remove_dev(const pstring &name)
-{
-	device_t *dev = netlist().m_devices.find_by_name(name);
-	pstring temp = name + ".";
-	if (dev == NULL)
-		netlist().error("Device %s does not exist\n", name.cstr());
-
-	remove_start_with<tagmap_terminal_t>(m_terminals, temp);
-	remove_start_with<tagmap_param_t>(m_params, temp);
-
-	const link_t *p = m_links.data();
-	while (p != NULL)
-	{
-		const link_t *n = p+1;
-		if (temp.equals(p->e1.substr(0,temp.len())) || temp.equals(p->e2.substr(0,temp.len())))
-			m_links.remove(*p);
-		p = n;
-	}
-	netlist().m_devices.remove_by_name(name);
-}
-
 void setup_t::register_model(const pstring &model)
 {
 	m_models.add(model);
@@ -164,7 +143,7 @@ void setup_t::register_model(const pstring &model)
 
 void setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
 {
-	if (!(m_alias.add(link_t(alias, out), false)==true))
+	if (!m_alias.add(alias, out))
 		netlist().error("Error adding alias %s to alias list\n", alias.cstr());
 }
 
@@ -266,9 +245,9 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 			{
 				param_t &param = dynamic_cast<param_t &>(obj);
 				//printf("name: %s\n", name.cstr());
-				const pstring val = m_params_temp.find_by_name(name).e2;
-				if (val != "")
+				if (m_params_temp.contains(name))
 				{
+					const pstring val = m_params_temp[name];
 					switch (param.param_type())
 					{
 						case param_t::DOUBLE:
@@ -302,7 +281,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 							netlist().error("Parameter is not supported %s : %s\n", name.cstr(), val.cstr());
 					}
 				}
-				if (!(m_params.add(&param, false)==true))
+				if (!m_params.add(param.name(), &param))
 					netlist().error("Error adding parameter %s to parameter list\n", name.cstr());
 			}
 			break;
@@ -400,16 +379,16 @@ void setup_t::register_param(const pstring &param, const pstring &value)
 {
 	pstring fqn = build_fqn(param);
 
-	int idx = m_params_temp.index_by_name(fqn);
+	int idx = m_params_temp.index_of(fqn);
 	if (idx < 0)
 	{
-		if (!(m_params_temp.add(link_t(fqn, value), false)==true))
+		if (!m_params_temp.add(fqn, value))
 			netlist().error("Unexpected error adding parameter %s to parameter list\n", param.cstr());
 	}
 	else
 	{
-		netlist().warning("Overwriting %s old <%s> new <%s>\n", fqn.cstr(), m_params_temp[idx].e2.cstr(), value.cstr());
-		m_params_temp[idx].e2 = value;
+		netlist().warning("Overwriting %s old <%s> new <%s>\n", fqn.cstr(), m_params_temp.value_at(idx).cstr(), value.cstr());
+		m_params_temp[fqn] = value;
 	}
 }
 
@@ -421,7 +400,8 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 	/* FIXME: Detect endless loop */
 	do {
 		ret = temp;
-		temp = m_alias.find_by_name(ret).e2;
+		int p = m_alias.index_of(ret);
+		temp = (p>=0 ? m_alias.value_at(p) : "");
 	} while (temp != "");
 
 	NL_VERBOSE_OUT(("%s==>%s\n", name.cstr(), ret.cstr()));
@@ -480,14 +460,14 @@ param_t *setup_t::find_param(const pstring &param_in, bool required)
 	const pstring param_in_fqn = build_fqn(param_in);
 
 	const pstring &outname = resolve_alias(param_in_fqn);
-	param_t *ret;
+	int ret;
 
-	ret = m_params.find_by_name(outname);
-	if (ret == NULL && required)
+	ret = m_params.index_of(outname);
+	if (ret < 0 && required)
 		netlist().error("parameter %s(%s) not found!\n", param_in_fqn.cstr(), outname.cstr());
-	if (ret != NULL)
+	if (ret != -1)
 		NL_VERBOSE_OUT(("Found parameter %s\n", outname.cstr()));
-	return ret;
+	return (ret == -1 ? NULL : m_params.value_at(ret));
 }
 
 // FIXME avoid dynamic cast here
