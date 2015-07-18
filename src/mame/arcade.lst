@@ -4819,6 +4819,7 @@ rchasej         // 1991.09 Rail Chase (Japan)
 // Sega System 24 games
 // disk based
 hotrodj         // 1988.03 Hot Rod (Japan)
+hotrodja        // 1988.03 Hot Rod (Japan)
 hotrod          // 1988.?? Hot Rod (World)
 hotroda
 				// 1988.07 Hot Rod (US)
@@ -5760,6 +5761,7 @@ scg06nt         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 				// 2006.09 Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)
 				// 2006.10 Quest of D Oukoku no Syugosya Ver.3.00
 				// 2006.11 Quest of D Oukoku no Syugosya Ver.3.01
+mj3evo		// 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
 				// 2007.11 Quest of D The Battle Kingdom Ver.4.00
 				// 2008.01 Quest of D The Battle Kingdom Ver.4.00b
 				// 2008.02 Quest of D The Battle Kingdom Ver.4.00c
