@@ -105,7 +105,7 @@ disable hardware stretching, otherwise you won't get that "perfect"
 So, I recommend starting with these initial options and then tweaking
 from there. One additional option you might want to try in
 combination with the above is the -prescale option. -prescale takes
-an integer parameter from 1 to 8, and specifies a magnification
+an integer parameter from 1 to 3, and specifies a magnification
 amount by which the screen pixels are expanded before they are drawn
 to the screen. Why is this useful? And how much of a performance
 impact does it have? Well, that depends on the mode you are running
@@ -117,7 +117,7 @@ them to the screen. Depending on the video card, this is usually a
 small performance hit, but not too significant. The benefit is that
 each prescale factor reduces the blurriness of the pixels.
 -prescale 1 is the default, which does no scaling. -prescale 2 will
-double each pixel, -prescale 3 will triple each pixel, etc. For my
+double each pixel, and -prescale 3 will triple each pixel. For my
 money, -prescale 2 is sufficient, but people with super high
 resolution displays claim that larger -prescale factors work even
 better.
