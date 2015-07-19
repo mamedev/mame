@@ -890,6 +890,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/emu/bus/msx_cart/korean.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/majutsushi.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/majutsushi.h",
+		MAME_DIR .. "src/emu/bus/msx_cart/moonsound.h",
+		MAME_DIR .. "src/emu/bus/msx_cart/moonsound.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio_kb.c",
