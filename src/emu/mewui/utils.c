@@ -369,7 +369,7 @@ void save_sw_custom_filters(running_machine &machine, const game_driver *driver,
 			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
 				cinfo.append("  Year filter = ").append(m_year.ui[sw_custfltr::year[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_TYPE)
-				cinfo.append("  Type filter = ").append(m_year.ui[sw_custfltr::type[x]]).append("\n");
+				cinfo.append("  Type filter = ").append(m_type.ui[sw_custfltr::type[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_REGION)
 				cinfo.append("  Region filter = ").append(m_region.ui[sw_custfltr::region[x]]).append("\n");
 		}
@@ -444,7 +444,7 @@ void load_sw_custom_filters(running_machine &machine, const game_driver *driver,
 						char *eb = strchr(buffer, '=') + 2;
 						for (int z = 0; z < m_region.ui.size(); z++)
 							if (!strncmp(eb, m_region.ui[z].c_str(), m_region.ui[z].length()))
-								sw_custfltr::year[x] = z;
+								sw_custfltr::region[x] = z;
 					}
 				}
 		}

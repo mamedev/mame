@@ -19,7 +19,7 @@
 #include "mewui/selector.h"
 #include "mewui/swcustmenu.h"
 
-static const char *region_lists[] = { "arg", "asia", "aus", "aut", "bel", "blr", "bra", "can", "chi", "chn", "cze", "den",
+static const char *region_lists[] = { "arab", "arg", "asia", "aus", "aut", "bel", "blr", "bra", "can", "chi", "chn", "cze", "den",
 									"ecu", "esp", "euro", "fin", "fra", "gbr", "ger", "gre", "hkg", "hun", "irl", "isr",
 									"isv", "ita", "jpn", "kaz", "kor", "lat", "lux", "mex", "ned", "nld", "nor", "nzl",
 									"pol", "rus", "slo", "spa", "sui", "swe", "tha", "tpe", "tw", "uk", "ukr", "usa" };
@@ -1107,7 +1107,7 @@ void ui_menu_select_software::build_custom()
 				build_list(s_drivers, m_publisher.ui[sw_custfltr::mnfct[count]].c_str(), filter);
 				break;
 			case MEWUI_SW_REGION:
-				build_list(s_drivers, m_region.ui[sw_custfltr::mnfct[count]].c_str(), filter);
+				build_list(s_drivers, m_region.ui[sw_custfltr::region[count]].c_str(), filter);
 				break;
 			default:
 				build_list(s_drivers, NULL, filter);

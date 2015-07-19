@@ -237,11 +237,11 @@ void ui_menu_swcustom_filter::populate()
 			if (m_region.ui.size() == 1)
 				arrow_flags = 0;
 			else
-				arrow_flags = get_arrow_flags(0, m_region.ui.size() - 1, sw_custfltr::year[x]);
+				arrow_flags = get_arrow_flags(0, m_region.ui.size() - 1, sw_custfltr::region[x]);
 
 			std::string fbuff("^!Region");
 			convert_command_glyph(fbuff);
-			item_append(fbuff.c_str(), m_region.ui[sw_custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
+			item_append(fbuff.c_str(), m_region.ui[sw_custfltr::region[x]].c_str(), arrow_flags, (void *)(FPTR)(REGION_FILTER + x));
 		}
 	}
 
