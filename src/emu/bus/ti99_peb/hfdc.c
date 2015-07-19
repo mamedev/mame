@@ -1012,7 +1012,9 @@ SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( hfdc_harddisks )
 	SLOT_INTERFACE( "generic", MFMHD_GENERIC )     // Generic high-level emulation
-	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 and others
+	SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
+	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
+	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
