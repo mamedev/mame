@@ -240,6 +240,7 @@ endif
 endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
+ARCHITECTURE :=
 ifndef NOASM
 	NOASM := 1
 endif
@@ -903,12 +904,13 @@ $(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS) $(GENIE)
 linux_x64: generate $(PROJECTDIR)/gmake-linux/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
 
-.PHONY: linux
-linux: linux_x86
-
 .PHONY: linux_x86
 linux_x86: generate $(PROJECTDIR)/gmake-linux/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
+
+.PHONY: linux
+linux: generate $(PROJECTDIR)/gmake-linux/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)
 
 #-------------------------------------------------
 # gmake-linux-clang
