@@ -121,6 +121,7 @@ enum
 	MEWUI_SW_PARTIAL_SUPPORTED,
 	MEWUI_SW_UNSUPPORTED,
 	MEWUI_SW_REGION,
+	MEWUI_SW_TYPE,
 	MEWUI_SW_CUSTOM,
 	MEWUI_SW_LAST = MEWUI_SW_CUSTOM
 };
@@ -211,7 +212,7 @@ struct c_year
 	static UINT16 actual;
 };
 
-// Software region class
+// Software region
 struct c_sw_region
 {
 	std::vector<std::string> ui;
@@ -220,7 +221,7 @@ struct c_sw_region
 	std::string getname(const char *str);
 };
 
-// Publishers
+// Software publishers
 struct c_sw_publisher
 {
 	std::vector<std::string> ui;
@@ -229,7 +230,15 @@ struct c_sw_publisher
 	std::string getname(const char *str);
 };
 
-// Years
+// Software device type
+struct c_sw_type
+{
+	std::vector<std::string> ui;
+	UINT16 actual;
+	void set(const char *str);
+};
+
+// Software years
 struct c_sw_year
 {
 	std::vector<std::string> ui;
@@ -269,6 +278,7 @@ struct sw_custfltr
 	static UINT16  mnfct[MAX_CUST_FILTER];
 	static UINT16  year[MAX_CUST_FILTER];
 	static UINT16  region[MAX_CUST_FILTER];
+	static UINT16  type[MAX_CUST_FILTER];
 };
 
 // GLOBAL FUNCTIONS
@@ -287,8 +297,8 @@ void load_custom_filters(running_machine &machine);
 void save_custom_filters(running_machine &machine);
 
 // custom software filter load and save
-void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year);
-void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year);
+void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year, c_sw_type &_type);
+void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year, c_sw_type &_type);
 
 // jpeg loader
 template <typename _T>

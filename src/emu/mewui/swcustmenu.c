@@ -21,15 +21,15 @@
 //  ctor / dtor
 //-------------------------------------------------
 ui_menu_swcustom_filter::ui_menu_swcustom_filter(running_machine &machine, render_container *container, const game_driver *_driver,
-												c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year) :
-	ui_menu(machine, container), driver(_driver), m_region(_region), m_publisher(_publisher), m_year(_year)
+												c_sw_region &_region, c_sw_publisher &_publisher, c_sw_year &_year, c_sw_type &_type) :
+	ui_menu(machine, container), driver(_driver), m_region(_region), m_publisher(_publisher), m_year(_year), m_type(_type)
 {
 }
 
 ui_menu_swcustom_filter::~ui_menu_swcustom_filter()
 {
 	ui_menu::menu_stack->reset(UI_MENU_RESET_SELECT_FIRST);
-	save_sw_custom_filters(machine(), driver, m_region, m_publisher, m_year);
+	save_sw_custom_filters(machine(), driver, m_region, m_publisher, m_year, m_type);
 }
 
 //-------------------------------------------------
@@ -115,6 +115,22 @@ void ui_menu_swcustom_filter::handle()
 			else if (menu_event->iptkey == IPT_UI_SELECT)
 				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_year.ui, &sw_custfltr::year[pos])));
 		}
+		else if ((FPTR)menu_event->itemref >= TYPE_FILTER && (FPTR)menu_event->itemref < TYPE_FILTER + MAX_CUST_FILTER)
+		{
+			int pos = (int)((FPTR)menu_event->itemref - TYPE_FILTER);
+			if (menu_event->iptkey == IPT_UI_LEFT && sw_custfltr::type[pos] > 0)
+			{
+				sw_custfltr::type[pos]--;
+				changed = true;
+			}
+			else if (menu_event->iptkey == IPT_UI_RIGHT && sw_custfltr::type[pos] < m_type.ui.size() - 1)
+			{
+				sw_custfltr::type[pos]++;
+				changed = true;
+			}
+			else if (menu_event->iptkey == IPT_UI_SELECT)
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_selector(machine(), container, m_type.ui, &sw_custfltr::type[pos])));
+		}
 		else if ((FPTR)menu_event->itemref >= MNFCT_FILTER && (FPTR)menu_event->itemref < MNFCT_FILTER + MAX_CUST_FILTER)
 		{
 			int pos = (int)((FPTR)menu_event->itemref - MNFCT_FILTER);
@@ -176,7 +192,7 @@ void ui_menu_swcustom_filter::populate()
 		if (added)
 			selected = item.size() - 2;
 
-		// add manufacturer subitem
+		// add publisher subitem
 		if (sw_custfltr::other[x] == MEWUI_SW_PUBLISHERS && m_publisher.ui.size() > 0)
 		{
 			if (m_publisher.ui.size() == 1)
@@ -200,6 +216,19 @@ void ui_menu_swcustom_filter::populate()
 			std::string fbuff("^!Year");
 			convert_command_glyph(fbuff);
 			item_append(fbuff.c_str(), m_year.ui[sw_custfltr::year[x]].c_str(), arrow_flags, (void *)(FPTR)(YEAR_FILTER + x));
+		}
+
+		// add device type subitem
+		else if (sw_custfltr::other[x] == MEWUI_SW_TYPE && m_type.ui.size() > 0)
+		{
+			if (m_type.ui.size() == 1)
+				arrow_flags = 0;
+			else
+				arrow_flags = get_arrow_flags(0, m_type.ui.size() - 1, sw_custfltr::type[x]);
+
+			std::string fbuff("^!Device type");
+			convert_command_glyph(fbuff);
+			item_append(fbuff.c_str(), m_type.ui[sw_custfltr::type[x]].c_str(), arrow_flags, (void *)(FPTR)(TYPE_FILTER + x));
 		}
 
 		// add region subitem

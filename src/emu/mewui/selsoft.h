@@ -32,6 +32,7 @@ private:
 	c_sw_region         m_region;
 	c_sw_publisher      m_publisher;
 	c_sw_year           m_year;
+	c_sw_type           m_type;
 
 	ui_software_info *searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 	std::vector<ui_software_info *> m_displaylist;

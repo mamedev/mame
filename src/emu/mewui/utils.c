@@ -51,6 +51,7 @@ UINT16 sw_custfltr::other[MAX_CUST_FILTER];
 UINT16 sw_custfltr::mnfct[MAX_CUST_FILTER];
 UINT16 sw_custfltr::year[MAX_CUST_FILTER];
 UINT16 sw_custfltr::region[MAX_CUST_FILTER];
+UINT16 sw_custfltr::type[MAX_CUST_FILTER];
 
 std::string reselect_last::driver;
 std::string reselect_last::software;
@@ -59,12 +60,12 @@ std::string reselect_last::part;
 std::vector<cache_info> mewui_globals::driver_cache(driver_list::total() + 1);
 
 const char *mewui_globals::filter_text[] = { "All", "Available", "Unavailable", "Working", "Not Mechanical", "Category", "Favorites", "BIOS",
-												"Originals", "Clones", "Not Working", "Mechanical", "Manufacturers", "Years", "Support Save",
-												"Not Support Save", "CHD", "No CHD", "Use Samples", "Not Use Samples", "Stereo", "Vertical",
-												"Horizontal", "Raster", "Vectors", "Custom" };
+                                             "Originals", "Clones", "Not Working", "Mechanical", "Manufacturers", "Years", "Support Save",
+                                             "Not Support Save", "CHD", "No CHD", "Use Samples", "Not Use Samples", "Stereo", "Vertical",
+                                             "Horizontal", "Raster", "Vectors", "Custom" };
 
 const char *mewui_globals::sw_filter_text[] = { "All", "Available", "Unavailable", "Originals", "Clones", "Years", "Publishers", "Supported",
-												"Partial Supported", "Unsupported", "Region", "Custom" };
+                                                "Partial Supported", "Unsupported", "Region", "Device Type", "Custom" };
 
 const char *mewui_globals::ume_text[] = { "ALL", "ARCADES", "SYSTEMS" };
 
@@ -349,7 +350,7 @@ void c_year::set(const char *str)
 //  save custom filters info to file
 //-------------------------------------------------
 
-void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year)
+void save_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year, c_sw_type &m_type)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -367,6 +368,8 @@ void save_sw_custom_filters(running_machine &machine, const game_driver *driver,
 				cinfo.append("  Manufacturer filter = ").append(m_publisher.ui[sw_custfltr::mnfct[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_YEARS)
 				cinfo.append("  Year filter = ").append(m_year.ui[sw_custfltr::year[x]]).append("\n");
+			else if (sw_custfltr::other[x] == MEWUI_SW_TYPE)
+				cinfo.append("  Type filter = ").append(m_year.ui[sw_custfltr::type[x]]).append("\n");
 			else if (sw_custfltr::other[x] == MEWUI_SW_REGION)
 				cinfo.append("  Region filter = ").append(m_region.ui[sw_custfltr::region[x]]).append("\n");
 		}
@@ -379,7 +382,7 @@ void save_sw_custom_filters(running_machine &machine, const game_driver *driver,
 //  load custom filters info from file
 //-------------------------------------------------
 
-void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year)
+void load_sw_custom_filters(running_machine &machine, const game_driver *driver, c_sw_region &m_region, c_sw_publisher &m_publisher, c_sw_year &m_year, c_sw_type &m_type)
 {
 	// attempt to open the output file
 	emu_file file(machine.options().mewui_path(), OPEN_FLAG_READ);
@@ -426,6 +429,14 @@ void load_sw_custom_filters(running_machine &machine, const game_driver *driver,
 						for (int z = 0; z < m_year.ui.size(); z++)
 							if (!strncmp(db, m_year.ui[z].c_str(), m_year.ui[z].length()))
 								sw_custfltr::year[x] = z;
+					}
+					else if (y == MEWUI_SW_TYPE)
+					{
+						file.gets(buffer, MAX_CHAR_INFO);
+						char *fb = strchr(buffer, '=') + 2;
+						for (int z = 0; z < m_type.ui.size(); z++)
+							if (!strncmp(fb, m_type.ui[z].c_str(), m_type.ui[z].length()))
+								sw_custfltr::type[x] = z;
 					}
 					else if (y == MEWUI_SW_REGION)
 					{
