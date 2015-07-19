@@ -130,6 +130,8 @@ READ8_MEMBER(tb303_state::ram_r)
 
 WRITE8_MEMBER(tb303_state::led_w)
 {
+	// MCU G: leds state
+	display_matrix(4, 4, data, m_inp_mux);
 }
 
 WRITE8_MEMBER(tb303_state::switch_w)
