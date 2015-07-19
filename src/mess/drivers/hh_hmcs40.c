@@ -1580,6 +1580,7 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 {
 	// 2-player switch directly enables plate 14
 	m_plate = (m_plate & 0x3fff) | (newval ? 0 : 0x4000);
+	prepare_display();
 }
 
 

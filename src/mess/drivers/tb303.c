@@ -2,6 +2,8 @@
 // copyright-holders:hap
 /***************************************************************************
 
+  ** subclass of hh_ucom4_state (includes/hh_ucom4.h, drivers/hh_ucom4.c) **
+
   Roland TB-303 Bass Line, 1982, designed by Tadao Kikumoto
   * NEC uCOM-43 MCU, labeled D650C 133
   * 3*uPD444C 1024x4 Static CMOS SRAM
@@ -11,25 +13,20 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "cpu/ucom4/ucom4.h"
+#include "includes/hh_ucom4.h"
 
 #include "tb303.lh"
 
 
-class tb303_state : public driver_device
+class tb303_state : public hh_ucom4_state
 {
 public:
 	tb303_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+		: hh_ucom4_state(mconfig, type, tag),
 		m_t3_off_timer(*this, "t3_off")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_t3_off_timer;
-	
-	UINT8 m_mcu_port[9]; // MCU port A-I write data
 	
 	UINT8 m_ram[0xc00];
 	UINT16 m_ram_address;
@@ -86,7 +83,7 @@ void tb303_state::refresh_ram()
 	// _Q0: N/C, _Q1: IC-5, _Q2: IC-3, _Q3: IC-4
 	m_ram_ce = true;
 	UINT8 hi = 0;
-	switch (m_mcu_port[NEC_UCOM4_PORTE] >> 2 & 3)
+	switch (m_port[NEC_UCOM4_PORTE] >> 2 & 3)
 	{
 		case 0: m_ram_ce = false; break;
 		case 1: hi = 0; break;
@@ -98,9 +95,9 @@ void tb303_state::refresh_ram()
 	{
 		// _WE must be high(read mode) for address transitions
 		if (!m_ram_we)
-			m_ram_address = hi << 10 | (m_mcu_port[NEC_UCOM4_PORTE] << 8 & 0x300) | m_mcu_port[NEC_UCOM4_PORTF] << 4 | m_mcu_port[NEC_UCOM4_PORTD];
+			m_ram_address = hi << 10 | (m_port[NEC_UCOM4_PORTE] << 8 & 0x300) | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTD];
 		else
-			m_ram[m_ram_address] = m_mcu_port[NEC_UCOM4_PORTC];
+			m_ram[m_ram_address] = m_port[NEC_UCOM4_PORTC];
 	}
 
 	// to switchboard pin 19-22
@@ -111,7 +108,7 @@ WRITE8_MEMBER(tb303_state::ram_w)
 {
 	// MCU C: RAM data
 	// MCU D,F,E: RAM address
-	m_mcu_port[offset] = data;
+	m_port[offset] = data;
 	refresh_ram();
 	
 	// MCU D,F01: pitch data
@@ -138,6 +135,7 @@ WRITE8_MEMBER(tb303_state::strobe_w)
 }
 
 
+
 /***************************************************************************
 
   Inputs
@@ -157,15 +155,15 @@ INPUT_PORTS_END
 
 void tb303_state::machine_start()
 {
+	hh_ucom4_state::machine_start();
+	
 	// zerofill
-	memset(m_mcu_port, 0, sizeof(m_mcu_port));
 	memset(m_ram, 0, sizeof(m_ram));
 	m_ram_address = 0;
 	m_ram_ce = false;
 	m_ram_we = false;
 	
 	// register for savestates
-	save_item(NAME(m_mcu_port));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ram_address));
 	save_item(NAME(m_ram_ce));
@@ -191,6 +189,7 @@ static MACHINE_CONFIG_START( tb303, tb303_state )
 	MCFG_TIMER_START_DELAY(TB303_T3_CLOCK)
 	MCFG_TIMER_DRIVER_ADD("t3_off", tb303_state, t3_off)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tb303)
 
 	/* no video! */
