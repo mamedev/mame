@@ -19,40 +19,40 @@
 // -----------------------------------------------------------------------------
 
 #define TTL_INPUT(_name, _v)                                                   \
-		NET_REGISTER_DEV(logic_input, _name)                                   \
+		NET_REGISTER_DEV(TTL_INPUT, _name)                                   \
 		PARAM(_name.IN, _v)
 
 #define LOGIC_INPUT(_name, _v, _family)                                        \
-		NET_REGISTER_DEV(logic_input, _name)                                   \
+		NET_REGISTER_DEV(LOGIC_INPUT, _name)                                   \
 		PARAM(_name.IN, _v)													   \
 		PARAM(_name.FAMILY, _family)
 
 #define ANALOG_INPUT(_name, _v)                                                \
-		NET_REGISTER_DEV(analog_input, _name)                                  \
+		NET_REGISTER_DEV(ANALOG_INPUT, _name)                                  \
 		PARAM(_name.IN, _v)
 
 #define MAINCLOCK(_name, _freq)                                                \
-		NET_REGISTER_DEV(mainclock, _name)                                     \
+		NET_REGISTER_DEV(MAINCLOCK, _name)                                     \
 		PARAM(_name.FREQ, _freq)
 
 #define CLOCK(_name, _freq)                                                    \
-		NET_REGISTER_DEV(clock, _name)                                         \
+		NET_REGISTER_DEV(CLOCK, _name)                                         \
 		PARAM(_name.FREQ, _freq)
 
 #define EXTCLOCK(_name, _freq, _pattern)                                       \
-		NET_REGISTER_DEV(extclock, _name)                                      \
+		NET_REGISTER_DEV(EXTCLOCK, _name)                                      \
 		PARAM(_name.FREQ, _freq)                                               \
 		PARAM(_name.PATTERN, _pattern)
 
 #define GNDA()                                                                 \
-		NET_REGISTER_DEV(gnd, GND)
+		NET_REGISTER_DEV(GNDA, GND)
 
 #define DUMMY_INPUT(_name)                                                     \
-		NET_REGISTER_DEV(dummy_input, _name)
+		NET_REGISTER_DEV(DUMMY_INPUT, _name)
 
 //FIXME: Usage discouraged, use OPTIMIZE_FRONTIER instead
 #define FRONTIER_DEV(_name, _IN, _G, _OUT)                                     \
-		NET_REGISTER_DEV(frontier, _name)                                      \
+		NET_REGISTER_DEV(FRONTIER_DEV, _name)                                      \
 		NET_C(_IN, _name.I)                                                    \
 		NET_C(_G,  _name.G)                                                    \
 		NET_C(_OUT, _name.Q)
@@ -61,17 +61,17 @@
 		setup.register_frontier(# _attach, _r_in, _r_out);
 
 #define RES_SWITCH(_name, _IN, _P1, _P2)                                       \
-		NET_REGISTER_DEV(res_sw, _name)                                        \
+		NET_REGISTER_DEV(RES_SWITCH, _name)                                        \
 		NET_C(_IN, _name.I)                                                    \
 		NET_C(_P1, _name.1)                                                    \
 		NET_C(_P2, _name.2)
 
 /* Default device to hold netlist parameters */
 #define PARAMETERS(_name)                                                      \
-		NET_REGISTER_DEV(netlistparams, _name)
+		NET_REGISTER_DEV(PARAMETERS, _name)
 
 #define AFUNC(_name, _N, _F)			                                       \
-		NET_REGISTER_DEV(function, _name)                                      \
+		NET_REGISTER_DEV(AFUNC, _name)                                      \
 		PARAM(_name.N, _N)													   \
 		PARAM(_name.FUNC, _F)
 

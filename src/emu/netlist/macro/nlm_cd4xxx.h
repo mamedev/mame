@@ -21,23 +21,23 @@
  * ---------------------------------------------------------------------------*/
 
 #define CD4001_NOR(_name)                                                      \
-		NET_REGISTER_DEV_X(CD4001_NOR, _name)
+		NET_REGISTER_DEV(CD4001_NOR, _name)
 
 #define CD4001_DIP(_name)                                                      \
-		NET_REGISTER_DEV_X(CD4001_DIP, _name)
+		NET_REGISTER_DEV(CD4001_DIP, _name)
 
 /* ----------------------------------------------------------------------------
  *  DIP only macros
  * ---------------------------------------------------------------------------*/
 
 #define CD4020_DIP(_name)                                                      \
-		NET_REGISTER_DEV_X(CD4020_DIP, _name)
+		NET_REGISTER_DEV(CD4020_DIP, _name)
 
 #define CD4066_DIP(_name)                                                      \
-		NET_REGISTER_DEV_X(CD4066_DIP, _name)
+		NET_REGISTER_DEV(CD4066_DIP, _name)
 
 #define CD4016_DIP(_name)                                                      \
-		NET_REGISTER_DEV_X(CD4016_DIP, _name)
+		NET_REGISTER_DEV(CD4016_DIP, _name)
 
 /* ----------------------------------------------------------------------------
  *  External declarations

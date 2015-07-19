@@ -48,6 +48,7 @@ factory_list_t::~factory_list_t()
 	m_list.clear();
 }
 
+#if 0
 device_t *factory_list_t::new_device_by_classname(const pstring &classname) const
 {
 	for (std::size_t i=0; i < m_list.size(); i++)
@@ -62,6 +63,7 @@ device_t *factory_list_t::new_device_by_classname(const pstring &classname) cons
 	}
 	return NULL; // appease code analysis
 }
+#endif
 
 device_t *factory_list_t::new_device_by_name(const pstring &name, setup_t &setup) const
 {

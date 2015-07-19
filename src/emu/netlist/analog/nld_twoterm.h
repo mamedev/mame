@@ -40,7 +40,7 @@
 // ----------------------------------------------------------------------------------------
 
 #define RES(_name, _R)                                                         \
-		NET_REGISTER_DEV(R, _name)                                             \
+		NET_REGISTER_DEV(RES, _name)                                             \
 		NETDEV_PARAMI(_name, R, _R)
 
 #define POT(_name, _R)                                                         \
@@ -54,12 +54,12 @@
 
 
 #define CAP(_name, _C)                                                         \
-		NET_REGISTER_DEV(C, _name)                                             \
+		NET_REGISTER_DEV(CAP, _name)                                             \
 		NETDEV_PARAMI(_name, C, _C)
 
 /* Generic Diode */
 #define DIODE(_name,  _model)                                                  \
-		NET_REGISTER_DEV(D, _name)                                             \
+		NET_REGISTER_DEV(DIODE, _name)                                             \
 		NETDEV_PARAMI(_name, model, _model)
 
 #define VS(_name, _V)                                                          \

@@ -32,7 +32,7 @@
 
 /* FIXME: only used in mario.c */
 #define CD4020_WI(_name, _IP, _RESET, _VDD, _VSS)                              \
-		NET_REGISTER_DEV(CD4020, _name)                                        \
+		NET_REGISTER_DEV(CD4020_WI, _name)                                        \
 		NET_CONNECT(_name, IP, _IP)                                            \
 		NET_CONNECT(_name, RESET,  _RESET)                                     \
 		NET_CONNECT(_name, VDD,  _VDD)                                         \

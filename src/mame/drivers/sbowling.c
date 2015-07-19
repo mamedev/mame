@@ -55,33 +55,37 @@ public:
 		m_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	int m_bgmap;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	int m_sbw_system;
-	tilemap_t *m_sb_tilemap;
+	int m_bgmap;
+	int m_system;
+	tilemap_t *m_tilemap;
 	bitmap_ind16 *m_tmpbitmap;
 	UINT32 m_color_prom_address;
 	UINT8 m_pix_sh;
 	UINT8 m_pix[2];
 
-	DECLARE_WRITE8_MEMBER(sbw_videoram_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(pix_shift_w);
 	DECLARE_WRITE8_MEMBER(pix_data_w);
 	DECLARE_READ8_MEMBER(pix_data_r);
 	DECLARE_WRITE8_MEMBER(system_w);
 	DECLARE_WRITE8_MEMBER(graph_control_w);
 	DECLARE_READ8_MEMBER(controls_r);
-	TILE_GET_INFO_MEMBER(get_sb_tile_info);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(sbowling);
-	UINT32 screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(sbw_interrupt);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void postload();
 };
 
-TILE_GET_INFO_MEMBER(sbowling_state::get_sb_tile_info)
+TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
 {
 	UINT8 *rom = memregion("user1")->base();
 	int tileno = rom[tile_index + m_bgmap * 1024];
@@ -96,13 +100,14 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 		y = 255-y;
 		x = 247-x;
 	}
+	
 	tmpbitmap->pix16(y, x) = col;
 }
 
-WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
+WRITE8_MEMBER(sbowling_state::videoram_w)
 {
 	int flip = flip_screen();
-	int x,y,i,v1,v2;
+	int x,y,v1,v2;
 
 	m_videoram[offset] = data;
 
@@ -114,7 +119,7 @@ WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 	v1 = m_videoram[offset];
 	v2 = m_videoram[offset+0x2000];
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		plot_pixel_sbw(m_tmpbitmap, x++, y, m_color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
 		v1 >>= 1;
@@ -122,10 +127,10 @@ WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 	}
 }
 
-UINT32 sbowling_state::screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x18, cliprect);
-	m_sb_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	copybitmap_trans(bitmap, *m_tmpbitmap, 0, 0, 0, 0, cliprect, m_color_prom_address);
 	return 0;
 }
@@ -133,7 +138,21 @@ UINT32 sbowling_state::screen_update_sbowling(screen_device &screen, bitmap_ind1
 void sbowling_state::video_start()
 {
 	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(),32*8,32*8);
-	m_sb_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_sb_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	save_item(NAME(m_bgmap));
+	save_item(NAME(m_system));
+	save_item(NAME(m_color_prom_address));
+	save_item(NAME(m_pix_sh));
+	save_item(NAME(m_pix));
+	machine().save().register_postload(save_prepost_delegate(FUNC(sbowling_state::postload), this));
+}
+
+void sbowling_state::postload()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	for (int offs = 0; offs < 0x4000; offs++)
+		videoram_w(space, offs, m_videoram[offs]);
 }
 
 WRITE8_MEMBER(sbowling_state::pix_shift_w)
@@ -161,7 +180,7 @@ READ8_MEMBER(sbowling_state::pix_data_r)
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::sbw_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::interrupt)
 {
 	int scanline = param;
 
@@ -186,13 +205,13 @@ WRITE8_MEMBER(sbowling_state::system_w)
 
 	flip_screen_set(data&1);
 
-	if ((m_sbw_system^data)&1)
+	if ((m_system^data)&1)
 	{
 		int offs;
 		for (offs = 0;offs < 0x4000; offs++)
-			sbw_videoram_w(space, offs, m_videoram[offs]);
+			videoram_w(space, offs, m_videoram[offs]);
 	}
-	m_sbw_system = data;
+	m_system = data;
 }
 
 WRITE8_MEMBER(sbowling_state::graph_control_w)
@@ -210,12 +229,12 @@ WRITE8_MEMBER(sbowling_state::graph_control_w)
 	m_color_prom_address = ((data&0x07)<<7) | ((data&0xc0)>>3);
 
 	m_bgmap = ((data>>4)^3) & 0x3;
-	m_sb_tilemap->mark_all_dirty();
+	m_tilemap->mark_all_dirty();
 }
 
 READ8_MEMBER(sbowling_state::controls_r)
 {
-	if (m_sbw_system & 2)
+	if (m_system & 2)
 		return ioport("TRACKY")->read();
 	else
 		return ioport("TRACKX")->read();
@@ -223,7 +242,7 @@ READ8_MEMBER(sbowling_state::controls_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbowling_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
@@ -343,7 +362,6 @@ GFXDECODE_END
 PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
 	static const int resistances_rg[3] = { 470, 270, 100 };
 	static const int resistances_b[2]  = { 270, 100 };
@@ -355,7 +373,7 @@ PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 		3,  resistances_rg, outputs_g,  0,  100,
 		2,  resistances_b,  outputs_b,  0,  100);
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -384,14 +402,14 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, sbw_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update_sbowling)
+	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbowling)
@@ -425,4 +443,4 @@ ROM_START( sbowling )
 	ROM_LOAD( "kb09.6m",        0x0400, 0x0400, CRC(e29191a6) SHA1(9a2c78a96ef6d118f4dacbea0b7d454b66a452ae))
 ROM_END
 
-GAME( 1982, sbowling, 0, sbowling, sbowling, driver_device, 0, ROT90, "Taito Corporation", "Strike Bowling",GAME_IMPERFECT_SOUND)
+GAME( 1982, sbowling, 0, sbowling, sbowling, driver_device, 0, ROT90, "Taito Corporation", "Strike Bowling", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -50,7 +50,7 @@
 #include "../analog/nld_twoterm.h"
 
 #define R2R_DAC(_name, _VIN, _R, _N)                                            \
-		NET_REGISTER_DEV(r2r_dac, _name)                                       \
+		NET_REGISTER_DEV(R2R_DAC, _name)                                       \
 		NETDEV_PARAMI(_name, VIN, _VIN)                                        \
 		NETDEV_PARAMI(_name, R,   _R)                                          \
 		NETDEV_PARAMI(_name, N,   _N)

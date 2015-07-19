@@ -607,6 +607,144 @@ public:
 };
 
 // ----------------------------------------------------------------------------------------
+// hashmap list
+// ----------------------------------------------------------------------------------------
+
+
+template <class C>
+struct phash_functor
+{
+	unsigned hash(const C &v) { return (unsigned) v; }
+};
+
+template <>
+struct phash_functor<pstring>
+{
+	unsigned hash(const pstring &v)
+	{
+		const char *string = v.cstr();
+		unsigned result = *string++;
+		for (UINT8 c = *string++; c != 0; c = *string++)
+			result = (result*33) ^ c;
+		return result;
+	}
+};
+
+/* some primes 53, 97, 193, 389, 769, 1543, 3079, 6151 */
+template <class K, class V, class H = phash_functor<K> >
+class phashmap_t
+{
+public:
+	phashmap_t() : m_hash(389)
+	{
+		for (unsigned i=0; i<m_hash.size(); i++)
+			m_hash[i] = -1;
+	}
+
+	struct element_t
+	{
+		element_t() { }
+		element_t(K key, unsigned hash, V value)
+		: m_key(key), m_hash(hash), m_value(value), m_next(-1)
+		{}
+		K m_key;
+		unsigned m_hash;
+		V m_value;
+		int m_next;
+	};
+
+	void clear()
+	{
+		m_values.clear();
+		for (unsigned i=0; i<m_hash.size(); i++)
+			m_hash[i] = -1;
+	}
+
+	bool contains(const K &key) const
+	{
+		return (get_idx(key) >= 0);
+	}
+
+	int index_of(const K &key) const
+	{
+		return get_idx(key);
+	}
+
+	unsigned size() const { return m_values.size(); }
+
+	bool add(const K &key, const V &value)
+	{
+		H h;
+		const unsigned hash=h.hash(key);
+		const unsigned pos = hash % m_hash.size();
+		if (m_hash[pos] == -1)
+		{
+			unsigned vpos = m_values.size();
+			m_values.add(element_t(key, hash, value));
+			m_hash[pos] = vpos;
+		}
+		else
+		{
+			int ep = m_hash[pos];
+
+			for (; ep != -1; ep = m_values[ep].m_next)
+			{
+				if (m_values[ep].m_hash == hash && m_values[ep].m_key == key )
+					return false; /* duplicate */
+			}
+			unsigned vpos = m_values.size();
+			m_values.add(element_t(key, hash, value));
+			m_values[vpos].m_next = m_hash[pos];
+			m_hash[pos] = vpos;
+		}
+		return true;
+	}
+
+	V& operator[](const K &key)
+	{
+		int p = get_idx(key);
+		if (p == -1)
+		{
+			p = m_values.size();
+			add(key, V());
+		}
+		return m_values[p].m_value;
+	}
+
+	const V& operator[](const K &key) const
+	{
+		int p = get_idx(key);
+		if (p == -1)
+		{
+			p = m_values.size();
+			add(key, V());
+		}
+		return m_values[p].m_value;
+	}
+
+	V& value_at(const unsigned pos) { return m_values[pos].m_value; }
+	const V& value_at(const unsigned pos) const { return m_values[pos].m_value; }
+
+	V& key_at(const unsigned pos) const { return m_values[pos].m_key; }
+private:
+
+	int get_idx(const K &key) const
+	{
+		H h;
+		const unsigned hash=h.hash(key);
+		const unsigned pos = hash % m_hash.size();
+
+		for (int ep = m_hash[pos]; ep != -1; ep = m_values[ep].m_next)
+			if (m_values[ep].m_hash == hash && m_values[ep].m_key == key )
+				return ep;
+		return -1;
+	}
+
+	plist_t<element_t> m_values;
+	parray_t<int> m_hash;
+};
+
+// ----------------------------------------------------------------------------------------
 // sort a list ... slow, I am lazy
 // elements must support ">" operator.
 // ----------------------------------------------------------------------------------------

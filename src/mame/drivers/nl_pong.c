@@ -16,7 +16,7 @@
 #define TTL_7400A_NAND(_name, _A, _B) TTL_7400_NAND(_name, _A, _B)
 #else
 #define TTL_7400A_NAND(_name, _A, _B)                                          \
-		NET_REGISTER_DEV_X(TTL_7400A_NAND, _name)                              \
+		NET_REGISTER_DEV(TTL_7400A_NAND, _name)                              \
 		NET_CONNECT(_name, A, _A)                                              \
 		NET_CONNECT(_name, B, _B)
 #endif

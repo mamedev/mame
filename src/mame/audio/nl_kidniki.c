@@ -16,16 +16,16 @@
 #ifndef __PLIB_PREPROCESSOR__
 
 #define MC14584B_GATE(_name)                    		                      \
-		NET_REGISTER_DEV_X(MC14584B_GATE, _name)
+		NET_REGISTER_DEV(MC14584B_GATE, _name)
 
 #define MC14584B_DIP(_name)            	        		                      \
-		NET_REGISTER_DEV_X(MC14584B_DIP, _name)
+		NET_REGISTER_DEV(MC14584B_DIP, _name)
 
 #define LM324_DIP(_name)            			                              \
-		NET_REGISTER_DEV_X(LM324_DIP, _name)
+		NET_REGISTER_DEV(LM324_DIP, _name)
 
 #define LM358_DIP(_name)            			                              \
-		NET_REGISTER_DEV_X(LM358_DIP, _name)
+		NET_REGISTER_DEV(LM358_DIP, _name)
 
 NETLIST_EXTERNAL(kidniki_lib)
 

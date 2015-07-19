@@ -33,10 +33,10 @@
 #include "nld_9316.h"
 
 #define TTL_74192(_name)                                              \
-		NET_REGISTER_DEV(74192, _name)
+		NET_REGISTER_DEV(TTL_74192, _name)
 
 #define TTL_74192_DIP(_name)                                                         \
-		NET_REGISTER_DEV(74192_dip, _name)
+		NET_REGISTER_DEV(TTL_74192_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

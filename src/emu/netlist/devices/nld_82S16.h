@@ -27,9 +27,9 @@
 #include "../nl_base.h"
 
 #define TTL_82S16(_name)                                     \
-		NET_REGISTER_DEV(82S16, _name)
+		NET_REGISTER_DEV(TTL_82S16, _name)
 #define TTL_82S16_DIP(_name)                                 \
-		NET_REGISTER_DEV(82S16_dip, _name)
+		NET_REGISTER_DEV(TTL_82S16_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
