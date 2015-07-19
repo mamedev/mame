@@ -690,6 +690,7 @@ WRITE8_MEMBER( ymf278b_device::write )
 			timer_busy_start(0);
 			if (m_lastport) B_w(m_port_AB, data);
 			else A_w(m_port_AB, data);
+			m_last_fm_data = data;
 			break;
 
 		case 4:
@@ -737,6 +738,8 @@ READ8_MEMBER( ymf278b_device::read )
 		case 1:
 		case 3:
 			// but they're not implemented here yet
+			// This may be incorrect, but it makes the mbwave moonsound detection in msx drivers pass.
+			ret = m_last_fm_data;
 			break;
 
 		// PCM regs
@@ -879,6 +882,7 @@ void ymf278b_device::register_save_state()
 	save_item(NAME(m_port_AB));
 	save_item(NAME(m_port_C));
 	save_item(NAME(m_lastport));
+	save_item(NAME(m_last_fm_data));
 
 	for (i = 0; i < 24; ++i)
 	{
@@ -979,7 +983,8 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_space_config("samples", ENDIANNESS_BIG, 8, 22, 0, NULL),
-		m_irq_handler(*this)
+		m_irq_handler(*this),
+		m_last_fm_data(0)
 {
 	m_address_map[0] = *ADDRESS_MAP_NAME(ymf278b);
 }
