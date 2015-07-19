@@ -21,7 +21,7 @@ const device_type MSX_CART_MOONSOUND = &device_creator<msx_cart_moonsound>;
 
 
 msx_cart_moonsound::msx_cart_moonsound(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSX_CART_MOONSOUND, "MSX Cartridge - MOONSOUND", tag, owner, clock, "msx_cart_moonsound", __FILE__)
+	: device_t(mconfig, MSX_CART_MOONSOUND, "MSX Cartridge - MoonSound", tag, owner, clock, "msx_cart_moonsound", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_ymf278b(*this, "ymf278b")
 {
@@ -35,12 +35,13 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( moonsound )
-	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	// The moonsound cartridge has a separate stereo output.
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf278b", YMF278B, YMF278B_STD_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, ymf278b_map)
 	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(msx_cart_moonsound,irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 
