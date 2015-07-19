@@ -1446,6 +1446,9 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	float prescale[2] = {
 		prepare_vector ? 1.0f : (float)hlsl_prescale_x,
 		prepare_vector ? 1.0f : (float)hlsl_prescale_y };
+	float target_dims[2] = {
+		poly->get_prim_width(),
+		poly->get_prim_height() };
 	bool orientation_swap_xy =
 		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 	bool rotation_swap_xy =
@@ -1458,24 +1461,23 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
 	curr_effect->set_vector("Prescale", 2, prescale);
+	curr_effect->set_vector("TargetDims", 2, target_dims);
 	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
 	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
+	curr_effect->set_bool("PrepareVector", prepare_vector);
 
 	if (prepare_vector)
 	{
-		int source_width = d3d->get_width();
-		int source_height = d3d->get_height();
-		int target_width = 0;
-		int target_height = 0;
+		int texture_width = 0;
+		int texture_height = 0;
 
-		texture_info::compute_size_subroutine(d3d->get_texture_manager(), source_width, source_height, &target_width, &target_height);
+		texture_info::compute_size_subroutine(d3d->get_texture_manager(), (int)target_dims[0], (int)target_dims[1], &texture_width, &texture_height);
 
-		// todo: fix fullscreen
-		float source_dims[2] = { (float)target_width, (float)source_height };
-		float source_rect[2] = { 1.0f, 1.0f };
+		float source_dims[2] = { (float)texture_width, (float)texture_height };
+		float source_rect[2] = { target_dims[0] / texture_width , target_dims[1] / texture_height };
 
-		curr_effect->set_bool("PrepareVector", prepare_vector);
+		// override uniforms
 		curr_effect->set_vector("SourceDims", 2, source_dims);
 		curr_effect->set_vector("SourceRect", 2, source_rect);
 	}

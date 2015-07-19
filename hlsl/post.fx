@@ -66,10 +66,12 @@ bool xor(bool a, bool b)
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims; // size of the window or fullscreen
-uniform float2 ScreenRatio = float2(1.0f, 3.0f / 4.0f);
+uniform float2 ScreenRatio = float2(1.0f, 3.0f / 4.0f); // normalized screen ratio (defalt ratio of 4:3) 
 
 uniform float2 SourceDims; // size of the texture in power-of-two size
 uniform float2 SourceRect; // size of the uv rectangle
+
+uniform float2 TargetDims; // size of target
 
 uniform float2 ShadowDims = float2(32.0f, 32.0f); // size of the shadow texture (extended to power-of-two size)
 uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
@@ -142,7 +144,7 @@ static const float Epsilon = 1.0e-7f;
 static const float PI = 3.1415927f;
 static const float E = 2.7182817f;
 static const float Gelfond = 23.140692f; // e^pi (Gelfond constant)
-static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond–Schneider constant)
+static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneider constant)
 
 float nextPowerOfTwo(float n)
 {
@@ -214,9 +216,13 @@ float RoundBox(float2 p, float2 b, float r)
 
 float GetRoundCornerFactor(float2 coord, float amount)
 {
-	float2 SourceArea = 1.0f / SourceRect;	
-	float2 SourceRes = SourceDims * SourceRect;
-	float2 SourceRatio = float2(1.0f, SourceRes.y / SourceRes.x);
+	// hint: vector target area is always quadratic
+	float2 UsedSourceRect = PrepareVector
+		? float2(1.0f, 1.0f)
+		: SourceRect;
+	float2 SourceArea = 1.0f / UsedSourceRect;
+	float2 SourceDimsArea = SourceDims * UsedSourceRect;
+	float2 SourceRatio = float2(1.0f, SourceDimsArea.y / SourceDimsArea.x);
 	float2 SourceTexelDims = 1.0f / SourceDims;
 	
 	// base on the default ratio of 4:3
@@ -250,24 +256,24 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
 	float2 SourceTexelDims = 1.0f / SourceDims;
 
-	float2 SourceArea = 1.0f / SourceRect;
-	float2 HalfSourceRect = SourceRect * 0.5f;
+	// hint: vector target area is always quadratic
+	float2 UsedSourceRect = PrepareVector
+		? float2(1.0f, 1.0f)
+		: SourceRect;
+	float UsedCurvatureAmount = CurvatureAmount * 0.25f; // reduced curvature
+
+	float2 SourceArea = 1.0f / UsedSourceRect;
+	float2 DoubleSourceArea = SourceArea * 2.0f;
+	float SquareSourceAreaLength = pow(length(SourceArea), 2.0f);
+	float2 HalfSourceRect = UsedSourceRect * 0.5f;
 
 	// Screen Curvature
-	float2 CurvatureUnitCoord = 
-		  Input.TexCoord 
-		* SourceArea * 2.0f -
-		  1.0f;
-	float2 CurvatureCurve =
-		  CurvatureUnitCoord
-		* pow(length(CurvatureUnitCoord), 2.0f)
-		/ pow(length(SourceArea), 2.0f)
-		* CurvatureAmount * 0.25f; // reduced curvature
-	float2 CurvatureZoom = 
-		  1.0f - 
-		  SourceArea * 2.0f
-		/ pow(length(SourceArea), 2.0f)
-		* CurvatureAmount * 0.25f; // reduced curvature
+	float2 CurvatureUnitCoord = (Input.TexCoord * DoubleSourceArea) - 1.0f;
+	float2 CurvatureFactor = (1.0 / SquareSourceAreaLength) * UsedCurvatureAmount;
+	float2 CurvatureCurve = CurvatureUnitCoord * pow(length(CurvatureUnitCoord), 2.0f) * CurvatureFactor;
+	float2 CurvatureZoom = 1.0f - (DoubleSourceArea * CurvatureFactor);
+
+	// todo: vector cuverture requires a correction on y-axis if screen and target size differ and y > x
 
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
 	ScreenCoord -= HalfSourceRect;
@@ -280,11 +286,26 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	BaseCoord *= CurvatureZoom; // zoom
 	BaseCoord += HalfSourceRect;
 	BaseCoord += CurvatureCurve; // distortion
+		
+	float2 CurvatureCorrection = 1.0f;
 
+	// vector cuverture correction
+	if (PrepareVector)
+	{
+		float ScreenRatio = ScreenDims.x / ScreenDims.y;
+		float TargetRatio = TargetDims.x / TargetDims.y;
+
+		// hint: vector cuverture requires a correction on the x-axis by the amount that screen and target size differ
+		CurvatureCorrection.x +=
+			  (ScreenRatio / TargetRatio - 1.0f) 
+			* (1.0f + SquareSourceAreaLength * UsedCurvatureAmount);
+	}
+
+	// the floowing coordinates are used for effects
 	float2 BaseCoordCentered = Input.TexCoord;
 	BaseCoordCentered -= HalfSourceRect;
-	BaseCoordCentered *= CurvatureZoom; // zoom
-	BaseCoordCentered += CurvatureCurve; // distortion
+	BaseCoordCentered *= CurvatureZoom * CurvatureCorrection; // zoom
+	BaseCoordCentered += CurvatureCurve * CurvatureCorrection; // distortion
 
 	float2 BaseAreaCoord = BaseCoord;
 	BaseAreaCoord *= SourceArea;
@@ -304,6 +325,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
 	BaseColor.a = 1.0f;
+	// BaseColor.rgb = 1.0f;
 
 	// Vignetting Simulation (may affect bloom)
 	float2 VignetteCoord = BaseAreaCoordCentered;
