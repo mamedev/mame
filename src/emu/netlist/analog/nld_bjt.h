@@ -16,7 +16,7 @@
 // ----------------------------------------------------------------------------------------
 
 #define QBJT_SW(_name, _model)                                           \
-		NET_REGISTER_DEV(QBJT_switch, _name)                             \
+		NET_REGISTER_DEV(QBJT_SW, _name)                             \
 		NETDEV_PARAMI(_name,  model,   _model)
 
 #define QBJT_EB(_name, _model)                                           \

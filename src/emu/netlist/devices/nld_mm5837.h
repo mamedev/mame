@@ -23,7 +23,7 @@
 #include "../analog/nld_twoterm.h"
 
 #define MM5837_DIP(_name)                                                        \
-		NET_REGISTER_DEV(MM5837, _name)
+		NET_REGISTER_DEV(MM5837_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

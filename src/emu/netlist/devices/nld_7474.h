@@ -45,14 +45,14 @@
 #include "nld_signal.h"
 
 #define TTL_7474(_name, _CLK, _D, _CLRQ, _PREQ)                                     \
-		NET_REGISTER_DEV(7474, _name)                                               \
+		NET_REGISTER_DEV(TTL_7474, _name)                                               \
 		NET_CONNECT(_name, CLK, _CLK)                                               \
 		NET_CONNECT(_name, D,  _D)                                                  \
 		NET_CONNECT(_name, CLRQ,  _CLRQ)                                            \
 		NET_CONNECT(_name, PREQ,  _PREQ)
 
 #define TTL_7474_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7474_dip, _name)
+		NET_REGISTER_DEV(TTL_7474_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

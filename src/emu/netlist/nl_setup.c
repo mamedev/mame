@@ -21,8 +21,8 @@
 static NETLIST_START(base)
 	TTL_INPUT(ttlhigh, 1)
 	TTL_INPUT(ttllow, 0)
-	NET_REGISTER_DEV(gnd, GND)
-	NET_REGISTER_DEV(netlistparams, NETLIST)
+	NET_REGISTER_DEV(GND, GND)
+	NET_REGISTER_DEV(PARAMETER, NETLIST)
 
 	LOCAL_SOURCE(diode_models)
 	LOCAL_SOURCE(bjt_models)
@@ -129,7 +129,8 @@ device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 	}
 	else
 	{
-		device_t *dev = factory().new_device_by_classname(classname);
+		device_t *dev = factory().new_device_by_name(classname, *this);
+		//device_t *dev = factory().new_device_by_classname(classname);
 		if (dev == NULL)
 			netlist().error("Class %s not found!\n", classname.cstr());
 		return register_dev(dev, name);
@@ -344,7 +345,7 @@ void setup_t::register_frontier(const pstring attach, const double r_IN, const d
 	static int frontier_cnt = 0;
 	pstring frontier_name = pstring::sprintf("frontier_%d", frontier_cnt);
 	frontier_cnt++;
-	device_t *front = register_dev("nld_frontier", frontier_name);
+	device_t *front = register_dev("FRONTIER_DEV", frontier_name);
 	register_param(frontier_name + ".RIN", r_IN);
 	register_param(frontier_name + ".ROUT", r_OUT);
 	register_link(frontier_name + ".G", "GND");
@@ -860,7 +861,7 @@ void setup_t::start_devices()
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
-			device_t *nc = factory().new_device_by_classname("nld_log");
+			device_t *nc = factory().new_device_by_name("LOG", *this);
 			pstring name = "log_" + ll[i];
 			register_dev(nc, name);
 			register_link(name + ".I", ll[i]);

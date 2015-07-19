@@ -82,7 +82,7 @@ namespace netlist
 			m_list.add(factory);
 		}
 
-		ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
+		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
 		ATTR_COLD device_t *new_device_by_name(const pstring &name, setup_t &setup) const;
 		ATTR_COLD base_factory_t * factory_by_name(const pstring &name, setup_t &setup) const;
 

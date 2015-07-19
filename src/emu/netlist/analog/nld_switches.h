@@ -18,10 +18,10 @@
 // ----------------------------------------------------------------------------------------
 
 #define SWITCH(_name)                                                              \
-		NET_REGISTER_DEV(switch1, _name)
+		NET_REGISTER_DEV(SWITCH, _name)
 
 #define SWITCH2(_name)                                                              \
-		NET_REGISTER_DEV(switch2, _name)
+		NET_REGISTER_DEV(SWITCH2, _name)
 
 // ----------------------------------------------------------------------------------------
 // Devices ...

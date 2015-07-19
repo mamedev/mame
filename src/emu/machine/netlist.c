@@ -100,7 +100,7 @@ void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &se
 	pstring dname = "OUT_" + m_in;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 	NETLIB_NAME(analog_callback) *dev = downcast<NETLIB_NAME(analog_callback) *>(
-			setup.register_dev("nld_analog_callback", dname));
+			setup.register_dev("NETDEV_CALLBACK", dname));
 
 	dev->register_callback(m_delegate);
 	setup.register_link(dname + ".IN", m_in);
@@ -173,7 +173,7 @@ void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &set
 {
 	NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in)>();
 	if (snd_in == NULL)
-		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.register_dev("nld_sound_in", "STREAM_INPUT"));
+		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT"));
 
 	pstring sparam = pstring::sprintf("STREAM_INPUT.CHAN%d", m_channel);
 	setup.register_param(sparam, m_param_name);
@@ -213,7 +213,7 @@ void netlist_mame_stream_output_t::custom_netlist_additions(netlist::setup_t &se
 	pstring sname = pstring::sprintf("STREAM_OUT_%d", m_channel);
 
 	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
-	setup.register_dev("nld_sound_out", sname);
+	setup.register_dev("NETDEV_SOUND_OUT", sname);
 
 	setup.register_param(sname + ".CHAN" , m_channel);
 	setup.register_param(sname + ".MULT",  m_mult);

@@ -25,11 +25,8 @@
 #define DIPPINS(_pin1, ...)                                                          \
 		setup.register_dippins_arr( #_pin1 ", " # __VA_ARGS__);
 
-#define NET_REGISTER_DEV(_type, _name)                                              \
-		setup.register_dev(NETLIB_NAME_STR(_type), # _name);
-
 /* to be used to reference new library truthtable devices */
-#define NET_REGISTER_DEV_X(_type, _name)                                            \
+#define NET_REGISTER_DEV(_type, _name)                                            \
 		setup.register_dev(# _type, # _name);
 
 #define NET_REGISTER_SIGNAL(_type, _name)                                           \

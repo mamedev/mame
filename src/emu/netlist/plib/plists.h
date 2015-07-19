@@ -735,10 +735,8 @@ private:
 		const unsigned pos = hash % m_hash.size();
 
 		for (int ep = m_hash[pos]; ep != -1; ep = m_values[ep].m_next)
-		{
 			if (m_values[ep].m_hash == hash && m_values[ep].m_key == key )
 				return ep;
-		}
 		return -1;
 	}
 
