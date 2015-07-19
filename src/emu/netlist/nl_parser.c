@@ -360,7 +360,7 @@ void parser_t::device(const pstring &dev_type)
 	}
 	else
 	{
-		base_factory_t *f = m_setup.factory().factory_by_name(dev_type, m_setup);
+		base_factory_t *f = m_setup.factory().factory_by_name(dev_type);
 		device_t *dev;
 		pstring_list_t termlist = f->term_param_list();
 		pstring_list_t def_params = f->def_params();

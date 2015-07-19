@@ -52,7 +52,7 @@ setup_t::setup_t(netlist_t *netlist)
 	, m_proxy_cnt(0)
 {
 	netlist->set_setup(this);
-	m_factory = palloc(factory_list_t);
+	m_factory = palloc(factory_list_t(*this));
 }
 
 void setup_t::init()
@@ -129,7 +129,7 @@ device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 	}
 	else
 	{
-		device_t *dev = factory().new_device_by_name(classname, *this);
+		device_t *dev = factory().new_device_by_name(classname);
 		//device_t *dev = factory().new_device_by_classname(classname);
 		if (dev == NULL)
 			netlist().error("Class %s not found!\n", classname.cstr());
@@ -861,7 +861,7 @@ void setup_t::start_devices()
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
-			device_t *nc = factory().new_device_by_name("LOG", *this);
+			device_t *nc = factory().new_device_by_name("LOG");
 			pstring name = "log_" + ll[i];
 			register_dev(nc, name);
 			register_link(name + ".I", ll[i]);

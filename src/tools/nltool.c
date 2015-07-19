@@ -290,7 +290,7 @@ static void listdevices()
 {
 	netlist_tool_t nt;
 	nt.init();
-	const netlist::factory_list_t::list_t &list = nt.setup().factory().list();
+	const netlist::factory_list_t &list = nt.setup().factory();
 
 	nt.setup().register_source(palloc(netlist::source_proc_t("dummy", &netlist_dummy)));
 	nt.setup().include("dummy");
@@ -300,11 +300,11 @@ static void listdevices()
 
 	for (int i=0; i < list.size(); i++)
 	{
-		pstring out = pstring::sprintf("%-20s %s(<id>", list[i]->classname().cstr(),
-				list[i]->name().cstr() );
+		netlist::base_factory_t *f = list.value_at(i);
+		pstring out = pstring::sprintf("%-20s %s(<id>", f->classname().cstr(),
+				f->name().cstr() );
 		pstring terms("");
 
-		netlist::base_factory_t *f = list[i];
 		netlist::device_t *d = f->Create();
 		d->init(nt, pstring::sprintf("dummy%d", i));
 		d->start_dev();
@@ -318,18 +318,18 @@ static void listdevices()
 			terms += "," + inp;
 		}
 
-		if (list[i]->param_desc().startsWith("+"))
+		if (f->param_desc().startsWith("+"))
 		{
-			out += "," + list[i]->param_desc().substr(1);
+			out += "," + f->param_desc().substr(1);
 			terms = "";
 		}
-		else if (list[i]->param_desc() == "-")
+		else if (f->param_desc() == "-")
 		{
 			/* no params at all */
 		}
 		else
 		{
-			out += "," + list[i]->param_desc();
+			out += "," + f->param_desc();
 		}
 		out += ")";
 		printf("%s\n", out.cstr());

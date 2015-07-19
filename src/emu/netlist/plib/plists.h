@@ -780,17 +780,6 @@ public:
 		return m_values[p].m_value;
 	}
 
-	const V& operator[](const K &key) const
-	{
-		int p = get_idx(key);
-		if (p == -1)
-		{
-			p = m_values.size();
-			add(key, V());
-		}
-		return m_values[p].m_value;
-	}
-
 	V& value_at(const unsigned pos) { return m_values[pos].m_value; }
 	const V& value_at(const unsigned pos) const { return m_values[pos].m_value; }
 
