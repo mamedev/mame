@@ -19,9 +19,12 @@
     by adding chips and wires to the inside of the game.
 
     TODO:
+    - Need instructions
     - Proper SED1503F emulation (it's simulated in-driver for now)
-    - After each keypress it hits a HALT instruction. I guess the controller
-      should respond with a pointer to a RET somewhere.
+    - After each keypress it hits a HALT instruction. I guess the controller's
+      sync pin is involved somehow.
+    - When it wants tiles, put 64 into FD1B (monty), 7D1B (mmonty) and press
+      Enter.
 
 ****************************************************************************/
 
@@ -63,13 +66,21 @@ private:
 	UINT8 m_writeUpper;
 	UINT32 m_pixels[42*32];
 	bool m_sound_sw;
+	bool m_dirty;
 };
 
 
 static ADDRESS_MAP_START( monty_mem, AS_PROGRAM, 8, monty_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	//AM_RANGE(0x4000, 0x4000) // The main rom checks to see if another program is here on startup
 	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mmonty_mem, AS_PROGRAM, 8, monty_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	//AM_RANGE(0xc000, 0xc000) // The main rom checks to see if another program is here on startup
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -172,41 +183,47 @@ WRITE8_MEMBER( monty_state::ioCommandWrite1_w )
 
 WRITE8_MEMBER( monty_state::ioDisplayWrite_w )
 {
+	m_dirty = true;
 	// Offset directly corresponds to sed1503, DD RAM address (offset 0x7f may be special?)
 	//printf("(%04x) %02x %02x\n", m_maincpu->pc(), offset, data);
 
-	const UINT8 localUpper = (offset & 0x40) >> 6;
-	const UINT8 seg = offset & 0x3f;
-	const UINT8 com = data;
+	UINT8 x = offset & 0x3f;
+	UINT8 y = (BIT(offset, 6) + (m_writeUpper ? 2 : 0)) << 3;
 
 	// Skip the controller and write straight to the LCD    (pc=134f)
 	for (int i = 0; i < 8; i++)
 	{
-		// Pixel location
-		const int upperSedOffset = m_writeUpper ? 8*2 : 0;
-
-		const size_t x = seg;
-		const size_t y = i + (localUpper*8) + upperSedOffset;
-
 		// Pixel color
-		const bool on = (com >> i) & 0x01;
 		if (x < 42)
-			m_pixels[(y*42) + x] = on ? 0xffffffff : 0xff000000;
+			m_pixels[(y*42) + x] = BIT(data, i) ? 0xffffffff : 0xff000000;
+
+		y++;
 	}
 }
 
 
 UINT32 monty_state::lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	for (int y = 0; y < 32; y++)
+	if (!m_dirty)
+		return 1;
+
+	UINT8 x,y,z;
+	m_dirty = false;
+	for (y = 0; y < 32; y++)
 	{
-		for (int x = 0; x < 42; x++)
+		for (z = 0; z < 8; z++)
 		{
-			bitmap.pix32(y, x) = m_pixels[(y*42) + x];
+			for (x = 0; x < 5; x++)
+			{
+				bitmap.pix32(y, x+z*6) = m_pixels[y*42 + z*5 + x];
+			}
+			bitmap.pix32(y, 5+z*6) = 0; // space between letters
 		}
+		bitmap.pix32(y, 48) = m_pixels[y*42 + 40];
+		bitmap.pix32(y, 49) = m_pixels[y*42 + 41];
 	}
 
-	return 0x00;
+	return 0;
 }
 
 
@@ -228,8 +245,8 @@ static MACHINE_CONFIG_START( monty, monty_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not accurate
-	MCFG_SCREEN_SIZE(42, 32)    // Two SED1503s (42x16 pixels) control the top and bottom halves
-	MCFG_SCREEN_VISIBLE_AREA(0, 42-1, 0, 32-1)
+	MCFG_SCREEN_SIZE(50, 32)    // Two SED1503s (42x16 pixels) control the top and bottom halves
+	MCFG_SCREEN_VISIBLE_AREA(0, 50-1, 0, 32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(monty_state, lcd_update)
 
 	/* sound hardware */
@@ -241,6 +258,11 @@ static MACHINE_CONFIG_START( monty, monty_state )
 	MCFG_SED1520_ADD("sed1520_0", monty_screen_update)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mmonty, monty )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mmonty_mem)
+MACHINE_CONFIG_END
+
 
 // ROM definitions
 ROM_START( monty )
@@ -248,7 +270,7 @@ ROM_START( monty )
 	ROM_LOAD( "monty_main.bin",    0x0000, 0x4000, CRC(720b4f55) SHA1(0106eb88d3fbbf25a745b9b6ee785ba13689d095) )   // 27128
 	ROM_LOAD( "monty_module1.bin", 0x4000, 0x4000, CRC(2725d8c3) SHA1(8273b9779c0915f9c7c43ea4fb460f43ce036358) )   // 27128
 	ROM_LOAD( "monty_module2.bin", 0x8000, 0x4000, CRC(db672e47) SHA1(bb14fe86df06cfa4b19625ba417d1a5bc8eae155) )   // 27128
-	ROM_FILL(0x1193,1,0) // patch out first HALT so we can type in our names
+	ROM_FILL(0x1193,1,0) // patch out HALT so we can type in our names
 ROM_END
 
 ROM_START( mmonty )
@@ -256,10 +278,11 @@ ROM_START( mmonty )
 	ROM_LOAD( "master_monty_main.bin", 0x0000, 0x8000, CRC(bb5ef4d4) SHA1(ba2c759e429f8740df419f9abb60832eddfba8ab) )   // 27C256
 	ROM_LOAD( "monty_module1.bin",     0x8000, 0x4000, CRC(2725d8c3) SHA1(8273b9779c0915f9c7c43ea4fb460f43ce036358) )   // 27128
 	ROM_LOAD( "monty_module2.bin",     0xc000, 0x4000, CRC(db672e47) SHA1(bb14fe86df06cfa4b19625ba417d1a5bc8eae155) )   // 27128
+	ROM_FILL(0x1487,1,0) // patch out HALT so we can type in our names
 ROM_END
 
 
 // Drivers
 //    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT  COMPANY   FULLNAME                 FLAGS
 COMP( 1980, monty,   0,      0,       monty,     monty,  driver_device,  0,    "Ritam",  "Monty Plays Scrabble",  GAME_NOT_WORKING )
-COMP( 1980, mmonty,  0,      0,       monty,     monty,  driver_device,  0,    "Ritam",  "Master Monty",          GAME_IS_SKELETON )
+COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  driver_device,  0,    "Ritam",  "Master Monty",          GAME_NOT_WORKING )
