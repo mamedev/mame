@@ -51,6 +51,10 @@ NETLIST_END()
 
 static NETLIST_START(nl_popeye)
 
+	/* register hard coded netlists */
+
+	LOCAL_SOURCE(nl_popeye_imp_changer)
+
 	/* Standard stuff */
 
 	SOLVER(Solver, 48000)

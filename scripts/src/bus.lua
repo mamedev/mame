@@ -11,7 +11,7 @@
 
 -------------------------------------------------
 --
---@src/emu/bus/a7800/a78_slot.h,BUSES += A7800
+--@src/emu/bus/a7800/a78_slot.h,BUSES["A7800"] = true
 ---------------------------------------------------
 
 if (BUSES["A7800"]~=null) then
@@ -33,7 +33,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/a800/a800_slot.h,BUSES += A800
+--@src/emu/bus/a800/a800_slot.h,BUSES["A800"] = true
 ---------------------------------------------------
 
 if (BUSES["A800"]~=null) then
@@ -53,7 +53,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/a8sio/a8sio.h,BUSES += A8SIO
+--@src/emu/bus/a8sio/a8sio.h,BUSES["A8SIO"] = true
 ---------------------------------------------------
 
 if (BUSES["A8SIO"]~=null) then
@@ -68,7 +68,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/abcbus/abcbus.h,BUSES += ABCBUS
+--@src/emu/bus/abcbus/abcbus.h,BUSES["ABCBUS"] = true
 ---------------------------------------------------
 
 if (BUSES["ABCBUS"]~=null) then
@@ -107,7 +107,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/adam/exp.h,BUSES += ADAM
+--@src/emu/bus/adam/exp.h,BUSES["ADAM"] = true
 ---------------------------------------------------
 
 if (BUSES["ADAM"]~=null) then
@@ -126,7 +126,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/adamnet/adamnet.h,BUSES += ADAMNET
+--@src/emu/bus/adamnet/adamnet.h,BUSES["ADAMNET"] = true
 ---------------------------------------------------
 
 if (BUSES["ADAMNET"]~=null) then
@@ -149,7 +149,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/apf/slot.h,BUSES += APF
+--@src/emu/bus/apf/slot.h,BUSES["APF"] = true
 ---------------------------------------------------
 
 if (BUSES["APF"]~=null) then
@@ -164,7 +164,24 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/arcadia/slot.h,BUSES += ARCADIA
+--@src/emu/bus/apricot/expansion.h,BUSES["APRICOT_EXPANSION"] = true
+---------------------------------------------------
+
+if (BUSES["APRICOT_EXPANSION"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/bus/apricot/expansion.c",
+		MAME_DIR .. "src/emu/bus/apricot/expansion.h",
+		MAME_DIR .. "src/emu/bus/apricot/cards.c",
+		MAME_DIR .. "src/emu/bus/apricot/cards.h",
+		MAME_DIR .. "src/emu/bus/apricot/ram.c",
+		MAME_DIR .. "src/emu/bus/apricot/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/bus/arcadia/slot.h,BUSES["ARCADIA"] = true
 ---------------------------------------------------
 
 if (BUSES["ARCADIA"]~=null) then
@@ -179,7 +196,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/astrocde/slot.h,BUSES += ASTROCADE
+--@src/emu/bus/astrocde/slot.h,BUSES["ASTROCADE"] = true
 ---------------------------------------------------
 
 if (BUSES["ASTROCADE"]~=null) then
@@ -198,7 +215,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/bw2/exp.h,BUSES += BW2
+--@src/emu/bus/bw2/exp.h,BUSES["BW2"] = true
 ---------------------------------------------------
 
 if (BUSES["BW2"]~=null) then
@@ -213,8 +230,8 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/c64/exp.h,BUSES += C64
---@src/emu/bus/c64/user.h,BUSES += C64
+--@src/emu/bus/c64/exp.h,BUSES["C64"] = true
+--@src/emu/bus/c64/user.h,BUSES["C64"] = true
 ---------------------------------------------------
 
 if (BUSES["C64"]~=null) then
@@ -367,8 +384,8 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/cbm2/exp.h,BUSES += CBM2
---@src/emu/bus/cbm2/user.h,BUSES += CBM2
+--@src/emu/bus/cbm2/exp.h,BUSES["CBM2"] = true
+--@src/emu/bus/cbm2/user.h,BUSES["CBM2"] = true
 ---------------------------------------------------
 
 if (BUSES["CBM2"]~=null) then
@@ -389,7 +406,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/cbmiec/cbmiec.h,BUSES += CBMIEC
+--@src/emu/bus/cbmiec/cbmiec.h,BUSES["CBMIEC"] = true
 ---------------------------------------------------
 
 if (BUSES["CBMIEC"]~=null) then
@@ -420,7 +437,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/chanf/slot.h,BUSES += CHANNELF
+--@src/emu/bus/chanf/slot.h,BUSES["CHANNELF"] = true
 ---------------------------------------------------
 
 if (BUSES["CHANNELF"]~=null) then
@@ -435,7 +452,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/comx35/exp.h,BUSES += COMX35
+--@src/emu/bus/comx35/exp.h,BUSES["COMX35"] = true
 ---------------------------------------------------
 
 if (BUSES["COMX35"]~=null) then
@@ -464,7 +481,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/coleco/ctrl.h,BUSES += COLECO
+--@src/emu/bus/coleco/ctrl.h,BUSES["COLECO"] = true
 ---------------------------------------------------
 
 if (BUSES["COLECO"]~=null) then
@@ -485,7 +502,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/crvision/slot.h,BUSES += CRVISION
+--@src/emu/bus/crvision/slot.h,BUSES["CRVISION"] = true
 ---------------------------------------------------
 
 if (BUSES["CRVISION"]~=null) then
@@ -500,7 +517,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/dmv/dmv.h,BUSES += DMV
+--@src/emu/bus/dmv/dmv.h,BUSES["DMV"] = true
 ---------------------------------------------------
 
 if (BUSES["DMV"]~=null) then
@@ -529,7 +546,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/ecbbus/ecbbus.h,BUSES += ECBBUS
+--@src/emu/bus/ecbbus/ecbbus.h,BUSES["ECBBUS"] = true
 ---------------------------------------------------
 
 if (BUSES["ECBBUS"]~=null) then
@@ -544,7 +561,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/econet/econet.h,BUSES += ECONET
+--@src/emu/bus/econet/econet.h,BUSES["ECONET"] = true
 ---------------------------------------------------
 
 if (BUSES["ECONET"]~=null) then
@@ -559,7 +576,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/ep64/exp.h,BUSES += EP64
+--@src/emu/bus/ep64/exp.h,BUSES["EP64"] = true
 ---------------------------------------------------
 
 if (BUSES["EP64"]~=null) then
@@ -574,7 +591,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/generic/slot.h,BUSES += GENERIC
+--@src/emu/bus/generic/slot.h,BUSES["GENERIC"] = true
 ---------------------------------------------------
 
 if (BUSES["GENERIC"]~=null) then
@@ -593,7 +610,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/ieee488/ieee488.h,BUSES += IEEE488
+--@src/emu/bus/ieee488/ieee488.h,BUSES["IEEE488"] = true
 ---------------------------------------------------
 
 if (BUSES["IEEE488"]~=null) then
@@ -626,7 +643,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/iq151/iq151.h,BUSES += IQ151
+--@src/emu/bus/iq151/iq151.h,BUSES["IQ151"] = true
 ---------------------------------------------------
 
 if (BUSES["IQ151"]~=null) then
@@ -655,7 +672,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/isbx/isbx.h,BUSES += IMI7000
+--@src/emu/bus/isbx/isbx.h,BUSES["IMI7000"] = true
 ---------------------------------------------------
 
 if (BUSES["IMI7000"]~=null) then
@@ -670,7 +687,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/intv/slot.h,BUSES += INTV
+--@src/emu/bus/intv/slot.h,BUSES["INTV"] = true
 ---------------------------------------------------
 
 if (BUSES["INTV"]~=null) then
@@ -689,7 +706,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/isa/isa.h,BUSES += ISA
+--@src/emu/bus/isa/isa.h,BUSES["ISA"] = true
 ---------------------------------------------------
 
 if (BUSES["ISA"]~=null) then
@@ -801,7 +818,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/isbx/isbx.h,BUSES += ISBX
+--@src/emu/bus/isbx/isbx.h,BUSES["ISBX"] = true
 ---------------------------------------------------
 
 if (BUSES["ISBX"]~=null) then
@@ -818,7 +835,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/msx_slot/slot.h,BUSES += MSX_SLOT
+--@src/emu/bus/msx_slot/slot.h,BUSES["MSX_SLOT"] = true
 ---------------------------------------------------
 
 if (BUSES["MSX_SLOT"]~=null) then
@@ -873,6 +890,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/emu/bus/msx_cart/korean.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/majutsushi.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/majutsushi.h",
+		MAME_DIR .. "src/emu/bus/msx_cart/moonsound.h",
+		MAME_DIR .. "src/emu/bus/msx_cart/moonsound.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio.c",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio.h",
 		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio_kb.c",
@@ -895,7 +914,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/kc/kc.h,BUSES += KC
+--@src/emu/bus/kc/kc.h,BUSES["KC"] = true
 ---------------------------------------------------
 
 if (BUSES["KC"]~=null) then
@@ -915,7 +934,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/odyssey2/slot.h,BUSES += O2
+--@src/emu/bus/odyssey2/slot.h,BUSES["O2"] = true
 ---------------------------------------------------
 
 if (BUSES["O2"]~=null) then
@@ -934,7 +953,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/pc_joy/pc_joy.h,BUSES += PC_JOY
+--@src/emu/bus/pc_joy/pc_joy.h,BUSES["PC_JOY"] = true
 ---------------------------------------------------
 
 if (BUSES["PC_JOY"]~=null) then
@@ -949,7 +968,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/pc_kbd/pc_kbdc.h,BUSES += PC_KBD
+--@src/emu/bus/pc_kbd/pc_kbdc.h,BUSES["PC_KBD"] = true
 ---------------------------------------------------
 
 if (BUSES["PC_KBD"]~=null) then
@@ -978,9 +997,9 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/pet/cass.h,BUSES += PET
---@src/emu/bus/pet/exp.h,BUSES += PET
---@src/emu/bus/pet/user.h,BUSES += PET
+--@src/emu/bus/pet/cass.h,BUSES["PET"] = true
+--@src/emu/bus/pet/exp.h,BUSES["PET"] = true
+--@src/emu/bus/pet/user.h,BUSES["PET"] = true
 ---------------------------------------------------
 
 if (BUSES["PET"]~=null) then
@@ -1013,8 +1032,8 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/plus4/exp.h,BUSES += PLUS4
---@src/emu/bus/plus4/user.h,BUSES += PLUS4
+--@src/emu/bus/plus4/exp.h,BUSES["PLUS4"] = true
+--@src/emu/bus/plus4/user.h,BUSES["PLUS4"] = true
 ---------------------------------------------------
 
 if (BUSES["PLUS4"]~=null) then
@@ -1037,7 +1056,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/s100/s100.h,BUSES += S100
+--@src/emu/bus/s100/s100.h,BUSES["S100"] = true
 ---------------------------------------------------
 
 if (BUSES["S100"]~=null) then
@@ -1062,7 +1081,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/spc1000/exp.h,BUSES += SPC1000
+--@src/emu/bus/spc1000/exp.h,BUSES["SPC1000"] = true
 ---------------------------------------------------
 
 if (BUSES["SPC1000"]~=null) then
@@ -1079,7 +1098,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/tvc/tvc.h,BUSES += TVC
+--@src/emu/bus/tvc/tvc.h,BUSES["TVC"] = true
 ---------------------------------------------------
 
 if (BUSES["TVC"]~=null) then
@@ -1094,7 +1113,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vc4000/slot.h,BUSES += VC4000
+--@src/emu/bus/vc4000/slot.h,BUSES["VC4000"] = true
 ---------------------------------------------------
 
 if (BUSES["VC4000"]~=null) then
@@ -1109,7 +1128,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vcs/vcs_slot.h,BUSES += VCS
+--@src/emu/bus/vcs/vcs_slot.h,BUSES["VCS"] = true
 ---------------------------------------------------
 
 if (BUSES["VCS"]~=null) then
@@ -1130,7 +1149,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vcs/ctrl.h,BUSES += VCS_CTRL
+--@src/emu/bus/vcs/ctrl.h,BUSES["VCS_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["VCS_CTRL"]~=null) then
@@ -1155,7 +1174,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vectrex/slot.h,BUSES += VECTREX
+--@src/emu/bus/vectrex/slot.h,BUSES["VECTREX"] = true
 ---------------------------------------------------
 
 if (BUSES["VECTREX"]~=null) then
@@ -1170,7 +1189,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vic10/exp.h,BUSES += VIC10
+--@src/emu/bus/vic10/exp.h,BUSES["VIC10"] = true
 ---------------------------------------------------
 
 if (BUSES["VIC10"]~=null) then
@@ -1185,8 +1204,8 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vic20/exp.h,BUSES += VIC20
---@src/emu/bus/vic20/user.h,BUSES += VIC20
+--@src/emu/bus/vic20/exp.h,BUSES["VIC20"] = true
+--@src/emu/bus/vic20/user.h,BUSES["VIC20"] = true
 ---------------------------------------------------
 
 if (BUSES["VIC20"]~=null) then
@@ -1221,7 +1240,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vidbrain/exp.h,BUSES += VIDBRAIN
+--@src/emu/bus/vidbrain/exp.h,BUSES["VIDBRAIN"] = true
 ---------------------------------------------------
 
 if (BUSES["VIDBRAIN"]~=null) then
@@ -1240,8 +1259,8 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vip/byteio.h,BUSES += VIP
---@src/emu/bus/vip/exp.h,BUSES += VIP
+--@src/emu/bus/vip/byteio.h,BUSES["VIP"] = true
+--@src/emu/bus/vip/exp.h,BUSES["VIP"] = true
 ---------------------------------------------------
 
 if (BUSES["VIP"]~=null) then
@@ -1272,7 +1291,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/wangpc/wangpc.h,BUSES += WANGPC
+--@src/emu/bus/wangpc/wangpc.h,BUSES["WANGPC"] = true
 ---------------------------------------------------
 
 if (BUSES["WANGPC"]~=null) then
@@ -1301,7 +1320,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/z88/z88.h,BUSES += Z88
+--@src/emu/bus/z88/z88.h,BUSES["Z88"] = true
 ---------------------------------------------------
 
 if (BUSES["Z88"]~=null) then
@@ -1319,7 +1338,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/a2bus/a2bus.h,BUSES += A2BUS
+--@src/emu/bus/a2bus/a2bus.h,BUSES["A2BUS"] = true
 ---------------------------------------------------
 
 if (BUSES["A2BUS"]~=null) then
@@ -1409,7 +1428,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/nubus/nubus.h,BUSES += NUBUS
+--@src/emu/bus/nubus/nubus.h,BUSES["NUBUS"] = true
 ---------------------------------------------------
 
 if (BUSES["NUBUS"]~=null) then
@@ -1453,7 +1472,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/centronics/ctronics.h,BUSES += CENTRONICS
+--@src/emu/bus/centronics/ctronics.h,BUSES["CENTRONICS"] = true
 ---------------------------------------------------
 
 if (BUSES["CENTRONICS"]~=null) then
@@ -1492,7 +1511,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/rs232/rs232.h,BUSES += RS232
+--@src/emu/bus/rs232/rs232.h,BUSES["RS232"] = true
 ---------------------------------------------------
 
 if (BUSES["RS232"]~=null) then
@@ -1518,7 +1537,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/midi/midi.h,BUSES += MIDI
+--@src/emu/bus/midi/midi.h,BUSES["MIDI"] = true
 ---------------------------------------------------
 
 if (BUSES["MIDI"]~=null) then
@@ -1534,7 +1553,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/lpci/pci.h,BUSES += LPCI
+--@src/emu/bus/lpci/pci.h,BUSES["LPCI"] = true
 ---------------------------------------------------
 
 if (BUSES["LPCI"]~=null) then
@@ -1560,7 +1579,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/nes/nes_slot.h,BUSES += NES
+--@src/emu/bus/nes/nes_slot.h,BUSES["NES"] = true
 ---------------------------------------------------
 
 if (BUSES["NES"]~=null) then
@@ -1673,7 +1692,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/nes_ctrl/ctrl.h,BUSES += NES_CTRL
+--@src/emu/bus/nes_ctrl/ctrl.h,BUSES["NES_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["NES_CTRL"]~=null) then
@@ -1715,7 +1734,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/snes/snes_slot.h,BUSES += SNES
+--@src/emu/bus/snes/snes_slot.h,BUSES["SNES"] = true
 ---------------------------------------------------
 
 if (BUSES["SNES"]~=null) then
@@ -1751,7 +1770,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/snes_ctrl/ctrl.h,BUSES += SNES_CTRL
+--@src/emu/bus/snes_ctrl/ctrl.h,BUSES["SNES_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["SNES_CTRL"]~=null) then
@@ -1779,7 +1798,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vboy/slot.h,BUSES += VBOY
+--@src/emu/bus/vboy/slot.h,BUSES["VBOY"] = true
 ---------------------------------------------------
 if (BUSES["VBOY"]~=null) then
 	files {
@@ -1792,7 +1811,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/megadrive/md_slot.h,BUSES += MEGADRIVE
+--@src/emu/bus/megadrive/md_slot.h,BUSES["MEGADRIVE"] = true
 ---------------------------------------------------
 
 if (BUSES["MEGADRIVE"]~=null) then
@@ -1820,7 +1839,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/neogeo/neogeo_slot.h,BUSES += NEOGEO
+--@src/emu/bus/neogeo/neogeo_slot.h,BUSES["NEOGEO"] = true
 ---------------------------------------------------
 
 if (BUSES["NEOGEO"]~=null) then
@@ -1885,7 +1904,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/saturn/sat_slot.h,BUSES += SATURN
+--@src/emu/bus/saturn/sat_slot.h,BUSES["SATURN"] = true
 ---------------------------------------------------
 
 if (BUSES["SATURN"]~=null) then
@@ -1903,7 +1922,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/sega8/sega8_slot.h,BUSES += SEGA8
+--@src/emu/bus/sega8/sega8_slot.h,BUSES["SEGA8"] = true
 ---------------------------------------------------
 
 if (BUSES["SEGA8"]~=null) then
@@ -1921,7 +1940,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/sms_ctrl/smsctrl.h,BUSES += SMS_CTRL
+--@src/emu/bus/sms_ctrl/smsctrl.h,BUSES["SMS_CTRL"] = true
 ---------------------------------------------------
 
 if (BUSES["SMS_CTRL"]~=null) then
@@ -1949,7 +1968,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/sms_exp/smsexp.h,BUSES += SMS_EXP
+--@src/emu/bus/sms_exp/smsexp.h,BUSES["SMS_EXP"] = true
 ---------------------------------------------------
 
 if (BUSES["SMS_EXP"]~=null) then
@@ -1963,7 +1982,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/ti99_peb/peribox.h,BUSES += TI99PEB
+--@src/emu/bus/ti99_peb/peribox.h,BUSES["TI99PEB"] = true
 ---------------------------------------------------
 
 if (BUSES["TI99PEB"]~=null) then
@@ -2005,7 +2024,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/gameboy/gb_slot.h,BUSES += GAMEBOY
+--@src/emu/bus/gameboy/gb_slot.h,BUSES["GAMEBOY"] = true
 ---------------------------------------------------
 
 if (BUSES["GAMEBOY"]~=null) then
@@ -2021,7 +2040,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/gamegear/ggext.h,BUSES += GAMEGEAR
+--@src/emu/bus/gamegear/ggext.h,BUSES["GAMEGEAR"] = true
 ---------------------------------------------------
 
 if (BUSES["GAMEGEAR"]~=null) then
@@ -2035,7 +2054,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/gba/gba_slot.h,BUSES += GBA
+--@src/emu/bus/gba/gba_slot.h,BUSES["GBA"] = true
 ---------------------------------------------------
 
 if (BUSES["GBA"]~=null) then
@@ -2049,7 +2068,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/bml3/bml3bus.h,BUSES += BML3
+--@src/emu/bus/bml3/bml3bus.h,BUSES["BML3"] = true
 ---------------------------------------------------
 if (BUSES["BML3"]~=null) then
 	files {
@@ -2066,7 +2085,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/coco/cococart.h,BUSES += COCO
+--@src/emu/bus/coco/cococart.h,BUSES["COCO"] = true
 ---------------------------------------------------
 if (BUSES["COCO"]~=null) then
 	files {
@@ -2089,7 +2108,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/cpc/cpcexp.h,BUSES += CPC
+--@src/emu/bus/cpc/cpcexp.h,BUSES["CPC"] = true
 ---------------------------------------------------
 if (BUSES["CPC"]~=null) then
 	files {
@@ -2115,12 +2134,16 @@ if (BUSES["CPC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cpc/smartwatch.h",
 		MAME_DIR .. "src/emu/bus/cpc/brunword4.c",
 		MAME_DIR .. "src/emu/bus/cpc/brunword4.h",
+		MAME_DIR .. "src/emu/bus/cpc/hd20.c",
+		MAME_DIR .. "src/emu/bus/cpc/hd20.h",
+		MAME_DIR .. "src/emu/bus/cpc/ddi1.c",
+		MAME_DIR .. "src/emu/bus/cpc/ddi1.h",
 	}
 end
 
 ---------------------------------------------------
 --
---@src/emu/bus/epson_sio/epson_sio.h,BUSES += EPSON_SIO
+--@src/emu/bus/epson_sio/epson_sio.h,BUSES["EPSON_SIO"] = true
 ---------------------------------------------------
 if (BUSES["EPSON_SIO"]~=null) then
 	files {
@@ -2135,7 +2158,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/pce/pce_slot.h,BUSES += PCE
+--@src/emu/bus/pce/pce_slot.h,BUSES["PCE"] = true
 ---------------------------------------------------
 if (BUSES["PCE"]~=null) then
 	files {
@@ -2148,7 +2171,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/scv/slot.h,BUSES += SCV
+--@src/emu/bus/scv/slot.h,BUSES["SCV"] = true
 ---------------------------------------------------
 if (BUSES["SCV"]~=null) then
 	files {
@@ -2161,7 +2184,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/x68k/x68kexp.h,BUSES += X68K
+--@src/emu/bus/x68k/x68kexp.h,BUSES["X68K"] = true
 ---------------------------------------------------
 if (BUSES["X68K"]~=null) then
 	files {
@@ -2176,7 +2199,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/abckb/abckb.h,BUSES += ABCKB
+--@src/emu/bus/abckb/abckb.h,BUSES["ABCKB"] = true
 ---------------------------------------------------
 if (BUSES["ABCKB"]~=null) then
 	files {
@@ -2193,7 +2216,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/compucolor/compclr_flp.h,BUSES += COMPUCOLOR
+--@src/emu/bus/compucolor/compclr_flp.h,BUSES["COMPUCOLOR"] = true
 ---------------------------------------------------
 if (BUSES["COMPUCOLOR"]~=null) then
 	files {
@@ -2204,7 +2227,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/scsi/scsi.h,BUSES += SCSI
+--@src/emu/bus/scsi/scsi.h,BUSES["SCSI"] = true
 ---------------------------------------------------
 if (BUSES["SCSI"]~=null) then
 	files {
@@ -2235,7 +2258,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/macpds/macpds.h,BUSES += MACPDS
+--@src/emu/bus/macpds/macpds.h,BUSES["MACPDS"] = true
 ---------------------------------------------------
 if (BUSES["MACPDS"]~=null) then
 	files {
@@ -2248,7 +2271,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/oricext/oricext.h,BUSES += ORICEXT
+--@src/emu/bus/oricext/oricext.h,BUSES["ORICEXT"] = true
 ---------------------------------------------------
 if (BUSES["ORICEXT"]~=null) then
 	files {
@@ -2263,7 +2286,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/a1bus/a1bus.h,BUSES += A1BUS
+--@src/emu/bus/a1bus/a1bus.h,BUSES["A1BUS"] = true
 ---------------------------------------------------
 
 if (BUSES["A1BUS"]~=null) then
@@ -2279,7 +2302,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/amiga/zorro/zorro.h,BUSES += ZORRO
+--@src/emu/bus/amiga/zorro/zorro.h,BUSES["ZORRO"] = true
 ---------------------------------------------------
 
 if (BUSES["ZORRO"]~=null) then
@@ -2303,7 +2326,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/ql/exp.h,BUSES += QL
+--@src/emu/bus/ql/exp.h,BUSES["QL"] = true
 ---------------------------------------------------
 
 if (BUSES["QL"]~=null) then
@@ -2345,7 +2368,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vtech/memexp/memexp.h,BUSES += VTECH_MEMEXP
+--@src/emu/bus/vtech/memexp/memexp.h,BUSES["VTECH_MEMEXP"] = true
 ---------------------------------------------------
 
 if (BUSES["VTECH_MEMEXP"]~=null) then
@@ -2367,7 +2390,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/vtech/ioexp/ioexp.h,BUSES += VTECH_IOEXP
+--@src/emu/bus/vtech/ioexp/ioexp.h,BUSES["VTECH_IOEXP"] = true
 ---------------------------------------------------
 
 if (BUSES["VTECH_IOEXP"]~=null) then
@@ -2385,7 +2408,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/wswan/slot.h,BUSES += WSWAN
+--@src/emu/bus/wswan/slot.h,BUSES["WSWAN"] = true
 ---------------------------------------------------
 
 if (BUSES["WSWAN"]~=null) then
@@ -2399,7 +2422,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/psx/ctlrport.h,BUSES += PSX_CONTROLLER
+--@src/emu/bus/psx/ctlrport.h,BUSES["PSX_CONTROLLER"] = true
 ---------------------------------------------------
 
 if (BUSES["PSX_CONTROLLER"]~=null) then
@@ -2417,7 +2440,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/nasbus/nasbus.h,BUSES += NASBUS
+--@src/emu/bus/nasbus/nasbus.h,BUSES["NASBUS"] = true
 ---------------------------------------------------
 
 if (BUSES["NASBUS"]~=null) then
@@ -2435,7 +2458,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/cgenie/expansion.h,BUSES += CGENIE_EXPANSION
+--@src/emu/bus/cgenie/expansion.h,BUSES["CGENIE_EXPANSION"] = true
 ---------------------------------------------------
 
 if (BUSES["CGENIE_EXPANSION"]~=null) then
@@ -2451,7 +2474,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/bus/cgenie/parallel.h,BUSES += CGENIE_PARALLEL
+--@src/emu/bus/cgenie/parallel.h,BUSES["CGENIE_PARALLEL"] = true
 ---------------------------------------------------
 
 if (BUSES["CGENIE_PARALLEL"]~=null) then

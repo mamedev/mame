@@ -6,9 +6,8 @@
 PALETTE_INIT_MEMBER(pcktgal_state, pcktgal)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -34,21 +33,18 @@ PALETTE_INIT_MEMBER(pcktgal_state, pcktgal)
 
 void pcktgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
+	for (int offs = 0;offs < m_spriteram.bytes();offs += 4)
 	{
-		if (spriteram[offs] != 0xf8)
+		if (m_spriteram[offs] != 0xf8)
 		{
 			int sx,sy,flipx,flipy;
 
 
-			sx = 240 - spriteram[offs+2];
-			sy = 240 - spriteram[offs];
+			sx = 240 - m_spriteram[offs+2];
+			sy = 240 - m_spriteram[offs];
 
-			flipx = spriteram[offs+1] & 0x04;
-			flipy = spriteram[offs+1] & 0x02;
+			flipx = m_spriteram[offs+1] & 0x04;
+			flipy = m_spriteram[offs+1] & 0x02;
 			if (flip_screen()) {
 				sx=240-sx;
 				sy=240-sy;
@@ -57,8 +53,8 @@ void pcktgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			}
 
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8),
-					(spriteram[offs+1] & 0x70) >> 4,
+					m_spriteram[offs+3] + ((m_spriteram[offs+1] & 1) << 8),
+					(m_spriteram[offs+1] & 0x70) >> 4,
 					flipx,flipy,
 					sx,sy,0);
 		}

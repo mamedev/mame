@@ -148,6 +148,12 @@ void namcos86_state::video_start()
 	}
 
 	m_spriteram = m_rthunder_spriteram + 0x1800;
+
+	save_item(NAME(m_tilebank));
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
+	save_item(NAME(m_backcolor));
+	save_item(NAME(m_copy_sprites));
 }
 
 
@@ -158,29 +164,19 @@ void namcos86_state::video_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(namcos86_state::rthunder_videoram1_r)
-{
-	return m_rthunder_videoram1[offset];
-}
-
-WRITE8_MEMBER(namcos86_state::rthunder_videoram1_w)
+WRITE8_MEMBER(namcos86_state::videoram1_w)
 {
 	m_rthunder_videoram1[offset] = data;
 	m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
 }
 
-READ8_MEMBER(namcos86_state::rthunder_videoram2_r)
-{
-	return m_rthunder_videoram2[offset];
-}
-
-WRITE8_MEMBER(namcos86_state::rthunder_videoram2_w)
+WRITE8_MEMBER(namcos86_state::videoram2_w)
 {
 	m_rthunder_videoram2[offset] = data;
 	m_bg_tilemap[2+offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
 }
 
-WRITE8_MEMBER(namcos86_state::rthunder_tilebank_select_w)
+WRITE8_MEMBER(namcos86_state::tilebank_select_w)
 {
 	int bit = BIT(offset,10);
 	if (m_tilebank != bit)
@@ -191,53 +187,46 @@ WRITE8_MEMBER(namcos86_state::rthunder_tilebank_select_w)
 	}
 }
 
-static void scroll_w(address_space &space, int offset, int data, int layer)
+void namcos86_state::scroll_w(address_space &space, int offset, int data, int layer)
 {
-	namcos86_state *state = space.machine().driver_data<namcos86_state>();
 	switch (offset)
 	{
 		case 0:
-			state->m_xscroll[layer] = (state->m_xscroll[layer]&0xff)|(data<<8);
+			m_xscroll[layer] = (m_xscroll[layer]&0xff)|(data<<8);
 			break;
 		case 1:
-			state->m_xscroll[layer] = (state->m_xscroll[layer]&0xff00)|data;
+			m_xscroll[layer] = (m_xscroll[layer]&0xff00)|data;
 			break;
 		case 2:
-			state->m_yscroll[layer] = data;
+			m_yscroll[layer] = data;
 			break;
 	}
 }
 
-WRITE8_MEMBER(namcos86_state::rthunder_scroll0_w)
+WRITE8_MEMBER(namcos86_state::scroll0_w)
 {
 	scroll_w(space,offset,data,0);
 }
-WRITE8_MEMBER(namcos86_state::rthunder_scroll1_w)
+WRITE8_MEMBER(namcos86_state::scroll1_w)
 {
 	scroll_w(space,offset,data,1);
 }
-WRITE8_MEMBER(namcos86_state::rthunder_scroll2_w)
+WRITE8_MEMBER(namcos86_state::scroll2_w)
 {
 	scroll_w(space,offset,data,2);
 }
-WRITE8_MEMBER(namcos86_state::rthunder_scroll3_w)
+WRITE8_MEMBER(namcos86_state::scroll3_w)
 {
 	scroll_w(space,offset,data,3);
 }
 
-WRITE8_MEMBER(namcos86_state::rthunder_backcolor_w)
+WRITE8_MEMBER(namcos86_state::backcolor_w)
 {
 	m_backcolor = data;
 }
 
 
-
-READ8_MEMBER(namcos86_state::rthunder_spriteram_r)
-{
-	return m_rthunder_spriteram[offset];
-}
-
-WRITE8_MEMBER(namcos86_state::rthunder_spriteram_w)
+WRITE8_MEMBER(namcos86_state::spriteram_w)
 {
 	m_rthunder_spriteram[offset] = data;
 
@@ -273,17 +262,16 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void namcos86_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	namcos86_state *state = screen.machine().driver_data<namcos86_state>();
-	const UINT8 *source = &state->m_spriteram[0x0800-0x20]; /* the last is NOT a sprite */
-	const UINT8 *finish = &state->m_spriteram[0];
-	gfx_element *gfx = state->m_gfxdecode->gfx(2);
+	const UINT8 *source = &m_spriteram[0x0800-0x20]; /* the last is NOT a sprite */
+	const UINT8 *finish = &m_spriteram[0];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 
-	int sprite_xoffs = state->m_spriteram[0x07f5] + ((state->m_spriteram[0x07f4] & 1) << 8);
-	int sprite_yoffs = state->m_spriteram[0x07f7];
+	int sprite_xoffs = m_spriteram[0x07f5] + ((m_spriteram[0x07f4] & 1) << 8);
+	int sprite_yoffs = m_spriteram[0x07f7];
 
-	int bank_sprites = state->m_gfxdecode->gfx(2)->elements() / 8;
+	int bank_sprites = m_gfxdecode->gfx(2)->elements() / 8;
 
 	while (source >= finish)
 	{
@@ -311,7 +299,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		sx += sprite_xoffs;
 		sy -= sprite_yoffs;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
@@ -337,10 +325,8 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 void namcos86_state::set_scroll(int layer)
 {
-	int scrollx,scrolly;
-
-	scrollx = m_xscroll[layer];
-	scrolly = m_yscroll[layer];
+	int scrollx = m_xscroll[layer];
+	int scrolly = m_yscroll[layer];
 	if (flip_screen())
 	{
 		scrollx = -scrollx;
@@ -351,10 +337,8 @@ void namcos86_state::set_scroll(int layer)
 }
 
 
-UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layer;
-
 	/* flip screen is embedded in the sprite control registers */
 	flip_screen_set(m_spriteram[0x07f6] & 1);
 	set_scroll(0);
@@ -366,11 +350,9 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(m_gfxdecode->gfx(0)->colorbase() + 8*m_backcolor+7, cliprect);
 
-	for (layer = 0;layer < 8;layer++)
+	for (int layer = 0;layer < 8;layer++)
 	{
-		int i;
-
-		for (i = 3;i >= 0;i--)
+		for (int i = 3;i >= 0;i--)
 		{
 			if (((m_xscroll[i] & 0x0e00) >> 9) == layer)
 				m_bg_tilemap[i]->draw(screen, bitmap, cliprect, 0,layer,0);
@@ -382,20 +364,17 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 }
 
 
-void namcos86_state::screen_eof_namcos86(screen_device &screen, bool state)
+void namcos86_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
 	{
 		if (m_copy_sprites)
 		{
-			UINT8 *spriteram = m_spriteram;
-			int i,j;
-
-			for (i = 0;i < 0x800;i += 16)
+			for (int i = 0;i < 0x800;i += 16)
 			{
-				for (j = 10;j < 16;j++)
-					spriteram[i+j] = spriteram[i+j - 6];
+				for (int j = 10;j < 16;j++)
+					m_spriteram[i+j] = m_spriteram[i+j - 6];
 			}
 
 			m_copy_sprites = 0;

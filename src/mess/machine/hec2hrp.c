@@ -102,85 +102,25 @@ TIMER_CALLBACK_MEMBER(hec2hrp_state::Callback_CK)
 	m_CK_signal++;
 }
 
-void hec2hrp_state::hector_minidisc_init()
+WRITE8_MEMBER( hec2hrp_state::minidisc_control_w )
 {
-	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-	//set density
-	fdc->dden_w(1);// density select => always 1 (0 ?a plante !)
+	floppy_image_device *floppy = NULL;
 
-	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
-	floppy_get_device(machine(), 0)->floppy_mon_w( 0); // Moteur floppy A:
-	//floppy_get_device(machine(), 1)->floppy_mon_w(BIT(data, 7));   // Moteur floppy B:, not implanted on the real machine
+	if (BIT(data, 6)) floppy = m_floppy0->get_device();
+	// bit 7 = drive 2?
 
-	//Set the drive ready !
-	floppy_get_device(machine(), 0)->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0);// Disc 0 ready !
+	m_minidisc_fdc->set_floppy(floppy);
 
-}
-
-READ8_MEMBER(hec2hrp_state::hector_179x_register_r)
-{
-int data=0;
-fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-
-	switch (offset & 0x0ff)
+	if (floppy)
 	{
-		/* minidisc floppy disc interface */
-		case 0x04:
-			data = fdc->status_r(space, 0);
-			break;
-		case 0x05:
-			data = fdc->track_r(space, 0);
-			break;
-		case 0x06:
-			data = fdc->sector_r(space, 0);
-			break;
-		case 0x07:
-			data = fdc->data_r(space, 0);
-			break;
-		default:
-			break;
+		// don't know where the motor on signal is
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 4));
 	}
 
-	return data;
+	membank("bank2")->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC);
 }
-WRITE8_MEMBER(hec2hrp_state::hector_179x_register_w)
-{
-fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
-switch (offset)
-	{
-		/* minidisc floppy disc interface */
-		case 0x04:
-			fdc->command_w(space, 0, data);
-			break;
-		case 0x05:
-			fdc->track_w(space, 0, data);
-			break;
-		case 0x06:
-			fdc->sector_w(space, 0, data);
-			break;
-		case 0x07:
-			/*write into command register*/
-			fdc->data_w(space, 0, data);
-			break;
-		case 0x08:
-			/*General purpose port (0x08) for the minidisk I/O */
-			{
-			// Rom page bank switching
-			membank("bank2")->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC );
 
-			// Set drive number
-			if (BIT(data, 6)) fdc->set_drive(0);  // Set the correct drive number 0
-			//if (BIT(data, 7)) fdc->set_drive(1);// Set the correct drive number 1,never here
-
-			// Set side
-			fdc->set_side(BIT(data, 4) ? 1 : 0);// side select
-			}
-			break;
-
-		default:
-		break;
-	}
-}
 WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 {
 	if (offset==0x00)   {   /* 0x800 et 0x000=> video page, HR*/
@@ -255,7 +195,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 
 				/* floppy md master reset */
 				if (isHectorWithMiniDisc())
-					machine().device<fd1793_device>("wd179x")->mr_w(1);
+					m_minidisc_fdc->reset();
 			}
 
 			else /* aviable for BR machines */

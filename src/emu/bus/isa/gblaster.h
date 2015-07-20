@@ -29,6 +29,8 @@ public:
 		DECLARE_READ8_MEMBER(saa1099_16_r);
 		DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
 		DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
+		DECLARE_READ8_MEMBER(detect_r);
+		DECLARE_WRITE8_MEMBER(detect_w);
 protected:
 		// device-level overrides
 		virtual void device_start();
@@ -37,6 +39,7 @@ private:
 		// internal state
 		required_device<saa1099_device> m_saa1099_1;
 		required_device<saa1099_device> m_saa1099_2;
+		UINT8 detect_reg;
 };
 
 

@@ -308,7 +308,7 @@ inline void v30mz_cpu_device::write_port(UINT16 port, UINT8 data)
 
 inline UINT8 v30mz_cpu_device::fetch_op()
 {
-	UINT8 data = m_direct->read_decrypted_byte( pc() );
+	UINT8 data = m_direct->read_byte( pc() );
 	m_ip++;
 	return data;
 }
@@ -316,7 +316,7 @@ inline UINT8 v30mz_cpu_device::fetch_op()
 
 inline UINT8 v30mz_cpu_device::fetch()
 {
-	UINT8 data = m_direct->read_raw_byte( pc() );
+	UINT8 data = m_direct->read_byte( pc() );
 	m_ip++;
 	return data;
 }

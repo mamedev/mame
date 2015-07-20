@@ -5,6 +5,7 @@
  *
  */
 
+#include <solver/nld_solver.h>
 #include <cstdio>
 
 #include "plib/palloc.h"
@@ -15,41 +16,53 @@
 #include "nl_factory.h"
 #include "devices/net_lib.h"
 #include "devices/nld_system.h"
-#include "analog/nld_solver.h"
 #include "analog/nld_twoterm.h"
 
 static NETLIST_START(base)
 	TTL_INPUT(ttlhigh, 1)
 	TTL_INPUT(ttllow, 0)
-	NET_REGISTER_DEV(gnd, GND)
-	NET_REGISTER_DEV(netlistparams, NETLIST)
+	NET_REGISTER_DEV(GND, GND)
+	NET_REGISTER_DEV(PARAMETER, NETLIST)
+
+	LOCAL_SOURCE(diode_models)
+	LOCAL_SOURCE(bjt_models)
+	LOCAL_SOURCE(family_models)
+	LOCAL_SOURCE(TTL74XX_lib)
+	LOCAL_SOURCE(CD4XXX_lib)
+	LOCAL_SOURCE(OPAMP_lib)
 
 	INCLUDE(diode_models);
 	INCLUDE(bjt_models);
+	INCLUDE(family_models);
+	INCLUDE(TTL74XX_lib);
+	INCLUDE(CD4XXX_lib);
+	INCLUDE(OPAMP_lib);
 
 NETLIST_END()
 
 
 // ----------------------------------------------------------------------------------------
-// netlist_setup_t
+// setup_t
 // ----------------------------------------------------------------------------------------
 
-netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
+namespace netlist
+{
+setup_t::setup_t(netlist_t *netlist)
 	: m_netlist(netlist)
 	, m_proxy_cnt(0)
 {
-	netlist.set_setup(this);
-	m_factory = palloc(netlist_factory_list_t);
+	netlist->set_setup(this);
+	m_factory = palloc(factory_list_t);
 }
 
-void netlist_setup_t::init()
+void setup_t::init()
 {
-	nl_initialize_factory(factory());
+	initialize_factory(factory());
 	NETLIST_NAME(base)(*this);
 }
 
 
-netlist_setup_t::~netlist_setup_t()
+setup_t::~setup_t()
 {
 	m_links.clear();
 	m_alias.clear();
@@ -59,11 +72,12 @@ netlist_setup_t::~netlist_setup_t()
 
 	netlist().set_setup(NULL);
 	pfree(m_factory);
+	m_sources.clear_and_free();
 
 	pstring::resetmem();
 }
 
-ATTR_COLD pstring netlist_setup_t::build_fqn(const pstring &obj_name) const
+ATTR_COLD pstring setup_t::build_fqn(const pstring &obj_name) const
 {
 	if (m_stack.empty())
 		return netlist().name() + "." + obj_name;
@@ -71,7 +85,7 @@ ATTR_COLD pstring netlist_setup_t::build_fqn(const pstring &obj_name) const
 		return m_stack.peek() + "." + obj_name;
 }
 
-void netlist_setup_t::namespace_push(const pstring &aname)
+void setup_t::namespace_push(const pstring &aname)
 {
 	if (m_stack.empty())
 		m_stack.push(netlist().name() + "." + aname);
@@ -79,13 +93,13 @@ void netlist_setup_t::namespace_push(const pstring &aname)
 		m_stack.push(m_stack.peek() + "." + aname);
 }
 
-void netlist_setup_t::namespace_pop()
+void setup_t::namespace_pop()
 {
 	m_stack.pop();
 }
 
 
-netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pstring &name)
+device_t *setup_t::register_dev(device_t *dev, const pstring &name)
 {
 	pstring fqn = build_fqn(name);
 
@@ -96,72 +110,83 @@ netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pst
 	return dev;
 }
 
-netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const pstring &name)
+void setup_t::register_lib_entry(const pstring &name)
 {
-	netlist_device_t *dev = factory().new_device_by_classname(classname);
-	if (dev == NULL)
-		netlist().error("Class %s not found!\n", classname.cstr());
-	return register_dev(dev, name);
+	if (m_lib.contains(name))
+		netlist().warning("Lib entry collection already contains %s. IGNORED", name.cstr());
+	else
+		m_lib.add(name);
 }
 
-void netlist_setup_t::remove_dev(const pstring &name)
+device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 {
-	netlist_device_t *dev = netlist().m_devices.find_by_name(name);
-	pstring temp = name + ".";
-	if (dev == NULL)
-		netlist().error("Device %s does not exist\n", name.cstr());
-
-	remove_start_with<tagmap_terminal_t>(m_terminals, temp);
-	remove_start_with<tagmap_param_t>(m_params, temp);
-
-	const link_t *p = m_links.data();
-	while (p != NULL)
+	if (m_lib.contains(classname))
 	{
-		const link_t *n = p+1;
-		if (temp.equals(p->e1.substr(0,temp.len())) || temp.equals(p->e2.substr(0,temp.len())))
-			m_links.remove(*p);
-		p = n;
+		namespace_push(name);
+		include(classname);
+		namespace_pop();
+		return NULL;
 	}
-	netlist().m_devices.remove_by_name(name);
+	else
+	{
+		device_t *dev = factory().new_device_by_name(classname, *this);
+		//device_t *dev = factory().new_device_by_classname(classname);
+		if (dev == NULL)
+			netlist().error("Class %s not found!\n", classname.cstr());
+		return register_dev(dev, name);
+	}
 }
 
-void netlist_setup_t::register_model(const pstring &model)
+void setup_t::register_model(const pstring &model)
 {
 	m_models.add(model);
 }
 
-void netlist_setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
+void setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
 {
-	if (!(m_alias.add(link_t(alias, out), false)==true))
+	if (!m_alias.add(alias, out))
 		netlist().error("Error adding alias %s to alias list\n", alias.cstr());
 }
 
-void netlist_setup_t::register_alias(const pstring &alias, const pstring &out)
+void setup_t::register_alias(const pstring &alias, const pstring &out)
 {
 	pstring alias_fqn = build_fqn(alias);
 	pstring out_fqn = build_fqn(out);
 	register_alias_nofqn(alias_fqn, out_fqn);
 }
 
-pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in) const
+void setup_t::register_dippins_arr(const pstring &terms)
+{
+	pstring_list_t list(terms,", ");
+	if (list.size() == 0 || (list.size() % 2) == 1)
+		netlist().error("You must pass an equal number of pins to DIPPINS");
+	unsigned n = list.size();
+	for (unsigned i = 0; i < n / 2; i++)
+	{
+		register_alias(pstring::sprintf("%d", i+1), list[i * 2]);
+		register_alias(pstring::sprintf("%d", n-i), list[i * 2 + 1]);
+	}
+}
+
+pstring setup_t::objtype_as_astr(object_t &in) const
 {
 	switch (in.type())
 	{
-		case netlist_terminal_t::TERMINAL:
+		case terminal_t::TERMINAL:
 			return "TERMINAL";
-		case netlist_terminal_t::INPUT:
+		case terminal_t::INPUT:
 			return "INPUT";
-		case netlist_terminal_t::OUTPUT:
+		case terminal_t::OUTPUT:
 			return "OUTPUT";
-		case netlist_terminal_t::NET:
+		case terminal_t::NET:
 			return "NET";
-		case netlist_terminal_t::PARAM:
+		case terminal_t::PARAM:
 			return "PARAM";
-		case netlist_terminal_t::DEVICE:
+		case terminal_t::DEVICE:
 			return "DEVICE";
-		case netlist_terminal_t::NETLIST:
+		case terminal_t::NETLIST:
 			return "NETLIST";
-		case netlist_terminal_t::QUEUE:
+		case terminal_t::QUEUE:
 			return "QUEUE";
 	}
 	// FIXME: noreturn
@@ -169,21 +194,41 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in) const
 	return "Error";
 }
 
-void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj)
+const pstring setup_t::get_model_str(const pstring val) const
+{
+	if (val.startsWith(".model ") || val.find("(") >= 0)
+	{
+		return val;
+	}
+	else
+	{
+		pstring search = (".model " + val + " ").ucase();
+		for (std::size_t i=0; i < m_models.size(); i++)
+		{
+			if (m_models[i].ucase().startsWith(search))
+				return m_models[i];
+		}
+		netlist().error("Model %s not found\n", val.cstr());
+		return ""; /* please compiler */
+	}
+}
+
+
+void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 {
 	switch (obj.type())
 	{
-		case netlist_terminal_t::TERMINAL:
-		case netlist_terminal_t::INPUT:
-		case netlist_terminal_t::OUTPUT:
+		case terminal_t::TERMINAL:
+		case terminal_t::INPUT:
+		case terminal_t::OUTPUT:
 			{
-				netlist_core_terminal_t &term = dynamic_cast<netlist_core_terminal_t &>(obj);
-				if (obj.isType(netlist_terminal_t::OUTPUT))
+				core_terminal_t &term = dynamic_cast<core_terminal_t &>(obj);
+				if (obj.isType(terminal_t::OUTPUT))
 				{
-					if (obj.isFamily(netlist_terminal_t::LOGIC))
-						dynamic_cast<netlist_logic_output_t &>(term).init_object(dev, dev.name() + "." + name);
-					else if (obj.isFamily(netlist_terminal_t::ANALOG))
-						dynamic_cast<netlist_analog_output_t &>(term).init_object(dev, dev.name() + "." + name);
+					if (obj.isFamily(terminal_t::LOGIC))
+						dynamic_cast<logic_output_t &>(term).init_object(dev, dev.name() + "." + name);
+					else if (obj.isFamily(terminal_t::ANALOG))
+						dynamic_cast<analog_output_t &>(term).init_object(dev, dev.name() + "." + name);
 					else
 						netlist().error("Error adding %s %s to terminal list, neither LOGIC nor ANALOG\n", objtype_as_astr(term).cstr(), term.name().cstr());
 				}
@@ -195,82 +240,65 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 				NL_VERBOSE_OUT(("%s %s\n", objtype_as_astr(term).cstr(), name.cstr()));
 			}
 			break;
-		case netlist_terminal_t::NET:
+		case terminal_t::NET:
 			break;
-		case netlist_terminal_t::PARAM:
+		case terminal_t::PARAM:
 			{
-				netlist_param_t &param = dynamic_cast<netlist_param_t &>(obj);
+				param_t &param = dynamic_cast<param_t &>(obj);
 				//printf("name: %s\n", name.cstr());
-				const pstring val = m_params_temp.find_by_name(name).e2;
-				if (val != "")
+				if (m_params_temp.contains(name))
 				{
+					const pstring val = m_params_temp[name];
 					switch (param.param_type())
 					{
-						case netlist_param_t::DOUBLE:
+						case param_t::DOUBLE:
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
 							if (std::sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
-							dynamic_cast<netlist_param_double_t &>(param).initial(vald);
+							dynamic_cast<param_double_t &>(param).initial(vald);
 						}
 						break;
-						case netlist_param_t::INTEGER:
-						case netlist_param_t::LOGIC:
+						case param_t::INTEGER:
+						case param_t::LOGIC:
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
 							if (std::sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
-							dynamic_cast<netlist_param_int_t &>(param).initial((int) vald);
+							dynamic_cast<param_int_t &>(param).initial((int) vald);
 						}
 						break;
-						case netlist_param_t::STRING:
+						case param_t::STRING:
 						{
-							dynamic_cast<netlist_param_str_t &>(param).initial(val);
+							dynamic_cast<param_str_t &>(param).initial(val);
 						}
 						break;
-						case netlist_param_t::MODEL:
-						{
-							pstring search = (".model " + val + " ").ucase();
-							bool found = false;
-							for (std::size_t i=0; i < m_models.size(); i++)
-							{
-								if (m_models[i].ucase().startsWith(search))
-								{
-									//int pl=m_models[i].find("(");
-									//int pr=m_models[i].find(")");
-									//dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
-									dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i]);
-									found = true;
-									break;
-								}
-							}
-							if (!found)
-								netlist().error("Model %s not found\n", val.cstr());
-						}
-						break;
+						case param_t::MODEL:
+							dynamic_cast<param_model_t &>(param).initial(get_model_str(val));
+							break;
 						default:
 							netlist().error("Parameter is not supported %s : %s\n", name.cstr(), val.cstr());
 					}
 				}
-				if (!(m_params.add(&param, false)==true))
+				if (!m_params.add(param.name(), &param))
 					netlist().error("Error adding parameter %s to parameter list\n", name.cstr());
 			}
 			break;
-		case netlist_terminal_t::DEVICE:
+		case terminal_t::DEVICE:
 			netlist().error("Device registration not yet supported - %s\n", name.cstr());
 			break;
-		case netlist_terminal_t::NETLIST:
+		case terminal_t::NETLIST:
 			netlist().error("Netlist registration not yet supported - %s\n", name.cstr());
 			break;
-		case netlist_terminal_t::QUEUE:
+		case terminal_t::QUEUE:
 			netlist().error("QUEUE registration not yet supported - %s\n", name.cstr());
 			break;
 	}
 }
 
-void netlist_setup_t::register_link_arr(const pstring &terms)
+void setup_t::register_link_arr(const pstring &terms)
 {
 	pstring_list_t list(terms,", ");
 	if (list.size() < 2)
@@ -282,30 +310,90 @@ void netlist_setup_t::register_link_arr(const pstring &terms)
 }
 
 
-void netlist_setup_t::register_link(const pstring &sin, const pstring &sout)
+void setup_t::register_link_fqn(const pstring &sin, const pstring &sout)
 {
-	link_t temp = link_t(build_fqn(sin), build_fqn(sout));
+	link_t temp = link_t(sin, sout);
 	NL_VERBOSE_OUT(("link %s <== %s\n", sin.cstr(), sout.cstr()));
 	m_links.add(temp);
-	//if (!(m_links.add(sin + "." + sout, temp, false)==TMERR_NONE))
-	//  fatalerror("Error adding link %s<==%s to link list\n", sin.cstr(), sout.cstr());
 }
 
-void netlist_setup_t::register_param(const pstring &param, const double value)
+void setup_t::register_link(const pstring &sin, const pstring &sout)
+{
+	register_link_fqn(build_fqn(sin), build_fqn(sout));
+}
+
+void setup_t::remove_connections(const pstring pin)
+{
+	pstring pinfn = build_fqn(pin);
+	bool found = false;
+	for (std::size_t i = 0; i < m_links.size(); i++)
+	{
+		if ((m_links[i].e1 == pinfn) || (m_links[i].e2 == pinfn))
+		{
+			netlist().log("removing connection: %s <==> %s\n", m_links[i].e1.cstr(), m_links[i].e2.cstr());
+			m_links.remove_at(i);
+			found = true;
+		}
+	}
+	if (!found)
+		netlist().error("remove_connections: found no occurrence of %s\n", pin.cstr());
+}
+
+
+void setup_t::register_frontier(const pstring attach, const double r_IN, const double r_OUT)
+{
+	static int frontier_cnt = 0;
+	pstring frontier_name = pstring::sprintf("frontier_%d", frontier_cnt);
+	frontier_cnt++;
+	device_t *front = register_dev("FRONTIER_DEV", frontier_name);
+	register_param(frontier_name + ".RIN", r_IN);
+	register_param(frontier_name + ".ROUT", r_OUT);
+	register_link(frontier_name + ".G", "GND");
+	pstring attfn = build_fqn(attach);
+	bool found = false;
+	for (std::size_t i = 0; i < m_links.size(); i++)
+	{
+		if (m_links[i].e1 == attfn)
+		{
+			m_links[i].e1 = front->name() + ".I";
+			found = true;
+		}
+		else if (m_links[i].e2 == attfn)
+		{
+			m_links[i].e2 = front->name() + ".I";
+			found = true;
+		}
+	}
+	if (!found)
+		netlist().error("Frontier setup: found no occurrence of %s\n", attach.cstr());
+	register_link(attach, frontier_name + ".Q");
+}
+
+
+void setup_t::register_param(const pstring &param, const double value)
 {
 	// FIXME: there should be a better way
 	register_param(param, pstring::sprintf("%.9e", value));
 }
 
-void netlist_setup_t::register_param(const pstring &param, const pstring &value)
+void setup_t::register_param(const pstring &param, const pstring &value)
 {
 	pstring fqn = build_fqn(param);
 
-	if (!(m_params_temp.add(link_t(fqn, value), false)==true))
-		netlist().error("Error adding parameter %s to parameter list\n", param.cstr());
+	int idx = m_params_temp.index_of(fqn);
+	if (idx < 0)
+	{
+		if (!m_params_temp.add(fqn, value))
+			netlist().error("Unexpected error adding parameter %s to parameter list\n", param.cstr());
+	}
+	else
+	{
+		netlist().warning("Overwriting %s old <%s> new <%s>\n", fqn.cstr(), m_params_temp.value_at(idx).cstr(), value.cstr());
+		m_params_temp[fqn] = value;
+	}
 }
 
-const pstring netlist_setup_t::resolve_alias(const pstring &name) const
+const pstring setup_t::resolve_alias(const pstring &name) const
 {
 	pstring temp = name;
 	pstring ret;
@@ -313,17 +401,18 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	/* FIXME: Detect endless loop */
 	do {
 		ret = temp;
-		temp = m_alias.find_by_name(ret).e2;
+		int p = m_alias.index_of(ret);
+		temp = (p>=0 ? m_alias.value_at(p) : "");
 	} while (temp != "");
 
 	NL_VERBOSE_OUT(("%s==>%s\n", name.cstr(), ret.cstr()));
 	return ret;
 }
 
-netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_in, bool required)
+core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
-	netlist_core_terminal_t *ret;
+	core_terminal_t *ret;
 
 	ret = m_terminals.find_by_name(tname);
 	/* look for default */
@@ -340,14 +429,14 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 	return ret;
 }
 
-netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_in, netlist_object_t::type_t atype, bool required)
+core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, object_t::type_t atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
-	netlist_core_terminal_t *ret;
+	core_terminal_t *ret;
 
 	ret = m_terminals.find_by_name(tname);
 	/* look for default */
-	if (ret == NULL && atype == netlist_object_t::OUTPUT)
+	if (ret == NULL && atype == object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		pstring s = tname + ".Q";
@@ -367,34 +456,34 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 	return ret;
 }
 
-netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool required)
+param_t *setup_t::find_param(const pstring &param_in, bool required)
 {
 	const pstring param_in_fqn = build_fqn(param_in);
 
 	const pstring &outname = resolve_alias(param_in_fqn);
-	netlist_param_t *ret;
+	int ret;
 
-	ret = m_params.find_by_name(outname);
-	if (ret == NULL && required)
+	ret = m_params.index_of(outname);
+	if (ret < 0 && required)
 		netlist().error("parameter %s(%s) not found!\n", param_in_fqn.cstr(), outname.cstr());
-	if (ret != NULL)
+	if (ret != -1)
 		NL_VERBOSE_OUT(("Found parameter %s\n", outname.cstr()));
-	return ret;
+	return (ret == -1 ? NULL : m_params.value_at(ret));
 }
 
 // FIXME avoid dynamic cast here
-nld_base_proxy *netlist_setup_t::get_d_a_proxy(netlist_core_terminal_t &out)
+devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 {
-	nl_assert(out.isFamily(netlist_terminal_t::LOGIC));
+	nl_assert(out.isFamily(terminal_t::LOGIC));
 
 	//printf("proxy for %s\n", out.name().cstr());;
-	netlist_logic_output_t &out_cast = dynamic_cast<netlist_logic_output_t &>(out);
-	nld_base_proxy *proxy = out_cast.get_proxy();
+	logic_output_t &out_cast = dynamic_cast<logic_output_t &>(out);
+	devices::nld_base_proxy *proxy = out_cast.get_proxy();
 
 	if (proxy == NULL)
 	{
 		// create a new one ...
-		nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(out_cast);
+		devices::nld_base_d_to_a_proxy *new_proxy = out_cast.logic_family()->create_d_a_proxy(&out_cast);
 		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -406,7 +495,7 @@ nld_base_proxy *netlist_setup_t::get_d_a_proxy(netlist_core_terminal_t &out)
 
 		for (std::size_t i = 0; i < out.net().m_core_terms.size(); i++)
 		{
-			netlist_core_terminal_t *p = out.net().m_core_terms[i];
+			core_terminal_t *p = out.net().m_core_terms[i];
 			p->clear_net(); // de-link from all nets ...
 			if (!connect(new_proxy->proxy_term(), *p))
 				netlist().error("Error connecting %s to %s\n", new_proxy->proxy_term().name().cstr(), (*p).name().cstr());
@@ -420,12 +509,12 @@ nld_base_proxy *netlist_setup_t::get_d_a_proxy(netlist_core_terminal_t &out)
 	return proxy;
 }
 
-void netlist_setup_t::connect_input_output(netlist_core_terminal_t &in, netlist_core_terminal_t &out)
+void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 {
-	if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
+	if (out.isFamily(terminal_t::ANALOG) && in.isFamily(terminal_t::LOGIC))
 	{
-		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(in);
-		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, incast);
+		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
+		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(&incast));
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -437,9 +526,9 @@ void netlist_setup_t::connect_input_output(netlist_core_terminal_t &in, netlist_
 		out.net().register_con(proxy->m_I);
 
 	}
-	else if (out.isFamily(netlist_terminal_t::LOGIC) && in.isFamily(netlist_terminal_t::ANALOG))
+	else if (out.isFamily(terminal_t::LOGIC) && in.isFamily(terminal_t::ANALOG))
 	{
-		nld_base_proxy *proxy = get_d_a_proxy(out);
+		devices::nld_base_proxy *proxy = get_d_a_proxy(out);
 
 		connect_terminals(proxy->proxy_term(), in);
 		//proxy->out().net().register_con(in);
@@ -454,17 +543,17 @@ void netlist_setup_t::connect_input_output(netlist_core_terminal_t &in, netlist_
 }
 
 
-void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_core_terminal_t &inp)
+void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 {
-	if (inp.isFamily(netlist_terminal_t::ANALOG))
+	if (inp.isFamily(terminal_t::ANALOG))
 	{
 		connect_terminals(inp, term);
 	}
-	else if (inp.isFamily(netlist_terminal_t::LOGIC))
+	else if (inp.isFamily(terminal_t::LOGIC))
 	{
-		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(inp);
+		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		nld_a_to_d_proxy *proxy = palloc(nld_a_to_d_proxy, incast);
+		devices::nld_a_to_d_proxy *proxy = palloc(devices::nld_a_to_d_proxy(&incast));
 		incast.set_proxy(proxy);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
@@ -486,9 +575,9 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_c
 	}
 }
 
-void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_core_terminal_t &out)
+void setup_t::connect_terminal_output(terminal_t &in, core_terminal_t &out)
 {
-	if (out.isFamily(netlist_terminal_t::ANALOG))
+	if (out.isFamily(terminal_t::ANALOG))
 	{
 		NL_VERBOSE_OUT(("connect_terminal_output: %s %s\n", in.name().cstr(), out.name().cstr()));
 		/* no proxy needed, just merge existing terminal net */
@@ -497,10 +586,10 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_co
 		else
 			out.net().register_con(in);
 	}
-	else if (out.isFamily(netlist_terminal_t::LOGIC))
+	else if (out.isFamily(terminal_t::LOGIC))
 	{
 		NL_VERBOSE_OUT(("connect_terminal_output: connecting proxy\n"));
-		nld_base_proxy *proxy = get_d_a_proxy(out);
+		devices::nld_base_proxy *proxy = get_d_a_proxy(out);
 
 		connect_terminals(proxy->proxy_term(), in);
 	}
@@ -510,7 +599,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_co
 	}
 }
 
-void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2)
+void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 {
 	//nl_assert(in.isType(netlist_terminal_t::TERMINAL));
 	//nl_assert(out.isType(netlist_terminal_t::TERMINAL));
@@ -533,7 +622,7 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
 	else
 	{
 		NL_VERBOSE_OUT(("adding net ...\n"));
-		netlist_analog_net_t *anet =  palloc(netlist_analog_net_t);
+		analog_net_t *anet =  palloc(analog_net_t);
 		t1.set_net(*anet);
 		//m_netlist.solver()->m_nets.add(anet);
 		// FIXME: Nets should have a unique name
@@ -543,18 +632,18 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
 	}
 }
 
-static netlist_core_terminal_t &resolve_proxy(netlist_core_terminal_t &term)
+static core_terminal_t &resolve_proxy(core_terminal_t &term)
 {
-	if (term.isFamily(netlist_core_terminal_t::LOGIC))
+	if (term.isFamily(core_terminal_t::LOGIC))
 	{
-		netlist_logic_t &out = dynamic_cast<netlist_logic_t &>(term);
+		logic_t &out = dynamic_cast<logic_t &>(term);
 		if (out.has_proxy())
 			return out.get_proxy()->proxy_term();
 	}
 	return term;
 }
 
-bool netlist_setup_t::connect_input_input(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2)
+bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 {
 	bool ret = false;
 	if (t1.has_net())
@@ -565,7 +654,7 @@ bool netlist_setup_t::connect_input_input(netlist_core_terminal_t &t1, netlist_c
 		{
 			for (std::size_t i=0; i<t1.net().m_core_terms.size(); i++)
 			{
-				if (t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::TERMINAL)
+				if (t1.net().m_core_terms[i]->isType(core_terminal_t::TERMINAL)
 						/*|| t1.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT)*/)
 				{
 					ret = connect(t2, *t1.net().m_core_terms[i]);
@@ -583,7 +672,7 @@ bool netlist_setup_t::connect_input_input(netlist_core_terminal_t &t1, netlist_c
 		{
 			for (std::size_t i=0; i<t2.net().m_core_terms.size(); i++)
 			{
-				if (t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::TERMINAL)
+				if (t2.net().m_core_terms[i]->isType(core_terminal_t::TERMINAL)
 						/*|| t2.net().m_core_terms[i]->isType(netlist_core_terminal_t::OUTPUT)*/)
 				{
 					ret = connect(t1, *t2.net().m_core_terms[i]);
@@ -598,46 +687,46 @@ bool netlist_setup_t::connect_input_input(netlist_core_terminal_t &t1, netlist_c
 
 
 
-bool netlist_setup_t::connect(netlist_core_terminal_t &t1_in, netlist_core_terminal_t &t2_in)
+bool setup_t::connect(core_terminal_t &t1_in, core_terminal_t &t2_in)
 {
 	NL_VERBOSE_OUT(("Connecting %s to %s\n", t1_in.name().cstr(), t2_in.name().cstr()));
-	netlist_core_terminal_t &t1 = resolve_proxy(t1_in);
-	netlist_core_terminal_t &t2 = resolve_proxy(t2_in);
+	core_terminal_t &t1 = resolve_proxy(t1_in);
+	core_terminal_t &t2 = resolve_proxy(t2_in);
 	bool ret = true;
 
-	if (t1.isType(netlist_core_terminal_t::OUTPUT) && t2.isType(netlist_core_terminal_t::INPUT))
+	if (t1.isType(core_terminal_t::OUTPUT) && t2.isType(core_terminal_t::INPUT))
 	{
 		if (t2.has_net() && t2.net().isRailNet())
 			netlist().error("Input %s already connected\n", t2.name().cstr());
 		connect_input_output(t2, t1);
 	}
-	else if (t1.isType(netlist_core_terminal_t::INPUT) && t2.isType(netlist_core_terminal_t::OUTPUT))
+	else if (t1.isType(core_terminal_t::INPUT) && t2.isType(core_terminal_t::OUTPUT))
 	{
 		if (t1.has_net()  && t1.net().isRailNet())
 			netlist().error("Input %s already connected\n", t1.name().cstr());
 		connect_input_output(t1, t2);
 	}
-	else if (t1.isType(netlist_core_terminal_t::OUTPUT) && t2.isType(netlist_core_terminal_t::TERMINAL))
+	else if (t1.isType(core_terminal_t::OUTPUT) && t2.isType(core_terminal_t::TERMINAL))
 	{
-		connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t2), t1);
+		connect_terminal_output(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.isType(netlist_core_terminal_t::TERMINAL) && t2.isType(netlist_core_terminal_t::OUTPUT))
+	else if (t1.isType(core_terminal_t::TERMINAL) && t2.isType(core_terminal_t::OUTPUT))
 	{
-		connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t1), t2);
+		connect_terminal_output(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.isType(netlist_core_terminal_t::INPUT) && t2.isType(netlist_core_terminal_t::TERMINAL))
+	else if (t1.isType(core_terminal_t::INPUT) && t2.isType(core_terminal_t::TERMINAL))
 	{
-		connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t2), t1);
+		connect_terminal_input(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.isType(netlist_core_terminal_t::TERMINAL) && t2.isType(netlist_core_terminal_t::INPUT))
+	else if (t1.isType(core_terminal_t::TERMINAL) && t2.isType(core_terminal_t::INPUT))
 	{
-		connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t1), t2);
+		connect_terminal_input(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.isType(netlist_core_terminal_t::TERMINAL) && t2.isType(netlist_core_terminal_t::TERMINAL))
+	else if (t1.isType(core_terminal_t::TERMINAL) && t2.isType(core_terminal_t::TERMINAL))
 	{
-		connect_terminals(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_terminal_t &>(t2));
+		connect_terminals(dynamic_cast<terminal_t &>(t1), dynamic_cast<terminal_t &>(t2));
 	}
-	else if (t1.isType(netlist_core_terminal_t::INPUT) && t2.isType(netlist_core_terminal_t::INPUT))
+	else if (t1.isType(core_terminal_t::INPUT) && t2.isType(core_terminal_t::INPUT))
 	{
 		ret = connect_input_input(t1, t2);
 	}
@@ -647,7 +736,7 @@ bool netlist_setup_t::connect(netlist_core_terminal_t &t1_in, netlist_core_termi
 	return ret;
 }
 
-void netlist_setup_t::resolve_inputs()
+void setup_t::resolve_inputs()
 {
 	bool has_twoterms = false;
 
@@ -665,8 +754,8 @@ void netlist_setup_t::resolve_inputs()
 		{
 			const pstring t1s = m_links[li].e1;
 			const pstring t2s = m_links[li].e2;
-			netlist_core_terminal_t *t1 = find_terminal(t1s);
-			netlist_core_terminal_t *t2 = find_terminal(t2s);
+			core_terminal_t *t1 = find_terminal(t1s);
+			core_terminal_t *t2 = find_terminal(t2s);
 
 			if (connect(*t1, *t2))
 			{
@@ -691,7 +780,7 @@ void netlist_setup_t::resolve_inputs()
 
 	// delete empty nets ... and save m_list ...
 
-	netlist_net_t::list_t todelete;
+	net_t::list_t todelete;
 
 	for (std::size_t i = 0; i<netlist().m_nets.size(); i++)
 	{
@@ -733,29 +822,34 @@ void netlist_setup_t::resolve_inputs()
 	// FIXME: doesn't find internal devices. This needs to be more clever
 	for (std::size_t i=0; i < netlist().m_devices.size(); i++)
 	{
-		NETLIB_NAME(twoterm) *t = dynamic_cast<NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
+		devices::NETLIB_NAME(twoterm) *t = dynamic_cast<devices::NETLIB_NAME(twoterm) *>(netlist().m_devices[i]);
 		if (t != NULL)
 		{
 			has_twoterms = true;
 			if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+#if 0
 				netlist().error("Found device %s connected only to railterminals %s/%s\n",
 						t->name().cstr(), t->m_N.net().name().cstr(), t->m_P.net().name().cstr());
+#else
+				netlist().warning("Found device %s connected only to railterminals %s/%s\n",
+					t->name().cstr(), t->m_N.net().name().cstr(), t->m_P.net().name().cstr());
+#endif
 		}
 	}
 
 	netlist().log("initialize solver ...\n");
 
-	if (m_netlist.solver() == NULL)
+	if (netlist().solver() == NULL)
 	{
 		if (has_twoterms)
 			netlist().error("No solver found for this net although analog elements are present\n");
 	}
 	else
-		m_netlist.solver()->post_start();
+		netlist().solver()->post_start();
 
 }
 
-void netlist_setup_t::start_devices()
+void setup_t::start_devices()
 {
 	pstring env = nl_util::environment("NL_LOGS");
 
@@ -767,7 +861,7 @@ void netlist_setup_t::start_devices()
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
-			netlist_device_t *nc = factory().new_device_by_classname("nld_log");
+			device_t *nc = factory().new_device_by_name("LOG", *this);
 			pstring name = "log_" + ll[i];
 			register_dev(nc, name);
 			register_link(name + ".I", ll[i]);
@@ -777,23 +871,112 @@ void netlist_setup_t::start_devices()
 	netlist().start();
 }
 
-void netlist_setup_t::parse(const char *buf)
-{
-	netlist_parser parser(*this);
-	parser.parse(buf);
-}
-
-void netlist_setup_t::print_stats() const
+void setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{
 		for (std::size_t i = 0; i < netlist().m_started_devices.size(); i++)
 		{
-			netlist_core_device_t *entry = netlist().m_started_devices[i];
+			core_device_t *entry = netlist().m_started_devices[i];
 			printf("Device %20s : %12d %12d %15ld\n", entry->name().cstr(), entry->stat_call_count, entry->stat_update_count, (long int) entry->stat_total_time / (entry->stat_update_count + 1));
 		}
-		printf("Queue Pushes %15d\n", m_netlist.queue().m_prof_call);
-		printf("Queue Moves  %15d\n", m_netlist.queue().m_prof_sortmove);
+		printf("Queue Pushes %15d\n", netlist().queue().m_prof_call);
+		printf("Queue Moves  %15d\n", netlist().queue().m_prof_sortmove);
 	}
 #endif
+}
+
+// ----------------------------------------------------------------------------------------
+// Static
+// ----------------------------------------------------------------------------------------
+
+const pstring setup_t::model_value_str(const pstring &model_str, const pstring &entity, const pstring defval)
+{
+	pstring tmp = model_str;
+	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
+	int p = tmp.ucase().find(entity.ucase() + "=");
+	if (p>=0)
+	{
+		int pblank = tmp.find(" ", p);
+		if (pblank < 0) pblank = tmp.len() + 1;
+		tmp = tmp.substr(p, pblank - p);
+		if (tmp.right(1) == ")")
+			tmp = tmp.left(tmp.len()-1);
+		int pequal = tmp.find("=", 0);
+		if (pequal < 0)
+			fatalerror_e("parameter %s misformat in model %s temp %s\n", entity.cstr(), model_str.cstr(), tmp.cstr());
+		tmp = tmp.substr(pequal+1);
+		return tmp;
+	}
+	else
+	{
+		//netlist().log("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
+		//printf("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
+		return defval;
+	}
+}
+
+nl_double setup_t::model_value(const pstring &model_str, const pstring &entity, const nl_double defval)
+{
+	pstring tmp = model_value_str(model_str, entity, "NOTFOUND");
+
+	nl_double factor = NL_FCONST(1.0);
+	if (tmp != "NOTFOUND")
+	{
+		char numfac = *(tmp.right(1).cstr());
+		switch (numfac)
+		{
+			case 'M': factor = 1e6; break;
+			case 'k': factor = 1e3; break;
+			case 'm': factor = 1e-3; break;
+			case 'u': factor = 1e-6; break;
+			case 'n': factor = 1e-9; break;
+			case 'p': factor = 1e-12; break;
+			case 'f': factor = 1e-15; break;
+			case 'a': factor = 1e-18; break;
+			default:
+				if (numfac < '0' || numfac > '9')
+					fatalerror_e("Unknown number factor <%c> in: %s", numfac, entity.cstr());
+		}
+		if (factor != NL_FCONST(1.0))
+			tmp = tmp.left(tmp.len() - 1);
+		return tmp.as_double() * factor;
+	}
+	else
+	{
+		//netlist().log("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
+		return defval;
+	}
+}
+
+// ----------------------------------------------------------------------------------------
+// Sources
+// ----------------------------------------------------------------------------------------
+
+void setup_t::include(const pstring &netlist_name)
+{
+	for (std::size_t i=0; i < m_sources.size(); i++)
+	{
+		if (m_sources[i]->parse(this, netlist_name))
+			return;
+	}
+	netlist().error("unable to find %s in source collection", netlist_name.cstr());
+}
+
+// ----------------------------------------------------------------------------------------
+// base sources
+// ----------------------------------------------------------------------------------------
+
+bool netlist_source_string_t::parse(setup_t *setup, const pstring name)
+{
+	parser_t p(*setup);
+	return p.parse(m_str, name);
+}
+
+bool netlist_source_mem_t::parse(setup_t *setup, const pstring name)
+{
+	parser_t p(*setup);
+	return p.parse(m_str, name);
+}
+
 }

@@ -173,10 +173,16 @@ private:
 	// Timer callback
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// Callbacks
-	void ready_callback(int level);
-	void index_callback(int level);
-	void seek_complete_callback(int level);
+	// Handlers for incoming signals
+	void ready_handler();
+	void index_handler();
+	void seek_complete_handler();
+
+	// Wait for this line?
+	bool waiting_for_line(int line, int level);
+
+	// Wait for some other line?
+	bool waiting_for_other_line(int line);
 
 	// Wait for some time to pass or for a line to change level
 	void wait_time(emu_timer *tm, int microsec, int next_substate);
@@ -212,6 +218,7 @@ private:
 		int byte_counter;
 		bool data_separator_phase;
 		bool last_data_bit;
+		UINT8 clock_reg;
 		UINT8 data_reg;
 		int state;
 		int next_state;
@@ -241,11 +248,14 @@ private:
 	void rollback();
 	void checkpoint();
 
+	// Found a mark
+	bool found_mark(int state);
+
 	// Delivers the data bits from the given encoding
 	UINT8 get_data_from_encoding(UINT16 raw);
 
 	// ==============================================
-	//    PLL functions and interface to floppy
+	//    PLL functions and interface to floppy and harddisk
 	// ==============================================
 
 	// Phase-locked loops
@@ -254,12 +264,11 @@ private:
 	// Clock divider value
 	UINT8 m_clock_divider;
 
+	// MFM HD encoding type
+	mfmhd_enc_t m_hd_encoding;
+
 	// Resets the PLL to the given time
 	void pll_reset(const attotime &when, bool write);
-
-	// Encodes the byte using FM or MFM. Changes the m_live_state members
-	// shift_reg, data_reg, and last_data_bit
-	void encode_byte(UINT8 byte);
 
 	// Puts the word into the shift register directly. Changes the m_live_state members
 	// shift_reg, and last_data_bit
@@ -267,6 +276,10 @@ private:
 
 	// Encodes a byte in FM or MFM. Called by encode_byte.
 	UINT16 encode(UINT8 byte);
+
+	// Encodes a byte in FM or MFM. Called by encode_byte.
+	UINT16 encode_hd(UINT8 byte);
+	UINT16 encode_a1_hd();
 
 	// Encode the latest byte again
 	void encode_again();
@@ -282,6 +295,12 @@ private:
 
 	// Skips bytes on the track
 	void skip_on_track(int count, int next_state);
+
+	// Read from the MFM HD
+	bool read_from_mfmhd(const attotime &limit);
+
+	// Write to the MFM HD
+	bool write_to_mfmhd(const attotime &limit);
 
 	// ==============================================
 	//   Command state machine
@@ -353,8 +372,14 @@ private:
 	// Used in RESTORE to find out when to give up
 	int m_seek_count;
 
+	// Read/write logical or physical?
+	bool m_logical;
+
 	// Signals to abort writing
 	bool m_stopwrite;
+
+	// Flag to remember whether we found the first sector during a physical access
+	bool m_first_sector_found;
 
 	// Used for formatting
 	int m_sector_count;
@@ -367,6 +392,21 @@ private:
 
 	// Are we in FM mode?
 	bool fm_mode();
+
+	// Seek completed?
+	bool seek_complete();
+
+	// Are we on track 0?
+	bool on_track00();
+
+	// Are we at the index hole?
+	bool index_hole();
+
+	// Is the attached drive ready?
+	bool drive_ready();
+
+	// Are we reading a track?
+	bool reading_track();
 
 	// Delivers the desired head
 	int desired_head();
@@ -398,18 +438,12 @@ private:
 	// Sector size as read from the track
 	int calc_sector_size();
 
-	// Are we on track 0?
-	bool on_track00();
-
-	// Are we using rapid steps (needed to decide to wait for seek complete)
-	bool rapid_steps();
-
 	// Is the currently selected drive a floppy drive?
 	bool using_floppy();
 
 	// Common subprograms READ ID, VERIFY, and DATA TRANSFER
 	void read_id(int& cont, bool implied_seek, bool wait_seek_complete);
-	void verify(int& cont, bool verify_all);
+	void verify(int& cont);
 	void data_transfer(int& cont);
 
 	// ===================================================

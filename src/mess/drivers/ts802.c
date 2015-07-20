@@ -211,7 +211,7 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_FD1793x_ADD("fdc", XTAL_4MHz / 2)                  // unknown clock
+	MCFG_FD1793_ADD("fdc", XTAL_4MHz / 2)                  // unknown clock
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 

@@ -28,7 +28,9 @@ public:
 		m_tilemap40_regs_base(*this, "tmap40_regs"),
 		m_tilemap50_regs_base(*this, "tmap50_regs"),
 		m_fullscreenzoom(*this, "fullscreenzoom"),
-		m_0xc0000000_ram(*this, "0xc0000000_ram")
+		m_0xc0000000_ram(*this, "0xc0000000_ram"),
+		m_decrypted_gamerom(*this, "decrypted_gamerom"),
+		m_0xc0000000_ram_decrypted(*this, "0xc0000000_ram_decrypted")
 	{ }
 
 	required_device<sh2_device> m_maincpu;
@@ -45,13 +47,12 @@ public:
 	required_shared_ptr<UINT32> m_tilemap50_regs_base;
 	required_shared_ptr<UINT32> m_fullscreenzoom;
 	required_shared_ptr<UINT32> m_0xc0000000_ram;
+	required_shared_ptr<UINT32> m_decrypted_gamerom;
+	required_shared_ptr<UINT32> m_0xc0000000_ram_decrypted;
 
 	fujitsu_29f016a_device *m_simm[7][8];
-	UINT32* m_decrypted_bios;
-	UINT32* m_decrypted_gamerom;
 	UINT32 m_cram_gfxflash_bank;
 	UINT32* m_nops;
-	UINT32* m_0xc0000000_ram_decrypted;
 	UINT32* m_char_ram;
 	UINT32* m_eeprom;
 	UINT32 m_ss_pal_base;
@@ -111,7 +112,6 @@ public:
 	DECLARE_WRITE32_MEMBER(cps3_unk_vidregs_w);
 	DECLARE_READ32_MEMBER(cps3_colourram_r);
 	DECLARE_WRITE32_MEMBER(cps3_colourram_w);
-	DECLARE_DIRECT_UPDATE_MEMBER(cps3_direct_handler);
 	DECLARE_DRIVER_INIT(sfiii3);
 	DECLARE_DRIVER_INIT(sfiii);
 	DECLARE_DRIVER_INIT(redearth);

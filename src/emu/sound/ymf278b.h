@@ -131,6 +131,7 @@ private:
 	direct_read_data * m_direct;
 	const address_space_config m_space_config;
 	devcb_write_line m_irq_handler;
+	UINT8 m_last_fm_data;
 };
 
 extern const device_type YMF278B;

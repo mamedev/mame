@@ -329,7 +329,7 @@ void nevada_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 WRITE_LINE_MEMBER(nevada_state::duart18_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(4, state, m_duart18_68681->get_irq_vector());
-};
+}
 
 /***************************************************************************/
 /***************************************************************************/
@@ -344,7 +344,7 @@ WRITE_LINE_MEMBER(nevada_state::duart18_irq_handler)
 WRITE_LINE_MEMBER(nevada_state::duart39_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(3, state, m_duart39_68681->get_irq_vector());
-};
+}
 
 /***************************************************************************/
 /***************************************************************************/
@@ -360,7 +360,7 @@ WRITE_LINE_MEMBER(nevada_state::duart39_irq_handler)
 WRITE_LINE_MEMBER(nevada_state::duart40_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(5, state, m_duart40_68681->get_irq_vector());
-};
+}
 
 /***************************************************************************/
 /*********************    RTC SECTION       ********************************/

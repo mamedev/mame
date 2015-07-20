@@ -104,8 +104,8 @@
 //  MEMORY/OPCODE READ/WRITE
 //**************************************************************************
 
-#define RDOP(O)     O = m_direct->read_decrypted_byte(PCD); PC++
-#define RDOPARG(A)  A = m_direct->read_raw_byte(PCD); PC++
+#define RDOP(O)     O = m_direct->read_byte(PCD); PC++
+#define RDOPARG(A)  A = m_direct->read_byte(PCD); PC++
 #define RM(A)       m_program->read_byte(A)
 #define WM(A,V)     m_program->write_byte(A,V)
 

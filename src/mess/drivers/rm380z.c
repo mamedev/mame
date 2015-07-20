@@ -103,10 +103,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READWRITE(rm380z_portlow_r, rm380z_portlow_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("wd1771", fd1771_device, status_r, command_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("wd1771", fd1771_device, track_r, track_w)
-	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE("wd1771", fd1771_device, sector_r, sector_w)
-	AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE("wd1771", fd1771_device, data_r, data_w)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("wd1771", fd1771_t, read, write)
 	AM_RANGE(0xc4, 0xc4) AM_WRITE(disk_0_control)
 	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
 ADDRESS_MAP_END
@@ -120,12 +117,9 @@ INPUT_PORTS_END
 //
 //
 
-static const floppy_interface rm380z_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_SSSD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
-};
+static SLOT_INTERFACE_START( rm380z_floppies )
+	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
+SLOT_INTERFACE_END
 
 UINT32 rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -157,10 +151,10 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_RAM_DEFAULT_SIZE("56K")
 
 	/* floppy disk */
-	MCFG_DEVICE_ADD("wd1771", FD1771, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+	MCFG_FD1771_ADD("wd1771", XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rm380z_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 
 	/* keyboard */
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)

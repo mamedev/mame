@@ -46,6 +46,9 @@ const int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 #define MCFG_DEVICE_ADDRESS_MAP(_space, _map) \
 	device_memory_interface::static_set_addrmap(*device, _space, ADDRESS_MAP_NAME(_map));
 
+#define MCFG_DEVICE_REMOVE_ADDRESS_MAP(_space) \
+	device_memory_interface::static_set_addrmap(*device, _space, NULL);
+
 #define MCFG_DEVICE_PROGRAM_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
 
@@ -54,6 +57,9 @@ const int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 
 #define MCFG_DEVICE_IO_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _map)
+
+#define MCFG_DEVICE_DECRYPTED_OPCODES_MAP(_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_DECRYPTED_OPCODES, _map)
 
 
 
@@ -82,6 +88,8 @@ public:
 	// basic information getters
 	bool has_space(int index = 0) const { return (m_addrspace[index] != NULL); }
 	bool has_space(address_spacenum index) const { return (m_addrspace[int(index)] != NULL); }
+	bool has_configured_map(int index = 0) const { return (m_address_map[index] != NULL); }
+	bool has_configured_map(address_spacenum index) const { return (m_address_map[int(index)] != NULL); }
 	address_space &space(int index = 0) const { assert(m_addrspace[index] != NULL); return *m_addrspace[index]; }
 	address_space &space(address_spacenum index) const { assert(m_addrspace[int(index)] != NULL); return *m_addrspace[int(index)]; }
 

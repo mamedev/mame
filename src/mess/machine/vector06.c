@@ -138,10 +138,22 @@ TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 
 WRITE8_MEMBER( vector06_state::vector06_disc_w )
 {
-// something here needs to turn the motor on
+	floppy_image_device *floppy = NULL;
 
-	m_fdc->set_side (BIT(data, 2) ^ 1);
-	m_fdc->set_drive(BIT(data, 0));
+	switch (data & 0x01)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		// something here needs to turn the motor on
+		floppy->mon_w(0);
+		floppy->ss_w(!BIT(data, 2));
+	}
 }
 
 void vector06_state::machine_start()

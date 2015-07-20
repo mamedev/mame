@@ -144,8 +144,8 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 static const game_offset game_offsets[] =
 {
 	/* only sprites */
-	{ "tndrcade", { -1,  0 } },             // correct (wall at beginning of game)
-	{ "tndrcadej",{ -1,  0 } },             // "
+	{ "tndrcade", {  0,  0 } },             // correct (start grid, wall at beginning of game)
+	{ "tndrcadej",{  0,  0 } },             // "
 	{ "wits",     {  0,  0 } },             // unknown
 	{ "thunderl", {  0,  0 } },             // unknown
 	{ "wiggie",   {  0,  0 } },             // some problems but they seem y co-ordinate related?
@@ -185,20 +185,22 @@ static const game_offset game_offsets[] =
 	{ "blandia",  {  0,  8 }, { -2,  6 } }, // correct (test grid, startup bg)
 	{ "blandiap", {  0,  8 }, { -2,  6 } }, // "
 	{ "zingzip",  {  0,  0 }, { -1, -2 } }, // sprites unknown, tilemaps correct (test grid)
-	{ "eightfrc", {  3,  4 }, {  0,  0 } }, // unknown
-	{ "daioh",    {  1,  1 }, { -1, -1 } }, // correct? (launch window and test grid are right, but planet is wrong)
-	{ "daioha",   {  1,  1 }, { -1, -1 } }, // "
+	{ "eightfrc", {  3,  4 }, {  0,  0 } }, // correct (test mode)
+	{ "daioh",    {  0,  0 }, { -1, -1 } }, // correct (test grid, planet)
+	{ "daioha",   {  0,  0 }, { -1, -1 } }, // "
+	{ "daiohc",   {  0,  0 }, { -1, -1 } }, // "
+	{ "daiohp",   {  0,  0 }, { -1, -1 } }, // "
 	{ "msgundam", {  0,  0 }, { -2, -2 } }, // correct (test grid, banpresto logo)
 	{ "msgundam1",{  0,  0 }, { -2, -2 } }, // "
 	{ "oisipuzl", {  1,  1 }, { -1, -1 } }, // correct (test mode) flip screen not supported?
 	{ "triplfun", {  1,  1 }, { -1, -1 } }, // "
-	{ "wrofaero", {  0,  0 }, {  0,  0 } }, // unknown
+	{ "wrofaero", {  0,  0 }, {  0,  0 } }, // correct (test mode)
 	{ "jjsquawk", {  1,  1 }, { -1, -1 } }, // correct (test mode)
 	{ "jjsquawkb",{  1,  1 }, { -1, -1 } }, // "
 	{ "kamenrid", {  0,  0 }, { -2, -2 } }, // correct (map, banpresto logo)
 	{ "extdwnhl", {  0,  0 }, { -2, -2 } }, // correct (test grid, background images)
 	{ "sokonuke", {  0,  0 }, { -2, -2 } }, // correct (game selection, test grid)
-	{ "gundhara", {  0,  0 }, {  0,  0 } }, // unknown, flip screen not supported?
+	{ "gundhara", {  0,  0 }, {  0,  0 } }, // correct (test mode)
 	{ "zombraid", {  0,  0 }, { -2, -2 } }, // correct for normal, flip screen not working yet
 	{ "zombraidp", {  0,  0 }, { -2, -2 } }, // correct for normal, flip screen not working yet
 	{ "zombraidpj", {  0,  0 }, { -2, -2 } }, // correct for normal, flip screen not working yet
@@ -550,7 +552,8 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 
 	// position kludges
 	m_seta001->set_fg_xoffsets(m_global_offsets->sprite_offs[1], m_global_offsets->sprite_offs[0]);
-	m_seta001->set_fg_yoffsets( -0x0a, 0x0e );
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 }
 
 

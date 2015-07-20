@@ -421,7 +421,7 @@ private:
 		UINT32 *            offset_base32;              /* base in memory where the RAM lives, 32-bit pointer, with the start offset pre-applied  */
 	}       m_fastram[MIPS3_MAX_FASTRAM];
 
-	UINT64 m_debugger_temp;
+	UINT32 m_debugger_temp;
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */

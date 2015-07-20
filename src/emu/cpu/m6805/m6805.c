@@ -53,14 +53,14 @@
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M6805_RDOP(addr) ((unsigned)m_direct->read_decrypted_byte(addr))
+#define M6805_RDOP(addr) ((unsigned)m_direct->read_byte(addr))
 
 /****************************************************************************/
 /* M6805_RDOP_ARG() is identical to M6805_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M6805_RDOP_ARG(addr) ((unsigned)m_direct->read_raw_byte(addr))
+#define M6805_RDOP_ARG(addr) ((unsigned)m_direct->read_byte(addr))
 
 #define SP_MASK m_sp_mask   /* stack pointer mask */
 #define SP_LOW  m_sp_low    /* stack pointer low water mark */

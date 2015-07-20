@@ -210,7 +210,7 @@ void nec_common_device::do_prefetch(int previous_ICount)
 UINT8 nec_common_device::fetch()
 {
 	prefetch();
-	return m_direct->read_raw_byte((Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	return m_direct->read_byte((Sreg(PS)<<4)+m_ip++, m_fetch_xor);
 }
 
 UINT16 nec_common_device::fetchword()
@@ -230,7 +230,7 @@ static UINT8 parity_table[256];
 UINT8 nec_common_device::fetchop()
 {
 	prefetch();
-	return m_direct->read_decrypted_byte(( Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	return m_direct->read_byte(( Sreg(PS)<<4)+m_ip++, m_fetch_xor);
 }
 
 

@@ -1,174 +1,142 @@
-// license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
-/*********************************************************************
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
+/***************************************************************************
 
-    formats/svi_dsk.c
+    Spectravideo SVI-318/328
 
-    SVI318 disk images
+    Disk image format
 
-*********************************************************************/
-
-#include <string.h>
-#include <assert.h>
+***************************************************************************/
 
 #include "svi_dsk.h"
-#include "basicdsk.h"
 
-static FLOPPY_IDENTIFY(svi_dsk_identify)
+svi_format::svi_format()
 {
-	*vote = ((floppy_image_size(floppy) == (172032)) || (floppy_image_size(floppy) == (346112))) ? 100 : 0;
-	return FLOPPY_ERROR_SUCCESS;
 }
 
-static int svi_get_heads_per_disk(floppy_image_legacy *floppy)
+const char *svi_format::name() const
 {
-	return (floppy_image_size(floppy) == (172032)) ? 1 : 2;
+	return "svi";
 }
 
-static int svi_get_tracks_per_disk(floppy_image_legacy *floppy)
+const char *svi_format::description() const
 {
-	return 40;
+	return "SVI-318/328 disk image";
 }
 
-static UINT64 svi_translate_offset(floppy_image_legacy *floppy,
-		int track, int head, int sector)
+const char *svi_format::extensions() const
 {
-	UINT64 o;
-	if ((track==0) && (head==0))
-		o = sector*128;
-	else
-		o = ((track*((floppy_image_size(floppy) == (172032)) ? 1 : 2)+head)*17+sector)*256-2048; /* (17*256)-(18*128)=2048 */
-
-	return o;
+	return "dsk";
 }
 
-static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, UINT64 *offset)
+int svi_format::identify(io_generic *io, UINT32 form_factor)
 {
-	UINT64 offs;
-	/* translate the sector to a raw sector */
-	if (!sector_is_index)
+	UINT64 size = io_generic_size(io);
+
+	if (size == 172032 || size == 346112)
+		return 50;
+
+	return 0;
+}
+
+bool svi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	UINT64 size = io_generic_size(io);
+	int head_count;
+
+	switch (size)
 	{
-		sector -= 1;
+	case 172032: head_count = 1; break;
+	case 346112: head_count = 2; break;
+	default: return false;
 	}
-	/* check to see if we are out of range */
-	if ((head < 0) || (head >= ((floppy_image_size(floppy) == (172032)) ? 1 : 2)) || (track < 0) || (track >= 40)
-			|| (sector < 0) || (sector >= ((head==0 && track==0) ? 18 : 17)))
-		return FLOPPY_ERROR_SEEKERROR;
 
-	offs = svi_translate_offset(floppy, track, head, sector);
-	if (offset)
-		*offset = offs;
-	return FLOPPY_ERROR_SUCCESS;
-}
+	int file_offset = 0;
 
+	for (int track = 0; track < 40; track++)
+	{
+		for (int head = 0; head < head_count ; head++)
+		{
+			int sector_count = (track == 0 && head == 0) ? 18 : 17;
+			int sector_size = (track == 0 && head == 0) ? 128 : 256;
 
+			desc_pc_sector sectors[20];
+			UINT8 sector_data[5000];
+			int sector_offset = 0;
 
-static floperr_t internal_svi_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
-{
-	UINT64 offset;
-	floperr_t err;
-	err = get_offset(floppy, head, track, sector, sector_is_index, &offset);
-	if (err)
-		return err;
+			for (int i = 0; i < sector_count; i++)
+			{
+				sectors[i].track = track;
+				sectors[i].head = head;
+				sectors[i].sector = i + 1;
+				sectors[i].actual_size = sector_size;
+				sectors[i].size = sector_size >> 8;
+				sectors[i].deleted = false;
+				sectors[i].bad_crc = false;
+				sectors[i].data = &sector_data[sector_offset];
 
-	floppy_image_read(floppy, buffer, offset, buflen);
-	return FLOPPY_ERROR_SUCCESS;
-}
+				io_generic_read(io, sectors[i].data, file_offset, sector_size);
 
+				sector_offset += sector_size;
+				file_offset += sector_size;
+			}
 
-
-static floperr_t internal_svi_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, const void *buffer, size_t buflen, int ddam)
-{
-	UINT64 offset;
-	floperr_t err;
-
-	err = get_offset(floppy, head, track, sector, sector_is_index, &offset);
-	if (err)
-		return err;
-
-	floppy_image_write(floppy, buffer, offset, buflen);
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-
-
-static floperr_t svi_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
-{
-	return internal_svi_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
-}
-
-static floperr_t svi_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
-{
-	return internal_svi_write_sector(floppy, head, track, sector, FALSE, buffer, buflen, ddam);
-}
-
-static floperr_t svi_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
-{
-	return internal_svi_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
-}
-
-static floperr_t svi_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
-{
-	return internal_svi_write_sector(floppy, head, track, sector, TRUE, buffer, buflen, ddam);
-}
-
-static floperr_t svi_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
-{
-	floperr_t err;
-	err = get_offset(floppy, head, track, sector, FALSE, NULL);
-	if (err)
-		return err;
-
-	if (sector_length) {
-		*sector_length = (head==0 && track==0) ? 128 : 256;
+			if (track == 0 && head == 0)
+				build_wd_track_fm(track, head, image, 50000, sector_count, sectors, 10, 26, 11);
+			else
+				build_wd_track_mfm(track, head, image, 100000, sector_count, sectors, 32, 50, 22);
+		}
 	}
-	return FLOPPY_ERROR_SUCCESS;
+
+	return true;
 }
 
-
-
-static floperr_t svi_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
+bool svi_format::save(io_generic *io, floppy_image *image)
 {
-	sector_index += 1;
-	if (cylinder)
-		*cylinder = track;
-	if (side)
-		*side = head;
-	if (sector)
-		*sector = sector_index;
-	if (flags)
-		/* TODO: read DAM or DDAM and determine flags */
-		*flags = 0;
-	return svi_get_sector_length(floppy, head, track, sector_index, sector_length);
+	UINT8 bitstream[500000/8];
+	UINT8 sector_data[50000];
+	desc_xs sectors[256];
+	int track_size;
+	UINT64 file_offset = 0;
+
+	int track_count, head_count;
+	image->get_actual_geometry(track_count, head_count);
+
+	// initial fm track
+	generate_bitstream_from_track(0, 0, 4000, bitstream, track_size, image);
+	extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+
+	for (int i = 0; i < 18; i++)
+	{
+		io_generic_write(io, sectors[i + 1].data, file_offset, 128);
+		file_offset += 128;
+	}
+
+	// rest are mfm tracks
+	for (int track = 0; track < track_count; track++)
+	{
+		for (int head = 0; head < head_count; head++)
+		{
+			// skip track 0, head 0
+			if (track == 0) { if (head_count == 1) break; else head++; }
+
+			generate_bitstream_from_track(track, head, 2000, bitstream, track_size, image);
+			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+
+			for (int i = 0; i < 17; i++)
+			{
+				io_generic_write(io, sectors[i + 1].data, file_offset, 256);
+				file_offset += 256;
+			}
+		}
+	}
+
+	return true;
 }
 
-
-static FLOPPY_CONSTRUCT(svi_dsk_construct)
+bool svi_format::supports_save() const
 {
-	struct FloppyCallbacks *callbacks;
-	callbacks = floppy_callbacks(floppy);
-	callbacks->read_sector = svi_read_sector;
-	callbacks->write_sector = svi_write_sector;
-	callbacks->read_indexed_sector = svi_read_indexed_sector;
-	callbacks->write_indexed_sector = svi_write_indexed_sector;
-	callbacks->get_sector_length = svi_get_sector_length;
-	callbacks->get_heads_per_disk = svi_get_heads_per_disk;
-	callbacks->get_tracks_per_disk = svi_get_tracks_per_disk;
-	callbacks->get_indexed_sector_info = svi_get_indexed_sector_info;
-
-	return FLOPPY_ERROR_SUCCESS;
+	return true;
 }
 
-
-
-/* ----------------------------------------------------------------------- */
-
-LEGACY_FLOPPY_OPTIONS_START( svi318 )
-	LEGACY_FLOPPY_OPTION( svi_dsk, "dsk", "SVI-318 floppy disk image",  svi_dsk_identify, svi_dsk_construct, NULL, NULL)
-	LEGACY_FLOPPY_OPTION( svi_cpm, "dsk", "SVI-728 DSDD CP/M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([17])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
+const floppy_format_type FLOPPY_SVI_FORMAT = &floppy_image_format_creator<svi_format>;

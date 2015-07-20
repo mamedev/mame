@@ -1595,7 +1595,7 @@ void ppc_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			void *base = m_direct->read_decrypted_ptr(seqhead->physpc, m_codexor);
+			void *base = m_direct->read_ptr(seqhead->physpc, m_codexor);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i0,base,dword
 			UML_CMP(block, I0, seqhead->opptr.l[0]);                                // cmp     i0,*opptr
 			UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);              // exne    nocode,seqhead->pc
@@ -1609,20 +1609,20 @@ void ppc_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				void *base = m_direct->read_decrypted_ptr(seqhead->physpc, m_codexor);
+				void *base = m_direct->read_ptr(seqhead->physpc, m_codexor);
 				UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);             // load    i0,base,dword
 				UML_CMP(block, I0, curdesc->opptr.l[0]);                            // cmp     i0,*opptr
 				UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);          // exne    nocode,seqhead->pc
 			}
 #else
 		UINT32 sum = 0;
-		void *base = m_direct->read_decrypted_ptr(seqhead->physpc, m_codexor);
+		void *base = m_direct->read_ptr(seqhead->physpc, m_codexor);
 		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                     // load    i0,base,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_decrypted_ptr(curdesc->physpc, m_codexor);
+				base = m_direct->read_ptr(curdesc->physpc, m_codexor);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);             // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                                 // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];

@@ -15,30 +15,55 @@
 //============================================================
 
 /*
- * The next options needs -Wno-pmf-conversions to compile and gcc
- * There is quite some significant speed-up of up to 20% involved.
- * NO_USE_PMFCONVERSION is for illustrative purposes only. Using PMFs
- * has some overhead in comparison to calling a virtual function.
+ * The following options determine how object::update is called.
+ * NL_PMF_TYPE_VIRTUAL
+ *      Use stock virtual call
  *
- * To get a performance increase we need the GCC extension.
+ * NL_PMF_TYPE_GNUC_PMF
+ *      Use standard pointer to member function syntax
  *
- * Todo: This doesn't work with current (4.8+) mingw 32bit builds.
- *       Therefore disabled for now for i386 builds.
+ *  NL_PMF_TYPE_GNUC_PMF_CONV
+ *      Use gnu extension and convert the pmf to a function pointer.
+ *      This is not standard compliant and needs
+ *      -Wno-pmf-conversions to compile.
  *
+ *  NL_PMF_TYPE_INTERNAL
+ *      Use the same approach as MAME for deriving the function pointer.
+ *      This is compiler-dependant as well
+ *
+ *  Benchmarks for ./nltool -c run -f src/mame/drivers/nl_pong.c -t 10 -n pong_fast
+ *
+ *  NL_PMF_TYPE_INTERNAL:       215%
+ *  NL_PMF_TYPE_GNUC_PMF:       163%
+ *  NL_PMF_TYPE_GNUC_PMF_CONV:  215%
+ *  NL_PMF_TYPE_VIRTUAL:        213%
+ *
+ *  The whole exercise was done to avoid virtual calls. In prior versions of
+ *  netlist, the INTERNAL and GNUC_PMF_CONV approach provided significant improvement.
+ *  Since than, ATTR_COLD was removed from functions declared as virtual.
+ *  This may explain that the recent benchmarks show no difference at all.
+ *
+ *  Disappointing is the GNUC_PMF performance.
  */
 
-#ifndef USE_PMFDELEGATES
-#if defined(__clang__) || defined(__APPLE__) || (defined(__GNUC__) && defined(__i386__))
-	#define USE_PMFDELEGATES            (0)
-	#define NO_USE_PMFCONVERSION        (1)
-#elif defined(__GNUC__)
-	#define USE_PMFDELEGATES        (0)
-	#define NO_USE_PMFCONVERSION    (0)
-	#pragma GCC diagnostic ignored "-Wpmf-conversions"
-#else
-	#define USE_PMFDELEGATES        (0)
-	#define NO_USE_PMFCONVERSION    (1)
+// This will be autodetected
+//#define NL_PMF_TYPE 3
+
+#define NL_PMF_TYPE_VIRTUAL         0
+#define NL_PMF_TYPE_GNUC_PMF        1
+#define NL_PMF_TYPE_GNUC_PMF_CONV   2
+#define NL_PMF_TYPE_INTERNAL        3
+
+#ifndef NL_PMF_TYPE
+	#if PHAS_PMF_INTERNAL
+		#define NL_PMF_TYPE NL_PMF_TYPE_INTERNAL
+	#else
+		#define NL_PMF_TYPE NL_PMF_TYPE_VIRTUAL
+	#endif
 #endif
+
+#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV)
+#pragma GCC diagnostic ignored "-Wpmf-conversions"
 #endif
 
 /*
@@ -68,7 +93,6 @@
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
 
 #define NETLIST_GMIN_DEFAULT    (1e-9)
-
 
 //#define nl_double float
 //#define NL_FCONST(x) (x ## f)
@@ -111,12 +135,6 @@
 #else
 #define HAS_OPENMP (0)
 #endif
-
-// prevent implicit copying
-#define NETLIST_PREVENT_COPYING(_name)          \
-	private:                                    \
-		_name(const _name &);                   \
-		_name &operator=(const _name &);
 
 //============================================================
 //  Performance tracking

@@ -47,6 +47,16 @@ namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const ch
 void namco_63701x_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock()/1000);
+
+	for (int i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_voices[i].select), i);
+		save_item(NAME(m_voices[i].playing), i);
+		save_item(NAME(m_voices[i].base_addr), i);
+		save_item(NAME(m_voices[i].position), i);
+		save_item(NAME(m_voices[i].volume), i);
+		save_item(NAME(m_voices[i].silence_counter), i);
+	}
 }
 
 

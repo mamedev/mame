@@ -4,7 +4,7 @@
 
     okim9810.h
 
-    OKI MSM9810 ADCPM(2) sound chip.
+    OKI MSM9810 ADPCM(2) sound chip.
 
     Notes:
     The master clock frequency for this chip can range from 3.5MHz to 4.5Mhz.

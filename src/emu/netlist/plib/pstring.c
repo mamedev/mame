@@ -5,12 +5,12 @@
  *
  */
 
-#include <new>
 #include <cstdio>
 #include <cstring>
 //FIXME:: pstring should be locale free
 #include <cctype>
 #include <cstdlib>
+#include <algorithm>
 
 #include "pstring.h"
 #include "palloc.h"
@@ -73,7 +73,7 @@ void pstring::pcopy(const char *from, int size)
 	m_ptr = n;
 }
 
-pstring pstring::substr(unsigned int start, int count) const
+const pstring pstring::substr(unsigned int start, int count) const
 {
 	pstring ret;
 	unsigned alen = len();
@@ -85,7 +85,7 @@ pstring pstring::substr(unsigned int start, int count) const
 	return ret;
 }
 
-pstring pstring::ucase() const
+const pstring pstring::ucase() const
 {
 	pstring ret = *this;
 	ret.pcopy(cstr(), len());
@@ -94,7 +94,7 @@ pstring pstring::ucase() const
 	return ret;
 }
 
-int pstring::find_first_not_of(const pstring no) const
+int pstring::find_first_not_of(const pstring &no) const
 {
 	for (int i=0; i < len(); i++)
 	{
@@ -108,7 +108,7 @@ int pstring::find_first_not_of(const pstring no) const
 	return -1;
 }
 
-int pstring::find_last_not_of(const pstring no) const
+int pstring::find_last_not_of(const pstring &no) const
 {
 	for (int i=len() - 1; i >= 0; i--)
 	{
@@ -144,7 +144,7 @@ pstring pstring::replace(const pstring &search, const pstring &replace) const
 	}
 	return ret;
 }
-pstring pstring::ltrim(const pstring ws) const
+const pstring pstring::ltrim(const pstring &ws) const
 {
 	int f = find_first_not_of(ws);
 	if (f>=0)
@@ -153,7 +153,7 @@ pstring pstring::ltrim(const pstring ws) const
 		return "";
 }
 
-pstring pstring::rtrim(const pstring ws) const
+const pstring pstring::rtrim(const pstring &ws) const
 {
 	int f = find_last_not_of(ws);
 	if (f>=0)
@@ -218,7 +218,7 @@ long pstring::as_long(bool *error) const
 	return ret;
 }
 
-pstring pstring::vprintf(va_list args) const
+const pstring pstring::vprintf(va_list args) const
 {
 	// sprintf into the temporary buffer
 	char tempbuf[4096];
@@ -259,7 +259,7 @@ void pstring::resetmem()
 // pstring ...
 // ----------------------------------------------------------------------------------------
 
-pstring pstring::sprintf(const char *format, ...)
+const pstring pstring::sprintf(const char *format, ...)
 {
 	va_list ap;
 	va_start(ap, format);

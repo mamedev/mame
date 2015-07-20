@@ -31,6 +31,7 @@ class rsp_cop2_drc : public rsp_cop2
 	virtual void state_string_export(const int index, std::string &str);
 
 	void cfunc_unimplemented_opcode();
+
 public:
 	virtual void lbv();
 	virtual void lsv();

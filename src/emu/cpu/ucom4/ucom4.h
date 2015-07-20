@@ -44,7 +44,6 @@
 #define MCFG_UCOM4_WRITE_I_CB(_devcb) \
 	ucom4_cpu_device::set_write_i_callback(*device, DEVCB_##_devcb);
 
-
 enum
 {
 	NEC_UCOM4_PORTA = 0,
@@ -56,6 +55,13 @@ enum
 	NEC_UCOM4_PORTG,
 	NEC_UCOM4_PORTH,
 	NEC_UCOM4_PORTI
+};
+
+enum
+{
+	NEC_UCOM43 = 0,
+	NEC_UCOM44,
+	NEC_UCOM45
 };
 
 

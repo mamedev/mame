@@ -9,6 +9,8 @@
 
 #include "nld_74192.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(74192)
 {
 	register_sub("subABCD", m_ABCD);
@@ -42,7 +44,7 @@ NETLIB_RESET(74192)
 }
 
 // FIXME: Timing
-static const netlist_time delay[4] =
+/* static */ const netlist_time delay[4] =
 {
 		NLTIME_FROM_NS(40),
 		NLTIME_FROM_NS(40),
@@ -130,3 +132,5 @@ NETLIB_RESET(74192_dip)
 {
 	NETLIB_NAME(74192)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

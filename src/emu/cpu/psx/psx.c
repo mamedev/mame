@@ -1437,7 +1437,7 @@ void psxcpu_device::update_cop0( int reg )
 		( m_cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
 		( m_cp0r[ CP0_SR ] & m_cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
 	{
-		m_op = m_direct->read_decrypted_dword( m_pc );
+		m_op = m_direct->read_dword( m_pc );
 		execute_unstoppable_instructions( 1 );
 		exception( EXC_INT );
 	}
@@ -1470,11 +1470,11 @@ void psxcpu_device::fetch_next_op()
 	{
 		UINT32 safepc = m_delayv & ~m_bad_word_address_mask;
 
-		m_op = m_direct->read_decrypted_dword( safepc );
+		m_op = m_direct->read_dword( safepc );
 	}
 	else
 	{
-		m_op = m_direct->read_decrypted_dword( m_pc + 4 );
+		m_op = m_direct->read_dword( m_pc + 4 );
 	}
 }
 
@@ -2289,7 +2289,7 @@ void psxcpu_device::execute_run()
 		if( LOG_BIOSCALL ) log_bioscall();
 		debugger_instruction_hook( this,  m_pc );
 
-		m_op = m_direct->read_decrypted_dword( m_pc );
+		m_op = m_direct->read_dword( m_pc );
 
 		if( m_berr )
 		{

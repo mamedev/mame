@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Roberto Lavarone
 /******************************************************************************
     Nuova Elettronica Z80NE system driver
@@ -377,7 +377,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-
+#if 0
 static const UINT32 lx388palette[] =
 {
 	rgb_t(0x00, 0xff, 0x00), /* GREEN */
@@ -399,6 +399,7 @@ static const UINT32 lx388palette[] =
 	rgb_t(0x40, 0x10, 0x00), /* ALPHANUMERIC DARK ORANGE */
 	rgb_t(0xff, 0xc4, 0x18)      /* ALPHANUMERIC BRIGHT ORANGE */
 };
+#endif
 
 FLOPPY_FORMATS_MEMBER( z80ne_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
@@ -527,7 +528,7 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_FD1771x_ADD("wd1771", XTAL_2MHz / 2)
+	MCFG_FD1771_ADD("wd1771", XTAL_2MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, NULL,   z80ne_state::floppy_formats)

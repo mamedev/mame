@@ -4,15 +4,18 @@
 
 Exidy discrete hardware games
 
- Alley Rally (1975)
+ Alley Rally (1975) (AR-1A)
  Attack (1977)
  Death Race (1976)
  Destruction Derby (1975)
- Spiders From Space (1976)
+ Hockey / Tennis (Thumper Bumper?) (1974)
  Score (1977)
+ Spiders From Space (1976)
+ Sting (1974)
  Super Death Chase (1977)
- Table Football (1975)
- TV Pinball (1974)
+ Table Foosballer / Table Football (1975)
+ Table Pinball (1974)
+ TV Pinball (1974) (PB-4)
 
 ***************************************************************************/
 

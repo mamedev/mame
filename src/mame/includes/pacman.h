@@ -23,7 +23,8 @@ public:
 		m_s2650games_tileram(*this, "s2650_tileram"),
 		m_rocktrv2_prot_data(*this, "rocktrv2_prot"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_patched_opcodes(*this, "patched_opcodes")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -37,6 +38,7 @@ public:
 	optional_shared_ptr<UINT8> m_rocktrv2_prot_data;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_shared_ptr<UINT8> m_patched_opcodes;
 
 	UINT8 m_cannonb_bit_to_read;
 	int m_mystery;

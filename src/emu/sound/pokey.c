@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Brad Oliver, Eric Smith, Juergen Buchmueller
 /*****************************************************************************
  *
@@ -1100,7 +1100,7 @@ void pokey_device::pokey_potgo(void)
 {
 	int pot;
 
-	LOG(("POKEY #%p pokey_potgo\n", this));
+	LOG(("POKEY #%p pokey_potgo\n", (void *) this));
 
 	m_ALLPOT = 0x00;
 	m_pot_counter = 0;

@@ -105,6 +105,12 @@ Vsync : 60.58hz
 #include "sound/ay8910.h"
 #include "includes/vastar.h"
 
+
+void vastar_state::machine_start()
+{
+	save_item(NAME(m_nmi_mask));
+}
+
 void vastar_state::machine_reset()
 {
 	/* we must start with the second CPU halted */
@@ -119,7 +125,7 @@ void vastar_state::machine_reset()
 	m_spriteram3 = m_fgvideoram + 0x800;
 }
 
-WRITE8_MEMBER(vastar_state::vastar_hold_cpu2_w)
+WRITE8_MEMBER(vastar_state::hold_cpu2_w)
 {
 	/* I'm not sure that this works exactly like this */
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
@@ -138,10 +144,10 @@ WRITE8_MEMBER(vastar_state::nmi_mask_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(vastar_bg2videoram_w) AM_SHARE("bg2videoram") AM_MIRROR(0x2000)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(vastar_bg1videoram_w) AM_SHARE("bg1videoram") AM_MIRROR(0x2000)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram") AM_MIRROR(0x2000)
+	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram") AM_MIRROR(0x2000)
 	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_SHARE("sprite_priority")   /* sprite/BG priority */
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(vastar_fgvideoram_w) AM_SHARE("fgvideoram") // fg videoram + sprites
+	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") // fg videoram + sprites
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
@@ -150,7 +156,7 @@ static ADDRESS_MAP_START( main_port_map, AS_IO, 8, vastar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(vastar_hold_cpu2_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(hold_cpu2_w)
 ADDRESS_MAP_END
 
 
@@ -432,7 +438,7 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vastar_state, screen_update_vastar)
+	MCFG_SCREEN_UPDATE_DRIVER(vastar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vastar)
@@ -643,8 +649,8 @@ ROM_START( pprobe )
 ROM_END
 
 
-GAME( 1983, vastar,  0,      vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 1)", 0 )
-GAME( 1983, vastar2, vastar, vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 2)", 0 )
-GAME( 1983, vastar3, vastar, vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 3)", 0 )
-GAME( 1983, vastar4, vastar, vastar, vastar4,driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 4)", 0 )
-GAME( 1985, pprobe,  0,      vastar, pprobe, driver_device, 0, ROT90, "Crux / Kyugo?", "Planet Probe (prototype?)", 0 ) // has no Copyright, probably because Crux didn't have a trading name at this point?
+GAME( 1983, vastar,  0,      vastar, vastar, driver_device, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 1)", GAME_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
+GAME( 1983, vastar2, vastar, vastar, vastar, driver_device, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, vastar3, vastar, vastar, vastar, driver_device, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1983, vastar4, vastar, vastar, vastar4,driver_device, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 4)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pprobe,  0,      vastar, pprobe, driver_device, 0, ROT90, "Crux / Kyugo?", "Planet Probe (prototype?)", GAME_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?

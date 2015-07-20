@@ -40,7 +40,7 @@ enum
 	TYPE_MASK       = 0x00C0,
 	TYPE_16         = 0x0000,
 	TYPE_8LOW       = 0x0040,
-	TYPE_8HIGH      = 0x0080,
+	TYPE_8HIGH      = 0x0080
 };
 
 /* envelope phase */
@@ -49,7 +49,7 @@ enum
 	PHASE_NONE      = 0,
 	PHASE_ATTACK,
 	PHASE_DECAY,
-	PHASE_RELEASE,
+	PHASE_RELEASE
 };
 
 

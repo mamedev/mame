@@ -78,7 +78,7 @@ BUSES["CENTRONICS"] = true
 function createProjects_mame_tiny(_target, _subtarget)
 	project ("mame_tiny")
 	targetsubdir(_target .."_" .. _subtarget)
-	kind "StaticLib"
+	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame-tiny"))
 	
 	options {
@@ -92,9 +92,13 @@ function createProjects_mame_tiny(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mame/layout",
-	}	
+	}
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+	end
 
 	files{
 		MAME_DIR .. "src/mame/machine/ticket.c",

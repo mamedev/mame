@@ -109,8 +109,6 @@ void validity_checker::validate_tag(const char *tag)
 	// too short/too long = bad
 	if (strlen(begin) < MIN_TAG_LENGTH)
 		osd_printf_error("Tag '%s' is too short (must be at least %d characters)\n", tag, MIN_TAG_LENGTH);
-	if (strlen(begin) > MAX_TAG_LENGTH)
-		osd_printf_error("Tag '%s' is too long (must be less than %d characters)\n", tag, MAX_TAG_LENGTH);
 }
 
 
@@ -188,7 +186,7 @@ void validity_checker::check_shared_source(const game_driver &driver)
 //  check_all - check all drivers
 //-------------------------------------------------
 
-void validity_checker::check_all()
+bool validity_checker::check_all()
 {
 	// start by checking core stuff
 	validate_begin();
@@ -220,6 +218,8 @@ void validity_checker::check_all()
 
 	// cleanup
 	validate_end();
+
+	return !(m_errors > 0 || m_warnings > 0);
 }
 
 
@@ -328,6 +328,8 @@ void validity_checker::validate_one(const game_driver &driver)
 void validity_checker::validate_core()
 {
 	// basic system checks
+	if (~0 != -1) osd_printf_error("Machine must be two's complement\n");
+
 	UINT8 a = 0xff;
 	UINT8 b = a + 1;
 	if (b > a) osd_printf_error("UINT8 must be 8 bits\n");
@@ -341,6 +343,16 @@ void validity_checker::validate_core()
 	if (sizeof(UINT32) != 4) osd_printf_error("UINT32 must be 32 bits\n");
 	if (sizeof(INT64)  != 8) osd_printf_error("INT64 must be 64 bits\n");
 	if (sizeof(UINT64) != 8) osd_printf_error("UINT64 must be 64 bits\n");
+
+	// check signed right shift
+	INT8  a8 = -3;
+	INT16 a16 = -3;
+	INT32 a32 = -3;
+	INT64 a64 = -3;
+	if (a8  >> 1 != -2) osd_printf_error("INT8 right shift must be arithmetic\n");
+	if (a16 >> 1 != -2) osd_printf_error("INT16 right shift must be arithmetic\n");
+	if (a32 >> 1 != -2) osd_printf_error("INT32 right shift must be arithmetic\n");
+	if (a64 >> 1 != -2) osd_printf_error("INT64 right shift must be arithmetic\n");
 
 	// check pointer size
 #ifdef PTR64

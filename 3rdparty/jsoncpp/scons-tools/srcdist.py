@@ -1,3 +1,8 @@
+# Copyright 2007 Baptiste Lepilleur
+# Distributed under MIT license, or public domain if desired and
+# recognized in your jurisdiction.
+# See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+
 import os
 import os.path
 from fnmatch import fnmatch
@@ -47,7 +52,7 @@ import targz
 ##         elif token == "=":
 ##            data[key] = list()
 ##         else:
-##            append_data( data, key, new_data, token )
+##            append_data(data, key, new_data, token)
 ##            new_data = True
 ##
 ##      last_token = token
@@ -55,7 +60,7 @@ import targz
 ##      
 ##      if last_token == '\\' and token != '\n':
 ##         new_data = False
-##         append_data( data, key, new_data, '\\' )
+##         append_data(data, key, new_data, '\\')
 ##
 ##   # compress lists of len 1 into single strings
 ##   for (k, v) in data.items():
@@ -116,7 +121,7 @@ import targz
 ##         else:
 ##            for pattern in file_patterns:
 ##               sources.extend(glob.glob("/".join([node, pattern])))
-##   sources = map( lambda path: env.File(path), sources )
+##   sources = map(lambda path: env.File(path), sources)
 ##   return sources
 ##
 ##
@@ -143,7 +148,7 @@ def srcDistEmitter(source, target, env):
 ##   # add our output locations
 ##   for (k, v) in output_formats.items():
 ##      if data.get("GENERATE_" + k, v[0]) == "YES":
-##         targets.append(env.Dir( os.path.join(out_dir, data.get(k + "_OUTPUT", v[1]))) )
+##         targets.append(env.Dir(os.path.join(out_dir, data.get(k + "_OUTPUT", v[1]))))
 ##
 ##   # don't clobber targets
 ##   for node in targets:
@@ -161,14 +166,13 @@ def generate(env):
    Add builders and construction variables for the
    SrcDist tool.
    """
-##   doxyfile_scanner = env.Scanner(
-##      DoxySourceScan,
+##   doxyfile_scanner = env.Scanner(##      DoxySourceScan,
 ##      "DoxySourceScan",
 ##      scan_check = DoxySourceScanCheck,
-##   )
+##)
 
    if targz.exists(env):
-      srcdist_builder = targz.makeBuilder( srcDistEmitter )
+      srcdist_builder = targz.makeBuilder(srcDistEmitter)
 
       env['BUILDERS']['SrcDist'] = srcdist_builder
 

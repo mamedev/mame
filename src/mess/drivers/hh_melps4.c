@@ -29,7 +29,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<2> m_inp_matrix; // max 2
+	optional_ioport_array<4> m_inp_matrix; // max 4
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
@@ -226,20 +226,95 @@ public:
 		: hh_melps4_state(mconfig, type, tag)
 	{ }
 
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	DECLARE_READ16_MEMBER(input_r);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
 
 // handlers
+
+void cfrogger_state::prepare_display()
+{
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
+	UINT16 plate = BITSWAP16(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
+	display_matrix(16, 12, plate, grid);
+}
+
+WRITE8_MEMBER(cfrogger_state::plate_w)
+{
+	// Sx,Fx,Gx: vfd matrix plate
+	int mask = (offset == MELPS4_PORTS) ? 0xff : 0xf; // port S is 8-bit
+	int shift = (offset == MELPS4_PORTS) ? 0 : (offset + 1) * 4;
+	m_plate = (m_plate & ~(mask << shift)) | (data << shift);
+	prepare_display();
+
+	// F0,F1: input mux
+	m_inp_mux = m_plate >> 8 & 3;
+}
+
+WRITE16_MEMBER(cfrogger_state::grid_w)
+{
+	// D0-D11: vfd matrix grid
+	m_grid = data;
+	prepare_display();
+}
+
+WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
+{
+	// T: speaker out
+	m_speaker->level_w(state);
+}
+
+READ16_MEMBER(cfrogger_state::input_r)
+{
+	// K0,K1: multiplexed inputs
+	// K2: N/C
+	// K3: fixed input
+	return (m_inp_matrix[2]->read() & 8) | (read_inputs(2) & 3);
+}
 
 
 // config
 
 static INPUT_PORTS_START( cfrogger )
+	PORT_START("IN.0") // F0 port K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.1") // F1 port K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN.2") // K3
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
+
+	PORT_START("IN.3") // fake
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, cfrogger_state, reset_button, NULL)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(cfrogger_state::reset_button)
+{
+	// reset button is directly tied to MCU reset pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_MELPS4_READ_K_CB(READ16(cfrogger_state, input_r))
+	MCFG_MELPS4_WRITE_S_CB(WRITE8(cfrogger_state, plate_w))
+	MCFG_MELPS4_WRITE_F_CB(WRITE8(cfrogger_state, plate_w))
+	MCFG_MELPS4_WRITE_G_CB(WRITE8(cfrogger_state, plate_w))
+	MCFG_MELPS4_WRITE_D_CB(WRITE16(cfrogger_state, grid_w))
+	MCFG_MELPS4_WRITE_T_CB(WRITELINE(cfrogger_state, speaker_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_melps4_test)
@@ -270,4 +345,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1981, cfrogger, 0,        0, cfrogger, cfrogger, driver_device, 0, "Coleco", "Frogger (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1981, cfrogger, 0,        0, cfrogger, cfrogger, driver_device, 0, "Coleco", "Frogger (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )

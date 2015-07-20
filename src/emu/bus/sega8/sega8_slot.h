@@ -47,6 +47,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) {}
 	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual int get_lphaser_xoffs() { return m_lphaser_xoffs; }
 	// a few carts (for SG1000) acts as a RAM expansion, taking control of the system RAM in 0xc000-0xffff
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
@@ -61,7 +62,6 @@ public:
 	void set_late_battery(bool val) { m_late_battery_enable = val; }
 	bool get_late_battery() { return m_late_battery_enable; }
 	void set_lphaser_xoffs(int val) { m_lphaser_xoffs = val; }
-	int get_lphaser_xoffs() { return m_lphaser_xoffs; }
 	void set_sms_mode(int val) { m_sms_mode = val; }
 	int get_sms_mode() { return m_sms_mode; }
 

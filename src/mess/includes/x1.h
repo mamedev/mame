@@ -15,7 +15,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/i8255.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
 #include "video/mc6845.h"
 #include "sound/2151intf.h"
@@ -23,7 +23,6 @@
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -81,6 +80,10 @@ public:
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
 		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
+		m_floppy2(*this, "fdc:2"),
+		m_floppy3(*this, "fdc:3"),
 		m_crtc(*this, "crtc"),
 		m_ctc(*this, "ctc"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -88,10 +91,16 @@ public:
 		m_dma(*this, "dma")
 	{ }
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
-	required_device<mb8877_device> m_fdc;
+	required_device<mb8877_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80ctc_device> m_ctc;
 

@@ -1102,7 +1102,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 							if (LOG_NATURAL_KEYBOARD)
 							{
 								std::string tempstr;
-								logerror("natural_keyboard: code=%i (%s) port=%p field->name='%s'\n", int(code), unicode_to_string(tempstr, code), port, field->name());
+								logerror("natural_keyboard: code=%i (%s) port=%p field->name='%s'\n", int(code), unicode_to_string(tempstr, code), (void *)port, field->name());
 							}
 						}
 					}

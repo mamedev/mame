@@ -1282,5 +1282,5 @@ GAME( 1988, gradius2b, vulcan,   twin16,    vulcan, twin16_state,    twin16,    
 GAME( 1988, fround,    0,        fround,    fround, fround_state,    fround,    ROT0,   "Konami", "The Final Round (version M)", GAME_SUPPORTS_SAVE )
 GAME( 1988, froundl,   fround,   fround,    fround, fround_state,    fround,    ROT0,   "Konami", "The Final Round (version L)", GAME_SUPPORTS_SAVE )
 GAME( 1988, hpuncher,  fround,   twin16,    fround, twin16_state,    twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, miaj,      mia,      miaj,      miaj,   twin16_state,    twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, miaj,      mia,      miaj,      miaj,   twin16_state,    twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (version R) (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, cuebrickj, ROT0, "Konami", "Cue Brick (Japan)", GAME_SUPPORTS_SAVE )

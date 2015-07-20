@@ -45,7 +45,8 @@ documentation still exists.
 #include "machine/6821pia.h"
 #include "includes/dgn_beta.h"
 #include "machine/mos6551.h"
-#include "formats/coco_dsk.h"
+#include "formats/vdk_dsk.h"
+#include "formats/dmk_dsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
@@ -288,13 +289,6 @@ PALETTE_INIT_MEMBER(dgn_beta_state, dgn)
 	}
 }
 
-static const floppy_interface dgnbeta_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(coco),
-	NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout dgnbeta_charlayout =
 {
@@ -313,6 +307,14 @@ static GFXDECODE_START( dgnbeta )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
 GFXDECODE_END
 
+FLOPPY_FORMATS_MEMBER( dgn_beta_state::floppy_formats )
+	FLOPPY_VDK_FORMAT,
+	FLOPPY_DMK_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( dgn_beta_floppies )
+	SLOT_INTERFACE("qd", FLOPPY_525_QD)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	/* basic machine hardware */
@@ -366,12 +368,14 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_b))
 
-	MCFG_DEVICE_ADD(FDC_TAG, WD2797, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(dgn_beta_state,dgnbeta_fdc_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(dgn_beta_state,dgnbeta_fdc_drq_w))
+	MCFG_WD2797_ADD(FDC_TAG, XTAL_1MHz)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dgn_beta_state, dgnbeta_fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dgn_beta_state, dgnbeta_fdc_drq_w))
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(dgnbeta_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgn_beta_floppies, "qd", dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", dgn_beta_floppies, "qd", dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":2", dgn_beta_floppies, "qd", dgn_beta_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgn_beta_floppies, "qd", dgn_beta_state::floppy_formats)
 
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_12_288MHz / 16)    //XTAL is guessed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

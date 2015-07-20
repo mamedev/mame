@@ -64,7 +64,6 @@
 #include "machine/6821pia.h"
 #include "includes/dgn_beta.h"
 #include "machine/mos6551.h"
-#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 
 #include "debug/debugcpu.h"
@@ -567,7 +566,6 @@ READ8_MEMBER(dgn_beta_state::d_pia1_pa_r)
 WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
 {
 	int HALT_DMA;
-	wd2797_device *fdc = machine().device<wd2797_device>(FDC_TAG);
 
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80) != m_d_pia1_pa_last)
@@ -589,10 +587,20 @@ WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
 	}
 
 	/* Drive selects are binary encoded on PA0 & PA1 */
-	fdc->set_drive(~data & DSMask);
+	floppy_image_device *floppy = NULL;
 
-	/* Set density of WD2797 */
-	fdc->dden_w(BIT(data, 6));
+	switch (~data & 0x03)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	case 2: floppy = m_floppy2->get_device(); break;
+	case 3: floppy = m_floppy3->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	// not connected: bit 5 = ENP
+	m_fdc->dden_w(BIT(data, 6));
 	LOG_DISK(("Set density %s\n", BIT(data, 6) ? "low" : "high"));
 }
 
@@ -787,7 +795,7 @@ void dgn_beta_state::cpu1_recalc_firq(int state)
 /********************************************************************************************/
 
 /* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
-WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_intrq_w)
+WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_intrq_w )
 {
 	device_t *device = machine().device(PIA_2_TAG);
 	LOG_DISK(("dgnbeta_fdc_intrq_w(%d)\n", state));
@@ -796,64 +804,21 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_intrq_w)
 }
 
 /* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
-WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_drq_w)
+WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_drq_w )
 {
 	LOG_DISK(("dgnbeta_fdc_drq_w(%d)\n", state));
 	cpu1_recalc_firq(state);
 }
 
-READ8_MEMBER(dgn_beta_state::dgnbeta_wd2797_r)
+READ8_MEMBER( dgn_beta_state::dgnbeta_wd2797_r )
 {
-	int result = 0;
-	wd2797_device *fdc = machine().device<wd2797_device>(FDC_TAG);
-
-	switch(offset & 0x03)
-	{
-		case 0:
-			result = fdc->status_r(space, 0);
-			LOG_DISK(("Disk status=%2.2X\n",result));
-			break;
-		case 1:
-			result = fdc->track_r(space, 0);
-			break;
-		case 2:
-			result = fdc->sector_r(space, 0);
-			break;
-		case 3:
-			result = fdc->data_r(space, 0);
-			break;
-		default:
-			break;
-	}
-
-	return result;
+	return m_fdc->read(space, offset & 0x03);
 }
 
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_wd2797_w)
+WRITE8_MEMBER( dgn_beta_state::dgnbeta_wd2797_w )
 {
-	wd2797_device *fdc = machine().device<wd2797_device>(FDC_TAG);
-
-	m_wd2797_written=1;
-
-	switch(offset & 0x3)
-	{
-		case 0:
-			/* disk head is encoded in the command byte */
-			/* But only for Type 3/4 commands */
-			if(data & 0x80)
-				fdc->set_side((data & 0x02) ? 1 : 0);
-			fdc->command_w(space, 0, data);
-			break;
-		case 1:
-			fdc->track_w(space, 0, data);
-			break;
-		case 2:
-			fdc->sector_w(space, 0, data);
-			break;
-		case 3:
-			fdc->data_w(space, 0, data);
-			break;
-	};
+	m_wd2797_written = 1;
+	m_fdc->write(space, offset & 0x03, data);
 }
 
 /* Scan physical keyboard into Keyboard array */
@@ -924,7 +889,6 @@ void dgn_beta_state::dgn_beta_line_interrupt (int data)
 /********************************* Machine/Driver Initialization ****************************************/
 void dgn_beta_state::machine_reset()
 {
-	wd2797_device *fdc = machine().device<wd2797_device>(FDC_TAG);
 	pia6821_device *pia_0 = machine().device<pia6821_device>( PIA_0_TAG );
 	pia6821_device *pia_1 = machine().device<pia6821_device>( PIA_1_TAG );
 	pia6821_device *pia_2 = machine().device<pia6821_device>( PIA_2_TAG );
@@ -963,12 +927,8 @@ void dgn_beta_state::machine_reset()
 	m_DMA_NMI_LAST = 0x80;       /* start with DMA NMI inactive, as pulled up */
 //  DMA_NMI = CLEAR_LINE;       /* start with DMA NMI inactive */
 
-	fdc->dden_w(CLEAR_LINE);
-	fdc->set_drive(0);
-
 	m_videoram.set_target(m_ram->pointer(),m_videoram.bytes());     /* Point video ram at the start of physical ram */
 
-	fdc->reset();
 	m_wd2797_written=0;
 
 	m_maincpu->reset();

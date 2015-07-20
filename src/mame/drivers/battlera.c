@@ -24,14 +24,20 @@
 #include "emu.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
-#include "sound/msm5205.h"
 #include "sound/c6280.h"
 #include "includes/battlera.h"
 
 
+void battlera_state::machine_start()
+{
+	save_item(NAME(m_control_port_select));
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_toggle));
+}
+
 /******************************************************************************/
 
-WRITE8_MEMBER(battlera_state::battlera_sound_w)
+WRITE8_MEMBER(battlera_state::sound_w)
 {
 	if (offset == 0)
 	{
@@ -65,7 +71,7 @@ READ8_MEMBER(battlera_state::control_data_r)
 
 static ADDRESS_MAP_START( battlera_map, AS_PROGRAM, 8, battlera_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x1e0800, 0x1e0801) AM_WRITE(battlera_sound_w)
+	AM_RANGE(0x1e0800, 0x1e0801) AM_WRITE(sound_w)
 	AM_RANGE(0x1e1000, 0x1e13ff) AM_DEVREADWRITE( "huc6260", huc6260_device, palette_direct_read, palette_direct_write) AM_SHARE("paletteram")
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8") /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(control_data_r, control_data_w)
@@ -84,7 +90,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 
-WRITE_LINE_MEMBER(battlera_state::battlera_adpcm_int)
+WRITE_LINE_MEMBER(battlera_state::adpcm_int)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -94,12 +100,12 @@ WRITE_LINE_MEMBER(battlera_state::battlera_adpcm_int)
 		m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE8_MEMBER(battlera_state::battlera_adpcm_data_w)
+WRITE8_MEMBER(battlera_state::adpcm_data_w)
 {
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(battlera_state::battlera_adpcm_reset_w)
+WRITE8_MEMBER(battlera_state::adpcm_reset_w)
 {
 	m_msm->reset_w(0);
 }
@@ -107,10 +113,10 @@ WRITE8_MEMBER(battlera_state::battlera_adpcm_reset_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, battlera_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE("c6280", c6280_device, c6280_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank7") /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_byte_r) AM_WRITE(battlera_adpcm_reset_w)
+	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_byte_r) AM_WRITE(adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
@@ -183,11 +189,6 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(battlera_state::pce_irq_changed)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
 UINT32 battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_huc6260->video_update( bitmap, cliprect );
@@ -219,8 +220,7 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x20000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(battlera_state, pce_irq_changed))
-
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(battlera_state, battlera_adpcm_int)) /* interrupt function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(battlera_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
@@ -301,6 +301,6 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, battlera, 0,        battlera, battlera, driver_device,  0,   ROT0, "Data East Corporation", "Battle Rangers (World)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, bldwolf,  battlera, battlera, battlera, driver_device,  0,   ROT0, "Data East USA", "Bloody Wolf (US)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, bldwolfj, battlera, battlera, battlera, driver_device,  0,   ROT0, "Data East Corporation", "Narazumono Sentoubutai Bloody Wolf (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, battlera, 0,        battlera, battlera, driver_device,  0,   ROT0, "Data East Corporation", "Battle Rangers (World)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, bldwolf,  battlera, battlera, battlera, driver_device,  0,   ROT0, "Data East USA", "Bloody Wolf (US)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, bldwolfj, battlera, battlera, battlera, driver_device,  0,   ROT0, "Data East Corporation", "Narazumono Sentoubutai Bloody Wolf (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

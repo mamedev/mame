@@ -1901,22 +1901,25 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
  */
 	if ( m_system_type != SYSTEM_GX4000 )
 	{
-		if ( ( offset & (1<<10) ) == 0 )
+		if(m_fdc)  // if FDC is present (it isn't on a 464)
 		{
 			if ( ( offset & (1<<10) ) == 0 )
 			{
-				int b8b0 = ( ( offset & (1<<8) ) >> (8 - 1) ) | ( offset & 0x01 );
-
-				switch (b8b0)
+				if ( ( offset & (1<<10) ) == 0 )
 				{
-				case 0x02:
-					data = m_fdc->msr_r(space, 0);
-					break;
-				case 0x03:
-					data = m_fdc->fifo_r(space, 0);
-					break;
-				default:
-					break;
+					int b8b0 = ( ( offset & (1<<8) ) >> (8 - 1) ) | ( offset & 0x01 );
+
+					switch (b8b0)
+					{
+					case 0x02:
+						data = m_fdc->msr_r(space, 0);
+						break;
+					case 0x03:
+						data = m_fdc->fifo_r(space, 0);
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}
@@ -2094,34 +2097,37 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 */
 		if(m_system_type != SYSTEM_GX4000)
 		{
-			if ((offset & (1<<7)) == 0)
-			{
-				unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
-
-				switch (b8b0)
+			if(m_fdc)  // if FDC is present (it isn't on a 464)
+			{	
+				if ((offset & (1<<7)) == 0)
 				{
-				case 0x00:
-				case 0x01:
+					unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
+
+					switch (b8b0)
 					{
-						/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
-						 * "1" the FDD motor will be active.
-						 * "0" the FDD motor will be in-active.*/
-						floppy_image_device *floppy;
-						floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
-						if(floppy)
-							floppy->mon_w(!BIT(data, 0));
-						floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
-						if(floppy)
-							floppy->mon_w(!BIT(data, 0));
+					case 0x00:
+					case 0x01:
+						{
+							/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
+							 * "1" the FDD motor will be active.
+							 * "0" the FDD motor will be in-active.*/
+							floppy_image_device *floppy;
+							floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
+							if(floppy)
+								floppy->mon_w(!BIT(data, 0));
+							floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
+							if(floppy)
+								floppy->mon_w(!BIT(data, 0));
+							break;
+						}
+
+					case 0x03: /* Write Data register of FDC */
+						m_fdc->fifo_w(space, 0,data);
+						break;
+
+					default:
 						break;
 					}
-
-				case 0x03: /* Write Data register of FDC */
-					m_fdc->fifo_w(space, 0,data);
-					break;
-
-				default:
-					break;
 				}
 			}
 		}

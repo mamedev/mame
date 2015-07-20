@@ -819,7 +819,7 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           =
+EXAMPLE_PATH           = ..
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -1946,8 +1946,7 @@ INCLUDE_FILE_PATTERNS  = *.h
 PREDEFINED             = "_MSC_VER=1400" \
                          _CPPRTTI \
                          _WIN32 \
-                         JSONCPP_DOC_EXCLUDE_IMPLEMENTATION \
-                         JSON_VALUE_USE_INTERNAL_MAP
+                         JSONCPP_DOC_EXCLUDE_IMPLEMENTATION
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

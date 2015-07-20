@@ -208,6 +208,9 @@ const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a
 	{ 0xac, 1,6,3,5,0,7,4,2 },
 };
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, fd1094_device )
+	AM_RANGE(0x00000, 0xfffff) AM_ROM AM_SHARE(":fd1089_decrypted_opcodes")
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -219,10 +222,14 @@ const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a
 //-------------------------------------------------
 
 fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: m68000_device(mconfig, tag, owner, clock, shortname, source)
+	: m68000_device(mconfig, tag, owner, clock, shortname, source),
+	  m_decrypted_opcodes(*this, ":fd1089_decrypted_opcodes")
 {
 	// override the name after the m68000 initializes
 	m_name.assign(name);
+
+	// add the decrypted opcodes map
+	m_address_map[AS_DECRYPTED_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
 }
 
 fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -257,18 +264,12 @@ void fd1089_base_device::device_start()
 	// determine length and resize our internal buffers
 	UINT32 romsize = region()->bytes();
 	m_plaintext.resize(romsize/2);
-	m_decrypted_opcodes.resize(romsize/2);
 
 	// copy the plaintext
 	memcpy(&m_plaintext[0], rombase, romsize);
 
 	// decrypt it, overwriting original data with the decrypted data
 	decrypt(0x000000, romsize, &m_plaintext[0], &m_decrypted_opcodes[0], rombase);
-
-	// mark the ROM region as decrypted, pointing to the opcodes (if it is mapped)
-	address_space &program = space(AS_PROGRAM);
-	if (program.get_read_ptr(0) != NULL)
-		program.set_decrypted_region(0x000000, romsize - 1, &m_decrypted_opcodes[0]);
 }
 
 

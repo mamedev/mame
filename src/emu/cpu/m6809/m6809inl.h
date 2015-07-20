@@ -126,48 +126,6 @@ inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(int ordinal, UINT
 
 
 //-------------------------------------------------
-//  match_target_bytes
-//-------------------------------------------------
-
-inline ATTR_FORCE_INLINE bool m6809_base_device::match_target_bytes(UINT16 address, const UINT8 *bytes, int length)
-{
-	UINT8 *start_raw        = (UINT8 *) m_direct->read_raw_ptr(address);
-	UINT8 *start_decrypted  = (UINT8 *) m_direct->read_decrypted_ptr(address);
-	UINT8 *end_raw          = (UINT8 *) m_direct->read_raw_ptr(address + length - 1);
-	UINT8 *end_decrypted    = (UINT8 *) m_direct->read_decrypted_ptr(address + length - 1);
-
-	return (start_raw != NULL)
-		&& (end_raw != NULL)
-		&& (start_raw == start_decrypted)
-		&& (end_raw == end_decrypted)
-		&& (start_raw + length - 1 == end_raw)
-		&& !memcmp(start_raw, bytes, length);
-}
-
-
-//-------------------------------------------------
-//  burn_any_delay_loops - optimization for delay
-//  loops
-//-------------------------------------------------
-
-inline ATTR_FORCE_INLINE void m6809_base_device::burn_any_delay_loops()
-{
-	static const UINT8 target_bytes[] = { 0x30, 0x1F, 0x26, 0xFC };
-
-	if ((m_opcode == 0x26)
-		&& !(m_cc & CC_Z)
-		&& !(machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
-		&& match_target_bytes(m_pc.w - 3, target_bytes, ARRAY_LENGTH(target_bytes)))
-	{
-		// LEAX -1,X ; BNE *
-		UINT16 burned_loops = MIN((int) m_x.w - 1, m_icount / 8);
-		m_x.w -= burned_loops;
-		eat(burned_loops * 8);
-	}
-}
-
-
-//-------------------------------------------------
 //  daa - decimal arithmetic adjustment instruction
 //-------------------------------------------------
 

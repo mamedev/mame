@@ -1134,25 +1134,30 @@ void cheat_manager::reload()
 	m_lastline = 0;
 	m_disabled = false;
 
-	// load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
-	// and MAME will load gamename.xml
+	// load the cheat file, if it's a system that has a software list then try softlist_name/shortname.xml first,
+	// if it fails to load then try to load via crc32 - basename/crc32.xml ( eg. 01234567.xml )
 	image_interface_iterator iter(machine().root_device());
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 		if (image->exists())
 		{
-			// if we are loading through software lists, try to load shortname.xml
+			// if we are loading through a software list, try to load softlist_name/shortname.xml
+			// this allows the coexistence of arcade cheats with cheats for home conversions which
+			// have the same shortname
 			if (image->software_entry() != NULL)
 			{
-				load_cheats(image->basename());
+				std::string filename;
+				strprintf(filename, "%s%s%s", image->software_list_name(), PATH_SEPARATOR, image->basename());
+				load_cheats(filename.c_str());
 				break;
 			}
+			// else we are loading outside the software list, try to load machine_basename/crc32.xml
 			else
 			{
 				UINT32 crc = image->crc();
 				if (crc != 0)
 				{
 					std::string filename;
-					strprintf(filename,"%08X", crc);
+					strprintf(filename, "%s%s%08X", machine().basename(), PATH_SEPARATOR, crc);
 					load_cheats(filename.c_str());
 					break;
 				}

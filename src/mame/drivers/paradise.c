@@ -14,8 +14,8 @@ Sound Chips  :  2 x AR17961 (OKI M6295) (only 1 in Torus)
 ---------------------------------------------------------------------------
 Year + Game          Board#
 ---------------------------------------------------------------------------
-94+ Paradise         YS-1600
-94+ Paradise Deluxe  YS-1604
+94  Paradise         YS-1600
+94  Paradise Deluxe  YS-1604
 95  Target Ball      YS-2002
 96  Penky            YS951004
 96  Torus            YS-0402? Looks identical
@@ -27,8 +27,6 @@ Notes:
 paradise: I'm not sure it's working correctly:
 
 - The high scores table can't be entered !?
-- The chance to play a bonus game is very slim. I think I got to play
-  a couple in total. Is there a way to trigger them !?
 
 penky: we need to delay the irqs at startup or it won't boot. Either one of
        ports 0x2003.r or 0x2005.w starts up the irq timer (confirmed via trojan)
@@ -80,6 +78,11 @@ DIPSW-B
        TV Test        |    Game    |                           |off|*
     (Slide Show)      |    Test    |                           |on |
 --------------------------------------------------------------------
+
+2015/06/03 - System11
+Amended above comments - bonus round is triggered by percentage when you
+beat a stage.  Added 2 clones.  Amended date to 1994 based on Distributor
+sticker from Jan 95 and factory sticker 94*41.
 
 ***************************************************************************/
 
@@ -802,9 +805,20 @@ YS-1604
 |                                                         |
 |---------------------------------------------------------|
 
-The year is not shown but must be >= 1994, since the development system
-(cross compiler?) they used left a "1994.8-1989" in the rom
+Year is assumed to be 1994 based on 94*41 factory sticker and 19/1/95
+operator sticker on a revised version PCB.  The year is not shown but
+must be >= 1994, since the development system (cross compiler?) they
+used left a "1994.8-1989" in the rom
 
+Paradise (set 2): No board ID, although some tracks which are wire hacks on
+ YS-1600 PCB are corrected on this version. All roms are labeled as "A-19"
+ Except for the program rom all other data matches Paradise (set 1).
+ NOTE: on this version of the PCB the above listed 4MHz OSC is replaced with
+       a 3.579545MHz OSC
+
+The Escape version might be the newest revision due to improved slot machine
+ animation on 'girl select' compared to other sets. Except for the program
+ rom all other data matches Paradise (set 1).
 ***************************************************************************/
 
 ROM_START( paradise )
@@ -833,6 +847,58 @@ ROM_START( paradise )
 	ROM_LOAD( "u113", 0x00000, 0x80000, CRC(53de6025) SHA1(c94b3778b57ff7f46ce4cff661841019fb187d5d) )
 ROM_END
 
+ROM_START( paradisea )
+		ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+		ROM_LOAD( "a-19.U128", 0x00000, 0x40000, CRC(d47ecb7e) SHA1(74e7a33f2fc4c7c830c53c50541c3d0efd152e98) )
+
+		ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
+		ROM_LOAD( "a-19.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
+		ROM_LOAD( "a-19.u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
+
+		ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)  /* 8x8x4 Background */
+		ROM_LOAD( "a-19.u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
+
+		ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
+		ROM_LOAD( "a-19.u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
+		ROM_LOAD( "a-19.u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
+
+		ROM_REGION( 0x40000, "gfx4", ROMREGION_INVERT)  /* 8x8x8 Midground */
+		ROM_LOAD( "a-19.u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
+		ROM_LOAD( "a-19.u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
+
+		ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+		ROM_LOAD( "a-19.u85", 0x00000, 0x40000, CRC(bf3c3065) SHA1(54dd7ffea2fb3f31ed575e982b82691cddc2581a) )
+
+		ROM_REGION( 0x80000, "oki2", 0 )    /* Samples (banked) */
+		ROM_LOAD( "a-19.u113", 0x00000, 0x80000, CRC(53de6025) SHA1(c94b3778b57ff7f46ce4cff661841019fb187d5d) )
+ROM_END
+
+ROM_START( paradisee ) /* YS-1600 PCB. All labels are simply labeled "Escape" */
+		ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+		ROM_LOAD( "escape.U128", 0x00000, 0x40000, CRC(19b4e854) SHA1(7d7292017df67b7ed3a3e0059334866890c58b83) )
+
+		ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
+		ROM_LOAD( "escape.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
+		ROM_LOAD( "escape.u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
+
+		ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)  /* 8x8x4 Background */
+		ROM_LOAD( "escape.u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
+
+		ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
+		ROM_LOAD( "escape.u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
+		ROM_LOAD( "escape.u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
+
+		ROM_REGION( 0x40000, "gfx4", ROMREGION_INVERT)  /* 8x8x8 Midground */
+		ROM_LOAD( "escape.u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
+		ROM_LOAD( "escape.u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
+
+		ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+		ROM_LOAD( "escape.u85", 0x00000, 0x40000, CRC(bf3c3065) SHA1(54dd7ffea2fb3f31ed575e982b82691cddc2581a) )
+
+		ROM_REGION( 0x80000, "oki2", 0 )    /* Samples (banked) */
+		ROM_LOAD( "escape.u113", 0x00000, 0x80000, CRC(53de6025) SHA1(c94b3778b57ff7f46ce4cff661841019fb187d5d) )
+ROM_END
+
 ROM_START( paradlx )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
 	ROM_LOAD( "8.u128", 0x00000, 0x40000, CRC(3a45ac9e) SHA1(24e1b508ef582c8429e09929fea387f3a137f0e3) )
@@ -858,8 +924,6 @@ ROM_START( paradlx )
 	ROM_REGION( 0x80000, "oki2", 0 )    /* Samples (banked) */
 	ROM_LOAD( "9.u113", 0x00000, 0x80000, CRC(9c5337f0) SHA1(4d7a8069be4551aad9d7d32d835dcf91be079359) )
 ROM_END
-
-
 
 ROM_START( para2dx )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
@@ -1244,12 +1308,14 @@ DRIVER_INIT_MEMBER(paradise_state,torus)
 
 ***************************************************************************/
 
-GAME( 199?,  paradise, 0,       paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise", GAME_SUPPORTS_SAVE )   // year not shown, but should be >=1994
-GAME( 199?,  paradlx,  0,       paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )      // "
-GAME( 199?,  para2dx,  0,       paradise, para2dx, paradise_state,  paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )    // "
-GAME( 1995,  tgtball,  0,       tgtball,  tgtball, paradise_state,  tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
-GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball, paradise_state,  tgtball,  ROT0,  "Yun Sung", "Target Ball", GAME_SUPPORTS_SAVE )
-GAME( 1996,  penky,    0,       penky,    penky, paradise_state,    tgtball,  ROT0,  "Yun Sung", "Penky", GAME_SUPPORTS_SAVE )
-GAME( 1996,  torus,    0,       torus,    torus, paradise_state,    torus,    ROT90, "Yun Sung", "Torus", GAME_SUPPORTS_SAVE )
-GAME( 1998,  madball,  0,       madball,  madball, paradise_state,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", GAME_SUPPORTS_SAVE )
-GAME( 1997,  madballn, madball, madball,  madball, paradise_state,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", GAME_SUPPORTS_SAVE )
+GAME( 1994,  paradise, 0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung (Escape license)", "Paradise (Escape)", GAME_SUPPORTS_SAVE )
+GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 1995,  tgtball,  0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", GAME_SUPPORTS_SAVE )
+GAME( 1995,  tgtballa, tgtball,   tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball", GAME_SUPPORTS_SAVE )
+GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, tgtball,  ROT0,  "Yun Sung", "Penky", GAME_SUPPORTS_SAVE )
+GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, torus,    ROT90, "Yun Sung", "Torus", GAME_SUPPORTS_SAVE )
+GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", GAME_SUPPORTS_SAVE )
+GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", GAME_SUPPORTS_SAVE )

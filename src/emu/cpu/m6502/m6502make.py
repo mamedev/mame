@@ -68,7 +68,7 @@ FULL_EAT_ALL="""\
 """
 
 FULL_MEMORY="""\
-\tif(icount <= 0) { inst_substate = %(substate)s; return; }
+\tif(icount == 0) { inst_substate = %(substate)s; return; }
 %(ins)s
 \ticount--;
 """
@@ -97,7 +97,7 @@ case %(substate)s:;
 """
 
 PARTIAL_MEMORY="""\
-\tif(icount <= 0) { inst_substate = %(substate)s; return; }
+\tif(icount == 0) { inst_substate = %(substate)s; return; }
 case %(substate)s:
 %(ins)s
 \ticount--;

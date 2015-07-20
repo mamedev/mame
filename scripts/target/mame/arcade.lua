@@ -128,6 +128,8 @@ CPUS["ARCOMPACT"] = true
 CPUS["HMCS40"] = true
 --CPUS["E0C6200"] = true
 --CPUS["MELPS4"] = true
+--CPUS["HPHYBRID"] = true
+--CPUS["SM510"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -470,6 +472,7 @@ MACHINES["MSM6242"] = true
 --MACHINES["NCR5380N"] = true
 --MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
+MACHINES["NETLIST"] = true
 --MACHINES["NCR53C7XX"] = true
 MACHINES["NMC9306"] = true
 --MACHINES["NSC810"] = true
@@ -534,7 +537,6 @@ MACHINES["UPD765"] = true
 MACHINES["V3021"] = true
 MACHINES["WD_FDC"] = true
 MACHINES["WD11C00_17"] = true
-MACHINES["WD17XX"] = true
 MACHINES["WD2010"] = true
 MACHINES["WD33C93"] = true
 MACHINES["X2212"] = true
@@ -760,7 +762,7 @@ end
 function createMAMEProjects(_target, _subtarget, _name)
 	project (_name)
 	targetsubdir(_target .."_" .. _subtarget)
-	kind "StaticLib"
+	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
 	
 	options {
@@ -774,9 +776,14 @@ function createMAMEProjects(_target, _subtarget, _name)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mame/layout",
 	}
+
+	if _OPTIONS["with-bundled-zlib"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/zlib",
+		}
+end
 end
 	
 function createProjects_mame_arcade(_target, _subtarget)
@@ -1238,7 +1245,6 @@ files {
 	MAME_DIR .. "src/mame/audio/astrof.c",
 	MAME_DIR .. "src/mame/drivers/backfire.c",
 	MAME_DIR .. "src/mame/drivers/battlera.c",
-	MAME_DIR .. "src/mame/video/battlera.c",
 	MAME_DIR .. "src/mame/drivers/boogwing.c",
 	MAME_DIR .. "src/mame/video/boogwing.c",
 	MAME_DIR .. "src/mame/drivers/brkthru.c",
@@ -2421,6 +2427,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/model1.c",
 	MAME_DIR .. "src/mame/machine/model1.c",
 	MAME_DIR .. "src/mame/video/model1.c",
+	MAME_DIR .. "src/mame/machine/s32comm.c",
+	MAME_DIR .. "src/mame/machine/m1comm.c",
 	MAME_DIR .. "src/mame/audio/dsbz80.c",
 	MAME_DIR .. "src/mame/drivers/model2.c",
 	MAME_DIR .. "src/mame/video/model2.c",
@@ -2474,6 +2482,7 @@ files {
 	MAME_DIR .. "src/mame/video/segas18.c",
 	MAME_DIR .. "src/mame/drivers/segas24.c",
 	MAME_DIR .. "src/mame/video/segas24.c",
+	MAME_DIR .. "src/mame/drivers/segam1.c",
 	MAME_DIR .. "src/mame/drivers/segas32.c",
 	MAME_DIR .. "src/mame/machine/segas32.c",
 	MAME_DIR .. "src/mame/video/segas32.c",
@@ -2575,7 +2584,6 @@ files {
 	MAME_DIR .. "src/mame/machine/n64.c",
 	MAME_DIR .. "src/mame/video/n64.c",
 	MAME_DIR .. "src/mame/video/rdpblend.c",
-	MAME_DIR .. "src/mame/video/rdpspn16.c",
 	MAME_DIR .. "src/mame/video/rdptpipe.c",
 	MAME_DIR .. "src/mame/drivers/hanaawas.c",
 	MAME_DIR .. "src/mame/video/hanaawas.c",
@@ -2598,6 +2606,7 @@ files {
 	MAME_DIR .. "src/mame/machine/st0016.c",
 	MAME_DIR .. "src/mame/drivers/simple_st0016.c",
 	MAME_DIR .. "src/mame/video/seta001.c",
+	MAME_DIR .. "src/mame/drivers/thedealr.c",
 }
 
 createMAMEProjects(_target, _subtarget, "sigma")

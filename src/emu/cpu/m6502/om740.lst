@@ -99,7 +99,7 @@ bra_rel
 	TMP = read_pc();
 	read_pc_noinc();
 	if(page_changing(PC, INT8(TMP))) {
-		read_direct(set_l(PC, PC+INT8(TMP)));
+		read_arg(set_l(PC, PC+INT8(TMP)));
 	}
 	PC += INT8(TMP);
 	prefetch();
@@ -112,8 +112,8 @@ jmp_zpi
 	prefetch();
 
 reset740
-	PC = read_direct(0xfffe);
-	PC = set_h(PC, read_direct(0xffff));
+	PC = read_arg(0xfffe);
+	PC = set_h(PC, read_arg(0xffff));
 	prefetch();
 	inst_state = -1;
 
@@ -131,13 +131,13 @@ brk740_imp
 	write(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
 	if(nmi_state) {
-		PC = read_direct(0xfffa);
-		PC = set_h(PC, read_direct(0xfffb));
+		PC = read_arg(0xfffa);
+		PC = set_h(PC, read_arg(0xfffb));
 		nmi_state = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
-		PC = read_direct(m_irq_vector);
-		PC = set_h(PC, read_direct(m_irq_vector+1));
+		PC = read_arg(m_irq_vector);
+		PC = set_h(PC, read_arg(m_irq_vector+1));
 		if(irq_taken)
 			standard_irq_callback(IRQ_LINE);
 	}

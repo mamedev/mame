@@ -369,14 +369,14 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 				gfx = m_p_chargen[ (ra << 7) | ( chr & 0x7F ) ];
 
 			/* Display a scanline of a character */
-			*p++ = BIT(gfx, 7) ? ( dim ? 1 : 2 ) : 0;
-			*p++ = BIT(gfx, 6) ? ( dim ? 1 : 2 ) : 0;
-			*p++ = BIT(gfx, 5) ? ( dim ? 1 : 2 ) : 0;
-			*p++ = BIT(gfx, 4) ? ( dim ? 1 : 2 ) : 0;
-			*p++ = BIT(gfx, 3) ? ( dim ? 1 : 2 ) : 0;
-			*p++ = BIT(gfx, 2) ? ( dim ? 1 : 2 ) : 0;
-			*p++ = BIT(gfx, 1) ? ( dim ? 1 : 2 ) : 0;
-			*p++ = BIT(gfx, 0) ? ( dim ? 1 : 2 ) : 0;
+			*p++ = BIT(gfx, 7) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 6) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 5) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 4) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 3) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 2) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 1) ? ( dim ? 2 : 1 ) : 0;
+			*p++ = BIT(gfx, 0) ? ( dim ? 2 : 1 ) : 0;
 		}
 	}
 

@@ -47,7 +47,6 @@ TODO:
 - volume/panning is linear? volume slides are too steep
 - most music sounds tinny, probably due to missing DSP?
 - what is reg 0xa/0xc? seems related to volume
-- chip should running at 31khz (divider of 768 instead of 192)
 - identify sample flags
   * bassdrum in shikigam level 1 music is a good hint: it should be one octave
     lower, indicating possible stereo sample, or base octave(like in ymf278)
@@ -86,10 +85,9 @@ void zsg2_device::device_start()
 
 	memset(&m_chan, 0, sizeof(m_chan));
 
-	m_stream = stream_alloc(0, 2, clock() / 192);
+	m_stream = stream_alloc(0, 2, clock() / 768);
 
 	m_mem_blocks = m_mem_base.length();
-
 	m_mem_copy = auto_alloc_array_clear(machine(), UINT32, m_mem_blocks);
 	m_full_samples = auto_alloc_array_clear(machine(), INT16, m_mem_blocks * 4 + 4); // +4 is for empty block
 
@@ -214,7 +212,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				continue;
 
 			m_chan[ch].step_ptr += m_chan[ch].step;
-			if (m_chan[ch].step_ptr & 0x40000)
+			if (m_chan[ch].step_ptr & 0x10000)
 			{
 				m_chan[ch].step_ptr &= 0xffff;
 				if (++m_chan[ch].cur_pos >= m_chan[ch].end_pos)
@@ -231,7 +229,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				m_chan[ch].samples = prepare_samples(m_chan[ch].page | m_chan[ch].cur_pos);
 			}
 
-			INT32 sample = (m_chan[ch].samples[m_chan[ch].step_ptr >> 16 & 3] * m_chan[ch].vol) >> 16;
+			INT32 sample = (m_chan[ch].samples[m_chan[ch].step_ptr >> 14 & 3] * m_chan[ch].vol) >> 16;
 
 			mix_l += (sample * m_chan[ch].panl + sample * (0x1f - m_chan[ch].panr)) >> 5;
 			mix_r += (sample * m_chan[ch].panr + sample * (0x1f - m_chan[ch].panl)) >> 5;

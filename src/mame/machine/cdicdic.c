@@ -542,7 +542,7 @@ void cdicdic_device::sample_trigger()
 
 	if(m_decode_addr == 0xffff)
 	{
-		verboselog(machine(), 0, "Decode stop requested, stopping playback\n" );
+		verboselog(machine(), 0, "%s", "Decode stop requested, stopping playback\n" );
 		m_audio_sample_timer->adjust(attotime::never);
 		return;
 	}
@@ -550,11 +550,11 @@ void cdicdic_device::sample_trigger()
 	if(!m_decode_delay)
 	{
 		// Indicate that data has been decoded
-		verboselog(machine(), 0, "Flagging that audio data has been decoded\n" );
+		verboselog(machine(), 0, "%s", "Flagging that audio data has been decoded\n" );
 		m_audio_buffer |= 0x8000;
 
 		// Set the CDIC interrupt line
-		verboselog(machine(), 0, "Setting CDIC interrupt line for soundmap decode\n" );
+		verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for soundmap decode\n" );
 		state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 		state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 	}
@@ -576,7 +576,7 @@ void cdicdic_device::sample_trigger()
 		verboselog(machine(), 0, "Updated m_decode_addr, new value is %04x\n", m_decode_addr );
 
 		//// Delay for Frequency * (18*28*2*size in bytes) before requesting more data
-		verboselog(machine(), 0, "Data is valid, setting up a new callback\n" );
+		verboselog(machine(), 0, "%s", "Data is valid, setting up a new callback\n" );
 		m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram, m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram, m_decode_addr & 0x3ffe));
 		m_audio_sample_timer->adjust(m_decode_period);
 		//dmadac_enable(&dmadac[0], 2, 0);
@@ -586,7 +586,7 @@ void cdicdic_device::sample_trigger()
 		// Swap buffer positions to indicate our new buffer position at the next read
 		m_decode_addr ^= 0x1a00;
 
-		verboselog(machine(), 0, "Data is not valid, indicating to shut down on the next audio sample\n" );
+		verboselog(machine(), 0, "%s", "Data is not valid, indicating to shut down on the next audio sample\n" );
 		m_decode_addr = 0xffff;
 		m_audio_sample_timer->adjust(m_decode_period);
 	}
@@ -695,7 +695,7 @@ void cdicdic_device::process_delayed_command()
 				if(((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_FORM | CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == (CDIC_SUBMODE_FORM | CDIC_SUBMODE_AUDIO)) &&
 					(m_channel & m_audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
 				{
-					verboselog(machine(), 0, "Audio sector\n" );
+					verboselog(machine(), 0, "%s", "Audio sector\n" );
 
 					m_x_buffer |= 0x8000;
 					//m_data_buffer |= 0x4000;
@@ -709,7 +709,7 @@ void cdicdic_device::process_delayed_command()
 					decode_audio_sector(((UINT8*)m_ram) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
 
 					//printf( "Setting CDIC interrupt line\n" );
-					verboselog(machine(), 0, "Setting CDIC interrupt line for audio sector\n" );
+					verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for audio sector\n" );
 					state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 					state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 				}
@@ -728,13 +728,13 @@ void cdicdic_device::process_delayed_command()
 						(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == CDIC_SUBMODE_EOF)
 					{
 						//printf( "Setting CDIC interrupt line\n" );
-						verboselog(machine(), 0, "Setting CDIC interrupt line for message sector\n" );
+						verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for message sector\n" );
 						state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 						state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 					}
 					else
 					{
-						verboselog(machine(), 0, "Message sector, ignored\n" );
+						verboselog(machine(), 0, "%s", "Message sector, ignored\n" );
 					}
 				}
 				else
@@ -748,7 +748,7 @@ void cdicdic_device::process_delayed_command()
 					}
 
 					//printf( "Setting CDIC interrupt line\n" );
-					verboselog(machine(), 0, "Setting CDIC interrupt line for data sector\n" );
+					verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for data sector\n" );
 					state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 					state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 				}
@@ -843,7 +843,7 @@ void cdicdic_device::process_delayed_command()
 				m_ram[(m_data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 			}
 
-			verboselog(machine(), 0, "Setting CDIC interrupt line for CDDA sector\n" );
+			verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for CDDA sector\n" );
 			state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 			state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
@@ -894,7 +894,7 @@ void cdicdic_device::process_delayed_command()
 
 			m_time = next_msf << 8;
 
-			verboselog(machine(), 0, "Setting CDIC interrupt line for Seek sector\n" );
+			verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for Seek sector\n" );
 			state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 			state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
@@ -944,7 +944,7 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
 				state->m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
-				verboselog(machine(), 0, "Clearing CDIC interrupt line\n" );
+				verboselog(machine(), 0, "%s", "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
 			verboselog(machine(), 0, "cdic_r: Audio Buffer Register = %04x & %04x\n", temp, mem_mask);
@@ -958,7 +958,7 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
 				state->m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
-				verboselog(machine(), 0, "Clearing CDIC interrupt line\n" );
+				verboselog(machine(), 0, "%s", "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
 			verboselog(machine(), 0, "cdic_r: X-Buffer Register = %04x & %04x\n", temp, mem_mask);

@@ -98,8 +98,6 @@ public:
 	vcombat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tlc34076(*this, "tlc34076"),
-		m_vid_0_shared_ram(*this, "vid_0_ram"),
-		m_vid_1_shared_ram(*this, "vid_1_ram"),
 		m_framebuffer_ctrl(*this, "fb_control"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -110,8 +108,6 @@ public:
 	UINT16* m_m68k_framebuffer[2];
 	UINT16* m_i860_framebuffer[2][2];
 	required_device<tlc34076_device> m_tlc34076;
-	required_shared_ptr<UINT16> m_vid_0_shared_ram;
-	required_shared_ptr<UINT16> m_vid_1_shared_ram;
 	required_shared_ptr<UINT16> m_framebuffer_ctrl;
 	int m_crtc_select;
 	DECLARE_WRITE16_MEMBER(main_video_write);
@@ -125,8 +121,6 @@ public:
 	DECLARE_WRITE64_MEMBER(v0_fb_w);
 	DECLARE_WRITE64_MEMBER(v1_fb_w);
 	DECLARE_WRITE16_MEMBER(crtc_w);
-	DECLARE_DIRECT_UPDATE_MEMBER(vcombat_vid_0_direct_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(vcombat_vid_1_direct_handler);
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
 	DECLARE_DRIVER_INIT(shadfgtr);
@@ -435,37 +429,9 @@ MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
 }
 
 
-DIRECT_UPDATE_MEMBER(vcombat_state::vcombat_vid_0_direct_handler)
-{
-	if (address >= 0xfffc0000 && address <= 0xffffffff)
-	{
-		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, m_vid_0_shared_ram);
-		return ~0;
-	}
-	return address;
-}
-
-DIRECT_UPDATE_MEMBER(vcombat_state::vcombat_vid_1_direct_handler)
-{
-	if (address >= 0xfffc0000 && address <= 0xffffffff)
-	{
-		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, m_vid_1_shared_ram);
-		return ~0;
-	}
-	return address;
-}
-
-
 DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-
-	/* The two i860s execute out of RAM */
-	address_space &v0space = m_vid_0->space(AS_PROGRAM);
-	v0space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), this));
-
-	address_space &v1space = m_vid_1->space(AS_PROGRAM);
-	v1space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_1_direct_handler), this));
 
 	/* Allocate the 68000 framebuffers */
 	m_m68k_framebuffer[0] = auto_alloc_array(machine(), UINT16, 0x8000);
@@ -506,10 +472,6 @@ DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
 	m_i860_framebuffer[0][1] = auto_alloc_array(machine(), UINT16, 0x8000);
 	m_i860_framebuffer[1][0] = NULL;
 	m_i860_framebuffer[1][1] = NULL;
-
-	/* The i860 executes out of RAM */
-	address_space &space = m_vid_0->space(AS_PROGRAM);
-	space.set_direct_update_handler(direct_update_delegate(FUNC(vcombat_state::vcombat_vid_0_direct_handler), this));
 }
 
 

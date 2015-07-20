@@ -57,14 +57,14 @@ private:
 			struct {
 					unsigned char m_r0[4];
 					unsigned char m_r1[4];
-			};
+			} regs;
 	};
 	union {
 			unsigned short m_RAM[256*2];      /* 2 256-word internal RAM banks */
 			struct {
 					unsigned short m_RAM0[256];
 					unsigned short m_RAM1[256];
-			};
+			} mem;
 	};
 	UINT16 m_stack[6]; /* 6-level hardware stack */
 	PAIR m_ppc;

@@ -134,6 +134,7 @@ void ui_menu_control_device_image::load_software_part()
 	std::string temp_name = std::string(sld->list_name()).append(":").append(swi->shortname()).append(":").append(swp->name());
 
 	driver_enumerator drivlist(machine().options(), machine().options().system_name());
+	drivlist.next();
 	media_auditor auditor(drivlist);
 	media_auditor::summary summary = auditor.audit_software(sld->list_name(), (software_info *)swi, AUDIT_VALIDATE_FAST);
 	// if everything looks good, load software

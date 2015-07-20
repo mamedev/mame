@@ -16,6 +16,7 @@
 #include "konami.h"
 #include "korean.h"
 #include "majutsushi.h"
+#include "moonsound.h"
 #include "msx_audio.h"
 #include "msxdos2.h"
 #include "nomapper.h"
@@ -61,6 +62,7 @@ SLOT_INTERFACE_START(msx_cart)
 	SLOT_INTERFACE_INTERNAL("disk_fsfd1a", MSX_CART_FSFD1A)
 	SLOT_INTERFACE_INTERNAL("disk_fscf351", MSX_CART_FSCF351)
 	SLOT_INTERFACE("bm_012", MSX_CART_BM_012)
+	SLOT_INTERFACE("moonsound", MSX_CART_MOONSOUND)
 SLOT_INTERFACE_END
 
 

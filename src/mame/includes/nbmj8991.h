@@ -19,7 +19,13 @@ public:
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
+
+	enum
+	{
+		TIMER_BLITTER
+	};
 
 	int m_scrollx;
 	int m_scrolly;
@@ -39,26 +45,32 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_clut;
 	int m_flipscreen_old;
-	DECLARE_WRITE8_MEMBER(nbmj8991_soundbank_w);
-	DECLARE_WRITE8_MEMBER(nbmj8991_sound_w);
-	DECLARE_READ8_MEMBER(nbmj8991_sound_r);
-	DECLARE_WRITE8_MEMBER(nbmj8991_palette_type1_w);
-	DECLARE_WRITE8_MEMBER(nbmj8991_palette_type2_w);
-	DECLARE_WRITE8_MEMBER(nbmj8991_palette_type3_w);
-	DECLARE_WRITE8_MEMBER(nbmj8991_blitter_w);
-	DECLARE_READ8_MEMBER(nbmj8991_clut_r);
-	DECLARE_WRITE8_MEMBER(nbmj8991_clut_w);
+	emu_timer *m_blitter_timer;
+
+	DECLARE_WRITE8_MEMBER(soundbank_w);
+	DECLARE_WRITE8_MEMBER(palette_type1_w);
+	DECLARE_WRITE8_MEMBER(palette_type2_w);
+	DECLARE_WRITE8_MEMBER(palette_type3_w);
+	DECLARE_WRITE8_MEMBER(blitter_w);
+	DECLARE_READ8_MEMBER(clut_r);
+	DECLARE_WRITE8_MEMBER(clut_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+
 	DECLARE_DRIVER_INIT(galkaika);
 	DECLARE_DRIVER_INIT(tokimbsj);
 	DECLARE_DRIVER_INIT(tokyogal);
 	DECLARE_DRIVER_INIT(finalbny);
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_nbmj8991_type1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_nbmj8991_type2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(blitter_timer_callback);
-	void nbmj8991_vramflip();
+
+	UINT32 screen_update_type1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_type2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vramflip();
 	void update_pixel(int x, int y);
-	void nbmj8991_gfxdraw();
+	void gfxdraw();
+
+	void postload();
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

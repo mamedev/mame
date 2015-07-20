@@ -1,10 +1,15 @@
+# Copyright 2010 Baptiste Lepilleur
+# Distributed under MIT license, or public domain if desired and
+# recognized in your jurisdiction.
+# See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+
 from __future__ import print_function
 import os.path
 
-def fix_source_eol( path, is_dry_run = True, verbose = True, eol = '\n' ):
+def fix_source_eol(path, is_dry_run = True, verbose = True, eol = '\n'):
     """Makes sure that all sources have the specified eol sequence (default: unix)."""
-    if not os.path.isfile( path ):
-        raise ValueError( 'Path "%s" is not a file' % path )
+    if not os.path.isfile(path):
+        raise ValueError('Path "%s" is not a file' % path)
     try:
         f = open(path, 'rb')
     except IOError as msg:
@@ -29,27 +34,27 @@ def fix_source_eol( path, is_dry_run = True, verbose = True, eol = '\n' ):
 ##    
 ##    
 ##
-##def _do_fix( is_dry_run = True ):
+##def _do_fix(is_dry_run = True):
 ##    from waftools import antglob
-##    python_sources = antglob.glob( '.',
+##    python_sources = antglob.glob('.',
 ##        includes = '**/*.py **/wscript **/wscript_build',
 ##        excludes = antglob.default_excludes + './waf.py',
-##        prune_dirs = antglob.prune_dirs + 'waf-* ./build' )
+##        prune_dirs = antglob.prune_dirs + 'waf-* ./build')
 ##    for path in python_sources:
-##        _fix_python_source( path, is_dry_run )
+##        _fix_python_source(path, is_dry_run)
 ##
-##    cpp_sources = antglob.glob( '.',
+##    cpp_sources = antglob.glob('.',
 ##        includes = '**/*.cpp **/*.h **/*.inl',
-##        prune_dirs = antglob.prune_dirs + 'waf-* ./build' )
+##        prune_dirs = antglob.prune_dirs + 'waf-* ./build')
 ##    for path in cpp_sources:
-##        _fix_source_eol( path, is_dry_run )
+##        _fix_source_eol(path, is_dry_run)
 ##
 ##
 ##def dry_fix(context):
-##    _do_fix( is_dry_run = True )
+##    _do_fix(is_dry_run = True)
 ##
 ##def fix(context):
-##    _do_fix( is_dry_run = False )
+##    _do_fix(is_dry_run = False)
 ##
 ##def shutdown():
 ##    pass

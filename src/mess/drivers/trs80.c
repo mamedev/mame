@@ -136,6 +136,8 @@ There don't seem to be any JV1 boot disks for Model III/4.
 ***************************************************************************/
 
 #include "includes/trs80.h"
+#include "formats/trs80_dsk.h"
+#include "formats/dmk_dsk.h"
 
 
 static ADDRESS_MAP_START( trs80_map, AS_PROGRAM, 8, trs80_state )
@@ -158,10 +160,10 @@ static ADDRESS_MAP_START( model1_map, AS_PROGRAM, 8, trs80_state )
 	AM_RANGE(0x37e4, 0x37e7) AM_WRITE(trs80_cassunit_w)
 	AM_RANGE(0x37e8, 0x37eb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0x37ec, 0x37ec) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0x37ec, 0x37ec) AM_DEVWRITE("wd179x", fd1793_device, command_w)
-	AM_RANGE(0x37ed, 0x37ed) AM_DEVREADWRITE("wd179x", fd1793_device, track_r, track_w)
-	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("wd179x", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("wd179x", fd1793_device, data_r, data_w)
+	AM_RANGE(0x37ec, 0x37ec) AM_DEVWRITE("fdc", fd1793_t, cmd_w)
+	AM_RANGE(0x37ed, 0x37ed) AM_DEVREADWRITE("fdc", fd1793_t, track_r, track_w)
+	AM_RANGE(0x37ee, 0x37ee) AM_DEVREADWRITE("fdc", fd1793_t, sector_r, sector_w)
+	AM_RANGE(0x37ef, 0x37ef) AM_DEVREADWRITE("fdc", fd1793_t, data_r, data_w)
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("p_videoram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
@@ -208,10 +210,10 @@ static ADDRESS_MAP_START( model3_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("wd179x", fd1793_device, command_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", fd1793_device, data_r, data_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_t, cmd_w)
+	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_t, track_r, track_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_t, sector_r, sector_w)
+	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_t, data_r, data_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
 	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
@@ -230,10 +232,10 @@ static ADDRESS_MAP_START( model4_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("wd179x", fd1793_device, command_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", fd1793_device, data_r, data_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_t, cmd_w)
+	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_t, track_r, track_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_t, sector_r, sector_w)
+	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_t, data_r, data_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
 	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
@@ -253,10 +255,10 @@ static ADDRESS_MAP_START( model4p_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("wd179x", fd1793_device, command_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", fd1793_device, data_r, data_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_t, cmd_w)
+	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_t, track_r, track_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_t, sector_r, sector_w)
+	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_t, data_r, data_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
 	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
@@ -277,10 +279,10 @@ static ADDRESS_MAP_START( meritum_io, AS_IO, 8, trs80_state )
 	// eg. port F0 should be 5, port F2 should have bit 3 set.
 	//AM_RANGE(0x03, 0x03) unknown
 	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
-	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("wd179x", fd1793_device, command_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("wd179x", fd1793_device, track_r, track_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("wd179x", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("wd179x", fd1793_device, data_r, data_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_t, cmd_w)
+	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_t, track_r, track_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_t, sector_r, sector_w)
+	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_t, data_r, data_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
 	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
 	//AM_RANGE(0xfc, 0xfd) unknown
@@ -545,12 +547,15 @@ static GFXDECODE_START(meritum)
 GFXDECODE_END
 
 
-static const floppy_interface trs80_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(trs80),
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( trs80_state::floppy_formats )
+	FLOPPY_TRS80_FORMAT,
+	FLOPPY_DMK_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( trs80_floppies )
+	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( trs80, trs80_state )       // the original model I, level I, with no extras
 	/* basic machine hardware */
@@ -595,11 +600,13 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
 
-	MCFG_DEVICE_ADD("wd179x", FD1793, 0) // should be FD1771 or FD1791 but inverted data lines are too tricky to fix now
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(trs80_state,trs80_fdc_intrq_w))
+	MCFG_FD1793_ADD("fdc", XTAL_1MHz) // todo: should be fd1771
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(trs80_state,trs80_fdc_intrq_w))
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(trs80_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", trs80_floppies, "", trs80_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))

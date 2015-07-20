@@ -137,7 +137,7 @@ offs_t v810_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 #define WIO_H(addr, val) (m_io->write_word(addr,val))
 #define WIO_W(addr, val) (m_io->write_dword(addr,val))
 
-#define R_OP(addr)  (m_direct->read_decrypted_word(addr))
+#define R_OP(addr)  (m_direct->read_word(addr))
 
 #define GET1 (op&0x1f)
 #define GET2 ((op>>5)&0x1f)

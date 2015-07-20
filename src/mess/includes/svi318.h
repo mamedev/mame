@@ -14,7 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/ram.h"
 #include "machine/buffer.h"
 #include "imagedev/cassette.h"
@@ -44,22 +44,25 @@ public:
 		m_ins8250_1(*this, "ins8250_1"),
 		m_cart(*this, "cartslot"),
 		m_fd1793(*this, "wd179x"),
+		m_floppy0(*this, "wd179x:0"),
+		m_floppy1(*this, "wd179x:1"),
 		m_crtc(*this, "crtc"),
 		m_line(*this, "LINE"),
 		m_joysticks(*this, "JOYSTICKS"),
 		m_buttons(*this, "BUTTONS"),
 		m_palette(*this, "palette"),
+		m_floppy(NULL),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
 		m_bank4(*this, "bank4")
 	{ }
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	// FDC
-	UINT8 m_driveselect;
 	int m_drq;
 	int m_irq;
-	UINT8 m_heads[2];
 
 	DECLARE_WRITE8_MEMBER(ppi_w);
 	DECLARE_READ8_MEMBER(psg_port_a_r);
@@ -105,7 +108,9 @@ protected:
 	required_device<ins8250_device> m_ins8250_0;
 	required_device<ins8250_device> m_ins8250_1;
 	required_device<generic_slot_device> m_cart;
-	required_device<fd1793_device> m_fd1793;
+	required_device<fd1793_t> m_fd1793;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_ioport_array<11> m_line;
 	required_ioport m_joysticks;
@@ -133,6 +138,8 @@ private:
 
 	// keyboard
 	UINT8   m_keyboard_row;
+
+	floppy_image_device *m_floppy;
 
 	// centronics
 	int m_centronics_busy;

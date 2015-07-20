@@ -974,6 +974,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas16a_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, segas16a_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -1962,6 +1966,11 @@ static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( system16a_no7751p, system16a_no7751 )
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 /*
@@ -3503,7 +3512,59 @@ DRIVER_INIT_MEMBER(segas16a_state,quartet)
 DRIVER_INIT_MEMBER(segas16a_state,fantzonep)
 {
 	DRIVER_INIT_CALL(generic);
-	sega_315_5177_decode(machine(), "soundcpu");
+
+	// 315-5177
+	static const UINT8 xor_table[128] =
+	{
+		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
+		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
+		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
+		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
+		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
+		0x05,0x55,0x50,0x14,
+
+		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
+		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
+		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
+		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
+		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
+		0x05,0x55,0x50,0x14,
+	};
+
+	static const int swap_table[128] =
+	{
+		0,0,0,0,
+		1,1,1,1,1,
+		2,2,2,2,2,
+		3,3,3,3,
+		4,4,4,4,4,
+		5,5,5,5,5,
+		6,6,6,6,6,
+		7,7,7,7,7,
+		8,8,8,8,
+		9,9,9,9,9,
+		10,10,10,10,10,
+		11,11,11,11,11,
+		12,12,12,12,12,
+		13,13,
+
+		8,8,8,8,
+		9,9,9,9,9,
+		10,10,10,10,10,
+		11,11,11,11,
+		12,12,12,12,12,
+		13,13,13,13,13,
+		14,14,14,14,14,
+		15,15,15,15,15,
+		16,16,16,16,
+		17,17,17,17,17,
+		18,18,18,18,18,
+		19,19,19,19,19,
+		20,20,20,20,20,
+		21,21,
+	};
+
+	sega_decode_2(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, xor_table, swap_table);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,sdi)
@@ -3545,7 +3606,7 @@ GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a
 GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", GAME_SUPPORTS_SAVE )
 GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1986, fantzonep,  fantzone, system16a_no7751,         fantzone,   segas16a_state,fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE )
+GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,   segas16a_state,fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE )
 GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // bad / missing gfx roms
 GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, newer, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )

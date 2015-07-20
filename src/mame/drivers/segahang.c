@@ -426,6 +426,11 @@ static ADDRESS_MAP_START( hangon_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(hangon_io_r, hangon_io_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segahang_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sharrier_map, AS_PROGRAM, 16, segahang_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -959,11 +964,17 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( endurobl, sharrier_base )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+
 	MCFG_FRAGMENT_ADD(sound_board_2203)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( endurob2, sharrier_base )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+
 	MCFG_FRAGMENT_ADD(sound_board_2203x2)
 MACHINE_CONFIG_END
 
@@ -1777,13 +1788,10 @@ DRIVER_INIT_MEMBER(segahang_state,enduror)
 DRIVER_INIT_MEMBER(segahang_state,endurobl)
 {
 	DRIVER_INIT_CALL(enduror);
-
 	// assemble decrypted half of ROM and register it
 	UINT16 *rom = reinterpret_cast<UINT16 *>(memregion("maincpu")->base());
-	UINT16 *decrypt = auto_alloc_array(machine(), UINT16, 0x40000/2);
-	memcpy(decrypt + 0x00000/2, rom + 0x30000/2, 0x10000);
-	memcpy(decrypt + 0x10000/2, rom + 0x10000/2, 0x20000);
-	m_maincpu->space(AS_PROGRAM).set_decrypted_region(0x000000, 0x03ffff, decrypt);
+	memcpy(m_decrypted_opcodes + 0x00000/2, rom + 0x30000/2, 0x10000);
+	memcpy(m_decrypted_opcodes + 0x10000/2, rom + 0x10000/2, 0x20000);
 }
 
 DRIVER_INIT_MEMBER(segahang_state,endurob2)
@@ -1792,9 +1800,7 @@ DRIVER_INIT_MEMBER(segahang_state,endurob2)
 
 	// assemble decrypted half of ROM and register it
 	UINT16 *rom = reinterpret_cast<UINT16 *>(memregion("maincpu")->base());
-	UINT16 *decrypt = auto_alloc_array(machine(), UINT16, 0x40000/2);
-	memcpy(decrypt, rom, 0x30000);
-	m_maincpu->space(AS_PROGRAM).set_decrypted_region(0x000000, 0x03ffff, decrypt);
+	memcpy(m_decrypted_opcodes, rom, 0x30000);
 }
 
 

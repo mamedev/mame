@@ -23,7 +23,6 @@ public:
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
 
-	virtual void next(int cycles);
 	virtual void io_w8(UINT8 adr, UINT8 data);
 	virtual void io_w16(UINT8 adr, UINT16 data);
 	virtual UINT8 io_r8(UINT8 adr);

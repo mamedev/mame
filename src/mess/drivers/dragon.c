@@ -18,7 +18,8 @@
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
-#include "formats/coco_dsk.h"
+#include "formats/vdk_dsk.h"
+#include "formats/dmk_dsk.h"
 #include "imagedev/flopdrv.h"
 
 
@@ -125,12 +126,19 @@ static SLOT_INTERFACE_START(dragon_cart)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 
-static const floppy_interface coco_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(coco),
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
+	FLOPPY_VDK_FORMAT,
+	FLOPPY_DMK_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( dragon_floppies )
+	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
+	SLOT_INTERFACE("sd",   FLOPPY_525_SD)
+	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
+	SLOT_INTERFACE("dd",   FLOPPY_525_DD)
+	SLOT_INTERFACE("ssqd", FLOPPY_525_SSQD)
+	SLOT_INTERFACE("qd",   FLOPPY_525_QD)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( dragon_base, dragon_state )
 	// basic machine hardware
@@ -237,12 +245,14 @@ static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	// floppy
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
+	MCFG_WD2797_ADD(WD2797_TAG, XTAL_1MHz)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_drq_w))
 
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_floppies, "qd", dragon_alpha_state::dragon_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_floppies, "qd", dragon_alpha_state::dragon_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_floppies, "qd", dragon_alpha_state::dragon_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_floppies, "qd", dragon_alpha_state::dragon_formats)
 
 	// sound hardware
 	MCFG_SOUND_ADD(AY8912_TAG, AY8912, 1000000)

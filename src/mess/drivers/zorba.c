@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_I8275_IRQ_CALLBACK(WRITELINE(zorba_state, irq0_w))
-	MCFG_FD1793x_ADD("fdc", XTAL_24MHz / 24)
+	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(zorba_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
 	//MCFG_WD_FDC_FORCE_READY

@@ -64,10 +64,8 @@ Notes:
 
 
 
-WRITE8_MEMBER(sprcros2_state::sprcros2_m_port7_w)
+WRITE8_MEMBER(sprcros2_state::m_port7_w)
 {
-	UINT8 *RAM = memregion("master")->base();
-
 	//76543210
 	//x------- unused
 	//-x------ bankswitch halves of scm-01.10k into c000-dfff
@@ -78,17 +76,15 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_m_port7_w)
 	//-------x nmi enable
 
 	if((m_port7^data)&0x40)
-		membank("bank1")->set_base(&RAM[0x10000+((data&0x40)<<7)]);
+		membank("masterbank")->set_entry((data&0x40)>>6);
 
 	machine().tilemap().set_flip_all(data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
 	m_port7 = data;
 }
 
-WRITE8_MEMBER(sprcros2_state::sprcros2_s_port3_w)
+WRITE8_MEMBER(sprcros2_state::s_port3_w)
 {
-	UINT8 *RAM = memregion("slave")->base();
-
 	//76543210
 	//xxxx---- unused
 	//----x--- bankswitch halves of scs-27.5k into c000-dfff
@@ -96,15 +92,15 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_s_port3_w)
 	//-------x nmi enable
 
 	if((m_s_port3^data)&0x08)
-		membank("bank2")->set_base(&RAM[0x10000+((data&0x08)<<10)]);
+		membank("slavebank")->set_entry((data&0x08)>>3);
 
 	m_s_port3 = data;
 }
 
 static ADDRESS_MAP_START( sprcros2_master_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("masterbank")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xe817) AM_RAM                     //always zero
 	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe840, 0xefff) AM_RAM                     //always zero
@@ -119,13 +115,13 @@ static ADDRESS_MAP_START( sprcros2_master_io_map, AS_IO, 8, sprcros2_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("EXTRA") AM_DEVWRITE("sn3", sn76489_device, write)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07, 0x07) AM_WRITE(sprcros2_m_port7_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(m_port7_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_slave_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("slavebank")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM                     //always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
@@ -133,9 +129,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_slave_io_map, AS_IO, 8, sprcros2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sprcros2_bgscrollx_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(sprcros2_bgscrolly_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(sprcros2_s_port3_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(bgscrollx_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(bgscrolly_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(s_port3_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sprcros2 )
@@ -230,7 +226,7 @@ static GFXDECODE_START( sprcros2 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprcros2_fglayout,     512, 64 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::sprcros2_m_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::m_interrupt)
 {
 	int scanline = param;
 
@@ -246,7 +242,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::sprcros2_m_interrupt)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(sprcros2_state::sprcros2_s_interrupt)
+INTERRUPT_GEN_MEMBER(sprcros2_state::s_interrupt)
 {
 	if(m_s_port3&0x01)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -254,6 +250,9 @@ INTERRUPT_GEN_MEMBER(sprcros2_state::sprcros2_s_interrupt)
 
 void sprcros2_state::machine_start()
 {
+	membank("masterbank")->configure_entries(0, 2, memregion("master")->base() + 0x10000, 0x2000);
+	membank("slavebank")->configure_entries(0, 2, memregion("slave")->base() + 0x10000, 0x2000);
+
 	save_item(NAME(m_port7));
 	save_item(NAME(m_s_port3));
 }
@@ -264,12 +263,12 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_CPU_ADD("master", Z80,10000000/2)
 	MCFG_CPU_PROGRAM_MAP(sprcros2_master_map)
 	MCFG_CPU_IO_MAP(sprcros2_master_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sprcros2_state, sprcros2_m_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sprcros2_state, m_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", Z80,10000000/2)
 	MCFG_CPU_PROGRAM_MAP(sprcros2_slave_map)
 	MCFG_CPU_IO_MAP(sprcros2_slave_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sprcros2_state, sprcros2_s_interrupt, 2*60)    //2 nmis
+	MCFG_CPU_PERIODIC_INT_DRIVER(sprcros2_state, s_interrupt, 2*60)    //2 nmis
 
 
 	/* video hardware */
@@ -278,7 +277,7 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sprcros2_state, screen_update_sprcros2)
+	MCFG_SCREEN_UPDATE_DRIVER(sprcros2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprcros2)
@@ -372,5 +371,5 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "sc-60.4k",    0x0320, 0x0100, CRC(d7a4e57d) SHA1(6db02ec6aa55b05422cb505e63c71e36b4b11b4a) ) //fg clut
 ROM_END
 
-GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", 0 )
-GAME( 1986, sprcros2a,sprcros2, sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", 0 )
+GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, sprcros2a,sprcros2, sprcros2, sprcros2, driver_device, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", GAME_SUPPORTS_SAVE )

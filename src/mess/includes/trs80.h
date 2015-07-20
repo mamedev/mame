@@ -16,12 +16,11 @@
 #include "machine/ay31015.h"
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/snapquik.h"
 #include "formats/trs_cas.h"
-#include "formats/trs_dsk.h"
 
 
 class trs80_state : public driver_device
@@ -34,7 +33,11 @@ public:
 		m_cent_data_out(*this, "cent_data_out"),
 		m_cent_status_in(*this, "cent_status_in"),
 		m_ay31015(*this, "tr1602"),
-		m_fdc(*this, "wd179x"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
+		m_floppy2(*this, "fdc:2"),
+		m_floppy3(*this, "fdc:3"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
 		m_p_videoram(*this, "p_videoram"),
@@ -67,12 +70,18 @@ public:
 		m_bank18(NULL),
 		m_bank19(NULL) { }
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
 	optional_device<input_buffer_device> m_cent_status_in;
 	optional_device<ay31015_device> m_ay31015;
-	optional_device<fd1793_device> m_fdc;
+	optional_device<fd1793_t> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	optional_device<floppy_connector> m_floppy2;
+	optional_device<floppy_connector> m_floppy3;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	DECLARE_WRITE8_MEMBER ( trs80_ff_w );

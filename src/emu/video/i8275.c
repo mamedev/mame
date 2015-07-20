@@ -315,7 +315,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				int vsp = 0;
 				int rvv = 0;
 
-				UINT8 data = m_buffer[!m_buffer_dma][sx];
+				UINT8 data = (end_of_row || m_end_of_screen) ? 0 : m_buffer[!m_buffer_dma][sx];
 
 				if (data & 0x80)
 				{
@@ -359,7 +359,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 								m_end_of_screen = true;
 								break;
 							}
-							vsp = 1;
+							//vsp = 1;
 						}
 						else
 						{

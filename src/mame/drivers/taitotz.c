@@ -652,7 +652,7 @@ private:
 		POLY_V      = 2,
 		POLY_NX     = 3,
 		POLY_NY     = 4,
-		POLY_NZ     = 5,
+		POLY_NZ     = 5
 	};
 
 	//static const float ZBUFFER_MAX = 10000000000.0f;

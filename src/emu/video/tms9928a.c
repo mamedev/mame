@@ -82,6 +82,34 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag
 //  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
+tms9129_device::tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9928a_device( mconfig, TMS9129, "TMS9129", tag, owner, clock, true, true, false, "tms9129", __FILE__)
+{ }
+
+tms9918_device::tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9928a_device( mconfig, TMS9918, "TMS9918", tag, owner, clock, false, false, true, "tms9918", __FILE__)
+{ }
+
+tms9918a_device::tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9928a_device( mconfig, TMS9918A, "TMS9918A", tag, owner, clock, false, true, true, "tms9918a", __FILE__)
+{ }
+
+tms9118_device::tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9928a_device( mconfig, TMS9118, "TMS9118 VDP", tag, owner, clock, false, true, false, "tms9118", __FILE__)
+{ }
+
+tms9128_device::tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9928a_device( mconfig, TMS9128, "TMS9128 VDP", tag, owner, clock, false, true, false, "tms9128", __FILE__)
+{ }
+
+tms9929_device::tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9928a_device( mconfig, TMS9929, "TMS9929", tag, owner, clock, true, false, true, "tms9929", __FILE__)
+{ }
+
+tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9928a_device( mconfig, TMS9929A, "TMS9929A", tag, owner, clock, true, true, true, "tms9929a", __FILE__)
+{ }
+
 
 READ8_MEMBER( tms9928a_device::vram_read )
 {

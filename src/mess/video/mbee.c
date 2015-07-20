@@ -1,12 +1,12 @@
-// license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller, Robbbert
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /***************************************************************************
     microbee.c
 
     video hardware
-    Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
+    Originally written by Juergen Buchmueller, Dec 1999
 
-    Rewritten by Robbbert
+    Rewritten by Robbbert (see notes in driver file).
 
     Operation of old keyboard:
     The design is taken from the SY6545 Application Note AN3. As the CRTC

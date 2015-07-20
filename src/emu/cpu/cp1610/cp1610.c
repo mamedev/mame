@@ -46,7 +46,7 @@ const device_type CP1610 = &device_creator<cp1610_cpu_device>;
 /* set sign and zero flags */
 #define SET_SZ(n)               \
 	if (n == 0)                 \
-		m_flags |= Z;       \
+		m_flags |= Z;           \
 	else                        \
 	if (n & 0x8000)             \
 		m_flags |= S
@@ -54,45 +54,32 @@ const device_type CP1610 = &device_creator<cp1610_cpu_device>;
 /* set sign zero, and carry flags */
 #define SET_SZC(n,m)            \
 	if (n == 0)                 \
-		m_flags |= Z;       \
+		m_flags |= Z;           \
 	else                        \
 	if (n & 0x8000)             \
-		m_flags |= S;       \
+		m_flags |= S;           \
 	if ((n + m) & 0x10000)      \
 		m_flags |= C
 
 /* set carry and overflow flags */
 #define SET_COV(n,m,qq)         \
-	{ unsigned int pp = n + m;  \
+{                               \
+	unsigned int pp = n + m;    \
 	if (pp & 0x10000)           \
-		m_flags |= C;       \
+		m_flags |= C;           \
 	if (qq)                     \
 	{                           \
 		if ((n^pp)&(~(m^n))&0x8000) \
-			m_flags |= OV; \
+			m_flags |= OV;      \
 		if (m == 0x8000)        \
-			m_flags ^= OV;  \
+			m_flags ^= OV;      \
 	}                           \
 	else                        \
 	{                           \
 		if ((n^pp)&(~(m^n))&0x8000) \
 			m_flags |= OV;      \
 	}                           \
-	}
-
-#if 0
-#define SET_COV(n,m)         \
-	if ((n&0x7fff)+(m&0x7fff) > 0x7fff) \
-	{                           \
-		if (!(m_flags & C))\
-			m_flags |= OV;  \
-	}                           \
-	else                        \
-	{                           \
-		if (m_flags & C)    \
-			m_flags |= OV;  \
-	}
-#endif
+}
 
 /***********************************
  *  illegal opcodes
@@ -368,16 +355,16 @@ void cp1610_cpu_device::cp1610_rlc_2(int r)
 	{
 		case 0:
 			offset = 0;
-		break;
+			break;
 		case OV:
 			offset = 1;
-		break;
+			break;
 		case C:
 			offset = 2;
-		break;
+			break;
 		case (C | OV):
 			offset = 3;
-		break;
+			break;
 	}
 
 	CLR_SZOC;
@@ -1098,10 +1085,6 @@ void cp1610_cpu_device::cp1610_mviat_i(int m, int d)
 	m_r[m]++;
 	m_r[d] = temp;
 	m_icount -= 8;
-
-	//m_r[d] = cp1610_readmem16(m_r[m]);
-	//m_r[m]++;
-	//m_icount -= 8;
 }
 
 /***************************************************
@@ -1525,13 +1508,6 @@ void cp1610_cpu_device::cp1610_xori(int d)
 	m_r[d] ^= data;
 	SET_SZ(m_r[d]);
 	m_icount -= 8;
-}
-
-
-void cp1610_cpu_device::device_reset()
-{
-	/* This is how we set the reset vector */
-	set_input_line(CP1610_RESET, PULSE_LINE);
 }
 
 /***************************************************
@@ -2040,61 +2016,61 @@ void cp1610_cpu_device::cp1610_do_sdbd()
 	case 0x260:
 	case 0x268:
 	case 0x270:
-	case 0x278: /* 1 001 xxx xxx */ cp1610_illegal();               break;
+	case 0x278: /* 1 001 xxx xxx */ cp1610_illegal(); break;
 
-	case 0x280: /* 1 010 000 xxx */ cp1610_sdbd_mviat(0,dest);        break;
-	case 0x288: /* 1 010 001 xxx */ cp1610_sdbd_mviat(1,dest);        break;
-	case 0x290: /* 1 010 010 xxx */ cp1610_sdbd_mviat(2,dest);        break;
-	case 0x298: /* 1 010 011 xxx */ cp1610_sdbd_mviat(3,dest);        break;
-	case 0x2a0: /* 1 010 100 xxx */ cp1610_sdbd_mviat_i(4,dest);  break;
-	case 0x2a8: /* 1 010 101 xxx */ cp1610_sdbd_mviat_i(5,dest);  break;
-	case 0x2b0: /* 1 010 110 xxx */ cp1610_sdbd_mviat_d(6,dest);  break; /* ??? */
-	case 0x2b8: /* 1 010 111 xxx */ cp1610_sdbd_mvii(dest);           break;
+	case 0x280: /* 1 010 000 xxx */ cp1610_sdbd_mviat(0,dest); break;
+	case 0x288: /* 1 010 001 xxx */ cp1610_sdbd_mviat(1,dest); break;
+	case 0x290: /* 1 010 010 xxx */ cp1610_sdbd_mviat(2,dest); break;
+	case 0x298: /* 1 010 011 xxx */ cp1610_sdbd_mviat(3,dest); break;
+	case 0x2a0: /* 1 010 100 xxx */ cp1610_sdbd_mviat_i(4,dest); break;
+	case 0x2a8: /* 1 010 101 xxx */ cp1610_sdbd_mviat_i(5,dest); break;
+	case 0x2b0: /* 1 010 110 xxx */ cp1610_sdbd_mviat_d(6,dest); break; /* ??? */
+	case 0x2b8: /* 1 010 111 xxx */ cp1610_sdbd_mvii(dest); break;
 
-	case 0x2c0: /* 1 011 000 xxx */ cp1610_sdbd_addat(0,dest);        break;
-	case 0x2c8: /* 1 011 001 xxx */ cp1610_sdbd_addat(1,dest);        break;
-	case 0x2d0: /* 1 011 010 xxx */ cp1610_sdbd_addat(2,dest);        break;
-	case 0x2d8: /* 1 011 011 xxx */ cp1610_sdbd_addat(3,dest);        break;
-	case 0x2e0: /* 1 011 100 xxx */ cp1610_sdbd_addat_i(4,dest);  break;
-	case 0x2e8: /* 1 011 101 xxx */ cp1610_sdbd_addat_i(5,dest);  break;
-	case 0x2f0: /* 1 011 110 xxx */ cp1610_sdbd_addat_d(6,dest);  break; /* ??? */
-	case 0x2f8: /* 1 011 111 xxx */ cp1610_sdbd_addi(dest);           break;
+	case 0x2c0: /* 1 011 000 xxx */ cp1610_sdbd_addat(0,dest); break;
+	case 0x2c8: /* 1 011 001 xxx */ cp1610_sdbd_addat(1,dest); break;
+	case 0x2d0: /* 1 011 010 xxx */ cp1610_sdbd_addat(2,dest); break;
+	case 0x2d8: /* 1 011 011 xxx */ cp1610_sdbd_addat(3,dest); break;
+	case 0x2e0: /* 1 011 100 xxx */ cp1610_sdbd_addat_i(4,dest); break;
+	case 0x2e8: /* 1 011 101 xxx */ cp1610_sdbd_addat_i(5,dest); break;
+	case 0x2f0: /* 1 011 110 xxx */ cp1610_sdbd_addat_d(6,dest); break; /* ??? */
+	case 0x2f8: /* 1 011 111 xxx */ cp1610_sdbd_addi(dest); break;
 
-	case 0x300: /* 1 100 000 xxx */ cp1610_sdbd_subat(0,dest);        break;
-	case 0x308: /* 1 100 001 xxx */ cp1610_sdbd_subat(1,dest);        break;
-	case 0x310: /* 1 100 010 xxx */ cp1610_sdbd_subat(2,dest);        break;
-	case 0x318: /* 1 100 011 xxx */ cp1610_sdbd_subat(3,dest);        break;
-	case 0x320: /* 1 100 100 xxx */ cp1610_sdbd_subat_i(4,dest);  break;
-	case 0x328: /* 1 100 101 xxx */ cp1610_sdbd_subat_i(5,dest);  break;
-	case 0x330: /* 1 100 110 xxx */ cp1610_sdbd_subat_d(6,dest);  break; /* ??? */
-	case 0x338: /* 1 100 111 xxx */ cp1610_sdbd_subi(dest);           break;
+	case 0x300: /* 1 100 000 xxx */ cp1610_sdbd_subat(0,dest); break;
+	case 0x308: /* 1 100 001 xxx */ cp1610_sdbd_subat(1,dest); break;
+	case 0x310: /* 1 100 010 xxx */ cp1610_sdbd_subat(2,dest); break;
+	case 0x318: /* 1 100 011 xxx */ cp1610_sdbd_subat(3,dest); break;
+	case 0x320: /* 1 100 100 xxx */ cp1610_sdbd_subat_i(4,dest); break;
+	case 0x328: /* 1 100 101 xxx */ cp1610_sdbd_subat_i(5,dest); break;
+	case 0x330: /* 1 100 110 xxx */ cp1610_sdbd_subat_d(6,dest); break; /* ??? */
+	case 0x338: /* 1 100 111 xxx */ cp1610_sdbd_subi(dest); break;
 
-	case 0x340: /* 1 101 000 xxx */ cp1610_sdbd_cmpat(0,dest);        break;
-	case 0x348: /* 1 101 001 xxx */ cp1610_sdbd_cmpat(1,dest);        break;
-	case 0x350: /* 1 101 010 xxx */ cp1610_sdbd_cmpat(2,dest);        break;
-	case 0x358: /* 1 101 011 xxx */ cp1610_sdbd_cmpat(3,dest);        break;
-	case 0x360: /* 1 101 100 xxx */ cp1610_sdbd_cmpat_i(4,dest);  break;
-	case 0x368: /* 1 101 101 xxx */ cp1610_sdbd_cmpat_i(5,dest);  break;
-	case 0x370: /* 1 101 110 xxx */ cp1610_sdbd_cmpat_d(6,dest);  break; /* ??? */
-	case 0x378: /* 1 101 111 xxx */ cp1610_sdbd_cmpi(dest);           break;
+	case 0x340: /* 1 101 000 xxx */ cp1610_sdbd_cmpat(0,dest); break;
+	case 0x348: /* 1 101 001 xxx */ cp1610_sdbd_cmpat(1,dest); break;
+	case 0x350: /* 1 101 010 xxx */ cp1610_sdbd_cmpat(2,dest); break;
+	case 0x358: /* 1 101 011 xxx */ cp1610_sdbd_cmpat(3,dest); break;
+	case 0x360: /* 1 101 100 xxx */ cp1610_sdbd_cmpat_i(4,dest); break;
+	case 0x368: /* 1 101 101 xxx */ cp1610_sdbd_cmpat_i(5,dest); break;
+	case 0x370: /* 1 101 110 xxx */ cp1610_sdbd_cmpat_d(6,dest); break; /* ??? */
+	case 0x378: /* 1 101 111 xxx */ cp1610_sdbd_cmpi(dest); break;
 
-	case 0x380: /* 1 110 000 xxx */ cp1610_sdbd_andat(0,dest);        break;
-	case 0x388: /* 1 110 001 xxx */ cp1610_sdbd_andat(1,dest);        break;
-	case 0x390: /* 1 110 010 xxx */ cp1610_sdbd_andat(2,dest);        break;
-	case 0x398: /* 1 110 011 xxx */ cp1610_sdbd_andat(3,dest);        break;
-	case 0x3a0: /* 1 110 100 xxx */ cp1610_sdbd_andat_i(4,dest);  break;
-	case 0x3a8: /* 1 110 101 xxx */ cp1610_sdbd_andat_i(5,dest);  break;
-	case 0x3b0: /* 1 110 110 xxx */ cp1610_sdbd_andat_d(6,dest);  break; /* ??? */
-	case 0x3b8: /* 1 110 111 xxx */ cp1610_sdbd_andi(dest);           break;
+	case 0x380: /* 1 110 000 xxx */ cp1610_sdbd_andat(0,dest); break;
+	case 0x388: /* 1 110 001 xxx */ cp1610_sdbd_andat(1,dest); break;
+	case 0x390: /* 1 110 010 xxx */ cp1610_sdbd_andat(2,dest); break;
+	case 0x398: /* 1 110 011 xxx */ cp1610_sdbd_andat(3,dest); break;
+	case 0x3a0: /* 1 110 100 xxx */ cp1610_sdbd_andat_i(4,dest); break;
+	case 0x3a8: /* 1 110 101 xxx */ cp1610_sdbd_andat_i(5,dest); break;
+	case 0x3b0: /* 1 110 110 xxx */ cp1610_sdbd_andat_d(6,dest); break; /* ??? */
+	case 0x3b8: /* 1 110 111 xxx */ cp1610_sdbd_andi(dest); break;
 
-	case 0x3c0: /* 1 110 000 xxx */ cp1610_sdbd_xorat(0,dest);        break;
-	case 0x3c8: /* 1 110 001 xxx */ cp1610_sdbd_xorat(1,dest);        break;
-	case 0x3d0: /* 1 110 010 xxx */ cp1610_sdbd_xorat(2,dest);        break;
-	case 0x3d8: /* 1 110 011 xxx */ cp1610_sdbd_xorat(3,dest);        break;
-	case 0x3e0: /* 1 110 100 xxx */ cp1610_sdbd_xorat_i(4,dest);  break;
-	case 0x3e8: /* 1 110 101 xxx */ cp1610_sdbd_xorat_i(5,dest);  break;
-	case 0x3f0: /* 1 110 110 xxx */ cp1610_sdbd_xorat_d(6,dest);  break; /* ??? */
-	case 0x3f8: /* 1 110 111 xxx */ cp1610_sdbd_xori(dest);           break;
+	case 0x3c0: /* 1 110 000 xxx */ cp1610_sdbd_xorat(0,dest); break;
+	case 0x3c8: /* 1 110 001 xxx */ cp1610_sdbd_xorat(1,dest); break;
+	case 0x3d0: /* 1 110 010 xxx */ cp1610_sdbd_xorat(2,dest); break;
+	case 0x3d8: /* 1 110 011 xxx */ cp1610_sdbd_xorat(3,dest); break;
+	case 0x3e0: /* 1 110 100 xxx */ cp1610_sdbd_xorat_i(4,dest); break;
+	case 0x3e8: /* 1 110 101 xxx */ cp1610_sdbd_xorat_i(5,dest); break;
+	case 0x3f0: /* 1 110 110 xxx */ cp1610_sdbd_xorat_d(6,dest); break; /* ??? */
+	case 0x3f8: /* 1 110 111 xxx */ cp1610_sdbd_xori(dest); break;
 	default:                        cp1610_illegal(); break;
 	}
 }
@@ -2115,25 +2091,25 @@ void cp1610_cpu_device::cp1610_do_jumps()
 
 	switch( jumptype )
 	{
-	case 0x000: /* 0 0xx xxx x00 */ cp1610_jsr(4,addr);       break;
-	case 0x001: /* 0 0xx xxx x01 */ cp1610_jsre(4,addr);  break;
-	case 0x002: /* 0 0xx xxx x10 */ cp1610_jsrd(4,addr);  break;
-	case 0x003: /* 0 0xx xxx x11 */ cp1610_illegal();       break;
+	case 0x000: /* 0 0xx xxx x00 */ cp1610_jsr(4,addr); break;
+	case 0x001: /* 0 0xx xxx x01 */ cp1610_jsre(4,addr); break;
+	case 0x002: /* 0 0xx xxx x10 */ cp1610_jsrd(4,addr); break;
+	case 0x003: /* 0 0xx xxx x11 */ cp1610_illegal(); break;
 
-	case 0x100: /* 0 1xx xxx x00 */ cp1610_jsr(5,addr);       break;
-	case 0x101: /* 0 1xx xxx x01 */ cp1610_jsre(5,addr);  break;
-	case 0x102: /* 0 1xx xxx x10 */ cp1610_jsrd(5,addr);  break;
-	case 0x103: /* 0 1xx xxx x11 */ cp1610_illegal();       break;
+	case 0x100: /* 0 1xx xxx x00 */ cp1610_jsr(5,addr); break;
+	case 0x101: /* 0 1xx xxx x01 */ cp1610_jsre(5,addr); break;
+	case 0x102: /* 0 1xx xxx x10 */ cp1610_jsrd(5,addr); break;
+	case 0x103: /* 0 1xx xxx x11 */ cp1610_illegal(); break;
 
-	case 0x200: /* 1 0xx xxx x00 */ cp1610_jsr(6,addr);       break;
-	case 0x201: /* 1 0xx xxx x01 */ cp1610_jsre(6,addr);  break;
-	case 0x202: /* 1 0xx xxx x10 */ cp1610_jsrd(6,addr);  break;
-	case 0x203: /* 1 0xx xxx x11 */ cp1610_illegal();       break;
+	case 0x200: /* 1 0xx xxx x00 */ cp1610_jsr(6,addr); break;
+	case 0x201: /* 1 0xx xxx x01 */ cp1610_jsre(6,addr); break;
+	case 0x202: /* 1 0xx xxx x10 */ cp1610_jsrd(6,addr); break;
+	case 0x203: /* 1 0xx xxx x11 */ cp1610_illegal(); break;
 
-	case 0x300: /* 1 1xx xxx x00 */ cp1610_j(addr);           break;
-	case 0x301: /* 1 1xx xxx x01 */ cp1610_je(addr);      break;
-	case 0x302: /* 1 1xx xxx x10 */ cp1610_jd(addr);      break;
-	case 0x303: /* 1 1xx xxx x11 */ cp1610_illegal();       break;
+	case 0x300: /* 1 1xx xxx x00 */ cp1610_j(addr); break;
+	case 0x301: /* 1 1xx xxx x01 */ cp1610_je(addr); break;
+	case 0x302: /* 1 1xx xxx x10 */ cp1610_jd(addr); break;
+	case 0x303: /* 1 1xx xxx x11 */ cp1610_illegal(); break;
 	}
 
 	m_icount -= 12;
@@ -2166,104 +2142,104 @@ void cp1610_cpu_device::execute_run()
 		switch( opcode )
 		{
 		/* opcode  bitmask */
-		case 0x000: /* 0 000 000 000 */ cp1610_hlt();       break; /* TBD */
-		case 0x001: /* 0 000 000 001 */ cp1610_do_sdbd();   break;
-		case 0x002: /* 0 000 000 010 */ cp1610_eis();       break; /* TBD */
-		case 0x003: /* 0 000 000 011 */ cp1610_dis();       break; /* TBD */
-		case 0x004: /* 0 000 000 100 */ cp1610_do_jumps();  break;
-		case 0x005: /* 0 000 000 101 */ cp1610_tci();       break; /* TBD */
-		case 0x006: /* 0 000 000 110 */ cp1610_clrc();      break;
-		case 0x007: /* 0 000 000 111 */ cp1610_setc();      break;
+		case 0x000: /* 0 000 000 000 */ cp1610_hlt(); break; /* TBD */
+		case 0x001: /* 0 000 000 001 */ cp1610_do_sdbd(); break;
+		case 0x002: /* 0 000 000 010 */ cp1610_eis(); break; /* TBD */
+		case 0x003: /* 0 000 000 011 */ cp1610_dis(); break; /* TBD */
+		case 0x004: /* 0 000 000 100 */ cp1610_do_jumps(); break;
+		case 0x005: /* 0 000 000 101 */ cp1610_tci(); break; /* TBD */
+		case 0x006: /* 0 000 000 110 */ cp1610_clrc(); break;
+		case 0x007: /* 0 000 000 111 */ cp1610_setc(); break;
 
-		case 0x008: /* 0 000 001 000 */ cp1610_incr(0);       break;
-		case 0x009: /* 0 000 001 001 */ cp1610_incr(1);       break;
-		case 0x00a: /* 0 000 001 010 */ cp1610_incr(2);       break;
-		case 0x00b: /* 0 000 001 011 */ cp1610_incr(3);       break;
-		case 0x00c: /* 0 000 001 100 */ cp1610_incr(4);       break;
-		case 0x00d: /* 0 000 001 101 */ cp1610_incr(5);       break;
-		case 0x00e: /* 0 000 001 110 */ cp1610_incr(6);       break;
-		case 0x00f: /* 0 000 001 111 */ cp1610_incr(7);       break;
+		case 0x008: /* 0 000 001 000 */ cp1610_incr(0); break;
+		case 0x009: /* 0 000 001 001 */ cp1610_incr(1); break;
+		case 0x00a: /* 0 000 001 010 */ cp1610_incr(2); break;
+		case 0x00b: /* 0 000 001 011 */ cp1610_incr(3); break;
+		case 0x00c: /* 0 000 001 100 */ cp1610_incr(4); break;
+		case 0x00d: /* 0 000 001 101 */ cp1610_incr(5); break;
+		case 0x00e: /* 0 000 001 110 */ cp1610_incr(6); break;
+		case 0x00f: /* 0 000 001 111 */ cp1610_incr(7); break;
 
-		case 0x010: /* 0 000 010 000 */ cp1610_decr(0);       break;
-		case 0x011: /* 0 000 010 001 */ cp1610_decr(1);       break;
-		case 0x012: /* 0 000 010 010 */ cp1610_decr(2);       break;
-		case 0x013: /* 0 000 010 011 */ cp1610_decr(3);       break;
-		case 0x014: /* 0 000 010 100 */ cp1610_decr(4);       break;
-		case 0x015: /* 0 000 010 101 */ cp1610_decr(5);       break;
-		case 0x016: /* 0 000 010 110 */ cp1610_decr(6);       break;
-		case 0x017: /* 0 000 010 111 */ cp1610_decr(7);       break;
+		case 0x010: /* 0 000 010 000 */ cp1610_decr(0); break;
+		case 0x011: /* 0 000 010 001 */ cp1610_decr(1); break;
+		case 0x012: /* 0 000 010 010 */ cp1610_decr(2); break;
+		case 0x013: /* 0 000 010 011 */ cp1610_decr(3); break;
+		case 0x014: /* 0 000 010 100 */ cp1610_decr(4); break;
+		case 0x015: /* 0 000 010 101 */ cp1610_decr(5); break;
+		case 0x016: /* 0 000 010 110 */ cp1610_decr(6); break;
+		case 0x017: /* 0 000 010 111 */ cp1610_decr(7); break;
 
-		case 0x018: /* 0 000 011 000 */ cp1610_comr(0);       break;
-		case 0x019: /* 0 000 011 001 */ cp1610_comr(1);       break;
-		case 0x01a: /* 0 000 011 010 */ cp1610_comr(2);       break;
-		case 0x01b: /* 0 000 011 011 */ cp1610_comr(3);       break;
-		case 0x01c: /* 0 000 011 100 */ cp1610_comr(4);       break;
-		case 0x01d: /* 0 000 011 101 */ cp1610_comr(5);       break;
-		case 0x01e: /* 0 000 011 110 */ cp1610_comr(6);       break;
-		case 0x01f: /* 0 000 011 111 */ cp1610_comr(7);       break;
+		case 0x018: /* 0 000 011 000 */ cp1610_comr(0); break;
+		case 0x019: /* 0 000 011 001 */ cp1610_comr(1); break;
+		case 0x01a: /* 0 000 011 010 */ cp1610_comr(2); break;
+		case 0x01b: /* 0 000 011 011 */ cp1610_comr(3); break;
+		case 0x01c: /* 0 000 011 100 */ cp1610_comr(4); break;
+		case 0x01d: /* 0 000 011 101 */ cp1610_comr(5); break;
+		case 0x01e: /* 0 000 011 110 */ cp1610_comr(6); break;
+		case 0x01f: /* 0 000 011 111 */ cp1610_comr(7); break;
 
-		case 0x020: /* 0 000 100 000 */ cp1610_negr(0);       break;
-		case 0x021: /* 0 000 100 001 */ cp1610_negr(1);       break;
-		case 0x022: /* 0 000 100 010 */ cp1610_negr(2);       break;
-		case 0x023: /* 0 000 100 011 */ cp1610_negr(3);       break;
-		case 0x024: /* 0 000 100 100 */ cp1610_negr(4);       break;
-		case 0x025: /* 0 000 100 101 */ cp1610_negr(5);       break;
-		case 0x026: /* 0 000 100 110 */ cp1610_negr(6);       break;
-		case 0x027: /* 0 000 100 111 */ cp1610_negr(7);       break;
+		case 0x020: /* 0 000 100 000 */ cp1610_negr(0); break;
+		case 0x021: /* 0 000 100 001 */ cp1610_negr(1); break;
+		case 0x022: /* 0 000 100 010 */ cp1610_negr(2); break;
+		case 0x023: /* 0 000 100 011 */ cp1610_negr(3); break;
+		case 0x024: /* 0 000 100 100 */ cp1610_negr(4); break;
+		case 0x025: /* 0 000 100 101 */ cp1610_negr(5); break;
+		case 0x026: /* 0 000 100 110 */ cp1610_negr(6); break;
+		case 0x027: /* 0 000 100 111 */ cp1610_negr(7); break;
 
-		case 0x028: /* 0 000 101 000 */ cp1610_adcr(0);       break;
-		case 0x029: /* 0 000 101 001 */ cp1610_adcr(1);       break;
-		case 0x02a: /* 0 000 101 010 */ cp1610_adcr(2);       break;
-		case 0x02b: /* 0 000 101 011 */ cp1610_adcr(3);       break;
-		case 0x02c: /* 0 000 101 100 */ cp1610_adcr(4);       break;
-		case 0x02d: /* 0 000 101 101 */ cp1610_adcr(5);       break;
-		case 0x02e: /* 0 000 101 110 */ cp1610_adcr(6);       break;
-		case 0x02f: /* 0 000 101 111 */ cp1610_adcr(7);       break;
+		case 0x028: /* 0 000 101 000 */ cp1610_adcr(0); break;
+		case 0x029: /* 0 000 101 001 */ cp1610_adcr(1); break;
+		case 0x02a: /* 0 000 101 010 */ cp1610_adcr(2); break;
+		case 0x02b: /* 0 000 101 011 */ cp1610_adcr(3); break;
+		case 0x02c: /* 0 000 101 100 */ cp1610_adcr(4); break;
+		case 0x02d: /* 0 000 101 101 */ cp1610_adcr(5); break;
+		case 0x02e: /* 0 000 101 110 */ cp1610_adcr(6); break;
+		case 0x02f: /* 0 000 101 111 */ cp1610_adcr(7); break;
 
-		case 0x030: /* 0 000 110 000 */ cp1610_gswd(0);       break;
-		case 0x031: /* 0 000 110 001 */ cp1610_gswd(1);       break;
-		case 0x032: /* 0 000 110 010 */ cp1610_gswd(2);       break;
-		case 0x033: /* 0 000 110 011 */ cp1610_gswd(3);       break;
-		case 0x034: /* 0 000 110 100 */ cp1610_nop();       break;
-		case 0x035: /* 0 000 110 101 */ cp1610_nop();       break;
-		case 0x036: /* 0 000 110 110 */ cp1610_sin();       break; /* TBD */
-		case 0x037: /* 0 000 110 111 */ cp1610_sin();       break; /* TBD */
+		case 0x030: /* 0 000 110 000 */ cp1610_gswd(0); break;
+		case 0x031: /* 0 000 110 001 */ cp1610_gswd(1); break;
+		case 0x032: /* 0 000 110 010 */ cp1610_gswd(2); break;
+		case 0x033: /* 0 000 110 011 */ cp1610_gswd(3); break;
+		case 0x034: /* 0 000 110 100 */ cp1610_nop(); break;
+		case 0x035: /* 0 000 110 101 */ cp1610_nop(); break;
+		case 0x036: /* 0 000 110 110 */ cp1610_sin(); break; /* TBD */
+		case 0x037: /* 0 000 110 111 */ cp1610_sin(); break; /* TBD */
 
-		case 0x038: /* 0 000 111 000 */ cp1610_rswd(0);       break;
-		case 0x039: /* 0 000 111 001 */ cp1610_rswd(1);       break;
-		case 0x03a: /* 0 000 111 010 */ cp1610_rswd(2);       break;
-		case 0x03b: /* 0 000 111 011 */ cp1610_rswd(3);       break;
-		case 0x03c: /* 0 000 111 100 */ cp1610_rswd(4);       break;
-		case 0x03d: /* 0 000 111 101 */ cp1610_rswd(5);       break;
-		case 0x03e: /* 0 000 111 110 */ cp1610_rswd(6);       break;
-		case 0x03f: /* 0 000 111 111 */ cp1610_rswd(7);       break;
+		case 0x038: /* 0 000 111 000 */ cp1610_rswd(0); break;
+		case 0x039: /* 0 000 111 001 */ cp1610_rswd(1); break;
+		case 0x03a: /* 0 000 111 010 */ cp1610_rswd(2); break;
+		case 0x03b: /* 0 000 111 011 */ cp1610_rswd(3); break;
+		case 0x03c: /* 0 000 111 100 */ cp1610_rswd(4); break;
+		case 0x03d: /* 0 000 111 101 */ cp1610_rswd(5); break;
+		case 0x03e: /* 0 000 111 110 */ cp1610_rswd(6); break;
+		case 0x03f: /* 0 000 111 111 */ cp1610_rswd(7); break;
 
-		case 0x040: /* 0 001 000 000 */ cp1610_swap(0);       break;
-		case 0x041: /* 0 001 000 001 */ cp1610_swap(1);       break;
-		case 0x042: /* 0 001 000 010 */ cp1610_swap(2);       break;
-		case 0x043: /* 0 001 000 011 */ cp1610_swap(3);       break;
-		case 0x044: /* 0 001 000 100 */ cp1610_dswap(0);  break;
-		case 0x045: /* 0 001 000 101 */ cp1610_dswap(1);  break;
-		case 0x046: /* 0 001 000 110 */ cp1610_dswap(2);  break;
-		case 0x047: /* 0 001 000 111 */ cp1610_dswap(3);  break;
+		case 0x040: /* 0 001 000 000 */ cp1610_swap(0); break;
+		case 0x041: /* 0 001 000 001 */ cp1610_swap(1); break;
+		case 0x042: /* 0 001 000 010 */ cp1610_swap(2); break;
+		case 0x043: /* 0 001 000 011 */ cp1610_swap(3); break;
+		case 0x044: /* 0 001 000 100 */ cp1610_dswap(0); break;
+		case 0x045: /* 0 001 000 101 */ cp1610_dswap(1); break;
+		case 0x046: /* 0 001 000 110 */ cp1610_dswap(2); break;
+		case 0x047: /* 0 001 000 111 */ cp1610_dswap(3); break;
 
-		case 0x048: /* 0 001 001 000 */ cp1610_sll_1(0);  break;
-		case 0x049: /* 0 001 001 001 */ cp1610_sll_1(1);  break;
-		case 0x04a: /* 0 001 001 010 */ cp1610_sll_1(2);  break;
-		case 0x04b: /* 0 001 001 011 */ cp1610_sll_1(3);  break;
-		case 0x04c: /* 0 001 001 100 */ cp1610_sll_2(0);  break;
-		case 0x04d: /* 0 001 001 101 */ cp1610_sll_2(1);  break;
-		case 0x04e: /* 0 001 001 110 */ cp1610_sll_2(2);  break;
-		case 0x04f: /* 0 001 001 111 */ cp1610_sll_2(3);  break;
+		case 0x048: /* 0 001 001 000 */ cp1610_sll_1(0); break;
+		case 0x049: /* 0 001 001 001 */ cp1610_sll_1(1); break;
+		case 0x04a: /* 0 001 001 010 */ cp1610_sll_1(2); break;
+		case 0x04b: /* 0 001 001 011 */ cp1610_sll_1(3); break;
+		case 0x04c: /* 0 001 001 100 */ cp1610_sll_2(0); break;
+		case 0x04d: /* 0 001 001 101 */ cp1610_sll_2(1); break;
+		case 0x04e: /* 0 001 001 110 */ cp1610_sll_2(2); break;
+		case 0x04f: /* 0 001 001 111 */ cp1610_sll_2(3); break;
 
-		case 0x050: /* 0 001 010 000 */ cp1610_rlc_1(0);  break;
-		case 0x051: /* 0 001 010 001 */ cp1610_rlc_1(1);  break;
-		case 0x052: /* 0 001 010 010 */ cp1610_rlc_1(2);  break;
-		case 0x053: /* 0 001 010 011 */ cp1610_rlc_1(3);  break;
-		case 0x054: /* 0 001 010 100 */ cp1610_rlc_2(0);  break;
-		case 0x055: /* 0 001 010 101 */ cp1610_rlc_2(1);  break;
-		case 0x056: /* 0 001 010 110 */ cp1610_rlc_2(2);  break;
-		case 0x057: /* 0 001 010 111 */ cp1610_rlc_2(3);  break;
+		case 0x050: /* 0 001 010 000 */ cp1610_rlc_1(0); break;
+		case 0x051: /* 0 001 010 001 */ cp1610_rlc_1(1); break;
+		case 0x052: /* 0 001 010 010 */ cp1610_rlc_1(2); break;
+		case 0x053: /* 0 001 010 011 */ cp1610_rlc_1(3); break;
+		case 0x054: /* 0 001 010 100 */ cp1610_rlc_2(0); break;
+		case 0x055: /* 0 001 010 101 */ cp1610_rlc_2(1); break;
+		case 0x056: /* 0 001 010 110 */ cp1610_rlc_2(2); break;
+		case 0x057: /* 0 001 010 111 */ cp1610_rlc_2(3); break;
 
 		case 0x058: /* 0 001 011 000 */ cp1610_sllc_1(0); break;
 		case 0x059: /* 0 001 011 001 */ cp1610_sllc_1(1); break;
@@ -2274,32 +2250,32 @@ void cp1610_cpu_device::execute_run()
 		case 0x05e: /* 0 001 011 110 */ cp1610_sllc_2(2); break;
 		case 0x05f: /* 0 001 011 111 */ cp1610_sllc_2(3); break;
 
-		case 0x060: /* 0 001 100 000 */ cp1610_slr_1(0);  break;
-		case 0x061: /* 0 001 100 001 */ cp1610_slr_1(1);  break;
-		case 0x062: /* 0 001 100 010 */ cp1610_slr_1(2);  break;
-		case 0x063: /* 0 001 100 011 */ cp1610_slr_1(3);  break;
-		case 0x064: /* 0 001 100 100 */ cp1610_slr_2(0);  break;
-		case 0x065: /* 0 001 100 101 */ cp1610_slr_2(1);  break;
-		case 0x066: /* 0 001 100 110 */ cp1610_slr_2(2);  break;
-		case 0x067: /* 0 001 100 111 */ cp1610_slr_2(3);  break;
+		case 0x060: /* 0 001 100 000 */ cp1610_slr_1(0); break;
+		case 0x061: /* 0 001 100 001 */ cp1610_slr_1(1); break;
+		case 0x062: /* 0 001 100 010 */ cp1610_slr_1(2); break;
+		case 0x063: /* 0 001 100 011 */ cp1610_slr_1(3); break;
+		case 0x064: /* 0 001 100 100 */ cp1610_slr_2(0); break;
+		case 0x065: /* 0 001 100 101 */ cp1610_slr_2(1); break;
+		case 0x066: /* 0 001 100 110 */ cp1610_slr_2(2); break;
+		case 0x067: /* 0 001 100 111 */ cp1610_slr_2(3); break;
 
-		case 0x068: /* 0 001 101 000 */ cp1610_sar_1(0);  break;
-		case 0x069: /* 0 001 101 001 */ cp1610_sar_1(1);  break;
-		case 0x06a: /* 0 001 101 010 */ cp1610_sar_1(2);  break;
-		case 0x06b: /* 0 001 101 011 */ cp1610_sar_1(3);  break;
-		case 0x06c: /* 0 001 101 100 */ cp1610_sar_2(0);  break;
-		case 0x06d: /* 0 001 101 101 */ cp1610_sar_2(1);  break;
-		case 0x06e: /* 0 001 101 110 */ cp1610_sar_2(2);  break;
-		case 0x06f: /* 0 001 101 111 */ cp1610_sar_2(3);  break;
+		case 0x068: /* 0 001 101 000 */ cp1610_sar_1(0); break;
+		case 0x069: /* 0 001 101 001 */ cp1610_sar_1(1); break;
+		case 0x06a: /* 0 001 101 010 */ cp1610_sar_1(2); break;
+		case 0x06b: /* 0 001 101 011 */ cp1610_sar_1(3); break;
+		case 0x06c: /* 0 001 101 100 */ cp1610_sar_2(0); break;
+		case 0x06d: /* 0 001 101 101 */ cp1610_sar_2(1); break;
+		case 0x06e: /* 0 001 101 110 */ cp1610_sar_2(2); break;
+		case 0x06f: /* 0 001 101 111 */ cp1610_sar_2(3); break;
 
-		case 0x070: /* 0 001 110 000 */ cp1610_rrc_1(0);  break;
-		case 0x071: /* 0 001 110 001 */ cp1610_rrc_1(1);  break;
-		case 0x072: /* 0 001 110 010 */ cp1610_rrc_1(2);  break;
-		case 0x073: /* 0 001 110 011 */ cp1610_rrc_1(3);  break;
-		case 0x074: /* 0 001 110 100 */ cp1610_rrc_2(0);  break;
-		case 0x075: /* 0 001 110 101 */ cp1610_rrc_2(1);  break;
-		case 0x076: /* 0 001 110 110 */ cp1610_rrc_2(2);  break;
-		case 0x077: /* 0 001 110 111 */ cp1610_rrc_2(3);  break;
+		case 0x070: /* 0 001 110 000 */ cp1610_rrc_1(0); break;
+		case 0x071: /* 0 001 110 001 */ cp1610_rrc_1(1); break;
+		case 0x072: /* 0 001 110 010 */ cp1610_rrc_1(2); break;
+		case 0x073: /* 0 001 110 011 */ cp1610_rrc_1(3); break;
+		case 0x074: /* 0 001 110 100 */ cp1610_rrc_2(0); break;
+		case 0x075: /* 0 001 110 101 */ cp1610_rrc_2(1); break;
+		case 0x076: /* 0 001 110 110 */ cp1610_rrc_2(2); break;
+		case 0x077: /* 0 001 110 111 */ cp1610_rrc_2(3); break;
 
 		case 0x078: /* 0 001 111 000 */ cp1610_sarc_1(0); break;
 		case 0x079: /* 0 001 111 001 */ cp1610_sarc_1(1); break;
@@ -2310,7 +2286,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x07e: /* 0 001 111 110 */ cp1610_sarc_2(2); break;
 		case 0x07f: /* 0 001 111 111 */ cp1610_sarc_2(3); break;
 
-		case 0x080: /* 0 010 000 000 */ cp1610_tstr(0);       break;
+		case 0x080: /* 0 010 000 000 */ cp1610_tstr(0); break;
 		case 0x081: /* 0 010 000 001 */ cp1610_movr(0,1); break;
 		case 0x082: /* 0 010 000 010 */ cp1610_movr(0,2); break;
 		case 0x083: /* 0 010 000 011 */ cp1610_movr(0,3); break;
@@ -2320,7 +2296,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x087: /* 0 010 000 111 */ cp1610_movr(0,7); break; /* jr */
 
 		case 0x088: /* 0 010 001 000 */ cp1610_movr(1,0); break;
-		case 0x089: /* 0 010 001 001 */ cp1610_tstr(1);       break;
+		case 0x089: /* 0 010 001 001 */ cp1610_tstr(1); break;
 		case 0x08a: /* 0 010 001 010 */ cp1610_movr(1,2); break;
 		case 0x08b: /* 0 010 001 011 */ cp1610_movr(1,3); break;
 		case 0x08c: /* 0 010 001 100 */ cp1610_movr(1,4); break;
@@ -2330,7 +2306,7 @@ void cp1610_cpu_device::execute_run()
 
 		case 0x090: /* 0 010 010 000 */ cp1610_movr(2,0); break;
 		case 0x091: /* 0 010 010 001 */ cp1610_movr(2,1); break;
-		case 0x092: /* 0 010 010 010 */ cp1610_tstr(2);       break;
+		case 0x092: /* 0 010 010 010 */ cp1610_tstr(2); break;
 		case 0x093: /* 0 010 010 011 */ cp1610_movr(2,3); break;
 		case 0x094: /* 0 010 010 100 */ cp1610_movr(2,4); break;
 		case 0x095: /* 0 010 010 101 */ cp1610_movr(2,5); break;
@@ -2340,7 +2316,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x098: /* 0 010 011 000 */ cp1610_movr(3,0); break;
 		case 0x099: /* 0 010 011 001 */ cp1610_movr(3,1); break;
 		case 0x09a: /* 0 010 011 010 */ cp1610_movr(3,2); break;
-		case 0x09b: /* 0 010 011 011 */ cp1610_tstr(3);       break;
+		case 0x09b: /* 0 010 011 011 */ cp1610_tstr(3); break;
 		case 0x09c: /* 0 010 011 100 */ cp1610_movr(3,4); break;
 		case 0x09d: /* 0 010 011 101 */ cp1610_movr(3,5); break;
 		case 0x09e: /* 0 010 011 110 */ cp1610_movr(3,6); break;
@@ -2350,7 +2326,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x0a1: /* 0 010 100 001 */ cp1610_movr(4,1); break;
 		case 0x0a2: /* 0 010 100 010 */ cp1610_movr(4,2); break;
 		case 0x0a3: /* 0 010 100 011 */ cp1610_movr(4,3); break;
-		case 0x0a4: /* 0 010 100 100 */ cp1610_tstr(4);       break;
+		case 0x0a4: /* 0 010 100 100 */ cp1610_tstr(4); break;
 		case 0x0a5: /* 0 010 100 101 */ cp1610_movr(4,5); break;
 		case 0x0a6: /* 0 010 100 110 */ cp1610_movr(4,6); break;
 		case 0x0a7: /* 0 010 100 111 */ cp1610_movr(4,7); break; /* jr */
@@ -2360,7 +2336,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x0aa: /* 0 010 101 010 */ cp1610_movr(5,2); break;
 		case 0x0ab: /* 0 010 101 011 */ cp1610_movr(5,3); break;
 		case 0x0ac: /* 0 010 101 100 */ cp1610_movr(5,4); break;
-		case 0x0ad: /* 0 010 101 101 */ cp1610_tstr(5);       break;
+		case 0x0ad: /* 0 010 101 101 */ cp1610_tstr(5); break;
 		case 0x0ae: /* 0 010 101 110 */ cp1610_movr(5,6); break;
 		case 0x0af: /* 0 010 101 111 */ cp1610_movr(5,7); break; /* jr */
 
@@ -2370,7 +2346,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x0b3: /* 0 010 110 011 */ cp1610_movr(6,3); break;
 		case 0x0b4: /* 0 010 110 100 */ cp1610_movr(6,4); break;
 		case 0x0b5: /* 0 010 110 101 */ cp1610_movr(6,5); break;
-		case 0x0b6: /* 0 010 110 110 */ cp1610_tstr(6);       break;
+		case 0x0b6: /* 0 010 110 110 */ cp1610_tstr(6); break;
 		case 0x0b7: /* 0 010 110 111 */ cp1610_movr(6,7); break; /* jr */
 
 		case 0x0b8: /* 0 010 111 000 */ cp1610_movr(7,0); break;
@@ -2380,7 +2356,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x0bc: /* 0 010 111 100 */ cp1610_movr(7,4); break;
 		case 0x0bd: /* 0 010 111 101 */ cp1610_movr(7,5); break;
 		case 0x0be: /* 0 010 111 110 */ cp1610_movr(7,6); break;
-		case 0x0bf: /* 0 010 111 111 */ cp1610_tstr(7);       break;
+		case 0x0bf: /* 0 010 111 111 */ cp1610_tstr(7); break;
 
 		case 0x0c0: /* 0 011 000 000 */ cp1610_addr(0,0); break;
 		case 0x0c1: /* 0 011 000 001 */ cp1610_addr(0,1); break;
@@ -2670,7 +2646,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x1be: /* 0 110 111 110 */ cp1610_andr(7,6); break;
 		case 0x1bf: /* 0 110 111 111 */ cp1610_andr(7,7); break;
 
-		case 0x1c0: /* 0 111 000 000 */ cp1610_clrr(0);       break;
+		case 0x1c0: /* 0 111 000 000 */ cp1610_clrr(0); break;
 		case 0x1c1: /* 0 111 000 001 */ cp1610_xorr(0,1); break;
 		case 0x1c2: /* 0 111 000 010 */ cp1610_xorr(0,2); break;
 		case 0x1c3: /* 0 111 000 011 */ cp1610_xorr(0,3); break;
@@ -2680,7 +2656,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x1c7: /* 0 111 000 111 */ cp1610_xorr(0,7); break;
 
 		case 0x1c8: /* 0 111 001 000 */ cp1610_xorr(1,0); break;
-		case 0x1c9: /* 0 111 001 001 */ cp1610_clrr(1);       break;
+		case 0x1c9: /* 0 111 001 001 */ cp1610_clrr(1); break;
 		case 0x1ca: /* 0 111 001 010 */ cp1610_xorr(1,2); break;
 		case 0x1cb: /* 0 111 001 011 */ cp1610_xorr(1,3); break;
 		case 0x1cc: /* 0 111 001 100 */ cp1610_xorr(1,4); break;
@@ -2690,7 +2666,7 @@ void cp1610_cpu_device::execute_run()
 
 		case 0x1d0: /* 0 111 010 000 */ cp1610_xorr(2,0); break;
 		case 0x1d1: /* 0 111 010 001 */ cp1610_xorr(2,1); break;
-		case 0x1d2: /* 0 111 010 010 */ cp1610_clrr(2);       break;
+		case 0x1d2: /* 0 111 010 010 */ cp1610_clrr(2); break;
 		case 0x1d3: /* 0 111 010 011 */ cp1610_xorr(2,3); break;
 		case 0x1d4: /* 0 111 010 100 */ cp1610_xorr(2,4); break;
 		case 0x1d5: /* 0 111 010 101 */ cp1610_xorr(2,5); break;
@@ -2700,7 +2676,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x1d8: /* 0 111 011 000 */ cp1610_xorr(3,0); break;
 		case 0x1d9: /* 0 111 011 001 */ cp1610_xorr(3,1); break;
 		case 0x1da: /* 0 111 011 010 */ cp1610_xorr(3,2); break;
-		case 0x1db: /* 0 111 011 011 */ cp1610_clrr(3);       break;
+		case 0x1db: /* 0 111 011 011 */ cp1610_clrr(3); break;
 		case 0x1dc: /* 0 111 011 100 */ cp1610_xorr(3,4); break;
 		case 0x1dd: /* 0 111 011 101 */ cp1610_xorr(3,5); break;
 		case 0x1de: /* 0 111 011 110 */ cp1610_xorr(3,6); break;
@@ -2710,7 +2686,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x1e1: /* 0 111 100 001 */ cp1610_xorr(4,1); break;
 		case 0x1e2: /* 0 111 100 010 */ cp1610_xorr(4,2); break;
 		case 0x1e3: /* 0 111 100 011 */ cp1610_xorr(4,3); break;
-		case 0x1e4: /* 0 111 100 100 */ cp1610_clrr(4);       break;
+		case 0x1e4: /* 0 111 100 100 */ cp1610_clrr(4); break;
 		case 0x1e5: /* 0 111 100 101 */ cp1610_xorr(4,5); break;
 		case 0x1e6: /* 0 111 100 110 */ cp1610_xorr(4,6); break;
 		case 0x1e7: /* 0 111 100 111 */ cp1610_xorr(4,7); break;
@@ -2720,7 +2696,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x1ea: /* 0 111 101 010 */ cp1610_xorr(5,2); break;
 		case 0x1eb: /* 0 111 101 011 */ cp1610_xorr(5,3); break;
 		case 0x1ec: /* 0 111 101 100 */ cp1610_xorr(5,4); break;
-		case 0x1ed: /* 0 111 101 101 */ cp1610_clrr(5);       break;
+		case 0x1ed: /* 0 111 101 101 */ cp1610_clrr(5); break;
 		case 0x1ee: /* 0 111 101 110 */ cp1610_xorr(5,6); break;
 		case 0x1ef: /* 0 111 101 111 */ cp1610_xorr(5,7); break;
 
@@ -2730,7 +2706,7 @@ void cp1610_cpu_device::execute_run()
 		case 0x1f3: /* 0 111 110 011 */ cp1610_xorr(6,3); break;
 		case 0x1f4: /* 0 111 110 100 */ cp1610_xorr(6,4); break;
 		case 0x1f5: /* 0 111 110 101 */ cp1610_xorr(6,5); break;
-		case 0x1f6: /* 0 111 110 110 */ cp1610_clrr(6);       break;
+		case 0x1f6: /* 0 111 110 110 */ cp1610_clrr(6); break;
 		case 0x1f7: /* 0 111 110 111 */ cp1610_xorr(6,7); break;
 
 		case 0x1f8: /* 0 111 111 000 */ cp1610_xorr(7,0); break;
@@ -2740,25 +2716,25 @@ void cp1610_cpu_device::execute_run()
 		case 0x1fc: /* 0 111 111 100 */ cp1610_xorr(7,4); break;
 		case 0x1fd: /* 0 111 111 101 */ cp1610_xorr(7,5); break;
 		case 0x1fe: /* 0 111 111 110 */ cp1610_xorr(7,6); break;
-		case 0x1ff: /* 0 110 111 111 */ cp1610_clrr(7);       break;
+		case 0x1ff: /* 0 110 111 111 */ cp1610_clrr(7); break;
 
-		case 0x200: /* 1 000 000 000 */ cp1610_b(0);      break;
-		case 0x201: /* 1 000 000 001 */ cp1610_bc(0);     break; /* aka BLGE */
-		case 0x202: /* 1 000 000 010 */ cp1610_bov(0);        break;
-		case 0x203: /* 1 000 000 011 */ cp1610_bpl(0);        break;
-		case 0x204: /* 1 000 000 100 */ cp1610_bze(0);        break; /* aka BEQ */
-		case 0x205: /* 1 000 000 101 */ cp1610_blt(0);        break;
-		case 0x206: /* 1 000 000 110 */ cp1610_ble(0);        break;
-		case 0x207: /* 1 000 000 111 */ cp1610_busc(0);       break;
+		case 0x200: /* 1 000 000 000 */ cp1610_b(0); break;
+		case 0x201: /* 1 000 000 001 */ cp1610_bc(0); break; /* aka BLGE */
+		case 0x202: /* 1 000 000 010 */ cp1610_bov(0); break;
+		case 0x203: /* 1 000 000 011 */ cp1610_bpl(0); break;
+		case 0x204: /* 1 000 000 100 */ cp1610_bze(0); break; /* aka BEQ */
+		case 0x205: /* 1 000 000 101 */ cp1610_blt(0); break;
+		case 0x206: /* 1 000 000 110 */ cp1610_ble(0); break;
+		case 0x207: /* 1 000 000 111 */ cp1610_busc(0); break;
 
-		case 0x208: /* 1 000 001 000 */ cp1610_nopp(0);       break;
-		case 0x209: /* 1 000 001 001 */ cp1610_bnc(0);        break; /* aka BLLT */
-		case 0x20a: /* 1 000 001 010 */ cp1610_bnov(0);       break;
-		case 0x20b: /* 1 000 001 011 */ cp1610_bmi(0);        break;
-		case 0x20c: /* 1 000 001 100 */ cp1610_bnze(0);       break; /* aka BNEQ */
-		case 0x20d: /* 1 000 001 101 */ cp1610_bge(0);        break;
-		case 0x20e: /* 1 000 001 110 */ cp1610_bgt(0);        break;
-		case 0x20f: /* 1 000 001 111 */ cp1610_besc(0);       break;
+		case 0x208: /* 1 000 001 000 */ cp1610_nopp(0); break;
+		case 0x209: /* 1 000 001 001 */ cp1610_bnc(0); break; /* aka BLLT */
+		case 0x20a: /* 1 000 001 010 */ cp1610_bnov(0); break;
+		case 0x20b: /* 1 000 001 011 */ cp1610_bmi(0); break;
+		case 0x20c: /* 1 000 001 100 */ cp1610_bnze(0); break; /* aka BNEQ */
+		case 0x20d: /* 1 000 001 101 */ cp1610_bge(0); break;
+		case 0x20e: /* 1 000 001 110 */ cp1610_bgt(0); break;
+		case 0x20f: /* 1 000 001 111 */ cp1610_besc(0); break;
 
 		case 0x210: /* 1 000 010 000 */ cp1610_bext(0,0); break;
 		case 0x211: /* 1 000 010 001 */ cp1610_bext(1,0); break;
@@ -2771,552 +2747,552 @@ void cp1610_cpu_device::execute_run()
 
 		case 0x218: /* 1 000 011 000 */ cp1610_bext(8,0); break;
 		case 0x219: /* 1 000 011 001 */ cp1610_bext(9,0); break;
-		case 0x21a: /* 1 000 011 010 */ cp1610_bext(10,0);    break;
-		case 0x21b: /* 1 000 011 011 */ cp1610_bext(11,0);    break;
-		case 0x21c: /* 1 000 011 100 */ cp1610_bext(12,0);    break;
-		case 0x21d: /* 1 000 011 101 */ cp1610_bext(13,0);    break;
-		case 0x21e: /* 1 000 011 110 */ cp1610_bext(14,0);    break;
-		case 0x21f: /* 1 000 011 111 */ cp1610_bext(15,0);    break;
+		case 0x21a: /* 1 000 011 010 */ cp1610_bext(10,0); break;
+		case 0x21b: /* 1 000 011 011 */ cp1610_bext(11,0); break;
+		case 0x21c: /* 1 000 011 100 */ cp1610_bext(12,0); break;
+		case 0x21d: /* 1 000 011 101 */ cp1610_bext(13,0); break;
+		case 0x21e: /* 1 000 011 110 */ cp1610_bext(14,0); break;
+		case 0x21f: /* 1 000 011 111 */ cp1610_bext(15,0); break;
 
-		case 0x220: /* 1 000 100 000 */ cp1610_b(0xffff);     break;
-		case 0x221: /* 1 000 100 001 */ cp1610_bc(0xffff);        break; /* aka BLGE */
-		case 0x222: /* 1 000 100 010 */ cp1610_bov(0xffff);       break;
-		case 0x223: /* 1 000 100 011 */ cp1610_bpl(0xffff);       break;
-		case 0x224: /* 1 000 100 100 */ cp1610_bze(0xffff);       break; /* aka BEQ */
-		case 0x225: /* 1 000 100 101 */ cp1610_blt(0xffff);       break;
-		case 0x226: /* 1 000 100 110 */ cp1610_ble(0xffff);       break;
-		case 0x227: /* 1 000 100 111 */ cp1610_busc(0xffff);  break;
+		case 0x220: /* 1 000 100 000 */ cp1610_b(0xffff); break;
+		case 0x221: /* 1 000 100 001 */ cp1610_bc(0xffff); break; /* aka BLGE */
+		case 0x222: /* 1 000 100 010 */ cp1610_bov(0xffff); break;
+		case 0x223: /* 1 000 100 011 */ cp1610_bpl(0xffff); break;
+		case 0x224: /* 1 000 100 100 */ cp1610_bze(0xffff); break; /* aka BEQ */
+		case 0x225: /* 1 000 100 101 */ cp1610_blt(0xffff); break;
+		case 0x226: /* 1 000 100 110 */ cp1610_ble(0xffff); break;
+		case 0x227: /* 1 000 100 111 */ cp1610_busc(0xffff); break;
 
-		case 0x228: /* 1 000 101 000 */ cp1610_nopp(0xffff);  break;
-		case 0x229: /* 1 000 101 001 */ cp1610_bnc(0xffff);       break; /* aka BLLT */
-		case 0x22a: /* 1 000 101 010 */ cp1610_bnov(0xffff);  break;
-		case 0x22b: /* 1 000 101 011 */ cp1610_bmi(0xffff);       break;
-		case 0x22c: /* 1 000 101 100 */ cp1610_bnze(0xffff);  break; /* aka BNEQ */
-		case 0x22d: /* 1 000 101 101 */ cp1610_bge(0xffff);       break;
-		case 0x22e: /* 1 000 101 110 */ cp1610_bgt(0xffff);       break;
-		case 0x22f: /* 1 000 101 111 */ cp1610_besc(0xffff);  break;
+		case 0x228: /* 1 000 101 000 */ cp1610_nopp(0xffff); break;
+		case 0x229: /* 1 000 101 001 */ cp1610_bnc(0xffff); break; /* aka BLLT */
+		case 0x22a: /* 1 000 101 010 */ cp1610_bnov(0xffff); break;
+		case 0x22b: /* 1 000 101 011 */ cp1610_bmi(0xffff); break;
+		case 0x22c: /* 1 000 101 100 */ cp1610_bnze(0xffff); break; /* aka BNEQ */
+		case 0x22d: /* 1 000 101 101 */ cp1610_bge(0xffff); break;
+		case 0x22e: /* 1 000 101 110 */ cp1610_bgt(0xffff); break;
+		case 0x22f: /* 1 000 101 111 */ cp1610_besc(0xffff); break;
 
-		case 0x230: /* 1 000 110 000 */ cp1610_bext(0,0xffff);    break;
-		case 0x231: /* 1 000 110 001 */ cp1610_bext(1,0xffff);    break;
-		case 0x232: /* 1 000 110 010 */ cp1610_bext(2,0xffff);    break;
-		case 0x233: /* 1 000 110 011 */ cp1610_bext(3,0xffff);    break;
-		case 0x234: /* 1 000 110 100 */ cp1610_bext(4,0xffff);    break;
-		case 0x235: /* 1 000 110 101 */ cp1610_bext(5,0xffff);    break;
-		case 0x236: /* 1 000 110 110 */ cp1610_bext(6,0xffff);    break;
-		case 0x237: /* 1 000 110 111 */ cp1610_bext(7,0xffff);    break;
+		case 0x230: /* 1 000 110 000 */ cp1610_bext(0,0xffff); break;
+		case 0x231: /* 1 000 110 001 */ cp1610_bext(1,0xffff); break;
+		case 0x232: /* 1 000 110 010 */ cp1610_bext(2,0xffff); break;
+		case 0x233: /* 1 000 110 011 */ cp1610_bext(3,0xffff); break;
+		case 0x234: /* 1 000 110 100 */ cp1610_bext(4,0xffff); break;
+		case 0x235: /* 1 000 110 101 */ cp1610_bext(5,0xffff); break;
+		case 0x236: /* 1 000 110 110 */ cp1610_bext(6,0xffff); break;
+		case 0x237: /* 1 000 110 111 */ cp1610_bext(7,0xffff); break;
 
-		case 0x238: /* 1 000 111 000 */ cp1610_bext(8,0xffff);    break;
-		case 0x239: /* 1 000 111 001 */ cp1610_bext(9,0xffff);    break;
-		case 0x23a: /* 1 000 111 010 */ cp1610_bext(10,0xffff);   break;
-		case 0x23b: /* 1 000 111 011 */ cp1610_bext(11,0xffff);   break;
-		case 0x23c: /* 1 000 111 100 */ cp1610_bext(12,0xffff);   break;
-		case 0x23d: /* 1 000 111 101 */ cp1610_bext(13,0xffff);   break;
-		case 0x23e: /* 1 000 111 110 */ cp1610_bext(14,0xffff);   break;
-		case 0x23f: /* 1 000 111 111 */ cp1610_bext(15,0xffff);   break;
+		case 0x238: /* 1 000 111 000 */ cp1610_bext(8,0xffff); break;
+		case 0x239: /* 1 000 111 001 */ cp1610_bext(9,0xffff); break;
+		case 0x23a: /* 1 000 111 010 */ cp1610_bext(10,0xffff); break;
+		case 0x23b: /* 1 000 111 011 */ cp1610_bext(11,0xffff); break;
+		case 0x23c: /* 1 000 111 100 */ cp1610_bext(12,0xffff); break;
+		case 0x23d: /* 1 000 111 101 */ cp1610_bext(13,0xffff); break;
+		case 0x23e: /* 1 000 111 110 */ cp1610_bext(14,0xffff); break;
+		case 0x23f: /* 1 000 111 111 */ cp1610_bext(15,0xffff); break;
 
-		case 0x240: /* 1 001 000 000 */ cp1610_mvo(0);            break;
-		case 0x241: /* 1 001 000 001 */ cp1610_mvo(1);            break;
-		case 0x242: /* 1 001 000 010 */ cp1610_mvo(2);            break;
-		case 0x243: /* 1 001 000 011 */ cp1610_mvo(3);            break;
-		case 0x244: /* 1 001 000 100 */ cp1610_mvo(4);            break;
-		case 0x245: /* 1 001 000 101 */ cp1610_mvo(5);            break;
-		case 0x246: /* 1 001 000 110 */ cp1610_mvo(6);            break;
-		case 0x247: /* 1 001 000 111 */ cp1610_mvo(7);            break;
+		case 0x240: /* 1 001 000 000 */ cp1610_mvo(0); break;
+		case 0x241: /* 1 001 000 001 */ cp1610_mvo(1); break;
+		case 0x242: /* 1 001 000 010 */ cp1610_mvo(2); break;
+		case 0x243: /* 1 001 000 011 */ cp1610_mvo(3); break;
+		case 0x244: /* 1 001 000 100 */ cp1610_mvo(4); break;
+		case 0x245: /* 1 001 000 101 */ cp1610_mvo(5); break;
+		case 0x246: /* 1 001 000 110 */ cp1610_mvo(6); break;
+		case 0x247: /* 1 001 000 111 */ cp1610_mvo(7); break;
 
-		case 0x248: /* 1 001 001 000 */ cp1610_mvoat(0,1);        break;
-		case 0x249: /* 1 001 001 001 */ cp1610_mvoat(1,1);        break;
-		case 0x24a: /* 1 001 001 010 */ cp1610_mvoat(2,1);        break;
-		case 0x24b: /* 1 001 001 011 */ cp1610_mvoat(3,1);        break;
-		case 0x24c: /* 1 001 001 100 */ cp1610_mvoat(4,1);        break;
-		case 0x24d: /* 1 001 001 101 */ cp1610_mvoat(5,1);        break;
-		case 0x24e: /* 1 001 001 110 */ cp1610_mvoat(6,1);        break;
-		case 0x24f: /* 1 001 001 111 */ cp1610_mvoat(7,1);        break;
+		case 0x248: /* 1 001 001 000 */ cp1610_mvoat(0,1); break;
+		case 0x249: /* 1 001 001 001 */ cp1610_mvoat(1,1); break;
+		case 0x24a: /* 1 001 001 010 */ cp1610_mvoat(2,1); break;
+		case 0x24b: /* 1 001 001 011 */ cp1610_mvoat(3,1); break;
+		case 0x24c: /* 1 001 001 100 */ cp1610_mvoat(4,1); break;
+		case 0x24d: /* 1 001 001 101 */ cp1610_mvoat(5,1); break;
+		case 0x24e: /* 1 001 001 110 */ cp1610_mvoat(6,1); break;
+		case 0x24f: /* 1 001 001 111 */ cp1610_mvoat(7,1); break;
 
-		case 0x250: /* 1 001 010 000 */ cp1610_mvoat(0,2);        break;
-		case 0x251: /* 1 001 010 001 */ cp1610_mvoat(1,2);        break;
-		case 0x252: /* 1 001 010 010 */ cp1610_mvoat(2,2);        break;
-		case 0x253: /* 1 001 010 011 */ cp1610_mvoat(3,2);        break;
-		case 0x254: /* 1 001 010 100 */ cp1610_mvoat(4,2);        break;
-		case 0x255: /* 1 001 010 101 */ cp1610_mvoat(5,2);        break;
-		case 0x256: /* 1 001 010 110 */ cp1610_mvoat(6,2);        break;
-		case 0x257: /* 1 001 010 111 */ cp1610_mvoat(7,2);        break;
+		case 0x250: /* 1 001 010 000 */ cp1610_mvoat(0,2); break;
+		case 0x251: /* 1 001 010 001 */ cp1610_mvoat(1,2); break;
+		case 0x252: /* 1 001 010 010 */ cp1610_mvoat(2,2); break;
+		case 0x253: /* 1 001 010 011 */ cp1610_mvoat(3,2); break;
+		case 0x254: /* 1 001 010 100 */ cp1610_mvoat(4,2); break;
+		case 0x255: /* 1 001 010 101 */ cp1610_mvoat(5,2); break;
+		case 0x256: /* 1 001 010 110 */ cp1610_mvoat(6,2); break;
+		case 0x257: /* 1 001 010 111 */ cp1610_mvoat(7,2); break;
 
-		case 0x258: /* 1 001 011 000 */ cp1610_mvoat(0,3);        break;
-		case 0x259: /* 1 001 011 001 */ cp1610_mvoat(1,3);        break;
-		case 0x25a: /* 1 001 011 010 */ cp1610_mvoat(2,3);        break;
-		case 0x25b: /* 1 001 011 011 */ cp1610_mvoat(3,3);        break;
-		case 0x25c: /* 1 001 011 100 */ cp1610_mvoat(4,3);        break;
-		case 0x25d: /* 1 001 011 101 */ cp1610_mvoat(5,3);        break;
-		case 0x25e: /* 1 001 011 110 */ cp1610_mvoat(6,3);        break;
-		case 0x25f: /* 1 001 011 111 */ cp1610_mvoat(7,3);        break;
+		case 0x258: /* 1 001 011 000 */ cp1610_mvoat(0,3); break;
+		case 0x259: /* 1 001 011 001 */ cp1610_mvoat(1,3); break;
+		case 0x25a: /* 1 001 011 010 */ cp1610_mvoat(2,3); break;
+		case 0x25b: /* 1 001 011 011 */ cp1610_mvoat(3,3); break;
+		case 0x25c: /* 1 001 011 100 */ cp1610_mvoat(4,3); break;
+		case 0x25d: /* 1 001 011 101 */ cp1610_mvoat(5,3); break;
+		case 0x25e: /* 1 001 011 110 */ cp1610_mvoat(6,3); break;
+		case 0x25f: /* 1 001 011 111 */ cp1610_mvoat(7,3); break;
 
-		case 0x260: /* 1 001 100 000 */ cp1610_mvoat_i(0,4);  break;
-		case 0x261: /* 1 001 100 001 */ cp1610_mvoat_i(1,4);  break;
-		case 0x262: /* 1 001 100 010 */ cp1610_mvoat_i(2,4);  break;
-		case 0x263: /* 1 001 100 011 */ cp1610_mvoat_i(3,4);  break;
-		case 0x264: /* 1 001 100 100 */ cp1610_mvoat_i(4,4);  break;
-		case 0x265: /* 1 001 100 101 */ cp1610_mvoat_i(5,4);  break;
-		case 0x266: /* 1 001 100 110 */ cp1610_mvoat_i(6,4);  break;
-		case 0x267: /* 1 001 100 111 */ cp1610_mvoat_i(7,4);  break;
+		case 0x260: /* 1 001 100 000 */ cp1610_mvoat_i(0,4); break;
+		case 0x261: /* 1 001 100 001 */ cp1610_mvoat_i(1,4); break;
+		case 0x262: /* 1 001 100 010 */ cp1610_mvoat_i(2,4); break;
+		case 0x263: /* 1 001 100 011 */ cp1610_mvoat_i(3,4); break;
+		case 0x264: /* 1 001 100 100 */ cp1610_mvoat_i(4,4); break;
+		case 0x265: /* 1 001 100 101 */ cp1610_mvoat_i(5,4); break;
+		case 0x266: /* 1 001 100 110 */ cp1610_mvoat_i(6,4); break;
+		case 0x267: /* 1 001 100 111 */ cp1610_mvoat_i(7,4); break;
 
-		case 0x268: /* 1 001 101 000 */ cp1610_mvoat_i(0,5);  break;
-		case 0x269: /* 1 001 101 001 */ cp1610_mvoat_i(1,5);  break;
-		case 0x26a: /* 1 001 101 010 */ cp1610_mvoat_i(2,5);  break;
-		case 0x26b: /* 1 001 101 011 */ cp1610_mvoat_i(3,5);  break;
-		case 0x26c: /* 1 001 101 100 */ cp1610_mvoat_i(4,5);  break;
-		case 0x26d: /* 1 001 101 101 */ cp1610_mvoat_i(5,5);  break;
-		case 0x26e: /* 1 001 101 110 */ cp1610_mvoat_i(6,5);  break;
-		case 0x26f: /* 1 001 101 111 */ cp1610_mvoat_i(7,5);  break;
+		case 0x268: /* 1 001 101 000 */ cp1610_mvoat_i(0,5); break;
+		case 0x269: /* 1 001 101 001 */ cp1610_mvoat_i(1,5); break;
+		case 0x26a: /* 1 001 101 010 */ cp1610_mvoat_i(2,5); break;
+		case 0x26b: /* 1 001 101 011 */ cp1610_mvoat_i(3,5); break;
+		case 0x26c: /* 1 001 101 100 */ cp1610_mvoat_i(4,5); break;
+		case 0x26d: /* 1 001 101 101 */ cp1610_mvoat_i(5,5); break;
+		case 0x26e: /* 1 001 101 110 */ cp1610_mvoat_i(6,5); break;
+		case 0x26f: /* 1 001 101 111 */ cp1610_mvoat_i(7,5); break;
 
-		case 0x270: /* 1 001 110 000 */ cp1610_mvoat_i(0,6);  break; /* pshr */
-		case 0x271: /* 1 001 110 001 */ cp1610_mvoat_i(1,6);  break; /* pshr */
-		case 0x272: /* 1 001 110 010 */ cp1610_mvoat_i(2,6);  break; /* pshr */
-		case 0x273: /* 1 001 110 011 */ cp1610_mvoat_i(3,6);  break; /* pshr */
-		case 0x274: /* 1 001 110 100 */ cp1610_mvoat_i(4,6);  break; /* pshr */
-		case 0x275: /* 1 001 110 101 */ cp1610_mvoat_i(5,6);  break; /* pshr */
-		case 0x276: /* 1 001 110 110 */ cp1610_mvoat_i(6,6);  break; /* pshr */
-		case 0x277: /* 1 001 110 111 */ cp1610_mvoat_i(7,6);  break; /* pshr */
+		case 0x270: /* 1 001 110 000 */ cp1610_mvoat_i(0,6); break; /* pshr */
+		case 0x271: /* 1 001 110 001 */ cp1610_mvoat_i(1,6); break; /* pshr */
+		case 0x272: /* 1 001 110 010 */ cp1610_mvoat_i(2,6); break; /* pshr */
+		case 0x273: /* 1 001 110 011 */ cp1610_mvoat_i(3,6); break; /* pshr */
+		case 0x274: /* 1 001 110 100 */ cp1610_mvoat_i(4,6); break; /* pshr */
+		case 0x275: /* 1 001 110 101 */ cp1610_mvoat_i(5,6); break; /* pshr */
+		case 0x276: /* 1 001 110 110 */ cp1610_mvoat_i(6,6); break; /* pshr */
+		case 0x277: /* 1 001 110 111 */ cp1610_mvoat_i(7,6); break; /* pshr */
 
-		case 0x278: /* 1 001 111 000 */ cp1610_mvoi(0);           break;
-		case 0x279: /* 1 001 111 001 */ cp1610_mvoi(1);           break;
-		case 0x27a: /* 1 001 111 010 */ cp1610_mvoi(2);           break;
-		case 0x27b: /* 1 001 111 011 */ cp1610_mvoi(3);           break;
-		case 0x27c: /* 1 001 111 100 */ cp1610_mvoi(4);           break;
-		case 0x27d: /* 1 001 111 101 */ cp1610_mvoi(5);           break;
-		case 0x27e: /* 1 001 111 110 */ cp1610_mvoi(6);           break;
-		case 0x27f: /* 1 001 111 111 */ cp1610_mvoi(7);           break;
+		case 0x278: /* 1 001 111 000 */ cp1610_mvoi(0); break;
+		case 0x279: /* 1 001 111 001 */ cp1610_mvoi(1); break;
+		case 0x27a: /* 1 001 111 010 */ cp1610_mvoi(2); break;
+		case 0x27b: /* 1 001 111 011 */ cp1610_mvoi(3); break;
+		case 0x27c: /* 1 001 111 100 */ cp1610_mvoi(4); break;
+		case 0x27d: /* 1 001 111 101 */ cp1610_mvoi(5); break;
+		case 0x27e: /* 1 001 111 110 */ cp1610_mvoi(6); break;
+		case 0x27f: /* 1 001 111 111 */ cp1610_mvoi(7); break;
 
-		case 0x280: /* 1 010 000 000 */ cp1610_mvi(0);            break;
-		case 0x281: /* 1 010 000 001 */ cp1610_mvi(1);            break;
-		case 0x282: /* 1 010 000 010 */ cp1610_mvi(2);            break;
-		case 0x283: /* 1 010 000 011 */ cp1610_mvi(3);            break;
-		case 0x284: /* 1 010 000 100 */ cp1610_mvi(4);            break;
-		case 0x285: /* 1 010 000 101 */ cp1610_mvi(5);            break;
-		case 0x286: /* 1 010 000 110 */ cp1610_mvi(6);            break;
-		case 0x287: /* 1 010 000 111 */ cp1610_mvi(7);            break;
+		case 0x280: /* 1 010 000 000 */ cp1610_mvi(0); break;
+		case 0x281: /* 1 010 000 001 */ cp1610_mvi(1); break;
+		case 0x282: /* 1 010 000 010 */ cp1610_mvi(2); break;
+		case 0x283: /* 1 010 000 011 */ cp1610_mvi(3); break;
+		case 0x284: /* 1 010 000 100 */ cp1610_mvi(4); break;
+		case 0x285: /* 1 010 000 101 */ cp1610_mvi(5); break;
+		case 0x286: /* 1 010 000 110 */ cp1610_mvi(6); break;
+		case 0x287: /* 1 010 000 111 */ cp1610_mvi(7); break;
 
-		case 0x288: /* 1 010 001 000 */ cp1610_mviat(1,0);        break;
-		case 0x289: /* 1 010 001 001 */ cp1610_mviat(1,1);        break;
-		case 0x28a: /* 1 010 001 010 */ cp1610_mviat(1,2);        break;
-		case 0x28b: /* 1 010 001 011 */ cp1610_mviat(1,3);        break;
-		case 0x28c: /* 1 010 001 100 */ cp1610_mviat(1,4);        break;
-		case 0x28d: /* 1 010 001 101 */ cp1610_mviat(1,5);        break;
-		case 0x28e: /* 1 010 001 110 */ cp1610_mviat(1,6);        break;
-		case 0x28f: /* 1 010 001 111 */ cp1610_mviat(1,7);        break;
+		case 0x288: /* 1 010 001 000 */ cp1610_mviat(1,0); break;
+		case 0x289: /* 1 010 001 001 */ cp1610_mviat(1,1); break;
+		case 0x28a: /* 1 010 001 010 */ cp1610_mviat(1,2); break;
+		case 0x28b: /* 1 010 001 011 */ cp1610_mviat(1,3); break;
+		case 0x28c: /* 1 010 001 100 */ cp1610_mviat(1,4); break;
+		case 0x28d: /* 1 010 001 101 */ cp1610_mviat(1,5); break;
+		case 0x28e: /* 1 010 001 110 */ cp1610_mviat(1,6); break;
+		case 0x28f: /* 1 010 001 111 */ cp1610_mviat(1,7); break;
 
-		case 0x290: /* 1 010 010 000 */ cp1610_mviat(2,0);        break;
-		case 0x291: /* 1 010 010 001 */ cp1610_mviat(2,1);        break;
-		case 0x292: /* 1 010 010 010 */ cp1610_mviat(2,2);        break;
-		case 0x293: /* 1 010 010 011 */ cp1610_mviat(2,3);        break;
-		case 0x294: /* 1 010 010 100 */ cp1610_mviat(2,4);        break;
-		case 0x295: /* 1 010 010 101 */ cp1610_mviat(2,5);        break;
-		case 0x296: /* 1 010 010 110 */ cp1610_mviat(2,6);        break;
-		case 0x297: /* 1 010 010 111 */ cp1610_mviat(2,7);        break;
+		case 0x290: /* 1 010 010 000 */ cp1610_mviat(2,0); break;
+		case 0x291: /* 1 010 010 001 */ cp1610_mviat(2,1); break;
+		case 0x292: /* 1 010 010 010 */ cp1610_mviat(2,2); break;
+		case 0x293: /* 1 010 010 011 */ cp1610_mviat(2,3); break;
+		case 0x294: /* 1 010 010 100 */ cp1610_mviat(2,4); break;
+		case 0x295: /* 1 010 010 101 */ cp1610_mviat(2,5); break;
+		case 0x296: /* 1 010 010 110 */ cp1610_mviat(2,6); break;
+		case 0x297: /* 1 010 010 111 */ cp1610_mviat(2,7); break;
 
-		case 0x298: /* 1 010 011 000 */ cp1610_mviat(3,0);        break;
-		case 0x299: /* 1 010 011 001 */ cp1610_mviat(3,1);        break;
-		case 0x29a: /* 1 010 011 010 */ cp1610_mviat(3,2);        break;
-		case 0x29b: /* 1 010 011 011 */ cp1610_mviat(3,3);        break;
-		case 0x29c: /* 1 010 011 100 */ cp1610_mviat(3,4);        break;
-		case 0x29d: /* 1 010 011 101 */ cp1610_mviat(3,5);        break;
-		case 0x29e: /* 1 010 011 110 */ cp1610_mviat(3,6);        break;
-		case 0x29f: /* 1 010 011 111 */ cp1610_mviat(3,7);        break;
+		case 0x298: /* 1 010 011 000 */ cp1610_mviat(3,0); break;
+		case 0x299: /* 1 010 011 001 */ cp1610_mviat(3,1); break;
+		case 0x29a: /* 1 010 011 010 */ cp1610_mviat(3,2); break;
+		case 0x29b: /* 1 010 011 011 */ cp1610_mviat(3,3); break;
+		case 0x29c: /* 1 010 011 100 */ cp1610_mviat(3,4); break;
+		case 0x29d: /* 1 010 011 101 */ cp1610_mviat(3,5); break;
+		case 0x29e: /* 1 010 011 110 */ cp1610_mviat(3,6); break;
+		case 0x29f: /* 1 010 011 111 */ cp1610_mviat(3,7); break;
 
-		case 0x2a0: /* 1 010 100 000 */ cp1610_mviat_i(4,0);  break;
-		case 0x2a1: /* 1 010 100 001 */ cp1610_mviat_i(4,1);  break;
-		case 0x2a2: /* 1 010 100 010 */ cp1610_mviat_i(4,2);  break;
-		case 0x2a3: /* 1 010 100 011 */ cp1610_mviat_i(4,3);  break;
-		case 0x2a4: /* 1 010 100 100 */ cp1610_mviat_i(4,4);  break;
-		case 0x2a5: /* 1 010 100 101 */ cp1610_mviat_i(4,5);  break;
-		case 0x2a6: /* 1 010 100 110 */ cp1610_mviat_i(4,6);  break;
-		case 0x2a7: /* 1 010 100 111 */ cp1610_mviat_i(4,7);  break;
+		case 0x2a0: /* 1 010 100 000 */ cp1610_mviat_i(4,0); break;
+		case 0x2a1: /* 1 010 100 001 */ cp1610_mviat_i(4,1); break;
+		case 0x2a2: /* 1 010 100 010 */ cp1610_mviat_i(4,2); break;
+		case 0x2a3: /* 1 010 100 011 */ cp1610_mviat_i(4,3); break;
+		case 0x2a4: /* 1 010 100 100 */ cp1610_mviat_i(4,4); break;
+		case 0x2a5: /* 1 010 100 101 */ cp1610_mviat_i(4,5); break;
+		case 0x2a6: /* 1 010 100 110 */ cp1610_mviat_i(4,6); break;
+		case 0x2a7: /* 1 010 100 111 */ cp1610_mviat_i(4,7); break;
 
-		case 0x2a8: /* 1 010 101 000 */ cp1610_mviat_i(5,0);  break;
-		case 0x2a9: /* 1 010 101 001 */ cp1610_mviat_i(5,1);  break;
-		case 0x2aa: /* 1 010 101 010 */ cp1610_mviat_i(5,2);  break;
-		case 0x2ab: /* 1 010 101 011 */ cp1610_mviat_i(5,3);  break;
-		case 0x2ac: /* 1 010 101 100 */ cp1610_mviat_i(5,4);  break;
-		case 0x2ad: /* 1 010 101 101 */ cp1610_mviat_i(5,5);  break;
-		case 0x2ae: /* 1 010 101 110 */ cp1610_mviat_i(5,6);  break;
-		case 0x2af: /* 1 010 101 111 */ cp1610_mviat_i(5,7);  break;
+		case 0x2a8: /* 1 010 101 000 */ cp1610_mviat_i(5,0); break;
+		case 0x2a9: /* 1 010 101 001 */ cp1610_mviat_i(5,1); break;
+		case 0x2aa: /* 1 010 101 010 */ cp1610_mviat_i(5,2); break;
+		case 0x2ab: /* 1 010 101 011 */ cp1610_mviat_i(5,3); break;
+		case 0x2ac: /* 1 010 101 100 */ cp1610_mviat_i(5,4); break;
+		case 0x2ad: /* 1 010 101 101 */ cp1610_mviat_i(5,5); break;
+		case 0x2ae: /* 1 010 101 110 */ cp1610_mviat_i(5,6); break;
+		case 0x2af: /* 1 010 101 111 */ cp1610_mviat_i(5,7); break;
 
-		case 0x2b0: /* 1 010 110 000 */ cp1610_pulr(0);           break;
-		case 0x2b1: /* 1 010 110 001 */ cp1610_pulr(1);           break;
-		case 0x2b2: /* 1 010 110 010 */ cp1610_pulr(2);           break;
-		case 0x2b3: /* 1 010 110 011 */ cp1610_pulr(3);           break;
-		case 0x2b4: /* 1 010 110 100 */ cp1610_pulr(4);           break;
-		case 0x2b5: /* 1 010 110 101 */ cp1610_pulr(5);           break;
-		case 0x2b6: /* 1 010 110 110 */ cp1610_pulr(6);           break;
-		case 0x2b7: /* 1 010 110 111 */ cp1610_pulr(7);           break;
+		case 0x2b0: /* 1 010 110 000 */ cp1610_pulr(0); break;
+		case 0x2b1: /* 1 010 110 001 */ cp1610_pulr(1); break;
+		case 0x2b2: /* 1 010 110 010 */ cp1610_pulr(2); break;
+		case 0x2b3: /* 1 010 110 011 */ cp1610_pulr(3); break;
+		case 0x2b4: /* 1 010 110 100 */ cp1610_pulr(4); break;
+		case 0x2b5: /* 1 010 110 101 */ cp1610_pulr(5); break;
+		case 0x2b6: /* 1 010 110 110 */ cp1610_pulr(6); break;
+		case 0x2b7: /* 1 010 110 111 */ cp1610_pulr(7); break;
 
-		case 0x2b8: /* 1 010 111 000 */ cp1610_mvii(0);           break;
-		case 0x2b9: /* 1 010 111 001 */ cp1610_mvii(1);           break;
-		case 0x2ba: /* 1 010 111 010 */ cp1610_mvii(2);           break;
-		case 0x2bb: /* 1 010 111 011 */ cp1610_mvii(3);           break;
-		case 0x2bc: /* 1 010 111 100 */ cp1610_mvii(4);           break;
-		case 0x2bd: /* 1 010 111 101 */ cp1610_mvii(5);           break;
-		case 0x2be: /* 1 010 111 110 */ cp1610_mvii(6);           break;
-		case 0x2bf: /* 1 010 111 111 */ cp1610_mvii(7);           break;
+		case 0x2b8: /* 1 010 111 000 */ cp1610_mvii(0); break;
+		case 0x2b9: /* 1 010 111 001 */ cp1610_mvii(1); break;
+		case 0x2ba: /* 1 010 111 010 */ cp1610_mvii(2); break;
+		case 0x2bb: /* 1 010 111 011 */ cp1610_mvii(3); break;
+		case 0x2bc: /* 1 010 111 100 */ cp1610_mvii(4); break;
+		case 0x2bd: /* 1 010 111 101 */ cp1610_mvii(5); break;
+		case 0x2be: /* 1 010 111 110 */ cp1610_mvii(6); break;
+		case 0x2bf: /* 1 010 111 111 */ cp1610_mvii(7); break;
 
-		case 0x2c0: /* 1 011 000 000 */ cp1610_add(0);            break;
-		case 0x2c1: /* 1 011 000 001 */ cp1610_add(1);            break;
-		case 0x2c2: /* 1 011 000 010 */ cp1610_add(2);            break;
-		case 0x2c3: /* 1 011 000 011 */ cp1610_add(3);            break;
-		case 0x2c4: /* 1 011 000 100 */ cp1610_add(4);            break;
-		case 0x2c5: /* 1 011 000 101 */ cp1610_add(5);            break;
-		case 0x2c6: /* 1 011 000 110 */ cp1610_add(6);            break;
-		case 0x2c7: /* 1 011 000 111 */ cp1610_add(7);            break;
+		case 0x2c0: /* 1 011 000 000 */ cp1610_add(0); break;
+		case 0x2c1: /* 1 011 000 001 */ cp1610_add(1); break;
+		case 0x2c2: /* 1 011 000 010 */ cp1610_add(2); break;
+		case 0x2c3: /* 1 011 000 011 */ cp1610_add(3); break;
+		case 0x2c4: /* 1 011 000 100 */ cp1610_add(4); break;
+		case 0x2c5: /* 1 011 000 101 */ cp1610_add(5); break;
+		case 0x2c6: /* 1 011 000 110 */ cp1610_add(6); break;
+		case 0x2c7: /* 1 011 000 111 */ cp1610_add(7); break;
 
-		case 0x2c8: /* 1 011 001 000 */ cp1610_addat(1,0);        break;
-		case 0x2c9: /* 1 011 001 001 */ cp1610_addat(1,1);        break;
-		case 0x2ca: /* 1 011 001 010 */ cp1610_addat(1,2);        break;
-		case 0x2cb: /* 1 011 001 011 */ cp1610_addat(1,3);        break;
-		case 0x2cc: /* 1 011 001 100 */ cp1610_addat(1,4);        break;
-		case 0x2cd: /* 1 011 001 101 */ cp1610_addat(1,5);        break;
-		case 0x2ce: /* 1 011 001 110 */ cp1610_addat(1,6);        break;
-		case 0x2cf: /* 1 011 001 111 */ cp1610_addat(1,7);        break;
+		case 0x2c8: /* 1 011 001 000 */ cp1610_addat(1,0); break;
+		case 0x2c9: /* 1 011 001 001 */ cp1610_addat(1,1); break;
+		case 0x2ca: /* 1 011 001 010 */ cp1610_addat(1,2); break;
+		case 0x2cb: /* 1 011 001 011 */ cp1610_addat(1,3); break;
+		case 0x2cc: /* 1 011 001 100 */ cp1610_addat(1,4); break;
+		case 0x2cd: /* 1 011 001 101 */ cp1610_addat(1,5); break;
+		case 0x2ce: /* 1 011 001 110 */ cp1610_addat(1,6); break;
+		case 0x2cf: /* 1 011 001 111 */ cp1610_addat(1,7); break;
 
-		case 0x2d0: /* 1 011 010 000 */ cp1610_addat(2,0);        break;
-		case 0x2d1: /* 1 011 010 001 */ cp1610_addat(2,1);        break;
-		case 0x2d2: /* 1 011 010 010 */ cp1610_addat(2,2);        break;
-		case 0x2d3: /* 1 011 010 011 */ cp1610_addat(2,3);        break;
-		case 0x2d4: /* 1 011 010 100 */ cp1610_addat(2,4);        break;
-		case 0x2d5: /* 1 011 010 101 */ cp1610_addat(2,5);        break;
-		case 0x2d6: /* 1 011 010 110 */ cp1610_addat(2,6);        break;
-		case 0x2d7: /* 1 011 010 111 */ cp1610_addat(2,7);        break;
+		case 0x2d0: /* 1 011 010 000 */ cp1610_addat(2,0); break;
+		case 0x2d1: /* 1 011 010 001 */ cp1610_addat(2,1); break;
+		case 0x2d2: /* 1 011 010 010 */ cp1610_addat(2,2); break;
+		case 0x2d3: /* 1 011 010 011 */ cp1610_addat(2,3); break;
+		case 0x2d4: /* 1 011 010 100 */ cp1610_addat(2,4); break;
+		case 0x2d5: /* 1 011 010 101 */ cp1610_addat(2,5); break;
+		case 0x2d6: /* 1 011 010 110 */ cp1610_addat(2,6); break;
+		case 0x2d7: /* 1 011 010 111 */ cp1610_addat(2,7); break;
 
-		case 0x2d8: /* 1 011 011 000 */ cp1610_addat(3,0);        break;
-		case 0x2d9: /* 1 011 011 001 */ cp1610_addat(3,1);        break;
-		case 0x2da: /* 1 011 011 010 */ cp1610_addat(3,2);        break;
-		case 0x2db: /* 1 011 011 011 */ cp1610_addat(3,3);        break;
-		case 0x2dc: /* 1 011 011 100 */ cp1610_addat(3,4);        break;
-		case 0x2dd: /* 1 011 011 101 */ cp1610_addat(3,5);        break;
-		case 0x2de: /* 1 011 011 110 */ cp1610_addat(3,6);        break;
-		case 0x2df: /* 1 011 011 111 */ cp1610_addat(3,7);        break;
+		case 0x2d8: /* 1 011 011 000 */ cp1610_addat(3,0); break;
+		case 0x2d9: /* 1 011 011 001 */ cp1610_addat(3,1); break;
+		case 0x2da: /* 1 011 011 010 */ cp1610_addat(3,2); break;
+		case 0x2db: /* 1 011 011 011 */ cp1610_addat(3,3); break;
+		case 0x2dc: /* 1 011 011 100 */ cp1610_addat(3,4); break;
+		case 0x2dd: /* 1 011 011 101 */ cp1610_addat(3,5); break;
+		case 0x2de: /* 1 011 011 110 */ cp1610_addat(3,6); break;
+		case 0x2df: /* 1 011 011 111 */ cp1610_addat(3,7); break;
 
-		case 0x2e0: /* 1 011 100 000 */ cp1610_addat_i(4,0);  break;
-		case 0x2e1: /* 1 011 100 001 */ cp1610_addat_i(4,1);  break;
-		case 0x2e2: /* 1 011 100 010 */ cp1610_addat_i(4,2);  break;
-		case 0x2e3: /* 1 011 100 011 */ cp1610_addat_i(4,3);  break;
-		case 0x2e4: /* 1 011 100 100 */ cp1610_addat_i(4,4);  break;
-		case 0x2e5: /* 1 011 100 101 */ cp1610_addat_i(4,5);  break;
-		case 0x2e6: /* 1 011 100 110 */ cp1610_addat_i(4,6);  break;
-		case 0x2e7: /* 1 011 100 111 */ cp1610_addat_i(4,7);  break;
+		case 0x2e0: /* 1 011 100 000 */ cp1610_addat_i(4,0); break;
+		case 0x2e1: /* 1 011 100 001 */ cp1610_addat_i(4,1); break;
+		case 0x2e2: /* 1 011 100 010 */ cp1610_addat_i(4,2); break;
+		case 0x2e3: /* 1 011 100 011 */ cp1610_addat_i(4,3); break;
+		case 0x2e4: /* 1 011 100 100 */ cp1610_addat_i(4,4); break;
+		case 0x2e5: /* 1 011 100 101 */ cp1610_addat_i(4,5); break;
+		case 0x2e6: /* 1 011 100 110 */ cp1610_addat_i(4,6); break;
+		case 0x2e7: /* 1 011 100 111 */ cp1610_addat_i(4,7); break;
 
-		case 0x2e8: /* 1 011 101 000 */ cp1610_addat_i(5,0);  break;
-		case 0x2e9: /* 1 011 101 001 */ cp1610_addat_i(5,1);  break;
-		case 0x2ea: /* 1 011 101 010 */ cp1610_addat_i(5,2);  break;
-		case 0x2eb: /* 1 011 101 011 */ cp1610_addat_i(5,3);  break;
-		case 0x2ec: /* 1 011 101 100 */ cp1610_addat_i(5,4);  break;
-		case 0x2ed: /* 1 011 101 101 */ cp1610_addat_i(5,5);  break;
-		case 0x2ee: /* 1 011 101 110 */ cp1610_addat_i(5,6);  break;
-		case 0x2ef: /* 1 011 101 111 */ cp1610_addat_i(5,7);  break;
+		case 0x2e8: /* 1 011 101 000 */ cp1610_addat_i(5,0); break;
+		case 0x2e9: /* 1 011 101 001 */ cp1610_addat_i(5,1); break;
+		case 0x2ea: /* 1 011 101 010 */ cp1610_addat_i(5,2); break;
+		case 0x2eb: /* 1 011 101 011 */ cp1610_addat_i(5,3); break;
+		case 0x2ec: /* 1 011 101 100 */ cp1610_addat_i(5,4); break;
+		case 0x2ed: /* 1 011 101 101 */ cp1610_addat_i(5,5); break;
+		case 0x2ee: /* 1 011 101 110 */ cp1610_addat_i(5,6); break;
+		case 0x2ef: /* 1 011 101 111 */ cp1610_addat_i(5,7); break;
 
-		case 0x2f0: /* 1 011 110 000 */ cp1610_addat_d(6,0);  break;
-		case 0x2f1: /* 1 011 110 001 */ cp1610_addat_d(6,1);  break;
-		case 0x2f2: /* 1 011 110 010 */ cp1610_addat_d(6,2);  break;
-		case 0x2f3: /* 1 011 110 011 */ cp1610_addat_d(6,3);  break;
-		case 0x2f4: /* 1 011 110 100 */ cp1610_addat_d(6,4);  break;
-		case 0x2f5: /* 1 011 110 101 */ cp1610_addat_d(6,5);  break;
-		case 0x2f6: /* 1 011 110 110 */ cp1610_addat_d(6,6);  break;
-		case 0x2f7: /* 1 011 110 111 */ cp1610_addat_d(6,7);  break;
+		case 0x2f0: /* 1 011 110 000 */ cp1610_addat_d(6,0); break;
+		case 0x2f1: /* 1 011 110 001 */ cp1610_addat_d(6,1); break;
+		case 0x2f2: /* 1 011 110 010 */ cp1610_addat_d(6,2); break;
+		case 0x2f3: /* 1 011 110 011 */ cp1610_addat_d(6,3); break;
+		case 0x2f4: /* 1 011 110 100 */ cp1610_addat_d(6,4); break;
+		case 0x2f5: /* 1 011 110 101 */ cp1610_addat_d(6,5); break;
+		case 0x2f6: /* 1 011 110 110 */ cp1610_addat_d(6,6); break;
+		case 0x2f7: /* 1 011 110 111 */ cp1610_addat_d(6,7); break;
 
-		case 0x2f8: /* 1 011 111 000 */ cp1610_addi(0);           break;
-		case 0x2f9: /* 1 011 111 001 */ cp1610_addi(1);           break;
-		case 0x2fa: /* 1 011 111 010 */ cp1610_addi(2);           break;
-		case 0x2fb: /* 1 011 111 011 */ cp1610_addi(3);           break;
-		case 0x2fc: /* 1 011 111 100 */ cp1610_addi(4);           break;
-		case 0x2fd: /* 1 011 111 101 */ cp1610_addi(5);           break;
-		case 0x2fe: /* 1 011 111 110 */ cp1610_addi(6);           break;
-		case 0x2ff: /* 1 011 111 111 */ cp1610_addi(7);           break;
+		case 0x2f8: /* 1 011 111 000 */ cp1610_addi(0); break;
+		case 0x2f9: /* 1 011 111 001 */ cp1610_addi(1); break;
+		case 0x2fa: /* 1 011 111 010 */ cp1610_addi(2); break;
+		case 0x2fb: /* 1 011 111 011 */ cp1610_addi(3); break;
+		case 0x2fc: /* 1 011 111 100 */ cp1610_addi(4); break;
+		case 0x2fd: /* 1 011 111 101 */ cp1610_addi(5); break;
+		case 0x2fe: /* 1 011 111 110 */ cp1610_addi(6); break;
+		case 0x2ff: /* 1 011 111 111 */ cp1610_addi(7); break;
 
-		case 0x300: /* 1 100 000 000 */ cp1610_sub(0);            break;
-		case 0x301: /* 1 100 000 001 */ cp1610_sub(1);            break;
-		case 0x302: /* 1 100 000 010 */ cp1610_sub(2);            break;
-		case 0x303: /* 1 100 000 011 */ cp1610_sub(3);            break;
-		case 0x304: /* 1 100 000 100 */ cp1610_sub(4);            break;
-		case 0x305: /* 1 100 000 101 */ cp1610_sub(5);            break;
-		case 0x306: /* 1 100 000 110 */ cp1610_sub(6);            break;
-		case 0x307: /* 1 100 000 111 */ cp1610_sub(7);            break;
+		case 0x300: /* 1 100 000 000 */ cp1610_sub(0); break;
+		case 0x301: /* 1 100 000 001 */ cp1610_sub(1); break;
+		case 0x302: /* 1 100 000 010 */ cp1610_sub(2); break;
+		case 0x303: /* 1 100 000 011 */ cp1610_sub(3); break;
+		case 0x304: /* 1 100 000 100 */ cp1610_sub(4); break;
+		case 0x305: /* 1 100 000 101 */ cp1610_sub(5); break;
+		case 0x306: /* 1 100 000 110 */ cp1610_sub(6); break;
+		case 0x307: /* 1 100 000 111 */ cp1610_sub(7); break;
 
-		case 0x308: /* 1 100 001 000 */ cp1610_subat(1,0);        break;
-		case 0x309: /* 1 100 001 001 */ cp1610_subat(1,1);        break;
-		case 0x30a: /* 1 100 001 010 */ cp1610_subat(1,2);        break;
-		case 0x30b: /* 1 100 001 011 */ cp1610_subat(1,3);        break;
-		case 0x30c: /* 1 100 001 100 */ cp1610_subat(1,4);        break;
-		case 0x30d: /* 1 100 001 101 */ cp1610_subat(1,5);        break;
-		case 0x30e: /* 1 100 001 110 */ cp1610_subat(1,6);        break;
-		case 0x30f: /* 1 100 001 111 */ cp1610_subat(1,7);        break;
+		case 0x308: /* 1 100 001 000 */ cp1610_subat(1,0); break;
+		case 0x309: /* 1 100 001 001 */ cp1610_subat(1,1); break;
+		case 0x30a: /* 1 100 001 010 */ cp1610_subat(1,2); break;
+		case 0x30b: /* 1 100 001 011 */ cp1610_subat(1,3); break;
+		case 0x30c: /* 1 100 001 100 */ cp1610_subat(1,4); break;
+		case 0x30d: /* 1 100 001 101 */ cp1610_subat(1,5); break;
+		case 0x30e: /* 1 100 001 110 */ cp1610_subat(1,6); break;
+		case 0x30f: /* 1 100 001 111 */ cp1610_subat(1,7); break;
 
-		case 0x310: /* 1 100 010 000 */ cp1610_subat(2,0);        break;
-		case 0x311: /* 1 100 010 001 */ cp1610_subat(2,1);        break;
-		case 0x312: /* 1 100 010 010 */ cp1610_subat(2,2);        break;
-		case 0x313: /* 1 100 010 011 */ cp1610_subat(2,3);        break;
-		case 0x314: /* 1 100 010 100 */ cp1610_subat(2,4);        break;
-		case 0x315: /* 1 100 010 101 */ cp1610_subat(2,5);        break;
-		case 0x316: /* 1 100 010 110 */ cp1610_subat(2,6);        break;
-		case 0x317: /* 1 100 010 111 */ cp1610_subat(2,7);        break;
+		case 0x310: /* 1 100 010 000 */ cp1610_subat(2,0); break;
+		case 0x311: /* 1 100 010 001 */ cp1610_subat(2,1); break;
+		case 0x312: /* 1 100 010 010 */ cp1610_subat(2,2); break;
+		case 0x313: /* 1 100 010 011 */ cp1610_subat(2,3); break;
+		case 0x314: /* 1 100 010 100 */ cp1610_subat(2,4); break;
+		case 0x315: /* 1 100 010 101 */ cp1610_subat(2,5); break;
+		case 0x316: /* 1 100 010 110 */ cp1610_subat(2,6); break;
+		case 0x317: /* 1 100 010 111 */ cp1610_subat(2,7); break;
 
-		case 0x318: /* 1 100 011 000 */ cp1610_subat(3,0);        break;
-		case 0x319: /* 1 100 011 001 */ cp1610_subat(3,1);        break;
-		case 0x31a: /* 1 100 011 010 */ cp1610_subat(3,2);        break;
-		case 0x31b: /* 1 100 011 011 */ cp1610_subat(3,3);        break;
-		case 0x31c: /* 1 100 011 100 */ cp1610_subat(3,4);        break;
-		case 0x31d: /* 1 100 011 101 */ cp1610_subat(3,5);        break;
-		case 0x31e: /* 1 100 011 110 */ cp1610_subat(3,6);        break;
-		case 0x31f: /* 1 100 011 111 */ cp1610_subat(3,7);        break;
+		case 0x318: /* 1 100 011 000 */ cp1610_subat(3,0); break;
+		case 0x319: /* 1 100 011 001 */ cp1610_subat(3,1); break;
+		case 0x31a: /* 1 100 011 010 */ cp1610_subat(3,2); break;
+		case 0x31b: /* 1 100 011 011 */ cp1610_subat(3,3); break;
+		case 0x31c: /* 1 100 011 100 */ cp1610_subat(3,4); break;
+		case 0x31d: /* 1 100 011 101 */ cp1610_subat(3,5); break;
+		case 0x31e: /* 1 100 011 110 */ cp1610_subat(3,6); break;
+		case 0x31f: /* 1 100 011 111 */ cp1610_subat(3,7); break;
 
-		case 0x320: /* 1 100 100 000 */ cp1610_subat_i(4,0);  break;
-		case 0x321: /* 1 100 100 001 */ cp1610_subat_i(4,1);  break;
-		case 0x322: /* 1 100 100 010 */ cp1610_subat_i(4,2);  break;
-		case 0x323: /* 1 100 100 011 */ cp1610_subat_i(4,3);  break;
-		case 0x324: /* 1 100 100 100 */ cp1610_subat_i(4,4);  break;
-		case 0x325: /* 1 100 100 101 */ cp1610_subat_i(4,5);  break;
-		case 0x326: /* 1 100 100 110 */ cp1610_subat_i(4,6);  break;
-		case 0x327: /* 1 100 100 111 */ cp1610_subat_i(4,7);  break;
+		case 0x320: /* 1 100 100 000 */ cp1610_subat_i(4,0); break;
+		case 0x321: /* 1 100 100 001 */ cp1610_subat_i(4,1); break;
+		case 0x322: /* 1 100 100 010 */ cp1610_subat_i(4,2); break;
+		case 0x323: /* 1 100 100 011 */ cp1610_subat_i(4,3); break;
+		case 0x324: /* 1 100 100 100 */ cp1610_subat_i(4,4); break;
+		case 0x325: /* 1 100 100 101 */ cp1610_subat_i(4,5); break;
+		case 0x326: /* 1 100 100 110 */ cp1610_subat_i(4,6); break;
+		case 0x327: /* 1 100 100 111 */ cp1610_subat_i(4,7); break;
 
-		case 0x328: /* 1 100 101 000 */ cp1610_subat_i(5,0);  break;
-		case 0x329: /* 1 100 101 001 */ cp1610_subat_i(5,1);  break;
-		case 0x32a: /* 1 100 101 010 */ cp1610_subat_i(5,2);  break;
-		case 0x32b: /* 1 100 101 011 */ cp1610_subat_i(5,3);  break;
-		case 0x32c: /* 1 100 101 100 */ cp1610_subat_i(5,4);  break;
-		case 0x32d: /* 1 100 101 101 */ cp1610_subat_i(5,5);  break;
-		case 0x32e: /* 1 100 101 110 */ cp1610_subat_i(5,6);  break;
-		case 0x32f: /* 1 100 101 111 */ cp1610_subat_i(5,7);  break;
+		case 0x328: /* 1 100 101 000 */ cp1610_subat_i(5,0); break;
+		case 0x329: /* 1 100 101 001 */ cp1610_subat_i(5,1); break;
+		case 0x32a: /* 1 100 101 010 */ cp1610_subat_i(5,2); break;
+		case 0x32b: /* 1 100 101 011 */ cp1610_subat_i(5,3); break;
+		case 0x32c: /* 1 100 101 100 */ cp1610_subat_i(5,4); break;
+		case 0x32d: /* 1 100 101 101 */ cp1610_subat_i(5,5); break;
+		case 0x32e: /* 1 100 101 110 */ cp1610_subat_i(5,6); break;
+		case 0x32f: /* 1 100 101 111 */ cp1610_subat_i(5,7); break;
 
-		case 0x330: /* 1 100 110 000 */ cp1610_subat_d(6,0);  break;
-		case 0x331: /* 1 100 110 001 */ cp1610_subat_d(6,1);  break;
-		case 0x332: /* 1 100 110 010 */ cp1610_subat_d(6,2);  break;
-		case 0x333: /* 1 100 110 011 */ cp1610_subat_d(6,3);  break;
-		case 0x334: /* 1 100 110 100 */ cp1610_subat_d(6,4);  break;
-		case 0x335: /* 1 100 110 101 */ cp1610_subat_d(6,5);  break;
-		case 0x336: /* 1 100 110 110 */ cp1610_subat_d(6,6);  break;
-		case 0x337: /* 1 100 110 111 */ cp1610_subat_d(6,7);  break;
+		case 0x330: /* 1 100 110 000 */ cp1610_subat_d(6,0); break;
+		case 0x331: /* 1 100 110 001 */ cp1610_subat_d(6,1); break;
+		case 0x332: /* 1 100 110 010 */ cp1610_subat_d(6,2); break;
+		case 0x333: /* 1 100 110 011 */ cp1610_subat_d(6,3); break;
+		case 0x334: /* 1 100 110 100 */ cp1610_subat_d(6,4); break;
+		case 0x335: /* 1 100 110 101 */ cp1610_subat_d(6,5); break;
+		case 0x336: /* 1 100 110 110 */ cp1610_subat_d(6,6); break;
+		case 0x337: /* 1 100 110 111 */ cp1610_subat_d(6,7); break;
 
-		case 0x338: /* 1 100 111 000 */ cp1610_subi(0);           break;
-		case 0x339: /* 1 100 111 001 */ cp1610_subi(1);           break;
-		case 0x33a: /* 1 100 111 010 */ cp1610_subi(2);           break;
-		case 0x33b: /* 1 100 111 011 */ cp1610_subi(3);           break;
-		case 0x33c: /* 1 100 111 100 */ cp1610_subi(4);           break;
-		case 0x33d: /* 1 100 111 101 */ cp1610_subi(5);           break;
-		case 0x33e: /* 1 100 111 110 */ cp1610_subi(6);           break;
-		case 0x33f: /* 1 100 111 111 */ cp1610_subi(7);           break;
+		case 0x338: /* 1 100 111 000 */ cp1610_subi(0); break;
+		case 0x339: /* 1 100 111 001 */ cp1610_subi(1); break;
+		case 0x33a: /* 1 100 111 010 */ cp1610_subi(2); break;
+		case 0x33b: /* 1 100 111 011 */ cp1610_subi(3); break;
+		case 0x33c: /* 1 100 111 100 */ cp1610_subi(4); break;
+		case 0x33d: /* 1 100 111 101 */ cp1610_subi(5); break;
+		case 0x33e: /* 1 100 111 110 */ cp1610_subi(6); break;
+		case 0x33f: /* 1 100 111 111 */ cp1610_subi(7); break;
 
-		case 0x340: /* 1 101 000 000 */ cp1610_cmp(0);            break;
-		case 0x341: /* 1 101 000 001 */ cp1610_cmp(1);            break;
-		case 0x342: /* 1 101 000 010 */ cp1610_cmp(2);            break;
-		case 0x343: /* 1 101 000 011 */ cp1610_cmp(3);            break;
-		case 0x344: /* 1 101 000 100 */ cp1610_cmp(4);            break;
-		case 0x345: /* 1 101 000 101 */ cp1610_cmp(5);            break;
-		case 0x346: /* 1 101 000 110 */ cp1610_cmp(6);            break;
-		case 0x347: /* 1 101 000 111 */ cp1610_cmp(7);            break;
+		case 0x340: /* 1 101 000 000 */ cp1610_cmp(0); break;
+		case 0x341: /* 1 101 000 001 */ cp1610_cmp(1); break;
+		case 0x342: /* 1 101 000 010 */ cp1610_cmp(2); break;
+		case 0x343: /* 1 101 000 011 */ cp1610_cmp(3); break;
+		case 0x344: /* 1 101 000 100 */ cp1610_cmp(4); break;
+		case 0x345: /* 1 101 000 101 */ cp1610_cmp(5); break;
+		case 0x346: /* 1 101 000 110 */ cp1610_cmp(6); break;
+		case 0x347: /* 1 101 000 111 */ cp1610_cmp(7); break;
 
-		case 0x348: /* 1 101 001 000 */ cp1610_cmpat(1,0);        break;
-		case 0x349: /* 1 101 001 001 */ cp1610_cmpat(1,1);        break;
-		case 0x34a: /* 1 101 001 010 */ cp1610_cmpat(1,2);        break;
-		case 0x34b: /* 1 101 001 011 */ cp1610_cmpat(1,3);        break;
-		case 0x34c: /* 1 101 001 100 */ cp1610_cmpat(1,4);        break;
-		case 0x34d: /* 1 101 001 101 */ cp1610_cmpat(1,5);        break;
-		case 0x34e: /* 1 101 001 110 */ cp1610_cmpat(1,6);        break;
-		case 0x34f: /* 1 101 001 111 */ cp1610_cmpat(1,7);        break;
+		case 0x348: /* 1 101 001 000 */ cp1610_cmpat(1,0); break;
+		case 0x349: /* 1 101 001 001 */ cp1610_cmpat(1,1); break;
+		case 0x34a: /* 1 101 001 010 */ cp1610_cmpat(1,2); break;
+		case 0x34b: /* 1 101 001 011 */ cp1610_cmpat(1,3); break;
+		case 0x34c: /* 1 101 001 100 */ cp1610_cmpat(1,4); break;
+		case 0x34d: /* 1 101 001 101 */ cp1610_cmpat(1,5); break;
+		case 0x34e: /* 1 101 001 110 */ cp1610_cmpat(1,6); break;
+		case 0x34f: /* 1 101 001 111 */ cp1610_cmpat(1,7); break;
 
-		case 0x350: /* 1 101 010 000 */ cp1610_cmpat(2,0);        break;
-		case 0x351: /* 1 101 010 001 */ cp1610_cmpat(2,1);        break;
-		case 0x352: /* 1 101 010 010 */ cp1610_cmpat(2,2);        break;
-		case 0x353: /* 1 101 010 011 */ cp1610_cmpat(2,3);        break;
-		case 0x354: /* 1 101 010 100 */ cp1610_cmpat(2,4);        break;
-		case 0x355: /* 1 101 010 101 */ cp1610_cmpat(2,5);        break;
-		case 0x356: /* 1 101 010 110 */ cp1610_cmpat(2,6);        break;
-		case 0x357: /* 1 101 010 111 */ cp1610_cmpat(2,7);        break;
+		case 0x350: /* 1 101 010 000 */ cp1610_cmpat(2,0); break;
+		case 0x351: /* 1 101 010 001 */ cp1610_cmpat(2,1); break;
+		case 0x352: /* 1 101 010 010 */ cp1610_cmpat(2,2); break;
+		case 0x353: /* 1 101 010 011 */ cp1610_cmpat(2,3); break;
+		case 0x354: /* 1 101 010 100 */ cp1610_cmpat(2,4); break;
+		case 0x355: /* 1 101 010 101 */ cp1610_cmpat(2,5); break;
+		case 0x356: /* 1 101 010 110 */ cp1610_cmpat(2,6); break;
+		case 0x357: /* 1 101 010 111 */ cp1610_cmpat(2,7); break;
 
-		case 0x358: /* 1 101 011 000 */ cp1610_cmpat(3,0);        break;
-		case 0x359: /* 1 101 011 001 */ cp1610_cmpat(3,1);        break;
-		case 0x35a: /* 1 101 011 010 */ cp1610_cmpat(3,2);        break;
-		case 0x35b: /* 1 101 011 011 */ cp1610_cmpat(3,3);        break;
-		case 0x35c: /* 1 101 011 100 */ cp1610_cmpat(3,4);        break;
-		case 0x35d: /* 1 101 011 101 */ cp1610_cmpat(3,5);        break;
-		case 0x35e: /* 1 101 011 110 */ cp1610_cmpat(3,6);        break;
-		case 0x35f: /* 1 101 011 111 */ cp1610_cmpat(3,7);        break;
+		case 0x358: /* 1 101 011 000 */ cp1610_cmpat(3,0); break;
+		case 0x359: /* 1 101 011 001 */ cp1610_cmpat(3,1); break;
+		case 0x35a: /* 1 101 011 010 */ cp1610_cmpat(3,2); break;
+		case 0x35b: /* 1 101 011 011 */ cp1610_cmpat(3,3); break;
+		case 0x35c: /* 1 101 011 100 */ cp1610_cmpat(3,4); break;
+		case 0x35d: /* 1 101 011 101 */ cp1610_cmpat(3,5); break;
+		case 0x35e: /* 1 101 011 110 */ cp1610_cmpat(3,6); break;
+		case 0x35f: /* 1 101 011 111 */ cp1610_cmpat(3,7); break;
 
-		case 0x360: /* 1 101 100 000 */ cp1610_cmpat_i(4,0);  break;
-		case 0x361: /* 1 101 100 001 */ cp1610_cmpat_i(4,1);  break;
-		case 0x362: /* 1 101 100 010 */ cp1610_cmpat_i(4,2);  break;
-		case 0x363: /* 1 101 100 011 */ cp1610_cmpat_i(4,3);  break;
-		case 0x364: /* 1 101 100 100 */ cp1610_cmpat_i(4,4);  break;
-		case 0x365: /* 1 101 100 101 */ cp1610_cmpat_i(4,5);  break;
-		case 0x366: /* 1 101 100 110 */ cp1610_cmpat_i(4,6);  break;
-		case 0x367: /* 1 101 100 111 */ cp1610_cmpat_i(4,7);  break;
+		case 0x360: /* 1 101 100 000 */ cp1610_cmpat_i(4,0); break;
+		case 0x361: /* 1 101 100 001 */ cp1610_cmpat_i(4,1); break;
+		case 0x362: /* 1 101 100 010 */ cp1610_cmpat_i(4,2); break;
+		case 0x363: /* 1 101 100 011 */ cp1610_cmpat_i(4,3); break;
+		case 0x364: /* 1 101 100 100 */ cp1610_cmpat_i(4,4); break;
+		case 0x365: /* 1 101 100 101 */ cp1610_cmpat_i(4,5); break;
+		case 0x366: /* 1 101 100 110 */ cp1610_cmpat_i(4,6); break;
+		case 0x367: /* 1 101 100 111 */ cp1610_cmpat_i(4,7); break;
 
-		case 0x368: /* 1 101 101 000 */ cp1610_cmpat_i(5,0);  break;
-		case 0x369: /* 1 101 101 001 */ cp1610_cmpat_i(5,1);  break;
-		case 0x36a: /* 1 101 101 010 */ cp1610_cmpat_i(5,2);  break;
-		case 0x36b: /* 1 101 101 011 */ cp1610_cmpat_i(5,3);  break;
-		case 0x36c: /* 1 101 101 100 */ cp1610_cmpat_i(5,4);  break;
-		case 0x36d: /* 1 101 101 101 */ cp1610_cmpat_i(5,5);  break;
-		case 0x36e: /* 1 101 101 110 */ cp1610_cmpat_i(5,6);  break;
-		case 0x36f: /* 1 101 101 111 */ cp1610_cmpat_i(5,7);  break;
+		case 0x368: /* 1 101 101 000 */ cp1610_cmpat_i(5,0); break;
+		case 0x369: /* 1 101 101 001 */ cp1610_cmpat_i(5,1); break;
+		case 0x36a: /* 1 101 101 010 */ cp1610_cmpat_i(5,2); break;
+		case 0x36b: /* 1 101 101 011 */ cp1610_cmpat_i(5,3); break;
+		case 0x36c: /* 1 101 101 100 */ cp1610_cmpat_i(5,4); break;
+		case 0x36d: /* 1 101 101 101 */ cp1610_cmpat_i(5,5); break;
+		case 0x36e: /* 1 101 101 110 */ cp1610_cmpat_i(5,6); break;
+		case 0x36f: /* 1 101 101 111 */ cp1610_cmpat_i(5,7); break;
 
-		case 0x370: /* 1 101 110 000 */ cp1610_cmpat_d(6,0);  break;
-		case 0x371: /* 1 101 110 001 */ cp1610_cmpat_d(6,1);  break;
-		case 0x372: /* 1 101 110 010 */ cp1610_cmpat_d(6,2);  break;
-		case 0x373: /* 1 101 110 011 */ cp1610_cmpat_d(6,3);  break;
-		case 0x374: /* 1 101 110 100 */ cp1610_cmpat_d(6,4);  break;
-		case 0x375: /* 1 101 110 101 */ cp1610_cmpat_d(6,5);  break;
-		case 0x376: /* 1 101 110 110 */ cp1610_cmpat_d(6,6);  break;
-		case 0x377: /* 1 101 110 111 */ cp1610_cmpat_d(6,7);  break;
+		case 0x370: /* 1 101 110 000 */ cp1610_cmpat_d(6,0); break;
+		case 0x371: /* 1 101 110 001 */ cp1610_cmpat_d(6,1); break;
+		case 0x372: /* 1 101 110 010 */ cp1610_cmpat_d(6,2); break;
+		case 0x373: /* 1 101 110 011 */ cp1610_cmpat_d(6,3); break;
+		case 0x374: /* 1 101 110 100 */ cp1610_cmpat_d(6,4); break;
+		case 0x375: /* 1 101 110 101 */ cp1610_cmpat_d(6,5); break;
+		case 0x376: /* 1 101 110 110 */ cp1610_cmpat_d(6,6); break;
+		case 0x377: /* 1 101 110 111 */ cp1610_cmpat_d(6,7); break;
 
-		case 0x378: /* 1 101 111 000 */ cp1610_cmpi(0);           break;
-		case 0x379: /* 1 101 111 001 */ cp1610_cmpi(1);           break;
-		case 0x37a: /* 1 101 111 010 */ cp1610_cmpi(2);           break;
-		case 0x37b: /* 1 101 111 011 */ cp1610_cmpi(3);           break;
-		case 0x37c: /* 1 101 111 100 */ cp1610_cmpi(4);           break;
-		case 0x37d: /* 1 101 111 101 */ cp1610_cmpi(5);           break;
-		case 0x37e: /* 1 101 111 110 */ cp1610_cmpi(6);           break;
-		case 0x37f: /* 1 101 111 111 */ cp1610_cmpi(7);           break;
+		case 0x378: /* 1 101 111 000 */ cp1610_cmpi(0); break;
+		case 0x379: /* 1 101 111 001 */ cp1610_cmpi(1); break;
+		case 0x37a: /* 1 101 111 010 */ cp1610_cmpi(2); break;
+		case 0x37b: /* 1 101 111 011 */ cp1610_cmpi(3); break;
+		case 0x37c: /* 1 101 111 100 */ cp1610_cmpi(4); break;
+		case 0x37d: /* 1 101 111 101 */ cp1610_cmpi(5); break;
+		case 0x37e: /* 1 101 111 110 */ cp1610_cmpi(6); break;
+		case 0x37f: /* 1 101 111 111 */ cp1610_cmpi(7); break;
 
-		case 0x380: /* 1 110 000 000 */ cp1610_and(0);            break;
-		case 0x381: /* 1 110 000 001 */ cp1610_and(1);            break;
-		case 0x382: /* 1 110 000 010 */ cp1610_and(2);            break;
-		case 0x383: /* 1 110 000 011 */ cp1610_and(3);            break;
-		case 0x384: /* 1 110 000 100 */ cp1610_and(4);            break;
-		case 0x385: /* 1 110 000 101 */ cp1610_and(5);            break;
-		case 0x386: /* 1 110 000 110 */ cp1610_and(6);            break;
-		case 0x387: /* 1 110 000 111 */ cp1610_and(7);            break;
+		case 0x380: /* 1 110 000 000 */ cp1610_and(0); break;
+		case 0x381: /* 1 110 000 001 */ cp1610_and(1); break;
+		case 0x382: /* 1 110 000 010 */ cp1610_and(2); break;
+		case 0x383: /* 1 110 000 011 */ cp1610_and(3); break;
+		case 0x384: /* 1 110 000 100 */ cp1610_and(4); break;
+		case 0x385: /* 1 110 000 101 */ cp1610_and(5); break;
+		case 0x386: /* 1 110 000 110 */ cp1610_and(6); break;
+		case 0x387: /* 1 110 000 111 */ cp1610_and(7); break;
 
-		case 0x388: /* 1 110 001 000 */ cp1610_andat(1,0);        break;
-		case 0x389: /* 1 110 001 001 */ cp1610_andat(1,1);        break;
-		case 0x38a: /* 1 110 001 010 */ cp1610_andat(1,2);        break;
-		case 0x38b: /* 1 110 001 011 */ cp1610_andat(1,3);        break;
-		case 0x38c: /* 1 110 001 100 */ cp1610_andat(1,4);        break;
-		case 0x38d: /* 1 110 001 101 */ cp1610_andat(1,5);        break;
-		case 0x38e: /* 1 110 001 110 */ cp1610_andat(1,6);        break;
-		case 0x38f: /* 1 110 001 111 */ cp1610_andat(1,7);        break;
+		case 0x388: /* 1 110 001 000 */ cp1610_andat(1,0); break;
+		case 0x389: /* 1 110 001 001 */ cp1610_andat(1,1); break;
+		case 0x38a: /* 1 110 001 010 */ cp1610_andat(1,2); break;
+		case 0x38b: /* 1 110 001 011 */ cp1610_andat(1,3); break;
+		case 0x38c: /* 1 110 001 100 */ cp1610_andat(1,4); break;
+		case 0x38d: /* 1 110 001 101 */ cp1610_andat(1,5); break;
+		case 0x38e: /* 1 110 001 110 */ cp1610_andat(1,6); break;
+		case 0x38f: /* 1 110 001 111 */ cp1610_andat(1,7); break;
 
-		case 0x390: /* 1 110 010 000 */ cp1610_andat(2,0);        break;
-		case 0x391: /* 1 110 010 001 */ cp1610_andat(2,1);        break;
-		case 0x392: /* 1 110 010 010 */ cp1610_andat(2,2);        break;
-		case 0x393: /* 1 110 010 011 */ cp1610_andat(2,3);        break;
-		case 0x394: /* 1 110 010 100 */ cp1610_andat(2,4);        break;
-		case 0x395: /* 1 110 010 101 */ cp1610_andat(2,5);        break;
-		case 0x396: /* 1 110 010 110 */ cp1610_andat(2,6);        break;
-		case 0x397: /* 1 110 010 111 */ cp1610_andat(2,7);        break;
+		case 0x390: /* 1 110 010 000 */ cp1610_andat(2,0); break;
+		case 0x391: /* 1 110 010 001 */ cp1610_andat(2,1); break;
+		case 0x392: /* 1 110 010 010 */ cp1610_andat(2,2); break;
+		case 0x393: /* 1 110 010 011 */ cp1610_andat(2,3); break;
+		case 0x394: /* 1 110 010 100 */ cp1610_andat(2,4); break;
+		case 0x395: /* 1 110 010 101 */ cp1610_andat(2,5); break;
+		case 0x396: /* 1 110 010 110 */ cp1610_andat(2,6); break;
+		case 0x397: /* 1 110 010 111 */ cp1610_andat(2,7); break;
 
-		case 0x398: /* 1 110 011 000 */ cp1610_andat(3,0);        break;
-		case 0x399: /* 1 110 011 001 */ cp1610_andat(3,1);        break;
-		case 0x39a: /* 1 110 011 010 */ cp1610_andat(3,2);        break;
-		case 0x39b: /* 1 110 011 011 */ cp1610_andat(3,3);        break;
-		case 0x39c: /* 1 110 011 100 */ cp1610_andat(3,4);        break;
-		case 0x39d: /* 1 110 011 101 */ cp1610_andat(3,5);        break;
-		case 0x39e: /* 1 110 011 110 */ cp1610_andat(3,6);        break;
-		case 0x39f: /* 1 110 011 111 */ cp1610_andat(3,7);        break;
+		case 0x398: /* 1 110 011 000 */ cp1610_andat(3,0); break;
+		case 0x399: /* 1 110 011 001 */ cp1610_andat(3,1); break;
+		case 0x39a: /* 1 110 011 010 */ cp1610_andat(3,2); break;
+		case 0x39b: /* 1 110 011 011 */ cp1610_andat(3,3); break;
+		case 0x39c: /* 1 110 011 100 */ cp1610_andat(3,4); break;
+		case 0x39d: /* 1 110 011 101 */ cp1610_andat(3,5); break;
+		case 0x39e: /* 1 110 011 110 */ cp1610_andat(3,6); break;
+		case 0x39f: /* 1 110 011 111 */ cp1610_andat(3,7); break;
 
-		case 0x3a0: /* 1 110 100 000 */ cp1610_andat_i(4,0);  break;
-		case 0x3a1: /* 1 110 100 001 */ cp1610_andat_i(4,1);  break;
-		case 0x3a2: /* 1 110 100 010 */ cp1610_andat_i(4,2);  break;
-		case 0x3a3: /* 1 110 100 011 */ cp1610_andat_i(4,3);  break;
-		case 0x3a4: /* 1 110 100 100 */ cp1610_andat_i(4,4);  break;
-		case 0x3a5: /* 1 110 100 101 */ cp1610_andat_i(4,5);  break;
-		case 0x3a6: /* 1 110 100 110 */ cp1610_andat_i(4,6);  break;
-		case 0x3a7: /* 1 110 100 111 */ cp1610_andat_i(4,7);  break;
+		case 0x3a0: /* 1 110 100 000 */ cp1610_andat_i(4,0); break;
+		case 0x3a1: /* 1 110 100 001 */ cp1610_andat_i(4,1); break;
+		case 0x3a2: /* 1 110 100 010 */ cp1610_andat_i(4,2); break;
+		case 0x3a3: /* 1 110 100 011 */ cp1610_andat_i(4,3); break;
+		case 0x3a4: /* 1 110 100 100 */ cp1610_andat_i(4,4); break;
+		case 0x3a5: /* 1 110 100 101 */ cp1610_andat_i(4,5); break;
+		case 0x3a6: /* 1 110 100 110 */ cp1610_andat_i(4,6); break;
+		case 0x3a7: /* 1 110 100 111 */ cp1610_andat_i(4,7); break;
 
-		case 0x3a8: /* 1 110 101 000 */ cp1610_andat_i(5,0);  break;
-		case 0x3a9: /* 1 110 101 001 */ cp1610_andat_i(5,1);  break;
-		case 0x3aa: /* 1 110 101 010 */ cp1610_andat_i(5,2);  break;
-		case 0x3ab: /* 1 110 101 011 */ cp1610_andat_i(5,3);  break;
-		case 0x3ac: /* 1 110 101 100 */ cp1610_andat_i(5,4);  break;
-		case 0x3ad: /* 1 110 101 101 */ cp1610_andat_i(5,5);  break;
-		case 0x3ae: /* 1 110 101 110 */ cp1610_andat_i(5,6);  break;
-		case 0x3af: /* 1 110 101 111 */ cp1610_andat_i(5,7);  break;
+		case 0x3a8: /* 1 110 101 000 */ cp1610_andat_i(5,0); break;
+		case 0x3a9: /* 1 110 101 001 */ cp1610_andat_i(5,1); break;
+		case 0x3aa: /* 1 110 101 010 */ cp1610_andat_i(5,2); break;
+		case 0x3ab: /* 1 110 101 011 */ cp1610_andat_i(5,3); break;
+		case 0x3ac: /* 1 110 101 100 */ cp1610_andat_i(5,4); break;
+		case 0x3ad: /* 1 110 101 101 */ cp1610_andat_i(5,5); break;
+		case 0x3ae: /* 1 110 101 110 */ cp1610_andat_i(5,6); break;
+		case 0x3af: /* 1 110 101 111 */ cp1610_andat_i(5,7); break;
 
-		case 0x3b0: /* 1 110 110 000 */ cp1610_andat_d(6,0);  break;
-		case 0x3b1: /* 1 110 110 001 */ cp1610_andat_d(6,1);  break;
-		case 0x3b2: /* 1 110 110 010 */ cp1610_andat_d(6,2);  break;
-		case 0x3b3: /* 1 110 110 011 */ cp1610_andat_d(6,3);  break;
-		case 0x3b4: /* 1 110 110 100 */ cp1610_andat_d(6,4);  break;
-		case 0x3b5: /* 1 110 110 101 */ cp1610_andat_d(6,5);  break;
-		case 0x3b6: /* 1 110 110 110 */ cp1610_andat_d(6,6);  break;
-		case 0x3b7: /* 1 110 110 111 */ cp1610_andat_d(6,7);  break;
+		case 0x3b0: /* 1 110 110 000 */ cp1610_andat_d(6,0); break;
+		case 0x3b1: /* 1 110 110 001 */ cp1610_andat_d(6,1); break;
+		case 0x3b2: /* 1 110 110 010 */ cp1610_andat_d(6,2); break;
+		case 0x3b3: /* 1 110 110 011 */ cp1610_andat_d(6,3); break;
+		case 0x3b4: /* 1 110 110 100 */ cp1610_andat_d(6,4); break;
+		case 0x3b5: /* 1 110 110 101 */ cp1610_andat_d(6,5); break;
+		case 0x3b6: /* 1 110 110 110 */ cp1610_andat_d(6,6); break;
+		case 0x3b7: /* 1 110 110 111 */ cp1610_andat_d(6,7); break;
 
-		case 0x3b8: /* 1 110 111 000 */ cp1610_andi(0);           break;
-		case 0x3b9: /* 1 110 111 001 */ cp1610_andi(1);           break;
-		case 0x3ba: /* 1 110 111 010 */ cp1610_andi(2);           break;
-		case 0x3bb: /* 1 110 111 011 */ cp1610_andi(3);           break;
-		case 0x3bc: /* 1 110 111 100 */ cp1610_andi(4);           break;
-		case 0x3bd: /* 1 110 111 101 */ cp1610_andi(5);           break;
-		case 0x3be: /* 1 110 111 110 */ cp1610_andi(6);           break;
-		case 0x3bf: /* 1 110 111 111 */ cp1610_andi(7);           break;
+		case 0x3b8: /* 1 110 111 000 */ cp1610_andi(0); break;
+		case 0x3b9: /* 1 110 111 001 */ cp1610_andi(1); break;
+		case 0x3ba: /* 1 110 111 010 */ cp1610_andi(2); break;
+		case 0x3bb: /* 1 110 111 011 */ cp1610_andi(3); break;
+		case 0x3bc: /* 1 110 111 100 */ cp1610_andi(4); break;
+		case 0x3bd: /* 1 110 111 101 */ cp1610_andi(5); break;
+		case 0x3be: /* 1 110 111 110 */ cp1610_andi(6); break;
+		case 0x3bf: /* 1 110 111 111 */ cp1610_andi(7); break;
 
-		case 0x3c0: /* 1 111 000 000 */ cp1610_xor(0);            break;
-		case 0x3c1: /* 1 111 000 001 */ cp1610_xor(1);            break;
-		case 0x3c2: /* 1 111 000 010 */ cp1610_xor(2);            break;
-		case 0x3c3: /* 1 111 000 011 */ cp1610_xor(3);            break;
-		case 0x3c4: /* 1 111 000 100 */ cp1610_xor(4);            break;
-		case 0x3c5: /* 1 111 000 101 */ cp1610_xor(5);            break;
-		case 0x3c6: /* 1 111 000 110 */ cp1610_xor(6);            break;
-		case 0x3c7: /* 1 111 000 111 */ cp1610_xor(7);            break;
+		case 0x3c0: /* 1 111 000 000 */ cp1610_xor(0); break;
+		case 0x3c1: /* 1 111 000 001 */ cp1610_xor(1); break;
+		case 0x3c2: /* 1 111 000 010 */ cp1610_xor(2); break;
+		case 0x3c3: /* 1 111 000 011 */ cp1610_xor(3); break;
+		case 0x3c4: /* 1 111 000 100 */ cp1610_xor(4); break;
+		case 0x3c5: /* 1 111 000 101 */ cp1610_xor(5); break;
+		case 0x3c6: /* 1 111 000 110 */ cp1610_xor(6); break;
+		case 0x3c7: /* 1 111 000 111 */ cp1610_xor(7); break;
 
-		case 0x3c8: /* 1 111 001 000 */ cp1610_xorat(1,0);        break;
-		case 0x3c9: /* 1 111 001 001 */ cp1610_xorat(1,1);        break;
-		case 0x3ca: /* 1 111 001 010 */ cp1610_xorat(1,2);        break;
-		case 0x3cb: /* 1 111 001 011 */ cp1610_xorat(1,3);        break;
-		case 0x3cc: /* 1 111 001 100 */ cp1610_xorat(1,4);        break;
-		case 0x3cd: /* 1 111 001 101 */ cp1610_xorat(1,5);        break;
-		case 0x3ce: /* 1 111 001 110 */ cp1610_xorat(1,6);        break;
-		case 0x3cf: /* 1 111 001 111 */ cp1610_xorat(1,7);        break;
+		case 0x3c8: /* 1 111 001 000 */ cp1610_xorat(1,0); break;
+		case 0x3c9: /* 1 111 001 001 */ cp1610_xorat(1,1); break;
+		case 0x3ca: /* 1 111 001 010 */ cp1610_xorat(1,2); break;
+		case 0x3cb: /* 1 111 001 011 */ cp1610_xorat(1,3); break;
+		case 0x3cc: /* 1 111 001 100 */ cp1610_xorat(1,4); break;
+		case 0x3cd: /* 1 111 001 101 */ cp1610_xorat(1,5); break;
+		case 0x3ce: /* 1 111 001 110 */ cp1610_xorat(1,6); break;
+		case 0x3cf: /* 1 111 001 111 */ cp1610_xorat(1,7); break;
 
-		case 0x3d0: /* 1 111 010 000 */ cp1610_xorat(2,0);        break;
-		case 0x3d1: /* 1 111 010 001 */ cp1610_xorat(2,1);        break;
-		case 0x3d2: /* 1 111 010 010 */ cp1610_xorat(2,2);        break;
-		case 0x3d3: /* 1 111 010 011 */ cp1610_xorat(2,3);        break;
-		case 0x3d4: /* 1 111 010 100 */ cp1610_xorat(2,4);        break;
-		case 0x3d5: /* 1 111 010 101 */ cp1610_xorat(2,5);        break;
-		case 0x3d6: /* 1 111 010 110 */ cp1610_xorat(2,6);        break;
-		case 0x3d7: /* 1 111 010 111 */ cp1610_xorat(2,7);        break;
+		case 0x3d0: /* 1 111 010 000 */ cp1610_xorat(2,0); break;
+		case 0x3d1: /* 1 111 010 001 */ cp1610_xorat(2,1); break;
+		case 0x3d2: /* 1 111 010 010 */ cp1610_xorat(2,2); break;
+		case 0x3d3: /* 1 111 010 011 */ cp1610_xorat(2,3); break;
+		case 0x3d4: /* 1 111 010 100 */ cp1610_xorat(2,4); break;
+		case 0x3d5: /* 1 111 010 101 */ cp1610_xorat(2,5); break;
+		case 0x3d6: /* 1 111 010 110 */ cp1610_xorat(2,6); break;
+		case 0x3d7: /* 1 111 010 111 */ cp1610_xorat(2,7); break;
 
-		case 0x3d8: /* 1 111 011 000 */ cp1610_xorat(3,0);        break;
-		case 0x3d9: /* 1 111 011 001 */ cp1610_xorat(3,1);        break;
-		case 0x3da: /* 1 111 011 010 */ cp1610_xorat(3,2);        break;
-		case 0x3db: /* 1 111 011 011 */ cp1610_xorat(3,3);        break;
-		case 0x3dc: /* 1 111 011 100 */ cp1610_xorat(3,4);        break;
-		case 0x3dd: /* 1 111 011 101 */ cp1610_xorat(3,5);        break;
-		case 0x3de: /* 1 111 011 110 */ cp1610_xorat(3,6);        break;
-		case 0x3df: /* 1 111 011 111 */ cp1610_xorat(3,7);        break;
+		case 0x3d8: /* 1 111 011 000 */ cp1610_xorat(3,0); break;
+		case 0x3d9: /* 1 111 011 001 */ cp1610_xorat(3,1); break;
+		case 0x3da: /* 1 111 011 010 */ cp1610_xorat(3,2); break;
+		case 0x3db: /* 1 111 011 011 */ cp1610_xorat(3,3); break;
+		case 0x3dc: /* 1 111 011 100 */ cp1610_xorat(3,4); break;
+		case 0x3dd: /* 1 111 011 101 */ cp1610_xorat(3,5); break;
+		case 0x3de: /* 1 111 011 110 */ cp1610_xorat(3,6); break;
+		case 0x3df: /* 1 111 011 111 */ cp1610_xorat(3,7); break;
 
-		case 0x3e0: /* 1 111 100 000 */ cp1610_xorat_i(4,0);  break;
-		case 0x3e1: /* 1 111 100 001 */ cp1610_xorat_i(4,1);  break;
-		case 0x3e2: /* 1 111 100 010 */ cp1610_xorat_i(4,2);  break;
-		case 0x3e3: /* 1 111 100 011 */ cp1610_xorat_i(4,3);  break;
-		case 0x3e4: /* 1 111 100 100 */ cp1610_xorat_i(4,4);  break;
-		case 0x3e5: /* 1 111 100 101 */ cp1610_xorat_i(4,5);  break;
-		case 0x3e6: /* 1 111 100 110 */ cp1610_xorat_i(4,6);  break;
-		case 0x3e7: /* 1 111 100 111 */ cp1610_xorat_i(4,7);  break;
+		case 0x3e0: /* 1 111 100 000 */ cp1610_xorat_i(4,0); break;
+		case 0x3e1: /* 1 111 100 001 */ cp1610_xorat_i(4,1); break;
+		case 0x3e2: /* 1 111 100 010 */ cp1610_xorat_i(4,2); break;
+		case 0x3e3: /* 1 111 100 011 */ cp1610_xorat_i(4,3); break;
+		case 0x3e4: /* 1 111 100 100 */ cp1610_xorat_i(4,4); break;
+		case 0x3e5: /* 1 111 100 101 */ cp1610_xorat_i(4,5); break;
+		case 0x3e6: /* 1 111 100 110 */ cp1610_xorat_i(4,6); break;
+		case 0x3e7: /* 1 111 100 111 */ cp1610_xorat_i(4,7); break;
 
-		case 0x3e8: /* 1 111 101 000 */ cp1610_xorat_i(5,0);  break;
-		case 0x3e9: /* 1 111 101 001 */ cp1610_xorat_i(5,1);  break;
-		case 0x3ea: /* 1 111 101 010 */ cp1610_xorat_i(5,2);  break;
-		case 0x3eb: /* 1 111 101 011 */ cp1610_xorat_i(5,3);  break;
-		case 0x3ec: /* 1 111 101 100 */ cp1610_xorat_i(5,4);  break;
-		case 0x3ed: /* 1 111 101 101 */ cp1610_xorat_i(5,5);  break;
-		case 0x3ee: /* 1 111 101 110 */ cp1610_xorat_i(5,6);  break;
-		case 0x3ef: /* 1 111 101 111 */ cp1610_xorat_i(5,7);  break;
+		case 0x3e8: /* 1 111 101 000 */ cp1610_xorat_i(5,0); break;
+		case 0x3e9: /* 1 111 101 001 */ cp1610_xorat_i(5,1); break;
+		case 0x3ea: /* 1 111 101 010 */ cp1610_xorat_i(5,2); break;
+		case 0x3eb: /* 1 111 101 011 */ cp1610_xorat_i(5,3); break;
+		case 0x3ec: /* 1 111 101 100 */ cp1610_xorat_i(5,4); break;
+		case 0x3ed: /* 1 111 101 101 */ cp1610_xorat_i(5,5); break;
+		case 0x3ee: /* 1 111 101 110 */ cp1610_xorat_i(5,6); break;
+		case 0x3ef: /* 1 111 101 111 */ cp1610_xorat_i(5,7); break;
 
-		case 0x3f0: /* 1 111 110 000 */ cp1610_xorat_d(6,0);  break;
-		case 0x3f1: /* 1 111 110 001 */ cp1610_xorat_d(6,1);  break;
-		case 0x3f2: /* 1 111 110 010 */ cp1610_xorat_d(6,2);  break;
-		case 0x3f3: /* 1 111 110 011 */ cp1610_xorat_d(6,3);  break;
-		case 0x3f4: /* 1 111 110 100 */ cp1610_xorat_d(6,4);  break;
-		case 0x3f5: /* 1 111 110 101 */ cp1610_xorat_d(6,5);  break;
-		case 0x3f6: /* 1 111 110 110 */ cp1610_xorat_d(6,6);  break;
-		case 0x3f7: /* 1 111 110 111 */ cp1610_xorat_d(6,7);  break;
+		case 0x3f0: /* 1 111 110 000 */ cp1610_xorat_d(6,0); break;
+		case 0x3f1: /* 1 111 110 001 */ cp1610_xorat_d(6,1); break;
+		case 0x3f2: /* 1 111 110 010 */ cp1610_xorat_d(6,2); break;
+		case 0x3f3: /* 1 111 110 011 */ cp1610_xorat_d(6,3); break;
+		case 0x3f4: /* 1 111 110 100 */ cp1610_xorat_d(6,4); break;
+		case 0x3f5: /* 1 111 110 101 */ cp1610_xorat_d(6,5); break;
+		case 0x3f6: /* 1 111 110 110 */ cp1610_xorat_d(6,6); break;
+		case 0x3f7: /* 1 111 110 111 */ cp1610_xorat_d(6,7); break;
 
-		case 0x3f8: /* 1 111 111 000 */ cp1610_xori(0);           break;
-		case 0x3f9: /* 1 111 111 001 */ cp1610_xori(1);           break;
-		case 0x3fa: /* 1 111 111 010 */ cp1610_xori(2);           break;
-		case 0x3fb: /* 1 111 111 011 */ cp1610_xori(3);           break;
-		case 0x3fc: /* 1 111 111 100 */ cp1610_xori(4);           break;
-		case 0x3fd: /* 1 111 111 101 */ cp1610_xori(5);           break;
-		case 0x3fe: /* 1 111 111 110 */ cp1610_xori(6);           break;
-		case 0x3ff: /* 1 111 111 111 */ cp1610_xori(7);           break;
+		case 0x3f8: /* 1 111 111 000 */ cp1610_xori(0); break;
+		case 0x3f9: /* 1 111 111 001 */ cp1610_xori(1); break;
+		case 0x3fa: /* 1 111 111 010 */ cp1610_xori(2); break;
+		case 0x3fb: /* 1 111 111 011 */ cp1610_xori(3); break;
+		case 0x3fc: /* 1 111 111 100 */ cp1610_xori(4); break;
+		case 0x3fd: /* 1 111 111 101 */ cp1610_xori(5); break;
+		case 0x3fe: /* 1 111 111 110 */ cp1610_xori(6); break;
+		case 0x3ff: /* 1 111 111 111 */ cp1610_xori(7); break;
 		}
 
 		if (m_mask_interrupts == 0)
@@ -3387,6 +3363,12 @@ void cp1610_cpu_device::device_start()
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
 
 	m_icountptr = &m_icount;
+}
+
+void cp1610_cpu_device::device_reset()
+{
+	/* This is how we set the reset vector */
+	set_input_line(CP1610_RESET, PULSE_LINE);
 }
 
 void cp1610_cpu_device::execute_set_input(int irqline, int state)

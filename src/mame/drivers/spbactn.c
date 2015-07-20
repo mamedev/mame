@@ -84,7 +84,7 @@ The manual defines the controls as 4 push buttons:
 
 TODO : (also check the notes from the galspnbl.c driver)
 
-  - coin insertion is not recognized consistenly.
+  - coin insertion is not recognized consistently.
   - rewrite video, do single pass sprite render, move sprite code to device, share with gaiden.c etc.
   - convert to tilemaps
   - all the unknown regs
@@ -580,7 +580,7 @@ ROM_START( spbactnp )
 
 
 	/* does this have an extra (horizontal) screen maybe, with the girls being displayed on that instead of the main one.. */
-	ROM_REGION( 0x10000, "extracpu", 0 ) // what? it's annother z80 rom... unused for now
+	ROM_REGION( 0x10000, "extracpu", 0 ) // what? it's another z80 rom... unused for now
 	ROM_LOAD( "6204_6-6.29c",   0x00000, 0x10000, CRC(e8250c26) SHA1(9b669878790c8e3c5d80f165b5ffa1d6830f4696) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* 8x8 BG Tiles */ // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation??
@@ -592,6 +592,6 @@ ROM_START( spbactnp )
 	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
 ROM_END
 
-GAME( 1991, spbactn, 0,        spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, spbactnj, spbactn, spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", GAME_NOT_WORKING ) // early proto, (c) date is 2 years earlier!
+GAME( 1991, spbactn, 0,        spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, spbactnj, spbactn, spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!

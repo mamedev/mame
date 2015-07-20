@@ -10,7 +10,7 @@
 #define DGN_BETA_H_
 
 #include "video/mc6845.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 
@@ -58,12 +58,6 @@
 #define KOutDat             KInClk      /* Also used for data into output shifter */
 #define KInDat              0x20        /* Keyboard data in from keyboard (serial stream) */
 
-/***** WD2797 pins *****/
-
-#define DSMask              0x03        /* PA0 & PA1 are binary encoded drive */
-#define ENPCtrl             0x20        /* PA5 on PIA */
-#define DDenCtrl            0x40        /* PA6 on PIA */
-
 /***** Video Modes *****/
 
 enum BETA_VID_MODES
@@ -93,7 +87,14 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
+		m_fdc(*this, FDC_TAG),
+		m_floppy0(*this, FDC_TAG ":0"),
+		m_floppy1(*this, FDC_TAG ":1"),
+		m_floppy2(*this, FDC_TAG ":2"),
+		m_floppy3(*this, FDC_TAG ":3"),
 		m_palette(*this, "palette") { }
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<mc6845_device> m_mc6845;
 	required_shared_ptr<UINT8> m_videoram;
@@ -214,6 +215,11 @@ public:
 	void dgn_beta_frame_interrupt (int data);
 	void dgn_beta_line_interrupt (int data);
 	required_device<ram_device> m_ram;
+	required_device<wd2797_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 	required_device<palette_device> m_palette;
 };
 

@@ -22,7 +22,7 @@
 
 #define ARCOMPACT_OPERATION ((op & 0xf800) >> 11)
 
-extern char *output;;
+extern char *output;
 
 CPU_DISASSEMBLE(arcompact)
 {

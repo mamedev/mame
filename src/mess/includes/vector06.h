@@ -15,10 +15,9 @@
 #include "sound/wave.h"
 #include "machine/i8255.h"
 #include "machine/ram.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -32,16 +31,22 @@ public:
 	m_cassette(*this, "cassette"),
 	m_cart(*this, "cartslot"),
 	m_fdc(*this, "wd1793"),
+	m_floppy0(*this, "wd1793:0"),
+	m_floppy1(*this, "wd1793:1"),
 	m_ppi(*this, "ppi8255"),
 	m_ppi2(*this, "ppi8255_2"),
 	m_ram(*this, RAM_TAG),
 	m_palette(*this, "palette")
 	{ }
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
-	required_device<fd1793_device> m_fdc;
+	required_device<fd1793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<i8255_device> m_ppi;
 	required_device<i8255_device> m_ppi2;
 	required_device<ram_device> m_ram;

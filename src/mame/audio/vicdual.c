@@ -15,8 +15,6 @@
  * Oct 2004, Derrick Renaud
  ************************************************************************/
 
-static emu_timer *frogs_croak_timer;
-
 
 /* Discrete Sound Input Nodes */
 #define FROGS_FLY_EN        NODE_01
@@ -133,7 +131,7 @@ TIMER_CALLBACK_MEMBER( vicdual_state::frogs_croak_callback )
 
 MACHINE_START_MEMBER(vicdual_state,frogs_audio)
 {
-	frogs_croak_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vicdual_state::frogs_croak_callback), this));
+	m_frogs_croak_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vicdual_state::frogs_croak_callback), this));
 
 	machine_start();
 }
@@ -164,7 +162,7 @@ WRITE8_MEMBER( vicdual_state::frogs_audio_w )
 		if (last_croak)
 		{
 			/* The croak will keep playing until .429s after being disabled */
-			frogs_croak_timer->adjust(attotime::from_double(1.1 * RES_K(390) * CAP_U(1)));
+			m_frogs_croak_timer->adjust(attotime::from_double(1.1 * RES_K(390) * CAP_U(1)));
 		}
 	}
 	if (new_buzzz)

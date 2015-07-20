@@ -78,7 +78,20 @@
  *
  *************************************/
 
-void grchamp_state::machine_reset()
+void grchamp_state::machine_start()
+{
+	save_item(NAME(m_cpu0_out));
+	save_item(NAME(m_cpu1_out));
+	save_item(NAME(m_comm_latch));
+	save_item(NAME(m_comm_latch2));
+	save_item(NAME(m_ledlatch));
+	save_item(NAME(m_ledaddr));
+	save_item(NAME(m_ledram));
+	save_item(NAME(m_collide));
+	save_item(NAME(m_collmode));
+}
+
+	void grchamp_state::machine_reset()
 {
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
 	coin_lockout_w(machine(), 1, (ioport("DSWB")->read() & 0x10) ? 1 : 0);
@@ -92,14 +105,14 @@ void grchamp_state::machine_reset()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(grchamp_state::grchamp_cpu0_interrupt)
+INTERRUPT_GEN_MEMBER(grchamp_state::cpu0_interrupt)
 {
 	if (m_cpu0_out[0] & 0x01)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(grchamp_state::grchamp_cpu1_interrupt)
+INTERRUPT_GEN_MEMBER(grchamp_state::cpu1_interrupt)
 {
 	if (m_cpu1_out[4] & 0x01)
 		device.execute().set_input_line(0, ASSERT_LINE);
@@ -409,22 +422,22 @@ READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
  *
  *************************************/
 
-WRITE8_MEMBER(grchamp_state::grchamp_portA_0_w)
+WRITE8_MEMBER(grchamp_state::portA_0_w)
 {
 	m_discrete->write(space, GRCHAMP_A_DATA, data);
 }
 
-WRITE8_MEMBER(grchamp_state::grchamp_portB_0_w)
+WRITE8_MEMBER(grchamp_state::portB_0_w)
 {
 	m_discrete->write(space, GRCHAMP_B_DATA, 255-data);
 }
 
-WRITE8_MEMBER(grchamp_state::grchamp_portA_2_w)
+WRITE8_MEMBER(grchamp_state::portA_2_w)
 {
 	/* A0/A1 modify the output of AY8910 #2 */
 	/* A7 contributes to the discrete logic hanging off of AY8910 #0 */
 }
-WRITE8_MEMBER(grchamp_state::grchamp_portB_2_w)
+WRITE8_MEMBER(grchamp_state::portB_2_w)
 {
 	/* B0 connects elsewhere */
 }
@@ -505,9 +518,9 @@ ADDRESS_MAP_END
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, grchamp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(grchamp_left_w) AM_SHARE("leftram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(grchamp_right_w) AM_SHARE("rightram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(grchamp_center_w) AM_SHARE("centerram")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(left_w) AM_SHARE("leftram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(right_w) AM_SHARE("rightram")
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(center_w) AM_SHARE("centerram")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x5000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
@@ -636,13 +649,13 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  grchamp_cpu0_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
 
 	/* GAME BOARD */
 	MCFG_CPU_ADD("sub", Z80, PIXEL_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  grchamp_cpu1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
 
 	/* SOUND BOARD */
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/2)
@@ -660,23 +673,23 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(grchamp_state, screen_update_grchamp)
+	MCFG_SCREEN_UPDATE_DRIVER(grchamp_state, screen_update)
 
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, grchamp_portA_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, grchamp_portB_0_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
 	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
 	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, grchamp_portA_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, grchamp_portB_2_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -747,4 +760,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, grchamp, 0, grchamp, grchamp, driver_device, 0, ROT270, "Taito", "Grand Champion", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS, layout_grchamp )
+GAMEL( 1981, grchamp, 0, grchamp, grchamp, driver_device, 0, ROT270, "Taito", "Grand Champion", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_grchamp )

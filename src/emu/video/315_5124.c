@@ -171,7 +171,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 
 
 sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source)
-	: device_t( mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	: device_t( mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_cram_size( cram_size )
@@ -1613,8 +1613,11 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_hcounter));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_current_palette));
-	save_item(NAME(m_tmpbitmap));
-	save_item(NAME(m_y1_bitmap));
+
+	// these were created with register_screen_bitmap which is dynamic, and will reallocate if the screen size changes, saving them is NOT safe with the current core.
+	// The Genesis VDP (315_5313.c) which uses this as a base in order to support the legacy SMS operaiton mode can change resolutions for example.
+	//save_item(NAME(m_tmpbitmap));
+	//save_item(NAME(m_y1_bitmap));
 	save_item(NAME(m_draw_time));
 	save_item(NAME(m_sprite_base));
 	save_item(NAME(m_sprite_pattern_line));

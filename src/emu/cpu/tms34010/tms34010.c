@@ -174,32 +174,32 @@ inline UINT32 tms340x0_device::ROPCODE()
 {
 	UINT32 pc = TOBYTE(m_pc);
 	m_pc += 2 << 3;
-	return m_direct->read_decrypted_word(pc);
+	return m_direct->read_word(pc);
 }
 
 inline INT16 tms340x0_device::PARAM_WORD()
 {
 	UINT32 pc = TOBYTE(m_pc);
 	m_pc += 2 << 3;
-	return m_direct->read_raw_word(pc);
+	return m_direct->read_word(pc);
 }
 
 inline INT32 tms340x0_device::PARAM_LONG()
 {
 	UINT32 pc = TOBYTE(m_pc);
 	m_pc += 4 << 3;
-	return (UINT16)m_direct->read_raw_word(pc) | (m_direct->read_raw_word(pc + 2) << 16);
+	return (UINT16)m_direct->read_word(pc) | (m_direct->read_word(pc + 2) << 16);
 }
 
 inline INT16 tms340x0_device::PARAM_WORD_NO_INC()
 {
-	return m_direct->read_raw_word(TOBYTE(m_pc));
+	return m_direct->read_word(TOBYTE(m_pc));
 }
 
 inline INT32 tms340x0_device::PARAM_LONG_NO_INC()
 {
 	UINT32 pc = TOBYTE(m_pc);
-	return (UINT16)m_direct->read_raw_word(pc) | (m_direct->read_raw_word(pc + 2) << 16);
+	return (UINT16)m_direct->read_word(pc) | (m_direct->read_word(pc + 2) << 16);
 }
 
 /* read memory byte */

@@ -160,9 +160,11 @@ Game Name            IC1             IC1 Type    IC3            IC3 Type    Jump
 -------------------------------------------------------------------------------------------------------
 Super Mario World    NSS-MW-0_PRG    LH534J      NSS-R_IC3_MW   27C256      CL1 CL2 CL3 CL4 CL5 - Short
                                                                             SL1 SL2 SL3 SL4 SL5 - Open
+Super Mario World    NSS-R__IC1__MW  ?LH534J?    NSS-R_IC3_MW   27C256      CL1 CL2 CL3 CL4 CL5 - Short
+                                                                            SL1 SL2 SL3 SL4 SL5 - Open
 Super Tennis         NSS-ST-0        LH534J      NSS-R_IC3_ST   27C256      CL1 CL2 CL3 CL4 CL5 - Short
                                                                             SL1 SL2 SL3 SL4 SL5 - Open
-Super Soccer         NSS-R_IC1_FS    TC574000    NSS-R_IC3_FS   27C256      CL1 CL2 CL3 CL4 CL5 - Open
+Super Soccer         NSS-R__IC1__FS  TC574000    NSS-R_IC3_FS   27C256      CL1 CL2 CL3 CL4 CL5 - Open
                                                                             SL1 SL2 SL3 SL4 SL5 - Short
 -------------------------------------------------------------------------------------------------------
 Note - By setting the jumpers to 'Super Soccer', the other 2 games can use standard EPROMs if required.
@@ -1010,13 +1012,15 @@ ROM_START( nss_smw )
 	NSS_BIOS
 	ROM_REGION( 0x100000, "user3", 0 )
 	ROM_LOAD( "nss-mw-0_prg.ic1", 0x000000, 0x80000, CRC(c46766f2) SHA1(06a6efc246c6fdb83efab1d402d61d2179a84494) )
+	// Note: this rom appears with 2 variations: LH534J mask rom with "NSS-MW-0 // PRG" silkscreen
+	// or ?LH534J mask rom? with "NSS-R // IC1 // MW" label sticker
 
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, "ibios_rom", 0 )
 	ROM_LOAD( "nss-r__ic3__mw.ic3", 0x0000, 0x8000, CRC(f2c5466e) SHA1(e116f01342fcf359498ed8750741c139093b1fb2) )
 
 	ROM_REGION( 0x10, "rp5h01", 0 )
-	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(fd700dca) SHA1(6805cefb1856c3498b7a7a049c0d09858afac47c) )
+	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(fd700dca) SHA1(6805cefb1856c3498b7a7a049c0d09858afac47c) ) // Labeled "MW" on yellow sticker
 ROM_END
 
 ROM_START( nss_fzer )

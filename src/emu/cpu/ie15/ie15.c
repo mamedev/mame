@@ -37,7 +37,7 @@ ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_
 {
 	// set our instruction counter
 	m_icountptr = &m_icount;
-};
+}
 
 //-------------------------------------------------
 //  device_start - start up the device
@@ -414,14 +414,14 @@ inline void ie15_device::execute_one(int opcode)
 
 inline UINT8 ie15_device::rop()
 {
-	UINT8 retVal = m_direct->read_decrypted_byte(m_PC.w.l);
+	UINT8 retVal = m_direct->read_byte(m_PC.w.l);
 	m_PC.w.l = (m_PC.w.l + 1) & 0x0fff;
 	return retVal;
 }
 
 inline UINT8 ie15_device::arg()
 {
-	UINT8 retVal = m_direct->read_raw_byte(m_PC.w.l);
+	UINT8 retVal = m_direct->read_byte(m_PC.w.l);
 	return retVal;
 }
 

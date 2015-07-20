@@ -18,14 +18,14 @@
 		<year>2002</year>
 		<publisher>Toshio Fukui</publisher>
 
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="cpmbin.d88" size="348848" crc="040f32e8" sha1="c6d09ed529c23fcbdc9b0468b0481a521a5240e5" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Source Disk (w/ TF-DOS)" />
 			<dataarea name="flop" size="348848">
 				<rom name="cpmsrc.d88" size="348848" crc="ce3fbee1" sha1="fd6f8d1f8ffea8e33f24d5241ee3deb3f471c313" offset="0" />
@@ -48,14 +48,14 @@
 		<year>2011?</year>
 		<publisher>Toshio Fukui</publisher>
 
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="mz64cpmb.d88" size="348848" crc="0e65fc85" sha1="10194f69a9e399d4822026026c1a6d0c8de1ab9a" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Source Disk (w/ TF-DOS)" />
 			<dataarea name="flop" size="348848">
 				<rom name="mz64cpms.d88" size="348848" crc="5d76a801" sha1="a05cd4b99030685d7878e44f9bd1a82d8161de1a" offset="0" />
@@ -67,7 +67,7 @@
 		<description>TF-DOS Ver2.1C (TF)</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Master Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="tfds21cmr.d88" size="348848" crc="dca59c9f" sha1="313465c15b9046104c70202a46e3e7454c8d095e" offset="0" />
@@ -79,14 +79,14 @@
 		<description>TF-DOS Ver2.1 (TF)</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Master Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="tfds21mr.d88" size="348848" crc="ffa75514" sha1="11b13d487dfb6fa3e77e329b32e7f23bcb67609c" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="tfds21sr.d88" size="348848" crc="4b324606" sha1="35026012f38a2402a948c9c73630b9a46a7f1a6d" offset="0" />
 			</dataarea>
@@ -97,13 +97,13 @@
 		<description>TF-DOS Ver2.0B (TS)</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="tfd2ts2e.d88" size="348848" crc="a8bb3380" sha1="f0d2e58f97f4bd8abf8c3b066d2ed4ce751985e3" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="tfd2ts2r.d88" size="348848" crc="5bbbe5dc" sha1="e0162ed833bc8dcd691bcf6d2b18e9d7a7a11714" offset="0" />
 			</dataarea>
@@ -114,7 +114,7 @@
 		<description>Graphic Editor III "Art Magic"</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gred3_tf.d88" size="348848" crc="82e0843e" sha1="5f6b13dbeaf781b09a157778799da2811cac1624" offset="0" />
 			</dataarea>
@@ -125,7 +125,7 @@
 		<description>Brave</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="brave.d88" size="348848" crc="8a9bc713" sha1="1747b68b188b0c25b78a2ebb9b9184e82fc2531f" offset="0" />
 			</dataarea>
@@ -136,7 +136,7 @@
 		<description>Lilas</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="lilascmp.d88" size="348848" crc="ac570829" sha1="15e927727d3498660c1dc3f3ea55409aad4eeef8" offset="0" />
 			</dataarea>
@@ -147,7 +147,7 @@
 		<description>TF-DOS Programs 1</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="cdosprg1.d88" size="348848" crc="7176ce03" sha1="2ee08c47c4071e03d942ed166253382d0d380780" offset="0" />
 			</dataarea>
@@ -158,7 +158,7 @@
 		<description>TF-DOS Programs 2</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="cdosprg2.d88" size="348848" crc="4f0a38c6" sha1="fafaee86a65883b7270ff247802220777468c9fc" offset="0" />
 			</dataarea>
@@ -170,7 +170,7 @@
 		<description>Sharp BASIC Programs 1</description>
 		<year>200?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="sbasprg1.d88" size="348848" crc="c92c42ca" sha1="c87a02c9ba94b70f26727b018b82ecb9bfe4c41a" offset="0" />
 			</dataarea>

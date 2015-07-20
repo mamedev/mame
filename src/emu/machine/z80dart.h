@@ -500,6 +500,16 @@ public:
 	DECLARE_READ8_MEMBER( ba_cd_r );
 	DECLARE_WRITE8_MEMBER( ba_cd_w );
 
+	DECLARE_READ8_MEMBER( da_r ) { return m_chanA->data_read(); }
+	DECLARE_WRITE8_MEMBER( da_w ) { m_chanA->data_write(data); }
+	DECLARE_READ8_MEMBER( db_r ) { return m_chanB->data_read(); }
+	DECLARE_WRITE8_MEMBER( db_w ) { m_chanB->data_write(data); }
+
+	DECLARE_READ8_MEMBER( ca_r ) { return m_chanA->control_read(); }
+	DECLARE_WRITE8_MEMBER( ca_w ) { m_chanA->control_write(data); }
+	DECLARE_READ8_MEMBER( cb_r ) { return m_chanB->control_read(); }
+	DECLARE_WRITE8_MEMBER( cb_w ) { m_chanB->control_write(data); }
+
 	// interrupt acknowledge
 	int m1_r();
 

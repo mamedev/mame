@@ -570,6 +570,14 @@ static void memory_error(const char *message)
     pool behavior
 -------------------------------------------------*/
 
+/**
+ * @fn  int test_memory_pools(void)
+ *
+ * @brief   Tests memory pools.
+ *
+ * @return  An int.
+ */
+
 int test_memory_pools(void)
 {
 	object_pool *pool;

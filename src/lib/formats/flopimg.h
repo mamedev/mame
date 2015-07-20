@@ -357,7 +357,7 @@ protected:
 
 		SECTOR_LOOP_START,      //!< Start of the per-sector loop, sector number goes from p1 to p2 inclusive
 		SECTOR_LOOP_END,        //!< End of the per-sector loop
-		SECTOR_INTERLEAVE_SKEW, //!< Defines interleave and skew for sector counting
+		SECTOR_INTERLEAVE_SKEW  //!< Defines interleave and skew for sector counting
 	};
 
 	//! Sector data description
@@ -686,7 +686,7 @@ public:
 		FF_3        = 0x20202033, //!< "3   " 3 inch disk
 		FF_35       = 0x20203533, //!< "35  " 3.5 inch disk
 		FF_525      = 0x20353235, //!< "525 " 5.25 inch disk
-		FF_8        = 0x20202038, //!< "8   " 8 inch disk
+		FF_8        = 0x20202038  //!< "8   " 8 inch disk
 	};
 
 	//! Variants
@@ -698,14 +698,14 @@ public:
 		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
 		DSQD  = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
 		DSHD  = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
-		DSED  = 0x44455344, //!< "DSED", Double-sided extra-density (2880K)
+		DSED  = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
 	};
 
 	//! Encodings
 	enum {
 		FM   = 0x2020464D, //!< "  FM", frequency modulation
 		MFM  = 0x204D464D, //!< " MFM", modified frequency modulation
-		M2FM = 0x4D32464D, //!< "M2FM", modified modified frequency modulation
+		M2FM = 0x4D32464D  //!< "M2FM", modified modified frequency modulation
 	};
 
 	// construction/destruction

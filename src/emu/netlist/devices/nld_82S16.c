@@ -7,7 +7,7 @@
 
 #include "nld_82S16.h"
 
-//static const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+NETLIB_NAMESPACE_DEVICES_START()
 
 // FIXME: timing!
 // FIXME: optimize device (separate address decoder!)
@@ -100,3 +100,5 @@ NETLIB_UPDATE(82S16_dip)
 {
 	NETLIB_NAME(82S16)::update();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

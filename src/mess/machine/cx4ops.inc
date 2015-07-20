@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:byuu
+// copyright-holders:byuu, Nach
 /***************************************************************************
 
     cx4ops.c

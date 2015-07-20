@@ -86,9 +86,9 @@ enum input_changed_enum
 	IC_VR2
 };
 
-NETLIST_EXTERNAL(pongdoubles);
-NETLIST_EXTERNAL(pong_fast);
-NETLIST_EXTERNAL(breakout);
+NETLIST_EXTERNAL(pongdoubles)
+NETLIST_EXTERNAL(pong_fast)
+NETLIST_EXTERNAL(breakout)
 
 class ttl_mono_state : public driver_device
 {
@@ -216,7 +216,9 @@ private:
 
 static NETLIST_START(pong)
 
-	NETLIST_MEMREGION("maincpu")
+	MEMREGION_SOURCE("maincpu")
+	PARAM(NETLIST.USE_DEACTIVATE, 1)
+	INCLUDE(pong_schematics)
 
 NETLIST_END()
 

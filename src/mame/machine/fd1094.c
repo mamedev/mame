@@ -35,8 +35,8 @@
     if bit 13 of the current value is 1; the fourth one is executed whenever one
     of the first three has been executed; the fifth one is always executed. Every
     step can be thought as consisting of a serie of operations, with some steps
-    avoiding some of them: a uncondicional bitswap, some conditional XORs,
-    a unconditional XOR and some condicional bitswaps.
+    avoiding some of them: a unconditional bitswap, some conditional XORs,
+    a unconditional XOR and some conditional bitswaps.
 
     In the end, the decryption of a value at a given address is controlled by 32
     boolean variables; 8 of them change at every address (repeating after 0x2000
@@ -472,6 +472,9 @@ const UINT16 fd1094_device::s_masked_opcodes[] =
 	0xde3a,0xde7a,0xdeba,0xdefa,    0xdffa
 };
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, fd1094_device )
+	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK(":fd1094_decrypted_opcodes")
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -534,7 +537,8 @@ UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
 		return &m_decrypted_opcodes[state][0];
 
 	// otherwise, allocate and decrypt
-	m_decrypted_opcodes[state].resize(m_size);
+	m_decrypted_opcodes[state].resize(0x200000/2);
+	memset(&m_decrypted_opcodes[state][0], 0, 0x200000);
 	m_fd1094.decrypt(m_baseaddress, m_size, m_rgnoffset, &m_decrypted_opcodes[state][0], state);
 	return &m_decrypted_opcodes[state][0];
 }
@@ -552,6 +556,7 @@ UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
 
 fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: m68000_device(mconfig, tag, owner, clock, "fd1094", __FILE__),
+		m_decrypted_opcodes_bank(*this, ":fd1094_decrypted_opcodes"),
 		m_state(0x00),
 		m_irqmode(false),
 		m_cache(*this),
@@ -561,6 +566,9 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 {
 	// override the name after the m68000 initializes
 	m_name.assign("FD1094");
+
+	// add the decrypted opcodes map
+	m_address_map[AS_DECRYPTED_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
 
 	// create the initial masked opcode table
 	memset(m_masked_opcodes_lookup, 0, sizeof(m_masked_opcodes_lookup));
@@ -575,6 +583,8 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 	for (int opcode = 0; opcode < 65536; opcode += 2)
 		if ((opcode & 0xff80) == 0x4e80 || (opcode & 0xf0f8) == 0x50c8 || (opcode & 0xf000) == 0x6000)
 			m_masked_opcodes_lookup[1][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
+
+	m_state_change = state_change_delegate(FUNC(fd1094_device::default_state_change), this);
 }
 
 
@@ -625,9 +635,6 @@ void fd1094_device::change_state(int newstate)
 
 void fd1094_device::device_start()
 {
-	// start the base device
-	m68000_device::device_start();
-
 	// find the key
 	m_key = memregion("key")->base();
 	if (m_key == NULL)
@@ -655,13 +662,12 @@ void fd1094_device::device_start()
 	if (m_srcbase == NULL)
 		throw emu_fatalerror("FD1094 found no data to decrypt!");
 
-	// if address 0 is mapped to ROM, assume this is a state memory mapping and
-	// use the internal state change callback
-	if (space(AS_PROGRAM).get_read_ptr(0) != NULL)
-		m_state_change = state_change_delegate(FUNC(fd1094_device::default_state_change), this);
-
 	// determine length and configure our cache
 	m_cache.configure(0x000000, m_srcbytes, 0x000000);
+	change_state(STATE_RESET);
+
+	// start the base device
+	m68000_device::device_start();
 
 	// register for the state changing callbacks we need in the m68000
 	set_cmpild_callback(write32_delegate(FUNC(fd1094_device::cmp_callback),this));
@@ -683,7 +689,7 @@ void fd1094_device::device_reset()
 	// flush the cache and switch to the reset state
 	m_cache.reset();
 	change_state(STATE_RESET);
-
+	fprintf(stderr, "reset done\n");
 	// reset the parent
 	m68000_device::device_reset();
 }
@@ -913,7 +919,7 @@ void fd1094_device::decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, 
 
 void fd1094_device::default_state_change(UINT8 state)
 {
-	space(AS_PROGRAM).set_decrypted_region(0x000000, m_srcbytes - 1, m_cache.decrypted_opcodes(state));
+	m_decrypted_opcodes_bank->set_base(m_cache.decrypted_opcodes(state));
 }
 
 

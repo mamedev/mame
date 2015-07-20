@@ -126,52 +126,22 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
 {
 	LOG(("swtpc09_dmf2_control_reg_w $%02X\n", data));
 
-	switch (data & 0x0F)
+	floppy_image_device *floppy = NULL;
+
+	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (!BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (!BIT(data, 3)) floppy = m_floppy3->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
 	{
-		case 0x0e:
-			m_fdc->set_drive(0);
-				// need to set drive ready as sw checks before doing anything
-			machine().device<legacy_floppy_image_device>("floppy0")->floppy_drive_set_ready_state(1,0);
-			break;
-		case 0x0d:
-			m_fdc->set_drive(1);
-			machine().device<legacy_floppy_image_device>("floppy1")->floppy_drive_set_ready_state(1,0);
-			break;
-
-		case 0x0b:
-			m_fdc->set_drive(2);
-			machine().device<legacy_floppy_image_device>("floppy2")->floppy_drive_set_ready_state(1,0);
-			break;
-
-		case 0x07:
-			m_fdc->set_drive(3);
-			machine().device<legacy_floppy_image_device>("floppy3")->floppy_drive_set_ready_state(1,0);
-			break;
-
-		default:
-		break;
-		}
-
-	// ignore side select in emulation due to sector numbering
-	////side select
-	//if (!(data & 0x10)) {
-	//   wd17xx_set_side(fdc, 1);
-	//}
-	//if (data & 0x10) {
-	//   wd17xx_set_side(fdc, 0);
-	//}
-
-
-	/* bit 5 dden select */
-
-	if (!(data & 0x20)) {
-		m_fdc->dden_w(0);
-		LOG(("Density single\n"));
+		floppy->mon_w(0);
+		floppy->ss_w(!BIT(data, 4));
 	}
-	if (data & 0x20) {
-		m_fdc->dden_w(1);
-		LOG(("Density double\n"));
-	}
+
+	m_fdc->dden_w(!BIT(data, 5));
 }
 
 /* FDC controller dma transfer */
@@ -384,52 +354,22 @@ WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
 {
 	LOG(("swtpc09_dmf3_control_reg_w $%02X\n", data));
 
-	switch (data & 0x0F)
+	floppy_image_device *floppy = NULL;
+
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
 	{
-		case 0x01:
-			m_fdc->set_drive(0);
-				// need to set drive ready as sw checks before doing anything
-			machine().device<legacy_floppy_image_device>("floppy0")->floppy_drive_set_ready_state(1,0);
-			break;
-		case 0x02:
-			m_fdc->set_drive(1);
-			machine().device<legacy_floppy_image_device>("floppy1")->floppy_drive_set_ready_state(1,0);
-			break;
-
-		case 0x04:
-			m_fdc->set_drive(2);
-			machine().device<legacy_floppy_image_device>("floppy2")->floppy_drive_set_ready_state(1,0);
-			break;
-
-		case 0x08:
-			m_fdc->set_drive(3);
-			machine().device<legacy_floppy_image_device>("floppy3")->floppy_drive_set_ready_state(1,0);
-			break;
-
-		default:
-		break;
-		}
-
-	// ignore side select in emulation due to sector numbering
-	////side select
-	//if (!(data & 0x10)) {
-	//   wd17xx_set_side(fdc, 1);
-	//}
-	//if (data & 0x10) {
-	//   wd17xx_set_side(fdc, 0);
-	//}
-
-
-	/* bit 5 dden select */
-
-	if (data & 0x20) {
-		m_fdc->dden_w(0);
-		LOG(("Density single\n"));
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 4));
 	}
-	if (!(data & 0x20)) {
-		m_fdc->dden_w(1);
-		LOG(("Density double\n"));
-	}
+
+	m_fdc->dden_w(BIT(data, 5));
 }
 
 // DC4 drive select
@@ -438,33 +378,14 @@ WRITE8_MEMBER ( swtpc09_state::dc4_control_reg_w )
 {
 	LOG(("swtpc09_dc4_control_reg_w $%02X\n", data));
 
-	switch (data & 0x03)
-	{
-		case 0x00:
-			m_fdc->set_drive(0);
-				// need to set drive ready as sw checks before doing anything
-			machine().device<legacy_floppy_image_device>("floppy0")->floppy_drive_set_ready_state(1,0);
-			break;
-		case 0x01:
-			m_fdc->set_drive(1);
-			machine().device<legacy_floppy_image_device>("floppy1")->floppy_drive_set_ready_state(1,0);
-			break;
+	floppy_image_device *floppy = NULL;
 
-		case 0x02:
-			m_fdc->set_drive(2);
-			machine().device<legacy_floppy_image_device>("floppy2")->floppy_drive_set_ready_state(1,0);
-			break;
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
 
-		case 0x03:
-			m_fdc->set_drive(3);
-			machine().device<legacy_floppy_image_device>("floppy3")->floppy_drive_set_ready_state(1,0);
-			break;
-
-		default:
-		break;
-		}
-
-	// ignore side select in emulation due to sector numbering
+	m_fdc->set_floppy(floppy);
 }
 
 
@@ -537,7 +458,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
-	fd1793_device *fdc = machine().device<fd1793_device>("fdc");
+	fd1793_t *fdc = machine().device<fd1793_t>("fdc");
 	pia6821_device *pia = machine().device<pia6821_device>("pia");
 	ptm6840_device *ptm = machine().device<ptm6840_device>("ptm");
 	acia6850_device *acia = machine().device<acia6850_device>("acia");
@@ -574,7 +495,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 			mem.install_readwrite_handler(logical_address+0x004, logical_address+0x004, read8_delegate(FUNC(acia6850_device::status_r), acia), write8_delegate(FUNC(acia6850_device::control_w),acia));
 			mem.install_readwrite_handler(logical_address+0x005, logical_address+0x005, read8_delegate(FUNC(acia6850_device::data_r), acia), write8_delegate(FUNC(acia6850_device::data_w),acia));
 			mem.install_write_handler(logical_address+0x014, logical_address+0x014, write8_delegate(FUNC(swtpc09_state::dc4_control_reg_w),this));
-			mem.install_readwrite_handler(logical_address+0x018, logical_address+0x01b, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
+			mem.install_readwrite_handler(logical_address+0x018, logical_address+0x01b, read8_delegate(FUNC(fd1793_t::read), fdc), write8_delegate(FUNC(fd1793_t::write),fdc));
 			//mem.nop_readwrite(logical_address+0x01c, logical_address+0x05f);
 			mem.install_readwrite_handler(logical_address+0x060, logical_address+0x06f, read8_delegate(FUNC(pia6821_device::read), piaide), write8_delegate(FUNC(pia6821_device::write), piaide));
 			//mem.nop_readwrite(logical_address+0x070, logical_address+0x07f);
@@ -598,7 +519,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 		if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 conroller this is the map
 		{
 			mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
-			mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
+			mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_t::read), fdc), write8_delegate(FUNC(fd1793_t::write),fdc));
 			mem.install_readwrite_handler(logical_address+0x024, logical_address+0x03f, read8_delegate(FUNC(swtpc09_state::dmf2_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_control_reg_w),this));
 			mem.install_readwrite_handler(logical_address+0x040, logical_address+0x041, read8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_w),this));
 			//mem.nop_readwrite(logical_address+0x042, logical_address+0x7ff);
@@ -608,7 +529,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 		else if (m_system_type == FLEX_DC4_PIAIDE)   // 2k ram for piaide on s09 board
 		{
 			//mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
-			//mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
+			//mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_t::read), fdc), write8_delegate(FUNC(fd1793_t::write),fdc));
 			//mem.install_readwrite_handler(logical_address+0x024, logical_address+0x03f, read8_delegate(FUNC(swtpc09_state::dmf2_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_control_reg_w),this));
 			//mem.install_readwrite_handler(logical_address+0x040, logical_address+0x041, read8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_w),this));
 			mem.install_ram(logical_address+0x000, logical_address+0x7ff, &RAM[0xf000]);
@@ -618,7 +539,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 		else    // assume DMF3 controller
 		{
 			mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
-			mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
+			mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_t::read), fdc), write8_delegate(FUNC(fd1793_t::write),fdc));
 			mem.install_readwrite_handler(logical_address+0x024, logical_address+0x024, read8_delegate(FUNC(swtpc09_state::dmf3_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf3_control_reg_w),this));
 			mem.install_readwrite_handler(logical_address+0x025, logical_address+0x025, read8_delegate(FUNC(swtpc09_state::dmf3_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf3_dma_address_reg_w),this));
 			//mem.nop_readwrite(logical_address+0x030, logical_address+0x03f);

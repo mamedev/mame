@@ -403,6 +403,13 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) /* verifed on pcb */
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( tokie, toki )
+	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tokic, toki )
+	SEIBU_SOUND_SYSTEM_ENCRYPTED_CUSTOM()
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tokib, toki_state )
 
@@ -757,8 +764,6 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 	{
 		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
-
-	m_seibu_sound->decrypt("audiocpu",0x2000);
 }
 
 
@@ -821,16 +826,12 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 	/* Decrypt data for z80 program */
 	{
-		address_space &space = m_audiocpu->space(AS_PROGRAM);
-		UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x20000);
+		UINT8 *decrypt = m_seibu_sound->get_custom_decrypt();
 		UINT8 *rom = memregion("audiocpu")->base();
-		int i;
 
 		memcpy(decrypt,rom,0x20000);
 
-		space.set_decrypted_region(0x0000, 0x1fff, decrypt);
-
-		for (i = 0;i < 0x2000;i++)
+		for (int i = 0;i < 0x2000;i++)
 		{
 			UINT8 src = decrypt[i];
 			rom[i] = src^0x55;
@@ -852,15 +853,15 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 
 // these 2 are both unique revisions
-GAME( 1989, toki,  0,    toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tokiu, toki, toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, toki,  0,    tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tokiu, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", GAME_SUPPORTS_SAVE )
 
 // these 3 are all the same revision, only the region byte differs
-GAME( 1989, tokia, toki, toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tokiua,toki, toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, juju,  toki, toki,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tokia, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tokiua,toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, juju,  toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1990, tokib,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1990, jujub,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Playmark)", "JuJu Densetsu (Playmark bootleg)", GAME_SUPPORTS_SAVE )
 /* Sound hardware seems to have been slightly modified, the coins are handled ok, but there is no music and bad sfx.  Program roms have a slight bitswap, Flipscreen also seems to be ignored */
-GAME( 1989, jujuba, toki, toki,  toki, toki_state,  jujuba, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // bootleg of tokia/juju revison
+GAME( 1989, jujuba, toki, tokic, toki, toki_state,  jujuba, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // bootleg of tokia/juju revison

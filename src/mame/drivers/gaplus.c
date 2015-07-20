@@ -144,7 +144,7 @@ TODO:
 - schematics show 4 lines going from the 58XX I/O chip to the 26XX (starfield generator).
   Function and operation unknown.
 
-- Add 62XX custom to machine/namcoio.c (though it's quite different from 56XX and 58XX).
+- Complete 62XX custom emulation (machine/namco62.c) (though it's quite different from 56XX and 58XX).
 
 - Is the sprite generator the same as Phozon? This isn't clear yet. They are
   very similar, especially in the way the size flags are layed out.
@@ -158,17 +158,7 @@ TODO:
 #include "includes/gaplus.h"
 
 
-READ8_MEMBER(gaplus_state::gaplus_spriteram_r)
-{
-	return m_spriteram[offset];
-}
-
-WRITE8_MEMBER(gaplus_state::gaplus_spriteram_w)
-{
-	m_spriteram[offset] = data;
-}
-
-WRITE8_MEMBER(gaplus_state::gaplus_irq_1_ctrl_w)
+WRITE8_MEMBER(gaplus_state::irq_1_ctrl_w)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit & 1;
@@ -176,7 +166,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::gaplus_irq_2_ctrl_w)
+WRITE8_MEMBER(gaplus_state::irq_2_ctrl_w)
 {
 	int bit = offset & 1;
 	m_sub_irq_mask = bit & 1;
@@ -184,7 +174,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_2_ctrl_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::gaplus_irq_3_ctrl_w)
+WRITE8_MEMBER(gaplus_state::irq_3_ctrl_w)
 {
 	int bit = !BIT(offset, 13);
 	m_sub2_irq_mask = bit & 1;
@@ -192,7 +182,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_3_ctrl_w)
 		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::gaplus_sreset_w)
+WRITE8_MEMBER(gaplus_state::sreset_w)
 {
 	int bit = !BIT(offset, 11);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
@@ -200,7 +190,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_sreset_w)
 	m_namco_15xx->mappy_sound_enable(bit);
 }
 
-WRITE8_MEMBER(gaplus_state::gaplus_freset_w)
+WRITE8_MEMBER(gaplus_state::freset_w)
 {
 	int bit = !BIT(offset, 11);
 
@@ -242,7 +232,7 @@ TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_main_irq)
+INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -266,13 +256,13 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 0);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub_irq)
+INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub_irq)
 {
 	if(m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub2_irq)
+INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub2_irq)
 {
 	if(m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);
@@ -280,32 +270,32 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub2_irq)
 
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gaplus_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_SHARE("videoram")        /* tilemap RAM (shared with CPU #2) */
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_SHARE("spriteram") /* shared RAM with CPU #2 (includes sprite RAM) */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")        /* tilemap RAM (shared with CPU #2) */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram") /* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)                                      /* shared RAM with CPU #3 */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)                                                   /* custom I/O chips interface */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)                                                   /* custom I/O chips interface */
-	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_SHARE("customio_3")  /* custom I/O chip #3 interface */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)                                                      /* main CPU irq control */
+	AM_RANGE(0x6820, 0x682f) AM_READWRITE(customio_3_r, customio_3_w) AM_SHARE("customio_3")  /* custom I/O chip #3 interface */
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(irq_1_ctrl_w)                                                      /* main CPU irq control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)                                                          /* watchdog */
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)                                                          /* reset CPU #2 & #3, enable sound */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(gaplus_freset_w)                                                          /* reset I/O chips */
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(gaplus_starfield_control_w)               /* starfield control */
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(sreset_w)                                                          /* reset CPU #2 & #3, enable sound */
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(freset_w)                                                          /* reset I/O chips */
+	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(starfield_control_w)               /* starfield control */
 	AM_RANGE(0xa000, 0xffff) AM_ROM                                                                             /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gaplus_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w)     /* tilemap RAM (shared with CPU #1) */
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w)   /* shared RAM with CPU #1 */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")   /* tilemap RAM (shared with CPU #1) */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram")                           /* shared RAM with CPU #1 */
 //  AM_RANGE(0x500f, 0x500f) AM_WRITENOP                                            /* ??? written 256 times on startup */
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(gaplus_irq_2_ctrl_w)                          /* IRQ 2 control */
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(irq_2_ctrl_w)                          /* IRQ 2 control */
 	AM_RANGE(0xa000, 0xffff) AM_ROM                                                 /* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gaplus_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)  /* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)                       /* watchdog? */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(gaplus_irq_3_ctrl_w)                                          /* interrupt enable/disable */
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(irq_3_ctrl_w)                                          /* interrupt enable/disable */
 	AM_RANGE(0xe000, 0xffff) AM_ROM                                                                 /* ROM */
 ADDRESS_MAP_END
 
@@ -495,7 +485,7 @@ WRITE8_MEMBER(gaplus_state::out_lamps1)
 	coin_counter_w(machine(), 1, ~data & 1);
 }
 
-MACHINE_START_MEMBER(gaplus_state,gaplus)
+void gaplus_state::machine_start()
 {
 	switch (m_type)
 	{
@@ -509,6 +499,10 @@ MACHINE_START_MEMBER(gaplus_state,gaplus)
 			m_namco56xx = machine().device<namco56xx_device>("namcoio_2");
 			break;
 	}
+
+	save_item(NAME(m_main_irq_mask));
+	save_item(NAME(m_sub_irq_mask));
+	save_item(NAME(m_sub2_irq_mask));
 }
 
 
@@ -517,17 +511,16 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,  24576000/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  gaplus_vblank_main_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_main_irq)
 
 	MCFG_CPU_ADD("sub", M6809,  24576000/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  gaplus_vblank_sub_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub_irq)
 
 	MCFG_CPU_ADD("sub2", M6809, 24576000/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  gaplus_vblank_sub2_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub2_irq)
 
-	MCFG_MACHINE_START_OVERRIDE(gaplus_state, gaplus)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* a high value to ensure proper synchronization of the CPUs */
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
@@ -558,8 +551,8 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaplus_state, screen_update_gaplus)
-	MCFG_SCREEN_VBLANK_DRIVER(gaplus_state, screen_eof_gaplus)
+	MCFG_SCREEN_UPDATE_DRIVER(gaplus_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(gaplus_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaplus)
@@ -1011,16 +1004,16 @@ DRIVER_INIT_MEMBER(gaplus_state,galaga3)
 
 
 /* These sets are on revision 2 or 3 PCBs AKA "Namco" PCBs */
-GAME( 1984, gaplus,   0,        gapluso,  gapluso,  gaplus_state, gaplus,  ROT90, "Namco", "Gaplus (GP2 rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gaplusa,  gaplus,   gapluso,  gapluso,  gaplus_state, gaplus,  ROT90, "Namco", "Gaplus (GP2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gaplusd,  gaplus,   gaplusd,  gapluso,  gaplus_state, gaplusd, ROT90, "Namco", "Gaplus (GP2 rev D, alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3a, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3b, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplus,   0,        gapluso,  gapluso,  gaplus_state, gaplus,  ROT90, "Namco", "Gaplus (GP2 rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, gaplusa,  gaplus,   gapluso,  gapluso,  gaplus_state, gaplus,  ROT90, "Namco", "Gaplus (GP2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, gaplusd,  gaplus,   gaplusd,  gapluso,  gaplus_state, gaplusd, ROT90, "Namco", "Gaplus (GP2 rev D, alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, galaga3a, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3 rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, galaga3b, gaplus,   gaplus,   gaplus,   gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (GP3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 /* These sets are on older revision (AKA Midway) 1 PCBs */
-GAME( 1984, galaga3c, gaplus,   gaplus,   galaga3a, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 4)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 5)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3c, gaplus,   gaplus,   galaga3a, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 4)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "Namco", "Galaga 3 (set 5)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 /* This is an odd mix of Galaga3 and Gaplus, main code seems closest to galaga3m but still has significant changes, copyright is modified to 1992, has Galaga 3 style high scores, PARSEF spelling error on high score table */
-GAME( 1992, gaplust,  gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "bootleg (Tecfri)", "Gaplus (Tecfri PCB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, gaplust,  gaplus,   gaplus,   galaga3m, gaplus_state, galaga3, ROT90, "bootleg (Tecfri)", "Gaplus (Tecfri PCB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

@@ -619,33 +619,35 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 /* ======================================================================== */
 
 
-INLINE unsigned int m68k_read_immediate_32(m68000_base_device *m68k, unsigned int address)
-{
-	return (m68k->/*memory.*/readimm16(address) << 16) | m68k->/*memory.*/readimm16(address + 2);
-}
-
 INLINE unsigned int m68k_read_pcrelative_8(m68000_base_device *m68k, unsigned int address)
 {
-	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
-		return ((m68k->/*memory.*/readimm16(address&~1)>>(8*(1-(address & 1))))&0xff);
-
-	return m68k->/*memory.*/read8(address);
+	return ((m68k->readimm16(address&~1)>>(8*(1-(address & 1))))&0xff);
 }
 
 INLINE unsigned int m68k_read_pcrelative_16(m68000_base_device *m68k, unsigned int address)
 {
-	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
-		return m68k->/*memory.*/readimm16(address);
+	if(address & 1)
+		return
+			(m68k->readimm16(address-1) << 8) |
+			(m68k->readimm16(address+1) >> 8);
 
-	return m68k->/*memory.*/read16(address);
+	else
+		return
+			(m68k->readimm16(address  )      );
 }
 
 INLINE unsigned int m68k_read_pcrelative_32(m68000_base_device *m68k, unsigned int address)
 {
-	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
-		return m68k_read_immediate_32(m68k, address);
+	if(address & 1)
+		return
+			(m68k->readimm16(address-1) << 24) |
+			(m68k->readimm16(address+1) << 8)  |
+			(m68k->readimm16(address+3) >> 8);
 
-	return m68k->/*memory.*/read32(address);
+	else
+		return
+			(m68k->readimm16(address  ) << 16) |
+			(m68k->readimm16(address+2)      );
 }
 
 
@@ -687,7 +689,7 @@ INLINE UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address)
 			// do a cache fill if the line is invalid or the tags don't match
 			if ((!m68k->ic_valid[idx]) || (m68k->ic_address[idx] != tag))
 			{
-				m68k->ic_data[idx] = m68k->read32(address & ~3);
+				UINT32 data = m68k->read32(address & ~3);
 
 //              printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
 
@@ -695,6 +697,7 @@ INLINE UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address)
 				if (!m68k->mmu_tmp_buserror_occurred)
 				{
 					m68k->ic_address[idx] = tag;
+					m68k->ic_data[idx] = data;
 					m68k->ic_valid[idx] = true;
 				}
 				else

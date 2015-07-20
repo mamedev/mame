@@ -86,13 +86,6 @@ void gambl186_state::machine_start()
 	membank("data_bank")->configure_entries(0, 4, memregion("data")->base(), 0x40000);
 }
 
-static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_ROMBANK("data_bank") // TODO: way bigger than this, banked?
-	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
-ADDRESS_MAP_END
-
 static const UINT8 password[] = {5, 2, 0, 3, 0, 0, 2, 4, 5, 6, 0x16};
 
 READ16_MEMBER(gambl186_state::comms_r)
@@ -364,6 +357,12 @@ WRITE16_MEMBER(gambl186_state::upd_w)
 //  m_upd7759->start_w(1);
 }
 
+static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x40000, 0x7ffff) AM_ROMBANK("data_bank")
+	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffff)

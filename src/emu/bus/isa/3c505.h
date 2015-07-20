@@ -134,6 +134,7 @@ public:
 
 	required_ioport m_iobase;
 	required_ioport m_irqdrq;
+	required_ioport m_romopts;
 
 	virtual void recv_cb(UINT8 *data, int length);
 
@@ -145,6 +146,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual const rom_entry *device_rom_region() const;
 
 private:
 	// device-level overrides

@@ -19,6 +19,9 @@ m4510_device::m4510_device(const machine_config &mconfig, const char *tag, devic
 	program_config.m_addrbus_width = 20;
 	program_config.m_logaddr_width = 16;
 	program_config.m_page_shift = 13;
+	sprogram_config.m_addrbus_width = 20;
+	sprogram_config.m_logaddr_width = 16;
+	sprogram_config.m_page_shift = 13;
 }
 
 offs_t m4510_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
@@ -71,14 +74,14 @@ UINT8 m4510_device::mi_4510_normal::read(UINT16 adr)
 	return program->read_byte(base->map(adr));
 }
 
-UINT8 m4510_device::mi_4510_normal::read_direct(UINT16 adr)
+UINT8 m4510_device::mi_4510_normal::read_sync(UINT16 adr)
 {
-	return direct->read_raw_byte(base->map(adr));
+	return sdirect->read_byte(base->map(adr));
 }
 
-UINT8 m4510_device::mi_4510_normal::read_decrypted(UINT16 adr)
+UINT8 m4510_device::mi_4510_normal::read_arg(UINT16 adr)
 {
-	return direct->read_decrypted_byte(base->map(adr));
+	return direct->read_byte(base->map(adr));
 }
 
 void m4510_device::mi_4510_normal::write(UINT16 adr, UINT8 val)
@@ -90,14 +93,14 @@ m4510_device::mi_4510_nd::mi_4510_nd(m4510_device *_base) : mi_4510_normal(_base
 {
 }
 
-UINT8 m4510_device::mi_4510_nd::read_direct(UINT16 adr)
+UINT8 m4510_device::mi_4510_nd::read_sync(UINT16 adr)
 {
-	return read(adr);
+	return sprogram->read_byte(base->map(adr));
 }
 
-UINT8 m4510_device::mi_4510_nd::read_decrypted(UINT16 adr)
+UINT8 m4510_device::mi_4510_nd::read_arg(UINT16 adr)
 {
-	return read(adr);
+	return program->read_byte(base->map(adr));
 }
 
 #include "cpu/m6502/m4510.inc"

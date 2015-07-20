@@ -139,7 +139,7 @@ protected:
 	enum
 	{
 		CHIP_TYPE_TMS32031,
-		CHIP_TYPE_TMS32032,
+		CHIP_TYPE_TMS32032
 	};
 
 	// construction/destruction

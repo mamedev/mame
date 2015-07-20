@@ -599,7 +599,7 @@ READ8_MEMBER( ace_state::pio_pa_r )
 	*/
 
 	return 0;
-};
+}
 
 WRITE8_MEMBER( ace_state::pio_pa_w )
 {
@@ -620,7 +620,7 @@ WRITE8_MEMBER( ace_state::pio_pa_w )
 
 	// centronics strobe
 	m_centronics->write_strobe(!BIT(data, 6));
-};
+}
 
 //**************************************************************************
 //  MACHINE INITIALIZATION

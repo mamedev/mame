@@ -26,10 +26,10 @@ inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag,
 
 
 // hacks for test purposes, these are installed over the program rom so we know when irqs are actually taken
-READ8_MEMBER(inder_sb_device::megaphx_02cc_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; };
-READ8_MEMBER(inder_sb_device::megaphx_02e6_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; };
-READ8_MEMBER(inder_sb_device::megaphx_0309_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; };
-READ8_MEMBER(inder_sb_device::megaphx_0323_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; };
+READ8_MEMBER(inder_sb_device::megaphx_02cc_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; }
+READ8_MEMBER(inder_sb_device::megaphx_02e6_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; }
+READ8_MEMBER(inder_sb_device::megaphx_0309_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; }
+READ8_MEMBER(inder_sb_device::megaphx_0323_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; }
 
 
 

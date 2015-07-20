@@ -443,7 +443,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 
 	if((scanline % 2) == 0)
 	{
-		m_v9958->set_resolution(RENDER_HIGH);
 		m_v9958->interrupt();
 	}
 }

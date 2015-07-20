@@ -25,7 +25,7 @@
 
 #include "emu.h"
 #include "includes/swtpc09.h"
-
+#include "formats/flex_dsk.h"
 
 
 /**************************************************************************
@@ -70,64 +70,20 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( swtpc09 )
 INPUT_PORTS_END
 
-static LEGACY_FLOPPY_OPTIONS_START(swtpc09)
-	LEGACY_FLOPPY_OPTION(dsdd40, "dsk", "flex 40 trks ds dd 5.25", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([36])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ssdd40, "dsk", "flex 40 trks ss dd 5.25 ", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([25])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(sssd40, "dsk", "flex 40 trks ss sd 5.25", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(sssd35, "dsk", "flex 35 trks ss sd 5.25", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([35])
-		SECTORS([10])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(flex144M, "dsk", "flex 1.44mb disk from swtpc emu", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([72])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(flexdssd8inch, "dsk", "Flex 8 inch ds sd floppy image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([30])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(uniflexdssd8inch, "dsk", "UNIFlex 8 inch ds sd floppy image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([16])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(uniflexdsdd8inch, "dsk", "UNIFlex 8 inch ds dd floppy image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([32])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
+FLOPPY_FORMATS_MEMBER( swtpc09_state::floppy_formats )
+	FLOPPY_FLEX_FORMAT
+FLOPPY_FORMATS_END
 
-
-static const floppy_interface swtpc09_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(swtpc09),
-	NULL
-};
+// todo: implement floppy controller cards as slot devices and do this properly
+static SLOT_INTERFACE_START( swtpc09_floppies )
+	SLOT_INTERFACE("sssd",   FLOPPY_525_SSSD)     // flex 40 trks ss sd 5.25
+	SLOT_INTERFACE("sssd35", FLOPPY_525_SSSD_35T) // flex 35 trks ss sd 5.25
+	SLOT_INTERFACE("ssdd",   FLOPPY_525_SSDD)     // flex 40 trks ss dd 5.25
+	SLOT_INTERFACE("dd",     FLOPPY_525_DD)       // flex 40 trks ds dd 5.25
+	SLOT_INTERFACE("8dssd",  FLOPPY_8_DSSD)       // UNIFlex 8 inch ds sd
+	SLOT_INTERFACE("8dsdd",  FLOPPY_8_DSDD)       // UNIFlex 8 inch ds dd
+	SLOT_INTERFACE("35hd",   FLOPPY_35_HD)        // flex 1.44mb disk from swtpc emu (emulator only?)
+SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER(swtpc09_state::write_acia_clock)
 {
@@ -171,12 +127,14 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
+	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
@@ -210,10 +168,12 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("piaide", PIA6821, 0)
 
@@ -258,10 +218,12 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
 	MCFG_VIA6522_READPA_HANDLER(READ8(swtpc09_state, dmf3_via_read_porta))

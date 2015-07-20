@@ -2388,7 +2388,7 @@ void h6280_device::pull(UINT8 &value)
  ***************************************************************/
 UINT8 h6280_device::read_opcode()
 {
-	return m_direct->read_decrypted_byte(translated(PCW));
+	return m_direct->read_byte(translated(PCW));
 }
 
 /***************************************************************
@@ -2396,7 +2396,7 @@ UINT8 h6280_device::read_opcode()
  ***************************************************************/
 UINT8 h6280_device::read_opcode_arg()
 {
-	return m_direct->read_raw_byte(translated(PCW));
+	return m_direct->read_byte(translated(PCW));
 }
 
 

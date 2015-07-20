@@ -313,7 +313,7 @@ offs_t hd6309_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 //  read_operand
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT8 hd6309_device::read_operand()
+inline UINT8 hd6309_device::read_operand()
 {
 	switch(m_addressing_mode)
 	{
@@ -332,7 +332,7 @@ ATTR_FORCE_INLINE UINT8 hd6309_device::read_operand()
 //  read_operand
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT8 hd6309_device::read_operand(int ordinal)
+inline UINT8 hd6309_device::read_operand(int ordinal)
 {
 	switch(m_addressing_mode)
 	{
@@ -356,7 +356,7 @@ ATTR_FORCE_INLINE UINT8 hd6309_device::read_operand(int ordinal)
 //  write_operand
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void hd6309_device::write_operand(UINT8 data)
+inline void hd6309_device::write_operand(UINT8 data)
 {
 	switch(m_addressing_mode)
 	{
@@ -375,7 +375,7 @@ ATTR_FORCE_INLINE void hd6309_device::write_operand(UINT8 data)
 //  write_operand
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void hd6309_device::write_operand(int ordinal, UINT8 data)
+inline void hd6309_device::write_operand(int ordinal, UINT8 data)
 {
 	switch(m_addressing_mode)
 	{
@@ -398,7 +398,7 @@ ATTR_FORCE_INLINE void hd6309_device::write_operand(int ordinal, UINT8 data)
 //  bittest_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE UINT8 &hd6309_device::bittest_register()
+inline UINT8 &hd6309_device::bittest_register()
 {
 	switch(m_temp_im & 0xC0)
 	{
@@ -414,7 +414,7 @@ ATTR_FORCE_INLINE UINT8 &hd6309_device::bittest_register()
 //  bittest_source
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE bool hd6309_device::bittest_source()
+inline bool hd6309_device::bittest_source()
 {
 	return (m_temp.b.l & (1 << ((m_temp_im >> 3) & 0x07))) ? true : false;
 }
@@ -424,7 +424,7 @@ ATTR_FORCE_INLINE bool hd6309_device::bittest_source()
 //  bittest_dest
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE bool hd6309_device::bittest_dest()
+inline bool hd6309_device::bittest_dest()
 {
 	return (bittest_register() & (1 << ((m_temp_im >> 0) & 0x07))) ? true : false;
 }
@@ -434,7 +434,7 @@ ATTR_FORCE_INLINE bool hd6309_device::bittest_dest()
 //  bittest_set
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void hd6309_device::bittest_set(bool result)
+inline void hd6309_device::bittest_set(bool result)
 {
 	if (result)
 		bittest_register() |= (1 << ((m_temp_im >> 0) & 0x07));
@@ -448,7 +448,7 @@ ATTR_FORCE_INLINE void hd6309_device::bittest_set(bool result)
 //  read_exgtfr_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(UINT8 reg)
+inline m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(UINT8 reg)
 {
 	UINT16 value = 0;
 
@@ -486,7 +486,7 @@ ATTR_FORCE_INLINE m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_
 //  write_exgtfr_register
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void hd6309_device::write_exgtfr_register(UINT8 reg, m6809_base_device::exgtfr_register value)
+inline void hd6309_device::write_exgtfr_register(UINT8 reg, m6809_base_device::exgtfr_register value)
 {
 	switch(reg & 0x0F)
 	{
@@ -517,7 +517,7 @@ ATTR_FORCE_INLINE void hd6309_device::write_exgtfr_register(UINT8 reg, m6809_bas
 //  tfr_read
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE bool hd6309_device::tfr_read(UINT8 opcode, UINT8 arg, UINT8 &data)
+inline bool hd6309_device::tfr_read(UINT8 opcode, UINT8 arg, UINT8 &data)
 {
 	PAIR16 *reg;
 
@@ -550,7 +550,7 @@ ATTR_FORCE_INLINE bool hd6309_device::tfr_read(UINT8 opcode, UINT8 arg, UINT8 &d
 //  tfr_write
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE bool hd6309_device::tfr_write(UINT8 opcode, UINT8 arg, UINT8 data)
+inline bool hd6309_device::tfr_write(UINT8 opcode, UINT8 arg, UINT8 data)
 {
 	PAIR16 *reg;
 
@@ -789,7 +789,7 @@ bool hd6309_device::divd()
 //  execute_one - try to execute a single instruction
 //-------------------------------------------------
 
-ATTR_FORCE_INLINE void hd6309_device::execute_one()
+inline void hd6309_device::execute_one()
 {
 	switch(pop_state())
 	{

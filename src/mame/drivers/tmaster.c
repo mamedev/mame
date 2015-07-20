@@ -227,7 +227,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
 WRITE_LINE_MEMBER(tmaster_state::duart_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(4, state, m_duart->get_irq_vector());
-};
+}
 
 /***************************************************************************
 

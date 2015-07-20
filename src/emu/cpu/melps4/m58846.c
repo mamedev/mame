@@ -4,14 +4,9 @@
 
   Mitsubishi M58846 MCU
 
-  TODO:
-  - o hai
-
 */
 
 #include "m58846.h"
-#include "debugger.h"
-
 
 
 const device_type M58846 = &device_creator<m58846_device>;
@@ -30,7 +25,7 @@ ADDRESS_MAP_END
 
 // device definitions
 m58846_device::m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: melps4_cpu_device(mconfig, M58846, "M58846", tag, owner, clock, 11, ADDRESS_MAP_NAME(program_2kx9), 7, ADDRESS_MAP_NAME(data_128x4), "m58846", __FILE__)
+	: melps4_cpu_device(mconfig, M58846, "M58846", tag, owner, clock, 11, ADDRESS_MAP_NAME(program_2kx9), 7, ADDRESS_MAP_NAME(data_128x4), 12 /* number of D pins */, 2 /* subroutine page */, 1 /* interrupt page */, "m58846", __FILE__)
 { }
 
 
@@ -50,10 +45,7 @@ offs_t m58846_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 void m58846_device::device_start()
 {
 	melps4_cpu_device::device_start();
-
-	// set fixed state
-	m_bm_page = 2;
-	m_int_page = 1;
+	m_timer = timer_alloc(0);
 }
 
 
@@ -65,6 +57,58 @@ void m58846_device::device_start()
 void m58846_device::device_reset()
 {
 	melps4_cpu_device::device_reset();
+	reset_timer();
+}
+
+
+
+//-------------------------------------------------
+//  timers
+//-------------------------------------------------
+
+void m58846_device::reset_timer()
+{
+	attotime base = attotime::from_ticks(6, unscaled_clock());
+	m_timer->adjust(base);
+}
+
+void m58846_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id != 0)
+		return;
+
+	// timer 1: 7-bit fixed counter (manual specifically says 127)
+	if (++m_tmr_count[0] == 127)
+	{
+		m_tmr_count[0] = 0;
+		m_irqflag[1] = true;
+		m_possible_irq = true;
+	}
+
+	// timer 2: 8-bit user defined counter with auto-reload
+	if (m_v & 8 && ++m_tmr_count[1] == 0)
+	{
+		m_tmr_count[1] = m_tmr_reload;
+		m_irqflag[2] = true;
+		m_possible_irq = true;
+		m_port_t ^= 1;
+		m_write_t(m_port_t);
+	}
+
+	// schedule next timeout
+	reset_timer();
+}
+
+void m58846_device::write_v(UINT8 data)
+{
+	// d0: enable timer 1 irq
+	// d1: enable timer 2 irq? (TODO)
+	// d2: ?
+	// d3: timer 2 enable
+	m_tmr_irq_enabled[0] = (data & 1) ? true : false;
+	m_possible_irq = true;
+
+	m_v = data;
 }
 
 
@@ -76,7 +120,7 @@ void m58846_device::device_reset()
 void m58846_device::execute_one()
 {
 	// handle one opcode
-	switch (m_op & 0xf0)
+	switch (m_op & 0x1f0)
 	{
 		case 0x30: op_sey(); break;
 		case 0x70: op_sp(); break;
@@ -86,7 +130,7 @@ void m58846_device::execute_one()
 		case 0xc0: case 0xd0: case 0xe0: case 0xf0: op_lxy(); break;
 
 		default:
-			switch (m_op & 0xfc)
+			switch (m_op & 0x1fc)
 			{
 		case 0x20: op_szb(); break;
 		case 0x4c: op_sb(); break;
@@ -111,6 +155,7 @@ void m58846_device::execute_one()
 		case 0x03: op_dey(); break;
 		case 0x04: op_di(); break;
 		case 0x05: op_ei(); break;
+		case 0x09: op_tabe(); break; // undocumented
 		case 0x0a: op_am(); break;
 		case 0x0b: op_ose(); break;
 		case 0x0c: op_tya(); break;
@@ -123,6 +168,8 @@ void m58846_device::execute_one()
 		case 0x15: op_sd(); break;
 		case 0x16: op_tepa(); break;
 		case 0x17: op_ospa(); break;
+		case 0x18: op_rl(); break; // undocumented
+		case 0x19: op_rr(); break; // undocumented
 		case 0x1a: op_teab(); break;
 		case 0x1b: op_osab(); break;
 		case 0x1c: op_tba(); break;
@@ -157,10 +204,10 @@ void m58846_device::execute_one()
 			break;
 
 			}
-			break; // 0xff
+			break; // 0x1ff
 
 			}
-			break; // 0xfc
+			break; // 0x1fc
 
 	} // big switch
 }

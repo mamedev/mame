@@ -68,9 +68,6 @@ public:
 	int m_copy_sprites;
 	UINT8 m_drawmode_table[16];
 
-	DECLARE_DIRECT_UPDATE_MEMBER(direct_handler_main);
-	DECLARE_DIRECT_UPDATE_MEMBER(direct_handler_sub);
-
 	DECLARE_WRITE_LINE_MEMBER(subres_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(dsw_r);
@@ -138,6 +135,5 @@ public:
 	void init_DACs();
 
 private:
-	inline offs_t direct_handler(int whichcpu, direct_read_data &direct, offs_t address);
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);
 };

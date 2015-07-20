@@ -195,7 +195,7 @@ struct dsp56k_core
 	address_space *data;
 
 	UINT16 peripheral_ram[0x40];
-	UINT16 program_ram[0x800];
+	UINT16 *program_ram;
 };
 
 
@@ -204,7 +204,6 @@ class dsp56k_device : public cpu_device
 public:
 	dsp56k_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
-	DECLARE_DIRECT_UPDATE_MEMBER(dsp56k_direct_handler);
 	DECLARE_READ16_MEMBER( program_r );
 	DECLARE_WRITE16_MEMBER( program_w );
 	DECLARE_READ16_MEMBER( peripheral_register_r );
@@ -244,6 +243,7 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
+	required_shared_ptr<UINT16> m_program_ram;
 
 	dsp56k_core m_dsp56k_core;
 

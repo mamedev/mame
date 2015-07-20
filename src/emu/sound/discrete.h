@@ -3747,8 +3747,6 @@ enum
  *
  *************************************/
 
-#define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
-
 /*
  * add and delete may be slow - the focus is on access!
  */

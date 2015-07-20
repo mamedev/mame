@@ -14,6 +14,7 @@ SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 {
 	if (machine().root_device().memregion("samples")->base())
 		m_sample_buf = auto_alloc_array(machine(), INT16, 2 * machine().root_device().memregion("samples")->bytes());
+		save_pointer(NAME(m_sample_buf), 2 * machine().root_device().memregion("samples")->bytes());
 }
 
 MACHINE_CONFIG_FRAGMENT( cclimber_audio )
@@ -58,6 +59,9 @@ cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, cons
 
 void cclimber_audio_device::device_start()
 {
+	save_item(NAME(m_sample_num));
+	save_item(NAME(m_sample_freq));
+	save_item(NAME(m_sample_volume));
 }
 
 //-------------------------------------------------

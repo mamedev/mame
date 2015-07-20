@@ -300,13 +300,13 @@ void mc68hc11_cpu_device::hc11_regs_w(UINT32 address, UINT8 value)
 
 UINT8 mc68hc11_cpu_device::FETCH()
 {
-	return m_direct->read_decrypted_byte(m_pc++);
+	return m_direct->read_byte(m_pc++);
 }
 
 UINT16 mc68hc11_cpu_device::FETCH16()
 {
 	UINT16 w;
-	w = (m_direct->read_decrypted_byte(m_pc) << 8) | (m_direct->read_decrypted_byte(m_pc+1));
+	w = (m_direct->read_byte(m_pc) << 8) | (m_direct->read_byte(m_pc+1));
 	m_pc += 2;
 	return w;
 }

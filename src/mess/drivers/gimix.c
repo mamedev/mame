@@ -586,7 +586,7 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_PTM6840_IRQ_CB(WRITELINE(gimix_state,irq_w))  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
-	MCFG_FD1797x_ADD("fdc",XTAL_8MHz / 4)
+	MCFG_FD1797_ADD("fdc",XTAL_8MHz / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(gimix_state,fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(gimix_state,fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY

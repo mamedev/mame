@@ -35,6 +35,15 @@
     Note:
     - MK-82 have same roms as original Big Board
     - MK-83 have 256K of RAM
+
+    8-inch formats
+    77 tracks, 1 head, 26 sectors, 128 bytes sector length, first sector id 1
+    77 tracks, 1 head, 26 sectors, 256 bytes sector length, first sector id 1
+
+    5.25-inch formats
+    40 tracks, 1 head, 18 sectors, 128 bytes sector length, first sector id 1
+    40 tracks, 2 heads, 18 sectors, 128 bytes sector length, first sector id 1
+
 */
 
 
@@ -235,7 +244,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 	data |= m_400_460 << 5;
 
 	return data;
-};
+}
 
 WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 {
@@ -318,7 +327,7 @@ READ8_MEMBER( xerox820_state::kbpio_pb_r )
 	*/
 
 	return m_kb->read() ^ 0xff;
-};
+}
 
 WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
 {
@@ -491,34 +500,7 @@ void xerox820ii_state::machine_reset()
 
 	m_fdc->reset();
 }
-/*
-static LEGACY_FLOPPY_OPTIONS_START( xerox820 )
-    LEGACY_FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([1])
-        TRACKS([77])
-        SECTORS([26])
-        SECTOR_LENGTH([128])
-        FIRST_SECTOR_ID([1]))
-    LEGACY_FLOPPY_OPTION( ssdd8, "dsk", "8\" SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([1])
-        TRACKS([77])
-        SECTORS([26])
-        SECTOR_LENGTH([256])
-        FIRST_SECTOR_ID([1]))
-    LEGACY_FLOPPY_OPTION( sssd5, "dsk", "5.25\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([1])
-        TRACKS([40])
-        SECTORS([18])
-        SECTOR_LENGTH([128])
-        FIRST_SECTOR_ID([1]))
-    LEGACY_FLOPPY_OPTION( ssdd5, "dsk", "5.25\" SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([2])
-        TRACKS([40])
-        SECTORS([18])
-        SECTOR_LENGTH([128])
-        FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-*/
+
 
 /* F4 Character Displayer */
 static const gfx_layout xerox820_charlayout =
@@ -589,7 +571,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_20MHz/8))
 
-	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/20)
+	MCFG_FD1771_ADD(FD1771_TAG, XTAL_20MHz/20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
@@ -676,7 +658,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_16MHz/4))
 
-	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_16MHz/8)
+	MCFG_FD1797_ADD(FD1797_TAG, XTAL_16MHz/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)

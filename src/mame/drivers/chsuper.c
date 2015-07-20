@@ -135,21 +135,21 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 
 */
 
-WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )	// Port EEh
+WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 {
 	coin_counter_w(machine(), 0, data & 0x01);  // Coin counter
-	output_set_lamp_value(0, (data >> 1) & 1);	// Hold 1 / Black (Nero) lamp.
-	coin_counter_w(machine(), 1, data & 0x04);	// Payout / Ticket Out pulse
-	output_set_lamp_value(1, (data >> 3) & 1);	// Hold 2 / Low (Bassa) lamp.
+	output_set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
+	coin_counter_w(machine(), 1, data & 0x04);  // Payout / Ticket Out pulse
+	output_set_lamp_value(1, (data >> 3) & 1);  // Hold 2 / Low (Bassa) lamp.
 	// D4: unused...
-	output_set_lamp_value(5, (data >> 5) & 1);	// BET lamp
+	output_set_lamp_value(5, (data >> 5) & 1);  // BET lamp
 	// D6: ticket motor...
 	// D7: unused...
 
 /*  Workaround to get the HOLD 3 lamp line active,
     from the HOLD 1 and HOLD 5 lamps status...
 */
-	m_blacklamp = (data >> 1) & 1;	            // latching the BLACK lamp status...
+	m_blacklamp = (data >> 1) & 1;              // latching the BLACK lamp status...
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
@@ -161,29 +161,29 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )	// Port EEh
 	}
 }
 
-WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )	// Port EFh
+WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...
-	output_set_lamp_value(3, (data >> 2) & 1);	// Hold 4 / High (Alta) lamp.
+	output_set_lamp_value(3, (data >> 2) & 1);  // Hold 4 / High (Alta) lamp.
 	// D3: unused...
 	// D4: unused...
-	output_set_lamp_value(4, (data >> 5) & 1);	// Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
-	output_set_lamp_value(6, (data >> 6) & 1);	// Start / Gamble (Raddoppio) lamp.
+	output_set_lamp_value(4, (data >> 5) & 1);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
+	output_set_lamp_value(6, (data >> 6) & 1);  // Start / Gamble (Raddoppio) lamp.
 	// D7: unused...
 
 /*  Workaround to get the HOLD 3 lamp line active,
     from the HOLD 1 and HOLD 5 lamps status...
 */
-	m_redlamp = (data >> 5) & 1;	// latching the RED lamp status...
+	m_redlamp = (data >> 5) & 1;    // latching the RED lamp status...
 
-	if ((m_blacklamp == 1) & (m_redlamp == 1))	// if both are ON...
+	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output_set_lamp_value(2, 1);	// Hold 3 ON
+		output_set_lamp_value(2, 1);    // Hold 3 ON
 	}
 	else
 	{
-		output_set_lamp_value(2, 0);	// Hold 3 OFF
+		output_set_lamp_value(2, 0);    // Hold 3 OFF
 	}
 }
 
@@ -208,9 +208,42 @@ static ADDRESS_MAP_START( chsuper_portmap, AS_IO, 8, chsuper_state )
 	AM_RANGE( 0x00fc, 0x00fc ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
 	AM_RANGE( 0x00fd, 0x00fd ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
 	AM_RANGE( 0x00fe, 0x00fe ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
-	AM_RANGE( 0x8300, 0x8300 ) AM_READ_PORT("IN2")	// valid input port present in test mode.
+	AM_RANGE( 0x8300, 0x8300 ) AM_READ_PORT("IN2")  // valid input port present in test mode.
 	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_device, write_unsigned8) // unk writes
 ADDRESS_MAP_END
+
+/* About Sound...
+
+  Samples are PCM unsigned 8-bit, mono.
+  These are embedded into the program ROM, starting
+  at the 0x10000 offset.
+
+  The audio system is currently unknown, but the sound writes
+  are the following...
+
+  For any sample triggered:
+
+  FF39h --> 0x02
+  FF30h --> 0x30
+
+  then the following 5 writes (per sample number)...
+
+  SND# (hex):  00    01    02    03    04    05    06    07    08    09    0A    0B    0C    0D    0E    0F    10    11    12    13    14
+  Writes...
+  FF2Ah:      0x00  0xEA  0x01  0x76  0x00  0xF9  0x01  0x0F  0x00  0x84  0x01  0x01  0x00  0x01  0x01  0x01  0x00  0x01  0x01  0x8C  0x00
+  FF29h:      0xFF  0xF6  0x04  0x05  0xFF  0x05  0x04  0x75  0xFF  0xF8  0x04  0x00  0xFF  0x00  0x04  0x21  0xFF  0x21  0x04  0x0D  0xFF
+  FF28h:      0xFF  0x0F  0xF8  0x69  0xFF  0x75  0x83  0x05  0xFF  0x0D  0x90  0xF8  0xFF  0x00  0x20  0x00  0xFF  0x00  0x00  0x9C  0xFF
+  FF2Fh:      0xF7  0x0F  0xFF  0xFF  0x06  0x00  0xFF  0xFF  0xF9  0x0D  0xFD  0xFF  0x01  0x04  0x1C  0xFF  0x22  0xE3  0xFF  0xFF  0xBB
+  FF2Eh:      0xF0  0x17  0xFF  0xFF  0x8A  0xF2  0xFF  0xFF  0xF2  0x7D  0x98  0xFF  0xFF  0x20  0xE0  0xFF  0xFF  0x00  0xFF  0xFF  0x1F
+
+  then ending with...
+
+  FF2Ch --> 0x00
+  FF2Bh --> 0xF8
+  FF30h --> 0x90
+  FF39h --> 0x00
+
+*/
 
 
 static INPUT_PORTS_START( chsuper )
@@ -230,7 +263,7 @@ static INPUT_PORTS_START( chsuper )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )	// ticket-in in chmpnum
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // ticket-in in chmpnum
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // ticket out / payout in chsuper2
 

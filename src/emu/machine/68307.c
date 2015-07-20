@@ -114,7 +114,7 @@ int m68307_calc_cs(m68307cpu_device *m68k, offs_t address)
 UINT16 m68307cpu_device::simple_read_immediate_16_m68307(offs_t address)
 {
 //  m68307_currentcs = m68307_calc_cs(this, address);
-	return m_direct->read_decrypted_word(address);
+	return m_direct->read_word(address);
 }
 
 UINT8 m68307cpu_device::read_byte_m68307(offs_t address)

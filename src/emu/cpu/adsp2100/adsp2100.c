@@ -811,7 +811,7 @@ inline void adsp21xx_device::program_write(UINT32 addr, UINT32 data)
 
 inline UINT32 adsp21xx_device::opcode_read()
 {
-	return m_direct->read_decrypted_dword(m_pc << 2);
+	return m_direct->read_dword(m_pc << 2);
 }
 
 

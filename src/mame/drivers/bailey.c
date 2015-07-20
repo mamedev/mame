@@ -4,7 +4,10 @@
 
  Bailey International discrete hardware games
 
+ Fighter Squadron (1976)
  Fun Four (1976)
+ Missile Command (1976)
+ Sebring (1976)
 
 ***************************************************************************/
 

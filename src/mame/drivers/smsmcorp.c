@@ -286,7 +286,7 @@ READ8_MEMBER(smsmfg_state::link_r)
 			return m_communication_port_status;
 	}
 	return 0;
-};
+}
 
 WRITE8_MEMBER(smsmfg_state::link_w)
 {

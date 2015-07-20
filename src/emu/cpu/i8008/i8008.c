@@ -42,7 +42,7 @@ i8008_device::i8008_device(const machine_config &mconfig, const char *tag, devic
 {
 	// set our instruction counter
 	m_icountptr = &m_icount;
-};
+}
 
 //-------------------------------------------------
 //  device_start - start up the device
@@ -620,7 +620,7 @@ inline void i8008_device::pop_stack()
 
 inline UINT8 i8008_device::rop()
 {
-	UINT8 retVal = m_direct->read_decrypted_byte(GET_PC.w.l);
+	UINT8 retVal = m_direct->read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x3fff;
 	m_PC = GET_PC;
 	return retVal;
@@ -658,7 +658,7 @@ inline void i8008_device::set_reg(UINT8 reg, UINT8 val)
 
 inline UINT8 i8008_device::arg()
 {
-	UINT8 retVal = m_direct->read_raw_byte(GET_PC.w.l);
+	UINT8 retVal = m_direct->read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x3fff;
 	m_PC = GET_PC;
 	return retVal;

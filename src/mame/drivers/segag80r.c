@@ -322,6 +322,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, segag80r_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
+ADDRESS_MAP_END
+
 
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80r_state )
@@ -877,6 +884,10 @@ static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 	MCFG_FRAGMENT_ADD(monsterb_sound_board)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( monster2, monsterb )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 
@@ -897,6 +908,7 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sindbadm_portmap)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -1497,11 +1509,34 @@ DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 
 DRIVER_INIT_MEMBER(segag80r_state,monster2)
 {
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x88,0x08,0x80,0x00 }, { 0x00,0x08,0x20,0x28 },   /* ...0...0...0...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...0...1 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...0...1...0 */
+		{ 0x88,0x08,0x80,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...0...0...1...1 */
+		{ 0x00,0x08,0x20,0x28 }, { 0x88,0x08,0x80,0x00 },   /* ...0...1...0...0 */
+		{ 0xa0,0x80,0x20,0x00 }, { 0x80,0x88,0x00,0x08 },   /* ...0...1...0...1 */
+		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0x20,0x00 },   /* ...0...1...1...0 */
+		{ 0x88,0x08,0x80,0x00 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...1...1 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x80,0x88,0x00,0x08 },   /* ...1...0...0...0 */
+		{ 0x80,0x88,0x00,0x08 }, { 0x00,0x08,0x20,0x28 },   /* ...1...0...0...1 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0xa8,0x08,0x88 },   /* ...1...0...1...0 */
+		{ 0x00,0x08,0x20,0x28 }, { 0x80,0xa0,0x88,0xa8 },   /* ...1...0...1...1 */
+		{ 0x80,0x88,0x00,0x08 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...1...0...0 */
+		{ 0x80,0xa0,0x88,0xa8 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...1...0...1 */
+		{ 0xa0,0x80,0x20,0x00 }, { 0x80,0xa0,0x88,0xa8 },   /* ...1...1...1...0 */
+		{ 0x28,0x20,0xa8,0xa0 }, { 0x00,0x08,0x20,0x28 }    /* ...1...1...1...1 */
+	};
+
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* configure the 315-5006 security chip */
-	spatter_decode(machine(), "maincpu");
 	m_decrypt = segag80_security(0);
 
 	/* configure video */
@@ -1546,11 +1581,34 @@ DRIVER_INIT_MEMBER(segag80r_state,pignewt)
 
 DRIVER_INIT_MEMBER(segag80r_state,sindbadm)
 {
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...0...0...0 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x00,0x20,0x80,0xa0 },   /* ...0...0...0...1 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x00,0x20,0x80,0xa0 },   /* ...0...0...1...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...0...1...1 */
+		{ 0xa8,0x88,0xa0,0x80 }, { 0xa0,0x20,0xa8,0x28 },   /* ...0...1...0...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...0...1 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x00,0x20,0x80,0xa0 },   /* ...0...1...1...0 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x00,0x20,0x80,0xa0 },   /* ...0...1...1...1 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...1...0...0...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...1...0...0...1 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x00,0x20,0x80,0xa0 },   /* ...1...0...1...0 */
+		{ 0xa8,0xa0,0x88,0x80 }, { 0x00,0x20,0x80,0xa0 },   /* ...1...0...1...1 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...0...0 */
+		{ 0xa8,0x88,0xa0,0x80 }, { 0xa0,0x20,0xa8,0x28 },   /* ...1...1...0...1 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...1...0 */
+		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 }    /* ...1...1...1...1 */
+	};
+
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* configure the encrypted Z80 */
-	sindbadm_decode(machine(), "maincpu");
 	m_decrypt = segag80_security(0);
 
 	/* configure video */
@@ -1585,7 +1643,7 @@ GAME( 1981, spaceod2,  spaceod,  spaceod,  spaceod, segag80r_state,  spaceod,  R
 GAME( 1982, monsterb,  0,        monsterb, monsterb, segag80r_state, monsterb, ROT270, "Sega", "Monster Bash", GAME_IMPERFECT_SOUND )
 
 /* 2-board G-80 system */
-GAME( 1982, monsterb2, monsterb, monsterb, monsterb, segag80r_state, monster2, ROT270, "Sega", "Monster Bash (2 board version)", GAME_IMPERFECT_SOUND )
+GAME( 1982, monsterb2, monsterb, monster2, monsterb, segag80r_state, monster2, ROT270, "Sega", "Monster Bash (2 board version)", GAME_IMPERFECT_SOUND )
 GAME( 1983, pignewt,   0,        pignewt,  pignewt, segag80r_state,  pignewt,  ROT270, "Sega", "Pig Newton (version C)", GAME_IMPERFECT_SOUND )
 GAME( 1983, pignewta,  pignewt,  pignewt,  pignewta, segag80r_state, pignewt,  ROT270, "Sega", "Pig Newton (version A)", GAME_IMPERFECT_SOUND )
 GAME( 1983, sindbadm,  0,        sindbadm, sindbadm, segag80r_state, sindbadm, ROT270, "Sega", "Sindbad Mystery", 0 )

@@ -394,11 +394,15 @@ void memory_entry::release(memory_entry *entry, const char *file, int line)
 	release_lock();
 }
 
-
-//-------------------------------------------------
-//  report_unfreed - print a list of unfreed
-//  memory to the target file
-//-------------------------------------------------
+/**
+ * @fn  void memory_entry::report_unfreed(UINT64 start)
+ *
+ * @brief   -------------------------------------------------
+ *            report_unfreed - print a list of unfreed memory to the target file
+ *          -------------------------------------------------.
+ *
+ * @param   start   The start.
+ */
 
 void memory_entry::report_unfreed(UINT64 start)
 {

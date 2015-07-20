@@ -28,8 +28,8 @@ protected:
 	public:
 		virtual ~mi_2a03_normal() {}
 		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_direct(UINT16 adr);
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_arg(UINT16 adr);
 		virtual void write(UINT16 adr, UINT8 val);
 	};
 
@@ -37,8 +37,8 @@ protected:
 	public:
 		virtual ~mi_2a03_nd() {}
 		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_direct(UINT16 adr);
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_arg(UINT16 adr);
 		virtual void write(UINT16 adr, UINT8 val);
 	};
 
@@ -62,7 +62,7 @@ enum {
 	N2A03_IRQ_LINE = m6502_device::IRQ_LINE,
 	N2A03_APU_IRQ_LINE = m6502_device::APU_IRQ_LINE,
 	N2A03_NMI_LINE = m6502_device::NMI_LINE,
-	N2A03_SET_OVERFLOW = m6502_device::V_LINE,
+	N2A03_SET_OVERFLOW = m6502_device::V_LINE
 };
 
 extern const device_type N2A03;

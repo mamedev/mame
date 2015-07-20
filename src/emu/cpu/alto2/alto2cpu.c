@@ -250,7 +250,7 @@ alto2_cpu_device::~alto2_cpu_device()
 
 void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
 {
-	logerror("%s: unit=%d diablo_hd_device=%p\n", __FUNCTION__, unit, ptr);
+	logerror("%s: unit=%d diablo_hd_device=%p\n", __FUNCTION__, unit, (void *) ptr);
 	m_drive[unit] = ptr;
 }
 

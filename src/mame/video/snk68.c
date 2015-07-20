@@ -53,9 +53,7 @@ TILE_GET_INFO_MEMBER(snk68_state::get_searchar_tile_info)
 void snk68_state::common_video_start()
 {
 	m_fg_tilemap->set_transparent_pen(0);
-
-	m_fg_tilemap->set_scrolldx(0, m_screen->width() - 256);
-	m_fg_tilemap->set_scrolldy(0, m_screen->height() - 256);
+	save_item(NAME(m_sprite_flip_axis));
 }
 
 void snk68_state::video_start()
@@ -64,6 +62,8 @@ void snk68_state::video_start()
 	m_fg_tile_offset = 0;
 
 	common_video_start();
+
+	save_item(NAME(m_fg_tile_offset));
 }
 
 VIDEO_START_MEMBER(snk68_state,searchar)
@@ -79,7 +79,7 @@ VIDEO_START_MEMBER(snk68_state,searchar)
 
 ***************************************************************************/
 
-READ16_MEMBER(snk68_state::pow_spriteram_r)
+READ16_MEMBER(snk68_state::spriteram_r)
 {
 	// streetsj expects the MSB of every 32-bit word to be FF. Presumably RAM
 	// exists only for 3 bytes out of 4 and the fourth is unmapped.
@@ -89,24 +89,23 @@ READ16_MEMBER(snk68_state::pow_spriteram_r)
 		return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(snk68_state::pow_spriteram_w)
+WRITE16_MEMBER(snk68_state::spriteram_w)
 {
-	UINT16 *spriteram16 = m_spriteram;
-	UINT16 newword = spriteram16[offset];
+	UINT16 newword = m_spriteram[offset];
 
 	if (!(offset & 1))
 		data |= 0xff00;
 
 	COMBINE_DATA(&newword);
 
-	if (spriteram16[offset] != newword)
+	if (m_spriteram[offset] != newword)
 	{
 		int vpos = m_screen->vpos();
 
 		if (vpos > 0)
 			m_screen->update_partial(vpos - 1);
 
-		spriteram16[offset] = newword;
+		m_spriteram[offset] = newword;
 	}
 }
 
@@ -130,12 +129,11 @@ WRITE16_MEMBER(snk68_state::searchar_fg_videoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(snk68_state::pow_flipscreen16_w)
+WRITE16_MEMBER(snk68_state::pow_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_flipscreen = data & 0x08;
-		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		flip_screen_set(data & 0x08);
 
 		m_sprite_flip_axis = data & 0x04;   // for streetsm? though might not be present on this board
 
@@ -147,30 +145,13 @@ WRITE16_MEMBER(snk68_state::pow_flipscreen16_w)
 	}
 }
 
-WRITE16_MEMBER(snk68_state::searchar_flipscreen16_w)
+WRITE16_MEMBER(snk68_state::searchar_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_flipscreen = data & 0x08;
-		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-
+		flip_screen_set(data & 0x08);
 		m_sprite_flip_axis = data & 0x04;
 	}
-}
-
-WRITE16_MEMBER(snk68_state::pow_paletteram16_word_w)
-{
-	UINT16 newword;
-	int r,g,b;
-
-	COMBINE_DATA(&m_paletteram[offset]);
-	newword = m_paletteram[offset];
-
-	r = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
-	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
-	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01) ;
-
-	m_palette->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 
@@ -182,21 +163,18 @@ WRITE16_MEMBER(snk68_state::pow_paletteram16_word_w)
 
 void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group)
 {
-	UINT16 *spriteram16 = m_spriteram;
-	int flipscreen = m_flipscreen;
-	int sprite_flip_axis = m_sprite_flip_axis;
-	const UINT16* tiledata = &spriteram16[0x800*group];
+	const UINT16* tiledata = &m_spriteram[0x800*group];
 
 	// pow has 0x4000 tiles and independent x/y flipping
 	// the other games have > 0x4000 tiles and flipping in only one direction
 	// (globally selected)
-	int const is_pow = (m_gfxdecode->gfx(1)->elements() <= 0x4000);
-	int offs;
+	bool const is_pow = (m_gfxdecode->gfx(1)->elements() <= 0x4000);
+	bool const flip = flip_screen();
 
-	for (offs = 0; offs < 0x800; offs += 0x40)
+	for (int offs = 0; offs < 0x800; offs += 0x40)
 	{
-		int mx = (spriteram16[offs + 2*group] & 0xff) << 4;
-		int my = spriteram16[offs + 2*group + 1];
+		int mx = (m_spriteram[offs + 2*group] & 0xff) << 4;
+		int my = m_spriteram[offs + 2*group + 1];
 		int i;
 
 		mx = mx | (my >> 12);
@@ -204,7 +182,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		mx = ((mx + 16) & 0x1ff) - 16;
 		my = -my;
 
-		if (flipscreen)
+		if (flip)
 		{
 			mx = 240 - mx;
 			my = 240 - my;
@@ -229,7 +207,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				}
 				else
 				{
-					if (sprite_flip_axis)
+					if (m_sprite_flip_axis)
 					{
 						fx = 0;
 						fy = tile & 0x8000;
@@ -242,7 +220,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					tile &= 0x7fff;
 				}
 
-				if (flipscreen)
+				if (flip)
 				{
 					fx = !fx;
 					fy = !fy;
@@ -259,7 +237,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				tiledata += 2;
 			}
 
-			if (flipscreen)
+			if (flip)
 				my -= 16;
 			else
 				my += 16;
@@ -268,7 +246,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 }
 
 
-UINT32 snk68_state::screen_update_pow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x7ff, cliprect);
 

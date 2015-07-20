@@ -47,7 +47,7 @@ const device_type MB8844 = &device_creator<mb8844_cpu_device>;
     MACROS
 ***************************************************************************/
 
-#define READOP(a)           (m_direct->read_decrypted_byte(a))
+#define READOP(a)           (m_direct->read_byte(a))
 
 #define RDMEM(a)            (m_data->read_byte(a))
 #define WRMEM(a,v)          (m_data->write_byte((a), (v)))

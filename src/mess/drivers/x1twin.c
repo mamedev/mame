@@ -394,23 +394,9 @@ static const z80_daisy_config x1_daisy[] =
 	{ NULL }
 };
 
-static LEGACY_FLOPPY_OPTIONS_START( x1 )
-	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface x1_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(x1),
-	"floppy_5_25"
-};
-
-
+static SLOT_INTERFACE_START( x1_floppies )
+	SLOT_INTERFACE("dd", FLOPPY_525_DD)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	/* basic machine hardware */
@@ -471,8 +457,14 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", x1_floppies, "dd", x1_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", x1_floppies, "dd", x1_state::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -502,9 +494,6 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_CASSETTE_INTERFACE("x1_cass")
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
-
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x1_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
 #if 0
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)

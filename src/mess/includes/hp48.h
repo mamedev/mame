@@ -16,7 +16,7 @@ typedef enum {
 	HP48_G,
 	HP48_GX,
 	HP48_GP,
-	HP49_G,
+	HP49_G
 } hp48_models;
 
 /* memory module configuration */

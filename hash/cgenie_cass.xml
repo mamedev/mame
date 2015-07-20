@@ -3,936 +3,964 @@
 
 <!--
 
-  TODO:
-  * document basic tapes when they are fixed!
-  * add to usage "start with /" for games which need it (those which don't autostart)
-  * check which games work and which don't and fix the supported flag accordingly
+TCG is Trommeschläger Computer GmbH, who renamed themselves mid 1983 to TCS. They were the German
+distributor of the Colour Genie EG2000 computers.
+
 -->
 
-<softwarelist name="cgenie_cass" description="EACA Colour Genie/EG2000 cassettes">
-	<software name="andromed" supported="no">
-		<description>Andromeda</description>
-		<year>1982</year>
-		<publisher>TGC</publisher>
-		<info name="usage" value="Type SYSTEM and load with ANDRO"/>
+<softwarelist name="cgenie_cass" description="EACA Colour Genie EG2000 cassettes">
 
+	<software name="andromed" supported="yes">
+		<description>Andromeda (32k)</description>
+		<year>1982</year>
+		<publisher>TCG</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with ANDRO, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="12544">
-				<rom name="andromeda (1982)(buchmueller, juergen)(de).cas" size="12544" crc="cb10616e" sha1="65e6679e24bb7e946b90961ba20cb522ae29e601" offset="0" />
+				<rom name="andromeda_32k.cas" size="12544" crc="cb10616e" sha1="65e6679e24bb7e946b90961ba20cb522ae29e601" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="andromeda" cloneof="andromed" supported="no">
-		<description>Andromeda (Alt)</description>
+	<software name="andromed16" cloneof="andromed" supported="yes">
+		<description>Andromeda (16k)</description>
 		<year>1982</year>
-		<publisher>TGC</publisher>
-		<info name="usage" value="Type SYSTEM and load with ANDRO"/>
-
+		<publisher>TCG</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with ANDRO" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14938">
-				<rom name="andromeda (1982)(buchmueller, juergen)(de)[a].cas" size="14938" crc="be51a28c" sha1="71c474378582f9d522a0047b3d6a83856f5be542" offset="0" />
+				<rom name="andromeda_16k.cas" size="14938" crc="be51a28c" sha1="71c474378582f9d522a0047b3d6a83856f5be542" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="astrnaut" supported="no">
+	<software name="astrnaut" supported="yes">
 		<description>Astronaut</description>
 		<year>1984</year>
-		<publisher>N.A. Taylor</publisher>
-		<info name="usage" value="Type SYSTEM and load with ASTRO"/>
+		<publisher>N. A. Taylor</publisher>
+		<info name="usage" value="Type SYSTEM and load with ASTRO" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="9100">
-				<rom name="astronaut (1984)(taylor, n. a.).cas" size="9100" crc="7e57ada8" sha1="d98171f78f2da39ec7ea7c897a78741f1e926bee" offset="0" />
+				<rom name="astronaut.cas" size="9100" crc="7e57ada8" sha1="d98171f78f2da39ec7ea7c897a78741f1e926bee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="basicode" supported="no">
+	<!-- Missing: Bäng-Bäng, 1983 TCS -->
+
+	<software name="basicode" supported="yes">
 		<description>Basicode</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with BASICO"/>
-
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with BASICO, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="2199">
-				<rom name="basicode (1983)(tcs).cas" size="2199" crc="9da86441" sha1="f1b806842c4f0cfa9b4b69c4e45fae2135925712" offset="0" />
+				<rom name="basicode.cas" size="2199" crc="9da86441" sha1="f1b806842c4f0cfa9b4b69c4e45fae2135925712" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="baspack" supported="no">
+	<software name="basicp5" supported="yes">
+		<description>Basic +5</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="usage" value="Type SYSTEM and load with BPLUS5, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="5250">
+				<rom name="basic_plus5.cas" size="5250" crc="870865de" sha1="c2b98f33c93fc30a2926fb465d2f21b7ae92d9df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baspack" supported="yes">
 		<description>Basic-Packer 2.13</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with PACKER"/>
-
+		<info name="usage" value="Type SYSTEM and load with PACKER, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="4448">
-				<rom name="basic packer v2.13 (1983)(tcs).cas" size="4448" crc="b1074e77" sha1="bcff0ab3e60fac4213342f6e5807d047c6e96f8d" offset="0" />
+				<rom name="basic_packer_213.cas" size="4448" crc="b1074e77" sha1="bcff0ab3e60fac4213342f6e5807d047c6e96f8d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="chopper" supported="no">
-		<description>Chopper</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with CHOP"/>
+	<!-- Missing: Break Out -->
+	<!-- Missing: Colour-Assembler -->	
 
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="27969">
-				<rom name="chopper (19xx)(-)[req 32k].cas" size="27969" crc="5e13a90b" sha1="46e9ce8a093f9735b1a31e874a13b1beb79aadd2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chop83" supported="no">
-		<description>Chopper (Autostart)</description>
-		<year>1983</year>
-		<publisher>Juergen Buchmueller</publisher>
-		<info name="usage" value="Type SYSTEM and load with CHOP83"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="12034">
-				<rom name="chopper (1983)(buchmueller, juergen)[req 16k].cas" size="12034" crc="190a67fb" sha1="f8f3d6280561d6af2c14feb206d8a55d08948958" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="colcom" supported="no">
-		<description>TCS Colour Basic Compiler Ver. 3.05</description>
+	<software name="colcom" supported="yes">
+		<description>Colour Basic Compiler 3.05</description>
 		<year>1982</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with COLCOM"/>
-
+		<info name="usage" value="Type SYSTEM and load with COLCOM, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="15340">
-				<rom name="colour basic compiler v3.05 (1982)(tcs)(de).cas" size="15340" crc="2628fe32" sha1="143104b746cd959a0c022bd8a8807ad9875f4d8a" offset="0" />
+				<rom name="colour_basic_compiler.cas" size="15340" crc="2628fe32" sha1="143104b746cd959a0c022bd8a8807ad9875f4d8a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="colbasp" supported="no">
-		<description>Colour Basic +5</description>
-		<year>1983</year>
-		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with BPLUS5"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="5250">
-				<rom name="colour basic plus (1983)(tcs).cas" size="5250" crc="870865de" sha1="c2b98f33c93fc30a2926fb465d2f21b7ae92d9df" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="colconv" supported="no">
-		<description>EG 2000 Tape-Disk Converter Ver. 1.1</description>
-		<year>19??</year>
+	<software name="coldemo" supported="yes">
+		<description>Colourdemo</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with COLOFF"/>
-
+		<info name="author" value="Carsten Schmidt, Kalle Braun" />
+		<info name="usage" value="Load with CLOAD, enter RUN to start" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="1452">
-				<rom name="colour office tape-disk converter v1.11 (19xx)(-).cas" size="1452" crc="88fdad97" sha1="6d66db21fb6bfdd0b339a5e4884a9f014c06eb3a" offset="0" />
+			<dataarea name="cass" size="9002">
+				<rom name="colourdemo.cas" size="9002" crc="c70117ee" sha1="29e6874686eb090a3ab3e01787d77e646e2806be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="coldesig" supported="no">
+	<software name="coldesig" supported="yes">
 		<description>Colour Design 3.0</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with DESIGN"/>
-
+		<info name="usage" value="Type SYSTEM and load with DESIGN, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="849">
-				<rom name="colour design v3.0 (19xx)(-).cas" size="849" crc="3cade933" sha1="ad81c5fe7ff6ce162f5a5b51234e2dc41421975b" offset="0" />
+				<rom name="colour_design_30.cas" size="849" crc="3cade933" sha1="ad81c5fe7ff6ce162f5a5b51234e2dc41421975b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="coldosin" supported="no">
-		<description>Colour DOS - Interface</description>
-		<year>1997</year>
-		<publisher>Juergen Buchmueller</publisher>
-		<info name="usage" value="Type SYSTEM and load with EASY"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="2889">
-				<rom name="colour dos interface (1997)(buchmueller, juergen).cas" size="2889" crc="4a8578a2" sha1="d2d707952b695c065c5a7b400d2314bc921bc15f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="colforth" supported="no">
-		<description>Colour-Forth v2.0</description>
+	<software name="colforth" supported="yes">
+		<description>Colour-Forth 2.0 (with cassette support)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with BFORTH"/>
-
+		<info name="usage" value="Type SYSTEM and load with BFORTH, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="13132">
-				<rom name="colour forth v2.0 (1983)(tcs).cas" size="13132" crc="a2f51fc0" sha1="424c3c5be4d1c205499cea371b0f302f40dbdb60" offset="0" />
+				<rom name="colour_forth_20_cas.cas" size="13132" crc="a2f51fc0" sha1="424c3c5be4d1c205499cea371b0f302f40dbdb60" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="colfortha" cloneof="colforth" supported="no">
-		<description>Colour-Forth v2.0 (Alt)</description>
+	<software name="colfortha" cloneof="colforth" supported="yes">
+		<description>Colour-Forth 2.0</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with FORTH"/>
-
+		<info name="usage" value="Type SYSTEM and load with FORTH, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="7246">
-				<rom name="colour forth v2.0 (1983)(tcs)[a].cas" size="7246" crc="628cc3ce" sha1="8bdaa980d10c3a579f9a40052880f624f11e0eeb" offset="0" />
+				<rom name="colour_forth_20.cas" size="7246" crc="628cc3ce" sha1="8bdaa980d10c3a579f9a40052880f624f11e0eeb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="colkong" supported="no">
-		<description>Colour Kong (16k)</description>
-		<year>1983</year>
-		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with KONG"/>
+	<!-- Missing: Colour-Frogger (or is this Toad Mania?) -->
 
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="8731">
-				<rom name="colour kong (1983)(tcs)[req 16k].cas" size="8731" crc="f6ae6158" sha1="319a60dc863eabd05c79a8de261af70b6e5ba74b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="colkong32" cloneof="colkong" supported="no">
+	<software name="colkong" supported="yes">
 		<description>Colour Kong (32k)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with KONG32"/>
-
+		<info name="author" value="Harald Bögeholz" />
+		<info name="usage" value="Type SYSTEM and load with KONG32, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="12335">
-				<rom name="colour kong (1983)(tcs)[req 32k].cas" size="12335" crc="83fba82e" sha1="1799cde3a3fe308cb987df940ee111ad564936c5" offset="0" />
+				<rom name="colour_kong_32k.cas" size="12335" crc="83fba82e" sha1="1799cde3a3fe308cb987df940ee111ad564936c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="colkonga" cloneof="colkong" supported="no">
-		<description>Colour Kong (16k, Alt)</description>
+	<software name="colkong16" cloneof="colkong" supported="yes">
+		<description>Colour Kong (16k)</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with KONG16"/>
+		<info name="author" value="Harald Bögeholz" />
+		<info name="usage" value="Type SYSTEM and load with KONG" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="8731">
+				<rom name="colour_kong_16k.cas" size="8731" crc="f6ae6158" sha1="319a60dc863eabd05c79a8de261af70b6e5ba74b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="colkong16a" cloneof="colkong" supported="yes">
+		<description>Colour Kong (16k, no autostart)</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Harald Bögeholz" />
+		<info name="usage" value="Type SYSTEM and load with KONG16, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="8742">
-				<rom name="colour kong (1983)(tcs)[a][req 16k].cas" size="8742" crc="111deb80" sha1="9a106a73d113851c6a60d401715f96fbbe2d9534" offset="0" />
+				<rom name="colour_kong_16k_noautostart.cas" size="8742" crc="111deb80" sha1="9a106a73d113851c6a60d401715f96fbbe2d9534" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="colmon2" supported="no">
-		<description>Colmon Vers.2</description>
+	<!-- Missing: Colour-Monitor I -->
+
+	<software name="colmon2" supported="yes">
+		<description>Colour-Monitor 2.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with COLMON"/>
-
+		<info name="usage" value="Type SYSTEM and load with COLMON, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="4192">
-				<rom name="colour monitor v2.0 (19xx)(-).cas" size="4192" crc="ae8b9163" sha1="ac9bd8ca81036482e73742a2fa1b77747500cf70" offset="0" />
+				<rom name="colour_monitor_2.cas" size="4192" crc="ae8b9163" sha1="ac9bd8ca81036482e73742a2fa1b77747500cf70" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="monrom" supported="no">
-		<description>Unknown program "MONROM"</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with MONROM"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="4195">
-				<rom name="colour monitor v2.0 (19xx)(-)[a].cas" size="4195" crc="8c96504c" sha1="4f84cb5fa31f2a645217092cfc183acdc8b65c8e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="colmon30" supported="no">
+	<software name="colmon3" supported="yes">
 		<description>Colour-Monitor 3.0</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with COLMON"/>
-
+		<info name="usage" value="Type SYSTEM and load with COLMON, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="15091">
-				<rom name="colour monitor v3.0 (1983)(tcs).cas" size="15091" crc="51f27191" sha1="bb5dce66adc62cf7d4460fa93331132f66b0266e" offset="0" />
+				<rom name="colour_monitor_3.cas" size="15091" crc="51f27191" sha1="bb5dce66adc62cf7d4460fa93331132f66b0266e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="colpasc" supported="no">
+	<software name="colpasc" supported="yes">
 		<description>Colour-PASCAL 2.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with PASCAL"/>
-
+		<info name="usage" value="Type SYSTEM and load with PASCAL" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="11896">
-				<rom name="colour pascal v2.0 (19xx)(-).cas" size="11896" crc="463af74d" sha1="8756a8f0ba9bb82b9c1a45ed15e8e1d07dedf6c7" offset="0" />
+				<rom name="colour_pascal_20.cas" size="11896" crc="463af74d" sha1="8756a8f0ba9bb82b9c1a45ed15e8e1d07dedf6c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="colrot" supported="no">
+	<software name="colrot" supported="yes">
 		<description>Colrot</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with COLROT"/>
-
+		<info name="author" value="Udo Gerber" />
+		<info name="usage" value="Type SYSTEM and load with COLROT (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="12132">
-				<rom name="colour rot (1983)(tcs)(de).cas" size="12132" crc="d95dc066" sha1="52c112b2e342fcec6faac1a10677e3f1ba2cdc6a" offset="0" />
+				<rom name="colrot.cas" size="12132" crc="d95dc066" sha1="52c112b2e342fcec6faac1a10677e3f1ba2cdc6a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="colscha" supported="no">
-		<description>Colour-SCHACH</description>
-		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with SARGON"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="10161">
-				<rom name="colour schach (1983)(-)(de).cas" size="10161" crc="b21c8982" sha1="78bb511ac85cc5b996a2fcfe6ebb9dc9e25e2040" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="colsch" supported="no">
+	<software name="colscha" supported="yes">
 		<description>Colour Schach</description>
 		<year>1983</year>
-		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with SCHACH"/>
-
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Kalle Braun" />
+		<info name="usage" value="Type SYSTEM and load with SARGON, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="11127">
-				<rom name="colour schach (1983)(tcs)(de).cas" size="11127" crc="997f5271" sha1="ce040beccae0504b169f693bf6a8c17633bfcfb8" offset="0" />
+			<dataarea name="cass" size="10161">
+				<rom name="colour_schach.cas" size="10161" crc="b21c8982" sha1="78bb511ac85cc5b996a2fcfe6ebb9dc9e25e2040" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cosmicat" supported="no">
+	<software name="colsch" supported="yes">
+		<description>Colour Schach (TCS)</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Kalle Braun" />
+		<info name="usage" value="Type SYSTEM and load with SCHACH, enter / to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="11127">
+				<rom name="colour_schach_tcs.cas" size="11127" crc="997f5271" sha1="ce040beccae0504b169f693bf6a8c17633bfcfb8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Missing: Colour-Skat -->
+	<!-- Missing: Colour Synthesizer aka Synthi, TCS 1983 (Jürgen Buchmüller) -->
+	<!-- Missing: Colour-Text -->
+	<!-- Missing: Colzap -->
+	<!-- Missing: Composer, TCS 1983 (Carsten Schmidt) -->
+
+	<software name="chopper" supported="yes">
+		<description>Chopper (TCS)</description>
+		<year>198?</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with CHOP, enter / to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="27969">
+				<rom name="chopper_tcs.cas" size="27969" crc="5e13a90b" sha1="46e9ce8a093f9735b1a31e874a13b1beb79aadd2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chop83" supported="yes">
+		<description>Chopper (1983)</description>
+		<year>1983</year>
+		<publisher>Jürgen Buchmüller</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with CHOP83" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="12034">
+				<rom name="chopper_83.cas" size="12034" crc="190a67fb" sha1="f8f3d6280561d6af2c14feb206d8a55d08948958" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Missing: Conquer -->
+
+	<software name="cosmicat" supported="yes">
 		<description>Cosmic Attack</description>
 		<year>198?</year>
 		<publisher>Kansas Software</publisher>
-		<info name="usage" value="Type SYSTEM and load with COSMIC"/>
-
+		<info name="author" value="Wal Mansell" />
+		<info name="usage" value="Type SYSTEM and load with COSMIC, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="9775">
-				<rom name="cosmic attack (19xx)(kansas software).cas" size="9775" crc="a0231790" sha1="5b9fec64e2f46e8240ed1416c2e3a7c12e489251" offset="0" />
+				<rom name="cosmic_attack.cas" size="9775" crc="a0231790" sha1="5b9fec64e2f46e8240ed1416c2e3a7c12e489251" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="crzpaintb" cloneof="crzpaint" supported="no">
-		<description>Crazy Paint (Later, Alt)</description>
+	<software name="crzpaint" supported="yes">
+		<description>Crazy Paint</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with PAINT, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="12539">
+				<rom name="crazy_paint.cas" size="12539" crc="4665242c" sha1="07bfc1328c12f81cb7bf18c0e3bf8f1d5983222b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crzpaintc" cloneof="crzpaint" supported="yes">
+		<description>Crazy Paint (The Colour Connection)</description>
 		<year>1984</year>
 		<publisher>The Colour Connection</publisher>
-		<info name="usage" value="Type SYSTEM and load with CRAZY2"/>
-
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with PAINT2, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="13654">
-				<rom name="crazy paint (19xx)(-).cas" size="13654" crc="75202477" sha1="465b440db5c9acc46ef5186a5b1cad0f0938d3d4" offset="0" />
+			<dataarea name="cass" size="13583">
+				<rom name="crazy_paint_tcc.cas" size="13583" crc="b5d90e32" sha1="734678f6fa49d7f2263b6633bb191dc0c241ec1a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="eagle" supported="no">
+	<software name="crzpaintca" cloneof="crzpaint" supported="yes">
+		<description>Crazy Paint (The Colour Connection, alternate)</description>
+		<year>1984</year>
+		<publisher>The Colour Connection</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with CRAZY2, enter / to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="13654">
+				<rom name="crazy_paint_tcc_a.cas" size="13654" crc="75202477" sha1="465b440db5c9acc46ef5186a5b1cad0f0938d3d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Missing: Death-Trap -->
+	<!-- Missing: Dig-Boy, TCS 1983 -->
+	<!-- Missing: Doppelwurm, TCS 1983 -->
+
+	<software name="eagle" supported="yes">
 		<description>Eagle</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with EAGLE"/>
-
+		<info name="author" value="Thomas M. Binzinger" />
+		<info name="usage" value="Type SYSTEM and load with EAGLE, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14910">
-				<rom name="eagle (1983)(tcs)(de).cas" size="14910" crc="3453cd15" sha1="fb4089ad9dc2df0d5120eae7256b8354cda9696f" offset="0" />
+				<rom name="eagle.cas" size="14910" crc="3453cd15" sha1="fb4089ad9dc2df0d5120eae7256b8354cda9696f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="eatman" supported="no">
+	<software name="eatman" supported="yes">
 		<description>Eatman</description>
 		<year>1983</year>
 		<publisher>Computer Service W. Neumann - Molimerx Ltd.</publisher>
-		<info name="usage" value="Type SYSTEM and load with EATMAN"/>
-
+		<info name="author" value="Bernd Herd" />
+		<info name="usage" value="Type SYSTEM and load with EATMAN, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="4003">
-				<rom name="eatman (1983)(computer service).cas" size="4003" crc="eaa18750" sha1="641ee74cf5e19dfd69955e153a309030e47b6284" offset="0" />
+				<rom name="eatman.cas" size="4003" crc="eaa18750" sha1="641ee74cf5e19dfd69955e153a309030e47b6284" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="eis" supported="no">
+	<software name="eis" supported="yes">
 		<description>Eis</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with EIS"/>
-
+		<info name="author" value="Klaus Weber" />
+		<info name="usage" value="Type SYSTEM and load with EIS, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14908">
-				<rom name="eis (1983)(tcs)(de).cas" size="14908" crc="36ae9438" sha1="45046f1ec0b7111179858996d15e3eea6f85f17e" offset="0" />
+				<rom name="eis.cas" size="14908" crc="36ae9438" sha1="45046f1ec0b7111179858996d15e3eea6f85f17e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="eliminat" supported="no">
+	<software name="eliminat" supported="yes">
 		<description>Eliminator</description>
 		<year>1984</year>
-		<publisher>The Colour Connection</publisher>
-		<info name="usage" value="Type SYSTEM and load with ELIMIN"/>
-
+		<publisher>TCC</publisher>
+		<info name="author" value="Harald Bögeholz" />
+		<info name="usage" value="Type SYSTEM and load with ELIMIN, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="12451">
-				<rom name="eliminator (1984)(tcs).cas" size="12451" crc="e1e5e436" sha1="86cc1030fc256cd16149003d5b66725ac0f3da5d" offset="0" />
+				<rom name="eliminator.cas" size="12451" crc="e1e5e436" sha1="86cc1030fc256cd16149003d5b66725ac0f3da5d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="fgr" supported="no">
-		<description>Unknown program "FGR"</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with FGR"/>
+	<!-- Missing: Empire -->
+	<!-- Missing: ExNimroid, TCS 1983 -->
+	<!-- Missing: ExReversic, TCS 1983 -->
 
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="17">
-				<rom name="fgr (19xx)(-).cas" size="17" crc="3a132301" sha1="d28f49d820906046968d1f0f89c62b1f40ae17b5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="firebird" supported="no">
+	<software name="firebird" supported="yes">
 		<description>Firebird</description>
 		<year>1983</year>
-		<publisher>Heinz Hubben Software</publisher>
-		<info name="usage" value="Type SYSTEM and load with FIREB"/>
-
+		<publisher>Heinz Hübben Software</publisher>
+		<info name="author" value="Thomas M. Binzinger" />
+		<info name="usage" value="Type SYSTEM and load with FIREB, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="13899">
-				<rom name="firebird (1983)(binzinger, thomas m.)(de).cas" size="13899" crc="a102563d" sha1="7006f67ed89269de733997022c5998e402d774fb" offset="0" />
+				<rom name="firebird.cas" size="13899" crc="a102563d" sha1="7006f67ed89269de733997022c5998e402d774fb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="flugsim" supported="no">
+	<software name="flugsim" supported="yes">
 		<description>Colour Genie Flugsimulator</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with FLUG"/>
-
+		<info name="usage" value="Type SYSTEM and load with FLUG, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="15755">
-				<rom name="flugsimulator (19xx)(-)(de).cas" size="15755" crc="091cc8bd" sha1="02ebb664e9335035a68419b92193114da5caacc1" offset="0" />
+				<rom name="flugsimulator.cas" size="15755" crc="091cc8bd" sha1="02ebb664e9335035a68419b92193114da5caacc1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="fraggles" supported="no">
-		<description>Im Reich der Fraggles</description>
+	<software name="fraggles" supported="yes">
+		<description>Im Reich der Fraggels</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with FRAGGL"/>
-
+		<info name="usage" value="Type SYSTEM and load with FRAGGL (req. 32k memory and floppy drive)"/>
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="12619">
-				<rom name="im reich aer fraggles (19xx)(-).cas" size="12619" crc="4a107aaf" sha1="4664d6bcf7ae86558b598a576c6249b7612b00c3" offset="0" />
+				<rom name="im_reich_der_fraggels.cas" size="12619" crc="4a107aaf" sha1="4664d6bcf7ae86558b598a576c6249b7612b00c3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="glueck" supported="no">
-		<description>Glueckspilz</description>
-		<year>1983</year>
-		<publisher>TCS?</publisher>
-		<info name="usage" value="Type SYSTEM and load with GLUECK"/>
+	<!-- Missing: Galactic Attack, Klaus Weber -->
 
+	<software name="glueck" supported="yes">
+		<description>Glückspilz</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Udo Gronostay, Klaus Kunze" />
+		<info name="usage" value="Type SYSTEM and load with GLUECK, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14655">
-				<rom name="glueckspilz (1983)(gronostay, udo - kunze, klaus)(de).cas" size="14655" crc="92c71078" sha1="b118e0da5824e55df8268a3bbc10be64f7d7499e" offset="0" />
+				<rom name="glueckspilz.cas" size="14655" crc="92c71078" sha1="b118e0da5824e55df8268a3bbc10be64f7d7499e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="grafiked" supported="no">
-		<description>Grafik Editor</description>
+	<software name="grafiked" supported="yes">
+		<description>Grafik-Editor</description>
 		<year>1983</year>
-		<publisher>TCS?</publisher>
-		<info name="usage" value="Type SYSTEM and load with GRAFIK"/>
-
+		<publisher>TCS</publisher>
+		<info name="author" value="Udo Gerber" />
+		<info name="usage" value="Type SYSTEM and load with GRAFIK" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="41555">
-				<rom name="grafik editor (1983)(gerber, udo)(de).cas" size="41555" crc="7cbf2726" sha1="7e0b4e3dd1363a68324f50408f827e685aaab286" offset="0" />
+				<!-- Aborts with a syntax error, bad? -->
+				<rom name="grafik_editor.cas" size="41555" crc="7cbf2726" sha1="7e0b4e3dd1363a68324f50408f827e685aaab286" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="helikopt" supported="no">
+	<software name="hektik" supported="yes">
+		<description>Hektik</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with HEKTIK, enter / to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="14668">
+				<rom name="hektik.cas" size="14668" crc="37475957" sha1="0a79c39ef04f46993e440ffd842f125ac43140e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="helikopt" supported="yes">
 		<description>Helikopter</description>
 		<year>1983</year>
-		<publisher>Heinz Hubben Software</publisher>
-		<info name="usage" value="Type SYSTEM and load with HELIKO"/>
-
+		<publisher>Heinz Hübben Software</publisher>
+		<info name="author" value="Thomas M. Binzinger" />
+		<info name="usage" value="Type SYSTEM and load with HELIKO" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="18148">
-				<rom name="helikopter (1983)(binzinger, thomas m.)(de).cas" size="18148" crc="5c046ce2" sha1="606560daa74dd39b06e89881918b730bd19f2442" offset="0" />
+				<rom name="helikopter.cas" size="18148" crc="5c046ce2" sha1="606560daa74dd39b06e89881918b730bd19f2442" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="invasion" supported="no">
+	<software name="invasion" supported="partial">
 		<description>Invasion aus dem Weltraum</description>
 		<year>1982</year>
-		<publisher>Harald Boegeholz</publisher>
-		<info name="usage" value="Type SYSTEM and load with INVASI"/>
-
+		<publisher>TCS</publisher>
+		<info name="author" value="Harald Bögeholz" />
+		<info name="usage" value="Type SYSTEM and load with INVASI, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="8450">
-				<rom name="invasion aus dem weltraum (1982)(boegeholz, harald)(de).cas" size="8450" crc="8fd27759" sha1="445198d22d8d7b2dafd747006ffd156fede301bc" offset="0" />
+				<rom name="invasion_aus_dem_weltraum.cas" size="8450" crc="8fd27759" sha1="445198d22d8d7b2dafd747006ffd156fede301bc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="jetset" supported="no">
-		<description>Jet Set Billy 16K Version</description>
+		<description>Jet Set Billy (16k)</description>
 		<year>1984</year>
 		<publisher>Arcade Games</publisher>
-		<info name="usage" value="Type SYSTEM and load with JETSET"/>
-
+		<info name="author" value="R. Hamilton" />
+		<info name="usage" value="Type SYSTEM and load with JETSET" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="2123">
-				<rom name="jet set billy (1984)(hamilton, r.)(part 1 of 2)[req 16k].cas" size="2123" crc="883161e8" sha1="6062a05ccde2e8b8165575c902f2109ca83e95f2" offset="0" />
+				<rom name="jet_set_billy_part1.cas" size="2123" crc="883161e8" sha1="6062a05ccde2e8b8165575c902f2109ca83e95f2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cgenie_cass">
 			<dataarea name="cass" size="9197">
-				<rom name="jet set billy (1984)(hamilton, r.)(part 2 of 2)[req 16k].cas" size="9197" crc="98c7a0da" sha1="74d0a79f9a931df03df2b06350521d7d390786c9" offset="0" />
+				<!-- Displays "Loading error" after a while -->
+				<rom name="jet_set_billy_part2.cas" size="9197" crc="98c7a0da" sha1="74d0a79f9a931df03df2b06350521d7d390786c9" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="life" supported="no">
+	<!-- Missing: Joker-Poker, TCS 1983 -->
+
+	<software name="kaefer" supported="yes">
+		<description>Marienkäfer</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Klaus Weber" />
+		<info name="usage" value="Type SYSTEM and load with KAEFER, enter / to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="17118">
+				<rom name="marienkaefer.cas" size="17118" crc="38422db1" sha1="a3aabab4aa5166b18846186a5565eca47f4d62e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Missing: Kings -->
+
+	<software name="life" supported="yes">
 		<description>Life</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with LIFE"/>
-
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with LIFE, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="5625">
-				<rom name="life (1983)(tcs)(de).cas" size="5625" crc="18d97fe6" sha1="166e8cc82883ebf5afa64db8acb7fbd7121a2175" offset="0" />
+				<rom name="life.cas" size="5625" crc="18d97fe6" sha1="166e8cc82883ebf5afa64db8acb7fbd7121a2175" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lunarlan" supported="no">
+	<!-- Missing: Länder-Quiz, Klaus Weber -->
+
+	<software name="lunarlan" supported="yes">
 		<description>Lunar Lander</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with LUNA L"/>
-
+		<info name="author" value="Klaus Weber" />
+		<info name="usage" value="Type SYSTEM and load with LUNA L, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="15493">
-				<rom name="lunar lander (1983)(weber, klaus).cas" size="15493" crc="916ceeb1" sha1="c1662e927629668e8dbdf1a2b4f955e27894474a" offset="0" />
+				<rom name="lunar_lander.cas" size="15493" crc="916ceeb1" sha1="c1662e927629668e8dbdf1a2b4f955e27894474a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mampf2" supported="no">
+	<!-- Missing: Madtree, TCS 1983 -->
+	<!-- Missing: Mau-Mau, TCS 1982 (Carsten Schmidt, Kalle Braun) -->
+	<!-- Missing: Mampf (Mampfman?), TCS 1983 -->
+
+	<software name="mampf2" supported="yes">
 		<description>Mampf Man II</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with MAMPF2"/>
-
+		<info name="author" value="Klaus Weber" />
+		<info name="usage" value="Type SYSTEM and load with MAMPF2, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="17055">
-				<rom name="mampf man ii (1983)(weber, klaus).cas" size="17055" crc="e6ffd933" sha1="c1952444e8d99e367058ddd0b70ecb0eb3ce8834" offset="0" />
+				<rom name="mampfman2.cas" size="17055" crc="e6ffd933" sha1="c1952444e8d99e367058ddd0b70ecb0eb3ce8834" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kaefer" supported="no">
-		<description>Marien Kaefer</description>
-		<year>1984</year>
-		<publisher>TCS?</publisher>
-		<info name="usage" value="Type SYSTEM and load with KAEFER"/>
+	<!-- Missing: Mathematik-Lernprogramm -->
+	<!-- Missing: Mausi, TCS 1983 -->
+	<!-- Missing: Memory -->
 
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="17118">
-				<rom name="marien kaefer (1984)(weber, klaus).cas" size="17118" crc="38422db1" sha1="a3aabab4aa5166b18846186a5565eca47f4d62e9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="meteor" supported="no">
+	<software name="meteor" supported="yes">
 		<description>Meteor</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with METEOR"/>
-
+		<info name="author" value="Harald Bögeholz" />
+		<info name="usage" value="Type SYSTEM and load with METEOR" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="8628">
-				<rom name="meteor (1983)(tcs)(de).cas" size="8628" crc="5683a102" sha1="78ba24d6eda120ede404e3c6fb4fb4d7cb7fd019" offset="0" />
+				<rom name="meteor.cas" size="8628" crc="5683a102" sha1="78ba24d6eda120ede404e3c6fb4fb4d7cb7fd019" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="monroe" supported="no">
-		<description>Unknown program "MONROE"</description>
-		<year>19??</year>
+		<description>Unknown (data?)</description>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with MONROE"/>
-
+		<info name="usage" value="Type SYSTEM and load with MONROE" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="4198">
-				<rom name="monroe (19xx)(-).cas" size="4198" crc="820b662f" sha1="0c2ccf61ee673384a05d1012fca09e215fd7880d" offset="0" />
+				<rom name="monroe.cas" size="4198" crc="820b662f" sha1="0c2ccf61ee673384a05d1012fca09e215fd7880d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="motten" supported="no">
+	<software name="motten" supported="yes">
 		<description>Motten</description>
 		<year>1982</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with MOTTEN"/>
-
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with MOTTEN, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14630">
-				<rom name="motten (1982)(tcs)(de).cas" size="14630" crc="fb5efa13" sha1="75fe474ec2ab0ebf7d300e95561788b4d91b8637" offset="0" />
+				<rom name="motten.cas" size="14630" crc="fb5efa13" sha1="75fe474ec2ab0ebf7d300e95561788b4d91b8637" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="musik" supported="no">
+	<software name="musik" supported="yes">
 		<description>Musik</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with MUSIK"/>
-
+		<info name="usage" value="Type SYSTEM and load with MUSIK, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="15639">
-				<rom name="musik demo (1983)(tcs).cas" size="15639" crc="ac9a24d8" sha1="7d035d6f2b523e87462f41812352634bfee9397e" offset="0" />
+				<rom name="musik.cas" size="15639" crc="ac9a24d8" sha1="7d035d6f2b523e87462f41812352634bfee9397e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="netzo" supported="no">
+	<!-- Missing: NE555 -->
+
+	<software name="netzo" supported="yes">
 		<description>Netzo</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with NETZO"/>
-
+		<info name="author" value="Thomas M. Binzinger" />
+		<info name="usage" value="Type SYSTEM and load with NETZO, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14990">
-				<rom name="netzo (1983)(tcs)(de).cas" size="14990" crc="63eac136" sha1="fa35faff66988c94ed7caff0c9f593075d2dcbb0" offset="0" />
+				<rom name="netzo.cas" size="14990" crc="63eac136" sha1="fa35faff66988c94ed7caff0c9f593075d2dcbb0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pacboy" supported="no">
+	<!-- Missing: Opamp (Operationsverstärker Applikationen), Uwe Gerber -->
+	<!-- Missing: Optik (Grundeigenschaften des Lichts) -->
+	<!-- Missing: Orgel, TCS 1982 -->
+
+	<software name="pacboy" supported="yes">
 		<description>Pac Boy</description>
 		<year>1984</year>
-		<publisher>Heinz Hubben Software</publisher>
-		<info name="usage" value="Type SYSTEM and load with PACBOY"/>
-
+		<publisher>Heinz Hübben Software</publisher>
+		<info name="developer" value="Spectra-Games" />
+		<info name="usage" value="Type SYSTEM and load with PACBOY (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="13376">
-				<rom name="pac boy (1984)(spectra games)(de).cas" size="13376" crc="515b36d4" sha1="a3945e5dda04f0964880acacd2778dd99ff200d3" offset="0" />
+				<rom name="pac_boy.cas" size="13376" crc="515b36d4" sha1="a3945e5dda04f0964880acacd2778dd99ff200d3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="crzpaint" supported="no">
-		<description>Crazy Paint</description>
-		<year>1983</year>
-		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with PAINT"/>
+	<!-- Missing: Panik, TCS 1982 -->
+	<!-- Missing: Panzerkampf, TCS 1983 -->
+	<!-- Missing: Physik des Transistors -->
+	<!-- Missing: Plotter, TCS 1983 -->
+	<!-- Missing: Punktejagd -->
 
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="12539">
-				<rom name="painter (19xx)(-).cas" size="12539" crc="4665242c" sha1="07bfc1328c12f81cb7bf18c0e3bf8f1d5983222b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crzpainta" cloneof="crzpaint" supported="no">
-		<description>Crazy Paint (Later)</description>
-		<year>1984</year>
-		<publisher>The Colour Connection</publisher>
-		<info name="usage" value="Type SYSTEM and load with PAINT2"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="13583">
-				<rom name="painter 2 (19xx)(-).cas" size="13583" crc="b5d90e32" sha1="734678f6fa49d7f2263b6633bb191dc0c241ec1a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rs232" supported="no">
+	<software name="rs232" supported="yes">
 		<description>RS-232 Treiberprogramm</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with RS232"/>
-
+		<info name="usage" value="Type SYSTEM and load with RS232, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="209">
-				<rom name="rs-232 treiber programm (19xx)(-)(de).cas" size="209" crc="53f5b980" sha1="8d192995c5ac6e4a7241ae8200f78ab26647b3c4" offset="0" />
+				<rom name="rs232_treiber_programm.cas" size="209" crc="53f5b980" sha1="8d192995c5ac6e4a7241ae8200f78ab26647b3c4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="saug" supported="no">
+	<software name="saug" supported="yes">
 		<description>Saug</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with SAUG"/>
-
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with SAUG, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="11885">
-				<rom name="saug (1982)(tcs).cas" size="11885" crc="f477896c" sha1="34fa2c2ce143785eb9ebda1b3889f86ee2fa81ab" offset="0" />
+				<rom name="saug.cas" size="11885" crc="f477896c" sha1="34fa2c2ce143785eb9ebda1b3889f86ee2fa81ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scrprint" supported="no">
-		<description>Screen Printer</description>
-		<year>1983</year>
-		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with FONTS"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="12071">
-				<rom name="screen printer (1983)(tcs).cas" size="12071" crc="ea427be8" sha1="6a4f8d8858a0a8859d21eb2bab658fbc25526319" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="scuttle" supported="no">
+	<software name="scuttle" supported="yes">
 		<description>Scuttle</description>
-		<year>1982</year>
-		<publisher>TGC?</publisher>
-		<info name="usage" value="Type SYSTEM and load with SCUTTL"/>
-
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="T. Schwertfeger" />
+		<info name="usage" value="Type SYSTEM and load with SCUTTL, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="14906">
-				<rom name="scuttle (1982)(schwertfeger, t.)(de).cas" size="14906" crc="2fb32641" sha1="c0bab5873e9ac16e853d98a2eab374afeebb1dd2" offset="0" />
+				<rom name="scuttle.cas" size="14906" crc="2fb32641" sha1="c0bab5873e9ac16e853d98a2eab374afeebb1dd2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="skramble" supported="no">
+	<!-- Missing: Shaper -->
+
+	<software name="skramble" supported="yes">
 		<description>Skramble</description>
 		<year>1983</year>
 		<publisher>Algray Software</publisher>
-		<info name="usage" value="Type SYSTEM and load with SKRMBL"/>
-
+		<info name="author" value="Stuart Sampson" />
+		<info name="usage" value="Type SYSTEM and load with SKRMBL, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="21939">
-				<rom name="skramble (1983)(sampson, stuart).cas" size="21939" crc="249df317" sha1="f9ebd7d63ec8d018eef5ac351de75aa615cf70a7" offset="0" />
+				<!-- Seems to be twice on tape? -->
+				<rom name="skramble.cas" size="21939" crc="249df317" sha1="f9ebd7d63ec8d018eef5ac351de75aa615cf70a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="softschu" supported="no">
+	<!-- Missing: Sound-Editor -->
+
+	<software name="softschu" supported="yes">
 		<description>Software-Schutz</description>
 		<year>1983</year>
-		<publisher>Harald Boegeholz</publisher>
-		<info name="usage" value="Type SYSTEM and load with EGPROT"/>
-
+		<publisher>Harald Bögeholz</publisher>
+		<info name="usage" value="Type SYSTEM and load with EGPROT, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="978">
-				<rom name="software-schutz (1983)(boegeholz, harald)(de).cas" size="978" crc="4baa38a3" sha1="5efc2ab9b44da3d2c3cf743808e7a20b9e8e595c" offset="0" />
+				<rom name="software_schutz.cas" size="978" crc="4baa38a3" sha1="5efc2ab9b44da3d2c3cf743808e7a20b9e8e595c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spaceatt" supported="no">
+	<software name="spaceatt" supported="yes">
 		<description>Space Attack</description>
 		<year>1984</year>
-		<publisher>The Colour Connection</publisher>
-		<info name="usage" value="Type SYSTEM and load with SPACE"/>
-
+		<publisher>TCC</publisher>
+		<info name="author" value="A. Mueller" />
+		<info name="usage" value="Type SYSTEM and load with SPACE, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="7606">
-				<rom name="space attack (1984)(mueller, a.).cas" size="7606" crc="8f1c0271" sha1="9230b416d6928cb2616d3e5176589ec6c76d00ca" offset="0" />
+				<rom name="space_attack.cas" size="7606" crc="8f1c0271" sha1="9230b416d6928cb2616d3e5176589ec6c76d00ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spaceman" supported="no">
+	<software name="spaceman" supported="yes">
 		<description>Spaceman</description>
 		<year>198?</year>
-		<publisher>TCS?</publisher>
-		<info name="usage" value="Type SYSTEM and load with SPACE"/>
-
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Alexander Drawe" />
+		<info name="usage" value="Type SYSTEM and load with SPACE, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="11618">
-				<rom name="spaceman (19xx)(drawe, alexander)(de).cas" size="11618" crc="3de8d663" sha1="19da6f30c6f254c2bb01b6ce52a9bad4d7022858" offset="0" />
+				<rom name="spaceman.cas" size="11618" crc="3de8d663" sha1="19da6f30c6f254c2bb01b6ce52a9bad4d7022858" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="superbas" supported="no">
-		<description>Super-Basic</description>
-		<year>19??</year>
-		<publisher>Heinz Hubben Software</publisher>
-		<info name="usage" value="Type SYSTEM and load with BASCOM"/>
+	<!-- Missing: Screen-Printer (standalone) -->
 
+	<software name="superbas" supported="yes">
+		<description>Super-Basic</description>
+		<year>198?</year>
+		<publisher>Heinz Hübben Software</publisher>
+		<info name="usage" value="Type SYSTEM and load with BASCOM (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="7577">
-				<rom name="super basic (19xx)(huebben, heinz)(de).cas" size="7577" crc="1da95676" sha1="ab79434eed8f98bb0336a37c65a19c15af11f660" offset="0" />
+				<rom name="super_basic.cas" size="7577" crc="1da95676" sha1="ab79434eed8f98bb0336a37c65a19c15af11f660" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="superhrn" supported="no">
-		<description>Superhirn</description>
-		<year>1982</year>
-		<publisher>TTS</publisher>
-		<info name="usage" value="Type SYSTEM and load with MASTER"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="7938">
-				<rom name="super hirn (1982)(-).cas" size="7938" crc="b2fa4ace" sha1="ec05875e6a5d63faa01778fc51880a2a32920e1d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supergra" supported="no">
+	<software name="supergra" supported="yes">
 		<description>Super-Grafik</description>
 		<year>1984</year>
 		<publisher>The Colour Connection</publisher>
-		<info name="usage" value="Type SYSTEM and load with SPLOT"/>
-
+		<info name="author" value="Ralf Steffenhagen" />
+		<info name="usage" value="Type SYSTEM and load with SPLOT (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="24370">
-				<rom name="super plot (1984)(steffenhagen, ralf)(de).cas" size="24370" crc="5f49eda1" sha1="733c7b7f0b032cf0e6e6c07831c9fa5227e191d8" offset="0" />
+				<rom name="super_grafik.cas" size="24370" crc="5f49eda1" sha1="733c7b7f0b032cf0e6e6c07831c9fa5227e191d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="syscopy" supported="no">
-		<description>System Copy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with SYSCOP"/>
+	<software name="superhrn" supported="yes">
+		<description>Superhirn</description>
+		<year>198?</year>
+		<publisher>TTS</publisher>
+		<info name="usage" value="Type SYSTEM and load with MASTER, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="7938">
+				<rom name="superhirn.cas" size="7938" crc="b2fa4ace" sha1="ec05875e6a5d63faa01778fc51880a2a32920e1d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
+	<software name="syscopy" supported="yes">
+		<description>System Copy</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Gerber" />
+		<info name="usage" value="Type SYSTEM and load with SYSCOP, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="2003">
-				<rom name="system copy (19xx)(-)(de).cas" size="2003" crc="1fa35da3" sha1="0b7e18b1c1898b047fe867d10a5e0138113510e0" offset="0" />
+				<rom name="system_copy.cas" size="2003" crc="1fa35da3" sha1="0b7e18b1c1898b047fe867d10a5e0138113510e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tausend" supported="no">
-		<description>Tausend Fuss</description>
+	<software name="tapedisk" supported="yes">
+		<description>Tape-Disk Converter 1.11</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Type SYSTEM and load with COLOFF, enter / to start (req. floppy drive)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="1452">
+				<rom name="tape-disk_converter_111.cas" size="1452" crc="88fdad97" sha1="6d66db21fb6bfdd0b339a5e4884a9f014c06eb3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tausend" supported="yes">
+		<description>Tausendfuss</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with FUSS"/>
-
+		<info name="usage" value="Type SYSTEM and load with FUSS, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="3822">
-				<rom name="tausend fuss (1983)(tcs)(de).cas" size="3822" crc="41504360" sha1="ea0449594a28ce73df36a7bbf643e89e26abc223" offset="0" />
+				<rom name="tausendfuss.cas" size="3822" crc="41504360" sha1="ea0449594a28ce73df36a7bbf643e89e26abc223" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="toadman" supported="no">
+	<software name="toadman" supported="yes">
 		<description>Toad Mania</description>
 		<year>1983</year>
 		<publisher>Gumboot Software</publisher>
-		<info name="usage" value="Type SYSTEM and load with TOAD"/>
-
+		<info name="author" value="Tony Parkin, Marc J. Leduc" />
+		<info name="usage" value="Type SYSTEM and load with TOAD" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="9359">
-				<rom name="toad mania (1983)(gumboot).cas" size="9359" crc="e91c4c81" sha1="c221592c09df5f44284e6ded42df3fcc7e5ff088" offset="0" />
+				<rom name="toad_mania.cas" size="9359" crc="e91c4c81" sha1="c221592c09df5f44284e6ded42df3fcc7e5ff088" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tracemon" supported="no">
+	<software name="tracemon" supported="yes">
 		<description>Tracemon</description>
 		<year>1983</year>
 		<publisher>Juergen Buchmueller</publisher>
-		<info name="usage" value="Type SYSTEM and load with TRACEM"/>
-
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with TRACEM, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="8382">
-				<rom name="tracemon (1983)(buchmueller, juergen).cas" size="8382" crc="6b0bf332" sha1="a2f354850c0b5e6a55273ce726a52010eb33ca4f" offset="0" />
+				<rom name="tracemon.cas" size="8382" crc="6b0bf332" sha1="a2f354850c0b5e6a55273ce726a52010eb33ca4f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="triton" supported="no">
+	<software name="triton" supported="yes">
 		<description>Triton Battle</description>
 		<year>19??</year>
 		<publisher>Schmidtke Electronic</publisher>
-		<info name="usage" value="Type SYSTEM and load with TRIBAT"/>
-
+		<info name="author" value="M. Gergeleit, H. C. Steinbeck" />
+		<info name="usage" value="Type SYSTEM and load with TRIBAT, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="11743">
-				<rom name="triton battle (19xx)(gergeleit, m. - steinbeck, h.c.).cas" size="11743" crc="1bbab68f" sha1="4744ce3b7e2c6912fd9ddfd6dfba4007eebca62c" offset="0" />
+				<rom name="triton_battle.cas" size="11743" crc="1bbab68f" sha1="4744ce3b7e2c6912fd9ddfd6dfba4007eebca62c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ubootjag" supported="no">
+	<software name="ubootjag" supported="yes">
 		<description>U-Boot-Jagd</description>
 		<year>198?</year>
-		<publisher>TGC?</publisher>
-		<info name="usage" value="Type SYSTEM and load with U-BOOT"/>
-
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Type SYSTEM and load with U-BOOT, enter / to start" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="11497">
-				<rom name="u boot jagd (19xx)(-)(de).cas" size="11497" crc="5caa9b13" sha1="e1c10245217b5f8e23a3a966fb40f809e105c1a2" offset="0" />
+				<rom name="uboot_jagd.cas" size="11497" crc="5caa9b13" sha1="e1c10245217b5f8e23a3a966fb40f809e105c1a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="unkmulti" supported="no">
 		<description>Unknown multi-program tape</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Type SYSTEM and load with UHRCOP or SCRPRT"/>
-
+		<info name="usage" value="Type SYSTEM and load with UHRCOP or SCRPRT" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="1481">
-				<rom name="uhr copy (19xx)(-)(de).cas" size="1481" crc="27938748" sha1="c1e87c3e7aa2842b5b95ce4fbac24d6cb9a287fd" offset="0" />
+				<rom name="uhrcop_scrnprt.cas" size="1481" crc="27938748" sha1="c1e87c3e7aa2842b5b95ce4fbac24d6cb9a287fd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="zeichen" supported="no">
-		<description>Zeichen Editor</description>
+	<!-- Missing: Wurm -->
+
+	<software name="zeichene" supported="yes">
+		<description>Zeicheneditor +</description>
 		<year>1983</year>
 		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with EDITO2"/>
-
-		<part name="cass1" interface="cgenie_cass">
-			<dataarea name="cass" size="11131">
-				<rom name="definierbare zeichen editor (1983)(tcs).cas" size="11131" crc="a21e5f61" sha1="57ce7c921e8a773de0f30dde65f2320e114bbe71" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zeichena" cloneof="zeichen" supported="no">
-		<description>Zeichen Editor (Alt)</description>
-		<year>1983</year>
-		<publisher>TCS</publisher>
-		<info name="usage" value="Type SYSTEM and load with EDITOR"/>
-
+		<info name="usage" value="Type SYSTEM and load with EDITOR, enter / to start (req. 32k memory)" />
 		<part name="cass1" interface="cgenie_cass">
 			<dataarea name="cass" size="9233">
-				<rom name="definierbare zeichen editor (1983)(tcs)[a].cas" size="9233" crc="dff8308e" sha1="b3cb291e5f96141187d19b18edc048aba544d7be" offset="0" />
+				<rom name="zeicheneditor_plus.cas" size="9233" crc="dff8308e" sha1="b3cb291e5f96141187d19b18edc048aba544d7be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeichen2" supported="yes">
+		<description>Zeicheneditor + (incl. SCREEN-Editor)</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="usage" value="Type SYSTEM and load with EDITO2, enter / to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="11131">
+				<rom name="zeicheneditor_plus_2.cas" size="11131" crc="a21e5f61" sha1="57ce7c921e8a773de0f30dde65f2320e114bbe71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeichens" supported="yes">
+		<description>Zeichensätze (incl. Screen-Printer)</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with FONTS, enter / to start (req. 32k memory)" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="12071">
+				<rom name="zeichensaetze_with_screen_printer.cas" size="12071" crc="ea427be8" sha1="6a4f8d8858a0a8859d21eb2bab658fbc25526319" offset="0" />
 			</dataarea>
 		</part>
 	</software>

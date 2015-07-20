@@ -148,10 +148,8 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 #include "video/mc6845.h"
 #include "machine/pic8259.h"
 #include "machine/6821pia.h"
-#include "machine/wd17xx.h"
-
+#include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 
 class z100_state : public driver_device
 {
@@ -164,8 +162,13 @@ public:
 		m_picm(*this, "pic8259_master"),
 		m_pics(*this, "pic8259_slave"),
 		m_fdc(*this, "z207_fdc"),
+		m_floppy0(*this, "z207_fdc:0"),
+		m_floppy1(*this, "z207_fdc:1"),
+		m_floppy2(*this, "z207_fdc:2"),
+		m_floppy3(*this, "z207_fdc:3"),
 		m_crtc(*this, "crtc"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_floppy(NULL)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -173,7 +176,11 @@ public:
 	required_device<pia6821_device> m_pia1;
 	required_device<pic8259_device> m_picm;
 	required_device<pic8259_device> m_pics;
-	required_device<fd1797_device> m_fdc;
+	required_device<fd1797_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 
@@ -184,8 +191,8 @@ public:
 	DECLARE_WRITE8_MEMBER(keyb_command_w);
 	DECLARE_WRITE8_MEMBER(z100_6845_address_w);
 	DECLARE_WRITE8_MEMBER(z100_6845_data_w);
-	DECLARE_READ8_MEMBER(z207_fdc_r);
-	DECLARE_WRITE8_MEMBER(z207_fdc_w);
+	DECLARE_WRITE8_MEMBER(floppy_select_w);
+	DECLARE_WRITE8_MEMBER(floppy_motor_w);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(video_pia_A_w);
 	DECLARE_WRITE8_MEMBER(video_pia_B_w);
@@ -200,7 +207,8 @@ public:
 	UINT8 m_clr_val;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT16 m_start_addr;
-	UINT8 m_z207_cur_drive;
+
+	floppy_image_device *m_floppy;
 
 	mc6845_device *m_mc6845;
 	DECLARE_DRIVER_INIT(z100);
@@ -350,41 +358,25 @@ WRITE8_MEMBER( z100_state::z100_6845_data_w )
 	m_crtc->register_w(space, offset, data);
 }
 
-READ8_MEMBER( z100_state::z207_fdc_r )
+// todo: side select?
+
+WRITE8_MEMBER( z100_state::floppy_select_w )
 {
-	UINT8 res;
-
-	res = 0;
-
-	switch(offset)
+	switch (data & 0x03)
 	{
-		case 0: res = m_fdc->status_r(space, offset); break;
-		case 1: res = m_fdc->track_r(space, offset);  break;
-		case 2: res = m_fdc->sector_r(space, offset); break;
-		case 3: res = m_fdc->data_r(space, offset); break;
+	case 0: m_floppy = m_floppy0->get_device(); break;
+	case 1: m_floppy = m_floppy1->get_device(); break;
+	case 2: m_floppy = m_floppy2->get_device(); break;
+	case 3: m_floppy = m_floppy3->get_device(); break;
 	}
 
-	return res;
+	m_fdc->set_floppy(m_floppy);
 }
 
-WRITE8_MEMBER( z100_state::z207_fdc_w )
+WRITE8_MEMBER( z100_state::floppy_motor_w )
 {
-	switch(offset)
-	{
-		case 0: m_fdc->command_w(space, offset,data); break;
-		case 1: m_fdc->track_w(space, offset,data); break;
-		case 2: m_fdc->sector_w(space, offset,data); break;
-		case 3: m_fdc->data_w(space, offset,data); break;
-		case 4: // disk control
-			m_fdc->set_drive(data & 3);
-			m_z207_cur_drive = data & 3;
-			break;
-		case 5: // aux control
-			floppy_get_device(machine(), m_z207_cur_drive)->floppy_mon_w(!BIT(data, 1));
-			floppy_get_device(machine(), m_z207_cur_drive)->floppy_drive_set_ready_state(data & 2,0);
-			break;
-
-	}
+	if (m_floppy)
+		m_floppy->mon_w(!BIT(data, 1));
 }
 
 static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
@@ -399,7 +391,9 @@ static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
 //  AM_RANGE (0xa4, 0xa7) gateway (reserved)
 //  AM_RANGE (0xac, 0xad) Z-217 secondary disk controller (winchester)
 //  AM_RANGE (0xae, 0xaf) Z-217 primary disk controller (winchester)
-	AM_RANGE (0xb0, 0xb7) AM_READWRITE(z207_fdc_r,z207_fdc_w) // primary (wd1797)
+	AM_RANGE (0xb0, 0xb3) AM_DEVREADWRITE("z207_fdc", fd1797_t, read, write)
+	AM_RANGE (0xb4, 0xb4) AM_WRITE(floppy_select_w)
+	AM_RANGE (0xb5, 0xb5) AM_WRITE(floppy_motor_w)
 //  z-207 secondary disk controller (wd1797)
 //  AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
 //  AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
@@ -644,22 +638,6 @@ WRITE_LINE_MEMBER( z100_state::video_pia_CB2_w )
 	m_clr_val = (state & 1) ? 0x00 : 0xff;
 }
 
-static LEGACY_FLOPPY_OPTIONS_START( z100 )
-	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([16])
-		SECTOR_LENGTH([256]) //up to 1024
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface z100_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(z100),
-	"floppy_5_25"
-};
-
 void z100_state::machine_start()
 {
 	m_mc6845 = machine().device<mc6845_device>("crtc");
@@ -680,6 +658,10 @@ void z100_state::machine_reset()
 			m_palette->set_pen_color(i,pal3bit(0),pal3bit(i),pal3bit(0));
 	}
 }
+
+static SLOT_INTERFACE_START( z100_floppies )
+	SLOT_INTERFACE("dd", FLOPPY_525_DD)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( z100, z100_state )
 	/* basic machine hardware */
@@ -715,10 +697,12 @@ static MACHINE_CONFIG_START( z100, z100_state )
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
-	MCFG_DEVICE_ADD("z207_fdc", FD1797, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+	MCFG_FD1797_ADD("z207_fdc", XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(z100_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:0", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:1", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:2", z100_floppies, "", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:3", z100_floppies, "", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

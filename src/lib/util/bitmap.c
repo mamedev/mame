@@ -20,9 +20,9 @@
 //  CONSTANTS
 //**************************************************************************
 
-// alignment values; 128 bytes is the largest cache line on typical
-// architectures today
+/** @brief  alignment values; 128 bytes is the largest cache line on typical architectures today. */
 const UINT32 BITMAP_OVERALL_ALIGN = 128;
+/** @brief  The bitmap rowbytes align. */
 const UINT32 BITMAP_ROWBYTES_ALIGN = 128;
 
 
@@ -61,9 +61,20 @@ inline void bitmap_t::compute_base(int xslop, int yslop)
 //  BITMAP ALLOCATION/CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  bitmap_t - basic constructor
-//-------------------------------------------------
+/**
+ * @fn  bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xslop, int yslop)
+ *
+ * @brief   -------------------------------------------------
+ *            bitmap_t - basic constructor
+ *          -------------------------------------------------.
+ *
+ * @param   format  Describes the format to use.
+ * @param   bpp     The bits per pixel.
+ * @param   width   The width.
+ * @param   height  The height.
+ * @param   xslop   The xslop.
+ * @param   yslop   The yslop.
+ */
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xslop, int yslop)
 	: m_alloc(NULL),
@@ -76,6 +87,18 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xsl
 	allocate(width, height, xslop, yslop);
 }
 
+/**
+ * @fn  bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int height, int rowpixels)
+ *
+ * @brief   Constructor.
+ *
+ * @param   format          Describes the format to use.
+ * @param   bpp             The bits per pixel.
+ * @param [in,out]  base    If non-null, the base.
+ * @param   width           The width.
+ * @param   height          The height.
+ * @param   rowpixels       The rowpixels.
+ */
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int height, int rowpixels)
 	: m_alloc(NULL),
@@ -91,6 +114,16 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int hei
 {
 }
 
+/**
+ * @fn  bitmap_t::bitmap_t(bitmap_format format, int bpp, bitmap_t &source, const rectangle &subrect)
+ *
+ * @brief   Constructor.
+ *
+ * @param   format          Describes the format to use.
+ * @param   bpp             The bits per pixel.
+ * @param [in,out]  source  Source for the.
+ * @param   subrect         The subrect.
+ */
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, bitmap_t &source, const rectangle &subrect)
 	: m_alloc(NULL),
@@ -109,10 +142,13 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, bitmap_t &source, const rectan
 	assert(source.cliprect().contains(subrect));
 }
 
-
-//-------------------------------------------------
-//  ~bitmap_t - basic destructor
-//-------------------------------------------------
+/**
+ * @fn  bitmap_t::~bitmap_t()
+ *
+ * @brief   -------------------------------------------------
+ *            ~bitmap_t - basic destructor
+ *          -------------------------------------------------.
+ */
 
 bitmap_t::~bitmap_t()
 {
@@ -120,12 +156,19 @@ bitmap_t::~bitmap_t()
 	reset();
 }
 
-
-//-------------------------------------------------
-//  allocate -- (re)allocate memory for the bitmap
-//  at the given size, destroying anything that
-//  already exists
-//-------------------------------------------------
+/**
+ * @fn  void bitmap_t::allocate(int width, int height, int xslop, int yslop)
+ *
+ * @brief   -------------------------------------------------
+ *            allocate -- (re)allocate memory for the bitmap at the given size, destroying
+ *            anything that already exists
+ *          -------------------------------------------------.
+ *
+ * @param   width   The width.
+ * @param   height  The height.
+ * @param   xslop   The xslop.
+ * @param   yslop   The yslop.
+ */
 
 void bitmap_t::allocate(int width, int height, int xslop, int yslop)
 {
@@ -157,12 +200,19 @@ void bitmap_t::allocate(int width, int height, int xslop, int yslop)
 	compute_base(xslop, yslop);
 }
 
-
-//-------------------------------------------------
-//  resize -- resize a bitmap, reusing existing
-//  memory if the new size is smaller than the
-//  current size
-//-------------------------------------------------
+/**
+ * @fn  void bitmap_t::resize(int width, int height, int xslop, int yslop)
+ *
+ * @brief   -------------------------------------------------
+ *            resize -- resize a bitmap, reusing existing memory if the new size is smaller than
+ *            the current size
+ *          -------------------------------------------------.
+ *
+ * @param   width   The width.
+ * @param   height  The height.
+ * @param   xslop   The xslop.
+ * @param   yslop   The yslop.
+ */
 
 void bitmap_t::resize(int width, int height, int xslop, int yslop)
 {
@@ -197,11 +247,13 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 	compute_base(xslop, yslop);
 }
 
-
-//-------------------------------------------------
-//  reset -- reset to an invalid bitmap, deleting
-//  all allocated stuff
-//-------------------------------------------------
+/**
+ * @fn  void bitmap_t::reset()
+ *
+ * @brief   -------------------------------------------------
+ *            reset -- reset to an invalid bitmap, deleting all allocated stuff
+ *          -------------------------------------------------.
+ */
 
 void bitmap_t::reset()
 {
@@ -218,11 +270,18 @@ void bitmap_t::reset()
 	m_cliprect.set(0, -1, 0, -1);
 }
 
-
-//-------------------------------------------------
-//  wrap -- wrap an array of memory; the target
-//  bitmap does not own the memory
-//-------------------------------------------------
+/**
+ * @fn  void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
+ *
+ * @brief   -------------------------------------------------
+ *            wrap -- wrap an array of memory; the target bitmap does not own the memory
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  base    If non-null, the base.
+ * @param   width           The width.
+ * @param   height          The height.
+ * @param   rowpixels       The rowpixels.
+ */
 
 void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
 {
@@ -237,12 +296,17 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
 	m_cliprect.set(0, m_width - 1, 0, m_height - 1);
 }
 
-
-//-------------------------------------------------
-//  wrap -- wrap a subrectangle of an existing
-//  bitmap by copying its fields; the target
-//  bitmap does not own the memory
-//-------------------------------------------------
+/**
+ * @fn  void bitmap_t::wrap(const bitmap_t &source, const rectangle &subrect)
+ *
+ * @brief   -------------------------------------------------
+ *            wrap -- wrap a subrectangle of an existing bitmap by copying its fields; the target
+ *            bitmap does not own the memory
+ *          -------------------------------------------------.
+ *
+ * @param   source  Source for the.
+ * @param   subrect The subrect.
+ */
 
 void bitmap_t::wrap(const bitmap_t &source, const rectangle &subrect)
 {
@@ -262,11 +326,15 @@ void bitmap_t::wrap(const bitmap_t &source, const rectangle &subrect)
 	m_cliprect.set(0, m_width - 1, 0, m_height - 1);
 }
 
-
-//-------------------------------------------------
-//  set_palette -- associate a palette with a
-//  bitmap
-//-------------------------------------------------
+/**
+ * @fn  void bitmap_t::set_palette(palette_t *palette)
+ *
+ * @brief   -------------------------------------------------
+ *            set_palette -- associate a palette with a bitmap
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  palette If non-null, the palette.
+ */
 
 void bitmap_t::set_palette(palette_t *palette)
 {
@@ -285,10 +353,16 @@ void bitmap_t::set_palette(palette_t *palette)
 	}
 }
 
-
-//-------------------------------------------------
-//  fill -- fill a bitmap with a solid color
-//-------------------------------------------------
+/**
+ * @fn  void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
+ *
+ * @brief   -------------------------------------------------
+ *            fill -- fill a bitmap with a solid color
+ *          -------------------------------------------------.
+ *
+ * @param   color       The color.
+ * @param   cliprect    The cliprect.
+ */
 
 void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 {

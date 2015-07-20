@@ -243,6 +243,15 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 void srmp5_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
+
+	save_item(NAME(m_input_select));
+	save_item(NAME(m_cmd1));
+	save_item(NAME(m_cmd2));
+	save_item(NAME(m_cmd_stat));
+	save_item(NAME(m_chrbank));
+	save_pointer(NAME(m_tileram), 0x100000/2);
+	save_pointer(NAME(m_sprram), 0x80000/2);
+	save_item(NAME(m_vidregs));
 }
 
 WRITE32_MEMBER(srmp5_state::bank_w)
@@ -610,4 +619,4 @@ DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 #endif
 }
 
-GAME( 1994, srmp5,  0,    srmp5,    srmp5, srmp5_state,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5", GAME_IMPERFECT_GRAPHICS)
+GAME( 1994, srmp5,  0,    srmp5,    srmp5, srmp5_state,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

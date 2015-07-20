@@ -84,10 +84,10 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_post_load() { }
 	virtual void device_clock_changed() { }
 
-	static TIMER_CALLBACK( timer_end_callback );
 
 private:
 	void update_irqstate();
@@ -113,6 +113,11 @@ private:
 	UINT8           m_timershift;
 	UINT8           m_timerstate;
 	emu_timer *     m_timer;
+
+	enum
+	{
+		TIMER_END_CB
+	};
 };
 
 

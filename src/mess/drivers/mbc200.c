@@ -41,8 +41,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/mc6845.h"
-//#include "machine/wd_fdc.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 
 class mbc200_state : public driver_device
@@ -56,14 +55,13 @@ public:
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
 		, m_fdc(*this, "fdc")
-		//, m_floppy0(*this, "fdc:0")
-		//, m_floppy1(*this, "fdc:1")
-		, m_floppy0(*this, FLOPPY_0)
-		, m_floppy1(*this, FLOPPY_1)
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
 	{ }
 
 	DECLARE_READ8_MEMBER(p2_porta_r);
 	DECLARE_WRITE8_MEMBER(pm_porta_w);
+	DECLARE_WRITE8_MEMBER(pm_portb_w);
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
@@ -75,12 +73,9 @@ private:
 	required_device<i8255_device> m_ppi_m;
 	required_shared_ptr<UINT8> m_vram;
 	required_device<cpu_device> m_maincpu;
-	//required_device<mb8876_t> m_fdc;
-	//required_device<floppy_connector> m_floppy0;
-	//required_device<floppy_connector> m_floppy1;
-	required_device<mb8876_device> m_fdc;
-	required_device<legacy_floppy_image_device> m_floppy0;
-	required_device<legacy_floppy_image_device> m_floppy1;
+	required_device<mb8876_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 
@@ -97,13 +92,32 @@ WRITE8_MEMBER( mbc200_state::pm_porta_w )
 	m_comm_latch = data; // to slave CPU
 }
 
+WRITE8_MEMBER( mbc200_state::pm_portb_w )
+{
+	floppy_image_device *floppy = NULL;
+
+	// to be verified
+	switch (data & 0x01)
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 7));
+	}
+}
+
 static ADDRESS_MAP_START( mbc200_io , AS_IO, 8, mbc200_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("i8251_1", i8251_device, data_r, data_w)
 	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("i8251_1", i8251_device, status_r, control_w)
-	//AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi_m", i8255_device, read, write)
 	AM_RANGE(0xec, 0xec) AM_DEVREADWRITE("i8251_2", i8251_device, data_r, data_w)
 	AM_RANGE(0xed, 0xed) AM_DEVREADWRITE("i8251_2", i8251_device, status_r, control_w)
@@ -142,18 +156,6 @@ INPUT_PORTS_END
 
 void mbc200_state::machine_start()
 {
-//  floppy_image_device *floppy = NULL;
-//  floppy = m_floppy0->get_device();
-// floppy1 not supported currently
-//  m_fdc->set_floppy(floppy);
-
-//  if (floppy)
-//      floppy->mon_w(0);
-
-	m_floppy0->floppy_mon_w(0);
-	m_floppy1->floppy_mon_w(0);
-	m_floppy0->floppy_drive_set_ready_state(1, 1);
-	m_floppy1->floppy_drive_set_ready_state(1, 1);
 }
 
 void mbc200_state::machine_reset()
@@ -163,16 +165,9 @@ void mbc200_state::machine_reset()
 	memcpy(main, roms, 0x1000);
 }
 
-static const floppy_interface mbc200_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_SSDD_40,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25"
-};
-
-//static SLOT_INTERFACE_START( mbc200_floppies )
-//  SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
-//SLOT_INTERFACE_END
+static SLOT_INTERFACE_START( mbc200_floppies )
+	SLOT_INTERFACE("qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
 
 MC6845_UPDATE_ROW( mbc200_state::update_row )
 {
@@ -244,16 +239,14 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 
 	MCFG_DEVICE_ADD("ppi_m", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(mbc200_state, pm_porta_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(mbc200_state, pm_portb_w))
 
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0) // INS8251N
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0) // INS8251A
 
-	//MCFG_MB8876x_ADD("fdc", 1000000) // guess
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_DEVICE_ADD("fdc", MB8876, 0) // MB8876A
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbc200_floppy_interface)
+	MCFG_MB8876_ADD("fdc", XTAL_8MHz / 8) // guess
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")

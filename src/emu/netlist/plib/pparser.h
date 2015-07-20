@@ -9,12 +9,12 @@
 #define PPARSER_H_
 
 #include "pconfig.h"
-#include "../nl_config.h" // FIXME
-#include "../nl_util.h"
+#include "pstring.h"
+#include "plists.h"
 
 class ptokenizer
 {
-	NETLIST_PREVENT_COPYING(ptokenizer)
+	P_PREVENT_COPYING(ptokenizer)
 public:
 	virtual ~ptokenizer() {}
 
@@ -51,13 +51,13 @@ public:
 			m_id = token_id_t(-1);
 			m_token ="";
 		}
-		token_t(token_type type, const pstring str)
+		token_t(token_type type, const pstring &str)
 		{
 			m_type = type;
 			m_id = token_id_t(-1);
 			m_token = str;
 		}
-		token_t(const token_id_t id, const pstring str)
+		token_t(const token_id_t id, const pstring &str)
 		{
 			m_type = TOKEN;
 			m_id = id;
@@ -86,6 +86,7 @@ public:
 	token_t get_token();
 	pstring get_string();
 	pstring get_identifier();
+	pstring get_identifier_or_number();
 	double get_number_double();
 	long get_number_long();
 
@@ -145,7 +146,7 @@ private:
 
 class ppreprocessor
 {
-	NETLIST_PREVENT_COPYING(ppreprocessor)
+	P_PREVENT_COPYING(ppreprocessor)
 public:
 
 	struct define_t

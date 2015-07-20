@@ -13,10 +13,11 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_colorram(*this, "bg_colorram"),
-		m_msm(*this, "msm"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -25,6 +26,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram_2;
 	required_shared_ptr<UINT8> m_bg_videoram;
 	required_shared_ptr<UINT8> m_bg_colorram;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;
@@ -37,16 +39,19 @@ public:
 	UINT32   m_adpcm_address;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	required_device<msm5205_device> m_msm;
 
 	UINT8 m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(appoooh_adpcm_w);
-	DECLARE_WRITE8_MEMBER(appoooh_scroll_w);
-	DECLARE_WRITE8_MEMBER(appoooh_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(appoooh_fg_colorram_w);
-	DECLARE_WRITE8_MEMBER(appoooh_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(appoooh_bg_colorram_w);
-	DECLARE_WRITE8_MEMBER(appoooh_out_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
+	DECLARE_WRITE8_MEMBER(scroll_w);
+	DECLARE_WRITE8_MEMBER(fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(fg_colorram_w);
+	DECLARE_WRITE8_MEMBER(bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(bg_colorram_w);
+	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_DRIVER_INIT(robowres);
 	DECLARE_DRIVER_INIT(robowresb);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -61,10 +66,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite );
 	void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite );
-	DECLARE_WRITE_LINE_MEMBER(appoooh_adpcm_int);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

@@ -192,6 +192,10 @@ static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, jack_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( striv_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xcfff) AM_READ(striv_question_r)
@@ -929,6 +933,11 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( treahunt, jack )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( striv, jack )
 
@@ -1442,23 +1451,17 @@ DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
 
 void jack_state::treahunt_decode(  )
 {
-	int A;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x4000);
-	int data;
-
-	space.set_decrypted_region(0x0000, 0x3fff, decrypt);
 
 	/* Thanks to Mike Balfour for helping out with the decryption */
-	for (A = 0; A < 0x4000; A++)
+	for (int A = 0; A < 0x4000; A++)
 	{
-		data = rom[A];
+		UINT8 data = rom[A];
 
 		if (A & 0x1000)
 		{
 			/* unencrypted = D0 D2 D5 D1 D3 D6 D4 D7 */
-			decrypt[A] =
+			m_decrypted_opcodes[A] =
 					((data & 0x01) << 7) |
 					((data & 0x02) << 3) |
 					((data & 0x04) << 4) |
@@ -1469,12 +1472,12 @@ void jack_state::treahunt_decode(  )
 
 			if ((A & 0x04) == 0)
 			/* unencrypted = !D0 D2 D5 D1 D3 D6 D4 !D7 */
-				decrypt[A] ^= 0x81;
+				m_decrypted_opcodes[A] ^= 0x81;
 		}
 		else
 		{
 			/* unencrypted = !D7 D2 D5 D1 D3 D6 D4 !D0 */
-			decrypt[A] =
+			m_decrypted_opcodes[A] =
 					(~data & 0x81) |
 					((data & 0x02) << 3) |
 					((data & 0x04) << 4) |
@@ -1555,7 +1558,7 @@ DRIVER_INIT_MEMBER(jack_state,striv)
 GAME( 1982, jack,      0,        jack,     jack,     jack_state, jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state, jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state, jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1982, treahunt,  jack,     jack,     treahunt, jack_state, treahunt, ROT90,  "Hara Industries", "Treasure Hunt", GAME_SUPPORTS_SAVE )
+GAME( 1982, treahunt,  jack,     treahunt, treahunt, jack_state, treahunt, ROT90,  "Hara Industries", "Treasure Hunt", GAME_SUPPORTS_SAVE )
 GAME( 1982, zzyzzyxx,  0,        jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zzyzzyxx2, zzyzzyxx, jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, brix,      zzyzzyxx, jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", GAME_SUPPORTS_SAVE )

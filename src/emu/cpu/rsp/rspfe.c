@@ -37,7 +37,7 @@ bool rsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	UINT32 op, opswitch;
 
 	// fetch the opcode
-	op = desc.opptr.l[0] = m_rsp.m_direct->read_decrypted_dword(desc.physpc | 0x1000);
+	op = desc.opptr.l[0] = m_rsp.m_direct->read_dword(desc.physpc | 0x1000);
 
 	// all instructions are 4 bytes and default to a single cycle each
 	desc.length = 4;

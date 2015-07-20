@@ -9,7 +9,7 @@
 **********************************************************************/
 
 #include "includes/thomson.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 
 #define VERBOSE 0 /* 0, 1 or 2 */
@@ -275,7 +275,7 @@ static UINT8 to7_5p14_select;
 
 READ8_MEMBER( thomson_state::to7_5p14_r )
 {
-	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
+	wd2793_t *fdc = machine().device<wd2793_t>("wd2793");
 
 	if ( offset < 4 )
 		return fdc->read(space, offset );
@@ -290,37 +290,24 @@ READ8_MEMBER( thomson_state::to7_5p14_r )
 
 WRITE8_MEMBER( thomson_state::to7_5p14_w )
 {
-	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
+	wd2793_t *fdc = machine().device<wd2793_t>("wd2793");
 	if ( offset < 4 )
 		fdc->write(space, offset, data );
 	else if ( offset == 8 )
 	{
 		/* drive select */
-		int drive = -1, side = 0;
+		floppy_image_device *floppy = NULL;
 
-		switch ( data & 7 )
-		{
-		case 0: break;
-		case 2: drive = 0; side = 0; break;
-		case 3: drive = 1; side = 1; break;
-		case 4: drive = 2; side = 0; break;
-		case 5: drive = 3; side = 1; break;
-		default:
-			logerror( "%f $%04x to7_5p14_w: invalid drive select pattern $%02X\n", machine().time().as_double(), m_maincpu->pc(), data );
-		}
+		if (BIT(data, 1)) floppy = fdc->subdevice<floppy_connector>("0")->get_device();
+		if (BIT(data, 2)) floppy = fdc->subdevice<floppy_connector>("1")->get_device();
 
-		fdc->dden_w(BIT(data, 7));
+		fdc->set_floppy(floppy);
 
-		to7_5p14_select = data;
-
-		if ( drive != -1 )
+		if (floppy)
 		{
 			thom_floppy_active( 0 );
-			fdc->set_drive( drive );
-			fdc->set_side( side );
-			LOG(( "%f $%04x to7_5p14_w: $%02X set drive=%i side=%i density=%s\n",
-					machine().time().as_double(), m_maincpu->pc(),
-					data, drive, side, (BIT(data, 7) ? "FM" : "MFM")));
+			floppy->mon_w(0);
+			floppy->ss_w(BIT(data, 0));
 		}
 	}
 	else
@@ -332,7 +319,7 @@ WRITE8_MEMBER( thomson_state::to7_5p14_w )
 
 void thomson_state::to7_5p14_reset()
 {
-	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
+	wd2793_t *fdc = machine().device<wd2793_t>("wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	fdc->reset();
 }
@@ -1911,7 +1898,6 @@ void thomson_state::thomson_index_callback(legacy_floppy_image_device *device, i
 		break;
 
 	case 2:
-		machine().device<wd2793_device>("wd2793")->index_pulse_callback(device, state);
 		break;
 
 	case 3:

@@ -301,7 +301,11 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) // frequency and pin 7 verified (pin set in audio\seibu.h)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raidenu, raiden )
+static MACHINE_CONFIG_DERIVED( raidene, raiden )
+	SEIBU_SOUND_SYSTEM_ENCRYPTED_FULL()
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( raidenu, raidene )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -616,7 +620,6 @@ void raiden_state::common_decrypt()
 DRIVER_INIT_MEMBER(raiden_state,raiden)
 {
 	common_decrypt();
-	m_seibu_sound->decrypt("audiocpu",0x20000);
 }
 
 DRIVER_INIT_MEMBER(raiden_state,raidenk)
@@ -626,17 +629,16 @@ DRIVER_INIT_MEMBER(raiden_state,raidenk)
 
 DRIVER_INIT_MEMBER(raiden_state,raidenu)
 {
-	m_seibu_sound->decrypt("audiocpu",0x20000);
 }
 
 
 /***************************************************************************/
 
 /* Same PCB, differ by region byte(s) */
-GAME( 1990, raiden,   0,      raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, raidena,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, raidenu,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, raident,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, raiden,   0,      raidene, raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, raidena,  raiden, raidene, raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, raidenu,  raiden, raidene, raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, raident,  raiden, raidene, raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", GAME_SUPPORTS_SAVE )
 
 /* Same as above, but the sound CPU code is not encrypted */
 GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raidenk, ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", GAME_SUPPORTS_SAVE )

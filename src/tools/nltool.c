@@ -166,12 +166,12 @@ pstring filetobuf(pstring fname)
 	}
 }
 
-class netlist_tool_t : public netlist_base_t
+class netlist_tool_t : public netlist::netlist_t
 {
 public:
 
 	netlist_tool_t()
-	: netlist_base_t(), m_logs(""), m_verbose(false), m_setup(NULL)
+	: netlist::netlist_t(), m_logs(""), m_verbose(false), m_setup(NULL)
 	{
 	}
 
@@ -183,7 +183,7 @@ public:
 
 	void init()
 	{
-		m_setup = palloc(netlist_setup_t, *this);
+		m_setup = palloc(netlist::setup_t(this));
 		this->init_object(*this, "netlist");
 		m_setup->init();
 	}
@@ -192,11 +192,8 @@ public:
 	{
 		// read the netlist ...
 
-		netlist_sources_t sources;
-
-		sources.add(netlist_source_t(buffer));
-		sources.parse(*m_setup, name);
-		//m_setup->parse(buffer);
+		m_setup->register_source(palloc(netlist::netlist_source_mem_t(buffer)));
+		m_setup->include(name);
 		log_setup();
 
 		// start devices
@@ -213,7 +210,7 @@ public:
 		for (int i=0; i < ll.size(); i++)
 		{
 			pstring name = "log_" + ll[i];
-			/*netlist_device_t *nc = */ m_setup->register_dev("nld_log", name);
+			/*netlist_device_t *nc = */ m_setup->register_dev("LOG", name);
 			m_setup->register_link(name + ".I", ll[i]);
 		}
 	}
@@ -247,7 +244,7 @@ protected:
 	}
 
 private:
-	netlist_setup_t *m_setup;
+	netlist::setup_t *m_setup;
 };
 
 
@@ -278,7 +275,7 @@ static void run(tool_options_t &opts)
 	printf("runnning ...\n");
 	t = osd_ticks();
 
-	nt.process_queue(netlist_time::from_double(ttr));
+	nt.process_queue(netlist::netlist_time::from_double(ttr));
 	nt.stop();
 
 	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
@@ -293,12 +290,10 @@ static void listdevices()
 {
 	netlist_tool_t nt;
 	nt.init();
-	const netlist_factory_list_t::list_t &list = nt.setup().factory().list();
+	const netlist::factory_list_t::list_t &list = nt.setup().factory().list();
 
-	netlist_sources_t sources;
-
-	sources.add(netlist_source_t("dummy", &netlist_dummy));
-	sources.parse(nt.setup(),"dummy");
+	nt.setup().register_source(palloc(netlist::source_proc_t("dummy", &netlist_dummy)));
+	nt.setup().include("dummy");
 
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();
@@ -309,8 +304,8 @@ static void listdevices()
 				list[i]->name().cstr() );
 		pstring terms("");
 
-		netlist_base_factory_t *f = list[i];
-		netlist_device_t *d = f->Create();
+		netlist::base_factory_t *f = list[i];
+		netlist::device_t *d = f->Create();
 		d->init(nt, pstring::sprintf("dummy%d", i));
 		d->start_dev();
 
@@ -349,16 +344,29 @@ static void listdevices()
     main - primary entry point
 -------------------------------------------------*/
 
+#if (!PSTANDALONE)
 #include "corealloc.h"
+#endif
+
+static const char *pmf_verbose[] =
+{
+	"NL_PMF_TYPE_VIRTUAL",
+	"NL_PMF_TYPE_GNUC_PMF",
+	"NL_PMF_TYPE_GNUC_PMF_CONV",
+	"NL_PMF_TYPE_INTERNAL"
+};
 
 int main(int argc, char *argv[])
 {
+#if (!PSTANDALONE)
 	track_memory(true);
 	{
+#endif
 	tool_options_t opts;
 	int ret;
 
 	fprintf(stderr, "%s", "WARNING: This is Work In Progress! - It may fail anytime\n");
+	fprintf(stderr, "Update dispatching using method %s\n", pmf_verbose[NL_PMF_TYPE]);
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
 		fprintf(stderr, "Error parsing %s\n", argv[ret]);
@@ -396,7 +404,9 @@ int main(int argc, char *argv[])
 		usage(opts);
 		return 1;
 	}
+#if (!PSTANDALONE)
 	}
 	dump_unfreed_mem();
+#endif
 	return 0;
 }

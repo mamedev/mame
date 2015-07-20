@@ -22,7 +22,7 @@ public:
 protected:
 	enum {
 		STATE_FETCH = 0x200,
-		STATE_FETCH_NOIRQ = 0x201,
+		STATE_FETCH_NOIRQ = 0x201
 	};
 
 	enum {
@@ -32,7 +32,7 @@ protected:
 		F_VT = 0x1000,
 		F_V  = 0x2000,
 		F_N  = 0x4000,
-		F_Z  = 0x8000,
+		F_Z  = 0x8000
 	};
 
 	struct disasm_entry {
@@ -65,7 +65,7 @@ protected:
 		DASM_indirect_3,        /* Indirect, normal or auto-incrementing, 3 operators */
 		DASM_indexed_1,         /* Indexed, short or long, 1 operator */
 		DASM_indexed_2,         /* Indexed, short or long, 2 operators */
-		DASM_indexed_3,         /* Indexed, short or long, 3 operators */
+		DASM_indexed_3         /* Indexed, short or long, 3 operators */
 	};
 
 	// device-level overrides
@@ -119,7 +119,7 @@ protected:
 	inline void next(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH; }
 	inline void next_noirq(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH_NOIRQ; }
 	void check_irq();
-	inline UINT8 read_pc() { return direct->read_decrypted_byte(PC++); }
+	inline UINT8 read_pc() { return direct->read_byte(PC++); }
 
 	void reg_w8(UINT8 adr, UINT8 data);
 	void reg_w16(UINT8 adr, UINT16 data);

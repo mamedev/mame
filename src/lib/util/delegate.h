@@ -95,20 +95,29 @@
 #if defined(__GNUC__)
 	/* does not work in versions over 4.7.x of 32bit MINGW  */
 	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
-		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+		//#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
+		#define MEMBER_ABI __thiscall
+		#define HAS_DIFFERENT_ABI 1
 	#elif defined(EMSCRIPTEN)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#elif defined(__arm__) || defined(__ARMEL__)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#else
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
+		#define MEMBER_ABI
+		#define HAS_DIFFERENT_ABI 0
 	#endif
 #else
 #define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 #endif
 
+#define USE_STATIC_DELEGATE 1
 
-
+#if (USE_DELEGATE_TYPE == DELEGATE_TYPE_COMPATIBLE)
+	#define MEMBER_ABI
+	#define HAS_DIFFERENT_ABI 0
+#endif
 //**************************************************************************
 //  HELPER CLASSES
 //**************************************************************************
@@ -554,7 +563,7 @@ public:
 		typedef typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type>::static_ref_func_type static_ref_func_type;
 	};
 	typedef typename traits<delegate_generic_class>::static_func_type generic_static_func;
-
+	typedef MEMBER_ABI generic_static_func generic_member_func;
 	// generic constructor
 	delegate_base()
 		: m_function(NULL),
@@ -646,20 +655,28 @@ public:
 		return (m_raw_function == rhs.m_raw_function && object() == rhs.object() && m_raw_mfp == rhs.m_raw_mfp);
 	}
 
+#define DELEGATE_CALL(x) \
+	if (is_mfp() && (HAS_DIFFERENT_ABI)) \
+		return (*reinterpret_cast<generic_member_func>(m_function)) x; \
+	else \
+		return (*m_function) x;
+	//return MEMBER_ABI (*reinpertret_cast<generic_member_func>(m_function)) x;
+
 	// call the function
-	_ReturnType operator()() const { return (*m_function)(m_object); }
-	_ReturnType operator()(_P1Type p1) const { return (*m_function)(m_object, p1); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2) const { return (*m_function)(m_object, p1, p2); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3) const { return (*m_function)(m_object, p1, p2, p3); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4) const { return (*m_function)(m_object, p1, p2, p3, p4); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5) const { return (*m_function)(m_object, p1, p2, p3, p4, p5); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6) const { return (*m_function)(m_object, p1, p2, p3, p4, p5, p6); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7) const { return (*m_function)(m_object, p1, p2, p3, p4, p5, p6, p7); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8) const { return (*m_function)(m_object, p1, p2, p3, p4, p5, p6, p7, p8); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9) const { return (*m_function)(m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10) const { return (*m_function)(m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11) const { return (*m_function)(m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11, _P12Type p12) const { return (*m_function)(m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); }
+	_ReturnType operator()() const { DELEGATE_CALL((m_object)); }
+	//_ReturnType operator()() const { return (*m_function)(m_object); }
+	_ReturnType operator()(_P1Type p1) const { DELEGATE_CALL((m_object, p1)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2) const { DELEGATE_CALL((m_object, p1, p2)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3) const { DELEGATE_CALL((m_object, p1, p2, p3)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4) const { DELEGATE_CALL((m_object, p1, p2, p3, p4)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)); }
+	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11, _P12Type p12) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)); }
 
 	// getters
 	bool has_object() const { return (object() != NULL); }
@@ -732,8 +749,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -749,8 +768,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -766,8 +787,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -783,8 +806,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -800,8 +825,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -817,8 +844,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -834,8 +863,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -851,8 +882,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -868,8 +901,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -885,8 +920,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -902,8 +939,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -919,8 +958,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
@@ -936,8 +977,10 @@ public:
 	delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#ifdef USE_STATIC_DELEGATE
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
 	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
+#endif
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 

@@ -12,8 +12,8 @@
         },
         {"name": "shared_dll",
          "variables": [
-            ["JSONCPP_LIB_BUILD_SHARED=true"],
-            ["JSONCPP_LIB_BUILD_SHARED=false"]
+            ["BUILD_SHARED_LIBS=true"],
+            ["BUILD_SHARED_LIBS=false"]
           ]
         },
         {"name": "build_type",

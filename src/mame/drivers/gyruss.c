@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_CPU_PROGRAM_MAP(main_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gyruss_state,  master_vblank_irq)
 
-	MCFG_CPU_ADD("sub", M6809, MASTER_CLOCK/12)     /* 1.536 MHz */
+	MCFG_CPU_ADD("sub", KONAMI1, MASTER_CLOCK/12)     /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gyruss_state,  slave_vblank_irq)
 
@@ -681,7 +681,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gyruss_state,gyruss)
 {
-	konami1_decode(machine(), "sub");
 }
 
 

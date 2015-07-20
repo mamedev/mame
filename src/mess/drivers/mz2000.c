@@ -21,15 +21,14 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "machine/i8255.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/pit8253.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
 #include "machine/rp5c15.h"
-
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "formats/2d_dsk.h"
 #include "formats/mz_cas.h"
 
 #define MASTER_CLOCK XTAL_17_73447MHz/5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
@@ -41,8 +40,13 @@ public:
 	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cass(*this, "cassette"),
+		m_floppy(NULL),
 		m_maincpu(*this, "maincpu"),
 		m_mb8877a(*this, "mb8877a"),
+		m_floppy0(*this, "mb8877a:0"),
+		m_floppy1(*this, "mb8877a:1"),
+		m_floppy2(*this, "mb8877a:2"),
+		m_floppy3(*this, "mb8877a:3"),
 		m_pit8253(*this, "pit"),
 		m_beeper(*this, "beeper"),
 		m_region_tvram(*this, "tvram"),
@@ -68,7 +72,11 @@ public:
 		m_io_config(*this, "CONFIG"),
 		m_palette(*this, "palette")  { }
 
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	required_device<cassette_image_device> m_cass;
+
+	floppy_image_device *m_floppy;
 
 	UINT8 m_ipl_enable;
 	UINT8 m_tvram_enable;
@@ -98,15 +106,16 @@ public:
 	DECLARE_READ8_MEMBER(mz2000_mem_r);
 	DECLARE_WRITE8_MEMBER(mz2000_mem_w);
 	DECLARE_WRITE8_MEMBER(mz2000_gvram_bank_w);
-	DECLARE_WRITE8_MEMBER(mz2000_fdc_w);
+	DECLARE_WRITE8_MEMBER(floppy_select_w);
+	DECLARE_WRITE8_MEMBER(floppy_side_w);
 	DECLARE_WRITE8_MEMBER(timer_w);
 	DECLARE_WRITE8_MEMBER(mz2000_tvram_attr_w);
 	DECLARE_WRITE8_MEMBER(mz2000_gvram_mask_w);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(mz2000_wd17xx_r);
-	DECLARE_WRITE8_MEMBER(mz2000_wd17xx_w);
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(mz2000_porta_r);
 	DECLARE_READ8_MEMBER(mz2000_portb_r);
 	DECLARE_READ8_MEMBER(mz2000_portc_r);
@@ -119,7 +128,11 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<mb8877_device> m_mb8877a;
+	required_device<mb8877_t> m_mb8877a;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 	required_device<pit8253_device> m_pit8253;
 	required_device<beep_device> m_beeper;
 	required_memory_region m_region_tvram;
@@ -339,7 +352,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
 	m_gvram_bank = data & 3;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_wd17xx_r)
+READ8_MEMBER(mz2000_state::fdc_r)
 {
 	if(m_has_fdc)
 		return m_mb8877a->read(space, offset) ^ 0xff;
@@ -347,25 +360,34 @@ READ8_MEMBER(mz2000_state::mz2000_wd17xx_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_wd17xx_w)
+WRITE8_MEMBER(mz2000_state::fdc_w)
 {
 	if(m_has_fdc)
 		m_mb8877a->write(space, offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)
+WRITE8_MEMBER(mz2000_state::floppy_select_w)
 {
-	switch(offset+0xdc)
+	switch (data & 0x03)
 	{
-		case 0xdc:
-			m_mb8877a->set_drive(data & 3);
-			floppy_get_device(machine(), data & 3)->floppy_mon_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_get_device(machine(), data & 3)->floppy_drive_set_ready_state(1,0);
-			break;
-		case 0xdd:
-			m_mb8877a->set_side((data & 1));
-			break;
+	case 0: m_floppy = m_floppy0->get_device(); break;
+	case 1: m_floppy = m_floppy1->get_device(); break;
+	case 2: m_floppy = m_floppy2->get_device(); break;
+	case 3: m_floppy = m_floppy3->get_device(); break;
 	}
+
+	m_mb8877a->set_floppy(m_floppy);
+
+	// todo: bit 2 is connected to something too...
+
+	if (m_floppy)
+		m_floppy->mon_w(!BIT(data, 7));
+}
+
+WRITE8_MEMBER(mz2000_state::floppy_side_w)
+{
+	if (m_floppy)
+		m_floppy->ss_w(BIT(data, 0));
 }
 
 WRITE8_MEMBER(mz2000_state::timer_w)
@@ -396,8 +418,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mz2000_io, AS_IO, 8, mz2000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xd8, 0xdb) AM_READWRITE(mz2000_wd17xx_r, mz2000_wd17xx_w)
-	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2000_fdc_w)
+	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0xdc, 0xdc) AM_WRITE(floppy_select_w)
+	AM_RANGE(0xdd, 0xdd) AM_WRITE(floppy_side_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
@@ -775,23 +798,15 @@ READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)
 	return m_porta_latch;
 }
 
-#if 0
-static LEGACY_FLOPPY_OPTIONS_START( mz2000 )
-	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-#endif
 
-static const floppy_interface mz2000_floppy_interface =
-{
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( mz2000_state::floppy_formats )
+	FLOPPY_2D_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( mz2000_floppies )
+	SLOT_INTERFACE("dd", FLOPPY_525_DD)
+SLOT_INTERFACE_END
+
 
 static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	/* basic machine hardware */
@@ -818,12 +833,14 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_DEVICE_ADD("mb8877a", MB8877, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+	MCFG_MB8877_ADD("mb8877a", XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2000_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:2", mz2000_floppies, "dd", mz2000_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:3", mz2000_floppies, "dd", mz2000_state::floppy_formats)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","mz2000_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2000_flop")
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
@@ -843,7 +860,6 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2000)
 	MCFG_PALETTE_ADD("palette", 8)
-
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

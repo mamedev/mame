@@ -339,7 +339,7 @@ const rom_entry *tms3203x_device::device_rom_region() const
 
 inline UINT32 tms3203x_device::ROPCODE(offs_t pc)
 {
-	return m_direct->read_decrypted_dword(pc << 2);
+	return m_direct->read_dword(pc << 2);
 }
 
 

@@ -35,28 +35,88 @@ enum mn10200_flag
 	FLAG_D15 = 0x8000  // ?
 };
 
-const device_type MN1020012A = &device_creator<mn10200_device>;
 
-static ADDRESS_MAP_START( mn1020012_internal_map, AS_PROGRAM, 16, mn10200_device )
+const device_type MN1020012A = &device_creator<mn1020012a_device>;
+
+// internal memory maps
+static ADDRESS_MAP_START( mn1020012a_internal_map, AS_PROGRAM, 16, mn10200_device )
 	AM_RANGE(0x00fc00, 0x00ffff) AM_READWRITE8(io_control_r, io_control_w, 0xffff)
 ADDRESS_MAP_END
 
-mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, "mn1020012a", __FILE__),
-	m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(mn1020012_internal_map)),
-	m_io_config("data", ENDIANNESS_LITTLE, 8, 8, 0)
+
+// device definitions
+mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mn10200_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map), "mn1020012a", __FILE__)
+{ }
+
+
+// disasm
+void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			strprintf(str, "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
+				(m_psw >> 12) & 3,
+				m_psw & FLAG_IE ? "on " : "off",
+				(m_psw >> 8) & 7,
+				m_psw & FLAG_VX ? 'V' : '-',
+				m_psw & FLAG_CX ? 'C' : '-',
+				m_psw & FLAG_NX ? 'N' : '-',
+				m_psw & FLAG_ZX ? 'Z' : '-',
+				m_psw & FLAG_VF ? 'v' : '-',
+				m_psw & FLAG_CF ? 'c' : '-',
+				m_psw & FLAG_NF ? 'n' : '-',
+				m_psw & FLAG_ZF ? 'z' : '-');
+			break;
+	}
 }
+
+offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( mn10200 );
+	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
+}
+
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+enum
+{
+	MN10200_PC = 0,
+	MN10200_PSW,
+	MN10200_MDR,
+	MN10200_D0,
+	MN10200_D1,
+	MN10200_D2,
+	MN10200_D3,
+	MN10200_A0,
+	MN10200_A1,
+	MN10200_A2,
+	MN10200_A3,
+	MN10200_NMICR,
+	MN10200_IAGR
+};
+
 void mn10200_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_io = &space(AS_IO);
+
+	// resolve callbacks
+	m_read_port0.resolve_safe(0xff);
+	m_read_port1.resolve_safe(0xff);
+	m_read_port2.resolve_safe(0xff);
+	m_read_port3.resolve_safe(0xff);
+	m_read_port4.resolve_safe(0xff);
+
+	m_write_port0.resolve_safe();
+	m_write_port1.resolve_safe();
+	m_write_port2.resolve_safe();
+	m_write_port3.resolve_safe();
+	m_write_port4.resolve_safe();
 
 	// init and register for savestates
 	save_item(NAME(m_pc));
@@ -176,34 +236,6 @@ void mn10200_device::device_start()
 }
 
 
-void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str)
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			strprintf(str, "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
-				(m_psw >> 12) & 3,
-				m_psw & FLAG_IE ? "on " : "off",
-				(m_psw >> 8) & 7,
-				m_psw & FLAG_VX ? 'V' : '-',
-				m_psw & FLAG_CX ? 'C' : '-',
-				m_psw & FLAG_NX ? 'N' : '-',
-				m_psw & FLAG_ZX ? 'Z' : '-',
-				m_psw & FLAG_VF ? 'v' : '-',
-				m_psw & FLAG_CF ? 'c' : '-',
-				m_psw & FLAG_NF ? 'n' : '-',
-				m_psw & FLAG_ZF ? 'z' : '-');
-			break;
-	}
-}
-
-
-offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
-{
-	extern CPU_DISASSEMBLE( mn10200 );
-	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
-}
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -234,7 +266,10 @@ void mn10200_device::device_reset()
 }
 
 
-// interrupts
+
+//-------------------------------------------------
+//  interrupts
+//-------------------------------------------------
 
 void mn10200_device::take_irq(int level, int group)
 {
@@ -332,7 +367,10 @@ void mn10200_device::execute_set_input(int irqnum, int state)
 }
 
 
-// 8-bit timers
+
+//-------------------------------------------------
+//  timers
+//-------------------------------------------------
 
 int mn10200_device::timer_tick_simple(int tmr)
 {
@@ -405,7 +443,10 @@ TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 }
 
 
-// opcode handlers
+
+//-------------------------------------------------
+//  opcode helpers
+//-------------------------------------------------
 
 void mn10200_device::illegal(UINT8 prefix, UINT8 op)
 {
@@ -479,9 +520,9 @@ void mn10200_device::do_jsr(UINT32 to, UINT32 ret)
 	change_pc(to);
 }
 
-void mn10200_device::do_branch(bool state)
+void mn10200_device::do_branch(int condition)
 {
-	if (state)
+	if (condition)
 	{
 		m_cycles -= 1;
 		change_pc(m_pc + (INT8)read_arg8(m_pc));
@@ -489,6 +530,10 @@ void mn10200_device::do_branch(bool state)
 }
 
 
+
+//-------------------------------------------------
+//  execute loop
+//-------------------------------------------------
 
 void mn10200_device::execute_run()
 {
@@ -579,13 +624,13 @@ void mn10200_device::execute_run()
 		// add dn, dm
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-			m_d[op&3] = do_add(m_d[op&3], m_d[op>>2&3], 0);
+			m_d[op&3] = do_add(m_d[op&3], m_d[op>>2&3]);
 			break;
 
 		// sub dn, dm
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
-			m_d[op&3] = do_sub(m_d[op&3], m_d[op>>2&3], 0);
+			m_d[op&3] = do_sub(m_d[op&3], m_d[op>>2&3]);
 			break;
 
 		// extx dn
@@ -634,19 +679,19 @@ void mn10200_device::execute_run()
 
 		// add imm8, an
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
-			m_a[op&3] = do_add(m_a[op&3], (INT8)read_arg8(m_pc), 0);
+			m_a[op&3] = do_add(m_a[op&3], (INT8)read_arg8(m_pc));
 			m_pc += 1;
 			break;
 
 		// add imm8, dn
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
-			m_d[op&3] = do_add(m_d[op&3], (INT8)read_arg8(m_pc), 0);
+			m_d[op&3] = do_add(m_d[op&3], (INT8)read_arg8(m_pc));
 			m_pc += 1;
 			break;
 
 		// cmp imm8, dn
 		case 0xd8: case 0xd9: case 0xda: case 0xdb:
-			do_sub(m_d[op&3], (INT8)read_arg8(m_pc), 0);
+			do_sub(m_d[op&3], (INT8)read_arg8(m_pc));
 			m_pc += 1;
 			break;
 
@@ -718,7 +763,7 @@ void mn10200_device::execute_run()
 
 		// bra label8
 		case 0xea:
-			do_branch(true);
+			do_branch();
 			m_pc += 1;
 			break;
 
@@ -733,7 +778,7 @@ void mn10200_device::execute_run()
 
 		// cmp imm16, an
 		case 0xec: case 0xed: case 0xee: case 0xef:
-			do_sub(m_a[op&3], read_arg16(m_pc), 0);
+			do_sub(m_a[op&3], read_arg16(m_pc));
 			m_pc += 2;
 			break;
 
@@ -904,17 +949,17 @@ void mn10200_device::execute_run()
 		{
 		// add dm, an
 		case 0x00:
-			m_a[op&3] = do_add(m_a[op&3], m_d[op>>2&3], 0);
+			m_a[op&3] = do_add(m_a[op&3], m_d[op>>2&3]);
 			break;
 
 		// sub dm, an
 		case 0x10:
-			m_a[op&3] = do_sub(m_a[op&3], m_d[op>>2&3], 0);
+			m_a[op&3] = do_sub(m_a[op&3], m_d[op>>2&3]);
 			break;
 
 		// cmp dm, an
 		case 0x20:
-			do_sub(m_a[op&3], m_d[op>>2&3], 0);
+			do_sub(m_a[op&3], m_d[op>>2&3]);
 			break;
 
 		// mov dm, an
@@ -924,17 +969,17 @@ void mn10200_device::execute_run()
 
 		// add an, am
 		case 0x40:
-			m_a[op&3] = do_add(m_a[op&3], m_a[op>>2&3], 0);
+			m_a[op&3] = do_add(m_a[op&3], m_a[op>>2&3]);
 			break;
 
 		// sub an, am
 		case 0x50:
-			m_a[op&3] = do_sub(m_a[op&3], m_a[op>>2&3], 0);
+			m_a[op&3] = do_sub(m_a[op&3], m_a[op>>2&3]);
 			break;
 
 		// cmp an, am
 		case 0x60:
-			do_sub(m_a[op&3], m_a[op>>2&3], 0);
+			do_sub(m_a[op&3], m_a[op>>2&3]);
 			break;
 
 		// mov an, am
@@ -962,17 +1007,17 @@ void mn10200_device::execute_run()
 
 		// add an, dm
 		case 0xc0:
-			m_d[op&3] = do_add(m_d[op&3], m_a[op>>2&3], 0);
+			m_d[op&3] = do_add(m_d[op&3], m_a[op>>2&3]);
 			break;
 
 		// sub an, dm
 		case 0xd0:
-			m_d[op&3] = do_sub(m_d[op&3], m_a[op>>2&3], 0);
+			m_d[op&3] = do_sub(m_d[op&3], m_a[op>>2&3]);
 			break;
 
 		// cmp an, dm
 		case 0xe0:
-			do_sub(m_d[op&3], m_a[op>>2&3], 0);
+			do_sub(m_d[op&3], m_a[op>>2&3]);
 			break;
 
 		// mov an, dm
@@ -1123,7 +1168,7 @@ void mn10200_device::execute_run()
 		// cmp dn, dm
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-			do_sub(m_d[op&3], m_d[op>>2&3], 0);
+			do_sub(m_d[op&3], m_d[op>>2&3]);
 			break;
 
 		// mov dn, mdr
@@ -1221,22 +1266,22 @@ void mn10200_device::execute_run()
 
 		// add imm24, dn
 		case 0x60: case 0x61: case 0x62: case 0x63:
-			m_d[op&3] = do_add(m_d[op&3], read_arg24(m_pc), 0);
+			m_d[op&3] = do_add(m_d[op&3], read_arg24(m_pc));
 			break;
 
 		// add imm24, an
 		case 0x64: case 0x65: case 0x66: case 0x67:
-			m_a[op&3] = do_add(m_a[op&3], read_arg24(m_pc), 0);
+			m_a[op&3] = do_add(m_a[op&3], read_arg24(m_pc));
 			break;
 
 		// sub imm24, dn
 		case 0x68: case 0x69: case 0x6a: case 0x6b:
-			m_d[op&3] = do_sub(m_d[op&3], read_arg24(m_pc), 0);
+			m_d[op&3] = do_sub(m_d[op&3], read_arg24(m_pc));
 			break;
 
 		// sub imm24, an
 		case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-			m_a[op&3] = do_sub(m_a[op&3], read_arg24(m_pc), 0);
+			m_a[op&3] = do_sub(m_a[op&3], read_arg24(m_pc));
 			break;
 
 		// mov imm24, dn
@@ -1251,12 +1296,12 @@ void mn10200_device::execute_run()
 
 		// cmp imm24, dn
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
-			do_sub(m_d[op&3], read_arg24(m_pc), 0);
+			do_sub(m_d[op&3], read_arg24(m_pc));
 			break;
 
 		// cmp imm24, an
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			do_sub(m_a[op&3], read_arg24(m_pc), 0);
+			do_sub(m_a[op&3], read_arg24(m_pc));
 			break;
 
 		// mov (d24, an), dm
@@ -1514,12 +1559,12 @@ void mn10200_device::execute_run()
 
 		// add imm16, an
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
-			m_a[op&3] = do_add(m_a[op&3], (INT16)read_arg16(m_pc), 0);
+			m_a[op&3] = do_add(m_a[op&3], (INT16)read_arg16(m_pc));
 			break;
 
 		// sub imm16, an
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			m_a[op&3] = do_sub(m_a[op&3], (INT16)read_arg16(m_pc), 0);
+			m_a[op&3] = do_sub(m_a[op&3], (INT16)read_arg16(m_pc));
 			break;
 
 		// and imm16, psw
@@ -1537,12 +1582,12 @@ void mn10200_device::execute_run()
 
 		// add imm16, dn
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
-			m_d[op&3] = do_add(m_d[op&3], (INT16)read_arg16(m_pc), 0);
+			m_d[op&3] = do_add(m_d[op&3], (INT16)read_arg16(m_pc));
 			break;
 
 		// sub imm16, dn
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			m_d[op&3] = do_sub(m_d[op&3], (INT16)read_arg16(m_pc), 0);
+			m_d[op&3] = do_sub(m_d[op&3], (INT16)read_arg16(m_pc));
 			break;
 
 		// mov an, (abs16)
@@ -1564,7 +1609,7 @@ void mn10200_device::execute_run()
 
 		// cmp imm16, dn
 		case 0x48: case 0x49: case 0x4a: case 0x4b:
-			do_sub(m_d[op&3], (INT16)read_arg16(m_pc), 0);
+			do_sub(m_d[op&3], (INT16)read_arg16(m_pc));
 			break;
 
 		// xor imm16, dn
@@ -1644,7 +1689,10 @@ void mn10200_device::execute_run()
 }
 
 
-// internal i/o
+
+//-------------------------------------------------
+//  internal i/o
+//-------------------------------------------------
 
 WRITE8_MEMBER(mn10200_device::io_control_w)
 {
@@ -2007,19 +2055,19 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		// outputs
 		case 0x3c0:
 			m_port[0].out = data;
-			m_io->write_byte(MN10200_PORT0, m_port[0].out | (m_port[0].dir ^ 0xff));
+			m_write_port0(MN10200_PORT0, m_port[0].out | (m_port[0].dir ^ 0xff), 0xff);
 			break;
 		case 0x264:
 			m_port[1].out = data;
-			m_io->write_byte(MN10200_PORT1, m_port[1].out | (m_port[1].dir ^ 0xff));
+			m_write_port1(MN10200_PORT1, m_port[1].out | (m_port[1].dir ^ 0xff), 0xff);
 			break;
 		case 0x3c2:
 			m_port[2].out = data & 0x0f;
-			m_io->write_byte(MN10200_PORT2, m_port[2].out | (m_port[2].dir ^ 0x0f));
+			m_write_port2(MN10200_PORT2, m_port[2].out | (m_port[2].dir ^ 0x0f), 0xff);
 			break;
 		case 0x3c3:
 			m_port[3].out = data & 0x1f;
-			m_io->write_byte(MN10200_PORT3, m_port[3].out | (m_port[3].dir ^ 0x1f));
+			m_write_port3(MN10200_PORT3, m_port[3].out | (m_port[3].dir ^ 0x1f), 0xff);
 			break;
 
 		// directions (0=input, 1=output)
@@ -2047,7 +2095,6 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 			break;
 	}
 }
-
 
 
 READ8_MEMBER(mn10200_device::io_control_r)
@@ -2151,13 +2198,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 
 		// inputs
 		case 0x3d0:
-			return m_io->read_byte(MN10200_PORT0) | m_port[0].dir;
+			return m_read_port0(MN10200_PORT0, 0xff) | m_port[0].dir;
 		case 0x3d1:
-			return m_io->read_byte(MN10200_PORT1) | m_port[1].dir;
+			return m_read_port1(MN10200_PORT1, 0xff) | m_port[1].dir;
 		case 0x3d2:
-			return (m_io->read_byte(MN10200_PORT2) & 0x0f) | m_port[2].dir;
+			return (m_read_port2(MN10200_PORT2, 0xff) & 0x0f) | m_port[2].dir;
 		case 0x3d3:
-			return (m_io->read_byte(MN10200_PORT3) & 0x1f) | m_port[3].dir;
+			return (m_read_port3(MN10200_PORT3, 0xff) & 0x1f) | m_port[3].dir;
 
 		// directions (0=input, 1=output)
 		case 0x3e0:

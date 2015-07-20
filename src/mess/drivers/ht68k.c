@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         Hawthorne Technology TinyGiant HT68k
@@ -137,7 +137,7 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", mc68681_device, rx_a_w))
 
-	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
+	MCFG_WD1770_ADD("wd1770", XTAL_8MHz )
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)

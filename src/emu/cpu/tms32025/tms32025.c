@@ -134,8 +134,8 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #define S_IN(A)         (m_io->read_word((A)<<1))
 #define S_OUT(A,V)      (m_io->write_word(((A)<<1),(V)))
 
-#define M_RDOP(A)       ((m_pgmmap[(A) >> 7]) ? (m_pgmmap[(A) >> 7][(A) & 0x7f]) : m_direct->read_decrypted_word((A)<<1))
-#define M_RDOP_ARG(A)   ((m_pgmmap[(A) >> 7]) ? (m_pgmmap[(A) >> 7][(A) & 0x7f]) : m_direct->read_decrypted_word((A)<<1))
+#define M_RDOP(A)       ((m_pgmmap[(A) >> 7]) ? (m_pgmmap[(A) >> 7][(A) & 0x7f]) : m_direct->read_word((A)<<1))
+#define M_RDOP_ARG(A)   ((m_pgmmap[(A) >> 7]) ? (m_pgmmap[(A) >> 7][(A) & 0x7f]) : m_direct->read_word((A)<<1))
 
 
 /************************** Memory mapped registers ****************/

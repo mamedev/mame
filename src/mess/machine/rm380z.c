@@ -210,41 +210,18 @@ WRITE8_MEMBER( rm380z_state::keyboard_put )
 
 WRITE8_MEMBER( rm380z_state::disk_0_control )
 {
-	fd1771_device *fdc = machine().device<fd1771_device>("wd1771");
+	floppy_image_device *floppy = NULL;
 
-	//printf("disk drive port0 write [%x]\n",data);
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
 
-	// drive port0
-	if (data&0x01)
-	{
-		// drive select bit 0
-		fdc->set_drive(0);
-	}
+	m_fdc->set_floppy(floppy);
 
-	if (data&0x02)
+	if (floppy)
 	{
-		// drive select bit 1
-		fdc->set_drive(1);
-	}
-
-	if (data&0x08)
-	{
-		// motor on
-	}
-
-	// "MSEL (dir/side select bit)"
-	if (data&0x20)
-	{
-		fdc->set_side(1);
-	}
-	else
-	{
-		fdc->set_side(0);
-	}
-
-	// set drive en- (?)
-	if (data&0x40)
-	{
+		// don't know how motor on is connected
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 5));
 	}
 }
 

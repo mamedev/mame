@@ -14,7 +14,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "formats/pk8020_dsk.h"
 #include "includes/pk8020.h"
 #include "machine/ram.h"
 
@@ -141,21 +141,6 @@ static INPUT_PORTS_START( pk8020 )
 		PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static LEGACY_FLOPPY_OPTIONS_START(pk8020)
-	LEGACY_FLOPPY_OPTION(pk8020, "kdi", "PK8020 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface pk8020_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pk8020),
-	"floppy_5_25"
-};
 
 /* F4 Character Displayer */
 static const gfx_layout pk8020_charlayout =
@@ -174,6 +159,15 @@ static const gfx_layout pk8020_charlayout =
 static GFXDECODE_START( pk8020 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pk8020_charlayout, 0, 4 )
 GFXDECODE_END
+
+
+FLOPPY_FORMATS_MEMBER( pk8020_state::floppy_formats )
+	FLOPPY_PK8020_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( pk8020_floppies )
+	SLOT_INTERFACE("qd", FLOPPY_525_QD)
+SLOT_INTERFACE_END
 
 
 /* Machine driver */
@@ -221,9 +215,14 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_DEVICE_ADD("rs232", I8251, 0)
 	MCFG_DEVICE_ADD("lan", I8251, 0)
 
-	MCFG_DEVICE_ADD("wd1793", FD1793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	MCFG_WD17XX_DDEN_CALLBACK(VCC)
+	MCFG_FD1793_ADD("wd1793", XTAL_20MHz / 20)
+
+	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1793:2", pk8020_floppies, "qd", pk8020_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1793:3", pk8020_floppies, "qd", pk8020_state::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "korvet_flop")
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -234,9 +233,6 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pk8020_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","korvet_flop")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

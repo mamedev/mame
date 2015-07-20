@@ -655,7 +655,7 @@ namespace uml
 	const parameter M7(parameter::make_mapvar(MAPVAR_M0 + 7));
 	const parameter M8(parameter::make_mapvar(MAPVAR_M0 + 8));
 	const parameter M9(parameter::make_mapvar(MAPVAR_M0 + 9));
-};
+}
 
 
 #endif /* __UML_H__ */

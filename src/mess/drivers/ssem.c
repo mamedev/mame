@@ -89,7 +89,7 @@ enum
 	PANEL_LNUP, PANEL_LNDN,
 
 	// Halt
-	PANEL_HALT,
+	PANEL_HALT
 };
 
 INPUT_CHANGED_MEMBER(ssem_state::panel_check)
@@ -540,7 +540,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 			// Isolate and convert 4-digit decimal address
 			memcpy(token_buf, image_line, 4);
 			token_buf[4] = '\0';
-			sscanf(token_buf, "%04d", &line);
+			sscanf(token_buf, "%04u", &line);
 
 			if (!core_stricmp(image.filetype(), "snp"))
 			{

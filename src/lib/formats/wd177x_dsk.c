@@ -204,6 +204,11 @@ bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
+			if (f.encoding == floppy_image::FM)
+				desc[14].p1 = get_track_dam_fm(f, head, track);
+			else
+				desc[16].p1 = get_track_dam_mfm(f, head, track);
+
 			io_generic_read(io, sectdata, get_image_offset(f, head, track), track_size);
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
@@ -343,6 +348,18 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 int wd177x_format::get_image_offset(const format &f, int head, int track)
 {
 	return (track * f.head_count + head) * compute_track_size(f);
+}
+
+int wd177x_format::get_track_dam_fm(const format &f, int head, int track)
+{
+	// everything marked as data by default
+	return FM_DAM;
+}
+
+int wd177x_format::get_track_dam_mfm(const format &f, int head, int track)
+{
+	// everything marked as data by default
+	return MFM_DAM;
 }
 
 void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &candidates)

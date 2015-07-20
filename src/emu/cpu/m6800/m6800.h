@@ -84,7 +84,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO && m_has_io) ? &m_io_config : NULL ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
 	void state_string_export(const device_state_entry &entry, std::string &str);
@@ -95,6 +95,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	address_space_config m_program_config;
+	address_space_config m_decrypted_opcodes_config;
 	address_space_config m_io_config;
 	bool m_has_io;
 
@@ -115,8 +116,8 @@ protected:
 	int     m_sc1_state;
 
 	/* Memory spaces */
-	address_space *m_program;
-	direct_read_data *m_direct;
+	address_space *m_program, *m_decrypted_opcodes;
+	direct_read_data *m_direct, *m_decrypted_opcodes_direct;
 	address_space *m_io;
 
 	const op_func *m_insn;

@@ -144,7 +144,7 @@
 
 	<software name="msdos20" supported="no">
 	<!-- "This is a standard 360k MS-DOS disk image, 512 bytes/sector, 9 sectors, 2 sides, 40 tracks." -->
-	<!-- MESS complains about "Unable to identify the image format" -->
+	<!-- Use with BIOS 2.0 and the 8086 APB -->
 		<description>MS-DOS 2.0</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
@@ -298,7 +298,7 @@
 		</part>
 	</software>
 
-	<software name="olinum" supported="no"> <!-- Invalid in M20 -->
+	<software name="olinum" supported="no"> <!-- Collection of BASIC programs, boot PCOS and run basic to use -->
 		<description>OliNum</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
@@ -310,7 +310,7 @@
 		</part>
 	</software>
 
-	<software name="olisort" supported="no"> <!-- Invalid in M20 -->
+	<software name="olisort" supported="no"> <!-- Collection of BASIC programs, boot PCOS and run basic to use -->
 		<description>OliSort 2.0.6</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
@@ -322,7 +322,7 @@
 		</part>
 	</software>
 
-	<software name="olistat" supported="no"> <!-- Invalid in M20 -->
+	<software name="olistat" supported="no"> <!-- Collection of BASIC programs, boot PCOS and run basic to use -->
 		<description>OliStat</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
@@ -455,7 +455,7 @@
 
 
 <!-- This is a user disk with high school math programs -->
-	<software name="m20utent" supported="no"> <!-- Invalid in M20 -->
+	<software name="m20utent" supported="no"> <!-- Collection of BASIC programs, boot PCOS and run basic to use -->
 		<description>M20 Utente</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -49,7 +49,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/i8255.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/pit8253.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
@@ -57,7 +57,6 @@
 
 //#include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 
 #define RP5C15_TAG      "rp5c15"
 
@@ -71,6 +70,12 @@ public:
 		m_pit(*this, "pit"),
 		m_beeper(*this, "beeper"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_fdc(*this, "mb8877a"),
+		m_floppy0(*this, "mb8877a:0"),
+		m_floppy1(*this, "mb8877a:1"),
+		m_floppy2(*this, "mb8877a:2"),
+		m_floppy3(*this, "mb8877a:3"),
+		m_floppy(NULL),
 		m_palette(*this, "palette")
 	{ }
 
@@ -79,6 +84,13 @@ public:
 	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<mb8877_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+
+	floppy_image_device *m_floppy;
 
 	UINT8 *m_main_ram;
 	UINT8 *m_ipl_rom;
@@ -161,7 +173,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mz2500_tv_crtc_w);
 	DECLARE_WRITE8_MEMBER(mz2500_irq_sel_w);
 	DECLARE_WRITE8_MEMBER(mz2500_irq_data_w);
-	DECLARE_WRITE8_MEMBER(mz2500_fdc_w);
 	DECLARE_READ8_MEMBER(mz2500_rom_r);
 	DECLARE_WRITE8_MEMBER(mz2500_rom_w);
 	DECLARE_WRITE8_MEMBER(palette4096_io_w);
@@ -190,8 +201,12 @@ public:
 	DECLARE_PALETTE_INIT(mz2500);
 	UINT32 screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);
-	DECLARE_READ8_MEMBER(mz2500_wd17xx_r);
-	DECLARE_WRITE8_MEMBER(mz2500_wd17xx_w);
+
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
+	DECLARE_WRITE8_MEMBER(floppy_select_w);
+	DECLARE_WRITE8_MEMBER(floppy_side_w);
+
 	DECLARE_READ8_MEMBER(mz2500_porta_r);
 	DECLARE_READ8_MEMBER(mz2500_portb_r);
 	DECLARE_READ8_MEMBER(mz2500_portc_r);
@@ -1182,41 +1197,28 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 //  popmessage("%02x %02x %02x %02x",m_irq_vector[0],m_irq_vector[1],m_irq_vector[2],m_irq_vector[3]);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_fdc_w)
+WRITE8_MEMBER(mz2500_state::floppy_select_w)
 {
-	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-	UINT8 drivenum;
-	switch(offset+0xdc)
+	switch ((data & 0x03) ^ m_fdc_reverse)
 	{
-		case 0xdc:
-			drivenum = (data & 3) ^ m_fdc_reverse;
-			fdc->set_drive(drivenum);
-			floppy_get_device(machine(), drivenum)->floppy_mon_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_get_device(machine(), drivenum)->floppy_drive_set_ready_state(1,0);
-			break;
-		case 0xdd:
-			fdc->set_side((data & 1));
-			break;
+	case 0: m_floppy = m_floppy0->get_device(); break;
+	case 1: m_floppy = m_floppy1->get_device(); break;
+	case 2: m_floppy = m_floppy2->get_device(); break;
+	case 3: m_floppy = m_floppy3->get_device(); break;
 	}
+
+	m_fdc->set_floppy(m_floppy);
+
+	if (m_floppy)
+		m_floppy->mon_w(!BIT(data, 7));
 }
 
-#if 0
-static LEGACY_FLOPPY_OPTIONS_START( mz2500 )
-	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-#endif
-
-static const floppy_interface mz2500_floppy_interface =
+WRITE8_MEMBER(mz2500_state::floppy_side_w)
 {
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_3_5"
-};
+	if (m_floppy)
+		m_floppy->ss_w(BIT(data, 0));
+}
+
 
 static ADDRESS_MAP_START(mz2500_map, AS_PROGRAM, 8, mz2500_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(bank0_r,bank0_w)
@@ -1267,16 +1269,14 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 	m_palette->set_pen_color(pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
 }
 
-READ8_MEMBER(mz2500_state::mz2500_wd17xx_r)
+READ8_MEMBER(mz2500_state::fdc_r)
 {
-	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-	return fdc->read(space, offset) ^ 0xff;
+	return m_fdc->read(space, offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_wd17xx_w)
+WRITE8_MEMBER(mz2500_state::fdc_w)
 {
-	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-	fdc->write(space, offset, data ^ 0xff);
+	m_fdc->write(space, offset, data ^ 0xff);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
@@ -1532,8 +1532,9 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
 	AM_RANGE(0xcc, 0xcc) AM_READWRITE(rp5c15_8_r, rp5c15_8_w)
 	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
-	AM_RANGE(0xd8, 0xdb) AM_READWRITE(mz2500_wd17xx_r, mz2500_wd17xx_w)
-	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
+	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0xdc, 0xdc) AM_WRITE(floppy_select_w)
+	AM_RANGE(0xdd, 0xdd) AM_WRITE(floppy_side_w)
 	AM_RANGE(0xde, 0xde) AM_WRITENOP
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
@@ -2067,6 +2068,12 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
 }
 
+
+static SLOT_INTERFACE_START( mz2500_floppies )
+	SLOT_INTERFACE("dd", FLOPPY_35_DD)
+SLOT_INTERFACE_END
+
+
 static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
@@ -2101,12 +2108,14 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk1))
 
-	MCFG_DEVICE_ADD("mb8877a", MB8877, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+	MCFG_MB8877_ADD("mb8877a", XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2500_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:2", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:3", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","mz2500")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2500")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

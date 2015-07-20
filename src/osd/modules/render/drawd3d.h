@@ -226,6 +226,6 @@ private:
 	int                     m_line_count;
 };
 
-};
+}
 
 #endif

@@ -14,7 +14,7 @@ Research Machines RM 380Z
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/keyboard.h"
 
 //
@@ -89,13 +89,17 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_messram;
-	optional_device<fd1771_device> m_fdc;
+	required_device<fd1771_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
 		m_messram(*this, RAM_TAG),
-		m_fdc(*this, "wd1771")
+		m_fdc(*this, "wd1771"),
+		m_floppy0(*this, "wd1771:0"),
+		m_floppy1(*this, "wd1771:1")
 	{
 	}
 

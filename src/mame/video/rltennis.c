@@ -83,7 +83,7 @@ enum
 	BLT_FLAGS,
 	BLT_UNK,
 	BLT_START,
-	BLT_UNK2,
+	BLT_UNK2
 };
 
 enum
@@ -91,7 +91,7 @@ enum
 	BITMAP_BG=0,
 	BITMAP_FG_1,
 	BITMAP_FG_2,
-	BITMAP_FG_DISPLAY,
+	BITMAP_FG_DISPLAY
 };
 
 #define BLTFLAG_DST_X_DIR   (1<<0)

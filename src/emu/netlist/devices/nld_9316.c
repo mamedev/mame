@@ -9,6 +9,8 @@
 
 #define MAXCNT 15
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(9316)
 {
 	register_sub("subABCD", subABCD);
@@ -81,7 +83,7 @@ NETLIB_START(9316_sub)
 
 NETLIB_RESET(9316_sub)
 {
-	m_CLK.set_state(netlist_logic_t::STATE_INP_LH);
+	m_CLK.set_state(logic_t::STATE_INP_LH);
 	m_cnt = 0;
 	m_loadq = 1;
 	m_ent = 1;
@@ -151,7 +153,7 @@ inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt, const ne
 
 inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
 {
-	static const netlist_time out_delay = NLTIME_FROM_NS(20);
+	/* static */ const netlist_time out_delay = NLTIME_FROM_NS(20);
 #if 0
 //    for (int i=0; i<4; i++)
 //        OUTLOGIC(m_Q[i], (cnt >> i) & 1, delay[i]);
@@ -226,3 +228,5 @@ NETLIB_RESET(9316_dip)
 {
 	NETLIB_NAME(9316)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

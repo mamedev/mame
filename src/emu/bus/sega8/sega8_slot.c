@@ -410,7 +410,7 @@ bool sega8_cart_slot_device::call_load()
 
 void sega8_cart_slot_device::call_unload()
 {
-	if (m_cart && m_cart->get_ram_size() && m_cart->get_has_battery())
+	if (m_cart && m_cart->get_ram_base() && m_cart->get_ram_size() && m_cart->get_has_battery())
 		battery_save(m_cart->get_ram_base(), m_cart->get_ram_size());
 }
 
@@ -731,7 +731,7 @@ void sega8_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, UIN
 	logerror("FILE DETAILS\n" );
 	logerror("============\n" );
 	logerror("Name: %s\n", basename());
-	logerror("File Size: 0x%" I64FMT "x\n", (software_entry() == NULL) ? length() : get_software_region_length("rom"));
+	logerror("File Size: 0x%08x\n", (software_entry() == NULL) ? (int)length() : (int)get_software_region_length("rom"));
 	logerror("Detected type: %s\n", sega8_get_slot(m_type));
 	logerror("ROM (Allocated) Size: 0x%X\n", len);
 	logerror("RAM: %s\n", nvram_len ? "Yes" : "No");

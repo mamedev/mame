@@ -5,6 +5,18 @@
 #include "video/rgbutil.h"
 #include "includes/model3.h"
 
+/*
+    TODO:
+    - Tilemap flash effect
+    - Fog
+    - Mipmapping
+    - Mipmap uploads smaller than a tile
+    - Some of the 4-bit and 8-bit textures need their alpha values rechecked
+    - Spotlights
+    - Recheck normal vector transform
+
+*/
+
 #define ENABLE_BILINEAR     1
 
 #define TRI_PARAM_TEXTURE_PAGE          0x1
@@ -12,8 +24,9 @@
 #define TRI_PARAM_TEXTURE_MIRROR_V      0x4
 #define TRI_PARAM_TEXTURE_ENABLE        0x8
 #define TRI_PARAM_ALPHA_TEST            0x10
+#define TRI_PARAM_COLOR_MOD             0x20
 
-#define TRI_BUFFER_SIZE                 35000
+#define TRI_BUFFER_SIZE                 50000
 #define TRI_ALPHA_BUFFER_SIZE           15000
 
 struct model3_polydata
@@ -41,7 +54,9 @@ public:
 	void clear_fb();
 	void clear_zb();
 	void draw_scanline_solid(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_solid_trans(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 	void draw_scanline_tex(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_colormod(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 	void draw_scanline_tex_contour(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 	void draw_scanline_tex_trans(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
 	void draw_scanline_tex_alpha(INT32 scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
@@ -136,7 +151,7 @@ void model3_state::video_start()
 	static const gfx_layout char4_layout =
 	{
 		8, 8,
-		30720,
+		31744,
 		4,
 		{ 0,1,2,3 },
 		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
@@ -147,7 +162,7 @@ void model3_state::video_start()
 	static const gfx_layout char8_layout =
 	{
 		8, 8,
-		15360,
+		15872,
 		8,
 		{ 0,1,2,3,4,5,6,7 },
 		{ 4*8, 5*8, 6*8, 7*8, 0*8, 1*8, 2*8, 3*8 },
@@ -182,12 +197,6 @@ void model3_state::video_start()
 	m_polygon_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000/4);
 
 	m_vid_reg0 = 0;
-
-	m_viewport_focal_length = 300.;
-	m_viewport_region_x = 0;
-	m_viewport_region_y = 0;
-	m_viewport_region_width = 496;
-	m_viewport_region_height = 384;
 
 	m_layer4[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer0_4bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_layer8[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer0_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -253,14 +262,18 @@ void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cli
 }
 #endif
 
-void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int bitdepth, int sx, int sy)
+void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int sx, int sy, int prio)
 {
+	int bitdepth = (m_layer_priority & (0x10 << layer)) ? 1 : 0;
+//  int layer_prio = (m_layer_priority & (0x1 << layer)) ? 1 : 0;
+
 	tilemap_t *tmap = bitdepth ? m_layer4[layer] : m_layer8[layer];
 	bitmap_ind16 &pixmap = tmap->pixmap();
 	const pen_t *pens = m_palette->pens();
 
 	UINT32* palram = (UINT32*)&m_paletteram64[0];
 	UINT16* rowscroll_ram = (UINT16*)&m_m3_char_ram[0x1ec00];
+	UINT32* rowmask_ram = (UINT32*)&m_m3_char_ram[0x1ee00];
 
 	int x1 = cliprect.min_x;
 	int y1 = cliprect.min_y;
@@ -287,6 +300,12 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 		if (rowscroll & 0x100)
 			rowscroll |= ~0x1ff;
 
+		UINT16 rowmask;
+		if (prio && (layer == 1 || layer == 2))
+			rowmask = BYTE_REVERSE32(rowmask_ram[(y & 0x1ff) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)]) & 0xffff;
+		else
+			rowmask = 0xffff;
+
 		int iix = ix & 0x1ff;
 
 		int rx1 = x1 - (rowscroll * 2);
@@ -302,10 +321,15 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 
 		for (int x = rx1; x <= rx2; x++)
 		{
-			UINT16 p0 = src[iix & 0x1ff];
-			if ((palram[p0^NATIVE_ENDIAN_VALUE_LE_BE(1,0)] & NATIVE_ENDIAN_VALUE_LE_BE(0x00800000,0x00008000)) == 0)
+			UINT32 mask = rowmask & (1 << ((iix & 0x1ff) >> 5));
+
+			if (mask)
 			{
-				dst[x] = pens[p0];
+				UINT16 p0 = src[iix & 0x1ff];
+				if ((palram[p0^NATIVE_ENDIAN_VALUE_LE_BE(1,0)] & NATIVE_ENDIAN_VALUE_LE_BE(0x00800000,0x00008000)) == 0)
+				{
+					dst[x] = pens[p0];
+				}
 			}
 			iix++;
 		}
@@ -339,26 +363,26 @@ UINT32 model3_state::screen_update_model3(screen_device &screen, bitmap_rgb32 &b
 
 	// render enabled layers with priority 0
 	if ((layer_data[3] & 0x80000000) && (m_layer_priority & 0x8) == 0)
-		draw_layer(bitmap, cliprect, 3, m_layer_priority & 0x80, layer_scroll_x[3], layer_scroll_y[3]);
+		draw_layer(bitmap, cliprect, 3, layer_scroll_x[3], layer_scroll_y[3], 0);
 	if ((layer_data[2] & 0x80000000) && (m_layer_priority & 0x4) == 0)
-		draw_layer(bitmap, cliprect, 2, m_layer_priority & 0x40, layer_scroll_x[2], layer_scroll_y[2]);
+		draw_layer(bitmap, cliprect, 2, layer_scroll_x[2], layer_scroll_y[2], 0);
 	if ((layer_data[1] & 0x80000000) && (m_layer_priority & 0x2) == 0)
-		draw_layer(bitmap, cliprect, 1, m_layer_priority & 0x20, layer_scroll_x[1], layer_scroll_y[1]);
+		draw_layer(bitmap, cliprect, 1, layer_scroll_x[1], layer_scroll_y[1], 0);
 	if ((layer_data[0] & 0x80000000) && (m_layer_priority & 0x1) == 0)
-		draw_layer(bitmap, cliprect, 0, m_layer_priority & 0x10, layer_scroll_x[0], layer_scroll_y[0]);
+		draw_layer(bitmap, cliprect, 0, layer_scroll_x[0], layer_scroll_y[0], 0);
 
 	// render 3D
 	m_renderer->draw(bitmap, cliprect);
 
 	// render enabled layers with priority 1
 	if ((layer_data[3] & 0x80000000) && (m_layer_priority & 0x8) != 0)
-		draw_layer(bitmap, cliprect, 3, m_layer_priority & 0x80, layer_scroll_x[3], layer_scroll_y[3]);
+		draw_layer(bitmap, cliprect, 3, layer_scroll_x[3], layer_scroll_y[3], 1);
 	if ((layer_data[2] & 0x80000000) && (m_layer_priority & 0x4) != 0)
-		draw_layer(bitmap, cliprect, 2, m_layer_priority & 0x40, layer_scroll_x[2], layer_scroll_y[2]);
-	if ((layer_data[1] & 0x80000000) && (m_layer_priority & 0x2) != 0)
-		draw_layer(bitmap, cliprect, 1, m_layer_priority & 0x20, layer_scroll_x[1], layer_scroll_y[1]);
+		draw_layer(bitmap, cliprect, 2, layer_scroll_x[2], layer_scroll_y[2], 1);
 	if ((layer_data[0] & 0x80000000) && (m_layer_priority & 0x1) != 0)
-		draw_layer(bitmap, cliprect, 0, m_layer_priority & 0x10, layer_scroll_x[0], layer_scroll_y[0]);
+		draw_layer(bitmap, cliprect, 0, layer_scroll_x[0], layer_scroll_y[0], 1);
+	if ((layer_data[1] & 0x80000000) && (m_layer_priority & 0x2) != 0)
+		draw_layer(bitmap, cliprect, 1, layer_scroll_x[1], layer_scroll_y[1], 1);
 
 	return 0;
 }
@@ -422,7 +446,8 @@ WRITE64_MEMBER(model3_state::model3_tile_w)
 
     0xF1180010:                                             VBL IRQ acknowledge
 
-    0xF1180020:         -------- x------- -------- -------- Layer 3 bitdepth (0 = 8-bit, 1 = 4-bit)
+    0xF1180020:         xxxxxxxx -------- -------- -------- ?
+                        -------- x------- -------- -------- Layer 3 bitdepth (0 = 8-bit, 1 = 4-bit)
                         -------- -x------ -------- -------- Layer 2 bitdepth (0 = 8-bit, 1 = 4-bit)
                         -------- --x----- -------- -------- Layer 1 bitdepth (0 = 8-bit, 1 = 4-bit)
                         -------- ---x---- -------- -------- Layer 0 bitdepth (0 = 8-bit, 1 = 4-bit)
@@ -571,50 +596,53 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 				}
 				break;
 
-			case 1:     /* 4-bit grayscale in low nibble */
+			case 1:     /* A4L4 interleaved */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = pal4bit(texsrc[x] >> 0);
-					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
+					UINT8 grayvalue = pal4bit(texsrc[x] & 0xf);
+					UINT8 a = pal4bit((texsrc[x] >> 4) & 0xf);
+					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
-			case 2:     /* 4-bit grayscale in 2nd nibble */
+			case 2:     /* A4L4? */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = pal4bit(texsrc[x] >> 4);
-					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
+					UINT8 grayvalue = pal4bit((texsrc[x] >> 0) & 0xf);
+					UINT8 a = pal4bit((texsrc[x] >> 4) & 0xf);
+					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
-			case 3:     /* 4-bit grayscale in 3rd nibble */
+			case 3:     /* A4L4 interleaved */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = pal4bit(texsrc[x] >> 8);
-					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
+					UINT8 grayvalue = pal4bit((texsrc[x] >> 8) & 0xf);
+					UINT8 a = pal4bit((texsrc[x] >> 12) & 0xf);
+					alpha &= dest[x] = rgb_t(a, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
 			case 4:     /* 8-bit A4L4 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 pixdata = texsrc[x / 2] >> ((~x & 1) * 8);
-					alpha &= dest[x] = rgb_t(pal4bit(pixdata >> 4), pal4bit(~pixdata), pal4bit(~pixdata), pal4bit(~pixdata));
+					UINT8 pixdata = texsrc[x] >> 8;
+					alpha &= dest[x] = rgb_t(pal4bit(pixdata), pal4bit(pixdata >> 4), pal4bit(pixdata >> 4), pal4bit(pixdata >> 4));
 				}
 				break;
 
-			case 5:     /* 8-bit grayscale */
+			case 5:     /* L8 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = texsrc[x / 2] >> ((~x & 1) * 8);
+					UINT8 grayvalue = texsrc[x];
 					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
-			case 6:     /* 4-bit grayscale in high nibble */
+			case 6:     /* L8 */
 				for (x = 0; x < pixwidth; x++)
 				{
-					UINT8 grayvalue = pal4bit(texsrc[x] >> 12);
+					UINT8 grayvalue = texsrc[x] >> 8;
 					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
@@ -688,23 +716,23 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 
     0x01:   Child node pointer (inherits parameters from this node)
     0x02:   Sibling node pointer
-    0x03:   Unknown (float)
+    0x03:   (float) Focal length? Affected by frustum angles and viewport size
     0x04:   Sun light vector Z-component (float)
     0x05:   Sun light vector X-component (float)
     0x06:   Sun light vector Y-component (float)
     0x07:   Sun light intensity (float)
-    0x08:   Far Clip plane Z
-    0x09:   Far Clip plane Distance
-    0x0a:   Near Clip plane Z
-    0x0b:   Near Clip plane Distance
-    0x0c:   Left Clip plane Z
-    0x0d:   Left Clip plane X
-    0x0e:   Top Clip plane Z
-    0x0f:   Top Clip plane Y
-    0x10:   Right Clip plane Z
-    0x11:   Right Clip plane X
-    0x12:   Bottom Clip plane Z
-    0x13:   Bottom Clip plane Y
+    0x08:   ? (float) Affected by left and right angle
+    0x09:   ? (float) Affected by top and bottom angle
+    0x0a:   ? (float) Affected by top and bottom angle
+    0x0b:   ? (float) Affected by left and right angle
+    0x0c:   (float) Frustum Left Angle Y (these angles are defined in polar coordinates)
+    0x0d:   (float) Frustum Left Angle X
+    0x0e:   (float) Frustum Top Angle Y
+    0x0f:   (float) Frustum Top Angle X
+    0x10:   (float) Frustum Right Angle Y
+    0x11:   (float) Frustum Right Angle X
+    0x12:   (float) Frustum Bottom Angle Y
+    0x13:   (float) Frustum Bottom Angle X
 
     0x14:   xxxxxxxx xxxxxxxx -------- -------- Viewport height (14.2 fixed-point)
             -------- -------- xxxxxxxx xxxxxxxx Viewport width (14.2 fixed-point)
@@ -735,7 +763,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
             -------- -------- -----xxx -------- Light RGB Fog (RGB111?)
             -------- -------- -------- xxxxxxxx Scroll Fog (0.8 fixed-point?) What is this???
 
-    0x21:   ?
+    0x21:   ? seen 8.0, 0.125, 1000000000.0
     0x22:   Fog Color (RGB888)
     0x23:   Fog Density (float)
 
@@ -818,19 +846,24 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 
     Polygon Data
 
-    0x00:   -------- xxxxxxxx xxxxxx-- -------- Polygon ID
+    0x00:   x------- -------- -------- -------- Supermodel says specular enable
+            -xxxxx-- -------- -------- -------- ?
+            ------xx xxxxxxxx xxxxxx-- -------- Polygon ID
             -------- -------- -------- -x------ 0 = Triangle, 1 = Quad
             -------- -------- -------- ----x--- Vertex 3 shared from previous polygon
             -------- -------- -------- -----x-- Vertex 2 shared from previous polygon
             -------- -------- -------- ------x- Vertex 1 shared from previous polygon
             -------- -------- -------- -------x Vertex 0 shared from previous polygon
-            xxxxxxxx -------- -------- x-xx---- ?
+            -------- -------- -------- x-xx---- ?
             -------- -------- ------xx -------- Broken polygons in srally2 set these (a way to mark them for HW to not render?)
 
     0x01:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal X coordinate (2.22 fixed point)
             -------- -------- -------- -x------ UV format (0 = 13.3, 1 = 16.0)
+            -------- -------- -------- ---x---- 1 = Double-sided polygon
             -------- -------- -------- -----x-- If set, this is the last polygon
-            -------- -------- -------- x-xxx-xx ?
+            -------- -------- -------- ------x- Poly color, 1 = RGB, 0 = color table
+            -------- -------- -------- x-x-x--x ?
+
 
     0x02:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Polygon normal Y coordinate (2.22 fixed point)
             -------- -------- -------- ------x- Texture U mirror enable
@@ -844,7 +877,8 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
     0x04:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Color (RGB888)
             -------- -------- -------- -x------ Texture page
             -------- -------- -------- ---xxxxx Upper 5 bits of texture U coordinate
-            -------- -------- -------- x-x----- ?
+            -------- -------- -------- x------- ?
+            -------- -------- -------- --x----- ?
 
     0x05:   xxxxxxxx xxxxxxxx xxxxxxxx -------- Specular color?
             -------- -------- -------- x------- Low bit of texture U coordinate
@@ -852,15 +886,28 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
             -------- -------- -------- -xx----- ?
 
     0x06:   x------- -------- -------- -------- Texture contour enable
-            -xxxxxxx -------- -------- -------- Specularity?
+            -xxxxx-- -------- -------- -------- Fixed shading?
+            ------x- -------- -------- -------- Enable fixed shading?
+            -------x -------- -------- -------- Could be high priority polygon?
             -------- x------- -------- -------- 1 = disable transparency?
-            -------- -xxxxx-- -------- -------- Polygon transparency (0 = fully transparent)
+            -------- -xxxxx-- -------- -------- Polygon translucency (0 = fully transparent)
             -------- -------x -------- -------- 1 = disable lighting
-            -------- -------- xxxxx--- -------- Polygon luminosity
+            -------- -------- xxxxx--- -------- Polygon light modifier (Amount that a luminous polygon will burn through fog.
+                                                                        Valid range is 0.0 to 1.0. 0.0 is completely fogged;
+                                                                        1.0 has no fog.)
             -------- -------- -----x-- -------- Texture enable
             -------- -------- ------xx x------- Texture format
             -------- -------- -------- -------x Alpha enable?
-            -------- ------x- -------- -xxxxxx- ?
+            -------- ------x- -------- -------- Never seen set?
+            -------- -------- -------- -----xx- Always set?
+            -------- -------- -------- -xxxx--- ?
+
+    TODO:   Bits to find (from Real3D dev guide):
+            SetHighPriority(): Indicates that the polygon has higher priority than others in scene
+            PolygonIsLayered(): Indicates a stencil polygon.
+            DoSmoothShading(): Indicates that the polygon will be smooth shaded
+            void SetNPScale ( float np_scale ) ; Sets the texture lod scale for the polygon. A value greater than 1 will increase the
+                                                 range of the transition of texture level of detail.
 
 
     Vertex entry
@@ -904,7 +951,7 @@ WRITE64_MEMBER(model3_state::real3d_polygon_ram_w)
 	}
 }
 
-static const UINT8 texture_decode[64] =
+static const UINT8 texture_decode16[64] =
 {
 		0,  1,  4,  5,  8,  9, 12, 13,
 		2,  3,  6,  7, 10, 11, 14, 15,
@@ -914,6 +961,18 @@ static const UINT8 texture_decode[64] =
 	34, 35, 38, 39, 42, 43, 46, 47,
 	48, 49, 52, 53, 56, 57, 60, 61,
 	50, 51, 54, 55, 58, 59, 62, 63
+};
+
+static const UINT8 texture_decode8[32] =
+{
+		1,  3,  5,  7,
+		0,  2,  4,  6,
+		9, 11, 13, 15,
+		8, 10, 12, 14,
+	17, 19, 21, 23,
+	16, 18, 20, 22,
+	25, 27, 29, 31,
+	24, 26, 28, 30
 };
 
 inline void model3_state::write_texture16(int xpos, int ypos, int width, int height, int page, UINT16 *data)
@@ -928,7 +987,7 @@ inline void model3_state::write_texture16(int xpos, int ypos, int width, int hei
 			int b = 0;
 			for(j=y; j < y+8; j++) {
 				for(i=x; i < x+8; i++) {
-					*texture++ = data[texture_decode[b^1]];
+					*texture++ = data[texture_decode16[b^1]];
 					++b;
 				}
 				texture += 2048-8;
@@ -938,28 +997,76 @@ inline void model3_state::write_texture16(int xpos, int ypos, int width, int hei
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-inline void model3_state::write_texture8(int xpos, int ypos, int width, int height, int page, UINT16 *data)
+inline void model3_state::write_texture8(int xpos, int ypos, int width, int height, int page, int upper, int lower, UINT16 *data)
 {
 	int x,y,i,j;
-	UINT16 color = 0x7c00;
 
-	for(y=ypos; y < ypos+(height/2); y+=4)
+	for(y=ypos; y < ypos+height; y+=8)
 	{
 		for(x=xpos; x < xpos+width; x+=8)
 		{
 			UINT16 *texture = &m_texture_ram[page][y*2048+x];
-			for(j=y; j < y+4; j++) {
-				for(i=x; i < x+8; i++) {
-					*texture = color;
+			int b = 0;
+			for(j=y; j < y+8; j++)
+			{
+				for(i=x; i < x+8; i+=2)
+				{
+					UINT16 d = data[texture_decode8[b]];
+
+					if (upper)
+						*texture = (*texture & 0xff) | (d & 0xff00);
+					if (lower)
+						*texture = (*texture & 0xff00) | ((d >> 8) & 0xff);
 					texture++;
+
+					if (upper)
+						*texture = (*texture & 0xff) | ((d & 0xff) << 8);
+					if (lower)
+						*texture = (*texture & 0xff00) | (d & 0xff);
+					texture++;
+
+					++b;
 				}
 				texture += 2048-8;
 			}
+			data += 32;
 		}
 	}
 }
-#endif
+
+/*
+    Texture header:
+
+    -------- -------- -------- --xxxxxx X-position
+    -------- -------- ----xxxx x------- Y-position
+    -------- -------x xx------ -------- Width
+    -------- ----xxx- -------- -------- Height
+    -------- ---x---- -------- -------- Texture page
+    -------- --x----- -------- -------- Write 8-bit data to the lower byte of texel
+    -------- -x------ -------- -------- Write 8-bit data to the upper byte of texel
+    -------- x------- -------- -------- Bitdepth, 0 = 8-bit, 1 = 16-bit
+    xxxxxxxx -------- -------- -------- Texture type
+                                            0x00 = texture with mipmaps
+                                            0x01 = texture without mipmaps
+                                            0x02 = only mipmaps
+                                            0x80 = possibly gamma table
+
+*/
+
+static const int mipmap_coords[9][2] =
+{
+	{ 1024,  512 },
+	{ 1536,  768 },
+	{ 1792,  896 },
+	{ 1920,  960 },
+	{ 1984,  992 },
+	{ 2016, 1008 },
+	{ 2032, 1016 },
+	{ 2040, 1020 },
+	{ 2044, 1022 },
+};
+
+static const int mipmap_divider[9] = { 2, 4, 8, 16, 32, 64, 128, 256, 512 };
 
 void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 {
@@ -968,36 +1075,100 @@ void model3_state::real3d_upload_texture(UINT32 header, UINT32 *data)
 	int xpos    = (header & 0x3f) * 32;
 	int ypos    = ((header >> 7) & 0x1f) * 32;
 	int page    = (header >> 20) & 0x1;
-	//int bitdepth = (header >> 23) & 0x1;
+	int bitdepth = (header >> 23) & 0x1;
+	int upper_byte = (header >> 22) & 0x1;
+	int lower_byte = (header >> 21) & 0x1;
+
+	//printf("write tex: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
 
 	switch(header >> 24)
 	{
 		case 0x00:      /* Texture with mipmaps */
-			//if(bitdepth) {
-				write_texture16(xpos, ypos, width, height, page, (UINT16*)data);
-				invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
-			//} else {
-				/* TODO: 8-bit textures are weird. need to figure out some additional bits */
-				//logerror("W: %d, H: %d, X: %d, Y: %d, P: %d, Bit: %d, : %08X, %08X\n", width, height, xpos, ypos, page, bitdepth, header & 0x00681040, header);
-				//write_texture8(xpos, ypos, width, height, page, (UINT16*)data);
-			//}
+		{
+			int x = xpos;
+			int y = ypos;
+			int w = width;
+			int h = height;
+
+			int mipmap = 0;
+
+			while (w >= 8 && h >= 8)
+			{
+				if (bitdepth)
+				{
+					write_texture16(x, y, w, h, page, (UINT16*)data);
+				}
+				else
+				{
+					//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
+					write_texture8(x, y, w, h, page, upper_byte, lower_byte, (UINT16*)data);
+				}
+
+				data += (w * h * (bitdepth ? 2 : 1)) / 4;
+				w /= 2;
+				h /= 2;
+
+				x = mipmap_coords[mipmap][0] + (xpos / mipmap_divider[mipmap]);
+				y = mipmap_coords[mipmap][1] + (ypos / mipmap_divider[mipmap]);
+				mipmap++;
+			}
+
+			invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
 			break;
+		}
 		case 0x01:      /* Texture without mipmaps */
-			//if(bitdepth) {
+		{
+			if (bitdepth)
+			{
 				write_texture16(xpos, ypos, width, height, page, (UINT16*)data);
-				invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
-			//} else {
-				/* TODO: 8-bit textures are weird. need to figure out some additional bits */
-				//logerror("W: %d, H: %d, X: %d, Y: %d, P: %d, Bit: %d, : %08X, %08X\n", width, height, xpos, ypos, page, bitdepth, header & 0x00681040, header);
-				//write_texture8(xpos, ypos, width, height, page, (UINT16*)data);
-			//}
+			}
+			else
+			{
+				//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
+				write_texture8(xpos, ypos, width, height, page, upper_byte, lower_byte, (UINT16*)data);
+			}
+
+			invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
 			break;
+		}
 		case 0x02:      /* Only mipmaps */
+		{
+			int x = mipmap_coords[0][0] + (xpos / mipmap_divider[0]);
+			int y = mipmap_coords[0][1] + (ypos / mipmap_divider[0]);
+			int w = width / 2;
+			int h = height / 2;
+
+			int mipmap = 1;
+
+			while (w >= 8 && h >= 8)
+			{
+				if (bitdepth)
+				{
+					write_texture16(x, y, w, h, page, (UINT16*)data);
+				}
+				else
+				{
+					//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
+					write_texture8(x, y, w, h, page, upper_byte, lower_byte, (UINT16*)data);
+				}
+
+				data += (w * h * (bitdepth ? 2 : 1)) / 4;
+				w /= 2;
+				h /= 2;
+
+				x = mipmap_coords[mipmap][0] + (xpos / mipmap_divider[mipmap]);
+				y = mipmap_coords[mipmap][1] + (ypos / mipmap_divider[mipmap]);
+				mipmap++;
+			}
+
+			invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
 			break;
+		}
 		case 0x80:      /* Gamma-table ? */
 			break;
 		default:
-			fatalerror("Unknown texture type: %02X\n", header >> 24);
+			fatalerror("Unknown texture type: %02X (%08X)\n", header >> 24, header);
+			break;
 	}
 }
 
@@ -1021,13 +1192,6 @@ void model3_state::real3d_display_list_end()
 
 	reset_triangle_buffers();
 	real3d_traverse_display_list();
-
-	/*
-	m_renderer->draw_opaque_triangles(m_tri_buffer, m_tri_buffer_ptr);
-	m_renderer->draw_alpha_triangles(m_tri_alpha_buffer, m_tri_alpha_buffer_ptr);
-
-	m_renderer->wait_for_polys();
-	*/
 
 	for (int i=0; i < 4; i++)
 	{
@@ -1241,78 +1405,145 @@ void model3_state::translate_matrix_stack(float x, float y, float z)
 	matrix_multiply(tm, m_matrix_stack[m_matrix_stack_ptr], &m_matrix_stack[m_matrix_stack_ptr]);
 }
 
+void model3_state::set_projection(float left, float right, float top, float bottom, float near, float far)
+{
+	float l = near * tanf(left * 0.5f);
+	float r = near * tanf(right * 0.5f);
+	float t = near * tanf(top * 0.5f );
+	float b = near * tanf(bottom * 0.5f);
+
+	m_projection_matrix[0][0] = (2.0f * near) / (l - r);
+	m_projection_matrix[0][1] = 0.0f;
+	m_projection_matrix[0][2] = (r + l) / (r - l);
+	m_projection_matrix[0][3] = 0.0f;
+	m_projection_matrix[1][0] = 0.0f;
+	m_projection_matrix[1][1] = (2.0f * near) / (t - b);
+	m_projection_matrix[1][2] = (t + b) / (t - b);
+	m_projection_matrix[1][3] = 0.0f;
+	m_projection_matrix[2][0] = 0.0f;
+	m_projection_matrix[2][1] = 0.0f;
+	m_projection_matrix[2][2] = -(far + near) / (far - near);
+	m_projection_matrix[2][3] = -(2.0f * far * near) / (far - near);
+	m_projection_matrix[3][0] = 0.0f;
+	m_projection_matrix[3][1] = 0.0f;
+	m_projection_matrix[3][2] = -1.0f;
+	m_projection_matrix[3][3] = 0.0f;
+}
+
 /*****************************************************************************/
 /* transformation and rasterizing */
 
-INLINE bool is_point_inside(float x, float y, float z, m3_plane cp)
+static int clip_w(const m3_clip_vertex* v, int num_vertices, m3_clip_vertex* out)
 {
-	float s = (x * cp.x) + (y * cp.y) + (z * cp.z) + cp.d;
-	if (s >= 0.0f)
-		return true;
-	else
-		return false;
-}
+	if (num_vertices <= 0)
+		return 0;
 
-INLINE float line_plane_intersection(const m3_clip_vertex *v1, const m3_clip_vertex *v2, m3_plane cp)
-{
-	float x = v1->x - v2->x;
-	float y = v1->y - v2->y;
-	float z = v1->z - v2->z;
-	float t = ((cp.x * v1->x) + (cp.y * v1->y) + (cp.z * v1->z)) / ((cp.x * x) + (cp.y * y) + (cp.z * z));
-	return t;
-}
+	const float W_PLANE = 0.000001f;
 
-static int clip_polygon(const m3_clip_vertex *v, int num_vertices, m3_plane cp, m3_clip_vertex *vout)
-{
 	m3_clip_vertex clipv[10];
 	int clip_verts = 0;
-	float t;
-	int i;
 
 	int previ = num_vertices - 1;
 
-	for (i=0; i < num_vertices; i++)
+	for (int i=0; i < num_vertices; i++)
 	{
-		bool v1_in = is_point_inside(v[i].x, v[i].y, v[i].z, cp);
-		bool v2_in = is_point_inside(v[previ].x, v[previ].y, v[previ].z, cp);
+		int v1_side = (v[i].w < W_PLANE) ? -1 : 1;
+		int v2_side = (v[previ].w < W_PLANE) ? -1 : 1;
 
-		if (v1_in && v2_in)         /* edge is completely inside the volume */
+		if ((v1_side * v2_side) < 0)        // edge goes through W plane
 		{
-			clipv[clip_verts] = v[i];
+			// insert vertex at intersection point
+			float wdiv = v[previ].w - v[i].w;
+			if (wdiv == 0.0f)       // 0 edge means degenerate polygon
+				return 0;
+
+			float t = fabs((W_PLANE - v[previ].w) / wdiv);
+
+			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
+			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
+			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
+			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
+			clipv[clip_verts].u = v[previ].u + ((v[i].u - v[previ].u) * t);
+			clipv[clip_verts].v = v[previ].v + ((v[i].v - v[previ].v) * t);
+			clipv[clip_verts].i = v[previ].i + ((v[i].i - v[previ].i) * t);
+			clipv[clip_verts].s = v[previ].s + ((v[i].s - v[previ].s) * t);
 			++clip_verts;
 		}
-		else if (!v1_in && v2_in)   /* edge is entering the volume */
+		if (v1_side > 0)                // current point is inside
 		{
-			/* insert vertex at intersection point */
-			t = line_plane_intersection(&v[i], &v[previ], cp);
-			clipv[clip_verts].x = v[i].x + ((v[previ].x - v[i].x) * t);
-			clipv[clip_verts].y = v[i].y + ((v[previ].y - v[i].y) * t);
-			clipv[clip_verts].z = v[i].z + ((v[previ].z - v[i].z) * t);
-			clipv[clip_verts].u = v[i].u + ((v[previ].u - v[i].u) * t);
-			clipv[clip_verts].v = v[i].v + ((v[previ].v - v[i].v) * t);
-			clipv[clip_verts].i = v[i].i + ((v[previ].i - v[i].i) * t);
-			++clip_verts;
-		}
-		else if (v1_in && !v2_in)   /* edge is leaving the volume */
-		{
-			/* insert vertex at intersection point */
-			t = line_plane_intersection(&v[i], &v[previ], cp);
-			clipv[clip_verts].x = v[i].x + ((v[previ].x - v[i].x) * t);
-			clipv[clip_verts].y = v[i].y + ((v[previ].y - v[i].y) * t);
-			clipv[clip_verts].z = v[i].z + ((v[previ].z - v[i].z) * t);
-			clipv[clip_verts].u = v[i].u + ((v[previ].u - v[i].u) * t);
-			clipv[clip_verts].v = v[i].v + ((v[previ].v - v[i].v) * t);
-			clipv[clip_verts].i = v[i].i + ((v[previ].i - v[i].i) * t);
-			++clip_verts;
-
-			/* insert the existing vertex */
 			clipv[clip_verts] = v[i];
 			++clip_verts;
 		}
 
 		previ = i;
 	}
-	memcpy(&vout[0], &clipv[0], sizeof(vout[0]) * clip_verts);
+
+	memcpy(&out[0], &clipv[0], sizeof(out[0]) * clip_verts);
+	return clip_verts;
+}
+
+static int clip(const m3_clip_vertex* v, int num_vertices, m3_clip_vertex* out, int axis, int sign)
+{
+	if (num_vertices <= 0)
+		return 0;
+
+	m3_clip_vertex clipv[10];
+	int clip_verts = 0;
+
+	int previ = num_vertices - 1;
+
+	for (int i=0; i < num_vertices; i++)
+	{
+		int v1_side, v2_side;
+		float* v1a = (float*)&v[i];
+		float* v2a = (float*)&v[previ];
+
+		float v1_axis, v2_axis;
+
+		if (sign)       // +axis
+		{
+			v1_axis = v1a[axis];
+			v2_axis = v2a[axis];
+		}
+		else            // -axis
+		{
+			v1_axis = -v1a[axis];
+			v2_axis = -v2a[axis];
+		}
+
+		v1_side = (v1_axis <= v[i].w) ? 1 : -1;
+		v2_side = (v2_axis <= v[previ].w) ? 1 : -1;
+
+		if ((v1_side * v2_side) < 0)        // edge goes through W plane
+		{
+			// insert vertex at intersection point
+			float wdiv = ((v[previ].w - v2_axis) - (v[i].w - v1_axis));
+
+			if (wdiv == 0.0f)           // 0 edge means degenerate polygon
+				return 0;
+
+			float t = fabs((v[previ].w - v2_axis) / wdiv);
+
+			clipv[clip_verts].x = v[previ].x + ((v[i].x - v[previ].x) * t);
+			clipv[clip_verts].y = v[previ].y + ((v[i].y - v[previ].y) * t);
+			clipv[clip_verts].z = v[previ].z + ((v[i].z - v[previ].z) * t);
+			clipv[clip_verts].w = v[previ].w + ((v[i].w - v[previ].w) * t);
+			clipv[clip_verts].u = v[previ].u + ((v[i].u - v[previ].u) * t);
+			clipv[clip_verts].v = v[previ].v + ((v[i].v - v[previ].v) * t);
+			clipv[clip_verts].i = v[previ].i + ((v[i].i - v[previ].i) * t);
+			clipv[clip_verts].s = v[previ].s + ((v[i].s - v[previ].s) * t);
+			++clip_verts;
+		}
+		if (v1_side > 0)                // current point is inside
+		{
+			clipv[clip_verts] = v[i];
+			++clip_verts;
+		}
+
+		previ = i;
+	}
+
+	memcpy(&out[0], &clipv[0], sizeof(out[0]) * clip_verts);
 	return clip_verts;
 }
 
@@ -1368,7 +1599,14 @@ void model3_state::draw_model(UINT32 addr)
 	m3_clip_vertex clip_vert[10];
 
 	MATRIX transform_matrix;
-	float center_x, center_y;
+	MATRIX vp_matrix;
+	MATRIX coord_matrix;
+
+	memset(&coord_matrix, 0, sizeof(coord_matrix));
+	coord_matrix[0][0] = m_coordinate_system[0][1];
+	coord_matrix[1][1] = m_coordinate_system[1][2];
+	coord_matrix[2][2] = -m_coordinate_system[2][0];
+	coord_matrix[3][3] = 1.0f;
 
 	if (m_step < 0x15)      // position coordinates are 17.7 fixed-point in Step 1.0
 		fixed_point_fraction = 1.0f / 128.0f;
@@ -1377,9 +1615,9 @@ void model3_state::draw_model(UINT32 addr)
 
 	get_top_matrix(&transform_matrix);
 
-	/* current viewport center coordinates on screen */
-	center_x = (float)(m_viewport_region_x + (m_viewport_region_width / 2));
-	center_y = (float)(m_viewport_region_y + (m_viewport_region_height / 2));
+	// make view-projection matrix
+	matrix_multiply(transform_matrix, coord_matrix, &transform_matrix);
+	matrix_multiply(transform_matrix, m_projection_matrix, &vp_matrix);
 
 	memset(prev_vertex, 0, sizeof(prev_vertex));
 
@@ -1448,23 +1686,28 @@ void model3_state::draw_model(UINT32 addr)
 		/* Copy current vertices as previous vertices */
 		memcpy(prev_vertex, vertex, sizeof(m3_vertex) * 4);
 
-		color = (header[4] >> 8) & 0xffffff;
+		if (header[1] & 0x2)
+		{
+			color = (header[4] >> 8) & 0xffffff;
+		}
+		else
+		{
+			int ci = (header[4] >> 8) & 0x7ff;
+			color = m_polygon_ram[0x400 + ci];
+		}
+
 		polygon_transparency =  (header[6] & 0x800000) ? 32 : ((header[6] >> 18) & 0x1f);
 
 		/* transform polygon normal to view-space */
 		sn[0] = (normal[0] * transform_matrix[0][0]) +
-				(normal[1] * transform_matrix[1][0]) +
-				(normal[2] * transform_matrix[2][0]);
-		sn[1] = (normal[0] * transform_matrix[0][1]) +
+				(normal[1] * transform_matrix[0][1]) +
+				(normal[2] * transform_matrix[0][2]);
+		sn[1] = (normal[0] * transform_matrix[1][0]) +
 				(normal[1] * transform_matrix[1][1]) +
-				(normal[2] * transform_matrix[2][1]);
-		sn[2] = (normal[0] * transform_matrix[0][2]) +
-				(normal[1] * transform_matrix[1][2]) +
+				(normal[2] * transform_matrix[1][2]);
+		sn[2] = (normal[0] * transform_matrix[2][0]) +
+				(normal[1] * transform_matrix[2][1]) +
 				(normal[2] * transform_matrix[2][2]);
-
-		sn[0] *= m_coordinate_system[0][1];
-		sn[1] *= m_coordinate_system[1][2];
-		sn[2] *= m_coordinate_system[2][0];
 
 		// TODO: depth bias
 		// transform and light vertices
@@ -1477,36 +1720,38 @@ void model3_state::draw_model(UINT32 addr)
 			vect[2] = vertex[i].z;
 			vect[3] = 1.0f;
 
-			// transform to world-space
-			matrix_multiply_vector(transform_matrix, vect, &p[i]);
+			// transform to projection space
+			matrix_multiply_vector(vp_matrix, vect, &p[i]);
 
-			// apply coordinate system
-			clip_vert[i].x = p[i][0] * m_coordinate_system[0][1];
-			clip_vert[i].y = p[i][1] * m_coordinate_system[1][2];
-			clip_vert[i].z = p[i][2] * m_coordinate_system[2][0];
-			clip_vert[i].u = vertex[i].u * texture_coord_scale;
-			clip_vert[i].v = vertex[i].v * texture_coord_scale;
+			clip_vert[i].x = p[i][0];
+			clip_vert[i].y = p[i][1];
+			clip_vert[i].z = p[i][2];
+			clip_vert[i].w = p[i][3];
+
+			clip_vert[i].u = vertex[i].u * texture_coord_scale * 256.0f;        // 8 bits of subtexel accuracy for bilinear filtering
+			clip_vert[i].v = vertex[i].v * texture_coord_scale * 256.0f;
 
 			// transform vertex normal
 			VECTOR3 n;
 			n[0] = (vertex[i].nx * transform_matrix[0][0]) +
-					(vertex[i].ny * transform_matrix[1][0]) +
-					(vertex[i].nz * transform_matrix[2][0]);
-			n[0] *= m_coordinate_system[0][1];
-			n[1] = (vertex[i].nx * transform_matrix[0][1]) +
+					(vertex[i].ny * transform_matrix[0][1]) +
+					(vertex[i].nz * transform_matrix[0][2]);
+			n[1] = (vertex[i].nx * transform_matrix[1][0]) +
 					(vertex[i].ny * transform_matrix[1][1]) +
-					(vertex[i].nz * transform_matrix[2][1]);
-			n[1] *= m_coordinate_system[1][2];
-			n[2] = (vertex[i].nx * transform_matrix[0][2]) +
-					(vertex[i].ny * transform_matrix[1][2]) +
+					(vertex[i].nz * transform_matrix[1][2]);
+			n[2] = (vertex[i].nx * transform_matrix[2][0]) +
+					(vertex[i].ny * transform_matrix[2][1]) +
 					(vertex[i].nz * transform_matrix[2][2]);
-			n[2] *= m_coordinate_system[2][0];
 
 			// lighting
 			float intensity;
 			if ((header[6] & 0x10000) == 0)
 			{
 				float dot = dot_product3(n, m_parallel_light);
+
+				if (header[1] & 0x10)
+					dot = fabs(dot);
+
 				intensity = ((dot * m_parallel_light_intensity) + m_ambient_light_intensity) * 255.0f;
 				if (intensity > 255.0f)
 				{
@@ -1519,43 +1764,55 @@ void model3_state::draw_model(UINT32 addr)
 			}
 			else
 			{
-				// apply luminosity
-				intensity = ((float)((header[6] >> 11) & 0x1f) / 31.0f) * 255.0f;
+				intensity = 255.0f;
 			}
 
 			clip_vert[i].i = intensity;
 		}
 
 		/* clip against view frustum */
-		num_vertices = clip_polygon(clip_vert, num_vertices, m_clip_plane[0], clip_vert);
-		num_vertices = clip_polygon(clip_vert, num_vertices, m_clip_plane[1], clip_vert);
-		num_vertices = clip_polygon(clip_vert, num_vertices, m_clip_plane[2], clip_vert);
-		num_vertices = clip_polygon(clip_vert, num_vertices, m_clip_plane[3], clip_vert);
-		num_vertices = clip_polygon(clip_vert, num_vertices, m_clip_plane[4], clip_vert);
+		num_vertices = clip_w(clip_vert, num_vertices, clip_vert);
+		num_vertices = clip(clip_vert, num_vertices, clip_vert, 0, 0);      // W <= -X
+		num_vertices = clip(clip_vert, num_vertices, clip_vert, 0, 1);      // W <= +X
+		num_vertices = clip(clip_vert, num_vertices, clip_vert, 1, 0);      // W <= -Y
+		num_vertices = clip(clip_vert, num_vertices, clip_vert, 1, 1);      // W <= +X
+		num_vertices = clip(clip_vert, num_vertices, clip_vert, 2, 0);      // W <= -Z
+		num_vertices = clip(clip_vert, num_vertices, clip_vert, 2, 1);      // W <= +Z
+
+		/* divide by W, transform to screen coords */
+		for(i=0; i < num_vertices; i++)
+		{
+			float oow = 1.0f / clip_vert[i].w;
+
+			clip_vert[i].x *= oow;
+			clip_vert[i].y *= oow;
+			clip_vert[i].z *= oow;
+			clip_vert[i].u *= oow;
+			clip_vert[i].v *= oow;
+
+			clip_vert[i].x = (((clip_vert[i].x * 0.5f) + 0.5f) * m_viewport_width) + m_viewport_x;
+			clip_vert[i].y = (((clip_vert[i].y * 0.5f) + 0.5f) * m_viewport_height) + m_viewport_y;
+			clip_vert[i].z = (((clip_vert[i].z * 0.5f) + 0.5f) * (m_viewport_far - m_viewport_near)) + m_viewport_near;
+		}
 
 		/* backface culling */
-		if( (header[6] & 0x800000) && (!(header[1] & 0x0010)) ) {
-			if(sn[0]*clip_vert[0].x + sn[1]*clip_vert[0].y + sn[2]*clip_vert[0].z >0)
+		if( (header[6] & 0x800000) && (!(header[1] & 0x0010)) )
+		{
+			if (sn[0]*clip_vert[0].x + sn[1]*clip_vert[0].y + sn[2]*clip_vert[0].z > 0)
 				back_face = 1;
 			else
 				back_face = 0;
 		}
 		else
+		{
 			back_face = 0;  //no culling for transparent or two-sided polygons
+		}
+
+		back_face = 0;
 
 		if (!back_face)
 		{
-			/* homogeneous Z-divide, screen-space transformation */
-			for(i=0; i < num_vertices; i++)
-			{
-				float ooz = 1.0f / clip_vert[i].z;
-				clip_vert[i].x = ((clip_vert[i].x * ooz) * m_viewport_focal_length) + center_x;
-				clip_vert[i].y = ((clip_vert[i].y * ooz) * m_viewport_focal_length) + center_y;
-				clip_vert[i].u *= ooz;
-				clip_vert[i].v *= ooz;
-			}
-
-
+			bool colormod = false;
 			cached_texture* texture;
 
 			if (header[6] & 0x0000400)
@@ -1565,6 +1822,9 @@ void model3_state::draw_model(UINT32 addr)
 				int tex_width = ((header[3] >> 3) & 0x7);
 				int tex_height = (header[3] & 0x7);
 				int tex_format = (header[6] >> 7) & 0x7;
+
+				if (tex_format != 0 && tex_format != 7)     // enable color modulation if this is not a color texture
+					colormod = true;
 
 				if (tex_width >= 6 || tex_height >= 6)      // srally2 poly ram has degenerate polys with 2k tex size (cpu bug or intended?)
 					return;
@@ -1578,7 +1838,7 @@ void model3_state::draw_model(UINT32 addr)
 
 			for (i=2; i < num_vertices; i++)
 			{
-				bool alpha = (header[6] & 0x1) || (header[6] & 0x80000000);     // put to alpha buffer if there's any transparency involved
+				bool alpha = (header[6] & 0x1) || ((header[6] & 0x800000) == 0);        // put to alpha buffer if there's any transparency involved
 				m3_triangle* tri = push_triangle(alpha);
 
 				// bail out if tri buffer is maxed out (happens during harley boot)
@@ -1593,12 +1853,13 @@ void model3_state::draw_model(UINT32 addr)
 				tri->transparency = polygon_transparency;
 				tri->color = color;
 
-				tri->param   = 0;
-				tri->param   |= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
-				tri->param   |= (header[6] & 0x00000400) ? TRI_PARAM_TEXTURE_ENABLE : 0;
-				tri->param   |= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
-				tri->param   |= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
-				tri->param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
+				tri->param = 0;
+				tri->param |= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
+				tri->param |= (header[6] & 0x00000400) ? TRI_PARAM_TEXTURE_ENABLE : 0;
+				tri->param |= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
+				tri->param |= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
+				tri->param |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
+				tri->param |= (colormod) ? TRI_PARAM_COLOR_MOD : 0;
 			}
 		}
 	}
@@ -1754,8 +2015,6 @@ void model3_state::draw_viewport(int pri, UINT32 address)
 {
 	const UINT32 *node = get_memory_pointer(address);
 	UINT32 link_address;
-	float /*viewport_left, viewport_right, */viewport_top, viewport_bottom;
-	float /*fov_x,*/ fov_y;
 
 	link_address = node[1];
 
@@ -1769,28 +2028,33 @@ void model3_state::draw_viewport(int pri, UINT32 address)
 		return;
 
 	/* set viewport parameters */
-	m_viewport_region_x      = (node[26] & 0xffff) >> 4;         /* 12.4 fixed point */
-	m_viewport_region_y      = ((node[26] >> 16) & 0xffff) >> 4;
-	m_viewport_region_width  = (node[20] & 0xffff) >> 2;         /* 14.2 fixed point */
-	m_viewport_region_height = ((node[20] >> 16) & 0xffff) >> 2;
+	m_viewport_x      = (float)(node[26] & 0xffff) / 16.0f;         /* 12.4 fixed point */
+	m_viewport_y      = (float)((node[26] >> 16) & 0xffff) / 16.0f;
+	m_viewport_width  = (float)(node[20] & 0xffff) / 4.0f;          /* 14.2 fixed point */
+	m_viewport_height = (float)((node[20] >> 16) & 0xffff) / 4.0f;
 
-	/* frustum plane angles */
-	//viewport_left         = RADIAN_TO_DEGREE(asin(*(float *)&node[12]));
-	//viewport_right            = RADIAN_TO_DEGREE(asin(*(float *)&node[16]));
-	viewport_top            = RADIAN_TO_DEGREE(asin(*(float *)&node[14]));
-	viewport_bottom         = RADIAN_TO_DEGREE(asin(*(float *)&node[18]));
+	m_viewport_near = 1.0f;
+	m_viewport_far = 100000.0f;
 
-	/* build clipping planes */
-	m_clip_plane[0].x = *(float *)&node[13]; m_clip_plane[0].y = 0.0f;        m_clip_plane[0].z = *(float *)&node[12]; m_clip_plane[0].d = 0.0f;
-	m_clip_plane[1].x = *(float *)&node[17]; m_clip_plane[1].y = 0.0f;        m_clip_plane[1].z = *(float *)&node[16]; m_clip_plane[1].d = 0.0f;
-	m_clip_plane[2].x = 0.0f;        m_clip_plane[2].y = *(float *)&node[15]; m_clip_plane[2].z = *(float *)&node[14]; m_clip_plane[2].d = 0.0f;
-	m_clip_plane[3].x = 0.0f;        m_clip_plane[3].y = *(float *)&node[19]; m_clip_plane[3].z = *(float *)&node[18]; m_clip_plane[3].d = 0.0f;
-	m_clip_plane[4].x = 0.0f;        m_clip_plane[4].y = 0.0f;        m_clip_plane[4].z = 1.0f;        m_clip_plane[4].d = 1.0f;
+	/* set up frustum */
+	float frustum_left      = atan2(*(float *)&node[12], *(float *)&node[13]);
+	float frustum_right     = -atan2(*(float *)&node[16], -*(float *)&node[17]);
+	float frustum_top       = atan2(*(float *)&node[14], *(float *)&node[15]);
+	float frustum_bottom    = -atan2(*(float *)&node[18], -*(float *)&node[19]);
+//  float frustum_1         = atan2(*(float *)&node[9], *(float *)&node[8]);
+//  float frustum_2         = atan2(*(float *)&node[11], *(float *)&node[10]);
 
-	/* compute field of view */
-	//fov_x = viewport_left + viewport_right;
-	fov_y = viewport_top + viewport_bottom;
-	m_viewport_focal_length = (m_viewport_region_height / 2) / tan( (fov_y * M_PI / 180.0f) / 2.0f );
+	/*
+	printf("%f\n", *(float *)&node[3]);
+	printf("0: %f, 1: %f, 2: %f, 3: %f\n", *(float *)&node[8], *(float *)&node[9], *(float *)&node[10], *(float *)&node[11]);
+	printf("4: %f, 5: %f, 6: %f, 7: %f\n", *(float *)&node[12], *(float *)&node[13], *(float *)&node[14], *(float *)&node[15]);
+	printf("8: %f, 9: %f, A: %f, B: %f\n", *(float *)&node[16], *(float *)&node[17], *(float *)&node[18], *(float *)&node[19]);
+	printf("fl = %f, fr = %f, ft = %f, fb = %f\n", RADIAN_TO_DEGREE(frustum_left), RADIAN_TO_DEGREE(frustum_right), RADIAN_TO_DEGREE(frustum_top), RADIAN_TO_DEGREE(frustum_bottom));
+	printf("f1 = %f, f2 = %f\n", RADIAN_TO_DEGREE(frustum_1), RADIAN_TO_DEGREE(frustum_2));
+	*/
+
+	set_projection(frustum_left, frustum_right, frustum_top, frustum_bottom, m_viewport_near, m_viewport_far);
+
 
 	m_matrix_base_address = node[22];
 	/* TODO: where does node[23] point to ? LOD table ? */
@@ -1798,7 +2062,7 @@ void model3_state::draw_viewport(int pri, UINT32 address)
 	/* set lighting parameters */
 	m_parallel_light[0] = *(float *)&node[5];
 	m_parallel_light[1] = *(float *)&node[6];
-	m_parallel_light[2] = -*(float *)&node[4];
+	m_parallel_light[2] = *(float *)&node[4];
 	m_parallel_light_intensity = *(float *)&node[7];
 	m_ambient_light_intensity = (UINT8)(node[36] >> 8) / 256.0f;
 
@@ -1893,10 +2157,10 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 			{
 				v[i].x = tri->v[i].x;
 				v[i].y = tri->v[i].y;
-				v[i].p[0] = tri->v[i].z;
-				v[i].p[1] = 1.0f / tri->v[i].z;
-				v[i].p[2] = tri->v[i].u * 256.0f;       // 8 bits of subtexel precision for bilinear filtering
-				v[i].p[3] = tri->v[i].v * 256.0f;
+				v[i].p[0] = tri->v[i].w;
+				v[i].p[1] = 1.0f / tri->v[i].w;
+				v[i].p[2] = tri->v[i].u;
+				v[i].p[3] = tri->v[i].v;
 				v[i].p[4] = tri->v[i].i;
 			}
 
@@ -1904,8 +2168,19 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 			extra.texture = tri->texture;
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
+			extra.color = tri->color;
 
-			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex), this), 5, v[0], v[1], v[2]);
+			if (tri->param & TRI_PARAM_ALPHA_TEST)
+			{
+				render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_contour), this), 5, v[0], v[1], v[2]);
+			}
+			else
+			{
+				if (tri->param & TRI_PARAM_COLOR_MOD)
+					render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_colormod), this), 5, v[0], v[1], v[2]);
+				else
+					render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex), this), 5, v[0], v[1], v[2]);
+			}
 		}
 		else
 		{
@@ -1913,7 +2188,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 			{
 				v[i].x = tri->v[i].x;
 				v[i].y = tri->v[i].y;
-				v[i].p[0] = tri->v[i].z;
+				v[i].p[0] = tri->v[i].w;
 				v[i].p[1] = tri->v[i].i;
 			}
 
@@ -1947,10 +2222,10 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 			{
 				v[i].x = tri->v[i].x;
 				v[i].y = tri->v[i].y;
-				v[i].p[0] = tri->v[i].z;
-				v[i].p[1] = 1.0f / tri->v[i].z;
-				v[i].p[2] = tri->v[i].u * 256.0f;       // 8 bits of subtexel precision for bilinear filtering
-				v[i].p[3] = tri->v[i].v * 256.0f;
+				v[i].p[0] = tri->v[i].w;
+				v[i].p[1] = 1.0f / tri->v[i].w;
+				v[i].p[2] = tri->v[i].u;
+				v[i].p[3] = tri->v[i].v;
 				v[i].p[4] = tri->v[i].i;
 			}
 
@@ -1959,14 +2234,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
 
-			if (tri->param & TRI_PARAM_ALPHA_TEST)
-			{
-				render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_contour), this), 5, v[0], v[1], v[2]);
-			}
-			else
-			{
-				render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_alpha), this), 5, v[0], v[1], v[2]);
-			}
+			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_alpha), this), 5, v[0], v[1], v[2]);
 		}
 		else
 		{
@@ -1974,15 +2242,15 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 			{
 				v[i].x = tri->v[i].x;
 				v[i].y = tri->v[i].y;
-				v[i].p[0] = tri->v[i].z;
+				v[i].p[0] = tri->v[i].w;
 				v[i].p[1] = tri->v[i].i;
 			}
 
 			model3_polydata &extra = object_data_alloc();
 			extra.color = tri->color;
+			extra.transparency = tri->transparency;
 
-			// TODO: scanline renderer for solid /w transparency
-			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_solid), this), 2, v[0], v[1], v[2]);
+			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_solid_trans), this), 2, v[0], v[1], v[2]);
 		}
 	}
 }
@@ -1998,36 +2266,54 @@ void model3_renderer::draw_scanline_solid(INT32 scanline, const extent_t &extent
 	float in = extent.param[1].start;
 	float inz = extent.param[1].dpdx;
 
-	int pr = polydata.color & 0xff0000;
-	int pg = polydata.color & 0xff00;
-	int pb = polydata.color & 0xff;
-
-	int srctrans = polydata.transparency;
-	int desttrans = 32 - polydata.transparency;
+	rgbaint_t color(polydata.color);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < zb[x])
+		if (z <= zb[x])
 		{
-			int ii = (int)(in);
+			rgbaint_t c(color);
 
-			int r = (pr * ii) >> 8;
-			int g = (pg * ii) >> 8;
-			int b = (pb * ii) >> 8;
+			c.scale_imm_and_clamp((int)in);
 
-			if (srctrans != 0x1f)
+			fb[x] = 0xff000000 | c.to_rgba_clamp();
+			zb[x] = z;
+		}
+
+		in += inz;
+		z += dz;
+	}
+}
+
+void model3_renderer::draw_scanline_solid_trans(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+{
+	UINT32 *fb = &m_fb->pix32(scanline);
+	float *zb = (float*)&m_zb->pix32(scanline);
+
+	float z = extent.param[0].start;
+	float dz = extent.param[0].dpdx;
+
+	float in = extent.param[1].start;
+	float inz = extent.param[1].dpdx;
+
+	rgbaint_t color(polydata.color);
+
+	int trans = (polydata.transparency << 3) | (polydata.transparency >> 2);
+
+	for (int x = extent.startx; x < extent.stopx; x++)
+	{
+		if (z <= zb[x])
+		{
+			rgbaint_t c(color);
+
+			c.scale_imm_and_clamp((int)in);
+
+			if (trans != 0xff)
 			{
-				UINT32 orig = fb[x];
-				r = (r * srctrans) >> 5;
-				g = (g * srctrans) >> 5;
-				b = (b * srctrans) >> 5;
-				r += ((orig & 0x00ff0000) * desttrans) >> 5;
-				g += ((orig & 0x0000ff00) * desttrans) >> 5;
-				b += ((orig & 0x000000ff) * desttrans) >> 5;
+				c.blend(rgbaint_t(fb[x]), trans);
 			}
 
-			fb[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
-			zb[x] = z;
+			fb[x] = 0xff000000 | c.to_rgba_clamp();
 		}
 
 		in += inz;
@@ -2058,7 +2344,7 @@ do {                                                                            
 	UINT32 pix01 = texture->data[(v1 << width) + u2];                           \
 	UINT32 pix10 = texture->data[(v2 << width) + u1];                           \
 	UINT32 pix11 = texture->data[(v2 << width) + u2];                           \
-	texel = rgba_bilinear_filter(pix00, pix01, pix10, pix11, u, v);             \
+	texel = rgbaint_t::bilinear_filter(pix00, pix01, pix10, pix11, u, v);       \
 } while(0);
 
 #if ENABLE_BILINEAR
@@ -2090,18 +2376,63 @@ void model3_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent, 
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < zb[x])
+		if (z <= zb[x])
 		{
 			UINT32 texel;
-			TEX_FETCH();
+			TEX_FETCH();        // TODO fetch rgbaint_t instead
 
-			int ii = in;
+			rgbaint_t color(texel);
 
-			UINT32 r = ((texel & 0xff0000) * ii) >> 8;
-			UINT32 g = ((texel & 0xff00) * ii) >> 8;
-			UINT32 b = ((texel & 0xff) * ii) >> 8;
+			color.scale_imm_and_clamp((int)in);
 
-			fb[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
+			fb[x] = 0xff000000 | color.to_rgba_clamp();
+			zb[x] = z;
+		}
+
+		ooz += dooz;
+		uoz += duoz;
+		voz += dvoz;
+		in += inz;
+		z += dz;
+	}
+}
+
+void model3_renderer::draw_scanline_tex_colormod(INT32 scanline, const extent_t &extent, const model3_polydata &polydata, int threadid)
+{
+	UINT32 *fb = &m_fb->pix32(scanline);
+	float *zb = (float*)&m_zb->pix32(scanline);
+	const cached_texture *texture = polydata.texture;
+
+	float z = extent.param[0].start;
+	float dz = extent.param[0].dpdx;
+	float ooz = extent.param[1].start;
+	float dooz = extent.param[1].dpdx;
+	float uoz = extent.param[2].start;
+	float duoz = extent.param[2].dpdx;
+	float voz = extent.param[3].start;
+	float dvoz = extent.param[3].dpdx;
+	float in = extent.param[4].start;
+	float inz = extent.param[4].dpdx;
+
+	UINT32 umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
+	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
+	UINT32 width = 6 + texture->width;
+
+	rgbaint_t polycolor(polydata.color);
+
+	for (int x = extent.startx; x < extent.stopx; x++)
+	{
+		if (z <= zb[x])
+		{
+			UINT32 texel;
+			TEX_FETCH();        // TODO fetch rgbaint_t instead
+
+			rgbaint_t color(texel);
+
+			color.scale_and_clamp(polycolor);
+			color.scale_imm_and_clamp((int)in);
+
+			fb[x] = 0xff000000 | color.to_rgba_clamp();
 			zb[x] = z;
 		}
 
@@ -2134,9 +2465,11 @@ void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &
 	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
 	UINT32 width = 6 + texture->width;
 
+	rgbaint_t polycolor(polydata.color);
+
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < zb[x])
+		if (z <= zb[x])
 		{
 			UINT32 texel;
 			TEX_FETCH();
@@ -2144,19 +2477,13 @@ void model3_renderer::draw_scanline_tex_contour(INT32 scanline, const extent_t &
 			UINT32 fa = texel >> 24;
 			if (fa >= 0xf8)
 			{
-				UINT32 r = ((texel & 0x00ff0000) * fa) >> 8;
-				UINT32 g = ((texel & 0x0000ff00) * fa) >> 8;
-				UINT32 b = ((texel & 0x000000ff) * fa) >> 8;
+				rgbaint_t color(texel);
 
-				UINT32 orig = fb[x];
+				color.scale_and_clamp(polycolor);
+				color.scale_imm_and_clamp((int)in);
+				color.blend(rgbaint_t(fb[x]), fa);
 
-				int minalpha = 255 - fa;
-
-				r += ((orig & 0x00ff0000) * minalpha) >> 8;
-				g += ((orig & 0x0000ff00) * minalpha) >> 8;
-				b += ((orig & 0x000000ff) * minalpha) >> 8;
-
-				fb[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
+				fb[x] = 0xff000000 | color.to_rgba_clamp();
 				zb[x] = z;
 			}
 		}
@@ -2186,37 +2513,28 @@ void model3_renderer::draw_scanline_tex_trans(INT32 scanline, const extent_t &ex
 	float in = extent.param[4].start;
 	float inz = extent.param[4].dpdx;
 
-	int srctrans = polydata.transparency;
-	int desttrans = 32 - polydata.transparency;
+	int trans = (polydata.transparency << 3) | (polydata.transparency >> 2);
 
 	UINT32 umask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_U) ? 64 : 32) << texture->width) - 1;
 	UINT32 vmask = (((polydata.texture_param & TRI_PARAM_TEXTURE_MIRROR_V) ? 64 : 32) << texture->height) - 1;
 	UINT32 width = 6 + texture->width;
 
+	rgbaint_t polycolor(polydata.color);
+
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < zb[x])
+		if (z <= zb[x])
 		{
 			UINT32 texel;
 			TEX_FETCH();
 
-			int ii = (int)in;
+			rgbaint_t color(texel);
 
-			UINT32 r = ((texel & 0x00ff0000) * ii) >> 8;
-			UINT32 g = ((texel & 0x0000ff00) * ii) >> 8;
-			UINT32 b = ((texel & 0x000000ff) * ii) >> 8;
+			color.scale_and_clamp(polycolor);
+			color.scale_imm_and_clamp((int)in);
+			color.blend(rgbaint_t(fb[x]), trans);
 
-			r = (r * srctrans) >> 5;
-			g = (g * srctrans) >> 5;
-			b = (b * srctrans) >> 5;
-
-			UINT32 orig = fb[x];
-
-			r += ((orig & 0x00ff0000) * desttrans) >> 5;
-			g += ((orig & 0x0000ff00) * desttrans) >> 5;
-			b += ((orig & 0x000000ff) * desttrans) >> 5;
-
-			fb[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
+			fb[x] = 0xff000000 | color.to_rgba_clamp();
 		}
 
 		ooz += dooz;
@@ -2253,7 +2571,7 @@ void model3_renderer::draw_scanline_tex_alpha(INT32 scanline, const extent_t &ex
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < zb[x])
+		if (z <= zb[x])
 		{
 			UINT32 texel;
 			TEX_FETCH();
@@ -2261,24 +2579,12 @@ void model3_renderer::draw_scanline_tex_alpha(INT32 scanline, const extent_t &ex
 			UINT32 fa = texel >> 24;
 			if (fa != 0)
 			{
-				int ii = (int)in;
+				rgbaint_t color(texel);
 
-				UINT32 r = ((texel & 0x00ff0000) * ii) >> 8;
-				UINT32 g = ((texel & 0x0000ff00) * ii) >> 8;
-				UINT32 b = ((texel & 0x000000ff) * ii) >> 8;
+				color.scale_imm_and_clamp((int)in);
+				color.blend(rgbaint_t(fb[x]), fa);
 
-				r = (r * fa) >> 8;
-				g = (g * fa) >> 8;
-				b = (b * fa) >> 8;
-
-				UINT32 orig = fb[x];
-
-				int minalpha = 255 - fa;
-				r += ((orig & 0x00ff0000) * minalpha) >> 8;
-				g += ((orig & 0x0000ff00) * minalpha) >> 8;
-				b += ((orig & 0x000000ff) * minalpha) >> 8;
-
-				fb[x] = 0xff000000 | (r & 0xff0000) | (g & 0xff00) | (b & 0xff);
+				fb[x] = 0xff000000 | color.to_rgba_clamp();
 			}
 		}
 

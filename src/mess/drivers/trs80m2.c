@@ -722,7 +722,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
+	MCFG_FD1791_ADD(FD1791_TAG, XTAL_8MHz/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITE8(Z80PIO_TAG, z80pio_device, pa_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
@@ -812,7 +812,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
+	MCFG_FD1791_ADD(FD1791_TAG, XTAL_8MHz/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITE8(Z80PIO_TAG, z80pio_device, pa_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)

@@ -18,59 +18,207 @@
     CONSTANTS
 ***************************************************************************/
 
+/**
+ * @def FILETYPE_READ
+ *
+ * @brief   A macro that defines filetype read.
+ */
+
 #define FILETYPE_READ           1
+
+/**
+ * @def FILETYPE_CREATE
+ *
+ * @brief   A macro that defines filetype create.
+ */
+
 #define FILETYPE_CREATE         2
 
+/** @brief  Size of the maximum riff. */
 #define MAX_RIFF_SIZE           (2UL * 1024 * 1024 * 1024 - 1024)   /* just under 2GB */
+/** @brief  The maximum avi size in gigabytes. */
 #define MAX_AVI_SIZE_IN_GB      (256)
+
+/**
+ * @def FOUR_GB
+ *
+ * @brief   A macro that defines four gigabytes.
+ */
+
 #define FOUR_GB                 ((UINT64)1 << 32)
 
+/**
+ * @def MAX_SOUND_CHANNELS
+ *
+ * @brief   A macro that defines maximum sound channels.
+ */
+
 #define MAX_SOUND_CHANNELS      2
+
+/**
+ * @def SOUND_BUFFER_MSEC
+ *
+ * @brief   A macro that defines sound buffer msec.
+ */
+
 #define SOUND_BUFFER_MSEC       2000        /* milliseconds of sound buffering */
 
+/** @brief  The chunktype riff. */
 #define CHUNKTYPE_RIFF          AVI_FOURCC('R','I','F','F')
+/** @brief  List of chunktypes. */
 #define CHUNKTYPE_LIST          AVI_FOURCC('L','I','S','T')
+/** @brief  The chunktype junk. */
 #define CHUNKTYPE_JUNK          AVI_FOURCC('J','U','N','K')
+/** @brief  The chunktype avih. */
 #define CHUNKTYPE_AVIH          AVI_FOURCC('a','v','i','h')
+/** @brief  The chunktype strh. */
 #define CHUNKTYPE_STRH          AVI_FOURCC('s','t','r','h')
+/** @brief  The chunktype strf. */
 #define CHUNKTYPE_STRF          AVI_FOURCC('s','t','r','f')
+/** @brief  The first chunktype index. */
 #define CHUNKTYPE_IDX1          AVI_FOURCC('i','d','x','1')
+/** @brief  The chunktype indx. */
 #define CHUNKTYPE_INDX          AVI_FOURCC('i','n','d','x')
+/** @brief  The chunktype xxdb. */
 #define CHUNKTYPE_XXDB          AVI_FOURCC(0x00,0x00,'d','b')
+/** @brief  The chunktype xxdc. */
 #define CHUNKTYPE_XXDC          AVI_FOURCC(0x00,0x00,'d','c')
+/** @brief  The chunktype xxwb. */
 #define CHUNKTYPE_XXWB          AVI_FOURCC(0x00,0x00,'w','b')
+/** @brief  The chunktype ixxx. */
 #define CHUNKTYPE_IXXX          AVI_FOURCC('i','x',0x00,0x00)
+/** @brief  The chunktype xx mask. */
 #define CHUNKTYPE_XX_MASK       AVI_FOURCC(0x00,0x00,0xff,0xff)
 
+/** @brief  The listtype avi. */
 #define LISTTYPE_AVI            AVI_FOURCC('A','V','I',' ')
+/** @brief  The listtype avix. */
 #define LISTTYPE_AVIX           AVI_FOURCC('A','V','I','X')
+/** @brief  The listtype hdrl. */
 #define LISTTYPE_HDRL           AVI_FOURCC('h','d','r','l')
+/** @brief  The listtype strl. */
 #define LISTTYPE_STRL           AVI_FOURCC('s','t','r','l')
+/** @brief  The listtype movi. */
 #define LISTTYPE_MOVI           AVI_FOURCC('m','o','v','i')
 
+/** @brief  The streamtype vids. */
 #define STREAMTYPE_VIDS         AVI_FOURCC('v','i','d','s')
+/** @brief  The streamtype auds. */
 #define STREAMTYPE_AUDS         AVI_FOURCC('a','u','d','s')
 
+/** @brief  The handler bitmap. */
 #define HANDLER_DIB             AVI_FOURCC('D','I','B',' ')
+/** @brief  The handler hfyu. */
 #define HANDLER_HFYU            AVI_FOURCC('h','f','y','u')
 
 /* main AVI header files */
+
+/**
+ * @def AVIF_HASINDEX
+ *
+ * @brief   A macro that defines avif hasindex.
+ */
+
 #define AVIF_HASINDEX           0x00000010
+
+/**
+ * @def AVIF_MUSTUSEINDEX
+ *
+ * @brief   A macro that defines avif mustuseindex.
+ */
+
 #define AVIF_MUSTUSEINDEX       0x00000020
+
+/**
+ * @def AVIF_ISINTERLEAVED
+ *
+ * @brief   A macro that defines avif isinterleaved.
+ */
+
 #define AVIF_ISINTERLEAVED      0x00000100
+
+/**
+ * @def AVIF_COPYRIGHTED
+ *
+ * @brief   A macro that defines avif copyrighted.
+ */
+
 #define AVIF_COPYRIGHTED        0x00010000
+
+/**
+ * @def AVIF_WASCAPTUREFILE
+ *
+ * @brief   A macro that defines avif wascapturefile.
+ */
+
 #define AVIF_WASCAPTUREFILE     0x00020000
 
 /* index definitions */
+
+/**
+ * @def AVI_INDEX_OF_INDEXES
+ *
+ * @brief   A macro that defines avi index of indexes.
+ */
+
 #define AVI_INDEX_OF_INDEXES    0x00
+
+/**
+ * @def AVI_INDEX_OF_CHUNKS
+ *
+ * @brief   A macro that defines avi index of chunks.
+ */
+
 #define AVI_INDEX_OF_CHUNKS     0x01
+
+/**
+ * @def AVI_INDEX_IS_DATA
+ *
+ * @brief   A macro that defines avi index is data.
+ */
+
 #define AVI_INDEX_IS_DATA       0x80
+
+/**
+ * @def AVI_INDEX_2FIELD
+ *
+ * @brief   A macro that defines avi index 2 field.
+ */
+
 #define AVI_INDEX_2FIELD        0x01
 
 /* HuffYUV definitions */
+
+/**
+ * @def HUFFYUV_PREDICT_LEFT
+ *
+ * @brief   A macro that defines huffyuv predict left.
+ */
+
 #define HUFFYUV_PREDICT_LEFT     0
+
+/**
+ * @def HUFFYUV_PREDICT_GRADIENT
+ *
+ * @brief   A macro that defines huffyuv predict gradient.
+ */
+
 #define HUFFYUV_PREDICT_GRADIENT 1
+
+/**
+ * @def HUFFYUV_PREDICT_MEDIAN
+ *
+ * @brief   A macro that defines huffyuv predict median.
+ */
+
 #define HUFFYUV_PREDICT_MEDIAN   2
+
+/**
+ * @def HUFFYUV_PREDICT_DECORR
+ *
+ * @brief   A macro that defines huffyuv predict decorr.
+ */
+
 #define HUFFYUV_PREDICT_DECORR   0x40
 
 
@@ -79,96 +227,177 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/**
+ * @struct  avi_chunk
+ *
+ * @brief   An avi chunk.
+ */
+
 struct avi_chunk
 {
+	/** @brief  The offset. */
 	UINT64              offset;                 /* file offset of chunk header */
+	/** @brief  The size. */
 	UINT64              size;                   /* size of this chunk */
+	/** @brief  The type. */
 	UINT32              type;                   /* type of this chunk */
+	/** @brief  The listtype. */
 	UINT32              listtype;               /* type of this list (if we are a list) */
 };
 
+/**
+ * @struct  avi_chunk_list
+ *
+ * @brief   List of avi chunks.
+ */
 
 struct avi_chunk_list
 {
+	/** @brief  The offset. */
 	UINT64              offset;                 /* offset in the file of header */
+	/** @brief  The length. */
 	UINT32              length;                 /* length of the chunk including header */
 };
 
+/**
+ * @struct  huffyuv_table
+ *
+ * @brief   A huffyuv table.
+ */
 
 struct huffyuv_table
 {
+	/** @brief  The shift[ 256]. */
 	UINT8               shift[256];             /* bit shift amounts */
+	/** @brief  The bits[ 256]. */
 	UINT32              bits[256];              /* bit match values */
+	/** @brief  The mask[ 256]. */
 	UINT32              mask[256];              /* bit mask values */
+	/** @brief  The baselookup[ 65536]. */
 	UINT16              baselookup[65536];      /* base lookup table */
+	/** @brief  The extralookup. */
 	UINT16 *            extralookup;            /* extra lookup tables */
 };
 
+/**
+ * @struct  huffyuv_data
+ *
+ * @brief   A huffyuv data.
+ */
 
 struct huffyuv_data
 {
+	/** @brief  The predictor. */
 	UINT8               predictor;              /* predictor */
+	/** @brief  The table[ 3]. */
 	huffyuv_table       table[3];               /* array of tables */
 };
 
+/**
+ * @struct  avi_stream
+ *
+ * @brief   An avi stream.
+ */
 
 struct avi_stream
 {
+	/** @brief  The type. */
 	UINT32              type;                   /* subtype of stream */
+	/** @brief  Describes the format to use. */
 	UINT32              format;                 /* format of stream data */
 
+	/** @brief  The rate. */
 	UINT32              rate;                   /* timescale for stream */
+	/** @brief  The scale. */
 	UINT32              scale;                  /* duration of one sample in the stream */
+	/** @brief  The samples. */
 	UINT32              samples;                /* number of samples */
 
+	/** @brief  The chunk. */
 	avi_chunk_list *    chunk;                  /* list of chunks */
+	/** @brief  The chunks. */
 	UINT32              chunks;                 /* chunks currently known */
+	/** @brief  The chunksalloc. */
 	UINT32              chunksalloc;            /* number of chunks allocated */
 
+	/** @brief  The width. */
 	UINT32              width;                  /* width of video */
+	/** @brief  The height. */
 	UINT32              height;                 /* height of video */
+	/** @brief  The depth. */
 	UINT32              depth;                  /* depth of video */
+	/** @brief  The interlace. */
 	UINT8               interlace;              /* interlace parameters */
+	/** @brief  The huffyuv. */
 	huffyuv_data *      huffyuv;                /* huffyuv decompression data */
 
+	/** @brief  The channels. */
 	UINT16              channels;               /* audio channels */
+	/** @brief  The samplebits. */
 	UINT16              samplebits;             /* audio bits per sample */
+	/** @brief  The samplerate. */
 	UINT32              samplerate;             /* audio sample rate */
 
 	/* only used when creating */
+	/** @brief  The saved strh offset. */
 	UINT64              saved_strh_offset;      /* writeoffset of strh chunk */
+	/** @brief  The saved indx offset. */
 	UINT64              saved_indx_offset;      /* writeoffset of indx chunk */
 };
 
+/**
+ * @struct  avi_file
+ *
+ * @brief   An avi file.
+ */
 
 struct avi_file
 {
 	/* shared data */
+	/** @brief  The file. */
 	osd_file *          file;                   /* pointer to open file */
+	/** @brief  The type. */
 	int                 type;                   /* type of access (read/create) */
+	/** @brief  The information. */
 	avi_movie_info      info;                   /* movie info structure */
+	/** @brief  The tempbuffer. */
 	UINT8 *             tempbuffer;             /* temporary buffer */
+	/** @brief  The tempbuffersize. */
 	UINT32              tempbuffersize;         /* size of the temporary buffer */
 
 	/* only used when reading */
+	/** @brief  The streams. */
 	int                 streams;                /* number of streams */
+	/** @brief  The stream. */
 	avi_stream *        stream;                 /* allocated array of stream information */
+	/** @brief  The rootchunk. */
 	avi_chunk           rootchunk;              /* dummy root chunk that wraps the whole file */
 
 	/* only used when creating */
+	/** @brief  The writeoffs. */
 	UINT64              writeoffs;              /* current file write offset */
+	/** @brief  The riffbase. */
 	UINT64              riffbase;               /* base of the current RIFF */
 
+	/** @brief  The chunkstack[ 8]. */
 	avi_chunk           chunkstack[8];          /* stack of chunks we are writing */
+	/** @brief  The chunksp. */
 	int                 chunksp;                /* stack pointer for the current chunk */
 
+	/** @brief  The saved movi offset. */
 	UINT64              saved_movi_offset;      /* writeoffset of movi list */
+	/** @brief  The saved avih offset. */
 	UINT64              saved_avih_offset;      /* writeoffset of avih chunk */
 
+	/** @brief  The soundbuf. */
 	INT16 *             soundbuf;               /* buffer for sound data */
+	/** @brief  The soundbuf samples. */
 	UINT32              soundbuf_samples;       /* length of sound buffer in samples */
+	/** @brief  The soundbuf chansamples[ maximum sound channels]. */
 	UINT32              soundbuf_chansamples[MAX_SOUND_CHANNELS]; /* samples in buffer for each channel */
+	/** @brief  The soundbuf chunks. */
 	UINT32              soundbuf_chunks;        /* number of chunks completed so far */
+	/** @brief  The soundbuf frames. */
 	UINT32              soundbuf_frames;        /* number of frames ahead of the video */
 };
 
@@ -241,6 +470,16 @@ static void printf_chunk_recursive(avi_file *file, avi_chunk *chunk, int indent)
     from the given buffer
 -------------------------------------------------*/
 
+/**
+ * @fn  INLINE UINT16 fetch_16bits(const UINT8 *data)
+ *
+ * @brief   Fetches the 16bits.
+ *
+ * @param   data    The data.
+ *
+ * @return  The 16bits.
+ */
+
 INLINE UINT16 fetch_16bits(const UINT8 *data)
 {
 	return data[0] | (data[1] << 8);
@@ -252,6 +491,16 @@ INLINE UINT16 fetch_16bits(const UINT8 *data)
     from the given buffer
 -------------------------------------------------*/
 
+/**
+ * @fn  INLINE UINT32 fetch_32bits(const UINT8 *data)
+ *
+ * @brief   Fetches the 32bits.
+ *
+ * @param   data    The data.
+ *
+ * @return  The 32bits.
+ */
+
 INLINE UINT32 fetch_32bits(const UINT8 *data)
 {
 	return data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
@@ -262,6 +511,16 @@ INLINE UINT32 fetch_32bits(const UINT8 *data)
     fetch_64bits - read 64 bits in LSB order
     from the given buffer
 -------------------------------------------------*/
+
+/**
+ * @fn  INLINE UINT64 fetch_64bits(const UINT8 *data)
+ *
+ * @brief   Fetches the 64bits.
+ *
+ * @param   data    The data.
+ *
+ * @return  The 64bits.
+ */
 
 INLINE UINT64 fetch_64bits(const UINT8 *data)
 {
@@ -277,6 +536,15 @@ INLINE UINT64 fetch_64bits(const UINT8 *data)
     to the given buffer
 -------------------------------------------------*/
 
+/**
+ * @fn  INLINE void put_16bits(UINT8 *data, UINT16 value)
+ *
+ * @brief   Puts the 16bits.
+ *
+ * @param [in,out]  data    If non-null, the data.
+ * @param   value           The value.
+ */
+
 INLINE void put_16bits(UINT8 *data, UINT16 value)
 {
 	data[0] = value >> 0;
@@ -288,6 +556,15 @@ INLINE void put_16bits(UINT8 *data, UINT16 value)
     put_32bits - write 32 bits in LSB order
     to the given buffer
 -------------------------------------------------*/
+
+/**
+ * @fn  INLINE void put_32bits(UINT8 *data, UINT32 value)
+ *
+ * @brief   Puts the 32bits.
+ *
+ * @param [in,out]  data    If non-null, the data.
+ * @param   value           The value.
+ */
 
 INLINE void put_32bits(UINT8 *data, UINT32 value)
 {
@@ -302,6 +579,15 @@ INLINE void put_32bits(UINT8 *data, UINT32 value)
     put_64bits - write 64 bits in LSB order
     to the given buffer
 -------------------------------------------------*/
+
+/**
+ * @fn  INLINE void put_64bits(UINT8 *data, UINT64 value)
+ *
+ * @brief   Puts the 64bits.
+ *
+ * @param [in,out]  data    If non-null, the data.
+ * @param   value           The value.
+ */
 
 INLINE void put_64bits(UINT8 *data, UINT64 value)
 {
@@ -321,6 +607,16 @@ INLINE void put_64bits(UINT8 *data, UINT64 value)
     video stream
 -------------------------------------------------*/
 
+/**
+ * @fn  INLINE avi_stream *get_video_stream(avi_file *file)
+ *
+ * @brief   Gets video stream.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  null if it fails, else the video stream.
+ */
+
 INLINE avi_stream *get_video_stream(avi_file *file)
 {
 	int streamnum;
@@ -338,6 +634,18 @@ INLINE avi_stream *get_video_stream(avi_file *file)
     get_audio_stream - return a pointer to the
     audio stream for the 'n'th channel
 -------------------------------------------------*/
+
+/**
+ * @fn  INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
+ *
+ * @brief   Gets audio stream.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   channel         The channel.
+ * @param [in,out]  offset  If non-null, the offset.
+ *
+ * @return  null if it fails, else the audio stream.
+ */
 
 INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
 {
@@ -364,6 +672,19 @@ INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
     set_stream_chunk_info - set the chunk info
     for a given chunk within a stream
 -------------------------------------------------*/
+
+/**
+ * @fn  INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
+ *
+ * @brief   Sets stream chunk information.
+ *
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param   index           Zero-based index of the.
+ * @param   offset          The offset.
+ * @param   length          The length.
+ *
+ * @return  An avi_error.
+ */
 
 INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
 {
@@ -398,6 +719,16 @@ INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 
     idx1 chunk
 -------------------------------------------------*/
 
+/**
+ * @fn  INLINE UINT32 compute_idx1_size(avi_file *file)
+ *
+ * @brief   Calculates the index 1 size.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  The calculated index 1 size.
+ */
+
 INLINE UINT32 compute_idx1_size(avi_file *file)
 {
 	int chunks = 0;
@@ -415,6 +746,17 @@ INLINE UINT32 compute_idx1_size(avi_file *file)
     get_chunkid_for_stream - make a chunk id for
     a given stream
 -------------------------------------------------*/
+
+/**
+ * @fn  INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
+ *
+ * @brief   Gets chunkid for stream.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  stream  If non-null, the stream.
+ *
+ * @return  The chunkid for stream.
+ */
 
 INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
 {
@@ -435,6 +777,17 @@ INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
     number, get the first sample number
 -------------------------------------------------*/
 
+/**
+ * @fn  INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
+ *
+ * @brief   Framenum to samplenum.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   framenum        The framenum.
+ *
+ * @return  An UINT32.
+ */
+
 INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
 {
 	return ((UINT64)file->info.audio_samplerate * (UINT64)framenum * (UINT64)file->info.video_sampletime + file->info.video_timescale - 1) / (UINT64)file->info.video_timescale;
@@ -446,6 +799,17 @@ INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
     tempbuffer if necessary to contain the
     requested amount of data
 -------------------------------------------------*/
+
+/**
+ * @fn  INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
+ *
+ * @brief   Expand tempbuffer.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   length          The length.
+ *
+ * @return  An avi_error.
+ */
 
 INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
 {
@@ -472,6 +836,17 @@ INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
 /*-------------------------------------------------
     avi_open - open an AVI movie file for read
 -------------------------------------------------*/
+
+/**
+ * @fn  avi_error avi_open(const char *filename, avi_file **file)
+ *
+ * @brief   Queries if a given avi open.
+ *
+ * @param   filename        Filename of the file.
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  An avi_error.
+ */
 
 avi_error avi_open(const char *filename, avi_file **file)
 {
@@ -524,6 +899,18 @@ error:
 /*-------------------------------------------------
     avi_create - create a new AVI movie file
 -------------------------------------------------*/
+
+/**
+ * @fn  avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file **file)
+ *
+ * @brief   Avi create.
+ *
+ * @param   filename        Filename of the file.
+ * @param   info            The information.
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  An avi_error.
+ */
 
 avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file **file)
 {
@@ -632,6 +1019,16 @@ error:
     avi_close - close an AVI movie file
 -------------------------------------------------*/
 
+/**
+ * @fn  avi_error avi_close(avi_file *file)
+ *
+ * @brief   Avi close.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  An avi_error.
+ */
+
 avi_error avi_close(avi_file *file)
 {
 	avi_error avierr = AVIERR_NONE;
@@ -706,6 +1103,14 @@ avi_error avi_close(avi_file *file)
     avi_printf_chunks - print the chunks in a file
 -------------------------------------------------*/
 
+/**
+ * @fn  void avi_printf_chunks(avi_file *file)
+ *
+ * @brief   Avi printf chunks.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ */
+
 void avi_printf_chunks(avi_file *file)
 {
 	printf_chunk_recursive(file, &file->rootchunk, 0);
@@ -716,6 +1121,16 @@ void avi_printf_chunks(avi_file *file)
     avi_error_string - get the error string for
     an avi_error
 -------------------------------------------------*/
+
+/**
+ * @fn  const char *avi_error_string(avi_error err)
+ *
+ * @brief   Avi error string.
+ *
+ * @param   err The error.
+ *
+ * @return  null if it fails, else a char*.
+ */
 
 const char *avi_error_string(avi_error err)
 {
@@ -748,6 +1163,16 @@ const char *avi_error_string(avi_error err)
     movie info
 -------------------------------------------------*/
 
+/**
+ * @fn  const avi_movie_info *avi_get_movie_info(avi_file *file)
+ *
+ * @brief   Avi get movie information.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  null if it fails, else an avi_movie_info*.
+ */
+
 const avi_movie_info *avi_get_movie_info(avi_file *file)
 {
 	return &file->info;
@@ -758,6 +1183,17 @@ const avi_movie_info *avi_get_movie_info(avi_file *file)
     avi_frame_to_sample - convert a frame index
     to a sample index
 -------------------------------------------------*/
+
+/**
+ * @fn  UINT32 avi_first_sample_in_frame(avi_file *file, UINT32 framenum)
+ *
+ * @brief   Avi first sample in frame.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   framenum        The framenum.
+ *
+ * @return  An UINT32.
+ */
 
 UINT32 avi_first_sample_in_frame(avi_file *file, UINT32 framenum)
 {
@@ -770,6 +1206,18 @@ UINT32 avi_first_sample_in_frame(avi_file *file, UINT32 framenum)
     for a particular frame from the AVI file,
     converting to YUY16 format
 -------------------------------------------------*/
+
+/**
+ * @fn  avi_error avi_read_video_frame(avi_file *file, UINT32 framenum, bitmap_yuy16 &bitmap)
+ *
+ * @brief   Avi read video frame.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   framenum        The framenum.
+ * @param [in,out]  bitmap  The bitmap.
+ *
+ * @return  An avi_error.
+ */
 
 avi_error avi_read_video_frame(avi_file *file, UINT32 framenum, bitmap_yuy16 &bitmap)
 {
@@ -828,6 +1276,20 @@ avi_error avi_read_video_frame(avi_file *file, UINT32 framenum, bitmap_yuy16 &bi
     avi_read_sound_samples - read sound sample
     data from an AVI file
 -------------------------------------------------*/
+
+/**
+ * @fn  avi_error avi_read_sound_samples(avi_file *file, int channel, UINT32 firstsample, UINT32 numsamples, INT16 *output)
+ *
+ * @brief   Avi read sound samples.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   channel         The channel.
+ * @param   firstsample     The firstsample.
+ * @param   numsamples      The numsamples.
+ * @param [in,out]  output  If non-null, the output.
+ *
+ * @return  An avi_error.
+ */
 
 avi_error avi_read_sound_samples(avi_file *file, int channel, UINT32 firstsample, UINT32 numsamples, INT16 *output)
 {
@@ -935,6 +1397,17 @@ avi_error avi_read_sound_samples(avi_file *file, int channel, UINT32 firstsample
     of video in YUY16 format
 -------------------------------------------------*/
 
+/**
+ * @fn  avi_error avi_append_video_frame(avi_file *file, bitmap_yuy16 &bitmap)
+ *
+ * @brief   Avi append video frame.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  bitmap  The bitmap.
+ *
+ * @return  An avi_error.
+ */
+
 avi_error avi_append_video_frame(avi_file *file, bitmap_yuy16 &bitmap)
 {
 	avi_stream *stream = get_video_stream(file);
@@ -981,6 +1454,17 @@ avi_error avi_append_video_frame(avi_file *file, bitmap_yuy16 &bitmap)
     avi_append_video_frame_rgb32 - append a frame
     of video in RGB32 format
 -------------------------------------------------*/
+
+/**
+ * @fn  avi_error avi_append_video_frame(avi_file *file, bitmap_rgb32 &bitmap)
+ *
+ * @brief   Avi append video frame.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  bitmap  The bitmap.
+ *
+ * @return  An avi_error.
+ */
 
 avi_error avi_append_video_frame(avi_file *file, bitmap_rgb32 &bitmap)
 {
@@ -1033,6 +1517,20 @@ avi_error avi_append_video_frame(avi_file *file, bitmap_rgb32 &bitmap)
     samples
 -------------------------------------------------*/
 
+/**
+ * @fn  avi_error avi_append_sound_samples(avi_file *file, int channel, const INT16 *samples, UINT32 numsamples, UINT32 sampleskip)
+ *
+ * @brief   Avi append sound samples.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   channel         The channel.
+ * @param   samples         The samples.
+ * @param   numsamples      The numsamples.
+ * @param   sampleskip      The sampleskip.
+ *
+ * @return  An avi_error.
+ */
+
 avi_error avi_append_sound_samples(avi_file *file, int channel, const INT16 *samples, UINT32 numsamples, UINT32 sampleskip)
 {
 	UINT32 sampoffset = file->soundbuf_chansamples[channel];
@@ -1062,6 +1560,18 @@ avi_error avi_append_sound_samples(avi_file *file, int channel, const INT16 *sam
     memory
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error read_chunk_data(avi_file *file, const avi_chunk *chunk, UINT8 **buffer)
+ *
+ * @brief   Reads chunk data.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   chunk           The chunk.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ *
+ * @return  The chunk data.
+ */
+
 static avi_error read_chunk_data(avi_file *file, const avi_chunk *chunk, UINT8 **buffer)
 {
 	file_error filerr;
@@ -1090,6 +1600,18 @@ static avi_error read_chunk_data(avi_file *file, const avi_chunk *chunk, UINT8 *
     first chunk in a container
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error get_first_chunk(avi_file *file, const avi_chunk *parent, avi_chunk *newchunk)
+ *
+ * @brief   Gets the first chunk.
+ *
+ * @param [in,out]  file        If non-null, the file.
+ * @param   parent              The parent.
+ * @param [in,out]  newchunk    If non-null, the newchunk.
+ *
+ * @return  The first chunk.
+ */
+
 static avi_error get_first_chunk(avi_file *file, const avi_chunk *parent, avi_chunk *newchunk)
 {
 	UINT64 startoffset = (parent != NULL && parent->type != 0) ? parent->offset + 12 : 0;
@@ -1104,6 +1626,18 @@ static avi_error get_first_chunk(avi_file *file, const avi_chunk *parent, avi_ch
     next chunk in a container
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error get_next_chunk(avi_file *file, const avi_chunk *parent, avi_chunk *newchunk)
+ *
+ * @brief   Gets the next chunk.
+ *
+ * @param [in,out]  file        If non-null, the file.
+ * @param   parent              The parent.
+ * @param [in,out]  newchunk    If non-null, the newchunk.
+ *
+ * @return  The next chunk.
+ */
+
 static avi_error get_next_chunk(avi_file *file, const avi_chunk *parent, avi_chunk *newchunk)
 {
 	UINT64 nextoffset = newchunk->offset + 8 + newchunk->size + (newchunk->size & 1);
@@ -1115,6 +1649,19 @@ static avi_error get_next_chunk(avi_file *file, const avi_chunk *parent, avi_chu
     find_first_chunk - get information about the
     first chunk of a particular type in a container
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error find_first_chunk(avi_file *file, UINT32 findme, const avi_chunk *container, avi_chunk *result)
+ *
+ * @brief   Searches for the first chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   findme          The findme.
+ * @param   container       The container.
+ * @param [out] result      If non-null, the result.
+ *
+ * @return  The found chunk.
+ */
 
 static avi_error find_first_chunk(avi_file *file, UINT32 findme, const avi_chunk *container, avi_chunk *result)
 {
@@ -1133,6 +1680,19 @@ static avi_error find_first_chunk(avi_file *file, UINT32 findme, const avi_chunk
     next chunk of a particular type in a container
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error find_next_chunk(avi_file *file, UINT32 findme, const avi_chunk *container, avi_chunk *result)
+ *
+ * @brief   Searches for the next chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   findme          The findme.
+ * @param   container       The container.
+ * @param [out] result      If non-null, the result.
+ *
+ * @return  The found chunk.
+ */
+
 static avi_error find_next_chunk(avi_file *file, UINT32 findme, const avi_chunk *container, avi_chunk *result)
 {
 	avi_error avierr;
@@ -1149,6 +1709,19 @@ static avi_error find_next_chunk(avi_file *file, UINT32 findme, const avi_chunk 
     find_first_list - get information about the
     first list of a particular type in a container
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error find_first_list(avi_file *file, UINT32 findme, const avi_chunk *container, avi_chunk *result)
+ *
+ * @brief   Searches for the first list.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   findme          The findme.
+ * @param   container       The container.
+ * @param [out] result      If non-null, the result.
+ *
+ * @return  The found list.
+ */
 
 static avi_error find_first_list(avi_file *file, UINT32 findme, const avi_chunk *container, avi_chunk *result)
 {
@@ -1167,6 +1740,19 @@ static avi_error find_first_list(avi_file *file, UINT32 findme, const avi_chunk 
     next list of a particular type in a container
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error find_next_list(avi_file *file, UINT32 findme, const avi_chunk *container, avi_chunk *result)
+ *
+ * @brief   Searches for the next list.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   findme          The findme.
+ * @param   container       The container.
+ * @param [out] result      If non-null, the result.
+ *
+ * @return  The found list.
+ */
+
 static avi_error find_next_list(avi_file *file, UINT32 findme, const avi_chunk *container, avi_chunk *result)
 {
 	avi_error avierr;
@@ -1183,6 +1769,19 @@ static avi_error find_next_list(avi_file *file, UINT32 findme, const avi_chunk *
     get_next_chunk_internal - fetch the next
     chunk relative to the current one
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error get_next_chunk_internal(avi_file *file, const avi_chunk *parent, avi_chunk *newchunk, UINT64 offset)
+ *
+ * @brief   Gets the next chunk internal.
+ *
+ * @param [in,out]  file        If non-null, the file.
+ * @param   parent              The parent.
+ * @param [in,out]  newchunk    If non-null, the newchunk.
+ * @param   offset              The offset.
+ *
+ * @return  The next chunk internal.
+ */
 
 static avi_error get_next_chunk_internal(avi_file *file, const avi_chunk *parent, avi_chunk *newchunk, UINT64 offset)
 {
@@ -1226,6 +1825,16 @@ static avi_error get_next_chunk_internal(avi_file *file, const avi_chunk *parent
 /*-------------------------------------------------
     read_movie_data - get data about a movie
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error read_movie_data(avi_file *file)
+ *
+ * @brief   Reads movie data.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  The movie data.
+ */
 
 static avi_error read_movie_data(avi_file *file)
 {
@@ -1328,6 +1937,16 @@ error:
     from the streams we've read
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error extract_movie_info(avi_file *file)
+ *
+ * @brief   Extracts the movie information described by file.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  The extracted movie information.
+ */
+
 static avi_error extract_movie_info(avi_file *file)
 {
 	//avi_stream *audiostream;
@@ -1389,6 +2008,17 @@ static avi_error extract_movie_info(avi_file *file)
     chunk
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error parse_avih_chunk(avi_file *file, avi_chunk *avih)
+ *
+ * @brief   Parse avih chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  avih    If non-null, the avih.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error parse_avih_chunk(avi_file *file, avi_chunk *avih)
 {
 	UINT8 *chunkdata = NULL;
@@ -1420,6 +2050,18 @@ error:
     chunk
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error parse_strh_chunk(avi_file *file, avi_stream *stream, avi_chunk *strh)
+ *
+ * @brief   Parse strh chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param [in,out]  strh    If non-null, the strh.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error parse_strh_chunk(avi_file *file, avi_stream *stream, avi_chunk *strh)
 {
 	UINT8 *chunkdata = NULL;
@@ -1447,6 +2089,18 @@ error:
     parse_strf_chunk - parse a strf header
     chunk
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error parse_strf_chunk(avi_file *file, avi_stream *stream, avi_chunk *strf)
+ *
+ * @brief   Parse strf chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param [in,out]  strf    If non-null, the strf.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error parse_strf_chunk(avi_file *file, avi_stream *stream, avi_chunk *strf)
 {
@@ -1491,6 +2145,18 @@ error:
 /*-------------------------------------------------
     parse_indx_chunk - parse an indx chunk
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk *strf)
+ *
+ * @brief   Parse indx chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param [in,out]  strf    If non-null, the strf.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk *strf)
 {
@@ -1582,6 +2248,18 @@ error:
     parse_idx1_chunk - parse an idx1 chunk
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error parse_idx1_chunk(avi_file *file, UINT64 baseoffset, avi_chunk *idx1)
+ *
+ * @brief   Parse index 1 chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   baseoffset      The baseoffset.
+ * @param [in,out]  idx1    If non-null, the first index.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error parse_idx1_chunk(avi_file *file, UINT64 baseoffset, avi_chunk *idx1)
 {
 	UINT8 *chunkdata = NULL;
@@ -1631,6 +2309,19 @@ error:
 /*-------------------------------------------------
     chunk_open - open a new chunk for writing
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error chunk_open(avi_file *file, UINT32 type, UINT32 listtype, UINT32 estlength)
+ *
+ * @brief   Queries if a given chunk open.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   type            The type.
+ * @param   listtype        The listtype.
+ * @param   estlength       The estlength.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error chunk_open(avi_file *file, UINT32 type, UINT32 listtype, UINT32 estlength)
 {
@@ -1690,6 +2381,16 @@ static avi_error chunk_open(avi_file *file, UINT32 type, UINT32 listtype, UINT32
     chunk_close - finish writing an chunk
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error chunk_close(avi_file *file)
+ *
+ * @brief   Chunk close.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error chunk_close(avi_file *file)
 {
 	avi_chunk *chunk = &file->chunkstack[--file->chunksp];
@@ -1722,6 +2423,19 @@ static avi_error chunk_close(avi_file *file)
 /*-------------------------------------------------
     chunk_write - write an chunk and its data
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error chunk_write(avi_file *file, UINT32 type, const void *data, UINT32 length)
+ *
+ * @brief   Chunk write.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   type            The type.
+ * @param   data            The data.
+ * @param   length          The length.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error chunk_write(avi_file *file, UINT32 type, const void *data, UINT32 length)
 {
@@ -1794,6 +2508,21 @@ static avi_error chunk_write(avi_file *file, UINT32 type, const void *data, UINT
     original
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error chunk_overwrite(avi_file *file, UINT32 type, const void *data, UINT32 length, UINT64 *offset, int initial_write)
+ *
+ * @brief   Chunk overwrite.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   type            The type.
+ * @param   data            The data.
+ * @param   length          The length.
+ * @param [in,out]  offset  If non-null, the offset.
+ * @param   initial_write   The initial write.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error chunk_overwrite(avi_file *file, UINT32 type, const void *data, UINT32 length, UINT64 *offset, int initial_write)
 {
 	UINT64 savedoffset = 0;
@@ -1825,6 +2554,16 @@ static avi_error chunk_overwrite(avi_file *file, UINT32 type, const void *data, 
     write_initial_headers - write out the inital
     set of AVI and stream headers
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error write_initial_headers(avi_file *file)
+ *
+ * @brief   Writes an initial headers.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error write_initial_headers(avi_file *file)
 {
@@ -1898,6 +2637,17 @@ static avi_error write_initial_headers(avi_file *file)
     chunk
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error write_avih_chunk(avi_file *file, int initial_write)
+ *
+ * @brief   Writes an avih chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   initial_write   The initial write.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error write_avih_chunk(avi_file *file, int initial_write)
 {
 	avi_stream *video = get_video_stream(file);
@@ -1922,6 +2672,18 @@ static avi_error write_avih_chunk(avi_file *file, int initial_write)
     write_strh_chunk - write the strh header
     chunk
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error write_strh_chunk(avi_file *file, avi_stream *stream, int initial_write)
+ *
+ * @brief   Writes a strh chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param   initial_write   The initial write.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error write_strh_chunk(avi_file *file, avi_stream *stream, int initial_write)
 {
@@ -1965,6 +2727,17 @@ static avi_error write_strh_chunk(avi_file *file, avi_stream *stream, int initia
     write_strf_chunk - write the strf header
     chunk
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error write_strf_chunk(avi_file *file, avi_stream *stream)
+ *
+ * @brief   Writes a strf chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  stream  If non-null, the stream.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error write_strf_chunk(avi_file *file, avi_stream *stream)
 {
@@ -2018,6 +2791,18 @@ static avi_error write_strf_chunk(avi_file *file, avi_stream *stream)
     write_indx_chunk - write the indx header
     chunk
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error write_indx_chunk(avi_file *file, avi_stream *stream, int initial_write)
+ *
+ * @brief   Writes an indx chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param   initial_write   The initial write.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error write_indx_chunk(avi_file *file, avi_stream *stream, int initial_write)
 {
@@ -2115,6 +2900,16 @@ static avi_error write_indx_chunk(avi_file *file, avi_stream *stream, int initia
     write_idx1_chunk - write the idx1 chunk
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error write_idx1_chunk(avi_file *file)
+ *
+ * @brief   Writes an index 1 chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error write_idx1_chunk(avi_file *file)
 {
 	UINT32 tempbuflength = compute_idx1_size(file) - 8;
@@ -2164,6 +2959,16 @@ static avi_error write_idx1_chunk(avi_file *file)
     buffering system
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error soundbuf_initialize(avi_file *file)
+ *
+ * @brief   Soundbuf initialize.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error soundbuf_initialize(avi_file *file)
 {
 	avi_stream *audio = get_audio_stream(file, 0, NULL);
@@ -2197,6 +3002,17 @@ static avi_error soundbuf_initialize(avi_file *file)
     chunk data
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error soundbuf_write_chunk(avi_file *file, UINT32 framenum)
+ *
+ * @brief   Soundbuf write chunk.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   framenum        The framenum.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error soundbuf_write_chunk(avi_file *file, UINT32 framenum)
 {
 	avi_stream *stream = get_audio_stream(file, 0, NULL);
@@ -2228,6 +3044,17 @@ static avi_error soundbuf_write_chunk(avi_file *file, UINT32 framenum)
     soundbuf_flush - flush data from the sound
     buffers
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error soundbuf_flush(avi_file *file, int only_flush_full)
+ *
+ * @brief   Soundbuf flush.
+ *
+ * @param [in,out]  file    If non-null, the file.
+ * @param   only_flush_full The only flush full.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error soundbuf_flush(avi_file *file, int only_flush_full)
 {
@@ -2322,6 +3149,19 @@ static avi_error soundbuf_flush(avi_file *file, int only_flush_full)
     bitmap to an RGB encoded frame
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error rgb32_compress_to_rgb(avi_stream *stream, const bitmap_rgb32 &bitmap, UINT8 *data, UINT32 numbytes)
+ *
+ * @brief   RGB 32 compress to RGB.
+ *
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param   bitmap          The bitmap.
+ * @param [in,out]  data    If non-null, the data.
+ * @param   numbytes        The numbytes.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error rgb32_compress_to_rgb(avi_stream *stream, const bitmap_rgb32 &bitmap, UINT8 *data, UINT32 numbytes)
 {
 	int height = MIN(stream->height, bitmap.height());
@@ -2373,6 +3213,19 @@ static avi_error rgb32_compress_to_rgb(avi_stream *stream, const bitmap_rgb32 &b
     encoded frame to a YUY16 bitmap
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error yuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *data, UINT32 numbytes, bitmap_yuy16 &bitmap)
+ *
+ * @brief   Yuv decompress to yuy 16.
+ *
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param   data            The data.
+ * @param   numbytes        The numbytes.
+ * @param [in,out]  bitmap  The bitmap.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error yuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *data, UINT32 numbytes, bitmap_yuy16 &bitmap)
 {
 	const UINT16 *dataend = (const UINT16 *)(data + numbytes);
@@ -2412,6 +3265,19 @@ static avi_error yuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *data, 
     bitmap to a YUV encoded frame
 -------------------------------------------------*/
 
+/**
+ * @fn  static avi_error yuy16_compress_to_yuy(avi_stream *stream, const bitmap_yuy16 &bitmap, UINT8 *data, UINT32 numbytes)
+ *
+ * @brief   Yuy 16 compress to yuy.
+ *
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param   bitmap          The bitmap.
+ * @param [in,out]  data    If non-null, the data.
+ * @param   numbytes        The numbytes.
+ *
+ * @return  An avi_error.
+ */
+
 static avi_error yuy16_compress_to_yuy(avi_stream *stream, const bitmap_yuy16 &bitmap, UINT8 *data, UINT32 numbytes)
 {
 	const UINT16 *dataend = (const UINT16 *)(data + numbytes);
@@ -2450,6 +3316,18 @@ static avi_error yuy16_compress_to_yuy(avi_stream *stream, const bitmap_yuy16 &b
     huffyuv_extract_tables - extract HuffYUV
     tables
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error huffyuv_extract_tables(avi_stream *stream, const UINT8 *chunkdata, UINT32 size)
+ *
+ * @brief   Huffyuv extract tables.
+ *
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param   chunkdata       The chunkdata.
+ * @param   size            The size.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error huffyuv_extract_tables(avi_stream *stream, const UINT8 *chunkdata, UINT32 size)
 {
@@ -2589,6 +3467,19 @@ error:
     huffyuv_decompress_to_yuy16 - decompress a
     HuffYUV-encoded frame to a YUY16 bitmap
 -------------------------------------------------*/
+
+/**
+ * @fn  static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *data, UINT32 numbytes, bitmap_yuy16 &bitmap)
+ *
+ * @brief   Huffyuv decompress to yuy 16.
+ *
+ * @param [in,out]  stream  If non-null, the stream.
+ * @param   data            The data.
+ * @param   numbytes        The numbytes.
+ * @param [in,out]  bitmap  The bitmap.
+ *
+ * @return  An avi_error.
+ */
 
 static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *data, UINT32 numbytes, bitmap_yuy16 &bitmap)
 {
@@ -2793,6 +3684,14 @@ static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *da
 	return AVIERR_NONE;
 }
 
+/**
+ * @fn  static void u64toa(UINT64 val, char *output)
+ *
+ * @brief   64toas.
+ *
+ * @param   val             The value.
+ * @param [in,out]  output  If non-null, the output.
+ */
 
 static void u64toa(UINT64 val, char *output)
 {
@@ -2809,6 +3708,16 @@ static void u64toa(UINT64 val, char *output)
     printf_chunk_recursive - print information
     about a chunk recursively
 -------------------------------------------------*/
+
+/**
+ * @fn  static void printf_chunk_recursive(avi_file *file, avi_chunk *container, int indent)
+ *
+ * @brief   Printf chunk recursive.
+ *
+ * @param [in,out]  file        If non-null, the file.
+ * @param [in,out]  container   If non-null, the container.
+ * @param   indent              The indent.
+ */
 
 static void printf_chunk_recursive(avi_file *file, avi_chunk *container, int indent)
 {

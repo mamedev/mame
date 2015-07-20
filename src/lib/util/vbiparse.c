@@ -276,6 +276,18 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
     frame
 -------------------------------------------------*/
 
+/**
+ * @fn  void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, int sourceshift, vbi_metadata *vbi)
+ *
+ * @brief   Vbi parse all.
+ *
+ * @param   source          Source for the.
+ * @param   sourcerowpixels The sourcerowpixels.
+ * @param   sourcewidth     The sourcewidth.
+ * @param   sourceshift     The sourceshift.
+ * @param [in,out]  vbi     If non-null, the vbi.
+ */
+
 void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, int sourceshift, vbi_metadata *vbi)
 {
 	UINT32 bits[2][24];
@@ -338,6 +350,16 @@ void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, i
     into a smaller form for storage
 -------------------------------------------------*/
 
+/**
+ * @fn  void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
+ *
+ * @brief   Vbi metadata pack.
+ *
+ * @param [in,out]  dest    If non-null, destination for the.
+ * @param   framenum        The framenum.
+ * @param   vbi             The vbi.
+ */
+
 void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
 {
 	dest[0] = framenum >> 16;
@@ -363,6 +385,16 @@ void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
     vbi_metadata_unpack - unpack the VBI data
     from a smaller form into the full structure
 -------------------------------------------------*/
+
+/**
+ * @fn  void vbi_metadata_unpack(vbi_metadata *vbi, UINT32 *framenum, const UINT8 *source)
+ *
+ * @brief   Vbi metadata unpack.
+ *
+ * @param [in,out]  vbi         If non-null, the vbi.
+ * @param [in,out]  framenum    If non-null, the framenum.
+ * @param   source              Source for the.
+ */
 
 void vbi_metadata_unpack(vbi_metadata *vbi, UINT32 *framenum, const UINT8 *source)
 {

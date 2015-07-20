@@ -10,14 +10,14 @@
 /* The collision detection techniques use in this driver
    are well explained in the comments in the sprint2 driver */
 
-WRITE8_MEMBER(starcrus_state::starcrus_s1_x_w){ m_s1_x = data^0xff; }
-WRITE8_MEMBER(starcrus_state::starcrus_s1_y_w){ m_s1_y = data^0xff; }
-WRITE8_MEMBER(starcrus_state::starcrus_s2_x_w){ m_s2_x = data^0xff; }
-WRITE8_MEMBER(starcrus_state::starcrus_s2_y_w){ m_s2_y = data^0xff; }
-WRITE8_MEMBER(starcrus_state::starcrus_p1_x_w){ m_p1_x = data^0xff; }
-WRITE8_MEMBER(starcrus_state::starcrus_p1_y_w){ m_p1_y = data^0xff; }
-WRITE8_MEMBER(starcrus_state::starcrus_p2_x_w){ m_p2_x = data^0xff; }
-WRITE8_MEMBER(starcrus_state::starcrus_p2_y_w){ m_p2_y = data^0xff; }
+WRITE8_MEMBER(starcrus_state::s1_x_w){ m_s1_x = data^0xff; }
+WRITE8_MEMBER(starcrus_state::s1_y_w){ m_s1_y = data^0xff; }
+WRITE8_MEMBER(starcrus_state::s2_x_w){ m_s2_x = data^0xff; }
+WRITE8_MEMBER(starcrus_state::s2_y_w){ m_s2_y = data^0xff; }
+WRITE8_MEMBER(starcrus_state::p1_x_w){ m_p1_x = data^0xff; }
+WRITE8_MEMBER(starcrus_state::p1_y_w){ m_p1_y = data^0xff; }
+WRITE8_MEMBER(starcrus_state::p2_x_w){ m_p2_x = data^0xff; }
+WRITE8_MEMBER(starcrus_state::p2_y_w){ m_p2_y = data^0xff; }
 
 void starcrus_state::video_start()
 {
@@ -26,9 +26,33 @@ void starcrus_state::video_start()
 
 	m_proj1_vid = auto_bitmap_ind16_alloc(machine(), 16, 16);
 	m_proj2_vid = auto_bitmap_ind16_alloc(machine(), 16, 16);
+	
+	save_item(NAME(m_s1_x));
+	save_item(NAME(m_s1_y));
+	save_item(NAME(m_s2_x));
+	save_item(NAME(m_s2_y));
+	save_item(NAME(m_p1_x));
+	save_item(NAME(m_p1_y));
+	save_item(NAME(m_p2_x));
+	save_item(NAME(m_p2_y));
+	save_item(NAME(m_p1_sprite));
+	save_item(NAME(m_p2_sprite));
+	save_item(NAME(m_s1_sprite));
+	save_item(NAME(m_s2_sprite));
+	save_item(NAME(m_engine1_on));
+	save_item(NAME(m_engine2_on));
+	save_item(NAME(m_explode1_on));
+	save_item(NAME(m_explode2_on));
+	save_item(NAME(m_launch1_on));
+	save_item(NAME(m_launch2_on));
+	save_item(NAME(m_collision_reg));
+	save_item(NAME(m_engine_sound_playing));
+	save_item(NAME(m_explode_sound_playing));
+	save_item(NAME(m_launch1_sound_playing));
+	save_item(NAME(m_launch2_sound_playing));
 }
 
-WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_1_w)
+WRITE8_MEMBER(starcrus_state::ship_parm_1_w)
 {
 	m_s1_sprite = data&0x1f;
 	m_engine1_on = ((data&0x20)>>5)^0x01;
@@ -51,7 +75,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_1_w)
 	}
 }
 
-WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_2_w)
+WRITE8_MEMBER(starcrus_state::ship_parm_2_w)
 {
 	m_s2_sprite = data&0x1f;
 	set_led_status(machine(), 2,~data & 0x80);          /* game over lamp */
@@ -77,7 +101,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_2_w)
 
 }
 
-WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
+WRITE8_MEMBER(starcrus_state::proj_parm_1_w)
 {
 	m_p1_sprite = data&0x0f;
 	m_launch1_on = ((data&0x20)>>5)^0x01;
@@ -114,7 +138,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 	}
 }
 
-WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_2_w)
+WRITE8_MEMBER(starcrus_state::proj_parm_2_w)
 {
 	m_p2_sprite = data&0x0f;
 	m_launch2_on = ((data&0x20)>>5)^0x01;
@@ -390,7 +414,7 @@ int starcrus_state::collision_check_s2p1p2()
 	return 0;
 }
 
-UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 starcrus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -465,7 +489,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-READ8_MEMBER(starcrus_state::starcrus_coll_det_r)
+READ8_MEMBER(starcrus_state::coll_det_r)
 {
 	return m_collision_reg ^ 0xff;
 }

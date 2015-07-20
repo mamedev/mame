@@ -437,7 +437,7 @@ offs_t dsp32c_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 
 inline UINT32 dsp32c_device::ROPCODE(offs_t pc)
 {
-	return m_direct->read_decrypted_dword(pc);
+	return m_direct->read_dword(pc);
 }
 
 inline UINT8 dsp32c_device::RBYTE(offs_t addr)

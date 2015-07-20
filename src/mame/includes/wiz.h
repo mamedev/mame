@@ -25,7 +25,8 @@ public:
 		m_attrram(*this, "attrram"),
 		m_attrram2(*this, "attrram2"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2")
+		m_spriteram2(*this, "spriteram2"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -42,6 +43,7 @@ public:
 	required_shared_ptr<UINT8> m_attrram2;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	INT32 m_flipx;
 	INT32 m_flipy;

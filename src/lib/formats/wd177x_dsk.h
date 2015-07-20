@@ -43,11 +43,16 @@ public:
 	virtual bool supports_save() const;
 
 protected:
+	enum { FM_DAM = 0xf56f, FM_DDAM = 0xf56a, MFM_DAM = 0xfb, MFM_DDAM = 0xf8 };
+
 	const format *formats;
+
 	virtual floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
 	virtual int find_size(io_generic *io, UINT32 form_factor);
 	virtual int get_image_offset(const format &f, int head, int track);
+	virtual int get_track_dam_fm(const format &f, int head, int track);
+	virtual int get_track_dam_mfm(const format &f, int head, int track);
 
 	int compute_track_size(const format &f) const;
 	void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors) const;

@@ -81,6 +81,7 @@
 #include "machine/upd765.h" /* for floppy disc controller */
 #include "cpu/z80/z80.h"
 #include "formats/hect_dsk.h"
+#include "formats/hector_minidisc.h"
 #include "includes/hec2hrp.h"
 
 /*****************************************************************************/
@@ -176,7 +177,8 @@ static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// Minidisc commands and changing the rom page !*/
-	AM_RANGE(0x000,0x0EF) AM_READWRITE(hector_179x_register_r,hector_179x_register_w)/* 179x registers*/
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("wd179x", fd1793_t, read, write)
+	AM_RANGE(0x08, 0x08) AM_WRITE(minidisc_control_w)
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
@@ -356,7 +358,6 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
 	hector_init();
-	hector_minidisc_init();
 }
 MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
 {
@@ -385,12 +386,14 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
 /********* mini disque interface ***************************/
 /***********************************************************/
 
-const floppy_interface minidisc_floppy_interface =
-{
-	FLOPPY_STANDARD_3_5_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(hector_minidisc),
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( hec2hrp_state::minidisc_formats )
+	FLOPPY_HMD_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( minidisc_floppies )
+	SLOT_INTERFACE("dd", FLOPPY_35_DD)
+SLOT_INTERFACE_END
+
 
 /******************************************************************************/
 static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
@@ -567,10 +570,9 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
 	/* Mini Disc */
-	MCFG_DEVICE_ADD("wd179x", FD1793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE1_TAGS
+	MCFG_FD1793_ADD("wd179x", XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, minidisc_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

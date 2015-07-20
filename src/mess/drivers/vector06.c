@@ -9,6 +9,7 @@
 ****************************************************************************/
 
 #include "includes/vector06.h"
+#include "formats/vector06_dsk.h"
 
 
 /* Address maps */
@@ -23,10 +24,10 @@ static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
 	AM_RANGE( 0x00, 0x03) AM_READWRITE(vector06_8255_1_r, vector06_8255_1_w )
 	AM_RANGE( 0x04, 0x07) AM_READWRITE(vector06_8255_2_r, vector06_8255_2_w )
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE(vector06_color_set)
-	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", fd1793_device, data_r, data_w)
-	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", fd1793_device, sector_r, sector_w)
-	AM_RANGE( 0x1A, 0x1A) AM_DEVREADWRITE("wd1793", fd1793_device, track_r, track_w)
-	AM_RANGE( 0x1B, 0x1B) AM_DEVREADWRITE("wd1793", fd1793_device, status_r, command_w)
+	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", fd1793_t, data_r, data_w)
+	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", fd1793_t, sector_r, sector_w)
+	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", fd1793_t, track_r, track_w)
+	AM_RANGE( 0x1b, 0x1b) AM_DEVREADWRITE("wd1793", fd1793_t, status_r, cmd_w)
 	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector06_disc_w)
 ADDRESS_MAP_END
 
@@ -119,21 +120,15 @@ static INPUT_PORTS_START( vector06 )
 
 INPUT_PORTS_END
 
-static LEGACY_FLOPPY_OPTIONS_START(vector)
-	LEGACY_FLOPPY_OPTION(vector, "fdd", "Vector disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([82])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
 
-static const floppy_interface vector_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(vector),
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( vector06_state::floppy_formats )
+	FLOPPY_VECTOR06_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( vector06_floppies )
+	SLOT_INTERFACE("qd", FLOPPY_525_QD)
+SLOT_INTERFACE_END
+
 
 /* Machine driver */
 static MACHINE_CONFIG_START( vector06, vector06_state )
@@ -176,11 +171,10 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_DEVICE_ADD("wd1793", FD1793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
-	MCFG_WD17XX_DDEN_CALLBACK(VCC)
+	MCFG_FD1793_ADD("wd1793", XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vector06_cart")

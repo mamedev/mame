@@ -23,7 +23,7 @@ public:
 
 }
 
-UNITTEST_STDVECTOR_LINKAGE(UnitTest::DeferredTestFailure);
+UNITTEST_STDVECTOR_LINKAGE(UnitTest::DeferredTestFailure)
 
 namespace UnitTest
 {
@@ -34,14 +34,14 @@ public:
 	DeferredTestResult();
     DeferredTestResult(char const* suite, char const* test);
     ~DeferredTestResult();
-    
+
     std::string suiteName;
     std::string testName;
     std::string failureFile;
-    
+
     typedef std::vector< DeferredTestFailure > FailureVec;
     FailureVec failures;
-    
+
     float timeElapsed;
 	bool failed;
 };

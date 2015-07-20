@@ -166,7 +166,7 @@ public:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// address spaces
-	const address_space_config m_program_config;
+	const address_space_config m_program_config, m_oprogram_config;
 
 	void define_state(void);
 
@@ -175,7 +175,6 @@ public:
 	void set_rte_callback(write_line_delegate callback);
 	void set_tas_write_callback(write8_delegate callback);
 	UINT16 get_fc();
-	void set_encrypted_opcode_range(offs_t start, offs_t end);
 	void set_hmmu_enable(int enable);
 	void set_instruction_hook(read32_delegate ihook);
 	void set_buserror_details(UINT32 fault_addr, UINT8 rw, UINT8 fc);
@@ -263,7 +262,7 @@ public:
                                                             allowing writeback to be disabled globally or selectively
                                                             or other side effects to be implemented */
 
-	address_space *program;
+	address_space *program, *oprogram;
 
 	/* Redirect memory calls */
 
@@ -278,11 +277,11 @@ public:
 //  class m68k_memory_interface
 //  {
 	public:
-		void init8(address_space &space);
-		void init16(address_space &space);
-		void init32(address_space &space);
-		void init32mmu(address_space &space);
-		void init32hmmu(address_space &space);
+		void init8(address_space &space, address_space &ospace);
+		void init16(address_space &space, address_space &ospace);
+		void init32(address_space &space, address_space &ospace);
+		void init32mmu(address_space &space, address_space &ospace);
+		void init32hmmu(address_space &space, address_space &ospace);
 
 		offs_t  opcode_xor;                     // Address Calculation
 		m68k_readimm16_delegate readimm16;      // Immediate read 16 bit
@@ -322,11 +321,8 @@ public:
 	public:
 //  m68k_memory_interface memory;
 
-	address_space *m_space;
-	direct_read_data *m_direct;
-
-	offs_t encrypted_start;
-	offs_t encrypted_end;
+	address_space *m_space, *m_ospace;
+	direct_read_data *m_direct, *m_odirect;
 
 	UINT32      iotemp;
 

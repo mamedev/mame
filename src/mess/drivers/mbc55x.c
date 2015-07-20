@@ -32,12 +32,6 @@ const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 	{ 0x80,0x80,0x80 }, /* light grey */
 };
 
-static const floppy_interface mbc55x_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSSD_35,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	"floppy_5_25"
-};
 
 static ADDRESS_MAP_START(mbc55x_mem, AS_PROGRAM, 8, mbc55x_state)
 	AM_RANGE( 0x00000, 0x0FFFF ) AM_RAMBANK(RAM_BANK00_TAG)
@@ -224,6 +218,23 @@ PALETTE_INIT_MEMBER(mbc55x_state, mbc55x)
 }
 
 
+FLOPPY_FORMATS_MEMBER( mbc55x_state::floppy_formats )
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
+
+
+// MBC-550 : 1 x 5.25" disk-drive (160 KB)
+// MBC-555 : 2 x 5.25" disk-drive (160 KB)
+// MBC-555-2 : 2 x 5.25" disk-drive (360 KB)
+// MBC-555-3 : 2 x 5.25" disk-drive (720 KB)
+
+static SLOT_INTERFACE_START( mbc55x_floppies )
+	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
+	SLOT_INTERFACE("dd", FLOPPY_525_DD)
+	SLOT_INTERFACE("qd", FLOPPY_525_QD)
+SLOT_INTERFACE_END
+
+
 static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8088, 3600000)
@@ -281,13 +292,12 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
-	MCFG_DEVICE_ADD(FDC_TAG, FD1793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(mbc55x_state, mbc55x_fdc_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(mbc55x_state, mbc55x_fdc_drq_w))
-	MCFG_WD17XX_DDEN_CALLBACK(GND)
+	MCFG_FD1793_ADD(FDC_TAG, XTAL_1MHz)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mbc55x_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":2", mbc55x_floppies, "", mbc55x_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", mbc55x_floppies, "", mbc55x_state::floppy_formats)
 
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")

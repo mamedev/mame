@@ -40,7 +40,7 @@
 */
 
 #include "machine/upd765.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76477.h"   /* for sn sound*/
@@ -83,7 +83,12 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this,"videoram"),
 		m_hector_videoram(*this,"hector_videoram") ,
-		m_keyboard(*this, "KEY") { }
+		m_keyboard(*this, "KEY"),
+		m_minidisc_fdc(*this, "wd179x"),
+		m_floppy0(*this, "wd179x:0")
+	{}
+
+	DECLARE_FLOPPY_FORMATS(minidisc_formats);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;
@@ -93,6 +98,9 @@ public:
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_hector_videoram;
 	required_ioport_array<9> m_keyboard;
+
+	optional_device<fd1793_t> m_minidisc_fdc;
+	optional_device<floppy_connector> m_floppy0;
 
 	UINT8 m_hector_flag_hr;
 	UINT8 m_hector_flag_80c;
@@ -131,8 +139,9 @@ public:
 	int m_hector_flag_result;
 	int m_print;
 	UINT8 m_hector_videoram_hrx[0x04000];
-	DECLARE_READ8_MEMBER(hector_179x_register_r);
-	DECLARE_WRITE8_MEMBER(hector_179x_register_w);
+
+	DECLARE_WRITE8_MEMBER(minidisc_control_w);
+
 	DECLARE_WRITE8_MEMBER(hector_switch_bank_w);
 	DECLARE_WRITE8_MEMBER(hector_keyboard_w);
 	DECLARE_READ8_MEMBER(hector_keyboard_r);
@@ -162,7 +171,6 @@ public:
 	int isHectorWithMiniDisc();
 	int isHectorHR();
 	int isHectoreXtend();
-	void hector_minidisc_init();
 	void Mise_A_Jour_Etat(int Adresse, int Value );
 	void Init_Value_SN76477_Hector();
 	void Update_Sound(address_space &space, UINT8 data);
@@ -187,7 +195,5 @@ public:
 
 	void hector_disc2_reset();
 };
-
-extern const floppy_interface minidisc_floppy_interface;
 
 MACHINE_CONFIG_EXTERN( hector_audio );

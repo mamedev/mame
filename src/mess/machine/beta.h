@@ -50,7 +50,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
-	required_device<wd2793_t> m_wd179x;
+	required_device<kr1818vg93_t> m_wd179x;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
