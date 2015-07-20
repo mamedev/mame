@@ -144,20 +144,13 @@ static INPUT_PORTS_START( osborne1 )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(osborne1_state, osborne1)
-{
-	palette.set_pen_color( 0, 0, 0, 0 ); /* Black */
-	palette.set_pen_color( 1, 0, 255, 0 );   /* Full */
-	palette.set_pen_color( 2, 0, 128, 0 );   /* Dimmed */
-}
-
-
 static const z80_daisy_config osborne1_daisy_chain[] =
 {
 /*  { osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 }, */
 	{ "osborne1_daisy" },
 	{ NULL }
 };
+
 
 /*
  * The Osborne-1 supports the following disc formats:
@@ -168,45 +161,12 @@ static const z80_daisy_config osborne1_daisy_chain[] =
  * - DEC 1820 double density: 40 tracks, 9 sectors per track, 512-byte sectors (180 KByte)
  *
  */
-	/*
-static LEGACY_FLOPPY_OPTIONS_START(osborne1 )
-	LEGACY_FLOPPY_OPTION( osd, "img", "Osborne single density", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([10])
-	    SECTOR_LENGTH([256])
-	    FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( odd, "img", "Osborne double density", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([5])
-	    SECTOR_LENGTH([1024])
-	    FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( ibm, "img", "IBM Personal Computer", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([8])
-	    SECTOR_LENGTH([512])
-	    FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( xerox, "img", "Xerox 820 Computer", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([18])
-	    SECTOR_LENGTH([128])
-	    FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( dec, "img", "DEC 1820 double density", basicdsk_identify_default, basicdsk_construct_default, NULL,
-	    HEADS([1])
-	    TRACKS([40])
-	    SECTORS([9])
-	    SECTOR_LENGTH([512])
-	    FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-*/
 
 static SLOT_INTERFACE_START( osborne1_floppies )
 	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD ) // Siemens FDD 100-5, custom Osborne electronics
 	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD ) // MPI 52(?), custom Osborne electronics
 SLOT_INTERFACE_END
+
 
 /* F4 Character Displayer */
 static const gfx_layout osborne1_charlayout =
@@ -226,6 +186,7 @@ static GFXDECODE_START( osborne1 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, osborne1_charlayout, 0, 1 )
 GFXDECODE_END
 
+
 static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP( osborne1_mem)
@@ -239,8 +200,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osborne1)
-	MCFG_PALETTE_ADD( "palette", 3 )
-	MCFG_PALETTE_INIT_OWNER(osborne1_state, osborne1)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
@@ -261,7 +221,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
 
-	MCFG_DEVICE_ADD("mb8877", MB8877x, MAIN_CLOCK/16)
+	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/16)
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)

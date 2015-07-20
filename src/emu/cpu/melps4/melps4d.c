@@ -18,10 +18,10 @@
 enum e_mnemonics
 {
 	em_ILL,
-	em_TAB, em_TBA, em_TAY, em_TYA, em_TEAB, em_TEPA, em_TXA, em_TAX,
+	em_TAB, em_TBA, em_TAY, em_TYA, em_TEAB, em_TABE, em_TEPA, em_TXA, em_TAX,
 	em_LXY, em_LZ, em_INY, em_DEY, em_LCPS, em_SADR,
 	em_TAM, em_XAM, em_XAMD, em_XAMI,
-	em_LA, em_AM, em_AMC, em_AMCS, em_A, em_SC, em_RC, em_SZC, em_CMA,
+	em_LA, em_AM, em_AMC, em_AMCS, em_A, em_SC, em_RC, em_SZC, em_CMA, em_RL, em_RR,
 	em_SB, em_RB, em_SZB, em_SEAM, em_SEY,
 	em_TLA, em_THA, em_TAJ, em_XAL, em_XAH, em_LC7, em_DEC, em_SHL, em_RHL, em_CPA, em_CPAS, em_CPAE, em_SZJ,
 	em_T1AB, em_TRAB, em_T2AB, em_TAB1, em_TABR, em_TAB2, em_TVA, em_TWA, em_SNZ1, em_SNZ2,
@@ -33,10 +33,10 @@ enum e_mnemonics
 static const char *const em_name[] =
 {
 	"?",
-	"TAB", "TBA", "TAY", "TYA", "TEAB", "TEPA", "TXA", "TAX",
+	"TAB", "TBA", "TAY", "TYA", "TEAB", "TABE", "TEPA", "TXA", "TAX",
 	"LXY", "LZ", "INY", "DEY", "LCPS", "SADR",
 	"TAM", "XAM", "XAMD", "XAMI",
-	"LA", "AM", "AMC", "AMCS", "A", "SC", "RC", "SZC", "CMA",
+	"LA", "AM", "AMC", "AMCS", "A", "SC", "RC", "SZC", "CMA", "RL", "RR",
 	"SB", "RB", "SZB", "SEAM", "SEY",
 	"TLA", "THA", "TAJ", "XAL", "XAH", "LC7", "DEC", "SHL", "RHL", "CPA", "CPAS", "CPAE", "SZJ",
 	"T1AB", "TRAB", "T2AB", "TAB1", "TABR", "TAB2", "TVA", "TWA", "SNZ1", "SNZ2",
@@ -49,10 +49,10 @@ static const char *const em_name[] =
 static const UINT8 em_bits[] =
 {
 	0,
-	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	6, 1, 0, 0, 1, 2,
 	2, 2, 2, 2,
-	4, 0, 0, 0, 4, 0, 0, 0, 0,
+	4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0,
 	2, 2, 2, 0, 4,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -67,10 +67,10 @@ static const UINT8 em_bits[] =
 static const UINT32 em_flags[] =
 {
 	0,
-	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -86,8 +86,8 @@ static const UINT32 em_flags[] =
 static const UINT8 m58846_opmap[0xc0] =
 {
 //  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
-	em_NOP,  em_BA,   em_INY,  em_DEY,  em_DI,   em_EI,   em_RU,   em_SU,   0,       0,       em_AM,   em_OSE,  em_TYA,  0,       0,       em_CMA,  // 0x
-	em_CLS,  em_CLDS, 0,       em_CLD,  em_RD,   em_SD,   em_TEPA, em_OSPA, 0,       0,       em_TEAB, em_OSAB, em_TBA,  em_TAY,  em_TAB,  0,       // 1x
+	em_NOP,  em_BA,   em_INY,  em_DEY,  em_DI,   em_EI,   em_RU,   em_SU,   0,       em_TABE, em_AM,   em_OSE,  em_TYA,  0,       0,       em_CMA,  // 0x
+	em_CLS,  em_CLDS, 0,       em_CLD,  em_RD,   em_SD,   em_TEPA, em_OSPA, em_RL,   em_RR,   em_TEAB, em_OSAB, em_TBA,  em_TAY,  em_TAB,  0,       // 1x
 	em_SZB,  em_SZB,  em_SZB,  em_SZB,  0,       0,       em_SEAM, 0,       0,       0,       0,       em_SZD,  0,       0,       0,       em_SZC,  // 2x
 	em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  em_SEY,  // 3x
 	em_LCPS, em_LCPS, 0,       em_AMC,  em_RT,   em_RTS,  em_RTI,  0,       em_RC,   em_SC,   em_LZ,   em_LZ,   em_SB,   em_SB,   em_SB,   em_SB,   // 4x

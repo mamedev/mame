@@ -2929,4 +2929,4 @@ bool render_target::init(renderer *d3d, base *d3dintf, int width, int height, in
 	return true;
 }
 
-};
+}

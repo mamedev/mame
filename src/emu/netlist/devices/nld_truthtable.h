@@ -24,6 +24,26 @@
 		static const char *m_desc[];                                                \
 	}
 
+#define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
+	{ \
+	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(_in, _out, _has_state, \
+			# _name, # _name, "+" _def_params);
+
+#define TT_HEAD(_x) \
+	ttd->m_desc.add(_x);
+
+#define TT_LINE(_x) \
+	ttd->m_desc.add(_x);
+
+#define TT_FAMILY(_x) \
+	ttd->m_family = netlist::logic_family_desc_t::from_model(setup.get_model_str(_x));
+
+#define TRUTHTABLE_END() \
+	setup.factory().register_device(ttd); \
+	}
+
+NETLIB_NAMESPACE_DEVICES_START()
+
 #if 0
 static inline UINT32 remove_first_bit(UINT32 v)
 {
@@ -71,7 +91,7 @@ private:
 };
 
 template<unsigned m_NI, unsigned m_NO, int has_state>
-class nld_truthtable_t : public netlist_device_t
+class nld_truthtable_t : public device_t
 {
 public:
 
@@ -90,7 +110,7 @@ public:
 	};
 
 	nld_truthtable_t(truthtable_t *ttbl, const char *desc[])
-	: netlist_device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
+	: device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
 	{
 		while (*desc != NULL && **desc != 0 )
 			{
@@ -101,7 +121,7 @@ public:
 	}
 
 	nld_truthtable_t(truthtable_t *ttbl, const pstring_list_t &desc)
-	: netlist_device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
+	: device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl)
 	{
 		m_desc = desc;
 	}
@@ -121,7 +141,7 @@ public:
 		for (unsigned i=0; i < m_NI; i++)
 		{
 			inout[i] = inout[i].trim();
-			register_input(inout[i], m_i[i]);
+			register_input(inout[i], m_I[i]);
 		}
 		for (unsigned i=0; i < m_NO; i++)
 		{
@@ -138,7 +158,7 @@ public:
 			if (idx>=0)
 			{
 				//printf("connecting %s %d\n", out[i].cstr(), idx);
-				connect(m_Q[i], m_i[idx]);
+				connect_late(m_Q[i], m_I[idx]);
 				// disable ignore for this inputs altogether.
 				// FIXME: This shouldn't be necessary
 				disabled_ignore |= (1<<idx);
@@ -157,16 +177,17 @@ public:
 		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero; k++)
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
 #endif
-		// FIXME: save state
 		save(NLNAME(m_last_state));
 		save(NLNAME(m_ign));
 		save(NLNAME(m_active));
-
 	}
 
 	void reset()
 	{
 		m_active = 0;
+		m_ign = 0;
+		for (unsigned i = 0; i < m_NI; i++)
+			m_I[i].activate();
 		for (unsigned i=0; i<m_NO;i++)
 			if (this->m_Q[i].net().num_cons()>0)
 				m_active++;
@@ -181,27 +202,28 @@ public:
 		UINT32 state = 0;
 		for (unsigned i = 0; i < m_NI; i++)
 		{
-			if (!doOUT || (m_ign & (1<<i)) != 0)
-				m_i[i].activate();
+			if (!doOUT || (m_ign & (1<<i)))
+				m_I[i].activate();
 		}
 		for (unsigned i = 0; i < m_NI; i++)
 		{
-			state |= (INPLOGIC(m_i[i]) << i);
+			state |= (INPLOGIC(m_I[i]) << i);
 			if (!doOUT)
-				if (this->m_i[i].net().time() > mt)
-					mt = this->m_i[i].net().time();
+				if (this->m_I[i].net().time() > mt)
+					mt = this->m_I[i].net().time();
 		}
 
 		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);
-		const UINT32 out = m_ttp->m_outs[nstate] & ((1 << m_NO) - 1);
-		m_ign = m_ttp->m_outs[nstate] >> m_NO;
+		const UINT32 outstate = m_ttp->m_outs[nstate];
+		const UINT32 out = outstate & ((1 << m_NO) - 1);
+		m_ign = outstate >> m_NO;
 		if (has_state)
 			m_last_state = (state << m_NO) | out;
 
 #if 0
 		for (int i = 0; i < m_NI; i++)
 			if (m_ign & (1 << i))
-				m_i[i].inactivate();
+				m_I[i].inactivate();
 #endif
 		const UINT32 timebase = nstate * m_NO;
 		if (doOUT)
@@ -213,10 +235,12 @@ public:
 			for (unsigned i = 0; i < m_NO; i++)
 				m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 
-		for (unsigned i = 0; i < m_NI; i++)
-			if (m_ign & (1 << i))
-				m_i[i].inactivate();
-
+		if (m_NI > 1 || has_state)
+		{
+			for (unsigned i = 0; i < m_NI; i++)
+				if (m_ign & (1 << i))
+					m_I[i].inactivate();
+		}
 	}
 
 	ATTR_HOT void update()
@@ -237,16 +261,27 @@ public:
 	ATTR_HOT void dec_active()
 	{
 		nl_assert(netlist().use_deactivate());
-		if (has_state == 0)
+		/* FIXME:
+		 * Based on current measurements there is no point to disable
+		 * 1 input devices. This should actually be a parameter so that we
+		 * can decide for each individual gate whether it is benefitial to
+		 * ignore deactivation.
+		 */
+		if (m_NI < 2)
+			return;
+		else if (has_state == 0)
+		{
 			if (--m_active == 0)
 			{
 				for (unsigned i = 0; i< m_NI; i++)
-					m_i[i].inactivate();
+					m_I[i].inactivate();
+				m_ign = (1<<m_NI)-1;
 			}
+		}
 	}
 
-	netlist_logic_input_t m_i[m_NI];
-	netlist_logic_output_t m_Q[m_NO];
+	logic_input_t m_I[m_NI];
+	logic_output_t m_Q[m_NO];
 
 private:
 
@@ -258,31 +293,40 @@ private:
 	pstring_list_t m_desc;
 };
 
-class netlist_base_factory_truthtable_t : public netlist_base_factory_t
+class netlist_base_factory_truthtable_t : public base_factory_t
 {
-	NETLIST_PREVENT_COPYING(netlist_base_factory_truthtable_t)
+	P_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 public:
 	netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
-	: netlist_base_factory_t(name, classname, def_param)
+	: base_factory_t(name, classname, def_param), m_family(netlist_family_TTL)
 	{}
+
+	virtual ~netlist_base_factory_truthtable_t()
+	{
+		if (!m_family->m_is_static)
+			pfree(m_family);
+	}
+
 	pstring_list_t m_desc;
+	logic_family_desc_t *m_family;
 };
 
 
 template<unsigned m_NI, unsigned m_NO, int has_state>
 class netlist_factory_truthtable_t : public netlist_base_factory_truthtable_t
 {
-	NETLIST_PREVENT_COPYING(netlist_factory_truthtable_t)
+	P_PREVENT_COPYING(netlist_factory_truthtable_t)
 public:
 	netlist_factory_truthtable_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	netlist_device_t *Create()
+	device_t *Create()
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
-		netlist_device_t *r = palloc(tt_type, &m_ttbl, m_desc);
+		device_t *r = palloc(tt_type(&m_ttbl, m_desc));
+		r->set_logic_family(m_family);
 		//r->init(setup, name);
 		return r;
 	}
@@ -295,20 +339,8 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 		const pstring &name, const pstring &classname,
 		const pstring &def_param);
 
-#define TRUTHTABLE_START(_name, _in, _out, _has_state, _def_params) \
-	{ \
-	netlist_base_factory_truthtable_t *ttd = nl_tt_factory_create(_in, _out, _has_state, \
-			# _name, # _name, "+" _def_params);
+NETLIB_NAMESPACE_DEVICES_END()
 
-#define TT_HEAD(_x) \
-	ttd->m_desc.add(_x);
-
-#define TT_LINE(_x) \
-	ttd->m_desc.add(_x);
-
-#define TRUTHTABLE_END() \
-	setup.factory().register_device(ttd); \
-	}
 
 
 #endif /* NLD_TRUTHTABLE_H_ */

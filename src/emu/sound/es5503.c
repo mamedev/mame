@@ -128,9 +128,10 @@ void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator, int resshi
 
 		*accumulator = altram << resshift;
 	}
+	int omode = (pPartner->control>>1) & 3;
 
 	// if swap mode, start the partner
-	if (mode == MODE_SWAP)
+	if ((mode == MODE_SWAP) || (omode == MODE_SWAP))
 	{
 		pPartner->control &= ~1;    // clear the halt bit
 		pPartner->accumulator = 0;  // and make sure it starts from the top (does this also need phase preservation?)
@@ -183,9 +184,9 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 					// channel strobe is always valid when reading; this allows potentially banking per voice
 					m_channel_strobe = (ctrl>>4) & 0xf;
-					data = (INT32)m_direct->read_raw_byte(ramptr + wtptr) ^ 0x80;
+					data = (INT32)m_direct->read_byte(ramptr + wtptr) ^ 0x80;
 
-					if (m_direct->read_raw_byte(ramptr + wtptr) == 0x00)
+					if (m_direct->read_byte(ramptr + wtptr) == 0x00)
 					{
 						halt_osc(osc, 1, &acc, resshift);
 					}

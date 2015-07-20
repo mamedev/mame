@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Raphael Nabet
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /****************************************************************************
 
     vzdos.c

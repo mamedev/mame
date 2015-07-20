@@ -13,13 +13,6 @@
 
 #include "flopimg.h"
 
-/**************************************************************************/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(m20);
-
-
-#include "wd177x_dsk.h"
-
 class m20_format : public floppy_image_format_t {
 public:
 	m20_format();

@@ -296,7 +296,7 @@ void cirrus_gd5428_device::start_bitblt()
 				else
 				{
 					UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
-				
+
 					copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 					if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
 						m_blt_source_current++;
@@ -1403,7 +1403,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 				if(svga.rgb8_en)
 				{
 					if(data & (0x01 << (7-i)))
-						vga.memory[((addr+offset)*8+i) % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;  
+						vga.memory[((addr+offset)*8+i) % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;
 				}
 				else if(svga.rgb15_en || svga.rgb16_en)
 				{

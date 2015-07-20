@@ -1379,8 +1379,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5513" />
 		<info name="alt_title" value="アルカザール" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="alcazar - the forgotten fortress (japan).rom" size="16384" crc="3ee454b0" sha1="807676038cbba043b8099eba9c5840a4811a7e59" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -2211,21 +2214,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5502" />
 		<info name="alt_title" value="ビームライダー" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="beam rider (japan).rom" size="32768" crc="1553e408" sha1="1231984ae24bf35f9f38596b864420d8ccd3f30b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="beamridra" cloneof="beamridr">
-		<description>Beam Rider (Jpn, Alt)</description>
-		<year>1984</year>
-		<publisher>Pony Canyon</publisher>
-		<info name="serial" value="R48X5502" />
-		<info name="alt_title" value="ビームライダー" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="beam rider (japan) (alt 1).rom" size="16384" crc="d6a6bee6" sha1="f51f936887498d21f6ee9fe8a7701633be67e79d" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -4155,20 +4148,11 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="R48X5506" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="decathlon (japan).rom" size="32768" crc="cd016b93" sha1="a1656f612360a126e09ef2baaa8002d92054125d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="decathlna" cloneof="decathln">
-		<description>Decathlon (Jpn, Alt)</description>
-		<year>1984</year>
-		<publisher>Pony Canyon</publisher>
-		<info name="serial" value="R48X5506" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="decathlon (japan) (alt 1).rom" size="16384" crc="f99b1c22" sha1="5d43cb6ca89f31d5f543e4dcd3fa9987b9769602" offset="0" />
+			<dataarea name="rom" size="65536">
+				<rom name="decathlon (japan).rom" size="16384" crc="f99b1c22" sha1="5d43cb6ca89f31d5f543e4dcd3fa9987b9769602" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -5983,8 +5967,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5505" />
 		<info name="alt_title" value="ヒーロー" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="h.e.r.o. (japan).rom" size="32768" crc="8fdad3af" sha1="ebb70722f75279911cce79e6bd78b8f514561b0f" offset="0" />
+			<dataarea name="rom" size="65536">
+				<rom name="h.e.r.o. (japan).rom" size="16384" crc="97ab0d70" sha1="6fbb385147a939a7e6b47f5945d8e3b671a8c065" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -7016,21 +7003,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5503" />
 		<info name="alt_title" value="キーストンケーパーズ" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="keystone kapers (japan).rom" size="32768" crc="7ff117f9" sha1="fb4724b8159beae132f89f394f71ce3934a61ae2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keykapera" cloneof="keykaper">
-		<description>Keystone Kapers (Jpn, Alt)</description>
-		<year>1984</year>
-		<publisher>Pony Canyon</publisher>
-		<info name="serial" value="R48X5503" />
-		<info name="alt_title" value="キーストンケーパーズ" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="keystone kapers (japan) (alt 1).rom" size="16384" crc="b1cf2097" sha1="3d5160331beb1c5cc54ba6ecef6b3ce2ff4660b6" offset="0" />
+			<dataarea name="rom" size="65536">
+				<rom name="keystone kapers (japan).rom" size="16384" crc="b1cf2097" sha1="3d5160331beb1c5cc54ba6ecef6b3ce2ff4660b6" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -9659,8 +9636,11 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="パストファインダー" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="pastfinder (japan).rom" size="16384" crc="d6d8d1d7" sha1="8117ec66c0645a54422841a632cfd6602f35c4f9" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -9981,8 +9961,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5508" />
 		<info name="alt_title" value="ピットフォールII" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="pitfall ii - lost caverns (japan).rom" size="16384" crc="d307a7b8" sha1="78079266711e60420480e4d95a39f0d7d974ad32" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -9994,8 +9977,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5508" />
 		<info name="alt_title" value="ピットフォールII" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="pitfall ii - lost caverns (japan) (alt 1).rom" size="16384" crc="71c59868" sha1="ae8c7355c829248305384243f78a870453367e77" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -10007,8 +9993,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5501" />
 		<info name="alt_title" value="ピットフォール" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="pitfall! (japan).rom" size="16384" crc="5a009c55" sha1="b88e9c548873dcfd190e0e38f7b279344eea41ec" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -10020,8 +10009,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5501" />
 		<info name="alt_title" value="ピットフォール" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="pitfall! (japan) (alt 1).rom" size="16384" crc="930aeb2c" sha1="5fb4b6c3735e4d9415565a856bb69f9fb4857161" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -10033,8 +10025,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5501" />
 		<info name="alt_title" value="ピットフォール" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="pitfall! (japan) (alt 2).rom" size="16384" crc="2cb24473" sha1="2fa9c0f016efc2d1752a272c632393f5063ea06c" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -10508,21 +10503,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5504" />
 		<info name="alt_title" value="リバーレイド" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="river raid (japan).rom" size="32768" crc="0f22a553" sha1="a1e14912d45944b9a6baef1d4d3a04c1ae8df923" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="riveraida" cloneof="riveraid">
-		<description>River Raid (Jpn, Alt)</description>
-		<year>1985</year>
-		<publisher>Pony Canyon</publisher>
-		<info name="serial" value="R48X5504" />
-		<info name="alt_title" value="リバーレイド" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="river raid (japan) (alt 1).rom" size="16384" crc="2fc1d75b" sha1="33be9017faf173eae04d0c91ca8d42d1c20596c0" offset="0" />
+			<dataarea name="rom" size="65536">
+				<rom name="river raid (japan).rom" size="16384" crc="2fc1d75b" sha1="33be9017faf173eae04d0c91ca8d42d1c20596c0" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -10608,8 +10593,11 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="R48X5511" />
 		<info name="alt_title" value="ロックンボルト" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="rock'n bolt (japan).rom" size="16384" crc="430e5789" sha1="1edabc3226648b54ae98d524b31f37ca47c8c88b" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -13171,20 +13159,11 @@ kept for now until finding out what those bytes affect...
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ゼンジー" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="zenji (japan).rom" size="32768" crc="1a4aebb2" sha1="2f4404d141acc40e48af0b12c70cd44b066ece10" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zenjia" cloneof="zenji">
-		<description>Zenji (Jpn, Alt)</description>
-		<year>1984</year>
-		<publisher>Pony Canyon</publisher>
-		<info name="alt_title" value="ゼンジー" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="zenji (japan) (alt 1).rom" size="16384" crc="77b3b0b9" sha1="c9440172802818cc5b9ae559fbd3f346a263605c" offset="0" />
+			<dataarea name="rom" size="65536">
+				<rom name="zenji (japan).rom" size="16384" crc="77b3b0b9" sha1="c9440172802818cc5b9ae559fbd3f346a263605c" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -13289,8 +13268,11 @@ kept for now until finding out what those bytes affect...
 		<year>1984</year>
 		<publisher>Activision?</publisher>
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="designer's pencil, the (europe) (program).rom" size="16384" crc="ce588c20" sha1="4b4a58a310a1138b95192d7fe0881bbdc45601d4" offset="0" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+				<rom size="16384" offset="0x8000" loadflag="reload" />
+				<rom size="16384" offset="0xc000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>

@@ -49,7 +49,8 @@ public:
 			m_hwc_input_value(0),
 			m_mj_input_num(0),
 			m_mj_last_val(0),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
 	{ }
 
 	// memory mapping
@@ -203,6 +204,7 @@ protected:
 	UINT8               m_mj_last_val;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;
 };
 
 

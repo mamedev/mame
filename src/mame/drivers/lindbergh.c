@@ -573,7 +573,7 @@ GAME(2005, hotd4,     lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "H
 GAME(2005, vf5,       lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Virtua Fighter 5 (Export)",                GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2006, abclimax,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "After Burner Climax (Export)",             GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2006, letsgoju,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Let's Go Jungle (Export)",                 GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
-GAME(2006, outr2sdx,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Outrun 2 SP SDX",                          GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
+GAME(2006, outr2sdx,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "OutRun 2 SP SDX",                          GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2006, psmash3,   lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Power Smash 3 / Virtua Tennis 3 (Export)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2006, vtennis3,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Virtua Tennis 3 (Japan)",                  GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2007, 2spicy,    lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "2 Spicy",                                  GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)

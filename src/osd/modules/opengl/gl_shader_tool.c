@@ -374,11 +374,6 @@ errout:
 
 int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shader_file, int verbose )
 {
-	int err = 0, i, c;
-	FILE * file = NULL;
-	const int buffer_len=8192;
-	GLcharARB *buffer=NULL;
-
 	if(shader==NULL || shader_file==NULL)
 	{
 		if(shader==NULL)
@@ -388,27 +383,29 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 		return -1;
 	}
 
-	file = fopen(shader_file, "r");
+	FILE *const file = fopen(shader_file, "r");
 	if(!file)
 	{
 		osd_printf_warning("cannot open shader_file: %s\n", shader_file);
 		return -1;
 	}
 
-	buffer = (GLcharARB *) malloc(buffer_len);
-	memset(buffer, 0, buffer_len);
+	// get the real file size
+	fseek(file, 0, SEEK_END);
+	int const buffer_len = (int)ftell(file);
+	fseek(file, 0, SEEK_SET);
 
-		/* Load Shader Sources */
-	i=0;
-	while( i<buffer_len-1 && EOF!=(c=fgetc(file)) )
-		buffer[i++]=(char)c;
+	GLcharARB *const buffer = (GLcharARB *)malloc(buffer_len + 1);
+	memset(buffer, 0, buffer_len + 1);
+
+	/* Load Shader Sources */
+	for( int i = 0, c = 0; i<buffer_len && EOF!=(c=fgetc(file)); i++ )
+		buffer[i]=(char)c;
 	fclose(file);
-	buffer[i]='\0';
 
-	err=gl_compile_shader_source(shader, type, buffer, verbose);
-		if(err) goto errout;
-
+	int const err=gl_compile_shader_source(shader, type, buffer, verbose);
 	free(buffer);
+	if(err) goto errout;
 
 	if(verbose)
 		osd_printf_warning("shader file: %s\n", shader_file);
@@ -416,9 +413,8 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 	return 0;
 
 errout:
-	free(buffer);
 	osd_printf_warning("failed to process shader_file: %s\n", shader_file);
-		return err;
+	return err;
 }
 
 

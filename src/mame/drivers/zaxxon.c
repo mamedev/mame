@@ -438,6 +438,9 @@ static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0xe0fb, 0xe0fb) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_enable_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, zaxxon_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
 
 /* derived from Zaxxon, different sound hardware */
 static ADDRESS_MAP_START( ixion_map, AS_PROGRAM, 8, zaxxon_state )
@@ -939,8 +942,19 @@ static MACHINE_CONFIG_DERIVED( zaxxon, root )
 	MCFG_FRAGMENT_ADD(zaxxon_samples)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( szaxxon, zaxxon )
+
+	/* encryption */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( futspy, root )
+
+	/* encryption */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -956,6 +970,7 @@ static MACHINE_CONFIG_DERIVED( razmataz, root )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
 
@@ -1429,14 +1444,13 @@ ROM_START( tiptop ) /* 3 board stack */
 ROM_END
 
 
-
 /*************************************
  *
- *  ROM decryption
+ *  Driver initialization
  *
  *************************************/
 
-void zaxxon_state::zaxxonj_decode(const char *cputag)
+DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1480,15 +1494,9 @@ void zaxxon_state::zaxxonj_decode(const char *cputag)
 		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 }     /* .......1...1...1 */
 	};
 
-	int A;
-	address_space &space = machine().device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *rom = memregion(cputag)->base();
-	int size = memregion(cputag)->bytes();
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, size);
+	UINT8 *rom = memregion("maincpu")->base();
 
-	space.set_decrypted_region(0x0000, size - 1, decrypt);
-
-	for (A = 0x0000; A < size; A++)
+	for (int A = 0x0000; A < 0x6000; A++)
 	{
 		int i,j;
 		UINT8 src;
@@ -1509,41 +1517,96 @@ void zaxxon_state::zaxxonj_decode(const char *cputag)
 		/* now decode the opcodes */
 		/* pick the translation table from bits 0, 4, and 8 of the address */
 		i = ((A >> 0) & 1) + (((A >> 4) & 1) << 1) + (((A >> 8) & 1) << 2);
-		decrypt[A] = src ^ opcode_xortable[i][j];
+		m_decrypted_opcodes[A] = src ^ opcode_xortable[i][j];
 	}
-}
-
-
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
-{
-	zaxxonj_decode("maincpu");
 }
 
 
 DRIVER_INIT_MEMBER(zaxxon_state,szaxxon)
 {
-	szaxxon_decode(machine(), "maincpu");
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...0...0...0 */
+		{ 0x08,0x28,0x88,0xa8 }, { 0x88,0x80,0x08,0x00 },   /* ...0...0...0...1 */
+		{ 0xa8,0x28,0xa0,0x20 }, { 0x20,0xa0,0x00,0x80 },   /* ...0...0...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...0...1...1 */
+		{ 0x08,0x28,0x88,0xa8 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...0...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...0...1 */
+		{ 0xa8,0x28,0xa0,0x20 }, { 0x20,0xa0,0x00,0x80 },   /* ...0...1...1...0 */
+		{ 0x08,0x28,0x88,0xa8 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...1...1 */
+		{ 0x08,0x28,0x88,0xa8 }, { 0x88,0x80,0x08,0x00 },   /* ...1...0...0...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...1...0 */
+		{ 0xa8,0x28,0xa0,0x20 }, { 0x20,0xa0,0x00,0x80 },   /* ...1...0...1...1 */
+		{ 0xa8,0x28,0xa0,0x20 }, { 0x20,0xa0,0x00,0x80 },   /* ...1...1...0...0 */
+		{ 0xa8,0x28,0xa0,0x20 }, { 0x20,0xa0,0x00,0x80 },   /* ...1...1...0...1 */
+		{ 0x08,0x28,0x88,0xa8 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x28,0x20,0xa8,0xa0 }    /* ...1...1...1...1 */
+	};
+
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x6000, convtable);
 }
 
 
 DRIVER_INIT_MEMBER(zaxxon_state,futspy)
 {
-	futspy_decode(machine(), "maincpu");
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x28,0x08,0x20,0x00 }, { 0x28,0x08,0x20,0x00 },   /* ...0...0...0...0 */
+		{ 0x80,0x00,0xa0,0x20 }, { 0x08,0x88,0x00,0x80 },   /* ...0...0...0...1 */
+		{ 0x80,0x00,0xa0,0x20 }, { 0x08,0x88,0x00,0x80 },   /* ...0...0...1...0 */
+		{ 0xa0,0x80,0x20,0x00 }, { 0x20,0x28,0xa0,0xa8 },   /* ...0...0...1...1 */
+		{ 0x28,0x08,0x20,0x00 }, { 0x88,0x80,0xa8,0xa0 },   /* ...0...1...0...0 */
+		{ 0x80,0x00,0xa0,0x20 }, { 0x08,0x88,0x00,0x80 },   /* ...0...1...0...1 */
+		{ 0x80,0x00,0xa0,0x20 }, { 0x20,0x28,0xa0,0xa8 },   /* ...0...1...1...0 */
+		{ 0x20,0x28,0xa0,0xa8 }, { 0x08,0x88,0x00,0x80 },   /* ...0...1...1...1 */
+		{ 0x88,0x80,0xa8,0xa0 }, { 0x28,0x08,0x20,0x00 },   /* ...1...0...0...0 */
+		{ 0x80,0x00,0xa0,0x20 }, { 0xa0,0x80,0x20,0x00 },   /* ...1...0...0...1 */
+		{ 0x20,0x28,0xa0,0xa8 }, { 0x08,0x88,0x00,0x80 },   /* ...1...0...1...0 */
+		{ 0x80,0x00,0xa0,0x20 }, { 0x20,0x28,0xa0,0xa8 },   /* ...1...0...1...1 */
+		{ 0x88,0x80,0xa8,0xa0 }, { 0x88,0x80,0xa8,0xa0 },   /* ...1...1...0...0 */
+		{ 0x80,0x00,0xa0,0x20 }, { 0x08,0x88,0x00,0x80 },   /* ...1...1...0...1 */
+		{ 0x80,0x00,0xa0,0x20 }, { 0x28,0x08,0x20,0x00 },   /* ...1...1...1...0 */
+		{ 0x20,0x28,0xa0,0xa8 }, { 0xa0,0x80,0x20,0x00 }    /* ...1...1...1...1 */
+	};
+
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x6000, convtable);
 }
 
 
 DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
 {
-	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
+	// Note: same as nprinces
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0x08,0x88,0x00,0x80 }, { 0xa0,0x20,0x80,0x00 },   /* ...0...0...0...0 */
+		{ 0xa8,0xa0,0x28,0x20 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...1 */
+		{ 0x88,0x80,0x08,0x00 }, { 0x28,0x08,0xa8,0x88 },   /* ...0...0...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x28,0x08,0xa8,0x88 },   /* ...0...0...1...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0xa0,0x20,0x80,0x00 },   /* ...0...1...0...0 */
+		{ 0xa8,0xa0,0x28,0x20 }, { 0xa8,0xa0,0x28,0x20 },   /* ...0...1...0...1 */
+		{ 0x88,0x80,0x08,0x00 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...1...1 */
+		{ 0xa0,0x20,0x80,0x00 }, { 0xa0,0x20,0x80,0x00 },   /* ...1...0...0...0 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...0...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0x80,0x08,0x00 },   /* ...1...0...1...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...1...1 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...1...1...0...0 */
+		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...1...1...0...1 */
+		{ 0x88,0x80,0x08,0x00 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...1...0 */
+		{ 0x08,0x88,0x00,0x80 }, { 0x28,0x08,0xa8,0x88 }    /* ...1...1...1...1 */
+	};
 
-	nprinces_decode(machine(), "maincpu");
+
+	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x6000, convtable);
+
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* additional input ports are wired */
 	pgmspace.install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
@@ -1570,19 +1633,19 @@ DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
 GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 1)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 2)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 3)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxonj,  zaxxon, zaxxon,   zaxxon, zaxxon_state,   zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon, zaxxon_state,   zaxxonj,  ROT90,  "bootleg", "Jackson",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxonj,  zaxxon, szaxxon,  zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, szaxxon,  zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "bootleg", "Jackson",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware but extra sound board plugged into 8255 PPI socket and encrypted cpu */
-GAME( 1982, szaxxon,  0,      zaxxon,   szaxxon, zaxxon_state,  szaxxon,  ROT90,  "Sega",    "Super Zaxxon (315-5013)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, szaxxon,  0,      szaxxon,  szaxxon, zaxxon_state,   szaxxon,  ROT90,  "Sega",    "Super Zaxxon (315-5013)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware? but encrypted cpu */
-GAME( 1984, futspy,   0,      futspy,   futspy, zaxxon_state,   futspy,   ROT90,  "Sega",    "Future Spy (315-5061)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, futspy,   0,      futspy,   futspy, zaxxon_state,    futspy,   ROT90,  "Sega",    "Future Spy (315-5061)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
 /* G-80 Universal Sound Board */
-GAME( 1983, razmataz, 0,      razmataz, razmataz, zaxxon_state, razmataz, ROT90,  "Sega",    "Razzmatazz", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, ixion,    0,      razmataz, ixion, zaxxon_state,    szaxxon,  ROT270, "Sega",    "Ixion (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1983, razmataz, 0,      razmataz, razmataz, zaxxon_state,  razmataz, ROT90,  "Sega",    "Razzmatazz", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, ixion,    0,      razmataz, ixion, zaxxon_state,     szaxxon,  ROT270, "Sega",    "Ixion (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */

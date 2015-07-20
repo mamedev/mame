@@ -55,7 +55,7 @@ public:
 		MP_IN1P,
 		MP_OUTP,
 		MP_IE,
-		MP_INTPEN,
+		MP_INTPEN
 	};
 
 	enum
@@ -63,7 +63,7 @@ public:
 		INPUT_X1        = 1,
 		INPUT_X2        = 2,
 		INPUT_X3        = 3,
-		INPUT_X4        = 4,
+		INPUT_X4        = 4
 	};
 
 	DECLARE_READ32_MEMBER(mp_param_r);
@@ -158,7 +158,7 @@ public:
 
 	enum
 	{
-		PP_PC = 1,
+		PP_PC = 1
 	};
 
 protected:

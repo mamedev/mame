@@ -22,13 +22,25 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/**
+ * @struct  zippath_returned_directory
+ *
+ * @brief   A zippath returned directory.
+ */
+
 struct zippath_returned_directory
 {
+	/** @brief  The next. */
 	zippath_returned_directory *next;
+	/** @brief  The name. */
 	std::string name;
 };
 
-
+/**
+ * @class   zippath_directory
+ *
+ * @brief   A zippath directory.
+ */
 
 class zippath_directory
 {
@@ -41,16 +53,23 @@ public:
 			returned_dirlist(NULL) { }
 
 	/* common */
+	/** @brief  true to returned parent. */
 	bool returned_parent;
+	/** @brief  The returned entry. */
 	osd_directory_entry returned_entry;
 
 	/* specific to normal directories */
+	/** @brief  Pathname of the directory. */
 	osd_directory *directory;
 
 	/* specific to ZIP directories */
+	/** @brief  true to called zip first. */
 	bool called_zip_first;
+	/** @brief  The zipfile. */
 	zip_file *zipfile;
+	/** @brief  The zipprefix. */
 	std::string zipprefix;
+	/** @brief  The returned dirlist. */
 	zippath_returned_directory *returned_dirlist;
 };
 
@@ -69,9 +88,17 @@ static int is_7z_file(const char *path);
     PATH OPERATIONS
 ***************************************************************************/
 
-//============================================================
-//  is_path_separator
-//============================================================
+/**
+ * @fn  int is_path_separator(char c)
+ *
+ * @brief   ============================================================
+ *            is_path_separator
+ *          ============================================================.
+ *
+ * @param   c   The character.
+ *
+ * @return  An int.
+ */
 
 int is_path_separator(char c)
 {
@@ -81,6 +108,16 @@ int is_path_separator(char c)
 /*-------------------------------------------------
     parse_parent_path - parses out the parent path
 -------------------------------------------------*/
+
+/**
+ * @fn  static void parse_parent_path(const char *path, int *beginpos, int *endpos)
+ *
+ * @brief   Parse parent path.
+ *
+ * @param   path                Full pathname of the file.
+ * @param [in,out]  beginpos    If non-null, the beginpos.
+ * @param [in,out]  endpos      If non-null, the endpos.
+ */
 
 static void parse_parent_path(const char *path, int *beginpos, int *endpos)
 {
@@ -111,6 +148,17 @@ static void parse_parent_path(const char *path, int *beginpos, int *endpos)
     zippath_parent - retrieves the parent directory
 -------------------------------------------------*/
 
+/**
+ * @fn  std::string &zippath_parent(std::string &dst, const char *path)
+ *
+ * @brief   Zippath parent.
+ *
+ * @param [in,out]  dst Destination for the.
+ * @param   path        Full pathname of the file.
+ *
+ * @return  A std::string&amp;
+ */
+
 std::string &zippath_parent(std::string &dst, const char *path)
 {
 	int pos;
@@ -133,6 +181,17 @@ std::string &zippath_parent(std::string &dst, const char *path)
     directory basename
 -------------------------------------------------*/
 
+/**
+ * @fn  std::string &zippath_parent_basename(std::string &dst, const char *path)
+ *
+ * @brief   Zippath parent basename.
+ *
+ * @param [in,out]  dst Destination for the.
+ * @param   path        Full pathname of the file.
+ *
+ * @return  A std::string&amp;
+ */
+
 std::string &zippath_parent_basename(std::string &dst, const char *path)
 {
 	int beginpos, endpos;
@@ -146,6 +205,18 @@ std::string &zippath_parent_basename(std::string &dst, const char *path)
 /*-------------------------------------------------
     zippath_combine - combines two paths
 -------------------------------------------------*/
+
+/**
+ * @fn  std::string &zippath_combine(std::string &dst, const char *path1, const char *path2)
+ *
+ * @brief   Zippath combine.
+ *
+ * @param [in,out]  dst Destination for the.
+ * @param   path1       The first path.
+ * @param   path2       The second path.
+ *
+ * @return  A std::string&amp;
+ */
 
 std::string &zippath_combine(std::string &dst, const char *path1, const char *path2)
 {
@@ -183,6 +254,16 @@ std::string &zippath_combine(std::string &dst, const char *path1, const char *pa
     file_error to a zip_error
 -------------------------------------------------*/
 
+/**
+ * @fn  static file_error file_error_from_zip_error(zip_error ziperr)
+ *
+ * @brief   File error from zip error.
+ *
+ * @param   ziperr  The ziperr.
+ *
+ * @return  A file_error.
+ */
+
 static file_error file_error_from_zip_error(zip_error ziperr)
 {
 	file_error filerr;
@@ -215,6 +296,18 @@ static file_error file_error_from_zip_error(zip_error ziperr)
     create_core_file_from_zip - creates a core_file
     from a zip file entry
 -------------------------------------------------*/
+
+/**
+ * @fn  static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, core_file *&file)
+ *
+ * @brief   Creates core file from zip.
+ *
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param   header          The header.
+ * @param [in,out]  file    [in,out] If non-null, the file.
+ *
+ * @return  The new core file from zip.
+ */
 
 static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header *header, core_file *&file)
 {
@@ -250,6 +343,19 @@ done:
 /*-------------------------------------------------
     zippath_fopen - opens a zip path file
 -------------------------------------------------*/
+
+/**
+ * @fn  file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&file, std::string &revised_path)
+ *
+ * @brief   Zippath fopen.
+ *
+ * @param   filename                Filename of the file.
+ * @param   openflags               The openflags.
+ * @param [in,out]  file            [in,out] If non-null, the file.
+ * @param [in,out]  revised_path    Full pathname of the revised file.
+ *
+ * @return  A file_error.
+ */
 
 file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&file, std::string &revised_path)
 {
@@ -380,6 +486,16 @@ done:
     is_root - tests to see if this path is the root
 -------------------------------------------------*/
 
+/**
+ * @fn  static int is_root(const char *path)
+ *
+ * @brief   Is root.
+ *
+ * @param   path    Full pathname of the file.
+ *
+ * @return  An int.
+ */
+
 static int is_root(const char *path)
 {
 	int i = 0;
@@ -402,6 +518,16 @@ static int is_root(const char *path)
     7-zip file
 -------------------------------------------------*/
 
+/**
+ * @fn  static int is_7z_file(const char *path)
+ *
+ * @brief   Is 7z file.
+ *
+ * @param   path    Full pathname of the file.
+ *
+ * @return  An int.
+ */
+
 static int is_7z_file(const char *path)
 {
 	const char *s = strrchr(path, '.');
@@ -413,6 +539,16 @@ static int is_7z_file(const char *path)
     is_zip_file - tests to see if this file is a
     ZIP file
 -------------------------------------------------*/
+
+/**
+ * @fn  static int is_zip_file(const char *path)
+ *
+ * @brief   Is zip file.
+ *
+ * @param   path    Full pathname of the file.
+ *
+ * @return  An int.
+ */
 
 static int is_zip_file(const char *path)
 {
@@ -427,6 +563,16 @@ static int is_zip_file(const char *path)
     character is a path separator within a ZIP file
 -------------------------------------------------*/
 
+/**
+ * @fn  static int is_zip_file_separator(char c)
+ *
+ * @brief   Is zip file separator.
+ *
+ * @param   c   The character.
+ *
+ * @return  An int.
+ */
+
 static int is_zip_file_separator(char c)
 {
 	return (c == '/') || (c == '\\');
@@ -439,6 +585,16 @@ static int is_zip_file_separator(char c)
     character is a path separator within a ZIP path
 -------------------------------------------------*/
 
+/**
+ * @fn  static int is_zip_path_separator(char c)
+ *
+ * @brief   Is zip path separator.
+ *
+ * @param   c   The character.
+ *
+ * @return  An int.
+ */
+
 static int is_zip_path_separator(char c)
 {
 	return is_zip_file_separator(c) || is_path_separator(c);
@@ -450,6 +606,17 @@ static int is_zip_path_separator(char c)
     next_path_char - lexes out the next path
     character, normalizing separators as '/'
 -------------------------------------------------*/
+
+/**
+ * @fn  static char next_path_char(const char *s, int *pos)
+ *
+ * @brief   Next path character.
+ *
+ * @param   s           The const char * to process.
+ * @param [in,out]  pos If non-null, the position.
+ *
+ * @return  A char.
+ */
 
 static char next_path_char(const char *s, int *pos)
 {
@@ -492,6 +659,18 @@ static char next_path_char(const char *s, int *pos)
     zippath_find_sub_path - attempts to identify the
     type of a sub path in a zip file
 -------------------------------------------------*/
+
+/**
+ * @fn  static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type)
+ *
+ * @brief   Zippath find sub path.
+ *
+ * @param [in,out]  zipfile If non-null, the zipfile.
+ * @param   subpath         The subpath.
+ * @param [in,out]  type    If non-null, the type.
+ *
+ * @return  null if it fails, else a zip_file_header*.
+ */
 
 static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const char *subpath, osd_dir_entry_type *type)
 {
@@ -545,6 +724,19 @@ static const zip_file_header *zippath_find_sub_path(zip_file *zipfile, const cha
     zippath_resolve - separates a ZIP path out into
     true path and ZIP entry components
 -------------------------------------------------*/
+
+/**
+ * @fn  static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_type, zip_file *&zipfile, std::string &newpath)
+ *
+ * @brief   Zippath resolve.
+ *
+ * @param   path                Full pathname of the file.
+ * @param [in,out]  entry_type  Type of the entry.
+ * @param [in,out]  zipfile     [in,out] If non-null, the zipfile.
+ * @param [in,out]  newpath     The newpath.
+ *
+ * @return  A file_error.
+ */
 
 static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_type, zip_file *&zipfile, std::string &newpath)
 {
@@ -641,6 +833,17 @@ done:
     zippath_opendir - opens a directory
 -------------------------------------------------*/
 
+/**
+ * @fn  file_error zippath_opendir(const char *path, zippath_directory **directory)
+ *
+ * @brief   Zippath opendir.
+ *
+ * @param   path                Full pathname of the file.
+ * @param [in,out]  directory   If non-null, pathname of the directory.
+ *
+ * @return  A file_error.
+ */
+
 file_error zippath_opendir(const char *path, zippath_directory **directory)
 {
 	file_error err;
@@ -701,6 +904,14 @@ done:
     zippath_closedir - closes a directory
 -------------------------------------------------*/
 
+/**
+ * @fn  void zippath_closedir(zippath_directory *directory)
+ *
+ * @brief   Zippath closedir.
+ *
+ * @param [in,out]  directory   If non-null, pathname of the directory.
+ */
+
 void zippath_closedir(zippath_directory *directory)
 {
 	if (directory->directory != NULL)
@@ -726,6 +937,17 @@ void zippath_closedir(zippath_directory *directory)
     returns the relative path
 -------------------------------------------------*/
 
+/**
+ * @fn  static const char *get_relative_path(zippath_directory *directory, const zip_file_header *header)
+ *
+ * @brief   Gets relative path.
+ *
+ * @param [in,out]  directory   If non-null, pathname of the directory.
+ * @param   header              The header.
+ *
+ * @return  null if it fails, else the relative path.
+ */
+
 static const char *get_relative_path(zippath_directory *directory, const zip_file_header *header)
 {
 	const char *result = NULL;
@@ -746,6 +968,16 @@ static const char *get_relative_path(zippath_directory *directory, const zip_fil
 /*-------------------------------------------------
     zippath_readdir - reads a directory
 -------------------------------------------------*/
+
+/**
+ * @fn  const osd_directory_entry *zippath_readdir(zippath_directory *directory)
+ *
+ * @brief   Zippath readdir.
+ *
+ * @param [in,out]  directory   If non-null, pathname of the directory.
+ *
+ * @return  null if it fails, else an osd_directory_entry*.
+ */
 
 const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 {
@@ -852,6 +1084,16 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
     zippath_is_zip - returns TRUE if this path is
     a ZIP path or FALSE if not
 -------------------------------------------------*/
+
+/**
+ * @fn  int zippath_is_zip(zippath_directory *directory)
+ *
+ * @brief   Zippath is zip.
+ *
+ * @param [in,out]  directory   If non-null, pathname of the directory.
+ *
+ * @return  An int.
+ */
 
 int zippath_is_zip(zippath_directory *directory)
 {

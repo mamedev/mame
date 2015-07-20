@@ -982,6 +982,10 @@ ADDRESS_MAP_END
 // The Pacman code uses $5004 and $5005 for LED's and $5007 for coin lockout.  This hardware does not
 // exist on any Pacman or Puckman board I have seen.  DW
 
+static ADDRESS_MAP_START( patched_opcodes_map, AS_DECRYPTED_OPCODES, 8, pacman_state )
+	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM AM_SHARE("patched_opcodes")
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
@@ -3460,6 +3464,11 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pacmanp, pacman )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(patched_opcodes_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pengojpm, pacman )
@@ -6371,25 +6380,22 @@ ROM_END
 
 void pacman_state::maketrax_rom_decode()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x4000);
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	space.set_decrypted_region(0x0000, 0x3fff, decrypted);
 
-	memcpy(decrypted,rom,0x4000);
+	memcpy(m_patched_opcodes,rom,0x4000);
 
-	decrypted[0x0415] = 0xc9;
-	decrypted[0x1978] = 0x18;
-	decrypted[0x238e] = 0xc9;
-	decrypted[0x3ae5] = 0xe6;
-	decrypted[0x3ae7] = 0x00;
-	decrypted[0x3ae8] = 0xc9;
-	decrypted[0x3aed] = 0x86;
-	decrypted[0x3aee] = 0xc0;
-	decrypted[0x3aef] = 0xb0;
+	m_patched_opcodes[0x0415] = 0xc9;
+	m_patched_opcodes[0x1978] = 0x18;
+	m_patched_opcodes[0x238e] = 0xc9;
+	m_patched_opcodes[0x3ae5] = 0xe6;
+	m_patched_opcodes[0x3ae7] = 0x00;
+	m_patched_opcodes[0x3ae8] = 0xc9;
+	m_patched_opcodes[0x3aed] = 0x86;
+	m_patched_opcodes[0x3aee] = 0xc0;
+	m_patched_opcodes[0x3aef] = 0xb0;
 }
 
 DRIVER_INIT_MEMBER(pacman_state,maketrax)
@@ -6403,25 +6409,22 @@ DRIVER_INIT_MEMBER(pacman_state,maketrax)
 
 void pacman_state::korosuke_rom_decode()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x4000);
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	space.set_decrypted_region(0x0000, 0x3fff, decrypted);
 
-	memcpy(decrypted,rom,0x4000);
+	memcpy(m_patched_opcodes,rom,0x4000);
 
-	decrypted[0x044c] = 0xc9;
-	decrypted[0x1973] = 0x18;
-	decrypted[0x238c] = 0xc9;
-	decrypted[0x3ae9] = 0xe6;   /* not changed */
-	decrypted[0x3aeb] = 0x00;
-	decrypted[0x3aec] = 0xc9;
-	decrypted[0x3af1] = 0x86;
-	decrypted[0x3af2] = 0xc0;
-	decrypted[0x3af3] = 0xb0;
+	m_patched_opcodes[0x044c] = 0xc9;
+	m_patched_opcodes[0x1973] = 0x18;
+	m_patched_opcodes[0x238c] = 0xc9;
+	m_patched_opcodes[0x3ae9] = 0xe6;   /* not changed */
+	m_patched_opcodes[0x3aeb] = 0x00;
+	m_patched_opcodes[0x3aec] = 0xc9;
+	m_patched_opcodes[0x3af1] = 0x86;
+	m_patched_opcodes[0x3af2] = 0xc0;
+	m_patched_opcodes[0x3af3] = 0xb0;
 }
 
 DRIVER_INIT_MEMBER(pacman_state,korosuke)
@@ -6869,18 +6872,18 @@ GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  jumpshot, ROT
 
 GAME( 1985, shootbul, 0,        pacman,   shootbul, pacman_state,  jumpshot, ROT90,  "Bally Midway", "Shoot the Bull", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, crush,    0,        pacman,   maketrax, pacman_state,  maketrax, ROT90,  "Alpha Denshi Co. / Kural Samno Electric, Ltd.", "Crush Roller (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, crush,    0,        pacmanp,  maketrax, pacman_state,  maketrax, ROT90,  "Alpha Denshi Co. / Kural Samno Electric, Ltd.", "Crush Roller (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush2,   crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "Alpha Denshi Co. / Kural Esco Electric, Ltd.", "Crush Roller (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush3,   crush,    pacman,   maketrax, pacman_state,  eyes,     ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Crush Roller (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush4,   crush,    crush4,   crush4,   driver_device, 0,        ROT90,  "Alpha Denshi Co. / Kural TWT", "Crush Roller (set 4)", GAME_SUPPORTS_SAVE )
-GAME( 1981, maketrax, crush,    pacman,   maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, maketrxb, crush,    pacman,   maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, korosuke, crush,    pacman,   korosuke, pacman_state,  korosuke, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1981, maketrax, crush,    pacmanp,  maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, maketrxb, crush,    pacmanp,  maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, korosuke, crush,    pacmanp,  korosuke, pacman_state,  korosuke, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "bootleg", "Crush Roller (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, crushbl2, crush,    pacman,   mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, crushbl3, crush,    pacman,   mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1981, crushbl2, crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, crushbl3, crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crushs,   crush,    crushs,   crushs,   driver_device, 0,        ROT90,  "bootleg (Sidam)", "Crush Roller (bootleg set 4)", GAME_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
-GAME( 1981, mbrush,   crush,    pacman,   mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Magic Brush (bootleg of Crush Roller)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mbrush,   crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Magic Brush (bootleg of Crush Roller)", GAME_SUPPORTS_SAVE )
 GAME( 1981, paintrlr, crush,    pacman,   paintrlr, driver_device, 0,        ROT90,  "bootleg", "Paint Roller (bootleg of Crush Roller)", GAME_SUPPORTS_SAVE )
 
 GAME( 1982, eyes,     0,        pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 1)", GAME_SUPPORTS_SAVE )

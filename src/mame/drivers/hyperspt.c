@@ -292,7 +292,7 @@ INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
 static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyperspt_state,  vblank_irq)
 
@@ -544,7 +544,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(hyperspt_state,hyperspt)
 {
-	konami1_decode(machine(), "maincpu");
 }
 
 

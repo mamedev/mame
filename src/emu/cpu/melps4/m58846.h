@@ -29,6 +29,13 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	// timers
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void write_v(UINT8 data);
+
+	emu_timer *m_timer;
+	void reset_timer();
 };
 
 

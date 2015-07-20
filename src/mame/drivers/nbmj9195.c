@@ -22,7 +22,6 @@ Notes:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/tmpz84c011.h"
 #include "machine/nvram.h"
 #include "includes/nb1413m3.h"      // needed for mahjong input controller
 #include "sound/3812intf.h"
@@ -30,29 +29,22 @@ Notes:
 #include "includes/nbmj9195.h"
 
 
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_soundbank_w)
+void nbmj9195_state::machine_start()
 {
-	UINT8 *SNDROM = memregion("audiocpu")->base();
-
-	membank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x8000, 0x8000);
+	
+	save_item(NAME(m_inputport));
+	save_item(NAME(m_dipswbitsel));
+	save_item(NAME(m_outcoin_flag));
+	save_item(NAME(m_mscoutm_inputport));
 }
 
-READ8_MEMBER(nbmj9195_state::nbmj9195_sound_r)
+WRITE8_MEMBER(nbmj9195_state::soundbank_w)
 {
-	return soundlatch_byte_r(space, 0);
+	membank("soundbank")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_sound_w)
-{
-	soundlatch_byte_w(space, 0, data);
-}
-
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_soundclr_w)
-{
-	soundlatch_clear_byte_w(space, 0, 0);
-}
-
-void nbmj9195_state::nbmj9195_outcoin_flag_w(int data)
+WRITE8_MEMBER(nbmj9195_state::outcoin_flag_w)
 {
 	// bit0: coin in counter
 	// bit1: coin out counter
@@ -63,17 +55,17 @@ void nbmj9195_state::nbmj9195_outcoin_flag_w(int data)
 	else m_outcoin_flag = 1;
 }
 
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_inputportsel_w)
+WRITE8_MEMBER(nbmj9195_state::inputportsel_w)
 {
 	m_inputport = (data ^ 0xff);
 }
 
-int nbmj9195_state::nbmj9195_dipsw_r()
+int nbmj9195_state::dipsw_r()
 {
 	return (((ioport("DSWA")->read() & 0xff) | ((ioport("DSWB")->read() & 0xff) << 8)) >> m_dipswbitsel) & 0x01;
 }
 
-void nbmj9195_state::nbmj9195_dipswbitsel_w(int data)
+WRITE8_MEMBER(nbmj9195_state::dipswbitsel_w)
 {
 	switch (data & 0xc0)
 	{
@@ -92,7 +84,7 @@ void nbmj9195_state::nbmj9195_dipswbitsel_w(int data)
 	}
 }
 
-void nbmj9195_state::mscoutm_inputportsel_w( int data)
+WRITE8_MEMBER(nbmj9195_state::mscoutm_inputportsel_w)
 {
 	m_mscoutm_inputport = (data ^ 0xff);
 }
@@ -117,13 +109,6 @@ READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_1_r)
 
 
 /* TMPZ84C011 PIO emulation */
-
-// mscoutm, imekura, mjegolf
-READ8_MEMBER(nbmj9195_state::mscoutm_cpu_porta_r)
-{
-	// COIN IN, ETC...
-	return  ioport("SYSTEM")->read();
-}
 
 READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portb_r)
 {
@@ -167,24 +152,6 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
 	}
 }
 
-
-
-// mscoutm, imekura, mjegolf
-WRITE8_MEMBER(nbmj9195_state::mscoutm_cpu_porta_w)
-{
-	mscoutm_inputportsel_w(data);    // NB22090
-}
-
-WRITE8_MEMBER(nbmj9195_state::mscoutm_cpu_portd_w)
-{
-	nbmj9195_clutsel_w(data);
-}
-
-WRITE8_MEMBER(nbmj9195_state::mscoutm_cpu_porte_w)
-{
-	nbmj9195_gfxflag2_w(data);       // NB22090
-}
-
 // other games
 
 READ8_MEMBER(nbmj9195_state::others_cpu_porta_r)
@@ -207,7 +174,7 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portb_r)
 	case 0x08:
 		return ioport("KEY3")->read();
 	case 0x10:
-		return ((ioport("KEY4")->read() & 0x7f) | (nbmj9195_dipsw_r() << 7));
+		return ((ioport("KEY4")->read() & 0x7f) | (dipsw_r() << 7));
 	default:
 		return (ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read() & ioport("KEY3")->read() & (ioport("KEY4")->read() & 0x7f));
 	}
@@ -233,59 +200,9 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
 	}
 }
 
-
-WRITE8_MEMBER(nbmj9195_state::others_cpu_portc_w)
-{
-	nbmj9195_dipswbitsel_w(data);
-}
-
-WRITE8_MEMBER(nbmj9195_state::others_cpu_portd_w)
-{
-	nbmj9195_clutsel_w(data);
-}
-
-WRITE8_MEMBER(nbmj9195_state::others_cpu_porte_w)
-{
-	nbmj9195_outcoin_flag_w(data);
-}
-
-
-/* TMPZ84C011 sound CPU */
-
-READ8_MEMBER(nbmj9195_state::soundcpu_portd_r)
-{
-	return nbmj9195_sound_r(space, 0);
-}
-
-WRITE8_MEMBER(nbmj9195_state::soundcpu_porta_w)
-{
-	nbmj9195_soundbank_w(space, 0, data);
-}
-
-WRITE8_MEMBER(nbmj9195_state::soundcpu_dac1_w)
-{
-	m_dac1->write_unsigned8(data);
-}
-
-WRITE8_MEMBER(nbmj9195_state::soundcpu_dac2_w)
-{
-	m_dac2->write_unsigned8(data);
-}
-
-WRITE8_MEMBER(nbmj9195_state::mscoutm_soundcpu_portb_w)
-{
-	m_dac2->write_unsigned8(data);
-}
-
-WRITE8_MEMBER(nbmj9195_state::mscoutm_soundcpu_portc_w)
-{
-	m_dac1->write_unsigned8(data);
-}
-
-
 WRITE8_MEMBER(nbmj9195_state::soundcpu_porte_w)
 {
-	if (!(data & 0x01)) nbmj9195_soundclr_w(space, 0, 0);
+	if (!(data & 0x01)) soundlatch_clear_byte_w(space, 0, 0);
 }
 
 
@@ -304,53 +221,48 @@ void nbmj9195_state::machine_reset()
 
 DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ROM = memregion("audiocpu")->base();
 
 	// sound program patch
 	ROM[0x0213] = 0x00;         // DI -> NOP
-
-	// initialize sound rom bank
-	nbmj9195_soundbank_w(space, 0, 0);
-	logerror("DRIVER_INIT( nbmj9195 )\n");
 }
 
 
 static ADDRESS_MAP_START( sailorws_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjuraden_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( koinomp_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngpgal_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mscoutm_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe5ff) AM_RAM
-	AM_RANGE(0xe600, 0xebff) AM_READWRITE(nbmj9195_nb22090_palette_r,nbmj9195_nb22090_palette_w)
+	AM_RANGE(0xe600, 0xebff) AM_RAM_WRITE(nb22090_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xec00, 0xf1ff) AM_RAM
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe5ff) AM_READWRITE(nbmj9195_nb22090_palette_r,nbmj9195_nb22090_palette_w)
+	AM_RANGE(0xe000, 0xe5ff) AM_RAM_WRITE(nb22090_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe600, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xf1ff) AM_RAM
 	AM_RANGE(0xf200, 0xffff) AM_RAM
@@ -359,264 +271,264 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xb2, 0xb2) AM_WRITENOP
 	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
-	AM_RANGE(0xb6, 0xb6) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb6, 0xb6) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP
 	AM_RANGE(0xc4, 0xc4) AM_WRITENOP
-	AM_RANGE(0xc6, 0xc6) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xc6, 0xc6) AM_WRITE(inputportsel_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb8) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb0, 0xb8) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc8, 0xc8) AM_WRITENOP
 	AM_RANGE(0xd0, 0xd0) AM_WRITENOP
-	AM_RANGE(0xd8, 0xd8) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xd8, 0xd8) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x24, 0x24) AM_WRITENOP
 	AM_RANGE(0x28, 0x28) AM_WRITENOP
-	AM_RANGE(0x2c, 0x2c) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0x2c, 0x2c) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xe0, 0xe1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x22, 0x22) AM_WRITENOP
 	AM_RANGE(0x24, 0x24) AM_WRITENOP
-	AM_RANGE(0x26, 0x26) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0x26, 0x26) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xe0, 0xe1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xd8, 0xd8) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xd8, 0xd8) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xda, 0xda) AM_WRITENOP
 	AM_RANGE(0xdc, 0xdc) AM_WRITENOP
-	AM_RANGE(0xde, 0xde) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xde, 0xde) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
 	AM_RANGE(0xe4, 0xe4) AM_WRITENOP
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xe6, 0xe6) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
 	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xfa, 0xfa) AM_WRITENOP
 	AM_RANGE(0xfc, 0xfc) AM_WRITENOP
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
 	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
 	AM_RANGE(0xe4, 0xe4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITENOP
-	AM_RANGE(0xb8, 0xb8) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb8, 0xb8) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x90, 0x90) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0x90, 0x90) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x94, 0x94) AM_WRITENOP
 	AM_RANGE(0x98, 0x98) AM_WRITENOP
-	AM_RANGE(0x9c, 0x9c) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0x9c, 0x9c) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosimotm_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(nbmj9195_inputportsel_w)
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf4, 0xf4) AM_NOP
 	AM_RANGE(0xf8, 0xf8) AM_NOP
 ADDRESS_MAP_END
@@ -624,83 +536,83 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xf8, 0xf8) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
 	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x80, 0x81) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
@@ -708,18 +620,18 @@ static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
 
 	AM_RANGE(0x80, 0x80) AM_READ(mscoutm_dipsw_1_r)
 	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0x84, 0x84) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0x84, 0x84) AM_WRITE(soundlatch_byte_w)
 
 	AM_RANGE(0xa0, 0xa6) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
-	AM_RANGE(0xe0, 0xe1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
@@ -727,18 +639,18 @@ static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
 
 	AM_RANGE(0x80, 0x80) AM_READ(mscoutm_dipsw_1_r)
 	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0x84, 0x84) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0x84, 0x84) AM_WRITE(soundlatch_byte_w)
 
 	AM_RANGE(0xb0, 0xb6) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xe0, 0xe1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
@@ -746,18 +658,18 @@ static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
 
 	AM_RANGE(0x80, 0x86) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(nbmj9195_blitter_0_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_0_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_0_r)
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(nbmj9195_blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
 
 	AM_RANGE(0xe0, 0xe0) AM_READ(mscoutm_dipsw_1_r)
 	AM_RANGE(0xe2, 0xe2) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0xe4, 0xe4) AM_WRITE(nbmj9195_sound_w)
+	AM_RANGE(0xe4, 0xe4) AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
 
@@ -765,7 +677,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sailorws_sound_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_sound_io_map, AS_IO, 8, nbmj9195_state )
@@ -783,7 +695,7 @@ TODO: it probably doesn't belong in here. Both CPUs are certainly tmpz84c011 tho
 static ADDRESS_MAP_START( shabdama_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-//  AM_RANGE(0xd000, 0xd1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
+//  AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 //  AM_RANGE(0xd800, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -791,9 +703,9 @@ static ADDRESS_MAP_START( shabdama_io_map, AS_IO, 8, nbmj9195_state )
 //  ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-//  AM_RANGE(0x60, 0x61) AM_READ(nbmj9195_blitter_0_r)
-//  AM_RANGE(0x60, 0x6f) AM_WRITE(nbmj9195_blitter_0_w)
-//  AM_RANGE(0x70, 0x7f) AM_WRITE(nbmj9195_clut_0_w)
+//  AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
+//  AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
+//  AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 /********************************************************************************
@@ -2765,34 +2677,34 @@ static const z80_daisy_config daisy_chain_sound[] =
 
 // the only difference between these 2 setups is the DAC is swapped, is that intentional?
 #define OTHERS_TMZ84C011_SOUND_PORTS \
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porta_w)) \
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_dac1_w)) \
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_dac2_w)) \
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(nbmj9195_state, soundcpu_portd_r)) \
+	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundbank_w)) \
+	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac1", dac_device, write_unsigned8)) \
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac2", dac_device, write_unsigned8)) \
+	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(nbmj9195_state, soundlatch_byte_r)) \
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porte_w))
 #define MSCOUTM_TMZ84C011_SOUND_PORTS \
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porta_w)) \
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_dac2_w)) \
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_dac1_w)) \
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(nbmj9195_state, soundcpu_portd_r)) \
+	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundbank_w)) \
+	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac2", dac_device, write_unsigned8)) \
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac1", dac_device, write_unsigned8)) \
+	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(nbmj9195_state, soundlatch_byte_r)) \
 	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porte_w))
 
 
 #define MSCOUTM_TMZ84C011_MAIN_PORTS \
-	MCFG_TMPZ84C011_PORTA_READ_CB(READ8(nbmj9195_state, mscoutm_cpu_porta_r)) \
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, mscoutm_cpu_porta_w)) \
+	MCFG_TMPZ84C011_PORTA_READ_CB(IOPORT("SYSTEM")) \
+	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, mscoutm_inputportsel_w)) \
 	MCFG_TMPZ84C011_PORTB_READ_CB(READ8(nbmj9195_state, mscoutm_cpu_portb_r)) \
 	MCFG_TMPZ84C011_PORTC_READ_CB(READ8(nbmj9195_state, mscoutm_cpu_portc_r)) \
-	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, mscoutm_cpu_portd_w)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, mscoutm_cpu_porte_w))
+	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, clutsel_w)) \
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, gfxflag2_w))
 
 #define OTHERS_TMZ84C011_MAIN_PORTS \
 	MCFG_TMPZ84C011_PORTA_READ_CB(READ8(nbmj9195_state, others_cpu_porta_r)) \
 	MCFG_TMPZ84C011_PORTB_READ_CB(READ8(nbmj9195_state, others_cpu_portb_r)) \
 	MCFG_TMPZ84C011_PORTC_READ_CB(READ8(nbmj9195_state, others_cpu_portc_r)) \
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(nbmj9195_state, others_cpu_portc_w)) \
-	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, others_cpu_portd_w)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, others_cpu_porte_w))
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(nbmj9195_state, dipswbitsel_w)) \
+	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(nbmj9195_state, clutsel_w)) \
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, outcoin_flag_w))
 
 static MACHINE_CONFIG_START( NBMJDRV1_base, nbmj9195_state )
 
@@ -2815,7 +2727,7 @@ static MACHINE_CONFIG_START( NBMJDRV1_base, nbmj9195_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(1024, 512)     /* no way this is correct */
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj9195_state, screen_update_nbmj9195)
+	MCFG_SCREEN_UPDATE_DRIVER(nbmj9195_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -2854,7 +2766,7 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV2, NBMJDRV1_base )
 	OTHERS_TMZ84C011_SOUND_PORTS
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nbmj9195_1layer)
+	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,_1layer)
 MACHINE_CONFIG_END
 
 
@@ -2871,9 +2783,7 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV3, NBMJDRV1_base )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(512)
 
-	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nbmj9195_nb22090)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(nbmj9195_state, screen_update_nbmj9195)
+	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nb22090)
 MACHINE_CONFIG_END
 
 
@@ -3728,38 +3638,38 @@ ROM_START( shabdama )
 ROM_END
 
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY, FULLNAME, FLAGS
-GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", 0 )
-GAME( 1992, koinomp,  0,        koinomp,  koinomp, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", 0 )
-GAME( 1992, patimono, 0,        patimono, patimono, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Pachinko Monogatari (Japan)", 0 )
-GAME( 1992, janbari,  0,        janbari,  janbari, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Yubis / AV Japan", "Mahjong Janjan Baribari (Japan)", 0 )
-GAME( 1992, mjanbari, janbari,  janbari,  mjanbari, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yubis / AV Japan", "Medal Mahjong Janjan Baribari [BET] (Japan)", 0 )
-GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Kawakusu", "Medal Mahjong Circuit no Mehyou [BET] (Japan)", 0 )
-GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, nbmj9195, ROT0,   "Apple", "Ultra Maru-hi Mahjong (Japan)", 0 )
-GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, nbmj9195, ROT0,   "Fujic", "Mahjong Gal 10-renpatsu (Japan)", 0 )
-GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, nbmj9195, ROT0,   "Fujic", "Mahjong Ren-ai Club (Japan)", 0 )
-GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", 0 )
-GAME( 1993, mkeibaou, 0,        mkeibaou, mkeibaou, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Keibaou (Japan)", 0 )
-GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", 0 )
-GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", 0 )
-GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", 0 )
-GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars-R [BET] (Japan)", 0 )
-GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", 0 )
-GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195_state, nbmj9195, ROT0,   "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", 0 )
-GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", 0 )
-GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou [BET] (Japan)", 0 )
-GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", 0 )
-GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", 0 )
-GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", 0 )
+GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, koinomp,  0,        koinomp,  koinomp, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, patimono, 0,        patimono, patimono, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Pachinko Monogatari (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, janbari,  0,        janbari,  janbari, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Yubis / AV Japan", "Mahjong Janjan Baribari (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mjanbari, janbari,  janbari,  mjanbari, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yubis / AV Japan", "Medal Mahjong Janjan Baribari [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Kawakusu", "Medal Mahjong Circuit no Mehyou [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, nbmj9195, ROT0,   "Apple", "Ultra Maru-hi Mahjong (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, nbmj9195, ROT0,   "Fujic", "Mahjong Gal 10-renpatsu (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, nbmj9195, ROT0,   "Fujic", "Mahjong Ren-ai Club (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, mkeibaou, 0,        mkeibaou, mkeibaou, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Keibaou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars-R [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195_state, nbmj9195, ROT0,   "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195_state, nbmj9195, ROT0,   "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal, nbmj9195_state,   nbmj9195, ROT0,   "Nichibutsu", "Nekketsu Grand-Prix Gal (Japan)", 0 )
-GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Gottsu ee-kanji (Japan)", 0 )
-GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Bakuhatsu Junjouden (Japan)", 0 )
-GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Kawakusu", "Mahjong Circuit no Mehyou (Japan)", 0 )
-GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi Uranai (Japan set 1)", 0 )
-GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi Uranai (Japan set 2)", 0 )
+GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal, nbmj9195_state,   nbmj9195, ROT0,   "Nichibutsu", "Nekketsu Grand-Prix Gal (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Gottsu ee-kanji (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Bakuhatsu Junjouden (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / Kawakusu", "Mahjong Circuit no Mehyou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi Uranai (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Koi Uranai (Japan set 2)", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm, nbmj9195_state,  nbmj9195, ROT0,   "Sphinx / AV Japan", "Mahjong Scout Man (Japan)", 0 )
-GAME( 1994, imekura,  0,        imekura,  imekura, nbmj9195_state,  nbmj9195, ROT0,   "Sphinx / AV Japan", "Imekura Mahjong (Japan)", 0 )
-GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf, nbmj9195_state,  nbmj9195, ROT0,   "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", 0 )
+GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm, nbmj9195_state,  nbmj9195, ROT0,   "Sphinx / AV Japan", "Mahjong Scout Man (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, imekura,  0,        imekura,  imekura, nbmj9195_state,  nbmj9195, ROT0,   "Sphinx / AV Japan", "Imekura Mahjong (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf, nbmj9195_state,  nbmj9195, ROT0,   "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 199?, shabdama, 0,        shabdama, mjuraden,nbmj9195_state,  nbmj9195,       ROT0, "Nichibutsu",      "LD Mahjong #4 Shabon-Dama", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, shabdama, 0,        shabdama, mjuraden,nbmj9195_state,  nbmj9195,       ROT0, "Nichibutsu",      "LD Mahjong #4 Shabon-Dama", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

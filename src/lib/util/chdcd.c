@@ -21,6 +21,18 @@
     CONSTANTS & DEFINES
 ***************************************************************************/
 
+/**
+ * @def TOKENIZE();
+ *
+ * @brief   A macro that defines tokenize.
+ *
+ * @param   linebuffer          The linebuffer.
+ * @param   i                   Zero-based index of the.
+ * @param   sizeof(linebuffer)  The sizeof(linebuffer)
+ * @param   token               The token.
+ * @param   sizeof(token)       The sizeof(token)
+ */
+
 #define TOKENIZE i = tokenize( linebuffer, i, sizeof(linebuffer), token, sizeof(token) );
 
 
@@ -29,6 +41,7 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
+/** @brief  The linebuffer[ 512]. */
 static char linebuffer[512];
 
 
@@ -36,6 +49,16 @@ static char linebuffer[512];
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
+
+/**
+ * @fn  static std::string get_file_path(std::string &path)
+ *
+ * @brief   Gets file path.
+ *
+ * @param [in,out]  path    Full pathname of the file.
+ *
+ * @return  The file path.
+ */
 
 static std::string get_file_path(std::string &path)
 {
@@ -51,6 +74,16 @@ static std::string get_file_path(std::string &path)
 /*-------------------------------------------------
     get_file_size - get the size of a file
 -------------------------------------------------*/
+
+/**
+ * @fn  static UINT64 get_file_size(const char *filename)
+ *
+ * @brief   Gets file size.
+ *
+ * @param   filename    Filename of the file.
+ *
+ * @return  The file size.
+ */
 
 static UINT64 get_file_size(const char *filename)
 {
@@ -69,6 +102,20 @@ static UINT64 get_file_size(const char *filename)
 /*-------------------------------------------------
     tokenize - get a token from the line buffer
 -------------------------------------------------*/
+
+/**
+ * @fn  static int tokenize( const char *linebuffer, int i, int linebuffersize, char *token, int tokensize )
+ *
+ * @brief   Tokenizes.
+ *
+ * @param   linebuffer      The linebuffer.
+ * @param   i               Zero-based index of the.
+ * @param   linebuffersize  The linebuffersize.
+ * @param [in,out]  token   If non-null, the token.
+ * @param   tokensize       The tokensize.
+ *
+ * @return  An int.
+ */
 
 static int tokenize( const char *linebuffer, int i, int linebuffersize, char *token, int tokensize )
 {
@@ -114,6 +161,16 @@ static int tokenize( const char *linebuffer, int i, int linebuffersize, char *to
     msf_to_frames - convert m:s:f into a number of frames
 -------------------------------------------------*/
 
+/**
+ * @fn  static int msf_to_frames( char *token )
+ *
+ * @brief   Msf to frames.
+ *
+ * @param [in,out]  token   If non-null, the token.
+ *
+ * @return  An int.
+ */
+
 static int msf_to_frames( char *token )
 {
 	int m = 0;
@@ -140,6 +197,18 @@ static int msf_to_frames( char *token )
     length in bytes of the data and the offset in
     bytes to where the data starts in the file.
 -------------------------------------------------*/
+
+/**
+ * @fn  static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
+ *
+ * @brief   Parse WAV sample.
+ *
+ * @param   filename            Filename of the file.
+ * @param [in,out]  dataoffs    If non-null, the dataoffs.
+ *
+ * @return  An UINT32.
+ */
+
 static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 {
 	unsigned long offset = 0;
@@ -308,6 +377,16 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	return length;
 }
 
+/**
+ * @fn  UINT16 read_uint16(FILE *infile)
+ *
+ * @brief   Reads uint 16.
+ *
+ * @param [in,out]  infile  If non-null, the infile.
+ *
+ * @return  The uint 16.
+ */
+
 UINT16 read_uint16(FILE *infile)
 {
 	UINT16 res = 0;
@@ -320,6 +399,16 @@ UINT16 read_uint16(FILE *infile)
 	return res;
 }
 
+/**
+ * @fn  UINT32 read_uint32(FILE *infile)
+ *
+ * @brief   Reads uint 32.
+ *
+ * @param [in,out]  infile  If non-null, the infile.
+ *
+ * @return  The uint 32.
+ */
+
 UINT32 read_uint32(FILE *infile)
 {
 	UINT32 res = 0;
@@ -331,6 +420,16 @@ UINT32 read_uint32(FILE *infile)
 
 	return res;
 }
+
+/**
+ * @fn  UINT64 read_uint64(FILE *infile)
+ *
+ * @brief   Reads uint 64.
+ *
+ * @param [in,out]  infile  If non-null, the infile.
+ *
+ * @return  The uint 64.
+ */
 
 UINT64 read_uint64(FILE *infile)
 {
@@ -351,6 +450,18 @@ UINT64 read_uint64(FILE *infile)
 /*-------------------------------------------------
     chdcd_parse_nero - parse a Nero .NRG file
 -------------------------------------------------*/
+
+/**
+ * @fn  chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ *
+ * @brief   Chdcd parse nero.
+ *
+ * @param   tocfname        The tocfname.
+ * @param [in,out]  outtoc  The outtoc.
+ * @param [in,out]  outinfo The outinfo.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
@@ -526,6 +637,18 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
     chdcd_parse_iso - parse a .ISO file
 -------------------------------------------------*/
 
+/**
+ * @fn  chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ *
+ * @brief   Chdcd parse ISO.
+ *
+ * @param   tocfname        The tocfname.
+ * @param [in,out]  outtoc  The outtoc.
+ * @param [in,out]  outinfo The outinfo.
+ *
+ * @return  A chd_error.
+ */
+
 chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
 	FILE *infile;
@@ -590,6 +713,18 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 /*-------------------------------------------------
     chdcd_parse_gdi - parse a Sega GD-ROM rip
 -------------------------------------------------*/
+
+/**
+ * @fn  static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ *
+ * @brief   Chdcd parse GDI.
+ *
+ * @param   tocfname        The tocfname.
+ * @param [in,out]  outtoc  The outtoc.
+ * @param [in,out]  outinfo The outinfo.
+ *
+ * @return  A chd_error.
+ */
 
 static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
@@ -710,6 +845,18 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 /*-------------------------------------------------
     chdcd_parse_cue - parse a CDRWin format CUE file
 -------------------------------------------------*/
+
+/**
+ * @fn  chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ *
+ * @brief   Chdcd parse cue.
+ *
+ * @param   tocfname        The tocfname.
+ * @param [in,out]  outtoc  The outtoc.
+ * @param [in,out]  outinfo The outinfo.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
@@ -993,6 +1140,18 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 /*-------------------------------------------------
     chdcd_parse_toc - parse a CDRDAO format TOC file
 -------------------------------------------------*/
+
+/**
+ * @fn  chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
+ *
+ * @brief   Chdcd parse TOC.
+ *
+ * @param   tocfname        The tocfname.
+ * @param [in,out]  outtoc  The outtoc.
+ * @param [in,out]  outinfo The outinfo.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {

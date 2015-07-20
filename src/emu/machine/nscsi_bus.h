@@ -83,7 +83,7 @@ public:
 		S_PHASE_STATUS   = S_CTL|S_INP,
 		S_PHASE_MSG_OUT  = S_MSG|S_CTL,
 		S_PHASE_MSG_IN   = S_MSG|S_CTL|S_INP,
-		S_PHASE_MASK     = S_MSG|S_CTL|S_INP,
+		S_PHASE_MASK     = S_MSG|S_CTL|S_INP
 	};
 
 	nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
@@ -117,7 +117,7 @@ protected:
 		SS_INT_CONDITION_MET             = 0x14,
 		SS_RESV_CONFLICT                 = 0x18,
 		SS_TERMINATED                    = 0x22,
-		SS_QUEUE_FULL                    = 0x28,
+		SS_QUEUE_FULL                    = 0x28
 	};
 
 	// SCSI commands
@@ -238,7 +238,7 @@ protected:
 		SC_PLAY_CD                       = 0xbc,
 		SC_MECHANISM_STATUS              = 0xbd,
 		SC_READ_CD                       = 0xbe,
-		SC_SEND_DVD_STRUCTURE            = 0xbf,
+		SC_SEND_DVD_STRUCTURE            = 0xbf
 	};
 
 	// SCSI Messages
@@ -264,12 +264,12 @@ protected:
 		SM_SIMPLE_QUEUE                  = 0x20,
 		SM_HEAD_QUEUE                    = 0x21,
 		SM_ORDERED_QUEUE                 = 0x22,
-		SM_IGNORE_WIDE_RES               = 0x23,
+		SM_IGNORE_WIDE_RES               = 0x23
 	};
 
 	enum {
 		SBUF_MAIN,
-		SBUF_SENSE,
+		SBUF_SENSE
 	};
 
 	UINT8 scsi_cmdbuf[4096], scsi_sense_buffer[8];
@@ -359,7 +359,7 @@ protected:
 
 private:
 	enum {
-		IDLE,
+		IDLE
 	};
 
 	enum {
@@ -370,20 +370,20 @@ private:
 		TARGET_WAIT_MSG_BYTE,
 		TARGET_WAIT_CMD_BYTE,
 		TARGET_WAIT_DATA_IN_BYTE,
-		TARGET_WAIT_DATA_OUT_BYTE,
+		TARGET_WAIT_DATA_OUT_BYTE
 	};
 
 	enum {
 		RECV_BYTE_T_WAIT_ACK_0 = 1,
 		RECV_BYTE_T_WAIT_ACK_1,
 		SEND_BYTE_T_WAIT_ACK_0,
-		SEND_BYTE_T_WAIT_ACK_1,
+		SEND_BYTE_T_WAIT_ACK_1
 	};
 
 	enum {
 		STATE_MASK = 0x00ff,
 		SUB_SHIFT  = 8,
-		SUB_MASK   = 0xff00,
+		SUB_MASK   = 0xff00
 	};
 
 	enum {
@@ -393,7 +393,7 @@ private:
 		BC_MESSAGE_2,
 		BC_DATA_IN,
 		BC_DATA_OUT,
-		BC_BUS_FREE,
+		BC_BUS_FREE
 	};
 
 	struct control {

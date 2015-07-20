@@ -41,7 +41,7 @@ class spu_device : public device_t, public device_sound_interface
 		dirtyflag_voice_mask=0x00ffffff,
 		dirtyflag_reverb=0x01000000,
 		dirtyflag_ram=0x02000000,
-		dirtyflag_irq=0x04000000,
+		dirtyflag_irq=0x04000000
 	};
 
 protected:

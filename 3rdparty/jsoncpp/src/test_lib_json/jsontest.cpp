@@ -323,7 +323,7 @@ void Runner::listTests() const {
 }
 
 int Runner::runCommandLine(int argc, const char* argv[]) const {
-  typedef std::deque<std::string> TestNames;
+  // typedef std::deque<std::string> TestNames;
   Runner subrunner;
   for (int index = 1; index < argc; ++index) {
     std::string opt = argv[index];

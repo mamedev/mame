@@ -2377,7 +2377,7 @@ void tlcs90_device::t90_start_timer(int i)
 
 	m_timer[i]->adjust(period, i, period);
 
-	logerror("%04X: CPU Timer %d started at %lf Hz\n", m_pc.w.l, i, 1.0 / period.as_double());
+	logerror("%04X: CPU Timer %d started at %f Hz\n", m_pc.w.l, i, 1.0 / period.as_double());
 }
 
 void tlcs90_device::t90_start_timer4()
@@ -2399,7 +2399,7 @@ void tlcs90_device::t90_start_timer4()
 
 	m_timer[4]->adjust(period, 4, period);
 
-	logerror("%04X: CPU Timer 4 started at %lf Hz\n", m_pc.w.l, 1.0 / period.as_double());
+	logerror("%04X: CPU Timer 4 started at %f Hz\n", m_pc.w.l, 1.0 / period.as_double());
 }
 
 

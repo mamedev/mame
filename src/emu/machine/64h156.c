@@ -336,7 +336,7 @@ void c64h156_device::live_run(const attotime &limit)
 			// update signals
 			if (byte != cur_live.byte) {
 				if (!byte || !cur_live.accl) {
-					if (LOG) logerror("%s BYTE %u\n", cur_live.tm.as_string(),byte);
+					if (LOG) logerror("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
 					cur_live.byte = byte;
 					syncpoint = true;
 				}

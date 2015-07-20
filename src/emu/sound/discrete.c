@@ -39,7 +39,8 @@
 #include "wavwrite.h"
 #include "discrete.h"
 
-
+/* for_each collides with c++ standard libraries - include it here */
+#define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
 
 // device type definition
 const device_type DISCRETE = &device_creator<discrete_sound_device>;

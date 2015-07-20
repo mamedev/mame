@@ -39,6 +39,27 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( nmi_line );
 
 protected:
+	class memory_interface {
+	public:
+		address_space *m_program, *m_sprogram;
+		direct_read_data *m_direct, *m_sdirect;
+
+		virtual ~memory_interface() {}
+		virtual UINT8 read(UINT16 adr) = 0;
+		virtual UINT8 read_opcode(UINT16 adr) = 0;
+		virtual UINT8 read_opcode_arg(UINT16 adr) = 0;
+		virtual void write(UINT16 adr, UINT8 val) = 0;
+	};
+
+	class mi_default : public memory_interface {
+	public:
+		virtual ~mi_default() {}
+		virtual UINT8 read(UINT16 adr);
+		virtual UINT8 read_opcode(UINT16 adr);
+		virtual UINT8 read_opcode_arg(UINT16 adr);
+		virtual void write(UINT16 adr, UINT8 val);
+	};
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -119,6 +140,9 @@ protected:
 		VECTOR_RESET_FFFE   = 0xFFFE
 	};
 
+	// Memory interface
+	memory_interface *          m_mintf;
+
 	// CPU registers
 	PAIR16                      m_pc;               // program counter
 	PAIR16                      m_ppc;              // previous program counter
@@ -151,19 +175,19 @@ protected:
 	void eat_remaining();
 
 	// read a byte from given memory location
-	inline UINT8 read_memory(UINT16 address)             { eat(1); return m_addrspace[AS_PROGRAM]->read_byte(address); }
+	inline UINT8 read_memory(UINT16 address)             { eat(1); return m_mintf->read(address); }
 
 	// write a byte to given memory location
-	inline void write_memory(UINT16 address, UINT8 data) { eat(1); m_addrspace[AS_PROGRAM]->write_byte(address, data); }
+	inline void write_memory(UINT16 address, UINT8 data) { eat(1); m_mintf->write(address, data); }
 
 	// read_opcode() is like read_memory() except it is used for reading opcodes. In  the case of a system
 	// with memory mapped I/O, this function can be used  to greatly speed up emulation.
-	inline UINT8 read_opcode(UINT16 address)             { eat(1); return m_direct->read_decrypted_byte(address); }
+	inline UINT8 read_opcode(UINT16 address)             { eat(1); return m_mintf->read_opcode(address); }
 
 	// read_opcode_arg() is identical to read_opcode() except it is used for reading opcode  arguments. This
 	// difference can be used to support systems that use different encoding mechanisms for opcodes
 	// and opcode arguments.
-	inline UINT8 read_opcode_arg(UINT16 address)         { eat(1); return m_direct->read_raw_byte(address); }
+	inline UINT8 read_opcode_arg(UINT16 address)         { eat(1); return m_mintf->read_opcode_arg(address); }
 
 	// read_opcode() and bump the program counter
 	inline UINT8 read_opcode()                           { return read_opcode(m_pc.w++); }
@@ -186,10 +210,6 @@ protected:
 	UINT8 read_operand(int ordinal);
 	void write_operand(UINT8 data);
 	void write_operand(int ordinal, UINT8 data);
-
-	// delay loops
-	bool match_target_bytes(UINT16 address, const UINT8 *bytes, int length);
-	void burn_any_delay_loops();
 
 	// instructions
 	void daa();
@@ -245,7 +265,7 @@ protected:
 private:
 	// address spaces
 	const address_space_config  m_program_config;
-	direct_read_data *          m_direct;
+	const address_space_config  m_sprogram_config;
 
 	// other state
 	UINT32                      m_state;

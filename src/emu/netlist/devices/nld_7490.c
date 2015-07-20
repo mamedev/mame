@@ -7,6 +7,8 @@
 
 #include "nld_7490.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(7490)
 {
 	register_input("A", m_A);
@@ -43,6 +45,9 @@ static const netlist_time delay[4] =
 
 NETLIB_UPDATE(7490)
 {
+	const netlist_sig_t new_A = INPLOGIC(m_A);
+	const netlist_sig_t new_B = INPLOGIC(m_B);
+
 	if (INPLOGIC(m_R91) & INPLOGIC(m_R92))
 	{
 		m_cnt = 9;
@@ -53,20 +58,23 @@ NETLIB_UPDATE(7490)
 		m_cnt = 0;
 		update_outputs();
 	}
-	else if (m_last_A && !INPLOGIC(m_A))  // High - Low
+	else
 	{
-		m_cnt ^= 1;
-		OUTLOGIC(m_Q[0], m_cnt & 1, delay[0]);
+		if (m_last_A && !new_A)  // High - Low
+		{
+			m_cnt ^= 1;
+			OUTLOGIC(m_Q[0], m_cnt & 1, delay[0]);
+		}
+		if (m_last_B && !new_B)  // High - Low
+		{
+			m_cnt += 2;
+			if (m_cnt >= 10)
+				m_cnt &= 1; /* Output A is not reset! */
+			update_outputs();
+		}
 	}
-	else if (m_last_B && !INPLOGIC(m_B))  // High - Low
-	{
-		m_cnt += 2;
-		if (m_cnt >= 10)
-			m_cnt = 0;
-		update_outputs();
-	}
-	m_last_A = INPLOGIC(m_A);
-	m_last_B = INPLOGIC(m_B);
+	m_last_A = new_A;
+	m_last_B = new_B;
 }
 
 NETLIB_FUNC_VOID(7490, update_outputs, (void))
@@ -85,7 +93,7 @@ NETLIB_START(7490_dip)
 	// register_subalias("4", ); --> NC
 	// register_subalias("5", ); --> VCC
 	register_subalias("6", m_R91);
-		register_subalias("7", m_R92);
+	register_subalias("7", m_R92);
 
 	register_subalias("8", m_Q[2]);
 	register_subalias("9", m_Q[1]);
@@ -106,3 +114,5 @@ NETLIB_RESET(7490_dip)
 {
 	NETLIB_NAME(7490)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

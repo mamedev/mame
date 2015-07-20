@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Raphael Nabet
 /*
     990_dk.c: emulation of a TI FD800 'Diablo' floppy disk controller

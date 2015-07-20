@@ -1091,7 +1091,7 @@ void pit8253_device::set_clockin(int timerno, double new_clockin)
 	pit8253_timer *timer = get_timer(timerno);
 	assert(timer != NULL);
 
-	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %lf\n", timerno, new_clockin));
+	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %f\n", timerno, new_clockin));
 
 	update(timer);
 	timer->clockin = new_clockin;

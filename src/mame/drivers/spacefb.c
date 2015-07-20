@@ -126,6 +126,18 @@
  *************************************/
 
 
+void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case TIMER_INTERRUPT:
+		interrupt_callback(ptr, param);
+		break;
+	default:
+			assert_always(FALSE, "Unknown id in spacefb_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 {
 	int next_vpos;
@@ -144,13 +156,6 @@ TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos));
 }
 
-
-void spacefb_state::create_interrupt_timer()
-{
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefb_state::interrupt_callback),this));
-}
-
-
 void spacefb_state::start_interrupt_timer()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
@@ -166,7 +171,9 @@ void spacefb_state::start_interrupt_timer()
 
 void spacefb_state::machine_start()
 {
-	create_interrupt_timer();
+	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+
+	save_item(NAME(m_sound_latch));
 }
 
 
@@ -181,9 +188,9 @@ void spacefb_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_IO);
 	/* the 3 output ports are cleared on reset */
-	spacefb_port_0_w(space, 0, 0);
-	spacefb_port_1_w(space, 0, 0);
-	spacefb_port_2_w(space, 0, 0);
+	port_0_w(space, 0, 0);
+	port_1_w(space, 0, 0);
+	port_2_w(space, 0, 0);
 
 	start_interrupt_timer();
 }
@@ -226,18 +233,18 @@ static ADDRESS_MAP_START( spacefb_main_io_map, AS_IO, 8, spacefb_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
 	AM_RANGE(0x04, 0x07) AM_READNOP  /* yes, this is correct (1-of-8 decoder) */
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_WRITE(spacefb_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_WRITE(spacefb_port_1_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_WRITE(spacefb_port_2_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_WRITE(port_0_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_WRITE(port_1_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_WRITE(port_2_w)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spacefb_audio_io_map, AS_IO, 8, spacefb_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(spacefb_audio_p2_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(spacefb_audio_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(spacefb_audio_t1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(audio_p2_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(audio_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)
 ADDRESS_MAP_END
 
 
@@ -344,7 +351,7 @@ static MACHINE_CONFIG_START( spacefb, spacefb_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(SPACEFB_PIXEL_CLOCK, SPACEFB_HTOTAL, SPACEFB_HBEND, SPACEFB_HBSTART, SPACEFB_VTOTAL, SPACEFB_VBEND, SPACEFB_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(spacefb_state, screen_update_spacefb)
+	MCFG_SCREEN_UPDATE_DRIVER(spacefb_state, screen_update)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(spacefb_audio)
@@ -597,12 +604,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, spacefb,  0,       spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 04-u)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefbe, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefbe2,spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefba, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 02-a)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefbg, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacebrd, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacefbb, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg", "Space Firebird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, spacedem, spacefb, spacefb, spacedem, driver_device, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg? (Potomac Mortgage)", "Star Warrior", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, spacefb,  0,       spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 04-u)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spacefbe, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spacefbe2,spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 03-e set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spacefba, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo", "Space Firebird (rev. 02-a)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spacefbg, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spacebrd, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spacefbb, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg", "Space Firebird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spacedem, spacefb, spacefb, spacedem, driver_device, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg? (Potomac Mortgage)", "Star Warrior", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

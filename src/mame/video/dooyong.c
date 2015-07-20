@@ -346,6 +346,12 @@ UINT32 dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bi
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
+	/* Text layer is offset on this machine */
+	if (!flip_screen())
+		m_tx_tilemap->set_scrolly(0, 8);
+	else
+		m_tx_tilemap->set_scrolly(0, -8);
+
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
@@ -360,6 +366,12 @@ UINT32 dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, b
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
+
+	/* Text layer is offset on this machine */
+	if (!flip_screen())
+		m_tx_tilemap->set_scrolly(0, 8);
+	else
+		m_tx_tilemap->set_scrolly(0, -8);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
@@ -455,9 +467,6 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
 
-	/* Text layer is offset on this machine */
-	m_tx_tilemap->set_scrolly(0, 8);
-
 	memset(m_bgscroll8, 0, 0x10);
 	memset(m_bg2scroll8, 0, 0x10);
 	memset(m_fgscroll8, 0, 0x10);
@@ -491,9 +500,6 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
 	/* Configure tilemap transparency */
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
-
-	/* Text layer is offset on this machine */
-	m_tx_tilemap->set_scrolly(0, 8);
 
 	memset(m_bgscroll8, 0, 0x10);
 	memset(m_bg2scroll8, 0, 0x10);

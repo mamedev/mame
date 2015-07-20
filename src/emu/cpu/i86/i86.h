@@ -14,6 +14,10 @@ extern const device_type I8088;
 #define INPUT_LINE_TEST         20
 
 
+#define MCFG_I8086_LOCK_HANDLER(_write) \
+	devcb = &i8086_common_cpu_device::set_lock_handler(*device, DEVCB_##_write);
+
+
 enum
 {
 	I8086_PC=0,
@@ -28,6 +32,9 @@ class i8086_common_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+	template<class _Object> static devcb_base &set_lock_handler(device_t &device, _Object object)
+		{ return downcast<i8086_common_cpu_device &>(device).m_lock_handler.set_callback(object); }
 
 protected:
 	enum
@@ -325,6 +332,9 @@ protected:
 
 	UINT8 m_timing[200];
 	bool m_halt;
+
+	bool m_lock;
+	devcb_write_line m_lock_handler;
 };
 
 class i8086_cpu_device : public i8086_common_cpu_device

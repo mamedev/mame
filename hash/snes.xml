@@ -3692,7 +3692,7 @@ Beyond that last category are the roms waiting to be classified.
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="spellcraft (usa) (proto).sfc" size="1048576" crc="3daea8a1" sha1="fe4dcca5c3cb2e721f4dbf971cc06fe10f78e629" offset="0x000000" />
+				<rom name="spellcraft (usa) (proto).sfc" size="1048576" crc="47e900bf" sha1="67107c028eb23b830c9fdfc4136c416d793dd98f" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

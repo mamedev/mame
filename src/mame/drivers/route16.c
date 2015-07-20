@@ -982,6 +982,6 @@ GAME( 1980, speakres, 0,        speakres, speakres, driver_device, 0,        ROT
 GAME( 1980, speakresb,speakres, speakres, speakres, driver_device, 0,        ROT270, "bootleg", "Speak & Rescue (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, stratvox, speakres, stratvox, stratvox, driver_device, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox", GAME_SUPPORTS_SAVE )
 GAME( 1980, stratvoxb,speakres, stratvox, stratvox, driver_device, 0,        ROT270, "bootleg", "Stratovox (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg", "Space Echo (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spacecho2,speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg", "Space Echo (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)", "Space Echo (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)", "Space Echo (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, driver_device, 0,        ROT0,   "Taito", "T.T Mahjong", GAME_SUPPORTS_SAVE )

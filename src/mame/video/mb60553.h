@@ -19,7 +19,6 @@ public:
 	void reg_written( int num_reg);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void set_pal_base( int m_pal_base);
-	void set_gfx_region( int m_gfx_region);
 	void draw( screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority);
 	tilemap_t* get_tilemap();
 
@@ -44,7 +43,7 @@ protected:
 
 
 private:
-	UINT8 m_m_gfx_region;
+	UINT8 m_gfx_region;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 

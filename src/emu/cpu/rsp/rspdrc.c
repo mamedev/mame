@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "debugger.h"
 #include "rsp.h"
-#include "rspdiv.h"
 #include "rspfe.h"
 #include "rspcp2.h"
 #include "cpu/drcfe.h"
@@ -184,7 +183,7 @@ static void cfunc_write32(void *param)
 
 void rsp_device::rspdrc_set_options(UINT32 options)
 {
-	if (!machine().options().drc()) return;
+	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
 	m_drcoptions = options;
 }
 
@@ -308,7 +307,7 @@ void rsp_device::execute_run_drc()
 
 void rsp_device::rspdrc_flush_drc_cache()
 {
-	if (!machine().options().drc()) return;
+	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
 	m_cache_dirty = TRUE;
 }
 
@@ -669,12 +668,12 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
 			UINT32 sum = seqhead->opptr.l[0];
-			void *base = m_direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
+			void *base = m_direct->read_ptr(seqhead->physpc | 0x1000);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                         // load    i0,base,0,dword
 
 			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
-				base = m_direct->read_decrypted_ptr(seqhead->delay.first()->physpc | 0x1000);
+				base = m_direct->read_ptr(seqhead->delay.first()->physpc | 0x1000);
 				assert(base != NULL);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
@@ -691,13 +690,13 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 	else
 	{
 		UINT32 sum = 0;
-		void *base = m_direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
+		void *base = m_direct->read_ptr(seqhead->physpc | 0x1000);
 		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_decrypted_ptr(curdesc->physpc | 0x1000);
+				base = m_direct->read_ptr(curdesc->physpc | 0x1000);
 				assert(base != NULL);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                     // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
@@ -705,7 +704,7 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 
 				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
-					base = m_direct->read_decrypted_ptr(curdesc->delay.first()->physpc | 0x1000);
+					base = m_direct->read_ptr(curdesc->delay.first()->physpc | 0x1000);
 					assert(base != NULL);
 					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1

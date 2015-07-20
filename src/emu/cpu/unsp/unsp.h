@@ -28,7 +28,7 @@ enum
 
 	UNSP_IRQ,
 	UNSP_FIQ,
-	UNSP_SB,
+	UNSP_SB
 
 };
 

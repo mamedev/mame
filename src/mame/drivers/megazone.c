@@ -234,7 +234,7 @@ INTERRUPT_GEN_MEMBER(megazone_state::vblank_irq)
 static MACHINE_CONFIG_START( megazone, megazone_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 18432000/9)        /* 2 MHz */
+	MCFG_CPU_ADD("maincpu", KONAMI1, 18432000/9)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(megazone_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", megazone_state,  vblank_irq)
 
@@ -506,7 +506,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(megazone_state,megazone)
 {
-	konami1_decode(machine(), "maincpu");
 }
 
 GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, megazone, ROT90, "Konami", "Mega Zone (Konami set 1)", GAME_SUPPORTS_SAVE )

@@ -403,7 +403,7 @@ static const Z8000_init table[] = {
 {0x9900,0x99ff, 1,1, 70,&z8002_device::Z99_ssss_dddd,                           "mult    %rl3,%rw2",               0},
 {0x9a00,0x9aff, 1,1,744,&z8002_device::Z9A_ssss_dddd,                           "divl    %rq3,%rl2",               0},
 {0x9b00,0x9bff, 1,1,107,&z8002_device::Z9B_ssss_dddd,                           "div     %rl3,%rw2",               0},
-{0x9c08,0x9cf8,16,1, 13,&z8002_device::Z9C_dddd_1000,                           "testl   %rl2",                    0},
+{0x9c00,0x9cf8, 8,1, 13,&z8002_device::Z9C_dddd_1000,                           "testl   %rl2",                    0},
 {0x9d00,0x9dff, 1,1, 10,&z8002_device::Z9D_imm8,                                "rsvd9d",                          0},
 {0x9e00,0x9e0f, 1,1, 10,&z8002_device::Z9E_0000_cccc,                           "ret     %c3",                     DASMFLAG_STEP_OUT},
 {0x9f00,0x9fff, 1,1, 10,&z8002_device::Z9F_imm8,                                "rsvd9f",                          0},
@@ -543,7 +543,7 @@ void z8000_init_tables(void)
 	for (i = 0; i < 256; i++)
 		z8000_zsp[i] = ((i == 0) ? F_Z : 0) |
 						((i & 128) ? F_S : 0) |
-						((((i>>7)^(i>>6)^(i>>5)^(i>>4)^(i>>3)^(i>>2)^(i>>1)^i) & 1) ? F_PV : 0);
+						((((i>>7)^(i>>6)^(i>>5)^(i>>4)^(i>>3)^(i>>2)^(i>>1)^i) & 1) ? 0 : F_PV);
 
 	/* first set all 64K opcodes to invalid */
 	for (i = 0; i < 0x10000; i++)

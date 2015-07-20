@@ -334,7 +334,7 @@ INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
 static MACHINE_CONFIG_START( circusc, circusc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2048000)        /* 2 MHz? */
+	MCFG_CPU_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */
 	MCFG_CPU_PROGRAM_MAP(circusc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", circusc_state,  vblank_irq)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
@@ -567,7 +567,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(circusc_state,circusc)
 {
-	konami1_decode(machine(), "maincpu");
 }
 
 

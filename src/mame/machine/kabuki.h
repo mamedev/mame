@@ -2,18 +2,18 @@
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
 
-void mgakuen2_decode(running_machine &machine);
-void pang_decode(running_machine &machine);
-void cworld_decode(running_machine &machine);
-void hatena_decode(running_machine &machine);
-void spang_decode(running_machine &machine);
-void spangj_decode(running_machine &machine);
-void sbbros_decode(running_machine &machine);
-void marukin_decode(running_machine &machine);
-void qtono1_decode(running_machine &machine);
-void qsangoku_decode(running_machine &machine);
-void block_decode(running_machine &machine);
-void wof_decode(running_machine &machine);
-void dino_decode(running_machine &machine);
-void punisher_decode(running_machine &machine);
-void slammast_decode(running_machine &machine);
+void mgakuen2_decode(UINT8 *src, UINT8 *dst, int size);
+void pang_decode(UINT8 *src, UINT8 *dst, int size);
+void cworld_decode(UINT8 *src, UINT8 *dst, int size);
+void hatena_decode(UINT8 *src, UINT8 *dst, int size);
+void spang_decode(UINT8 *src, UINT8 *dst, int size);
+void spangj_decode(UINT8 *src, UINT8 *dst, int size);
+void sbbros_decode(UINT8 *src, UINT8 *dst, int size);
+void marukin_decode(UINT8 *src, UINT8 *dst, int size);
+void qtono1_decode(UINT8 *src, UINT8 *dst, int size);
+void qsangoku_decode(UINT8 *src, UINT8 *dst, int size);
+void block_decode(UINT8 *src, UINT8 *dst, int size);
+void wof_decode(UINT8 *src, UINT8 *dst);
+void dino_decode(UINT8 *src, UINT8 *dst);
+void punisher_decode(UINT8 *src, UINT8 *dst);
+void slammast_decode(UINT8 *src, UINT8 *dst);

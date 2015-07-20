@@ -1,9 +1,9 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
 #include "machine/eepromser.h"
 #include "video/tc0480scp.h"
 
-struct tempsprite
+struct gb_tempsprite
 {
 	int gfx;
 	int code,color;
@@ -44,7 +44,7 @@ public:
 
 	bool m_coin_lockout;
 	UINT16 m_coin_word;
-	struct tempsprite *m_spritelist;
+	struct gb_tempsprite *m_spritelist;
 	UINT32 m_mem[2];
 
 	DECLARE_WRITE32_MEMBER(gunbustr_input_w);

@@ -103,6 +103,7 @@ private:
 	saa1099_channel m_channels[6];    /* channels */
 	saa1099_noise m_noise[2];         /* noise generators */
 	double m_sample_rate;
+	int m_master_clock;
 };
 
 extern const device_type SAA1099;

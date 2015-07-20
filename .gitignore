@@ -3,6 +3,7 @@
 !/*/
 !/.gitattributes
 !/.gitignore
+!/.travis.yml
 !/makefile
 !/mame.doxygen 
 !/*.md

@@ -127,7 +127,7 @@ enum
 	OP_FFRI4,
 	OP_FFRI8,
 	OP_FFRFS,
-	OP_FFRFD,
+	OP_FFRFD
 };
 
 

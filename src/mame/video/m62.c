@@ -92,14 +92,14 @@ static const res_net_info m62_sprite_net_info =
 };
 
 
-/* this is a complete guess */
 static const res_net_info battroad_char_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VIN_TTL_OUT,
 	{
+		{ RES_NET_AMP_NONE, 0, 0, 2, {       470, 220 } },
 		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_NONE, 0, 0, 2, {       470, 220 } }
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } }
+
 	}
 };
 
@@ -155,8 +155,8 @@ static const res_net_decode_info battroad_char_decode_info =
 	0x000, 0x01f,       /* start/end */
 	/*  R      G      B */
 	{ 0x600, 0x600, 0x600 }, /* offsets */
-	{     0,     3,     6 }, /* shifts */
-	{  0x07,  0x07,  0x03 }  /* masks */
+	{     6,     3,     0 }, /* shifts */
+	{  0x03,  0x07,  0x07 }  /* masks */
 };
 
 
@@ -292,7 +292,7 @@ void m62_state::register_savestate(  )
 WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~ioport("DSW2")->read() & 1;
+	data ^= ((~ioport("DSW2")->read()) & 1);
 
 	m_flipscreen = data & 0x01;
 	if (m_flipscreen)
@@ -302,6 +302,10 @@ WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 
 	coin_counter_w(machine(), 0, data & 2);
 	coin_counter_w(machine(), 1, data & 4);
+
+	/* Sound inhibit ... connected to D6 which is not present on any board */
+	if (m_audio->m_audio_SINH != NULL)
+		m_audio->m_audio_SINH->write((data >> 3) & 1);
 }
 
 WRITE8_MEMBER(m62_state::m62_hscroll_low_w)

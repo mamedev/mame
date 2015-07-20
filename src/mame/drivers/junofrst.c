@@ -409,7 +409,7 @@ INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
 static MACHINE_CONFIG_START( junofrst, junofrst_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)         /* 1.5 MHz ??? */
+	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", junofrst_state,  _30hz_irq)
 
@@ -507,10 +507,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(junofrst_state,junofrst)
 {
-	UINT8 *decrypted = konami1_decode(machine(), "maincpu");
-
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
-	membank("bank1")->configure_decrypted_entries(0, 16, decrypted + 0x10000, 0x1000);
 }
 
 

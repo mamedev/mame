@@ -48,8 +48,6 @@ public:
 	UINT8 m_sys0;
 	UINT8 m_sys1;
 
-	direct_update_delegate m_dsp56k_update_handler;
-
 	/* TTL text plane stuff */
 	int m_ttl_gfx_index;
 	tilemap_t *m_ttl_tilemap;
@@ -95,7 +93,6 @@ public:
 	DECLARE_WRITE32_MEMBER(polygonet_ttl_ram_w);
 	DECLARE_READ32_MEMBER(polygonet_roz_ram_r);
 	DECLARE_WRITE32_MEMBER(polygonet_roz_ram_w);
-	DIRECT_UPDATE_MEMBER(plygonet_dsp56k_direct_handler);
 	DECLARE_DRIVER_INIT(polygonet);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(roz_get_tile_info);

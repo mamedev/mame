@@ -229,7 +229,7 @@ inline int s2650_device::check_irq_line()
  ***************************************************************/
 inline UINT8 s2650_device::ROP()
 {
-	UINT8 result = m_direct->read_decrypted_byte(m_page + m_iar);
+	UINT8 result = m_direct->read_byte(m_page + m_iar);
 	m_iar = (m_iar + 1) & PMSK;
 	return result;
 }
@@ -240,7 +240,7 @@ inline UINT8 s2650_device::ROP()
  ***************************************************************/
 inline UINT8 s2650_device::ARG()
 {
-	UINT8 result = m_direct->read_raw_byte(m_page + m_iar);
+	UINT8 result = m_direct->read_byte(m_page + m_iar);
 	m_iar = (m_iar + 1) & PMSK;
 	return result;
 }

@@ -39,21 +39,25 @@
 #include "nld_signal.h"
 
 #define TTL_7425_NOR(_name, _I1, _I2, _I3, _I4)                                     \
-		NET_REGISTER_DEV(7425, _name)                                               \
+		NET_REGISTER_DEV(TTL_7425_NOR, _name)                                               \
 		NET_CONNECT(_name, A, _I1)                                                  \
 		NET_CONNECT(_name, B, _I2)                                                  \
 		NET_CONNECT(_name, C, _I3)                                                  \
 		NET_CONNECT(_name, D, _I4)
 
+#define TTL_7425_DIP(_name)                                                         \
+		NET_REGISTER_DEV(TTL_7425_DIP, _name)
+
+NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_SIGNAL(7425, 4, 1, 0);
-
-#define TTL_7425_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7425_dip, _name)
 
 NETLIB_DEVICE(7425_dip,
 
 	NETLIB_NAME(7425) m_1;
 	NETLIB_NAME(7425) m_2;
 );
+
+NETLIB_NAMESPACE_DEVICES_END()
+
 #endif /* NLD_7425_H_ */

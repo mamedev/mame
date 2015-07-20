@@ -195,20 +195,27 @@ Notes:
 #include "cpu/m6800/m6800.h"
 #include "includes/pacland.h"
 
-WRITE8_MEMBER(pacland_state::pacland_subreset_w)
+
+void pacland_state::machine_start()
+{
+	save_item(NAME(m_main_irq_mask));
+	save_item(NAME(m_mcu_irq_mask));
+}
+
+WRITE8_MEMBER(pacland_state::subreset_w)
 {
 	int bit = !BIT(offset,11);
 	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pacland_state::pacland_flipscreen_w)
+WRITE8_MEMBER(pacland_state::flipscreen_w)
 {
 	int bit = !BIT(offset,11);
 	flip_screen_set(bit);
 }
 
 
-READ8_MEMBER(pacland_state::pacland_input_r)
+READ8_MEMBER(pacland_state::input_r)
 {
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
@@ -219,20 +226,20 @@ READ8_MEMBER(pacland_state::pacland_input_r)
 	return r;
 }
 
-WRITE8_MEMBER(pacland_state::pacland_coin_w)
+WRITE8_MEMBER(pacland_state::coin_w)
 {
 	coin_lockout_global_w(machine(), data & 1);
 	coin_counter_w(machine(), 0, ~data & 2);
 	coin_counter_w(machine(), 1, ~data & 4);
 }
 
-WRITE8_MEMBER(pacland_state::pacland_led_w)
+WRITE8_MEMBER(pacland_state::led_w)
 {
 	set_led_status(machine(), 0, data & 0x08);
 	set_led_status(machine(), 1, data & 0x10);
 }
 
-WRITE8_MEMBER(pacland_state::pacland_irq_1_ctrl_w)
+WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit;
@@ -240,7 +247,7 @@ WRITE8_MEMBER(pacland_state::pacland_irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(pacland_state::pacland_irq_2_ctrl_w)
+WRITE8_MEMBER(pacland_state::irq_2_ctrl_w)
 {
 	int bit = !BIT(offset, 13);
 	m_mcu_irq_mask = bit;
@@ -251,19 +258,19 @@ WRITE8_MEMBER(pacland_state::pacland_irq_2_ctrl_w)
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pacland_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(pacland_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(pacland_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x2000, 0x37ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3800, 0x3801) AM_WRITE(pacland_scroll0_w)
-	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(pacland_scroll1_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(pacland_bankswitch_w)
+	AM_RANGE(0x3800, 0x3801) AM_WRITE(scroll0_w)
+	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(scroll1_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)      /* PSG device, shared RAM */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(pacland_irq_1_ctrl_w)
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(irq_1_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(pacland_subreset_w)
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(pacland_flipscreen_w)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(subreset_w)
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(flipscreen_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pacland_state )
@@ -271,10 +278,10 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pacland_state )
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)      /* PSG device, shared RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(watchdog_reset_w)     /* watchdog? */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(pacland_irq_2_ctrl_w)
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(irq_2_ctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd003) AM_READ(pacland_input_r)
+	AM_RANGE(0xd000, 0xd003) AM_READ(input_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -286,9 +293,9 @@ READ8_MEMBER(pacland_state::readFF)
 
 static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, pacland_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("IN2")
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(pacland_coin_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(coin_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)  /* leds won't work otherwise */
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(pacland_led_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(led_w)
 ADDRESS_MAP_END
 
 
@@ -433,7 +440,7 @@ static MACHINE_CONFIG_START( pacland, pacland_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update_pacland)
+	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacland)

@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "svi318_cass")
 
-	MCFG_FD1793x_ADD("wd179x", XTAL_1MHz)
+	MCFG_FD1793_ADD("wd179x", XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(svi318_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(svi318_state, fdc_drq_w))
 
@@ -439,7 +439,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "svi318_cass")
 
-	MCFG_FD1793x_ADD("wd179x", XTAL_1MHz)
+	MCFG_FD1793_ADD("wd179x", XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(svi318_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(svi318_state, fdc_drq_w))
 

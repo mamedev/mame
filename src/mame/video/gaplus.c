@@ -2,7 +2,7 @@
 // copyright-holders:Manuel Abadia, Ernesto Corvi, Nicola Salmoria
 /***************************************************************************
 
-  video.c
+  gaplus.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -183,6 +183,15 @@ void gaplus_state::video_start()
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0xff);
 
 	starfield_init();
+
+	save_item(NAME(m_starfield_control));
+
+	for (int i = 0; i < MAX_STARS; i++)
+	{
+		save_item(NAME(m_stars[i].x), i);
+		save_item(NAME(m_stars[i].y), i);
+		// col and set aren't changed after init
+	}
 }
 
 
@@ -193,18 +202,13 @@ void gaplus_state::video_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(gaplus_state::gaplus_videoram_r)
-{
-	return m_videoram[offset];
-}
-
-WRITE8_MEMBER(gaplus_state::gaplus_videoram_w)
+WRITE8_MEMBER(gaplus_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(gaplus_state::gaplus_starfield_control_w)
+WRITE8_MEMBER(gaplus_state::starfield_control_w)
 {
 	offset &= 3;
 	m_starfield_control[offset] = data;
@@ -298,7 +302,7 @@ void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 	}
 }
 
-UINT32 gaplus_state::screen_update_gaplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 gaplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
@@ -319,7 +323,7 @@ UINT32 gaplus_state::screen_update_gaplus(screen_device &screen, bitmap_ind16 &b
 }
 
 
-void gaplus_state::screen_eof_gaplus(screen_device &screen, bool state)/* update starfields */
+void gaplus_state::screen_eof(screen_device &screen, bool state)/* update starfields */
 {
 	// falling edge
 	if (!state)

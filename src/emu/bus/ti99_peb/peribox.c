@@ -179,9 +179,6 @@ CRUCLK*  51||52  DBIN
 #include "emu.h"
 #include "peribox.h"
 
-// MFM hard drives
-#include "machine/ti99_hd.h"
-
 // The cards
 #include "ti_32kmem.h"
 #include "ti_fdc.h"
@@ -198,9 +195,6 @@ CRUCLK*  51||52  DBIN
 #include "spchsyn.h"
 #include "memex.h"
 #include "horizon.h"
-
-// Disk formats
-#include "formats/ti99_dsk.h"
 
 /*
     Debugging flags. Set to 0 or 1.
@@ -222,14 +216,6 @@ CRUCLK*  51||52  DBIN
 #define PEBSLOT7 "slot7"
 #define PEBSLOT8 "slot8"
 
-// TODO: Connect other lines (think about how to propagate to the controller)
-static const floppy_interface ti99_4_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,              // type
-	LEGACY_FLOPPY_OPTIONS_NAME(ti99),       // image formats
-	NULL                                    // interface
-};
-
 peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, "peribox", __FILE__),
 	m_console_inta(*this),
@@ -237,6 +223,8 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 	m_datamux_ready(*this)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
+	// The address prefix is actually created by the "Flex cable interface"
+	// which sits in slot 1.
 	m_address_prefix = 0x70000;
 }
 
@@ -383,11 +371,6 @@ void peribox_device::device_start(void)
 {
 	if (TRACE_EMU) logerror("%s: started\n", tag());
 
-	subdevice<legacy_floppy_image_device>(FLOPPY_0)->floppy_drive_set_rpm(300.);
-	subdevice<legacy_floppy_image_device>(FLOPPY_1)->floppy_drive_set_rpm(300.);
-	subdevice<legacy_floppy_image_device>(FLOPPY_2)->floppy_drive_set_rpm(300.);
-	subdevice<legacy_floppy_image_device>(FLOPPY_3)->floppy_drive_set_rpm(300.);
-
 	// Resolve the callback lines to the console
 	m_console_inta.resolve();
 	m_console_intb.resolve();
@@ -432,15 +415,13 @@ SLOT_INTERFACE_START( peribox_slot7 )
 	SLOT_INTERFACE("ide", TI99_IDE)
 	SLOT_INTERFACE("usbsm", TI99_USBSM)
 	SLOT_INTERFACE("bwg", TI99_BWG)
-	SLOT_INTERFACE("hfdc", TI99_HFDC_LEG)
-	SLOT_INTERFACE("hfdcnew", TI99_HFDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_slot8 )
 	SLOT_INTERFACE("tifdc", TI99_FDC)
 	SLOT_INTERFACE("bwg", TI99_BWG)
-	SLOT_INTERFACE("hfdc", TI99_HFDC_LEG)
-	SLOT_INTERFACE("hfdcnew", TI99_HFDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( peribox_device )
@@ -451,19 +432,6 @@ MACHINE_CONFIG_FRAGMENT( peribox_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
-
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_device::device_mconfig_additions() const
@@ -478,8 +446,11 @@ machine_config_constructor peribox_device::device_mconfig_additions() const
 peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : peribox_device(mconfig, PERIBOX_GEN, "Peripheral expansion box Geneve", tag, owner, clock, "peribox_gen", __FILE__)
 {
+	// The Geneve sits in slot 1; there is no prefix here - it can control
+	// a maximum address space of 512 KiB in the box. With the Genmod
+	// modification, the full 2 MiB space is available.
 	m_address_prefix = 0x00000;
-};
+}
 
 // The BwG controller will not run with the Geneve due to its wait state
 // logic; it assumes that before reading 5FF6 (data register), address 5FF7
@@ -489,14 +460,12 @@ peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char
 SLOT_INTERFACE_START( peribox_slot7nobwg )
 	SLOT_INTERFACE("ide", TI99_IDE)
 	SLOT_INTERFACE("usbsm", TI99_USBSM)
-	SLOT_INTERFACE("hfdc", TI99_HFDC_LEG)
-	SLOT_INTERFACE("hfdcnew", TI99_HFDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_slot8nobwg )
 	SLOT_INTERFACE("tifdc", TI99_FDC)
-	SLOT_INTERFACE("hfdc", TI99_HFDC_LEG)
-	SLOT_INTERFACE("hfdcnew", TI99_HFDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_slotg )
@@ -517,19 +486,6 @@ MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7nobwg )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8nobwg )
-
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_gen_device::device_mconfig_additions() const
@@ -545,7 +501,7 @@ peribox_998_device::peribox_998_device(const machine_config &mconfig, const char
 : peribox_device(mconfig, PERIBOX_998, "Peripheral expansion box 99/8", tag, owner, clock, "peribox_998", __FILE__)
 {
 	m_address_prefix = 0x70000;
-};
+}
 
 // The BwG controller will not run with the TI-99/8 for the same reason why
 // it won't work with the Geneve.
@@ -569,19 +525,6 @@ MACHINE_CONFIG_FRAGMENT( peribox_998_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot998 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot998 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8nobwg )
-
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_998_device::device_mconfig_additions() const
@@ -597,7 +540,7 @@ peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *
 : peribox_device(mconfig, PERIBOX_SG, "Peripheral expansion box SGCPU", tag, owner, clock, "peribox_sg", __FILE__)
 {
 	m_address_prefix = 0x70000;
-};
+}
 
 SLOT_INTERFACE_START( peribox_slotp )
 	SLOT_INTERFACE("pcode", TI99_P_CODE)
@@ -621,20 +564,7 @@ MACHINE_CONFIG_FRAGMENT( peribox_sg_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotp )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot7 )
-
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_sg_device::device_mconfig_additions() const
@@ -651,7 +581,7 @@ peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *
 : peribox_device(mconfig, PERIBOX_EV, "Peripheral expansion box EVPC", tag, owner, clock, "peribox_ev", __FILE__)
 {
 	m_address_prefix = 0x70000;
-};
+}
 
 MACHINE_CONFIG_FRAGMENT( peribox_ev_device )
 	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT2, peribox_ev_slot, "evpc" )
@@ -661,34 +591,11 @@ MACHINE_CONFIG_FRAGMENT( peribox_ev_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
-
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
-	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_ev_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( peribox_ev_device );
-}
-
-/***************************************************************************
-    Floppy interface
-****************************************************************************/
-
-// TODO: won't be called unless motor_on is triggered
-WRITE_LINE_MEMBER( peribox_device::indexhole )
-{
-	logerror("peribox_device: indexhole\n");
 }
 
 /***************************************************************************

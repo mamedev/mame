@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Raphael Nabet, R. Belmont
 /*
     rtc65271 emulation

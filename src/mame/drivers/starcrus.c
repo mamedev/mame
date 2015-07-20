@@ -22,18 +22,18 @@ static ADDRESS_MAP_START( starcrus_map, AS_PROGRAM, 8, starcrus_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( starcrus_io_map, AS_IO, 8, starcrus_state )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(starcrus_s1_x_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(starcrus_s1_y_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(starcrus_coll_det_r, starcrus_s2_x_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(starcrus_s2_y_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(starcrus_p1_x_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(starcrus_p1_y_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(starcrus_p2_x_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(starcrus_p2_y_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(starcrus_ship_parm_1_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(starcrus_ship_parm_2_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(starcrus_proj_parm_1_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(starcrus_proj_parm_2_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(s1_x_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(s1_y_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(coll_det_r, s2_x_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(s2_y_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(p1_x_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(p1_y_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(p2_x_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(p2_y_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ship_parm_1_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ship_parm_2_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(proj_parm_1_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(proj_parm_2_w)
 ADDRESS_MAP_END
 
 
@@ -144,7 +144,7 @@ static MACHINE_CONFIG_START( starcrus, starcrus_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(starcrus_state, screen_update_starcrus)
+	MCFG_SCREEN_UPDATE_DRIVER(starcrus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starcrus)
@@ -189,4 +189,4 @@ ROM_START( starcrus )
 ROM_END
 
 
-GAME( 1977, starcrus, 0, starcrus, starcrus, driver_device, 0, ROT0, "RamTek", "Star Cruiser", GAME_IMPERFECT_SOUND )
+GAME( 1977, starcrus, 0, starcrus, starcrus, driver_device, 0, ROT0, "RamTek", "Star Cruiser", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

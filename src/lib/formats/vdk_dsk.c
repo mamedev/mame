@@ -102,7 +102,7 @@ bool vdk_format::save(io_generic *io, floppy_image *image)
 	header[0] = 'd';
 	header[1] = 'k';
 	header[2] = sizeof(header) % 0x100;
-    header[3] = sizeof(header) / 0x100;
+	header[3] = sizeof(header) / 0x100;
 	header[4] = 0x10;
 	header[5] = 0x10;
 	header[6] = 'M';

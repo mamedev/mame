@@ -43,7 +43,7 @@ public:
 		ADC_4,
 		ADC_5,
 		ADC_6,
-		ADC_7,
+		ADC_7
 	};
 
 	h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate);
@@ -65,7 +65,7 @@ protected:
 	enum {
 		STATE_RESET = 0x10000,
 		STATE_IRQ   = 0x10001,
-		STATE_TRACE = 0x10002,
+		STATE_TRACE = 0x10002
 	};
 
 	enum {
@@ -80,7 +80,7 @@ protected:
 
 		EXR_T  = 0x80,
 		EXR_NC = 0x78,
-		EXR_I  = 0x07,
+		EXR_I  = 0x07
 	};
 
 	enum {
@@ -138,7 +138,7 @@ protected:
 		DASM_ccr,      /* internal register ccr */
 		DASM_exr,      /* internal register exr */
 		DASM_macl,     /* internal register macl */
-		DASM_mach,     /* internal register mach */
+		DASM_mach      /* internal register mach */
 	};
 
 	// device-level overrides
@@ -469,7 +469,7 @@ enum {
 	H8_E6,
 	H8_E7,
 	H8_CCR,
-	H8_EXR,
+	H8_EXR
 };
 
 #endif

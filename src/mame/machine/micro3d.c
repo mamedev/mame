@@ -33,7 +33,7 @@
 WRITE_LINE_MEMBER(micro3d_state::duart_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(3, state, m_duart68681->get_irq_vector());
-};
+}
 
 WRITE_LINE_MEMBER(micro3d_state::duart_txb)
 {
@@ -41,7 +41,7 @@ WRITE_LINE_MEMBER(micro3d_state::duart_txb)
 	m_audiocpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
 	// TODO: next line should be behind a timer callback which lasts one audiocpu clock cycle
 	m_audiocpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
-};
+}
 
 READ8_MEMBER(micro3d_state::data_to_i8031)
 {

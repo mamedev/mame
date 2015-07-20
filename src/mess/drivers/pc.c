@@ -389,12 +389,6 @@ ROM_START( olivm15 )
 	ROM_LOAD( "oliv_m15.bin",0xfc000, 0x04000, CRC(bf2ef795) SHA1(02d497131f5ca2c78f2accd38ab0eab6813e3ebf))
 ROM_END
 
-ROM_START( olypeopl )
-	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD16_BYTE( "uo1271c0.bin", 0xfe000, 0x1000, CRC(c9187bce) SHA1(464e1f96046657b49afa4223ede1040650643d58))
-	ROM_LOAD16_BYTE( "uo1271d0.bin", 0xfe001, 0x1000, CRC(10e6437b) SHA1(0b77bb7a62f0a8240602f4cdcc3d6765e62894f4))
-ROM_END
-
 ROM_START( sx16 )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "tmm27128ad.bin",0xfc000, 0x4000, CRC(f8543362) SHA1(fef625e260ca89ba02174584bdc12db609f0780e))
@@ -474,7 +468,6 @@ COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga, driver_device
 
 COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sharp", "PC-7000", GAME_NOT_WORKING)
 
-COMP( 198?, olypeopl,   ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Olympia", "People PC", GAME_NOT_WORKING)
 COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sanyo", "SX-16", GAME_NOT_WORKING)
 COMP( 198?, mbc16,      ibm5150,    0,          pccga,      pccga, driver_device,      0,      "Sanyo", "MBC-16" , GAME_NOT_WORKING)
 

@@ -4,7 +4,7 @@
 
     Sega Saturn (c) 1994 Sega
 
-    List of things that needs to be implemented:
+    @todo List of things that needs to be implemented:
     - There's definitely an ack mechanism in SCU irqs. This is almost surely done via
       the ISM register (i.e. going 0->1 to the given bit acks it).
     - There might be a delay to exactly when SCU irqs happens. This is due to the basic
@@ -38,7 +38,8 @@
       H counter value 0x0ec (236) -> 0xe0
       H counter value 0x12c (300) -> 0x100
     - Timer 1 seems to count backwards compared to Timer 0 from setting 0x6b onward.
-
+    - Yabause claims that if VDP2 DISP bit isn't enabled then vblank irqs (hblank too?) 
+      doesn't happen.
 
 **************************************************************************************/
 

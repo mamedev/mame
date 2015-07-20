@@ -103,7 +103,6 @@ public:
 	bool m_beep_state;
 	DECLARE_DRIVER_INIT(osborne1);
 	virtual void machine_reset();
-	DECLARE_PALETTE_INIT(osborne1);
 	TIMER_CALLBACK_MEMBER(osborne1_video_callback);
 	TIMER_CALLBACK_MEMBER(setup_osborne1);
 

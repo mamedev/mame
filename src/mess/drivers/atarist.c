@@ -2099,7 +2099,7 @@ static MACHINE_CONFIG_START( st, st_state )
 
 	// devices
 
-	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD1772_ADD(WD1772_TAG, Y2/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
@@ -2190,7 +2190,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	// devices
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 
-	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD1772_ADD(WD1772_TAG, Y2/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
@@ -2288,7 +2288,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 
 	// devices
 
-	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD1772_ADD(WD1772_TAG, Y2/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
@@ -2401,7 +2401,7 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_WD1772x_ADD(WD1772_TAG, U517/2)
+	MCFG_WD1772_ADD(WD1772_TAG, U517/2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
@@ -2453,7 +2453,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tt030 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( tt030, st )
+static MACHINE_CONFIG_DERIVED( tt030, ste )
 MACHINE_CONFIG_END
 
 
@@ -2461,7 +2461,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon, st )
+static MACHINE_CONFIG_DERIVED( falcon, ste )
 MACHINE_CONFIG_END
 
 
@@ -2469,7 +2469,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon40 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon40, st )
+static MACHINE_CONFIG_DERIVED( falcon40, ste )
 MACHINE_CONFIG_END
 
 

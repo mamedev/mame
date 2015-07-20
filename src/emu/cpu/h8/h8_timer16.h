@@ -54,7 +54,7 @@ public:
 		DIV_512,
 		DIV_1024,
 		DIV_2048,
-		DIV_4096,
+		DIV_4096
 	};
 
 	enum {
@@ -69,7 +69,7 @@ public:
 		IRQ_D = 0x08,
 		IRQ_V = 0x10,
 		IRQ_U = 0x20,
-		IRQ_TRIG = 0x40,
+		IRQ_TRIG = 0x40
 	};
 
 

@@ -238,7 +238,7 @@ protected:
 	optional_ioport m_io_plus4;
 
 	void spectrum_UpdateBorderBitmap();
-	void spectrum_UpdateScreenBitmap();
+	void spectrum_UpdateScreenBitmap(bool eof = false);
 	inline unsigned char get_display_color(unsigned char color, int invert);
 	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines);

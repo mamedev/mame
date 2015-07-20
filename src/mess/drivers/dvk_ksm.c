@@ -288,8 +288,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 	UINT16 offset;
 
 	DBG_LOG(2,"scanline_cb",
-		("addr %02x frame %" I64FMT "d x %.4d y %.3d row %.2d\n",
-		m_video.line, m_screen->frame_number(), m_screen->hpos(), y, y%11));
+		("addr %02x frame %d x %.4d y %.3d row %.2d\n",
+		m_video.line, (int)m_screen->frame_number(), m_screen->hpos(), y, y%11));
 
 	if (y < KSM_VERT_START) return;
 	y -= KSM_VERT_START;

@@ -328,6 +328,10 @@ static ADDRESS_MAP_START( kungfut_main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, wiz_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( wiz_main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
 	AM_RANGE(0xd400, 0xd400) AM_READ(wiz_protection_r)
@@ -830,6 +834,7 @@ static MACHINE_CONFIG_DERIVED( stinger, kungfut )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stinger_main_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -849,6 +854,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( scion, stinger )
 
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 2*8, 30*8-1)
@@ -863,12 +871,12 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( kungfut )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "p1.bin",  0x0000, 0x4000, CRC(b1e56960) SHA1(993388bbb663412110d1012be9ffc00b06fce4d0) )
 	ROM_LOAD( "p3.bin",  0x4000, 0x4000, CRC(6fc346f8) SHA1(bd1663fa780e41eafd668bf502b40c9750270e55) )
 	ROM_LOAD( "p2.bin",  0x8000, 0x4000, CRC(042cc9c5) SHA1(09f87e240c2aaa19fe7b8cb548ded828ab67b18b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(68028a5d) SHA1(2fabf5e55e09a34cd090d123737d31970e4086e8) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )
@@ -888,12 +896,12 @@ ROM_START( kungfut )
 ROM_END
 
 ROM_START( kungfuta )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "kungfu.01",  0x0000, 0x4000, CRC(48dada70) SHA1(a90901d2aef73d4fa9d9c80769b82a3fead0a0f9) )
 	ROM_LOAD( "kungfu.02",  0x4000, 0x4000, CRC(c08c5152) SHA1(c5db3ee1ee165708d93d296b51a5bb43265ac75f) )
 	ROM_LOAD( "kungfu.03",  0x8000, 0x4000, CRC(09b8670c) SHA1(170e7cbf87727d940e959fa7a0328b4cc1aba195) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "kungfu.04",  0x0000, 0x2000,  CRC(352bff48) SHA1(87d2408d31e1326ec810debcb2c724d1f003ae7b) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )
@@ -913,12 +921,12 @@ ROM_START( kungfuta )
 ROM_END
 
 ROM_START( wiz )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "ic07_01.bin",  0x0000, 0x4000, CRC(c05f2c78) SHA1(98b93234684a3a228552ef41a08512fef1befedd) )
 	ROM_LOAD( "ic05_03.bin",  0x4000, 0x4000, CRC(7978d879) SHA1(866efdff3c111793d5a3cc2fa0b03a2b4e371c49) )
 	ROM_LOAD( "ic06_02.bin",  0x8000, 0x4000, CRC(9c406ad2) SHA1(cd82c3dc622886b6ebb30ba565f3c34d5a4e229b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "ic57_10.bin",  0x0000, 0x2000, CRC(8a7575bd) SHA1(5470c4c3a40139f45db7a9e260f40b5244f10123) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
@@ -941,12 +949,12 @@ ROM_START( wiz )
 ROM_END
 
 ROM_START( wizt )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "wiz1.bin",     0x0000, 0x4000, CRC(5a6d3c60) SHA1(faeb7e7ddeee9638ec046655e87f866d81fdbee0) )
 	ROM_LOAD( "ic05_03.bin",  0x4000, 0x4000, CRC(7978d879) SHA1(866efdff3c111793d5a3cc2fa0b03a2b4e371c49) )
 	ROM_LOAD( "ic06_02.bin",  0x8000, 0x4000, CRC(9c406ad2) SHA1(cd82c3dc622886b6ebb30ba565f3c34d5a4e229b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "ic57_10.bin",  0x0000, 0x2000, CRC(8a7575bd) SHA1(5470c4c3a40139f45db7a9e260f40b5244f10123) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
@@ -970,12 +978,12 @@ ROM_END
 
 /* was marked as Wiz Alt Sound */
 ROM_START( wizta )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "ic7",  0x0000, 0x4000, CRC(b2ec49ad) SHA1(f1624995e9d426dd69d6567a91713aa023e716ad) )
 	ROM_LOAD( "ic5",  0x4000, 0x4000, CRC(f7e8f792) SHA1(2c1f82e6f6b2573d8bf0a27fb344fe86f475ddef) )
 	ROM_LOAD( "ic6",  0x8000, 0x4000, CRC(9c406ad2) SHA1(cd82c3dc622886b6ebb30ba565f3c34d5a4e229b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "ic57",  0x0000, 0x2000, CRC(8a7575bd) SHA1(5470c4c3a40139f45db7a9e260f40b5244f10123) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
@@ -998,14 +1006,14 @@ ROM_START( wizta )
 ROM_END
 
 ROM_START( stinger )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1-5j.bin",     0x0000, 0x2000, CRC(1a2ca600) SHA1(473e89f2c49f6e6f38df5d6fc2267ffecf84c6c8) )    /* encrypted */
 	ROM_LOAD( "2-6j.bin",     0x2000, 0x2000, CRC(957cd39c) SHA1(38bb589b3bfd962415b31d1151adf4bdb661122f) )    /* encrypted */
 	ROM_LOAD( "3-8j.bin",     0x4000, 0x2000, CRC(404c932e) SHA1(c23eac49e06ff38564062c0e8c8cdadf877f1d6a) )    /* encrypted */
 	ROM_LOAD( "4-9j.bin",     0x6000, 0x2000, CRC(2d570f91) SHA1(31d54d9fd5254c33f07c605bd6112c7eb53c42a1) )    /* encrypted */
 	ROM_LOAD( "5-10j.bin",    0x8000, 0x2000, CRC(c841795c) SHA1(e03860813c03ca1c737935accc2b5fe87c6b624a) )    /* encrypted */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "6-9f.bin",     0x0000, 0x2000, CRC(79757f0c) SHA1(71be938c32c6a84618763761786ecc5d7d47581a) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
@@ -1025,14 +1033,14 @@ ROM_START( stinger )
 ROM_END
 
 ROM_START( stinger2 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "n1.bin",       0x0000, 0x2000, CRC(f2d2790c) SHA1(0e5e92ef45b5bc27b0818f83c89b3bda0e701403) )    /* encrypted */
 	ROM_LOAD( "n2.bin",       0x2000, 0x2000, CRC(8fd2d8d8) SHA1(d3318a81fddeb3fa50d01569c1e1145e26ce7277) )    /* encrypted */
 	ROM_LOAD( "n3.bin",       0x4000, 0x2000, CRC(f1794d36) SHA1(7954500f489c0bc58cda8e7ffc2e4474759fdc33) )    /* encrypted */
 	ROM_LOAD( "n4.bin",       0x6000, 0x2000, CRC(230ba682) SHA1(c419ffebd021d41b3f5021948007fb6bcdb1cdf7) )    /* encrypted */
 	ROM_LOAD( "n5.bin",       0x8000, 0x2000, CRC(a03a01da) SHA1(28fecac7a821ac4718242919840266a907160df0) )    /* encrypted */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "6-9f.bin",     0x0000, 0x2000, CRC(79757f0c) SHA1(71be938c32c6a84618763761786ecc5d7d47581a) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
@@ -1052,14 +1060,14 @@ ROM_START( stinger2 )
 ROM_END
 
 ROM_START( scion )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "sc1",          0x0000, 0x2000, CRC(8dcad575) SHA1(3f194ece25e730b1cbbf3f332bbdebc3a6a72b0f) )
 	ROM_LOAD( "sc2",          0x2000, 0x2000, CRC(f608e0ba) SHA1(e55b0ad4dc117339d45a999e13760f4ab3ca4ce0) )
 	ROM_LOAD( "sc3",          0x4000, 0x2000, CRC(915289b9) SHA1(b32b40f93de4501619486a8c5a8367d3b2e357a6) )
 	ROM_LOAD( "4.9j",         0x6000, 0x2000, CRC(0f40d002) SHA1(13b04f3902ebdda02670fcb667e181cf70594c37) )
 	ROM_LOAD( "5.10j",        0x8000, 0x2000, CRC(dc4923b7) SHA1(ec5c22ef1f9ba0fe4da3de62a63a44aa3ff850f4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "sc6",          0x0000, 0x2000, CRC(09f5f9c1) SHA1(83e489f32597880fb1a13f0bafedd275facb21f7) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
@@ -1079,14 +1087,14 @@ ROM_START( scion )
 ROM_END
 
 ROM_START( scionc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1.5j",         0x0000, 0x2000, CRC(5aaf571e) SHA1(53becfad13e95012dce6597625c64dcba9ac4433) )
 	ROM_LOAD( "2.6j",         0x2000, 0x2000, CRC(d5a66ac9) SHA1(3192da12b2d6a07e203999ed97cdba16d4917a98) )
 	ROM_LOAD( "3.8j",         0x4000, 0x2000, CRC(6e616f28) SHA1(ea32add6173251152ca84426c098c92ace123878) )
 	ROM_LOAD( "4.9j",         0x6000, 0x2000, CRC(0f40d002) SHA1(13b04f3902ebdda02670fcb667e181cf70594c37) )
 	ROM_LOAD( "5.10j",        0x8000, 0x2000, CRC(dc4923b7) SHA1(ec5c22ef1f9ba0fe4da3de62a63a44aa3ff850f4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "6.9f",         0x0000, 0x2000, CRC(a66a0ce6) SHA1(b2d6a8ded007c362c58496ead33d1561a982440a) )
 
 	ROM_REGION( 0x6000,  "gfx1", 0 )    /* sprites/chars */
@@ -1115,15 +1123,11 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+
 	UINT8 *rom = memregion("maincpu")->base();
-	int size = memregion("maincpu")->bytes();
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, size);
 	const UINT8 *tbl;
 
-	space.set_decrypted_region(0x0000, 0xffff, decrypt);
-
-	for (int a = 0x0000; a < 0x10000; a++)
+	for (int a = 0x0000; a < 0xc000; a++)
 	{
 		int row;
 		UINT8 src;
@@ -1131,7 +1135,7 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		if (a & 0x2040)
 		{
 			/* not encrypted */
-			decrypt[a] = rom[a];
+			m_decrypted_opcodes[a] = rom[a];
 		}
 		else
 		{
@@ -1142,7 +1146,7 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 
 			/* decode the opcodes */
 			tbl = swap_xor_table[row];
-			decrypt[a] = BITSWAP8(src, tbl[0], 6, tbl[1], 4, tbl[2], 2, 1, 0) ^ tbl[3];
+			m_decrypted_opcodes[a] = BITSWAP8(src, tbl[0], 6, tbl[1], 4, tbl[2], 2, 1, 0) ^ tbl[3];
 		}
 	}
 }

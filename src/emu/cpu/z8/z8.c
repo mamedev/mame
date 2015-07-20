@@ -210,7 +210,7 @@ offs_t z8_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom
 
 UINT8 z8_device::fetch()
 {
-	UINT8 data = m_direct->read_decrypted_byte(m_pc);
+	UINT8 data = m_direct->read_byte(m_pc);
 
 	m_pc++;
 

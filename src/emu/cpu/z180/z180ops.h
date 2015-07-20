@@ -102,7 +102,7 @@ UINT8 z180_device::ROP()
 {
 	offs_t addr = _PCD;
 	_PC++;
-	return m_direct->read_decrypted_byte(MMU_REMAP_ADDR(addr));
+	return m_odirect->read_byte(MMU_REMAP_ADDR(addr));
 }
 
 /****************************************************************
@@ -115,14 +115,14 @@ UINT8 z180_device::ARG()
 {
 	offs_t addr = _PCD;
 	_PC++;
-	return m_direct->read_raw_byte(MMU_REMAP_ADDR(addr));
+	return m_direct->read_byte(MMU_REMAP_ADDR(addr));
 }
 
 UINT32 z180_device::ARG16()
 {
 	offs_t addr = _PCD;
 	_PC += 2;
-	return m_direct->read_raw_byte(MMU_REMAP_ADDR(addr)) | (m_direct->read_raw_byte(MMU_REMAP_ADDR(addr+1)) << 8);
+	return m_direct->read_byte(MMU_REMAP_ADDR(addr)) | (m_direct->read_byte(MMU_REMAP_ADDR(addr+1)) << 8);
 }
 
 /***************************************************************

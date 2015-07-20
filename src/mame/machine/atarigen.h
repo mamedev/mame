@@ -218,7 +218,7 @@ private:
 	{
 		TID_SCANLINE_INT,
 		TID_TILEROW_UPDATE,
-		TID_EOF,
+		TID_EOF
 	};
 
 	// internal helpers

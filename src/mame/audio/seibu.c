@@ -83,6 +83,13 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 		m_rst10_irq(0xff),
 		m_rst18_irq(0xff)
 {
+	m_encryption_mode = 0;
+	m_decrypted_opcodes = NULL;
+}
+
+void seibu_sound_device::set_encryption(int mode)
+{
+	m_encryption_mode = mode;
 }
 
 //-------------------------------------------------
@@ -91,6 +98,33 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 
 void seibu_sound_device::device_start()
 {
+	int length = memregion(":audiocpu")->bytes();
+	UINT8 *rom = memregion(":audiocpu")->base();
+	if (length > 0x10000)
+	{
+		membank(":seibu_bank1")->configure_entries(0, (length - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
+
+		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
+		membank(":seibu_bank1")->set_entry(0);
+	} else
+		membank(":seibu_bank1")->set_base(rom + 0x8000);
+
+	switch(m_encryption_mode) {
+	case 0: break;
+	case 3: break;
+
+	case 1:
+		get_custom_decrypt();
+		memcpy(m_decrypted_opcodes, rom, length);
+		apply_decrypt(rom, m_decrypted_opcodes, 0x2000);
+		break;
+
+	case 2:
+		get_custom_decrypt();
+		apply_decrypt(rom, m_decrypted_opcodes, length);
+		break;
+	}
+
 	m_main2sub[0] = m_main2sub[1] = 0;
 	m_sub2main[0] = m_sub2main[1] = 0;
 
@@ -108,18 +142,8 @@ void seibu_sound_device::device_start()
 
 void seibu_sound_device::device_reset()
 {
-	int romlength = machine().root_device().memregion("audiocpu")->bytes();
-	UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
-
-	m_sound_cpu = machine().device("audiocpu");
+	m_sound_cpu = machine().device(":audiocpu");
 	update_irq_lines(VECTOR_INIT);
-	if (romlength > 0x10000)
-	{
-		machine().root_device().membank("bank1")->configure_entries(0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
-
-		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
-		machine().root_device().membank("bank1")->set_entry(0);
-	}
 }
 
 static UINT8 decrypt_data(int a,int src)
@@ -155,25 +179,32 @@ static UINT8 decrypt_opcode(int a,int src)
 	return src;
 }
 
-void seibu_sound_device::decrypt(const char *cpu,int length)
+UINT8 *seibu_sound_device::get_custom_decrypt()
 {
-	address_space &space = machine().device(cpu)->memory().space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array_clear(machine(), UINT8, length);
-	UINT8 *rom = machine().root_device().memregion(cpu)->base();
-	int i;
+	if (m_decrypted_opcodes)
+		return m_decrypted_opcodes;
 
-	space.set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
+	int size = memregion(":audiocpu")->bytes();
+	m_decrypted_opcodes = auto_alloc_array_clear(machine(), UINT8, size);
+	membank(":seibu_bank0d")->set_base(m_decrypted_opcodes);
+	if (size > 0x10000) {
+		membank(":seibu_bank1d")->configure_entries(0, (size - 0x10000) / 0x8000, m_decrypted_opcodes + 0x10000, 0x8000);
+		membank(":seibu_bank1d")->set_entry(0);
+	} else
+		membank(":seibu_bank1d")->set_base(m_decrypted_opcodes + 0x8000);
 
-	for (i = 0;i < length;i++)
+	return m_decrypted_opcodes;
+}
+
+void seibu_sound_device::apply_decrypt(UINT8 *rom, UINT8 *opcodes, int length)
+{
+	for (int i = 0;i < length;i++)
 	{
 		UINT8 src = rom[i];
 
 		rom[i]      = decrypt_data(i,src);
-		decrypt[i]  = decrypt_opcode(i,src);
+		opcodes[i]  = decrypt_opcode(i,src);
 	}
-
-	if (length > 0x10000)
-		machine().root_device().membank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
 void seibu_sound_device::update_irq_lines(int param)
@@ -238,7 +269,9 @@ WRITE_LINE_MEMBER( seibu_sound_device::fm_irqhandler )
 
 WRITE8_MEMBER( seibu_sound_device::bank_w )
 {
-	space.machine().root_device().membank("bank1")->set_entry(data & 1);
+	membank(":seibu_bank1")->set_entry(data & 1);
+	if (m_decrypted_opcodes)
+		membank(":seibu_bank1d")->set_entry(data & 1);
 }
 
 WRITE8_MEMBER( seibu_sound_device::coin_w )
@@ -326,6 +359,11 @@ WRITE16_MEMBER( seibu_sound_device::main_mustb_w )
 
 /***************************************************************************/
 
+ADDRESS_MAP_START( seibu_sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, driver_device )
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("seibu_bank0d")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1d")
+ADDRESS_MAP_END
+
 ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
@@ -341,7 +379,7 @@ ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( seibu2_airraid_sound_map, AS_PROGRAM, 8, driver_device )
@@ -359,7 +397,7 @@ ADDRESS_MAP_START( seibu2_airraid_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 //  AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( seibu2_sound_map, AS_PROGRAM, 8, driver_device )
@@ -377,7 +415,7 @@ ADDRESS_MAP_START( seibu2_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( seibu2_raiden2_sound_map, AS_PROGRAM, 8, driver_device )
@@ -396,7 +434,7 @@ ADDRESS_MAP_START( seibu2_raiden2_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x6002, 0x6002) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 	AM_RANGE(0x4004, 0x4004) AM_NOP
 	AM_RANGE(0x401a, 0x401a) AM_NOP
 ADDRESS_MAP_END
@@ -416,7 +454,7 @@ ADDRESS_MAP_START( seibu_newzeroteam_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( seibu3_sound_map, AS_PROGRAM, 8, driver_device )
@@ -434,7 +472,7 @@ ADDRESS_MAP_START( seibu3_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( seibu3_adpcm_sound_map, AS_PROGRAM, 8, driver_device )
@@ -456,7 +494,7 @@ ADDRESS_MAP_START( seibu3_adpcm_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
 	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 /***************************************************************************

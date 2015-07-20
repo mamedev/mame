@@ -659,8 +659,7 @@ public:
 	if (is_mfp() && (HAS_DIFFERENT_ABI)) \
 		return (*reinterpret_cast<generic_member_func>(m_function)) x; \
 	else \
-		return (*m_function) x; \
-
+		return (*m_function) x;
 	//return MEMBER_ABI (*reinpertret_cast<generic_member_func>(m_function)) x;
 
 	// call the function

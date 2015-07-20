@@ -11,4 +11,13 @@
 // Multiline comment cpp-style
 // Second line
 .cpp-test.c=3
-.cpp-test.d=4
+// Comment before double
+.cpp-test.d=4.1
+// Comment before string
+.cpp-test.e="e-string"
+// Comment before true
+.cpp-test.f=true
+// Comment before false
+.cpp-test.g=false
+// Comment before null
+.cpp-test.h=null

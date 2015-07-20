@@ -19,7 +19,7 @@ static SLOT_INTERFACE_START( microdisc_floppies )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( microdisc )
-	MCFG_FD1793x_ADD("fdc", XTAL_8MHz/8)
+	MCFG_FD1793_ADD("fdc", XTAL_8MHz/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(microdisc_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(microdisc_device, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(microdisc_device, fdc_hld_w))

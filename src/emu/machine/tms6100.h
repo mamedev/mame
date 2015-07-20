@@ -37,6 +37,7 @@ private:
 	UINT8  m_tms_clock;
 	UINT8  m_data;
 	UINT8  m_state;
+	//UINT8  m_variant;
 
 };
 

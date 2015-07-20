@@ -14,7 +14,7 @@ driver by Nicola Salmoria
 #include "sound/2151intf.h"
 #include "includes/shisen.h"
 
-READ8_MEMBER(shisen_state::sichuan2_dsw1_r)
+READ8_MEMBER(shisen_state::dsw1_r)
 {
 	int ret = ioport("DSW1")->read();
 
@@ -33,7 +33,7 @@ READ8_MEMBER(shisen_state::sichuan2_dsw1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(shisen_state::sichuan2_coin_w)
+WRITE8_MEMBER(shisen_state::coin_w)
 {
 	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
 
@@ -46,16 +46,16 @@ WRITE8_MEMBER(shisen_state::sichuan2_coin_w)
 static ADDRESS_MAP_START( shisen_map, AS_PROGRAM, 8, shisen_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(sichuan2_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(sichuan2_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(sichuan2_dsw1_r, sichuan2_coin_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(dsw1_r, coin_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("m72", m72_audio_device, sound_command_byte_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE(sichuan2_bankswitch_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE(bankswitch_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("COIN")
 ADDRESS_MAP_END
@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( shisen, shisen_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(shisen_state, screen_update_sichuan2)
+	MCFG_SCREEN_UPDATE_DRIVER(shisen_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shisen)
@@ -423,7 +423,7 @@ ROM_START( matchit )
 	/* no samples on this board */
 ROM_END
 
-GAME( 1989, matchit,  0,         shisen,   matchit, driver_device,  0, ROT0, "Tamtex",  "Match It", 0 )
-GAME( 1989, shisen,   matchit,   shisen,   shisen, driver_device,   0, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", 0 )
-GAME( 1989, sichuan2, matchit,   shisen,   shisen, driver_device,   0, ROT0, "hack", "Sichuan II (hack, set 1)", 0 )
-GAME( 1989, sichuan2a,matchit,   shisen,   shisen, driver_device,   0, ROT0, "hack", "Sichuan II (hack, set 2)", 0 )
+GAME( 1989, matchit,  0,         shisen,   matchit, driver_device,  0, ROT0, "Tamtex",  "Match It", GAME_SUPPORTS_SAVE )
+GAME( 1989, shisen,   matchit,   shisen,   shisen, driver_device,   0, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, sichuan2, matchit,   shisen,   shisen, driver_device,   0, ROT0, "hack", "Sichuan II (hack, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, sichuan2a,matchit,   shisen,   shisen, driver_device,   0, ROT0, "hack", "Sichuan II (hack, set 2)", GAME_SUPPORTS_SAVE )

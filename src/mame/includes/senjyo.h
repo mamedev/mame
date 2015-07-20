@@ -30,7 +30,8 @@ public:
 		m_bg3videoram(*this, "bg3videoram"),
 		m_radarram(*this, "radarram"),
 		m_bgstripesram(*this, "bgstripesram"),
-		m_generic_paletteram_8(*this, "paletteram") { }
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -56,6 +57,7 @@ public:
 	required_shared_ptr<UINT8> m_radarram;
 	required_shared_ptr<UINT8> m_bgstripesram;
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	// game specific initialization
 	int m_is_senjyo;

@@ -139,7 +139,7 @@ protected:
 
 enum {
 	M65CE02_IRQ_LINE = m6502_device::IRQ_LINE,
-	M65CE02_NMI_LINE = m6502_device::NMI_LINE,
+	M65CE02_NMI_LINE = m6502_device::NMI_LINE
 };
 
 

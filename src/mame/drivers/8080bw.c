@@ -3307,7 +3307,6 @@ ROM_START( searthie )
 	ROM_LOAD( "searthie.e",   0x1800, 0x0800, CRC(baf949b0) SHA1(bfda97a3ef59fcdf87814afc6918507190c3e315) )
 ROM_END
 
-
 ROM_START( invadrmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "11.1t",       0x0000, 0x0400, CRC(389d44b6) SHA1(5d2581b8bc0da918ce57cf319e06b5b31989c681) )
@@ -3318,7 +3317,6 @@ ROM_START( invadrmr )
 	ROM_LOAD( "sv06.1g",     0x1c00, 0x0400, CRC(2c68e0b4) SHA1(a5e5357120102ad32792bf3ef6362f45b7ba7070) )
 ROM_END
 
-
 ROM_START( claybust )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0.a1",         0x0000, 0x0400, CRC(90810582) SHA1(a5c3655bae6f92a3cd0eae3a5a3c25e414d4fdf0) )
@@ -3328,7 +3326,6 @@ ROM_START( claybust )
 	ROM_LOAD( "4.a6",         0x1000, 0x0400, CRC(09a21120) SHA1(e976d2c173c649e51b032bc5dad54f006864155c) )
 	ROM_LOAD( "5.a8",         0x1400, 0x0400, CRC(92cd4da8) SHA1(217e00012a52c479bf0b0cf37ce556387755740d) )
 ROM_END
-
 
 ROM_START( gunchamp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3342,7 +3339,6 @@ ROM_START( gunchamp )
 	ROM_LOAD( "258.a10",      0x1c00, 0x0400, CRC(471d4052) SHA1(c8ccda2eba44c2ab49f5fc2874fe70c2bdae35d3) )
 ROM_END
 
-
 ROM_START( spaceatt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "h",            0x0000, 0x0400, CRC(d0c32d72) SHA1(b3bd950b1ba940fbeb5d95e55113ed8f4c311434) ) // == SV01
@@ -3351,6 +3347,34 @@ ROM_START( spaceatt )
 	ROM_LOAD( "c",            0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) ) // == SV04
 	ROM_LOAD( "b",            0x1800, 0x0400, CRC(6fc782aa) SHA1(0275adbeec455e146f4443b0b836b1171436b79b) )
 	ROM_LOAD( "a",            0x1c00, 0x0400, CRC(211ac4a3) SHA1(e08e90a4e77cfa30400626a484c9f37c87ea13f9) )
+ROM_END
+
+/* SPACE ATTACK set is from Video Game GmbH - 1010 A / Top board shows Video-Games - 6302 LICH - 1034
+   Roms are set up as 1k bproms (82S137) and data is 1 rom top 4 bits, another bottom 4.  This data once assembled matches original spaceatt set */
+ROM_START( spaceattbp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROMX_LOAD( "06e.bin",      0x0000, 0x0400, CRC(68301d05) SHA1(b0c33a982b42378da828281e74356d58fbea1d86), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI )
+	ROMX_LOAD( "12l.bin",      0x0000, 0x0400, CRC(c5a5228f) SHA1(7861b5567d44e972d728551d47aab9b92d71ffc7), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO )
+	ROMX_LOAD( "05de.bin",     0x0400, 0x0400, CRC(42032c14) SHA1(753948e7f52b88655c894b48d419b76de07c14f2), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI )
+	ROMX_LOAD( "11hl.bin",     0x0400, 0x0400, CRC(d5d3811a) SHA1(7d2d983fa88b0349a90a6331ca3e18583125d21e), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO )
+	ROMX_LOAD( "04d.bin",      0x0800, 0x0400, CRC(5f5e540c) SHA1(9092794a878494dbe34c2f05a212ff7b9d00fc55), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI )
+	ROMX_LOAD( "10h.bin",      0x0800, 0x0400, CRC(9d5ef6f1) SHA1(ef584678373375a7f13307d7c4597639a5f6010e), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO )
+	ROMX_LOAD( "03b.bin",      0x1400, 0x0400, CRC(89e13008) SHA1(1ad82ae0607af27925b42758f8c86a0e89079620), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI )
+	ROMX_LOAD( "09g.bin",      0x1400, 0x0400, CRC(c16f5503) SHA1(cf36beac472c5c405342193b7ef434d32b37a4a8), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO )
+	ROMX_LOAD( "02ab.bin",     0x1800, 0x0400, CRC(ffa166c2) SHA1(10496fcbb272130cc200dfb1886808559be8d6ea), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI )
+	ROMX_LOAD( "08f.bin",      0x1800, 0x0400, CRC(b5fa1a2b) SHA1(7eab1cb9a9f95520a37ee4fb2b246ef072dedcbd), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO )
+	ROMX_LOAD( "01a.bin",      0x1c00, 0x0400, CRC(44f8e99c) SHA1(9adecdadb16edaebde02892e30f9f87fb98f4ae1), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI )
+	ROMX_LOAD( "07ef.bin",     0x1c00, 0x0400, CRC(9560880d) SHA1(866d6c3714b939814ce48707be53a69ef8355b34), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO )
+ROM_END
+
+/* SPACE ATTACK set is from Video Games GmbH - Board Typ 1010 C / Top board shows Video-Games - 6302 LICH - 1034B
+   Contains same data as spaceatt but with added 00 fill to make larger roms (b+a=E1, 00fill+c=F1, f+00fill=G1, h+sv02=H1) */
+ROM_START( spaceatt2k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "H1.bin",     0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
+	ROM_LOAD( "G1.bin",     0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
+	ROM_LOAD( "F1.bin",     0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
+	ROM_LOAD( "E1.bin",     0x1800, 0x0800, CRC(19971ca7) SHA1(373900e6796aa681f35158e2c4c7665574990906) )
 ROM_END
 
 ROM_START( spaceat2 )
@@ -3370,12 +3394,6 @@ ROM_START( galmonst )
 	ROM_LOAD( "b.5u",            0x1800, 0x0400, CRC(34678b80) SHA1(17f01facb3272c963a8bca290c4ca36411b8de31) )
 	ROM_LOAD( "a.5v",            0x1c00, 0x0400, CRC(05a6806b) SHA1(ea884110d0ea6463801cbc2f87ce9c4921b49e33) )
 ROM_END
-
-
-
-
-
-
 
 ROM_START( spacecom )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4696,6 +4714,8 @@ GAMEL(1979, cosmicm2,   invaders, cosmicmo,  cosmicmo,  driver_device, 0, ROT270
 GAMEL(1980?,sinvzen,    invaders, invaders,  sinvzen,   driver_device, 0, ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1980, ultrainv,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Konami", "Ultra Invaders", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spaceattbp, invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bproms)(bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spaceatt2k, invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (2k roms)(bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, galmonst,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Laguna S.A.)", "Galaxy Monsters (Laguna S.A. Spanish bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2,   invaders, invaders,  spaceat2,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
 GAMEL(1979, spacecom,   invaders, spacecom,  spacecom,  _8080bw_state, spacecom, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_spacecom )

@@ -71,7 +71,6 @@ other supported games as well.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/irem.h"
 #include "includes/iremipt.h"
 #include "includes/m62.h"
 
@@ -2182,7 +2181,7 @@ GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT
 GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "Irem", "Spartan X (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  driver_device, 0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, battroad, 0,        battroad, battroad, m62_state,     battroad, ROT90,  "Irem", "The Battle-Road", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1984, battroad, 0,        battroad, battroad, m62_state,     battroad, ROT90,  "Irem", "The Battle-Road", GAME_SUPPORTS_SAVE )
 GAME( 1984, ldrun,    0,        ldrun,    ldrun,    driver_device, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    driver_device, 0,        ROT0,   "Irem (licensed from Broderbund, Digital Controls Inc. license)", "Lode Runner (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   m62_state,     ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", GAME_SUPPORTS_SAVE ) /* Japanese version is called Bangeringu Teikoku No Gyakushuu */

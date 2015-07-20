@@ -1453,10 +1453,17 @@ UINT32 chd_cd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *
 	return complen;
 }
 
-
-//-------------------------------------------------
-//  blocksize - return the optimal block size
-//-------------------------------------------------
+/**
+ * @fn  UINT32 chd_cd_flac_compressor::blocksize(UINT32 bytes)
+ *
+ * @brief   -------------------------------------------------
+ *            blocksize - return the optimal block size
+ *          -------------------------------------------------.
+ *
+ * @param   bytes   The bytes.
+ *
+ * @return  An UINT32.
+ */
 
 UINT32 chd_cd_flac_compressor::blocksize(UINT32 bytes)
 {
@@ -1473,9 +1480,19 @@ UINT32 chd_cd_flac_compressor::blocksize(UINT32 bytes)
 //  CD FLAC DECOMPRESSOR
 //**************************************************************************
 
-//-------------------------------------------------
-//  chd_cd_flac_decompressor - constructor
-//-------------------------------------------------
+/**
+ * @fn  chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
+ *
+ * @brief   -------------------------------------------------
+ *            chd_cd_flac_decompressor - constructor
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_CODEC_ERROR  Thrown when a chderr codec error error condition occurs.
+ *
+ * @param [in,out]  chd The chd.
+ * @param   hunkbytes   The hunkbytes.
+ * @param   lossy       true to lossy.
+ */
 
 chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
 	: chd_decompressor(chd, hunkbytes, lossy),
@@ -1503,21 +1520,34 @@ chd_cd_flac_decompressor::chd_cd_flac_decompressor(chd_file &chd, UINT32 hunkbyt
 		throw CHDERR_CODEC_ERROR;
 }
 
-
-//-------------------------------------------------
-//  ~chd_cd_flac_decompressor - destructor
-//-------------------------------------------------
+/**
+ * @fn  chd_cd_flac_decompressor::~chd_cd_flac_decompressor()
+ *
+ * @brief   -------------------------------------------------
+ *            ~chd_cd_flac_decompressor - destructor
+ *          -------------------------------------------------.
+ */
 
 chd_cd_flac_decompressor::~chd_cd_flac_decompressor()
 {
 	inflateEnd(&m_inflater);
 }
 
-
-//-------------------------------------------------
-//  decompress - decompress data using the FLAC
-//  codec
-//-------------------------------------------------
+/**
+ * @fn  void chd_cd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen)
+ *
+ * @brief   -------------------------------------------------
+ *            decompress - decompress data using the FLAC codec
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_DECOMPRESSION_ERROR  Thrown when a chderr decompression error error
+ *                                          condition occurs.
+ *
+ * @param   src             Source for the.
+ * @param   complen         The complen.
+ * @param [in,out]  dest    If non-null, destination for the.
+ * @param   destlen         The destlen.
+ */
 
 void chd_cd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen)
 {
@@ -1562,9 +1592,17 @@ void chd_cd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT
 //  AVHUFF COMPRESSOR
 //**************************************************************************
 
-//-------------------------------------------------
-//  chd_avhuff_compressor - constructor
-//-------------------------------------------------
+/**
+ * @fn  chd_avhuff_compressor::chd_avhuff_compressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
+ *
+ * @brief   -------------------------------------------------
+ *            chd_avhuff_compressor - constructor
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  chd The chd.
+ * @param   hunkbytes   The hunkbytes.
+ * @param   lossy       true to lossy.
+ */
 
 chd_avhuff_compressor::chd_avhuff_compressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
 	: chd_compressor(chd, hunkbytes, lossy),
@@ -1581,10 +1619,24 @@ chd_avhuff_compressor::chd_avhuff_compressor(chd_file &chd, UINT32 hunkbytes, bo
 	}
 }
 
-
-//-------------------------------------------------
-//  compress - compress data using the A/V codec
-//-------------------------------------------------
+/**
+ * @fn  UINT32 chd_avhuff_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *dest)
+ *
+ * @brief   -------------------------------------------------
+ *            compress - compress data using the A/V codec
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_INVALID_DATA         Thrown when a chderr invalid data error condition
+ *                                          occurs.
+ * @exception   CHDERR_COMPRESSION_ERROR    Thrown when a chderr compression error error
+ *                                          condition occurs.
+ *
+ * @param   src             Source for the.
+ * @param   srclen          The srclen.
+ * @param [in,out]  dest    If non-null, destination for the.
+ *
+ * @return  An UINT32.
+ */
 
 UINT32 chd_avhuff_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *dest)
 {
@@ -1609,12 +1661,18 @@ UINT32 chd_avhuff_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *d
 	return complen;
 }
 
-
-//-------------------------------------------------
-//  postinit - actual initialization of avhuff
-//  happens here, on the first attempt to compress
-//  or decompress data
-//-------------------------------------------------
+/**
+ * @fn  void chd_avhuff_compressor::postinit()
+ *
+ * @brief   -------------------------------------------------
+ *            postinit - actual initialization of avhuff happens here, on the first attempt to
+ *            compress or decompress data
+ *          -------------------------------------------------.
+ *
+ * @exception   err                     Thrown when an error error condition occurs.
+ * @exception   CHDERR_INVALID_METADATA Thrown when a chderr invalid metadata error condition
+ *                                      occurs.
+ */
 
 void chd_avhuff_compressor::postinit()
 {
@@ -1646,20 +1704,38 @@ void chd_avhuff_compressor::postinit()
 //  AVHUFF DECOMPRESSOR
 //**************************************************************************
 
-//-------------------------------------------------
-//  chd_avhuff_decompressor - constructor
-//-------------------------------------------------
+/**
+ * @fn  chd_avhuff_decompressor::chd_avhuff_decompressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
+ *
+ * @brief   -------------------------------------------------
+ *            chd_avhuff_decompressor - constructor
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  chd The chd.
+ * @param   hunkbytes   The hunkbytes.
+ * @param   lossy       true to lossy.
+ */
 
 chd_avhuff_decompressor::chd_avhuff_decompressor(chd_file &chd, UINT32 hunkbytes, bool lossy)
 	: chd_decompressor(chd, hunkbytes, lossy)
 {
 }
 
-
-//-------------------------------------------------
-//  decompress - decompress data using the A/V
-//  codec
-//-------------------------------------------------
+/**
+ * @fn  void chd_avhuff_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen)
+ *
+ * @brief   -------------------------------------------------
+ *            decompress - decompress data using the A/V codec
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_DECOMPRESSION_ERROR  Thrown when a chderr decompression error error
+ *                                          condition occurs.
+ *
+ * @param   src             Source for the.
+ * @param   complen         The complen.
+ * @param [in,out]  dest    If non-null, destination for the.
+ * @param   destlen         The destlen.
+ */
 
 void chd_avhuff_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8 *dest, UINT32 destlen)
 {
@@ -1677,11 +1753,19 @@ void chd_avhuff_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT8
 	}
 }
 
-
-//-------------------------------------------------
-//  config - codec-specific configuration for the
-//  A/V codec
-//-------------------------------------------------
+/**
+ * @fn  void chd_avhuff_decompressor::configure(int param, void *config)
+ *
+ * @brief   -------------------------------------------------
+ *            config - codec-specific configuration for the A/V codec
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_INVALID_PARAMETER    Thrown when a chderr invalid parameter error
+ *                                          condition occurs.
+ *
+ * @param   param           The parameter.
+ * @param [in,out]  config  If non-null, the configuration.
+ */
 
 void chd_avhuff_decompressor::configure(int param, void *config)
 {

@@ -1132,7 +1132,7 @@ eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_#
 { \
 	static_set_size(*this, _cells, _bits); \
 	static_set_address_bits(*this, _addrbits); \
-}; \
+} \
 const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT = &device_creator<eeprom_serial_##_lowercase##_##_bits##bit_device>;
 // standard 93CX6 class of 16-bit EEPROMs
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c06, 93C06, 16, 16, 6)

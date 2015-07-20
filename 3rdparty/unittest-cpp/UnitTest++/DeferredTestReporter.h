@@ -10,7 +10,7 @@
 
 #include <vector>
 
-UNITTEST_STDVECTOR_LINKAGE(UnitTest::DeferredTestResult);
+UNITTEST_STDVECTOR_LINKAGE(UnitTest::DeferredTestResult)
 
 namespace UnitTest
 {

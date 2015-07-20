@@ -67,8 +67,29 @@
 #define ZIPCRC          0x0e
 #define ZIPSIZE         0x12
 #define ZIPUNCMP        0x16
+
+/**
+ * @def ZIPFNLN
+ *
+ * @brief   A macro that defines zipfnln.
+ */
+
 #define ZIPFNLN         0x1a
+
+/**
+ * @def ZIPXTRALN
+ *
+ * @brief   A macro that defines zipxtraln.
+ */
+
 #define ZIPXTRALN       0x1c
+
+/**
+ * @def ZIPNAME
+ *
+ * @brief   A macro that defines zipname.
+ */
+
 #define ZIPNAME         0x1e
 
 
@@ -77,10 +98,30 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
+/**
+ * @fn  INLINE UINT16 read_word(UINT8 *buf)
+ *
+ * @brief   Reads a word.
+ *
+ * @param [in,out]  buf If non-null, the buffer.
+ *
+ * @return  The word.
+ */
+
 INLINE UINT16 read_word(UINT8 *buf)
 {
 	return (buf[1] << 8) | buf[0];
 }
+
+/**
+ * @fn  INLINE UINT32 read_dword(UINT8 *buf)
+ *
+ * @brief   Reads a double word.
+ *
+ * @param [in,out]  buf If non-null, the buffer.
+ *
+ * @return  The double word.
+ */
 
 INLINE UINT32 read_dword(UINT8 *buf)
 {
@@ -93,6 +134,7 @@ INLINE UINT32 read_dword(UINT8 *buf)
     GLOBAL VARIABLES
 ***************************************************************************/
 
+/** @brief  The zip cache[ zip cache size]. */
 static zip_file *zip_cache[ZIP_CACHE_SIZE];
 
 
@@ -121,6 +163,17 @@ static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buff
 /*-------------------------------------------------
     zip_file_open - opens a ZIP file for reading
 -------------------------------------------------*/
+
+/**
+ * @fn  zip_error zip_file_open(const char *filename, zip_file **zip)
+ *
+ * @brief   Queries if a given zip file open.
+ *
+ * @param   filename    Filename of the file.
+ * @param [in,out]  zip If non-null, the zip.
+ *
+ * @return  A zip_error.
+ */
 
 zip_error zip_file_open(const char *filename, zip_file **zip)
 {
@@ -213,6 +266,14 @@ error:
     to the cache
 -------------------------------------------------*/
 
+/**
+ * @fn  void zip_file_close(zip_file *zip)
+ *
+ * @brief   Zip file close.
+ *
+ * @param [in,out]  zip If non-null, the zip.
+ */
+
 void zip_file_close(zip_file *zip)
 {
 	int cachenum;
@@ -243,6 +304,12 @@ void zip_file_close(zip_file *zip)
     cache and free all memory
 -------------------------------------------------*/
 
+/**
+ * @fn  void zip_file_cache_clear(void)
+ *
+ * @brief   Zip file cache clear.
+ */
+
 void zip_file_cache_clear(void)
 {
 	int cachenum;
@@ -267,6 +334,16 @@ void zip_file_cache_clear(void)
     in the ZIP
 -------------------------------------------------*/
 
+/**
+ * @fn  const zip_file_header *zip_file_first_file(zip_file *zip)
+ *
+ * @brief   Zip file first file.
+ *
+ * @param [in,out]  zip If non-null, the zip.
+ *
+ * @return  null if it fails, else a zip_file_header*.
+ */
+
 const zip_file_header *zip_file_first_file(zip_file *zip)
 {
 	/* reset the position and go from there */
@@ -279,6 +356,16 @@ const zip_file_header *zip_file_first_file(zip_file *zip)
     zip_file_next_entry - return the next entry
     in the ZIP
 -------------------------------------------------*/
+
+/**
+ * @fn  const zip_file_header *zip_file_next_file(zip_file *zip)
+ *
+ * @brief   Zip file next file.
+ *
+ * @param [in,out]  zip If non-null, the zip.
+ *
+ * @return  null if it fails, else a zip_file_header*.
+ */
 
 const zip_file_header *zip_file_next_file(zip_file *zip)
 {
@@ -337,6 +424,18 @@ const zip_file_header *zip_file_next_file(zip_file *zip)
     from a ZIP into the target buffer
 -------------------------------------------------*/
 
+/**
+ * @fn  zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
+ *
+ * @brief   Zip file decompress.
+ *
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   length          The length.
+ *
+ * @return  A zip_error.
+ */
+
 zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
 {
 	zip_error ziperr;
@@ -384,6 +483,14 @@ zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
     zip_file
 -------------------------------------------------*/
 
+/**
+ * @fn  static void free_zip_file(zip_file *zip)
+ *
+ * @brief   Free zip file.
+ *
+ * @param [in,out]  zip If non-null, the zip.
+ */
+
 static void free_zip_file(zip_file *zip)
 {
 	if (zip != NULL)
@@ -409,6 +516,16 @@ static void free_zip_file(zip_file *zip)
 /*-------------------------------------------------
     read_ecd - read the ECD data
 -------------------------------------------------*/
+
+/**
+ * @fn  static zip_error read_ecd(zip_file *zip)
+ *
+ * @brief   Reads an ecd.
+ *
+ * @param [in,out]  zip If non-null, the zip.
+ *
+ * @return  The ecd.
+ */
 
 static zip_error read_ecd(zip_file *zip)
 {
@@ -484,6 +601,17 @@ static zip_error read_ecd(zip_file *zip)
     offset of the compressed data
 -------------------------------------------------*/
 
+/**
+ * @fn  static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
+ *
+ * @brief   Gets compressed data offset.
+ *
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param [in,out]  offset  If non-null, the offset.
+ *
+ * @return  The compressed data offset.
+ */
+
 static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
 {
 	file_error error;
@@ -521,6 +649,19 @@ static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
     type 0 data (which is uncompressed)
 -------------------------------------------------*/
 
+/**
+ * @fn  static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
+ *
+ * @brief   Decompress the data type 0.
+ *
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param   offset          The offset.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   length          The length.
+ *
+ * @return  A zip_error.
+ */
+
 static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
 {
 	file_error filerr;
@@ -541,6 +682,19 @@ static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buff
     decompress_data_type_8 - decompress
     type 8 data (which is deflated)
 -------------------------------------------------*/
+
+/**
+ * @fn  static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
+ *
+ * @brief   Decompress the data type 8.
+ *
+ * @param [in,out]  zip     If non-null, the zip.
+ * @param   offset          The offset.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   length          The length.
+ *
+ * @return  A zip_error.
+ */
 
 static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
 {

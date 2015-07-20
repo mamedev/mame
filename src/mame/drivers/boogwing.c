@@ -143,6 +143,9 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x3c0000, 0x3c004f) AM_RAM // ?
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, boogwing_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, boogwing_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
@@ -317,6 +320,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(boogwing_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/4)
@@ -635,7 +639,7 @@ DRIVER_INIT_MEMBER(boogwing_state,boogwing)
 	deco56_decrypt_gfx(machine(), "tiles2");
 	deco56_decrypt_gfx(machine(), "tiles3");
 	deco56_remap_gfx(machine(), "gfx6");
-	deco102_decrypt_cpu(machine(), "maincpu", 0x42ba, 0x00, 0x18);
+	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x100000, 0x42ba, 0x00, 0x18);
 	memcpy(dst, src, 0x100000);
 }
 

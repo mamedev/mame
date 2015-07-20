@@ -68,17 +68,15 @@
 
 #define MAX_SAMPLE_CHUNK        512
 
-/* Variants */
+/* 6 Variants, from tms5110r.inc */
 
-#define TMS5110_IS_5110A    (1)
-#define TMS5110_IS_5100     (2)
-#define TMS5110_IS_5110     (3)
+#define TMS5110_IS_TMC0281  (1)
+#define TMS5110_IS_TMC0281D (2)
+#define TMS5110_IS_CD2801   (3)
+#define TMS5110_IS_CD2802   (4)
+#define TMS5110_IS_TMS5110A (5)
+#define TMS5110_IS_M58817   (6)
 
-#define TMS5110_IS_CD2801   TMS5110_IS_5100
-#define TMS5110_IS_TMC0281  TMS5110_IS_5100
-
-#define TMS5110_IS_CD2802   TMS5110_IS_5110
-#define TMS5110_IS_M58817   TMS5110_IS_5110
 
 /* States for CTL */
 
@@ -104,14 +102,23 @@ void tms5110_device::set_variant(int variant)
 {
 	switch (variant)
 	{
-		case TMS5110_IS_5110A:
+		case TMS5110_IS_TMC0281:
+			m_coeff = &T0280B_0281A_coeff;
+			break;
+		case TMS5110_IS_TMC0281D:
+			m_coeff = &T0280D_0281D_coeff;
+			break;
+		case TMS5110_IS_CD2801:
+			m_coeff = &T0280F_2801A_coeff;
+			break;
+		case TMS5110_IS_M58817:
+			m_coeff = &M58817_coeff;
+			break;
+		case TMS5110_IS_CD2802:
+			m_coeff = &T0280F_2802_coeff;
+			break;
+		case TMS5110_IS_TMS5110A:
 			m_coeff = &tms5110a_coeff;
-			break;
-		case TMS5110_IS_5100:
-			m_coeff = &pat4209836_coeff;
-			break;
-		case TMS5110_IS_5110:
-			m_coeff = &pat4403965_coeff;
 			break;
 		default:
 			fatalerror("Unknown variant in tms5110_create\n");
@@ -490,21 +497,17 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 		}
 		else
 		{
-						/* generate voiced samples here */
+			// generate voiced samples here
 			/* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
 			 * function has a chirp/peak and then a long chain of zeroes.
-			 * The last entry of the chirp rom is at address 0b110011 (50d), the 51st sample,
+			 * The last entry of the chirp rom is at address 0b110011 (51d), the 52nd sample,
 			 * and if the address reaches that point the ADDRESS incrementer is
-			 * disabled, forcing all samples beyond 50d to be == 50d
-			 * (address 50d holds zeroes)
+			 * disabled, forcing all samples beyond 51d to be == 51d
 			 */
-
-		/*if (m_coeff->subtype & (SUBTYPE_TMS5100 | SUBTYPE_M58817))*/
-
-		if (m_pitch_count > 50)
-			current_val = m_coeff->chirptable[50];
-		else
-			current_val = m_coeff->chirptable[m_pitch_count];
+			if (m_pitch_count >= 51)
+				current_val = (INT8)m_coeff->chirptable[51];
+			else /*m_pitch_count < 51*/
+				current_val = (INT8)m_coeff->chirptable[m_pitch_count];
 		}
 
 		/* Update LFSR *20* times every sample, like patent shows */
@@ -873,7 +876,7 @@ void tms5110_device::device_start()
 {
 	m_table = region()->base();
 
-	set_variant(TMS5110_IS_5110A);
+	set_variant(TMS5110_IS_TMS5110A);
 
 	/* resolve lines */
 	m_m0_cb.resolve();
@@ -898,27 +901,7 @@ void tms5110_device::device_start()
 void tms5100_device::device_start()
 {
 	tms5110_device::device_start();
-	set_variant(TMS5110_IS_5100);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5110a_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_5110A);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cd2801_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_CD2801);
+	set_variant(TMS5110_IS_TMC0281);
 }
 
 //-------------------------------------------------
@@ -935,10 +918,50 @@ void tmc0281_device::device_start()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+void tms5100a_device::device_start()
+{
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_TMC0281D);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tmc0281d_device::device_start()
+{
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_TMC0281D);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cd2801_device::device_start()
+{
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_CD2801);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
 void cd2802_device::device_start()
 {
 	tms5110_device::device_start();
 	set_variant(TMS5110_IS_CD2802);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms5110a_device::device_start()
+{
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_TMS5110A);
 }
 
 //-------------------------------------------------
@@ -1365,28 +1388,10 @@ tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, 
 
 const device_type TMS5100 = &device_creator<tms5100_device>;
 
-
 tms5100_device::tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, TMS5100, "TMS5100", tag, owner, clock, "tms5100", __FILE__)
 {
 }
-
-
-const device_type TMS5110A = &device_creator<tms5110a_device>;
-
-tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms5110_device(mconfig, TMS5110A, "TMS5110A", tag, owner, clock, "tms5110a", __FILE__)
-{
-}
-
-
-const device_type CD2801 = &device_creator<cd2801_device>;
-
-cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms5110_device(mconfig, CD2801, "CD2801", tag, owner, clock, "cd2801", __FILE__)
-{
-}
-
 
 const device_type TMC0281 = &device_creator<tmc0281_device>;
 
@@ -1395,6 +1400,26 @@ tmc0281_device::tmc0281_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+const device_type TMS5100A = &device_creator<tms5100a_device>;
+
+tms5100a_device::tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms5110_device(mconfig, TMS5100A, "TMS5100A", tag, owner, clock, "tms5100a", __FILE__)
+{
+}
+
+const device_type TMC0281D = &device_creator<tmc0281d_device>;
+
+tmc0281d_device::tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms5110_device(mconfig, TMC0281D, "TMC0281D", tag, owner, clock, "tmc0281d", __FILE__)
+{
+}
+
+const device_type CD2801 = &device_creator<cd2801_device>;
+
+cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms5110_device(mconfig, CD2801, "CD2801", tag, owner, clock, "cd2801", __FILE__)
+{
+}
 
 const device_type CD2802 = &device_creator<cd2802_device>;
 
@@ -1403,6 +1428,12 @@ cd2802_device::cd2802_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+const device_type TMS5110A = &device_creator<tms5110a_device>;
+
+tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms5110_device(mconfig, TMS5110A, "TMS5110A", tag, owner, clock, "tms5110a", __FILE__)
+{
+}
 
 const device_type M58817 = &device_creator<m58817_device>;
 

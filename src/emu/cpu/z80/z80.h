@@ -55,7 +55,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -137,12 +137,12 @@ protected:
 	void illegal_1();
 	void illegal_2();
 
-	PROTOTYPES(op);
-	PROTOTYPES(cb);
-	PROTOTYPES(dd);
-	PROTOTYPES(ed);
-	PROTOTYPES(fd);
-	PROTOTYPES(xycb);
+	PROTOTYPES(op)
+	PROTOTYPES(cb)
+	PROTOTYPES(dd)
+	PROTOTYPES(ed)
+	PROTOTYPES(fd)
+	PROTOTYPES(xycb)
 
 	void halt();
 	void leave_halt();
@@ -233,10 +233,13 @@ protected:
 
 	// address spaces
 	const address_space_config m_program_config;
+	const address_space_config m_decrypted_opcodes_config;
 	const address_space_config m_io_config;
 	address_space *m_program;
-	address_space  *m_io;
+	address_space *m_decrypted_opcodes;
+	address_space *m_io;
 	direct_read_data *m_direct;
+	direct_read_data *m_decrypted_opcodes_direct;
 
 	PAIR            m_prvpc;
 	PAIR            m_pc;

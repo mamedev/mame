@@ -155,14 +155,14 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 
 UINT8 i80186_cpu_device::fetch_op()
 {
-	UINT8 data = m_direct->read_decrypted_byte(pc(), m_fetch_xor);
+	UINT8 data = m_direct->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
 
 UINT8 i80186_cpu_device::fetch()
 {
-	UINT8 data = m_direct->read_raw_byte(pc(), m_fetch_xor);
+	UINT8 data = m_direct->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }

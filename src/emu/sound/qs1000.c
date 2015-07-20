@@ -523,7 +523,7 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						if (chan.m_start + chan.m_adpcm_addr >=  chan.m_loop_end)
 							chan.m_adpcm_addr = chan.m_loop_start - chan.m_start;
 
-						UINT8 data = m_direct->read_raw_byte(chan.m_start + (chan.m_adpcm_addr >> 1));
+						UINT8 data = m_direct->read_byte(chan.m_start + (chan.m_adpcm_addr >> 1));
 						UINT8 nibble = (chan.m_adpcm_addr & 1 ? data : data >> 4) & 0xf;
 						chan.m_adpcm_signal = chan.m_adpcm.clock(nibble);
 					}
@@ -556,7 +556,7 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						}
 					}
 
-					INT8 result = m_direct->read_raw_byte(chan.m_addr) - 128;
+					INT8 result = m_direct->read_byte(chan.m_addr) - 128;
 
 					chan.m_acc += chan.m_freq;
 					chan.m_addr = (chan.m_addr + (chan.m_acc >> 18)) & QS1000_ADDRESS_MASK;
@@ -576,9 +576,9 @@ void qs1000_device::start_voice(int ch)
 	UINT32 table_addr = (m_channels[ch].m_regs[0x01] << 16) | (m_channels[ch].m_regs[0x02] << 8) | m_channels[ch].m_regs[0x03];
 
 	// Fetch the sound information
-	UINT16 freq = (m_direct->read_raw_byte(table_addr + 0) << 8) | m_direct->read_raw_byte(table_addr + 1);
-	UINT16 word1 = (m_direct->read_raw_byte(table_addr + 2) << 8) | m_direct->read_raw_byte(table_addr + 3);
-	UINT16 base = (m_direct->read_raw_byte(table_addr + 4) << 8) | m_direct->read_raw_byte(table_addr + 5);
+	UINT16 freq = (m_direct->read_byte(table_addr + 0) << 8) | m_direct->read_byte(table_addr + 1);
+	UINT16 word1 = (m_direct->read_byte(table_addr + 2) << 8) | m_direct->read_byte(table_addr + 3);
+	UINT16 base = (m_direct->read_byte(table_addr + 4) << 8) | m_direct->read_byte(table_addr + 5);
 
 	if (LOGGING_ENABLED)
 		printf("[%.6x] Freq:%.4x  ????:%.4x  Addr:%.4x\n", table_addr, freq, word1, base);
@@ -588,42 +588,42 @@ void qs1000_device::start_voice(int ch)
 		return;
 
 	// Fetch the sample pointers and flags
-	UINT8 byte0 = m_direct->read_raw_byte(base);
+	UINT8 byte0 = m_direct->read_byte(base);
 
 	UINT32 start_addr;
 
 	start_addr  = byte0 << 16;
-	start_addr |= m_direct->read_raw_byte(base + 1) << 8;
-	start_addr |= m_direct->read_raw_byte(base + 2) << 0;
+	start_addr |= m_direct->read_byte(base + 1) << 8;
+	start_addr |= m_direct->read_byte(base + 2) << 0;
 	start_addr &= QS1000_ADDRESS_MASK;
 
 	UINT32 loop_start;
 
 	loop_start = (byte0 & 0xf0) << 16;
-	loop_start |= m_direct->read_raw_byte(base + 3) << 12;
-	loop_start |= m_direct->read_raw_byte(base + 4) << 4;
-	loop_start |= m_direct->read_raw_byte(base + 5) >> 4;
+	loop_start |= m_direct->read_byte(base + 3) << 12;
+	loop_start |= m_direct->read_byte(base + 4) << 4;
+	loop_start |= m_direct->read_byte(base + 5) >> 4;
 	loop_start &= QS1000_ADDRESS_MASK;
 
 	UINT32 loop_end;
 
 	loop_end = (byte0 & 0xf0) << 16;
-	loop_end |= (m_direct->read_raw_byte(base + 5) & 0xf) << 16;
-	loop_end |= m_direct->read_raw_byte(base + 6) << 8;
-	loop_end |= m_direct->read_raw_byte(base + 7);
+	loop_end |= (m_direct->read_byte(base + 5) & 0xf) << 16;
+	loop_end |= m_direct->read_byte(base + 6) << 8;
+	loop_end |= m_direct->read_byte(base + 7);
 	loop_end &= QS1000_ADDRESS_MASK;
 
-	UINT8 byte8 = m_direct->read_raw_byte(base + 8);
+	UINT8 byte8 = m_direct->read_byte(base + 8);
 
 	if (LOGGING_ENABLED)
 	{
-		UINT8 byte9 = m_direct->read_raw_byte(base + 9);
-		UINT8 byte10 = m_direct->read_raw_byte(base + 10);
-		UINT8 byte11 = m_direct->read_raw_byte(base + 11);
-		UINT8 byte12 = m_direct->read_raw_byte(base + 12);
-		UINT8 byte13 = m_direct->read_raw_byte(base + 13);
-		UINT8 byte14 = m_direct->read_raw_byte(base + 14);
-		UINT8 byte15 = m_direct->read_raw_byte(base + 15);
+		UINT8 byte9 = m_direct->read_byte(base + 9);
+		UINT8 byte10 = m_direct->read_byte(base + 10);
+		UINT8 byte11 = m_direct->read_byte(base + 11);
+		UINT8 byte12 = m_direct->read_byte(base + 12);
+		UINT8 byte13 = m_direct->read_byte(base + 13);
+		UINT8 byte14 = m_direct->read_byte(base + 14);
+		UINT8 byte15 = m_direct->read_byte(base + 15);
 
 		printf("[%.6x] Sample Start:%.6x  Loop Start:%.6x  Loop End:%.6x  Params: %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", base, start_addr, loop_start, loop_end, byte8, byte9, byte10, byte11, byte12, byte13, byte14, byte15);
 	}

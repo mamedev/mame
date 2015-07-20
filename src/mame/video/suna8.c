@@ -381,7 +381,7 @@ void suna8_state::draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 
 				m_gfxdecode->gfx(which)->transpen(bitmap,cliprect,
 							tile + (attr & 0x3)*0x100 + gfxbank,
-							(((attr >> 2) & 0xf) | colorbank) + 0x10 * m_palettebank,    // hardhea2 player2
+							(((attr >> 2) & 0xf) ^ colorbank) + 0x10 * m_palettebank,    // player2 in hardhea2 and sparkman
 							tile_flipx, tile_flipy,
 							sx, sy, 0xf);
 			}

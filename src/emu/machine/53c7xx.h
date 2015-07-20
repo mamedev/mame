@@ -98,14 +98,14 @@ private:
 	{
 		STATE_MASK = 0x00ff,
 		SUB_SHIFT  = 8,
-		SUB_MASK   = 0xff00,
+		SUB_MASK   = 0xff00
 	};
 
 	enum
 	{
 		MODE_I,
 		MODE_T,
-		MODE_D,
+		MODE_D
 	};
 
 	enum scsi_state
@@ -131,7 +131,7 @@ private:
 		SEND_WAIT_SETTLE,
 		RECV_WAIT_SETTLE,
 		RECV_WAIT_REQ_0,
-		RECV_WAIT_REQ_1,
+		RECV_WAIT_REQ_1
 	};
 
 	void update_irqs();
@@ -148,7 +148,7 @@ private:
 		SCRIPTS_IDLE,
 		SCRIPTS_WAIT_MANUAL_START,
 		SCRIPTS_FETCH,
-		SCRIPTS_EXECUTE,
+		SCRIPTS_EXECUTE
 	};
 
 	void set_scripts_state(scripts_state state);

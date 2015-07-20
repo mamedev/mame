@@ -9,7 +9,7 @@
 
 
 
-UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_mixerregs1[8]&0x07ff, cliprect); // complete guess, causes green behind test grid in twc94 and blue behind title screen on gstriker
 
@@ -34,13 +34,11 @@ UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-VIDEO_START_MEMBER(gstriker_state, gstriker)
+void gstriker_state::video_start()
 {
 	// Initalize the chip for the score plane
-	m_tx->set_gfx_region(0);
 	m_tx->get_tilemap()->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
-	m_bg->set_gfx_region(1);
 	m_bg->get_tilemap()->set_transparent_pen(0xf);
 }

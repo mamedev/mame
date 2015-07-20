@@ -100,7 +100,7 @@ void nubus_wsportrait_device::device_start()
 
 	slotspace = get_slotspace();
 
-	printf("[wsportrait %p] slotspace = %x\n", this, slotspace);
+	printf("[wsportrait %p] slotspace = %x\n", (void *)this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (UINT32 *)&m_vram[0];

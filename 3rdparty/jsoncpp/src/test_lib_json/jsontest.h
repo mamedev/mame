@@ -178,8 +178,8 @@ private:
 
 template <typename T, typename U>
 TestResult& checkEqual(TestResult& result,
-                       const T& expected,
-                       const U& actual,
+                       T expected,
+                       U actual,
                        const char* file,
                        unsigned int line,
                        const char* expr) {
@@ -214,7 +214,7 @@ TestResult& checkStringEqual(TestResult& result,
 #define JSONTEST_ASSERT_PRED(expr)                                             \
   {                                                                            \
     JsonTest::PredicateContext _minitest_Context = {                           \
-      result_->predicateId_, __FILE__, __LINE__, #expr                         \
+      result_->predicateId_, __FILE__, __LINE__, #expr, NULL, NULL             \
     };                                                                         \
     result_->predicateStackTail_->next_ = &_minitest_Context;                  \
     result_->predicateId_ += 1;                                                \

@@ -102,11 +102,11 @@
 union ADDR_REG
 {
 #ifdef LSB_FIRST
-	struct { UINT16 loword, hiword ; } ;
-	struct { UINT8 addr0, addr1, addr2; };
+	struct { UINT16 loword, hiword ; } as16bit;
+	struct { UINT8 addr0, addr1, addr2; } as8bit;
 #else
-	struct { UINT16 hiword, loword ; } ;
-	struct { UINT8 addr2, addr1, addr0; };
+	struct { UINT16 hiword, loword ; } as16bit;
+	struct { UINT8 addr2, addr1, addr0; } as8bit;
 #endif
 	UINT32 addr;
 };
@@ -490,12 +490,12 @@ void bfcobra_state::RunBlit(address_space &space)
 		UINT8 dstdata = 0;
 
 		/* Read the blitter command */
-		BLITPRG_READ(source.addr0);
-		BLITPRG_READ(source.addr1);
-		BLITPRG_READ(source.addr2);
-		BLITPRG_READ(dest.addr0);
-		BLITPRG_READ(dest.addr1);
-		BLITPRG_READ(dest.addr2);
+		BLITPRG_READ(source.as8bit.addr0);
+		BLITPRG_READ(source.as8bit.addr1);
+		BLITPRG_READ(source.as8bit.addr2);
+		BLITPRG_READ(dest.as8bit.addr0);
+		BLITPRG_READ(dest.as8bit.addr1);
+		BLITPRG_READ(dest.as8bit.addr2);
 		BLITPRG_READ(modectl);
 		BLITPRG_READ(compfunc);
 		BLITPRG_READ(outercnt);
@@ -516,13 +516,13 @@ void bfcobra_state::RunBlit(address_space &space)
 				blitter.command & CMD_SRCUP ? "SRCUP" : "     ",
 				blitter.command & CMD_DSTUP ? "DSTUP" : "     ");
 
-			osd_printf_debug("Src Address Byte 0  %.2x\n", blitter.source.addr0);
-			osd_printf_debug("Src Address Byte 1  %.2x\n", blitter.source.addr1);
-			osd_printf_debug("Src Control         %.2x\n", blitter.source.addr2);
+			osd_printf_debug("Src Address Byte 0  %.2x\n", blitter.source.as8bit.addr0);
+			osd_printf_debug("Src Address Byte 1  %.2x\n", blitter.source.as8bit.addr1);
+			osd_printf_debug("Src Control         %.2x\n", blitter.source.as8bit.addr2);
 			osd_printf_debug("  Src Address       %.5x\n", blitter.source.addr & 0xfffff);
-			osd_printf_debug("Dest Address Byte 0 %.2x\n", blitter.dest.addr0);
-			osd_printf_debug("Dest Address Byte 1 %.2x\n", blitter.dest.addr1);
-			osd_printf_debug("Dest Control        %.2x\n", blitter.dest.addr2);
+			osd_printf_debug("Dest Address Byte 0 %.2x\n", blitter.dest.as8bit.addr0);
+			osd_printf_debug("Dest Address Byte 1 %.2x\n", blitter.dest.as8bit.addr1);
+			osd_printf_debug("Dest Control        %.2x\n", blitter.dest.as8bit.addr2);
 			osd_printf_debug("  Dst. Address      %.5x\n", blitter.dest.addr & 0xfffff);
 			osd_printf_debug("Mode Control        %.2x",   blitter.modectl);
 			osd_printf_debug("     %s\n", blitter.modectl & MODE_BITTOBYTE ? "BIT_TO_BYTE" : "");
@@ -552,40 +552,40 @@ void bfcobra_state::RunBlit(address_space &space)
 					if (blitter.modectl & MODE_YFRAC)
 					{
 						if (blitter.modectl & MODE_SSIGN )
-							blitter.dest.addr0--;
+							blitter.dest.as8bit.addr0--;
 						else
-							blitter.dest.addr0++;
+							blitter.dest.as8bit.addr0++;
 					}
 					else
 					{
 						if (blitter.modectl & MODE_DSIGN )
-							blitter.dest.addr1--;
+							blitter.dest.as8bit.addr1--;
 						else
-							blitter.dest.addr1++;
+							blitter.dest.as8bit.addr1++;
 					}
-					if( blitter.source.addr0 < blitter.step )
+					if( blitter.source.as8bit.addr0 < blitter.step )
 					{
-						blitter.source.addr0 -=blitter.step ;
-						blitter.source.addr0 +=blitter.source.addr1;
+						blitter.source.as8bit.addr0 -= blitter.step ;
+						blitter.source.as8bit.addr0 += blitter.source.as8bit.addr1;
 
 						if ( blitter.modectl & MODE_YFRAC )
 						{
 							if (blitter.modectl & MODE_DSIGN )
-								blitter.dest.addr1--;
+								blitter.dest.as8bit.addr1--;
 							else
-								blitter.dest.addr1++;
+								blitter.dest.as8bit.addr1++;
 						}
 						else
 						{
 							if (blitter.modectl & MODE_SSIGN )
-								blitter.dest.addr0--;
+								blitter.dest.as8bit.addr0--;
 							else
-								blitter.dest.addr0++;
+								blitter.dest.as8bit.addr0++;
 						}
 					}
 					else
 					{
-						blitter.source.addr0 -=blitter.step;
+						blitter.source.as8bit.addr0 -= blitter.step;
 					}
 
 					*blitter_get_addr( blitter.dest.addr) = blitter.pattern;
@@ -603,7 +603,7 @@ void bfcobra_state::RunBlit(address_space &space)
 				if (LOOPTYPE == 3 && innercnt == blitter.innercnt)
 				{
 					srcdata = *(blitter_get_addr( blitter.source.addr & 0xfffff));
-					blitter.source.loword++;
+					blitter.source.as16bit.loword++;
 					cycles_used++;
 				}
 
@@ -616,9 +616,9 @@ void bfcobra_state::RunBlit(address_space &space)
 						cycles_used++;
 
 						if (blitter.modectl & MODE_SSIGN)
-							blitter.source.loword-- ;
+							blitter.source.as16bit.loword-- ;
 						else
-							blitter.source.loword++;
+							blitter.source.as16bit.loword++;
 
 						result = srcdata;
 					}
@@ -725,9 +725,9 @@ void bfcobra_state::RunBlit(address_space &space)
 
 				/* Update destination address */
 				if (blitter.modectl & MODE_DSIGN)
-					blitter.dest.loword--;
+					blitter.dest.as16bit.loword--;
 				else
-					blitter.dest.loword++;
+					blitter.dest.as16bit.loword++;
 
 			} while (--innercnt);
 
@@ -738,10 +738,10 @@ void bfcobra_state::RunBlit(address_space &space)
 			else
 			{
 				if (blitter.command & CMD_DSTUP)
-					blitter.dest.loword += blitter.step;
+					blitter.dest.as16bit.loword += blitter.step;
 
 				if (blitter.command & CMD_SRCUP)
-					blitter.source.loword += blitter.step;
+					blitter.source.as16bit.loword += blitter.step;
 
 				if (blitter.command & CMD_PARRD)
 				{
@@ -937,7 +937,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 		case 0x20:
 		{
 			/* Seems correct - used during RLE pic decoding */
-			val = m_blitter.dest.addr0;
+			val = m_blitter.dest.as8bit.addr0;
 			break;
 		}
 		case 0x22:
@@ -1006,17 +1006,17 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 		}
 		case 0x18:
 		{
-			m_blitter.program.addr0 = data;
+			m_blitter.program.as8bit.addr0 = data;
 			break;
 		}
 		case 0x19:
 		{
-			m_blitter.program.addr1 = data;
+			m_blitter.program.as8bit.addr1 = data;
 			break;
 		}
 		case 0x1A:
 		{
-			m_blitter.program.addr2 = data;
+			m_blitter.program.as8bit.addr2 = data;
 			break;
 		}
 		case 0x20:
@@ -1091,7 +1091,7 @@ enum fdc_phase
 	COMMAND,
 	EXECUTION_R,
 	EXECUTION_W,
-	RESULTS,
+	RESULTS
 };
 
 enum command

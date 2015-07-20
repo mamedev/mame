@@ -124,8 +124,8 @@ void c352_device::mix_one_channel(unsigned long ch, long sample_count)
 			return;
 		}
 
-		sample = (char)m_direct->read_raw_byte(pos);
-		nextsample = (char)m_direct->read_raw_byte(pos+cnt);
+		sample = (char)m_direct->read_byte(pos);
+		nextsample = (char)m_direct->read_byte(pos+cnt);
 
 		// sample is muLaw, not 8-bit linear (Fighting Layer uses this extensively)
 		if (flag & C352_FLG_MULAW)
@@ -489,7 +489,7 @@ void c352_device::device_start()
 			divider=332;
 			break;
 	}
-	
+
 	m_sample_rate_base = clock() / divider;
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);

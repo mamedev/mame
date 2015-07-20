@@ -19,14 +19,11 @@ DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
 	UINT8* pSprite = memregion("gfx1")->base();
 	UINT8* pOffset = memregion("proms")->base();
 
-	int i;
-	int j;
-
 	/* re-arrange sprite data using the PROM */
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		for (j = 0; j < 16; j++)
+		for (int j = 0; j < 16; j++)
 		{
 			UINT16 v =
 				(pSprite[0] << 0xC) |
@@ -44,16 +41,18 @@ DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
 			pSprite += 4;
 		}
 	}
+	
+	save_item(NAME(m_da_latch));
 }
 
 
-WRITE8_MEMBER(poolshrk_state::poolshrk_da_latch_w)
+WRITE8_MEMBER(poolshrk_state::da_latch_w)
 {
 	m_da_latch = data & 15;
 }
 
 
-WRITE8_MEMBER(poolshrk_state::poolshrk_led_w)
+WRITE8_MEMBER(poolshrk_state::led_w)
 {
 	if (offset & 2)
 		set_led_status(machine(), 0, offset & 1);
@@ -62,7 +61,7 @@ WRITE8_MEMBER(poolshrk_state::poolshrk_led_w)
 }
 
 
-WRITE8_MEMBER(poolshrk_state::poolshrk_watchdog_w)
+WRITE8_MEMBER(poolshrk_state::watchdog_w)
 {
 	if ((offset & 3) == 3)
 	{
@@ -71,7 +70,7 @@ WRITE8_MEMBER(poolshrk_state::poolshrk_watchdog_w)
 }
 
 
-READ8_MEMBER(poolshrk_state::poolshrk_input_r)
+READ8_MEMBER(poolshrk_state::input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	UINT8 val = ioport(portnames[offset & 3])->read();
@@ -91,7 +90,7 @@ READ8_MEMBER(poolshrk_state::poolshrk_input_r)
 }
 
 
-READ8_MEMBER(poolshrk_state::poolshrk_irq_reset_r)
+READ8_MEMBER(poolshrk_state::irq_reset_r)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -105,15 +104,15 @@ static ADDRESS_MAP_START( poolshrk_cpu_map, AS_PROGRAM, 8, poolshrk_state )
 	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x2000) AM_WRITEONLY AM_SHARE("playfield_ram")
 	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_SHARE("hpos_ram")
 	AM_RANGE(0x0c00, 0x0c0f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_SHARE("vpos_ram")
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2000) AM_READWRITE(poolshrk_input_r, poolshrk_watchdog_w)
-	AM_RANGE(0x1400, 0x17ff) AM_MIRROR(0x2000) AM_WRITE(poolshrk_scratch_sound_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x2000) AM_WRITE(poolshrk_score_sound_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x2000) AM_WRITE(poolshrk_click_sound_w)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2000) AM_READWRITE(input_r, watchdog_w)
+	AM_RANGE(0x1400, 0x17ff) AM_MIRROR(0x2000) AM_WRITE(scratch_sound_w)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x2000) AM_WRITE(score_sound_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x2000) AM_WRITE(click_sound_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP /* diagnostic ROM location */
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(poolshrk_da_latch_w)
-	AM_RANGE(0x6400, 0x67ff) AM_WRITE(poolshrk_bump_sound_w)
-	AM_RANGE(0x6800, 0x6bff) AM_READ(poolshrk_irq_reset_r)
-	AM_RANGE(0x6c00, 0x6fff) AM_WRITE(poolshrk_led_w)
+	AM_RANGE(0x6000, 0x63ff) AM_WRITE(da_latch_w)
+	AM_RANGE(0x6400, 0x67ff) AM_WRITE(bump_sound_w)
+	AM_RANGE(0x6800, 0x6bff) AM_READ(irq_reset_r)
+	AM_RANGE(0x6c00, 0x6fff) AM_WRITE(led_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -225,7 +224,7 @@ static MACHINE_CONFIG_START( poolshrk, poolshrk_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1, 255, 24, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update_poolshrk)
+	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poolshrk)
@@ -258,4 +257,4 @@ ROM_START( poolshrk )
 ROM_END
 
 
-GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, poolshrk, 0, "Atari", "Poolshark", 0 )
+GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, poolshrk, 0, "Atari", "Poolshark", GAME_SUPPORTS_SAVE )

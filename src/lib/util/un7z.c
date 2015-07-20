@@ -467,6 +467,14 @@ _7z_error _7z_file_decompress(_7z_file *new_7z, void *buffer, UINT32 length)
     _7z_file
 -------------------------------------------------*/
 
+/**
+ * @fn  static void free__7z_file(_7z_file *_7z)
+ *
+ * @brief   Free 7z file.
+ *
+ * @param [in,out]  _7z If non-null, the 7z.
+ */
+
 static void free__7z_file(_7z_file *_7z)
 {
 	if (_7z != NULL)

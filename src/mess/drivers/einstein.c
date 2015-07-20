@@ -734,7 +734,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* uart */
 	MCFG_DEVICE_ADD(IC_I060, I8251, 0)
 
-	MCFG_WD1770x_ADD(IC_I042, XTAL_X002)
+	MCFG_WD1770_ADD(IC_I042, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)

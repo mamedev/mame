@@ -1073,7 +1073,7 @@ ROM_START( vk100 )
 	 *    Complement: M=A^(P^N)
 	 *    Erase: M=N
 	 */
-	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
+	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic14", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
 
 	ROM_REGION(0x100, "trans", ROMREGION_ERASEFF )
 	/* this is the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
@@ -1087,7 +1087,7 @@ ROM_START( vk100 )
 	 *            \\\\\\\\- X'9 thru X'2
 	 * The VT125 prom @ E60 is literally identical to this, the same exact part: 23-060B1
 	 */
-	ROM_LOAD( "wb---0_060b1.mmi6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
+	ROM_LOAD( "wb---0_060b1.mmi6309.pr2.ic82", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
 	ROM_REGION(0x100, "dir", ROMREGION_ERASEFF )
 		/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
@@ -1114,7 +1114,7 @@ ROM_START( vk100 )
 		*            \--------- UNUSED, always 0
 		* The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
 		*/
-	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0000, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
+	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic111", 0x0000, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
 
 	ROM_REGION( 0x100, "ras_erase", ROMREGION_ERASEFF )
 	/* this is the "RAS/ERASE ROM" involved with driving the RAS lines and erasing VRAM dram (256*4, 82s129)
@@ -1155,10 +1155,11 @@ ROM_START( vk100 )
 	   X'2 inputs lend credence to this.
 	 *
 	 */
-	ROM_LOAD( "wb8151_573a2.mmi6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
+	ROM_LOAD( "wb8151_573a2.mmi6301.pr3.ic41", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
 
 	ROM_REGION( 0x100, "vector", ROMREGION_ERASEFF )
 	// WARNING: it is possible that the first two bytes of this prom are bad!
+	// The PROM on andy's board appears to be damaged, this will need to be redumped from another board.
 	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
 	 * the vector rom bits are complex and are unfortunately poorly documented
 	 * in the tech manual. see figure 5-23.
@@ -1194,7 +1195,7 @@ ROM_START( vk100 )
 	 *
 	 * The VT125 prom E71 and its latch E70 is mostly equivalent to the vector prom, but the address order is different
 	 */
-	ROM_LOAD( "wb8146_058b1.mmi6309.pr1.ic99", 0x0000, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
+	ROM_LOAD( "wb8146_058b1.mmi6309.pr1.ic99", 0x0000, 0x0100, BAD_DUMP CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 
 	ROM_REGION( 0x20, "sync", ROMREGION_ERASEFF )
 	/* this is the "SYNC ROM" == mb6331 (32x8, 82s123)

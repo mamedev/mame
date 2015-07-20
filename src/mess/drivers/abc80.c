@@ -269,7 +269,7 @@ READ8_MEMBER( abc80_state::pio_pa_r )
 	data |= (m_key_strobe << 7);
 
 	return data;
-};
+}
 
 READ8_MEMBER( abc80_state::pio_pb_r )
 {
@@ -305,7 +305,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	if (LOG) logerror("%s %s read tape latch %u\n", machine().time().as_string(), machine().describe_context(), m_tape_in_latch);
 
 	return data;
-};
+}
 
 WRITE8_MEMBER( abc80_state::pio_pb_w )
 {
@@ -356,7 +356,7 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 
 		m_pio->pb7_w(m_tape_in_latch);
 	}
-};
+}
 
 
 //-------------------------------------------------

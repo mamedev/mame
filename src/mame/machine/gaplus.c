@@ -2,7 +2,7 @@
 // copyright-holders:Manuel Abadia, Ernesto Corvi, Nicola Salmoria
 /***************************************************************************
 
-  machine.c
+  gaplus.c
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -20,7 +20,7 @@
 *                                                                                   *
 ************************************************************************************/
 
-WRITE8_MEMBER(gaplus_state::gaplus_customio_3_w)
+WRITE8_MEMBER(gaplus_state::customio_3_w)
 {
 	if ((offset == 0x09) && (data >= 0x0f))
 		m_samples->start(0,0);
@@ -29,7 +29,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_customio_3_w)
 }
 
 
-READ8_MEMBER(gaplus_state::gaplus_customio_3_r)
+READ8_MEMBER(gaplus_state::customio_3_r)
 {
 	int mode = m_customio_3[8];
 

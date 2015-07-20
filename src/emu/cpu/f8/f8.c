@@ -96,7 +96,7 @@ void f8_cpu_device::ROMC_00(int insttim) /* SKR - added parameter to tell if  */
 	 * of PC0.
 	 */
 
-	m_dbus = m_direct->read_decrypted_byte(m_pc0);
+	m_dbus = m_direct->read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim;    /* SKR - ROMC00 is usually short, not short+long, */
 							/* but DS is long */
@@ -110,7 +110,7 @@ void f8_cpu_device::ROMC_01()
 	 * location addressed by PC0; then all devices add the 8-bit value
 	 * on the data bus as signed binary number to PC0.
 	 */
-	m_dbus = m_direct->read_raw_byte(m_pc0);
+	m_dbus = m_direct->read_byte(m_pc0);
 	m_pc0 += (INT8)m_dbus;
 	m_icount -= cL;
 }
@@ -134,7 +134,7 @@ void f8_cpu_device::ROMC_03(int insttim) /* SKR - added parameter to tell if  */
 	 * Similiar to 0x00, except that it is used for immediate operands
 	 * fetches (using PC0) instead of instruction fetches.
 	 */
-	m_dbus = m_io = m_direct->read_raw_byte(m_pc0);
+	m_dbus = m_io = m_direct->read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim;
 }
@@ -228,7 +228,7 @@ void f8_cpu_device::ROMC_0C()
 	 * by PC0 into the data bus; then all devices move the value that
 	 * has just been placed on the data bus into the low order byte of PC0.
 	 */
-	m_dbus = m_direct->read_raw_byte(m_pc0);
+	m_dbus = m_direct->read_byte(m_pc0);
 	m_pc0 = (m_pc0 & 0xff00) | m_dbus;
 	m_icount -= cL;
 }
@@ -251,7 +251,7 @@ void f8_cpu_device::ROMC_0E()
 	 * The value on the data bus is then moved to the low order byte
 	 * of DC0 by all devices.
 	 */
-	m_dbus = m_direct->read_raw_byte(m_pc0);
+	m_dbus = m_direct->read_byte(m_pc0);
 	m_dc0 = (m_dc0 & 0xff00) | m_dbus;
 	m_icount -= cL;
 }
@@ -289,7 +289,7 @@ void f8_cpu_device::ROMC_11()
 	 * data bus. All devices must then move the contents of the
 	 * data bus to the upper byte of DC0.
 	 */
-	m_dbus = m_direct->read_raw_byte(m_pc0);
+	m_dbus = m_direct->read_byte(m_pc0);
 	m_dc0 = (m_dc0 & 0x00ff) | (m_dbus << 8);
 	m_icount -= cL;
 }

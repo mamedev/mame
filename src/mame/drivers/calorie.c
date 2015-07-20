@@ -94,7 +94,8 @@ public:
 		m_sprites(*this, "sprites"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_fg_ram;
@@ -121,6 +122,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 };
 
 
@@ -256,7 +258,7 @@ WRITE8_MEMBER(calorie_state::bogus_w)
 static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0xdc00, 0xdcff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -269,6 +271,11 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, calorie_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( calorie_sound_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -447,6 +454,7 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(calorie_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
@@ -555,13 +563,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(calorie_state,calorie)
 {
-	sega_317_0004_decode(machine(), "maincpu");
+	// 317-0004
+	sega_decode_317(memregion("maincpu")->base(), m_decrypted_opcodes, 0);
 }
 
 DRIVER_INIT_MEMBER(calorie_state,calorieb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x10000);
+	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
 

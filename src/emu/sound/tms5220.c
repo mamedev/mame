@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet, Couriersud, Michael Zapf
 /**********************************************************************************************
 
@@ -338,7 +338,7 @@ void tms5220_device::set_variant(int variant)
 	{
 		case TMS5220_IS_5200:
 		case TMS5220_IS_CD2501ECD:
-			m_coeff = &tms5200_coeff;
+			m_coeff = &T0285_2501E_coeff;
 			break;
 		case TMS5220_IS_5220C:
 		case TMS5220_IS_5220:
@@ -920,9 +920,9 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 			 * disabled, forcing all samples beyond 51d to be == 51d
 			 */
 			if (m_pitch_count >= 51)
-				m_excitation_data = m_coeff->chirptable[51];
+				m_excitation_data = (INT8)m_coeff->chirptable[51];
 			else /*m_pitch_count < 51*/
-				m_excitation_data = m_coeff->chirptable[m_pitch_count];
+				m_excitation_data = (INT8)m_coeff->chirptable[m_pitch_count];
 		}
 
 		// Update LFSR *20* times every sample (once per T cycle), like patent shows

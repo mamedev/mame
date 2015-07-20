@@ -348,7 +348,7 @@ offs_t upi41_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 
 UINT8 mcs48_cpu_device::opcode_fetch()
 {
-	return m_direct->read_decrypted_byte(m_pc++);
+	return m_direct->read_byte(m_pc++);
 }
 
 
@@ -359,7 +359,7 @@ UINT8 mcs48_cpu_device::opcode_fetch()
 
 UINT8 mcs48_cpu_device::argument_fetch()
 {
-	return m_direct->read_raw_byte(m_pc++);
+	return m_direct->read_byte(m_pc++);
 }
 
 

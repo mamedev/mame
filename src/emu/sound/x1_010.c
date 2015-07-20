@@ -21,7 +21,8 @@ Registers:
 
     Reg:    Bits:       Meaning:
 
-    0       7654 3---
+    0       7--- ----   Frequency divider flag (only downtown seems to set this)
+            -654 3---
             ---- -2--   PCM/Waveform repeat flag (0:Ones 1:Repeat) (*1)
             ---- --1-   Sound out select (0:PCM 1:Waveform)
             ---- ---0   Key on / off
@@ -190,7 +191,7 @@ WRITE16_MEMBER( x1_010_device::word_w )
 void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	X1_010_CHANNEL  *reg;
-	int     ch, i, volL, volR, freq;
+	int     ch, i, volL, volR, freq, div;
 	register INT8   *start, *end, data;
 	register UINT8  *env;
 	register UINT32 smp_offs, smp_step, env_offs, env_step, delta;
@@ -206,13 +207,14 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		if( (reg->status&1) != 0 ) {                            // Key On
 			stream_sample_t *bufL = outputs[0];
 			stream_sample_t *bufR = outputs[1];
+			div = (reg->status&0x80) ? 1 : 0;
 			if( (reg->status&2) == 0 ) {                        // PCM sampling
 				start    = m_region + reg->start*0x1000;
 				end      = m_region + (0x100-reg->end)*0x1000;
 				volL     = ((reg->volume>>4)&0xf)*VOL_BASE;
 				volR     = ((reg->volume>>0)&0xf)*VOL_BASE;
 				smp_offs = m_smp_offset[ch];
-				freq     = reg->frequency;
+				freq     = reg->frequency>>div;
 				// Meta Fox does write the frequency register, but this is a hack to make it "work" with the current setup
 				// This is broken for Arbalester (it writes 8), but that'll be fixed later.
 				if( freq == 0 ) freq = 4;
@@ -238,7 +240,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			} else {                                            // Wave form
 				start    = (INT8 *)&(m_reg[reg->volume*128+0x1000]);
 				smp_offs = m_smp_offset[ch];
-				freq     = (reg->pitch_hi<<8)+reg->frequency;
+				freq     = ((reg->pitch_hi<<8)+reg->frequency)>>div;
 				smp_step = (UINT32)((float)m_base_clock/128.0f/1024.0f/4.0f*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
 
 				env      = (UINT8 *)&(m_reg[reg->end*128]);

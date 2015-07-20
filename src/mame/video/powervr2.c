@@ -119,9 +119,9 @@ inline INT32 powervr2_device::clamp(INT32 in, INT32 min, INT32 max)
 // Perform a standard bilinear filter across four pixels
 inline UINT32 powervr2_device::bilinear_filter(UINT32 c0, UINT32 c1, UINT32 c2, UINT32 c3, float u, float v)
 {
-	UINT32 ui = (u * 256.0f);
-	UINT32 vi = (v * 256.0f);
-	return rgba_bilinear_filter(c0, c1, c3, c2, ui, vi);
+	const UINT32 ui = (u * 256.0f);
+	const UINT32 vi = (v * 256.0f);
+	return rgbaint_t::bilinear_filter(c0, c1, c3, c2, ui, vi);
 }
 
 // Multiply with alpha value in bits 31-24

@@ -879,7 +879,7 @@ UINT8 grip_device::ecbbus_io_r(offs_t offset)
 	}
 
 	return data;
-};
+}
 
 
 //-------------------------------------------------

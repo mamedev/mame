@@ -151,7 +151,7 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_RAM_DEFAULT_SIZE("56K")
 
 	/* floppy disk */
-	MCFG_FD1771x_ADD("wd1771", XTAL_1MHz)
+	MCFG_FD1771_ADD("wd1771", XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)

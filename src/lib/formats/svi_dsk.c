@@ -118,7 +118,7 @@ bool svi_format::save(io_generic *io, floppy_image *image)
 		for (int head = 0; head < head_count; head++)
 		{
 			// skip track 0, head 0
-			if (track == 0)	{ if (head_count == 1) break; else head++; }
+			if (track == 0) { if (head_count == 1) break; else head++; }
 
 			generate_bitstream_from_track(track, head, 2000, bitstream, track_size, image);
 			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
@@ -140,4 +140,3 @@ bool svi_format::supports_save() const
 }
 
 const floppy_format_type FLOPPY_SVI_FORMAT = &floppy_image_format_creator<svi_format>;
-

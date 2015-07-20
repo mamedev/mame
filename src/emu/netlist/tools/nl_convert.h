@@ -10,9 +10,6 @@
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
 
-#include <cstddef>
-#include <cstdarg>
-
 #include "plib/pstring.h"
 #include "plib/plists.h"
 #include "plib/pparser.h"
@@ -29,7 +26,7 @@ public:
 	virtual ~nl_convert_base_t()
 	{
 		m_nets.clear_and_free();
-		devs.clear_and_free();
+		m_devs.clear_and_free();
 		m_pins.clear_and_free();
 	}
 
@@ -57,10 +54,10 @@ protected:
 	double get_sp_val(const pstring &sin);
 
 private:
-	struct sp_net_t
+	struct net_t
 	{
 	public:
-		sp_net_t(const pstring &aname)
+		net_t(const pstring &aname)
 		: m_name(aname), m_no_export(false) {}
 
 		const pstring &name() { return m_name;}
@@ -74,18 +71,18 @@ private:
 		pstring_list_t m_terminals;
 	};
 
-	struct sp_dev_t
+	struct dev_t
 	{
 	public:
-		sp_dev_t(const pstring &atype, const pstring &aname, const pstring &amodel)
+		dev_t(const pstring &atype, const pstring &aname, const pstring &amodel)
 		: m_type(atype), m_name(aname), m_model(amodel), m_val(0), m_has_val(false)
 		{}
 
-		sp_dev_t(const pstring &atype, const pstring &aname, double aval)
+		dev_t(const pstring &atype, const pstring &aname, double aval)
 		: m_type(atype), m_name(aname), m_model(""), m_val(aval), m_has_val(true)
 		{}
 
-		sp_dev_t(const pstring &atype, const pstring &aname)
+		dev_t(const pstring &atype, const pstring &aname)
 		: m_type(atype), m_name(aname), m_model(""), m_val(0.0), m_has_val(false)
 		{}
 
@@ -105,16 +102,16 @@ private:
 		bool m_has_val;
 	};
 
-	struct _sp_unit {
-		pstring sp_unit;
-		pstring nl_func;
-		double mult;
+	struct unit_t {
+		pstring m_unit;
+		pstring m_func;
+		double m_mult;
 	};
 
-	struct sp_pin_alias_t
+	struct pin_alias_t
 	{
 	public:
-		sp_pin_alias_t(const pstring &name, const pstring &alias)
+		pin_alias_t(const pstring &name, const pstring &alias)
 		: m_name(name), m_alias(alias)
 		{}
 		const pstring &name() { return m_name; }
@@ -124,19 +121,16 @@ private:
 		pstring m_alias;
 	};
 
-
-
-
 private:
 
 	pstringbuffer m_buf;
 
-	pnamedlist_t<sp_dev_t *> devs;
-	pnamedlist_t<sp_net_t *> m_nets;
+	pnamedlist_t<dev_t *> m_devs;
+	pnamedlist_t<net_t *> m_nets;
 	plist_t<pstring> m_ext_alias;
-	pnamedlist_t<sp_pin_alias_t *> m_pins;
+	pnamedlist_t<pin_alias_t *> m_pins;
 
-	static _sp_unit m_sp_units[];
+	static unit_t m_units[];
 
 };
 
@@ -170,7 +164,6 @@ public:
 
 	class eagle_tokenizer : public ptokenizer
 	{
-
 	public:
 		eagle_tokenizer(nl_convert_eagle_t &convert)
 		: ptokenizer(), m_convert(convert)

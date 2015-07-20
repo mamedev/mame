@@ -1,15 +1,15 @@
-// license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller, Robbbert
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /***************************************************************************
-    microbee.c
 
-    system driver
-    Juergen Buchmueller, Jan 2000
-    Robbbert 2008-2015
+Driver completely rewritten by Robbbert, in a process begun on 2009-02-24.
+Assistance/advice was gratefully received from:
+    E.J.Wordsworth (owner of Microbee Systems), nama, ChickenMan,
+    and the author of the "ubee512" emulator.
 
-    Assistance from:
-    Brett Selwood, Andrew Davies; E.J.Wordsworth (owner of Microbee Systems),
-    nama, ChickenMan, and the author of the "ubee512" emulator.
+Previous driver was written by Juergen Buchmueller, Jan 2000 with assistance
+from Brett Selwood and Andrew Davies.
+
 
     Keyboard notes are in video/microbee.c
 
@@ -762,7 +762,7 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
 	MCFG_CPU_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
-	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 2)
+	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -784,7 +784,7 @@ static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
-	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 2)
+	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)

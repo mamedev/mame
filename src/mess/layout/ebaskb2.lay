@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_black2"><rect><color red="0.07" green="0.0" blue="0.01" /></rect></element>
+	<element name="static_black2c"><disk><color red="0.07" green="0.0" blue="0.01" /></disk></element>
+	<element name="static_white0"><rect><color red="0.66" green="0.66" blue="0.66" /></rect></element>
+	<element name="static_white"><rect><color red="0.7" green="0.7" blue="0.7" /></rect></element>
+	<element name="static_whitec"><disk><color red="0.7" green="0.7" blue="0.7" /></disk></element>
+
+	<element name="text_score">
+		<text string="SCORE >"><color red="0.8" green="0.8" blue="0.8" /></text>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.2" blue="0.25" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.12" green="0.022" blue="0.025" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.25" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="13.3" right="40.7" top="18" bottom="48" />
+		<bezel element="static_black">
+			<bounds left="13.3" right="40.7" top="18" bottom="48" />
+		</bezel>
+
+	<!-- score panels -->
+
+		<bezel element="static_white0"><bounds x="13.8" y="30.5" width="4" height="5" /></bezel>
+		<bezel element="static_black"><bounds x="13.9" y="30.6" width="3.8" height="4.8" /></bezel>
+
+		<bezel name="digit1" element="digit">
+			<bounds x="14.3" y="33" width="3" height="2" />
+			<orientation rotate="270" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds x="14.3" y="31" width="3" height="2" />
+			<orientation rotate="270" />
+		</bezel>
+
+		<bezel element="text_score">
+			<bounds x="17.9" y="30" width="1" height="6" />
+			<orientation rotate="270" />
+		</bezel>
+
+		<bezel element="static_white0"><bounds x="36.2" y="30.5" width="4" height="5" /></bezel>
+		<bezel element="static_black"><bounds x="36.3" y="30.6" width="3.8" height="4.8" /></bezel>
+
+		<bezel name="digit3" element="digit">
+			<bounds x="36.7" y="31" width="3" height="2" />
+			<orientation rotate="90" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="36.7" y="33" width="3" height="2" />
+			<orientation rotate="90" />
+		</bezel>
+
+		<bezel element="text_score">
+			<bounds x="35.1" y="30" width="1" height="6" />
+			<orientation rotate="90" />
+		</bezel>
+
+
+	<!-- main bezel -->
+
+		<bezel element="static_white"><bounds x="19.3" y="19.3" width="15.4" height="27.4" /></bezel>
+		<bezel element="static_black2"><bounds x="19.5" y="19.5" width="15.0" height="27.0" /></bezel>
+
+		<bezel element="static_white"><bounds x="25.3" y="18.0" width="3.4" height="30.0" /></bezel>
+		<bezel element="static_black2"><bounds x="25.5" y="19.5" width="3" height="27.0" /></bezel>
+		<bezel element="static_black2"><bounds x="25" y="26.05" width="4" height="13.8" /></bezel>
+
+		<bezel element="static_whitec"><bounds x="25.3" y="31.3" width="3.4" height="3.4" /></bezel>
+		<bezel element="static_black2c"><bounds x="25.5" y="31.5" width="3" height="3" /></bezel>
+		<bezel element="static_white"><bounds x="18.9" y="32.9" width="16.2" height="0.2" /></bezel>
+
+		<bezel element="static_whitec"><bounds x="25.3" y="24.3" width="3.4" height="3.4" /></bezel>
+		<bezel element="static_black2c"><bounds x="25.5" y="24.5" width="3" height="3" /></bezel>
+		<bezel element="static_black2"><bounds x="25.5" y="23.9" width="3" height="2" /></bezel>
+		<bezel element="static_white"><bounds x="25.4" y="25.8" width="3.2" height="0.2" /></bezel>
+
+		<bezel element="static_whitec"><bounds x="25.3" y="38.3" width="3.4" height="3.4" /></bezel>
+		<bezel element="static_black2c"><bounds x="25.5" y="38.5" width="3" height="3" /></bezel>
+		<bezel element="static_black2"><bounds x="25.5" y="40.1" width="3" height="2" /></bezel>
+		<bezel element="static_white"><bounds x="25.4" y="40" width="3.2" height="0.2" /></bezel>
+
+		<bezel element="static_white"><bounds x="26.1" y="18.5" width="1.8" height="1.8" /></bezel>
+		<bezel element="static_black2"><bounds x="26.3" y="18.7" width="1.4" height="1.4" /></bezel>
+
+		<bezel element="static_white"><bounds x="26.1" y="45.7" width="1.8" height="1.8" /></bezel>
+		<bezel element="static_black2"><bounds x="26.3" y="45.9" width="1.4" height="1.4" /></bezel>
+
+
+	<!-- round leds -->
+
+		<bezel name="lamp40" element="led"><bounds x="20" y="20" width="1" height="1" /></bezel>
+		<bezel name="lamp41" element="led"><bounds x="23.3" y="21.5" width="1" height="1" /></bezel>
+		<bezel name="lamp42" element="led"><bounds x="26.5" y="21" width="1" height="1" /></bezel>
+		<bezel name="lamp43" element="led"><bounds x="29.7" y="21.5" width="1" height="1" /></bezel>
+		<bezel name="lamp65" element="led"><bounds x="33" y="20" width="1" height="1" /></bezel>
+
+		<bezel name="lamp50" element="led"><bounds x="20" y="25" width="1" height="1" /></bezel>
+		<bezel name="lamp51" element="led"><bounds x="23.8" y="24.5" width="1" height="1" /></bezel>
+		<bezel name="lamp52" element="led"><bounds x="26.5" y="26.2" width="1" height="1" /></bezel>
+		<bezel name="lamp53" element="led"><bounds x="29.2" y="24.5" width="1" height="1" /></bezel>
+		<bezel name="lamp74" element="led"><bounds x="33" y="25" width="1" height="1" /></bezel>
+
+		<bezel name="lamp60" element="led"><bounds x="20" y="30" width="1" height="1" /></bezel>
+		<bezel name="lamp61" element="led"><bounds x="23.3" y="29" width="1" height="1" /></bezel>
+		<bezel name="lamp62" element="led"><bounds x="26.5" y="30" width="1" height="1" /></bezel>
+		<bezel name="lamp63" element="led"><bounds x="29.7" y="29" width="1" height="1" /></bezel>
+		<bezel name="lamp75" element="led"><bounds x="33" y="30" width="1" height="1" /></bezel>
+
+		<bezel name="lamp70" element="led"><bounds x="20" y="35" width="1" height="1" /></bezel>
+		<bezel name="lamp71" element="led"><bounds x="23.3" y="36" width="1" height="1" /></bezel>
+		<bezel name="lamp72" element="led"><bounds x="26.5" y="35" width="1" height="1" /></bezel>
+		<bezel name="lamp73" element="led"><bounds x="29.7" y="36" width="1" height="1" /></bezel>
+		<bezel name="lamp84" element="led"><bounds x="33" y="35" width="1" height="1" /></bezel>
+
+		<bezel name="lamp80" element="led"><bounds x="20" y="40" width="1" height="1" /></bezel>
+		<bezel name="lamp81" element="led"><bounds x="23.8" y="40.5" width="1" height="1" /></bezel>
+		<bezel name="lamp82" element="led"><bounds x="26.5" y="38.8" width="1" height="1" /></bezel>
+		<bezel name="lamp83" element="led"><bounds x="29.2" y="40.5" width="1" height="1" /></bezel>
+		<bezel name="lamp85" element="led"><bounds x="33" y="40" width="1" height="1" /></bezel>
+
+		<bezel name="lamp90" element="led"><bounds x="20" y="45" width="1" height="1" /></bezel>
+		<bezel name="lamp91" element="led"><bounds x="23.3" y="43.5" width="1" height="1" /></bezel>
+		<bezel name="lamp92" element="led"><bounds x="26.5" y="44" width="1" height="1" /></bezel>
+		<bezel name="lamp93" element="led"><bounds x="29.7" y="43.5" width="1" height="1" /></bezel>
+		<bezel name="lamp95" element="led"><bounds x="33" y="45" width="1" height="1" /></bezel>
+
+		<bezel name="lamp64" element="led"><bounds x="26.5" y="18.9" width="1" height="1" /></bezel>
+		<bezel name="lamp94" element="led"><bounds x="26.5" y="46.1" width="1" height="1" /></bezel>
+
+
+	</view>
+</mamelayout>

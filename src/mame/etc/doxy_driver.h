@@ -1,11 +1,11 @@
 /*! @file doxy_driver.h
     @license BSD-3-Clause
     @copyright Angelo Salese & the MAME team
-    
+
     @basehw 4enraya
     Main CPU: Z80
     Sound Chip: AY8910
-    
+
     @memmap 4enraya,Z80
     0x0000-0xbfff ROM
     0xc000-0xcfff work RAM
@@ -27,14 +27,13 @@
  */
 
 
-/** 
+/**
  template for Doxygen commenting style for drivers
  All accepted special commands that aren't in Doxygen needs to be hooked up into the ini file.
  memmap/iomap/irq -> [%s,%s] -> [name_of_romset,cpu_name]
  irqnum -> type of irq, might accept one or two commands (for vectors)
  irqname -> A description of the irq used, might use brief and extended description.
- 
+
  @sa http://www.stack.nl/~dimitri/doxygen/manual/commands.html
  @todo needs discussion for accepted standardized syntax
  */
- 

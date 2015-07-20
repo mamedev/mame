@@ -1355,6 +1355,10 @@ static ADDRESS_MAP_START( mooncrst_map_base, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( moonqsr_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, galaxian_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxian_state )
 	AM_IMPORT_FROM(mooncrst_map_base)
 	AM_IMPORT_FROM(mooncrst_map_discrete)
@@ -1668,6 +1672,10 @@ static ADDRESS_MAP_START( mshuttle_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2")
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mshuttle_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, galaxian_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mshuttle_portmap, AS_IO, 8, galaxian_state )
@@ -5192,6 +5200,11 @@ static MACHINE_CONFIG_DERIVED( mooncrst, galaxian_base )
 	MCFG_FRAGMENT_ADD(mooncrst_audio)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( moonqsr, mooncrst )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(moonqsr_decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( fantastc, galaxian_base )
 
@@ -5289,6 +5302,7 @@ static MACHINE_CONFIG_DERIVED( mshuttle, galaxian_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mshuttle_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(mshuttle_decrypted_opcodes_map)
 	MCFG_CPU_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */
@@ -5965,7 +5979,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mooncrst)
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(0x8000, memregion("maincpu")->base());
+	decode_mooncrst(0x4000, memregion("maincpu")->base());
 }
 
 
@@ -5990,15 +6004,11 @@ DRIVER_INIT_MEMBER(galaxian_state,mooncrgx)
 
 DRIVER_INIT_MEMBER(galaxian_state,moonqsr)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
-
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::moonqsr_extend_tile_info, &galaxian_state::moonqsr_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(0x8000, decrypt);
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
+	decode_mooncrst(0x4000, m_decrypted_opcodes);
 }
 
 WRITE8_MEMBER(galaxian_state::artic_gfxbank_w)
@@ -6253,14 +6263,9 @@ DRIVER_INIT_MEMBER(galaxian_state,kong)
 
 void galaxian_state::mshuttle_decode(const UINT8 convtable[8][16])
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x10000);
-	int A;
 
-	space.set_decrypted_region(0x0000, 0xffff, decrypt);
-
-	for (A = 0x0000;A < 0x10000;A++)
+	for (int A = 0x0000;A < 0x8000;A++)
 	{
 		int i,j;
 		UINT8 src = rom[A];
@@ -6273,7 +6278,7 @@ void galaxian_state::mshuttle_decode(const UINT8 convtable[8][16])
 		j = (src & 0x01) | ((src & 0x04) >> 1) | ((src & 0x10) >> 2) | ((src & 0x40) >> 3);
 
 		/* decode the opcodes */
-		decrypt[A] = (src & 0xaa) | convtable[i][j];
+		m_decrypted_opcodes[A] = (src & 0xaa) | convtable[i][j];
 	}
 }
 
@@ -9151,7 +9156,7 @@ ROM_END
 
 
 ROM_START( mshuttle )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "my05",         0x0000, 0x1000, CRC(83574af1) SHA1(d69c2a0538a49d6c72c3346ac4e3959d91da6c98) )
 	ROM_LOAD( "my04",         0x1000, 0x1000, CRC(1cfae2c8) SHA1(6c7eeee70e91b8498c41525dcc60f8086cff8da7) )
 	ROM_LOAD( "my03",         0x2000, 0x1000, CRC(c8b8a368) SHA1(140ba60f55285d1e9f7a262634f5ce5c3470ab71) )
@@ -9173,7 +9178,7 @@ ROM_START( mshuttle )
 ROM_END
 
 ROM_START( mshuttle2 )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "my05",         0x0000, 0x1000, CRC(83574af1) SHA1(d69c2a0538a49d6c72c3346ac4e3959d91da6c98) )
 	ROM_LOAD( "my04",         0x1000, 0x1000, CRC(1cfae2c8) SHA1(6c7eeee70e91b8498c41525dcc60f8086cff8da7) )
 	ROM_LOAD( "my03",         0x2000, 0x1000, CRC(c8b8a368) SHA1(140ba60f55285d1e9f7a262634f5ce5c3470ab71) )
@@ -9197,7 +9202,7 @@ ROM_END
 
 
 ROM_START( mshuttlej )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "mcs.5",        0x0000, 0x1000, CRC(a5a292b4) SHA1(b4e9d969c762f4114eba88051917df122fc7181f) )
 	ROM_LOAD( "mcs.4",        0x1000, 0x1000, CRC(acdc0f9e) SHA1(8cd6d6566fe3f4090ccb625c3c1e5850a371826f) )
 	ROM_LOAD( "mcs.3",        0x2000, 0x1000, CRC(c1e3f5d8) SHA1(d3af89d485b1ca21ac879dbe15490dcd1cd64f2a) )
@@ -9220,7 +9225,7 @@ ROM_START( mshuttlej )
 ROM_END
 
 ROM_START( mshuttlej2 )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )   /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "ali5.bin",     0x0000, 0x1000, CRC(320fe630) SHA1(df4fe25989783c8851f41c9b4b63dedfa365c1e9) )
 	ROM_LOAD( "mcs.4",        0x1000, 0x1000, CRC(acdc0f9e) SHA1(8cd6d6566fe3f4090ccb625c3c1e5850a371826f) )
 	ROM_LOAD( "mcs.3",        0x2000, 0x1000, CRC(c1e3f5d8) SHA1(d3af89d485b1ca21ac879dbe15490dcd1cd64f2a) )
@@ -9721,25 +9726,34 @@ ROM_START( theend )
 	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
 ROM_END
 
-ROM_START( theends )
+/*
+All labels are in the form of:
+
+THE END (c)
+RA3 13
+1980 STERN
+
+The above example is for IC13
+*/
+ROM_START( theends ) /* The Stern Electronics license */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic13",         0x0000, 0x0800, CRC(90e5ab14) SHA1(b926801ab1cc1e2787a76ced6c7cffd6fce753d4) )
-	ROM_LOAD( "ic14",         0x0800, 0x0800, CRC(950f0a07) SHA1(bde9f3c6cf060dc6f5b7652287b94e04bed7bcf7) )
-	ROM_LOAD( "ic15",         0x1000, 0x0800, CRC(6786bcf5) SHA1(7556d3dc51d6a112b6357b8a36df05fd1a4d1cc9) )
-	ROM_LOAD( "ic16",         0x1800, 0x0800, CRC(380a0017) SHA1(3354eb328a32537f722fe8a0949ddcab6cf21eb8) )
-	ROM_LOAD( "ic17",         0x2000, 0x0800, CRC(af067b7f) SHA1(855c6ddf29fbfea004c7143fe29064abf53801ad) )
-	ROM_LOAD( "ic18",         0x2800, 0x0800, CRC(a0411b93) SHA1(d644968758a1b73d13e09b24d24bfec82276e8f4) )
+	ROM_LOAD( "the_end_ra3_13.ic13",         0x0000, 0x0800, CRC(90e5ab14) SHA1(b926801ab1cc1e2787a76ced6c7cffd6fce753d4) )
+	ROM_LOAD( "the_end_ra3_14.ic14",         0x0800, 0x0800, CRC(950f0a07) SHA1(bde9f3c6cf060dc6f5b7652287b94e04bed7bcf7) )
+	ROM_LOAD( "the_end_ra3_15.ic15",         0x1000, 0x0800, CRC(6786bcf5) SHA1(7556d3dc51d6a112b6357b8a36df05fd1a4d1cc9) )
+	ROM_LOAD( "the_end_ra3_16.ic16",         0x1800, 0x0800, CRC(380a0017) SHA1(3354eb328a32537f722fe8a0949ddcab6cf21eb8) )
+	ROM_LOAD( "the_end_ra3_17.ic17",         0x2000, 0x0800, CRC(af067b7f) SHA1(855c6ddf29fbfea004c7143fe29064abf53801ad) )
+	ROM_LOAD( "the_end_ra3_18.ic18",         0x2800, 0x0800, CRC(a0411b93) SHA1(d644968758a1b73d13e09b24d24bfec82276e8f4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ic56",         0x0000, 0x0800, CRC(3b2c2f70) SHA1(bcccdacacfc9a3b5f1412dfba6bb0046d283bccc) )
-	ROM_LOAD( "ic55",         0x0800, 0x0800, CRC(e0429e50) SHA1(27678fc3172cbca3ae1eae96e9d8a62561d5ce40) )
+	ROM_LOAD( "the_end_ra3_56.ic56",         0x0000, 0x0800, CRC(3b2c2f70) SHA1(bcccdacacfc9a3b5f1412dfba6bb0046d283bccc) )
+	ROM_LOAD( "the_end_ra2_55.ic55",         0x0800, 0x0800, CRC(e0429e50) SHA1(27678fc3172cbca3ae1eae96e9d8a62561d5ce40) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "ic30",         0x0000, 0x0800, CRC(527fd384) SHA1(92a384899d5acd2c689f637da16a0e2d11a9d9c6) )
-	ROM_LOAD( "ic31",         0x0800, 0x0800, CRC(af6d09b6) SHA1(f3ad51dc88aa58fd39195ead978b039e0b0b585c) )
+	ROM_LOAD( "the_end_ra3_30.ic30",         0x0000, 0x0800, CRC(527fd384) SHA1(92a384899d5acd2c689f637da16a0e2d11a9d9c6) )
+	ROM_LOAD( "the_end_ra3_31.ic31",         0x0800, 0x0800, CRC(af6d09b6) SHA1(f3ad51dc88aa58fd39195ead978b039e0b0b585c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
+	ROM_LOAD( "6331-1j.86",   0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* no label for this chip */
 ROM_END
 
 ROM_START( theendb )
@@ -10850,7 +10864,7 @@ GAME( 1980, mooncreg,    mooncrst, mooncrst,   mooncreg,   galaxian_state, moonc
 GAME( 1980, mooncrsl,    mooncrst, mooncrst,   mooncrsl,   galaxian_state, mooncrsu,   ROT90,  "bootleg (Laguna S.A.)", "Cresta Mundo (Laguna S.A. Spanish Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, stera,       mooncrst, mooncrst,   smooncrs,   galaxian_state, mooncrsu,   ROT90,  "bootleg", "Steraranger (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrgx,    mooncrst, galaxian,   mooncrgx,   galaxian_state, mooncrgx,   ROT270, "bootleg", "Moon Cresta (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1980, moonqsr,     0,        mooncrst,   moonqsr,    galaxian_state, moonqsr,    ROT90,  "Nichibutsu", "Moon Quasar", GAME_SUPPORTS_SAVE )
+GAME( 1980, moonqsr,     0,        moonqsr,    moonqsr,    galaxian_state, moonqsr,    ROT90,  "Nichibutsu", "Moon Quasar", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonal2,     galaxian, mooncrst,   moonal2,    galaxian_state, galaxian,   ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonal2b,    galaxian, mooncrst,   moonal2,    galaxian_state, galaxian,   ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2 (older version)", GAME_SUPPORTS_SAVE )
 

@@ -102,6 +102,11 @@ newoption {
 }
 
 newoption {
+    trigger = "SDL_INI_PATH",
+    description = "Default search path for .ini files",
+}
+
+newoption {
 	trigger = "NO_X11",
 	description = "Disable use of X11",
 	allowed = {

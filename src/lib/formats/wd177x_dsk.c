@@ -204,7 +204,6 @@ bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
-
 			if (f.encoding == floppy_image::FM)
 				desc[14].p1 = get_track_dam_fm(f, head, track);
 			else

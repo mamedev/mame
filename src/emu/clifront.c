@@ -110,6 +110,8 @@ int cli_frontend::execute(int argc, char **argv)
 		std::string option_errors;
 		m_options.parse_command_line(argc, argv, option_errors);
 
+		m_options.parse_standard_inis(option_errors);
+
 		if (*(m_options.software_name()) != 0)
 		{
 			const game_driver *system = m_options.system();
@@ -175,7 +177,6 @@ int cli_frontend::execute(int argc, char **argv)
 			}
 		}
 
-		m_options.parse_standard_inis(option_errors);
 		// parse the command line, adding any system-specific options
 		if (!m_options.parse_command_line(argc, argv, option_errors))
 		{
@@ -1549,7 +1550,9 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
 	{
 		validity_checker valid(m_options);
-		valid.check_all();
+		bool result = valid.check_all();
+		if (!result)
+			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed!\n");
 		return;
 	}
 

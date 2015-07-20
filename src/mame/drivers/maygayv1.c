@@ -804,14 +804,14 @@ WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
 {
 	m_maincpu->set_input_line_and_vector(5, state, m_duart68681->get_irq_vector());
 //  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
-};
+}
 
 
 WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 {
 	m_d68681_val = state;
 	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
-};
+}
 
 READ8_MEMBER(maygayv1_state::data_to_i8031)
 {

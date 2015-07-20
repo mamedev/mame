@@ -13,9 +13,9 @@ Games on this system include....
 |*| 2003 | Crazy Taxi High Roller (Rev B)                     | Sega / Hitmaker          | GDROM  | GDX-0002B  | 317-0353-COM |
 | | 2003 | Virtua Cop 3                                       | Sega                     | GDROM  | GDX-0003   | 317-0354-COM |
 |*| 2003 | Virtua Cop 3 (Rev A)                               | Sega                     | GDROM  | GDX-0003A  | 317-0354-COM |
-| | 2003 | Out Run 2                                          | Sega                     | GDROM  | GDX-0004   | 317-0372-COM |
-|*| 2003 | Out Run 2 (Rev A)                                  | Sega                     | GDROM  | GDX-0004A  | 317-0372-COM |
-| | 2003 | Out Run 2 prototype (Rev P)                        | Sega                     | GDROM  | GDX-0004P  |              |
+| | 2003 | OutRun 2                                           | Sega                     | GDROM  | GDX-0004   | 317-0372-COM |
+|*| 2003 | OutRun 2 (Rev A)                                   | Sega                     | GDROM  | GDX-0004A  | 317-0372-COM |
+| | 2003 | OutRun 2 prototype (Rev P )                        | Sega                     | GDROM  | GDX-0004P  |              |
 | | 2004 | Sega Golf Club Network Pro Tour                    | Sega                     | GDROM  | GDX-0005   |              |
 | | 2004 | Sega Network Taisen Mahjong MJ 2                   | Sega                     | GDROM  | GDX-0006   |              |
 | | 2004 | Sega Network Taisen Mahjong MJ 2 (Rev A)           | Sega                     | GDROM  | GDX-0006A  |              |
@@ -32,15 +32,15 @@ Games on this system include....
 | | 2004 | Wangan Midnight Maximum Tune (Export)              | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
 | | 2004 | Wangan Midnight Maximum Tune (Export) (Rev A)      | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
 |*| 2004 | Wangan Midnight Maximum Tune (Export) (Rev B)      | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
-| | 2004 | Outrun 2 SP (Japan)                                | Sega                     | GDROM  | GDX-0011   |              |
+| | 2004 | OutRun 2 SP (Japan)                                | Sega                     | GDROM  | GDX-0011   |              |
 |*| 2004 | Ghost Squad                                        | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
 |*| 2004 | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
 |*| 2005 | Gundam Battle Operating Simulator                  | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
-| | 2004 | Outrun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0xxx-COM |
-|*| 2004 | Outrun 2 Special Tours (Rev A)                     | Sega                     | GDROM  | GDX-0014A  | 317-0xxx-COM |
+| | 2004 | OutRun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0xxx-COM |
+|*| 2004 | OutRun 2 Special Tours (Rev A)                     | Sega                     | GDROM  | GDX-0014A  | 317-0xxx-COM |
 |*| 2005 | Wangan Midnight Maximum Tune 2 (Japan)             | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
-|*| 2005 | Wangan Midnight Maximum Tune 2 (Japan) (Rev A)     | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
-|*| 2005 | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
+| | 2005 | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
+|*| 2005 | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
 | | 2005 | Sega Network Taisen Mahjong MJ 3                   | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
 | | 2005 | Sega Network Taisen Mahjong MJ 3 (Rev A)           | Sega                     | GDROM  | GDX-0017A  | 317-0414-JPN |
 | | 2005 | Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega                     | GDROM  | GDX-0017B  | 317-0414-JPN |
@@ -52,6 +52,7 @@ Games on this system include....
 |*| 2005 | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  |              |
 | | 2006 | Sega Network Taisen Mahjong MJ 3 Evolution         | Sega                     | GDROM  | GDX-0021   |              |
 | | 2006 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  |              |
+|*| 2007 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  |              |
 | | 2009 | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
 |*| 2009 | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
 |*| 2004 | Quest Of D (Ver.1.01C)                             | Sega                     | CDROM  | CDV-10005C |              |
@@ -197,6 +198,9 @@ XBox Board
 Notes:
       * These parts located on the other side of the PCB
       Some of the connectors are not used.
+      GAME1/2      - Connected to CN1 on Base Board. JST Part Number B12B-PHDSS
+      GAME3/4      - Connected to CN1 on Base Board. JST Part Number B12B-PHDSS
+      FRONT_PANEL  - Connected to CN1 on Base Board. JST Part Number B10B-PHDSS
 
 
 Base Board
@@ -378,6 +382,203 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 //#define LOG_BASEBOARD
 //#define USB_ENABLED
 
+struct OHCIEndpointDescriptor {
+	int mps; // MaximumPacketSize
+	int f; // Format
+	int k; // sKip
+	int s; // Speed
+	int d; // Direction
+	int en; // EndpointNumber
+	int fa; // FunctionAddress
+	UINT32 tailp; // TDQueueTailPointer
+	UINT32 headp; // TDQueueHeadPointer
+	UINT32 nexted; // NextED
+	int c; // toggleCarry
+	int h; // Halted
+	UINT32 word0;
+};
+
+struct OHCITransferDescriptor {
+	int cc; // ConditionCode
+	int ec; // ErrorCount
+	int t; // DataToggle
+	int di; // DelayInterrupt
+	int dp; // Direction/PID
+	int r; // bufferRounding
+	UINT32 cbp; // CurrentBufferPointer
+	UINT32 nexttd; // NextTD
+	UINT32 be; // BufferEnd
+	UINT32 word0;
+};
+
+struct OHCIIsochronousTransferDescriptor {
+	int cc; // ConditionCode
+	int fc; // FrameCount
+	int di; // DelayInterrupt
+	int sf; // StartingFrame
+	UINT32 bp0; // BufferPage0
+	UINT32 nexttd; // NextTD
+	UINT32 be; // BufferEnd
+	UINT32 offset[8]; // Offset/PacketStatusWord
+};
+
+enum OHCIRegisters {
+	HcRevision=0,
+	HcControl,
+	HcCommandStatus,
+	HcInterruptStatus,
+	HcInterruptEnable,
+	HcInterruptDisable,
+	HcHCCA,
+	HcPeriodCurrentED,
+	HcControlHeadED,
+	HcControlCurrentED,
+	HcBulkHeadED,
+	HcBulkCurrentED,
+	HcDoneHead,
+	HcFmInterval,
+	HcFmRemaining,
+	HcFmNumber,
+	HcPeriodicStart,
+	HcLSThreshold,
+	HcRhDescriptorA,
+	HcRhDescriptorB,
+	HcRhStatus,
+	HcRhPortStatus1
+};
+
+enum OHCIHostControllerFunctionalState {
+	UsbReset=0,
+	UsbResume,
+	UsbOperational,
+	UsbSuspend
+};
+
+enum OHCIInterrupt {
+	SchedulingOverrun=1,
+	WritebackDoneHead=2,
+	StartofFrame=4,
+	ResumeDetected=8,
+	UnrecoverableError=16,
+	FrameNumberOverflow=32,
+	RootHubStatusChange=64,
+	OwnershipChange=0x40000000,
+	MasterInterruptEnable=0x80000000
+};
+
+enum OHCICompletionCode {
+	NoError=0,
+	CRC,
+	BitStuffing,
+	DataToggleMismatch,
+	Stall,
+	DeviceNotResponding,
+	PIDCheckFailure,
+	UnexpectedPID,
+	DataOverrun,
+	DataUnderrun,
+	BufferOverrun=12,
+	BufferUnderrun,
+	NotAccessed=14
+};
+
+struct USBSetupPacket {
+	UINT8 bmRequestType;
+	UINT8 bRequest;
+	UINT16 wValue;
+	UINT16 wIndex;
+	UINT16 wLength;
+};
+
+struct USBStandardDeviceDscriptor {
+	UINT8 bLength;
+	UINT8 bDescriptorType;
+	UINT16 bcdUSB;
+	UINT8 bDeviceClass;
+	UINT8 bDeviceSubClass;
+	UINT8 bDeviceProtocol;
+	UINT8 bMaxPacketSize0;
+	UINT16 idVendor;
+	UINT16 idProduct;
+	UINT16 bcdDevice;
+	UINT8 iManufacturer;
+	UINT8 iProduct;
+	UINT8 iSerialNumber;
+	UINT8 bNumConfigurations;
+};
+
+struct USBStandardConfigurationDescriptor {
+	UINT8 bLength;
+	UINT8 bDescriptorType;
+	UINT16 wTotalLength;
+	UINT8 bNumInterfaces;
+	UINT8 bConfigurationValue;
+	UINT8 iConfiguration;
+	UINT8 bmAttributes;
+	UINT8 MaxPower;
+};
+
+struct USBStandardInterfaceDescriptor {
+	UINT8 bLength;
+	UINT8 bDescriptorType;
+	UINT8 bInterfaceNumber;
+	UINT8 bAlternateSetting;
+	UINT8 bNumEndpoints;
+	UINT8 bInterfaceClass;
+	UINT8 bInterfaceSubClass;
+	UINT8 bInterfaceProtocol;
+	UINT8 iInterface;
+};
+
+struct USBStandardEndpointDescriptor {
+	UINT8 bLength;
+	UINT8 bDescriptorType;
+	UINT8 bEndpointAddress;
+	UINT8 bmAttributes;
+	UINT16 wMaxPacketSize;
+	UINT8 bInterval;
+};
+
+enum USBPid {
+	SetupPid=0,
+	OutPid,
+	InPid
+};
+
+enum USBRequestCode {
+	GET_STATUS=0,
+	CLEAR_FEATURE=1,
+	SET_FEATURE=3,
+	SET_ADDRESS=5,
+	GET_DESCRIPTOR=6,
+	SET_DESCRIPTOR=7,
+	GET_CONFIGURATION=8,
+	SET_CONFIGURATION=9,
+	GET_INTERFACE=10,
+	SET_INTERFACE=11,
+	SYNCH_FRAME=12
+};
+
+enum USBDescriptorType {
+	DEVICE=1,
+	CONFIGURATION=2,
+	STRING=3,
+	INTERFACE=4,
+	ENDPOINT=5
+};
+
+class ohci_function_device {
+public:
+	ohci_function_device();
+	void execute_reset();
+	int execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size);
+private:
+	int address;
+	int controldir;
+	int remain;
+	UINT8 *position;
+};
+
 class chihiro_state : public driver_device
 {
 public:
@@ -411,9 +612,12 @@ public:
 	int smbus_pic16lc(int command, int rw, int data);
 	int smbus_cx25871(int command, int rw, int data);
 	int smbus_eeprom(int command, int rw, int data);
+	void usb_ohci_plug(int port, ohci_function_device *function);
 	void usb_ohci_interrupts();
 	void usb_ohci_read_endpoint_descriptor(UINT32 address);
+	void usb_ohci_writeback_endpoint_descriptor(UINT32 address);
 	void usb_ohci_read_transfer_descriptor(UINT32 address);
+	void usb_ohci_writeback_transfer_descriptor(UINT32 address);
 	void usb_ohci_read_isochronous_transfer_descriptor(UINT32 address);
 	void baseboard_ide_event(int type, UINT8 *read, UINT8 *write);
 	UINT8 *baseboard_ide_dimmboard(UINT32 lba);
@@ -476,46 +680,22 @@ public:
 	} ac97st;
 	struct ohci_state {
 		UINT32 hc_regs[255];
-		int ports[4 + 1];
+		struct {
+			ohci_function_device *function;
+			int delay;
+		} ports[4 + 1];
 		emu_timer *timer;
 		int state;
 		UINT32 framenumber;
+		UINT32 nextinterupted;
+		UINT32 nextbulked;
+		int interruptbulkratio;
+		int writebackdonehadcounter;
 		address_space *space;
-		struct {
-			int mps; // MaximumPacketSize
-			int f; // Format
-			int k; // sKip
-			int s; // Speed
-			int d; // Direction
-			int en; // EndpointNumber
-			int fa; // FunctionAddress
-			UINT32 tailp; // TDQueueTailPointer
-			UINT32 headp; // TDQueueHeadPointer
-			UINT32 nexted; // NextED
-			int c; // toggleCarry
-			int h; // Halted
-		} endpoint_descriptor;
-		struct {
-			int cc; // ConditionCode
-			int ec; // ErrorCount
-			int t; // DataToggle
-			int di; // DelayInterrupt
-			int dp; // Direction/PID
-			int r; // bufferRounding
-			UINT32 cbp; // CurrentBufferPointer
-			UINT32 nexttd; // NextTD
-			UINT32 be; // BufferEnd
-		} transfer_descriptor;
-		struct {
-			int cc; // ConditionCode
-			int fc; // FrameCount
-			int di; // DelayInterrupt
-			int sf; // StartingFrame
-			UINT32 bp0; // BufferPage0
-			UINT32 nexttd; // NextTD
-			UINT32 be; // BufferEnd
-			UINT32 offset[8]; // Offset/PacketStatusWord
-		} isochronous_transfer_descriptor;
+		UINT8 buffer[1024];
+		OHCIEndpointDescriptor endpoint_descriptor;
+		OHCITransferDescriptor transfer_descriptor;
+		OHCIIsochronousTransferDescriptor isochronous_transfer_descriptor;
 	} ohcist;
 	UINT8 pic16lc_buffer[0xff];
 	nv2a_renderer *nvidia_nv2a;
@@ -526,50 +706,6 @@ public:
 	int usbhack_index;
 	int usbhack_counter;
 	required_device<cpu_device> m_maincpu;
-
-	enum OHCIRegisters {
-		HcRevision=0,
-		HcControl,
-		HcCommandStatus,
-		HcInterruptStatus,
-		HcInterruptEnable,
-		HcInterruptDisable,
-		HcHCCA,
-		HcPeriodCurrentED,
-		HcControlHeadED,
-		HcControlCurrentED,
-		HcBulkHeadED,
-		HcBulkCurrentED,
-		HcDoneHead,
-		HcFmInterval,
-		HcFmRemaining,
-		HcFmNumber,
-		HcPeriodicStart,
-		HcLSThreshold,
-		HcRhDescriptorA,
-		HcRhDescriptorB,
-		HcRhStatus,
-		HcRhPortStatus0
-	};
-
-	enum OHCIHostControllerFunctionalState {
-		UsbReset=0,
-		UsbResume,
-		UsbOperational,
-		UsbSuspend
-	};
-
-	enum OHCIInterrupt {
-		SchedulingOverrun=1,
-		WritebackDoneHead=2,
-		StartofFrame=4,
-		ResumeDetected=8,
-		UnrecoverableError=16,
-		FrameNumberOverflow=32,
-		RootHubStatusChange=64,
-		OwnershipChange=0x40000000,
-		MasterInterruptEnable=0x80000000
-	};
 };
 
 /* jamtable instructions for Chihiro (different from console)
@@ -1280,14 +1416,18 @@ WRITE32_MEMBER(chihiro_state::usbctrl_w)
 		if (hcfs == UsbOperational) {
 			ohcist.timer->enable();
 			ohcist.timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+			ohcist.writebackdonehadcounter = 7;
 		}
 		else
 			ohcist.timer->enable(false);
 		ohcist.state = hcfs;
+		ohcist.interruptbulkratio = (data & 3) + 1;
 	}
 	if (offset == HcCommandStatus) {
 		if (data & 1)
 			ohcist.hc_regs[HcControl] |= 3 << 6;
+		ohcist.hc_regs[HcCommandStatus] |= data;
+		return;
 	}
 	if (offset == HcInterruptStatus) {
 		ohcist.hc_regs[HcInterruptStatus] &= ~data;
@@ -1304,8 +1444,8 @@ WRITE32_MEMBER(chihiro_state::usbctrl_w)
 		usb_ohci_interrupts();
 		return;
 	}
-	if (offset >= HcRhPortStatus0) {
-		int port = offset - HcRhPortStatus0 + 1; // port 0 not used
+	if (offset >= HcRhPortStatus1) {
+		int port = offset - HcRhPortStatus1 + 1; // port 0 not used
 		// bit 0 ClearPortEnable: 1 clears PortEnableStatus
 		// bit 1 SetPortEnable: 1 sets PortEnableStatus
 		// bit 2 SetPortSuspend: 1 sets PortSuspendStatus
@@ -1313,8 +1453,9 @@ WRITE32_MEMBER(chihiro_state::usbctrl_w)
 		// bit 4 SetPortReset: 1 sets PortResetStatus
 		if (data & 0x10) {
 			ohcist.hc_regs[offset] |= 0x10;
+			ohcist.ports[port].function->execute_reset();
 			// after 10ms set PortResetStatusChange and clear PortResetStatus and set PortEnableStatus
-			ohcist.ports[port] = 10;
+			ohcist.ports[port].delay = 10;
 		}
 		// bit 8 SetPortPower: 1 sets PortPowerStatus
 		// bit 9 ClearPortPower: 1 clears PortPowerStatus
@@ -1336,31 +1477,266 @@ TIMER_CALLBACK_MEMBER(chihiro_state::usb_ohci_timer)
 {
 	UINT32 hcca;
 	int changed = 0;
+	int list = 1;
+	bool cont = false;
+	int pid, remain, mps;
 
+	hcca = ohcist.hc_regs[HcHCCA];
 	if (ohcist.state == UsbOperational) {
-		ohcist.framenumber=(ohcist.framenumber+1) & 0xffff;
-		hcca = ohcist.hc_regs[HcHCCA];
+		// increment frame number
+		ohcist.framenumber = (ohcist.framenumber + 1) & 0xffff;
 		ohcist.space->write_dword(hcca + 0x80, ohcist.framenumber);
 		ohcist.hc_regs[HcFmNumber] = ohcist.framenumber;
 	}
+	// port reset delay
 	for (int p = 1; p <= 4; p++) {
-		if (ohcist.ports[p] > 0) {
-			ohcist.ports[p]--;
-			if (ohcist.ports[p] == 0) {
-				ohcist.hc_regs[HcRhPortStatus0 + p - 1] = (ohcist.hc_regs[HcRhPortStatus0 + p - 1] & ~(1 << 4)) | (1 << 20) | (1 << 1);
+		if (ohcist.ports[p].delay > 0) {
+			ohcist.ports[p].delay--;
+			if (ohcist.ports[p].delay == 0) {
+				ohcist.hc_regs[HcRhPortStatus1 + p - 1] = (ohcist.hc_regs[HcRhPortStatus1 + p - 1] & ~(1 << 4)) | (1 << 20) | (1 << 1); // bit 1 PortEnableStatus
 				changed = 1;
 			}
 		}
 	}
 	if (ohcist.state == UsbOperational) {
+		while (list >= 0)
+		{
+			// select list, do transfer
+			if (list == 0) {
+				if (ohcist.hc_regs[HcControl] & (1 << 2)) {
+					// periodic
+					if (ohcist.hc_regs[HcControl] & (1 << 3)) {
+						// isochronous
+					}
+				}
+				list = -1;
+			}
+			if (list == 1) {
+				// control
+				if (ohcist.hc_regs[HcControl] & (1 << 4)) {
+					cont = true;
+					while (cont == true) {
+						// if current endpoint descriptor is not 0 use it, otherwise ...
+						if (ohcist.hc_regs[HcControlCurrentED] == 0) {
+							// ... check the filled bit ...
+							if (ohcist.hc_regs[HcCommandStatus] & (1 << 1)) {
+								// ... if 1 start processing from the head of the list
+								ohcist.hc_regs[HcControlCurrentED] = ohcist.hc_regs[HcControlHeadED];
+								ohcist.hc_regs[HcCommandStatus] &= ~(1 << 1);
+								// but if the list is empty, go to the next list
+								if (ohcist.hc_regs[HcControlCurrentED] == 0)
+									cont = false;
+							}
+							else
+								cont = false;
+						}
+						if (cont == true) {
+							// service endpoint descriptor
+							usb_ohci_read_endpoint_descriptor(ohcist.hc_regs[HcControlCurrentED]);
+							// only if it is not halted and not to be skipped
+							if (!(ohcist.endpoint_descriptor.h | ohcist.endpoint_descriptor.k)) {
+								// compare the Endpoint Descriptor’s TailPointer and NextTransferDescriptor fields.
+								if (ohcist.endpoint_descriptor.headp != ohcist.endpoint_descriptor.tailp) {
+									UINT32 a, b;
+									// service transfer descriptor
+									usb_ohci_read_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+									// get pid
+									if (ohcist.endpoint_descriptor.d == 1)
+										pid=OutPid; // out
+									else if (ohcist.endpoint_descriptor.d == 2)
+										pid=InPid; // in
+									else {
+										pid = ohcist.transfer_descriptor.dp; // 0 setup 1 out 2 in
+									}
+									// determine how much data to transfer
+									// setup pid must be 8 bytes
+									a = ohcist.transfer_descriptor.be & 0xfff;
+									b = ohcist.transfer_descriptor.cbp & 0xfff;
+									if ((ohcist.transfer_descriptor.be ^ ohcist.transfer_descriptor.cbp) & 0xfffff000)
+										a |= 0x1000;
+									remain = a - b + 1;
+									if (pid == InPid) {
+										mps = ohcist.endpoint_descriptor.mps;
+										if (remain < mps)
+											mps = remain;
+									}
+									else {
+										mps = ohcist.endpoint_descriptor.mps;
+									}
+									if (ohcist.transfer_descriptor.cbp == 0)
+										mps = 0;
+									b = ohcist.transfer_descriptor.cbp;
+									// if sending ...
+									if (pid != InPid) {
+										// ... get mps bytes
+										for (int c = 0; c < mps; c++) {
+											ohcist.buffer[c] = ohcist.space->read_byte(b);
+											b++;
+											if ((b & 0xfff) == 0)
+												b = ohcist.transfer_descriptor.be & 0xfffff000;
+										}
+									}
+									// should check for time available
+									// execute transaction
+									mps=ohcist.ports[1].function->execute_transfer(ohcist.endpoint_descriptor.fa, ohcist.endpoint_descriptor.en, pid, ohcist.buffer, mps);
+									// if receiving ...
+									if (pid == InPid) {
+										// ... store mps bytes
+										for (int c = 0; c < mps; c++) {
+											ohcist.space->write_byte(b,ohcist.buffer[c]);
+											b++;
+											if ((b & 0xfff) == 0)
+												b = ohcist.transfer_descriptor.be & 0xfffff000;
+										}
+									}
+									// status writeback (CompletionCode field, DataToggleControl field, CurrentBufferPointer field, ErrorCount field)
+									ohcist.transfer_descriptor.cc = NoError;
+									ohcist.transfer_descriptor.t = (ohcist.transfer_descriptor.t ^ 1) | 2;
+									ohcist.transfer_descriptor.cbp = b;
+									ohcist.transfer_descriptor.ec = 0;
+									if ((remain == mps) || (mps == 0)) {
+										// retire transfer descriptor
+										a = ohcist.endpoint_descriptor.headp;
+										ohcist.endpoint_descriptor.headp = ohcist.transfer_descriptor.nexttd;
+										ohcist.transfer_descriptor.nexttd = ohcist.hc_regs[HcDoneHead];
+										ohcist.hc_regs[HcDoneHead] = a;
+										ohcist.endpoint_descriptor.c = ohcist.transfer_descriptor.t & 1;
+										if (ohcist.transfer_descriptor.di != 7) {
+											if (ohcist.transfer_descriptor.di < ohcist.writebackdonehadcounter)
+												ohcist.writebackdonehadcounter = ohcist.transfer_descriptor.di;
+										}
+										usb_ohci_writeback_transfer_descriptor(a);
+										usb_ohci_writeback_endpoint_descriptor(ohcist.hc_regs[HcControlCurrentED]);
+									} else {
+										usb_ohci_writeback_transfer_descriptor(ohcist.endpoint_descriptor.headp);
+									}
+								} else
+									ohcist.hc_regs[HcControlCurrentED] = ohcist.endpoint_descriptor.nexted;
+							} else
+								ohcist.hc_regs[HcControlCurrentED] = ohcist.endpoint_descriptor.nexted;
+							// one bulk every n control transfers
+							ohcist.interruptbulkratio--;
+							if (ohcist.interruptbulkratio <= 0) {
+								ohcist.interruptbulkratio = (ohcist.hc_regs[HcControl] & 3) + 1;
+								cont = false;
+							}
+						}
+					}
+				}
+				list = 2;
+			}
+			if (list == 2) {
+				// bulk
+				if (ohcist.hc_regs[HcControl] & (1 << 5)) {
+					ohcist.hc_regs[HcCommandStatus] &= ~(1 << 2);
+					if (ohcist.hc_regs[HcControlCurrentED] == 0)
+						list = 0;
+					else if (ohcist.hc_regs[HcControl] & (1 << 4))
+						list = 1;
+					else
+						list = 0;
+				}
+			}
+		}
 		if (ohcist.framenumber == 0)
 			ohcist.hc_regs[HcInterruptStatus] |= FrameNumberOverflow;
 		ohcist.hc_regs[HcInterruptStatus] |= StartofFrame;
+		if ((ohcist.writebackdonehadcounter != 0) && (ohcist.writebackdonehadcounter != 7))
+			ohcist.writebackdonehadcounter--;
+		if ((ohcist.writebackdonehadcounter == 0) && ((ohcist.hc_regs[HcInterruptStatus] & WritebackDoneHead) == 0)) {
+			UINT32 b = 0;
+
+			if ((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != WritebackDoneHead)
+				b = 1;
+			ohcist.hc_regs[HcInterruptStatus] |= WritebackDoneHead;
+			ohcist.space->write_dword(hcca + 0x84, ohcist.hc_regs[HcDoneHead] | b);
+			ohcist.hc_regs[HcDoneHead] = 0;
+			ohcist.writebackdonehadcounter = 7;
+		}
 	}
 	if (changed != 0) {
 		ohcist.hc_regs[HcInterruptStatus] |= RootHubStatusChange;
 	}
 	usb_ohci_interrupts();
+}
+
+void chihiro_state::usb_ohci_plug(int port, ohci_function_device *function)
+{
+	if ((port > 0) && (port <= 4)) {
+		ohcist.ports[port].function = function;
+		ohcist.hc_regs[HcRhPortStatus1+port-1] = 1;
+	}
+}
+
+static USBStandardDeviceDscriptor devdesc = {18,1,0x201,0xff,0x34,0x56,64,0x100,0x101,0x301,0,0,0,1};
+
+ohci_function_device::ohci_function_device()
+{
+	address = 0;
+	controldir = 0;
+	remain = 0;
+	position = NULL;
+}
+
+void ohci_function_device::execute_reset()
+{
+	address = 0;
+}
+
+int ohci_function_device::execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size)
+{
+	if (endpoint == 0) {
+		if (pid == SetupPid) {
+			struct USBSetupPacket *p=(struct USBSetupPacket *)buffer;
+			// define direction
+			controldir = p->bmRequestType & 128;
+			// case !=0, in data stage and out status stage
+			// case ==0, out data stage and in status stage
+			position = NULL;
+			remain = p->wLength;
+			if ((p->bmRequestType & 0x60) == 0) {
+				switch (p->bRequest) {
+				case GET_DESCRIPTOR:
+					if ((p->wValue >> 8) == 1) { // device descriptor
+						//p->wValue & 255;
+						position = (UINT8 *)&devdesc;
+						remain = sizeof(devdesc);
+					}
+					break;
+				case SET_ADDRESS:
+					//p->wValue;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		else if (pid == InPid) {
+			// case !=0, give data
+			// case ==0, nothing
+			if (size > remain)
+				size = remain;
+			if (controldir != 0) {
+				if (position != NULL)
+					memcpy(buffer, position, size);
+				position = position + size;
+				remain = remain - size;
+			}
+		}
+		else if (pid == OutPid) {
+			// case !=0, nothing
+			// case ==0, give data
+			if (size > remain)
+				size = remain;
+			if (controldir == 0) {
+				if (position != NULL)
+					memcpy(position, buffer, size);
+				position = position + size;
+				remain = remain - size;
+			}
+		}
+	}
+	return size;
 }
 
 void chihiro_state::usb_ohci_interrupts()
@@ -1376,6 +1752,7 @@ void chihiro_state::usb_ohci_read_endpoint_descriptor(UINT32 address)
 	UINT32 w;
 
 	w = ohcist.space->read_dword(address);
+	ohcist.endpoint_descriptor.word0 = w;
 	ohcist.endpoint_descriptor.fa = w & 0x7f;
 	ohcist.endpoint_descriptor.en = (w >> 7) & 15;
 	ohcist.endpoint_descriptor.d = (w >> 11) & 3;
@@ -1391,13 +1768,25 @@ void chihiro_state::usb_ohci_read_endpoint_descriptor(UINT32 address)
 	ohcist.endpoint_descriptor.nexted = ohcist.space->read_dword(address + 12);
 }
 
+void chihiro_state::usb_ohci_writeback_endpoint_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.endpoint_descriptor.word0 & 0xf8000000;
+	w = w | (ohcist.endpoint_descriptor.mps << 16) | (ohcist.endpoint_descriptor.f << 15) | (ohcist.endpoint_descriptor.k << 14) | (ohcist.endpoint_descriptor.s << 13) | (ohcist.endpoint_descriptor.d << 11) | (ohcist.endpoint_descriptor.en << 7) | ohcist.endpoint_descriptor.fa;
+	ohcist.space->write_dword(address, w);
+	w = ohcist.endpoint_descriptor.headp | (ohcist.endpoint_descriptor.c << 1) | ohcist.endpoint_descriptor.h;
+	ohcist.space->write_dword(address + 8, w);
+}
+
 void chihiro_state::usb_ohci_read_transfer_descriptor(UINT32 address)
 {
 	UINT32 w;
 
 	w = ohcist.space->read_dword(address);
+	ohcist.transfer_descriptor.word0 = w;
 	ohcist.transfer_descriptor.cc = (w >> 28) & 15;
-	ohcist.transfer_descriptor.ec= (w >> 16) & 3;
+	ohcist.transfer_descriptor.ec= (w >> 26) & 3;
 	ohcist.transfer_descriptor.t= (w >> 24) & 3;
 	ohcist.transfer_descriptor.di= (w >> 21) & 7;
 	ohcist.transfer_descriptor.dp= (w >> 19) & 3;
@@ -1405,6 +1794,17 @@ void chihiro_state::usb_ohci_read_transfer_descriptor(UINT32 address)
 	ohcist.transfer_descriptor.cbp = ohcist.space->read_dword(address + 4);
 	ohcist.transfer_descriptor.nexttd = ohcist.space->read_dword(address + 8);
 	ohcist.transfer_descriptor.be = ohcist.space->read_dword(address + 12);
+}
+
+void chihiro_state::usb_ohci_writeback_transfer_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.transfer_descriptor.word0 & 0x0003ffff;
+	w = w | (ohcist.transfer_descriptor.cc << 28) | (ohcist.transfer_descriptor.ec << 26) | (ohcist.transfer_descriptor.t << 24) | (ohcist.transfer_descriptor.di << 21) | (ohcist.transfer_descriptor.dp << 19) | (ohcist.transfer_descriptor.r << 18);
+	ohcist.space->write_dword(address, w);
+	ohcist.space->write_dword(address + 4, ohcist.transfer_descriptor.cbp);
+	ohcist.space->write_dword(address + 8, ohcist.transfer_descriptor.nexttd);
 }
 
 void chihiro_state::usb_ohci_read_isochronous_transfer_descriptor(UINT32 address)
@@ -1621,6 +2021,23 @@ TIMER_CALLBACK_MEMBER(chihiro_state::audio_apu_timer)
 			bv = bv << 1;
 		}
 	}
+}
+
+static UINT32 hubintiasbridg_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+{
+#ifdef LOG_PCI
+	//  logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+#endif
+	if ((function == 0) && (reg == 8))
+		return 0xb4; // 0:1:0 revision id must be at least 0xb4, otherwise usb will require a hub
+	return 0;
+}
+
+static void hubintiasbridg_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+#ifdef LOG_PCI
+	if (reg >= 16) logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
+#endif
 }
 
 /*
@@ -2131,10 +2548,12 @@ void chihiro_state::machine_start()
 	ohcist.hc_regs[HcFmInterval] = 0x2edf;
 	ohcist.hc_regs[HcLSThreshold] = 0x628;
 	ohcist.hc_regs[HcRhDescriptorA] = 4;
-	ohcist.hc_regs[HcRhPortStatus0] = 1; // test connect
+	ohcist.interruptbulkratio = 1;
+	ohcist.writebackdonehadcounter = 7;
 	ohcist.space = &m_maincpu->space();
 	ohcist.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(chihiro_state::usb_ohci_timer), this), (void *)"USB OHCI Timer");
 	ohcist.timer->enable(false);
+	usb_ohci_plug(1, new ohci_function_device()); // test connect
 #endif
 	usbhack_index = -1;
 	for (int a = 1; a < 2; a++)
@@ -2175,7 +2594,7 @@ static MACHINE_CONFIG_START(chihiro_base, chihiro_state)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "PCI Bridge Device - Host Bridge", dummy_pci_r, dummy_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(1, "HUB Interface - ISA Bridge", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(1, "HUB Interface - ISA Bridge", hubintiasbridg_pci_r, hubintiasbridg_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(2, "OHCI USB Controller 1", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(3, "OHCI USB Controller 2", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(4, "MCP Networking Adapter", dummy_pci_r, dummy_pci_w)
@@ -2347,8 +2766,8 @@ ROM_START( mj2c )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0006c", 0, BAD_DUMP SHA1(505653117a73ed8b256ccf19450e7573a4dc57e9) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("317-0374-jpn.data", 0x00, 0x50, NO_DUMP )
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
 ROM_END
 
 ROM_START( mj2f )
@@ -2357,8 +2776,8 @@ ROM_START( mj2f )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0006f", 0, SHA1(d3900ca5135f9001e642c78b4d323d353880b41b) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("317-0374-jpn.data", 0x00, 0x50, NO_DUMP )
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
 ROM_END
 
 /*
@@ -2383,8 +2802,8 @@ ROM_START( mj2 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0006g", 0, SHA1(e306837d5c093fdf1e9ff02239a8563535b1c181) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("317-0374-jpn.data", 0x00, 0x50, NO_DUMP )
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
 ROM_END
 
 ROM_START( ollie )
@@ -2463,21 +2882,21 @@ ROM_START( outr2st )
 	ROM_LOAD( "317-0xxx-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
 ROM_END
 
-ROM_START( wangmd2b )
+ROM_START( wangmid2 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0015a", 0, BAD_DUMP SHA1(cb306df60550bbd8df312634cb97014bb39f1631) )
+	DISK_IMAGE_READONLY( "gdx-0015", 0, BAD_DUMP SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5106-jpn.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
 ROM_END
 
-ROM_START( wangmid2 )
+ROM_START( wangmd2b )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0016", 0, BAD_DUMP SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
+	DISK_IMAGE_READONLY( "gdx-0016a", 0, BAD_DUMP SHA1(cb306df60550bbd8df312634cb97014bb39f1631) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5106-com.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
@@ -2489,8 +2908,8 @@ ROM_START( mj3d )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0017d", 0, BAD_DUMP SHA1(cfbbd452c8f4efe0e99f398f5521fc3574b913bb) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("317-0414-jpn.data", 0x00, 0x50, NO_DUMP )
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0414-jpn.pic", 0x000000, 0x004000, CRC(27d1c541) SHA1(c85a8229dd769af02ab43c97f09f995743cdb315) )
 ROM_END
 
 ROM_START( mj3 )
@@ -2499,8 +2918,8 @@ ROM_START( mj3 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0017f", 0, SHA1(8641be9b2e1d8eb33cf27d3444956c0117debc2f) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("317-0414-jpn.data", 0x00, 0x50, NO_DUMP )
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0414-jpn.pic", 0x000000, 0x004000, CRC(27d1c541) SHA1(c85a8229dd769af02ab43c97f09f995743cdb315) )
 ROM_END
 
 ROM_START( scg06nt )
@@ -2511,6 +2930,17 @@ ROM_START( scg06nt )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("gdx-0018.data", 0x00, 0x50, CRC(1a210abd) SHA1(43a54d028315d2dfa9f8ea6fb59265e0b980b02f) )
+ROM_END
+
+ROM_START( mj3evo )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0021b", 0, SHA1(c97d1dc95cdf1b4bd5d7cf6b4db0757f3d6bd723) )
+
+	// PIC label is unknown
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-xxxx-jpn.pic", 0x000000, 0x004000, CRC(650fcc94) SHA1(c88488900460fb3deecb3cf376fc043b10c020ef) )
 ROM_END
 
 /*
@@ -2552,8 +2982,8 @@ ROM_END
 /* 0002B */ GAME( 2003, crtaxihr, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega / Hitmaker",          "Crazy Taxi High Roller (Rev B) (GDX-0002B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0003     GAME( 2003, vcop3o,   vcop3,    chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Virtua Cop 3 (GDX-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
 /* 0003A */ GAME( 2003, vcop3,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Virtua Cop 3 (Rev A) (GDX-0003A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-// 0004     GAME( 2003, outr2o,   outr2,    chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Out Run 2 (GDX-0004)", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
-/* 0004A */ GAME( 2003, outr2,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Out Run 2 (Rev A) (GDX-0004A)", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
+// 0004     GAME( 2003, outr2o,   outr2,    chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 (GDX-0004)", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
+/* 0004A */ GAME( 2003, outr2,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 (Rev A) (GDX-0004A)", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
 // 0005     GAME( 2004, sgolcnpt, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Golf Club Network Pro Tour (GDX-0005)", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
 // 0006     GAME( 2004, mj2o,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (GDX-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0006A    GAME( 2004, mj2a,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev A) (GDX-0006A)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -2571,15 +3001,15 @@ ROM_END
 // 0009A    GAME( 2004, wangmida, wangmid,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (Rev A) (GDX-0009A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 /* 0009B */ GAME( 2004, wangmid,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (Rev B) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0010
-// 0011     GAME( 2004, outr2sp,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Out Run 2 SP (Japan) (GDX-0011)", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
+// 0011     GAME( 2004, outr2sp,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 SP (Japan) (GDX-0011)", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
 /* 0012  */ GAME( 2004, ghostsqo, ghostsqu, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Ghost Squad (GDX-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
 /* 0012A */ GAME( 2004, ghostsqu, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Ghost Squad (Rev A) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 /* 0013  */ GAME( 2005, gundamos, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Gundam Battle Operating Simulator (GDX-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
-// 0014     GAME( 2004, outr2sto, outr2st,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Out Run 2 Special Tours (GDX-0014)", GAME_NO_SOUND|GAME_NOT_WORKING )
-/* 0014A */ GAME( 2004, outr2st,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Out Run 2 Special Tours (Rev A) (GDX-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-// 0015     GAME( 2005, wanmd2bo, wangmd2b, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
-/* 0015A */ GAME( 2005, wangmd2b, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (Rev A) (GDX-0015A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-/* 0016  */ GAME( 2005, wangmid2, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (GDX-0016)", GAME_NO_SOUND|GAME_NOT_WORKING )
+// 0014     GAME( 2004, outr2sto, outr2st,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (GDX-0014)", GAME_NO_SOUND|GAME_NOT_WORKING )
+/* 0014A */ GAME( 2004, outr2st,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Rev A) (GDX-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+/* 0015  */ GAME( 2005, wangmid2, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
+// 0016     GAME( 2005, wanmd2bo, wangmd2b, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (GDX-0016)", GAME_NO_SOUND|GAME_NOT_WORKING )
+/* 0016A */ GAME( 2005, wangmd2b, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (Rev A) (GDX-0016A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0017     GAME( 2005, mj3o,     mj3,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (GDX-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0017A    GAME( 2005, mj3a,     mj3,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (Rev A) (GDX-0017A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0017B    GAME( 2005, mj3b,     mj3,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (Rev B) (GDX-0017B)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -2591,8 +3021,9 @@ ROM_END
 /* 0018A */ GAME( 2005, scg06nt,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Club Golf 2006 Next Tours (Rev A) (GDX-0018A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0019
 // 0020
-// 0021     GAME( 2005, mj3evo,   mj3ev,    chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (GDX-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
-// 0021A    GAME( 2005, mj3ev,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) (GDX-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+// 0021     GAME( 2006, mj3evoo,  mj3evo,    chihirogd,   chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (GDX-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
+// 0021A    GAME( 2006, mj3evoa,  mj3evo,    chihirogd,   chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) (GDX-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+/* 0021B */ GAME( 2007, mj3evo,   chihiro,   chihirogd,   chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) (GDX-0021B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0022
 // 0023
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )

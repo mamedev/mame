@@ -22,16 +22,16 @@ protected:
 	public:
 		virtual ~mi_6504_normal() {}
 		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_direct(UINT16 adr);
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_arg(UINT16 adr);
 		virtual void write(UINT16 adr, UINT8 val);
 	};
 
 	class mi_6504_nd : public mi_6504_normal {
 	public:
 		virtual ~mi_6504_nd() {}
-		virtual UINT8 read_direct(UINT16 adr);
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_arg(UINT16 adr);
 	};
 
 	virtual void device_start();
@@ -41,7 +41,7 @@ protected:
 enum {
 	M6504_IRQ_LINE = m6502_device::IRQ_LINE,
 	M6504_NMI_LINE = m6502_device::NMI_LINE,
-	M6504_SET_OVERFLOW = m6502_device::V_LINE,
+	M6504_SET_OVERFLOW = m6502_device::V_LINE
 };
 
 extern const device_type M6504;

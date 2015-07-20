@@ -39,18 +39,14 @@ Encryption PAL 16R4 on CPU board
 
 DRIVER_INIT_MEMBER(stfight_state,empcity)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-
-	m_decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
-	space.set_decrypted_region(0x0000, 0x7fff, m_decrypt);
 
 	for (UINT32 A = 0; A < 0x8000; ++A)
 	{
 		UINT8 src = rom[A];
 
 		// decode opcode
-		m_decrypt[A] =
+		m_decrypted_opcodes[A] =
 				( src & 0xA6 ) |
 				( ( ( ( src << 2 ) ^ src ) << 3 ) & 0x40 ) |
 				( ~( ( src ^ ( A >> 1 ) ) >> 2 ) & 0x10 ) |

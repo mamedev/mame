@@ -35,7 +35,7 @@ enum mea8000_state
 	MEA8000_STOPPED,    /* nothing to do, timer disabled */
 	MEA8000_WAIT_FIRST, /* received pitch, wait for first full trame, timer disabled */
 	MEA8000_STARTED,    /* playing a frame, timer on */
-	MEA8000_SLOWING,    /* repating last frame with decreasing amplitude, timer on */
+	MEA8000_SLOWING     /* repeating last frame with decreasing amplitude, timer on */
 };
 
 ALLOW_SAVE_TYPE( mea8000_state );

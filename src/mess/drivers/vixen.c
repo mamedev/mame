@@ -790,7 +790,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_dsr))
 
-	MCFG_FD1797x_ADD(FDC1797_TAG, XTAL_23_9616MHz/24)
+	MCFG_FD1797_ADD(FDC1797_TAG, XTAL_23_9616MHz/24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(vixen_state, fdc_intrq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)

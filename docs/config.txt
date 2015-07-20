@@ -159,6 +159,14 @@ Page DN   [SDL ONLY]
 
 Alt+ENTER Toggles between full-screen and windowed mode.
 
+Scroll Lock  Default mapping for the uimodekey.  This key allows user to
+          disable and enable the emulated keyboard in machines that require
+          it.  All emulations which require emulated keyboards will start in
+          that mode and you can only access the internal UI (hitting TAB) by
+          first hitting this key.  You can change the initial status of the
+          emulated keyboard is presented upon start by using -ui_active trigger
+          as detailed below.
+
 Escape    Exits emulator.
 
 
@@ -332,9 +340,29 @@ of your command:
         in the rompath are verified;  however, you can limit this list by specifying a
         specific softwarelistname (without .XML) after the -verifysoftlist command.
 
+
+OSD related options
+-------------------
+
+-uimodekey [keystring]
+
+	Key used to toggle emulated keyboard on and off.  Default setting is SCRLOCK.
+
+-uifontprovider
+
+	Chooses provider for UI font:  win, none or auto.  The Default setting is AUTO.
+
+
+OSD CLI options
+---------------
+
 -listmidi
 
-        Create a list of list available MIDI I/O devices for use with emulation.
+        Create a list of available MIDI I/O devices for use with emulation.
+
+-listnetwork
+
+	Create a list of available Network Adapters for use with emulation.
 
 
 
@@ -901,8 +929,8 @@ Core input options
 	the coin lockout outputs were actually connected to the coin
 	mechanisms. If this feature is enabled, then attempts to enter a coin
 	while the lockout is active will fail and will display a popup message
-	in the user interface. If this feature is disabled, the coin lockout
-	signal will be ignored. The default is ON (-coin_lockout).
+	in the user interface (In debug mode). If this feature is disabled, the
+	coin lockout signal will be ignored. The default is ON (-coin_lockout).
 
 -ctrlr <controller>
 
@@ -1129,6 +1157,32 @@ Debugging options
 	This means that the VIDEO_UPDATE callback will be called repeatedly
 	during pause, which can be useful for debugging. The default is OFF
 	(-noupdate_in_pause).
+
+
+Core communication options
+--------------------------
+
+-comm_localhost <string>
+
+	Local address to bind to.  This can be a traditional xxx.xxx.xxx.xxx
+	address or a string containing a resolvable hostname.  The default is
+	value is "0.0.0.0"
+
+-comm_localport <string>
+
+	Local port to bind to.  This can be any traditional communications port
+        as an unsigned 16-bit integer (0-65535).  The default value is "15122".
+
+-comm_remotehost <string>
+
+	Remote address to connect to.  This can be a traditional xxx.xxx.xxx.xxx
+        address or a string containing a resolvable hostname.  The default is
+        value is "0.0.0.0"
+
+-comm_remoteport <string>
+
+	Remote port to connect to.  This can be any traditional communications port
+	as an unsigned 16-bit integer (0-65535).  The default value is "15122".
 
 
 

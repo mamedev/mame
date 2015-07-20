@@ -167,8 +167,6 @@ public:
 	UINT32 m_a2_palette[16];
 	UINT32 m_shr_palette[256];
 
-	DECLARE_DIRECT_UPDATE_MEMBER(apple2gs_opbase);
-
 	READ8_MEMBER( apple2gs_c0xx_r );
 	WRITE8_MEMBER( apple2gs_c0xx_w );
 	WRITE8_MEMBER( apple2gs_main0400_w );

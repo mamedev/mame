@@ -145,7 +145,7 @@ enum
 	FEATURE_I8052           = 0x01,
 	FEATURE_CMOS            = 0x02,
 	FEATURE_I80C52          = 0x04,
-	FEATURE_DS5002FP        = 0x08,
+	FEATURE_DS5002FP        = 0x08
 };
 
 /* Internal address in SFR of registers */
@@ -198,7 +198,7 @@ enum
 	ADDR_TA     = 0xc7,
 	ADDR_RNR    = 0xcf,
 	ADDR_RPCTL  = 0xd8,
-	ADDR_RPS    = 0xda,
+	ADDR_RPS    = 0xda
 
 };
 
@@ -217,7 +217,7 @@ enum
 	V_TF2   = 0x02b,    /* Timer 2 Overflow */
 
 	/* DS5002FP */
-	V_PFI   = 0x02b,    /* Power Failure Interrupt */
+	V_PFI   = 0x02b     /* Power Failure Interrupt */
 };
 
 
@@ -379,8 +379,8 @@ ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag,
 ***************************************************************************/
 
 /* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)         m_direct->read_decrypted_byte(pc)
-#define ROP_ARG(pc)     m_direct->read_raw_byte(pc)
+#define ROP(pc)         m_direct->read_byte(pc)
+#define ROP_ARG(pc)     m_direct->read_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
 #define CODEMEM_R(a)    (UINT8)m_program->read_byte(a)
@@ -1996,7 +1996,7 @@ void mcs51_cpu_device::execute_run()
 		/* Read next opcode */
 		PPC = PC;
 		debugger_instruction_hook(this, PC);
-		op = m_direct->read_decrypted_byte(PC++);
+		op = m_direct->read_byte(PC++);
 
 		/* process opcode and count cycles */
 		m_inst_cycles = mcs51_cycles[op];

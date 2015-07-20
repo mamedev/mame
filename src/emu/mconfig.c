@@ -25,6 +25,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	: m_minimum_quantum(attotime::zero),
 		m_watchdog_vblank_count(0),
 		m_watchdog_time(attotime::zero),
+		m_force_no_drc(false),
 		m_default_layout(NULL),
 		m_gamedrv(gamedrv),
 		m_options(options)
