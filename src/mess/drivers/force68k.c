@@ -2,7 +2,7 @@
 // copyright-holders:Joakim Larsson Edström
 /***************************************************************************
 
-    Force SYS68K CPU-1/CPU-6 VME SBC drivers
+    Force SYS68K CPU-1/CPU-6 VME SBC drivers, initially based on the 68ksbc.c
 
     13/06/2015
 
@@ -26,7 +26,7 @@ Address Range     Description
 OAO 000 - OBF FFF USER EPROMArea
 0C0 041 - 0C0 043 ACIA (P3) Host
 0C0 080 - 0C0 082 ACIA (P4) Terminal
-0C0 101 - 0C0 103 ACIA (P5) Remote
+0C0 101 - 0C0 103 ACIA (P5) Remote device (eg printer)
 0C0 401 - 0C0 42F RTC 
 OEO 001 - 0E0 035 PI/T
 OEO 200 - 0E0 2FF FPU
@@ -74,7 +74,6 @@ enabled/disabled via a jumper field.
 Additionally, the SYS68K1CPU-1 B/D supports the ACFAIL, SYSRESET, 
 SYSFAIL and SYSCLK signal (16 MHz).
 
-Based on the 68ksbc.c
 
     TODO:
     - Finish 2 x ACIA6850, host and remote interface left, terminal works 
@@ -237,6 +236,17 @@ static MACHINE_CONFIG_START( fccpu1, force68k_state )
 
         /* P5/Remote Port config */
 	MCFG_DEVICE_ADD("aciaremt", ACIA6850, 0)
+
+#define PRINTER 0
+#if PRINTER
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232rmt", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232rmt", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232rmt", default_rs232_devices, "printer")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("aciaremt", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("aciaremt", acia6850_device, write_cts))
+#endif 
+
         MCFG_DEVICE_ADD("aciaremt_clock", CLOCK, ACIA_CLOCK)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(force68k_state, write_aciaterm_clock))
 
