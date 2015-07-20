@@ -37,7 +37,9 @@
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
  see http://startup.nmnaturalhistory.org/visitorstories/view.php?ii=79
- Robert "Bob" C. Quinn was definitely lead engineer on the VT125 and may have been lead engineer on the VK100 as well
+ Robert "Bob" C. Quinn was definitely lead engineer on the VT125
+ Robert "Bob" T. Collins was the lead engineer on the VK100
+ Pedro Ortiz (https://www.linkedin.com/pub/pedro-ortiz/16/68b/196) did the drafting for the enclosure and case
 
  The prototype name for the VK100 was 'SMAKY' (Smart Keyboard)
 
@@ -220,6 +222,7 @@ public:
 	UINT8 m_VG_MODE; // 2 bits, latched on EXEC
 	UINT8 m_vgGO; // activated on next SYNC pulse after EXEC
 	UINT8 m_ACTS;
+	UINT8 m_ADSR;
 	ioport_port* m_col_array[16];
 
 	DECLARE_WRITE8_MEMBER(vgLD_X);
@@ -244,6 +247,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
 	UINT8 vram_read();
+	UINT8 vram_attr_read();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void vram_write(UINT8 data);
 
@@ -286,6 +290,21 @@ UINT8 vk100_state::vram_read()
 	return (block>>(4*nybbleNum))&0xF;
 }
 
+// returns the attribute nybble for the current pixel based on X and Y regs
+UINT8 vk100_state::vram_attr_read()
+{
+	// XFinal is (X'&0x3FC)|(X&0x3)
+	UINT16 XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
+	// EA is the effective ram address for a 16-bit block
+	UINT16 EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
+	UINT16 block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
+	// nybbleNum is the attribute nybble, which in this case is always 3
+	UINT8 nybbleNum = 3;
+	return (block>>(4*nybbleNum))&0xF;
+}
+
+// writes one nybble to vram array based on X and Y regs, and updates the attrib ram if needed
 void vk100_state::vram_write(UINT8 data)
 {
 	// XFinal is (X'&0x3FC)|(X&0x3)
@@ -430,10 +449,20 @@ WRITE8_MEMBER(vk100_state::vgERR)
 }
 
 /* port 0x45: "SOPS" screen options
- * Blink --Background color--  Blink Serial Select  Reverse
- * Enable Green  Red    Blue   Control              BG/FG
- * d7     d6     d5     d4     d3     d2     d1     d0
- * apparently, 00 = rs232/eia, 01 = 20ma, 10 = hardcopy, 11 = test/loopback
+ * (handled by 74LS273 @ E55, schematic sheet 10, all signals called 'VVG1 BDx' where x is 7 to 0)
+ * Blink   --Background color--    Blink   Serial  Serial  Reverse
+ * Enable  Green   Red     Blue    Control SL1     SL0     BG/FG
+ * d7      d6      d5      d4      d3      d2      d1      d0
+ * apparently, SLx: 00 = rs232/eia(J6), 01 = 20ma(J1), 10 = hardcopy(J7), 11 = test/loopback
+ * Serial Select (SLx) routing controls are rather complex, shown on schematic
+ * page 9:
+ * VDC2    |  I8251 pins                                                      |  SYSTAT_B bits
+ * SL1 SL0 |  8251RXD   8251RTS    8251TXD    8251/DTR    8251/DSR    8251CTS |  SYSTATB_ACTS   SYSTATB_ADSR
+ * 0   0      J6 /RXD   J6 /RTS    J6 TXD     J6 /DTR     J7 URTS     GND        J6 /CTS        J6 /DSR
+ * 0   1      J1 +-R    ACTS(loop) J1 +-T     J6 /DTR     J7 URTS     GND        8251RTS(loop)  J6 /DSR
+ * 1   0      J7 DRXD   J7 DRTS*   J7 DTXD    J6 /DTR     J7 URTS     GND        J7 /DCTS       J6 /DSR
+ * 1   1      8251TXD   ACTS(loop) 8251RXD    J6 /DTR     J7 URTS     GND        8251RTS(loop)  J6 /DSR
+ *                      * and UCTS, the pin drives both pins on J7
  */
 WRITE8_MEMBER(vk100_state::vgSOPS)
 {
@@ -586,8 +615,8 @@ WRITE8_MEMBER(vk100_state::BAUD)
 }
 
 /* port 0x40-0x47: "SYSTAT A"; various status bits, poorly documented in the tech manual
- * /GO    BIT3   BIT2   BIT1   BIT0   Dip     RST7.5 GND
- *                                    Switch  VSYNC
+ * /GO    VDM1   VDM1   VDM1   VDM1   Dip     RST7.5 GND***
+ *        BIT3   BIT2   BIT1   BIT0   Switch  VSYNC
  * d7     d6     d5     d4     d3     d2      d1     d0
   bit3, 2, 1, 0 are the 4 bits output from the VRAM 12->4 multiplexer
    which are also inputs to the pattern rom; they are constantly updated
@@ -597,7 +626,8 @@ WRITE8_MEMBER(vk100_state::BAUD)
   d6,5,4,3 are from the 74ls298 at ic4 (right edge of pcb)
   d2 is where the dipswitch values are read from, based on the offset
   d1 is connected to 8085 rst7.5 (pin 7) and crtc pin 40 (VSYNC) [verified via tracing]
-  d0 is tied to GND [verified via tracing]
+  d0 is tied to GND [verified via tracing] but the schematics both tie it to GND
+     and call it LP FLAG, may be a leftover from development.
 
  31D reads and checks d7 in a loop
  205 reads, xors with 0x55 (from reg D), ANDS result with 0x78 and branches if it is not zero (checking for bit pattern 1010?)
@@ -623,18 +653,20 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
  * after this it does something and waits for an rxrdy interrupt
 
  shows the results of:
- * ACTS (/CTS)  ?      ?      ?      ?      ?      ?      ?
- * d7           d6     d5     d4     d3     d2     d1     d0
+ * ACTS (/CTS)  ADSR (/DSR)  GND    GND    ATTR3  ATTR2  ATTR1  ATTR0
+ * d7           d6           d5     d4     d3     d2     d1     d0
  * the ACTS (inverse of DCTS) signal lives in one of these bits (see 5-62)
  * it XORs the read of systat_b with the E register (which holds 0x6)
  * and checks the result
+ * The 4 attribute ram bits for the cell being pointed at by the X and Y regs are readable as the low nybble.
+ * The DSR pin is readable as bit 6.
  */
 READ8_MEMBER(vk100_state::SYSTAT_B)
 {
 #ifdef SYSTAT_B_VERBOSE
 	logerror("0x%04X: SYSTAT_B Read!\n", m_maincpu->pc());
 #endif
-	return (m_ACTS<<7)|0x7F;
+	return (m_ACTS<<7)|(m_ADSR<<6)|vram_attr_read();
 }
 
 READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
@@ -913,6 +945,7 @@ void vk100_state::machine_start()
 	m_VG_MODE = 0;
 	m_vgGO = 0;
 	m_ACTS = 1;
+	m_ADSR = 1;
 	char kbdcol[8];
 	// look up all 16 tags 'the slow way' but only once on reset
 	for (int i = 0; i < 16; i++)
@@ -1132,10 +1165,10 @@ ROM_START( vk100 )
 	 *            |\-------- Y11 (D out of ls191 left of hd46505) [verified via tracing]
 	 *            \--------- ERASE L/d5 on the vector rom [verified via tracing]
 	 * data bits: 3210
-	 *            |||\-- ? wr_1?
-	 *            ||\--- ? wr_2?
-	 *            |\---- ? wr_3?
-	 *            \----- ? wr_4?
+	 *            |||\-- /WE for VRAM Attribute bits
+	 *            ||\--- /WE for VRAM bits 0-3 (leftmost bits, first to be shifted out)
+	 *            |\---- /WE for VRAM bits 4-7
+	 *            \----- /WE for VRAM bits 8-11 (rightmost bits, last to be shifted out)
 	 * The VT125 prom E93 is mostly equivalent to the ras/erase prom; On the vt125 version, the inputs are:
 	 *  (X'10 NOR X'11)
 	 *  (Y9 NOR Y10)
