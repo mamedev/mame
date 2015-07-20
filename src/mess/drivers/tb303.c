@@ -35,12 +35,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
+	DECLARE_WRITE8_MEMBER(strobe_w);
 	void refresh_ram();
 
-	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_WRITE8_MEMBER(strobe_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void update_leds();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(t3_clock);
 	TIMER_DEVICE_CALLBACK_MEMBER(t3_off);
@@ -81,6 +81,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(tb303_state::t3_clock)
 
 ***************************************************************************/
 
+// external ram
+
 void tb303_state::refresh_ram()
 {
 	// MCU E2,E3 goes through a 4556 IC(pin 14,13) to one of uPD444 _CE:
@@ -103,9 +105,6 @@ void tb303_state::refresh_ram()
 		else
 			m_ram[m_ram_address] = m_port[NEC_UCOM4_PORTC];
 	}
-
-	// to switchboard pin 19-22
-	//..
 }
 
 WRITE8_MEMBER(tb303_state::ram_w)
@@ -128,18 +127,6 @@ READ8_MEMBER(tb303_state::ram_r)
 		return 0;
 }
 
-WRITE8_MEMBER(tb303_state::led_w)
-{
-	// MCU G: leds state
-	display_matrix(4, 4, data, m_inp_mux);
-}
-
-WRITE8_MEMBER(tb303_state::switch_w)
-{
-	// MCU H: input/led mux
-	m_inp_mux = data;
-}
-
 WRITE8_MEMBER(tb303_state::strobe_w)
 {
 	// MCU I0: RAM _WE
@@ -148,6 +135,37 @@ WRITE8_MEMBER(tb303_state::strobe_w)
 	
 	// MCU I1: pitch data latch strobe
 	// MCU I2: gate signal
+
+	m_port[offset] = data;
+}
+
+
+// switch board
+
+void tb303_state::update_leds()
+{
+	// 4*4 LED matrix from port G/H:
+	/*
+		0.0 D204    1.0 D211    2.0 D217    3.0 D205
+		0.1 D206    1.1 D213    2.1 D218    3.1 D207
+		0.2 D208    1.2 D215    2.2 D220    3.2 D210
+		0.3 D209    1.3 D216    2.3 D221    3.3 D212
+	*/
+	display_matrix(4, 4, m_port[NEC_UCOM4_PORTG], m_port[NEC_UCOM4_PORTH]);
+	
+	// todo: battery led
+	// todo: 4 more leds(see top-left part)
+}
+
+WRITE8_MEMBER(tb303_state::switch_w)
+{
+	// MCU G: leds state
+	// MCU H: input/led mux
+	if (offset == NEC_UCOM4_PORTH)
+		m_inp_mux = data;
+	
+	m_port[offset] = data;
+	update_leds();
 }
 
 READ8_MEMBER(tb303_state::input_r)
@@ -259,7 +277,7 @@ static MACHINE_CONFIG_START( tb303, tb303_state )
 	MCFG_UCOM4_WRITE_D_CB(WRITE8(tb303_state, ram_w))
 	MCFG_UCOM4_WRITE_E_CB(WRITE8(tb303_state, ram_w))
 	MCFG_UCOM4_WRITE_F_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(tb303_state, led_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(tb303_state, switch_w))
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(tb303_state, switch_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(tb303_state, strobe_w))
 
