@@ -2195,7 +2195,7 @@ ROM_START( drtoppelj )
 ROM_END
 
 /* M6100309A PCB
-   PO-0038A */
+   P0-0038A */
 ROM_START( kageki )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b35-16.11c", 0x00000, 0x10000, CRC(a4e6fd58) SHA1(7cfe5b3fa6c88cdab45719f5b58541270825ad30) )    /* US ver */
@@ -2502,7 +2502,7 @@ Taito, 1988
 Taito ID: K1100356A
           J1100156A
           MAIN PCB
-Seta ID: PO-041A
+Seta ID: P0-041A
 */
 /* This pcb is similar but not identical to the Chuka Taisen pcb above;
    there is an M-chip i8742 (with Taito silkscreen) and no 3rd z80.
