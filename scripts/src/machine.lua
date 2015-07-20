@@ -188,7 +188,7 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/6850acia.h,MACHINES += PIT68230
+--@src/emu/machine/68230pit.h,MACHINES["PIT68230"] = true
 ---------------------------------------------------
 
 if (MACHINES["PIT68230"]~=null) then
