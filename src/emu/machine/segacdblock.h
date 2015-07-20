@@ -84,6 +84,7 @@ private:
 	INT32 m_FADEnd;
 	UINT16 m_cd_state;
 	UINT8 m_cmd_issued;
+	UINT8 m_data_read;
 	bool m_sh1_inited;
 	bool m_isDiscInTray;
 	//bool m_TOCPhase;

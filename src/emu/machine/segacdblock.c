@@ -134,7 +134,7 @@ WRITE16_MEMBER(segacdblock_device::hirq_w)
 }
 
 READ16_MEMBER(segacdblock_device::hirq_mask_r){	return m_hirq_mask; }
-WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { COMBINE_DATA(&m_hirq_mask); }
+WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { printf("%04x\n",m_hirq_mask); debugger_break(machine()); COMBINE_DATA(&m_hirq_mask); }
 
 void segacdblock_device::SH2SendsCommand()
 {
@@ -146,16 +146,16 @@ void segacdblock_device::SH2SendsCommand()
 }
 
 // 0x6001fd8 cd-block string check
-READ16_MEMBER(segacdblock_device::cr0_r){ return m_dr[0]; }
+READ16_MEMBER(segacdblock_device::cr0_r){ m_data_read |= 1; return m_dr[0]; }
 WRITE16_MEMBER(segacdblock_device::cr0_w){ m_cmd_issued |= 1; COMBINE_DATA(&m_cr[0]);}
 
-READ16_MEMBER(segacdblock_device::cr1_r){ return m_dr[1]; }
+READ16_MEMBER(segacdblock_device::cr1_r){ m_data_read |= 2; return m_dr[1]; }
 WRITE16_MEMBER(segacdblock_device::cr1_w){ m_cmd_issued |= 2; COMBINE_DATA(&m_cr[1]);}
 
-READ16_MEMBER(segacdblock_device::cr2_r){ return m_dr[2]; }
+READ16_MEMBER(segacdblock_device::cr2_r){ m_data_read |= 4; return m_dr[2]; }
 WRITE16_MEMBER(segacdblock_device::cr2_w){ m_cmd_issued |= 4; COMBINE_DATA(&m_cr[2]);}
 
-READ16_MEMBER(segacdblock_device::cr3_r){ return m_dr[3]; }
+READ16_MEMBER(segacdblock_device::cr3_r){ m_data_read |= 8; return m_dr[3]; }
 WRITE16_MEMBER(segacdblock_device::cr3_w){ m_cmd_issued |= 8; COMBINE_DATA(&m_cr[3]); SH2SendsCommand(); }
 
 void segacdblock_device::cd_defragblocks(partitionT *part)
@@ -436,6 +436,7 @@ void segacdblock_device::cd_free_block(blockT *blktofree)
 		return;
 	}
 
+	printf("%d\n",blktofree->size);
 	debug_var = 0;
 	for (i = 0; i < 200; i++)
 	{
@@ -447,6 +448,7 @@ void segacdblock_device::cd_free_block(blockT *blktofree)
 		}
 	}
 
+	printf("afterparty %d\n",blktofree->size);
 	if(debug_var > 1)
 		debugger_break(machine());
 	
@@ -1248,8 +1250,9 @@ void segacdblock_device::cd_cmd_delete_sector()
 		partitions[bufnum].bnum[i] = 0xff;
 	}
 	
+	
 	// defrag what's left
-	cd_defragblocks(transpart);
+	cd_defragblocks(&partitions[bufnum]);
 
 	partitions[bufnum].numblks -= sectnum;
 
@@ -1762,7 +1765,8 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		//if(m_cd_timer->remaining().as_double() != 1000000000.000000)
 		//	return;
 		dma_setup();
-
+		if(m_data_read != 0xf)
+			return;
 		if(m_isDiscInTray == false)
 			m_cd_state = CD_STAT_NODISC;
 		//	m_cd_state = CD_STAT_PAUSE;
@@ -1859,7 +1863,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			}
 			m_cd_timer->adjust(attotime::from_hz(DEBUG_CDSPEED));
 			
-			
+			m_data_read = 0; // make sure data readback is read.
 			//if(m_TransferActive == true)
 			//	m_cd_state|= CD_STAT_TRANS;
 			//cd_standard_return(true);
@@ -1900,7 +1904,7 @@ void segacdblock_device::device_reset()
 	m_peri_timer->reset();
 	m_cmd_timer->reset();
 	m_cd_timer->reset();
-	
+	m_data_read |= 0xf;
 	xfertype = CDDMA_STOPPED;
 	sourcetype = SOURCE_NONE;
 	m_dma_size = 0;
@@ -1909,6 +1913,7 @@ void segacdblock_device::device_reset()
 	m_sh1_inited = false;
 	m_cmd_issued = 0;
 	m_hirq = 0xffff;
+	m_hirq_mask = 0xffff;
 	freeblocks = 200;
 	m_LastBuffer = 0xff;
 	m_CurrentTrack = 0xff;
