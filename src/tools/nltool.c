@@ -105,6 +105,7 @@ public:
 		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
 		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
 		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
+		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
 		opt_help("h", "help",                 "display help", this)
 	{}
 
@@ -115,6 +116,7 @@ public:
 	poption_str_limit opt_type;
 	poption_str    opt_cmd;
 	poption_bool   opt_verb;
+	poption_bool   opt_quiet;
 	poption_bool   opt_help;
 };
 
@@ -171,7 +173,7 @@ class netlist_tool_t : public netlist::netlist_t
 public:
 
 	netlist_tool_t()
-	: netlist::netlist_t(), m_logs(""), m_verbose(false), m_setup(NULL)
+	: netlist::netlist_t(), m_opts(NULL), m_setup(NULL)
 	{
 	}
 
@@ -206,7 +208,7 @@ public:
 	void log_setup()
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
-		pstring_list_t ll(m_logs, ":");
+		pstring_list_t ll(m_opts ? m_opts->opt_logs() : "" , ":");
 		for (int i=0; i < ll.size(); i++)
 		{
 			pstring name = "log_" + ll[i];
@@ -215,9 +217,7 @@ public:
 		}
 	}
 
-	pstring m_logs;
-
-	bool m_verbose;
+	tool_options_t *m_opts;
 
 protected:
 
@@ -226,15 +226,18 @@ protected:
 		switch (level)
 		{
 			case NL_LOG:
-				if (m_verbose)
+				if (m_opts ? m_opts->opt_verb() : false)
 				{
 					vprintf(format, ap);
 					printf("\n");
 				}
 				break;
 			case NL_WARNING:
-				vprintf(format, ap);
-				printf("\n");
+				if (!(m_opts ? m_opts->opt_quiet() : false))
+				{
+					vprintf(format, ap);
+					printf("\n");
+				}
 				break;
 			case NL_ERROR:
 				vprintf(format, ap);
@@ -265,9 +268,8 @@ static void run(tool_options_t &opts)
 	netlist_tool_t nt;
 	osd_ticks_t t = osd_ticks();
 
+	nt.m_opts = &opts;
 	nt.init();
-	nt.m_logs = opts.opt_logs();
-	nt.m_verbose = opts.opt_verb();
 	nt.read_netlist(filetobuf(opts.opt_file()), opts.opt_name());
 	double ttr = opts.opt_ttr();
 
