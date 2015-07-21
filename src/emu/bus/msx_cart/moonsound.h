@@ -31,7 +31,6 @@ public:
 
 private:
 	required_device<ymf278b_device> m_ymf278b;
-
 };
 
 
