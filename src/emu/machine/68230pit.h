@@ -66,6 +66,7 @@ private:
 	UINT8  m_pbcr;  // Port B Control register
 	UINT8  m_padr;  // Port A Data register
 	UINT8  m_pbdr;  // Port B Data register
+	UINT8  m_psr;   // Port Status Register
 };
 
 

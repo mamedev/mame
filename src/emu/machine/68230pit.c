@@ -67,6 +67,7 @@ void pit68230_device::device_reset()
   m_pbcr = 0;
   m_padr = 0;
   m_pbdr = 0;
+  m_psr = 0;
 }
 
 WRITE8_MEMBER( pit68230_device::data_w )
@@ -97,6 +98,14 @@ WRITE8_MEMBER( pit68230_device::data_w )
   case PIT_68230_PBCR: 
     printf("PBCR");
     m_pbcr = data;
+    break;
+  case PIT_68230_PADR:
+    printf("PADR");
+    m_padr = data;
+    break;
+  case PIT_68230_PSR:
+    printf("PSR");
+    m_padr = data;
     break;
   default:
     printf("unhandled register %02x", offset);
@@ -139,12 +148,24 @@ READ8_MEMBER( pit68230_device::data_r )
     printf("PADR");
     data = m_padr;
     break;
-  case PIT_68230_PBDR: 
+  case PIT_68230_PBDR:
+    /* 4.6.2. PORT B DATA REGISTER (PBDR). The port B data register is a holding register for moving data
+to and from port B pins. The port B data direction register determines whether each pin is an input (zero)
+or an output (one). This register is readable and writable at all times. Depending on the chosen mode/submode, 
+reading or writing may affect the double-buffered handshake mechanism. The port B data register is not affected
+by the assertion of the RESET pin. PB0-PB7 sits on pins 17-24 on a 48 pin DIP package */ 
     printf("PBDR");
     data = m_pbdr;
+    //    data = (m_pbdr & 0xfc) | 1; // CPU-1 centronics interface expects to see 2 lowest bits equal 1 for printer
+    break;
+  case PIT_68230_PSR:
+    printf("PSR");
+    data = m_psr;
+    //    data = m_psr | 1; // CPU-1 centronics interface expects status to be non zero
     break;
   default:
     printf("unhandled register %02x", offset);
+    data = 0;
   }
   printf("\n");
 
