@@ -26,9 +26,9 @@ Address Range     Description
 OAO 000 - OBF FFF USER EPROMArea
 0C0 041 - 0C0 043 ACIA (P3) Host
 0C0 080 - 0C0 082 ACIA (P4) Terminal
-0C0 101 - 0C0 103 ACIA (P5) Remote device (eg printer)
+0C0 101 - 0C0 103 ACIA (P5) Remote device (eg serial printer)
 0C0 401 - 0C0 42F RTC 
-OEO 001 - 0E0 035 PI/T
+OEO 001 - 0E0 035 PI/T (eg centronics printer)
 OEO 200 - 0E0 2FF FPU
 OEO 300 - 0E0 300 Reset Off
 OEO 380 - 0E0 380 Reset On
@@ -78,6 +78,7 @@ SYSFAIL and SYSCLK signal (16 MHz).
     TODO:
     - Finish 2 x ACIA6850, host and remote interface left, terminal works 
     - Finish 1 x 68230 Motorola, Parallel Interface / Timer
+      - Connect Port B to a Centronics printer interface
     - Add 1 x Abort Switch
     - Add configurable serial connector between ACIA:s and 
       - Real terminal emulator, ie rs232 "socket"
@@ -253,8 +254,8 @@ static MACHINE_CONFIG_START( fccpu1, force68k_state )
 	/* RTC Real Time Clock device */
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
 
-	/* PIT Parallel Interface and Timer device */
-	MCFG_DEVICE_ADD("pit", PIT68230, 0)
+	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
+	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2) 
 
 MACHINE_CONFIG_END
 
@@ -312,9 +313,9 @@ ROM_START( fccpu1 )
    MM <address> [<data» [;<options» <CR>       Memory Modify
    MS <address> <data1 > <data2> < ... <CR>    Memory Set - starting at addr with data 1. data 2 ...
    NOBR [<address> ... ] <CR>                  Remove Breakpoint
-   NOPA <CR>                                   Printer Detach
+   NOPA <CR>                                   Printer Detach (Centronics on PIT/P2)
    OF <CR>                                     Offset
-   PA <CR>                                     Printer Attach
+   PA <CR>                                     Printer Attach (Centronics on PIT/P2)
    PF[n] <CR>                                  Set/display Port Format
    RM <CR>                                     Register Modify
    TM [<exit character» <CR>                   Transparent Mode
