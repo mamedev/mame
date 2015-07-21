@@ -51,15 +51,15 @@ public:
 	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pce_common_state(mconfig, type, tag) { }
 
-	DECLARE_WRITE8_MEMBER(paranoia_8085_d000_w);
-	DECLARE_READ8_MEMBER(paranoia_z80_io_01_r);
-	DECLARE_READ8_MEMBER(paranoia_z80_io_02_r);
-	DECLARE_WRITE8_MEMBER(paranoia_z80_io_17_w);
-	DECLARE_WRITE8_MEMBER(paranoia_z80_io_37_w);
-	DECLARE_WRITE8_MEMBER(paranoia_i8155_a_w);
-	DECLARE_WRITE8_MEMBER(paranoia_i8155_b_w);
-	DECLARE_WRITE8_MEMBER(paranoia_i8155_c_w);
-	DECLARE_WRITE_LINE_MEMBER(paranoia_i8155_timer_out);
+	DECLARE_WRITE8_MEMBER(i8085_d000_w);
+	DECLARE_READ8_MEMBER(z80_io_01_r);
+	DECLARE_READ8_MEMBER(z80_io_02_r);
+	DECLARE_WRITE8_MEMBER(z80_io_17_w);
+	DECLARE_WRITE8_MEMBER(z80_io_37_w);
+	DECLARE_WRITE8_MEMBER(i8155_a_w);
+	DECLARE_WRITE8_MEMBER(i8155_b_w);
+	DECLARE_WRITE8_MEMBER(i8155_c_w);
+	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
 };
 
 
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, paranoia_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(paranoia_state::paranoia_8085_d000_w)
+WRITE8_MEMBER(paranoia_state::i8085_d000_w)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START(paranoia_8085_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
 	AM_RANGE( 0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE( 0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
-	AM_RANGE( 0xd000, 0xd000) AM_WRITE(paranoia_8085_d000_w )
+	AM_RANGE( 0xd000, 0xd000) AM_WRITE(i8085_d000_w )
 	AM_RANGE( 0xe000, 0xe1ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -112,48 +112,48 @@ static ADDRESS_MAP_START(paranoia_z80_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x7000, 0x73ff) AM_RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER(paranoia_state::paranoia_z80_io_01_r)
+READ8_MEMBER(paranoia_state::z80_io_01_r)
 {
 	return 0;
 }
 
-READ8_MEMBER(paranoia_state::paranoia_z80_io_02_r)
+READ8_MEMBER(paranoia_state::z80_io_02_r)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(paranoia_state::paranoia_z80_io_17_w)
+WRITE8_MEMBER(paranoia_state::z80_io_17_w)
 {
 }
 
-WRITE8_MEMBER(paranoia_state::paranoia_z80_io_37_w)
+WRITE8_MEMBER(paranoia_state::z80_io_37_w)
 {
 }
 
 static ADDRESS_MAP_START(paranoia_z80_io_map, AS_IO, 8, paranoia_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ(paranoia_z80_io_01_r )
-	AM_RANGE( 0x02, 0x02 ) AM_READ(paranoia_z80_io_02_r )
-	AM_RANGE( 0x17, 0x17 ) AM_WRITE(paranoia_z80_io_17_w )
-	AM_RANGE( 0x37, 0x37 ) AM_WRITE(paranoia_z80_io_37_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ(z80_io_01_r )
+	AM_RANGE( 0x02, 0x02 ) AM_READ(z80_io_02_r )
+	AM_RANGE( 0x17, 0x17 ) AM_WRITE(z80_io_17_w )
+	AM_RANGE( 0x37, 0x37 ) AM_WRITE(z80_io_37_w )
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(paranoia_state::paranoia_i8155_a_w)
+WRITE8_MEMBER(paranoia_state::i8155_a_w)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-WRITE8_MEMBER(paranoia_state::paranoia_i8155_b_w)
+WRITE8_MEMBER(paranoia_state::i8155_b_w)
 {
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-WRITE8_MEMBER(paranoia_state::paranoia_i8155_c_w)
+WRITE8_MEMBER(paranoia_state::i8155_c_w)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(paranoia_state::paranoia_i8155_timer_out)
+WRITE_LINE_MEMBER(paranoia_state::i8155_timer_out)
 {
 	//m_subcpu->set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);
@@ -175,10 +175,10 @@ static MACHINE_CONFIG_START( paranoia, paranoia_state )
 	MCFG_CPU_IO_MAP(paranoia_z80_io_map)
 
 	MCFG_DEVICE_ADD("i8155", I8155, 1000000 /*?*/)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(paranoia_state, paranoia_i8155_a_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(paranoia_state, paranoia_i8155_b_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(paranoia_state, paranoia_i8155_c_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(paranoia_state, paranoia_i8155_timer_out))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(paranoia_state, i8155_a_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(paranoia_state, i8155_b_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(paranoia_state, i8155_c_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(paranoia_state, i8155_timer_out))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -217,4 +217,4 @@ ROM_START(paranoia)
 	ROM_LOAD( "4.352", 0x18000, 0x8000, CRC(11297fed) SHA1(17a294e65ba1c4806307602dee4c7c627ad1fcfd) )
 ROM_END
 
-GAME( 1990, paranoia, 0, paranoia, paranoia, pce_common_state, pce_common, ROT0, "Naxat Soft", "Paranoia", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, paranoia, 0, paranoia, paranoia, pce_common_state, pce_common, ROT0, "Naxat Soft", "Paranoia", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
