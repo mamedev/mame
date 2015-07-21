@@ -192,7 +192,6 @@ perhaps? The two writes seem to take only two values.
 	   - Air Inferno: Almost surely crashing during replay has missing smoke effect, looks quit odd atm.
 	   - Top Landing: Night stages might have wrong priority for stars-above-sea;
 	   - Input limiters / analog thresholds for both games;
-	   - Special thanks to syq for being a cunt.
  */
 
 #include "emu.h"
