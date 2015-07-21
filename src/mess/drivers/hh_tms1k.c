@@ -40,6 +40,7 @@
   MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.c
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
+ *MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
   MP3450A  TMS1100   1979, MicroVision cartridge: Blockbuster
   MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike

@@ -5,7 +5,6 @@
 TODO:
 - Properly hook up correct SRAM sizes for different moonsound compatible
   cartridges. (Original moonsound has 128KB SRAM)
-- Fix FM support (ymf262 support needs to be added to ymf278b).
 
 **********************************************************************************/
 
@@ -42,6 +41,10 @@ static MACHINE_CONFIG_FRAGMENT( moonsound )
 	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(msx_cart_moonsound,irq_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+    MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
+    MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
+    MCFG_SOUND_ROUTE(4, "lspeaker", 0.40)
+    MCFG_SOUND_ROUTE(5, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 

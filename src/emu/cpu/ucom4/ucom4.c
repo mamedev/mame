@@ -12,6 +12,11 @@
   TODO:
   - what happens with uCOM-43 opcodes on an uCOM-44/45 MCU?
   - what's the data after the ROM data for? (eg. 2000-2047, official ROM size is 2000)
+  - is DPh internally 3-bit or 4-bit? (currently assume 4-bit, it could have effect
+    on specific uCOM-43 exchange opcodes)
+  - RAM access from 0x50-0x7f on data_96x4
+  - invalid port accesses via DPl
+  - documentation is conflicting if IRQ is level or edge triggered
 
 */
 
@@ -116,10 +121,10 @@ void ucom4_cpu_device::device_start()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ucom4_cpu_device::simple_timer_cb), this));
 
 	// resolve callbacks
-	m_read_a.resolve_safe(0xf);
-	m_read_b.resolve_safe(0xf);
-	m_read_c.resolve_safe(0xf);
-	m_read_d.resolve_safe(0xf);
+	m_read_a.resolve_safe(0);
+	m_read_b.resolve_safe(0);
+	m_read_c.resolve_safe(0);
+	m_read_d.resolve_safe(0);
 
 	m_write_c.resolve_safe();
 	m_write_d.resolve_safe();
