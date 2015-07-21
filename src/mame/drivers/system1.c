@@ -47,6 +47,7 @@ bullfgt     6x8k  1x8k  6x8k  2x16k  no  ppi  ????    6069
 thetogyu    3x16k 1x8k  6x8k  2x16k  no  pio  6073
 
 spatter     3x16k 1x8k  6x8k  4x16k  no  pio  6394    6306
+spattera    3x16k 1x8k  6x8k  4x16k  no  pio  6599    6306
 ssanchan    3x16k 1x8k  6x8k  4x16k  no  pio  6312
 
 pitfall2    3x16k 1x8k  6x8k  2x16k  no  pio  6458(a) 6454
@@ -118,6 +119,18 @@ blockgalb   1x64k 1x8k  6x8k  4x16k  no       bootleg
 
 nob         3x32k 1x16k 3x32k 4x32k  yes
 nobb        3x32k 1x16k 3x32k 4x32k  yes
+
+*******************************************************************************
+
+Spatter (315-5099)
+Sega 1984
+
+This game runs on Sega System 1 hardware.
+
+834-5583-12 SPATTER (sticker)
+834-5542 daughter board with 4 eproms (EPR6306, EPR6307, EPR6308, EPR6309)
+834-5540 daughter board with logic ICs 
+315-5099 custom Z80 CPU w/security
 
 *******************************************************************************
 
@@ -2808,7 +2821,7 @@ ROM_END
 
 ROM_START( spattera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-6597.116",   0x0000, 0x4000, BAD_DUMP CRC(be80384d) SHA1(9e1f5807492b98c3f36a5b80466dcb2a1f1fead8) ) /* encrypted */ // consistent read, but fails ingame ROM check on PCB
+	ROM_LOAD( "epr-6597.116",   0x0000, 0x4000, CRC(fb928b9d) SHA1(0a9bede7a147009b9ebb8a0b73681359da665982) ) /* encrypted */ 
 	ROM_LOAD( "epr-6598.109",   0x4000, 0x4000, CRC(5dff037a) SHA1(8e6f6b75a89609ab0498d317c11e6d653343ffbe) ) /* encrypted */
 	ROM_LOAD( "epr-6599.96",    0x8000, 0x4000, CRC(7ba9de5b) SHA1(f18542c95e8241433ed995c213924ad1ce03cd5b) )
 
@@ -4958,6 +4971,34 @@ DRIVER_INIT_MEMBER(system1_state,spatter)
 	sega_decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000, convtable);
 }
 
+DRIVER_INIT_MEMBER(system1_state,spattera)
+{
+	static const UINT8 convtable[32][4] =
+	{
+		/*       opcode                   data                     address      */
+		/*  A    B    C    D         A    B    C    D                           */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x80,0xa0,0x00,0x20 },   /* ...0...0...0...0 */
+		{ 0x20,0x28,0x00,0x08 }, { 0x20,0x28,0x00,0x08 },   /* ...0...0...0...1 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x08,0x28,0x00,0x20 },   /* ...0...0...1...0 */
+		{ 0x88,0x08,0xa8,0x28 }, { 0x88,0x08,0xa8,0x28 },   /* ...0...0...1...1 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x20,0x28,0x00,0x08 },   /* ...0...1...0...0 */
+		{ 0x28,0xa8,0x20,0xa0 }, { 0x20,0x28,0x00,0x08 },   /* ...0...1...0...1 */
+		{ 0xa0,0xa8,0x20,0x28 }, { 0x08,0x28,0x00,0x20 },   /* ...0...1...1...0 */
+		{ 0x88,0x08,0xa8,0x28 }, { 0x88,0x08,0xa8,0x28 },   /* ...0...1...1...1 */
+		{ 0x28,0xa8,0x20,0xa0 }, { 0xa0,0xa8,0x20,0x28 },   /* ...1...0...0...0 */
+		{ 0x88,0x08,0xa8,0x28 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...0...0...1 */
+		{ 0x28,0xa8,0x20,0xa0 }, { 0x08,0x28,0x00,0x20 },   /* ...1...0...1...0 */
+		{ 0x28,0xa8,0x20,0xa0 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...0...1...1 */
+		{ 0x20,0x28,0x00,0x08 }, { 0x20,0x28,0x00,0x08 },   /* ...1...1...0...0 */
+		{ 0x88,0x08,0xa8,0x28 }, { 0x20,0x28,0x00,0x08 },   /* ...1...1...0...1 */
+		{ 0x08,0x28,0x00,0x20 }, { 0x80,0xa0,0x00,0x20 },   /* ...1...1...1...0 */
+		{ 0x08,0x28,0x00,0x20 }, { 0x88,0x08,0xa8,0x28 }    /* ...1...1...1...1 */
+	};
+
+	DRIVER_INIT_CALL(bank00);
+	sega_decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000, convtable);
+}
+
 DRIVER_INIT_MEMBER(system1_state,pitfall2)
 {
 	static const UINT8 convtable[32][4] =
@@ -5615,7 +5656,7 @@ GAME( 1984, flicky,     0,        sys1piox,  flicky,    system1_state, flicky,  
 GAME( 1984, flickys2,   flicky,   sys1pio,   flickys2,  system1_state, bank00,   ROT0,   "Sega", "Flicky (128k Version, System 2, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1984, thetogyu,   bullfgt,  sys1piox,  bullfgt,   system1_state, bullfgtj, ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, spatter,    0,        sys1piosx, spatter,   system1_state, spatter,  ROT0,   "Sega", "Spatter (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, spattera,   spatter,  sys1piosx, spatter,   system1_state, spatter,  ROT0,   "Sega", "Spatter (315-5099)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1984, spattera,   spatter,  sys1piosx, spatter,   system1_state, spattera, ROT0,   "Sega", "Spatter (315-5099)", GAME_SUPPORTS_SAVE )
 GAME( 1984, ssanchan,   spatter,  sys1piosx, spatter,   system1_state, spatter,  ROT0,   "Sega", "Sanrin San Chan (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pitfall2,   0,        sys1piox,  pitfall2,  system1_state, pitfall2, ROT0,   "Sega", "Pitfall II (315-5093)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pitfall2a,  pitfall2, sys1piox,  pitfall2,  system1_state, pitfall2, ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", GAME_SUPPORTS_SAVE )
