@@ -93,7 +93,6 @@ static UINT64 execute_if(symbol_table &table, void *ref, int params, const UINT6
 static UINT64 global_get(symbol_table &table, void *ref);
 static void global_set(symbol_table &table, void *ref, UINT64 value);
 
-static void execute_show(running_machine &machine, int ref, int params, const char **param);
 static void execute_help(running_machine &machine, int ref, int params, const char **param);
 static void execute_print(running_machine &machine, int ref, int params, const char **param);
 static void execute_printf(running_machine &machine, int ref, int params, const char **param);
@@ -268,7 +267,6 @@ void debug_command_init(running_machine &machine)
 	}
 
 	/* add all the commands */
-	debug_console_register_command(machine, "show",      CMDFLAG_NONE, 0, 0, 1, execute_show);
 	debug_console_register_command(machine, "help",      CMDFLAG_NONE, 0, 0, 1, execute_help);
 	debug_console_register_command(machine, "print",     CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_print);
 	debug_console_register_command(machine, "printf",    CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_printf);
@@ -670,39 +668,6 @@ static int debug_command_parameter_command(running_machine &machine, const char 
 /***************************************************************************
     COMMAND HELPERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    show infos of various kind
--------------------------------------------------*/
-
-static void execute_show(running_machine &machine, int ref, int params, const char *param[])
-{
-	class cpu_device *cpu;
-	static long long unsigned int last = 0uLL;
-
-	/* CPU is implicit */
-	if (!debug_command_parameter_cpu(machine, NULL, (device_t **) &cpu))
-		return;
-
-	if (params == 0)
-	{
-	        debug_console_printf(machine, "Show what?\n");
-	}
-	else if (params == 1)
-	{
-	        if (!strcmp(param[0], "clock"))
-	        {
-	                debug_console_printf(machine, "The clock is: %lld(0x%llx) and that is %lld(0x%llx) CPU clock cycles since last 'show clock' command\n", 
-					     cpu->total_cycles(), cpu->total_cycles(), cpu->total_cycles() - last, cpu->total_cycles() - last);
-			last = cpu->total_cycles();
-		}
-		else
-		{
-		  debug_console_printf(machine, "Unknown property %s. ", param[0]);
-		  debug_console_printf(machine, "Valid properties are: 'clock'\n");
-		}
-	}
-}
 
 /*-------------------------------------------------
     execute_help - execute the help command

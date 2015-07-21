@@ -13,18 +13,6 @@ guys
 
 <softwarelist name="vectrex" description="GCE Vectrex cartridges">
 
-	<software name="bouncer">
-		<description>Bouncer - things bouncing in a box</description>
-		<year>2015</year>
-		<publisher>Joakim Larsson Edstrom</publisher>
-		<part name="cart" interface="vectrex_cart">
-			<feature name="slot" value="vec_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="bouncer.bin" size="8192" crc="b2313487" sha1="1731e892da8945fe4945b43847d23960c581682a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="3dminest">
 		<description>3D Mine Storm</description>
 		<year>1983</year>

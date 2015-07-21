@@ -1457,19 +1457,6 @@ static const help_item static_help_list[] =
 		"\n"
 		"unmount cart\n"
 		"  Unmounts any file mounted on device named cart.\n"
-	},
-	{
-		"show",
-		"\n"
-		"  show <property>\n"
-		"\n"
-		"Shows the value(s) of a property.\nValid properties are:\n"
-		" clock - prints the total number of clockcycles consumed from reset and the diff from last time the command was issued.\n"
-		"\n"
-		"Examples:\n"
-		"\n"
-		"show clock\n"
-		" The clock is: 4816918(0x00498016) and that is 3(0x3) CPU clock cycles since last 'show clock' command\n\n"
 	}
 };
 
