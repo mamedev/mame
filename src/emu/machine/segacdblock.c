@@ -1107,9 +1107,8 @@ void segacdblock_device::cd_cmd_get_sector_number(UINT8 buffer_number)
 		}
 	}	
 
-	//printf("%d\n",m_dr[3]);
-	
-	set_flag(DRDY);
+	if(m_dr[3] != 0)
+		set_flag(DRDY);
 	set_flag(CMOK);
 }
 
