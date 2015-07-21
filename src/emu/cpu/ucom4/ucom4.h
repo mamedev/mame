@@ -216,8 +216,8 @@ protected:
 	void ram_w(UINT8 data);
 	void pop_stack();
 	void push_stack();
-	UINT8 input_r(int index);
-	void output_w(int index, UINT8 data);
+	virtual UINT8 input_r(int index);
+	virtual void output_w(int index, UINT8 data);
 
 	bool check_op_43();
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
@@ -322,6 +322,9 @@ class upd650_cpu_device : public ucom4_cpu_device
 {
 public:
 	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:	
+	virtual UINT8 input_r(int index);
 };
 
 
