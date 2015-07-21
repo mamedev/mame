@@ -922,8 +922,9 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 		case 2:
 			res = th<<6;
 			//  1 C B Right Left Down Up
+			//  WHP actually has a very specific code at 0x6015f30, doesn't like bits 0-1 active here ...
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>4)) & 0x30); // C & B
-			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0xf);
+			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0xc);
 			break;
 		case 1:
 			res = th<<6;
@@ -935,11 +936,10 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 			//  0 Start A 0 0    Down Up
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>6)) & 0x30); // Start & A
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0x3);
+			//  ... and actually wants bits 2 - 3 active here.
+			res|= 0xc;
 			break;
 	}
-
-	if(machine().input().code_pressed(KEYCODE_Z))
-		return machine().rand();
 	
 	return res;
 }
