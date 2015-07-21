@@ -21,7 +21,7 @@
 
 #define OPAMP(_name, _model)                                                   \
 		NET_REGISTER_DEV(OPAMP, _name)                                         \
-		NETDEV_PARAMI(_name, model, _model)
+		NETDEV_PARAMI(_name, MODEL, _model)
 
 #define LM3900(_name)                                                          \
 	SUBMODEL(opamp_lm3900, _name)

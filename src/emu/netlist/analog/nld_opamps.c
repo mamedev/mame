@@ -64,7 +64,7 @@ NETLIB_START(OPAMP)
 	register_output("VH", m_VH);
 	register_output("VREF", m_VREF);
 
-	register_param("model", m_model, "");
+	register_param("MODEL", m_model, "");
 
 	m_type = m_model.model_value("TYPE");
 

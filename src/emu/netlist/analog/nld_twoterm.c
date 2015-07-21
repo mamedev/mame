@@ -264,7 +264,7 @@ NETLIB_START(D)
 {
 	register_terminal("A", m_P);
 	register_terminal("K", m_N);
-	register_param("model", m_model, "");
+	register_param("MODEL", m_model, "");
 
 	m_D.save("m_D", *this);
 

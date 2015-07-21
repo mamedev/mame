@@ -78,8 +78,8 @@ NETLIST_START(dummy)
 	/* The opamp actually has an FPF of about 500k. This doesn't work here and causes oscillations.
 	 * FPF here therefore about half the Solver clock.
 	 */
-	PARAM(XU16.B.model, "MB3614_SLOW")
-	PARAM(XU17.C.model, "MB3614_SLOW")
+	PARAM(XU16.B.MODEL, "MB3614_SLOW")
+	PARAM(XU17.C.MODEL, "MB3614_SLOW")
 
 	OPTIMIZE_FRONTIER(C51.1, RES_K(20), 50)
 	OPTIMIZE_FRONTIER(R77.2, RES_K(20), 50)

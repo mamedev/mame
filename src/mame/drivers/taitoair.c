@@ -184,15 +184,14 @@ perhaps? The two writes seem to take only two values.
 
 ****************************************************************************/
 /*!
- @todo - Framebuffer DMA requires palette switch to be selected dynamically, see at first stage Course Select in Top Landing. 
+ @todo - Framebuffer DMA requires palette switch to be selected dynamically, see at first stage Course Select in Top Landing.
          My gut feeling is that 3d poly fill operation actually copies to internal buffer then a DMA op actually do the buffer-to-screen copy, including gradiation ROZ too;
 	   - Air Inferno: missing landing monitor camera (blackened);
 	   - Air Inferno: missing 3d HUD graphics;
 	   - Air Inferno: Expert course has wrong 3d geometry;
-	   - Air Inferno: Almost surely crashing during replay has missing smoke effect, looks quit odd atm.
+	   - Air Inferno: Almost surely crashing during replay has missing smoke effect, looks quite odd atm.
 	   - Top Landing: Night stages might have wrong priority for stars-above-sea;
 	   - Input limiters / analog thresholds for both games;
-	   - Special thanks to syq for being a cunt.
  */
 
 #include "emu.h"
@@ -355,9 +354,9 @@ WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
 		  [3] both games uses 0xb7, most likely a register setting.
 */
 WRITE16_MEMBER(taitoair_state::dma_regs_w)
-{	
+{
 	printf("%08x %04x\n",offset,data);
-	
+
 	if(offset == 0 && ACCESSING_BITS_8_15)
 	{
 		if(data == 0x1fff)
@@ -481,7 +480,7 @@ READ16_MEMBER(taitoair_state::dsp_muldiv_1_r)
 {
 	if(m_dsp_muldiv_c_1 == 0)
 		return 0xffff; /**< @todo true value? */
-	
+
 	return m_dsp_muldiv_a_1*m_dsp_muldiv_b_1/m_dsp_muldiv_c_1;
 }
 
@@ -504,7 +503,7 @@ READ16_MEMBER(taitoair_state::dsp_muldiv_2_r)
 {
 	if(m_dsp_muldiv_c_2 == 0)
 		return 0xffff; /**< @todo true value? */
-	
+
 	return m_dsp_muldiv_a_2*m_dsp_muldiv_b_2/m_dsp_muldiv_c_2;
 }
 

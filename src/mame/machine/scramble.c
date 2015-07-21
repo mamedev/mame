@@ -675,4 +675,9 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 
 	membank("rombank")->set_base            (m_harem_decrypted_data);
 	membank("rombank_decrypted")->set_base  (m_harem_decrypted_opcodes);
+
+	save_item(NAME(m_harem_decrypt_mode));
+	save_item(NAME(m_harem_decrypt_bit));
+	save_item(NAME(m_harem_decrypt_clk));
+	save_item(NAME(m_harem_decrypt_count));
 }

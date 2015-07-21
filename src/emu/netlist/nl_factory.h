@@ -62,35 +62,34 @@ namespace netlist
 		}
 	};
 
-	class factory_list_t
+	class factory_list_t : public phashmap_t<pstring, base_factory_t *>
 	{
 	public:
-		typedef plist_t<base_factory_t *> list_t;
-
-		factory_list_t();
+		factory_list_t(setup_t &m_setup);
 		~factory_list_t();
 
 		template<class _C>
 		ATTR_COLD void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			m_list.add(palloc(factory_t< _C >(name, classname, def_param)));
+			if (!add(name, palloc(factory_t< _C >(name, classname, def_param))))
+				error(pstring::sprintf("factory already contains %s", name.cstr()));
 		}
 
 		ATTR_COLD void register_device(base_factory_t *factory)
 		{
-			m_list.add(factory);
+			if (!add(factory->name(), factory))
+				error(pstring::sprintf("factory already contains %s", factory->name().cstr()));
 		}
 
 		//ATTR_COLD device_t *new_device_by_classname(const pstring &classname) const;
-		ATTR_COLD device_t *new_device_by_name(const pstring &name, setup_t &setup) const;
-		ATTR_COLD base_factory_t * factory_by_name(const pstring &name, setup_t &setup) const;
-
-		const list_t &list() { return m_list; }
+		ATTR_COLD device_t *new_device_by_name(const pstring &name);
+		ATTR_COLD base_factory_t * factory_by_name(const pstring &name);
 
 	private:
-		list_t m_list;
+		void error(const pstring &s);
 
+		setup_t &m_setup;
 	};
 
 }

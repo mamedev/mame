@@ -52,7 +52,7 @@ setup_t::setup_t(netlist_t *netlist)
 	, m_proxy_cnt(0)
 {
 	netlist->set_setup(this);
-	m_factory = palloc(factory_list_t);
+	m_factory = palloc(factory_list_t(*this));
 }
 
 void setup_t::init()
@@ -129,7 +129,7 @@ device_t *setup_t::register_dev(const pstring &classname, const pstring &name)
 	}
 	else
 	{
-		device_t *dev = factory().new_device_by_name(classname, *this);
+		device_t *dev = factory().new_device_by_name(classname);
 		//device_t *dev = factory().new_device_by_classname(classname);
 		if (dev == NULL)
 			netlist().error("Class %s not found!\n", classname.cstr());
@@ -235,7 +235,7 @@ void setup_t::register_object(device_t &dev, const pstring &name, object_t &obj)
 				else
 					term.init_object(dev, dev.name() + "." + name);
 
-				if (!(m_terminals.add(&term, false)==true))
+				if (!m_terminals.add(term.name(), &term))
 					netlist().error("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), term.name().cstr());
 				NL_VERBOSE_OUT(("%s %s\n", objtype_as_astr(term).cstr(), name.cstr()));
 			}
@@ -412,48 +412,53 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
-	core_terminal_t *ret;
+	int ret;
 
-	ret = m_terminals.find_by_name(tname);
+	ret = m_terminals.index_of(tname);
 	/* look for default */
-	if (ret == NULL)
+	if (ret < 0)
 	{
 		/* look for ".Q" std output */
-		pstring s = tname + ".Q";
-		ret = m_terminals.find_by_name(s);
+		ret = m_terminals.index_of(tname + ".Q");
 	}
-	if (ret == NULL && required)
+
+	core_terminal_t *term = (ret < 0 ? NULL : m_terminals.value_at(ret));
+
+	if (term == NULL && required)
 		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
-	if (ret != NULL)
+	if (term != NULL)
 		NL_VERBOSE_OUT(("Found input %s\n", tname.cstr()));
-	return ret;
+	return term;
 }
 
 core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, object_t::type_t atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
-	core_terminal_t *ret;
+	int ret;
 
-	ret = m_terminals.find_by_name(tname);
+	ret = m_terminals.index_of(tname);
 	/* look for default */
-	if (ret == NULL && atype == object_t::OUTPUT)
+	if (ret < 0 && atype == object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
-		pstring s = tname + ".Q";
-		ret = m_terminals.find_by_name(s);
+		ret = m_terminals.index_of(tname + ".Q");
 	}
-	if (ret == NULL && required)
+	if (ret < 0 && required)
 		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
-	if (ret != NULL && ret->type() != atype)
+
+	core_terminal_t *term = (ret < 0 ? NULL : m_terminals.value_at(ret));
+
+	if (term != NULL && term->type() != atype)
 	{
 		if (required)
 			netlist().error("object %s(%s) found but wrong type\n", terminal_in.cstr(), tname.cstr());
 		else
-			ret = NULL;
+			term = NULL;
 	}
-	if (ret != NULL)
+	if (term != NULL)
 		NL_VERBOSE_OUT(("Found input %s\n", tname.cstr()));
-	return ret;
+
+	return term;
 }
 
 param_t *setup_t::find_param(const pstring &param_in, bool required)
@@ -807,12 +812,13 @@ void setup_t::resolve_inputs()
 	netlist().log("looking for terminals not connected ...");
 	for (std::size_t i = 0; i < m_terminals.size(); i++)
 	{
-		if (!m_terminals[i]->has_net())
+		core_terminal_t *term = m_terminals.value_at(i);
+		if (!term->has_net())
 			errstr += pstring::sprintf("Found terminal %s without a net\n",
-					m_terminals[i]->name().cstr());
-		else if (m_terminals[i]->net().num_cons() == 0)
+					term->name().cstr());
+		else if (term->net().num_cons() == 0)
 			netlist().warning("Found terminal %s without connections",
-					m_terminals[i]->name().cstr());
+					term->name().cstr());
 	}
 	if (errstr != "")
 		netlist().error("%s", errstr.cstr());
@@ -861,7 +867,7 @@ void setup_t::start_devices()
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
-			device_t *nc = factory().new_device_by_name("LOG", *this);
+			device_t *nc = factory().new_device_by_name("LOG");
 			pstring name = "log_" + ll[i];
 			register_dev(nc, name);
 			register_link(name + ".I", ll[i]);

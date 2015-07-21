@@ -294,7 +294,7 @@ private:
 		SUB,
 		DIV,
 		PUSH_CONST,
-		PUSH_INPUT,
+		PUSH_INPUT
 	};
 
 	struct rpn_inst

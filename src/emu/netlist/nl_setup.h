@@ -127,9 +127,6 @@ namespace netlist
 			const pstring &name() const { return e1; }
 		};
 
-		//typedef pnamedlist_t<link_t> tagmap_nstring_t;
-		typedef pnamedlist_t<core_terminal_t *> tagmap_terminal_t;
-
 		setup_t(netlist_t *netlist);
 		~setup_t();
 
@@ -193,9 +190,6 @@ namespace netlist
 
 		bool is_library_item(const pstring &name) const { return m_lib.contains(name); }
 
-		/* not ideal, but needed for save_state */
-		tagmap_terminal_t  m_terminals;
-
 		void print_stats() const;
 
 		/* static support functions */
@@ -206,25 +200,6 @@ namespace netlist
 	protected:
 
 	private:
-
-		netlist_t *m_netlist;
-
-		phashmap_t<pstring, pstring> m_alias;
-		phashmap_t<pstring, param_t *>  m_params;
-		phashmap_t<pstring, pstring> m_params_temp;
-
-		plist_t<link_t> m_links;
-
-		factory_list_t *m_factory;
-
-		plist_t<pstring> m_models;
-
-		int m_proxy_cnt;
-
-		pstack_t<pstring> m_stack;
-		source_t::list_t m_sources;
-		plist_t<pstring> m_lib;
-
 
 		void connect_terminals(core_terminal_t &in, core_terminal_t &out);
 		void connect_input_output(core_terminal_t &in, core_terminal_t &out);
@@ -237,6 +212,25 @@ namespace netlist
 
 		const pstring resolve_alias(const pstring &name) const;
 		devices::nld_base_proxy *get_d_a_proxy(core_terminal_t &out);
+
+		netlist_t *m_netlist;
+
+		phashmap_t<pstring, pstring> m_alias;
+		phashmap_t<pstring, param_t *>  m_params;
+		phashmap_t<pstring, pstring> m_params_temp;
+		phashmap_t<pstring, core_terminal_t *> m_terminals;
+
+		plist_t<link_t> m_links;
+
+		factory_list_t *m_factory;
+
+		plist_t<pstring> m_models;
+
+		int m_proxy_cnt;
+
+		pstack_t<pstring> m_stack;
+		source_t::list_t m_sources;
+		plist_t<pstring> m_lib;
 
 #if 0
 		template <class T>

@@ -115,6 +115,7 @@ public:
 	DECLARE_DRIVER_INIT(seganinj);
 	DECLARE_DRIVER_INIT(gardia);
 	DECLARE_DRIVER_INIT(spatter);
+	DECLARE_DRIVER_INIT(spattera);
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	virtual void machine_start();
 	virtual void machine_reset();

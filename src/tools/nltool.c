@@ -105,6 +105,7 @@ public:
 		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
 		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
 		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
+		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
 		opt_help("h", "help",                 "display help", this)
 	{}
 
@@ -115,6 +116,7 @@ public:
 	poption_str_limit opt_type;
 	poption_str    opt_cmd;
 	poption_bool   opt_verb;
+	poption_bool   opt_quiet;
 	poption_bool   opt_help;
 };
 
@@ -171,7 +173,7 @@ class netlist_tool_t : public netlist::netlist_t
 public:
 
 	netlist_tool_t()
-	: netlist::netlist_t(), m_logs(""), m_verbose(false), m_setup(NULL)
+	: netlist::netlist_t(), m_opts(NULL), m_setup(NULL)
 	{
 	}
 
@@ -206,7 +208,7 @@ public:
 	void log_setup()
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
-		pstring_list_t ll(m_logs, ":");
+		pstring_list_t ll(m_opts ? m_opts->opt_logs() : "" , ":");
 		for (int i=0; i < ll.size(); i++)
 		{
 			pstring name = "log_" + ll[i];
@@ -215,9 +217,7 @@ public:
 		}
 	}
 
-	pstring m_logs;
-
-	bool m_verbose;
+	tool_options_t *m_opts;
 
 protected:
 
@@ -226,15 +226,18 @@ protected:
 		switch (level)
 		{
 			case NL_LOG:
-				if (m_verbose)
+				if (m_opts ? m_opts->opt_verb() : false)
 				{
 					vprintf(format, ap);
 					printf("\n");
 				}
 				break;
 			case NL_WARNING:
-				vprintf(format, ap);
-				printf("\n");
+				if (!(m_opts ? m_opts->opt_quiet() : false))
+				{
+					vprintf(format, ap);
+					printf("\n");
+				}
 				break;
 			case NL_ERROR:
 				vprintf(format, ap);
@@ -265,9 +268,8 @@ static void run(tool_options_t &opts)
 	netlist_tool_t nt;
 	osd_ticks_t t = osd_ticks();
 
+	nt.m_opts = &opts;
 	nt.init();
-	nt.m_logs = opts.opt_logs();
-	nt.m_verbose = opts.opt_verb();
 	nt.read_netlist(filetobuf(opts.opt_file()), opts.opt_name());
 	double ttr = opts.opt_ttr();
 
@@ -290,7 +292,7 @@ static void listdevices()
 {
 	netlist_tool_t nt;
 	nt.init();
-	const netlist::factory_list_t::list_t &list = nt.setup().factory().list();
+	const netlist::factory_list_t &list = nt.setup().factory();
 
 	nt.setup().register_source(palloc(netlist::source_proc_t("dummy", &netlist_dummy)));
 	nt.setup().include("dummy");
@@ -300,11 +302,11 @@ static void listdevices()
 
 	for (int i=0; i < list.size(); i++)
 	{
-		pstring out = pstring::sprintf("%-20s %s(<id>", list[i]->classname().cstr(),
-				list[i]->name().cstr() );
+		netlist::base_factory_t *f = list.value_at(i);
+		pstring out = pstring::sprintf("%-20s %s(<id>", f->classname().cstr(),
+				f->name().cstr() );
 		pstring terms("");
 
-		netlist::base_factory_t *f = list[i];
 		netlist::device_t *d = f->Create();
 		d->init(nt, pstring::sprintf("dummy%d", i));
 		d->start_dev();
@@ -318,18 +320,18 @@ static void listdevices()
 			terms += "," + inp;
 		}
 
-		if (list[i]->param_desc().startsWith("+"))
+		if (f->param_desc().startsWith("+"))
 		{
-			out += "," + list[i]->param_desc().substr(1);
+			out += "," + f->param_desc().substr(1);
 			terms = "";
 		}
-		else if (list[i]->param_desc() == "-")
+		else if (f->param_desc() == "-")
 		{
 			/* no params at all */
 		}
 		else
 		{
-			out += "," + list[i]->param_desc();
+			out += "," + f->param_desc();
 		}
 		out += ")";
 		printf("%s\n", out.cstr());

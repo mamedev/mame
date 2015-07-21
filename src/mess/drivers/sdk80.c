@@ -195,6 +195,10 @@ ROM_START( sdk80 )
 	/* 512-byte Signetics 2513 character generator ROM at location D2-D3 */
 	ROM_REGION(0x0200, "gfx1",0)
 	ROM_LOAD("s2513.d2", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee))
+
+	/* 256x4 PROM located on the video board, schematic location P7, to be moved into separate device later */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "6300__d7.p7",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS           INIT   COMPANY   FULLNAME  FLAGS */

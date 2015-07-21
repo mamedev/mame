@@ -55,7 +55,7 @@ NETLIB_NAME(Q)::~NETLIB_NAME(Q)()
 
 NETLIB_START(Q)
 {
-	register_param("model", m_model, "");
+	register_param("MODEL", m_model, "");
 }
 
 NETLIB_RESET(Q)

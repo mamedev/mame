@@ -2123,11 +2123,10 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_50MHz/3)   // clock?
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
