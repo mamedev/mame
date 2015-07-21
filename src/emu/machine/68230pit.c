@@ -46,8 +46,7 @@ const device_type PIT68230 = &device_creator<pit68230_device>;
 //-------------------------------------------------
 
 pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-        : device_t(mconfig, PIT68230, "Motorola 68230 PI/T", tag, owner, clock, "pit68230", __FILE__),
-	m_internal_clock(0.0)
+        : device_t(mconfig, PIT68230, "Motorola 68230 PI/T", tag, owner, clock, "pit68230", __FILE__)
 {
 }
 
@@ -63,6 +62,7 @@ void pit68230_device::device_reset()
   m_psrr = 0;
   m_paddr = 0;
   m_pbddr = 0;
+  m_pcddr = 0;
   m_pacr = 0;
   m_pbcr = 0;
   m_padr = 0;

@@ -56,7 +56,6 @@ protected:
 	virtual void device_reset();
 
 private:
-	double m_internal_clock;
         UINT8  m_pgcr;  // Port General Control register
 	UINT8  m_psrr;  // Port Service Request register
 	UINT8  m_paddr; // Port A Data Direction register
