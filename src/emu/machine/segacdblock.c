@@ -398,6 +398,9 @@ segacdblock_device::blockT *segacdblock_device::cd_alloc_block(UINT8 *blknum)
 {
 	INT32 i;
 
+	if(freeblocks == 0)
+		return (blockT *)NULL;
+
 	// search the 200 available blocks for a free one
 	for (i = 0; i < 200; i++)
 	{
@@ -405,11 +408,6 @@ segacdblock_device::blockT *segacdblock_device::cd_alloc_block(UINT8 *blknum)
 		{
 			//printf("%d\n",freeblocks);
 			freeblocks--;
-			if (freeblocks < 0)
-			{
-				//set_flag(BFUL);
-				return (blockT *)NULL;
-			}
 
 			blocks[i].size = m_SectorLengthIn;
 			*blknum = i;
