@@ -81,6 +81,9 @@ public:
 	bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
 	bool startsWith(const char *arg) const;
 
+	bool endsWith(const pstring &arg) const { return (this->right(arg.len()) == arg); }
+	bool endsWith(const char *arg) const { return endsWith(pstring(arg)); }
+
 	pstring replace(const pstring &search, const pstring &replace) const;
 
 	// these return nstring ...

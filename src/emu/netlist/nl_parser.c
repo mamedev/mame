@@ -196,7 +196,7 @@ void parser_t::net_truthtable_start()
 		else if (token.is(m_tok_TT_FAMILY))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_family = netlist::logic_family_desc_t::from_model(m_setup.get_model_str(get_string()));
+			ttd->m_family = m_setup.family_from_model(get_string());
 			require_token(m_tok_param_right);
 		}
 		else

@@ -134,8 +134,8 @@ NETLIB_UPDATE(extclock)
 NETLIB_START(logic_input)
 {
 	/* make sure we get the family first */
-	register_param("FAMILY", m_FAMILY, ".model FAMILY(TYPE=TTL)");
-	set_logic_family(logic_family_desc_t::from_model(m_FAMILY.Value()));
+	register_param("FAMILY", m_FAMILY, "FAMILY(TYPE=TTL)");
+	set_logic_family(netlist().setup().family_from_model(m_FAMILY.Value()));
 
 	register_output("Q", m_Q);
 	register_param("IN", m_IN, 0);

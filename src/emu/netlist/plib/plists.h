@@ -799,7 +799,7 @@ public:
 	V& value_at(const unsigned pos) { return m_values[pos].m_value; }
 	const V& value_at(const unsigned pos) const { return m_values[pos].m_value; }
 
-	V& key_at(const unsigned pos) const { return m_values[pos].m_key; }
+	V& key_at(const unsigned pos) { return m_values[pos].m_key; }
 private:
 
 	int get_idx(const K &key) const

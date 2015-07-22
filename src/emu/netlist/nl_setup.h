@@ -143,7 +143,7 @@ namespace netlist
 
 		void register_lib_entry(const pstring &name);
 
-		void register_model(const pstring &model);
+		void register_model(const pstring &model_in);
 		void register_alias(const pstring &alias, const pstring &out);
 		void register_dippins_arr(const pstring &terms);
 
@@ -158,8 +158,6 @@ namespace netlist
 
 		void register_frontier(const pstring attach, const double r_IN, const double r_OUT);
 		void remove_connections(const pstring attach);
-
-		const pstring get_model_str(const pstring val) const;
 
 		void register_object(device_t &dev, const pstring &name, object_t &obj);
 		bool connect(core_terminal_t &t1, core_terminal_t &t2);
@@ -192,11 +190,13 @@ namespace netlist
 
 		void print_stats() const;
 
-		/* static support functions */
+		/* model / family related */
 
-		static const pstring model_value_str(const pstring &model_str, const pstring &entity, const pstring defval);
-		static nl_double model_value(const pstring &model_str, const pstring &entity, const nl_double defval);
+		logic_family_desc_t *family_from_model(const pstring &model);
+		const pstring model_value_str(model_map_t &map, const pstring &entity);
+		nl_double model_value(model_map_t &map, const pstring &entity);
 
+		void model_parse(const pstring &model, model_map_t &map);
 	protected:
 
 	private:
@@ -224,7 +224,7 @@ namespace netlist
 
 		factory_list_t *m_factory;
 
-		plist_t<pstring> m_models;
+		phashmap_t<pstring, pstring> m_models;
 
 		int m_proxy_cnt;
 
