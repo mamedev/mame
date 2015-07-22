@@ -857,8 +857,17 @@ void segacdblock_device::cd_cmd_play_disc()
 	}
 	else
 	{
-		printf("track mode\n");
-		debugger_break(machine());
+		
+		m_CurrentTrack = (start_pos >> 8) & 0xff;
+		printf("track mode %d\n",m_CurrentTrack);
+
+		if(m_CurrentTrack == 0)
+			debugger_break(machine());
+		else
+		{
+			m_FAD = cdrom_get_track_start(cdrom, m_CurrentTrack-1);
+			// cdda
+		}
 	}
 	
 	if(end_pos & 0x800000)
@@ -872,8 +881,14 @@ void segacdblock_device::cd_cmd_play_disc()
 	}
 	else
 	{
-		printf("resume pause state\n");
-		debugger_break(machine());
+		printf("resume pause state %08x\n",end_pos);
+		if(end_pos == 0xffffff)
+			debugger_break(machine());
+		else
+		{
+			/**< @todo m_FAD too? */
+			m_FADEnd = cdrom_get_track_start(cdrom, m_CurrentTrack) - m_FAD;
+		}
 	}
 	status_change = (m_cd_state & 0x0f00) != CD_STAT_PLAY;
 	
@@ -1829,7 +1844,6 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				else
 				{
 					p_ok = 1; // TODO
-					
 					//machine().device<cdda_device>("cdda")->start_audio(cd_curfad, 1);
 				}
 			}
