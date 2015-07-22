@@ -862,7 +862,7 @@ void saturn_state::cd_exec_command( void )
 					//printf("Partition %08x %04x\n",bufnum,cr4);
 				}
 
-				printf("%04x\n",cr4);
+				//printf("%04x\n",cr4);
 				if(cr4 == 0)
 					hirqreg |= (CMOK);
 				else
