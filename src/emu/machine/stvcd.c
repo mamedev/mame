@@ -862,7 +862,11 @@ void saturn_state::cd_exec_command( void )
 					//printf("Partition %08x %04x\n",bufnum,cr4);
 				}
 
-				hirqreg |= (CMOK|DRDY);
+				//printf("%04x\n",cr4);
+				if(cr4 == 0)
+					hirqreg |= (CMOK);
+				else
+					hirqreg |= (CMOK|DRDY);								
 				status_type = 1;
 			}
 			break;
@@ -1908,6 +1912,7 @@ void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
 		cmd_pending |= 1;
+		sh1_timer->adjust(attotime::never);
 		break;
 	case 0x001c:
 	case 0x001e:
@@ -2359,6 +2364,8 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 			{
 				printf("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
 				match = 0;
+				cd_stat = CD_STAT_PAUSE;
+				cd_curfad--;
 				//lastbuf = flt->condfalse;
 				//flt = &filters[lastbuf];
 			}
