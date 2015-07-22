@@ -11,9 +11,10 @@
 
 enum
 {
-	C352_DIVIDER_228 = 0,
-	C352_DIVIDER_288 = 1,
-	C352_DIVIDER_332 = 2
+	C352_DIVIDER_S11 = 228, // System 11
+	C352_DIVIDER_S22 = 288, // System 22, Super 22, NB, ND, FL
+	C352_DIVIDER_S23 = 296, // System 23, Super 23
+	C352_DIVIDER_S12 = 332  // System 12
 };
 
 //**************************************************************************
