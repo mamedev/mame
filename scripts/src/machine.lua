@@ -188,7 +188,19 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/68561mpcc.h,MACHINES["68561MPCC"] = true
+--@src/emu/machine/68230pit.h,MACHINES["PIT68230"] = true
+---------------------------------------------------
+
+if (MACHINES["PIT68230"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/68230pit.c",
+		MAME_DIR .. "src/emu/machine/68230pit.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/68561mpcc.h,MACHINES += 68561MPCC
 ---------------------------------------------------
 
 if (MACHINES["68561MPCC"]~=null) then

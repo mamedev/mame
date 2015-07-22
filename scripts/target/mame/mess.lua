@@ -485,6 +485,7 @@ MACHINES["PCCARD"] = true
 MACHINES["PCF8593"] = true
 MACHINES["PCKEYBRD"] = true
 MACHINES["PIC8259"] = true
+MACHINES["PIT68230"] = true
 MACHINES["PIT8253"] = true
 MACHINES["PLA"] = true
 --MACHINES["PROFILE"] = true
@@ -722,6 +723,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"exidy",
 		"fairch",
 		"fidelity",
+		"force",
 		"fujitsu",
 		"funtech",
 		"galaxy",
@@ -1507,6 +1509,11 @@ createMESSProjects(_target, _subtarget, "fidelity")
 files {          
 	MAME_DIR .. "src/mess/drivers/csc.c",       
 	MAME_DIR .. "src/mess/drivers/fidelz80.c",  
+}
+
+createMESSProjects(_target, _subtarget, "force")
+files {          
+	MAME_DIR .. "src/mess/drivers/force68k.c",  
 }
 
 createMESSProjects(_target, _subtarget, "fujitsu")
