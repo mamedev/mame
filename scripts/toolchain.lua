@@ -24,6 +24,7 @@ newoption {
 		{ "mingw-clang",   "MinGW (clang compiler)" },
 		{ "nacl",          "Native Client"          },
 		{ "nacl-arm",      "Native Client - ARM"    },
+		{ "netbsd",        "NetBSD"                },
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "pnacl",         "Native Client - PNaCl"  },
@@ -145,6 +146,10 @@ function toolchain(_buildDir, _subDir)
 
 		if "freebsd" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-freebsd")
+		end
+
+		if "netbsd" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-netbsd")
 		end
 
 		if "ios-arm" == _OPTIONS["gcc"] then
@@ -590,7 +595,29 @@ function toolchain(_buildDir, _subDir)
 	
 	configuration { "freebsd", "x64", "Debug" }
 		targetdir (_buildDir .. "freebsd" .. "/bin/x64/Debug")
-		
+
+	configuration { "netbsd", "x32" }
+		objdir (_buildDir .. "netbsd" .. "/obj")
+		buildoptions {
+			"-m32",
+		}
+	configuration { "netbsd", "x32", "Release" }
+		targetdir (_buildDir .. "netbsd" .. "/bin/x32/Release")
+
+	configuration { "netbsd", "x32", "Debug" }
+		targetdir (_buildDir .. "netbsd" .. "/bin/x32/Debug")
+
+	configuration { "netbsd", "x64" }
+		objdir (_buildDir .. "netbsd" .. "/obj")
+		buildoptions {
+			"-m64",
+		}
+	configuration { "netbsd", "x64", "Release" }
+		targetdir (_buildDir .. "netbsd" .. "/bin/x64/Release")
+
+	configuration { "netbsd", "x64", "Debug" }
+		targetdir (_buildDir .. "netbsd" .. "/bin/x64/Debug")
+
 	configuration { "android-*" }
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/include",

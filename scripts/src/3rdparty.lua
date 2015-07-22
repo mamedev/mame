@@ -534,6 +534,13 @@ project "portmidi"
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
 		}
 	end
+	if _OPTIONS["targetos"]=="netbsd" then
+		files {
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
+			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
+		}
+	end
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmac.c",
@@ -587,6 +594,11 @@ project "bgfx"
 		}
 		
 	configuration { "freebsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "netbsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
