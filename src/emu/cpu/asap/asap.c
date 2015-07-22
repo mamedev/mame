@@ -343,7 +343,7 @@ offs_t asap_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 
 inline UINT32 asap_device::readop(offs_t pc)
 {
-	return m_direct->read_decrypted_dword(pc);
+	return m_direct->read_dword(pc);
 }
 
 

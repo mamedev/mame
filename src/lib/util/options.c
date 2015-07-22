@@ -709,10 +709,15 @@ void core_options::remove_entry(core_options::entry &delentry)
 	m_entrylist.remove(delentry);
 }
 
-
-//-------------------------------------------------
-//  copyfrom - copy options from another set
-//-------------------------------------------------
+/**
+ * @fn  void core_options::copyfrom(const core_options &src)
+ *
+ * @brief   -------------------------------------------------
+ *            copyfrom - copy options from another set
+ *          -------------------------------------------------.
+ *
+ * @param   src Source for the.
+ */
 
 void core_options::copyfrom(const core_options &src)
 {
@@ -724,12 +729,21 @@ void core_options::copyfrom(const core_options &src)
 		append_entry(*global_alloc(entry(curentry->name(), curentry->description(), curentry->flags(), curentry->default_value())));
 }
 
-
-//-------------------------------------------------
-//  validate_and_set_data - make sure the data is
-//  of the appropriate type and within range,
-//  then set it
-//-------------------------------------------------
+/**
+ * @fn  bool core_options::validate_and_set_data(core_options::entry &curentry, const char *newdata, int priority, std::string &error_string)
+ *
+ * @brief   -------------------------------------------------
+ *            validate_and_set_data - make sure the data is of the appropriate type and within
+ *            range, then set it
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  curentry        The curentry.
+ * @param   newdata                 The newdata.
+ * @param   priority                The priority.
+ * @param [in,out]  error_string    The error string.
+ *
+ * @return  true if it succeeds, false if it fails.
+ */
 
 bool core_options::validate_and_set_data(core_options::entry &curentry, const char *newdata, int priority, std::string &error_string)
 {

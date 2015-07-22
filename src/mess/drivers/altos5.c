@@ -430,7 +430,7 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("z80sio", z80dart_device, ctsb_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", altos5_state, ctc_tick, attotime::from_hz(XTAL_8MHz / 4))
-	MCFG_FD1797x_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_FD1797_ADD("fdc", XTAL_8MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(altos5_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("z80dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)

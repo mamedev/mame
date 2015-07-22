@@ -14,6 +14,7 @@
 #ifndef __RSP_H__
 #define __RSP_H__
 
+#include "emu.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 
@@ -133,7 +134,6 @@ class rsp_device : public cpu_device
 	friend class rsp_frontend;
 	friend class rsp_cop2;
 	friend class rsp_cop2_drc;
-	friend class rsp_cop2_simd;
 
 public:
 	// construction/destruction
@@ -162,6 +162,8 @@ public:
 	void ccfunc_unimplemented_opcode();
 	void ccfunc_sp_set_status_cb();
 	void ccfunc_unimplemented();
+
+	UINT8* get_dmem() { return m_dmem8; }
 
 protected:
 	// device-level overrides

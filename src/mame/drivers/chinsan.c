@@ -87,6 +87,7 @@ public:
 	required_device<msm5205_device> m_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	UINT8 *m_decrypted_opcodes;
 };
 
 
@@ -139,6 +140,7 @@ UINT32 chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind16 
 WRITE8_MEMBER(chinsan_state::ctrl_w)
 {
 	membank("bank1")->set_entry(data >> 6);
+	membank("bank1d")->set_entry(data >> 6);
 }
 
 WRITE8_MEMBER(chinsan_state::ym_port_w1)
@@ -246,6 +248,11 @@ static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("video")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, chinsan_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
@@ -564,7 +571,9 @@ WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
 
 void chinsan_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
+	membank("bank0d")->set_base(m_decrypted_opcodes);
+	membank("bank1d")->configure_entries(0, 4, m_decrypted_opcodes + 0x8000, 0x4000);
 
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_port_select));
@@ -589,6 +598,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_CPU_ADD("maincpu", Z80,10000000/2)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state,  irq0_line_hold)
 
 
@@ -633,10 +643,10 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( chinsan )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* encrypted code / data */
+	ROM_REGION( 0x18000, "maincpu", 0 ) /* encrypted code / data */
 	ROM_LOAD( "mm00.7d", 0x00000, 0x08000, CRC(f7a4414f) SHA1(f65223b2928f610ab97fda2f2c008806cf2420e5) )
 	ROM_CONTINUE(        0x00000, 0x08000 ) // first half is blank
-	ROM_LOAD( "mm01.8d", 0x10000, 0x10000, CRC(c69ddbf5) SHA1(9533365c1761b113174d53a2e23ce6a7baca7dfe) )
+	ROM_LOAD( "mm01.8d", 0x08000, 0x10000, CRC(c69ddbf5) SHA1(9533365c1761b113174d53a2e23ce6a7baca7dfe) )
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-5012.key",  0x0000, 0x2000, CRC(2ecfb132) SHA1(3110ef82080dd7d908cc6bf34c6643f187f90b29) )
@@ -667,7 +677,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chinsan_state,chinsan)
 {
-	mc8123_decrypt_rom(machine(), "maincpu", "user1", "bank1", 4);
+	m_decrypted_opcodes = auto_alloc_array(machine(), UINT8, 0x18000);
+	mc8123_decode(memregion("maincpu")->base(), m_decrypted_opcodes, memregion("user1")->base(), 0x18000);
 }
 
 

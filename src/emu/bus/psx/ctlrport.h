@@ -39,7 +39,7 @@ protected:
 	enum
 	{
 		QUERY_PAD_STATE = 0x42,
-		CONFIG_MODE = 0x43,
+		CONFIG_MODE = 0x43
 	};
 
 private:

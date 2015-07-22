@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x04051000, 0x040511ff) AM_READWRITE16(pal_r, pal_w, 0xffffffff)
 	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(vregs_r, vregs_w, 0xffffffff)
 	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
-	AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
+//	AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
 //  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
 	AM_RANGE(0x06000000, 0x061fffff) AM_READ(cart_r)
 	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
@@ -504,7 +504,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",SH2,8000000)
+	MCFG_CPU_ADD("maincpu",SH2A,8000000)
 	MCFG_CPU_PROGRAM_MAP(casloopy_map)
 
 //  MCFG_CPU_ADD("subcpu",V60,8000000)

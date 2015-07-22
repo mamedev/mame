@@ -35,7 +35,7 @@ protected:
 		T10MMC_CMD_PAUSE_RESUME = 0x4b,
 		T10MMC_CMD_STOP_PLAY_SCAN = 0x4e,
 		T10MMC_CMD_PLAY_AUDIO_12 = 0xa5,
-		T10MMC_CMD_SET_CD_SPEED = 0xbb,
+		T10MMC_CMD_SET_CD_SPEED = 0xbb
 	};
 
 	enum toc_format_t

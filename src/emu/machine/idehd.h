@@ -107,7 +107,7 @@ protected:
 
 	enum
 	{
-		TID_NULL = TID_BUSY + 1,
+		TID_NULL = TID_BUSY + 1
 	};
 
 private:

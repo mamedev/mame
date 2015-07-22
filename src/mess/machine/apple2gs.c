@@ -1772,42 +1772,6 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, UIN
 
 
 
-DIRECT_UPDATE_MEMBER(apple2gs_state::apple2gs_opbase)
-{
-	UINT8 *opptr = NULL;
-	int slot;
-
-	if (((address & 0xFEF000) == 0x00C000) || ((address & 0xFEF000) == 0xE0C000))
-	{
-		if ((m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
-		{
-			opptr = &m_ram->pointer()[address];
-		}
-		else if ((address & 0x000F00) == 0x000000)
-		{
-			if (((address & 0xFF) >= 0x71) && ((address & 0xFF) <= 0x7F))
-				opptr = apple2gs_getslotmem(address);
-		}
-		else
-		{
-			slot = (address & 0x000F00) / 0x100;
-
-			if ((slot > 7) || ((m_sltromsel & (1 << slot)) == 0))
-				opptr = apple2gs_getslotmem(address);
-		}
-
-		if (opptr != NULL)
-		{
-			direct.explicit_configure(address, address, ~0, opptr - address);
-
-			address = ~0;
-		}
-	}
-	return address;
-}
-
-
-
 READ8_MEMBER( apple2gs_state::apple2gs_00Cxxx_r ) { return apple2gs_xxCxxx_r(space, offset | 0x00C000); }
 READ8_MEMBER( apple2gs_state::apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(space, offset | 0x01C000); }
 READ8_MEMBER( apple2gs_state::apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(space, offset | 0xE0C000); }
@@ -1910,7 +1874,6 @@ void apple2gs_state::apple2gs_setup_memory()
 	space.install_write_handler(0xe0c000, 0xe0cfff, write8_delegate(FUNC(apple2gs_state::apple2gs_E0Cxxx_w),this));
 	space.install_read_handler(0xe1c000, 0xe1cfff, read8_delegate(FUNC(apple2gs_state::apple2gs_E1Cxxx_r),this));
 	space.install_write_handler(0xe1c000, 0xe1cfff, write8_delegate(FUNC(apple2gs_state::apple2gs_E1Cxxx_w),this));
-	space.set_direct_update_handler(direct_update_delegate(FUNC(apple2gs_state::apple2gs_opbase), this));
 
 
 	/* install aux memory writes (for shadowing) */

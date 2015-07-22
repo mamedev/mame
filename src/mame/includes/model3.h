@@ -22,14 +22,6 @@ struct cached_texture
 	rgb_t       data[1];
 };
 
-struct m3_plane
-{
-	float x;
-	float y;
-	float z;
-	float d;
-};
-
 struct m3_vertex
 {
 	float x;
@@ -47,9 +39,11 @@ struct m3_clip_vertex
 	float x;
 	float y;
 	float z;
+	float w;
 	float u;
 	float v;
 	float i;
+	float s;
 };
 
 struct m3_triangle
@@ -149,7 +143,7 @@ public:
 	UINT8 m_id_data[32];
 	INT32 m_id_size;
 	int m_tdo;
-	UINT8 m_layer_priority;
+	UINT16 m_layer_priority;
 	UINT32 m_layer_modulate_r;
 	UINT32 m_layer_modulate_g;
 	UINT32 m_layer_modulate_b;
@@ -175,12 +169,13 @@ public:
 	int m_list_depth;
 	MATRIX *m_matrix_stack;
 	MATRIX m_coordinate_system;
-	float m_viewport_focal_length;
-	int m_viewport_region_x;
-	int m_viewport_region_y;
-	int m_viewport_region_width;
-	int m_viewport_region_height;
-	m3_plane m_clip_plane[5];
+	MATRIX m_projection_matrix;
+	float m_viewport_x;
+	float m_viewport_y;
+	float m_viewport_width;
+	float m_viewport_height;
+	float m_viewport_near;
+	float m_viewport_far;
 	UINT32 m_matrix_base_address;
 	cached_texture *m_texcache[2][1024/32][2048/32];
 
@@ -249,6 +244,7 @@ public:
 	DECLARE_DRIVER_INIT(daytona2);
 	DECLARE_DRIVER_INIT(eca);
 	DECLARE_DRIVER_INIT(srally2);
+	DECLARE_DRIVER_INIT(harleya);
 	DECLARE_DRIVER_INIT(skichamp);
 	DECLARE_DRIVER_INIT(spikeofe);
 	DECLARE_DRIVER_INIT(scud);
@@ -302,11 +298,12 @@ public:
 	void reset_triangle_buffers();
 	m3_triangle* push_triangle(bool alpha);
 	void draw_layers(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int bitdepth, int sx, int sy);
+	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int sx, int sy, int prio);
 	void draw_3d_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
 	cached_texture *get_texture(int page, int texx, int texy, int texwidth, int texheight, int format);
 	inline void write_texture16(int xpos, int ypos, int width, int height, int page, UINT16 *data);
+	inline void write_texture8(int xpos, int ypos, int width, int height, int page, int upper, int lower, UINT16 *data);
 	void real3d_upload_texture(UINT32 header, UINT32 *data);
 	void init_matrix_stack();
 	void get_top_matrix(MATRIX *out);
@@ -316,6 +313,7 @@ public:
 	void translate_matrix_stack(float x, float y, float z);
 	void draw_model(UINT32 addr);
 	UINT32 *get_memory_pointer(UINT32 address);
+	void set_projection(float left, float right, float top, float bottom, float near, float far);
 	void load_matrix(int matrix_num, MATRIX *out);
 	void traverse_list4(int lod_num, UINT32 address);
 	void traverse_list(UINT32 address);

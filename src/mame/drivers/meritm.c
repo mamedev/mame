@@ -301,10 +301,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::meritm_interrupt)
 
 	if((scanline % 2) == 0)
 	{
-		m_v9938_0->set_resolution(RENDER_HIGH);
 		m_v9938_0->interrupt();
-
-		m_v9938_1->set_resolution(RENDER_HIGH);
 		m_v9938_1->interrupt();
 	}
 }
@@ -372,12 +369,12 @@ void meritm_state::meritm_crt250_switch_banks(  )
 
 	//logerror( "CRT250: Switching banks: rom = %0x (bank = %x)\n", rombank, m_bank );
 	membank("bank1")->set_entry(rombank );
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_crt250_bank_w)
 {
 	meritm_crt250_switch_banks();
-};
+}
 
 void meritm_state::meritm_switch_banks(  )
 {
@@ -391,19 +388,19 @@ void meritm_state::meritm_switch_banks(  )
 	membank("bank1")->set_entry(rombank );
 	membank("bank2")->set_entry(rombank | 0x01);
 	membank("bank3")->set_entry(rambank);
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
 {
 	m_psd_a15 = data;
 	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, space.device().safe_pc() );
 	meritm_switch_banks();
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_bank_w)
 {
 	meritm_switch_banks();
-};
+}
 
 /*************************************
  *
@@ -416,13 +413,13 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_questions_lo_w)
 {
 	m_questions_loword_address &= 0xff00;
 	m_questions_loword_address |= data;
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_crt250_questions_hi_w)
 {
 	m_questions_loword_address &= 0x00ff;
 	m_questions_loword_address |= (data << 8);
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
 {
@@ -466,7 +463,7 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
 		logerror( "Reading question byte at %06X\n", questions_address | m_questions_loword_address);
 		*dst = memregion("extra")->base()[questions_address | m_questions_loword_address];
 	}
-};
+}
 
 
 /*************************************
@@ -490,7 +487,7 @@ WRITE8_MEMBER(meritm_state::meritm_ds1644_w)
 		}
 		//logerror( "Writing RTC, reg = %d, data = %x\n", offset, data);
 	}
-};
+}
 
 UINT8 meritm_state::binary_to_BCD(UINT8 data)
 {
@@ -517,7 +514,7 @@ READ8_MEMBER(meritm_state::meritm_ds1644_r)
 		m_ram[0x7fff] = binary_to_BCD(systime.local_time.year % 100);
 	}
 	return m_ram[rambank*0x2000 + 0x1ff8 + offset];
-};
+}
 
 /*************************************
  *
@@ -863,7 +860,7 @@ READ8_MEMBER(meritm_state::meritm_8255_port_c_r)
 {
 	//logerror( "8255 port C read\n" );
 	return 0xff;
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
 {
@@ -891,7 +888,7 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
 WRITE8_MEMBER(meritm_state::meritm_ay8930_port_b_w)
 {
 	// lamps
-};
+}
 
 /*************************************
  *
@@ -917,7 +914,7 @@ READ8_MEMBER(meritm_state::meritm_audio_pio_port_a_r)
 	*/
 
 	return m_vint;
-};
+}
 
 READ8_MEMBER(meritm_state::meritm_audio_pio_port_b_r)
 {
@@ -937,7 +934,7 @@ READ8_MEMBER(meritm_state::meritm_audio_pio_port_b_r)
 	*/
 
 	return m_ds1204->read_dq();
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_a_w)
 {
@@ -958,7 +955,7 @@ WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_a_w)
 
 	m_bank = (data & 7) | ((data >> 2) & 0x18);
 	//logerror("Writing BANK with %x (raw = %x)\n", m_bank, data);
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_b_w)
 {
@@ -980,7 +977,7 @@ WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_b_w)
 	m_ds1204->write_rst((data >> 2) & 1);
 	m_ds1204->write_clk((data >> 1) & 1);
 	m_ds1204->write_dq(data & 0x01);
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_io_pio_port_a_w)
 {
@@ -998,7 +995,7 @@ WRITE8_MEMBER(meritm_state::meritm_io_pio_port_a_w)
 	    7       J3 PE7
 
 	*/
-};
+}
 
 WRITE8_MEMBER(meritm_state::meritm_io_pio_port_b_w)
 {
@@ -1016,7 +1013,7 @@ WRITE8_MEMBER(meritm_state::meritm_io_pio_port_b_w)
 	    7       J3 PF7
 
 	*/
-};
+}
 
 static const z80_daisy_config meritm_daisy_chain[] =
 {
@@ -1031,7 +1028,7 @@ MACHINE_START_MEMBER(meritm_state,merit_common)
 	m_z80pio_0->strobe_b(1);
 	m_z80pio_1->strobe_a(1);
 	m_z80pio_1->strobe_b(1);
-};
+}
 
 void meritm_state::machine_start()
 {
@@ -1041,13 +1038,13 @@ void meritm_state::machine_start()
 	MACHINE_START_CALL_MEMBER(merit_common);
 	save_item(NAME(m_bank));
 
-};
+}
 
 MACHINE_START_MEMBER(meritm_state,meritm_crt250_questions)
 {
 	meritm_state::machine_start();
 	save_item(NAME(m_questions_loword_address));
-};
+}
 
 MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
 {
@@ -1069,7 +1066,7 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 	save_item(NAME(m_bank));
 	save_item(NAME(m_psd_a15));
 	save_pointer(NAME(m_ram), 0x8000);
-};
+}
 
 // from MSX2 driver, may be not accurate for merit games
 #define MSX2_XBORDER_PIXELS     16
@@ -2277,7 +2274,7 @@ ROM_END
 DRIVER_INIT_MEMBER(meritm_state,megat3te)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
-};
+}
 
 /* CRT-250 */
 GAME( 1987, americna,  0,        meritm_crt250, americna,  driver_device, 0,        ROT0, "Merit", "Americana (9131-00)", GAME_IMPERFECT_GRAPHICS )

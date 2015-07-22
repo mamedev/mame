@@ -56,7 +56,7 @@ protected:
 			TYPE_INS8250A,
 			TYPE_NS16450,
 			TYPE_NS16550,
-			TYPE_NS16550A,
+			TYPE_NS16550A
 	};
 	int m_device_type;
 	struct {

@@ -47,7 +47,11 @@
 #define luaL_openlib(L,name,reg,nup) luaL_setfuncs(L,reg,nup)
 #endif
 
+#ifndef USE_SYSTEM_SQLITE
 #include "sqlite3/sqlite3.h"
+#else
+#include <sqlite3.h>
+#endif
 
 /* compile time features */
 #if !defined(SQLITE_OMIT_PROGRESS_CALLBACK)
@@ -260,7 +264,7 @@ static int dbvm_tostring(lua_State *L) {
 	if (svm->vm == NULL)
 		strcpy(buff, "closed");
 	else
-		sprintf(buff, "%p", svm);
+		sprintf(buff, "%p", (void *)svm);
 	lua_pushfstring(L, "sqlite virtual machine (%s)", buff);
 	return 1;
 }
@@ -743,7 +747,7 @@ static int lcontext_tostring(lua_State *L) {
 	if (ctx->ctx == NULL)
 		strcpy(buff, "closed");
 	else
-		sprintf(buff, "%p", ctx->ctx);
+		sprintf(buff, "%p", (void *) ctx->ctx);
 	lua_pushfstring(L, "sqlite function context (%s)", buff);
 	return 1;
 }

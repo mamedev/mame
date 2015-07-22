@@ -212,6 +212,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, angelkds_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, angelkds_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP // 00 on start-up, not again
@@ -628,6 +633,12 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( spcpostn, angelkds )
+	/* encryption */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
 /*** Rom Loading
 
  "maincpu" for the main code
@@ -643,7 +654,7 @@ MACHINE_CONFIG_END
 
 ROM_START( angelkds )
 	/* Nasco X090-PC-A  (Sega 837-6600) */
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "11428.c10",    0x00000, 0x08000, CRC(90daacd2) SHA1(7e50ad1cbed0c1e6bad04ef1611cad25538c905f) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* Banked Code */
@@ -690,7 +701,7 @@ ROM_END
 
 ROM_START( spcpostn )
 	/* X090-PC-A 171-5383 */
-	ROM_REGION( 2*0x10000, "maincpu", 0 ) /* D317-0005 (NEC Z80 Custom) */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* D317-0005 (NEC Z80 Custom) */
 	ROM_LOAD( "epr10125.c10", 0x00000, 0x08000, CRC(bffd38c6) SHA1(af02907124343ddecd21439d25f1ebb81ef9f51a) ) /* encrypted */
 
 	ROM_REGION( 0x28000, "user1", 0 ) /* Banked Code */
@@ -736,10 +747,12 @@ DRIVER_INIT_MEMBER(angelkds_state,spcpostn)
 {
 	UINT8 *RAM = memregion("user1")->base();
 
-	sega_317_0005_decode(machine(), "maincpu");
+	// 317-0005
+	sega_decode_317(memregion("maincpu")->base(), m_decrypted_opcodes, 1);
+
 	membank("bank1")->configure_entries(0, 10, &RAM[0x0000], 0x4000);
 }
 
 
 GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds_state, angelkds,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     GAME_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
-GAME( 1986, spcpostn, 0, angelkds, spcpostn, angelkds_state, spcpostn,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , GAME_SUPPORTS_SAVE) /* encrypted */
+GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, spcpostn,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , GAME_SUPPORTS_SAVE) /* encrypted */

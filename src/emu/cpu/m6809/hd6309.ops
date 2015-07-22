@@ -14,9 +14,6 @@ MAIN:
 	// opcode fetch
 	@m_opcode = read_opcode();
 
-	// burn delay loops
-	burn_any_delay_loops();
-
 	// dispatch opcode
 	switch(m_opcode)
 	{

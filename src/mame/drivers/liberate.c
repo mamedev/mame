@@ -263,6 +263,10 @@ static ADDRESS_MAP_START( liberate_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, liberate_state )
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( prosoccr_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
@@ -373,54 +377,43 @@ static INPUT_PORTS_START( generic_input )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW1:5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW1:6")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, "Manufacturer" )
+	PORT_DIPNAME( 0x80, 0x00, "Manufacturer" ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x00, "Data East USA" )
 	PORT_DIPSETTING(    0x80, "Data East Corporation" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" ) PORT_DIPLOCATION("DSW2:3,4")
+	PORT_DIPSETTING(    0x00, "20000 only" )
+	PORT_DIPSETTING(    0x0c, "20000, every 40000 after" )
+	PORT_DIPSETTING(    0x08, "30000, every 50000 after" )
+	PORT_DIPSETTING(    0x04, "50000, every 70000 after" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW2:8")
 
 	PORT_START("TILT")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
@@ -437,25 +430,10 @@ static INPUT_PORTS_START( boomrang )
 	PORT_INCLUDE( generic_input )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" )
-	PORT_DIPSETTING(    0x00, "20K Only" )
-	PORT_DIPSETTING(    0x0c, "20K & Every 30K" )
-	PORT_DIPSETTING(    0x08, "30K & Every 50K" )
-	PORT_DIPSETTING(    0x04, "50K & Every 70K" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Invincibility" ) /* Manual calls it "Hit Check Of Boomer" */
+	PORT_DIPNAME( 0x80, 0x80, "Invincibility" ) PORT_DIPLOCATION("DSW2:8") /* Manual calls it "Hit Check Of Boomer" */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -464,22 +442,17 @@ static INPUT_PORTS_START( kamikcab )
 	PORT_INCLUDE( generic_input )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" )
-	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_DIPSETTING(    0x0c, "20000 Every 30000" )
-	PORT_DIPSETTING(    0x08, "30000 Every 40000" )
-	PORT_DIPSETTING(    0x04, "40000 Every 50000" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x80, "Invincibility (Cheat)" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" ) PORT_DIPLOCATION("DSW2:3,4")
+	PORT_DIPSETTING(    0x00, "20000 only" )
+	PORT_DIPSETTING(    0x0c, "20000, every 30000 after" )
+	PORT_DIPSETTING(    0x08, "30000, every 40000 after" )
+	PORT_DIPSETTING(    0x04, "40000, every 50000 after" )
+	PORT_DIPNAME( 0x80, 0x80, "Invincibility (Cheat)" ) PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -500,67 +473,35 @@ static INPUT_PORTS_START( liberate )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x80, 0x80, "Manufacturer" )
-	PORT_DIPSETTING(    0x00, "(INVALID) Data East USA (Dual Assault)" )
+	PORT_DIPSETTING(    0x00, "(INVALID) Data East USA (Dual Assault)" ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, "Data East Corporation (Liberation)" )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" )
-	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_DIPSETTING(    0x0c, "20000 30000" )
-	PORT_DIPSETTING(    0x08, "30000 50000" )
-	PORT_DIPSETTING(    0x04, "50000 70000" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) /* Difficulty? */
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) /* Difficulty? */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW2:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( prosport )
 	PORT_INCLUDE( generic_input )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Service" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW1:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Service" ) PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Test Mode" )
+	PORT_DIPNAME( 0x20, 0x20, "Test Mode" ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x00, "ROM Test" )
 	PORT_DIPSETTING(    0x20, "Maping Test" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW1:8")
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW2:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW2:2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW2:3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW2:4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW2:5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dualaslt )
@@ -581,9 +522,7 @@ static INPUT_PORTS_START( liberatb )
 	PORT_BIT( 0xf9, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW1:8")
 
 	PORT_MODIFY("TILT")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -593,54 +532,25 @@ static INPUT_PORTS_START( prosoccr )
 	PORT_INCLUDE( generic_input )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) //maybe reversed coins actually?
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW1:7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW1:8")
 
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("DSW2") // Imported from decocass version "cpsoccer"
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW2:1") /* Listed as "Number of Balls" */
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, "Number of Nice Goal" ) PORT_DIPLOCATION("DSW2:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
+	PORT_DIPSETTING(    0x06, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:5") /* Listed as "Class" */
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6")
 INPUT_PORTS_END
 
 /*************************************
@@ -813,7 +723,7 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 	m_bank = 0;
 }
 
-static MACHINE_CONFIG_START( liberate, liberate_state )
+static MACHINE_CONFIG_START( liberate_base, liberate_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
@@ -855,7 +765,12 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( liberatb, liberate )
+static MACHINE_CONFIG_DERIVED( liberate, liberate_base )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( liberatb, liberate_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
@@ -863,14 +778,14 @@ static MACHINE_CONFIG_DERIVED( liberatb, liberate )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( boomrang, liberate )
+static MACHINE_CONFIG_DERIVED( boomrang, liberate_base )
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_boomrang)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( prosoccr, liberate )
+static MACHINE_CONFIG_DERIVED( prosoccr, liberate_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1362,21 +1277,14 @@ DRIVER_INIT_MEMBER(liberate_state,yellowcb)
 
 DRIVER_INIT_MEMBER(liberate_state,liberate)
 {
-	int A;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	space.set_decrypted_region(0x0000, 0xffff, decrypted);
-
 	/* Swap bits for opcodes only, not data */
-	for (A = 0; A < 0x10000; A++) {
-		decrypted[A] = (ROM[A] & 0xd7) | ((ROM[A] & 0x08) << 2) | ((ROM[A] & 0x20) >> 2);
-		decrypted[A] = (decrypted[A] & 0xbb) | ((decrypted[A] & 0x04) << 4) | ((decrypted[A] & 0x40) >> 4);
-		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
+	for (int A = 0; A < 0x8000; A++) {
+		m_decrypted_opcodes[A] = (ROM[A+0x8000] & 0xd7) | ((ROM[A+0x8000] & 0x08) << 2) | ((ROM[A+0x8000] & 0x20) >> 2);
+		m_decrypted_opcodes[A] = (m_decrypted_opcodes[A] & 0xbb) | ((m_decrypted_opcodes[A] & 0x04) << 4) | ((m_decrypted_opcodes[A] & 0x40) >> 4);
+		m_decrypted_opcodes[A] = (m_decrypted_opcodes[A] & 0x7d) | ((m_decrypted_opcodes[A] & 0x02) << 6) | ((m_decrypted_opcodes[A] & 0x80) >> 6);
 	}
-
-	membank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
 }
 
 /*************************************
@@ -1386,8 +1294,8 @@ DRIVER_INIT_MEMBER(liberate_state,liberate)
  *************************************/
 
 GAME( 1983, prosoccr,  0,        prosoccr,  prosoccr, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Soccer", GAME_SUPPORTS_SAVE )
-GAME( 1983, prosport,  0,        prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf (set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, prosporta, prosport, prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf (set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, prosport,  0,        prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation", "Pro Sports - Bowling, Tennis, and Golf", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, prosporta, prosport, prosport,  prosport, liberate_state, prosport, ROT270, "Data East Corporation (Digital Controls license)", "Pro Sports - Bowling, Tennis, and Golf (USA)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, boomrang,  0,        boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, boomranga, boomrang, boomrang,  boomrang, liberate_state, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, kamikcab,  0,        boomrang,  kamikcab, liberate_state, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", GAME_SUPPORTS_SAVE )

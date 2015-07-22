@@ -26,6 +26,18 @@
 		</part>
 	</software>
 
+	<software name="1001demoa" cloneof="1001demo">
+		<description>Commodore SFD-1001 Test/Demo</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="commodore sfd-1001 test demo.d82" size="1066496" crc="87f79d8c" sha1="6f73fd233871fae7e16a9eda9f628c907606ce9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2040demov1" cloneof="2040demo">
 		<description>Commodore 2040 Floppy Disk Drive Test/Demo Disk (DOS v1)</description>
 		<year>197?</year>
@@ -34,6 +46,115 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="c2040testdemo-dosv1.g64" size="333744" crc="4015e3eb" sha1="dd790b66b1ae660cae13c0f608d9895fa0825e37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apshaid">
+		<description>Temple of Apshai</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="temple of apshai (1979)(automated simulations).d64" size="174848" crc="cf6b2a6f" sha1="c40fefc57db4d8eb13d575e8f3731a299104482c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dateston">
+		<description>The Datestones of Ryn A Microquest</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="datestones of ryn (1979)(automated simulations).d64" size="174848" crc="1fbcf28a" sha1="936099e06ff1843db92956e8647f89f553ae7b89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escaped">
+		<description>Escape from the Death Planet</description>
+		<year>1979</year>
+		<publisher>Fantasy Games Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="escape from the death planet (1979)(fantasy games software).d64" size="174848" crc="b6a5e95f" sha1="d2dd418a3b7803ffdeef1572c498307a01cb2db0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxyd">
+		<description>Galaxy!</description>
+		<year>1981</year>
+		<publisher>Microcomputer Games, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="galaxy! (1981)(avalon hill).d64" size="174848" crc="ee09100e" sha1="e94add6ab81d706cf2812e23eb6039715bdad126" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hellfire">
+		<description>Hellfire Warrior</description>
+		<year>1980</year>
+		<publisher>Automated Simulations</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="hellfire warrior (1980)(automated simulations).d64" size="174848" crc="19ff4a71" sha1="f155ed22c781a6883bf5119056ba7a1870a9fb2e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mapscaps">
+		<description>Maps and Capitals</description>
+		<year>1978</year>
+		<publisher>Solomon</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="maps and capitals (1978)(solomon).d64" size="174848" crc="6d3111dd" sha1="7730b5cff7afb01efedf0f3cece7fe596b22c0cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oriond">
+		<description>Invasion Orion</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="invasion orion (1979)(automated simulations).d64" size="174848" crc="2fa76e5c" sha1="bf1b41364962cd1fb7faa805536740ef3b96b5f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="states">
+		<description>The States</description>
+		<year>1978</year>
+		<publisher>Solomon</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="states (1978)(solomon).d64" size="174848" crc="4b45669d" sha1="df769e3d302b6ed0229174b19f825d4515d15574" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="tunvkatm">
+		<description>Tunnel Vision and Cat and Mouse</description>
+		<year>1978</year>
+		<publisher>Solomon</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="tunnel vision and kat and mouse (1978)(michael riley).d64" size="174848" crc="5a26138d" sha1="a20b52cb9c086d8acfbd063814c412e6d04bf259" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -47,16 +168,16 @@
 		<!--
 		VisiCalc(R)                                                 PET 2001, CBM 2001
 		Program Diskette                                              and CBM 8032 32K
-		                              [VisiCorp logo]                for 2040 and 4040
+									  [VisiCorp logo]                for 2040 and 4040
 		One of the VisiTM programs                                     Diskette Drives
 		from VisiCorp                                           by Software Arts, Inc.
 
-		                                VisiCorpTM
-		                            PERSONAL SOFTWARETM
+										VisiCorpTM
+									PERSONAL SOFTWARETM
 
 		Program Copyright (C) 1979, 1981
 		Software Arts, Inc. All Rights Reserved
-		                                                                    20910-5511
+																			20910-5511
 		-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -80,16 +201,16 @@
 		<!--
 		VisiCalc(R)                                                 PET 2001, CBM 2001
 		Program Diskette                                         CBM 8032 and CBM 8096
-		                              [VisiCorp logo]          for 8050 Diskette Drive
+									  [VisiCorp logo]          for 8050 Diskette Drive
 		One of the VisiTM programs                              by Software Arts, Inc.
 		from VisiCorp
 
-		                                VisiCorpTM
-		                            PERSONAL SOFTWARETM
+										VisiCorpTM
+									PERSONAL SOFTWARETM
 
 		Program Copyright (C) 1979, 1982
 		Software Arts, Inc. All Rights Reserved
-		                                                                    20910-5612
+																			20910-5612
 		-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
@@ -704,7 +825,7 @@
 		<info name="serial" value="CP2-620-580" />
 
 		<!--
-		          C P / M   ( R )       V e r s i o n   2 . 2
+				  C P / M   ( R )       V e r s i o n   2 . 2
 		( C )   1 9 7 6 - 1 9 8 0   D i g i t a l   R e s e a r c h
 		s e r i a l  #  C P 2 - 6 2 0 -   5 8 0   # #
 		8050 format / 4040 on back   (C) 1982 Madison Computer
@@ -728,7 +849,7 @@
 		<year>2012</year>
 		<publisher>Steve Gray</publisher>
 		<!-- These disks contain some programs typed in from the HSG manual,
-		     along with new programs that were written in 2012. -->
+			 along with new programs that were written in 2012. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">

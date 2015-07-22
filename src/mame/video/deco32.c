@@ -5,24 +5,24 @@
 
 /******************************************************************************/
 
-WRITE32_MEMBER(deco32_state::deco32_pri_w)
+WRITE32_MEMBER(deco32_state::pri_w)
 {
 	m_pri=data;
 }
 
-WRITE32_MEMBER(dragngun_state::dragngun_sprite_control_w)
+WRITE32_MEMBER(dragngun_state::sprite_control_w)
 {
-	m_dragngun_sprite_ctrl=data;
+	m_sprite_ctrl=data;
 }
 
-WRITE32_MEMBER(dragngun_state::dragngun_spriteram_dma_w)
+WRITE32_MEMBER(dragngun_state::spriteram_dma_w)
 {
 	/* DMA spriteram to private sprite chip area, and clear cpu ram */
 	m_spriteram->copy();
 	memset(m_spriteram->live(),0,0x2000);
 }
 
-WRITE32_MEMBER(deco32_state::deco32_ace_ram_w)
+WRITE32_MEMBER(deco32_state::ace_ram_w)
 {
 	/* Some notes pieced together from Tattoo Assassins info:
 
@@ -98,7 +98,7 @@ void deco32_state::updateAceRam()
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE32_MEMBER(deco32_state::deco32_nonbuffered_palette_w)
+WRITE32_MEMBER(deco32_state::nonbuffered_palette_w)
 {
 	int r,g,b;
 
@@ -111,13 +111,13 @@ WRITE32_MEMBER(deco32_state::deco32_nonbuffered_palette_w)
 	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
-WRITE32_MEMBER(deco32_state::deco32_buffered_palette_w)
+WRITE32_MEMBER(deco32_state::buffered_palette_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	m_dirty_palette[offset]=1;
 }
 
-WRITE32_MEMBER(deco32_state::deco32_palette_dma_w)
+WRITE32_MEMBER(deco32_state::palette_dma_w)
 {
 	const int m=m_palette->entries();
 	int r,g,b,i;
@@ -145,9 +145,22 @@ WRITE32_MEMBER(deco32_state::deco32_palette_dma_w)
 
 /******************************************************************************/
 
+void deco32_state::video_start()
+{
+	save_item(NAME(m_pri));
+	save_item(NAME(m_spriteram16));
+	save_item(NAME(m_spriteram16_buffered));
+	save_item(NAME(m_pf1_rowscroll));
+	save_item(NAME(m_pf2_rowscroll));
+	save_item(NAME(m_pf3_rowscroll));
+	save_item(NAME(m_pf4_rowscroll));
+}
+
 VIDEO_START_MEMBER(deco32_state,captaven)
 {
 	m_has_ace_ram=0;
+	
+	deco32_state::video_start();
 }
 
 VIDEO_START_MEMBER(deco32_state,fghthist)
@@ -155,30 +168,9 @@ VIDEO_START_MEMBER(deco32_state,fghthist)
 	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
 	m_sprgen->alloc_sprite_bitmap();
 	m_has_ace_ram=0;
-}
-
-VIDEO_START_MEMBER(dragngun_state,dragngun)
-{
-	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
-	m_screen->register_screen_bitmap(m_temp_render_bitmap);
-
-	memset(m_dirty_palette,0,4096);
-
-	save_item(NAME(m_dragngun_sprite_ctrl));
-	m_has_ace_ram=0;
-
-
-}
-
-VIDEO_START_MEMBER(dragngun_state,lockload)
-{
-	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
-	m_screen->register_screen_bitmap(m_temp_render_bitmap);
-
-	memset(m_dirty_palette,0,4096);
-
-	save_item(NAME(m_dragngun_sprite_ctrl));
-	m_has_ace_ram=0;
+	
+	save_pointer(NAME(m_dirty_palette), 4096);
+	deco32_state::video_start();
 }
 
 VIDEO_START_MEMBER(deco32_state,nslasher)
@@ -191,26 +183,59 @@ VIDEO_START_MEMBER(deco32_state,nslasher)
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();
 	memset(m_dirty_palette,0,4096);
-	save_item(NAME(m_pri));
 	m_has_ace_ram=1;
+	
+	save_pointer(NAME(m_dirty_palette), 4096);
+	save_item(NAME(m_ace_ram_dirty));
+	save_item(NAME(m_spriteram16_2));
+	save_item(NAME(m_spriteram16_2_buffered));
+	
+	deco32_state::video_start();
 }
 
+void dragngun_state::video_start()
+{
+	save_item(NAME(m_pf1_rowscroll));
+	save_item(NAME(m_pf2_rowscroll));
+	save_item(NAME(m_pf3_rowscroll));
+	save_item(NAME(m_pf4_rowscroll));
+}
+
+VIDEO_START_MEMBER(dragngun_state,dragngun)
+{
+	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	m_screen->register_screen_bitmap(m_temp_render_bitmap);
+
+	memset(m_dirty_palette,0,4096);
+	
+	m_has_ace_ram=0;
+
+	save_item(NAME(m_sprite_ctrl));
+	save_pointer(NAME(m_dirty_palette), 4096);
+}
+
+VIDEO_START_MEMBER(dragngun_state,lockload)
+{
+	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
+	m_screen->register_screen_bitmap(m_temp_render_bitmap);
+
+	memset(m_dirty_palette,0,4096);
+
+	m_has_ace_ram=0;
+
+	save_item(NAME(m_sprite_ctrl));
+	save_pointer(NAME(m_dirty_palette), 4096);
+}
 /******************************************************************************/
-
-void deco32_state::screen_eof_captaven(screen_device &screen, bool state)
-{
-}
-
-void dragngun_state::screen_eof_dragngun(screen_device &screen, bool state)
-{
-}
 
 
 /******************************************************************************/
 
 UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	address_space &space = machine().driver_data()->generic_space();
+	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	flip_screen_set(BIT(flip, 7));
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x000), cliprect); // Palette index not confirmed
@@ -267,7 +292,7 @@ UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb3
 	{
 		rectangle clip(cliprect.min_x, cliprect.max_x, 8, 247);
 
-		m_sprgenzoom->dragngun_draw_sprites(bitmap,clip,m_spriteram->buffer(), m_dragngun_sprite_layout_0_ram, m_dragngun_sprite_layout_1_ram, m_dragngun_sprite_lookup_0_ram, m_dragngun_sprite_lookup_1_ram, m_dragngun_sprite_ctrl, screen.priority(), m_temp_render_bitmap );
+		m_sprgenzoom->dragngun_draw_sprites(bitmap,clip,m_spriteram->buffer(), m_sprite_layout_0_ram, m_sprite_layout_1_ram, m_sprite_lookup_0_ram, m_sprite_lookup_1_ram, m_sprite_ctrl, screen.priority(), m_temp_render_bitmap );
 
 	}
 

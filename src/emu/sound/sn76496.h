@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER( stereo_w );
 	void write(UINT8 data);
 	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
 
 protected:
 	virtual void    device_start();
@@ -74,90 +75,70 @@ private:
 class sn76496_device : public sn76496_base_device
 {
 public:
-	sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, SN76496, "SN76496", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "sn76496", __FILE__)
-	{ }
+	sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // U8106 not verified yet. todo: verify; (a custom marked sn76489? only used on mr. do and maybe other universal games)
 class u8106_device : public sn76496_base_device
 {
 public:
-	u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, U8106, "U8106", tag, 0x4000, 0x01, 0x02, true, false, 8, true, owner, clock, "u8106", __FILE__)
-	{ }
+	u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // Y2404 not verified yet. todo: verify; (don't be fooled by the Y, it's a TI chip, not Yamaha)
 class y2404_device : public sn76496_base_device
 {
 public:
-	y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, Y2404, "Y2404", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "y2404", __FILE__)
-	{ }
+	y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // SN76489 not verified yet. todo: verify;
 class sn76489_device : public sn76496_base_device
 {
 public:
-	sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, SN76489, "SN76489", tag, 0x4000, 0x01, 0x02, true, false, 8, true, owner, clock, "sn76489", __FILE__)
-	{ }
+	sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)
 class sn76489a_device : public sn76496_base_device
 {
 public:
-	sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, SN76489A, "SN76489A", tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock, "sn76489a", __FILE__)
-	{ }
+	sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // SN76494 not verified, (according to datasheet: same as sn76489a but without the /8 divider)
 class sn76494_device : public sn76496_base_device
 {
 public:
-	sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, SN76494, "SN76494", tag, 0x10000, 0x04, 0x08, false, false, 1, true, owner, clock, "sn76494", __FILE__)
-	{ }
+	sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // SN94624 whitenoise verified, phase verified, period verified; verified by PlgDavid
 class sn94624_device : public sn76496_base_device
 {
 public:
-	sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, SN94624, "SN94624", tag, 0x4000, 0x01, 0x02, true, false, 1, true, owner, clock, "sn94624", __FILE__)
-	{ }
+	sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // NCR7496 not verified; info from smspower wiki
 class ncr7496_device : public sn76496_base_device
 {
 public:
-	ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, NCR7496, "NCR7496", tag, 0x8000, 0x02, 0x20, false, false, 8, true, owner, clock, "ncr7496", __FILE__)
-	{ }
+	ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // Verified by Justin Kerk
 class gamegear_device : public sn76496_base_device
 {
 public:
-	gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, GAMEGEAR, "Game Gear PSG", tag, 0x8000, 0x01, 0x08, true, true, 8, false, owner, clock, "gamegear_psg", __FILE__)
-	{ }
+	gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // todo: verify; from smspower wiki, assumed to have same invert as gamegear
 class segapsg_device : public sn76496_base_device
 {
 public:
-	segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, SEGAPSG, "SEGA VDP PSG", tag, 0x8000, 0x01, 0x08, true, false, 8, false, owner, clock, "segapsg", __FILE__)
-	{ }
+	segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 #endif /* __SN76496_H__ */

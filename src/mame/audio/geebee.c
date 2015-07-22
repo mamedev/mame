@@ -29,15 +29,6 @@ geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const ch
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void geebee_sound_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

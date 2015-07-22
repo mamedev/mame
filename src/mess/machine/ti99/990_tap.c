@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Raphael Nabet
 /*
     990_tap.c: emulation of a generic ti990 tape controller, for use with

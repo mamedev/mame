@@ -1,4 +1,4 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Raphael Nabet
 /*
     990_hd.h: include file for 990_hd.c

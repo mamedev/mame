@@ -56,9 +56,9 @@ struct sn74s516_t
 	union
 	{
 	#ifdef LSB_FIRST
-		struct { UINT16 W; INT16 Z; };
+		struct { UINT16 W; INT16 Z; } as16bit;
 	#else
-		struct { INT16 Z; UINT16 W; };
+		struct { INT16 Z; UINT16 W; } as16bit;
 	#endif
 		INT32 ZW32;
 	} ZW;
@@ -241,9 +241,9 @@ struct pit8253_state
 	union
 	{
 #ifdef LSB_FIRST
-		struct { UINT8 LSB; UINT8 MSB; };
+		struct { UINT8 LSB; UINT8 MSB; } as8bit;
 #else
-		struct { UINT8 MSB; UINT8 LSB; };
+		struct { UINT8 MSB; UINT8 LSB; } as8bit;
 #endif
 		UINT16 val;
 	} counts[3];

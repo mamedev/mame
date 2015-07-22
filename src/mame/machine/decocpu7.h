@@ -14,7 +14,7 @@ protected:
 		bool had_written;
 
 		virtual ~mi_decrypt() {}
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
 		virtual void write(UINT16 adr, UINT8 val);
 	};
 

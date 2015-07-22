@@ -260,7 +260,7 @@ void finalizr_state::machine_reset()
 static MACHINE_CONFIG_START( finalizr, finalizr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/6) /* ??? */
+	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/6) /* ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
 
@@ -352,7 +352,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(finalizr_state,finalizr)
 {
-	konami1_decode(machine(), "maincpu");
 }
 
 

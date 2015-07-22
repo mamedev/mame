@@ -51,10 +51,13 @@ const device_type I8089_CHANNEL = &device_creator<i8089_channel>;
 i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, I8089_CHANNEL, "Intel 8089 I/O Channel", tag, owner, clock, "i8089_channel", __FILE__),
 	m_write_sintr(*this),
+	m_iop(NULL),
 	m_icount(0),
 	m_xfer_pending(false),
 	m_dma_value(0),
-	m_dma_state(DMA_IDLE)
+	m_dma_state(DMA_IDLE),
+	m_drq(0),
+	m_prio(PRIO_IDLE)
 {
 }
 
@@ -74,6 +77,7 @@ void i8089_channel::device_start()
 	save_item(NAME(m_xfer_pending));
 	save_item(NAME(m_dma_value));
 	save_item(NAME(m_dma_state));
+	save_item(NAME(m_drq));
 	save_item(NAME(m_prio));
 
 	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
@@ -246,11 +250,13 @@ int i8089_channel::execute_run()
 			break;
 
 		case DMA_WAIT_FOR_SOURCE_DRQ:
-			fatalerror("%s('%s'): wait for source drq not supported\n", shortname(), tag());
+			if (m_drq)
+				m_dma_state = DMA_FETCH;
+			break;
 
 		case DMA_FETCH:
 			if (VERBOSE_DMA)
-				logerror("%s('%s'): entering state: DMA_FETCH", shortname(), tag());
+				logerror("%s('%s'): entering state: DMA_FETCH\n", shortname(), tag());
 
 			// source is 16-bit?
 			if (BIT(m_r[PSW].w, 1))
@@ -306,7 +312,9 @@ int i8089_channel::execute_run()
 			fatalerror("%s('%s'): dma translate requested\n", shortname(), tag());
 
 		case DMA_WAIT_FOR_DEST_DRQ:
-			fatalerror("%s('%s'): wait for destination drq not supported\n", shortname(), tag());
+			if (m_drq)
+				m_dma_state = DMA_STORE;
+			break;
 
 		case DMA_STORE:
 			if (VERBOSE_DMA)
@@ -834,5 +842,7 @@ WRITE_LINE_MEMBER( i8089_channel::ext_w )
 WRITE_LINE_MEMBER( i8089_channel::drq_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): ext_w: %d\n", shortname(), tag(), state);
+		logerror("%s('%s'): drq_w: %d\n", shortname(), tag(), state);
+
+	m_drq = state;
 }

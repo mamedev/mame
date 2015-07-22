@@ -12,20 +12,16 @@
   TODO:
   - what happens with uCOM-43 opcodes on an uCOM-44/45 MCU?
   - what's the data after the ROM data for? (eg. 2000-2047, official ROM size is 2000)
+  - is DPh internally 3-bit or 4-bit? (currently assume 4-bit, it could have effect
+    on specific uCOM-43 exchange opcodes)
+  - RAM access from 0x50-0x7f on data_96x4
+  - invalid port accesses via DPl
+  - documentation is conflicting if IRQ is level or edge triggered
 
 */
 
-enum
-{
-	NEC_UCOM43 = 0,
-	NEC_UCOM44,
-	NEC_UCOM45
-};
-
 #include "ucom4.h"
 #include "debugger.h"
-
-#include "ucom4op.inc"
 
 
 // uCOM-43 products: 2000x8 ROM, RAM size custom, supports full instruction set
@@ -62,7 +58,7 @@ ADDRESS_MAP_END
 
 // device definitions
 upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
+	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_2k), 7 /* data width */, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
 { }
 
 upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -124,10 +120,11 @@ void ucom4_cpu_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ucom4_cpu_device::simple_timer_cb), this));
 
-	m_read_a.resolve_safe(0xf);
-	m_read_b.resolve_safe(0xf);
-	m_read_c.resolve_safe(0xf);
-	m_read_d.resolve_safe(0xf);
+	// resolve callbacks
+	m_read_a.resolve_safe(0);
+	m_read_b.resolve_safe(0);
+	m_read_c.resolve_safe(0);
+	m_read_d.resolve_safe(0);
 
 	m_write_c.resolve_safe();
 	m_write_d.resolve_safe();

@@ -11,6 +11,7 @@
 #include "debugger.h"
 #include "sh2.h"
 #include "sh2comn.h"
+#include "mconfig.h"
 
 extern unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode);
 
@@ -1309,7 +1310,7 @@ void sh2_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			void *base = m_direct->read_decrypted_ptr(seqhead->physpc, SH2_CODE_XOR(0));
+			void *base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x2);                          // load    i0,base,word
 			UML_CMP(block, I0, seqhead->opptr.w[0]);                        // cmp     i0,*opptr
 			UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));       // exne    nocode,seqhead->pc
@@ -1323,20 +1324,20 @@ void sh2_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_decrypted_ptr(curdesc->physpc, SH2_CODE_XOR(0));
+				base = m_direct->read_ptr(curdesc->physpc, SH2_CODE_XOR(0));
 				UML_LOAD(block, I0, curdesc->opptr.w, 0, SIZE_WORD, SCALE_x2);          // load    i0,*opptr,0,word
 				UML_CMP(block, I0, curdesc->opptr.w[0]);                    // cmp     i0,*opptr
 				UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));   // exne    nocode,seqhead->pc
 			}
 #else
 		UINT32 sum = 0;
-		void *base = m_direct->read_decrypted_ptr(seqhead->physpc, SH2_CODE_XOR(0));
+		void *base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x4);                              // load    i0,base,word
 		sum += seqhead->opptr.w[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_decrypted_ptr(curdesc->physpc, SH2_CODE_XOR(0));
+				base = m_direct->read_ptr(curdesc->physpc, SH2_CODE_XOR(0));
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x2);                      // load    i1,*opptr,word
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.w[0];
@@ -2945,7 +2946,7 @@ int sh2_device::generate_group_12(drcuml_block *block, compiler_state *compiler,
 
 void sh2_device::sh2drc_set_options(UINT32 options)
 {
-	if (!machine().options().drc()) return;
+	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
 	m_drcoptions = options;
 }
 
@@ -2957,7 +2958,7 @@ void sh2_device::sh2drc_set_options(UINT32 options)
 
 void sh2_device::sh2drc_add_pcflush(offs_t address)
 {
-	if (!machine().options().drc()) return;
+	if (!(mconfig().options().drc() && !mconfig().m_force_no_drc)) return;
 
 	if (m_pcfsel < ARRAY_LENGTH(m_pcflushes))
 		m_pcflushes[m_pcfsel++] = address;

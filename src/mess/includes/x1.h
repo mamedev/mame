@@ -23,7 +23,6 @@
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

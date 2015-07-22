@@ -2194,6 +2194,8 @@ ROM_START( drtoppelj )
 	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )   /* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
+/* M6100309A PCB
+   P0-0038A */
 ROM_START( kageki )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b35-16.11c", 0x00000, 0x10000, CRC(a4e6fd58) SHA1(7cfe5b3fa6c88cdab45719f5b58541270825ad30) )    /* US ver */
@@ -2464,6 +2466,9 @@ ROM_START( tnzs )
 	ROM_LOAD( "b53-23.3",   0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )
 	ROM_LOAD( "b53-20.2",   0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )
 	ROM_LOAD( "b53-21.1",   0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
+
+	ROM_REGION( 0x10000, "pal", 0 )
+	ROM_LOAD( "b53-15.pal16l8a.subpcb.ic6.jed", 0x00000, 0x01000, NO_DUMP) // on sub pcb
 ROM_END
 
 ROM_START( tnzsj )
@@ -2485,16 +2490,29 @@ ROM_START( tnzsj )
 	ROM_LOAD( "b53-23.3",   0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )
 	ROM_LOAD( "b53-20.2",   0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )
 	ROM_LOAD( "b53-21.1",   0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
+
+	ROM_REGION( 0x10000, "pal", 0 )
+	ROM_LOAD( "b53-15.pal16l8a.subpcb.ic6.jed", 0x00000, 0x01000, NO_DUMP) // on sub pcb
 ROM_END
 
-/* tnzs - old style PCB sets */
+/* tnzs - old style PCB sets 
+The New Zealand Story
+Taito, 1988
 
+Taito ID: K1100356A
+          J1100156A
+          MAIN PCB
+Seta ID: P0-041A
+*/
+/* This pcb is similar but not identical to the Chuka Taisen pcb above;
+   there is an M-chip i8742 (with Taito silkscreen) and no 3rd z80.
+   There is no sub-pcb like the later TNZS pcb has. */
 ROM_START( tnzsjo )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b53-10.32", 0x00000, 0x20000, CRC(a73745c6) SHA1(73eb38e75e08312d752332f988dc655084b4a86d) )
+	ROM_LOAD( "b53-10.u32", 0x00000, 0x20000, CRC(a73745c6) SHA1(73eb38e75e08312d752332f988dc655084b4a86d) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b53-11.38", 0x00000, 0x10000, CRC(9784d443) SHA1(bc3647aac9974031dbe4898417fbaa99841f9548) )
+	ROM_LOAD( "b53-11.u38", 0x00000, 0x10000, CRC(9784d443) SHA1(bc3647aac9974031dbe4898417fbaa99841f9548) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
@@ -2509,6 +2527,11 @@ ROM_START( tnzsjo )
 	ROM_LOAD( "b53-03.3",   0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )
 	ROM_LOAD( "b53-02.2",   0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )
 	ROM_LOAD( "b53-01.1",   0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are marked b06 and so are probably shared with extermination */
+	ROM_LOAD( "b06-12.pal16l8a.ic26.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.ic25.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-14.pal16x8a.icxx.jed", 0x02000, 0x01000, NO_DUMP) // does this chip exist?
 ROM_END
 
 	ROM_START( tnzso )
@@ -2519,7 +2542,7 @@ ROM_END
 	ROM_LOAD( "u38", 0x00000, 0x10000, CRC(60340d63) SHA1(12a26d19dc8e407e502f25617a5a4c9cea131ce2) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "b53-06.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
+	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	/* ROMs taken from another set (the ones from this set were read incorrectly) */
@@ -2531,6 +2554,12 @@ ROM_END
 	ROM_LOAD( "b53-03.3",   0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )
 	ROM_LOAD( "b53-02.2",   0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )
 	ROM_LOAD( "b53-01.1",   0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* PALS not directly observed on this board but assumed to exist */
+	/* these are marked b06 and so are probably shared with extermination */
+	ROM_LOAD( "b06-12.pal16l8a.ic26.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.ic25.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-14.pal16x8a.icxx.jed", 0x02000, 0x01000, NO_DUMP) // does this chip exist?
 ROM_END
 
 ROM_START( tnzsop )
@@ -2552,6 +2581,12 @@ ROM_START( tnzsop )
 	ROM_LOAD( "ns_a05.rom",   0xa0000, 0x20000, CRC(6e762e20) SHA1(66731fe4053b9c09bc9c95d10aba212db08b4636) )
 	ROM_LOAD( "ns_a04.rom",   0xc0000, 0x20000, CRC(e1fd1b9d) SHA1(6027491b927c2ab9c77fbf8895da1abcfbe32d62) )
 	ROM_LOAD( "ns_a02.rom",   0xe0000, 0x20000, CRC(2ab06bda) SHA1(2b208b564e55c258665e1f66b26fe14a6c68eb96) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* PALS not directly observed on this board but assumed to exist */
+	/* these are marked b06 and so are probably shared with extermination */
+	ROM_LOAD( "b06-12.pal16l8a.ic26.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.ic25.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-14.pal16x8a.icxx.jed", 0x02000, 0x01000, NO_DUMP) // does this chip exist?
 ROM_END
 
 /*

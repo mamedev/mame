@@ -53,19 +53,19 @@ PALETTE_INIT_MEMBER(grchamp_state, grchamp)
 }
 
 
-WRITE8_MEMBER(grchamp_state::grchamp_left_w)
+WRITE8_MEMBER(grchamp_state::left_w)
 {
 	m_leftram[offset] = data;
 	m_left_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(grchamp_state::grchamp_center_w)
+WRITE8_MEMBER(grchamp_state::center_w)
 {
 	m_centerram[offset] = data;
 	m_center_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(grchamp_state::grchamp_right_w)
+WRITE8_MEMBER(grchamp_state::right_w)
 {
 	m_rightram[offset] = data;
 	m_right_tilemap->mark_tile_dirty(offset);
@@ -343,7 +343,7 @@ void grchamp_state::draw_objects(int y, UINT8 *objdata)
 }
 
 
-UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 grchamp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const rgb_t objpix_lookup[8] =
 	{

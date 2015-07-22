@@ -59,19 +59,19 @@ PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
 	}
 }
 
-WRITE8_MEMBER(sprcros2_state::sprcros2_fgvideoram_w)
+WRITE8_MEMBER(sprcros2_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fgtilemap->mark_tile_dirty(offset&0x3ff);
 }
 
-WRITE8_MEMBER(sprcros2_state::sprcros2_bgvideoram_w)
+WRITE8_MEMBER(sprcros2_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bgtilemap->mark_tile_dirty(offset&0x3ff);
 }
 
-WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrollx_w)
+WRITE8_MEMBER(sprcros2_state::bgscrollx_w)
 {
 	if(m_port7&0x02)
 		m_bgtilemap->set_scrollx(0, 0x100-data);
@@ -79,12 +79,12 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrollx_w)
 		m_bgtilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrolly_w)
+WRITE8_MEMBER(sprcros2_state::bgscrolly_w)
 {
 	m_bgtilemap->set_scrolly(0, data);
 }
 
-TILE_GET_INFO_MEMBER(sprcros2_state::get_sprcros2_bgtile_info)
+TILE_GET_INFO_MEMBER(sprcros2_state::get_bgtile_info)
 {
 	UINT32 tile_number = m_bgvideoram[tile_index];
 	UINT8 attr = m_bgvideoram[tile_index + 0x400];
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(sprcros2_state::get_sprcros2_bgtile_info)
 			(attr&0x08)?TILE_FLIPX:0);
 }
 
-TILE_GET_INFO_MEMBER(sprcros2_state::get_sprcros2_fgtile_info)
+TILE_GET_INFO_MEMBER(sprcros2_state::get_fgtile_info)
 {
 	UINT32 tile_number = m_fgvideoram[tile_index];
 	UINT8 attr = m_fgvideoram[tile_index + 0x400];
@@ -126,8 +126,8 @@ TILE_GET_INFO_MEMBER(sprcros2_state::get_sprcros2_fgtile_info)
 
 void sprcros2_state::video_start()
 {
-	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprcros2_state::get_sprcros2_bgtile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprcros2_state::get_sprcros2_fgtile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprcros2_state::get_bgtile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprcros2_state::get_fgtile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fgtilemap->configure_groups(*m_gfxdecode->gfx(2), 0);
 }
@@ -178,7 +178,7 @@ void sprcros2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-UINT32 sprcros2_state::screen_update_sprcros2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sprcros2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bgtilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

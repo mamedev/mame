@@ -2453,7 +2453,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 {
 	UINT64 offset, length, bytes = 1;
 	int minbytes, maxbytes, byteswidth;
-	address_space *space;
+	address_space *space, *decrypted_space;
 	FILE *f = NULL;
 	int j;
 
@@ -2466,6 +2466,8 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 		return;
 	if (!debug_command_parameter_cpu_space(machine, (params > 4) ? param[4] : NULL, AS_PROGRAM, space))
 		return;
+	if (!debug_command_parameter_cpu_space(machine, (params > 4) ? param[4] : NULL, AS_DECRYPTED_OPCODES, decrypted_space))
+		decrypted_space = space;
 
 	/* determine the width of the bytes */
 	cpu_device *cpudevice = downcast<cpu_device *>(&space->device());
@@ -2508,8 +2510,8 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 			/* fetch the bytes up to the maximum */
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1, FALSE);
-				argbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1, TRUE);
+				opbuf[numbytes] = debug_read_opcode(*decrypted_space, pcbyte + numbytes, 1);
+				argbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1);
 			}
 
 			/* disassemble the result */
@@ -2522,7 +2524,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 			int startdex = outdex;
 			numbytes = space->address_to_byte(numbytes);
 			for (j = 0; j < numbytes; j += minbytes)
-				outdex += sprintf(&output[outdex], "%s ", core_i64_hex_format(debug_read_opcode(*space, pcbyte + j, minbytes, FALSE), minbytes * 2));
+				outdex += sprintf(&output[outdex], "%s ", core_i64_hex_format(debug_read_opcode(*decrypted_space, pcbyte + j, minbytes), minbytes * 2));
 			if (outdex - startdex < byteswidth)
 				outdex += sprintf(&output[outdex], "%*s", byteswidth - (outdex - startdex), "");
 			outdex += sprintf(&output[outdex], "  ");
@@ -2647,9 +2649,11 @@ static void execute_traceflush(running_machine &machine, int ref, int params, co
 static void execute_history(running_machine &machine, int ref, int params, const char *param[])
 {
 	/* validate parameters */
-	address_space *space;
+	address_space *space, *decrypted_space;
 	if (!debug_command_parameter_cpu_space(machine, (params > 0) ? param[0] : NULL, AS_PROGRAM, space))
 		return;
+	if (!debug_command_parameter_cpu_space(machine, (params > 0) ? param[0] : NULL, AS_DECRYPTED_OPCODES, decrypted_space))
+		decrypted_space = space;
 
 	UINT64 count = device_debug::HISTORY_SIZE;
 	if (!debug_command_parameter_number(machine, param[1], &count))
@@ -2672,8 +2676,8 @@ static void execute_history(running_machine &machine, int ref, int params, const
 		UINT8 opbuf[64], argbuf[64];
 		for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 		{
-			opbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1, false);
-			argbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1, true);
+			opbuf[numbytes] = debug_read_opcode(*decrypted_space, pcbyte + numbytes, 1);
+			argbuf[numbytes] = debug_read_opcode(*space, pcbyte + numbytes, 1);
 		}
 
 		char buffer[200];

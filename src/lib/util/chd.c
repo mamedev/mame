@@ -57,23 +57,37 @@ enum
 // V5 compression types
 enum
 {
+	///< codec #0
 	// these types are live when running
-	COMPRESSION_TYPE_0 = 0,                     // codec #0
-	COMPRESSION_TYPE_1 = 1,                     // codec #1
-	COMPRESSION_TYPE_2 = 2,                     // codec #2
-	COMPRESSION_TYPE_3 = 3,                     // codec #3
-	COMPRESSION_NONE = 4,                       // no compression; implicit length = hunkbytes
-	COMPRESSION_SELF = 5,                       // same as another block in this chd
-	COMPRESSION_PARENT = 6,                     // same as a hunk's worth of units in the parent chd
+	COMPRESSION_TYPE_0 = 0,
+	///< codec #1
+	COMPRESSION_TYPE_1 = 1,
+	///< codec #2
+	COMPRESSION_TYPE_2 = 2,
+	///< codec #3
+	COMPRESSION_TYPE_3 = 3,
+	///< no compression; implicit length = hunkbytes
+	COMPRESSION_NONE = 4,
+	///< same as another block in this chd
+	COMPRESSION_SELF = 5,
+	///< same as a hunk's worth of units in the parent chd
+	COMPRESSION_PARENT = 6,
 
+	///< start of small RLE run (4-bit length)
 	// these additional pseudo-types are used for compressed encodings:
-	COMPRESSION_RLE_SMALL,                      // start of small RLE run (4-bit length)
-	COMPRESSION_RLE_LARGE,                      // start of large RLE run (8-bit length)
-	COMPRESSION_SELF_0,                         // same as the last COMPRESSION_SELF block
-	COMPRESSION_SELF_1,                         // same as the last COMPRESSION_SELF block + 1
-	COMPRESSION_PARENT_SELF,                    // same block in the parent
-	COMPRESSION_PARENT_0,                       // same as the last COMPRESSION_PARENT block
-	COMPRESSION_PARENT_1                        // same as the last COMPRESSION_PARENT block + 1
+	COMPRESSION_RLE_SMALL,
+	///< start of large RLE run (8-bit length)
+	COMPRESSION_RLE_LARGE,
+	///< same as the last COMPRESSION_SELF block
+	COMPRESSION_SELF_0,
+	///< same as the last COMPRESSION_SELF block + 1
+	COMPRESSION_SELF_1,
+	///< same block in the parent
+	COMPRESSION_PARENT_SELF,
+	///< same as the last COMPRESSION_PARENT block
+	COMPRESSION_PARENT_0,
+	///< same as the last COMPRESSION_PARENT block + 1
+	COMPRESSION_PARENT_1
 };
 
 
@@ -265,9 +279,13 @@ inline UINT8 chd_file::bits_for_value(UINT64 value)
 //  CHD FILE MANAGEMENT
 //**************************************************************************
 
-//-------------------------------------------------
-//  chd_file - constructor
-//-------------------------------------------------
+/**
+ * @fn  chd_file::chd_file()
+ *
+ * @brief   -------------------------------------------------
+ *            chd_file - constructor
+ *          -------------------------------------------------.
+ */
 
 chd_file::chd_file()
 	: m_file(NULL),
@@ -278,10 +296,13 @@ chd_file::chd_file()
 	close();
 }
 
-
-//-------------------------------------------------
-//  ~chd_file - destructor
-//-------------------------------------------------
+/**
+ * @fn  chd_file::~chd_file()
+ *
+ * @brief   -------------------------------------------------
+ *            ~chd_file - destructor
+ *          -------------------------------------------------.
+ */
 
 chd_file::~chd_file()
 {
@@ -289,10 +310,15 @@ chd_file::~chd_file()
 	close();
 }
 
-
-//-------------------------------------------------
-//  sha1 - return our SHA1 value
-//-------------------------------------------------
+/**
+ * @fn  sha1_t chd_file::sha1()
+ *
+ * @brief   -------------------------------------------------
+ *            sha1 - return our SHA1 value
+ *          -------------------------------------------------.
+ *
+ * @return  A sha1_t.
+ */
 
 sha1_t chd_file::sha1()
 {
@@ -310,10 +336,18 @@ sha1_t chd_file::sha1()
 	}
 }
 
-
-//-------------------------------------------------
-//  raw_sha1 - return our raw SHA1 value
-//-------------------------------------------------
+/**
+ * @fn  sha1_t chd_file::raw_sha1()
+ *
+ * @brief   -------------------------------------------------
+ *            raw_sha1 - return our raw SHA1 value
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_UNSUPPORTED_VERSION  Thrown when a chderr unsupported version error
+ *                                          condition occurs.
+ *
+ * @return  A sha1_t.
+ */
 
 sha1_t chd_file::raw_sha1()
 {
@@ -335,10 +369,18 @@ sha1_t chd_file::raw_sha1()
 	}
 }
 
-
-//-------------------------------------------------
-//  parent_sha1 - return our parent's SHA1 value
-//-------------------------------------------------
+/**
+ * @fn  sha1_t chd_file::parent_sha1()
+ *
+ * @brief   -------------------------------------------------
+ *            parent_sha1 - return our parent's SHA1 value
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_UNSUPPORTED_VERSION  Thrown when a chderr unsupported version error
+ *                                          condition occurs.
+ *
+ * @return  A sha1_t.
+ */
 
 sha1_t chd_file::parent_sha1()
 {
@@ -360,11 +402,19 @@ sha1_t chd_file::parent_sha1()
 	}
 }
 
-
-//-------------------------------------------------
-//  hunk_info - return information about this
-//  hunk
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32 &compbytes)
+ *
+ * @brief   -------------------------------------------------
+ *            hunk_info - return information about this hunk
+ *          -------------------------------------------------.
+ *
+ * @param   hunknum             The hunknum.
+ * @param [in,out]  compressor  The compressor.
+ * @param [in,out]  compbytes   The compbytes.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32 &compbytes)
 {
@@ -463,10 +513,15 @@ chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32
 	return CHDERR_NONE;
 }
 
-
-//-------------------------------------------------
-//  set_raw_sha1 - set our SHA1 values
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::set_raw_sha1(sha1_t rawdata)
+ *
+ * @brief   -------------------------------------------------
+ *            set_raw_sha1 - set our SHA1 values
+ *          -------------------------------------------------.
+ *
+ * @param   rawdata The rawdata.
+ */
 
 void chd_file::set_raw_sha1(sha1_t rawdata)
 {
@@ -484,10 +539,17 @@ void chd_file::set_raw_sha1(sha1_t rawdata)
 		metadata_update_hash();
 }
 
-
-//-------------------------------------------------
-//  set_parent_sha1 - set the parent SHA1 value
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::set_parent_sha1(sha1_t parent)
+ *
+ * @brief   -------------------------------------------------
+ *            set_parent_sha1 - set the parent SHA1 value
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_INVALID_FILE Thrown when a chderr invalid file error condition occurs.
+ *
+ * @param   parent  The parent.
+ */
 
 void chd_file::set_parent_sha1(sha1_t parent)
 {
@@ -504,11 +566,21 @@ void chd_file::set_parent_sha1(sha1_t parent)
 	file_write(m_parentsha1_offset, rawbuf, sizeof(rawbuf));
 }
 
-
-//-------------------------------------------------
-//  create - create a new file with no parent
-//  using an existing opened file handle
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
+ *
+ * @brief   -------------------------------------------------
+ *            create - create a new file with no parent using an existing opened file handle
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  file    The file.
+ * @param   logicalbytes    The logicalbytes.
+ * @param   hunkbytes       The hunkbytes.
+ * @param   unitbytes       The unitbytes.
+ * @param   compression     The compression.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
 {
@@ -529,11 +601,21 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
 	return create_common();
 }
 
-
-//-------------------------------------------------
-//  create - create a new file with a parent
-//  using an existing opened file handle
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
+ *
+ * @brief   -------------------------------------------------
+ *            create - create a new file with a parent using an existing opened file handle
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  file    The file.
+ * @param   logicalbytes    The logicalbytes.
+ * @param   hunkbytes       The hunkbytes.
+ * @param   compression     The compression.
+ * @param [in,out]  parent  The parent.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
 {
@@ -554,11 +636,21 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
 	return create_common();
 }
 
-
-//-------------------------------------------------
-//  create - create a new file with no parent
-//  using a filename
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
+ *
+ * @brief   -------------------------------------------------
+ *            create - create a new file with no parent using a filename
+ *          -------------------------------------------------.
+ *
+ * @param   filename        Filename of the file.
+ * @param   logicalbytes    The logicalbytes.
+ * @param   hunkbytes       The hunkbytes.
+ * @param   unitbytes       The unitbytes.
+ * @param   compression     The compression.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
 {
@@ -585,11 +677,21 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 	return chderr;
 }
 
-
-//-------------------------------------------------
-//  create - create a new file with a parent
-//  using a filename
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
+ *
+ * @brief   -------------------------------------------------
+ *            create - create a new file with a parent using a filename
+ *          -------------------------------------------------.
+ *
+ * @param   filename        Filename of the file.
+ * @param   logicalbytes    The logicalbytes.
+ * @param   hunkbytes       The hunkbytes.
+ * @param   compression     The compression.
+ * @param [in,out]  parent  The parent.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
 {
@@ -616,11 +718,19 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 	return chderr;
 }
 
-
-//-------------------------------------------------
-//  open - open an existing file for read or
-//  read/write
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
+ *
+ * @brief   -------------------------------------------------
+ *            open - open an existing file for read or read/write
+ *          -------------------------------------------------.
+ *
+ * @param   filename        Filename of the file.
+ * @param   writeable       true if writeable.
+ * @param [in,out]  parent  If non-null, the parent.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
 {
@@ -648,11 +758,19 @@ chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
 	return err;
 }
 
-
-//-------------------------------------------------
-//  open - open an existing file for read or
-//  read/write
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::open(core_file &file, bool writeable, chd_file *parent)
+ *
+ * @brief   -------------------------------------------------
+ *            open - open an existing file for read or read/write
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  file    The file.
+ * @param   writeable       true if writeable.
+ * @param [in,out]  parent  If non-null, the parent.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::open(core_file &file, bool writeable, chd_file *parent)
 {
@@ -667,10 +785,13 @@ chd_error chd_file::open(core_file &file, bool writeable, chd_file *parent)
 	return open_common(writeable);
 }
 
-
-//-------------------------------------------------
-//  close - close a CHD file for access
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::close()
+ *
+ * @brief   -------------------------------------------------
+ *            close - close a CHD file for access
+ *          -------------------------------------------------.
+ */
 
 void chd_file::close()
 {
@@ -719,10 +840,28 @@ void chd_file::close()
 	m_cachehunk = ~0;
 }
 
-
-//-------------------------------------------------
-//  read - read a single hunk from the CHD file
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
+ *
+ * @brief   -------------------------------------------------
+ *            read - read a single hunk from the CHD file
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_NOT_OPEN             Thrown when a chderr not open error condition occurs.
+ * @exception   CHDERR_HUNK_OUT_OF_RANGE    Thrown when a chderr hunk out of range error
+ *                                          condition occurs.
+ * @exception   CHDERR_DECOMPRESSION_ERROR  Thrown when a chderr decompression error error
+ *                                          condition occurs.
+ * @exception   CHDERR_REQUIRES_PARENT      Thrown when a chderr requires parent error condition
+ *                                          occurs.
+ * @exception   CHDERR_READ_ERROR           Thrown when a chderr read error error condition
+ *                                          occurs.
+ *
+ * @param   hunknum         The hunknum.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ *
+ * @return  The hunk.
+ */
 
 chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 {
@@ -850,10 +989,24 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 	}
 }
 
-
-//-------------------------------------------------
-//  write - write a single hunk to the CHD file
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::write_hunk(UINT32 hunknum, const void *buffer)
+ *
+ * @brief   -------------------------------------------------
+ *            write - write a single hunk to the CHD file
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_NOT_OPEN             Thrown when a chderr not open error condition occurs.
+ * @exception   CHDERR_HUNK_OUT_OF_RANGE    Thrown when a chderr hunk out of range error
+ *                                          condition occurs.
+ * @exception   CHDERR_FILE_NOT_WRITEABLE   Thrown when a chderr file not writeable error
+ *                                          condition occurs.
+ *
+ * @param   hunknum The hunknum.
+ * @param   buffer  The buffer.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::write_hunk(UINT32 hunknum, const void *buffer)
 {
@@ -922,33 +1075,58 @@ chd_error chd_file::write_hunk(UINT32 hunknum, const void *buffer)
 	}
 }
 
-
-//-------------------------------------------------
-//  read_units - read the given number of units
-//  from the CHD
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::read_units(UINT64 unitnum, void *buffer, UINT32 count)
+ *
+ * @brief   -------------------------------------------------
+ *            read_units - read the given number of units from the CHD
+ *          -------------------------------------------------.
+ *
+ * @param   unitnum         The unitnum.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   count           Number of.
+ *
+ * @return  The units.
+ */
 
 chd_error chd_file::read_units(UINT64 unitnum, void *buffer, UINT32 count)
 {
 	return read_bytes(unitnum * UINT64(m_unitbytes), buffer, count * m_unitbytes);
 }
 
-
-//-------------------------------------------------
-//  write_units - write the given number of units
-//  to the CHD
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::write_units(UINT64 unitnum, const void *buffer, UINT32 count)
+ *
+ * @brief   -------------------------------------------------
+ *            write_units - write the given number of units to the CHD
+ *          -------------------------------------------------.
+ *
+ * @param   unitnum The unitnum.
+ * @param   buffer  The buffer.
+ * @param   count   Number of.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::write_units(UINT64 unitnum, const void *buffer, UINT32 count)
 {
 	return write_bytes(unitnum * UINT64(m_unitbytes), buffer, count * m_unitbytes);
 }
 
-
-//-------------------------------------------------
-//  read_bytes - read from the CHD at a byte level,
-//  using the cache to handle partial hunks
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::read_bytes(UINT64 offset, void *buffer, UINT32 bytes)
+ *
+ * @brief   -------------------------------------------------
+ *            read_bytes - read from the CHD at a byte level, using the cache to handle partial
+ *            hunks
+ *          -------------------------------------------------.
+ *
+ * @param   offset          The offset.
+ * @param [in,out]  buffer  If non-null, the buffer.
+ * @param   bytes           The bytes.
+ *
+ * @return  The bytes.
+ */
 
 chd_error chd_file::read_bytes(UINT64 offset, void *buffer, UINT32 bytes)
 {
@@ -988,11 +1166,20 @@ chd_error chd_file::read_bytes(UINT64 offset, void *buffer, UINT32 bytes)
 	return CHDERR_NONE;
 }
 
-
-//-------------------------------------------------
-//  write_bytes - write to the CHD at a byte level,
-//  using the cache to handle partial hunks
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::write_bytes(UINT64 offset, const void *buffer, UINT32 bytes)
+ *
+ * @brief   -------------------------------------------------
+ *            write_bytes - write to the CHD at a byte level, using the cache to handle partial
+ *            hunks
+ *          -------------------------------------------------.
+ *
+ * @param   offset  The offset.
+ * @param   buffer  The buffer.
+ * @param   bytes   The bytes.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::write_bytes(UINT64 offset, const void *buffer, UINT32 bytes)
 {
@@ -1033,11 +1220,22 @@ chd_error chd_file::write_bytes(UINT64 offset, const void *buffer, UINT32 bytes)
 	return CHDERR_NONE;
 }
 
-
-//-------------------------------------------------
-//  read_metadata - read the indexed metadata
-//  of the given type
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::string &output)
+ *
+ * @brief   -------------------------------------------------
+ *            read_metadata - read the indexed metadata of the given type
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_METADATA_NOT_FOUND   Thrown when a chderr metadata not found error
+ *                                          condition occurs.
+ *
+ * @param   searchtag       The searchtag.
+ * @param   searchindex     The searchindex.
+ * @param [in,out]  output  The output.
+ *
+ * @return  The metadata.
+ */
 
 chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::string &output)
 {
@@ -1066,6 +1264,21 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 	}
 }
 
+/**
+ * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output)
+ *
+ * @brief   Reads a metadata.
+ *
+ * @exception   CHDERR_METADATA_NOT_FOUND   Thrown when a chderr metadata not found error
+ *                                          condition occurs.
+ *
+ * @param   searchtag       The searchtag.
+ * @param   searchindex     The searchindex.
+ * @param [in,out]  output  The output.
+ *
+ * @return  The metadata.
+ */
+
 chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output)
 {
 	// wrap this for clean reporting
@@ -1089,6 +1302,23 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 	}
 }
 
+/**
+ * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 &resultlen)
+ *
+ * @brief   Reads a metadata.
+ *
+ * @exception   CHDERR_METADATA_NOT_FOUND   Thrown when a chderr metadata not found error
+ *                                          condition occurs.
+ *
+ * @param   searchtag           The searchtag.
+ * @param   searchindex         The searchindex.
+ * @param [in,out]  output      If non-null, the output.
+ * @param   outputlen           The outputlen.
+ * @param [in,out]  resultlen   The resultlen.
+ *
+ * @return  The metadata.
+ */
+
 chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 &resultlen)
 {
 	// wrap this for clean reporting
@@ -1111,6 +1341,23 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 		return err;
 	}
 }
+
+/**
+ * @fn  chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output, chd_metadata_tag &resulttag, UINT8 &resultflags)
+ *
+ * @brief   Reads a metadata.
+ *
+ * @exception   CHDERR_METADATA_NOT_FOUND   Thrown when a chderr metadata not found error
+ *                                          condition occurs.
+ *
+ * @param   searchtag           The searchtag.
+ * @param   searchindex         The searchindex.
+ * @param [in,out]  output      The output.
+ * @param [in,out]  resulttag   The resulttag.
+ * @param [in,out]  resultflags The resultflags.
+ *
+ * @return  The metadata.
+ */
 
 chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output, chd_metadata_tag &resulttag, UINT8 &resultflags)
 {
@@ -1137,11 +1384,21 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 	}
 }
 
-
-//-------------------------------------------------
-//  write_metadata - write the indexed metadata
-//  of the given type
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags)
+ *
+ * @brief   -------------------------------------------------
+ *            write_metadata - write the indexed metadata of the given type
+ *          -------------------------------------------------.
+ *
+ * @param   metatag     The metatag.
+ * @param   metaindex   The metaindex.
+ * @param   inputbuf    The inputbuf.
+ * @param   inputlen    The inputlen.
+ * @param   flags       The flags.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags)
 {
@@ -1209,11 +1466,21 @@ chd_error chd_file::write_metadata(chd_metadata_tag metatag, UINT32 metaindex, c
 	}
 }
 
-
-//-------------------------------------------------
-//  delete_metadata - remove the given metadata
-//  from the list
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::delete_metadata(chd_metadata_tag metatag, UINT32 metaindex)
+ *
+ * @brief   -------------------------------------------------
+ *            delete_metadata - remove the given metadata from the list
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_METADATA_NOT_FOUND   Thrown when a chderr metadata not found error
+ *                                          condition occurs.
+ *
+ * @param   metatag     The metatag.
+ * @param   metaindex   The metaindex.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::delete_metadata(chd_metadata_tag metatag, UINT32 metaindex)
 {
@@ -1237,11 +1504,19 @@ chd_error chd_file::delete_metadata(chd_metadata_tag metatag, UINT32 metaindex)
 	}
 }
 
-
-//-------------------------------------------------
-//  clone_all_metadata - clone the metadata from
-//  one CHD to a second
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::clone_all_metadata(chd_file &source)
+ *
+ * @brief   -------------------------------------------------
+ *            clone_all_metadata - clone the metadata from one CHD to a second
+ *          -------------------------------------------------.
+ *
+ * @exception   err Thrown when an error error condition occurs.
+ *
+ * @param [in,out]  source  Another instance to copy.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::clone_all_metadata(chd_file &source)
 {
@@ -1276,12 +1551,18 @@ chd_error chd_file::clone_all_metadata(chd_file &source)
 	}
 }
 
-
-//-------------------------------------------------
-//  compute_overall_sha1 - iterate through the
-//  metadata and compute the overall hash of the
-//  CHD file
-//-------------------------------------------------
+/**
+ * @fn  sha1_t chd_file::compute_overall_sha1(sha1_t rawsha1)
+ *
+ * @brief   -------------------------------------------------
+ *            compute_overall_sha1 - iterate through the metadata and compute the overall hash of
+ *            the CHD file
+ *          -------------------------------------------------.
+ *
+ * @param   rawsha1 The first rawsha.
+ *
+ * @return  The calculated overall sha 1.
+ */
 
 sha1_t chd_file::compute_overall_sha1(sha1_t rawsha1)
 {
@@ -1322,10 +1603,19 @@ sha1_t chd_file::compute_overall_sha1(sha1_t rawsha1)
 	return overall_sha1.finish();
 }
 
-
-//-------------------------------------------------
-//  codec_config - set internal codec parameters
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *config)
+ *
+ * @brief   -------------------------------------------------
+ *            codec_config - set internal codec parameters
+ *          -------------------------------------------------.
+ *
+ * @param   codec           The codec.
+ * @param   param           The parameter.
+ * @param [in,out]  config  If non-null, the configuration.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *config)
 {
@@ -1349,11 +1639,17 @@ chd_error chd_file::codec_configure(chd_codec_type codec, int param, void *confi
 	}
 }
 
-
-//-------------------------------------------------
-//  error_string - return an error string for
-//  the given CHD error
-//-------------------------------------------------
+/**
+ * @fn  const char *chd_file::error_string(chd_error err)
+ *
+ * @brief   -------------------------------------------------
+ *            error_string - return an error string for the given CHD error
+ *          -------------------------------------------------.
+ *
+ * @param   err The error.
+ *
+ * @return  null if it fails, else a char*.
+ */
 
 const char *chd_file::error_string(chd_error err)
 {
@@ -1401,10 +1697,16 @@ const char *chd_file::error_string(chd_error err)
 //  INTERNAL HELPERS
 //**************************************************************************
 
-//-------------------------------------------------
-//  guess_unitbytes - for older CHD formats, take
-//  a guess at the bytes/unit based on metadata
-//-------------------------------------------------
+/**
+ * @fn  UINT32 chd_file::guess_unitbytes()
+ *
+ * @brief   -------------------------------------------------
+ *            guess_unitbytes - for older CHD formats, take a guess at the bytes/unit based on
+ *            metadata
+ *          -------------------------------------------------.
+ *
+ * @return  An UINT32.
+ */
 
 UINT32 chd_file::guess_unitbytes()
 {
@@ -1426,11 +1728,21 @@ UINT32 chd_file::guess_unitbytes()
 	return m_hunkbytes;
 }
 
-
-//-------------------------------------------------
-//  parse_v3_header - parse the header from a v3
-//  file and configure core parameters
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
+ *
+ * @brief   -------------------------------------------------
+ *            parse_v3_header - parse the header from a v3 file and configure core parameters
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_INVALID_FILE         Thrown when a chderr invalid file error condition
+ *                                          occurs.
+ * @exception   CHDERR_UNKNOWN_COMPRESSION  Thrown when a chderr unknown compression error
+ *                                          condition occurs.
+ *
+ * @param [in,out]  rawheader   If non-null, the rawheader.
+ * @param [in,out]  parentsha1  The first parentsha.
+ */
 
 void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
 {
@@ -1479,11 +1791,21 @@ void chd_file::parse_v3_header(UINT8 *rawheader, sha1_t &parentsha1)
 	m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
 }
 
-
-//-------------------------------------------------
-//  parse_v4_header - parse the header from a v4
-//  file and configure core parameters
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
+ *
+ * @brief   -------------------------------------------------
+ *            parse_v4_header - parse the header from a v4 file and configure core parameters
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_INVALID_FILE         Thrown when a chderr invalid file error condition
+ *                                          occurs.
+ * @exception   CHDERR_UNKNOWN_COMPRESSION  Thrown when a chderr unknown compression error
+ *                                          condition occurs.
+ *
+ * @param [in,out]  rawheader   If non-null, the rawheader.
+ * @param [in,out]  parentsha1  The first parentsha.
+ */
 
 void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
 {
@@ -1532,11 +1854,18 @@ void chd_file::parse_v4_header(UINT8 *rawheader, sha1_t &parentsha1)
 	m_unitcount = (m_logicalbytes + m_unitbytes - 1) / m_unitbytes;
 }
 
-
-//-------------------------------------------------
-//  parse_v5_header - read the header from a v5
-//  file and configure core parameters
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1)
+ *
+ * @brief   -------------------------------------------------
+ *            parse_v5_header - read the header from a v5 file and configure core parameters
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_INVALID_FILE Thrown when a chderr invalid file error condition occurs.
+ *
+ * @param [in,out]  rawheader   If non-null, the rawheader.
+ * @param [in,out]  parentsha1  The first parentsha.
+ */
 
 void chd_file::parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1)
 {
@@ -1575,11 +1904,18 @@ void chd_file::parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1)
 	parentsha1 = be_read_sha1(&rawheader[m_parentsha1_offset]);
 }
 
-
-//-------------------------------------------------
-//  compress_v5_map - compress the v5 map and
-//  write it to the end of the file
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::compress_v5_map()
+ *
+ * @brief   -------------------------------------------------
+ *            compress_v5_map - compress the v5 map and write it to the end of the file
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_COMPRESSION_ERROR    Thrown when a chderr compression error error
+ *                                          condition occurs.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::compress_v5_map()
 {
@@ -1782,10 +2118,16 @@ chd_error chd_file::compress_v5_map()
 	}
 }
 
-
-//-------------------------------------------------
-//  decompress_v5_map - decompress the v5 map
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::decompress_v5_map()
+ *
+ * @brief   -------------------------------------------------
+ *            decompress_v5_map - decompress the v5 map
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_DECOMPRESSION_ERROR  Thrown when a chderr decompression error error
+ *                                          condition occurs.
+ */
 
 void chd_file::decompress_v5_map()
 {
@@ -1900,11 +2242,22 @@ void chd_file::decompress_v5_map()
 		throw CHDERR_DECOMPRESSION_ERROR;
 }
 
-
-//-------------------------------------------------
-//  create_common - command path when creating a
-//  new CHD file
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::create_common()
+ *
+ * @brief   -------------------------------------------------
+ *            create_common - command path when creating a new CHD file
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_UNSUPPORTED_VERSION  Thrown when a chderr unsupported version error
+ *                                          condition occurs.
+ * @exception   CHDERR_INVALID_PARAMETER    Thrown when a chderr invalid parameter error
+ *                                          condition occurs.
+ * @exception   CHDERR_UNKNOWN_COMPRESSION  Thrown when a chderr unknown compression error
+ *                                          condition occurs.
+ *
+ * @return  The new common.
+ */
 
 chd_error chd_file::create_common()
 {
@@ -1999,11 +2352,28 @@ chd_error chd_file::create_common()
 	return CHDERR_NONE;
 }
 
-
-//-------------------------------------------------
-//  open_common - common path when opening an
-//  existing CHD file for input
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file::open_common(bool writeable)
+ *
+ * @brief   -------------------------------------------------
+ *            open_common - common path when opening an existing CHD file for input
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_INVALID_FILE         Thrown when a chderr invalid file error condition
+ *                                          occurs.
+ * @exception   CHDERR_UNSUPPORTED_VERSION  Thrown when a chderr unsupported version error
+ *                                          condition occurs.
+ * @exception   CHDERR_FILE_NOT_WRITEABLE   Thrown when a chderr file not writeable error
+ *                                          condition occurs.
+ * @exception   CHDERR_INVALID_PARENT       Thrown when a chderr invalid parent error condition
+ *                                          occurs.
+ * @exception   CHDERR_INVALID_PARAMETER    Thrown when a chderr invalid parameter error
+ *                                          condition occurs.
+ *
+ * @param   writeable   true if writeable.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file::open_common(bool writeable)
 {
@@ -2063,11 +2433,16 @@ chd_error chd_file::open_common(bool writeable)
 	}
 }
 
-
-//-------------------------------------------------
-//  create_open_common - common code for handling
-//  creation and opening of a file
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::create_open_common()
+ *
+ * @brief   -------------------------------------------------
+ *            create_open_common - common code for handling creation and opening of a file
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_UNKNOWN_COMPRESSION  Thrown when a chderr unknown compression error
+ *                                          condition occurs.
+ */
 
 void chd_file::create_open_common()
 {
@@ -2091,12 +2466,24 @@ void chd_file::create_open_common()
 	m_cache.resize(m_hunkbytes);
 }
 
-
-//-------------------------------------------------
-//  verify_proper_compression_append - verify that
-//  the given hunk is a proper candidate for
-//  appending to a compressed CHD
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::verify_proper_compression_append(UINT32 hunknum)
+ *
+ * @brief   -------------------------------------------------
+ *            verify_proper_compression_append - verify that the given hunk is a proper candidate
+ *            for appending to a compressed CHD
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_NOT_OPEN             Thrown when a chderr not open error condition occurs.
+ * @exception   CHDERR_HUNK_OUT_OF_RANGE    Thrown when a chderr hunk out of range error
+ *                                          condition occurs.
+ * @exception   CHDERR_FILE_NOT_WRITEABLE   Thrown when a chderr file not writeable error
+ *                                          condition occurs.
+ * @exception   CHDERR_COMPRESSION_ERROR    Thrown when a chderr compression error error
+ *                                          condition occurs.
+ *
+ * @param   hunknum The hunknum.
+ */
 
 void chd_file::verify_proper_compression_append(UINT32 hunknum)
 {
@@ -2127,12 +2514,20 @@ void chd_file::verify_proper_compression_append(UINT32 hunknum)
 		throw CHDERR_COMPRESSION_ERROR;
 }
 
-
-//-------------------------------------------------
-//  hunk_write_compressed - write a hunk to a
-//  compressed CHD, discovering the best
-//  technique
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::hunk_write_compressed(UINT32 hunknum, INT8 compression, const UINT8 *compressed, UINT32 complength, crc16_t crc16)
+ *
+ * @brief   -------------------------------------------------
+ *            hunk_write_compressed - write a hunk to a compressed CHD, discovering the best
+ *            technique
+ *          -------------------------------------------------.
+ *
+ * @param   hunknum     The hunknum.
+ * @param   compression The compression.
+ * @param   compressed  The compressed.
+ * @param   complength  The complength.
+ * @param   crc16       The CRC 16.
+ */
 
 void chd_file::hunk_write_compressed(UINT32 hunknum, INT8 compression, const UINT8 *compressed, UINT32 complength, crc16_t crc16)
 {
@@ -2150,11 +2545,19 @@ void chd_file::hunk_write_compressed(UINT32 hunknum, INT8 compression, const UIN
 	be_write(&rawmap[10], crc16, 2);
 }
 
-
-//-------------------------------------------------
-//  hunk_copy_from_self - mark a hunk as being a
-//  copy of another hunk in the same CHD
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::hunk_copy_from_self(UINT32 hunknum, UINT32 otherhunk)
+ *
+ * @brief   -------------------------------------------------
+ *            hunk_copy_from_self - mark a hunk as being a copy of another hunk in the same CHD
+ *          -------------------------------------------------.
+ *
+ * @exception   CHDERR_INVALID_PARAMETER    Thrown when a chderr invalid parameter error
+ *                                          condition occurs.
+ *
+ * @param   hunknum     The hunknum.
+ * @param   otherhunk   The otherhunk.
+ */
 
 void chd_file::hunk_copy_from_self(UINT32 hunknum, UINT32 otherhunk)
 {
@@ -2173,11 +2576,16 @@ void chd_file::hunk_copy_from_self(UINT32 hunknum, UINT32 otherhunk)
 	be_write(&rawmap[10], 0, 2);
 }
 
-
-//-------------------------------------------------
-//  hunk_copy_from_parent - mark a hunk as being a
-//  copy of a hunk from a parent CHD
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::hunk_copy_from_parent(UINT32 hunknum, UINT64 parentunit)
+ *
+ * @brief   -------------------------------------------------
+ *            hunk_copy_from_parent - mark a hunk as being a copy of a hunk from a parent CHD
+ *          -------------------------------------------------.
+ *
+ * @param   hunknum     The hunknum.
+ * @param   parentunit  The parentunit.
+ */
 
 void chd_file::hunk_copy_from_parent(UINT32 hunknum, UINT64 parentunit)
 {
@@ -2192,10 +2600,20 @@ void chd_file::hunk_copy_from_parent(UINT32 hunknum, UINT64 parentunit)
 	be_write(&rawmap[10], 0, 2);
 }
 
-
-//-------------------------------------------------
-//  metadata_find - find a metadata entry
-//-------------------------------------------------
+/**
+ * @fn  bool chd_file::metadata_find(chd_metadata_tag metatag, INT32 metaindex, metadata_entry &metaentry, bool resume)
+ *
+ * @brief   -------------------------------------------------
+ *            metadata_find - find a metadata entry
+ *          -------------------------------------------------.
+ *
+ * @param   metatag             The metatag.
+ * @param   metaindex           The metaindex.
+ * @param [in,out]  metaentry   The metaentry.
+ * @param   resume              true to resume.
+ *
+ * @return  true if it succeeds, false if it fails.
+ */
 
 bool chd_file::metadata_find(chd_metadata_tag metatag, INT32 metaindex, metadata_entry &metaentry, bool resume)
 {
@@ -2238,11 +2656,16 @@ bool chd_file::metadata_find(chd_metadata_tag metatag, INT32 metaindex, metadata
 	return false;
 }
 
-
-//-------------------------------------------------
-//  metadata_set_previous_next - set the 'next'
-//  offset of a piece of metadata
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::metadata_set_previous_next(UINT64 prevoffset, UINT64 nextoffset)
+ *
+ * @brief   -------------------------------------------------
+ *            metadata_set_previous_next - set the 'next' offset of a piece of metadata
+ *          -------------------------------------------------.
+ *
+ * @param   prevoffset  The prevoffset.
+ * @param   nextoffset  The nextoffset.
+ */
 
 void chd_file::metadata_set_previous_next(UINT64 prevoffset, UINT64 nextoffset)
 {
@@ -2267,11 +2690,13 @@ void chd_file::metadata_set_previous_next(UINT64 prevoffset, UINT64 nextoffset)
 	file_write(offset, rawbuf, sizeof(rawbuf));
 }
 
-
-//-------------------------------------------------
-//  metadata_update_hash - compute the SHA1
-//  hash of all metadata that requests it
-//-------------------------------------------------
+/**
+ * @fn  void chd_file::metadata_update_hash()
+ *
+ * @brief   -------------------------------------------------
+ *            metadata_update_hash - compute the SHA1 hash of all metadata that requests it
+ *          -------------------------------------------------.
+ */
 
 void chd_file::metadata_update_hash()
 {
@@ -2290,11 +2715,18 @@ void chd_file::metadata_update_hash()
 	file_write(m_sha1_offset, rawbuf, sizeof(rawbuf));
 }
 
-
-//-------------------------------------------------
-//  metadata_hash_compare - compare two hash
-//  entries
-//-------------------------------------------------
+/**
+ * @fn  int CLIB_DECL chd_file::metadata_hash_compare(const void *elem1, const void *elem2)
+ *
+ * @brief   -------------------------------------------------
+ *            metadata_hash_compare - compare two hash entries
+ *          -------------------------------------------------.
+ *
+ * @param   elem1   The first element.
+ * @param   elem2   The second element.
+ *
+ * @return  A CLIB_DECL.
+ */
 
 int CLIB_DECL chd_file::metadata_hash_compare(const void *elem1, const void *elem2)
 {
@@ -2307,9 +2739,13 @@ int CLIB_DECL chd_file::metadata_hash_compare(const void *elem1, const void *ele
 //  CHD COMPRESSOR
 //**************************************************************************
 
-//-------------------------------------------------
-//  chd_file_compressor - constructor
-//-------------------------------------------------
+/**
+ * @fn  chd_file_compressor::chd_file_compressor()
+ *
+ * @brief   -------------------------------------------------
+ *            chd_file_compressor - constructor
+ *          -------------------------------------------------.
+ */
 
 chd_file_compressor::chd_file_compressor()
 	: m_walking_parent(false),
@@ -2330,10 +2766,13 @@ chd_file_compressor::chd_file_compressor()
 	m_work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI);
 }
 
-
-//-------------------------------------------------
-//  ~chd_file_compressor - destructor
-//-------------------------------------------------
+/**
+ * @fn  chd_file_compressor::~chd_file_compressor()
+ *
+ * @brief   -------------------------------------------------
+ *            ~chd_file_compressor - destructor
+ *          -------------------------------------------------.
+ */
 
 chd_file_compressor::~chd_file_compressor()
 {
@@ -2346,10 +2785,13 @@ chd_file_compressor::~chd_file_compressor()
 		delete m_codecs[codecnum];
 }
 
-
-//-------------------------------------------------
-//  compress_begin - initiate compression
-//-------------------------------------------------
+/**
+ * @fn  void chd_file_compressor::compress_begin()
+ *
+ * @brief   -------------------------------------------------
+ *            compress_begin - initiate compression
+ *          -------------------------------------------------.
+ */
 
 void chd_file_compressor::compress_begin()
 {
@@ -2392,10 +2834,18 @@ void chd_file_compressor::compress_begin()
 	m_write_hunk = 0;
 }
 
-
-//-------------------------------------------------
-//  compress_continue - continue compression
-//-------------------------------------------------
+/**
+ * @fn  chd_error chd_file_compressor::compress_continue(double &progress, double &ratio)
+ *
+ * @brief   -------------------------------------------------
+ *            compress_continue - continue compression
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  progress    The progress.
+ * @param [in,out]  ratio       The ratio.
+ *
+ * @return  A chd_error.
+ */
 
 chd_error chd_file_compressor::compress_continue(double &progress, double &ratio)
 {
@@ -2538,11 +2988,18 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 	return m_walking_parent ? CHDERR_WALKING_PARENT : CHDERR_COMPRESSING;
 }
 
-
-//-------------------------------------------------
-//  async_walk_parent - handle asynchronous parent
-//  walking operations
-//-------------------------------------------------
+/**
+ * @fn  void *chd_file_compressor::async_walk_parent_static(void *param, int threadid)
+ *
+ * @brief   -------------------------------------------------
+ *            async_walk_parent - handle asynchronous parent walking operations
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  param   If non-null, the parameter.
+ * @param   threadid        The threadid.
+ *
+ * @return  null if it fails, else a void*.
+ */
 
 void *chd_file_compressor::async_walk_parent_static(void *param, int threadid)
 {
@@ -2550,6 +3007,14 @@ void *chd_file_compressor::async_walk_parent_static(void *param, int threadid)
 	item->m_compressor->async_walk_parent(*item);
 	return NULL;
 }
+
+/**
+ * @fn  void chd_file_compressor::async_walk_parent(work_item &item)
+ *
+ * @brief   Asynchronous walk parent.
+ *
+ * @param [in,out]  item    The item.
+ */
 
 void chd_file_compressor::async_walk_parent(work_item &item)
 {
@@ -2565,11 +3030,18 @@ void chd_file_compressor::async_walk_parent(work_item &item)
 	atomic_exchange32(&item.m_status, WS_COMPLETE);
 }
 
-
-//-------------------------------------------------
-//  async_compress_hunk - handle asynchronous
-//  hunk compression
-//-------------------------------------------------
+/**
+ * @fn  void *chd_file_compressor::async_compress_hunk_static(void *param, int threadid)
+ *
+ * @brief   -------------------------------------------------
+ *            async_compress_hunk - handle asynchronous hunk compression
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  param   If non-null, the parameter.
+ * @param   threadid        The threadid.
+ *
+ * @return  null if it fails, else a void*.
+ */
 
 void *chd_file_compressor::async_compress_hunk_static(void *param, int threadid)
 {
@@ -2577,6 +3049,15 @@ void *chd_file_compressor::async_compress_hunk_static(void *param, int threadid)
 	item->m_compressor->async_compress_hunk(*item, threadid);
 	return NULL;
 }
+
+/**
+ * @fn  void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
+ *
+ * @brief   Asynchronous compress hunk.
+ *
+ * @param [in,out]  item    The item.
+ * @param   threadid        The threadid.
+ */
 
 void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
 {
@@ -2599,17 +3080,30 @@ void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
 	atomic_exchange32(&item.m_status, WS_COMPLETE);
 }
 
-
-//-------------------------------------------------
-//  async_read - handle asynchronous source file
-//  reading
-//-------------------------------------------------
+/**
+ * @fn  void *chd_file_compressor::async_read_static(void *param, int threadid)
+ *
+ * @brief   -------------------------------------------------
+ *            async_read - handle asynchronous source file reading
+ *          -------------------------------------------------.
+ *
+ * @param [in,out]  param   If non-null, the parameter.
+ * @param   threadid        The threadid.
+ *
+ * @return  null if it fails, else a void*.
+ */
 
 void *chd_file_compressor::async_read_static(void *param, int threadid)
 {
 	reinterpret_cast<chd_file_compressor *>(param)->async_read();
 	return NULL;
 }
+
+/**
+ * @fn  void chd_file_compressor::async_read()
+ *
+ * @brief   Asynchronous read.
+ */
 
 void chd_file_compressor::async_read()
 {
@@ -2686,9 +3180,13 @@ void chd_file_compressor::async_read()
 //  CHD COMPRESSOR HASHMAP
 //**************************************************************************
 
-//-------------------------------------------------
-//  hashmap - constructor
-//-------------------------------------------------
+/**
+ * @fn  chd_file_compressor::hashmap::hashmap()
+ *
+ * @brief   -------------------------------------------------
+ *            hashmap - constructor
+ *          -------------------------------------------------.
+ */
 
 chd_file_compressor::hashmap::hashmap()
 	: m_block_list(new entry_block(NULL))
@@ -2697,10 +3195,13 @@ chd_file_compressor::hashmap::hashmap()
 	memset(m_map, 0, sizeof(m_map));
 }
 
-
-//-------------------------------------------------
-//  ~hashmap - destructor
-//-------------------------------------------------
+/**
+ * @fn  chd_file_compressor::hashmap::~hashmap()
+ *
+ * @brief   -------------------------------------------------
+ *            ~hashmap - destructor
+ *          -------------------------------------------------.
+ */
 
 chd_file_compressor::hashmap::~hashmap()
 {
@@ -2708,10 +3209,13 @@ chd_file_compressor::hashmap::~hashmap()
 	delete m_block_list;
 }
 
-
-//-------------------------------------------------
-//  reset - reset the state of the map
-//-------------------------------------------------
+/**
+ * @fn  void chd_file_compressor::hashmap::reset()
+ *
+ * @brief   -------------------------------------------------
+ *            reset - reset the state of the map
+ *          -------------------------------------------------.
+ */
 
 void chd_file_compressor::hashmap::reset()
 {
@@ -2728,10 +3232,18 @@ void chd_file_compressor::hashmap::reset()
 	memset(m_map, 0, sizeof(m_map));
 }
 
-
-//-------------------------------------------------
-//  find - find an item in the CRC map
-//-------------------------------------------------
+/**
+ * @fn  UINT64 chd_file_compressor::hashmap::find(crc16_t crc16, sha1_t sha1)
+ *
+ * @brief   -------------------------------------------------
+ *            find - find an item in the CRC map
+ *          -------------------------------------------------.
+ *
+ * @param   crc16   The CRC 16.
+ * @param   sha1    The first sha.
+ *
+ * @return  An UINT64.
+ */
 
 UINT64 chd_file_compressor::hashmap::find(crc16_t crc16, sha1_t sha1)
 {
@@ -2742,10 +3254,17 @@ UINT64 chd_file_compressor::hashmap::find(crc16_t crc16, sha1_t sha1)
 	return NOT_FOUND;
 }
 
-
-//-------------------------------------------------
-//  add - add an item to the CRC map
-//-------------------------------------------------
+/**
+ * @fn  void chd_file_compressor::hashmap::add(UINT64 itemnum, crc16_t crc16, sha1_t sha1)
+ *
+ * @brief   -------------------------------------------------
+ *            add - add an item to the CRC map
+ *          -------------------------------------------------.
+ *
+ * @param   itemnum The itemnum.
+ * @param   crc16   The CRC 16.
+ * @param   sha1    The first sha.
+ */
 
 void chd_file_compressor::hashmap::add(UINT64 itemnum, crc16_t crc16, sha1_t sha1)
 {

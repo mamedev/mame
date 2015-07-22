@@ -26,7 +26,7 @@ enum {
 	f1_kwd_clrstat      = f1_task_14,           //!< f1 14: clear status register
 	f1_kwd_load_kcom    = f1_task_15,           //!< f1 15: load kcom register
 	f1_kwd_load_kadr    = f1_task_16,           //!< f1 16: load kadr register
-	f1_kwd_load_kdata   = f1_task_17,           //!< f1 17: load kdata register
+	f1_kwd_load_kdata   = f1_task_17            //!< f1 17: load kdata register
 };
 
 //! F2 functions for disk word task
@@ -37,7 +37,7 @@ enum {
 	f2_kwd_xfrdat       = f2_task_13,           //!< f2 13: branches NEXT[9] on !SEEKONLY
 	f2_kwd_swrnrdy      = f2_task_14,           //!< f2 14: branches NEXT[9] on !SWRDY
 	f2_kwd_nfer         = f2_task_15,           //!< f2 15: branches NEXT[9] on !KFER
-	f2_kwd_strobon      = f2_task_16,           //!< f2 16: branches NEXT[9] on STROBE
+	f2_kwd_strobon      = f2_task_16            //!< f2 16: branches NEXT[9] on STROBE
 												//!< f2 17: undefined
 };
 

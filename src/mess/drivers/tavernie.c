@@ -371,7 +371,7 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tavernie_state, pa_ivg_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("beeper", beep_device, set_state))
 
-	MCFG_FD1795x_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_FD1795_ADD("fdc", XTAL_8MHz / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 

@@ -8,6 +8,8 @@
 #include "nld_truthtable.h"
 #include "../plib/plists.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 unsigned truthtable_desc_t::count_bits(UINT32 v)
 {
 	unsigned ret = 0;
@@ -133,7 +135,7 @@ void truthtable_desc_t::help(unsigned cur, pstring_list_t list,
 		{
 			// cutoff previous inputs and outputs for ignore
 			if (m_outs[nstate] != ~0U &&  m_outs[nstate] != val)
-				nl_fatalerror("Error in truthtable: State %04x already set, %d != %d\n",
+				fatalerror_e("Error in truthtable: State %04x already set, %d != %d\n",
 						(UINT32) nstate, m_outs[nstate], val);
 			m_outs[nstate] = val;
 			for (unsigned j=0; j<m_NO; j++)
@@ -229,18 +231,18 @@ void truthtable_desc_t::setup(const pstring_list_t &truthtable, UINT32 disabled_
 	for (UINT32 i=0; i<m_size; i++)
 	{
 		if (m_outs[i] == ~0U)
-			nl_fatalerror("truthtable: found element not set %04x\n", i);
+			fatalerror_e("truthtable: found element not set %04x\n", i);
 		m_outs[i] |= ((ign[i] & ~disabled_ignore)  << m_NO);
 	}
 	*m_initialized = true;
 
 }
 
-#define ENTRYX(_n,_m,_h)	case (_n * 1000 + _m * 10 + _h): \
+#define ENTRYX(_n,_m,_h)    case (_n * 1000 + _m * 10 + _h): \
 	{ typedef netlist_factory_truthtable_t<_n,_m,_h> xtype; \
-	  return palloc(xtype,name,classname,def_param); } break
+		return palloc(xtype(name,classname,def_param)); } break
 
-#define ENTRYY(_n,_m)	ENTRYX(_n,_m,0); ENTRYX(_n,_m,1)
+#define ENTRYY(_n,_m)   ENTRYX(_n,_m,0); ENTRYX(_n,_m,1)
 
 #define ENTRY(_n) ENTRYY(_n, 1); ENTRYY(_n, 2); ENTRYY(_n, 3); ENTRYY(_n, 4); ENTRYY(_n, 5); ENTRYY(_n, 6)
 
@@ -267,3 +269,5 @@ netlist_base_factory_truthtable_t *nl_tt_factory_create(const unsigned ni, const
 	}
 	return NULL;
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

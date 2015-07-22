@@ -37,7 +37,7 @@ enum
 	SHARC_B0,       SHARC_B1,       SHARC_B2,       SHARC_B3,
 	SHARC_B4,       SHARC_B5,       SHARC_B6,       SHARC_B7,
 	SHARC_B8,       SHARC_B9,       SHARC_B10,      SHARC_B11,
-	SHARC_B12,      SHARC_B13,      SHARC_B14,      SHARC_B15,
+	SHARC_B12,      SHARC_B13,      SHARC_B14,      SHARC_B15
 };
 
 

@@ -33,7 +33,7 @@ const device_type I8089 = &device_creator<i8089_device>;
 //-------------------------------------------------
 
 i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	cpu_device(mconfig, I8089, "Intel 8089", tag, owner, clock, "i8089", __FILE__),
+	cpu_device(mconfig, I8089, "I8089", tag, owner, clock, "i8089", __FILE__),
 	m_icount(0),
 	m_ch1(*this, "1"),
 	m_ch2(*this, "2"),

@@ -81,7 +81,9 @@ READ8_MEMBER(freekick_state::spinner_r)
 
 WRITE8_MEMBER(freekick_state::pbillrd_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 1);
+	m_bank1->set_entry(data & 1);
+	if(m_bank1d)
+		m_bank1d->set_entry(data & 1);
 }
 
 WRITE8_MEMBER(freekick_state::nmi_enable_w)
@@ -185,6 +187,11 @@ static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76489a_device, write)
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, freekick_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( freekickb_map, AS_PROGRAM, 8, freekick_state )
@@ -582,7 +589,7 @@ MACHINE_RESET_MEMBER(freekick_state,freekick)
 
 MACHINE_START_MEMBER(freekick_state,pbillrd)
 {
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_bank1->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x4000);
 
 	MACHINE_START_CALL_MEMBER(freekick);
 }
@@ -645,6 +652,11 @@ static MACHINE_CONFIG_DERIVED( pbillrd, base )
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pbillrdm, pbillrd )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( freekickb, base )
 
 	/* basic machine hardware */
@@ -676,6 +688,7 @@ static MACHINE_CONFIG_DERIVED( gigas, base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
@@ -704,11 +717,10 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( pbillrd )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "pb.18", 0x00000, 0x4000, CRC(9e6275ac) SHA1(482e845e7fb4190da483155bd908ad470373cd5c) )
-	ROM_LOAD( "pb.7",  0x04000, 0x4000, CRC(dd438431) SHA1(07a950e38b3f627ecf95e5831e5480abb337a010) )
-	ROM_CONTINUE(      0x10000, 0x4000 )
-	ROM_LOAD( "pb.9",  0x14000, 0x4000, CRC(089ce80a) SHA1(779be9ba2277a26fbebf4acf9e2f5319a934b0f5) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "pb.18", 0x0000, 0x4000, CRC(9e6275ac) SHA1(482e845e7fb4190da483155bd908ad470373cd5c) )
+	ROM_LOAD( "pb.7",  0x4000, 0x8000, CRC(dd438431) SHA1(07a950e38b3f627ecf95e5831e5480abb337a010) )
+	ROM_LOAD( "pb.9",  0xc000, 0x4000, CRC(089ce80a) SHA1(779be9ba2277a26fbebf4acf9e2f5319a934b0f5) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
 	ROM_LOAD( "pb.4", 0x000000, 0x04000, CRC(2f4d4dd3) SHA1(ee4facabf591c235c270db4f4d3f612b8c474e57) )
@@ -730,11 +742,10 @@ ROM_START( pbillrd )
 ROM_END
 
 ROM_START( pbillrds ) /* Encrytped with a Sega MC-8123 (317-0030) CPU module */
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "10626.8n",  0x00000, 0x4000, CRC(51d725e6) SHA1(d7007c983530780e7fa3686cb7a6d7c382c802fa) ) /* encrypted */
-	ROM_LOAD( "10625.8r",  0x04000, 0x4000, CRC(8977c724) SHA1(f00835a04dc6fa7d8c1e382dace515f2aa7d6f44) ) /* encrypted */
-	ROM_CONTINUE(          0x10000, 0x4000 )
-	ROM_LOAD( "10627.10n", 0x14000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "10626.8n",  0x0000, 0x4000, CRC(51d725e6) SHA1(d7007c983530780e7fa3686cb7a6d7c382c802fa) ) /* encrypted */
+	ROM_LOAD( "10625.8r",  0x4000, 0x8000, CRC(8977c724) SHA1(f00835a04dc6fa7d8c1e382dace515f2aa7d6f44) ) /* encrypted */
+	ROM_LOAD( "10627.10n", 0xc000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0030.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) )
@@ -761,11 +772,10 @@ ROM_END
 // all ROMs were HN4827128G-25, except 17, HN27256G-25
 // CPU module marked 3?7-500B, but seems to act the same as above
 ROM_START( pbillrdsa )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "29",  0x00000, 0x4000, CRC(da020258) SHA1(172276061c2e06bcf3477488734a72598412181b) ) /* encrypted */ // label scraped off, might be 20
-	ROM_LOAD( "17",  0x04000, 0x4000, CRC(9bb3d467) SHA1(5d61c80c920363cbcb548f4a08434e2a05b3d5f3) ) /* encrypted */
-	ROM_CONTINUE(          0x10000, 0x4000 )
-	ROM_LOAD( "19", 0x14000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "29",  0x0000, 0x4000, CRC(da020258) SHA1(172276061c2e06bcf3477488734a72598412181b) ) /* encrypted */ // label scraped off, might be 20
+	ROM_LOAD( "17",  0x4000, 0x8000, CRC(9bb3d467) SHA1(5d61c80c920363cbcb548f4a08434e2a05b3d5f3) ) /* encrypted */
+	ROM_LOAD( "19", 0xc000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0030.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) )
@@ -1034,12 +1044,12 @@ ROM_START( countrunb2 )
 ROM_END
 
 ROM_START( gigasm2b )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )
-	ROM_LOAD( "8.rom", 0x10000, 0x4000, CRC(c00a4a6c) SHA1(0d1bb849c9bfe4e92ad70e4ef19da494c0bd7ba8) )
+	ROM_REGION( 2*0xc000, "maincpu", 0 )
+	ROM_LOAD( "8.rom", 0x0c000, 0x4000, CRC(c00a4a6c) SHA1(0d1bb849c9bfe4e92ad70e4ef19da494c0bd7ba8) )
 	ROM_CONTINUE(      0x00000, 0x4000 )
-	ROM_LOAD( "7.rom", 0x14000, 0x4000, CRC(92bd9045) SHA1(e4d8a94deeb795bb284ca0bd211ed40ed498b172) )
+	ROM_LOAD( "7.rom", 0x10000, 0x4000, CRC(92bd9045) SHA1(e4d8a94deeb795bb284ca0bd211ed40ed498b172) )
 	ROM_CONTINUE(      0x04000, 0x4000 )
-	ROM_LOAD( "9.rom", 0x18000, 0x4000, CRC(a3ef809c) SHA1(6d4098658aa124e10e5edb8e8e3abe0aa26741a1) )
+	ROM_LOAD( "9.rom", 0x14000, 0x4000, CRC(a3ef809c) SHA1(6d4098658aa124e10e5edb8e8e3abe0aa26741a1) )
 	ROM_CONTINUE(      0x08000, 0x4000 )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
@@ -1111,10 +1121,10 @@ Note: MCU dump has fixed bits, but read is good. If not correct, it's protected.
 */
 
 ROM_START( gigasb )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )
-	ROM_LOAD( "g-7",   0x10000, 0x4000, CRC(daf4e88d) SHA1(391dff914ce8e9b7975fc8827c066d7db16c4171) )
+	ROM_REGION( 2*0xc000, "maincpu", 0 )
+	ROM_LOAD( "g-7",   0x0c000, 0x4000, CRC(daf4e88d) SHA1(391dff914ce8e9b7975fc8827c066d7db16c4171) )
 	ROM_CONTINUE(      0x00000, 0x4000 )
-	ROM_LOAD( "g-8",   0x14000, 0x8000, CRC(4ab4c1f1) SHA1(63d8f489c7a8271e99a66d97e6eb0eb252cb2b67) )
+	ROM_LOAD( "g-8",   0x10000, 0x8000, CRC(4ab4c1f1) SHA1(63d8f489c7a8271e99a66d97e6eb0eb252cb2b67) )
 	ROM_CONTINUE(      0x04000, 0x8000 )
 
 	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
@@ -1137,8 +1147,8 @@ ROM_START( gigasb )
 ROM_END
 
 ROM_START( oigas )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom.7",   0x10000, 0x4000, CRC(e5bc04cc) SHA1(ffbd416313a9e49d2f9a7268d5ef48a8b641e480) )
+	ROM_REGION( 2*0xc000, "maincpu", 0 )
+	ROM_LOAD( "rom.7",   0x0c000, 0x4000, CRC(e5bc04cc) SHA1(ffbd416313a9e49d2f9a7268d5ef48a8b641e480) )
 	ROM_CONTINUE(        0x00000, 0x4000)
 	ROM_LOAD( "rom.8",   0x04000, 0x8000, CRC(c199060d) SHA1(de8f1e0f941533abbbed25b595b1d51fadbb428d) )
 
@@ -1174,19 +1184,25 @@ ROM_END
 
 DRIVER_INIT_MEMBER(freekick_state,gigasb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0xbfff, memregion("maincpu")->base() + 0x10000);
+	membank("bank0d")->set_base(memregion("maincpu")->base() + 0xc000);
+	m_bank1d->set_base(memregion("maincpu")->base() + 0x14000);
 }
 
 
 DRIVER_INIT_MEMBER(freekick_state,pbillrds)
 {
-	mc8123_decrypt_rom(machine(), "maincpu", "user1", "bank1", 2);
+	UINT8 *decrypted_opcodes = auto_alloc_array(machine(), UINT8, 0x10000);
+	mc8123_decode(memregion("maincpu")->base(), decrypted_opcodes, memregion("user1")->base(), 0x10000);
+	membank("bank0d")->set_base(decrypted_opcodes);
+	m_bank1d->configure_entries(0, 2, decrypted_opcodes + 0x8000, 0x4000);
 }
 
 DRIVER_INIT_MEMBER(freekick_state,gigas)
 {
-	mc8123_decrypt_rom(machine(), "maincpu", "user1", NULL, 1);
+	UINT8 *decrypted_opcodes = auto_alloc_array(machine(), UINT8, 0xc000);
+	mc8123_decode(memregion("maincpu")->base(), decrypted_opcodes, memregion("user1")->base(), 0xc000);
+	membank("bank0d")->set_base(decrypted_opcodes);
+	m_bank1d->set_base(decrypted_opcodes + 0x8000);
 }
 
 
@@ -1203,8 +1219,8 @@ GAME( 1986, gigasb,    gigas,    gigas,     gigas,    freekick_state, gigasb,  R
 GAME( 1986, oigas,     gigas ,   oigas,     gigas,    freekick_state, gigasb,  ROT270, "bootleg",                      "Oigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1986, gigasm2b,  0,        gigas,     gigasm2,  freekick_state, gigasb,  ROT270, "bootleg",                      "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, pbillrd,   0,        pbillrd,   pbillrd,  driver_device,  0,       ROT0,   "Nihon System",                 "Perfect Billiard", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, pbillrds,  pbillrd,  pbillrd,   pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, pbillrdsa, pbillrd,  pbillrd,   pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-5008)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // sticker on CPU module different (wrong?) functionality the same
+GAME( 1987, pbillrds,  pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, pbillrdsa, pbillrd,  pbillrdm,  pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-5008)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // sticker on CPU module different (wrong?) functionality the same
 GAME( 1987, freekick,  0,        freekickb, freekck,  driver_device, 0,        ROT270, "Nihon System (Merit license)", "Free Kick (NS6201-A 1987.10)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, freekicka, freekick, freekickb, freekck,  driver_device, 0,        ROT270, "Nihon System",                 "Free Kick (NS6201-A 1987.9)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, freekickb1,freekick, freekickb, freekck,  driver_device, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

@@ -7,6 +7,8 @@
 
 #include "nld_7450.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(7450)
 {
 	register_input("A", m_A);
@@ -88,3 +90,5 @@ NETLIB_RESET(7450_dip)
 	m_1.do_reset();
 	m_2.do_reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

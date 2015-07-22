@@ -13,25 +13,25 @@
 #include "includes/spacefb.h"
 
 
-READ8_MEMBER(spacefb_state::spacefb_audio_p2_r)
+READ8_MEMBER(spacefb_state::audio_p2_r)
 {
 	return (m_sound_latch & 0x18) << 1;
 }
 
 
-READ8_MEMBER(spacefb_state::spacefb_audio_t0_r)
+READ8_MEMBER(spacefb_state::audio_t0_r)
 {
 	return m_sound_latch & 0x20;
 }
 
 
-READ8_MEMBER(spacefb_state::spacefb_audio_t1_r)
+READ8_MEMBER(spacefb_state::audio_t1_r)
 {
 	return m_sound_latch & 0x04;
 }
 
 
-WRITE8_MEMBER(spacefb_state::spacefb_port_1_w)
+WRITE8_MEMBER(spacefb_state::port_1_w)
 {
 	m_audiocpu->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 

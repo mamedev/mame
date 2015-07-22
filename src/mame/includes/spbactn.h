@@ -9,19 +9,27 @@ class spbactn_state : public driver_device
 public:
 	spbactn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_bgvideoram(*this, "bgvideoram"),
-		m_fgvideoram(*this, "fgvideoram"),
-		m_spvideoram(*this, "spvideoram"),
-		m_extraram(*this, "extraram"),
-		m_extraram2(*this, "extraram2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
-		m_mixer(*this, "mixer")
+		m_mixer(*this, "mixer"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spvideoram(*this, "spvideoram"),
+		m_extraram(*this, "extraram"),
+		m_extraram2(*this, "extraram2")
 		{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<tecmo_spr_device> m_sprgen;
+	required_device<tecmo_mix_device> m_mixer;
 
 	required_shared_ptr<UINT16> m_bgvideoram;
 	required_shared_ptr<UINT16> m_fgvideoram;
@@ -74,14 +82,4 @@ public:
 	{
 		return 0xffff;
 	}
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<tecmo_spr_device> m_sprgen;
-	required_device<tecmo_mix_device> m_mixer;
-
-
-
 };

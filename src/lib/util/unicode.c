@@ -308,6 +308,16 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
     previous character in a string
 -------------------------------------------------*/
 
+/**
+ * @fn  const char *utf8_previous_char(const char *utf8string)
+ *
+ * @brief   UTF 8 previous character.
+ *
+ * @param   utf8string  The UTF 8string.
+ *
+ * @return  null if it fails, else a char*.
+ */
+
 const char *utf8_previous_char(const char *utf8string)
 {
 	while ((*--utf8string & 0xc0) == 0x80)
@@ -321,6 +331,16 @@ const char *utf8_previous_char(const char *utf8string)
     given string is a properly formed sequence of
     UTF-8 characters
 -------------------------------------------------*/
+
+/**
+ * @fn  int utf8_is_valid_string(const char *utf8string)
+ *
+ * @brief   UTF 8 is valid string.
+ *
+ * @param   utf8string  The UTF 8string.
+ *
+ * @return  An int.
+ */
 
 int utf8_is_valid_string(const char *utf8string)
 {

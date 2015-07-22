@@ -56,6 +56,7 @@ class naomi_state : public dc_state
 	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
 	DECLARE_MACHINE_RESET(naomi);
 	DECLARE_DRIVER_INIT(atomiswave);
+	DECLARE_DRIVER_INIT(xtrmhnt2);
 	DECLARE_DRIVER_INIT(naomigd);
 	DECLARE_DRIVER_INIT(ggxx);
 	DECLARE_DRIVER_INIT(ggxxrl);
@@ -104,6 +105,7 @@ class naomi_state : public dc_state
 	DECLARE_READ64_MEMBER( naomigd_ggxxrl_idle_skip_r );
 	DECLARE_READ64_MEMBER( naomigd_sfz3ugd_idle_skip_r );
 	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
+	DECLARE_READ64_MEMBER( xtrmhnt2_hack_r );
 };
 
 MACHINE_CONFIG_EXTERN(naomi_aw_base);

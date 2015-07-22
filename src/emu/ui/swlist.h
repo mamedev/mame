@@ -15,7 +15,7 @@
 
 class ui_menu_software_parts : public ui_menu {
 public:
-	enum { T_EMPTY, T_FMGR, T_SWLIST, T_ENTRY, };
+	enum { T_EMPTY, T_FMGR, T_SWLIST, T_ENTRY };
 	ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result);
 	virtual ~ui_menu_software_parts();
 	virtual void populate();

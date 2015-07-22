@@ -184,7 +184,7 @@ bcc_rel
 	if(!(P & F_C)) {
 		read_pc_noinc();
 		if(page_changing(PC, INT8(TMP))) {
-			read_direct(set_l(PC, PC+INT8(TMP)));
+			read_arg(set_l(PC, PC+INT8(TMP)));
 		}
 		PC += INT8(TMP);
 	}
@@ -195,7 +195,7 @@ bcs_rel
 	if(P & F_C) {
 		read_pc_noinc();
 		if(page_changing(PC, INT8(TMP))) {
-			read_direct(set_l(PC, PC+INT8(TMP)));
+			read_arg(set_l(PC, PC+INT8(TMP)));
 		}
 		PC += INT8(TMP);
 	}
@@ -206,7 +206,7 @@ beq_rel
 	if(P & F_Z) {
 		read_pc_noinc();
 		if(page_changing(PC, INT8(TMP))) {
-			read_direct(set_l(PC, PC+INT8(TMP)));
+			read_arg(set_l(PC, PC+INT8(TMP)));
 		}
 		PC += INT8(TMP);
 	}
@@ -228,7 +228,7 @@ bmi_rel
 	if(P & F_N) {
 		read_pc_noinc();
 		if(page_changing(PC, INT8(TMP))) {
-			read_direct(set_l(PC, PC+INT8(TMP)));
+			read_arg(set_l(PC, PC+INT8(TMP)));
 		}
 		PC += INT8(TMP);
 	}
@@ -239,7 +239,7 @@ bne_rel
 	if(!(P & F_Z)) {
 		read_pc_noinc();
 		if(page_changing(PC, INT8(TMP))) {
-			read_direct(set_l(PC, PC+INT8(TMP)));
+			read_arg(set_l(PC, PC+INT8(TMP)));
 		}
 		PC += INT8(TMP);
 	}
@@ -250,7 +250,7 @@ bpl_rel
 	if(!(P & F_N)) {
 		read_pc_noinc();
 		if(page_changing(PC, INT8(TMP))) {
-			read_direct(set_l(PC, PC+INT8(TMP)));
+			read_arg(set_l(PC, PC+INT8(TMP)));
 		}
 		PC += INT8(TMP);
 	}
@@ -270,13 +270,13 @@ brk_imp
 	write(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
 	if(nmi_state) {
-		PC = read_direct(0xfffa);
-		PC = set_h(PC, read_direct(0xfffb));
+		PC = read_arg(0xfffa);
+		PC = set_h(PC, read_arg(0xfffb));
 		nmi_state = false;
 		standard_irq_callback(NMI_LINE);
 	} else {
-		PC = read_direct(0xfffe);
-		PC = set_h(PC, read_direct(0xffff));
+		PC = read_arg(0xfffe);
+		PC = set_h(PC, read_arg(0xffff));
 		if(irq_taken)
 			standard_irq_callback(IRQ_LINE);
 	}
@@ -290,7 +290,7 @@ bvc_rel
 	if(!(P & F_V)) {
 		read_pc_noinc();
 		if(page_changing(PC, INT8(TMP))) {
-			read_direct(set_l(PC, PC+INT8(TMP)));
+			read_arg(set_l(PC, PC+INT8(TMP)));
 		}
 		PC += INT8(TMP);
 	}
@@ -301,7 +301,7 @@ bvs_rel
 	if(P & F_V) {
 		read_pc_noinc();
 		if(page_changing(PC, INT8(TMP))) {
-			read_direct(set_l(PC, PC+INT8(TMP)));
+			read_arg(set_l(PC, PC+INT8(TMP)));
 		}
 		PC += INT8(TMP);
 	}
@@ -1216,8 +1216,8 @@ tya_imp
 
 #   exceptions
 reset
-	PC = read_direct(0xfffc);
-	PC = set_h(PC, read_direct(0xfffd));
+	PC = read_arg(0xfffc);
+	PC = set_h(PC, read_arg(0xfffd));
 	prefetch();
 	inst_state = -1;
 

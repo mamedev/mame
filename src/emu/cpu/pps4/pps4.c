@@ -115,7 +115,7 @@ offs_t pps4_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
  */
 inline UINT8 pps4_device::ROP()
 {
-	const UINT8 op = m_direct->read_decrypted_byte(m_P & 0xFFF);
+	const UINT8 op = m_direct->read_byte(m_P & 0xFFF);
 	m_Ip = m_I1;         // save previous opcode
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
@@ -131,7 +131,7 @@ inline UINT8 pps4_device::ROP()
  */
 inline UINT8 pps4_device::ARG()
 {
-	const UINT8 arg = m_direct->read_raw_byte(m_P & 0xFFF);
+	const UINT8 arg = m_direct->read_byte(m_P & 0xFFF);
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
 	return arg;

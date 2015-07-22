@@ -43,13 +43,12 @@
    TODO:
    - accurate timing of envelopes
    - LFO (vibrato, tremolo)
-   - integrate YMF262 (used by Fuuki games, not used by Psikyo and Metro games)
-   - able to hook up "Moonsound", supporting mixed ROM+RAM (for MSX driver in MESS)
-     (this should be possible now by using a custom address map?)
+   - integrate YMF262 mixing (used by Fuuki games, not used by Psikyo and Metro games)
 */
 
 #include "emu.h"
 #include "ymf278b.h"
+#include "ymf262.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -226,6 +225,12 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	INT32 *mixp;
 	INT32 vl, vr;
 
+	if (&stream == m_stream_ymf262)
+	{
+		ymf262_update_one(m_ymf262, outputs, samples);
+		return;
+	}
+
 	memset(m_mix_buffer, 0, sizeof(m_mix_buffer[0])*samples*2);
 
 	for (i = 0; i < 24; i++)
@@ -250,23 +255,23 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				{
 					// 8 bit
 					case 0:
-						sample = m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>16))<<8;
+						sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
 					// 12 bit
 					case 1:
 						if (slot->stepptr & 0x10000)
-							sample = m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
-								(m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
+							sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
+								(m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
-							sample = m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
-								(m_direct->read_raw_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
+							sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
+								(m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
 					// 16 bit
 					case 2:
-						sample = m_direct->read_raw_byte(slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
-							m_direct->read_raw_byte(slot->startaddr + ((slot->stepptr>>16)*2)+1);
+						sample = m_direct->read_byte(slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
+							m_direct->read_byte(slot->startaddr + ((slot->stepptr>>16)*2)+1);
 						break;
 
 					// ?? bit, effect is unknown, datasheet says it's prohibited
@@ -480,7 +485,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 				else
 					offset = m_wavetblhdr*0x80000 + (slot->wave - 384) * 12;
 				for (i = 0; i < 12; i++)
-					p[i] = m_direct->read_raw_byte(offset+i);
+					p[i] = m_direct->read_byte(offset+i);
 
 				slot->bits = (p[0]&0xc0)>>6;
 				slot->startaddr = (p[2] | (p[1]<<8) | ((p[0]&0x3f)<<16));
@@ -683,6 +688,7 @@ WRITE8_MEMBER( ymf278b_device::write )
 			timer_busy_start(0);
 			m_port_AB = data;
 			m_lastport = offset>>1 & 1;
+			ymf262_write(m_ymf262, offset, data);
 			break;
 
 		case 1:
@@ -690,6 +696,8 @@ WRITE8_MEMBER( ymf278b_device::write )
 			timer_busy_start(0);
 			if (m_lastport) B_w(m_port_AB, data);
 			else A_w(m_port_AB, data);
+			m_last_fm_data = data;
+			ymf262_write(m_ymf262, offset, data);
 			break;
 
 		case 4:
@@ -737,6 +745,8 @@ READ8_MEMBER( ymf278b_device::read )
 		case 1:
 		case 3:
 			// but they're not implemented here yet
+			// This may be incorrect, but it makes the mbwave moonsound detection in msx drivers pass.
+			ret = m_last_fm_data;
 			break;
 
 		// PCM regs
@@ -752,7 +762,7 @@ READ8_MEMBER( ymf278b_device::read )
 					ret = (m_pcmregs[m_port_C] & 0x1f) | 0x20; // device ID in upper bits
 					break;
 				case 6:
-					ret = m_direct->read_raw_byte(m_memadr);
+					ret = m_direct->read_byte(m_memadr);
 					m_memadr = (m_memadr + 1) & 0x3fffff;
 					break;
 
@@ -827,6 +837,14 @@ void ymf278b_device::device_reset()
 	m_current_irq = 0;
 	if (!m_irq_handler.isnull())
 		m_irq_handler(0);
+
+	ymf262_reset_chip(m_ymf262);
+}
+
+void ymf278b_device::device_stop()
+{
+	ymf262_shutdown(m_ymf262);
+	m_ymf262 = NULL;
 }
 
 void ymf278b_device::precompute_rate_tables()
@@ -879,6 +897,7 @@ void ymf278b_device::register_save_state()
 	save_item(NAME(m_port_AB));
 	save_item(NAME(m_port_C));
 	save_item(NAME(m_lastport));
+	save_item(NAME(m_last_fm_data));
 
 	for (i = 0; i < 24; ++i)
 	{
@@ -923,6 +942,28 @@ void ymf278b_device::register_save_state()
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
+
+static void ymf278b_ymf262_irq_handler(void *param,int irq)
+{
+}
+
+
+static void ymf278b_ymf262_timer_handler(void *param, int c, const attotime &period)
+{
+}
+
+static void ymf278b_ymf262_update_request(void *param, int interval)
+{
+	ymf278b_device *ymf278b = (ymf278b_device *) param;
+	ymf278b->ymf262_update_request();
+}
+
+
+void ymf278b_device::ymf262_update_request()
+{
+	m_stream_ymf262->update();
+}
+
 
 void ymf278b_device::device_start()
 {
@@ -969,6 +1010,20 @@ void ymf278b_device::device_start()
 
 	// Register state for saving
 	register_save_state();
+
+	// YMF262 related 
+
+	/* stream system initialize */
+	int ymf262_clock = clock() / (19/8.0);
+	m_ymf262 = ymf262_init(this, ymf262_clock, ymf262_clock / 288);
+	assert_always(m_ymf262 != NULL, "Error creating YMF262 chip");
+
+	m_stream_ymf262 = machine().sound().stream_alloc(*this, 0, 4, ymf262_clock / 288);
+
+	/* YMF262 setup */
+	ymf262_set_timer_handler (m_ymf262, ymf278b_ymf262_timer_handler, this);
+	ymf262_set_irq_handler   (m_ymf262, ymf278b_ymf262_irq_handler, this);
+	ymf262_set_update_handler(m_ymf262, ymf278b_ymf262_update_request, this);
 }
 
 
@@ -979,7 +1034,8 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_space_config("samples", ENDIANNESS_BIG, 8, 22, 0, NULL),
-		m_irq_handler(*this)
+		m_irq_handler(*this),
+		m_last_fm_data(0)
 {
 	m_address_map[0] = *ADDRESS_MAP_NAME(ymf278b);
 }

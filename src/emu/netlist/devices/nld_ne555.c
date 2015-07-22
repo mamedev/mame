@@ -5,12 +5,14 @@
  *
  */
 
+#include <solver/nld_solver.h>
 #include "nld_ne555.h"
 #include "../nl_setup.h"
-#include "../analog/nld_solver.h"
 
 #define R_OFF (1E20)
 #define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2
+
+NETLIB_NAMESPACE_DEVICES_START()
 
 inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a, const nl_double b)
 {
@@ -40,9 +42,9 @@ NETLIB_START(NE555)
 	register_subalias("DISCH", m_RDIS.m_P); // Pin 7
 	register_subalias("VCC",  m_R1.m_P);    // Pin 8
 
-	connect(m_R1.m_N, m_R2.m_P);
-	connect(m_R2.m_N, m_R3.m_P);
-	connect(m_RDIS.m_N, m_R3.m_N);
+	connect_late(m_R1.m_N, m_R2.m_P);
+	connect_late(m_R2.m_N, m_R3.m_P);
+	connect_late(m_RDIS.m_N, m_R3.m_N);
 
 	save(NLNAME(m_last_out));
 	save(NLNAME(m_ff));
@@ -66,7 +68,6 @@ NETLIB_RESET(NE555)
 NETLIB_UPDATE(NE555)
 {
 	// FIXME: assumes GND is connected to 0V.
-	// FIXME: Hookup RESET!
 
 	nl_double vt = clamp(TERMANALOG(m_R2.m_P), 0.7, 1.4);
 	bool bthresh = (INPANALOG(m_THRES) > vt);
@@ -124,3 +125,5 @@ NETLIB_RESET(NE555_dip)
 {
 	NETLIB_NAME(NE555)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

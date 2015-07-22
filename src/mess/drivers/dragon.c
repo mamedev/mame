@@ -245,7 +245,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	// floppy
-	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_1MHz)
+	MCFG_WD2797_ADD(WD2797_TAG, XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_alpha_state, fdc_drq_w))
 

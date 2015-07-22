@@ -631,7 +631,7 @@ void tms7000_device::execute_run()
 	{
 		debugger_instruction_hook(this, m_pc);
 
-		m_op = m_direct->read_decrypted_byte(m_pc++);
+		m_op = m_direct->read_byte(m_pc++);
 		execute_one(m_op);
 	} while (m_icount > 0);
 }

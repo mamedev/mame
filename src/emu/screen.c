@@ -463,7 +463,10 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	// if an old style VBLANK_TIME was specified in the MACHINE_CONFIG,
 	// use it; otherwise calculate the VBLANK period from the visible area
 	if (m_oldstyle_vblank_supplied)
+	{
 		m_vblank_period = m_vblank;
+		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
+	}
 	else
 		m_vblank_period = m_scantime * (height - visarea.height());
 

@@ -1336,6 +1336,9 @@ ROM_START( scfinals ) /* This is the single PCB version */
 	ROM_LOAD16_BYTE("d49-04.38", 0x000000, 0x200000, CRC(44b365a9) SHA1(14c4a6b193a0069360406c74c500ba24f2a55b62) ) // C8 C9 CA CB
 	// half empty
 	ROM_LOAD16_BYTE("d49-05.41", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) ) // -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "scfinals.nv", 0x0000, 0x0080, CRC(f25945fc) SHA1(9eed644767b5bd2a13f9158e81c94fd36ba63d71) )
 ROM_END
 
 ROM_START( scfinalso ) /* Cart version */
@@ -1368,6 +1371,9 @@ ROM_START( scfinalso ) /* Cart version */
 	ROM_LOAD16_BYTE("d49-04.38", 0x000000, 0x200000, CRC(44b365a9) SHA1(14c4a6b193a0069360406c74c500ba24f2a55b62) ) // C8 C9 CA CB
 	// half empty
 	ROM_LOAD16_BYTE("d49-05.41", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) ) // -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "scfinalso.nv", 0x0000, 0x0080, CRC(1319752e) SHA1(7d1890ebc7d4e2074d3e820e3991b5c57756ad92) )
 ROM_END
 
 ROM_START( lightbr )
@@ -3828,14 +3834,6 @@ DRIVER_INIT_MEMBER(taito_f3_state,trstaroj)
 
 DRIVER_INIT_MEMBER(taito_f3_state,scfinals)
 {
-	UINT32 *RAM = (UINT32 *)memregion("maincpu")->base();
-
-	/* Doesn't boot without this - eprom related? */
-	RAM[0x5af0/4]=0x4e710000|(RAM[0x5af0/4]&0xffff);
-
-	/* Rom checksum error */
-	RAM[0xdd0/4]=0x4e750000;
-
 	m_f3_game=SCFINALS;
 	tile_decode(machine());
 }

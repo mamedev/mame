@@ -584,7 +584,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	// ZC0 = SIO channel B clock, ZC1 = SIO channel A clock
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTCB_TAG, z80ctc_device, trg3))
 
-	MCFG_MB8877x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_MB8877_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
 

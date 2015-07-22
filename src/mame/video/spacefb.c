@@ -17,14 +17,14 @@
  *
  *************************************/
 
-WRITE8_MEMBER(spacefb_state::spacefb_port_0_w)
+WRITE8_MEMBER(spacefb_state::port_0_w)
 {
 	m_screen->update_now();
 	m_port_0 = data;
 }
 
 
-WRITE8_MEMBER(spacefb_state::spacefb_port_2_w)
+WRITE8_MEMBER(spacefb_state::port_2_w)
 {
 	m_screen->update_now();
 	m_port_2 = data;
@@ -88,6 +88,11 @@ void spacefb_state::video_start()
 	   but most likely, the actual star position is random as the hardware
 	   uses whatever value is on the shift register on power-up */
 	m_star_shift_reg = 0x18f89;
+
+	save_pointer(NAME(m_object_present_map), width * height);
+	save_item(NAME(m_port_0));
+	save_item(NAME(m_port_2));
+	save_item(NAME(m_star_shift_reg));
 }
 
 
@@ -391,7 +396,7 @@ void spacefb_state::draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect
  *
  *************************************/
 
-UINT32 spacefb_state::screen_update_spacefb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 spacefb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	draw_objects(bitmap, cliprect);
 	draw_starfield(screen, bitmap, cliprect);

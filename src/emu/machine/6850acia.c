@@ -258,7 +258,7 @@ WRITE8_MEMBER( acia6850_device::data_w )
 	/// TODO: find out if data stored during master reset is sent after divider is set
 	if (m_divide == 0)
 	{
-		logerror("%s:ACIA %p: Data write while in reset!\n", machine().describe_context(), this);
+		logerror("%s:ACIA %p: Data write while in reset!\n", machine().describe_context(), (void *)this);
 	}
 
 	/// TODO: find out what happens if TDRE is already clear when you write

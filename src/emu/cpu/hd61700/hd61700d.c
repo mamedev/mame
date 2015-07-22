@@ -38,7 +38,7 @@ enum
 	OP_REG8_,
 	OP_REGIM8,
 	OP_RMSIM3,
-	OP_RSIR,
+	OP_RSIR
 };
 
 struct hd61700_dasm

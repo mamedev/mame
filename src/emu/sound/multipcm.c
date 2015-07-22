@@ -534,7 +534,7 @@ void multipcm_device::device_start()
 
 		for (int j = 0; j < 12; j++)
 		{
-			ptSample[j] = (UINT8)m_direct->read_raw_byte((i*12) + j);
+			ptSample[j] = (UINT8)m_direct->read_byte((i*12) + j);
 		}
 
 		m_Samples[i].Start=(ptSample[0]<<16)|(ptSample[1]<<8)|(ptSample[2]<<0);
@@ -616,7 +616,7 @@ void multipcm_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 				unsigned int adr=slot->offset>>SHIFT;
 				signed int sample;
 				unsigned int step=slot->step;
-				signed int csample=(signed short) (m_direct->read_raw_byte(slot->Base+adr)<<8);
+				signed int csample=(signed short) (m_direct->read_byte(slot->Base+adr)<<8);
 				signed int fpart=slot->offset&((1<<SHIFT)-1);
 				sample=(csample*fpart+slot->Prev*((1<<SHIFT)-fpart))>>SHIFT;
 

@@ -11,26 +11,28 @@
 #include "../nl_base.h"
 #include "nld_twoterm.h"
 
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Macros
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-#define QBJT_SW(_name, _model)                                           \
-		NET_REGISTER_DEV(QBJT_switch, _name)                             \
-		NETDEV_PARAMI(_name,  model,   _model)
+#define QBJT_SW(_name, _model)                                                 \
+		NET_REGISTER_DEV(QBJT_SW, _name)                                       \
+		NETDEV_PARAMI(_name,  MODEL,   _model)
 
-#define QBJT_EB(_name, _model)                                           \
-		NET_REGISTER_DEV(QBJT_EB, _name)                                 \
-		NETDEV_PARAMI(_name,  model,   _model)
+#define QBJT_EB(_name, _model)                                                 \
+		NET_REGISTER_DEV(QBJT_EB, _name)                                       \
+		NETDEV_PARAMI(_name,  MODEL,   _model)
 
 
-// ----------------------------------------------------------------------------------------
+NETLIB_NAMESPACE_DEVICES_START()
+
+// -----------------------------------------------------------------------------
 // nld_Q - Base classes
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Have a common start for transistors
 
-class NETLIB_NAME(Q) : public netlist_device_t
+class NETLIB_NAME(Q) : public device_t
 {
 public:
 	enum q_type {
@@ -49,7 +51,7 @@ protected:
 	virtual void reset();
 	ATTR_HOT void update();
 
-	netlist_param_model_t m_model;
+	param_model_t m_model;
 private:
 	q_type m_qtype;
 };
@@ -71,9 +73,9 @@ private:
 
 
 
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // nld_QBJT_switch
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 
 /*
@@ -94,9 +96,9 @@ class NETLIB_NAME(QBJT_switch) : public NETLIB_NAME(QBJT)
 public:
 	ATTR_COLD NETLIB_NAME(QBJT_switch)()
 	: NETLIB_NAME(QBJT)(BJT_SWITCH),
-		m_RB(netlist_object_t::ANALOG),
-		m_RC(netlist_object_t::ANALOG),
-		m_BC_dummy(netlist_object_t::ANALOG),
+		m_RB(object_t::ANALOG),
+		m_RC(object_t::ANALOG),
+		m_BC_dummy(object_t::ANALOG),
 		m_gB(NETLIST_GMIN_DEFAULT), m_gC(NETLIST_GMIN_DEFAULT), m_V(0.0), m_state_on(0) { }
 
 
@@ -124,9 +126,9 @@ protected:
 private:
 };
 
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // nld_QBJT_EB
-// ----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 
 class NETLIB_NAME(QBJT_EB) : public NETLIB_NAME(QBJT)
@@ -134,9 +136,9 @@ class NETLIB_NAME(QBJT_EB) : public NETLIB_NAME(QBJT)
 public:
 	ATTR_COLD NETLIB_NAME(QBJT_EB)()
 	: NETLIB_NAME(QBJT)(BJT_EB),
-		m_D_CB(netlist_object_t::ANALOG),
-		m_D_EB(netlist_object_t::ANALOG),
-		m_D_EC(netlist_object_t::ANALOG),
+		m_D_CB(object_t::ANALOG),
+		m_D_EB(object_t::ANALOG),
+		m_D_EC(object_t::ANALOG),
 		m_alpha_f(0),
 		m_alpha_r(0)
 		{ }
@@ -149,8 +151,8 @@ protected:
 	ATTR_HOT void virtual update();
 	NETLIB_UPDATE_TERMINALSI();
 
-	netlist_generic_diode m_gD_BC;
-	netlist_generic_diode m_gD_BE;
+	generic_diode m_gD_BC;
+	generic_diode m_gD_BE;
 
 	nld_twoterm m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
 	nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
@@ -161,5 +163,7 @@ protected:
 
 private:
 };
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_BJT_H_ */

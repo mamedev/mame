@@ -3,6 +3,7 @@
 #include "machine/i8255.h"
 #include "includes/galaxold.h"
 #include "sound/tms5110.h"
+#include "sound/digitalk.h"
 
 class scramble_state : public galaxold_state
 {
@@ -13,7 +14,8 @@ public:
 		m_ppi8255_0(*this, "ppi8255_0"),
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_tmsprom(*this, "tmsprom"),
-		m_soundram(*this, "soundram")
+		m_soundram(*this, "soundram"),
+		m_digitalker(*this, "digitalker")
 	{
 	}
 
@@ -22,6 +24,7 @@ public:
 	optional_device<i8255_device>  m_ppi8255_1;
 	optional_device<tmsprom_device>  m_tmsprom;
 	optional_shared_ptr<UINT8> m_soundram;
+	optional_device<digitalker_device> m_digitalker;
 
 	UINT8 m_cavelon_bank;
 
@@ -50,12 +53,12 @@ public:
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
 	DECLARE_WRITE8_MEMBER(ad2083_tms5110_ctrl_w);
 
-	DECLARE_WRITE8_MEMBER(harem_portA_w);
-	DECLARE_WRITE8_MEMBER(harem_portB_w);
-
+	// harem
 	DECLARE_WRITE8_MEMBER(harem_decrypt_bit_w);
 	DECLARE_WRITE8_MEMBER(harem_decrypt_clk_w);
 	DECLARE_WRITE8_MEMBER(harem_decrypt_rst_w);
+	DECLARE_READ8_MEMBER(harem_digitalker_intr_r);
+	DECLARE_WRITE8_MEMBER(harem_digitalker_control_w);
 
 	DECLARE_DRIVER_INIT(cavelon);
 	DECLARE_DRIVER_INIT(mariner);

@@ -16,47 +16,36 @@
 
 
 ******************************************************************************/
-READ8_MEMBER(nbmj9195_state::nbmj9195_palette_r)
-{
-	return m_palette_ptr[offset];
-}
 
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_palette_w)
+WRITE8_MEMBER(nbmj9195_state::palette_w)
 {
-	int r, g, b;
-
 	m_palette_ptr[offset] = data;
 
 	if (offset & 1)
 	{
 		offset &= 0x1fe;
 
-		r = ((m_palette_ptr[offset + 0] & 0x0f) >> 0);
-		g = ((m_palette_ptr[offset + 0] & 0xf0) >> 4);
-		b = ((m_palette_ptr[offset + 1] & 0x0f) >> 0);
+		int r = ((m_palette_ptr[offset + 0] & 0x0f) >> 0);
+		int g = ((m_palette_ptr[offset + 0] & 0xf0) >> 4);
+		int b = ((m_palette_ptr[offset + 1] & 0x0f) >> 0);
 
 		m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
-READ8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_r)
-{
-	return m_nb22090_palette[offset];
-}
-
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_w)
+WRITE8_MEMBER(nbmj9195_state::nb22090_palette_w)
 {
 	int r, g, b;
 	int offs_h, offs_l;
 
-	m_nb22090_palette[offset] = data;
+	m_palette_ptr[offset] = data;
 
 	offs_h = (offset / 0x0300);
 	offs_l = (offset & 0x00ff);
 
-	r = m_nb22090_palette[(0x000 + (offs_h * 0x300) + offs_l)];
-	g = m_nb22090_palette[(0x100 + (offs_h * 0x300) + offs_l)];
-	b = m_nb22090_palette[(0x200 + (offs_h * 0x300) + offs_l)];
+	r = m_palette_ptr[(0x000 + (offs_h * 0x300) + offs_l)];
+	g = m_palette_ptr[(0x100 + (offs_h * 0x300) + offs_l)];
+	b = m_palette_ptr[(0x200 + (offs_h * 0x300) + offs_l)];
 
 	m_palette->set_pen_color(((offs_h * 0x100) + offs_l), rgb_t(r, g, b));
 }
@@ -65,7 +54,7 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_w)
 
 
 ******************************************************************************/
-int nbmj9195_state::nbmj9195_blitter_r(int offset, int vram)
+int nbmj9195_state::blitter_r(int offset, int vram)
 {
 	int ret;
 	UINT8 *GFXROM = memregion("gfx1")->base();
@@ -80,7 +69,7 @@ int nbmj9195_state::nbmj9195_blitter_r(int offset, int vram)
 	return ret;
 }
 
-void nbmj9195_state::nbmj9195_blitter_w(int offset, int data, int vram)
+void nbmj9195_state::blitter_w(int offset, int data, int vram)
 {
 	int new_line;
 
@@ -94,7 +83,7 @@ void nbmj9195_state::nbmj9195_blitter_w(int offset, int data, int vram)
 				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
 					m_flipscreen[vram] = (data & 0x40) ? 0 : 1;
 					m_dispflag[vram] = (data & 0x80) ? 1 : 0;
-					nbmj9195_vramflip(vram);
+					vramflip(vram);
 					break;
 		case 0x01:  m_scrollx[vram] = (m_scrollx[vram] & 0x0100) | data; break;
 		case 0x02:  m_scrollx[vram] = (m_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
@@ -121,23 +110,23 @@ void nbmj9195_state::nbmj9195_blitter_w(int offset, int data, int vram)
 		case 0x0b:  m_blitter_destx[vram] = (m_blitter_destx[vram]  & 0x00ff) | (data << 8); break;
 		case 0x0c:  m_blitter_desty[vram] = (m_blitter_desty[vram]  & 0xff00) | data; break;
 		case 0x0d:  m_blitter_desty[vram] = (m_blitter_desty[vram]  & 0x00ff) | (data << 8);
-					nbmj9195_gfxdraw(vram);
+					gfxdraw(vram);
 					break;
 		default:    break;
 	}
 }
 
-void nbmj9195_state::nbmj9195_clutsel_w(int data)
+WRITE8_MEMBER(nbmj9195_state::clutsel_w)
 {
 	m_clutsel = data;
 }
 
-void nbmj9195_state::nbmj9195_clut_w(int offset, int data, int vram)
+void nbmj9195_state::clut_w(int offset, int data, int vram)
 {
 	m_clut[vram][((m_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
 
-void nbmj9195_state::nbmj9195_gfxflag2_w(int data)
+WRITE8_MEMBER(nbmj9195_state::gfxflag2_w)
 {
 	m_gfxflag2 = data;
 }
@@ -146,7 +135,7 @@ void nbmj9195_state::nbmj9195_gfxflag2_w(int data)
 
 
 ******************************************************************************/
-void nbmj9195_state::nbmj9195_vramflip(int vram)
+void nbmj9195_state::vramflip(int vram)
 {
 	int x, y;
 	UINT16 color1, color2;
@@ -202,7 +191,7 @@ void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-void nbmj9195_state::nbmj9195_gfxdraw(int vram)
+void nbmj9195_state::gfxdraw(int vram)
 {
 	UINT8 *GFX = memregion("gfx1")->base();
 	int width = m_screen->width();
@@ -359,38 +348,63 @@ void nbmj9195_state::nbmj9195_gfxdraw(int vram)
 	m_nb19010_busyflag = 0;
 
 	/* 1650ns per count */
-	timer_set(attotime::from_nsec(m_nb19010_busyctr * 1650), TIMER_BLITTER);
+	m_blitter_timer->adjust(attotime::from_nsec(m_nb19010_busyctr * 1650));
 }
 
 /******************************************************************************
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_blitter_0_w){ nbmj9195_blitter_w(offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_blitter_1_w){ nbmj9195_blitter_w(offset, data, 1); }
+WRITE8_MEMBER(nbmj9195_state::blitter_0_w){ blitter_w(offset, data, 0); }
+WRITE8_MEMBER(nbmj9195_state::blitter_1_w){ blitter_w(offset, data, 1); }
 
-READ8_MEMBER(nbmj9195_state::nbmj9195_blitter_0_r){ return nbmj9195_blitter_r(offset, 0); }
-READ8_MEMBER(nbmj9195_state::nbmj9195_blitter_1_r){ return nbmj9195_blitter_r(offset, 1); }
+READ8_MEMBER(nbmj9195_state::blitter_0_r){ return blitter_r(offset, 0); }
+READ8_MEMBER(nbmj9195_state::blitter_1_r){ return blitter_r(offset, 1); }
 
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_0_w){ nbmj9195_clut_w(offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::nbmj9195_clut_1_w){ nbmj9195_clut_w(offset, data, 1); }
+WRITE8_MEMBER(nbmj9195_state::clut_0_w){ clut_w(offset, data, 0); }
+WRITE8_MEMBER(nbmj9195_state::clut_1_w){ clut_w(offset, data, 1); }
 
 /******************************************************************************
 
 
 ******************************************************************************/
-VIDEO_START_MEMBER(nbmj9195_state,nbmj9195_1layer)
+VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
+	
+	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
 	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 0;
+	
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_scrollx_raster));
+	save_item(NAME(m_blitter_destx));
+	save_item(NAME(m_blitter_desty));
+	save_item(NAME(m_blitter_sizex));
+	save_item(NAME(m_blitter_sizey));
+	save_item(NAME(m_blitter_src_addr));
+	save_item(NAME(m_blitter_direction_x));
+	save_item(NAME(m_blitter_direction_y));
+	save_item(NAME(m_dispflag));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_clutmode));
+	save_item(NAME(m_transparency));
+	save_item(NAME(m_clutsel));
+	save_item(NAME(m_gfxflag2));
+	save_item(NAME(m_gfxdraw_mode));
+	save_item(NAME(m_nb19010_busyctr));
+	save_item(NAME(m_nb19010_busyflag));
+	save_pointer(NAME(m_videoram[0]), width * height);
+	save_pointer(NAME(m_clut[0]), 0x1000);
+	save_item(NAME(m_flipscreen_old));
+	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj9195_state::postload), this));
 }
 
 void nbmj9195_state::video_start()
@@ -398,34 +412,64 @@ void nbmj9195_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
+	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_screen->register_screen_bitmap(m_tmpbitmap[1]);
 	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
 	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 1;
+	m_screen_refresh = 1;
+	
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_scrollx_raster));
+	save_item(NAME(m_blitter_destx));
+	save_item(NAME(m_blitter_desty));
+	save_item(NAME(m_blitter_sizex));
+	save_item(NAME(m_blitter_sizey));
+	save_item(NAME(m_blitter_src_addr));
+	save_item(NAME(m_blitter_direction_x));
+	save_item(NAME(m_blitter_direction_y));
+	save_item(NAME(m_dispflag));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_clutmode));
+	save_item(NAME(m_transparency));
+	save_item(NAME(m_clutsel));
+	save_item(NAME(m_gfxflag2));
+	save_item(NAME(m_gfxdraw_mode));
+	save_item(NAME(m_nb19010_busyctr));
+	save_item(NAME(m_nb19010_busyflag));
+	save_pointer(NAME(m_videoram[0]), width * height);
+	save_pointer(NAME(m_videoram[1]), width * height);
+	save_pointer(NAME(m_clut[0]), 0x1000);
+	save_pointer(NAME(m_clut[1]), 0x1000);
+	save_item(NAME(m_flipscreen_old));
+	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj9195_state::postload), this));
 }
 
-VIDEO_START_MEMBER(nbmj9195_state,nbmj9195_nb22090)
+void nbmj9195_state::postload()
 {
+	m_screen_refresh = 1;
+}
+
+VIDEO_START_MEMBER(nbmj9195_state,nb22090)
+{
+	nbmj9195_state::video_start();
+
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
-	m_screen->register_screen_bitmap(m_tmpbitmap[1]);
-	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_videoram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoworkram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoworkram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_nb22090_palette = auto_alloc_array(machine(), UINT8, 0xc00);
-	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
-	m_nb19010_busyflag = 1;
+
+	save_pointer(NAME(m_videoworkram[0]), width * height);
+	save_pointer(NAME(m_videoworkram[1]), width * height);
+
 	m_gfxdraw_mode = 2;
 }
 
@@ -433,7 +477,7 @@ VIDEO_START_MEMBER(nbmj9195_state,nbmj9195_nb22090)
 
 
 ******************************************************************************/
-UINT32 nbmj9195_state::screen_update_nbmj9195(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 nbmj9195_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	int x, y;

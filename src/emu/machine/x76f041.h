@@ -52,7 +52,7 @@ private:
 		CONFIG_BCR2 = 1,
 		CONFIG_CR = 2,
 		CONFIG_RR = 3,
-		CONFIG_RC = 4,
+		CONFIG_RC = 4
 	};
 
 	enum bcr_t

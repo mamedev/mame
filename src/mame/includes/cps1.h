@@ -116,7 +116,8 @@ public:
 		m_msm_2(*this, "msm2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
 	// cps1
@@ -212,6 +213,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_shared_ptr<UINT16> m_decrypted_opcodes;
 
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
@@ -271,6 +273,7 @@ public:
 	DECLARE_DRIVER_INIT(ganbare);
 	DECLARE_DRIVER_INIT(cps2_video);
 	DECLARE_DRIVER_INIT(cps2);
+	DECLARE_DRIVER_INIT(cps2nc);
 	DECLARE_DRIVER_INIT(cps2crpt);
 	DECLARE_DRIVER_INIT(ssf2tb);
 	DECLARE_DRIVER_INIT(pzloop2);
@@ -301,6 +304,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
+	void kabuki_setup(void (*decode)(UINT8 *src, UINT8 *dst));
 
 	/* fcrash handlers */
 	DECLARE_DRIVER_INIT(kodb);

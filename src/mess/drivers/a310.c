@@ -377,7 +377,7 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("512K, 1M, 4M, 8M, 16M")
 
-	MCFG_WD1772x_ADD("fdc", 8000000 / 1) // TODO: frequency
+	MCFG_WD1772_ADD("fdc", 8000000 / 1) // TODO: frequency
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE( a310_state, a310_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a310_state, a310_wd177x_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", a310_floppies, "35dd", a310_state::floppy_formats)

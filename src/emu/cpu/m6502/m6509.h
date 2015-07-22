@@ -32,8 +32,8 @@ protected:
 		virtual ~mi_6509_normal() {}
 		virtual UINT8 read(UINT16 adr);
 		virtual UINT8 read_9(UINT16 adr);
-		virtual UINT8 read_direct(UINT16 adr);
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_arg(UINT16 adr);
 		virtual void write(UINT16 adr, UINT8 val);
 		virtual void write_9(UINT16 adr, UINT8 val);
 	};
@@ -42,8 +42,8 @@ protected:
 	public:
 		mi_6509_nd(m6509_device *base);
 		virtual ~mi_6509_nd() {}
-		virtual UINT8 read_direct(UINT16 adr);
-		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr);
+		virtual UINT8 read_arg(UINT16 adr);
 	};
 
 	virtual void device_start();
@@ -74,7 +74,7 @@ protected:
 enum {
 	M6509_IRQ_LINE = m6502_device::IRQ_LINE,
 	M6509_NMI_LINE = m6502_device::NMI_LINE,
-	M6509_SET_OVERFLOW = m6502_device::V_LINE,
+	M6509_SET_OVERFLOW = m6502_device::V_LINE
 };
 
 enum {

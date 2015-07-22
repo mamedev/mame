@@ -49,6 +49,15 @@ address_space_config::address_space_config()
 {
 }
 
+/*!
+ @param name
+ @param endian CPU endianness
+ @param datawidth CPU parallelism bits
+ @param addrwidth address bits
+ @param addrshift
+ @param internal
+ @param defmap
+ */
 address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 		m_endianness(endian),

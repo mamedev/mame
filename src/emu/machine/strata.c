@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Raphael Nabet, Michael Zapf
 /*
     Intel 28F640J5 Flash ROM emulation (could also handle 28F320J5 with minor

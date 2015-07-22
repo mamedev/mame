@@ -18,8 +18,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "bus/isa/fdc.h"
 
 class ax20_state : public driver_device
 {
@@ -29,18 +28,37 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_p_vram(*this, "p_vram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_fdc(*this, "fdc")  { }
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_p_vram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<i8272a_device> m_fdc;
 
 	virtual void machine_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_shared_ptr<UINT8> m_p_vram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_WRITE8_MEMBER(tc_w);
+	DECLARE_WRITE8_MEMBER(ctl_w);
 };
 
+READ8_MEMBER(ax20_state::unk_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(ax20_state::tc_w)
+{
+	m_fdc->tc_w((data & 0xf0) == 0xf0);
+}
+
+WRITE8_MEMBER(ax20_state::ctl_w)
+{
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 1));
+}
 
 UINT32 ax20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -68,6 +86,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ax20_io, AS_IO, 8, ax20_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xffc0, 0xffc0) AM_WRITE(tc_w)
+	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(ctl_w)
+	AM_RANGE(0xffe0, 0xffe0) AM_READ(unk_r)
+	AM_RANGE(0xff80, 0xff81) AM_DEVICE("fdc", i8272a_device, map)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -94,12 +116,9 @@ static GFXDECODE_START( ax20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ax20_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const floppy_interface ax20_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSDD_40, // TODO
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
-};
+static SLOT_INTERFACE_START( ax20_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( ax20, ax20_state )
 	/* basic machine hardware */
@@ -118,8 +137,10 @@ static MACHINE_CONFIG_START( ax20, ax20_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ax20)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
+	MCFG_I8272A_ADD("fdc", true)
+
 	/* Devices */
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, ax20_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

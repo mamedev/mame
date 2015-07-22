@@ -1289,16 +1289,15 @@ static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *exte
 			UINT8 texel3 = get_texel_8bit(texbase, v1, u1, texwidth);
 			if (texel0 != transcolor)
 			{
-				rgb_t color0 = WAVERAM_READ16(palbase, texel0);
-				rgb_t color1 = WAVERAM_READ16(palbase, texel1);
-				rgb_t color2 = WAVERAM_READ16(palbase, texel2);
-				rgb_t color3 = WAVERAM_READ16(palbase, texel3);
-				rgb_t filtered;
+				UINT32 color0 = WAVERAM_READ16(palbase, texel0);
+				UINT32 color1 = WAVERAM_READ16(palbase, texel1);
+				UINT32 color2 = WAVERAM_READ16(palbase, texel2);
+				UINT32 color3 = WAVERAM_READ16(palbase, texel3);
 				color0 = ((color0 & 0x7c00) << 9) | ((color0 & 0x3e0) << 6) | ((color0 & 0x1f) << 3);
 				color1 = ((color1 & 0x7c00) << 9) | ((color1 & 0x3e0) << 6) | ((color1 & 0x1f) << 3);
 				color2 = ((color2 & 0x7c00) << 9) | ((color2 & 0x3e0) << 6) | ((color2 & 0x1f) << 3);
 				color3 = ((color3 & 0x7c00) << 9) | ((color3 & 0x3e0) << 6) | ((color3 & 0x1f) << 3);
-				filtered = rgb_bilinear_filter(color0, color1, color2, color3, curu, curv);
+				rgb_t filtered = rgbaint_t::bilinear_filter(color0, color1, color2, color3, curu, curv);
 				WAVERAM_WRITEPIX(zeus_renderbase, scanline, x, filtered);
 				*depthptr = depth;
 			}

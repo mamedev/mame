@@ -557,13 +557,13 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			break;
 		}
 
-        // Did we lost the software parts?
-        if (swinfo->num_parts() == 0)
-        {
-            osd_printf_error("%s: %s has no part\n", filename(), swinfo->shortname());
-            break;
-        }
-        
+		// Did we lost the software parts?
+		if (swinfo->num_parts() == 0)
+		{
+			osd_printf_error("%s: %s has no part\n", filename(), swinfo->shortname());
+			break;
+		}
+
 		// Second, since the xml is fine, run additional checks:
 
 		// check for duplicate names

@@ -16,9 +16,6 @@ MAIN:
 	@m_opcode = read_opcode();
 	m_lic_func(CLEAR_LINE);
 
-	// burn delay loops
-	burn_any_delay_loops();
-
 	// dispatch opcode
 	switch(m_opcode)
 	{

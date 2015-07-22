@@ -143,8 +143,8 @@ protected:
 	inline UINT16 read_mem16(UINT16 address) { return m_program->read_byte(address) << 8 | m_program->read_byte((address + 1) & 0xffff); }
 	inline void write_mem16(UINT16 address, UINT16 data) { m_program->write_byte(address, data >> 8 & 0xff); m_program->write_byte((address + 1) & 0xffff, data & 0xff); }
 
-	inline UINT8 imm8() { return m_direct->read_raw_byte(m_pc++); }
-	inline UINT16 imm16() { UINT16 ret = m_direct->read_raw_byte(m_pc++) << 8; return ret | m_direct->read_raw_byte(m_pc++); }
+	inline UINT8 imm8() { return m_direct->read_byte(m_pc++); }
+	inline UINT16 imm16() { UINT16 ret = m_direct->read_byte(m_pc++) << 8; return ret | m_direct->read_byte(m_pc++); }
 
 	inline UINT8 pull8() { return m_program->read_byte(m_sp--); }
 	inline void push8(UINT8 data) { m_program->write_byte(++m_sp, data); }

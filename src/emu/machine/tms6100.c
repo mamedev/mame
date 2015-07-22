@@ -136,13 +136,15 @@ void tms6100_device::device_start()
 	save_item(NAME(m_m0));
 	save_item(NAME(m_m1));
 	save_item(NAME(m_state));
+	//save_item(NAME(m_variant));
+	//tms6100_set_variant(tms, TMS6110_IS_TMS6100);
 
 }
 
 void m58819_device::device_start()
 {
-	//tms5110_set_variant(tms, TMS5110_IS_5100);
 	tms6100_device::device_start();
+	//tms6100_set_variant(tms, TMS6110_IS_M58819);
 }
 
 //-------------------------------------------------
@@ -197,7 +199,15 @@ WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
 				else
 				{
 					/* read bit at address */
+					/* if (m_variant == TMS6110_IS_M58819)
+					{
+						m_data = (m_rom[m_address >> 3] >> (7-(m_address & 0x07))) & 1;
+					}
+					else // m_variant == (TMS6110_IS_TMS6100 || TMS6110_IS_TMS6125)
+					{
+						*/
 					m_data = (m_rom[m_address >> 3] >> (m_address & 0x07)) & 1;
+					/* } */
 					m_address++;
 				}
 				m_state &= ~TMS6100_READ_PENDING;

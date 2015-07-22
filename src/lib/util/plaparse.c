@@ -294,6 +294,18 @@ static bool process_field(jed_data *data, const UINT8 **src, const UINT8 *srcend
     that has been loaded raw into memory
 -------------------------------------------------*/
 
+/**
+ * @fn  int pla_parse(const void *data, size_t length, jed_data *result)
+ *
+ * @brief   Pla parse.
+ *
+ * @param   data        The data.
+ * @param   length      The length.
+ * @param [out] result  If non-null, the result.
+ *
+ * @return  An int.
+ */
+
 int pla_parse(const void *data, size_t length, jed_data *result)
 {
 	const UINT8 *src = (const UINT8 *)data;

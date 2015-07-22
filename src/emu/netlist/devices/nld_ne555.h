@@ -25,6 +25,7 @@
 #define NE555(_name)                                                        \
 		NET_REGISTER_DEV(NE555, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(NE555,
 	NETLIB_NAME(R) m_R1;
@@ -32,10 +33,10 @@ NETLIB_DEVICE(NE555,
 	NETLIB_NAME(R) m_R3;
 	NETLIB_NAME(R) m_RDIS;
 
-	netlist_logic_input_t m_RESET;
-	netlist_analog_input_t m_THRES;
-	netlist_analog_input_t m_TRIG;
-	netlist_analog_output_t m_OUT;
+	logic_input_t m_RESET;
+	analog_input_t m_THRES;
+	analog_input_t m_TRIG;
+	analog_output_t m_OUT;
 
 	bool m_last_out;
 	bool m_ff;
@@ -45,9 +46,10 @@ NETLIB_DEVICE(NE555,
 );
 
 #define NE555_DIP(_name)                                                         \
-		NET_REGISTER_DEV(NE555_dip, _name)
+		NET_REGISTER_DEV(NE555_DIP, _name)
 
 NETLIB_DEVICE_DERIVED_PURE(NE555_dip, NE555);
 
+NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_NE555_H_ */

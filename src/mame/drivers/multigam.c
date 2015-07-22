@@ -379,14 +379,14 @@ WRITE8_MEMBER(multigam_state::multigam_switch_prg_rom)
 		memcpy(&dst[0x8000], &src[data*0x4000], 0x4000);
 		memcpy(&dst[0xc000], &src[data*0x4000], 0x4000);
 	}
-};
+}
 
 WRITE8_MEMBER(multigam_state::multigam_switch_gfx_rom)
 {
 	membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * (data & 0x3f)));
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_game_gfx_bank = data;
-};
+}
 
 
 WRITE8_MEMBER(multigam_state::multigam_mapper2_w)
@@ -631,7 +631,7 @@ void multigam_state::multigam_init_mmc3(UINT8 *prg_base, int prg_size, int chr_b
 	m_multigam3_mmc3_prg_base = prg_base;
 	m_multigam3_mmc3_chr_bank_base = chr_bank_base;
 	m_multigam3_mmc3_prg_size = prg_size;
-};
+}
 
 WRITE8_MEMBER(multigam_state::multigm3_mapper2_w)
 {
@@ -643,14 +643,14 @@ WRITE8_MEMBER(multigam_state::multigm3_mapper2_w)
 	{
 		logerror("Unmapped multigam_mapper2_w: offset = %04X, data = %02X\n", offset, data);
 	}
-};
+}
 
 WRITE8_MEMBER(multigam_state::multigm3_switch_gfx_rom)
 {
 	set_videorom_bank(0, 8, data & 0x3f, 8);
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_game_gfx_bank = data;
-};
+}
 
 WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 {
@@ -682,7 +682,7 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 		memcpy(&dst[0x8000], &src[data*0x4000], 0x4000);
 		memcpy(&dst[0xc000], &src[data*0x4000], 0x4000);
 	}
-};
+}
 
 /******************************************************
 
@@ -889,7 +889,7 @@ void multigam_state::multigam_init_mmc1(UINT8 *prg_base, int prg_size, int chr_b
 	m_mmc1_chr_bank_base = chr_bank_base;
 
 	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
-};
+}
 
 
 /******************************************************
@@ -1182,7 +1182,7 @@ MACHINE_RESET_MEMBER(multigam_state,multigm3)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* reset the ppu */
 	multigm3_switch_prg_rom(space, 0, 0x01 );
-};
+}
 
 void multigam_state::machine_start()
 {
@@ -1217,7 +1217,7 @@ MACHINE_START_MEMBER(multigam_state,multigm3)
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x1c00, 0x1fff, "bank9");
 
 	set_videorom_bank(0, 8, 0, 8);
-};
+}
 
 MACHINE_START_MEMBER(multigam_state,supergm3)
 {
@@ -1430,7 +1430,7 @@ void multigam_state::multigm3_decrypt(UINT8* mem, int memsize, const UINT8* deco
 	{
 		mem[i] = decode_nibble[mem[i] & 0x0f] | (decode_nibble[mem[i] >> 4] << 4);
 	}
-};
+}
 
 DRIVER_INIT_MEMBER(multigam_state,multigm3)
 {
@@ -1483,7 +1483,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	}
 
 	multigam_switch_prg_rom(space, 0x0, 0x01);
-};
+}
 
 GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
 GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )

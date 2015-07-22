@@ -28,7 +28,7 @@ public:
 		IRQ_A_TX,
 		IRQ_B_TX,
 		IRQ_A_EXT,
-		IRQ_B_EXT,
+		IRQ_B_EXT
 	};
 
 	mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -81,7 +81,7 @@ private:
 	int lastIRQStat;
 	IRQType_t IRQType;
 
-	Chan channel[1];
+	Chan channel[2];
 
 	devcb_write_line intrq_cb;
 

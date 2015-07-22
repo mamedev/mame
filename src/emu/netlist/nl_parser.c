@@ -12,11 +12,13 @@
 //#undef NL_VERBOSE_OUT
 //#define NL_VERBOSE_OUT(x) printf x
 
+namespace netlist
+{
 // ----------------------------------------------------------------------------------------
 // A netlist parser
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void netlist_parser::verror(pstring msg, int line_num, pstring line)
+ATTR_COLD void parser_t::verror(pstring msg, int line_num, pstring line)
 {
 	m_setup.netlist().error("line %d: error: %s\n\t\t%s\n", line_num,
 			msg.cstr(), line.cstr());
@@ -25,7 +27,7 @@ ATTR_COLD void netlist_parser::verror(pstring msg, int line_num, pstring line)
 }
 
 
-bool netlist_parser::parse(const char *buf, const pstring nlname)
+bool parser_t::parse(const char *buf, const pstring nlname)
 {
 	ppreprocessor prepro;
 
@@ -48,11 +50,14 @@ bool netlist_parser::parse(const char *buf, const pstring nlname)
 	m_tok_comma = register_token(",");
 
 	m_tok_ALIAS = register_token("ALIAS");
+	m_tok_DIPPINS = register_token("DIPPINS");
 	m_tok_NET_C = register_token("NET_C");
+	m_tok_FRONTIER = register_token("OPTIMIZE_FRONTIER");
 	m_tok_PARAM = register_token("PARAM");
 	m_tok_NET_MODEL = register_token("NET_MODEL");
 	m_tok_INCLUDE = register_token("INCLUDE");
 	m_tok_LOCAL_SOURCE = register_token("LOCAL_SOURCE");
+	m_tok_LOCAL_LIB_ENTRY = register_token("LOCAL_LIB_ENTRY");
 	m_tok_SUBMODEL = register_token("SUBMODEL");
 	m_tok_NETLIST_START = register_token("NETLIST_START");
 	m_tok_NETLIST_END = register_token("NETLIST_END");
@@ -60,6 +65,7 @@ bool netlist_parser::parse(const char *buf, const pstring nlname)
 	m_tok_TRUTHTABLE_END = register_token("TRUTHTABLE_END");
 	m_tok_TT_HEAD = register_token("TT_HEAD");
 	m_tok_TT_LINE = register_token("TT_LINE");
+	m_tok_TT_FAMILY = register_token("TT_FAMILY");
 
 	bool in_nl = false;
 
@@ -101,7 +107,7 @@ bool netlist_parser::parse(const char *buf, const pstring nlname)
 	}
 }
 
-void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
+void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 {
 	while (true)
 	{
@@ -115,8 +121,12 @@ void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
 
 		if (token.is(m_tok_ALIAS))
 			net_alias();
+		else if (token.is(m_tok_DIPPINS))
+			dippins();
 		else if (token.is(m_tok_NET_C))
 			net_c();
+		else if (token.is(m_tok_FRONTIER))
+			frontier();
 		else if (token.is(m_tok_PARAM))
 			netdev_param();
 		else if (token.is(m_tok_NET_MODEL))
@@ -129,6 +139,11 @@ void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			net_local_source();
 		else if (token.is(m_tok_TRUTHTABLE_START))
 			net_truthtable_start();
+		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
+		{
+			m_setup.register_lib_entry(get_identifier());
+			require_token(m_tok_param_right);
+		}
 		else if (token.is(m_tok_NETLIST_END))
 		{
 			netdev_netlist_end();
@@ -139,7 +154,7 @@ void netlist_parser::parse_netlist(ATTR_UNUSED const pstring &nlname)
 	}
 }
 
-void netlist_parser::net_truthtable_start()
+void parser_t::net_truthtable_start()
 {
 	pstring name = get_identifier();
 	require_token(m_tok_comma);
@@ -152,7 +167,7 @@ void netlist_parser::net_truthtable_start()
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	netlist_base_factory_truthtable_t *ttd = nl_tt_factory_create(ni, no, hs,
+	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
 			name, name, "+" + def_param);
 
 	while (true)
@@ -171,6 +186,12 @@ void netlist_parser::net_truthtable_start()
 			ttd->m_desc.add(get_string());
 			require_token(m_tok_param_right);
 		}
+		else if (token.is(m_tok_TT_FAMILY))
+		{
+			require_token(m_tok_param_left);
+			ttd->m_family = netlist::logic_family_desc_t::from_model(m_setup.get_model_str(get_string()));
+			require_token(m_tok_param_right);
+		}
 		else
 		{
 			require_token(token, m_tok_TRUTHTABLE_END);
@@ -183,20 +204,20 @@ void netlist_parser::net_truthtable_start()
 }
 
 
-void netlist_parser::netdev_netlist_start()
+void parser_t::netdev_netlist_start()
 {
 	// don't do much
 	token_t name = get_token();
 	require_token(m_tok_param_right);
 }
 
-void netlist_parser::netdev_netlist_end()
+void parser_t::netdev_netlist_end()
 {
 	// don't do much
 	require_token(m_tok_param_right);
 }
 
-void netlist_parser::net_model()
+void parser_t::net_model()
 {
 	// don't do much
 	pstring model = get_string();
@@ -204,20 +225,33 @@ void netlist_parser::net_model()
 	require_token(m_tok_param_right);
 }
 
-void netlist_parser::net_submodel()
+void parser_t::net_submodel()
 {
 	// don't do much
-	pstring name = get_identifier();
-	require_token(m_tok_comma);
 	pstring model = get_identifier();
+	require_token(m_tok_comma);
+	pstring name = get_identifier();
 	require_token(m_tok_param_right);
 
 	m_setup.namespace_push(name);
-	m_setup.include(name);
+	m_setup.include(model);
 	m_setup.namespace_pop();
 }
 
-void netlist_parser::net_include()
+void parser_t::frontier()
+{
+	// don't do much
+	pstring attachat = get_identifier();
+	require_token(m_tok_comma);
+	double r_IN = eval_param(get_token());
+	require_token(m_tok_comma);
+	double r_OUT = eval_param(get_token());
+	require_token(m_tok_param_right);
+
+	m_setup.register_frontier(attachat, r_IN, r_OUT);
+}
+
+void parser_t::net_include()
 {
 	// don't do much
 	pstring name = get_identifier();
@@ -226,7 +260,7 @@ void netlist_parser::net_include()
 	m_setup.include(name);
 }
 
-void netlist_parser::net_local_source()
+void parser_t::net_local_source()
 {
 	// This directive is only for hardcoded netlists. Ignore it here.
 	pstring name = get_identifier();
@@ -234,9 +268,9 @@ void netlist_parser::net_local_source()
 
 }
 
-void netlist_parser::net_alias()
+void parser_t::net_alias()
 {
-	pstring alias = get_identifier();
+	pstring alias = get_identifier_or_number();
 
 	require_token(m_tok_comma);
 
@@ -248,7 +282,7 @@ void netlist_parser::net_alias()
 	m_setup.register_alias(alias, out);
 }
 
-void netlist_parser::net_c()
+void parser_t::net_c()
 {
 	pstring first = get_identifier();
 	require_token(m_tok_comma);
@@ -267,69 +301,114 @@ void netlist_parser::net_c()
 
 }
 
-void netlist_parser::netdev_param()
+void parser_t::dippins()
+{
+	pstring_list_t pins;
+
+	pins.add(get_identifier());
+	require_token(m_tok_comma);
+
+	while (true)
+	{
+		pstring t1 = get_identifier();
+		pins.add(t1);
+		token_t n = get_token();
+		if (n.is(m_tok_param_right))
+			break;
+		if (!n.is(m_tok_comma))
+			error("expected a comma, found <%s>", n.str().cstr());
+	}
+	if ((pins.size() % 2) == 1)
+		error("You must pass an equal number of pins to DIPPINS");
+	unsigned n = pins.size();
+	for (unsigned i = 0; i < n / 2; i++)
+	{
+		m_setup.register_alias(pstring::sprintf("%d", i+1), pins[i*2]);
+		m_setup.register_alias(pstring::sprintf("%d", n-i), pins[i*2 + 1]);
+	}
+}
+
+void parser_t::netdev_param()
 {
 	pstring param;
-	nl_double val;
 	param = get_identifier();
 	require_token(m_tok_comma);
-	val = eval_param(get_token());
+	token_t tok = get_token();
+	if (tok.is_type(STRING))
+	{
+		NL_VERBOSE_OUT(("Parser: Param: %s %s\n", param.cstr(), tok.str().cstr()));
+		m_setup.register_param(param, tok.str());
+	}
+	else
+	{
+		nl_double val = eval_param(tok);
 	NL_VERBOSE_OUT(("Parser: Param: %s %f\n", param.cstr(), val));
 	m_setup.register_param(param, val);
+	}
 	require_token(m_tok_param_right);
 }
 
-void netlist_parser::device(const pstring &dev_type)
+void parser_t::device(const pstring &dev_type)
 {
-	pstring devname;
-	netlist_base_factory_t *f = m_setup.factory().factory_by_name(dev_type, m_setup);
-	netlist_device_t *dev;
-	pstring_list_t termlist = f->term_param_list();
-	pstring_list_t def_params = f->def_params();
-
-	std::size_t cnt;
-
-	devname = get_identifier();
-
-	dev = f->Create();
-	m_setup.register_dev(dev, devname);
-
-	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
-
-	cnt = 0;
-	while (cnt < def_params.size())
+	if (m_setup.is_library_item(dev_type))
 	{
-		pstring paramfq = devname + "." + def_params[cnt];
+		pstring devname = get_identifier();
+		m_setup.namespace_push(devname);
+		m_setup.include(dev_type);
+		m_setup.namespace_pop();
+		require_token(m_tok_param_right);
+	}
+	else
+	{
+		base_factory_t *f = m_setup.factory().factory_by_name(dev_type);
+		device_t *dev;
+		pstring_list_t termlist = f->term_param_list();
+		pstring_list_t def_params = f->def_params();
 
-		NL_VERBOSE_OUT(("Defparam: %s\n", paramfq.cstr()));
-		require_token(m_tok_comma);
+		std::size_t cnt;
+
+		pstring devname = get_identifier();
+
+		dev = f->Create();
+		m_setup.register_dev(dev, devname);
+
+		NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
+
+		cnt = 0;
+		while (cnt < def_params.size())
+		{
+			pstring paramfq = devname + "." + def_params[cnt];
+
+			NL_VERBOSE_OUT(("Defparam: %s\n", paramfq.cstr()));
+			require_token(m_tok_comma);
+			token_t tok = get_token();
+			if (tok.is_type(STRING))
+			{
+				m_setup.register_param(paramfq, tok.str());
+			}
+			else
+			{
+				nl_double val = eval_param(tok);
+				m_setup.register_param(paramfq, val);
+			}
+			cnt++;
+		}
+
 		token_t tok = get_token();
-		if (tok.is_type(STRING))
+		cnt = 0;
+		while (tok.is(m_tok_comma) && cnt < termlist.size())
 		{
-			m_setup.register_param(paramfq, tok.str());
+			pstring output_name = get_identifier();
+
+			m_setup.register_link(devname + "." + termlist[cnt], output_name);
+
+			cnt++;
+			tok = get_token();
 		}
-		else
-		{
-			nl_double val = eval_param(tok);
-			m_setup.register_param(paramfq, val);
-		}
-		cnt++;
+		if (cnt != termlist.size())
+			m_setup.netlist().error("netlist: input count mismatch for %s - expected %" SIZETFMT " found %" SIZETFMT "\n", devname.cstr(), SIZET_PRINTF(termlist.size()), SIZET_PRINTF(cnt));
+		require_token(tok, m_tok_param_right);
 	}
-
-	token_t tok = get_token();
-	cnt = 0;
-	while (tok.is(m_tok_comma) && cnt < termlist.size())
-	{
-		pstring output_name = get_identifier();
-
-		m_setup.register_link(devname + "." + termlist[cnt], output_name);
-
-		cnt++;
-		tok = get_token();
-	}
-	if (cnt != termlist.size())
-		m_setup.netlist().error("netlist: input count mismatch for %s - expected %" SIZETFMT " found %" SIZETFMT "\n", devname.cstr(), termlist.size(), cnt);
-	require_token(tok, m_tok_param_right);
 }
 
 
@@ -338,7 +417,7 @@ void netlist_parser::device(const pstring &dev_type)
 // ----------------------------------------------------------------------------------------
 
 
-nl_double netlist_parser::eval_param(const token_t tok)
+nl_double parser_t::eval_param(const token_t tok)
 {
 	static const char *macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
 	static nl_double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
@@ -385,4 +464,5 @@ nl_double netlist_parser::eval_param(const token_t tok)
 		require_token(m_tok_param_right);
 	return ret * facs[f];
 #endif
+}
 }

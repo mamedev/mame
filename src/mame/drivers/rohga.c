@@ -1453,11 +1453,13 @@ ROM_START( wizdfire )
 	ROM_LOAD16_BYTE( "mas08", 0x000001, 0x080000,  CRC(e224fb7a) SHA1(9aa92fb98bddff313db2077c4db102e94c7af09b) ) /* Sprites #2 */
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
-	ROM_REGION(0x80000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "mas10",  0x00000,  0x80000,  CRC(6edc06a7) SHA1(8ab92cca9d4a5d4fed3d99737c6f023f3f606db2) )
+	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
+	// hack, sample banks 0/1 are used for the Japanese version and 2/3 are used for the English version, I can't find the bankswitch, so swap the halves.
+	ROM_LOAD( "mas10",  0x80000,  0x80000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
+	ROM_CONTINUE(0x00000, 0x80000)
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Oki samples */
-	ROM_LOAD( "mas11",  0x00000,  0x80000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
+	ROM_REGION(0x080000, "oki2", 0 ) /* Oki samples */
+	ROM_LOAD( "mas11",  0x00000,  0x080000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )   /* Priority (unused) */
@@ -1497,11 +1499,13 @@ ROM_START( wizdfireu )
 	ROM_LOAD16_BYTE( "mas08", 0x000001, 0x080000,  CRC(e224fb7a) SHA1(9aa92fb98bddff313db2077c4db102e94c7af09b) ) /* Sprites #2 */
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
-	ROM_REGION(0x80000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "mas10",  0x00000,  0x80000,  CRC(6edc06a7) SHA1(8ab92cca9d4a5d4fed3d99737c6f023f3f606db2) )
+	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
+	// hack, sample banks 0/1 are used for the Japanese version and 2/3 are used for the English version, I can't find the bankswitch, so swap the halves
+	ROM_LOAD( "mas10",  0x80000,  0x80000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
+	ROM_CONTINUE(0x00000, 0x80000)
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Oki samples */
-	ROM_LOAD( "mas11",  0x00000,  0x80000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
+	ROM_REGION(0x080000, "oki2", 0 ) /* Oki samples */
+	ROM_LOAD( "mas11",  0x00000,  0x080000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )   /* Priority (unused) */
@@ -1541,11 +1545,11 @@ ROM_START( darkseal2 )
 	ROM_LOAD16_BYTE( "mas08", 0x000001, 0x080000,  CRC(e224fb7a) SHA1(9aa92fb98bddff313db2077c4db102e94c7af09b) ) /* Sprites #2 */
 	ROM_LOAD16_BYTE( "mas09", 0x000000, 0x080000,  CRC(5f6deb41) SHA1(850d0e157b4355e866ec770a2012293b2c55648f) )
 
-	ROM_REGION(0x80000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "mas10",  0x00000,  0x80000,  BAD_DUMP CRC(6edc06a7) SHA1(8ab92cca9d4a5d4fed3d99737c6f023f3f606db2) ) // Incorrect ROM for this version
+	ROM_REGION(0x100000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "mas10",  0x00000,  0x100000,  CRC(f4b4c8a1) SHA1(c9e80c55e42a78e358b6b14dadc3be7b28bd5d62) )
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Oki samples */
-	ROM_LOAD( "mas11",  0x00000,  0x80000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
+	ROM_REGION(0x080000, "oki2", 0 ) /* Oki samples */
+	ROM_LOAD( "mas11",  0x00000,  0x080000,  CRC(c2f0a4f2) SHA1(af71d649aea273c17d7fbcf8693e8a1d4b31f7f8) )
 
 	ROM_REGION( 1024, "proms", 0 )
 	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )   /* Priority (unused) */

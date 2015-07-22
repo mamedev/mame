@@ -198,7 +198,7 @@ static MACHINE_CONFIG_FRAGMENT( vy0010 )
 	// HLT pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
 	// READY inverted in VY-0010 cartridge and pulled low on VY-0010/VY-0011 floppy drive
-	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_FORCE_READY
 
 	// Single sided 3.5" floppy drive
@@ -220,7 +220,7 @@ machine_config_constructor msx_cart_vy0010::device_mconfig_additions() const
 
 
 static MACHINE_CONFIG_FRAGMENT( fsfd1 )
-	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 4)
 
 	// Double sided 3.5" floppy drive
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk::floppy_formats)
@@ -262,7 +262,7 @@ machine_config_constructor msx_cart_fsfd1a::device_mconfig_additions() const
 
 
 static MACHINE_CONFIG_FRAGMENT( fscf351 )
-	MCFG_MB8877x_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_MB8877_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_FORCE_READY
 
 	// Double sided 3.5" floppy drive

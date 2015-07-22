@@ -225,7 +225,7 @@ static MACHINE_CONFIG_START( jupiter, jupiter2_state )
 	MCFG_CPU_IO_MAP(jupiter_m6800_io)
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771x, 1000000)
+	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, NULL, floppy_image_device::default_floppy_formats)
 
@@ -259,7 +259,7 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771x, 1000000)
+	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, NULL, floppy_image_device::default_floppy_formats)
 

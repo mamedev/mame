@@ -444,7 +444,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(sangho_state::sangho_interrupt)
 
 	if((scanline % 2) == 0)
 	{
-		m_v9958->set_resolution(RENDER_HIGH);
 		m_v9958->interrupt();
 	}
 }

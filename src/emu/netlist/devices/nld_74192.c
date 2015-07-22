@@ -9,6 +9,8 @@
 
 #include "nld_74192.h"
 
+NETLIB_NAMESPACE_DEVICES_START()
+
 NETLIB_START(74192)
 {
 	register_sub("subABCD", m_ABCD);
@@ -130,3 +132,5 @@ NETLIB_RESET(74192_dip)
 {
 	NETLIB_NAME(74192)::reset();
 }
+
+NETLIB_NAMESPACE_DEVICES_END()

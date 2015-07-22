@@ -43,7 +43,7 @@
 
 #define PPC    m_ppc.w.h
 
-#define FETCH() m_direct->read_decrypted_word(rPC++ << 1)
+#define FETCH() m_direct->read_word(rPC++ << 1)
 #define PROGRAM_WORD(a) m_program->read_word((a) << 1)
 #define GET_PPC_OFFS() PPC
 
@@ -353,47 +353,47 @@ UINT32 ssp1601_device::ptr1_read_(int ri, int isj2, int modi3)
 		// mod=0 (00)
 		case 0x00:
 		case 0x01:
-		case 0x02: return m_RAM0[m_r0[t&3]];
-		case 0x03: return m_RAM0[0];
+		case 0x02: return mem.m_RAM0[regs.m_r0[t&3]];
+		case 0x03: return mem.m_RAM0[0];
 		case 0x04:
 		case 0x05:
-		case 0x06: return m_RAM1[m_r1[t&3]];
-		case 0x07: return m_RAM1[0];
+		case 0x06: return mem.m_RAM1[regs.m_r1[t&3]];
+		case 0x07: return mem.m_RAM1[0];
 		// mod=1 (01), "+!"
 		case 0x08:
 		case 0x09:
-		case 0x0a: return m_RAM0[m_r0[t&3]++];
-		case 0x0b: return m_RAM0[1];
+		case 0x0a: return mem.m_RAM0[regs.m_r0[t&3]++];
+		case 0x0b: return mem.m_RAM0[1];
 		case 0x0c:
 		case 0x0d:
-		case 0x0e: return m_RAM1[m_r1[t&3]++];
-		case 0x0f: return m_RAM1[1];
+		case 0x0e: return mem.m_RAM1[regs.m_r1[t&3]++];
+		case 0x0f: return mem.m_RAM1[1];
 		// mod=2 (10), "-"
 		case 0x10:
 		case 0x11:
-		case 0x12: rp = &m_r0[t&3]; t = m_RAM0[*rp];
+		case 0x12: rp = &regs.m_r0[t&3]; t = mem.m_RAM0[*rp];
 					if (!(rST&7)) { (*rp)--; return t; }
 					add = -1; goto modulo;
-		case 0x13: return m_RAM0[2];
+		case 0x13: return mem.m_RAM0[2];
 		case 0x14:
 		case 0x15:
-		case 0x16: rp = &m_r1[t&3]; t = m_RAM1[*rp];
+		case 0x16: rp = &regs.m_r1[t&3]; t = mem.m_RAM1[*rp];
 					if (!(rST&7)) { (*rp)--; return t; }
 					add = -1; goto modulo;
-		case 0x17: return m_RAM1[2];
+		case 0x17: return mem.m_RAM1[2];
 		// mod=3 (11), "+"
 		case 0x18:
 		case 0x19:
-		case 0x1a: rp = &m_r0[t&3]; t = m_RAM0[*rp];
+		case 0x1a: rp = &regs.m_r0[t&3]; t = mem.m_RAM0[*rp];
 					if (!(rST&7)) { (*rp)++; return t; }
 					add = 1; goto modulo;
-		case 0x1b: return m_RAM0[3];
+		case 0x1b: return mem.m_RAM0[3];
 		case 0x1c:
 		case 0x1d:
-		case 0x1e: rp = &m_r1[t&3]; t = m_RAM1[*rp];
+		case 0x1e: rp = &regs.m_r1[t&3]; t = mem.m_RAM1[*rp];
 					if (!(rST&7)) { (*rp)++; return t; }
 					add = 1; goto modulo;
-		case 0x1f: return m_RAM1[3];
+		case 0x1f: return mem.m_RAM1[3];
 	}
 
 	return 0;
@@ -412,40 +412,40 @@ void ssp1601_device::ptr1_write(int op, UINT32 d)
 		// mod=0 (00)
 		case 0x00:
 		case 0x01:
-		case 0x02: m_RAM0[m_r0[t&3]] = d; return;
-		case 0x03: m_RAM0[0] = d; return;
+		case 0x02: mem.m_RAM0[regs.m_r0[t&3]] = d; return;
+		case 0x03: mem.m_RAM0[0] = d; return;
 		case 0x04:
 		case 0x05:
-		case 0x06: m_RAM1[m_r1[t&3]] = d; return;
-		case 0x07: m_RAM1[0] = d; return;
+		case 0x06: mem.m_RAM1[regs.m_r1[t&3]] = d; return;
+		case 0x07: mem.m_RAM1[0] = d; return;
 		// mod=1 (01), "+!"
 		// mod=3,      "+"
 		case 0x08:
 		case 0x09:
-		case 0x0a: m_RAM0[m_r0[t&3]++] = d; return;
-		case 0x0b: m_RAM0[1] = d; return;
+		case 0x0a: mem.m_RAM0[regs.m_r0[t&3]++] = d; return;
+		case 0x0b: mem.m_RAM0[1] = d; return;
 		case 0x0c:
 		case 0x0d:
-		case 0x0e: m_RAM1[m_r1[t&3]++] = d; return;
-		case 0x0f: m_RAM1[1] = d; return;
+		case 0x0e: mem.m_RAM1[regs.m_r1[t&3]++] = d; return;
+		case 0x0f: mem.m_RAM1[1] = d; return;
 		// mod=2 (10), "-"
 		case 0x10:
 		case 0x11:
-		case 0x12: m_RAM0[m_r0[t&3]--] = d; CHECK_RPL(); return;
-		case 0x13: m_RAM0[2] = d; return;
+		case 0x12: mem.m_RAM0[regs.m_r0[t&3]--] = d; CHECK_RPL(); return;
+		case 0x13: mem.m_RAM0[2] = d; return;
 		case 0x14:
 		case 0x15:
-		case 0x16: m_RAM1[m_r1[t&3]--] = d; CHECK_RPL(); return;
-		case 0x17: m_RAM1[2] = d; return;
+		case 0x16: mem.m_RAM1[regs.m_r1[t&3]--] = d; CHECK_RPL(); return;
+		case 0x17: mem.m_RAM1[2] = d; return;
 		// mod=3 (11), "+"
 		case 0x18:
 		case 0x19:
-		case 0x1a: m_RAM0[m_r0[t&3]++] = d; CHECK_RPL(); return;
-		case 0x1b: m_RAM0[3] = d; return;
+		case 0x1a: mem.m_RAM0[regs.m_r0[t&3]++] = d; CHECK_RPL(); return;
+		case 0x1b: mem.m_RAM0[3] = d; return;
 		case 0x1c:
 		case 0x1d:
-		case 0x1e: m_RAM1[m_r1[t&3]++] = d; CHECK_RPL(); return;
-		case 0x1f: m_RAM1[3] = d; return;
+		case 0x1e: mem.m_RAM1[regs.m_r1[t&3]++] = d; CHECK_RPL(); return;
+		case 0x1f: mem.m_RAM1[3] = d; return;
 	}
 }
 
@@ -457,21 +457,21 @@ UINT32 ssp1601_device::ptr2_read(int op)
 		// mod=0 (00)
 		case 0x00:
 		case 0x01:
-		case 0x02: mv = m_RAM0[m_r0[t&3]]++; break;
-		case 0x03: mv = m_RAM0[0]++; break;
+		case 0x02: mv = mem.m_RAM0[regs.m_r0[t&3]]++; break;
+		case 0x03: mv = mem.m_RAM0[0]++; break;
 		case 0x04:
 		case 0x05:
-		case 0x06: mv = m_RAM1[m_r1[t&3]]++; break;
-		case 0x07: mv = m_RAM1[0]++; break;
+		case 0x06: mv = mem.m_RAM1[regs.m_r1[t&3]]++; break;
+		case 0x07: mv = mem.m_RAM1[0]++; break;
 		// mod=1 (01)
-		case 0x0b: mv = m_RAM0[1]++; break;
-		case 0x0f: mv = m_RAM1[1]++; break;
+		case 0x0b: mv = mem.m_RAM0[1]++; break;
+		case 0x0f: mv = mem.m_RAM1[1]++; break;
 		// mod=2 (10)
-		case 0x13: mv = m_RAM0[2]++; break;
-		case 0x17: mv = m_RAM1[2]++; break;
+		case 0x13: mv = mem.m_RAM0[2]++; break;
+		case 0x17: mv = mem.m_RAM1[2]++; break;
 		// mod=3 (11)
-		case 0x1b: mv = m_RAM0[3]++; break;
-		case 0x1f: mv = m_RAM1[3]++; break;
+		case 0x1b: mv = mem.m_RAM0[3]++; break;
+		case 0x1f: mv = mem.m_RAM1[3]++; break;
 		default:   logerror(__FILE__ " FIXME: unimplemented mod in ((rX)) @ %04x\n", GET_PPC_OFFS());
 					return 0;
 	}

@@ -127,7 +127,7 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793x_ADD("fdc", XTAL_1MHz)
+	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
 
@@ -168,7 +168,7 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793x_ADD("fdc", XTAL_1MHz)
+	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-	MCFG_FD1793x_ADD("fdc", XTAL_1MHz)
+	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)

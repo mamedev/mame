@@ -22,7 +22,8 @@ public:
 		m_text_attr_ram(*this, "text_attr_ram"),
 		m_tx_vram(*this, "tx_vram"),
 		m_vh_latch_ram(*this, "vh_latch_ram"),
-		m_sprite_ram(*this, "sprite_ram") { }
+		m_sprite_ram(*this, "sprite_ram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -36,6 +37,7 @@ public:
 	optional_shared_ptr<UINT8> m_tx_vram;
 	required_shared_ptr<UINT8> m_vh_latch_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 
 	UINT8 *m_decrypt;
 	UINT8 m_fm_data;

@@ -18,6 +18,8 @@ m6509_device::m6509_device(const machine_config &mconfig, const char *tag, devic
 {
 	program_config.m_addrbus_width = 20;
 	program_config.m_logaddr_width = 20;
+	sprogram_config.m_addrbus_width = 20;
+	sprogram_config.m_logaddr_width = 20;
 }
 
 void m6509_device::device_start()
@@ -71,9 +73,9 @@ UINT8 m6509_device::mi_6509_normal::read(UINT16 adr)
 	return res;
 }
 
-UINT8 m6509_device::mi_6509_normal::read_direct(UINT16 adr)
+UINT8 m6509_device::mi_6509_normal::read_sync(UINT16 adr)
 {
-	UINT8 res = direct->read_raw_byte(base->adr_in_bank_i(adr));
+	UINT8 res = sdirect->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -81,9 +83,9 @@ UINT8 m6509_device::mi_6509_normal::read_direct(UINT16 adr)
 	return res;
 }
 
-UINT8 m6509_device::mi_6509_normal::read_decrypted(UINT16 adr)
+UINT8 m6509_device::mi_6509_normal::read_arg(UINT16 adr)
 {
-	UINT8 res = direct->read_decrypted_byte(base->adr_in_bank_i(adr));
+	UINT8 res = direct->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -123,9 +125,9 @@ m6509_device::mi_6509_nd::mi_6509_nd(m6509_device *_base) : mi_6509_normal(_base
 {
 }
 
-UINT8 m6509_device::mi_6509_nd::read_direct(UINT16 adr)
+UINT8 m6509_device::mi_6509_nd::read_sync(UINT16 adr)
 {
-	UINT8 res = program->read_byte(base->adr_in_bank_i(adr));
+	UINT8 res = sprogram->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -133,7 +135,7 @@ UINT8 m6509_device::mi_6509_nd::read_direct(UINT16 adr)
 	return res;
 }
 
-UINT8 m6509_device::mi_6509_nd::read_decrypted(UINT16 adr)
+UINT8 m6509_device::mi_6509_nd::read_arg(UINT16 adr)
 {
 	UINT8 res = program->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)

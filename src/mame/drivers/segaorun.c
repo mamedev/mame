@@ -465,7 +465,7 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 
 		case 0:
 			mapper.map_as_ram(0x60000, 0x08000, 0xf98000, "workram", write16_delegate());
-			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", 0x00000, write16_delegate());
+			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
 			break;
 	}
 }

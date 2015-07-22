@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Roberto Ventura, Leandro Dardini, Yochizo, Nicola Salmoria
 /******************************************************************************
 

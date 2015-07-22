@@ -124,7 +124,7 @@
 
 const device_type SH1 = &device_creator<sh1_device>;
 const device_type SH2 = &device_creator<sh2_device>;
-
+const device_type SH2A = &device_creator<sh2a_device>;
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for
@@ -141,15 +141,38 @@ READ32_MEMBER(sh2_device::sh2_internal_a5)
     sh2_internal_map - maps SH2 built-ins
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( sh2_internal_map, AS_PROGRAM, 32, sh2_device )
+static ADDRESS_MAP_START( sh7604_map, AS_PROGRAM, 32, sh2_device )
 	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
-	AM_RANGE(0xe0000000, 0xffffffff) AM_READWRITE(sh2_internal_r, sh2_internal_w)
+/*! 
+  @todo: cps3boot breaks with this enabled. Needs customization ...
+  */
+//	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
+//	AM_RANGE(0xffffff88, 0xffffff8b) AM_READWRITE(dma_dtcr0_r,dma_dtcr0_w)
+	AM_RANGE(0xe0000000, 0xe00001ff) AM_MIRROR(0x1ffffe00) AM_READWRITE(sh7604_r, sh7604_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sh7021_map, AS_PROGRAM, 32, sh2a_device )
+//  overrides
+	AM_RANGE(0x05ffff40, 0x05ffff43) AM_READWRITE(dma_sar0_r, dma_sar0_w)
+	AM_RANGE(0x05ffff44, 0x05ffff47) AM_READWRITE(dma_dar0_r, dma_dar0_w)
+	AM_RANGE(0x05ffff48, 0x05ffff4b) AM_READWRITE16(dmaor_r, dmaor_w,0xffff0000)
+	AM_RANGE(0x05ffff48, 0x05ffff4b) AM_READWRITE16(dma_tcr0_r, dma_tcr0_w,0x0000ffff)
+	AM_RANGE(0x05ffff4c, 0x05ffff4f) AM_READWRITE16(dma_chcr0_r, dma_chcr0_w, 0x0000ffff)
+//  fall-back
+ 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff) // SH-7032H internal i/o
+//	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+//	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
+//  fall-back
+ 	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
+ADDRESS_MAP_END
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SH2, "SH-2", tag, owner, clock, "sh2", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh2_internal_map))
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh7604_map))
+	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, 32, 0)
 	, m_is_slave(0)
 	, m_cpu_type(CPU_TYPE_SH2)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
@@ -170,7 +193,7 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_out_of_cycles(NULL)
 	, m_debugger_temp(0)
 {
-	m_isdrc = mconfig.options().drc() ? true : false;
+	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
 }
 
 
@@ -184,9 +207,10 @@ void sh2_device::device_stop()
 }
 
 
-sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type)
+sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal_map, int addrlines )
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh2_internal_map))
+	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
+	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
 	, m_is_slave(0)
 	, m_cpu_type(cpu_type)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
@@ -206,14 +230,28 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_nocode(NULL)
 	, m_out_of_cycles(NULL)
 {
-	m_isdrc = mconfig.options().drc() ? true : false;
+	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
 }
 
-sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sh2_device(mconfig, SH1, "SH-1", tag, owner, clock, "sh1", __FILE__, CPU_TYPE_SH1 )
+sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sh2_device(mconfig, SH1, "SH-2A", tag, owner, clock, "sh2a", __FILE__, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7021_map), 28 )
 {
 }
 
+sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sh2_device(mconfig, SH1, "SH-1", tag, owner, clock, "sh1", __FILE__, CPU_TYPE_SH1, ADDRESS_MAP_NAME(sh7032_map), 28 )
+{
+}
+
+const address_space_config *sh2_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_program_config : NULL;
+	default:                   return NULL;
+	}
+}
 
 offs_t sh2_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
@@ -229,113 +267,65 @@ offs_t sh2_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-
 UINT8 sh2_device::RB(offs_t A)
 {
-	if (A >= 0xe0000000)
-		return sh2_internal_r(*m_internal, (A & 0x1fc)>>2, 0xff << (((~A) & 3)*8)) >> (((~A) & 3)*8);
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+		return m_program->read_byte(A & AM);
 
-	if (A >= 0xc0000000)
-		return m_program->read_byte(A);
-
-	if (A >= 0x40000000)
-		return 0xa5;
-
-	return m_program->read_byte(A & AM);
+	return m_program->read_byte(A);
 }
 
 UINT16 sh2_device::RW(offs_t A)
 {
-	if (A >= 0xe0000000)
-		return sh2_internal_r(*m_internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+		return m_program->read_word(A & AM);
 
-	if (A >= 0xc0000000)
-		return m_program->read_word(A);
-
-	if (A >= 0x40000000)
-		return 0xa5a5;
-
-	return m_program->read_word(A & AM);
+	return m_program->read_word(A);
 }
 
 UINT32 sh2_device::RL(offs_t A)
 {
-	if (A >= 0xe0000000) /* I/O */
-		return sh2_internal_r(*m_internal, (A & 0x1fc)>>2, 0xffffffff);
-
-	if (A >= 0xc0000000) /* Cache Data Array */
-		return m_program->read_dword(A);
-
-	if (A >= 0x40000000) /* Cache Associative Purge Area */
-		return 0xa5a5a5a5;
-
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
-	return m_program->read_dword(A & AM);
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
+		return m_program->read_dword(A & AM);
+
+	return m_program->read_dword(A);
 }
 
 void sh2_device::WB(offs_t A, UINT8 V)
 {
-	if (A >= 0xe0000000)
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		sh2_internal_w(*m_internal, (A & 0x1fc)>>2, V << (((~A) & 3)*8), 0xff << (((~A) & 3)*8));
+		m_program->write_byte(A & AM,V);
 		return;
 	}
-
-	if (A >= 0xc0000000)
-	{
-		m_program->write_byte(A,V);
-		return;
-	}
-
-	if (A >= 0x40000000)
-		return;
-
-	m_program->write_byte(A & AM,V);
+	
+	m_program->write_byte(A,V);
 }
 
 void sh2_device::WW(offs_t A, UINT16 V)
 {
-	if (A >= 0xe0000000)
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		sh2_internal_w(*m_internal, (A & 0x1fc)>>2, V << (((~A) & 2)*8), 0xffff << (((~A) & 2)*8));
+		m_program->write_word(A & AM,V);
 		return;
 	}
-
-	if (A >= 0xc0000000)
-	{
-		m_program->write_word(A,V);
-		return;
-	}
-
-	if (A >= 0x40000000)
-		return;
-
-	m_program->write_word(A & AM,V);
+	
+	m_program->write_word(A,V);
 }
 
 void sh2_device::WL(offs_t A, UINT32 V)
 {
-	if (A >= 0xe0000000) /* I/O */
+	if((A & 0xf0000000) == 0 || (A & 0xf0000000) == 0x20000000)
 	{
-		sh2_internal_w(*m_internal, (A & 0x1fc)>>2, V, 0xffffffff);
+		m_program->write_dword(A & AM,V);
 		return;
 	}
-
-	if (A >= 0xc0000000) /* Cache Data Array */
-	{
-		m_program->write_dword(A,V);
-		return;
-	}
-
-	/*  0x60000000 Cache Address Data Array */
-
-	if (A >= 0x40000000) /* Cache Associative Purge Area */
-		return;
-
+	
 	/* 0x20000000 no Cache */
 	/* 0x00000000 read thru Cache if CE bit is 1 */
-	m_program->write_dword(A & AM,V);
+	m_program->write_dword(A,V);
 }
 
 /*  code                 cycles  t-bit
@@ -2397,7 +2387,8 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_decrypted_program = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : &space(AS_PROGRAM);
+	m_direct = &m_decrypted_program->direct();
 	m_internal = &space(AS_PROGRAM);
 
 	save_item(NAME(m_sh2_state->pc));

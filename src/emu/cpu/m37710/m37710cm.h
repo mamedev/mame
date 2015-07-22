@@ -23,10 +23,10 @@
 #define M37710_CALL_DEBUGGER(x)         debugger_instruction_hook(this, x)
 #define m37710_read_8(addr)             m_program->read_byte(addr)
 #define m37710_write_8(addr,data)       m_program->write_byte(addr,data)
-#define m37710_read_8_immediate(A)      m_direct->read_decrypted_byte(A, BYTE_XOR_LE(0))
+#define m37710_read_8_immediate(A)      m_direct->read_byte(A, BYTE_XOR_LE(0))
 #define m37710_read_16(addr)            m_program->read_word_unaligned(addr)
 #define m37710_write_16(addr,data)      m_program->write_word_unaligned(addr,data)
-#define m37710_read_16_immediate(A)     m_direct->read_decrypted_word(A)
+#define m37710_read_16_immediate(A)     m_direct->read_word(A)
 
 
 /* ======================================================================== */

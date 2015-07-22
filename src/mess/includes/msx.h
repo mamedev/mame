@@ -23,7 +23,6 @@
 #include "video/tms9928a.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
-#include "formats/basicdsk.h"
 #include "formats/fmsx_cas.h"
 #include "formats/msx_dsk.h"
 #include "hashfile.h"

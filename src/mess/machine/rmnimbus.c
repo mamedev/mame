@@ -244,7 +244,8 @@ static void nimbus_debug(running_machine &machine, int ref, int params, const ch
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	if(params>0)
 	{
-		sscanf(param[0],"%d",&state->m_debug_machine);
+		int temp;
+		sscanf(param[0],"%d",&temp); state->m_debug_machine = temp;
 	}
 	else
 	{

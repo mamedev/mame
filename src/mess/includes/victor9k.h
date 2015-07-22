@@ -75,9 +75,12 @@ public:
 		m_brt(0),
 		m_cont(0),
 		m_via1_irq(CLEAR_LINE),
+		m_via2_irq(CLEAR_LINE),
 		m_via3_irq(CLEAR_LINE),
 		m_fdc_irq(CLEAR_LINE),
-		m_ssda_irq(CLEAR_LINE)
+		m_ssda_irq(CLEAR_LINE),
+		m_kbrdy(1),
+		m_kbackctl(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -114,6 +117,7 @@ public:
 	DECLARE_WRITE8_MEMBER( via2_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( write_ria );
 	DECLARE_WRITE_LINE_MEMBER( write_rib );
+	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
 
 	DECLARE_WRITE8_MEMBER( via3_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
@@ -128,18 +132,25 @@ public:
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	/* video state */
+	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
+	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
+
+	// video state
 	int m_brt;
 	int m_cont;
 
-	/* interrupts */
+	// interrupts
 	int m_via1_irq;
+	int m_via2_irq;
 	int m_via3_irq;
 	int m_fdc_irq;
 	int m_ssda_irq;
 
-	DECLARE_WRITE_LINE_MEMBER(mux_serial_b_w);
-	DECLARE_WRITE_LINE_MEMBER(mux_serial_a_w);
+	// keyboard
+	int m_kbrdy;
+	int m_kbackctl;
+
+	void update_kback();
 };
 
 #endif

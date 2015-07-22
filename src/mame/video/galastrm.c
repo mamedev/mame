@@ -7,7 +7,7 @@
 #define X_OFFSET 96
 #define Y_OFFSET 60
 
-struct poly_extra_data
+struct gs_poly_extra_data
 {
 	bitmap_ind16 *texbase;
 };
@@ -28,12 +28,12 @@ void galastrm_state::galastrm_exit()
 
 void galastrm_state::video_start()
 {
-	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
+	m_spritelist = auto_alloc_array(machine(), struct gs_tempsprite, 0x4000);
 
 	m_screen->register_screen_bitmap(m_tmpbitmaps);
 	m_screen->register_screen_bitmap(m_polybitmap);
 
-	m_poly = poly_alloc(machine(), 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	m_poly = poly_alloc(machine(), 16, sizeof(gs_poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(galastrm_state::galastrm_exit), this));
 }
 
@@ -191,7 +191,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority)
 {
-	struct tempsprite *sprite_ptr = m_sprite_ptr_pre;
+	struct gs_tempsprite *sprite_ptr = m_sprite_ptr_pre;
 
 	while (sprite_ptr != m_spritelist)
 	{
@@ -217,7 +217,7 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 static void tc0610_draw_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const gs_poly_extra_data *extra = (const gs_poly_extra_data *)extradata;
 	bitmap_ind16 *destmap = (bitmap_ind16 *)dest;
 	UINT16 *framebuffer = &destmap->pix16(scanline);
 	bitmap_ind16 *texbase = extra->texbase;
@@ -239,7 +239,7 @@ static void tc0610_draw_scanline(void *dest, INT32 scanline, const poly_extent *
 
 void galastrm_state::tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip)
 {
-	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(m_poly);
+	gs_poly_extra_data *extra = (gs_poly_extra_data *)poly_get_extra_data(m_poly);
 	poly_draw_scanline_func callback;
 	poly_vertex vert[4];
 	int rsx = m_tc0610_ctrl_reg[1][0];

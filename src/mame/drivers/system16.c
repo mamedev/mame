@@ -97,6 +97,7 @@
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 #include "video/segaic16.h"
+#include "sound/2203intf.h"
 
 #define SHADOW_COLORS_MULTIPLIER 3
 
@@ -118,6 +119,15 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_nmi_w)
 	}
 }
 
+WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundcpu->set_input_line(0, HOLD_LINE);
+	}
+}
+
 
 static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -127,7 +137,10 @@ static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x412000, 0x412fff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_nmi_w)
+//	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_irq_w)
+	AM_RANGE(0xC42006, 0xC42007) AM_WRITE(sound_command_irq_w)
+	
+	AM_RANGE(0xC44000, 0xC44001) AM_READNOP
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
@@ -145,15 +158,6 @@ static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 ADDRESS_MAP_END
 
 /***************************************************************************/
-
-WRITE16_MEMBER(segas1x_bootleg_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		soundlatch_byte_w(space, 0, data & 0xff);
-		m_soundcpu->set_input_line(0, HOLD_LINE);
-	}
-}
 
 WRITE16_MEMBER(segas1x_bootleg_state::sys16_coinctrl_w)
 {
@@ -187,7 +191,7 @@ static ADDRESS_MAP_START( passshtb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
 	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
 	AM_RANGE(0xc46004, 0xc46005) AM_WRITE(s16a_bootleg_fgscrolly_w)
@@ -265,7 +269,7 @@ static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc41006, 0xc41007) AM_READ(passht4b_io3_r)
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xc43000, 0xc43001) AM_READ_PORT("P1")     // test mode only
 	AM_RANGE(0xc43002, 0xc43003) AM_READ_PORT("P2")
 	AM_RANGE(0xc43004, 0xc43005) AM_READ_PORT("P3")
@@ -313,7 +317,7 @@ static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xC44000, 0xC44001) AM_WRITENOP
 	AM_RANGE(0xc46000, 0xc46001) AM_WRITE(s16a_bootleg_bgscrolly_w)
 	AM_RANGE(0xc46002, 0xc46003) AM_WRITE(s16a_bootleg_bgscrollx_w)
@@ -424,6 +428,24 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
+static ADDRESS_MAP_START(shinobi_datsu_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
+	AM_RANGE(0xe400, 0xe401) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
+	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_byte_r)
+
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shinobi_datsu_sound_io, AS_IO, 8, segas1x_bootleg_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
+
+
+/*******************************************************************************/
+
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_byte_r)
@@ -504,7 +526,7 @@ static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x902000, 0x902001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xff0006, 0xff0007) AM_WRITE(sound_command_w)
+	AM_RANGE(0xff0006, 0xff0007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xff0020, 0xff003f) AM_WRITENOP // config regs
 ADDRESS_MAP_END
 #endif
@@ -625,6 +647,10 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas1x_bootleg_state )
+	AM_RANGE(0x000000, 0x0bffff) AM_ROM AM_SHARE("decrypted_opcodes")
+ADDRESS_MAP_END
+
 void segas1x_bootleg_state::datsu_set_pages(  )
 {
 	UINT16 page;
@@ -687,7 +713,7 @@ static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x900006, 0x900007) AM_WRITE(sound_command_w)
+	AM_RANGE(0x900006, 0x900007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE") AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
 	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
@@ -701,7 +727,7 @@ static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
-	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
@@ -821,7 +847,7 @@ static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_w)
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
 	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
@@ -875,7 +901,7 @@ static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xc80000, 0xc80001) AM_WRITENOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
@@ -902,7 +928,7 @@ static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
 	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xc43034, 0xc43035) AM_WRITENOP
 	AM_RANGE(0xc80000, 0xc80001) AM_NOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
@@ -939,7 +965,7 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
-	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc42006, 0xc42007) AM_WRITE(sound_command_irq_w)
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITENOP
 	AM_RANGE(0xc80000, 0xc80001) AM_WRITENOP // vblank irq ack
@@ -959,7 +985,7 @@ static ADDRESS_MAP_START( tturfbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_w)
+	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
 	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
@@ -1079,14 +1105,6 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		soundlatch_byte_w(space, 0, data & 0xff);
-		m_soundcpu->set_input_line(0, HOLD_LINE);
-	}
-}
 
 static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -2012,15 +2030,11 @@ GFXDECODE_END
  *************************************/
 
 /* System 16A/B Bootlegs */
-static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
+static MACHINE_CONFIG_START( system16_base, segas1x_bootleg_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  sys16_interrupt)
-
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2035,6 +2049,13 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 	MCFG_PALETTE_ADD("palette", 2048*SHADOW_COLORS_MULTIPLIER)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( system16, system16_base )
+
+	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2043,7 +2064,6 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 MACHINE_CONFIG_END
-
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 {
@@ -2090,8 +2110,7 @@ static MACHINE_CONFIG_FRAGMENT( system16_datsu_sound )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_DERIVED( shinobib, system16 )
+static MACHINE_CONFIG_DERIVED( shinobi_datsu, system16_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2103,7 +2122,32 @@ static MACHINE_CONFIG_DERIVED( shinobib, system16 )
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_shinobi )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
+
+	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(segas1x_bootleg_state, nmi_line_pulse,  3000) // or from the YM2203?
+	MCFG_CPU_PROGRAM_MAP(shinobi_datsu_sound_map)
+	MCFG_CPU_IO_MAP(shinobi_datsu_sound_io)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	// 2x YM2203C, one at U57, one at U56
+	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+//	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segas1x_bootleg_state, datsu_irq_handler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+
+	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+//	MCFG_YM2203_IRQ_HANDLER(WRITELINE(segas1x_bootleg_state, datsu_irq_handler))
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( passshtb, system16_7759 )
 
@@ -2159,6 +2203,7 @@ static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb1_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  sys16_interrupt)
 
 
@@ -2187,6 +2232,7 @@ static MACHINE_CONFIG_DERIVED( goldnaxeb2, goldnaxeb1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb2_map)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
 MACHINE_CONFIG_END
 
 
@@ -2202,6 +2248,7 @@ static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bayrouteb2_map)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
 
 	MCFG_FRAGMENT_ADD(system16_datsu_sound)
 
@@ -2402,6 +2449,32 @@ ROM_START( shinobld )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "12.bin", 0x000001, 0x10000, CRC(757a0c71) SHA1(8f476b0fd5f5dd480489af09b99585c58a4801fc) )
 	ROM_LOAD16_BYTE( "14.bin", 0x000000, 0x10000, CRC(a65870b2) SHA1(3e9b4aa694bf86ef9db4756ebaa3d8d87d7f269a) )
+	ROM_LOAD16_BYTE( "13.bin", 0x020001, 0x10000, CRC(c4334bcd) SHA1(ea1dd23ca6fbf632d8e10bbb9ced6515a69bd14a) )
+	ROM_LOAD16_BYTE( "15.bin", 0x020000, 0x10000, CRC(b70a6ec1) SHA1(79db41c36d6a053bcdc355b46b19ae938a7755a9) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) /* tiles */
+	ROM_LOAD( "9.bin",  0x00000, 0x10000, CRC(565e11c6) SHA1(e063400b3d0470b932d75da0be9cd4b446189dea) )
+	ROM_LOAD( "10.bin", 0x10000, 0x10000, CRC(7cc40b6c) SHA1(ffad7eef7ab2ff9a2e49a8d71b5785a61fa3c675) )
+	ROM_LOAD( "11.bin", 0x20000, 0x10000, CRC(0f6c7b1c) SHA1(defc76592c285b3396e89a3cff7a73f3a948117f) )
+
+	ROM_REGION16_BE( 0x080000, "sprites", ROMREGION_ERASEFF ) /* sprites */
+	ROM_LOAD16_BYTE( "5.bin", 0x00001, 0x10000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
+	ROM_LOAD16_BYTE( "3.bin", 0x00000, 0x10000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
+	ROM_LOAD16_BYTE( "8.bin", 0x20001, 0x10000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
+	ROM_LOAD16_BYTE( "2.bin", 0x20000, 0x10000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
+	ROM_LOAD16_BYTE( "6.bin", 0x40001, 0x10000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
+	ROM_LOAD16_BYTE( "4.bin", 0x40000, 0x10000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
+	ROM_LOAD16_BYTE( "7.bin", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
+	ROM_LOAD16_BYTE( "1.bin", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU + data */
+	ROM_LOAD( "16.bin", 0x0000, 0x10000, CRC(52c8364e) SHA1(01d30b82f92498d155d2e31d43d58dff0285cce3) )
+ROM_END
+
+ROM_START( shinoblda )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "12.bin", 0x000001, 0x10000, CRC(68c91fd5) SHA1(54dc1d26711c73b30cbb5387dde27ba21cc102f4) ) // sldh
+	ROM_LOAD16_BYTE( "14.bin", 0x000000, 0x10000, CRC(9e887c80) SHA1(798a3dc499ef14b362bc37ff91b247e367f42ab9) ) // sldh
 	ROM_LOAD16_BYTE( "13.bin", 0x020001, 0x10000, CRC(c4334bcd) SHA1(ea1dd23ca6fbf632d8e10bbb9ced6515a69bd14a) )
 	ROM_LOAD16_BYTE( "15.bin", 0x020000, 0x10000, CRC(b70a6ec1) SHA1(79db41c36d6a053bcdc355b46b19ae938a7755a9) )
 
@@ -3462,28 +3535,23 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,wb3bbl)
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb1)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 	UINT8 *KEY = memregion("decryption")->base();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 data[0x1000];
+	UINT16 data[0x800];
 
 	// the decryption key is in a rom (part of an MSDOS executable...)
 	for (i = 0; i < 0x800; i++)
 	{
-		KEY[i] = KEY[i] ^ 0xff;
-		data[(i * 2) + 0] = ((KEY[i] & 0x80) >> 1) | ((KEY[i] & 0x40) >> 2) | ((KEY[i] & 0x20) >> 3) | ((KEY[i] & 0x10) >> 4);
-		data[(i * 2) + 1] = ((KEY[i] & 0x08) << 3) | ((KEY[i] & 0x04) << 2) | ((KEY[i] & 0x02) << 1) | ((KEY[i] & 0x01) << 0);
+		UINT8 k = KEY[i] ^ 0xff;
+		data[i] = ((k & 0x80) << 7) | ((k & 0x40) << 6) | ((k & 0x20) << 5) | ((k & 0x10) << 4) | ((k & 0x08) << 3) | ((k & 0x04) << 2) | ((k & 0x02) << 1) | ((k & 0x01) << 0);
 	}
 
-	m_decrypted_region = auto_alloc_array(machine(), UINT8, 0xc0000);
-	memcpy(m_decrypted_region, ROM, 0xc0000);
+	memcpy(m_decrypted_opcodes, ROM, 0xc0000);
 
-	for (i = 0; i < 0x40000; i++)
+	for (i = 0; i < 0x20000; i++)
 	{
-		m_decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
+		m_decrypted_opcodes[i] = ROM[i] ^ data[i & 0x7ff];
 	}
-
-	space.set_decrypted_region(0x00000, 0xbffff, m_decrypted_region);
 
 	DRIVER_INIT_CALL(common);
 
@@ -3499,23 +3567,20 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb1)
 	//
 	// for now we use the code which is present in the unprotected bootleg set
 	// and modify the rom to use it
-	UINT16 *ROM2;
-	UINT16 *decrypted_region2;
 
 	// decrypt
 	DRIVER_INIT_CALL(goldnaxeb1);
 
-	ROM2 = (UINT16*)memregion("maincpu")->base();
-	decrypted_region2 = (UINT16*)m_decrypted_region;
+	UINT16 *ROM = (UINT16*)memregion("maincpu")->base();
 
 	// patch interrupt vector
-	ROM2[0x0070/2] = 0x000b;
-	ROM2[0x0072/2] = 0xf000;
+	ROM[0x0070/2] = 0x000b;
+	ROM[0x0072/2] = 0xf000;
 
 	// patch check for code in RAM
-	decrypted_region2[0x107e/2] = 0x48e7;
-	decrypted_region2[0x1080/2] = 0x000b;
-	decrypted_region2[0x1082/2] = 0xf000;
+	m_decrypted_opcodes[0x107e/2] = 0x48e7;
+	m_decrypted_opcodes[0x1080/2] = 0x000b;
+	m_decrypted_opcodes[0x1082/2] = 0xf000;
 }
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb2)
@@ -3703,7 +3768,11 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,astormbl)
  *************************************/
 
 /* System 16A based bootlegs (less complex tilemap system) */
-GAME( 1987, shinobld,    shinobi,   shinobib,    shinobi, segas1x_bootleg_state,   shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1987, shinobld,    shinobi,   shinobi_datsu,    shinobi, segas1x_bootleg_state,   shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1987, shinoblda,   shinobi,   shinobi_datsu,    shinobi, segas1x_bootleg_state,   shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+
+
+
 GAME( 1988, passshtb,    passsht,   passshtb,    passsht, segas1x_bootleg_state,   passsht,    ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1988, passht4b,    passsht,   passsht4b,   passht4b, segas1x_bootleg_state,  shinobl,    ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1988, wb3bbl,      wb3,       wb3bb,       wb3b, segas1x_bootleg_state,      wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", GAME_NOT_WORKING )

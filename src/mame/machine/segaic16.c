@@ -179,6 +179,7 @@ sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &m
 		m_cputag(NULL),
 		m_cpu(NULL),
 		m_space(NULL),
+		m_decrypted_space(NULL),
 		m_curregion(0)
 {
 }
@@ -354,7 +355,7 @@ READ8_MEMBER( sega_315_5195_mapper_device::read )
 //  map_as_rom - map a region as ROM data
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_t mirror, const char *bank_name, offs_t rgnoffset, write16_delegate whandler)
+void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler)
 {
 	// determine parameters
 	region_info info;
@@ -377,14 +378,17 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 
 		// map now
 		m_space->install_read_bank(info.start, romend, 0, info.mirror, bank_name);
+		if (m_decrypted_space)
+			m_decrypted_space->install_read_bank(info.start, romend, 0, info.mirror, decrypted_bank_name);
 
 		// configure the bank
 		memory_bank *bank = owner()->membank(bank_name);
+		memory_bank *decrypted_bank = owner()->membank(decrypted_bank_name);
 		UINT8 *memptr = m_cpu->region()->base() + rgnoffset;
 		bank->set_base(memptr);
 
 		// remember this bank, and decrypt if necessary
-		m_banks[m_curregion].set(bank, info.start, romend, rgnoffset, memptr);
+		m_banks[m_curregion].set(bank, decrypted_bank, info.start, romend, rgnoffset, memptr);
 	}
 
 	// either install a write handler if provided or unmap the region
@@ -524,6 +528,8 @@ void sega_315_5195_mapper_device::device_start()
 	if (m_space == NULL)
 		throw emu_fatalerror("Unable to find program address space on device '%s'", m_cputag);
 
+	m_decrypted_space = m_cpu->has_space(AS_DECRYPTED_OPCODES) ? &m_cpu->space(AS_DECRYPTED_OPCODES) : NULL;
+
 	// register for saves
 	save_item(NAME(m_regs));
 }
@@ -597,6 +603,7 @@ void sega_315_5195_mapper_device::update_mapping()
 
 sega_315_5195_mapper_device::decrypt_bank::decrypt_bank()
 	: m_bank(NULL),
+		m_decrypted_bank(NULL),
 		m_start(0),
 		m_end(0),
 		m_rgnoffs(~0),
@@ -647,7 +654,7 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd109
 //  a change
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, offs_t start, offs_t end, offs_t rgnoffs, UINT8 *src)
+void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, UINT8 *src)
 {
 	// ignore if not encrypted
 	if (m_fd1089 == NULL && m_fd1094_cache == NULL)
@@ -662,6 +669,7 @@ void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, offs_t st
 
 	// update to the current state
 	m_bank = bank;
+	m_decrypted_bank = decrypted_bank;
 	m_start = start;
 	m_end = end;
 	m_rgnoffs = rgnoffs;
@@ -692,12 +700,12 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 	{
 		m_fd1089_decrypted.resize((m_end + 1 - m_start) / 2);
 		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, &m_fd1089_decrypted[0], reinterpret_cast<UINT16 *>(m_srcptr));
-		m_bank->set_base_decrypted(&m_fd1089_decrypted[0]);
+		m_decrypted_bank->set_base(&m_fd1089_decrypted[0]);
 	}
 
 	// fd1094 case
 	if (m_fd1094_cache != NULL)
-		m_bank->set_base_decrypted(m_fd1094_cache->decrypted_opcodes(m_fd1094_cache->fd1094().state()));
+		m_decrypted_bank->set_base(m_fd1094_cache->decrypted_opcodes(m_fd1094_cache->fd1094().state()));
 }
 
 

@@ -2659,7 +2659,7 @@ static INPUT_PORTS_START( mjdialq2 )
 	PORT_DIPNAME( 0x40, 0x40, "Select Special Item" ) /* Allows to select which one of the nine special items you want. */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Debug" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -5352,6 +5352,22 @@ ROM_START( mayab )
 	ROM_LOAD( "promat02.bin",  0x200, 0x200, CRC(e38eb360) SHA1(739960dd57ec3305edd57aa63816a81ddfbebf3e) )
 ROM_END
 
+ROM_START( mayac )
+	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "e16", 0x00000, 0x10000, CRC(badafb62) SHA1(eabe390f5b3ca6acd4b194b65b81fda7ddca35b8) )
+	ROM_LOAD( "e15", 0x28000, 0x10000, CRC(7ea5b49a) SHA1(aaae848669d9f88c0660f46cc801e4eb0f5e3b89) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "g18", 0x00000, 0x40000, CRC(b621955c) SHA1(8bb3cf16585f33e81921efe7958cf8ca08e8df7f) )
+	ROM_LOAD( "g16", 0x40000, 0x40000, CRC(26b1c824) SHA1(e1a1a51ef94a3933d5fe4b3d47ad2c1dfb9a1c19) )
+	ROM_LOAD( "g15", 0x80000, 0x40000, CRC(f7c6f77e) SHA1(27ba271ec67504dc0c6f9b20362206bbd4b0d90a) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "82s147-2.b5",  0x000, 0x200, CRC(5091de2b) SHA1(ae13676cd2fbde1b87c85480283b24440e069ba4) ) // FIXED BITS (0xxxxxxx)
+	ROM_LOAD( "82s147-1.b6",  0x200, 0x200, CRC(6d4940cd) SHA1(33875fd846977f8839fdb0f2a259959994552f35) )
+ROM_END
+
+
 ROM_START( inca )
 	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "am27c512.1", 0x00000, 0x10000, CRC(b0d513f7) SHA1(65ef4702302bbfc7c7a77f7353120ee3f5c94b31) )
@@ -5440,12 +5456,11 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 
 	}
 }
+	
 
-DRIVER_INIT_MEMBER(dynax_state,maya)
+DRIVER_INIT_MEMBER(dynax_state, maya_common)
 {
 	/* Address lines scrambling on 1 z80 rom */
-	int i;
-	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
 	UINT8   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
@@ -5456,13 +5471,39 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 		rom[0] = temp[0];   rom[1] = temp[4];   rom[2] = temp[1];   rom[3] = temp[5];
 		rom[4] = temp[2];   rom[5] = temp[6];   rom[6] = temp[3];   rom[7] = temp[7];
 	}
+}
+
+
+DRIVER_INIT_MEMBER(dynax_state,maya)
+{
+	DRIVER_INIT_CALL(maya_common);
+
+	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	int i;
 
 	/* Address lines scrambling on the blitter data roms */
 	{
 		dynamic_buffer rom(0xc0000);
 		memcpy(&rom[0], gfx, 0xc0000);
 		for (i = 0; i < 0xc0000; i++)
-			gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
+			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+	}
+}
+
+
+DRIVER_INIT_MEMBER(dynax_state,mayac)
+{
+	DRIVER_INIT_CALL(maya_common);
+
+	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	int i;
+
+	/* Address lines scrambling on the blitter data roms */
+	{
+		dynamic_buffer rom(0xc0000);
+		memcpy(&rom[0], gfx, 0xc0000);
+		for (i = 0; i < 0xc0000; i++)
+			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 	}
 }
 
@@ -5487,6 +5528,27 @@ ROM_START( mjdialq2 )
 	ROM_RELOAD(          0x10000, 0x08000 )             // 1
 	ROM_CONTINUE(        0x20000, 0x08000 )             // 3
 	ROM_LOAD( "5202.2c", 0x30000, 0x08000, CRC(8e8b0038) SHA1(44130bb29b569610826e1fc7e4b2822f0e1034b1) )   // 5
+	ROM_CONTINUE(        0x70000, 0x08000 )             // d
+
+	ROM_REGION( 0xa0000, "gfx1", 0 )    // blitter data
+	ROM_LOAD( "5207.2h", 0x00000, 0x20000, CRC(7794cd62) SHA1(7fa2fd50d7c975c381dda36f505df0e152196bb5) )
+	ROM_LOAD( "5206.2g", 0x20000, 0x20000, CRC(9e810021) SHA1(cf1052c96b9da3abb263be1ce8481aeded2c5d00) )
+	ROM_LOAD( "5205.2f", 0x40000, 0x20000, CRC(8c05572f) SHA1(544a5eb8b989fb1195986ed856da04350941ef59) )
+	ROM_LOAD( "5204.2e", 0x60000, 0x20000, CRC(958ef9ab) SHA1(ec768c587dc9e6b691564b6b35abbece252bcd28) )
+	ROM_LOAD( "5203.2d", 0x80000, 0x20000, CRC(706072d7) SHA1(d4692296d234b824961a94390e6d646ed9a7d5fd) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "d52-2.9e", 0x000, 0x200, CRC(18585ce3) SHA1(7f2e20bb09c1d810910094a6b19e5151666d74ac) )  // FIXED BITS (0xxxxxxx)
+	ROM_LOAD( "d52-1.8e", 0x200, 0x200, CRC(8868247a) SHA1(97652025c411b379dfab576dc7f2d8d0d61d0828) )
+ROM_END
+
+// Program roms from a non-working pcb. The other roms match the parent.
+ROM_START( mjdialq2a )
+	ROM_REGION( 0x78000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "5201.2b", 0x00000, 0x10000, CRC(6b735bb0) SHA1(2756e8711cf3be45ec0ca97bce621135df71e9fc) )
+	ROM_RELOAD(          0x10000, 0x08000 )             // 1
+	ROM_CONTINUE(        0x20000, 0x08000 )             // 3
+	ROM_LOAD( "5202.2c", 0x30000, 0x08000, CRC(7819521f) SHA1(57a385b4ff3343dfa47499ddc25db26b3b64a441) )   // 5
 	ROM_CONTINUE(        0x70000, 0x08000 )             // d
 
 	ROM_REGION( 0xa0000, "gfx1", 0 )    // blitter data
@@ -7213,6 +7275,25 @@ ROM_START( hjingi )
 	ROM_LOAD( "h09.6", 0x00000, 0x20000, CRC(86bde64d) SHA1(d9b79184697044ae8a4d04ea22deca2e14162065) )
 ROM_END
 
+// dump of the program roms only?
+ROM_START( hjingia )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "h10b.4a", 0x00000, 0x20000, CRC(a77a062a) SHA1(cae76effd573c20e20172829220587a5d200eb9e) )
+	ROM_RELOAD(          0x10000, 0x20000 )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
+	ROM_LOAD( "h02.21", 0x00000, 0x20000, CRC(9dde2d59) SHA1(96df4ba97ee9611d9a3c7bcaae9cd97815a7b8a5) )
+	ROM_LOAD( "h03.22", 0x20000, 0x20000, CRC(1ac59443) SHA1(e70fe6184e7090cf7229d83b87db65f7715de2a8) )
+	ROM_LOAD( "h01.20", 0x40000, 0x20000, CRC(24391ddc) SHA1(6a2e3fae4b6d0b1d8073306f37c9fdaa04b69eb8) )
+	ROM_LOAD( "h04.1",  0x60000, 0x20000, CRC(3756c745) SHA1(f275a72d6e07f21148900d24a8018d03504f249f) )
+	ROM_LOAD( "h05.2",  0x80000, 0x20000, CRC(249d360a) SHA1(688fced1298c345a18314d2c88664c757a2de35c) )
+	ROM_LOAD( "h06.3",  0xa0000, 0x20000, CRC(014a4945) SHA1(0cd747787a81226fd4937616a6ce45af731a4049) )
+	ROM_LOAD( "h07.4",  0xc0000, 0x20000, CRC(8b6f8a2d) SHA1(c5f3ec64a7ea3edc556182f42e6da4842d88e0ba) )
+	ROM_LOAD( "h08.5",  0xe0000, 0x20000, CRC(6f996e6e) SHA1(c2b916afbfd257417f0383ad261f3720a027fdd9) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )    // blitter data
+	ROM_LOAD( "h09.6", 0x00000, 0x20000, CRC(86bde64d) SHA1(d9b79184697044ae8a4d04ea22deca2e14162065) )
+ROM_END
 
 /***************************************************************************
 
@@ -7294,14 +7375,16 @@ ROM_END
 GAME( 1988, janyuki,  0,        janyuki,  janyuki,  driver_device, 0,        ROT0,   "Dynax",                    "Jong Yu Ki (Japan)",                                            GAME_SUPPORTS_SAVE )
 GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, driver_device, 0,        ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      GAME_SUPPORTS_SAVE )
 GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  driver_device, 0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           GAME_SUPPORTS_SAVE )
-GAME( 1990, hjingi,   0,        hjingi,   hjingi,   driver_device, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       GAME_SUPPORTS_SAVE )
+GAME( 1990, hjingi,   0,        hjingi,   hjingi,   driver_device, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       GAME_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   driver_device, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet, alt.)",                                 GAME_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
 GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, driver_device, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          GAME_SUPPORTS_SAVE )
 GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          GAME_SUPPORTS_SAVE )
 GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, driver_device, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  GAME_SUPPORTS_SAVE )
-/* these 5 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
+/* these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
 GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
 GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
 GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  GAME_SUPPORTS_SAVE )
+GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state,   mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           GAME_SUPPORTS_SAVE )
 GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "<unknown>",                "Inca",                                                          GAME_SUPPORTS_SAVE )
 GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state,   blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           GAME_SUPPORTS_SAVE )
 
@@ -7311,6 +7394,7 @@ GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, driver_device, 0,        ROT
 GAME( 1990, 7jigen,   0,        nanajign, nanajign, driver_device, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, jantouki, 0,        jantouki, jantouki, driver_device, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           GAME_SUPPORTS_SAVE )
 GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                       GAME_SUPPORTS_SAVE )
+GAME( 1991, mjdialq2a,mjdialq2, mjdialq2, mjdialq2, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan, alt.)",                                 GAME_SUPPORTS_SAVE )
 GAME( 1991, yarunara, 0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      GAME_SUPPORTS_SAVE )
 GAME( 1991, mjangels, 0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  GAME_SUPPORTS_SAVE )
 GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, driver_device, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               GAME_SUPPORTS_SAVE )

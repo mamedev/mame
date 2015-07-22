@@ -30,6 +30,7 @@
 */
 
 #include "emu.h"
+#include "sound/cdda.h"
 #include "scsp.h"
 
 
@@ -1010,8 +1011,10 @@ unsigned short scsp_device::r16(address_space &space, unsigned int addr)
 			v= *((unsigned short *) (m_DSP.EFREG+(addr-0xec0)/2));
 		else
 		{
-			/*
-			TODO: Kyuutenkai reads from 0xee0/0xee2, it's an undocumented "DSP internal buffer" register ...
+			/**!
+			@todo Kyuutenkai reads from 0xee0/0xee2, it's tied with EXTS register(s) also used for CD-Rom Player equalizer.
+			This port is actually an external parallel port, directly connected from the CD Block device, hence code is a bit of an hack.
+			Kyuutenkai code snippet for reference:
 			004A3A: 207C 0010 0EE0             movea.l #$100ee0, A0
 			004A40: 43EA 0090                  lea     ($90,A2), A1 ;A2=0x700
 			004A44: 6100 0254                  bsr     $4c9a
@@ -1044,11 +1047,11 @@ unsigned short scsp_device::r16(address_space &space, unsigned int addr)
 			    004CB0: 4CDF 0002                  movem.l (A7)+, D1
 			    004CB4: 4E75                       rts
 			*/
-			logerror("SCSP: Reading from unmapped register %08x\n",addr);
+			logerror("SCSP: Reading from EXTS register %08x\n",addr);
 			if(addr == 0xee0)
-				v= m_DSP.TEMP[0] >> 16;
+				v =	space.machine().device<cdda_device>("cdda")->get_channel_volume(0);
 			if(addr == 0xee2)
-				v= m_DSP.TEMP[0] & 0xffff;
+				v = space.machine().device<cdda_device>("cdda")->get_channel_volume(1);
 		}
 	}
 	return v;

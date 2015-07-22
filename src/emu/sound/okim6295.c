@@ -303,14 +303,14 @@ void okim6295_device::write_command(UINT8 command)
 					// determine the start/stop positions
 					offs_t base = m_command * 8;
 
-					offs_t start = m_direct->read_raw_byte(base + 0) << 16;
-					start |= m_direct->read_raw_byte(base + 1) << 8;
-					start |= m_direct->read_raw_byte(base + 2) << 0;
+					offs_t start = m_direct->read_byte(base + 0) << 16;
+					start |= m_direct->read_byte(base + 1) << 8;
+					start |= m_direct->read_byte(base + 2) << 0;
 					start &= 0x3ffff;
 
-					offs_t stop = m_direct->read_raw_byte(base + 3) << 16;
-					stop |= m_direct->read_raw_byte(base + 4) << 8;
-					stop |= m_direct->read_raw_byte(base + 5) << 0;
+					offs_t stop = m_direct->read_byte(base + 3) << 16;
+					stop |= m_direct->read_byte(base + 4) << 8;
+					stop |= m_direct->read_byte(base + 5) << 0;
 					stop &= 0x3ffff;
 
 					if (start < stop)
@@ -405,7 +405,7 @@ void okim6295_device::okim_voice::generate_adpcm(direct_read_data &direct, strea
 	while (samples-- != 0)
 	{
 		// fetch the next sample byte
-		int nibble = direct.read_raw_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
+		int nibble = direct.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 
 		// output to the buffer, scaling by the volume
 		// signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767

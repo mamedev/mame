@@ -138,8 +138,8 @@ static void sn_divide(running_machine &machine)
 	if (SN74S516.X == 0)
 	{
 		osd_printf_debug("%s:SN74S516 tried to divide by zero\n", machine.describe_context());
-		SN74S516.ZW.Z = (INT16)0xffff;
-		SN74S516.ZW.W = 0xffff;
+		SN74S516.ZW.as16bit.Z = (INT16)0xffff;
+		SN74S516.ZW.as16bit.W = 0xffff;
 		SN74S516.ZWfl = 0;
 		return;
 	}
@@ -160,8 +160,8 @@ static void sn_divide(running_machine &machine)
 		}
 		case 0x6664:
 		{
-			Z = SN74S516.ZW.W / SN74S516.X;
-			W = SN74S516.ZW.W % SN74S516.X;
+			Z = SN74S516.ZW.as16bit.W / SN74S516.X;
+			W = SN74S516.ZW.as16bit.W % SN74S516.X;
 			break;
 		}
 		default:
@@ -174,8 +174,8 @@ static void sn_divide(running_machine &machine)
 	if (Z > 0xffff)
 		Z |= 0xff00;
 
-	SN74S516.ZW.Z = Z;
-	SN74S516.ZW.W = W;
+	SN74S516.ZW.as16bit.Z = Z;
+	SN74S516.ZW.as16bit.W = W;
 	SN74S516.ZWfl = 0;
 }
 
@@ -205,9 +205,9 @@ static void kick_sn74s516(running_machine &machine, UINT16 *data, const int ins)
 
 #define LOAD_X      (SN74S516.X = *data)
 #define LOAD_Y      (SN74S516.Y = *data)
-#define LOAD_Z      (SN74S516.ZW.Z = *data)
-#define LOAD_W      (SN74S516.ZW.W = *data)
-#define READ_ZW     *data = SN74S516.ZWfl ? SN74S516.ZW.W : SN74S516.ZW.Z; \
+#define LOAD_Z      (SN74S516.ZW.as16bit.Z = *data)
+#define LOAD_W      (SN74S516.ZW.as16bit.W = *data)
+#define READ_ZW     *data = SN74S516.ZWfl ? SN74S516.ZW.as16bit.W : SN74S516.ZW.as16bit.Z; \
 					SN74S516.ZWfl ^= 1;
 
 #define UPDATE_SEQUENCE (SN74S516.code = (SN74S516.code << 4) | ins)
@@ -359,7 +359,7 @@ static void kick_sn74s516(running_machine &machine, UINT16 *data, const int ins)
 			else if (ins == 7)
 			{
 				/* 6667 = Load X, Load Z, Load W, Clear Z */
-				SN74S516.ZW.Z = 0;
+				SN74S516.ZW.as16bit.Z = 0;
 				sn74s516_update(machine, ins);
 			}
 			break;
@@ -955,7 +955,7 @@ enum
 	BB_MUX_DPROE,
 	BB_MUX_PPOE,
 	BB_MUX_INSCL,
-	BB_MUX_ILDEN,
+	BB_MUX_ILDEN
 };
 
 #define BB_SET_INS0_BIT do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff;} while(0)

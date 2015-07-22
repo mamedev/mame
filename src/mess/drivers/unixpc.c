@@ -208,7 +208,7 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 	MCFG_RAM_EXTRA_OPTIONS("2M")
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797x, 1000000)
+	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)

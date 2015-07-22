@@ -27,7 +27,7 @@
 	static_cast<floppy_connector *>(device)->set_formats(_formats);
 
 #define DECLARE_FLOPPY_FORMATS(_name) \
-	static const floppy_format_type _name [];
+	static const floppy_format_type _name []
 
 #define FLOPPY_FORMATS_MEMBER(_member) \
 	const floppy_format_type _member [] = {
@@ -186,6 +186,7 @@ protected:
 	int find_index(UINT32 position, const std::vector<UINT32> &buf);
 	void write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg);
 	void commit_image();
+	attotime get_next_index_time(std::vector<UINT32> &buf, int index, int delta, attotime base);
 };
 
 class ui_menu_control_floppy_image : public ui_menu_control_device_image {

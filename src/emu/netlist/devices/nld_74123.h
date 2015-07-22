@@ -30,6 +30,20 @@
  *       Q1Q |7           10| Q2
  *       GND |8            9| Q2Q
  *           +--------------+
+ *
+ *  CD4538: Dual Retriggerable, Resettable One Shots
+ *
+ *           +--------------+
+ *        C1 |1     ++    16| VCC
+ *       RC1 |2           15| C2
+ *      CLR1 |3           14| RC2
+ *        A1 |4    4538   13| CLR2
+ *        B1 |5           12| A2
+ *        Q1 |6           11| B2
+ *       Q1Q |7           10| Q2
+ *       GND |8            9| Q2Q
+ *           +--------------+
+ *
  */
 
 #ifndef NLD_74123_H_
@@ -40,37 +54,38 @@
 #include "../analog/nld_twoterm.h"
 
 #define TTL_74123(_name)                                                        \
-		NET_REGISTER_DEV(74123, _name)
+		NET_REGISTER_DEV(TTL_74123, _name)
 
+NETLIB_NAMESPACE_DEVICES_START()
 
 NETLIB_DEVICE(74123,
 public:
 	NETLIB_NAME(res_sw) m_RP;
 	NETLIB_NAME(res_sw) m_RN;
 
-	netlist_logic_output_t m_RP_Q;
-	netlist_logic_output_t m_RN_Q;
+	logic_output_t m_RP_Q;
+	logic_output_t m_RN_Q;
 
-	netlist_logic_input_t m_A;
-	netlist_logic_input_t m_B;
-	netlist_logic_input_t m_CLRQ;
-	netlist_logic_output_t m_Q;
-	netlist_logic_output_t m_QQ;
+	logic_input_t m_A;
+	logic_input_t m_B;
+	logic_input_t m_CLRQ;
+	logic_output_t m_Q;
+	logic_output_t m_QQ;
 
-	netlist_analog_input_t m_CV;
+	analog_input_t m_CV;
 
 	netlist_sig_t m_last_trig;
 	UINT8         m_state;
 	double        m_KP;
 
-	netlist_param_double_t m_K;
-	netlist_param_double_t m_RI;
+	param_double_t m_K;
+	param_double_t m_RI;
 
 	int m_dev_type;
 );
 
 #define TTL_74123_DIP(_name)                                                         \
-		NET_REGISTER_DEV(74123_dip, _name)
+		NET_REGISTER_DEV(TTL_74123_DIP, _name)
 
 NETLIB_DEVICE(74123_dip,
 
@@ -84,7 +99,7 @@ NETLIB_DEVICE(74123_dip,
  */
 
 #define TTL_9602_DIP(_name)                                                         \
-		NET_REGISTER_DEV(9602_dip, _name)
+		NET_REGISTER_DEV(TTL_9602_DIP, _name)
 
 NETLIB_DEVICE(9602_dip,
 
@@ -92,6 +107,21 @@ NETLIB_DEVICE(9602_dip,
 	NETLIB_NAME(74123) m_2;
 
 );
+
+/*
+ * The CD4538 is pretty similar to the 9602
+ */
+
+#define CD4538_DIP(_name)                                                         \
+		NET_REGISTER_DEV(CD4538_DIP, _name)
+
+NETLIB_DEVICE(4538_dip,
+	NETLIB_LOGIC_FAMILY(CD4XXX)
+	NETLIB_NAME(74123) m_1;
+	NETLIB_NAME(74123) m_2;
+);
+
+NETLIB_NAMESPACE_DEVICES_END()
 
 
 #endif /* NLD_74123_H_ */

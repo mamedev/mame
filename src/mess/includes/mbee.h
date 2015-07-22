@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller, Robbbert
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /*****************************************************************************
  *
  * includes/mbee.h

@@ -108,7 +108,7 @@ const device_type DSP56156 = &device_creator<dsp56k_device>;
  *  Internal Memory Maps
  ****************************************************************************/
 static ADDRESS_MAP_START( dsp56156_program_map, AS_PROGRAM, 16, dsp56k_device )
-	AM_RANGE(0x0000,0x07ff) AM_READWRITE(program_r, program_w)   /* 1-5 */
+	AM_RANGE(0x0000,0x07ff) AM_RAM AM_SHARE("dsk56k_program_ram")   /* 1-5 */
 //  AM_RANGE(0x2f00,0x2fff) AM_ROM                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
 ADDRESS_MAP_END
 
@@ -122,29 +122,14 @@ dsp56k_device::dsp56k_device(const machine_config &mconfig, const char *tag, dev
 	: cpu_device(mconfig, DSP56156, "DSP56156", tag, owner, clock, "dsp56156", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_program_map))
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_x_data_map))
+	, m_program_ram(*this, "dsk56k_program_ram")
 {
 }
-
-
-/***************************************************************************
-    Direct Update Handler
-***************************************************************************/
-DIRECT_UPDATE_MEMBER( dsp56k_device::dsp56k_direct_handler )
-{
-	if (address <= (0x07ff<<1))
-	{
-		direct.explicit_configure(0x0000<<1, 0x07ff<<1, (0x07ff<<1) | 1, m_dsp56k_core.program_ram);
-		return ~0;
-	}
-
-	return address;
-}
-
 
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
-#define ROPCODE(pc)   cpustate->direct->read_decrypted_word(pc)
+#define ROPCODE(pc)   cpustate->direct->read_word(pc)
 
 
 /***************************************************************************
@@ -255,6 +240,7 @@ void dsp56k_device::device_start()
 	memset(&m_dsp56k_core, 0, sizeof(m_dsp56k_core));
 
 	m_dsp56k_core.device = this;
+	m_dsp56k_core.program_ram = m_program_ram;
 
 	/* Call specific module inits */
 	pcu_init(&m_dsp56k_core, this);
@@ -292,15 +278,10 @@ void dsp56k_device::device_start()
 	save_item(NAME(m_dsp56k_core.HI.bootstrap_offset));
 
 	save_item(NAME(m_dsp56k_core.peripheral_ram));
-	save_item(NAME(m_dsp56k_core.program_ram));
 
 	m_dsp56k_core.program = &space(AS_PROGRAM);
 	m_dsp56k_core.direct = &m_dsp56k_core.program->direct();
 	m_dsp56k_core.data = &space(AS_DATA);
-
-	/* Setup the direct memory handler for this CPU */
-	/* NOTE: Be sure to grab this guy and call him if you ever install another direct_update_hander in a driver! */
-	m_dsp56k_core.program->set_direct_update_handler(direct_update_delegate(FUNC(dsp56k_device::dsp56k_direct_handler), this));
 
 	state_add(DSP56K_PC,     "PC", m_dsp56k_core.PCU.pc).formatstr("%04X");
 	state_add(DSP56K_SR,     "SR", m_dsp56k_core.PCU.sr).formatstr("%04X");

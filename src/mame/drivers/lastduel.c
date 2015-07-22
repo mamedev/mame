@@ -25,7 +25,6 @@ To advance test mode screens:
 TODO:
 - The seem to be minor priority issues in Mad Gear, but the game might just
   be like that. The priority PROM is dumped but currently not used.
-- visible area might be wrong
 
 **************************************************************************
 

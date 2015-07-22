@@ -160,58 +160,37 @@ static void kabuki_decode(UINT8 *src,UINT8 *dest_op,UINT8 *dest_data,
 
 
 
-static void mitchell_decode(running_machine &machine, int swap_key1,int swap_key2,int addr_key,int xor_key)
+static void mitchell_decode(UINT8 *src, UINT8 *dst, int size, int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, machine.root_device().memregion("maincpu")->bytes());
-	int numbanks = (machine.root_device().memregion("maincpu")->bytes() - 0x10000) / 0x4000;
-	int i;
+	int numbanks = (size - 0x10000) / 0x4000;
 
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
-	kabuki_decode(rom,decrypt,rom,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);
+	kabuki_decode(src,dst,src,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);
 
-	rom += 0x10000;
-	decrypt += 0x10000;
-	for (i = 0; i < numbanks; i++)
-		kabuki_decode(rom+i*0x4000,decrypt+i*0x4000,rom+i*0x4000,0x8000,0x4000, swap_key1,swap_key2,addr_key,xor_key);
-
-	machine.root_device().membank("bank1")->configure_decrypted_entries(0, numbanks, decrypt, 0x4000);
-/*
-    {
-        FILE *f;
-        f = fopen("a","wb");
-        fwrite(rom,1,0x8000,f);
-        fwrite(rom+0x10000,1,0x40000,f);
-        fclose(f);
-    }
-*/
+	src += 0x10000;
+	dst += 0x10000;
+	for (int i = 0; i < numbanks; i++)
+		kabuki_decode(src+i*0x4000,dst+i*0x4000,src+i*0x4000,0x8000,0x4000, swap_key1,swap_key2,addr_key,xor_key);
 }
 
-void mgakuen2_decode(running_machine &machine) { mitchell_decode(machine,0x76543210,0x01234567,0xaa55,0xa5); }
-void pang_decode(running_machine &machine)     { mitchell_decode(machine,0x01234567,0x76543210,0x6548,0x24); }
-void cworld_decode(running_machine &machine)   { mitchell_decode(machine,0x04152637,0x40516273,0x5751,0x43); }
-void hatena_decode(running_machine &machine)   { mitchell_decode(machine,0x45670123,0x45670123,0x5751,0x43); }
-void spang_decode(running_machine &machine)    { mitchell_decode(machine,0x45670123,0x45670123,0x5852,0x43); }
-void spangj_decode(running_machine &machine)   { mitchell_decode(machine,0x45123670,0x67012345,0x55aa,0x5a); }
-void sbbros_decode(running_machine &machine)   { mitchell_decode(machine,0x45670123,0x45670123,0x2130,0x12); }
-void marukin_decode(running_machine &machine)  { mitchell_decode(machine,0x54321076,0x54321076,0x4854,0x4f); }
-void qtono1_decode(running_machine &machine)   { mitchell_decode(machine,0x12345670,0x12345670,0x1111,0x11); }
-void qsangoku_decode(running_machine &machine) { mitchell_decode(machine,0x23456701,0x23456701,0x1828,0x18); }
-void block_decode(running_machine &machine)    { mitchell_decode(machine,0x02461357,0x64207531,0x0002,0x01); }
+void mgakuen2_decode(UINT8 *src, UINT8 *dst, int size) { mitchell_decode(src,dst,size,0x76543210,0x01234567,0xaa55,0xa5); }
+void pang_decode(UINT8 *src, UINT8 *dst, int size)     { mitchell_decode(src,dst,size,0x01234567,0x76543210,0x6548,0x24); }
+void cworld_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x04152637,0x40516273,0x5751,0x43); }
+void hatena_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x5751,0x43); }
+void spang_decode(UINT8 *src, UINT8 *dst, int size)    { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x5852,0x43); }
+void spangj_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x45123670,0x67012345,0x55aa,0x5a); }
+void sbbros_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x45670123,0x45670123,0x2130,0x12); }
+void marukin_decode(UINT8 *src, UINT8 *dst, int size)  { mitchell_decode(src,dst,size,0x54321076,0x54321076,0x4854,0x4f); }
+void qtono1_decode(UINT8 *src, UINT8 *dst, int size)   { mitchell_decode(src,dst,size,0x12345670,0x12345670,0x1111,0x11); }
+void qsangoku_decode(UINT8 *src, UINT8 *dst, int size) { mitchell_decode(src,dst,size,0x23456701,0x23456701,0x1828,0x18); }
+void block_decode(UINT8 *src, UINT8 *dst, int size)    { mitchell_decode(src,dst,size,0x02461357,0x64207531,0x0002,0x01); }
 
 
-static void cps1_decode(running_machine &machine,int swap_key1,int swap_key2,int addr_key,int xor_key)
+static void cps1_decode(UINT8 *src, UINT8 *dst,int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
-	address_space &space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
-	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
-
-	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
-	kabuki_decode(rom,decrypt,rom,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);
+	kabuki_decode(src,dst,src,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);
 }
 
-void wof_decode(running_machine &machine)      { cps1_decode(machine,0x01234567,0x54163072,0x5151,0x51); }
-void dino_decode(running_machine &machine)     { cps1_decode(machine,0x76543210,0x24601357,0x4343,0x43); }
-void punisher_decode(running_machine &machine) { cps1_decode(machine,0x67452103,0x75316024,0x2222,0x22); }
-void slammast_decode(running_machine &machine) { cps1_decode(machine,0x54321076,0x65432107,0x3131,0x19); }
+void wof_decode(UINT8 *src, UINT8 *dst)      { cps1_decode(src,dst,0x01234567,0x54163072,0x5151,0x51); }
+void dino_decode(UINT8 *src, UINT8 *dst)     { cps1_decode(src,dst,0x76543210,0x24601357,0x4343,0x43); }
+void punisher_decode(UINT8 *src, UINT8 *dst) { cps1_decode(src,dst,0x67452103,0x75316024,0x2222,0x22); }
+void slammast_decode(UINT8 *src, UINT8 *dst) { cps1_decode(src,dst,0x54321076,0x65432107,0x3131,0x19); }

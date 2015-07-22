@@ -21,7 +21,6 @@
 #include "imgtool.h"
 #include "iflopimg.h"
 #include "formats/imageutl.h"
-#include "formats/ami_dsk.h"
 
 
 

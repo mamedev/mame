@@ -121,6 +121,14 @@ static void WRITE_UINT32(unsigned char* data, UINT32 val)
 
 /* Initialize the SHA values */
 
+/**
+ * @fn  void sha1_init(struct sha1_ctx *ctx)
+ *
+ * @brief   Sha 1 initialise.
+ *
+ * @param [in,out]  ctx If non-null, the context.
+ */
+
 void
 sha1_init(struct sha1_ctx *ctx)
 {
@@ -144,6 +152,15 @@ sha1_init(struct sha1_ctx *ctx)
    sections, e.g. based on the four subrounds
 
    Note that this function destroys the data area */
+
+/**
+ * @fn  static void sha1_transform(UINT32 *state, UINT32 *data)
+ *
+ * @brief   Sha 1 transform.
+ *
+ * @param [in,out]  state   If non-null, the state.
+ * @param [in,out]  data    If non-null, the data.
+ */
 
 static void
 sha1_transform(UINT32 *state, UINT32 *data)
@@ -250,6 +267,15 @@ sha1_transform(UINT32 *state, UINT32 *data)
 	state[4] += E;
 }
 
+/**
+ * @fn  static void sha1_block(struct sha1_ctx *ctx, const UINT8 *block)
+ *
+ * @brief   Sha 1 block.
+ *
+ * @param [in,out]  ctx If non-null, the context.
+ * @param   block       The block.
+ */
+
 static void
 sha1_block(struct sha1_ctx *ctx, const UINT8 *block)
 {
@@ -266,6 +292,16 @@ sha1_block(struct sha1_ctx *ctx, const UINT8 *block)
 
 	sha1_transform(ctx->digest, data);
 }
+
+/**
+ * @fn  void sha1_update(struct sha1_ctx *ctx, unsigned length, const UINT8 *buffer)
+ *
+ * @brief   Sha 1 update.
+ *
+ * @param [in,out]  ctx If non-null, the context.
+ * @param   length      The length.
+ * @param   buffer      The buffer.
+ */
 
 void
 sha1_update(struct sha1_ctx *ctx,
@@ -302,6 +338,14 @@ sha1_update(struct sha1_ctx *ctx,
 
 /* Final wrapup - pad to SHA1_DATA_SIZE-byte boundary with the bit pattern
    1 0* (64-bit count of bits processed, MSB-first) */
+
+/**
+ * @fn  void sha1_final(struct sha1_ctx *ctx)
+ *
+ * @brief   Sha 1 final.
+ *
+ * @param [in,out]  ctx If non-null, the context.
+ */
 
 void
 sha1_final(struct sha1_ctx *ctx)
@@ -345,6 +389,16 @@ sha1_final(struct sha1_ctx *ctx)
 	data[SHA1_DATA_LENGTH-1] = (ctx->count_low << 9) | (ctx->index << 3);
 	sha1_transform(ctx->digest, data);
 }
+
+/**
+ * @fn  void sha1_digest(const struct sha1_ctx *ctx, unsigned length, UINT8 *digest)
+ *
+ * @brief   Sha 1 digest.
+ *
+ * @param   ctx             The context.
+ * @param   length          The length.
+ * @param [in,out]  digest  If non-null, the digest.
+ */
 
 void
 sha1_digest(const struct sha1_ctx *ctx,

@@ -34,6 +34,7 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 	/* bits 0-4 select ROM bank */
 	//logerror("%04x: bankswitch %02x\n", space.device().safe_pc(), data);
 	membank("bank1")->set_entry(data & 0x1f);
+	membank("bank1d")->set_entry(data & 0x1f);
 
 	/* bit 5 used but unknown */
 
@@ -96,6 +97,11 @@ static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("palette")  /* palette + vram + scrollram */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM     /* work RAM */
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cbasebal_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8, cbasebal_state )
@@ -223,8 +229,6 @@ GFXDECODE_END
 
 void cbasebal_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x4000);
-
 	save_item(NAME(m_rambank));
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_spritebank));
@@ -257,6 +261,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */
 	MCFG_CPU_PROGRAM_MAP(cbasebal_map)
 	MCFG_CPU_IO_MAP(cbasebal_portmap)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -330,7 +335,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
 {
-	pang_decode(machine());
+	UINT8 *src = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+	UINT8 *dst = auto_alloc_array(machine(), UINT8, size);
+	pang_decode(src, dst, size);
+	membank("bank1")->configure_entries(0, 32, src + 0x10000, 0x4000);
+	membank("bank0d")->set_base(dst);
+	membank("bank1d")->configure_entries(0, 32, dst + 0x10000, 0x4000);
 }
 
 

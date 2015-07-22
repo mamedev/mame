@@ -149,7 +149,7 @@ private:
 			UINT32 pix01 = palbase[texbase[u1]];
 			UINT32 pix10 = palbase[texbase[v1]];
 			UINT32 pix11 = palbase[texbase[u1 + v1]];
-			return rgb_bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
+			return rgbaint_t::bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
 		}
 		else
 		{
@@ -181,11 +181,7 @@ private:
 			const UINT16 *texbase = reinterpret_cast<const UINT16 *>(texture.base);
 			texbase += v0 * texture.rowpixels + u0;
 
-			UINT32 pix00 = palbase[texbase[0]];
-			UINT32 pix01 = palbase[texbase[u1]];
-			UINT32 pix10 = palbase[texbase[v1]];
-			UINT32 pix11 = palbase[texbase[u1 + v1]];
-			return rgba_bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
+			return rgbaint_t::bilinear_filter(palbase[texbase[0]], palbase[texbase[u1]], palbase[texbase[v1]], palbase[texbase[u1 + v1]], curu >> 8, curv >> 8);
 		}
 		else
 		{
@@ -247,7 +243,7 @@ private:
 				else
 					pix11 = pix10;
 			}
-			return rgb_bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
+			return rgbaint_t::bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
 		}
 		else
 		{
@@ -278,11 +274,7 @@ private:
 			const UINT32 *texbase = reinterpret_cast<const UINT32 *>(texture.base);
 			texbase += v0 * texture.rowpixels + u0;
 
-			UINT32 pix00 = texbase[0];
-			UINT32 pix01 = texbase[u1];
-			UINT32 pix10 = texbase[v1];
-			UINT32 pix11 = texbase[u1 + v1];
-			return rgb_bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
+			return rgbaint_t::bilinear_filter(texbase[0], texbase[u1], texbase[v1], texbase[u1 + v1], curu >> 8, curv >> 8);
 		}
 		else
 		{
@@ -313,11 +305,7 @@ private:
 			const UINT32 *texbase = reinterpret_cast<const UINT32 *>(texture.base);
 			texbase += v0 * texture.rowpixels + u0;
 
-			UINT32 pix00 = texbase[0];
-			UINT32 pix01 = texbase[u1];
-			UINT32 pix10 = texbase[v1];
-			UINT32 pix11 = texbase[u1 + v1];
-			return rgba_bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
+			return rgbaint_t::bilinear_filter(texbase[0], texbase[u1], texbase[v1], texbase[u1 + v1], curu >> 8, curv >> 8);
 		}
 		else
 		{

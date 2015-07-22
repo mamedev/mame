@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Yochizo
 class exzisus_state : public driver_device
 {

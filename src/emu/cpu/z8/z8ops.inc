@@ -146,7 +146,7 @@ void z8_device::load_from_memory(address_space *space)
 	UINT8 src = get_working_register(operands & 0x0f);
 
 	UINT16 address = register_pair_read(src);
-	UINT8 data = m_direct->read_decrypted_byte(address);
+	UINT8 data = m_direct->read_byte(address);
 
 	register_write(dst, data);
 }
@@ -171,7 +171,7 @@ void z8_device::load_from_memory_autoinc(address_space *space)
 	UINT8 src = get_working_register(operands & 0x0f);
 
 	UINT16 address = register_pair_read(src);
-	UINT8 data = m_direct->read_decrypted_byte(address);
+	UINT8 data = m_direct->read_byte(address);
 
 	register_write(real_dst, data);
 

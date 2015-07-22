@@ -63,6 +63,10 @@
 #pragma warning (disable : 4204)  // missing c99 support
 #endif
 
+#if defined(_WIN32) && !defined(MONGOOSE_NO_CGI) && !defined(MONGOOSE_ENABLE_THREADS)
+#define MONGOOSE_ENABLE_THREADS   /* Windows uses stdio threads for CGI */
+#endif
+
 #ifndef MONGOOSE_ENABLE_THREADS
 #define NS_DISABLE_THREADS
 #endif
@@ -90,6 +94,9 @@
 #pragma comment(lib, "ws2_32.lib")    // Linking with winsock library
 #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
+#endif
+#ifndef FD_SETSIZE
+#define FD_SETSIZE 1024
 #endif
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -231,6 +238,7 @@ struct ns_connection {
 
   sock_t sock;                // Socket
   union socket_address sa;    // Peer address
+  size_t recv_iobuf_limit; /* Max size of recv buffer */
   struct iobuf recv_iobuf;    // Received data
   struct iobuf send_iobuf;    // Data scheduled for sending
   SSL *ssl;
@@ -250,6 +258,7 @@ struct ns_connection {
 #define NSF_WANT_WRITE              (1 << 6)
 #define NSF_LISTENING               (1 << 7)
 #define NSF_UDP                     (1 << 8)
+#define NSF_DISCARD                 (1 << 9)
 
 #define NSF_USER_1                  (1 << 20)
 #define NSF_USER_2                  (1 << 21)
@@ -326,6 +335,7 @@ int ns_resolve(const char *domain_name, char *ip_addr_buf, size_t buf_len);
 #define NS_CALLOC calloc
 #endif
 
+#define NS_MAX_SOCKETPAIR_ATTEMPTS  10
 #define NS_CTL_MSG_MESSAGE_SIZE     (8 * 1024)
 #define NS_READ_BUFFER_SIZE         2048
 #define NS_UDP_RECEIVE_BUFFER_SIZE  2000
@@ -854,7 +864,17 @@ static int ns_is_error(int n) {
 #ifdef _WIN32
      && WSAGetLastError() != WSAEINTR && WSAGetLastError() != WSAEWOULDBLOCK
 #endif
-    );
+    )
+#ifdef NS_ENABLE_SSL
+    /*
+     * OpenSSL can return an error when the peer is closing the socket.
+     * We don't encounter this error with openssl actually, but it's returned
+     * by our polarssl <-> openssl wrapper who tries to speak the openssl API
+     * as we understood it.
+     */
+    || n == SSL_AD_CLOSE_NOTIFY
+#endif
+    ;
 }
 
 void ns_sock_to_str(sock_t sock, char *buf, size_t len, int flags) {
@@ -1056,7 +1076,7 @@ static void ns_handle_udp(struct ns_connection *ls) {
 }
 
 static void ns_add_to_set(sock_t sock, fd_set *set, sock_t *max_fd) {
-  if (sock != INVALID_SOCKET) {
+  if ( (sock != INVALID_SOCKET) && (sock < FD_SETSIZE) ) {
     FD_SET(sock, set);
     if (*max_fd == INVALID_SOCKET || sock > *max_fd) {
       *max_fd = sock;
@@ -1099,7 +1119,9 @@ time_t ns_mgr_poll(struct ns_mgr *mgr, int milli) {
   tv.tv_sec = milli / 1000;
   tv.tv_usec = (milli % 1000) * 1000;
 
-  if (select((int) max_fd + 1, &read_set, &write_set, NULL, &tv) > 0) {
+  if (select((int) max_fd + 1, &read_set, &write_set, NULL, &tv) < 0) {
+    return 0;
+  } else {
     // select() might have been waiting for a long time, reset current_time
     // now to prevent last_io_time being set to the past.
     current_time = time(NULL);
@@ -1250,9 +1272,12 @@ void ns_mgr_init(struct ns_mgr *s, void *user_data) {
 #endif
 
 #ifndef NS_DISABLE_SOCKETPAIR
-  do {
-    ns_socketpair2(s->ctl, SOCK_DGRAM);
-  } while (s->ctl[0] == INVALID_SOCKET);
+  {
+    int attempts = 0, max_attempts = NS_MAX_SOCKETPAIR_ATTEMPTS;
+    do {
+      ns_socketpair2(s->ctl, SOCK_DGRAM);
+    } while (s->ctl[0] == INVALID_SOCKET && ++attempts < max_attempts);
+  }
 #endif
 
 #ifdef NS_ENABLE_SSL
@@ -1404,7 +1429,7 @@ struct dir_entry {
   file_stat_t st;
 };
 
-// NOTE(lsm): this enum shoulds be in sync with the config_options.
+// NOTE(lsm): this enum should be in sync with the config_options.
 enum {
   ACCESS_CONTROL_LIST,
 #ifndef MONGOOSE_NO_FILESYSTEM
@@ -1948,12 +1973,20 @@ static void write_chunk(struct connection *conn, const char *buf, int len) {
 }
 
 size_t mg_printf(struct mg_connection *conn, const char *fmt, ...) {
-  struct connection *c = MG_CONN_2_CONN(conn);
   va_list ap;
+  int ret;
 
   va_start(ap, fmt);
-  ns_vprintf(c->ns_conn, fmt, ap);
+  ret = mg_vprintf(conn, fmt, ap);
   va_end(ap);
+
+  return ret;
+}
+
+size_t mg_vprintf(struct mg_connection *conn, const char *fmt, va_list ap) {
+  struct connection *c = MG_CONN_2_CONN(conn);
+
+  ns_vprintf(c->ns_conn, fmt, ap);
 
   return c->ns_conn->send_iobuf.len;
 }
@@ -1973,6 +2006,8 @@ struct threadparam {
 
 static int wait_until_ready(sock_t sock, int for_read) {
   fd_set set;
+  if ( (sock == INVALID_SOCKET) || (sock >= FD_SETSIZE) )
+    return 0;
   FD_ZERO(&set);
   FD_SET(sock, &set);
   select(sock + 1, for_read ? &set : 0, for_read ? 0 : &set, 0, 0);
@@ -1992,7 +2027,7 @@ static void *push_to_stdin(void *arg) {
       if (!WriteFile(tp->hPipe, buf + sent, n - sent, &k, 0)) stop = 1;
     }
   }
-  DBG(("%s", "FORWARED EVERYTHING TO CGI"));
+  DBG(("%s", "FORWARDED EVERYTHING TO CGI"));
   CloseHandle(tp->hPipe);
   NS_FREE(tp);
   _endthread();
@@ -2312,9 +2347,17 @@ static void open_cgi_endpoint(struct connection *conn, const char *prog) {
   // Try to create socketpair in a loop until success. ns_socketpair()
   // can be interrupted by a signal and fail.
   // TODO(lsm): use sigaction to restart interrupted syscall
-  do {
-    ns_socketpair(fds);
-  } while (fds[0] == INVALID_SOCKET);
+  {
+    int attempts = 0, max_attempts = NS_MAX_SOCKETPAIR_ATTEMPTS;
+    do {
+      ns_socketpair(fds);
+    } while (fds[0] == INVALID_SOCKET && ++attempts < max_attempts);
+
+    if (fds[0] == INVALID_SOCKET) {
+      closesocket(fds[0]);
+      send_http_error(conn, 500, "ns_socketpair() failed");
+    }
+  }
 
   if (start_process(conn->server->config_options[CGI_INTERPRETER],
                     prog, blk.buf, blk.vars, dir, fds[1]) != 0) {
@@ -2503,7 +2546,7 @@ static size_t parse_http_message(char *buf, size_t len,
 
   buf[len - 1] = '\0';
 
-  // RFC says that all initial whitespaces should be ingored
+  // RFC says that all initial whitespaces should be ignored
   while (*buf != '\0' && isspace(* (unsigned char *) buf)) {
     buf++;
   }
@@ -2677,7 +2720,8 @@ static int convert_uri_to_file_name(struct connection *conn, char *buf,
 #endif
   const char *uri = conn->mg_conn.uri;
   const char *domain = mg_get_header(&conn->mg_conn, "Host");
-  size_t match_len, root_len = root == NULL ? 0 : strlen(root);
+  // Important: match_len has to be declared as int, unless rewrites break.
+  int match_len, root_len = root == NULL ? 0 : strlen(root);
 
   // Perform virtual hosting rewrites
   if (rewrites != NULL && domain != NULL) {
@@ -2784,16 +2828,24 @@ size_t mg_send_data(struct mg_connection *c, const void *data, int data_len) {
 }
 
 size_t mg_printf_data(struct mg_connection *c, const char *fmt, ...) {
-  struct connection *conn = MG_CONN_2_CONN(c);
   va_list ap;
+  int ret;
+
+  va_start(ap, fmt);
+  ret = mg_vprintf_data(c, fmt, ap);
+  va_end(ap);
+
+  return ret;
+}
+
+size_t mg_vprintf_data(struct mg_connection *c, const char *fmt, va_list ap) {
+  struct connection *conn = MG_CONN_2_CONN(c);
   int len;
   char mem[IOBUF_SIZE], *buf = mem;
 
   terminate_headers(c);
 
-  va_start(ap, fmt);
   len = ns_avprintf(&buf, sizeof(mem), fmt, ap);
-  va_end(ap);
 
   if (len >= 0) {
     write_chunk((struct connection *) conn, buf, len);
@@ -2816,7 +2868,7 @@ static int is_big_endian(void) {
 // Copyright(c) By Steve Reid <steve@edmweb.com>
 #define SHA1HANDSOFF
 #if defined(__sun)
-//#include "solarisfixes.h"
+#include "solarisfixes.h"
 #endif
 
 union char64long16 { unsigned char c[64]; uint32_t l[16]; };
@@ -3033,7 +3085,8 @@ static size_t deliver_websocket_frame(struct connection *conn) {
     }
 
     // Call the handler and remove frame from the iobuf
-    if (call_user(conn, MG_REQUEST) == MG_FALSE) {
+    if (call_user(conn, MG_REQUEST) == MG_FALSE ||
+        (buf[0] & 0x0f) == WEBSOCKET_OPCODE_CONNECTION_CLOSE) {
       conn->ns_conn->flags |= NSF_FINISHED_SENDING_DATA;
     }
     iobuf_remove(&conn->ns_conn->recv_iobuf, frame_len);
@@ -3314,14 +3367,17 @@ static int find_index_file(struct connection *conn, char *path,
 
   // If no index file exists, restore directory path
   if (!found) {
-    path[n] = '\0';
+    path[n] = '/';
+    path[n + 1] = '\0';
   }
 
   return found;
 }
 
 static int parse_range_header(const char *header, int64_t *a, int64_t *b) {
-  return sscanf(header, "bytes=%" INT64_FMT "-%" INT64_FMT, a, b);
+//  return sscanf(header, "bytes=%" INT64_FMT "-%" INT64_FMT, a, b);
+//  return sscanf(header, "bytes=%ld-%ld" INT64_FMT, a, b);
+	return 0;
 }
 
 static void gmt_time_string(char *buf, size_t buf_len, time_t *t) {
@@ -3332,7 +3388,7 @@ static void open_file_endpoint(struct connection *conn, const char *path,
                                file_stat_t *st, const char *extra_headers) {
   char date[64], lm[64], etag[64], range[64], headers[1000];
   const char *msg = "OK", *hdr;
-  time_t curtime = time(NULL);
+  time_t t, curtime = time(NULL);
   int64_t r1, r2;
   struct vec mime_vec;
   int n;
@@ -3362,7 +3418,7 @@ static void open_file_endpoint(struct connection *conn, const char *path,
   // Prepare Etag, Date, Last-Modified headers. Must be in UTC, according to
   // http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.3
   gmt_time_string(date, sizeof(date), &curtime);
-  time_t t = st->st_mtime;
+  t = st->st_mtime; // store in local variable for NDK compile
   gmt_time_string(lm, sizeof(lm), &t);
   construct_etag(etag, sizeof(etag), st);
 
@@ -3512,11 +3568,11 @@ static int scan_directory(struct connection *conn, const char *dir,
     }
     mg_snprintf(path, sizeof(path), "%s%c%s", dir, '/', dp->d_name);
 
-    // Resize the array if nesessary
+    // Resize the array if necessary
     if (arr_ind >= arr_size) {
       if ((p = (struct dir_entry *)
            NS_REALLOC(*arr, (inc + arr_size) * sizeof(**arr))) != NULL) {
-        // Memset new chunk to zero, otherwize st_mtime will have garbage which
+        // Memset new chunk to zero, otherwise st_mtime will have garbage which
         // can make strftime() segfault, see
         // http://code.google.com/p/mongoose/issues/detail?id=79
         memset(p + arr_size, 0, sizeof(**arr) * inc);
@@ -3567,6 +3623,7 @@ static void print_dir_entry(const struct dir_entry *de) {
   int64_t fsize = de->st.st_size;
   int is_dir = S_ISDIR(de->st.st_mode);
   const char *slash = is_dir ? "/" : "";
+  time_t t;
 
   if (is_dir) {
     mg_snprintf(size, sizeof(size), "%s", "[DIRECTORY]");
@@ -3583,7 +3640,7 @@ static void print_dir_entry(const struct dir_entry *de) {
       mg_snprintf(size, sizeof(size), "%.1fG", (double) fsize / 1073741824);
     }
   }
-  time_t t = de->st.st_mtime;
+  t = de->st.st_mtime;  // store in local variable for NDK compile
   strftime(mod, sizeof(mod), "%d-%b-%Y %H:%M", localtime(&t));
   mg_url_encode(de->file_name, strlen(de->file_name), href, sizeof(href));
   mg_printf_data(&de->conn->mg_conn,
@@ -3639,12 +3696,14 @@ static void send_directory_listing(struct connection *conn, const char *dir) {
               sort_direction, sort_direction, sort_direction);
 
   num_entries = scan_directory(conn, dir, &arr);
-  qsort(arr, num_entries, sizeof(arr[0]), compare_dir_entries);
-  for (i = 0; i < num_entries; i++) {
-    print_dir_entry(&arr[i]);
-    NS_FREE(arr[i].file_name);
+  if (arr) {
+      qsort(arr, num_entries, sizeof(arr[0]), compare_dir_entries);
+      for (i = 0; i < num_entries; i++) {
+        print_dir_entry(&arr[i]);
+        NS_FREE(arr[i].file_name);
+      }
+      NS_FREE(arr);
   }
-  NS_FREE(arr);
 
   write_terminating_chunk(conn);
   close_local_endpoint(conn);
@@ -3655,7 +3714,7 @@ static void send_directory_listing(struct connection *conn, const char *dir) {
 static void print_props(struct connection *conn, const char *uri,
                         file_stat_t *stp) {
   char mtime[64];
-  time_t t = stp->st_mtime;
+  time_t t = stp->st_mtime;  // store in local variable for NDK compile
   gmt_time_string(mtime, sizeof(mtime), &t);
   mg_printf(&conn->mg_conn,
       "<d:response>"
@@ -3861,11 +3920,16 @@ void mg_send_digest_auth_request(struct mg_connection *c) {
   c->status_code = 401;
   mg_printf(c,
             "HTTP/1.1 401 Unauthorized\r\n"
+            "Content-Length: 0\r\n"
             "WWW-Authenticate: Digest qop=\"auth\", "
             "realm=\"%s\", nonce=\"%lu\"\r\n\r\n",
             conn->server->config_options[AUTH_DOMAIN],
             (unsigned long) time(NULL));
-  close_local_endpoint(conn);
+  if (conn->cl > 0) {
+    conn->ns_conn->flags |= NSF_DISCARD;
+  } else {
+    close_local_endpoint(conn);
+  }
 }
 
 // Use the global passwords file, if specified by auth_gpass option,
@@ -4285,7 +4349,7 @@ static void do_ssi_include(struct mg_connection *conn, const char *ssi,
     mg_snprintf(path, sizeof(path), "%s", file_name);
   } else if (sscanf(tag, " file=\"%[^\"]\"", file_name) == 1 ||
              sscanf(tag, " \"%[^\"]\"", file_name) == 1) {
-    // File name is relative to the currect document
+    // File name is relative to the current document
     mg_snprintf(path, sizeof(path), "%s", ssi);
     if ((p = strrchr(path, '/')) != NULL) {
       p[1] = '\0';
@@ -4697,6 +4761,10 @@ static void try_parse(struct connection *conn) {
     // iobuf could be reallocated, and pointers in parsed request could
     // become invalid.
     conn->request = (char *) NS_MALLOC(conn->request_len);
+    if (conn->request == NULL) {
+      conn->ns_conn->flags |= NSF_CLOSE_IMMEDIATELY;
+      return;
+    }
     memcpy(conn->request, io->buf, conn->request_len);
     //DBG(("%p [%.*s]", conn, conn->request_len, conn->request));
     iobuf_remove(io, conn->request_len);
@@ -4731,6 +4799,19 @@ static void on_recv_data(struct connection *conn) {
 
   if (conn->endpoint_type == EP_PROXY) {
     if (conn->endpoint.nc != NULL) do_proxy(conn);
+    return;
+  }
+
+  if (conn->ns_conn->flags & NSF_DISCARD) {
+    size_t n = conn->cl;
+    if (n > io->len) {
+      n = io->len;
+    }
+    iobuf_remove(io, n);
+    conn->cl -= n;
+    if (conn->cl == 0) {
+      close_local_endpoint(conn);
+    }
     return;
   }
 
@@ -4913,7 +4994,7 @@ static void close_local_endpoint(struct connection *conn) {
 
   conn->endpoint_type = EP_NONE;
   conn->cl = conn->num_bytes_recv = conn->request_len = 0;
-  conn->ns_conn->flags &= ~(NSF_FINISHED_SENDING_DATA |
+  conn->ns_conn->flags &= ~(NSF_FINISHED_SENDING_DATA | NSF_DISCARD |
                             NSF_BUFFER_BUT_DONT_SEND | NSF_CLOSE_IMMEDIATELY |
                             MG_HEADERS_SENT | MG_USING_CHUNKED_API);
 
@@ -4921,7 +5002,7 @@ static void close_local_endpoint(struct connection *conn) {
   // (IP addresses & ports, server_param) must survive. Nullify the rest.
   c->request_method = c->uri = c->http_version = c->query_string = NULL;
   c->num_headers = c->status_code = c->is_websocket = c->content_len = 0;
-  c->connection_param = c->callback_param = NULL;
+  c->callback_param = NULL;
 
   if (keep_alive) {
     on_recv_data(conn);  // Can call us recursively if pipelining is used
@@ -4983,26 +5064,25 @@ struct mg_connection *mg_next(struct mg_server *s, struct mg_connection *c) {
 }
 
 static int get_var(const char *data, size_t data_len, const char *name,
-                   char *dst, size_t dst_len) {
-  const char *p, *e, *s;
+                   char *dst, size_t dst_len, int n) {
+  const char *p, *e = data + data_len, *s;
   size_t name_len;
-  int len;
+  int i = 0, len = -1;
 
   if (dst == NULL || dst_len == 0) {
     len = -2;
   } else if (data == NULL || name == NULL || data_len == 0) {
-    len = -1;
     dst[0] = '\0';
   } else {
     name_len = strlen(name);
-    e = data + data_len;
-    len = -1;
     dst[0] = '\0';
 
     // data is "var1=val1&var2=val2...". Find variable first
     for (p = data; p + name_len < e; p++) {
       if ((p == data || p[-1] == '&') && p[name_len] == '=' &&
           !mg_strncasecmp(name, p, name_len)) {
+
+        if (n != i++) continue;
 
         // Point p to variable value
         p += name_len + 1;
@@ -5029,14 +5109,19 @@ static int get_var(const char *data, size_t data_len, const char *name,
   return len;
 }
 
-int mg_get_var(const struct mg_connection *conn, const char *name,
-               char *dst, size_t dst_len) {
+int mg_get_var_n(const struct mg_connection *conn, const char *name,
+               char *dst, size_t dst_len, int n) {
   int len = get_var(conn->query_string, conn->query_string == NULL ? 0 :
-                    strlen(conn->query_string), name, dst, dst_len);
-  if (len < 0) {
-    len = get_var(conn->content, conn->content_len, name, dst, dst_len);
+                    strlen(conn->query_string), name, dst, dst_len, n);
+  if (len == -1) {
+    len = get_var(conn->content, conn->content_len, name, dst, dst_len, n);
   }
   return len;
+}
+
+int mg_get_var(const struct mg_connection *conn, const char *name,
+               char *dst, size_t dst_len) {
+  return mg_get_var_n(conn, name, dst, dst_len, 0);
 }
 
 static int get_line_len(const char *buf, int buf_len) {
@@ -5095,6 +5180,14 @@ void mg_copy_listeners(struct mg_server *s, struct mg_server *to) {
     if ((c->flags & NSF_LISTENING) &&
         (tmp = (struct ns_connection *) NS_MALLOC(sizeof(*tmp))) != NULL) {
       memcpy(tmp, c, sizeof(*tmp));
+
+#if defined(NS_ENABLE_SSL) && defined(HEADER_SSL_H)
+      /* OpenSSL only. See https://github.com/cesanta/mongoose/issues/441 */
+      if (tmp->ssl_ctx != NULL) {
+        tmp->ssl_ctx->references++;
+      }
+#endif
+
       tmp->mgr = &to->ns_mgr;
       ns_add_conn(tmp->mgr, tmp);
     }
@@ -5153,6 +5246,7 @@ const char *mg_set_option(struct mg_server *server, const char *name,
     char buf[500] = "";
     size_t n = 0;
     struct vec vec;
+
     /*
      * Ports can be specified as 0, meaning that OS has to choose any
      * free port that is available. In order to pass chosen port number to
@@ -5247,31 +5341,32 @@ static void process_udp(struct ns_connection *nc) {
   //ns_printf(nc, "%s", "HTTP/1.0 200 OK\r\n\r\n");
 }
 
+#ifdef MONGOOSE_SEND_NS_EVENTS
+static void send_ns_event(struct ns_connection *nc, int ev, void *p) {
+  struct connection *conn = (struct connection *) nc->user_data;
+  if (conn != NULL) {
+    void *param[2] = { nc, p };
+    conn->mg_conn.callback_param = param;
+    call_user(conn, (enum mg_event) ev);
+  }
+}
+#else
+static void send_ns_event(struct ns_connection *nc, int ev, void *p) {
+  (void) nc; (void) p; (void) ev;
+}
+#endif
+
 static void mg_ev_handler(struct ns_connection *nc, int ev, void *p) {
   struct connection *conn = (struct connection *) nc->user_data;
 
   // Send NS event to the handler. Note that call_user won't send an event
   // if conn == NULL. Therefore, repeat this for NS_ACCEPT event as well.
-#ifdef MONGOOSE_SEND_NS_EVENTS
-  {
-    struct connection *conn = (struct connection *) nc->user_data;
-    void *param[2] = { nc, p };
-    if (conn != NULL) conn->mg_conn.callback_param = param;
-    call_user(conn, (enum mg_event) ev);
-  }
-#endif
+  send_ns_event(nc, ev, p);
 
   switch (ev) {
     case NS_ACCEPT:
       on_accept(nc, (union socket_address *) p);
-#ifdef MONGOOSE_SEND_NS_EVENTS
-      {
-        struct connection *conn = (struct connection *) nc->user_data;
-        void *param[2] = { nc, p };
-        if (conn != NULL) conn->mg_conn.callback_param = param;
-        call_user(conn, (enum mg_event) ev);
-      }
-#endif
+      send_ns_event(nc, ev, p);
       break;
 
     case NS_CONNECT:
@@ -5343,6 +5438,11 @@ static void mg_ev_handler(struct ns_connection *nc, int ev, void *p) {
             write_terminating_chunk(conn);
           }
           close_local_endpoint(conn);
+          /*
+           * MG_POLL callback returned MG_TRUE,
+           * i.e. data is sent, set corresponding flag
+           */
+          conn->ns_conn->flags |= NSF_FINISHED_SENDING_DATA;
         }
 
         if (conn->endpoint_type == EP_FILE) {
@@ -5379,7 +5479,7 @@ static void iter2(struct ns_connection *nc, int ev, void *param) {
   (void) ev;
 
   //DBG(("%p [%s]", conn, msg));
-  if (sscanf(msg, "%p %n", &func, &n) && func != NULL && conn != NULL) {
+  if (sscanf(msg, "%p %n", (void **) &func, &n) && func != NULL && conn != NULL) {
     conn->mg_conn.callback_param = (void *) (msg + n);
     func(&conn->mg_conn, MG_POLL);
   }

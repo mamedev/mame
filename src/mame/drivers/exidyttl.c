@@ -4,7 +4,7 @@
 
 Exidy discrete hardware games
 
- Alley Rally (1975)
+ Alley Rally (1975) (AR-1A)
  Attack (1977)
  Death Race (1976)
  Destruction Derby (1975)
@@ -15,7 +15,7 @@ Exidy discrete hardware games
  Super Death Chase (1977)
  Table Foosballer / Table Football (1975)
  Table Pinball (1974)
- TV Pinball (1974)
+ TV Pinball (1974) (PB-4)
 
 ***************************************************************************/
 

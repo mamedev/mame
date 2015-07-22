@@ -50,6 +50,17 @@ void iteagle_fpga_device::device_start()
 	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
 
 	m_timer = timer_alloc(0, NULL);
+
+	// virtpool nvram
+	memset(m_ram, 0, sizeof(m_ram));
+	// byte 0x10 is check sum of first 16 bytes
+	// when corrupt the fw writes the following
+	m_ram[0x00/4] = 0x00010207;
+	m_ram[0x04/4] = 0x04010101;
+	m_ram[0x08/4] = 0x01030101;
+	m_ram[0x0c/4] = 0x00000001;
+	m_ram[0x10/4] = 0x00000018;
+
 }
 
 void iteagle_fpga_device::device_reset()

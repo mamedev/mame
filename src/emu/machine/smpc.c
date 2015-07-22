@@ -683,7 +683,10 @@ void saturn_state::smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_s
 			printf ("SMPC: CD %s\n",(data & 1) ? "off" : "on");
 			machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(saturn_state::smpc_cd_enable),this),data & 1);
 			break;
-		case 0x0d:
+		case 0x0a:
+		case 0x0b:
+			popmessage ("SMPC: NETLINK %s, contact MAMEdev",(data & 1) ? "off" : "on");
+			break;		case 0x0d:
 			if(LOG_SMPC) printf ("SMPC: System Reset\n");
 			smpc_system_reset();
 			break;
@@ -922,8 +925,9 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 		case 2:
 			res = th<<6;
 			//  1 C B Right Left Down Up
+			//  WHP actually has a very specific code at 0x6015f30, doesn't like bits 0-1 active here ...
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>4)) & 0x30); // C & B
-			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0xf);
+			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0xc);
 			break;
 		case 1:
 			res = th<<6;
@@ -935,9 +939,11 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 			//  0 Start A 0 0    Down Up
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>6)) & 0x30); // Start & A
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0x3);
+			//  ... and actually wants bits 2 - 3 active here.
+			res|= 0xc;
 			break;
 	}
-
+	
 	return res;
 }
 
@@ -1021,13 +1027,13 @@ WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
 		{
 			if(data & 0x40)
 			{
-				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
+				if(LOG_PAD_CMD) printf("SMPC: BREAK request %02x\n",data);
 				m_smpc.SR &= 0x0f;
 				m_smpc.intback_stage = 0;
 			}
 			else if(data & 0x80)
 			{
-				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
+				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request %02x\n",data);
 				machine().scheduler().timer_set(attotime::from_usec(700), timer_expired_delegate(FUNC(saturn_state::intback_peripheral),this),0); /* TODO: is timing correct? */
 				m_smpc.OREG[31] = 0x10;
 				m_smpc.SF = 0x01; //TODO: set hand-shake flag?

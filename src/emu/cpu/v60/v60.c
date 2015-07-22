@@ -63,17 +63,17 @@ offs_t v70_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 
 // memory accessors
 #if defined(LSB_FIRST) && !defined(ALIGN_INTS)
-#define OpRead8(a)   (m_direct->read_decrypted_byte(a))
-#define OpRead16(a)  (m_direct->read_decrypted_word(a))
-#define OpRead32(a)  (m_direct->read_decrypted_dword(a))
+#define OpRead8(a)   (m_direct->read_byte(a))
+#define OpRead16(a)  (m_direct->read_word(a))
+#define OpRead32(a)  (m_direct->read_dword(a))
 #else
-#define OpRead8(a)   (m_direct->read_decrypted_byte((a), m_fetch_xor))
-#define OpRead16(a)  ((m_direct->read_decrypted_byte(((a)+0), m_fetch_xor) << 0) | \
-							(m_direct->read_decrypted_byte(((a)+1), m_fetch_xor) << 8))
-#define OpRead32(a)  ((m_direct->read_decrypted_byte(((a)+0), m_fetch_xor) << 0) | \
-							(m_direct->read_decrypted_byte(((a)+1), m_fetch_xor) << 8) | \
-							(m_direct->read_decrypted_byte(((a)+2), m_fetch_xor) << 16) | \
-							(m_direct->read_decrypted_byte(((a)+3), m_fetch_xor) << 24))
+#define OpRead8(a)   (m_direct->read_byte((a), m_fetch_xor))
+#define OpRead16(a)  ((m_direct->read_byte(((a)+0), m_fetch_xor) << 0) | \
+							(m_direct->read_byte(((a)+1), m_fetch_xor) << 8))
+#define OpRead32(a)  ((m_direct->read_byte(((a)+0), m_fetch_xor) << 0) | \
+							(m_direct->read_byte(((a)+1), m_fetch_xor) << 8) | \
+							(m_direct->read_byte(((a)+2), m_fetch_xor) << 16) | \
+							(m_direct->read_byte(((a)+3), m_fetch_xor) << 24))
 #endif
 
 

@@ -140,7 +140,7 @@ enum {
 	OMTI_STATE_SELECTION,
 	OMTI_STATE_COMMAND,
 	OMTI_STATE_DATA,
-	OMTI_STATE_STATUS,
+	OMTI_STATE_STATUS
 };
 
 // OMTI commands
@@ -1285,7 +1285,7 @@ omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, co
 void omti_disk_image_device::device_config_complete()
 {
 	update_names(OMTI_DISK, "disk", "disk");
-};
+}
 
 
 /***************************************************************************

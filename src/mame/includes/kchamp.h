@@ -19,7 +19,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -62,10 +63,11 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_int);
 	void kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	UINT8 *decrypt_code();
+	void decrypt_code();
 	DECLARE_WRITE_LINE_MEMBER(msmint);
 	required_device<cpu_device> m_maincpu;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_shared_ptr<UINT8> m_decrypted_opcodes;
 };

@@ -323,7 +323,7 @@
 #include "machine/timekpr.h"
 #include "video/k001604.h"
 #include "video/poly.h"
-#include "video/rgbgen.h"
+#include "video/rgbutil.h"
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"
 
@@ -419,7 +419,7 @@ private:
 	enum
 	{
 		RE_STATUS_IDLE              = 0,
-		RE_STATUS_COMMAND           = 1,
+		RE_STATUS_COMMAND           = 1
 	};
 
 	enum
@@ -431,7 +431,7 @@ private:
 		POLY_A      = 4,
 		POLY_U      = 5,
 		POLY_V      = 6,
-		POLY_W      = 7,
+		POLY_W      = 7
 	};
 };
 
@@ -444,7 +444,7 @@ public:
 	{
 		EVENT_EMPTY,
 		EVENT_HALF_FULL,
-		EVENT_FULL,
+		EVENT_FULL
 	};
 
 	typedef delegate<void (EventType)> event_delegate;
@@ -687,7 +687,7 @@ public:
 	enum
 	{
 		MAIN_INT_M2S = 0x01,
-		MAIN_INT_S2M = 0x02,
+		MAIN_INT_S2M = 0x02
 	};
 
 	UINT8 m_m2s_int_enable;
@@ -895,7 +895,7 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 			rgb_t texel10 = texture_fetch(&m_texture_ram[tex_address], iu, iv+1, texture_width, tex_format);
 			rgb_t texel11 = texture_fetch(&m_texture_ram[tex_address], iu+1, iv+1, texture_width, tex_format);
 
-			rgb_t texel = rgba_bilinear_filter(texel00, texel01, texel10, texel11, (int)(lerp_u * 255), (int)(lerp_v * 255));
+			rgb_t texel = rgbaint_t::bilinear_filter(texel00, texel01, texel10, texel11, (int)(lerp_u * 255), (int)(lerp_v * 255));
 
 #endif
 

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Graves
 /*************************************************************************
 
@@ -49,7 +49,7 @@ public:
 	required_device<tc0640fio_device> m_tc0640fio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_spriteext;

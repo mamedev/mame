@@ -29,7 +29,7 @@ enum
 	/* Pseudo registers to keep track of the interrupt statuses */
 	LR35902_IE, LR35902_IF,
 	/* Pseudo register to change and check the cpu operating speed */
-	LR35902_SPEED,
+	LR35902_SPEED
 };
 
 

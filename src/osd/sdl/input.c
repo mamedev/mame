@@ -2067,7 +2067,7 @@ void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> 
 	input_item_id mameid_code;
 	input_code ui_code;
 	input_type_entry *entry;
-	const char*  uimode;
+	const char* uimode;
 	char fullmode[64];
 
 	// loop over the defaults

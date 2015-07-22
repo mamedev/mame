@@ -215,7 +215,6 @@ void tonton_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(tonton_state::tonton_interrupt)
 {
-	m_v9938->set_resolution(0);
 	m_v9938->interrupt();
 }
 

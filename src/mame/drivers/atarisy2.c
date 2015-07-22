@@ -194,18 +194,6 @@ void atarisy2_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-DIRECT_UPDATE_MEMBER( atarisy2_state::atarisy2_direct_handler )
-{
-	/* make sure slapstic area looks like ROM */
-	if (address >= 0x8000 && address < 0x8200)
-	{
-		direct.explicit_configure(0x8000, 0x81ff, 0x1ff, reinterpret_cast<UINT8 *>(m_slapstic_base.target()));
-		return ~0;
-	}
-	return address;
-}
-
-
 MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_start();
@@ -215,6 +203,9 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 	save_item(NAME(m_p2portwr_state));
 	save_item(NAME(m_p2portrd_state));
 	save_item(NAME(m_sound_reset_state));
+
+	m_rombank1->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x2000);
+	m_rombank2->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 
@@ -223,8 +214,6 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 	atarigen_state::machine_reset();
 	m_slapstic->slapstic_reset();
 	scanline_timer_reset(*m_screen, 64);
-
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_state::atarisy2_direct_handler), this));
 
 	m_p2portwr_state = 0;
 	m_p2portrd_state = 0;
@@ -286,44 +275,39 @@ WRITE16_MEMBER(atarisy2_state::int_enable_w)
 
 WRITE16_MEMBER(atarisy2_state::bankselect_w)
 {
-	static const int bankoffset[64] =
+	/*static const int bankoffset[64] =
 	{
-		0x28000, 0x20000, 0x18000, 0x10000,
-		0x2a000, 0x22000, 0x1a000, 0x12000,
-		0x2c000, 0x24000, 0x1c000, 0x14000,
-		0x2e000, 0x26000, 0x1e000, 0x16000,
-		0x48000, 0x40000, 0x38000, 0x30000,
-		0x4a000, 0x42000, 0x3a000, 0x32000,
-		0x4c000, 0x44000, 0x3c000, 0x34000,
-		0x4e000, 0x46000, 0x3e000, 0x36000,
-		0x68000, 0x60000, 0x58000, 0x50000,
-		0x6a000, 0x62000, 0x5a000, 0x52000,
-		0x6c000, 0x64000, 0x5c000, 0x54000,
-		0x6e000, 0x66000, 0x5e000, 0x56000,
-		0x88000, 0x80000, 0x78000, 0x70000,
-		0x8a000, 0x82000, 0x7a000, 0x72000,
-		0x8c000, 0x84000, 0x7c000, 0x74000,
-		0x8e000, 0x86000, 0x7e000, 0x76000
-	};
+		12, 8, 4, 0,
+		13, 9, 5, 1,
+		14, 10, 6, 2,
+		15, 11, 7, 3,
+		28, 24, 20, 16,
+		29, 25, 21, 17,
+		30, 26, 22, 18,
+		31, 27, 23, 19,
+		44, 40, 36, 32,
+		45, 41, 37, 33,
+		46, 42, 38, 34,
+		47, 43, 39, 35,
+		60, 56, 52, 48,
+		61, 57, 53, 49,
+		62, 58, 54, 50,
+		63, 59, 55, 51
+	};*/
 
-	int newword = m_bankselect[offset];
-	UINT8 *base;
-
-	COMBINE_DATA(&newword);
-	m_bankselect[offset] = newword;
-
-	base = &memregion("maincpu")->base()[bankoffset[(newword >> 10) & 0x3f]];
-	memcpy(offset ? m_rombank2 : m_rombank1, base, 0x2000);
+	int banknumber = ((data >> 10) & 0x3f) ^ 0x03;
+	banknumber = BITSWAP16(banknumber, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 1, 0, 3, 2);
+	
+	if (offset)
+		m_rombank2->set_entry(banknumber);
+	else
+		m_rombank1->set_entry(banknumber);
 }
 
 
 void atarisy2_state::device_post_load()
 {
 	atarigen_state::device_post_load();
-
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	bankselect_w(space, 0, m_bankselect[0], 0xffff);
-	bankselect_w(space, 1, m_bankselect[1], 0xffff);
 }
 
 
@@ -768,7 +752,7 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w) AM_SHARE("bankselect")
+	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w)
 	AM_RANGE(0x1480, 0x1487) AM_MIRROR(0x0078) AM_WRITE(adc_strobe_w)
 	AM_RANGE(0x1580, 0x1581) AM_MIRROR(0x001e) AM_WRITE(int0_ack_w)
 	AM_RANGE(0x15a0, 0x15a1) AM_MIRROR(0x001e) AM_WRITE(int1_ack_w)
@@ -781,8 +765,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x1800, 0x1801) AM_MIRROR(0x03fe) AM_READ(switch_r) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x1c00, 0x1c01) AM_MIRROR(0x03fe) AM_READ(sound_r)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(videoram_r, videoram_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_SHARE("rombank1")
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_SHARE("rombank2")
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("rombank1")
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank2")
 	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(slapstic_r, slapstic_w) AM_SHARE("slapstic_base")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

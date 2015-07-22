@@ -11,19 +11,27 @@ NETLIST_START(main)
     /* Standard stuff */
 
     CLOCK(clk, 1000) // 1000 Hz
-    SOLVER(Solver, 48000)
-    //PARAM(Solver.ACCURACY, 1e-3)
+    SOLVER(Solver, 480000)
+    PARAM(Solver.ACCURACY, 1e-10)
+    PARAM(Solver.NR_LOOPS, 30000	)
     //PARAM(Solver.CONVERG, 1.0)
-    //PARAM(Solver.GS_LOOPS, 30)
+    PARAM(Solver.GS_LOOPS, 30)
+	PARAM(Solver.GS_THRESHOLD, 99)
+
+    // Tie up +5 to opamps thought it's not currently needed
+    // Stay compatible
+    ANALOG_INPUT(V5, 5)
+    NET_C(op.VCC, V5)
+    NET_C(op1.VCC, V5)
 
     /* Opamp wired as impedance changer */
-    SUBMODEL(op, opamp)
+    SUBMODEL(opamp, op)
 
     NET_C(op.GND, GND)
     NET_C(op.PLUS, clk)
     NET_C(op.MINUS, op.OUT)
 
-    SUBMODEL(op1, opamp)
+    SUBMODEL(opamp, op1)
     /* Wired as inverting amplifier connected to output of first opamp */
 
     RES(R1, 100000)
@@ -42,7 +50,7 @@ NETLIST_START(main)
     NET_C(RL.1, op1.OUT)
 
     LOG(logX, op1.OUT)
-    //LOG(logY, clk)
+    LOG(logY, clk)
 NETLIST_END()
 
 NETLIST_START(opamp)
@@ -62,13 +70,16 @@ NETLIST_START(opamp)
     ALIAS(OUT, EBUF.OP) // Opamp output ...
 
     ALIAS(GND, EBUF.ON) // GND terminal
+    ALIAS(VCC, DUMMY.I) // VCC terminal
+    DUMMY_INPUT(DUMMY)
 
     /* The opamp model */
 
-    VCCS(G1)
-    PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
-    RES(RP1, 1000)
-    CAP(CP1, 1.59e-6)   // <== change to 1.59e-3 for 10Khz bandwidth
+    LVCCS(G1)
+    PARAM(G1.G, 0.0021)
+	PARAM(G1.CURLIM, 0.002)
+    RES(RP1, 1e7)
+    CAP(CP1, 0.00333e-6)
     VCVS(EBUF)
     PARAM(EBUF.RO, 50)
     PARAM(EBUF.G, 1)

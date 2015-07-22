@@ -2465,21 +2465,21 @@ pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, cons
 	select_connected = true;
 }
 
-dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock, "dp8473", __FILE__)
+dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "DP8473", tag, owner, clock, "dp8473", __FILE__)
 {
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
 }
 
-pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock, "pc8477a", __FILE__)
+pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC8477A", tag, owner, clock, "pc8477a", __FILE__)
 {
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
 }
 
-wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock, "wd37c65c", __FILE__)
+wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "WD37C65C", tag, owner, clock, "wd37c65c", __FILE__)
 {
 	ready_polled = true;
 	ready_connected = false;

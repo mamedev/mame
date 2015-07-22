@@ -113,8 +113,10 @@ m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_lic_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
+	m_sprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 8, 16),
 	m_clock_divider(divider)
 {
+	m_mintf = NULL;
 }
 
 
@@ -124,7 +126,14 @@ m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *
 
 void m6809_base_device::device_start()
 {
-	m_direct = &m_addrspace[AS_PROGRAM]->direct();
+	if (!m_mintf)
+		m_mintf = new mi_default;
+
+	m_mintf->m_program  = &space(AS_PROGRAM);
+	m_mintf->m_sprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_mintf->m_program;
+
+	m_mintf->m_direct  = &m_mintf->m_program->direct();
+	m_mintf->m_sdirect = &m_mintf->m_sprogram->direct();
 
 	m_lic_func.resolve_safe();
 
@@ -280,11 +289,12 @@ void m6809_base_device::device_post_load()
 
 const address_space_config *m6809_base_device::memory_space_config(address_spacenum spacenum) const
 {
-	if (spacenum == AS_PROGRAM)
+	switch(spacenum)
 	{
-		return &m_program_config;
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_sprogram_config : NULL;
+	default:                   return NULL;
 	}
-	return NULL;
 }
 
 
@@ -536,6 +546,28 @@ void m6809_base_device::execute_run()
 	{
 		execute_one();
 	} while(m_icount > 0);
+}
+
+
+UINT8 m6809_base_device::mi_default::read(UINT16 adr)
+{
+	return m_program->read_byte(adr);
+}
+
+UINT8 m6809_base_device::mi_default::read_opcode(UINT16 adr)
+{
+	return m_sdirect->read_byte(adr);
+}
+
+UINT8 m6809_base_device::mi_default::read_opcode_arg(UINT16 adr)
+{
+	return m_direct->read_byte(adr);
+}
+
+
+void m6809_base_device::mi_default::write(UINT16 adr, UINT8 val)
+{
+	m_program->write_byte(adr, val);
 }
 
 

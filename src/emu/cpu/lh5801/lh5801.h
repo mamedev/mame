@@ -56,7 +56,7 @@ pc 8bit
 // input lines
 enum
 {
-	LH5801_LINE_MI,     //maskable interrupt
+	LH5801_LINE_MI     //maskable interrupt
 };
 
 

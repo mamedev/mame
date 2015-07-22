@@ -283,7 +283,7 @@ INT32 score7_cpu_device::sign_extend(UINT32 data, UINT8 len)
 
 UINT32 score7_cpu_device::fetch()
 {
-	return m_direct->read_decrypted_dword(m_pc & ~3);
+	return m_direct->read_dword(m_pc & ~3);
 }
 
 UINT8 score7_cpu_device::read_byte(offs_t offset)

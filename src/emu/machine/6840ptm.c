@@ -407,7 +407,7 @@ void ptm6840_device::reload_count(int idx)
 		duration *= m_t3_divisor;
 	}
 
-	PLOG(("MC6840 #%s: reload_count(%d): output = %lf\n", tag(), idx, duration.as_double()));
+	PLOG(("MC6840 #%s: reload_count(%d): output = %f\n", tag(), idx, duration.as_double()));
 
 #if 0
 	if (!(m_control_reg[idx] & 0x02))

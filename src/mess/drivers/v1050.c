@@ -918,6 +918,8 @@ void v1050_state::update_fdc()
 	}
 }
 
+// disk format: 80 tracks, 1 head, 10 sectors, 512 bytes sector length, first sector id 1
+
 static SLOT_INTERFACE_START( v1050_floppies )
 	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD ) // Teac FD 55E-02-U
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Teac FD 55-FV-35-U
@@ -937,16 +939,6 @@ WRITE_LINE_MEMBER( v1050_state::fdc_drq_w )
 	update_fdc();
 }
 
-/*
-static LEGACY_FLOPPY_OPTIONS_START( v1050 )
-    LEGACY_FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([1])
-        TRACKS([80])
-        SECTORS([10])
-        SECTOR_LENGTH([512])
-        FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-*/
 
 // Machine Initialization
 
@@ -1099,7 +1091,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, XTAL_16MHz/4)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v1050_state, write_sio_clock))
 
-	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_MB8877_ADD(MB8877_TAG, XTAL_16MHz/16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(v1050_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(v1050_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)

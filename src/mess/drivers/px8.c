@@ -52,7 +52,7 @@ enum
 	GAH40M_CTLR1 = 0,
 	GAH40M_CMDR,
 	GAH40M_CTLR2,
-	GAH40M_IER = 4,
+	GAH40M_IER = 4
 };
 
 enum
