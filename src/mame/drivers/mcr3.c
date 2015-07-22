@@ -2033,6 +2033,9 @@ GAME( 1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, stargrds, ROT0,
 /* MCR scrolling games */
 GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", GAME_SUPPORTS_SAVE, layout_spyhunt )
 GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", GAME_SUPPORTS_SAVE, layout_spyhunt )
-GAME (1983, spyhuntpr,spyhunt,  spyhuntpr, spyhuntpr,mcr3_state,  spyhuntpr,ROT90, "Bally Midway (Recreativos Franco S.A. license)", "Spy Hunter (Spain, Recreativos Franco S.A. PCB)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // PCB made by Recreativos Franco S.A. in Spain, has Bally Midway logo, board is dated '85' so seems to be a low-cost rebuild? it is unclear if it made it to market.
 GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", GAME_SUPPORTS_SAVE )
 GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE, layout_turbotag )
+ 
+// very different hardware, probably bootleg despite the license text printed on the PCB, similar to '1942p' in 1942.c.  Probably should be put in separate driver.
+// PCB made by Tecfri for Recreativos Franco S.A. in Spain, has Bally Midway logo, and licensing text on the PCB.  Board is dated '85' so seems to be a low-cost rebuild? it is unclear if it made it to market.
+GAME (1983, spyhuntpr,spyhunt,  spyhuntpr, spyhuntpr,mcr3_state,  spyhuntpr,ROT90, "Bally Midway (Recreativos Franco S.A. license)", "Spy Hunter (Spain, Tecfri / Recreativos Franco S.A. PCB)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
