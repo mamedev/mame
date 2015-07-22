@@ -2224,7 +2224,7 @@ tbreakup    // Tomy
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
-// hh_tms1k snspell.c
+// hh_tms1k tispeak.c
 snspell
 snspella
 snspellb
