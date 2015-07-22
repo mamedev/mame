@@ -1016,6 +1016,8 @@ void segacdblock_device::cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_n
 	int i;
 	if(reset_flags == 0)
 	{
+		m_cd_state = CD_STAT_STANDBY;
+		
 		if(buffer_number < MAX_FILTERS)
 		{
 			for (i = 0; i < MAX_BLOCKS; i++)
