@@ -687,7 +687,12 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 	rgb_t color = UI_BACKGROUND_COLOR;
 	bool isstar = false;
 
-	strprintf(tempbuf[0], "MEWUI %s (%s) (%d / %d machines)", mewui_version, bare_build_version, visible_items, (driver_list::total() - 1));
+	if (mewui_globals::ume_system == MEWUI_MAME)
+		strprintf(tempbuf[0], "MEWUI %s (%s) ( %d / %d machines (%d BIOS) )", mewui_version, bare_build_version, visible_items, (driver_list::total() - 1), m_isabios + m_issbios);
+	else if (mewui_globals::ume_system == MEWUI_ARCADES)
+		strprintf(tempbuf[0], "MEWUI %s (%s) ( %d / %d arcades (%d BIOS) )", mewui_version, bare_build_version, visible_items, m_isarcades, m_isabios);
+	else if (mewui_globals::ume_system == MEWUI_SYSTEMS)
+		strprintf(tempbuf[0], "MEWUI %s (%s) ( %d / %d systems (%d BIOS) )", mewui_version, bare_build_version, visible_items, m_issystems, m_issbios);
 
 	std::string filtered;
 
@@ -1514,11 +1519,28 @@ void ui_mewui_select_game::save_cache_info()
 		std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sort_game_list);
 
 		int index = 0;
+		m_isabios = 0;
+		m_issbios = 0;
+		m_isarcades = 0;
+		m_issystems = 0;
 		for (int x = 0; x < driver_list::total(); ++x)
 		{
 			const game_driver *driver = &driver_list::driver(x);
 			if (!strcmp("___empty", driver->name))
 				continue;
+
+			if (driver->flags & GAME_TYPE_ARCADE)
+			{
+				if (driver->flags & GAME_IS_BIOS_ROOT)
+					m_isabios++;
+				m_isarcades++;
+			}
+			else
+			{
+				if (driver->flags & GAME_IS_BIOS_ROOT)
+					m_issbios++;
+				m_issystems++;
+			}
 
 			cache_info infos;
 			machine_config config(*driver, machine().options());
@@ -1552,6 +1574,11 @@ void ui_mewui_select_game::save_cache_info()
 			int find = driver_list::find(m_sortedlist[index++]->name);
 			myfile << find;
 		}
+		UINT8 space = 0;
+		myfile << space << m_isabios;
+		myfile << space << m_issbios;
+		myfile << space << m_isarcades;
+		myfile << space << m_issystems;
 		myfile.close();
 	}
 }
@@ -1610,6 +1637,11 @@ void ui_mewui_select_game::load_cache_info()
 		myfile >> find;
 		m_sortedlist.push_back(&driver_list::driver(find));
 	}
+	UINT8 space = 0;
+	myfile >> space >> m_isabios;
+	myfile >> space >> m_issbios;
+	myfile >> space >> m_isarcades;
+	myfile >> space >> m_issystems;
 	myfile.close();
 	std::stable_sort(c_mnfct::ui.begin(), c_mnfct::ui.end());
 	std::stable_sort(c_year::ui.begin(), c_year::ui.end());

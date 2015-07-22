@@ -29,6 +29,7 @@ private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 	char m_search[40];
 	int  m_prev_selected;
+	int  m_isabios, m_issbios, m_isarcades, m_issystems;
 
 	std::vector<const game_driver *> m_availablelist;
 	std::vector<const game_driver *> m_fulllist;
