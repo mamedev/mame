@@ -108,9 +108,6 @@ void segacdblock_device::set_flag(UINT16 which)
 	m_hirq |= which;
 }
 
-/*!
- @todo: wrong and not needed
- */
 void segacdblock_device::clear_flag(UINT16 which)
 {
 	m_hirq &= ~which;
@@ -263,6 +260,7 @@ READ16_MEMBER(segacdblock_device::datatrns_r)
 		{
 			m_dma_src = 0;
 			xfertype = CDDMA_STOPPED;
+			m_TOCPhase = false;
 		}
 	}
 	else
@@ -407,9 +405,9 @@ segacdblock_device::blockT *segacdblock_device::cd_alloc_block(UINT8 *blknum)
 		{
 			//printf("%d\n",freeblocks);
 			freeblocks--;
-			if (freeblocks <= 0)
+			if (freeblocks < 0)
 			{
-				set_flag(BFUL);
+				//set_flag(BFUL);
 				return (blockT *)NULL;
 			}
 
@@ -422,7 +420,7 @@ segacdblock_device::blockT *segacdblock_device::cd_alloc_block(UINT8 *blknum)
 		}
 	}
 
-	set_flag(BFUL);
+	//set_flag(BFUL);
 	return (blockT *)NULL;
 }
 
@@ -454,7 +452,7 @@ void segacdblock_device::cd_free_block(blockT *blktofree)
 	
 	blktofree->size = -1;
 	freeblocks++;
-	m_hirq &= ~BFUL;
+	//m_hirq &= ~BFUL;
 }
 
 void segacdblock_device::cd_readblock(UINT32 fad, UINT8 *dat)
@@ -1107,8 +1105,8 @@ void segacdblock_device::cd_cmd_get_sector_number(UINT8 buffer_number)
 		}
 	}	
 
-	if(m_dr[3] != 0)
-		set_flag(DRDY);
+	//if(m_dr[3] != 0)
+	//	set_flag(DRDY);
 	set_flag(CMOK);
 }
 
@@ -1170,11 +1168,12 @@ void segacdblock_device::cd_cmd_get_sector_info(UINT8 sector_offset, UINT8 buffe
 void segacdblock_device::cd_cmd_set_sector_length(UINT8 length_in, UINT8 length_out)
 {
 	const int sectorSizes[4] = { 2048, 2336, 2340, 2352 };
-	assert(length_in < 4);
-	assert(length_out < 4);
-	m_SectorLengthIn = sectorSizes[length_in];
-	m_SectorLengthOut = sectorSizes[length_out];
-	
+
+	if((length_in & 0xfc) == 0)
+		m_SectorLengthIn = sectorSizes[length_in];
+	if((length_out & 0xfc) == 0)
+		m_SectorLengthOut = sectorSizes[length_out];
+
 	cd_standard_return(false);
 
 	set_flag(ESEL);
@@ -1523,6 +1522,7 @@ void segacdblock_device::dma_setup()
 			xfertype = CDDMA_INPROGRESS;
 			set_flag(DRDY);
 			sourcetype = SOURCE_NONE;
+			m_TOCPhase = true;
 			printf("TOC on bus executed\n");
 			//debugger_break(machine());
 			break;
@@ -1701,7 +1701,7 @@ segacdblock_device::partitionT *segacdblock_device::cd_read_filtered_sector(INT3
 	int trktype;
 
 	//if ((cddevice != NULL) && (!buffull))
-	if (CDDeviceConnection != NULL && (!(m_hirq & BFUL)))
+	if (CDDeviceConnection != NULL && (freeblocks > 0))
 	{
 		// find out the track's type
 		trktype = cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad-150));
@@ -1755,6 +1755,7 @@ segacdblock_device::partitionT *segacdblock_device::cd_read_filtered_sector(INT3
 void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id < CD_TIMER+1);
+
 	
 	if(id == CMD_TIMER)
 		SH1CommandExecute();
@@ -1817,7 +1818,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			UINT8 p_ok;
 			
 			if(m_FADEnd)
-			printf("FAD %08x %08x\n",m_FAD,m_FADEnd);
+				printf("FAD %08x %08x %04x\n",m_FAD,m_FADEnd,m_hirq);
 
 			p_ok = 0;
 			if (cdrom)
@@ -1870,6 +1871,22 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		}
 	}
 	
+	popmessage("%d",freeblocks);
+	
+	if(freeblocks == 0)
+		set_flag(BFUL);
+	else
+		clear_flag(BFUL);
+	/*if(m_TOCPhase == false)
+	{
+		if(freeblocks != 200)
+			set_flag(DRDY);
+		else
+			clear_flag(DRDY);
+	}*/
+	if(freeblocks == 200)
+		clear_flag(CSCT);
+		
 }
 
 //-------------------------------------------------

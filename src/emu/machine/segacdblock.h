@@ -271,6 +271,7 @@ private:
 	int m_CurrentTrack;
 	int m_CalculateActualSize;
 	bool m_TempPause;
+	bool m_TOCPhase;
 	//bool m_BufferFull;
 };
 
