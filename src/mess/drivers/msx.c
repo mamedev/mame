@@ -8246,8 +8246,8 @@ MACHINE_CONFIG_END
 
 /*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT     INIT              COMPANY       FULLNAME */
 /* MSX1 */
-COMP(1986, ax150,      0,        0, ax150,      msx,      driver_device, 0, "Al Alamiah", "AX-150 (MSX1)", 0)
-COMP(1986, ax170,      0,        0, ax170,      msx,      driver_device, 0, "Al Alamiah", "AX-170 (MSX1)", 0)
+COMP(1986, ax150,      0,        0, ax150,      msx,      driver_device, 0, "Al Alamiah", "AX-150 (Arabic) (MSX1)", 0)
+COMP(1986, ax170,      0,        0, ax170,      msx,      driver_device, 0, "Al Alamiah", "AX-170 (Arabic) (MSX1)", 0)
 COMP(1983, canonv8,    0,        0, canonv8,    msx,      driver_device, 0, "Canon", "V-8 (MSX1)", 0)
 COMP(1983, canonv10,   canonv20, 0, canonv10,   msx,      driver_device, 0, "Canon", "V-10 (MSX1)", 0)
 COMP(1983, canonv20,   0,        0, canonv20,   msx,      driver_device, 0, "Canon", "V-20 (MSX1)", 0)
@@ -8379,8 +8379,8 @@ COMP(1984, yc64,       0,        0, yc64,       msx,      driver_device, 0, "Yas
 COMP(1984, mx64,       0,        0, mx64,       msxkr,    driver_device, 0, "Yeno", "MX64 (MSX1)", 0)
 
 /* MSX2 */
-COMP(1986, ax350,      0,        0, ax350,      msx2,     driver_device, 0, "Al Alamiah", "AX-350 (MSX2)", 0)
-COMP(1986, ax370,      0,        0, ax370,      msx2,     driver_device, 0, "Al Alamiah", "AX-370 (MSX2)", 0)
+COMP(1986, ax350,      0,        0, ax350,      msx2,     driver_device, 0, "Al Alamiah", "AX-350 (Arabic) (MSX2)", 0)
+COMP(1986, ax370,      0,        0, ax370,      msx2,     driver_device, 0, "Al Alamiah", "AX-370 (Arabic) (MSX2)", 0)
 COMP(1985, canonv25,   0,        0, canonv25,   msx2,     driver_device, 0, "Canon", "V-25 (MSX2)", 0)
 COMP(1985, canonv30,   0,        0, canonv30,   msx2,     driver_device, 0, "Canon", "V-30 (MSX2)", 0)
 COMP(1985, canonv30f,  canonv30, 0, canonv30f,  msx2,     driver_device, 0, "Canon", "V-30F (MSX2)", 0)
