@@ -34,6 +34,7 @@ function maintargetosdoptions(_target,_subtarget)
 	links {
 		"comctl32",
 		"comdlg32",
+		"mingw32",
 	}
 end
 
