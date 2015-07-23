@@ -3142,6 +3142,10 @@ void n64_state::video_start()
 	}
 }
 
+void screen_eof_n64(screen_device &screen, bool state)
+{
+}
+
 UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	n64_periphs* n64 = machine().device<n64_periphs>("rcp");
@@ -3197,6 +3201,12 @@ UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap,
 	m_rdp->video_update(n64, bitmap);
 
 	return 0;
+}
+
+void n64_state::screen_eof_n64(screen_device &screen, bool state)
+{
+	m_rdp->wait();
+	m_rdp->m_aux_buf_ptr = 0;
 }
 
 void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object)
