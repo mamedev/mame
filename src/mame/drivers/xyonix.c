@@ -13,7 +13,8 @@ prom, the 2x 256k roms, and the 1x 6264 ram.
 Dip SW is 1 x 8-position
 
 on the PCB is an empty socket. written next to the socket is 68705P3. "oh no" you
-say..... well, its unpopulated, so maybe it was never used?
+say..... well, its unpopulated, so maybe it was never used? (another PCB was
+found with the 68705 populated)
 
 
 TODO:
@@ -259,6 +260,9 @@ ROM_START( xyonix )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xyonix3.bin", 0x00000, 0x10000, CRC(1960a74e) SHA1(5fd7bc31ca2f5f1e114d3d0ccf6554ebd712cbd3) )
 
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "mc68705p3s.e7", 0x00000, 0x780, BAD_DUMP CRC(f60cdd86) SHA1(e18cc598153b3e108942328ee9c5b9f83b034c41) ) // FIXED BITS (xxxxxx0x)
+	
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "xyonix1.bin", 0x00000, 0x08000, CRC(3dfa9596) SHA1(52cdbbe18f83cea7248c29588ea3a18c4bb7984f) )
 	ROM_LOAD( "xyonix2.bin", 0x08000, 0x08000, CRC(db87343e) SHA1(62bc30cd65b2f8976cd73a0b349a9ccdb3faaad2) )
@@ -270,3 +274,4 @@ ROM_END
 /* GAME drivers **************************************************************/
 
 GAME( 1989, xyonix, 0, xyonix, xyonix, driver_device, 0, ROT0, "Philko", "Xyonix", GAME_SUPPORTS_SAVE )
+	

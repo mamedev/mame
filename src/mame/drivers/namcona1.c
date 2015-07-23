@@ -319,15 +319,15 @@ int namcona1_state::transfer_dword( UINT32 dest, UINT32 source )
 	}
 	if( dest>=0xf00000 && dest<0xf02000 )
 	{
-		namcona1_paletteram_w(space, (dest-0xf00000)/2, data, 0xffff );
+		paletteram_w(space, (dest-0xf00000)/2, data, 0xffff );
 	}
 	else if( dest>=0xf40000 && dest<0xf80000 )
 	{
-		namcona1_gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
+		gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff0000 && dest<0xffc000 )
 	{
-		namcona1_videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
+		videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )
 	{
@@ -412,7 +412,7 @@ static void blit_setup( int format, int *bytes_per_row, int *pitch, int mode )
 	}
 } /* blit_setup */
 
-void namcona1_state::namcona1_blit()
+void namcona1_state::blit()
 {
 	int src0 = m_vreg[0x0];
 	int src1 = m_vreg[0x1];
@@ -487,16 +487,16 @@ void namcona1_state::namcona1_blit()
 			src_offset = 0;
 		}
 	}
-} /* namcona1_blit */
+} /* blit */
 
-WRITE16_MEMBER(namcona1_state::namcona1_vreg_w)
+WRITE16_MEMBER(namcona1_state::vreg_w)
 {
 	COMBINE_DATA( &m_vreg[offset] );
 
 	switch( offset )
 	{
 	case 0x18/2:
-		namcona1_blit();
+		blit();
 		/* see also 0x1e */
 		break;
 
@@ -505,7 +505,7 @@ WRITE16_MEMBER(namcona1_state::namcona1_vreg_w)
 		/* interrupt enable mask; 0 enables INT level */
 		break;
 	}
-} /* namcona1_vreg_w */
+} /* vreg_w */
 
 /***************************************************************/
 
@@ -546,10 +546,10 @@ static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0)  // code
 	AM_RANGE(0xe00000, 0xe00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_RAM_WRITE(namcona1_vreg_w) AM_SHARE("vreg")
-	AM_RANGE(0xf00000, 0xf01fff) AM_RAM_WRITE(namcona1_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w) AM_SHARE("cgram")
-	AM_RANGE(0xff0000, 0xffbfff) AM_RAM_WRITE(namcona1_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xefff00, 0xefffff) AM_RAM_WRITE(vreg_w) AM_SHARE("vreg")
+	AM_RANGE(0xf00000, 0xf01fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(gfxram_r, gfxram_w) AM_SHARE("cgram")
+	AM_RANGE(0xff0000, 0xffbfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_SHARE("scroll")      /* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")           /* spriteram */
@@ -694,6 +694,14 @@ void namcona1_state::machine_start()
 	m_maskrom = (UINT16 *)memregion("maskrom")->base();
 	m_mEnableInterrupts = 0;
 	m_c140->set_base(m_workram);
+	
+	save_item(NAME(m_mEnableInterrupts));
+	save_item(NAME(m_count));
+	save_item(NAME(m_mcu_mailbox));
+	save_item(NAME(m_mcu_port4));
+	save_item(NAME(m_mcu_port5));
+	save_item(NAME(m_mcu_port6));
+	save_item(NAME(m_mcu_port8));
 }
 
 // the MCU boots the 68000
@@ -893,7 +901,7 @@ GFXDECODE_END
 //                 IRQ 1 =>
 //                 IRQ 2 =>
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::namcona1_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::interrupt)
 {
 	int scanline = param;
 	int enabled = m_mEnableInterrupts ? ~m_vreg[0x1a/2] : 0;
@@ -933,7 +941,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_main", namcona1_state, namcona1_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_main", namcona1_state, interrupt, "screen", 0, 1)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 
@@ -943,7 +951,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(namcona1_state, screen_update_namcona1)
+	MCFG_SCREEN_UPDATE_DRIVER(namcona1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
@@ -992,7 +1000,7 @@ DRIVER_INIT_MEMBER(namcona1_state,knckhead)  { m_gametype = NAMCO_KNCKHEAD; }
 DRIVER_INIT_MEMBER(namcona1_state,numanath)  { m_gametype = NAMCO_NUMANATH; }
 DRIVER_INIT_MEMBER(namcona1_state,quiztou)   { m_gametype = NAMCO_QUIZTOU; }
 DRIVER_INIT_MEMBER(namcona1_state,swcourt)   { m_gametype = NAMCO_SWCOURT; }
-DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { m_gametype = NAMCO_TINKLPIT; }
+DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { m_gametype = NAMCO_TINKLPIT; save_item(NAME(m_keyval)); }
 DRIVER_INIT_MEMBER(namcona1_state,xday2)     { m_gametype = NAMCO_XDAY2; }
 
 ROM_START( bkrtmaq )
@@ -1301,25 +1309,25 @@ ROM_START( xday2 )
 ROM_END
 
 // NA-1 (C69 MCU)
-GAME( 1992, bkrtmaq,    0,        namcona1w, namcona1_quiz, namcona1_state,bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", 0 )
-GAME( 1992, cgangpzl,   0,        namcona1w, namcona1_joy, namcona1_state, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", 0 )
-GAME( 1992, cgangpzlj,  cgangpzl, namcona1w, namcona1_joy, namcona1_state, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (Japan)", 0 )
-GAME( 1992, exvania,    0,        namcona1,  namcona1_joy, namcona1_state, exbania,  ROT0, "Namco", "Exvania (World)", 0 )
-GAME( 1992, exvaniaj,   exvania,  namcona1,  namcona1_joy, namcona1_state, exbania,  ROT0, "Namco", "Exvania (Japan)", 0 )
-GAME( 1992, fghtatck,   0,        namcona1,  namcona1_joy, namcona1_state, fa,       ROT90,"Namco", "Fighter & Attacker (US)", 0 )
-GAME( 1992, fa,         fghtatck, namcona1,  namcona1_joy, namcona1_state, fa,       ROT90,"Namco", "F/A (Japan)", 0 )
-GAME( 1992, swcourt,    0,        namcona1w, namcona1_joy, namcona1_state, swcourt,  ROT0, "Namco", "Super World Court (World)", 0 )
-GAME( 1992, swcourtj,   swcourt,  namcona1w, namcona1_joy, namcona1_state, swcourt,  ROT0, "Namco", "Super World Court (Japan)", 0 )
-GAME( 1993, emeraldaj,  emeralda, namcona1w, namcona1_joy, namcona1_state, emeraldj, ROT0, "Namco", "Emeraldia (Japan Version B)", 0 ) /* Parent is below on NA-2 Hardware */
-GAME( 1993, emeraldaja, emeralda, namcona1w, namcona1_joy, namcona1_state, emeraldj, ROT0, "Namco", "Emeraldia (Japan)", 0 ) /* Parent is below on NA-2 Hardware */
-GAME( 1993, tinklpit,   0,        namcona1w, namcona1_joy, namcona1_state, tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", 0 )
+GAME( 1992, bkrtmaq,    0,        namcona1w, namcona1_quiz, namcona1_state,bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, cgangpzl,   0,        namcona1w, namcona1_joy, namcona1_state, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", GAME_SUPPORTS_SAVE )
+GAME( 1992, cgangpzlj,  cgangpzl, namcona1w, namcona1_joy, namcona1_state, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, exvania,    0,        namcona1,  namcona1_joy, namcona1_state, exbania,  ROT0, "Namco", "Exvania (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, exvaniaj,   exvania,  namcona1,  namcona1_joy, namcona1_state, exbania,  ROT0, "Namco", "Exvania (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, fghtatck,   0,        namcona1,  namcona1_joy, namcona1_state, fa,       ROT90,"Namco", "Fighter & Attacker (US)", GAME_SUPPORTS_SAVE )
+GAME( 1992, fa,         fghtatck, namcona1,  namcona1_joy, namcona1_state, fa,       ROT90,"Namco", "F/A (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, swcourt,    0,        namcona1w, namcona1_joy, namcona1_state, swcourt,  ROT0, "Namco", "Super World Court (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, swcourtj,   swcourt,  namcona1w, namcona1_joy, namcona1_state, swcourt,  ROT0, "Namco", "Super World Court (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, emeraldaj,  emeralda, namcona1w, namcona1_joy, namcona1_state, emeraldj, ROT0, "Namco", "Emeraldia (Japan Version B)", GAME_SUPPORTS_SAVE ) /* Parent is below on NA-2 Hardware */
+GAME( 1993, emeraldaja, emeralda, namcona1w, namcona1_joy, namcona1_state, emeraldj, ROT0, "Namco", "Emeraldia (Japan)", GAME_SUPPORTS_SAVE ) /* Parent is below on NA-2 Hardware */
+GAME( 1993, tinklpit,   0,        namcona1w, namcona1_joy, namcona1_state, tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", GAME_SUPPORTS_SAVE )
 
 // NA-2 (C70 MCU)
-GAME( 1992, knckhead,   0,        namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (World)", 0 )
-GAME( 1992, knckheadj,  knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", 0 )
-GAME( 1992, knckheadjp, knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan, Prototype?)", 0 )
-GAME( 1993, emeralda,   0,        namcona2,  namcona1_joy, namcona1_state, emeralda, ROT0, "Namco", "Emeraldia (World)", 0 )
-GAME( 1993, numanath,   0,        namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (World)", 0 )
-GAME( 1993, numanathj,  numanath, namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (Japan)", 0 )
-GAME( 1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona1_state,quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", 0 )
-GAME( 1995, xday2,      0,        namcona2,  namcona1_joy, namcona1_state, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, knckhead,   0,        namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, knckheadj,  knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, knckheadjp, knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan, Prototype?)", GAME_SUPPORTS_SAVE )
+GAME( 1993, emeralda,   0,        namcona2,  namcona1_joy, namcona1_state, emeralda, ROT0, "Namco", "Emeraldia (World)", GAME_SUPPORTS_SAVE )
+GAME( 1993, numanath,   0,        namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (World)", GAME_SUPPORTS_SAVE )
+GAME( 1993, numanathj,  numanath, namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona1_state,quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1995, xday2,      0,        namcona2,  namcona1_joy, namcona1_state, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

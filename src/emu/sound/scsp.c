@@ -282,6 +282,8 @@ void scsp_device::MainCheckPendingIRQ(UINT16 irq_type)
 {
 	m_mcipd |= irq_type;
 
+	//machine().scheduler().synchronize(); // force resync
+
 	if(m_mcipd & m_mcieb)
 		m_main_irq_cb(1);
 	else
@@ -696,8 +698,8 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 			break;
 		case 8:
 		case 9:
-			/* Only MSLC could be written. */
-			m_udata.data[0x8/2] &= 0x7800;
+			/* Only MSLC could be written.  */
+			m_udata.data[0x8/2] &= 0xf800; /**< @todo Docs claims MSLC to be 0x7800, but Jikkyou Parodius doesn't agree. */
 			break;
 		case 0x12:
 		case 0x13:

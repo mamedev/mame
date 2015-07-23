@@ -9,7 +9,8 @@
   * 3*uPD444C 1024x4 Static CMOS SRAM
   * board is packed with discrete components
 
-  x
+  TODO:
+  - still too much to list here
 
 ***************************************************************************/
 
@@ -162,7 +163,7 @@ WRITE8_MEMBER(tb303_state::switch_w)
 	// MCU G: leds state
 	// MCU H: input/led mux
 	if (offset == NEC_UCOM4_PORTH)
-		m_inp_mux = data;
+		m_inp_mux = data = data ^ 0xf;
 	
 	m_port[offset] = data;
 	update_leds();
@@ -304,7 +305,7 @@ MACHINE_CONFIG_END
 
 ROM_START( tb303 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d650c-133.ic8", 0x0000, 0x0800, CRC(0805b37a) SHA1(9a0c1891b56446535cef66a11b8366e1b22cc23f) )
+	ROM_LOAD( "d650c-133.ic8", 0x0000, 0x0800, CRC(268a8d8b) SHA1(7a4236b2bc9a5cd4c80c63ca1a193e03becfcb4c) )
 ROM_END
 
 

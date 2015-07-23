@@ -297,6 +297,10 @@ ifeq ($(TARGETOS),freebsd)
 OSD := sdl
 endif
 
+ifeq ($(TARGETOS),netbsd)
+OSD := sdl
+endif
+
 ifeq ($(TARGETOS),solaris)
 OSD := sdl
 endif
@@ -1004,6 +1008,26 @@ freebsd: freebsd_x86
 .PHONY: freebsd_x86
 freebsd_x86: generate $(PROJECTDIR)/gmake-freebsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)32
+
+
+#-------------------------------------------------
+# gmake-netbsd
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-netbsd/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=netbsd --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: netbsd_x64
+netbsd_x64: generate $(PROJECTDIR)/gmake-netbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)64
+
+.PHONY: netbsd
+netbsd: netbsd_x86
+
+.PHONY: netbsd_x86
+netbsd_x86: generate $(PROJECTDIR)/gmake-netbsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-netbsd config=$(CONFIG)32
 
 
 #-------------------------------------------------
