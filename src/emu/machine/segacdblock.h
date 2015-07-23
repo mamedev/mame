@@ -275,6 +275,8 @@ private:
 	bool m_TempPause;
 	bool m_TOCPhase;
 	//bool m_BufferFull;
+	
+	void debug_cd_return_garbage_data();
 };
 
 

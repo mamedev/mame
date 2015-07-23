@@ -45,7 +45,7 @@
   - Lunar 2: Add Transfer File Info 254;
   - Yoshimoto Mahjong: CD state reject;
   - Zero Divide: won't work without seeking position.
-- Astal: doesn't like commands 0x43 / 0x45 for whatever reason;
+- Astal: doesn't like commands 0x43 / 0x45 for whatever reason, or probably it isn't liking the usual 0x00 / 0x51;
 - Whizz / Time Gal: fix stall.
 - Falcom Classics 2: fix start button not pressing (caused by CD Block time out for a thread);
 - pull request, otherwise might as well still use saturn_cdblock branch.
@@ -61,6 +61,7 @@
 
 #define DUMP_DIR_ENTRIES 0
 #define TRY_SINGLE_STEP 0
+#define SHOW_FREEBLOCKS 0
 
 #include "emu.h"
 #include "machine/segacdblock.h"
@@ -1007,6 +1008,7 @@ void segacdblock_device::cd_cmd_set_filter_subheader_conditions()
 	set_flag(CMOK);
 }
 
+
 void segacdblock_device::cd_cmd_get_filter_subheader_conditions(UINT8 filter_number)
 {
 	m_dr[0] = m_cd_state | (CDFilters[filter_number].chan & 0xff);
@@ -1058,7 +1060,7 @@ void segacdblock_device::cd_cmd_get_filter_mode(UINT8 filter_number)
 	m_dr[1] = 0;
 	m_dr[2] = 0;
 	m_dr[3] = 0;
-
+	
 	set_flag(ESEL);
 	set_flag(CMOK);
 }
@@ -1937,7 +1939,9 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		}
 	}
 	
+ 	#if SHOW_FREEBLOCKS
 	popmessage("%d",freeblocks);
+	#endif
 	
 	if(freeblocks == 0)
 		set_flag(BFUL);
@@ -2062,3 +2066,16 @@ WRITE32_MEMBER( segacdblock_device::write )
 	if(mem_mask == 0xffffffff)
 		debugger_break(machine());
 }
+
+/*!
+ @brief Last resort debugging function.
+ */
+void segacdblock_device::debug_cd_return_garbage_data()
+{
+	popmessage("Using naughty Hack");
+	m_dr[0] = m_cd_state | (machine().rand() & 0xff);
+	m_dr[1] = machine().rand() & 0xffff;
+	m_dr[2] = machine().rand() & 0xffff;
+	m_dr[3] = machine().rand() & 0xffff;
+}
+
