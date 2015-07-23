@@ -688,11 +688,11 @@ void ui_mewui_select_game::custom_render(void *selectedref, float top, float bot
 	bool isstar = false;
 
 	if (mewui_globals::ume_system == MEWUI_MAME)
-		strprintf(tempbuf[0], "MEWUI %s (%s) ( %d / %d machines (%d BIOS) )", mewui_version, bare_build_version, visible_items, (driver_list::total() - 1), m_isabios + m_issbios);
+		strprintf(tempbuf[0], "MEWUI %s ( %d / %d machines (%d BIOS) )", mewui_version, visible_items, (driver_list::total() - 1), m_isabios + m_issbios);
 	else if (mewui_globals::ume_system == MEWUI_ARCADES)
-		strprintf(tempbuf[0], "MEWUI %s (%s) ( %d / %d arcades (%d BIOS) )", mewui_version, bare_build_version, visible_items, m_isarcades, m_isabios);
+		strprintf(tempbuf[0], "MEWUI %s ( %d / %d arcades (%d BIOS) )", mewui_version, visible_items, m_isarcades, m_isabios);
 	else if (mewui_globals::ume_system == MEWUI_SYSTEMS)
-		strprintf(tempbuf[0], "MEWUI %s (%s) ( %d / %d systems (%d BIOS) )", mewui_version, bare_build_version, visible_items, m_issystems, m_issbios);
+		strprintf(tempbuf[0], "MEWUI %s ( %d / %d systems (%d BIOS) )", mewui_version, visible_items, m_issystems, m_issbios);
 
 	std::string filtered;
 

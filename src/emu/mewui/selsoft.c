@@ -593,7 +593,7 @@ void ui_menu_select_software::custom_render(void *selectedref, float top, float 
 
 	// determine the text for the header
 	int vis_item = (m_search[0] != 0) ? visible_items : (has_empty_start ? visible_items - 1 : visible_items);
-	strprintf(tempbuf[0], "MEWUI %s (%s) (%d / %d softwares)", mewui_version, bare_build_version, vis_item, (int)m_swlist.size() - 1);
+	strprintf(tempbuf[0], "MEWUI %s ( %d / %d softwares )", mewui_version, vis_item, (int)m_swlist.size() - 1);
 	tempbuf[1].assign("Driver: \"").append(ui_driver->description).append("\" software list ");
 
 	if (mewui_globals::actual_sw_filter == MEWUI_SW_REGION && m_region.ui.size() != 0)
