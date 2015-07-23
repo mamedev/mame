@@ -273,8 +273,8 @@ NETLIB_START(D)
 
 NETLIB_UPDATE_PARAM(D)
 {
-	nl_double Is = m_model.model_value("Is", 1e-15);
-	nl_double n = m_model.model_value("N", 1);
+	nl_double Is = m_model.model_value("IS");
+	nl_double n = m_model.model_value("N");
 
 	m_D.set_param(Is, n, netlist().gmin());
 }

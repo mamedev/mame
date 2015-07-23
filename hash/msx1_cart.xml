@@ -14357,7 +14357,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="belnot" supported="no">
+	<software name="belnot">
 		<description>Believe It or Not (Arab)</description>
 		<year>1990</year>
 		<publisher>Al Alamiah</publisher>
@@ -14413,6 +14413,7 @@ legacy FM implementations cannot find it.
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="F007" />
+		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="doubleface1-.rom" size="32768" crc="301ba28a" sha1="a66fe495cfd443cac9cfd434d95a537e6984dbc6" offset="0x0000" />
@@ -14929,7 +14930,7 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="alnrom" supported="no">
+	<software name="alnrom">
 		<description>Language of Numbers (Arab)</description>
 		<year>1989</year>
 		<publisher>Al Alamiah</publisher>
@@ -14942,22 +14943,20 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="count1" supported="no">
+	<software name="count1">
 		<description>Let's Count 1 (Arab)</description>
 		<year>1989</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="P058" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="ascii8" />
-			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="65536">
 				<rom name="a_lets1.rom" size="65536" crc="76e5363a" sha1="08eb5001bd95ffb7232cdbdffbec7634eb110ad8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="count3" supported="no">
+	<software name="count3">
 		<description>Let's Count 3 (Arab)</description>
 		<year>1990</year>
 		<publisher>Al Alamiah</publisher>
@@ -15396,15 +15395,13 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="sakhrlog" supported="no">
+	<software name="sakhrlog">
 		<description>Sakhr Logo (Arab)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="C050" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="ascii16" />
-			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="65536">
 				<rom name="a_logo-a.rom" size="65536" crc="25bd7869" sha1="a2901318f8216ccd2f4d08b0f272e1bf90ab197a" offset="0" />
 			</dataarea>
@@ -15710,15 +15707,13 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<software name="youngres" supported="no">
+	<software name="youngres">
 		<description>Young Researcher (Arab)</description>
 		<year>1989</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="P098" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
-			<feature name="slot" value="ascii8" />
-			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="65536">
 				<rom name="a_smallserch.rom" size="65536" crc="e5479952" sha1="e4f7a94d0cb43f56f73d54c22364e91434363945" offset="0" />
 			</dataarea>

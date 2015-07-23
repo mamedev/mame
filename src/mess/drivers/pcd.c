@@ -69,6 +69,8 @@ public:
 	DECLARE_WRITE8_MEMBER( scsi_w );
 	DECLARE_WRITE8_MEMBER( vram_sw_w );
 	DECLARE_WRITE16_MEMBER( vram_w );
+	DECLARE_READ16_MEMBER( mmu_r );
+	DECLARE_WRITE16_MEMBER( mmu_w );
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
@@ -262,6 +264,7 @@ WRITE16_MEMBER( pcd_state::dskctl_w )
 		floppy1->mon_w(!(m_dskctl & 4));
 		floppy1->ss_w((m_dskctl & 8) != 0);
 	}
+	m_fdc->dden_w((m_dskctl & 0x10) ? 1 : 0);
 }
 
 READ8_MEMBER( pcd_state::led_r )
@@ -279,6 +282,17 @@ WRITE8_MEMBER( pcd_state::led_w )
 		logerror("%c", (data & (1 << i)) ? '-' : '*');
 	logerror("\n");
 	m_led = data;
+}
+
+READ16_MEMBER( pcd_state::mmu_r )
+{
+	logerror("%s: mmu read %04x\n", machine().describe_context(), offset + 0x8000);
+	return 0;
+}
+
+WRITE16_MEMBER( pcd_state::mmu_w )
+{
+	logerror("%s: mmu write %04x %04x\n", machine().describe_context(), offset + 0x8000, data);
 }
 
 SCN2674_DRAW_CHARACTER_MEMBER(pcd_state::display_pixels)
@@ -408,6 +422,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(mmu_r, mmu_w)
 	AM_RANGE(0x0000, 0xefff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE8("pic1", pic8259_device, read, write, 0xffff)

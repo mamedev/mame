@@ -12,6 +12,12 @@
 #include "machine/nvram.h"
 
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -169,3 +175,8 @@ void nvram_device::determine_final_base()
 	if (m_region != NULL && m_region->bytes() != m_length)
 		throw emu_fatalerror("NVRAM device '%s' has a default region, but it should be 0x%" SIZETFMT "X bytes", tag(), m_length);
 }
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif
+

@@ -306,6 +306,12 @@ namespace netlist
 	class param_model_t;
 
 	// -----------------------------------------------------------------------------
+	// model_map_t
+	// -----------------------------------------------------------------------------
+
+	typedef phashmap_t<pstring, pstring> model_map_t;
+
+	// -----------------------------------------------------------------------------
 	// netlist_output_family_t
 	// -----------------------------------------------------------------------------
 
@@ -324,8 +330,6 @@ namespace netlist
 		nl_double m_R_high;
 
 		bool m_is_static;
-
-		static logic_family_desc_t *from_model(const pstring &model);
 	};
 
 	class logic_family_t
@@ -946,6 +950,7 @@ namespace netlist
 			param_t::save_register();
 		}
 
+		virtual void changed() { }
 		C m_param;
 	private:
 	};
@@ -968,9 +973,16 @@ namespace netlist
 		ATTR_COLD param_model_t() : param_template_t<pstring, param_t::MODEL>() { }
 
 		/* these should be cached! */
-		ATTR_COLD nl_double model_value(const pstring &entity, const nl_double defval = 0.0) const;
-		ATTR_COLD const pstring model_value_str(const pstring &entity, const pstring defval = "") const;
-		ATTR_COLD const pstring model_type() const;
+		ATTR_COLD nl_double model_value(const pstring &entity);
+		ATTR_COLD const pstring model_value_str(const pstring &entity);
+		ATTR_COLD const pstring model_type();
+	protected:
+		void changed()
+		{
+			m_map.clear();
+		}
+	private:
+		model_map_t m_map;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1284,6 +1296,7 @@ namespace netlist
 		if (m_param != param)
 		{
 			m_param = param;
+			changed();
 			device().update_param();
 		}
 	}

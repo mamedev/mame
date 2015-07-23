@@ -36,7 +36,7 @@
 	ttd->m_desc.add(_x);
 
 #define TT_FAMILY(_x) \
-	ttd->m_family = netlist::logic_family_desc_t::from_model(setup.get_model_str(_x));
+	ttd->m_family = setup.family_from_model(_x);
 
 #define TRUTHTABLE_END() \
 	setup.factory().register_device(ttd); \

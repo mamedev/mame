@@ -75,7 +75,9 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #		define	D3D11_REQ_MAXANISOTROPY	16
 #	endif // D3D11_REQ_MAXANISOTROPY
 
+#if (__GNUC__ < 5)
 typedef void ID3D11InfoQueue;
+#endif // (__GNUC__ < 5)
 
 #endif // __MINGW32__
 

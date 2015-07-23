@@ -690,13 +690,13 @@ ADDRESS_MAP_END
  * (a15 to a8 are latched the same value as a7-a0 on the 8080 and 8085)
  * [this map is derived from extensive tracing as well as some guesswork, noted for the crtc, systat_b and the uart]
    a7  a6  a5  a4  a3  a2  a1  a0
-   ?x  0   ?x  ?x  ?x  ?x  ?x  0     W     CRTC address
-   ?x  0   ?x  ?x  ?x  ?x  ?x  1     RW    CRTC register r/w
+   x   0   x   x   x   x   x   0     W     CRTC address
+   x   0   x   x   x   x   x   1     RW    CRTC register r/w
    x   1   *   *   *   **  **  **        read area (rightmost 74ls138):
    x   1   0   0   0   *   *   *     R     SYSTAT_A (a0-a3 chooses the bit of the dipswitches read via d3)
-   x   1   0   0   1   ?x  ?x  ?x    R     SYSTAT_B
-   x   1   0   1   0   ?x  ?x  0     R     i8251 UART data
-   x   1   0   1   0   ?x  ?x  1     R     i8251 UART status
+   x   1   0   0   1   x   x   x    R     SYSTAT_B
+   x   1   0   1   0   x   x   0     R     i8251 UART data
+   x   1   0   1   0   x   x   1     R     i8251 UART status
    x   1   0   1   1   x   x   x     R     unused
    x   1   1   0   0   x   x   x     R     unused
    x   1   1   0   1   x   x   x     R     unused
@@ -720,10 +720,10 @@ ADDRESS_MAP_END
    x   1   1   0   0   1   *   *     W     set VG_MODE to * * XOR 3 and Execute (if GO is not active)
    x   1   1   0   1   0   x   x     W     KYBDW
    x   1   1   0   1   1   x   x     W     BAUD
-   x   1   1   1   0   0   ?x  0     W     i8251 UART data
-   x   1   1   1   0   0   ?x  1     W     i8251 UART control
+   x   1   1   1   0   0   x   0     W     i8251 UART data
+   x   1   1   1   0   0   x   1     W     i8251 UART control
    x   1   1   1   0   1   x   x     W     unused
-   x   1   1   1   1   0   x   x     W     unused? (may be wired-or to KYBDW)
+   x   1   1   1   1   0   x   x     W     unused
    x   1   1   1   1   1   x   x     W     unused
 */
 static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
