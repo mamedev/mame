@@ -14413,6 +14413,7 @@ legacy FM implementations cannot find it.
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="F007" />
+		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="doubleface1-.rom" size="32768" crc="301ba28a" sha1="a66fe495cfd443cac9cfd434d95a537e6984dbc6" offset="0x0000" />
