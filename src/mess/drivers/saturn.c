@@ -79,6 +79,7 @@ public:
 
 	DECLARE_READ32_MEMBER(saturn_null_ram_r);
 	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
+	DECLARE_WRITE32_MEMBER(astal_cache_hack_w);
 
 	void saturn_init_driver(int rgn);
 	DECLARE_DRIVER_INIT(saturnus);
@@ -109,6 +110,20 @@ READ32_MEMBER( sat_console_state::abus_dummy_r )
 	return -1;
 }
 
+/*!
+ @brief Astal hack
+ 
+ @discussion Slave CPU in Astal pretends to write an illegal SCU ISM register for some reason. 
+ In the grandscheme of how cache really works it's probably using 0x6000348 RAM register for doing a 
+ task then purge the line and recopy the right ISM buffer.
+
+ @todo stupid hack, not going to be officially released.
+ */
+WRITE32_MEMBER( sat_console_state::astal_cache_hack_w )
+{
+	m_workram_h[0x348/4] = 0xfffff77c;
+}
+
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  AM_WRITENOP // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
@@ -137,6 +152,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 //  AM_RANGE(0x22000000, 0x24ffffff) AM_ROM // Cartridge area mirror
+	AM_RANGE(0x460b7f60, 0x460b7f63) AM_WRITE(astal_cache_hack_w)
 	AM_RANGE(0x45000000, 0x46ffffff) AM_WRITENOP
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP // cache address array
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array, Dragon Ball Z sprites relies on this
