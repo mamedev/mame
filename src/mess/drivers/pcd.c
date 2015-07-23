@@ -262,6 +262,7 @@ WRITE16_MEMBER( pcd_state::dskctl_w )
 		floppy1->mon_w(!(m_dskctl & 4));
 		floppy1->ss_w((m_dskctl & 8) != 0);
 	}
+	m_fdc->dden_w((m_dskctl & 0x10) ? 1 : 0);
 }
 
 READ8_MEMBER( pcd_state::led_r )
