@@ -45,11 +45,12 @@
   - Lunar 2: Add Transfer File Info 254;
   - Yoshimoto Mahjong: CD state reject;
   - Zero Divide: won't work without seeking position.
+- Astal: doesn't like commands 0x43 / 0x45 for whatever reason;
 - Whizz / Time Gal: fix stall.
 - Falcom Classics 2: fix start button not pressing (caused by CD Block time out for a thread);
 - pull request, otherwise might as well still use saturn_cdblock branch.
 - Add MPEG support, or die trying @spoiler it's a sub-system @endspoiler;
-- Document & optimize;
+- Document all functions & optimize;
 
 @notes
 - doomj: A work RAM H buffer (0x260666b0) never zeroed during gameplay;
@@ -121,7 +122,7 @@ void segacdblock_device::set_flag(UINT16 which)
 	if(m_hirq & CMOK && which & CMOK)
 	{
 		printf("CMOK setted up with CMOK enabled ...\n");
-		debugger_break(machine());
+		//debugger_break(machine());
 	}
 	
 	m_hirq |= which;
@@ -154,11 +155,14 @@ WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { printf("%04x\n",m_hirq_mask); 
 
 void segacdblock_device::SH2SendsCommand()
 {
-	
-	
+//	const int cd_timing_step[2] = { 16667, 166666667 };
+//	UINT8 cd_command = m_cr[0] >> 8;
 	if(m_cmd_issued != 0xf)
 		fatalerror("SH-2 attempted to write a command in-the-middle %04x\n",m_cmd_issued);
 	
+	/*!
+	 @todo Phase 1 for Busy, Phase 2 for processed command issued, needs some bare bones timing before proceeding.
+	*/
 	m_cmd_timer->adjust(attotime::from_hz(16667));
 	m_peri_timer->adjust(attotime::never);
 }
