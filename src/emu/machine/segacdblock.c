@@ -28,9 +28,28 @@
 33cc open, nodisc, fatal -> r0
 2f10 "Last CD-DMA buffer address write %08x",r14
 
-@todo
-- (fill up this section once pull request these files);
-- use #define or a struct instead of m_cr[x] (starts counting from 1, shrug)
+@todo In no order:
+- use #define or a struct / enum instead of m_cr[x] (starts counting from 1, shrug);
+- Write a debug function for checking if m_cr changes values (dummy paranoid check).
+- Improve command timings. "CMOK setted up with CMOK enabled" can be a good preliminary indication for that;
+- Improve DMA, add missing features.
+- Improve buffer FIFO, starting from the basic fact that SH-1 might always transmit with 16-bit bus.
+- Remove debugger breaks (missing known features at very least).
+- Fix TOC and correlated command 0x03 for CD-ROM player.
+- HIRQ Registers are not yet, for timing and for how they really works (DRDY as an example);
+- Proper Periodic, Wait, Transfer in progress, Busy, Scan, Seek, Stand-By CD states;
+- Add missing commands, namely:
+  - Seek &| Pause command 0x11.
+  - Subchannel RW command 0x20 for CD-ROM Player.
+  - Assault Suit Leynos 2: won't work if Read File fails.
+  - Lunar 2: Add Transfer File Info 254;
+  - Yoshimoto Mahjong: CD state reject;
+  - Zero Divide: won't work without seeking position.
+- Whizz / Time Gal: fix stall.
+- Falcom Classics 2: fix start button not pressing (caused by CD Block time out for a thread);
+- pull request, otherwise might as well still use saturn_cdblock branch.
+- Add MPEG support, or die trying @spoiler it's a sub-system @endspoiler;
+- Document & optimize;
 
 @notes
 - doomj: A work RAM H buffer (0x260666b0) never zeroed during gameplay;
@@ -135,6 +154,8 @@ WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { printf("%04x\n",m_hirq_mask); 
 
 void segacdblock_device::SH2SendsCommand()
 {
+	
+	
 	if(m_cmd_issued != 0xf)
 		fatalerror("SH-2 attempted to write a command in-the-middle %04x\n",m_cmd_issued);
 	
@@ -360,7 +381,9 @@ void segacdblock_device::SH1CommandExecute()
 		
 		case 0x40:	cd_cmd_set_filter_range(m_cr[2] >> 8); break;
 		case 0x42:  cd_cmd_set_filter_subheader_conditions(); break;
+		case 0x43:  cd_cmd_get_filter_subheader_conditions(m_cr[2] >> 8); break;
 		case 0x44:  cd_cmd_set_filter_mode(m_cr[0] & 0xff, m_cr[2] >> 8); break;
+		case 0x45:  cd_cmd_get_filter_mode(m_cr[2] >> 8);
 		case 0x46:	cd_cmd_set_filter_connection(m_cr[2] >> 8); break;
 		case 0x48:	cd_cmd_reset_selector(m_cr[0] & 0xff, m_cr[2] >> 8); break;
 
@@ -980,6 +1003,18 @@ void segacdblock_device::cd_cmd_set_filter_subheader_conditions()
 	set_flag(CMOK);
 }
 
+void segacdblock_device::cd_cmd_get_filter_subheader_conditions(UINT8 filter_number)
+{
+	m_dr[0] = m_cd_state | (CDFilters[filter_number].chan & 0xff);
+	m_dr[1] = (CDFilters[filter_number].smmask << 8) | (CDFilters[filter_number].cimask & 0xff);
+	m_dr[2] = CDFilters[filter_number].fid & 0xff;
+	m_dr[3] = (CDFilters[filter_number].smval << 8) | (CDFilters[filter_number].cival & 0xff);
+	
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
+
 void segacdblock_device::cd_cmd_set_filter_connection(UINT8 filter_number)
 {
 	if (m_cr[0] & 1)    // set true condition
@@ -1002,10 +1037,23 @@ void segacdblock_device::cd_cmd_set_filter_mode(UINT8 mode, UINT8 filter_number)
 	}
 	else
 	{
+		if(filter_number >= MAX_FILTERS)
+			fatalerror("set filter mode > 0x24???");
 		CDFilters[filter_number].mode = mode;
 	}
 
 	cd_standard_return(false);
+
+	set_flag(ESEL);
+	set_flag(CMOK);
+}
+
+void segacdblock_device::cd_cmd_get_filter_mode(UINT8 filter_number)
+{
+	m_dr[0] = m_cd_state | CDFilters[filter_number].mode;
+	m_dr[1] = 0;
+	m_dr[2] = 0;
+	m_dr[3] = 0;
 
 	set_flag(ESEL);
 	set_flag(CMOK);

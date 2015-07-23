@@ -212,6 +212,8 @@ private:
 	// 0x40
 	void cd_cmd_set_filter_range(UINT8 filter_number);
 	void cd_cmd_set_filter_mode(UINT8 mode, UINT8 filter_number);
+	void cd_cmd_get_filter_subheader_conditions(UINT8 filter_number);
+	void cd_cmd_get_filter_mode(UINT8 filter_number);
 	void cd_cmd_set_filter_subheader_conditions();
 	void cd_cmd_set_filter_connection(UINT8 filter_number);
 	void cd_cmd_reset_selector(UINT8 reset_flags, UINT8 buffer_number);

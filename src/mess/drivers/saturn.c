@@ -117,7 +117,7 @@ READ32_MEMBER( sat_console_state::abus_dummy_r )
  In the grandscheme of how cache really works it's probably using 0x6000348 RAM register for doing a 
  task then purge the line and recopy the right ISM buffer.
 
- @todo stupid hack, not going to be officially released.
+ @todo stupid hack, not going to be officially released like this.
  */
 WRITE32_MEMBER( sat_console_state::astal_cache_hack_w )
 {
