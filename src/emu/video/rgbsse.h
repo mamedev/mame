@@ -512,10 +512,10 @@ protected:
 	struct _statics
 	{
 		__m128  dummy_for_alignment;
-		INT16   alpha_mask[8];
-		INT16   red_mask[8];
-		INT16   green_mask[8];
-		INT16   blue_mask[8];
+		UINT16   alpha_mask[8];
+		UINT16   red_mask[8];
+		UINT16   green_mask[8];
+		UINT16   blue_mask[8];
 		INT16   scale_table[256][8];
 	};
 

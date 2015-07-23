@@ -9,6 +9,14 @@
  * the vectorizations fast-math enables pretty expensive
  */
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
+
 //#pragma GCC optimize "-ffast-math"
 #if 0
 #pragma GCC optimize "-ffast-math"
@@ -600,3 +608,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 }
 
 NETLIB_NAMESPACE_DEVICES_END()
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

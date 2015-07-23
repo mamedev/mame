@@ -10,6 +10,13 @@
 
 #include "pparser.h"
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 //#undef NL_VERBOSE_OUT
 //#define NL_VERBOSE_OUT(x) printf x
 
@@ -480,3 +487,8 @@ pstring ppreprocessor::process(const pstring &contents)
 	}
 	return pstring(ret.cstr());
 }
+
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

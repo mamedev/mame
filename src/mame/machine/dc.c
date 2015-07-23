@@ -14,6 +14,13 @@
 #include "machine/naomig1.h"
 #include "video/powervr2.h"
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 #define DEBUG_REGISTERS (1)
 
 #if DEBUG_REGISTERS
@@ -722,3 +729,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
 {
 	m_powervr2->pvr_scanline_timer(param);
 }
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif
+
