@@ -92,10 +92,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT8> m_vram;
-	required_memory_region m_tiles;
-	required_memory_region m_colors;
+	required_region_ptr<UINT8> m_tiles;
+	required_region_ptr<UINT8> m_colors;
 
-	static const int BALL_SIZE = 4;
 	static const rgb_t m_palette[];
 
 	UINT8 m_ball_x;
@@ -207,15 +206,15 @@ UINT32 mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	{
 		for (int x = 0; x < 256 / 8; x++)
 		{
-			UINT8 code = m_vram[(y * 32) + x];
+			UINT8 code = m_vram[(y * 32) + x] & 0x7f;
 
 			// normal palette 00..7f, alternate palette 80..ff
-			UINT8 color = m_colors->base()[code | (BIT(m_color, 6) << 7)];
+			UINT8 color = m_colors[code | (BIT(m_color, 6) << 7)];
 
 			// draw one tile
 			for (int tx = 0; tx < 12; tx++)
 			{
-				UINT8 gfx = m_tiles->base()[(code << 4) + tx];
+				UINT8 gfx = m_tiles[(code << 4) + tx];
 
 				bitmap.pix32(y * 12 + tx, x * 8 + 0) = BIT(gfx, 4) ? rgb_t::black : m_palette[color];
 				bitmap.pix32(y * 12 + tx, x * 8 + 1) = BIT(gfx, 5) ? rgb_t::black : m_palette[color];
@@ -231,8 +230,9 @@ UINT32 mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	}
 
 	// draw ball
+	static const int BALL_SIZE = 4;
 	int ball_y = (m_ball_y >> 4) * 12 + (m_ball_y & 0x0f);
-	bitmap.plot_box(m_ball_x - BALL_SIZE, ball_y - BALL_SIZE, BALL_SIZE, BALL_SIZE, rgb_t::white);
+	bitmap.plot_box(m_ball_x - BALL_SIZE + 1, ball_y - BALL_SIZE + 1, BALL_SIZE, BALL_SIZE, rgb_t::white);
 
 	return 0;
 }
@@ -244,14 +244,14 @@ UINT32 mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 const rgb_t mmagic_state::m_palette[] =
 {
-	rgb_t::black,
+	rgb_t(0x00, 0x00, 0x00),
 	rgb_t(0xff, 0x00, 0x00),
 	rgb_t(0x00, 0xff, 0x00),
 	rgb_t(0xff, 0xff, 0x00),
 	rgb_t(0x00, 0x00, 0xff),
 	rgb_t(0xff, 0x00, 0xff),
 	rgb_t(0x00, 0xff, 0xff),
-	rgb_t::white,
+	rgb_t(0xff, 0xff, 0xff)
 };
 
 
@@ -311,7 +311,7 @@ ROM_START( mmagic )
 	ROM_LOAD("4ai.45a", 0x0c00, 0x0400, CRC(3048bd6c) SHA1(740051589f6ba44b2ee68edf76a3177bb973d78e))
 	ROM_LOAD("5ai.5a",  0x1000, 0x0400, CRC(2cab8f04) SHA1(203a3c005f18f968cd14c972bbb9fd7e0fc3b670))
 
-	ROM_REGION(0x600, "tiles", 0)
+	ROM_REGION(0x800, "tiles", 0)
 	ROM_LOAD("6h.6hi", 0x000, 0x200, CRC(b6321b6f) SHA1(06611f7419d2982e006a3e81b79677e59e194f38))
 	ROM_LOAD("7h.7hi", 0x200, 0x200, CRC(9ec0e82c) SHA1(29983f690a1b6134bb1983921f42c14898788095))
 	ROM_LOAD("6j.6jk", 0x400, 0x200, CRC(7ce83302) SHA1(1870610ff07ab11622e183e04e3fce29328ff291))
