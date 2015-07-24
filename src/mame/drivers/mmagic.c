@@ -110,7 +110,7 @@ private:
 
 static ADDRESS_MAP_START( mmagic_mem, AS_PROGRAM, 8, mmagic_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
+	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x2000, 0x21ff) AM_RAM
 	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(ball_x_w)
@@ -157,7 +157,7 @@ static INPUT_PORTS_START( mmagic )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Debug?")	// debug? checked once at startup
 
 	PORT_START("paddle")
 	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
@@ -229,10 +229,13 @@ UINT32 mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 
-	// draw ball
-	static const int BALL_SIZE = 4;
-	int ball_y = (m_ball_y >> 4) * 12 + (m_ball_y & 0x0f);
-	bitmap.plot_box(m_ball_x - BALL_SIZE + 1, ball_y - BALL_SIZE + 1, BALL_SIZE, BALL_SIZE, rgb_t::white);
+	// draw ball (if not disabled)
+	if (m_ball_x != 0xff)
+	{
+		static const int BALL_SIZE = 4;
+		int ball_y = (m_ball_y >> 4) * 12 + (m_ball_y & 0x0f);
+		bitmap.plot_box(m_ball_x - BALL_SIZE + 1, ball_y - BALL_SIZE + 1, BALL_SIZE, BALL_SIZE, rgb_t::white);
+	}
 
 	return 0;
 }
@@ -304,12 +307,13 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 ROM_START( mmagic )
-	ROM_REGION(0x1400, "maincpu", 0)
+	ROM_REGION(0x1800, "maincpu", 0)
 	ROM_LOAD("1ai.2a",  0x0000, 0x0400, CRC(ec772e2e) SHA1(7efc1bbb24b2ed73c518aea1c4ef4b9a93034e31))
 	ROM_LOAD("2ai.3a",  0x0400, 0x0400, CRC(e5d482ca) SHA1(208b808e9208bb6f5f5f89ffbeb5a885be33733a))
 	ROM_LOAD("3ai.4a",  0x0800, 0x0400, CRC(e8d38deb) SHA1(d7384234fb47e4b1d0421f58571fa748662b05f5))
 	ROM_LOAD("4ai.45a", 0x0c00, 0x0400, CRC(3048bd6c) SHA1(740051589f6ba44b2ee68edf76a3177bb973d78e))
 	ROM_LOAD("5ai.5a",  0x1000, 0x0400, CRC(2cab8f04) SHA1(203a3c005f18f968cd14c972bbb9fd7e0fc3b670))
+	// location 6a is unpopulated, if the "debug" switch is activated on bootup it would jump here
 
 	ROM_REGION(0x800, "tiles", 0)
 	ROM_LOAD("6h.6hi", 0x000, 0x200, CRC(b6321b6f) SHA1(06611f7419d2982e006a3e81b79677e59e194f38))
