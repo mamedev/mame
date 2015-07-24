@@ -841,22 +841,24 @@ if _OPTIONS["OPTIMIZE"] then
 	end
 	if _OPTIONS["LTO"]=="1" then
 		buildoptions {
-			"-flto=1",
+			"-flto=2",
 -- these next flags allow MAME to compile in linux GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
-			"-ffat-lto-objects",	"-Wodr",
+			"-fno-fat-lto-objects",	"-Wodr",
 			"-flto-compression-level=9", -- lto didn't work with anything less on linux with < 12G RAM
 			"-flto-odr-type-merging",
-			"-flto-report" -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
+			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
+			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report","-fuse-linker-plugin",
 			
 		}
 -- same flags are needed by linker
 		linkoptions {
-			"-flto=1",
+			"-flto=2",
 -- these next flags allow MAME to compile in linux GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
-			"-ffat-lto-objects",	"-Wodr",
+			"-fno-fat-lto-objects",	"-Wodr",
 			"-flto-compression-level=9", -- lto didn't work with anything less on linux with < 12G RAM
 			"-flto-odr-type-merging",
-			"-flto-report" -- if you get an error in lto after [WPA] stage printout, but before any [LTRANS] section printout, you need more memory!
+			"-flto-report", -- if you get an error in lto after [WPA] stage printout, but before any [LTRANS] section printout, you need more memory!
+			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report","-fuse-linker-plugin",
 		}
 		
 		
@@ -1018,7 +1020,7 @@ end
 			end
 			if (version >= 50000) then
 				buildoptions {
-					"-D__USE_MINGW_ANSI_STDIO=1", -- required or lua won't compile linux ignores this but Windows needs it
+--					"-D__USE_MINGW_ANSI_STDIO=1", -- required or lua won't compile linux ignores this but Windows needs it
 					"-freport-bug",
 					"-D_GLIBCXX_USE_CXX11_ABI=0", -- does not seem to matter in linux, mingw needs to link printf,etc
 --					"-DNO_MEM_TRACKING",          -- must comment out for mingw GCC 5.2 pedantic or get new/delete redef error
