@@ -2,9 +2,19 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="interact" description="Interact Family Computer cassettes">
 <!--
+TODO:
+years
+publisher
+serials (<info name="serial" value=""/>)
+
+http://oldcomputers.net/interact.html
+http://www.trailingedge.com/misc/Interact.pdf
+-->
+
+<!--
 UNDUMPED:
 These are from the Spring 1981 catalog from Micro Video, after they aquired the rights from Interact
-oldcomputers.net/interact/MV_catalog.pdf
+http://oldcomputers.net/interact/MV_catalog.pdf
 
 *16k of RAM is needed
 Games:
@@ -74,7 +84,7 @@ Not in the catalog:
 Alignment Tape (Micro Video)
 -->
 
-<!-- Interact Family Computer and Micronique Hector 1 cassettes -->
+<!-- Interact Family Computer cassettes -->
 
 <!-- Interact-published cassettes -->
 	<!-- Tape 101 -->
@@ -357,7 +367,7 @@ Alignment Tape (Micro Video)
 		</part>
 	</software>
 
-<!-- Other cassettes -->
+<!-- released by Micro Video -->
 
 	<software name="checkbk">
 		<description>Checkbook Balancer</description>
@@ -382,7 +392,7 @@ Alignment Tape (Micro Video)
 	</software>
 
 	<software name="earthout">
-		<description>Earth Outpost I</description><!-- requires 16k of ram -->
+		<description>Earth Outpost I</description><!-- requires 16k of RAM -->
 		<year>1980</year>
 		<publisher>Micro Video</publisher>
 		<part name="cass" interface="interact_cass">

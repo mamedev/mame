@@ -39,7 +39,7 @@ List of confirmed retail cartridges rom dumps
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-b99p-0 g1.u1" size="1048576" crc="56b83539" sha1="9f0f45d84e60e9c6f52fde14e1c0a49992aed025" offset="000000" />
-				<!-- "cgb-b99e-0 f1" (USA) -->
+				<!-- name="cgb-b99e-0 f1.u1" (USA) -->
 			</dataarea>
 		</part>
 	</software>
@@ -579,6 +579,23 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="bombmsel">
+		<!-- Notes: GBC only -->
+		<description>Bomberman Selection (Kor)</description>
+		<year>2003</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="CGB-B2CK-KOR"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-M-BFAN-20" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1" /><!-- MBC1-B -->
+			<feature name="slot" value="rom_mbc1col" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgb-b2ck-0 f1.u1" size="1048576" crc="af2b426e" sha1="52451464a9f4dd5faefe4594954cbce03bff0d05" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="buffy">
 		<!-- Notes: GBC only -->
 		<description>Buffy the Vampire Slayer (Euro, USA)</description><!-- only Euro confirmed -->
@@ -598,10 +615,10 @@ List of verified retail cartridges rom dumps
 
 	<software name="bugsbcc3">
 		<!-- Notes: GBC only -->
-		<description>Bugs Bunny - Crazy Castle 3 (Euro, USA)</description><!-- only Euro confirmed -->
+		<description>Bugs Bunny - Crazy Castle 3 (Euro, Aus, USA)</description><!-- only Euro confirmed -->
 		<year>1999</year>
 		<publisher>Kemco</publisher>
-		<info name="serial" value="DMG-AB6E-USA, DMG-AB6P-EUR"/>
+		<info name="serial" value="DMG-AB6E-USA, DMG-AB6P-(AUS/EUR)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -2125,6 +2142,23 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="rocketp">
+		<!-- Notes: GBC only -->
+		<description>Rocket Power - Gettin' Air (Euro, USA)</description><!-- only Euro confirmed -->
+		<year>2001</year>
+		<publisher>THQ</publisher>
+		<info name="serial" value="CGB-BRUP-EUR, CGB-BRUE-USA"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A07-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM" />
+			<feature name="u2" value="U2 MBC5" />
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgb-brup-0 f1.u1" size="1048576" crc="7025eb63" sha1="d9c5c22f1f5a2a922cb2b39d5e8f3df31c1155d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rox">
 		<description>Rox - 6=Six (Euro, USA)</description><!-- only Euro confirmed -->
 		<year>2001</year>
@@ -2213,6 +2247,7 @@ List of verified retail cartridges rom dumps
 		<year>1999</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="DMG-ARZP-(NOE/UKV)"/>
+		<info name="alt_title" value="Rugrats - Der Film (Ger cart)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -2642,7 +2677,7 @@ List of verified retail cartridges rom dumps
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-B3TE-USA, CGB-B3TP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A08-01" /><!-- also found with DMG-A08-10 -->
+			<feature name="pcb" value="DMG-A08-(01/10)" />
 			<feature name="u1" value="U1 16M/32M/64M-MROM" />
 			<feature name="u2" value="U2 MBC-5" />
 			<feature name="u3" value="U3 64K-SRAM" />
@@ -3018,6 +3053,26 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 		</part>
 	</software>
 
+	<software name="bistrogf">
+		<!-- Notes: SGB enhanced, also released by NP in 2000-10 -->
+		<description>Kakutou Ryouri Densetsu Bistro Recipe - Gekitou Foodon Battle Hen (Jpn)</description>
+		<year>1999</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="DMG-AWRJ-JPN"/>
+		<info name="release" value="19991008"/>
+		<info name="alt_title" value="格闘料理伝説ビストロレシピ 激闘★フードンバトル編"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="dmg-awrj-0.u1" size="1048576" crc="459a126b" sha1="6a972325c07687b51fe6dbb3813bf54e1721668f" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bombmqstj" cloneof="bombmqst">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-08 -->
 		<description>Bomberman Quest (Jpn)</description>
@@ -3097,6 +3152,46 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 		</part>
 	</software>
 
+	<software name="dquest12" cloneof="dwarr12">
+		<!-- Notes: SGB enhanced -->
+		<description>Dragon Quest I &amp; II (Jpn)</description>
+		<year>1999</year>
+		<publisher>Enix</publisher>
+		<info name="serial" value="DMG-AEDJ-JPN"/>
+		<info name="release" value="19990923"/>
+		<info name="alt_title" value="ドラゴンクエストI・II"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-01" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="dmg-aedj-0.u1" size="2097152" crc="a053b42e" sha1="8cfdfb7a76dd0012af3b441e162fcd37e4370958" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbgall3j" cloneof="gwatch3">
+		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
+		<description>Game Boy Gallery 3 (Jpn)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-AGQJ-JPN"/>
+		<info name="release" value="19990408"/>
+		<info name="alt_title" value="ゲームボーイギャラリー3"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-Z02-01" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="dmg-agqj-0.u1" size="1048576" crc="149f807e" sha1="18c3e0a015fa79c8694b8554e3c46fd67f034c71" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gbwars3">
 		<!-- Notes: GBC only -->
 		<description>Game Boy Wars 3 (Jpn)</description>
@@ -3113,6 +3208,46 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 				<rom name="cgb-bwwj-0.u1" size="1048576" crc="30c26262" sha1="61e08f96261b5f85c65c70db5464b4298f9f2cf8" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kindajik">
+		<!-- Notes: SGB enhanced -->
+		<description>Kindaichi Shounen no Jikenbo - 10nenme no Shoutaijou (Jpn)</description>
+		<year>2000</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="DMG-BKSJ-JPN"/>
+		<info name="release" value="20001216"/>
+		<info name="alt_title" value="金田一少年の事件簿 〜10年目の招待状〜"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="dmg-bksj-0.u1" size="2097152" crc="de52ffdc" sha1="468ea148eb15eac3b771a2520e0b5248ea5085a1" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kinnibn2">
+		<!-- Notes: SGB enhanced -->
+		<description>Kinniku Banzuke GB2 - Mezase! Muscle Champion (Jpn)</description>
+		<year>2000</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="DMG-B6KJ-JPN (RK213-J1)"/>
+		<info name="release" value="20000810"/>
+		<info name="alt_title" value="筋肉番付GB2 〜目指せ!マッスルチャンピオン!〜"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-01" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="dmg-b6kj-0.u1" size="2097152" crc="42de9092" sha1="5ea803b820ff865a4470d7f82b36da6b82f3caec" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3150,6 +3285,26 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="cgb-bvod-0.u1" size="1048576" crc="fd11138e" sha1="861f53ec6d5981b5f5237777fd776299d90f4cc0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mconankh">
+		<!-- Notes: SGB enhanced -->
+		<description>Meitantei Conan - Kigantou Hihou Densetsu (Jpn)</description>
+		<year>2000</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="DMG-A5BJ-JPN"/>
+		<info name="release" value="20000331"/>
+		<info name="alt_title" value="名探偵コナン 奇岩島秘宝伝説"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="dmg-a5bj-0.u1" size="1048576" crc="e620fae2" sha1="cd3f8015e5b708f1eb14c374042a1701eeaafc4f" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3227,6 +3382,47 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 		</part>
 	</software>
 
+	<!-- set C27D to 06 in the checking screen -->
+	<software name="mobiltrn" supported="partial">
+		<!-- Notes: GBC only -->
+		<description>Mobile Trainer (Jpn)</description>
+		<year>2001</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="モバイルトレーナー"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A03-10" />
+			<feature name="u1" value="U1 16M/32M/64M-MROM" />
+			<feature name="u2" value="U2 MBC-5" />
+			<feature name="u3" value="U3 256K-SRAM" />
+			<feature name="u4" value="U4 MM1134A" />
+			<feature name="battery" value="Batt CR1616" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="cgb-b9aj-0.u1" size="2097152" crc="7226ead0" sha1="ecc0579edeaf9eccd722d605cc288cd023c8576a" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moorhun">
+		<!-- Notes: GBC only -->
+		<description>Die Original Moorhuhn Jagd (Ger)</description>
+		<year>2000</year>
+		<publisher>Ravensburger Interactive</publisher>
+		<info name="serial" value="CGB-BOMD-NOE"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A07-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM" />
+			<feature name="u2" value="U2 MBC5" />
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgb-bomd-0.u1" size="1048576" crc="714ec204" sha1="d4f3fe5bdeed4bbf40d3f1eb6eab7a69676c6138" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="muppets">
 		<!-- Notes: GBC only -->
 		<description>The Muppets (Euro, Black Cart)</description>
@@ -3251,19 +3447,79 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 		</part>
 	</software>
 
-	<software name="moorhun">
-		<!-- Notes: GBC only -->
-		<description>Die Original Moorhuhn Jagd (Ger)</description>
-		<year>2000</year>
-		<publisher>Ravensburger Interactive</publisher>
-		<info name="serial" value="CGB-BOMD-NOE"/>
+	<software name="ohasuynr">
+		<!-- Notes: SGB enhanced -->
+		<description>Ohasuta Yama-chan &amp; Raymond (Jpn)</description>
+		<year>1999</year>
+		<publisher>Epoch</publisher>
+		<info name="serial" value="DMG-AOSJ-JPN"/>
+		<info name="release" value="19990312"/>
+		<info name="alt_title" value="おはスタ やまちゃん&amp;レイモンド"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
-			<feature name="u1" value="U1 2M/4M/8M MROM" />
-			<feature name="u2" value="U2 MBC5" />
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="cgb-bomd-0.u1" size="1048576" crc="714ec204" sha1="d4f3fe5bdeed4bbf40d3f1eb6eab7a69676c6138" offset="000000" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-aosj-0.u1" size="262144" crc="840ef32f" sha1="373166bc65dd9b6c5734add30a8d278986fc9c98" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="onepglin">
+		<!-- Notes: SGB enhanced -->
+		<description>From TV Animation One Piece - Maboroshi no Grand Line Boukenki! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="DMG-BZOJ-JPN"/>
+		<info name="release" value="20020628"/>
+		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 幻のグランドライン冒険記!"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A03-10" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="4194304">
+				<rom name="dmg-bzoj-0.u1" size="4194304" crc="a7317bb8" sha1="7fa5fbb94390876dee807216c2097cdb42510efe" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="onepyumea" cloneof="onepyume">
+		<!-- Notes: SGB enhanced -->
+		<description>From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Jpn)</description>
+		<year>2001</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="DMG-BLUJ-JPN"/>
+		<info name="release" value="20010427"/>
+		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生!"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="4194304">
+				<rom name="dmg-bluj-0.u1" size="4194304" crc="c693aa37" sha1="459f1ae41f6c5c6464745a23ea42bbba5385a83b" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantomz">
+		<!-- Notes: SGB enhanced -->
+		<description>Phantom Zona - Kaijin Zona (Jpn)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-BKZJ-JPN"/>
+		<info name="release" value="20001021"/>
+		<info name="alt_title" value="怪人ゾナー"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A03-10" />
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="dmg-bkzj-0.u1" size="2097152" crc="3e43f25f" sha1="bf2162f970a9dbb658afbdd7354155768daa96b1" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3287,6 +3543,25 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 		</part>
 	</software>
 
+	<software name="pokecardj" cloneof="pokecard">
+		<!-- Notes: SGB enhanced -->
+		<description>Pokémon Card GB (Jpn)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-ACXJ-JPN"/>
+		<info name="release" value="19981218"/>
+		<info name="alt_title" value="ポケモンカードGB"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="" />
+			<feature name="slot" value="rom_huc1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmg-acxj-0.u1" size="1048576" crc="1926f570" sha1="2287627c5b4d56bd9a01aab83408c301b9cf1a6c" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokegold">
 		<description>Pokémon - Gold Version (Euro, USA)</description>
 		<year>2000</year>
@@ -3299,6 +3574,44 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="2097152">
 				<rom name="dmg-aaue-0.u1" size="2097152" crc="6bde3c3e" sha1="d8b8a3600a465308c9953dfa04f0081c05bdcb94" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeeun" cloneof="pokesilv">
+		<!-- Notes: GBC only -->
+		<description>Pocket Monsters Eun (Kor)</description>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="CGB-AAXK-KOR"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KGDU-10" />
+			<feature name="slot" value="rom_mbc3" />
+			<feature name="rtc" value="yes" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="cgb-aaxk-0.u1" size="2097152" crc="9cc1f90f" sha1="cb22d7e03a74dc3a563fde6be8626626b2b392e7" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokegeum" cloneof="pokegold">
+		<!-- Notes: GBC only -->
+		<description>Pocket Monsters Geum (Kor)</description>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="CGB-AAUK-KOR"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KGDU-10" />
+			<feature name="slot" value="rom_mbc3" />
+			<feature name="rtc" value="yes" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="cgb-aauk-0.u1" size="2097152" crc="249a7a66" sha1="c0ff3999e1093e1af59ef3eea3f1bfd7c1f18a65" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -3438,118 +3751,39 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 		</part>
 	</software>
 
-	<software name="vigilnt8">
-		<!-- Notes: GBC only, Rumble support -->
-		<description>Vigilante 8 (USA)</description>
-		<year>1999</year>
-		<publisher>Vatical Entertainment</publisher>
-		<info name="serial" value="CGB-VV8E-USA"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A10-01" />
-			<feature name="slot" value="rom_mbc5" />
-			<feature name="rumble" value="yes" />
-			<dataarea name="rom" size="1048576">
-				<rom name="cgb-vv8e-0" size="1048576" crc="d1a188dc" sha1="4e4ce54c06e8f71ba6e0d8fc8550c177dcf660fd" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zeldaseau" cloneof="zeldasea">
-		<!-- Notes: GBC only -->
-		<description>The Legend of Zelda - Oracle of Seasons (Aus, USA)</description><!-- only USA confirmed -->
-		<year>2001</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="CGB-AZ7U-AUS, CGB-AZ7E-USA"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A06-10" />
-			<feature name="u1" value="U1 2M/4M/8M MROM" />
-			<feature name="u2" value="U2 MBC-5" />
-			<feature name="u3" value="U3 64K SRAM" />
-			<feature name="u4" value="U4 MM1134A" />
-			<feature name="battery" value="Batt CR1616" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="cgb-az7e-0.u1" size="1048576" crc="d7e9f5d7" sha1="ba1268290fb2b1b70505d2d7b5825fc8a4816a4b" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mconankh">
-		<!-- Notes: SGB enhanced -->
-		<description>Meitantei Conan - Kigantou Hihou Densetsu (Jpn)</description>
+	<software name="telefngp">
+		<description>Keitai Denjuu Telefang - Power Version (Jpn)</description>
 		<year>2000</year>
-		<publisher>Banpresto</publisher>
-		<info name="serial" value="DMG-A5BJ-JPN"/>
-		<info name="release" value="20000331"/>
-		<info name="alt_title" value="名探偵コナン 奇岩島秘宝伝説"/>
+		<publisher>Natsume</publisher>
+		<info name="serial" value="DMG-BTXJ-JPN"/>
+		<info name="release" value="20001103"/>
+		<info name="alt_title" value="携帯電獣テレファング パワー・バージョン"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KGDU-10" />
+			<feature name="slot" value="rom_mbc3" />
+			<feature name="rtc" value="yes" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="dmg-btxj-0.u1" size="2097152" crc="8b61cfcc" sha1="baaf7fb9f9958ca22982ba0600bc0cb8a7fc4764" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tokoro">
+		<description>Tokoro-san no Setagaya C.C. (Jpn)</description>
+		<year>2000</year>
+		<publisher>Natsume</publisher>
+		<info name="serial" value="DMG-BGBJ-JPN"/>
+		<info name="release" value="20000811"/>
+		<info name="alt_title" value="所さんの世田谷CC"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A06-01" />
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
-				<rom name="dmg-a5bj-0.u1" size="1048576" crc="e620fae2" sha1="cd3f8015e5b708f1eb14c374042a1701eeaafc4f" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokecardj" cloneof="pokecard">
-		<!-- Notes: SGB enhanced -->
-		<description>Pokémon Card GB (Jpn)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-ACXJ-JPN"/>
-		<info name="release" value="19981218"/>
-		<info name="alt_title" value="ポケモンカードGB"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="" />
-			<feature name="slot" value="rom_huc1" />
-			<dataarea name="rom" size="1048576">
-				<rom name="dmg-acxj-0.u1" size="1048576" crc="1926f570" sha1="2287627c5b4d56bd9a01aab83408c301b9cf1a6c" offset="000000" />
-			</dataarea>
-			<dataarea name="ram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dquest12" cloneof="dwarr12">
-		<!-- Notes: SGB enhanced -->
-		<description>Dragon Quest I &amp; II (Jpn)</description>
-		<year>1999</year>
-		<publisher>Enix</publisher>
-		<info name="serial" value="DMG-AEDJ-JPN"/>
-		<info name="release" value="19990923"/>
-		<info name="alt_title" value="ドラゴンクエストI・II"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A08-01" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="2097152">
-				<rom name="dmg-aedj-0.u1" size="2097152" crc="a053b42e" sha1="8cfdfb7a76dd0012af3b441e162fcd37e4370958" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gbgall3j" cloneof="gwatch3">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>Game Boy Gallery 3 (Jpn)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-AGQJ-JPN"/>
-		<info name="release" value="19990408"/>
-		<info name="alt_title" value="ゲームボーイギャラリー3"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-Z02-01" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="dmg-agqj-0.u1" size="1048576" crc="149f807e" sha1="18c3e0a015fa79c8694b8554e3c46fd67f034c71" offset="000000" />
+				<rom name="dmg-bgbj-0.u1" size="1048576" crc="9139e307" sha1="f38d776ff74d02c2edce0dcbc84edd5601ee315a" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -3576,19 +3810,18 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 		</part>
 	</software>
 
-	<software name="ohasuynr">
-		<!-- Notes: SGB enhanced -->
-		<description>Ohasuta Yama-chan &amp; Raymond (Jpn)</description>
+	<software name="vigilnt8">
+		<!-- Notes: GBC only, Rumble support -->
+		<description>Vigilante 8 (USA)</description>
 		<year>1999</year>
-		<publisher>Epoch</publisher>
-		<info name="serial" value="DMG-AOSJ-JPN"/>
-		<info name="release" value="19990312"/>
-		<info name="alt_title" value="おはスタ やまちゃん&amp;レイモンド"/>
+		<publisher>Vatical Entertainment</publisher>
+		<info name="serial" value="CGB-VV8E-USA"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A07-01" />
+			<feature name="pcb" value="DMG-A10-01" />
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="262144">
-				<rom name="dmg-aosj-0.u1" size="262144" crc="840ef32f" sha1="373166bc65dd9b6c5734add30a8d278986fc9c98" offset="000000" />
+			<feature name="rumble" value="yes" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgb-vv8e-0" size="1048576" crc="d1a188dc" sha1="4e4ce54c06e8f71ba6e0d8fc8550c177dcf660fd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3613,161 +3846,25 @@ List of roms where only incomplete pcb data is available (no clear photo, relyin
 		</part>
 	</software>
 
-	<software name="bistrogf">
-		<!-- Notes: SGB enhanced, also released by NP in 2000-10 -->
-		<description>Kakutou Ryouri Densetsu Bistro Recipe - Gekitou Foodon Battle Hen (Jpn)</description>
-		<year>1999</year>
-		<publisher>Banpresto</publisher>
-		<info name="serial" value="DMG-AWRJ-JPN"/>
-		<info name="release" value="19991008"/>
-		<info name="alt_title" value="格闘料理伝説ビストロレシピ 激闘★フードンバトル編"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A06-01" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="dmg-awrj-0.u1" size="1048576" crc="459a126b" sha1="6a972325c07687b51fe6dbb3813bf54e1721668f" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kinnibn2">
-		<!-- Notes: SGB enhanced -->
-		<description>Kinniku Banzuke GB2 - Mezase! Muscle Champion (Jpn)</description>
-		<year>2000</year>
-		<publisher>Konami</publisher>
-		<info name="serial" value="DMG-B6KJ-JPN (RK213-J1)"/>
-		<info name="release" value="20000810"/>
-		<info name="alt_title" value="筋肉番付GB2 〜目指せ!マッスルチャンピオン!〜"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A08-01" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="2097152">
-				<rom name="dmg-b6kj-0.u1" size="2097152" crc="42de9092" sha1="5ea803b820ff865a4470d7f82b36da6b82f3caec" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tokoro">
-		<description>Tokoro-san no Setagaya C.C. (Jpn)</description>
-		<year>2000</year>
-		<publisher>Natsume</publisher>
-		<info name="serial" value="DMG-BGBJ-JPN"/>
-		<info name="release" value="20000811"/>
-		<info name="alt_title" value="所さんの世田谷CC"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A06-01" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="dmg-bgbj-0.u1" size="1048576" crc="9139e307" sha1="f38d776ff74d02c2edce0dcbc84edd5601ee315a" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kindajik">
-		<!-- Notes: SGB enhanced -->
-		<description>Kindaichi Shounen no Jikenbo - 10nenme no Shoutaijou (Jpn)</description>
-		<year>2000</year>
-		<publisher>Banpresto</publisher>
-		<info name="serial" value="DMG-BKSJ-JPN"/>
-		<info name="release" value="20001216"/>
-		<info name="alt_title" value="金田一少年の事件簿 〜10年目の招待状〜"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A08-10" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="2097152">
-				<rom name="dmg-bksj-0.u1" size="2097152" crc="de52ffdc" sha1="468ea148eb15eac3b771a2520e0b5248ea5085a1" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="phantomz">
-		<!-- Notes: SGB enhanced -->
-		<description>Phantom Zona - Kaijin Zona (Jpn)</description>
-		<year>2000</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-BKZJ-JPN"/>
-		<info name="release" value="20001021"/>
-		<info name="alt_title" value="怪人ゾナー"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A03-10" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="2097152">
-				<rom name="dmg-bkzj-0.u1" size="2097152" crc="3e43f25f" sha1="bf2162f970a9dbb658afbdd7354155768daa96b1" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="onepyumea" cloneof="onepyume">
-		<!-- Notes: SGB enhanced -->
-		<description>From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Jpn)</description>
+	<software name="zeldaseau" cloneof="zeldasea">
+		<!-- Notes: GBC only -->
+		<description>The Legend of Zelda - Oracle of Seasons (Aus, USA)</description><!-- only USA confirmed -->
 		<year>2001</year>
-		<publisher>Banpresto</publisher>
-		<info name="serial" value="DMG-BLUJ-JPN"/>
-		<info name="release" value="20010427"/>
-		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生!"/>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="CGB-AZ7U-AUS, CGB-AZ7E-USA"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="pcb" value="DMG-A06-10" />
+			<feature name="u1" value="U1 2M/4M/8M MROM" />
+			<feature name="u2" value="U2 MBC-5" />
+			<feature name="u3" value="U3 64K SRAM" />
+			<feature name="u4" value="U4 MM1134A" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
-			<dataarea name="rom" size="4194304">
-				<rom name="dmg-bluj-0.u1" size="4194304" crc="c693aa37" sha1="459f1ae41f6c5c6464745a23ea42bbba5385a83b" offset="000000" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cgb-az7e-0.u1" size="1048576" crc="d7e9f5d7" sha1="ba1268290fb2b1b70505d2d7b5825fc8a4816a4b" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="telefngp">
-		<description>Keitai Denjuu Telefang - Power Version (Jpn)</description>
-		<year>2000</year>
-		<publisher>Natsume</publisher>
-		<info name="serial" value="DMG-BTXJ-JPN"/>
-		<info name="release" value="20001103"/>
-		<info name="alt_title" value="携帯電獣テレファング パワー・バージョン"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-KGDU-10" />
-			<feature name="slot" value="rom_mbc3" />
-			<feature name="rtc" value="yes" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="2097152">
-				<rom name="dmg-btxj-0.u1" size="2097152" crc="8b61cfcc" sha1="baaf7fb9f9958ca22982ba0600bc0cb8a7fc4764" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="onepglin">
-		<!-- Notes: SGB enhanced -->
-		<description>From TV Animation One Piece - Maboroshi no Grand Line Boukenki! (Jpn)</description>
-		<year>2002</year>
-		<publisher>Banpresto</publisher>
-		<info name="serial" value="DMG-BZOJ-JPN"/>
-		<info name="release" value="20020628"/>
-		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 幻のグランドライン冒険記!"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-A03-10" />
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="4194304">
-				<rom name="dmg-bzoj-0.u1" size="4194304" crc="a7317bb8" sha1="7fa5fbb94390876dee807216c2097cdb42510efe" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -5573,20 +5670,6 @@ List of unconfirmed retail cartridge roms
 				<rom name="bomberman quest (usa).bin" size="1048576" crc="a089c656" sha1="4436f6ee03f7a8b2f235b64e26400c0e951d8a3a" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bombmsel">
-		<!-- Notes: GBC only -->
-		<description>Bomberman Selection (Kor)</description>
-		<year>2003</year>
-		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="CGB-B2CK-KOR"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1col" />
-			<dataarea name="rom" size="1048576">
-				<rom name="bomberman selection (korea).bin" size="1048576" crc="af2b426e" sha1="52451464a9f4dd5faefe4594954cbce03bff0d05" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14108,7 +14191,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="metafght">
+	<software name="metafght" cloneof="bmaster">
 		<!-- Notes: GBC only -->
 		<description>Meta Fight EX (Jpn)</description>
 		<year>2000</year>
@@ -14429,24 +14512,6 @@ List of unconfirmed retail cartridge roms
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="4194304">
 				<rom name="mizuki shigeru no shin youkaiden (japan).bin" size="4194304" crc="fc1f100f" sha1="ab12770558fb95434bba0da0d3b8a91e2d9179fb" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- when it checks for the connection, it checks for a value of 06 in C27D -->
-	<software name="mobiltrn" supported="partial">
-		<!-- Notes: GBC only -->
-		<description>Mobile Trainer (Jpn)</description>
-		<year>2001</year>
-		<publisher>Nintendo</publisher>
-		<info name="alt_title" value="モバイルトレーナー"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="2097152">
-				<rom name="mobile trainer (japan).bin" size="2097152" crc="7226ead0" sha1="ecc0579edeaf9eccd722d605cc288cd023c8576a" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -16347,42 +16412,6 @@ List of unconfirmed retail cartridge roms
 				<rom name="pocket lure boy (japan).bin" size="1048576" crc="35a29628" sha1="2cc7337a2b6ac37238ac1cdaf8e7966bd9493295" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokeeun" cloneof="pokesilv">
-		<!-- Notes: GBC only -->
-		<description>Pocket Monsters Eun (Kor)</description>
-		<year>2002</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="CGB-AAXK-KOR"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc3" />
-			<feature name="rtc" value="yes" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="2097152">
-				<rom name="pocket monsters eun (korea).bin" size="2097152" crc="9cc1f90f" sha1="cb22d7e03a74dc3a563fde6be8626626b2b392e7" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokegeum" cloneof="pokegold">
-		<!-- Notes: GBC only -->
-		<description>Pocket Monsters Geum (Kor)</description>
-		<year>2002</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="CGB-AAUK-KOR"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc3" />
-			<feature name="rtc" value="yes" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="2097152">
-				<rom name="pocket monsters geum (korea).bin" size="2097152" crc="249a7a66" sha1="c0ff3999e1093e1af59ef3eea3f1bfd7c1f18a65" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -18446,26 +18475,11 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="rocketp">
-		<!-- Notes: GBC only -->
-		<description>Rocket Power - Gettin' Air (Euro, USA)</description>
-		<year>2001</year>
-		<publisher>THQ;</publisher>
-		<info name="serial" value="CGB-BRUP-EUR, CGB-BRUE-USA"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="1048576">
-				<rom name="rocket power - gettin' air (usa).bin" size="1048576" crc="7025eb63" sha1="d9c5c22f1f5a2a922cb2b39d5e8f3df31c1155d7" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rocketpf" cloneof="rocketp">
 		<!-- Notes: GBC only -->
 		<description>Rocket Power - La Glisse de l'Extreme (Fra)</description>
 		<year>2001</year>
-		<publisher>THQ;</publisher>
-		<info name="serial" value="??"/>
+		<publisher>THQ</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -22848,7 +22862,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="zeldadai">
+	<software name="zeldadai" cloneof="zeldasea">
 		<!-- Notes: GBC only -->
 		<description>Zelda no Densetsu - Fushigi no Kinomi - Daichi no Shou (Jpn)</description>
 		<year>2001</year>
@@ -22867,7 +22881,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="zeldajik">
+	<software name="zeldajik" cloneof="zeldaage">
 		<!-- Notes: GBC only -->
 		<description>Zelda no Densetsu - Fushigi no Kinomi - Jikuu no Shou (Jpn)</description>
 		<year>2001</year>
@@ -23133,7 +23147,7 @@ List of unconfirmed non retail roms
 	<software name="pocknaka">
 		<!-- Notes: GBC only -->
 		<description>Poketto no Naka no Ookoku (Jpn, Prototype)</description>
-		<year>2000</year><!-- scheduled to be released January 2001 (3/11/2000 Famitsu) -->
+		<year>2000</year><!-- scheduled to be released January 2001 (2000-11-03 Famitsu) -->
 		<publisher>Hector</publisher>
 		<info name="alt_title" value="ポケットの中の王国"/>
 		<part name="cart" interface="gameboy_cart">
@@ -23538,7 +23552,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 	<software name="mc_8in1">
 		<description>8 in 1 (Tw)</description>
-		<year>19??</year>
+		<year>1999</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="??"/>
 		<part name="cart" interface="gameboy_cart">
@@ -24408,7 +24422,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- This got ripped by m_digi10 -->
+<!-- This got ripped from m_digi10 -->
 	<software name="digid3">
 		<description>Chao Jin Hua - Shu Ma Bao Bei D-3 (Chi, Ripped from 10 in 1 multicart)</description>
 		<year>200?</year>
@@ -24456,7 +24470,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- this is a sprite hack (based on Golden Sun by Camelot) of another sintax game "Castlevania DX", currently undumped -->
+<!-- this is a sprite hack (based on Golden Sun by Camelot) of another Sintax game "Castlevania DX", currently undumped -->
 <!-- ingame title uses 黃金の太陽, so I romanized it in the Jpn way rather than in the Chinese way... -->
 	<software name="hjtaiyou">
 		<description>Pian Wai Zhang Huang Jin no Taiyou - Feng Yin De Yuan Gu Lian Jin Shu (Chi)</description>
@@ -24473,7 +24487,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- this is a sprite hack (based on Dragon Quest by Enix) of another sintax game "Castlevania DX", currently undumped -->
+<!-- this is a sprite hack (based on Dragon Quest by Enix) of another Sintax game "Castlevania DX", currently undumped -->
 	<software name="dquest8">
 		<description>Yong Zhe Dou E Long VIII (Chi)</description>
 		<year>200?</year>
@@ -25642,10 +25656,10 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 	</software>
 
 	<software name="sqsd">
-		<!-- Alt. Title: 石器時代 精靈王誕生 (Stone Age - Birth of the Goblin King) -->
 		<description>Shi Qi Shi Dai - Jing Ling Wang Dan Sheng (Chi)</description>
 		<year>20??</year>
 		<publisher>GOWIN</publisher>
+		<info name="alt_title" value="石器時代 精靈王誕生 (Stone Age - Birth of the Goblin King)"/>
 		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_yong" />
@@ -25916,6 +25930,8 @@ but the 256KB version is definitely underdumped and misses sprite data
 <!-- TO BE VERIFIED: all of these files have the same first half and *very* similar second half (~99%). Hard to say which is good though -->
 <!-- Once sorted out what is good and what not, the entry should be moved among the Sintax games above! -->
 	<software name="mslug2k1">
+		<!-- 越南戰役2001 (簡) (Windy) -->
+		<!-- seems to be a Simplified Chinese translation of the below -->
 		<!-- probably developed by BDD -->
 		<description>Metal Slug 2001 (Chi)</description>
 		<year>20??</year>
@@ -25931,43 +25947,43 @@ but the 256KB version is definitely underdumped and misses sprite data
 		</part>
 	</software>
 
+<!--
+There are various dumps of this:
+"a1" version (CRC 424cea4a) which has a bad internal checksum (0xf6b1)
+"a2" version (CRC bf0028d9) which has a fixed internal checksum (0xf527)
+
+Both have the ROM type set to "ROM + MBC5 + RAM + Battery" and a 32KB SRAM set. The
+"unknown" set is set to "ROM + MBC5", no SRAM and has a bad header checksum (0xbe).
+This means that it needs the BIOS check disabled.
+
+The name "Metal Slug 2001" comes from the name in the header, "METAL SLUG 2". A
+more literal translation is "Vietnam Battle 2001".
+-->
 	<software name="mslug2k1a" cloneof="mslug2k1">
+		<!-- 越南戰役2001 (繁) (unknown) -->
 		<!-- probably developed by BDD -->
-		<description>Metal Slug 2001 (Chi, Alt 1)</description>
+		<description>Metal Slug 2001 (Chi, Alt)</description>
 		<year>20??</year>
 		<publisher>Sintax</publisher>
+		<info name="alt_title" value="越南戰役2001"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
-				<rom name="metal slug 2001 (unl) (a1).bin" size="1048576" crc="424cea4a" sha1="d8ea5abeb33e19ddfea3102f009e45ba9293ce76" offset="000000" />
+				<rom name="yuenan zhanyi 2001 (fan) (unknown).bin" size="1048576" crc="ed3520d6" sha1="097b9cf5e0afdbe990999995b2f203ac749f9a94" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
 		</part>
 	</software>
 
+<!-- Title hack of the above -->
 	<software name="mslug2k1b" cloneof="mslug2k1">
 		<!-- probably developed by BDD -->
-		<description>Metal Slug 2001 (Chi, Alt 2)</description>
+		<description>Teshu Budui 2001 (Chi)</description>
 		<year>20??</year>
-		<publisher>Sintax</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="metal slug 2001 (unl) (a2).bin" size="1048576" crc="bf0028d9" sha1="99f536400bb99892b736f66305e1b11d8229c668" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mslug2k1c" cloneof="mslug2k1">
-		<!-- probably developed by BDD -->
-		<description>Metal Slug 2001 (Chi, Alt 3)</description>
-		<year>20??</year>
-		<publisher>Sintax</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="特殊部队2001"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->

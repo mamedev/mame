@@ -42,7 +42,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 
 
   Region codes:
-  A - NTSC region
+  A - NTSC region (Asia?)
   E - USA
   D - Germany
   F - France
@@ -54,7 +54,6 @@ Info on N64 chip labels (from The Cart Scan Repository)
 
 <!-- List of confirmed carts (info from pictures) -->
 <softwarelist name="n64" description="Nintendo 64 cartridges">
-
 	<software name="007goldnu" cloneof="007goldn">
 		<description>007 - GoldenEye (USA)</description>
 		<year>1997</year>
@@ -1186,7 +1185,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Super Mario 64 (USA, Hong Kong)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NSME-USA, NUS-NSME-HKG"/>
+		<info name="serial" value="NUS-NSME-(USA/HKG)"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
 			<feature name="u1" value="NUS-NSME-0" />
@@ -1250,6 +1249,23 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nthd-1.u1" size="12582912" crc="1878086f" sha1="9786f138231509156bf23b1e9f1c327acec89b41" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2u" cloneof="toystor2">
+		<description>Toy Story 2 (USA, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="NUS-NTHE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NTHE-1" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nthe-1.u1" size="12582912" crc="a11f0f8e" sha1="e0cd3699fd9f5443d3dfa2333726eaea724d892d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1582,23 +1598,6 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="33554432">
 				<rom name="nus-czle-0.u1" size="33554432" crc="ec95702d" sha1="79a4f053d34018e59279e6d4b83c7daccd985c87" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- List of semi-confirmed carts (from Zapatabase, information incomplete) -->
-	<software name="blastcrpu1" cloneof="blastcrp">
-		<description>Blast Corps (USA)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NBCE-USA"/>
-		<part name="cart" interface="n64_cart">
-			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="NUS-NBCE-0" />
-			<feature name="u2" value="" /><!-- blank slot? -->
-			<feature name="u3" value="CIC-NUS-6102" />
-			<dataarea name="rom" size="8388608">
-				<rom name="nus-nbce-0.u1" size="8388608" crc="22ca221d" sha1="a6ad7fff57b10b782cede51d4558e19ad134f019" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2364,6 +2363,17 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="blast corps (usa) (rev a).bin" size="8388608" crc="23d415f8" sha1="80e5365bd5ee8388e38a04b23bf3db9b5e4bf06b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blastcrpu1" cloneof="blastcrp">
+		<description>Blast Corps (USA)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="blast corps (usa).bin" size="8388608" crc="22ca221d" sha1="a6ad7fff57b10b782cede51d4558e19ad134f019" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10405,17 +10415,6 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="toystor2u" cloneof="toystor2">
-		<description>Toy Story 2 (USA, Rev. A)</description>
-		<year>1999</year>
-		<publisher>Activision</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="toy story 2 (usa) (rev a).bin" size="12582912" crc="a11f0f8e" sha1="e0cd3699fd9f5443d3dfa2333726eaea724d892d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="toystor2ua" cloneof="toystor2">
 		<description>Toy Story 2 (USA)</description>
 		<year>1999</year>
@@ -11777,17 +11776,6 @@ patched out (+ a fix for internal checksum)
 
 <!-- Non game cartridges -->
 
-	<software name="arp64a" cloneof="arp64" supported="no">
-		<description>Action Replay Pro 64 (Euro, v3.0)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="action replay pro 64 (europe) (v3.0) (unl).bin" size="262144" crc="c992dfb4" sha1="d5e4e8c875d6bda0afafb1b2513b16b1cb88dfc1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="arp64" supported="no">
 		<description>Action Replay Pro 64 (Euro, v3.3)</description>
 		<year>19??</year>
@@ -11795,6 +11783,17 @@ patched out (+ a fix for internal checksum)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="action replay pro 64 (europe) (v3.3) (unl).bin" size="262144" crc="9fbabfda" sha1="c3426114f5da1fb7abde15a766d362698ad07166" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arp64a" cloneof="arp64" supported="no">
+		<description>Action Replay Pro 64 (Euro, v3.0)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="action replay pro 64 (europe) (v3.0) (unl).bin" size="262144" crc="c992dfb4" sha1="d5e4e8c875d6bda0afafb1b2513b16b1cb88dfc1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11821,24 +11820,24 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
-	<software name="gsharka" cloneof="arp64" supported="no">
-		<description>GameShark Pro (USA, v2.0)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="gameshark pro (usa) (v2.0) (unl).bin" size="262144" crc="ef9edf87" sha1="19148a009ef8e1013ab35c8141781184b141699f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gshark" cloneof="arp64" supported="no">
+	<software name="gshark" supported="no">
 		<description>GameShark Pro (USA, v3.3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="gameshark pro (usa) (v3.3) (unl).bin" size="262144" crc="7cc07bbc" sha1="3b5046ae8129fd226eb7b02bc2c26cc7548fe6f2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gsharka" cloneof="gshark" supported="no">
+		<description>GameShark Pro (USA, v2.0)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="gameshark pro (usa) (v2.0) (unl).bin" size="262144" crc="ef9edf87" sha1="19148a009ef8e1013ab35c8141781184b141699f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

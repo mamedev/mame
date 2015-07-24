@@ -1257,7 +1257,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-<!-- does this need RTC too? -->
+<!-- needs RTC -->
 	<software name="sennenkz" supported="no">
 		<description>Sennen Kazoku (Jpn)</description>
 		<year>2005</year>
@@ -1621,7 +1621,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="AGB-BOCE-USA, AGB-BOCP-EUR"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-" />
+			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH" /><!-- 39VF512 -->
 
@@ -1633,10 +1633,10 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="wariotws">
-		<description>WarioWare - Twisted! (USA)</description>
+		<description>WarioWare - Twisted! (USA, Aus?)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-RZWE-USA"/>
+		<info name="serial" value="AGB-RZWE-(USA/AUS)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-MOM-01" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -1998,8 +1998,8 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<info name="serial" value="AGB-MSHE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-40" />
-
 			<feature name="u1" value="U1 GPIO MASKROM" />
+
 			<dataarea name="rom" size="33554432">
 				<rom name="agb-mshe-0.u1" size="33554432" crc="363c3eb8" sha1="dc4c959a7740315d892633869f7fc6382aadbb0e" offset="000000" />
 			</dataarea>
@@ -2285,6 +2285,27 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="16777216">
 				<rom name="pokemon - sapphire version (europe) (rev 1).bin" size="16777216" crc="bafedae5" sha1="4722efb8cd45772ca32555b98fd3b9719f8e60a9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokesaphj" cloneof="pokesaph">
+		<description>Pocket Monsters - Sapphire (Jpn)</description>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="AGB-AXPJ-JPN"/>
+		<info name="release" value="20021121"/>
+		<info name="alt_title" value="ポケットモンスター サファイア"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E05-01" />
+			<feature name="u1" value="U1 GPIO MASK ROM" />
+			<feature name="u2" value="1M/512K FLASH U2" />
+			<feature name="u3" value="U3 RTC" />
+			<feature name="bt1" value="CR1616" />
+
+			<feature name="slot" value="gba_flash_1m" />
+			<dataarea name="rom" size="8388608">
+				<rom name="pocket monsters - sapphire (japan).bin" size="8388608" crc="fd1eeb78" sha1="3233342c2f3087e6ffe6c1791cd5867db07df842" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4584,7 +4605,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="jimnvsjng" cloneof="jimnvsjn">
-		<description>Jimmy Neutron Boy Genius vs. Jimmy Negatron (Ger)</description>
+		<description>Jimmy Neutron vs. Jimmy Negatron (Ger)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -4595,7 +4616,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="jimnvsjngp" cloneof="jimnvsjn">
-		<description>Jimmy Neutron vs. Jimmy Negatron (Ger, Prototype)</description>
+		<description>Jimmy Neutron vs. Jimmy Negatron (Ger, Prototype v201D)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -14243,7 +14264,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<description>Finding Nemo (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-AZIE-USA, AGB-AZIP"/>
+		<info name="serial" value="AGB-AZIE-USA, AGB-AZIP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="finding nemo (usa, europe).bin" size="8388608" crc="3b098667" sha1="a0c98d05b0854bb724f1ea5df89f19f77e6beb79" offset="000000" />
@@ -27264,21 +27285,6 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="pokesaphj" cloneof="pokesaph">
-		<description>Pocket Monsters - Sapphire (Jpn)</description>
-		<year>2002</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AXPJ-JPN"/>
-		<info name="release" value="20021121"/>
-		<info name="alt_title" value="ポケットモンスター サファイア"/>
-		<part name="cart" interface="gba_cart">
-			<feature name="slot" value="gba_flash_1m" />
-			<dataarea name="rom" size="8388608">
-				<rom name="pocket monsters - sapphire (japan).bin" size="8388608" crc="fd1eeb78" sha1="3233342c2f3087e6ffe6c1791cd5867db07df842" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pcketprf">
 		<description>Pocket Professor - Kwik Notes - Vol. 1 (USA)</description>
 		<year>2006</year>
@@ -29487,7 +29493,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="rcktpwbbp" cloneof="rcktpwbb">
-		<description>Rocket Power - Beach Bandits (USA, Prototype V0.14)</description>
+		<description>Rocket Power - Beach Bandits (USA, Prototype v0.14)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">

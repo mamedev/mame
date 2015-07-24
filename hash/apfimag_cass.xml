@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="apfimag_cass" description="APF Imagination cassettes">
+<softwarelist name="apfimag_cass" description="APF Imagination Machine cassettes">
 
 <!-- To load a tape, just start APF Imagination with the BASIC cart inserted, and type CLOAD followed by <Return>
 (by default mapped to your ']' key). Then start the tape from the Internal UI and press <Return>.
@@ -10,6 +10,11 @@ If you don't press <Return>, the system won't read the tape (this is fairly unus
 
 Once the tape has finished loading, just type RUN to start the loaded program -->
 
+<!-- There also exists (undumped):
+Typing Tutor course [...] gives you instructions through the built-in speaker,
+then tests your skill at duplicating the keys shown on the TV screen.
+Speed and accuracy is then scored and you're retested on weakest keys.
+(Popular Science, May 1980, page 18) -->
 
 <!-- Games & Programs -->
 
@@ -496,12 +501,13 @@ checks whether the user is typing the program printed in the manual, for each le
 	</software>
 
 	<software name="froggy" supported="no">
-		<description>Froggy (Bad?)</description>
+		<description>Froggy on the Freeway!!</description>
 		<year>198?</year>
 		<publisher>E. Beckett</publisher>
+		<info name="usage" value="Wait 2 seconds before pressing 'RETURN'"/>
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="1224492">
-				<rom name="e_beckett_froggy.wav" size="1224492" crc="ef0bf4b9" sha1="b35f53062117c98fbff2903cbd9ae52df91bf80e" offset="0" />
+				<rom name="e_beckett_froggy.wav" size="1224492" crc="ef0bf4b9" sha1="b35f53062117c98fbff2903cbd9ae52df91bf80e" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -529,11 +535,11 @@ checks whether the user is typing the program printed in the manual, for each le
 		</part>
 	</software>
 
-<!-- glitched gfx -->
-	<software name="gskull" supported="partial">
+	<software name="gskull">
 		<description>GraySkull</description>
 		<year>1984</year>
 		<publisher>G. Karabin</publisher>
+		<info name="usage" value="Wait 3 seconds before pressing 'RETURN'"/>
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="2033578">
 				<rom name="g_karabin_greyskull.wav" size="2033578" crc="977a672d" sha1="d35924b4b64d085a1b9e122d34ed2bcff6310898" offset="0" />

@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<softwarelist name="osborne1" description="Osborne-1 floppies">
+<softwarelist name="osborne1" description="Osborne-1 disk images">
 
 	<software name="amcall">
-		<description>AMCALL (v2.06)</description>
+		<description>Auto MicroCALL Communications Program (2.06 OSBORNE-1 (TP))</description>
 		<year>1982</year>
 		<publisher>MicroCALL Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -18,10 +17,10 @@
 		<description>AMCALL (v2.06, Alt)</description>
 		<year>1982</year>
 		<publisher>MicroCALL Services</publisher>
+		<info name="part_number" value="2B50002-00" />
 		<info name="usage" value="Requires CP/M disk in drive A"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="1113" />
-			<feature name="part_number" value="2B50002-00" />
 			<dataarea name="flop" size="71587">
 				<rom name="amcall.imd" size="71587" crc="9f767e1d" sha1="aef5a9496312f2380d3f8b8bec22bb07fe51c76b" offset="0" />
 			</dataarea>
@@ -42,7 +41,7 @@
 	</software>
 
 	<software name="mileston">
-		<description>Milestone (Rev 1.09)</description>
+		<description>Milestone (v1.09)</description>
 		<year>1981</year>
 		<publisher>Organic Software</publisher>
 		<info name="usage" value="Requires CP/M disk in drive A"/>
@@ -55,7 +54,7 @@
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Sample Data Files" />
+			<feature name="disk_label" value="Sample Data Files" />
 			<dataarea name="flop" size="16021">
 				<rom name="milstn-2.imd" size="16021" crc="0c20006d" sha1="0666ad4b1e29d473bc95b19b7566f3dd5ce67e64" offset="0" />
 			</dataarea>
@@ -122,8 +121,8 @@
 		</part>
 	</software>
 
-	<software name="actcpm">
-		<description>60K CP/M vers 2.20 for Osborne </description>
+	<software name="60kcpm">
+		<description>60K CP/M for Osborne I (v2.20)</description>
 		<year>19??</year>
 		<publisher>Australian Computer &amp; Telecommunications</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -134,7 +133,7 @@
 	</software>
 
 	<software name="basic80">
-		<description>BASIC-80 (Rev. 5.21)</description>
+		<description>BASIC-80 (Rev. 5.21, CPM Version)</description>
 		<year>1981</year>
 		<publisher>Microsoft</publisher>
 		<info name="release" value="19810529"/>
@@ -146,7 +145,7 @@
 	</software>
 
 	<software name="dbase2">
-		<description>dBase II (v2.3)</description>
+		<description>dBase II (v2.3, 19820106)</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="release" value="19820106"/>
@@ -160,8 +159,7 @@
 	<software name="mdm740">
 		<description>MDM740 modem program</description>
 		<year>1984</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="programmer" value="Irvin M. Hoff"/>
+		<publisher>Irvin M. Hoff</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="46928">
 				<rom name="os1mdm7.td0" size="46928" crc="2a6383d2" sha1="bf31f5cf2852744f661d20a8f7c6b57993b7c9b6" offset="0" />
@@ -215,7 +213,7 @@
 	</software>
 
 	<software name="wordstar">
-		<description>Wordstar (rel. 2.26)</description>
+		<description>MicroPro WordStar (r2.26, serial WY4432FG)</description>
 		<year>1981</year>
 		<publisher>Micropro International</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -243,7 +241,6 @@
 		<year>1983</year>
 		<publisher>Osmosis Computer</publisher>
 		<info name="release" value="198303??"/>
-
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="1690" />
 			<feature name="disk_label" value="Osmosis CP/M Disk Emulation System for the Osborne 1 Microcomputer" />
@@ -258,7 +255,6 @@
 		<year>1982</year>
 		<publisher>Osmosis Computer</publisher>
 		<info name="release" value="198210??"/>
-
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="2121" />
 			<feature name="disk_label" value="Double Density Distribution" />
@@ -269,7 +265,7 @@
 	</software>
 
 	<software name="rt60a" supported="no">
-		<description>RT-60A Real Time Clock Software (v2.7)</description>   <!-- for the RT-60A Real Time Clock, rom dump needed -->
+		<description>RT-60A Real Time Clock Software (v2.7)</description> <!-- for the RT-60A Real Time Clock, rom dump needed? -->
 		<year>19??</year>
 		<publisher>JG Communications</publisher>
 		<part name="flop1" interface="floppy_5_25">

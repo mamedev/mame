@@ -787,7 +787,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<description>Family Computer Golf U.S. Course</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="FSC-GFUE"/>
+		<info name="serial" value="FSC-GFUE"/><!-- also "FSC-GSUE"? -->
 		<info name="release" value="19870614"/>
 		<info name="alt_title" value="ゴルフ ユーエス コース"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1252,23 +1252,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 <!-- Save Disk Error -->
-	<software name="zelda2a" cloneof="zelda2" supported="no">
-		<description>Link no Bouken - The Legend of Zelda 2 (v1.0)</description>
-		<year>1987</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="FMC-LNK"/>
-		<info name="release" value="19870114"/>
-		<info name="alt_title" value="リンクの冒険"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="131000">
-				<rom name="link no bouken - the legend of zelda 2 (japan) (v1.0).fds" size="131000" crc="2d9d88c0" sha1="0fde8404f6cec68a29d339993edc8a82abade409" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Save Disk Error -->
 	<software name="zelda2" supported="no">
-		<description>Link no Bouken - The Legend of Zelda 2 (v1.1)</description>
+		<description>The Legend of Zelda 2 - Link no Bouken (v1.1)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-LNK"/>
@@ -1277,6 +1262,21 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="link no bouken - the legend of zelda 2 (japan) (v1.1).fds" size="131000" crc="1187fe3d" sha1="8877321f1fda7d54bf2468dd6f5e36d321cbcce1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Save Disk Error -->
+	<software name="zelda2a" cloneof="zelda2" supported="no">
+		<description>The Legend of Zelda 2 - Link no Bouken (v1.0)</description>
+		<year>1987</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="FMC-LNK"/>
+		<info name="release" value="19870114"/>
+		<info name="alt_title" value="リンクの冒険"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="131000">
+				<rom name="link no bouken - the legend of zelda 2 (japan) (v1.0).fds" size="131000" crc="2d9d88c0" sha1="0fde8404f6cec68a29d339993edc8a82abade409" offset="0" />
 			</dataarea>
 		</part>
 	</software>

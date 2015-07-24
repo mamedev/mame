@@ -13,7 +13,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 
 <!-- Games -->
 
-	<software name="abusimbl" supported="no">
+	<software name="abusimbl">
 		<description>Abu Simbel</description>
 		<year>19??</year>
 		<publisher>Dynamic Soft Program / Alco%.Soft</publisher>
@@ -24,7 +24,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="breakout" supported="no">
+	<software name="breakout">
 		<description>Break out-800</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35,7 +35,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="cyrus" supported="no">
+	<software name="cyrus">
 		<description>Cyrus is Chess</description>
 		<year>1987</year>
 		<publisher>Intelligent Software</publisher>
@@ -47,7 +47,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="gps2" supported="no">
+	<software name="gps2">
 		<description>Grand Prix Simulator 2</description>
 		<year>19??</year>
 		<publisher>Proton Software</publisher>
@@ -58,7 +58,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="highway" supported="no">
+	<software name="highway">
 		<description>Highway</description>
 		<year>19??</year>
 		<publisher>Vortex Software/Ladinek Software</publisher>
@@ -69,7 +69,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="james" supported="no">
+	<software name="james">
 		<description>James v1.0c (Cz)</description>
 		<year>19??</year>
 		<publisher>Pilsoft</publisher>
@@ -94,12 +94,12 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 -->
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="20896">
-				<rom name="mucmac8oo.mzf" size="20896" crc="fab9b721" sha1="524e8855ae1dd36f013c4050924d0540f920d90d" offset="0" />
+				<rom name="mucmac800.mzf" size="20896" crc="fab9b721" sha1="524e8855ae1dd36f013c4050924d0540f920d90d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="800demo" supported="no">
+	<software name="800demo">
 		<description>MZ-800 Demo</description><!-- came with each MZ-800 -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -115,7 +115,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="pcgrally" supported="no">
+	<software name="pcgrally">
 		<description>PCG Rally</description>
 		<year>1983</year>
 		<publisher>Namco/HAL Laboratory</publisher>
@@ -126,7 +126,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="uridium" supported="no">
+	<software name="uridium">
 		<description>Uridium</description>
 		<year>1990</year>
 		<publisher>Hewson</publisher>
@@ -137,7 +137,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="wayotef" supported="no">
+	<software name="wayotef">
 		<description>The Way of the Exploding Fist (Cz)</description>
 		<year>1987</year>
 		<publisher>MiKrSoft</publisher>
@@ -150,7 +150,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 
 <!-- MZ-821 SHARP Basic Trainer (Germany) -->
 
-	<software name="egg" supported="no">
+	<software name="egg">
 		<description>Intellectual Game - Egg</description>
 		<year>1984</year>
 		<publisher>dB-SOFT</publisher>
@@ -159,7 +159,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 				<rom name="egg.bas.mzf" size="18896" crc="bd2da937" sha1="40d9683591824f369f705015e4188e4eaa2c16f6" offset="0" />
 			</dataarea>
 		</part>
-<!-- This came in the same zip. What is it? -->
+		<!-- This came in the same zip. What is it? -->
 		<part name="cass2" interface="mz_cass">
 			<dataarea name="cass" size="959">
 				<rom name="egg.obj.mzf" size="959" crc="eb6d293d" sha1="1a4a1e1841b921d9a01fdf2cc54c26bd3291c776" offset="0" />
@@ -167,7 +167,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		</part>
 	</software>
 
-	<software name="adrsdata" supported="no">
+	<software name="adrsdata">
 		<description>Adress Data</description>
 		<year>19??</year>
 		<publisher>BBG Software</publisher>

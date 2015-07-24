@@ -35,7 +35,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Bound High! (Jpn, USA, Prototype)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="VUE-VBHE-JPN, VUE-VBHE-USA"/>
+		<info name="serial" value="VUE-VBHE-(JPN/USA)"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="slot" value="vb_rom" />
 			<dataarea name="rom" size="2097152">
@@ -49,7 +49,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Galactic Pinball (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="VUE-VGPJ-JPN, VUE-VGPJ-USA"/>
+		<info name="serial" value="VUE-VGPJ-(JPN/USA)"/>
 		<info name="release" value="19950701 (JPN), 19950814 (USA)"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="slot" value="vb_rom" />
@@ -130,7 +130,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Mario Clash (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="VUE-VMCJ-JPN, VUE-VMCJ-USA"/>
+		<info name="serial" value="VUE-VMCJ-(JPN/USA)"/>
 		<info name="release" value="19950928 (JPN), 199510xx (USA)"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="slot" value="vb_rom" />
@@ -146,7 +146,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Mario's Tennis (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="VUE-VMTJ-JPN, VUE-VMTJ-USA"/>
+		<info name="serial" value="VUE-VMTJ-(JPN/USA)"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="slot" value="vb_rom" />
@@ -307,7 +307,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Teleroboxer (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="VUE-VTBJ-JPN, VUE-VTBJ-USA"/>
+		<info name="serial" value="VUE-VTBJ-(JPN/USA)"/>
 		<info name="release" value="19950721 (JPN), 19950814 (USA)"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="slot" value="vb_eeprom" />
@@ -492,7 +492,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<description>Virtual Boy Wario Land (USA) ~ Virtual Boy Wario Land - Awazon no Hihou (Jpn)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="VUE-VWCJ-JPN, VUE-VWCJ-USA"/>
+		<info name="serial" value="VUE-VWCJ-(JPN/USA)"/>
 		<info name="release" value="19951201 (JPN), 199511xx (USA)"/>
 		<part name="cart" interface="vboy_cart">
 			<feature name="slot" value="vb_eeprom" />

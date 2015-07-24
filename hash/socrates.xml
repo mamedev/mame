@@ -16,6 +16,7 @@ Undumped:
 		<description>Amazing Mazes</description>
 		<year>1989</year>
 		<publisher>Video Technology</publisher>
+		<info name="alt_title" value="Verwirrenden Labyrinthen (Ger); Super-Labyrinthes (Fra)"/>
 		<part name="cart" interface="socrates_cart">
 			<dataarea name="rom" size="0x20000">
 				<!-- Label: "(Vtech) 27-5050-00 // TC531000CP-L332 // (C)1989 VIDEO TECHNOLOGY // 8931EAI   JAPAN"; Alt label: "(Vtech) LH53101Y // (C)1989 VIDEO TECHNOLOGY // 8934 D"; cart has an orange QC stickse -->
@@ -40,6 +41,7 @@ Undumped:
 		<description>CAD Professor Maus</description>
 		<year>1989</year>
 		<publisher>Video Technology</publisher>
+		<info name="alt_title" value="Konstruieren mit Computerhilfe (Ger); Programme de Dao (Fra)"/>
 		<part name="cart" interface="socrates_cart">
 			<dataarea name="rom" size="0x20000">
 				<!-- Label: "(Vtech) 27-5044-00-0 // TC531000CP-L329 // (C)1989 VIDEO TECHNOLOGY // 8926EAI   JAPAN"; cart has a blue QC sticker -->
@@ -52,6 +54,7 @@ Undumped:
 		<description>Facts'N Fraction</description>
 		<year>1988</year>
 		<publisher>Video Technology</publisher>
+		<info name="alt_title" value="Welt der Bruchrechnungen (Ger); Fractions (Fra)"/>
 		<part name="cart" interface="socrates_cart">
 			<dataarea name="rom" size="0x20000">
 				<!-- Label: "(Vtech) 27-5001-00-0 // TC531000CP-L313 // (C)1988 VIDEO TECHNOLOGY // 8918EAI   JAPAN"; cart has a brown QC sticker -->
@@ -88,6 +91,7 @@ Undumped:
 		<description>Memory Mania (Rev. B)</description>
 		<year>1988</year>
 		<publisher>Video Technology</publisher>
+		<info name="alt_title" value="Gedächtnis-Training (Ger); Exercices de Memoire (Fra)"/>
 		<part name="cart" interface="socrates_cart">
 			<dataarea name="rom" size="0x20000">
 				<!-- Label: "(Vtech) 27-5002-00-0 // TC531000CP-L314 // (C)1988 VIDEO TECHNOLOGY // 8905EAI   JAPAN"; cart has a red QC sticker with a small B sticker on top of it, and the rom has a large B sticker; cart pcb shows signs of resoldering, which leads me to believe this is the B revision of the rom code for this game -->

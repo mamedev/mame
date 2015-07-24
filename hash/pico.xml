@@ -590,7 +590,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="STD 16M" />
 			<feature name="ic1" value="PICO-9839G" />
-			<dataarea name="flop" size="1048576">
+			<dataarea name="rom" size="1048576">
 				<rom name="pico-9839g.ic1" size="1048576" crc="d074b19e" sha1="970d04fd31f7a1ac88531a0df7ce3cd6453628d8" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -1676,7 +1676,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="STD 16M" />
 			<feature name="ic1" value="1242401" />
-			<dataarea name="flop" size="1048576">
+			<dataarea name="rom" size="1048576">
 				<rom name="1242401.ic1" size="1048576" crc="b27663e5" sha1="9343306c6f021274e1fb67cfebf1b4b19587724e" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -1952,7 +1952,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6586A" />
 			<feature name="ic1" value="MPR-17779 J19" />
-			<dataarea name="flop" size="1048576">
+			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17779 j19.ic1" size="1048576" crc="53f94256" sha1="9d9cdd8281e7dadb6668f35692e42fbde74d6349" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -1966,7 +1966,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6586A" />
 			<feature name="ic1" value="MPR-17780 J20" />
-			<dataarea name="flop" size="1048576">
+			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17780 j20.ic1" size="1048576" crc="659d7fee" sha1="d1e3e9d3dba32c39d53cfbe76f0d233ec36bab79" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -1980,7 +1980,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="" />
 			<feature name="ic1" value="PICO-9515I" />
-			<dataarea name="flop" size="2097152">
+			<dataarea name="rom" size="2097152">
 				<rom name="pico-9515i.ic1" size="2097152" crc="63e37ab9" sha1="a7ff319deaffbb27d732d86ad42458f26e4fcb12" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -2010,7 +2010,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6883A" />
 			<feature name="ic1" value="MPR-17858 J02" />
-			<dataarea name="flop" size="1048576">
+			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17858 j02.ic1" size="1048576" crc="1b46e52f" sha1="83f33c26ec829d85b3226f85b2e0da78f7f65ff2" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -4449,7 +4449,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="STD 16M" />
 			<feature name="ic1" value="1262413" />
-			<dataarea name="flop" size="1048576">
+			<dataarea name="rom" size="1048576">
 				<rom name="1262413.ic1" size="1048576" crc="9cb9d32b" sha1="e6022562d2b1c7448835d47b749ed57144397c9a" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
