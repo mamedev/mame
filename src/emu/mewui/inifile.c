@@ -237,25 +237,42 @@ void favorite_manager::add_favorite_game()
 	image_interface_iterator iter(machine().root_device());
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
-		// get the base name
-		if (image->basename() != NULL)
+		if (image->exists() && image->software_entry())
 		{
 			const software_info *swinfo = image->software_entry();
 			ui_software_info tmpmatches;
 			if (swinfo->shortname()) tmpmatches.shortname.assign(swinfo->shortname());
-			if (swinfo->longname()) tmpmatches.longname.assign(swinfo->longname());
+			if (image->longname()) tmpmatches.longname.assign(image->longname());
 			if (swinfo->parentname()) tmpmatches.parentname.assign(swinfo->parentname());
-			if (swinfo->year()) tmpmatches.year.assign(swinfo->year());
-			if (swinfo->publisher()) tmpmatches.publisher.assign(swinfo->publisher());
-			tmpmatches.supported = swinfo->supported();
+			if (image->year()) tmpmatches.year.assign(image->year());
+			if (image->manufacturer()) tmpmatches.publisher.assign(image->manufacturer());
+			tmpmatches.supported = image->supported();
 			if (image->part_entry()->name()) tmpmatches.part.assign(image->part_entry()->name());
 			tmpmatches.driver = &machine().system();
 			if (image->software_list_name()) tmpmatches.listname.assign(image->software_list_name());
 			if (image->part_entry()->interface()) tmpmatches.interface.assign(image->part_entry()->interface());
-			tmpmatches.instance.clear();
+			if (image->instance_name()) tmpmatches.instance.assign(image->instance_name());
 			tmpmatches.startempty = 0;
 			tmpmatches.parentlongname.clear();
+			if (swinfo->parentname())
+			{
+				software_list_device *swlist = software_list_device::find_by_name(machine().config(), image->software_list_name());
+				for (software_info *c_swinfo = swlist->first_software_info(); c_swinfo != NULL; c_swinfo = c_swinfo->next())
+				{
+					std::string c_parent(c_swinfo->parentname());
+					if (!c_parent.empty() && !c_parent.compare(swinfo->shortname()))
+						{
+							tmpmatches.parentlongname.assign(c_swinfo->longname());
+							break;
+						}
+				}
+			}
+
 			tmpmatches.usage.clear();
+			for (feature_list_item *flist = swinfo->other_info(); flist != NULL; flist = flist->next())
+				if (!strcmp(flist->name(), "usage"))
+					tmpmatches.usage.assign(flist->value());
+
 			if (image->image_type_name()) tmpmatches.devicetype.assign(image->image_type_name());
 			tmpmatches.available = true;
 			software_avail = true;
@@ -308,7 +325,7 @@ bool favorite_manager::isgame_favorite()
 
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
-		if (image->filename() != NULL)
+		if (image->software_entry())
 		{
 			image_loaded = true;
 			const software_info *swinfo = image->software_entry();
