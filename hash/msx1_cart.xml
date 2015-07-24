@@ -1670,8 +1670,8 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Prosoft</publisher>
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16385">
-				<rom name="antarctic adventure - japanese version (1984)(konami)[cr prosoft][rc-701].rom" size="16385" crc="8ced0683" sha1="63d3755c81b2c294ff3bd96cfb9f5a2f3d83b86c" offset="0x0000" />
+			<dataarea name="rom" size="32768">
+				<rom name="antarctic adventure - japanese version (1984)(konami)[cr prosoft][rc-701].rom" size="16385" crc="8ced0683" sha1="63d3755c81b2c294ff3bd96cfb9f5a2f3d83b86c" status="baddump" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2555,8 +2555,8 @@ kept for now until finding out what those bytes affect...
 		<publisher>Ample Software</publisher>
 		<info name="alt_title" value="ブギウギジャングル" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16385">
-				<rom name="boogie woogi jungle (japan) (alt 2).rom" size="16385" crc="464e7594" sha1="86f8e3250cdcbadccf131255a1ef59ed291be8e9" offset="0" />
+			<dataarea name="rom" size="32768">
+				<rom name="boogie woogi jungle (japan) (alt 2).rom" size="16385" crc="464e7594" sha1="86f8e3250cdcbadccf131255a1ef59ed291be8e9" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3054,8 +3054,8 @@ kept for now until finding out what those bytes affect...
 		<year>1983</year>
 		<publisher>Ample Software</publisher>
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16385">
-				<rom name="car-race (japan) (alt 2).rom" size="16385" crc="51445292" sha1="ab7354c9ced9782d572c4dd69249b76a1244e5ce" offset="0" />
+			<dataarea name="rom" size="32768">
+				<rom name="car-race (japan) (alt 2).rom" size="16385" crc="51445292" sha1="ab7354c9ced9782d572c4dd69249b76a1244e5ce" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3721,14 +3721,16 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- only tape released? tap2crt hack?? -->
+<!-- only tape released? tap2crt hack??
+     There is a cartridge version released by Al Alamiah, but this is probably not it
+ -->
 	<software name="confused" supported="no">
 		<description>Confused? (Euro)</description>
 		<year>198?</year>
 		<publisher>Eaglesoft</publisher>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="49152">
-				<rom name="confused (europe).rom" size="49152" crc="63084e71" sha1="9865f0bc4d54137809f0d8b48d5461ddf0c5bf4c" offset="0" />
+				<rom name="confused (europe).rom" size="49152" crc="63084e71" sha1="9865f0bc4d54137809f0d8b48d5461ddf0c5bf4c" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4659,8 +4661,8 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="DP3912010" />
 		<info name="alt_title" value="エクセリオン" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16417">
-				<rom name="exerion (japan) (alt 2).rom" size="16417" crc="369cb84e" sha1="8ecc34ebff9d37c0fe9560cfdc53a052cff3d1ab" offset="0" />
+			<dataarea name="rom" size="32768">
+				<rom name="exerion (japan) (alt 2).rom" size="16417" crc="369cb84e" sha1="8ecc34ebff9d37c0fe9560cfdc53a052cff3d1ab" status="baddump"  offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7676,8 +7678,8 @@ kept for now until finding out what those bytes affect...
 		<year>19??</year>
 		<publisher>Prosoft</publisher>
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16385">
-				<rom name="konami's tennis (1984)(konami)[cr prosoft][rc-720].rom" size="16385" crc="a5427ecd" sha1="54008fe7cd7f1a47fca70462a0a7b5682146099b" offset="0x0000" />
+			<dataarea name="rom" size="32768">
+				<rom name="konami's tennis (1984)(konami)[cr prosoft][rc-720].rom" size="16385" crc="a5427ecd" sha1="54008fe7cd7f1a47fca70462a0a7b5682146099b" status="baddump" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7751,8 +7753,8 @@ kept for now until finding out what those bytes affect...
 		<info name="serial" value="PS-2011G" />
 		<info name="alt_title" value="功夫大君" />
 		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="16385">
-				<rom name="kung fu taigun (japan) (alt 1).rom" size="16385" crc="8c30be94" sha1="304ea29469461f1cfa801f62af0bf5045a6882fc" offset="0" />
+			<dataarea name="rom" size="32768">
+				<rom name="kung fu taigun (japan) (alt 1).rom" size="16385" crc="8c30be94" sha1="304ea29469461f1cfa801f62af0bf5045a6882fc" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8996,6 +8998,7 @@ kept for now until finding out what those bytes affect...
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<dataarea name="rom" size="131072">
 				<rom name="valis - the fantasm soldier (1987)(zemina).rom" size="131072" crc="87361b76" sha1="dccdb2d18c70a94e48b3ec5e0cb986c5d708bbc9" offset="0x0000" />
 			</dataarea>
@@ -11726,6 +11729,7 @@ kept for now until finding out what those bytes affect...
 		<year>1988</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<dataarea name="rom" size="262144">
 				<rom name="super laydock - mission striker (1988)(zemina).rom" size="262144" crc="b885a464" sha1="244399d67d7851f3daa9bb87a14f5b8ef6d8c160" offset="0x0000" />
 			</dataarea>
@@ -13293,6 +13297,7 @@ kept for now until finding out what those bytes affect...
 		<year>1984</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HM-014" />
+		<info name="usage" value="Application can be entered from Basic by typing CALL EDDY2" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="eddy 2 (japan) (program).rom" size="16384" crc="2de03477" sha1="28bf2354cdd70e30b682f40b734029ece44d70bd" offset="0" />
@@ -13305,6 +13310,7 @@ kept for now until finding out what those bytes affect...
 		<year>1984</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HM-014" />
+		<info name="usage" value="Application can be entered from Basic by typing CALL EDDY2" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="eddy 2 (japan) (program) (alt 1).rom" size="16384" crc="141a6300" sha1="20f1883c45fc3c39ddf48a7de69b6ef588fac8fb" offset="0" />
@@ -13430,6 +13436,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-503" />
 		<info name="alt_title" value="描きくけコン" />
+		<info name="usage" value="Application can be started from Basic by typing _GRATOOL or pressing F1" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="kakikukekon (japan) (program).rom" size="16384" crc="4a4a6148" sha1="632ef250c76b222158ba90dfc68b9e004dbafe3a" offset="0" />
@@ -13561,6 +13568,7 @@ kept for now until finding out what those bytes affect...
 		<description>MSX-Aid (Jpn)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
+		<info name="usage" value="From Basic type CALL HELP for more information" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="msx-aid (japan) (program).rom" size="16384" crc="a7c4ac70" sha1="d4edb2af4170fd4069960ad61d3f664462bef568" offset="0" />
@@ -15685,6 +15693,7 @@ legacy FM implementations cannot find it.
 		<description>Amazing Kid (Arab)</description>
 		<year>1990</year>
 		<publisher>Husnisoft</publisher>
+		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="amazingkid.rom" size="32768" crc="43690da6" sha1="55cc50740d68d2558351cd8d125821dd1be70a1c" offset="0x0000" />
@@ -15843,6 +15852,7 @@ legacy FM implementations cannot find it.
 		<description>Barq Writer (Arab)</description>
 		<year>1987</year>
 		<publisher>Barq</publisher>
+		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="barq writer (barq, 1987).rom" size="32768" crc="bf2e13a4" sha1="b13b8a747e8bb1ba875724d1a3fbdcbfcff6594c" offset="0x0000" />
