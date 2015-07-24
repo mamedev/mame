@@ -2213,6 +2213,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mario.c",
 	MAME_DIR .. "src/mame/audio/mario.c",
 	MAME_DIR .. "src/mame/video/mario.c",
+	MAME_DIR .. "src/mame/drivers/mmagic.c",
 	MAME_DIR .. "src/mame/drivers/multigam.c",
 	MAME_DIR .. "src/mame/drivers/n8080.c",
 	MAME_DIR .. "src/mame/audio/n8080.c",
