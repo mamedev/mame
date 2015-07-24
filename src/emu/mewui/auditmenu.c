@@ -197,7 +197,7 @@ void ui_menu_audit::save_available_machines()
 		int find = 0;
 
 		// generate available list
-		for (int x = 0; x < m_available.size(); ++x)
+		for (size_t x = 0; x < m_available.size(); ++x)
 		{
 			find = driver_list::find(m_available[x]->name);
 			myfile << find << space;
@@ -206,7 +206,7 @@ void ui_menu_audit::save_available_machines()
 		}
 
 		// generate unavailable list
-		for (int x = 0; x < m_unavailable.size(); ++x)
+		for (size_t x = 0; x < m_unavailable.size(); ++x)
 		{
 			find = driver_list::find(m_unavailable[x]->name);
 			myfile << find << space;

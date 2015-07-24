@@ -42,7 +42,7 @@ void ui_menu_selector::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			for (int idx = 0; idx < str_items.size(); idx++)
+			for (size_t idx = 0; idx < str_items.size(); idx++)
 				if ((void*)&str_items[idx] == menu_event->itemref)
 					*selector = idx;
 
@@ -121,7 +121,7 @@ void ui_menu_selector::populate()
 	}
 	else
 	{
-		for (int index = 0, added = 0; index < str_items.size(); index++)
+		for (size_t index = 0, added = 0; index < str_items.size(); index++)
 			if (str_items[index].compare("_skip_") != 0)
 			{
 				if (first_pass && *selector == index)

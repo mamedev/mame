@@ -290,7 +290,7 @@ void load_custom_filters(running_machine &machine)
 					{
 						file.gets(buffer, MAX_CHAR_INFO);
 						char *ab = strchr(buffer, '=') + 2;
-						for (int z = 0; z < c_mnfct::ui.size(); z++)
+						for (size_t z = 0; z < c_mnfct::ui.size(); z++)
 							if (!strncmp(ab, c_mnfct::ui[z].c_str(), c_mnfct::ui[z].length()))
 								custfltr::mnfct[x] = z;
 					}
@@ -298,7 +298,7 @@ void load_custom_filters(running_machine &machine)
 					{
 						file.gets(buffer, MAX_CHAR_INFO);
 						char *db = strchr(buffer, '=') + 2;
-						for (int z = 0; z < c_year::ui.size(); z++)
+						for (size_t z = 0; z < c_year::ui.size(); z++)
 							if (!strncmp(db, c_year::ui[z].c_str(), c_year::ui[z].length()))
 								custfltr::year[x] = z;
 					}
@@ -418,7 +418,7 @@ void load_sw_custom_filters(running_machine &machine, const game_driver *driver,
 					{
 						file.gets(buffer, MAX_CHAR_INFO);
 						char *ab = strchr(buffer, '=') + 2;
-						for (int z = 0; z < m_publisher.ui.size(); z++)
+						for (size_t z = 0; z < m_publisher.ui.size(); z++)
 							if (!strncmp(ab, m_publisher.ui[z].c_str(), m_publisher.ui[z].length()))
 								sw_custfltr::mnfct[x] = z;
 					}
@@ -426,7 +426,7 @@ void load_sw_custom_filters(running_machine &machine, const game_driver *driver,
 					{
 						file.gets(buffer, MAX_CHAR_INFO);
 						char *db = strchr(buffer, '=') + 2;
-						for (int z = 0; z < m_year.ui.size(); z++)
+						for (size_t z = 0; z < m_year.ui.size(); z++)
 							if (!strncmp(db, m_year.ui[z].c_str(), m_year.ui[z].length()))
 								sw_custfltr::year[x] = z;
 					}
@@ -434,7 +434,7 @@ void load_sw_custom_filters(running_machine &machine, const game_driver *driver,
 					{
 						file.gets(buffer, MAX_CHAR_INFO);
 						char *fb = strchr(buffer, '=') + 2;
-						for (int z = 0; z < m_type.ui.size(); z++)
+						for (size_t z = 0; z < m_type.ui.size(); z++)
 							if (!strncmp(fb, m_type.ui[z].c_str(), m_type.ui[z].length()))
 								sw_custfltr::type[x] = z;
 					}
@@ -442,7 +442,7 @@ void load_sw_custom_filters(running_machine &machine, const game_driver *driver,
 					{
 						file.gets(buffer, MAX_CHAR_INFO);
 						char *eb = strchr(buffer, '=') + 2;
-						for (int z = 0; z < m_region.ui.size(); z++)
+						for (size_t z = 0; z < m_region.ui.size(); z++)
 							if (!strncmp(eb, m_region.ui[z].c_str(), m_region.ui[z].length()))
 								sw_custfltr::region[x] = z;
 					}

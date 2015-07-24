@@ -375,7 +375,7 @@ void ui_menu::draw_select_game()
 		}
 	}
 
-	for (int count = visible_items; count < item.size(); count++)
+	for (size_t count = visible_items; count < item.size(); count++)
 	{
 		const ui_menu_item &pitem = item[count];
 		const char *itemtext = pitem.text;
@@ -1363,7 +1363,7 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 
 			if (!m_item.empty() && mewui_globals::curdats_view == MEWUI_COMMAND_LOAD)
 			{
-				for (int x = 0; x < m_item.size(); x++)
+				for (size_t x = 0; x < m_item.size(); x++)
 				{
 					std::string t_buffer;
 					machine().datfile().load_command_info(t_buffer, x);

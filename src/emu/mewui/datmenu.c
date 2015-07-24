@@ -40,7 +40,7 @@ void ui_menu_command::populate()
 
 	if (!text.empty())
 	{
-		for (int menu_items = 0; menu_items < text.size(); menu_items++)
+		for (size_t menu_items = 0; menu_items < text.size(); menu_items++)
 			item_append(text[menu_items].c_str(), NULL, 0, (void *)(FPTR)menu_items);
 
 		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);

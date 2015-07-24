@@ -325,7 +325,7 @@ bool favorite_manager::isgame_favorite()
 
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
-		if (image->software_entry())
+		if (image->exists() && image->software_entry())
 		{
 			image_loaded = true;
 			const software_info *swinfo = image->software_entry();
@@ -343,12 +343,7 @@ bool favorite_manager::isgame_favorite()
 	}
 
 	if (!image_loaded)
-		for (size_t current = 0; current < favorite_list.size(); current++)
-			if (favorite_list[current].driver == &machine().system())
-			{
-				current_favorite = current;
-				return true;
-			}
+		return isgame_favorite(&machine().system());
 
 	current_favorite = -1;
 	return false;

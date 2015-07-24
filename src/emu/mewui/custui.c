@@ -120,7 +120,7 @@ ui_menu_font_ui::ui_menu_font_ui(running_machine &machine, render_container *con
 	m_italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 	m_class.actual = 0;
 
-	for (int index = 0; index < m_class.ui.size(); index++)
+	for (size_t index = 0; index < m_class.ui.size(); index++)
 	{
 		if (m_class.ui[index] == name)
 		{

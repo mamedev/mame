@@ -485,7 +485,7 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 	float width, maxwidth;
 	maxwidth = origx2 - origx1;
 
-	for (int line = 0; line < folders.size(); line++)
+	for (size_t line = 0; line < folders.size(); line++)
 	{
 		machine().ui().draw_text_full(container, folders[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_TRUNCATE,
 		                              DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
@@ -532,7 +532,7 @@ void ui_menu_display_actual::custom_render(void *selectedref, float top, float b
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	for (int line = 0; line < folders.size(); line++)
+	for (size_t line = 0; line < folders.size(); line++)
 	{
 		machine().ui().draw_text_full(container, folders[line].c_str(), x1, y1, x2 - x1, JUSTIFY_LEFT, WRAP_TRUNCATE,
 		                              DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
@@ -572,7 +572,7 @@ void ui_menu_remove_folder::handle()
 		int index = (FPTR)menu_event->itemref - 1;
 		std::string tmppath;
 
-		for (int i = 0; i < item.size() - 2; i++)
+		for (size_t i = 0; i < item.size() - 2; i++)
 			if (i != index)
 				tmppath.append(item[i].text).append(";");
 

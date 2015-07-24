@@ -359,7 +359,7 @@ void ui_menu_select_software::populate()
 		}
 
 		// iterate over entries
-		for (int curitem = 0; curitem < m_displaylist.size(); curitem++)
+		for (size_t curitem = 0; curitem < m_displaylist.size(); curitem++)
 		{
 			if (reselect_last::software.compare("[Start empty]") == 0 && !reselect_last::driver.empty())
 				old_software = 0;
@@ -507,7 +507,7 @@ void ui_menu_select_software::build_software_list()
 	m_displaylist.resize(m_swlist.size() + 1);
 
 	// retrieve and set the long name of software for parents
-	for (int y = 1; y < m_swlist.size(); y++)
+	for (size_t y = 1; y < m_swlist.size(); y++)
 	{
 		if (!m_swlist[y].parentname.empty())
 		{
@@ -523,7 +523,7 @@ void ui_menu_select_software::build_software_list()
 				}
 
 			// not found? then scan forward
-			for (int x = y; !found && x < m_swlist.size(); x++)
+			for (size_t x = y; !found && x < m_swlist.size(); x++)
 				if (!m_swlist[y].parentname.compare(m_swlist[x].shortname) && !m_swlist[y].instance.compare(m_swlist[x].instance))
 				{
 					m_swlist[y].parentlongname.assign(m_swlist[x].longname);
@@ -967,7 +967,7 @@ void ui_menu_select_software::build_list(std::vector<ui_software_info *> &s_driv
 	}
 
 	// iterate over entries
-	for (int x = 0; x < s_drivers.size(); x++)
+	for (size_t x = 0; x < s_drivers.size(); x++)
 	{
 		switch (filter)
 		{

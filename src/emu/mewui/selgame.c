@@ -528,7 +528,7 @@ void ui_mewui_select_game::populate()
 			}
 
 			// iterate over entries
-			for (int curitem = 0; curitem < m_displaylist.size(); curitem++)
+			for (size_t curitem = 0; curitem < m_displaylist.size(); curitem++)
 			{
 				if (!reselect_last::driver.empty() && !(core_stricmp(m_displaylist[curitem]->name, reselect_last::driver.c_str())))
 					old_item_selected = curitem;
@@ -1121,7 +1121,7 @@ void ui_mewui_select_game::build_list(std::vector<const game_driver *> &s_driver
 			s_drivers = m_sortedlist;
 	}
 
-	for (int index = 0; index < s_drivers.size(); index++)
+	for (size_t index = 0; index < s_drivers.size(); index++)
 	{
 		if (!bioscheck && filter != FILTER_BIOS && (s_drivers[index]->flags & GAME_IS_BIOS_ROOT) != 0)
 			continue;
@@ -1234,7 +1234,7 @@ void ui_mewui_select_game::build_custom()
 	else
 		s_drivers = m_sortedlist;
 
-	for (int index = 0; index < s_drivers.size(); ++index)
+	for (size_t index = 0; index < s_drivers.size(); ++index)
 	{
 		if ((s_drivers[index]->flags & GAME_TYPE_ARCADE) && mewui_globals::ume_system == MEWUI_SYSTEMS)
 			continue;
@@ -1291,7 +1291,7 @@ void ui_mewui_select_game::build_category()
 	std::vector<int> temp_filter;
 	machine().inifile().load_ini_category(temp_filter);
 
-	for (int index = 0; index < temp_filter.size(); ++index)
+	for (size_t index = 0; index < temp_filter.size(); ++index)
 	{
 		int actual = temp_filter[index];
 		m_tmp.push_back(&driver_list::driver(actual));
@@ -1312,7 +1312,7 @@ void ui_mewui_select_game::build_from_cache(std::vector<const game_driver *> &s_
 		filter = mewui_globals::actual_filter;
 	}
 
-	for (int index = 0; index < s_drivers.size(); ++index)
+	for (size_t index = 0; index < s_drivers.size(); ++index)
 	{
 		if (!bioscheck && filter != FILTER_BIOS && (s_drivers[index]->flags & GAME_IS_BIOS_ROOT) != 0)
 			continue;
@@ -1465,7 +1465,7 @@ void ui_mewui_select_game::inkey_export()
 		else
 		{
 			// iterate over entries
-			for (int curitem = 0; curitem < m_displaylist.size(); curitem++)
+			for (size_t curitem = 0; curitem < m_displaylist.size(); curitem++)
 			{
 				int f = driver_list::find(m_displaylist[curitem]->name);
 				drivlist.include(f);
@@ -1670,7 +1670,7 @@ void ui_mewui_select_game::save_available_machines()
 		int find = 0;
 
 		// generate available list
-		for (int x = 0; x < m_availablelist.size(); ++x)
+		for (size_t x = 0; x < m_availablelist.size(); ++x)
 		{
 			find = driver_list::find(m_availablelist[x]->name);
 			myfile << find << space;
@@ -1679,7 +1679,7 @@ void ui_mewui_select_game::save_available_machines()
 		}
 
 		// generate unavailable list
-		for (int x = 0; x < m_unavailablelist.size(); ++x)
+		for (size_t x = 0; x < m_unavailablelist.size(); ++x)
 		{
 			find = driver_list::find(m_unavailablelist[x]->name);
 			myfile << find << space;
