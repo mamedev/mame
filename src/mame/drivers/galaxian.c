@@ -6510,12 +6510,50 @@ DRIVER_INIT_MEMBER(galaxian_state,atlantis)
 }
 
 
+
+
+
 DRIVER_INIT_MEMBER(galaxian_state,scobra)
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, NULL, NULL);
 }
 
+
+// this can be further simplified
+unsigned char scobrae_table[128] = {
+	0x00, 0x49, 0x21, 0x68, 0x18, 0x51, 0x39, 0x70,	0x12, 0x5B, 0x33, 0x7A,	0x0A, 0x43, 0x2B, 0x62,
+	0x84, 0xCD, 0xA5, 0xEC, 0x9C, 0xD5, 0xBD, 0xF4,	0x96, 0xDF, 0xB7, 0xFE, 0x8E, 0xC7, 0xAF, 0xE6,
+	0x24, 0x6D, 0x05, 0x4C,	0x3C, 0x75, 0x1D, 0x54,	0x36, 0x7F, 0x17, 0x5E, 0x2E, 0x67, 0x0F, 0x46,
+	0xA0, 0xE9, 0x81, 0xC8, 0xB8, 0xF1, 0x99, 0xD0,	0xB2, 0xFB, 0x93, 0xDA,	0xAA, 0xE3, 0x8B, 0xC2,
+	0x40, 0x09, 0x61, 0x28, 0x58, 0x11, 0x79, 0x30,	0x52, 0x1B, 0x73, 0x3A, 0x4A, 0x03, 0x6B, 0x22,
+	0xC4, 0x8D, 0xE5, 0xAC,	0xDC, 0x95, 0xFD, 0xB4,	0xD6, 0x9F, 0xF7, 0xBE, 0xCE, 0x87, 0xEF, 0xA6,
+	0x64, 0x2D, 0x45, 0x0C, 0x7C, 0x35, 0x5D, 0x14,	0x76, 0x3F, 0x57, 0x1E,	0x6E, 0x27, 0x4F, 0x06, 
+	0xE0, 0xA9, 0xC1, 0x88, 0xF8, 0xB1, 0xD9, 0x90,	0xF2, 0xBB, 0xD3, 0x9A, 0xEA, 0xA3, 0xCB, 0x82,
+};
+
+DRIVER_INIT_MEMBER(galaxian_state,scobrae)
+{
+
+	UINT8 *rom = memregion("maincpu")->base();
+	int offs;
+
+	for (offs = 0; offs < 0x6000; offs++)
+	{
+		UINT8 data = rom[offs];
+
+		if (offs&0x80)
+			data ^= scobrae_table[(0x7f-offs) & 0x7f] ^ 0xff;
+		else
+			data ^= scobrae_table[offs & 0x7f] ^ 0xff;
+		
+		rom[offs] = data;
+	}
+
+
+	/* video extensions */
+	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, NULL, NULL);
+}
 
 
 DRIVER_INIT_MEMBER(galaxian_state,losttomb)
@@ -11014,7 +11052,7 @@ GAME( 1982, monsterz,    0,        monsterz,   sfx,        galaxian_state, sfx, 
 GAME( 1981, scobra,      0,        scobra,     scobra,     galaxian_state, scobra,     ROT90,  "Konami", "Super Cobra", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrase,    scobra,   scobra,     scobra,     galaxian_state, scobra,     ROT90,  "Konami (Sega license)", "Super Cobra (Sega)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobras,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1981, scobrae,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics) (encrypted, KONATEC XC-103SS CPU)", GAME_NOT_WORKING )
+GAME( 1981, scobrae,     scobra,   scobra,     scobras,    galaxian_state, scobrae,    ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics) (encrypted, KONATEC XC-103SS CPU)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrab,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "bootleg", "Super Cobra (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, suprheli,    scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", GAME_SUPPORTS_SAVE )
 
