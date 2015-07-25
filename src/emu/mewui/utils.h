@@ -192,7 +192,7 @@ struct cache_info
 
 struct reselect_last
 {
-	static std::string driver, software, part;
+	static std::string driver, software, swlist;
 };
 
 // Manufacturers

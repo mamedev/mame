@@ -329,16 +329,14 @@ bool favorite_manager::isgame_favorite()
 		{
 			image_loaded = true;
 			const software_info *swinfo = image->software_entry();
-			const software_part *swpart = image->part_entry();
 
 			for (size_t current = 0; current < favorite_list.size(); current++)
-				if (favorite_list[current].shortname.compare(swinfo->shortname()) == 0)
-					if (swpart != NULL)
-						if (swpart->name() != NULL && favorite_list[current].part.compare(swpart->name()) == 0)
-						{
-							current_favorite = current;
-							return true;
-						}
+				if (!favorite_list[current].shortname.compare(swinfo->shortname()) &&
+				    !favorite_list[current].listname.compare(image->software_list_name()))
+				{
+					current_favorite = current;
+					return true;
+				}
 		}
 	}
 

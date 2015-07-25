@@ -365,7 +365,7 @@ void ui_menu_select_software::populate()
 				old_software = 0;
 
 			else if (!reselect_last::software.empty() && m_displaylist[curitem]->shortname.compare(reselect_last::software) == 0
-							&& m_displaylist[curitem]->part.compare(reselect_last::part) == 0)
+							&& m_displaylist[curitem]->listname.compare(reselect_last::swlist) == 0)
 					old_software = has_empty_start ? curitem + 1 : curitem;
 
 			item_append(m_displaylist[curitem]->longname.c_str(), m_displaylist[curitem]->devicetype.c_str(),
@@ -398,7 +398,7 @@ void ui_menu_select_software::populate()
 
 	reselect_last::driver.clear();
 	reselect_last::software.clear();
-	reselect_last::part.clear();
+	reselect_last::swlist.clear();
 }
 
 //-------------------------------------------------
@@ -496,7 +496,7 @@ void ui_menu_select_software::build_software_list()
 	{
 		reselect_last::driver.assign(m_swlist[0].driver->name);
 		reselect_last::software.clear();
-		reselect_last::part.clear();
+		reselect_last::swlist.clear();
 		mewui_globals::force_reselect_software = true;
 		machine().manager().schedule_new_driver(*m_swlist[0].driver);
 		machine().schedule_hard_reset();
@@ -803,7 +803,7 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 	{
 		reselect_last::driver.assign(ui_swinfo->driver->name);
 		reselect_last::software.assign("[Start empty]");
-		reselect_last::part.clear();
+		reselect_last::swlist.clear();
 		mewui_globals::force_reselect_software = true;
 		machine().manager().schedule_new_driver(*ui_swinfo->driver);
 		machine().schedule_hard_reset();
@@ -817,19 +817,37 @@ void ui_menu_select_software::inkey_select(const ui_menu_event *menu_event)
 		media_auditor auditor(drivlist);
 		drivlist.next();
 		software_list_device *swlist = software_list_device::find_by_name(drivlist.config(), ui_swinfo->listname.c_str());
-		software_info *swinfo = swlist->find(ui_swinfo->shortname.c_str());
+		swinfo = swlist->find(ui_swinfo->shortname.c_str());
 
 		media_auditor::summary summary = auditor.audit_software(swlist->list_name(), swinfo, AUDIT_VALIDATE_FAST);
 
-		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
+		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
+			if (swinfo->has_multiple_parts(ui_swinfo->interface.c_str()))
+			{
+				std::vector<std::string> partname, partdesc;
+				for (const software_part *swpart = swinfo->first_part(); swpart != NULL; swpart = swpart->next())
+				{
+					if (swpart->matches_interface(ui_swinfo->interface.c_str()))
+					{
+						partname.push_back(swpart->name());
+						std::string menu_part_name(swpart->name());
+						if (swpart->feature("part_id") != NULL)
+							menu_part_name.assign("(").append(swpart->feature("part_id")).append(")");
+						partdesc.push_back(menu_part_name);
+					}
+				}
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_mewui_software_parts(machine(), container, partname, partdesc, ui_swinfo)));
+				return;
+			}
+
 			std::string error_string;
 			std::string string_list = std::string(ui_swinfo->listname).append(":").append(ui_swinfo->shortname).append(":").append(ui_swinfo->part).append(":").append(ui_swinfo->instance);
 			machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 
 			reselect_last::driver.assign(drivlist.driver().name);
-			reselect_last::software.assign(ui_swinfo->shortname.c_str());
-			reselect_last::part.assign(ui_swinfo->part.c_str());
+			reselect_last::software.assign(ui_swinfo->shortname);
+			reselect_last::swlist.assign(ui_swinfo->listname);
 			mewui_globals::force_reselect_software = true;
 
 			std::string snap_list = std::string(ui_swinfo->listname).append("/").append(ui_swinfo->shortname);
@@ -1115,3 +1133,51 @@ void ui_menu_select_software::build_custom()
 		}
 	}
 }
+
+
+ui_mewui_software_parts::ui_mewui_software_parts(running_machine &machine, render_container *container, std::vector<std::string> partname, std::vector<std::string> partdesc, ui_software_info *ui_info) : ui_menu(machine, container)
+{
+	m_nameparts = partname;
+	m_descpart = partdesc;
+	m_uiinfo = ui_info;
+}
+
+ui_mewui_software_parts::~ui_mewui_software_parts()
+{
+}
+
+void ui_mewui_software_parts::populate()
+{
+	for (size_t index = 0; index < m_nameparts.size(); index++)
+		item_append(m_nameparts[index].c_str(), m_descpart[index].c_str(), 0, (void *)&m_nameparts[index]);
+}
+
+void ui_mewui_software_parts::handle()
+{
+	// process the menu
+	const ui_menu_event *event = process(0);
+	if (event != NULL && event->iptkey == IPT_UI_SELECT && event->itemref != NULL)
+	{
+		for (size_t idx = 0; idx < m_nameparts.size(); idx++)
+			if ((void*)&m_nameparts[idx] == event->itemref)
+			{
+				std::string error_string;
+				std::string string_list = std::string(m_uiinfo->listname).append(":").append(m_uiinfo->shortname).append(":").append(m_nameparts[idx]).append(":").append(m_uiinfo->instance);
+				machine().options().set_value(OPTION_SOFTWARENAME, string_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+
+				reselect_last::driver.assign(m_uiinfo->driver->name);
+				reselect_last::software.assign(m_uiinfo->shortname);
+				reselect_last::swlist.assign(m_uiinfo->listname);
+				mewui_globals::force_reselect_software = true;
+
+				std::string snap_list = std::string(m_uiinfo->listname).append("/").append(m_uiinfo->shortname);
+				machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+
+				machine().manager().schedule_new_driver(*m_uiinfo->driver);
+				machine().schedule_hard_reset();
+				ui_menu::stack_reset(machine());
+			}
+	}
+}
+
+

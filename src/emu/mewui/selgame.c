@@ -113,7 +113,7 @@ ui_mewui_select_game::ui_mewui_select_game(running_machine &machine, render_cont
 	{
 		reselect_last::driver.clear();
 		reselect_last::software.clear();
-		reselect_last::part.clear();
+		reselect_last::swlist.clear();
 	}
 
 	std::string error_string;
@@ -604,7 +604,7 @@ osd_printf_info("fav size = %d\n", (int)machine().favorite().favorite_list.size(
 	{
 		reselect_last::driver.clear();
 		reselect_last::software.clear();
-		reselect_last::part.clear();
+		reselect_last::swlist.clear();
 		mewui_globals::force_reselect_software = false;
 	}
 }
@@ -964,7 +964,7 @@ void ui_mewui_select_game::inkey_select(const ui_menu_event *menu_event)
 			{
 				reselect_last::driver.assign(driver->name);
 				reselect_last::software.clear();
-				reselect_last::part.clear();
+				reselect_last::swlist.clear();
 				machine().manager().schedule_new_driver(*driver);
 				machine().schedule_hard_reset();
 				ui_menu::stack_reset(machine());
@@ -1037,8 +1037,8 @@ void ui_mewui_select_game::inkey_select_favorite(const ui_menu_event *menu_event
 			std::string snap_list = std::string(ui_swinfo->listname.c_str()).append(PATH_SEPARATOR).append(ui_swinfo->shortname.c_str());
 			machine().options().set_value(OPTION_SNAPNAME, snap_list.c_str(), OPTION_PRIORITY_CMDLINE, error_string);
 			reselect_last::driver.assign(drv.driver().name);
-			reselect_last::software.assign(ui_swinfo->shortname.c_str());
-			reselect_last::part.assign(ui_swinfo->part.c_str());
+			reselect_last::software.assign(ui_swinfo->shortname);
+			reselect_last::swlist.assign(ui_swinfo->listname);
 			machine().manager().schedule_new_driver(drv.driver());
 			machine().schedule_hard_reset();
 			ui_menu::stack_reset(machine());

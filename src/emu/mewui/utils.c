@@ -55,7 +55,7 @@ UINT16 sw_custfltr::type[MAX_CUST_FILTER];
 
 std::string reselect_last::driver;
 std::string reselect_last::software;
-std::string reselect_last::part;
+std::string reselect_last::swlist;
 
 std::vector<cache_info> mewui_globals::driver_cache(driver_list::total() + 1);
 
