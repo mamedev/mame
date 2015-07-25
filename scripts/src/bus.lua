@@ -433,6 +433,8 @@ if (BUSES["CBMIEC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cbmiec/serialbox.h",
 		MAME_DIR .. "src/emu/bus/cbmiec/vic1515.c",
 		MAME_DIR .. "src/emu/bus/cbmiec/vic1515.h",
+		MAME_DIR .. "src/emu/bus/cbmiec/vic1520.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/vic1520.h",
 	}
 end
 

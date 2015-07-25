@@ -826,6 +826,30 @@
 		</part>
 	</software>
 
+	<software name="1520tool">
+		<description>Tools for the Commodore 1520 Plotter</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c1520_1.d64" size="174848" crc="346c6314" sha1="1b412ca97c7bb3aecbfcc2ce7a921d2f98d849e2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c1520_2.d64" size="174848" crc="4c009b05" sha1="b4af1966071a2e28005883eb8c9c3a9efff12792" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c1520_3.d64" size="174848" crc="e1db28c8" sha1="259c7a7762955891009382c8423add7ad8830213" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swiftlnk">
 		<description>CMD SwiftLink</description>
 		<year>1990</year>
