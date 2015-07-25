@@ -16241,7 +16241,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 <!-- This does not work; the dump is incomplete -->
-	<software name="sbw1" supported="no">>
+	<software name="sbw1" supported="no">
 		<description>Super Bros. World 1</description>
 		<year>19??</year>
 		<publisher>Clover</publisher>
