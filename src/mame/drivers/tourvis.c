@@ -18,36 +18,57 @@
 
     Aero Blaster (label shows "Vol. 33") [dumped]
     After Burner
-    Bonk
+    Ballistix
+    Bomberman
     Columns [dumped]
     Cyber Core
+    Daisempuu
     Dead Moon
+    Dodge Ball
     Doraemon Meikyuu Daisakusen
     Down Load
+    Dragon Spirit
     Dungeon Explorer [dumped]
+    Final Blaster
     Final Lap Twin [dumped]
     Final Match Tennis
     Formation Soccer [dumped]
     Gomola Speed [dumped]
     Jackie Chan [dumped]
+    Jinmu Densho
+    Kiki Kaikai
+    Legend Of Hero Tomna
     Legendary Axe [dumped]
     Mr. Heli
     Out Run
+    Pac-Land
+    Parasol Stars
+    PC Denjin Punkic Cyborg
+    PC Genjin
     PC Genjin 2 [dumped]
     Power Eleven [dumped]
+    Power Golf
     Power League IV [dumped]
     Power Sports
+    Psycho Chaser
     Puzzle Boy
     Rastan Saga II [dumped]
     Saigo no Nindou
+    Salamander
+    Shinobi
     Son Son II
     Special Criminal Investigation [dumped]
     Super Star Soldier (label shows "Vol. 30") [dumped]
     Super Volley ball [dumped]
+    Tatsujin
+    Terra Cresta II
     Thunder Blade [dumped]
+    Toy Shop Boys
     USA Pro Basketball [dumped]
     Vigilante
     Volfied [dumped]
+    W-Ring
+    Xevious
 
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
