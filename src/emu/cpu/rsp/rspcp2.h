@@ -32,6 +32,13 @@
 #endif
 
 #if USE_SIMD
+
+#ifdef _MSC_VER
+#define __align16 __declspec(align(16))
+#else
+#define __align16 __attribute__((aligned(16)))
+#endif
+
 #if (defined(__SSE4_2__) || defined(_MSC_VER))
 #include <nmmintrin.h>
 #elif (defined(__SSE4_1__) || defined(_MSC_VER))
@@ -181,7 +188,7 @@ protected:
 	UINT32          m_vres[8];          /* used for temporary vector results */
 
 #if USE_SIMD
-	__declspec(align(16)) VECTOR_REG      m_v[32];
+	__align16 VECTOR_REG      m_v[32];
 #else
 	VECTOR_REG      m_v[32];
 #endif
@@ -232,9 +239,9 @@ protected:
 		UINT16 s[24];
 	};
 
-	__declspec(align(16)) aligned_rsp_1vect_t m_vdqm;
-	__declspec(align(16)) aligned_rsp_2vect_t m_flags[3];
-	__declspec(align(16)) aligned_rsp_3vect_t m_acc;
+	__align16 aligned_rsp_1vect_t m_vdqm;
+	__align16 aligned_rsp_2vect_t m_flags[3];
+	__align16 aligned_rsp_3vect_t m_acc;
 	UINT32 m_dp_flag;
 
 	typedef struct
