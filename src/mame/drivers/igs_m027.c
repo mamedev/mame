@@ -66,6 +66,7 @@ public:
 	DECLARE_DRIVER_INIT(zhongguo);
 	DECLARE_DRIVER_INIT(klxyj);
 	DECLARE_DRIVER_INIT(fearless);
+	DECLARE_DRIVER_INIT(slqz3);
 	TILE_GET_INFO_MEMBER(get_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
 	virtual void video_start();
@@ -998,13 +999,20 @@ DRIVER_INIT_MEMBER(igs_m027_state,zhongguo)
 	pgm_create_dummy_internal_arm_region();
 }
 
+DRIVER_INIT_MEMBER(igs_m027_state,slqz3)
+{
+	slqz3_decrypt(machine());
+	//sdwx_gfx_decrypt(machine());
+	pgm_create_dummy_internal_arm_region();
+}
+
 /***************************************************************************
 
     Game Drivers
 
 ***************************************************************************/
 
-GAME( 1999,  slqz3,     0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3", GAME_IS_SKELETON )
+GAME( 1999,  slqz3,     0, igs_majhong, sdwx, igs_m027_state, slqz3,       ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", GAME_IS_SKELETON )
 GAME( 2002,  sdwx,      0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", GAME_IS_SKELETON ) // aka Christmas 5 Line?
 GAME( 200?,  sddz,      0, igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  GAME_IS_SKELETON )
 GAME( 2000,  zhongguo,  0, igs_majhong, sdwx, igs_m027_state, zhongguo,    ROT0, "IGS", "Zhong Guo Chu Da D",  GAME_IS_SKELETON )

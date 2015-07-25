@@ -6133,8 +6133,9 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16_sram" />
 			<feature name="mapper" value="M60002-0125SP-16" />
-			<dataarea name="rom" size="131072">
+			<dataarea name="rom" size="262144">
 				<rom name="harryfox msx special (japan).rom" size="131072" crc="96b7faca" sha1="a3de07612da7986387a4f5c41bbbc7e3b244e077" offset="0" />
+				<rom size="131072" offset="0x20000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="sram" size="2048" >
 			</dataarea>
@@ -9230,6 +9231,7 @@ kept for now until finding out what those bytes affect...
 		<description>Pac-Man (Kor)</description>
 		<year>198?</year>
 		<publisher>Clover</publisher>
+		<info name="usage" value="Requires a machine with RAM in a main slot" />
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="pacman.rom" size="32768" crc="52e694ab" sha1="8435d825a47afabcd50e5295c36eefd5d5a421cb" offset="0" />
@@ -16225,27 +16227,29 @@ legacy FM implementations cannot find it.
 	</software>
 
 
-<!-- This does not work... is the dump complete? -->
-	<software name="bioman4">
+<!-- This does not work... the dump is incomplete -->
+	<software name="bioman4" supported="no">
 		<description>BIOMAN4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<dataarea name="rom" size="32768">
-				<rom name="bioman4.rom" size="32768" crc="7306e61d" sha1="9aba571fbdedcdcd0c20dcae8fdde31328d51b1c" offset="0" />
+				<rom name="bioman4.rom" size="32768" crc="7306e61d" sha1="9aba571fbdedcdcd0c20dcae8fdde31328d51b1c" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- Needs another mapper!! -->
-	<software name="sbw1">
+<!-- This does not work; the dump is incomplete -->
+	<software name="sbw1" supported="no">
 		<description>Super Bros. World 1</description>
 		<year>19??</year>
 		<publisher>Clover</publisher>
 		<info name="alt_title" value="슈퍼 브로스 월드 1" />
 		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami" />
 			<dataarea name="rom" size="32768">
-				<rom name="sbrosw_n.rom" size="32768" crc="62256991" sha1="a3e8e076b9c8d4060082233a2f16184cf4911a85" offset="0" />
+				<rom name="sbrosw_n.rom" size="32768" crc="62256991" sha1="a3e8e076b9c8d4060082233a2f16184cf4911a85" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>

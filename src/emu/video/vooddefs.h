@@ -4737,13 +4737,14 @@ INLINE INT32 ATTR_FORCE_INLINE new_log2(double &value)
 }
 
 // Computes A/C and B/C and returns log2 of 1/C
-// A, B and C are 16.32 values.  The results are 14.18.
+// A, B and C are 16.32 values.  The results are 24.8.
 INLINE void ATTR_FORCE_INLINE multi_reciplog(INT64 valueA, INT64 valueB, INT64 valueC, INT32 &log, INT32 &resA, INT32 &resB)
 {
-	double recip = 1.0f/valueC;
-	double resAD = valueA * recip * ((INT64)1<<(47-29));
-	double resBD = valueB * recip * ((INT64)1<<(47-29));
+	double recip = double(1ULL<<(47-39))/valueC;
+	double resAD = valueA * recip;
+	double resBD = valueB * recip;
   log = new_log2(recip);
+  log += 56<<8;
   resA = resAD;
   resB = resBD;
 }
@@ -4761,8 +4762,8 @@ INLINE rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, INT32 x, const UINT
 		INT32 wLog;
 		if (USE_FAST_RECIP) {
 			const INT32 oow = fast_reciplog((ITERW), &wLog);
-			s = ((INT64)oow * (ITERS)) >> 29;
-			t = ((INT64)oow * (ITERT)) >> 29;
+			s = ((INT64)oow * (ITERS)) >> (29+10);
+			t = ((INT64)oow * (ITERT)) >> (29+10);
 		} else {
 			multi_reciplog(ITERS, ITERT, ITERW, wLog, s, t);
 		}
@@ -4770,8 +4771,8 @@ INLINE rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, INT32 x, const UINT
 	}
 	else
 	{
-		s = (ITERS) >> 14;
-		t = (ITERT) >> 14;
+		s = (ITERS) >> (14+10);
+		t = (ITERT) >> (14+10);
 	}
 
 	/* clamp W */
@@ -4810,8 +4811,8 @@ INLINE rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, INT32 x, const UINT
 		UINT32 texel0;
 
 		/* adjust S/T for the LOD and strip off the fractions */
-		s >>= ilod + 18;
-		t >>= ilod + 18;
+		s >>= ilod + (18-10);
+		t >>= ilod + (18-10);
 
 		/* clamp/wrap S/T if necessary */
 		if (TEXMODE_CLAMP_S(TEXMODE))
@@ -4847,8 +4848,8 @@ INLINE rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, INT32 x, const UINT
 
 		/* adjust S/T for the LOD and strip off all but the low 8 bits of */
 		/* the fraction */
-		s >>= ilod + 10;
-		t >>= ilod + 10;
+		s >>= ilod; // + (10-10);
+		t >>= ilod; // + (10-10);
 
 		/* also subtract 1/2 texel so that (0.5,0.5) = a full (0,0) texel */
 		s -= 0x80;

@@ -6510,12 +6510,44 @@ DRIVER_INIT_MEMBER(galaxian_state,atlantis)
 }
 
 
+
+
+
 DRIVER_INIT_MEMBER(galaxian_state,scobra)
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, NULL, NULL);
 }
 
+
+
+DRIVER_INIT_MEMBER(galaxian_state,scobrae)
+{
+
+	UINT8 *rom = memregion("maincpu")->base();
+	int offs;
+
+	for (offs = 0; offs < 0x6000; offs++)
+	{
+		int i = offs & 0x7f;
+		int x = rom[offs];
+
+		if (offs & 0x80) i ^= 0x7f;
+
+		if (i & 0x01) x ^= 0x49;
+		if (i & 0x02) x ^= 0x21;
+		if (i & 0x04) x ^= 0x18;
+		if (i & 0x08) x ^= 0x12;
+		if (i & 0x10) x ^= 0x84;
+		if (i & 0x20) x ^= 0x24;
+		if (i & 0x40) x ^= 0x40;
+
+		rom[offs] = x ^ 0xff;
+	}
+
+	/* video extensions */
+	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, NULL, NULL);
+}
 
 
 DRIVER_INIT_MEMBER(galaxian_state,losttomb)
@@ -10419,6 +10451,30 @@ ROM_START( scobrab )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
 ROM_END
 
+ROM_START( scobrae ) // main program is identical to the scobras set once decrypted
+	ROM_REGION( 0x10000, "maincpu", 0 ) // all roms have STERN labels
+	ROM_LOAD( "super cobra ra1 2c 1981.2c",   0x0000, 0x1000, CRC(ba9d4152) SHA1(f1792c0049804ac956ab7f95f699559fca4df960) )
+	ROM_LOAD( "super cobra ra1 2e 1981.2e",   0x1000, 0x1000, CRC(f9b77b27) SHA1(7974761456aaabcf016158ee5f5c32c89e43c748) )
+	ROM_LOAD( "super cobra ra1 2f 1981.2f",   0x2000, 0x1000, CRC(e6109c2c) SHA1(1749ac277b1af45b1f6722d2ddaf46be043b2b25) )
+	ROM_LOAD( "super cobra ra1 2h 1981.2h",   0x3000, 0x1000, CRC(8762735b) SHA1(07dd9b390d44fec9f83c88abf28d167c1710dcc9) )
+	ROM_LOAD( "super cobra ra1 2j 1981.2j",   0x4000, 0x1000, CRC(5648f404) SHA1(5cfbada816fd614508c7cd41196a350176c5882d) )
+	ROM_LOAD( "super cobra ra1 2l 1981.2l",   0x5000, 0x1000, CRC(34476cc3) SHA1(b8b1c9572e0c5e25f3d2a33d5a0ce40de007b478) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "super cobra ra1 5f 1981.5f",   0x0000, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) )
+	ROM_LOAD( "super cobra ra1 5h 1981.5h",   0x0800, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) )
+
+	// roms below were missing, so not verified for this set but likely the same because the main program is.
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "5c",   0x0000, 0x0800, BAD_DUMP CRC(deeb0dd3) SHA1(b815a586f05361b75078d58f1fddfdb36f9d8fae) )
+	ROM_LOAD( "5d",   0x0800, 0x0800, BAD_DUMP CRC(872c1a74) SHA1(20f05bf398ad2690f5ba4e4158ad62aeec226413) )
+	ROM_LOAD( "5e",   0x1000, 0x0800, BAD_DUMP CRC(ccd7a110) SHA1(5a247e360530be0f94c90fcc7d0ce628d460449f) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, BAD_DUMP CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
+ROM_END
+
+
 ROM_START( suprheli )
 	/* this is a bootleg of Super Cobra */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10990,6 +11046,7 @@ GAME( 1982, monsterz,    0,        monsterz,   sfx,        galaxian_state, sfx, 
 GAME( 1981, scobra,      0,        scobra,     scobra,     galaxian_state, scobra,     ROT90,  "Konami", "Super Cobra", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrase,    scobra,   scobra,     scobra,     galaxian_state, scobra,     ROT90,  "Konami (Sega license)", "Super Cobra (Sega)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobras,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scobrae,     scobra,   scobra,     scobras,    galaxian_state, scobrae,    ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics) (encrypted, KONATEC XC-103SS CPU)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrab,     scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "bootleg", "Super Cobra (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, suprheli,    scobra,   scobra,     scobras,    galaxian_state, scobra,     ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", GAME_SUPPORTS_SAVE )
 
