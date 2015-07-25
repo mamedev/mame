@@ -6211,8 +6211,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- keeps resetting, wrong mapper? -->
-	<software name="hydlide3k" cloneof="hydlide3" supported="partial">
+	<software name="hydlide3k" cloneof="hydlide3">
 		<description>Hydlide 3 - The Space Memories (Kor)</description>
 		<year>1987</year>
 		<publisher>Zemina</publisher>
