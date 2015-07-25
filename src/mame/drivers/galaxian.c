@@ -10467,8 +10467,8 @@ ROM_START( scobrae )
 	ROM_LOAD( "super cobra ra1 2l 1981.2l",   0x5000, 0x1000, CRC(34476cc3) SHA1(b8b1c9572e0c5e25f3d2a33d5a0ce40de007b478) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "super cobra ra1 5h 1981.5h",   0x0000, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) )
-	ROM_LOAD( "super cobra ra1 5f 1981.5f",   0x0800, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) )
+	ROM_LOAD( "super cobra ra1 5f 1981.5f",   0x0000, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) )
+	ROM_LOAD( "super cobra ra1 5h 1981.5h",   0x0800, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) )
 
 	// roms below were missing, so not verified for this set
 	ROM_REGION( 0x10000, "audiocpu", 0 )
