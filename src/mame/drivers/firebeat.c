@@ -102,12 +102,6 @@
     ???        ?              2001    Pop'n Music Mickey Tunes
 
     TODO:
-        - The display list pointer setting in the graphics chip is not understood. Currently
-          it has to be changed manually. (BIOS = 0x200000, PPP bootup = 0x1D0800, ingame = 0x0000, 0x8000 & 0x10000)
-
-        - Keyboardmania 3rd mix is missing some graphics in the ingame. Most notably the backgrounds.
-          The display list objects seem to be there, but the address is wrong (0x14c400, instead of the correct address)
-
         - The external Yamaha MIDI sound board is not emulated (no keyboard sounds).
 
 
@@ -141,6 +135,7 @@
 #include "machine/midikbd.h"
 #include "sound/ymz280b.h"
 #include "sound/cdda.h"
+#include "sound/rf5c400.h"
 #include "firebeat.lh"
 
 
@@ -872,6 +867,7 @@ void firebeat_gcu_device::device_stop()
 
 
 
+#define PRINT_SPU_MEM 0
 
 class firebeat_state : public driver_device
 {
@@ -879,6 +875,7 @@ public:
 	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_flash_main(*this, "flash_main"),
 		m_flash_snd1(*this, "flash_snd1"),
@@ -889,10 +886,12 @@ public:
 		m_kbd1(*this, "kbd1"),
 		m_ata(*this, "ata"),
 		m_gcu0(*this, "gcu0"),
-		m_gcu1(*this, "gcu1")
+		m_gcu1(*this, "gcu1"),
+		m_spuata(*this, "spu_ata")
 	{ }
 
 	required_device<ppc4xx_device> m_maincpu;
+	optional_device<m68000_device> m_audiocpu;
 	required_shared_ptr<UINT32> m_work_ram;
 	required_device<fujitsu_29f016a_device> m_flash_main;
 	required_device<fujitsu_29f016a_device> m_flash_snd1;
@@ -904,6 +903,7 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<firebeat_gcu_device> m_gcu0;
 	required_device<firebeat_gcu_device> m_gcu1;
+	optional_device<ata_interface_device> m_spuata;
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
@@ -918,6 +918,7 @@ public:
 	int m_ibutton_state;
 	int m_ibutton_read_subkey_ptr;
 	UINT8 m_ibutton_subkey_data[0x40];
+
 	DECLARE_READ8_MEMBER(soundram_r);
 	DECLARE_DRIVER_INIT(ppd);
 	DECLARE_DRIVER_INIT(kbm);
@@ -957,7 +958,13 @@ public:
 	DECLARE_READ32_MEMBER(ppc_spu_share_r);
 	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
 	DECLARE_READ16_MEMBER(spu_unk_r);
+	DECLARE_WRITE16_MEMBER(spu_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(spu_220000_w);
+	DECLARE_READ16_MEMBER(m68k_spu_share_r);
+	DECLARE_WRITE16_MEMBER(m68k_spu_share_w);
+	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
 	void set_ibutton(UINT8 *data);
 	int ibutton_w(UINT8 data);
 	DECLARE_WRITE8_MEMBER(security_w);
@@ -1567,6 +1574,10 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 {
 	UINT32 r = 0;
 
+#if PRINT_SPU_MEM
+	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+#endif
+
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= m_spu_shared_ram[(offset * 4) + 0] << 24;
@@ -1582,6 +1593,11 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 	if (ACCESSING_BITS_0_7)
 	{
 		r |= m_spu_shared_ram[(offset * 4) + 3] <<  0;
+
+		if (offset == 0xff)		// address 0x3ff clears PPC interrupt
+		{
+			m_maincpu->set_input_line(INPUT_LINE_IRQ3, CLEAR_LINE);
+		}
 	}
 
 	return r;
@@ -1589,6 +1605,10 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 
 WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 {
+#if PRINT_SPU_MEM
+	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+#endif
+
 	if (ACCESSING_BITS_24_31)
 	{
 		m_spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
@@ -1600,6 +1620,11 @@ WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_spu_shared_ram[(offset * 4) + 2] = (data >>  8) & 0xff;
+
+		if (offset == 0xff)		// address 0x3fe triggers M68K interrupt
+		{
+			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
+		}
 	}
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1607,21 +1632,89 @@ WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
+/*  SPU board M68K IRQs
+
+    IRQ1: ?
+
+    IRQ2: Timer?
+	
+	IRQ4: Dual-port RAM mailbox (when PPC writes to 0x3FE)
+	      Handles commands from PPC (bytes 0x00 and 0x01)
+	
+	IRQ6: ATA
+*/
+
 READ16_MEMBER(firebeat_state::m68k_spu_share_r)
 {
-	return m_spu_shared_ram[offset] << 8;
+#if PRINT_SPU_MEM
+	printf("m68k_spu_share_r: %08X, %08X\n", offset, mem_mask);
+#endif
+	UINT16 r = 0;
+
+	if (ACCESSING_BITS_0_7)
+	{
+		r |= m_spu_shared_ram[offset];
+
+		if (offset == 0x3fe)			// address 0x3fe clears M68K interrupt
+		{
+			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
+		}
+	}
+	return r;
 }
 
 WRITE16_MEMBER(firebeat_state::m68k_spu_share_w)
 {
-	m_spu_shared_ram[offset] = (data >> 8) & 0xff;
-}
+#if PRINT_SPU_MEM
+	printf("m68k_spu_share_w: %04X, %08X, %08X\n", data, offset, mem_mask);
 #endif
+	if (ACCESSING_BITS_0_7)
+	{
+		m_spu_shared_ram[offset] = data & 0xff;
+
+		if (offset == 0x3ff)			// address 0x3ff triggers PPC interrupt
+		{
+			m_maincpu->set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);
+		}
+	}
+}
 
 READ16_MEMBER(firebeat_state::spu_unk_r)
 {
-	return 0xffff;
+	// dipswitches?
+
+	UINT16 r = 0;
+	r |= 0x80;		// if set, uses ATA PIO mode, otherwise DMA
+
+	return r;
+}
+
+WRITE16_MEMBER(firebeat_state::spu_irq_ack_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		if (data & 0x01)
+			m_audiocpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+		if (data & 0x02)
+			m_audiocpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+		if (data & 0x08)
+			m_audiocpu->set_input_line(INPUT_LINE_IRQ6, CLEAR_LINE);
+	}
+}
+
+WRITE16_MEMBER(firebeat_state::spu_220000_w)
+{
+	// IRQ2 handler 5 sets all bits
+}
+
+WRITE_LINE_MEMBER(firebeat_state::spu_ata_interrupt)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ6, state);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(firebeat_state::spu_timer_callback)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -1661,7 +1754,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
-	AM_RANGE(0x340000, 0x34000f) AM_READ(spu_unk_r)
+	AM_RANGE(0x200000, 0x200001) AM_READ(spu_unk_r)
+	AM_RANGE(0x220000, 0x220001) AM_WRITE(spu_220000_w)
+	AM_RANGE(0x230000, 0x230001) AM_WRITE(spu_irq_ack_w)
+	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(m68k_spu_share_r, m68k_spu_share_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs0, write_cs0)
+	AM_RANGE(0x340000, 0x34000f) AM_DEVREADWRITE("spu_ata", ata_interface_device, read_cs1, write_cs1)
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rf5c400", rf5c400_device, rf5c400_r, rf5c400_w)	
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1821,6 +1920,7 @@ INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
 	// IRQ 0: VBlank
 	// IRQ 1: Extend board IRQ
 	// IRQ 2: Main board UART
+	// IRQ 3: SPU mailbox interrupt
 	// IRQ 4: ATA
 
 	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -1977,6 +2077,15 @@ static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(spu_map)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sputimer", firebeat_state, spu_timer_callback, attotime::from_hz(1000));
+
+	MCFG_RF5C400_ADD("rf5c400", XTAL_16_9344MHz)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_ATA_INTERFACE_ADD("spu_ata", ata_devices, "cdrom", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, spu_ata_interrupt))
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
@@ -2259,11 +2368,13 @@ ROM_START( popn4 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gq986jaa01", 0, SHA1(e5368ac029b0bdf29943ae66677b5521ae1176e1) )
 
-	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
-	DISK_IMAGE( "gq986jaa02", 1, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
+	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
+	DISK_IMAGE( "gq986jaa02", 0, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
 ROM_END
 
 ROM_START( popn5 )
@@ -2276,11 +2387,13 @@ ROM_START( popn5 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
 
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "a04jaa01", 0, SHA1(87136ddad1d786b4d5f04381fcbf679ab666e6c9) )
 
-	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "a04jaa02", 1, SHA1(49a017dde76f84829f6e99a678524c40665c3bfd) )
+	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "a04jaa02", 0, SHA1(49a017dde76f84829f6e99a678524c40665c3bfd) )
 ROM_END
 
 ROM_START( popn6 )
@@ -2293,11 +2406,13 @@ ROM_START( popn6 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gqa16jaa01", 0, SHA1(7a7e475d06c74a273f821fdfde0743b33d566e4c) )
 
-	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
-	DISK_IMAGE( "gqa16jaa02", 1, SHA1(e39067300e9440ff19cb98c1abc234fa3d5b26d1) )
+	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
+	DISK_IMAGE( "gqa16jaa02", 0, SHA1(e39067300e9440ff19cb98c1abc234fa3d5b26d1) )
 ROM_END
 
 ROM_START( popn7 )
@@ -2310,11 +2425,13 @@ ROM_START( popn7 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(259c733ca4d30281205b46b7bf8d60c9d01aa818) )
 
-	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "b00jaa02", 1, SHA1(c8ce2f8ee6aeeedef9c110a59e68fcec7b669ad6) )
+	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "b00jaa02", 0, SHA1(c8ce2f8ee6aeeedef9c110a59e68fcec7b669ad6) )
 ROM_END
 
 ROM_START( popn8 )
@@ -2327,11 +2444,13 @@ ROM_START( popn8 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gqb30jaa01", 0, SHA1(0ff3e40e3717ce23337b3a2438bdaca01cba9e30) )
 
-	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "gqb30jaa02", 1, SHA1(f067d502c23efe0267aada5706f5bc7a54605942) )
+	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "gqb30jaa02", 0, SHA1(f067d502c23efe0267aada5706f5bc7a54605942) )
 ROM_END
 
 ROM_START( popnanm2 )
@@ -2344,11 +2463,13 @@ ROM_START( popnanm2 )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gea02jaa01", 0, SHA1(e81203b6812336c4d00476377193340031ef11b1) )
 
-	DISK_REGION( "ata:1:cdrom" ) // data DVD-ROM
-	DISK_IMAGE_READONLY( "gea02jaa02", 1, SHA1(7212e399779f37a5dcb8317a8f635a3b3f620aa9) )
+	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
+	DISK_IMAGE_READONLY( "gea02jaa02", 0, SHA1(7212e399779f37a5dcb8317a8f635a3b3f620aa9) )
 ROM_END
 
 ROM_START( ppd )
@@ -2382,7 +2503,7 @@ ROM_END
 // Beatmania III has a different BIOS and SPU program, and they aren't dumped yet
 ROM_START( bm37th )
 	ROM_REGION32_BE(0x80000, "user1", 0)
-	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, BAD_DUMP CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
+	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, BAD_DUMP CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))		// boots with KBM BIOS
 
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gcb07-jc", 0x000000, 0x0000c0, CRC(16115b6a) SHA1(dcb2a3346973941a946b2cdfd31a5a761f666ca3) )
@@ -2390,16 +2511,18 @@ ROM_START( bm37th )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gcb07jca01", 0, SHA1(f906379bdebee314e2ca97c7756259c8c25897fd) )
 
-	DISK_REGION( "ata:1:hdd:image" ) // data HDD
-	DISK_IMAGE_READONLY( "gcb07jca02", 1, SHA1(6b8e17635825a6a43dc8d2721fe2eb0e0f39e940) )
+	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
+	DISK_IMAGE_READONLY( "gcb07jca02", 0, SHA1(6b8e17635825a6a43dc8d2721fe2eb0e0f39e940) )
 ROM_END
 
 ROM_START( bm3final )
 	ROM_REGION32_BE(0x80000, "user1", 0)
-	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, BAD_DUMP CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
+	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, BAD_DUMP CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))		// boots with KBM BIOS
 
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)    // Security dongle
 	ROM_LOAD( "gcc01-jc", 0x000000, 0x0000c0, CRC(9c49fed8) SHA1(212b87c1d25763117611ffb2a36ed568d429d2f4) )
@@ -2407,11 +2530,13 @@ ROM_START( bm3final )
 	ROM_REGION(0x80000, "audiocpu", 0)          // SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
+	ROM_REGION16_LE(0x1000000, "rf5c400", ROMREGION_ERASE00)
+
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
 	DISK_IMAGE_READONLY( "gcc01jca01", 0, SHA1(3e7af83670d791591ad838823422959987f7aab9) )
 
-	DISK_REGION( "ata:1:hdd:image" ) // data HDD
-	DISK_IMAGE_READONLY( "gcc01jca02", 1, SHA1(823e29bab11cb67069d822f5ffb2b90b9d3368d2) )
+	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
+	DISK_IMAGE_READONLY( "gcc01jca02", 0, SHA1(823e29bab11cb67069d822f5ffb2b90b9d3368d2) )
 ROM_END
 
 /*****************************************************************************/

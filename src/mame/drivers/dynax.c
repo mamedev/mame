@@ -4441,7 +4441,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hnoridur, dynax_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
+	MCFG_CPU_ADD("maincpu",Z80,XTAL_22MHz / 4)    /* 5.5MHz */
 	MCFG_CPU_PROGRAM_MAP(hnoridur_mem_map)
 	MCFG_CPU_IO_MAP(hnoridur_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
@@ -4467,14 +4467,14 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -4811,7 +4811,7 @@ static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjembase, hnoridur )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("maincpu")	// TMPZ84015
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(mjembase_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  mjelctrn_vblank_interrupt)   /* IM 2 needs a vector on the data bus */
@@ -6267,12 +6267,42 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Electromagnetic Base
-DYNAX D3803248L1
+Mahjong Electromagnetic Base (Dynax, 1989)
 
-AY-3-8912?, MSM5205?
-HD46505SP?, Dynax blitter? (rest of the chips are scratched)
-4 x DSW8, 28-way connector
+PCB Layout
+----------
+
+D3803248L1
+sticker: M6100524A
+  |--------------------------------------|
+  |             TMS4461  17G032   3804   |
+|-|             TMS4461           3805   |
+|       TMS4461 TMS4461   3801    3806   |
+|       TMS4461 TMS4461   3802    3807   |
+|                         3803    3808   |
+|             PAL                 3809   |
+|     6845SP                      381A   |
+|              2018     PAL              |
+|  DSW4 384KHz 2018          DSW1   0.1UF|
+|  LM358  M5205                          |
+|  LM358  YM2413             CPU   TC5563|
+|  MB3712   AY-3-8912                    |
+|-|VOL      DSW3             DSW2        |
+  |VOL   3.579545MHz       22MHz  3815   |
+  |--------------------------------------|
+Notes:
+      CPU       - surface scratched, clock input 11MHz [22/2], looks like TMPZ84015
+      AY-3-8912 - clock 1.375MHz [22/16]
+      YM2413    - clock 3.579545MHz
+      M5205     - clock 384kHz
+      6845SP    - clock 2.75MHz [22/8], VSync pin - 60.1188Hz, HSync pin - 15.8112kHz
+      TMS4461   - 1Mx4-bit DRAM
+      2018      - 2kx8-bit SRAM
+      TC5563    - 8kx8-bit SRAM
+      17G032    - custom Dynax GFX chip
+      DSW1-4    - 8-position DIP switches
+      0.1UF     - 5.5v 0.1UF supercap
+      MB3712    - Fujitsu MB3712 AMP
 
 ***************************************************************************/
 

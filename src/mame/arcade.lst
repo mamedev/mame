@@ -9746,11 +9746,12 @@ realbrko        // "600" Billiard Academy Real Break 1998 (Europe)
 realbrkk        // "600" Billiard Academy Real Break 1998 (Korea)
 janshinp        // "700j" 1996 Dynax / Sigma
 dtoyoken        // "700d" 1996 Dynax / Sigma
-cafepara        // 1999 Techno-Top
-daimyojn        // 2002 Dynax / Techno-Top
-momotaro        // 2004 Techno-Top
+cafepara        // "001" 1999 Techno-Top
+mjgnight        // "003" 2000 Techno-Top
+daimyojn        // "017" 2002 Dynax / Techno-Top
+momotaro        // "027" 2004 Techno-Top
 kotbinyo        // 1997 Dynax / Shinwhajin
-kotbinsp        // 1997 Dynax / Shinwhajin
+kotbinsp        // "909" 1997 Dynax / Shinwhajin
 
 pkgnsh          // "505" Pachinko Gindama Shoubu 1998 (Japan)
 pkgnshdx        // "522" Pachinko Gindama Shoubu DX 1998 (Japan)
@@ -9877,6 +9878,7 @@ tarzana         // (c) 1999?
 starzan         // (c) 2000?
 
 // IGS027A Cpu Games
+slqz3           // (c) 1999
 zhongguo        // (c) 2000
 sdwx            // (c) 2002
 sddz            // (c) 200?

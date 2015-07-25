@@ -431,6 +431,8 @@ if (BUSES["CBMIEC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cbmiec/interpod.h",
 		MAME_DIR .. "src/emu/bus/cbmiec/serialbox.c",
 		MAME_DIR .. "src/emu/bus/cbmiec/serialbox.h",
+		MAME_DIR .. "src/emu/bus/cbmiec/vic1515.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/vic1515.h",
 	}
 end
 
@@ -1496,7 +1498,7 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/emu/bus/centronics/digiblst.c",
 		MAME_DIR .. "src/emu/bus/centronics/digiblst.h",
 	}
-	
+
 	dependency {
 		{ MAME_DIR .. "src/emu/bus/centronics/epson_ex800.c",  GEN_DIR .. "emu/layout/ex800.lh" },
 		{ MAME_DIR .. "src/emu/bus/centronics/epson_lx800.c",  GEN_DIR .. "emu/layout/lx800.lh" },
@@ -1506,7 +1508,7 @@ if (BUSES["CENTRONICS"]~=null) then
 	custombuildtask {
 		layoutbuildtask("emu/layout", "ex800"),
 		layoutbuildtask("emu/layout", "lx800"),
-	}		
+	}
 end
 
 ---------------------------------------------------
