@@ -4,7 +4,7 @@
 
 Galaxia by Zaccaria (1979)
 Also released in several regions as "Super Galaxians".
-Set regions are unknown, so all are currently Galaxia.
+Set regions are unknown, so all are currently named Galaxia.
 
 Taken from an untested board.
 
@@ -62,11 +62,6 @@ TODO:
 - add sound board emulation
 - improve bullets
 - accurate sprite/bg sync in astrowar
-
-NOTE: Are there unemulated waitstates? On real hardware, the speed of both
-Astrowars and Galaxia are a bit slower, as seen in these videos:
-https://www.youtube.com/watch?v=xHBrZJxIfzI
-https://www.youtube.com/watch?v=eSrQFBMeDlM
 
 */
 
@@ -295,7 +290,7 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
@@ -340,7 +335,7 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
