@@ -240,6 +240,8 @@ if (BUSES["C64"]~=null) then
 		MAME_DIR .. "src/emu/bus/c64/exp.h",
 		MAME_DIR .. "src/emu/bus/c64/c128_comal80.c",
 		MAME_DIR .. "src/emu/bus/c64/c128_comal80.h",
+		MAME_DIR .. "src/emu/bus/c64/c128_partner.c",
+		MAME_DIR .. "src/emu/bus/c64/c128_partner.h",
 		MAME_DIR .. "src/emu/bus/c64/comal80.c",
 		MAME_DIR .. "src/emu/bus/c64/comal80.h",
 		MAME_DIR .. "src/emu/bus/c64/cpm.c",
