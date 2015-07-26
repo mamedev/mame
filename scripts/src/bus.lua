@@ -435,6 +435,8 @@ if (BUSES["CBMIEC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cbmiec/vic1515.h",
 		MAME_DIR .. "src/emu/bus/cbmiec/vic1520.c",
 		MAME_DIR .. "src/emu/bus/cbmiec/vic1520.h",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1526.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1526.h",
 	}
 end
 
