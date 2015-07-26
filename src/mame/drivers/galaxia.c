@@ -48,16 +48,28 @@ Quick PCB sketch:
 Astro Wars (port of Astro Fighter) is on a stripped down board of Galaxia,
 using only one 2636 chip, less RAM, and no PROM.
 
+Manuals and Schematic for Galaxia can be found at:
+http://www.zzzaccaria.com/manuals/SuperGalaxiansTechnicalManual.zip
+http://www.zzzaccaria.com/manuals/GalaxiaSchematics.zip
+
 ---
 
 HW has many similarities with quasar.c / cvs.c / zac2650.c
 
 TODO:
-- fix colors, there's no color prom?!
+- correct color generation using info from Super Galaxians technical manual and
+Galaxia schematics
 - stars background should be multi color
-- improve sound, maybe part discrete
+- add sound board emulation
 - improve bullets
-- accurate astrowar sprite/bg sync
+- accurate sprite/bg sync in astrowar
+* https://www.youtube.com/watch?v=1XTY76LAtxI unknown astrowar set! undumped,
+different colors, speed and sound board (likely bootleg?)
+
+NOTE: Are there unemulated waitstates? On real hardware, the speed of both
+Astrowars and Galaxia are a bit slower, as seen in these videos:
+https://www.youtube.com/watch?v=xHBrZJxIfzI
+https://www.youtube.com/watch?v=eSrQFBMeDlM
 
 */
 
@@ -464,8 +476,8 @@ ROM_START( astrowar )
 ROM_END
 
 
-GAME( 1979, galaxia,  0,       galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxia,  0,       galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia / Super Galaxians (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia / Super Galaxians (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia / Super Galaxians (set 3)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia / Super Galaxians (set 4)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1980, astrowar, 0,       astrowar, galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
