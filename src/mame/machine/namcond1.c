@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "video/ygv608.h"
 #include "includes/namcond1.h"
 
 /* Perform basic machine initialisation */
@@ -22,6 +21,7 @@
 void namcond1_state::machine_start()
 {
 	save_item(NAME(m_h8_irq5_enabled));
+	// save_item(NAME(m_p8)); //isn't read anywhere for the time being
 }
 
 void namcond1_state::machine_reset()
@@ -51,15 +51,8 @@ void namcond1_state::machine_reset()
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-// instance of the shared ram pointer
-
-READ16_MEMBER(namcond1_state::namcond1_shared_ram_r)
-{
-	return m_shared_ram[offset];
-}
-
 // $c3ff00-$c3ffff
-READ16_MEMBER(namcond1_state::namcond1_cuskey_r)
+READ16_MEMBER(namcond1_state::cuskey_r)
 {
 	switch( offset )
 	{
@@ -77,17 +70,7 @@ READ16_MEMBER(namcond1_state::namcond1_cuskey_r)
 	}
 }
 
-WRITE16_MEMBER(namcond1_state::namcond1_shared_ram_w)
-{
-	switch( offset )
-	{
-		default :
-			COMBINE_DATA( m_shared_ram + offset );
-			break;
-	}
-}
-
-WRITE16_MEMBER(namcond1_state::namcond1_cuskey_w)
+WRITE16_MEMBER(namcond1_state::cuskey_w)
 {
 	switch( offset )
 	{

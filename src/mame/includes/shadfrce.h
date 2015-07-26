@@ -13,6 +13,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_io_p1(*this, "P1"),
+		m_io_p2(*this, "P2"),
+		m_io_dsw1(*this, "DSW1"),
+		m_io_dsw2(*this, "DSW2"),
+		m_io_other(*this, "OTHER"),
+		m_io_extra(*this, "EXTRA"),
+		m_io_misc(*this, "MISC"),
+		m_io_system(*this, "SYSTEM"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg0videoram(*this, "bg0videoram"),
 		m_bg1videoram(*this, "bg1videoram"),
@@ -24,6 +32,15 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	required_ioport m_io_p1;
+	required_ioport m_io_p2;
+	required_ioport m_io_dsw1;
+	required_ioport m_io_dsw2;
+	required_ioport m_io_other;
+	required_ioport m_io_extra;
+	required_ioport m_io_misc;
+	required_ioport m_io_system;
 
 	required_shared_ptr<UINT16> m_fgvideoram;
 	required_shared_ptr<UINT16> m_bg0videoram;
@@ -66,5 +83,5 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offset );
 };
