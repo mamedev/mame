@@ -242,16 +242,16 @@ READ16_MEMBER(shadfrce_state::input_ports_r)
 	switch (offset)
 	{
 		case 0 :
-			data = (ioport("P1")->read() & 0xff) | ((ioport("DSW2")->read() & 0xc0) << 6) | ((ioport("SYSTEM")->read() & 0x0f) << 8);
+			data = (m_io_p1->read() & 0xff) | ((m_io_dsw2->read() & 0xc0) << 6) | ((m_io_system->read() & 0x0f) << 8);
 			break;
 		case 1 :
-			data = (ioport("P2")->read() & 0xff) | ((ioport("DSW2")->read() & 0x3f) << 8);
+			data = (m_io_p2->read() & 0xff) | ((m_io_dsw2->read() & 0x3f) << 8);
 			break;
 		case 2 :
-			data = (ioport("EXTRA")->read() & 0xff) | ((ioport("DSW1")->read() & 0x3f) << 8);
+			data = (m_io_extra->read() & 0xff) | ((m_io_dsw1->read() & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (ioport("OTHER")->read() & 0xff) | ((ioport("DSW1")->read() & 0xc0) << 2) | ((ioport("MISC")->read() & 0x38) << 8) | (m_vblank << 8);
+			data = (m_io_other->read() & 0xff) | ((m_io_dsw1->read() & 0xc0) << 2) | ((m_io_misc->read() & 0x38) << 8) | (m_vblank << 8);
 			break;
 	}
 
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")  /* Fake IN6 (DIP1) */
+	PORT_START("DSW1")  /*DSW1, not mapped directly  */
 	PORT_DIPNAME( 0x01, 0x01, "Unused DIP 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -473,7 +473,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")  /* Fake IN7 (DIP2) */
+	PORT_START("DSW2")  /* DSW2, not mapped directly */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
