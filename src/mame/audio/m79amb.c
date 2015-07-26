@@ -330,7 +330,7 @@ WRITE8_MEMBER(m79amb_state::m79amb_8000_w)
 	m_discrete->write(space, M79AMB_SHOT_EN, data & 0x01);
 	m_discrete->write(space, M79AMB_BOOM_EN, data & 0x02);
 	m_discrete->write(space, M79AMB_THUD_EN, data & 0x04);
-};
+}
 
 WRITE8_MEMBER(m79amb_state::m79amb_8003_w)
 {

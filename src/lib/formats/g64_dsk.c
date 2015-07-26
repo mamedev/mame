@@ -44,37 +44,47 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	dynamic_buffer img(size);
 	io_generic_read(io, &img[0], 0, size);
 
-	if (img[VERSION]) {
-		throw emu_fatalerror("g64_format: Unsupported version %u", img[VERSION]);
+	if (img[POS_VERSION]) {
+		throw emu_fatalerror("g64_format: Unsupported version %u", img[POS_VERSION]);
 	}
 
-	int track_count = img[TRACK_COUNT];
+	int track_count = img[POS_TRACK_COUNT];
 	int head = 0;
 
 	for (int track = 0; track < track_count; track++)
 	{
-		UINT32 track_offset = pick_integer_le(&img[0], TRACK_OFFSET + (track * 4), 4);
+		int cylinder = track % TRACK_COUNT;
 
-		if (!track_offset)
+		if (track == TRACK_COUNT)
+			head = 1;
+
+		UINT32 tpos = POS_TRACK_OFFSET + (track * 4);
+		UINT32 spos = tpos + (track_count * 4);
+		UINT32 dpos = pick_integer_le(&img[0], tpos, 4);
+
+		if (!dpos)
 			continue;
 
-		if (track_offset > size)
-			throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, track_offset);
+		if (dpos > size)
+			throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, dpos);
 
-		UINT32 speed_zone = pick_integer_le(&img[0], SPEED_ZONE + (track * 4), 4);
+		UINT32 speed_zone = pick_integer_le(&img[0], spos, 4);
 
 		if (speed_zone > 3)
 			throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
 
-		UINT16 track_bytes = pick_integer_le(&img[0], track_offset, 2);
+		UINT16 track_bytes = pick_integer_le(&img[0], dpos, 2);
 		int track_size = track_bytes * 8;
 
-		LOG_FORMATS("track %u size %u cell %ld\n", track, track_size, 200000000L/track_size);
+		LOG_FORMATS("head %u track %u offs %u size %u cell %ld\n", head, cylinder, dpos, track_bytes, 200000000L/track_size);
 
-		generate_track_from_bitstream(track, head, &img[track_offset+2], track_size, image);
+		generate_track_from_bitstream(cylinder, head, &img[dpos+2], track_size, image);
 	}
 
-	image->set_variant(floppy_image::SSSD);
+	if (!head)
+		image->set_variant(floppy_image::SSSD);
+	else
+		image->set_variant(floppy_image::DSSD);
 
 	return true;
 }
@@ -93,52 +103,59 @@ int g64_format::generate_bitstream(int track, int head, int speed_zone, UINT8 *t
 
 bool g64_format::save(io_generic *io, floppy_image *image)
 {
-	UINT8 header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, 0x54, TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
+	int tracks, heads;
+	image->get_actual_geometry(tracks, heads);
+	tracks = TRACK_COUNT * heads;
 
-	io_generic_write(io, header, SIGNATURE, sizeof(header));
+	// write header
+	UINT8 header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, tracks, TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
+	io_generic_write(io, header, POS_SIGNATURE, sizeof(header));
 
-	int head = 0;
-	int tracks_written = 0;
+	// write tracks
+	for (int head = 0; head < heads; head++) {
+		int tracks_written = 0;
 
-	dynamic_buffer trackbuf(TRACK_LENGTH-2);
-	for (int track = 0; track < 84; track++) {
-		UINT32 tpos = TRACK_OFFSET + track * 4;
-		UINT32 spos = SPEED_ZONE + track * 4;
-		UINT32 dpos = TRACK_DATA + tracks_written * TRACK_LENGTH;
+		dynamic_buffer trackbuf(TRACK_LENGTH-2);
 
-		io_generic_write_filler(io, 0x00, tpos, 4);
-		io_generic_write_filler(io, 0x00, spos, 4);
+		for (int track = 0; track < TRACK_COUNT; track++) {
+			UINT32 tpos = POS_TRACK_OFFSET + (track * 4);
+			UINT32 spos = tpos + (tracks * 4);
+			UINT32 dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * TRACK_LENGTH);
 
-		if (image->get_buffer(track, head).size() <= 1)
-			continue;
+			io_generic_write_filler(io, 0x00, tpos, 4);
+			io_generic_write_filler(io, 0x00, spos, 4);
 
-		int track_size;
-		int speed_zone;
+			if (image->get_buffer(track, head).size() <= 1)
+				continue;
 
-		// figure out the cell size and speed zone from the track data
-		if ((speed_zone = generate_bitstream(track, head, 3, &trackbuf[0], track_size, image)) == -1)
-			if ((speed_zone = generate_bitstream(track, head, 2, &trackbuf[0], track_size, image)) == -1)
-				if ((speed_zone = generate_bitstream(track, head, 1, &trackbuf[0], track_size, image)) == -1)
-					if ((speed_zone = generate_bitstream(track, head, 0, &trackbuf[0], track_size, image)) == -1)
-						throw emu_fatalerror("g64_format: Cannot determine speed zone for track %u", track);
+			int track_size;
+			int speed_zone;
 
-		LOG_FORMATS("track %u size %u cell %u\n", track, track_size, c1541_cell_size[speed_zone]);
+			// figure out the cell size and speed zone from the track data
+			if ((speed_zone = generate_bitstream(track, head, 3, &trackbuf[0], track_size, image)) == -1)
+				if ((speed_zone = generate_bitstream(track, head, 2, &trackbuf[0], track_size, image)) == -1)
+					if ((speed_zone = generate_bitstream(track, head, 1, &trackbuf[0], track_size, image)) == -1)
+						if ((speed_zone = generate_bitstream(track, head, 0, &trackbuf[0], track_size, image)) == -1)
+							throw emu_fatalerror("g64_format: Cannot determine speed zone for track %u", track);
 
-		UINT8 track_offset[4];
-		UINT8 speed_offset[4];
-		UINT8 track_length[2];
+			LOG_FORMATS("head %u track %u size %u cell %u\n", head, track, track_size, c1541_cell_size[speed_zone]);
 
-		place_integer_le(track_offset, 0, 4, dpos);
-		place_integer_le(speed_offset, 0, 4, speed_zone);
-		place_integer_le(track_length, 0, 2, track_size/8);
+			UINT8 track_offset[4];
+			UINT8 speed_offset[4];
+			UINT8 track_length[2];
 
-		io_generic_write(io, track_offset, tpos, 4);
-		io_generic_write(io, speed_offset, spos, 4);
-		io_generic_write_filler(io, 0xff, dpos, TRACK_LENGTH);
-		io_generic_write(io, track_length, dpos, 2);
-		io_generic_write(io, &trackbuf[0], dpos + 2, track_size);
+			place_integer_le(track_offset, 0, 4, dpos);
+			place_integer_le(speed_offset, 0, 4, speed_zone);
+			place_integer_le(track_length, 0, 2, track_size/8);
 
-		tracks_written++;
+			io_generic_write(io, track_offset, tpos, 4);
+			io_generic_write(io, speed_offset, spos, 4);
+			io_generic_write_filler(io, 0xff, dpos, TRACK_LENGTH);
+			io_generic_write(io, track_length, dpos, 2);
+			io_generic_write(io, &trackbuf[0], dpos + 2, track_size);
+
+			tracks_written++;
+		}
 	}
 
 	return true;
@@ -151,12 +168,12 @@ const char *g64_format::name() const
 
 const char *g64_format::description() const
 {
-	return "Commodore 1541 GCR disk image";
+	return "Commodore 1541/1571 GCR disk image";
 }
 
 const char *g64_format::extensions() const
 {
-	return "g64,g41";
+	return "g64,g41,g71";
 }
 
 const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_format>;

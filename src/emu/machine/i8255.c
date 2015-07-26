@@ -44,7 +44,7 @@ enum
 enum
 {
 	MODE_OUTPUT = 0,
-	MODE_INPUT,
+	MODE_INPUT
 };
 
 

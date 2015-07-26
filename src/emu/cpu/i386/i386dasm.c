@@ -70,7 +70,7 @@ enum
 	PARAM_XMM0,
 	PARAM_XMM64,            /* 64-bit memory or XMM register */
 	PARAM_XMM32,            /* 32-bit memory or XMM register */
-	PARAM_XMM16,            /* 16-bit memory or XMM register */
+	PARAM_XMM16             /* 16-bit memory or XMM register */
 };
 
 enum

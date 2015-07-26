@@ -50,10 +50,15 @@
 #include "nld_9316.h"
 
 #include "nld_ne555.h"
+#include "nld_mm5837.h"
 
 #include "nld_r2r_dac.h"
 
 #include "nld_log.h"
+
+#include "../macro/nlm_cd4xxx.h"
+#include "../macro/nlm_ttl74xx.h"
+#include "../macro/nlm_opamp.h"
 
 #include "../analog/nld_bjt.h"
 #include "../analog/nld_fourterm.h"
@@ -66,6 +71,7 @@
 
 NETLIST_EXTERNAL(diode_models)
 NETLIST_EXTERNAL(bjt_models)
+NETLIST_EXTERNAL(family_models)
 
 namespace netlist {
 	void initialize_factory(netlist::factory_list_t &factory);

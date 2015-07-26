@@ -13,6 +13,14 @@
 #include "sh2.h"
 #include "sh2comn.h"
 
+
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 #define VERBOSE 0
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
@@ -366,6 +374,7 @@ void sh2_device::sh2_do_dma(int dma)
 
 
 		LOG(("SH2.%s: DMA %d complete\n", tag(), dma));
+		m_m[0x62+4*dma] = 0;
 		m_m[0x63+4*dma] |= 2;
 		m_dma_timer_active[dma] = 0;
 		m_dma_irq[dma] |= 1;
@@ -461,13 +470,10 @@ void sh2_device::sh2_dmac_check(int dma)
 	}
 }
 
-WRITE32_MEMBER( sh2_device::sh2_internal_w )
+
+WRITE32_MEMBER( sh2_device::sh7604_w )
 {
 	UINT32 old;
-
-	if (m_isdrc)
-		offset &= 0x7f;
-
 
 	old = m_m[offset];
 	COMBINE_DATA(m_m+offset);
@@ -688,11 +694,8 @@ WRITE32_MEMBER( sh2_device::sh2_internal_w )
 	}
 }
 
-READ32_MEMBER( sh2_device::sh2_internal_r )
+READ32_MEMBER( sh2_device::sh7604_r )
 {
-	if (m_isdrc)
-	offset &= 0x7f;
-
 //  logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
 	switch( offset )
 	{
@@ -888,3 +891,138 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 
 	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }
+
+/*
+ SH-7021 on-chip device
+ */
+
+void sh2a_device::sh7032_dma_exec(int ch)
+{
+	const short dma_word_size[4] = { 0, +1, -1, 0 };
+	UINT8 rs = (m_dma[ch].chcr >> 8) & 0xf;	/**< Resource Select bits */
+	if(rs != 0xc) // Auto-Request
+	{
+		logerror("Warning: SH7032 DMA enables non auto-request transfer\n");
+		return;
+	}
+
+	// channel enable & master enable
+	if((m_dma[ch].chcr & 1) == 0 || (m_dmaor & 1) == 0)
+		return;
+
+	printf("%08x %08x %04x\n",m_dma[ch].sar,m_dma[ch].dar,m_dma[ch].chcr);
+	UINT8 dm = (m_dma[ch].chcr >> 14) & 3;	/**< Destination Address Mode bits */
+	UINT8 sm = (m_dma[ch].chcr >> 12) & 3;	/**< Source Address Mode bits */
+	bool ts = (m_dma[ch].chcr & 8); 		/**< Transfer Size bit */
+	int src_word_size = dma_word_size[sm] * ((ts == true) ? 2 : 1);
+	int dst_word_size = dma_word_size[dm] * ((ts == true) ? 2 : 1);
+	UINT32 src_addr = m_dma[ch].sar;
+	UINT32 dst_addr = m_dma[ch].dar;
+	UINT32 size_index = m_dma[ch].tcr;
+	if(size_index == 0)
+		size_index = 0x10000;
+
+	if(ts == false)
+		logerror("SH7032: DMA byte mode check\n");
+
+	for(int index = size_index;index>-1;index--)
+	{
+		if(ts == true)
+			m_program->write_word(dst_addr,m_program->read_word(src_addr));
+		else
+			m_program->write_byte(dst_addr,m_program->read_byte(src_addr));
+
+		src_addr += src_word_size;
+		dst_addr += dst_word_size;
+	}
+
+	m_dma[ch].chcr &= ~1; /**< @todo non-instant DMA */
+	printf("%02x %02x %02x %1d\n",sm,dm,rs,ts);
+}
+
+READ32_MEMBER(sh2a_device::dma_sar0_r)
+{
+	return m_dma[0].sar;
+}
+
+WRITE32_MEMBER(sh2a_device::dma_sar0_w)
+{
+	COMBINE_DATA(&m_dma[0].sar);
+}
+
+READ32_MEMBER(sh2a_device::dma_dar0_r)
+{
+	return m_dma[0].dar;
+}
+
+WRITE32_MEMBER(sh2a_device::dma_dar0_w)
+{
+	COMBINE_DATA(&m_dma[0].dar);
+}
+
+READ16_MEMBER(sh2a_device::dma_tcr0_r)
+{
+	return m_dma[0].tcr;
+}
+
+WRITE16_MEMBER(sh2a_device::dma_tcr0_w)
+{
+	//printf("%04x\n",data);
+	COMBINE_DATA(&m_dma[0].tcr);
+}
+
+READ16_MEMBER(sh2a_device::dma_chcr0_r)
+{
+	return m_dma[0].chcr;
+}
+
+WRITE16_MEMBER(sh2a_device::dma_chcr0_w)
+{
+	//printf("%04x CHCR0\n",data);
+	COMBINE_DATA(&m_dma[0].chcr);
+	sh7032_dma_exec(0);
+}
+
+READ16_MEMBER(sh2a_device::dmaor_r)
+{
+	return m_dmaor;
+}
+
+WRITE16_MEMBER(sh2a_device::dmaor_w)
+{
+	COMBINE_DATA(&m_dmaor);
+	sh7032_dma_exec(0);
+}
+
+/*!
+  @brief Dummy debug interface
+  */
+READ16_MEMBER(sh1_device::sh7032_r)
+{
+	return m_sh7032_regs[offset];
+}
+
+/*!
+  @brief Dummy debug interface
+ */
+WRITE16_MEMBER(sh1_device::sh7032_w)
+{
+	COMBINE_DATA(&m_sh7032_regs[offset]);
+}
+
+READ16_MEMBER(sh2a_device::sh7021_r)
+{
+	return m_sh7021_regs[offset];
+}
+
+/*!
+  @brief Dummy debug interface
+ */
+WRITE16_MEMBER(sh2a_device::sh7021_w)
+{
+	COMBINE_DATA(&m_sh7021_regs[offset]);
+}
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif
+

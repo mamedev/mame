@@ -153,6 +153,13 @@ public:
 
 		memset(m_tiles, 0, 8 * sizeof(n64_tile_t));
 		memset(m_cmd_data, 0, sizeof(m_cmd_data));
+
+		for (INT32 i = 0; i < 8; i++)
+		{
+			m_tiles[i].num = i;
+			m_tiles[i].invmm = rgbaint_t(~0, ~0, ~0, ~0);
+			m_tiles[i].invmask = rgbaint_t(~0, ~0, ~0, ~0);
+		}
 	}
 
 	void        process_command_list();
@@ -381,6 +388,10 @@ private:
 	static const INT32 s_rdp_command_length[];
 	static const char* s_image_format[];
 	static const char* s_image_size[];
+
+public:
+	bool ignore;
+	bool dolog;
 };
 
 #endif // _VIDEO_N64_H_

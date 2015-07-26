@@ -2639,7 +2639,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
 		std::string temptag;
 		if (tag == NULL) {
-			strprintf(temptag, "anon_%p", membank);
+			strprintf(temptag, "anon_%p", (void *) membank);
 			tag = temptag.c_str();
 		}
 		manager().m_banklist.append(tag, *membank);
@@ -2788,7 +2788,7 @@ namespace {
 		offs_t start, end;
 		subrange(offs_t _start, offs_t _end) : start(_start), end(_end) {}
 	};
-};
+}
 
 void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries)
 {

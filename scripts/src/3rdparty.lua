@@ -534,6 +534,13 @@ project "portmidi"
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
 		}
 	end
+	if _OPTIONS["targetos"]=="netbsd" then
+		files {
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
+			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
+		}
+	end
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmac.c",
@@ -587,6 +594,11 @@ project "bgfx"
 		}
 		
 	configuration { "freebsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "netbsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
@@ -650,6 +662,7 @@ end
 -- PortAudio library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-portaudio"] then
 project "portaudio"
 	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
 	kind "StaticLib"
@@ -775,6 +788,11 @@ project "portaudio"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"portaudio",
+}
+end
 		
 --------------------------------------------------
 -- UnitTest++ library objects

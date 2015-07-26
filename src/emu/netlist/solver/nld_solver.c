@@ -9,6 +9,14 @@
  * the vectorizations fast-math enables pretty expensive
  */
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
+
 //#pragma GCC optimize "-ffast-math"
 #if 0
 #pragma GCC optimize "-ffast-math"
@@ -134,9 +142,9 @@ ATTR_COLD void matrix_solver_t::setup(analog_net_t::list_t &nets)
 							break;
 						case device_t::BJT_EB:
 						case device_t::DIODE:
-						//case device_t::VCVS:
+						case device_t::LVCCS:
 						case device_t::BJT_SWITCH:
-							NL_VERBOSE_OUT(("found BJT/Diode\n"));
+							NL_VERBOSE_OUT(("found BJT/Diode/LVCCS\n"));
 							if (!m_dynamic_devices.contains(&p->device()))
 								m_dynamic_devices.add(&p->device());
 							break;
@@ -262,7 +270,7 @@ void matrix_solver_t::solve_base(C *p)
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
-			netlist().warning("NEWTON_LOOPS exceeded ... reschedule");
+			netlist().warning("NEWTON_LOOPS exceeded on net %s... reschedule", this->name().cstr());
 			m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
 		}
 	}
@@ -600,3 +608,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 }
 
 NETLIB_NAMESPACE_DEVICES_END()
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

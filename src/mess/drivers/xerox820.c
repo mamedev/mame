@@ -244,7 +244,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 	data |= m_400_460 << 5;
 
 	return data;
-};
+}
 
 WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 {
@@ -327,7 +327,7 @@ READ8_MEMBER( xerox820_state::kbpio_pb_r )
 	*/
 
 	return m_kb->read() ^ 0xff;
-};
+}
 
 WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
 {

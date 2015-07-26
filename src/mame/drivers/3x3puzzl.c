@@ -162,7 +162,7 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrollx_w)
 {
 	m_tilemap1->set_scrollx(data);
-};
+}
 
 WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
 {

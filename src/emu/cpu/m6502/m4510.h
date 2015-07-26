@@ -74,7 +74,7 @@ protected:
 
 enum {
 	M4510_IRQ_LINE = m6502_device::IRQ_LINE,
-	M4510_NMI_LINE = m6502_device::NMI_LINE,
+	M4510_NMI_LINE = m6502_device::NMI_LINE
 };
 
 extern const device_type M4510;

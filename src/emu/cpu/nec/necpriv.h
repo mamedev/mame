@@ -17,7 +17,7 @@ enum
 	NEC_TRAP_VECTOR     = 1,
 	NEC_NMI_VECTOR      = 2,
 	NEC_BRKV_VECTOR     = 4,
-	NEC_CHKIND_VECTOR   = 5,
+	NEC_CHKIND_VECTOR   = 5
 };
 
 /* interrupt sources */
@@ -25,7 +25,7 @@ enum INTSOURCES
 {
 	BRK = 0,
 	INT_IRQ = 1,
-	NMI_IRQ = 2,
+	NMI_IRQ = 2
 };
 
 
@@ -39,7 +39,7 @@ enum BREGS {
 	DL = NATIVE_ENDIAN_VALUE_LE_BE(0x4, 0x5),
 	DH = NATIVE_ENDIAN_VALUE_LE_BE(0x5, 0x4),
 	BL = NATIVE_ENDIAN_VALUE_LE_BE(0x6, 0x7),
-	BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6),
+	BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6)
 };
 
 #define Sreg(x)         m_sregs[x]

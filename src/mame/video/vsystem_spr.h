@@ -41,14 +41,14 @@ public:
 	UINT32 tile_callback_noindirect(UINT32 tile);
 	vsystem_tile_indirection_delegate m_newtilecb;
 
+	// inline config
 	int m_xoffs, m_yoffs;
 	bool m_pdraw;
-
-	UINT16* m_vram;
-	UINT16 m_pal_base;
 	UINT16 m_pal_mask;
 	UINT8 m_gfx_region;
 	UINT8 m_transpen;
+
+	UINT16 m_pal_base;
 
 	struct vsystem_sprite_attributes
 	{
@@ -63,7 +63,7 @@ public:
 		int color;
 		int pri;
 		UINT32 map;
-	} curr_sprite;
+	} m_curr_sprite;
 
 	void get_sprite_attributes(UINT16* ram);
 	void common_sprite_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);

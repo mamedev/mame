@@ -11,6 +11,13 @@
 #include "cpu/ssem/ssem.h"
 #include "imagedev/snapquik.h"
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 class ssem_state : public driver_device
 {
 public:
@@ -89,7 +96,7 @@ enum
 	PANEL_LNUP, PANEL_LNDN,
 
 	// Halt
-	PANEL_HALT,
+	PANEL_HALT
 };
 
 INPUT_CHANGED_MEMBER(ssem_state::panel_check)
@@ -540,7 +547,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 			// Isolate and convert 4-digit decimal address
 			memcpy(token_buf, image_line, 4);
 			token_buf[4] = '\0';
-			sscanf(token_buf, "%04d", &line);
+			sscanf(token_buf, "%04u", &line);
 
 			if (!core_stricmp(image.filetype(), "snp"))
 			{
@@ -642,3 +649,7 @@ ROM_END
 
 /*   YEAR  NAME     PARENT    COMPAT   MACHINE  INPUT  INIT        COMPANY                       FULLNAME */
 COMP(1948, ssem,    0,        0,       ssem,    ssem, driver_device,  0,   "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", GAME_NO_SOUND_HW | GAME_SUPPORTS_SAVE )
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

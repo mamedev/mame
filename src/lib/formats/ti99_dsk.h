@@ -47,7 +47,7 @@ protected:
 };
 
 /*
-    Modern implementation of the sector dump format.
+    Implementation of the sector dump format.
 */
 class ti99_sdf_format : public ti99_floppy_format
 {
@@ -86,7 +86,7 @@ private:
 extern const floppy_format_type FLOPPY_TI99_SDF_FORMAT;
 
 /*
-    Modern implementation of the track dump format.
+    Implementation of the track dump format.
 */
 class ti99_tdf_format : public ti99_floppy_format
 {
@@ -107,13 +107,5 @@ private:
 };
 
 extern const floppy_format_type FLOPPY_TI99_TDF_FORMAT;
-
-// ========================================================================
-/*
-    Legacy implementation.
-*/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(ti99);
-void ti99_set_80_track_drives(int use80);
 
 #endif /* TI99_DSK_H */

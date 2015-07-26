@@ -54,7 +54,7 @@ protected:
 enum {
 	DECO16_IRQ_LINE = m6502_device::IRQ_LINE,
 	DECO16_NMI_LINE = m6502_device::NMI_LINE,
-	DECO16_SET_OVERFLOW = m6502_device::V_LINE,
+	DECO16_SET_OVERFLOW = m6502_device::V_LINE
 };
 
 extern const device_type DECO16;

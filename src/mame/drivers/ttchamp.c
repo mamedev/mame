@@ -31,7 +31,7 @@
  _|   74LS244  74LS14N 74HC74  16MHz |D70116C-10 | |
 |__________________________________________________|
 
-The PCB is Spanish and manufacured by Gamart.
+The PCB is Spanish and manufactured by Gamart.
 
 
 Table tennis Championships by Gamart 1995
@@ -46,7 +46,7 @@ Rom files definition:
 ttennis2/3 main program
 ttennis1 adpcm data
 ttennis4/5 graphics
-*there is a pic16c84 that i cannot dump because my programmer doesn't support it.
+*there is a pic16c84 that I cannot dump because my programmer doesn't support it.
 
 Dumped by tirino73
 
@@ -59,7 +59,7 @@ Dumped by tirino73
 - A bunch of spurious RAM writes to ROM area (genuine bug? left-overs?)
 
 Notes
-I think the PIC is used to interface with battry backed RAM instead of an EEPROM,
+I think the PIC is used to interface with battery backed RAM instead of an EEPROM,
 we currently simulate this as the PIC is read protected.
 
 
@@ -71,6 +71,7 @@ we currently simulate this as the PIC is read protected.
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 
+
 class ttchamp_state : public driver_device
 {
 public:
@@ -79,36 +80,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
-	UINT16* m_peno_mainram;
-
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	
 	UINT16 m_paloff;
-	DECLARE_WRITE16_MEMBER(paloff_w);
-	DECLARE_WRITE16_MEMBER(pcup_prgbank_w);
-	DECLARE_WRITE16_MEMBER(paldat_w);
-
-	DECLARE_WRITE16_MEMBER(port10_w);
-
-	DECLARE_WRITE16_MEMBER(port20_w);
-	DECLARE_WRITE16_MEMBER(port62_w);
-
-	DECLARE_READ16_MEMBER(port1e_r);
-
-	DECLARE_READ16_MEMBER(ttchamp_pic_r);
-	DECLARE_WRITE16_MEMBER(ttchamp_pic_w);
-
 	UINT16 m_port10;
 	UINT8 m_rombank;
-
-	DECLARE_DRIVER_INIT(ttchamp);
-
-	DECLARE_READ16_MEMBER(ttchamp_blit_start_r);
-
-	DECLARE_READ16_MEMBER(ttchamp_mem_r);
-	DECLARE_WRITE16_MEMBER(ttchamp_mem_w);
-
 	UINT16 m_videoram0[0x10000 / 2];
 	UINT16 m_videoram2[0x10000 / 2];
-
 
 	enum picmode
 	{
@@ -116,10 +95,11 @@ public:
 		PIC_SET_READADDRESS = 1,
 		PIC_SET_WRITEADDRESS = 2,
 		PIC_SET_WRITELATCH = 3,
-		PIC_SET_READLATCH = 4,
+		PIC_SET_READLATCH = 4
 
-	} picmodex;
+	};
 
+	picmode m_picmodex;
 
 	int m_pic_readaddr;
 	int m_pic_writeaddr;
@@ -133,27 +113,63 @@ public:
 	int m_spritesinit;
 	int m_spriteswidth;
 	int m_spritesaddr;
-
-	virtual void machine_start();
 	UINT16* m_rom16;
 	UINT8* m_rom8;
 
+	DECLARE_WRITE16_MEMBER(paloff_w);
+	DECLARE_WRITE16_MEMBER(pcup_prgbank_w);
+	DECLARE_WRITE16_MEMBER(paldat_w);
+
+	DECLARE_WRITE16_MEMBER(port10_w);
+
+	DECLARE_WRITE16_MEMBER(port20_w);
+	DECLARE_WRITE16_MEMBER(port62_w);
+
+	DECLARE_READ16_MEMBER(port1e_r);
+
+	DECLARE_READ16_MEMBER(pic_r);
+	DECLARE_WRITE16_MEMBER(pic_w);
+
+	DECLARE_READ16_MEMBER(blit_start_r);
+
+	DECLARE_READ16_MEMBER(mem_r);
+	DECLARE_WRITE16_MEMBER(mem_w);
+
+	virtual void machine_start();
 	virtual void video_start();
-	UINT32 screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ttchamp_irq);
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(irq);
 };
+
+ALLOW_SAVE_TYPE(ttchamp_state::picmode);
+
 
 void ttchamp_state::machine_start()
 {
 	m_rom16 = (UINT16*)memregion("maincpu")->base();
 	m_rom8 = memregion("maincpu")->base();
 
-	picmodex = PIC_IDLE;
+	m_picmodex = PIC_IDLE;
 
 	m_bakram = auto_alloc_array(machine(), UINT8, 0x100);
 	machine().device<nvram_device>("backram")->set_base(m_bakram, 0x100);
+	
+	save_item(NAME(m_paloff));
+	save_item(NAME(m_port10));
+	save_item(NAME(m_rombank));
+	save_item(NAME(m_videoram0));
+	save_item(NAME(m_videoram2));
+	save_item(NAME(m_picmodex));
+	save_item(NAME(m_pic_readaddr));
+	save_item(NAME(m_pic_writeaddr));
+	save_item(NAME(m_pic_latched));
+	save_item(NAME(m_pic_writelatched));
+	save_item(NAME(m_mainram));
+	save_item(NAME(m_spritesinit));
+	save_item(NAME(m_spriteswidth));
+	save_item(NAME(m_spritesaddr));
 
 }
 
@@ -161,7 +177,7 @@ void ttchamp_state::video_start()
 {
 }
 
-UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	logerror("update\n");
 	int y,x,count;
@@ -261,13 +277,13 @@ WRITE16_MEMBER(ttchamp_state::paldat_w)
 	m_palette->set_pen_color(m_paloff & 0x3ff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
-READ16_MEMBER(ttchamp_state::ttchamp_pic_r)
+READ16_MEMBER(ttchamp_state::pic_r)
 {
 //  printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
-	if (picmodex == PIC_SET_READLATCH)
+	if (m_picmodex == PIC_SET_READLATCH)
 	{
 //      printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
-		picmodex = PIC_IDLE;
+		m_picmodex = PIC_IDLE;
 
 		return m_pic_latched << 8;
 
@@ -276,29 +292,29 @@ READ16_MEMBER(ttchamp_state::ttchamp_pic_r)
 
 }
 
-WRITE16_MEMBER(ttchamp_state::ttchamp_pic_w)
+WRITE16_MEMBER(ttchamp_state::pic_w)
 {
-//  printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, picmodex);
-	if (picmodex == PIC_IDLE)
+//  printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, m_picmodex);
+	if (m_picmodex == PIC_IDLE)
 	{
 		if (data == 0x11)
 		{
-			picmodex = PIC_SET_READADDRESS;
+			m_picmodex = PIC_SET_READADDRESS;
 //          printf("state = SET_READADDRESS\n");
 		}
 		else if (data == 0x12)
 		{
-			picmodex = PIC_SET_WRITELATCH;
+			m_picmodex = PIC_SET_WRITELATCH;
 //          printf("latch write data.. \n" );
 		}
 		else if (data == 0x20)
 		{
-			picmodex = PIC_SET_WRITEADDRESS;
+			m_picmodex = PIC_SET_WRITEADDRESS;
 //          printf("state = PIC_SET_WRITEADDRESS\n");
 		}
 		else if (data == 0x21) // write latched data
 		{
-			picmodex = PIC_IDLE;
+			m_picmodex = PIC_IDLE;
 			m_bakram[m_pic_writeaddr] = m_pic_writelatched;
 	//      printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
 		}
@@ -309,33 +325,33 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_pic_w)
 			m_pic_latched = m_bakram[m_pic_readaddr>>1];
 
 //          printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
-			picmodex = PIC_SET_READLATCH; // waiting to read...
+			m_picmodex = PIC_SET_READLATCH; // waiting to read...
 		}
 		else
 		{
 //          printf("unknown\n");
 		}
 	}
-	else if (picmodex == PIC_SET_READADDRESS)
+	else if (m_picmodex == PIC_SET_READADDRESS)
 	{
 		m_pic_readaddr = data;
-		picmodex = PIC_IDLE;
+		m_picmodex = PIC_IDLE;
 	}
-	else if (picmodex == PIC_SET_WRITEADDRESS)
+	else if (m_picmodex == PIC_SET_WRITEADDRESS)
 	{
 		m_pic_writeaddr = data;
-		picmodex = PIC_IDLE;
+		m_picmodex = PIC_IDLE;
 	}
-	else if (picmodex == PIC_SET_WRITELATCH)
+	else if (m_picmodex == PIC_SET_WRITELATCH)
 	{
 		m_pic_writelatched = data;
-		picmodex = PIC_IDLE;
+		m_picmodex = PIC_IDLE;
 	}
 
 }
 
 
-READ16_MEMBER(ttchamp_state::ttchamp_mem_r)
+READ16_MEMBER(ttchamp_state::mem_r)
 {
 	// bits 0xf0 are used too, so this is likely wrong.
 
@@ -367,7 +383,7 @@ READ16_MEMBER(ttchamp_state::ttchamp_mem_r)
 	}
 }
 
-WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
+WRITE16_MEMBER(ttchamp_state::mem_w)
 {
 	// this is very strange, we use the offset (address bits) not data bits to set values..
 	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
@@ -484,7 +500,7 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 
 
 static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(ttchamp_mem_r, ttchamp_mem_w)
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
 /* Re-use same parameters as before (one-shot) */
@@ -494,7 +510,7 @@ READ16_MEMBER(ttchamp_state::port1e_r)
 	return 0xff;
 }
 
-READ16_MEMBER(ttchamp_state::ttchamp_blit_start_r)
+READ16_MEMBER(ttchamp_state::blit_start_r)
 {
 	m_spritesinit = 1;
 	return 0xff;
@@ -533,7 +549,7 @@ static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
 
 	AM_RANGE(0x0006, 0x0007) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x0018, 0x0019) AM_READ(ttchamp_blit_start_r) // read before using bus write offset as blit parameters
+	AM_RANGE(0x0018, 0x0019) AM_READ(blit_start_r) // read before using bus write offset as blit parameters
 	AM_RANGE(0x001e, 0x001f) AM_READ(port1e_r) // read before some blit operations (but not all)
 
 	AM_RANGE(0x0008, 0x0009) AM_WRITE(paldat_w)
@@ -543,7 +559,7 @@ static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
 
 	AM_RANGE(0x0020, 0x0021) AM_WRITE(port20_w)
 
-	AM_RANGE(0x0034, 0x0035) AM_READWRITE(ttchamp_pic_r, ttchamp_pic_w)
+	AM_RANGE(0x0034, 0x0035) AM_READWRITE(pic_r, pic_w)
 
 	AM_RANGE(0x0062, 0x0063) AM_WRITE(port62_w)
 
@@ -616,7 +632,7 @@ static INPUT_PORTS_START(ttchamp)
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(ttchamp_state::ttchamp_irq)/* right? */
+INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 {
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -626,7 +642,7 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ttchamp_map)
 	MCFG_CPU_IO_MAP(ttchamp_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ttchamp_state,  ttchamp_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ttchamp_state,  irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -634,7 +650,7 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ttchamp_state, screen_update_ttchamp)
+	MCFG_SCREEN_UPDATE_DRIVER(ttchamp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
@@ -676,10 +692,7 @@ ROM_START( ttchampa )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
-{
-}
 
 // only the graphics differ between the two sets, code section is the same
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", 0 ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", 0 ) // this only has Palencia Elektronik advertising boards
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, driver_device, 0, ROT0,  "Gamart",                               "Table Tennis Champions", GAME_SUPPORTS_SAVE ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, driver_device, 0, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", GAME_SUPPORTS_SAVE ) // this only has Palencia Elektronik advertising boards

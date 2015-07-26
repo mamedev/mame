@@ -84,12 +84,21 @@ k053252_device::k053252_device(const machine_config &mconfig, const char *tag, d
 
 void k053252_device::device_start()
 {
-	save_item(NAME(m_regs));
 	m_int1_en_cb.resolve_safe();
 	m_int2_en_cb.resolve_safe();
 	m_int1_ack_cb.resolve_safe();
 	m_int2_ack_cb.resolve_safe();
 	//m_int_time_cb.resolve_safe();
+
+	save_item(NAME(m_regs));
+	save_item(NAME(m_hc));
+	save_item(NAME(m_hfp));
+	save_item(NAME(m_hbp));
+	save_item(NAME(m_vc));
+	save_item(NAME(m_vfp));
+	save_item(NAME(m_vbp));
+	save_item(NAME(m_vsw));
+	save_item(NAME(m_hsw));
 }
 
 //-------------------------------------------------

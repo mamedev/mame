@@ -53,7 +53,7 @@ WRITE8_MEMBER( mbee_state::pio_port_b_w )
 
 	m_cassette->output(BIT(data, 1) ? -1.0 : +1.0);
 	m_speaker->level_w(BIT(data, 6));
-};
+}
 
 READ8_MEMBER( mbee_state::pio_port_b_r )
 {

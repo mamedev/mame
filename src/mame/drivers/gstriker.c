@@ -178,6 +178,13 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 ******************************************************************************/
 
+void gstriker_state::machine_start()
+{
+	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x8000);
+	
+	save_item(NAME(m_dmmy_8f_ret));
+	save_item(NAME(m_pending_command));
+}
 
 /*** MISC READ / WRITE HANDLERS **********************************************/
 
@@ -207,18 +214,14 @@ READ16_MEMBER(gstriker_state::pending_command_r)
 }
 #endif
 
-WRITE8_MEMBER(gstriker_state::gs_sh_pending_command_clear_w)
+WRITE8_MEMBER(gstriker_state::sh_pending_command_clear_w)
 {
 	m_pending_command = 0;
 }
 
-WRITE8_MEMBER(gstriker_state::gs_sh_bankswitch_w)
+WRITE8_MEMBER(gstriker_state::sh_bankswitch_w)
 {
-	UINT8 *RAM = memregion("audiocpu")->base();
-	int bankaddress;
-
-	bankaddress = (data & 0x07) * 0x8000;
-	membank("bank1")->set_base(&RAM[bankaddress]);
+	membank("soundbank")->set_entry(data & 0x07);
 }
 
 /*** GFX DECODE **************************************************************/
@@ -258,15 +261,6 @@ static GFXDECODE_START( gstriker )
 
 GFXDECODE_END
 
-/*** MORE SOUND RELATED ******************************************************/
-
-WRITE_LINE_MEMBER(gstriker_state::gs_ym2610_irq)
-{
-	if (state)
-		m_audiocpu->set_input_line(0, ASSERT_LINE);
-	else
-		m_audiocpu->set_input_line(0, CLEAR_LINE);
-}
 
 /*** MEMORY LAYOUTS **********************************************************/
 
@@ -297,14 +291,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gstriker_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, gstriker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_WRITE(gs_sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(gs_sh_pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(sh_bankswitch_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(sh_pending_command_clear_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
@@ -530,7 +524,7 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000) /* hand-tuned, it needs a bit */)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update_gstriker)
+	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstriker)
@@ -540,9 +534,11 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 
 	MCFG_DEVICE_ADD("zoomtilemap", MB60553, 0)
 	MCFG_MB60553_GFXDECODE("gfxdecode")
+	MCFG_MB60553_GFX_REGION(1)
 
 	MCFG_DEVICE_ADD("texttilemap", VS920A, 0)
 	MCFG_VS920A_GFXDECODE("gfxdecode")
+	MCFG_VS920A_GFX_REGION(0)
 
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
@@ -552,12 +548,10 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(gstriker_state,gstriker)
-
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(gstriker_state, gs_ym2610_irq))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -576,11 +570,8 @@ static MACHINE_CONFIG_DERIVED( vgoal, gstriker )
 	MCFG_CPU_PROGRAM_MAP(gstriker_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
-	MCFG_DEVICE_REPLACE("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
+	MCFG_DEVICE_MODIFY("vsystem_spr")
 	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0xf) // different vs. the other games, find register
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR_PALETTE("palette")
 MACHINE_CONFIG_END
 
 
@@ -1010,7 +1001,7 @@ WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
 	}
 }
 
-void gstriker_state::mcu_init(  )
+void gstriker_state::mcu_init()
 {
 	m_dmmy_8f_ret = 0xFFFF;
 	m_pending_command = 0;
@@ -1021,6 +1012,9 @@ void gstriker_state::mcu_init(  )
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20008e, 0x20008f, write16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20008e, 0x20008f, read16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_r),this));
+	
+	save_item(NAME(m_mcu_data));
+	save_item(NAME(m_prot_reg));
 }
 
 DRIVER_INIT_MEMBER(gstriker_state,twrldc94)
@@ -1046,13 +1040,13 @@ DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker, 0,        gstriker, gstriker, driver_device, 0,        ROT0, "Human", "Grand Striker", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gstrikera, gstriker, gstriker, gstriker, driver_device, 0,        ROT0, "Human", "Grand Striker (Americas)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, driver_device, 0,        ROT0, "Human", "Grand Striker (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gstriker, 0,        gstriker, gstriker, driver_device, 0,        ROT0, "Human", "Grand Striker", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, gstrikera, gstriker, gstriker, gstriker, driver_device, 0,        ROT0, "Human", "Grand Striker (Americas)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, driver_device, 0,        ROT0, "Human", "Grand Striker (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
-GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (Europe)",         GAME_NOT_WORKING ) // has ger/hol/arg/bra/ita/eng/spa/fra
-GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", GAME_NOT_WORKING ) // has ger/hol/arg/bra/ita/kor/usa/jpn
-GAME( 1994, twrldc94, 0,        twc94,    twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, twrldc94a,twrldc94, twc94,    twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, vgoalsoc, 0,        vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (Europe)",         GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
+GAME( 1994, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, gstriker_state, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
+GAME( 1994, twrldc94, 0,        twc94,    twrldc94, gstriker_state, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, twrldc94a,twrldc94, twc94,    twrldc94, gstriker_state, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

@@ -35,7 +35,7 @@
  *
  *************************************/
 
-struct poly_extra_data
+struct mz_poly_extra_data
 {
 	const void *    palbase;
 	const void *    texbase;
@@ -260,7 +260,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus)
 		m_palette->set_pen_color(i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 
 	/* initialize polygon engine */
-	poly = poly_alloc(machine(), 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine(), 10000, sizeof(mz_poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus_state::exit_handler), this));
@@ -623,7 +623,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					// m_zeusbase[0x46] = ??? = 0x00000000
 					// m_zeusbase[0x4c] = ??? = 0x00808080 (brightness?)
 					// m_zeusbase[0x4e] = ??? = 0x00808080 (brightness?)
-					poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
+					mz_poly_extra_data *extra = (mz_poly_extra_data *)poly_get_extra_data(poly);
 					poly_vertex vert[4];
 
 					vert[0].x = (INT16)m_zeusbase[0x08];
@@ -1084,7 +1084,7 @@ void midzeus_state::zeus_draw_model(UINT32 texdata, int logit)
 void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT32 texdata, int logit)
 {
 	poly_draw_scanline_func callback;
-	poly_extra_data *extra;
+	mz_poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
 	float uscale, vscale;
@@ -1212,7 +1212,7 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 			clipvert[i].y += 0.0005f;
 	}
 
-	extra = (poly_extra_data *)poly_get_extra_data(poly);
+	extra = (mz_poly_extra_data *)poly_get_extra_data(poly);
 
 	if ((ctrl_word & 0x000c0000) == 0x000c0000)
 	{
@@ -1269,7 +1269,7 @@ void midzeus_state::zeus_draw_quad(int long_fmt, const UINT32 *databuffer, UINT3
 
 static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;
@@ -1324,7 +1324,7 @@ static void render_poly_texture(void *dest, INT32 scanline, const poly_extent *e
 
 static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
 	int x;
 
 	for (x = extent->startx; x < extent->stopx; x++)
@@ -1351,7 +1351,7 @@ static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
 	UINT16 color = extra->solidcolor;
 	INT32 curz = (INT32)(extent->param[0].start);
 	INT32 curv = extent->param[2].start;
@@ -1377,7 +1377,7 @@ static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_poly_solid_fixedz(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	const mz_poly_extra_data *extra = (const mz_poly_extra_data *)extradata;
 	UINT16 color = extra->solidcolor;
 	UINT16 depth = extra->zoffset;
 	int x;

@@ -211,7 +211,7 @@ MACHINE_RESET_MEMBER(cdi_state,cdi)
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
-MACHINE_RESET_MEMBER(cdi_state,quizrd12)
+MACHINE_RESET_MEMBER(cdi_state,quizard12)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -219,7 +219,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd12)
 	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
-MACHINE_RESET_MEMBER(cdi_state,quizrd17)
+MACHINE_RESET_MEMBER(cdi_state,quizard17)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -227,8 +227,8 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd17)
 	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
-/* Untested - copied from quizrd17 */
-MACHINE_RESET_MEMBER(cdi_state,quizrd18)
+/* Untested - copied from quizard17 */
+MACHINE_RESET_MEMBER(cdi_state,quizard18)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -236,7 +236,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd18)
 	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
-MACHINE_RESET_MEMBER(cdi_state,quizrd22)
+MACHINE_RESET_MEMBER(cdi_state,quizard22)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -248,8 +248,8 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd22)
 	m_scc->set_quizard_mcu_ack(0x59);
 }
 
-/* Untested - copied from quizrd22 */
-MACHINE_RESET_MEMBER(cdi_state,quizrd23)
+/* Untested - copied from quizard22 */
+MACHINE_RESET_MEMBER(cdi_state,quizard23)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -261,7 +261,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd23)
 	m_scc->set_quizard_mcu_ack(0x59);
 }
 
-MACHINE_RESET_MEMBER(cdi_state,quizrd32)
+MACHINE_RESET_MEMBER(cdi_state,quizard32)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -269,8 +269,8 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd32)
 	m_scc->set_quizard_mcu_ack(0x58);
 }
 
-/* Untested - copied from quizrd32 */
-MACHINE_RESET_MEMBER(cdi_state,quizrd34)
+/* Untested - copied from quizard32 */
+MACHINE_RESET_MEMBER(cdi_state,quizard34)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -278,8 +278,8 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd34)
 	m_scc->set_quizard_mcu_ack(0x58);
 }
 
-/* Untested - copied from quizrr41 */
-MACHINE_RESET_MEMBER(cdi_state,quizrr40)
+/* Untested - copied from quizard4r41 */
+MACHINE_RESET_MEMBER(cdi_state,quizard4r40)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -288,7 +288,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrr40)
 	m_scc->set_quizard_mcu_ack(0x57);
 }
 
-MACHINE_RESET_MEMBER(cdi_state,quizrr41)
+MACHINE_RESET_MEMBER(cdi_state,quizard4r41)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -297,7 +297,7 @@ MACHINE_RESET_MEMBER(cdi_state,quizrr41)
 	m_scc->set_quizard_mcu_ack(0x57);
 }
 
-MACHINE_RESET_MEMBER(cdi_state,quizrr42)
+MACHINE_RESET_MEMBER(cdi_state,quizard4r42)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
@@ -373,44 +373,44 @@ static MACHINE_CONFIG_DERIVED( quizard, cdi_base )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrd12, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd12 )
+static MACHINE_CONFIG_DERIVED( quizard12, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard12 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrd17, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd17 )
+static MACHINE_CONFIG_DERIVED( quizard17, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard17 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrd18, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd18 )
+static MACHINE_CONFIG_DERIVED( quizard18, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard18 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrd22, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd22 )
+static MACHINE_CONFIG_DERIVED( quizard22, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard22 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrd23, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd23 )
+static MACHINE_CONFIG_DERIVED( quizard23, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard23 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrd32, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd32 )
+static MACHINE_CONFIG_DERIVED( quizard32, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard32 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrd34, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrd34 )
+static MACHINE_CONFIG_DERIVED( quizard3, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard34 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrr40, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrr40 )
+static MACHINE_CONFIG_DERIVED( quizard4r40, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4r40 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrr41, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrr41 )
+static MACHINE_CONFIG_DERIVED( quizard4r41, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4r41 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizrr42, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizrr42 )
+static MACHINE_CONFIG_DERIVED( quizard4r42, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4r42 )
 MACHINE_CONFIG_END
 
 
@@ -460,7 +460,10 @@ ROM_START( cdibios )
 	ROM_REGION(0x2000, "slave", 0)
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 ROM_END
-ROM_START( quizard )
+
+// Quizard
+
+ROM_START( quizard ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -471,10 +474,10 @@ ROM_START( quizard )
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrd32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
+	DISK_IMAGE_READONLY( "quizard18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 ROM_END
 
-ROM_START( quizrd22 )
+ROM_START( quizard_17 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -485,10 +488,10 @@ ROM_START( quizrd22 )
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrd22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
+	DISK_IMAGE_READONLY( "quizard17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
 ROM_END
 
-ROM_START( quizrd17 )
+ROM_START( quizard_12 ) /* CD-ROM printed 01/95 */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -499,10 +502,10 @@ ROM_START( quizrd17 )
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrd17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
+	DISK_IMAGE_READONLY( "quizard12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
 ROM_END
 
-ROM_START( quizrd12 ) /* CD-ROM printed 01/95 */
+ROM_START( quizard_10 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -512,11 +515,17 @@ ROM_START( quizrd12 ) /* CD-ROM printed 01/95 */
 	ROM_REGION(0x2000, "slave", 0)
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
+
+	// software: BurnAtOnce 0.99.5 / CHDMAN 0.163
+	// Drive: TS-L633R
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrd12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
+	DISK_IMAGE_READONLY( "quizard10", 0, SHA1(5715db50f0d5ffe06f47c0943f4bf0481ab6048e) )
 ROM_END
 
-ROM_START( quizrd18 ) /* CD-ROM printed ??/?? */
+
+// Quizard 2
+
+ROM_START( quizard2 ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -527,10 +536,10 @@ ROM_START( quizrd18 ) /* CD-ROM printed ??/?? */
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrd18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
+	DISK_IMAGE_READONLY( "quizard23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
 ROM_END
 
-ROM_START( quizrd23 ) /* CD-ROM printed ??/?? */
+ROM_START( quizard2_22 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -541,10 +550,12 @@ ROM_START( quizrd23 ) /* CD-ROM printed ??/?? */
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrd23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
+	DISK_IMAGE_READONLY( "quizard22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 ROM_END
 
-ROM_START( quizrd34 ) /* CD-ROM printed ??/?? */
+// Quizard 3
+
+ROM_START( quizard3 ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -555,10 +566,10 @@ ROM_START( quizrd34 ) /* CD-ROM printed ??/?? */
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrd34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
+	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 ROM_END
 
-ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
+ROM_START( quizard3_32 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -569,10 +580,11 @@ ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrr42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
+	DISK_IMAGE_READONLY( "quizard32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 ROM_END
 
-ROM_START( quizrr41 )
+
+ROM_START( quizard4 ) /* CD-ROM printed 09/98 */
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -583,10 +595,10 @@ ROM_START( quizrr41 )
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrr41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
+	DISK_IMAGE_READONLY( "quizard4r42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 ROM_END
 
-ROM_START( quizrr40 ) /* CD-ROM printed 07/97 */
+ROM_START( quizard4_41 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
 
@@ -597,7 +609,21 @@ ROM_START( quizrr40 ) /* CD-ROM printed 07/97 */
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "quizrr40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
+	DISK_IMAGE_READONLY( "quizard4r41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
+ROM_END
+
+ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+
+	ROM_REGION(0x2000, "cdic", 0)
+	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "quizard4r40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 ROM_END
 
 
@@ -611,17 +637,18 @@ CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0, 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 
 GAME( 1995, cdibios,  0,             cdi_base,      quizard, driver_device,      0, ROT0,     "Philips",      "CD-i Bios", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_IS_BIOS_ROOT )
-// Working
-GAME( 1995, quizrd12, cdibios,      quizrd12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd17, cdibios,      quizrd17,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd22, cdibios,      quizrd22,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizrd18, cdibios,      quizrd18,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 1.8", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd23, cdibios,      quizrd23,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2.3", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd34, cdibios,      quizrd34,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3.4", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizard,     cdibios,      quizard18,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.8)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_17,  quizard,      quizard17,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.7)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_12,  quizard,      quizard12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizard_10,  quizard,      quizard12,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard (v1.0)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
-// Partially working
-GAME( 1996, quizard,  cdibios,      quizrd32,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1997, quizrr40, cdibios,      quizrr40,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.0", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr41, cdibios,      quizrr41,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr42, cdibios,      quizrr42,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2,    cdibios,      quizard23,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.3)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizard2_22, quizard2,     quizard22,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+
+GAME( 1995, quizard3,    cdibios,      quizard3,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.4)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1996, quizard3_32, quizard3,     quizard32,      quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+
+GAME( 1998, quizard4,    cdibios,      quizard4r42,    quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION ) // doesn't boot
+GAME( 1998, quizard4_41, quizard4,     quizard4r41,    quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1997, quizard4_40, quizard4,     quizard4r40,    quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.0)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )

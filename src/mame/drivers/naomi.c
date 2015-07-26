@@ -1533,9 +1533,16 @@ Sushi Bar
 */
 
 #include "emu.h"
-
-
 #include "includes/naomi.h"
+
+
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 
 #define CPU_CLOCK (200000000)
 
@@ -9151,7 +9158,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0004 */ GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0005 */ GAME( 1999, spawn,    naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Todd Mc Farlane / Capcom","Spawn In the Demon's Hand (JPN, USA, EUR, ASI, AUS) (Rev B)", GAME_FLAGS )
 /* 0006 */ GAME( 1999, puyoda,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Compile",         "Puyo Puyo Da!", GAME_FLAGS )
-/* 0007-02 */ GAME( 2000,mvsc2,  naomi, naomim1, naomi,   naomi_state, mvsc2,  ROT0,  "Marvel / Capcom", "Marvel Vs. Capcom 2 New Age of Heroes (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_FLAGS )
+/* 0007-02 */ GAME( 2000,mvsc2,  naomi, naomim1, naomi,   naomi_state, mvsc2,  ROT0,  "Capcom / Marvel", "Marvel Vs. Capcom 2 New Age of Heroes (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_FLAGS )
 /* 0008 */ GAME( 2000, pstone2,  naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_FLAGS )
 /* 0011 */ GAME( 2000, capsnk,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_FLAGS )
 /* 0011 */ GAME( 2000, capsnka,  capsnk,naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )
@@ -9377,3 +9384,8 @@ GAME( 2006, mslug6,   awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega
 GAME( 2006, xtrmhnt2, awbios, aw2c, aw2c, naomi_state, xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )
 GAME( 2008, claychal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )
 GAME( 2009, basschal, awbios, aw2c, aw2c, naomi_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif
+

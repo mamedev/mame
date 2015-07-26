@@ -226,6 +226,8 @@ public:
 	DECLARE_DRIVER_INIT(blktouch);
 	DECLARE_DRIVER_INIT(mjelct3a);
 	DECLARE_DRIVER_INIT(mjreach);
+	DECLARE_DRIVER_INIT(maya_common);
+	DECLARE_DRIVER_INIT(mayac);
 	DECLARE_DRIVER_INIT(maya);
 
 	UINT32 screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

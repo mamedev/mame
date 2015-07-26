@@ -129,6 +129,11 @@ newoption {
 }
 
 newoption {
+    trigger = 'with-bundled-portaudio',
+    description = 'Build bundled PortAudio library',
+}
+
+newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {
@@ -271,6 +276,15 @@ newoption {
 newoption {
 	trigger = "SSE2",
 	description = "SSE2 optimized code and SSE2 code generation.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
+newoption {
+	trigger = "SSE3",
+	description = "SSE3 optimized code and SSE3 code generation.",
 	allowed = {
 		{ "0",   "Disabled" 	},
 		{ "1",   "Enabled"      },
@@ -699,8 +713,12 @@ if (_OPTIONS["targetos"]=="solaris") then
 	}
 else
 	buildoptions_c {
-		"-std=gnu89",
-
+--		"-std=gnu99",
+		"-std=gnu89",		
+--		"-Wpedantic",
+--		"-pedantic",
+--		"-Wno-variadic-macros",
+--		"-Wno-long-long",
 	}
 end	
 
@@ -709,12 +727,24 @@ if _OPTIONS["CPP11"]=="1" then
 	buildoptions_cpp {
 		"-x c++",
 		"-std=gnu++11",
+--		"-std=c++11",
+--		"-Wpedantic",
+--		"-pedantic",
+--		"-Wno-variadic-macros",
+--		"-Wno-long-long",
+
 	}
 else
 	--we compile C++ code to C++98 standard with GNU extensions
 	buildoptions_cpp {
 		"-x c++",
+--		"-Wpedantic",
+--		"-pedantic",
 		"-std=gnu++98",
+		"-Wno-variadic-macros",
+		"-Wno-long-long",
+		"-Wno-variadic-macros",
+--		"-std=c++98",
 	}
 end
 
@@ -810,18 +840,25 @@ if _OPTIONS["OPTIMIZE"] then
 		}
 	end
 	if _OPTIONS["LTO"]=="1" then
--- -flto=4 -> 4 threads, reduce if you are low on memory (less than 8G)
 		buildoptions {
-			"-flto=4",
+			"-flto=2",
+-- these next flags allow MAME to compile in linux GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
+			"-fno-fat-lto-objects",	"-Wodr",
+			"-flto-compression-level=9", -- lto didn't work with anything less on linux with < 12G RAM
+			"-flto-odr-type-merging",
+			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
+			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report","-fuse-linker-plugin",
+			
 		}
-		buildoptions {
-			"-fno-fat-lto-objects",
-		}
+-- same flags are needed by linker
 		linkoptions {
-			"-flto=4",
-		}
-		linkoptions {
-			"-fno-fat-lto-objects",
+			"-flto=2",
+-- these next flags allow MAME to compile in linux GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
+			"-fno-fat-lto-objects",	"-Wodr",
+			"-flto-compression-level=9", -- lto didn't work with anything less on linux with < 12G RAM
+			"-flto-odr-type-merging",
+			"-flto-report", -- if you get an error in lto after [WPA] stage printout, but before any [LTRANS] section printout, you need more memory!
+			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report","-fuse-linker-plugin",
 		}
 		
 		
@@ -840,6 +877,15 @@ if _OPTIONS["SSE2"]=="1" then
 		"-msse2"
 	}
 end
+
+if _OPTIONS["SSE3"]=="1" then
+	buildoptions {
+		"-msse",
+		"-msse2",
+		"-msse3"
+	}
+end
+
 
 if _OPTIONS["OPENMP"]=="1" then
 	buildoptions {
@@ -964,14 +1010,27 @@ end
 				}
 			end
 			if (version >= 40800) then
-				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
-				buildoptions {
-					"-Wno-array-bounds"
-				}
+-- grr.. array-bounds works on GCC5.2 linux, but fails in sqllite3.c on MingW GCC 5.1.1 for now
+--				if (version < 50000) then
+--					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
+					buildoptions {
+						"-Wno-array-bounds"
+					}
+--				end
 			end
 			if (version >= 50000) then
 				buildoptions {
-					"-D__USE_MINGW_ANSI_STDIO=1",							
+--					"-D__USE_MINGW_ANSI_STDIO=1", -- required or lua won't compile linux ignores this but Windows needs it
+					"-freport-bug",
+					"-D_GLIBCXX_USE_CXX11_ABI=0", -- does not seem to matter in linux, mingw needs to link printf,etc
+--					"-DNO_MEM_TRACKING",          -- must comment out for mingw GCC 5.2 pedantic or get new/delete redef error
+-- next two should work, but compiler complains about end conditions that are int when loop variable is unsigned. maybe these can be fixed
+--					"-funsafe-loop-optimizations",
+--					"-Wunsafe-loop-optimizations",
+-- this six flag combo lets MAME compile with LTO=1 on linux with no errors (whew!--Cowering)  someone should probably pretty this up as you can't really debug with them enabled
+					"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
+					"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
+
 				}
 			end
 			

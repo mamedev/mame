@@ -670,7 +670,7 @@ static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where a
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1/P2 Button 5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1/P2 Play")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1/P2 Cancel")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //causes "unauthorized conversion" msg.
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // pulling this LOW causes "unathorized conversion" msg.
 
 	PORT_START("IN1") /* Pins #57 through #51 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -722,6 +722,68 @@ static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where a
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( mroundup ) // todo: Find were Player 2 "Play" is mapped, all "IPT_UNKNOWN" below checked and nothing seems to work
+	PORT_START("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Play")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Q) PORT_NAME("Cancel")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset Points") /* Counts down player point if pressed instead of "Play" */
+
+	PORT_START("IN1") /* Pins #57 through #51 of J3 in decending order */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* AKA Diagnostics - Seems to reset the game */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )    PORT_COCKTAIL PORT_CODE(KEYCODE_E) PORT_NAME("P2 Cancel")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0xc0, 0xc0, "Percentage Out" )
+	PORT_DIPSETTING(    0x80, "80%" )
+	PORT_DIPSETTING(    0x00, "85%" ) /* Duplicate */
+	PORT_DIPSETTING(    0xc0, "85%" )
+	PORT_DIPSETTING(    0x40, "90%" )
+
+
+	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_CODE(KEYCODE_A) PORT_NAME("P2 Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CODE(KEYCODE_S) PORT_NAME("P2 Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_CODE(KEYCODE_F) PORT_NAME("P2 Button 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_CODE(KEYCODE_G) PORT_NAME("P2 Button 5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // pulling this LOW causes "unathorized conversion" msg.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, NULL)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Enable Draw Poker" )     PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Enable Foto Finish" )    PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Enable Black Jack" )     PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )     PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Points Per Coin" )       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "1 Point" )
+	PORT_DIPSETTING(    0x00, "5 Points" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, "Counter Top" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )           PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0xc0, "10" )
+	PORT_DIPSETTING(    0x80, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( pitbossa )
 	PORT_INCLUDE( pitboss )
 
@@ -769,12 +831,15 @@ static INPUT_PORTS_START( casino5 )
 	PORT_START("IN1") /* Pins #57 through #51 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   /* AKA Diagnostics */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* 1 displays additional screens in attract mode - custom ads screen (requires optional Keyboard to set up) */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) /* Runs basic Diagnostics on roms */
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )    /* AKA Diagnostics - Shows simple Statistics */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* 1 displays additional screens in attract mode - custom ads screen (requires optional Keyboard to set up) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Likely controls Percentage out, 75%, 80%, 85% & 90%  as per manual's "Tab Positions" */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0xc0, 0xc0, "Percentage Out" )     /* Controls Percentage out, 75%, 80%, 85% & 90%  as per manual's "Tab Positions" - Need to verify values */
+	PORT_DIPSETTING(    0x00, "75%" )
+	PORT_DIPSETTING(    0x80, "80%" )
+	PORT_DIPSETTING(    0xc0, "85%" )
+	PORT_DIPSETTING(    0x40, "90%" )
 
 	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order (usually P2 controls - Not used!) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1343,6 +1408,21 @@ ROM_START( casino5 ) /* Standard version, the rom set with 3315-02 U5-1 is the "
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
+ROM_END
+
+ROM_START( mroundup )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "kru1cd_u5.u5",  0x0000, 0x2000, CRC(7bd90672) SHA1(5f763e807370df991cc2c4abaeb8184c42149a0e) ) /* Internal designation: RUM1HRV0 */
+	ROM_LOAD( "kru1cd_u6.u6",  0x2000, 0x2000, CRC(fccffb0d) SHA1(57cbfb7e2bf1050cb2da8b4cc7cdd7e18356bcd2) ) /* Games included in this set are: */
+	ROM_LOAD( "kru1cd_u7.u7",  0x4000, 0x2000, CRC(72131230) SHA1(e7c08b537848a7c6e6e987c6d0644a031bb238d4) ) /* Draw Poker, Blackjack, Foto Finish */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
 ROM_START( riviera ) /* PAL16L8ANC labeled DEC-003 at U13 */
@@ -2095,6 +2175,8 @@ GAME( 1983, pitbossb, pitboss, pitboss,  pitbossa, driver_device,  0,   ROT0,  "
 GAME( 1983, pitbossc, pitboss, pitboss,  pitbossb, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-?)",            GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1984, casino5,  0,       casino5,  casino5,  driver_device,  0,   ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       GAME_SUPPORTS_SAVE )
+
+GAME( 1984, mroundup, 0,       pitboss,  mroundup, driver_device,  0,   ROT0,  "Merit", "The Round Up",                      GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 
 GAME( 1987, riviera,  0,       dodge,    riviera,  driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1986, rivieraa, riviera, dodge,    riviera,  driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

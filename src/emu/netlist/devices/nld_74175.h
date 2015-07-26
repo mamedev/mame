@@ -39,9 +39,9 @@
 #include "nld_signal.h"
 
 #define TTL_74175(_name)                                     \
-		NET_REGISTER_DEV(74175, _name)
+		NET_REGISTER_DEV(TTL_74175, _name)
 #define TTL_74175_DIP(_name)                                 \
-		NET_REGISTER_DEV(74175_dip, _name)
+		NET_REGISTER_DEV(TTL_74175_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

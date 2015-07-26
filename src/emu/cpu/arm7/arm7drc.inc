@@ -671,7 +671,7 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_LABEL(block, done);                                             // done:
 
 	block->end();
-};
+}
 
 /*-------------------------------------------------
     static_generate_nocode_handler - generate an

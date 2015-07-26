@@ -412,7 +412,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( harem_sound_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x6000, 0x6000) AM_READNOP
+	AM_RANGE(0x6000, 0x6000) AM_READ(harem_digitalker_intr_r)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
@@ -420,7 +420,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( harem_sound_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	// ports->speech?:
+	// ports->speech:
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("8910.3", ay8910_device, address_w)
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("8910.3", ay8910_device, data_r, data_w)
 	// same as scramble:
@@ -1688,11 +1688,14 @@ static MACHINE_CONFIG_DERIVED( harem, scramble )
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
 
-	/* sound hardware */
+	/* extra AY8910 with I/O ports */
 	MCFG_SOUND_ADD("8910.3", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(scramble_state, harem_portA_w))   // Port A write
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(scramble_state, harem_portB_w))   // Port B write
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("digitalker", digitalker_device, digitalker_data_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(scramble_state, harem_digitalker_control_w))
+
+	MCFG_DIGITALKER_ADD("digitalker", 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2218,7 +2221,7 @@ ROM_START( harem ) /* Main PCB version simular to Scorpion (also developed by I.
 	ROM_LOAD( "harem_sound1.ic12", 0x0000, 0x2000, CRC(b54799dd) SHA1(b6aeb010257cba48a52afd33b4f8031c7d99550c) )
 	ROM_LOAD( "harem_sound2.ic13", 0x2000, 0x1000, CRC(2d5573a4) SHA1(1fdcd99d89e078509634742b2116a35bb199fe4b) )
 
-	ROM_REGION( 0x2000, "unknown", 0 ) // DigiTalker ROM (same exact sound PCB as Scorpion (galdrv.c))
+	ROM_REGION( 0x2000, "digitalker", 0 ) // DigiTalker ROM (same exact sound PCB as Scorpion (galaxian.c))
 	ROM_LOAD( "harem_h1+h2.ic25",  0x0000, 0x2000, CRC(279f923a) SHA1(166b1b625997766f0de7cc18af52c42268022fcb) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -2268,4 +2271,4 @@ GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, ad2083,     
 
 GAME( 1981, turpins,  turtles,  turpins,  turpins,  driver_device,  0,            ROT90, "bootleg",             "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
 
-GAME( 1983, harem,    0,        harem,    harem,    scramble_state, harem,        ROT90, "I.G.R.",              "Harem",                          GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // colors, missing speech?
+GAME( 1983, harem,    0,        harem,    harem,    scramble_state, harem,        ROT90, "I.G.R.",              "Harem",                          GAME_SUPPORTS_SAVE )

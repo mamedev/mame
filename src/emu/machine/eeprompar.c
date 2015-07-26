@@ -120,7 +120,7 @@ eeprom_parallel_##_lowercase##_device::eeprom_parallel_##_lowercase##_device(con
 	: eeprom_parallel_##_baseclass##_device(mconfig, EEPROM_PARALLEL_##_uppercase, "Parallel EEPROM " #_uppercase " (" #_cells "x" #_bits ")", tag, owner, #_lowercase, __FILE__) \
 { \
 	static_set_size(*this, _cells, _bits); \
-}; \
+} \
 const device_type EEPROM_PARALLEL_##_uppercase = &device_creator<eeprom_parallel_##_lowercase##_device>;
 // standard 28XX class of 8-bit EEPROMs
 DEFINE_PARALLEL_EEPROM_DEVICE(28xx, 2804, 2804, 8, 512)

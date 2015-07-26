@@ -28,6 +28,7 @@ public:
 	void n64_machine_stop();
 
 	UINT32 screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_n64(screen_device &screen, bool state);
 	required_device<cpu_device> m_maincpu;
 };
 

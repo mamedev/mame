@@ -335,7 +335,7 @@ void tms9902_device::set_receive_data_rate()
 	// Thus the callback function should add up this value on each poll
 	// and deliver a data input not before it sums up to 1.
 	m_baudpoll = (double)(baud / (10*POLLING_FREQ));
-	if (VERBOSE>3) LOG ("TMS9902: baudpoll = %lf\n", m_baudpoll);
+	if (VERBOSE>3) LOG ("TMS9902: baudpoll = %f\n", m_baudpoll);
 
 	m_last_config_value = value;
 	m_ctrl_cb((offs_t)CONFIG, RATERECV);

@@ -57,7 +57,7 @@ enum
 	I286_LDTR,
 	I286_LDTR_BASE,
 	I286_LDTR_LIMIT,
-	I286_LDTR_FLAGS,
+	I286_LDTR_FLAGS
 };
 
 class i80286_cpu_device : public i8086_common_cpu_device

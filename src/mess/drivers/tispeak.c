@@ -873,7 +873,7 @@ ROM_END
 ROM_START( snmathp )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	// typed in from patent 4946391, verified with source code
-	// BTANB note: Mix It does not work at all, this is an original bug in the prototype. There are probably other minor bugs too.
+	// BTANB note: Mix It does not work at all, this is an original bug in the patent listing. There are probably other minor bugs too.
 	ROM_LOAD( "us4946391_t2074", 0x0000, 0x1000, CRC(011f0c2d) SHA1(d2e14d72e03ca864abd51da78ffb71a9da82f624) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
@@ -923,17 +923,17 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT COMPAT MACHINE  INPUT     INIT                     COMPANY, FULLNAME, FLAGS */
-COMP( 1978, snspell,    0,        0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-COMP( 1979, snspella,   snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1980, snspellb,   snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1978, snspelluk,  snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1981, snspelluka, snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1979, snspelljp,  snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1978, snspell,    0,        0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/patent)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+COMP( 1979, snspella,   snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
+COMP( 1980, snspellb,   snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
+COMP( 1978, snspelluk,  snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
+COMP( 1981, snspelluka, snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
+COMP( 1979, snspelljp,  snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
 COMP( 1980, ladictee,   snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
 
 COMP( 1986, snmath,     0,        0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-COMP( 1980, snmathp,    snmath,   0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1980, snmathp,    snmath,   0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/patent)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 COMP( 1980, snread,     0,        0, snread,   snread,   tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 
-COMP( 1979, lantutor,   0,        0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1979, lantutor,   0,        0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (patent)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

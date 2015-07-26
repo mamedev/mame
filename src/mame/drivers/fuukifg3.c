@@ -38,8 +38,6 @@ Notes so far:
 - PCM channels of music in asurabus is sometimes off-tune, check Chen-Mao's stage for example
   note: srom.u7 (z80 prg) is a good dump
 
-- YMF278B and YMF262 are hooked up in an awkward way (real chip has YMF262 integrated)
-
 Asura Blade
 Fuuki Co. Ltd., 1998
 
@@ -162,7 +160,6 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymf278b.h"
-#include "sound/262intf.h"
 #include "includes/fuukifg3.h"
 
 
@@ -258,10 +255,6 @@ WRITE8_MEMBER(fuuki32_state::snd_z80_w)
 WRITE8_MEMBER(fuuki32_state::snd_ymf278b_w)
 {
 	machine().device<ymf278b_device>("ymf1")->write(space, offset, data);
-
-	// also write to ymf262
-	if (offset < 4)
-		machine().device<ymf262_device>("ymf2")->write(space, offset, data);
 }
 
 static ADDRESS_MAP_START( fuuki32_sound_map, AS_PROGRAM, 8, fuuki32_state )
@@ -584,12 +577,10 @@ static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-
-	MCFG_SOUND_ADD("ymf2", YMF262, YMF278B_STD_CLOCK / (19/8.0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(4, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(5, "rspeaker", 0.40)
 
 MACHINE_CONFIG_END
 

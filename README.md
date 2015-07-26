@@ -1,8 +1,7 @@
 
 # **MAME** #
 
-[![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+[![Build Status](https://travis-ci.org/mamedev/mame.svg)](https://travis-ci.org/mamedev/mame) [![Build status](https://ci.appveyor.com/api/projects/status/te0qy56b72tp5kmo?svg=true)](https://ci.appveyor.com/project/startaq/mame) [![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 What is MAME?
 =============

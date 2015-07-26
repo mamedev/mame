@@ -56,7 +56,7 @@ TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
-	verboselog(machine(), 0, "Asserting IRQ2\n" );
+	verboselog(machine(), 0, "%s", "Asserting IRQ2\n" );
 	state->m_maincpu->set_input_line_vector(M68K_IRQ_2, 26);
 	state->m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	m_interrupt_timer->adjust(attotime::never);
@@ -140,7 +140,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 				case 0xf3:
 				case 0xf4:
 				case 0xf7:
-					verboselog(machine(), 0, "slave_r: De-asserting IRQ2\n" );
+					verboselog(machine(), 0, "%s", "slave_r: De-asserting IRQ2\n" );
 					state->m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 					break;
 			}

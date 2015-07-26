@@ -16,15 +16,17 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define VCCS(_name)                                                                \
+#define VCCS(_name)                                                            \
 		NET_REGISTER_DEV(VCCS, _name)
 
-#define CCCS(_name)                                                                \
+#define CCCS(_name)                                                            \
 		NET_REGISTER_DEV(CCCS, _name)
 
-#define VCVS(_name)                                                                \
+#define VCVS(_name)                                                            \
 		NET_REGISTER_DEV(VCVS, _name)
 
+#define LVCCS(_name)                                                           \
+		NET_REGISTER_DEV(LVCCS, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -57,11 +59,14 @@ public:
 	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
 	: device_t(afamily), m_gfac(1.0) {  }
 
+	param_double_t m_G;
+	param_double_t m_RI;
+
 protected:
 	virtual void start();
 	virtual void reset();
 	virtual void update_param();
-	ATTR_HOT void update();
+	ATTR_HOT virtual void update();
 
 	ATTR_COLD void start_internal(const nl_double def_RI);
 
@@ -74,10 +79,29 @@ protected:
 	terminal_t m_OP1;
 	terminal_t m_ON1;
 
-	param_double_t m_G;
-	param_double_t m_RI;
-
 	nl_double m_gfac;
+};
+
+/* Limited Current source*/
+
+class NETLIB_NAME(LVCCS) : public NETLIB_NAME(VCCS)
+{
+public:
+	ATTR_COLD NETLIB_NAME(LVCCS)()
+	: NETLIB_NAME(VCCS)(LVCCS), m_vi(0.0) {  }
+	ATTR_COLD NETLIB_NAME(LVCCS)(const family_t afamily)
+	: NETLIB_NAME(VCCS)(afamily), m_vi(0.0) {  }
+
+	param_double_t m_cur_limit; /* current limit */
+
+protected:
+	virtual void start();
+	virtual void reset();
+	virtual void update_param();
+	ATTR_HOT virtual void update();
+	NETLIB_UPDATE_TERMINALSI();
+
+	nl_double m_vi;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -153,6 +177,8 @@ public:
 	ATTR_COLD NETLIB_NAME(VCVS)()
 	: NETLIB_NAME(VCCS)(VCVS) { }
 
+	param_double_t m_RO;
+
 protected:
 	virtual void start();
 	virtual void reset();
@@ -162,7 +188,6 @@ protected:
 	terminal_t m_OP2;
 	terminal_t m_ON2;
 
-	param_double_t m_RO;
 };
 
 NETLIB_NAMESPACE_DEVICES_END()

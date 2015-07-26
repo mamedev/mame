@@ -40,10 +40,14 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
  */
 
 #ifndef NL_CONVERT_CPP
-#ifdef NETLIST_DEVELOPMENT
+#ifndef NETLIST_DEVELOPMENT
+#define NETLIST_DEVELOPMENT 0
+#endif
+#if (NETLIST_DEVELOPMENT)
 #define CHIP(_n, _t) setup.register_dev( palloc(netlist::devices::nld_ ## _t ## _dip), _n);
 #else
-#define CHIP(_n, _t) setup.register_dev(NETLIB_NAME_STR(_t ## _dip), _n);
+#define CHIP(_n, _t) setup.register_dev(NETLIB_NAME_STR_S(TTL_ ## _t ## _DIP), _n);
+//#define CHIP(_n, _t) TTL_ ## _t ## _DIP(_n)
 #endif
 
 #define CONNECTION( ... ) CONNECTIONY( CONNECTIONX( __VA_ARGS__ ) )
@@ -114,7 +118,7 @@ public:
 #define CIRCUIT_LAYOUT_END NETLIST_END()
 
 #define CHIP_555_Mono(_name,  _pdesc)   \
-	CHIP(# _name, NE555) \
+	NE555_DIP(_name) \
 	NET_C(_name.6, _name.7) \
 	RES(_name ## _R, (_pdesc)->r) \
 	CAP(_name ## _C, (_pdesc)->c) \
@@ -126,7 +130,7 @@ public:
 	NET_CSTR(# _name ".1", "GND")
 
 #define CHIP_555_Astable(_name,  _pdesc)   \
-	CHIP(# _name, NE555) \
+	NE555_DIP(_name) \
 	RES(_name ## _R1, (_pdesc)->r1) \
 	RES(_name ## _R2, (_pdesc)->r2) \
 	CAP(_name ## _C, (_pdesc)->c) \

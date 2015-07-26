@@ -25,6 +25,7 @@ namespace netlist
 
 		void parse_netlist(const pstring &nlname);
 		void net_alias();
+		void dippins();
 		void netdev_param();
 		void net_c();
 		void frontier();
@@ -51,6 +52,7 @@ namespace netlist
 		token_id_t m_tok_comma;
 		token_id_t m_tok_ALIAS;
 		token_id_t m_tok_NET_C;
+		token_id_t m_tok_DIPPINS;
 		token_id_t m_tok_FRONTIER;
 		token_id_t m_tok_PARAM;
 		token_id_t m_tok_NET_MODEL;

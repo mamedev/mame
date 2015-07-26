@@ -30,6 +30,20 @@
  *       Q1Q |7           10| Q2
  *       GND |8            9| Q2Q
  *           +--------------+
+ *
+ *  CD4538: Dual Retriggerable, Resettable One Shots
+ *
+ *           +--------------+
+ *        C1 |1     ++    16| VCC
+ *       RC1 |2           15| C2
+ *      CLR1 |3           14| RC2
+ *        A1 |4    4538   13| CLR2
+ *        B1 |5           12| A2
+ *        Q1 |6           11| B2
+ *       Q1Q |7           10| Q2
+ *       GND |8            9| Q2Q
+ *           +--------------+
+ *
  */
 
 #ifndef NLD_74123_H_
@@ -40,7 +54,7 @@
 #include "../analog/nld_twoterm.h"
 
 #define TTL_74123(_name)                                                        \
-		NET_REGISTER_DEV(74123, _name)
+		NET_REGISTER_DEV(TTL_74123, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 
@@ -71,7 +85,7 @@ public:
 );
 
 #define TTL_74123_DIP(_name)                                                         \
-		NET_REGISTER_DEV(74123_dip, _name)
+		NET_REGISTER_DEV(TTL_74123_DIP, _name)
 
 NETLIB_DEVICE(74123_dip,
 
@@ -85,13 +99,26 @@ NETLIB_DEVICE(74123_dip,
  */
 
 #define TTL_9602_DIP(_name)                                                         \
-		NET_REGISTER_DEV(9602_dip, _name)
+		NET_REGISTER_DEV(TTL_9602_DIP, _name)
 
 NETLIB_DEVICE(9602_dip,
 
 	NETLIB_NAME(74123) m_1;
 	NETLIB_NAME(74123) m_2;
 
+);
+
+/*
+ * The CD4538 is pretty similar to the 9602
+ */
+
+#define CD4538_DIP(_name)                                                         \
+		NET_REGISTER_DEV(CD4538_DIP, _name)
+
+NETLIB_DEVICE(4538_dip,
+	NETLIB_LOGIC_FAMILY(CD4XXX)
+	NETLIB_NAME(74123) m_1;
+	NETLIB_NAME(74123) m_2;
 );
 
 NETLIB_NAMESPACE_DEVICES_END()

@@ -43,8 +43,8 @@ UINT8 ucom4_cpu_device::input_r(int index)
 	{
 		case NEC_UCOM4_PORTA: inp = m_read_a(index, 0xff); break;
 		case NEC_UCOM4_PORTB: inp = m_read_b(index, 0xff); break;
-		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff); break;
-		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff); break;
+		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff) | m_port_out[index]; break;
+		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
 
 		default:
 			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
@@ -52,6 +52,15 @@ UINT8 ucom4_cpu_device::input_r(int index)
 	}
 
 	return inp & 0xf;
+}
+
+UINT8 upd650_cpu_device::input_r(int index)
+{
+	// bidirectional ports are 'push-pull', meaning it will output 0 when it's read
+	if ((index & 0xf) == NEC_UCOM4_PORTC || (index & 0xf) == NEC_UCOM4_PORTD)
+		output_w(index, 0);
+	
+	return ucom4_cpu_device::input_r(index);
 }
 
 void ucom4_cpu_device::output_w(int index, UINT8 data)

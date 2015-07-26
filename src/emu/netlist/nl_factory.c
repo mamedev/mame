@@ -34,20 +34,22 @@ ATTR_COLD const pstring_list_t base_factory_t::def_params()
 }
 
 
-factory_list_t::factory_list_t()
+factory_list_t::factory_list_t(	setup_t &setup)
+: m_setup(setup)
 {
 }
 
 factory_list_t::~factory_list_t()
 {
-	for (std::size_t i=0; i < m_list.size(); i++)
+	for (std::size_t i=0; i < size(); i++)
 	{
-		base_factory_t *p = m_list[i];
+		base_factory_t *p = value_at(i);
 		pfree(p);
 	}
-	m_list.clear();
+	clear();
 }
 
+#if 0
 device_t *factory_list_t::new_device_by_classname(const pstring &classname) const
 {
 	for (std::size_t i=0; i < m_list.size(); i++)
@@ -62,26 +64,28 @@ device_t *factory_list_t::new_device_by_classname(const pstring &classname) cons
 	}
 	return NULL; // appease code analysis
 }
+#endif
 
-device_t *factory_list_t::new_device_by_name(const pstring &name, setup_t &setup) const
+void factory_list_t::error(const pstring &s)
 {
-	base_factory_t *f = factory_by_name(name, setup);
+	m_setup.netlist().error("%s", s.cstr());
+}
+
+device_t *factory_list_t::new_device_by_name(const pstring &name)
+{
+	base_factory_t *f = factory_by_name(name);
 	return f->Create();
 }
 
-base_factory_t * factory_list_t::factory_by_name(const pstring &name, setup_t &setup) const
+base_factory_t * factory_list_t::factory_by_name(const pstring &name)
 {
-	for (std::size_t i=0; i < m_list.size(); i++)
+	if (contains(name))
+		return (*this)[name];
+	else
 	{
-		base_factory_t *p = m_list[i];
-		if (p->name() == name)
-		{
-			return p;
-		}
-		p++;
+		m_setup.netlist().error("Class %s not found!\n", name.cstr());
+		return NULL; // appease code analysis
 	}
-	setup.netlist().error("Class %s not found!\n", name.cstr());
-	return NULL; // appease code analysis
 }
 
 }

@@ -193,7 +193,7 @@ protected:
 		FIF_DIS  = 0x20,
 		FIF_EIS  = 0x40,
 
-		SPEC_ND  = 0x0001,
+		SPEC_ND  = 0x0001
 	};
 
 
@@ -258,7 +258,7 @@ protected:
 		WRITE_TRACK_SECTOR_BYTE,
 
 		WRITE_TRACK_POST_SECTORS,
-		WRITE_TRACK_POST_SECTORS_BYTE,
+		WRITE_TRACK_POST_SECTORS_BYTE
 	};
 
 	struct pll_t {
@@ -354,7 +354,7 @@ protected:
 		C_SCAN_HIGH,
 
 		C_INVALID,
-		C_INCOMPLETE,
+		C_INCOMPLETE
 	};
 
 	void delay_cycles(emu_timer *tm, int cycles);

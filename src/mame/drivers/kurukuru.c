@@ -266,7 +266,6 @@ WRITE_LINE_MEMBER(kurukuru_state::kurukuru_vdp_interrupt)
 
 TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_state::kurukuru_vdp_scanline)
 {
-	m_v9938->set_resolution(0);
 	m_v9938->interrupt();
 }
 

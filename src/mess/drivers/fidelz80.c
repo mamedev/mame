@@ -665,12 +665,12 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portb_w )
 	}
 
 	// ignoring the language switch enable for now, is bit 0x40
-};
+}
 
 WRITE8_MEMBER( fidelz80_state::fidelz80_portc_w )
 {
 	m_kp_matrix = data;
-};
+}
 
 WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 {

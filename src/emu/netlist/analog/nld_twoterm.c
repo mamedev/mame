@@ -240,11 +240,20 @@ NETLIB_RESET(C)
 NETLIB_UPDATE_PARAM(C)
 {
 	//step_time(1.0/48000.0);
+	m_GParallel = netlist().gmin() * m_C.Value();
 }
 
 NETLIB_UPDATE(C)
 {
 	NETLIB_NAME(twoterm)::update();
+}
+
+ATTR_HOT void NETLIB_NAME(C)::step_time(const nl_double st)
+{
+	/* Gpar should support convergence */
+	const nl_double G = m_C.Value() / st +  m_GParallel;
+	const nl_double I = -G * deltaV();
+	set(G, 0.0, I);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -255,7 +264,7 @@ NETLIB_START(D)
 {
 	register_terminal("A", m_P);
 	register_terminal("K", m_N);
-	register_param("model", m_model, "");
+	register_param("MODEL", m_model, "");
 
 	m_D.save("m_D", *this);
 
@@ -264,8 +273,8 @@ NETLIB_START(D)
 
 NETLIB_UPDATE_PARAM(D)
 {
-	nl_double Is = m_model.model_value("Is", 1e-15);
-	nl_double n = m_model.model_value("N", 1);
+	nl_double Is = m_model.model_value("IS");
+	nl_double n = m_model.model_value("N");
 
 	m_D.set_param(Is, n, netlist().gmin());
 }

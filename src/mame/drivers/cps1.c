@@ -9601,6 +9601,42 @@ ROM_START( varthj )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
 ROM_END
 
+/* B-Board 91634B-2, Japan Resale Ver. */
+ROM_START( varthjr )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "vaj_23b.8f", 0x00000, 0x80000, CRC(ad3d3522) SHA1(db627233f9d8a03c2d4bb31614951a0cdc81600d) )
+	ROM_LOAD16_WORD_SWAP( "vaj_22b.7f", 0x80000, 0x80000, CRC(034e3e55) SHA1(eeb85a827cf18dafbdf0a2828aa39128352857f3) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROMX_LOAD( "va_01.3a", 0x000000, 0x80000, CRC(b1fb726e) SHA1(5ac0876b6c49d0a99710dda68653664f4d8c1167) , ROM_GROUPWORD | ROM_SKIP(6) )  // == va-5m.7a
+	ROMX_LOAD( "va_02.4a", 0x000002, 0x80000, CRC(4c6588cd) SHA1(d14e8cf051ac934ccc989d8c571c6cc9eed34af5) , ROM_GROUPWORD | ROM_SKIP(6) )  // == va-7m.9a
+	ROMX_LOAD( "va_03.5a", 0x000004, 0x80000, CRC(0b1ace37) SHA1(6f9493c22f667f683db2789972fd16bb94724679) , ROM_GROUPWORD | ROM_SKIP(6) )  // == va-1m.3a
+	ROMX_LOAD( "va_04.6a", 0x000006, 0x80000, CRC(44dfe706) SHA1(a013a434df3161a91aafbb35dc4e20dfb3f177f4) , ROM_GROUPWORD | ROM_SKIP(6) )  // == va-3m.5a
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "va_09.12a", 0x00000, 0x08000, CRC(7a99446e) SHA1(ca027f41e3e58be5abc33ad7380746658cb5380a) )
+	ROM_CONTINUE(          0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "va_18.11c", 0x00000, 0x20000, CRC(de30510e) SHA1(8e878696192606b76a3a0e53553e638d9621cff7) )
+	ROM_LOAD( "va_19.12c", 0x20000, 0x20000, CRC(0610a4ac) SHA1(3da02ea6a7a56c85de898806d2a1cf6bc526c1b3) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "va63b.1a",     0x0000, 0x0117, BAD_DUMP CRC(38540e86) SHA1(86e0aba363108f80a8eff84b99d11528ad6db099) ) /* Handcrafted but works on actual US PCB.  Redump needed */
+	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 )
+	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
+ROM_END
+
 /* B-Board 89625B-1 */
 ROM_START( qad )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -11819,6 +11855,7 @@ GAME( 1992, varth,       0,        cps1_12MHz, varth,    cps_state,   cps1,     
 GAME( 1992, varthr1,     varth,    cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (World 920612)", GAME_SUPPORTS_SAVE )  // "ETC"
 GAME( 1992, varthu,      varth,    cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom (Romstar license)", "Varth: Operation Thunderstorm (USA 920612)", GAME_SUPPORTS_SAVE )
 GAME( 1992, varthj,      varth,    cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (Japan 920714)", GAME_SUPPORTS_SAVE )
+GAME( 1992, varthjr,     varth,    cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (Japan Resale Ver. 920714)", GAME_SUPPORTS_SAVE )
 GAME( 1992, qad,         0,        cps1_12MHz, qad,      cps_state,   cps1,     ROT0,   "Capcom", "Quiz & Dragons: Capcom Quiz Game (USA 920701)", GAME_SUPPORTS_SAVE ) // 12MHz verified
 GAME( 1994, qadjr,       qad,      cps1_12MHz, qadjr,    cps_state,   cps1,     ROT0,   "Capcom", "Quiz & Dragons: Capcom Quiz Game (Japan Resale Ver. 940921)", GAME_SUPPORTS_SAVE )
 GAME( 1992, wof,         0,        qsound,     wof,      cps_state,   wof,      ROT0,   "Capcom", "Warriors of Fate (World 921031)", GAME_SUPPORTS_SAVE )   // "ETC"

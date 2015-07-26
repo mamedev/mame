@@ -126,7 +126,7 @@ private:
 	// timer IDs
 	enum
 	{
-		TID_FORCE_UPDATE,
+		TID_FORCE_UPDATE
 	};
 
 	// internal helpers

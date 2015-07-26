@@ -434,7 +434,7 @@ P1KEY11  29|30  P2KEY11
 			KEY8  = 0x1000, // JAMMA P1 Left
 			KEY9  = 0x2000, // JAMMA P1 Right
 			KEY10 = 0x0020, // JAMMA P2 Right
-			KEY11 = 0x0800, // JAMMA P1 Button 1
+			KEY11 = 0x0800  // JAMMA P1 Button 1
 		}; // Mahjong->JAMMA mapping specific to this game pcb
 
 		UINT16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading

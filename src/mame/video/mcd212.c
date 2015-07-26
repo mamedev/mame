@@ -819,7 +819,7 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 				if(m_channel[channel].dcr & MCD212_DCR_CM)
 				{
 					// 4-bit Bitmap
-					verboselog(machine, 0, "Unsupported display mode: 4-bit Bitmap\n" );
+					verboselog(machine, 0, "%s", "Unsupported display mode: 4-bit Bitmap\n" );
 				}
 				else
 				{
@@ -1000,7 +1000,7 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 			case MCD212_DDR_FT_RLE:
 				if(m_channel[channel].dcr & MCD212_DCR_CM)
 				{
-					verboselog(machine, 0, "Unsupported display mode: 4-bit RLE\n" );
+					verboselog(machine, 0, "%s", "Unsupported display mode: 4-bit RLE\n" );
 					done = 1;
 				}
 				else
@@ -1427,7 +1427,7 @@ TIMER_CALLBACK_MEMBER( mcd212_device::perform_scan )
 		if(scanline == 0)
 		{
 			// Process ICA
-			verboselog(machine, 6, "Frame Start\n" );
+			verboselog(machine, 6, "%s", "Frame Start\n" );
 			m_channel[0].csrr &= 0x7f;
 			for(int index = 0; index < 2; index++)
 			{

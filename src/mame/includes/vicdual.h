@@ -23,9 +23,9 @@ public:
 		m_discrete(*this, "discrete"),
 		m_coinstate_timer(*this, "coinstate"),
 		m_nsub_coinage_timer(*this, "nsub_coin"),
+		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
-		m_characterram(*this, "characterram"),
-		m_screen(*this, "screen")
+		m_characterram(*this, "characterram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -35,25 +35,30 @@ public:
 	optional_device<discrete_device> m_discrete;
 	required_device<timer_device> m_coinstate_timer;
 	optional_device<timer_device> m_nsub_coinage_timer;
+	required_device<screen_device> m_screen;
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_characterram;
-	required_device<screen_device> m_screen;
 
 	UINT8 m_coin_status;
 	UINT8 m_palette_bank;
 	UINT8 m_samurai_protection_data;
 	int m_nsub_coin_counter;
 	int m_nsub_play_counter;
-
 	int m_port1State;
 	int m_port2State;
 	int m_psgData;
+	emu_timer *m_frogs_croak_timer;
 
 	void coin_in();
 	void assert_coin_status();
 
-	DECLARE_WRITE8_MEMBER(vicdual_videoram_w);
-	DECLARE_WRITE8_MEMBER(vicdual_characterram_w);
+	// common
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(characterram_w);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
+
+	// game specific
 	DECLARE_READ8_MEMBER(depthch_io_r);
 	DECLARE_WRITE8_MEMBER(depthch_io_w);
 	DECLARE_READ8_MEMBER(safari_io_r);
@@ -83,7 +88,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nsub_io_w);
 	DECLARE_READ8_MEMBER(invinco_io_r);
 	DECLARE_WRITE8_MEMBER(invinco_io_w);
-	DECLARE_WRITE8_MEMBER(vicdual_palette_bank_w);
 
 	/*----------- defined in audio/vicdual.c -----------*/
 	DECLARE_WRITE8_MEMBER( frogs_audio_w );
@@ -109,12 +113,12 @@ public:
 	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
 	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );
 
-	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_read_coin_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_64v);
-	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_vblank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_composite_blank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_get_timer_value);
-	DECLARE_CUSTOM_INPUT_MEMBER(vicdual_fake_lives_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank_comp);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_composite_blank_comp);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_timer_value);
+	DECLARE_CUSTOM_INPUT_MEMBER(fake_lives_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(nsub_coin_in);
@@ -128,13 +132,12 @@ public:
 	DECLARE_MACHINE_START(frogs_audio);
 
 	virtual void machine_start();
-	virtual void machine_reset();
 
-	UINT32 screen_update_vicdual_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_vicdual_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_vicdual_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int get_vcounter();
-	int vicdual_is_cabinet_color();
+	int is_cabinet_color();
 };
 
 MACHINE_CONFIG_EXTERN( carnival_audio );

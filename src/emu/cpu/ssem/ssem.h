@@ -78,7 +78,7 @@ enum
 {
 	SSEM_PC = 1,
 	SSEM_A,
-	SSEM_HALT,
+	SSEM_HALT
 };
 
 CPU_DISASSEMBLE( ssem );

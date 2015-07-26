@@ -19,7 +19,7 @@ msx_cart_konami::msx_cart_konami(const machine_config &mconfig, const char *tag,
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_selected_bank[i] = 0;
+		m_selected_bank[i] = i;
 	}
 	for (int i = 0; i < 8; i++)
 	{
@@ -88,7 +88,7 @@ READ8_MEMBER(msx_cart_konami::read_cart)
 
 WRITE8_MEMBER(msx_cart_konami::write_cart)
 {
-	switch (offset)
+	switch (offset & 0xe000)
 	{
 		case 0x4000:
 			m_selected_bank[0] = data;
@@ -128,7 +128,7 @@ msx_cart_konami_scc::msx_cart_konami_scc(const machine_config &mconfig, const ch
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_selected_bank[i] = 0;
+		m_selected_bank[i] = i;
 	}
 	for (int i = 0; i < 8; i++)
 	{

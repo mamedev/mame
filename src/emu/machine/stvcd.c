@@ -862,7 +862,11 @@ void saturn_state::cd_exec_command( void )
 					//printf("Partition %08x %04x\n",bufnum,cr4);
 				}
 
-				hirqreg |= (CMOK|DRDY);
+				//printf("%04x\n",cr4);
+				if(cr4 == 0)
+					hirqreg |= (CMOK);
+				else
+					hirqreg |= (CMOK|DRDY);					
 				status_type = 1;
 			}
 			break;
@@ -1908,6 +1912,7 @@ void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
 		cmd_pending |= 1;
+		sh1_timer->adjust(attotime::never);
 		break;
 	case 0x001c:
 	case 0x001e:

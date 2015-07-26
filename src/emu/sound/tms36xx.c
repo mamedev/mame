@@ -375,6 +375,21 @@ void tms36xx_device::device_start()
 		m_decay[0], m_decay[1], m_decay[2],
 		m_decay[3], m_decay[4], m_decay[5]));
 	LOG(("TMS36xx speed         %d\n", m_speed));
+	
+	save_item(NAME(m_octave));
+	save_item(NAME(m_tune_counter));
+	save_item(NAME(m_note_counter));
+	save_item(NAME(m_voices));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_vol));
+	save_item(NAME(m_vol_counter));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_frequency));
+	save_item(NAME(m_output));
+	save_item(NAME(m_enable));
+	save_item(NAME(m_tune_num));
+	save_item(NAME(m_tune_ofs));
+	save_item(NAME(m_tune_max));
 }
 
 

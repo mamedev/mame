@@ -372,6 +372,9 @@ private:
 	// Used in RESTORE to find out when to give up
 	int m_seek_count;
 
+	// Read/write logical or physical?
+	bool m_logical;
+
 	// Signals to abort writing
 	bool m_stopwrite;
 
@@ -401,6 +404,9 @@ private:
 
 	// Is the attached drive ready?
 	bool drive_ready();
+
+	// Are we reading a track?
+	bool reading_track();
 
 	// Delivers the desired head
 	int desired_head();
@@ -437,7 +443,7 @@ private:
 
 	// Common subprograms READ ID, VERIFY, and DATA TRANSFER
 	void read_id(int& cont, bool implied_seek, bool wait_seek_complete);
-	void verify(int& cont, bool verify_all);
+	void verify(int& cont);
 	void data_transfer(int& cont);
 
 	// ===================================================

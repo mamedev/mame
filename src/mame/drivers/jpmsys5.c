@@ -53,7 +53,7 @@ enum int_levels
 	INT_6850ACIA   = 4,
 	INT_WATCHDOG   = 5,
 	INT_FLOPPYCTRL = 6,
-	INT_POWERFAIL  = 7,
+	INT_POWERFAIL  = 7
 };
 
 

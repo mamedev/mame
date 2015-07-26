@@ -27,7 +27,7 @@
 #include "../nl_base.h"
 
 #define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)                      \
-		NET_REGISTER_DEV(7448, _name)                                               \
+		NET_REGISTER_DEV(TTL_7448, _name)                                               \
 		NET_CONNECT(_name, A, _A0)                                                  \
 		NET_CONNECT(_name, B, _A1)                                                  \
 		NET_CONNECT(_name, C, _A2)                                                  \
@@ -37,7 +37,7 @@
 		NET_CONNECT(_name, RBIQ, _RBIQ)
 
 #define TTL_7448_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7448_dip, _name)
+		NET_REGISTER_DEV(TTL_7448_DIP, _name)
 
 /*
  * FIXME: Using truthtable is a lot slower than the explicit device

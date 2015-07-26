@@ -174,7 +174,9 @@ bits(7:4) and bit(24)), X, and Y:
 
 #define MODIFY_PIXEL(VV)
 
-
+// Need to turn off cycle eating when debugging MIPS drc
+// otherwise timer interrupts won't match nodrc debug mode.
+#define EAT_CYCLES          (1)
 
 
 /*************************************
@@ -1458,8 +1460,14 @@ INLINE INT32 prepare_tmu(tmu_state *t)
 	/* adjust the result: negative to get the log of the original value */
 	/* plus 12 to account for the extra exponent, and divided by 2 to */
 	/* get the log of the square root of texdx */
-	(void)fast_reciplog(texdx, &lodbase);
-	return (-lodbase + (12 << 8)) / 2;
+	#if USE_FAST_RECIP == 1
+		(void)fast_reciplog(texdx, &lodbase);
+		return (-lodbase + (12 << 8)) / 2;
+	#else
+		double tmpTex = texdx;
+		lodbase = new_log2(tmpTex);
+		return (lodbase + (12 << 8)) / 2;
+	#endif
 }
 
 
@@ -3303,8 +3311,6 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 					iterw = (UINT32) sw[pix] << 16;
 				}
 				INT32 iterz = sw[pix] << 12;
-				rgb_union color;
-				rgb_union iterargb = { 0 };
 
 				/* apply clipping */
 				if (FBZMODE_ENABLE_CLIPPING(v->reg[fbzMode].u))
@@ -3319,6 +3325,13 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 						goto nextpixel;
 					}
 				}
+				#if USE_OLD_RASTER == 1
+					rgb_union color;
+					rgb_union iterargb = { 0 };
+				#else
+					rgbaint_t color, preFog;
+					rgbaint_t iterargb(0);
+				#endif
 
 				/* pixel pipeline part 1 handles depth testing and stippling */
 				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, v->reg[fbzColorPath].u, v->reg[fbzMode].u, iterz, iterw);
@@ -3362,35 +3375,38 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
 				fogdepth = biasdepth = (UINT32) sw[pix];
 
-				/* use the RGBA we stashed above */
-				color.rgb.r = r = sr[pix];
-				color.rgb.g = g = sg[pix];
-				color.rgb.b = b = sb[pix];
-				color.rgb.a = a = sa[pix];
-
-				if (USE_OLD_RASTER) {
+				#if USE_OLD_RASTER == 1
 					/* Perform depth testing */
 					DEPTH_TEST(v, stats, x, v->reg[fbzMode].u);
+
+					/* use the RGBA we stashed above */
+					color.rgb.r = r = sr[pix];
+					color.rgb.g = g = sg[pix];
+					color.rgb.b = b = sb[pix];
+					color.rgb.a = a = sa[pix];
 
 					/* apply chroma key, alpha mask, and alpha testing */
 					APPLY_CHROMAKEY(v, stats, v->reg[fbzMode].u, color);
 					APPLY_ALPHAMASK(v, stats, v->reg[fbzMode].u, color.rgb.a);
 					APPLY_ALPHATEST(v, stats, v->reg[alphaMode].u, color.rgb.a);
-				} else {
+				#else
 					/* Perform depth testing */
 					if (!depthTest((UINT16) v->reg[zaColor].u, stats, depth[x], v->reg[fbzMode].u, biasdepth))
 						goto nextpixel;
+
+					/* use the RGBA we stashed above */
+					color.set(sa[pix], sr[pix], sg[pix], sb[pix]);
 
 					/* handle chroma key */
 					if (!chromaKeyTest(v, stats, v->reg[fbzMode].u, color))
 						goto nextpixel;
 					/* handle alpha mask */
-					if (!alphaMaskTest(stats, v->reg[fbzMode].u, color.rgb.a))
+					if (!alphaMaskTest(stats, v->reg[fbzMode].u, color.get_a()))
 						goto nextpixel;
 					/* handle alpha test */
-					if (!alphaTest(v, stats, v->reg[alphaMode].u, color.rgb.a))
+					if (!alphaTest(v, stats, v->reg[alphaMode].u, color.get_a()))
 						goto nextpixel;
-				}
+				#endif
 
 				/* wait for any outstanding work to finish */
 				poly_wait(v->poly, "LFB Write");
@@ -3937,7 +3953,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			/* bit 31 is not used */
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(1000);
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
@@ -3950,7 +3966,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 		case vRetrace:
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(10);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(10);
 			result = v->screen->vpos();
 			break;
 
@@ -3965,7 +3981,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			result = v->fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
-			v->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) v->cpu->execute().eat_cycles(1000);
 			break;
 
 		case cmdFifoAMin:
@@ -5703,7 +5719,7 @@ static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo)
 
 	if (LOG_RASTERIZERS)
 		printf("Adding rasterizer @ %p : cp=%08X am=%08X %08X fbzM=%08X tm0=%08X tm1=%08X (hash=%d)\n",
-				info->callback,
+				(void *)info->callback,
 				info->eff_color_path, info->eff_alpha_mode, info->eff_fog_mode, info->eff_fbz_mode,
 				info->eff_tex_mode_0, info->eff_tex_mode_1, hash);
 
@@ -6496,5 +6512,26 @@ RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x000000C4, 0x
 RASTERIZER_ENTRY( 0x00002425, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD ) /*   67     1962      14755 */
 RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x000000C4, 0x0C261ACD ) /* * 66       74       3951 */
 RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x00000000, 0x00010FF9, 0x00000ACD, 0x04221AC9 ) /*   70      374       3691 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x0C261ACD ) /* * 20      350       7928 */
+/* virtpool ----> fbzColorPath alphaMode   fogMode,    fbzMode,    texMode0,   texMode1        hash */
+RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B0739, 0x0C261A0F, 0x042210C0 ) /* * 78  2182388   74854175 */
+RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B07F9, 0x0C261A0F, 0x042210C0 ) /* * 46   114830    6776826 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045110, 0x00000000, 0x000B0739, 0x0C261A0F, 0x042210C0 ) /* * 58  1273673    4513463 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045110, 0x00000000, 0x000B0739, 0x0C261A09, 0x042210C0 ) /* * 46   634995    2275612 */
+RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B073B, 0x0C261A0F, 0x042210C0 ) /* * 46    26651    1883507 */
+RASTERIZER_ENTRY( 0x00482405, 0x00045110, 0x00000000, 0x000B073B, 0x0C261A0F, 0x042210C0 ) /* * 26   220644     751241 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00445110, 0x00000000, 0x000B073B, 0x0C261A09, 0x042210C0 ) /* * 79    14846    3499120 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B0739, 0x0C261A09, 0x042210C0 ) /* * 66    26665    1583363 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B073B, 0x0C26100F, 0x042210C0 ) /* * 78    33096     957935 */
+//RASTERIZER_ENTRY( 0x00002425, 0x00445110, 0x00000000, 0x000B07F9, 0x0C261A0F, 0x042210C0 ) /* * 38    12494     678029 */
+//RASTERIZER_ENTRY( 0x00800000, 0x00000000, 0x00000000, 0x00000200, 0x00000000, 0x00000000 ) /* * 28    25348     316181 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B0739, 0x0C26100F, 0x042210C0 ) /* * 13    11344     267903 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B073B, 0x0C261A09, 0x042210C0 ) /* * 34     1548     112168 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B07FB, 0x0C26100F, 0x042210C0 ) /* * 35      664      25222 */
+//RASTERIZER_ENTRY( 0x00000002, 0x00000000, 0x00000000, 0x00000300, 0xFFFFFFFF, 0xFFFFFFFF ) /* * 33      512      18393 */
+//RASTERIZER_ENTRY( 0x00002421, 0x00000000, 0x00000000, 0x000B07FB, 0x0C261A0F, 0x042210C0 ) /* * 14      216      16842 */
+//RASTERIZER_ENTRY( 0x00000001, 0x00000000, 0x00000000, 0x00000300, 0x00000800, 0x00000800 ) /* * 87        2         72 */
+//RASTERIZER_ENTRY( 0x00000001, 0x00000000, 0x00000000, 0x00000200, 0x08241A00, 0x08241A00 ) /* * 92        2          8 */
+//RASTERIZER_ENTRY( 0x00000001, 0x00000000, 0x00000000, 0x00000200, 0x00000000, 0x08241A00 ) /* * 93        2          8 */
 
 #endif

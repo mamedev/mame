@@ -258,6 +258,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/g64_dsk.h",
 		MAME_DIR .. "src/lib/formats/gtp_cas.c",
 		MAME_DIR .. "src/lib/formats/gtp_cas.h",
+		MAME_DIR .. "src/lib/formats/guab_dsk.c",
+		MAME_DIR .. "src/lib/formats/guab_dsk.h",
 		MAME_DIR .. "src/lib/formats/hect_dsk.c",
 		MAME_DIR .. "src/lib/formats/hect_dsk.h",
 		MAME_DIR .. "src/lib/formats/hect_tap.c",

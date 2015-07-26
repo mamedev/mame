@@ -188,7 +188,19 @@ end
 
 ---------------------------------------------------
 --
---@src/emu/machine/68561mpcc.h,MACHINES["68561MPCC"] = true
+--@src/emu/machine/68230pit.h,MACHINES["PIT68230"] = true
+---------------------------------------------------
+
+if (MACHINES["PIT68230"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/68230pit.c",
+		MAME_DIR .. "src/emu/machine/68230pit.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/68561mpcc.h,MACHINES += 68561MPCC
 ---------------------------------------------------
 
 if (MACHINES["68561MPCC"]~=null) then
@@ -1779,7 +1791,7 @@ end
 
 if (MACHINES["RF5C296"]~=null) then
 	MACHINES["PCCARD"] = true
-	files {	
+	files {
 		MAME_DIR .. "src/emu/machine/rf5c296.c",
 		MAME_DIR .. "src/emu/machine/rf5c296.h",
 	}
@@ -2535,17 +2547,6 @@ if (MACHINES["AT_KEYBC"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/emu/machine/smc92x4.h,MACHINES["SMC92X4"] = true
----------------------------------------------------
-
-if (MACHINES["SMC92X4"]~=null) then
-	files {
-		MAME_DIR .. "src/emu/machine/smc92x4.c",
-		MAME_DIR .. "src/emu/machine/smc92x4.h",
-	}
-end
 
 ---------------------------------------------------
 --

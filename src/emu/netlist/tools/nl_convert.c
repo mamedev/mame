@@ -10,6 +10,14 @@
 #include <cmath>
 #include "nl_convert.h"
 
+
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
+
 template<typename Class>
 static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
 {
@@ -455,3 +463,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 	}
 
 }
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

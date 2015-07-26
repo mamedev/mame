@@ -1,12 +1,16 @@
+# vim: et ts=4 sts=4 sw=4 tw=0
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
 PROJECT(jsoncpp)
 ENABLE_TESTING()
 
-OPTION(JSONCPP_WITH_TESTS "Compile and run JsonCpp test executables" ON)
+OPTION(JSONCPP_WITH_TESTS "Compile and (for jsoncpp_check) run JsonCpp test executables" ON)
 OPTION(JSONCPP_WITH_POST_BUILD_UNITTEST "Automatically run unit-tests as a post build step" ON)
 OPTION(JSONCPP_WITH_WARNING_AS_ERROR "Force compilation to fail if a warning occurs" OFF)
 OPTION(JSONCPP_WITH_PKGCONFIG_SUPPORT "Generate and install .pc files" ON)
 OPTION(JSONCPP_WITH_CMAKE_PACKAGE "Generate and install cmake package files" OFF)
+OPTION(BUILD_SHARED_LIBS "Build jsoncpp_lib as a shared library." OFF)
+OPTION(BUILD_STATIC_LIBS "Build jsoncpp_lib static library." ON)
 
 # Ensures that CMAKE_BUILD_TYPE is visible in cmake-gui on Unix
 IF(NOT WIN32)
@@ -17,29 +21,20 @@ IF(NOT WIN32)
     ENDIF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT WIN32)
 
+SET(DEBUG_LIBNAME_SUFFIX "" CACHE STRING "Optional suffix to append to the library name for a debug build")
 SET(LIB_SUFFIX "" CACHE STRING "Optional arch-dependent suffix for the library installation directory")
 
 SET(RUNTIME_INSTALL_DIR bin
     CACHE PATH "Install dir for executables and dlls")
-SET(ARCHIVE_INSTALL_DIR lib${LIB_SUFFIX}
+SET(ARCHIVE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}
     CACHE PATH "Install dir for static libraries")
-SET(LIBRARY_INSTALL_DIR lib${LIB_SUFFIX}
+SET(LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}
     CACHE PATH "Install dir for shared libraries")
-SET(INCLUDE_INSTALL_DIR include
+SET(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include
     CACHE PATH "Install dir for headers")
 SET(PACKAGE_INSTALL_DIR lib${LIB_SUFFIX}/cmake
     CACHE PATH "Install dir for cmake package config files")
 MARK_AS_ADVANCED( RUNTIME_INSTALL_DIR ARCHIVE_INSTALL_DIR INCLUDE_INSTALL_DIR PACKAGE_INSTALL_DIR )
-
-# This ensures shared DLL are in the same dir as executable on Windows.
-# Put all executables / libraries are in a project global directory.
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
-    CACHE PATH "Single directory for all static libraries.")
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
-    CACHE PATH "Single directory for all dynamic libraries on Unix.")
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin
-    CACHE PATH "Single directory for all executable and dynamic libraries on Windows.")
-MARK_AS_ADVANCED( CMAKE_RUNTIME_OUTPUT_DIRECTORY CMAKE_LIBRARY_OUTPUT_DIRECTORY CMAKE_ARCHIVE_OUTPUT_DIRECTORY )
 
 # Set variable named ${VAR_NAME} to value ${VALUE}
 FUNCTION(set_using_dynamic_name VAR_NAME VALUE)
@@ -64,17 +59,24 @@ MACRO(jsoncpp_parse_version VERSION_TEXT OUPUT_PREFIX)
 ENDMACRO(jsoncpp_parse_version)
 
 # Read out version from "version" file
-FILE(STRINGS "version" JSONCPP_VERSION)
-
+#FILE(STRINGS "version" JSONCPP_VERSION)
+#SET( JSONCPP_VERSION_MAJOR X )
+#SET( JSONCPP_VERSION_MINOR Y )
+#SET( JSONCPP_VERSION_PATCH Z )
+SET( JSONCPP_VERSION 1.6.2 )
 jsoncpp_parse_version( ${JSONCPP_VERSION} JSONCPP_VERSION )
-IF(NOT JSONCPP_VERSION_FOUND)
-    MESSAGE(FATAL_ERROR "Failed to parse version string properly. Expect X.Y.Z")
-ENDIF(NOT JSONCPP_VERSION_FOUND)
+#IF(NOT JSONCPP_VERSION_FOUND)
+#    MESSAGE(FATAL_ERROR "Failed to parse version string properly. Expect X.Y.Z")
+#ENDIF(NOT JSONCPP_VERSION_FOUND)
 
 MESSAGE(STATUS "JsonCpp Version: ${JSONCPP_VERSION_MAJOR}.${JSONCPP_VERSION_MINOR}.${JSONCPP_VERSION_PATCH}")
 # File version.h is only regenerated on CMake configure step
 CONFIGURE_FILE( "${PROJECT_SOURCE_DIR}/src/lib_json/version.h.in"
-                "${PROJECT_SOURCE_DIR}/include/json/version.h" )
+                "${PROJECT_SOURCE_DIR}/include/json/version.h"
+                NEWLINE_STYLE UNIX )
+CONFIGURE_FILE( "${PROJECT_SOURCE_DIR}/version.in"
+                "${PROJECT_SOURCE_DIR}/version"
+                NEWLINE_STYLE UNIX )
 
 macro(UseCompilationWarningAsError)
 	if ( MSVC )
@@ -92,6 +94,14 @@ if ( MSVC )
     # unreachable code warning when compiled in release configuration.
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W4 ")
 endif( MSVC )
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # using regular Clang or AppleClang
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wshorten-64-to-32")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  # using GCC
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Wextra -pedantic")
+endif()
 
 IF(JSONCPP_WITH_WARNING_AS_ERROR)
     UseCompilationWarningAsError()

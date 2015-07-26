@@ -27,17 +27,15 @@ void poolshrk_state::video_start()
 }
 
 
-UINT32 poolshrk_state::screen_update_poolshrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 poolshrk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	m_bg_tilemap->mark_all_dirty();
 
 	bitmap.fill(0, cliprect);
 
 	/* draw sprites */
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		int hpos = m_hpos_ram[i];
 		int vpos = m_vpos_ram[i];

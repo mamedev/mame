@@ -39,7 +39,7 @@
 #include "nld_truthtable.h"
 
 #define TTL_74279_DIP(_name)                                                         \
-		NET_REGISTER_DEV(74279_dip, _name)
+		NET_REGISTER_DEV(TTL_74279_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

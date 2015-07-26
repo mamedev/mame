@@ -86,7 +86,7 @@ enum e_operand
 	O_M8,       /* (8) */
 	O_M16,      /* (i16) */
 	O_R,            /* register */
-	O_SR,       /* status register */
+	O_SR        /* status register */
 };
 
 

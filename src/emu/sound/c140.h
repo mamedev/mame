@@ -51,23 +51,23 @@ struct C140_VOICE
 		sample_end(0),
 		sample_loop(0) {}
 
-	long    ptoffset;
-	long    pos;
-	long    key;
+	INT32    ptoffset;
+	INT32    pos;
+	INT32    key;
 	//--work
-	long    lastdt;
-	long    prevdt;
-	long    dltdt;
+	INT32    lastdt;
+	INT32    prevdt;
+	INT32    dltdt;
 	//--reg
-	long    rvol;
-	long    lvol;
-	long    frequency;
-	long    bank;
-	long    mode;
+	INT32    rvol;
+	INT32    lvol;
+	INT32    frequency;
+	INT32    bank;
+	INT32    mode;
 
-	long    sample_start;
-	long    sample_end;
-	long    sample_loop;
+	INT32    sample_start;
+	INT32    sample_end;
+	INT32    sample_loop;
 };
 
 

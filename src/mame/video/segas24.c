@@ -28,7 +28,7 @@ namespace {
 
 		segas24_mixer *mixer;
 	};
-};
+}
 
 UINT32 segas24_state::screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

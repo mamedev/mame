@@ -4441,7 +4441,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hnoridur, dynax_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
+	MCFG_CPU_ADD("maincpu",Z80,XTAL_22MHz / 4)    /* 5.5MHz */
 	MCFG_CPU_PROGRAM_MAP(hnoridur_mem_map)
 	MCFG_CPU_IO_MAP(hnoridur_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
@@ -4467,14 +4467,14 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2413", YM2413, 3579545)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -4811,7 +4811,7 @@ static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjembase, hnoridur )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("maincpu")	// TMPZ84015
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(mjembase_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  mjelctrn_vblank_interrupt)   /* IM 2 needs a vector on the data bus */
@@ -5352,6 +5352,22 @@ ROM_START( mayab )
 	ROM_LOAD( "promat02.bin",  0x200, 0x200, CRC(e38eb360) SHA1(739960dd57ec3305edd57aa63816a81ddfbebf3e) )
 ROM_END
 
+ROM_START( mayac )
+	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "e16", 0x00000, 0x10000, CRC(badafb62) SHA1(eabe390f5b3ca6acd4b194b65b81fda7ddca35b8) )
+	ROM_LOAD( "e15", 0x28000, 0x10000, CRC(7ea5b49a) SHA1(aaae848669d9f88c0660f46cc801e4eb0f5e3b89) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "g18", 0x00000, 0x40000, CRC(b621955c) SHA1(8bb3cf16585f33e81921efe7958cf8ca08e8df7f) )
+	ROM_LOAD( "g16", 0x40000, 0x40000, CRC(26b1c824) SHA1(e1a1a51ef94a3933d5fe4b3d47ad2c1dfb9a1c19) )
+	ROM_LOAD( "g15", 0x80000, 0x40000, CRC(f7c6f77e) SHA1(27ba271ec67504dc0c6f9b20362206bbd4b0d90a) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "82s147-2.b5",  0x000, 0x200, CRC(5091de2b) SHA1(ae13676cd2fbde1b87c85480283b24440e069ba4) ) // FIXED BITS (0xxxxxxx)
+	ROM_LOAD( "82s147-1.b6",  0x200, 0x200, CRC(6d4940cd) SHA1(33875fd846977f8839fdb0f2a259959994552f35) )
+ROM_END
+
+
 ROM_START( inca )
 	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "am27c512.1", 0x00000, 0x10000, CRC(b0d513f7) SHA1(65ef4702302bbfc7c7a77f7353120ee3f5c94b31) )
@@ -5440,12 +5456,11 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 
 	}
 }
+	
 
-DRIVER_INIT_MEMBER(dynax_state,maya)
+DRIVER_INIT_MEMBER(dynax_state, maya_common)
 {
 	/* Address lines scrambling on 1 z80 rom */
-	int i;
-	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
 	UINT8   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
@@ -5456,13 +5471,39 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 		rom[0] = temp[0];   rom[1] = temp[4];   rom[2] = temp[1];   rom[3] = temp[5];
 		rom[4] = temp[2];   rom[5] = temp[6];   rom[6] = temp[3];   rom[7] = temp[7];
 	}
+}
+
+
+DRIVER_INIT_MEMBER(dynax_state,maya)
+{
+	DRIVER_INIT_CALL(maya_common);
+
+	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	int i;
 
 	/* Address lines scrambling on the blitter data roms */
 	{
 		dynamic_buffer rom(0xc0000);
 		memcpy(&rom[0], gfx, 0xc0000);
 		for (i = 0; i < 0xc0000; i++)
-			gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
+			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+	}
+}
+
+
+DRIVER_INIT_MEMBER(dynax_state,mayac)
+{
+	DRIVER_INIT_CALL(maya_common);
+
+	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	int i;
+
+	/* Address lines scrambling on the blitter data roms */
+	{
+		dynamic_buffer rom(0xc0000);
+		memcpy(&rom[0], gfx, 0xc0000);
+		for (i = 0; i < 0xc0000; i++)
+			gfx[i] = rom[BITSWAP24(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 	}
 }
 
@@ -6226,12 +6267,42 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Electromagnetic Base
-DYNAX D3803248L1
+Mahjong Electromagnetic Base (Dynax, 1989)
 
-AY-3-8912?, MSM5205?
-HD46505SP?, Dynax blitter? (rest of the chips are scratched)
-4 x DSW8, 28-way connector
+PCB Layout
+----------
+
+D3803248L1
+sticker: M6100524A
+  |--------------------------------------|
+  |             TMS4461  17G032   3804   |
+|-|             TMS4461           3805   |
+|       TMS4461 TMS4461   3801    3806   |
+|       TMS4461 TMS4461   3802    3807   |
+|                         3803    3808   |
+|             PAL                 3809   |
+|     6845SP                      381A   |
+|              2018     PAL              |
+|  DSW4 384KHz 2018          DSW1   0.1UF|
+|  LM358  M5205                          |
+|  LM358  YM2413             CPU   TC5563|
+|  MB3712   AY-3-8912                    |
+|-|VOL      DSW3             DSW2        |
+  |VOL   3.579545MHz       22MHz  3815   |
+  |--------------------------------------|
+Notes:
+      CPU       - surface scratched, clock input 11MHz [22/2], looks like TMPZ84015
+      AY-3-8912 - clock 1.375MHz [22/16]
+      YM2413    - clock 3.579545MHz
+      M5205     - clock 384kHz
+      6845SP    - clock 2.75MHz [22/8], VSync pin - 60.1188Hz, HSync pin - 15.8112kHz
+      TMS4461   - 1Mx4-bit DRAM
+      2018      - 2kx8-bit SRAM
+      TC5563    - 8kx8-bit SRAM
+      17G032    - custom Dynax GFX chip
+      DSW1-4    - 8-position DIP switches
+      0.1UF     - 5.5v 0.1UF supercap
+      MB3712    - Fujitsu MB3712 AMP
 
 ***************************************************************************/
 
@@ -7339,10 +7410,11 @@ GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   driver_device, 0,        ROT
 GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, driver_device, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          GAME_SUPPORTS_SAVE )
 GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          GAME_SUPPORTS_SAVE )
 GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, driver_device, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  GAME_SUPPORTS_SAVE )
-/* these 5 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
+/* these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
 GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
 GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
 GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  GAME_SUPPORTS_SAVE )
+GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state,   mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           GAME_SUPPORTS_SAVE )
 GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "<unknown>",                "Inca",                                                          GAME_SUPPORTS_SAVE )
 GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state,   blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           GAME_SUPPORTS_SAVE )
 

@@ -14,7 +14,7 @@
 //! F2 functions for display horizontal task
 enum {
 	f2_dht_evenfield    = f2_task_10,           //!< f2 10: load even field
-	f2_dht_setmode      = f2_task_11,           //!< f2 11: set mode
+	f2_dht_setmode      = f2_task_11            //!< f2 11: set mode
 };
 
 void f1_early_dht_block();                      //!< F1 func: disable the display word task

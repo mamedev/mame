@@ -64,10 +64,10 @@ public:
 };
 
 //FIXME: set to proper values
-class logic_family_cd4000_t : public logic_family_desc_t
+class logic_family_cd4xxx_t : public logic_family_desc_t
 {
 public:
-	logic_family_cd4000_t() : logic_family_desc_t()
+	logic_family_cd4xxx_t() : logic_family_desc_t()
 	{
 		m_low_thresh_V = 0.8;
 		m_high_thresh_V = 2.0;
@@ -85,37 +85,7 @@ public:
 };
 
 logic_family_desc_t *netlist_family_TTL = palloc(logic_family_ttl_t);
-logic_family_desc_t *netlist_family_CD4000 = palloc(logic_family_cd4000_t);
-
-class logic_family_std_proxy_t : public logic_family_desc_t
-{
-public:
-	logic_family_std_proxy_t() { }
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
-	{
-		return palloc(devices::nld_d_to_a_proxy(proxied));
-	}
-};
-
-logic_family_desc_t *logic_family_desc_t::from_model(const pstring &model)
-{
-	if (setup_t::model_value_str(model, "TYPE", "") == "TTL")
-		return netlist_family_TTL;
-	if (setup_t::model_value_str(model, "TYPE", "") == "CD4000")
-		return netlist_family_CD4000;
-
-	logic_family_std_proxy_t *ret = palloc(logic_family_std_proxy_t);
-
-	ret->m_low_thresh_V = setup_t::model_value(model, "IVL", 0.8);
-	ret->m_high_thresh_V = setup_t::model_value(model, "IVH", 2.0);
-	ret->m_low_V = setup_t::model_value(model, "OVL", 0.1);
-	ret->m_high_V = setup_t::model_value(model, "OVH", 4.0);
-	ret->m_R_low = setup_t::model_value(model, "ORL", 1.0);
-	ret->m_R_high = setup_t::model_value(model, "ORH", 130.0);
-
-	return ret;
-}
-
+logic_family_desc_t *netlist_family_CD4XXX = palloc(logic_family_cd4xxx_t);
 
 // ----------------------------------------------------------------------------------------
 // netlist_queue_t
@@ -555,6 +525,19 @@ ATTR_COLD void device_t::register_subalias(const pstring &name, core_terminal_t 
 		m_terminals.add(alias);
 }
 
+ATTR_COLD void device_t::register_subalias(const pstring &name, const pstring &aliased)
+{
+	pstring alias = this->name() + "." + name;
+	pstring aliased_fqn = this->name() + "." + aliased;
+
+	// everything already fully qualified
+	setup().register_alias_nofqn(alias, aliased_fqn);
+
+	// FIXME: make this working again
+	//if (term.isType(terminal_t::INPUT) || term.isType(terminal_t::TERMINAL))
+	//	m_terminals.add(name);
+}
+
 ATTR_COLD void device_t::register_terminal(const pstring &name, terminal_t &port)
 {
 	setup().register_object(*this, name, port);
@@ -588,8 +571,12 @@ ATTR_COLD void device_t::register_input(const pstring &name, analog_input_t &inp
 
 ATTR_COLD void device_t::connect_late(core_terminal_t &t1, core_terminal_t &t2)
 {
-	//printf("device %s: connect %s to %s\n", name().cstr(), t1.name().cstr(), t2.name().cstr());
 	setup().register_link_fqn(t1.name(), t2.name());
+}
+
+ATTR_COLD void device_t::connect_late(const pstring &t1, const pstring &t2)
+{
+	setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
 }
 
 ATTR_COLD void device_t::connect_direct(core_terminal_t &t1, core_terminal_t &t2)
@@ -1048,27 +1035,26 @@ ATTR_COLD param_t::param_t(const param_type_t atype)
 {
 }
 
-ATTR_COLD const pstring param_model_t::model_type() const
+ATTR_COLD const pstring param_model_t::model_type()
 {
-	pstring tmp = this->Value();
-	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
-	int p = tmp.find("(");
-	int p1 = p;
-	while (--p >= 0 && tmp[p] != ' ')
-		;
-
-	return tmp.substr(p+1, p1-p-1).ucase();
+	if (m_map.size() == 0)
+		netlist().setup().model_parse(this->Value(), m_map);
+	return m_map["COREMODEL"];
 }
 
 
-ATTR_COLD const pstring param_model_t::model_value_str(const pstring &entity, const pstring defval) const
+ATTR_COLD const pstring param_model_t::model_value_str(const pstring &entity)
 {
-	return setup_t::model_value_str(this->Value(), entity, defval);
+	if (m_map.size() == 0)
+		netlist().setup().model_parse(this->Value(), m_map);
+	return netlist().setup().model_value_str(m_map, entity);
 }
 
-ATTR_COLD nl_double param_model_t::model_value(const pstring &entity, const nl_double defval) const
+ATTR_COLD nl_double param_model_t::model_value(const pstring &entity)
 {
-	return setup_t::model_value(this->Value(), entity, defval);
+	if (m_map.size() == 0)
+		netlist().setup().model_parse(this->Value(), m_map);
+	return netlist().setup().model_value(m_map, entity);
 }
 
 } // namespace

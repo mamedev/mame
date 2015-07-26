@@ -298,8 +298,8 @@ UINT32 aerofgt_state::screen_update_pspikes(screen_device &screen, bitmap_ind16 
 	screen.priority().fill(0, cliprect);
 
 	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 	return 0;
 }
 
@@ -317,11 +317,11 @@ UINT32 aerofgt_state::screen_update_karatblz(screen_device &screen, bitmap_ind16
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
 	return 0;
 }
 
@@ -343,11 +343,11 @@ UINT32 aerofgt_state::screen_update_spinlbrk(screen_device &screen, bitmap_ind16
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
 	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
 
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
 	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
 	return 0;
 }
 
@@ -370,11 +370,11 @@ UINT32 aerofgt_state::screen_update_turbofrc(screen_device &screen, bitmap_ind16
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0); //enemy
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1); //enemy
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1); //ship
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0); //intro
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0); //ship
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1); //intro
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1); //enemy
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0); //enemy
 	return 0;
 }
 

@@ -349,7 +349,7 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_irq_handler)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
-};
+}
 
 READ8_MEMBER(dectalk_state::dectalk_duart_input)
 {

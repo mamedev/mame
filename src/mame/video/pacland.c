@@ -189,8 +189,6 @@ TILE_GET_INFO_MEMBER(pacland_state::get_fg_tile_info)
 
 void pacland_state::video_start()
 {
-	int color;
-
 	m_screen->register_screen_bitmap(m_fg_bitmap);
 	m_fg_bitmap.fill(0xffff);
 
@@ -204,12 +202,14 @@ void pacland_state::video_start()
 	/* create one group per color code; for each group, set the transparency mask
 	   to correspond to the pens that are 0x7f or 0xff */
 	assert(m_gfxdecode->gfx(0)->colors() <= TILEMAP_NUM_GROUPS);
-	for (color = 0; color < m_gfxdecode->gfx(0)->colors(); color++)
+	for (int color = 0; color < m_gfxdecode->gfx(0)->colors(); color++)
 	{
 		UINT32 mask = m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0x7f);
 		mask |= m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0xff);
 		m_fg_tilemap->set_transmask(color, mask, 0);
 	}
+
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_scroll0));
@@ -224,35 +224,31 @@ void pacland_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(pacland_state::pacland_videoram_w)
+WRITE8_MEMBER(pacland_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(pacland_state::pacland_videoram2_w)
+WRITE8_MEMBER(pacland_state::videoram2_w)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(pacland_state::pacland_scroll0_w)
+WRITE8_MEMBER(pacland_state::scroll0_w)
 {
 	m_scroll0 = data + 256 * offset;
 }
 
-WRITE8_MEMBER(pacland_state::pacland_scroll1_w)
+WRITE8_MEMBER(pacland_state::scroll1_w)
 {
 	m_scroll1 = data + 256 * offset;
 }
 
-WRITE8_MEMBER(pacland_state::pacland_bankswitch_w)
+WRITE8_MEMBER(pacland_state::bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("maincpu")->base();
-
-	bankaddress = 0x10000 + ((data & 0x07) << 13);
-	membank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_entry(data & 0x07);
 
 //  pbc = data & 0x20;
 
@@ -277,9 +273,8 @@ void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	UINT8 *spriteram = m_spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
-	int offs;
 
-	for (offs = 0;offs < 0x80;offs += 2)
+	for (int offs = 0;offs < 0x80;offs += 2)
 	{
 		static const int gfx_offs[2][2] =
 		{
@@ -333,15 +328,13 @@ void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	int y, x;
-
 	/* draw tilemap transparently over it; this will leave invalid pens (0xffff)
 	   anywhere where the fg_tilemap should be transparent; note that we assume
 	   the fg_bitmap has been pre-erased to 0xffff */
 	m_fg_tilemap->draw(screen, m_fg_bitmap, cliprect, priority, 0);
 
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const UINT8 *pri = &screen.priority().pix8(y);
 		UINT16 *src = &m_fg_bitmap.pix16(y);
@@ -349,7 +342,7 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
 		   source pixel is not the invalid pen; also clear to 0xffff when finished */
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT16 pix = src[x];
 			if (pix != 0xffff)
@@ -363,12 +356,11 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 }
 
 
-UINT32 pacland_state::screen_update_pacland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int row;
 	int flip = flip_screen();
 
-	for (row = 5; row < 29; row++)
+	for (int row = 5; row < 29; row++)
 		m_fg_tilemap->set_scrollx(row, m_scroll0 - (flip ? 7 : 0));
 	m_bg_tilemap->set_scrollx(0, m_scroll1);
 

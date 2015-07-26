@@ -192,6 +192,7 @@ public:
 	DECLARE_READ16_MEMBER(e90_prot_r);
 	DECLARE_WRITE16_MEMBER(e90_prot_w);
 	UINT32 screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 private:
 	UINT32 m_dip_read_offset;
 };
@@ -856,6 +857,7 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_SCREEN_SIZE(640, 525)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_n64)
+	MCFG_SCREEN_VBLANK_DRIVER(aleck64_state, screen_eof_n64)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 

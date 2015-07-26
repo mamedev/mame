@@ -22,10 +22,10 @@ NETLIB_NAMESPACE_DEVICES_START()
 // ----------------------------------------------------------------------------------------
 
 #define NETDEV_RSFF(_name)                                                          \
-		NET_REGISTER_DEV(nicRSFF, _name)
+		NET_REGISTER_DEV(NETDEV_RSFF, _name)
 
 #define NETDEV_DELAY(_name)                                                         \
-		NET_REGISTER_DEV(nicDelay, _name)
+		NET_REGISTER_DEV(NETDEV_DELAY, _name)
 
 // ----------------------------------------------------------------------------------------
 // Devices ...

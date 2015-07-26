@@ -143,37 +143,37 @@ VIDEO_START_MEMBER(appoooh_state,appoooh)
 	save_item(NAME(m_priority));
 }
 
-WRITE8_MEMBER(appoooh_state::appoooh_scroll_w)
+WRITE8_MEMBER(appoooh_state::scroll_w)
 {
 	m_scroll_x = data;
 }
 
 
-WRITE8_MEMBER(appoooh_state::appoooh_fg_videoram_w)
+WRITE8_MEMBER(appoooh_state::fg_videoram_w)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(appoooh_state::appoooh_fg_colorram_w)
+WRITE8_MEMBER(appoooh_state::fg_colorram_w)
 {
 	m_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(appoooh_state::appoooh_bg_videoram_w)
+WRITE8_MEMBER(appoooh_state::bg_videoram_w)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(appoooh_state::appoooh_bg_colorram_w)
+WRITE8_MEMBER(appoooh_state::bg_colorram_w)
 {
 	m_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(appoooh_state::appoooh_out_w)
+WRITE8_MEMBER(appoooh_state::out_w)
 {
 	/* bit 0 controls NMI */
 	m_nmi_mask = data & 1;
@@ -191,9 +191,7 @@ WRITE8_MEMBER(appoooh_state::appoooh_out_w)
 
 	/* bit 6 ROM bank select */
 	{
-		UINT8 *RAM = memregion("maincpu")->base();
-
-		membank("bank1")->set_base(&RAM[data&0x40 ? 0x10000 : 0x0a000]);
+		membank("bank1")->set_entry((data&0x40) ? 1 : 0);
 	}
 
 	/* bit 7 unknown (used) */

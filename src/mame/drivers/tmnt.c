@@ -2084,7 +2084,7 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	//MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_VISIBLE_AREA(13*8-8, (64-13)*8-1+8, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt)
 	MCFG_SCREEN_PALETTE("palette")
 	// We see something strange in the left 8 pixels and the right 8 pixels, but it is same as real PCB.
@@ -2198,7 +2198,7 @@ static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2255,7 +2255,7 @@ static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-15)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
 	MCFG_SCREEN_VBLANK_DRIVER(tmnt_state, screen_eof_blswhstl)
 	MCFG_SCREEN_PALETTE("palette")
@@ -3791,6 +3791,31 @@ ROM_START( ssridersjbd )
 	ROM_LOAD( "ssriders_jbd.nv", 0x0000, 0x080, CRC(006200e3) SHA1(a6a0640c1a6d69a41db90f1fc935e97f2fa68553) )
 ROM_END
 
+ROM_START( ssridersjad )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 2*256k and 2*128k for 68000 code */
+	ROM_LOAD16_BYTE( "064jad02.8e",  0x000000, 0x40000, CRC(13709ee6) SHA1(89f047711c2d978382fa8259d5dba9223a9c96db) )
+	ROM_LOAD16_BYTE( "064jad03.8g",  0x000001, 0x40000, CRC(2fa32229) SHA1(15027f8903389ddc57ada3f79ee5595520b06936) )
+	ROM_LOAD16_BYTE( "064eab04.10e", 0x080000, 0x20000, CRC(ef2315bd) SHA1(2c8b11321cb5fdb78d760fabca666c0d8cc5b298) )
+	ROM_LOAD16_BYTE( "064eab05.10g", 0x080001, 0x20000, CRC(51d6fbc4) SHA1(e80de7d155b7f263c48ef4ae2702059be3c18e76) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "064e01.2f",   0x0000, 0x10000, CRC(44b9bc52) SHA1(4654d6e14c6956c40a19cb41155accb63f0da338) )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "064e12.16k",   0x000000, 0x080000, CRC(e2bdc619) SHA1(04449deb267b0beacfa33640b593eb16194aa0d9) )
+	ROM_LOAD32_WORD( "064e11.12k",   0x000002, 0x080000, CRC(2d8ca8b0) SHA1(7c882f79c2402cf75979c681071007d76e4db9ae) )
+
+	ROM_REGION( 0x200000, "k053245", 0 )    /* sprites */
+	ROM_LOAD32_WORD( "064e09.7l", 0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )
+	ROM_LOAD32_WORD( "064e07.3l", 0x000002, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
+
+	ROM_REGION( 0x100000, "k053260", 0 )    /* samples for the 053260 */
+	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_jad.nv", 0x0000, 0x080, CRC(8962058c) SHA1(2aa470d02c7047c637d216690c281a144b70b4c3) )
+ROM_END
+
 ROM_START( ssridersjac )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 2*256k and 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "064jac02.8e",  0x000000, 0x40000, CRC(64a35f6f) SHA1(161127360e68054898cbe4d90382cf1682c8870b) )
@@ -4162,6 +4187,7 @@ GAME( 1991, ssridersuab, ssriders, ssriders, ssridr4p,  driver_device, 0,       
 GAME( 1991, ssridersubc, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, ssridersabd, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersjad, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver JAD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, ssridersjac, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver JAC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  driver_device, 0,        ROT0,   "bootleg","Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

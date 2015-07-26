@@ -2213,6 +2213,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mario.c",
 	MAME_DIR .. "src/mame/audio/mario.c",
 	MAME_DIR .. "src/mame/video/mario.c",
+	MAME_DIR .. "src/mame/drivers/mmagic.c",
 	MAME_DIR .. "src/mame/drivers/multigam.c",
 	MAME_DIR .. "src/mame/drivers/n8080.c",
 	MAME_DIR .. "src/mame/audio/n8080.c",
@@ -2606,6 +2607,7 @@ files {
 	MAME_DIR .. "src/mame/machine/st0016.c",
 	MAME_DIR .. "src/mame/drivers/simple_st0016.c",
 	MAME_DIR .. "src/mame/video/seta001.c",
+	MAME_DIR .. "src/mame/drivers/thedealr.c",
 }
 
 createMAMEProjects(_target, _subtarget, "sigma")

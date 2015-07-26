@@ -23,6 +23,12 @@
 #include "emu.h"
 #include "machine/pit8253.h"
 
+// for now, make buggy GCC/Mingw STFU about I64FMT
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
 
 /* device types */
 enum
@@ -1091,7 +1097,7 @@ void pit8253_device::set_clockin(int timerno, double new_clockin)
 	pit8253_timer *timer = get_timer(timerno);
 	assert(timer != NULL);
 
-	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %lf\n", timerno, new_clockin));
+	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %f\n", timerno, new_clockin));
 
 	update(timer);
 	timer->clockin = new_clockin;
@@ -1129,3 +1135,7 @@ WRITE_LINE_MEMBER( pit8253_device::write_clk2 )
 {
 	set_clock_signal(2, state);
 }
+
+#if (defined(__MINGW32__) && (__GNUC__ >= 5))
+#pragma GCC diagnostic pop
+#endif

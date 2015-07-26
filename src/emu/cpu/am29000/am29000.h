@@ -273,7 +273,7 @@ enum
 	SPR_CR   = 135,
 	SPR_FPE  = 160,
 	SPR_INTE = 161,
-	SPR_FPS  = 162,
+	SPR_FPS  = 162
 };
 
 
@@ -282,7 +282,7 @@ enum
 	SPACE_INSTRUCTION = 0,
 	SPACE_DATA,
 	SPACE_IO,
-	SPACE_COPROCESSOR,
+	SPACE_COPROCESSOR
 };
 
 
@@ -319,7 +319,7 @@ enum
 	EXCEPTION_MULTMU                    = 31,
 	EXCEPTION_MULTIPLY                  = 32,
 	EXCEPTION_DIVIDE                    = 33,
-	EXCEPTION_MULTIPLU                  = 44,      // TODO: FINISH ME
+	EXCEPTION_MULTIPLU                  = 44       // TODO: FINISH ME
 };
 
 

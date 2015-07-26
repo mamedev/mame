@@ -51,6 +51,8 @@ void hexion_state::video_start()
 	m_vram[0] = memregion("maincpu")->base() + 0x30000;
 	m_vram[1] = m_vram[0] + 0x2000;
 	m_unkram = m_vram[1] + 0x2000;
+	
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 
@@ -61,12 +63,10 @@ void hexion_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hexion_state::hexion_bankswitch_w)
+WRITE8_MEMBER(hexion_state::bankswitch_w)
 {
-	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
-
 	/* bits 0-3 select ROM bank */
-	membank("bank1")->set_base(rom + 0x2000 * (data & 0x0f));
+	membank("bank1")->set_entry(data & 0x0f);
 
 	/* does bit 6 trigger the 052591? */
 	if (data & 0x40)
@@ -85,7 +85,7 @@ if (data & 0x30)
 //logerror("%04x: bankswitch_w %02x\n",space.device().safe_pc(),data);
 }
 
-READ8_MEMBER(hexion_state::hexion_bankedram_r)
+READ8_MEMBER(hexion_state::bankedram_r)
 {
 	if (m_gfxrom_select && offset < 0x1000)
 	{
@@ -106,7 +106,7 @@ READ8_MEMBER(hexion_state::hexion_bankedram_r)
 	}
 }
 
-WRITE8_MEMBER(hexion_state::hexion_bankedram_w)
+WRITE8_MEMBER(hexion_state::bankedram_w)
 {
 	if (m_bankctrl == 3 && offset == 0 && (data & 0xfe) == 0)
 	{
@@ -138,13 +138,13 @@ WRITE8_MEMBER(hexion_state::hexion_bankedram_w)
 logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",space.device().safe_pc(),offset,data,m_bankctrl);
 }
 
-WRITE8_MEMBER(hexion_state::hexion_bankctrl_w)
+WRITE8_MEMBER(hexion_state::bankctrl_w)
 {
 //logerror("%04x: bankctrl_w %02x\n",space.device().safe_pc(),data);
 	m_bankctrl = data;
 }
 
-WRITE8_MEMBER(hexion_state::hexion_gfxrom_select_w)
+WRITE8_MEMBER(hexion_state::gfxrom_select_w)
 {
 //logerror("%04x: gfxrom_select_w %02x\n",space.device().safe_pc(),data);
 	m_gfxrom_select = data;
@@ -158,7 +158,7 @@ WRITE8_MEMBER(hexion_state::hexion_gfxrom_select_w)
 
 ***************************************************************************/
 
-UINT32 hexion_state::screen_update_hexion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 hexion_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0,0);

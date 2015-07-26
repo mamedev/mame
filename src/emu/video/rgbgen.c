@@ -117,7 +117,7 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 	if ((UINT32)m_b > 255) { m_b = (m_b < 0) ? 0 : 255; }
 }
 
-void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
+void rgbaint_t::scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
 {
 	m_a = (m_a * scale.m_a + other.m_a * scale2.m_a) >> 8;
 	m_r = (m_r * scale.m_r + other.m_r * scale2.m_r) >> 8;

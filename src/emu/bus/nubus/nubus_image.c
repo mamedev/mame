@@ -77,7 +77,7 @@ messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconf
 void messimg_disk_image_device::device_config_complete()
 {
 	update_names(MESSIMG_DISK, "disk", "disk");
-};
+}
 
 
 /*-------------------------------------------------

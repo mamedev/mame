@@ -48,7 +48,7 @@
 #include "../nl_base.h"
 
 #define TTL_9310(_name, _CLK, _ENP, _ENT, _CLRQ, _LOADQ, _A, _B, _C, _D)            \
-		NET_REGISTER_DEV(9310, _name)                                               \
+		NET_REGISTER_DEV(TTL_9310, _name)                                               \
 		NET_CONNECT(_name, CLK, _CLK)                                               \
 		NET_CONNECT(_name, ENP,  _ENP)                                              \
 		NET_CONNECT(_name, ENT,  _ENT)                                              \
@@ -60,7 +60,7 @@
 		NET_CONNECT(_name, D,    _D)
 
 #define TTL_9310_DIP(_name)                                                         \
-		NET_REGISTER_DEV(9310_dip, _name)
+		NET_REGISTER_DEV(TTL_9310_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

@@ -36,26 +36,22 @@ void namcona1_state::tilemap_get_info(
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info0)
 {
-	UINT16 *videoram = m_videoram;
-	tilemap_get_info(tileinfo,tile_index,0*0x1000+videoram,m_vreg[0xbc/2]&1);
+	tilemap_get_info(tileinfo,tile_index,0*0x1000+m_videoram,m_vreg[0xbc/2]&1);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info1)
 {
-	UINT16 *videoram = m_videoram;
-	tilemap_get_info(tileinfo,tile_index,1*0x1000+videoram,m_vreg[0xbc/2]&2);
+	tilemap_get_info(tileinfo,tile_index,1*0x1000+m_videoram,m_vreg[0xbc/2]&2);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info2)
 {
-	UINT16 *videoram = m_videoram;
-	tilemap_get_info(tileinfo,tile_index,2*0x1000+videoram,m_vreg[0xbc/2]&4);
+	tilemap_get_info(tileinfo,tile_index,2*0x1000+m_videoram,m_vreg[0xbc/2]&4);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info3)
 {
-	UINT16 *videoram = m_videoram;
-	tilemap_get_info(tileinfo,tile_index,3*0x1000+videoram,m_vreg[0xbc/2]&8);
+	tilemap_get_info(tileinfo,tile_index,3*0x1000+m_videoram,m_vreg[0xbc/2]&8);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
@@ -82,10 +78,9 @@ TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
 
 /*************************************************************************/
 
-WRITE16_MEMBER(namcona1_state::namcona1_videoram_w)
+WRITE16_MEMBER(namcona1_state::videoram_w)
 {
-	UINT16 *videoram = m_videoram;
-	COMBINE_DATA( &videoram[offset] );
+	COMBINE_DATA( &m_videoram[offset] );
 	if( offset<0x8000/2 )
 	{
 		m_bg_tilemap[offset/0x1000]->mark_tile_dirty(offset&0xfff);
@@ -94,7 +89,7 @@ WRITE16_MEMBER(namcona1_state::namcona1_videoram_w)
 	{
 		m_bg_tilemap[4]->mark_all_dirty();
 	}
-} /* namcona1_videoram_w */
+} /* videoram_w */
 
 /*************************************************************************/
 
@@ -113,9 +108,9 @@ void namcona1_state::UpdatePalette( int offset )
 	m_palette->set_pen_color(offset+0x1000, r, g, b);
 
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-} /* namcona1_paletteram_w */
+}
 
-WRITE16_MEMBER(namcona1_state::namcona1_paletteram_w)
+WRITE16_MEMBER(namcona1_state::paletteram_w)
 {
 	COMBINE_DATA( &m_paletteram[offset] );
 	if( m_vreg[0x8e/2] )
@@ -129,7 +124,7 @@ WRITE16_MEMBER(namcona1_state::namcona1_paletteram_w)
 }
 
 
-READ16_MEMBER(namcona1_state::namcona1_gfxram_r)
+READ16_MEMBER(namcona1_state::gfxram_r)
 {
 	UINT16 type = m_vreg[0x0c/2];
 	if( type == 0x03 )
@@ -145,9 +140,9 @@ READ16_MEMBER(namcona1_state::namcona1_gfxram_r)
 		return m_cgram[offset];
 	}
 	return 0x0000;
-} /* namcona1_gfxram_r */
+} /* gfxram_r */
 
-WRITE16_MEMBER(namcona1_state::namcona1_gfxram_w)
+WRITE16_MEMBER(namcona1_state::gfxram_w)
 {
 	UINT16 type = m_vreg[0x0c/2];
 	UINT16 old_word;
@@ -174,7 +169,7 @@ WRITE16_MEMBER(namcona1_state::namcona1_gfxram_w)
 			m_gfxdecode->gfx(1)->mark_dirty(offset/0x20);
 		}
 	}
-} /* namcona1_gfxram_w */
+} /* gfxram_w */
 
 void namcona1_state::video_start()
 {
@@ -190,7 +185,19 @@ void namcona1_state::video_start()
 	m_shaperam.resize(0x8000);
 
 	m_gfxdecode->gfx(2)->set_source(&m_shaperam[0]);
-} /* namcona1_vh_start */
+	
+	save_item(NAME(m_shaperam));
+	save_item(NAME(m_palette_is_dirty));
+	
+	machine().save().register_postload(save_prepost_delegate(FUNC(namcona1_state::postload), this));
+} /* video_start */
+
+void namcona1_state::postload()
+{
+	for (int i = 0; i < 3; i++)
+		m_gfxdecode->gfx(i)->mark_all_dirty();
+}
+
 
 /*************************************************************************/
 
@@ -510,7 +517,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 	}
 } /* draw_background */
 
-UINT32 namcona1_state::screen_update_namcona1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int which;
 	int priority;

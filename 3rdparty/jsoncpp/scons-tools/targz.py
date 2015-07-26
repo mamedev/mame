@@ -1,3 +1,8 @@
+# Copyright 2007 Baptiste Lepilleur
+# Distributed under MIT license, or public domain if desired and
+# recognized in your jurisdiction.
+# See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
+
 """tarball
 
 Tool-specific initialization for tarball.
@@ -27,9 +32,9 @@ TARGZ_DEFAULT_COMPRESSION_LEVEL = 9
 
 if internal_targz:
     def targz(target, source, env):
-        def archive_name( path ):
-            path = os.path.normpath( os.path.abspath( path ) )
-            common_path = os.path.commonprefix( (base_dir, path) )
+        def archive_name(path):
+            path = os.path.normpath(os.path.abspath(path))
+            common_path = os.path.commonprefix((base_dir, path))
             archive_name = path[len(common_path):]
             return archive_name
             
@@ -37,23 +42,23 @@ if internal_targz:
             for name in names:
                 path = os.path.join(dirname, name)
                 if os.path.isfile(path):
-                    tar.add(path, archive_name(path) )
+                    tar.add(path, archive_name(path))
         compression = env.get('TARGZ_COMPRESSION_LEVEL',TARGZ_DEFAULT_COMPRESSION_LEVEL)
-        base_dir = os.path.normpath( env.get('TARGZ_BASEDIR', env.Dir('.')).abspath )
+        base_dir = os.path.normpath(env.get('TARGZ_BASEDIR', env.Dir('.')).abspath)
         target_path = str(target[0])
-        fileobj = gzip.GzipFile( target_path, 'wb', compression )
+        fileobj = gzip.GzipFile(target_path, 'wb', compression)
         tar = tarfile.TarFile(os.path.splitext(target_path)[0], 'w', fileobj)
         for source in source:
             source_path = str(source)
             if source.isdir():
                 os.path.walk(source_path, visit, tar)
             else:
-                tar.add(source_path, archive_name(source_path) )      # filename, arcname
+                tar.add(source_path, archive_name(source_path))      # filename, arcname
         tar.close()
 
     targzAction = SCons.Action.Action(targz, varlist=['TARGZ_COMPRESSION_LEVEL','TARGZ_BASEDIR'])
 
-    def makeBuilder( emitter = None ):
+    def makeBuilder(emitter = None):
         return SCons.Builder.Builder(action = SCons.Action.Action('$TARGZ_COM', '$TARGZ_COMSTR'),
                                      source_factory = SCons.Node.FS.Entry,
                                      source_scanner = SCons.Defaults.DirScanner,

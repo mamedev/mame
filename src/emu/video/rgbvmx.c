@@ -168,13 +168,13 @@ void rgbaint_t::blend(const rgbaint_t& other, UINT8 factor)
 
 	m_value = vec_msum((VECU16)m_value, (VECU16)scale1, vec_mulo((VECU16)other.m_value, (VECU16)scale2));
 	m_value = vec_add(vec_sl(temp, shift), (VECU32)m_value);
-	sra(8);
+	sra_imm(8);
 }
 
 void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 {
 	mul(scale);
-	sra(8);
+	sra_imm(8);
 	max(0);
 	min(255);
 }
@@ -182,19 +182,19 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 void rgbaint_t::scale_imm_and_clamp(const INT32 scale)
 {
 	mul_imm(scale);
-	sra(8);
+	sra_imm(8);
 	max(0);
 	min(255);
 }
 
-void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
+void rgbaint_t::scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
 {
 	rgbaint_t color2(other);
 	color2.mul(scale2);
 
 	mul(scale);
 	add(color2);
-	sra(8);
+	sra_imm(8);
 	max(0);
 	min(255);
 }
@@ -202,7 +202,7 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 void rgbaint_t::scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& other)
 {
 	mul_imm(scale);
-	sra(8);
+	sra_imm(8);
 	add(other);
 	max(0);
 	min(255);
@@ -211,7 +211,7 @@ void rgbaint_t::scale_imm_add_and_clamp(const INT32 scale, const rgbaint_t& othe
 void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 {
 	mul(scale);
-	sra(8);
+	sra_imm(8);
 	add(other);
 	max(0);
 	min(255);

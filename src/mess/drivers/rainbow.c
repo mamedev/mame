@@ -1021,10 +1021,12 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 		if (offset < 0x8000)
 		{
 			m_shared[offset + 0x8000] = data;
+			return; // [!]
 		}
 		else if (offset < 0x8800)
 		{
 			m_z80_private[offset & 0x7ff] = data; // SRAM
+			return; // [!]
 		}
 
 		m_shared[offset ^ 0x8000] = data;
@@ -1032,14 +1034,11 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 	else
 	{
 		if (offset < 0x800)
-		{
 			m_z80_private[offset] = data; // SRAM
-		}
 		else
-		{
 			m_shared[offset] = data;
-		}
 	}
+	return;
 }
 
 
@@ -1123,7 +1122,7 @@ static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
 void rainbow_state::hdc_reset()
 {
-	printf(">> HARD DISC CONTROLLER RESET <<\n");
+//	printf(">> HARD DISC CONTROLLER RESET <<\n");
 	logerror(">> HARD DISC CONTROLLER RESET <<\n");
 
 	m_hdc->reset(); // NEW HDC
@@ -2016,8 +2015,9 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	{
 		printf("\n**** INVALID DRIVE ****");
 		data = (data & (255 - 3)) | m_unit;
-		data = data | 8;  // MOTOR 0 OFF
-		data = data | 16; // MOTOR 1 OFF
+
+		data = data & (255 - 8); // MOTOR 0 OFF
+		data = data & (255 - 16); // MOTOR 1 OFF
 	}
 	else
 	{
@@ -2025,11 +2025,11 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 		if (m_unit < 2)
 		{
-			data = data & (255 - 8); // MOTOR 0 (for A or B)
+			data = data | 8; // MOTOR 0 (for A or B)  
 		}
 		else
 		{
-			data = data & (255 - 16); // MOTOR 1 (for C or D)
+			data = data | 16; // MOTOR 1 (for C or D)
 			enable_start = 2;
 			disable_start = 4;
 		}
@@ -2365,87 +2365,97 @@ MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, motor_tick, attotime::fro
 MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
+//----------------------------------------------------------------------------------------
 // 'Rainbow 100-A' (system module 70-19974-00, PSU H7842-A)
 // - first generation hardware (introduced May '82) with ROM 04.03.11
 // - inability to boot from hard disc (mind the inadequate PSU)
-
-// AVAILABLE RAM: 64 K on board (instead of 128 K on model 'B').
+//----------------------------------------------------------------------------------------
+// AVAILABLE RAM: 64 K on board (versus 128 K on model 'B'). 
 
 // Two compatible memory expansions were sold by DEC:
-// (PCIXX-AA) : 64 K (usable on either Rainbow 100-A or 100-B)
-// (PCIXX-AB) : 192 K ( " )
+// (PCIXX-AA) : 64 K (usable on either Rainbow 100-A or 100-B) *
+// (PCIXX-AB) : 192 K ( " )  *
 // Totals to 256 K on a 100-A, while the RAM limit appears to be 832 K.
 
+// * DEC changed the way signals are handled on J6 (memory connector) later:
+//  "Whether a PC100-A or PC100-B memory module is installed on the PC100-B system module
+//   affects the functions the signals on 5 pins (29, 30, 32, 43, and 47) of the J6 connector 
+//   will perform." (from 'EK-RB100_TM_001 Addendum for PC100-A_PC100-B Dec.84' page 120).
+//----------------------------------------------------------------------------------------
 // KNOWN DIFFERENCES TO 100-B:
 // - cannot control bit 7 of IRQ vector (prevents DOS > 2.01 from booting on unmodified hardware)
 // - 4 color palette with graphics option (instead of 16 colors on later models)
-// - differences in arbitration logic (compare schematics of -B and -A; part E11 <- vs. -> E13)?
 // - smaller ROMs (3 x 2764) with fewer routines (no documented way to beep...)
+// - socketed NVRAM chip: X2212D 8238AES
 ROM_START(rainbow100a)
 ROM_REGION(0x100000, "maincpu", 0)
 
-// FIXME: 12-19606-02a.bin and 12-19606-02b.bin are just PART NUMBERS from the 100-A field manual.
-// Someone who knows the DEC naming conventions should correct them -
-ROM_LOAD("12-19606-02a.bin", 0xFA000, 0x2000, NO_DUMP) // ROM (FA000-FBFFF) (E89) 8 K
-ROM_LOAD("12-19606-02b.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90) 8 K
+ROM_LOAD("23-176e4-00.bin", 0xFA000, 0x2000, NO_DUMP) // ROM (FA000-FBFFF) (E89) 8 K
+ROM_LOAD("23-177e4-00.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90) 8 K
 
 // SOCKETED LANGUAGE ROM (E91) with 1 single localization per ROM -
-ROM_LOAD("70-20274-15", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - USA
-// ROM_LOAD("bg-r873a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - Canadian (French)
-// ROM_LOAD("bg-r876a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - British (UK)
-// ROM_LOAD("bg-r878a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - German / Austrian
-// ROM_LOAD("bg-r874a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - Italian
-// ROM_LOAD("bg-r377a-bv", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - Spanish
-// (...)
-// Appendix A / EK-RB100 Rainbow Technical Manual Addendum for 100A and 100B (Dec.84) lists all 15.
+ROM_LOAD("23-092e4-00.bin", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K - English (?)
+// See also MP-01491-00 - PC100A FIELD MAINTENANCE SET. Appendix A of EK-RB100 Rainbow
+// Technical Manual Addendum f.100A and 100B (Dec.84) lists 15 localizations / part numbers 
 
-ROM_REGION(0x1000, "chargen", 0)
-ROM_LOAD("chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+ROM_REGION(0x1000, "chargen", 0) // [E98] 2732 (4 K) EPROM 
+ROM_LOAD("23-020e3-00.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
 
+//----------------------------------------------------------------------------------------
 // ROM definition for 100-B (system module 70-19974-02, PSU H7842-D)
-// Built until ~ May 1986 (see MP-01491-00)
+// Built until ~ May 1986 (from MP-01491-00)
 // - 32 K ROM (version 5.03)
 // - 128 K base and 896 K max. mem.
 ROM_START(rainbow)
 ROM_REGION(0x100000, "maincpu", 0)
-ROM_LOAD("23-022e5-00.bin", 0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
+
+// Note that the 'Field Maintenance Print Set 1984' also lists alternate revision 'A1' with 
+//              23-063e3-00 (for chargen) and '23-074e5-00' / '23-073e5-00' for E5-01 / E5-02.
+
+// Part numbers 22E5, 20E5 and 37E3 verified to match revision "B" (FCC ID : A0994Q - PC100 - B).
+
+// BOOT ROM 
+ROM_LOAD("23-022e5-00.bin", 0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e)) 
 ROM_RELOAD(0xf4000, 0x4000)
+
+// LANGUAGE ROM 
 ROM_LOAD("23-020e5-00.bin", 0xf8000, 0x4000, CRC(8638712f) SHA1(8269b0d95dc6efbe67d500dac3999df4838625d8)) // German, French, English
 //ROM_LOAD( "23-015e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Dutch, French, English
 //ROM_LOAD( "23-016e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Finish, Swedish, English
-//ROM_LOAD( "23-017e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Danish, Norwegian, English
-//ROM_LOAD( "23-018e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Spanish, Italian, English
+//ROM_LOAD( "23-017e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Danish, Norwegian, English 
+//ROM_LOAD( "23-018e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Spanish, Italian, English 
 ROM_RELOAD(0xfc000, 0x4000)
-ROM_REGION(0x1000, "chargen", 0)
-ROM_LOAD("chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 
-//  ROM_REGION(0x800, BUFFER, 0)  // HDC RAM buffer 2 K -- NEW HDC
-//  // ROM_FILL(0x000, 0x800, 0x00)
+// CHARACTER GENERATOR (E3-03)
+ROM_REGION(0x1000, "chargen", 0) 
+ROM_LOAD("23-037e3.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
 
+//----------------------------------------------------------------------------------------
 // 'Rainbow 190 B' (announced March 1985) is identical to 100-B, with alternate ROM v5.05.
 // According to an article in Wall Street Journal it came with a 10 MB HD and 640 K RAM.
+
+// All programs not dependent on specific ROM addresses should work. A first glance:
+// - jump tables (F4000-F40083 and FC000-FC004D) were not extended
+// - absolute addresses of some internal routines have changed (affects BOOT 2.x / 3.x dual boot)
 
 // A Readme from January 1985 mentions 'recent ROM changes for MASS 11' (a VAX word processor).
 // It is *likely* that the sole differences between 5.05 and 5.03 affect terminal emulation.
 
-// * jump tables (F4000-F40083 and FC000-FC004D) were not extended.
-// * absolute addresses of some internal routines have changed.
-// All programs not dependent on specific ROM addresses should just work...
-
-// FIXME: ROM names are made up.
+// FIXME: ROM names are * made up *. 
 // Someone who knows the DEC naming conventions should correct them -
 ROM_START(rainbow190)
 ROM_REGION(0x100000, "maincpu", 0)
-ROM_LOAD("dec190rom0.bin", 0xf0000, 0x4000, CRC(FAC191D2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de))
+ROM_LOAD("dec190rom0.bin", 0xf0000, 0x4000, CRC(fac191d2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de))
 ROM_RELOAD(0xf4000, 0x4000)
-ROM_LOAD("dec190rom1.bin", 0xf8000, 0x4000, CRC(5CE59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2))
+ROM_LOAD("dec190rom1.bin", 0xf8000, 0x4000, CRC(5ce59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2))
 
 ROM_RELOAD(0xfc000, 0x4000)
-ROM_REGION(0x1000, "chargen", 0)
+ROM_REGION(0x1000, "chargen", 0) 
 ROM_LOAD("chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
+//----------------------------------------------------------------------------------------
 
 /* Driver */
 

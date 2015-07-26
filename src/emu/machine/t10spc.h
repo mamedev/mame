@@ -73,7 +73,7 @@ protected:
 		T10SBC_CMD_READ_CAPACITY = 0x25,
 		T10SBC_CMD_WRITE_10 = 0x2a,
 		T10SBC_CMD_SEEK_10 = 0x2b,
-		T10SBC_CMD_READ_12 = 0xa8,
+		T10SBC_CMD_READ_12 = 0xa8
 	};
 
 	enum

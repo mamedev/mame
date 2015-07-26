@@ -156,7 +156,7 @@ SOUNDS["YM3526"] = true
 SOUNDS["Y8950"] = true
 SOUNDS["YMF262"] = true
 --SOUNDS["YMF271"] = true
---SOUNDS["YMF278B"] = true
+SOUNDS["YMF278B"] = true
 --SOUNDS["YMZ280B"] = true
 SOUNDS["SN76477"] = true
 SOUNDS["SN76496"] = true
@@ -485,6 +485,7 @@ MACHINES["PCCARD"] = true
 MACHINES["PCF8593"] = true
 MACHINES["PCKEYBRD"] = true
 MACHINES["PIC8259"] = true
+MACHINES["PIT68230"] = true
 MACHINES["PIT8253"] = true
 MACHINES["PLA"] = true
 --MACHINES["PROFILE"] = true
@@ -722,6 +723,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"exidy",
 		"fairch",
 		"fidelity",
+		"force",
 		"fujitsu",
 		"funtech",
 		"galaxy",
@@ -775,6 +777,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"novag",
 		"ns",
 		"olivetti",
+		"olympia",
 		"omnibyte",
 		"orion",
 		"osborne",
@@ -837,6 +840,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"toshiba",
 		"trainer",
 		"trs",
+		"ultimachine",
 		"ultratec",
 		"unisys",
 		"veb",
@@ -1507,6 +1511,11 @@ files {
 	MAME_DIR .. "src/mess/drivers/fidelz80.c",  
 }
 
+createMESSProjects(_target, _subtarget, "force")
+files {          
+	MAME_DIR .. "src/mess/drivers/force68k.c",  
+}
+
 createMESSProjects(_target, _subtarget, "fujitsu")
 files {           
 	MAME_DIR .. "src/mess/drivers/fmtowns.c",
@@ -1628,6 +1637,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/isbc.c",
 	MAME_DIR .. "src/mess/machine/isbc_215g.c", 
 	MAME_DIR .. "src/mess/drivers/rex6000.c",   
+	MAME_DIR .. "src/mess/drivers/sdk80.c",     
 	MAME_DIR .. "src/mess/drivers/sdk85.c",     
 	MAME_DIR .. "src/mess/drivers/sdk86.c",   
 	MAME_DIR .. "src/mess/drivers/imds2.c",  
@@ -1901,6 +1911,11 @@ files {
 	MAME_DIR .. "src/mess/drivers/m24.c",
 	MAME_DIR .. "src/mess/machine/m24_kbd.c",
 	MAME_DIR .. "src/mess/machine/m24_z8000.c"
+}
+
+createMESSProjects(_target, _subtarget, "olympia")
+files {          
+	MAME_DIR .. "src/mess/drivers/peoplepc.c"
 }
 
 createMESSProjects(_target, _subtarget, "ns")
@@ -2442,6 +2457,11 @@ files {
 	MAME_DIR .. "src/mess/machine/trs80m2kb.c", 
 	MAME_DIR .. "src/mess/drivers/tandy2k.c",
 	MAME_DIR .. "src/mess/machine/tandy2kb.c", 
+}
+
+createMESSProjects(_target, _subtarget, "ultimachine")
+files {
+	MAME_DIR .. "src/mess/drivers/rambo.c",
 }
 
 createMESSProjects(_target, _subtarget, "ultratec")

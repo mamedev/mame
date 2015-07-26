@@ -196,9 +196,7 @@ TODO:
 /*Rom bankswitching*/
 WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 {
-	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
-
-	membank("bank1")->set_base(rom + 0x6000 * (data & 0x01));
+	membank("bank1")->set_entry(data & 0x01);
 }
 
 
@@ -249,8 +247,7 @@ MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 {
 	/* 6809 bank memory set */
 	{
-		UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
-		membank("bank2")->set_base(rom);
+		membank("bank2")->set_entry(0);
 		m_audiocpu->reset();
 	}
 }
@@ -272,10 +269,8 @@ WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 /*Sound Functions*/
 WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 {
-	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
-
 	/* bit6 = bank offset */
-	membank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
+	membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
 
 	m_msm->data_w(data);         /* bit0..3  */
 	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
@@ -997,9 +992,11 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 	swap_block(rom + 0x26000, rom + 0x2c000, 0x2000);
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
 
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x6000);
+	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0xc000);
+	
 	/* make sure bank is valid in cpu-reset */
-	rom = memregion("audiocpu")->base() + 0x10000;
-	membank("bank2")->set_base(rom);
+	membank("bank2")->set_entry(0);
 }
 
 

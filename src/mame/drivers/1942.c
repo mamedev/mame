@@ -168,6 +168,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::c1942_scanline)
 }
 
 
+
+
 static ADDRESS_MAP_START( c1942_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -203,6 +205,12 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
+WRITE8_MEMBER(_1942_state::c1942p_soundlatch_w)
+{
+	soundlatch_byte_w(space, 0, data);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -221,7 +229,7 @@ static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_WRITE(c1942p_palette_w)  AM_SHARE("protopal")
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(c1942_bankswitch_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(c1942p_soundlatch_w)
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(c1942p_f600_w)
 
 	AM_RANGE(0xf700, 0xf700) AM_READ_PORT("DSWA")
@@ -230,6 +238,23 @@ static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xf703, 0xf703) AM_READ_PORT("P1")
 	AM_RANGE(0xf704, 0xf704) AM_READ_PORT("P2")
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START(c1942p_sound_map, AS_PROGRAM, 8, _1942_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( c1942p_sound_io, AS_IO, 8, _1942_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+ADDRESS_MAP_END
+
+
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -597,10 +622,11 @@ static MACHINE_CONFIG_START( 1942p, _1942_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(c1942p_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, c1942_scanline, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", _1942_state,  irq0_line_hold) // note, powerups won't move down the screen with the original '1942' logic.
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)  /* 3 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PROGRAM_MAP(c1942p_sound_map)
+	MCFG_CPU_IO_MAP(c1942p_sound_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
 
 
@@ -891,8 +917,7 @@ ROM_START( 1942p )
 	ROM_LOAD( "3.bin",    0x14000, 0x4000, CRC(108fda63) SHA1(6ffdf57a04bcfae9fdb2343f30cff50926188cbf) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "snd.bin",   0x0000, 0x4000, BAD_DUMP CRC(43d6df9f) SHA1(c34579c73faa7e9552a6721ef8050b33ca158588) ) // sldh - looks bad, window was smashed, likely dead.
-	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) ) // works but we can't be 100% sure it was the same.
+	ROM_LOAD( "04.bin",   0x0000, 0x4000,  CRC(b4efd1af) SHA1(015b687b1714f892c3b2528bceb2df8ca48b6b8e) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "8.bin",    0x0000, 0x2000, CRC(6ebca191) SHA1(0dbddadde54a0ab66994c4a8726be05c6ca88a0e) ) /* characters */ // sldh
@@ -926,4 +951,4 @@ GAME( 1984, 1942abl,  1942, 1942, 1942, _1942_state, 1942, ROT270, "bootleg", "1
 GAME( 198?, 1942h,    1942, 1942, 1942, _1942_state, 1942, ROT270, "hack (Two Bit Score?)", "42", GAME_SUPPORTS_SAVE )
 GAME( 1984, 1942b,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (First Version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 1942w,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", GAME_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
-GAME( 1984, 1942p,    1942, 1942p,1942p,_1942_state, 1942, ROT270, "Capcom", "1942 (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1984, 1942p,    1942, 1942p,1942p,_1942_state, 1942, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", GAME_SUPPORTS_SAVE )

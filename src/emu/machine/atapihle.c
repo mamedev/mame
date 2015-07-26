@@ -244,6 +244,12 @@ void atapi_hle_device::process_command()
 		set_irq(ASSERT_LINE);
 		break;
 
+	case IDE_COMMAND_CHECK_POWER_MODE:
+		m_status = IDE_STATUS_DRDY;
+		m_sector_count = 0xff;		// Power mode: 0x00 = Standby, 0x80 = Idle mode, 0xff = Active mode or Idle mode
+		set_irq(ASSERT_LINE);
+		break;
+
 	default:
 		ata_hle_device::process_command();
 		break;

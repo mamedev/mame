@@ -234,7 +234,7 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 
 	while (image.fread( &line, sizeof(line)) == sizeof(line))
 	{
-		int addr, b0, b1, b2, b3, b4, b5, b6, b7, dummy;
+		unsigned int addr, b0, b1, b2, b3, b4, b5, b6, b7, dummy;
 
 		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
 			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)

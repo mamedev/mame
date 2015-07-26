@@ -58,7 +58,7 @@
 #include "../nl_base.h"
 
 #define TTL_7490(_name, _A, _B, _R1, _R2, _R91, _R92)                               \
-		NET_REGISTER_DEV(7490, _name)                                               \
+		NET_REGISTER_DEV(TTL_7490, _name)                                               \
 		NET_CONNECT(_name, A, _A)                                                   \
 		NET_CONNECT(_name, B, _B)                                                   \
 		NET_CONNECT(_name, R1,  _R1)                                                \
@@ -67,7 +67,7 @@
 		NET_CONNECT(_name, R92, _R92)
 
 #define TTL_7490_DIP(_name)                                                         \
-		NET_REGISTER_DEV(7490_dip, _name)
+		NET_REGISTER_DEV(TTL_7490_DIP, _name)
 
 NETLIB_NAMESPACE_DEVICES_START()
 

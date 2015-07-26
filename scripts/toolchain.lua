@@ -24,6 +24,7 @@ newoption {
 		{ "mingw-clang",   "MinGW (clang compiler)" },
 		{ "nacl",          "Native Client"          },
 		{ "nacl-arm",      "Native Client - ARM"    },
+		{ "netbsd",        "NetBSD"                },
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "pnacl",         "Native Client - PNaCl"  },
@@ -147,6 +148,10 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-freebsd")
 		end
 
+		if "netbsd" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-netbsd")
+		end
+
 		if "ios-arm" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
@@ -190,6 +195,8 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.cc  = "$(MINGW32)/bin/i686-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW32)/bin/i686-w64-mingw32-g++"
 			premake.gcc.ar  = "$(MINGW32)/bin/ar"
+-- lto docs say to use gcc-ar so that plugin is completely setup, but this doesn't work in windows with the current build tools' copy of gcc-ar.exe
+--			premake.gcc.ar  = "$(MINGW32)/bin/gcc-ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw32-gcc")
 		end
 
@@ -200,6 +207,8 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.cc  = "$(MINGW64)/bin/x86_64-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW64)/bin/x86_64-w64-mingw32-g++"
 			premake.gcc.ar  = "$(MINGW64)/bin/ar"
+-- lto docs say to use gcc-ar so that plugin is completely setup, but this doesn't work in windows with the current build tools' copy of gcc-ar.exe
+--			premake.gcc.ar  = "$(MINGW64)/bin/gcc-ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw64-gcc")
 		end
 
@@ -590,7 +599,29 @@ function toolchain(_buildDir, _subDir)
 	
 	configuration { "freebsd", "x64", "Debug" }
 		targetdir (_buildDir .. "freebsd" .. "/bin/x64/Debug")
-		
+
+	configuration { "netbsd", "x32" }
+		objdir (_buildDir .. "netbsd" .. "/obj")
+		buildoptions {
+			"-m32",
+		}
+	configuration { "netbsd", "x32", "Release" }
+		targetdir (_buildDir .. "netbsd" .. "/bin/x32/Release")
+
+	configuration { "netbsd", "x32", "Debug" }
+		targetdir (_buildDir .. "netbsd" .. "/bin/x32/Debug")
+
+	configuration { "netbsd", "x64" }
+		objdir (_buildDir .. "netbsd" .. "/obj")
+		buildoptions {
+			"-m64",
+		}
+	configuration { "netbsd", "x64", "Release" }
+		targetdir (_buildDir .. "netbsd" .. "/bin/x64/Release")
+
+	configuration { "netbsd", "x64", "Debug" }
+		targetdir (_buildDir .. "netbsd" .. "/bin/x64/Debug")
+
 	configuration { "android-*" }
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/include",

@@ -179,15 +179,6 @@
 			RelativePath="..\..\include\json\json.h">
 		</File>
 		<File
-			RelativePath="..\..\src\lib_json\json_batchallocator.h">
-		</File>
-		<File
-			RelativePath="..\..\src\lib_json\json_internalarray.inl">
-		</File>
-		<File
-			RelativePath="..\..\src\lib_json\json_internalmap.inl">
-		</File>
-		<File
 			RelativePath="..\..\src\lib_json\json_reader.cpp">
 		</File>
 		<File

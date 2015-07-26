@@ -49,7 +49,6 @@
  Undumped Semicom games on similar hardware:
    Red Wyvern - A semi-sequel or update?
  Same time era, but unknown hardware:
-   Gaia The last Choice of the Earth (c) 1998 (might be Baryon Future Assault type hardware)
    Choice III: Joker's Dream (c) 2001
 
 TODO:

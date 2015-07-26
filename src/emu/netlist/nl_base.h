@@ -306,6 +306,12 @@ namespace netlist
 	class param_model_t;
 
 	// -----------------------------------------------------------------------------
+	// model_map_t
+	// -----------------------------------------------------------------------------
+
+	typedef phashmap_t<pstring, pstring> model_map_t;
+
+	// -----------------------------------------------------------------------------
 	// netlist_output_family_t
 	// -----------------------------------------------------------------------------
 
@@ -324,8 +330,6 @@ namespace netlist
 		nl_double m_R_high;
 
 		bool m_is_static;
-
-		static logic_family_desc_t *from_model(const pstring &model);
 	};
 
 	class logic_family_t
@@ -351,7 +355,7 @@ namespace netlist
 
 
 	extern logic_family_desc_t *netlist_family_TTL;
-	extern logic_family_desc_t *netlist_family_CD4000;
+	extern logic_family_desc_t *netlist_family_CD4XXX;
 
 
 	// -----------------------------------------------------------------------------
@@ -388,6 +392,7 @@ namespace netlist
 			BJT_SWITCH, // BJT(Switch)
 			VCVS,       // Voltage controlled voltage source
 			VCCS,       // Voltage controlled current source
+			LVCCS,      // Voltage controlled current source (Current limited)
 			CCCS,       // Current controlled current source
 			VS,			// Voltage Source
 			CS,			// Current Source
@@ -945,6 +950,7 @@ namespace netlist
 			param_t::save_register();
 		}
 
+		virtual void changed() { }
 		C m_param;
 	private:
 	};
@@ -967,9 +973,16 @@ namespace netlist
 		ATTR_COLD param_model_t() : param_template_t<pstring, param_t::MODEL>() { }
 
 		/* these should be cached! */
-		ATTR_COLD nl_double model_value(const pstring &entity, const nl_double defval = 0.0) const;
-		ATTR_COLD const pstring model_value_str(const pstring &entity, const pstring defval = "") const;
-		ATTR_COLD const pstring model_type() const;
+		ATTR_COLD nl_double model_value(const pstring &entity);
+		ATTR_COLD const pstring model_value_str(const pstring &entity);
+		ATTR_COLD const pstring model_type();
+	protected:
+		void changed()
+		{
+			m_map.clear();
+		}
+	private:
+		model_map_t m_map;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1087,12 +1100,14 @@ namespace netlist
 
 		ATTR_COLD void register_sub(const pstring &name, device_t &dev);
 		ATTR_COLD void register_subalias(const pstring &name, core_terminal_t &term);
+		ATTR_COLD void register_subalias(const pstring &name, const pstring &aliased);
 		ATTR_COLD void register_terminal(const pstring &name, terminal_t &port);
 		ATTR_COLD void register_output(const pstring &name, analog_output_t &out);
 		ATTR_COLD void register_output(const pstring &name, logic_output_t &out);
 		ATTR_COLD void register_input(const pstring &name, analog_input_t &in);
 		ATTR_COLD void register_input(const pstring &name, logic_input_t &in);
 
+		ATTR_COLD void connect_late(const pstring &t1, const pstring &t2);
 		ATTR_COLD void connect_late(core_terminal_t &t1, core_terminal_t &t2);
 		ATTR_COLD void connect_direct(core_terminal_t &t1, core_terminal_t &t2);
 
@@ -1281,6 +1296,7 @@ namespace netlist
 		if (m_param != param)
 		{
 			m_param = param;
+			changed();
 			device().update_param();
 		}
 	}

@@ -105,15 +105,15 @@ class sh2_device : public cpu_device
 public:
 	// construction/destruction
 	sh2_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
-	sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type);
+	sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type,address_map_constructor internal_map, int addrlines);
 
 	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
 	static void set_dma_kludge_callback(device_t &device, sh2_dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }
 	static void set_dma_fifo_data_available_callback(device_t &device, sh2_dma_fifo_data_available_delegate callback) { downcast<sh2_device &>(device).m_dma_fifo_data_available_cb = callback; }
 	static void set_ftcsr_read_callback(device_t &device, sh2_ftcsr_read_delegate callback) { downcast<sh2_device &>(device).m_ftcsr_read_cb = callback; }
 
-	DECLARE_WRITE32_MEMBER( sh2_internal_w );
-	DECLARE_READ32_MEMBER( sh2_internal_r );
+	DECLARE_WRITE32_MEMBER( sh7604_w );
+	DECLARE_READ32_MEMBER( sh7604_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
 	void sh2_set_frt_input(int state);
@@ -149,6 +149,7 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	address_space *m_program, *m_decrypted_program;
 
 private:
 	address_space_config m_program_config, m_decrypted_program_config;
@@ -195,7 +196,6 @@ private:
 	UINT32 m_pcflushes[16];           // pcflush entries
 
 	INT8    m_irq_line_state[17];
-	address_space *m_program, *m_decrypted_program;
 protected:
 	direct_read_data *m_direct;
 private:
@@ -494,12 +494,49 @@ public:
 	void func_SUBV();
 };
 
+class sh2a_device : public sh2_device
+{
+public:
+	// construction/destruction
+	sh2a_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+
+	DECLARE_READ32_MEMBER(dma_sar0_r);
+	DECLARE_WRITE32_MEMBER(dma_sar0_w);
+	DECLARE_READ32_MEMBER(dma_dar0_r);
+	DECLARE_WRITE32_MEMBER(dma_dar0_w);
+	DECLARE_READ16_MEMBER(dmaor_r);
+	DECLARE_WRITE16_MEMBER(dmaor_w);
+	DECLARE_READ16_MEMBER(dma_tcr0_r);
+	DECLARE_WRITE16_MEMBER(dma_tcr0_w);
+	DECLARE_READ16_MEMBER(dma_chcr0_r);
+	DECLARE_WRITE16_MEMBER(dma_chcr0_w);
+	DECLARE_READ16_MEMBER(sh7021_r);
+	DECLARE_WRITE16_MEMBER(sh7021_w);
+	void sh7032_dma_exec(int ch);
+	
+private:
+	UINT16 m_sh7021_regs[0x200];
+	struct
+	{
+		UINT32              sar;	/**< Source Address Register */
+		UINT32              dar;	/**< Destination Address Register */
+		UINT16				tcr;	/**< Transfer Count Register */
+		UINT16				chcr;	/**< Channel Control Register */
+	} m_dma[4];
+	UINT16 m_dmaor;					/**< DMA Operation Register (status flags) */
+
+};
 
 class sh1_device : public sh2_device
 {
 public:
 	// construction/destruction
 	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+
+	DECLARE_READ16_MEMBER(sh7032_r);
+	DECLARE_WRITE16_MEMBER(sh7032_w);
+private:
+	UINT16 m_sh7032_regs[0x200];
 };
 
 
@@ -526,6 +563,7 @@ private:
 
 extern const device_type SH1;
 extern const device_type SH2;
+extern const device_type SH2A;
 
 
 #endif /* __SH2_H__ */

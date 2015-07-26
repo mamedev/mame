@@ -447,11 +447,11 @@ private:
 //  Textures
 //============================================================
 
-/* texture_info holds information about a texture */
-class texture_info
+/* ogl_texture_info holds information about a texture */
+class ogl_texture_info
 {
 public:
-	texture_info()
+	ogl_texture_info()
 	:   hash(0), flags(0), rawwidth(0), rawheight(0),
 		rawwidth_create(0), rawheight_create(0),
 		type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
@@ -567,19 +567,19 @@ private:
 	void loadGLExtensions();
 	void initialize_gl();
 	void set_blendmode(int blendmode);
-	void texture_compute_type_subroutine(const render_texinfo *texsource, texture_info *texture, UINT32 flags);
-	void texture_compute_size_subroutine(texture_info *texture, UINT32 flags,
+	void texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags);
+	void texture_compute_size_subroutine(ogl_texture_info *texture, UINT32 flags,
 				UINT32 width, UINT32 height,
 				int* p_width, int* p_height, int* p_width_create, int* p_height_create);
-	void texture_compute_size_type(const render_texinfo *texsource, texture_info *texture, UINT32 flags);
-	texture_info *texture_create(const render_texinfo *texsource, UINT32 flags);
-	int texture_shader_create(const render_texinfo *texsource, texture_info *texture, UINT32 flags);
-	texture_info *texture_find(const render_primitive *prim);
-	void texture_coord_update(texture_info *texture, const render_primitive *prim, int shaderIdx);
-	void texture_mpass_flip(texture_info *texture, int shaderIdx);
-	void texture_shader_update(texture_info *texture, render_container *container,  int shaderIdx);
-	texture_info * texture_update(const render_primitive *prim, int shaderIdx);
-	void texture_disable(texture_info * texture);
+	void texture_compute_size_type(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags);
+	ogl_texture_info *texture_create(const render_texinfo *texsource, UINT32 flags);
+	int texture_shader_create(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags);
+	ogl_texture_info *texture_find(const render_primitive *prim);
+	void texture_coord_update(ogl_texture_info *texture, const render_primitive *prim, int shaderIdx);
+	void texture_mpass_flip(ogl_texture_info *texture, int shaderIdx);
+	void texture_shader_update(ogl_texture_info *texture, render_container *container,  int shaderIdx);
+	ogl_texture_info * texture_update(const render_primitive *prim, int shaderIdx);
+	void texture_disable(ogl_texture_info * texture);
 	void texture_all_disable();
 
 	INT32           m_blittimer;
@@ -591,7 +591,7 @@ private:
 
 	int             m_initialized;        // is everything well initialized, i.e. all GL stuff etc.
 	// 3D info (GL mode only)
-	texture_info *  m_texhash[HASH_SIZE + OVERFLOW_SIZE];
+	ogl_texture_info *  m_texhash[HASH_SIZE + OVERFLOW_SIZE];
 	int             m_last_blendmode;     // previous blendmode
 	INT32           m_texture_max_width;      // texture maximum width
 	INT32           m_texture_max_height;     // texture maximum height
@@ -734,7 +734,7 @@ static int glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
 //  Textures
 //============================================================
 
-static void texture_set_data(texture_info *texture, const render_texinfo *texsource, UINT32 flags);
+static void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, UINT32 flags);
 
 //============================================================
 //  Static Variables
@@ -1106,7 +1106,7 @@ int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 void sdl_info_ogl::destroy_all_textures()
 {
-	texture_info *texture = NULL;
+	ogl_texture_info *texture = NULL;
 	int lock=FALSE;
 	int i;
 
@@ -1499,7 +1499,7 @@ void sdl_info_ogl::loadGLExtensions()
 int sdl_info_ogl::draw(const int update)
 {
 	render_primitive *prim;
-	texture_info *texture=NULL;
+	ogl_texture_info *texture=NULL;
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
 
@@ -1946,7 +1946,7 @@ static void drawogl_exit(void)
 // we also don't want to use PBO's in the case of nocopy==TRUE,
 // since we now might have GLSL shaders - this decision simplifies out life ;-)
 //
-void sdl_info_ogl::texture_compute_type_subroutine(const render_texinfo *texsource, texture_info *texture, UINT32 flags)
+void sdl_info_ogl::texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
 {
 	texture->type = TEXTURE_TYPE_NONE;
 	texture->nocopy = FALSE;
@@ -2000,7 +2000,7 @@ INLINE int get_valid_pow2_value(int v, int needPow2)
 	return (needPow2)?gl_round_to_pow2(v):v;
 }
 
-void sdl_info_ogl::texture_compute_size_subroutine(texture_info *texture, UINT32 flags,
+void sdl_info_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, UINT32 flags,
 											UINT32 width, UINT32 height,
 											int* p_width, int* p_height, int* p_width_create, int* p_height_create)
 {
@@ -2051,7 +2051,7 @@ void sdl_info_ogl::texture_compute_size_subroutine(texture_info *texture, UINT32
 		*p_height_create=height_create;
 }
 
-void sdl_info_ogl::texture_compute_size_type(const render_texinfo *texsource, texture_info *texture, UINT32 flags)
+void sdl_info_ogl::texture_compute_size_type(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
 {
 	int finalheight, finalwidth;
 	int finalheight_create, finalwidth_create;
@@ -2204,7 +2204,7 @@ static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_nam
 	return 0;
 }
 
-int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, texture_info *texture, UINT32 flags)
+int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, ogl_texture_info *texture, UINT32 flags)
 {
 	int uniform_location;
 	int i;
@@ -2377,12 +2377,12 @@ int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, texture
 	return 0;
 }
 
-texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, UINT32 flags)
+ogl_texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, UINT32 flags)
 {
-	texture_info *texture;
+	ogl_texture_info *texture;
 
 	// allocate a new texture
-	texture = global_alloc(texture_info);
+	texture = global_alloc(ogl_texture_info);
 
 	// fill in the core data
 	texture->hash = texture_compute_hash(texsource, flags);
@@ -2832,7 +2832,7 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 //  texture_set_data
 //============================================================
 
-static void texture_set_data(texture_info *texture, const render_texinfo *texsource, UINT32 flags)
+static void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, UINT32 flags)
 {
 	if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
@@ -2955,7 +2955,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 //  texture_find
 //============================================================
 
-static int compare_texture_primitive(const texture_info *texture, const render_primitive *prim)
+static int compare_texture_primitive(const ogl_texture_info *texture, const render_primitive *prim)
 {
 	if (texture->texinfo.base == prim->texture.base &&
 		texture->texinfo.width == prim->texture.width &&
@@ -2968,10 +2968,10 @@ static int compare_texture_primitive(const texture_info *texture, const render_p
 		return 0;
 }
 
-texture_info *sdl_info_ogl::texture_find(const render_primitive *prim)
+ogl_texture_info *sdl_info_ogl::texture_find(const render_primitive *prim)
 {
 	HashT texhash = texture_compute_hash(&prim->texture, prim->flags);
-	texture_info *texture;
+	ogl_texture_info *texture;
 
 	texture = m_texhash[texhash];
 	if (texture != NULL)
@@ -2993,7 +2993,7 @@ texture_info *sdl_info_ogl::texture_find(const render_primitive *prim)
 //  texture_update
 //============================================================
 
-void sdl_info_ogl::texture_coord_update(texture_info *texture, const render_primitive *prim, int shaderIdx)
+void sdl_info_ogl::texture_coord_update(ogl_texture_info *texture, const render_primitive *prim, int shaderIdx)
 {
 	float ustart = 0.0f, ustop = 0.0f;            // beginning/ending U coordinates
 	float vstart = 0.0f, vstop = 0.0f;            // beginning/ending V coordinates
@@ -3070,7 +3070,7 @@ void sdl_info_ogl::texture_coord_update(texture_info *texture, const render_prim
 	}
 }
 
-void sdl_info_ogl::texture_mpass_flip(texture_info *texture, int shaderIdx)
+void sdl_info_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 {
 	UINT32 mpass_src_idx = texture->mpass_dest_idx;
 
@@ -3141,7 +3141,7 @@ void sdl_info_ogl::texture_mpass_flip(texture_info *texture, int shaderIdx)
 	}
 }
 
-void sdl_info_ogl::texture_shader_update(texture_info *texture, render_container *container, int shaderIdx)
+void sdl_info_ogl::texture_shader_update(ogl_texture_info *texture, render_container *container, int shaderIdx)
 {
 	int uniform_location;
 	GLfloat vid_attributes[4];
@@ -3166,9 +3166,9 @@ void sdl_info_ogl::texture_shader_update(texture_info *texture, render_container
 	}
 }
 
-texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, int shaderIdx)
+ogl_texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, int shaderIdx)
 {
-	texture_info *texture = texture_find(prim);
+	ogl_texture_info *texture = texture_find(prim);
 	int texBound = 0;
 
 	// if we didn't find one, create a new texture
@@ -3239,7 +3239,7 @@ texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, int sh
 		return texture;
 }
 
-void sdl_info_ogl::texture_disable(texture_info * texture)
+void sdl_info_ogl::texture_disable(ogl_texture_info * texture)
 {
 	if ( texture->type == TEXTURE_TYPE_SHADER )
 	{

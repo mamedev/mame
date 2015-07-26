@@ -34,12 +34,14 @@
  *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
+ *MP3300   TMS1000   1980, Estrela Genius (from Brazil, looks and plays identical to Simon)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
  *M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
   MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.c
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
+ *MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
   MP3450A  TMS1100   1979, MicroVision cartridge: Blockbuster
   MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike
@@ -4596,7 +4598,7 @@ CONS( 1980, gjackpot,  0,        0, gjackpot,  gjackpot,  driver_device, 0, "Gak
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // ***
 
 CONS( 1979, starwbc,   0,        0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_SUPPORTS_SAVE )
-CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (prototype)", GAME_SUPPORTS_SAVE )
+CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (patent)", GAME_SUPPORTS_SAVE )
 
 COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kosmos", "Astro", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
@@ -4608,7 +4610,7 @@ CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Mil
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )
 CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", GAME_SUPPORTS_SAVE ) // ***
-CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", GAME_SUPPORTS_SAVE )
 CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Parker Brothers", "Split Second", GAME_SUPPORTS_SAVE )
 CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", GAME_SUPPORTS_SAVE )
