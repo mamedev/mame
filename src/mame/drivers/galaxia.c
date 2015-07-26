@@ -3,6 +3,8 @@
 /*
 
 Galaxia by Zaccaria (1979)
+Also released in several regions as "Super Galaxians".
+Set regions are unknown, so all are currently Galaxia.
 
 Taken from an untested board.
 
@@ -11,7 +13,7 @@ Taken from an untested board.
 
 This is not a direct pirate of Galaxian as you might think from the name.
 The game uses a Signetics 2650A CPU with three 40-pin 2636 chips, which are
-responsible for sound and some video functions.
+responsible for basic sound and some video functions.
 
 Other than that, the video hardware looks like it's similar to Galaxian
 (2 x 2114, 2 x 2101, 2 x EPROM) but there is no attack RAM and the graphics
@@ -48,16 +50,22 @@ Quick PCB sketch:
 Astro Wars (port of Astro Fighter) is on a stripped down board of Galaxia,
 using only one 2636 chip, less RAM, and no PROM.
 
+Manual and Schematic for Galaxia can be found at:
+http://www.zzzaccaria.com/manuals/SuperGalaxiansTechnicalManual.zip
+http://www.zzzaccaria.com/manuals/GalaxiaSchematics.zip
+
 ---
 
-HW has many similarities with quasar.c / cvs.c / zac2650.c
-
 TODO:
-- fix colors, there's no color prom?!
-- stars background should be multi color
-- improve sound, maybe part discrete
+- correct color/star generation using info from Galaxia technical manual and schematics
+- add sound board emulation
 - improve bullets
-- accurate astrowar sprite/bg sync
+- accurate sprite/bg sync in astrowar
+
+NOTE: Are there unemulated waitstates? On real hardware, the speed of both
+Astrowars and Galaxia are a bit slower, as seen in these videos:
+https://www.youtube.com/watch?v=xHBrZJxIfzI
+https://www.youtube.com/watch?v=eSrQFBMeDlM
 
 */
 
@@ -462,7 +470,6 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro.1d",  0x00000, 0x0400, CRC(6053f834) SHA1(e0b76800c241b3c8010c09869cecbc109b25310a) )
 	ROM_LOAD( "astro.3d",  0x00400, 0x0400, CRC(822505aa) SHA1(f9d3465e14bb850a286f8b4f42aa0a4044413b67) )
 ROM_END
-
 
 GAME( 1979, galaxia,  0,       galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
