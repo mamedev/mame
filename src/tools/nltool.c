@@ -104,6 +104,7 @@ public:
 		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
 		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
 		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
+		opt_inp( "i", "input",       "",      "input file to process (default is none)", this),
 		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
 		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
 		opt_help("h", "help",                 "display help", this)
@@ -115,6 +116,7 @@ public:
 	poption_str    opt_file;
 	poption_str_limit opt_type;
 	poption_str    opt_cmd;
+	poption_str    opt_inp;
 	poption_bool   opt_verb;
 	poption_bool   opt_quiet;
 	poption_bool   opt_help;
@@ -263,6 +265,66 @@ void usage(tool_options_t &opts)
 	fprintf(stderr, "%s\n", opts.help().cstr());
 }
 
+struct input_t
+{
+	netlist::netlist_time m_time;
+	netlist::param_t *m_param;
+	double m_value;
+
+	input_t()
+	{
+
+	}
+	input_t(netlist::netlist_t *netlist, const pstring &line)
+	{
+		char buf[400];
+		double t;
+		int e = sscanf(line.cstr(), "%lf,%[^,],%lf", &t, buf, &m_value);
+		if ( e!= 3)
+			throw netlist::fatalerror_e("error %d scanning line %s\n", e, line.cstr());
+		m_time = netlist::netlist_time::from_double(t);
+		m_param = netlist->setup().find_param(buf, true);
+	}
+
+	void setparam()
+	{
+		switch (m_param->param_type())
+		{
+			case netlist::param_t::MODEL:
+			case netlist::param_t::STRING:
+				throw netlist::fatalerror_e("param %s is not numeric\n", m_param->name().cstr());
+			case netlist::param_t::DOUBLE:
+				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
+				break;
+			case netlist::param_t::INTEGER:
+				static_cast<netlist::param_int_t*>(m_param)->setTo((int)m_value);
+				break;
+			case netlist::param_t::LOGIC:
+				static_cast<netlist::param_logic_t*>(m_param)->setTo((int) m_value);
+				break;
+		}
+	}
+};
+
+plist_t<input_t> *read_input(netlist::netlist_t *netlist, pstring fname)
+{
+	plist_t<input_t> *ret = palloc(plist_t<input_t>());
+	if (fname != "")
+	{
+		pstring_list_t lines(filetobuf(fname) , "\n");
+		for (unsigned i=0; i<lines.size(); i++)
+		{
+			pstring l = lines[i].trim();
+			if (l != "")
+			{
+				input_t inp(netlist, l);
+				ret->add(inp);
+			}
+		}
+	}
+	return ret;
+}
+
 static void run(tool_options_t &opts)
 {
 	netlist_tool_t nt;
@@ -271,14 +333,28 @@ static void run(tool_options_t &opts)
 	nt.m_opts = &opts;
 	nt.init();
 	nt.read_netlist(filetobuf(opts.opt_file()), opts.opt_name());
+
+	plist_t<input_t> *inps = read_input(&nt, opts.opt_inp());
+
 	double ttr = opts.opt_ttr();
 
 	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
 	printf("runnning ...\n");
 	t = osd_ticks();
 
-	nt.process_queue(netlist::netlist_time::from_double(ttr));
+	unsigned pos = 0;
+	netlist::netlist_time nlt = netlist::netlist_time::zero;
+
+	while (pos < inps->size() && (*inps)[pos].m_time < netlist::netlist_time::from_double(ttr))
+	{
+		nt.process_queue((*inps)[pos].m_time - nlt);
+		(*inps)[pos].setparam();
+		nlt = (*inps)[pos].m_time;
+		pos++;
+	}
+	nt.process_queue(netlist::netlist_time::from_double(ttr) - nlt);
 	nt.stop();
+	pfree(inps);
 
 	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
 	printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
