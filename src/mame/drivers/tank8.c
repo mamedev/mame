@@ -13,7 +13,7 @@ Atari Tank 8 driver
 
 
 
-void tank8_state::tank8_set_collision(int index)
+void tank8_state::set_collision(int index)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 
@@ -27,40 +27,40 @@ void tank8_state::machine_reset()
 }
 
 
-READ8_MEMBER(tank8_state::tank8_collision_r)
+READ8_MEMBER(tank8_state::collision_r)
 {
 	return m_collision_index;
 }
 
-WRITE8_MEMBER(tank8_state::tank8_lockout_w)
+WRITE8_MEMBER(tank8_state::lockout_w)
 {
 	coin_lockout_w(machine(), offset, ~data & 1);
 }
 
 
-WRITE8_MEMBER(tank8_state::tank8_int_reset_w)
+WRITE8_MEMBER(tank8_state::int_reset_w)
 {
 	m_collision_index &= ~0x3f;
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(tank8_state::tank8_crash_w)
+WRITE8_MEMBER(tank8_state::crash_w)
 {
 	m_discrete->write(space, TANK8_CRASH_EN, data);
 }
 
-WRITE8_MEMBER(tank8_state::tank8_explosion_w)
+WRITE8_MEMBER(tank8_state::explosion_w)
 {
 	m_discrete->write(space, TANK8_EXPLOSION_EN, data);
 }
 
-WRITE8_MEMBER(tank8_state::tank8_bugle_w)
+WRITE8_MEMBER(tank8_state::bugle_w)
 {
 	m_discrete->write(space, TANK8_BUGLE_EN, data);
 }
 
-WRITE8_MEMBER(tank8_state::tank8_bug_w)
+WRITE8_MEMBER(tank8_state::bug_w)
 {
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
@@ -84,12 +84,12 @@ WRITE8_MEMBER(tank8_state::tank8_bug_w)
 
 }
 
-WRITE8_MEMBER(tank8_state::tank8_attract_w)
+WRITE8_MEMBER(tank8_state::attract_w)
 {
 	m_discrete->write(space, TANK8_ATTRACT_EN, data);
 }
 
-WRITE8_MEMBER(tank8_state::tank8_motor_w)
+WRITE8_MEMBER(tank8_state::motor_w)
 {
 	m_discrete->write(space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
 	AM_RANGE(0x0400, 0x17ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 
-	AM_RANGE(0x1c00, 0x1c00) AM_READ(tank8_collision_r)
+	AM_RANGE(0x1c00, 0x1c00) AM_READ(collision_r)
 
 	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P1")
 	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("P2")
@@ -114,20 +114,20 @@ static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
 	AM_RANGE(0x1c0b, 0x1c0b) AM_READ_PORT("RC")
 	AM_RANGE(0x1c0f, 0x1c0f) AM_READ_PORT("VBLANK")
 
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(tank8_video_ram_w) AM_SHARE("video_ram")
+	AM_RANGE(0x1800, 0x1bff) AM_WRITE(video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_SHARE("pos_h_ram")
 	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_SHARE("pos_v_ram")
 	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_SHARE("pos_d_ram")
 
-	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(tank8_lockout_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(tank8_int_reset_w)
-	AM_RANGE(0x1d01, 0x1d01) AM_WRITE(tank8_crash_w)
-	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(tank8_explosion_w)
-	AM_RANGE(0x1d03, 0x1d03) AM_WRITE(tank8_bugle_w)
-	AM_RANGE(0x1d04, 0x1d04) AM_WRITE(tank8_bug_w)
+	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(lockout_w)
+	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(int_reset_w)
+	AM_RANGE(0x1d01, 0x1d01) AM_WRITE(crash_w)
+	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(explosion_w)
+	AM_RANGE(0x1d03, 0x1d03) AM_WRITE(bugle_w)
+	AM_RANGE(0x1d04, 0x1d04) AM_WRITE(bug_w)
 	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_SHARE("team")
-	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(tank8_attract_w)
-	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(tank8_motor_w)
+	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(attract_w)
+	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(motor_w)
 
 ADDRESS_MAP_END
 
@@ -339,8 +339,8 @@ static MACHINE_CONFIG_START( tank8, tank8_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(30 * 1000000 / 15681))
 	MCFG_SCREEN_SIZE(512, 524)
 	MCFG_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
-	MCFG_SCREEN_UPDATE_DRIVER(tank8_state, screen_update_tank8)
-	MCFG_SCREEN_VBLANK_DRIVER(tank8_state, screen_eof_tank8)
+	MCFG_SCREEN_UPDATE_DRIVER(tank8_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(tank8_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tank8)
@@ -480,8 +480,8 @@ DRIVER_INIT_MEMBER(tank8_state,decode)
 }
 
 
-GAME( 1976, tank8,    0,        tank8,    tank8, driver_device,    0,         ROT0, "Atari (Kee Games)", "Tank 8 (set 1)", 0)
-GAME( 1976, tank8a,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  GAME_NOT_WORKING )
-GAME( 1976, tank8b,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  GAME_NOT_WORKING )
-GAME( 1976, tank8c,   tank8,    tank8,    tank8, driver_device,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  GAME_NOT_WORKING )
-GAME( 1976, tank8d,   tank8,    tank8,    tank8, driver_device,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  GAME_NOT_WORKING )
+GAME( 1976, tank8,    0,        tank8,    tank8, driver_device,    0,         ROT0, "Atari (Kee Games)", "Tank 8 (set 1)", GAME_SUPPORTS_SAVE)
+GAME( 1976, tank8a,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1976, tank8b,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1976, tank8c,   tank8,    tank8,    tank8, driver_device,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1976, tank8d,   tank8,    tank8,    tank8, driver_device,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
