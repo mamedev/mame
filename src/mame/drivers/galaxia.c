@@ -63,8 +63,6 @@ Galaxia schematics
 - add sound board emulation
 - improve bullets
 - accurate sprite/bg sync in astrowar
-* https://www.youtube.com/watch?v=1XTY76LAtxI unknown astrowar set! undumped,
-different colors, speed and sound board (likely bootleg?)
 
 NOTE: Are there unemulated waitstates? On real hardware, the speed of both
 Astrowars and Galaxia are a bit slower, as seen in these videos:
