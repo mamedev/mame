@@ -14,6 +14,9 @@
   - Phase 3 - seems awfully hard - dip settings ?
   - Hook up Coin Counter
   - Test/Service Mode - not working?
+  * undumped quasar set! https://www.youtube.com/watch?v=4Sym5DBj5iI
+  sound is different and some text is missing (notably EXTENDED PLAY and FREE PLAY text)
+  published by US Billiards(?)
 
 ************************************************************************
 
