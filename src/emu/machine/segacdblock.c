@@ -1857,7 +1857,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			
 		//printf("FREE %d\n",freeblocks);
 
-		FREE_HIRQ(CMOK,KEYCODE_Q);
+		FREE_HIRQ(SCDQ,KEYCODE_Q);
 		FREE_HIRQ(DRDY,KEYCODE_W);
 		FREE_HIRQ(CSCT,KEYCODE_E);
 		FREE_HIRQ(BFUL,KEYCODE_R);
@@ -1907,6 +1907,7 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			}
 
 			set_flag(CSCT);
+			set_flag(SCDQ);
 
 			if(p_ok)
 			{
