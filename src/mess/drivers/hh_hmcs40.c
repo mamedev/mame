@@ -20,6 +20,8 @@
  @25      HD38800A  1981, Coleco Alien Attack
  @27      HD38800A  1981, Bandai Packri Monster
  *31      HD38800A  1981, Entex Select-a-Game cartridge: Space Invader 2 (have dump)
+ *37      HD38800A  1981, Entex Select-a-Game cartridge: Baseball 4 (have dump)
+ *38      HD38800A  1981, Entex Select-a-Game cartridge: Pinball (have dump)
  *41      HD38800A  1982, Gakken Puck Monster
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader (larger white version)
  @70      HD38800A  1982, Coleco Galaxian
