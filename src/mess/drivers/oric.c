@@ -49,6 +49,7 @@ public:
 	oric_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_palette(*this, "palette"),
 			m_psg(*this, "ay8912"),
 			m_centronics(*this, "centronics"),
 			m_cent_data_out(*this, "cent_data_out"),
@@ -81,6 +82,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<ay8910_device> m_psg;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
@@ -200,17 +202,6 @@ ADDRESS_MAP_END
 
 UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	static const UINT32 colors[8] = {
-		0x000000,
-		0xff0000,
-		0x00ff00,
-		0xffff00,
-		0x0000ff,
-		0xff00ff,
-		0x00ffff,
-		0xffffff
-	};
-
 	bool blink_state = m_blink_counter & 0x20;
 	m_blink_counter = (m_blink_counter + 1) & 0x3f;
 
@@ -219,8 +210,8 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitma
 	for(int y=0; y<224; y++) {
 		// Line attributes and current colors
 		UINT8 lattr = 0;
-		UINT32 fgcol = colors[7];
-		UINT32 bgcol = colors[0];
+		UINT32 fgcol = m_palette->pen_color(7);
+		UINT32 bgcol = m_palette->pen_color(0);
 
 		UINT32 *p = &bitmap.pix32(y);
 
@@ -251,9 +242,9 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitma
 			if(!(ch & 0x60)) {
 				pat = 0x00;
 				switch(ch & 0x18) {
-				case 0x00: fgcol = colors[ch & 7]; break;
+				case 0x00: fgcol = m_palette->pen_color(ch & 7); break;
 				case 0x08: lattr = ch & 7; break;
-				case 0x10: bgcol = colors[ch & 7]; break;
+				case 0x10: bgcol = m_palette->pen_color(ch & 7); break;
 				case 0x18: pattr = ch & 7; break;
 				}
 			}
@@ -783,6 +774,8 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
 	MCFG_SCREEN_VBLANK_DRIVER(oric_state, vblank_w)
+
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

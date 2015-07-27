@@ -5730,8 +5730,8 @@ mj2c            // 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev C)
 				// 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev D)
 ghostsqu        // 2004.12.09 Ghost Squad (Rev A)
 				// 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev E)
-mj2f            // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
-mj2             // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
+mj2             // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
+mj2g            // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
 				// 2005.03 Sangokushi Taisen
 gundamos        // 2005.03 Gundam Battle Operating Simulator
 				// 2005.04 Quest of D Ver.1.20
@@ -7133,6 +7133,7 @@ roadblst1       // 136048           (c) 1986, 1987
 roadblstc       // 136048           (c) 1986, 1987
 roadblstcg      // 136048           (c) 1986, 1987
 roadblstc1      // 136048           (c) 1986, 1987
+roadblstgu		// 136048			(c) 1986, 1987
 
 // Atari System 2 games
 // Paperboy
@@ -8477,7 +8478,8 @@ panicr          // Seibu / Taito
 panicrg         // Seibu / TV-Tuning (Germany)
 deadang         // (c) 1988 Seibu Kaihatsu
 leadang         // (c) 1988 Seibu Kaihatsu
-ghunter         // (c) 1988 Seibu Kaihatsu + Segasa/Sonic license
+ghunter         // (c) 1988 Seibu Kaihatsu
+ghunters        // (c) 1988 Seibu Kaihatsu + Segasa/Sonic license
 dynduke         // (c) 1989 Seibu Kaihatsu
 dyndukea        // (c) 1989 Seibu Kaihatsu
 dyndukej        // (c) 1989 Seibu Kaihatsu

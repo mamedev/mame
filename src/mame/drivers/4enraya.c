@@ -442,8 +442,7 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 4enraya)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(_4enraya_state, _4enraya)
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
