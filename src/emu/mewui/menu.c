@@ -1086,7 +1086,6 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 	}
 
 	x2 += left_width;
-
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
@@ -1096,7 +1095,6 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 	y2 -= UI_BOX_TB_BORDER;
 
 	*hover = -1;
-
 	for (int filter = 0; filter < text_lenght; filter++)
 	{
 		std::string str(text[filter]);
@@ -1163,7 +1161,6 @@ float ui_menu::draw_left_box(float x1, float y1, float x2, float y2, bool softwa
 
 		machine().ui().draw_text_full(container, str.c_str(), x1t, y1, x2 - x1, JUSTIFY_LEFT, WRAP_NEVER,
 		                              DRAW_NORMAL, UI_TEXT_COLOR, bgcolor, NULL, NULL, text_size);
-
 		y1 += line_height;
 	}
 
@@ -1519,7 +1516,6 @@ void ui_menu::infos_render(void *selectedref, float origx1, float origy1, float 
 			}
 			else
 			{
-				buffer.clear();
 				old_sw_view = mewui_globals::cur_sw_dats_view;
 				oldsoft = soft;
 				buffer.assign(soft->usage);
