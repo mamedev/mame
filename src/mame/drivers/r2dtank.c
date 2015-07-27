@@ -43,8 +43,6 @@ RAM = 4116 (x11)
 #include "machine/nvram.h"
 
 
-#define NUM_PENS    (8)
-
 #define LOG_AUDIO_COMM  (0)
 
 #define MAIN_CPU_MASTER_CLOCK   (11200000)
@@ -59,6 +57,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
@@ -66,7 +65,7 @@ public:
 	UINT8 m_flipscreen;
 	UINT32 m_ttl74123_output;
 	UINT8 m_AY8910_selected;
-	pen_t m_pens[NUM_PENS];
+
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_answer_r);
@@ -81,9 +80,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pia_comp_w);
 	virtual void machine_start();
 	DECLARE_WRITE8_MEMBER(ttl74123_output_changed);
-	MC6845_BEGIN_UPDATE(crtc_begin_update);
+
 	MC6845_UPDATE_ROW(crtc_update_row);
+
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
 };
 
@@ -257,16 +258,6 @@ WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
 }
 
 
-MC6845_BEGIN_UPDATE( r2dtank_state::crtc_begin_update )
-{
-	/* create the pens */
-	for (offs_t i = 0; i < NUM_PENS; i++)
-	{
-		m_pens[i] = rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-	}
-}
-
-
 MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 {
 	UINT8 x = 0;
@@ -302,7 +293,7 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 			}
 
 			color = bit ? fore_color : 0;
-			bitmap.pix32(y, x) = m_pens[color];
+			bitmap.pix32(y, x) = m_palette->pen_color(color);
 
 			x = x + 1;
 		}
@@ -457,10 +448,11 @@ static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(r2dtank_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(r2dtank_state, crtc_update_row)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(r2dtank_state, display_enable_changed))
 
