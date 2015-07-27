@@ -247,7 +247,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(smsmfg);
 	DECLARE_MACHINE_START(sureshot);
 	UINT32 screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -472,16 +471,6 @@ UINT32 smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(smsmfg_state, smsmfg)
-{
-	int i;
-
-	for (i = 0; i < 8; i++ )
-	{
-		palette.set_pen_color(i, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
-	}
-}
-
 /*************************************
  *
  *  Memory maps
@@ -572,8 +561,7 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 	MCFG_SCREEN_UPDATE_DRIVER(smsmfg_state, screen_update_sms)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(smsmfg_state, smsmfg)
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
