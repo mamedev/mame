@@ -21,27 +21,32 @@ public:
 	photon2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_spectrum_video_ram(*this, "spectrum_vram"),
-		m_speaker(*this, "speaker"){ }
+		m_speaker(*this, "speaker"),
+		m_spectrum_video_ram(*this, "spectrum_vram") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+
 	required_shared_ptr<UINT8> m_spectrum_video_ram;
+
 	int m_spectrum_frame_number;
 	int m_spectrum_flash_invert;
 	UINT8 m_spectrum_port_fe;
 	UINT8 m_nmi_enable;
 
-	DECLARE_WRITE8_MEMBER(photon2_membank_w);
-	DECLARE_READ8_MEMBER(photon2_fe_r);
-	DECLARE_WRITE8_MEMBER(photon2_fe_w);
-	DECLARE_WRITE8_MEMBER(photon2_misc_w);
-	virtual void machine_reset();
+	DECLARE_WRITE8_MEMBER(membank_w);
+	DECLARE_READ8_MEMBER(fe_r);
+	DECLARE_WRITE8_MEMBER(fe_w);
+	DECLARE_WRITE8_MEMBER(misc_w);
+
+	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(photon2);
+
 	UINT32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
-	required_device<speaker_sound_device> m_speaker;
 };
 
 
@@ -100,6 +105,10 @@ void photon2_state::video_start()
 {
 	m_spectrum_frame_number = 0;
 	m_spectrum_flash_invert = 0;
+	
+	save_item(NAME(m_spectrum_frame_number));
+	save_item(NAME(m_spectrum_flash_invert));
+	save_item(NAME(m_spectrum_port_fe));
 }
 
 #if 0
@@ -187,7 +196,7 @@ UINT32 photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind16
  *
  *************************************/
 
-WRITE8_MEMBER(photon2_state::photon2_membank_w)
+WRITE8_MEMBER(photon2_state::membank_w)
 {
 	int bank = 0;
 	if (data == 0)
@@ -207,21 +216,21 @@ WRITE8_MEMBER(photon2_state::photon2_membank_w)
 		logerror( "Unknown banking write: %02X\n", data);
 	}
 
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000*bank );
+	membank("mainbank")->set_entry(bank);
 }
 
-READ8_MEMBER(photon2_state::photon2_fe_r)
+READ8_MEMBER(photon2_state::fe_r)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(photon2_state::photon2_fe_w)
+WRITE8_MEMBER(photon2_state::fe_w)
 {
 	m_spectrum_port_fe = data;
 	m_speaker->level_w(BIT(data,4));
 }
 
-WRITE8_MEMBER(photon2_state::photon2_misc_w)
+WRITE8_MEMBER(photon2_state::misc_w)
 {
 	m_nmi_enable = !BIT(data,5);
 }
@@ -233,7 +242,7 @@ WRITE8_MEMBER(photon2_state::photon2_misc_w)
  *************************************/
 
 static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8, photon2_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("mainbank")
 	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_SHARE("spectrum_vram")
 	AM_RANGE(0x5b00, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -241,11 +250,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START (spectrum_io, AS_IO, 8, photon2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("JOY")
-	AM_RANGE(0x5b, 0x5b) AM_READ_PORT("COIN") AM_WRITE(photon2_misc_w)
-	AM_RANGE(0x7a, 0x7a) AM_WRITE(photon2_membank_w)
+	AM_RANGE(0x5b, 0x5b) AM_READ_PORT("COIN") AM_WRITE(misc_w)
+	AM_RANGE(0x7a, 0x7a) AM_WRITE(membank_w)
 	AM_RANGE(0x7b, 0x7b) AM_WRITENOP // unknown write
-	AM_RANGE(0x7e, 0x7e) AM_WRITE(photon2_membank_w)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(photon2_fe_r, photon2_fe_w)
+	AM_RANGE(0x7e, 0x7e) AM_WRITE(membank_w)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE(fe_r, fe_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -316,9 +325,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(photon2_state::spec_interrupt_hack)
 	}
 }
 
-void photon2_state::machine_reset()
+void photon2_state::machine_start()
 {
-	membank("bank1")->set_base(memregion("maincpu")->base());
+	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base(), 0x4000);
+	membank("mainbank")->set_entry(0);
+	
+	save_item(NAME(m_nmi_enable));
 }
 
 static MACHINE_CONFIG_START( photon2, photon2_state )
@@ -383,6 +395,6 @@ ROM_START( brod )
 	ROM_LOAD( "brod13.bin", 0xa000, 0x2000, CRC(1177cd17) SHA1(58c5c09a7b857ce6311339c4d0f4d8c1a7e232a3) )
 ROM_END
 
-GAME( 19??,  kok,   0,      photon2, photon2, driver_device, 0, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", 0 ) // originals (c)1983 ACG / Ultimate
-GAME( 19??,  black, 0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')", 0 ) // original (c)1988 Toposoft
-GAME( 19??,  brod,  0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')", 0 ) // original (c)1987 BEAM software
+GAME( 19??,  kok,   0,      photon2, photon2, driver_device, 0, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", GAME_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
+GAME( 19??,  black, 0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')", GAME_SUPPORTS_SAVE ) // original (c)1988 Toposoft
+GAME( 19??,  brod,  0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')", GAME_SUPPORTS_SAVE ) // original (c)1987 BEAM software

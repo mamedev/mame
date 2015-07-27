@@ -323,16 +323,6 @@ WRITE_LINE_MEMBER(spiders_state::flipscreen_w)
 }
 
 
-MC6845_BEGIN_UPDATE( spiders_state::crtc_begin_update )
-{
-	/* create the pens */
-	for (offs_t i = 0; i < NUM_PENS; i++)
-	{
-		m_pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-	}
-}
-
-
 MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 {
 	UINT8 x = 0;
@@ -378,7 +368,7 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 				data3 = data3 >> 1;
 			}
 
-			bitmap.pix32(y, x) = m_pens[color];
+			bitmap.pix32(y, x) = m_palette->pen_color(color);
 
 			x = x + 1;
 		}
@@ -578,10 +568,11 @@ static MACHINE_CONFIG_START( spiders, spiders_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(spiders_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(spiders_state, crtc_update_row)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(spiders_state, display_enable_changed))
 

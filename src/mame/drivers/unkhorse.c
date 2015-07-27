@@ -48,7 +48,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(timer_out);
 
 	virtual void machine_start();
-	DECLARE_PALETTE_INIT(horse);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -66,13 +65,6 @@ void horse_state::machine_start()
   Video
 
 ***************************************************************************/
-
-PALETTE_INIT_MEMBER(horse_state, horse)
-{
-	// palette is simply 3bpp
-	for (int i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-}
 
 UINT32 horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -223,8 +215,7 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(horse_state, horse)
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

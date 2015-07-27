@@ -240,6 +240,8 @@ if (BUSES["C64"]~=null) then
 		MAME_DIR .. "src/emu/bus/c64/exp.h",
 		MAME_DIR .. "src/emu/bus/c64/c128_comal80.c",
 		MAME_DIR .. "src/emu/bus/c64/c128_comal80.h",
+		MAME_DIR .. "src/emu/bus/c64/c128_partner.c",
+		MAME_DIR .. "src/emu/bus/c64/c128_partner.h",
 		MAME_DIR .. "src/emu/bus/c64/comal80.c",
 		MAME_DIR .. "src/emu/bus/c64/comal80.h",
 		MAME_DIR .. "src/emu/bus/c64/cpm.c",
@@ -435,6 +437,8 @@ if (BUSES["CBMIEC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cbmiec/vic1515.h",
 		MAME_DIR .. "src/emu/bus/cbmiec/vic1520.c",
 		MAME_DIR .. "src/emu/bus/cbmiec/vic1520.h",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1526.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1526.h",
 	}
 end
 

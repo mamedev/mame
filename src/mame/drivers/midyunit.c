@@ -1219,7 +1219,7 @@ static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(yawdim_sound_map)
 
 	/* video hardware */
@@ -1228,7 +1228,7 @@ static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,mkyawdim)
 
 	/* sound hardware */
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2561,17 +2561,20 @@ ROM_END
 
 ROM_START( mkyawdim2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound CPU */
-		// Differs from other yawdim set - sound doesn't want to work
-	ROM_LOAD ( "yawdim.u167", 0x00000, 0x10000, CRC(16da7efb) SHA1(ac1db81a55aca36136b94977a91a1fc778b7b164) )
+	// Differs from other mkyawdim set
+	ROM_LOAD ( "yawdim.u167", 0x00000, 0x08000, CRC(16da7efb) SHA1(ac1db81a55aca36136b94977a91a1fc778b7b164) )
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM */
-		// Half size as mkyawdim set
-	ROM_LOAD( "yawdim.u159",  0x00000, 0x20000, CRC(95b120af) SHA1(41b6fb384e5048926b87959a2c58d96b95698aba) )
-	ROM_CONTINUE(       0x40000, 0x20000 )
+	// Half size as mkyawdim set
+	ROM_LOAD( "yawdim.u159", 0x00000, 0x20000, CRC(95b120af) SHA1(41b6fb384e5048926b87959a2c58d96b95698aba) )
+	ROM_CONTINUE(            0x40000, 0x20000 )
+	ROM_RELOAD(              0x80000, 0x20000 )
+	ROM_CONTINUE(            0xc0000, 0x20000 )
 	ROM_LOAD( "mw-15.u160",  0x20000, 0x20000, CRC(6e68e0b0) SHA1(edb7aa6507452ffa5ce7097e3b1855a69542971c) )
-	ROM_CONTINUE(       0x60000, 0x20000 )
-	ROM_CONTINUE(       0xa0000, 0x20000 )
-	ROM_CONTINUE(       0xe0000, 0x20000 )
+	ROM_CONTINUE(            0x60000, 0x20000 )
+	ROM_CONTINUE(            0xa0000, 0x20000 )
+	ROM_CONTINUE(            0xe0000, 0x20000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "4.u25",  0x00000, 0x80000, CRC(b12b3bf2) SHA1(deb7755e8407d9de25124b3fdbc4c834a25d8252) )
@@ -2595,10 +2598,13 @@ ROM_START( mkyawdim3 )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM */
 	ROM_LOAD( "13.bin",  0x00000, 0x20000, CRC(921c613d) SHA1(be62b87f195b6347112ab13cc14514d4c88a8b86) ) // Half size as mkyawdim2 set and a quarter of mkyawdim
+	ROM_RELOAD(          0x40000, 0x20000 )
+	ROM_RELOAD(          0x80000, 0x20000 )
+	ROM_RELOAD(          0xc0000, 0x20000 )
 	ROM_LOAD( "14.bin",  0x20000, 0x20000, CRC(6e68e0b0) SHA1(edb7aa6507452ffa5ce7097e3b1855a69542971c) )
-	ROM_CONTINUE(       0x60000, 0x20000 )
-	ROM_CONTINUE(       0xa0000, 0x20000 )
-	ROM_CONTINUE(       0xe0000, 0x20000 )
+	ROM_CONTINUE(        0x60000, 0x20000 )
+	ROM_CONTINUE(        0xa0000, 0x20000 )
+	ROM_CONTINUE(        0xe0000, 0x20000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "p1.bin",  0x00000, 0x80000, CRC(2337a0f9) SHA1(d25743e5bb7b4a60f181783d17f217aa0a64536a) ) // differs from other Yawdim sets
@@ -2606,20 +2612,101 @@ ROM_START( mkyawdim3 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD ( "12.bin",  0x000000, 0x80000, CRC(d17096c4) SHA1(01ef390a372c9d94adf138f9543ebb88b89f4c38) )
-	ROM_LOAD ( "8.bin",  0x080000, 0x80000, CRC(993bc2e4) SHA1(7791edbec2b4b8971a3e790346dd7564ecf16d5c) )
+	ROM_LOAD ( "8.bin",   0x080000, 0x80000, CRC(993bc2e4) SHA1(7791edbec2b4b8971a3e790346dd7564ecf16d5c) )
 	ROM_LOAD ( "10.bin",  0x100000, 0x80000, CRC(6fb91ede) SHA1(a3735b49f93b08c44fbc97e2b5aad394628fbe90) )
-	ROM_LOAD ( "3.bin",  0x180000, 0x80000, CRC(ed1ff88a) SHA1(6b090b658ee6148af953bd0c9216f37162b6460f) )
+	ROM_LOAD ( "3.bin",   0x180000, 0x80000, CRC(ed1ff88a) SHA1(6b090b658ee6148af953bd0c9216f37162b6460f) )
 
 	ROM_LOAD (  "6.bin",  0x200000, 0x80000, CRC(a002a155) SHA1(3cf7909e92bcd428063596fc5b9953e0000d6eca) )
 	ROM_LOAD (  "1.bin",  0x280000, 0x80000, CRC(dcee8492) SHA1(a912b74d3b26ebd1b1613cc631080f83ececeaf8) )
-	ROM_LOAD (  "11.bin",  0x300000, 0x80000, CRC(de88caef) SHA1(a7927b504dc56ca5c9048373977fe5743b0a3f0b) )
+	ROM_LOAD (  "11.bin", 0x300000, 0x80000, CRC(de88caef) SHA1(a7927b504dc56ca5c9048373977fe5743b0a3f0b) )
 	ROM_LOAD (  "2.bin",  0x380000, 0x80000, CRC(37eb01b4) SHA1(06092460bd137e08d0f8df8560942ed877d40e09) )
 
-	ROM_LOAD ( "4.bin",  0x400000, 0x80000, CRC(45acaf21) SHA1(5edd36c55f4e5d3c74fb85171728ec0a58284b12) )
-	ROM_LOAD ( "7.bin",  0x480000, 0x80000, CRC(2a6c10a0) SHA1(cc90923c44f2961b945a0fd0f85ecc2ba04af2cb) )
-	ROM_LOAD ( "9.bin",  0x500000, 0x80000, CRC(23308979) SHA1(0b36788624a1cf0d3f4c895be5ba967b8dfcf85e) )
-	ROM_LOAD ( "5.bin",  0x580000, 0x80000, CRC(cafc47bb) SHA1(8610af6e52f7089ff4acd850c53ab8b4119e4445) )
+	ROM_LOAD ( "4.bin",   0x400000, 0x80000, CRC(45acaf21) SHA1(5edd36c55f4e5d3c74fb85171728ec0a58284b12) )
+	ROM_LOAD ( "7.bin",   0x480000, 0x80000, CRC(2a6c10a0) SHA1(cc90923c44f2961b945a0fd0f85ecc2ba04af2cb) )
+	ROM_LOAD ( "9.bin",   0x500000, 0x80000, CRC(23308979) SHA1(0b36788624a1cf0d3f4c895be5ba967b8dfcf85e) )
+	ROM_LOAD ( "5.bin",   0x580000, 0x80000, CRC(cafc47bb) SHA1(8610af6e52f7089ff4acd850c53ab8b4119e4445) )
 ROM_END
+
+
+/*************************************************************************
+
+Mortal Kombat bootleg
+
+PCB Layout
+----------
+
+Kombat rev. 2 1c
+|-----------------------------------------------------|
+|TDA2003 LM358 15  TMS34010                         19|
+|              16          48MHz                    20|
+| 14           8MHz                                   |
+| 6116                                              21|
+| Z80         M6295                                 22|
+|J                                                    |
+|A                           41464      4464 4464   23|
+|M                  6264     41464      4464 4464   24|
+|M                  17       41464      4464 4464     |
+|A                  18       41464      4464 4464   25|
+| DSW2(4)                               4464 4464   26|
+|             6264                      4464 4464     |
+|     DSW1(8)                                       27|
+|             6264               TPC1020            28|
+|                                                   29|
+|                                                   30|
+|-----------------------------------------------------|
+Notes:
+      Z80 @ 4MHz [8/2]
+      TMS34010 @ 48MHz
+      M6295 @ 1MHz[8/8]. Pin 7 HIGH
+      41464/4464 - 64kx4-bit DRAM
+      6264 - 8kx8-bit SRAM
+      6116 - 2kx8-bit SRAM
+      EPROMS: 14 is 27C512, 15 is 27C010, all others are 27C040
+              14 - Z80 program
+              15-16 - Oki samples
+              17-18 - Main program
+              19-30 - Graphics
+
+*************************************************************************/
+
+// same as mkyawdim3, but with its own main program roms
+ROM_START( mkyawdim4 )                                                                                             
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound CPU */
+	ROM_LOAD( "14.bin", 0x00000, 0x10000, CRC(b58d229e) SHA1(3ed14ef650dfa7f9d460611b19e9233a022cbea6) ) 
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM */
+	ROM_LOAD( "15.bin", 0x00000, 0x20000, CRC(921c613d) SHA1(be62b87f195b6347112ab13cc14514d4c88a8b86) ) 
+	ROM_RELOAD(         0x40000, 0x20000 )
+	ROM_RELOAD(         0x80000, 0x20000 )
+	ROM_RELOAD(         0xc0000, 0x20000 )
+	ROM_LOAD( "16.bin", 0x20000, 0x20000, CRC(6e68e0b0) SHA1(edb7aa6507452ffa5ce7097e3b1855a69542971c) ) 
+	ROM_CONTINUE(       0x60000, 0x20000 )
+	ROM_CONTINUE(       0xa0000, 0x20000 )
+	ROM_CONTINUE(       0xe0000, 0x20000 )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
+	ROM_LOAD16_BYTE( "17.bin", 0x00000, 0x80000, CRC(671b533d) SHA1(20859ceb0635126047216f85a6e35072e14766ad) )
+	ROM_LOAD16_BYTE( "18.bin", 0x00001, 0x80000, CRC(4e857747) SHA1(b94c7d5e4356ac6890e6bfaf75c76d94408e5bc5) )
+//	ROM_LOAD16_BYTE( "17.bin", 0x00000, 0x80000, CRC(b12b3bf2) SHA1(deb7755e8407d9de25124b3fdbc4c834a25d8252) ) // other PCB: mkyawdim3 with mkyawdim main program
+//	ROM_LOAD16_BYTE( "18.bin", 0x00001, 0x80000, CRC(7a37dc5c) SHA1(c4fc6933d8b990c5c56c65282b1f72b90b5d5435) ) 
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD( "22.bin", 0x000000, 0x80000, CRC(d17096c4) SHA1(01ef390a372c9d94adf138f9543ebb88b89f4c38) ) 
+	ROM_LOAD( "21.bin", 0x080000, 0x80000, CRC(993bc2e4) SHA1(7791edbec2b4b8971a3e790346dd7564ecf16d5c) ) 
+	ROM_LOAD( "20.bin", 0x100000, 0x80000, CRC(6fb91ede) SHA1(a3735b49f93b08c44fbc97e2b5aad394628fbe90) ) 
+	ROM_LOAD( "19.bin", 0x180000, 0x80000, CRC(ed1ff88a) SHA1(6b090b658ee6148af953bd0c9216f37162b6460f) ) 
+
+	ROM_LOAD( "26.bin", 0x200000, 0x80000, CRC(a002a155) SHA1(3cf7909e92bcd428063596fc5b9953e0000d6eca) ) 
+	ROM_LOAD( "25.bin", 0x280000, 0x80000, CRC(dcee8492) SHA1(a912b74d3b26ebd1b1613cc631080f83ececeaf8) ) 
+	ROM_LOAD( "24.bin", 0x300000, 0x80000, CRC(de88caef) SHA1(a7927b504dc56ca5c9048373977fe5743b0a3f0b) ) 
+	ROM_LOAD( "23.bin", 0x380000, 0x80000, CRC(37eb01b4) SHA1(06092460bd137e08d0f8df8560942ed877d40e09) ) 
+
+	ROM_LOAD( "30.bin", 0x400000, 0x80000, CRC(45acaf21) SHA1(5edd36c55f4e5d3c74fb85171728ec0a58284b12) ) 
+	ROM_LOAD( "29.bin", 0x480000, 0x80000, CRC(2a6c10a0) SHA1(cc90923c44f2961b945a0fd0f85ecc2ba04af2cb) ) 
+	ROM_LOAD( "28.bin", 0x500000, 0x80000, CRC(23308979) SHA1(0b36788624a1cf0d3f4c895be5ba967b8dfcf85e) ) 
+	ROM_LOAD( "27.bin", 0x580000, 0x80000, CRC(cafc47bb) SHA1(8610af6e52f7089ff4acd850c53ab8b4119e4445) ) 
+ROM_END                                                                                                              
+
 
 
 ROM_START( term2 )
@@ -2874,8 +2961,9 @@ GAME( 1992, mkyturboe,mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state, 
 GAME( 1992, mknifty,  mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mknifty666, mk,     yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mkyawdim, mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1992, mkyawdim2,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-GAME( 1992, mkyawdim3, mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND) //some sound effects aren't reproduced
+GAME( 1992, mkyawdim2,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim3,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim4,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND) // are some sound effects missing/wrong?
 
 GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", GAME_SUPPORTS_SAVE )
 GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", GAME_SUPPORTS_SAVE )

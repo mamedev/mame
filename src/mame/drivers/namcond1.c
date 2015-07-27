@@ -70,7 +70,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/ygv608.h"
 #include "cpu/h8/h83002.h"
 #include "includes/namcond1.h"
 #include "sound/c352.h"
@@ -80,13 +79,13 @@ Notes:
 
 static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_SHARE("shared_ram")
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("ygv608", ygv608_device, read, write)
 	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
 #ifdef MAME_DEBUG
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD("ygv608", ygv608_device, debug_trigger_r)
 #endif
-	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(namcond1_cuskey_r,namcond1_cuskey_w)
+	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
 ADDRESS_MAP_END
 
 /*************************************************************/
@@ -223,17 +222,6 @@ static GFXDECODE_START( namcond1 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000000, pts_16x16_8bits_layout,  0, 256 )
 GFXDECODE_END
 
-WRITE16_MEMBER(namcond1_state::sharedram_sub_w)
-{
-	COMBINE_DATA(&m_shared_ram[offset]);
-}
-
-READ16_MEMBER(namcond1_state::sharedram_sub_r)
-{
-	return m_shared_ram[offset];
-}
-
-
 READ16_MEMBER(namcond1_state::mcu_p7_read)
 {
 	return 0xff;
@@ -252,7 +240,7 @@ WRITE16_MEMBER(namcond1_state::mcu_pa_write)
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(sharedram_sub_r, sharedram_sub_w )
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
@@ -409,8 +397,8 @@ ROM_START( ncv2j )
 	ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
-GAME( 1995, ncv1,      0, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.1", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, ncv2,      0, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.2", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, ncv1,      0, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.1", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996, ncv2,      0, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.2", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, driver_device, 0, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )

@@ -146,10 +146,6 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "includes/shadfrce.h"
 
 
-#define MASTER_CLOCK        XTAL_28MHz
-#define CPU_CLOCK           MASTER_CLOCK / 2
-#define PIXEL_CLOCK     MASTER_CLOCK / 4
-
 WRITE16_MEMBER(shadfrce_state::flip_screen)
 {
 	flip_screen_set(data & 0x01);
@@ -242,16 +238,16 @@ READ16_MEMBER(shadfrce_state::input_ports_r)
 	switch (offset)
 	{
 		case 0 :
-			data = (ioport("P1")->read() & 0xff) | ((ioport("DSW2")->read() & 0xc0) << 6) | ((ioport("SYSTEM")->read() & 0x0f) << 8);
+			data = (m_io_p1->read() & 0xff) | ((m_io_dsw2->read() & 0xc0) << 6) | ((m_io_system->read() & 0x0f) << 8);
 			break;
 		case 1 :
-			data = (ioport("P2")->read() & 0xff) | ((ioport("DSW2")->read() & 0x3f) << 8);
+			data = (m_io_p2->read() & 0xff) | ((m_io_dsw2->read() & 0x3f) << 8);
 			break;
 		case 2 :
-			data = (ioport("EXTRA")->read() & 0xff) | ((ioport("DSW1")->read() & 0x3f) << 8);
+			data = (m_io_extra->read() & 0xff) | ((m_io_dsw1->read() & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (ioport("OTHER")->read() & 0xff) | ((ioport("DSW1")->read() & 0xc0) << 2) | ((ioport("MISC")->read() & 0x38) << 8) | (m_vblank << 8);
+			data = (m_io_other->read() & 0xff) | ((m_io_dsw1->read() & 0xc0) << 2) | ((m_io_misc->read() & 0x38) << 8) | (m_vblank << 8);
 			break;
 	}
 
@@ -450,7 +446,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")  /* Fake IN6 (DIP1) */
+	PORT_START("DSW1")  /*DSW1, not mapped directly  */
 	PORT_DIPNAME( 0x01, 0x01, "Unused DIP 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -473,7 +469,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")  /* Fake IN7 (DIP2) */
+	PORT_START("DSW2")  /* DSW2, not mapped directly */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -508,7 +504,7 @@ static const gfx_layout fg8x8x4_layout =
 	{ 0, 2, 4, 6 },
 	{ 1, 0, 8*8+1, 8*8+0, 16*8+1, 16*8+0, 24*8+1, 24*8+0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	32*8
+	4*8*8
 };
 
 static const gfx_layout sp16x16x5_layout =
@@ -516,9 +512,9 @@ static const gfx_layout sp16x16x5_layout =
 	16,16,
 	RGN_FRAC(1,5),
 	5,
-	{ 0x800000*8, 0x600000*8, 0x400000*8, 0x200000*8, 0x000000*8 },
-	{ 0,1,2,3,4,5,6,7,16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -527,23 +523,23 @@ static const gfx_layout bg16x16x6_layout =
 	16,16,
 	RGN_FRAC(1,3),
 	6,
-	{ 0x000000*8+8, 0x000000*8+0, 0x100000*8+8, 0x100000*8+0, 0x200000*8+8, 0x200000*8+0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,16*16+0,16*16+1,16*16+2,16*16+3,16*16+4,16*16+5,16*16+6,16*16+7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
-	64*8
+	{ RGN_FRAC(0,3)+8, RGN_FRAC(0,3), RGN_FRAC(1,3)+8, RGN_FRAC(1,3), RGN_FRAC(2,3)+8, RGN_FRAC(2,3) },
+	{ STEP8(0,1), STEP8(16*16,1) },
+	{ STEP16(0,16) },
+	2*16*16
 };
 
 static GFXDECODE_START( shadfrce )
-	GFXDECODE_ENTRY( "gfx1", 0, fg8x8x4_layout,   0x0000, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0, sp16x16x5_layout, 0x1000, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0, bg16x16x6_layout, 0x2000, 128 )
+	GFXDECODE_ENTRY( "chars",   0, fg8x8x4_layout,   0x0000, 256 )
+	GFXDECODE_ENTRY( "sprites", 0, sp16x16x5_layout, 0x1000, 128 )
+	GFXDECODE_ENTRY( "tiles",   0, bg16x16x6_layout, 0x2000, 128 )
 GFXDECODE_END
 
 /* Machine Driver Bits */
 
 static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)          /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, scanline, "screen", 0, 1)
 
@@ -551,7 +547,7 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_CPU_PROGRAM_MAP(shadfrce_sound_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 432, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
@@ -585,17 +581,17 @@ ROM_START( shadfrce )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "32j10-0.42",  0x00000, 0x10000, CRC(65daf475) SHA1(7144332b2d17af8645e22e1926b33113db0d20e2) )
 
-	ROM_REGION( 0x020000, "gfx1", 0 ) /* Chars */
+	ROM_REGION( 0x020000, "chars", 0 ) /* Chars */
 	ROM_LOAD( "32a11-0.55",  0x00000, 0x20000, CRC(cfaf5e77) SHA1(eab76e085f695c74cc868aaf95f04ff2acf66ee9) )
 
-	ROM_REGION( 0xa00000, "gfx2", 0 ) /* Sprite Tiles */
+	ROM_REGION( 0xa00000, "sprites", 0 ) /* Sprite Tiles */
 	ROM_LOAD( "32j4-0.12",  0x000000, 0x200000, CRC(1ebea5b6) SHA1(35bd49dda9ad75326d45ffb10c87d83fc4f1b7a8) )
 	ROM_LOAD( "32j5-0.13",  0x200000, 0x200000, CRC(600026b5) SHA1(5641246300d7e20dcff1eae004647faaee6cd1c6) )
 	ROM_LOAD( "32j6-0.24",  0x400000, 0x200000, CRC(6cde8ebe) SHA1(750933798235951fe24b2e667c33f692612c0aa0) )
 	ROM_LOAD( "32j7-0.25",  0x600000, 0x200000, CRC(bcb37922) SHA1(f3eee73c8b9f4873a7f1cc42e334e7502eaee3c8) )
 	ROM_LOAD( "32j8-0.32",  0x800000, 0x200000, CRC(201bebf6) SHA1(c89d2895ea5b19daea1f88542419f4e10f437c73) )
 
-	ROM_REGION( 0x300000, "gfx3", 0 ) /* BG Tiles */
+	ROM_REGION( 0x300000, "tiles", 0 ) /* BG Tiles */
 	ROM_LOAD( "32j1-0.4",  0x000000, 0x100000, CRC(f1cca740) SHA1(339079b95ca137e66b4f032ad67a0adf58cca100) )
 	ROM_LOAD( "32j2-0.5",  0x100000, 0x100000, CRC(5fac3e01) SHA1(20c30f4c76e303285ae37e596afe86aa4812c3b9) )
 	ROM_LOAD( "32j3-0.6",  0x200000, 0x100000, CRC(d297925e) SHA1(5bc4d37bf0dc54114884c816b94a64ef1ccfeda5) )
@@ -614,17 +610,17 @@ ROM_START( shadfrcej )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "32j10-0.42",  0x00000, 0x10000, CRC(65daf475) SHA1(7144332b2d17af8645e22e1926b33113db0d20e2) )
 
-	ROM_REGION( 0x020000, "gfx1", 0 ) /* Chars */
+	ROM_REGION( 0x020000, "chars", 0 ) /* Chars */
 	ROM_LOAD( "32j11-0.55",  0x00000, 0x20000, CRC(7252d993) SHA1(43f7de381841039aa290486aafb98e2cf3b8579b) )
 
-	ROM_REGION( 0xa00000, "gfx2", 0 ) /* Sprite Tiles */
+	ROM_REGION( 0xa00000, "sprites", 0 ) /* Sprite Tiles */
 	ROM_LOAD( "32j4-0.12",  0x000000, 0x200000, CRC(1ebea5b6) SHA1(35bd49dda9ad75326d45ffb10c87d83fc4f1b7a8) )
 	ROM_LOAD( "32j5-0.13",  0x200000, 0x200000, CRC(600026b5) SHA1(5641246300d7e20dcff1eae004647faaee6cd1c6) )
 	ROM_LOAD( "32j6-0.24",  0x400000, 0x200000, CRC(6cde8ebe) SHA1(750933798235951fe24b2e667c33f692612c0aa0) )
 	ROM_LOAD( "32j7-0.25",  0x600000, 0x200000, CRC(bcb37922) SHA1(f3eee73c8b9f4873a7f1cc42e334e7502eaee3c8) )
 	ROM_LOAD( "32j8-0.32",  0x800000, 0x200000, CRC(201bebf6) SHA1(c89d2895ea5b19daea1f88542419f4e10f437c73) )
 
-	ROM_REGION( 0x300000, "gfx3", 0 ) /* BG Tiles */
+	ROM_REGION( 0x300000, "tiles", 0 ) /* BG Tiles */
 	ROM_LOAD( "32j1-0.4",  0x000000, 0x100000, CRC(f1cca740) SHA1(339079b95ca137e66b4f032ad67a0adf58cca100) )
 	ROM_LOAD( "32j2-0.5",  0x100000, 0x100000, CRC(5fac3e01) SHA1(20c30f4c76e303285ae37e596afe86aa4812c3b9) )
 	ROM_LOAD( "32j3-0.6",  0x200000, 0x100000, CRC(d297925e) SHA1(5bc4d37bf0dc54114884c816b94a64ef1ccfeda5) )
@@ -643,17 +639,17 @@ ROM_START( shadfrcejv2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "32j10-0.42",  0x00000, 0x10000, CRC(65daf475) SHA1(7144332b2d17af8645e22e1926b33113db0d20e2) )
 
-	ROM_REGION( 0x020000, "gfx1", 0 ) /* Chars */
+	ROM_REGION( 0x020000, "chars", 0 ) /* Chars */
 	ROM_LOAD( "32j11-0.55",  0x00000, 0x20000, CRC(7252d993) SHA1(43f7de381841039aa290486aafb98e2cf3b8579b) )
 
-	ROM_REGION( 0xa00000, "gfx2", 0 ) /* Sprite Tiles */
+	ROM_REGION( 0xa00000, "sprites", 0 ) /* Sprite Tiles */
 	ROM_LOAD( "32j4-0.12",  0x000000, 0x200000, CRC(1ebea5b6) SHA1(35bd49dda9ad75326d45ffb10c87d83fc4f1b7a8) )
 	ROM_LOAD( "32j5-0.13",  0x200000, 0x200000, CRC(600026b5) SHA1(5641246300d7e20dcff1eae004647faaee6cd1c6) )
 	ROM_LOAD( "32j6-0.24",  0x400000, 0x200000, CRC(6cde8ebe) SHA1(750933798235951fe24b2e667c33f692612c0aa0) )
 	ROM_LOAD( "32j7-0.25",  0x600000, 0x200000, CRC(bcb37922) SHA1(f3eee73c8b9f4873a7f1cc42e334e7502eaee3c8) )
 	ROM_LOAD( "32j8-0.32",  0x800000, 0x200000, CRC(201bebf6) SHA1(c89d2895ea5b19daea1f88542419f4e10f437c73) )
 
-	ROM_REGION( 0x300000, "gfx3", 0 ) /* BG Tiles */
+	ROM_REGION( 0x300000, "tiles", 0 ) /* BG Tiles */
 	ROM_LOAD( "32j1-0.4",  0x000000, 0x100000, CRC(f1cca740) SHA1(339079b95ca137e66b4f032ad67a0adf58cca100) )
 	ROM_LOAD( "32j2-0.5",  0x100000, 0x100000, CRC(5fac3e01) SHA1(20c30f4c76e303285ae37e596afe86aa4812c3b9) )
 	ROM_LOAD( "32j3-0.6",  0x200000, 0x100000, CRC(d297925e) SHA1(5bc4d37bf0dc54114884c816b94a64ef1ccfeda5) )

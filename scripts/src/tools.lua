@@ -619,6 +619,42 @@ files {
 }
 
 --------------------------------------------------
+-- nlwav
+--------------------------------------------------
+
+project("nlwav")
+uuid ("7c5396d1-2a1a-4c93-bed6-6b8fa182054a")
+kind "ConsoleApp" 
+
+options {
+  "ForceCPP",
+}
+
+flags {
+  "Symbols", -- always include minimum symbols for executables  
+}
+
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
+  targetdir(MAME_DIR)
+end
+
+links {
+  "utils",
+  "ocore_" .. _OPTIONS["osd"],
+  "netlist",
+}
+
+includedirs {
+  MAME_DIR .. "src/osd",
+  MAME_DIR .. "src/lib/util",
+  MAME_DIR .. "src/emu/netlist",
+}
+
+files {
+  MAME_DIR .. "src/tools/nlwav.c",
+}
+
+--------------------------------------------------
 -- castool
 --------------------------------------------------
 

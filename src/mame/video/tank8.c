@@ -60,7 +60,7 @@ void tank8_state::set_pens()
 }
 
 
-WRITE8_MEMBER(tank8_state::tank8_video_ram_w)
+WRITE8_MEMBER(tank8_state::video_ram_w)
 {
 	m_video_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -68,7 +68,7 @@ WRITE8_MEMBER(tank8_state::tank8_video_ram_w)
 
 
 
-TILE_GET_INFO_MEMBER(tank8_state::tank8_get_tile_info)
+TILE_GET_INFO_MEMBER(tank8_state::get_tile_info)
 {
 	UINT8 code = m_video_ram[tile_index];
 
@@ -100,15 +100,19 @@ TILE_GET_INFO_MEMBER(tank8_state::tank8_get_tile_info)
 
 void tank8_state::video_start()
 {
+	m_collision_timer = timer_alloc(TIMER_COLLISION);
+
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 	m_screen->register_screen_bitmap(m_helper3);
 
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tank8_state::tank8_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tank8_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	/* VBLANK starts on scanline #256 and ends on scanline #24 */
 
 	m_tilemap->set_scrolly(0, 2 * 24);
+	
+	save_item(NAME(m_collision_index));
 }
 
 
@@ -170,7 +174,7 @@ void tank8_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	switch (id)
 	{
 	case TIMER_COLLISION:
-		tank8_set_collision(param);
+		set_collision(param);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in tank8_state::device_timer");
@@ -178,7 +182,7 @@ void tank8_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-UINT32 tank8_state::screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tank8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -189,7 +193,7 @@ UINT32 tank8_state::screen_update_tank8(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
+void tank8_state::screen_eof(screen_device &screen, bool state)
 {
 	// on falling edge
 	if (!state)
@@ -273,7 +277,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 						index |= 0x80; /* collision on right side */
 				}
 
-				timer_set(screen.time_until_pos(y, x), TIMER_COLLISION, index);
+				m_collision_timer->adjust(screen.time_until_pos(y, x), index);
 
 				_state = 1;
 			}
