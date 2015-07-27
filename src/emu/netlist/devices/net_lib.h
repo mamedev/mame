@@ -59,6 +59,7 @@
 #include "../macro/nlm_cd4xxx.h"
 #include "../macro/nlm_ttl74xx.h"
 #include "../macro/nlm_opamp.h"
+#include "../macro/nlm_other.h"
 
 #include "../analog/nld_bjt.h"
 #include "../analog/nld_fourterm.h"

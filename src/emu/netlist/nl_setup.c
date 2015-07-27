@@ -30,6 +30,7 @@ static NETLIST_START(base)
 	LOCAL_SOURCE(TTL74XX_lib)
 	LOCAL_SOURCE(CD4XXX_lib)
 	LOCAL_SOURCE(OPAMP_lib)
+	LOCAL_SOURCE(otheric_lib)
 
 	INCLUDE(diode_models);
 	INCLUDE(bjt_models);
@@ -37,6 +38,7 @@ static NETLIST_START(base)
 	INCLUDE(TTL74XX_lib);
 	INCLUDE(CD4XXX_lib);
 	INCLUDE(OPAMP_lib);
+	INCLUDE(otheric_lib);
 
 NETLIST_END()
 
