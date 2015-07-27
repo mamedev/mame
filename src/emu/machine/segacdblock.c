@@ -1907,13 +1907,13 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			}
 
 			set_flag(CSCT);
-			set_flag(SCDQ);
 
 			if(p_ok)
 			{
 				m_FAD ++;
 				m_FADEnd --;
-				
+				set_flag(SCDQ);
+
 				if(m_FADEnd <= 0)
 				{
 					m_cd_state = CD_STAT_PAUSE;
