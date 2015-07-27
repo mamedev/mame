@@ -10,13 +10,15 @@ public:
 		m_sn(*this, "snsnd"),
 		m_sharedram(*this, "sharedram"),
 		m_videoram1(*this, "videoram1"),
-		m_videoram2(*this, "videoram2"){ }
+		m_videoram2(*this, "videoram2"),
+		m_palette(*this, "palette") {}
 
 	optional_device<sn76477_device> m_sn;
 
 	required_shared_ptr<UINT8> m_sharedram;
 	required_shared_ptr<UINT8> m_videoram1;
 	required_shared_ptr<UINT8> m_videoram2;
+	required_device<palette_device> m_palette;
 
 	UINT8 m_ttmahjng_port_select;
 	int m_speakres_vrx;
@@ -41,9 +43,5 @@ public:
 	virtual void video_start();
 
 	UINT32 screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	pen_t route16_make_pen(UINT8 color);
-	pen_t ttmajng_make_pen(UINT8 color);
-	int video_update_stratvox_ttmahjng(bitmap_rgb32 &bitmap,const rectangle &cliprect,pen_t (route16_state::*make_pen)(UINT8));
 };

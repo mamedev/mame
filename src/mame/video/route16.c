@@ -47,24 +47,6 @@ WRITE8_MEMBER(route16_state::out1_w)
  *
  *************************************/
 
-pen_t route16_state::route16_make_pen(UINT8 color)
-{
-	return rgb_t(pal1bit((color >> 0) & 0x01),
-					pal1bit((color >> 1) & 0x01),
-					pal1bit((color >> 2) & 0x01));
-
-}
-
-
-pen_t route16_state::ttmajng_make_pen(UINT8 color)
-{
-	return rgb_t(pal1bit((color >> 2) & 0x01),
-					pal1bit((color >> 1) & 0x01),
-					pal1bit((color >> 0) & 0x01));
-
-}
-
-
 /*
  *  Game observation shows that Route 16 can blank each
  *  bitmap by setting bit 1 of the palette register.
@@ -106,14 +88,12 @@ UINT32 route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 
 										((data2 >> 0) & 0x01)];
 
 			/* the final color is the OR of the two colors (verified) */
-			UINT8 final_color = color1 | color2;
-
-			pen_t pen = route16_make_pen(final_color);
+			UINT8 final_color = (color1 | color2) & 0x07;
 
 			if (m_flipscreen)
-				bitmap.pix32(255 - y, 255 - x) = pen;
+				bitmap.pix32(255 - y, 255 - x) = m_palette->pen_color(final_color);
 			else
-				bitmap.pix32(y, x) = pen;
+				bitmap.pix32(y, x) = m_palette->pen_color(final_color);
 
 			x = x + 1;
 			data1 = data1 >> 1;
@@ -129,9 +109,7 @@ UINT32 route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 
  *  The Stratovox video connections have been verified from the schematics
  */
 
-int route16_state::video_update_stratvox_ttmahjng(bitmap_rgb32 &bitmap,
-											const rectangle &cliprect,
-											pen_t (route16_state::*make_pen)(UINT8))
+UINT32 route16_state::screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -161,14 +139,12 @@ int route16_state::video_update_stratvox_ttmahjng(bitmap_rgb32 &bitmap,
 										((data2 >> 0) & 0x01)];
 
 			/* the final color is the OR of the two colors */
-			UINT8 final_color = color1 | color2;
-
-			pen_t pen = (this->*make_pen)(final_color);
+			UINT8 final_color = (color1 | color2) & 0x07;
 
 			if (m_flipscreen)
-				bitmap.pix32(255 - y, 255 - x) = pen;
+				bitmap.pix32(255 - y, 255 - x) = m_palette->pen_color(final_color);
 			else
-				bitmap.pix32(y, x) = pen;
+				bitmap.pix32(y, x) = m_palette->pen_color(final_color);
 
 			x = x + 1;
 			data1 = data1 >> 1;
@@ -177,16 +153,4 @@ int route16_state::video_update_stratvox_ttmahjng(bitmap_rgb32 &bitmap,
 	}
 
 	return 0;
-}
-
-
-UINT32 route16_state::screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return video_update_stratvox_ttmahjng(bitmap, cliprect, &route16_state::route16_make_pen);
-}
-
-
-UINT32 route16_state::screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return video_update_stratvox_ttmahjng(bitmap, cliprect, &route16_state::ttmajng_make_pen);
 }
