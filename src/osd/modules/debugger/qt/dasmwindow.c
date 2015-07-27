@@ -2,6 +2,12 @@
 // copyright-holders:Andrew Gardner
 #define NO_MEM_TRACKING
 
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+
 #include "dasmwindow.h"
 
 #include "debug/debugcon.h"
@@ -30,17 +36,17 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 
 	// The input edit
 	m_inputEdit = new QLineEdit(topSubFrame);
-	connect(m_inputEdit, SIGNAL(returnPressed()), this, SLOT(expressionSubmitted()));
+	connect(m_inputEdit, &QLineEdit::returnPressed, this, &DasmWindow::expressionSubmitted);
 
 	// The cpu combo box
 	m_cpuComboBox = new QComboBox(topSubFrame);
 	m_cpuComboBox->setObjectName("cpu");
 	m_cpuComboBox->setMinimumWidth(300);
-	connect(m_cpuComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(cpuChanged(int)));
+	connect(m_cpuComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &DasmWindow::cpuChanged);
 
 	// The main disasm window
 	m_dasmView = new DebuggerView(DVT_DISASSEMBLY, m_machine, this);
-	connect(m_dasmView, SIGNAL(updated()), this, SLOT(dasmViewUpdated()));
+	connect(m_dasmView, &DebuggerView::updated, this, &DasmWindow::dasmViewUpdated);
 
 	// Force a recompute of the disassembly region
 	downcast<debug_view_disasm*>(m_dasmView->view())->set_expression("curpc");
@@ -77,9 +83,9 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 	m_breakpointToggleAct->setShortcut(Qt::Key_F9);
 	m_breakpointEnableAct->setShortcut(Qt::SHIFT + Qt::Key_F9);
 	m_runToCursorAct->setShortcut(Qt::Key_F4);
-	connect(m_breakpointToggleAct, SIGNAL(triggered(bool)), this, SLOT(toggleBreakpointAtCursor(bool)));
-	connect(m_breakpointEnableAct, SIGNAL(triggered(bool)), this, SLOT(enableBreakpointAtCursor(bool)));
-	connect(m_runToCursorAct, SIGNAL(triggered(bool)), this, SLOT(runToCursor(bool)));
+	connect(m_breakpointToggleAct, &QAction::triggered, this, &DasmWindow::toggleBreakpointAtCursor);
+	connect(m_breakpointEnableAct, &QAction::triggered, this, &DasmWindow::enableBreakpointAtCursor);
+	connect(m_runToCursorAct, &QAction::triggered, this, &DasmWindow::runToCursor);
 
 	// Right bar options
 	QActionGroup* rightBarGroup = new QActionGroup(this);
@@ -97,7 +103,7 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 	rightActEncrypted->setShortcut(QKeySequence("Ctrl+E"));
 	rightActComments->setShortcut(QKeySequence("Ctrl+C"));
 	rightActRaw->setChecked(true);
-	connect(rightBarGroup, SIGNAL(triggered(QAction*)), this, SLOT(rightBarChanged(QAction*)));
+	connect(rightBarGroup, &QActionGroup::triggered, this, &DasmWindow::rightBarChanged);
 
 	// Assemble the options menu
 	QMenu* optionsMenu = menuBar()->addMenu("&Options");
