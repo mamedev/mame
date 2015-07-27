@@ -34,6 +34,7 @@
 - Improve command timings. "CMOK setted up with CMOK enabled" can be a good preliminary indication for that;
 - Improve DMA, add missing features.
 - Improve buffer FIFO, starting from the basic fact that SH-1 might always transmit with 16-bit bus.
+- Add CD-DA parallel port communication with SCSP, start by expose a delegate in both cores.
 - Remove debugger breaks (missing known features at very least).
 - Fix TOC and correlated command 0x03 for CD-ROM player.
 - HIRQ Registers are not yet, for timing and for how they really works (DRDY as an example);
@@ -46,6 +47,7 @@
   - Yoshimoto Mahjong: CD state reject;
   - Zero Divide: won't work without seeking position.
 - Astal: doesn't like commands 0x43 / 0x45 for whatever reason, or probably it isn't liking the usual 0x00 / 0x51;
+- Chaos Seed: fix stall, uses SH-2 DMA while at it.
 - Whizz / Time Gal: fix stall.
 - Falcom Classics 2: fix start button not pressing (caused by CD Block time out for a thread);
 - pull request, otherwise might as well still use saturn_cdblock branch.
@@ -152,7 +154,7 @@ WRITE16_MEMBER(segacdblock_device::hirq_w)
 }
 
 READ16_MEMBER(segacdblock_device::hirq_mask_r){	return m_hirq_mask; }
-WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { printf("%04x\n",m_hirq_mask); debugger_break(machine()); COMBINE_DATA(&m_hirq_mask); }
+WRITE16_MEMBER(segacdblock_device::hirq_mask_w) { printf("HIRQ Mask %04x\n",m_hirq_mask); debugger_break(machine()); COMBINE_DATA(&m_hirq_mask); }
 
 void segacdblock_device::SH2SendsCommand()
 {
