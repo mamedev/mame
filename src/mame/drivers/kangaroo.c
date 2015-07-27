@@ -443,6 +443,8 @@ static MACHINE_CONFIG_START( nomcu, kangaroo_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(kangaroo_state, screen_update_kangaroo)
 
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
