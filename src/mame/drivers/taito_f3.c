@@ -1962,6 +1962,11 @@ ROM_START( bublbob2 )
 	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
 	ROM_LOAD16_BYTE("d90-04", 0x000000, 0x200000, CRC(feee5fda) SHA1(b89354013ec4d34bcd51ecded412effa66dd2f2f) )    // C8 C9 CA CB
 	ROM_LOAD16_BYTE("d90-05", 0x400000, 0x200000, CRC(c192331f) SHA1(ebab05b3681c70b373bc06c1826be1cc397d3af7) )    // CC CD -std-
+
+	ROM_REGION( 0x1200, "plds", 0 )
+	ROM_LOAD("d77-14_palce16v8q-15.ic21.bin", 0x000, 0x117, CRC(2c798a1c) SHA1(e8ac31c3cd53eb61fedfd710c31356e8fa968cbc) )
+	ROM_LOAD("d77-12_palce16v8q-15.ic48.bin", 0x000, 0x117, CRC(b1cc6195) SHA1(629ef8416a2cb51fcbc48e5c306dd04c96902726) )
+	ROM_LOAD("d77-11_palce16v8q-15.ic37.bin", 0x000, 0x117, CRC(a733f0de) SHA1(6eec26043cedb3cae4efe93faa84a07327be468b) )
 ROM_END
 
 
