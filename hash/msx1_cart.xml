@@ -666,15 +666,15 @@ Xyzolog - Electric Software
 		</part>
 	</software>
 
-	<!-- Does not seem to work at the moment -->
-	<software name="msxwritj" supported="no">
+	<!-- Code seems to work but it does not display text -->
+	<software name="msxwritj" supported="partial">
 		<description>Japanese MSX-Write (Jpn)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="日本語MSX-Write" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX WRITE 900178B" />
-			<feature name="slot" value="ascii8" />
+			<feature name="slot" value="msxwrite" />
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="524288">
 				<rom name="225 aa 8716 zoo" size="524288" crc="ef02e4f3" sha1="4180544158a57c99162269e33e4f2c77c9fce84e" offset="0" />

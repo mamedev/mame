@@ -21,7 +21,7 @@
 	|LS09           |
 	 |||||||||||||||
 
-    ROM     - EPROM
+    ROM     - Toshiba TMM24128AP 16Kx8 EPROM (blank label)
     RAM     - Sony CXK5864PN-15L 8Kx8 SRAM
     SW      - push button switch
     CN      - lead out to joystick port dongle

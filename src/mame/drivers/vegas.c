@@ -2446,9 +2446,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
+
+
+
 ROM_START( gauntleg )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.5 11/17/1998 */
-	ROM_LOAD( "legend15.bin", 0x000000, 0x80000, CRC(a8372d70) SHA1(d8cd4fd4d7007ee38bb58b5a818d0f83043d5a48) )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )
+	ROM_LOAD( "legend15.bin", 0x000000, 0x80000, CRC(a8372d70) SHA1(d8cd4fd4d7007ee38bb58b5a818d0f83043d5a48) ) // EPROM Boot code. Version: Nov 17 1998 19:18:28 / 1.5 Nov 17 1998 19:21:49
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.5 1/14/1999 Game 1/14/1999 */
 	DISK_IMAGE( "gauntleg", 0, SHA1(66eb70e2fba574a7abe54be8bd45310654b24b08) )
@@ -2459,8 +2462,9 @@ ROM_END
 
 
 ROM_START( gauntleg12 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.3 9/25/1998 */
-	ROM_LOAD( "legend12.bin", 0x000000, 0x80000, CRC(34674c5f) SHA1(92ec1779f3ab32944cbd953b6e1889503a57794b) )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )
+	ROM_LOAD( "legend13.bin", 0x000000, 0x80000, CRC(34674c5f) SHA1(92ec1779f3ab32944cbd953b6e1889503a57794b) ) //  EPROM Boot code. Version: Sep 25 1998 18:34:43 / 1.3 Sep 25 1998 18:33:45
+	ROM_LOAD( "legend14.bin", 0x000000, 0x80000, CRC(66869402) SHA1(bf470e0b9198b80f8baf8b9432a7e1df8c7d18ca) ) //  EPROM Boot code. Version: Oct 30 1998 17:48:21 / 1.4 Oct 30 1998 17:44:29
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.4 10/22/1998 Main 10/23/1998 */
 	DISK_IMAGE( "gauntl12", 0, SHA1(c8208e3ce3b02a271dc6b089efa98dd996b66ce0) )
@@ -2529,9 +2533,13 @@ ROM_END
 
 ROM_START( nbashowt )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
-	ROM_LOAD( "nbau27.100", 0x000000, 0x80000, CRC(ff5d620d) SHA1(8f07567929f40a2269a42495dfa9dd5edef688fe) )
+	ROM_LOAD( "showtime_mar15_1999.u27", 0x000000, 0x80000, CRC(ff5d620d) SHA1(8f07567929f40a2269a42495dfa9dd5edef688fe) ) // 16:09:14 Mar 15 1999 BIOS FOR SHOWTIME USING BANSHEE / 16:09:01 Mar 15 1999. POST FOR SHOWTIME USING BANSHEE
 
 	DISK_REGION( "ide:0:hdd:image" )
+	// various strings from this image
+	// SHOWTIME REV 2.0 
+	// BUILD DATE: Apr 25 1999 (diag.exe?)
+	// BUILD DATE: Apr 21 1999 (game?)
 	DISK_IMAGE( "nbashowt", 0, SHA1(f7c56bc3dcbebc434de58034986179ae01127f87) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
@@ -2541,20 +2549,49 @@ ROM_END
 
 ROM_START( nbanfl )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
-	ROM_LOAD( "u27nflnba.bin", 0x000000, 0x80000, CRC(6a9bd382) SHA1(18b942df6af86ea944c24166dbe88148334eaff9) )
-//  ROM_LOAD( "bootnflnba.bin", 0x000000, 0x80000, CRC(3def7053) SHA1(8f07567929f40a2269a42495dfa9dd5edef688fe) )
+	ROM_LOAD( "blitz00_sep22_1999.u27", 0x000000, 0x80000, CRC(6a9bd382) SHA1(18b942df6af86ea944c24166dbe88148334eaff9) ) // 16:00:32 Sep 22 1999 BIOS FOR BLITZ00 USING BANSHEE / 16:00:26 Sep 22 1999 POST FOR BLITZ00 USING BANSHEE
+//  ROM_LOAD( "bootnflnba.bin", 0x000000, 0x80000, CRC(3def7053) SHA1(8f07567929f40a2269a42495dfa9dd5edef688fe) ) // 1 byte different to above (0x51b95 is 0x1b instead of 0x18)
+	ROM_LOAD( "blitz00_nov30_1999.u27", 0x000000, 0x80000, CRC(4242bf14) SHA1(c1fcec67d7463df5f41afc89f22c3b4484279534) ) // 15:10:49 Nov 30 1999 BIOS FOR BLITZ00 USING BANSHEE / 15:10:43 Nov 30 1999 POST FOR BLITZ00 USING BANSHEE
 
 	DISK_REGION( "ide:0:hdd:image" )
+	// various strings from this image
+	//NBA SHOWTIME 2.1 
+	//BUILD DATE: Sep 22 1999 (diag.exe?)
+	//BUILD DATE: Sep 21 1999 (game?)
 	DISK_IMAGE( "nbanfl", 0, SHA1(f60c627f85f1bf58f2ea674063736a1e516e7e9e) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
+// I'm not sure if NBA Showtime: NBA on NBC Gold was a standalone release, or the version with NBA Showtime: NBA on NBC Gold is actually 'Sports Station'
+// it's possible the boot rom and CHD are mismatched here
+ROM_START( nbagold )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )
+	ROM_LOAD( "nbagold_jan10_2000.u27", 0x000000, 0x80000, CRC(6768e802) SHA1(d994e3efe14f57e261841134ddd1489fa67d418b) ) // 11:29:11 Jan 10 2000. BIOS FOR NBAGOLD USING BANSHEE / 11:23:58 Jan 10 2000. POST FOR NBAGOLD USING BANSHEE 
+
+	DISK_REGION( "ide:0:hdd:image" )
+	// various strings from this image
+	//NBA SHOWTIME GOLD 3.00
+	//BUILD DATE Feb 18 2000 (diag.exe)
+	//BUILD DATE:Feb 17 2000 (game?)
+	//BUILD DATE:Feb 10 2000 (something else?)
+	DISK_IMAGE( "nbanfl3", 0,  SHA1(19a51346ce5ae4e06e8dff3eb4bed59ec1ee855f))
+	// these both contain the same strings / build dates, same thing with different user data / drive sizes?
+//	DISK_IMAGE( "nbanfl27", 0, SHA1(da371d27e2fbceec493e2203055e0c1399eaf3b9) )
+//	DISK_IMAGE( "sportstn", 0, SHA1(9442feefaeb5ae4a090422e937615f8a2d8e8f31) )
+	
+
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
+	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
+
+	// also a PIC?
+ROM_END
+
 
 ROM_START( cartfury )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
-	ROM_LOAD( "bootu27", 0x000000, 0x80000, CRC(c44550a2) SHA1(ad30f1c3382ff2f5902a4cbacbb1f0c4e37f42f9) )
+	ROM_LOAD( "cart_mar8_2000.u27", 0x000000, 0x80000, CRC(c44550a2) SHA1(ad30f1c3382ff2f5902a4cbacbb1f0c4e37f42f9) ) // 10:40:17 Mar  8 2000 BIOS FOR CART USING VOODOO3 / 10:39:55 Mar  8 2000 POST FOR CART USING VOODOO3
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "cartfury", 0, SHA1(4c5bc2803297ea9a191bbd8b002d0e46b4ae1563) )
@@ -2691,8 +2728,10 @@ GAME( 1999, warfa,    0,        warfa, warfa, vegas_state,    warfa,    ROT0, "A
 GAME( 1999, roadburn, 0,        roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Durango + DSIO? + Voodoo banshee */
-GAME( 1998, nbashowt, 0,        nbashowt, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games", "NBA Showtime: NBA on NBC", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1999, nbanfl,   0,        nbanfl, nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games", "NBA Showtime / NFL Blitz 2000", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, nbashowt, 0,        nbashowt, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games", "NBA Showtime: NBA on NBC (ver 2.0)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1999, nbanfl,   0,        nbanfl, nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games", "NBA Showtime / NFL Blitz 2000 (ver 2.1)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 2000, nbagold , 0,        nbanfl, nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games", "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+
 
 /* Durango + Denver SIO + Voodoo 3 */
 GAME( 1998, sf2049,   0,        sf2049,   sf2049, vegas_state,   sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

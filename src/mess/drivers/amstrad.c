@@ -784,7 +784,7 @@ static SLOT_INTERFACE_START( amstrad_floppies )
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( aleste_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
@@ -1125,8 +1125,8 @@ static MACHINE_CONFIG_DERIVED( aleste, cpc6128 )
 	MCFG_DEVICE_REMOVE("upd765")
 	MCFG_I8272A_ADD("upd765", true)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "35hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "35hd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_REMOVE("flop_list")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "aleste")
