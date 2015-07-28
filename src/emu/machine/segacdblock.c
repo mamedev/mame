@@ -700,7 +700,10 @@ int segacdblock_device::sega_cdrom_get_adr_control(cdrom_file *file, int track)
 
 void segacdblock_device::cd_standard_return(bool isPeri)
 {
-	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0) | m_cd_state | ((m_playtype == true) ? 0x80 : 0);
+	m_dr[0] = (isPeri == true ? CD_STAT_PERI : 0);
+	m_dr[0]|= (m_TransferActive == true) ? CD_STAT_TRANS : 0;
+	m_dr[0]|= ((m_playtype == true) ? 0x80 : 0);
+	m_dr[0]|= m_cd_state;
 	m_dr[1] = (m_CurrentTrack == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cdrom, m_CurrentTrack)<<8) | (cdrom_get_track(cdrom, m_FAD-150)+1));
 	m_dr[2] = 0x0100 | ((m_FAD >> 16) & 0xff);
 	m_dr[3] = m_FAD & 0xffff;
@@ -792,7 +795,6 @@ void segacdblock_device::cd_cmd_end_transfer()
 		m_dr[1] = (m_dma_size>>1) & 0xffff;
 
 		m_TransferActive = false;
-		m_cd_state &= ~CD_STAT_TRANS;
 	}
 	else
 	{
@@ -1281,9 +1283,8 @@ void segacdblock_device::cd_cmd_get_sector(bool AutoDelete)
 	transpart = &partitions[bufnum];
 
 	m_TransferActive = true;
-	cd_standard_return(false); // cheap hack
+	cd_standard_return(false);
 	
-	m_dr[0] = CD_STAT_TRANS | m_cd_state;
 	xferoffs = 0;
 	xfersect = 0;
 	m_dma_size = 0;
@@ -1314,9 +1315,7 @@ void segacdblock_device::cd_cmd_delete_sector()
 	}	
 	// @todo reject states
 	m_TransferActive = false;
-	cd_standard_return(false); // cheap hack
-	
-	m_dr[0] = m_cd_state;
+	cd_standard_return(false); 
 	
 	cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
 	for (INT32 i = xfersectpos; i < xfersectpos+xfersectnum; i++)
@@ -1389,7 +1388,7 @@ void segacdblock_device::cd_cmd_get_file_info(UINT32 fileid)
 	if (fileid == 0xffffff)   // special
 		return; // @todo intentional
 	
-	m_dr[0] = m_cd_state;
+	cd_standard_return(false);  // cheap hack
 	m_dr[1] = 6;
 	m_dr[2] = 0;
 	m_dr[3] = 0;
@@ -1850,9 +1849,6 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			m_cd_state = CD_STAT_NODISC;
 		//	m_cd_state = CD_STAT_PAUSE;
 		//else
-
-		if(m_TransferActive == true)
-			m_cd_state|= CD_STAT_TRANS;
 
 		cd_standard_return(true);
 		set_flag(SCDQ);
