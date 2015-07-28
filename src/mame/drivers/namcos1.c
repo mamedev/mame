@@ -353,7 +353,7 @@ WRITE8_MEMBER(namcos1_state::irq_ack_w)
 
 READ8_MEMBER(namcos1_state::dsw_r)
 {
-	int ret = ioport("DIPSW")->read();
+	int ret = m_io_dipsw->read();
 	if (!(offset & 2)) ret >>= 4;
 	return 0xf0 | ret;
 }
@@ -871,7 +871,14 @@ static INPUT_PORTS_START( splatter )
 		//  Allow "CPU #0&1 Kick Watchdog in IRQ" = _____oo_
 		//                                          12345678
 	#endif
-	PORT_DIPNAME( 0x20, 0x20, "Stage Select (ver. SH3 only)" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( splatter3 )
+	PORT_INCLUDE( splatter )
+
+	PORT_MODIFY( "DIPSW" )
+	PORT_DIPNAME( 0x20, 0x20, "Stage Select" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2836,7 +2843,7 @@ GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, berabohm, ROT
 GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, alice,    ROT180, "Namco", "Marchen Maze (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", GAME_SUPPORTS_SAVE )
 GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, wldcourt, ROT180, "Namco", "World Court (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, splatter,  0,        ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", GAME_SUPPORTS_SAVE )
+GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", GAME_SUPPORTS_SAVE )
 GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", GAME_SUPPORTS_SAVE )
 GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, faceoff,  ROT180, "Namco", "Face Off (Japan)", GAME_SUPPORTS_SAVE )
