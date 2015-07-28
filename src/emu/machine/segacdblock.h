@@ -23,6 +23,10 @@ Sega Saturn CD-Block HLE device implementation
 #define MCFG_SEGACDBLOCK_ADD(_tag,_freq) \
 	MCFG_DEVICE_ADD(_tag, SEGACDBLOCK, _freq)
 
+#define MCFG_SEGACDBLOCK_DRDY_CALLBACK(_devcb) \
+	devcb = &segacdblock_device::set_cd_drdy_cb(*device, DEVCB_##_devcb);
+
+	
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -59,6 +63,8 @@ public:
 	DECLARE_READ16_MEMBER( datatrns_r );
 	DECLARE_READ32_MEMBER( datatrns32_r );
 	
+	template<class _Object> static devcb_base &set_cd_drdy_cb(device_t &device, _Object object) { return downcast<segacdblock_device &>(device).cd_drdy_cb.set_callback(object); }
+	
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -75,6 +81,7 @@ private:
 	static const device_timer_id PERI_TIMER = 0;
 	static const device_timer_id CMD_TIMER = 1;
 	static const device_timer_id CD_TIMER = 2;
+	devcb_write_line cd_drdy_cb;
 
 	UINT16 m_cr[4];
 	UINT16 m_dr[4];

@@ -48,6 +48,7 @@ test1f diagnostic hacks:
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"
 #include "machine/segacdblock.h"
+#include "debugger.h"
 
 #include "bus/saturn/sat_slot.h"
 #include "bus/saturn/rom.h"
@@ -80,14 +81,16 @@ public:
 	DECLARE_READ32_MEMBER(saturn_null_ram_r);
 	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
 	DECLARE_WRITE32_MEMBER(astal_cache_hack_w);
-
+	DECLARE_WRITE_LINE_MEMBER(cd_drdy_write_cb);
+	
 	void saturn_init_driver(int rgn);
 	DECLARE_DRIVER_INIT(saturnus);
 	DECLARE_DRIVER_INIT(saturneu);
 	DECLARE_DRIVER_INIT(saturnjp);
 
 	SH2_DMA_FIFO_DATA_AVAILABLE_CB(cdblock_data_available_callback);
-
+	bool m_cd_drdy_line;
+	
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	required_device<sat_cart_slot_device> m_exp;
@@ -96,15 +99,29 @@ public:
 	required_device<segacdblock_device> m_cdblock;
 };
 
+WRITE_LINE_MEMBER(sat_console_state::cd_drdy_write_cb)
+{
+	m_cd_drdy_line = state;
+	
+	if(state == true)
+	{
+		m_maincpu->sh2_notify_dma_data_available();
+		m_slave->sh2_notify_dma_data_available();
+	}
+}
+
 SH2_DMA_FIFO_DATA_AVAILABLE_CB(sat_console_state::cdblock_data_available_callback)
 {
 	if(src == 0x05818000)
 	{
-		return 0;
+		return m_cd_drdy_line;
 	}
 	else if((src & 0x07f00000) == 0x05800000)
-		printf("DMA callback %08x\n",src);
-
+	{
+		printf("CD Block SH-2 DMA callback %08x\n",src);
+		debugger_break(machine());
+	}
+	
 	return 1;
 }
 
@@ -755,6 +772,7 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_NVRAM_ADD_0FILL("smpc_nv") // TODO: default for each region (+ move it inside SMPC when converted to device)
 
 	MCFG_SEGACDBLOCK_ADD("sh1_hle", 0) // 150, @todo
+	MCFG_SEGACDBLOCK_DRDY_CALLBACK(WRITELINE(sat_console_state,cd_drdy_write_cb))
 	//MCFG_TIMER_DRIVER_ADD("sector_timer", sat_console_state, stv_sector_cb)
 	//MCFG_TIMER_DRIVER_ADD("sh1_cmd", sat_console_state, stv_sh1_sim)
 

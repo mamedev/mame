@@ -215,10 +215,16 @@ READ32_MEMBER(segacdblock_device::datatrns32_r)
 	res = -1;
 	if(xfertype == CDDMA_INPROGRESS)
 	{
-		printf("%d %d %d %d\n",xfersect,xfersectnum,xferoffs,m_dma_size);
+		//printf("%d %d %d %d\n",xfersect,xfersectnum,xferoffs,m_dma_size);
 		if (xfersect < xfersectnum)
 		{
 			// get next longword
+			if(transpart->blocks[xfersectpos+xfersect] == (blockT *)NULL)
+			{
+				cd_drdy_cb(false);
+				return res;
+			}
+			
 			res = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
 				  (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
 				  (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
@@ -343,7 +349,8 @@ MACHINE_CONFIG_END
 segacdblock_device::segacdblock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGACDBLOCK, "Sega Saturn CD-Block (HLE)", tag, owner, clock, "segacdblock", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("segacdblock", ENDIANNESS_BIG, 32,20, 0, NULL, *ADDRESS_MAP_NAME(map))
+		m_space_config("segacdblock", ENDIANNESS_BIG, 32,20, 0, NULL, *ADDRESS_MAP_NAME(map)),
+		cd_drdy_cb(*this)
 {
 }
 
@@ -1889,9 +1896,6 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		{
 			UINT8 p_ok;
 			
-			if(m_FADEnd)
-				printf("FAD %08x %08x %04x\n",m_FAD,m_FADEnd,m_hirq);
-
 			p_ok = 0;
 			if (cdrom)
 			{
@@ -1906,8 +1910,12 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 					//machine().device<cdda_device>("cdda")->start_audio(cd_curfad, 1);
 				}
 			}
+			
+			if(m_FADEnd)
+				printf("FAD %08x %08x %04x %d\n",m_FAD,m_FADEnd,m_hirq,p_ok);
 
 			set_flag(CSCT);
+			cd_drdy_cb(true);
 
 			if(p_ok)
 			{
@@ -1974,6 +1982,8 @@ void segacdblock_device::device_start()
 	m_peri_timer = timer_alloc(PERI_TIMER);
 	m_cmd_timer = timer_alloc(CMD_TIMER);
 	m_cd_timer = timer_alloc(CD_TIMER);
+	cd_drdy_cb.resolve_safe();
+
 	m_DMABuffer = auto_alloc_array_clear(machine(), UINT8, 2352);
 }
 
