@@ -95,4 +95,44 @@
 		</part>
 	</software>
 
+  <!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
+       If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
+	<software name="kingsq6e">
+		<description>King's Quest VI (Windows 3.1 enhanced)</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kings_quest_6_enhanced" sha1="0d237ee8c2d15be3b47f3676eddce41a00bca094" />
+			</diskarea>
+		</part>
+	</software>
+
+   <!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
+       If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
+	<software name="krondor">
+		<description>Betrayal at Krondor (1994 release, CDDA)</description>
+		<year>1994</year>
+		<publisher>Dynamix</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor" sha1="f0d0907edccfc4f6ab4f181b0d2e9a3b18f81e73" />
+			</diskarea>
+		</part>
+	</software>
+  
+	<software name="krondora" cloneof="krondor">
+		<description>Betrayal at Krondor (1998 release, no CDDA)</description>
+		<year>1998</year>
+		<publisher>Dynamix</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>
