@@ -215,15 +215,14 @@ READ32_MEMBER(segacdblock_device::datatrns32_r)
 	res = -1;
 	if(xfertype == CDDMA_INPROGRESS)
 	{
+		//if(m_ext_drdy == false)
+		//	return res;
+
 		//printf("%d %d %d %d\n",xfersect,xfersectnum,xferoffs,m_dma_size);
 		if (xfersect < xfersectnum)
 		{
 			// get next longword
-			if(transpart->blocks[xfersectpos+xfersect] == (blockT *)NULL)
-			{
-				cd_drdy_cb(false);
-				return res;
-			}
+			//if(transpart->blocks[xfersectpos+xfersect] == (blockT *)NULL)
 			
 			res = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
 				  (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
@@ -787,13 +786,13 @@ void segacdblock_device::cd_cmd_init(UINT8 init_flags)
 
 void segacdblock_device::cd_cmd_end_transfer()
 {
-	m_TransferActive = false;
-	m_cd_state &= ~CD_STAT_TRANS;
-
 	if(m_dma_size != 0)
 	{
 		m_dr[0] = m_cd_state | ((m_dma_size >> 17) & 0xff);
 		m_dr[1] = (m_dma_size>>1) & 0xffff;
+
+		m_TransferActive = false;
+		m_cd_state &= ~CD_STAT_TRANS;
 	}
 	else
 	{
@@ -804,8 +803,10 @@ void segacdblock_device::cd_cmd_end_transfer()
 	m_dr[2] = 0;
 	m_dr[3] = 0;
 	
-	if(DeleteSectorMode == true)
+	if(DeleteSectorMode == true && m_dma_size != 0)
 	{
+		m_dma_size = 0;
+
 		if (transpart->size > 0)
 		{
 			INT32 i;
@@ -857,7 +858,6 @@ void segacdblock_device::cd_cmd_end_transfer()
 	else
 		set_flag(EHST);
 	
-	m_dma_size = 0;
 	set_flag(CMOK);
 }
 
@@ -1915,13 +1915,25 @@ void segacdblock_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				printf("FAD %08x %08x %04x %d\n",m_FAD,m_FADEnd,m_hirq,p_ok);
 
 			set_flag(CSCT);
-			cd_drdy_cb(true);
+				
+			printf("%d %d X\n",xfersect,xfersectnum);
 
 			if(p_ok)
 			{
 				m_FAD ++;
 				m_FADEnd --;
-				set_flag(SCDQ);
+				
+				if (xfersect < xfersectnum)
+				{
+					m_ext_drdy = false;
+					cd_drdy_cb(false);
+				}
+				else
+				{
+					m_ext_drdy = true;
+					cd_drdy_cb(true);
+					set_flag(SCDQ);
+				}
 
 				if(m_FADEnd <= 0)
 				{

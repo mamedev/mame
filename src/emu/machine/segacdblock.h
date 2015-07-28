@@ -282,6 +282,7 @@ private:
 	bool m_TempPause;
 	bool m_TOCPhase;
 	//bool m_BufferFull;
+	bool m_ext_drdy;
 	
 	void debug_cd_return_garbage_data();
 };

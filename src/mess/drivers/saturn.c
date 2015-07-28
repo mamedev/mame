@@ -103,17 +103,19 @@ WRITE_LINE_MEMBER(sat_console_state::cd_drdy_write_cb)
 {
 	m_cd_drdy_line = state;
 	
-	if(state == true)
+/*	if(state == true)
 	{
 		m_maincpu->sh2_notify_dma_data_available();
 		m_slave->sh2_notify_dma_data_available();
-	}
+	}*/
 }
 
 SH2_DMA_FIFO_DATA_AVAILABLE_CB(sat_console_state::cdblock_data_available_callback)
 {
 	if(src == 0x05818000)
 	{
+		if(m_cd_drdy_line == false)
+			debugger_break(machine());
 		return m_cd_drdy_line;
 	}
 	else if((src & 0x07f00000) == 0x05800000)
