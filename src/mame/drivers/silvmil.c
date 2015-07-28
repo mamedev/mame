@@ -15,8 +15,8 @@
 OSC on Silver Millennium are 12MHz, 14.31818MHz & 4.096MHz
 The above has been verified on two boards.
 
-OSC on World Puzzlove are 12MHz, 14.31818Mhz & 4Mhz
-OSC on Korean Puzzlove are 12MHz, 15MHz & 4Mhz
+OSC on World Puzzlove are 12MHz, 14.31818MHz & 4MHz
+OSC on Korean Puzzlove are 12MHz, 15MHz & 4MHz
 Only one example of each of these is known to exist so far.
 
 Very likely to be 'whatever crystals we had on hand which were close enough for the batch' situations.
