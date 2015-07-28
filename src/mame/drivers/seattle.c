@@ -2834,8 +2834,18 @@ ROM_START( calspeed )
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
-
 ROM_START( calspeeda )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
+	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
+
+	DISK_REGION( "ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */
+	DISK_IMAGE( "cs_10r8a", 0, SHA1(ba4e7589740e0647938c81c5082bb71d8826bad4) )
+
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
+	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+ROM_END
+
+ROM_START( calspeedb )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
@@ -2845,6 +2855,9 @@ ROM_START( calspeeda )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
+
+
+
 
 
 ROM_START( vaportrx )
@@ -3152,8 +3165,12 @@ GAME( 1996, mace,     0,        mace,              mace, seattle_state,     mace
 GAME( 1997, macea,    mace,     mace,              mace, seattle_state,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", GAME_SUPPORTS_SAVE )
 GAME( 1996, sfrush,   0,        sfrush,            sfrush, seattle_state,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", GAME_SUPPORTS_SAVE )
 GAME( 1996, sfrushrk, 0,        sfrushrk,          sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, calspeed, 0,        calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a, 4/17/98)", GAME_SUPPORTS_SAVE )
-GAME( 1998, calspeeda,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a 3/4/98)", GAME_SUPPORTS_SAVE )
+GAME( 1998, calspeed, 0,        calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, calspeeda,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, calspeedb,calspeed, calspeed,          calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", GAME_SUPPORTS_SAVE )
+
+
+
 GAME( 1998, vaportrx, 0,        vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", GAME_SUPPORTS_SAVE )
 GAME( 1998, vaportrxp,vaportrx, vaportrx,          vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", GAME_SUPPORTS_SAVE )
 
@@ -3163,7 +3180,7 @@ GAME( 1997, blitz,    0,        blitz,             blitz, seattle_state,    blit
 GAME( 1997, blitz11,  blitz,    blitz,             blitz, seattle_state,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", GAME_SUPPORTS_SAVE )
 GAME( 1998, blitz99,  0,        blitz99,           blitz99, seattle_state,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", GAME_SUPPORTS_SAVE )
 GAME( 1998, blitz99a, blitz99,  blitz99,           blitz99, seattle_state,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1999, blitz2k,  0,        blitz2k,           blitz99, seattle_state,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition", GAME_SUPPORTS_SAVE )
+GAME( 1999, blitz2k,  0,        blitz2k,           blitz99, seattle_state,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", GAME_SUPPORTS_SAVE )
 GAME( 1998, carnevil, 0,        carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", GAME_SUPPORTS_SAVE )
 GAME( 1998, carnevil1,carnevil, carnevil,          carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", GAME_SUPPORTS_SAVE )
 GAME( 1998, hyprdriv, 0,        hyprdriv,          hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", GAME_SUPPORTS_SAVE )
