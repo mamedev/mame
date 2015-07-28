@@ -86,6 +86,8 @@ public:
 	DECLARE_DRIVER_INIT(saturneu);
 	DECLARE_DRIVER_INIT(saturnjp);
 
+	SH2_DMA_FIFO_DATA_AVAILABLE_CB(cdblock_data_available_callback);
+
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	required_device<sat_cart_slot_device> m_exp;
@@ -94,6 +96,17 @@ public:
 	required_device<segacdblock_device> m_cdblock;
 };
 
+SH2_DMA_FIFO_DATA_AVAILABLE_CB(sat_console_state::cdblock_data_available_callback)
+{
+	if(src == 0x05818000)
+	{
+		return 0;
+	}
+	else if((src & 0x07f00000) == 0x05800000)
+		printf("DMA callback %08x\n",src);
+
+	return 1;
+}
 
 READ8_MEMBER(sat_console_state::saturn_cart_type_r)
 {
@@ -712,11 +725,13 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_SH2_IS_SLAVE(0)
+	MCFG_SH2_FIFO_DATA_AVAIL_CB(sat_console_state, cdblock_data_available_callback)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sat_console_state, saturn_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
 	MCFG_SH2_IS_SLAVE(1)
+	MCFG_SH2_FIFO_DATA_AVAIL_CB(sat_console_state, cdblock_data_available_callback)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", sat_console_state, saturn_slave_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
