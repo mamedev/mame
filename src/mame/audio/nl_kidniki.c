@@ -15,14 +15,6 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
-#define LM324_DIP(_name)            			                              \
-		NET_REGISTER_DEV(LM324_DIP, _name)
-
-#define LM358_DIP(_name)            			                              \
-		NET_REGISTER_DEV(LM358_DIP, _name)
-
-NETLIST_EXTERNAL(kidniki_lib)
-
 #endif
 
 /* ----------------------------------------------------------------------------
@@ -40,9 +32,6 @@ NETLIST_START(kidniki_schematics)
 	// SHEET NAME:/
 	// IGNORED O_AUDIO0: O_AUDIO0  49 0
 	// .END
-
-	LOCAL_SOURCE(kidniki_lib)
-	INCLUDE(kidniki_lib)
 
 	/*
 	 * Workaround: The simplified opamp model does not correctly
@@ -316,131 +305,3 @@ NETLIST_START(kidniki_schematics)
 	NET_C(R26.2, C29.2, GND)
 
 NETLIST_END()
-
-/* ----------------------------------------------------------------------------
- *  Library section body START
- * ---------------------------------------------------------------------------*/
-
-NETLIST_START(opamp)
-
-	/* Opamp model from
-	 *
-	 * http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
-	 *
-	 * Bandwidth 1Mhz
-	 *
-	 */
-
-	/* Terminal definitions for calling netlists */
-
-	ALIAS(PLUS, G1.IP) // Positive input
-	ALIAS(MINUS, G1.IN) // Negative input
-	ALIAS(OUT, EBUF.OP) // Opamp output ...
-
-	ALIAS(GND, EBUF.ON) // GND terminal
-	ALIAS(VCC, DUMMY.I) // VCC terminal
-	DUMMY_INPUT(DUMMY)
-
-	/* The opamp model */
-
-	VCCS(G1)
-	PARAM(G1.RI, RES_K(1000))
-#if 1
-	PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
-	RES(RP1, 1000)
-	CAP(CP1, 1.59e-5)   // <== change to 1.59e-3 for 10Khz bandwidth
-#else
-	PARAM(G1.G, 1)  // typical OP-AMP amplification 100 * 1000 = 100000
-	RES(RP1, 100000)
-	CAP(CP1, 1.59e-7)   // <== change to 1.59e-3 for 10Khz bandwidth
-#endif
-	VCVS(EBUF)
-	PARAM(EBUF.RO, 50)
-	PARAM(EBUF.G, 1)
-
-//    PARAM(EBUF.RI, 1e20)
-//    NET_C(EBUF.ON, GND)
-
-	NET_C(G1.ON, GND)
-	NET_C(RP1.2, GND)
-	NET_C(CP1.2, GND)
-	NET_C(EBUF.IN, GND)
-
-	NET_C(RP1.1, G1.OP)
-	NET_C(CP1.1, RP1.1)
-
-	DIODE(DP,"1N914")
-	DIODE(DN,"1N914")
-
-	NET_C(DP.K, VCC)
-#if 1
-	NET_C(DP.A, DN.K, RP1.1)
-#else
-	RES(RDP, 1000)
-	RES(RDN, 1000)
-	NET_C(RDP.1, DP.A)
-	NET_C(RDN.1, DN.K)
-	NET_C(RDP.2, RDN.2, RP1.1)
-#endif
-	NET_C(DN.A, GND)
-
-	NET_C(EBUF.IP, RP1.1)
-
-NETLIST_END()
-
-NETLIST_START(LM324_DIP)
-	SUBMODEL(opamp, op1)
-	SUBMODEL(opamp, op2)
-	SUBMODEL(opamp, op3)
-	SUBMODEL(opamp, op4)
-
-	ALIAS( 1, op1.OUT)
-	ALIAS( 2, op1.MINUS)
-	ALIAS( 3, op1.PLUS)
-
-	ALIAS( 7, op2.OUT)
-	ALIAS( 6, op2.MINUS)
-	ALIAS( 5, op2.PLUS)
-
-	ALIAS( 8, op3.OUT)
-	ALIAS( 9, op3.MINUS)
-	ALIAS(10, op3.PLUS)
-
-	ALIAS(14, op4.OUT)
-	ALIAS(13, op4.MINUS)
-	ALIAS(12, op4.PLUS)
-
-	NET_C(op1.GND, op2.GND, op3.GND, op4.GND)
-	NET_C(op1.VCC, op2.VCC, op3.VCC, op4.VCC)
-
-	ALIAS(11, op1.GND)
-	ALIAS( 4, op1.VCC)
-NETLIST_END()
-
-NETLIST_START(LM358_DIP)
-	SUBMODEL(opamp, op1)
-	SUBMODEL(opamp, op2)
-
-	ALIAS( 1, op1.OUT)
-	ALIAS( 2, op1.MINUS)
-	ALIAS( 3, op1.PLUS)
-
-	ALIAS( 7, op2.OUT)
-	ALIAS( 6, op2.MINUS)
-	ALIAS( 5, op2.PLUS)
-
-
-	NET_C(op1.GND, op2.GND)
-	NET_C(op1.VCC, op2.VCC)
-
-	ALIAS( 4, op1.GND)
-	ALIAS( 8, op1.VCC)
-NETLIST_END()
-
-NETLIST_START(kidniki_lib)
-
-	LOCAL_LIB_ENTRY(LM324_DIP)
-	LOCAL_LIB_ENTRY(LM358_DIP)
-
-NETLIST_END()
-
