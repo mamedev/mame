@@ -876,6 +876,29 @@ ROM_START( vautour )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
+ROM_START( vautourza )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.e1",  0x0000, 0x0800, CRC(cd2807ee) SHA1(79b9769f212d25b9ccb5124e2aa632c964c14a0b) )
+	ROM_LOAD( "2.f1",  0x0800, 0x0800, CRC(3699b11a) SHA1(7122685cbfcd75898eaa68f8c5bf87c11df59a3b) )
+	ROM_LOAD( "3.h1",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "4.j1",  0x1800, 0x0800, CRC(106262eb) SHA1(1e52ca66ea3542d86f2604f5aadc854ffe22fd89) )
+	ROM_LOAD( "5.k1",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "6.h1",  0x2800, 0x0800, CRC(1fcac707) SHA1(ea10a1c94d8cf49391a4d393ccef56ae3b9458b1) )
+	ROM_LOAD( "7.m1",  0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
+	ROM_LOAD( "8.n1",  0x3800, 0x0800, CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "10.h2",     0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "9.j2",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "12.h4",  0x0000, 0x0800, CRC(8eff75c9) SHA1(d38a0e0c02ba680984dd8748a3c45ac55f81f127) )
+	ROM_LOAD( "11.j4",  0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s135.m9",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )  /* expanded in init (upper nibbles are the ic40 data, lower nibbles ic41 data) */
+ROM_END
+
 ROM_START( falconz )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "f45.bin",      0x0000, 0x0800, CRC(9158b43b) SHA1(222cbcfb3f95d09bb90148813541c2613d8b7e1c) )
@@ -1323,6 +1346,17 @@ DRIVER_INIT_MEMBER(phoenix_state,condor)
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x5000, 0x5000, "DSW1");
 }
 
+DRIVER_INIT_MEMBER(phoenix_state,vautourza)
+{
+	UINT8 *rgn          =   memregion("proms")->base();
+
+	// expand the 8-bit PROM into the same layout as the 4-bit PROMs used by most versions of the game
+	for (int i = 0; i < 0x100; i++)
+	{
+		rgn[i] = (rgn[i + 0x100] & 0xf0) >> 4;
+		rgn[i + 0x100] &= 0x0f;
+	}
+}
 
 /*** Phoenix (& clones) ***/
 GAME( 1980, phoenix,  0,        phoenix,  phoenix, driver_device,  0,        ROT90, "Amstar",                            "Phoenix (Amstar)", GAME_SUPPORTS_SAVE )
@@ -1342,6 +1376,8 @@ GAME( 1980, falcon,   phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT
 GAME( 1980, vautour,  phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg (Jeutel)",                  "Vautour (bootleg of Phoenix) (8085A CPU)", GAME_SUPPORTS_SAVE )
 GAME( 1980, falconz,  phoenix,  condor,   falconz, driver_device,  0,        ROT90, "bootleg",                           "Falcon (bootleg of Phoenix) (Z80 CPU)", GAME_SUPPORTS_SAVE )
 GAME( 1980, vautourz, phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg",                           "Vautour (bootleg of Phoenix) (Z80 CPU)", GAME_SUPPORTS_SAVE )
+GAME( 1980, vautourza,phoenix,  condor ,  phoenixt, phoenix_state,   vautourza,ROT90, "bootleg (Jeutel)",                  "Vautour (bootleg of Phoenix) (Z80 CPU, single PROM)", GAME_SUPPORTS_SAVE )
+
 // fenix is an italian bootleg based on vautourz
 GAME( 1980, fenix,    phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg",                           "Fenix (bootleg of Phoenix)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1980, griffon,  phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg (Videotron)",               "Griffon (bootleg of Phoenix)", GAME_SUPPORTS_SAVE )
