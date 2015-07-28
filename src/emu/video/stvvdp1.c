@@ -1953,7 +1953,7 @@ void saturn_state::stv_vdp1_process_list( void )
 					break;
 
 				case 0x0005:
-//              case 0x0007: // mirror? Baroque uses it, crashes for whatever reason
+				case 0x0007: // mirror? Baroque uses it, crashes for whatever reason. Samurai Spirits IV also uses it for HP bars during gameplay.
 					if (VDP1_LOG) logerror ("Sprite List Polyline\n");
 					stv2_current_sprite.ispoly = 1;
 					stv_vdp1_draw_poly_line(*cliprect);
@@ -1982,6 +1982,7 @@ void saturn_state::stv_vdp1_process_list( void )
 					m_vdp1.local_y = (INT16)stv2_current_sprite.CMDYA;
 					break;
 
+				// 0xc used by Samurai Spirits IV after game over & data save screen
 				default:
 					popmessage ("VDP1: Sprite List Illegal %02x, contact MAMEdev",stv2_current_sprite.CMDCTRL & 0xf);
 					m_vdp1.lopr = (position * 0x20) >> 3;

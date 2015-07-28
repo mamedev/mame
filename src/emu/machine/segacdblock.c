@@ -215,6 +215,7 @@ READ32_MEMBER(segacdblock_device::datatrns32_r)
 	res = -1;
 	if(xfertype == CDDMA_INPROGRESS)
 	{
+		printf("%d %d %d %d\n",xfersect,xfersectnum,xferoffs,m_dma_size);
 		if (xfersect < xfersectnum)
 		{
 			// get next longword
