@@ -2446,9 +2446,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
+
+
+
 ROM_START( gauntleg )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.5 11/17/1998 */
-	ROM_LOAD( "legend15.bin", 0x000000, 0x80000, CRC(a8372d70) SHA1(d8cd4fd4d7007ee38bb58b5a818d0f83043d5a48) )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )
+	ROM_LOAD( "legend15.bin", 0x000000, 0x80000, CRC(a8372d70) SHA1(d8cd4fd4d7007ee38bb58b5a818d0f83043d5a48) ) // EPROM Boot code. Version: Nov 17 1998 19:18:28 / 1.5 Nov 17 1998 19:21:49
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.5 1/14/1999 Game 1/14/1999 */
 	DISK_IMAGE( "gauntleg", 0, SHA1(66eb70e2fba574a7abe54be8bd45310654b24b08) )
@@ -2459,8 +2462,9 @@ ROM_END
 
 
 ROM_START( gauntleg12 )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 1.3 9/25/1998 */
-	ROM_LOAD( "legend12.bin", 0x000000, 0x80000, CRC(34674c5f) SHA1(92ec1779f3ab32944cbd953b6e1889503a57794b) )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )
+	ROM_LOAD( "legend13.bin", 0x000000, 0x80000, CRC(34674c5f) SHA1(92ec1779f3ab32944cbd953b6e1889503a57794b) ) //  EPROM Boot code. Version: Sep 25 1998 18:34:43 / 1.3 Sep 25 1998 18:33:45
+	ROM_LOAD( "legend14.bin", 0x000000, 0x80000, CRC(66869402) SHA1(bf470e0b9198b80f8baf8b9432a7e1df8c7d18ca) ) //  EPROM Boot code. Version: Oct 30 1998 17:48:21 / 1.4 Oct 30 1998 17:44:29
 
 	DISK_REGION( "ide:0:hdd:image" )    /* Guts 1.4 10/22/1998 Main 10/23/1998 */
 	DISK_IMAGE( "gauntl12", 0, SHA1(c8208e3ce3b02a271dc6b089efa98dd996b66ce0) )
