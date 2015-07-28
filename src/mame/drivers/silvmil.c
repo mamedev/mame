@@ -499,6 +499,28 @@ ROM_START( puzzlove )
 	ROM_LOAD16_BYTE( "8.u56", 0x100001, 0x80000, CRC(037dcd3d) SHA1(fcdf604710518982e0b4acc81a56fa703d0c9407) )
 ROM_END
 
+ROM_START( puzzlovek )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "3.U3", 0x00000, 0x40000, CRC(82ec8472) SHA1(e4f1a9fa0431de840d6fce466e09098a8d601660) )
+	ROM_LOAD16_BYTE( "4.U2", 0x00001, 0x40000, CRC(64edc708) SHA1(e0b29f8cd5dd654be34452fd197a77abc872e63d) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* z80  */
+	ROM_LOAD( "1.U202", 0x00000, 0x20000, CRC(3077eef3) SHA1(e2bf6e4a2166e1851486a801e74a7ec0d4599c28) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
+	ROM_LOAD( "2.U211", 0x00000, 0x40000, CRC(4c06ee68) SHA1(3cfcaec98e73c65a45b65d43e012c5529572c057) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "10.U41",  0x000000, 0x80000, CRC(7200e878) SHA1(2ec6389f802f6e0af0210e2b01788914c0eb1d04) )
+	ROM_LOAD16_BYTE( "9.U42",   0x000001, 0x80000, CRC(21b1e297) SHA1(0fe89d1c62d0f79b1379e4444b119bdc4cc70cfb) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "5.U53", 0x000000, 0x80000, CRC(8707dea0) SHA1(05e80ac34982a4e4768b7f3fccd2e557ca4b2545) )
+	ROM_LOAD16_BYTE( "6.U54", 0x000001, 0x80000, CRC(60a6de14) SHA1(06e3c08c51d6b3a05373c9999f01b0b8d23a1c89) )
+	ROM_LOAD16_BYTE( "7.U55", 0x100000, 0x80000, CRC(0f2eaec4) SHA1(4ce46fc6272e3cc14dfdcd7831157433ee7cf247) )
+	ROM_LOAD16_BYTE( "8.U56", 0x100001, 0x80000, CRC(037dce3d) SHA1(fcef604710518982e0b4acc81a56fa703d0c9407) )
+ROM_END
+
 void silvmil_state::tumblepb_gfx1_rearrange()
 {
 	UINT8 *rom = memregion("gfx1")->base();
@@ -525,5 +547,6 @@ DRIVER_INIT_MEMBER(silvmil_state,silvmil)
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1995, silvmil,  0, silvmil, silvmil, silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", GAME_SUPPORTS_SAVE )
-GAME( 1994, puzzlove, 0, puzzlove,puzzlove,silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", GAME_SUPPORTS_SAVE )
+GAME( 1995, silvmil,	0,		silvmil, silvmil, silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", GAME_SUPPORTS_SAVE )
+GAME( 1994, puzzlove,	0,		puzzlove,puzzlove,silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", GAME_SUPPORTS_SAVE )
+GAME( 1994, puzzlovek,	puzzlovek,	puzzlove,puzzlove,silvmil_state, silvmil, ROT0,   "Para", "PuzzLove (Korea)", GAME_SUPPORTS_SAVE )
