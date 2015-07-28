@@ -13,7 +13,7 @@
   This is a board game, it obviously requires game pieces and the board.
   The emulated part is the centerpiece, a black tower with a rotating card
   panel and LED digits for displaying health, amount of gold, etc. As far
-  as MESS is concerned, the game works fine.
+  as MAME is concerned, the game works fine.
 
   To start up the game, first press [MOVE], the machine now does a self-test.
   Then select level and number of players and the game will start. Read the

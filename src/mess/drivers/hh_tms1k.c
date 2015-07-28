@@ -78,7 +78,7 @@
  *M95041   ?        1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
  @CD7282SL TMS1100  1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
 
-  (* denotes not yet emulated by MESS, @ denotes it's in this driver)
+  (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 
   TODO:
@@ -911,7 +911,7 @@ MACHINE_CONFIG_END
   This is a head to head electronic tabletop LED-display sports console.
   One cartridge(Football) was included with the console, the other three were
   sold in a pack. Gameplay has emphasis on strategy, read the official manual
-  on how to play. Remember that you can rotate the view in MESS: rotate left
+  on how to play. Remember that you can rotate the view in MAME: rotate left
   for Home(P1) orientation, rotate right for Visitor(P2) orientation.
 
   Cartridge socket:
@@ -1076,7 +1076,7 @@ MACHINE_CONFIG_END
   are denoted by words ("left", "center", "short", etc), and an alternate one
   with little guys drawn next to the LEDs.
 
-  lamp translation table: led LDzz from game PCB = MESS lampyx:
+  lamp translation table: led LDzz from game PCB = MAME lampyx:
 
     LD0  = -        LD10 = lamp12   LD20 = lamp42   LD30 = lamp60
     LD1  = lamp23   LD11 = lamp4    LD21 = lamp41   LD31 = lamp61
@@ -1209,7 +1209,7 @@ MACHINE_CONFIG_END
   The sequel to Entex Baseball, this version keeps up with score and innings.
   As its predecessor, the pitcher controls are on a separate joypad.
 
-  lamp translation table: led zz from game PCB = MESS lampyx:
+  lamp translation table: led zz from game PCB = MAME lampyx:
 
     00 = -        10 = lamp94   20 = lamp74   30 = lamp50
     01 = lamp53   11 = lamp93   21 = lamp75   31 = lamp51
@@ -1335,7 +1335,7 @@ MACHINE_CONFIG_END
   This is another improvement over Entex Baseball, where gameplay is a bit more
   varied. Like the others, the pitcher controls are on a separate joypad.
 
-  lamp translation table: led zz from game PCB = MESS lampyx:
+  lamp translation table: led zz from game PCB = MAME lampyx:
   note: unlabeled panel leds are listed here as Sz, Bz, Oz, Iz, z left-to-right
 
     00 = -        10 = lamp75   20 = lamp72
@@ -1517,7 +1517,7 @@ MACHINE_CONFIG_END
   TMS1100, the second more widespread release runs on a COP400. There are
   also differences with the overlay mask.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -1748,7 +1748,7 @@ MACHINE_CONFIG_END
   * TMS1100 6010 MP1218 (die also labeled MP1218)
   * 4 7seg LEDs, and other LEDs behind bezel, 1bit sound
 
-  lamp translation table: led zz from game PCB = MESS lampyx:
+  lamp translation table: led zz from game PCB = MAME lampyx:
 
     11 = lamp90   21 = lamp91   31 = lamp92   41 = lamp93   51 = lamp95
     12 = lamp80   22 = lamp81   32 = lamp82   42 = lamp83   52 = lamp85
@@ -1873,7 +1873,7 @@ MACHINE_CONFIG_END
   * TMS1100 MP1221 (die labeled MP1221)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1bit sound
 
-  lamp translation table: led zz from game PCB = MESS lampyx:
+  lamp translation table: led zz from game PCB = MAME lampyx:
 
     0 = -          10 = lamp44     20 = lamp53     30 = lamp95     40 = lamp92
     1 = lamp30     11 = lamp45     21 = lamp54     31 = lamp85     41 = lamp93
@@ -1886,7 +1886,7 @@ MACHINE_CONFIG_END
     8 = lamp42     18 = lamp73     28 = lamp84     38 = lamp82
     9 = lamp43     19 = -          29 = lamp94     39 = lamp83
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 ***************************************************************************/
 
@@ -3684,7 +3684,7 @@ READ8_MEMBER(bankshot_state::read_k)
 // config
 
 /* physical button layout and labels is like this:
-  (note: remember that you can rotate the display in MESS)
+  (note: remember that you can rotate the display in MAME)
 
     [SELECT  [BALL UP] [BALL OVER]
      SCORE]
@@ -4019,7 +4019,7 @@ MACHINE_CONFIG_END
   - Japan: Block Attack
   - UK: Break-In
 
-  lamp translation table: led zz from game PCB = MESS lampyx:
+  lamp translation table: led zz from game PCB = MAME lampyx:
 
     00 = -         10 = lamp50    20 = lamp42
     01 = lamp70    11 = lamp51    21 = lamp33
@@ -4619,5 +4619,5 @@ CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tan
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", GAME_SUPPORTS_SAVE )
 
-// ***: As far as MESS is concerned, the game is emulated fine. But for it to be playable, it requires interaction
+// ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

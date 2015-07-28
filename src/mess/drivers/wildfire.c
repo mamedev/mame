@@ -9,7 +9,7 @@
   to create the illusion of a moving ball, and even the flippers are leds.
   A drawing of a pinball table is added as overlay.
 
-  NOTE!: MESS external artwork is recommended
+  NOTE!: MAME external artwork is recommended
 
 
   TODO:
@@ -90,7 +90,7 @@ inline bool wildfire_state::index_is_7segled(int index)
 	return (index < 3);
 }
 
-// lamp translation table: Lzz from patent US4334679 FIG.4 = MESS lampxxy,
+// lamp translation table: Lzz from patent US4334679 FIG.4 = MAME lampxxy,
 // where xx is led column and y is led row, eg. lamp103 is output A10 D3
 // (note: 2 mistakes in the patent: the L19 between L12 and L14 should be L13, and L84 should of course be L48)
 /*
